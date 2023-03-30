@@ -138,6 +138,7 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
     // evaluate stress
     FEElasticMaterial* emat = GetBaseMaterial();
     mat3ds s = emat->Stress(mp);
+    //mat3ds s = mat3d(Fgi * emat->Stress(mp) * Fgi.transpose()).sym();
     // restore safe copy
     pt.m_F = F;
     pt.m_J = J;

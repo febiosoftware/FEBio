@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FEElasticShellDomainOld.h"
 #include "FEElasticEASShellDomain.h"
 #include "FEElasticANSShellDomain.h"
+#include <FEBioMix/FEMultiphasicSolidDomain.h>
 #include "FEElasticMixture.h"
 #include "FEElasticMultigeneration.h"
 #include "FEUT4Domain.h"
@@ -67,6 +68,11 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FETrussDomain.h>
 #include <FECore/FEElement.h>
+#include "FEKinematicGrowth.h"
+#include <iostream>
+#include <FECore/log.h>
+#include <FECore/mathalg.h>
+#include <FECore/fecore_enum.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -3938,3 +3944,223 @@ bool FEPlotTrussStretch::Save(FEDomain& dom, FEDataStream& a)
 	}
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthRatio::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
+	// Check if we were successful.
+	if (kg == nullptr) return false;
+	FEGrowthTensor* pmf = kg->GetGrowthMaterial();
+	//FEVolumeGrowth* vg = dynamic_cast<FEVolumeGrowth*>(pmf);
+	if (pmf == nullptr) return false;
+	//if (vg == nullptr) return false;
+	// For each element get the growth tensor and then solve the average value.
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double g = 0.0;
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+			g += 1.0 + pmf->m_gm(pt) * pmf->SpeciesGrowth(pt);
+		}
+		g /= (double)el.GaussPoints();
+		a << g;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthTensor::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
+	// Check if we were successful.
+	if (kg == nullptr) return false;
+	FEGrowthTensor* pmf = kg->GetGrowthMaterial();
+	//FEVolumeGrowth* vg = dynamic_cast<FEVolumeGrowth*>(pmf);
+	if (pmf == nullptr) return false;
+	// For each element get the growth tensor and then solve the average value.
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FESolidElement& se = dynamic_cast<FESolidElement&>(dom.ElementRef(i));
+
+		std::vector<mat3ds> SPDs_gausspts;
+		// determine shape function value for the local position
+		// Get the interpolated SPD from the shape function-weighted Average Structure Tensor
+		for (int j = 0; j < se.GaussPoints(); ++j) {
+			FEMaterialPoint& pt = *se.GetMaterialPoint(j);
+			vec3d n0 = pmf->m_fiber->unitVector(pt);
+			mat3d gt = pmf->GrowthTensor(pt, n0);
+			mat3ds gts = gt.sym();
+			SPDs_gausspts.push_back(gts);
+		}
+
+		// array containing the SPD for each node in the element
+		mat3ds SPDs_nodes[FESolidElement::MAX_NODES];
+		// array for the shape function values
+		double H[FESolidElement::MAX_NODES];
+		// project the spds from integration points to the nodes
+		se.project_to_nodes(&SPDs_gausspts[0], SPDs_nodes);
+		double centerv;
+		switch (se.Type())
+		{
+		case FE_Element_Type::FE_HEX8G8:
+		case FE_Element_Type::FE_HEX8RI:
+		case FE_Element_Type::FE_HEX8G1:
+		case FE_Element_Type::FE_HEX20G8:
+		case FE_Element_Type::FE_HEX20G27:
+		case FE_Element_Type::FE_HEX27G27:
+		{
+			centerv = 0.0;
+		}
+		case FE_Element_Type::FE_TET4G1:
+		case FE_Element_Type::FE_TET4G4:
+		case FE_Element_Type::FE_TET5G4:
+		case FE_Element_Type::FE_TET10G1:
+		case FE_Element_Type::FE_TET10G4:
+		case FE_Element_Type::FE_TET10G8:
+		case FE_Element_Type::FE_TET10GL11:
+		case FE_Element_Type::FE_TET10G4RI1:
+		case FE_Element_Type::FE_TET10G8RI4:
+		case FE_Element_Type::FE_TET15G4:
+		case FE_Element_Type::FE_TET15G8:
+		case FE_Element_Type::FE_TET15G11:
+		case FE_Element_Type::FE_TET15G15:
+		case FE_Element_Type::FE_TET15G15RI4:
+		case FE_Element_Type::FE_TET20G15:
+		case FE_Element_Type::FE_PENTA6G6:
+		case FE_Element_Type::FE_PENTA15G8:
+		case FE_Element_Type::FE_PENTA15G21:
+		case FE_Element_Type::FE_PYRA5G8:
+		case FE_Element_Type::FE_PYRA13G8:
+		{
+			centerv = 0.5;
+		}
+		default:
+		{
+			break;
+		}
+		}	
+		se.shape_fnc(H, centerv, centerv, centerv);
+		mat3ds g = weightedAverageStructureTensor(SPDs_nodes, H, se.Nodes());
+		a << g;
+	}
+	return true;
+}
+
+//=============================================================================
+// Stress traces
+
+bool FEPlotTraceStresses::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		mat3ds s = mat3ds(0.0);
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint* mp = el.GetMaterialPoint(j);
+			const FEElasticMaterialPoint* ep = mp->ExtractData<FEElasticMaterialPoint>();
+			s += ep->m_s + mat3dd(1.0) * ep->m_p;
+		}
+		s /= (double)el.GaussPoints();
+		a << s.tr();
+	}
+	return true;
+};
+
+bool FEPlotTraceStressesAbs::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		mat3ds s = mat3ds(0.0);
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint* mp = el.GetMaterialPoint(j);
+			const FEElasticMaterialPoint* ep = mp->ExtractData<FEElasticMaterialPoint>();
+			s += ep->m_s + mat3dd(1.0) * ep->m_p;
+		}
+		s /= (double)el.GaussPoints();
+		a << fabs(s.tr());
+	}
+	return true;
+};
+
+bool FEPlotTraceSolidStressesAbs::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		mat3ds s = mat3ds(0.0);
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint* mp = el.GetMaterialPoint(j);
+			const FEElasticMaterialPoint* ep = mp->ExtractData<FEElasticMaterialPoint>();
+			s += ep->m_s;
+		}
+		s /= (double)el.GaussPoints();
+		a << fabs(s.tr());
+	}
+	return true;
+};
+
+bool FEPlotGrowthElasticDeformationGradient::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
+	// Check if we were successful.
+	if (kg == nullptr) return false;
+	FEGrowthTensor* gmat = kg->GetGrowthMaterial();
+	//FEVolumeGrowth* vg = dynamic_cast<FEVolumeGrowth*>(pmf);
+	if (gmat == nullptr) return false;
+	//if (vg == nullptr) return false;
+	// For each element get the growth tensor and then solve the average value.
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		mat3d g = mat3dd(1.0);
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			// Get the growth tensor inverse
+			
+			mat3d Q = gmat->GetLocalCS(mp);
+			
+			// get the fiber vector in local coordinates
+			vec3d fiber = gmat->m_fiber->unitVector(mp);
+			// convert to global coordinates
+			vec3d a0 = Q * fiber;
+
+			mat3d Fgi = gmat->GrowthTensorInverse(mp, a0);
+			double Jgi = Fgi.det();
+
+			// Get the deformation gradient and evaluate elastic deformation
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			mat3d Fe = pt.m_F * Fgi;
+			double Je = pt.m_J * Jgi;
+			// keep safe copy of deformation gradient.
+			mat3d F = pt.m_F;
+			double J = pt.m_J;
+			// substitute elastic deformation in material point
+			pt.m_F = Fe;
+			pt.m_J = Je;
+			// evaluate stress
+			FEElasticMaterial* emat = kg->GetBaseMaterial();
+			tens4ds c = emat->Tangent(mp);
+			// restore safe copy
+			pt.m_F = F;
+			pt.m_J = J;
+		}
+		g /= (double)el.GaussPoints();
+		a << g;
+	}
+	return true;
+};

@@ -66,7 +66,7 @@ public:
     //! get the elastic base material
     FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
     
-    //! get the elastic base material
+    //! get the growth tensor base material
     FEGrowthTensor* GetGrowthMaterial() { return m_pGrowth; }
     
     //! Returns the Cauchy stress

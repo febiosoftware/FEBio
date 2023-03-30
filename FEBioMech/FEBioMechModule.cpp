@@ -809,6 +809,12 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotStrongBondDevSED, "deviatoric strong bond SED");
     REGISTER_FECORE_CLASS(FEPlotWeakBondDevSED, "deviatoric weak bond SED");
     REGISTER_FECORE_CLASS(FEPlotTrussStretch  , "truss stretch");
+	REGISTER_FECORE_CLASS(FEPlotGrowthRatio, "growth ratio");
+	REGISTER_FECORE_CLASS(FEPlotGrowthTensor, "growth tensor");
+	REGISTER_FECORE_CLASS(FEPlotTraceStresses, "stress trace");
+	REGISTER_FECORE_CLASS(FEPlotTraceStressesAbs, "stress trace absolute");
+	REGISTER_FECORE_CLASS(FEPlotTraceSolidStressesAbs, "solid stress trace absolute");
+
 
 
 	// 2O continuum fields

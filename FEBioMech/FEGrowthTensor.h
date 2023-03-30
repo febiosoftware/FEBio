@@ -55,11 +55,23 @@ public:
     //! strain-energy density
     double FiberStrainEnergyDensity(FEMaterialPoint& pt, const vec3d& a0) override { return 0; }
     
+    double SoluteConcentration(FEMaterialPoint& pt);
+
+    double SBMConcentration(FEMaterialPoint& pt);
+
+    double Multiplier(FEMaterialPoint& pt, const vec3d& a0) { };
+
+    double SpeciesGrowth(FEMaterialPoint& pt);
+
     //! initialize
     bool Init() override;
     
 public:
     FEVec3dValuator* m_fiber;
+    FEParamDouble   m_gm;       //! isotropic growth multiplier
+    //!SL: temporary place holder. Intent is to allow scaling by value of some state variable. In this case we are saying SBM id number to identify which SBM to base growth on. Will implement general solution later for more options.
+    int             m_sbm_id = -1;   //! Which sbm should be used? Optional for now...
+    int             m_sol_id = -1;
 
     DECLARE_FECORE_CLASS();
 };
@@ -83,10 +95,9 @@ public:
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
 
 public:
-    FEParamDouble   m_gm;       //! isotropic growth multiplier
     
     // declare the parameter list
-    DECLARE_FECORE_CLASS();
+    //DECLARE_FECORE_CLASS();
 
 };
 
@@ -94,7 +105,7 @@ class FEElasticVolumeGrowth : public FEElasticFiberMaterial_T<FEVolumeGrowth>
 {
 public:
     FEElasticVolumeGrowth(FEModel* fem) : FEElasticFiberMaterial_T<FEVolumeGrowth>(fem) {}
-    DECLARE_FECORE_CLASS();
+    //DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -116,10 +127,10 @@ public:
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
     
 public:
-    FEParamDouble   m_gm;       //! growth multiplier
-
+    FEVec3dValuator* m_fiber_0;
+    FEVec3dValuator* m_fiber_1;
     // declare the parameter list
-    DECLARE_FECORE_CLASS();
+    //DECLARE_FECORE_CLASS();
 
 };
 
@@ -127,7 +138,7 @@ class FEElasticAreaGrowth : public FEElasticFiberMaterial_T<FEAreaGrowth>
 {
 public:
     FEElasticAreaGrowth(FEModel* fem) : FEElasticFiberMaterial_T<FEAreaGrowth>(fem) {}
-    DECLARE_FECORE_CLASS();
+    //DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -149,10 +160,9 @@ public:
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
     
 public:
-    FEParamDouble   m_gm;       //! growth multiplier
 
     // declare the parameter list
-    DECLARE_FECORE_CLASS();
+    // DECLARE_FECORE_CLASS();
 
 };
 
@@ -160,5 +170,5 @@ class FEElasticFiberGrowth : public FEElasticFiberMaterial_T<FEFiberGrowth>
 {
 public:
     FEElasticFiberGrowth(FEModel* fem) : FEElasticFiberMaterial_T<FEFiberGrowth>(fem) {}
-    DECLARE_FECORE_CLASS();
+    //DECLARE_FECORE_CLASS();
 };

@@ -52,6 +52,7 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEReaction(pfem)
     m_Vbar = 0.0;
 	m_Vovr = false; 
     m_nsol = -1;
+    m_nsbm = -1;
 
 	m_pFwd = m_pRev = 0;
 }
@@ -75,6 +76,7 @@ bool FEChemicalReaction::Init()
 
 	// initialize the stoichiometric coefficients to zero
 	m_nsol = nsol;
+    m_nsbm = nsbm;
 	m_vR.assign(ntot, 0);
 	m_vP.assign(ntot, 0);
 	m_v.assign(ntot, 0);

@@ -128,6 +128,7 @@ public:
 	
 public:
 	int				m_nsol;		//!< number of solutes in the mixture
+    int             m_nsbm;     //!< number of sbms in the mixture
 	vector<int>		m_vR;		//!< stoichiometric coefficients of reactants
 	vector<int>		m_vP;		//!< stoichiometric coefficients of products
 	vector<int>		m_v;		//!< net stoichiometric coefficients of reactants and products

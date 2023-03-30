@@ -59,6 +59,9 @@ SOFTWARE.*/
 #include "FECarterHayes.h"
 #include "FEReactionRateConst.h"
 #include "FEReactionRateHuiskes.h"
+#include "FEReactionRatePositional.h"
+#include "FEReactionRatePositionalZ.h"
+#include "FEReactionRatePositionalStress.h"
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
 #include "FEMembraneReactionRateConst.h"
@@ -74,6 +77,11 @@ SOFTWARE.*/
 #include "FEMembraneMassActionReversible.h"
 #include "FEActiveConstantSupply.h"
 #include "FEPorousNeoHookean.h"
+#include "FEHillActivation.h"
+#include "FEHillInhibition.h"
+#include "FEHillActivationANDActivation.h"
+#include "FEHillActivationANDInhibition.h"
+#include "FEHillActivationORActivation.h"
 
 #include "FEPoroTraction.h"
 #include "FEFluidFlux.h"
@@ -115,6 +123,8 @@ SOFTWARE.*/
 #include "FEPrescribedNodalFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
+#include "FEPrescribedPositionalConcentration.h"
+#include "FEPrescribedStressConcentration.h"
 
 #include "FEInitialFluidPressure.h"
 #include "FEInitialConcentration.h"
@@ -324,6 +334,8 @@ void FEBioMix::InitModule()
 	// boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
 	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
+	REGISTER_FECORE_CLASS(FEPrescribedPositionalConcentration, "prescribed positional concentration");
+	REGISTER_FECORE_CLASS(FEPrescribedStressConcentration, "prescribed stress-sensitive concentration");
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
@@ -425,6 +437,9 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberPowLinearSBM                 , "fiber-pow-linear sbm");
 	REGISTER_FECORE_CLASS(FEReactionRateConst		    	  , "constant reaction rate"    );
 	REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  , "Huiskes reaction rate"     );
+	REGISTER_FECORE_CLASS(FEReactionRatePositional			  , "Positional reaction rate"	);
+	REGISTER_FECORE_CLASS(FEReactionRatePositionalZ			  , "Z Positional reaction rate");
+	REGISTER_FECORE_CLASS(FEReactionRatePositionalStress	  , "Positional Stress reaction rate");
 	REGISTER_FECORE_CLASS(FEReactionRateNims		    	  , "Nims reaction rate"        );
 	REGISTER_FECORE_CLASS(FEReactionRateExpSED                , "exp-sed reaction rate"     );
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateConst         , "membrane constant reaction rate");
@@ -439,6 +454,11 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEMembraneMassActionReversible      , "membrane-mass-action-reversible");
 	REGISTER_FECORE_CLASS(FEMichaelisMenten                   , "Michaelis-Menten"         );
 	REGISTER_FECORE_CLASS(FESolidBoundMolecule                , "solid_bound"              );
+	REGISTER_FECORE_CLASS(FEHillActivation					  , "Hill activation"		   );
+	REGISTER_FECORE_CLASS(FEHillInhibition					  , "Hill inhibition"		   );
+	REGISTER_FECORE_CLASS(FEHillActivationANDActivation		  , "Hill activation AND activation");
+	REGISTER_FECORE_CLASS(FEHillActivationANDInhibition		  , "Hill activation AND inhibition");
+	REGISTER_FECORE_CLASS(FEHillActivationORActivation		  , "Hill activation OR activation");
 
 	REGISTER_FECORE_CLASS(FEReactantSpeciesRef, "vR");
 	REGISTER_FECORE_CLASS(FEProductSpeciesRef , "vP");
@@ -468,11 +488,11 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEPlotData
-	REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration      , "receptor-ligand concentration"   );
-	REGISTER_FECORE_CLASS(FEPlotSBMConcentration                 , "sbm concentration"			     );
-    REGISTER_FECORE_CLASS(FEPlotSBMArealConcentration            , "sbm areal concentration"         );
-	REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity			     , "sbm referential apparent density");
-	REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient"             );
+	REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration      , "receptor-ligand concentration"			);
+	REGISTER_FECORE_CLASS(FEPlotSBMConcentration                 , "sbm concentration"						);
+    REGISTER_FECORE_CLASS(FEPlotSBMArealConcentration            , "sbm areal concentration"				);
+	REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity			     , "sbm referential apparent density"		);
+	REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient"					);
 
 	//-----------------------------------------------------------------------------
 	// Element log data

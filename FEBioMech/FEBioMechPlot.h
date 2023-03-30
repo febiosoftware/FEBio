@@ -1196,3 +1196,51 @@ public:
 	FEPlotTrussStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! growth tensor average value
+class FEPlotGrowthRatio : public FEPlotDomainData
+{
+public:
+	FEPlotGrowthRatio(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! growth tensor average value
+class FEPlotGrowthTensor : public FEPlotDomainData
+{
+public:
+	FEPlotGrowthTensor(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Stress traces
+class FEPlotTraceStresses : public FEPlotDomainData
+{
+public:
+	FEPlotTraceStresses(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotTraceStressesAbs : public FEPlotDomainData
+{
+public:
+	FEPlotTraceStressesAbs(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotTraceSolidStressesAbs : public FEPlotDomainData
+{
+public:
+	FEPlotTraceSolidStressesAbs(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotGrowthElasticDeformationGradient : public FEPlotDomainData
+{
+public:
+	FEPlotGrowthElasticDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
