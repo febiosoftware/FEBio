@@ -158,6 +158,11 @@ BEGIN_FECORE_CLASS(FEMathValue, FEScalarValuator)
 	ADD_PARAMETER(m_expr, "math");
 END_FECORE_CLASS();
 
+FEMathValue::FEMathValue(FEModel* fem) : FEScalarValuator(fem)
+{
+	m_parent = nullptr;
+}
+
 void FEMathValue::setMathString(const std::string& s)
 {
 	m_expr = s;
@@ -172,7 +177,16 @@ void FEMathValue::Serialize(DumpStream& ar)
 {
 	FEScalarValuator::Serialize(ar);
 	if (ar.IsShallow()) return;
-	if (ar.IsLoading()) create();
+
+	if (ar.IsSaving())
+	{
+		ar << m_parent;
+	}
+	else if (ar.IsLoading())
+	{
+		ar >> m_parent;
+		create(m_parent);
+	}
 }
 
 bool FEMathValue::create(FECoreBase* pc)
@@ -194,6 +208,7 @@ bool FEMathValue::create(FECoreBase* pc)
 		// Now try to find the owner of this parameter
 		pc = fem->FindParameterOwner(param);
 	}
+	m_parent = pc;
 
 	// initialize the math expression
 	bool b = m_math.Init(m_expr, pc);
