@@ -44,7 +44,6 @@ FESoluteBackflowStabilization::FESoluteBackflowStabilization(FEModel* pfem) : FE
 {
     m_isol = -1;
     m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
-    m_nnlist = FENodeNodeList();
 }
 
 //-----------------------------------------------------------------------------
@@ -69,7 +68,6 @@ bool FESoluteBackflowStabilization::Init()
 	m_dof.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
 
     FESurface* ps = &GetSurface();
-    m_backflow.assign(ps->Nodes(), false);
     
     m_nnlist.Create(fem.GetMesh());
 
@@ -257,8 +255,7 @@ void FESoluteBackflowStabilization::LoadVector(FEGlobalVector& R)
 void FESoluteBackflowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-	ar & m_dofW;
-	ar & m_dofC;
-	ar & m_backflow;
-    //ar & m_nnlist;
+    if (ar.IsShallow()) return;
+	ar & m_dofW & m_dofC;
+    m_nnlist.Create(GetFEModel()->GetMesh());
 }

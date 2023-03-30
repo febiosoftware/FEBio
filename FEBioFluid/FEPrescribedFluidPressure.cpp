@@ -40,6 +40,7 @@ END_FECORE_CLASS();
 FEPrescribedFluidPressure::FEPrescribedFluidPressure(FEModel* fem) : FEPrescribedSurface(fem)
 {
 	m_p = 0.0;
+    m_psurf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -52,6 +53,8 @@ bool FEPrescribedFluidPressure::Init()
     SetDOFList(m_dofEF);
 
     if (FEPrescribedSurface::Init() == false) return false;
+    
+    m_psurf = GetSurface();
 
     m_e.assign(GetSurface()->Nodes(), 0.0);
     
@@ -64,17 +67,14 @@ bool FEPrescribedFluidPressure::Init()
 //-----------------------------------------------------------------------------
 void FEPrescribedFluidPressure::UpdateDilatation()
 {
-	// prescribe this dilatation at the nodes
-	FESurface* ps = GetSurface();
-
-	int N = ps->Nodes();
+	int N = m_psurf->Nodes();
 	std::vector<vector<double>> efNodes(N, vector<double>());
 
 	//Project sum of all ca and osc values from int points to nodes on surface
 	//All values put into map, including duplicates
-	for (int i = 0; i < ps->Elements(); ++i)
+	for (int i = 0; i < m_psurf->Elements(); ++i)
 	{
-		FESurfaceElement& el = ps->Element(i);
+		FESurfaceElement& el = m_psurf->Element(i);
 		// evaluate average prescribed pressure on this face
 		double p = 0;
 		for (int j = 0; j < el.GaussPoints(); ++j) {
@@ -108,7 +108,7 @@ void FEPrescribedFluidPressure::UpdateDilatation()
 		}
 	}
 	//For each node, average the nodal ef
-	for (int i = 0; i < ps->Nodes(); ++i)
+	for (int i = 0; i < m_psurf->Nodes(); ++i)
 	{
 		double ef = 0;
 		for (int j = 0; j < efNodes[i].size(); ++j)
@@ -160,6 +160,8 @@ void FEPrescribedFluidPressure::CopyFrom(FEBoundaryCondition* pbc)
 void FEPrescribedFluidPressure::Serialize(DumpStream& ar)
 {
     FEPrescribedSurface::Serialize(ar);
-    ar & m_dofEF;
     ar & m_e;
+    if (ar.IsShallow()) return;
+    ar & m_dofEF;
+    ar & m_psurf;
 }

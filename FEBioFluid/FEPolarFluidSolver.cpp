@@ -415,7 +415,6 @@ void FEPolarFluidSolver::Serialize(DumpStream& ar)
 {
     // Serialize parameters
     FENewtonSolver::Serialize(ar);
-    if (ar.IsShallow()) return;
 
     ar & m_nrhs;
     ar & m_niter;
@@ -423,10 +422,6 @@ void FEPolarFluidSolver::Serialize(DumpStream& ar)
     
     ar & m_neq & m_nveq & m_ngeq & m_nfeq;
 
-    ar & m_rhoi & m_alphaf & m_alpham;
-    ar & m_beta & m_gamma;
-    ar & m_pred;
-    
     ar & m_Fr & m_Ui & m_Ut;
     ar & m_Vi & m_Gi & m_Fi;
     
@@ -437,6 +432,12 @@ void FEPolarFluidSolver::Serialize(DumpStream& ar)
         m_Gi.assign(m_ngeq,0);
         m_Fi.assign(m_nfeq,0);
     }
+    
+    if (ar.IsShallow()) return;
+    ar & m_rhoi & m_alphaf & m_alpham;
+    ar & m_beta & m_gamma;
+    ar & m_pred;
+    
 }
 
 //-----------------------------------------------------------------------------

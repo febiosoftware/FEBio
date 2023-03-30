@@ -223,7 +223,12 @@ void FEInitialFluidPressureTemperature::SetTValue(double v)
 //-----------------------------------------------------------------------------
 void FEInitialFluidPressureTemperature::Serialize(DumpStream& ar)
 {
-    FEInitialCondition::Serialize(ar);
+    FENodalIC::Serialize(ar);
+    if (ar.IsLoading()) {
+        m_e.assign(m_nodeSet->Size(), 0.0);
+        m_T.assign(m_nodeSet->Size(), 0.0);
+    }
+    ar & m_e & m_T;
     if (ar.IsShallow()) return;
     ar & m_dofEF & m_dofT;
 }

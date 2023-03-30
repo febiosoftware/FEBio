@@ -1038,22 +1038,15 @@ void FEThermoFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FET
 void FEThermoFluidSolver::Serialize(DumpStream& ar)
 {
     FENewtonSolver::Serialize(ar);
-    if (ar.IsShallow()) return;
-    
+
     ar & m_nrhs;
     ar & m_niter;
     ar & m_nref & m_ntotref;
 
     ar & m_nveq & m_ndeq & m_nteq;
 
-    ar & m_rhoi & m_alphaf & m_alpham;
-    ar & m_gammaf;
-    ar & m_pred;
-
     ar & m_Fr & m_Ui &m_Ut;
     ar & m_Vi & m_Di & m_Ti;
-    
-    ar & m_dofW & m_dofEF & m_dofAEF & m_dofT & m_dofAT;
     
     if (ar.IsLoading())
     {
@@ -1062,4 +1055,12 @@ void FEThermoFluidSolver::Serialize(DumpStream& ar)
         m_Di.assign(m_ndeq,0);
         m_Ti.assign(m_nteq,0);
     }
+    
+    if (ar.IsShallow()) return;
+    
+    ar & m_rhoi & m_alphaf & m_alpham;
+    ar & m_gammaf;
+    ar & m_pred;
+
+    ar & m_dofW & m_dofEF & m_dofAEF & m_dofT & m_dofAT;    
 }

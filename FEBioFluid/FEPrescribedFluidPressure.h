@@ -60,6 +60,7 @@ private:
 
 protected:
     int             m_dofEF;
+    FESurface*      m_psurf;
 
 public:
     FEParamDouble   m_p;       //!< prescribed fluid pressure

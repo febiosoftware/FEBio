@@ -953,5 +953,11 @@ void FEFluidFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<double>
 void FEFluidFSIDomain3D::Serialize(DumpStream& ar)
 {
 	FESolidDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_pMat;
 	ar & m_sseps;
+    ar & m_dofU & m_dofV & m_dofW & m_dofAW;
+    ar & m_dofSU & m_dofR;
+    ar & m_dof;
+    ar & m_dofEF & m_dofAEF;
 }

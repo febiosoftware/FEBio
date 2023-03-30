@@ -113,5 +113,7 @@ void FEFluidPressureLoad::Update()
 void FEFluidPressureLoad::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofEF;
     ar & m_pfluid;
 }

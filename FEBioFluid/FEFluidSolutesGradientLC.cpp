@@ -144,7 +144,14 @@ bool FEFluidSolutesGradientLC::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesGradientLC::Serialize(DumpStream& ar) { m_lc.Serialize(ar); }
+void FEFluidSolutesGradientLC::Serialize(DumpStream& ar)
+{
+    m_lc.Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofC;
+}
+
+//-----------------------------------------------------------------------------
 void FEFluidSolutesGradientLC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lc.LoadVector(R, tp); }
 void FEFluidSolutesGradientLC::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
 bool FEFluidSolutesGradientLC::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }

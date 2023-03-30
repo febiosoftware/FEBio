@@ -373,5 +373,8 @@ bool FEFluidNormalVelocity::SetRimPressure()
 void FEFluidNormalVelocity::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
 	ar & m_nu;
+    ar & m_rim;
+    ar & m_dofW & m_dofEF;
 }

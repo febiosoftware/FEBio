@@ -71,7 +71,7 @@ void FEAugLagLinearConstraint::AddDOF(int node, int bc, double val)
 void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
 {
     FECoreClass::Serialize(ar);
-    ar& m_lam;
+    ar & m_dof & m_lam;
 }
 
 //-----------------------------------------------------------------------------

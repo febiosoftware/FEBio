@@ -71,6 +71,17 @@ FEFluidDomain3D& FEFluidDomain3D::operator = (FEFluidDomain3D& d)
 }
 
 //-----------------------------------------------------------------------------
+//! serialize data to archive
+void FEFluidDomain3D::Serialize(DumpStream& ar)
+{
+    FESolidDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofW & m_dofAW & m_dof;
+    ar & m_dofEF & m_dofAEF;
+    ar & m_pMat;
+}
+
+//-----------------------------------------------------------------------------
 // get total dof list
 const FEDofList& FEFluidDomain3D::GetDOFList() const
 {

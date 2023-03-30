@@ -55,6 +55,9 @@ public:
     //! initialize
     bool Init() override;
 
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
     //! activate
     void Activate() override;
 
