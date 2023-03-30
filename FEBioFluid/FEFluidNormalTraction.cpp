@@ -62,6 +62,14 @@ bool FEFluidNormalTraction::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidNormalTraction::Serialize(DumpStream& ar)
+{
+    FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofW;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
 void FEFluidNormalTraction::LoadVector(FEGlobalVector& R)
 {

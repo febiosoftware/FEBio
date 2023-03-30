@@ -77,6 +77,7 @@ bool FETangentialFlowStabilization::Init()
 void FETangentialFlowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
 	ar & m_dofW;
 }
 

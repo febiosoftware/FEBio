@@ -73,10 +73,10 @@ bool FENewtonianFluid::Init()
 void FENewtonianFluid::Serialize(DumpStream& ar)
 {
     FEViscousFluid::Serialize(ar);
+    
     if (ar.IsShallow()) return;
     
     ar & m_Tr;
-    ar & m_kappahat & m_muhat;
 }
 
 //-----------------------------------------------------------------------------

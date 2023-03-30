@@ -451,30 +451,28 @@ void FEFluidFSISolver::Serialize(DumpStream& ar)
 {
     // Serialize parameters
     FENewtonSolver::Serialize(ar);
-    if (ar.IsShallow()) return;
+    // serialize rigid solver
+    m_rigidSolver.Serialize(ar);
+    if (ar.IsShallow()) {
+        ar & m_Ui & m_Ut & m_Fr;
+        ar & m_Di & m_Vi & m_Fi;
+    }
+    else {
+        ar & m_nrhs;
+        ar & m_niter;
+        ar & m_nref & m_ntotref;
 
-    ar & m_nrhs;
-    ar & m_niter;
-    ar & m_nref & m_ntotref;
+        ar & m_nreq & m_ndeq & m_nfeq & m_nveq;
 
-    ar & m_nreq & m_ndeq & m_nfeq & m_nveq;
+        ar & m_rhoi & m_alphaf & m_alpham;
+        ar & m_beta & m_gamma;
+        ar & m_pred;
 
-	ar & m_rhoi & m_alphaf & m_alpham;
-	ar & m_beta & m_gamma;
-	ar & m_pred;
-
-	ar & m_Ui & m_Ut & m_Fr;
-	ar & m_Di & m_Vi & m_Fi;
-    
-    if (ar.IsLoading())
-    {
         m_Fr.assign(m_neq, 0);
         m_Di.assign(m_ndeq,0);
         m_Vi.assign(m_nveq,0);
         m_Fi.assign(m_nfeq,0);
     }
-    // serialize rigid solver
-    m_rigidSolver.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

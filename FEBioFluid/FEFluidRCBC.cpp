@@ -45,6 +45,7 @@ FEFluidRCBC::FEFluidRCBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem
 {
     m_R = 0.0;
     m_pfluid = nullptr;
+    m_psurf = nullptr;
     m_p0 = 0;
     m_C = 0.0;
     m_Bern = false;
@@ -65,12 +66,13 @@ bool FEFluidRCBC::Init()
 
     if (FEPrescribedSurface::Init() == false) return false;
 
+    m_psurf = GetSurface();
+    
     SetDOFList(m_dofEF);
 
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
-    FESurface& surf = *GetSurface();
-    FESurfaceElement& el = surf.Element(0);
+    FESurfaceElement& el = m_psurf->Element(0);
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
     
@@ -162,10 +164,9 @@ double FEFluidRCBC::FlowRate()
     vec3d rt[FEElement::MAX_NODES];
     vec3d vt[FEElement::MAX_NODES];
     
-    FESurface& surf = *GetSurface();
-    for (int iel=0; iel<surf.Elements(); ++iel)
+    for (int iel=0; iel<m_psurf->Elements(); ++iel)
     {
-        FESurfaceElement& el = surf.Element(iel);
+        FESurfaceElement& el = m_psurf->Element(iel);
         
         // nr integration points
         int nint = el.GaussPoints();
@@ -175,7 +176,7 @@ double FEFluidRCBC::FlowRate()
         
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
-            FENode& node = surf.GetMesh()->Node(el.m_node[i]);
+            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
             rt[i] = node.m_rt;
             vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
         }
@@ -216,10 +217,9 @@ double FEFluidRCBC::FlowRate()
 void FEFluidRCBC::Serialize(DumpStream& ar)
 {
     FEPrescribedSurface::Serialize(ar);
+    ar & m_pt & m_dpt & m_qt & m_dqt & m_e;
+    if (ar.IsShallow()) return;
     ar & m_pfluid;
-    ar & m_pt;
-    ar & m_dpt;
-    ar & m_qt;
-    ar & m_dqt;
-    ar & m_e;
+    ar & m_dofW & m_dofEF;
+    ar & m_psurf;
 }

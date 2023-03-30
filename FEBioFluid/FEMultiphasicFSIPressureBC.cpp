@@ -176,7 +176,11 @@ void FEMultiphasicFSIPressureBC::CopyFrom(FEBoundaryCondition* pbc)
 void FEMultiphasicFSIPressureBC::Serialize(DumpStream& ar)
 {
     FEPrescribedSurface::Serialize(ar);
-    ar& m_dofC;
-    ar& m_dofEF;
-    ar& m_e;
+    if (ar.IsLoading()) {
+        m_e.assign(GetSurface()->Nodes(), 0.0);
+    }
+    ar & m_e;
+    if (ar.IsShallow()) return;
+    ar & m_Rgas & m_Tabs;
+    ar & m_dofEF & m_dofC;
 }

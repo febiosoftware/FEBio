@@ -148,7 +148,14 @@ bool FEConstraintNormalFlow::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEConstraintNormalFlow::Serialize(DumpStream& ar) { m_lc.Serialize(ar); }
+void FEConstraintNormalFlow::Serialize(DumpStream& ar)
+{
+    m_lc.Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_surf;
+}
+
+//-----------------------------------------------------------------------------
 void FEConstraintNormalFlow::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lc.LoadVector(R, tp); }
 void FEConstraintNormalFlow::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
 bool FEConstraintNormalFlow::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }

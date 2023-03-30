@@ -70,10 +70,15 @@ bool FETempDependentConductivity::Init()
 void FETempDependentConductivity::Serialize(DumpStream& ar)
 {
     FEFluidThermalConductivity::Serialize(ar);
+    
     if (ar.IsShallow()) return;
     
     ar & m_Kr & m_Tr;
     ar & m_Khat;
+    
+    if (ar.IsLoading()) {
+        m_Khat->Init();
+    }
 }
 
 //-----------------------------------------------------------------------------

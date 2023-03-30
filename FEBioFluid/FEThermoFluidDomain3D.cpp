@@ -116,11 +116,12 @@ void FEThermoFluidDomain3D::Serialize(DumpStream& ar)
     
     if (ar.IsShallow()) return;
     
+    ar & m_pMat;
     ar & m_Tr;
-    ar & m_dofW & m_dofAW & m_dof;
+    ar & m_dof;
+    ar & m_dofW & m_dofAW;
     ar & m_dofEF & m_dofAEF;
     ar & m_dofT & m_dofAT;
-    ar & m_pMat;
 }
 
 //-----------------------------------------------------------------------------

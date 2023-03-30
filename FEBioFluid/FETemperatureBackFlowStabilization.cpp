@@ -36,7 +36,6 @@ SOFTWARE.*/
 //! constructor
 FETemperatureBackFlowStabilization::FETemperatureBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
-    m_nnlist = FENodeNodeList();
 }
 
 //-----------------------------------------------------------------------------
@@ -55,8 +54,10 @@ bool FETemperatureBackFlowStabilization::Init()
     // determine the nr of concentration equations
     m_dofW.Clear();
     m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofT = fem.GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
     m_dof.Clear();
-    m_dof.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE));
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDof(m_dofT);
 
     FESurface* ps = &GetSurface();
     m_backflow.assign(ps->Nodes(), false);
@@ -241,7 +242,9 @@ void FETemperatureBackFlowStabilization::LoadVector(FEGlobalVector& R)
 void FETemperatureBackFlowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
 	ar & m_dofW;
 	ar & m_dofT;
 	ar & m_backflow;
+    m_nnlist.Create(GetFEModel()->GetMesh());
 }

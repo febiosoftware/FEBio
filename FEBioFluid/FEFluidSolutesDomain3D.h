@@ -64,6 +64,9 @@ public: // overrides from FEElasticDomain
     //! initialize class
     bool Init() override;
     
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
     //! Reset data
     void Reset() override;
     
