@@ -265,3 +265,14 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 		LS.Assemble(ke);
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FELinearConstraintSet::Serialize(DumpStream& ar)
+{
+	FENLConstraint::Serialize(ar);
+
+	if (ar.IsShallow() == false)
+	{
+		ar & m_LC;
+	}
+}

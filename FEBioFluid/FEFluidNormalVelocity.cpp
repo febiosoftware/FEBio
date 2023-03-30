@@ -374,7 +374,7 @@ void FEFluidNormalVelocity::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
     if (ar.IsShallow()) return;
-	ar & m_nu;
+	ar & m_nu & m_VN;
     ar & m_rim;
     ar & m_dofW & m_dofEF;
 }

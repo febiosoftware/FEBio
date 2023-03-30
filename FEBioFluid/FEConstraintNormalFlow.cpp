@@ -150,6 +150,7 @@ bool FEConstraintNormalFlow::Init()
 //-----------------------------------------------------------------------------
 void FEConstraintNormalFlow::Serialize(DumpStream& ar)
 {
+	FESurfaceConstraint::Serialize(ar);
     m_lc.Serialize(ar);
     if (ar.IsShallow()) return;
     ar & m_surf;

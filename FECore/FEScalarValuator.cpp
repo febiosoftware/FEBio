@@ -270,6 +270,7 @@ FEScalarValuator* FEMappedValue::copy()
 void FEMappedValue::Serialize(DumpStream& dmp)
 {
 	if (dmp.IsShallow()) return;
+	dmp & m_scale;
 	dmp & m_val;
 }
 
