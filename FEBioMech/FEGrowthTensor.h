@@ -119,7 +119,6 @@ public:
     FEVec3dValuator* m_fiber_1;
     // declare the parameter list
     //DECLARE_FECORE_CLASS();
-
 };
 
 //-----------------------------------------------------------------------------
@@ -144,5 +143,4 @@ public:
 
     // declare the parameter list
     // DECLARE_FECORE_CLASS();
-
 };

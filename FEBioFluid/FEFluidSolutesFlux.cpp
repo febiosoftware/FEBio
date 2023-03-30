@@ -29,14 +29,16 @@
 #include "stdafx.h"
 #include "FEFluidSolutesFlux.h"
 #include "FEBioFluidSolutes.h"
+#include <FEBioMix/FESoluteInterface.h>
+#include <FECore/FEMaterial.h>
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
-#include "FECore/FEAnalysis.h"
+#include <FECore/FEAnalysis.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidSolutesFlux, FESurfaceLoad)
-ADD_PARAMETER(m_flux   , "flux");
-ADD_PARAMETER(m_isol   , "sol");
+ADD_PARAMETER(m_flux   , "flux")->setUnits("n/L^2.t")->setLongName("effective solute molar flux");
+ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -44,7 +46,7 @@ END_FECORE_CLASS();
 FEFluidSolutesFlux::FEFluidSolutesFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_dofC(pfem)
 {
     m_flux = 1.0;
-    m_isol = 0;
+    m_isol = -1;
 }
 
 //-----------------------------------------------------------------------------

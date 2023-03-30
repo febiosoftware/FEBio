@@ -120,6 +120,16 @@ bool FEFluidSolutesDomain3D::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidSolutesDomain3D::Serialize(DumpStream& ar)
+{
+    FESolidDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_pMat;
+    ar & m_dofW & m_dofAW & m_dof;
+    ar & m_dofEF & m_dofAEF & m_dofC & m_dofAC;
+}
+
+//-----------------------------------------------------------------------------
 void FEFluidSolutesDomain3D::Reset()
 {
     // reset base class
@@ -260,6 +270,7 @@ void FEFluidSolutesDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
+            mp.m_rt = mp.m_r0;
             
             if (pt.m_ef <= -1) {
                 throw NegativeJacobianDetected();
@@ -741,7 +752,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         double dep = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
         double d2ep = m_pMat->Fluid()->Tangent_Pressure_Strain_Strain(mp);
         // Jdot/J
-        double dJoJ = pt.m_efdot/(pt.m_ef+1);
+        double dJoJ = pt.m_efdot/Jf;
         // Miscellaneous constants
         double R = m_pMat->m_Rgas;
         double T = m_pMat->m_Tabs;
@@ -809,7 +820,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                 mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j]);
                 vec3d kJv = (pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j];
                 vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dep+pt.m_gradef*H[j]*d2ep)*H[i];
-                double kJJ = (H[j]*((ksi*m_btrans)/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;
+                double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;
                 
                 ke[i4  ][j4  ] += Kvv(0,0)*detJ;
                 ke[i4  ][j4+1] += Kvv(0,1)*detJ;
@@ -844,7 +855,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                         if (isol == jsol)
                         {
                             kvc += (spt.m_gradc[isol]*spt.m_dkdc[isol][isol]*H[j]+gradN[j]*spt.m_k[isol])*H[i]*R*T;
-                            kcc += -(ksi/dt*m_btrans*spt.m_k[isol]+spt.m_dkdc[isol][isol]*spt.m_cdot[isol] + dkdt[isol] + spt.m_c[isol]*spt.m_dkdc[isol][isol]*ksi/dt*m_btrans)*H[i]*H[j] + vdzdc[isol][isol]*spt.m_k[isol]*H[i]*H[j] + gradN[i]*((-spt.m_gradc[isol]*(spt.m_dkdc[isol][isol]*d0[isol]+spt.m_k[isol]*d0p[isol][isol])+pt.m_vft*(spt.m_dkdc[isol][isol]*spt.m_c[isol]+spt.m_k[isol]))*H[j]-gradN[j]*spt.m_k[isol]*d0[isol]);
+                            kcc += -(ksi/dt*spt.m_k[isol]+spt.m_dkdc[isol][isol]*spt.m_cdot[isol] + dkdt[isol] + spt.m_c[isol]*spt.m_dkdc[isol][isol]*ksi/dt)*H[i]*H[j] + vdzdc[isol][isol]*spt.m_k[isol]*H[i]*H[j] + gradN[i]*((-spt.m_gradc[isol]*(spt.m_dkdc[isol][isol]*d0[isol]+spt.m_k[isol]*d0p[isol][isol])+pt.m_vft*(spt.m_dkdc[isol][isol]*spt.m_c[isol]+spt.m_k[isol]))*H[j]-gradN[j]*spt.m_k[isol]*d0[isol]);
                             for (int ksol=0; ksol<nsol; ++ksol)
                             {
                                 if(isol==ksol)
@@ -860,7 +871,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                         else
                         {
                             kvc += spt.m_gradc[jsol]*spt.m_dkdc[jsol][isol]*H[i]*H[j]*R*T;
-                            kcc += -H[i]*H[j]*(spt.m_dkdc[isol][jsol]*spt.m_cdot[isol] + spt.m_c[isol]*spt.m_dkdc[isol][jsol]*ksi/dt*m_btrans) + H[i]*H[j]*vdzdc[isol][jsol]*spt.m_k[jsol] + gradN[i]*(-spt.m_gradc[isol]*(spt.m_dkdc[isol][jsol]*d0[isol]+spt.m_k[isol]*d0p[isol][jsol])+pt.m_vft*spt.m_dkdc[isol][jsol]*spt.m_c[isol])*H[j];
+                            kcc += -H[i]*H[j]*(spt.m_dkdc[isol][jsol]*spt.m_cdot[isol] + spt.m_c[isol]*spt.m_dkdc[isol][jsol]*ksi/dt) + H[i]*H[j]*vdzdc[isol][jsol]*spt.m_k[jsol] + gradN[i]*(-spt.m_gradc[isol]*(spt.m_dkdc[isol][jsol]*d0[isol]+spt.m_k[isol]*d0p[isol][jsol])+pt.m_vft*spt.m_dkdc[isol][jsol]*spt.m_c[isol])*H[j];
                             for (int ksol=0; ksol<nsol; ++ksol)
                             {
                                 if(jsol==ksol)
@@ -1015,7 +1026,7 @@ void FEFluidSolutesDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
     const double *gw = el.GaussWeights();
     
     double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
@@ -1049,7 +1060,7 @@ void FEFluidSolutesDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
         {
             for (j=0, j4 = 0; j<neln; ++j, j4 += ndpn)
             {
-                mat3d Mv = ((mat3dd(ksi*m_btrans/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
+                mat3d Mv = ((mat3dd(ksi/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
                 vec3d mJ = pt.m_aft*(-H[i]*H[j]*dens/(pt.m_ef+1)*detJ);
                 
                 ke[i4  ][j4  ] += Mv(0,0);

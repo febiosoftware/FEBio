@@ -38,4 +38,5 @@ public:
 public:
 	int		m_printParams;
 	int		m_noutput;
+	bool	m_bshowErrors;
 };

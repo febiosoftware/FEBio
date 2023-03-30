@@ -527,26 +527,32 @@ void FEMultiphasicFSISolver::Serialize(DumpStream& ar)
 {
     // Serialize parameters
     FENewtonSolver::Serialize(ar);
+    // serialize rigid solver
+    m_rigidSolver.Serialize(ar);
     
-    ar & m_nreq;
-    ar & m_ndeq;
-    ar & m_nfeq;
-    ar & m_nveq;
-    ar & m_nseq;
-    ar & m_nceq;
+    ar & m_nreq & m_ndeq & m_nfeq & m_nveq & m_nseq & m_nceq;
+    ar & m_nrhs & m_niter & m_nref & m_ntotref;
+
+    if (ar.IsLoading())
+    {
+        m_Fr.assign(m_neq, 0);
+        m_Vi.assign(m_nveq,0);
+        m_Di.assign(m_ndeq,0);
+        for (int i=0; i<m_nceq.size(); ++i) {
+            m_ci[i].assign(m_nceq[i], 0);
+            m_Ci[i].assign(m_nceq[i], 0);
+        }
+    }
+    
+    ar & m_Ui & m_Ut & m_Fr;
+    ar & m_Di & m_Vi & m_Fi & m_Ci;
+    
+    if (ar.IsShallow()) return;
     
     ar & m_rhoi & m_alphaf & m_alpham;
     ar & m_beta & m_gamma;
     ar & m_pred;
     
-    ar & m_Ui & m_Ut & m_Fr;
-    ar & m_di & m_Di;
-    ar & m_vi & m_Vi;
-    ar & m_fi & m_Fi;
-    ar & m_ci & m_Ci;
-    
-    // serialize rigid solver
-    m_rigidSolver.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -1095,7 +1101,7 @@ bool FEMultiphasicFSISolver::Quasin()
         normE1 = s*fabs(m_ui*m_R1);
         
         // check for nans
-        if (ISNAN(normR1)) throw NANDetected();
+        if (ISNAN(normR1)) throw NANInResidualDetected();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;

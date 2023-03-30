@@ -61,7 +61,6 @@ void FESurfaceLoad::Serialize(DumpStream& ar)
 	if (ar.IsShallow()) return;
 
 	ar & m_psurf;
-	ar & m_dof;
 
 	// the mesh manages surfaces for surface loads
 	if (m_psurf && ar.IsLoading())

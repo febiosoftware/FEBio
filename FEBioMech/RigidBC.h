@@ -43,8 +43,6 @@ public:
 
 	bool Init() override;
 
-	void Activate() override;
-
 	void Serialize(DumpStream& ar) override;
 
 	FERigidBody& GetRigidBody();

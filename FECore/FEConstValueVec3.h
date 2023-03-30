@@ -93,6 +93,8 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
+	bool Init() override;
+
 private:
 	std::string		m_mapName;
 

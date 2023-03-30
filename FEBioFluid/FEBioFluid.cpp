@@ -200,6 +200,7 @@ REGISTER_FECORE_CLASS(FEConstraintUniformFlow     , "uniform fluid flow"     );
 REGISTER_FECORE_CLASS(FEPlotDisplacement               , "displacement"             );
 REGISTER_FECORE_CLASS(FEPlotNodalFluidVelocity         , "nodal fluid velocity"     );
 REGISTER_FECORE_CLASS(FEPlotNodalRelativeFluidVelocity , "nodal fluid flux"         );
+REGISTER_FECORE_CLASS(FEPlotNodalFluidTemperature      , "nodal fluid temperature"  );
 REGISTER_FECORE_CLASS(FEPlotFluidDilatation            , "fluid dilatation"         );
 REGISTER_FECORE_CLASS(FEPlotFluidEffectivePressure     , "effective fluid pressure" );
 REGISTER_FECORE_CLASS(FEPlotElasticFluidPressure	   , "elastic fluid pressure"   );
@@ -227,8 +228,9 @@ REGISTER_FECORE_CLASS(FEPlotFluidSurfaceEnergyFlux     , "fluid surface energy f
 REGISTER_FECORE_CLASS(FEPlotFluidShearViscosity        , "fluid shear viscosity"    );
 REGISTER_FECORE_CLASS(FEPlotFluidMassFlowRate          , "fluid mass flow rate"     );
 REGISTER_FECORE_CLASS(FEPlotFluidStrainEnergyDensity   , "fluid strain energy density");
-REGISTER_FECORE_CLASS(FEPlotFluidKineticEnergyDensity  ,"fluid kinetic energy density");
+REGISTER_FECORE_CLASS(FEPlotFluidKineticEnergyDensity  , "fluid kinetic energy density");
 REGISTER_FECORE_CLASS(FEPlotFluidEnergyDensity         , "fluid energy density"     );
+REGISTER_FECORE_CLASS(FEPlotFluidBulkModulus           , "fluid bulk modulus"       );
 REGISTER_FECORE_CLASS(FEPlotFluidElementStrainEnergy   , "fluid element strain energy");
 REGISTER_FECORE_CLASS(FEPlotFluidElementKineticEnergy  , "fluid element kinetic energy");
 REGISTER_FECORE_CLASS(FEPlotFluidElementLinearMomentum , "fluid element linear momentum");

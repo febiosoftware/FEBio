@@ -37,7 +37,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFluidConstantConductivity, FEFluidThermalConductivity)
 
     // material parameters
-    ADD_PARAMETER(m_K   , FE_RANGE_GREATER_OR_EQUAL(0.0), "K");
+    ADD_PARAMETER(m_K   , FE_RANGE_GREATER_OR_EQUAL(0.0), "K")->setUnits("W/L.T");
 
 END_FECORE_CLASS();
 

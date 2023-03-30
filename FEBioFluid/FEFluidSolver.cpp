@@ -635,7 +635,7 @@ bool FEFluidSolver::Quasin()
         normE1 = s*fabs(m_ui*m_R1);
         
 		// check for nans
-		if (ISNAN(normR1)) throw NANDetected();
+		if (ISNAN(normR1)) throw NANInResidualDetected();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
@@ -952,21 +952,11 @@ void FEFluidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInf
 void FEFluidSolver::Serialize(DumpStream& ar)
 {
 	FENewtonSolver::Serialize(ar);
-	if (ar.IsShallow()) return;
     
-    ar & m_nrhs;
-    ar & m_niter;
-    ar & m_nref & m_ntotref;
-    
-    ar & m_neq & m_nveq & m_ndeq;
-    
-    ar & m_rhoi & m_alphaf & m_alpham;
-    ar & m_alphaf & m_alpham;
-    ar & m_gammaf;
-    ar & m_pred;
-    
-    ar & m_Fr & m_Ui & m_Ut;
+    ar & m_Ut & m_Ui;
     ar & m_Vi & m_Di;
+    ar & m_nrhs & m_niter & m_nref & m_ntotref;
+    ar & m_neq & m_nveq & m_ndeq;
     
     if (ar.IsLoading())
     {
@@ -974,4 +964,12 @@ void FEFluidSolver::Serialize(DumpStream& ar)
         m_Vi.assign(m_nveq,0);
         m_Di.assign(m_ndeq,0);
     }
+    
+	if (ar.IsShallow()) return;
+    
+    ar & m_rhoi & m_alphaf & m_alpham;
+    ar & m_gammaf;
+    ar & m_pred;
+    
+    ar & m_dofW & m_dofAW & m_dofEF & m_dofAEF;
 }

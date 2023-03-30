@@ -633,6 +633,13 @@ void FEModel::Update()
 	// mesh will also be update after the loads are updated
 	m_imp->m_meshUpdate = false;
 
+	int nvel = BoundaryConditions();
+	for (int i = 0; i < nvel; ++i)
+	{
+		FEBoundaryCondition& bc = *BoundaryCondition(i);
+		if (bc.IsActive()) bc.UpdateModel();
+	}
+
 	// update all model loads
 	for (int i = 0; i < ModelLoads(); ++i)
 	{
@@ -1305,9 +1312,6 @@ void FEModel::Activate()
         FESurfacePairConstraint& ci = *SurfacePairConstraint(i);
 		if (ci.IsActive()) ci.Activate();
 	}
-
-	// activate linear constraints
-	if (m_imp->m_LCM) m_imp->m_LCM->Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -1550,6 +1554,25 @@ FEParamValue FEModel::GetMeshParameter(const ParamString& paramString)
 			}
 		}
 	}
+	else if (next == "domain")
+	{
+		int nid = next.Index();
+		if ((nid >= 0) && (nid < mesh.Domains()))
+		{
+			FEDomain& dom = mesh.Domain(nid);
+			ParamString paramName = next.next();
+			FEParam* param = dom.FindParameter(paramName);
+			if (param)
+			{
+				if (param->type() == FE_PARAM_DOUBLE_MAPPED)
+				{
+					FEParamDouble& v = param->value<FEParamDouble>();
+					if (v.isConst()) return FEParamValue(param, &v.constValue(), FE_PARAM_DOUBLE);
+				}
+				return FEParamValue(param, param->data_ptr(), param->type());
+			}
+		}
+	}
 
 	// if we get here, we did not find it
 	return FEParamValue();
@@ -1629,6 +1652,13 @@ void FEModel::SetPrintParametersFlag(bool b)
 }
 
 //-----------------------------------------------------------------------------
+//! Get the print parameter flag
+bool FEModel::GetPrintParametersFlag() const
+{
+	return m_imp->m_printParams;
+}
+
+//-----------------------------------------------------------------------------
 bool FEModel::EvaluateLoadParameters()
 {
 	feLog("\n");
@@ -1678,12 +1708,22 @@ bool FEModel::EvaluateLoadParameters()
 			break;
 			case FE_PARAM_DOUBLE_MAPPED: 
 			{
-				p->value<FEParamDouble>().SetScaleFactor(s * pi.m_scl);
-				if (m_imp->m_printParams) feLog("%lg\n", p->value<FEParamDouble>().GetScaleFactor());
+				FEParamDouble& v = p->value<FEParamDouble>();
+				double c = 1.0;
+				if (v.isConst()) c = v.constValue();
+				v.SetScaleFactor(s * pi.m_scl);
+				if (m_imp->m_printParams) feLog("%lg\n", c*p->value<FEParamDouble>().GetScaleFactor());
 			}
 			break;
-			case FE_PARAM_VEC3D_MAPPED : p->value<FEParamVec3>().SetScaleFactor(s* pi.m_scl); break;
+			case FE_PARAM_VEC3D_MAPPED :
+			{
+				FEParamVec3& v = p->value<FEParamVec3>();
+				v.SetScaleFactor(s * pi.m_scl);
+				if (m_imp->m_printParams) feLog("%lg\n", v.GetScaleFactor());
+			}
+			break;
 			default:
+				feLog("\n");
 				assert(false);
 			}
 		}

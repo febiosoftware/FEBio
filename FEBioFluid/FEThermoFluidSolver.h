@@ -59,7 +59,7 @@ public:
     //! Initialize linear equation system
     bool InitEquations() override;
     bool InitEquations2() override;
-    
+
 public:
     //{ --- evaluation and update ---
     //! Perform an update

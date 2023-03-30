@@ -62,6 +62,7 @@ SOFTWARE.*/
 #define UNIT_POWER "W"
 #define UNIT_VOLTAGE "V"
 #define UNIT_CONCENTRATION "c"
+#define UNIT_RELATIVE_TEMPERATURE "R"
 
 #define UNIT_DEGREE "d"
 #define UNIT_RADIAN	"r"

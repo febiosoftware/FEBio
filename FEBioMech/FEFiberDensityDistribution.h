@@ -29,11 +29,12 @@ SOFTWARE.*/
 #pragma once
 
 #include "FECore/FEMaterial.h"
+#include "febiomech_api.h"
 
 //---------------------------------------------------------------------------
 // Base class for fiber density distribution functions
 //
-class FEFiberDensityDistribution : public FEMaterialProperty
+class FEBIOMECH_API FEFiberDensityDistribution : public FEMaterialProperty
 {
 public:
     FEFiberDensityDistribution(FEModel* pfem) : FEMaterialProperty(pfem) {}

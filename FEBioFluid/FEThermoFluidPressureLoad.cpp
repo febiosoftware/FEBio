@@ -34,14 +34,14 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEThermoFluidPressureLoad, FESurfaceConstraint)
-    ADD_PARAMETER(m_p0    , "pressure");
+    ADD_PARAMETER(m_p, "pressure")->setUnits("P")->setLongName("fluid pressure");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem)
 {
     m_pfluid = nullptr;
-    m_p0 = 0;
+    m_p = 0;
     
     m_dofEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0);
     m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
@@ -144,8 +144,10 @@ void FEThermoFluidPressureLoad::Update()
 void FEThermoFluidPressureLoad::Serialize(DumpStream& ar)
 {
     FESurfaceConstraint::Serialize(ar);
+    if (ar.IsShallow()) return;
     ar & m_pfluid;
     ar & m_Lm & m_Lmp;
+    ar & m_dofT & m_dofEF;
 }
 
 //-----------------------------------------------------------------------------
@@ -154,6 +156,16 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& 
 {
     int ndof = 3;
     vector<double> fe(ndof, 0.0);
+    
+    // for now assume that the prescribed pressure is the same on the entire surface
+    FESurfaceElement& el = m_surf.Element(0);
+    // evaluate average prescribed pressure on this face
+    double p0 = 0;
+    for (int j=0; j<el.GaussPoints(); ++j) {
+        FEMaterialPoint* pt = el.GetMaterialPoint(j);
+        p0 += m_p(*pt);
+    }
+    p0 /= el.GaussPoints();
 
     double alpha = tp.alphaf;
     
@@ -167,7 +179,7 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& 
         double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
         fe[0] = lam*dpJ;
         fe[1] = lam*dpT;
-        fe[2] = p - m_p0;
+        fe[2] = p - p0;
         vector<int> lm;
         UnpackLM(lm,i);
         R.Assemble(lm, fe);

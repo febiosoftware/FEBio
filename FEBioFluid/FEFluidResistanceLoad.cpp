@@ -80,6 +80,16 @@ bool FEFluidResistanceLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! serialization
+void FEFluidResistanceLoad::Serialize(DumpStream& ar)
+{
+    FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_pfluid;
+    ar & m_dofW & m_dofEF;
+}
+
+//-----------------------------------------------------------------------------
 //! Activate the degrees of freedom for this BC
 void FEFluidResistanceLoad::Activate()
 {

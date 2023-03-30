@@ -46,7 +46,7 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_dofC(pfem), m
 	m_flux = 1.0;
 	m_blinear = false; 
     m_bshellb = false;
-	m_isol = 0;
+	m_isol = -1;
 }
 	
 //-----------------------------------------------------------------------------
