@@ -71,7 +71,7 @@ void FEAugLagLinearConstraint::AddDOF(int node, int bc, double val)
 void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
 {
     FECoreClass::Serialize(ar);
-    ar& m_lam;
+    ar & m_dof & m_lam;
 }
 
 //-----------------------------------------------------------------------------
@@ -263,5 +263,16 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 		ke.SetNodes(en);
 		ke.SetIndices(elm);
 		LS.Assemble(ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FELinearConstraintSet::Serialize(DumpStream& ar)
+{
+	FENLConstraint::Serialize(ar);
+
+	if (ar.IsShallow() == false)
+	{
+		ar & m_LC;
 	}
 }

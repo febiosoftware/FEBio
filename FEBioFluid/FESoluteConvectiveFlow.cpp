@@ -174,4 +174,6 @@ void FESoluteConvectiveFlow::Update()
 void FESoluteConvectiveFlow::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofW & m_dofEF & m_dofC;
 }

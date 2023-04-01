@@ -1018,4 +1018,8 @@ void FETiedFluidInterface::Serialize(DumpStream &ar)
 	// serialize element pointers
 	SerializeElementPointers(m_ss, m_ms, ar);
 	SerializeElementPointers(m_ms, m_ss, ar);
+    
+    if (ar.IsShallow()) return;
+    ar & m_pfluid;
+    ar & m_dofWE;
 }

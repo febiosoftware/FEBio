@@ -1756,5 +1756,11 @@ void FEMultiphasicFSIDomain3D::ElementInertialForce(FESolidElement& el, vector<d
 void FEMultiphasicFSIDomain3D::Serialize(DumpStream& ar)
 {
     FESolidDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
     ar & m_sseps;
+    ar & m_pMat;
+    ar & m_dofU & m_dofV & m_dofW & m_dofAW;
+    ar & m_dofSU & m_dofR;
+    ar & m_dof;
+    ar & m_dofEF & m_dofAEF & m_dofC & m_dofAC;
 }

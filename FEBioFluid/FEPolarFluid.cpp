@@ -91,6 +91,15 @@ bool FEPolarFluid::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEPolarFluid::Serialize(DumpStream& ar)
+{
+    FEFluidMaterial::Serialize(ar);
+    if (ar.IsShallow()) return;
+    
+    ar & m_Tr;
+}
+
+//-----------------------------------------------------------------------------
 //! bulk modulus
 double FEPolarFluid::BulkModulus(FEMaterialPoint& mp)
 {

@@ -1197,16 +1197,28 @@ void FEFluidSolutesSolver::NonLinearConstraintForces(FEGlobalVector& R, const FE
 void FEFluidSolutesSolver::Serialize(DumpStream& ar)
 {
     FENewtonSolver::Serialize(ar);
+
+    ar & m_neq & m_nveq & m_ndeq & m_nseq & m_nceq;
+    ar & m_nrhs & m_niter & m_nref & m_ntotref;
+
+    ar & m_Fr & m_Ui & m_Ut;
+    ar & m_Vi & m_Di & m_Ci;
+
+    if (ar.IsLoading())
+    {
+        m_Fr.assign(m_neq, 0);
+        m_Vi.assign(m_nveq,0);
+        m_Di.assign(m_ndeq,0);
+        for (int i=0; i<m_nceq.size(); ++i) {
+            m_ci[i].assign(m_nceq[i], 0);
+            m_Ci[i].assign(m_nceq[i], 0);
+        }
+    }
+    
     if (ar.IsShallow()) return;
-    ar & m_nveq & m_ndeq & m_nseq;
-    ar & m_nceq;
+
     ar & m_alphaf & m_alpham;
     ar & m_gammaf;
     ar & m_pred;
-    
-    ar & m_Fr & m_Ui &m_Ut;
-    ar & m_Vi & m_vi;
-    ar & m_Di & m_di;
-
-    ar & m_ci & m_Ci;
+    ar & m_dofW & m_dofAW & m_dofEF & m_dofAEF & m_dofC & m_dofAC;
 }

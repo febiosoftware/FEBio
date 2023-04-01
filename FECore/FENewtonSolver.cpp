@@ -347,24 +347,24 @@ bool FENewtonSolver::AllocateLinearSystem()
 			feLogError("Unknown solver type selected\n");
 			return false;
 		}
+	}
 
-		if (m_part.empty() || (m_part.size() == 1))
+	if (m_part.empty() || (m_part.size() == 1))
+	{
+		// Set the partitioning of the global matrix
+		// This is only used for debugging block solvers for problems that
+		// usually don't generate a block structure
+		if (m_force_partition > 0)
 		{
-			// Set the partitioning of the global matrix
-			// This is only used for debugging block solvers for problems that
-			// usually don't generate a block structure
-			if (m_force_partition > 0)
-			{
-				m_part.resize(2);
-				m_part[0] = m_force_partition;
-				m_part[1] = m_neq - m_force_partition;
-			}
+			m_part.resize(2);
+			m_part[0] = m_force_partition;
+			m_part[1] = m_neq - m_force_partition;
 		}
+	}
 
-		if (m_part.empty() == false)
-		{
-			m_plinsolve->SetPartitions(m_part);
-		}
+	if (m_part.empty() == false)
+	{
+		m_plinsolve->SetPartitions(m_part);
 	}
 
 	feLogInfo("Selecting linear solver %s", m_plinsolve->GetTypeStr());

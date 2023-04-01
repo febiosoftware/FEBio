@@ -40,7 +40,7 @@ public:
     
 public:
     //! calculate thermal conductivity at material point
-    double ThermalConductivity(FEMaterialPoint& pt) override { return m_K; }
+    double ThermalConductivity(FEMaterialPoint& pt) override { return m_K(pt); }
     
     //! tangent of thermal conductivity with respect to strain J
     double Tangent_Strain(FEMaterialPoint& mp) override { return 0; }
@@ -49,7 +49,7 @@ public:
     double Tangent_Temperature(FEMaterialPoint& mp) override { return 0; };
 
 public:
-    double   m_K;    //!< thermal conductivity
+    FEParamDouble   m_K;    //!< thermal conductivity
     
     // declare parameter list
     DECLARE_FECORE_CLASS();

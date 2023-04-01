@@ -107,7 +107,14 @@ bool FEFluidSolutesPressureLC::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesPressureLC::Serialize(DumpStream& ar) { m_lc.Serialize(ar); }
+void FEFluidSolutesPressureLC::Serialize(DumpStream& ar)
+{
+    m_lc.Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofEF & m_dofC;
+}
+
+//-----------------------------------------------------------------------------
 void FEFluidSolutesPressureLC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lc.LoadVector(R, tp); }
 void FEFluidSolutesPressureLC::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
 bool FEFluidSolutesPressureLC::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }

@@ -46,6 +46,24 @@ FEThermoFluidDomain3D::FEThermoFluidDomain3D(FEModel* pfem) : FESolidDomain(pfem
 {
     m_pMat = 0;
     m_btrans = true;
+    
+    if (pfem)
+    {
+        // set the active degrees of freedom list
+        m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
+        m_dofAW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_ACCELERATION));
+
+        m_dofEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0);
+        m_dofAEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION_TDERIV), 0);
+        m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
+        m_dofAT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE_TDERIV), 0);
+
+        FEDofList dofs(pfem);
+        dofs.AddDofs(m_dofW);
+        dofs.AddDof(m_dofEF);
+        dofs.AddDof(m_dofT);
+        m_dof = dofs;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -86,24 +104,24 @@ bool FEThermoFluidDomain3D::Init()
     
     FEModel* pfem = GetFEModel();
     
-    // set the active degrees of freedom list
-    m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofAW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_ACCELERATION));
-
-    m_dofEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0);
-    m_dofAEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION_TDERIV), 0);
-    m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
-    m_dofAT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE_TDERIV), 0);
-
-    FEDofList dofs(pfem);
-    dofs.AddDofs(m_dofW);
-    dofs.AddDof(m_dofEF);
-    dofs.AddDof(m_dofT);
-    m_dof = dofs;
-
     m_Tr = GetFEModel()->GetGlobalConstant("T");
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEThermoFluidDomain3D::Serialize(DumpStream& ar)
+{
+    FESolidDomain::Serialize(ar);
+    
+    if (ar.IsShallow()) return;
+    
+    ar & m_pMat;
+    ar & m_Tr;
+    ar & m_dof;
+    ar & m_dofW & m_dofAW;
+    ar & m_dofEF & m_dofAEF;
+    ar & m_dofT & m_dofAT;
 }
 
 //-----------------------------------------------------------------------------
@@ -924,6 +942,17 @@ void FEThermoFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         
         // calculate the heat flux
         tf.m_q = m_pMat->HeatFlux(mp);
+        
+        // calculate remaining entries of thermofluid material point
+        // TODO: Not sure that we need any of these (consider taking them out)
+        tf.m_k = m_pMat->BulkModulus(mp);
+        tf.m_K = m_pMat->GetConduct()->ThermalConductivity(mp);
+        tf.m_dKJ = m_pMat->GetConduct()->Tangent_Strain(mp);
+        tf.m_dKT = m_pMat->GetConduct()->Tangent_Temperature(mp);
+        tf.m_cv = m_pMat->GetElastic()->IsochoricSpecificHeatCapacity(mp);
+        tf.m_dcvJ = m_pMat->GetElastic()->Tangent_cv_Strain(mp);
+        tf.m_dcvT = m_pMat->GetElastic()->Tangent_cv_Temperature(mp);
+        tf.m_cp = m_pMat->GetElastic()->IsobaricSpecificHeatCapacity(mp);
     }
 }
 
