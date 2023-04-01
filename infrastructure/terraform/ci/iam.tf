@@ -1,16 +1,30 @@
 resource "aws_iam_user" "gh" {
-  name = "tf-gh-actions"
-}
-
-resource "aws_iam_user_policy" "gh" {
-  name   = "github-policy"
-  user   = aws_iam_user.gh.name
-  policy = data.aws_iam_policy_document.gh.json
+  name = "tf-gh-actions-febio"
 }
 
 resource "aws_iam_access_key" "gh" {
   user = aws_iam_user.gh.name
 }
+
+resource "aws_iam_user_group_membership" "gh" {
+  user = aws_iam_user.gh.name
+
+  groups = [
+    aws_iam_group.gh.name,
+  ]
+}
+
+resource "aws_iam_group" "gh" {
+  name = "github-ci-group"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy" "gh" {
+  name   = "github-ci-policy"
+  group  = aws_iam_group.gh.name
+  policy = data.aws_iam_policy_document.gh.json
+}
+
 
 data "aws_iam_policy_document" "gh" {
   statement {

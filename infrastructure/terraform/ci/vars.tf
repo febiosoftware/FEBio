@@ -3,16 +3,6 @@ variable "repo_name" {
   default = "FEBio"
 }
 
-variable "aws_access_key_id" {
-  type      = string
-  sensitive = true
-}
-
-variable "aws_secret_access_key" {
-  type      = string
-  sensitive = true
-}
-
 variable "gh_token" {
   type      = string
   sensitive = true
