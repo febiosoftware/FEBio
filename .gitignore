@@ -444,3 +444,4 @@ Documentation/FEBio_User_Manual.html.LyXconv/
 ## direnv
 .env*
 .terraform
+febio
