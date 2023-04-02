@@ -84,4 +84,15 @@ data "aws_iam_policy_document" "gh" {
     resources = ["*"]
   }
 
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:PutObjectAcl",
+      "s3:GetObjectAcl"
+    ]
+    resources = ["${aws_s3_bucket.packages.arn}"]
+  }
+
 }
