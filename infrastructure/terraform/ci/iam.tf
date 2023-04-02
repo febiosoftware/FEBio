@@ -72,6 +72,20 @@ data "aws_iam_policy_document" "gh" {
 
   statement {
     actions = [
+      "ec2:RunInstances",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/for"
+      values   = ["Github CI"]
+    }
+    resources = ["arn:aws:ec2:us-east-1::image/ami-*"]
+
+
+  }
+
+  statement {
+    actions = [
       "ec2:CreateTags"
     ]
 
