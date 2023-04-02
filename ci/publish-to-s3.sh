@@ -1,8 +1,8 @@
 #! /bin/bash
 set -x
 SOURCE=$1
-VERSION=${VERSION:-$(git describe --tags)}
-PACKAGE="${SOURCE}-${VERSION}.tgz"
+GIT_TAG=${GIT_TAG}
+PACKAGE="${SOURCE}-${GIT_TAG}.tgz"
 BUCKET_NAME=${BUCKET_NAME:-febio-packages}
 REF_NAME=${REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}
 PACKAGE_NAME=${PACKAGE_NAME:-febio}

@@ -194,7 +194,7 @@ jobs:
         env:
           BUCKET_NAME: febio-packages
           OS: ${{ env.os }}
-          REF_NAME: ${{ github.ref}}
+          REF_NAME: ${{ github.ref_name}}
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
