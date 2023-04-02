@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "gh" {
       "s3:PutObjectAcl",
       "s3:GetObjectAcl"
     ]
-    resources = ["${aws_s3_bucket.packages.arn}"]
+    resources = ["${aws_s3_bucket.packages.arn}/*"]
   }
 
 }
