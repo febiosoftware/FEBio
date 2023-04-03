@@ -81,7 +81,8 @@ private:
     
 private:
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
-    
+    FESurface*          m_psurf;    //!< pointer to surface
+
     FEDofList   m_dofW;
     int         m_dofEF;
     

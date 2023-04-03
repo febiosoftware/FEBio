@@ -102,6 +102,9 @@ public:
 	//! build connectivity for matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
 protected:
 	//! calculate the constraint value
 	double constraint(FEAugLagLinearConstraint& LC);

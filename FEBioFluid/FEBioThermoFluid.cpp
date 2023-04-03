@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FEThermoFluidDomainFactory.h"
 #include "FEFixedFluidTemperature.h"
 #include "FEInitialFluidTemperature.h"
+#include "FEInitialFluidPressureTemperature.h"
 #include "FEPrescribedFluidTemperature.h"
 #include "FEFluidHeatSupplyConst.h"
 #include "FEFluidNormalHeatFlux.h"
@@ -97,7 +98,8 @@ void FEBioThermoFluid::InitModule()
     //-----------------------------------------------------------------------------
     // initial conditions
     REGISTER_FECORE_CLASS(FEInitialFluidTemperature  , "initial fluid temperature");
-    
+    REGISTER_FECORE_CLASS(FEInitialFluidPressureTemperature  , "initial fluid pressure and temperature");
+
     //-----------------------------------------------------------------------------
     // boundary conditions
     REGISTER_FECORE_CLASS(FEFixedFluidTemperature       , "zero fluid temperature"      );

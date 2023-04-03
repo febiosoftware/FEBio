@@ -70,6 +70,16 @@ bool FENewtonianFluid::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FENewtonianFluid::Serialize(DumpStream& ar)
+{
+    FEViscousFluid::Serialize(ar);
+    
+    if (ar.IsShallow()) return;
+    
+    ar & m_Tr;
+}
+
+//-----------------------------------------------------------------------------
 //! viscous stress
 mat3ds FENewtonianFluid::Stress(FEMaterialPoint& pt)
 {

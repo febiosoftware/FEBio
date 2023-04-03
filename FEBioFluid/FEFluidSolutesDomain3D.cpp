@@ -120,6 +120,16 @@ bool FEFluidSolutesDomain3D::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidSolutesDomain3D::Serialize(DumpStream& ar)
+{
+    FESolidDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_pMat;
+    ar & m_dofW & m_dofAW & m_dof;
+    ar & m_dofEF & m_dofAEF & m_dofC & m_dofAC;
+}
+
+//-----------------------------------------------------------------------------
 void FEFluidSolutesDomain3D::Reset()
 {
     // reset base class

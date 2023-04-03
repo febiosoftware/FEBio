@@ -960,6 +960,25 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 			m_ar.EndChunk();
 		}
 
+		// element sets
+		if (m.ElementSets() > 0)
+		{
+			m_ar.BeginChunk(PLT_ELEMENTSET_SECTION);
+			{
+				WriteElementSetSection(m);
+			}
+			m_ar.EndChunk();
+		}
+
+		// facet sets
+		if (m.FacetSets() > 0)
+		{
+			m_ar.BeginChunk(PLT_FACETSET_SECTION);
+			{
+				WriteFacetSetSection(m);
+			}
+			m_ar.EndChunk();
+		}
 		// parts
 		// (we write the materials as parts)
 		if (fem.Materials() > 0)
@@ -1363,6 +1382,73 @@ void FEBioPlotFile::WriteNodeSetSection(FEMesh& m)
 			std::vector<int> nodeList(nodes);
 			for (int i = 0; i < nodes; ++i) nodeList[i] = l[i];
 			m_ar.WriteChunk(PLT_NODESET_LIST, nodeList);
+		}
+		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteElementSetSection(FEMesh& m)
+{
+	for (int n = 0; n < m.ElementSets(); ++n)
+	{
+		FEElementSet& l = m.ElementSet(n);
+		int elems = l.Elements();
+		m_ar.BeginChunk(PLT_ELEMENTSET);
+		{
+			m_ar.BeginChunk(PLT_ELEMENTSET_HDR);
+			{
+				int nid = n + 1;
+				m_ar.WriteChunk(PLT_ELEMENTSET_ID, nid);
+				m_ar.WriteChunk(PLT_ELEMENTSET_SIZE, elems);
+				m_ar.WriteChunk(PLT_ELEMENTSET_NAME, l.GetName());
+			}
+			m_ar.EndChunk();
+
+			std::vector<int> elemList(elems);
+			for (int i = 0; i < elems; ++i) elemList[i] = l[i];
+			m_ar.WriteChunk(PLT_ELEMENTSET_LIST, elemList);
+		}
+		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteFacetSetSection(FEMesh& m)
+{
+	for (int ns = 0; ns < m.FacetSets(); ++ns)
+	{
+		FEFacetSet& surf = m.FacetSet(ns);
+		int NF = surf.Faces();
+
+		m_ar.BeginChunk(PLT_FACETSET);
+		{
+			int maxNodes = FEFacetSet::FACET::MAX_NODES;
+
+			m_ar.BeginChunk(PLT_FACETSET_HDR);
+			{
+				int sid = ns + 1;
+				m_ar.WriteChunk(PLT_FACETSET_ID, sid);
+				m_ar.WriteChunk(PLT_FACETSET_SIZE, NF);
+				m_ar.WriteChunk(PLT_FACETSET_NAME, surf.GetName());
+				m_ar.WriteChunk(PLT_FACETSET_MAXNODES, maxNodes);
+			}
+			m_ar.EndChunk();
+
+			m_ar.BeginChunk(PLT_FACETSET_LIST);
+			{
+				int n[FEElement::MAX_NODES + 2];
+				for (int i = 0; i < NF; ++i)
+				{
+					FEFacetSet::FACET& f = surf.Face(i);
+					int nf = f.ntype;	// this is the type and the nr. of nodes!
+					n[0] = i + 1;
+					n[1] = nf;
+					for (int i = 0; i < nf; ++i) n[i + 2] = f.node[i];
+					m_ar.WriteChunk(PLT_FACET, n, maxNodes + 2);
+				}
+			}
+			m_ar.EndChunk();
 		}
 		m_ar.EndChunk();
 	}

@@ -76,10 +76,13 @@ double FEPIDController::GetValue(double time)
 	m_prev = error;
 	m_prevTime = time;
 
-	feLog("PID controller %d:\n", GetID());
-	feLog("\tparameter = %lg\n", val);
-	feLog("\terror     = %lg\n", error);
-	feLog("\tvalue     = %lg\n", newVal);
+	if (GetFEModel()->GetPrintParametersFlag())
+	{
+		feLog("PID controller %d:\n", GetID());
+		feLog("\tparameter = %lg\n", val);
+		feLog("\terror     = %lg\n", error);
+		feLog("\tvalue     = %lg\n", newVal);
+	}
 
 	return newVal;
 }

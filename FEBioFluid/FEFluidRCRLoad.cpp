@@ -219,5 +219,8 @@ void FEFluidRCRLoad::LoadVector(FEGlobalVector& R)
 void FEFluidRCRLoad::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-    ar& m_pn& m_pp& m_qn& m_qp& m_pdn& m_pdp& m_tp;
+    ar & m_pn& m_pp& m_qn& m_qp& m_pdn& m_pdp& m_tp;
+    if (ar.IsShallow()) return;
+    ar & m_pfluid;
+    ar & m_dofW & m_dofEF;
 }

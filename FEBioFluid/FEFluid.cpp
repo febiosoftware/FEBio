@@ -83,6 +83,15 @@ bool FEFluid::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluid::Serialize(DumpStream& ar)
+{
+    FEFluidMaterial::Serialize(ar);
+    if (ar.IsShallow()) return;
+    
+    ar & m_Tr;
+}
+
+//-----------------------------------------------------------------------------
 //! returns a pointer to a new material point object
 FEMaterialPointData* FEFluid::CreateMaterialPointData()
 {

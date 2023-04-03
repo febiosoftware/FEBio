@@ -144,8 +144,10 @@ void FEThermoFluidPressureLoad::Update()
 void FEThermoFluidPressureLoad::Serialize(DumpStream& ar)
 {
     FESurfaceConstraint::Serialize(ar);
+    if (ar.IsShallow()) return;
     ar & m_pfluid;
     ar & m_Lm & m_Lmp;
+    ar & m_dofT & m_dofEF;
 }
 
 //-----------------------------------------------------------------------------

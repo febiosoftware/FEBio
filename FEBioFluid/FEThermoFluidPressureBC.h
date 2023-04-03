@@ -52,6 +52,8 @@ public:
 
     // copy data from another class
     void CopyFrom(FEBoundaryCondition* pbc) override;
+    
+    FESurface* GetSurface() { return m_psurf; }
 
 private:
     FEParamDouble   m_p;       //!< prescribed fluid pressure
@@ -63,6 +65,8 @@ private:
 
     int        m_dofEF;
     int        m_dofT;
+    
+    FESurface* m_psurf;
 
     DECLARE_FECORE_CLASS();
 };

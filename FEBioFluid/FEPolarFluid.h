@@ -51,6 +51,9 @@ public:
     //! performs initialization
     bool Init() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
     //! calculate stress at material point
     mat3ds Stress(FEMaterialPoint& pt) override;
     

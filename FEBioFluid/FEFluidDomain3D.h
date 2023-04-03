@@ -44,6 +44,9 @@ public:
     //! assignment operator
     FEFluidDomain3D& operator = (FEFluidDomain3D& d);
     
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     

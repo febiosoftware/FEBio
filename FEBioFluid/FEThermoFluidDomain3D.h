@@ -48,6 +48,9 @@ public:
     //! initialize
     bool Init() override;
     
+    //! serialize
+    void Serialize(DumpStream& ar) override;
+    
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     

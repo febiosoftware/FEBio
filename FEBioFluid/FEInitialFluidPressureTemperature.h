@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,46 +23,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FESurfaceLoad.h>
-#include "febiofluid_api.h"
+#include <FECore/FEInitialCondition.h>
 
-//-----------------------------------------------------------------------------
-//! Tangential damping prescribes a shear traction that opposes tangential
-//! fluid velocity on a boundary surface.  This can help stabilize inflow
-//! conditions.
-class FEBIOFLUID_API FETangentialDamping : public FESurfaceLoad
+class FEInitialFluidPressureTemperature : public FENodalIC
 {
 public:
-    //! constructor
-    FETangentialDamping(FEModel* pfem);
+    FEInitialFluidPressureTemperature(FEModel* fem);
+	bool Init() override;
+    void Activate() override;
     
-    //! Initialization
-    bool Init() override;
-    
-    //! data serialization
+    void SetPDOF(int ndof);
+    bool SetPDOF(const char* szdof);
+
+    void SetTDOF(int ndof);
+    bool SetTDOF(const char* szdof);
+
+    void GetNodalValues(int inode, std::vector<double>& values) override;
+    void SetPValue(double v);
+    void SetTValue(double v);
+
     void Serialize(DumpStream& ar) override;
 
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
-    
-    //! calculate pressure stiffness
-    void StiffnessMatrix(FELinearSystem& LS) override;
-    
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R) override;
-    
 protected:
-	vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
+    int     m_dofEF;
+    int     m_dofT;
+    FEParamDouble   m_Pdata;
+    FEParamDouble   m_Tdata;
+    vector<double>  m_e;
+    vector<double>  m_T;
 
-protected:
-    double			m_eps;      //!< damping coefficient (penalty)
-    
-    // degrees of freedom
-	FEDofList	m_dofW;
-    
-    DECLARE_FECORE_CLASS();
+	DECLARE_FECORE_CLASS();
 };
