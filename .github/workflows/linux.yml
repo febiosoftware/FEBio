@@ -91,9 +91,9 @@ jobs:
         with:
           name: febio4-${{runner.os}}-${{runner.arch}}
           path: |
-            febio/bin
-            febio/lib
-            !febio/lib/*.a
+            cmbuild/bin
+            cmbuild/lib
+            !cmbuild/lib/*.a
   tests:
     if: ${{inputs.runTests}}
     name: Run test suite
@@ -110,7 +110,7 @@ jobs:
         with:
           name: febio4-${{runner.os}}-${{runner.arch}}
           path: |
-            febio
+            cmbuild
       - name: Run test suite
         run: |
           ci/linux-test.sh
@@ -167,8 +167,8 @@ jobs:
           SSH_HOST: ${{ secrets.REPO_HOST }}
       - name: Stage Build to Repo
         run: |
-          scp febio/bin/* repo:~/update2/FEBioStudio2Dev/Linux/stage/bin
-          scp febio/lib/* repo:~/update2/FEBioStudio2Dev/Linux/stage/lib
+          scp cmbuild/bin/* repo:~/update2/FEBioStudio2Dev/Linux/stage/bin
+          scp cmbuild/lib/* repo:~/update2/FEBioStudio2Dev/Linux/stage/lib
           ssh repo "chmod +x update2/FEBioStudio2Dev/Linux/stage/bin/febio4"
       - name: Make Dev Release
         run: |
@@ -198,8 +198,8 @@ jobs:
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
-          ci/publish-to-s3.sh febio
-          ci/publish-to-s3.sh febio-sdk
+          ci/publish-to-s3.sh cmbuild febio
+          ci/publish-to-s3.sh cmbuild febio-sdk
   docker:
     name: Build and deploy docker with latest
     needs:

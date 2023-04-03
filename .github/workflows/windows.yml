@@ -1,8 +1,8 @@
 on:
   #schedule:
   #  - cron: '00 7 * * *' #0630 UTC kick off full build and regression
-  # push:
-  #  branches: [ ci/* ]
+  push:
+   branches: [ ci/* ]
   workflow_dispatch:
     inputs:
       runTests:
@@ -58,9 +58,14 @@ jobs:
     needs:
       - start-runner # required to get output from the start-runner job
     runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
+    outputs:
+      git_describe: ${{ steps.git-describe.outputs.git_describe }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - id: git-describe
+        run: |
+          echo "git_describe=$(git describe --tags)" >> "$GITHUB_OUTPUT"
       - name: Build
         run: |
           ci/windows.bat
@@ -150,7 +155,34 @@ jobs:
           SSH_HOST: ${{ secrets.REPO_HOST }}
       - name: Stage Build to Repo
         run: |
-          scp cmbuild/Release/* repo:~/update2/FEBioStudio2Dev/Windows/stage/bin
+          scp febio/Release/* repo:~/update2/FEBioStudio2Dev/Windows/stage/bin
       - name: Make Dev Release
         run: |
           ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -w"
+  publish-to-s3:
+    name: Publish to S3
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Publish to S3
+        env:
+          BUCKET_NAME: febio-packages
+          OS: Windows
+          REF_NAME: ${{ github.ref_name}}
+          PACKAGE_NAME: febio
+          GIT_TAG: ${{ needs.build.outputs.git_describe }}
+        run: |
+          ci/publish-to-s3.sh cmbuild febio
+          ci/publish-to-s3.sh cmbuild febio-sdk
