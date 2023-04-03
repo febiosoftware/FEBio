@@ -172,7 +172,7 @@ double harmonicY(int degree, int order, double theta, double phi, int numType)
         break;
     }
 
-    return normalization*std::assoc_legendre(degree, order, cos(theta))*pow(-1, degree)*e*negate;
+    return normalization*__assoc_legendre_p(degree, order, cos(theta))*pow(-1, degree)*e*negate;
 }
 
 void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int numPts, double* theta, double* phi)
@@ -553,4 +553,90 @@ void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd,
 	SetError("This version does not have MMG support");
 	return nullptr;
 #endif
+}
+
+
+template<typename _Tp>
+_Tp
+__poly_legendre_p(unsigned int __l, _Tp __x)
+{
+
+    if (__isnan(__x))
+    return std::numeric_limits<_Tp>::quiet_NaN();
+    else if (__x == +_Tp(1))
+    return +_Tp(1);
+    else if (__x == -_Tp(1))
+    return (__l % 2 == 1 ? -_Tp(1) : +_Tp(1));
+    else
+    {
+        _Tp __p_lm2 = _Tp(1);
+        if (__l == 0)
+        return __p_lm2;
+
+        _Tp __p_lm1 = __x;
+        if (__l == 1)
+        return __p_lm1;
+
+        _Tp __p_l = 0;
+        for (unsigned int __ll = 2; __ll <= __l; ++__ll)
+        {
+            //  This arrangement is supposed to be better for roundoff
+            //  protection, Arfken, 2nd Ed, Eq 12.17a.
+            __p_l = _Tp(2) * __x * __p_lm1 - __p_lm2
+                - (__x * __p_lm1 - __p_lm2) / _Tp(__ll);
+            __p_lm2 = __p_lm1;
+            __p_lm1 = __p_l;
+        }
+
+        return __p_l;
+    }
+}
+
+template<typename _Tp>
+_Tp
+__assoc_legendre_p(unsigned int __l, unsigned int __m, _Tp __x,
+            _Tp __phase)
+{
+
+    if (__m > __l)
+    return _Tp(0);
+    else if (__isnan(__x))
+    return std::numeric_limits<_Tp>::quiet_NaN();
+    else if (__m == 0)
+    return __poly_legendre_p(__l, __x);
+    else
+    {
+        _Tp __p_mm = _Tp(1);
+        if (__m > 0)
+        {
+            //  Two square roots seem more accurate more of the time
+            //  than just one.
+            _Tp __root = std::sqrt(_Tp(1) - __x) * std::sqrt(_Tp(1) + __x);
+            _Tp __fact = _Tp(1);
+            for (unsigned int __i = 1; __i <= __m; ++__i)
+            {
+                __p_mm *= __phase * __fact * __root;
+                __fact += _Tp(2);
+            }
+        }
+        if (__l == __m)
+        return __p_mm;
+
+        _Tp __p_mp1m = _Tp(2 * __m + 1) * __x * __p_mm;
+        if (__l == __m + 1)
+        return __p_mp1m;
+
+        _Tp __p_lm2m = __p_mm;
+        _Tp __P_lm1m = __p_mp1m;
+        _Tp __p_lm = _Tp(0);
+        for (unsigned int __j = __m + 2; __j <= __l; ++__j)
+        {
+            __p_lm = (_Tp(2 * __j - 1) * __x * __P_lm1m
+                    - _Tp(__j + __m - 1) * __p_lm2m) / _Tp(__j - __m);
+            __p_lm2m = __P_lm1m;
+            __P_lm1m = __p_lm;
+        }
+
+        return __p_lm;
+    }
 }
