@@ -63,6 +63,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - id: git-describe
         run: |
           echo "git_describe=$(git describe --tags)" >> "$GITHUB_OUTPUT"
@@ -155,7 +157,7 @@ jobs:
           SSH_HOST: ${{ secrets.REPO_HOST }}
       - name: Stage Build to Repo
         run: |
-          scp febio/Release/* repo:~/update2/FEBioStudio2Dev/Windows/stage/bin
+          scp cmbuild/Release/* repo:~/update2/FEBioStudio2Dev/Windows/stage/bin
       - name: Make Dev Release
         run: |
           ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -w"
@@ -168,8 +170,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Download Artifacts
+      - name: Download SDK
         uses: actions/download-artifact@v3
+        with:
+          name: febio4-sdk-Windows-${{runner.arch}}
+          path: |
+            artifacts/febio-sdk
+      - name: Download febio
+        uses: actions/download-artifact@v3
+        with:
+          name: febio4-Windows-${{runner.arch}}
+          path: |
+            artifacts/febio
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
@@ -184,5 +196,5 @@ jobs:
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
-          ci/publish-to-s3.sh cmbuild febio
-          ci/publish-to-s3.sh cmbuild febio-sdk
+          ci/publish-to-s3.sh artifacts/febio febio
+          ci/publish-to-s3.sh artifacts/febio-sdk febio-sdk

@@ -157,7 +157,7 @@ jobs:
         with:
           name: febio4-${{runner.os}}-${{runner.arch}}
           path: |
-            febio
+            cmbuild
       - name: Configure SSH
         run: |
           ci/configure-ssh.sh
@@ -182,8 +182,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Download Artifacts
+      - name: Download SDK
         uses: actions/download-artifact@v3
+        with:
+          name: febio4-sdk-${{runner.os}}-${{runner.arch}}
+          path: |
+            artifacts/febio-sdk
+      - name: Download febio
+        uses: actions/download-artifact@v3
+        with:
+          name: febio4-${{runner.os}}-${{runner.arch}}
+          path: |
+            artifacts/febio
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
@@ -198,8 +208,8 @@ jobs:
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
-          ci/publish-to-s3.sh cmbuild febio
-          ci/publish-to-s3.sh cmbuild febio-sdk
+          ci/publish-to-s3.sh artifacts/febio febio
+          ci/publish-to-s3.sh artifacts/febio-sdk febio-sdk
   docker:
     name: Build and deploy docker with latest
     needs:
@@ -213,7 +223,7 @@ jobs:
         with:
           name: febio4-${{runner.os}}-${{runner.arch}}
           path: |
-            febio
+            cmbuild
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
