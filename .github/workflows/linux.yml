@@ -208,8 +208,9 @@ jobs:
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
-          ci/publish-to-s3.sh artifacts/febio febio
-          ci/publish-to-s3.sh artifacts/febio-sdk febio-sdk
+          chmod +x artifacts/febio/bin/febio4
+          ci/publish-to-s3.sh artifacts/febio
+          ci/publish-to-s3.sh artifacts/febio-sdk
   docker:
     name: Build and deploy docker with latest
     needs:
