@@ -44,3 +44,9 @@ FEAMR_API void altGradient(int order, std::vector<double>& sphHarm, std::vector<
 FEAMR_API void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);
 FEAMR_API void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);
 }
+
+// Taken from std::assoc_legendre definition in GCC
+template<typename _Tp>
+_Tp
+__assoc_legendre_p(unsigned int __l, unsigned int __m, _Tp __x,
+            _Tp __phase = _Tp(+1));

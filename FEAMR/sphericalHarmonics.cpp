@@ -555,13 +555,13 @@ void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd,
 #endif
 }
 
-
+// Taken from std::assoc_legendre definition in GCC
 template<typename _Tp>
 _Tp
 __poly_legendre_p(unsigned int __l, _Tp __x)
 {
 
-    if (__isnan(__x))
+    if (isnan(__x))
     return std::numeric_limits<_Tp>::quiet_NaN();
     else if (__x == +_Tp(1))
     return +_Tp(1);
@@ -600,7 +600,7 @@ __assoc_legendre_p(unsigned int __l, unsigned int __m, _Tp __x,
 
     if (__m > __l)
     return _Tp(0);
-    else if (__isnan(__x))
+    else if (isnan(__x))
     return std::numeric_limits<_Tp>::quiet_NaN();
     else if (__m == 0)
     return __poly_legendre_p(__l, __x);
