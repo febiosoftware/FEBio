@@ -68,6 +68,7 @@ jobs:
       - id: git-describe
         run: |
           echo "git_describe=$(git describe --tags)" >> "$GITHUB_OUTPUT"
+        shell: bash
       - name: Build
         run: |
           ci/windows.bat
