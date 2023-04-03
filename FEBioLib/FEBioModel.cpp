@@ -1457,7 +1457,7 @@ bool FEBioModel::Init()
 
 	// see if a valid dump file name is defined.
 	const std::string& sdmp = GetDumpFileName();
-	if (sdmp.empty() == 0)
+	if (sdmp.empty())
 	{
 		// if not, we take the input file name and set the extension to .dmp
 		char sz[1024] = { 0 };
