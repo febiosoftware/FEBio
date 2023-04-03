@@ -439,3 +439,10 @@ CMakeCache.txt
 Documentation/FEBio_Theory_Manual.pdf
 Documentation/FEBio_User_Manual.html.LyXconv/
 
+build_development/CMakeFiles/3.25.0-rc2/VCTargetsPath.txt
+*.rule
+*.check_cache
+*.depend
+*.list
+*.txt
+*.stamp
