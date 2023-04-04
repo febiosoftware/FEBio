@@ -45,6 +45,8 @@ public: // from FEDomain
 
 	void SetMaterial(FEMaterial* pm) override;
 
+	FEMaterial* GetMaterial() override;
+
 public: // from FEMeshPartition
 
 	// return number of beam elements

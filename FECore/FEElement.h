@@ -321,6 +321,4 @@ public:
 	FEBeamElement(const FEBeamElement& el);
 
 	FEBeamElement& operator = (const FEBeamElement& el);
-
-	void SetTraits(FEElementTraits* pt);
 };

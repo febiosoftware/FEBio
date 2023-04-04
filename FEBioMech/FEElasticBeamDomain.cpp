@@ -27,10 +27,18 @@ SOFTWARE.*/
 #include "FEElasticBeamDomain.h"
 #include <FECore/FELinearSystem.h>
 #include "FEElasticBeamMaterial.h"
+#include "FEBioMech.h"
+
 
 FEElasticBeamDomain::FEElasticBeamDomain(FEModel* fem) : FEBeamDomain(fem), FEElasticDomain(fem), m_dofs(fem)
 {
-	
+	m_mat = nullptr;
+
+	if (fem)
+	{
+		m_dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+	}
 }
 
 // return number of beam elements
@@ -48,8 +56,18 @@ FEBeamElement& FEElasticBeamDomain::Element(int i) { return m_Elem[i]; }
 // create function
 bool FEElasticBeamDomain::Create(int elements, FE_Element_Spec espec)
 {
-	// TODO:
-	return false;
+	m_Elem.resize(elements);
+	for (int i = 0; i < elements; ++i)
+	{
+		FEBeamElement& el = m_Elem[i];
+		el.SetLocalID(i);
+		el.SetMeshPartition(this);
+	}
+
+	// set element type
+	ForEachElement([=](FEElement& el) { el.SetType(FE_BEAM2G1); });
+
+	return true;
 }
 
 //! Get the list of dofs on this domain
@@ -60,8 +78,14 @@ const FEDofList& FEElasticBeamDomain::GetDOFList() const
 
 void FEElasticBeamDomain::SetMaterial(FEMaterial* pm)
 {
+	FEDomain::SetMaterial(pm);
 	m_mat = dynamic_cast<FEElasticBeamMaterial*>(pm);
 	assert(m_mat);
+}
+
+FEMaterial* FEElasticBeamDomain::GetMaterial()
+{
+	return m_mat;
 }
 
 //! calculate the internal forces
@@ -94,7 +118,7 @@ void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<d
 
 	for (int n = 0; n < nint; ++n)
 	{
-		FEElasticBeamMaterialPoint& mp = dynamic_cast<FEElasticBeamMaterialPoint&>(*el.GetMaterialPoint(n));
+		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
 
 		// get stress from beam element
 		vec3d t = mp.m_t;	// stress
@@ -166,7 +190,7 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 	int nint = el.GaussPoints();
 	for (int n = 0; n < nint; ++n)
 	{
-		FEElasticBeamMaterialPoint& mp = dynamic_cast<FEElasticBeamMaterialPoint&>(*el.GetMaterialPoint(n));
+		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
 
 		// get stress from beam element
 		vec3d t = mp.m_t;	// stress traction
@@ -242,7 +266,7 @@ void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 	for (int n = 0; n < nint; ++n)
 	{
 		// get the material point
-		FEElasticBeamMaterialPoint& mp = dynamic_cast<FEElasticBeamMaterialPoint&>(*el.GetMaterialPoint(n));
+		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
 
 		// update G0 = dphi0/dS
 		mp.m_G0;

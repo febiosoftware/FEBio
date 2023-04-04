@@ -2027,3 +2027,79 @@ public:
 	//! project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao) const override;
 };
+
+//=============================================================================
+//                      B E A M   E L E M E N T S
+//
+// This section defines a set of element formulations used to describe beams.
+//=============================================================================
+
+//=============================================================================
+class FEBeamElementTraits : public FEElementTraits
+{
+public:
+	FEBeamElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et);
+
+	// initialization
+	void init();
+
+	// shape functions at r
+	virtual void shape(double* H, double r) = 0;
+
+	// shape function derivatives at (r)
+	virtual void shape_deriv(double* Gr, double r) = 0;
+
+	// shape function second derivatives at (r)
+	virtual void shape_deriv2(double* Grr, double r) = 0;
+
+public:
+	std::vector<double> gr;	//!< integration point coordinates
+	std::vector<double> gw;	//!< integration point weights
+
+	// local derivatives of shape functions at gauss points
+	matrix Gr;
+
+	// local second derivatives of shape functions at gauss points
+	matrix Grr;
+};
+
+//=============================================================================
+//
+//   FEBeam2_
+//   
+//=============================================================================
+
+//=============================================================================
+//! Base class for two-point beam
+class FEBeam2_ : public FEBeamElementTraits
+{
+public:
+	enum { NELN = 2 };
+
+public:
+	//! constructor
+	FEBeam2_(int ni, FE_Element_Type et) : FEBeamElementTraits(ni, NELN, ET_LINE2, et) {}
+
+	//! shape function at (r)
+	void shape(double* H, double r);
+
+	//! shape function derivatives at (r)
+	void shape_deriv(double* Gr, double r);
+
+	//! shape function derivatives at (r)
+	void shape_deriv2(double* Grr, double r);
+};
+
+//=============================================================================
+class FEBeam2G1 : public FEBeam2_
+{
+public:
+	enum { NINT = 1 };
+
+public:
+	//! constructor
+	FEBeam2G1();
+
+	//! project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao) const override;
+};

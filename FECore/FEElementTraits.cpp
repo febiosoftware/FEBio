@@ -3794,3 +3794,87 @@ void FELine2G1::project_to_nodes(double* ai, double* ao) const
 	ao[0] = ai[0];
 	ao[1] = ai[0];
 }
+
+//=============================================================================
+//
+//                  B E A M    E L E M E N T S
+//
+//=============================================================================
+
+FEBeamElementTraits::FEBeamElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et) : FEElementTraits(ni, ne, FE_ELEM_EDGE, es, et)
+{
+	gr.resize(ni);
+	gw.resize(ni);
+	Gr.resize(ni, ne);
+	Grr.resize(ni, ne);
+}
+
+//-----------------------------------------------------------------------------
+void FEBeamElementTraits::init()
+{
+	assert(m_nint > 0);
+	assert(m_neln > 0);
+
+	// evaluate shape functions
+	const int NE = FEElement::MAX_NODES;
+	double N[NE];
+	for (int n = 0; n < m_nint; ++n)
+	{
+		shape(N, gr[n]);
+		for (int i = 0; i < m_neln; ++i) m_H[n][i] = N[i];
+	}
+
+	// evaluate shape function derivatives
+	double Nr[NE];
+	for (int n = 0; n < m_nint; ++n)
+	{
+		shape_deriv(Nr, gr[n]);
+		for (int i = 0; i < m_neln; ++i)
+		{
+			Gr[n][i] = Nr[i];
+		}
+	}
+}
+
+//=============================================================================
+//                         FEBeam2_
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FEBeam2_::shape(double* H, double r)
+{
+	H[0] = 0.5 * (1.0 - r);
+	H[1] = 0.5 * (1.0 + r);
+}
+
+//-----------------------------------------------------------------------------
+void FEBeam2_::shape_deriv(double* Hr, double r)
+{
+	Hr[0] = -0.5;
+	Hr[1] = 0.5;
+}
+
+//-----------------------------------------------------------------------------
+void FEBeam2_::shape_deriv2(double* Hrr, double r)
+{
+	Hrr[0] = 0;
+	Hrr[1] = 0;
+}
+
+//=============================================================================
+//                          FEBeam2G1 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FEBeam2G1::FEBeam2G1() : FEBeam2_(NINT, FE_BEAM2G1)
+{
+	gr[0] = 0.0; gw[0] = 2.0;
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FEBeam2G1::project_to_nodes(double* ai, double* ao) const
+{
+	ao[0] = ai[0];
+	ao[1] = ai[0];
+}

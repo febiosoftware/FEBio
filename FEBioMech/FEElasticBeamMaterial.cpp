@@ -26,9 +26,13 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElasticBeamMaterial.h"
 
+BEGIN_FECORE_CLASS(FEElasticBeamMaterial, FEMaterial)
+	ADD_PARAMETER(m_density, "density");
+END_FECORE_CLASS();
+
 FEElasticBeamMaterial::FEElasticBeamMaterial(FEModel* fem) : FEMaterial(fem)
 {
-
+	m_density = 1.0;
 }
 
 void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
@@ -39,4 +43,9 @@ void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
 void FEElasticBeamMaterial::Tangent(FEElasticBeamMaterialPoint& mp, matrix& C)
 {
 
+}
+
+FEMaterialPointData* FEElasticBeamMaterial::CreateMaterialPointData()
+{
+	return new FEElasticBeamMaterialPoint();
 }

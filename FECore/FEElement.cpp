@@ -606,10 +606,3 @@ FEBeamElement& FEBeamElement::operator = (const FEBeamElement& el)
 
 	return (*this);
 }
-
-void FEBeamElement::SetTraits(FEElementTraits* pt)
-{
-	m_pT = pt;
-	m_node.resize(Nodes());
-	m_lnode.resize(Nodes());
-}

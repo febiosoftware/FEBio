@@ -26,7 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMaterial.h>
 
-class FEElasticBeamMaterialPoint : public FEMaterialPoint
+class FEElasticBeamMaterialPoint : public FEMaterialPointData
 {
 public:
 	FEElasticBeamMaterialPoint() {}
@@ -46,4 +46,11 @@ public:
 	void Stress(FEElasticBeamMaterialPoint& mp);
 
 	void Tangent(FEElasticBeamMaterialPoint& mp, matrix& C);
+
+	FEMaterialPointData* CreateMaterialPointData() override;
+
+private:
+	double	m_density;
+
+	DECLARE_FECORE_CLASS();
 };

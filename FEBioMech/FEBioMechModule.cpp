@@ -276,6 +276,8 @@ SOFTWARE.*/
 #include "FESolidAnalysis.h"
 #include <FECore/FEModelUpdate.h>
 
+#include "FEElasticBeamMaterial.h"
+
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
 void FEBioMech::InitModule()
@@ -551,6 +553,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPreStrainUncoupledElastic, "uncoupled prestrain elastic");
 	REGISTER_FECORE_CLASS(FEConstPrestrainGradient, "prestrain gradient");
 	REGISTER_FECORE_CLASS(FEInSituStretchGradient, "in-situ stretch");
+
+	// beam materials
+	REGISTER_FECORE_CLASS(FEElasticBeamMaterial, "elastic-beam");
 
 	//-----------------------------------------------------------------------------
 	// domain classes
