@@ -23,30 +23,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include <FECore/FECoreTask.h>
+#include <string>
 
-
-
-#include "stdafx.h"
-#include "FEBioTest.h"
-#include <FECore/FECoreKernel.h>
-#include "FEBioDiagnostic.h"
-#include "FETangentDiagnostic.h"
-#include "FERestartDiagnostics.h"
-#include "FEJFNKTangentDiagnostic.h"
-#include "FEMaterialTest.h"
-#include "FEResetTest.h"
-#include "FEStiffnessDiagnostic.h"
-
-namespace FEBioTest
+//-----------------------------------------------------------------------------
+class FEStiffnessDiagnostic : public FECoreTask
 {
+public:
+	FEStiffnessDiagnostic(FEModel* fem);
 
-void InitModule()
-{
-	REGISTER_FECORE_CLASS(FEBioDiagnostic, "diagnose");
-	REGISTER_FECORE_CLASS(FERestartDiagnostic, "restart_test");
-	REGISTER_FECORE_CLASS(FEJFNKTangentDiagnostic, "jfnk tangent test");
-	REGISTER_FECORE_CLASS(FEResetTest, "reset_test");
-	REGISTER_FECORE_CLASS(FEMaterialTest, "material test");
-	REGISTER_FECORE_CLASS(FEStiffnessDiagnostic, "stiffness_test");
-}
-}
+	bool Init(const char* szfile) override;
+
+	bool Run() override;
+
+	bool Diagnose();
+
+protected:
+	void deriv_residual(matrix& ke);
+};
