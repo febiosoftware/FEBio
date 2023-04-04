@@ -148,6 +148,12 @@ void FEBioModel::ShowWarningsAndErrors(bool b)
 }
 
 //-----------------------------------------------------------------------------
+bool FEBioModel::ShowWarningsAndErrors() const
+{
+	return m_bshowErrors;
+}
+
+//-----------------------------------------------------------------------------
 Timer& FEBioModel::GetSolveTimer()
 {
 	return *GetTimer(Timer_ModelSolve);
