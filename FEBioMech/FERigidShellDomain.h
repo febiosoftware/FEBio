@@ -77,6 +77,9 @@ public:
 	//! reset data
 	void Reset() override;
 
+	//! initialize shells 
+	void InitShells() override;
+
 public:
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FELinearSystem& LS) override;
