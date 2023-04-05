@@ -957,44 +957,46 @@ bool FEExplicitSolidSolver::DoSolve()
 
 	vector<double> vnp1(m_neq, 0.0);
 	vector<double> anp1(m_neq);
-#pragma omp parallel for shared(vnp1, anp1, v_pred)
-	for (int i = 0; i < m_neq; ++i)
+#pragma omp parallel shared(vnp1, anp1, v_pred)
 	{
-		anp1[i] = m_R1[i] * m_Mi[i];
+#pragma omp for
+		for (int i = 0; i < m_neq; ++i)
+		{
+			anp1[i] = m_R1[i] * m_Mi[i];
 
-		// update velocity
-		vnp1[i] = v_pred[i] + anp1[i] * dt * 0.5;
+			// update velocity
+			vnp1[i] = m_dyn_damping*(v_pred[i] + anp1[i] * dt * 0.5);
+		}
+
+		// scatter velocity and accelerations
+#pragma omp for nowait
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+			int n;
+			if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], vnp1[n]); node.m_at.x = anp1[n]; }
+			if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], vnp1[n]); node.m_at.y = anp1[n]; }
+			if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], vnp1[n]); node.m_at.z = anp1[n]; }
+
+			if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
+			if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
+			if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
+		}
+
+		// update the total displacements
+#pragma omp for nowait
+		for (int i = 0; i < m_neq; ++i)
+		{
+			m_Ut[i] += m_ui[i];
+			m_R0[i] = m_R1[i];
+		}
 	}
-
 
 	// increase iteration number
 	m_niter++;
 
-	// scatter velocity and accelerations
-#pragma omp parallel for shared(vnp1, anp1)
-	for (int i = 0; i < mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], m_dyn_damping*vnp1[n]); node.m_at.x = anp1[n]; }
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], m_dyn_damping*vnp1[n]); node.m_at.y = anp1[n]; }
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], m_dyn_damping*vnp1[n]); node.m_at.z = anp1[n]; }
-
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], m_dyn_damping*vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], m_dyn_damping*vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], m_dyn_damping*vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
-	}
-
 	// do minor iterations callbacks
 	fem.DoCallback(CB_MINOR_ITERS);
-
-	// update the total displacements
-#pragma omp parallel for
-	for (int i = 0; i < m_neq; ++i)
-	{
-		m_Ut[i] += m_ui[i];
-		m_R0[i] = m_R1[i];
-	}
 
 	return true;
 }

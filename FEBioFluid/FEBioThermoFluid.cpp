@@ -33,6 +33,11 @@ SOFTWARE.*/
 #include "FEThermoFluid.h"
 #include "FEThermoFluidDomain3D.h"
 #include "FEThermoFluidDomainFactory.h"
+#include "FEFixedFluidTemperature.h"
+#include "FEInitialFluidTemperature.h"
+#include "FEInitialFluidPressureTemperature.h"
+#include "FEPrescribedFluidTemperature.h"
+#include "FEFluidHeatSupplyConst.h"
 #include "FEFluidNormalHeatFlux.h"
 #include "FEIdealGas.h"
 #include "FERealGas.h"
@@ -41,6 +46,7 @@ SOFTWARE.*/
 #include "FETempDependentConductivity.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
+#include "FEThermoFluidPressureBC.h"
 #include "FEFluidModule.h"
 #include "FEThermoFluidAnalysis.h"
 #include <FECore/FEModelUpdate.h>
@@ -71,7 +77,11 @@ void FEBioThermoFluid::InitModule()
     febio.RegisterDomain(new FEThermoFluidDomainFactory);
 
     // define the thermo-fluid module
-    febio.CreateModule(new FEThermoFluidModule, "thermo-fluid");
+    febio.CreateModule(new FEThermoFluidModule, "thermo-fluid",
+                       "{"
+                       "   \"title\" : \"Thermofluid\","
+                       "   \"info\"  : \"Fluid analysis with heat transfer and thermodynamics.\""
+                       "}");
     febio.AddModuleDependency("fluid");
 
     //-----------------------------------------------------------------------------
@@ -85,9 +95,28 @@ void FEBioThermoFluid::InitModule()
 
     REGISTER_FECORE_CLASS(FEThermoFluidDomain3D, "thermo-fluid-3D");
 
+    //-----------------------------------------------------------------------------
+    // initial conditions
+    REGISTER_FECORE_CLASS(FEInitialFluidTemperature  , "initial fluid temperature");
+    REGISTER_FECORE_CLASS(FEInitialFluidPressureTemperature  , "initial fluid pressure and temperature");
+
+    //-----------------------------------------------------------------------------
+    // boundary conditions
+    REGISTER_FECORE_CLASS(FEFixedFluidTemperature       , "zero fluid temperature"      );
+    REGISTER_FECORE_CLASS(FEPrescribedFluidTemperature  , "prescribed fluid temperature");
+    REGISTER_FECORE_CLASS(FEThermoFluidPressureBC       , "fluid pressure");
+
+    //-----------------------------------------------------------------------------
+    // Surface loads
     REGISTER_FECORE_CLASS(FEFluidNormalHeatFlux, "fluid heat flux");
     REGISTER_FECORE_CLASS(FETemperatureBackFlowStabilization, "temperature backflow stabilization");
 
+    //-----------------------------------------------------------------------------
+    // Body loads
+    REGISTER_FECORE_CLASS(FEFluidHeatSupplyConst   , "constant fluid heat supply");
+    
+    //-----------------------------------------------------------------------------
+    // Materials
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
     REGISTER_FECORE_CLASS(FERealGas    , "real gas"    );
     REGISTER_FECORE_CLASS(FERealLiquid , "real liquid" );

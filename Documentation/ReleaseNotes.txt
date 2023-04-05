@@ -41,6 +41,54 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   4.1   3/27/2023
+
+===========================================================================
+
+* Fixed issue with exporting log data "contact pressure" and "contact gap".
+* Added element ID in Holmes-Mow permeability error message.
+* Fixed problem with initialization of FERigidBC in multi-step analysis.
+* Added all node, element, and facet sets defined in the input file to the plot file.
+* Fixed issue with linear constraints for multi-step problems.
+* Added config option (show_warnings_and_errors) to suppress warnings and error messages.
+* Added parameter to param_run task to generate standard febio output files.
+* Hide "clamp_shells" parameter in FERigidNodeSet since it has no effect currently.
+* Now printing const scaled value for prescribed FEParamDouble values.
+* Some changes that address minor inconsistencies between the BCs that replace their deprecated "load" versions.
+* Fixed error in description of Hill discrete material.
+* Added enums to solve_strategy parameter of FEFluidSolutesSolver.
+* Minor change to console update.
+* Corrected unit of P1 muscle material parameter in user manual.
+* Fixed issue caused when febio prompt recieves EOF on Linux.
+* Log data is now also evaluated and output at time 0.
+* Fixed issue with missing material point data in multigeneration material.
+* Fixed issue with initialization of FERealGas and FEOsmCoefManning.
+* Fixed issue with initialization of FEMappedValueVec3 class and FEElasticFiberMaterial_T.
+* Added check for invalid tags when reading rigid body force.
+* Replaced NANDetected with NANInSolutionDetected and NANInResidualDetected.
+* Minor formatting change when printing vec3d mapped parameters.
+* Changed range for FEDamageFiberExponential k2 parameter.
+* Fixed bug in allow-mixed-bcs logic in multistep analysis.
+* Added support for target rigid moments.
+* Added support for referencing domain parameters. This can now be used in the param_run task.
+* Fixed bug in periodic boundary related to projection search radius.
+* Updated reaction rates (const, expSED, Huiskes and Nims) to use FEParamDouble instead of double for material properties.
+* Fixed initiation of referential solid volume fraction in multiphasic solid and shell domains.
+* Added support for reading linear constraint offset and fixed issue related to offset.
+* Added plot variable for specific strain energy in multiphasic materials (to account for solid remodeling).
+* Added rigid body names to echo input.
+* Updated User Manual to described fixed pressure, prescribed pressure, fixed concentration, prescribed concentration, fluid pressure (for multiphasic analyses), and add description of update flag to solute natural flux surface load
+* Added FEMultiphasicFluidPressureLoad to allow prescribing the actual fluid pressure in a multiphasic analysis. Modified FESoluteNaturalFlux to provide better numerical convergence for this surface load.
+* Moved up initialization of rigid system so PID load controllers can reference rigid body parameters.
+* Fixed couple issues with explicit solver: initialized FETimeInfo and fixed bug in using prescribed rigid displacements.
+* Fixed issue with shell dofs in explicit solver. Made some minor performance improvements.
+* Renamed FEPrescribedFluidPressure to FEPrescribedNodalFluidPressure to avoid naming conflict.
+* Fixed bug in parsing vector<int> from input file.
+* Fixed bug in parsing input file comments that contain '-' characters.
+
+
+===========================================================================
+
  R E L E A S E   4.0   1/5/2023
 
 ===========================================================================

@@ -154,6 +154,19 @@ void FEMappedValueVec3::Serialize(DumpStream& ar)
 	ar & m_val;
 }
 
+bool FEMappedValueVec3::Init()
+{
+	if (m_val == nullptr)
+	{
+		FEModel& fem = *GetFEModel();
+		FEMesh& mesh = fem.GetMesh();
+		FEDataMap* map = mesh.FindDataMap(m_mapName);
+		if (map == nullptr) return false;
+		setDataMap(map);
+	}
+	return FEVec3dValuator::Init();
+}
+
 //=================================================================================================
 BEGIN_FECORE_CLASS(FELocalVectorGenerator, FEVec3dValuator)
 	ADD_PARAMETER(m_n, 2, "local");

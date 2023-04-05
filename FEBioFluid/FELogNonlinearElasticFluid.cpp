@@ -46,7 +46,8 @@ bool FELogNonlinearElasticFluid::Init()
 // serialization
 void FELogNonlinearElasticFluid::Serialize(DumpStream& ar)
 {
-    ar& m_k& m_rhor;
+    if (ar.IsLoading()) return;
+    ar & m_k & m_rhor;
 }
 
 //-----------------------------------------------------------------------------

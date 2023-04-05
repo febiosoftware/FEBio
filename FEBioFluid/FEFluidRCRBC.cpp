@@ -47,6 +47,7 @@ FEFluidRCRBC::FEFluidRCRBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pf
 {
     m_R = 0.0;
     m_pfluid = nullptr;
+    m_psurf = nullptr;
     m_p0 = 0;
     m_Rd = 0.0;
     m_pd = 0.0;
@@ -65,9 +66,11 @@ bool FEFluidRCRBC::Init()
 
     if (FEPrescribedSurface::Init() == false) return false;
     
+    m_psurf = GetSurface();
+    
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
-    FESurfaceElement& el = GetSurface()->Element(0);
+    FESurfaceElement& el = m_psurf->Element(0);
     FEElement* pe = el.m_elem[0];
     if (pe == nullptr) return false;
     
@@ -86,36 +89,46 @@ bool FEFluidRCRBC::Init()
 
 //-----------------------------------------------------------------------------
 //! Evaluate and prescribe the resistance pressure
+void FEFluidRCRBC::UpdateDilatation()
+{
+	// Check if we started a new time, if so, update variables
+	FETimeInfo& timeInfo = GetFEModel()->GetTime();
+	double time = timeInfo.currentTime;
+	int iter = timeInfo.currentIteration;
+	double dt = timeInfo.timeIncrement;
+	if ((time > m_tp) && (iter == 0)) {
+		m_pp = m_pn;
+		m_qp = m_qn;
+		m_pdp = m_pdn;
+		m_tp = time;
+	}
+
+	// evaluate the flow rate at the current time
+	m_qn = FlowRate();
+	m_pdn = m_pd;
+
+	double tau = m_Rd * m_C;
+
+	// calculate the RCR pressure
+	m_pn = m_pdn + (m_Rd / (1 + tau / dt) + m_R) * m_qn + tau / (dt + tau) * (m_pp - m_pdp - m_R * m_qp);
+
+	// calculate the dilatation
+	m_e = 0.0;
+	bool good = m_pfluid->Dilatation(0, m_pn, 0, m_e);
+	assert(good);
+}
+
+void FEFluidRCRBC::UpdateModel() { Update(); }
+
 void FEFluidRCRBC::Update()
 {
-    // Check if we started a new time, if so, update variables
-    FETimeInfo& timeInfo = GetFEModel()->GetTime();
-    double time = timeInfo.currentTime;
-    int iter = timeInfo.currentIteration;
-    double dt = timeInfo.timeIncrement;
-    if ((time > m_tp) && (iter == 0)) {
-        m_pp = m_pn;
-        m_qp = m_qn;
-        m_pdp = m_pdn;
-        m_tp = time;
-    }
-    
-    // evaluate the flow rate at the current time
-    m_qn = FlowRate();
-    m_pdn = m_pd;
-    
-    double tau = m_Rd*m_C;
-    
-    // calculate the RCR pressure
-    m_pn = m_pdn + (m_Rd/(1+tau/dt)+m_R)*m_qn + tau/(dt+tau)*(m_pp - m_pdp - m_R*m_qp);
-    
-    // calculate the dilatation
-    m_e = 0.0;
-    bool good = m_pfluid->Dilatation(0,m_pn,0, m_e);
-    assert(good);
+	UpdateDilatation();
 
     // the base class handles mapping the values to the nodal dofs
     FEPrescribedSurface::Update();
+
+	// TODO: Is this necessary?
+	GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -129,10 +142,9 @@ double FEFluidRCRBC::FlowRate()
     vec3d rt[FEElement::MAX_NODES];
     vec3d vt[FEElement::MAX_NODES];
     
-    FESurface& surf = *GetSurface();
-    for (int iel=0; iel<surf.Elements(); ++iel)
+    for (int iel=0; iel<m_psurf->Elements(); ++iel)
     {
-        FESurfaceElement& el = surf.Element(iel);
+        FESurfaceElement& el = m_psurf->Element(iel);
         
         // nr integration points
         int nint = el.GaussPoints();
@@ -142,7 +154,7 @@ double FEFluidRCRBC::FlowRate()
         
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
-            FENode& node = surf.Node(el.m_lnode[i]);
+            FENode& node = m_psurf->Node(el.m_lnode[i]);
             rt[i] = node.m_rt;
             vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
         }
@@ -179,9 +191,18 @@ double FEFluidRCRBC::FlowRate()
 }
 
 //-----------------------------------------------------------------------------
+void FEFluidRCRBC::PrepStep(std::vector<double>& ui, bool brel)
+{
+	UpdateDilatation();
+	FEPrescribedSurface::PrepStep(ui, brel);
+}
+
+//-----------------------------------------------------------------------------
 void FEFluidRCRBC::GetNodalValues(int nodelid, std::vector<double>& val)
 {
     val[0] = m_e;
+	FENode& node = GetMesh().Node(m_nodeList[nodelid]);
+	node.set(m_dofEF, m_e);
 }
 
 //-----------------------------------------------------------------------------
@@ -198,4 +219,8 @@ void FEFluidRCRBC::Serialize(DumpStream& ar)
 {
     FEPrescribedSurface::Serialize(ar);
     ar & m_pn & m_pp & m_qn & m_qp & m_pdn & m_pdp & m_tp & m_e;
+    if (ar.IsShallow()) return;
+    ar & m_pfluid;
+    ar & m_dofW & m_dofEF;
+    ar & m_psurf;
 }

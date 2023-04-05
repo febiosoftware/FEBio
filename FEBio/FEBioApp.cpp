@@ -155,7 +155,7 @@ int FEBioApp::RunModel()
 		Console::GetHandle()->Deactivate();
 
 	// register callbacks
-	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED, 0);
+	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS | CB_INIT | CB_SOLVED | CB_STEP_ACTIVE, 0);
 	fem.AddCallback(interrupt_cb, CB_ALWAYS, 0);
 	fem.AddCallback(break_point_cb, CB_ALWAYS, 0);
 
@@ -204,6 +204,7 @@ void FEBioApp::ApplyConfig(FEBioModel& fem)
 	{
 		fem.SetPrintParametersFlag(m_config.m_printParams != 0);
 	}
+	fem.ShowWarningsAndErrors(m_config.m_bshowErrors);
 }
 
 //-----------------------------------------------------------------------------
@@ -541,6 +542,7 @@ void FEBioApp::ProcessCommands()
 				printf("Unknown command: %s\n", argv[0]);
 			}
 		}
+        else if (nargs == 0) break;
 
 		// make sure to clear the progress on the console
 		FEBioModel* fem = GetCurrentModel();

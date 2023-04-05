@@ -71,6 +71,17 @@ FEFluidDomain3D& FEFluidDomain3D::operator = (FEFluidDomain3D& d)
 }
 
 //-----------------------------------------------------------------------------
+//! serialize data to archive
+void FEFluidDomain3D::Serialize(DumpStream& ar)
+{
+    FESolidDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofW & m_dofAW & m_dof;
+    ar & m_dofEF & m_dofAEF;
+    ar & m_pMat;
+}
+
+//-----------------------------------------------------------------------------
 // get total dof list
 const FEDofList& FEFluidDomain3D::GetDOFList() const
 {
@@ -112,7 +123,8 @@ void FEFluidDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
-            
+            mp.m_rt = mp.m_r0;
+
             if (pt.m_ef <= -1) {
                 throw NegativeJacobianDetected();
             }

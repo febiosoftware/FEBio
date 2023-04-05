@@ -43,6 +43,9 @@ public:
     //! initialization
     bool Init() override;
     
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
     //! calculate thermal conductivity at material point
     double ThermalConductivity(FEMaterialPoint& pt) override;
     
@@ -53,7 +56,8 @@ public:
     double Tangent_Temperature(FEMaterialPoint& mp) override;
     
 public:
-    FEFunction1D*   m_K;    //!< thermal conductivity
+    FEFunction1D*   m_Khat; //!< normalized thermal conductivity
+    double          m_Kr;   //!< thermal conductivity at reference temperature
     double          m_Tr;   //!< reference temperature
     
     // declare parameter list

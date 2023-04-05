@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 class FERigidBody;
 
-class FERigidCablePoint : public FECoreClass
+class FEBIOMECH_API FERigidCablePoint : public FECoreClass
 {
 public:
 	FERigidCablePoint(FEModel* fem) : FECoreClass(fem) {}

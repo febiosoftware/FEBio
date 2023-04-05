@@ -174,8 +174,10 @@ matrix matrix::operator * (const matrix& m) const
 {
 	assert(m_nc == m.m_nr);
 	matrix a(m_nr, m.m_nc);
-    
-    #pragma omp parallel for shared(a)
+
+	// NOTE: commented this out since this can be called for small matrices.
+	// TODO: make a separate function that implements a parallel version. (e.g. pmult) 
+//	#pragma omp parallel for shared(a)
 	for (int i = 0; i < m_nr; ++i)
 	{
 		double* pa = a.m_pr[i];

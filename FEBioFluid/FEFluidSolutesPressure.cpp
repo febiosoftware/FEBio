@@ -209,7 +209,7 @@ void FEFluidSolutesPressure::LoadVector(FEGlobalVector& R)
 void FEFluidSolutesPressure::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
     ar & m_pfs;
-    ar & m_dofC;
-    ar & m_dofEF;
+    ar & m_dofC & m_dofEF;
 }

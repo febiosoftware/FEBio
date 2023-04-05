@@ -454,7 +454,7 @@ double FEDamageFiberPower::d2m_dP(double P)
 //=================================================================================================
 BEGIN_FECORE_CLASS(FEDamageFiberExponential, FEDamageElasticFiber)
 	ADD_PARAMETER(m_k1, FE_RANGE_GREATER_OR_EQUAL(0.0), "k1");
-	ADD_PARAMETER(m_k2, FE_RANGE_GREATER(1.0), "k2");
+	ADD_PARAMETER(m_k2, FE_RANGE_GREATER(0.0), "k2");
 	ADD_PARAMETER(m_kappa, FE_RANGE_CLOSED(0.0, 1.0/3.0), "kappa");
 END_FECORE_CLASS();
 

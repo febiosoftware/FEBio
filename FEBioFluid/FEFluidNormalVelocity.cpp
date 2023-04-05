@@ -342,7 +342,7 @@ bool FEFluidNormalVelocity::SetParabolicVelocity()
 }
 
 //-----------------------------------------------------------------------------
-//! Evaluate normal velocities by solving Poiseuille flow across the surface
+//! Evaluate and prescribe rim pressure
 bool FEFluidNormalVelocity::SetRimPressure()
 {
     FESurface* ps = &GetSurface();
@@ -373,5 +373,8 @@ bool FEFluidNormalVelocity::SetRimPressure()
 void FEFluidNormalVelocity::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
-	ar & m_nu;
+    if (ar.IsShallow()) return;
+	ar & m_nu & m_VN;
+    ar & m_rim;
+    ar & m_dofW & m_dofEF;
 }

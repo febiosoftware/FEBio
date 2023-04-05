@@ -35,7 +35,7 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FESolubManning, FESoluteSolubility)
     ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
-    ADD_PARAMETER(m_sol  , "co_ion");
+    ADD_PARAMETER(m_sol  , "co_ion")->setEnums("$(solutes)");
     ADD_PROPERTY(m_solub, "solub" );
 END_FECORE_CLASS();
 

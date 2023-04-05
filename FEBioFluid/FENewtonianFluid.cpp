@@ -30,11 +30,16 @@ SOFTWARE.*/
 #include "FENewtonianFluid.h"
 #include "FEFluid.h"
 #include "FEBiphasicFSI.h"
+#include "FEThermoFluid.h"
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianFluid, FEViscousFluid)
-    ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits("P.t")->setLongName("bulk viscosity");
-    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits("P.t")->setLongName("shear viscosity");
+    ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits(UNIT_VISCOSITY)->setLongName("bulk viscosity");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("shear viscosity");
+// properties
+    ADD_PROPERTY(m_kappahat, "khat" ,FEProperty::Optional)->SetLongName("normalized bulk viscosity");
+    ADD_PROPERTY(m_muhat   , "muhat",FEProperty::Optional)->SetLongName("normalized shear viscosity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -43,6 +48,35 @@ FENewtonianFluid::FENewtonianFluid(FEModel* pfem) : FEViscousFluid(pfem)
 {
     m_kappa = 0;
     m_mu = 0;
+    m_Tr = 0;
+    m_kappahat = nullptr;
+    m_muhat = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! initialization
+bool FENewtonianFluid::Init()
+{
+    if (m_kappahat || m_muhat) {
+        m_Tr = GetGlobalConstant("T");
+        
+        if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
+    }
+    
+    if (m_kappahat) m_kappahat->Init();
+    if (m_muhat) m_muhat->Init();
+    
+    return FEViscousFluid::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FENewtonianFluid::Serialize(DumpStream& ar)
+{
+    FEViscousFluid::Serialize(ar);
+    
+    if (ar.IsShallow()) return;
+    
+    ar & m_Tr;
 }
 
 //-----------------------------------------------------------------------------
@@ -53,7 +87,10 @@ mat3ds FENewtonianFluid::Stress(FEMaterialPoint& pt)
     
     mat3ds D = vt.RateOfDeformation();
     
-    mat3ds s = mat3dd(1.0)*(D.tr()*(m_kappa - 2.*m_mu/3.)) + D*(2*m_mu);
+    double mu = ShearViscosity(pt);
+    double kappa = BulkViscosity(pt);
+    
+    mat3ds s = mat3dd(1.0)*(D.tr()*(kappa - 2.*mu/3.)) + D*(2*mu);
         
     return s;
 }
@@ -70,21 +107,86 @@ mat3ds FENewtonianFluid::Tangent_Strain(FEMaterialPoint& mp)
 tens4ds FENewtonianFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
 {
     mat3dd I(1.0);
-    tens4ds c = dyad1s(I)*(m_kappa - 2.*m_mu/3.) + dyad4s(I)*(2*m_mu);
+    double mu = ShearViscosity(mp);
+    double kappa = BulkViscosity(mp);
+    
+    tens4ds c = dyad1s(I)*(kappa - 2.*mu/3.) + dyad4s(I)*(2*mu);
     
     return c;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of stress with respect to temperature T
+mat3ds FENewtonianFluid::Tangent_Temperature(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+    
+    mat3ds D = vt.RateOfDeformation();
+    
+    double dmu = TangentShearViscosityTemperature(mp);
+    double dkappa = TangentBulkViscosityTemperature(mp);
+    
+    mat3ds ds = mat3dd(1.0)*(D.tr()*(dkappa - 2.*dmu/3.)) + D*(2*dmu);
+        
+    return ds;
 }
 
 //-----------------------------------------------------------------------------
 //! dynamic shear viscosity
 double FENewtonianFluid::ShearViscosity(FEMaterialPoint& mp)
 {
-    return m_mu;
+    double mu = m_mu;
+    if (m_muhat) {
+        FEThermoFluidMaterialPoint* tf = mp.ExtractData<FEThermoFluidMaterialPoint>();
+        if (tf) {
+            double That = (tf->m_T+m_Tr)/m_Tr;
+            mu *= m_muhat->value(That);
+        }
+    }
+    return mu;
 }
 
 //-----------------------------------------------------------------------------
-//! bulke viscosity
+//! dynamic shear viscosity tangent w.r.t. temperature
+double FENewtonianFluid::TangentShearViscosityTemperature(FEMaterialPoint& mp)
+{
+    double dmu = 0;
+    if (m_muhat) {
+        FEThermoFluidMaterialPoint* tf = mp.ExtractData<FEThermoFluidMaterialPoint>();
+        if (tf) {
+            double That = (tf->m_T+m_Tr)/m_Tr;
+            dmu = m_muhat->derive(That)*m_mu/m_Tr;
+        }
+    }
+    return dmu;
+}
+
+//-----------------------------------------------------------------------------
+//! bulk viscosity
 double FENewtonianFluid::BulkViscosity(FEMaterialPoint& mp)
 {
-    return m_kappa;
+    double kappa = m_kappa;
+    if (m_kappa) {
+        FEThermoFluidMaterialPoint* tf = mp.ExtractData<FEThermoFluidMaterialPoint>();
+        if (tf) {
+            double That = (tf->m_T+m_Tr)/m_Tr;
+            kappa *= m_kappahat->value(That);
+        }
+    }
+    return kappa;
+}
+
+//-----------------------------------------------------------------------------
+//! bulk viscosity tangent w.r.t. temperature
+double FENewtonianFluid::TangentBulkViscosityTemperature(FEMaterialPoint& mp)
+{
+    double dkappa = 0;
+    if (m_kappa) {
+        FEThermoFluidMaterialPoint* tf = mp.ExtractData<FEThermoFluidMaterialPoint>();
+        if (tf) {
+            double That = (tf->m_T+m_Tr)/m_Tr;
+            dkappa = m_kappahat->derive(That)*m_kappa/m_Tr;
+        }
+    }
+    return dkappa;
 }

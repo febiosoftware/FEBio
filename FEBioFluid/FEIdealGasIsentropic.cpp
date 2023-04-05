@@ -69,6 +69,15 @@ bool FEIdealGasIsentropic::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEIdealGasIsentropic::Serialize(DumpStream& ar)
+{
+    FEFluid::Serialize(ar);
+    if (ar.IsShallow()) return;
+    
+    ar & m_R & m_Pr & m_Tr & m_rhor;
+}
+
+//-----------------------------------------------------------------------------
 //! elastic pressure
 double FEIdealGasIsentropic::Pressure(FEMaterialPoint& mp)
 {

@@ -44,9 +44,6 @@ class XMLReader;
 //! This class represents a xml-attribute
 class XMLAtt
 {
-	//! max buffer size for attribute name and value
-	enum { MAX_TAG = 128 };
-
 public:
 	//! constructor
 	XMLAtt();
@@ -56,25 +53,25 @@ public:
 	bool operator != (const char* szval);
 
 	//! Get the attribute name
-	const char* name() { return m_szatt; }
+	const char* name() { return m_name.c_str(); }
 
 	//! Get the attribute value
-	const char* cvalue() { return m_szatv; }
+	const char* cvalue() { return m_val.c_str(); }
 
 public:
-	void value(int& val) { val = atoi(m_szatv); }
+	void value(int& val) { val = atoi(m_val.c_str()); }
 	int value(double* v, int n);
 	template <typename T> T value() { return T(0); }
 
 public:
-	char	m_szatt[MAX_TAG];	//!< attribute name
-	char	m_szatv[MAX_TAG];	//!< attribute value
+	std::string	m_name;
+	std::string m_val;
 	bool	m_bvisited;			//!< was the attribute processed or not?
 };
 
-template <> inline int XMLAtt::value<int>() { return atoi(m_szatv); }
-template <> inline double XMLAtt::value<double>() { return atof(m_szatv); }
-template <> inline std::string XMLAtt::value<std::string>() { return m_szatv; }
+template <> inline int XMLAtt::value<int>() { return atoi(m_val.c_str()); }
+template <> inline double XMLAtt::value<double>() { return atof(m_val.c_str()); }
+template <> inline std::string XMLAtt::value<std::string>() { return m_val; }
 
 //-------------------------------------------------------------------------
 //! This class implements a xml-tag. The value and attributes of this tag
@@ -85,19 +82,12 @@ template <> inline std::string XMLAtt::value<std::string>() { return m_szatv; }
 class XMLTag
 {
 public:
-	enum {MAX_TAG   = 512};
-	enum {MAX_ATT   =   8};
-	enum {MAX_LEVEL =  16};
-
-public:
-	char		m_sztag[MAX_TAG];		// tag name
+	std::string	m_sztag;			// tag name
 	std::string m_szval;				// tag value
 
-	XMLAtt	m_att[MAX_ATT];				// attribute list
-	int		m_natt;						// nr of attributes
+	std::vector<XMLAtt>	m_att;				// attribute list
 
-	int		m_nlevel;						// depth level
-	char	m_szroot[MAX_LEVEL][MAX_TAG];	// name tag of parent's
+	std::vector<std::string> m_path;	// current path (name tags of parents)
 
 	XMLReader*	m_preader;			// pointer to reader
     int64_t		m_fpos;				// file position of next tag
@@ -115,8 +105,8 @@ public:
 
 	int currentLine() const { return m_ncurrent_line; }
 
-	bool operator == (const char* sztag) { return (strcmp(sztag, m_sztag) == 0); }
-	bool operator != (const char* sztag) { return (strcmp(sztag, m_sztag) != 0); }
+	bool operator == (const char* sztag) { return (strcmp(sztag, m_sztag.c_str()) == 0); }
+	bool operator != (const char* sztag) { return (strcmp(sztag, m_sztag.c_str()) != 0); }
 	void operator ++ ();
 
 	void skip();
@@ -138,7 +128,7 @@ public:
 	bool AttributeValue(const char* szat, int&    n, bool bopt = false);
 	bool AttributeValue(const char* szat, double& d, bool bopt = false);
 		
-	const char* Name() { return m_sztag; }
+	const char* Name() { return m_sztag.c_str(); }
 
 	void value(double& val) { val = atof(m_szval.c_str()); } 
 	void value(float& val)  { val = (float) atof(m_szval.c_str()); }

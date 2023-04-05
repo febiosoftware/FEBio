@@ -80,6 +80,9 @@ public:
 	//! performs initialization
 	bool Init() override;
 
+    //! data serialization
+    void Serialize(DumpStream& ar) override;
+
 public:
 	//! calculate solute molar flux
 	vec3d SoluteFlux(FEMaterialPoint& pt, const int sol);

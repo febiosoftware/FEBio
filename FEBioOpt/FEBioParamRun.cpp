@@ -34,7 +34,7 @@ SOFTWARE.*/
 //! class constructor
 FEBioParamRun::FEBioParamRun(FEModel* pfem) : FECoreTask(pfem)
 {
-
+	m_febioOutput = false;
 }
 
 //! initialization
@@ -49,18 +49,22 @@ bool FEBioParamRun::Init(const char* szfile)
 	if (Input(szfile) == false) return false;
 
 	// don't plot anything
-	FEParameterList& pl = fem->GetParameterList();
-	fem->SetParameter("log_level", 0);
-	for (int i = 0; i < fem->Steps(); ++i)
+	if (m_febioOutput == false)
 	{
-		fem->GetStep(i)->SetPlotLevel(FE_PLOT_NEVER);
-		fem->GetStep(i)->SetOutputLevel(FE_OUTPUT_NEVER);
+		// NOTE: I need to call GetParameterList to ensure that the parameters are allocated.
+		FEParameterList& pl = fem->GetParameterList();
+		fem->SetParameter("log_level", 0);
+		for (int i = 0; i < fem->Steps(); ++i)
+		{
+			fem->GetStep(i)->SetPlotLevel(FE_PLOT_NEVER);
+			fem->GetStep(i)->SetOutputLevel(FE_OUTPUT_NEVER);
+		}
 	}
 
 	// do the initialization of the task
-	GetFEModel()->BlockLog();
+	if (m_febioOutput == false) GetFEModel()->BlockLog();
 	if (fem->Init() == false) return false;
-	GetFEModel()->UnBlockLog();
+	if (m_febioOutput == false) GetFEModel()->UnBlockLog();
 
 	// initialize all parameters
 	for (FEModelParameter* v : m_inVar)
@@ -139,6 +143,10 @@ bool FEBioParamRun::Input(const char* szfile)
 				{
 					tag.value(m_outFile);
 				}
+				else if (tag == "generate_febio_output")
+				{
+					tag.value(m_febioOutput);
+				}
 				else if (tag == "param")
 				{
 					// read parameter
@@ -172,9 +180,9 @@ bool FEBioParamRun::Run()
 	if (fem == nullptr) return false;
 
 	// solve the model
-	GetFEModel()->BlockLog();
+	if (m_febioOutput == false) GetFEModel()->BlockLog();
 	if (fem->Solve() == false) return false;
-	GetFEModel()->UnBlockLog();
+	if (m_febioOutput == false) GetFEModel()->UnBlockLog();
 
 	// output the values
 	FILE* fp = fopen(m_outFile.c_str(), "wt");

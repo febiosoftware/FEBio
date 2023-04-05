@@ -41,6 +41,9 @@ public:
     //! initialization
     bool Init() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
     //! elastic pressure
     double Pressure(FEMaterialPoint& mp) override;
     double Pressure(const double e, const double T = 0) override;

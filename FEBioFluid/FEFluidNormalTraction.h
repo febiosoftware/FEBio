@@ -44,6 +44,9 @@ public:
 	//! initialization
 	bool Init() override;
     
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
     //! Set the surface to apply the load to
     void SetSurface(FESurface* ps) override;
     
