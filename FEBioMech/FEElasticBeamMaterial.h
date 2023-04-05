@@ -51,6 +51,9 @@ public:
 
 private:
 	double	m_density;
+	double	m_A, m_A1, m_A2;
+	double	m_E, m_G;
+	double	m_I1, m_I2, m_J;
 
 	DECLARE_FECORE_CLASS();
 };
