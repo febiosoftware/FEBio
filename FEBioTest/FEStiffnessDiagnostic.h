@@ -23,54 +23,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include <FECore/FECoreTask.h>
+#include <string>
 
-
-
-#include "stdafx.h"
-#include "FESurfaceLoad.h"
-#include "FEMesh.h"
-#include "DumpStream.h"
-#include "FEModel.h"
-
-FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEModelLoad(pfem)
+//-----------------------------------------------------------------------------
+class FEStiffnessDiagnostic : public FECoreTask
 {
-	m_psurf = 0;
-}
+public:
+	FEStiffnessDiagnostic(FEModel* fem);
 
-FESurfaceLoad::~FESurfaceLoad(void)
-{
+	bool Init(const char* szfile) override;
 
-}
+	bool Run() override;
 
-//! Set the surface to apply the load to
-void FESurfaceLoad::SetSurface(FESurface* ps)
-{
-	m_psurf = ps; 
-}
+	bool Diagnose();
 
-bool FESurfaceLoad::Init()
-{
-	if (m_psurf == 0) return false;
-	if (m_psurf->Init() == false) return false;
-	return FEModelLoad::Init();
-}
-
-void FESurfaceLoad::Serialize(DumpStream& ar)
-{
-	FEModelLoad::Serialize(ar);
-	if (ar.IsShallow()) return;
-
-	ar & m_psurf;
-
-	// the mesh manages surfaces for surface loads
-	if (m_psurf && ar.IsLoading())
-	{
-		FEMesh* pm = m_psurf->GetMesh();
-		pm->AddSurface(m_psurf);
-	}
-}
-
-void FESurfaceLoad::ForceMeshUpdate()
-{
-	GetFEModel()->SetMeshUpdateFlag(true);
-}
+protected:
+	void deriv_residual(matrix& ke);
+};

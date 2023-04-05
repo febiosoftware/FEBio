@@ -262,3 +262,11 @@ public:
 	int run(int nargs, char** argv);
 	DECLARE_COMMAND(FEBioCmd_hist);
 };
+
+//-----------------------------------------------------------------------------
+class FEBioCmd_set : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_set);
+};
