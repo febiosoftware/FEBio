@@ -65,9 +65,12 @@ VTKPlotFile::VTKPlotFile(FEModel* fem) : PlotFile(fem)
 //! Open the plot database
 bool VTKPlotFile::Open(const char* szfile)
 {
+	m_filename = szfile;
+	size_t n = m_filename.rfind('.');
+	if (n != std::string::npos) m_filename.erase(n, std::string::npos);
+
 	BuildDictionary();
 	m_count = 0;
-	Write(0.f);
 	m_valid = true;
 	return true;
 }
@@ -75,7 +78,8 @@ bool VTKPlotFile::Open(const char* szfile)
 //! Open for appending
 bool VTKPlotFile::Append(const char* szfile)
 {
-	return true;
+	// TODO: need to find the file with the largest index. 
+	return false;
 }
 
 //! see if the plot file is valid
@@ -90,7 +94,7 @@ bool VTKPlotFile::Write(float ftime, int flag)
 	FEModel& fem = *GetFEModel();
 
 	std::stringstream ss;
-	ss << "out." << m_count++ << ".vtk";
+	ss << m_filename << "." << m_count++ << ".vtk";
 	string fileName = ss.str();
 	
 	m_fp = fopen(fileName.c_str(), "wt");
@@ -113,7 +117,7 @@ void VTKPlotFile::WriteHeader()
 {
 	FEModel& fem = *GetFEModel();
 	fprintf(m_fp, "%s\n", "# vtk DataFile Version 3.0");
-	fprintf(m_fp, "%s %g\n", "vtk output at time", fem.GetCurrentTime());
+	fprintf(m_fp, "%s %g\n", "time", fem.GetCurrentTime());
 	fprintf(m_fp, "%s\n", "ASCII");
 	fprintf(m_fp, "%s\n", "DATASET UNSTRUCTURED_GRID");
 }
@@ -217,11 +221,14 @@ void VTKPlotFile::WritePointData()
 				assert(a.size() == N * ndata);
 				if (a.size() != N * ndata) a.resize(N * ndata, 0.f);
 
+				// must remove all whitespace
+				string dataName = it->m_szname;
+				for (size_t i = 0; i < dataName.size(); ++i)
+					if (isspace(dataName[i])) dataName[i] = '_';
+				const char* szname = dataName.c_str();
 
-				std::vector<float>& val = a.data();
-				const char* szname = it->m_szname;
-		
 				// write the value array
+				std::vector<float>& val = a.data();
 				int ntype = pd->DataType();
 				if (ntype == PLT_FLOAT) {
 					fprintf(m_fp, "%s %s %s\n", "SCALARS", szname, "float");
@@ -261,6 +268,17 @@ void VTKPlotFile::WriteCellData()
 
 	PlotFile::Dictionary& dic = GetDictionary();
 	if (dic.DomainVariables() == 0) return;
+
+	// write the part IDs first
+	fprintf(m_fp, "\nCELL_DATA %d\n", elems);
+	fprintf(m_fp, "SCALARS part_id int\n");
+	fprintf(m_fp, "LOOKUP_TABLE default\n");
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+		for (int n = 0; n < NE; ++n) fprintf(m_fp, "%d\n", i);
+	}
 
 	fprintf(m_fp, "\nCELL_DATA %d\n", elems);
 	auto& elemData = dic.DomainVariableList();
@@ -305,7 +323,11 @@ void VTKPlotFile::WriteCellData()
 					}
 				}
 
-				const char* szname = it->m_szname;
+				// must remove all whitespace
+				string dataName = it->m_szname;
+				for (size_t i = 0; i < dataName.size(); ++i)
+					if (isspace(dataName[i])) dataName[i] = '_';
+				const char* szname = dataName.c_str();
 
 				// write the value array
 				int ntype = pd->DataType();

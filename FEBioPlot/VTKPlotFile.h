@@ -56,4 +56,5 @@ private:
 	FILE*	m_fp;
 	int		m_count;
 	bool	m_valid;
+	std::string	m_filename;
 };
