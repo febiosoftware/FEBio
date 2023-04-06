@@ -23,52 +23,47 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "febiofluid_api.h"
-#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEPrescribedBC.h>
+#include <FECore/FESurface.h>
 #include <FECore/FENodeNodeList.h>
 
 //-----------------------------------------------------------------------------
-//! FETemperatureBackflowStabilization is a fluid surface where temperature
-//! is maintained constant when the fluid velocity normal to the surface is
-//! inward.
+//! FEThermoFluidTemperatureBC prescribes a temperature BC on an inflow/outflow boundary
+//! by enforcing a simplified version of the energy balance as an essential BC
 //!
-class FEBIOFLUID_API FETemperatureBackFlowStabilization : public FESurfaceLoad
+class FEBIOFLUID_API FEThermoFluidTemperatureBC : public FEPrescribedSurface
 {
 public:
     //! constructor
-    FETemperatureBackFlowStabilization(FEModel* pfem);
-    
-    //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS) override {}
-    
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R) override;
-    
+    FEThermoFluidTemperatureBC(FEModel* pfem);
+
     //! set the dilatation
     void Update() override;
-    
+
+    //! initialize
+    bool Init() override;
+
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+
     //! evaluate flow rate
     void MarkBackFlow();
     
-    //! initialize
-    bool Init() override;
-    
-    //! activate
-    void Activate() override;
-    
-    //! serialization
-    void Serialize(DumpStream& ar) override;
-    
-    //! Set the surface to apply the load to
-    void SetSurface(FESurface* ps) override;
-    
-private:
-    FEDofList   m_dofW;
-    int         m_dofT;
-    FENodeNodeList m_nnlist;
+public:
+    // return the value for node i, dof j
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
+    // copy data from another class
+    void CopyFrom(FEBoundaryCondition* pbc) override;
+
+private:
+    vector<double>  m_T;
+    FESurface*      m_surf;
+    FENodeNodeList  m_nnlist;
+    vector<bool>    m_backflow;
+
+    FEDofList       m_dofW;
+    int             m_dofT;
 };

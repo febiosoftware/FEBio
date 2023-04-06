@@ -27,48 +27,32 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "febiofluid_api.h"
 #include <FECore/FESurfaceLoad.h>
-#include <FECore/FENodeNodeList.h>
+#include <FECore/FEModelParam.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! FETemperatureBackflowStabilization is a fluid surface where temperature
-//! is maintained constant when the fluid velocity normal to the surface is
-//! inward.
-//!
-class FEBIOFLUID_API FETemperatureBackFlowStabilization : public FESurfaceLoad
+//! FEFluidNormalHeatFlux is a thermo-fluid surface that has a normal
+//! heat flux prescribed on it, equal to what's coming underneath it
+class FEBIOFLUID_API FEFluidNaturalHeatFlux : public FESurfaceLoad
 {
 public:
     //! constructor
-    FETemperatureBackFlowStabilization(FEModel* pfem);
+    FEFluidNaturalHeatFlux(FEModel* pfem);
     
-    //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS) override {}
-    
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R) override;
-    
-    //! set the dilatation
-    void Update() override;
-    
-    //! evaluate flow rate
-    void MarkBackFlow();
-    
-    //! initialize
+    //! initialization
     bool Init() override;
-    
-    //! activate
-    void Activate() override;
-    
-    //! serialization
-    void Serialize(DumpStream& ar) override;
     
     //! Set the surface to apply the load to
     void SetSurface(FESurface* ps) override;
     
-private:
-    FEDofList   m_dofW;
-    int         m_dofT;
-    FENodeNodeList m_nnlist;
-
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R) override;
+    
+    //! calculate heat flux stiffness (there is none)
+    void StiffnessMatrix(FELinearSystem& LS) override {}
+    
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
 };
