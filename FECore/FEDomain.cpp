@@ -149,6 +149,12 @@ void FEDomain::Activate()
 }
 
 //-----------------------------------------------------------------------------
+void FEDomain::IncrementalUpdate(std::vector<double>& ui)
+{
+
+}
+
+//-----------------------------------------------------------------------------
 // This is the default packing method. 
 // It stores all the degrees of freedom for the first node in the order defined
 // by the DOF array, then for the second node, and so on. 

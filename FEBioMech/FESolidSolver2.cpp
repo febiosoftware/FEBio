@@ -503,6 +503,14 @@ void FESolidSolver2::Update(vector<double>& ui)
 	// update kinematics
 	UpdateKinematics(ui);
 
+	// update domains 
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		dom.IncrementalUpdate(ui);
+	}
+
 	// update model state
 	UpdateModel();
 }

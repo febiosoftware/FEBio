@@ -59,6 +59,9 @@ public: // from FEMeshPartition
 	// update internal domain variables
 	void Update(const FETimeInfo& tp) override;
 
+	// update data that depends on the incremental solution update
+	void IncrementalUpdate(std::vector<double>& ui) override;
+
 public:
 	//! return a beam element
 	FEBeamElement& Element(int i);

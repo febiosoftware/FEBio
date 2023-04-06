@@ -77,6 +77,10 @@ public:
 	//! Activate the domain
 	virtual void Activate();
 
+	//! gives domains a chance to update any data
+	//! that depends on the displacement increments.
+	virtual void IncrementalUpdate(std::vector<double>& ui);
+
 protected:
 	// helper function for activating dof lists
 	void Activate(const FEDofList& dof);

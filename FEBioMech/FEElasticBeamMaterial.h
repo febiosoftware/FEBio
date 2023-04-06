@@ -35,7 +35,17 @@ public:
 	vec3d	m_t;	// stress vector
 	vec3d	m_m;	// moment vector
 
-	vec3d	m_G0;	// derivative of mid-displacement w.r.t s
+	// strain measures
+	vec3d	m_G0;
+	vec3d	m_Gamma;
+	vec3d	m_Kappa;
+
+	// rotation information
+	quatd	m_Rp;	// rotation at previous time step
+	quatd	m_Ri;	// increment at current time step
+	quatd	m_Rt;	// current rotation
+
+	vec3d	m_w;	// spatial curvature
 };
 
 class FEElasticBeamMaterial : public FEMaterial

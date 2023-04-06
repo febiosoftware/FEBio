@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include "FEElasticBeamMaterial.h"
 #include "FEBioMech.h"
+#include <FECore/FEMesh.h>
 
 
 FEElasticBeamDomain::FEElasticBeamDomain(FEModel* fem) : FEBeamDomain(fem), FEElasticDomain(fem), m_dofs(fem)
@@ -249,6 +250,63 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 	}
 }
 
+void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
+{
+	// update the rotations at the material points
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FEBeamElement& el = Element(i);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+
+		// get the nodal values of the incremental displacement
+		vector<vec3d> dri(ne);
+		for (int j = 0; j < ne; ++j)
+		{
+			std::vector<int>& id = Node(el.m_lnode[j]).m_ID;
+			vec3d d(0, 0, 0);
+			if (id[m_dofs[3]] >= 0) d.x = ui[id[m_dofs[3]]];
+			if (id[m_dofs[4]] >= 0) d.y = ui[id[m_dofs[4]]];
+			if (id[m_dofs[5]] >= 0) d.z = ui[id[m_dofs[5]]];
+
+			dri[j] = d;
+		}
+
+		// evaluate at integration points
+		for (int n = 0; n < ni; ++n)
+		{
+			// get the material point
+			FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+			// evaluate at integration point
+			vec3d dr = el.Evaluate(dri.data(), n);
+
+			// TODO: evaluate dr/dS
+			vec3d drdS;
+
+			// calculate exponential map
+			mat3d dR; dR.exp(dr);
+
+			// extract quaternion
+			quatd dq(dR);
+
+			// update rotations (TODO: what about line searches!)
+			mp.m_Ri = dq * mp.m_Ri;
+			mp.m_Rt = mp.m_Ri * mp.m_Rp;
+
+			// update spatial curvature
+			mat3da Wn(mp.m_w);
+			mat3d W = dR * Wn * dR.transpose(); // this should be a skew-symmetric matrix!
+			vec3d w2(-W[1][2], W[0][2], -W[0][1]);
+
+			vec3d w1 = drdS; // TODO: This is only a 1st order approximation!
+
+			// update curvature
+			mp.m_w = w1 + w2;
+		}
+	}
+}
+
 void FEElasticBeamDomain::Update(const FETimeInfo& tp)
 {
 	int NE = Elements();
@@ -261,6 +319,16 @@ void FEElasticBeamDomain::Update(const FETimeInfo& tp)
 
 void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 {
+	// get the nodal positions
+	vec3d r0[2], rt[2];
+	r0[0] = Node(el.m_lnode[0]).m_r0;
+	r0[1] = Node(el.m_lnode[1]).m_r0;
+	rt[0] = Node(el.m_lnode[0]).m_rt;
+	rt[1] = Node(el.m_lnode[1]).m_rt;
+
+	double L0 = (r0[1] - r0[0]).Length();
+	vec3d G0 = (rt[1] - rt[0])/L0;
+
 	// loop over all integration points
 	int nint = el.GaussPoints();
 	for (int n = 0; n < nint; ++n)
@@ -269,7 +337,13 @@ void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
 
 		// update G0 = dphi0/dS
-		mp.m_G0;
+		mp.m_G0 = G0;
+		quatd q = mp.m_Rt;
+		quatd qi = q.Conjugate();
+
+		// calculate material strain measures
+		mp.m_Gamma = qi * G0 - vec3d(1, 0, 0);
+		mp.m_Kappa = qi * mp.m_w; // m_w is updated in Update(std::vector<double>& ui)
 
 		// evaluate the stress
 		m_mat->Stress(mp);

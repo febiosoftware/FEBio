@@ -48,14 +48,13 @@ FEElasticBeamMaterial::FEElasticBeamMaterial(FEModel* fem) : FEMaterial(fem)
 
 void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
 {
-	// TODO: calculate these
-	vec3d gamma;
-	vec3d kappa;
-	mat3d R;
+	vec3d gamma = mp.m_Gamma;
+	vec3d kappa = mp.m_Kappa;
+	quatd R = mp.m_Rt;
 
 	// material vectors
 	vec3d N = vec3d(m_G * m_A1 * gamma.x, m_G*m_A2*gamma.y, m_E*m_A*gamma.z);
-	vec3d M = vec3d(m_E * m_I1 * kappa.x, m_E*m_I2*kappa.y, m_G*m_J*gamma.z);
+	vec3d M = vec3d(m_E * m_I1 * kappa.x, m_E*m_I2*kappa.y, m_G*m_J*kappa.z);
 
 	// spatial vectors
 	mp.m_t = R * N;
