@@ -95,6 +95,11 @@ build {
     script = "./common/linux/git.sh"
   }
 
+  # awscli
+  provisioner "shell" {
+    script = "./common/linux/aws.sh"
+  }
+
   provisioner "shell" {
     environment_vars = [
       "DEPENDENCIES_PATH=${var.dependencies_folder}"
