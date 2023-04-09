@@ -6,7 +6,7 @@ SOURCE=$(basename $SOURCE)
 TARGET_NAME=$SOURCE
 pushd $DIR
 GIT_TAG=${GIT_TAG}
-PACKAGE="${TARGET_NAME}-${GIT_TAG}.tgz"
+PACKAGE="${TARGET_NAME}-${GIT_TAG}.tar.gz"
 BUCKET_NAME=${BUCKET_NAME:-febio-packages}
 REF_NAME=${REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}
 PACKAGE_NAME=${PACKAGE_NAME:-febio}
