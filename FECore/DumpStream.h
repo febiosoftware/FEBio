@@ -348,9 +348,9 @@ template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>
 {
 	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
-	int N;
-	read(&N, sizeof(int), 1);
-	if (N > 0)
+	int N = 0;
+	int nread = read(&N, sizeof(int), 1);
+	if ((nread != 0) && (N > 0))
 	{
 		o.resize(N);
 		for (int i = 0; i<N; ++i) (*this) >> o[i];
