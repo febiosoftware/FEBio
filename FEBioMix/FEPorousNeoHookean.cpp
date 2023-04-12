@@ -53,15 +53,6 @@ bool FEPorousNeoHookean::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! serialize
-void FEPorousNeoHookean::Serialize(DumpStream& ar)
-{
-    FEElasticMaterial::Serialize(ar);
-    if (ar.IsShallow()) return;
-    ar & m_E & m_phisr;
-}
-
-//-----------------------------------------------------------------------------
 mat3ds FEPorousNeoHookean::Stress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

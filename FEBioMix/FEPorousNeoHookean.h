@@ -51,9 +51,6 @@ public:
     //! initialize the material
     bool Init() override;
     
-    //! serialize
-    void Serialize(DumpStream& ar) override;
-    
     //! calculate stress at material point
     mat3ds Stress(FEMaterialPoint& pt) override;
     
