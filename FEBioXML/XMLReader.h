@@ -272,7 +272,7 @@ protected:
 	int		m_nline;		//!< current line (used only as temp storage)
     int64_t	m_currentPos;	//!< current file position
 
-	char	m_buf[BUF_SIZE];
+	char*	m_buf;
     int64_t    m_bufIndex, m_bufSize;
 	bool	m_eof;
 };
