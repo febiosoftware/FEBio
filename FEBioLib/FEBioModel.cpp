@@ -1667,3 +1667,54 @@ void FEBioModel::on_cb_stepSolved()
 	m_stats.ntotalRHS     += step->m_ntotrhs;
 	m_stats.ntotalReforms += step->m_ntotref;
 }
+
+//-----------------------------------------------------------------------------
+bool FEBioModel::Restart(const char* szfile)
+{
+	// check the extension of the file
+	const char* szext = strrchr(szfile, '.');
+	if (strcmp(szext, ".feb") == 0)
+	{
+		// process restart input file
+		FERestartImport file;
+		if (file.Load(*this, szfile) == false)
+		{
+			char szerr[256];
+			file.GetErrorMessage(szerr);
+			fprintf(stderr, "%s", szerr);
+			return false;
+		}
+
+		// get the number of new steps added
+		int newSteps = file.StepsAdded();
+		int step = Steps() - newSteps;
+
+		// Any additional steps that were created must be initialized
+		for (int i = step; i < Steps(); ++i)
+		{
+			FEAnalysis* step = GetStep(i);
+			if (step->Init() == false) return false;
+
+			// also initialize all the model components
+			for (int j = 0; j < step->ModelComponents(); ++j)
+			{
+				FEModelComponent* pc = step->GetModelComponent(j);
+				if (pc->Init() == false) return false;
+			}
+		}
+	}
+	else
+	{
+		// Open the dump file
+		DumpFile ar(*this);
+		if (ar.Open(szfile) == false)
+		{
+			return false;
+		}
+
+		// try reading the file
+		Serialize(ar);
+	}
+
+	return true;
+}
