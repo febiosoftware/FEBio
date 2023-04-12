@@ -342,7 +342,7 @@ template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>
 {
 	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
-	int N;
+	int N = 0;
 	m_bytes_serialized += read(&N, sizeof(int), 1);
 	if (N > 0)
 	{
