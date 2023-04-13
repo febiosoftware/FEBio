@@ -50,7 +50,7 @@ FEConstValueMat3d::FEConstValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
 
 FEMat3dValuator* FEConstValueMat3d::copy()
 {
-	FEConstValueMat3d* map = new FEConstValueMat3d(GetFEModel());
+	FEConstValueMat3d* map = fecore_alloc(FEConstValueMat3d, GetFEModel());
 	map->m_val = m_val;
 	return map;
 }
@@ -123,7 +123,7 @@ mat3d FEMat3dLocalElementMap::operator () (const FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 FEMat3dValuator* FEMat3dLocalElementMap::copy()
 {
-	FEMat3dLocalElementMap* map = new FEMat3dLocalElementMap(GetFEModel());
+	FEMat3dLocalElementMap* map = fecore_alloc(FEMat3dLocalElementMap, GetFEModel());
 	map->m_n[0] = m_n[0];
 	map->m_n[1] = m_n[1];
 	map->m_n[2] = m_n[2];
@@ -201,7 +201,7 @@ mat3d FEMat3dSphericalMap::operator () (const FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 FEMat3dValuator* FEMat3dSphericalMap::copy()
 {
-	FEMat3dSphericalMap* map = new FEMat3dSphericalMap(GetFEModel());
+	FEMat3dSphericalMap* map = fecore_alloc(FEMat3dSphericalMap, GetFEModel());
 	map->m_c = m_c;
 	map->m_r = m_r;
 	return map;
@@ -276,7 +276,7 @@ mat3d FEMat3dCylindricalMap::operator () (const FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 FEMat3dValuator* FEMat3dCylindricalMap::copy()
 {
-	FEMat3dCylindricalMap* val = new FEMat3dCylindricalMap(GetFEModel());
+	FEMat3dCylindricalMap* val = fecore_alloc(FEMat3dCylindricalMap, GetFEModel());
 	val->m_c = m_c;
 	val->m_a = m_a;
 	val->m_r = m_r;
@@ -371,7 +371,7 @@ mat3d FEMat3dPolarMap::operator () (const FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 FEMat3dValuator* FEMat3dPolarMap::copy()
 {
-	FEMat3dPolarMap* map = new FEMat3dPolarMap(GetFEModel());
+	FEMat3dPolarMap* map = fecore_alloc(FEMat3dPolarMap, GetFEModel());
 	map->m_c = m_c;
 	map->m_a = m_a;
 	map->m_d0 = m_d0;
@@ -451,7 +451,7 @@ mat3d FEMat3dVectorMap::operator () (const FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 FEMat3dValuator* FEMat3dVectorMap::copy()
 {
-	FEMat3dVectorMap* map = new FEMat3dVectorMap(GetFEModel());
+	FEMat3dVectorMap* map = fecore_alloc(FEMat3dVectorMap, GetFEModel());
 	map->m_a = m_a;
 	map->m_d = m_d;
 	map->m_Q = m_Q;

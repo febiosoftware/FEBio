@@ -61,12 +61,7 @@ public:
 
 	double* constValue() override { return &m_val; }
 
-	FEScalarValuator* copy() override
-	{ 
-		FEConstValue* val = new FEConstValue(GetFEModel()); 
-		val->m_val = m_val;
-		return val;
-	}
+	FEScalarValuator* copy() override;
 
 private:
 	double	m_val;

@@ -155,6 +155,13 @@ BEGIN_FECORE_CLASS(FEConstValue, FEScalarValuator)
 	ADD_PARAMETER(m_val, "const");
 END_FECORE_CLASS();
 
+FEScalarValuator* FEConstValue::copy()
+{
+	FEConstValue* val = fecore_alloc(FEConstValue, GetFEModel());
+	val->m_val = m_val;
+	return val;
+}
+
 //=============================================================================
 
 BEGIN_FECORE_CLASS(FEMathValue, FEScalarValuator)
@@ -224,7 +231,7 @@ FEMathValue::~FEMathValue()
 
 FEScalarValuator* FEMathValue::copy()
 {
-	FEMathValue* newExpr = new FEMathValue(GetFEModel());
+	FEMathValue* newExpr = fecore_alloc(FEMathValue, GetFEModel());
 	newExpr->m_expr = m_expr;
 	newExpr->m_math = m_math;
 	return newExpr;
@@ -288,7 +295,7 @@ double FENodeMappedValue::operator()(const FEMaterialPoint& pt)
 
 FEScalarValuator* FENodeMappedValue::copy()
 {
-	FENodeMappedValue* map = new FENodeMappedValue(GetFEModel());
+	FENodeMappedValue* map = fecore_alloc(FENodeMappedValue, GetFEModel());
 	map->setDataMap(m_val);
 	return map;
 }
