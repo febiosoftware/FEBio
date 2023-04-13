@@ -147,9 +147,5 @@ double FEPorousNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 double FEPorousNeoHookean::ReferentialSolidVolumeFraction(FEMaterialPoint& mp)
 {
-    double phisr = m_phisr(mp);
-    if (phisr < 1) return phisr;
-    
-    FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-    return pt.m_phi0t;
+    return m_phisr(mp);
 }
