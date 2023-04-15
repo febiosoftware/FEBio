@@ -79,7 +79,7 @@ jobs:
           ci/linux.sh
       - name: Create SDK
         run: |
-          ci/febio-sdk.sh
+          ci/create-febio-sdk.sh
       - name: Upload SDK
         uses: actions/upload-artifact@v3
         with:
@@ -153,6 +153,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'
       - uses: actions/download-artifact@v3
         with:
           name: febio4-${{runner.os}}-${{runner.arch}}
@@ -160,7 +162,7 @@ jobs:
             cmbuild
       - name: Configure SSH
         run: |
-          ci/configure-ssh.sh
+          ci-common/ci/linux/configure-ssh.sh
         env:
           SSH_USER: ${{ secrets.REPO_USER }}
           SSH_KEY: ${{ secrets.REPO_KEY }}
@@ -182,6 +184,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'
       - name: Download SDK
         uses: actions/download-artifact@v3
         with:
@@ -209,8 +213,8 @@ jobs:
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
           chmod +x artifacts/febio/bin/febio4
-          ci/publish-to-s3.sh artifacts/febio
-          ci/publish-to-s3.sh artifacts/febio-sdk
+          ci-common/ci/linux/publish-to-s3.sh artifacts/febio
+          ci-common/ci/linux/publish-to-s3.sh artifacts/febio-sdk
   docker:
     name: Build and deploy docker with latest
     needs:
