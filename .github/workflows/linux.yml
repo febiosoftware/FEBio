@@ -76,7 +76,7 @@ jobs:
           echo "git_describe=$(git describe --tags)" >> "$GITHUB_OUTPUT"
       - name: Build
         run: |
-          ci/linux.sh
+          ci/linux/build.sh
       - name: Create SDK
         run: |
           ci/create-febio-sdk.sh
@@ -113,7 +113,7 @@ jobs:
             cmbuild
       - name: Run test suite
         run: |
-          ci/linux-test.sh
+          ci/linux/test.sh
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -162,16 +162,14 @@ jobs:
             cmbuild
       - name: Configure SSH
         run: |
-          ci-common/ci/linux/configure-ssh.sh
+          ci/common/linux/configure-ssh.sh
         env:
           SSH_USER: ${{ secrets.REPO_USER }}
           SSH_KEY: ${{ secrets.REPO_KEY }}
           SSH_HOST: ${{ secrets.REPO_HOST }}
       - name: Stage Build to Repo
         run: |
-          scp cmbuild/bin/* repo:~/update2/FEBioStudio2Dev/Linux/stage/bin
-          scp cmbuild/lib/* repo:~/update2/FEBioStudio2Dev/Linux/stage/lib
-          ssh repo "chmod +x update2/FEBioStudio2Dev/Linux/stage/bin/febio4"
+          ci/linux/scp-to-repo.sh
       - name: Make Dev Release
         run: |
           ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -l"
@@ -212,9 +210,7 @@ jobs:
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
-          chmod +x artifacts/febio/bin/febio4
-          ci-common/ci/linux/publish-to-s3.sh artifacts/febio
-          ci-common/ci/linux/publish-to-s3.sh artifacts/febio-sdk
+          ci/linux/publish-to-s3.sh
   docker:
     name: Build and deploy docker with latest
     needs:
@@ -244,5 +240,4 @@ jobs:
           REPOSITORY: febio-runtime
           IMAGE_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f infrastructure/DockerfileRuntime .
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          ci/linux/publish-docker-images.sh

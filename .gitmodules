@@ -2,5 +2,5 @@
 	path = TestSuite
 	url = https://github.com/febiosoftware/TestSuite.git
 [submodule "ci-common"]
-	path = ci-common
+	path = ci/common
 	url = git@github.com:febiosoftware/ci-common.git
