@@ -71,10 +71,10 @@ jobs:
         shell: bash
       - name: Build
         run: |
-          ci/windows.bat
+          ci/windows/build.bat
       - name: Create SDK
         run: |
-          ci/create-febio-sdk.sh
+          ci/linux/create-febio-sdk.sh
         shell: bash
       - name: Upload SDK
         uses: actions/upload-artifact@v3
@@ -105,7 +105,7 @@ jobs:
           path: cmbuild/bin
       - name: Run test suite
         run: |
-          ci/windows-test.bat
+          ci/windows/test.bat
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -154,7 +154,7 @@ jobs:
             cmbuild
       - name: Configure SSH
         run: |
-          ci-common/ci/linux/configure-ssh.sh
+          ci/common/linux/configure-ssh.sh
         env:
           SSH_USER: ${{ secrets.REPO_USER }}
           SSH_KEY: ${{ secrets.REPO_KEY }}
@@ -202,5 +202,5 @@ jobs:
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
-          ci-common/ci/linux/publish-to-s3.sh artifacts/febio
-          ci-common/ci/linux/publish-to-s3.sh artifacts/febio-sdk
+          ci/common/linux/publish-to-s3.sh artifacts/febio
+          ci/common/linux/publish-to-s3.sh artifacts/febio-sdk
