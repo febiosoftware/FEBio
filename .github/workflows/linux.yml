@@ -79,7 +79,7 @@ jobs:
           ci/linux/build.sh
       - name: Create SDK
         run: |
-          ci/create-febio-sdk.sh
+          ci/linux/create-febio-sdk.sh
       - name: Upload SDK
         uses: actions/upload-artifact@v3
         with:
