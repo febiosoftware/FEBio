@@ -25,12 +25,12 @@ services:
   febio-build:
     <<: *default
     container_name: febio-build
-    command: ci/linux.sh
+    command: ci/linux/build.sh
 
   febio-tests:
     <<: *default
     container_name: febio-tests
-    command: ci/linux-test.sh
+    command: ci/linux/test.sh
 
   febio-runtime:
     build:
