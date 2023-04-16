@@ -23,85 +23,60 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
-#include "FETemperatureBackFlowStabilization.h"
-#include "FEFluid.h"
+#include "FEThermoFluidTemperatureBC.h"
 #include "FEBioThermoFluid.h"
+#include "FEThermoFluid.h"
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
-FETemperatureBackFlowStabilization::FETemperatureBackFlowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
+FEThermoFluidTemperatureBC::FEThermoFluidTemperatureBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
 {
-}
-
-//-----------------------------------------------------------------------------
-//! allocate storage
-void FETemperatureBackFlowStabilization::SetSurface(FESurface* ps)
-{
-    FESurfaceLoad::SetSurface(ps);
+    m_dofT = -1;
+    m_surf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
-bool FETemperatureBackFlowStabilization::Init()
+bool FEThermoFluidTemperatureBC::Init()
 {
     FEModel& fem = *GetFEModel();
     
-    // determine the nr of concentration equations
     m_dofW.Clear();
     m_dofW.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::RELATIVE_FLUID_VELOCITY));
     m_dofT = fem.GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofW);
-    m_dof.AddDof(m_dofT);
+    SetDOFList(m_dofW);
+    SetDOFList(m_dofT);
 
-    FESurface* ps = &GetSurface();
+    if (FEPrescribedSurface::Init() == false) return false;
 
+    m_surf = GetSurface();
+    m_T.assign(m_surf->Nodes(), 0.0);
+    m_backflow.assign(m_surf->Nodes(), false);
+    
     m_nnlist.Create(fem.GetMesh());
-
-    return FESurfaceLoad::Init();
+    
+    return FEPrescribedSurface::Init();
 }
 
 //-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FETemperatureBackFlowStabilization::Activate()
-{
-    FESurface* ps = &GetSurface();
-    
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        FENode& node = ps->Node(i);
-        // mark node as having open DOF
-        node.set_bc(m_dofT, DOF_OPEN);
-    }
-    
-    FESurfaceLoad::Activate();
-}
-
-//-----------------------------------------------------------------------------
-//! Evaluate and prescribe the temperature
-void FETemperatureBackFlowStabilization::Update()
+//! Evaluate and prescribe the resistance pressure
+void FEThermoFluidTemperatureBC::Update()
 {
     // determine backflow conditions
     MarkBackFlow();
     
-    // prescribe solute backflow constraint at the nodes
-    FESurface* ps = &GetSurface();
+    int N = m_surf->Nodes();
+    std::vector<vector<double>> efNodes(N, vector<double>());
+    std::vector<vector<double>> vn(N, vector<double>());
     
-    for (int i=0; i<ps->Nodes(); ++i)
+    for (int i=0; i<m_surf->Nodes(); ++i)
     {
-        FENode& node = ps->Node(i);
-        // set node as having prescribed DOF (concentration at previous time)
-        if (node.m_ID[m_dofT] < -1)
-            node.set(m_dofT, node.get_prev(m_dofT));
-        else
-        {
-            node.set_bc(m_dofT, DOF_PRESCRIBED);
-            node.m_ID[m_dofT] = -node.m_ID[m_dofT] - 2;
+        FENode& node = m_surf->Node(i);
+        
+        if (m_backflow[i]) m_T[i] = node.get_prev(m_dofT);
+        else {
             int nid = node.GetID()-1; //0 based
             int val = m_nnlist.Valence(nid);
             int* nlist = m_nnlist.NodeList(nid);
@@ -113,9 +88,9 @@ void FETemperatureBackFlowStabilization::Update()
             {
                 int cnid = *(nlist+j);
                 bool isSurf = false;
-                for (int k=0; k<ps->Nodes(); ++k)
+                for (int k=0; k<m_surf->Nodes(); ++k)
                 {
-                    if (cnid==ps->Node(k).GetID()-1)
+                    if (cnid==m_surf->Node(k).GetID()-1)
                         isSurf = true;
                 }
                 if (!isSurf)
@@ -142,40 +117,29 @@ void FETemperatureBackFlowStabilization::Update()
                 }
                 connectnid = connectnidarray[cnodeIndex];
                 FENode* cnode = GetFEModel()->GetMesh().FindNodeFromID(connectnid+1);
-                node.set(m_dofT, cnode->get(m_dofT));
+                m_T[i] = cnode->get(m_dofT);
             }
             else
-                node.set(m_dofT, node.get_prev(m_dofT));
+                m_T[i] = node.get_prev(m_dofT);
         }
     }
+    FEPrescribedSurface::Update();
 }
 
 //-----------------------------------------------------------------------------
 //! evaluate the flow rate across this surface
-void FETemperatureBackFlowStabilization::MarkBackFlow()
+void FEThermoFluidTemperatureBC::MarkBackFlow()
 {
-    // Mark all nodes on this surface to have open concentration DOF
-    FESurface* ps = &GetSurface();
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        FENode& node = ps->Node(i);
-        // mark node as having free DOF
-        if (node.m_ID[m_dofT] < -1) {
-            node.set_bc(m_dofT, DOF_OPEN);
-            node.m_ID[m_dofT] = -node.m_ID[m_dofT] - 2;
-        }
-    }
-
     // Calculate normal flow velocity on each face to determine
     // backflow condition
     vec3d rt[FEElement::MAX_NODES];
     vec3d vt[FEElement::MAX_NODES];
     
     const FETimeInfo& tp = GetTimeInfo();
-
-    for (int iel=0; iel<m_psurf->Elements(); ++iel)
+    
+    for (int iel=0; iel<m_surf->Elements(); ++iel)
     {
-        FESurfaceElement& el = m_psurf->Element(iel);
+        FESurfaceElement& el = m_surf->Element(iel);
         
         // nr integration points
         int nint = el.GaussPoints();
@@ -185,7 +149,7 @@ void FETemperatureBackFlowStabilization::MarkBackFlow()
         
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
-            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
+            FENode& node = m_surf->GetMesh()->Node(el.m_node[i]);
             rt[i] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
             vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alpha + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alpha);
         }
@@ -196,7 +160,7 @@ void FETemperatureBackFlowStabilization::MarkBackFlow()
         
         vec3d dxr, dxs, v;
         double vn = 0;
-
+        
         // repeat over integration points
         for (int n=0; n<nint; ++n)
         {
@@ -218,31 +182,35 @@ void FETemperatureBackFlowStabilization::MarkBackFlow()
             vn += (normal*v)*w[n];
         }
         
-        if (vn < 0) {
-            for (int i=0; i<neln; ++i) {
-                FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-                if (node.m_ID[m_dofT] > -1) {
-                    node.set_bc(m_dofT, DOF_PRESCRIBED);
-                    node.m_ID[m_dofT] = -node.m_ID[m_dofT] - 2;
-                }
-            }
-        }
+        if (vn < 0)
+            for (int i=0; i<neln; ++i) m_backflow[el.m_lnode[i]] = true;
+        else
+            for (int i=0; i<neln; ++i) m_backflow[el.m_lnode[i]] = false;
+
     }
 }
 
 //-----------------------------------------------------------------------------
-//! calculate residual
-void FETemperatureBackFlowStabilization::LoadVector(FEGlobalVector& R)
+void FEThermoFluidTemperatureBC::GetNodalValues(int nodelid, std::vector<double>& val)
 {
+    val[0] = m_T[nodelid];
+}
+
+//-----------------------------------------------------------------------------
+// copy data from another class
+void FEThermoFluidTemperatureBC::CopyFrom(FEBoundaryCondition* pbc)
+{
+    // TODO: implement this
+    assert(false);
 }
 
 //-----------------------------------------------------------------------------
 //! serialization
-void FETemperatureBackFlowStabilization::Serialize(DumpStream& ar)
+void FEThermoFluidTemperatureBC::Serialize(DumpStream& ar)
 {
-    FESurfaceLoad::Serialize(ar);
+    FEPrescribedSurface::Serialize(ar);
+    ar & m_T;
     if (ar.IsShallow()) return;
-	ar & m_dofW;
-	ar & m_dofT;
-    m_nnlist.Create(GetFEModel()->GetMesh());
+    ar & m_dofT;
+    ar & m_surf;
 }

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,32 +24,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEInitialCondition.h>
+#include "febiofluid_api.h"
+#include <FECore/FEPrescribedBC.h>
+#include <FECore/FESurface.h>
+#include <FECore/FENodeNodeList.h>
 
-class FEInitialFluidPressureTemperature : public FENodalIC
+//-----------------------------------------------------------------------------
+//! FEThermoFluidTemperatureBC prescribes a temperature BC on an inflow/outflow boundary
+//! by enforcing a simplified version of the energy balance as an essential BC
+//!
+class FEBIOFLUID_API FEThermoFluidTemperatureBC : public FEPrescribedSurface
 {
 public:
-    FEInitialFluidPressureTemperature(FEModel* fem);
-	bool Init() override;
-    void Activate() override;
-    
-    void SetPDOF(int ndof);
-    bool SetPDOF(const char* szdof);
+    //! constructor
+    FEThermoFluidTemperatureBC(FEModel* pfem);
 
-    void SetTDOF(int ndof);
-    bool SetTDOF(const char* szdof);
+    //! set the dilatation
+    void Update() override;
 
-    void GetNodalValues(int inode, std::vector<double>& values) override;
+    //! initialize
+    bool Init() override;
 
+    //! serialization
     void Serialize(DumpStream& ar) override;
 
-protected:
-    int     m_dofEF;
-    int     m_dofT;
-    FEParamDouble   m_Pdata;
-    FEParamDouble   m_Tdata;
-    vector<double>  m_e;
-    vector<double>  m_T;
+    //! evaluate flow rate
+    void MarkBackFlow();
+    
+public:
+    // return the value for node i, dof j
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
-	DECLARE_FECORE_CLASS();
+    // copy data from another class
+    void CopyFrom(FEBoundaryCondition* pbc) override;
+
+private:
+    vector<double>  m_T;
+    FESurface*      m_surf;
+    FENodeNodeList  m_nnlist;
+    vector<bool>    m_backflow;
+
+    FEDofList       m_dofW;
+    int             m_dofT;
 };

@@ -64,7 +64,7 @@ bool FERigidNodeSet::Init()
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Activate()
 {
-	FEBoundaryCondition::Activate();
+	FENodalBC::Activate();
 
 	// get the rigid body's ID
 	FEMechModel& fem = dynamic_cast<FEMechModel&>(*GetFEModel());
@@ -105,7 +105,7 @@ void FERigidNodeSet::SetRigidMaterialID(int rid)
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Deactivate()
 {
-	FEStepComponent::Deactivate();
+	FENodalBC::Deactivate();
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	FENodeSet& nset = *GetNodeSet();
 	for (size_t i=0; i<nset.Size(); ++i)
@@ -123,7 +123,7 @@ void FERigidNodeSet::Deactivate()
 //-----------------------------------------------------------------------------
 void FERigidNodeSet::Serialize(DumpStream& ar)
 {
-	FEStepComponent::Serialize(ar);
+	FENodalBC::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_rigidMat & m_bshellBC;
 }

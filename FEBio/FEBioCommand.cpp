@@ -79,6 +79,7 @@ REGISTER_COMMAND(FEBioCmd_Print        , "print"  , "print values of variables")
 REGISTER_COMMAND(FEBioCmd_Quit         , "quit"   , "terminate the run and quit");
 REGISTER_COMMAND(FEBioCmd_Restart      , "restart", "toggle restart mode");
 REGISTER_COMMAND(FEBioCmd_Run          , "run"    , "run an FEBio input file");
+REGISTER_COMMAND(FEBioCmd_set          , "set"    , "set value of some model and config parameters");
 REGISTER_COMMAND(FEBioCmd_svg          , "svg"    , "write matrix sparsity pattern to svg file");
 REGISTER_COMMAND(FEBioCmd_Time         , "time"   , "print progress time statistics");
 REGISTER_COMMAND(FEBioCmd_UnLoadPlugin , "unload" , "unload a plugin");
@@ -731,6 +732,51 @@ int FEBioCmd_list::run(int nargs, char** argv)
 		}
 	}
 	printf("\n");
+
+	return 0;
+}
+
+int FEBioCmd_set::run(int nargs, char** argv)
+{
+	FEBioModel* fem = GetFEM();
+	if (nargs == 1)
+	{
+		printf("output_negative_jacobians = %d\n", (NegativeJacobian::m_boutput ? 1 : 0));
+		if (fem)
+		{
+			printf("print_model_params        = %d\n", (fem->GetPrintParametersFlag() ? 1 : 0));
+			printf("show_warnings_and_errors  = %d\n", (fem->ShowWarningsAndErrors() ? 1 : 0));
+		}
+		return 0;
+	}
+
+	if (nargs != 3)
+	{
+		printf("insufficient arguments.");
+		return 0;
+	}
+
+	int n = atoi(argv[2]);
+
+	if (strcmp(argv[1], "output_negative_jacobians") == 0)
+	{
+		NegativeJacobian::m_boutput = (n != 0);
+		printf("output_negative_jacobians = %d", n);
+	}
+	else if (fem && strcmp(argv[1], "print_model_params") == 0)
+	{
+		fem->SetPrintParametersFlag(n != 0);
+		printf("print_model_params = %d", n);
+	}
+	else if (fem && strcmp(argv[1], "show_warnings_and_errors") == 0)
+	{
+		fem->ShowWarningsAndErrors(n != 0);
+		printf("show_warnings_and_errors = %d", n);
+	}
+	else
+	{
+		printf("don't know \"%s\"", argv[1]);
+	}
 
 	return 0;
 }

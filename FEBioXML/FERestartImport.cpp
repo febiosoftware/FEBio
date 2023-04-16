@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "FEBioLoadDataSection.h"
 #include "FEBioStepSection.h"
 #include "FEBioStepSection3.h"
+#include "FEBioStepSection4.h"
 
 void FERestartControlSection::Parse(XMLTag& tag)
 {
@@ -159,6 +160,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		if      (strcmp(szversion, "1.0") == 0) nversion = 1;
 		else if (strcmp(szversion, "2.0") == 0) nversion = 2;
 		else if (strcmp(szversion, "3.0") == 0) nversion = 3;
+		else if (strcmp(szversion, "4.0") == 0) nversion = 4;
 
 		if (nversion == -1) return errf("FATAL ERROR: Incorrect restart file version\n");
 
@@ -188,6 +190,20 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 			m_map["LoadData"] = lcSection;
 
 			m_map["Step"] = new FEBioStepSection3(this);
+		}
+
+		// Add the Step section for version 4
+		if (nversion == 4)
+		{
+			// set the file version to make sure we are using the correct format
+			SetFileVerion(0x0400);
+
+			// make sure we can redefine curves in the LoadData section
+			FEBioLoadDataSection3* lcSection = new FEBioLoadDataSection3(this);
+			lcSection->SetRedefineCurvesFlag(true);
+			m_map["LoadData"] = lcSection;
+
+			m_map["Step"] = new FEBioStepSection4(this);
 		}
 
 		// the first section has to be the archive

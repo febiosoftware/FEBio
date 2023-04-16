@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,32 +24,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEInitialCondition.h>
+#include <FECore/FECoreTask.h>
+#include <string>
 
-class FEInitialFluidPressureTemperature : public FENodalIC
+//-----------------------------------------------------------------------------
+class FEStiffnessDiagnostic : public FECoreTask
 {
 public:
-    FEInitialFluidPressureTemperature(FEModel* fem);
-	bool Init() override;
-    void Activate() override;
-    
-    void SetPDOF(int ndof);
-    bool SetPDOF(const char* szdof);
+	FEStiffnessDiagnostic(FEModel* fem);
 
-    void SetTDOF(int ndof);
-    bool SetTDOF(const char* szdof);
+	bool Init(const char* szfile) override;
 
-    void GetNodalValues(int inode, std::vector<double>& values) override;
+	bool Run() override;
 
-    void Serialize(DumpStream& ar) override;
+	bool Diagnose();
 
 protected:
-    int     m_dofEF;
-    int     m_dofT;
-    FEParamDouble   m_Pdata;
-    FEParamDouble   m_Tdata;
-    vector<double>  m_e;
-    vector<double>  m_T;
-
-	DECLARE_FECORE_CLASS();
+	void deriv_residual(matrix& ke);
 };

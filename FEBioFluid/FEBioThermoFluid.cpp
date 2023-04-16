@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FEPrescribedFluidTemperature.h"
 #include "FEFluidHeatSupplyConst.h"
 #include "FEFluidNormalHeatFlux.h"
+#include "FEFluidNaturalHeatFlux.h"
 #include "FEIdealGas.h"
 #include "FERealGas.h"
 #include "FERealLiquid.h"
@@ -47,6 +48,7 @@ SOFTWARE.*/
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
 #include "FEThermoFluidPressureBC.h"
+#include "FEThermoFluidTemperatureBC.h"
 #include "FEFluidModule.h"
 #include "FEThermoFluidAnalysis.h"
 #include <FECore/FEModelUpdate.h>
@@ -105,10 +107,12 @@ void FEBioThermoFluid::InitModule()
     REGISTER_FECORE_CLASS(FEFixedFluidTemperature       , "zero fluid temperature"      );
     REGISTER_FECORE_CLASS(FEPrescribedFluidTemperature  , "prescribed fluid temperature");
     REGISTER_FECORE_CLASS(FEThermoFluidPressureBC       , "fluid pressure");
+    REGISTER_FECORE_CLASS(FEThermoFluidTemperatureBC    , "natural temperature");
 
     //-----------------------------------------------------------------------------
     // Surface loads
     REGISTER_FECORE_CLASS(FEFluidNormalHeatFlux, "fluid heat flux");
+    REGISTER_FECORE_CLASS(FEFluidNaturalHeatFlux, "fluid natural heat flux");
     REGISTER_FECORE_CLASS(FETemperatureBackFlowStabilization, "temperature backflow stabilization");
 
     //-----------------------------------------------------------------------------

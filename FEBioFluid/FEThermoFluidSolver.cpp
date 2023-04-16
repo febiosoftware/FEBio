@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include "FEFluidDomain.h"
 #include <assert.h>
 #include "FEFluidResidualVector.h"
+#include <FEBioMech/FEResidualVector.h>
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/DOFS.h>
@@ -68,6 +69,11 @@ BEGIN_FECORE_CLASS(FEThermoFluidSolver, FENewtonSolver)
     ADD_PARAMETER(m_rhoi , "rhoi"        );
     ADD_PARAMETER(m_pred , "predictor"   );
     ADD_PARAMETER(m_minJf, "min_volume_ratio");
+    ADD_PARAMETER(m_minT , "min_abs_temperature");
+    ADD_PARAMETER(m_solve_strategy, "solve_strategy")->setEnums("coupled\0sequential\0");
+    ADD_PARAMETER(m_Tmin , "min_T_drop");
+    ADD_PARAMETER(m_Tmax , "min_T_rise");
+    ADD_PARAMETER(m_Tnum , "min_T_num");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -84,7 +90,11 @@ FEThermoFluidSolver::FEThermoFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), 
     m_Rmin = 1.0e-20;
     m_Rmax = 0;     // not used if zero
     m_minJf = 0;    // not used if zero
-    
+    m_minT = 0;     // not used if zero
+    m_Tmin = 0;     // not used if zero
+    m_Tmax = 0;     // not used if zero
+    m_Tnum = 1;
+
     m_nveq = 0;
     m_ndeq = 0;
     m_nteq = 0;
@@ -93,8 +103,12 @@ FEThermoFluidSolver::FEThermoFluidSolver(FEModel* pfem) : FENewtonSolver(pfem), 
     // assume non-symmetric stiffness
     m_msymm = REAL_UNSYMMETRIC;
 
+    m_solve_strategy = SOLVE_COUPLED;
+    
     m_rhoi = 0;
     m_pred = 0;
+    
+    m_sudden_T_change = false;
     
     // Preferred strategy is Broyden's method
     SetDefaultStrategy(QN_BROYDEN);
@@ -211,6 +225,13 @@ bool FEThermoFluidSolver::InitEquations()
         if (n.m_ID[m_dofT[0]] != -1) m_nteq++;
     }
 
+    // check that we are using a block scheme for sequential solves
+    if ((m_solve_strategy == SOLVE_SEQUENTIAL) && (m_eq_scheme != EQUATION_SCHEME::BLOCK))
+    {
+        feLogWarning("You need a block solver when using the sequential solve strategy.");
+        return false;
+    }
+    
     // Next, we add any Lagrange Multipliers
     FEModel& fem = *GetFEModel();
     for (int i = 0; i < fem.NonlinearConstraints(); ++i)
@@ -228,6 +249,20 @@ bool FEThermoFluidSolver::InitEquations()
         {
             m_neq += spc->InitEquations(m_neq);
         }
+    }
+    
+    if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
+    {
+        // repartition the equations so that we only have two partitions,
+        // one for the fluid-dilatation, and one for the temperature.
+        
+        // fluid equations is all the rest
+        int nfeq = m_neq - m_nteq;
+        
+        // create the new partitions
+        // Note that this assumes that the temperature equations are always last!
+        vector<int> p = { nfeq, m_nteq };
+        SetPartitions(p);
     }
     
     return true;
@@ -369,8 +404,31 @@ void FEThermoFluidSolver::UpdateKinematics(vector<double>& ui)
     scatter(U, mesh, m_dofW[1]);
     scatter(U, mesh, m_dofW[2]);
     scatter(U, mesh, m_dofEF[0]);
-    scatter(U, mesh, m_dofT[0]);
+//    scatter(U, mesh, m_dofT[0]);
 
+    // update temperature data
+    int nssd = 0, nssr = 0;
+    for (int i=0; i<mesh.Nodes(); ++i)
+    {
+        FENode& node = mesh.Node(i);
+        
+        // update nodal temperature
+        int n = node.m_ID[m_dofT[0]];
+        // Force the temperature to remain positive
+        if (n >= 0) {
+            double Tt = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+            double Tp = node.get_prev(m_dofT[0]);
+            if ((m_Tmin > 0) && (node.get_bc(m_dofT[0]) == DOF_OPEN) && (Tp - Tt >= m_Tmin))
+                nssd++;
+            if ((m_Tmax > 0) && (node.get_bc(m_dofT[0]) == DOF_OPEN) && (Tt - Tp >= m_Tmax))
+                nssr++;
+            node.set(m_dofT[0], Tt);
+        }
+    }
+    
+    if (nssd >= m_Tnum) m_sudden_T_change = true;
+    if (nssr >= m_Tnum) m_sudden_T_change = true;
+    
     // force dilatations to remain greater than -1
     if (m_minJf > 0) {
         const int NN = mesh.Nodes();
@@ -382,6 +440,18 @@ void FEThermoFluidSolver::UpdateKinematics(vector<double>& ui)
         }
     }
 
+    // force absolute temperature to remain greater than 0
+    double Tr = fem.GetGlobalConstant("T");
+    if (m_minT > 0) {
+        const int NN = mesh.Nodes();
+        for (int i=0; i<NN; ++i)
+        {
+            FENode& node = mesh.Node(i);
+            if (node.get(m_dofT[0]) <= -Tr)
+                node.set(m_dofT[0], m_minT - Tr);
+        }
+    }
+    
     // make sure the prescribed velocities are fullfilled
     int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
@@ -483,7 +553,8 @@ void FEThermoFluidSolver::Update(vector<double>& ui)
     UpdateKinematics(ui);
     
     // update model state
-    GetFEModel()->Update();
+//    GetFEModel()->Update();
+    UpdateModel();
 }
 
 //-----------------------------------------------------------------------------
@@ -645,6 +716,10 @@ bool FEThermoFluidSolver::Quasin()
     // Init QN method
     if (QNInit() == false) return false;
     
+    // this flag indicates whether the velocity has converged for a sequential solve
+    // (This is not used for a coupled solve.)
+    bool vel_converged = false;
+    
     // loop until converged or when max nr of reformations reached
     bool bconv = false; // convergence flag
     do
@@ -654,9 +729,44 @@ bool FEThermoFluidSolver::Quasin()
         // assume we'll converge.
         bconv = true;
         
+        // for sequential solve, we set one of the residual components to zero
+        if (m_solve_strategy == SOLVE_SEQUENTIAL)
+        {
+            int veq = m_neq - m_nteq;
+            if (vel_converged == false)
+            {
+                // zero the solute residual
+                for (int i = veq; i < m_neq; ++i) m_R0[i] = 0.0;
+            }
+            else
+            {
+                // zero the velocity residual
+                for (int i = 0; i < veq; ++i) m_R0[i] = 0.0;
+            }
+        }
+        
         // solve the equations (returns line search; solution stored in m_ui)
         double s = QNSolve();
 
+        // for sequential solve, we set one of the residual components to zero
+        if (m_solve_strategy == SOLVE_SEQUENTIAL)
+        {
+            int veq = m_neq - m_nteq;
+            if (vel_converged == false)
+            {
+                // zero the solute residual
+                for (int i = veq; i < m_neq; ++i) m_R1[i] = 0.0;
+                
+                // zero the solute solution
+                for (int i = veq; i < m_neq; ++i) m_ui[i] = 0.0;
+            }
+            else
+            {
+                // zero the velocity residual
+                for (int i = 0; i < veq; ++i) m_R1[i] = 0.0;
+            }
+        }
+        
         // extract the velocity and dilatation increments
         GetVelocityData(m_vi, m_ui);
         GetDilatationData(m_di, m_ui);
@@ -783,6 +893,26 @@ bool FEThermoFluidSolver::Quasin()
             // Do augmentations
             bconv = DoAugmentations();
         }
+        
+        if (bconv && (m_solve_strategy == SOLVE_SEQUENTIAL))
+        {
+            if (vel_converged == false)
+            {
+                vel_converged = true;
+                bconv = false;
+                m_qnstrategy->m_nups = 0;
+                m_niter = -1;
+                Residual(m_R0);
+                feLog("\n*** Velocity converged. Now solving for temperature.\n");
+            }
+        }
+        
+        // check for sudden temperature change
+        if (bconv && m_sudden_T_change) {
+            m_sudden_T_change = false;
+            throw ConcentrationChangeDetected();
+        }
+        else m_sudden_T_change = false;
         
         // increase iteration number
         m_niter++;
@@ -935,8 +1065,9 @@ bool FEThermoFluidSolver::Residual(vector<double>& R)
     zero(m_Fr);
     
     // setup the global vector
-    FEFluidResidualVector RHS(fem, R, m_Fr);
-    
+//    FEFluidResidualVector RHS(fem, R, m_Fr);
+    FEResidualVector RHS(fem, R, m_Fr);
+
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     

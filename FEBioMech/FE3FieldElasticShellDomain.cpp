@@ -392,7 +392,7 @@ void FE3FieldElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 //! This function loops over all elements and updates the stress
 void FE3FieldElasticShellDomain::Update(const FETimeInfo& tp)
 {
-	FEElasticShellDomain::Update(tp);
+	FESSIShellDomain::Update(tp);
 
     bool berr = false;
     int NE = (int) m_Elem.size();
