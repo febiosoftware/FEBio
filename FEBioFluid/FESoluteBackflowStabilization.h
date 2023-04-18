@@ -74,7 +74,6 @@ protected:
 private:
     FEDofList   m_dofW;
     int         m_dofC;
-    vector<bool> m_backflow;    //!< flag for nodes that have backflow
     FENodeNodeList m_nnlist;
 
     DECLARE_FECORE_CLASS();

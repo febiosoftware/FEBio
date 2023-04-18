@@ -59,7 +59,12 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
     double phi0 = pbm->GetReferentialSolidVolumeFraction(mp);
 	
     // check for potential error
-    if (J <= phi0) feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phi0);
+    if (J <= phi0) 
+	{
+		FEElement* pe = mp.m_elem;
+		int id = (pe ? pe->GetID() : -1);
+		feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g. (element %d)", J, phi0, id);
+	}
 
     // --- strain-dependent isotropic permeability ---
 	
@@ -80,7 +85,12 @@ tens4dmm FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	double phi0 = pbm->GetReferentialSolidVolumeFraction(mp);
 
     // check for potential error
-    if (J <= phi0) feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phi0);
+	if (J <= phi0)
+	{
+		FEElement* pe = mp.m_elem;
+		int id = (pe ? pe->GetID() : -1);
+		feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g. (element %d)", J, phi0, id);
+	}
 
 	mat3dd I(1);	// Identity
 	

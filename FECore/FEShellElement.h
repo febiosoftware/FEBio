@@ -67,12 +67,19 @@ public:
 public:
 	std::vector<double>	m_h0;	//!< initial shell thicknesses
 	std::vector<double>	m_ht;	//!< current shell thickness
-	std::vector<vec3d>   m_d0;   //!< initial shell director
+	std::vector<vec3d>	m_d0;   //!< initial shell director
 
-							// indices of solid elements this shell element is attached to.
-							// the first element is attached to the back of the shell
-							// and the second element is attached to the front.
-							// the index is -1 if no solid is attached on that side.
+	std::vector<vec3d>	m_g0[3];//!< reference covariant base vectors
+	std::vector<vec3d>	m_gt[3];//!< current covariant base vectors
+	std::vector<vec3d>	m_gp[3];//!< previous covariant base vectors
+
+	std::vector<vec3d>	m_G0[3];//!< reference contravariant base vectors
+	std::vector<vec3d>	m_Gt[3];//!< current contravariant base vectors
+
+	// indices of solid elements this shell element is attached to.
+	// the first element is attached to the back of the shell
+	// and the second element is attached to the front.
+	// the index is -1 if no solid is attached on that side.
 	int        m_elem[2];
 };
 

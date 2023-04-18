@@ -69,7 +69,6 @@ public:
 private:
     FEDofList   m_dofW;
     int         m_dofT;
-    vector<bool> m_backflow;    //!< flag for nodes that have backflow
     FENodeNodeList m_nnlist;
 
 };

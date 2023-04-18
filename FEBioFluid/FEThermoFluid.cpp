@@ -53,6 +53,13 @@ FEThermoFluid::FEThermoFluid(FEModel* pfem) : FEFluidMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+void FEThermoFluid::Serialize(DumpStream& ar)
+{
+    FEFluidMaterial::Serialize(ar);
+    if (ar.IsShallow()) return;
+}
+
+//-----------------------------------------------------------------------------
 //! returns a pointer to a new material point object
 FEMaterialPointData* FEThermoFluid::CreateMaterialPointData()
 {

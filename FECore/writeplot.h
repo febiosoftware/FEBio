@@ -84,21 +84,33 @@ template <class T> void writeIntegratedElementValue(FESurface& surf, FEDataStrea
 //=================================================================================================
 template <class T> void writeElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
 {
-	for (int i = 0; i<dom.Elements(); ++i) {
+	int NE = dom.Elements();
+	std::vector<T> v(NE);
+#pragma omp parallel for shared(v)
+	for (int i = 0; i<NE; ++i) {
 		FEElement& el = dom.ElementRef(i);
-		ar << fnc(*el.GetMaterialPoint(0));
+		v[i] = fnc(*el.GetMaterialPoint(0));
 	}
+
+	for (int i = 0; i < NE; ++i)
+		ar << v[i];
 }
 
 //=================================================================================================
 template <class T> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
 {
-	for (int i = 0; i<dom.Elements(); ++i) {
+	int NE = dom.Elements();
+	std::vector<T> v(NE);
+#pragma omp parallel for shared(v)
+	for (int i = 0; i<NE; ++i) {
 		FEElement& el = dom.ElementRef(i);
 		T s(0.0);
 		for (int j = 0; j<el.GaussPoints(); ++j) s += fnc(*el.GetMaterialPoint(j));
-		ar << s / (double)el.GaussPoints();
+		v[i] = s / (double)el.GaussPoints();
 	}
+
+	for (int i=0; i<NE; ++i)
+		ar << v[i];
 }
 
 //=================================================================================================

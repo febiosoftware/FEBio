@@ -142,6 +142,16 @@ bool FESolutesMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FESolutesMaterial::Serialize(DumpStream& ar)
+{
+    FEMaterial::Serialize(ar);
+    
+    if (ar.IsShallow()) return;
+    
+    ar & m_Rgas & m_Tabs & m_Fc;
+}
+
+//-----------------------------------------------------------------------------
 //! partition coefficient
 double FESolutesMaterial::PartitionCoefficient(FEMaterialPoint& pt, const int sol)
 {

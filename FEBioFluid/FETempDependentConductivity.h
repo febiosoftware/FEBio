@@ -43,6 +43,9 @@ public:
     //! initialization
     bool Init() override;
     
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
     //! calculate thermal conductivity at material point
     double ThermalConductivity(FEMaterialPoint& pt) override;
     

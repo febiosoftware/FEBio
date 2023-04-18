@@ -48,6 +48,7 @@ bool FELinearElasticFluid::Init()
 // serialization
 void FELinearElasticFluid::Serialize(DumpStream& ar)
 {
+    if (ar.IsShallow()) return;
     ar & m_k & m_rhor;
 }
 

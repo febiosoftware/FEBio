@@ -253,8 +253,11 @@ void FEMultiphasicFSISoluteBackflowStabilization::LoadVector(FEGlobalVector& R)
 void FEMultiphasicFSISoluteBackflowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-    ar & m_dofW;
-    ar & m_dofC;
+    if (ar.IsLoading()) {
+        m_backflow.assign(GetSurface().Nodes(), false);
+    }
     ar & m_backflow;
+    if (ar.IsShallow()) return;
+    ar & m_dofW & m_dofC;
     //ar & m_nnlist;
 }

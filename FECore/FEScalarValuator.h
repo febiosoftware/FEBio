@@ -62,12 +62,7 @@ public:
 
 	double* constValue() override { return &m_val; }
 
-	FEScalarValuator* copy() override
-	{ 
-		FEConstValue* val = new FEConstValue(GetFEModel()); 
-		val->m_val = m_val;
-		return val;
-	}
+	FEScalarValuator* copy() override;
 
 private:
 	double	m_val;
@@ -100,7 +95,7 @@ private:
 class FECORE_API FEMathValue : public FEScalarValuator
 {
 public:
-	FEMathValue(FEModel* fem) : FEScalarValuator(fem) {}
+	FEMathValue(FEModel* fem);
 	~FEMathValue();
 	double operator()(const FEMaterialPoint& pt) override;
 
@@ -117,6 +112,7 @@ public:
 private:
 	std::string			m_expr;
 	FEMathExpression	m_math;
+	FECoreBase*			m_parent;
 
 	DECLARE_FECORE_CLASS();
 };

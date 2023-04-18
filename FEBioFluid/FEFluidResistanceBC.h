@@ -46,11 +46,14 @@ public:
     //! initialize
     bool Init() override;
 
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
 	void Update() override;
 	void UpdateModel() override;
     
 public:
-	void PrepStep(std::vector<double>& ui, bool brel);
+	void PrepStep(std::vector<double>& ui, bool brel) override;
 
     // return the value for node i, dof j
     void GetNodalValues(int nodelid, std::vector<double>& val) override;
@@ -68,7 +71,8 @@ private:
 
 private:
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
-    double              m_e;
+    double              m_e;    //!< fluid dilatation
+    FESurface*          m_psurf;
     
 	FEDofList	m_dofW;
     int		m_dofEF;
