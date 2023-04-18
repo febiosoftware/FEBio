@@ -31,10 +31,10 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEEFDNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_NH.m_E, "E");
+	ADD_PARAMETER(m_NH.m_E, "E")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_NH.m_v, "v");
 	ADD_PARAMETER(m_EFD.m_beta, 3, "beta");
-	ADD_PARAMETER(m_EFD.m_ksi , 3, "ksi" );
+	ADD_PARAMETER(m_EFD.m_ksi , 3, "ksi" )->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////

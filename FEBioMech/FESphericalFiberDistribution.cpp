@@ -42,6 +42,9 @@ BEGIN_FECORE_CLASS(FESphericalFiberDistribution, FEElasticMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
 	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  );
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

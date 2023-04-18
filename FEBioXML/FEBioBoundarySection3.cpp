@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioBoundarySection3.h"
-#include <FECore/FEBoundaryCondition.h>
-#include <FEBioMech/FEMechModel.h>
+#include <FECore/FENodalBC.h>
+#include <FECore/FESurfaceBC.h>
 #include <FECore/FEModel.h>
 #include <FECore/FELinearConstraintManager.h>
 
@@ -80,20 +80,23 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 	if (szname) pbc->SetName(szname);
 
 	// get the node set
-	FEProperty* pn = pbc->FindProperty("node_set");
-	if (pn)
+	if (dynamic_cast<FENodalBC*>(pbc))
 	{
+		FENodalBC* nbc = dynamic_cast<FENodalBC*>(pbc); assert(nbc);
+
 		// read required node_set attribute
 		const char* szset = tag.AttributeValue("node_set");
 		FENodeSet* nodeSet = GetBuilder()->FindNodeSet(szset);
 		if (nodeSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
-		pn->SetProperty(nodeSet);
+
+		nbc->SetNodeSet(nodeSet);
 	}
 
 	// get the surface
-	FEProperty* ps = pbc->FindProperty("surface");
-	if (ps)
+	if (dynamic_cast<FESurfaceBC*>(pbc))
 	{
+		FESurfaceBC* sbc = dynamic_cast<FESurfaceBC*>(pbc);
+
 		// read required surface attribute
 		const char* surfaceName = tag.AttributeValue("surface");
 		FEFacetSet* pface = mesh.FindFacetSet(surfaceName);
@@ -105,7 +108,7 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 
 		// assign it
 		mesh.AddSurface(psurf);
-		ps->SetProperty(psurf);
+		sbc->SetSurface(psurf);
 	}
 
 	// add this boundary condition to the current step
@@ -120,7 +123,7 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 // (Used to be defined in the Contact section)
 void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 {
-	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	FEModelBuilder* feb = GetBuilder();
 	int NMAT = fem.Materials();
@@ -131,17 +134,16 @@ void FEBioBoundarySection3::ParseBCRigid(XMLTag& tag)
 	if (nodeSet == 0) throw XMLReader::InvalidAttributeValue(tag, "node_set", szset);
 
 	// create new rigid node set
-	FERigidNodeSet* prn = fecore_alloc(FERigidNodeSet, &fem);
+	FENodalBC* prn = fecore_new_class<FENodalBC>("FERigidNodeSet", &fem);
 
 	prn->SetNodeSet(nodeSet);
 
-	fem.AddRigidNodeSet(prn);
-
 	// the default shell bc depends on the shell formulation
-	prn->SetShellBC(feb->m_default_shell == OLD_SHELL ? FERigidNodeSet::HINGED_SHELL : FERigidNodeSet::CLAMPED_SHELL);
+	// hinged shell = 0
+	// clamped shell = 1
+	prn->SetParameter("clamp_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
 
-	// add it to the current step
-	GetBuilder()->AddComponent(prn);
+	feb->AddBC(prn);
 
 	// read the parameter list
 	ReadParameterList(tag, prn);
@@ -162,7 +164,7 @@ void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
 
 	FEModelBuilder* feb = GetBuilder();
 
-	FELinearConstraint* lc = new FELinearConstraint(&fem);
+	FELinearConstraint* lc = fecore_alloc(FELinearConstraint, &fem);
 
 	++tag;
 	do
@@ -177,9 +179,23 @@ void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
 		{
 			lc->SetParentDof(dofs.GetDOF(tag.szvalue()));
 		}
+		else if (tag == "offset")
+		{
+			double d = 0.0;
+			tag.value(d);
+			lc->SetOffset(d);
+
+			const char* szlc = tag.AttributeValue("lc", true);
+			if (szlc)
+			{
+				int l = atoi(szlc) - 1;
+				FEParam* pp = lc->FindParameter("offset"); assert(pp);
+				if (pp) fem.AttachLoadController(pp, l);
+			}
+		}
 		else if (tag == "child_dof")
 		{
-			FELinearConstraint::DOF* dof = new FELinearConstraint::DOF;
+			FELinearConstraintDOF* dof = new FELinearConstraintDOF(&fem);
 			++tag;
 			do
 			{

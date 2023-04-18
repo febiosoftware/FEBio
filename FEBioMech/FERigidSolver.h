@@ -122,10 +122,7 @@ class FEBIOMECH_API FERigidSolverNew : public FERigidSolver
 public:
 	FERigidSolverNew(FEModel* fem) : FERigidSolver(fem){}
 
-    // evaluate body forces
-    void BodyForces(FEGlobalVector& R, const FETimeInfo& timeInfo, FEBodyForce& pbf);
-    
-    // evaluate inertial data
+	// evaluate inertial data
 	void InertialForces(FEGlobalVector& R, const FETimeInfo& timeInfo);
 
 	// update rigid DOF increments

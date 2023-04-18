@@ -29,6 +29,8 @@ SOFTWARE.*/
 #pragma once
 #include "FEDiagnostic.h"
 
+class SparseMatrix;
+
 //-----------------------------------------------------------------------------
 class FEContactBiphasicScenario : public FEDiagnosticScenario
 {
@@ -65,7 +67,7 @@ public:
 class FEContactDiagnosticBiphasic : public FEDiagnostic
 {
 public:
-    FEContactDiagnosticBiphasic(FEModel& fem);
+    FEContactDiagnosticBiphasic(FEModel* fem);
     ~FEContactDiagnosticBiphasic();
     
     bool Run();

@@ -51,6 +51,13 @@ FEDamageMaterial::FEDamageMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+// returns a pointer to a new material point object
+FEMaterialPointData* FEDamageMaterial::CreateMaterialPointData()
+{
+	return new FEDamageMaterialPoint(m_pBase->CreateMaterialPointData());
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization.
 bool FEDamageMaterial::Init()
 {

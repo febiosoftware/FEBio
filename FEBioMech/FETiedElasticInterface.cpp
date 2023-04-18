@@ -76,6 +76,18 @@ void FETiedElasticSurface::Data::Serialize(DumpStream& ar)
 	ar & m_tr;
 }
 
+void FETiedElasticSurface::Data::Init()
+{
+    FEContactMaterialPoint::Init();
+    m_Gap = vec3d(0, 0, 0);
+    m_dg = vec3d(0, 0, 0);
+    m_nu = vec3d(0, 0, 0);
+    m_rs = vec2d(0, 0);
+    m_Lmd = vec3d(0, 0, 0);
+    m_tr = vec3d(0, 0, 0);
+    m_epsn = 1.0;
+}
+
 //-----------------------------------------------------------------------------
 // FETiedElasticSurface
 //-----------------------------------------------------------------------------
@@ -255,6 +267,10 @@ FETiedElasticInterface::FETiedElasticInterface(FEModel* pfem) : FEContactInterfa
     m_naugmin = 0;
     m_naugmax = 10;
     
+    // set parents
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
+
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
 }
@@ -279,16 +295,15 @@ bool FETiedElasticInterface::Init()
 //! build the matrix profile for use in the stiffness matrix
 void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
-    FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
     
     // get the DOFS
-    const int dof_X = fem.GetDOFIndex("x");
-    const int dof_Y = fem.GetDOFIndex("y");
-    const int dof_Z = fem.GetDOFIndex("z");
-    const int dof_RU = fem.GetDOFIndex("Ru");
-    const int dof_RV = fem.GetDOFIndex("Rv");
-    const int dof_RW = fem.GetDOFIndex("Rw");
+    const int dof_X = GetDOFIndex("x");
+    const int dof_Y = GetDOFIndex("y");
+    const int dof_Z = GetDOFIndex("z");
+    const int dof_RU = GetDOFIndex("Ru");
+    const int dof_RV = GetDOFIndex("Rv");
+    const int dof_RW = GetDOFIndex("Rw");
     
     const int ndpn = 6;
     vector<int> lm(ndpn*FEElement::MAX_NODES*2);

@@ -44,7 +44,8 @@ class DumpStream;
 //
 class FECORE_API FEFunction1D : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEFUNCTION1D_ID)
+	FECORE_BASE_CLASS(FEFunction1D);
 
 public:
 	FEFunction1D(FEModel* pfem);
@@ -75,6 +76,27 @@ public:
     
     // invert function
     virtual bool invert(const double f0, double &x);
+};
+
+//-----------------------------------------------------------------------------
+// A constant function
+class FECORE_API FEConstFunction : public FEFunction1D
+{
+public:
+	FEConstFunction(FEModel* fem) : FEFunction1D(fem), m_value(0.0) {}
+	FEFunction1D* copy() override { return new FEConstFunction(GetFEModel(), m_value); }
+
+	double value(double t) const override { return m_value;	}
+	double derive(double t) const override { return 0.0; }
+	double deriv2(double t) const override { return 0.0; }
+
+protected:
+	FEConstFunction(FEModel* fem, double val) : FEFunction1D(fem), m_value(val) {}
+
+private:
+	double	m_value;
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -153,6 +175,8 @@ public:
 
 	bool Init() override;
 
+	void Serialize(DumpStream& ar) override;
+
 	FEFunction1D* copy() override;
 
 	double value(double t) const override;
@@ -165,6 +189,8 @@ public:
 
 private:
 	void evalParams(std::vector<double>& val, double t) const;
+
+	bool BuildMathExpressions();
 
 private:
 	std::string			m_s;

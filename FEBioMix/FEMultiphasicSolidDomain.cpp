@@ -25,16 +25,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-
 #include "stdafx.h"
 #include "FEMultiphasicSolidDomain.h"
 #include "FEMultiphasicMultigeneration.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEAnalysis.h"
-#include "FECore/log.h"
-#include "FECore/DOFS.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
+#include <FECore/log.h>
+#include <FECore/DOFS.h>
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/sys.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -43,10 +43,15 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEMultiphasicSolidDomain::FEMultiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEMultiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
-    m_pMat = 0;
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    m_pMat = nullptr;
+	
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+        m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+        m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -136,9 +141,6 @@ bool FEMultiphasicSolidDomain::Init()
     const int nsbm = m_pMat->SBMs();
     const int nsol = m_pMat->Solutes();
     vector<double> sbmr(nsbm, 0);
-    for (int i = 0; i<nsbm; ++i) {
-        sbmr[i] = m_pMat->GetSBM(i)->m_rho0;
-    }
     
     for (int i = 0; i<(int)m_Elem.size(); ++i)
     {
@@ -155,12 +157,33 @@ bool FEMultiphasicSolidDomain::Init()
             FEBiphasicMaterialPoint& pb = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
+            // initialize sbm apparent densities
+            for (int i = 0; i<nsbm; ++i)
+                sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
+            
+            // initialize multiphasic solutes
+            ps.m_nsol = nsol;
+            ps.m_c.assign(nsol,0);
+            ps.m_ca.assign(nsol,0);
+            ps.m_crp.assign(nsol, 0);
+            ps.m_gradc.assign(nsol,vec3d(0,0,0));
+            ps.m_k.assign(nsol, 0);
+            ps.m_dkdJ.assign(nsol, 0);
+            ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
+            ps.m_j.assign(nsol,vec3d(0,0,0));
+            ps.m_bsb.assign(nsol, false);
+            ps.m_nsbm = nsbm;
             ps.m_sbmr = sbmr;
-            ps.m_sbmrp.assign(nsbm, 0);
-            ps.m_sbmrhat.assign(nsbm, 0);
-            ps.m_sbmrhatp.assign(nsbm, 0);
-            pb.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
-            ps.m_cF = m_pMat->FixedChargeDensity(mp);
+            ps.m_sbmrp = sbmr;
+            ps.m_sbmrhat.assign(nsbm,0);
+            ps.m_sbmrhatp.assign(nsbm,0);
+            
+            // initialize referential solid volume fraction
+            pb.m_phi0 = pb.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
+            if (pb.m_phi0 > 1.0) {
+                feLogError("Referential solid volume fraction of multiphasic material cannot exceed unity!\nCheck ratios of sbm apparent and true densities.");
+                return false;
+            }
             
             // evaluate reaction rates at initial time
             // check if this mixture includes chemical reactions
@@ -171,7 +194,7 @@ bool FEMultiphasicSolidDomain::Init()
                 // multiphasic material point data
                 FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
                 
-                double phi0 = pb.m_phi0;
+                double phi0 = pb.m_phi0t;
                 for (int isbm=0; isbm<nsbm; ++isbm) {
                     // combine the molar supplies from all the reactions
                     for (int k=0; k<nreact; ++k) {
@@ -346,8 +369,14 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
             }
             pt.m_pa = m_pMat->Pressure(mp);
             
+            // determine if solute is 'solid-bound'
+            for (int isol = 0; isol<nsol; ++isol) {
+                FESolute* soli = m_pMat->GetSolute(isol);
+                if (soli->m_pDiff->Diffusivity(mp).norm() == 0) ps.m_bsb[isol] = true;
+            }
+            
             // initialize referential solid volume fraction
-            pt.m_phi0 = m_pMat->SolidReferentialVolumeFraction(mp);
+            pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
             
             // calculate FCD, current and stress
             ps.m_cF = m_pMat->FixedChargeDensity(mp);
@@ -368,9 +397,6 @@ void FEMultiphasicSolidDomain::Reset()
     
     // extract the initial concentrations of the solid-bound molecules
     vector<double> sbmr(nsbm,0);
-    for (int i=0; i<nsbm; ++i) {
-        sbmr[i] = m_pMat->GetSBM(i)->m_rho0;
-    }
     
     for (int i=0; i<(int) m_Elem.size(); ++i)
     {
@@ -387,8 +413,9 @@ void FEMultiphasicSolidDomain::Reset()
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
-            // initialize referential solid volume fraction
-            pt.m_phi0 = m_pMat->m_phi0(mp);
+            // initialize sbm apparent densities
+            for (int i = 0; i<nsbm; ++i)
+                sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
             
             // initialize multiphasic solutes
             ps.m_nsol = nsol;
@@ -400,11 +427,15 @@ void FEMultiphasicSolidDomain::Reset()
             ps.m_dkdJ.assign(nsol, 0);
             ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
             ps.m_j.assign(nsol,vec3d(0,0,0));
+            ps.m_bsb.assign(nsol, false);
             ps.m_nsbm = nsbm;
             ps.m_sbmr = sbmr;
             ps.m_sbmrp = sbmr;
             ps.m_sbmrhat.assign(nsbm,0);
             ps.m_sbmrhatp.assign(nsbm,0);
+
+            // initialize referential solid volume fraction
+            pt.m_phi0 = pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
 
             // reset chemical reaction element data
             ps.m_cri.clear();
@@ -413,6 +444,7 @@ void FEMultiphasicSolidDomain::Reset()
                 m_pMat->GetReaction(j)->ResetElementData(mp);
         }
     }
+    m_breset = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -445,8 +477,8 @@ void FEMultiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             FEMultigenSBMMaterialPoint* pmg = mp.ExtractData<FEMultigenSBMMaterialPoint>();
             
-            pe.m_r0 = r0;
-            pe.m_rt = rt;
+            mp.m_r0 = r0;
+            mp.m_rt = rt;
             
             pe.m_J = defgrad(el, pe.m_F, j);
             
@@ -454,7 +486,7 @@ void FEMultiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             pt.m_Jp = pe.m_J;
             
             // reset referential solid volume fraction at previous time
-            pt.m_phi0p = pt.m_phi0;
+            pt.m_phi0p = pt.m_phi0t;
             
             // reset referential actual solute concentration at previous time
             for (int j=0; j<m_pMat->Solutes(); ++j) {
@@ -924,7 +956,7 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
         
         // evaluate the porosity and its derivative
         double phiw = m_pMat->Porosity(mp);
-        double phi0 = ppt.m_phi0;
+        double phi0 = ppt.m_phi0t;
         double phis = 1. - phiw;
         double dpdJ = phis/J;
         
@@ -1584,12 +1616,7 @@ void FEMultiphasicSolidDomain::Update(const FETimeInfo& tp)
         }
     }
     
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -1651,8 +1678,8 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
         // material point coordinates
         // TODO: I'm not entirly happy with this solution
         //		 since the material point coordinates are used by most materials.
-        pt.m_r0 = el.Evaluate(r0, n);
-        pt.m_rt = el.Evaluate(rt, n);
+        mp.m_r0 = el.Evaluate(r0, n);
+        mp.m_rt = el.Evaluate(rt, n);
         
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);
@@ -1669,8 +1696,9 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
         pmb->UpdateSolidBoundMolecules(mp);
         
         // evaluate referential solid volume fraction
-        ppt.m_phi0 = pmb->SolidReferentialVolumeFraction(mp);
-        
+        ppt.m_phi0t = pmb->SolidReferentialVolumeFraction(mp);
+        if (m_breset) ppt.m_phi0 = ppt.m_phi0t;
+
         // evaluate fluid pressure at gauss-point
         ppt.m_p = el.Evaluate(pn, n);
         
@@ -1715,4 +1743,5 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
             pmb->GetReaction(j)->UpdateElementData(mp);
         
     }
+    if (m_breset) m_breset = false;
 }

@@ -87,7 +87,6 @@ bool FEBiphasicTangentUniaxial::Init()
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_r0 = r[i];
-        n.m_rid = -1;
         
         // set displacement BC's
         if (BC[i][0] == -1) nset[0]->Add(i);
@@ -129,7 +128,7 @@ bool FEBiphasicTangentUniaxial::Init()
 	FENodeSet* dc = new FENodeSet(&fem);
     dc->Add({1, 2, 5, 6});
     FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_x, dc);
-	pdc->SetScale(d, 0);
+    pdc->SetScale(d, 0);
 	fem.AddBoundaryCondition(pdc);
 
 	return true;
@@ -137,20 +136,23 @@ bool FEBiphasicTangentUniaxial::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEBiphasicTangentDiagnostic::FEBiphasicTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEBiphasicTangentDiagnostic::FEBiphasicTangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
 	m_pscn = 0;
 
-	FEAnalysis* pstep = new FEAnalysis(&fem);
+	// make sure the correct module is active
+	fem->SetActiveModule("biphasic");
+
+	FEAnalysis* pstep = new FEAnalysis(fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>("biphasic", &fem);
+	FESolver* pnew_solver = fecore_new<FESolver>("biphasic", fem);
 	assert(pnew_solver);
 	pnew_solver->m_msymm = REAL_UNSYMMETRIC;
 	pstep->SetFESolver(pnew_solver);
 
-	fem.AddStep(pstep);
-	fem.SetCurrentStep(pstep);
+	fem->AddStep(pstep);
+	fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

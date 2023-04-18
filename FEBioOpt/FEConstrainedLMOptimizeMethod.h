@@ -36,7 +36,7 @@ SOFTWARE.*/
 class FEConstrainedLMOptimizeMethod : public FEOptimizeMethod
 {
 public:
-	FEConstrainedLMOptimizeMethod();
+	FEConstrainedLMOptimizeMethod(FEModel* fem);
 	bool Solve(FEOptimizeData* pOpt, vector<double>& amin, vector<double>& ymin, double* minObj) override;
 
 	FEOptimizeData* GetOptimizeData() { return m_pOpt; }
@@ -44,10 +44,13 @@ public:
 protected:
 	FEOptimizeData* m_pOpt;
 
-	void ObjFun(vector<double>& x, vector<double>& a, vector<double>& y, matrix& dyda);
+	void ObjFun(double* p, double* hx, int m, int n);
 
-	static FEConstrainedLMOptimizeMethod* m_pThis;
-	static void objfun(vector<double>& x, vector<double>& a, vector<double>& y, matrix& dyda) { return m_pThis->ObjFun(x, a, y, dyda); }
+	static void objfun(double* p, double* hx, int m, int n, void* adata) 
+	{ 
+		FEConstrainedLMOptimizeMethod* clm = (FEConstrainedLMOptimizeMethod*)adata;
+		return clm->ObjFun(p, hx, m , n);
+	}
 
 public:
 	double	m_tau;		// scale factor for mu
@@ -55,6 +58,7 @@ public:
 	double	m_fdiff;	// forward difference step size
 	int		m_nmax;		// maximum number of iterations
     int     m_loglevel; // log file output level
+	bool	m_scaleParams;	// scale parameters flag
 
 public:
 	vector<double>	m_yopt;	// optimal y-values

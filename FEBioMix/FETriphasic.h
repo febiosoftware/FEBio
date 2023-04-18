@@ -33,19 +33,22 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for triphasic materials.
 
-class FEBIOMIX_API FETriphasic : public FEMaterial, public FESoluteInterface
+class FEBIOMIX_API FETriphasic : public FEMaterial, public FESoluteInterface_T<FESolutesMaterialPoint>
 {
 public:
 	FETriphasic(FEModel* pfem);
 
 	// initialization
 	bool Init() override;
+    
+    //! specialized material points
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
 	// serialization
 	void Serialize(DumpStream& ar) override;
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override
+	FEMaterialPointData* CreateMaterialPointData() override
 	{ 
 		return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 	}
@@ -111,11 +114,16 @@ public:
 public:
 	int Solutes() override { return (int)m_pSolute.size(); }
 	FESolute* GetSolute(int i) override { return m_pSolute[i]; }
+	double GetReferentialFixedChargeDensity(const FEMaterialPoint& mp) override;
+	FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC; }
+	double GetFixedChargeDensity(const FEMaterialPoint& mp) override {
+		const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+		return spt->m_cF;
+	}
 
 public:
     FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
     FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
-    FEOsmoticCoefficient*		GetOsmoticCoefficient() { return m_pOsmC;  }
     
 public: // material parameters
 	FEParamDouble				m_phi0;			//!< solid volume fraction in reference configuration

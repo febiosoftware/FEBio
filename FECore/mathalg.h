@@ -26,6 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include "mat3d.h"
 #include <functional>
+#include "fecore_api.h"
 
 template <class T> T weightedAverage(T* d, double* w, int n)
 {
@@ -41,8 +42,8 @@ template <class T> T weightedAverage(T* d, double* w, int n, std::function<T(con
 	return s;
 }
 
-mat3ds weightedAverageStructureTensor(mat3ds* d, double* w, int n);
+FECORE_API mat3ds weightedAverageStructureTensor(mat3ds* d, double* w, int n);
 
 // evaluate Log_p (X)
-mat3ds Log(const mat3ds& p, const mat3ds& X);
-mat3ds Exp(const mat3ds& p, const mat3ds& X);
+FECORE_API mat3ds Log(const mat3ds& p, const mat3ds& X);
+FECORE_API mat3ds Exp(const mat3ds& p, const mat3ds& X);

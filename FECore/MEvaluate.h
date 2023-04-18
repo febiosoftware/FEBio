@@ -30,9 +30,7 @@ SOFTWARE.*/
 
 #include "MathObject.h"
 #include "MMatrix.h"
-#include <stack>
 #include <list>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 void MEvaluate(MathObject* po);
@@ -72,7 +70,7 @@ public:
 	bool contains(const MITEM& i) const;
 
 protected:
-	list<MITEM>		m_p;
+	std::list<MITEM>		m_p;
 };
 
 //-----------------------------------------------------------------------------
@@ -99,6 +97,6 @@ public:
 	MITEM Item();
 
 protected:
-	list<MTerm>	m_t;
+	std::list<MTerm>	m_t;
 	FRACTION	m_c;	// accumulator for constants
 };

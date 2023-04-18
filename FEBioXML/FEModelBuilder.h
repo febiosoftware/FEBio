@@ -28,13 +28,18 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEModel.h>
-#include <FEBioMech/RigidBC.h>
 #include "febioxml_api.h"
 #include "FEBModel.h"
 #include <string>
 
 class FESolver;
 class FEPointFunction;
+class FEMeshDataGenerator;
+class FEDomainMap;
+class FENodalLoad;
+class FEEdgeLoad;
+class FESurfaceLoad;
+class FEBodyLoad;
 
 // This is a helper class for building the FEModel from file input. 
 class FEBIOXML_API FEModelBuilder
@@ -80,33 +85,41 @@ public:
 		FEPointFunction*	pf;
 	};
 
+	struct FEBIOXML_API DataGen
+	{
+		FEMeshDataGenerator*	gen;	// the data generator
+		FEDomainMap*			map;	// the destination map 
+		FEParamDouble*			pp;		// the param to which to apply the map (or null)
+	};
+
 public:
 	//! constructor
 	FEModelBuilder(FEModel& fem);
+	virtual ~FEModelBuilder();
 
-	//! set the module name
-	void SetModuleName(const std::string& moduleName);
+	//! set the active module
+	void SetActiveModule(const std::string& moduleName);
 
 	//! Get the module name
 	std::string GetModuleName() const;
 
 	// create a new analysis step
-	FEAnalysis* CreateNewStep();
+	FEAnalysis* CreateNewStep(bool allocSolver = true);
 
 	// create a material
 	FEMaterial* CreateMaterial(const char* sztype);
 
 	// get the current step (will create a new one if no step was defined yet)
-	FEAnalysis*	GetStep();
+	FEAnalysis*	GetStep(bool allocSolver = true);
 
-	// add module component to current step
-	void AddComponent(FEModelComponent* mc);
+	// add component to current step
+	void AddComponent(FEStepComponent* mc);
 
 	// reset some data for reading next step
 	void NextStep();
 
 	//! Create a domain
-	FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat);
+	virtual FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat);
 
 	//! Get the mesh
 	FEMesh& GetMesh();
@@ -125,6 +138,8 @@ public:
 	void SetDefaultVariables();
 
 public:
+	virtual void AddMaterial(FEMaterial* pmat);
+
 	void AddBC(FEBoundaryCondition* pbc);
 	void AddNodalLoad(FENodalLoad* pfc);
 	void AddEdgeLoad(FEEdgeLoad* pel);
@@ -134,10 +149,8 @@ public:
 	void AddModelLoad(FEModelLoad* pml);
 	void AddNonlinearConstraint(FENLConstraint* pnc);
 
-	void AddRigidFixedBC            (FERigidBodyFixedBC* prc);
-	void AddRigidPrescribedBC       (FERigidBodyDisplacement* prc);
-	void AddRigidIC					(FERigidIC* prv);
-	void AddRigidNodeSet            (FERigidNodeSet* rs);
+	// TODO: Try to remove these
+	virtual void AddRigidComponent(FEStepComponent* prc);
 
 public:
 	void AddNodeSetPair(NodeSetPair& p) { m_nsetPair.push_back(p); }
@@ -167,15 +180,21 @@ public:
 public:
 	void AddMappedParameter(FEParam* p, FECoreBase* parent, const char* szmap, int index = 0);
 
+	void AddMeshDataGenerator(FEMeshDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp);
+
 	// This will associate all mapped parameters to their assigned maps.
 	void ApplyParameterMaps();
 
 	void ApplyLoadcurvesToFunctions();
 
+	bool GenerateMeshDataMaps();
+
 	// finish the build process
-	void Finish();
+	bool Finish();
 
 	FEBModel& GetFEBModel();
+
+	void SetDefaultSolver(const std::string& s) { m_defaultSolver = s; }
 
 private:
 	FEModel&		m_fem;				//!< model that is being constructed
@@ -183,6 +202,8 @@ private:
 	int				m_nsteps;			//!< nr of step sections read
 
 	FEBModel	m_feb;
+
+	std::string	m_defaultSolver;		//!< default solver
 
 public:
 	int		m_maxid;		//!< max element ID
@@ -216,6 +237,7 @@ protected:
 	vector<NodeSetSet>		m_nsetSet;
 	vector<MappedParameter>	m_mappedParams;
 	vector<MapLCToFunction>	m_lc2fnc;
+	vector<DataGen>			m_mapgen;
 
 protected:
 	int			m_node_off;		//!< node offset (i.e. lowest node ID)

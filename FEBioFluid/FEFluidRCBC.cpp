@@ -29,33 +29,31 @@ SOFTWARE.*/
 #include "FEFluid.h"
 #include "FEBioFluid.h"
 #include <FECore/FEAnalysis.h>
+#include <FECore/FEModel.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEFluidRCBC, FESurfaceLoad)
-ADD_PARAMETER(m_R , "R");
-ADD_PARAMETER(m_p0, "initial_pressure");
-ADD_PARAMETER(m_C, "capacitance");
-ADD_PARAMETER(m_Bern, "Bernoulli");
+BEGIN_FECORE_CLASS(FEFluidRCBC, FEPrescribedSurface)
+    ADD_PARAMETER(m_R , "R");
+    ADD_PARAMETER(m_p0, "initial_pressure");
+    ADD_PARAMETER(m_C, "capacitance");
+    ADD_PARAMETER(m_Bern, "Bernoulli");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidRCBC::FEFluidRCBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
+FEFluidRCBC::FEFluidRCBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
 {
     m_R = 0.0;
     m_pfluid = nullptr;
-    m_gamma = 1.0;
+    m_psurf = nullptr;
     m_p0 = 0;
     m_C = 0.0;
     m_Bern = false;
-    
+    m_e = 0.0;
     m_pt = m_dpt = 0;
     m_qt = m_dqt = 0;
     m_pp = m_dpp = 0;
     m_qp = m_dqp = 0;
-    
-    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -63,11 +61,14 @@ FEFluidRCBC::FEFluidRCBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 //! TODO: Generalize to include the initial conditions
 bool FEFluidRCBC::Init()
 {
-    if (FESurfaceLoad::Init() == false) return false;
+    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+
+    if (FEPrescribedSurface::Init() == false) return false;
+
+    m_psurf = GetSurface();
     
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofW);
-    m_dof.AddDof(m_dofEF);
+    SetDOFList(m_dofEF);
 
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
@@ -84,25 +85,14 @@ bool FEFluidRCBC::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FEFluidRCBC::Activate()
-{
-    FESurface* ps = &GetSurface();
-    
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
-        node.set_bc(m_dofEF, DOF_PRESCRIBED);
-    }
-}
-
-//-----------------------------------------------------------------------------
 //! Evaluate and prescribe the resistance pressure
-void FEFluidRCBC::Update()
+void FEFluidRCBC::UpdateDilatation()
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
-    double omoog = 1 - 1./m_gamma;
+    const FETimeInfo& tp = GetTimeInfo();
+
+    double dt = tp.timeIncrement;
+    double gamma = tp.gamma;
+    double omoog = 1.0 - 1.0/gamma;
     int niter = GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter;
 
     // if this is the start of a new time step, update the flow/pressure parameters
@@ -119,29 +109,50 @@ void FEFluidRCBC::Update()
     // evaluate the outflow pressure
     double qt = m_Bern ? m_qt*fabs(m_qt) : m_qt;
     double qp = m_Bern ? m_qp*fabs(m_qp) : m_qp;
-    m_dqt = m_dqp*omoog + (qt-qp)/m_gamma/dt;
-    m_dpt = m_dpp*omoog + (m_pt-m_pp)/m_gamma/dt;
-    m_pt = m_pp + (m_R*m_dqt + m_qt/m_C - m_dpp*omoog)*m_gamma*dt;
+    m_dqt = m_dqp*omoog + (qt-qp)/gamma/dt;
+    m_dpt = m_dpp*omoog + (m_pt-m_pp)/gamma/dt;
+    m_pt = m_pp + (m_R*m_dqt + m_qt/m_C - m_dpp*omoog)*gamma*dt;
     
     // calculate the dilatation
-    double e = 0;
-    bool good = m_pfluid->Dilatation(0,m_pt + m_p0,0, e);
+    m_e = 0.0;
+    bool good = m_pfluid->Dilatation(0,m_pt + m_p0,0, m_e);
     assert(good);
-    
-    // prescribe this dilatation at the nodes
-    FESurface* ps = &GetSurface();
-    
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        if (ps->Node(i).m_ID[m_dofEF] < -1)
-        {
-            FENode& node = ps->Node(i);
-            // set node as having prescribed DOF
-            node.set(m_dofEF, e);
-        }
-    }
-    
-    GetFEModel()->SetMeshUpdateFlag(true);
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidRCBC::PrepStep(std::vector<double>& ui, bool brel)
+{
+	UpdateDilatation();
+	FEPrescribedSurface::PrepStep(ui, brel);
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidRCBC::Update()
+{
+	UpdateDilatation();
+	FEPrescribedSurface::Update();
+
+	// TODO: Is this necessary?
+	GetFEModel()->SetMeshUpdateFlag(true);
+}
+
+void FEFluidRCBC::UpdateModel() { Update(); }
+
+//-----------------------------------------------------------------------------
+// return the value for node i, dof j
+void FEFluidRCBC::GetNodalValues(int nodelid, std::vector<double>& val)
+{
+    val[0] = m_e;
+	FENode& node = GetMesh().Node(m_nodeList[nodelid]);
+	node.set(m_dofEF, m_e);
+}
+
+//-----------------------------------------------------------------------------
+// copy data from another class
+void FEFluidRCBC::CopyFrom(FEBoundaryCondition* pbc)
+{
+    // TODO: implement this
+    assert(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -202,20 +213,13 @@ double FEFluidRCBC::FlowRate()
 }
 
 //-----------------------------------------------------------------------------
-//! calculate residual
-void FEFluidRCBC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
-{
-    m_gamma = tp.gamma;
-}
-
-//-----------------------------------------------------------------------------
 //! serialization
 void FEFluidRCBC::Serialize(DumpStream& ar)
 {
-    FESurfaceLoad::Serialize(ar);
+    FEPrescribedSurface::Serialize(ar);
+    ar & m_pt & m_dpt & m_qt & m_dqt & m_e;
+    if (ar.IsShallow()) return;
     ar & m_pfluid;
-    ar & m_pt;
-    ar & m_dpt;
-    ar & m_qt;
-    ar & m_dqt;
+    ar & m_dofW & m_dofEF;
+    ar & m_psurf;
 }

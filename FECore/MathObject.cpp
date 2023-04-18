@@ -72,7 +72,7 @@ MathObject::~MathObject()
 }
 
 //-----------------------------------------------------------------------------
-MVariable* MathObject::AddVariable(const std::string& var)
+MVariable* MathObject::AddVariable(const std::string& var, double initVal)
 {
 	if (m_Var.empty() == false)
 	{
@@ -81,7 +81,7 @@ MVariable* MathObject::AddVariable(const std::string& var)
 			if ((*it)->Name() == var) return *it;
 	}
 
-	MVariable* pv = new MVariable(var);
+	MVariable* pv = new MVariable(var, initVal);
 	pv->setIndex((int)m_Var.size());
 	m_Var.push_back(pv);
 	return pv;
@@ -124,6 +124,13 @@ int MSimpleExpression::Items()
 		return pe->size();
 	}
 	else return 1;
+}
+
+//-----------------------------------------------------------------------------
+double MSimpleExpression::value(const std::string& s)
+{
+	Create(s);
+	return value();
 }
 
 //-----------------------------------------------------------------------------

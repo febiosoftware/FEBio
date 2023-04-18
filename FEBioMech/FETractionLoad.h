@@ -48,10 +48,10 @@ public:
 
 public:
 	//! calculate contact forces
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! calculate stiffness
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 protected:
 	double			m_scale;	//!< scale factor for traction

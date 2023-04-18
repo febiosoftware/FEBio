@@ -37,13 +37,16 @@ public:
 	FEPreStrainUncoupledElastic(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! return the pre-strain gradient property
 	FEPrestrainGradient* PrestrainGradientProperty() override { return m_Fp; }
 
 	//! return the elastic material property
 	FEElasticMaterial* GetElasticMaterial() override { return m_mat; }
+
+	//! calculate (pre-strained) density 
+	double Density(FEMaterialPoint& mp) override;
 
 public:
 	//! Cauchy stress 

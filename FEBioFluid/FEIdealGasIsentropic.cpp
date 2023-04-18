@@ -28,8 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEIdealGasIsentropic.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
 #include <FECore/log.h>
 
 // define the material parameters
@@ -57,9 +55,9 @@ FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEFluid(pfem)
 //! initialization
 bool FEIdealGasIsentropic::Init() 
 {
-    m_R  = GetFEModel()->GetGlobalConstant("R");
-    m_Tr = GetFEModel()->GetGlobalConstant("T");
-    m_Pr = GetFEModel()->GetGlobalConstant("P");
+    m_R  = GetGlobalConstant("R");
+    m_Tr = GetGlobalConstant("T");
+    m_Pr = GetGlobalConstant("P");
     
 	if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
 	if (m_Tr <= 0) { feLogError("A positive ambient absolute temperature T must be defined in Globals section"); return false; }
@@ -68,6 +66,23 @@ bool FEIdealGasIsentropic::Init()
     m_rhor = m_M*m_Pr/(m_R*m_Tr);
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEIdealGasIsentropic::Serialize(DumpStream& ar)
+{
+    FEFluid::Serialize(ar);
+    if (ar.IsShallow()) return;
+    
+    ar & m_R & m_Pr & m_Tr & m_rhor;
+}
+
+//-----------------------------------------------------------------------------
+//! elastic pressure
+double FEIdealGasIsentropic::Pressure(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    return Pressure(fp.m_ef,0);
 }
 
 //-----------------------------------------------------------------------------

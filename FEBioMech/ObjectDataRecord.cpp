@@ -32,7 +32,11 @@ SOFTWARE.*/
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 
-REGISTER_SUPER_CLASS(FELogObjectData, FEOBJLOGDATA_ID);
+//-----------------------------------------------------------------------------
+ObjectDataRecord::ObjectDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_RB) 
+{
+
+}
 
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::SetData(const char* szexpr)
@@ -46,7 +50,7 @@ void ObjectDataRecord::SetData(const char* szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FELogObjectData* pdata = fecore_new<FELogObjectData>(sz, m_pfem);
+		FELogObjectData* pdata = fecore_new<FELogObjectData>(sz, GetFEModel());
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;
@@ -57,11 +61,11 @@ void ObjectDataRecord::SetData(const char* szexpr)
 //-----------------------------------------------------------------------------
 double ObjectDataRecord::Evaluate(int item, int ndata)
 {
-	FEMechModel* fem = dynamic_cast<FEMechModel*>(m_pfem);
+	FEMechModel* fem = dynamic_cast<FEMechModel*>(GetFEModel());
 
 	FEMesh& mesh = fem->GetMesh();
 	int nrb = item - 1;
-	if ((nrb < 0) || (nrb >= m_pfem->Materials())) return 0;
+	if ((nrb < 0) || (nrb >= fem->Materials())) return 0;
 
 	double val = 0;
 
@@ -77,18 +81,17 @@ double ObjectDataRecord::Evaluate(int item, int ndata)
 }
 
 //-----------------------------------------------------------------------------
-ObjectDataRecord::ObjectDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_RB) {}
-
-//-----------------------------------------------------------------------------
 int ObjectDataRecord::Size() const { return (int)m_Data.size(); }
 
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::SelectAllItems()
 {
+	FEMechModel* fem = dynamic_cast<FEMechModel*>(GetFEModel());
+
 	int n = 0, i;
-	for (i=0; i<m_pfem->Materials(); ++i)
+	for (i=0; i<fem->Materials(); ++i)
 	{
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(i));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem->GetMaterial(i));
 		if (pm) ++n;
 	}
 
@@ -96,9 +99,9 @@ void ObjectDataRecord::SelectAllItems()
 	{
 		m_item.resize(n);
 		n = 0;
-		for (i=0; i<m_pfem->Materials(); ++i)
+		for (i=0; i<fem->Materials(); ++i)
 		{
-			FERigidMaterial* pm  = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(i));
+			FERigidMaterial* pm  = dynamic_cast<FERigidMaterial*>(fem->GetMaterial(i));
 			if (pm)
 			{
 				m_item[n++] = i+1;

@@ -38,6 +38,8 @@ class FERigidBody;
 
 class FEBIOMECH_API FERigidConnector : public FENLConstraint
 {
+    FECORE_BASE_CLASS(FERigidConnector)
+
 public:
     //! constructor
     FERigidConnector(FEModel* pfem);

@@ -34,6 +34,8 @@ SOFTWARE.*/
 class FEScanOptimizeMethod : public FEOptimizeMethod
 {
 public:
+	FEScanOptimizeMethod(FEModel* fem);
+
 	// this implements the solution algorithm.
 	// returns the optimal parameter values in amin
 	// returns the optimal measurement vector in ymin

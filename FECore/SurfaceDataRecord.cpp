@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FESurface.h"
 
-REGISTER_SUPER_CLASS(FELogSurfaceData, FELOGSURFACEDATA_ID);
-
 //-----------------------------------------------------------------------------
 void FESurfaceDataRecord::SetData(const char* szexpr)
 {
@@ -43,7 +41,7 @@ void FESurfaceDataRecord::SetData(const char* szexpr)
     {
         ch = strchr(sz, ';');
         if (ch) *ch++ = 0;
-        FELogSurfaceData* pdata = fecore_new<FELogSurfaceData>(sz, m_pfem);
+        FELogSurfaceData* pdata = fecore_new<FELogSurfaceData>(sz, GetFEModel());
         if (pdata) m_Data.push_back(pdata);
         else throw UnknownDataField(sz);
         sz = ch;
@@ -51,7 +49,7 @@ void FESurfaceDataRecord::SetData(const char* szexpr)
 }
 
 //-----------------------------------------------------------------------------
-FESurfaceDataRecord::FESurfaceDataRecord(FEModel* pfem, const char* szfile) : DataRecord(pfem, szfile, FE_DATA_SURFACE) {}
+FESurfaceDataRecord::FESurfaceDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_SURFACE) {}
 
 //-----------------------------------------------------------------------------
 int FESurfaceDataRecord::Size() const { return (int)m_Data.size(); }
@@ -59,7 +57,7 @@ int FESurfaceDataRecord::Size() const { return (int)m_Data.size(); }
 //-----------------------------------------------------------------------------
 double FESurfaceDataRecord::Evaluate(int item, int ndata)
 {
-    FEMesh& mesh = m_pfem->GetMesh();
+    FEMesh& mesh = GetFEModel()->GetMesh();
     int nd = item - 1;
     if ((nd < 0) || (nd >= mesh.Surfaces())) return 0;
 
@@ -77,7 +75,7 @@ void FESurfaceDataRecord::SetSurface(int surfIndex)
 //-----------------------------------------------------------------------------
 void FESurfaceDataRecord::SelectAllItems()
 {
-    FEMesh& mesh = m_pfem->GetMesh();
+    FEMesh& mesh = GetFEModel()->GetMesh();
     int n = mesh.Surfaces();
     m_item.resize(n);
     for (int i = 0; i < n; ++i) m_item[i] = i + 1;

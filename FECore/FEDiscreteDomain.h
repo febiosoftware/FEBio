@@ -33,6 +33,9 @@ SOFTWARE.*/
 //! domain for discrete elements
 class FECORE_API FEDiscreteDomain : public FEDomain
 {
+	FECORE_SUPER_CLASS(FEDISCRETEDOMAIN_ID)
+	FECORE_BASE_CLASS(FEDiscreteDomain)
+
 public:
 	FEDiscreteDomain(FEModel* fem) : FEDomain(FE_DOMAIN_DISCRETE, fem) {}
 
@@ -44,6 +47,11 @@ public:
 	FEDiscreteElement& Element(int n) { return m_Elem[n]; }
 
 	bool Init() override;
+
+	void Reset() override;
+
+	//! copy data from another domain (overridden from FEDomain)
+	void CopyFrom(FEMeshPartition* pd) override;
 
 public:
 	void AddElement(int eid, int n[2]);

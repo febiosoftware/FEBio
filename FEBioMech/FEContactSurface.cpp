@@ -53,6 +53,7 @@ bool FEContactSurface::Init()
 	m_dofY = dofs.GetDOF("y");
 	m_dofZ = dofs.GetDOF("z");
 
+    SetInterfaceStatus(true);
 	return FESurface::Init();
 }
 

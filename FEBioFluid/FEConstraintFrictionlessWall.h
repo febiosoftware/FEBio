@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FEBioMech/FEAugLagLinearConstraint.h>
+#include <FECore/FEAugLagLinearConstraint.h>
 #include <FECore/FESurface.h>
 #include "febiofluid_api.h"
 
@@ -35,7 +35,7 @@ SOFTWARE.*/
 //! The FEConstraintFrictionlessWall class implements a frictionless fluid wall
 //! as a linear constraint on the components of the fluid velocity.
 
-class FEBIOFLUID_API FEConstraintFrictionlessWall : public FELinearConstraintSet
+class FEBIOFLUID_API FEConstraintFrictionlessWall : public FESurfaceConstraint
 {
 public:
     //! constructor
@@ -45,14 +45,33 @@ public:
     ~FEConstraintFrictionlessWall() {}
     
     //! Activation
-    void Activate();
+    void Activate() override;
 
     //! initialization
-    bool Init();
+    bool Init() override;
     
     //! Get the surface
-    FESurface* GetSurface() { return &m_surf; }
+    FESurface* GetSurface() override { return &m_surf; }
     
+public:
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
+    //! add the linear constraint contributions to the residual
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+
+    //! add the linear constraint contributions to the stiffness matrix
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+
+    //! do the augmentation
+    bool Augment(int naug, const FETimeInfo& tp) override;
+
+    //! build connectivity for matrix profile
+    void BuildMatrixProfile(FEGlobalMatrix& M) override;
+
 protected:
     FESurface	m_surf;
+    FELinearConstraintSet   m_lc;
+
+    DECLARE_FECORE_CLASS();
 };

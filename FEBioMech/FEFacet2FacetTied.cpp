@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFacet2FacetTied.h"
-#include "FECore/FEModel.h"
+#include "FECore/FEMesh.h"
 #include "FECore/FEClosestPointProjection.h"
 #include "FECore/FEGlobalMatrix.h"
 #include <FECore/FELinearSystem.h>
@@ -42,15 +42,23 @@ BEGIN_FECORE_CLASS(FEFacet2FacetTied, FEContactInterface)
 	ADD_PARAMETER(m_naugmin, "minaug"          );
 	ADD_PARAMETER(m_naugmax, "maxaug"          );
 	ADD_PARAMETER(m_stol   , "search_tolerance");
+	ADD_PARAMETER(m_gapoff , "gap_offset"      );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFacetTiedSurface::Data::Data()
 {
-	m_vgap = vec3d(0,0,0);
+	m_vgap  = vec3d(0,0,0);
+	m_vgap0 = vec3d(0,0,0);
 	m_Lm = vec3d(0,0,0);
 	m_rs = vec2d(0,0);
 	m_pme = (FESurfaceElement*) 0;
+}
+
+void FEFacetTiedSurface::Data::Serialize(DumpStream& ar)
+{
+	FEContactMaterialPoint::Serialize(ar);
+	ar & m_vgap & m_vgap0 & m_Lm & m_rs;
 }
 
 //-----------------------------------------------------------------------------
@@ -91,6 +99,7 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 				{
 					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
 					ar << d.m_vgap;
+					ar << d.m_vgap0;
 					ar << d.m_rs;
 					ar << d.m_Lm;
 				}
@@ -106,6 +115,7 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 				{
 					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
 					ar >> d.m_vgap;
+					ar >> d.m_vgap0;
 					ar >> d.m_rs;
 					ar >> d.m_Lm;
 				}
@@ -124,6 +134,7 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 				{
 					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
 					ar << d.m_vgap;
+					ar << d.m_vgap0;
 					ar << d.m_rs;
 					ar << d.m_Lm;
 				}
@@ -139,6 +150,7 @@ void FEFacetTiedSurface::Serialize(DumpStream &ar)
 				{
 					Data& d = static_cast<Data&>(*el.GetMaterialPoint(j));
 					ar >> d.m_vgap;
+					ar >> d.m_vgap0;
 					ar >> d.m_rs;
 					ar >> d.m_Lm;
 				}
@@ -154,6 +166,10 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 	static int count = 1;
 	SetID(count++);
 
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
+
 	// define sibling relationships
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
@@ -164,22 +180,22 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 	m_naugmin = 0;
 	m_naugmax = 10;
 	m_stol    = 0.0001;
+	m_gapoff  = false;
 }
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
 void FEFacet2FacetTied::BuildMatrixProfile(FEGlobalMatrix& K)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// get the DOFS
-	const int dof_X = fem.GetDOFIndex("x");
-	const int dof_Y = fem.GetDOFIndex("y");
-	const int dof_Z = fem.GetDOFIndex("z");
-	const int dof_RU = fem.GetDOFIndex("Ru");
-	const int dof_RV = fem.GetDOFIndex("Rv");
-	const int dof_RW = fem.GetDOFIndex("Rw");
+	const int dof_X = GetDOFIndex("x");
+	const int dof_Y = GetDOFIndex("y");
+	const int dof_Z = GetDOFIndex("z");
+	const int dof_RU = GetDOFIndex("Ru");
+	const int dof_RV = GetDOFIndex("Rv");
+	const int dof_RW = GetDOFIndex("Rw");
 
 	vector<int> lm(6*FEElement::MAX_NODES*2);
 
@@ -253,6 +269,28 @@ void FEFacet2FacetTied::Activate()
 
 	// project primary surface onto secondary surface
 	ProjectSurface(m_ss, m_ms);
+
+	if (m_gapoff)
+	{
+		// loop over all primary elements
+		for (int i = 0; i < m_ss.Elements(); ++i)
+		{
+			// get the primary element
+			FESurfaceElement& se = m_ss.Element(i);
+
+			// loop over all its integration points
+			int nint = se.GaussPoints();
+			for (int j = 0; j < nint; ++j)
+			{
+				// get integration point data
+				FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
+
+				pt.m_vgap0 = pt.m_vgap;
+				pt.m_vgap = vec3d(0, 0, 0);
+				pt.m_gap = 0.0;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -300,6 +338,8 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 
 				// calculate gap
 				pt.m_vgap = x - q;
+
+				pt.m_gap = pt.m_vgap.norm();
 			}
 			else pt.m_pme = 0;
 		}
@@ -355,7 +395,9 @@ void FEFacet2FacetTied::Update()
 				vec3d q = me.eval(y, r, s);
 
 				// calculate the gap function
-				pt.m_vgap = rn - q;
+				pt.m_vgap = (rn - q) - pt.m_vgap0;
+
+				pt.m_gap = pt.m_vgap.norm();
 			}
 		}
 	}

@@ -44,14 +44,17 @@ public:
 	//! initialization
 	bool Init() override;
     
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
     //! Set the surface to apply the load to
     void SetSurface(FESurface* ps) override;
     
     //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
+    void StiffnessMatrix(FELinearSystem& LS) override {}
     
     //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+    void LoadVector(FEGlobalVector& R) override;
     
 private:
     FEParamDouble	m_traction;	//!< magnitude of traction load

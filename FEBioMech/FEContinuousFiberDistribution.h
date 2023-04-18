@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticMaterial.h"
-#include "FEElasticFiberMaterial.h"
+#include "FEFiberMaterial.h"
 #include "FEFiberDensityDistribution.h"
 #include "FEFiberIntegrationScheme.h"
 #include "FEFiberMaterialPoint.h"
@@ -41,6 +41,9 @@ class FEContinuousFiberDistribution : public FEElasticMaterial
 public:
     FEContinuousFiberDistribution(FEModel* pfem);
     ~FEContinuousFiberDistribution();
+    
+    // returns a pointer to a new material point object
+    FEMaterialPointData* CreateMaterialPointData() override;
     
     // Initialization
     bool Init() override;
@@ -62,7 +65,7 @@ private:
 	double IntegratedFiberDensity(FEMaterialPoint& pt);
 
 protected:
-    FEElasticFiberMaterial*     m_pFmat;    // pointer to fiber material
+	FEFiberMaterial*			m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
 	FEFiberIntegrationScheme*   m_pFint;    // pointer to fiber integration scheme
 

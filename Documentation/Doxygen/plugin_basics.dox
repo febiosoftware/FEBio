@@ -2,15 +2,18 @@
 
 \page plugin_basics Plugin Basics
 
-Plugins are a powerful mechanism for extending FEBio's basic feature set. They are essentially dynamically linked libraries that can be loaded
-by FEBio during runtime. They are build and maintained separately from the FEBio source code. Plugins can be used to develop new constitutive models, 
-new boundary conditions, extension to the xplot database (i.e. plotfile), and more. 
+Plugins are a powerful mechanism for extending FEBio's basic feature set. A plugin is a dynamically linked library that can be loaded by FEBio at runtime. Plugins are typically build and maintained separately from the FEBio source code. 
+
+Plugins can be used to develop new constitutive models, boundary conditions, loads, and other model components. They can be used to extend the xplot database (i.e. plotfile), and log files, and can be used to couple FEBio to other codes. 
 
 Select one of the links below to learn more about a particular aspect
 of plugin development.
 
 \li \subpage building_a_plugin
 \li \subpage required_functions
-\li \subpage factory_classes
+\li \subpage register
+
+Once you're done developing a plugin, check out the following article that details how to use plugins in FEBio. 
+
 \li \subpage using_plugins
 */

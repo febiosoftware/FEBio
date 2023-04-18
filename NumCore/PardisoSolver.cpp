@@ -99,12 +99,6 @@ PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 	m_mtype = -2;
 	m_iparm3 = false;
 	m_isFactored = false;
-
-	/* If both PARDISO AND PARDISODL are defined, print a warning */
-#ifdef PARDISODL
-	fprintf(stderr, "WARNING: The MKL version of the Pardiso solver is being used\n\n");
-	exit(1);
-#endif
 }
 
 //-----------------------------------------------------------------------------

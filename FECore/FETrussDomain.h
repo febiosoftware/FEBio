@@ -27,11 +27,11 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEDomain.h"
+#include "FEBeamDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Abstract base class for truss elements
-class FECORE_API FETrussDomain : public FEDomain
+class FECORE_API FETrussDomain : public FEBeamDomain
 {
 public:
 	FETrussDomain(FEModel* pm);

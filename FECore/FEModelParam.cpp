@@ -48,12 +48,21 @@ FEModelParam::~FEModelParam()
 void FEModelParam::Serialize(DumpStream& ar)
 {
 	ar & m_scl;
+	if (ar.IsShallow() == false)
+	{
+		ar & m_dom;
+	}
 }
 
 //---------------------------------------------------------------------------------------
 FEParamDouble::FEParamDouble()
 {
 	m_val = fecore_new<FEScalarValuator>("const", nullptr);
+}
+
+FEParamDouble::~FEParamDouble()
+{
+	delete m_val;
 }
 
 FEParamDouble::FEParamDouble(const FEParamDouble& p)
@@ -69,6 +78,14 @@ void FEParamDouble::operator = (double v)
 	FEConstValue* val = fecore_new<FEConstValue>("const", nullptr);
 	*val->constValue() = v;
 	setValuator(val);
+}
+
+void FEParamDouble::operator = (const FEParamDouble& p)
+{
+	if (m_val) delete m_val;
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+//	m_dom = p.m_dom;
 }
 
 // set the valuator
@@ -109,11 +126,21 @@ FEParamVec3::FEParamVec3()
 	m_val = fecore_new<FEVec3dValuator>("vector", nullptr);
 }
 
+FEParamVec3::~FEParamVec3()
+{
+	delete m_val;
+}
+
 FEParamVec3::FEParamVec3(const FEParamVec3& p)
 {
 	m_val = p.m_val->copy();
 	m_scl = p.m_scl;
 	m_dom = p.m_dom;
+}
+
+bool FEParamVec3::Init()
+{
+	return (m_val ? m_val->Init() : true);
 }
 
 // set the value
@@ -124,12 +151,24 @@ void FEParamVec3::operator = (const vec3d& v)
 	setValuator(val);
 }
 
+void FEParamVec3::operator = (const FEParamVec3& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+//	m_dom = p.m_dom;
+}
+
 // set the valuator
 void FEParamVec3::setValuator(FEVec3dValuator* val)
 {
 	if (m_val) delete m_val;
 	m_val = val;
 	if (val) val->SetModelParam(this);
+}
+
+FEVec3dValuator* FEParamVec3::valuator()
+{
+	return m_val;
 }
 
 void FEParamVec3::Serialize(DumpStream& ar)
@@ -145,6 +184,11 @@ FEParamMat3d::FEParamMat3d()
 	m_val = fecore_new<FEMat3dValuator>("const", nullptr);
 }
 
+FEParamMat3d::~FEParamMat3d()
+{
+	delete m_val;
+}
+
 FEParamMat3d::FEParamMat3d(const FEParamMat3d& p)
 {
 	m_val = p.m_val->copy();
@@ -158,6 +202,18 @@ void FEParamMat3d::operator = (const mat3d& v)
 	FEConstValueMat3d* val = fecore_new<FEConstValueMat3d>("const", nullptr);
 	val->value() = v;
 	setValuator(val);
+}
+
+void FEParamMat3d::operator = (const FEParamMat3d& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+//	m_dom = p.m_dom;
+}
+
+bool FEParamMat3d::Init()
+{
+	return (m_val ? m_val->Init() : true);
 }
 
 // set the valuator
@@ -186,6 +242,11 @@ FEParamMat3ds::FEParamMat3ds()
 	m_val = fecore_new<FEMat3dsValuator>("const", nullptr);
 }
 
+FEParamMat3ds::~FEParamMat3ds()
+{
+	delete m_val;
+}
+
 FEParamMat3ds::FEParamMat3ds(const FEParamMat3ds& p)
 {
 	m_val = p.m_val->copy();
@@ -201,12 +262,24 @@ void FEParamMat3ds::operator = (const mat3ds& v)
 	setValuator(val);
 }
 
+void FEParamMat3ds::operator = (const FEParamMat3ds& p)
+{
+	m_val = p.m_val->copy();
+	m_scl = p.m_scl;
+//	m_dom = p.m_dom;
+}
+
 // set the valuator
 void FEParamMat3ds::setValuator(FEMat3dsValuator* val)
 {
 	if (m_val) delete m_val;
 	m_val = val;
 	if (val) val->SetModelParam(this);
+}
+
+FEMat3dsValuator* FEParamMat3ds::valuator()
+{
+	return m_val;
 }
 
 void FEParamMat3ds::Serialize(DumpStream& ar)

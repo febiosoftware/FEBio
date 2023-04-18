@@ -27,9 +27,8 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FESurfacePairConstraint.h"
-#include "FENLConstraint.h"
-#include "FETimeStepController.h"
+#include "FECoreBase.h"
+#include "FECoreClass.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -37,13 +36,15 @@ class FEModel;
 class FESolver;
 class FEDomain;
 class DumpStream;
-class FEBoundaryCondition;
+class FEStepComponent;
+class FETimeStepController;
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
 class FECORE_API FEAnalysis : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEANALYSIS_ID)
+	FECORE_BASE_CLASS(FEAnalysis);
 
 public:
 	//! constructor
@@ -95,14 +96,14 @@ public:
 	void ClearDomains() { m_Dom.clear(); }
 
 public:
-	//! add a model component
-	void AddModelComponent(FEModelComponent* pmc);
+	//! add a step component
+	void AddStepComponent(FEStepComponent* pmc);
 
 	//! return number of model components
-	int ModelComponents() const;
+	int StepComponents() const;
 
-	//! get a model component
-	FEModelComponent* GetModelComponent(int i);
+	//! get a step component
+	FEStepComponent* GetStepComponent(int i);
 
 public:
 	//! sets the plot level
@@ -186,7 +187,7 @@ private:
 
 protected:
 	std::vector<int>				m_Dom;	//!< list of active domains for this analysis
-	std::vector<FEModelComponent*>	m_MC;	//!< array of model components active during this step
+	std::vector<FEStepComponent*>	m_MC;	//!< array of model components active during this step
 
 	DECLARE_FECORE_CLASS();
 };

@@ -27,16 +27,13 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEMultiphasic.h"
-#include "FEBioFluid/FEFluidSolutes.h"
-#include "FEBioFluid/FESolutesMaterial.h"
-#include "FEBioFluid/FEMultiphasicFSI.h"
+#include "FEChemicalReaction.h"
 
 class FEBIOMIX_API FEReactionRateHuiskes : public FEReactionRate
 {
 public:
 	//! constructor
-	FEReactionRateHuiskes(FEModel* pfem) : FEReactionRate(pfem) { m_B = m_psi0 = 0; }
+	FEReactionRateHuiskes(FEModel* pfem);
 	
 	//! reaction rate at material point
 	double ReactionRate(FEMaterialPoint& pt) override;
@@ -48,8 +45,8 @@ public:
 	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
 	
 public:
-	double	m_B;					//!< mass supply coefficient
-	double	m_psi0;					//!< specific strain energy at homeostasis
+	FEParamDouble   m_B;					//!< mass supply coefficient
+    FEParamDouble   m_psi0;					//!< specific strain energy at homeostasis
 	
 	DECLARE_FECORE_CLASS();	
 };

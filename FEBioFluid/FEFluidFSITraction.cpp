@@ -43,19 +43,23 @@ END_FECORE_CLASS()
 //! constructor
 FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofW(pfem)
 {
-    // get the degrees of freedom
-	m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
-	m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
-	m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
-    m_bshellb = false;
-    
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofU);
-    m_dof.AddDofs(m_dofSU);
-    m_dof.AddDofs(m_dofW);
-    m_dof.AddDof(m_dofEF);
+	m_bshellb = false;
 
+    // get the degrees of freedom
+	// TODO: Can this be done in Init, since  there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+		m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+		m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+		m_dofEF = GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+
+		m_dof.Clear();
+		m_dof.AddDofs(m_dofU);
+		m_dof.AddDofs(m_dofSU);
+		m_dof.AddDofs(m_dofW);
+		m_dof.AddDof(m_dofEF);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -145,8 +149,10 @@ mat3ds FEFluidFSITraction::GetFluidStress(FESurfaceMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidFSITraction::LoadVector(FEGlobalVector& R)
 {
+	const FETimeInfo& tp = GetTimeInfo();
+
 	// If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
     FEDofList dof = m_bshellb ? m_dofSU : m_dofU;
 	m_psurf->LoadVector(R, dof, false, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
@@ -185,10 +191,12 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEModel* fem = GetFEModel();
 	FESurface* ps = &GetSurface();
+
+	const FETimeInfo& tp = GetTimeInfo();
 
 	// build dof list
 	// TODO: If surface is bottom of shell, we should take shell displacement dofs (i.e. m_dofSU).
@@ -286,10 +294,9 @@ void FEFluidFSITraction::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
 
-	ar & m_s;
-
 	if (ar.IsShallow() == false)
 	{
+        ar & m_s;
 		if (ar.IsSaving())
 		{
 			int NE = (int)m_elem.size();

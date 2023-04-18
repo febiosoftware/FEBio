@@ -55,6 +55,12 @@ public:
 		m_pmep = nullptr;
 	}
 
+	void Serialize(DumpStream& ar) override
+	{
+		FESurfaceMaterialPoint::Serialize(ar);
+		ar & m_gap & m_Ln;
+	}
+
 public:
 	double	m_gap;	//!< gap function at integration points
 	double	m_Ln;	//!< net contact pressure

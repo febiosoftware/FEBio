@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "vec3d.h"
-#include "FECoreBase.h"
+#include "FEModelComponent.h"
 
 //-----------------------------------------------------------------------------
 class FENodeSet;
@@ -40,26 +40,21 @@ class FEDomainMap;
 
 //-----------------------------------------------------------------------------
 // Data generators are used to generate values of model parameters. 
-class FECORE_API FEDataGenerator : public FECoreBase
+class FECORE_API FEMeshDataGenerator : public FEModelComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMESHDATAGENERATOR_ID)
+	FECORE_BASE_CLASS(FEMeshDataGenerator)
 
 public:
-	FEDataGenerator(FEModel* fem);
-	virtual ~FEDataGenerator();
+	FEMeshDataGenerator(FEModel* fem);
+	virtual ~FEMeshDataGenerator();
 
 	// this function gives the data generator a chance to initialize itself
 	// and check for any input problems.
 	virtual bool Init();
 
-	// generate the data array for the given node set
-	virtual bool Generate(FENodeDataMap& ar);
-
-	// generate the data array for the given facet set
-	virtual bool Generate(FESurfaceMap& data);
-
-	// generate the data array for the given element set
-	virtual bool Generate(FEDomainMap& data);
+	// evaluate the data at specific time
+	virtual void Evaluate(double time);
 
 public:
 	// overload  one of these functions for custom generators
@@ -68,4 +63,80 @@ public:
 	virtual void value(const vec3d& r, vec3d& data) {}
 	virtual void value(const vec3d& r, mat3d& data) {}
     virtual void value(const vec3d& r, mat3ds& data) {}
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FENodeDataGenerator : public FEMeshDataGenerator
+{
+	FECORE_BASE_CLASS(FENodeDataGenerator)
+
+public:
+	FENodeDataGenerator(FEModel* fem);
+
+	// generate the data array for the given node set
+	virtual bool Generate(FENodeDataMap& ar);
+
+	virtual FENodeDataMap* Generate();
+
+public:
+	void SetNodeSet(FENodeSet* nodeSet);
+
+	FENodeSet* GetNodeSet();
+
+protected:
+	FENodeSet* m_nodeSet;
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEEdgeDataGenerator : public FEMeshDataGenerator
+{
+	FECORE_BASE_CLASS(FEEdgeDataGenerator)
+
+public:
+	FEEdgeDataGenerator(FEModel* fem);
+
+	// generate the data array for the given node set
+//	virtual bool Generate(FEEdgeDataMap& ar);
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEFaceDataGenerator : public FEMeshDataGenerator
+{
+	FECORE_BASE_CLASS(FEFaceDataGenerator)
+
+public:
+	FEFaceDataGenerator(FEModel* fem);
+
+	// generate the data array for the given facet set
+	virtual bool Generate(FESurfaceMap& data);
+
+	virtual FESurfaceMap* Generate();
+
+public:
+	void SetFacetSet(FEFacetSet* surf);
+	FEFacetSet* GetFacetSet();
+
+private:
+	FEFacetSet* m_surf;
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEElemDataGenerator : public FEMeshDataGenerator
+{
+	FECORE_BASE_CLASS(FEElemDataGenerator)
+
+public:
+	FEElemDataGenerator(FEModel* fem);
+
+	// generate the data array for the given element set
+	virtual bool Generate(FEDomainMap& data);
+
+	virtual FEDomainMap* Generate();
+
+public:
+	void SetElementSet(FEElementSet* elset);
+	FEElementSet* GetElementSet();
+
+private:
+	FEElementSet* m_elemSet;
 };

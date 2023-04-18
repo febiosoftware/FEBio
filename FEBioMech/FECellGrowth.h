@@ -37,7 +37,7 @@ class FECellGrowth : public FEElasticMaterial
 public:
 	//! When used on its own (not in a solid mixture), this materials
 	//! is intrinsically unstable
-	FECellGrowth(FEModel* pfem) : FEElasticMaterial(pfem) { m_Rgas = 0; m_Tabs = 0; }
+	FECellGrowth(FEModel* pfem);
 	
 	//! Initialization routine
 	bool Init() override;

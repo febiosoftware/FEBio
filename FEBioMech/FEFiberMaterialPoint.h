@@ -28,3 +28,27 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FEMaterial.h"
+
+//-----------------------------------------------------------------------------
+// Define a material point that stores the fiber pre-stretch
+class FEFiberMaterialPoint : public FEMaterialPointData
+{
+public:
+	FEFiberMaterialPoint(FEMaterialPointData* pt);
+    
+	FEMaterialPointData* Copy();
+    
+    void Init();
+    
+    void Serialize(DumpStream& ar);
+    
+public:
+    // Set or clear pre-stretch, as needed in multigenerational materials (e.g., reactive viscoelasticity)
+    void SetPreStretch(const mat3ds Us) { m_Us = Us; m_bUs = true; }
+    void ResetPreStretch() { m_bUs = false; }
+    vec3d FiberPreStretch(const vec3d a0);
+
+public:
+    mat3ds  m_Us;   //!< pre-stretch tensor for fiber
+    bool    m_bUs;  //!< flag for pre-stretch
+};

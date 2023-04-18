@@ -27,13 +27,13 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEMultiphasic.h"
+#include "FEMembraneReaction.h"
 
 class FEBIOMIX_API FEMembraneReactionRateIonChannel : public FEMembraneReactionRate
 {
 public:
     //! constructor
-    FEMembraneReactionRateIonChannel(FEModel* pfem) : FEMembraneReactionRate(pfem) { m_g = 0; m_sol = -1; m_z = 0; }
+    FEMembraneReactionRateIonChannel(FEModel* pfem);
     
     // initialization
     bool Init() override;
@@ -42,7 +42,7 @@ public:
     double ReactionRate(FEMaterialPoint& pt) override;
     
     //! tangent of reaction rate with strain at material point
-    double Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override { return 0; }
+    double Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
     
     //! tangent of reaction rate with effective fluid pressure at material point
     double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override {return 0; }
@@ -55,8 +55,10 @@ public:
     double Tangent_ReactionRate_Ci(FEMaterialPoint& pt, const int isol) override;
     
 public:
-    int     m_sol;      //!< solute id (1-based)
+    int     m_sol;      //!< solute id (1-based) for ion
+    int     m_lid;      //!< local id of solute (zero-based)
     int     m_z;        //!< charge number of channel ion
+    int     m_sbm;      //!< sbm id (1-based) for channel protein
     double  m_g;        //!< channel conductance
     
     

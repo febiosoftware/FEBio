@@ -35,10 +35,12 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFluidMaterial, FEMaterial)
 
     // material parameters
-    ADD_PARAMETER(m_rhor, FE_RANGE_GREATER_OR_EQUAL(0.0), "density");
+    ADD_PARAMETER(m_rhor, FE_RANGE_GREATER_OR_EQUAL(0.0), "density")->setUnits(UNIT_DENSITY);
 
     // material properties
     ADD_PROPERTY(m_pViscous, "viscous");
+//  EXPERIMENTAL
+//    ADD_PROPERTY(m_pViscpol, "polar", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -52,7 +54,8 @@ END_FECORE_CLASS();
 FEFluidMaterial::FEFluidMaterial(FEModel* pfem) : FEMaterial(pfem)
 {
     m_rhor = 0;
-    m_pViscous = 0;
+    m_pViscous = nullptr;
+    m_pViscpol = nullptr;
 }
 
 //-----------------------------------------------------------------------------

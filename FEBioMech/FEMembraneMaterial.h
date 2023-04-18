@@ -29,9 +29,10 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/DumpStream.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-class FEMembraneMaterialPoint : public FEMaterialPoint
+class FEMembraneMaterialPoint : public FEMaterialPointData
 {
 public:
 	FEMembraneMaterialPoint()
@@ -39,14 +40,14 @@ public:
 		s[0] = s[1] = s[2] = 0;
 	}
 
-	FEMaterialPoint* Copy()
+	FEMaterialPointData* Copy()
 	{
-		return new FEMembraneMaterialPoint();
+		return new FEMembraneMaterialPoint(*this);
 	}
 
 	void Serialize(DumpStream& ar)
 	{
-		FEMaterialPoint::Serialize(ar);
+		FEMaterialPointData::Serialize(ar);
 		ar & g & s;
 	}
 
@@ -60,14 +61,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEMembraneMaterial : public FEMaterial
+class FEBIOMECH_API FEMembraneMaterial : public FEMaterial
 {
 public:
 	FEMembraneMaterial(FEModel* pfem) : FEMaterial(pfem) {}
 	virtual ~FEMembraneMaterial() {}
 
 	//! create material point data
-	FEMaterialPoint* CreateMaterialPointData() { return new FEMembraneMaterialPoint; }
+	FEMaterialPointData* CreateMaterialPointData() { return new FEMembraneMaterialPoint; }
 
 public:
 	//! calculate in-plane membrane stress
@@ -75,6 +76,8 @@ public:
 
 	//! calculate in-plane membrane tangent
 	virtual void Tangent(FEMaterialPoint& mp, double D[3][3]) = 0;
+
+	FECORE_BASE_CLASS(FEMembraneMaterial)
 };
 
 //-----------------------------------------------------------------------------

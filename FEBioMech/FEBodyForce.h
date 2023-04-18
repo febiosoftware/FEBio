@@ -49,7 +49,6 @@ public:
 	virtual mat3ds stiffness(FEMaterialPoint& pt) = 0;
 
 public:
-	// NOTE: Work in progress! Working on integrating body loads as a model loads
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 };

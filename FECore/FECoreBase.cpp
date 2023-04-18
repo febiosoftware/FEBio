@@ -47,7 +47,10 @@ FECoreBase::FECoreBase(FEModel* fem) : m_fem(fem)
 
 //-----------------------------------------------------------------------------
 //! destructor does nothing for now.
-FECoreBase::~FECoreBase(){}
+FECoreBase::~FECoreBase()
+{
+	ClearProperties();
+}
 
 //-----------------------------------------------------------------------------
 //! return the super class id
@@ -60,13 +63,13 @@ const char* FECoreBase::GetTypeStr() { return (m_fac ? m_fac->GetTypeStr() : nul
 
 //-----------------------------------------------------------------------------
 //! Set the factory class
-void FECoreBase::SetFactoryClass(FECoreFactory* fac)
+void FECoreBase::SetFactoryClass(const FECoreFactory* fac)
 {
 	m_fac = fac;
 }
 
 //-----------------------------------------------------------------------------
-FECoreFactory* FECoreBase::GetFactoryClass()
+const FECoreFactory* FECoreBase::GetFactoryClass() const
 {
 	return m_fac;
 }
@@ -135,27 +138,27 @@ void setParamValue(FEParam& pi, const std::string& val)
 
 //-----------------------------------------------------------------------------
 // set parameters through a class descriptor
-bool FECoreBase::SetParameters(const ClassDescriptor& cd)
+bool FECoreBase::SetParameters(const FEClassDescriptor& cd)
 {
-	const ClassDescriptor::ClassVariable* root = cd.Root();
+	const FEClassDescriptor::ClassVariable* root = cd.Root();
 	return SetParameters(*cd.Root());
 }
 
 //-----------------------------------------------------------------------------
 // set parameters through a class descriptor
-bool FECoreBase::SetParameters(const ClassDescriptor::ClassVariable& cv)
+bool FECoreBase::SetParameters(const FEClassDescriptor::ClassVariable& cv)
 {
 	FEParameterList& PL = GetParameterList();
 	for (int i=0; i<cv.Count(); ++i)
 	{
 		// get the next variable
-		const ClassDescriptor::Variable* vari = cv.GetVariable(i);
+		const FEClassDescriptor::Variable* vari = cv.GetVariable(i);
 
 		// see if this parameter is defined
 		FEParam* pi = PL.FindFromName(vari->m_name.c_str());
 		if (pi)
 		{
-			const ClassDescriptor::SimpleVariable* vi = dynamic_cast<const ClassDescriptor::SimpleVariable*>(vari);
+			const FEClassDescriptor::SimpleVariable* vi = dynamic_cast<const FEClassDescriptor::SimpleVariable*>(vari);
 			assert(vi);
 			if (vi == nullptr) return false;
 
@@ -165,7 +168,7 @@ bool FECoreBase::SetParameters(const ClassDescriptor::ClassVariable& cv)
 		else
 		{
 			// could be a property
-			const ClassDescriptor::ClassVariable* ci = dynamic_cast<const ClassDescriptor::ClassVariable*>(vari);
+			const FEClassDescriptor::ClassVariable* ci = dynamic_cast<const FEClassDescriptor::ClassVariable*>(vari);
 			assert(ci);
 
 			// find the property
@@ -173,7 +176,7 @@ bool FECoreBase::SetParameters(const ClassDescriptor::ClassVariable& cv)
 			if (prop == nullptr) return false;
 
 			// allocate a new child class
-			FECoreBase* pc = fecore_new<FECoreBase>(prop->GetClassID(), ci->m_type.c_str(), GetFEModel()); assert(pc);
+			FECoreBase* pc = fecore_new<FECoreBase>(prop->GetSuperClassID(), ci->m_type.c_str(), GetFEModel()); assert(pc);
 			if (pc == nullptr) return false;
 
 			// assign the property
@@ -300,7 +303,32 @@ bool FECoreBase::Init()
 				}
 			}
 		}
+		else if (pi.type() == FE_PARAM_VEC3D_MAPPED)
+		{
+			for (int j = 0; j < pi.dim(); ++j)
+			{
+				FEParamVec3& pd = pi.value<FEParamVec3>(j);
+				if (pd.Init() == false)
+				{
+					feLogError("Failed to initialize parameter %s", pi.name());
+					return false;
+				}
+			}
+		}
+		else if (pi.type() == FE_PARAM_MAT3D_MAPPED)
+		{
+			for (int j = 0; j < pi.dim(); ++j)
+			{
+				FEParamMat3d& pd = pi.value<FEParamMat3d>(j);
+				if (pd.Init() == false)
+				{
+					feLogError("Failed to initialize parameter %s", pi.name());
+					return false;
+				}
+			}
+		}
 	}
+
 	// check the parameter ranges
 	if (Validate() == false) return false;
 
@@ -313,7 +341,7 @@ bool FECoreBase::Init()
 		{
 			if (pi->Init() == false)
 			{
-				feLogError("The required property \"%s\" was not defined", pi->GetName());
+				feLogError("The property \"%s\" failed to initialize or was not defined.", pi->GetName());
 				return false;
 			}
 		}
@@ -330,9 +358,26 @@ bool FECoreBase::Init()
 void FECoreBase::AddProperty(FEProperty* pp, const char* sz, unsigned int flags)
 {
 	pp->SetName(sz);
+	pp->SetLongName(sz);
 	pp->SetFlags(flags);
 	pp->SetParent(this);
 	m_Prop.push_back(pp);
+}
+
+//-----------------------------------------------------------------------------
+void FECoreBase::RemoveProperty(int i)
+{
+	m_Prop[i] = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+void FECoreBase::ClearProperties()
+{
+	for (int i = 0; i < m_Prop.size(); ++i)
+	{
+		delete m_Prop[i];
+	}
+	m_Prop.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -357,14 +402,39 @@ int FECoreBase::FindPropertyIndex(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-FEProperty* FECoreBase::FindProperty(const char* sz)
+FEProperty* FECoreBase::FindProperty(const char* sz, bool searchChildren)
 {
+	// first, search the class' properties
 	int NP = (int)m_Prop.size();
 	for (int i = 0; i<NP; ++i)
 	{
 		FEProperty* pm = m_Prop[i];
 		if (pm && (strcmp(pm->GetName(), sz) == 0)) return pm;
 	}
+
+	// the property, wasn't found so look into the properties' properties
+	if (searchChildren)
+	{
+		for (int i = 0; i < NP; ++i)
+		{
+			FEProperty* pm = m_Prop[i];
+			if (pm)
+			{
+				int m = pm->size();
+				for (int j = 0; j < m; ++j)
+				{
+					FECoreBase* pcj = pm->get(j);
+					if (pcj)
+					{
+						// Note: we don't search children's children!
+						FEProperty* pj = pcj->FindProperty(sz);
+						if (pj) return pj;
+					}
+				}
+			}
+		}
+	}
+
 	return nullptr;
 }
 
@@ -585,5 +655,11 @@ bool FECoreBase::BuildClass()
 			if (pj) pj->BuildClass();
 		}
 	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FECoreBase::UpdateParams()
+{
 	return true;
 }

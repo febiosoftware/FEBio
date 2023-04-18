@@ -35,6 +35,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEBioLoadDataSection3::FEBioLoadDataSection3(FEFileImport* pim) : FEFileSection(pim) 
 {
+	m_redefineCurves = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -59,10 +60,6 @@ void FEBioLoadDataSection3::Parse(XMLTag& tag)
 			// get the number of load curves
 			int nlc = fem.LoadControllers();
 
-			// check that the ID is one more than the number of load curves defined
-			// This is to make sure that the ID's are in numerical order and no values are skipped.
-			if (nid != nlc + 1) throw XMLReader::InvalidAttributeValue(tag, "id");
-
 			// create the controller
 			FELoadController* plc = fecore_new<FELoadController>(sztype, &fem);
 			if (plc == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type");
@@ -70,11 +67,34 @@ void FEBioLoadDataSection3::Parse(XMLTag& tag)
 			// set the ID
 			plc->SetID(nid - 1);
 
-			// add the controller
-			fem.AddLoadController(plc);
+			// see if this refers to a valid curve
+			if (m_redefineCurves && ((nid > 0) && (nid <= nlc)))
+			{
+				fem.ReplaceLoadController(nid - 1, plc);
+			}
+			else
+			{
+				// check that the ID is one more than the number of load curves defined
+				// This is to make sure that the ID's are in numerical order and no values are skipped.
+				if (nid != nlc + 1)
+				{
+					delete plc;
+					throw XMLReader::InvalidAttributeValue(tag, "id");
+				}
+
+				// add the controller
+				fem.AddLoadController(plc);
+			}
 
 			// read the parameter list
 			ReadParameterList(tag, plc);
+
+			if (m_redefineCurves)
+			{
+				// We only get here during restart, in which case the new load controllers
+				// will not get a chance to be initialized, so we'll do it here.
+				plc->Init();
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 

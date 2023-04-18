@@ -33,13 +33,18 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
+#include "FEBiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteSolidDomain::FEBiphasicSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    // TODO: Can this be done in Init, since there is no error checking
+    if (pfem)
+    {
+        m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+        m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+        m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -153,8 +158,12 @@ void FEBiphasicSoluteSolidDomain::InitMaterialPoints()
             ps.m_crp[0] = pm.m_J*m_pMat->Porosity(mp)*ps.m_ca[0];
             pt.m_pa = m_pMat->Pressure(mp);
             
+            // determine if solute is 'solid-bound'
+            FESolute* soli = m_pMat->GetSolute();
+            if (soli->m_pDiff->Diffusivity(mp).norm() == 0) ps.m_bsb[0] = true;
+            
             // initialize referential solid volume fraction
-            pt.m_phi0 = m_pMat->m_phi0(mp);
+            pt.m_phi0t = m_pMat->m_phi0(mp);
             
             // calculate stress
             pm.m_s = m_pMat->Stress(mp);
@@ -233,7 +242,7 @@ void FEBiphasicSoluteSolidDomain::Reset()
         FESolutesMaterialPoint&  ps = *(mp.ExtractData<FESolutesMaterialPoint >());
             
         // initialize referential solid volume fraction
-        pt.m_phi0 = m_pMat->m_phi0(mp);
+        pt.m_phi0 = pt.m_phi0t = m_pMat->m_phi0(mp);
             
         // initialize multiphasic solutes
         ps.m_nsol = nsol;
@@ -241,6 +250,7 @@ void FEBiphasicSoluteSolidDomain::Reset()
         ps.m_ca.assign(nsol,0);
         ps.m_crp.assign(nsol, 0);
         ps.m_gradc.assign(nsol,vec3d(0,0,0));
+        ps.m_bsb.assign(nsol, false);
         ps.m_k.assign(nsol, 0);
         ps.m_dkdJ.assign(nsol, 0);
         ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
@@ -295,8 +305,8 @@ void FEBiphasicSoluteSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
             FEBiphasicMaterialPoint& pb = *mp.ExtractData<FEBiphasicMaterialPoint>();
             FESolutesMaterialPoint&  ps = *(mp.ExtractData<FESolutesMaterialPoint >());
-            pt.m_r0 = r0;
-            pt.m_rt = rt;
+            mp.m_r0 = r0;
+            mp.m_rt = rt;
             
             pt.m_J = defgrad(el, pt.m_F, j);
             
@@ -304,7 +314,7 @@ void FEBiphasicSoluteSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             
             pb.m_p = p;
             pb.m_gradp = gradient(el, pn, j);
-            pb.m_phi0p = pb.m_phi0;
+            pb.m_phi0p = pb.m_phi0t;
             ps.m_c[0] = c;
             ps.m_gradc[0] = gradient(el, ct, j);
             
@@ -1043,12 +1053,7 @@ void FEBiphasicSoluteSolidDomain::Update(const FETimeInfo& tp)
         }
     }
     
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -1056,7 +1061,7 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
 {
     FEModel& fem = *GetFEModel();
     double dt = fem.GetTime().timeIncrement;
-    bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+    bool sstate = (fem.GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE);
     
     int dofc = m_dofC + m_pMat->GetSolute()->GetSoluteDOF();
     int dofd = m_dofD + m_pMat->GetSolute()->GetSoluteDOF();
@@ -1100,8 +1105,8 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
         // material point coordinates
         // TODO: I'm not entirly happy with this solution
         //		 since the material point coordinates are used by most materials.
-        pt.m_r0 = el.Evaluate(r0, n);
-        pt.m_rt = el.Evaluate(rt, n);
+        mp.m_r0 = el.Evaluate(r0, n);
+        mp.m_rt = el.Evaluate(rt, n);
         
         // get the deformation gradient and determinant
         pt.m_J = defgrad(el, pt.m_F, n);
@@ -1146,7 +1151,7 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
                 ppt.m_phi0hat = 0;
                 //				ppt.m_phi0hat = pmb->GetSolid()->MolarMass()/pmb->GetSolid()->Density()*pmb->GetSolute()->m_pSupp->SolidSupply(mp);
                 
-                ppt.m_phi0 = ppt.m_phi0p + ppt.m_phi0hat*dt;
+                ppt.m_phi0t = ppt.m_phi0p + ppt.m_phi0hat*dt;
             }
         }
         

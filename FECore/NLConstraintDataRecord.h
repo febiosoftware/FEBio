@@ -33,12 +33,13 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Base class for nonlinear constraints log data (e.g. rigid connectors)
-class FECORE_API FELogNLConstraintData : public FECoreBase
+class FECORE_API FELogNLConstraintData : public FELogData
 {
-	FECORE_SUPER_CLASS
+    FECORE_SUPER_CLASS(FELOGNLCONSTRAINTDATA_ID)
+    FECORE_BASE_CLASS(FELogNLConstraintData)
 
 public:
-    FELogNLConstraintData(FEModel* fem) : FECoreBase(fem) {}
+    FELogNLConstraintData(FEModel* fem) : FELogData(fem) {}
     virtual ~FELogNLConstraintData(){}
     virtual double value(FENLConstraint& rc) = 0;
 };
@@ -47,9 +48,9 @@ public:
 class FECORE_API NLConstraintDataRecord : public DataRecord
 {
 public:
-	NLConstraintDataRecord(FEModel* pfem, const char* szfile);
+	NLConstraintDataRecord(FEModel* pfem);
     double Evaluate(int item, int ndata);
-    void SetData(const char* sz);
+    void SetData(const char* sz) override;
     void SelectAllItems();
 	int Size() const;
     

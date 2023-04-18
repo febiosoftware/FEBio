@@ -54,6 +54,44 @@ quatd quatd::slerp(quatd &q1, quatd &q2, const double t)
 		return quatd::lerp(q1,q3,t);
 }
 
+//-----------------------------------------------------------------------------
+quatd::quatd(const mat3d& m)
+{
+	quatd& q = *this;
+	double t;
+	if (m(2, 2) < 0)
+	{
+		if (m(0, 0) > m(1, 1))
+		{
+			t = 1 + m(0, 0) - m(1, 1) - m(2, 2);
+			q = quatd(t, m(0, 1) + m(1, 0), m(2, 0) + m(0, 2), m(1, 2) - m(2, 1));
+		}
+		else
+		{
+			t = 1 - m(0, 0) + m(1, 1) - m(2, 2);
+			q = quatd(m(0, 1) + m(1, 0), t, m(1, 2) + m(2, 1), m(2, 0) - m(0, 2));
+		}
+	}
+	else
+	{
+		if (m(0, 0) < -m(1, 1))
+		{
+			t = 1 - m(0, 0) - m(1, 1) + m(2, 2);
+			q = quatd(m(2, 0) + m(0, 2), m(1, 2) + m(2, 1), t, m(0, 1) - m(1, 0));
+		}
+		else
+		{
+			t = 1 + m(0, 0) + m(1, 1) + m(2, 2);
+			q = quatd(m(1, 2) - m(2, 1), m(2, 0) - m(0, 2), m(0, 1) - m(1, 0), t);
+		}
+	}
+
+	double s = 0.5 / sqrt(t);
+	q.x *= s;
+	q.y *= s;
+	q.z *= s;
+	q.w *= s;
+}
 
 //-----------------------------------------------------------------------------
 void quatd::SetEuler(double X, double Y, double Z)

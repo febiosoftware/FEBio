@@ -32,11 +32,11 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FECarreauYasudaFluid, FEViscousFluid)
-	ADD_PARAMETER(m_mu0, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0");
-	ADD_PARAMETER(m_mui, FE_RANGE_GREATER_OR_EQUAL(0.0), "mui");
-	ADD_PARAMETER(m_lam, FE_RANGE_GREATER_OR_EQUAL(0.0), "lambda");
-	ADD_PARAMETER(m_n  , FE_RANGE_GREATER_OR_EQUAL(0.0), "n");
-	ADD_PARAMETER(m_a  , FE_RANGE_GREATER_OR_EQUAL(2.0), "a");
+	ADD_PARAMETER(m_mu0, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu0")->setUnits("P.t")->setLongName("zero shear rate viscosity");
+	ADD_PARAMETER(m_mui, FE_RANGE_GREATER_OR_EQUAL(0.0), "mui")->setUnits("P.t")->setLongName("infinite shear rate viscosity");
+	ADD_PARAMETER(m_lam, FE_RANGE_GREATER_OR_EQUAL(0.0), "lambda")->setUnits(UNIT_TIME)->setLongName("relaxation time");
+	ADD_PARAMETER(m_n  , FE_RANGE_GREATER_OR_EQUAL(0.0), "n")->setLongName("power index");
+	ADD_PARAMETER(m_a  , FE_RANGE_GREATER_OR_EQUAL(2.0), "a")->setLongName("power denominator");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

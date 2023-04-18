@@ -29,15 +29,19 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "MMath.h"
 #include "MEvaluate.h"
+using namespace std;
 
 #ifndef PI
-#define PI	3.1415926535897932385
+#define PI	3.141592653589793
 #endif
 
 //-----------------------------------------------------------------------------
 MITEM MDerive(const MITEM& a, const MVariable& x)
 {
 	MITEM e = MEvaluate(a);
+
+	if (is_dependent(e, x) == false) return 0.0;
+
 	switch (e.Type())
 	{
 	case MCONST:
@@ -76,8 +80,8 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 		{
 			MITEM l = e.Left();
 			MITEM r = e.Right();
-			if (isConst(r) || is_named(r) || is_frac(r)) return (r*(l^(r-1.0)))*MDerive(l, x);
-			else if (isConst(l) || is_named(l) || is_frac(l)) return (Log(l)*e)*MDerive(r, x);
+			if (is_dependent(r, x) == false) return (r*(l^(r-1.0)))*MDerive(l, x);
+			else if (is_dependent(l, x) == false) return (Log(l)*e)*MDerive(r, x);
 			else
 			{
 				MITEM dl = MDerive(l, x);
@@ -122,32 +126,48 @@ MITEM MDerive(const MITEM& a, const MVariable& x)
 				MITEM Pi = new MNamedCt(PI, "pi");
 				return -(2/Sqrt(Pi))*Exp(-(p^2))*dp;
 			}
+			if (s.compare("H") == 0)
+			{
+				return 0.0;
+			}
 			assert(false);
 		}
 		break;
 	case MF2D:
 		{
 			const string& s = mfnc2d(e)->Name();
-			MITEM a = e.Left();
-			MITEM b = e.Right();
-			MITEM db = MDerive(b,x);
-#ifdef WIN32
-			if (s.compare("Jn") == 0)
+			MITEM l = e.Left();
+			MITEM r = e.Right();
+			if (s.compare("pow") == 0)
 			{
-				if (is_int(a))
+				if (isConst(r) || is_named(r) || is_frac(r)) return (r * (l ^ (r - 1.0))) * MDerive(l, x);
+				else if (isConst(l) || is_named(l) || is_frac(l)) return (Log(l) * e) * MDerive(r, x);
+				else
 				{
-					int n = (int) a.value();
-					if (n==0) return (-J1(b))*db;
-					else return ((Jn(n-1, b) - Jn(n+1,b))/2.0)*db;
+					MITEM dl = MDerive(l, x);
+					MITEM dr = MDerive(r, x);
+					return (e * (dr * Log(l) + (r * dl) / l));
+				}
+			}
+#ifdef WIN32
+			else if (s.compare("Jn") == 0)
+			{
+				MITEM dr = MDerive(r, x);
+				if (is_int(l))
+				{
+					int n = (int) l.value();
+					if (n==0) return (-J1(r))*dr;
+					else return ((Jn(n-1, r) - Jn(n+1, r))/2.0)*dr;
 				}
 			}
 			else if (s.compare("Yn") == 0)
 			{
-				if (is_int(a))
+				MITEM dr = MDerive(r, x);
+				if (is_int(l))
 				{
-					int n = (int) a.value();
-					if (n==0) return (-Y1(b))*db;
-					else return ((Yn(n-1, b) - Yn(n+1,b))/2.0)*db;
+					int n = (int) l.value();
+					if (n==0) return (-Y1(r))*dr;
+					else return ((Yn(n-1, r) - Yn(n+1, r))/2.0)*dr;
 				}
 			}
 #endif

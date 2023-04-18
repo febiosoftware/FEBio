@@ -54,10 +54,24 @@ void FESlidingSurface::FESlidingPoint::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
 
-	ar & m_gap & m_nu & m_eps & m_off;
+	ar & m_nu & m_eps & m_off;
 	ar & m_rs & m_rsp;
-	ar & m_Lm & m_Lt & m_Ln;
+	ar & m_Lm & m_Lt;
 	ar & m_M;
+}
+
+void FESlidingSurface::FESlidingPoint::Init()
+{
+	FEContactMaterialPoint::Init();
+	m_gap = 0.0;
+	m_nu = vec3d(0, 0, 0);
+	m_rs = vec2d(0, 0);
+	m_rsp = vec2d(0, 0);
+	m_Lm = 0.0;
+	m_M.zero();
+	m_Lt = vec2d(0, 0);
+	m_off = 0.0;
+	m_eps = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -80,6 +94,9 @@ BEGIN_FECORE_CLASS(FESlidingInterface, FEContactInterface)
 	ADD_PARAMETER(m_sradius      , "search_radius");
 	ADD_PARAMETER(m_bupdtpen     , "update_penalty");
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FESlidingSurface::FESlidingSurface(FEModel* pfem) : FEContactSurface(pfem) {}
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
@@ -179,6 +196,11 @@ bool FESlidingSurface::Init()
 
 	// allocate integration point data
 	m_data.resize(nn);
+	for (int i = 0; i < nn; ++i)
+	{
+		FESlidingPoint& d = m_data[i];
+		d.Init();
+	}
 
 	// we calculate the gap offset values
 	// This value is used to take the shell thickness into account
@@ -406,6 +428,10 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 	m_bautopen = false;	// don't use auto-penalty
 	m_btwo_pass = false; // don't use two-pass
 	m_sradius = 0;				// no search radius limitation
+
+	// set parents
+	m_ms.SetContactInterface(this);
+	m_ss.SetContactInterface(this);
 
 	// set the siblings
 	m_ms.SetSibling(&m_ss);
@@ -994,13 +1020,13 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		double TMT = Tt[0]*(Mki[0][0]*Tt[0]+Mki[0][1]*Tt[1])+Tt[1]*(Mki[1][0]*Tt[0]+Mki[1][1]*Tt[1]);
 		assert(TMT >= 0);
 
-		double phi = sqrt(TMT) - m_mu*Ln;
+		double phi = sqrt(TMT) - m_mu* tn;
 
 		// b. return map
 		if (phi > 0)
 		{
-			Tt[0] = m_mu*Ln*Tt[0]/sqrt(TMT);
-			Tt[1] = m_mu*Ln*Tt[1]/sqrt(TMT);
+			Tt[0] = m_mu* tn *Tt[0]/sqrt(TMT);
+			Tt[1] = m_mu* tn *Tt[1]/sqrt(TMT);
 		}
 
 		// tangential force vector
@@ -1018,10 +1044,10 @@ void FESlidingInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 	vector<int> lm(3*(MAXMN + 1));
 	vector<int> en(MAXMN+1);
 
-	double *Gr, *Gs, w[6];
-	vec3d r0[6];
+	double *Gr, *Gs, w[MAXMN];
+	vec3d r0[MAXMN];
 
-	double detJ[6];
+	double detJ[MAXMN];
 	vec3d dxr, dxs;
 
 	vector<int> sLM;

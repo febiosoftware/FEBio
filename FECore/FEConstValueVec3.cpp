@@ -24,11 +24,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
+#include "FEModel.h"
 #include "FEConstValueVec3.h"
 #include "FEMaterialPoint.h"
 #include "FEMeshPartition.h"
 #include "FENode.h"
 #include "quatd.h"
+#include <assert.h>
 
 //==================================================================================
 BEGIN_FECORE_CLASS(FEConstValueVec3, FEVec3dValuator)
@@ -39,7 +41,7 @@ FEConstValueVec3::FEConstValueVec3(FEModel* fem) : FEVec3dValuator(fem) {}
 
 FEVec3dValuator* FEConstValueVec3::copy()
 {
-	FEConstValueVec3* val = new FEConstValueVec3(GetFEModel());
+	FEConstValueVec3* val = fecore_alloc(FEConstValueVec3, GetFEModel());
 	val->m_val = m_val;
 	return val;
 }
@@ -51,6 +53,8 @@ END_FECORE_CLASS();
 
 FEMathValueVec3::FEMathValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 {
+	m_expr = "0,0,0";
+	Init();
 }
 
 //---------------------------------------------------------------------------------------
@@ -69,36 +73,46 @@ bool FEMathValueVec3::Init()
 //---------------------------------------------------------------------------------------
 bool FEMathValueVec3::create(const std::string& sx, const std::string& sy, const std::string& sz)
 {
-	for (int i = 0; i < 3; ++i)
+	FECoreBase* pc = nullptr;
+	if (pc == nullptr)
 	{
-		m_math[i].AddVariable("X");
-		m_math[i].AddVariable("Y");
-		m_math[i].AddVariable("Z");
+		// try to find the owner of this parameter
+		// First, we need the model parameter
+		FEModelParam* param = GetModelParam();
+		if (param == nullptr) return false;
+
+		// we'll need the model for this
+		FEModel* fem = GetFEModel();
+		if (fem == nullptr) return false;
+
+		// Now try to find the owner of this parameter
+		pc = fem->FindParameterOwner(param);
 	}
-	bool b;
-	b = m_math[0].Create(sx); assert(b);
-	b = m_math[1].Create(sy); assert(b);
-	b = m_math[2].Create(sz); assert(b);
+
+	if (m_math[0].Init(sx, pc) == false) return false;
+	if (m_math[1].Init(sy, pc) == false) return false;
+	if (m_math[2].Init(sz, pc) == false) return false;
 
 	return true;
 }
 
+bool FEMathValueVec3::UpdateParams()
+{
+	return Init();
+}
+
 vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)
 {
-	std::vector<double> var(3);
-	var[0] = pt.m_r0.x;
-	var[1] = pt.m_r0.y;
-	var[2] = pt.m_r0.z;
-	double vx = m_math[0].value_s(var);
-	double vy = m_math[1].value_s(var);
-	double vz = m_math[2].value_s(var);
+	double vx = m_math[0].value(GetFEModel(), pt);
+	double vy = m_math[1].value(GetFEModel(), pt);
+	double vz = m_math[2].value(GetFEModel(), pt);
 	return vec3d(vx, vy, vz);
 }
 
 //---------------------------------------------------------------------------------------
 FEVec3dValuator* FEMathValueVec3::copy()
 {
-	FEMathValueVec3* newVal = new FEMathValueVec3(GetFEModel());
+	FEMathValueVec3* newVal = fecore_alloc(FEMathValueVec3, GetFEModel());
 	newVal->m_math[0] = m_math[0];
 	newVal->m_math[1] = m_math[1];
 	newVal->m_math[2] = m_math[2];
@@ -106,6 +120,9 @@ FEVec3dValuator* FEMathValueVec3::copy()
 }
 
 //---------------------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEMappedValueVec3, FEVec3dValuator)
+	ADD_PARAMETER(m_mapName, "map");
+END_FECORE_CLASS();
 
 FEMappedValueVec3::FEMappedValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 {
@@ -125,7 +142,7 @@ vec3d FEMappedValueVec3::operator()(const FEMaterialPoint& pt)
 
 FEVec3dValuator* FEMappedValueVec3::copy()
 {
-	FEMappedValueVec3* map = new FEMappedValueVec3(GetFEModel());
+	FEMappedValueVec3* map = fecore_alloc(FEMappedValueVec3, GetFEModel());
 	map->m_val = m_val;
 	return map;
 }
@@ -135,6 +152,19 @@ void FEMappedValueVec3::Serialize(DumpStream& ar)
 	FEVec3dValuator::Serialize(ar);
 	if (ar.IsShallow()) return;
 	ar & m_val;
+}
+
+bool FEMappedValueVec3::Init()
+{
+	if (m_val == nullptr)
+	{
+		FEModel& fem = *GetFEModel();
+		FEMesh& mesh = fem.GetMesh();
+		FEDataMap* map = mesh.FindDataMap(m_mapName);
+		if (map == nullptr) return false;
+		setDataMap(map);
+	}
+	return FEVec3dValuator::Init();
 }
 
 //=================================================================================================
@@ -174,7 +204,7 @@ vec3d FELocalVectorGenerator::operator () (const FEMaterialPoint& mp)
 
 FEVec3dValuator* FELocalVectorGenerator::copy()
 {
-	FELocalVectorGenerator* map = new FELocalVectorGenerator(GetFEModel());
+	FELocalVectorGenerator* map = fecore_alloc(FELocalVectorGenerator, GetFEModel());
 	map->m_n[0] = m_n[0];
 	map->m_n[1] = m_n[1];
 	return map;
@@ -201,7 +231,7 @@ bool FESphericalVectorGenerator::Init()
 
 FEVec3dValuator* FESphericalVectorGenerator::copy()
 {
-	FESphericalVectorGenerator* map = new FESphericalVectorGenerator(GetFEModel());
+	FESphericalVectorGenerator* map = fecore_alloc(FESphericalVectorGenerator, GetFEModel());
 	map->m_center = m_center;
 	map->m_vector = m_vector;
 	return map;
@@ -226,7 +256,7 @@ vec3d FESphericalVectorGenerator::operator () (const FEMaterialPoint& mp)
 //=================================================================================================
 BEGIN_FECORE_CLASS(FECylindricalVectorGenerator, FEVec3dValuator)
 	ADD_PARAMETER(m_center, "center");
-	ADD_PARAMETER(m_axis, "axis")
+	ADD_PARAMETER(m_axis, "axis");
 	ADD_PARAMETER(m_vector, "vector");
 END_FECORE_CLASS();
 
@@ -266,7 +296,7 @@ vec3d FECylindricalVectorGenerator::operator () (const FEMaterialPoint& mp)
 
 FEVec3dValuator* FECylindricalVectorGenerator::copy()
 {
-	FECylindricalVectorGenerator* map = new FECylindricalVectorGenerator(GetFEModel());
+	FECylindricalVectorGenerator* map = fecore_alloc(FECylindricalVectorGenerator, GetFEModel());
 	map->m_center = m_center;
 	map->m_axis = m_axis;
 	map->m_vector = m_vector;
@@ -308,4 +338,25 @@ FEVec3dValuator* FESphericalAnglesVectorGenerator::copy()
 	v->m_theta = m_theta;
 	v->m_phi = m_phi;
 	return v;
+}
+
+
+//=================================================================================================
+BEGIN_FECORE_CLASS(FEUserVectorGenerator, FEVec3dValuator)
+END_FECORE_CLASS();
+
+FEUserVectorGenerator::FEUserVectorGenerator(FEModel* fem) : FEVec3dValuator(fem)
+{
+}
+
+vec3d FEUserVectorGenerator::operator () (const FEMaterialPoint& mp)
+{
+	assert(false);
+	return vec3d(0, 0, 0);
+}
+
+FEVec3dValuator* FEUserVectorGenerator::copy()
+{
+	assert(false);
+	return fecore_alloc(FEUserVectorGenerator, GetFEModel());
 }

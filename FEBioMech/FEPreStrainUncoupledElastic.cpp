@@ -40,20 +40,23 @@ FEPreStrainUncoupledElastic::FEPreStrainUncoupledElastic(FEModel* pfem) : FEUnco
 
 //-----------------------------------------------------------------------------
 //! Create material point data for this material
-FEMaterialPoint* FEPreStrainUncoupledElastic::CreateMaterialPointData()
+FEMaterialPointData* FEPreStrainUncoupledElastic::CreateMaterialPointData()
 { 
-	if (m_Fp == 0)
-	{
-		FEMaterialPoint* pm = m_mat->CreateMaterialPointData();
-		return new FEPrestrainMaterialPoint(pm);
-	}
-	else
-	{
-		FEMaterialPoint* pm = m_mat->CreateMaterialPointData();
-		FEMaterialPoint* pg = m_Fp->CreateMaterialPointData();
-		if (pg) pm->Append(pg);
-		return new FEPrestrainMaterialPoint(pm);
-	}
+	FEMaterialPointData* pm = m_mat->CreateMaterialPointData();
+	if (m_Fp) pm->Append(m_Fp->CreateMaterialPointData());
+	return new FEPrestrainMaterialPoint(pm);
+}
+
+//-----------------------------------------------------------------------------
+//! calculate (pre-strained) density 
+double FEPreStrainUncoupledElastic::Density(FEMaterialPoint& mp)
+{
+	double d0 = FEElasticMaterial::Density(mp);
+
+	mat3d Fp = PrestrainGradient(mp);
+	double Jp = Fp.det();
+
+	return d0 / Jp;
 }
 
 //-----------------------------------------------------------------------------

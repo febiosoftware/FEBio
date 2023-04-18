@@ -28,14 +28,22 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FENewtonianViscousSolid.h"
-#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianViscousSolid, FEElasticMaterial)
-	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa");
-	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   );
+	ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(      0.0), "kappa")->setUnits("P.t")->setLongName("bulk viscosity");
+	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(      0.0), "mu"   )->setUnits("P.t")->setLongName("shear viscosity");
+    ADD_PARAMETER(m_secant_tangent, "secant_tangent");
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FENewtonianViscousSolid::FENewtonianViscousSolid(FEModel* pfem) : FEElasticMaterial(pfem) 
+{
+    m_kappa = 0.0;
+    m_mu = 0.0;
+    m_secant_tangent = false;
+}
 
 //-----------------------------------------------------------------------------
 mat3ds FENewtonianViscousSolid::Stress(FEMaterialPoint& mp)
@@ -56,7 +64,7 @@ mat3ds FENewtonianViscousSolid::Stress(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 tens4ds FENewtonianViscousSolid::Tangent(FEMaterialPoint& mp)
 {
-    FETimeInfo& tp = GetFEModel()->GetTime();
+    const FETimeInfo& tp = GetTimeInfo();
     tens4ds Cv;
     
     if (tp.timeIncrement > 0) {

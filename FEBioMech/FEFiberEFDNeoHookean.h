@@ -52,8 +52,8 @@ public:
 	bool Init() override;
 
 public:
-	double	m_E;	//<! Young's modulus
-	double	m_v;	//<! Poisson's ratio
+	double	m_E;	//!< Young's modulus
+	double	m_v;	//!< Poisson's ratio
 
 	//--- active contraction stuff ---
 	double	m_a[3];

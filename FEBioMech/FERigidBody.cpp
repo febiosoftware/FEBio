@@ -34,8 +34,6 @@ SOFTWARE.*/
 #include "RigidBC.h"
 #include "FERigidMaterial.h"
 
-REGISTER_SUPER_CLASS(FERigidBody, FEOBJECT_ID);
-
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidBody, FECoreBase)
 	ADD_PARAMETER(m_Fr.x, "Fx");

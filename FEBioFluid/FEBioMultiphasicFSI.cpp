@@ -38,8 +38,13 @@
 #include "FETangentialFlowFSIStabilization.h"
 #include "FEMultiphasicFSISoluteFlux.h"
 #include "FEMultiphasicFSIPressure.h"
+#include "FEMultiphasicFSIPressureBC.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEMultiphasicFSISoluteBackflowStabilization.h"
+#include "FEFluidModule.h"
+#include "FEMultiphasicFSIAnalysis.h"
+#include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::MULTIPHASIC_FSI_VARIABLE var)
@@ -57,8 +62,8 @@ const char* FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::MULTIPHASI
         case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
         case FLUID_VELOCITY              : return "fluid velocity"             ; break;
         case FLUID_ACCELERATION          : return "fluid acceleration"         ; break;
-        case FLUID_DILATATION            : return "fluid dilation"             ; break;
-        case FLUID_DILATATION_TDERIV     : return "fluid dilation tderiv"      ; break;
+        case FLUID_DILATATION            : return "fluid dilatation"           ; break;
+        case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"    ; break;
         case FLUID_CONCENTRATION         : return "concentration"              ; break;
         case FLUID_CONCENTRATION_TDERIV  : return "concentration tderiv"       ; break;
     }
@@ -74,10 +79,15 @@ void FEBioMultiphasicFSI::InitModule()
     febio.RegisterDomain(new FEMultiphasicFSIDomainFactory);
     
     // define the fsi module
-    febio.CreateModule("multiphasic-FSI");
-    febio.SetModuleDependency("fluid");
-    febio.SetModuleDependency("multiphasic");    // also pulls in solid, biphasic, solutes
+    febio.CreateModule(new FEMultiphasicFSIModule, "multiphasic-FSI");
+    febio.AddModuleDependency("fluid");
+    febio.AddModuleDependency("multiphasic");    // also pulls in solid, biphasic, solutes
     
+    //-----------------------------------------------------------------------------
+    // analyis classes (default type must match module name!)
+    REGISTER_FECORE_CLASS(FEMultiphasicFSIAnalysis, "multiphasic-FSI");
+
+    //-----------------------------------------------------------------------------
     REGISTER_FECORE_CLASS(FEMultiphasicFSISolver, "multiphasic-FSI");
     
     REGISTER_FECORE_CLASS(FEMultiphasicFSI, "multiphasic-FSI");
@@ -90,9 +100,35 @@ void FEBioMultiphasicFSI::InitModule()
     
     REGISTER_FECORE_CLASS(FETangentialFlowFSIStabilization, "fluid tangential stabilization");
     
+    // loads
     REGISTER_FECORE_CLASS(FEMultiphasicFSISoluteFlux, "solute flux");
     REGISTER_FECORE_CLASS(FEMultiphasicFSISoluteBackflowStabilization, "solute backflow stabilization");
-    REGISTER_FECORE_CLASS(FEMultiphasicFSIPressure, "fluid pressure");
+    REGISTER_FECORE_CLASS(FEMultiphasicFSIPressure, "fluid pressure", 0x0300); // deprecated, use BC version
+
+    // bcs
+    REGISTER_FECORE_CLASS(FEMultiphasicFSIPressureBC, "fluid pressure");
+
+    //-----------------------------------------------------------------------------
+    // Reset solver parameters to preferred default settings
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 50;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEMultiphasicFSIAnalysis>([](FEMultiphasicFSIAnalysis* pc) {
+        pc->m_nanalysis = FEMultiphasicFSIAnalysis::DYNAMIC;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 5;
+        pc->m_Rmax = 1.0e+20;
+        // turn off reform on each time step and diverge reform
+        pc->m_breformtimestep = false;
+        pc->m_bdivreform = false;
+    }));
     
     febio.SetActiveModule(0);
 }

@@ -25,27 +25,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEPrescribedBC.h>
 #include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! FEFluidResistanceBC is a fluid surface that has a normal
-//! pressure proportional to the flow rate (resistance).
+//! FEFluidRCRBC is a fluid surface load that implements a 3-element Windkessel model
 //!
-class FEBIOFLUID_API FEFluidRCRBC : public FESurfaceLoad
+class FEBIOFLUID_API FEFluidRCRBC : public FEPrescribedSurface
 {
 public:
     //! constructor
     FEFluidRCRBC(FEModel* pfem);
     
-    //! calculate traction stiffness (there is none)
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override {}
-    
-    //! calculate load vector
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-    
     //! set the dilatation
     void Update() override;
+    void UpdateModel() override;
     
     //! evaluate flow rate
     double FlowRate();
@@ -53,28 +47,40 @@ public:
     //! initialize
     bool Init() override;
     
-    //! activate
-    void Activate() override;
-    
     //! serialization
     void Serialize(DumpStream& ar) override;
-    
+
+public:
+	void PrepStep(std::vector<double>& ui, bool brel);
+
+    // return the value for node i, dof j
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
+
+    // copy data from another class
+    void CopyFrom(FEBoundaryCondition* pbc) override;
+
+private:
+	//! set the dilatation
+	void UpdateDilatation();
+
 private:
     double          m_R;        //!< flow resistance
     double          m_Rd;       //!< distal resistance
     double          m_p0;       //!< initial fluid pressure
     double          m_C;        //!< capacitance
     double          m_pd;       //!< downstream pressure
-    bool            m_Bern;     //!< Use Bernoulli's Relation (Q*|Q|)
-    
-    vector<double> m_stepHist;  //!< history of time step size (recorded each step)
-    vector<double> m_timeHist;  //!< history of time at each step
-    vector<double> m_flowHist;  //!< history of flow rate at each step
     
 private:
-    double              m_alpha;
-    double              m_alphaf;
+    double              m_pn;   //!< fluid pressure at current time point
+    double              m_pp;   //!< fluid pressure at previous time point
+    double              m_qn;   //!< flow rate at current time point
+    double              m_qp;   //!< flow rate at previous time point
+    double              m_pdn;  //!< downstream fluid pressure at current time point
+    double              m_pdp;  //!< downstream fluid pressure at previous time point
+    double              m_tp;   //!< previous time
+    double              m_e;
     FEFluidMaterial*    m_pfluid;   //!< pointer to fluid
+    FESurface*          m_psurf;    //!< pointer to surface
     
     FEDofList   m_dofW;
     int         m_dofEF;

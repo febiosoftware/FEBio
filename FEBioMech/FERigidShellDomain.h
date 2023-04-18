@@ -52,6 +52,12 @@ public:
 	//! calculates the internal forces (nothing to do)
 	void InternalForces(FEGlobalVector& R) override;
 
+	//! calculates mass matrix (nothing to do)
+	void MassMatrix(FELinearSystem& LS, double scale) override;
+
+	//! calculates the inertial forces (nothing to do)
+	void InertialForces(FEGlobalVector& R, std::vector<double>& F) override;
+
 	// update domain data
 	void Update(const FETimeInfo& tp) override;
 };
@@ -71,12 +77,21 @@ public:
 	//! reset data
 	void Reset() override;
 
+	//! initialize shells 
+	void InitShells() override;
+
 public:
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FELinearSystem& LS) override;
 
 	//! calculates the internal forces (nothing to do)
 	void InternalForces(FEGlobalVector& R) override;
+
+	//! calculates mass matrix (nothing to do)
+	void MassMatrix(FELinearSystem& LS, double scale) override;
+
+	//! calculates the inertial forces (nothing to do)
+	void InertialForces(FEGlobalVector& R, std::vector<double>& F) override;
 
 	// update domain data
 	void Update(const FETimeInfo& tp) override;

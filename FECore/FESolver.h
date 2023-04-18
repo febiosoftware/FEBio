@@ -72,11 +72,12 @@ public:
 
 //-----------------------------------------------------------------------------
 // structure identifying nodal dof info
-struct FENodalDofInfo
+struct FECORE_API FENodalDofInfo
 {
 	int		m_eq = -1;		// equation number
 	int		m_node = -1;		// 0-based index into mesh!
 	int		m_dof = -1;		// index into nodal m_ID array
+	const char* szdof = nullptr;
 };
 
 //-----------------------------------------------------------------------------
@@ -93,7 +94,8 @@ class FEGlobalVector;
 //! the SolveStep function to solve the FE problem.
 class FECORE_API FESolver : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FESOLVER_ID)
+	FECORE_BASE_CLASS(FESolver)
 
 public:
 	//! constructor
@@ -138,7 +140,7 @@ public:
 	virtual bool Augment();
 
 	//! Calculates concentrated nodal loads
-	virtual void NodalLoads(FEGlobalVector& R, const FETimeInfo& tp);
+//	virtual void NodalLoads(FEGlobalVector& R, const FETimeInfo& tp);
 
 public:
 	//! Set the equation allocation scheme
@@ -181,8 +183,11 @@ public:
 	// extract the (square) norm of a solution vector
 	double ExtractSolutionNorm(const vector<double>& v, const FEDofList& dofs) const;
 
+	// return the solution vector
+	virtual std::vector<double> GetSolutionVector() const;
+
 public: //TODO Move these parameters elsewhere
-	int					m_bwopt;	    //!< bandwidth optimization flag
+	bool				m_bwopt;	    //!< bandwidth optimization flag
 	int					m_msymm;		//!< matrix symmetry flag for linear solver allocation
 	int					m_eq_scheme;	//!< equation number scheme (used in InitEquations)
 	int					m_eq_order;		//!< normal or reverse ordering

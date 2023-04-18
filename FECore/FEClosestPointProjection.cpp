@@ -542,6 +542,7 @@ FESurfaceElement* FEClosestPointProjection::ProjectSpecial(int closestPoint, con
 		// make sure one of them is our closest point
 		if (el.HasNode(m))
 		{
+			q = rm;
 			return &el;
 		}
 	}

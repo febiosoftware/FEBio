@@ -52,6 +52,8 @@ END_FECORE_CLASS();
 FEErosionAdaptor::FEErosionAdaptor(FEModel* fem) : FEMeshAdaptor(fem)
 {
 	m_maxIters = -1;
+	m_maxelem = 0;
+	m_nsort = 0;
 	m_criterion = nullptr;
 	m_bremoveIslands = false;
 }

@@ -1,5 +1,5 @@
 /**
-\page plugin_upgrade Upgrading plugins to FEBio 3.0
+\page plugin_upgrade3 Upgrading plugins to FEBio 3.0
 
 This document describes important details for upgrading a plugin that was designed for FEBio2 to FEBio3. 
 

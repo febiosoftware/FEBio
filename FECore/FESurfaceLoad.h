@@ -40,8 +40,6 @@ class FEGlobalVector;
 //! This is the base class for all loads that are applied to surfaces
 class FECORE_API FESurfaceLoad : public FEModelLoad
 {
-	FECORE_SUPER_CLASS
-
 public:
 	FESurfaceLoad(FEModel* pfem);
 	virtual ~FESurfaceLoad(void);
@@ -56,11 +54,17 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
-	const FEDofList& GetDofList() const;
+public:
+    virtual double ScalarLoad(FESurfaceMaterialPoint& mp) { return 0; }
+    virtual vec3d VectorLoad(FESurfaceMaterialPoint& mp) { return vec3d(0,0,0); }
+
+	// TODO: Can I get rid of this?
+	// This is needed to update the mesh after some surface loads, which aren't really
+	// surface loads modify boundary conditions
+	void ForceMeshUpdate();
 
 protected:
 	FESurface*	m_psurf;
-	FEDofList	m_dof;
 
-	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FESurfaceLoad)
 };

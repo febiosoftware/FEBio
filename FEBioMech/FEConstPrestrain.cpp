@@ -38,33 +38,34 @@ void FEConstPrestrainGradient::MaterialPointData::Init(bool bflag)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEConstPrestrainGradient::MaterialPointData::Copy()
+FEMaterialPointData* FEConstPrestrainGradient::MaterialPointData::Copy()
 { 
-	MaterialPointData* pm = new MaterialPointData(); 
-	pm->Fp = Fp;
+	MaterialPointData* pm = new MaterialPointData(*this); 
 	return pm;
 }
 
 //-----------------------------------------------------------------------------
 void FEConstPrestrainGradient::MaterialPointData::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & Fp;
 }
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEConstPrestrainGradient, FEPrestrainGradient)
+	ADD_PARAMETER(m_ramp, "ramp");
 	ADD_PARAMETER(m_Fp, "F0");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEConstPrestrainGradient::FEConstPrestrainGradient(FEModel* pfem) : FEPrestrainGradient(pfem)
 {
+	m_ramp = 1.0;
 	m_Fp = mat3dd(1.0);
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEConstPrestrainGradient::CreateMaterialPointData()
+FEMaterialPointData* FEConstPrestrainGradient::CreateMaterialPointData()
 {
 	return new MaterialPointData;
 }
@@ -73,7 +74,10 @@ FEMaterialPoint* FEConstPrestrainGradient::CreateMaterialPointData()
 mat3d FEConstPrestrainGradient::Prestrain(FEMaterialPoint& mp)
 {
 	MaterialPointData& ep = *mp.ExtractData<MaterialPointData>();
-	return m_Fp(mp)*ep.Fp;
+
+	mat3d Fp = mat3dd(1.0) * (1.0 - m_ramp) + m_Fp(mp) * m_ramp;
+
+	return Fp*ep.Fp;
 }
 
 //-----------------------------------------------------------------------------

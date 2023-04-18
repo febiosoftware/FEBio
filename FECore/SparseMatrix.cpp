@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "SparseMatrix.h"
 #include <memory.h>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 SparseMatrix::SparseMatrix()

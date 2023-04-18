@@ -32,15 +32,14 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the Donnan equilibrium variables.
-class FEDonnanEquilibriumMaterialPoint : public FEMaterialPoint
+class FEDonnanEquilibriumMaterialPoint : public FEMaterialPointData
 {
 public:
-    FEDonnanEquilibriumMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
+    FEDonnanEquilibriumMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
     
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     void Init();
-    void Update(const FETimeInfo& timeInfo);
     
     void Serialize(DumpStream& ar);
     
@@ -84,7 +83,7 @@ public:
     double Osmolarity(FEMaterialPoint& mp);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override
+	FEMaterialPointData* CreateMaterialPointData() override
     {
         return new FEDonnanEquilibriumMaterialPoint(new FEElasticMaterialPoint);
     }

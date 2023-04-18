@@ -30,18 +30,31 @@ SOFTWARE.*/
 #include "FEMaterial.h"
 #include "DumpStream.h"
 
-REGISTER_SUPER_CLASS(FEMaterial, FEMATERIAL_ID);
+//-----------------------------------------------------------------------------
+FEMaterialBase::FEMaterialBase(FEModel* fem) : FEModelComponent(fem)
+{
+}
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEMaterial, FECoreBase)
-	ADD_PARAMETER(m_Q, "mat_axis");
+//! returns a pointer to a new material point object
+FEMaterialPointData* FEMaterialBase::CreateMaterialPointData() { return nullptr; };
+
+//-----------------------------------------------------------------------------
+//! Update specialized material points at each iteration
+void FEMaterialBase::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+
+}
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEMaterial, FEMaterialBase)
+//	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEMaterial::FEMaterial(FEModel* fem) : FECoreBase(fem)
+FEMaterial::FEMaterial(FEModel* fem) : FEMaterialBase(fem)
 {
-	static int n = 1;
-	m_Q = mat3d::identity();
+	m_Q = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -55,11 +68,26 @@ FEMaterial::~FEMaterial()
 // evaluate local coordinate system at material point
 mat3d FEMaterial::GetLocalCS(const FEMaterialPoint& mp)
 {
+	mat3d Q = (m_Q ? m_Q->operator()(mp) : mat3d::identity());
 	FEMaterial* parent = dynamic_cast<FEMaterial*>(GetParent());
-	if (parent) {
-		mat3d Qp = parent->GetLocalCS(mp); return Qp*m_Q(mp);
+	if (parent) 
+	{
+		mat3d Qp = parent->GetLocalCS(mp);
+		return Qp*Q;
 	}
-	else return m_Q(mp);
+	else
+	{
+		mat3d A = mp.m_Q.RotationMatrix();
+		return A*Q;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// set the (local) material axis valuator
+void FEMaterial::SetMaterialAxis(FEMat3dValuator* val)
+{
+	if (m_Q) delete m_Q;
+	m_Q = val;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,4 +120,22 @@ void FEMaterial::AddDomainParameter(FEDomainParameter* p)
 {
 	assert(p);
 	m_param.push_back(p);
+}
+
+//==============================================================================
+BEGIN_FECORE_CLASS(FEMaterialProperty, FEMaterialBase)
+END_FECORE_CLASS();
+
+FEMaterialProperty::FEMaterialProperty(FEModel* fem) : FEMaterialBase(fem)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+// Since properties don't have local coordinate system,
+// we return the parent's 
+mat3d FEMaterialProperty::GetLocalCS(const FEMaterialPoint& mp)
+{
+	FEMaterialBase* parent = dynamic_cast<FEMaterialBase*>(GetParent()); assert(parent);
+	return parent->GetLocalCS(mp);
 }

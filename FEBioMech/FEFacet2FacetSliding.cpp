@@ -39,23 +39,32 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEFacet2FacetSliding, FEContactInterface)
-	ADD_PARAMETER(m_epsn     , "penalty"      );
-	ADD_PARAMETER(m_bautopen , "auto_penalty" );
-    ADD_PARAMETER(m_bupdtpen , "update_penalty");
-	ADD_PARAMETER(m_atol     , "tolerance"    );
-	ADD_PARAMETER(m_btwo_pass, "two_pass"     );
-	ADD_PARAMETER(m_gtol     , "gaptol"       );
-	ADD_PARAMETER(m_naugmin  , "minaug"       );
-	ADD_PARAMETER(m_naugmax  , "maxaug"       );
-	ADD_PARAMETER(m_knmult   , "knmult"       );
-	ADD_PARAMETER(m_stol     , "search_tol"   );
-	ADD_PARAMETER(m_srad     , "search_radius");
-	ADD_PARAMETER(m_dxtol    , "dxtol"        );
-	ADD_PARAMETER(m_mu       , "fric_coeff"   );
-	ADD_PARAMETER(m_epsf     , "fric_penalty" );
-	ADD_PARAMETER(m_nsegup   , "seg_up"       );
-	ADD_PARAMETER(m_breloc   , "node_reloc"   );
-    ADD_PARAMETER(m_bsmaug   , "smooth_aug"   );
+	BEGIN_PARAM_GROUP("Augmentation");
+		ADD_PARAMETER(m_epsn     , "penalty"      );
+		ADD_PARAMETER(m_bautopen , "auto_penalty" );
+		ADD_PARAMETER(m_bupdtpen , "update_penalty");
+		ADD_PARAMETER(m_atol     , "tolerance"    );
+		ADD_PARAMETER(m_btwo_pass, "two_pass"     );
+		ADD_PARAMETER(m_gtol     , "gaptol"       )->setLongName("gap tolerance");
+		ADD_PARAMETER(m_naugmin  , "minaug"       )->setLongName("min. augmentations");
+		ADD_PARAMETER(m_naugmax  , "maxaug"       )->setLongName("max. augmentations");
+		ADD_PARAMETER(m_bsmaug   , "smooth_aug"   )->setLongName("Smooth augmentations");
+		END_PARAM_GROUP();
+
+	BEGIN_PARAM_GROUP("Projection");
+		ADD_PARAMETER(m_stol     , "search_tol"   );
+		ADD_PARAMETER(m_srad     , "search_radius");
+		ADD_PARAMETER(m_nsegup   , "seg_up"       )->setLongName("max. segment updates");
+		ADD_PARAMETER(m_breloc   , "node_reloc")->setLongName("node relocation");
+	END_PARAM_GROUP();
+
+	BEGIN_PARAM_GROUP("Miscellaneous");
+		ADD_PARAMETER(m_dxtol    , "dxtol"        )->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+		ADD_PARAMETER(m_mu       , "fric_coeff"   )->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+		ADD_PARAMETER(m_epsf     , "fric_penalty" )->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+		ADD_PARAMETER(m_knmult   , "knmult")->setLongName("Stiffness scale factor");
+	END_PARAM_GROUP();
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -71,12 +80,10 @@ FEFacetSlidingSurface::Data::Data()
 void FEFacetSlidingSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
-	ar & m_gap;
-	ar & m_nu;
-	ar & m_rs;
 	ar & m_Lm;
 	ar & m_eps;
-	ar & m_Ln;
+	ar & m_nu;
+	ar & m_rs;
 }
 
 //-----------------------------------------------------------------------------
@@ -265,6 +272,10 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	// Note that friction has not been implemented yet
 	m_mu = 0;
 	m_epsf = 0;
+
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
 
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);

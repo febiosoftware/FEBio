@@ -59,6 +59,11 @@ bool FEDofList::AddDof(const char* szdof)
 	return true;
 }
 
+void FEDofList::operator = (const std::vector<int>& dofs)
+{
+	m_dofList = dofs;
+}
+
 bool FEDofList::AddDof(int ndof)
 {
 	m_dofList.push_back(ndof);
@@ -70,7 +75,7 @@ bool FEDofList::AddVariable(const char* szvar)
 	DOFS& Dofs = m_fem->GetDOFS();
 	std::vector<int> dofList;
 	Dofs.GetDOFList(szvar, dofList);
-	if (dofList.empty()) return false;
+	if (dofList.empty()) { assert(false); return false; }
 
 	m_dofList.insert(m_dofList.end(), dofList.begin(), dofList.end());
 	return true;

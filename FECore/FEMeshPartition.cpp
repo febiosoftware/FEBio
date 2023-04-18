@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "DumpStream.h"
 
-REGISTER_SUPER_CLASS(FEMeshPartition, FEDOMAIN_ID);
-
 //-----------------------------------------------------------------------------
 FEMeshPartition::FEMeshPartition(int nclass, FEModel* fem) : FECoreBase(fem), m_nclass(nclass)
 {
@@ -169,6 +167,7 @@ bool FEMeshPartition::Init()
 void FEMeshPartition::ForEachMaterialPoint(std::function<void(FEMaterialPoint& mp)> f)
 {
 	int NE = Elements();
+#pragma omp parallel for shared(f)
 	for (int i = 0; i < NE; ++i)
 	{
 		FEElement& el = ElementRef(i);

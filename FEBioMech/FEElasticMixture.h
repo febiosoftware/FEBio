@@ -39,13 +39,13 @@ public:
 	FEElasticMixtureMaterialPoint();
 
 	//! Copy material point data
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy() override;
 
 	//! material point initialization
-	void Init();
+	void Init() override;
 
 	//! data serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	vector<double>				m_w;	//!< material weights
@@ -66,7 +66,7 @@ public:
 	FEElasticMixture(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// return number of materials
 	int Materials() { return (int)m_pMat.size(); }
@@ -81,7 +81,9 @@ public:
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
 public:
-   
+    //! data initialization
+    bool Init() override;
+    
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) override;
 		
@@ -93,6 +95,10 @@ public:
 
 	//! the density is the sum of the constituent densities
 	double Density(FEMaterialPoint& mp) override;
+    
+public:
+    double StrongBondSED(FEMaterialPoint& pt) override;
+    double WeakBondSED(FEMaterialPoint& pt) override;
     
 private:
 	std::vector<FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials

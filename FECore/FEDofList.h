@@ -45,6 +45,7 @@ public:
 
 	// assignment operator
 	void operator = (const FEDofList& dofs);
+	void operator = (const std::vector<int>& dofs);
 
 	// clear the list
 	void Clear();

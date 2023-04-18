@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPointConstraint.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEMesh.h"
 #include "FEBioMech.h"
 #include <FECore/FELinearSystem.h>
@@ -49,13 +48,17 @@ FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem), m_do
 	m_node = -1;
 	m_pel = 0;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 }
 
 //-----------------------------------------------------------------------------
 bool FEPointConstraint::Init()
 {
-	FEMesh& m = GetFEModel()->GetMesh();
+	FEMesh& m = GetMesh();
 	if ((m_node_id <= 0)||(m_node_id > m.Nodes())) return false;
 
 	// get the nodal position in the reference state
@@ -79,7 +82,7 @@ void FEPointConstraint::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FEPointConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	vector<int> lm(3*9);
 	FENode& n0 = mesh.Node(m_node);
 	lm[0] = n0.m_ID[m_dofU[0]];
@@ -99,7 +102,7 @@ void FEPointConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 void FEPointConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	int i;
-	FEMesh& m = GetFEModel()->GetMesh();
+	FEMesh& m = GetMesh();
 
 	// calculate H matrix
 	double H[9], *r = m_rs;
@@ -156,7 +159,7 @@ void FEPointConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FEPointConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEMesh& m = GetFEModel()->GetMesh();
+	FEMesh& m = GetMesh();
 
 	// calculate H matrix
 	double H[9], *r = m_rs;

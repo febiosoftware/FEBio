@@ -41,8 +41,11 @@ public:
 	public:
 		Data();
 
+		void Serialize(DumpStream& ar);
+
 	public:
-		vec3d	m_vgap;	//!< gap function
+		vec3d	m_vgap;		//!< gap function
+		vec3d	m_vgap0;	//!< initial gap function
 		vec3d	m_Lm;	//!< Lagrange multiplier
 		vec2d	m_rs;	//!< natural coordinates on secondary surface element
 	};
@@ -116,6 +119,7 @@ public:
 	double		m_stol;		//!< search tolerance
 	int			m_naugmax;	//!< maximum nr of augmentations
 	int			m_naugmin;	//!< minimum nr of augmentations
+	bool		m_gapoff;	//!< retain initial gap as offset
 
 	DECLARE_FECORE_CLASS();
 };

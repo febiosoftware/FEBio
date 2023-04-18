@@ -27,7 +27,6 @@ SOFTWARE.*/
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
 #include <set>
-using namespace std;
 
 class FEContactPotentialSurface : public FEContactSurface
 {
@@ -36,12 +35,20 @@ public:
 	{
 	public:
 		vec3d	m_tc;
+
+		void Serialize(DumpStream& ar) override
+		{
+			FEContactMaterialPoint::Serialize(ar);
+			ar & m_tc;
+		}
 	};
 
 public:
 	FEContactPotentialSurface(FEModel* fem);
 
 	void GetContactTraction(int nelem, vec3d& tc) override;
+
+	double GetContactArea() override;
 
 	FEMaterialPoint* CreateMaterialPoint() override;
 };
@@ -73,6 +80,9 @@ public:
 	// init
 	bool Init() override;
 
+	// serialization
+	void Serialize(DumpStream& ar) override;
+
 	// -- from FEContactInterface
 public:
 	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
@@ -82,11 +92,13 @@ public:
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 protected:
-	void ElementForce(FESurfaceElement& el1, FESurfaceElement& el2, vector<double>& fe);
+	void ElementForce(FESurfaceElement& el1, FESurfaceElement& el2, std::vector<double>& fe);
 	void ElementStiffness(FESurfaceElement& el1, FESurfaceElement& el2, matrix& ke);
 
 	double PotentialDerive(double r);
 	double PotentialDerive2(double r);
+
+	void BuildNeighborTable();
 
 protected:
 	FEContactPotentialSurface	m_surf1;
@@ -97,12 +109,13 @@ protected:
 	double	m_p;
 	double	m_Rin;
 	double	m_Rout;
+	double	m_Rmin;
 	double	m_wtol;
 
 	double	m_c1, m_c2;
 
-	vector<	set<FESurfaceElement*> >			m_activeElements;
-	vector< set<FESurfaceElement*> >	m_elemNeighbors;
+	std::vector< std::set<FESurfaceElement*> >	m_activeElements;
+	std::vector< std::set<FESurfaceElement*> >	m_elemNeighbors;
 
 	DECLARE_FECORE_CLASS();
 };

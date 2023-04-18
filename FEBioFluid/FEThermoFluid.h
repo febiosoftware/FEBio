@@ -27,7 +27,6 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEModel.h>
 #include <FEBioMech/FEBodyForce.h>
 #include "FEFluidMaterial.h"
 #include "FEElasticFluid.h"
@@ -44,8 +43,11 @@ public:
     FEThermoFluid(FEModel* pfem);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
 public:
     //! calculate stress at material point
     mat3ds Stress(FEMaterialPoint& pt) override;

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "MMath.h"
 #include "MEvaluate.h"
+using namespace std;
 
 //-----------------------------------------------------------------------------
 MITEM MExpand(const MITEM& i)

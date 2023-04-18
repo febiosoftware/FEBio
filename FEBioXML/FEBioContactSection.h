@@ -86,3 +86,16 @@ protected:
 	void ParseRigidSliding(XMLTag& tag);
 	void ParseContactInterface(XMLTag& tag, FESurfacePairConstraint* pci);
 };
+
+
+//-----------------------------------------------------------------------------
+// Version 4.0
+class FEBioContactSection4 : public FEBioContactSection
+{
+public:
+	FEBioContactSection4(FEFileImport* im) : FEBioContactSection(im) {}
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseContactInterface(XMLTag& tag, FESurfacePairConstraint* pci);
+};

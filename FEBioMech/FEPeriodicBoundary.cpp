@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPeriodicBoundary.h"
+#include <FECore/FEMesh.h>
 
 FEPeriodicSurface::Data::Data()
 {
@@ -152,12 +153,15 @@ FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem)
 	SetID(count++);
 
 	m_stol = 0.01;
-	m_srad = 1.0;
 	m_atol = 0;
 	m_eps = 0;
 	m_btwo_pass = false;
 	m_off = vec3d(0,0,0);
 	m_naugmin = 0;
+
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
 
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
@@ -204,15 +208,15 @@ void FEPeriodicBoundary::CopyFrom(FESurfacePairConstraint* pci)
 void FEPeriodicBoundary::BuildMatrixProfile(FEGlobalMatrix& K)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// get the DOFS
-	const int dof_X = fem.GetDOFIndex("x");
-	const int dof_Y = fem.GetDOFIndex("y");
-	const int dof_Z = fem.GetDOFIndex("z");
-	const int dof_RU = fem.GetDOFIndex("Ru");
-	const int dof_RV = fem.GetDOFIndex("Rv");
-	const int dof_RW = fem.GetDOFIndex("Rw");
+	const int dof_X = GetDOFIndex("x");
+	const int dof_Y = GetDOFIndex("y");
+	const int dof_Z = GetDOFIndex("z");
+	const int dof_RU = GetDOFIndex("Ru");
+	const int dof_RV = GetDOFIndex("Rv");
+	const int dof_RW = GetDOFIndex("Rw");
 
 	vector<int> lm(6*5);
 
@@ -272,12 +276,13 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 
 	// unit vector in direction of cr
 	// this will serve as the projection distance
-	vec3d cn(cr); cn.unit();
+	vec3d cn(cr); 
+	double D = cn.unit();
 
 	// initialize projection data
 	FENormalProjection np(ms);
 	np.SetTolerance(m_stol);
-	np.SetSearchRadius(m_srad);
+	np.SetSearchRadius(1.1*D);
 	np.Init();
 
 	// loop over all primary nodes
@@ -404,8 +409,8 @@ void FEPeriodicBoundary::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 			for (int i=0; i<nseln; ++i)
 			{
-				r0[i] = ss.GetMesh()->Node(sel.m_node[i]).m_r0;
-				rt[i] = ss.GetMesh()->Node(sel.m_node[i]).m_rt;
+				r0[i] = ss.Node(sel.m_lnode[i]).m_r0;
+				rt[i] = ss.Node(sel.m_lnode[i]).m_rt;
 			}
 			w = sel.GaussWeights();
 
@@ -561,8 +566,8 @@ void FEPeriodicBoundary::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 
 			for (int i=0; i<nseln; ++i)
 			{
-				r0[i] = ss.GetMesh()->Node(se.m_node[i]).m_r0;
-				rt[i] = ss.GetMesh()->Node(se.m_node[i]).m_rt;
+				r0[i] = ss.Node(se.m_lnode[i]).m_r0;
+				rt[i] = ss.Node(se.m_lnode[i]).m_rt;
 			}
 
 			w = se.GaussWeights();
@@ -597,7 +602,7 @@ void FEPeriodicBoundary::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 				nmeln = me.Nodes();
 
 				// get the secondary element node positions
-				for (k=0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
+				for (k=0; k<nmeln; ++k) rtm[k] = ms.Node(me.m_lnode[k]).m_rt;
 
 				// primary node natural coordinates in secondary element
 				r = ss.m_data[m].m_rs[0];

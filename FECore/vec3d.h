@@ -54,6 +54,28 @@ public:
 
 	vec3d operator - () const { return vec3d(-x, -y, -z); }
 
+    double& operator() (int i)
+    {
+        switch(i)
+        {
+            case 0: {return x; break;}
+            case 1: {return y; break;}
+            case 2: {return z; break;}
+            default: {return x; break;}
+        }
+    }
+    
+    double operator() (int i) const
+    {
+        switch(i)
+        {
+            case 0: {return x; break;}
+            case 1: {return y; break;}
+            case 2: {return z; break;}
+            default: {return x; break;}
+        }
+    }
+    
 	// dot product
 	double operator * (const vec3d& r) const { return (x*r.x + y*r.y + z*r.z); }
 
@@ -82,5 +104,60 @@ public:
 	double norm2() const { return (x*x + y*y + z*z); }
 
 public:
+	// NOTE: Added to simplify integration with FEBio Studio
+	vec3d Normalize() { unit(); return *this; }
+	vec3d Normalized() const { vec3d v(x, y, z); v.unit(); return v; }
+	double Length() const { return norm(); }
+	double SqrLength() const { return norm2(); }
+	bool operator == (const vec3d& a) const { return ((a.x == x) && (a.y == y) && (a.z == z)); }
+
+ public:
 	double x, y, z;
 };
+
+
+//-----------------------------------------------------------------------------
+class vec3f
+{
+public:
+	vec3f() { x = y = z = 0; }
+	vec3f(float rx, float ry, float rz) { x = rx; y = ry; z = rz; }
+
+	vec3f operator + (const vec3f& v) const { return vec3f(x + v.x, y + v.y, z + v.z); }
+	vec3f operator - (const vec3f& v) const { return vec3f(x - v.x, y - v.y, z - v.z); }
+	vec3f operator ^ (const vec3f& v) const
+	{
+		return vec3f(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
+	}
+
+	float operator * (const vec3f& v) const { return (x * v.x + y * v.y + z * v.z); }
+
+	vec3f operator * (const float g) const { return vec3f(x * g, y * g, z * g); }
+	vec3f operator / (const float g) const { return vec3f(x / g, y / g, z / g); }
+
+	const vec3f& operator += (const vec3f& v) { x += v.x; y += v.y; z += v.z; return (*this); }
+	const vec3f& operator -= (const vec3f& v) { x -= v.x; y -= v.y; z -= v.z; return (*this); }
+	const vec3f& operator /= (const float& f) { x /= f; y /= f; z /= f; return (*this); }
+	const vec3f& operator /= (const int& n) { x /= n; y /= n; z /= n; return (*this); }
+	const vec3f& operator *= (const float& f) { x *= f; y *= f; z *= f; return (*this); }
+
+	vec3f operator - () { return vec3f(-x, -y, -z); }
+
+	float Length() const { return (float)sqrt(x * x + y * y + z * z); }
+
+	float SqrLength() const { return (float)(x * x + y * y + z * z); }
+
+	vec3f& Normalize()
+	{
+		float L = Length();
+		if (L != 0) { x /= L; y /= L; z /= L; }
+
+		return (*this);
+	}
+
+public:
+	float x, y, z;
+};
+
+inline vec3d to_vec3d(const vec3f& r) { return vec3d((double)r.x, (double)r.y, (double)r.z); }
+inline vec3f to_vec3f(const vec3d& r) { return vec3f((float)r.x, (float)r.y, (float)r.z); }

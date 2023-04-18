@@ -46,10 +46,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEBioRestart : public FECoreTask
+// class for testing reverse communication interface of FEModel
+class FEBioRCISolver : public FECoreTask
 {
 public:
-	FEBioRestart(FEModel* pfem);
+	FEBioRCISolver(FEModel* fem);
 
 	//! initialization
 	bool Init(const char* szfile) override;
@@ -59,11 +60,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// class for testing reverse communication interface of FEModel
-class FEBioRCISolver : public FECoreTask
+// Configures the model for running in the nightly test suite. 
+class FEBioTestSuiteTask : public FECoreTask
 {
 public:
-	FEBioRCISolver(FEModel* fem);
+	FEBioTestSuiteTask(FEModel* fem);
 
 	//! initialization
 	bool Init(const char* szfile) override;

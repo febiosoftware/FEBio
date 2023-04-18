@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEDataExport.h"
 #include "vec3d.h"
+using namespace std;
 
 //-----------------------------------------------------------------------------
 void FEDataExport::Serialize(FEDataStream& ar)

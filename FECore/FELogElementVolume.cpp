@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FELogElementVolume.h"
 #include "FEModel.h"
+#include "FESurface.h"
 
 FELogElementVolume::FELogElementVolume(FEModel* fem) : FELogElemData(fem)
 {
@@ -35,4 +36,13 @@ double FELogElementVolume::value(FEElement& el)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	return mesh.CurrentElementVolume(el);
+}
+
+FELogFaceArea::FELogFaceArea(FEModel* fem) : FELogFaceData(fem) {}
+
+double FELogFaceArea::value(FESurfaceElement& el)
+{
+	FESurface* surface = dynamic_cast<FESurface*>(el.GetMeshPartition());
+	if (surface == nullptr) return 0.0;
+	return surface->CurrentFaceArea(el);
 }

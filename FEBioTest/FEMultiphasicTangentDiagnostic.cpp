@@ -121,7 +121,6 @@ bool FEMultiphasicTangentUniaxial::Init()
     {
         FENode& n = m.Node(i);
         n.m_rt = n.m_rp = n.m_r0 = r[i];
-        n.m_rid = -1;
         
         // set displacement BC's
         if (BC[i][0] == -1) nset[0]->Add(i);
@@ -183,20 +182,23 @@ bool FEMultiphasicTangentUniaxial::Init()
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
+FEMultiphasicTangentDiagnostic::FEMultiphasicTangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
+	// make sure the correct module is active
+	fem->SetActiveModule("multiphasic");
+
     m_pscn = 0;
 
-	FEAnalysis* pstep = new FEAnalysis(&fem);
+	FEAnalysis* pstep = new FEAnalysis(fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>("multiphasic", &fem);
+	FESolver* pnew_solver = fecore_new<FESolver>("multiphasic", fem);
 	assert(pnew_solver);
 	pnew_solver->m_msymm = REAL_UNSYMMETRIC;
 	pstep->SetFESolver(pnew_solver);
 
-	fem.AddStep(pstep);
-	fem.SetCurrentStep(pstep);
+	fem->AddStep(pstep);
+	fem->SetCurrentStep(pstep);
 }
 
 //-----------------------------------------------------------------------------

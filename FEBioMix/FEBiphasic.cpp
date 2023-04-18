@@ -34,11 +34,11 @@ SOFTWARE.*/
 // Material parameters for the FEBiphasic material
 BEGIN_FECORE_CLASS(FEBiphasic, FEMaterial)
 	ADD_PARAMETER(m_phi0 , FE_RANGE_CLOSED(0.0, 1.0), "phi0");
-	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
+	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density")->setUnits(UNIT_DENSITY);
     ADD_PARAMETER(m_tau  , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau");
 
 	// set material properties
-	ADD_PROPERTY(m_pSolid, "solid");
+	ADD_PROPERTY(m_pSolid, "solid", FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pPerm, "permeability");
 	ADD_PROPERTY(m_pSupp, "solvent_supply", FEProperty::Optional);
 	ADD_PROPERTY(m_pAmom, "active_supply", FEProperty::Optional);
@@ -48,10 +48,10 @@ END_FECORE_CLASS();
 //============================================================================
 // FEBiphasicMaterialPoint
 //============================================================================
-FEBiphasicMaterialPoint::FEBiphasicMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+FEBiphasicMaterialPoint::FEBiphasicMaterialPoint(FEMaterialPointData* ppt) : FEMaterialPointData(ppt) {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEBiphasicMaterialPoint::Copy()
+FEMaterialPointData* FEBiphasicMaterialPoint::Copy()
 {
 	FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -61,9 +61,9 @@ FEMaterialPoint* FEBiphasicMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEBiphasicMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_p & m_gradp & m_gradpp;
-	ar & m_w & m_pa & m_phi0 & m_phi0p & m_phi0hat & m_Jp;
+	ar & m_w & m_pa & m_phi0 & m_phi0t & m_phi0p & m_phi0hat & m_Jp;
     ar & m_ss;
 }
 
@@ -73,12 +73,12 @@ void FEBiphasicMaterialPoint::Init()
 	m_p = m_pa = 0;
 	m_gradp = m_gradpp = vec3d(0,0,0);
 	m_w = vec3d(0,0,0);
-	m_phi0 = m_phi0p = 0;
+	m_phi0 = m_phi0t = m_phi0p = 0;
 	m_phi0hat = 0;
 	m_Jp = 1;
     m_ss.zero();
 
-	FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //============================================================================
@@ -101,25 +101,37 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-// returns a pointer to a new material point object
-FEMaterialPoint* FEBiphasic::CreateMaterialPointData() 
+// initialize
+bool FEBiphasic::Init()
 {
-	// create biphasic material point
-	FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(nullptr);
+    if (!m_pSolid->Init()) return false;
+    if (!m_pPerm->Init()) return false;
+    if (m_pSupp && !m_pSupp->Init()) return false;
+    if (m_pAmom && !m_pAmom->Init()) return false;
+    return true;
+}
 
+//-----------------------------------------------------------------------------
+// returns a pointer to a new material point object
+FEMaterialPointData* FEBiphasic::CreateMaterialPointData()
+{
 	// create the solid material point
-	FEMaterialPoint* ep = m_pSolid->CreateMaterialPointData();
+	FEMaterialPointData* ep = m_pSolid->CreateMaterialPointData();
 
-	// create the permeability
-	FEMaterialPoint* pm = m_pPerm->CreateMaterialPointData();
-	if (pm)
-	{
-		pm->SetNext(ep);
-		pt->SetNext(pm);
-	}
-	else pt->SetNext(ep);
-
+    // create biphasic material point
+    FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(ep);
+    
 	return pt;
+}
+
+//-----------------------------------------------------------------------------
+// update specialized material points
+void FEBiphasic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pPerm->UpdateSpecializedMaterialPoints(mp, tp);
+    if (m_pSupp) m_pSupp->UpdateSpecializedMaterialPoints(mp, tp);
+    if (m_pAmom) m_pAmom->UpdateSpecializedMaterialPoints(mp, tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +145,7 @@ double FEBiphasic::Porosity(FEMaterialPoint& pt)
 	double J = et.m_J;
 	// porosity
 //	double phiw = 1 - m_phi0/J;
-	double phi0 = pet.m_phi0;
+	double phi0 = pet.m_phi0t;
 	double phiw = 1 - phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse

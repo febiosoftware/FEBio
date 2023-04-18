@@ -32,8 +32,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "MMath.h"
 #include "MObj2String.h"
-
-REGISTER_SUPER_CLASS(FEFunction1D, FEFUNCTION1D_ID);
+#include "log.h"
 
 FEFunction1D::FEFunction1D(FEModel* fem) : FECoreBase(fem)
 {
@@ -108,6 +107,11 @@ bool FEFunction1D::invert(const double f0, double &x)
 }
 
 //=============================================================================
+BEGIN_FECORE_CLASS(FEConstFunction, FEFunction1D)
+	ADD_PARAMETER(m_value, "value");
+END_FECORE_CLASS();
+
+//=============================================================================
 BEGIN_FECORE_CLASS(FELinearFunction, FEFunction1D)
 	ADD_PARAMETER(m_slope, "slope");
 	ADD_PARAMETER(m_intercept, "intercept");
@@ -136,6 +140,12 @@ void FEMathFunction::SetMathString(const std::string& s)
 }
 
 bool FEMathFunction::Init()
+{
+	if (BuildMathExpressions() == false) return false;
+	return FEFunction1D::Init();
+}
+
+bool FEMathFunction::BuildMathExpressions()
 {
 	// process the string
 	m_exp.Clear();
@@ -194,7 +204,17 @@ bool FEMathFunction::Init()
     else
         m_d2exp.Create("0");
 
-	return FEFunction1D::Init();
+	return true;
+}
+
+void FEMathFunction::Serialize(DumpStream& ar)
+{
+	FEFunction1D::Serialize(ar);
+	if ((ar.IsShallow() == false) && (ar.IsLoading()))
+	{
+		bool b = BuildMathExpressions();
+		assert(b);
+	}
 }
 
 FEFunction1D* FEMathFunction::copy()

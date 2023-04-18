@@ -342,70 +342,18 @@ void FELinearSolver::Serialize(DumpStream& ar)
 //! Evaluate the right-hand side "force" vector
 void FELinearSolver::ForceVector(FEGlobalVector& R)
 {
-	// Add nodal loads
-	NodalLoads(R);
-
-	// add surface loads
-	SurfaceLoads(R);
-
-	// add body loads
-	BodyLoads(R);
-}
-
-//-----------------------------------------------------------------------------
-void FELinearSolver::NodalLoads(FEGlobalVector& R)
-{
 	// get the modal and mesh
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	// Get the DOF handler
-	DOFS& dofs = fem.GetDOFS();
-
 	FETimeInfo& tp = fem.GetTime();
 
-	// loop over nodal loads
-	int ncnf = fem.NodalLoads();
-	for (int i = 0; i<ncnf; ++i)
+	// loop over model loads
+	int nml = fem.ModelLoads();
+	for (int i = 0; i < nml; ++i)
 	{
-		FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive()) fc.LoadVector(R, tp);
-	}
-}
-
-//-----------------------------------------------------------------------------
-// add surface loads to the RHS vector
-void FELinearSolver::SurfaceLoads(FEGlobalVector& R)
-{
-	// get the time information
-	FEModel& fem = *GetFEModel();
-	const FETimeInfo& tp = fem.GetTime();
-
-	int nsl = fem.SurfaceLoads();
-	for (int i = 0; i<nsl; ++i)
-	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl && psl->IsActive())
-		{
-			psl->LoadVector(R, tp);
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// add body loads to RHS vector
-void FELinearSolver::BodyLoads(FEGlobalVector& R)
-{
-	FEModel& fem = *GetFEModel();
-	const FETimeInfo& tp = fem.GetTime();
-	int nbl = fem.BodyLoads();
-	for (int i = 0; i<nbl; ++i)
-	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(i);
-		if (pbl && pbl->IsActive())
-		{
-			pbl->ForceVector(R);
-		}
+		FEModelLoad& ml = *fem.ModelLoad(i);
+		if (ml.IsActive()) ml.LoadVector(R);
 	}
 }
 

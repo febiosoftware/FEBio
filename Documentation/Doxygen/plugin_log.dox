@@ -30,11 +30,18 @@ The <c>feLog</c> macro works just like the c printf function and can be used to 
 feLog("A negative Jacobian was detected at integration point %d of element %d", 1, 123);
 \endcode
 
-For producing a warning or an error message, you can use the following two macros. The message will be shown in a box with a title of either "Warning" or "Error". 
+For producing a warning or an error message, you can use the following two macros. The message will be shown in a box with a title. 
 
 \code
+feLogInfo("This will print a message to the screen.");
 feLogWarning("This will print a warning to the screen.");
 feLogError("This will print an error message to the screen.");
+\endcode
+
+For debugging, you can use the feLogDebug function. This will only print to the output when the user runs a model in debug mode (e.g. -g was added as a command line option.)
+
+\code
+feLogDebug("A debug message is written only when the user runs in debug mode.")
 \endcode
 
 For classes that do not inherit from FECoreBase, or in non-member functions, you must use the extended macros, which take a pointer to the FEModel as its first argument. 
@@ -42,7 +49,8 @@ For classes that do not inherit from FECoreBase, or in non-member functions, you
 \code
 FEModel* fem;
 FELogEx(fem, "So far, things are looking good.");
-FELogWarningEx(fem, "Hmm, that shouldn't happen.");
-FELogErrorEx(fem, "Oh no! Exit the building!");
+FELogDebugEx(fem, "Hmm, should this happen?");
+FELogWarningEx(fem, "Oh oh, that shouldn't happen.");
+FELogErrorEx(fem, "Exit the building! Now!!");
 \endcode
 */

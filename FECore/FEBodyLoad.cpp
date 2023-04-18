@@ -28,10 +28,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBodyLoad.h"
-#include "FEModel.h"
+#include "FEMesh.h"
 #include "FEModelParam.h"
-
-REGISTER_SUPER_CLASS(FEBodyLoad, FEBODYLOAD_ID);
 
 //-----------------------------------------------------------------------------
 FEBodyLoad::FEBodyLoad(FEModel* pfem) : FEModelLoad(pfem)
@@ -50,7 +48,7 @@ bool FEBodyLoad::Init()
 	// If the domain list is empty, add all the domains
 	if (m_dom.IsEmpty())
 	{
-		FEMesh& mesh = GetFEModel()->GetMesh();
+		FEMesh& mesh = GetMesh();
 		for (int i=0; i<mesh.Domains(); ++i)
 		{
 			FEDomain* dom = &mesh.Domain(i);
@@ -107,31 +105,9 @@ FEDomainList& FEBodyLoad::GetDomainList()
 	return m_dom; 
 }
 
-// Evaluate force vector
-void FEBodyLoad::ForceVector(FEGlobalVector& R)
-{
-
-}
-
-// evaluate stiffness matrix
-void FEBodyLoad::StiffnessMatrix(FELinearSystem& S)
-{
-
-}
-
 //! Serialization
 void FEBodyLoad::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
 	m_dom.Serialize(ar);
-}
-
-void FEBodyLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
-{
-
-}
-
-void FEBodyLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
-{
-
 }

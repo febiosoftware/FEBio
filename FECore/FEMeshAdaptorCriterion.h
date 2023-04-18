@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "fecore_api.h"
-#include "FECoreBase.h"
+#include "FEModelComponent.h"
 #include <FECore/FEMaterialPoint.h>
 
 class FEElementSet;
@@ -70,9 +70,10 @@ private:
 // This class is a helper class for use in the mesh adaptors. Its purpose is to assign
 // values based on some criterion. This element list is then usually passed to the 
 // mesh adaptor for further processing.
-class FECORE_API FEMeshAdaptorCriterion : public FECoreBase
+class FECORE_API FEMeshAdaptorCriterion : public FEModelComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMESHADAPTORCRITERION_ID)
+	FECORE_BASE_CLASS(FEMeshAdaptorCriterion)
 
 public:
 	// Constructor

@@ -36,7 +36,8 @@ SOFTWARE.*/
 // Base class for evaluating scalar parameters
 class FECORE_API FEScalarValuator : public FEValuator
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FESCALARVALUATOR_ID)
+	FECORE_BASE_CLASS(FEScalarValuator)
 
 public:
 	FEScalarValuator(FEModel* fem) : FEValuator(fem) {};
@@ -61,12 +62,7 @@ public:
 
 	double* constValue() override { return &m_val; }
 
-	FEScalarValuator* copy() override
-	{ 
-		FEConstValue* val = new FEConstValue(GetFEModel()); 
-		val->m_val = m_val;
-		return val;
-	}
+	FEScalarValuator* copy() override;
 
 private:
 	double	m_val;
@@ -75,17 +71,31 @@ private:
 };
 
 //---------------------------------------------------------------------------------------
-class FECORE_API FEMathValue : public FEScalarValuator
+class FEMathExpression : public MSimpleExpression
 {
 	struct MathParam
 	{
 		int			type;	// 0 = param, 1 = map
-		FEParam*	pp;
-		FEDataMap*	map;
+		FEParam* pp;
+		FEDataMap* map;
 	};
 
 public:
-	FEMathValue(FEModel* fem) : FEScalarValuator(fem) {}
+	bool Init(const std::string& expr, FECoreBase* pc = nullptr);
+
+	void operator = (const FEMathExpression& me);
+
+	double value(FEModel* fem, const FEMaterialPoint& pt);
+
+private:
+	std::vector<MathParam>	m_vars;
+};
+
+//---------------------------------------------------------------------------------------
+class FECORE_API FEMathValue : public FEScalarValuator
+{
+public:
+	FEMathValue(FEModel* fem);
 	~FEMathValue();
 	double operator()(const FEMaterialPoint& pt) override;
 
@@ -101,8 +111,8 @@ public:
 
 private:
 	std::string			m_expr;
-	MSimpleExpression	m_math;
-	std::vector<MathParam>	m_vars;
+	FEMathExpression	m_math;
+	FECoreBase*			m_parent;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -113,12 +123,18 @@ class FECORE_API FEMappedValue : public FEScalarValuator
 public:
 	FEMappedValue(FEModel* fem);
 	void setDataMap(FEDataMap* val);
+	void setScaleFactor(double s);
+
+	FEDataMap* dataMap();
 
 	double operator()(const FEMaterialPoint& pt) override;
 
 	FEScalarValuator* copy() override;
 
+	void Serialize(DumpStream& dmp) override;
+
 private:
+	double		m_scale;	// scale factor
 	FEDataMap*	m_val;
 };
 

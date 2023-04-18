@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElementSelectionCriterion.h"
-#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 
 BEGIN_FECORE_CLASS(FEElementSelectionCriterion, FEMeshAdaptorCriterion)
 	ADD_PARAMETER(m_value, "value");
@@ -39,7 +39,7 @@ FEElementSelectionCriterion::FEElementSelectionCriterion(FEModel* fem) : FEMeshA
 
 FEMeshAdaptorSelection FEElementSelectionCriterion::GetElementSelection(FEElementSet* elemSet)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	FEMeshAdaptorSelection elemList;
 	FEElementIterator it(&mesh, elemSet);
 	for (; it.isValid(); ++it)

@@ -57,30 +57,43 @@ bool FEModelParameter::Init()
 		return false;
 	}
 
-    // see if it's the correct type
-    if (val.type() == FE_PARAM_VEC2D) {
-        // make sure we have a valid data pointer
-        vec2d* vd = (vec2d*) val.data_ptr();
-        // store the pointer to the parameter
-        m_pd = &vd->y();
-        return true;
+    switch (val.type()) {
+        case FE_PARAM_DOUBLE:
+        {
+            // make sure we have a valid data pointer
+            double* pd = (double*) val.data_ptr();
+            if (pd == 0)
+            {
+                feLogError("Invalid data pointer for parameter %s", name.c_str());
+                return false;
+            }
+            
+            // store the pointer to the parameter
+            m_pd = pd;
+        }
+            break;
+            
+        case FE_PARAM_VEC2D:
+        {
+            // make sure we have a valid data pointer
+            vec2d* vd = (vec2d*) val.data_ptr();
+            if (vd == 0)
+            {
+                feLogError("Invalid data pointer for parameter %s", name.c_str());
+                return false;
+            }
+            // store the pointer to the parameter
+            m_pd = &vd->y();
+        }
+            break;
+            
+       default:
+        {
+            feLogError("Invalid parameter type for parameter %s", name.c_str());
+            return false;
+        }
+            break;
     }
-	else if (val.type() != FE_PARAM_DOUBLE)
-	{
-		feLogError("Invalid parameter type for parameter %s", name.c_str());
-		return false;
-	}
-
-	// make sure we have a valid data pointer
-	double* pd = (double*) val.data_ptr();
-	if (pd == 0)
-	{
-		feLogError("Invalid data pointer for parameter %s", name.c_str());
-		return false;
-	}
-
-	// store the pointer to the parameter
-	m_pd = pd;
 
 	return true;
 }
@@ -121,7 +134,7 @@ FEOptimizeData::~FEOptimizeData(void)
 bool FEOptimizeData::Init()
 {
 	// allocate default optimization solver if none specified in input file
-	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod;
+	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod(GetFEModel());
 
 	// allocate default solver if none specified in input file
 	if (m_pTask == 0) m_pTask = fecore_new<FECoreTask>("solve", m_fem);
@@ -174,8 +187,14 @@ bool FEOptimizeData::Solve()
 		for (int i=0; i<(int) ymin.size(); ++i)
 			feLog("\t\t%15lg\n", ymin[i]);
 
+		// evaluate final regression coefficient
+		vector<double> y0;
+		m_obj->GetMeasurements(y0);
+		double minR2 = m_obj->RegressionCoefficient(y0, ymin);
+
 		feLog("\tTotal iterations ........ : %15d\n\n", m_niter);
 		feLog("\tFinal objective value ... : %15lg\n\n", minObj);
+        feLog("\tFinal regression coef ... : %15lg\n\n", minR2);
 		feLog("\tOptimal parameters:\n\n");
 		// report the parameters for the minimal value
 		for (int i = 0; i<NVAR; ++i)

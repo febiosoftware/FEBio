@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEBioModuleSection.h"
 #include "FEBioControlSection.h"
 #include "FEBioControlSection3.h"
+#include "FEBioControlSection4.h"
 #include "FEBioGlobalsSection.h"
 #include "FEBioMaterialSection.h"
 #include "FEBioGeometrySection.h"
@@ -46,12 +47,16 @@ SOFTWARE.*/
 #include "FEBioLoadDataSection.h"
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
+#include "FEBioStepSection4.h"
 #include "FEBioDiscreteSection.h"
 #include "FEBioMeshDataSection.h"
 #include "FEBioCodeSection.h"
 #include "FEBioRigidSection.h"
+#include "FEBioRigidSection4.h"
 #include "FEBioMeshAdaptorSection.h"
 #include "FEBioMeshSection.h"
+#include "FEBioMeshSection4.h"
+#include "FEBioMeshDomainsSection4.h"
 #include "FEBioStepSection3.h"
 #include "FECore/DataStore.h"
 #include "FECore/FEModel.h"
@@ -144,6 +149,26 @@ FEBioImport::FailedBuildingPart::FailedBuildingPart(const std::string& partName)
 FEBioImport::MeshDataError::MeshDataError()
 {
 	SetErrorString("An error occurred processing mesh_data section.");
+}
+
+FEBioImport::RepeatedNodeSet::RepeatedNodeSet(const std::string& name)
+{
+	SetErrorString("A nodeset with name \"%s\" was already defined.", name.c_str());
+}
+
+FEBioImport::RepeatedSurface::RepeatedSurface(const std::string& name)
+{
+	SetErrorString("A surface with name \"%s\" was already defined.", name.c_str());
+}
+
+FEBioImport::RepeatedEdgeSet::RepeatedEdgeSet(const std::string& name)
+{
+	SetErrorString("An edge with name \"%s\" was already defined.", name.c_str());
+}
+
+FEBioImport::RepeatedElementSet::RepeatedElementSet(const std::string& name)
+{
+	SetErrorString("An element set with name \"%s\" was already defined.", name.c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -242,12 +267,40 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Step"       ] = new FEBioStepSection3        (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}
+
+	// version 4.0
+	if (nversion == 0x0400)
+	{
+		// we no longer allow unknown attributes
+		SetStopOnUnknownAttribute(true);
+
+		m_map["Control"    ] = new FEBioControlSection4     (this);
+		m_map["Material"   ] = new FEBioMaterialSection3    (this);
+		m_map["Mesh"       ] = new FEBioMeshSection4        (this);
+		m_map["MeshDomains"] = new FEBioMeshDomainsSection4 (this);
+		m_map["Include"    ] = new FEBioIncludeSection      (this);
+		m_map["Initial"    ] = new FEBioInitialSection3     (this);
+		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);
+		m_map["Loads"      ] = new FEBioLoadsSection3       (this);
+		m_map["Contact"    ] = new FEBioContactSection4     (this);
+		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
+		m_map["Constraints"] = new FEBioConstraintsSection25(this);
+		m_map["Code"       ] = new FEBioCodeSection         (this); // added in FEBio 2.4 (experimental feature!)
+		m_map["MeshData"   ] = new FEBioMeshDataSection4    (this);	// added in febio4
+		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
+		m_map["Rigid"      ] = new FEBioRigidSection4       (this); // added in FEBio 4.0
+		m_map["Step"       ] = new FEBioStepSection4        (this);
+		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
+	}
 }
 
 //-----------------------------------------------------------------------------
 bool FEBioImport::Load(FEModel& fem, const char* szfile)
 {
-	m_builder = new FEModelBuilder(fem);
+	if (m_builder == nullptr)
+	{
+		m_builder = new FEModelBuilder(fem);
+	}
 
 	// intialize some variables
 	m_szdmp[0] = 0;
@@ -270,7 +323,8 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 
 	// finish building
 	try {
-		m_builder->Finish();
+		bool b = m_builder->Finish();
+		if (b == false) return errf("FAILED building FEBio model.");
 	}
 	catch (std::exception e)
 	{
@@ -284,6 +338,14 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! set a custom model builder 
+void FEBioImport::SetModelBuilder(FEModelBuilder* modelBuilder)
+{
+	delete m_builder;
+	m_builder = modelBuilder;
 }
 
 //-----------------------------------------------------------------------------
@@ -312,12 +374,13 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		// get the version number
 		ParseVersion(tag);
 
-		// FEBio3 only supports file version 1.2, 2.0, 2.5, and 3.0
+		// FEBio4 only supports file version 1.2, 2.0, 2.5, 3.0, and 4.0
 		int nversion = GetFileVersion();
 		if ((nversion != 0x0102) && 
 			(nversion != 0x0200) && 
 			(nversion != 0x0205) && 
-			(nversion != 0x0300)) throw InvalidVersion();
+			(nversion != 0x0300) && 
+			(nversion != 0x0400)) throw InvalidVersion();
 
 		// build the file section map based on the version number
 		BuildFileSectionMap(nversion);
@@ -329,7 +392,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 		if (broot && (nversion < 0x0205))
 		{
 			// We need to define a default Module type since before 2.5 this tag is optional for structural mechanics model definitions.
-			GetBuilder()->SetModuleName("solid");
+			GetBuilder()->SetActiveModule("solid");
 
 			// set default variables for older files.
 			GetBuilder()->SetDefaultVariables();
@@ -359,7 +422,8 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 			// Creating an analysis step will allocate a solver class (based on the module) 
 			// and this in turn will allocate the degrees of freedom.
 			// TODO: This is kind of a round-about way and I really want to find a better solution.
-			GetBuilder()->GetStep();
+			// NOTE: For version 4.0 we do not allocate the solver by default
+			GetBuilder()->GetStep(nversion >= 0x0400 ? false : true);
 
 			// let's get the next tag
 			++tag;
@@ -499,7 +563,7 @@ FENodeSet* FEBioImport::ParseNodeSet(XMLTag& tag, const char* szatt)
 		if (szname == 0) szname = "_unnamed";
 
 		// create a new node set
-		pns = fecore_alloc(FENodeSet, GetFEModel());
+		pns = new FENodeSet(GetFEModel());
 		pns->SetName(szname);
 
 		// add the nodeset to the mesh

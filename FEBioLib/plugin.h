@@ -92,6 +92,9 @@ public:
 	//! get the plugin's path
 	std::string GetFilePath() const { return m_filepath; }
 
+	//! Get the allocator ID
+	int GetAllocatorID() const { return m_allocater_id; }
+
 protected:
 	void SetNameFromFilePath(const char* szfile);
 

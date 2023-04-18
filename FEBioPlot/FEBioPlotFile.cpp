@@ -43,6 +43,7 @@ FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
 	m_nfmt = 0;
 	m_arraySize = 0;
 	m_szname[0] = 0;
+	m_szunit[0] = 0;
 }
 
 FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_ITEM& item)
@@ -53,14 +54,16 @@ FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM(const FEBioPlotFile::DICTIONARY_
 	m_arraySize = item.m_arraySize;
 	m_arrayNames = item.m_arrayNames;
 	m_szname[0] = 0;
+	m_szunit[0] = 0;
 	if (item.m_szname[0]) strcpy(m_szname, item.m_szname);
+	if (item.m_szunit[0]) strcpy(m_szunit, item.m_szunit);
 }
 
 class FEPlotSurfaceDataExport : public FEPlotData
 {
 public:
 	FEPlotSurfaceDataExport(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, FE_REGION_SURFACE, itype, fmt) { m_szname = szname; }
-	void Save(FEModel& fem, Archive& ar)
+	void Save(FEModel& fem, PltArchive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
 		int NS = mesh.Surfaces();
@@ -93,7 +96,7 @@ class FEPlotDomainDataExport : public FEPlotData
 {
 public:
 	FEPlotDomainDataExport(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, FE_REGION_DOMAIN, itype, fmt) { m_szname = szname; }
-	void Save(FEModel& fem, Archive& ar)
+	void Save(FEModel& fem, PltArchive& ar)
 	{
 		FEMesh& mesh = fem.GetMesh();
 		int NDOMS = mesh.Domains();
@@ -491,6 +494,10 @@ bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szn
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Node.push_back(it);
 		return true;
 	}
@@ -510,6 +517,10 @@ bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* sz
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Elem.push_back(it);
 		return true;
 	}
@@ -529,6 +540,10 @@ bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* s
 		it.m_arraySize = ps->GetArraysize();
 		it.m_arrayNames = ps->GetArrayNames();
 		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
 		m_Face.push_back(it);
 		return true;
 	}
@@ -588,6 +603,7 @@ FEBioPlotFile::FEBioPlotFile(FEModel* fem) : PlotFile(fem)
 {
 	m_ncompress = 0;
 	m_meshesWritten = 0;
+	m_exportUnitsFlag = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -801,6 +817,15 @@ bool FEBioPlotFile::WriteHeader(FEModel& fem)
 		m_ar.WriteChunk(PLT_HDR_SOFTWARE, sz);
 	}
 
+	// units flag
+	m_exportUnitsFlag = false;
+	const char* szunits = fem.GetUnits();
+	if (szunits != nullptr)
+	{
+		m_exportUnitsFlag = true;
+		m_ar.WriteChunk(PLT_HDR_UNITS, szunits);
+	}
+
 	return true;
 }
 
@@ -885,6 +910,11 @@ void FEBioPlotFile::WriteDictionaryItem(DICTIONARY_ITEM& it)
 		}
 	}
 	m_ar.WriteChunk(PLT_DIC_ITEM_NAME, it.m_szname, STR_SIZE);
+
+	if (m_exportUnitsFlag && it.m_szunit && it.m_szunit[0])
+	{
+		m_ar.WriteChunk(PLT_DIC_ITEM_UNITS, it.m_szunit, STR_SIZE);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -930,6 +960,25 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 			m_ar.EndChunk();
 		}
 
+		// element sets
+		if (m.ElementSets() > 0)
+		{
+			m_ar.BeginChunk(PLT_ELEMENTSET_SECTION);
+			{
+				WriteElementSetSection(m);
+			}
+			m_ar.EndChunk();
+		}
+
+		// facet sets
+		if (m.FacetSets() > 0)
+		{
+			m_ar.BeginChunk(PLT_FACETSET_SECTION);
+			{
+				WriteFacetSetSection(m);
+			}
+			m_ar.EndChunk();
+		}
 		// parts
 		// (we write the materials as parts)
 		if (fem.Materials() > 0)
@@ -1002,7 +1051,7 @@ void FEBioPlotFile::WriteDomainSection(FEMesh& m)
 			{
 			case FE_DOMAIN_SOLID   : WriteSolidDomain   (static_cast<FESolidDomain&   >(dom)); break;
 			case FE_DOMAIN_SHELL   : WriteShellDomain   (static_cast<FEShellDomain&   >(dom)); break;
-			case FE_DOMAIN_TRUSS   : WriteTrussDomain   (static_cast<FETrussDomain&   >(dom)); break;
+			case FE_DOMAIN_BEAM    : WriteBeamDomain    (static_cast<FEBeamDomain&    >(dom)); break;
 			case FE_DOMAIN_DISCRETE: WriteDiscreteDomain(static_cast<FEDiscreteDomain&>(dom)); break;
             case FE_DOMAIN_2D      : WriteDomain2D      (static_cast<FEDomain2D&      >(dom)); break;
 			}
@@ -1123,7 +1172,7 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
+void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
@@ -1133,7 +1182,7 @@ void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
 
 	// figure out element type
 	int ne = 2;
-	int dtype = PLT_ELEM_TRUSS;
+	int dtype = PLT_ELEM_LINE2;
 
 	// write the header
 	m_ar.BeginChunk(PLT_DOMAIN_HDR);
@@ -1170,7 +1219,7 @@ void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
 
 	// figure out element type
 	int ne = 2;
-	int dtype = PLT_ELEM_TRUSS;
+	int dtype = PLT_ELEM_LINE2;
 
 	// write the header
 	m_ar.BeginChunk(PLT_DOMAIN_HDR);
@@ -1333,6 +1382,73 @@ void FEBioPlotFile::WriteNodeSetSection(FEMesh& m)
 			std::vector<int> nodeList(nodes);
 			for (int i = 0; i < nodes; ++i) nodeList[i] = l[i];
 			m_ar.WriteChunk(PLT_NODESET_LIST, nodeList);
+		}
+		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteElementSetSection(FEMesh& m)
+{
+	for (int n = 0; n < m.ElementSets(); ++n)
+	{
+		FEElementSet& l = m.ElementSet(n);
+		int elems = l.Elements();
+		m_ar.BeginChunk(PLT_ELEMENTSET);
+		{
+			m_ar.BeginChunk(PLT_ELEMENTSET_HDR);
+			{
+				int nid = n + 1;
+				m_ar.WriteChunk(PLT_ELEMENTSET_ID, nid);
+				m_ar.WriteChunk(PLT_ELEMENTSET_SIZE, elems);
+				m_ar.WriteChunk(PLT_ELEMENTSET_NAME, l.GetName());
+			}
+			m_ar.EndChunk();
+
+			std::vector<int> elemList(elems);
+			for (int i = 0; i < elems; ++i) elemList[i] = l[i];
+			m_ar.WriteChunk(PLT_ELEMENTSET_LIST, elemList);
+		}
+		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteFacetSetSection(FEMesh& m)
+{
+	for (int ns = 0; ns < m.FacetSets(); ++ns)
+	{
+		FEFacetSet& surf = m.FacetSet(ns);
+		int NF = surf.Faces();
+
+		m_ar.BeginChunk(PLT_FACETSET);
+		{
+			int maxNodes = FEFacetSet::FACET::MAX_NODES;
+
+			m_ar.BeginChunk(PLT_FACETSET_HDR);
+			{
+				int sid = ns + 1;
+				m_ar.WriteChunk(PLT_FACETSET_ID, sid);
+				m_ar.WriteChunk(PLT_FACETSET_SIZE, NF);
+				m_ar.WriteChunk(PLT_FACETSET_NAME, surf.GetName());
+				m_ar.WriteChunk(PLT_FACETSET_MAXNODES, maxNodes);
+			}
+			m_ar.EndChunk();
+
+			m_ar.BeginChunk(PLT_FACETSET_LIST);
+			{
+				int n[FEElement::MAX_NODES + 2];
+				for (int i = 0; i < NF; ++i)
+				{
+					FEFacetSet::FACET& f = surf.Face(i);
+					int nf = f.ntype;	// this is the type and the nr. of nodes!
+					n[0] = i + 1;
+					n[1] = nf;
+					for (int i = 0; i < nf; ++i) n[i + 2] = f.node[i];
+					m_ar.WriteChunk(PLT_FACET, n, maxNodes + 2);
+				}
+			}
+			m_ar.EndChunk();
 		}
 		m_ar.EndChunk();
 	}
@@ -1585,6 +1701,11 @@ void FEBioPlotFile::WriteNodeDataField(FEModel &fem, FEPlotData* pd)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 {
+	// get the domain name (if any)
+	string domName;
+	const char* szdom = pd->GetDomainName();
+	if (szdom) domName = szdom;
+
 	// loop over all surfaces
 	FEMesh& m = fem.GetMesh();
 	int NS = m.Surfaces();
@@ -1592,62 +1713,65 @@ void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 	{
 		FESurface& S = m.Surface(i);
 
-		Surface& surf = m_Surf[i];
-		assert(surf.surf == &S);
-
-		// Determine data size.
-		// Note that for the FMT_MULT case we are 
-		// assuming 9 data entries per facet
-		// regardless of the nr of nodes a facet really has
-		// this is because for surfaces, all elements are not
-		// necessarily of the same type
-		// TODO: Fix the assumption of the FMT_MULT
-		int datasize = pd->VarSize(pd->DataType());
-		int nsize = datasize;
-		switch (pd->StorageFormat())
+		if (domName.empty() || (domName == S.GetName()))
 		{
-		case FMT_NODE: nsize *= S.Nodes(); break;
-		case FMT_ITEM: nsize *= S.Elements(); break;
-		case FMT_MULT: nsize *= surf.maxNodes * S.Elements(); break;
-		case FMT_REGION:
-			// one value per surface so nsize remains unchanged
-			break;
-		default:
-			assert(false);
-		}
+			Surface& surf = m_Surf[i];
+			assert(surf.surf == &S);
 
-		// save data
-		FEDataStream a; a.reserve(nsize);
-		if (pd->Save(S, a))
-		{
-			// in FEBio 3.0, the data streams are assumed to have no padding, but for now we still need to pad 
-			// the data stream before we write it to the file
-			if (a.size() == nsize)
+			// Determine data size.
+			// Note that for the FMT_MULT case we are 
+			// assuming 9 data entries per facet
+			// regardless of the nr of nodes a facet really has
+			// this is because for surfaces, all elements are not
+			// necessarily of the same type
+			// TODO: Fix the assumption of the FMT_MULT
+			int datasize = pd->VarSize(pd->DataType());
+			int nsize = datasize;
+			switch (pd->StorageFormat())
 			{
-				// assumed padding is already there, or not needed
-				m_ar.WriteData(i + 1, a.data());
+			case FMT_NODE: nsize *= S.Nodes(); break;
+			case FMT_ITEM: nsize *= S.Elements(); break;
+			case FMT_MULT: nsize *= surf.maxNodes * S.Elements(); break;
+			case FMT_REGION:
+				// one value per surface so nsize remains unchanged
+				break;
+			default:
+				assert(false);
 			}
-			else
+
+			// save data
+			FEDataStream a; a.reserve(nsize);
+			if (pd->Save(S, a))
 			{
-				// this is only needed for FMT_MULT storage
-				assert(pd->StorageFormat() == FMT_MULT);
-
-				// add padding
-				const int M = surf.maxNodes;
-				int m = 0;
-				FEDataStream b; b.assign(nsize, 0.f);
-				for (int n = 0; n < S.Elements(); ++n)
+				// in FEBio 3.0, the data streams are assumed to have no padding, but for now we still need to pad 
+				// the data stream before we write it to the file
+				if (a.size() == nsize)
 				{
-					FESurfaceElement& el = S.Element(n);
-					int ne = el.Nodes();
-					for (int j = 0; j < ne; ++j)
-					{
-						for (int k = 0; k < datasize; ++k) b[n*M*datasize + j*datasize + k] = a[m++];
-					}
+					// assumed padding is already there, or not needed
+					m_ar.WriteData(i + 1, a.data());
 				}
+				else
+				{
+					// this is only needed for FMT_MULT storage
+					assert(pd->StorageFormat() == FMT_MULT);
 
-				// write the padded data
-				m_ar.WriteData(i + 1, b.data());
+					// add padding
+					const int M = surf.maxNodes;
+					int m = 0;
+					FEDataStream b; b.assign(nsize, 0.f);
+					for (int n = 0; n < S.Elements(); ++n)
+					{
+						FESurfaceElement& el = S.Element(n);
+						int ne = el.Nodes();
+						for (int j = 0; j < ne; ++j)
+						{
+							for (int k = 0; k < datasize; ++k) b[n * M * datasize + j * datasize + k] = a[m++];
+						}
+					}
+
+					// write the padded data
+					m_ar.WriteData(i + 1, b.data());
+				}
 			}
 		}
 	}
@@ -1673,44 +1797,51 @@ void FEBioPlotFile::WriteDomainDataField(FEModel &fem, FEPlotData* pd)
 		return;
 	}
 
+	// get the domain name (if any)
+	string domName;
+	const char* szdom = pd->GetDomainName();
+	if (szdom) domName = szdom;
+
 	// loop over all domains in the item list
-	int N = (int)item.size();
 	for (int i = 0; i<ND; ++i)
 	{
 		// get the domain
 		FEDomain& D = m.Domain(item[i]);
 
-		// calculate the size of the data vector
-		int nsize = pd->VarSize(pd->DataType());
-		switch (pd->StorageFormat())
+		if (domName.empty() || (D.GetName() == domName))
 		{
-		case FMT_NODE: nsize *= D.Nodes(); break;
-		case FMT_ITEM: nsize *= D.Elements(); break;
-		case FMT_MULT:
-		{
-			// since all elements have the same type within a domain
-			// we just grab the number of nodes of the first element 
-			// to figure out how much storage we need
-			FEElement& e = D.ElementRef(0);
-			int n = e.Nodes();
-			nsize *= n*D.Elements();
-		}
-		break;
-		case FMT_REGION:
-			// one value for this domain so nsize remains unchanged
+			// calculate the size of the data vector
+			int nsize = pd->VarSize(pd->DataType());
+			switch (pd->StorageFormat())
+			{
+			case FMT_NODE: nsize *= D.Nodes(); break;
+			case FMT_ITEM: nsize *= D.Elements(); break;
+			case FMT_MULT:
+			{
+				// since all elements have the same type within a domain
+				// we just grab the number of nodes of the first element 
+				// to figure out how much storage we need
+				FEElement& e = D.ElementRef(0);
+				int n = e.Nodes();
+				nsize *= n * D.Elements();
+			}
 			break;
-		default:
-			assert(false);
-		}
-		assert(nsize > 0);
+			case FMT_REGION:
+				// one value for this domain so nsize remains unchanged
+				break;
+			default:
+				assert(false);
+			}
+			assert(nsize > 0);
 
-		// fill data vector and save
-		FEDataStream a;
-		a.reserve(nsize);
-		if (pd->Save(D, a))
-		{
-			assert(a.size() == nsize);
-			m_ar.WriteData(item[i] + 1, a.data());
+			// fill data vector and save
+			FEDataStream a;
+			a.reserve(nsize);
+			if (pd->Save(D, a))
+			{
+				assert(a.size() == nsize);
+				m_ar.WriteData(item[i] + 1, a.data());
+			}
 		}
 	}
 }
@@ -1721,9 +1852,11 @@ bool FEBioPlotFile::Append(const char *szfile)
 	// try to open the file
 	if (m_ar.Open(szfile) == false) return false;
 
-	// add plot variables
 	FEModel* fem = GetFEModel();
 	FEPlotDataStore& pltData = fem->GetPlotDataStore();
+	SetCompression(pltData.GetPlotCompression());
+
+	// add plot variables
 	for (int n = 0; n < pltData.PlotVariables(); ++n)
 	{
 		FEPlotVariable& vi = pltData.GetPlotVariable(n);
@@ -1738,12 +1871,16 @@ bool FEBioPlotFile::Append(const char *szfile)
 		}
 	}
 
+	// NOTE: Reading the dictionary rebuilds the plot variables too, but
+	//       there is not enough data in the dictionary to do that correctly. 
+	//       So, we should probably rely on the data store, which gets serialized to the dump file.
 	// open the root element
-	m_ar.OpenChunk();
+	bool bok = true;
+/*	m_ar.OpenChunk();
 	unsigned int nid = m_ar.GetChunkID();
 	if (nid != PLT_ROOT) return false;
 
-	bool bok = false;
+	bok = false;
 	while (m_ar.OpenChunk() == IO_OK)
 	{
 		nid = m_ar.GetChunkID();
@@ -1755,7 +1892,7 @@ bool FEBioPlotFile::Append(const char *szfile)
 		}
 		m_ar.CloseChunk();
 	}
-
+*/
 	// close it again ...
 	m_ar.Close();
 

@@ -35,27 +35,27 @@ SOFTWARE.*/
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-class FENodeFluidXVel : public FENodeLogData
+class FENodeFluidXVel : public FELogNodeData
 {
 public:
-    FENodeFluidXVel(FEModel* pfem) : FENodeLogData(pfem){}
-    double value(int node);
+    FENodeFluidXVel(FEModel* pfem) : FELogNodeData(pfem){}
+    double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeFluidYVel : public FENodeLogData
+class FENodeFluidYVel : public FELogNodeData
 {
 public:
-    FENodeFluidYVel(FEModel* pfem) : FENodeLogData(pfem){}
-    double value(int node);
+    FENodeFluidYVel(FEModel* pfem) : FELogNodeData(pfem){}
+	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeFluidZVel : public FENodeLogData
+class FENodeFluidZVel : public FELogNodeData
 {
 public:
-    FENodeFluidZVel(FEModel* pfem) : FENodeLogData(pfem){}
-    double value(int node);
+    FENodeFluidZVel(FEModel* pfem) : FELogNodeData(pfem){}
+	double value(const FENode& node) override;
 };
 
 //=============================================================================

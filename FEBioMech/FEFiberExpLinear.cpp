@@ -34,17 +34,16 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberExpLinear, FEElasticFiberMaterial)
-	ADD_PARAMETER(m_c3  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c3");
+BEGIN_FECORE_CLASS(FEFiberExpLinear, FEFiberMaterial)
+	ADD_PARAMETER(m_c3  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c3")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_c4  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c4");
-	ADD_PARAMETER(m_c5  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c5");
+	ADD_PARAMETER(m_c5  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c5")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
-	ADD_PARAMETER(m_epsf, "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFiberExpLinear::FEFiberExpLinear(FEModel* pfem) : FEElasticFiberMaterial(pfem)
+FEFiberExpLinear::FEFiberExpLinear(FEModel* pfem) : FEFiberMaterial(pfem)
 {
 	m_c3 = 0;
 	m_c4 = 0;
@@ -172,3 +171,13 @@ double FEFiberExpLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec
 
 	return sed;
 }
+
+
+//============================================================================================
+// define the material parameters
+BEGIN_FECORE_CLASS(FEElasticFiberExpLinear, FEElasticFiberMaterial)
+	ADD_PARAMETER(m_fib.m_c3  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c3")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_fib.m_c4  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c4");
+	ADD_PARAMETER(m_fib.m_c5  , FE_RANGE_GREATER_OR_EQUAL(0.0), "c5")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_fib.m_lam1, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
+END_FECORE_CLASS();

@@ -37,7 +37,6 @@ BEGIN_FECORE_CLASS(FEFiberExponentialPowerUC, FEElasticFiberMaterialUC)
 	ADD_PARAMETER(m_beta, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
 	ADD_PARAMETER(m_ksi, "ksi");
 	ADD_PARAMETER(m_mu, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-    ADD_PARAMETER(m_epsf , "epsilon_scale");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -127,12 +126,20 @@ tens4ds FEFiberExponentialPowerUC::DevFiberTangent(FEMaterialPoint& mp, const ve
 		// calculate the outer product of nt
 		mat3ds N = dyad(nt);
 		tens4ds NxN = dyad1s(N);
+        mat3dd I(1);
+        tens4ds IxI = dyad1s(I);
+        tens4ds I4 = dyad4s(I);
 
 		// calculate strain energy derivative
 		double Wl = m_ksi*pow(In_1, m_beta - 1.0)*exp(m_alpha*pow(In_1, m_beta));
 
 		// calculate the fiber stress
 		s = N*(2.0*Wl / J);
+
+        // add the contribution from shear
+        mat3ds B = pt.DevLeftCauchyGreen();
+        mat3ds BmI = B - I;
+        s += (N*BmI).sym()*(m_mu / J);
 
 		// calculate strain energy 2nd derivative
 		double tmp = m_alpha*pow(In_1, m_beta);
@@ -142,19 +149,15 @@ tens4ds FEFiberExponentialPowerUC::DevFiberTangent(FEMaterialPoint& mp, const ve
 		c = NxN*(4.0*Wll / J);
 
 		// add the contribution from shear
-		mat3ds B = pt.DevLeftCauchyGreen();
 		c += dyad4s(N, B)*(m_mu / J);
+
+        // This is the final value of the elasticity tensor
+        c += ((I4 + IxI / 3.0)*s.tr() - dyad1s(I, s))*(2. / 3.) - (ddots(IxI, c) - IxI*(c.tr() / 3.)) / 3.;
 	}
 	else
 	{
 		c.zero();
 	}
-
-	// This is the final value of the elasticity tensor
-	mat3dd I(1);
-	tens4ds IxI = dyad1s(I);
-	tens4ds I4 = dyad4s(I);
-	c += ((I4 + IxI / 3.0)*s.tr() - dyad1s(I, s))*(2. / 3.) - (ddots(IxI, c) - IxI*(c.tr() / 3.)) / 3.;
 
 	return c;
 }

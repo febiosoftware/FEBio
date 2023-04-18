@@ -29,9 +29,10 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/tens3d.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-class FEBCPrescribedDeformation : public FEPrescribedNodeSet
+class FEBIOMECH_API FEBCPrescribedDeformation : public FEPrescribedNodeSet
 {
 public:
 	FEBCPrescribedDeformation(FEModel* pfem);
@@ -43,8 +44,6 @@ public:
 protected:
 	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
-	bool SetDofList(FEDofList& dofs) override;
-
 protected:
 	double	m_scale;
 	mat3d	m_F;
@@ -53,7 +52,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEBCPrescribedDeformation2O : public FEPrescribedNodeSet
+class FEBIOMECH_API FEBCPrescribedDeformation2O : public FEPrescribedNodeSet
 {
 public:
 	FEBCPrescribedDeformation2O(FEModel* pfem);
@@ -70,8 +69,6 @@ public:
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 protected:
-	bool SetDofList(FEDofList& dofs) override;
-
 	void GetNodalValues(int nodelist, std::vector<double>& val) override;
 
 protected:

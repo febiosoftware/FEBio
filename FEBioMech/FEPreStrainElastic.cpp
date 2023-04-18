@@ -27,16 +27,18 @@ SOFTWARE.*/
 #include "FEPreStrainElastic.h"
 
 //! constructor
-FEPrestrainMaterialPoint::FEPrestrainMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) 
+FEPrestrainMaterialPoint::FEPrestrainMaterialPoint(FEMaterialPointData* mp) : FEMaterialPointData(mp)
 { 
 	F0.unit(); 
 	Fc.unit(); 
 }
 
 //! copy
-FEMaterialPoint* FEPrestrainMaterialPoint::Copy()
+FEMaterialPointData* FEPrestrainMaterialPoint::Copy()
 {
-	return new FEPrestrainMaterialPoint((m_pNext?m_pNext->Copy():0));
+	FEMaterialPointData* mp = new FEPrestrainMaterialPoint(*this);
+	if (m_pNext) mp->SetNext(m_pNext->Copy());
+	return mp;
 }
 
 //! initialization
@@ -47,7 +49,7 @@ void FEPrestrainMaterialPoint::Init(bool bflag)
 //! Serialization
 void FEPrestrainMaterialPoint::Serialize(DumpStream& dmp)
 {
-	FEMaterialPoint::Serialize(dmp);
+	FEMaterialPointData::Serialize(dmp);
 	dmp & F0 & Fc;
 }
 
@@ -65,21 +67,24 @@ FEPrestrainElastic::FEPrestrainElastic(FEModel* pfem) : FEElasticMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+// evaluate density in (pre-strained) reference configuration
+double FEPrestrainElastic::Density(FEMaterialPoint& mp)
+{
+	double d0 = FEElasticMaterial::Density(mp);
+
+	mat3d Fp = PrestrainGradient(mp);
+	double Jp = Fp.det();
+
+	return d0 / Jp;
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data for this material
-FEMaterialPoint* FEPrestrainElastic::CreateMaterialPointData()
+FEMaterialPointData* FEPrestrainElastic::CreateMaterialPointData()
 { 
-	if (m_Fp == nullptr)
-	{
-		FEMaterialPoint* pm = m_mat->CreateMaterialPointData();
-		return new FEPrestrainMaterialPoint(pm);
-	}
-	else
-	{
-		FEMaterialPoint* pm = m_mat->CreateMaterialPointData();
-		FEMaterialPoint* pg = m_Fp->CreateMaterialPointData();
-		if (pg) pm->Append(pg);
-		return new FEPrestrainMaterialPoint(pm);
-	}
+	FEMaterialPointData* pm = new FEPrestrainMaterialPoint(m_mat->CreateMaterialPointData());
+	if (m_Fp) pm->Append(m_Fp->CreateMaterialPointData());
+	return pm;
 }
 
 //-----------------------------------------------------------------------------

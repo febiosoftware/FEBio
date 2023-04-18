@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEGenericHyperelastic, FEElasticMaterial)
-	ADD_PARAMETER(m_exp, "W");
+	ADD_PARAMETER(m_exp, "W")->setUnits(UNIT_ENERGY);
 END_FECORE_CLASS();
 
 FEGenericHyperelastic::FEGenericHyperelastic(FEModel* fem) : FEElasticMaterial(fem)
@@ -39,7 +39,13 @@ FEGenericHyperelastic::FEGenericHyperelastic(FEModel* fem) : FEElasticMaterial(f
 
 bool FEGenericHyperelastic::Init()
 {
-	vector<string> vars = { "I1", "I2", "J" };
+	if (BuildMathExpressions() == false) return false;
+	return FEElasticMaterial::Init();
+}
+
+bool FEGenericHyperelastic::BuildMathExpressions()
+{
+	vector<string> vars = { "I1", "I2", "J", "X", "Y", "Z"};
 
 	// add all user parameters
 	FEParameterList& pl = GetParameterList();
@@ -88,7 +94,19 @@ bool FEGenericHyperelastic::Init()
 	string sWJJ = o2s.Convert(m_WJJ); feLog("WJJ = %s\n", sWJJ.c_str());
 #endif
 
-	return FEElasticMaterial::Init();
+	return true;
+}
+
+
+// serialization
+void FEGenericHyperelastic::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	if ((ar.IsShallow() == false) && ar.IsLoading())
+	{
+		bool b = BuildMathExpressions();
+		assert(b);
+	}
 }
 
 mat3ds FEGenericHyperelastic::Stress(FEMaterialPoint& mp)
@@ -104,7 +122,7 @@ mat3ds FEGenericHyperelastic::Stress(FEMaterialPoint& mp)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
-	vector<double> v = { I1, I2, J };
+	vector<double> v = { I1, I2, J, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 
 	double W1 = m_W1.value_s(v);
@@ -131,7 +149,7 @@ tens4ds FEGenericHyperelastic::Tangent(FEMaterialPoint& mp)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
-	vector<double> v = { I1, I2, J };
+	vector<double> v = { I1, I2, J, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 
 	double W1 = m_W1.value_s(v);
@@ -177,7 +195,7 @@ double FEGenericHyperelastic::StrainEnergyDensity(FEMaterialPoint& mp)
 	double I1 = B.tr();
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
-	vector<double> v = { I1, I2, J };
+	vector<double> v = { I1, I2, J, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 
 	double W = m_W.value_s(v);

@@ -38,13 +38,13 @@ SOFTWARE.*/
 #include "FENodalLoad.h"
 #include "LinearSolver.h"
 
-REGISTER_SUPER_CLASS(FESolver, FESOLVER_ID);
-
 BEGIN_FECORE_CLASS(FESolver, FECoreBase)
-	ADD_PARAMETER(m_msymm    , "symmetric_stiffness");
-	ADD_PARAMETER(m_eq_scheme, "equation_scheme");
-	ADD_PARAMETER(m_eq_order , "equation_order" );
-	ADD_PARAMETER(m_bwopt    , "optimize_bw");
+	BEGIN_PARAM_GROUP("linear system");
+		ADD_PARAMETER(m_msymm    , "symmetric_stiffness", 0, "non-symmetric\0symmetric\0symmetric structure\0");
+		ADD_PARAMETER(m_eq_scheme, "equation_scheme", 0, "staggered\0block\0");
+		ADD_PARAMETER(m_eq_order , "equation_order", 0, "default\0reverse\0febio2\0");
+		ADD_PARAMETER(m_bwopt    , "optimize_bw");
+	END_PARAM_GROUP();
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ FESolver::FESolver(FEModel* fem) : FECoreBase(fem)
 
 	m_neq = 0;
 
-	m_bwopt = 0;
+	m_bwopt = false;
 
 	m_eq_scheme = EQUATION_SCHEME::STAGGERED;
 	m_eq_order = EQUATION_ORDER::NORMAL_ORDER;
@@ -162,6 +162,13 @@ double FESolver::ExtractSolutionNorm(const vector<double>& v, const FEDofList& d
 		}
 	}
 	return norm;
+}
+
+//-----------------------------------------------------------------------------
+// return the solution vector
+std::vector<double> FESolver::GetSolutionVector() const
+{
+	return std::vector<double>();
 }
 
 //-----------------------------------------------------------------------------
@@ -299,6 +306,9 @@ bool FESolver::InitStep(double time)
 
 	// evaluate load controllers values at current time
 	fem.EvaluateLoadControllers(time);
+
+	// evaluate data generators at current time
+	fem.EvaluateDataGenerators(time);
 
 	// evaluate load parameters
 	fem.EvaluateLoadParameters();
@@ -779,19 +789,6 @@ bool FESolver::Augment()
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates concentrated nodal loads
-void FESolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
-{
-	// loop over nodal loads
-	FEModel& fem = *GetFEModel();
-	for (int i = 0; i<fem.NodalLoads(); ++i)
-	{
-		FENodalLoad& fc = *fem.NodalLoad(i);
-		if (fc.IsActive()) fc.LoadVector(R, tp);
-	}
-}
-
-//-----------------------------------------------------------------------------
 // return the node (mesh index) from an equation number
 FENodalDofInfo FESolver::GetDOFInfoFromEquation(int ieq)
 {
@@ -799,6 +796,7 @@ FENodalDofInfo FESolver::GetDOFInfoFromEquation(int ieq)
 	info.m_eq = ieq;
 	info.m_node = -1;
 	info.m_dof = -1;
+	info.szdof = "";
 
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -810,8 +808,11 @@ FENodalDofInfo FESolver::GetDOFInfoFromEquation(int ieq)
 		{
 			if (id[j] == ieq)
 			{
-				info.m_node = i;
+				info.m_node = node.GetID();
 				info.m_dof = j;
+				DOFS& Dofs = GetFEModel()->GetDOFS();
+				info.szdof = Dofs.GetDOFName(info.m_dof);
+				if (info.szdof == nullptr) info.szdof = "???";
 				return info;
 			}
 		}

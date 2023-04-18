@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEPrescribedDOF.h"
 #include "FENodalLoad.h"
 #include "FEFixedBC.h"
+#include "FELinearConstraint.h"
 #include "FEInitialCondition.h"
 #include "FECorePlot.h"
 #include "FESurfaceToSurfaceMap.h"
@@ -40,6 +41,7 @@ SOFTWARE.*/
 #include "FEPointFunction.h"
 #include "FELoadCurve.h"
 #include "FEMathController.h"
+#include "FEMathIntervalController.h"
 #include "FEPIDController.h"
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
@@ -52,9 +54,22 @@ SOFTWARE.*/
 #include "FEFacetSet.h"
 #include "FEElementSet.h"
 #include "FEConstValueVec3.h"
+#include "NodeDataRecord.h"
+#include "FaceDataRecord.h"
+#include "ElementDataRecord.h"
+#include "NLConstraintDataRecord.h"
+#include "FEAugLagLinearConstraint.h"
+#include "SurfaceDataRecord.h"
 #include "FELogEnclosedVolume.h"
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
+#include "FELogSolutionNorm.h"
+#include "FELinearConstraint.h"
+#include "LUSolver.h"
+#include "FETimeStepController.h"
+#include "FEModifiedNewtonStrategy.h"
+#include "FEFullNewtonStrategy.h"
+#include "SkylineSolver.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -82,26 +97,34 @@ void FECore::InitModule()
 	FEElementLibrary::Initialize();
 
 // analysis class
-REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
+//REGISTER_FECORE_CLASS(FEAnalysis, "analysis");
 
 // time controller
-REGISTER_FECORE_CLASS(FETimeStepController, "time_stepper");
+REGISTER_FECORE_CLASS(FETimeStepController, "default");
 
 // boundary conditions
-REGISTER_FECORE_CLASS(FEFixedBC      , "fix"      );
-REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe");
+REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      , 0x300);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe", 0x300);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FELinearConstraint, "linear constraint");
+REGISTER_FECORE_CLASS(FELinearConstraintDOF, "child_dof");
 
 // nodal loads
 REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");
 
 // initial conditions
-REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     );
+REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     , 0x300);	// obsolete in 4.0
+
+// (augmented lagrangian) linear constraints
+REGISTER_FECORE_CLASS(FELinearConstraintSet, "linear constraint");
+REGISTER_FECORE_CLASS(FEAugLagLinearConstraint, "linear_constraint");
+REGISTER_FECORE_CLASS(FEAugLagLinearConstraintDOF, "node");
 
 // plot field
 REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");
 
 // load curves
 REGISTER_FECORE_CLASS(FEPointFunction , "point");
+REGISTER_FECORE_CLASS(FEConstFunction, "const");
 REGISTER_FECORE_CLASS(FELinearFunction, "linear ramp");
 REGISTER_FECORE_CLASS(FEStepFunction  , "step");
 REGISTER_FECORE_CLASS(FEMathFunction  , "math");
@@ -124,6 +147,7 @@ REGISTER_FECORE_CLASS(FESphericalVectorGenerator      , "spherical");
 REGISTER_FECORE_CLASS(FECylindricalVectorGenerator    , "cylindrical");
 REGISTER_FECORE_CLASS(FESphericalAnglesVectorGenerator, "angles");
 REGISTER_FECORE_CLASS(FEMappedValueVec3               , "map");
+REGISTER_FECORE_CLASS(FEUserVectorGenerator           , "user");
 
 // mat3d generators
 REGISTER_FECORE_CLASS(FEConstValueMat3d       , "const"      );
@@ -140,24 +164,28 @@ REGISTER_FECORE_CLASS(FEConstValueMat3ds , "const");
 REGISTER_FECORE_CLASS(FEMappedValueMat3ds, "map");
 
 // load controllers
-REGISTER_FECORE_CLASS(FELoadCurve     , "loadcurve");
-REGISTER_FECORE_CLASS(FEMathController, "math");
-REGISTER_FECORE_CLASS(FEPIDController , "PID");
+REGISTER_FECORE_CLASS(FELoadCurve             , "loadcurve");
+REGISTER_FECORE_CLASS(FEMathController        , "math");
+REGISTER_FECORE_CLASS(FEMathIntervalController, "math-interval");
+REGISTER_FECORE_CLASS(FEPIDController         , "PID");
 
 // Newton strategies
 REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");
 REGISTER_FECORE_CLASS(FEBroydenStrategy, "Broyden");
 REGISTER_FECORE_CLASS(JFNKStrategy     , "JFNK");
+REGISTER_FECORE_CLASS(FEModifiedNewtonStrategy, "modified Newton");
+REGISTER_FECORE_CLASS(FEFullNewtonStrategy    , "full Newton");
 
 // preconditioners
 REGISTER_FECORE_CLASS(DiagonalPreconditioner, "diagonal");
 
-// Mesh item lists
-REGISTER_FECORE_CLASS(FENodeSet   , "node_set");
-REGISTER_FECORE_CLASS(FEFacetSet  , "surface" );
-REGISTER_FECORE_CLASS(FEElementSet, "elem_set");
-
 REGISTER_FECORE_CLASS(FESurface, "surface");
+
+// data records
+REGISTER_FECORE_CLASS(NodeDataRecord, "node_data");
+REGISTER_FECORE_CLASS(FaceDataRecord, "face_data");
+REGISTER_FECORE_CLASS(ElementDataRecord, "element_data");
+REGISTER_FECORE_CLASS(NLConstraintDataRecord, "rigid_connector_data");
 
 // log classes
 REGISTER_FECORE_CLASS(FELogEnclosedVolume, "volume");
@@ -165,4 +193,12 @@ REGISTER_FECORE_CLASS(FELogElementVolume, "V");
 REGISTER_FECORE_CLASS(FELogDomainVolume, "volume");
 REGISTER_FECORE_CLASS(FELogAvgDomainData, "avg");
 REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
+REGISTER_FECORE_CLASS(FELogIntegralDomainData, "integrate");
+REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
+REGISTER_FECORE_CLASS(FELogFaceArea    , "facet area");
+
+// linear solvers
+REGISTER_FECORE_CLASS(LUSolver, "LU");
+REGISTER_FECORE_CLASS(SkylineSolver, "skyline");
+
 }

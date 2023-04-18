@@ -50,20 +50,24 @@ FEFluidSolutesDomain3D::FEFluidSolutesDomain3D(FEModel* pfem) : FESolidDomain(pf
     m_pMat = 0;
     m_btrans = true;
     
-    m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
-    m_dofAW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_ACCELERATION));
-    
-    m_dofEF = pfem->GetDOFIndex("ef");
-    m_dofAEF = pfem->GetDOFIndex("aef");
-    m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
-    m_dofAC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), 0);
+    // TODO: Can this be done in Init, since  there is no error checking
+    if (pfem)
+    {
+        m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
+        m_dofAW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_ACCELERATION));
 
-    // list the degrees of freedom
-    // (This allows the FEDomain base class to handle several tasks such as UnpackLM)
-    m_dof.AddDof(m_dofW[0]);
-    m_dof.AddDof(m_dofW[1]);
-    m_dof.AddDof(m_dofW[2]);
-    m_dof.AddDof(m_dofEF);
+        m_dofEF = pfem->GetDOFIndex("ef");
+        m_dofAEF = pfem->GetDOFIndex("aef");
+        m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
+        m_dofAC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), 0);
+
+        // list the degrees of freedom
+        // (This allows the FEDomain base class to handle several tasks such as UnpackLM)
+        m_dof.AddDof(m_dofW[0]);
+        m_dof.AddDof(m_dofW[1]);
+        m_dof.AddDof(m_dofW[2]);
+        m_dof.AddDof(m_dofEF);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -113,6 +117,16 @@ bool FEFluidSolutesDomain3D::Init()
     m_dof = dofs;
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidSolutesDomain3D::Serialize(DumpStream& ar)
+{
+    FESolidDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_pMat;
+    ar & m_dofW & m_dofAW & m_dof;
+    ar & m_dofEF & m_dofAEF & m_dofC & m_dofAC;
 }
 
 //-----------------------------------------------------------------------------
@@ -256,10 +270,10 @@ void FEFluidSolutesDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
             FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
             pt.m_r0 = el.Evaluate(x0, j);
+            mp.m_rt = mp.m_r0;
             
             if (pt.m_ef <= -1) {
-                feLogError("Negative jacobian was detected.");
-                throw DoRunningRestart();
+                throw NegativeJacobianDetected();
             }
             
             // reset chemical reaction element data
@@ -272,7 +286,7 @@ void FEFluidSolutesDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::InternalForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
     
@@ -294,7 +308,7 @@ void FEFluidSolutesDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo&
         fe.assign(ndof, 0);
         
         // calculate internal force vector
-        ElementInternalForce(el, fe, tp);
+        ElementInternalForce(el, fe);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -307,8 +321,9 @@ void FEFluidSolutesDomain3D::InternalForces(FEGlobalVector& R, const FETimeInfo&
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FEFluidSolutesDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, n;
     
     // jacobian matrix, inverse jacobian matrix and determinants
@@ -430,7 +445,7 @@ void FEFluidSolutesDomain3D::ElementInternalForce(FESolidElement& el, vector<dou
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, FEBodyForce& BF)
+void FEFluidSolutesDomain3D::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
     int NE = (int)m_Elem.size();
     
@@ -449,7 +464,7 @@ void FEFluidSolutesDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, 
         fe.assign(ndof, 0);
         
         // apply body forces
-        ElementBodyForce(BF, el, fe, tp);
+        ElementBodyForce(BF, el, fe);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -462,7 +477,7 @@ void FEFluidSolutesDomain3D::BodyForce(FEGlobalVector& R, const FETimeInfo& tp, 
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FEFluidSolutesDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
 {
     // jacobian
     double Ji[3][3], detJ;
@@ -555,8 +570,9 @@ void FEFluidSolutesDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement& e
 
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
-void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     // jacobian
     double Ji[3][3], detJ;
     const double *H, *Gr, *Gs, *Gt;
@@ -681,8 +697,9 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidE
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, i4, j, j4, n;
     
     // Get the current element's data
@@ -735,7 +752,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, co
         double dep = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
         double d2ep = m_pMat->Fluid()->Tangent_Pressure_Strain_Strain(mp);
         // Jdot/J
-        double dJoJ = pt.m_efdot/(pt.m_ef+1);
+        double dJoJ = pt.m_efdot/Jf;
         // Miscellaneous constants
         double R = m_pMat->m_Rgas;
         double T = m_pMat->m_Tabs;
@@ -803,7 +820,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, co
                 mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j]);
                 vec3d kJv = (pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j];
                 vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dep+pt.m_gradef*H[j]*d2ep)*H[i];
-                double kJJ = (H[j]*((ksi*m_btrans)/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;
+                double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;
                 
                 ke[i4  ][j4  ] += Kvv(0,0)*detJ;
                 ke[i4  ][j4+1] += Kvv(0,1)*detJ;
@@ -838,7 +855,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, co
                         if (isol == jsol)
                         {
                             kvc += (spt.m_gradc[isol]*spt.m_dkdc[isol][isol]*H[j]+gradN[j]*spt.m_k[isol])*H[i]*R*T;
-                            kcc += -(ksi/dt*m_btrans*spt.m_k[isol]+spt.m_dkdc[isol][isol]*spt.m_cdot[isol] + dkdt[isol] + spt.m_c[isol]*spt.m_dkdc[isol][isol]*ksi/dt*m_btrans)*H[i]*H[j] + vdzdc[isol][isol]*spt.m_k[isol]*H[i]*H[j] + gradN[i]*((-spt.m_gradc[isol]*(spt.m_dkdc[isol][isol]*d0[isol]+spt.m_k[isol]*d0p[isol][isol])+pt.m_vft*(spt.m_dkdc[isol][isol]*spt.m_c[isol]+spt.m_k[isol]))*H[j]-gradN[j]*spt.m_k[isol]*d0[isol]);
+                            kcc += -(ksi/dt*spt.m_k[isol]+spt.m_dkdc[isol][isol]*spt.m_cdot[isol] + dkdt[isol] + spt.m_c[isol]*spt.m_dkdc[isol][isol]*ksi/dt)*H[i]*H[j] + vdzdc[isol][isol]*spt.m_k[isol]*H[i]*H[j] + gradN[i]*((-spt.m_gradc[isol]*(spt.m_dkdc[isol][isol]*d0[isol]+spt.m_k[isol]*d0p[isol][isol])+pt.m_vft*(spt.m_dkdc[isol][isol]*spt.m_c[isol]+spt.m_k[isol]))*H[j]-gradN[j]*spt.m_k[isol]*d0[isol]);
                             for (int ksol=0; ksol<nsol; ++ksol)
                             {
                                 if(isol==ksol)
@@ -854,7 +871,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, co
                         else
                         {
                             kvc += spt.m_gradc[jsol]*spt.m_dkdc[jsol][isol]*H[i]*H[j]*R*T;
-                            kcc += -H[i]*H[j]*(spt.m_dkdc[isol][jsol]*spt.m_cdot[isol] + spt.m_c[isol]*spt.m_dkdc[isol][jsol]*ksi/dt*m_btrans) + H[i]*H[j]*vdzdc[isol][jsol]*spt.m_k[jsol] + gradN[i]*(-spt.m_gradc[isol]*(spt.m_dkdc[isol][jsol]*d0[isol]+spt.m_k[isol]*d0p[isol][jsol])+pt.m_vft*spt.m_dkdc[isol][jsol]*spt.m_c[isol])*H[j];
+                            kcc += -H[i]*H[j]*(spt.m_dkdc[isol][jsol]*spt.m_cdot[isol] + spt.m_c[isol]*spt.m_dkdc[isol][jsol]*ksi/dt) + H[i]*H[j]*vdzdc[isol][jsol]*spt.m_k[jsol] + gradN[i]*(-spt.m_gradc[isol]*(spt.m_dkdc[isol][jsol]*d0[isol]+spt.m_k[isol]*d0p[isol][jsol])+pt.m_vft*spt.m_dkdc[isol][jsol]*spt.m_c[isol])*H[j];
                             for (int ksol=0; ksol<nsol; ++ksol)
                             {
                                 if(jsol==ksol)
@@ -883,7 +900,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke, co
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::StiffnessMatrix(FELinearSystem& LS)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -904,7 +921,7 @@ void FEFluidSolutesDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
         ke.zero();
         
         // calculate material stiffness
-        ElementStiffness(el, ke, tp);
+        ElementStiffness(el, ke);
         
         // get the element's LM vector
         vector<int> lm;
@@ -917,7 +934,41 @@ void FEFluidSolutesDomain3D::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::MassMatrix(FELinearSystem& LS)
+{
+    // repeat over all solid elements
+    int NE = (int)m_Elem.size();
+    
+#pragma omp parallel for shared (NE)
+    for (int iel=0; iel<NE; ++iel)
+    {
+        FESolidElement& el = m_Elem[iel];
+        
+        // element stiffness matrix
+        FEElementMatrix ke(el);
+        
+        // create the element's stiffness matrix
+        const int nsol = m_pMat->Solutes();
+        const int ndpn = 4 + nsol;
+        int ndof = ndpn*el.Nodes();
+        ke.resize(ndof, ndof);
+        ke.zero();
+        
+        // calculate inertial stiffness
+        ElementMassMatrix(el, ke);
+        
+        // get the element's LM vector
+        vector<int> lm;
+        UnpackLM(el, lm);
+        ke.SetIndices(lm);
+        
+        // assemble element matrix in global stiffness matrix
+        LS.Assemble(ke);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidSolutesDomain3D::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
     // repeat over all solid elements
     int NE = (int)m_Elem.size();
@@ -937,40 +988,7 @@ void FEFluidSolutesDomain3D::MassMatrix(FELinearSystem& LS, const FETimeInfo& tp
         ke.zero();
         
         // calculate inertial stiffness
-        ElementMassMatrix(el, ke, tp);
-        
-        // get the element's LM vector
-        vector<int> lm;
-        UnpackLM(el, lm);
-        ke.SetIndices(lm);
-        
-        // assemble element matrix in global stiffness matrix
-        LS.Assemble(ke);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void FEFluidSolutesDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETimeInfo& tp, FEBodyForce& bf)
-{
-    // repeat over all solid elements
-    int NE = (int)m_Elem.size();
-    
-    for (int iel=0; iel<NE; ++iel)
-    {
-        FESolidElement& el = m_Elem[iel];
-        
-        // element stiffness matrix
-        FEElementMatrix ke(el);
-        
-        // create the element's stiffness matrix
-        const int nsol = m_pMat->Solutes();
-        const int ndpn = 4 + nsol;
-        int ndof = ndpn*el.Nodes();
-        ke.resize(ndof, ndof);
-        ke.zero();
-        
-        // calculate inertial stiffness
-        ElementBodyForceStiffness(bf, el, ke, tp);
+        ElementBodyForceStiffness(bf, el, ke);
         
         // get the element's LM vector
         vector<int> lm;
@@ -984,8 +1002,9 @@ void FEFluidSolutesDomain3D::BodyForceStiffness(FELinearSystem& LS, const FETime
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEFluidSolutesDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
+    const FETimeInfo& tp = GetFEModel()->GetTime();
     int i, i4, j, j4, n;
     
     // Get the current element's data
@@ -1007,7 +1026,7 @@ void FEFluidSolutesDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, c
     const double *gw = el.GaussWeights();
     
     double dt = tp.timeIncrement;
-    double ksi = tp.alpham/(tp.gamma*tp.alphaf);
+    double ksi = tp.alpham/(tp.gamma*tp.alphaf)*m_btrans;
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
@@ -1041,7 +1060,7 @@ void FEFluidSolutesDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke, c
         {
             for (j=0, j4 = 0; j<neln; ++j, j4 += ndpn)
             {
-                mat3d Mv = ((mat3dd(ksi*m_btrans/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
+                mat3d Mv = ((mat3dd(ksi/dt) + pt.m_Lf)*H[j] + mat3dd(gradN[j]*pt.m_vft))*(H[i]*dens*detJ);
                 vec3d mJ = pt.m_aft*(-H[i]*H[j]*dens/(pt.m_ef+1)*detJ);
                 
                 ke[i4  ][j4  ] += Mv(0,0);
@@ -1086,12 +1105,7 @@ void FEFluidSolutesDomain3D::Update(const FETimeInfo& tp)
         }
     }
     
-    // if we encountered an error, we request a running restart
-    if (berr)
-    {
-        if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-        throw DoRunningRestart();
-    }
+    if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -1195,9 +1209,10 @@ void FEFluidSolutesDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::InertialForces(FEGlobalVector& R)
 {
     int NE = (int)m_Elem.size();
+#pragma omp parallel for shared (NE)
     for (int i=0; i<NE; ++i)
     {
         // element force vector
@@ -1214,7 +1229,7 @@ void FEFluidSolutesDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo&
         fe.assign(ndof, 0);
         
         // calculate internal force vector
-        ElementInertialForce(el, fe, tp);
+        ElementInertialForce(el, fe);
         
         // get the element's LM vector
         UnpackLM(el, lm);
@@ -1225,7 +1240,7 @@ void FEFluidSolutesDomain3D::InertialForces(FEGlobalVector& R, const FETimeInfo&
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe, const FETimeInfo& tp)
+void FEFluidSolutesDomain3D::ElementInertialForce(FESolidElement& el, vector<double>& fe)
 {
     int i, n;
     

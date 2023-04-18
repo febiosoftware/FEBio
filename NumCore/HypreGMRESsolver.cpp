@@ -187,7 +187,7 @@ public:
 	// destroy preconditioner
 	void destroyPrecond()
 	{
-		HYPRE_BoomerAMGDestroy(precond);
+		if (precond) HYPRE_BoomerAMGDestroy(precond);
 	}
 
 	// allocate solver

@@ -41,6 +41,7 @@ FETimeInfo::FETimeInfo()
 	alpham = 1.0;
 	currentIteration = 0;
 	augmentation = 0;
+	timeStep = 0;
 }
 
 FETimeInfo::FETimeInfo(double time, double tinc)

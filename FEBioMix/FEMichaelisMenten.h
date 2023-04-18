@@ -27,10 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEMultiphasic.h"
-#include "FEBioFluid/FEFluidSolutes.h"
-#include "FEBioFluid/FESolutesMaterial.h"
-#include "FEBioFluid/FEMultiphasicFSI.h"
+#include "FEChemicalReaction.h"
 
 //-----------------------------------------------------------------------------
 //! Forward chemical reaction following Michaelis-Menten kinetics.
@@ -43,7 +40,7 @@ class FEBIOMIX_API FEMichaelisMenten : public FEChemicalReaction
 {
 public:
 	//! constructor
-	FEMichaelisMenten(FEModel* pfem) : FEChemicalReaction(pfem) {m_Rid = m_Pid = -1; m_Km = m_c0 = 0; m_Rtype = false; }
+	FEMichaelisMenten(FEModel* pfem);
 	
 	//! data initialization and checking
 	bool Init() override;

@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEGenericHyperelasticUC, FEUncoupledMaterial)
-	ADD_PARAMETER(m_exp, "W");
+	ADD_PARAMETER(m_exp, "W")->setUnits(UNIT_ENERGY);
 	ADD_PARAMETER(m_printDerivs, "print_derivs");
 END_FECORE_CLASS();
 
@@ -42,7 +42,13 @@ FEGenericHyperelasticUC::FEGenericHyperelasticUC(FEModel* fem) : FEUncoupledMate
 // initialization
 bool FEGenericHyperelasticUC::Init()
 {
-	vector<string> vars = { "I1", "I2" };
+	if (BuildMathExpressions() == false) return false;
+	return FEUncoupledMaterial::Init();
+}
+
+bool FEGenericHyperelasticUC::BuildMathExpressions()
+{
+	vector<string> vars = { "I1", "I2", "X", "Y", "Z" };
 
 	// add all user parameters
 	FEParameterList& pl = GetParameterList();
@@ -85,7 +91,18 @@ bool FEGenericHyperelasticUC::Init()
 		string sW22 = o2s.Convert(m_W22); feLog("W22 = %s\n", sW22.c_str());
 	}
 
-	return FEUncoupledMaterial::Init();
+	return true;
+}
+
+// serialization
+void FEGenericHyperelasticUC::Serialize(DumpStream& ar)
+{
+	FEUncoupledMaterial::Serialize(ar);
+	if ((ar.IsShallow() == false) && ar.IsLoading())
+	{
+		bool b = BuildMathExpressions();
+		assert(b);
+	}
 }
 
 //! Deviatoric Cauchy stress
@@ -108,7 +125,7 @@ mat3ds FEGenericHyperelasticUC::DevStress(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// get strain energy derivatives
-	vector<double> v = { I1, I2 };
+	vector<double> v = { I1, I2, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 	double W1 = m_W1.value_s(v);
 	double W2 = m_W2.value_s(v);
@@ -141,7 +158,7 @@ tens4ds FEGenericHyperelasticUC::DevTangent(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// get strain energy derivatives
-	vector<double> v = { I1, I2 };
+	vector<double> v = { I1, I2, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 	double W1 = m_W1.value_s(v);
 	double W2 = m_W2.value_s(v);
@@ -196,7 +213,7 @@ double FEGenericHyperelasticUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// evaluate (deviatoric) strain energy
-	vector<double> v = { I1, I2 };
+	vector<double> v = { I1, I2, mp.m_r0.x, mp.m_r0.y, mp.m_r0.z };
 	for (int i = 0; i < m_param.size(); ++i) v.push_back(*m_param[i]);
 	double W = m_W.value_s(v);
 

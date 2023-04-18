@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "FEElasticMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
-FEElasticMaterialPoint::FEElasticMaterialPoint()
+FEElasticMaterialPoint::FEElasticMaterialPoint(FEMaterialPointData* mp) : FEMaterialPointData(mp)
 {
 	m_F.unit();
 	m_J = 1;
@@ -38,10 +38,11 @@ FEElasticMaterialPoint::FEElasticMaterialPoint()
     m_v = m_a = m_gradJ = vec3d(0, 0, 0);
     m_buncoupled = false;
     m_Wt = m_Wp = 0;
+    m_p = 0;
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEElasticMaterialPoint::Copy()
+FEMaterialPointData* FEElasticMaterialPoint::Copy()
 {
 	FEElasticMaterialPoint* pt = new FEElasticMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -62,17 +63,17 @@ void FEElasticMaterialPoint::Init()
     
     m_Wt = m_Wp = 0;
 
-	m_rt = m_r0;
+    m_p = 0;
     
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init();
+    FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
 void FEElasticMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
-    ar & m_F & m_J & m_s & m_v & m_a & m_gradJ & m_L & m_Wt & m_Wp;
+	FEMaterialPointData::Serialize(ar);
+    ar & m_F & m_J & m_s & m_v & m_a & m_gradJ & m_L & m_Wt & m_Wp & m_p;
 }
 
 //-----------------------------------------------------------------------------

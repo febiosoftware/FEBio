@@ -29,9 +29,10 @@ SOFTWARE.*/
 #pragma once
 
 #include "FECore/LinearSolver.h"
+#include "numcore_api.h"
 
 namespace NumCore {
 
-void InitModule();
+	NUMCORE_API void InitModule();
 
 } // namespace NumCore

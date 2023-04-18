@@ -35,9 +35,10 @@ SOFTWARE.*/
 
 FEPowellOptimizeMethod* FEPowellOptimizeMethod::m_pThis = 0;
 
-//-----------------------------------------------------------------------------
-// FEPowellOptimizeMethod
-//-----------------------------------------------------------------------------
+FEPowellOptimizeMethod::FEPowellOptimizeMethod(FEModel* fem) : FEOptimizeMethod(fem)
+{
+
+}
 
 bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt, vector<double>& amin, vector<double>& ymin, double* minObj)
 {

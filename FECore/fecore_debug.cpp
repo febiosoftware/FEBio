@@ -30,6 +30,8 @@ SOFTWARE.*/
 #include "fecore_debug.h"
 #include <string>
 #include <iostream>
+#include <stdarg.h>
+#include "version.h"
 using namespace std;
 
 std::list<FECoreDebugger::Variable*>	FECoreDebugger::m_var;
@@ -110,6 +112,28 @@ void FECoreDebugger::Remove(FECoreDebugger::Variable* pvar)
 			m_var.erase(it);
 			break;
 		}
+	}
+}
+
+FILE* FECoreDebugger::m_fp = nullptr;
+
+void FECoreDebugger::Print(const char* szformat, ...)
+{
+	if (m_fp == nullptr)
+	{
+		char fileName[256] = { 0 };
+		sprintf(fileName, "febio_%d.%d.%d_debug.log", FE_SDK_MAJOR_VERSION, FE_SDK_SUB_VERSION, FE_SDK_SUBSUB_VERSION);
+		m_fp = fopen(fileName, "wt"); assert(m_fp);
+	}
+
+	if (m_fp)
+	{
+		va_list	args;
+		va_start(args, szformat);
+		vfprintf(m_fp, szformat, args);
+		va_end(args);
+
+		fflush(m_fp);
 	}
 }
 

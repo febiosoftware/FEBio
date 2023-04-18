@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include "fecore_api.h"
 #include "fecore_enum.h"
 #include "FECoreBase.h"
-using namespace std;
 
 //-----------------------------------------------------------------------------
 class FENewtonSolver;
@@ -42,7 +41,8 @@ class LinearSolver;
 //! A Base class for newton-type solution strategies
 class FECORE_API FENewtonStrategy : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FENEWTONSTRATEGY_ID)
+	FECORE_BASE_CLASS(FENewtonStrategy)
 
 public:
 	FENewtonStrategy(FEModel* fem);
@@ -52,6 +52,9 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
+	//! reset data for new run
+	virtual void Reset();
+
 public:
 	//! initialize the linear system
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type mtype);
@@ -59,11 +62,11 @@ public:
 	//! Presolve update
 	virtual void PreSolveUpdate() {}
 
-	//! perform a Newton udpate
-	virtual bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1) = 0;
+	//! perform a Newton udpate (returning false will force a matrix reformations)
+	virtual bool Update(double s, std::vector<double>& ui, std::vector<double>& R0, std::vector<double>& R1) = 0;
 
 	//! solve the equations
-	virtual void SolveEquations(vector<double>& x, vector<double>& b) = 0;
+	virtual void SolveEquations(std::vector<double>& x, std::vector<double>& b) = 0;
 
 	//! reform the stiffness matrix
 	virtual bool ReformStiffness();
@@ -80,6 +83,4 @@ public:
 
 protected:
 	FENewtonSolver*	m_pns;
-
-	DECLARE_FECORE_CLASS();
 };

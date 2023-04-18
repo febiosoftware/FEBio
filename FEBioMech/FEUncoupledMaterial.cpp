@@ -33,8 +33,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Material parameters for FEUncoupledMaterial
 BEGIN_FECORE_CLASS(FEUncoupledMaterial, FEElasticMaterial)
-	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
-    ADD_PARAMETER(m_npmodel, "pressure_model" );
+	ADD_PARAMETER(m_K      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE)->MakeTopLevel(true)->setLongName("bulk modulus");
+    ADD_PARAMETER(m_npmodel, "pressure_model")->setEnums("default\0NIKE3D\0Abaqus\0Abaqus (GOH)\0")->MakeTopLevel(true);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -81,7 +81,8 @@ mat3ds FEUncoupledMaterial::Stress(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// calculate the stress as a sum of deviatoric stress and pressure
-	return mat3dd(UJ(pt.m_J)) + DevStress(mp);
+    pt.m_p = UJ(pt.m_J);
+	return mat3dd(pt.m_p) + DevStress(mp);
 }
 
 //------------------------------------------------------------------------------
@@ -103,7 +104,7 @@ tens4ds FEUncoupledMaterial::Tangent(FEMaterialPoint &mp)
 	tens4ds I4  = dyad4s(I);
 	
 	// pressure
-	double p = UJ(pt.m_J);
+	pt.m_p = UJ(pt.m_J);
 	
 	// tangent is sum of three terms
 	// C = c_tilde + c_pressure + c_k
@@ -116,7 +117,7 @@ tens4ds FEUncoupledMaterial::Tangent(FEMaterialPoint &mp)
 	// but we do need to add it here.
 	//
 	//        c_tilde         c_pressure            c_k
-	return DevTangent(mp) + (IxI - I4*2)*p + IxI*(UJJ(pt.m_J)*pt.m_J);
+	return DevTangent(mp) + (IxI - I4*2)*pt.m_p + IxI*(UJJ(pt.m_J)*pt.m_J);
 }
 
 //-----------------------------------------------------------------------------
@@ -131,10 +132,29 @@ double FEUncoupledMaterial::StrainEnergyDensity(FEMaterialPoint &mp)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEUncoupledMaterial::CreateMaterialPointData()
+//! The strain energy density function calculates the total sed as a sum of
+//! two terms, namely the deviatoric sed and U(J).
+double FEUncoupledMaterial::StrongBondSED(FEMaterialPoint &mp)
 {
-	FEMaterialPoint* mp = FEElasticMaterial::CreateMaterialPointData();
-	FEElasticMaterialPoint& pt = *mp->ExtractData<FEElasticMaterialPoint>();
-	pt.m_buncoupled = true;
+    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // calculate the stress as a sum of deviatoric stress and pressure
+    return U(pt.m_J) + StrongBondDevSED(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! The strain energy density function calculates the total sed as a sum of
+//! two terms, namely the deviatoric sed and U(J).
+double FEUncoupledMaterial::WeakBondSED(FEMaterialPoint &mp)
+{
+    // calculate the stress as a sum of deviatoric stress and pressure
+    return WeakBondDevSED(mp);
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPointData* FEUncoupledMaterial::CreateMaterialPointData()
+{
+	FEElasticMaterialPoint* mp = new FEElasticMaterialPoint;
+	mp->m_buncoupled = true;
 	return mp;
 }

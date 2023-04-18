@@ -45,15 +45,15 @@ public:
 	//! map source data onto target data
 	//! output: tval - values at the target points
 	//! input: sval - values of the source points
-	virtual bool Map(std::vector<double>& tval, function<double(int sourceNode)> src) = 0;
+	virtual bool Map(std::vector<double>& tval, std::function<double(int sourceNode)> src) = 0;
 
-	virtual double Map(int inode, function<double(int sourceNode)> src) = 0;
-	virtual vec3d MapVec3d(int inode, function<vec3d(int sourceNode)> src) = 0;
+	virtual double Map(int inode, std::function<double(int sourceNode)> src) = 0;
+	virtual vec3d MapVec3d(int inode, std::function<vec3d(int sourceNode)> src) = 0;
 
-	double Map(function<double(int sourceNode)> f);
-	vec3d MapVec3d(function<vec3d(int sourceNode)> f);
+	double Map(std::function<double(int sourceNode)> f);
+	vec3d MapVec3d(std::function<vec3d(int sourceNode)> f);
 };
 
-inline double FEMeshDataInterpolator::Map(function<double(int sourceNode)> f) { return Map(0, f); }
-inline vec3d FEMeshDataInterpolator::MapVec3d(function<vec3d(int sourceNode)> f) { return MapVec3d(0, f); }
+inline double FEMeshDataInterpolator::Map(std::function<double(int sourceNode)> f) { return Map(0, f); }
+inline vec3d FEMeshDataInterpolator::MapVec3d(std::function<vec3d(int sourceNode)> f) { return MapVec3d(0, f); }
 

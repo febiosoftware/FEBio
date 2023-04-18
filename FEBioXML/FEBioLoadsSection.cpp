@@ -28,14 +28,15 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBioLoadsSection.h"
-#include <FEBioMech/FEPointBodyForce.h>
-#include <FEBioMech/FEPressureLoad.h>
+#include <FECore/FEBodyLoad.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FENodalLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEEdge.h>
+#include <FECore/FEBoundaryCondition.h>
+#include <FECore/FEPrescribedBC.h>
 #include <FECore/log.h>
 
 //=============================================================================
@@ -70,42 +71,15 @@ void FEBioLoadsSection1x::ParseBodyForce(XMLTag &tag)
 	const char* szt = tag.AttributeValue("type", true);
 	if (szt == 0) szt = "const";
 
-	if (strcmp(szt, "point") == 0)
-	{
-		FEPointBodyForce* pf = fecore_alloc(FEPointBodyForce, &fem);
-		FEParameterList& pl = pf->GetParameterList();
-		++tag;
-		do
-		{
-			if (tag == "a")
-			{
-				const char* szlc = tag.AttributeValue("lc");
-				//						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
-				value(tag, pf->m_a);
-			}
-			else if (tag == "node")
-			{
-				value(tag, pf->m_inode);
-				pf->m_inode -= 1;
-			}
-			else if (ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-			++tag;
-		} while (!tag.isend());
+	// create the body force
+	FEBodyLoad* pf = fecore_new<FEBodyLoad>(szt, &fem);
+	if (pf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
-		fem.AddBodyLoad(pf);
-	}
-	else
-	{
-		// create the body force
-		FEBodyLoad* pf = fecore_new<FEBodyLoad>(szt, &fem);
-		if (pf == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+	// add it to the model
+	fem.AddModelLoad(pf);
 
-		// add it to the model
-		fem.AddBodyLoad(pf);
-
-		// read the parameter list
-		ReadParameterList(tag, pf);
-	}
+	// read the parameter list
+	ReadParameterList(tag, pf);
 }
 
 //-----------------------------------------------------------------------------
@@ -115,7 +89,7 @@ void FEBioLoadsSection1x::ParseBodyLoad(XMLTag& tag)
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(tag.Name(), &fem);
 	if (pbl == 0) throw XMLReader::InvalidTag(tag);
 	ReadParameterList(tag, pbl);
-	fem.AddBodyLoad(pbl);
+	fem.AddModelLoad(pbl);
 }
 
 //-----------------------------------------------------------------------------
@@ -245,7 +219,7 @@ void FEBioLoadsSection2::ParseBodyLoad(XMLTag& tag)
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(sztype, &fem);
 	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 	ReadParameterList(tag, pbl);
-	fem.AddBodyLoad(pbl);
+	fem.AddModelLoad(pbl);
 }
 
 
@@ -367,7 +341,7 @@ void FEBioLoadsSection2::ParseSurfaceLoad(XMLTag& tag)
 			}
 			else throw XMLReader::InvalidTag(tag);
 		}
-		else ++tag;
+		++tag;
 	} 
 	while (!tag.isend());
 
@@ -434,10 +408,9 @@ void FEBioLoadsSection2::ParseSurfaceLoadSurface(XMLTag& tag, FESurface* psurf)
 
 				psurf->CreateMaterialPointData();
 			}
-
-			++tag2;
 		}
-		else tag2.m_preader->SkipTag(tag2);
+		else tag2.skip();
+		++tag2;
 	}
 	while (!tag2.isend());
 }
@@ -565,7 +538,7 @@ void FEBioLoadsSection25::ParseBodyLoad(XMLTag& tag)
 	}
 
 	ReadParameterList(tag, pbl);
-	fem.AddBodyLoad(pbl);
+	fem.AddModelLoad(pbl);
 }
 
 //-----------------------------------------------------------------------------
@@ -638,7 +611,7 @@ void FEBioLoadsSection25::ParseSurfaceLoad(XMLTag& tag)
 			{
 				if (ReadParameter(tag, psl) == false)
 				{
-					if ((tag == "value") && (dynamic_cast<FEPressureLoad*>(psl)))
+					if ((tag == "value") && (strcmp(psl->GetTypeStr(), "pressure") == 0))
 					{
 						feLogWarningEx((&fem), "The value parameter of the pressure load is deprecated.");
 
@@ -708,12 +681,8 @@ void FEBioLoadsSection25::ParseObsoleteLoad(XMLTag& tag)
 	// this "load" was moved to the boundary section
 	if (strcmp(sztype, "fluid rotational velocity") == 0)
 	{
-		FEBoundaryCondition* pbc = fecore_new<FEBoundaryCondition>(sztype, fem);
+		FEPrescribedNodeSet* pbc = fecore_new<FEPrescribedNodeSet>(sztype, fem);
 		if (pbc == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-		// get the node_set property
-		FEProperty* prop = pbc->FindProperty("node_set");
-		if (prop == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 		// get the surface
 		const char* szset = tag.AttributeValue("surface");
@@ -722,13 +691,13 @@ void FEBioLoadsSection25::ParseObsoleteLoad(XMLTag& tag)
 
 		// extract the nodeset from the surface
 		FENodeList nodeList = pface->GetNodeList();
-		FENodeSet* nodeSet = fecore_alloc(FENodeSet, fem);
+		FENodeSet* nodeSet = new FENodeSet(fem);
 		nodeSet->SetName(pface->GetName());
 		nodeSet->Add(nodeList);
 		mesh.AddNodeSet(nodeSet);
 
-		// assign the surface
-		prop->SetProperty(nodeSet);
+		// assign the node set
+		pbc->SetNodeSet(nodeSet);
 
 		// Read the parameter list
 		ReadParameterList(tag, pbc);

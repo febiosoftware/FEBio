@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FERigidFollowerForce.h"
 #include "FERigidBody.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEMaterial.h"
 #include "FECore/FELoadCurve.h"
@@ -35,15 +34,15 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidFollowerForce, FEModelLoad);
-    ADD_PARAMETER(m_rid      , "rb"       );
+BEGIN_FECORE_CLASS(FERigidFollowerForce, FERigidLoad);
+    ADD_PARAMETER(m_rid      , "rb"       )->setEnums("$(rigid_materials)");
     ADD_PARAMETER(m_X        , "insertion");
     ADD_PARAMETER(m_f        , "force"    );
     ADD_PARAMETER(m_brelative, "relative" );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidFollowerForce::FERigidFollowerForce(FEModel* pfem) : FEModelLoad(pfem)
+FERigidFollowerForce::FERigidFollowerForce(FEModel* pfem) : FERigidLoad(pfem)
 {
     m_rid = -1;
     m_X = m_f = vec3d(0,0,0);
@@ -76,10 +75,11 @@ void FERigidFollowerForce::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidFollowerForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidFollowerForce::LoadVector(FEGlobalVector& R)
 {
     FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
     FERigidBody& body = *fem.GetRigidBody(m_rid);
+    const FETimeInfo& tp = fem.GetTime();
 
     double alpha = tp.alphaf;
     
@@ -114,11 +114,12 @@ void FERigidFollowerForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! Stiffness matrix
 //! TODO: Only the stiffness contribution in the were the axial forces are applied
 //!       to the center of mass has been implemented.
-void FERigidFollowerForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidFollowerForce::StiffnessMatrix(FELinearSystem& LS)
 {
     FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
     FERigidBody& body = *fem.GetRigidBody(m_rid);
 
+    const FETimeInfo& tp = fem.GetTime();
     double alpha = tp.alphaf;
     
     // get the attachment position in global coordinates for body A

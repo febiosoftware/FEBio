@@ -30,26 +30,21 @@ SOFTWARE.*/
 #include "FETimeStepController.h"
 #include "FELoadCurve.h"
 #include "FEAnalysis.h"
-#include "FEModel.h"
 #include "FEPointFunction.h"
 #include "DumpStream.h"
+#include "FEModel.h"
 #include "log.h"
-
-#define MIN(a,b) ((a)<(b) ? (a) : (b))
-#define MAX(a,b) ((a)>(b) ? (a) : (b))
-
-REGISTER_SUPER_CLASS(FETimeStepController, FETIMECONTROLLER_ID);
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FETimeStepController, FEParamContainer)
-	ADD_PARAMETER(m_maxretries, "max_retries");
-	ADD_PARAMETER(m_iteopt    , "opt_iter");
-	ADD_PARAMETER(m_dtmin     , "dtmin");
-	ADD_PARAMETER(m_dtmax     , "dtmax");
+	ADD_PARAMETER(m_maxretries, "max_retries")->setLongName("max retries");
+	ADD_PARAMETER(m_iteopt    , "opt_iter")->setLongName("optimal iterations");
+	ADD_PARAMETER(m_dtmin     , "dtmin")->setLongName("min stepsize");
+	ADD_PARAMETER(m_dtmax     , "dtmax")->setLongName("max stepsize");
 	ADD_PARAMETER(m_naggr     , "aggressiveness");
 	ADD_PARAMETER(m_cutback   , "cutback");
 	ADD_PARAMETER(m_dtforce   , "dtforce");
-	ADD_PARAMETER(m_must_points, "must_points");
+//	ADD_PARAMETER(m_must_points, "must_points");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -64,10 +59,13 @@ FETimeStepController::FETimeStepController(FEModel* fem) : FECoreBase(fem)
 	m_next_must = -1;
 	m_nmplc = -1;
 	m_iteopt = 11;
-	m_dtmax = m_dtmin = 0;
+	m_dtmin = 0;
+	m_dtmax = 0.1;
 
 	m_ddt = 0;
 	m_dtp = 0;
+	m_mp_repeat = false;
+	m_mp_toff = 0.0;
 
 	m_dtforce = false;
 }
@@ -113,6 +111,12 @@ bool FETimeStepController::Init()
 		m_nmplc = plc->GetID();
 		fem->DetachLoadController(p);
 
+		// print a warning that dtmax is ignored
+		if (m_dtmax != 0)
+		{
+			feLogWarning("dtmax is ignored when specifying must points.");
+		}
+
 		// if a must-point curve is defined and the must-points are empty,
 		// we copy the load curve points to the must-points
 		if (m_must_points.empty())
@@ -120,12 +124,17 @@ bool FETimeStepController::Init()
 			FELoadCurve* lc = dynamic_cast<FELoadCurve*>(plc);
 			if (lc)
 			{
-				FEPointFunction& f = lc->GetFunction();
+				PointCurve& f = lc->GetFunction();
+				// make sure we have at least two points
+				if (f.Points() < 2) return false;
 				for (int i = 0; i < f.Points(); ++i)
 				{
-					double ti = f.LoadPoint(i).time;
+					double ti = f.Point(i).x();
 					m_must_points.push_back(ti);
 				}
+
+				// check for repeat setting
+				if (f.GetExtendMode() == PointCurve::REPEAT) m_mp_repeat = true;
 			}
 		}
 	}
@@ -143,6 +152,7 @@ void FETimeStepController::Reset()
 	m_dtp = m_step->m_dt0;
 	m_nmust = -1;
 	m_next_must = -1;
+	m_mp_toff = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -204,7 +214,7 @@ void FETimeStepController::AutoTimeStep(int niter)
 	if (m_nmplc >= 0)
 	{
 		FELoadCurve& mpc = *(dynamic_cast<FELoadCurve*>(fem->GetLoadController(m_nmplc)));
-		FEPointFunction& lc = mpc.GetFunction();
+		PointCurve& lc = mpc.GetFunction();
 		dtmax = lc.value(told);
 	}
 
@@ -221,23 +231,28 @@ void FETimeStepController::AutoTimeStep(int niter)
 		// Adjust time step size
 		if (scale >= 1)
 		{
-			dtn = dtn + (dtmax - dtn)*MIN(.20, scale - 1);
-			dtn = MIN(dtn, 5.0*m_dtp);
-			dtn = MIN(dtn, dtmax);
+			dtn = dtn + (dtmax - dtn) * MIN(.20, scale - 1);
+			dtn = MIN(dtn, 5.0 * m_dtp);
+			if (dtmax > 0) dtn = MIN(dtn, dtmax);
 		}
 		else
 		{
-			dtn = dtn - (dtn - m_dtmin)*(1 - scale);
-			dtn = MAX(dtn, m_dtmin);
-			dtn = MIN(dtn, dtmax);
+			dtn = dtn - (dtn - m_dtmin) * (1 - scale);
+			if (m_dtmin > 0) dtn = MAX(dtn, m_dtmin);
+			if (dtmax   > 0) dtn = MIN(dtn, dtmax);
 		}
-
-		// Report new time step size
-		if (dtn > dt)
-			feLogEx(fem, "\nAUTO STEPPER: increasing time step, dt = %lg\n\n", dtn);
-		else if (dtn < dt)
-			feLogEx(fem, "\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
+	} 
+	else if (niter == 0)
+	{
+		if (m_dtmin > 0) dtn = MAX(dtn, m_dtmin);
+		if (dtmax   > 0) dtn = MIN(dtn, dtmax);
 	}
+
+	// Report new time step size
+	if (dtn > dt)
+		feLogEx(fem, "\nAUTO STEPPER: increasing time step, dt = %lg\n\n", dtn);
+	else if (dtn < dt)
+		feLogEx(fem, "\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
 
 	// Store this time step value. This is the value that will be used to evaluate
 	// the next time step increment. This will not include adjustments due to the must-point
@@ -256,6 +271,7 @@ void FETimeStepController::AutoTimeStep(int niter)
 	}
 
 	// store time step size
+	assert(dtn > 0);
 	m_step->m_dt = dtn;
 }
 
@@ -269,54 +285,53 @@ void FETimeStepController::AutoTimeStep(int niter)
 double FETimeStepController::CheckMustPoints(double t, double dt)
 {
 	FEModel* fem = m_step->GetFEModel();
+	const double eps = m_step->m_tend * 1e-12;
 
-	double tnew = t + dt;
-	double dtnew = dt;
-	const double eps = m_step->m_tend*1e-12;
-	double tmust = tnew + eps;
 	m_nmust = -1;
 	const int points = (int)m_must_points.size();
-	if (m_next_must < points)
+
+	if (m_next_must >= points)
 	{
-		double lp;
-		if (m_next_must < 0)
+		if (m_mp_repeat)
 		{
-			// find the first must-point that is on or past this time
-			m_next_must = 0;
-			bool bfound = false;
-			do
+			m_mp_toff += m_must_points.back();
+			m_next_must = -1;
+		}
+		else return dt;
+	}
+
+	// set the first must-point if it has not been set
+	if (m_next_must < 0)
+	{
+		m_next_must = 0;
+		while ((m_next_must < points) && (m_must_points[m_next_must] + m_mp_toff < t + eps))
+		{
+			m_next_must++;
+			if (m_next_must >= points)
 			{
-				lp = m_must_points[m_next_must];
-				if ((tmust > lp) && (fabs(tnew - lp) > 1e-12)) ++m_next_must;
-				else bfound = true;
-			} while ((bfound == false) && (m_next_must < points));
-
-			// make sure we did not pass all must points
-			if (m_next_must >= points) return dt;
-		}
-		else lp = m_must_points[m_next_must];
-
-		// TODO: what happens when dtnew < dtmin and the next time step fails??
-		if (tmust > lp)
-		{
-			dtnew = lp - t;
-			feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
-			m_nmust = m_next_must++;
-		}
-		else if (fabs(tnew - lp) < 1e-12)
-		{
-			m_nmust = m_next_must++;
-			tnew = lp;
-			dtnew = tnew - t;
-			feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
-		}
-		else if (tnew > m_step->m_tend)
-		{
-			dtnew = m_step->m_tend - t;
-			feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
-			m_nmust = m_next_must++;
+				if (m_mp_repeat)
+				{
+					m_next_must = 0;
+					m_mp_toff += m_must_points.back();
+				}
+				else return dt;
+			}
 		}
 	}
+
+	assert(m_next_must < points);
+	double tmust = m_must_points[m_next_must] + m_mp_toff;
+	assert(tmust + eps > t);
+
+	double dtnew = dt;
+	double tnew = t + dt;
+	if (tmust < tnew + eps)
+	{
+		dtnew = tmust - t;
+		feLogEx(fem, "MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtnew);
+		m_nmust = m_next_must++;
+	}
+
 	return dtnew;
 }
 
@@ -329,6 +344,8 @@ void FETimeStepController::Serialize(DumpStream& ar)
 	ar & m_nmplc;
 	ar & m_nmust;
 	ar & m_next_must;
+	ar & m_mp_toff;
+	ar & m_mp_repeat;
 	ar & m_ddt & m_dtp;
 	ar & m_step;
 	ar & m_must_points;

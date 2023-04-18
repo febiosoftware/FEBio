@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "FEFluidSolutesDomainFactory.h"
 #include "FEFluidSolutes.h"
 #include "FEFluidDomain.h"
-#include <FECore/FEDomain.h>
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 FEDomain* FEFluidSolutesDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
@@ -48,7 +48,7 @@ FEDomain* FEFluidSolutesDomainFactory::CreateDomain(const FE_Element_Spec& spec,
     
     if (sztype)
     {
-        FEDomain* pd = fecore_new<FEDomain>(sztype, pfem);
+        FEDomain* pd = fecore_new<FESolidDomain>(sztype, pfem);
         if (pd) pd->SetMaterial(pmat);
         return pd;
     }

@@ -28,12 +28,11 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESoluteConvectiveFlow.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEElemElemList.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/FEGlobalVector.h"
-#include "FECore/log.h"
 #include "FECore/LinearSolver.h"
+#include <FECore/FEModel.h>
 #include "FEBioFluidSolutes.h"
 
 //=============================================================================
@@ -45,15 +44,12 @@ END_FECORE_CLASS();
 //! constructor
 FESoluteConvectiveFlow::FESoluteConvectiveFlow(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
-    m_sol = 0;
-    m_gamma = 0.5;
-    m_dt = 0;
+    m_sol = -1;
     
     m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
-    m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
+    m_dofEF = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
+    m_dofC = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
 }
-
 
 //-----------------------------------------------------------------------------
 //! initialize
@@ -65,7 +61,7 @@ bool FESoluteConvectiveFlow::Init()
     int MAX_CDOFS = fedofs.GetVariableSize(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
     if ((m_sol < 1) || (m_sol > MAX_CDOFS)) return false;
     
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
     m_octree = new FEOctreeSearch(&mesh);
     m_octree->Init();
     
@@ -88,7 +84,7 @@ void FESoluteConvectiveFlow::Activate()
     int dofc = m_dofC + m_sol - 1;
     
     FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
     
     for (int i=0; i<mesh.Nodes(); ++i)
     {
@@ -101,14 +97,19 @@ void FESoluteConvectiveFlow::Activate()
             node.set_bc(dofc, DOF_PRESCRIBED);
         }
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------
 // return nodal value
 void FESoluteConvectiveFlow::Update()
 {
-    FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
+    FEMesh& mesh = GetMesh();
+
+    const FETimeInfo& tp = GetTimeInfo();
+    double gamma = tp.gamma;
+    double dt = tp.timeIncrement;
     
     for (int i=0; i<mesh.Nodes(); ++i)
     {
@@ -118,7 +119,7 @@ void FESoluteConvectiveFlow::Update()
             vec3d vt = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
             vec3d vp = node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2]);
             
-            vec3d X = x - (vt*m_gamma + vp*(1-m_gamma))*m_dt;
+            vec3d X = x - (vt*gamma + vp*(1-gamma))*dt;
             
             int dofc = m_dofC + m_sol - 1;
             double r[3] = { 0 };
@@ -141,7 +142,6 @@ void FESoluteConvectiveFlow::Update()
             }
             // if solid element is not found, project x onto the solute inlet surface
             else {
-                vec2d r2;
                 FESurfaceElement* pme;
                 vec3d n = x - X;
                 n.unit();
@@ -174,4 +174,6 @@ void FESoluteConvectiveFlow::Update()
 void FESoluteConvectiveFlow::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofW & m_dofEF & m_dofC;
 }

@@ -1,0 +1,60 @@
+/*This file is part of the FEBio source code and is licensed under the MIT license
+ listed below.
+ 
+ See Copyright-FEBio.txt for details.
+ 
+ Copyright (c) 2022 University of Utah, The Trustees of Columbia University in
+ the City of New York, and others.
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.*/
+
+#pragma once
+#include <FECore/FEModel.h>
+#include <FECore/FEMaterial.h>
+#include "febiofluid_api.h"
+
+//-----------------------------------------------------------------------------
+//! Polar fluid material point class.
+//
+class FEBIOFLUID_API FEPolarFluidMaterialPoint : public FEMaterialPointData
+{
+public:
+    //! constructor
+    FEPolarFluidMaterialPoint(FEMaterialPointData* pt = 0);
+    
+    //! create a shallow copy
+	FEMaterialPointData* Copy();
+    
+    //! data serialization
+    void Serialize(DumpStream& ar);
+    
+    //! Data initialization
+    void Init();
+    
+public:
+    mat3da RelativeSpin() { return mat3da(m_hf); }
+    
+public:
+    // polar fluid data
+    vec3d       m_gf;       //!< fluid angular velocity
+    vec3d       m_gfdot;    //!< fluid angular acceleration
+    vec3d       m_hf;       //!< fluid relative angular velocity
+    mat3da      m_sfa;      //!< antisymmetric part of fluid stress
+    mat3d       m_Psi;      //!< gradient of fluid angular velocity
+};

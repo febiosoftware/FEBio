@@ -43,22 +43,38 @@ FEInSituStretchGradient::FEInSituStretchGradient(FEModel* pfem) : FEPrestrainGra
 //-----------------------------------------------------------------------------
 bool FEInSituStretchGradient::Init()
 {
+	m_fiber = GetFiberProperty();
+	if (m_fiber == nullptr) return false;
+	return FEPrestrainGradient::Init();
+}
+
+//-----------------------------------------------------------------------------
+FEVec3dValuator* FEInSituStretchGradient::GetFiberProperty()
+{
 	// make sure the parent material is a prestrain material
 	FEPrestrainMaterial* prestrainMat = dynamic_cast<FEPrestrainMaterial*>(GetParent());
-	if (prestrainMat == nullptr) return false;
+	if (prestrainMat == nullptr) return nullptr;
 
 	// get the elastic property
 	FEElasticMaterial* elasticMat = prestrainMat->GetElasticMaterial();
 
 	// make sure it has a fiber property
-	FEParam* fiberProp = elasticMat->FindParameter("fiber");
-	if (fiberProp == nullptr) return false;
+	FEVec3dValuator* fiberProp = dynamic_cast<FEVec3dValuator*>(elasticMat->GetProperty("fiber"));
+	if (fiberProp == nullptr) return nullptr;
 
 	// make sure it's a vector map
-	if (fiberProp->type() != FE_PARAM_VEC3D_MAPPED) return false;
-	m_fiber = &(fiberProp->value<FEParamVec3>());
+	return fiberProp;
+}
 
-	return FEPrestrainGradient::Init();
+//-----------------------------------------------------------------------------
+void FEInSituStretchGradient::Serialize(DumpStream& ar)
+{
+	FEPrestrainGradient::Serialize(ar);
+	if ((ar.IsShallow() == false) && ar.IsLoading())
+	{
+		m_fiber = GetFiberProperty();
+		assert(m_fiber);
+	}
 }
 
 //-----------------------------------------------------------------------------

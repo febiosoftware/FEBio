@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include "FENodeSet.h"
 #include "FEDofList.h"
 
@@ -38,9 +38,10 @@ class FEFacetSet;
 //! whether or not the dofs of the node will be assigned an equation number. 
 //! Currently, there are two boundary conditions: a fixed (FEFixedBC) and a
 //! prescribed (FEPrescribedBC) boundary condition. 
-class FECORE_API FEBoundaryCondition : public FEModelComponent
+class FECORE_API FEBoundaryCondition : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEBC_ID)
+	FECORE_BASE_CLASS(FEBoundaryCondition);
 
 public:
 	//! constructor
@@ -59,6 +60,17 @@ public:
     virtual void Repair() {}
 
 	void Serialize(DumpStream& ar) override;
+
+	// TODO: Temporary construction to update some special boundary conditions in FEModel::Update
+	//       Will likely remove this at some point.
+	virtual void UpdateModel() {}
+
+
+public:
+	// set the dof list
+	void SetDOFList(int ndof);
+	void SetDOFList(const std::vector<int>& dofs);
+	void SetDOFList(const FEDofList& dofs);
 
 	const FEDofList& GetDofList() const { return m_dof; }
 

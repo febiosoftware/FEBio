@@ -45,6 +45,14 @@ bool FELinearElasticFluid::Init()
 }
 
 //-----------------------------------------------------------------------------
+// serialization
+void FELinearElasticFluid::Serialize(DumpStream& ar)
+{
+    if (ar.IsShallow()) return;
+    ar & m_k & m_rhor;
+}
+
+//-----------------------------------------------------------------------------
 //! gage pressure
 double FELinearElasticFluid::Pressure(FEMaterialPoint& mp)
 {

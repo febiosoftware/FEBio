@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEMaterial.h"
 #include "tools.h"
 #include "log.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem), m_dofU(pfem), m_dofSU(pfem)
@@ -396,9 +397,9 @@ void FESolidDomain::GetCurrentNodalCoordinates(const FESolidElement& el, vec3d* 
 		{
 			if (el.m_bitfc[i]) {
 				FENode& nd = m_pMesh->Node(el.m_node[i]);
-				rt[i] -= nd.m_d0 + rt[i] - nd.m_r0
-					- nd.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2])*alpha
-					- nd.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2])*(1 - alpha);
+				rt[i] = nd.m_r0 - nd.m_d0 \
+					+ nd.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2])*alpha \
+					+ nd.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2])*(1 - alpha);
 			}
 		}
 	}
@@ -990,8 +991,9 @@ double FESolidDomain::defgradp(FESolidElement &el, mat3d &F, int n)
 	GetPreviousNodalCoordinates(el, r);
     
     // calculate inverse jacobian
-    double Ji[3][3];
-    invjac0(el, Ji, n);
+//    double Ji[3][3];
+//    invjac0(el, Ji, n);
+	mat3d& Ji = el.m_J0i[n];
 
 	// shape function derivatives
 	double *Grn = el.Gr(n);
@@ -2533,11 +2535,10 @@ void FESolidDomain::LoadVector(
 
 	// degrees of freedom per node
 	int dofPerNode = dofList.Size();
-	std::vector<double> val(dofPerNode, 0.0);
 
 	// loop over all the elements
 	int NE = Elements();
-	//#pragma omp parallel for 
+	#pragma omp parallel for 
 	for (int i = 0; i<NE; ++i)
 	{
 		// get the next element
@@ -2547,6 +2548,8 @@ void FESolidDomain::LoadVector(
 		// only consider active elements
 		if (el.isActive()) 
 		{
+			std::vector<double> val(dofPerNode, 0.0);
+
 			// total size of the element vector
 			int ndof = dofPerNode * el.Nodes();
 

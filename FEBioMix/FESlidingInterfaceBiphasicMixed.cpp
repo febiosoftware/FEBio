@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FECore/log.h"
 #include <FEBioMech/FEBioMech.h>
 #include "FEBioMix.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
@@ -85,23 +86,18 @@ FESlidingSurfaceBiphasicMixed::Data::Data()
 void FESlidingSurfaceBiphasicMixed::Data::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactPoint::Serialize(ar);
-	ar & m_gap;
 	ar & m_dg;
-	ar & m_nu;
+    ar & m_Lmd;
+    ar & m_Lmt;
+    ar & m_epsn;
+    ar & m_epsp;
+    ar & m_p1;
+    ar & m_nu;
 	ar & m_s1;
+    ar & m_tr;
 	ar & m_rs;
 	ar & m_rsp;
-	ar & m_Lmd;
-	ar & m_Lmt;
-	ar & m_Lmp;
-	ar & m_epsn;
-	ar & m_epsp;
-	ar & m_pg;
-	ar & m_p1;
-	ar & m_Ln;
-	ar & m_bstick;
-	ar & m_tr;
-	ar & m_mueff;
+    ar & m_bstick;
 }
 
 //-----------------------------------------------------------------------------
@@ -600,6 +596,10 @@ FESlidingInterfaceBiphasicMixed::FESlidingInterfaceBiphasicMixed(FEModel* pfem) 
 
     m_dofP = pfem->GetDOFIndex("p");
     
+    // set parents
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
+
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
 }

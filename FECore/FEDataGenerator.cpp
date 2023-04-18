@@ -35,23 +35,42 @@ SOFTWARE.*/
 #include "FEElementSet.h"
 #include "log.h"
 
-REGISTER_SUPER_CLASS(FEDataGenerator, FEDATAGENERATOR_ID);
-
-FEDataGenerator::FEDataGenerator(FEModel* fem) : FECoreBase(fem)
+FEMeshDataGenerator::FEMeshDataGenerator(FEModel* fem) : FEModelComponent(fem)
 {
 }
 
-FEDataGenerator::~FEDataGenerator()
+FEMeshDataGenerator::~FEMeshDataGenerator()
 {
 }
 
-bool FEDataGenerator::Init()
+bool FEMeshDataGenerator::Init()
 {
 	return true;
 }
 
+void FEMeshDataGenerator::Evaluate(double time)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+FENodeDataGenerator::FENodeDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
+{
+	m_nodeSet = nullptr;
+}
+
+void FENodeDataGenerator::SetNodeSet(FENodeSet* nodeSet)
+{
+	m_nodeSet = nodeSet;
+}
+
+FENodeSet* FENodeDataGenerator::GetNodeSet()
+{
+	return m_nodeSet;
+}
+
 // generate the data array for the given node set
-bool FEDataGenerator::Generate(FENodeDataMap& map)
+bool FENodeDataGenerator::Generate(FENodeDataMap& map)
 {
 	const FENodeSet& set = *map.GetNodeSet();
 	int N = set.Size();
@@ -76,8 +95,38 @@ bool FEDataGenerator::Generate(FENodeDataMap& map)
 	return true;
 }
 
+FENodeDataMap* FENodeDataGenerator::Generate()
+{
+	assert(false);
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+FEEdgeDataGenerator::FEEdgeDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+FEFaceDataGenerator::FEFaceDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
+{
+	m_surf = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+void FEFaceDataGenerator::SetFacetSet(FEFacetSet* surf)
+{
+	m_surf = surf;
+}
+
+FEFacetSet* FEFaceDataGenerator::GetFacetSet()
+{
+	return m_surf;
+}
+
+//-----------------------------------------------------------------------------
 // generate the data array for the given facet set
-bool FEDataGenerator::Generate(FESurfaceMap& map)
+bool FEFaceDataGenerator::Generate(FESurfaceMap& map)
 {
 	const FEFacetSet& surf = *map.GetFacetSet();
 
@@ -109,8 +158,24 @@ bool FEDataGenerator::Generate(FESurfaceMap& map)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+FESurfaceMap* FEFaceDataGenerator::Generate()
+{
+	assert(false);
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+FEElemDataGenerator::FEElemDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
+{
+	m_elemSet = nullptr;
+}
+
+void FEElemDataGenerator::SetElementSet(FEElementSet* elset) { m_elemSet = elset; }
+FEElementSet* FEElemDataGenerator::GetElementSet() { return m_elemSet; }
+
 // generate the data array for the given element set
-bool FEDataGenerator::Generate(FEDomainMap& map)
+bool FEElemDataGenerator::Generate(FEDomainMap& map)
 {
 	const FEElementSet& set = *map.GetElementSet();
 
@@ -181,4 +246,10 @@ bool FEDataGenerator::Generate(FEDomainMap& map)
 		};
 	}
 	return true;
+}
+
+FEDomainMap* FEElemDataGenerator::Generate()
+{
+	assert(false);
+	return nullptr;
 }

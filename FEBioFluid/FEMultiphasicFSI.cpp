@@ -260,10 +260,10 @@ bool solvepolyMP(int n, vector<double> a, double& x)
 //============================================================================
 // FEFSIMaterialPoint
 //============================================================================
-FEMultiphasicFSIMaterialPoint::FEMultiphasicFSIMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+FEMultiphasicFSIMaterialPoint::FEMultiphasicFSIMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMultiphasicFSIMaterialPoint::Copy()
+FEMaterialPointData* FEMultiphasicFSIMaterialPoint::Copy()
 {
     FEMultiphasicFSIMaterialPoint* pt = new FEMultiphasicFSIMaterialPoint(*this);
     if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -273,7 +273,7 @@ FEMaterialPoint* FEMultiphasicFSIMaterialPoint::Copy()
 //-----------------------------------------------------------------------------
 void FEMultiphasicFSIMaterialPoint::Serialize(DumpStream& ar)
 {
-    FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
     ar & m_nsol & m_psi & m_Ie & m_cF & m_pe;
     ar & m_c & m_ca & m_gradc & m_j & m_cdot & m_k & m_dkdJ;
     ar & m_dkdc;
@@ -298,7 +298,18 @@ void FEMultiphasicFSIMaterialPoint::Init()
     m_dkdJc.clear();
     m_dkdcc.clear();
     
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
+}
+
+//-----------------------------------------------------------------------------
+double FEMultiphasicFSIMaterialPoint::Osmolarity() const
+{
+    double ew = 0.0;
+    for (int isol = 0; isol < (int)m_ca.size(); ++isol)
+    {
+        ew += m_ca[isol];
+    }
+    return ew;
 }
 
 //============================================================================
@@ -319,7 +330,7 @@ FEMultiphasicFSI::FEMultiphasicFSI(FEModel* pfem) : FEBiphasicFSI(pfem)
 
 //-----------------------------------------------------------------------------
 // returns a pointer to a new material point object
-FEMaterialPoint* FEMultiphasicFSI::CreateMaterialPointData()
+FEMaterialPointData* FEMultiphasicFSI::CreateMaterialPointData()
 {
     FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint(m_pSolid->CreateMaterialPointData());
     FEFSIMaterialPoint* fst = new FEFSIMaterialPoint(fpt);
@@ -333,13 +344,6 @@ FEMaterialPoint* FEMultiphasicFSI::CreateMaterialPointData()
 // initialize
 bool FEMultiphasicFSI::Init()
 {
-    // we first have to set the parent material
-    // TODO: This seems redundant since each material already has a pointer to its parent
-    for (int i=0; i<Reactions(); ++i)
-    {
-        m_pReact[i]->m_pMF = this;
-    }
-    
     // set the solute IDs first, since they are referenced in FESolute::Init()
     for (int i = 0; i<Solutes(); ++i) {
         m_pSolute[i]->SetSoluteLocalID(i);
@@ -382,13 +386,6 @@ void FEMultiphasicFSI::Serialize(DumpStream& ar)
     
     ar & m_Rgas & m_Tabs & m_Fc;
     ar & m_zmin & m_ndeg;
-    
-    if (ar.IsLoading())
-    {
-        // restore the m_pMP pointers for reactions
-        int NR = (int) m_pReact.size();
-        for (int i=0; i<NR; ++i) m_pReact[i]->m_pMF = this;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -785,4 +782,14 @@ vec3d FEMultiphasicFSI::SoluteFlux(FEMaterialPoint& pt, const int sol)
 void FEMultiphasicFSI::AddChemicalReaction(FEChemicalReaction* pcr)
 {
     m_pReact.push_back(pcr);
+}
+
+//-----------------------------------------------------------------------------
+double FEMultiphasicFSI::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+    const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+    const FEMultiphasicFSIMaterialPoint* mfspt = mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    const FEBiphasicFSIMaterialPoint* bfspt = mp.ExtractData<FEBiphasicFSIMaterialPoint>();
+    double cf = (ept->m_J - bfspt->m_phi0) * mfspt->m_cF / (1 - bfspt->m_phi0);
+    return cf;
 }

@@ -37,7 +37,11 @@ private:
 	T**	m_pc;	//!< pointer to pointer of property
 
 public:
-	FEPropertyT(T** ppc) : FEProperty(T::classID()) { m_pc = ppc; }
+	FEPropertyT(T** ppc) : FEProperty(T::superClassID())
+	{ 
+		m_pc = ppc; 
+		m_className = T::BaseClassName();
+	}
 
 	bool IsArray() const override { return false; }
 	bool IsType(FECoreBase* pc) const override { return (dynamic_cast<T*>(pc) != nullptr); }
@@ -81,6 +85,63 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+template <class T>
+class FEFixedPropertyT : public FEProperty
+{
+private:
+	T* m_pc;	//!< pointer to property
+
+public:
+	FEFixedPropertyT(T* ppc) : FEProperty(T::superClassID())
+	{
+		m_pc = ppc;
+		m_className = T::BaseClassName();
+	}
+
+	bool IsArray() const override { return false; }
+	bool IsType(FECoreBase* pc) const override { return (dynamic_cast<T*>(pc) != nullptr); }
+	void SetProperty(FECoreBase* pc) override
+	{
+		assert(m_pc == nullptr);
+		m_pc = dynamic_cast<T*>(pc);
+		pc->SetParent(GetParent());
+	}
+	int size() const override { return (m_pc == 0 ? 0 : 1); }
+
+	FECoreBase* get(int i) override { return m_pc; }
+	FECoreBase* get(const char* szname) override
+	{
+		if (m_pc->GetName() == std::string(szname))
+			return m_pc;
+		else
+			return 0;
+	}
+
+	FECoreBase* getFromID(int nid) override
+	{
+		if (m_pc && (m_pc->GetID() == nid)) return m_pc; else return nullptr;
+	}
+
+	void Serialize(DumpStream& ar) override
+	{
+		assert(m_pc);
+		ar & (*m_pc);
+	}
+
+	bool Init() override
+	{
+		if (m_pc) { return m_pc->Init(); }
+		else return false;
+	}
+
+	bool Validate() override
+	{
+		if (m_pc) return m_pc->Validate();
+		return true;
+	}
+};
+
+//-----------------------------------------------------------------------------
 //! Use this class to define array material properties
 template<class T> class FEVecPropertyT : public FEProperty
 {
@@ -89,7 +150,11 @@ private:
 	Y*	m_pmp;		//!< pointer to actual material property
 
 public:
-	FEVecPropertyT(Y* p) : FEProperty(T::classID()) { m_pmp = p; }
+	FEVecPropertyT(Y* p) : FEProperty(T::superClassID()) 
+	{ 
+		m_pmp = p; 
+		m_className = T::BaseClassName();
+	}
 	T* operator [] (int i) { return (*m_pmp)[i]; }
 	const T* operator [] (int i) const { return (*m_pmp)[i]; }
 
@@ -157,7 +222,8 @@ public:
 		{
 			int n = 0;
 			ar >> n;
-			m_pmp->assign(n, nullptr);
+			if (ar.IsShallow() == false) m_pmp->assign(n, nullptr);
+			assert(m_pmp->size() == n);
 			for (int i = 0; i<n; ++i)
 			{
 				ar >> (*m_pmp)[i];

@@ -26,18 +26,18 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FERigidForce.h"
 #include "FERigidBody.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEMaterial.h"
 #include "FECore/FELoadCurve.h"
 #include "FEMechModel.h"
 #include "FERigidMaterial.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/log.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidAxialForce, FEModelLoad);
-	ADD_PARAMETER(m_ida      , "rbA"     );
-	ADD_PARAMETER(m_idb      , "rbB"     );
+BEGIN_FECORE_CLASS(FERigidAxialForce, FERigidLoad);
+	ADD_PARAMETER(m_ida      , "rbA"     )->setEnums("$(rigid_materials)");
+	ADD_PARAMETER(m_idb      , "rbB"     )->setEnums("$(rigid_materials)");
 	ADD_PARAMETER(m_ra0      , "ra"      );
 	ADD_PARAMETER(m_rb0      , "rb"      );
 	ADD_PARAMETER(m_s        , "force"   );
@@ -45,7 +45,7 @@ BEGIN_FECORE_CLASS(FERigidAxialForce, FEModelLoad);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FEModelLoad(pfem)
+FERigidAxialForce::FERigidAxialForce(FEModel* pfem) : FERigidLoad(pfem)
 {
 	m_ida = m_idb = -1;
 	m_ra0 = m_rb0 = vec3d(0,0,0);
@@ -102,7 +102,7 @@ void FERigidAxialForce::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidAxialForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidAxialForce::LoadVector(FEGlobalVector& R)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidBody& bodyA = *fem.GetRigidBody(m_ida);
@@ -156,7 +156,7 @@ void FERigidAxialForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! Stiffness matrix
 //! TODO: Only the stiffness contribution in the were the axial forces are applied
 //!       to the center of mass has been implemented. 
-void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Get the rigid bodies
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
@@ -239,18 +239,23 @@ void FERigidAxialForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 
 //=============================================================================
 
-BEGIN_FECORE_CLASS(FERigidBodyForce, FEModelLoad)
-	ADD_PARAMETER(m_rigidMat, "rb");
-	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz\0Ru\0Rv\0Rw\0");
-	ADD_PARAMETER(m_force, "value");
-	ADD_PARAMETER(m_ntype, "load_type");
+BEGIN_FECORE_CLASS(FERigidBodyForce, FERigidLoad)
+	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
+	ADD_PARAMETER(m_dof, "dof", 0, "Rx\0Ry\0Rz");
+	ADD_PARAMETER(m_force, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE)->setUnits(UNIT_FORCE);
+	ADD_PARAMETER(m_ntype, "load_type")->setEnums("LOAD\0FOLLOW\0TARGET");
+	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
-FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FEModelLoad(pfem)
+FERigidBodyForce::FERigidBodyForce(FEModel* pfem) : FERigidLoad(pfem)
 {
+	m_rigidMat = -1;
 	m_ntype = FORCE_LOAD;
-	m_trg = 0.0;
 	m_rid = -1;
+	m_brelative = false;
+	m_force0 = 0.0;
+	m_force = 0.0;
+	m_dof = 0;
 }
 
 void FERigidBodyForce::SetRigidMaterialID(int nid) { m_rigidMat = nid; }
@@ -270,6 +275,9 @@ bool FERigidBodyForce::Init()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
 	if (pm == 0) return false;
 
+	// check the dof value
+	if ((m_dof < 0) || (m_dof >= 3)) return false;
+
 	return FEModelLoad::Init();
 }
 
@@ -288,12 +296,18 @@ void FERigidBodyForce::Activate()
 	{
 		switch (m_dof)
 		{
-		case 0: m_trg = rb.m_Fr.x; break;
-		case 1: m_trg = rb.m_Fr.y; break;
-		case 2: m_trg= rb.m_Fr.z; break;
-		case 3: m_trg = rb.m_Mr.x; break;
-		case 4: m_trg = rb.m_Mr.y; break;
-		case 5: m_trg= rb.m_Mr.z; break;
+		case 0: m_force0 = rb.m_Fr.x; break;
+		case 1: m_force0 = rb.m_Fr.y; break;
+		case 2: m_force0 = rb.m_Fr.z; break;
+		}
+	}
+	if ((m_ntype == FORCE_LOAD) && m_brelative)
+	{
+		switch (m_dof)
+		{
+		case 0: m_force0 = rb.m_Fr.x; break;
+		case 1: m_force0 = rb.m_Fr.y; break;
+		case 2: m_force0 = rb.m_Fr.z; break;
 		}
 	}
 }
@@ -302,29 +316,24 @@ void FERigidBodyForce::Activate()
 void FERigidBodyForce::Serialize(DumpStream& ar)
 {
 	FEModelLoad::Serialize(ar);
-	ar & m_ntype & m_dof & m_rigidMat & m_force & m_trg & m_rid;
-}
-
-//-----------------------------------------------------------------------------
-double FERigidBodyForce::Value()
-{
-	return m_force;
+	ar & m_ntype & m_dof & m_rigidMat & m_force & m_rid;
 }
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidBodyForce::LoadVector(FEGlobalVector& R)
 {
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FERigidBody& rb = *fem.GetRigidBody(m_rid);
+	double t = CurrentTime();
 
 	if (m_ntype == FORCE_FOLLOW)
 	{
 		// setup the force vector
 		vec3d f(0,0,0);
-		if      (m_dof == 0) f.x = Value();
-		else if (m_dof == 1) f.y = Value();
-		else if (m_dof == 2) f.z = Value();
+		if      (m_dof == 0) f.x = m_force;
+		else if (m_dof == 1) f.y = m_force;
+		else if (m_dof == 2) f.z = m_force;
 	
 		// apply the rigid body rotation
 		f = rb.GetRotation()*f;
@@ -340,7 +349,7 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		int I = rb.m_LM[m_dof];
 		if (I >= 0)
 		{
-			R[I] += m_force;
+			R[I] += m_force + m_force0;
 		}
 	}
 	else if (m_ntype == FORCE_TARGET)
@@ -350,9 +359,9 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 		double t0 = pstep->m_tstart;
 		double t1 = pstep->m_tend;
-		double w = (tp.currentTime - t0) / (t1 - t0);
+		double w = (t - t0) / (t1 - t0);
 		assert((w >= -0.0000001) && (w <= 1.0000001));
-		double f0 = m_trg, f1 = m_force;
+		double f0 = m_force0, f1 = m_force;
 
 		double f = f0 * (1.0 - w) + f1 * w;
 
@@ -363,7 +372,131 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 //-----------------------------------------------------------------------------
 //! Stiffness matrix
-void FERigidBodyForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidBodyForce::StiffnessMatrix(FELinearSystem& LS)
 {
 	// I think for follower forces I need to contribute to the stiffness matrix, but I'm not sure yet what.
+}
+
+
+//=============================================================================
+
+BEGIN_FECORE_CLASS(FERigidBodyMoment, FERigidLoad)
+	ADD_PARAMETER(m_rigidMat, "rb")->setEnums("$(rigid_materials)")->setLongName("Rigid material");
+	ADD_PARAMETER(m_dof, "dof", 0, "Ru\0Rv\0Rw\0");
+	ADD_PARAMETER(m_value, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE)->setUnits(UNIT_MOMENT);
+	ADD_PARAMETER(m_brelative, "relative");
+	ADD_PARAMETER(m_ntype, "load_type")->setEnums("LOAD\0FOLLOW\0TARGET");
+END_FECORE_CLASS();
+
+FERigidBodyMoment::FERigidBodyMoment(FEModel* pfem) : FERigidLoad(pfem)
+{
+	m_rigidMat = -1;
+	m_rid = -1;
+	m_brelative = false;
+	m_value0 = 0.0;
+	m_value = 0.0;
+	m_dof = 0;
+	m_ntype = MOMENT_LOAD;
+}
+
+void FERigidBodyMoment::SetRigidMaterialID(int nid) { m_rigidMat = nid; }
+
+void FERigidBodyMoment::SetDOF(int bc) { m_dof = bc; }
+
+void FERigidBodyMoment::SetValue(double f) { m_value = f; }
+
+//-----------------------------------------------------------------------------
+bool FERigidBodyMoment::Init()
+{
+	// At this point the rigid ID's are still associated with the materials.
+	// We want to associate them with the rigid objects instead.
+	FEModel& fem = *GetFEModel();
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
+	if (pm == 0) return false;
+
+	// follower moments are not supported yet.
+	if (m_ntype == MOMENT_FOLLOW)
+	{
+		feLogError("Follower moments are not supported.");
+		return false;
+	}
+
+	return FEModelLoad::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBodyMoment::Activate()
+{
+	FEModelLoad::Activate();
+
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
+
+	m_rid = pm->GetRigidBodyID(); assert(m_rid >= 0);
+
+	FERigidBody& rb = *fem.GetRigidBody(m_rid);
+	if (m_ntype == MOMENT_TARGET)
+	{
+		switch (m_dof)
+		{
+		case 0: m_value0 = rb.m_Mr.x; break;
+		case 1: m_value0 = rb.m_Mr.y; break;
+		case 2: m_value0 = rb.m_Mr.z; break;
+		}
+	}
+	if ((m_ntype == MOMENT_LOAD) && m_brelative)
+	{
+		switch (m_dof)
+		{
+		case 0: m_value0 = rb.m_Mr.x; break;
+		case 1: m_value0 = rb.m_Mr.y; break;
+		case 2: m_value0 = rb.m_Mr.z; break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBodyMoment::Serialize(DumpStream& ar)
+{
+	FEModelLoad::Serialize(ar);
+	ar & m_value0 & m_rid;
+}
+
+//-----------------------------------------------------------------------------
+//! Residual
+void FERigidBodyMoment::LoadVector(FEGlobalVector& R)
+{
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+	FERigidBody& rb = *fem.GetRigidBody(m_rid);
+	double t = CurrentTime();
+
+	int I = rb.m_LM[m_dof + 3];
+	if (I >= 0)
+	{
+		if (m_ntype == MOMENT_LOAD)
+		{
+			R[I] += m_value + m_value0;
+		}
+		else if (m_ntype == MOMENT_TARGET)
+		{
+			// get the current analysis step
+			FEAnalysis* pstep = fem.GetCurrentStep();
+
+			double t0 = pstep->m_tstart;
+			double t1 = pstep->m_tend;
+			double w = (t - t0) / (t1 - t0);
+			assert((w >= -0.0000001) && (w <= 1.0000001));
+			double M0 = m_value0, M1 = m_value;
+
+			double M = M0 * (1.0 - w) + M1 * w;
+			R[I] += M;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Stiffness matrix
+void FERigidBodyMoment::StiffnessMatrix(FELinearSystem& LS)
+{
+
 }

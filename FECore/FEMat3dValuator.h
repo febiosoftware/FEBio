@@ -35,7 +35,8 @@ class FEDataMap;
 // Base class for evaluating vec3d parameters
 class FECORE_API FEMat3dValuator : public FEValuator
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEMAT3DVALUATOR_ID)
+	FECORE_BASE_CLASS(FEMat3dValuator)
 
 public:
 	FEMat3dValuator(FEModel* fem) : FEValuator(fem) {};
@@ -221,5 +222,10 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 private:
-	FEDataMap*	m_val;
+	std::string	m_mapName;
+
+private:
+	FEDataMap* m_val;
+
+	DECLARE_FECORE_CLASS();
 };

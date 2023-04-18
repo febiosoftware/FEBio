@@ -36,7 +36,7 @@ FEMultiphasicStandard::FEMultiphasicStandard(FEModel* pfem) : FEMultiphasic(pfem
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEMultiphasicStandard::CreateMaterialPointData()
+FEMaterialPointData* FEMultiphasicStandard::CreateMaterialPointData()
 {
 	return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 }
@@ -45,7 +45,7 @@ FEMaterialPoint* FEMultiphasicStandard::CreateMaterialPointData()
 // call this function from shell domains only
 void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    double dt = CurrentTimeIncrement();
     
     // check if this mixture includes chemical reactions
     int nreact = (int)Reactions();
@@ -57,8 +57,10 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
-        
-        double phi0 = ppt.m_phi0;
+        FEShellElement* sel = dynamic_cast<FEShellElement*>(mp.m_elem);
+        double h = (sel) ? sel->Evaluate(sel->m_ht, mp.m_index) : 0;   // shell thickness
+
+        double phi0 = ppt.m_phi0t;
         int nsbm = SBMs();
         int nsol = Solutes();
         // create a temporary container for spt.m_sbmr so that this variable remains
@@ -77,7 +79,7 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
                 double zetahat = GetMembraneReaction(k)->ReactionSupply(mp);
                 double v = GetMembraneReaction(k)->m_v[nsol+isbm];
                 // remember to convert from molar supply to referential mass supply
-                spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*SBMMolarMass(isbm)*v*zetahat;
+                spt.m_sbmrhat[isbm] += pt.m_J/h*SBMMolarMass(isbm)*v*zetahat;
             }
             // perform the time integration (midpoint rule)
             sbmr[isbm] = spt.m_sbmrp[isbm] + dt*(spt.m_sbmrhat[isbm]+spt.m_sbmrhatp[isbm])/2;

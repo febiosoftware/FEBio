@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEDomainList.h"
 #include "DumpStream.h"
 #include "FEDomain.h"
-#include "FEModel.h"
 #include "FEMesh.h"
 #include <assert.h>
 using namespace std;

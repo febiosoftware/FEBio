@@ -44,8 +44,14 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEEFDUncoupled, FEUncoupledMaterial)
 	ADD_PARAMETER(m_beta, 3, FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
-	ADD_PARAMETER(m_ksi , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
+	ADD_PARAMETER(m_ksi , 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" )->setUnits(UNIT_PRESSURE);
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
+
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FEEFDUncoupled::FEEFDUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 //-----------------------------------------------------------------------------
 mat3ds FEEFDUncoupled::DevStress(FEMaterialPoint& mp)
@@ -73,6 +79,9 @@ mat3ds FEEFDUncoupled::DevStress(FEMaterialPoint& mp)
 		{ 1,-1, 1}
 	};
 
+	double ksi[3] = { m_ksi[0](mp), m_ksi[1](mp), m_ksi[2](mp) };
+	double beta[3] = { m_beta[0](mp), m_beta[1](mp), m_beta[2](mp) };
+
 	const int nint = 45;
 	for (int n=0; n<nint; ++n)
 	{
@@ -87,8 +96,8 @@ mat3ds FEEFDUncoupled::DevStress(FEMaterialPoint& mp)
 		//       and beta can be precalculated and reused. I have not done this yet since I
 		//       need to figure out how to initialize the material parameters for each time
 		//       step (instead of once at the start) in case the values depend on load curves.
-		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+		double ksi_n  = 1.0 / sqrt(SQR(n0a.x / ksi [0]) + SQR(n0a.y / ksi [1]) + SQR(n0a.z / ksi [2]));
+		double beta_n = 1.0 / sqrt(SQR(n0a.x / beta[0]) + SQR(n0a.y / beta[1]) + SQR(n0a.z / beta[2]));
 
 		// loop over the four quadrants
 		for (int l=0; l<4; ++l)
@@ -111,7 +120,7 @@ mat3ds FEEFDUncoupled::DevStress(FEMaterialPoint& mp)
 				mat3ds N = dyad(nt);
 			
 				// calculate strain energy derivative
-				Wl = beta*ksi*pow(In - 1.0, beta-1.0);
+				Wl = beta_n *ksi_n *pow(In - 1.0, beta_n -1.0);
 			
 				// calculate the stress
 				s += N*(Wl*wn);
@@ -156,6 +165,9 @@ tens4ds FEEFDUncoupled::DevTangent(FEMaterialPoint& mp)
 		{ 1,-1, 1}
 	};
 	
+	double ksi[3] = { m_ksi[0](mp), m_ksi[1](mp), m_ksi[2](mp) };
+	double beta[3] = { m_beta[0](mp), m_beta[1](mp), m_beta[2](mp) };
+
 	const int nint = 45;
 	for (int n=0; n<nint; ++n)
 	{
@@ -166,8 +178,8 @@ tens4ds FEEFDUncoupled::DevTangent(FEMaterialPoint& mp)
 		double wn = XYZ2[n][3];
 
 		// calculate material coefficients
-		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+		double ksi_n  = 1.0 / sqrt(SQR(n0a.x / ksi [0]) + SQR(n0a.y / ksi [1]) + SQR(n0a.z / ksi [2]));
+		double beta_n = 1.0 / sqrt(SQR(n0a.x / beta[0]) + SQR(n0a.y / beta[1]) + SQR(n0a.z / beta[2]));
 
 		for (int l=0; l<4; ++l)
 		{
@@ -187,8 +199,8 @@ tens4ds FEEFDUncoupled::DevTangent(FEMaterialPoint& mp)
 			{
 			
 				// calculate strain energy derivative
-				Wl = beta*ksi*pow(In - 1.0, beta-1.0);
-				Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
+				Wl = beta_n *ksi_n *pow(In - 1.0, beta_n -1.0);
+				Wll = beta_n *(beta_n -1.0)*ksi_n *pow(In - 1.0, beta_n -2.0);
 			
 				// calculate the outer product of nt
 				N2 = dyad(nt);
@@ -243,6 +255,9 @@ double FEEFDUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 		{ 1,-1, 1}
 	};
     
+	double ksi[3] = { m_ksi[0](mp), m_ksi[1](mp), m_ksi[2](mp) };
+	double beta[3] = { m_beta[0](mp), m_beta[1](mp), m_beta[2](mp) };
+
 	const int nint = 45;
 	for (int n=0; n<nint; ++n)
 	{
@@ -257,8 +272,8 @@ double FEEFDUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 		//       and beta can be precalculated and reused. I have not done this yet since I
 		//       need to figure out how to initialize the material parameters for each time
 		//       step (instead of once at the start) in case the values depend on load curves.
-		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+		double ksi_n  = 1.0 / sqrt(SQR(n0a.x / ksi [0]) + SQR(n0a.y / ksi [1]) + SQR(n0a.z / ksi [2]));
+		double beta_n = 1.0 / sqrt(SQR(n0a.x / beta[0]) + SQR(n0a.y / beta[1]) + SQR(n0a.z / beta[2]));
         
 		// loop over the four quadrants
 		for (int l=0; l<4; ++l)
@@ -278,7 +293,7 @@ double FEEFDUncoupled::DevStrainEnergyDensity(FEMaterialPoint& mp)
 			if (In > 1. + eps)
 			{
 				// calculate strain energy density
-				W = ksi*pow(In - 1.0, beta);
+				W = ksi_n *pow(In - 1.0, beta_n);
 				sed += W*wn;
 			}
 		}

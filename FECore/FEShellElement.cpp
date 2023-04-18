@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEShellElement.h"
 #include "DumpStream.h"
+using namespace std;
 
 //=================================================================================================
 // FEShellElement
@@ -55,6 +56,12 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	m_h0 = el.m_h0;
 	m_ht = el.m_ht;
 	m_d0 = el.m_d0;
+	m_g0[0] = el.m_g0[0]; m_g0[1] = el.m_g0[1]; m_g0[2] = el.m_g0[2];
+	m_gt[0] = el.m_gt[0]; m_gt[1] = el.m_gt[1]; m_gt[2] = el.m_gt[2];
+	m_gp[0] = el.m_gp[0]; m_gp[1] = el.m_gp[1]; m_gp[2] = el.m_gp[2];
+
+	m_G0[0] = el.m_G0[0]; m_G0[1] = el.m_G0[1]; m_G0[2] = el.m_G0[2];
+	m_Gt[0] = el.m_Gt[0]; m_Gt[1] = el.m_Gt[1]; m_Gt[2] = el.m_Gt[2];
 
 	m_elem[0] = el.m_elem[0];
 	m_elem[1] = el.m_elem[1];
@@ -80,6 +87,12 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 	m_h0 = el.m_h0;
 	m_ht = el.m_ht;
 	m_d0 = el.m_d0;
+	m_g0[0] = el.m_g0[0]; m_g0[1] = el.m_g0[1]; m_g0[2] = el.m_g0[2];
+	m_gt[0] = el.m_gt[0]; m_gt[1] = el.m_gt[1]; m_gt[2] = el.m_gt[2];
+	m_gp[0] = el.m_gp[0]; m_gp[1] = el.m_gp[1]; m_gp[2] = el.m_gp[2];
+
+	m_G0[0] = el.m_G0[0]; m_G0[1] = el.m_G0[1]; m_G0[2] = el.m_G0[2];
+	m_Gt[0] = el.m_Gt[0]; m_Gt[1] = el.m_Gt[1]; m_Gt[2] = el.m_Gt[2];
 
 	m_elem[0] = el.m_elem[0];
 	m_elem[1] = el.m_elem[1];
@@ -93,6 +106,22 @@ void FEShellElement::SetTraits(FEElementTraits* ptraits)
 	m_h0.assign(Nodes(), 0.0);
 	m_ht.assign(Nodes(), 0.0);
 	m_d0.assign(Nodes(), vec3d(0, 0, 0));
+	m_g0[0].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_g0[1].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_g0[2].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_gt[0].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_gt[1].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_gt[2].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_gp[0].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_gp[1].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_gp[2].assign(GaussPoints(), vec3d(0, 0, 0));
+
+	m_G0[0].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_G0[1].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_G0[2].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_Gt[0].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_Gt[1].assign(GaussPoints(), vec3d(0, 0, 0));
+	m_Gt[2].assign(GaussPoints(), vec3d(0, 0, 0));
 }
 
 void FEShellElement::Serialize(DumpStream &ar)
@@ -101,6 +130,11 @@ void FEShellElement::Serialize(DumpStream &ar)
 	if (ar.IsShallow() == false) {
 		ar & m_h0;
 		ar & m_d0;
+		ar & m_g0[0] & m_g0[1] & m_g0[2];
+		ar & m_gt[0] & m_gt[1] & m_gt[2];
+		ar & m_gp[0] & m_gp[1] & m_gp[2];
+		ar & m_G0[0] & m_G0[1] & m_G0[2];
+		ar & m_Gt[0] & m_Gt[1] & m_Gt[2];
 		ar & m_elem[0] & m_elem[1];
 	}
 	ar & m_ht;

@@ -36,23 +36,35 @@ class FEReactiveViscoelasticMaterial;
 class FEUncoupledReactiveViscoelasticMaterial;
 
 //-----------------------------------------------------------------------------
+//! Material point data array for reactive viscoelastic materials
+//!
+class FEReactiveViscoelasticMaterialPoint : public FEMaterialPointArray
+{
+public:
+    //! constructor
+    FEReactiveViscoelasticMaterialPoint();
+    
+    //! Copy material point data
+    FEMaterialPointData* Copy();
+};
+
+//-----------------------------------------------------------------------------
 //! Material point data for reactive viscoelastic materials
-class FEReactiveVEMaterialPoint : public FEMaterialPoint
+class FEReactiveVEMaterialPoint : public FEMaterialPointData
 {
 public:
     //! olverloaded constructors
-    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = pe; m_pRuc = 0; }
-    FEReactiveVEMaterialPoint(FEMaterialPoint *pt, FEUncoupledReactiveViscoelasticMaterial *pe) : FEMaterialPoint(pt) { m_pRve = 0; m_pRuc = pe; }
+    FEReactiveVEMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
     
     //! copy material point data
-    FEMaterialPoint* Copy() override;
+	FEMaterialPointData* Copy() override;
     
     //! Initialize material point data
     void Init() override;
-
-    //! Update material point data
-    void UpdateGenerations(const FETimeInfo& timeInfo);
     
+    //! Update material point data
+    void Update(const FETimeInfo& timeInfo) override;
+
     //! Serialize data to archive
     void Serialize(DumpStream& ar) override;
     
@@ -62,6 +74,10 @@ public:
     deque <double> m_Jv;	//!< determinant of Uv (store for efficiency)
     deque <double> m_v;     //!< time tv when generation starts breaking
     deque <double> m_f;     //!< mass fraction when generation starts breaking
-    FEReactiveViscoelasticMaterial*  m_pRve; //!< pointer to parent material
-    FEUncoupledReactiveViscoelasticMaterial*  m_pRuc; //!< pointer to parent material
+    
+public:
+    // weak bond recruitment parameters
+    double m_Et;            //!< trial strain value at time t
+    double m_Em;            //!< max strain value up to time t
+    deque <double> m_wv;    //!< total mass fraction of weak bonds
 };

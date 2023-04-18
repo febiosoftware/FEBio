@@ -30,16 +30,15 @@ SOFTWARE.*/
 #include <vector>
 #include <string>
 #include "fecore_api.h"
-using namespace std;
 
 //-----------------------------------------------------------------------------
 class ParamRef
 {
 public:
-	string	_name;		// name of parameter
-	int		_index;		// zero-based index of parameter (-1 if not available)
-	int		_id;		// ID of parameter (-1 if not available)
-	string	_idName;	// string ID of parameter
+	int			_index;		// zero-based index of parameter (-1 if not available)
+	int			_id;		// ID of parameter (-1 if not available)
+	std::string	_name;		// name of parameter
+	std::string	_idName;	// string ID of parameter
 
 public:
 	ParamRef() : _id(-1), _index(-1) {}
@@ -126,5 +125,5 @@ private:
 	ParamString() {}
 
 private:
-	vector<ParamRef>	m_param;
+	std::vector<ParamRef>	m_param;
 };

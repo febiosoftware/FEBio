@@ -45,7 +45,8 @@ class FECORE_API FEElementSet : public FEItemList
 {
 public:
 	//! constructor
-	FEElementSet(FEModel* fem);
+	FEElementSet(FEModel* fem);	// TODO: remove!
+	FEElementSet(FEMesh* fem);
 
 	// Create the element set
 	void Create(const std::vector<int>& elemList);
@@ -88,6 +89,9 @@ public:
 
 public:
 	void Serialize(DumpStream& ar);
+
+	static void SaveClass(DumpStream& ar, FEElementSet* p);
+	static FEElementSet* LoadClass(DumpStream& ar, FEElementSet* p);
 
 private:
 	// Build the lookup table

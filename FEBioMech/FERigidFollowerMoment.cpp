@@ -26,7 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FERigidFollowerMoment.h"
 #include "FERigidBody.h"
-#include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEMaterial.h"
 #include "FECore/FELoadCurve.h"
@@ -35,13 +34,13 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FERigidFollowerMoment, FEModelLoad);
-    ADD_PARAMETER(m_rid      , "rb"       );
+BEGIN_FECORE_CLASS(FERigidFollowerMoment, FERigidLoad);
+    ADD_PARAMETER(m_rid      , "rb"       )->setEnums("$(rigid_materials)");
     ADD_PARAMETER(m_m        , "moment"   );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidFollowerMoment::FERigidFollowerMoment(FEModel* pfem) : FEModelLoad(pfem)
+FERigidFollowerMoment::FERigidFollowerMoment(FEModel* pfem) : FERigidLoad(pfem)
 {
     m_rid = -1;
     m_m = vec3d(0,0,0);
@@ -72,11 +71,12 @@ void FERigidFollowerMoment::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Residual
-void FERigidFollowerMoment::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FERigidFollowerMoment::LoadVector(FEGlobalVector& R)
 {
     FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
     FERigidBody& body = *fem.GetRigidBody(m_rid);
 
+    const FETimeInfo& tp = fem.GetTime();
     double alpha = tp.alphaf;
     
     // calculate the moment value
@@ -97,11 +97,12 @@ void FERigidFollowerMoment::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! Stiffness matrix
 //! TODO: Only the stiffness contribution in the were the axial forces are applied
 //!       to the center of mass has been implemented.
-void FERigidFollowerMoment::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FERigidFollowerMoment::StiffnessMatrix(FELinearSystem& LS)
 {
     FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
     FERigidBody& body = *fem.GetRigidBody(m_rid);
 
+    const FETimeInfo& tp = fem.GetTime();
     double alpha = tp.alphaf;
     
     // calculate the moment value

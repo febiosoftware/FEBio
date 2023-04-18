@@ -63,4 +63,6 @@ public:
 	vector<double>	m_D, m_G, m_H;	//!< temp vectors for calculating BFGS update vectors
 
 	vector<double>	tmp;
+
+	DECLARE_FECORE_CLASS();
 };

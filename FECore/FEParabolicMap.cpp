@@ -32,12 +32,13 @@ SOFTWARE.*/
 #include "SparseMatrix.h"
 #include "LinearSolver.h"
 #include "FEGlobalMatrix.h"
+#include "FEModel.h"
 
-BEGIN_FECORE_CLASS(FEParabolicMap, FEDataGenerator)
+BEGIN_FECORE_CLASS(FEParabolicMap, FEFaceDataGenerator)
 	ADD_PARAMETER(m_scale, "value");
 END_FECORE_CLASS();
 
-FEParabolicMap::FEParabolicMap(FEModel* fem) : FEDataGenerator(fem)
+FEParabolicMap::FEParabolicMap(FEModel* fem) : FEFaceDataGenerator(fem), m_dofs(fem)
 {
 	m_scale = 1.0;
 }
@@ -47,9 +48,20 @@ FEParabolicMap::~FEParabolicMap()
 
 }
 
-bool FEParabolicMap::Init()
+void FEParabolicMap::SetDOFConstraint(const FEDofList& dofs)
 {
-	return false;
+	m_dofs = dofs;
+}
+
+FESurfaceMap* FEParabolicMap::Generate()
+{
+	FESurfaceMap* map = new FESurfaceMap(FEDataType::FE_DOUBLE);
+	if (Generate(*map) == false)
+	{
+		delete map;
+		map = nullptr;
+	}
+	return map;
 }
 
 bool FEParabolicMap::Generate(FESurfaceMap& map)
@@ -62,7 +74,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	// create a temp surface of the facet set
 	FESurface* ps = fecore_alloc(FESurface, GetFEModel());
 	ps->Create(surf);
-
+	ps->InitSurface();
 	map.Create(&surf, 0.0, FMT_NODE);
 
 	// find surface boundary nodes
@@ -84,6 +96,24 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 		}
 	}
 
+	// Apply dof constraints
+	if (m_dofs.IsEmpty() == false)
+	{
+		// only consider nodes with fixed dofs as boundary nodes
+		for (int i = 0; i < ps->Nodes(); ++i)
+			if (boundary[i]) {
+				FENode& node = ps->Node(i);
+
+				bool b = false;
+				for (int j = 0; j < m_dofs.Size(); ++j)
+				{
+					if (node.get_bc(m_dofs[j]) != DOF_FIXED) b = true;
+				}
+
+				if (b) boundary[i] = false;
+			}
+	}
+
 	// count number of non-boundary nodes
 	int neq = 0;
 	vector<int> glm(ps->Nodes(), -1);
@@ -91,7 +121,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 		if (!boundary[i]) glm[i] = neq++;
 	if (neq == 0)
 	{
-		feLogError("Unable to set parabolic fluid normal velocity\n");
+		feLogError("Unable to set parabolic map\n");
 		delete ps;
 		return false;
 	}
@@ -129,7 +159,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	pS->Zero();
 
 	// create global vector
-	vector<double> v;           //!< normal velocity solution
+	vector<double> v;           //!< solution
 	vector<double> rhs;         //!< right-hand-side
 	vector<double> Fr;          //!< reaction forces
 	v.assign(neq, 0);
@@ -211,7 +241,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	plinsolve->Factor();
 	if (plinsolve->BackSolve(v, rhs) == false)
 	{
-		feLogError("Unable to solve for parabolic fluid normal velocity\n");
+		feLogError("Unable to solve for parabolic field\n");
 		delete ps;
 		return false;
 	}
@@ -273,7 +303,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	map.set<double>(0.0);
 	for (int i = 0; i < ps->Nodes(); ++i)
 	{
-		map.set<double>(i, VN[i]);
+		map.set<double>(i, VN[i] * m_scale);
 	}
 
 	// clean up

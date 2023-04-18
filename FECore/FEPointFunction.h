@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "FEFunction1D.h"
+#include "PointCurve.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -38,8 +39,6 @@ class DumpStream;
 
 class FECORE_API FEPointFunction : public FEFunction1D
 {
-	class Imp;
-
 public:
 	//! Load point structure
 	struct LOADPOINT
@@ -47,13 +46,6 @@ public:
 		double time;
 		double value;
 	};
-
-public:
-	//! Interpolation functions
-	enum INTFUNC { STEP = 0, LINEAR = 1, SMOOTH = 2, CSPLINE = 3, CPOINTS = 4, APPROX = 5 };
-
-	//! Extend mode
-	enum EXTMODE { CONSTANT, EXTRAPOLATE, REPEAT, REPEAT_OFFSET };
 
 public:
 	//! default constructor
@@ -75,22 +67,19 @@ public:
 	void SetPoint(int i, double x, double y);
 
 	//! Set the type of interpolation
-	void SetInterpolation(INTFUNC fnc) { m_fnc = fnc; }
+	void SetInterpolation(int n);
 
 	//! Set the extend mode
-	void SetExtendMode(EXTMODE mode) { m_ext = mode; }
+	void SetExtendMode(int n);
 
 	//! returns point i
 	LOADPOINT LoadPoint(int i) const;
 
-	//! finds closest load point
-	int FindPoint(double t, double& tval, int startIndex = 0);
-
 	//! return nr of points
 	int Points() const;
 
-	//! see if there is a point at time t
-	bool HasPoint(double t) const;
+	//! set the points
+	void SetPoints(const std::vector<vec2d>& pts);
 
 	//! Serialize data to archive
 	void Serialize(DumpStream& ar) override;
@@ -100,6 +89,7 @@ public:
 
 	// copy from another function
 	void CopyFrom(const FEPointFunction& f);
+	void CopyFrom(const PointCurve& f);
 
 public: // operations
 
@@ -120,23 +110,16 @@ public: // implement from base class
 	//! returns the definite integral value between a and b
 	double integrate(double a, double b) const override;
 
-protected:
-	double ExtendValue(double t) const;
-
-// private:
-// 	//! returns the area of a trapezoid between a and b
-// 	double trap(double a, double b) const;
-
 	// TODO: I need to make this public so the parameters can be mapped to the FELoadCurve
-public:
-	int		m_fnc;	//!< interpolation function
+private:
+	int		m_int;	//!< interpolation function
 	int		m_ext;	//!< extend mode
     bool    m_bln;  //!< points represent (ln(x),y) instead of (x,y)
 	std::vector<vec2d>	m_points;
-    
-private:
-	Imp*	imp;
 
+private:
+	PointCurve	m_fnc;
+    
 	DECLARE_FECORE_CLASS();
 };
 

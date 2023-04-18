@@ -51,7 +51,7 @@ private:
 class FEEASShellTangentDiagnostic : public FEDiagnostic
 {
 public:
-    FEEASShellTangentDiagnostic(FEModel& fem);
+    FEEASShellTangentDiagnostic(FEModel* fem);
     virtual ~FEEASShellTangentDiagnostic(){}
     
     FEDiagnosticScenario* CreateScenario(const std::string& sname);

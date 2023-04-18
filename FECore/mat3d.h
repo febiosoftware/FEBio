@@ -32,6 +32,28 @@ SOFTWARE.*/
 #include "mat2d.h"
 
 //-----------------------------------------------------------------------------
+// useful constants for trig
+#ifndef PI
+#define PI 3.141592653589793
+#endif
+
+#ifndef RAD2DEG
+#define RAD2DEG (180.0/PI)
+#endif
+
+#ifndef DEG2RAD
+#define DEG2RAD (PI/180.0)
+#endif
+
+#ifndef MAX
+#define MAX(a, b) ((a)>(b)?(a):(b))
+#endif
+
+#ifndef MIN
+#define MIN(a, b) ((a)<(b)?(a):(b))
+#endif
+
+//-----------------------------------------------------------------------------
 // The following classes are defined in this file
 class mat3d;	// general 3D matrix of doubles
 class mat3ds;	// symmetric 3D matrix of doubles
@@ -179,6 +201,11 @@ public:
 	mat3d operator - (const mat3d& t) const;
 	mat3d operator * (const mat3d& t) const;
 	
+    // arithmetic operators for mat3da objects
+    mat3d operator + (const mat3da& t) const;
+    mat3d operator - (const mat3da& t) const;
+    mat3d operator * (const mat3da& t) const;
+    
 	// unary operators
 	mat3ds operator - () const;
 	
@@ -298,6 +325,10 @@ public:
 
 	vec3d operator * (const vec3d& a);
 
+    // arithmetic operators for mat3ds objects
+    mat3d operator + (const mat3ds& t) const;
+    mat3d operator - (const mat3ds& t) const;
+    
 protected:
 	double	d[3];	// stores xy, yz, xz
 
@@ -323,6 +354,7 @@ public:
 		  double a20, double a21, double a22);
 
 	mat3d(double m[3][3]);
+	mat3d(double a[9]);
 
 	mat3d(const mat3dd& m);
 	mat3d(const mat3ds& m);
@@ -421,7 +453,9 @@ public:
 
 	// calculates the inverse
 	mat3d inverse() const;
-    double invert(mat3d& Ai);
+    
+	// inverts the matrix.
+	bool invert();
 
 	// calculates the transpose
 	mat3d transpose() const;
@@ -479,6 +513,282 @@ inline mat3d skew(const vec3d& a)
                   a.z,    0, -a.x,
                  -a.y,  a.x,    0);
 }
+
+//-----------------------------------------------------------------------------
+// This class stores a 2nd order diagonal tensor
+class mat3fd
+{
+public:
+	mat3fd() { x = y = z = 0.f; }
+	mat3fd(float X, float Y, float Z) { x = X; y = Y; z = Z; }
+
+public:
+	float x, y, z;
+};
+
+//-----------------------------------------------------------------------------
+// mat3fs stores a 2nd order symmetric tensor
+//
+class mat3fs
+{
+public:
+	// constructors
+	mat3fs() { x = y = z = xy = yz = xz = 0; }
+	mat3fs(float fx, float fy, float fz, float fxy, float fyz, float fxz)
+	{
+		x = fx; y = fy; z = fz;
+		xy = fxy; yz = fyz; xz = fxz;
+	}
+
+	// operators
+	mat3fs& operator += (const mat3fs& v)
+	{
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		xy += v.xy;
+		yz += v.yz;
+		xz += v.xz;
+
+		return (*this);
+	}
+
+	// operators
+	mat3fs& operator -= (const mat3fs& v)
+	{
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+		xy -= v.xy;
+		yz -= v.yz;
+		xz -= v.xz;
+
+		return (*this);
+	}
+
+	mat3fs& operator *= (float g)
+	{
+		x *= g;
+		y *= g;
+		z *= g;
+		xy *= g;
+		yz *= g;
+		xz *= g;
+
+		return (*this);
+	}
+
+	mat3fs& operator /= (float g)
+	{
+		x /= g;
+		y /= g;
+		z /= g;
+		xy /= g;
+		yz /= g;
+		xz /= g;
+
+		return (*this);
+	}
+
+	mat3fs operator + (const mat3fs& a) { return mat3fs(x + a.x, y + a.y, z + a.z, xy + a.xy, yz + a.yz, xz + a.xz); }
+	mat3fs operator - (const mat3fs& a) { return mat3fs(x - a.x, y - a.y, z - a.z, xy - a.xy, yz - a.yz, xz - a.xz); }
+
+	mat3fs operator * (float a)
+	{
+		return mat3fs(x * a, y * a, z * a, xy * a, yz * a, xz * a);
+	}
+
+	mat3fs operator / (float g)
+	{
+		return mat3fs(x / g, y / g, z / g, xy / g, yz / g, xz / g);
+	}
+
+	vec3f operator * (vec3f& r)
+	{
+		return vec3f(
+			x * r.x + xy * r.y + xz * r.z,
+			xy * r.x + y * r.y + yz * r.z,
+			xz * r.x + yz * r.y + z * r.z);
+	}
+
+	// Effective or von-mises value
+	float von_mises() const
+	{
+		float vm;
+		vm = x * x + y * y + z * z;
+		vm -= x * y + y * z + x * z;
+		vm += 3 * (xy * xy + yz * yz + xz * xz);
+		vm = (float)sqrt(vm >= 0.0 ? vm : 0.0);
+		return vm;
+	}
+
+	// principle values
+	FECORE_API void Principals(float e[3]) const;
+
+	// principle directions
+	FECORE_API vec3f PrincDirection(int l);
+
+	// deviatroric principle values
+	FECORE_API void DeviatoricPrincipals(float e[3]) const;
+
+	// max-shear value
+	FECORE_API float MaxShear() const;
+
+	// eigen-vectors and values
+	FECORE_API void eigen(vec3f e[3], float l[3]) const;
+
+	// trace
+	float tr() const { return x + y + z; }
+
+	// determinant
+	float det() const { return (x * y * z + xy * yz * xz + xz * xy * yz - y * xz * xz - x * yz * yz - z * xy * xy); }
+
+	// L2 norm
+	float norm() const {
+		double d = x * x + y * y + z * z + 2 * (xy * xy + yz * yz + xz * xz);
+		return (float)sqrt(d);
+	}
+
+public:
+	float x, y, z;
+	float xy, yz, xz;
+};
+
+FECORE_API double fractional_anisotropy(const mat3fs& m);
+
+///////////////////////////////////////////////////////////////////
+// mat3f
+
+class mat3f
+{
+public:
+	mat3f() { zero(); }
+
+	mat3f(float a00, float a01, float a02, float a10, float a11, float a12, float a20, float a21, float a22)
+	{
+		d[0][0] = a00; d[0][1] = a01; d[0][2] = a02;
+		d[1][0] = a10; d[1][1] = a11; d[1][2] = a12;
+		d[2][0] = a20; d[2][1] = a21; d[2][2] = a22;
+	}
+
+	mat3f(const mat3fs& a)
+	{
+		d[0][0] = a.x; d[0][1] = a.xy; d[0][2] = a.xz;
+		d[1][0] = a.xy; d[1][1] = a.y; d[1][2] = a.yz;
+		d[2][0] = a.xz; d[2][1] = a.yz; d[2][2] = a.z;
+	}
+
+	float* operator [] (int i) { return d[i]; }
+	float& operator () (int i, int j) { return d[i][j]; }
+	float operator () (int i, int j) const { return d[i][j]; }
+
+	mat3f operator * (mat3f& m)
+	{
+		mat3f a;
+
+		int k;
+		for (k = 0; k < 3; k++)
+		{
+			a[0][0] += d[0][k] * m[k][0]; a[0][1] += d[0][k] * m[k][1]; a[0][2] += d[0][k] * m[k][2];
+			a[1][0] += d[1][k] * m[k][0]; a[1][1] += d[1][k] * m[k][1]; a[1][2] += d[1][k] * m[k][2];
+			a[2][0] += d[2][k] * m[k][0]; a[2][1] += d[2][k] * m[k][1]; a[2][2] += d[2][k] * m[k][2];
+		}
+
+		return a;
+	}
+
+	vec3f operator * (const vec3f& a) const
+	{
+		return vec3f(
+			d[0][0] * a.x + d[0][1] * a.y + d[0][2] * a.z,
+			d[1][0] * a.x + d[1][1] * a.y + d[1][2] * a.z,
+			d[2][0] * a.x + d[2][1] * a.y + d[2][2] * a.z
+			);
+	}
+
+	mat3f& operator *= (float g)
+	{
+		d[0][0] *= g;	d[0][1] *= g; d[0][2] *= g;
+		d[1][0] *= g;	d[1][1] *= g; d[1][2] *= g;
+		d[2][0] *= g;	d[2][1] *= g; d[2][2] *= g;
+		return (*this);
+	}
+
+	mat3f& operator /= (float g)
+	{
+		d[0][0] /= g;	d[0][1] /= g; d[0][2] /= g;
+		d[1][0] /= g;	d[1][1] /= g; d[1][2] /= g;
+		d[2][0] /= g;	d[2][1] /= g; d[2][2] /= g;
+		return (*this);
+	}
+
+	mat3f operator += (const mat3f& a)
+	{
+		d[0][0] += a.d[0][0]; d[0][1] += a.d[0][1]; d[0][2] += a.d[0][2];
+		d[1][0] += a.d[1][0]; d[1][1] += a.d[1][1]; d[1][2] += a.d[1][2];
+		d[2][0] += a.d[2][0]; d[2][1] += a.d[2][1]; d[2][2] += a.d[2][2];
+		return (*this);
+	}
+
+	mat3f operator -= (const mat3f& a)
+	{
+		d[0][0] -= a.d[0][0]; d[0][1] -= a.d[0][1]; d[0][2] -= a.d[0][2];
+		d[1][0] -= a.d[1][0]; d[1][1] -= a.d[1][1]; d[1][2] -= a.d[1][2];
+		d[2][0] -= a.d[2][0]; d[2][1] -= a.d[2][1]; d[2][2] -= a.d[2][2];
+		return (*this);
+	}
+
+	mat3fs sym() const
+	{
+		return mat3fs(d[0][0], d[1][1], d[2][2], 0.5f * (d[0][1] + d[1][0]), 0.5f * (d[1][2] + d[2][1]), 0.5f * (d[0][2] + d[2][0]));
+	}
+
+	void zero()
+	{
+		d[0][0] = d[0][1] = d[0][2] = 0.f;
+		d[1][0] = d[1][1] = d[1][2] = 0.f;
+		d[2][0] = d[2][1] = d[2][2] = 0.f;
+	}
+
+	vec3f col(int i) const
+	{
+		vec3f r;
+		switch (i)
+		{
+		case 0: r.x = d[0][0]; r.y = d[1][0]; r.z = d[2][0]; break;
+		case 1: r.x = d[0][1]; r.y = d[1][1]; r.z = d[2][1]; break;
+		case 2: r.x = d[0][2]; r.y = d[1][2]; r.z = d[2][2]; break;
+		}
+		return r;
+	}
+
+	vec3f row(int i) const
+	{
+		vec3f r;
+		switch (i)
+		{
+		case 0: r.x = d[0][0]; r.y = d[0][1]; r.z = d[0][2]; break;
+		case 1: r.x = d[1][0]; r.y = d[1][1]; r.z = d[1][2]; break;
+		case 2: r.x = d[2][0]; r.y = d[2][1]; r.z = d[2][2]; break;
+		}
+		return r;
+	}
+
+	mat3f transpose() const
+	{
+		return mat3f(
+			d[0][0], d[1][0], d[2][0],
+			d[0][1], d[1][1], d[2][1],
+			d[0][2], d[1][2], d[2][2]
+		);
+	}
+
+	// inverts the matrix.
+	bool invert();
+
+public:
+	float d[3][3];
+};
 
 // The following file contains the actual definition of the class functions
 #include "mat3d.hpp"

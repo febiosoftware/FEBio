@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidMaterial.h"
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 FERigidSolidDomain::FERigidSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}
@@ -83,4 +84,16 @@ void FERigidSolidDomain::InternalForces(FEGlobalVector& R)
 void FERigidSolidDomain::Update(const FETimeInfo& tp)
 {
 	// Nothing to see here. Please move on.
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSolidDomain::MassMatrix(FELinearSystem& LS, double scale)
+{
+	// Only crickets here ... 
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSolidDomain::InertialForces(FEGlobalVector& R, std::vector<double>& F)
+{
+	// chirp, chirp ...
 }

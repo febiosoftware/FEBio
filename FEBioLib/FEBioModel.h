@@ -32,15 +32,24 @@ SOFTWARE.*/
 #include <FECore/DataStore.h>
 #include <FEBioPlot/PlotFile.h>
 #include <FECore/FECoreKernel.h>
-#include "febiolib_api.h"
 #include <FEBioLib/Logfile.h>
+#include "febiolib_api.h"
 
 //-----------------------------------------------------------------------------
 // Dump level determines the times the restart file is written
 enum FE_Dump_Level {
 	FE_DUMP_NEVER,			// never write a dump file
 	FE_DUMP_MAJOR_ITRS,		// create a dump file at the end of each converged time step
-	FE_DUMP_STEP			// create a dump file at the end of an analysis step
+	FE_DUMP_STEP,			// create a dump file at the end of an analysis step
+	FE_DUMP_MUST_POINTS     // create a dump file only on must-points
+};
+
+//-----------------------------------------------------------------------------
+struct ModelStats {
+	int		ntimeSteps;		//!< total nr of time steps
+	int		ntotalIters;	//!< total nr of equilibrium iterations
+	int		ntotalRHS;		//!< total nr of right hand side evaluations
+	int		ntotalReforms;	//!< total nr of stiffness reformations
 };
 
 //-----------------------------------------------------------------------------
@@ -168,8 +177,21 @@ public:
 	//! get the dump level
 	int GetDumpLevel() const;
 
+	//! Set the dump stride
+	void SetDumpStride(int n);
+
+	//! get the dump stride
+	int GetDumpStride() const;
+
 	//! Set the log level
 	void SetLogLevel(int logLevel);
+
+	//! Get the stats 
+	ModelStats GetModelStats() const;
+
+	// flag to show warnings and errors
+	void ShowWarningsAndErrors(bool b);
+	bool ShowWarningsAndErrors() const;
 
 private:
 	void print_parameter(FEParam& p, int level = 0);
@@ -190,16 +212,16 @@ private:
 	int			m_ndebug;		//!< debug level flag
 	bool		m_writeMesh;	//!< write a new mesh section
 
+	bool		m_bshowErrors;	//!< print warnings and errors
+
 	int			m_logLevel;		//!< output level for log file
 
 	int			m_dumpLevel;	//!< level or writing restart file
+	int			m_dumpStride;	//!< write dump file every nth iterations
 
 private:
 	// accumulative statistics
-	int		m_ntimeSteps;		//!< total nr of time steps
-	int		m_ntotalIters;		//!< total nr of equilibrium iterations
-	int		m_ntotalRHS;		//!< total nr of right hand side evaluations
-	int		m_ntotalReforms;	//!< total nr of stiffness reformations
+	ModelStats	m_stats;
 
 protected: // file names
 	std::string		m_sfile_title;		//!< input file title 

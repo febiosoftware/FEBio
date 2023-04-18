@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include <FECore/FENodalLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FEBoundaryCondition.h>
+#include "FEBiphasicAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -64,13 +65,6 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver2(pfem), m_dofP
 
 	// set default formulation (full shape functions)
 	m_biphasicFormulation = 0;
-    
-	// Allocate degrees of freedom
-	DOFS& dofs = pfem->GetDOFS();
-	int varP = dofs.AddVariable("fluid pressure");
-	dofs.SetDOFName(varP, 0, "p");
-    int varQ = dofs.AddVariable("shell fluid pressure");
-    dofs.SetDOFName(varQ, 0, "q");
     
 	// get pressure dof
 	m_dofP.AddDof(pfem->GetDOFIndex("p"));
@@ -164,6 +158,20 @@ void FEBiphasicSolver::PrepStep()
 	zero(m_Pi);
 	zero(m_Di);
 
+	// for pressure nodal loads we need to multiply the time step size
+	FEModel& fem = *GetFEModel();
+	for (int i = 0; i < fem.ModelLoads(); ++i)
+	{
+		FENodalDOFLoad* pl = dynamic_cast<FENodalDOFLoad*>(fem.ModelLoad(i));
+		if (pl && pl->IsActive())
+		{
+			if ((pl->GetDOF() == m_dofP[0]) || (pl->GetDOF() == m_dofQ[0]))
+			{
+				pl->SetDtScale(true);
+			}
+		}
+	}
+
 	FESolidSolver2::PrepStep();
 }
 
@@ -176,13 +184,13 @@ bool FEBiphasicSolver::Quasin()
 	double	normE1;		// energy norm
 	double	normD;		// displacement norm
 	double	normd;		// displacement increment norm
-	double	normRi;		// initial residual norm
-	double	normEi;		// initial energy norm
-	double	normEm;		// max energy norm
-	double	normDi;		// initial displacement norm
+	double	normRi = 0; // initial residual norm
+	double	normEi = 0; // initial energy norm
+	double	normEm = 0;	// max energy norm
+	double	normDi = 0;	// initial displacement norm
 
 	// poro convergence norms data
-	double	normPi;		// initial pressure norm
+	double	normPi = 0;	// initial pressure norm
 	double	normP;		// current pressure norm
 	double	normp;		// incremement pressure norm
 
@@ -339,40 +347,6 @@ bool FEBiphasicSolver::Quasin()
 }
 
 //-----------------------------------------------------------------------------
-//! calculates the concentrated nodal forces
-void FEBiphasicSolver::NodalLoads(FEGlobalVector& R, const FETimeInfo& tp)
-{
-	// loop over nodal loads
-	FEModel& fem = *GetFEModel();
-	int NNL = fem.NodalLoads();
-	for (int i=0; i<NNL; ++i)
-	{
-		FENodalDOFLoad& fc = dynamic_cast<FENodalDOFLoad&>(*fem.NodalLoad(i));
-		if (fc.IsActive())
-		{
-			int dof = fc.GetDOF();
-
-			FENodeSet& nset = *fc.GetNodeSet();
-			int N = nset.Size();
-			for (int j=0; j<N; ++j)
-			{
-				int nid = nset[j];	// node ID
-
-				// get the nodal load value
-				double f = fc.NodeValue(j);
-			
-				// For pressure and concentration loads, multiply by dt
-				// for consistency with evaluation of residual and stiffness matrix
-				if ((dof == m_dofP[0]) || (dof == m_dofQ[0])) f *= tp.timeIncrement;
-
-				// assemble into residual
-				R.Assemble(nid, dof, f);
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! calculates the residual vector
 //! Note that the concentrated nodal forces are not calculated here.
 //! This is because they do not depend on the geometry 
@@ -385,7 +359,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
-	R = m_Fn;
+	zero(R);
 
 	// zero nodal reaction forces
 	zero(m_Fr);
@@ -400,7 +374,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	FEMesh& mesh = fem.GetMesh();
 
 	// calculate internal stress force
-	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+	if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i)
 		{
@@ -427,20 +401,6 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 		}
 	}
 
-    // calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
-	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->LoadVector(RHS, tp);
-    }
-    
-	// calculate forces due to surface loads
-	for (int i=0; i<fem.SurfaceLoads(); ++i)
-	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->LoadVector(RHS, tp);
-	}
-
 	// calculate contact forces
 	ContactForces(RHS);
 
@@ -454,10 +414,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	for (int i=0; i<NML; ++i)
 	{
 		FEModelLoad& mli = *fem.ModelLoad(i);
-		if (mli.IsActive())
-		{
-			mli.LoadVector(RHS, tp);
-		}
+		if (mli.IsActive()) mli.LoadVector(RHS);
 	}
 
 	// set the nodal reaction forces
@@ -498,7 +455,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = (m_msymm == REAL_SYMMETRIC);
-	if (pstep->m_nanalysis == FE_STEADY_STATE)
+	if (pstep->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE)
 	{
 		for (int i=0; i<mesh.Domains(); ++i) 
 		{
@@ -527,24 +484,15 @@ bool FEBiphasicSolver::StiffnessMatrix()
 		}
 	}
 
-    // calculate the body force stiffness matrix for each domain
-	// TODO: This is not  going to work with FEDiscreteSpringDomain
-	int NBL = fem.BodyLoads();
-	for (int j = 0; j<NBL; ++j)
-	{
-		FEBodyLoad* pbl = fem.GetBodyLoad(j);
-		if (pbl->IsActive()) pbl->StiffnessMatrix(LS, tp);
-    }
-    
 	// calculate contact stiffness
 	ContactStiffness(LS);
 
 	// calculate stiffness matrices for surface loads
-	int nsl = fem.SurfaceLoads();
-	for (int i=0; i<nsl; ++i)
+	int nml = fem.ModelLoads();
+	for (int i=0; i<nml; ++i)
 	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->StiffnessMatrix(LS, tp);
+		FEModelLoad* pml = fem.ModelLoad(i);
+		if (pml->IsActive()) pml->StiffnessMatrix(LS);
 	}
 
 	// calculate nonlinear constraint stiffness

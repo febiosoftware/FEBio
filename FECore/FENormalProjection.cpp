@@ -54,7 +54,7 @@ FESurfaceElement* FENormalProjection::Project(vec3d r, vec3d n, double rs[2])
 {
 	// let's find all the candidate surface elements
 	set<int>selist;
-	m_OT.FindCandidateSurfaceElements(r, n, selist);
+	m_OT.FindCandidateSurfaceElements(r, n, selist, m_rad);
 	
 	// now that we found candidate surface elements, lets see if we can find 
 	// those that intersect the ray, then pick the closest intersection
@@ -98,13 +98,13 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 {
 	// let's find all the candidate surface elements
 	set<int>selist;
-	m_OT.FindCandidateSurfaceElements(r, n, selist);
+	m_OT.FindCandidateSurfaceElements(r, n, selist, m_rad);
 	
 	// now that we found candidate surface elements, lets see if we can find 
 	// those that intersect the ray, then pick the closest intersection
 	set<int>::iterator it;
 	bool found = false;
-	double rsl[2], gl, g;
+	double rsl[2], gl, g = 0;
 	FESurfaceElement* pei = 0;
 	for (it=selist.begin(); it!=selist.end(); ++it) {
 		// get the surface element
@@ -118,7 +118,7 @@ FESurfaceElement* FENormalProjection::Project2(vec3d r, vec3d n, double rs[2])
 				rs[0] = rsl[0];
 				rs[1] = rsl[1];
 				pei = pe;
-			} else if ((fabs(gl) < fabs(g)) && (fabs(gl) < m_rad)) {
+			} else if ((fabs(gl) < m_rad) && (fabs(gl) < fabs(g))) {
 				g = gl;
 				rs[0] = rsl[0];
 				rs[1] = rsl[1];
@@ -141,7 +141,7 @@ FESurfaceElement* FENormalProjection::Project3(const vec3d& r, const vec3d& n, d
 {
 	// let's find all the candidate surface elements
 	set<int>selist;
-	m_OT.FindCandidateSurfaceElements(r, n, selist);
+	m_OT.FindCandidateSurfaceElements(r, n, selist, m_rad);
 
 	double g, gmax = -1e99, r2[2] = {rs[0], rs[1]};
 	int imin = -1;

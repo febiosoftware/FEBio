@@ -58,6 +58,7 @@ BEGIN_FECORE_CLASS(FESlidingElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_bflipm   , "flip_secondary"     );
     ADD_PARAMETER(m_bshellbs , "shell_bottom_primary"  );
     ADD_PARAMETER(m_bshellbm , "shell_bottom_secondary");
+    ADD_PARAMETER(m_offset   , "offset"             );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -90,18 +91,16 @@ void FESlidingElasticSurface::Data::Init()
 void FESlidingElasticSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
-	ar & m_gap;
 	ar & m_dg;
-	ar & m_nu;
+    ar & m_Lmd;
+    ar & m_epsn;
+    ar & m_Lmt;
+    ar & m_nu;
 	ar & m_s1;
+    ar & m_tr;
 	ar & m_rs;
 	ar & m_rsp;
-	ar & m_Lmt;
-	ar & m_Lmd;
-	ar & m_epsn;
-	ar & m_Ln;
 	ar & m_bstick;
-	ar & m_tr;
 }
 
 //-----------------------------------------------------------------------------
@@ -313,6 +312,12 @@ FESlidingElasticInterface::FESlidingElasticInterface(FEModel* pfem) : FEContactI
     m_bfreeze = false;
     m_bflipm = m_bflips = false;
     m_bshellbm = m_bshellbs = false;
+    
+    m_offset = 0;
+
+    // set parents
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
 
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
@@ -509,9 +514,9 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
                     rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_rt;
                 }
                 else {
-                    r0 = ss.Node(el.m_lnode[ j         ]).m_st();
-                    rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_st();
-                    rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_st();
+                    r0 = ss.Node(el.m_lnode[ j         ]).st();
+                    rp = ss.Node(el.m_lnode[(j+   1)%ne]).st();
+                    rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).st();
                 }
                 vec3d n = (rp - r0)^(rm - r0);
                 normal[el.m_lnode[j]] += n;
@@ -526,7 +531,7 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
             FENode& node = ss.Node(i);
             
             // get the spatial nodal coordinates
-            vec3d rt = ss.IsShellBottom() ? node.m_st() : node.m_rt;
+            vec3d rt = ss.IsShellBottom() ? node.st() : node.m_rt;
             vec3d nu = normal[i];
             
             // project onto the secondary surface
@@ -611,7 +616,7 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
                 // calculate the gap function
                 // NOTE: this has the opposite sign compared
                 // to Gerard's notes.
-                double g = nu*(r - q);
+                double g = nu*(r - q) + m_offset;
                 
                 double eps = m_epsn*data.m_epsn*psf;
                 
@@ -810,7 +815,7 @@ vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, co
             data.m_rs = data.m_rsp;
             
             // recalculate gap
-            data.m_dg = dg;
+            data.m_dg = dg + nu*m_offset;
         }
         else {
             // recalculate contact pressure for slip
@@ -873,7 +878,7 @@ vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, co
                     data.m_rs = data.m_rsp;
                     
                     // recalculate gap
-                    data.m_dg = dg;
+                    data.m_dg = dg + nu*m_offset;
                 }
                 else
                 {

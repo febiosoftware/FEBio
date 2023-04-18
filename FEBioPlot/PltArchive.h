@@ -27,7 +27,6 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/Archive.h"
 #include <assert.h>
 #include <string>
 #include <string.h>
@@ -35,14 +34,16 @@ SOFTWARE.*/
 #include <list>
 #include <vector>
 #include <stack>
-using namespace std;
+
+//-----------------------------------------------------------------------------
+enum IOResult { IO_ERROR, IO_OK, IO_END };
 
 //-----------------------------------------------------------------------------
 //! helper class for writing buffered data to file
 class FileStream
 {
 public:
-	FileStream();
+	FileStream(FILE* fp = nullptr, bool owner = true);
 	~FileStream();
 
 	bool Create(const char* szfile);
@@ -64,8 +65,13 @@ public:
 
 	void SetCompression(int n) { m_ncompress = n; }
 
+	FILE* FilePtr() { return m_fp; }
+
+	bool IsValid() { return (m_fp != nullptr); }
+
 private:
 	FILE*	m_fp;
+	bool	m_fileOwner;
 	size_t	m_bufsize;		//!< buffer size
 	size_t	m_current;		//!< current index
 	unsigned char*	m_buf;	//!< buffer
@@ -95,12 +101,12 @@ protected:
 };
 
 class OBranch : public OChunk
-{
+{	
 public:
 	OBranch(unsigned int nid) : OChunk(nid) {}
 	~OBranch()
 	{
-		list<OChunk*>::iterator pc;
+		std::list<OChunk*>::iterator pc;
 		for (pc = m_child.begin(); pc != m_child.end(); ++pc) delete (*pc);
 		m_child.clear();
 	}
@@ -108,7 +114,7 @@ public:
 	int Size()
 	{
 		int nsize = 0;
-		list<OChunk*>::iterator pc;
+		std::list<OChunk*>::iterator pc;
 		for (pc = m_child.begin(); pc != m_child.end(); ++pc) nsize += (*pc)->Size() + 2*sizeof(unsigned int);
 		return nsize;
 	}
@@ -120,14 +126,14 @@ public:
 		unsigned int nsize = Size();
 		fp->Write(&nsize, sizeof(unsigned int), 1);
 
-		list<OChunk*>::iterator pc;
+		std::list<OChunk*>::iterator pc;
 		for (pc = m_child.begin(); pc != m_child.end(); ++pc) (*pc)->Write(fp);
 	}
 
 	void AddChild(OChunk* pc) { m_child.push_back(pc); pc->SetParent(this); }
 
 protected:
-	list<OChunk*>	m_child;
+	std::list<OChunk*>	m_child;
 };
 
 template <typename T>
@@ -205,15 +211,17 @@ protected:
 };
 
 template <typename T>
-class OLeaf<vector<T> > : public OChunk
+class OLeaf<std::vector<T> > : public OChunk
 {
 public:
-	OLeaf(unsigned int nid, vector<T>& a) : OChunk(nid)
+	OLeaf(unsigned int nid, const std::vector<T>& a) : OChunk(nid), m_pd(nullptr)
 	{
 		m_nsize = (int)a.size();
-		assert(m_nsize > 0);
-		m_pd = new T[m_nsize];
-		memcpy(m_pd, &a[0], sizeof(T)*m_nsize);
+		if (m_nsize > 0)
+		{
+			m_pd = new T[m_nsize];
+			memcpy(m_pd, &a[0], sizeof(T) * m_nsize);
+		}
 	}
 	~OLeaf() { delete m_pd; }
 
@@ -223,7 +231,7 @@ public:
 		fp->Write(&m_nID , sizeof(unsigned int), 1);
 		unsigned int nsize = Size();
 		fp->Write(&nsize , sizeof(unsigned int), 1);
-		fp->Write(m_pd   , sizeof(T), m_nsize);
+		if (m_pd && (nsize > 0)) fp->Write(m_pd   , sizeof(T), m_nsize);
 	}
 
 protected:
@@ -233,7 +241,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Implementation of an archiving class. Will be used by the FEBioPlotFile class.
-class PltArchive : public Archive
+class PltArchive
 {
 protected:
 	// CHUNK data structure for reading
@@ -289,17 +297,15 @@ public:
 		m_pChunk->AddChild(new OLeaf<T*>(nid, po, n));
 	}
 
-	template <typename T> void WriteChunk(unsigned int nid, vector<T>& a)
+	template <typename T> void WriteChunk(unsigned int nid, std::vector<T>& a)
 	{
-		m_pChunk->AddChild(new OLeaf<vector<T> >(nid, a));
+		m_pChunk->AddChild(new OLeaf<std::vector<T> >(nid, a));
 	}
 
-	// (overridden from Archive)
-	virtual void WriteData(int nid, std::vector<float>& data)
+	void WriteData(int nid, std::vector<float>& data)
 	{
 		WriteChunk(nid, data);
 	}
-
 
 public:
 	// --- Reading ---
@@ -356,5 +362,5 @@ protected:
 
 	// read data
 	bool			m_bend;		// chunk end flag
-	stack<CHUNK*>	m_Chunk;
+	std::stack<CHUNK*>	m_Chunk;
 };

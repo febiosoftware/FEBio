@@ -32,14 +32,14 @@
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberKiousisUncoupled, FEElasticFiberMaterialUC)
+BEGIN_FECORE_CLASS(FEUncoupledFiberKiousis, FEElasticFiberMaterialUC)
     ADD_PARAMETER(m_d1, "d1");
     ADD_PARAMETER(m_d2, "d2");
     ADD_PARAMETER(m_n , "n" );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEFiberKiousisUncoupled::FEFiberKiousisUncoupled(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)
+FEUncoupledFiberKiousis::FEUncoupledFiberKiousis(FEModel* pfem) : FEElasticFiberMaterialUC(pfem)
 {
     m_d1 = 0;
     m_d2 = 1;
@@ -47,7 +47,7 @@ FEFiberKiousisUncoupled::FEFiberKiousisUncoupled(FEModel* pfem) : FEElasticFiber
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEFiberKiousisUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
+mat3ds FEUncoupledFiberKiousis::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -88,7 +88,7 @@ mat3ds FEFiberKiousisUncoupled::DevFiberStress(FEMaterialPoint& mp, const vec3d&
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEFiberKiousisUncoupled::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
+tens4ds FEUncoupledFiberKiousis::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -138,7 +138,7 @@ tens4ds FEFiberKiousisUncoupled::DevFiberTangent(FEMaterialPoint& mp, const vec3
 }
 
 //-----------------------------------------------------------------------------
-double FEFiberKiousisUncoupled::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
+double FEUncoupledFiberKiousis::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
     double sed = 0.0;
     

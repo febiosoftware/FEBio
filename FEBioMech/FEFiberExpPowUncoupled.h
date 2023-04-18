@@ -28,15 +28,18 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticFiberMaterialUC.h"
+#include "FEFiberMaterial.h"
+
+class FEUncoupledFiberExpPow;
 
 //-----------------------------------------------------------------------------
 //! Material class for single fiber, tension only
 //! Exponential-power law
 
-class FEFiberExpPowUncoupled : public FEElasticFiberMaterialUC
+class FEFiberExpPowUC : public FEFiberMaterialUncoupled
 {
 public:
-	FEFiberExpPowUncoupled(FEModel* pfem);
+	FEFiberExpPowUC(FEModel* pfem);
 	
 	//! Cauchy stress
 	virtual mat3ds DevFiberStress(FEMaterialPoint& mp, const vec3d& a0) override;
@@ -51,7 +54,17 @@ protected:
 	double			m_alpha;	// coefficient of (In-1) in exponential
 	double			m_beta;		// power of (In-1) in exponential
 	FEParamDouble	m_ksi;		// fiber modulus
+    double          m_mu;       // shear modulus
 
 	// declare the parameter list
+	DECLARE_FECORE_CLASS();
+
+	friend class FEUncoupledFiberExpPow;
+};
+
+class FEUncoupledFiberExpPow : public FEElasticFiberMaterialUC_T<FEFiberExpPowUC>
+{
+public:
+	FEUncoupledFiberExpPow(FEModel* fem) : FEElasticFiberMaterialUC_T<FEFiberExpPowUC>(fem) {}
 	DECLARE_FECORE_CLASS();
 };

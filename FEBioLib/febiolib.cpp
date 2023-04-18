@@ -35,17 +35,19 @@ SOFTWARE.*/
 #include "FEBioMix/FEBioMix.h"
 #include "FEBioOpt/FEBioOpt.h"
 #include "FEBioFluid/FEBioFluid.h"
-#include "FEBioFluid/FEBioFluidP.h"
 #include <FEBioFluid/FEBioFSI.h>
 #include <FEBioFluid/FEBioMultiphasicFSI.h>
 #include <FEBioFluid/FEBioFluidSolutes.h>
 #include <FEBioFluid/FEBioThermoFluid.h>
+#include <FEBioFluid/FEBioPolarFluid.h>
 #include <FEBioTest/FEBioTest.h>
 #include <FEBioRVE/FEBioRVE.h>
+#include <FEImgLib/FEImgLib.h>
 #endif
 #include "febio.h"
 #include "plugin.h"
 #include "FEBioStdSolver.h"
+#include "FEBioRestart.h"
 
 namespace febio {
 
@@ -62,6 +64,7 @@ void InitLibrary()
 	REGISTER_FECORE_CLASS(FEBioStdSolver, "solve");
 	REGISTER_FECORE_CLASS(FEBioRestart  , "restart");
 	REGISTER_FECORE_CLASS(FEBioRCISolver, "rci_solve");
+	REGISTER_FECORE_CLASS(FEBioTestSuiteTask, "test");
 
 	FECore::InitModule();
 	FEAMR::InitModule();
@@ -72,13 +75,14 @@ void InitLibrary()
 	FEBioMix::InitModule();
 	FEBioOpt::InitModule();
 	FEBioFluid::InitModule();
-    FEBioFluidP::InitModule();
 	FEBioFSI::InitModule();
     FEBioMultiphasicFSI::InitModule();
     FEBioFluidSolutes::InitModule();
     FEBioThermoFluid::InitModule();
+    FEBioPolarFluid::InitModule();
 	FEBioTest::InitModule();
 	FEBioRVE::InitModule();
+	FEImgLib::InitModule();
 #endif
 }
 

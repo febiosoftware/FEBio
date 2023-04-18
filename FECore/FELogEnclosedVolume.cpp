@@ -28,6 +28,9 @@ SOFTWARE.*/
 #include "FESurface.h"
 #include "FENode.h"
 
+BEGIN_FECORE_CLASS(FELogEnclosedVolume, FELogSurfaceData)
+END_FECORE_CLASS();
+
 double FELogEnclosedVolume::value(FESurface& surface)
 {
 	// loop over all elements

@@ -28,47 +28,50 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESoluteBackflowStabilization.h"
-#include "FEFluid.h"
+#include "FEFluidSolutes.h"
 #include "FEBioFluidSolutes.h"
 #include <FECore/FENodeNodeList.h>
+#include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FESoluteBackflowStabilization, FESurfaceLoad)
-ADD_PARAMETER(m_sol , "sol");
+    ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
 FESoluteBackflowStabilization::FESoluteBackflowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
-    m_sol = 0;
+    m_isol = -1;
     m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
-    m_nnlist = FENodeNodeList();
+}
+
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FESoluteBackflowStabilization::SetSurface(FESurface* ps)
+{
+    FESurfaceLoad::SetSurface(ps);
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FESoluteBackflowStabilization::Init()
 {
-    if (FESurfaceLoad::Init() == false) return false;
-    
     // determine the nr of concentration equations
     FEModel& fem = *GetFEModel();
     DOFS& fedofs = fem.GetDOFS();
     m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
     int MAX_CDOFS = fedofs.GetVariableSize(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
-    if ((m_sol < 1) || (m_sol > MAX_CDOFS)) return false;
+    if ((m_isol < 1) || (m_isol > MAX_CDOFS)) return false;
     
     m_dof.AddDofs(m_dofW);
 	m_dof.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
 
     FESurface* ps = &GetSurface();
-    m_backflow.assign(ps->Nodes(), false);
-    m_alpha = 1.0;
     
     m_nnlist.Create(fem.GetMesh());
 
-    return true;
+    return FESurfaceLoad::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -77,14 +80,16 @@ void FESoluteBackflowStabilization::Activate()
 {
     FESurface* ps = &GetSurface();
     
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
+        // mark node as having open DOF
         node.set_bc(dofc, DOF_OPEN);
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -97,7 +102,7 @@ void FESoluteBackflowStabilization::Update()
     // prescribe solute backflow constraint at the nodes
     FESurface* ps = &GetSurface();
     
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
@@ -164,7 +169,7 @@ void FESoluteBackflowStabilization::MarkBackFlow()
 {
     // Mark all nodes on this surface to have open concentration DOF
     FESurface* ps = &GetSurface();
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
@@ -174,6 +179,8 @@ void FESoluteBackflowStabilization::MarkBackFlow()
             node.m_ID[dofc] = -node.m_ID[dofc] - 2;
         }
     }
+
+    const FETimeInfo& tp = GetTimeInfo();
 
     // Calculate normal flow velocity on each face to determine
     // backflow condition
@@ -193,8 +200,8 @@ void FESoluteBackflowStabilization::MarkBackFlow()
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
             FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            rt[i] = node.m_rt*m_alpha + node.m_rp*(1-m_alpha);
-            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*m_alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-m_alphaf);
+            rt[i] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
+            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
         }
         
         double* Nr, *Ns;
@@ -239,9 +246,8 @@ void FESoluteBackflowStabilization::MarkBackFlow()
 
 //-----------------------------------------------------------------------------
 //! calculate residual
-void FESoluteBackflowStabilization::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FESoluteBackflowStabilization::LoadVector(FEGlobalVector& R)
 {
-    m_alpha = tp.alpha; m_alphaf = tp.alphaf;
 }
 
 //-----------------------------------------------------------------------------
@@ -249,10 +255,7 @@ void FESoluteBackflowStabilization::LoadVector(FEGlobalVector& R, const FETimeIn
 void FESoluteBackflowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-	ar & m_dofW;
-	ar & m_dofC;
-	ar & m_backflow;
-	ar & m_alpha;
-	ar & m_alphaf;
-    //ar & m_nnlist;
+    if (ar.IsShallow()) return;
+	ar & m_dofW & m_dofC;
+    m_nnlist.Create(GetFEModel()->GetMesh());
 }

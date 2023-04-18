@@ -33,29 +33,23 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-double FENodeFluidXVel::value(int nnode)
+double FENodeFluidXVel::value(const FENode& node)
 {
     const int dof_VFX = GetFEModel()->GetDOFIndex("wx");
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    FENode& node = mesh.Node(nnode);
     return node.get(dof_VFX);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeFluidYVel::value(int nnode)
+double FENodeFluidYVel::value(const FENode& node)
 {
     const int dof_VFY = GetFEModel()->GetDOFIndex("wy");
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    FENode& node = mesh.Node(nnode);
     return node.get(dof_VFY);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeFluidZVel::value(int nnode)
+double FENodeFluidZVel::value(const FENode& node)
 {
     const int dof_VFZ = GetFEModel()->GetDOFIndex("wz");
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    FENode& node = mesh.Node(nnode);
     return node.get(dof_VFZ);
 }
 
@@ -66,10 +60,11 @@ double FELogElemFluidPosX::value(FEElement& el)
     int nint = el.GaussPoints();
     for (int i=0; i<nint; ++i)
     {
-        FEFluidMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
-        FEElasticMaterialPoint* ept = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (pt) val += pt->m_r0.x;
-        else if (ept) val += ept->m_rt.x;
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+        FEFluidMaterialPoint* pt = mp.ExtractData<FEFluidMaterialPoint>();
+        FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt) val += mp.m_r0.x;
+        else if (ept) val += mp.m_rt.x;
     }
     return val / (double) nint;
 }
@@ -81,10 +76,11 @@ double FELogElemFluidPosY::value(FEElement& el)
     int nint = el.GaussPoints();
     for (int i=0; i<nint; ++i)
     {
-        FEFluidMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
-        FEElasticMaterialPoint* ept = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (pt) val += pt->m_r0.y;
-        else if (ept) val += ept->m_rt.y;
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEFluidMaterialPoint* pt = mp.ExtractData<FEFluidMaterialPoint>();
+		FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
+		if (pt) val += mp.m_r0.y;
+        else if (ept) val += mp.m_rt.y;
     }
     return val / (double) nint;
 }
@@ -96,10 +92,11 @@ double FELogElemFluidPosZ::value(FEElement& el)
     int nint = el.GaussPoints();
     for (int i=0; i<nint; ++i)
     {
-        FEFluidMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
-        FEElasticMaterialPoint* ept = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (pt) val += pt->m_r0.z;
-        else if (ept) val += ept->m_rt.z;
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEFluidMaterialPoint* pt = mp.ExtractData<FEFluidMaterialPoint>();
+		FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
+		if (pt) val += mp.m_r0.z;
+        else if (ept) val += mp.m_rt.z;
     }
     return val / (double) nint;
 }

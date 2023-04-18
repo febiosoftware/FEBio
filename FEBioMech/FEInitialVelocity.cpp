@@ -73,3 +73,47 @@ void FEInitialVelocity::GetNodalValues(int inode, std::vector<double>& values)
 	values[1] = v0.y;
 	values[2] = v0.z;
 }
+
+//=========================================================================
+BEGIN_FECORE_CLASS(FEInitialShellVelocity, FENodalIC)
+	ADD_PARAMETER(m_v0, "value");
+END_FECORE_CLASS();
+
+FEInitialShellVelocity::FEInitialShellVelocity(FEModel* fem) : FENodalIC(fem)
+{
+	m_v0 = vec3d(0, 0, 0);
+}
+
+// set the initial value
+void FEInitialShellVelocity::SetValue(const vec3d& v0)
+{
+	m_v0 = v0;
+}
+
+// initialization
+bool FEInitialShellVelocity::Init()
+{
+	FEDofList dofs(GetFEModel());
+	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY)) == false) return false;
+	SetDOFList(dofs);
+	return true;
+}
+
+// return the values for node i
+void FEInitialShellVelocity::GetNodalValues(int inode, std::vector<double>& values)
+{
+	assert(values.size() == 3);
+
+	const FENodeSet& nset = *GetNodeSet();
+	const FENode& node = *nset.Node(inode);
+
+	FEMaterialPoint mp;
+	mp.m_r0 = node.m_r0;
+	mp.m_index = inode;
+
+	vec3d v0 = m_v0(mp);
+
+	values[0] = v0.x;
+	values[1] = v0.y;
+	values[2] = v0.z;
+}

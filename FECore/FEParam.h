@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <vector>
 #include "fecore_api.h"
 #include "ParamString.h"
+#include "units.h"
 
 //-----------------------------------------------------------------------------
 class FEParamValidator;
@@ -50,7 +51,6 @@ enum FEParamType {
 	FE_PARAM_VEC3D,
 	FE_PARAM_MAT3D,
 	FE_PARAM_MAT3DS,
-	FE_PARAM_IMAGE_3D,
 	FE_PARAM_STRING,
 	FE_PARAM_DATA_ARRAY,
 	FE_PARAM_TENS3DRS,
@@ -70,7 +70,12 @@ enum FEParamType {
 // Parameter flags
 enum FEParamFlag {
 	FE_PARAM_ATTRIBUTE = 0x01,		// parameter will be read as attribute
-	FE_PARAM_USER      = 0x02		// user parameter (owned by parameter list)	
+	FE_PARAM_USER      = 0x02,		// user parameter (owned by parameter list)	
+	FE_PARAM_HIDDEN	   = 0x04,		// Hides parameter (in FEBio Studio)
+	FE_PARAM_ADDLC     = 0x08,		// parameter should get a default load curve in FEBio Studio
+	FE_PARAM_VOLATILE  = 0x10,		// parameter can change (e.g. via a load curve)
+	FE_PARAM_TOPLEVEL  = 0x20,		// parameter should only defined at top-level (materials only)
+	FE_PARAM_WATCH	   = 0x40		// This is a watch parameter 
 };
 
 class FEParam;
@@ -130,9 +135,12 @@ private:
 	FEParamType		m_type;		// type of variable
 	unsigned int	m_flag;		// parameter flags
 	bool*			m_watch;	// parameter watch (set to true if read in)
+	int				m_group;	// index of parameter group (-1 by default)
 
 	const char*	m_szname;	// name of the parameter
 	const char*	m_szenum;	// enumerate values for ints
+	const char* m_szunit;	// unit string
+	const char* m_szlongname;	// a longer, more descriptive name (optional)
 
 	// parameter validator
 	FEParamValidator*	m_pvalid;
@@ -155,11 +163,24 @@ public:
 	// return the name of the parameter
 	const char* name() const;
 
+	// return the long name of the parameter
+	const char* longName() const;
+
 	// return the enum values
 	const char* enums() const;
 
+	// get the current enum value (or nullptr)
+	const char* enumKey() const;
+
+	// get the unit string
+	const char* units() const;
+	FEParam* setUnits(const char* szunit);
+
 	// set the enum values (\0 separated. Make sure the end of the string has two \0's)
-	void SetEnums(const char* sz);
+	FEParam* setEnums(const char* sz);
+
+	// set the long name
+	FEParam* setLongName(const char* sz);
 
 	// parameter dimension
 	int dim() const;
@@ -180,10 +201,25 @@ public:
 	void setParent(FEParamContainer* pc);
 	FEParamContainer* parent();
 
-	void SetFlags(unsigned int flags);
+	FEParam* SetFlags(unsigned int flags);
 	unsigned int GetFlags() const;
 
-	void SetWatch(bool b);
+	void SetWatchVariable(bool* watchVar);
+	bool* GetWatchVariable();
+	void SetWatchFlag(bool b);
+
+	bool IsHidden() const;
+
+	bool IsVolatile() const;
+
+	FEParam* MakeVolatile(bool b);
+
+	bool IsTopLevel() const;
+	FEParam* MakeTopLevel(bool b);
+
+public:
+	int GetParamGroup() const;
+	void SetParamGroup(int i);
 
 public:
 	void Serialize(DumpStream& ar);

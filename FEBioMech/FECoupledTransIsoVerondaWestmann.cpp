@@ -30,24 +30,34 @@ SOFTWARE.*/
 #include "FECoupledTransIsoVerondaWestmann.h"
 #include <FECore/log.h>
 #include <FECore/expint_Ei.h>
+#include <FECore/FEConstValueVec3.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FECoupledTransIsoVerondaWestmann, FEElasticMaterial)
-	ADD_PARAMETER(m_c1  , FE_RANGE_GREATER(0.0), "c1");
+	ADD_PARAMETER(m_c1  , FE_RANGE_GREATER(0.0), "c1")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_c2  , "c2");
-	ADD_PARAMETER(m_c3  , "c3");
+	ADD_PARAMETER(m_c3  , "c3")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_c4  , "c4");
 	ADD_PARAMETER(m_c5  , "c5");
 	ADD_PARAMETER(m_flam, FE_RANGE_GREATER_OR_EQUAL(1.0), "lambda");
 	ADD_PARAMETER(m_K   , FE_RANGE_GREATER(0.0), "k");
-	ADD_PARAMETER(m_fiber, "fiber");
+	
+	ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FECoupledTransIsoVerondaWestmann::FECoupledTransIsoVerondaWestmann(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_fiber = vec3d(1, 0, 0);
+	m_c1 = 0.0;
+	m_c2 = 0.0;
+	m_c3 = 0.0;
+	m_c4 = 0.0;
+	m_c5 = 0.0;
+	m_flam = 1.0;
+	m_K = 0.0;
+
+	m_fiber = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -64,7 +74,7 @@ mat3ds FECoupledTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// get the material fiber axis
-	vec3d a0 = m_fiber(mp);
+	vec3d a0 = m_fiber->unitVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -123,11 +133,8 @@ tens4ds FECoupledTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 	// calculate left Cauchy-Green tensor: B = F*Ft
 	mat3ds B = pt.LeftCauchyGreen();
 
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
-
 	// get the material fiber axis
-	vec3d a0 = Q.col(0);
+	vec3d a0 = m_fiber->unitVector(mp);
 
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
@@ -198,12 +205,9 @@ double FECoupledTransIsoVerondaWestmann::StrainEnergyDensity(FEMaterialPoint& mp
 	// calculate square of B
 	mat3ds B2 = B.sqr();
     
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
-
 	// get the material fiber axis
-	vec3d a0 = Q.col(0);
-    
+	vec3d a0 = m_fiber->unitVector(mp);
+
 	// get the spatial fiber axis
 	vec3d a = pt.m_F*a0;
 	double l = a.unit();

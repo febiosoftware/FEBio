@@ -39,7 +39,7 @@ class FENodeSet;
 //! Nodal load boundary condition
 class FECORE_API FENodalLoad : public FEModelLoad
 {
-	FECORE_SUPER_CLASS
+	FECORE_BASE_CLASS(FENodalLoad)
 
 public:
 	//! constructor
@@ -75,10 +75,10 @@ public:
 
 public:
 	//! evaluate the contribution to the residual
-	virtual void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	virtual void LoadVector(FEGlobalVector& R) override;
 
 	//! evaluate the contribution to the global stiffness matrix
-	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	virtual void StiffnessMatrix(FELinearSystem& LS) override;
 
 private:
 	FEDofList	m_dofs;
@@ -110,9 +110,13 @@ public:
 
 	double NodeValue(int n);
 
+	void SetDtScale(bool b);
+
 private:
 	int				m_dof;		//!< degree of freedom index
 	FEParamDouble	m_scale;	//!< applied load scale factor
+
+	bool m_dtscale;
 
 	DECLARE_FECORE_CLASS();
 };

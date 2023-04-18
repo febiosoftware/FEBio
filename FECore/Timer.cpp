@@ -29,38 +29,16 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "Timer.h"
 #include <stdio.h>
-#include <time.h>
 #include <string>
+#include "FEModel.h"
 
-//-----------------------------------------------------------------------------
-// Define the data types used for measuring times.
-// This depends on the system
-#ifdef WIN32
-#define TIMER_TYPE clock_t
-#else
-#define TIMER_TYPE	time_t
-#endif
-
-//-----------------------------------------------------------------------------
-// forward declaration of the functions to retrieve timing info
-void sys_get_time(TIMER_TYPE& t);
-double sys_diff_time(TIMER_TYPE& t1, TIMER_TYPE& t0);
-
-//-----------------------------------------------------------------------------
-// OS-dependent timing functions
-#ifdef WIN32
-void sys_get_time(TIMER_TYPE& t) { t = clock(); }
-double sys_diff_time(TIMER_TYPE& t1, TIMER_TYPE& t0) { return (double) (t1 - t0) / CLOCKS_PER_SEC; }
-#else
-void sys_get_time(TIMER_TYPE& t) { time(&t); }
-double sys_diff_time(TIMER_TYPE& t1, TIMER_TYPE& t0) { return difftime(t1, t0); }
-#endif
+using namespace std::chrono;
 
 //-----------------------------------------------------------------------------
 // data storing timing info
 struct	timer_data {
-	TIMER_TYPE	m_start;	//!< time at start
-	TIMER_TYPE	m_stop;		//!< time at last stop
+	time_point<steady_clock>	m_start;	//!< time at start
+	time_point<steady_clock>	m_stop;		//!< time at last stop
 };
 
 //-----------------------------------------------------------------------------
@@ -80,7 +58,7 @@ Timer::~Timer()
 void Timer::start()
 {
 	timer_data& t = *(static_cast<timer_data*>(m_pimpl));
-	sys_get_time(t.m_start);
+    t.m_start = steady_clock::now();
 	m_brunning = true;
 }
 
@@ -88,16 +66,16 @@ void Timer::start()
 void Timer::stop()
 {
 	timer_data& t = *(static_cast<timer_data*>(m_pimpl));
-	sys_get_time(t.m_stop);
+	t.m_stop = steady_clock::now();
 	m_brunning = false;
 
-	m_sec += sys_diff_time(t.m_stop, t.m_start);
+	m_total += t.m_stop - t.m_start;
 }
 
 //-----------------------------------------------------------------------------
 void Timer::reset()
 {
-	m_sec = 0;
+	m_total = duration_cast<dseconds>(system_clock::duration::zero());
 	m_brunning = false;
 }
 
@@ -106,21 +84,20 @@ double Timer::peek()
 {
 	if (m_brunning)
 	{
-		TIMER_TYPE pause;
-		sys_get_time(pause);
+        time_point<steady_clock> pause = steady_clock::now();
 		timer_data& t = *(static_cast<timer_data*>(m_pimpl));
-		return m_sec + sys_diff_time(pause, t.m_start);
+        return duration_cast<dseconds>(m_total + (pause - t.m_start)).count();
 	}
 	else 
 	{
-		return m_sec;
+		return m_total.count();
 	}
 }
 
 //-----------------------------------------------------------------------------
 void Timer::GetTime(int& nhour, int& nmin, int& nsec)
 {
-	double sec = (m_brunning? peek() : m_sec);
+	double sec = (m_brunning? peek() : m_total.count());
 	GetTime(sec, nhour, nmin, nsec);
 }
 
@@ -135,7 +112,7 @@ void Timer::GetTime(double fsec, int& nhour, int& nmin, int& nsec)
 //-----------------------------------------------------------------------------
 double Timer::GetTime()
 {
-	return (m_brunning? peek() : m_sec);
+	return (m_brunning? peek() : m_total.count());
 }
 
 //-----------------------------------------------------------------------------
@@ -152,4 +129,18 @@ void Timer::time_str(double fsec, char* sz)
 	int nhour, nmin, nsec;
 	GetTime(fsec, nhour, nmin, nsec);
 	sprintf(sz, "%d:%02d:%02d", nhour, nmin, nsec);
+}
+
+//============================================================================
+TimerTracker::TimerTracker(FEModel* fem, int timerId) : TimerTracker(fem->GetTimer(timerId)) {}
+
+TimerTracker::TimerTracker(Timer* timer) 
+{
+	if (timer && (timer->isRunning() == false)) { m_timer = timer; timer->start(); }
+	else m_timer = nullptr;
+};
+
+TimerTracker::~TimerTracker() 
+{ 
+	if (m_timer) m_timer->stop(); 
 }

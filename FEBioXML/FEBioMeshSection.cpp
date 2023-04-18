@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include <FECore/FETrussDomain.h>
 #include <FECore/FEDomain2D.h>
 #include <FECore/FEModel.h>
-#include <FEBioMech/FEElasticMaterial.h>
+#include <FECore/FEMaterial.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FENodeNodeList.h>
 #include <sstream>
@@ -194,8 +194,12 @@ void FEBioMeshSection::ParseNodeSetSection(XMLTag& tag, FEBModel::Part* part)
 {
 	const char* szname = tag.AttributeValue("name");
 
+	// see if a nodeset with this name already exists
+	FEBModel::NodeSet* set = part->FindNodeSet(szname);
+	if (set) throw FEBioImport::RepeatedNodeSet(szname);
+
 	// create the node set
-	FEBModel::NodeSet* set = new FEBModel::NodeSet(szname);
+	set = new FEBModel::NodeSet(szname);
 	part->AddNodeSet(set);
 
 	int nodes = tag.children();
@@ -225,11 +229,15 @@ void FEBioMeshSection::ParseSurfaceSection(XMLTag& tag, FEBModel::Part* part)
 	// get the required name attribute
 	const char* szname = tag.AttributeValue("name");
 
+	// see if this surface was already defined
+	FEBModel::Surface* ps = part->FindSurface(szname);
+	if (ps) throw FEBioImport::RepeatedSurface(szname);
+
 	// count nr of faces
 	int faces = tag.children();
 
 	// allocate storage for faces
-	FEBModel::Surface* ps = new FEBModel::Surface(szname);
+	ps = new FEBModel::Surface(szname);
 	part->AddSurface(ps);
 	ps->Create(faces);
 
@@ -247,6 +255,7 @@ void FEBioMeshSection::ParseSurfaceSection(XMLTag& tag, FEBModel::Part* part)
 		else if (tag == "tri3") face.ntype = 3;
 		else if (tag == "tri6") face.ntype = 6;
 		else if (tag == "tri7") face.ntype = 7;
+		else if (tag == "tri10") face.ntype = 10;
 		else if (tag == "quad8") face.ntype = 8;
 		else if (tag == "quad9") face.ntype = 9;
 		else throw XMLReader::InvalidTag(tag);
@@ -269,8 +278,12 @@ void FEBioMeshSection::ParseElementSetSection(XMLTag& tag, FEBModel::Part* part)
 	// get the required name attribute
 	const char* szname = tag.AttributeValue("name");
 
+	// see if this element set was already defined
+	FEBModel::ElementSet* ps = part->FindElementSet(szname);
+	if (ps) throw FEBioImport::RepeatedElementSet(szname);
+
 	// allocate storage for faces
-	FEBModel::ElementSet* ps = new FEBModel::ElementSet(szname);
+	ps = new FEBModel::ElementSet(szname);
 	part->AddElementSet(ps);
 
 	// read elements

@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FENodeToNodeConstraint.h"
-#include <FECore/FEModel.h>
+#include <FECore/FEMesh.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEGlobalMatrix.h>
 
@@ -54,14 +54,12 @@ int FENodeToNodeConstraint::InitEquations(int neq)
 void FENodeToNodeConstraint::UnpackLM(vector<int>& lm)
 {
 	// get the displacement dofs
-	FEModel& fem = *GetFEModel();
-	DOFS& dofs = GetFEModel()->GetDOFS();
-	int dofX = dofs.GetDOF("x");
-	int dofY = dofs.GetDOF("y");
-	int dofZ = dofs.GetDOF("z");
+	int dofX = GetDOFIndex("x");
+	int dofY = GetDOFIndex("y");
+	int dofZ = GetDOFIndex("z");
 
 	// we need to couple the dofs of node A, B, and the LMs
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// add the dofs of node A
 	FENode& node_a = mesh.Node(m_a - 1);
@@ -91,8 +89,7 @@ void FENodeToNodeConstraint::Update(const std::vector<double>& ui)
 // The LoadVector function evaluates the "forces" that contribute to the residual of the system
 void FENodeToNodeConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 	vec3d ra = mesh.Node(m_a - 1).m_rt;
 	vec3d rb = mesh.Node(m_b - 1).m_rt;
 	vec3d c = ra - rb;

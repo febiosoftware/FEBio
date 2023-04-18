@@ -28,9 +28,10 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMultiphasic.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
+#include <FECore/FEModel.h>
+#include <FECore/FECoreKernel.h>
 #include <FECore/log.h>
+#include <FECore/tens4d.h>
 #include <complex>
 using namespace std;
 
@@ -46,7 +47,7 @@ BEGIN_FECORE_CLASS(FEMultiphasic, FEMaterial)
 	ADD_PARAMETER(m_cFr    , "fixed_charge_density");
 
 	// define the material properties
-	ADD_PROPERTY(m_pSolid , "solid"              );
+	ADD_PROPERTY(m_pSolid , "solid"              , FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pPerm  , "permeability"       );
 	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
 	ADD_PROPERTY(m_pSupp  , "solvent_supply"     , FEProperty::Optional);
@@ -54,6 +55,8 @@ BEGIN_FECORE_CLASS(FEMultiphasic, FEMaterial)
 	ADD_PROPERTY(m_pSBM   , "solid_bound"        , FEProperty::Optional);
 	ADD_PROPERTY(m_pReact , "reaction"           , FEProperty::Optional);
     ADD_PROPERTY(m_pMReact, "membrane_reaction"  , FEProperty::Optional);
+
+	ADD_PROPERTY(m_Q, "mat_axis", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -320,21 +323,23 @@ int FEMultiphasic::FindLocalSBMID(int nid)
 //-----------------------------------------------------------------------------
 bool FEMultiphasic::Init()
 {
-	// we first have to set the parent material
-	// TODO: This seems redundant since each material already has a pointer to its parent
-	for (int i=0; i<Reactions(); ++i)
-	{
-		m_pReact[i]->m_pMP = this;
-	}
-    for (int i=0; i<MembraneReactions(); ++i)
-    {
-        m_pMReact[i]->m_pMP = this;
-    }
-
 	// set the solute IDs first, since they are referenced in FESolute::Init()
 	for (int i = 0; i<Solutes(); ++i) {
 		m_pSolute[i]->SetSoluteLocalID(i);
 	}
+
+    if (m_pSolid->Init() == false) return false;
+    if (m_pPerm->Init() == false) return false;
+    if (m_pOsmC->Init() == false) return false;
+    if (m_pSupp && (m_pSupp->Init() == false)) return false;
+    for (int i=0; i<Solutes(); ++i)
+        if (m_pSolute[i]->Init() == false) return false;
+    for (int i=0; i<SBMs(); ++i)
+        if (m_pSBM[i]->Init() == false) return false;
+    for (int i=0; i<Reactions(); ++i)
+        if (m_pReact[i]->Init() == false) return false;
+    for (int i=0; i<MembraneReactions(); ++i)
+        if (m_pMReact[i]->Init() == false) return false;
 
 	// call the base class.
 	// This also initializes all properties
@@ -366,6 +371,24 @@ bool FEMultiphasic::Init()
 }
 
 //-----------------------------------------------------------------------------
+// update specialized material points
+void FEMultiphasic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pPerm->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pOsmC->UpdateSpecializedMaterialPoints(mp, tp);
+    if (m_pSupp) m_pSupp->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<Solutes(); ++i)
+        m_pSolute[i]->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<SBMs(); ++i)
+        m_pSBM[i]->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<Reactions(); ++i)
+        m_pReact[i]->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<MembraneReactions(); ++i)
+        m_pMReact[i]->UpdateSpecializedMaterialPoints(mp, tp);
+}
+
+//-----------------------------------------------------------------------------
 void FEMultiphasic::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
@@ -373,13 +396,6 @@ void FEMultiphasic::Serialize(DumpStream& ar)
 
 	ar & m_Rgas & m_Tabs & m_Fc;
 	ar & m_zmin & m_ndeg;
-
-	if (ar.IsLoading())
-	{
-		// restore the m_pMP pointers for reactions
-		int NR = (int) m_pReact.size();
-		for (int i=0; i<NR; ++i) m_pReact[i]->m_pMP = this;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -391,7 +407,7 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 		
 	// evaluate referential apparent density of base solid
 	double density = m_pSolid->Density(pt);
-	double rhosr = pet.m_phi0*density;
+	double rhosr = pet.m_phi0t*density;
 
 	// add contribution from solid-bound molecules
 	for (int isbm=0; isbm<(int)spt.m_sbmr.size(); ++isbm)
@@ -400,8 +416,15 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 	return rhosr;
 }
 
+//! Return solid referential apparent density
+double FEMultiphasic::GetReferentialSolidVolumeFraction(const FEMaterialPoint& pt)
+{
+    const FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    return bt.m_phi0t;
+}
+
 //-----------------------------------------------------------------------------
-//! Solid referential volume fraction
+//! Evaluate and return solid referential volume fraction
 double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 {
 	// get referential apparent density of base solid (assumed constant)
@@ -411,6 +434,9 @@ double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
 		phisr += SBMReferentialVolumeFraction(pt, isbm);
 	
+    FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    bt.m_phi0t = phisr;
+    
 	return phisr;
 }
 
@@ -422,7 +448,7 @@ double FEMultiphasic::Porosity(FEMaterialPoint& pt)
 	FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// solid referential volume fraction
-	double phisr = bt.m_phi0;
+	double phisr = bt.m_phi0t;
     
 	// relative volume
 	double J = et.m_J;
@@ -445,7 +471,7 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	
 	// relative volume
 	double J = et.m_J;
-	double phi0 = bt.m_phi0;
+	double phi0 = bt.m_phi0t;
 	double ce = 0;
 
 	// add contribution from charged solid-bound molecules
@@ -453,7 +479,12 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 		ce += SBMChargeNumber(isbm)*spt.m_sbmr[isbm]/SBMMolarMass(isbm);
     
     double cFr = m_cFr(pt);
-	double cF = (cFr*(1-phi0)+ce)/(J-phi0);
+	double cF = (cFr*(1-bt.m_phi0)+ce)/(J-phi0);
+    
+    // add contribution from solid-bound 'solutes'
+    const int nsol = (int)m_pSolute.size();
+    for (int isol=0; isol<nsol; ++isol)
+        if (spt.m_bsb[isol]) cF += spt.m_ca[isol]*m_pSolute[isol]->ChargeNumber();
 
 	return cF;
 }
@@ -475,13 +506,15 @@ double FEMultiphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 	const int nsol = (int)m_pSolute.size();
 	double cF = FixedChargeDensity(pt);
 
-	vector<double> c(nsol);		// effective concentration
-	vector<double> khat(nsol);	// solubility
-	vector<int> z(nsol);		// charge number
+	vector<double> c(nsol,0);       // effective concentration
+	vector<double> khat(nsol,1);	// solubility
+	vector<int> z(nsol,0);          // charge number
 	for (i=0; i<nsol; ++i) {
-		c[i] = set.m_c[i];
-		khat[i] = m_pSolute[i]->m_pSolub->Solubility(pt);
-		z[i] = m_pSolute[i]->ChargeNumber();
+        if (!set.m_bsb[i]) {
+            c[i] = set.m_c[i];
+            khat[i] = m_pSolute[i]->m_pSolub->Solubility(pt);
+            z[i] = m_pSolute[i]->ChargeNumber();
+        }
 	}
 	
 	// evaluate polynomial coefficients
@@ -594,7 +627,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
 	
 	// get the charge density and its derivatives
 	double J = ept.m_J;
-	double phi0 = ppt.m_phi0;
+	double phi0 = ppt.m_phi0t;
 	double cF = FixedChargeDensity(mp);
 	double dcFdJ = -cF/(J - phi0);
 	double dcFdJJ = 2*cF/SQR(J-phi0);
@@ -763,7 +796,7 @@ tens4ds FEMultiphasic::Tangent(FEMaterialPoint& mp)
 	
 	// relative volume and solid volume fraction
 	double J = ept.m_J;
-	double phi0 = bpt.m_phi0;
+	double phi0 = bpt.m_phi0t;
 	
 	// get the charge density and its derivatives
 	double cF = FixedChargeDensity(mp);
@@ -946,23 +979,20 @@ double FEMultiphasic::Pressure(FEMaterialPoint& pt)
 	int i;
 	
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	const int nsol = (int)m_pSolute.size();
 	
 	// effective pressure
 	double p = ppt.m_p;
 	
-	// effective concentration
-	vector<double> ca(nsol);
-	for (i=0; i<nsol; ++i)
-		ca[i] = Concentration(pt, i);
+	// osmolarity
+    double c = spt.Osmolarity();
 	
 	// osmotic coefficient
 	double osmc = m_pOsmC->OsmoticCoefficient(pt);
 	
 	// actual pressure
-	double pa = 0;
-	for (i=0; i<nsol; ++i) pa += ca[i];
-	pa = p + m_Rgas*m_Tabs*osmc*pa;
+	double pa = p + m_Rgas*m_Tabs*osmc*c;
 	
 	return pa;
 }
@@ -985,4 +1015,136 @@ vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 	Ie *= m_Fc;
 	
 	return Ie;
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate effective permeability
+mat3ds FEMultiphasic::EffectivePermeability(FEMaterialPoint& pt)
+{
+    // evaluate the hydraulic permeability
+    mat3ds K = GetPermeability()->Permeability(pt);
+
+    const int nsol = Solutes();
+    
+    // if there are no solutes in this mixture, we're done
+    if (nsol == 0) return K;
+
+    // initialize effective permeability
+    mat3ds Ke = K.inverse();
+    
+    // fluid volume fraction (porosity) in current configuration
+    double phiw = Porosity(pt);
+    double tmp = m_Rgas*m_Tabs/phiw;
+    mat3dd I(1.0);
+
+    FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
+
+    // add solute contributions (but not 'solid-bound' solutes)
+    for (int isol=0; isol<nsol; ++isol) {
+        if (!spt.m_bsb[isol]) {
+            // concentration
+            double ca = spt.m_ca[isol];
+            // solute diffusivity in mixture
+            mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt);
+            // solute free diffusivity
+            double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+            
+            Ke += (I - D/D0)*(tmp*ca/D0);
+        }
+    }
+        
+    return Ke.inverse();
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate tangent of effective permeability w.r.t. strain
+tens4dmm FEMultiphasic::TangentPermeabilityStrain(FEMaterialPoint& pt, const mat3ds& Ke)
+{
+    // get the hydraulic permeability strain tangent
+    tens4dmm dKdE = GetPermeability()->Tangent_Permeability_Strain(pt);
+    
+    const int nsol = Solutes();
+    
+    // if there are no solutes in this mixture, we're done
+    if (nsol == 0) return dKdE;
+    
+    // evaluate the inverse of the hydraulic permeability
+    mat3ds Ki = GetPermeability()->Permeability(pt).inverse();
+    
+    // fluid volume fraction (porosity) in current configuration
+    double phiw = Porosity(pt);
+    mat3dd I(1.0);
+    
+    FEElasticMaterialPoint&  ept = *(pt.ExtractData<FEElasticMaterialPoint >());
+    FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
+    
+    tens4dmm dKedE;
+    dKedE.zero();
+    
+    // add solute contributions
+    for (int isol=0; isol<nsol; ++isol) {
+        // concentration
+        double ca = spt.m_ca[isol];
+        // solute free diffusivity
+        double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+        // solute diffusivity in mixture, normalized by D0
+        mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt)/D0;
+        // solute diffusiviety strain tangent, normalized by D0
+        tens4dmm dDdE = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Strain(pt)/D0;
+        
+        dKedE += (dDdE + (dyad4mm(I, D) + dyad4mm(D,I) - dyad4mm(I,I))*2
+        - dyad1mm(D,I) + dyad1mm(I-D,I)*(1./phiw - ept.m_J*spt.m_dkdJ[isol]/spt.m_k[isol]))*ca/D0;
+    }
+    
+    dKedE = dKedE*(m_Rgas*m_Tabs/phiw) + ddot(dyad2mm(Ki,Ki), dKdE);
+    
+    return ddot(dyad2mm(Ke, Ke), dKedE);
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate tangent of effective permeability w.r.t. concentration
+mat3ds FEMultiphasic::TangentPermeabilityConcentration(FEMaterialPoint& pt, const int sol, const mat3ds& Ke)
+{
+    mat3ds dKedc(0,0,0,0,0,0);
+    
+    const int nsol = Solutes();
+    
+    if (nsol == 0) return dKedc;
+    
+    // fluid volume fraction (porosity) in current configuration
+    double phiw = Porosity(pt);
+    mat3dd I(1.0);
+    
+    FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
+    
+    // add solute contributions
+    for (int isol=0; isol<nsol; ++isol) {
+        // concentration
+        double ca = spt.m_ca[isol];
+        // solute free diffusivity
+        double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+        // solute diffusivity in mixture, normalized by D0
+        mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt)/D0;
+        // solute free diffusivity concentration tangent
+        double dD0dc = m_pSolute[isol]->m_pDiff->Tangent_Free_Diffusivity_Concentration(pt, sol);
+        // solute diffusivity concentration tangent
+        mat3ds dDdc = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Concentration(pt,sol);
+        
+        double kd = (isol == sol) ? 1 : 0;
+        dKedc += (I-D)*((spt.m_dkdc[isol][sol]*spt.m_c[isol] + spt.m_k[isol]*kd - dD0dc*ca/D0)/D0)
+        - (dDdc - D*dD0dc)*(ca/D0/D0);
+    }
+    
+    dKedc *= m_Rgas*m_Tabs/phiw;
+    
+    return -(Ke*dKedc*Ke).sym();
+}
+
+double FEMultiphasic::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0);
+	return cf;
 }

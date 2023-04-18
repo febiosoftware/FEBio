@@ -28,19 +28,20 @@ SOFTWARE.*/
 #include <FEBioMech/FEElasticMaterial.h>
 #include "FEFluidFSI.h"
 #include <FEBioMix/FEHydraulicPermeability.h>
+#include <FEBioMix/FEBiphasic.h>
 #include <FEBioMech/FEBodyForce.h>
 
 //-----------------------------------------------------------------------------
 //! FSI material point class.
 //
-class FEBIOFLUID_API FEBiphasicFSIMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEBiphasicFSIMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEBiphasicFSIMaterialPoint(FEMaterialPoint* pt);
+    FEBiphasicFSIMaterialPoint(FEMaterialPointData* pt);
     
     //! create a shallow copy
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! data serialization
     void Serialize(DumpStream& ar);
@@ -59,13 +60,13 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for FluidFSI materials.
 
-class FEBIOFLUID_API FEBiphasicFSI : public FEFluidFSI
+class FEBIOFLUID_API FEBiphasicFSI : public FEFluidFSI, public FEBiphasicInterface
 {
 public:
     FEBiphasicFSI(FEModel* pfem);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     //! performs initialization
     bool Init() override;
@@ -73,12 +74,6 @@ public:
 public:
     //! calculate inner stress at material point
     mat3ds Stress(FEMaterialPoint& pt);
-    
-    //! solid referential apparent density
-    double SolidReferentialApparentDensity(FEMaterialPoint& pt);
-    
-    //! solid referential volume fraction
-    double SolidReferentialVolumeFraction(FEMaterialPoint& pt);
     
     //! return the permeability tensor as a matrix
     void Permeability(double k[3][3], FEMaterialPoint& pt);
@@ -119,6 +114,19 @@ public:
     //! fluid density
     double FluidDensity(FEMaterialPoint& mp);
     
+public: // overridden from FEBiphasicInterface
+
+    double GetReferentialSolidVolumeFraction(const FEMaterialPoint& mp) override {
+        const FEBiphasicFSIMaterialPoint* pt = (mp.ExtractData<FEBiphasicFSIMaterialPoint>());
+        return pt->m_phi0;
+    }
+
+    //! solid referential apparent density
+    double SolidReferentialApparentDensity(FEMaterialPoint& pt) override;
+
+    //! solid referential volume fraction
+    double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
+
 public: // material parameters
     double      m_rhoTw; //!< true fluid density
     FEParamDouble      m_phi0;  //!< solid volume fraction in reference configuration

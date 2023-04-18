@@ -80,7 +80,7 @@ void FEDataParameter::update()
 	m_rf.Add(x, y);
 }
 
-FEDataParameter::FEDataParameter(FEModel* fem) : FEDataSource(fem), m_rf(fem)
+FEDataParameter::FEDataParameter(FEModel* fem) : FEDataSource(fem)
 {
 	m_ord = "fem.time";
 }
@@ -119,14 +119,14 @@ bool FEDataParameter::Init()
 			if (sz[0] == '\'') sz++;
 			*c1 = 0;
 
-			FENodeLogData* pd = fecore_new<FENodeLogData>(sz, fem);
+			FELogNodeData* pd = fecore_new<FELogNodeData>(sz, fem);
 			if (pd == nullptr) { feLogErrorEx(fem, "Invalid parameter name %s", m_param.c_str()); return false; }
 
 			FEMesh& mesh = fem->GetMesh();
 			FENode* pn = mesh.FindNodeFromID(nid);
 			if (pn == nullptr) { feLogErrorEx(fem, "Invalid node id"); return false; }
 
-			m_fy = [=]() { return pd->value(nid - 1); };
+			m_fy = [=]() { return pd->value(*pn); };
 		}
 		else if (strstr(m_param.c_str(), "fem.element_data"))
 		{
@@ -297,14 +297,14 @@ bool FEDataParameter::Init()
             if (sz[0] == '\'') sz++;
             *c1 = 0;
             
-            FENodeLogData* pd = fecore_new<FENodeLogData>(sz, fem);
+            FELogNodeData* pd = fecore_new<FELogNodeData>(sz, fem);
             if (pd == nullptr) { feLogErrorEx(fem, "Invalid ordinate name %s", m_ord.c_str()); return false; }
             
             FEMesh& mesh = fem->GetMesh();
             FENode* pn = mesh.FindNodeFromID(nid);
             if (pn == nullptr) { feLogErrorEx(fem, "Invalid node id"); return false; }
             
-            m_fx = [=]() { return pd->value(nid - 1); };
+            m_fx = [=]() { return pd->value(*pn); };
         }
 		else if (strstr(m_ord.c_str(), "fem.element_data"))
 		{
@@ -399,7 +399,7 @@ double FEDataFilterPositive::Evaluate(double t)
 
 
 //=================================================================================================
-FEDataFilterSum::FEDataFilterSum(FEModel* fem) : FEDataSource(fem), m_rf(fem)
+FEDataFilterSum::FEDataFilterSum(FEModel* fem) : FEDataSource(fem)
 {
 	m_data = nullptr;
 	m_nodeSet = nullptr;
@@ -410,7 +410,7 @@ FEDataFilterSum::~FEDataFilterSum()
 	delete m_data;
 }
 
-void FEDataFilterSum::SetData(FENodeLogData* data, FENodeSet* nodeSet)
+void FEDataFilterSum::SetData(FELogNodeData* data, FENodeSet* nodeSet)
 {
 	m_data = data;
 	m_nodeSet = nodeSet;
@@ -462,7 +462,7 @@ void FEDataFilterSum::update()
 	double sum = 0.0;
 	for (int i = 0; i < m_nodeSet->Size(); ++i)
 	{
-		double vi = m_data->value(ns[i]);
+		double vi = m_data->value(*ns.Node(i));
 		sum += vi;
 	}
 

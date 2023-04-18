@@ -32,12 +32,11 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFiberExpPow, FEElasticFiberMaterial)
+BEGIN_FECORE_CLASS(FEFiberExpPow, FEFiberMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
-	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" );
-	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"  );
-	ADD_PARAMETER(m_epsf , "epsilon_scale");
+	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" )->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"  )->setUnits(UNIT_PRESSURE);
     ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER_OR_EQUAL(1.0), "lam0");
 END_FECORE_CLASS();
 
@@ -45,7 +44,7 @@ END_FECORE_CLASS();
 // FEFiberExpPow
 //-----------------------------------------------------------------------------
 
-FEFiberExpPow::FEFiberExpPow(FEModel* pfem) : FEElasticFiberMaterial(pfem)
+FEFiberExpPow::FEFiberExpPow(FEModel* pfem) : FEFiberMaterial(pfem)
 { 
 	m_alpha = 0;
 	m_beta = 2;
@@ -207,6 +206,15 @@ double FEFiberExpPow::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d&
     return sed;
 }
 
+// define the material parameters
+BEGIN_FECORE_CLASS(FEElasticFiberExpPow, FEElasticFiberMaterial)
+	ADD_PARAMETER(m_fib.m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
+	ADD_PARAMETER(m_fib.m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta");
+	ADD_PARAMETER(m_fib.m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi" )->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_fib.m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"  )->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_fib.m_lam0 , FE_RANGE_GREATER_OR_EQUAL(1.0), "lam0");
+END_FECORE_CLASS();
+
 
 //-----------------------------------------------------------------------------
 // FEFiberExponentialPower
@@ -216,9 +224,8 @@ double FEFiberExpPow::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d&
 BEGIN_FECORE_CLASS(FEFiberExponentialPower, FEElasticFiberMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
-	ADD_PARAMETER(m_ksi  , "ksi"  );
-    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   );
-	ADD_PARAMETER(m_epsf , "epsilon_scale");
+	ADD_PARAMETER(m_ksi  , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi"  )->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_PRESSURE);
     ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER_OR_EQUAL(1.0), "lam0");
 END_FECORE_CLASS();
 

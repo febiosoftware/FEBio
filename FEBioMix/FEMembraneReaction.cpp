@@ -28,28 +28,45 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMembraneReaction.h"
-#include "FECore/FEElementTraits.h"
-#include "FECore/DOFS.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
-#include "FEMultiphasic.h"
+#include <FECore/FEElementTraits.h>
+#include <FECore/DOFS.h>
+#include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include "FESoluteInterface.h"
+#include "FESolute.h"
 #include <stdlib.h>
 
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEInternalReactantSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vRi");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEInternalProductSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vPi");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEExternalReactantSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vRe");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEExternalProductSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vPe");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEMembraneReaction, FEReaction)
-	ADD_PARAMETER(m_Vbar  , "Vbar");
-	ADD_PARAMETER(m_vRtmp , "vR"  );
-	ADD_PARAMETER(m_vPtmp , "vP"  );
-	ADD_PARAMETER(m_vRitmp, "vRi");
-	ADD_PARAMETER(m_vPitmp, "vPi");
-	ADD_PARAMETER(m_vRetmp, "vRe");
-	ADD_PARAMETER(m_vPetmp, "vPe");
+    ADD_PARAMETER(m_Vovr, "override_vbar")->SetFlags(FE_PARAM_WATCH);
+    ADD_PARAMETER(m_Vbar , "Vbar")->SetWatchVariable(&m_Vovr);
 
-	// set material properties
-	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
-	ADD_PROPERTY(m_pRev, "reverse_rate", FEProperty::Optional);
+    ADD_PROPERTY(m_vRtmp, "vR", FEProperty::Optional)->SetLongName("Membrane reactants");
+    ADD_PROPERTY(m_vPtmp, "vP", FEProperty::Optional)->SetLongName("Membrane products");
+    ADD_PROPERTY(m_vRitmp, "vRi", FEProperty::Optional)->SetLongName("Inner membrane reactants");
+    ADD_PROPERTY(m_vPitmp, "vPi", FEProperty::Optional)->SetLongName("Inner membrane products");;
+    ADD_PROPERTY(m_vRetmp, "vRe", FEProperty::Optional)->SetLongName("Outer membrane reactants");
+    ADD_PROPERTY(m_vPetmp, "vPe", FEProperty::Optional)->SetLongName("Outer membrane products");
 
 END_FECORE_CLASS();
 
@@ -57,39 +74,84 @@ END_FECORE_CLASS();
 FEMembraneReaction::FEMembraneReaction(FEModel* pfem) : FEReaction(pfem)
 {
     // additional initializations
+    m_Vbar = 0.0;
     m_Vovr = false;
+    m_nsol = -1;
 
 	m_pFwd = m_pRev = 0;
 }
 
 //-----------------------------------------------------------------------------
-FESoluteData* FEMembraneReaction::FindSoluteData(int nid)
+// Finds the solute id of a solute with given ID nsol.
+// This currently returns either nsol if a solute was found or -1 if not
+FESoluteData* FEMembraneReaction::GetSolute(int nsol)
 {
     FEModel& fem = *GetFEModel();
-    int N = GetFEModel()->GlobalDataItems();
+    int N = fem.GlobalDataItems();
     for (int i=0; i<N; ++i)
     {
         FESoluteData* psd = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
-        if (psd && (psd->GetID() - 1 == nid)) return psd;
+        if (psd)
+        {
+            if (psd->GetID()-1 == nsol) return psd;
+        }
     }
-    return 0;
+    return nullptr;
 }
 
 //-----------------------------------------------------------------------------
 bool FEMembraneReaction::Init()
 {
-    // initialize base class
-    FEReaction::Init();
-    
     // set the parents for the reaction rates
     if (m_pFwd) m_pFwd->m_pReact = this;
     if (m_pRev) m_pRev->m_pReact = this;
     
-    //************* reactants and products in multiphasic domain **************
+    // initialize base class
+    if (FEReaction::Init() == false) return false;
     
+    //************* reactants and products in multiphasic domain **************
+
+    // create the intmaps
+    for (int i = 0; i < m_vRtmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvr = m_vRtmp[i];
+        if (pvr->IsSolute()) SetStoichiometricCoefficient(m_solR, pvr->m_speciesID - 1, pvr->m_v);
+        if (pvr->IsSBM()   ) SetStoichiometricCoefficient(m_sbmR, pvr->m_speciesID - 1, pvr->m_v);
+    }
+    for (int i = 0; i < m_vPtmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvp = m_vPtmp[i];
+        if (pvp->IsSolute()) SetStoichiometricCoefficient(m_solP, pvp->m_speciesID - 1, pvp->m_v);
+        if (pvp->IsSBM()   ) SetStoichiometricCoefficient(m_sbmP, pvp->m_speciesID - 1, pvp->m_v);
+    }
+    for (int i = 0; i < m_vRitmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvr = m_vRitmp[i];
+        assert(pvr->IsSolute());
+        if (pvr->IsSolute()) SetStoichiometricCoefficient(m_solRi, pvr->m_speciesID - 1, pvr->m_v);
+    }
+    for (int i = 0; i < m_vPitmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvp = m_vPitmp[i];
+        assert(pvp->IsSolute());
+        if (pvp->IsSolute()) SetStoichiometricCoefficient(m_solPi, pvp->m_speciesID - 1, pvp->m_v);
+    }
+    for (int i = 0; i < m_vRetmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvr = m_vRetmp[i];
+        assert(pvr->IsSolute());
+        if (pvr->IsSolute()) SetStoichiometricCoefficient(m_solRe, pvr->m_speciesID - 1, pvr->m_v);
+    }
+    for (int i = 0; i < m_vPetmp.size(); ++i)
+    {
+        FEReactionSpeciesRef* pvp = m_vPetmp[i];
+        assert(pvp->IsSolute());
+        if (pvp->IsSolute()) SetStoichiometricCoefficient(m_solPe, pvp->m_speciesID - 1, pvp->m_v);
+    }
+
     // initialize the reaction coefficients
-    const int nsol = m_pMP->Solutes();
-    const int nsbm = m_pMP->SBMs();
+    const int nsol = m_psm->Solutes();
+    const int nsbm = m_psm->SBMs();
     const int ntot = nsol + nsbm;
     
     // initialize the stoichiometric coefficients to zero
@@ -104,7 +166,7 @@ bool FEMembraneReaction::Init()
     intmap solR = m_solR;
     intmap solP = m_solP;
     for (int isol = 0; isol<nsol; ++isol) {
-        int sid = m_pMP->GetSolute(isol)->GetSoluteID() - 1;
+        int sid = m_psm->GetSolute(isol)->GetSoluteID() - 1;
         it = solR.find(sid);
         if (it != solR.end()) m_vR[isol] = it->second;
         it = solP.find(sid);
@@ -116,7 +178,7 @@ bool FEMembraneReaction::Init()
     intmap sbmR = m_sbmR;
     intmap sbmP = m_sbmP;
     for (int isbm = 0; isbm<nsbm; ++isbm) {
-        int sid = m_pMP->GetSBM(isbm)->GetSBMID() - 1;
+        int sid = m_psm->GetSBM(isbm)->GetSBMID() - 1;
         it = sbmR.find(sid);
         if (it != sbmR.end()) m_vR[nsol + isbm] = it->second;
         it = sbmP.find(sid);
@@ -133,12 +195,13 @@ bool FEMembraneReaction::Init()
     DOFS& fedofs = GetFEModel()->GetDOFS();
     int MAX_DDOFS = fedofs.GetVariableSize("shell concentration");
     m_NSOL = MAX_DDOFS;
+    m_z.assign(MAX_DDOFS, 0);
 
     // initialize the stoichiometric coefficients to zero
     m_vRi.assign(MAX_DDOFS, 0); m_vRe.assign(MAX_DDOFS, 0);
     m_vPi.assign(MAX_DDOFS, 0); m_vPe.assign(MAX_DDOFS, 0);
     m_vi.assign(MAX_DDOFS, 0); m_ve.assign(MAX_DDOFS, 0);
-    
+
     // cycle through all the solutes in the mixture and determine
     // if they participate in this reaction
     for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
@@ -156,6 +219,8 @@ bool FEMembraneReaction::Init()
     for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
         m_vi[ISOL] = m_vPi[ISOL] - m_vRi[ISOL];
         m_ve[ISOL] = m_vPe[ISOL] - m_vRe[ISOL];
+        FESoluteData* sd = GetSolute(ISOL);
+        m_z[ISOL] = sd->m_z;
     }
 
     //************** continue with all reactants and products ***************
@@ -164,11 +229,11 @@ bool FEMembraneReaction::Init()
     if (!m_Vovr) {
         m_Vbar = 0;
         for (int isol = 0; isol<nsol; ++isol)
-            m_Vbar += m_v[isol] * m_pMP->GetSolute(isol)->MolarMass() / m_pMP->GetSolute(isol)->Density();
+            m_Vbar += m_v[isol] * m_psm->GetSolute(isol)->MolarMass() / m_psm->GetSolute(isol)->Density();
         for (int isbm = 0; isbm<nsbm; ++isbm)
-            m_Vbar += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->MolarMass() / m_pMP->GetSBM(isbm)->Density();
+            m_Vbar += m_v[nsol + isbm] * m_psm->GetSBM(isbm)->MolarMass() / m_psm->GetSBM(isbm)->Density();
         for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
-            FESoluteData* sd = FindSoluteData(ISOL);
+            FESoluteData* sd = GetSolute(ISOL);
             m_Vbar += m_vi[ISOL] * sd->m_M / sd->m_rhoT;
             m_Vbar += m_ve[ISOL] * sd->m_M / sd->m_rhoT;
         }
@@ -177,13 +242,12 @@ bool FEMembraneReaction::Init()
     // check that the reaction satisfies electroneutrality
     int znet = 0;
     for (int isol = 0; isol<nsol; ++isol)
-        znet += m_v[isol] * m_pMP->GetSolute(isol)->ChargeNumber();
+        znet += m_v[isol] * m_psm->GetSolute(isol)->ChargeNumber();
     for (int isbm = 0; isbm<nsbm; ++isbm)
-        znet += m_v[nsol + isbm] * m_pMP->GetSBM(isbm)->ChargeNumber();
+        znet += m_v[nsol + isbm] * m_psm->GetSBM(isbm)->ChargeNumber();
     for (int ISOL = 0; ISOL<MAX_DDOFS; ++ISOL) {
-        FESoluteData* sd = FindSoluteData(ISOL);
-        znet += m_vi[ISOL] * sd->m_z;
-        znet += m_ve[ISOL] * sd->m_z;
+        znet += m_vi[ISOL] * m_z[ISOL];
+        znet += m_ve[ISOL] * m_z[ISOL];
     }
 	if (znet != 0) {
 		feLogError("membrane reaction must satisfy electroneutrality");
@@ -194,103 +258,10 @@ bool FEMembraneReaction::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEMembraneReaction::SetParameter(FEParam& p)
-{
-    if (strcmp(p.name(), "Vbar") == 0)
-    {
-        m_Vovr = true;
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool FEMembraneReaction::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
-{
-    // get number of DOFS
-    DOFS& fedofs = GetFEModel()->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
-    if (strcmp(p.name(), "vR") == 0)
-    {
-        if (strcmp(szatt, "sbm") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if (id < 0) return false;
-            SetStoichiometricCoefficient(m_sbmR, id, m_vRtmp);
-            return true;
-        }
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solR, id, m_vRtmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vP") == 0)
-    {
-        if (strcmp(szatt, "sbm") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if (id < 0) return false;
-            SetStoichiometricCoefficient(m_sbmP, id, m_vPtmp);
-            return true;
-        }
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solP, id, m_vPtmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vRi") == 0)
-    {
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solRi, id, m_vRitmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vPi") == 0)
-    {
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solPi, id, m_vPitmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vRe") == 0)
-    {
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solRe, id, m_vRetmp);
-            return true;
-        }
-    }
-    else if (strcmp(p.name(), "vPe") == 0)
-    {
-        if (strcmp(szatt, "sol") == 0)
-        {
-            int id = atoi(szval) - 1;
-            if ((id < 0) || (id >= MAX_CDOFS)) return false;
-            SetStoichiometricCoefficient(m_solPe, id, m_vPetmp);
-            return true;
-        }
-    }
-    return false;
-}
-
-//-----------------------------------------------------------------------------
 //! Data serialization
 void FEMembraneReaction::Serialize(DumpStream& ar)
 {
-    FEMaterial::Serialize(ar);
+    FEReaction::Serialize(ar);
     
     if (ar.IsShallow() == false)
     {

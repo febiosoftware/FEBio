@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEElasticMaterial.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for uncoupled hyperelastic material formulations.
@@ -48,7 +49,7 @@ SOFTWARE.*/
 //! to provide the deviatoric stress function and the pressure function as well as their
 //! derivatives. 
 
-class FEUncoupledMaterial :	public FEElasticMaterial
+class FEBIOMECH_API FEUncoupledMaterial : public FEElasticMaterial
 {
 public:
 	//! constructor
@@ -73,6 +74,13 @@ public:
 	virtual double DevStrainEnergyDensity(FEMaterialPoint& mp) { return 0; }
     
 public:
+    virtual double StrongBondDevSED(FEMaterialPoint& pt) { return DevStrainEnergyDensity(pt); }
+    virtual double WeakBondDevSED(FEMaterialPoint& pt) { return 0; }
+
+public:
+    // TODO: removing virtual from the following 3 functions causes changes
+    // to the convergence criteria on macOS, despite these functions not
+    // being overridden anywhere.
 	//! strain energy density U(J)
     virtual double U(double J) {
         switch (m_npmodel) {
@@ -120,13 +128,16 @@ public:
 
 	//! calculate strain energy (do not overload!)
 	double StrainEnergyDensity(FEMaterialPoint& pt) final;
+    double StrongBondSED(FEMaterialPoint& pt) final;
+    double WeakBondSED(FEMaterialPoint& pt) final;
 
 	// Create material point data
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
 public:
 	double	m_K;			//!< bulk modulus
 	int     m_npmodel;      //!< pressure model for U(J)
 
 	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEUncoupledMaterial)
 };

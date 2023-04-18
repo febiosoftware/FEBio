@@ -26,7 +26,6 @@
 
 
 #include "FERealGas.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/FEFunction1D.h>
 #include "FEFluidMaterialPoint.h"
@@ -61,9 +60,9 @@ FERealGas::FERealGas(FEModel* pfem) : FEElasticFluid(pfem)
 //! initialization
 bool FERealGas::Init()
 {
-    m_R  = GetFEModel()->GetGlobalConstant("R");
-    m_Tr = GetFEModel()->GetGlobalConstant("T");
-    m_Pr = GetFEModel()->GetGlobalConstant("P");
+    m_R  = GetGlobalConstant("R");
+    m_Tr = GetGlobalConstant("T");
+    m_Pr = GetGlobalConstant("P");
     
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
@@ -74,7 +73,8 @@ bool FERealGas::Init()
 
     // check if we should assume ideal gas
     if (m_nvc == 0) {
-        m_A[0] = new FELinearFunction(GetFEModel(), 0, 1);
+		m_A[0] = fecore_alloc(FEConstFunction, GetFEModel());
+		m_A[0]->SetParameter("value", 1.0);
         m_nvc = 1;
     }
     m_a0->Init();
@@ -82,6 +82,16 @@ bool FERealGas::Init()
         if (m_A[k]) m_A[k]->Init();
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+void FERealGas::Serialize(DumpStream& ar)
+{
+    FEElasticFluid::Serialize(ar);
+
+    if (ar.IsShallow()) return;
+    ar & m_pMat;
+    ar & m_R & m_Pr & m_Tr & m_rhor;
 }
 
 //-----------------------------------------------------------------------------
@@ -454,11 +464,12 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
             bool convgd = false;
             bool done = false;
             int iter = 0;
+			FEMaterialPoint mp(ft);
             do {
                 ++iter;
                 fp->m_ef = e;
-                double f = Pressure(*ft) - p;
-                double df = Tangent_Strain(*ft);
+                double f = Pressure(mp) - p;
+                double df = Tangent_Strain(mp);
                 double de = (df != 0) ? -f/df : 0;
                 e += de;
                 if ((fabs(de) < errrel*fabs(e)) ||
@@ -469,7 +480,7 @@ bool FERealGas::Dilatation(const double T, const double p, const double c, doubl
             delete ft;
             return convgd;
         }
-            break;
+        break;
     }
     return false;
 }

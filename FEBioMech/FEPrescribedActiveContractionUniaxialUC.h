@@ -58,3 +58,25 @@ private:
     
     DECLARE_FECORE_CLASS();
 };
+
+//-----------------------------------------------------------------------------
+// This material implements an active contraction model which can be used
+// as a component of an uncoupled solid mixture material.
+class FEPrescribedActiveContractionFiberUC : public FEUncoupledMaterial
+{
+public:
+    //! constructor
+    FEPrescribedActiveContractionFiberUC(FEModel* pfem);
+
+    //! stress
+    mat3ds DevStress(FEMaterialPoint& pt) override;
+
+    //! tangent
+    tens4ds DevTangent(FEMaterialPoint& pt) override;
+
+private:
+    FEParamDouble	m_T0;       // prescribed active stress
+    FEParamVec3     m_n0;		// unit vector along fiber direction (local coordinate system)
+
+    DECLARE_FECORE_CLASS();
+};

@@ -29,36 +29,36 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFluidResistanceBC.h"
 #include "FEBioFluid.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEFluidResistanceBC, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEFluidResistanceBC, FEPrescribedSurface)
 	ADD_PARAMETER(m_R , "R");
 	ADD_PARAMETER(m_p0, "pressure_offset");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
+FEFluidResistanceBC::FEFluidResistanceBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
 {
     m_R = 0.0;
     m_pfluid = nullptr;
-    m_alpha = 1.0;
     m_p0 = 0;
-    
-	m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-	m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
-    
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofW);
-    m_dof.AddDof(m_dofEF);
-
+    m_e = 0.0;
+    m_psurf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FEFluidResistanceBC::Init()
 {
-	if (FESurfaceLoad::Init() == false) return false;
+    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    SetDOFList(m_dofEF);
+    
+	if (FEPrescribedSurface::Init() == false) return false;
+    
+    m_psurf = GetSurface();
 
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
@@ -75,22 +75,33 @@ bool FEFluidResistanceBC::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Activate the degrees of freedom for this BC
-void FEFluidResistanceBC::Activate()
+//! serialization
+void FEFluidResistanceBC::Serialize(DumpStream& ar)
 {
-    FESurface* ps = &GetSurface();
-    
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
-        node.set_bc(m_dofEF, DOF_PRESCRIBED);
-    }
+    FEPrescribedSurface::Serialize(ar);
+    ar & m_e;
+    if (ar.IsShallow()) return;
+    ar & m_pfluid;
+    ar & m_dofW & m_dofEF;
+    ar & m_psurf;
 }
 
 //-----------------------------------------------------------------------------
-//! Evaluate and prescribe the resistance pressure
 void FEFluidResistanceBC::Update()
+{
+	UpdateDilatation();
+	FEPrescribedSurface::Update();
+
+	// TODO: Is this necessary?
+	GetFEModel()->SetMeshUpdateFlag(true);
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidResistanceBC::UpdateModel() { Update(); }
+
+//-----------------------------------------------------------------------------
+//! Evaluate and prescribe the resistance pressure
+void FEFluidResistanceBC::UpdateDilatation()
 {
     // evaluate the flow rate
     double Q = FlowRate();
@@ -99,28 +110,13 @@ void FEFluidResistanceBC::Update()
     double p = m_R*Q;
     
     // calculate the dilatation
-    double e = 0;
-    bool good = m_pfluid->Dilatation(0,p+m_p0,0, e);
+    m_e = 0;
+    bool good = m_pfluid->Dilatation(0,p+m_p0,0, m_e);
     assert(good);
-    
-    // prescribe this dilatation at the nodes
-    FESurface* ps = &GetSurface();
-
-    for (int i=0; i<ps->Nodes(); ++i)
-    {
-        if (ps->Node(i).m_ID[m_dofEF] < -1)
-        {
-            FENode& node = ps->Node(i);
-            // set node as having prescribed DOF
-            node.set(m_dofEF, e);
-        }
-    }
-    
-    GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------
-//! evaluate the flow rate across this surface
+//! evaluate the flow rate across this surface at the current time
 double FEFluidResistanceBC::FlowRate()
 {
     double Q = 0;
@@ -128,6 +124,10 @@ double FEFluidResistanceBC::FlowRate()
     vec3d rt[FEElement::MAX_NODES];
     vec3d vt[FEElement::MAX_NODES];
     
+    const FETimeInfo& tp = GetTimeInfo();
+    double alpha = tp.alpha;
+    double alphaf = tp.alphaf;
+
     for (int iel=0; iel<m_psurf->Elements(); ++iel)
     {
         FESurfaceElement& el = m_psurf->Element(iel);
@@ -140,9 +140,9 @@ double FEFluidResistanceBC::FlowRate()
         
         // nodal coordinates
         for (int i=0; i<neln; ++i) {
-            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            rt[i] = node.m_rt*m_alpha + node.m_rp*(1-m_alpha);
-            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*m_alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-m_alphaf);
+            FENode& node = m_psurf->Node(el.m_lnode[i]);
+            rt[i] = node.m_rt;
+            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
         }
         
         double* Nr, *Ns;
@@ -177,17 +177,25 @@ double FEFluidResistanceBC::FlowRate()
 }
 
 //-----------------------------------------------------------------------------
-//! calculate residual
-void FEFluidResistanceBC::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
-{ 
-	m_alpha = tp.alpha; m_alphaf = tp.alphaf; 
+void FEFluidResistanceBC::PrepStep(std::vector<double>& ui, bool brel)
+{
+	UpdateDilatation();
+	FEPrescribedSurface::PrepStep(ui, brel);
 }
 
 //-----------------------------------------------------------------------------
-//! serialization
-void FEFluidResistanceBC::Serialize(DumpStream& ar)
+void FEFluidResistanceBC::GetNodalValues(int nodelid, std::vector<double>& val)
 {
-	FESurfaceLoad::Serialize(ar);
-	ar & m_alpha & m_alphaf;
-	ar & m_pfluid;
+    val[0] = m_e;
+
+	FENode& node = GetMesh().Node(m_nodeList[nodelid]);
+	node.set(m_dofEF, m_e);
+}
+
+//-----------------------------------------------------------------------------
+// copy data from another class
+void FEFluidResistanceBC::CopyFrom(FEBoundaryCondition* pbc)
+{
+    // TODO: implement this
+    assert(false);
 }

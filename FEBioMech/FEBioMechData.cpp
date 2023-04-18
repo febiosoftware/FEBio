@@ -44,151 +44,120 @@ SOFTWARE.*/
 #include "FERigidConnector.h"
 #include "FEVolumeConstraint.h"
 #include "FEContactSurface.h"
+#include "FEDiscreteElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
-double FENodeXPos::value(int nnode) 
+double FENodeXPos::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_rt.x; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYPos::value(int nnode) 
+double FENodeYPos::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_rt.y; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZPos::value(int nnode) 
+double FENodeZPos::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_rt.z; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXDisp::value(int nnode) 
+double FENodeXDisp::value(const FENode& node)
 {
 	const int dof_X = GetFEModel()->GetDOFIndex("x");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_X); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYDisp::value(int nnode) 
+double FENodeYDisp::value(const FENode& node)
 {
 	const int dof_Y = GetFEModel()->GetDOFIndex("y");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_Y); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZDisp::value(int nnode) 
+double FENodeZDisp::value(const FENode& node)
 {
 	const int dof_Z = GetFEModel()->GetDOFIndex("z");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_Z); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXVel::value(int nnode) 
+double FENodeXVel::value(const FENode& node)
 {
 	const int dof_VX = GetFEModel()->GetDOFIndex("vx");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VX);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYVel::value(int nnode) 
+double FENodeYVel::value(const FENode& node)
 {
 	const int dof_VY = GetFEModel()->GetDOFIndex("vy");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VY); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZVel::value(int nnode) 
+double FENodeZVel::value(const FENode& node)
 {
 	const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.get(dof_VZ);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXAcc::value(int nnode) 
+double FENodeXAcc::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_at.x; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYAcc::value(int nnode) 
+double FENodeYAcc::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_at.y; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZAcc::value(int nnode) 
+double FENodeZAcc::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	FENode& node = mesh.Node(nnode);
 	return node.m_at.z; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceX::value(int nnode) 
+double FENodeForceX::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		vector<double>& Fn = psolid_solver->m_Fn;
-		vector<int>& id = mesh.Node(nnode).m_ID;
-
-		double Fx = 0.0;
-		if (id[0] >= 0) Fx = Fn[id[0]];
-		else if (-id[0] - 2 >= 0) Fx = Fr[-id[0] - 2];
-		return Fx;
+		const vector<int>& id = node.m_ID;
+		return (-id[0] - 2 >= 0 ? Fr[-id[0] - 2] : 0);
 	}
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceY::value(int nnode) 
+double FENodeForceY::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		vector<int>& id = mesh.Node(nnode).m_ID;
+		const vector<int>& id = node.m_ID;
 		return (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);
 	}
 	return 0;
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceZ::value(int nnode) 
+double FENodeForceZ::value(const FENode& node)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
-		vector<int>& id = mesh.Node(nnode).m_ID;
+		const vector<int>& id = node.m_ID;
 		return (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
 	}
 	return 0;
@@ -200,8 +169,8 @@ double FELogContactGap::value(FESurfaceElement& el)
 	double g = 0.0;
 	for (int i = 0; i < el.GaussPoints(); ++i)
 	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
-		FEContactMaterialPoint* cp = mp.ExtractData<FEContactMaterialPoint>();
+		FEMaterialPoint* mp = el.GetMaterialPoint(i);
+		FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
 		if (cp)
 		{
 			g += cp->m_gap;
@@ -218,8 +187,8 @@ double FELogContactPressure::value(FESurfaceElement& el)
 	double Lm = 0.0;
 	for (int i = 0; i < el.GaussPoints(); ++i)
 	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
-		FEContactMaterialPoint* cp = mp.ExtractData<FEContactMaterialPoint>();
+		FEMaterialPoint* mp = el.GetMaterialPoint(i);
+		FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
 		if (cp)
 		{
 			Lm += cp->m_Ln;
@@ -231,13 +200,61 @@ double FELogContactPressure::value(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogContactTractionX::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.x;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionY::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.y;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogContactTractionZ::value(FESurfaceElement& el)
+{
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		vec3d tn;
+		ps->GetSurfaceTraction(el.m_lid, tn);
+		return tn.z;
+	}
+	return 0.0;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemPosX::value(FEElement& el)
 {
 	double val = 0.0;
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.x;
 	}
 	return val / (double) nint;
@@ -250,7 +267,7 @@ double FELogElemPosY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.y;
 	}
 	return val / (double) nint;
@@ -263,7 +280,7 @@ double FELogElemPosZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		FEMaterialPoint& pt = *el.GetMaterialPoint(i);
 		val += pt.m_rt.z;
 	}
 	return val / (double) nint;
@@ -1672,8 +1689,8 @@ double FELogDamage::value(FEElement& el)
         else if (pmg) {
             for (int k=0; k<pmg->Components(); ++k)
             {
-                FEDamageMaterialPoint* ppd = pt.GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                FEDamageMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEDamageMaterialPoint>();
+                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                 if (ppd) D += (float) ppd->m_D;
                 else if (pem)
                 {
@@ -1718,7 +1735,7 @@ double FELogOctahedralPlasticStrain::value(FEElement& el)
             {
                 FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
                 FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pt.GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
                 if (prp) D += (float) prp->m_gp[0];
                 else if (prd) D += (float) prd->m_gp[0];
                 else if (pem)
@@ -1736,6 +1753,129 @@ double FELogOctahedralPlasticStrain::value(FEElement& el)
     }
     D /= (double) nint;
     return D;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementStretch::value(FEElement& el)
+{
+	if (dynamic_cast<FEDiscreteElement*>(&el) == nullptr) return 0.0;
+
+	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
+
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vec3d ra0 = mesh.Node(del.m_node[0]).m_r0;
+	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
+	vec3d rb0 = mesh.Node(del.m_node[1]).m_r0;
+	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
+
+	double L0 = (rb0 - ra0).norm();
+	double Lt = (rb1 - ra1).norm();
+
+	double l = Lt / L0;
+
+	return l;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementElongation::value(FEElement& el)
+{
+	if (dynamic_cast<FEDiscreteElement*>(&el) == nullptr) return 0.0;
+
+	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
+
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vec3d ra0 = mesh.Node(del.m_node[0]).m_r0;
+	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
+	vec3d rb0 = mesh.Node(del.m_node[1]).m_r0;
+	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
+
+	double L0 = (rb0 - ra0).norm();
+	double Lt = (rb1 - ra1).norm();
+
+	double Dl = Lt - L0;
+
+	return Dl;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForce::value(FEElement& el)
+{
+	if (dynamic_cast<FEDiscreteElement*>(&el) == nullptr) return 0.0;
+
+	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	// get the (one) material point data
+	FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
+
+	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
+	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
+	vec3d e = rb1 - ra1; e.unit();
+
+	vec3d F = mp.m_Ft;
+
+	double Fm = F * e;
+
+	return Fm;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceX::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.x;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceY::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.y;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogDiscreteElementForceZ::value(FEElement& el)
+{
+	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	if (mp) return mp->m_Ft.z;
+	else return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElementMixtureStress::value(FEElement& el)
+{
+	if (m_comp < 0) return 0.0;
+
+	double s = 0.0;
+	for (int n = 0; n < el.GaussPoints(); ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
+		if (mmp)
+		{
+			if (m_comp < mmp->Components())
+			{
+				FEElasticMaterialPoint& ep = *mmp->GetPointData(m_comp)->ExtractData<FEElasticMaterialPoint>();
+
+				switch (m_metric)
+				{
+				case 0: s += ep.m_s.xx(); break;
+				case 1: s += ep.m_s.xy(); break;
+				case 2: s += ep.m_s.yy(); break;
+				case 3: s += ep.m_s.xz(); break;
+				case 4: s += ep.m_s.yz(); break;
+				case 5: s += ep.m_s.zz(); break;
+				}
+			}
+		}
+	}
+	s /= (double)el.GaussPoints();
+
+	return s;
 }
 
 //-----------------------------------------------------------------------------
@@ -1881,12 +2021,29 @@ double FELogRigidConnectorRotationZ::value(FENLConstraint& rc)
 double FELogVolumeConstraint::value(FENLConstraint& rc)
 {
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
-    return (prc ? prc->m_s.m_Vt : 0);
+    return (prc ? prc->EnclosedVolume() : 0);
 }
 
 //-----------------------------------------------------------------------------
 double FELogVolumePressure::value(FENLConstraint& rc)
 {
     FEVolumeConstraint* prc = dynamic_cast<FEVolumeConstraint*>(&rc);
-    return (prc ? prc->m_s.m_p : 0);
+    return (prc ? prc->Pressure() : 0);
+}
+
+//=============================================================================
+double FELogContactArea::value(FESurface& surface)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surface);
+	if (pcs == 0) return 0.0;
+
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		double area = pcs->GetContactArea();
+		return area;
+	}
+	return 0.0;
 }

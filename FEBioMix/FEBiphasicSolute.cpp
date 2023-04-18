@@ -43,7 +43,7 @@ BEGIN_FECORE_CLASS(FEBiphasicSolute, FEMaterial)
 	ADD_PARAMETER(m_rhoTw, FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
 
 	// set material properties
-	ADD_PROPERTY(m_pSolid , "solid");
+	ADD_PROPERTY(m_pSolid , "solid", FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pPerm  , "permeability");
 	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
 	ADD_PROPERTY(m_pSolute, "solute");
@@ -69,7 +69,7 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEBiphasicSolute::CreateMaterialPointData() 
+FEMaterialPointData* FEBiphasicSolute::CreateMaterialPointData() 
 {
 	FEBiphasicMaterialPoint* pbp = new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
 	return new FESolutesMaterialPoint(pbp);
@@ -82,6 +82,11 @@ bool FEBiphasicSolute::Init()
 	// because it is used in FESolute::Init()
 	m_pSolute->SetSoluteLocalID(0);
 
+    if (!m_pSolid->Init()) return false;
+    if (!m_pPerm->Init()) return false;
+    if (!m_pOsmC->Init()) return false;
+    if (!m_pSolute->Init()) return false;
+    
 	// Call base class which calls the Init member of all properties
 	if (FEMaterial::Init() == false) return false;
 	
@@ -92,6 +97,16 @@ bool FEBiphasicSolute::Init()
 	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");	 return false; }
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// update specialized material points
+void FEBiphasicSolute::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pPerm->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pOsmC->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pSolute->UpdateSpecializedMaterialPoints(mp, tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +128,7 @@ double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 	double J = et.m_J;
 	// porosity
 //	double phiw = 1 - m_phi0/J;
-	double phi0 = pet.m_phi0;
+	double phi0 = pet.m_phi0t;
 	double phiw = 1 - phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse
@@ -334,4 +349,13 @@ void FEBiphasicSolute::PartitionCoefficientFunctions(FEMaterialPoint& mp, double
     kappa = m_pSolute->m_pSolub->Solubility(mp);
     dkdJ = m_pSolute->m_pSolub->Tangent_Solubility_Strain(mp);
     dkdc = m_pSolute->m_pSolub->Tangent_Solubility_Concentration(mp,0);
+}
+
+double FEBiphasicSolute::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0);
+	return cf;
 }

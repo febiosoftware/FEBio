@@ -29,14 +29,16 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FECoreFactory.h"
 #include "FECoreBase.h"
+#include "log.h"
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
-FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* szclass, const char* szalias, int nspec) : m_scid(scid)
+FECoreFactory::FECoreFactory(SUPER_CLASS_ID scid, const char* szclass, const char* szbase, const char* szalias, int nspec) : m_scid(scid)
 { 
 	m_szclass = szclass;
-	m_szalias = szalias; 
+	m_szalias = szalias;
+	m_szbase = szbase;
 	m_module = 0; 
 	m_spec = nspec;
 	m_alloc_id = -1;
@@ -54,7 +56,7 @@ void FECoreFactory::SetModuleID(unsigned int mid)
 }
 
 //-----------------------------------------------------------------------------
-FECoreBase* FECoreFactory::CreateInstance(FEModel* pfem)
+FECoreBase* FECoreFactory::CreateInstance(FEModel* pfem) const
 {
 	// create a new instance of this class
 	FECoreBase* pclass = Create(pfem); assert(pclass);
@@ -65,6 +67,13 @@ FECoreBase* FECoreFactory::CreateInstance(FEModel* pfem)
 
 	// build the class descriptor
 	if (pclass->BuildClass() == false) return 0;
+
+	if (m_spec != -1)
+	{
+		int n1 = FECORE_SPEC_MAJOR(m_spec);
+		int n2 = FECORE_SPEC_MINOR(m_spec);
+		if (pfem) feLogWarningEx(pfem, "\"%s\" is deprecated in spec %d.%d!", m_szalias, n1, n2);
+	}
 
 	// return the pointer
 	return pclass;

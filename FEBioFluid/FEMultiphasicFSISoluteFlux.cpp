@@ -29,8 +29,8 @@
 #include "stdafx.h"
 #include "FEMultiphasicFSISoluteFlux.h"
 #include "FEBioMultiphasicFSI.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <FECore/FEFacetSet.h>
 #include "FECore/FEAnalysis.h"
 
 //=============================================================================
@@ -44,7 +44,7 @@ END_FECORE_CLASS();
 FEMultiphasicFSISoluteFlux::FEMultiphasicFSISoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_dofC(pfem), m_dofU(pfem)
 {
     m_flux = 1.0;
-    m_isol = 0;
+    m_isol = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ void FEMultiphasicFSISoluteFlux::SetSurface(FESurface* ps)
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the prescribed normal component of velocity
-void FEMultiphasicFSISoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEMultiphasicFSISoluteFlux::LoadVector(FEGlobalVector& R)
 {
     FEMultiphasicFSISoluteFlux* flux = this;
     m_psurf->LoadVector(R, m_dofC, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
@@ -75,8 +75,10 @@ void FEMultiphasicFSISoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo&
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicFSISoluteFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEMultiphasicFSISoluteFlux::StiffnessMatrix(FELinearSystem& LS)
 {
+    const FETimeInfo& tp = GetTimeInfo();
+
     // evaluate the stiffness contribution
     FEMultiphasicFSISoluteFlux* flux = this;
     m_psurf->LoadStiffness(LS, m_dofC, m_dofU, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
@@ -115,7 +117,7 @@ bool FEMultiphasicFSISoluteFlux::Init()
     FEModel* fem = GetFEModel();
     m_dofC.Clear();
     m_dofU.Clear();
-    m_dofC.AddDof(fem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), m_isol-1));
+    m_dofC.AddDof(GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), m_isol-1));
     m_dofU.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::DISPLACEMENT));
     m_dof.Clear();
     m_dof.AddDofs(m_dofU);

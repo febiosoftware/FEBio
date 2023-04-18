@@ -38,7 +38,7 @@ DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
 	m_ptr_lock = false;
 
 #ifdef _DEBUG
-	m_btypeInfo = true;
+	m_btypeInfo = false;
 #else
 	m_btypeInfo = false;
 #endif
@@ -59,7 +59,8 @@ bool DumpStream::IsShallow() const { return m_bshallow; }
 //-----------------------------------------------------------------------------
 DumpStream::~DumpStream()
 {
-	m_ptr.clear();
+	m_ptrOut.clear();
+	m_ptrIn.clear();
 	m_bytes_serialized = 0;
 }
 
@@ -86,9 +87,16 @@ void DumpStream::Open(bool bsave, bool bshallow)
 	m_ptr_lock = false;
 
 	// add the "null" pointer
-	m_ptr.clear();
-	Pointer p = { 0, 0 };
-	m_ptr.push_back(p);
+	if (bsave)
+	{
+		m_ptrOut.clear();
+		m_ptrOut[nullptr] = 0;
+	}
+	else
+	{
+		m_ptrIn.clear();
+		m_ptrIn.push_back(nullptr);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -96,14 +104,15 @@ void DumpStream::check()
 {
 	if (IsSaving())
 	{
-		write(&m_bytes_serialized, sizeof(m_bytes_serialized), 1);
+		m_bytes_serialized += write(&m_bytes_serialized, sizeof(m_bytes_serialized), 1);
 	}
 	else
 	{
 		size_t nsize;
-		read(&nsize, sizeof(m_bytes_serialized), 1);
+		size_t tmp = read(&nsize, sizeof(m_bytes_serialized), 1);
 		assert(m_bytes_serialized == nsize);
 		if (m_bytes_serialized != nsize) throw DumpStream::ReadError();
+		m_bytes_serialized += tmp;
 	}
 }
 
@@ -124,7 +133,7 @@ DumpStream& DumpStream::operator << (const char* sz)
 { 
 	int n = (sz ? (int)strlen(sz) : 0);
 	m_bytes_serialized += write(&n, sizeof(int), 1);
-	if (sz) m_bytes_serialized += write(sz, sizeof(char), n);
+	if (sz && (n > 0)) m_bytes_serialized += write(sz, sizeof(char), n);
 	return (*this);
 }
 
@@ -133,7 +142,7 @@ DumpStream& DumpStream::operator << (char* sz)
 { 
 	int n = (sz ? (int)strlen(sz) : 0); 
 	m_bytes_serialized += write(&n, sizeof(int), 1);
-	if (sz) m_bytes_serialized += write(sz, sizeof(char), n);
+	if (sz && (n > 0)) m_bytes_serialized += write(sz, sizeof(char), n);
 	return (*this);
 }
 
@@ -218,20 +227,9 @@ DumpStream& DumpStream::operator >> (double a[3][3])
 //-----------------------------------------------------------------------------
 int DumpStream::FindPointer(void* p)
 {
-	for (int i = 0; i < (int)m_ptr.size(); ++i)
-	{
-		if (m_ptr[i].pd == p) return i;
-	}
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
-int DumpStream::FindPointer(int id)
-{
-	for (int i = 0; i < (int)m_ptr.size(); ++i)
-	{
-		if (m_ptr[i].id == id) return i;
-	}
+	assert(IsSaving());
+	auto it = m_ptrOut.find(p);
+	if (it != m_ptrOut.end()) return it->second;
 	return -1;
 }
 
@@ -240,11 +238,17 @@ void DumpStream::AddPointer(void* p)
 {
 	if (m_ptr_lock) return;
 	if (p == nullptr) { assert(false); return;	}
-	assert(FindPointer(p) == -1);
-	Pointer ptr;
-	ptr.pd = p;
-	ptr.id = (int)m_ptr.size();
-	m_ptr.push_back(ptr);
+
+	if (IsSaving())
+	{
+		assert(FindPointer(p) == -1);
+		int id = (int)m_ptrOut.size();
+		m_ptrOut[p] = id;
+	}
+	else
+	{
+		m_ptrIn.push_back(p);
+	}
 }
 
 //-----------------------------------------------------------------------------

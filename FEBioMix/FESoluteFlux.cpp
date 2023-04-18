@@ -28,15 +28,15 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESoluteFlux.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEAnalysis.h"
+#include <FECore/FEAnalysis.h>
+#include <FECore/FEFacetSet.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FESoluteFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_flux   , "flux");
 	ADD_PARAMETER(m_blinear, "linear");
     ADD_PARAMETER(m_bshellb, "shell_bottom");
-	ADD_PARAMETER(m_isol   , "solute_id");
+	ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ FESoluteFlux::FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_dofC(pfem), m
 	m_flux = 1.0;
 	m_blinear = false; 
     m_bshellb = false;
-	m_isol = 0;
+	m_isol = -1;
 }
 	
 //-----------------------------------------------------------------------------
@@ -75,24 +75,23 @@ bool FESoluteFlux::Init()
 	if (m_isol == -1) return false;
 
 	// set up the dof lists
-	FEModel* fem = GetFEModel();
 	m_dofC.Clear();
 	m_dofU.Clear();
 	if (m_bshellb == false)
 	{ 
-		m_dofC.AddDof(fem->GetDOFIndex("concentration", m_isol - 1));
+		m_dofC.AddDof(GetDOFIndex("concentration", m_isol - 1));
 
-		m_dofU.AddDof(fem->GetDOFIndex("x"));
-		m_dofU.AddDof(fem->GetDOFIndex("y"));
-		m_dofU.AddDof(fem->GetDOFIndex("z"));
+		m_dofU.AddDof(GetDOFIndex("x"));
+		m_dofU.AddDof(GetDOFIndex("y"));
+		m_dofU.AddDof(GetDOFIndex("z"));
 	}
 	else
 	{
-		m_dofC.AddDof(fem->GetDOFIndex("shell concentration", m_isol - 1));
+		m_dofC.AddDof(GetDOFIndex("shell concentration", m_isol - 1));
 
-		m_dofU.AddDof(fem->GetDOFIndex("sx"));
-		m_dofU.AddDof(fem->GetDOFIndex("sy"));
-		m_dofU.AddDof(fem->GetDOFIndex("sz"));
+		m_dofU.AddDof(GetDOFIndex("sx"));
+		m_dofU.AddDof(GetDOFIndex("sy"));
+		m_dofU.AddDof(GetDOFIndex("sz"));
 
 	}
     m_dof.AddDofs(m_dofU);
@@ -101,9 +100,9 @@ bool FESoluteFlux::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FESoluteFlux::LoadVector(FEGlobalVector& R)
 {
-	double dt = tp.timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	m_psurf->SetShellBottom(m_bshellb);
 
@@ -124,10 +123,10 @@ void FESoluteFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FESoluteFlux::StiffnessMatrix(FELinearSystem& LS)
 {
 	// time increment
-	double dt = tp.timeIncrement;
+	double dt = CurrentTimeIncrement();
 
 	m_psurf->SetShellBottom(m_bshellb);
 	

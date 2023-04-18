@@ -40,10 +40,15 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainOld(pfem), FEElasticDomain(pfem), m_dofSU(pfem), m_dofSR(pfem), m_dofR(pfem), m_dof(pfem)
 {
-	m_pMat = 0;
-	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofSR.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	m_pMat = nullptr;
+	
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofSR.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -672,10 +677,10 @@ void FEElasticShellDomainOld::ElementStiffness(int iel, matrix& ke)
 
 void FEElasticShellDomainOld::ElementBodyForce(FEModel& fem, FEShellElementOld& el, vector<double>& fe)
 {
-	int NF = fem.BodyLoads();
+	int NF = fem.ModelLoads();
 	for (int nf = 0; nf < NF; ++nf)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(nf));
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.ModelLoad(nf));
 		if (pbf)
 		{
             // integration weights
@@ -767,8 +772,8 @@ void FEElasticShellDomainOld::Update(const FETimeInfo& tp)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are used by most materials.
-			pt.m_r0 = el.Evaluate(r0, n);
-			pt.m_rt = el.Evaluate(rt, n);
+			mp.m_r0 = el.Evaluate(r0, n);
+			mp.m_rt = el.Evaluate(rt, n);
 
 			// get the deformation gradient and determinant
 			pt.m_J = defgrad(el, pt.m_F, n);

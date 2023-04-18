@@ -33,12 +33,10 @@ SOFTWARE.*/
 #include "FENode.h"
 #include "FEMaterialPoint.h"
 
-REGISTER_SUPER_CLASS(FENodalLoad, FENODALLOAD_ID);
-
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalLoad, FEModelLoad)
 	ADD_PARAMETER(m_brelative, "relative");
-	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
+//	ADD_PROPERTY(m_nodeSet, "node_set", FEProperty::Reference);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -53,7 +51,7 @@ void FENodalLoad::Serialize(DumpStream& ar)
 {
 	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_dofs;
+	ar & m_dofs & m_nodeSet;
 }
 
 //-----------------------------------------------------------------------------
@@ -121,7 +119,7 @@ FENodeSet* FENodalLoad::GetNodeSet()
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FENodalLoad::LoadVector(FEGlobalVector& R)
 {
 	FENodeSet& nset = *m_nodeSet;
 	int dofs = m_dofs.Size();
@@ -147,14 +145,14 @@ void FENodalLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FENodalLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FENodalLoad::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Nothing to do here.
 }
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalDOFLoad, FENodalLoad)
-	ADD_PARAMETER(m_dof, "dof", 0, "@dof_list");
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list)");
 	ADD_PARAMETER(m_scale, "scale");
 END_FECORE_CLASS();
 
@@ -163,6 +161,14 @@ FENodalDOFLoad::FENodalDOFLoad(FEModel* fem) : FENodalLoad(fem)
 {
 	m_dof = -1;
 	m_scale = 0.0;
+
+	m_dtscale = false;
+}
+
+//-----------------------------------------------------------------------------
+void FENodalDOFLoad::SetDtScale(bool b)
+{
+	m_dtscale = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -191,6 +197,12 @@ void FENodalDOFLoad::GetNodalValues(int n, std::vector<double>& val)
 	mp.m_index = n;
 
 	val[0] = m_scale(mp);
+
+	if (m_dtscale)
+	{
+		double dt = GetTimeInfo().timeIncrement;
+		val[0] *= dt;
+	}
 }
 
 double FENodalDOFLoad::NodeValue(int n)
@@ -203,5 +215,13 @@ double FENodalDOFLoad::NodeValue(int n)
 	mp.m_r0 = node.m_r0;
 	mp.m_index = n;
 
-	return m_scale(mp);
+	double val = m_scale(mp);
+
+	if (m_dtscale)
+	{
+		double dt = GetTimeInfo().timeIncrement;
+		val *= dt;
+	}
+
+	return val;
 }

@@ -29,7 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEUncoupledMaterial.h"
 #include "FEUncoupledFiberExpLinear.h"
-#include "FEActiveFiberContraction.h"
+#include "FEActiveContractionMaterial.h"
 #include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
@@ -44,22 +44,29 @@ public:
 	FETransIsoVerondaWestmann(FEModel* pfem);
 
 public:
-	double	m_c1;	//!< Veronda-Westmann coefficient C1
-	double	m_c2;	//!< Veronda-Westmann coefficient C2
+    FEParamDouble   m_c1;	//!< Veronda-Westmann coefficient C1
+    FEParamDouble   m_c2;	//!< Veronda-Westmann coefficient C2
 
 public:
 	//! calculate deviatoric stress at material point
-	virtual mat3ds DevStress(FEMaterialPoint& pt) override;
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric tangent stiffness at material point
-	virtual tens4ds DevTangent(FEMaterialPoint& pt) override;
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
 
 	//! calculate deviatoric strain energy density at material point
-	virtual double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
+	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
+    
+    //! create material point data
+    FEMaterialPointData* CreateMaterialPointData() override;
+    
+    // update force-velocity material point
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
 protected:
-	FEUncoupledFiberExpLinear	m_fib;
-	FEActiveFiberContraction*	m_ac;
+    FEFiberExpLinearUC		       m_fib;
+    FEActiveContractionMaterial*    m_ac;
+	FEVec3dValuator* m_fiber;
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

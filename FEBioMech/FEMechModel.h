@@ -30,10 +30,9 @@ SOFTWARE.*/
 //---------------------------------------------------------------------------------------
 class FERigidSystem;
 class FERigidBody;
-class FERigidBodyDisplacement;
-class FERigidBodyFixedBC;
+class FERigidPrescribedBC;
+class FERigidFixedBC;
 class FERigidIC;
-class FERigidSurface;
 class FERigidNodeSet;
 
 //---------------------------------------------------------------------------------------
@@ -83,9 +82,6 @@ public:
 	// get a rigid body
 	FERigidBody* GetRigidBody(int n);
 
-	// find a rigid surface
-	FERigidSurface* FindRigidSurface(const std::string& name);
-
 	// find a rigid body from a material ID
 	int FindRigidbodyFromMaterialID(int matId);
 
@@ -93,19 +89,16 @@ public:
 	int RigidPrescribedBCs() const;
 
 	// return the rigid prescribed displacement
-	FERigidBodyDisplacement* GetRigidPrescribedBC(int i);
+	FERigidPrescribedBC* GetRigidPrescribedBC(int i);
 
 	// add a rigid presribed BC
-	void AddRigidPrescribedBC(FERigidBodyDisplacement* pDC);
+	void AddRigidPrescribedBC(FERigidPrescribedBC* pDC);
 
 	// add a rigid fixed BC
-	void AddRigidFixedBC(FERigidBodyFixedBC* pBC);
+	void AddRigidFixedBC(FERigidFixedBC* pBC);
 
 	// add a rigid initial condition
 	void AddRigidInitialCondition(FERigidIC* pIC);
-
-	// add a rigid nodeset
-	void AddRigidNodeSet(FERigidNodeSet* rns);
 
 private:
 	FERigidSystem*	m_prs;

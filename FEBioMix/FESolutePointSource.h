@@ -26,10 +26,12 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEOctreeSearch.h>
+#include <unordered_map>
+#include "febiomix_api.h"
 
 class FESolidElement;
 
-class FESolutePointSource : public FEBodyLoad
+class FEBIOMIX_API FESolutePointSource : public FEBodyLoad
 {
 public:
 	FESolutePointSource(FEModel* fem);
@@ -50,21 +52,43 @@ public:
 
 	void SetRate(double rate);
 
+	void SetRadius(double radius);
+
 	double GetRate() const;
+
+	double GetdC() const;
+
+	double GetdCp() const;
+
+	void SetdC(double dC);
+
+	void SetdCp(double dCp);
 
 	void SetAccumulateFlag(bool b);
 
+	void SetAccumulateCAFlag(bool b);
+
 	//! Evaluate force vector
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 	//! evaluate stiffness matrix
-	void StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& S) override;
+
+	//! return all the elements in the given radius
+	void FindNodesInRadius(std::vector<FEElement*>& possible_nodes, double& total_elem);
+
+	vec3d ClampNatC(double r[3]);
 
 private:
 	int		m_soluteId;	//!< solute ID
 	double	m_rate;		//!< production rate
 	vec3d	m_pos;		//!< position of source
-	bool	m_accumulate; //!< accumulate flag
+	bool	m_accumulate = false; //!< accumulate flag
+	bool	m_accumulate_ca; //! < accumulate actual concentration flag
+	double	m_radius;
+	double	m_Vc;
+	double	m_dC = 0.0;
+	double	m_dCp = 0.0;
 
 private:
 	FEOctreeSearch		m_search;

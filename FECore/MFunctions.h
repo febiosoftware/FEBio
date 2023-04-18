@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "math.h"
+#include "fecore_api.h"
 
 typedef double (*FUNCPTR) (double);
 typedef double (*FUNC2PTR) (double, double);
@@ -64,4 +65,4 @@ double unit_step(double x);
 double binomial(double n, double r);
 
 // gamma function
-double gamma(double x);
+FECORE_API double gamma(double x);

@@ -28,18 +28,13 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEModelComponent.h"
-#include <string.h>
+#include "FEModel.h"
 #include "DumpStream.h"
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 FEModelComponent::FEModelComponent(FEModel* fem) : FECoreBase(fem)
 {
-	// the ID can be used by derived class to define a identifier for derived classes
-	// This value needs to be set in the constructor
-	m_nID = 0;
-
-	// initialize parameters
-	m_bactive = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -49,46 +44,72 @@ FEModelComponent::~FEModelComponent()
 }
 
 //-----------------------------------------------------------------------------
-int FEModelComponent::GetID() const
-{
-	return m_nID;
-}
-
-//-----------------------------------------------------------------------------
-void FEModelComponent::SetID(int n)
-{
-	m_nID = n;
-}
-
-//-----------------------------------------------------------------------------
-bool FEModelComponent::IsActive() const
-{ 
-	return m_bactive; 
-}
-
-//-----------------------------------------------------------------------------
-void FEModelComponent::Activate()
-{ 
-	m_bactive = true; 
-}
-
-//-----------------------------------------------------------------------------
-void FEModelComponent::Deactivate()
-{ 
-	m_bactive = false; 
-}
-
-//-----------------------------------------------------------------------------
 void FEModelComponent::Update()
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void FEModelComponent::Serialize(DumpStream& ar)
+double FEModelComponent::CurrentTime() const
 {
-	FECoreBase::Serialize(ar);
-	if (ar.IsShallow()) return;
-	ar & m_nID;
-	ar & m_bactive;
+	return GetFEModel()->GetTime().currentTime;
+}
+
+//-----------------------------------------------------------------------------
+double FEModelComponent::CurrentTimeIncrement() const
+{
+	return GetFEModel()->GetTime().timeIncrement;
+}
+
+//-----------------------------------------------------------------------------
+double FEModelComponent::GetGlobalConstant(const char* sz) const
+{
+	return GetFEModel()->GetGlobalConstant(sz);
+}
+
+//-----------------------------------------------------------------------------
+int FEModelComponent::GetDOFIndex(const char* szvar, int n) const
+{
+	return GetFEModel()->GetDOFIndex(szvar, n);
+}
+
+//-----------------------------------------------------------------------------
+int FEModelComponent::GetDOFIndex(const char* szdof) const
+{
+	return GetFEModel()->GetDOFIndex(szdof);
+}
+
+//-----------------------------------------------------------------------------
+//! Get the model's mesh
+FEMesh& FEModelComponent::GetMesh()
+{
+	return GetFEModel()->GetMesh();
+}
+
+//-----------------------------------------------------------------------------
+const FETimeInfo& FEModelComponent::GetTimeInfo() const
+{
+	return GetFEModel()->GetTime();
+}
+
+//-----------------------------------------------------------------------------
+void FEModelComponent::AttachLoadController(const char* szparam, int lc)
+{
+	FEParam* p = GetParameter(szparam); assert(p);
+	if (p)
+	{
+		FEModel* fem = GetFEModel();
+		fem->AttachLoadController(p, lc);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEModelComponent::AttachLoadController(void* pd, int lc)
+{
+	FEParam* p = FindParameterFromData(pd); assert(p);
+	if (p)
+	{
+		FEModel* fem = GetFEModel();
+		fem->AttachLoadController(p, lc);
+	}
 }

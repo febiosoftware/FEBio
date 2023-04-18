@@ -23,25 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERigidWallInterface.h"
-#include "FECore/FENNQuery.h"
+#include <FECore/FENNQuery.h>
 #include <FECore/FEModel.h>
-#include "FECore/FEGlobalMatrix.h"
-#include "FECore/log.h"
+#include <FECore/FEGlobalMatrix.h>
+#include <FECore/log.h>
 #include <FEBioMech/FEElasticShellDomainOld.h>
 #include <FECore/FELinearSystem.h>
 
+// Macauley bracket
+#define MBRACKET(x) ((x)>=0? (x): 0)
+#define HEAVYSIDE(x) ((x)>=0?1:0)
+
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_FECORE_CLASS(FERigidWallInterface, FEContactInterface)
-	ADD_PARAMETER(m_atol   , "tolerance"   );
-	ADD_PARAMETER(m_eps    , "penalty"     );
-	ADD_PARAMETER(m_d	   , "offset"      );
-	ADD_PARAMETER(m_plane.a, 4, "plane"   );
+BEGIN_FECORE_CLASS(FERigidWallInterface, FESurfaceConstraint)
+	ADD_PARAMETER(m_laugon , "laugon"    )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+	ADD_PARAMETER(m_atol   , "tolerance" );
+	ADD_PARAMETER(m_eps    , "penalty"   );
+	ADD_PARAMETER(m_d	   , "offset"    );
+	ADD_PARAMETER(m_a      , 4, "plane"  );
 END_FECORE_CLASS();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -206,15 +208,26 @@ void FERigidWallSurface::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_plane(pfem)
+FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FESurfaceConstraint(pfem)
 {
 	static int count = 1;
 	SetID(count++);
 
+	m_laugon = 0;
+
+	m_a[0] = m_a[1] = m_a[2] = m_a[3] = 0.0;
+
+	m_ss = new FERigidWallSurface(pfem);
 	m_eps = 0;
 	m_atol = 0;
 	m_d = 0.0;
 };
+
+//-----------------------------------------------------------------------------
+FERigidWallInterface::~FERigidWallInterface()
+{
+	delete m_ss;
+}
 
 //-----------------------------------------------------------------------------
 //! Initializes the rigid wall interface data
@@ -222,11 +235,7 @@ FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(p
 bool FERigidWallInterface::Init()
 {
 	// create the surface
-	if (m_ss.Init() == false) return false;
-
-	// initialize rigid surface
-	m_plane.Init();
-
+	if (m_ss->Init() == false) return false;
 	return true;
 }
 
@@ -234,6 +243,8 @@ bool FERigidWallInterface::Init()
 //! build the matrix profile for use in the stiffness matrix
 void FERigidWallInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 {
+	FERigidWallSurface& surf = *m_ss;
+
 	FEModel& fem = *GetFEModel();
 
 	// get the DOFS
@@ -245,16 +256,16 @@ void FERigidWallInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 	const int dof_RW = fem.GetDOFIndex("Rw");
 
 	vector<int> lm(6);
-	for (int j=0; j<m_ss.Nodes(); ++j)
+	for (int j=0; j< surf.Nodes(); ++j)
 	{
-		if (m_ss.m_gap[j] >= 0)
+		if (surf.m_gap[j] >= 0)
 		{
-			lm[0] = m_ss.Node(j).m_ID[dof_X];
-			lm[1] = m_ss.Node(j).m_ID[dof_Y];
-			lm[2] = m_ss.Node(j).m_ID[dof_Z];
-			lm[3] = m_ss.Node(j).m_ID[dof_RU];
-			lm[4] = m_ss.Node(j).m_ID[dof_RV];
-			lm[5] = m_ss.Node(j).m_ID[dof_RW];
+			lm[0] = surf.Node(j).m_ID[dof_X];
+			lm[1] = surf.Node(j).m_ID[dof_Y];
+			lm[2] = surf.Node(j).m_ID[dof_Z];
+			lm[3] = surf.Node(j).m_ID[dof_RU];
+			lm[4] = surf.Node(j).m_ID[dof_RV];
+			lm[5] = surf.Node(j).m_ID[dof_RW];
 
 			K.build_add(lm);
 		}
@@ -265,10 +276,10 @@ void FERigidWallInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 void FERigidWallInterface::Activate()
 {
 	// don't forget to call the base class
-	FEContactInterface::Activate();
+	FESurfaceConstraint::Activate();
 
 	// project primary surface onto secondary surface
-	ProjectSurface(m_ss);
+	ProjectSurface(*m_ss);
 }
 
 //-----------------------------------------------------------------------------
@@ -276,26 +287,28 @@ void FERigidWallInterface::Activate()
 
 void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 {
+	FERigidWallSurface& surf = *m_ss;
+
 	// loop over all primary surface nodes
-	for (int i=0; i<m_ss.Nodes(); ++i)
+	for (int i=0; i< surf.Nodes(); ++i)
 	{
 		// get the nodal position
-		vec3d r = m_ss.Node(i).m_rt;
+		vec3d r = surf.Node(i).m_rt;
 
 		// project this node onto the plane
-		vec3d q = m_plane.Project(r);
+		vec3d q = ProjectToPlane(r);
 
 		// get the local surface normal
-		vec3d np = m_plane.Normal(q);
+		vec3d np = PlaneNormal(q);
 
 		// calculate offset
 		q += np*m_d;
 
 		// the normal is set to the secondary surface element normal
-		m_ss.m_nu[i] = np;
+		surf.m_nu[i] = np;
 	
 		// calculate initial gap
-		m_ss.m_gap[i] = -(np*(r - q)) + m_ss.m_off[i];
+		surf.m_gap[i] = -(np*(r - q)) + surf.m_off[i];
 	}
 }
 
@@ -305,7 +318,7 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 void FERigidWallInterface::Update()
 {
 	// project primary surface onto secondary surface
-	ProjectSurface(m_ss);
+	ProjectSurface(*m_ss);
 }
 
 //-----------------------------------------------------------------------------
@@ -344,21 +357,23 @@ void FERigidWallInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	double pen = m_eps, eps;
 	
 	// loop over all primary surface facets
-	int ne = m_ss.Elements();
+	FERigidWallSurface& surf = *m_ss;
+
+	int ne = surf.Elements();
 	for (j=0; j<ne; ++j)
 	{
 		// get the next element
-		FESurfaceElement& sel = m_ss.Element(j);
+		FESurfaceElement& sel = surf.Element(j);
 
 		// get the element's LM vector
-		m_ss.UnpackLM(sel, sLM);
+		surf.UnpackLM(sel, sLM);
 
 		nseln = sel.Nodes();
 
 		for (int i=0; i<nseln; ++i)
 		{
-			r0[i] = m_ss.GetMesh()->Node(sel.m_node[i]).m_r0;
-			rt[i] = m_ss.GetMesh()->Node(sel.m_node[i]).m_rt;
+			r0[i] = surf.GetMesh()->Node(sel.m_node[i]).m_r0;
+			rt[i] = surf.GetMesh()->Node(sel.m_node[i]).m_rt;
 		}
 		w = sel.GaussWeights();
 
@@ -390,12 +405,12 @@ void FERigidWallInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				detJ = (dxr ^ dxs).norm();
 
 				// get node normal force
-				eps = pen*m_ss.m_eps[m];
-				tn = m_ss.m_Lm[m] + eps*m_ss.m_gap[m];
+				eps = pen* surf.m_eps[m];
+				tn = surf.m_Lm[m] + eps* surf.m_gap[m];
 				tn = MBRACKET(tn);
 
 				// get the node normal
-				vec3d& nu = m_ss.m_nu[m];
+				vec3d& nu = surf.m_nu[m];
 
 				// calculate force vector
 				fe[0] = detJ*w[n]*tn*nu.x;
@@ -448,20 +463,21 @@ void FERigidWallInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 	double pen = m_eps, eps;
 
 	// loop over all primary surface elements
-	int ne = m_ss.Elements();
+	FERigidWallSurface& surf = *m_ss;
+	int ne = surf.Elements();
 	for (j=0; j<ne; ++j)
 	{
-		FESurfaceElement& se = m_ss.Element(j);
+		FESurfaceElement& se = surf.Element(j);
 
 		// get the element's LM vector
-		m_ss.UnpackLM(se, sLM);
+		surf.UnpackLM(se, sLM);
 
 		nseln = se.Nodes();
 
 		for (int i=0; i<nseln; ++i)
 		{
-			r0[i] = m_ss.GetMesh()->Node(se.m_node[i]).m_r0;
-			rt[i] = m_ss.GetMesh()->Node(se.m_node[i]).m_rt;
+			r0[i] = surf.GetMesh()->Node(se.m_node[i]).m_r0;
+			rt[i] = surf.GetMesh()->Node(se.m_node[i]).m_rt;
 		}
 
 		w = se.GaussWeights();
@@ -494,19 +510,19 @@ void FERigidWallInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				detJ = (dxr ^ dxs).norm();
 
 				// gap
-				gap = m_ss.m_gap[m];
+				gap = surf.m_gap[m];
 
 				// lagrange multiplier
-				Lm = m_ss.m_Lm[m];
+				Lm = surf.m_Lm[m];
 
 				// get node normal force
-				eps = pen*m_ss.m_eps[m];
+				eps = pen* surf.m_eps[m];
 
-				tn = m_ss.m_Lm[m] + eps*m_ss.m_gap[m];
+				tn = surf.m_Lm[m] + eps* surf.m_gap[m];
 				tn = MBRACKET(tn);
 
 				// get the node normal
-				vec3d& nu = m_ss.m_nu[m];
+				vec3d& nu = surf.m_nu[m];
 
 				// set up the N vector
 				N[0] = nu.x;
@@ -552,29 +568,31 @@ bool FERigidWallInterface::Augment(int naug, const FETimeInfo& tp)
 	double Lm;
 	bool bconv = true;
 
+	FERigidWallSurface& surf = *m_ss;
+
 	// penalty value
 	double pen = m_eps, eps;
 
 	// calculate initial norms
 	double normL0 = 0;
-	for (i=0; i<m_ss.Nodes(); ++i) normL0 += m_ss.m_Lm[i]*m_ss.m_Lm[i];
+	for (i=0; i< surf.Nodes(); ++i) normL0 += surf.m_Lm[i]* surf.m_Lm[i];
 	normL0 = sqrt(normL0);
 
 	// update Lagrange multipliers and calculate current norms
 	double normL1 = 0;
 	double normgc = 0;
 	int N = 0;
-	for (i=0; i<m_ss.Nodes(); ++i)
+	for (i=0; i< surf.Nodes(); ++i)
 	{
 		// update Lagrange multipliers
-		eps = pen*m_ss.m_eps[i];
+		eps = pen* surf.m_eps[i];
 
-		Lm = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
+		Lm = surf.m_Lm[i] + eps* surf.m_gap[i];
 		Lm = MBRACKET(Lm);
 		normL1 += Lm*Lm;
-		if (m_ss.m_gap[i] > 0)
+		if (surf.m_gap[i] > 0)
 		{
-			normgc += m_ss.m_gap[i]*m_ss.m_gap[i];
+			normgc += surf.m_gap[i]* surf.m_gap[i];
 			++N;
 		}
 	}	
@@ -594,13 +612,13 @@ bool FERigidWallInterface::Augment(int naug, const FETimeInfo& tp)
 	if (pctn >= m_atol)
 	{
 		bconv = false;
-		for (i=0; i<m_ss.Nodes(); ++i)
+		for (i=0; i< surf.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
-			eps = pen*m_ss.m_eps[i];
+			eps = pen* surf.m_eps[i];
 
-			Lm = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
-			m_ss.m_Lm[i] = MBRACKET(Lm);
+			Lm = surf.m_Lm[i] + eps* surf.m_gap[i];
+			surf.m_Lm[i] = MBRACKET(Lm);
 		}	
 	}
 
@@ -608,10 +626,25 @@ bool FERigidWallInterface::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
+vec3d FERigidWallInterface::PlaneNormal(const vec3d& r)
+{
+	vec3d n(m_a[0], m_a[1], m_a[2]);
+	n.unit();
+	return n;
+}
 
+//-----------------------------------------------------------------------------
+vec3d FERigidWallInterface::ProjectToPlane(const vec3d& r)
+{
+	double d = m_a[3];
+
+	double l = m_a[0] * r.x + m_a[1] * r.y + m_a[2] * r.z - d;
+	return vec3d(r.x - l * m_a[0], r.y - l * m_a[1], r.z - l * m_a[2]);
+}
+
+//-----------------------------------------------------------------------------
 void FERigidWallInterface::Serialize(DumpStream &ar)
 {
-	FEContactInterface::Serialize(ar);
-	m_ss.Serialize(ar);
-	m_plane.Serialize(ar);
+	FESurfaceConstraint::Serialize(ar);
+	m_ss->Serialize(ar);
 }

@@ -49,6 +49,13 @@ FEDamageNeoHookean::FEDamageNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+// returns a pointer to a new material point object
+FEMaterialPointData* FEDamageNeoHookean::CreateMaterialPointData()
+{
+	return new FEDamageMaterialPoint(new FEElasticMaterialPoint);
+}
+
+//-----------------------------------------------------------------------------
 // Initialization routine and parameter checking
 bool FEDamageNeoHookean::Init()
 {

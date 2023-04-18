@@ -30,14 +30,28 @@ SOFTWARE.*/
 #include "FEElasticTrussDomain.h"
 #include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
+#include "FEUncoupledMaterial.h"
+#include "FEElasticMaterialPoint.h"
 #include "FEBioMech.h"
 
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEElasticTrussDomain, FETrussDomain)
+	ADD_PARAMETER(m_a0, "cross_sectional_area");
+	ADD_PARAMETER(m_v, "v")->setLongName("Poisson's ratio");
+END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! Constructor
 FEElasticTrussDomain::FEElasticTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem)
 {
+	m_a0 = 0.0;
+	m_v = 0.5;
+
 	m_pMat = 0;
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -60,8 +74,38 @@ const FEDofList& FEElasticTrussDomain::GetDOFList() const
 void FEElasticTrussDomain::SetMaterial(FEMaterial* pmat)
 {
 	FETrussDomain::SetMaterial(pmat);
-	m_pMat = dynamic_cast<FETrussMaterial*>(pmat);
+	m_pMat = dynamic_cast<FESolidMaterial*>(pmat);
 	assert(m_pMat);
+}
+
+//-----------------------------------------------------------------------------
+//! initialize the domain
+bool FEElasticTrussDomain::Init()
+{
+	if (m_a0 != 0.0)
+	{
+		for (int i = 0; i < Elements(); ++i)
+		{
+			FETrussElement& el = Element(i);
+			el.m_a0 = m_a0;
+		}
+	}
+
+
+	for (int i = 0; i < (int)m_Elem.size(); ++i)
+	{
+		// unpack the element
+		FETrussElement& el = m_Elem[i];
+
+		// nodal coordinates
+		vec3d r0[2];
+		for (int j = 0; j < 2; ++j) r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
+
+		// initial length
+		el.m_L0 = (r0[1] - r0[0]).norm();
+	}
+
+	return FETrussDomain::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -130,37 +174,55 @@ void FEElasticTrussDomain::StiffnessMatrix(FELinearSystem& LS)
 }
 
 //-----------------------------------------------------------------------------
+//! intertial stiffness matrix
+void FEElasticTrussDomain::MassMatrix(FELinearSystem& LS, double scale)
+{
+	for (int n = 0; n < Elements(); ++n)
+	{
+		FETrussElement& el = Element(n);
+
+		matrix me(2, 2); me.zero();
+		ElementMassMatrix(el, me);
+
+		FEElementMatrix Me(6, 6); Me.zero();
+		for (int i=0; i<2; ++i)
+		{ 
+			for (int j = 0; j < 2; ++j)
+			{
+				Me[3 * i    ][3 * j    ] = me[i][j];
+				Me[3 * i + 1][3 * j + 1] = me[i][j];
+				Me[3 * i + 2][3 * j + 2] = me[i][j];
+			}
+		}
+
+		vector<int> lm;
+		UnpackLM(el, lm);
+
+		Me.SetIndices(lm);
+
+		LS.Assemble(Me);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 {
 	FETrussElement& el = Element(iel);
 
-	// nodal coordinates
-	vec3d r0[2], rt[2];
-	for (int i=0; i<2; ++i)
-	{
-		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-	}
-
-	// intial length
-	double L = (r0[1] - r0[0]).norm();
-
-	// current length
-	double l = (rt[1] - rt[0]).norm();
-
 	// get the elastic tangent
 	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
-	FETrussMaterialPoint& pt = *mp.ExtractData<FETrussMaterialPoint>();
-	double E = m_pMat->Tangent(pt);
+	tens4ds c = m_pMat->Tangent(mp);
+	double E = c(0, 0);
 
 	// element initial volume
-	double V = L*el.m_a0;
+	double V = el.m_L0*el.m_a0;
+	double l = el.m_L0 / el.m_lam;
 
 	// Kirchhoff Stress
-	double tau = pt.m_tau;
+	double tau = el.m_tau;
 
 	// scalar stiffness
-	double k = V / (l*l)*( E - 2*tau);
+	double k = E;// V / (l * l) * (E - 2 * tau);
 
 	// axial force T = s*a = t*V/l
 	double T = tau*V/l;
@@ -185,16 +247,38 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 }
 
 //----------------------------------------------------------------------------
+//! elemental mass matrix
+void FEElasticTrussDomain::ElementMassMatrix(FETrussElement& el, matrix& me)
+{
+	// nodal coordinates
+	vec3d r0[2];
+	for (int i = 0; i < 2; ++i)
+	{
+		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+	}
+
+	double L = (r0[1] - r0[0]).norm();
+	double A = el.m_a0;
+	double rho = m_pMat->Density(*el.GetMaterialPoint(0));
+
+	me[0][0] = rho * A * L / 3.0; me[0][1] = rho * A * L / 6.0;
+	me[1][0] = rho * A * L / 6.0; me[1][1] = rho * A * L / 3.0;
+}
+
+//----------------------------------------------------------------------------
 void FEElasticTrussDomain::InternalForces(FEGlobalVector& R)
 {
 	// element force vector
-	vector<double> fe;
-	vector<int> lm;
 	int NT = (int)m_Elem.size();
+#pragma omp parallel for
 	for (int i=0; i<NT; ++i)
 	{
 		FETrussElement& el = m_Elem[i];
+
+		vector<double> fe;
 		ElementInternalForces(el, fe);
+
+		vector<int> lm;
 		UnpackLM(el, lm);
 		R.Assemble(el.m_node, lm, fe);
 	}
@@ -204,21 +288,21 @@ void FEElasticTrussDomain::InternalForces(FEGlobalVector& R)
 void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<double>& fe)
 {
 	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
-	FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
+	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 	// get the element's normal
 	vec3d n = TrussNormal(el);
 
-	// get the element's Kirchhoff stress
-	double tau = pt.m_tau;
-
 	// nodal coordinates
-	vec3d r0[2], rt[2];
-	for (int i=0; i<2; ++i)
-	{
-		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-	}
+	vec3d r0[2] = {
+		m_pMesh->Node(el.m_node[0]).m_r0,
+		m_pMesh->Node(el.m_node[1]).m_r0
+	};
+
+	vec3d rt[2] = {
+		m_pMesh->Node(el.m_node[0]).m_rt,
+		m_pMesh->Node(el.m_node[1]).m_rt
+	};
 
 	// initial length
 	double L = (r0[1] - r0[0]).norm();
@@ -226,14 +310,23 @@ void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<doub
 	// current length
 	double l = (rt[1] - rt[0]).norm();
 
+	// stress in element
+	double tau = pt.m_s.xx();
+
 	// elements initial volume
 	double V = L*el.m_a0;
 
+	// current volume
+	double v = V * pt.m_J;
+
+	// current area
+	double a = v / l;
+
 	// calculate nodal forces
 	fe.resize(6);
-	fe[0] = tau*V/l*n.x;
-	fe[1] = tau*V/l*n.y;
-	fe[2] = tau*V/l*n.z;
+	fe[0] = tau*a*n.x;
+	fe[1] = tau*a*n.y;
+	fe[2] = tau*a*n.z;
 	fe[3] = -fe[0];
 	fe[4] = -fe[1];
 	fe[5] = -fe[2];
@@ -243,18 +336,17 @@ void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<doub
 //! Update the truss' stresses
 void FEElasticTrussDomain::Update(const FETimeInfo& tp)
 {
+	FEUncoupledMaterial* um = dynamic_cast<FEUncoupledMaterial*>(GetMaterial());
+
 	// loop over all elements
-	vec3d r0[2], rt[2];
+#pragma omp parallel for
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// unpack the element
 		FETrussElement& el = m_Elem[i];
 
-		// setup the material point
-		FEMaterialPoint& mp = *(el.GetMaterialPoint(0));
-		FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
-
 		// nodal coordinates
+		vec3d r0[2], rt[2];
 		for (int j=0; j<2; ++j)
 		{
 			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
@@ -264,10 +356,30 @@ void FEElasticTrussDomain::Update(const FETimeInfo& tp)
 		double l = (rt[1] - rt[0]).norm();
 		double L = (r0[1] - r0[0]).norm();
 
+		double lam = l / L;
+		double linv2 = 1.0 / sqrt(pow(lam, 2.0*m_v));
+
 		// calculate strain
-		pt.m_l = l / L;
+		el.m_lam = l / L;
+
+		// setup deformation gradient (assuming incompressibility)
+		mat3d F(lam, 0.0, 0.0, 0.0, linv2, 0.0, 0.0, 0.0, linv2);
 
 		// calculate stress
-		pt.m_tau = m_pMat->Stress(pt);
+		FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+		FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+		ep.m_F = F;
+		ep.m_J = F.det();
+
+		if (um)
+		{
+			mat3ds devs = um->DevStress(mp);
+			double p = -devs.yy();
+			ep.m_s = devs + mat3dd(p);
+		}
+		else
+		{
+			ep.m_s = m_pMat->Stress(mp);
+		}
 	}
 }

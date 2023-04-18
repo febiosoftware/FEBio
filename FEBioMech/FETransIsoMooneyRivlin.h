@@ -29,7 +29,8 @@ SOFTWARE.*/
 #pragma once
 #include "FEUncoupledMaterial.h"
 #include "FEUncoupledFiberExpLinear.h"
-#include "FEActiveFiberContraction.h"
+#include "FEActiveContractionMaterial.h"
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Mooney-Rivlin material
@@ -43,8 +44,8 @@ public:
 	FETransIsoMooneyRivlin(FEModel* pfem);
 
 public:
-	double			c1;			//!< Mooney-Rivlin coefficient C1
-	double			c2;			//!< Mooney-Rivlin coefficient C2
+	FEParamDouble   m_c1;			//!< Mooney-Rivlin coefficient C1
+    FEParamDouble   m_c2;			//!< Mooney-Rivlin coefficient C2
 
 public:
 	//! calculate deviatoric stress at material point
@@ -56,9 +57,16 @@ public:
 	//! calculate deviatoric strain energy density at material point
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
 
+    //! create material point data
+    FEMaterialPointData* CreateMaterialPointData() override;
+    
+    // update force-velocity material point
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+    
 protected:
-	FEUncoupledFiberExpLinear	m_fib;
-	FEActiveFiberContraction*	m_ac;
+	FEFiberExpLinearUC		       m_fib;
+    FEActiveContractionMaterial*   m_ac;
+	FEVec3dValuator* m_fiber;
 
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

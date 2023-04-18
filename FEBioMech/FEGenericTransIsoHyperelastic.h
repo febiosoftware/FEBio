@@ -47,7 +47,7 @@ public:
 
 private:
 	std::string			m_exp;
-	FEParamVec3			m_fiber;
+	FEVec3dValuator*	m_fiber;
 
 private:
 	MSimpleExpression	m_W;		// strain-energy function

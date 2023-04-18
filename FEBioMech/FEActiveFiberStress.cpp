@@ -33,12 +33,15 @@ SOFTWARE.*/
 
 //=====================================================================================
 
-BEGIN_FECORE_CLASS(FEActiveFiberStress, FEMaterial);
-	ADD_PARAMETER(m_smax, "smax");
+BEGIN_FECORE_CLASS(FEActiveFiberStress, FEElasticMaterial);
+	ADD_PARAMETER(m_smax, "smax")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_ac, "activation");
 
 	ADD_PROPERTY(m_stl, "stl", FEProperty::Optional);
 	ADD_PROPERTY(m_stv, "stv", FEProperty::Optional);
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 FEActiveFiberStress::FEActiveFiberStress(FEModel* fem) : FEElasticMaterial(fem)

@@ -23,13 +23,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEPointBodyForce.h"
-#include "FEElasticMaterial.h"
-#include "FECore/FEModel.h"
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPointBodyForce, FEBodyForce);
@@ -51,8 +47,7 @@ FEPointBodyForce::FEPointBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 //-----------------------------------------------------------------------------
 vec3d FEPointBodyForce::force(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	vec3d x = pt.m_rt;
+	vec3d x = mp.m_rt;
 	vec3d n = x - m_rc;
 	double l = n.unit();
 
@@ -63,9 +58,7 @@ vec3d FEPointBodyForce::force(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 mat3ds FEPointBodyForce::stiffness(FEMaterialPoint &mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	vec3d x = pt.m_rt;
+	vec3d x = mp.m_rt;
 	vec3d n = x - m_rc;
 	double l = n.unit();
 
@@ -98,19 +91,18 @@ void FEPointBodyForce::Serialize(DumpStream &ar)
 //-----------------------------------------------------------------------------
 bool FEPointBodyForce::Init()
 {
+	FEMesh& m = GetMesh();
 	if (m_inode == -1)
 	{
 		if (!m_brigid)
 		{
 			// find the element in which point r0 lies
-			FEMesh& m = GetFEModel()->GetMesh();
 			m_pel = m.FindSolidElement(m_rc, m_rs);
 		}
 		else m_pel = 0;
 	}
 	else 
 	{
-		FEMesh& m = GetFEModel()->GetMesh();
 		m_rc = m.Node(m_inode).m_r0;
 	}
 
@@ -125,7 +117,7 @@ void FEPointBodyForce::Update()
 	{
 		if (m_pel)
 		{
-			FEMesh& m = GetFEModel()->GetMesh();
+			FEMesh& m = GetMesh();
 			vec3d x[FEElement::MAX_NODES];
 			for (int i=0; i<8; ++i) x[i] = m.Node(m_pel->m_node[i]).m_rt;
 
@@ -146,7 +138,7 @@ void FEPointBodyForce::Update()
 	}
 	else
 	{
-		FEMesh& m = GetFEModel()->GetMesh();
+		FEMesh& m = GetMesh();
 		m_rc = m.Node(m_inode).m_rt;
 	}
 }

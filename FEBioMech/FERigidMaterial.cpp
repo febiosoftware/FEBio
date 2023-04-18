@@ -25,39 +25,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FERigidMaterial.h"
-#include "FECore/FEModel.h"
 #include "FERigidBody.h"
 #include "FEMechModel.h"
 #include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FERigidMaterial, FESolidMaterial)
-	ADD_PARAMETER(m_E      , FE_RANGE_GREATER(0.0), "E"             );
-	ADD_PARAMETER(m_v      , FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v"             );
-	ADD_PARAMETER(m_pmid   , "parent_id"     );
-	ADD_PARAMETER(m_rc     , "center_of_mass");
+	ADD_PARAMETER(m_E      , FE_RANGE_GREATER_OR_EQUAL(0.0), "E"         )->setLongName("Young's modulus");
+	ADD_PARAMETER(m_v      , FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v")->setLongName("Poisson's ratio");
+	ADD_PARAMETER(m_com    , "override_com")->SetFlags(FE_PARAM_WATCH);
+	ADD_PARAMETER(m_rc    , "center_of_mass")->SetWatchVariable(&m_com);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 // constructor
 FERigidMaterial::FERigidMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 {
-	m_com = 0;	// calculate COM automatically
 	m_E = 1;
 	m_v = 0;
+	m_rc = vec3d(0, 0, 0);
+
+	m_com = false;	// calculate COM automatically
 	m_pmid = -1;
 	m_nRB = -1;
 
 	m_binit = false;
-}
-
-//-----------------------------------------------------------------------------
-void FERigidMaterial::SetParameter(FEParam& p)
-{
-	if (strcmp(p.name(), "center_of_mass") == 0)
-	{
-		m_com = 1;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -79,13 +71,13 @@ bool FERigidMaterial::Init()
 			rb.UpdateMass();
 
 			// next, calculate the center of mass, or just set it
-			if (m_com == 1)
+			if (m_com == false)
 			{
-				rb.SetCOM(m_rc);
+				rb.UpdateCOM();
 			}
 			else
 			{
-				rb.UpdateCOM();
+				rb.SetCOM(m_rc); 
 			}
 
 			// finally, determine moi

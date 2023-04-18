@@ -38,7 +38,6 @@ BEGIN_FECORE_CLASS(FEOrthotropicCLE, FEElasticMaterial)
 	ADD_PARAMETER(lp22, "lp22");
 	ADD_PARAMETER(lm22, "lm22");
 	ADD_PARAMETER(lp33, "lp33");
-	ADD_PARAMETER(lp11, "lp11");
 	ADD_PARAMETER(lm33, "lm33");
 	ADD_PARAMETER(l12, "l12");
 	ADD_PARAMETER(l23, "l23");
@@ -46,6 +45,9 @@ BEGIN_FECORE_CLASS(FEOrthotropicCLE, FEElasticMaterial)
 	ADD_PARAMETER(mu1, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu1");
 	ADD_PARAMETER(mu2, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu2");
 	ADD_PARAMETER(mu3, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu3");
+
+    ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

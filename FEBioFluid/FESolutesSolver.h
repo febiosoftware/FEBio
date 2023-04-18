@@ -94,7 +94,6 @@ public:
 	int			m_nCeq;		//!< total number of concentration dofs
 
 public:
-    vector<double> m_Fn;    //!< concentrated nodal force vector
     vector<double> m_Fr;    //!< nodal reaction forces
     
     // solute data

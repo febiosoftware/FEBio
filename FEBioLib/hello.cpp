@@ -55,7 +55,7 @@ int febio::Hello(LogStream& log)
 	log.print("                                                                           \n");
 	log.print(szversion);
 	log.print("  FEBio is a registered trademark.                                         \n");
-	log.print("  copyright (c) 2006-2021 - All rights reserved                            \n");
+	log.print("  copyright (c) 2006-2023 - All rights reserved                            \n");
 	log.print("                                                                           \n");
 	log.print("===========================================================================\n");
 	log.print("\n");

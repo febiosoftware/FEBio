@@ -27,20 +27,20 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEModelComponent.h"
+#include "FEStepComponent.h"
 #include <vector>
 #include "FENodeDataMap.h"
 #include "FENodeSet.h"
 #include "FEDofList.h"
 #include "FEModelParam.h"
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! Base class for defining initial conditions.
 //! Initial conditions can be used to set the initial state of the model in an analysis. 
-class FECORE_API FEInitialCondition : public FEModelComponent
+class FECORE_API FEInitialCondition : public FEStepComponent
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEIC_ID)
+	FECORE_BASE_CLASS(FEInitialCondition);
 
 public:
 	FEInitialCondition(FEModel* pfem);
@@ -89,6 +89,7 @@ public:
 	FEInitialDOF(FEModel* fem, int ndof, FENodeSet* nset);
 
 	void SetDOF(int ndof);
+	bool SetDOF(const char* szdof);
 
 	void Serialize(DumpStream& ar) override;
 
@@ -99,7 +100,7 @@ public:
 
 	void SetValue(double v);
 
-private:
+protected:
 	int				m_dof;		//!< degree of freedom
 	FEParamDouble	m_data;		//!< nodal values
 

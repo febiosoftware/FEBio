@@ -26,8 +26,6 @@
 
 
 #include "FENonlinearElasticFluid.h"
-#include <FECore/FEModel.h>
-#include <FECore/log.h>
 #include "FEFluidMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
@@ -42,6 +40,13 @@ FENonlinearElasticFluid::FENonlinearElasticFluid(FEModel* pfem) : FEElasticFluid
 bool FENonlinearElasticFluid::Init()
 {
     return true;
+}
+
+//-----------------------------------------------------------------------------
+// serialization
+void FENonlinearElasticFluid::Serialize(DumpStream& ar)
+{
+    ar& m_k& m_rhor;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +71,8 @@ double FENonlinearElasticFluid::Tangent_Strain(FEMaterialPoint& mp)
 //! 2nd tangent of pressure with respect to strain J
 double FENonlinearElasticFluid::Tangent_Strain_Strain(FEMaterialPoint& mp)
 {
-    return 0;
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    return 2*m_k/pow(1+fp.m_ef,3);
 }
 
 //-----------------------------------------------------------------------------

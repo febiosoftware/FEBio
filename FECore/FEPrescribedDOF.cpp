@@ -29,14 +29,14 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPrescribedDOF.h"
 #include "FENodeSet.h"
-#include "FEModel.h"
 #include "DumpStream.h"
+#include "FEMesh.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPrescribedDOF, FEPrescribedNodeSet)
 	ADD_PARAMETER(m_scale, "scale");
-	ADD_PARAMETER(m_dof  , "dof", 0, "@dof_list");
+	ADD_PARAMETER(m_dof  , "dof", 0, "$(dof_list)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -61,6 +61,16 @@ void FEPrescribedDOF::SetDOF(int ndof)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPrescribedDOF::SetDOF(const char* szdof)
+{
+	int ndof = GetDOFIndex(szdof);
+	assert(ndof >= 0);
+	if (ndof < 0) return false;
+	SetDOF(ndof);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 // Sets the displacement scale factor. An optional load curve index can be given
 // of the load curve that will control the scale factor.
 FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
@@ -68,8 +78,7 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 	m_scale = s;
 	if (lc >= 0)
 	{
-		FEParam* p = FindParameterFromData(&m_scale); assert(p);
-		GetFEModel()->AttachLoadController(p, lc);
+		AttachLoadController(&m_scale, lc);
 	}
 	return *this;
 }
@@ -77,12 +86,15 @@ FEPrescribedDOF& FEPrescribedDOF::SetScale(double s, int lc)
 //-----------------------------------------------------------------------------
 bool FEPrescribedDOF::Init()
 {
+	// set the dof first before calling base class
+	if (m_dof < 0) return false;
+	SetDOFList(m_dof);
+
 	// don't forget to call the base class
-	if (FEPrescribedBC::Init() == false) return false;
+	if (FEPrescribedNodeSet::Init() == false) return false;
 
 	// make sure this is not a rigid node
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 	int NN = mesh.Nodes();
 	const FENodeSet& nset = *GetNodeSet();
 	for (size_t i = 0; i<nset.Size(); ++i)
@@ -97,12 +109,6 @@ bool FEPrescribedDOF::Init()
 	}
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPrescribedDOF::SetDofList(FEDofList& dofs)
-{
-	return dofs.AddDof(m_dof);
 }
 
 //-----------------------------------------------------------------------------

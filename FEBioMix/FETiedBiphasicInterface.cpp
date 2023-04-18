@@ -78,11 +78,9 @@ void FETiedBiphasicSurface::Data::Serialize(DumpStream& ar)
 	ar & m_nu;
 	ar & m_rs;
 	ar & m_Lmd;
-	ar & m_Lmp;
+	ar & m_tr;
 	ar & m_epsn;
 	ar & m_epsp;
-	ar & m_pg;
-	ar & m_tr;
 }
 
 //-----------------------------------------------------------------------------
@@ -238,6 +236,10 @@ FETiedBiphasicInterface::FETiedBiphasicInterface(FEModel* pfem) : FEContactInter
 
 	m_dofP = pfem->GetDOFIndex("p");
 	
+	// set parents
+	m_ss.SetContactInterface(this);
+	m_ms.SetContactInterface(this);
+
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
 }

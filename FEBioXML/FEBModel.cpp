@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include <FECore/FEShellDomain.h>
 #include <FECore/log.h>
+using namespace std;
 
 //=============================================================================
 FEBModel::NodeSet::NodeSet() {}
@@ -53,6 +54,25 @@ const string& FEBModel::NodeSet::Name() const { return m_name; }
 void FEBModel::NodeSet::SetNodeList(const vector<int>& node) { m_node = node; }
 
 const vector<int>& FEBModel::NodeSet::NodeList() const { return m_node; }
+
+//=============================================================================
+FEBModel::EdgeSet::EdgeSet() {}
+
+FEBModel::EdgeSet::EdgeSet(const FEBModel::EdgeSet& set)
+{
+	m_name = set.m_name;
+	m_edge = set.m_edge;
+}
+
+FEBModel::EdgeSet::EdgeSet(const string& name) : m_name(name) {}
+
+void FEBModel::EdgeSet::SetName(const string& name) { m_name = name; }
+
+const string& FEBModel::EdgeSet::Name() const { return m_name; }
+
+void FEBModel::EdgeSet::SetEdgeList(const vector<EDGE>& edge) { m_edge = edge; }
+
+const vector<FEBModel::EDGE>& FEBModel::EdgeSet::EdgeList() const { return m_edge; }
 
 //=============================================================================
 FEBModel::ElementSet::ElementSet() {}
@@ -216,6 +236,36 @@ FEBModel::Surface* FEBModel::Part::FindSurface(const string& name)
 	return nullptr;
 }
 
+FEBModel::NodeSet* FEBModel::Part::FindNodeSet(const string& name)
+{
+	for (size_t i = 0; i < m_NSet.size(); ++i)
+	{
+		NodeSet* nset = m_NSet[i];
+		if (nset->Name() == name) return nset;
+	}
+	return nullptr;
+}
+
+FEBModel::EdgeSet* FEBModel::Part::FindEdgeSet(const string& name)
+{
+	for (size_t i = 0; i < m_LSet.size(); ++i)
+	{
+		EdgeSet* lset = m_LSet[i];
+		if (lset->Name() == name) return lset;
+	}
+	return nullptr;
+}
+
+FEBModel::ElementSet* FEBModel::Part::FindElementSet(const string& name)
+{
+	for (size_t i = 0; i < m_ESet.size(); ++i)
+	{
+		ElementSet* eset = m_ESet[i];
+		if (eset->Name() == name) return eset;
+	}
+	return nullptr;
+}
+
 //=============================================================================
 FEBModel::FEBModel()
 {
@@ -260,7 +310,7 @@ FEBModel::Part* FEBModel::FindPart(const string& name)
 	return 0;
 }
 
-bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETransform& T)
+bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Transform& T)
 {
 	// we'll need the kernel for creating domains
 	FECoreKernel& febio = FECoreKernel::GetInstance();
@@ -322,7 +372,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 		FENode& meshNode = mesh.Node(N0 + n++);
 
 		meshNode.SetID(++nid);
-		meshNode.m_r0 = T.Transform(partNode.r);
+		meshNode.m_r0 = T.Apply(partNode.r);
 		meshNode.m_rt = meshNode.m_r0;
 	}
 	assert(n == NN);
@@ -411,7 +461,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 		NodeSet* set = part.GetNodeSet(i);
 
 		// create a new node set
-		FENodeSet* feset = fecore_alloc(FENodeSet, &fem);
+		FENodeSet* feset = new FENodeSet(&fem);
 
 		// add the name
 		string name = partName + set->Name();
@@ -427,6 +477,34 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 		mesh.AddNodeSet(feset);
 	}
 
+	// create edges
+	int Edges = part.EdgeSets();
+	for (int i = 0; i < Edges; ++i)
+	{
+		EdgeSet* edgeSet = part.GetEdgeSet(i);
+		int N = edgeSet->Edges();
+
+		// create a new segment set
+		FESegmentSet* segSet = new FESegmentSet(&fem);
+		string name = partName + edgeSet->Name();
+		segSet->SetName(name.c_str());
+
+		// copy data
+		segSet->Create(N);
+		for (int j = 0; j < N; ++j)
+		{
+			EDGE& edge = edgeSet->Edge(j);
+			FESegmentSet::SEGMENT& seg = segSet->Segment(j);
+
+			seg.ntype = edge.ntype;
+			int nn = edge.ntype;	// we assume that the type also identifies the number of nodes
+			for (int n = 0; n < nn; ++n) seg.node[n] = NLT[edge.node[n] - noff];
+		}
+
+		// add it to the mesh
+		mesh.AddSegmentSet(segSet);
+	}
+
 	// create surfaces
 	int Surfs = part.Surfaces();
 	for (int i=0; i<Surfs; ++i)
@@ -435,7 +513,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 		int faces = surf->Facets();
 
 		// create a new facet set
-		FEFacetSet* fset = fecore_alloc(FEFacetSet, &fem);
+		FEFacetSet* fset = new FEFacetSet(&fem);
 		string name = partName + surf->Name();
 		fset->SetName(name.c_str());
 
@@ -463,7 +541,7 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const FETr
 		vector<int> elist = eset.ElementList();
 
 		int ne = (int) elist.size();
-		FEElementSet* feset = fecore_alloc(FEElementSet, &fem);
+		FEElementSet* feset = new FEElementSet(&fem);
 		string name = partName + eset.Name();
 		feset->SetName(name);
 

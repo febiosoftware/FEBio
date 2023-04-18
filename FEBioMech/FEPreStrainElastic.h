@@ -30,14 +30,14 @@ SOFTWARE.*/
 //! Class for stroing pre-strain gradient data
 //! This material point class stores the initial pre-strain "guess" and
 //! the correction term. The total prestrain gradient is the product of these two.
-class FEPrestrainMaterialPoint : public FEMaterialPoint
+class FEPrestrainMaterialPoint : public FEMaterialPointData
 {
 public:
 	//! constructor
-	FEPrestrainMaterialPoint(FEMaterialPoint* pt);
+	FEPrestrainMaterialPoint(FEMaterialPointData* mp);
 
 	//! copy
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
 	//! initialization
 	void Init(bool bflag);
@@ -70,10 +70,10 @@ protected:
 //! Base class for algorithms that will be used to calculate a pre-strain gradient.
 //! This is used by the FEPrestrainElastic class to calculate the initial pre-strain
 //! gradient.
-class FEPrestrainGradient : public FEMaterial
+class FEBIOMECH_API FEPrestrainGradient : public FEMaterialProperty
 {
 public:
-	FEPrestrainGradient(FEModel* pfem) : FEMaterial(pfem) {}
+	FEPrestrainGradient(FEModel* pfem) : FEMaterialProperty(pfem) {}
 	virtual ~FEPrestrainGradient(){}
 
 	// evaluate the pre-strain deformation gradient
@@ -82,6 +82,8 @@ public:
 	// initialize the pre-strain gradient based on a deformation gradient
 	// This is used by the pre-strain initial condition
 	virtual void Initialize(const mat3d& F, FEMaterialPoint& mp) = 0;
+
+	FECORE_BASE_CLASS(FEPrestrainGradient)
 };
 
 //-----------------------------------------------------------------------------
@@ -103,13 +105,16 @@ public:
 	FEPrestrainElastic(FEModel* pfem);
 
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! return the pre-strain gradient property
 	FEPrestrainGradient* PrestrainGradientProperty() override { return m_Fp; }
 
 	//! return the elastic material
 	FEElasticMaterial* GetElasticMaterial() override { return m_mat; }
+
+	// evaluate density in (pre-strained) reference configuration
+	double Density(FEMaterialPoint& mp) override;
 
 public:
 	//! Cauchy stress 

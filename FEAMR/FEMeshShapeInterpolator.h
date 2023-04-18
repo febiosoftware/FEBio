@@ -46,17 +46,17 @@ public:
 
 	bool Init() override;
 
-	void SetTargetPoints(const vector<vec3d>& trgPoints);
+	void SetTargetPoints(const std::vector<vec3d>& trgPoints);
 	bool SetTargetPoint(const vec3d& r) override;
 
-	bool Map(std::vector<double>& tval, function<double(int sourceNode)> src) override;
+	bool Map(std::vector<double>& tval, std::function<double(int sourceNode)> src) override;
 
-	double Map(int inode, function<double(int sourceNode)> src) override;
-	vec3d MapVec3d(int inode, function<vec3d(int sourceNode)> src) override;
+	double Map(int inode, std::function<double(int sourceNode)> src) override;
+	vec3d MapVec3d(int inode, std::function<vec3d(int sourceNode)> src) override;
 
 private:
 	FEMesh*	m_mesh;
 	FEOctreeSearch*	m_os;
-	vector<vec3d>	m_trgPoints;
-	vector<Data>	m_data;
+	std::vector<vec3d>	m_trgPoints;
+	std::vector<Data>	m_data;
 };

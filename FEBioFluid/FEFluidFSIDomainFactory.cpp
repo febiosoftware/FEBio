@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFluidFSIDomainFactory.h"
 #include "FEBiphasicFSI.h"
-#include <FECore/FEDomain.h>
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 FEDomain* FEFluidFSIDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
@@ -37,25 +37,22 @@ FEDomain* FEFluidFSIDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEM
 	FEModel* pfem = pmat->GetFEModel();
 	FE_Element_Class eclass = spec.eclass;
 	FE_Element_Shape eshape = spec.eshape;
-	const char* sztype = 0;
+
+	FEDomain* pd = nullptr;
+	
 	if (dynamic_cast<FEBiphasicFSI*>(pmat))
 	{
 		// fluid elements
-		if (eclass == FE_ELEM_SOLID) sztype = "biphasic-FSI-3D";
+		if (eclass == FE_ELEM_SOLID) pd = fecore_new<FESolidDomain>("biphasic-FSI-3D", pfem);
 		else return 0;
 	}
     else if (dynamic_cast<FEFluidFSI*>(pmat))
     {
         // fluid elements
-        if (eclass == FE_ELEM_SOLID) sztype = "fluid-FSI-3D";
+        if (eclass == FE_ELEM_SOLID) pd = fecore_new<FESolidDomain>("fluid-FSI-3D", pfem);
         else return 0;
     }
 
-	if (sztype)
-	{
-		FEDomain* pd = fecore_new<FEDomain>(sztype, pfem);
-		if (pd) pd->SetMaterial(pmat);
-		return pd;
-	}
-	else return 0;
+	if (pd) pd->SetMaterial(pmat);
+	return pd;
 }

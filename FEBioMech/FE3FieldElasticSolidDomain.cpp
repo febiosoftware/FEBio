@@ -120,7 +120,8 @@ void FE3FieldElasticSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
     FEElasticSolidDomain::PreSolveUpdate(timeInfo);
     int NE = (int)m_Data.size();
-    for (int i=0; i<NE; ++i)
+#pragma omp parallel for
+	for (int i=0; i<NE; ++i)
     {
         ELEM_DATA& d = m_Data[i];
         d.eJp = d.eJt;
@@ -448,7 +449,7 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 {
 	bool berr = false;
 	int NE = (int) m_Elem.size();
-//	#pragma omp parallel for shared(NE, berr)
+	#pragma omp parallel for shared(NE, berr)
 	for (int i=0; i<NE; ++i)
 	{
 		try
@@ -465,12 +466,7 @@ void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 		}
 	}
 
-	// if we encountered an error, we request a running restart
-	if (berr)
-	{
-		if (NegativeJacobian::DoOutput() == false) feLogError("Negative jacobian was detected.");
-		throw DoRunningRestart();
-	}
+	if (berr) throw NegativeJacobianDetected();
 }
 
 //-----------------------------------------------------------------------------
@@ -535,19 +531,20 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        pt.m_p = ed.ep;
 
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are not used by most materials.
-		pt.m_r0 = el.Evaluate(r0, n);
-		pt.m_rt = el.Evaluate(r, n);
+		mp.m_r0 = el.Evaluate(r0, n);
+		mp.m_rt = el.Evaluate(r, n);
 
 		// get the deformation gradient and determinant
         double Jt, Jp;
         mat3d Ft, Fp;
         Jt = defgrad(el, Ft, n);
         Jp = defgradp(el, Fp, n);
-        pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
+        pt.m_F = (m_alphaf==1.0? Ft : Ft*m_alphaf + Fp*(1-m_alphaf));
         pt.m_J = pt.m_F.det();
         mat3d Fi = pt.m_F.inverse();
         pt.m_L = (Ft - Fp)*Fi/dt;

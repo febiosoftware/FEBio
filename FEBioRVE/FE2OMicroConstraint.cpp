@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -132,7 +133,11 @@ FE2OMicroConstraint::FE2OMicroConstraint(FEModel* pfem) : FESurfaceConstraint(pf
 	m_blaugon = false;
 	m_binit = false;	// will be set to true during activation
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -179,7 +184,7 @@ void FE2OMicroConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 //-----------------------------------------------------------------------------
 void FE2OMicroConstraint::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	int N = el.Nodes();
 	lm.resize(N*3);
 	for (int i=0; i<N; ++i)

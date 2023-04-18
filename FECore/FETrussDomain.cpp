@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FETrussDomain::FETrussDomain(FEModel* fem) : FEDomain(FE_DOMAIN_TRUSS, fem)
+FETrussDomain::FETrussDomain(FEModel* fem) : FEBeamDomain(fem)
 {
 }
 

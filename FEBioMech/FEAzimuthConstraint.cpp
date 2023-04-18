@@ -26,8 +26,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEAzimuthConstraint.h"
 #include "FEBioMech.h"
-#include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/FENode.h>
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEAzimuthConstraint, FENodeSetConstraint)
@@ -47,7 +47,11 @@ FEAzimuthConstraint::FEAzimuthConstraint(FEModel* fem) : FENodeSetConstraint(fem
 	m_minaug = 0;
 	m_maxaug = 0;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (fem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -175,8 +179,6 @@ void FEAzimuthConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //! calculate the constraint stiffness
 void FEAzimuthConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
-
 	int N = m_nodeSet.Size();
 	for (int i = 0; i < N; ++i)
 	{

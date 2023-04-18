@@ -28,17 +28,18 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPermRefOrtho.h"
+#include <FECore/log.h>
 
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPermRefOrtho, FEHydraulicPermeability)
-	ADD_PARAMETER(m_perm0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "perm0");
+	ADD_PARAMETER(m_perm0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "perm0")->setUnits(UNIT_PERMEABILITY);
 	ADD_PARAMETER(m_M0    , FE_RANGE_GREATER_OR_EQUAL(0.0), "M0");
 	ADD_PARAMETER(m_alpha0, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha0");
-	ADD_PARAMETER(m_perm1, "perm1");
-	ADD_PARAMETER(m_perm2, "perm2");
-	ADD_PARAMETER(m_M    , "M");
-	ADD_PARAMETER(m_alpha, "alpha");
+	ADD_PARAMETER(m_perm1, 3, "perm1")->setUnits(UNIT_PERMEABILITY);
+	ADD_PARAMETER(m_perm2, 3, "perm2")->setUnits(UNIT_PERMEABILITY);
+	ADD_PARAMETER(m_M    , 3, "M");
+	ADD_PARAMETER(m_alpha, 3, "alpha");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -46,15 +47,14 @@ END_FECORE_CLASS();
 FEPermRefOrtho::FEPermRefOrtho(FEModel* pfem) : FEHydraulicPermeability(pfem)
 {
 	m_perm0 = 1;
-	m_perm1 = vec3d(0,0,0);
-    m_perm2 = vec3d(0,0,0);
+	m_perm1[0] = 0.0; m_perm1[1] = 0.0; m_perm1[2] = 0.0;
+	m_perm2[0] = 0.0; m_perm2[1] = 0.0; m_perm2[2] = 0.0;
 
 	m_M0 = 0;
     m_alpha0 = 0;
-	m_M = vec3d(0);
-	m_alpha = vec3d(0);
+	m_M[0] = 0.0; m_M[1] = 0.0; m_M[2] = 0.0;
+	m_alpha[0] = 0.0; m_alpha[1] = 0.0; m_alpha[2] = 0.0;
 }
-
 
 //-----------------------------------------------------------------------------
 //! Permeability tensor.
@@ -79,8 +79,12 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	// relative volume
 	double J = et.m_J;
 	// referential solid volume fraction
-	double phi0 = pt.m_phi0;
+    double phi0 = pt.m_phi0;
+	double phisr = pt.m_phi0t;
 	
+    // check for potential error
+    if (J <= phisr) feLogError("The perm-ref-ortho permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
+    
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
 
@@ -92,16 +96,16 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	
 	// --- strain-dependent permeability ---
 	
-	double f, k1[3], k2[3], alpha[3], M[3];
+	double f;
     double M0 = m_M0(mp);
     double alpha0 = m_alpha0(mp);
-	double k0 = m_perm0(mp)*pow((J-phi0)/(1-phi0),alpha0)*exp(M0*(J*J-1.0)/2.0);
-    vec3d k1v = m_perm1(mp); k1[0] = k1v.x; k1[1] = k1v.y; k1[2] = k1v.z;
-    vec3d k2v = m_perm2(mp); k2[0] = k2v.x; k2[1] = k2v.y; k2[2] = k2v.z;
-    vec3d alphav = m_alpha(mp); alpha[0] = alphav.x; alpha[1] = alphav.y; alpha[2] = alphav.z;
-    vec3d Mv = m_M(mp); M[0] = Mv.x; M[1] = Mv.y; M[2] = Mv.z;
+	double k0 = m_perm0(mp)*pow((J-phisr)/(1-phi0),alpha0)*exp(M0*(J*J-1.0)/2.0);
+	double k1[3] = { m_perm1[0](mp), m_perm1[1](mp), m_perm1[2](mp) };
+	double k2[3] = { m_perm2[0](mp), m_perm2[1](mp), m_perm2[2](mp) };
+	double alpha[3] = { m_alpha[0](mp), m_alpha[1](mp), m_alpha[2](mp) };
+	double M[3] = { m_M[0](mp), m_M[1](mp), m_M[2](mp) };
 	for (a=0; a<3; a++) {
-		f = pow((J-phi0)/(1-phi0),alpha[a])*exp(M[a]*(J*J-1.0)/2.0);
+		f = pow((J-phisr)/(1-phi0),alpha[a])*exp(M[a]*(J*J-1.0)/2.0);
 		k1[a] *= f/(J*J);
 		k2[a] *= 0.5*f/pow(J,4);
 	}
@@ -136,7 +140,11 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	double J = et.m_J;
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
-	
+    double phisr = pt.m_phi0t;
+
+    // check for potential error
+    if (J <= phisr) feLogError("The perm-ref-ortho permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
+    
 	// get local coordinates
 	mat3d Q = GetLocalCS(mp);
 
@@ -146,24 +154,24 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 		m[a] = dyad(F*V);	// Evaluate texture tensor in the current configuration
 	}
 	
-	double f, k0, k1[3], k2[3], alpha[3], M[3], K0prime, K1prime, K2prime;
+	double f, k0, K0prime, K1prime, K2prime;
 	mat3ds k0hat, k1hat, k2hat;
     double M0 = m_M0(mp);
     double alpha0 = m_alpha0(mp);
-	k0 = m_perm0(mp)*pow((J-phi0)/(1-phi0),alpha0)*exp(M0*(J*J-1.0)/2.0);
-	K0prime = (1+J*(alpha0/(J-phi0)+M0*J))*k0;
+	k0 = m_perm0(mp)*pow((J-phisr)/(1-phi0),alpha0)*exp(M0*(J*J-1.0)/2.0);
+	K0prime = (1+J*(alpha0/(J-phisr)+M0*J))*k0;
 	k0hat = mat3dd(K0prime);
 	tens4dmm K4 = dyad1mm(I,k0hat)-dyad4s(I)*(2*k0);
-    vec3d k1v = m_perm1(mp); k1[0] = k1v.x; k1[1] = k1v.y; k1[2] = k1v.z;
-    vec3d k2v = m_perm2(mp); k2[0] = k2v.x; k2[1] = k2v.y; k2[2] = k2v.z;
-    vec3d alphav = m_alpha(mp); alpha[0] = alphav.x; alpha[1] = alphav.y; alpha[2] = alphav.z;
-    vec3d Mv = m_M(mp); M[0] = Mv.x; M[1] = Mv.y; M[2] = Mv.z;
+	double k1[3] = { m_perm1[0](mp), m_perm1[1](mp), m_perm1[2](mp) };
+	double k2[3] = { m_perm2[0](mp), m_perm2[1](mp), m_perm2[2](mp) };
+	double alpha[3] = { m_alpha[0](mp), m_alpha[1](mp), m_alpha[2](mp) };
+	double M[3] = { m_M[0](mp), m_M[1](mp), m_M[2](mp) };
 	for (a=0; a<3; a++) {
-		f = pow((J-phi0)/(1-phi0),alpha[a])*exp(M[a]*(J*J-1.0)/2.0);
+		f = pow((J-phisr)/(1-phi0),alpha[a])*exp(M[a]*(J*J-1.0)/2.0);
 		k1[a] *= f/(J*J);
 		k2[a] *= 0.5*f/pow(J,4);
-		K1prime = (J*J*M[a]+(J*(alpha[a]-1)+phi0)/(J-phi0))*k1[a];
-		K2prime = (J*J*M[a]+(J*(alpha[a]-3)+3*phi0)/(J-phi0))*k2[a];
+		K1prime = (J*J*M[a]+(J*(alpha[a]-1)+phi0)/(J-phisr))*k1[a];
+		K2prime = (J*J*M[a]+(J*(alpha[a]-3)+3*phi0)/(J-phisr))*k2[a];
 		k1hat = mat3dd(K1prime);
 		k2hat = mat3dd(K2prime);
 		K4 += dyad1mm(m[a],k1hat) + dyad1mm((m[a]*b).sym()*2.0,k2hat)

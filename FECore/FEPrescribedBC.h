@@ -27,20 +27,25 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBoundaryCondition.h"
+#include "FENodalBC.h"
+#include "FESurfaceBC.h"
 #include "FEDofList.h"
 
 //-----------------------------------------------------------------------------
-class FENodeSet;
-class FESurface;
-
-//-----------------------------------------------------------------------------
-// base class for prescribed boundary conditions
-class FECORE_API FEPrescribedBC : public FEBoundaryCondition
+// Base class for prescribed BCs on a nodeset
+class FECORE_API FEPrescribedNodeSet : public FENodalBC
 {
 public:
-	// constructor
-	FEPrescribedBC(FEModel* pfem);
+	FEPrescribedNodeSet(FEModel* fem);
+
+	void Activate() override;
+
+	// deactivation
+	void Deactivate() override;
+
+	void Update() override;
+
+	void Repair() override;
 
 	// set the relative flag
 	void SetRelativeFlag(bool br);
@@ -53,79 +58,56 @@ public:
 	// serialization
 	void Serialize(DumpStream& ar) override;
 
-	// initialization
-	bool Init() override;
-
-	// activation
-	void Activate() override;
-
-	// deactivation
-	void Deactivate() override;
-
-	// Set the node list
-	void SetNodeList(const FENodeList& nodeList);
-
-	void Update() override;
-    
-    void Repair() override;
-
-public:
-	// Derived classes must implement this to set the dof list.
-	// This function is called during initialization
-	virtual bool SetDofList(FEDofList& dofs) = 0;
-
 	//! Derived classes need to override this function.
 	//! return the value for node i, dof j (i is index into nodeset, j is index into doflist)
 	virtual void GetNodalValues(int nodelid, std::vector<double>& val) = 0;
 
-private:
-	bool	m_brelative;		//!< relative flag
+protected:
+	bool				m_brelative;		//!< relative flag
 
-private:
-	FENodeList			m_nodeList;	//!< list of nodes to apply bc too
-	std::vector<double>	m_rval;		//!< values used for relative BC
-
-	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-// Base class for prescribed BCs on a nodeset
-class FECORE_API FEPrescribedNodeSet : public FEPrescribedBC
-{
-public:
-	FEPrescribedNodeSet(FEModel* fem);
-
-	void SetNodeSet(FENodeSet* nodeSet);
-
-	const FENodeSet* GetNodeSet();
-
-	bool Init() override;
-
-	void Activate() override;
-
-private:
-	FENodeSet*	m_nodeSet;
+protected:
+	std::vector<double>	m_rval;				//!< values used for relative BC
 
 	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
 // Base class for prescribed BCs on a surface
-class FECORE_API FEPrescribedSurface : public FEPrescribedBC
+class FECORE_API FEPrescribedSurface : public FESurfaceBC
 {
 public:
 	FEPrescribedSurface(FEModel* fem);
 
-	void SetSurface(FESurface* surface);
-
-	const FESurface* GetSurface();
-
-	bool Init() override;
-
 	void Activate() override;
 
-private:
-	FESurface*	m_surface;
+	// deactivation
+	void Deactivate() override;
+
+	void Update() override;
+
+	void Repair() override;
+
+	// This function is called when the solver needs to know the 
+	// prescribed dof values. The brel flag indicates wheter the total 
+	// value is needed or the value with respect to the current nodal dof value
+	void PrepStep(std::vector<double>& ui, bool brel = true) override;
+
+	// set the relative flag
+	void SetRelativeFlag(bool br);
+
+	// serialization
+	void Serialize(DumpStream& ar) override;
+
+	//! Derived classes need to override this function.
+	//! return the value for node i, dof j (i is index into nodeset, j is index into doflist)
+	virtual void GetNodalValues(int nodelid, std::vector<double>& val) = 0;
+
+protected:
+	bool				m_brelative;		//!< relative flag
+
+protected:
+	FENodeList			m_nodeList;			//!< list of nodes to apply bc too
+	std::vector<double>	m_rval;				//!< values used for relative BC
 
 	DECLARE_FECORE_CLASS();
 };

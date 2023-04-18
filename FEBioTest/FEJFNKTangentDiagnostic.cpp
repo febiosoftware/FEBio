@@ -29,10 +29,11 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FENewtonSolver.h>
 #include <FECore/JFNKMatrix.h>
-#include <NumCore/CompactUnSymmMatrix.h>
+#include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/log.h>
-#include <FEBioLib/FEBioModel.h>
-#include <FEBioXML/XMLReader.h>
+#include <FECore/FEModel.h>
+#include <FECore/FEGlobalMatrix.h>
+#include <XML/XMLReader.h>
 
 FEJFNKTangentDiagnostic::FEJFNKTangentDiagnostic(FEModel* fem) : FECoreTask(fem)
 {
@@ -102,7 +103,7 @@ bool cb_diagnose(FEModel* fem, unsigned int nwhen, void* pd)
 
 bool FEJFNKTangentDiagnostic::Run()
 {
-	FEBioModel& fem = dynamic_cast<FEBioModel&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 	fem.AddCallback(cb_diagnose, CB_MAJOR_ITERS, this);
 
 //	fem.GetLogFile().SetMode(Logfile::LOG_FILE);

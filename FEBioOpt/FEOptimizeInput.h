@@ -23,13 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FEBioXML/XMLReader.h>
-#include <FEBioXML/FileImport.h>
-#include <FECore/FEModel.h>
+#include <XML/XMLReader.h>
 
 //-----------------------------------------------------------------------------
 //! FEBio error terminated during the optimization
@@ -40,68 +35,19 @@ class FEOptimizeData;
 
 //=============================================================================
 //! Class that reads the optimization input file
-class FEOptimizeInput : public FEFileImport
+class FEOptimizeInput
 {
 public:
 	bool Input(const char* szfile, FEOptimizeData* pOpt);
 
 private:
-	FEOptimizeData*	m_opt;
-};
+	void ParseTask(XMLTag& tag);
+	void ParseOptions(XMLTag& tag);
+	void ParseParameters(XMLTag& tag);
+	void ParseConstraints(XMLTag& tag);
+	void ParseObjective(XMLTag& tag);
 
-//=============================================================================
-class FEOptionsSection : public FEFileSection
-{
-public:
-	FEOptionsSection(FEOptimizeData* opt, FEFileImport* im) : FEFileSection(im), m_opt(opt) {}
-	void Parse(XMLTag& tag) override;
-
-private:
-	FEOptimizeData*	m_opt;
-};
-
-//=============================================================================
-class FETaskSection : public FEFileSection
-{
-public:
-	FETaskSection(FEOptimizeData* opt, FEFileImport* im) : FEFileSection(im), m_opt(opt) {}
-	void Parse(XMLTag& tag) override;
-
-private:
-	FEOptimizeData*	m_opt;
-};
-
-//=============================================================================
-class FEObjectiveSection : public FEFileSection
-{
-public:
-	FEObjectiveSection(FEOptimizeData* opt, FEFileImport* im) : FEFileSection(im), m_opt(opt) {}
-	void Parse(XMLTag& tag) override;
-
-private:
-	FEDataSource* ParseDataSource(XMLTag& tag, FEOptimizeData& opt);
-
-private:
-	FEOptimizeData*	m_opt;
-};
-
-//=============================================================================
-class FEParametersSection : public FEFileSection
-{
-public:
-	FEParametersSection(FEOptimizeData* opt, FEFileImport* im) : FEFileSection(im), m_opt(opt) {}
-	void Parse(XMLTag& tag) override;
-
-private:
-	FEOptimizeData*	m_opt;
-};
-
-//=============================================================================
-class FEConstraintsSection : public FEFileSection
-{
-public:
-	FEConstraintsSection(FEOptimizeData* opt, FEFileImport* im) : FEFileSection(im), m_opt(opt) {}
-	void Parse(XMLTag& tag) override;
+	FEDataSource* ParseDataSource(XMLTag& tag);
 
 private:
 	FEOptimizeData*	m_opt;

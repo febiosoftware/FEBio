@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-FEProperty::FEProperty(SUPER_CLASS_ID classID) : m_szname(nullptr), m_flags(0), m_classID(classID) {}
+FEProperty::FEProperty(SUPER_CLASS_ID superClassID) : m_szname(nullptr), m_className(nullptr), m_szlongname(nullptr), m_szdefaultType(nullptr), m_flags(0), m_superClassID(superClassID) {}
 
 //-----------------------------------------------------------------------------
 FEProperty::~FEProperty(){}
@@ -51,6 +51,29 @@ FEProperty& FEProperty::SetName(const char* sz)
 //-----------------------------------------------------------------------------
 //! Return the name of this property
 const char* FEProperty::GetName() const { return m_szname; }
+
+//-----------------------------------------------------------------------------
+FEProperty& FEProperty::SetLongName(const char* sz)
+{
+	m_szlongname = sz;
+	return *this;
+}
+
+//-----------------------------------------------------------------------------
+const char* FEProperty::GetLongName() const { return m_szlongname; }
+
+//-----------------------------------------------------------------------------
+const char* FEProperty::GetDefaultType() const
+{
+	return m_szdefaultType;
+}
+
+//-----------------------------------------------------------------------------
+FEProperty& FEProperty::SetDefaultType(const char* szdefType)
+{
+	m_szdefaultType = szdefType;
+	return *this;
+}
 
 //-----------------------------------------------------------------------------
 void FEProperty::Write(DumpStream& ar, FECoreBase* pc)

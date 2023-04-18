@@ -80,6 +80,8 @@ void FEPressureStabilization::Activate()
         // calculate time constant
         double tau = TimeConstant(el, ps);
     }
+    
+    FESurfaceLoad::Activate();
 }
 
 //-----------------------------------------------------------------------------

@@ -101,10 +101,10 @@ private:
 	double			m_eps;		// forward difference epsilon
 	SparseMatrix*	m_K;		// the actual sparse matrix (This is only used as a preconditioner and can be null)
 	FENewtonSolver*	m_pns;
-	vector<double>	m_v, m_R;
+	std::vector<double>	m_v, m_R;
 
-	vector<double>	m_R0;
+	std::vector<double>	m_R0;
 
-	vector<int>		m_freeDofs, m_prescribedDofs;
+	std::vector<int>		m_freeDofs, m_prescribedDofs;
 	MultiplyPolicy	m_policy;
 };

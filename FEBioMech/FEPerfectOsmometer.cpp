@@ -28,14 +28,13 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEPerfectOsmometer.h"
-#include <FECore/FEModel.h>
 #include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPerfectOsmometer, FEElasticMaterial)
 	ADD_PARAMETER(m_phiwr, FE_RANGE_CLOSED(0.0, 1.0), "phiw0");
-	ADD_PARAMETER(m_iosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "iosm");
-	ADD_PARAMETER(m_bosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm");
+	ADD_PARAMETER(m_iosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "iosm")->setUnits("n/L^3");
+	ADD_PARAMETER(m_bosm , FE_RANGE_GREATER_OR_EQUAL(0.0), "bosm")->setUnits("n/L^3");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -51,8 +50,8 @@ bool FEPerfectOsmometer::Init()
 {
 	if (FEElasticMaterial::Init() == false) return false;
 	
-	m_Rgas = GetFEModel()->GetGlobalConstant("R");
-	m_Tabs = GetFEModel()->GetGlobalConstant("T");
+	m_Rgas = GetGlobalConstant("R");
+	m_Tabs = GetGlobalConstant("T");
 	
 	if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
 	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");	 return false; }

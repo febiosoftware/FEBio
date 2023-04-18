@@ -29,8 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMaxDamageCriterion.h"
 #include "FEElasticMaterial.h"
-#include <FECore/FEElement.h>
-#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEDamageAdaptorCriterion, FEMeshAdaptorCriterion)
 END_FECORE_CLASS();
@@ -41,18 +39,8 @@ FEDamageAdaptorCriterion::FEDamageAdaptorCriterion(FEModel* fem) : FEMeshAdaptor
 
 bool FEDamageAdaptorCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
 {
-	FEDamageMaterialPoint* dp = nullptr;
-	// for mixtures, we have to make sure we get the right component
-	if (mp.Components() > 1)
-	{
-		for (int i = 0; i < mp.Components(); ++i)
-		{
-			FEMaterialPoint* mpi = mp.GetPointData(i);
-			dp = mpi->ExtractData<FEDamageMaterialPoint>();
-			if (dp) break;
-		}
-	}
-	else dp = mp.ExtractData<FEDamageMaterialPoint>();
+	// TODO: What about mixtures? 
+	FEDamageMaterialPoint* dp = mp.ExtractData<FEDamageMaterialPoint>();
 	if (dp == nullptr) return false;
 
 	// evaluate the damage at this point

@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEDistanceConstraint.h"
 #include <FECore/FELinearSystem.h>
 #include "FEBioMech.h"
+#include <FECore/FEMesh.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -56,7 +57,11 @@ FEDistanceConstraint::FEDistanceConstraint(FEModel* pfem) : FENLConstraint(pfem)
 	m_nminaug = 0;
 	m_nmaxaug = 10;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -64,7 +69,7 @@ FEDistanceConstraint::FEDistanceConstraint(FEModel* pfem) : FENLConstraint(pfem)
 bool FEDistanceConstraint::Init()
 {
 	// get the FE mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	int NN = mesh.Nodes();
 
 	// make sure the nodes are valid
@@ -82,7 +87,7 @@ void FEDistanceConstraint::Activate()
 	FENLConstraint::Activate();
 
 	// get the FE mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	int NN = mesh.Nodes();
 
 	// get the initial position of the two nodes
@@ -97,7 +102,7 @@ void FEDistanceConstraint::Activate()
 void FEDistanceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	// get the FE mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// get the two nodes
 	FENode& nodea = mesh.Node(m_node[0] - 1);
@@ -143,7 +148,7 @@ void FEDistanceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 void FEDistanceConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// get the FE mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// get the two nodes
 	FENode& nodea = mesh.Node(m_node[0] - 1);
@@ -208,7 +213,7 @@ bool FEDistanceConstraint::Augment(int naug, const FETimeInfo& tp)
 	if ((m_blaugon == false) || (m_atol <= 0.0)) return true;
 
 	// get the FE mesh
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// get the two nodes
 	FENode& nodea = mesh.Node(m_node[0] - 1);
@@ -249,7 +254,7 @@ bool FEDistanceConstraint::Augment(int naug, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FEDistanceConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 {
-	FEMesh& mesh = GetFEModel()->GetMesh();
+	FEMesh& mesh = GetMesh();
 	vector<int> lm(6);
 	FENode& n0 = mesh.Node(m_node[0] - 1);
 	lm[0] = n0.m_ID[m_dofU[0]];

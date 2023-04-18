@@ -28,14 +28,22 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMembraneMassActionForward.h"
-#include "FECore/DOFS.h"
+#include "FESoluteInterface.h"
+
+BEGIN_FECORE_CLASS(FEMembraneMassActionForward, FEMembraneReaction)
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FEMembraneMassActionForward::FEMembraneMassActionForward(FEModel* pfem) : FEMembraneReaction(pfem)
+{
+    // set material properties
+    ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+}
 
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEMembraneMassActionForward::ReactionSupply(FEMaterialPoint& pt)
 {
-    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-    
     // get reaction rate
     double kF = m_pFwd->ReactionRate(pt);
     
@@ -43,41 +51,41 @@ double FEMembraneMassActionForward::ReactionSupply(FEMaterialPoint& pt)
     double zhat = kF;
     
     // start with contribution from membrane solutes
-    const int nsol = (int)spt.m_c.size();
+    const int nsol = (int) m_psm->Solutes();
     for (int i=0; i<nsol; ++i) {
         int vR = m_vR[i];
         if (vR > 0) {
-            double c = spt.m_c[i];
+            double c = m_psm->GetActualSoluteConcentration(pt, i);
             zhat *= pow(c, vR);
         }
     }
     
     // add contribution of solid-bound molecules
-    const int nsbm = (int)spt.m_sbmr.size();
+    const int nsbm = (int) m_psm->SBMs();
     for (int i=0; i<nsbm; ++i) {
         int vR = m_vR[nsol+i];
         if (vR > 0) {
-            double c = m_pMP->SBMConcentration(pt, i);
+            double c = m_psm->SBMArealConcentration(pt, i);
             zhat *= pow(c, vR);
         }
     }
     
     // add contribution from internal and external solutes
-    const int nse = (int)spt.m_ce.size();
+    const int nse = (int) m_psm->SolutesExternal(pt);
     for (int i=0; i<nse; ++i) {
-        int vRe = m_vRe[spt.m_ide[i]];
+        int vRe = m_vRe[m_psm->GetSoluteIDExternal(pt,i)];
         if (vRe > 0) {
             // evaluate nodal effective concentrations
-            double c = spt.m_ce[i];
+            double c = m_psm->GetEffectiveSoluteConcentrationExternal(pt,i);
             zhat *= pow(c, vRe);
         }
     }
-    const int nsi = (int)spt.m_ci.size();
+    const int nsi = (int) m_psm->SolutesInternal(pt);
     for (int i=0; i<nsi; ++i) {
-        int vRi = m_vRi[spt.m_idi[i]];
+        int vRi = m_vRi[m_vRi[m_psm->GetSoluteIDInternal(pt,i)]];
         if (vRi > 0) {
             // evaluate nodal effective concentrations
-            double c = spt.m_ci[i];
+            double c = m_psm->GetEffectiveSoluteConcentrationInternal(pt,i);
             zhat *= pow(c, vRi);
         }
     }
@@ -143,10 +151,10 @@ double FEMembraneMassActionForward::Tangent_ReactionSupply_Concentration(FEMater
     // if the derivative is taken with respect to a solid-bound molecule, return 0
     if (sol >= nsol) return 0;
     
-    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     double zhat = ReactionSupply(pt);
     double dzhatdc = 0;
-    if ((zhat > 0) && (spt.m_c[sol] > 0)) dzhatdc = m_vR[sol]/spt.m_c[sol]*zhat;
+    double c = m_psm->GetActualSoluteConcentration(pt, sol);
+    if ((zhat > 0) && (c > 0)) dzhatdc = m_vR[sol]/c*zhat;
     
     return dzhatdc;
 }
@@ -159,9 +167,10 @@ double FEMembraneMassActionForward::Tangent_ReactionSupply_Ci(FEMaterialPoint& p
     double kF = m_pFwd->ReactionRate(pt);
     double dkFdci = m_pFwd->Tangent_ReactionRate_Ci(pt, sol);
     double dzhatdc = 0;
-    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     if (kF != 0) dzhatdc = dkFdci/kF*zhat;
-    if ((zhat > 0) && (spt.m_ci[sol] > 0)) dzhatdc += m_vRi[spt.m_idi[sol]]/spt.m_ci[sol]*zhat;
+    double ci = m_psm->GetEffectiveSoluteConcentrationInternal(pt, sol);
+    int IDi = m_psm->GetSoluteIDInternal(pt, sol);
+    if ((zhat > 0) && (ci > 0)) dzhatdc += m_vRi[IDi]/ci*zhat;
     
     return dzhatdc;
 }
@@ -174,9 +183,10 @@ double FEMembraneMassActionForward::Tangent_ReactionSupply_Ce(FEMaterialPoint& p
     double kF = m_pFwd->ReactionRate(pt);
     double dkFdce = m_pFwd->Tangent_ReactionRate_Ce(pt, sol);
     double dzhatdc = 0;
-    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     if (kF != 0) dzhatdc = dkFdce/kF*zhat;
-    if ((zhat > 0) && (spt.m_ce[sol] > 0)) dzhatdc += m_vRe[spt.m_ide[sol]]/spt.m_ce[sol]*zhat;
+    double ce = m_psm->GetEffectiveSoluteConcentrationExternal(pt, sol);
+    int IDe = m_psm->GetSoluteIDExternal(pt, sol);
+    if ((zhat > 0) && (ce > 0)) dzhatdc += m_vRe[IDe]/ce*zhat;
     
     return dzhatdc;
 }

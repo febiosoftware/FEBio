@@ -35,7 +35,8 @@ SOFTWARE.*/
 // Base class for evaluating vec3d parameters
 class FECORE_API FEVec3dValuator : public FEValuator
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FEVEC3DVALUATOR_ID)
+	FECORE_BASE_CLASS(FEVec3dValuator)
 
 public:
 	FEVec3dValuator(FEModel* fem);
@@ -52,4 +53,11 @@ public:
 
 	// return the const value
 	virtual vec3d* constValue() { return nullptr; }
+
+	// return a unit vector
+	vec3d unitVector(const FEMaterialPoint& pt)
+	{
+		vec3d v = operator () (pt);
+		return v.Normalized();
+	}
 };

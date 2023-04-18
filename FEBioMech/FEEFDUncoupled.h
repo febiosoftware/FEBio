@@ -34,7 +34,7 @@ SOFTWARE.*/
 class FEEFDUncoupled : public FEUncoupledMaterial
 {
 public:
-	FEEFDUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+	FEEFDUncoupled(FEModel* pfem);
 
 	//! deviatoric Cauchy stress
 	mat3ds DevStress(FEMaterialPoint& pt) override;
@@ -46,8 +46,8 @@ public:
 	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
     
 public:
-	double	m_beta[3];	// power in power-law relation
-	double	m_ksi[3];	// coefficient in power-law relation
+	FEParamDouble	m_beta[3];	// power in power-law relation
+	FEParamDouble	m_ksi[3];	// coefficient in power-law relation
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

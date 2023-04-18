@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include <vector>
 #include "fecore_api.h"
 #include "mat3d.h"
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! General purpose matrix class.
@@ -111,16 +110,25 @@ public:
 
 	// calculate the LU decomposition
 	// note that this modifies the matrix
-	void lufactor(vector<int>& indx);
+	void lufactor(std::vector<int>& indx);
 
 	// solve using the lu factor calculated with lufactor
-	void lusolve(vector<double>& b, vector<int>& indx);
+	void lusolve(std::vector<double>& b, std::vector<int>& indx);
 
 	// solve the linear system Ax=b
-	void solve(const vector<double>& b, vector<double>& x);
+	void solve(std::vector<double>& x, const std::vector<double>& b);
+
+	bool lsq_solve(std::vector<double>& x, std::vector<double>& b);
+
+	bool eigen_vectors(matrix& Eigen, std::vector<double>& eigen_values);
 
 	// infinity-norm
 	double inf_norm();
+
+	void mult(std::vector<double>& x, std::vector<double>& y);
+    void mult(const matrix& m, std::vector<double>& x, std::vector<double>& y);
+	void mult_transpose(std::vector<double>& x, std::vector<double>& y);
+	void mult_transpose_self(matrix& AAt);
 
 public:
 	void set(int i, int j, const mat3d& a);
@@ -197,9 +205,9 @@ protected:
 	int	m_nsize;	// size of matrix (ie. total nr of elements = nr*nc)
 };
 
-vector<double> FECORE_API operator / (vector<double>& b, matrix& m);
-vector<double> FECORE_API operator * (matrix& m, vector<double>& b);
-matrix FECORE_API outer_product(vector<double>& a);
+std::vector<double> FECORE_API operator / (std::vector<double>& b, matrix& m);
+std::vector<double> FECORE_API operator * (matrix& m, std::vector<double>& b);
+matrix FECORE_API outer_product(std::vector<double>& a);
 
 inline void matrix::set(int i, int j, const mat3d& a)
 {

@@ -28,7 +28,8 @@ SOFTWARE.*/
 
 #pragma once
 #include <ostream>
-#include "CompactUnSymmMatrix.h"
+#include <FECore/CompactUnSymmMatrix.h>
+#include "numcore_api.h"
 
 namespace NumCore
 {
@@ -36,33 +37,33 @@ namespace NumCore
 	// mode:
 	// - 0 = binary mode
 	// - 1 = text mode
-	bool write_hb(CompactMatrix& K, const char* szfile, int mode = 0);
+	NUMCORE_API bool write_hb(CompactMatrix& K, const char* szfile, int mode = 0);
 
 	// write a vector to file
-	bool write_vector(const vector<double>& a, const char* szfile, int mode = 0);
+	NUMCORE_API bool write_vector(const std::vector<double>& a, const char* szfile, int mode = 0);
 
 	// read compact matrix (binary mode only)
-	CompactMatrix* read_hb(const char* szfile);
+	NUMCORE_API CompactMatrix* read_hb(const char* szfile);
 
 	// read vector<double> from file
-	bool read_vector(std::vector<double>& a, const char* szfile);
+	NUMCORE_API bool read_vector(std::vector<double>& a, const char* szfile);
 
 	// calculate inf-norm of inverse matrix (only works with CRSSparsMatrix(1))
-	double inverse_infnorm(CompactMatrix* A);
+	NUMCORE_API double inverse_infnorm(CompactMatrix* A);
 
 	// calculate condition number of a CRSSparseMatrix(1) (Very expensive!)
-	double conditionNumber(CRSSparseMatrix* A);
+	NUMCORE_API double conditionNumber(CRSSparseMatrix* A);
 
 	// estimate condition number
-	double estimateConditionNumber(SparseMatrix* A);
+	NUMCORE_API double estimateConditionNumber(SparseMatrix* A);
 
 	// create a random vector
-	void randomVector(vector<double>& R, double vmin = 0.0, double vmax = 1.0);
+	NUMCORE_API void randomVector(std::vector<double>& R, double vmin = 0.0, double vmax = 1.0);
 
 	// inf-norm of a vector
-	double infNorm(const std::vector<double>& x);
+	NUMCORE_API double infNorm(const std::vector<double>& x);
 
 	// print matrix sparsity pattern to svn file
-	void print_svg(CompactMatrix* m, std::ostream &out, int i0 = 0, int j0 = 0, int i1 = -1, int j1 = -1);
+	NUMCORE_API void print_svg(CompactMatrix* m, std::ostream &out, int i0 = 0, int j0 = 0, int i1 = -1, int j1 = -1);
 
 } // namespace NumCore

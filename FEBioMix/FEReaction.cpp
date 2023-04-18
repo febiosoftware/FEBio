@@ -28,39 +28,135 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEReaction.h"
-#include "FECore/FEElementTraits.h"
-#include "FECore/DOFS.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
 #include <FECore/log.h>
-#include "FEMultiphasic.h"
-#include <FEBioFluid/FEFluidSolutes.h>
-#include <FEBioFluid/FEMultiphasicFSI.h>
-#include <FEBioFluid/FESolutesMaterial.h>
-#include <stdlib.h>
+#include "FESoluteInterface.h"
+#include "FESolute.h"
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FEReaction::FEReaction(FEModel* pfem) : FEMaterial(pfem)
+FEReaction::FEReaction(FEModel* pfem) : FEMaterialProperty(pfem)
 {
-    m_pMP = 0;
-    m_pFS = 0;
-    m_pSM = 0;
-    m_pMF = 0;
+    m_psm = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 bool FEReaction::Init()
 {
     // make sure the parent class is set
-    assert(m_pMP || m_pFS || m_pSM || m_pMF);
-    if (m_pMP == 0 && m_pFS == 0 && m_pSM == 0 && m_pMF == 0) {
-        feLogError("Parent class not set");
+    m_psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+    assert(m_psm);
+    if (m_psm == 0) {
+        feLogError("Parent class not set or of incorrect type");
         return false;
     }
     
     // now call base class
-    if (FEMaterial::Init() == false) return false;
-    
-    return true;
+    return FEMaterialProperty::Init();
 }
 
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEReactionSpeciesRef, FEMaterialProperty)
+	ADD_PARAMETER(m_speciesID, "species", FE_PARAM_ATTRIBUTE, "$(species)");
+	ADD_PARAMETER(m_solId    , "sol")->SetFlags(FE_PARAM_ATTRIBUTE | FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_sbmId    , "sbm")->SetFlags(FE_PARAM_ATTRIBUTE | FE_PARAM_HIDDEN);
+END_FECORE_CLASS();
+
+FEReactionSpeciesRef::FEReactionSpeciesRef(FEModel* fem) : FEMaterialProperty(fem) 
+{
+    m_speciesID = -1;
+    m_solId = -1;
+    m_sbmId = -1;
+    
+    m_v = 0;
+
+    m_speciesType = UnknownSpecies;
+}
+
+int FEReactionSpeciesRef::GetSpeciesType() const
+{
+    assert(m_speciesType != UnknownSpecies);
+    return m_speciesType;
+}
+
+bool FEReactionSpeciesRef::IsSolute() const
+{
+    return (m_speciesType == SoluteSpecies);
+}
+
+bool FEReactionSpeciesRef::IsSBM() const
+{
+    return (m_speciesType == SBMSpecies);
+}
+
+bool FEReactionSpeciesRef::Init()
+{
+    // make sure the species ID is valid
+    if ((m_speciesID == -1) && (m_solId == -1) && (m_sbmId == -1)) return false;
+
+    // figure out if this is a solute or sbm
+    if (m_speciesType == UnknownSpecies)
+    {
+        FEModel& fem = *GetFEModel();
+        if (m_speciesID != -1)
+        {
+            int id = m_speciesID - 1;
+            int n = 0;
+            for (int i = 0; i < fem.GlobalDataItems(); ++i)
+            {
+                FESoluteData* sol = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+                FESBMData* sbm = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
+                if (sol || sbm)
+                {
+                    if (id == n)
+                    {
+                        if (sol) { m_speciesType = SoluteSpecies; m_speciesID = sol->GetID(); }
+                        if (sbm) { m_speciesType = SBMSpecies; m_speciesID = sbm->GetID(); }
+
+                        break;
+                    }
+                    else n++;
+                }
+            }
+        }
+        else if (m_solId != -1)
+        {
+            for (int i = 0; i < fem.GlobalDataItems(); ++i)
+            {
+                FESoluteData* sol = dynamic_cast<FESoluteData*>(fem.GetGlobalData(i));
+                if (sol && (sol->GetID() == m_solId))
+                {
+                    m_speciesType = SoluteSpecies;
+                    m_speciesID = sol->GetID(); 
+                }
+            }
+        }
+        else if (m_sbmId != -1)
+        {
+            for (int i = 0; i < fem.GlobalDataItems(); ++i)
+            {
+                FESBMData* sbm = dynamic_cast<FESBMData*>(fem.GetGlobalData(i));
+                if (sbm && (sbm->GetID() == m_sbmId))
+                {
+                    m_speciesType = SBMSpecies;
+                    m_speciesID = sbm->GetID();
+                }
+            }
+        }
+
+        assert(m_speciesType != UnknownSpecies);
+        if (m_speciesType == UnknownSpecies) return false;
+    }
+
+    return FEMaterialProperty::Init();
+}
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEReactantSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vR");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+BEGIN_FECORE_CLASS(FEProductSpeciesRef, FEReactionSpeciesRef)
+    ADD_PARAMETER(m_v, "vP");
+END_FECORE_CLASS();

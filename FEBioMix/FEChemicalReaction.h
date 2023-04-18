@@ -27,19 +27,17 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterial.h"
-#include "FEBioMix/FESolutesMaterialPoint.h"
 #include "FEReaction.h"
 #include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for reaction rates.
 
-class FEBIOMIX_API FEReactionRate : public FEMaterial
+class FEBIOMIX_API FEReactionRate : public FEMaterialProperty
 {
 public:
     //! constructor
-    FEReactionRate(FEModel* pfem) : FEMaterial(pfem) {}
+    FEReactionRate(FEModel* pfem) : FEMaterialProperty(pfem), m_pReact(nullptr) {}
     
     //! reaction rate at material point
     virtual double ReactionRate(FEMaterialPoint& pt) = 0;
@@ -57,6 +55,8 @@ public:
     
 public:
     FEReaction*    m_pReact;    //!< pointer to parent reaction
+
+    FECORE_BASE_CLASS(FEReactionRate)
 };
 
 //-----------------------------------------------------------------------------
@@ -72,10 +72,6 @@ public:
 	bool Init() override;
 
 public:
-	void SetParameter(FEParam& p) override;
-
-	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) override;
-
     //! set the forward reaction rate
     void SetForwardReactionRate(FEReactionRate* pfwd) { m_pFwd = pfwd; }
     
@@ -118,6 +114,9 @@ public:
 	void Serialize(DumpStream& ar) override;
 
 public:
+    vector<FEReactantSpeciesRef*> m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
+    vector<FEProductSpeciesRef*> m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
+
     FEReactionRate*    m_pFwd;        //!< pointer to forward reaction rate
     FEReactionRate*    m_pRev;        //!< pointer to reverse reaction rate
     
@@ -134,8 +133,7 @@ public:
 	vector<int>		m_v;		//!< net stoichiometric coefficients of reactants and products
     double          m_Vbar;     //!< weighted molar volume of reactants and products
     bool            m_Vovr;     //!< override flag for m_Vbar
-	int				m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
-	int				m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
 
 	DECLARE_FECORE_CLASS();
+    FECORE_BASE_CLASS(FEChemicalReaction)
 };

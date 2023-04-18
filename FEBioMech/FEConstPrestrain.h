@@ -31,12 +31,12 @@ SOFTWARE.*/
 class FEConstPrestrainGradient : public FEPrestrainGradient
 {
 public:
-	class MaterialPointData : public FEMaterialPoint
+	class MaterialPointData : public FEMaterialPointData
 	{
 	public:
 		MaterialPointData();
 		void Init(bool bflag);
-		FEMaterialPoint* Copy();
+		FEMaterialPointData* Copy();
 		void Serialize(DumpStream& ar);
 
 	public:
@@ -46,13 +46,14 @@ public:
 public:
 	FEConstPrestrainGradient(FEModel* pfem);
 
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	mat3d Prestrain(FEMaterialPoint& mp) override;
 
 	void Initialize(const mat3d& F, FEMaterialPoint& mp) override;
 
 protected:
+	double			m_ramp;
 	FEParamMat3d	m_Fp;
 
 	DECLARE_FECORE_CLASS();

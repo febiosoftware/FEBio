@@ -54,10 +54,10 @@ public:
 	void SetSurface(FESurface* ps) override;
 
 	//! calculate flux stiffness
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 	//! calculate residual
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 private:
 	// evaluate solid velocity at integration point

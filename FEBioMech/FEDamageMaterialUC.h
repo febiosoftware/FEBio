@@ -53,8 +53,11 @@ public:
     //! damage
     double Damage(FEMaterialPoint& pt);
     
+    //! data initialization and checking
+    bool Init() override;
+    
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     // get the elastic material
     FEUncoupledMaterial* GetElasticMaterial() override { return m_pBase; }

@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETriphasic.h"
-#include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/log.h>
 
@@ -45,7 +44,7 @@ BEGIN_FECORE_CLASS(FETriphasic, FEMaterial)
 	ADD_PARAMETER(m_cFr    , "fixed_charge_density");
 
 	// set material properties
-	ADD_PROPERTY(m_pSolid , "solid"              );
+	ADD_PROPERTY(m_pSolid , "solid"              , FEProperty::Required | FEProperty::TopLevel);
 	ADD_PROPERTY(m_pPerm  , "permeability"       );
 	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
 	ADD_PROPERTY(m_pSolute, "solute"             );
@@ -87,6 +86,12 @@ bool FETriphasic::Init()
 	m_pSolute[0]->SetSoluteLocalID(0);
     m_pSolute[1]->SetSoluteLocalID(1);
 
+    if (m_pSolid->Init() == false) return false;
+    if (m_pPerm->Init() == false) return false;
+    if (m_pOsmC->Init() == false) return false;
+    for (int i=0; i<Solutes(); ++i)
+        if (m_pSolute[i]->Init() == false) return false;
+
 	// Call base class initialization. This will also initialize all properties.
 	if (FEMaterial::Init() == false) return false;
 
@@ -104,15 +109,26 @@ bool FETriphasic::Init()
 		return false;
 	}
 	
-	m_Rgas = GetFEModel()->GetGlobalConstant("R");
-	m_Tabs = GetFEModel()->GetGlobalConstant("T");
-	m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
+	m_Rgas = GetGlobalConstant("R");
+	m_Tabs = GetGlobalConstant("T");
+	m_Fc   = GetGlobalConstant("Fc");
 	
 	if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
 	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section"  ); return false; }
 	if (m_Fc   <= 0) { feLogError("A positive Faraday constant Fc must be defined in Globals section"     ); return false; }
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// update specialized material points
+void FETriphasic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pPerm->UpdateSpecializedMaterialPoints(mp, tp);
+    m_pOsmC->UpdateSpecializedMaterialPoints(mp, tp);
+    for (int i=0; i<Solutes(); ++i)
+        m_pSolute[i]->UpdateSpecializedMaterialPoints(mp, tp);
 }
 
 //-----------------------------------------------------------------------------
@@ -134,7 +150,7 @@ double FETriphasic::Porosity(FEMaterialPoint& pt)
 	double J = et.m_J;
 	// porosity
 	//	double phiw = 1 - m_phi0/J;
-	double phi0 = pet.m_phi0;
+	double phi0 = pet.m_phi0t;
 	double phiw = 1 - phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse
@@ -152,8 +168,9 @@ double FETriphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	
 	// relative volume
 	double J = et.m_J;
-	double phi0 = pet.m_phi0;
-	double cF = m_cFr(pt)*(1-phi0)/(J-phi0);
+    double phi0 = pet.m_phi0;
+	double phisr = pet.m_phi0t;
+	double cF = m_cFr(pt)*(1-phi0)/(J-phisr);
 	
 	return cF;
 }
@@ -259,7 +276,7 @@ tens4ds FETriphasic::Tangent(FEMaterialPoint& mp)
 	
 	// relative volume and solid volume fraction
 	double J = ept.m_J;
-	double phi0 = ppt.m_phi0;
+	double phi0 = ppt.m_phi0t;
 	
 	// get the charge density and its derivatives
 	double cF = FixedChargeDensity(mp);
@@ -526,7 +543,7 @@ void FETriphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<doub
     
     // get the charge density and its derivatives
     double J = ept.m_J;
-    double phi0 = ppt.m_phi0;
+    double phi0 = ppt.m_phi0t;
     double cF = FixedChargeDensity(mp);
     double dcFdJ = -cF/(J - phi0);
     double dcFdJJ = 2*cF/SQR(J-phi0);
@@ -592,4 +609,13 @@ void FETriphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<doub
             dkdc[isol][jsol] = zz[isol]*dkhdc[isol][jsol]+z[isol]*kappa[isol]*zidzdc[jsol];
         }
     }
+}
+
+double FETriphasic::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)
+{
+	const FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint >());
+	const FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+	const FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint >());
+	double cf = (ept->m_J - bpt->m_phi0t) * spt->m_cF / (1 - bpt->m_phi0);
+	return cf;
 }

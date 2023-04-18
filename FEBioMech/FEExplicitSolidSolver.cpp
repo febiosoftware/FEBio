@@ -30,6 +30,8 @@ SOFTWARE.*/
 #include "FEExplicitSolidSolver.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
+#include "FELinearTrussDomain.h"
+#include "FEElasticTrussDomain.h"
 #include "FERigidMaterial.h"
 #include "FEBodyForce.h"
 #include "FEContactInterface.h"
@@ -42,8 +44,10 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/FENLConstraint.h>
 #include "FEResidualVector.h"
 #include "FEBioMech.h"
+#include "FESolidAnalysis.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -58,51 +62,55 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) :
 	m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem),
 	m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
 {
-	m_dyn_damping = 0.99;
+	m_dyn_damping = 1;
 	m_niter = 0;
 	m_nreq = 0;
 
 	m_mass_lumping = HRZ_LUMPING;
 
 	// Allocate degrees of freedom
-	DOFS& dofs = pfem->GetDOFS();
-	int varD = dofs.AddVariable("displacement", VAR_VEC3);
-	dofs.SetDOFName(varD, 0, "x");
-	dofs.SetDOFName(varD, 1, "y");
-	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
-	dofs.SetDOFName(varQ, 0, "u");
-	dofs.SetDOFName(varQ, 1, "v");
-	dofs.SetDOFName(varQ, 2, "w");
-	int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
-	dofs.SetDOFName(varQR, 0, "Ru");
-	dofs.SetDOFName(varQR, 1, "Rv");
-	dofs.SetDOFName(varQR, 2, "Rw");
-	int varV = dofs.AddVariable("velocity", VAR_VEC3);
-	dofs.SetDOFName(varV, 0, "vx");
-	dofs.SetDOFName(varV, 1, "vy");
-	dofs.SetDOFName(varV, 2, "vz");
-	int varSU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT), VAR_VEC3);
-	dofs.SetDOFName(varSU, 0, "sx");
-	dofs.SetDOFName(varSU, 1, "sy");
-	dofs.SetDOFName(varSU, 2, "sz");
-	int varSV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY), VAR_VEC3);
-	dofs.SetDOFName(varSV, 0, "svx");
-	dofs.SetDOFName(varSV, 1, "svy");
-	dofs.SetDOFName(varSV, 2, "svz");
-	int varSA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION), VAR_VEC3);
-	dofs.SetDOFName(varSA, 0, "sax");
-	dofs.SetDOFName(varSA, 1, "say");
-	dofs.SetDOFName(varSA, 2, "saz");
+	// TODO: Can this be done in Init, since there is no error checking
+	if (pfem)
+	{
+		DOFS& dofs = pfem->GetDOFS();
+		int varD = dofs.AddVariable("displacement", VAR_VEC3);
+		dofs.SetDOFName(varD, 0, "x");
+		dofs.SetDOFName(varD, 1, "y");
+		dofs.SetDOFName(varD, 2, "z");
+		int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
+		dofs.SetDOFName(varQ, 0, "u");
+		dofs.SetDOFName(varQ, 1, "v");
+		dofs.SetDOFName(varQ, 2, "w");
+		int varQR = dofs.AddVariable("rigid rotation", VAR_VEC3);
+		dofs.SetDOFName(varQR, 0, "Ru");
+		dofs.SetDOFName(varQR, 1, "Rv");
+		dofs.SetDOFName(varQR, 2, "Rw");
+		int varV = dofs.AddVariable("velocity", VAR_VEC3);
+		dofs.SetDOFName(varV, 0, "vx");
+		dofs.SetDOFName(varV, 1, "vy");
+		dofs.SetDOFName(varV, 2, "vz");
+		int varSU = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT), VAR_VEC3);
+		dofs.SetDOFName(varSU, 0, "sx");
+		dofs.SetDOFName(varSU, 1, "sy");
+		dofs.SetDOFName(varSU, 2, "sz");
+		int varSV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY), VAR_VEC3);
+		dofs.SetDOFName(varSV, 0, "svx");
+		dofs.SetDOFName(varSV, 1, "svy");
+		dofs.SetDOFName(varSV, 2, "svz");
+		int varSA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION), VAR_VEC3);
+		dofs.SetDOFName(varSA, 0, "sax");
+		dofs.SetDOFName(varSA, 1, "say");
+		dofs.SetDOFName(varSA, 2, "saz");
 
-	// get the DOF indices
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
-	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
-	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
-	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
-	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
-	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
+		// get the DOF indices
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+		m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
+		m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
+		m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -215,6 +223,78 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 							el_lumped_mass[i] += kab;
 						}
 					}
+					// assemble element matrix into inv_mass vector 
+					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+				}
+			}
+			else if (dynamic_cast<FELinearTrussDomain*>(&mesh.Domain(nd)))
+			{
+				FELinearTrussDomain* ptd = dynamic_cast<FELinearTrussDomain*>(&mesh.Domain(nd));
+
+				// loop over all the elements
+				for (int iel = 0; iel < ptd->Elements(); ++iel)
+				{
+					FETrussElement& el = ptd->Element(iel);
+					ptd->UnpackLM(el, lm);
+
+					// create the element's stiffness matrix
+					FEElementMatrix ke(el);
+					int neln = el.Nodes();
+					ke.resize(neln, neln);
+					ke.zero();
+
+					// calculate inertial stiffness
+					ptd->ElementMassMatrix(el, ke);
+
+					// reduce to a lumped mass vector and add up the total
+					el_lumped_mass.assign(3 * neln, 0.0);
+					for (int i = 0; i < neln; ++i)
+					{
+						for (int j = 0; j < neln; ++j)
+						{
+							double kab = ke[i][j];
+							el_lumped_mass[3 * i    ] += kab;
+							el_lumped_mass[3 * i + 1] += kab;
+							el_lumped_mass[3 * i + 2] += kab;
+						}
+					}
+
+					// assemble element matrix into inv_mass vector 
+					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+				}
+			}
+			else if (dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd)))
+			{
+				FEElasticTrussDomain* ptd = dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd));
+
+				// loop over all the elements
+				for (int iel = 0; iel < ptd->Elements(); ++iel)
+				{
+					FETrussElement& el = ptd->Element(iel);
+					ptd->UnpackLM(el, lm);
+
+					// create the element's stiffness matrix
+					FEElementMatrix ke(el);
+					int neln = el.Nodes();
+					ke.resize(neln, neln);
+					ke.zero();
+
+					// calculate inertial stiffness
+					ptd->ElementMassMatrix(el, ke);
+
+					// reduce to a lumped mass vector and add up the total
+					el_lumped_mass.assign(3 * neln, 0.0);
+					for (int i = 0; i < neln; ++i)
+					{
+						for (int j = 0; j < neln; ++j)
+						{
+							double kab = ke[i][j];
+							el_lumped_mass[3 * i    ] += kab;
+							el_lumped_mass[3 * i + 1] += kab;
+							el_lumped_mass[3 * i + 2] += kab;
+						}
+					}
+
 					// assemble element matrix into inv_mass vector 
 					Mi.Assemble(el.m_node, lm, el_lumped_mass);
 				}
@@ -360,11 +440,27 @@ bool FEExplicitSolidSolver::Init()
 {
 	if (FESolver::Init() == false) return false;
 
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// set the dynamic update flag only if we are running a dynamic analysis
+	// NOTE: I don't think we need to set the dynamic update flag, in fact, we should 
+	//		 turn it off, since it's on by default, and it incurs a significant performance overhead
+//	bool b = (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC ? true : false);
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
+		FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
+		if (d) d->SetDynamicUpdateFlag(false);
+		if (s) s->SetDynamicUpdateFlag(false);
+	}
+
 	// get nr of equations
 	int neq = m_neq;
 
 	// allocate vectors
-	m_Fn.assign(neq, 0);
+	m_R0.assign(neq, 0);
+	m_R1.assign(neq, 0);
 	m_Fr.assign(neq, 0);
 	m_ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
@@ -373,8 +469,6 @@ bool FEExplicitSolidSolver::Init()
 	GetFEModel()->Update();
 
 	// we need to fill the total displacement vector m_Ut
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
 	gather(m_Ut, mesh, m_dofU[0]);
 	gather(m_Ut, mesh, m_dofU[1]);
 	gather(m_Ut, mesh, m_dofU[2]);
@@ -392,31 +486,25 @@ bool FEExplicitSolidSolver::Init()
 		return false;
 	}
 
-	// Calculate initial residual to be used on the first time step
-	if (Residual(m_R0) == false) return false;
-
 	// calculate the initial acceleration
-	for (int i = 0; i < mesh.Nodes(); ++i)
+	// (Only when the totiter == 0, in case of a restart)
+	if (GetFEModel()->GetCurrentStep()->m_ntotiter == 0)
 	{
-		FENode& node = mesh.Node(i);
-		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = m_R0[n] * m_Mi[n];
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = m_R0[n] * m_Mi[n];
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = m_R0[n] * m_Mi[n];
+		// Calculate initial residual to be used on the first time step
+		if (Residual(m_R0) == false) return false;
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
-	}
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+			int n;
+			if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = m_R0[n] * m_Mi[n];
+			if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = m_R0[n] * m_Mi[n];
+			if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = m_R0[n] * m_Mi[n];
 
-	// set the dynamic update flag only if we are running a dynamic analysis
-	bool b = (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC ? true : false);
-	for (int i = 0; i < mesh.Domains(); ++i)
-	{
-		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
-		FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
-		if (d) d->SetDynamicUpdateFlag(b);
-		if (s) s->SetDynamicUpdateFlag(b);
+			if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
+			if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
+			if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
+		}
 	}
 
 	return true;
@@ -450,21 +538,22 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 
 	// total displacements
 	vector<double> U(m_Ut.size());
-	for (size_t i=0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ut[i];
+#pragma omp parallel for
+	for (int i=0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ut[i];
 
 	// update flexible nodes
 	// translational dofs
-	scatter(U, mesh, m_dofU[0]);
-	scatter(U, mesh, m_dofU[1]);
-	scatter(U, mesh, m_dofU[2]);
+	scatter3(U, mesh, m_dofU[0], m_dofU[1], m_dofU[2]);
+
 	// rotational dofs
-	scatter(U, mesh, m_dofSQ[0]);
-	scatter(U, mesh, m_dofSQ[1]);
-	scatter(U, mesh, m_dofSQ[2]);
+	// TODO: Commenting this out, since this is only needed for the old shells, which I'm not sure
+	//       if they would work with the explicit solver anyways.
+//	scatter(U, mesh, m_dofSQ[0]);
+//	scatter(U, mesh, m_dofSQ[1]);
+//	scatter(U, mesh, m_dofSQ[2]);
+
 	// shell displacement
-	scatter(U, mesh, m_dofSU[0]);
-	scatter(U, mesh, m_dofSU[1]);
-	scatter(U, mesh, m_dofSU[2]);
+	scatter3(U, mesh, m_dofSU[0], m_dofSU[1], m_dofSU[2]);
 
 	// make sure the prescribed displacements are fullfilled
 	int ndis = fem.BoundaryConditions();
@@ -485,6 +574,7 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 
 	// Update the spatial nodal positions
 	// Don't update rigid nodes since they are already updated
+#pragma omp parallel for
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -500,6 +590,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	// get the number of rigid bodies
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	const int NRB = fem.RigidBodies();
+	if (NRB == 0) return;
 
 	// first calculate the rigid body displacement increments
 	for (int i=0; i<NRB; ++i)
@@ -523,10 +614,10 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	const int NRD = fem.RigidPrescribedBCs();
 	for (int i=0; i<NRD; ++i)
 	{
-		FERigidBodyDisplacement& dc = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
 		if (dc.IsActive())
 		{
-			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
+			FERigidBody& RB = dc.GetRigidBody();
 			int I = dc.GetBC();
 			RB.m_du[I] = dc.Value() - RB.m_Up[I];
 		}
@@ -586,6 +677,10 @@ void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 {
 	FESolver::Serialize(ar);
 	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug & m_neq & m_nreq;
+	if (ar.IsShallow() == false)
+	{
+		ar & m_Mi & m_Ut & m_R0 & m_R1;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -665,6 +760,7 @@ void FEExplicitSolidSolver::PrepStep()
 	// we need them for velocity and acceleration calculations
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	FEMesh& mesh = fem.GetMesh();
+#pragma omp parallel for
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& ni = mesh.Node(i);
@@ -675,14 +771,6 @@ void FEExplicitSolidSolver::PrepStep()
 	}
 
 	const FETimeInfo& tp = fem.GetTime();
-
-	// apply concentrated nodal forces
-	// since these forces do not depend on the geometry
-	// we can do this once outside the NR loop.
-	vector<double> dummy(m_neq, 0.0);
-	zero(m_Fn);
-	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalLoads(Fn, tp);
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
@@ -703,10 +791,10 @@ void FEExplicitSolidSolver::PrepStep()
 	// calculate local rigid displacements
 	for (i=0; i<(int) fem.RigidPrescribedBCs(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *fem.GetRigidPrescribedBC(i);
-		FERigidBody& RB = *fem.GetRigidBody(DC.GetID());
+		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
 		if (DC.IsActive())
 		{
+			FERigidBody& RB = DC.GetRigidBody();
 			int I = DC.GetBC();
 			RB.m_dul[I] = DC.Value() - RB.m_Ut[I];
 		}
@@ -797,7 +885,9 @@ void FEExplicitSolidSolver::PrepStep()
 	// intialize material point data
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
-	fem.Update();
+	// NOTE: Commenting this out since I don't think anything needs to be updated here. 
+	//       This also halves the number of update calls, so gives a performance boost. 
+//	fem.Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -819,6 +909,7 @@ bool FEExplicitSolidSolver::DoSolve()
 
 	// collect accelerations, velocities, displacements
 	vector<double> an(m_neq, 0.0), vn(m_neq, 0.0), un(m_neq, 0.0);
+#pragma omp parallel for shared(an, vn, un, mesh)
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -833,64 +924,79 @@ bool FEExplicitSolidSolver::DoSolve()
 		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { un[n] = node.get(m_dofSU[2]); vn[n] = node.get(m_dofSV[2]); an[n] = node.get(m_dofSA[2]); }
 	}
 
-	// velocity predictor
 	vector<double> v_pred(m_neq, 0.0);
+	double Dnorm = 0.0;
+#pragma omp parallel for shared(v_pred, vn, an) reduction(+: Dnorm)
 	for (int i = 0; i < m_neq; ++i)
 	{
+		// velocity predictor
 		v_pred[i] = vn[i] + an[i] * dt*0.5;
-	}
 
-	// update displacements
-	for (int i = 0; i < m_neq; ++i)
-	{
+		// update displacements
 		m_ui[i] = dt * v_pred[i];
+
+		// update norm
+		Dnorm += m_ui[i] * m_ui[i];
 	}
-	double Dnorm = sqrt(m_ui * m_ui);
+	Dnorm = sqrt(Dnorm);
+
 	feLog("\t displacement norm : %lg\n", Dnorm);
 	Update(m_ui);
 
 	// evaluate acceleration
 	Residual(m_R1);
-	double Rnorm = sqrt(m_R1 * m_R1);
+
+	double Rnorm = 0.0;
+#pragma omp parallel for reduction(+: Rnorm)
+	for (int i=0; i<m_neq; ++i)
+	{
+		Rnorm += m_R1[i] * m_R1[i];
+	}
+	Rnorm = sqrt(Rnorm);
 	feLog("\t force vector norm : %lg\n", Rnorm);
 
-	vector<double> anp1(m_neq);
-	for (int i = 0; i < m_neq; ++i)
-	{
-		anp1[i] = m_R1[i] * m_Mi[i];
-	}
-
-	// update velocity
 	vector<double> vnp1(m_neq, 0.0);
-	for (int i = 0; i < m_neq; ++i)
+	vector<double> anp1(m_neq);
+#pragma omp parallel shared(vnp1, anp1, v_pred)
 	{
-		vnp1[i] = v_pred[i] + anp1[i]*dt*0.5;
+#pragma omp for
+		for (int i = 0; i < m_neq; ++i)
+		{
+			anp1[i] = m_R1[i] * m_Mi[i];
+
+			// update velocity
+			vnp1[i] = m_dyn_damping*(v_pred[i] + anp1[i] * dt * 0.5);
+		}
+
+		// scatter velocity and accelerations
+#pragma omp for nowait
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+			int n;
+			if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], vnp1[n]); node.m_at.x = anp1[n]; }
+			if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], vnp1[n]); node.m_at.y = anp1[n]; }
+			if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], vnp1[n]); node.m_at.z = anp1[n]; }
+
+			if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
+			if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
+			if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
+		}
+
+		// update the total displacements
+#pragma omp for nowait
+		for (int i = 0; i < m_neq; ++i)
+		{
+			m_Ut[i] += m_ui[i];
+			m_R0[i] = m_R1[i];
+		}
 	}
 
 	// increase iteration number
 	m_niter++;
 
-	// scatter velocity and accelerations
-	for (int i = 0; i < mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], vnp1[n]); node.m_at.x = anp1[n]; }
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], vnp1[n]); node.m_at.y = anp1[n]; }
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], vnp1[n]); node.m_at.z = anp1[n]; }
-
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
-	}
-
 	// do minor iterations callbacks
 	fem.DoCallback(CB_MINOR_ITERS);
-
-	// update the total displacements
-	m_Ut += m_ui;
-
-	m_R0 = m_R1;
 
 	return true;
 }
@@ -908,7 +1014,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	const FETimeInfo& tp = fem.GetTime();
 
 	// initialize residual with concentrated nodal loads
-	R = m_Fn;
+	zero(R);
 
 	// zero nodal reaction forces
 	zero(m_Fr);
@@ -934,26 +1040,12 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 		dom.InternalForces(RHS);
 	}
 
-	// calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
+	// calculate forces due to model loads
+	int nml = fem.ModelLoads();
+	for (int i=0; i<nml; ++i)
 	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
-				if (pbf) dom.BodyForce(RHS, *pbf);
-			}
-		}
-	}
-
-	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
-	for (int i=0; i<nsl; ++i)
-	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->LoadVector(RHS, tp);
+		FEModelLoad* pml = fem.ModelLoad(i);
+		if (pml->IsActive()) pml->LoadVector(RHS);
 	}
 
 	// calculate contact forces
@@ -967,11 +1059,9 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	// enforced using the augmented lagrangian
 	NonLinearConstraintForces(RHS, tp);
 
-	// forces due to point constraints
-//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->LoadVector(this, R);
-
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
+#pragma omp parallel for
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);

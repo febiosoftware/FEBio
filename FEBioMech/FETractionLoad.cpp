@@ -33,8 +33,8 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FETractionLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_scale   , "scale");
-	ADD_PARAMETER(m_traction, "traction");
+	ADD_PARAMETER(m_scale   , "scale")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
+	ADD_PARAMETER(m_traction, "traction")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_bshellb , "shell_bottom");
 	ADD_PARAMETER(m_blinear, "linear");
 END_FECORE_CLASS();
@@ -77,7 +77,7 @@ bool FETractionLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FETractionLoad::LoadVector(FEGlobalVector& R)
 {
 	FESurface& surf = GetSurface();
 	surf.SetShellBottom(m_bshellb);
@@ -101,7 +101,7 @@ void FETractionLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FETractionLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FETractionLoad::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Nothing to do here.
 	// TODO: I think if the linear flag is false, I do need to evaluate a stiffness.

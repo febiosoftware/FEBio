@@ -28,11 +28,13 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEReactionRateNims.h"
+#include "FESoluteInterface.h"
+#include "FESolutesMaterialPoint.h"
 #include "FECore/FEModel.h"
 #include <FECore/log.h>
 
 // Material parameters for the FEMultiphasic material
-BEGIN_FECORE_CLASS(FEReactionRateNims, FEMaterial)
+BEGIN_FECORE_CLASS(FEReactionRateNims, FEReactionRate)
 	ADD_PARAMETER(m_sol, "sol");
 	ADD_PARAMETER(m_k0, "k0");
 	ADD_PARAMETER(m_kc, "kc");
@@ -43,9 +45,22 @@ BEGIN_FECORE_CLASS(FEReactionRateNims, FEMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+FEReactionRateNims::FEReactionRateNims(FEModel* pfem) : FEReactionRate(pfem)
+{
+    m_lid = m_cmax = -1;
+    m_sol = -1;
+    m_k0 = 0.0;
+    m_cc = 0.0;
+    m_kc = 0.0;
+    m_cr = 0.0;
+    m_kr = 0.0;
+    m_trel = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 bool FEReactionRateNims::Init()
 {
-	if (FEMaterial::Init() == false) return false;
+	if (FEReactionRate::Init() == false) return false;
 	
     // do only once
     if (m_lid == -1) {
@@ -59,8 +74,8 @@ bool FEReactionRateNims::Init()
 		}
         
         // convert global sol value to local id
-        FEMultiphasic* pmp = m_pReact->m_pMP;
-		m_lid = pmp->FindLocalSoluteID(m_sol - 1);
+        FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+		m_lid = psm->FindLocalSoluteID(m_sol - 1);
         
         // check validity of local id
 		if (m_lid == -1) {
@@ -87,18 +102,23 @@ double FEReactionRateNims::ReactionRate(FEMaterialPoint& pt)
     double c = spt.m_ca[m_lid];
     double cmax = max(c,spt.m_crd[m_cmax]);
     
-    double k = m_k0;
+    double k = m_k0(pt);
+    double kr = m_kr(pt);
+    double kc = m_kc(pt);
+    double trel = m_trel(pt);
+    double cr = m_cr(pt);
+    double cc = m_cc(pt);
     
     // if we are past the release time and got exposed to the solute
-    if ((m_trel > 0) && (t >= m_trel)) {
-        if (cmax < m_cr) k += (m_kr - m_k0)*cmax/m_cr;
-        else k = m_kr;
+    if ((trel > 0) && (t >= trel)) {
+        if (cmax < cr) k += (kr - k)*cmax/cr;
+        else k = kr;
     }
     // otherwise
     else {
         // evaluate reaction rate
-        if (cmax < m_cc) k += (m_kc - m_k0)*cmax/m_cc;
-        else k = m_kc;
+        if (cmax < cc) k += (kc - k)*cmax/cc;
+        else k = kc;
     }
 
 	return k;

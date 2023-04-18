@@ -161,12 +161,16 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			else
 			{
 				// data will be generated
-				FEDataGenerator* gen = fecore_new<FEDataGenerator>(szgen, &fem);
+				FEElemDataGenerator* gen = fecore_new<FEElemDataGenerator>(szgen, &fem);
 				if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
 				// get the variable or name
+				string mapName;
 				const char* szvar = tag.AttributeValue("var", true);
-				const char* szname = (szvar == nullptr ? tag.AttributeValue("name") : nullptr);
+				const char* szname = tag.AttributeValue("name", true);
+				if (szvar) mapName = szvar;
+				else if (szname) mapName = szname;
+				else { assert(false); }
 
 				// make sure the parameter is valid
 				FEParamDouble* pp = nullptr;
@@ -191,71 +195,16 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 					else pp = &(pv->value<FEParamDouble>());
 				}
 
-				// read the parameters of the generator
-				ReadParameterList(tag, gen);
-
-				// give the generator a chance to validate itself
-				if (gen->Init() == false) throw FEBioImport::DataGeneratorError();
-
 				// create a new domain map (only scalars for now!)
 				FEDomainMap* map = new FEDomainMap(FE_DOUBLE);
 				map->Create(part);
+				map->SetName(mapName);
 
-				// generate the data
-				if (gen->Generate(*map) == false)
-				{
-					delete map;
-					throw FEBioImport::DataGeneratorError();
-				}
+				// read the parameters of the generator
+				ReadParameterList(tag, gen);
 
-				// either map it directly to a variable or just store it
-				if (szvar)
-				{
-					FEParamDouble& p = *pp;
-
-					// see if this map is already defined
-					FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(szvar));
-					if (oldMap)
-					{
-						// it is, so merge it
-						oldMap->Merge(*map);
-
-						// we can now delete this map
-						delete map;
-					}
-					else
-					{
-						// nope, so add it
-						map->SetName(szvar);
-						mesh.AddDataMap(map);
-
-						// apply the map
-						FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);
-						val->setDataMap(map);
-						p.setValuator(val);
-					}
-				}
-				else
-				{
-					// see if this map is already defined
-					FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(szname));
-					if (oldMap)
-					{
-						// it is, so merge it
-						oldMap->Merge(*map);
-
-						// we can now delete this map
-						delete map;
-					}
-					else
-					{
-						// set the name
-						map->SetName(szname);
-
-						// add it to the mesh
-						mesh.AddDataMap(map);
-					}
-				}
+				// Add it to the list (will be evaluated later)
+				GetBuilder()->AddMeshDataGenerator(gen, map, pp);
 			}
 		}
 		else if (tag == "SurfaceData")
@@ -283,7 +232,7 @@ void FEBioMeshDataSection::Parse(XMLTag& tag)
 			const char* szgen = tag.AttributeValue("generator", true);
 			if (szgen)
 			{
-				FEDataGenerator* gen = fecore_new<FEDataGenerator>(szgen, &fem);
+				FEFaceDataGenerator* gen = fecore_new<FEFaceDataGenerator>(szgen, &fem);
 				if (gen == nullptr) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
 				ReadParameterList(tag, gen);
@@ -427,21 +376,17 @@ void FEBioMeshDataSection::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 	FEMaterial* mat = dom->GetMaterial();
 	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
 
-	// get the fiber parameter
-	ParamString s("fiber");
-	FEParam* param = mat->FindParameter(s);
-	if (param == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
-	if (param->type() != FE_PARAM_VEC3D_MAPPED) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
-
-	// get the parameter
-	FEParamVec3& p = param->value<FEParamVec3>();
+	// get the fiber property
+	FEProperty* fiber = mat->FindProperty("fiber");
+	if (fiber == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+	if (fiber->GetSuperClassID() != FEVEC3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
 
 	// create a domain map
 	FEDomainMap* map = new FEDomainMap(FE_VEC3D, FMT_ITEM);
 	map->Create(&set);
 	FEMappedValueVec3* val = fecore_new<FEMappedValueVec3>("map", GetFEModel());
 	val->setDataMap(map);
-	p.setValuator(val);
+	fiber->SetProperty(val);
 
 	vector<ELEMENT_DATA> data;
 	ParseElementData(tag, set, data, 3);
@@ -527,10 +472,8 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 		if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "var", szvar);
 	}
 
-	FEParam* pQ = mat->FindParameter("mat_axis"); assert(pQ);
+	FEProperty* pQ = mat->FindProperty("mat_axis"); assert(pQ);
 	if (pQ == nullptr) throw XMLReader::InvalidAttributeValue(tag, "var", szvar);
-
-	FEParamMat3d& Q = pQ->value<FEParamMat3d>();
 
 	// create the map's name.
 	stringstream ss;
@@ -607,7 +550,7 @@ void FEBioMeshDataSection::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 		// It does not, so add it
 		FEMappedValueMat3d* val = fecore_alloc(FEMappedValueMat3d, GetFEModel());
 		val->setDataMap(map);
-		Q.setValuator(val);
+		pQ->SetProperty(val);
 		mesh.AddDataMap(map);
 	}
 }

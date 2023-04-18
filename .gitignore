@@ -33,9 +33,10 @@ bld/
 build/
 
 
-# Visual Studio 2015/2017 cache/options directory
+# Visual Studio cache/options directory
 .vs/
 VS2019/
+VS2022/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
@@ -390,6 +391,7 @@ MigrationBackup/
 
 # miscellaneous
 Documentation/Doxygen/doc
+Documentation/Doxygen/doc_only
 
 .DS_Store
 
@@ -424,7 +426,7 @@ DerivedData/
 
 ## cmake build directories
 cbuild/
-cmbuild/
+cmbuild*/
 
 ##cmake files
 CMakeLists.txt
@@ -433,3 +435,7 @@ CMakeCache.txt
 
 ## Visual Studio Code
 .vscode/
+
+Documentation/FEBio_Theory_Manual.pdf
+Documentation/FEBio_User_Manual.html.LyXconv/
+

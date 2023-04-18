@@ -31,11 +31,10 @@ SOFTWARE.*/
 #include "PltArchive.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEShellDomain.h"
-#include "FECore/FETrussDomain.h"
+#include "FECore/FEBeamDomain.h"
 #include "FECore/FEDiscreteDomain.h"
 #include "FECore/FEDomain2D.h"
 #include <list>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! This class implements the facilities to export FE data in the FEBio
@@ -45,7 +44,8 @@ class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
-	enum { PLT_VERSION = 0x0031 };
+	// 32: added PLT_ELEMENTSET_SECTION
+	enum { PLT_VERSION = 0x0032 };
 
 	// file tags
 	enum { 
@@ -57,6 +57,7 @@ public:
 			PLT_HDR_COMPRESSION			= 0x01010004,
 			PLT_HDR_AUTHOR				= 0x01010005,	// new in 2.0
 			PLT_HDR_SOFTWARE			= 0x01010006,	// new in 2.0
+			PLT_HDR_UNITS				= 0x01010007,	// new in 4.0
 		PLT_DICTIONARY					= 0x01020000,
 			PLT_DIC_ITEM				= 0x01020001,
 			PLT_DIC_ITEM_TYPE			= 0x01020002,
@@ -64,6 +65,7 @@ public:
 			PLT_DIC_ITEM_NAME			= 0x01020004,
 			PLT_DIC_ITEM_ARRAYSIZE		= 0x01020005,	// added in version 0x05
 			PLT_DIC_ITEM_ARRAYNAME		= 0x01020006,	// added in version 0x05
+			PLT_DIC_ITEM_UNITS			= 0x01020007,	// added in version 4.0
 			PLT_DIC_GLOBAL				= 0x01021000,
 //			PLT_DIC_MATERIAL			= 0x01022000,	// this was removed
 			PLT_DIC_NODAL				= 0x01023000,
@@ -110,8 +112,27 @@ public:
 				PLT_PART_ID				= 0x01045101,
 				PLT_PART_NAME			= 0x01045102,
 
-			// plot objects were added in 3.0
+			// element set section was added in 4.1
+			PLT_ELEMENTSET_SECTION		= 0x01046000,
+				PLT_ELEMENTSET			= 0x01046100,
+				PLT_ELEMENTSET_HDR		= 0x01046101,
+					PLT_ELEMENTSET_ID	= 0x01046102,
+					PLT_ELEMENTSET_NAME	= 0x01046103,
+					PLT_ELEMENTSET_SIZE	= 0x01046104,
+				PLT_ELEMENTSET_LIST		= 0x01046200,
 
+			// facet set section was added in 4.1
+			PLT_FACETSET_SECTION			= 0x01047000,
+				PLT_FACETSET				= 0x01047100,
+				PLT_FACETSET_HDR			= 0x01047101,
+					PLT_FACETSET_ID			= 0x01047102,
+					PLT_FACETSET_NAME		= 0x01047103,
+					PLT_FACETSET_SIZE		= 0x01047104,
+					PLT_FACETSET_MAXNODES	= 0x01047105,
+				PLT_FACETSET_LIST			= 0x01047200,
+					PLT_FACET				= 0x01047201,
+
+			// plot objects were added in 3.0
 			PLT_OBJECTS_SECTION			= 0x01050000,
 					PLT_OBJECT_ID		= 0x01050001,
 					PLT_OBJECT_NAME		= 0x01050002,
@@ -149,7 +170,7 @@ public:
 		PLT_ELEM_TET4, 
 		PLT_ELEM_QUAD, 
 		PLT_ELEM_TRI, 
-		PLT_ELEM_TRUSS, 
+		PLT_ELEM_LINE2, 
 		PLT_ELEM_HEX20, 
 		PLT_ELEM_TET10, 
 		PLT_ELEM_TET15, 
@@ -182,14 +203,15 @@ public:
 		unsigned int	m_ntype;	// data type
 		unsigned int	m_nfmt;		// storage format
 		unsigned int	m_arraySize;	// size of arrays (only used by arrays)
-		vector<string>	m_arrayNames;	// names of array components (optional)
+		std::vector<string>	m_arrayNames;	// names of array components (optional)
 		char			m_szname[STR_SIZE];
+		char			m_szunit[STR_SIZE];
 	};
 
 	class Dictionary
 	{
 	public:
-		bool AddVariable(FEModel* pfem, const char* szname, vector<int>& item, const char* szdom = "");
+		bool AddVariable(FEModel* pfem, const char* szname, std::vector<int>& item, const char* szdom = "");
 
 		int NodalVariables() { return (int)m_Node.size(); }
 		int DomainVarialbes() { return (int)m_Elem.size(); }
@@ -209,9 +231,9 @@ public:
 	protected:
 		bool AddGlobalVariable  (FEPlotData* ps, const char* szname);
 		bool AddMaterialVariable(FEPlotData* ps, const char* szname);
-		bool AddNodalVariable   (FEPlotData* ps, const char* szname, vector<int>& item);
-		bool AddDomainVariable  (FEPlotData* ps, const char* szname, vector<int>& item);
-		bool AddSurfaceVariable (FEPlotData* ps, const char* szname, vector<int>& item);
+		bool AddNodalVariable   (FEPlotData* ps, const char* szname, std::vector<int>& item);
+		bool AddDomainVariable  (FEPlotData* ps, const char* szname, std::vector<int>& item);
+		bool AddSurfaceVariable (FEPlotData* ps, const char* szname, std::vector<int>& item);
 
 	protected:
 		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
@@ -290,7 +312,7 @@ public:
 	//! Add a variable to the dictionary
 	bool AddVariable(FEPlotData* ps, const char* szname);
 	bool AddVariable(const char* sz);
-	bool AddVariable(const char* sz, vector<int>& item, const char* szdom = "");
+	bool AddVariable(const char* sz, std::vector<int>& item, const char* szdom = "");
 
 	//! Set the compression level
 	void SetCompression(int n);
@@ -325,13 +347,15 @@ protected:
 	void WriteDomainSection (FEMesh& m);
 	void WriteSurfaceSection(FEMesh& m);
 	void WriteNodeSetSection(FEMesh& m);
+	void WriteElementSetSection(FEMesh& m);
+	void WriteFacetSetSection(FEMesh& m);
 	void WritePartsSection  (FEModel& fem);
 	void WriteObjectsSection();
 	void WriteObject(PlotObject* po);
 
 	void WriteSolidDomain   (FESolidDomain&    dom);
 	void WriteShellDomain   (FEShellDomain&    dom);
-	void WriteTrussDomain   (FETrussDomain&    dom);
+	void WriteBeamDomain    (FEBeamDomain&    dom);
 	void WriteDiscreteDomain(FEDiscreteDomain& dom);
     void WriteDomain2D      (FEDomain2D&       dom);
 
@@ -359,16 +383,19 @@ protected:
 	int			m_ncompress;	// compression level
 	int			m_meshesWritten;	// nr of meshes written
 	string		m_softwareString;	// the software string
+	bool		m_exportUnitsFlag;	// flag that indicates whether to write units
 
-	vector<Surface>	m_Surf;
+	std::vector<Surface>	m_Surf;
 
-	vector<PointObject*>	m_Points;
-	vector<LineObject*>		m_Lines;
+	std::vector<PointObject*>	m_Points;
+	std::vector<LineObject*>		m_Lines;
 };
 
 //-----------------------------------------------------------------------------
 class FEPlotObjectData : public FEPlotData
 {
+	FECORE_BASE_CLASS(FEPlotObjectData)
+
 public:
 	FEPlotObjectData(FEModel* fem) : FEPlotData(fem) {}
 

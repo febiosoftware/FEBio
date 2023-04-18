@@ -65,7 +65,7 @@ void FEDomain::CreateMaterialPointData()
 
 		for (int k = 0; k < el.GaussPoints(); ++k)
 		{
-			FEMaterialPoint* mp = pmat->CreateMaterialPointData();
+			FEMaterialPoint* mp = new FEMaterialPoint(pmat->CreateMaterialPointData());
 			mp->m_r0 = el.Evaluate(r, k);
 			mp->m_index = k;
 			el.SetMaterialPointData(mp, k);
@@ -125,7 +125,8 @@ void FEDomain::Serialize(DumpStream& ar)
 				int nint = el.GaussPoints();
 				for (int j = 0; j < nint; ++j)
 				{
-					el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+					FEMaterialPoint* mp = new FEMaterialPoint(pmat->CreateMaterialPointData());
+					el.SetMaterialPointData(mp, j);
 					el.GetMaterialPoint(j)->Serialize(ar);
 				}
 			}

@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEMortarSlidingContact.h"
-#include "FECore/FEModel.h"
 #include "FECore/mortar.h"
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/log.h"
@@ -121,9 +120,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEMortarSlidingContact::FEMortarSlidingContact(FEModel* pfem) : FEMortarInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofX = GetDOFIndex("x");
+	m_dofY = GetDOFIndex("y");
+	m_dofZ = GetDOFIndex("z");
 }
 
 //-----------------------------------------------------------------------------

@@ -32,11 +32,13 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEEFDDonnanEquilibrium, FEElasticMaterial)
 	ADD_PARAMETER(m_DEQ.m_phiwr, "phiw0");
-	ADD_PARAMETER(m_DEQ.m_cFr, "cF0");
-	ADD_PARAMETER(m_DEQ.m_bosm, "bosm");
+	ADD_PARAMETER(m_DEQ.m_cFr, "cF0")->setUnits(UNIT_CONCENTRATION);
+	ADD_PARAMETER(m_DEQ.m_bosm, "bosm")->setUnits(UNIT_CONCENTRATION);
     ADD_PARAMETER(m_DEQ.m_Phi, "Phi");
 	ADD_PARAMETER(m_Fib.m_beta, 3, "beta");
-	ADD_PARAMETER(m_Fib.m_ksi , 3, "ksi" );
+	ADD_PARAMETER(m_Fib.m_ksi , 3, "ksi" )->setUnits(UNIT_PRESSURE);
+
+	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

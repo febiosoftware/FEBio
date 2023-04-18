@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FESolutesMaterialPoint.h"
 #include "FECore/DumpStream.h"
+using namespace std;
 
 //=============================================================================
 //   FESolutesMaterialPoint
@@ -37,7 +38,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Create a shallow copy of the material point data
-FEMaterialPoint* FESolutesMaterialPoint::Copy()
+FEMaterialPointData* FESolutesMaterialPoint::Copy()
 {
 	FESolutesMaterialPoint* pt = new FESolutesMaterialPoint(*this);
 	if (m_pNext) pt->m_pNext = m_pNext->Copy();
@@ -80,16 +81,17 @@ void FESolutesMaterialPoint::Init()
     m_ci.clear();
     m_ide.clear();
     m_idi.clear();
+    m_bsb.clear();
     
 	// don't forget to initialize the base class
-    FEMaterialPoint::Init();
+	FEMaterialPointData::Init();
 }
 
 //-----------------------------------------------------------------------------
 //! Serialize material point data to the archive
 void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPoint::Serialize(ar);
+	FEMaterialPointData::Serialize(ar);
 	ar & m_nsol & m_psi & m_cF & m_Ie & m_nsbm;
 	ar & m_c & m_gradc & m_j & m_ca & m_crp & m_k & m_dkdJ;
 	ar & m_dkdc;
@@ -99,4 +101,17 @@ void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 	ar & m_strain & m_pe & m_pi;
 	ar & m_ce & m_ide;
 	ar & m_ci & m_idi;
+    ar & m_bsb;
+}
+
+//-----------------------------------------------------------------------------
+double FESolutesMaterialPoint::Osmolarity() const
+{
+    double ew = 0.0;
+    for (int isol = 0; isol < (int)m_ca.size(); ++isol)
+    {
+        // exclude solid-bound 'solutes'
+        if (!m_bsb[isol]) ew += m_ca[isol];
+    }
+    return ew;
 }

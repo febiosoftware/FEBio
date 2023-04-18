@@ -28,9 +28,9 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEDomain.h"
-#include "FEModel.h"
 #include "FEDofList.h"
 #include "FELinearSystem.h"
+#include "FESolidElement.h"
 
 //-----------------------------------------------------------------------------
 // This typedef defines a surface integrand. 
@@ -46,6 +46,9 @@ typedef std::function<void(FEMaterialPoint& mp, int node_a, int node_b, matrix& 
 //! abstract base class for 3D volumetric elements
 class FECORE_API FESolidDomain : public FEDomain
 {
+    FECORE_SUPER_CLASS(FESOLIDDOMAIN_ID)
+    FECORE_BASE_CLASS(FESolidDomain)
+
 public:
     //! constructor
     FESolidDomain(FEModel* pfem);

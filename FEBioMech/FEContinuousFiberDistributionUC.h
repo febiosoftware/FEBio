@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEFiberDensityDistribution.h"
 #include "FEFiberIntegrationScheme.h"
 #include "FEFiberMaterialPoint.h"
+#include "FEFiberMaterial.h"
 
 //  This material is a container for a fiber material, a fiber density
 //  distribution, and an integration scheme.
@@ -41,6 +42,9 @@ class FEContinuousFiberDistributionUC : public FEUncoupledMaterial
 public:
     FEContinuousFiberDistributionUC(FEModel* pfem);
     ~FEContinuousFiberDistributionUC();
+    
+    // returns a pointer to a new material point object
+	FEMaterialPointData* CreateMaterialPointData() override;
     
 public:
 	//! calculate stress at material point
@@ -52,14 +56,11 @@ public:
 	//! calculate deviatoric strain energy density
 	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
     
-	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() override;
-
 private:
 	double IntegratedFiberDensity(FEMaterialPoint& pt);
 
-public:
-    FEElasticFiberMaterialUC*   m_pFmat;    // pointer to fiber material
+protected:
+	FEFiberMaterialUncoupled*	m_pFmat;    // pointer to fiber material
 	FEFiberDensityDistribution* m_pFDD;     // pointer to fiber density distribution
 	FEFiberIntegrationScheme*	m_pFint;    // pointer to fiber integration scheme
 

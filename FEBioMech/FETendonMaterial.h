@@ -49,7 +49,7 @@ public:
 
 	double	m_lam1;	//!< max exponential fiber stretch
 
-	FEParamVec3		m_fiber;
+	FEVec3dValuator*	m_fiber;
 	
 public:
 	//! calculate deviatoric stress at material point

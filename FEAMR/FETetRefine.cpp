@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEMeshTopo.h>
 #include <FECore/FEFixedBC.h>
 #include <FECore/FESurface.h>
+#include <FECore/FEModel.h>
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FETetRefine, FERefineMesh)
@@ -50,7 +51,7 @@ bool FETetRefine::RefineMesh()
 	if (m_topo == nullptr) return false;
 	FEMeshTopo& topo = *m_topo;
 
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
 	int NEL = dom.Elements();
@@ -125,7 +126,7 @@ bool FETetRefine::RefineMesh()
 		int NE0 = oldDom.Elements();
 
 		// create a copy of old domain (since we want to retain the old domain)
-		FEDomain* newDom = fecore_new<FEDomain>(oldDom.GetTypeStr(), &fem);
+		FEDomain* newDom = fecore_new<FESolidDomain>(oldDom.GetTypeStr(), &fem);
 		newDom->Create(NE0, FEElementLibrary::GetElementSpecFromType(FE_TET4G4));
 		for (int j = 0; j < NE0; ++j)
 		{

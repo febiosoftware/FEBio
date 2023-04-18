@@ -30,6 +30,17 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEConcentrationIndependentReaction.h"
 
+BEGIN_FECORE_CLASS(FEConcentrationIndependentReaction, FEChemicalReaction)
+	// set material properties
+	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FEConcentrationIndependentReaction::FEConcentrationIndependentReaction(FEModel* pfem) : FEChemicalReaction(pfem) 
+{
+
+}
+
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEConcentrationIndependentReaction::ReactionSupply(FEMaterialPoint& pt)
@@ -48,7 +59,7 @@ double FEConcentrationIndependentReaction::ReactionSupply(FEMaterialPoint& pt)
 	for (int i=0; i<nsbm; ++i) {
 		int vR = m_vR[nsol+i];
 		if (vR > 0) {
-			double c = m_pMP->SBMConcentration(pt, i);
+			double c = m_psm->SBMConcentration(pt, i);
 			zhat *= pow(c, vR);
 		}
 	}
@@ -66,7 +77,7 @@ mat3ds FEConcentrationIndependentReaction::Tangent_ReactionSupply_Strain(FEMater
 	const int nsol = m_nsol;
 	const int nsbm = (int)m_v.size() - nsol;
 	double J = ept.m_J;
-	double phi0 = bpt.m_phi0;
+	double phi0 = bpt.m_phi0t;
     
 	double kF = m_pFwd->ReactionRate(pt);
 	mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);

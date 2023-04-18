@@ -32,11 +32,14 @@ SOFTWARE.*/
 #include "FESolidDomain.h"
 #include "FEModelParam.h"
 #include "FEBodyLoad.h"
+#include "FENodalLoad.h"
 #include "FEPlotData.h"
 #include "FESurface.h"
 #include "FEMaterialPointProperty.h"
 #include "writeplot.h"
 #include "FESurfaceLoad.h"
+#include "FEDomainMap.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -54,6 +57,9 @@ FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
 // the material parameter in the format [materialname.parametername].
 bool FEPlotParameter::SetFilter(const char* sz)
 {
+	// store the filter for serialization
+	m_filter = sz;
+
 	// find the parameter
 	ParamString ps(sz);
 	m_param = GetFEModel()->GetParameterValue(ps);
@@ -79,8 +85,9 @@ bool FEPlotParameter::SetFilter(const char* sz)
 			if (itemList == 0)
 			{
 				// for some classes, the item list can be empty
-				if      (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
+				if (dynamic_cast<FEBodyLoad*>(pc)) { SetRegionType(FE_REGION_DOMAIN); m_dom = &(dynamic_cast<FEBodyLoad*>(pc))->GetDomainList(); }
 	//			else if (dynamic_cast<FESurfaceLoad*>(pc)) { SetRegionType(FE_REGION_SURFACE); m_surf = dynamic_cast<FESurfaceLoad*>(pc)->GetSurface().GetFacetSet(); }
+				else if (dynamic_cast<FENodalLoad*>(pc)) SetRegionType(FE_REGION_NODE);
 				else return false;
 			}
 			else
@@ -238,6 +245,22 @@ bool FEPlotParameter::SetFilter(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+void FEPlotParameter::Serialize(DumpStream& ar)
+{
+	FEPlotData::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+		ar << m_filter;
+	else
+	{
+		string filter;
+		ar >> filter;
+		SetFilter(filter.c_str());
+	}
+}
+
+//-----------------------------------------------------------------------------
 // The Save function stores the material parameter data to the plot file.
 bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 {
@@ -264,6 +287,34 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 		if (m_param.type() == FE_PARAM_DOUBLE_MAPPED)
 		{
 			FEParamDouble& mapDouble = dynamic_cast<FEParamDouble&>(map);
+
+			FEMappedValue* val = dynamic_cast<FEMappedValue*>(mapDouble.valuator());
+			if (val)
+			{
+				FEDomainMap* map = dynamic_cast<FEDomainMap*>(val->dataMap()); assert(map);
+				if (map->StorageFormat() == FMT_MULT)
+				{
+					// loop over all elements
+					int NE = dom.Elements();
+					for (int i = 0; i < NE; ++i)
+					{
+						FEElement& e = dom.ElementRef(i);
+						int ne = e.Nodes();
+
+						vector<double> sn(ne);
+						for (int j = 0; j < ne; ++j)
+						{
+							sn[j] = map->value<double>(i, j);
+						}
+
+						// push data to archive
+						for (int j = 0; j < ne; ++j) a << sn[j];
+					}
+
+					return true;
+				}
+			}
+
 			writeNodalProjectedElementValues<double>(sd, a, mapDouble);
 		}
 		else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
@@ -391,13 +442,33 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 	{
 		FEParamDouble& map = m_param.value<FEParamDouble>();
 		FENodeSet* nset = dynamic_cast<FENodeSet*>(map.GetItemList());
-		if (nset == 0) return false;
-
-		// write the nodal values
-		writeNodalValues<double>(*nset, a, map);
+		if (nset)
+			writeNodalValues<double>(*nset, a, map);
+		else
+		{
+			writeNodalValues<double>(mesh, a, [&](const FENode& node) {
+				FEMaterialPoint mp;
+				mp.m_r0 = node.m_r0;
+				mp.m_index = -1;
+				double v = map(mp);
+				return v;
+			});
+		}
 
 		return true;
 	}
+	else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
+	{
+		FEParamVec3& map = m_param.value<FEParamVec3>();
+		FENodeSet* nset = dynamic_cast<FENodeSet*>(map.GetItemList());
+		if (nset == 0) return false;
+
+		// write the nodal values
+		writeNodalValues<vec3d>(*nset, a, map);
+
+		return true;
+	}
+
 
 	return false;
 }

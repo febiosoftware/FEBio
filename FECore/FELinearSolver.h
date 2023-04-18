@@ -94,16 +94,6 @@ protected: // some helper functions
 	std::vector<double>	GetLoadVector() override;
 
 protected:
-	// Add nodal loads to RHS vector
-	void NodalLoads(FEGlobalVector& R);
-
-	// add surface loads to the RHS vector
-	void SurfaceLoads(FEGlobalVector& R);
-
-	// add body loads to RHS vector
-	void BodyLoads(FEGlobalVector& R);
-
-protected:
 	vector<double>		m_R;	//!< RHS vector
 	vector<double>		m_u;	//!< vector containing prescribed values
 

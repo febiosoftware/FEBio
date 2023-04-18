@@ -33,8 +33,6 @@ SOFTWARE.*/
 #include "FEDataMap.h"
 #include "DumpStream.h"
 
-REGISTER_SUPER_CLASS(FEMat3dValuator, FEMAT3DGENERATOR_ID);
-
 //=============================================================================
 // FELocalMap
 //-----------------------------------------------------------------------------
@@ -50,7 +48,7 @@ FEConstValueMat3d::FEConstValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
 
 FEMat3dValuator* FEConstValueMat3d::copy()
 {
-	FEConstValueMat3d* map = new FEConstValueMat3d(GetFEModel());
+	FEConstValueMat3d* map = fecore_alloc(FEConstValueMat3d, GetFEModel());
 	map->m_val = m_val;
 	return map;
 }
@@ -469,6 +467,11 @@ void FEMat3dVectorMap::Serialize(DumpStream &ar)
 // FEMappedValueMat3d
 //-----------------------------------------------------------------------------
 
+BEGIN_FECORE_CLASS(FEMappedValueMat3d, FEMat3dValuator)
+	ADD_PARAMETER(m_mapName, "map");
+END_FECORE_CLASS();
+
+
 FEMappedValueMat3d::FEMappedValueMat3d(FEModel* fem) : FEMat3dValuator(fem)
 {
 	m_val = nullptr;
@@ -491,7 +494,7 @@ mat3d FEMappedValueMat3d::operator()(const FEMaterialPoint& pt)
 
 FEMat3dValuator* FEMappedValueMat3d::copy()
 {
-	FEMappedValueMat3d* map = new FEMappedValueMat3d(GetFEModel());
+	FEMappedValueMat3d* map = fecore_alloc(FEMappedValueMat3d, GetFEModel());
 	map->m_val = m_val;
 	return map;
 }

@@ -38,32 +38,24 @@ FEBodyForce::FEBodyForce(FEModel* pfem) : FEBodyLoad(pfem)
 
 //-----------------------------------------------------------------------------
 // NOTE: Work in progress! Working on integrating body loads as model loads
-void FEBodyForce::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEBodyForce::LoadVector(FEGlobalVector& R)
 {
 	for (int i = 0; i<Domains(); ++i)
 	{
 		FEDomain* dom = Domain(i);
-		FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
-		if ((mat == nullptr) || (mat->IsRigid() == false))
-		{
-			FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
-			if (edom) edom->BodyForce(R, *this);
-		}
+		FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
+		if (edom) edom->BodyForce(R, *this);
 	}
 }
 
 //-----------------------------------------------------------------------------
 // NOTE: Work in progress! Working on integrating body loads as model loads
-void FEBodyForce::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEBodyForce::StiffnessMatrix(FELinearSystem& LS)
 {
 	for (int i = 0; i<Domains(); ++i)
 	{
 		FEDomain* dom = Domain(i);
-		FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
-		if ((mat==nullptr) || (mat->IsRigid() == false))
-		{
-			FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
-			if (edom) edom->BodyForceStiffness(LS, *this);
-		}
+		FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(dom);
+		if (edom) edom->BodyForceStiffness(LS, *this);
 	}
 }

@@ -16,7 +16,7 @@ FEDomain* FEMultiScaleDomainFactory::CreateDomain(const FE_Element_Spec& spec, F
 
 	if (sztype)
 	{
-		FEDomain* pd = fecore_new<FEDomain>(sztype, pfem);
+		FESolidDomain* pd = fecore_new<FESolidDomain>(sztype, pfem);
 		if (pd) pd->SetMaterial(pmat);
 		return pd;
 	}

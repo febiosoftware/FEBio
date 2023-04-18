@@ -32,9 +32,15 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEArrudaBoyce, FEUncoupledMaterial)
-	ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu");
-	ADD_PARAMETER(m_N , FE_RANGE_GREATER(0.0), "N" );
+	ADD_PARAMETER(m_mu, FE_RANGE_GREATER(0.0), "mu")->setUnits(UNIT_PRESSURE)->setLongName("initial modulus");
+	ADD_PARAMETER(m_N , FE_RANGE_GREATER(0.0), "N" )->setLongName("links");
 END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FEArrudaBoyce::FEArrudaBoyce(FEModel* pfem) : FEUncoupledMaterial(pfem)
+{
+	m_N = 1;
+}
 
 //-----------------------------------------------------------------------------
 mat3ds FEArrudaBoyce::DevStress(FEMaterialPoint& mp)

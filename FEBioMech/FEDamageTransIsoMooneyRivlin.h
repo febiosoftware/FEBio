@@ -35,12 +35,12 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // We first define a material point that stores the damage variable.
-class FETIMRDamageMaterialPoint : public FEMaterialPoint
+class FETIMRDamageMaterialPoint : public FEMaterialPointData
 {
 public:
-	FETIMRDamageMaterialPoint(FEMaterialPoint *pt);
+	FETIMRDamageMaterialPoint(FEMaterialPointData*pt);
 
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
 	void Init();
 	void Update(const FETimeInfo& timeInfo);
@@ -86,7 +86,7 @@ public:
 
 public:
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() override { return new FETIMRDamageMaterialPoint(new FEElasticMaterialPoint); }
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 public:
 	//! calculate deviatoric stress at material point

@@ -30,34 +30,39 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! Material defining a single generation of a multi-generation material
-class FEGenerationMaterial : public FEElasticMaterial
+// TODO: This was introduced so that the FEGenerationMaterial fits in the current
+//       framework, which assumes that all features classes are derived from base-classes.
+class FEBIOMECH_API FEGenerationBase : public FEMaterialProperty
 {
 public:
-	FEGenerationMaterial(FEModel* pfem);
+	FEGenerationBase(FEModel* fem);
 
 	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt) override;
-		
+	mat3ds Stress(FEMaterialPoint& pt);
+
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt) override;
+	tens4ds Tangent(FEMaterialPoint& pt);
 
 	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
-    
-    // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override {
-        return m_pMat->CreateMaterialPointData();
-    }
-    
-    //! Get the elastic component
-    FEElasticMaterial* GetElasticMaterial() override { return m_pMat; }
-    
+	double StrainEnergyDensity(FEMaterialPoint& pt);
+
+	// returns a pointer to a new material point object
+	FEMaterialPointData* CreateMaterialPointData() override;
+
 public:
 	double	btime;	//!< generation birth time
 
-	FEElasticMaterial*	m_pMat;	//!< pointer to elastic material
+	FEElasticMaterial* m_pMat;	//!< pointer to elastic material
 
+	FECORE_BASE_CLASS(FEGenerationBase)
+};
+
+//-----------------------------------------------------------------------------
+//! Material defining a single generation of a multi-generation material
+class FEGenerationMaterial : public FEGenerationBase
+{
+public:
+	FEGenerationMaterial(FEModel* pfem);
 	DECLARE_FECORE_CLASS();
 };
 
@@ -72,16 +77,13 @@ class FEElasticMultigeneration;
 //! second, third, etc. generations.  These relate the reference configuration of 
 //! each generation relative to the first generation.
 
-class FEMultigenerationMaterialPoint : public FEMaterialPoint
+class FEMultigenerationMaterialPoint : public FEMaterialPointArray
 {
 public:
     FEMultigenerationMaterialPoint();
 		
-	FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
 
-	//! Add a child material point
-	void AddMaterialPoint(FEMaterialPoint* pt);
-		
 	//! data serialization
 	void Serialize(DumpStream& ar);
 
@@ -89,11 +91,8 @@ public:
 
 	void Update(const FETimeInfo& timeInfo);
 
-    FEMaterialPoint* GetPointData(int i) { return m_mp[i]; }
-    
 public:
 	// multigenerational material data
-    vector<FEMaterialPoint*>    m_mp;   //!< material point data for multigeneration components
 	double	m_tgen;		//!< last generation time
     int     m_ngen;     //!< number of active generations
 	FEElasticMultigeneration*	m_pmat;
@@ -108,16 +107,14 @@ public:
 	FEElasticMultigeneration(FEModel* pfem);
 		
 	// returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+    FEMaterialPointData* CreateMaterialPointData() override;
 
     // return number of materials
     int Materials() { return (int)m_MG.size(); }
     
     // return a generation material component
-    FEGenerationMaterial* GetMaterial(int i) { return m_MG[i]; }
+	FEGenerationBase* GetMaterial(int i) { return m_MG[i]; }
     
-	void AddMaterial(FEElasticMaterial* pmat);
-	
 public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt) override;
@@ -131,7 +128,11 @@ public:
 	int CheckGeneration(const double t);
 
 public:
-	std::vector<FEGenerationMaterial*>	m_MG;		//!< multigeneration data
+    double StrongBondSED(FEMaterialPoint& pt) override;
+    double WeakBondSED(FEMaterialPoint& pt) override;
+    
+public:
+	std::vector<FEGenerationBase*>	m_MG;		//!< multigeneration data
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

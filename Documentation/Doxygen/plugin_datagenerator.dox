@@ -1,0 +1,77 @@
+/**
+\page plugin_datagenerator Data Generator Plugins
+
+Several model components can make use of maps to make their parameters depend on the position (e.g. materials, boundary conditions, loads). The maps are defined over different mesh partitions (e.g. nodesets, surfaces, domains) and are used to assign different values to different nodes or elements of the mesh. The map's values can be defined explicitly (e.g. as a tabulated list in the input file), or alternatively can be generated programatically using data generators. 
+
+The advantage of using data generators to generate the map's value is twofold: 1) It can reduce the size of input files considerably since the values are generated programatically, and 2) allows dynamic changes to map as the model evolves in time.
+
+The following sections describe how to create data generators for specific mesh partitions. 
+
+\section node_gen Node data generators
+
+Node data generators generate data for node sets and thus can be used by model components that are typically defined on node sets, such as prescribed displacements and nodal loads. 
+
+Node data generators inherit from the FENodeDataGenerator base class.
+
+\code
+class MyDataGenerator : public FENodeDataGenerator
+{
+public:
+	MyDataGenerator(FEModel* fem) : FENodeDataGenerator(fem){}
+
+	// implement this function
+	FENodeDataMap* Generate();
+};
+\endcode
+
+The main function to implement is the \c Generate member. This member creates and returns the node data map.
+
+\code
+FENodeDataMap* MyDataGenerator::Generate()
+{
+	FENodeDataMap* map = new FENodeDataMap(FEDataType::FE_DOUBLE);
+	FENodeSet* nodeSet = GetNodeSet();
+	map->Create(nodeSet);
+	map->fillValue(0.0);
+	return map;
+}
+\endcode
+
+\section surf_gen Surface data generators
+
+Surface data generators generate data for surfaces and can be used by model components that are typically defined on surfaces, such as surface loads. 
+
+Surface data generators inherit from the FEFaceDataGenerator base class. 
+
+\section elem_gen Element data generators
+
+Element data generators generate data for domains and can be used by model components that are typically defined on domains, such as materials or body loads. 
+
+Element data generators inherit from the FEElemDataGenerator base class. 
+
+\code
+class MyElemDataGenerator : public FEElemDataGenerator
+{
+public:
+	MyElemDataGenerator(FEModel* fem) : FEElemDataGenerator(fem){}
+
+	FEDomainMap* Generate() override;
+}
+\endcode
+
+The \c Generate class member creates and returns the FEDomainMap. 
+
+\code
+FEDomainMap* MyElemDataGenerator::Generate()
+{
+	FEElementSet* elset = GetElementSet();
+	if (elset == nullptr) return nullptr;
+
+	FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_MATPOINTS);
+	map->Create(elset);
+	map->fillValue(0.0);
+	return map;	
+}
+\endcode
+
+*/

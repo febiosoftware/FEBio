@@ -123,8 +123,8 @@ void FESurfaceElement::facet_edge(int j, int* en) const
 	case 6:
 	case 7:
 		en[0] = m_lnode[j];
-		en[1] = m_lnode[(j + 1) % 3];
-		en[2] = m_lnode[j + 3];
+		en[1] = m_lnode[j + 3];
+		en[2] = m_lnode[(j + 1) % 3];
 		break;
 	case 4:
 		en[0] = m_lnode[j];
@@ -133,8 +133,8 @@ void FESurfaceElement::facet_edge(int j, int* en) const
 	case 8:
 	case 9:
 		en[0] = m_lnode[j];
-		en[1] = m_lnode[(j + 1) % 4];
-		en[2] = m_lnode[j + 4];
+		en[1] = m_lnode[j + 4];
+		en[2] = m_lnode[(j + 1) % 4];
 		break;
 	}
 }

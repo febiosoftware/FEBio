@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FECore/FENormalProjection.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEModel.h>
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -84,24 +85,18 @@ FESlidingSurfaceBiphasic::Data::Data()
 void FESlidingSurfaceBiphasic::Data::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactPoint::Serialize(ar);
-	ar & m_gap;
 	ar & m_dg;
-	ar & m_nu;
+    ar & m_Lmd;
+    ar & m_Lmt;
+    ar & m_epsn;
+    ar & m_epsp;
+    ar & m_p1;
+    ar & m_nu;
 	ar & m_s1;
+    ar & m_tr;
 	ar & m_rs;
 	ar & m_rsp;
-	ar & m_Lmd;
-	ar & m_Lmt;
-	ar & m_Lmp;
-	ar & m_epsn;
-	ar & m_epsp;
-	ar & m_pg;
-	ar & m_p1;
-	ar & m_Ln;
-	ar & m_bstick;
-	ar & m_tr;
-	ar & m_mueff;
-    ar & m_fls;
+    ar & m_bstick;
 }
 
 //-----------------------------------------------------------------------------
@@ -555,6 +550,10 @@ FESlidingInterfaceBiphasic::FESlidingInterfaceBiphasic(FEModel* pfem) : FEContac
 
     m_dofP = pfem->GetDOFIndex("p");
     
+    // set parents
+    m_ss.SetContactInterface(this);
+    m_ms.SetContactInterface(this);
+
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
 }
@@ -1219,6 +1218,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
     data.m_mueff = 0.0;
     data.m_fls = 0.0;
     data.m_s1 = vec3d(0,0,0);
+    double flsmax = 1./(1-m_phi);   // theoretical upper bound on fluid load support
     
     // get local FLS from element projection
     double fls = 0;
@@ -1253,6 +1253,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
             {
                 data.m_mueff = ts/pn;
                 data.m_fls = m_bsmfls ? fls : p/pn;
+                if (data.m_fls > flsmax) data.m_fls = flsmax;
             }
             
             // store the previous values as the current
@@ -1287,6 +1288,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                 
                 // calculate effective friction coefficient
                 data.m_fls = m_bsmfls ? fls : p/pn;
+                if (data.m_fls > flsmax) data.m_fls = flsmax;
                 data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                 data.m_mueff = MBRACKET(data.m_mueff);
                 
@@ -1329,6 +1331,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                 if (tn != 0)
                 {
                     data.m_fls = m_bsmfls ? fls : p/(-tn);
+                    if (data.m_fls > flsmax) data.m_fls = flsmax;
                     mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                     mueff = MBRACKET(mueff);
                 }
@@ -1346,6 +1349,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                     if (pn > 0) {
                         data.m_mueff = ts/pn;
                         data.m_fls = m_bsmfls ? fls : p/pn;
+                        if (data.m_fls > flsmax) data.m_fls = flsmax;
                     }
                     
                     // store the previous values as the current
@@ -1382,6 +1386,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                         // calculate effective friction coefficient
                         data.m_fls = p/pn;
                         data.m_fls = m_bsmfls ? fls : p/pn;
+                        if (data.m_fls > flsmax) data.m_fls = flsmax;
                         data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                         data.m_mueff = MBRACKET(data.m_mueff);
 
@@ -1415,6 +1420,7 @@ vec3d FESlidingInterfaceBiphasic::ContactTraction(FESlidingSurfaceBiphasic& ss, 
                     
                     // calculate effective friction coefficient
                     data.m_fls = m_bsmfls ? fls : p/pn;
+                    if (data.m_fls > flsmax) data.m_fls = flsmax;
                     data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                     data.m_mueff = MBRACKET(data.m_mueff);
 

@@ -43,7 +43,7 @@ public:
 	~FEElasticMaterial();
 
 	//! create material point data for this material
-	FEMaterialPoint* CreateMaterialPointData() override { return new FEElasticMaterialPoint; }
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	//! calculate strain energy density at material point
 	virtual double StrainEnergyDensity(FEMaterialPoint& pt);
@@ -53,14 +53,15 @@ public:
 
 public:
 	//! evaluates approximation to Cauchy stress using forward difference
-	mat3ds SecantStress(FEMaterialPoint& pt);
+	mat3ds SecantStress(FEMaterialPoint& pt) override;
 
-	mat3ds SolidStress(FEMaterialPoint& pt) override;
+public:
+    virtual double StrongBondSED(FEMaterialPoint& pt) { return StrainEnergyDensity(pt); }
+    virtual double WeakBondSED(FEMaterialPoint& pt) { return 0; }
 
 protected:
-	bool	m_secant_stress;	//!< use secant approximation to stress
-
-	DECLARE_FECORE_CLASS();
+//	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEElasticMaterial);
 };
 
 //-----------------------------------------------------------------------------

@@ -25,9 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMMGRemesh.h"
-#include <FECore/FEModel.h>
 #include <FECore/FEMeshTopo.h>
-#include <FECore/FEMesh.h>
+#include <FECore/FEModel.h>
 #include <FECore/FEDomain.h>
 #include <FECore/FESolidDomain.h>
 #include <FECore/FESurface.h>
@@ -59,7 +58,6 @@ public:
 #endif
 
 BEGIN_FECORE_CLASS(FEMMGRemesh, FERefineMesh)
-	ADD_PARAMETER(m_maxiter, "max_iters");
 	ADD_PARAMETER(m_hmin, "min_element_size");
 	ADD_PARAMETER(m_hausd, "hausdorff");
 	ADD_PARAMETER(m_hgrad, "gradation");
@@ -72,7 +70,6 @@ END_FECORE_CLASS();
 
 FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 {
-	m_maxiter = 1;
 	m_maxelem = 0;
 	m_relativeSize = true;
 	m_meshCoarsen = false;
@@ -96,8 +93,7 @@ FEMMGRemesh::FEMMGRemesh(FEModel* fem) : FERefineMesh(fem)
 
 bool FEMMGRemesh::Init()
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 	if (mesh.IsType(ET_TET4) == false) return false;
 
 	return FERefineMesh::Init();
@@ -106,8 +102,7 @@ bool FEMMGRemesh::Init()
 bool FEMMGRemesh::RefineMesh()
 {
 #ifdef HAS_MMG
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
+	FEMesh& mesh = GetMesh();
 
 	// initialize the MMG mesh
 	MMG5_pMesh mmgMesh = NULL;
@@ -138,7 +133,7 @@ bool FEMMGRemesh::RefineMesh()
 	}
 
 	// build the new mesh
-	bool bret = mmg->build_new_mesh(mmgMesh, mmgSol, fem);
+	bool bret = mmg->build_new_mesh(mmgMesh, mmgSol, *GetFEModel());
 
 	// Clean up
 	MMG3D_Free_all(MMG5_ARG_start,

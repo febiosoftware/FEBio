@@ -37,9 +37,9 @@ SOFTWARE.*/
 #include <FECore/SparseMatrix.h>
 #include <FECore/log.h>
 #include <FECore/FEMaterial.h>
-#include <FECore/Archive.h>
 #include "FEMechModel.h"
 #include <FECore/FELinearSystem.h>
+#include "FESolidAnalysis.h"
 
 FERigidSolver::FERigidSolver(FEModel* fem)
 {
@@ -152,7 +152,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 	// calculate local rigid displacements
 	for (int i = 0; i<fem.RigidPrescribedBCs(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
 		if (DC.IsActive()) DC.InitTimeStep();
 	}
 
@@ -168,6 +168,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 				// if all rotation dofs are fixed or prescribed, set the flag
 				if (m_bAllowMixedBCs==false)
 				{
+					RB.m_bpofr = false;
 					if (RB.m_pDC[3] || RB.m_pDC[4] || RB.m_pDC[5])
 					{
 						bool bpofr[3] = { false };
@@ -183,7 +184,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 						bool br[3] = { false, false, false };
 						for (int j = 3; j < 6; ++j)
 						{
-							FERigidBodyDisplacement* dc = RB.m_pDC[j];
+							FERigidPrescribedBC* dc = RB.m_pDC[j];
 							if (dc && dc->GetRelativeFlag()) br[j - 3] = true;
 						}
 
@@ -270,7 +271,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 	}
 
 	FEAnalysis* pstep = m_fem->GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		FEMesh& mesh = m_fem->GetMesh();
 
@@ -1151,7 +1152,7 @@ void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui,
 	const int NRD = fem.RigidPrescribedBCs();
 	for (int i = 0; i<NRD; ++i)
 	{
-		FERigidBodyDisplacement& dc = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
 		if (dc.IsActive())
 		{
 			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
@@ -1298,10 +1299,9 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 		// first do the displacements
 		if (RB.m_prb == 0)
 		{
-			FERigidBodyDisplacement* pdc;
 			for (int j = 0; j<3; ++j)
 			{
-				pdc = RB.m_pDC[j];
+				FERigidPrescribedBC* pdc = RB.m_pDC[j];
 				if (pdc)
 				{
 					// TODO: do I need to take the line search step into account here?
@@ -1395,48 +1395,6 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
             }
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-//! evaluate body forces
-void FERigidSolverNew::BodyForces(FEGlobalVector& R, const FETimeInfo& timeInfo, FEBodyForce& pbf)
-{
-	if (m_fem == nullptr) return;
-	FEMechModel& fem = *m_fem;
-
-	int nrb = fem.RigidBodies();
-    
-    // calculate body forces on rigid bodies
-    for (int i = 0; i<nrb; ++i)
-    {
-        FERigidBody& RB = *fem.GetRigidBody(i);
-        
-        // 3 translation dofs of rigid body needed for body force
-        vector<double> fe(3);
-        vector<int>	LM(3);
-        
-        // create a material point to evaluate the body force
-        FEElasticMaterialPoint mp;
-        mp.m_r0 = RB.m_r0;
-        mp.m_rt = RB.m_rt;
-		mp.m_F = RB.GetRotation().RotationMatrix();
-        
-        // body force = mass*body force per mass (recall that body forces are negated in FEBio)
-        vec3d F = pbf.force(mp)*(-RB.m_mass);
-        
-        fe[0] = F.x;
-        fe[1] = F.y;
-        fe[2] = F.z;
-        
-        // pack the equation numbers
-        LM[0] = RB.m_LM[0];
-        LM[1] = RB.m_LM[1];
-        LM[2] = RB.m_LM[2];
-        R.Assemble(LM, fe);
-        
-        // add to rigid body force
-        RB.m_Fr += F;
-    }
 }
 
 //-----------------------------------------------------------------------------

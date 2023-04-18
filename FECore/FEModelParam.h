@@ -66,11 +66,13 @@ class FECORE_API FEParamDouble : public FEModelParam
 {
 public:
 	FEParamDouble();
+	~FEParamDouble();
 
 	FEParamDouble(const FEParamDouble& p);
 
 	// set the value
 	void operator = (double v);
+	void operator = (const FEParamDouble& p);
 
 	// set the valuator
 	void setValuator(FEScalarValuator* val);
@@ -103,14 +105,19 @@ class FECORE_API FEParamVec3 : public FEModelParam
 {
 public:
 	FEParamVec3();
+	~FEParamVec3();
 
 	FEParamVec3(const FEParamVec3& p);
 
+	bool Init();
+
 	// set the value
 	void operator = (const vec3d& v);
+	void operator = (const FEParamVec3& p);
 
 	// set the valuator
 	void setValuator(FEVec3dValuator* val);
+	FEVec3dValuator* valuator();
 
 	// evaluate the parameter at a material point
 	vec3d operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }
@@ -137,11 +144,15 @@ class FECORE_API FEParamMat3d : public FEModelParam
 {
 public:
 	FEParamMat3d();
+	~FEParamMat3d();
 
 	FEParamMat3d(const FEParamMat3d& p);
 
 	// set the value
 	void operator = (const mat3d& v);
+	void operator = (const FEParamMat3d& v);
+
+	bool Init();
 
 	// set the valuator
 	void setValuator(FEMat3dValuator* val);
@@ -170,14 +181,19 @@ class FECORE_API FEParamMat3ds : public FEModelParam
 {
 public:
 	FEParamMat3ds();
+	~FEParamMat3ds();
 
 	FEParamMat3ds(const FEParamMat3ds& p);
 
 	// set the value
 	void operator = (const mat3ds& v);
+	void operator = (const FEParamMat3ds& v);
 
 	// set the valuator
 	void setValuator(FEMat3dsValuator* val);
+
+	// get the valuator
+	FEMat3dsValuator* valuator();
 
 	// evaluate the parameter at a material point
 	mat3ds operator () (const FEMaterialPoint& pt) { return (*m_val)(pt)*m_scl; }

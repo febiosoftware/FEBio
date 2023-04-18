@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <stdio.h>
-#include "XMLReader.h"
+#include <XML/XMLReader.h>
 #include <FECore/vec3d.h>
 #include <FECore/mat3d.h>
 #include <FECore/tens3d.h>
@@ -36,7 +36,6 @@ SOFTWARE.*/
 #include "FEModelBuilder.h"
 #include "febioxml_api.h"
 #include <map>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -68,6 +67,58 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+// Class for handling unrecognized tags. 
+// Use FEFileSection::SetInvalidTagHandler to set the handler for unrecognized parameters. 
+class FEInvalidTagHandler
+{
+public:
+	FEInvalidTagHandler() {}
+	virtual ~FEInvalidTagHandler() {}
+
+	virtual bool ProcessTag(XMLTag& tag) { return false; }
+};
+
+//-----------------------------------------------------------------------------
+// The FEObsoleteParamHandler class tries to map an unrecognized tag to 
+// a model parameter. Obsolete parameters are added with the AddParam function. 
+class FEObsoleteParamHandler : public FEInvalidTagHandler
+{
+	struct FEObsoleteParam
+	{
+		const char* oldName = nullptr;
+		const char* newName = nullptr;
+		int paramType = FE_PARAM_INVALID;
+		bool readIn = false;
+		union {
+			bool		bVal;
+			int			iVal;
+			double		gVal;
+		};
+	};
+
+public:
+	FEObsoleteParamHandler(XMLTag& tag, FECoreBase* pc);
+
+	// Add an obsolete parameter.
+	// The oldname is a relative path w.r.t. the XMLTag passed in the constructor.
+	// the newName is a ParamString, relative to the pc parameter. 
+	// To mark a parameter as ignored, set newName to nullptr, and paramType to FE_PARAM_INVALID.
+	void AddParam(const char* oldName, const char* newName, FEParamType paramType);
+
+	// This will try to find an entry in the m_param list. If a match is not find, this function returns false.
+	bool ProcessTag(XMLTag& tag) override;
+
+	// This function will try to map the obsolete parameters to model parameters. 
+	// Or it will print a warning if the obsolete parameter will be ignored. 
+	virtual void MapParameters();
+
+private:
+	std::string	m_root;
+	FECoreBase* m_pc;
+	vector<FEObsoleteParam>	m_param;
+};
+
+//-----------------------------------------------------------------------------
 // Base class for XML sections parsers
 class FEBIOXML_API FEFileSection
 {
@@ -82,6 +133,9 @@ public:
 	FEModel* GetFEModel();
 
 	FEModelBuilder* GetBuilder();
+
+	// Set the handler for unrecognized tags
+	void SetInvalidTagHandler(FEInvalidTagHandler* ith);
 
 public:
 	//! read a nodal ID
@@ -115,11 +169,12 @@ protected:
 
 private:
 	FEFileImport*	m_pim;
+	FEInvalidTagHandler* m_ith = nullptr;
 };
 
 //-----------------------------------------------------------------------------
 // class that manages file section parsers
-class FEBIOXML_API FEFileSectionMap : public map<string, FEFileSection*>
+class FEBIOXML_API FEFileSectionMap : public std::map<string, FEFileSection*>
 {
 public:
 	~FEFileSectionMap();

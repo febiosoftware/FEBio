@@ -38,35 +38,38 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! FSI material point class.
 //
-class FEBIOFLUID_API FEFluidSolutesMaterialPoint : public FEMaterialPoint
+class FEBIOFLUID_API FEFluidSolutesMaterialPoint : public FEMaterialPointData
 {
 public:
     //! constructor
-    FEFluidSolutesMaterialPoint(FEMaterialPoint* pt);
+    FEFluidSolutesMaterialPoint(FEMaterialPointData* pt);
     
     //! create a shallow copy
-    FEMaterialPoint* Copy();
+	FEMaterialPointData* Copy();
     
     //! data serialization
     void Serialize(DumpStream& ar);
     
     //! Data initialization
     void Init();
+
+public:
+    double Osmolarity() const;
     
 public:
     // solutes material data
     int                 m_nsol;     //!< number of solutes
     vector<double>      m_c;        //!< effective solute concentration
-    vector<double>      m_ca;        //!< effective solute concentration
+    vector<double>      m_ca;       //!< actual solute concentration
     vector<vec3d>       m_gradc;    //!< spatial gradient of solute concentration
     vector<vec3d>       m_j;        //!< solute molar flux
     vector<double>      m_cdot;     //!< material time derivative of solute concentration following fluid
     double            m_psi;        //!< electric potential
-    vec3d            m_Ie;        //!< current density
-    double           m_pe;           //!< effective fluid pressure
-    vector<double>    m_k;        //!< solute partition coefficient
-    vector<double>    m_dkdJ;        //!< 1st deriv of m_k with strain (J)
-    vector<double>    m_dkdJJ;    //!< 2nd deriv of m_k with strain (J)
+    vec3d            m_Ie;          //!< current density
+    double           m_pe;          //!< effective fluid pressure
+    vector<double>    m_k;          //!< solute partition coefficient
+    vector<double>    m_dkdJ;       //!< 1st deriv of m_k with strain (J)
+    vector<double>    m_dkdJJ;      //!< 2nd deriv of m_k with strain (J)
     vector< vector<double> >    m_dkdc;            //!< 1st deriv of m_k with effective concentration
     vector< vector<double> >    m_dkdJc;        //!< cross deriv of m_k with J and c
     vector< vector< vector<double> > > m_dkdcc;    // 2nd deriv of m_k with c
@@ -75,13 +78,13 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for FluidFSI materials.
 
-class FEBIOFLUID_API FEFluidSolutes : public FEMaterial, public FESoluteInterface
+class FEBIOFLUID_API FEFluidSolutes : public FEMaterial, public FESoluteInterface_T<FEFluidSolutesMaterialPoint>
 {
 public:
     FEFluidSolutes(FEModel* pfem);
     
     // returns a pointer to a new material point object
-    FEMaterialPoint* CreateMaterialPointData() override;
+	FEMaterialPointData* CreateMaterialPointData() override;
     
     //! performs initialization
     bool Init() override;
@@ -93,27 +96,27 @@ public:
     FEFluid* Fluid() { return m_pFluid; }
     
     //! calculate solute molar flux
-    vec3d SoluteFlux(FEMaterialPoint& pt, const int sol);
+    vec3d SoluteFlux(const FEMaterialPoint& pt, const int sol);
     
     //! actual concentration (as opposed to effective concentration)
-    double ConcentrationActual(FEMaterialPoint& pt, const int sol);
+    double ConcentrationActual(const FEMaterialPoint& pt, const int sol);
     
     //! actual fluid pressure (as opposed to effective pressure)
-    double PressureActual(FEMaterialPoint& pt);
+    double PressureActual(const FEMaterialPoint& pt);
     
     //! partition coefficient
-    double PartitionCoefficient(FEMaterialPoint& pt, const int sol);
+    double PartitionCoefficient(const FEMaterialPoint& pt, const int sol);
     
     //! partition coefficients and their derivatives
-    void PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
+    void PartitionCoefficientFunctions(const FEMaterialPoint& mp, vector<double>& kappa,
                                        vector<double>& dkdJ,
                                        vector< vector<double> >& dkdc);
     
     //! electric potential
-    double ElectricPotential(FEMaterialPoint& pt, const bool eform=false);
+    double ElectricPotential(const FEMaterialPoint& pt, const bool eform=false);
     
     //! current density
-    vec3d CurrentDensity(FEMaterialPoint& pt);
+    vec3d CurrentDensity(const FEMaterialPoint& pt);
     
     //! solute density
     double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }
@@ -129,9 +132,22 @@ public:
     
     // solute interface
 public:
+
+    typedef FEFluidSolutesMaterialPoint SoluteMaterialPoint_t;
+
     int Solutes() override { return (int)m_pSolute.size(); }
     FESolute* GetSolute(int i) override { return m_pSolute[i]; }
-    FEOsmoticCoefficient*        GetOsmoticCoefficient() { return m_pOsmC;  }
+    FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC;  }
+    double GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override;
+    double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override { return ConcentrationActual(mp, soluteIndex); }
+    double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override;
+    vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override { return SoluteFlux(mp, soluteIndex); }
+    double GetOsmolarity(const FEMaterialPoint& mp) override;
+    double GetElectricPotential(const FEMaterialPoint& mp) override { return ElectricPotential(mp); }
+    vec3d GetCurrentDensity(const FEMaterialPoint& mp) override { return CurrentDensity(mp); }
+    double dkdc(const FEMaterialPoint& mp, int i, int j) override;
+
+public:
     FEChemicalReaction*            GetReaction            (int i) { return m_pReact[i];  }
     
     int Reactions         () { return (int) m_pReact.size();    }

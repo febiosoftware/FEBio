@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "FEDofList.h"
 #include "FESurfaceElement.h"
+#include "FENode.h"
 
 //-----------------------------------------------------------------------------
 class FEMesh;
@@ -49,6 +50,12 @@ public:
 
 	// return the surface element
 	FESurfaceElement* SurfaceElement() { return (FESurfaceElement*)m_elem; }
+
+	void Serialize(DumpStream& ar) override
+	{
+		FEMaterialPoint::Serialize(ar);
+		ar & dxr & dxs;
+	}
 };
 
 // helper class for describing shape functions at dofs in integration routines
@@ -78,6 +85,9 @@ typedef std::function<void(FESurfaceMaterialPoint& mp, const FESurfaceDofShape& 
 
 class FECORE_API FESurface : public FEMeshPartition
 {
+	FECORE_SUPER_CLASS(FESURFACE_ID)
+	FECORE_BASE_CLASS(FESurface)
+
 public:
 	//! default constructor
 	FESurface(FEModel* fem);
@@ -160,6 +170,9 @@ public:
 	//! Get the spatial position given natural coordinates
 	vec3d Position(FESurfaceElement& el, double r, double s);
 
+    //! Get the spatial position of an integration point
+    vec3d Position(FESurfaceElement& el, int n);
+    
 	//! Get the nodal coordinates of an element
 	void NodalCoordinates(FESurfaceElement& el, vec3d* re);
     
@@ -168,8 +181,11 @@ public:
     
 
 public:
-	//! calculate the surface area of a surface element
+	//! calculate the reference surface area of a surface element
 	double FaceArea(FESurfaceElement& el);
+
+	//! calculate the current surface area of a surface element
+	double CurrentFaceArea(FESurfaceElement& el);
 
 	//! return the max element size
 	double MaxElementSize();

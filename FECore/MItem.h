@@ -58,7 +58,7 @@ enum Item_Type {
 class MVariable
 {
 public:
-	MVariable(const std::string& s) : m_v(0), m_name(s), m_index(-1) {}
+	MVariable(const std::string& s, double initVal = 0.0) : m_v(initVal), m_name(s), m_index(-1) {}
 	MVariable(const MVariable& v) : m_v(0), m_name(v.m_name), m_index(-1) {}
 	void operator = (const MVariable& v) { m_name = v.m_name; m_index = v.m_index; }
 	double value() const { return m_v; }
@@ -592,6 +592,8 @@ bool is_rconst(const MItem* pi); // is recursive constant
 bool is_dependent(const MItem* pi, const MVariable& x); // is i dependent on x
 bool is_dependent(const MItem* pi, const MItem* px); // is i dependent on x
 bool is_scalar(const MItem* pi);	// is the expression scalar
+
+inline bool is_rconst(const MITEM& i) { return is_rconst(i.ItemPtr()); }
 
 bool is_pi(const MItem* pi); // is pi the constant pi?
 inline bool is_pi(const MITEM& i) { return is_pi(i.ItemPtr()); }

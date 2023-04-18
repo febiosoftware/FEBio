@@ -73,6 +73,9 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 	// get the measurement vector
 	vector<double> y0(ndata);
 	GetMeasurements(y0);
+    
+    // evaluate regression coefficient R^2
+	double rsq = RegressionCoefficient(y0, y);
 
 	double chisq = 0.0;
 	if (m_verbose) feLog("               CURRENT        REQUIRED      DIFFERENCE\n");
@@ -83,14 +86,33 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 		if (m_verbose) feLog("%5d: %15.10lg %15.10lg %15lg\n", i + 1, y[i], y0[i], fabs(y[i] - y0[i]));
 	}
 	feLog("objective value: %lg\n", chisq);
+    feLog("regression coef: %lg\n", rsq);
 
 	return chisq;
+}
+
+double FEObjectiveFunction::RegressionCoefficient(const std::vector<double>& y0, const std::vector<double>& y)
+{
+	int ndata = (int)y0.size();
+	double xb = 0, yb = 0, xyb = 0, x2b = 0, y2b = 0;
+	for (int i = 0; i < ndata; ++i)
+	{
+		xb += y0[i]; yb += y[i];
+		xyb += y0[i] * y[i];
+		x2b += pow(y0[i], 2); y2b += pow(y[i], 2);
+	}
+	xb /= ndata; yb /= ndata;
+	xyb /= ndata;
+	x2b /= ndata; y2b /= ndata;
+
+	double rsq = pow(xyb - xb * yb, 2) / (x2b - xb * xb) / (y2b - yb * yb);
+	return rsq;
 }
 
 //=============================================================================
 
 //----------------------------------------------------------------------------
-FEDataFitObjective::FEDataFitObjective(FEModel* fem) : FEObjectiveFunction(fem), m_lc(fem)
+FEDataFitObjective::FEDataFitObjective(FEModel* fem) : FEObjectiveFunction(fem)
 {
 	m_src = 0;
 }
@@ -159,7 +181,7 @@ void FEDataFitObjective::GetMeasurements(vector<double>& y0)
 {
 	int ndata = m_lc.Points();
 	y0.resize(ndata);
-	for (int i = 0; i<ndata; ++i) y0[i] = m_lc.LoadPoint(i).value;
+	for (int i = 0; i<ndata; ++i) y0[i] = m_lc.Point(i).y();
 }
 
 //----------------------------------------------------------------------------
@@ -168,7 +190,7 @@ void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 	int ndata = m_lc.Points();
 	for (int i = 0; i<ndata; ++i)
 	{
-		double xi = m_lc.LoadPoint(i).time;
+		double xi = m_lc.Point(i).x();
 		f[i] = m_src->Evaluate(xi);
 	}
 }
@@ -344,7 +366,7 @@ bool FENodeDataTable::AddValue(int nodeID, vector<double>& v)
 	return true;
 }
 
-void FENodeDataTable::AddVariable(FENodeLogData* var)
+void FENodeDataTable::AddVariable(FELogNodeData* var)
 {
 	m_var.push_back(var);
 }
@@ -390,7 +412,7 @@ void FENodeDataTable::EvaluateFunctions(vector<double>& f)
 		int v = m_Data[i].ivar;
 
 		// calculate node value
-		double val = m_var[v]->value(n);
+		double val = m_var[v]->value(mesh.Node(n));
 
 		// store result
 		f[i] = val;

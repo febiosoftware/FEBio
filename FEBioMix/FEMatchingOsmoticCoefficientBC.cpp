@@ -29,9 +29,10 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEMatchingOsmoticCoefficientBC.h"
 #include "FEBioMix.h"
+#include <FECore/FEModel.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEMatchingOsmoticCoefficientBC, FEPrescribedSurface)
     ADD_PARAMETER(m_ambp , "ambient_pressure");
     ADD_PARAMETER(m_ambc , "ambient_osmolarity");
     ADD_PARAMETER(m_bshellb , "shell_bottom");
@@ -39,7 +40,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEMatchingOsmoticCoefficientBC::FEMatchingOsmoticCoefficientBC(FEModel* pfem) : FESurfaceLoad(pfem)
+FEMatchingOsmoticCoefficientBC::FEMatchingOsmoticCoefficientBC(FEModel* pfem) : FEPrescribedSurface(pfem)
 {
     m_ambp = m_ambc = 0.0;
     m_bshellb = false;
@@ -49,19 +50,10 @@ FEMatchingOsmoticCoefficientBC::FEMatchingOsmoticCoefficientBC(FEModel* pfem) : 
 }
 
 //-----------------------------------------------------------------------------
-//! initialize
-bool FEMatchingOsmoticCoefficientBC::Init()
-{
-    if (FESurfaceLoad::Init() == false) return false;
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
 //! Activate the degrees of freedom for this BC
 void FEMatchingOsmoticCoefficientBC::Activate()
 {
-    FESurface* ps = &GetSurface();
+    FESurface* ps = GetSurface();
     
     FEModel* fem = GetFEModel();
 
@@ -82,13 +74,17 @@ void FEMatchingOsmoticCoefficientBC::Activate()
             }
         }
     }
+
+    // NOTE: Hmmm, not sure about this one. Maybe skip immediate base class?
+//    FEPrescribedSurface::Activate();
+    FESurfaceBC::Activate();
 }
 
 //-----------------------------------------------------------------------------
 //! Evaluate and prescribe the ambient effective fluid pressure, using the multiphasic osmotic coefficient
 void FEMatchingOsmoticCoefficientBC::Update()
 {
-    FESurface* ps = &GetSurface();
+    FESurface* ps = GetSurface();
     
     FEModel* fem = GetFEModel();
     
@@ -135,13 +131,30 @@ void FEMatchingOsmoticCoefficientBC::Update()
             else node.set(m_dofQ, pe);
         }
     }
-    
-    fem->SetMeshUpdateFlag(true);
+}
+
+//-----------------------------------------------------------------------------
+void FEMatchingOsmoticCoefficientBC::GetNodalValues(int nodelid, std::vector<double>& val)
+{
+    // TODO: implement this
+    assert(false);
+}
+
+//-----------------------------------------------------------------------------
+void FEMatchingOsmoticCoefficientBC::CopyFrom(FEBoundaryCondition* pbc)
+{
+    // TODO: implement this
+    assert(false);
 }
 
 //-----------------------------------------------------------------------------
 //! serialization
 void FEMatchingOsmoticCoefficientBC::Serialize(DumpStream& ar)
 {
-    FESurfaceLoad::Serialize(ar);
+    FEPrescribedSurface::Serialize(ar);
+    if (ar.IsShallow() == false)
+    {
+        ar& m_dofP;
+        ar& m_dofQ;
+    }
 }

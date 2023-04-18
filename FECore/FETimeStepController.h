@@ -35,7 +35,8 @@ class DumpStream;
 // Class to control the time step
 class FECORE_API FETimeStepController : public FECoreBase
 {
-	FECORE_SUPER_CLASS
+	FECORE_SUPER_CLASS(FETIMECONTROLLER_ID)
+	FECORE_BASE_CLASS(FETimeStepController)
 
 public:
 	FETimeStepController(FEModel* fem);
@@ -80,6 +81,8 @@ public:
 	double	m_cutback;		//!< cut back factor used in aggressive time stepping
 
 	std::vector<double>	m_must_points;	//!< the list of must-points
+	bool				m_mp_repeat;	//!< repeat must-points
+	double				m_mp_toff;		//!< offset for repeat must-points
 
 private:
 	double	m_ddt;			//!< used by auto-time stepper

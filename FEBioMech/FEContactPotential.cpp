@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEBox.h>
+#include <stdexcept>
 
 vec3d MaterialPointPosition(FESurfaceElement& el, int n)
 {
@@ -93,20 +94,47 @@ void FEContactPotentialSurface::GetContactTraction(int nelem, vec3d& tc)
 	tc /= (double)el.GaussPoints();
 }
 
+double FEContactPotentialSurface::GetContactArea()
+{
+	double area = 0.0;
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		double* gw = el.GaussWeights();
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+			if (mp.m_tc.norm2() != 0.0)
+			{
+				vec3d dA = mp.dxr ^ mp.dxs;
+				double da = dA.norm();
+				area += da * gw[n];
+			}
+		}
+	}
+	return area;
+}
+
+
 BEGIN_FECORE_CLASS(FEContactPotential, FEContactInterface)
 	ADD_PARAMETER(m_kc, "kc");
 	ADD_PARAMETER(m_p, "p");
 	ADD_PARAMETER(m_Rin, "R_in");
 	ADD_PARAMETER(m_Rout, "R_out");
+	ADD_PARAMETER(m_Rmin, "R0_min");
 	ADD_PARAMETER(m_wtol, "w_tol");
 END_FECORE_CLASS();
 
-FEContactPotential::FEContactPotential(FEModel* fem) : m_surf1(fem), m_surf2(fem)
+FEContactPotential::FEContactPotential(FEModel* fem) : FEContactInterface(fem), m_surf1(fem), m_surf2(fem)
 {
+	m_surf1.SetContactInterface(this);
+	m_surf2.SetContactInterface(this);
+
 	m_kc = 0.0;
 	m_p = 4;
 	m_Rin = 1.0;
 	m_Rout = 2.0;
+	m_Rmin = 0.0;
 	m_wtol = 0.0;
 }
 
@@ -211,6 +239,8 @@ public:
 			m_elemList.insert(el);
 		}
 
+		bool empty() const { return m_elemList.empty(); }
+
 	public:
 		BOX m_box;
 		set<FESurfaceElement*>	m_elemList;
@@ -224,6 +254,9 @@ public:
 		int ix = (int)(m_nx * (r.x - box.r0.x) / box.width());
 		int iy = (int)(m_ny * (r.y - box.r0.y) / box.height());
 		int iz = (int)(m_nz * (r.z - box.r0.z) / box.depth());
+		if (ix == m_nx) ix--;
+		if (iy == m_ny) iy--;
+		if (iz == m_nz) iz--;
 
 		int icell = iz * (m_nx * m_ny) + iy * m_nx + ix;
 		Cell* c = m_cell + icell;
@@ -240,13 +273,15 @@ public:
 		for (int i = 0; i < 27; ++i)
 		{
 			Cell* ci = c->m_nbr[i];
-			if (ci != nullptr) cellList[n++] = ci;
+			if ((ci != nullptr) && (ci->empty() == false)) cellList[n++] = ci;
 		}
 		return n;
 	}
 
 public:
-	Grid(FESurface& s, int boxDivs, double minBoxSize)
+	Grid() { m_nx = m_ny = m_nz = 0; m_cell = nullptr; }
+
+	bool Build(FESurface& s, int boxDivs, double minBoxSize)
 	{
 		// update the bounding box
 		for (int i = 0; i < s.Nodes(); ++i)
@@ -331,9 +366,12 @@ public:
 			{
 				FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
 				Cell* c = FindCell(mp.m_rt); assert(c);
+				if (c == nullptr) return false;
 				c->add(&el);
 			}
 		}
+
+		return true;
 	}
 
 	Cell* GetCell(int i, int j, int k) const
@@ -356,7 +394,12 @@ protected:
 bool FEContactPotential::Init()
 {
 	if (FEContactInterface::Init() == false) return false;
+	BuildNeighborTable();
+	return true;
+}
 
+void FEContactPotential::BuildNeighborTable()
+{
 	m_elemNeighbors.resize(m_surf1.Elements());
 	for (int i = 0; i < m_surf1.Elements(); ++i)
 	{
@@ -374,8 +417,6 @@ bool FEContactPotential::Init()
 			}
 		}
 	}
-
-	return true;
 }
 
 // update
@@ -397,7 +438,11 @@ void FEContactPotential::Update()
 	// build the grid
 	int ndivs = (int)pow(m_surf2.Elements(), 0.33333);
 	if (ndivs < 2) ndivs = 2;
-	Grid g(m_surf2, ndivs, m_Rout);
+	Grid g;
+	if (g.Build(m_surf2, ndivs, m_Rout) == false)
+	{
+		throw std::runtime_error("Failed to build grid in FEContactPotential::Update");
+	}
 
 	// build the list of active elements
 	m_activeElements.resize(m_surf1.Elements());
@@ -409,13 +454,16 @@ void FEContactPotential::Update()
 		set<FESurfaceElement*>& activeElems = m_activeElements[i];
 		activeElems.clear();
 
-		set<FESurfaceElement*> nbrList = m_elemNeighbors[i];
+		// list of elements to exclude. This will be neighbors and elements
+		// already processed
+		set<FESurfaceElement*> excludeList = m_elemNeighbors[i];
 
 		for (int n = 0; n < el1.GaussPoints(); ++n)
 		{
 			FECPContactPoint& mp1 = static_cast<FECPContactPoint&>(*el1.GetMaterialPoint(n));
 			mp1.m_gap = 0.0;
 			vec3d r1 = mp1.m_rt;
+			vec3d R1 = mp1.m_r0;
 			vec3d n1 = mp1.dxr ^ mp1.dxs; n1.unit();
 
 			// find the grid cell this point is in and loop over the cell's neighborhood
@@ -428,26 +476,35 @@ void FEContactPotential::Update()
 				{
 					// make sure we did not process this element yet
 					// and the element is not a neighbor (which can be the case for self-contact)
-					if ((activeElems.find(el2) == activeElems.end()) &&
-						(nbrList.find(el2) == nbrList.end()))
+					if (excludeList.find(el2) == excludeList.end())
 					{
 						// Next, we see if any integration point of el2 is close to the current 
 						// integration point of el1. 
+						vec3d r12;
 						for (int m = 0; m < el2->GaussPoints(); ++m)
 						{
-							FECPContactPoint& mp2 = static_cast<FECPContactPoint&>(*el2->GetMaterialPoint(m));
+							FEMaterialPoint* mp2 = el2->GetMaterialPoint(m);
+							vec3d r2 = mp2->m_rt;
+							vec3d R2 = mp2->m_r0;
 
-							vec3d r12 = r1 - mp2.m_rt;
+							r12.x = r1.x - r2.x;
+							r12.y = r1.y - r2.y;
+							r12.z = r1.z - r2.z;
+//							vec3d r12 = r1 - mp2.m_rt;
 							if ((r12.x < m_Rout) && (r12.x > -m_Rout) &&
 								(r12.y < m_Rout) && (r12.y > -m_Rout) &&
 								(r12.z < m_Rout) && (r12.z > -m_Rout) &&
 								(r12.norm2() < m_Rout * m_Rout))
 							{
+								double L12 = (R2 - R1).norm2();
 								double l12 = r12.unit();
-								if (fabs(r12 * n1) > m_wtol)
+								if ((fabs(r12 * n1) >= m_wtol) && (L12 >= m_Rmin))
 								{
 									// we found one, so insert it to the list of active elements
 									activeElems.insert(el2);
+
+									// also insert it to the exclude list
+									excludeList.insert(el2);
 
 //									fprintf(stderr, "r12: %lg, %lg, %lg\n", r12.x, r12.y, r12.z);
 //									fprintf(stderr, "n1 : %lg, %lg, %lg\n", n1.x, n1.y, n1.z);
@@ -537,22 +594,30 @@ void FEContactPotential::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	const int ndof = 3;
 
 	// clear all contact tractions
-	for (int i = 0; i < m_surf1.Elements(); ++i)
+#pragma omp parallel
 	{
-		FESurfaceElement& el = m_surf1.Element(i);
-		for (int n = 0; n < el.GaussPoints(); ++n)
+		#pragma omp for
+		for (int i = 0; i < m_surf1.Elements(); ++i)
 		{
-			FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
-			cp.m_tc = vec3d(0, 0, 0);
+			FESurfaceElement& el = m_surf1.Element(i);
+			for (int n = 0; n < el.GaussPoints(); ++n)
+			{
+				FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+				cp.m_Ln = 0.0;
+				cp.m_tc = vec3d(0, 0, 0);
+			}
 		}
-	}
-	for (int i = 0; i < m_surf2.Elements(); ++i)
-	{
-		FESurfaceElement& el = m_surf2.Element(i);
-		for (int n = 0; n < el.GaussPoints(); ++n)
+
+		#pragma omp for
+		for (int i = 0; i < m_surf2.Elements(); ++i)
 		{
-			FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
-			cp.m_tc = vec3d(0, 0, 0);
+			FESurfaceElement& el = m_surf2.Element(i);
+			for (int n = 0; n < el.GaussPoints(); ++n)
+			{
+				FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+				cp.m_Ln = 0.0;
+				cp.m_tc = vec3d(0, 0, 0);
+			}
 		}
 	}
 
@@ -595,6 +660,32 @@ void FEContactPotential::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 			// assemble
 			R.Assemble(lm, fe);
+		}
+	}
+
+	// update contact pressures (only needed for plot output)
+#pragma omp parallel
+	{
+		#pragma omp for
+		for (int i = 0; i < m_surf1.Elements(); ++i)
+		{
+			FESurfaceElement& el = m_surf1.Element(i);
+			for (int n = 0; n < el.GaussPoints(); ++n)
+			{
+				FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+				cp.m_Ln = cp.m_tc.norm();
+			}
+		}
+
+		#pragma omp for
+		for (int i = 0; i < m_surf2.Elements(); ++i)
+		{
+			FESurfaceElement& el = m_surf2.Element(i);
+			for (int n = 0; n < el.GaussPoints(); ++n)
+			{
+				FECPContactPoint& cp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+				cp.m_Ln = cp.m_tc.norm();
+			}
 		}
 	}
 }
@@ -786,4 +877,14 @@ void FEContactPotential::ElementStiffness(FESurfaceElement& el1, FESurfaceElemen
 	}
 
 	ke *= -1.0;
+}
+
+void FEContactPotential::Serialize(DumpStream& ar)
+{
+	FEContactInterface::Serialize(ar);
+
+	m_surf1.Serialize(ar);
+	m_surf2.Serialize(ar);
+
+	BuildNeighborTable();
 }

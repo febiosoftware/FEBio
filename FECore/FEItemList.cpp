@@ -31,14 +31,24 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "FEModel.h"
 
-REGISTER_SUPER_CLASS(FEItemList, FEITEMLIST_ID);
-
-FEItemList::FEItemList(FEModel* fem) : FECoreBase(fem)
+FEItemList::FEItemList(FEModel* fem)// : FECoreBase(fem)
 {
 	if (fem)
 	{
 		m_mesh = &fem->GetMesh();
 	}
+}
+
+FEItemList::FEItemList(FEMesh* mesh)// : FECoreBase(fem)
+{
+	m_mesh = mesh;
+}
+
+FEItemList::~FEItemList() {}
+
+void FEItemList::Serialize(DumpStream& ar)
+{
+	ar & m_name;
 }
 
 // get the mesh
@@ -50,4 +60,25 @@ FEMesh* FEItemList::GetMesh() const
 void FEItemList::SetMesh(FEMesh* mesh)
 {
 	m_mesh = mesh;
+}
+
+const std::string& FEItemList::GetName() const
+{
+	return m_name;
+}
+
+void FEItemList::SetName(const std::string& name)
+{
+	m_name = name;
+}
+
+FEItemList* FEItemList::LoadClass(DumpStream& ar, FEItemList* p)
+{
+	assert(false);
+	return nullptr;
+}
+
+void FEItemList::SaveClass(DumpStream& ar, FEItemList* p)
+{
+	assert(false);
 }

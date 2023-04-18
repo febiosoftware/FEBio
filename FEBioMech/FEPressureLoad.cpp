@@ -34,7 +34,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_FECORE_CLASS(FEPressureLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_pressure, "pressure");
+	ADD_PARAMETER(m_pressure, "pressure")->setUnits(UNIT_PRESSURE)->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_bsymm   , "symmetric_stiffness");
 	ADD_PARAMETER(m_blinear , "linear");
 	ADD_PARAMETER(m_bshellb , "shell_bottom");
@@ -69,7 +69,7 @@ bool FEPressureLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEPressureLoad::LoadVector(FEGlobalVector& R)
 {
 	FESurface& surf = GetSurface();
 	surf.SetShellBottom(m_bshellb);
@@ -96,7 +96,7 @@ void FEPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Don't calculate stiffness for a linear load
 	if (m_blinear) return;
