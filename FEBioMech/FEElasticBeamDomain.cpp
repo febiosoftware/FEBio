@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEElasticBeamMaterial.h"
 #include "FEBioMech.h"
 #include <FECore/FEMesh.h>
+#include <FECore/fecore_debug.h>
 
 
 FEElasticBeamDomain::FEElasticBeamDomain(FEModel* fem) : FEBeamDomain(fem), FEElasticDomain(fem), m_dofs(fem)
@@ -130,13 +131,13 @@ void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<d
 		mat3da S(G0); // skew-symmetric matrix from Grad (TODO: check sign!)
 
 		// integration point 
-		double s = 0.0;
+		double s = L0 * 0.5;
 
 		// shape function (at integration point)
-		double H[2] = { 0.5 * (1.0 - s), 0.5 * (1.0 + s) };
+		double H[2] = { (1.0 - s / L0), s / L0 };
 
 		// shape function derivative (at integration point)
-		double G[2] = { -0.5, 0.5 }; // TODO: multiply by L0?
+		double G[2] = { -1, 1 }; // TODO: multiply by L0?
 
 		for (int i = 0; i < ne; ++i)
 		{
@@ -152,7 +153,9 @@ void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<d
 			P = ksi * R;
 
 			// assemble
-			for (int j = 0; j < 6; ++j) fe[i * 6 + j] += P[j] * w;
+			// note the negative sign: this is because we need to subtract
+			// the internal forces from the external forces.
+			for (int j = 0; j < 6; ++j) fe[i * 6 + j] -= P[j] * w;
 		}
 	}
 }
@@ -186,7 +189,7 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 	double w = L0;
 
 	// integration point 
-	double s = 0.0;
+	double s = L0 * 0.5;
 
 	int nint = el.GaussPoints();
 	for (int n = 0; n < nint; ++n)
@@ -201,10 +204,10 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 		mat3da Sm(m);
 
 		// shape function (at integration point)
-		double H[2] = { 0.5 * (1.0 - s), 0.5 * (1.0 + s) };
+		double H[2] = { (1.0 - s / L0),   s / L0 };
 
 		// shape function derivative (at integration point)
-		double G[2] = { -0.5, 0.5 }; // TODO: multiply by L0?
+		double G[2] = { -1, 1 }; // TODO: multiply by L0?
 
 		vec3d G0 = mp.m_G0; // = dphi_0/dS
 
@@ -228,6 +231,7 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 
 				// spatial tangent
 				matrix c(6, 6);
+				m_mat->Tangent(mp, c);
 
 				// material stiffness
 				matrix Se(6, 6);
@@ -259,7 +263,11 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
-		// get the nodal values of the incremental displacement
+		// initial length
+		vec3d r0[2] = { Node(el.m_lnode[0]).m_r0, Node(el.m_lnode[1]).m_r0 };
+		double L0 = (r0[1] - r0[0]).Length();
+
+		// get the nodal values of the incremental rotations
 		vector<vec3d> dri(ne);
 		for (int j = 0; j < ne; ++j)
 		{
@@ -279,10 +287,12 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 			FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
 
 			// evaluate at integration point
-			vec3d dr = el.Evaluate(dri.data(), n);
+			double s = 0.5 * L0;
+			double H[2] = { 1 - s / L0, s / L0 };
+			vec3d dr = dri[0] * H[0] + dri[1] * H[1];
 
 			// TODO: evaluate dr/dS
-			vec3d drdS;
+			vec3d drdS = (dri[1] - dri[0]) / L0;
 
 			// calculate exponential map
 			mat3d dR; dR.exp(dr);
@@ -291,12 +301,16 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 			quatd dq(dR);
 
 			// update rotations (TODO: what about line searches!)
-			mp.m_Ri = dq * mp.m_Ri;
+			mp.m_Ri = dq;// *mp.m_Ri;
 			mp.m_Rt = mp.m_Ri * mp.m_Rp;
 
 			// update spatial curvature
-			mat3da Wn(mp.m_w);
+			mat3da Wn(vec3d(0, 0, 0));// mp.m_w);
 			mat3d W = dR * Wn * dR.transpose(); // this should be a skew-symmetric matrix!
+
+			fecore_watch(W);
+
+//			fecore_break();
 			vec3d w2(-W[1][2], W[0][2], -W[0][1]);
 
 			vec3d w1 = drdS; // TODO: This is only a 1st order approximation!
