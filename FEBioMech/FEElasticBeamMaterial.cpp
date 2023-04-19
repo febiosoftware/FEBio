@@ -63,14 +63,18 @@ void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
 
 void FEElasticBeamMaterial::Tangent(FEElasticBeamMaterialPoint& mp, matrix& C)
 {
+	mat3dd C1(m_G * m_A1, m_G * m_A2, m_E * m_A);
+	mat3dd C2(m_E * m_I1, m_E * m_I2, m_G * m_J);
+	quatd R = mp.m_Rt;
+	mat3d Q = R.RotationMatrix();
+
+	mat3d c1 = Q * C1;
+	mat3d c2 = Q * C2;
+
 	C.resize(6, 6);
 	C.zero();
-	C[0][0] = m_G * m_A1;
-	C[1][1] = m_G * m_A2;
-	C[2][2] = m_E * m_A;
-	C[3][3] = m_E * m_I1;
-	C[4][4] = m_E * m_I2;
-	C[5][5] = m_G * m_J;
+	C.add(0, 0, c1);
+	C.add(3, 3, c2);
 }
 
 FEMaterialPointData* FEElasticBeamMaterial::CreateMaterialPointData()
