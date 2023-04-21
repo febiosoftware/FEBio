@@ -65,3 +65,7 @@ double FEScaledUncoupledMaterial::DevStrainEnergyDensity(FEMaterialPoint& pt)
     return m_pBase->DevStrainEnergyDensity(pt)*scale;
 }
 
+FEMaterialPointData* FEScaledUncoupledMaterial::CreateMaterialPointData()
+{
+    return m_pBase->CreateMaterialPointData();
+}

@@ -47,6 +47,8 @@ public:
     //! strain energy density function
     double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
 
+    FEMaterialPointData* CreateMaterialPointData() override;
+
     DECLARE_FECORE_CLASS();
     
 private:

@@ -246,7 +246,7 @@ bool FEODFFiberDistribution::Init()
         {
             FEDomain* domain = &mesh.Domain(index);
 			FEMaterial* mat = dynamic_cast<FEMaterial*>(domain->GetMaterial());
-			if (mat != this->GetParent())
+			if (mat != this->GetAncestor())
 			{
                 continue;
             }

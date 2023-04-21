@@ -66,3 +66,8 @@ double FEScaledElasticMaterial::StrainEnergyDensity(FEMaterialPoint& pt)
     return m_pBase->StrainEnergyDensity(pt)*scale;
 }
 
+FEMaterialPointData* FEScaledElasticMaterial::CreateMaterialPointData()
+{
+    return m_pBase->CreateMaterialPointData();
+}
+

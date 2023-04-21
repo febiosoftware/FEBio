@@ -238,7 +238,7 @@ bool FEODFFiberDistributionSmallMesh::Init()
         {
             FEDomain* domain = &mesh.Domain(index);
 			FEMaterial* mat = dynamic_cast<FEMaterial*>(domain->GetMaterial());
-			if (mat != this->GetParent())
+			if (mat != this->GetAncestor())
 			{
                 continue;
             }
@@ -315,6 +315,8 @@ bool FEODFFiberDistributionSmallMesh::Init()
     // std::cout << "Interp Time: " << interpTime.peek() << std::endl;
     // std::cout << "Reduce Time: " << reduceTime.peek() << std::endl;
     // std::cout << "Remesh Time: " << remeshTime/36 << std::endl;
+
+    std::cout << "size: " << m_ElODF.size() << std::endl;
 
 	return true;
 }
