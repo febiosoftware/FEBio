@@ -54,6 +54,8 @@ SOFTWARE.*/
 #include "FEElasticMixture.h"
 #include "FEElasticMultigeneration.h"
 #include "FEEllipsoidalFiberDistribution.h"
+#include "FEFiberCDF.h"
+#include "FEFiberCDFUncoupled.h"
 #include "FEFiberEntropyChain.h"
 #include "FEFiberEntropyChainUC.h"
 #include "FEFiberExpPow.h"
@@ -418,6 +420,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEScaledUncoupledMaterial, "scaled uncoupled");
 
 	// fiber materials (derived from FEFiberMaterial)
+    REGISTER_FECORE_CLASS(FEFiberCDF         , "fiber-CDF"           );
 	REGISTER_FECORE_CLASS(FEFiberNH          , "fiber-NH"            );
 	REGISTER_FECORE_CLASS(FEFiberExpPow      , "fiber-exp-pow"       );
 	REGISTER_FECORE_CLASS(FEFiberExpLinear   , "fiber-exp-linear"    );
@@ -430,6 +433,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEFiberGrowth      , "fiber growth"        );
 
 	// Elastic Fiber materials (derived from FEElasticFiberMaterial)
+    REGISTER_FECORE_CLASS(FEElasticFiberCDF         , "fiber-CDF"           );
 	REGISTER_FECORE_CLASS(FEElasticFiberNH          , "fiber-NH"            );
 	REGISTER_FECORE_CLASS(FEElasticFiberExpPow      , "fiber-exp-pow"       );
 	REGISTER_FECORE_CLASS(FEElasticFiberExpLinear   , "fiber-exp-linear"    );
@@ -439,6 +443,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEElasticFiberEntropyChain, "fiber-entropy-chain" );
 
 	// fiber materials for uncoupled formulation (derived from FEFiberMaterialUC)
+    REGISTER_FECORE_CLASS(FEFiberCDFUncoupled  , "fiber-CDF-uncoupled"       );
 	REGISTER_FECORE_CLASS(FEFiberExpLinearUC   , "uncoupled fiber-exp-linear");
 	REGISTER_FECORE_CLASS(FEFiberNHUC          , "fiber-NH-uncoupled");
 	REGISTER_FECORE_CLASS(FEFiberExpPowUC      , "fiber-exp-pow-uncoupled");
@@ -446,6 +451,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEFiberEntropyChainUC, "uncoupled fiber-entropy-chain");
 
 	// Uncoupled elastic fiber materials (derived from FEUncoupledFiberMaterial)
+    REGISTER_FECORE_CLASS(FEElasticFiberCDFUncoupled    , "fiber-CDF-uncoupled"       );
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpLinear     , "uncoupled fiber-exp-linear");
 	REGISTER_FECORE_CLASS(FEUncoupledFiberNH            , "fiber-NH-uncoupled");
 	REGISTER_FECORE_CLASS(FEUncoupledFiberExpPow        , "fiber-exp-pow-uncoupled");
@@ -707,6 +713,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementMixtureStress, "mixture stress");
 	REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, "uncoupled pressure");
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");
+    REGISTER_FECORE_CLASS(FEPlotElementDevElasticity, "deviatoric elasticity");
 	REGISTER_FECORE_CLASS(FEPlotRelativeVolume, "relative volume");
 	REGISTER_FECORE_CLASS(FEPlotShellRelativeVolume, "shell relative volume");// , FECORE_SPEC(3, 0)); // NOTE: deprecated
 	REGISTER_FECORE_CLASS(FEPlotFiberVector, "fiber vector");
