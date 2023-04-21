@@ -169,6 +169,8 @@ SOFTWARE.*/
 #include "FELungMaterial.h"
 #include "FEGrowthTensor.h"
 #include "FEKinematicGrowth.h"
+#include "FEScaledElasticMaterial.h"
+#include "FEScaledUncoupledMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -362,6 +364,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
     REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
+    REGISTER_FECORE_CLASS(FEScaledElasticMaterial, "scaled elasitc");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
@@ -412,6 +415,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
 	REGISTER_FECORE_CLASS(FEShenoyMaterial, "Shenoy");
 	REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean, "fiber neo-Hookean");
+    REGISTER_FECORE_CLASS(FEScaledUncoupledMaterial, "scaled uncoupled");
 
 	// fiber materials (derived from FEFiberMaterial)
 	REGISTER_FECORE_CLASS(FEFiberNH          , "fiber-NH"            );
