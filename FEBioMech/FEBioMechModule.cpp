@@ -366,7 +366,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
     REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
-    REGISTER_FECORE_CLASS(FEScaledElasticMaterial, "scaled elasitc");
+    REGISTER_FECORE_CLASS(FEScaledElasticMaterial, "scaled elastic");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
