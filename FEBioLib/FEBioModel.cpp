@@ -1716,5 +1716,19 @@ bool FEBioModel::Restart(const char* szfile)
 		Serialize(ar);
 	}
 
+
+	// Open the log file for appending
+	const std::string& slog = GetLogfileName();
+	Logfile& felog = GetLogFile();
+	if (felog.append(slog.c_str()) == false)
+	{
+		printf("WARNING: Could not reopen log file. A new log file is created\n");
+		felog.open(slog.c_str());
+		return false;
+	}
+
+	// inform the user from where the problem is restarted
+	felog.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", GetCurrentTime());
+
 	return true;
 }
