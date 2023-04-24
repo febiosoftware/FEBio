@@ -26,6 +26,22 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElasticBeamMaterial.h"
 
+FEElasticBeamMaterialPoint::FEElasticBeamMaterialPoint()
+{
+
+}
+
+void FEElasticBeamMaterialPoint::Init()
+{
+
+}
+
+void FEElasticBeamMaterialPoint::Update(const FETimeInfo& timeInfo)
+{
+	m_Rp = m_Rt;
+}
+
+//=======================================================================================
 BEGIN_FECORE_CLASS(FEElasticBeamMaterial, FEMaterial)
 	ADD_PARAMETER(m_density, "density");
 	ADD_PARAMETER(m_E , "E" );
@@ -35,7 +51,6 @@ BEGIN_FECORE_CLASS(FEElasticBeamMaterial, FEMaterial)
 	ADD_PARAMETER(m_A2, "A2");
 	ADD_PARAMETER(m_I1, "I1");
 	ADD_PARAMETER(m_I2, "I2");
-	ADD_PARAMETER(m_J , "J" );
 END_FECORE_CLASS();
 
 FEElasticBeamMaterial::FEElasticBeamMaterial(FEModel* fem) : FEMaterial(fem)
@@ -43,7 +58,7 @@ FEElasticBeamMaterial::FEElasticBeamMaterial(FEModel* fem) : FEMaterial(fem)
 	m_density = 1.0;
 	m_A = m_A1 = m_A2 = 0.0;
 	m_G = m_E = 0.0;
-	m_I1 = m_I2 = m_J = 0.0;
+	m_I1 = m_I2 = 0;
 }
 
 void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
@@ -51,10 +66,11 @@ void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
 	vec3d gamma = mp.m_Gamma;
 	vec3d kappa = mp.m_Kappa;
 	quatd R = mp.m_Rt;
+	double J = m_I1 + m_I2;
 
 	// material vectors
 	vec3d N = vec3d(m_G * m_A1 * gamma.x, m_G*m_A2*gamma.y, m_E*m_A*gamma.z);
-	vec3d M = vec3d(m_E * m_I1 * kappa.x, m_E*m_I2*kappa.y, m_G*m_J*kappa.z);
+	vec3d M = vec3d(m_E * m_I1 * kappa.x, m_E*m_I2*kappa.y, m_G*  J*kappa.z);
 
 	// spatial vectors
 	mp.m_t = R * N;
@@ -63,8 +79,10 @@ void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
 
 void FEElasticBeamMaterial::Tangent(FEElasticBeamMaterialPoint& mp, matrix& C)
 {
+	double J = m_I1 + m_I2;
+
 	mat3dd C1(m_G * m_A1, m_G * m_A2, m_E * m_A);
-	mat3dd C2(m_E * m_I1, m_E * m_I2, m_G * m_J);
+	mat3dd C2(m_E * m_I1, m_E * m_I2, m_G *   J);
 	quatd R = mp.m_Rt;
 	mat3d Q = R.RotationMatrix();
 

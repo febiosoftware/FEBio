@@ -111,7 +111,10 @@ void FEElasticBeamDomain::InternalForces(FEGlobalVector& R)
 
 void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<double>& fe)
 {
-	double L0 = 1; // TODO: reference length of beam
+	// reference length of beam (TODO: Store on beam element?)
+	vec3d ra = Node(el.m_lnode[0]).m_r0;
+	vec3d rb = Node(el.m_lnode[1]).m_r0;
+	double L0 = (rb - ra).Length();
 
 	// loop over integration points
 	int nint = el.GaussPoints();
@@ -175,6 +178,10 @@ void FEElasticBeamDomain::StiffnessMatrix(FELinearSystem& LS)
 		FEElementMatrix ke(el, lm); ke.zero();
 		ElementStiffnessMatrix(el, ke);
 
+		matrix& kem = static_cast<matrix&>(ke);
+		fecore_watch(kem);
+//		fecore_break();
+
 		LS.Assemble(ke);
 	}
 }
@@ -183,7 +190,10 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 {
 	int ne = el.Nodes();
 
-	double L0 = 1; // TODO: reference beam length
+	// reference length of beam (TODO: Store on beam element?)
+	vec3d ra = Node(el.m_lnode[0]).m_r0;
+	vec3d rb = Node(el.m_lnode[1]).m_r0;
+	double L0 = (rb - ra).Length();
 
 	// only a single integration point
 	double w = L0;
@@ -301,7 +311,7 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 			quatd dq(dR);
 
 			// update rotations (TODO: what about line searches!)
-			mp.m_Ri = dq;// *mp.m_Ri;
+			mp.m_Ri = dq * mp.m_Ri;
 			mp.m_Rt = mp.m_Ri * mp.m_Rp;
 
 			// update spatial curvature
@@ -356,7 +366,7 @@ void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 		quatd qi = q.Conjugate();
 
 		// calculate material strain measures
-		mp.m_Gamma = qi * G0 - vec3d(1, 0, 0);
+		mp.m_Gamma = q * G0 - vec3d(1, 0, 0);
 		mp.m_Kappa = qi * mp.m_w; // m_w is updated in Update(std::vector<double>& ui)
 
 		// evaluate the stress

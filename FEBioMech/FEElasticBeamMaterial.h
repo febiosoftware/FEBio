@@ -29,7 +29,13 @@ SOFTWARE.*/
 class FEElasticBeamMaterialPoint : public FEMaterialPointData
 {
 public:
-	FEElasticBeamMaterialPoint() {}
+	FEElasticBeamMaterialPoint();
+
+	void Init() override;
+
+	//! The Update function is used to update material point data
+	//! Note that this gets called at the start of the time step during PreSolveUpdate
+	void Update(const FETimeInfo& timeInfo) override;
 
 public:
 	vec3d	m_t;	// stress vector
@@ -63,7 +69,7 @@ private:
 	double	m_density;
 	double	m_A, m_A1, m_A2;
 	double	m_E, m_G;
-	double	m_I1, m_I2, m_J;
+	double	m_I1, m_I2;
 
 	DECLARE_FECORE_CLASS();
 };
