@@ -46,6 +46,7 @@ SOFTWARE.*/
 #include "FESolutesMaterial.h"
 #include "FESolutesDomain.h"
 #include "FESolutesDomainFactory.h"
+#include "FEBioFluidPlot.h"
 #include <FEBioMix/FESoluteFlux.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModelUpdate.h>
@@ -107,6 +108,10 @@ void FEBioFluidSolutes::InitModule()
     // constraints
     REGISTER_FECORE_CLASS(FEFluidSolutesPressureLC     , "fluid pressure constraint", FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FEFluidSolutesGradientLC     , "zero concentration gradient", FECORE_EXPERIMENTAL);
+    
+    //-----------------------------------------------------------------------------
+    // classes derived from FEPlotData
+    REGISTER_FECORE_CLASS(FEPlotFluidRelativePecletNumber, "solute relative Peclet number");
 
 	// solutes solver classes
 	febio.RegisterDomain(new FESolutesDomainFactory);
