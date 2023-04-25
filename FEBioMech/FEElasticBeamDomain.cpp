@@ -140,7 +140,7 @@ void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<d
 		double H[2] = { (1.0 - s / L0), s / L0 };
 
 		// shape function derivative (at integration point)
-		double G[2] = { -1, 1 }; // TODO: multiply by L0?
+		double G[2] = { -1 / L0, 1 / L0 };
 
 		for (int i = 0; i < ne; ++i)
 		{
@@ -217,7 +217,7 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 		double H[2] = { (1.0 - s / L0),   s / L0 };
 
 		// shape function derivative (at integration point)
-		double G[2] = { -1, 1 }; // TODO: multiply by L0?
+		double G[2] = { -1 / L0, 1 / L0 };
 
 		vec3d G0 = mp.m_G0; // = dphi_0/dS
 
@@ -252,7 +252,7 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 				matrix Te(6, 6); Te.zero();
 				Te.add(0, 3, (-St * (G[a] * H[b])));
 				Te.add(3, 0, (St * (H[a] * G[b])));
-				Te.add(3, 3, P * (H[a] * H[b]));
+				Te.add(3, 3, P * (H[a] * H[b]) - Sm*(G[a]*H[b]) );
 
 				// assemble into ke
 				for (int i = 0; i < 6; ++i)
@@ -366,7 +366,7 @@ void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 		quatd qi = q.Conjugate();
 
 		// calculate material strain measures
-		mp.m_Gamma = q * G0 - vec3d(1, 0, 0);
+		mp.m_Gamma = qi * G0 - vec3d(1, 0, 0);
 		mp.m_Kappa = qi * mp.m_w; // m_w is updated in Update(std::vector<double>& ui)
 
 		// evaluate the stress
