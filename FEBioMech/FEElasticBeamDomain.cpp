@@ -301,7 +301,6 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 			double H[2] = { 1 - s / L0, s / L0 };
 			vec3d dr = dri[0] * H[0] + dri[1] * H[1];
 
-			// TODO: evaluate dr/dS
 			vec3d drdS = (dri[1] - dri[0]) / L0;
 
 			// calculate exponential map
@@ -315,15 +314,21 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 			mp.m_Rt = mp.m_Ri * mp.m_Rp;
 
 			// update spatial curvature
-			mat3da Wn(vec3d(0, 0, 0));// mp.m_w);
+			mat3da Wn(mp.m_w);
 			mat3d W = dR * Wn * dR.transpose(); // this should be a skew-symmetric matrix!
 
-			fecore_watch(W);
-
-//			fecore_break();
 			vec3d w2(-W[1][2], W[0][2], -W[0][1]);
 
-			vec3d w1 = drdS; // TODO: This is only a 1st order approximation!
+			double g1 = 1, g2 = 1;
+			double a = dr.norm();
+			if (a != 0)
+			{
+				g1 = sin(a) / a;
+				g2 = sin(0.5 * a) / (0.5 * a);
+			}
+			vec3d e(dr); e.unit();
+
+			vec3d w1 = drdS*g1 + e*((1.0 - g1)*(e*drdS)) + (dr ^ drdS)*(0.5*g2*g2);
 
 			// update curvature
 			mp.m_w = w1 + w2;

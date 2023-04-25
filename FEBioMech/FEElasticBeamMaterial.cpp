@@ -85,9 +85,10 @@ void FEElasticBeamMaterial::Tangent(FEElasticBeamMaterialPoint& mp, matrix& C)
 	mat3dd C2(m_E * m_I1, m_E * m_I2, m_G *   J);
 	quatd R = mp.m_Rt;
 	mat3d Q = R.RotationMatrix();
+	mat3d Qt = Q.transpose();
 
-	mat3d c1 = Q * C1;
-	mat3d c2 = Q * C2;
+	mat3d c1 = Q * C1 * Qt;
+	mat3d c2 = Q * C2 * Qt;
 
 	C.resize(6, 6);
 	C.zero();
