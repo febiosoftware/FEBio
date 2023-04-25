@@ -1205,3 +1205,30 @@ public:
 	FEPlotTrussStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! beam element stress
+class FEPlotBeamStress : public FEPlotDomainData
+{
+public:
+	FEPlotBeamStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! beam element strain
+class FEPlotBeamStrain : public FEPlotDomainData
+{
+public:
+	FEPlotBeamStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! beam element curvature
+class FEPlotBeamCurvature : public FEPlotDomainData
+{
+public:
+	FEPlotBeamCurvature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

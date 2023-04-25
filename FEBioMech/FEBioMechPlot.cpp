@@ -67,6 +67,8 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FETrussDomain.h>
 #include <FECore/FEElement.h>
+#include <FEBioMech/FEElasticBeamDomain.h>
+#include <FEBioMech/FEElasticBeamMaterial.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -3960,5 +3962,83 @@ bool FEPlotTrussStretch::Save(FEDomain& dom, FEDataStream& a)
 		FETrussElement& el = td->Element(i);
 		a << el.m_lam;
 	}
+	return true;
+}
+
+//-------------------------------------------------------------------------------
+bool FEPlotBeamStress::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEElasticBeamDomain* beam = dynamic_cast<FEElasticBeamDomain*>(&dom);
+	if (beam == nullptr) return false;
+
+	for (int i = 0; i < beam->Elements(); ++i)
+	{
+		FEBeamElement& el = beam->Element(i);
+
+		vec3d t(0, 0, 0);
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			// get the material point
+			FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+			t += mp.m_t;
+		}
+		t /= (double)nint;
+		a << t;
+	}
+
+	return true;
+}
+
+//-------------------------------------------------------------------------------
+bool FEPlotBeamStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEElasticBeamDomain* beam = dynamic_cast<FEElasticBeamDomain*>(&dom);
+	if (beam == nullptr) return false;
+
+	for (int i = 0; i < beam->Elements(); ++i)
+	{
+		FEBeamElement& el = beam->Element(i);
+
+		vec3d t(0, 0, 0);
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			// get the material point
+			FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+			t += mp.m_Rt * mp.m_Gamma;
+		}
+		t /= (double)nint;
+		a << t;
+	}
+
+	return true;
+}
+
+//-------------------------------------------------------------------------------
+bool FEPlotBeamCurvature::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEElasticBeamDomain* beam = dynamic_cast<FEElasticBeamDomain*>(&dom);
+	if (beam == nullptr) return false;
+
+	for (int i = 0; i < beam->Elements(); ++i)
+	{
+		FEBeamElement& el = beam->Element(i);
+
+		vec3d t(0, 0, 0);
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			// get the material point
+			FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+			t += mp.m_Rt*mp.m_Kappa;
+		}
+		t /= (double)nint;
+		a << t;
+	}
+
 	return true;
 }
