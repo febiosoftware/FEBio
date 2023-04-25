@@ -55,6 +55,39 @@ quatd quatd::slerp(quatd &q1, quatd &q2, const double t)
 }
 
 //-----------------------------------------------------------------------------
+quatd::quatd(const mat3d & m)
+{
+	// find max(tr(m), m00,m11,m22)
+	double M = m.trace();
+	if ((M >= m(0, 0)) && (M >= m(1, 1)) && (M >= m(2, 2)))
+	{
+		w = 0.5*sqrt(1.0 + M);
+		x = 0.25 * (m(2, 1) - m(1, 2)) / w;
+		y = 0.25 * (m(0, 2) - m(2, 0)) / w;
+		z = 0.25 * (m(1, 0) - m(0, 1)) / w;
+	}
+	else
+	{
+		int i = 0;
+		if (m(1, 1) > m(0, 0)) i = 1;
+		if (m(2, 2) > m(i, i)) i = 2;
+		int j = (i + 1) % 3;
+		int k = (j + 1) % 3;
+
+		double q[3];
+		q[i] = sqrt(0.5 * m(i, i) + 0.25 * (1.0 - M));
+		w = 0.5 * (m(k, j) - m(j, k)) / q[i];
+		q[j] = 0.25 * (m(j, i) + m(i, j)) / q[i];
+		q[k] = 0.25 * (m(k, i) + m(i, k)) / q[i];
+
+		x = q[0];
+		y = q[1];
+		z = q[2];
+	}
+}
+
+// TODO: This looks like it calculates the opposite rotation
+/*
 quatd::quatd(const mat3d& m)
 {
 	quatd& q = *this;
@@ -92,6 +125,7 @@ quatd::quatd(const mat3d& m)
 	q.z *= s;
 	q.w *= s;
 }
+*/
 
 //-----------------------------------------------------------------------------
 void quatd::SetEuler(double X, double Y, double Z)
