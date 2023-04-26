@@ -133,6 +133,17 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Referential solute concentration
+class FEPlotReferentialSoluteConcentration : public FEPlotDomainData
+{
+public:
+	FEPlotReferentialSoluteConcentration(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+	vector<int>	m_sol;
+};
+
+//-----------------------------------------------------------------------------
 //! Actual solute concentration
 class FEPlotPartitionCoefficient : public FEPlotDomainData
 {
@@ -194,6 +205,16 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 protected:
     vector<int>    m_sbm;
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotSBMReferentialConcentration : public FEPlotDomainData
+{
+public:
+	FEPlotSBMReferentialConcentration(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+	vector<int>	m_sbm;
 };
 
 //-----------------------------------------------------------------------------

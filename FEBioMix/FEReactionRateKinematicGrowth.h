@@ -27,29 +27,27 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEElasticMaterial.h"
+#include "FEChemicalReaction.h"
 
-//-----------------------------------------------------------------------------
-//! This is a coupled formulation for the Mooney-Rivlin material.
-class FECoupledMooneyRivlin : public FEElasticMaterial
+class FEBIOMIX_API FEReactionRateKinematicGrowth : public FEReactionRate
 {
 public:
-	FECoupledMooneyRivlin(FEModel* pfem) : FEElasticMaterial(pfem){}
+	//! constructor
+	FEReactionRateKinematicGrowth(FEModel* pfem);
 
-protected:
-	FEParamDouble	m_c1;	//!< Mooney-Rivlin parameter c1
-	FEParamDouble	m_c2;	//!< Mooney-Rivlin parameter c2
-	FEParamDouble	m_K;	//!< bulk modulus
+	//! reaction rate at material point
+	double ReactionRate(FEMaterialPoint& pt) override;
+
+	//! tangent of reaction rate with strain at material point
+	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
+
+	//! tangent of reaction rate with effective fluid pressure at material point
+	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+
+	//! initialization
+	bool Init() override;
 
 public:
-	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt) override;
-
-	//! calculate tangent at material point
-	tens4ds Tangent(FEMaterialPoint& pt) override;
-
-	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
-    
+	FEParamDouble m_k;
 	DECLARE_FECORE_CLASS();
 };

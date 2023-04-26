@@ -42,13 +42,16 @@ public:
     FEMaterialPointData* Copy() override;
     
     void Init() override;
+
     void Update(const FETimeInfo& timeInfo) override;
     
     void Serialize(DumpStream& ar) override;
     
 public:
-    FEParamMat3d    m_Fe;       //!< elastic deformation
-    FEParamMat3d    m_Fg;       //!< growth deformation
+    mat3d    m_Fe;       //!< elastic deformation
+    mat3d    m_Fg;       //!< growth deformation
+    double   m_Je;
+    double   m_Jg;
     FEParamDouble   m_rhor;     //!< solid referential density
 };
 

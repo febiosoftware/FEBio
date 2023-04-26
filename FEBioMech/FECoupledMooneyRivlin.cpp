@@ -59,8 +59,12 @@ mat3ds FECoupledMooneyRivlin::Stress(FEMaterialPoint& mp)
 	// identity tensor
 	mat3dd I(1.0);
 
+	double C1 = m_c1(mp);
+	double C2 = m_c2(mp);
+	double K = m_K(mp);
+
 	// calculate stress
-	return (B*(m_c1+I1*m_c2) - B2*m_c2 - I*(m_c1+2.0*m_c2))*(2.0/J) + I*(m_K*log(J)/J);
+	return (B*(C1+I1*C2) - B2*C2 - I*(C1+2.0*C2))*(2.0/J) + I*(K*log(J)/J);
 }
 
 //-----------------------------------------------------------------------------
@@ -84,10 +88,12 @@ tens4ds FECoupledMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	tens4ds BoB = dyad4s(B);
 
 	// strain energy derivates
-	double W2 = m_c2;
+	double W2 = m_c2(mp);
+	double C1 = m_c1(mp);
+	double K = m_K(mp);
 
 	// spatial tangent
-	tens4ds c = BxB*(4.0*W2/J) - BoB*(4.0*W2/J) + IoI*(4.0*(m_c1+2.0*m_c2)/J) + IxI*(m_K/J) - IoI*(2.0*m_K*log(J)/J);
+	tens4ds c = BxB*(4.0*W2/J) - BoB*(4.0*W2/J) + IoI*(4.0*(C1+2.0*W2)/J) + IxI*(K/J) - IoI*(2.0*K*log(J)/J);
 
 	return c;
 }
@@ -112,9 +118,13 @@ double FECoupledMooneyRivlin::StrainEnergyDensity(FEMaterialPoint& mp)
 	// Invariants of B (= invariants of C)
 	double I1 = B.tr();
     double I2 = (I1*I1 - B2.tr())/2.;
+
+	double C1 = m_c1(mp);
+	double C2 = m_c2(mp);
+	double K = m_K(mp);
     
-    double sed = m_c1*(I1-3) + m_c2*(I2-3)
-    - 2*(m_c1+2*m_c2)*lnJ + m_K*lnJ*lnJ/2.;
+    double sed = C1*(I1-3) + C2*(I2-3)
+    - 2*(C1+2*C2)*lnJ + K*lnJ*lnJ/2.;
     
     return sed;
 }

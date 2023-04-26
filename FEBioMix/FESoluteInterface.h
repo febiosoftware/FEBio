@@ -30,6 +30,8 @@ SOFTWARE.*/
 #include <FECore/fecore_api.h>
 #include "febiomix_api.h"
 #include <FECore/vec3d.h>
+#include <FEBioMech/FEKinematicGrowth.h>
+#include <FEBioMech/FEGrowthTensor.h>
 
 class FESolute;
 class FESolidBoundMolecule;
@@ -60,6 +62,9 @@ public:
 
 	// return the actual solution concentration at this material point
 	virtual double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+
+	// return the actual solution concentration at this material point
+	virtual double GetReferentialSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
 
 	// return the partition coefficient at this material point
 	virtual double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
@@ -102,6 +107,9 @@ public:
 
 	//! SBM areal concentration (mole per shell area) -- should only be called from shell domains
 	virtual double SBMArealConcentration(FEMaterialPoint& pt, const int sbm) { return 0.0; }
+
+	//! SBM referential concentration (molar concentration in current configuration)
+	virtual double SBMReferentialConcentration(FEMaterialPoint& pt, const int sbm) { return 0.0; }
 
     // return the number of solutes on external side
     virtual int SolutesExternal(FEMaterialPoint& pt) { return 0; }
@@ -149,6 +157,16 @@ public:
 		T* spt = mp.ExtractData<T>();
 		return spt->m_ca[soluteIndex];
 	};
+	double GetReferentialSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
+		T* spt = mp.ExtractData<T>();
+		FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+		double J = ep.m_J;
+		FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
+		double J_e = kp.m_Je;
+		FEBiphasicMaterialPoint& bp = *mp.ExtractData<FEBiphasicMaterialPoint>();
+		double phisr = bp.m_phi0t;
+		return spt->m_ca[soluteIndex] * (J - phisr);
+	}
 	double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
 		T* spt = mp.ExtractData<T>();
 		return spt->m_k[soluteIndex];

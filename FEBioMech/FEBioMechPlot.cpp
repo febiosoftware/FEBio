@@ -4130,37 +4130,109 @@ bool FEPlotGrowthElasticDeformationGradient::Save(FEDomain& dom, FEDataStream& a
 		mat3d g = mat3dd(1.0);
 		for (int j = 0; j < el.GaussPoints(); ++j) {
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			// Get the growth tensor inverse
-			
-			mat3d Q = gmat->GetLocalCS(mp);
-			
-			// get the fiber vector in local coordinates
-			vec3d fiber = gmat->m_fiber->unitVector(mp);
-			// convert to global coordinates
-			vec3d a0 = Q * fiber;
-
-			mat3d Fgi = gmat->GrowthTensorInverse(mp, a0);
-			double Jgi = Fgi.det();
-
-			// Get the deformation gradient and evaluate elastic deformation
-			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			mat3d Fe = pt.m_F * Fgi;
-			double Je = pt.m_J * Jgi;
-			// keep safe copy of deformation gradient.
-			mat3d F = pt.m_F;
-			double J = pt.m_J;
-			// substitute elastic deformation in material point
-			pt.m_F = Fe;
-			pt.m_J = Je;
-			// evaluate stress
-			FEElasticMaterial* emat = kg->GetBaseMaterial();
-			tens4ds c = emat->Tangent(mp);
-			// restore safe copy
-			pt.m_F = F;
-			pt.m_J = J;
+			FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
+			g += kp.m_Fe;
 		}
 		g /= (double)el.GaussPoints();
 		a << g;
+	}
+	return true;
+};
+
+bool FEPlotGrowthDeformationGradient::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
+	// Check if we were successful.
+	if (kg == nullptr) return false;
+	FEGrowthTensor* gmat = kg->GetGrowthMaterial();
+	//FEVolumeGrowth* vg = dynamic_cast<FEVolumeGrowth*>(pmf);
+	if (gmat == nullptr) return false;
+	//if (vg == nullptr) return false;
+	// For each element get the growth tensor and then solve the average value.
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		mat3d g = mat3dd(1.0);
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
+			g += kp.m_Fg;
+		}
+		g /= (double)el.GaussPoints();
+		a << g;
+	}
+	return true;
+};
+
+bool FEPlotJacobian::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double J = 0.0;
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+			J += ep.m_J;
+		}
+		J /= (double)el.GaussPoints();
+		a << J;
+	}
+	return true;
+};
+
+bool FEPlotGrowthElasticJacobian::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
+	// Check if we were successful.
+	if (kg == nullptr) return false;
+	FEGrowthTensor* gmat = kg->GetGrowthMaterial();
+	//FEVolumeGrowth* vg = dynamic_cast<FEVolumeGrowth*>(pmf);
+	if (gmat == nullptr) return false;
+	//if (vg == nullptr) return false;
+	// For each element get the growth tensor and then solve the average value.
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double J_e = 0.0;
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
+			J_e += kp.m_Je;
+		}
+		J_e /= (double)el.GaussPoints();
+		a << J_e;
+	}
+	return true;
+};
+
+bool FEPlotGrowthJacobian::Save(FEDomain& dom, FEDataStream& a)
+{
+	// Try to get the kinematic growth material.
+	FEMaterial* mat = dom.GetMaterial();
+	FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
+	// Check if we were successful.
+	if (kg == nullptr) return false;
+	FEGrowthTensor* gmat = kg->GetGrowthMaterial();
+	if (gmat == nullptr) return false;
+	// For each element get the growth tensor and then solve the average value.
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double J_g = 0.0;
+		for (int j = 0; j < el.GaussPoints(); ++j) {
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
+			J_g += kp.m_Jg;
+		}
+		J_g /= (double)el.GaussPoints();
+		a << J_g;
 	}
 	return true;
 };

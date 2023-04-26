@@ -814,6 +814,11 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotTraceStresses, "stress trace");
 	REGISTER_FECORE_CLASS(FEPlotTraceStressesAbs, "stress trace absolute");
 	REGISTER_FECORE_CLASS(FEPlotTraceSolidStressesAbs, "solid stress trace absolute");
+	REGISTER_FECORE_CLASS(FEPlotGrowthElasticDeformationGradient, "growth elastic deformation gradient");
+	REGISTER_FECORE_CLASS(FEPlotGrowthDeformationGradient, "growth deformation gradient");
+	REGISTER_FECORE_CLASS(FEPlotJacobian, "Jacobian");
+	REGISTER_FECORE_CLASS(FEPlotGrowthElasticJacobian, "growth elastic Jacobian");
+	REGISTER_FECORE_CLASS(FEPlotGrowthJacobian, "growth Jacobian");
 
 
 

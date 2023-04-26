@@ -570,6 +570,78 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 
 //=================================================================================================
 //-----------------------------------------------------------------------------
+FEPlotReferentialSoluteConcentration::FEPlotReferentialSoluteConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
+{
+	DOFS& dofs = pfem->GetDOFS();
+	int nsol = dofs.GetVariableSize("concentration");
+	SetArraySize(nsol);
+
+	// collect the names
+	int ndata = pfem->GlobalDataItems();
+	vector<string> s;
+	for (int i = 0; i < ndata; ++i)
+	{
+		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+		if (ps)
+		{
+			s.push_back(ps->GetName());
+			m_sol.push_back(ps->GetID());
+		}
+	}
+	assert(nsol == (int)s.size());
+	SetArrayNames(s);
+	SetUnits(UNIT_CONCENTRATION);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotReferentialSoluteConcentration::Save(FEDomain& dom, FEDataStream& a)
+{
+	FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// figure out the local solute IDs. This depends on the material
+	int nsols = (int)m_sol.size();
+	vector<int> lid(nsols, -1);
+	int negs = 0;
+	for (int i = 0; i < (int)m_sol.size(); ++i)
+	{
+		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+		if (lid[i] < 0) negs++;
+	}
+	if (negs == nsols) return false;
+
+	// loop over all elements
+	int N = dom.Elements();
+	for (int i = 0; i < N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		for (int k = 0; k < nsols; ++k)
+		{
+			int nsid = lid[k];
+			if (nsid == -1) a << 0.f;
+			else
+			{
+				// calculate average concentration
+				double ew = 0;
+				for (int j = 0; j < el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
+					FEBiphasicMaterialPoint& bp = *mp.ExtractData<FEBiphasicMaterialPoint>();
+					ew += pm->GetReferentialSoluteConcentration(mp, nsid);
+				}
+				ew /= el.GaussPoints();
+				a << ew;
+			}
+		}
+
+	}
+	return true;
+}
+
+//=================================================================================================
+//-----------------------------------------------------------------------------
 FEPlotPartitionCoefficient::FEPlotPartitionCoefficient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
     DOFS& dofs = pfem->GetDOFS();
@@ -974,6 +1046,77 @@ bool FEPlotSBMArealConcentration::Save(FEDomain &dom, FEDataStream& a)
     }
     return true;
 }
+
+//=================================================================================================
+// FEPlotSBMReferentialConcentration
+//=================================================================================================
+
+//-----------------------------------------------------------------------------
+FEPlotSBMReferentialConcentration::FEPlotSBMReferentialConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
+{
+	// count SBMs
+	int sbms = 0;
+	int ndata = pfem->GlobalDataItems();
+	vector<string> names;
+	for (int i = 0; i < ndata; ++i)
+	{
+		FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
+		if (sbm)
+		{
+			names.push_back(sbm->GetName());
+			m_sbm.push_back(sbm->GetID());
+			sbms++;
+		}
+	}
+
+	SetArraySize(sbms);
+	SetArrayNames(names);
+	SetUnits(UNIT_CONCENTRATION);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSBMReferentialConcentration::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+	if (pm == 0) return false;
+
+	// figure out the local SBM IDs. This depend on the material
+	int nsbm = (int)m_sbm.size();
+	vector<int> lid(nsbm, -1);
+	for (int i = 0; i < (int)m_sbm.size(); ++i)
+	{
+		lid[i] = GetLocalSBMID(pm, m_sbm[i]);
+	}
+
+	int N = dom.Elements();
+	for (int i = 0; i < N; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		for (int k = 0; k < nsbm; ++k)
+		{
+			int nk = lid[k];
+			if (nk == -1) a << 0.f;
+			else
+			{
+				// calculate average concentration
+				double ew = 0;
+				for (int j = 0; j < el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+
+					if (pt) ew += pm->SBMReferentialConcentration(mp, nk);
+				}
+				ew /= el.GaussPoints();
+
+				a << ew;
+			}
+		}
+	}
+	return true;
+}
+
 
 //-----------------------------------------------------------------------------
 bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)

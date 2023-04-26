@@ -59,9 +59,7 @@ SOFTWARE.*/
 #include "FECarterHayes.h"
 #include "FEReactionRateConst.h"
 #include "FEReactionRateHuiskes.h"
-#include "FEReactionRatePositional.h"
-#include "FEReactionRatePositionalZ.h"
-#include "FEReactionRatePositionalStress.h"
+#include "FEReactionRateStressSensitive.h"
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
 #include "FEMembraneReactionRateConst.h"
@@ -69,9 +67,11 @@ SOFTWARE.*/
 #include "FEMembraneReactionRateVoltageGated.h"
 #include "FEMassActionForward.h"
 #include "FEMassActionForwardEffective.h"
+#include "FEMassActionForwardReferential.h"
 #include "FEMichaelisMenten.h"
 #include "FEMassActionReversible.h"
 #include "FEMassActionReversibleEffective.h"
+#include "FEMassActionReversibleReferential.h"
 #include "FEConcentrationIndependentReaction.h"
 #include "FEMembraneMassActionForward.h"
 #include "FEMembraneMassActionReversible.h"
@@ -123,8 +123,7 @@ SOFTWARE.*/
 #include "FEPrescribedNodalFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
-#include "FEPrescribedPositionalConcentration.h"
-#include "FEPrescribedStressConcentration.h"
+#include "FEPrescribedStressSensitiveConcentration.h"
 
 #include "FEInitialFluidPressure.h"
 #include "FEInitialConcentration.h"
@@ -334,8 +333,7 @@ void FEBioMix::InitModule()
 	// boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
 	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
-	REGISTER_FECORE_CLASS(FEPrescribedPositionalConcentration, "prescribed positional concentration");
-	REGISTER_FECORE_CLASS(FEPrescribedStressConcentration, "prescribed stress-sensitive concentration");
+	REGISTER_FECORE_CLASS(FEPrescribedStressSensitiveConcentration, "prescribed stress sensitive concentration")
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
@@ -346,6 +344,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration     , "effective solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveShellSoluteConcentration, "effective shell solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration        , "solute concentration");
+	REGISTER_FECORE_CLASS(FEPlotReferentialSoluteConcentration   , "referential solute concentration");
     REGISTER_FECORE_CLASS(FEPlotPartitionCoefficient             , "partition coefficient");
 	REGISTER_FECORE_CLASS(FEPlotSoluteFlux		                 , "solute flux"                     );
     REGISTER_FECORE_CLASS(FEPlotSoluteVolumetricFlux             , "solute volumetric flux"          );
@@ -437,9 +436,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberPowLinearSBM                 , "fiber-pow-linear sbm");
 	REGISTER_FECORE_CLASS(FEReactionRateConst		    	  , "constant reaction rate"    );
 	REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  , "Huiskes reaction rate"     );
-	REGISTER_FECORE_CLASS(FEReactionRatePositional			  , "Positional reaction rate"	);
-	REGISTER_FECORE_CLASS(FEReactionRatePositionalZ			  , "Z Positional reaction rate");
-	REGISTER_FECORE_CLASS(FEReactionRatePositionalStress	  , "Positional Stress reaction rate");
+	REGISTER_FECORE_CLASS(FEReactionRateStressSensitive		  , "stress sensitive reaction rate");
 	REGISTER_FECORE_CLASS(FEReactionRateNims		    	  , "Nims reaction rate"        );
 	REGISTER_FECORE_CLASS(FEReactionRateExpSED                , "exp-sed reaction rate"     );
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateConst         , "membrane constant reaction rate");
@@ -447,10 +444,12 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateVoltageGated  , "membrane voltage-gated reaction rate");
 	REGISTER_FECORE_CLASS(FEMassActionForward		    	  , "mass-action-forward"       );
 	REGISTER_FECORE_CLASS(FEMassActionForwardEffective		  , "mass-action-forward-effective");
+	REGISTER_FECORE_CLASS(FEMassActionForwardReferential	  , "mass-action-forward-referential");
 	REGISTER_FECORE_CLASS(FEMembraneMassActionForward         , "membrane-mass-action-forward");
 	REGISTER_FECORE_CLASS(FEConcentrationIndependentReaction  , "concentration-independent");
 	REGISTER_FECORE_CLASS(FEMassActionReversible              , "mass-action-reversible"   );
 	REGISTER_FECORE_CLASS(FEMassActionReversibleEffective     , "mass-action-reversible-effective");
+	REGISTER_FECORE_CLASS(FEMassActionReversibleReferential   , "mass-action-reversible-referential");
 	REGISTER_FECORE_CLASS(FEMembraneMassActionReversible      , "membrane-mass-action-reversible");
 	REGISTER_FECORE_CLASS(FEMichaelisMenten                   , "Michaelis-Menten"         );
 	REGISTER_FECORE_CLASS(FESolidBoundMolecule                , "solid_bound"              );
@@ -491,6 +490,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotReceptorLigandConcentration      , "receptor-ligand concentration"			);
 	REGISTER_FECORE_CLASS(FEPlotSBMConcentration                 , "sbm concentration"						);
     REGISTER_FECORE_CLASS(FEPlotSBMArealConcentration            , "sbm areal concentration"				);
+	REGISTER_FECORE_CLASS(FEPlotSBMReferentialConcentration		 , "sbm referential concentration"			);
 	REGISTER_FECORE_CLASS(FEPlotSBMRefAppDensity			     , "sbm referential apparent density"		);
 	REGISTER_FECORE_CLASS(FEPlotOsmoticCoefficient               , "osmotic coefficient"					);
 

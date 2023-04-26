@@ -27,29 +27,49 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEElasticMaterial.h"
+#include <FECore/FEPrescribedDOF.h>
+#include <FECore/tens3d.h>
+#include <FEBioMech/FEBioMech.h>
+#include "febiomix_api.h"
+#include <FECore/FEElement.h>
 
 //-----------------------------------------------------------------------------
-//! This is a coupled formulation for the Mooney-Rivlin material.
-class FECoupledMooneyRivlin : public FEElasticMaterial
+class FEBIOMIX_API FEPrescribedStressSensitiveConcentration : public FEPrescribedDOF
 {
 public:
-	FECoupledMooneyRivlin(FEModel* pfem) : FEElasticMaterial(pfem){}
+	//! constructor
+	FEPrescribedStressSensitiveConcentration(FEModel* pfem);
 
-protected:
-	FEParamDouble	m_c1;	//!< Mooney-Rivlin parameter c1
-	FEParamDouble	m_c2;	//!< Mooney-Rivlin parameter c2
-	FEParamDouble	m_K;	//!< bulk modulus
+	//! initializer
+	bool Init() override;
+
+	//! get integration point stress
+	mat3ds GetStress(FEElement& m_elem, int nodelid);
+
+	//! get integration point Jacobian
+	double GetEffectiveJacobian(FEElement& m_elem, int nodelid);
+
+	//! get integration point concentration
+	double GetConcentration(FEElement& m_elem, int nodelid);
+
+	//! get stress projected at the nodes
+	mat3ds GetNodalStress(int nodelid);
+
+	//! get Jacobian projected at the nodes
+	double GetNodalEffectiveJacobian(int nodelid);
+
+	//! get concentration projected at the nodes
+	double GetNodalConcentration(int nodelid);
 
 public:
-	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt) override;
-
-	//! calculate tangent at material point
-	tens4ds Tangent(FEMaterialPoint& pt) override;
-
-	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
-    
+	double stress0	= 0.1;
+	double m_a0		= 1.0;
+	double m_a		= 1.0;
+	double m_b		= 0.5;
+	FEParamDouble m_value;
 	DECLARE_FECORE_CLASS();
+protected:
+	void GetNodalValues(int nodelid, std::vector<double>& val) override;
+
+protected:
 };

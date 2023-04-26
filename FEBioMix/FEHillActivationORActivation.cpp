@@ -64,11 +64,11 @@ double FEHillActivationORActivation::ReactionRate(FEMaterialPoint& pt)
 	{
 		if (m_sol_id[i] > 0)
 		{
-			c[i] = m_pReact->m_psm->GetActualSoluteConcentration(pt, m_sol_id[i] - 1);
+			c[i] = m_pReact->m_psm->GetReferentialSoluteConcentration(pt, m_sol_id[i] - 1);
 		}
 		else if (m_sbm_id[i] > 0)
 		{
-			c[i] = m_pReact->m_psm->SBMConcentration(pt, m_sbm_id[i] - 1);
+			c[i] = m_pReact->m_psm->SBMReferentialConcentration(pt, m_sbm_id[i] - 1);
 		}
 		cn[i] = pow(c[i], m_n);
 		F[i] = (B * cn[i]) / (Kn + cn[i]);

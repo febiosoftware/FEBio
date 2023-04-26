@@ -108,7 +108,7 @@ void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::funct
 
 	// this array will store the results
 	FESPRProjection map;
-	map.SetInterpolationOrder(interpolOrder);
+	map.SetInterpolationOrder(1);
 	vector<double> val[6];
 
 	// fill the ED array

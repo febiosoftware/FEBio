@@ -29,26 +29,32 @@ SOFTWARE.*/
 #pragma once
 #include "FEChemicalReaction.h"
 
-class FEBIOMIX_API FEReactionRatePositionalStress : public FEReactionRate
+//-----------------------------------------------------------------------------
+//! Law of mass action for reversible chemical reaction.
+class FEBIOMIX_API FEMassActionReversibleReferential : public FEChemicalReaction
 {
 public:
 	//! constructor
-	FEReactionRatePositionalStress(FEModel* pfem);
+	FEMassActionReversibleReferential(FEModel* pfem);
+		
+	//! molar supply at material point
+	double ReactionSupply(FEMaterialPoint& pt) override;
 	
-	//! reaction rate at material point
-	double ReactionRate(FEMaterialPoint& pt) override;
+	//! tangent of molar supply with strain (J) at material point
+	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
 	
-	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
+	//! tangent of molar supply with effective pressure at material point
+	double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt) override;
 	
-	//! tangent of reaction rate with effective fluid pressure at material point
-	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+	//! tangent of molar supply with effective concentration at material point
+	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
 	
-public:
-	double stress0	= 1.0;
-	double m_k		= 1.0;
-	double m_b		= 0.4;
-	double m_n		= 1.0;
-	double C1		= 1.0;
-	DECLARE_FECORE_CLASS();	
+	//! molar supply at material point
+	double FwdReactionSupply(FEMaterialPoint& pt);
+	
+	//! molar supply at material point
+	double RevReactionSupply(FEMaterialPoint& pt);
+
+	DECLARE_FECORE_CLASS();
 };
+

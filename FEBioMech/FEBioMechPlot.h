@@ -1244,3 +1244,31 @@ public:
 	FEPlotGrowthElasticDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+class FEPlotGrowthDeformationGradient : public FEPlotDomainData
+{
+public:
+	FEPlotGrowthDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotJacobian : public FEPlotDomainData
+{
+public:
+	FEPlotJacobian(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotGrowthElasticJacobian : public FEPlotDomainData
+{
+public:
+	FEPlotGrowthElasticJacobian(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotGrowthJacobian : public FEPlotDomainData
+{
+public:
+	FEPlotGrowthJacobian(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

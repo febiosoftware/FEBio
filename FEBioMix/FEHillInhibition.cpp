@@ -54,11 +54,11 @@ double FEHillInhibition::ReactionRate(FEMaterialPoint& pt)
 	double c = 0.0;
 	if (m_sol_id > 0)
 	{
-		c = m_pReact->m_psm->GetActualSoluteConcentration(pt, m_sol_id - 1);
+		c = m_pReact->m_psm->GetReferentialSoluteConcentration(pt, m_sol_id - 1);
 	}
 	else if (m_sbm_id > 0)
 	{
-		c = m_pReact->m_psm->SBMConcentration(pt, m_sbm_id - 1);
+		c = m_pReact->m_psm->SBMReferentialConcentration(pt, m_sbm_id - 1);
 	}
 	double En = pow(m_E50, m_n);
 	double B = (En - 1.0) / (2.0 * En - 1.0);

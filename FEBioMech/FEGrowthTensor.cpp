@@ -81,7 +81,6 @@ mat3d FEVolumeGrowth::GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& n0)
 {
     mat3d Fg = GrowthTensor(pt, n0);
     return Fg.inverse();
-    //return mat3dd(1./m_gm(pt));
 }
 
 //-----------------------------------------------------------------------------
@@ -90,7 +89,6 @@ double FEVolumeGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 {
     mat3d Fg = GrowthTensor(pt, n0);
     return pow(Fg[0][0], 3);
-    //return pow(m_gm(pt), 3);
 }
 
 //-----------------------------------------------------------------------------
@@ -160,8 +158,8 @@ double FEGrowthTensor::SoluteConcentration(FEMaterialPoint& pt)
     int nint = m_el->GaussPoints();
     FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
     FESolutesMaterialPoint& pd = *(pt.ExtractData<FESolutesMaterialPoint>());
-    FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom->GetMaterial());
-    return pd.m_c[m_sol_id - 1];
+    FEMultiphasic* pm = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
+    return pm->GetReferentialSoluteConcentration(pt, m_sol_id - 1);
 }
 
 //-----------------------------------------------------------------------------

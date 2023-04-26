@@ -152,6 +152,14 @@ public:
 		return spt.m_sbmr[sbm] / SBMMolarMass(sbm) * h / ept.m_J;
 	}
 
+	//! SBM actual concentration (molar concentration per fluid volume in current configuration)
+	double SBMReferentialConcentration(FEMaterialPoint& pt, const int sbm) override {
+		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+		return spt.m_sbmr[sbm] / SBMMolarMass(sbm);
+	}
+
     // return the number of solutes on external side
     int SolutesExternal(FEMaterialPoint& pt) override {
         FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
