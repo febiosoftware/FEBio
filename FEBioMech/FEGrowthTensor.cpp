@@ -24,6 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+#include "stdafx.h"
 #include "FEGrowthTensor.h"
 #include <FECore/FEConstValueVec3.h>
 #include <FECore/FEModel.h>
@@ -35,7 +36,7 @@ SOFTWARE.*/
 //!
 // define the material parameters
 BEGIN_FECORE_CLASS(FEGrowthTensor, FEMaterialProperty)
-    ADD_PROPERTY(m_fiber, "fiber", FEProperty::Optional)->SetDefaultType("vector");
+    ADD_PARAMETER(m_fiber, "fiber");
     ADD_PARAMETER(m_gm, "multiplier")->setLongName("time_multiplier");
     ADD_PARAMETER(m_sbm_id, "sbm_id")->setLongName("sbm id for scaling growth");
     ADD_PARAMETER(m_sol_id, "sol_id")->setLongName("sol id for scaling growth");
@@ -43,19 +44,13 @@ END_FECORE_CLASS();
 
 FEGrowthTensor::FEGrowthTensor(FEModel* pfem) : FEMaterialProperty(pfem)
 {
-    m_fiber = nullptr;
+    m_fiber = vec3d(1, 0, 0);
 }
 
 FEGrowthTensor::~FEGrowthTensor() {}
 
 bool FEGrowthTensor::Init()
 {
-    if (m_fiber == nullptr) {
-        FEConstValueVec3* val = fecore_new<FEConstValueVec3>("vector", nullptr);
-        val->value() = vec3d(1, 0, 0);
-        m_fiber = val;
-    }
-
     return FEMaterialProperty::Init();
 }
 

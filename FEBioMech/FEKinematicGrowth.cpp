@@ -128,7 +128,7 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
     // material axes
     mat3d Q = GetLocalCS(mp);
     // get the fiber vector in local coordinates
-    vec3d fiber = gmat->m_fiber->unitVector(mp);
+    vec3d fiber = gmat->m_fiber.unitVector(mp);
     // convert to global coordinates
     vec3d a0 = Q * fiber;
     
@@ -165,7 +165,7 @@ tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
     // material axes
     mat3d Q = GetLocalCS(mp);
     // get the fiber vector in local coordinates
-    vec3d fiber = gmat->m_fiber->unitVector(mp);
+    vec3d fiber = gmat->m_fiber.unitVector(mp);
     // convert to global coordinates
     vec3d a0 = Q * fiber;
     
@@ -201,7 +201,7 @@ double FEKinematicGrowth::StrainEnergyDensity(FEMaterialPoint& mp)
     // material axes
     mat3d Q = GetLocalCS(mp);
     // get the fiber vector in local coordinates
-    vec3d fiber = gmat->m_fiber->unitVector(mp);
+    vec3d fiber = gmat->m_fiber.unitVector(mp);
     // convert to global coordinates
     vec3d a0 = Q * fiber;
 
@@ -237,7 +237,7 @@ void FEKinematicGrowth::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
     // material axes
     mat3d Q = GetLocalCS(mp);
     // get the fiber vector in local coordinates
-    vec3d fiber = gmat->m_fiber->unitVector(mp);
+    vec3d fiber = gmat->m_fiber.unitVector(mp);
     // convert to global coordinates
     vec3d a0 = Q * fiber;
     

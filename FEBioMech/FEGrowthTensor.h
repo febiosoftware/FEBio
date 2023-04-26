@@ -62,12 +62,14 @@ public:
     bool Init() override;
     
 public:
-    FEVec3dValuator* m_fiber;
+    FEParamVec3 m_fiber;
+    //FEVec3dValuator* m_fiber;
     FEParamDouble   m_gm;       //! isotropic growth multiplier
     //!SL: temporary place holder. Intent is to allow scaling by value of some state variable. In this case we are saying SBM id number to identify which SBM to base growth on. Will implement general solution later for more options.
     int             m_sbm_id = -1;   //! Which sbm should be used? Optional for now...
     int             m_sol_id = -1;
 
+protected:
     DECLARE_FECORE_CLASS();
 };
 

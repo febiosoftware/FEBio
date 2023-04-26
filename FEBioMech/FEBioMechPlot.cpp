@@ -4017,7 +4017,7 @@ bool FEPlotGrowthTensor::Save(FEDomain& dom, FEDataStream& a)
 		// Get the interpolated SPD from the shape function-weighted Average Structure Tensor
 		for (int j = 0; j < se.GaussPoints(); ++j) {
 			FEMaterialPoint& pt = *se.GetMaterialPoint(j);
-			vec3d n0 = pmf->m_fiber->unitVector(pt);
+			vec3d n0 = pmf->m_fiber.unitVector(pt);
 			mat3d gt = pmf->GrowthTensor(pt, n0);
 			mat3ds gts = gt.sym();
 			SPDs_gausspts.push_back(gts);
