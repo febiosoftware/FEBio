@@ -41,7 +41,7 @@ FEConstValueVec3::FEConstValueVec3(FEModel* fem) : FEVec3dValuator(fem) {}
 
 FEVec3dValuator* FEConstValueVec3::copy()
 {
-	FEConstValueVec3* val = new FEConstValueVec3(GetFEModel());
+	FEConstValueVec3* val = fecore_alloc(FEConstValueVec3, GetFEModel());
 	val->m_val = m_val;
 	return val;
 }
@@ -112,7 +112,7 @@ vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)
 //---------------------------------------------------------------------------------------
 FEVec3dValuator* FEMathValueVec3::copy()
 {
-	FEMathValueVec3* newVal = new FEMathValueVec3(GetFEModel());
+	FEMathValueVec3* newVal = fecore_alloc(FEMathValueVec3, GetFEModel());
 	newVal->m_math[0] = m_math[0];
 	newVal->m_math[1] = m_math[1];
 	newVal->m_math[2] = m_math[2];
@@ -204,7 +204,7 @@ vec3d FELocalVectorGenerator::operator () (const FEMaterialPoint& mp)
 
 FEVec3dValuator* FELocalVectorGenerator::copy()
 {
-	FELocalVectorGenerator* map = new FELocalVectorGenerator(GetFEModel());
+	FELocalVectorGenerator* map = fecore_alloc(FELocalVectorGenerator, GetFEModel());
 	map->m_n[0] = m_n[0];
 	map->m_n[1] = m_n[1];
 	return map;
@@ -231,7 +231,7 @@ bool FESphericalVectorGenerator::Init()
 
 FEVec3dValuator* FESphericalVectorGenerator::copy()
 {
-	FESphericalVectorGenerator* map = new FESphericalVectorGenerator(GetFEModel());
+	FESphericalVectorGenerator* map = fecore_alloc(FESphericalVectorGenerator, GetFEModel());
 	map->m_center = m_center;
 	map->m_vector = m_vector;
 	return map;
@@ -296,7 +296,7 @@ vec3d FECylindricalVectorGenerator::operator () (const FEMaterialPoint& mp)
 
 FEVec3dValuator* FECylindricalVectorGenerator::copy()
 {
-	FECylindricalVectorGenerator* map = new FECylindricalVectorGenerator(GetFEModel());
+	FECylindricalVectorGenerator* map = fecore_alloc(FECylindricalVectorGenerator, GetFEModel());
 	map->m_center = m_center;
 	map->m_axis = m_axis;
 	map->m_vector = m_vector;

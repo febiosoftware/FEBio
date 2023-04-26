@@ -950,6 +950,30 @@ bool FEPlotElementElasticity::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+//! Store the average deviatoric elasticity for each element.
+
+class FEElementDevElasticity
+{
+public:
+    FEElementDevElasticity(FEUncoupledMaterial* pm) : m_mat(pm) {}
+    tens4ds operator()(const FEMaterialPoint& mp)
+    {
+        return m_mat->DevTangent(const_cast<FEMaterialPoint&>(mp));
+    }
+private:
+    FEUncoupledMaterial*    m_mat;
+};
+
+bool FEPlotElementDevElasticity::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEUncoupledMaterial* pme = dom.GetMaterial()->ExtractProperty<FEUncoupledMaterial>();
+    if ((pme == 0) || pme->IsRigid()) return false;
+    
+    writeAverageElementValue<tens4ds>(dom, a, FEElementDevElasticity(pme));
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 class FEStrainEnergy
 {
 public:

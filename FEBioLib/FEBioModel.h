@@ -191,6 +191,7 @@ public:
 
 	// flag to show warnings and errors
 	void ShowWarningsAndErrors(bool b);
+	bool ShowWarningsAndErrors() const;
 
 private:
 	void print_parameter(FEParam& p, int level = 0);

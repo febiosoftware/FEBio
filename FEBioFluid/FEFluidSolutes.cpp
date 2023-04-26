@@ -686,6 +686,11 @@ double FEFluidSolutes::GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int 
     return spt.m_c[soluteIndex];
 }
 
+double FEFluidSolutes::GetFreeDiffusivity(FEMaterialPoint& mp, int soluteIndex)
+{
+    return m_pSolute[soluteIndex]->m_pDiff->Free_Diffusivity(mp);
+}
+
 double FEFluidSolutes::GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex)
 {
     FEFluidSolutesMaterialPoint& spt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();

@@ -66,7 +66,6 @@ void FESurfaceLoad::Serialize(DumpStream& ar)
 	if (m_psurf && ar.IsLoading())
 	{
 		FEMesh* pm = m_psurf->GetMesh();
-		assert(pm->FindSurface(m_psurf->GetName()) == nullptr);
 		pm->AddSurface(m_psurf);
 	}
 }

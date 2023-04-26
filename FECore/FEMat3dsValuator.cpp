@@ -48,7 +48,7 @@ FEConstValueMat3ds::FEConstValueMat3ds(FEModel* fem) : FEMat3dsValuator(fem)
 
 FEMat3dsValuator* FEConstValueMat3ds::copy()
 {
-	FEConstValueMat3ds* map = new FEConstValueMat3ds(GetFEModel());
+	FEConstValueMat3ds* map = fecore_alloc(FEConstValueMat3ds, GetFEModel());
 	map->m_val = m_val;
 	return map;
 }

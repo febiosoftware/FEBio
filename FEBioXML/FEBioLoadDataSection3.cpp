@@ -88,6 +88,13 @@ void FEBioLoadDataSection3::Parse(XMLTag& tag)
 
 			// read the parameter list
 			ReadParameterList(tag, plc);
+
+			if (m_redefineCurves)
+			{
+				// We only get here during restart, in which case the new load controllers
+				// will not get a chance to be initialized, so we'll do it here.
+				plc->Init();
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 

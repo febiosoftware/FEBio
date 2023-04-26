@@ -627,6 +627,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element elasticity tensor
+class FEPlotElementDevElasticity : public FEPlotDomainData
+{
+public:
+    FEPlotElementDevElasticity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_TENS4FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Damage reduction factor
 class FEPlotDamage : public FEPlotDomainData
 {
