@@ -149,8 +149,7 @@ void FEMesh::Serialize(DumpStream& ar)
 		for (int i = 0; i < maps; ++i)
 		{
 			FEDataMap* map = GetDataMap(i);
-			ar << map->DataMapType();
-			map->Serialize(ar);
+			ar << map;
 		}
 	}
 	else
@@ -211,11 +210,8 @@ void FEMesh::Serialize(DumpStream& ar)
 		ar >> maps;
 		for (int i = 0; i < maps; ++i)
 		{
-			ar >> mapType;
-
-			FEDataMap* map = CreateDataMap(mapType);
-			assert(map);
-			map->Serialize(ar);
+			FEDataMap* map = nullptr;
+			ar >> map;
 			AddDataMap(map);
 		}
 
