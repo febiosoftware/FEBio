@@ -23,60 +23,49 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEInitialFluidPressureTemperature.h"
-#include "FEBioThermoFluid.h"
-#include "FEThermoFluid.h"
-#include "FEFluid.h"
+#include "FEInitialFluidSolutesPressure.h"
+#include "FEBioFluidSolutes.h"
+#include "FEFluidSolutes.h"
 #include <FECore/FEModel.h>
-#include <FECore/FEAnalysis.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEInitialFluidPressureTemperature, FEInitialCondition)
+BEGIN_FECORE_CLASS(FEInitialFluidSolutesPressure, FEInitialCondition)
 // material properties
-    ADD_PARAMETER(m_Pdata, "pressure"   )->setUnits(UNIT_PRESSURE);
-    ADD_PARAMETER(m_Tdata, "temperature")->setUnits(UNIT_RELATIVE_TEMPERATURE);
+    ADD_PARAMETER(m_Pdata, "value"   )->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEInitialFluidPressureTemperature::FEInitialFluidPressureTemperature(FEModel* fem) : FENodalIC(fem)
+FEInitialFluidSolutesPressure::FEInitialFluidSolutesPressure(FEModel* fem) : FENodalIC(fem)
 {
+    m_dofEF = -1;
+    m_dofC = -1;
+    m_Rgas = 0;
+    m_Tabs = 0;
+    m_Fc = 0;
 }
 
 //-----------------------------------------------------------------------------
-bool FEInitialFluidPressureTemperature::Init()
+bool FEInitialFluidSolutesPressure::Init()
 {
     if (SetPDOF("ef") == false) return false;
-	if (SetTDOF("T") == false) return false;
     m_e.assign(m_nodeSet->Size(), 0.0);
-    m_T.assign(m_nodeSet->Size(), 0.0);
 
     FEDofList dofs(GetFEModel());
-    if (dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION)) == false) return false;
-    if (dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE)) == false) return false;
+    if (dofs.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION)) == false) return false;
     SetDOFList(dofs);
-    
+    m_dofC = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
+    m_Rgas = GetFEModel()->GetGlobalConstant("R");
+    m_Tabs = GetFEModel()->GetGlobalConstant("T");
+    m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
+
 	return FENodalIC::Init();
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::SetTDOF(int ndof) { m_dofT = ndof; }
+void FEInitialFluidSolutesPressure::SetPDOF(int ndof) { m_dofEF = ndof; }
 
 //-----------------------------------------------------------------------------
-bool FEInitialFluidPressureTemperature::SetTDOF(const char* szdof)
-{
-    FEModel* fem = GetFEModel();
-    int ndof = fem->GetDOFIndex(szdof);
-    assert(ndof >= 0);
-    if (ndof < 0) return false;
-    SetTDOF(ndof);
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::SetPDOF(int ndof) { m_dofEF = ndof; }
-
-//-----------------------------------------------------------------------------
-bool FEInitialFluidPressureTemperature::SetPDOF(const char* szdof)
+bool FEInitialFluidSolutesPressure::SetPDOF(const char* szdof)
 {
     FEModel* fem = GetFEModel();
     int ndof = fem->GetDOFIndex(szdof);
@@ -87,7 +76,7 @@ bool FEInitialFluidPressureTemperature::SetPDOF(const char* szdof)
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::Activate()
+void FEInitialFluidSolutesPressure::Activate()
 {
     // prescribe this dilatation at the nodes
     FEModel* fem = GetFEModel();
@@ -104,75 +93,82 @@ void FEInitialFluidPressureTemperature::Activate()
     for (int i=0; i<mesh.Elements(); ++i)
     {
         FEElement& el = *mesh.Element(i);
+        FESolidElement* se = dynamic_cast<FESolidElement*>(&el);
         // get material
         FEMaterial* pm = GetFEModel()->GetMaterial(el.GetMatID());
-        FEThermoFluid* ptfl = pm->ExtractProperty<FEThermoFluid>();
         FEFluid* pfl = pm->ExtractProperty<FEFluid>();
-        if (ptfl) {
+        FESoluteInterface* psi = pm->ExtractProperty<FESoluteInterface>();
+        if (pfl) {
             double efi[FEElement::MAX_INTPOINTS] = {0};
             double efo[FEElement::MAX_NODES] = {0};
-            bool good = true;
-            for (int j=0; j<el.GaussPoints(); ++j) {
-                FEMaterialPoint* pt = el.GetMaterialPoint(j);
-                good = good && ptfl->Dilatation(m_Tdata(*pt), m_Pdata(*pt), efi[j]);
-            }
-            // project dilatations from integration points to nodes
-            el.project_to_nodes(efi, efo);
-            if (good) {
-                for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_node[j]].push_back(efo[j]);
-            }
-            else {
+            if (psi) {
+                const int nsol = psi->Solutes();
+                std::vector<double> kappa(nsol,0);
+                double osc = 0, p = 0, epot = 0;
+                const int nint = se->GaussPoints();
+                // get the average osmotic coefficient and partition coefficients in the solid element
+                for (int j=0; j<nint; ++j) {
+                    FEMaterialPoint* pt = se->GetMaterialPoint(j);
+                    osc += psi->GetOsmoticCoefficient()->OsmoticCoefficient(*pt);
+                    p += m_Pdata(*pt);
+                    epot += psi->GetElectricPotential(*pt);
+                    for (int k=0; k<nsol; ++k)
+                        kappa[k] += psi->GetSolute(k)->m_pSolub->Solubility(*pt);
+                }
+                osc /= nint;
+                p /= nint;
+                epot /= nint;
+                double ex = exp(-m_Fc*epot/m_Rgas/m_Tabs);
+                for (int k=0; k<nsol; ++k) kappa[k] *= pow(ex,psi->GetSolute(k)->ChargeNumber())/nint;
+                // loop over element nodes
                 for (int j=0; j<el.Nodes(); ++j) {
-                    efo[j] = 0;
-                    efNodes[el.m_node[j]].push_back(efo[j]);
+                    double osm = 0;
+                    FENode& node = mesh.Node(el.m_lnode[j]);
+                    // calculate osmolarity at this node, using nodal effective solute concentrations
+                    for (int k=0; k<nsol; ++k)
+                        osm += node.get(m_dofC+psi->GetSolute(k)->GetSoluteID()-1)*kappa[k];
+                    bool good = pfl->Dilatation(0, p - m_Rgas*m_Tabs*osc*osm, efo[j]);
+                    assert(good);
                 }
             }
-        }
-        else if (pfl) {
-            double efi[FEElement::MAX_INTPOINTS] = {0};
-            double efo[FEElement::MAX_NODES] = {0};
-            bool good = true;
-            for (int j=0; j<el.GaussPoints(); ++j) {
-                FEMaterialPoint* pt = el.GetMaterialPoint(j);
-                good = good && pfl->Dilatation(0, m_Pdata(*pt), efi[j]);
-            }
-            // project dilatations from integration points to nodes
-            el.project_to_nodes(efi, efo);
-            if (good) {
-                for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_node[j]].push_back(efo[j]);
-            }
             else {
+                double p = 0;
+                const int nint = se->GaussPoints();
+                // get the average osmotic coefficient and partition coefficients in the solid element
+                for (int j=0; j<nint; ++j) {
+                    FEMaterialPoint* pt = se->GetMaterialPoint(j);
+                    p += m_Pdata(*pt);
+                }
+                p /= nint;
+                // loop over element nodes
                 for (int j=0; j<el.Nodes(); ++j) {
-                    efo[j] = 0;
-                    efNodes[el.m_node[j]].push_back(efo[j]);
+                    FENode& node = mesh.Node(el.m_lnode[j]);
+                    bool good = pfl->Dilatation(0, p, efo[j]);
+                    assert(good);
                 }
             }
+            for (int j=0; j<el.Nodes(); ++j)
+                efNodes[el.m_lnode[j]].push_back(efo[j]);
         }
-        else break;
+        //If no solid element, insert all 0s
+        else {
+            for (int j=0; j<el.Nodes(); ++j)
+                efNodes[el.m_lnode[j]].push_back(0);
+        }
     }
     
     //For each node, average the nodal ef
-    for (int i=0; i<nodeList.Size(); ++i)
+    for (int i=0; i<mesh.Nodes(); ++i)
     {
         double ef = 0;
         for (int j = 0; j < efNodes[i].size(); ++j)
             ef += efNodes[i][j];
         ef /= efNodes[i].size();
-            
+        
         // store value for now
         m_e[i] = ef;
-        
-        // get the nodal temperature
-        FENode& node = *nodeList.Node(i);
-        FEMaterialPoint mp;
-        mp.m_r0 = node.m_r0;
-        mp.m_index = i;
-
-        m_T[i] = m_Tdata(mp);
     }
-    
+
     FEStepComponent::Activate();
     if (m_dofs.IsEmpty()) return;
 
@@ -194,22 +190,21 @@ void FEInitialFluidPressureTemperature::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::GetNodalValues(int inode, std::vector<double>& values)
+void FEInitialFluidSolutesPressure::GetNodalValues(int inode, std::vector<double>& values)
 {
     values[0] = m_e[inode];
-    values[1] = m_T[inode];
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::Serialize(DumpStream& ar)
+void FEInitialFluidSolutesPressure::Serialize(DumpStream& ar)
 {
     FENodalIC::Serialize(ar);
-    if (ar.IsLoading()) {
+    if (ar.IsLoading())
         m_e.assign(m_nodeSet->Size(), 0.0);
-        m_T.assign(m_nodeSet->Size(), 0.0);
-    }
-    ar & m_e & m_T;
+    ar & m_e;
     if (ar.IsShallow()) return;
-    ar & m_dofEF & m_dofT;
+    ar & m_dofEF;
+    ar & m_dofC;
+    ar & m_Rgas & m_Tabs & m_Fc;
 }
 

@@ -23,52 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include <FECore/FEInitialCondition.h>
 
-#include "stdafx.h"
-#include "FEInitialFluidVelocity.h"
-#include "FEBioFluid.h"
-#include <FECore/FEMaterialPoint.h>
-#include <FECore/FENode.h>
-
-BEGIN_FECORE_CLASS(FEInitialFluidVelocity, FENodalIC)
-    ADD_PARAMETER(m_v0, "value")->setUnits(UNIT_VELOCITY);
-END_FECORE_CLASS();
-
-FEInitialFluidVelocity::FEInitialFluidVelocity(FEModel* fem) : FENodalIC(fem)
+class FEInitialFluidPressure : public FENodalIC
 {
-    m_v0 = vec3d(0, 0, 0);
-}
+public:
+    FEInitialFluidPressure(FEModel* fem);
+	bool Init() override;
+    void Activate() override;
+    
+    void SetPDOF(int ndof);
+    bool SetPDOF(const char* szdof);
 
-// set the initial value
-void FEInitialFluidVelocity::SetValue(const vec3d& v0)
-{
-    m_v0 = v0;
-}
+    void GetNodalValues(int inode, std::vector<double>& values) override;
 
-// initialization
-bool FEInitialFluidVelocity::Init()
-{
-    FEDofList dofs(GetFEModel());
-    if (dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
-    SetDOFList(dofs);
-    return true;
-}
+    void Serialize(DumpStream& ar) override;
 
-// return the values for node i
-void FEInitialFluidVelocity::GetNodalValues(int inode, std::vector<double>& values)
-{
-    assert(values.size() == 3);
-    
-    const FENodeSet& nset = *GetNodeSet();
-    const FENode& node = *nset.Node(inode);
-    
-    FEMaterialPoint mp;
-    mp.m_r0 = node.m_r0;
-    mp.m_index = inode;
-    
-    vec3d v0 = m_v0(mp);
-    
-    values[0] = v0.x;
-    values[1] = v0.y;
-    values[2] = v0.z;
-}
+protected:
+    int     m_dofEF;
+    FEParamDouble   m_Pdata;
+    vector<double>  m_e;
+
+	DECLARE_FECORE_CLASS();
+};

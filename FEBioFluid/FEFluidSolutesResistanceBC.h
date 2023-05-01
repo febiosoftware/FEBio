@@ -27,49 +27,50 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEFluid.h"
+#include <FECore/FEPrescribedBC.h>
+#include "FEFluidSolutes.h"
 
 //-----------------------------------------------------------------------------
-//! Ideal gas under isentropic conditions.
-
-class FEBIOFLUID_API FEIdealGasIsentropic : public FEFluid
+//! FEFluidSolutesResistanceBC is a fluid-solutes surface that has a normal
+//! pressure proportional to the flow rate (resistance).
+//!
+class FEBIOFLUID_API FEFluidSolutesResistanceBC : public FEPrescribedSurface
 {
 public:
-    FEIdealGasIsentropic(FEModel* pfem);
+    //! constructor
+    FEFluidSolutesResistanceBC(FEModel* pfem);
     
-public:
-    //! initialization
+    //! evaluate flow rate
+    double FlowRate();
+    
+    //! initialize
     bool Init() override;
-    
-    //! Serialization
+
+    //! serialize data to archive
     void Serialize(DumpStream& ar) override;
 
-    //! elastic pressure
-    double Pressure(FEMaterialPoint& mp) override;
-    double Pressure(const double e, const double T = 0) override;
-    
-    //! tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain(FEMaterialPoint& mp) override;
-    
-    //! 2nd tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) override;
-    
-    //! strain energy density
-    double StrainEnergyDensity(FEMaterialPoint& mp) override;
-    
-    //! invert pressure-dilatation relation
-    bool Dilatation(const double T, const double p, double& e) override;
-    
-    //! evaluate temperature
-    double Temperature(FEMaterialPoint& mp) override;
+	void Update() override;
     
 public:
-    double      m_gamma;    //!< ratio of specific heats (constant pressure/constant volume)
-    double      m_M;        //!< molar mass
-    double      m_Pr;       //!< ambient pressure
-    double      m_Tr;       //!< ambient temperature
-    double      m_R;        //!< universal gas constant
+    // return the value for node i, dof j
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
+
+    // copy data from another class
+    void CopyFrom(FEBoundaryCondition* pbc) override;
+
+private:
+    double			m_R;        //!< flow resistance
+    double          m_p0;       //!< fluid pressure offset
+    vector<double>  m_e;        //!< fluid dilatation
+
+private:
+    double          m_Rgas;
+    double          m_Tabs;
     
-    // declare parameter list
+
+	FEDofList       m_dofW;
+    int             m_dofEF;
+    int             m_dofC;
+
     DECLARE_FECORE_CLASS();
 };

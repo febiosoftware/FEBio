@@ -80,7 +80,7 @@ public:
     double Temperature(FEMaterialPoint& mp) override { return m_Tr; }
     
     //! evaluate dilatation from pressure
-    bool Dilatation(const double T, const double p, const double c, double& e) override;
+    bool Dilatation(const double T, const double p, double& e) override;
     
     //! return elastic fluid
     FEElasticFluid* GetElastic() { return m_pElastic; }

@@ -80,8 +80,8 @@ public:
     //! isobaric specific heat capacity
     virtual double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) = 0;
             
-    //! calculate dilatation for given pressure and temperature
-    virtual bool Dilatation(const double T, const double p, const double c, double& e) = 0;
+    //! calculate dilatation for given (effective) pressure and temperature
+    virtual bool Dilatation(const double T, const double p, double& e) = 0;
     
     //! calculate fluid pressure and its derivatives from state variables
     double Pressure(const double ef, const double T);

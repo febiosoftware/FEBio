@@ -23,60 +23,41 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEInitialFluidPressureTemperature.h"
-#include "FEBioThermoFluid.h"
-#include "FEThermoFluid.h"
+#include "FEInitialFluidPressure.h"
+#include "FEBioFluid.h"
 #include "FEFluid.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEInitialFluidPressureTemperature, FEInitialCondition)
+BEGIN_FECORE_CLASS(FEInitialFluidPressure, FEInitialCondition)
 // material properties
-    ADD_PARAMETER(m_Pdata, "pressure"   )->setUnits(UNIT_PRESSURE);
-    ADD_PARAMETER(m_Tdata, "temperature")->setUnits(UNIT_RELATIVE_TEMPERATURE);
+    ADD_PARAMETER(m_Pdata, "value"   )->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEInitialFluidPressureTemperature::FEInitialFluidPressureTemperature(FEModel* fem) : FENodalIC(fem)
+FEInitialFluidPressure::FEInitialFluidPressure(FEModel* fem) : FENodalIC(fem)
 {
 }
 
 //-----------------------------------------------------------------------------
-bool FEInitialFluidPressureTemperature::Init()
+bool FEInitialFluidPressure::Init()
 {
     if (SetPDOF("ef") == false) return false;
-	if (SetTDOF("T") == false) return false;
     m_e.assign(m_nodeSet->Size(), 0.0);
-    m_T.assign(m_nodeSet->Size(), 0.0);
 
     FEDofList dofs(GetFEModel());
-    if (dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION)) == false) return false;
-    if (dofs.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE)) == false) return false;
+    if (dofs.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
     SetDOFList(dofs);
     
 	return FENodalIC::Init();
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::SetTDOF(int ndof) { m_dofT = ndof; }
+void FEInitialFluidPressure::SetPDOF(int ndof) { m_dofEF = ndof; }
 
 //-----------------------------------------------------------------------------
-bool FEInitialFluidPressureTemperature::SetTDOF(const char* szdof)
-{
-    FEModel* fem = GetFEModel();
-    int ndof = fem->GetDOFIndex(szdof);
-    assert(ndof >= 0);
-    if (ndof < 0) return false;
-    SetTDOF(ndof);
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::SetPDOF(int ndof) { m_dofEF = ndof; }
-
-//-----------------------------------------------------------------------------
-bool FEInitialFluidPressureTemperature::SetPDOF(const char* szdof)
+bool FEInitialFluidPressure::SetPDOF(const char* szdof)
 {
     FEModel* fem = GetFEModel();
     int ndof = fem->GetDOFIndex(szdof);
@@ -87,7 +68,7 @@ bool FEInitialFluidPressureTemperature::SetPDOF(const char* szdof)
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::Activate()
+void FEInitialFluidPressure::Activate()
 {
     // prescribe this dilatation at the nodes
     FEModel* fem = GetFEModel();
@@ -106,30 +87,8 @@ void FEInitialFluidPressureTemperature::Activate()
         FEElement& el = *mesh.Element(i);
         // get material
         FEMaterial* pm = GetFEModel()->GetMaterial(el.GetMatID());
-        FEThermoFluid* ptfl = pm->ExtractProperty<FEThermoFluid>();
         FEFluid* pfl = pm->ExtractProperty<FEFluid>();
-        if (ptfl) {
-            double efi[FEElement::MAX_INTPOINTS] = {0};
-            double efo[FEElement::MAX_NODES] = {0};
-            bool good = true;
-            for (int j=0; j<el.GaussPoints(); ++j) {
-                FEMaterialPoint* pt = el.GetMaterialPoint(j);
-                good = good && ptfl->Dilatation(m_Tdata(*pt), m_Pdata(*pt), efi[j]);
-            }
-            // project dilatations from integration points to nodes
-            el.project_to_nodes(efi, efo);
-            if (good) {
-                for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_node[j]].push_back(efo[j]);
-            }
-            else {
-                for (int j=0; j<el.Nodes(); ++j) {
-                    efo[j] = 0;
-                    efNodes[el.m_node[j]].push_back(efo[j]);
-                }
-            }
-        }
-        else if (pfl) {
+        if (pfl) {
             double efi[FEElement::MAX_INTPOINTS] = {0};
             double efo[FEElement::MAX_NODES] = {0};
             bool good = true;
@@ -163,14 +122,6 @@ void FEInitialFluidPressureTemperature::Activate()
             
         // store value for now
         m_e[i] = ef;
-        
-        // get the nodal temperature
-        FENode& node = *nodeList.Node(i);
-        FEMaterialPoint mp;
-        mp.m_r0 = node.m_r0;
-        mp.m_index = i;
-
-        m_T[i] = m_Tdata(mp);
     }
     
     FEStepComponent::Activate();
@@ -194,22 +145,19 @@ void FEInitialFluidPressureTemperature::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::GetNodalValues(int inode, std::vector<double>& values)
+void FEInitialFluidPressure::GetNodalValues(int inode, std::vector<double>& values)
 {
     values[0] = m_e[inode];
-    values[1] = m_T[inode];
 }
 
 //-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::Serialize(DumpStream& ar)
+void FEInitialFluidPressure::Serialize(DumpStream& ar)
 {
     FENodalIC::Serialize(ar);
-    if (ar.IsLoading()) {
+    if (ar.IsLoading())
         m_e.assign(m_nodeSet->Size(), 0.0);
-        m_T.assign(m_nodeSet->Size(), 0.0);
-    }
-    ar & m_e & m_T;
+    ar & m_e;
     if (ar.IsShallow()) return;
-    ar & m_dofEF & m_dofT;
+    ar & m_dofEF;
 }
 
