@@ -119,11 +119,15 @@ void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<d
 	// loop over integration points
 	int nint = el.GaussPoints();
 	int ne = el.Nodes();
-	double w = L0; // weight is reference length of beam
+	double* w = el.GaussWeights();
 
 	for (int n = 0; n < nint; ++n)
 	{
 		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+		// shape functions
+		double* H = el.H(n);
+		double* Hr = el.Hr(n);
 
 		// get stress from beam element
 		vec3d t = mp.m_t;	// stress
@@ -136,11 +140,13 @@ void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<d
 		// integration point 
 		double s = L0 * 0.5;
 
-		// shape function (at integration point)
-		double H[2] = { (1.0 - s / L0), s / L0 };
+		// J = dS / dr
+		double J = L0 / 2.0;
 
 		// shape function derivative (at integration point)
-		double G[2] = { -1 / L0, 1 / L0 };
+		double G[2] = { Hr[0] / J, Hr[1] / J };
+
+		double wJ = w[n] * J;
 
 		for (int i = 0; i < ne; ++i)
 		{
@@ -158,7 +164,7 @@ void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<d
 			// assemble
 			// note the negative sign: this is because we need to subtract
 			// the internal forces from the external forces.
-			for (int j = 0; j < 6; ++j) fe[i * 6 + j] -= P[j] * w;
+			for (int j = 0; j < 6; ++j) fe[i * 6 + j] -= P[j] * wJ;
 		}
 	}
 }
@@ -195,13 +201,9 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 	vec3d rb = Node(el.m_lnode[1]).m_r0;
 	double L0 = (rb - ra).Length();
 
-	// only a single integration point
-	double w = L0;
-
-	// integration point 
-	double s = L0 * 0.5;
-
+	// loop over integration points
 	int nint = el.GaussPoints();
+	double* w = el.GaussWeights();
 	for (int n = 0; n < nint; ++n)
 	{
 		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
@@ -213,11 +215,16 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 		mat3da St(t);
 		mat3da Sm(m);
 
-		// shape function (at integration point)
-		double H[2] = { (1.0 - s / L0),   s / L0 };
+		// shape functions
+		double* H = el.H(n);
+		double* Hr = el.Hr(n);
+
+		// J = dS / dr
+		double J = L0 / 2.0;
 
 		// shape function derivative (at integration point)
-		double G[2] = { -1 / L0, 1 / L0 };
+		double G[2] = { Hr[0] / J, Hr[1] / J };
+		double wJ = w[n] * J;
 
 		vec3d G0 = mp.m_G0; // = dphi_0/dS
 
@@ -258,7 +265,7 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 				for (int i = 0; i < 6; ++i)
 					for (int j = 0; j < 6; ++j)
 					{
-						ke[6 * a + i][6 * b + j] += (Se(i, j) + Te(i, j)) * w;
+						ke[6 * a + i][6 * b + j] += (Se(i, j) + Te(i, j)) * wJ;
 					}
 			}
 	}
@@ -297,10 +304,10 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 			FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
 
 			// evaluate at integration point
-			double s = 0.5 * L0;
-			double H[2] = { 1 - s / L0, s / L0 };
+			double* H = el.H(n);
 			vec3d dr = dri[0] * H[0] + dri[1] * H[1];
 
+			// TODO: use shape function derivatives
 			vec3d drdS = (dri[1] - dri[0]) / L0;
 
 			// calculate exponential map

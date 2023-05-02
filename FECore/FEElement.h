@@ -321,4 +321,7 @@ public:
 	FEBeamElement(const FEBeamElement& el);
 
 	FEBeamElement& operator = (const FEBeamElement& el);
+
+	double* GaussWeights() { return &((FEBeamElementTraits*)(m_pT))->gw[0]; }
+	double* Hr(int n) { return ((FEBeamElementTraits*)(m_pT))->Gr[n]; }
 };
