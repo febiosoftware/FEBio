@@ -25,52 +25,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-#include "stdafx.h"
-#include "FENodalForce.h"
-#include "FEBioMech.h"
-#include <FECore/FENodeSet.h>
-#include <FECore/FEMaterialPoint.h>
-#include <FECore/FENode.h>
 
-BEGIN_FECORE_CLASS(FENodalForce, FENodalLoad)
-	ADD_PARAMETER(m_f, "value")->setUnits(UNIT_FORCE)->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
-	ADD_PARAMETER(m_shellBottom, "shell_bottom");
-END_FECORE_CLASS();
+#pragma once
+#include <FECore/FEPrescribedBC.h>
+#include "FEFluidSolutes.h"
 
-FENodalForce::FENodalForce(FEModel* fem) : FENodalLoad(fem)
+//-----------------------------------------------------------------------------
+//! FEFluidSolutesResistanceBC is a fluid-solutes surface that has a normal
+//! pressure proportional to the flow rate (resistance).
+//!
+class FEBIOFLUID_API FEFluidSolutesResistanceBC : public FEPrescribedSurface
 {
-	m_f = vec3d(0, 0, 0);
-	m_shellBottom = false;
-}
+public:
+    //! constructor
+    FEFluidSolutesResistanceBC(FEModel* pfem);
+    
+    //! evaluate flow rate
+    double FlowRate();
+    
+    //! initialize
+    bool Init() override;
 
-// set the value
-void FENodalForce::SetValue(const vec3d& v)
-{
-	m_f = v;
-}
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
 
-bool FENodalForce::SetDofList(FEDofList& dofList)
-{
-	if (m_shellBottom)
-		return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
-	else
-		return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-}
+	void Update() override;
+    
+public:
+    // return the value for node i, dof j
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
-void FENodalForce::GetNodalValues(int inode, std::vector<double>& val)
-{
-	assert(val.size() == 3);
-	const FENodeSet& nset = *GetNodeSet();
-	int nid = nset[inode];
-	const FENode& node = *nset.Node(inode);
+    // copy data from another class
+    void CopyFrom(FEBoundaryCondition* pbc) override;
 
-	FEMaterialPoint mp;
-	mp.m_r0 = node.m_r0;
-	mp.m_index = inode;
+private:
+    double			m_R;        //!< flow resistance
+    double          m_p0;       //!< fluid pressure offset
+    vector<double>  m_e;        //!< fluid dilatation
 
-	vec3d f = m_f(mp);
+private:
+    double          m_Rgas;
+    double          m_Tabs;
+    
 
-	val[0] = f.x;
-	val[1] = f.y;
-	val[2] = f.z;
-}
+	FEDofList       m_dofW;
+    int             m_dofEF;
+    int             m_dofC;
+
+    DECLARE_FECORE_CLASS();
+};

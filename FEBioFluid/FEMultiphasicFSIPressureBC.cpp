@@ -115,8 +115,7 @@ void FEMultiphasicFSIPressureBC::Update()
                     for (int k=0; k<nsol; ++k)
                         osm += node.get(m_dofC+psi->GetSolute(k)->GetSoluteID()-1)*kappa[k];
                     // evaluate dilatation at this node
-                    double c = m_Rgas*osc*osm;
-                    bool good = pfl->Dilatation(m_Tabs, p, c, efo[j]);
+                    bool good = pfl->Dilatation(0, p - m_Rgas*m_Tabs*osc*osm, efo[j]);
                     assert(good);
                 }
             }
@@ -125,8 +124,7 @@ void FEMultiphasicFSIPressureBC::Update()
                 for (int j=0; j<el.Nodes(); ++j) {
                     FENode& node = ps->Node(el.m_lnode[j]);
                     // evaluate dilatation at this node
-                    double c = 0;
-                    bool good = pfl->Dilatation(m_Tabs, p, c, efo[j]);
+                    bool good = pfl->Dilatation(0, p, efo[j]);
                     assert(good);
                 }
             }

@@ -79,6 +79,7 @@ SOFTWARE.*/
 #include "FEPrescribedFluidDilatation.h"
 #include "FEInitialFluidDilatation.h"
 #include "FEInitialFluidVelocity.h"
+#include "FEInitialFluidPressure.h"
 
 #include "FEConstFluidBodyForce.h"
 #include "FECentrifugalFluidBodyForce.h"
@@ -184,6 +185,7 @@ REGISTER_FECORE_CLASS(FEFluidResistanceBC        , "fluid resistance");
 // initial conditions
 REGISTER_FECORE_CLASS(FEInitialFluidDilatation, "initial fluid dilatation");
 REGISTER_FECORE_CLASS(FEInitialFluidVelocity  , "initial fluid velocity");
+REGISTER_FECORE_CLASS(FEInitialFluidPressure  , "initial fluid pressure");
 
 //-----------------------------------------------------------------------------
 // Contact interfaces
@@ -239,6 +241,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidElementCenterOfMass   , "fluid element center o
 REGISTER_FECORE_CLASS(FEPlotFluidFlowRate              , "fluid flow rate"               );
 REGISTER_FECORE_CLASS(FEPlotFluidPressure              , "fluid pressure"                );
 REGISTER_FECORE_CLASS(FEPlotFluidHeatFlux              , "fluid heat flux"               );
+REGISTER_FECORE_CLASS(FEPlotFluidRelativeReynoldsNumber, "fluid relative Reynolds number");
 REGISTER_FECORE_CLASS(FEPlotFluidSpecificFreeEnergy    , "fluid specific free energy"    );
 REGISTER_FECORE_CLASS(FEPlotFluidSpecificEntropy       , "fluid specific entropy"        );
 REGISTER_FECORE_CLASS(FEPlotFluidSpecificInternalEnergy, "fluid specific internal energy");

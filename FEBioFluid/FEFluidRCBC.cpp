@@ -115,7 +115,7 @@ void FEFluidRCBC::UpdateDilatation()
     
     // calculate the dilatation
     m_e = 0.0;
-    bool good = m_pfluid->Dilatation(0,m_pt + m_p0,0, m_e);
+    bool good = m_pfluid->Dilatation(0,m_pt + m_p0, m_e);
     assert(good);
 }
 

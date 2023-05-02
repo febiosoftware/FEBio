@@ -117,7 +117,7 @@ void FEFluidResistanceLoad::Update()
     
     // calculate the dilatation
     double e = 0;
-    bool good = m_pfluid->Dilatation(0,p+m_p0,0, e);
+    bool good = m_pfluid->Dilatation(0,p+m_p0, e);
     assert(good);
     
     // prescribe this dilatation at the nodes

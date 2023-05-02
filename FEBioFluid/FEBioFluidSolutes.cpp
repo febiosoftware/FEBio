@@ -34,10 +34,12 @@ SOFTWARE.*/
 #include "FEFluidSolutesDomain3D.h"
 #include "FEFluidSolutesDomainFactory.h"
 #include "FESoluteBackflowStabilization.h"
+#include "FEInitialFluidSolutesPressure.h"
 #include "FEFluidSolutesFlux.h"
 #include "FEFluidSolutesNaturalFlux.h"
 #include "FEFluidSolutesPressure.h"
 #include "FEFluidSolutesPressureBC.h"
+#include "FEFluidSolutesResistanceBC.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEFluidSolutesPressureLC.h"
 #include "FEFluidSolutesGradientLC.h"
@@ -46,6 +48,7 @@ SOFTWARE.*/
 #include "FESolutesMaterial.h"
 #include "FESolutesDomain.h"
 #include "FESolutesDomainFactory.h"
+#include "FEBioFluidPlot.h"
 #include <FEBioMix/FESoluteFlux.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModelUpdate.h>
@@ -97,16 +100,24 @@ void FEBioFluidSolutes::InitModule()
     // loads
     REGISTER_FECORE_CLASS(FEFluidSolutesFlux           , "solute flux"                  );
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
-    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux"          , FECORE_EXPERIMENTAL);
+    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux");
     REGISTER_FECORE_CLASS(FEFluidSolutesPressure       , "fluid pressure"               , 0x0300); // deprecated, use BC version
     REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       , FECORE_EXPERIMENTAL);
 
     // bcs
     REGISTER_FECORE_CLASS(FEFluidSolutesPressureBC, "fluid pressure");
+    REGISTER_FECORE_CLASS(FEFluidSolutesResistanceBC, "fluid resistance");
+
+    // ics
+    REGISTER_FECORE_CLASS(FEInitialFluidSolutesPressure, "initial fluid pressure");
 
     // constraints
     REGISTER_FECORE_CLASS(FEFluidSolutesPressureLC     , "fluid pressure constraint", FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FEFluidSolutesGradientLC     , "zero concentration gradient", FECORE_EXPERIMENTAL);
+    
+    //-----------------------------------------------------------------------------
+    // classes derived from FEPlotData
+    REGISTER_FECORE_CLASS(FEPlotFluidRelativePecletNumber, "solute relative Peclet number");
 
 	// solutes solver classes
 	febio.RegisterDomain(new FESolutesDomainFactory);
