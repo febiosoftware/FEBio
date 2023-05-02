@@ -865,6 +865,16 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Class that projects stresses from integration points to the nodes
+//! TODO: This only works with tet10 and hex8 -domains
+class FEPlotNodalTraceStresses : public FEPlotDomainData
+{
+public:
+	FEPlotNodalTraceStresses(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Deformation gradient
 class FEPlotDeformationGradient : public FEPlotDomainData
 {
@@ -1233,31 +1243,17 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
-class FEPlotTraceStressesAbs : public FEPlotDomainData
-{
-public:
-	FEPlotTraceStressesAbs(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-class FEPlotTraceSolidStressesAbs : public FEPlotDomainData
-{
-public:
-	FEPlotTraceSolidStressesAbs(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
-	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
 class FEPlotGrowthElasticDeformationGradient : public FEPlotDomainData
 {
 public:
-	FEPlotGrowthElasticDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	FEPlotGrowthElasticDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 class FEPlotGrowthDeformationGradient : public FEPlotDomainData
 {
 public:
-	FEPlotGrowthDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	FEPlotGrowthDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 

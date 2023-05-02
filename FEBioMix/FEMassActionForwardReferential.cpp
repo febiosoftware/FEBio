@@ -71,7 +71,7 @@ double FEMassActionForwardReferential::ReactionSupply(FEMaterialPoint& pt)
     for (int i = 0; i < nsbm; ++i) {
         int vR = m_vR[nsol + i];
         if (vR > 0) {
-            double c = m_psm->SBMConcentration(pt, i);
+            double c = m_psm->SBMReferentialConcentration(pt, i);
             zhat *= pow(c, vR);
         }
     }
@@ -83,24 +83,25 @@ double FEMassActionForwardReferential::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of molar supply with strain at material point
 mat3ds FEMassActionForwardReferential::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
-    const int nsol = m_nsol;
-    const int nsbm = (int)m_v.size() - nsol;
+    //const int nsol = m_nsol;
+    //const int nsbm = (int)m_v.size() - nsol;
 
-    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
-    FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+    //FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
+    //FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 
-    double kF = m_pFwd->ReactionRate(pt);
-    //mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);
-    double zhat = ReactionSupply(pt);
-    mat3ds dzhatde = mat3dd(0);
+    //double kF = m_pFwd->ReactionRate(pt);
+    ////mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);
+    //double zhat = ReactionSupply(pt);
+    //mat3ds dzhatde = mat3dd(0);
     mat3ds I = mat3dd(1);
 
-    for (int isbm = 0; isbm < nsbm; ++isbm)
-        dzhatde -= I * (m_vR[nsol + isbm]);
+    //for (int isbm = 0; isbm < nsbm; ++isbm)
+    //    dzhatde -= I * (m_vR[nsol + isbm]);
 
-    dzhatde *= zhat;
-    mat3ds dzde = -1.0 * zhat * I;
-    return dzhatde;
+    //dzhatde *= zhat;
+    //mat3ds dzde = -1.0 * zhat * I;
+    mat3ds dzde = 0.0 * I;
+    return dzde;
 }
 
 //-----------------------------------------------------------------------------

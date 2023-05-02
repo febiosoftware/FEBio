@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEPrescribedStressSensitiveConcentration.h"
+#include "FEPrescribedReferentialConcentration.h"
 #include <FECore/FEMesh.h>
 #include <FEBioMech/FEBioMech.h>
 #include "FEBioMix.h"
@@ -36,47 +36,23 @@ SOFTWARE.*/
 #include <FECore/FENodeElemList.h>
 #include <FEBioMix/FESolutesMaterialPoint.h>
 #include <FEBioMix/FEBiphasic.h>
-BEGIN_FECORE_CLASS(FEPrescribedStressSensitiveConcentration, FEPrescribedDOF)
-	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
-	ADD_PARAMETER(m_value, "value");
-	ADD_PARAMETER(stress0, "residual_stress")->setLongName("initial residual stress");
-	ADD_PARAMETER(m_a0, "min_stress_scale");
-	ADD_PARAMETER(m_a, "stress_scale_amplitude");
-	ADD_PARAMETER(m_b, "stress_scale_width");
+BEGIN_FECORE_CLASS(FEPrescribedReferentialConcentration, FEPrescribedDOF)
+ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
+ADD_PARAMETER(m_value, "value");
 END_FECORE_CLASS();
 
-FEPrescribedStressSensitiveConcentration::FEPrescribedStressSensitiveConcentration(FEModel* pfem) : FEPrescribedDOF(pfem)
+FEPrescribedReferentialConcentration::FEPrescribedReferentialConcentration(FEModel* pfem) : FEPrescribedDOF(pfem)
 {
 
 }
 
-bool FEPrescribedStressSensitiveConcentration::Init()
+bool FEPrescribedReferentialConcentration::Init()
 {
 	if (FEPrescribedDOF::Init() == false) return false;
-	return true;
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEPrescribedStressSensitiveConcentration::GetStress(FEElement& m_elem, int node_id)
-{
-	mat3ds si[FEElement::MAX_INTPOINTS];
-	mat3ds so[FEElement::MAX_NODES];
-
-	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
-		FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
-		FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
-		mat3dd I = mat3dd(1.0);
-		if (ep)
-			si[i] = ep->m_s;
-		else
-			si[i].zero();
-	}
-	m_elem.project_to_nodes(si, so);
-	return so[m_elem.FindNode(node_id)];
-}
-
-//-----------------------------------------------------------------------------
-double FEPrescribedStressSensitiveConcentration::GetEffectiveJacobian(FEElement& m_elem, int node_id)
+double FEPrescribedReferentialConcentration::GetEffectiveJacobian(FEElement& m_elem, int node_id)
 {
 	double ai[FEElement::MAX_INTPOINTS];
 	double ao[FEElement::MAX_NODES];
@@ -94,11 +70,11 @@ double FEPrescribedStressSensitiveConcentration::GetEffectiveJacobian(FEElement&
 			ai[i] = 0.0;
 	}
 	m_elem.project_to_nodes(ai, ao);
-	return ao[m_elem.FindNode(node_id)];
+	return ao[m_elem.FindNode(m_elem.m_node[node_id])];
 }
 
 //-----------------------------------------------------------------------------
-double FEPrescribedStressSensitiveConcentration::GetConcentration(FEElement& m_elem, int node_id)
+double FEPrescribedReferentialConcentration::GetConcentration(FEElement& m_elem, int node_id)
 {
 	double ai[FEElement::MAX_INTPOINTS];
 	double ao[FEElement::MAX_NODES];
@@ -111,32 +87,11 @@ double FEPrescribedStressSensitiveConcentration::GetConcentration(FEElement& m_e
 			ai[i] = 0.0;
 	}
 	m_elem.project_to_nodes(ai, ao);
-	return ao[m_elem.FindNode(node_id)];
+	return ao[m_elem.FindNode(m_elem.m_node[node_id])];
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEPrescribedStressSensitiveConcentration::GetNodalStress(int node_id)
-{
-	// get the mesh to which this surface belongs
-	FENodeElemList& NEL = GetMesh().NodeElementList();
-	int nval = NEL.Valence(node_id);
-	FEElement** ppe = NEL.ElementList(node_id);
-
-	// Get the elements that the node belongs to
-	mat3ds s = mat3ds(0.0);
-	double vol = 0.0;
-	for (int i = 0; i < nval; ++i)
-	{
-		double v = GetMesh().ElementVolume(*ppe[i]);
-		s += GetStress(*ppe[i], node_id) * v;
-		vol += v;
-	}
-	s = s / vol;
-	return s;
-}
-
-//-----------------------------------------------------------------------------
-double FEPrescribedStressSensitiveConcentration::GetNodalEffectiveJacobian(int node_id)
+double FEPrescribedReferentialConcentration::GetNodalEffectiveJacobian(int node_id)
 {
 	// get the mesh to which this surface belongs
 	FENodeElemList& NEL = GetMesh().NodeElementList();
@@ -149,16 +104,16 @@ double FEPrescribedStressSensitiveConcentration::GetNodalEffectiveJacobian(int n
 	for (int i = 0; i < nval; ++i)
 	{
 		double v = GetMesh().ElementVolume(*ppe[i]);
-		J_eff += GetEffectiveJacobian(*ppe[i], node_id) * v;
+		J_eff += GetEffectiveJacobian(*ppe[i], i) * v;
 		vol += v;
 	}
-	J_eff = J_eff / nval;
+	J_eff = J_eff / vol;
 	return J_eff;
 }
 
 
 //-----------------------------------------------------------------------------
-double FEPrescribedStressSensitiveConcentration::GetNodalConcentration(int node_id)
+double FEPrescribedReferentialConcentration::GetNodalConcentration(int node_id)
 {
 	// get the mesh to which this surface belongs
 	FENodeElemList& NEL = GetMesh().NodeElementList();
@@ -171,7 +126,7 @@ double FEPrescribedStressSensitiveConcentration::GetNodalConcentration(int node_
 	for (int i = 0; i < nval; ++i)
 	{
 		double v = GetMesh().ElementVolume(*ppe[i]);
-		s += GetConcentration(*ppe[i], node_id) * v;
+		s += GetConcentration(*ppe[i], i) * v;
 		vol += v;
 	}
 	s = s / vol;
@@ -179,15 +134,12 @@ double FEPrescribedStressSensitiveConcentration::GetNodalConcentration(int node_
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedStressSensitiveConcentration::GetNodalValues(int nodelid, std::vector<double>& val)
+void FEPrescribedReferentialConcentration::GetNodalValues(int nodelid, std::vector<double>& val)
 {
 	FENode* p_n = GetNodeSet()->Node(nodelid);
 	int node_id = p_n->GetID() - 1;
 	// get the stress
-	mat3ds s = GetNodalStress(node_id);
 	double c = GetNodalConcentration(node_id);
-	double m_S = m_a0 + m_a / (1.0 + (exp(-(s.tr() - m_b) / stress0)));
-	
 	double J_eff = GetNodalEffectiveJacobian(node_id);
-	val[0] = c / J_eff * m_S;
+	val[0] = c / J_eff;
 }

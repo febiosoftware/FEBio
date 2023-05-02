@@ -65,7 +65,7 @@ double FEHillInhibition::ReactionRate(FEMaterialPoint& pt)
 	double K = pow((B - 1.0), (1 / m_n));
 	double cn = pow(c, m_n);
 	double Kn = pow(K, m_n);
-	double zhat = (m_w / m_t) * (1.0 - (m_Kmax * B * cn) / (Kn + cn));
+	double zhat = (m_Kmax * m_w / m_t) * (1.0 - (B * cn) / (Kn + cn));
 	return zhat;
 }
 
@@ -74,27 +74,6 @@ double FEHillInhibition::ReactionRate(FEMaterialPoint& pt)
 mat3ds FEHillInhibition::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
 	return mat3ds(0.0);
-	/*FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
-
-	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
-
-	double rhor = pbm->SolidReferentialApparentDensity(pt);
-	double phir = pbm->SolidReferentialVolumeFraction(pt);
-	double p = pbm->GetActualFluidPressure(pt);
-
-	double J = et.m_J;
-	double zhat = ReactionRate(pt);
-	mat3dd I(1);
-	if (rhor > 0.0)
-	{
-		mat3ds dzhatde = (I * (-zhat) + (et.m_s + I * p) * (1 / rhor)) / (J - phir);
-		return dzhatde;
-	}
-	else
-	{
-		mat3ds dzhatde = (I * (-zhat) + (et.m_s + I * p) * (1.0)) / (J - phir);
-		return dzhatde;
-	}*/
 }
 
 //-----------------------------------------------------------------------------

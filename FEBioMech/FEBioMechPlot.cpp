@@ -761,6 +761,17 @@ public:
 	}
 };
 
+//=============================================================================
+class FETraceStress
+{
+public:
+	double operator()(const FEMaterialPoint& mp)
+	{
+		const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+		return (pt ? pt->m_s.tr() : 0.0);
+	}
+};
+
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
@@ -843,6 +854,13 @@ bool FEPlotSPRLinearStresses::Save(FEDomain& dom, FEDataStream& a)
 bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 {
 	writeNodalProjectedElementValues<mat3ds>(dom, a, FEStress());
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotNodalTraceStresses::Save(FEDomain& dom, FEDataStream& a)
+{
+	writeNodalProjectedElementValues<double>(dom, a, FETraceStress());
 	return true;
 }
 
@@ -4090,7 +4108,7 @@ bool FEPlotTraceStresses::Save(FEDomain& dom, FEDataStream& a)
 		for (int j = 0; j < el.GaussPoints(); ++j) {
 			FEMaterialPoint* mp = el.GetMaterialPoint(j);
 			const FEElasticMaterialPoint* ep = mp->ExtractData<FEElasticMaterialPoint>();
-			s += ep->m_s + mat3dd(1.0) * ep->m_p;
+			s += ep->m_s;
 		}
 		s /= (double)el.GaussPoints();
 		a << s.tr();
@@ -4098,68 +4116,27 @@ bool FEPlotTraceStresses::Save(FEDomain& dom, FEDataStream& a)
 	return true;
 };
 
-bool FEPlotTraceStressesAbs::Save(FEDomain& dom, FEDataStream& a)
-{
-	// Try to get the kinematic growth material.
-	FEMaterial* mat = dom.GetMaterial();
-	for (int i = 0; i < dom.Elements(); ++i)
-	{
-		FEElement& el = dom.ElementRef(i);
-		mat3ds s = mat3ds(0.0);
-		for (int j = 0; j < el.GaussPoints(); ++j) {
-			FEMaterialPoint* mp = el.GetMaterialPoint(j);
-			const FEElasticMaterialPoint* ep = mp->ExtractData<FEElasticMaterialPoint>();
-			s += ep->m_s + mat3dd(1.0) * ep->m_p;
-		}
-		s /= (double)el.GaussPoints();
-		a << fabs(s.tr());
-	}
-	return true;
-};
-
-bool FEPlotTraceSolidStressesAbs::Save(FEDomain& dom, FEDataStream& a)
-{
-	// Try to get the kinematic growth material.
-	FEMaterial* mat = dom.GetMaterial();
-	for (int i = 0; i < dom.Elements(); ++i)
-	{
-		FEElement& el = dom.ElementRef(i);
-		mat3ds s = mat3ds(0.0);
-		for (int j = 0; j < el.GaussPoints(); ++j) {
-			FEMaterialPoint* mp = el.GetMaterialPoint(j);
-			const FEElasticMaterialPoint* ep = mp->ExtractData<FEElasticMaterialPoint>();
-			s += ep->m_s;
-		}
-		s /= (double)el.GaussPoints();
-		a << fabs(s.tr());
-	}
-	return true;
-};
-
 bool FEPlotGrowthElasticDeformationGradient::Save(FEDomain& dom, FEDataStream& a)
 {
-	// Try to get the kinematic growth material.
-	FEMaterial* mat = dom.GetMaterial();
-	FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
-	// Check if we were successful.
-	if (kg == nullptr) return false;
-	FEGrowthTensor* gmat = kg->GetGrowthMaterial();
-	//FEVolumeGrowth* vg = dynamic_cast<FEVolumeGrowth*>(pmf);
-	if (gmat == nullptr) return false;
-	//if (vg == nullptr) return false;
-	// For each element get the growth tensor and then solve the average value.
-	for (int i = 0; i < dom.Elements(); ++i)
-	{
-		FEElement& el = dom.ElementRef(i);
-		mat3d g = mat3dd(1.0);
-		for (int j = 0; j < el.GaussPoints(); ++j) {
-			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
-			g += kp.m_Fe;
-		}
-		g /= (double)el.GaussPoints();
-		a << g;
-	}
+	//// Try to get the kinematic growth material.
+	//FEMaterial* mat = dom.GetMaterial();
+	//FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
+	//// Check if we were successful.
+	//if (kg == nullptr) return false;
+	//FEGrowthTensor* gmat = kg->GetGrowthMaterial();
+	////FEVolumeGrowth* vg = dynamic_cast<FEVolumeGrowth*>(pmf);
+	//if (gmat == nullptr) return false;
+	////if (vg == nullptr) return false;
+	//// For each element get the growth tensor and then solve the average value.
+
+	FEKinematicGrowth* kgm = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
+	if (kgm == nullptr) return false;
+
+	writeAverageElementValue<mat3d>(dom, a, [](const FEMaterialPoint& mp) {
+		const FEKinematicMaterialPoint& pt = *mp.ExtractData<FEKinematicMaterialPoint>();
+		return pt.m_Fe;
+		});
+
 	return true;
 };
 

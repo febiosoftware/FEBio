@@ -1,3 +1,4 @@
+#pragma once
 /*This file is part of the FEBio source code and is licensed under the MIT license
 listed below.
 
@@ -27,28 +28,40 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEChemicalReaction.h"
+#include <FECore/FEPrescribedDOF.h>
+#include <FECore/tens3d.h>
+#include <FEBioMech/FEBioMech.h>
+#include "febiomix_api.h"
+#include <FECore/FEElement.h>
 
-class FEBIOMIX_API FEReactionRateStressSensitive : public FEReactionRate
+//-----------------------------------------------------------------------------
+class FEBIOMIX_API FEPrescribedReferentialConcentration : public FEPrescribedDOF
 {
 public:
 	//! constructor
-	FEReactionRateStressSensitive(FEModel* pfem);
-	
-	//! reaction rate at material point
-	double ReactionRate(FEMaterialPoint& pt) override;
+	FEPrescribedReferentialConcentration(FEModel* pfem);
 
-	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
-	
-	//! tangent of reaction rate with effective fluid pressure at material point
-	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+	//! initializer
+	bool Init() override;
+
+	//! get integration point Jacobian
+	double GetEffectiveJacobian(FEElement& m_elem, int nodelid);
+
+	//! get integration point concentration
+	double GetConcentration(FEElement& m_elem, int nodelid);
+
+	//! get Jacobian projected at the nodes
+	double GetNodalEffectiveJacobian(int nodelid);
+
+	//! get concentration projected at the nodes
+	double GetNodalConcentration(int nodelid);
 
 public:
-	double m_a0		= 1.0;
-	double m_a		= 1.0;
-	double m_b		= 0.5;
-	double stress0	= 1.0;
-	FEParamDouble m_k;
-	DECLARE_FECORE_CLASS();	
+
+	FEParamDouble m_value;
+	DECLARE_FECORE_CLASS();
+protected:
+	void GetNodalValues(int nodelid, std::vector<double>& val) override;
+
+protected:
 };

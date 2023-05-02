@@ -121,30 +121,31 @@ double FEMassActionReversibleReferential::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of molar supply with strain at material point
 mat3ds FEMassActionReversibleReferential::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
-    const int nsol = m_nsol;
-    const int nsbm = (int)m_v.size() - nsol;
+    //const int nsol = m_nsol;
+    //const int nsbm = (int)m_v.size() - nsol;
 
-    // forward reaction
-    double kF = m_pFwd->ReactionRate(pt);
-    double zhatF = FwdReactionSupply(pt);
-    mat3ds dzhatFde = mat3dd(0);
+    //// forward reaction
+    //double kF = m_pFwd->ReactionRate(pt);
+    //double zhatF = FwdReactionSupply(pt);
+    //mat3ds dzhatFde = mat3dd(0);
     mat3ds I = mat3dd(1);
-    for (int isbm = 0; isbm < nsbm; ++isbm)
-        dzhatFde += I * (m_vR[nsol + isbm]);
+    //for (int isbm = 0; isbm < nsbm; ++isbm)
+    //    dzhatFde += I * (m_vR[nsol + isbm]);
 
-    dzhatFde *= zhatF;
+    //dzhatFde *= zhatF;
 
-    //// reverse reaction
-    double kR = m_pRev->ReactionRate(pt);
-    double zhatR = RevReactionSupply(pt);
-    mat3ds dzhatRde = mat3dd(0);
+    ////// reverse reaction
+    //double kR = m_pRev->ReactionRate(pt);
+    //double zhatR = RevReactionSupply(pt);
+    //mat3ds dzhatRde = mat3dd(0);
 
-    for (int isbm = 0; isbm < nsbm; ++isbm)
-        dzhatRde -= I * (m_vP[nsol + isbm]);
+    //for (int isbm = 0; isbm < nsbm; ++isbm)
+    //    dzhatRde -= I * (m_vP[nsol + isbm]);
 
-    dzhatRde *= zhatR;
+    //dzhatRde *= zhatR;
 
-    return dzhatFde - dzhatRde;
+    //return dzhatFde - dzhatRde;
+    return I * 0.0;
 }
 
 //-----------------------------------------------------------------------------
