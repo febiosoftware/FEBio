@@ -33,9 +33,9 @@ SOFTWARE.*/
 #include "FEBioMech/FENeoHookean.h"
 #include <FEBioMech/FEKinematicGrowth.h>
 #include <FEBioMech/FEGrowthTensor.h>
-#include <FECore\FESolidElement.h>
-#include <FECore\FESPRProjection.h>
-#include <FECore\FESolidDomain.h>
+#include <FECore/FESolidElement.h>
+#include <FECore/FESPRProjection.h>
+#include <FECore/FESolidDomain.h>
 
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactionRateStressSensitive, FEReactionRate)
