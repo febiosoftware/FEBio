@@ -567,6 +567,7 @@ void FELineElement::SetTraits(FEElementTraits* pt)
 FEBeamElement::FEBeamElement()
 {
 	m_lid = -1;
+	m_L0 = 0.0;
 }
 
 FEBeamElement::FEBeamElement(const FEBeamElement& el)
@@ -576,6 +577,7 @@ FEBeamElement::FEBeamElement(const FEBeamElement& el)
 
 	// copy data
 	m_lid = el.m_lid;
+	m_L0 = el.m_L0;
 
 	// copy base class data
 	m_mat = el.m_mat;
@@ -594,6 +596,7 @@ FEBeamElement& FEBeamElement::operator = (const FEBeamElement& el)
 
 	// copy data
 	m_lid = el.m_lid;
+	m_L0 = el.m_L0;
 
 	// copy base class data
 	m_mat = el.m_mat;

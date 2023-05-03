@@ -39,6 +39,7 @@ void FEElasticBeamMaterialPoint::Init()
 void FEElasticBeamMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
 	m_Rp = m_Rt;
+	m_Ri = quatd(0, 0, 0);
 }
 
 //=======================================================================================

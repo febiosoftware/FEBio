@@ -324,4 +324,7 @@ public:
 
 	double* GaussWeights() { return &((FEBeamElementTraits*)(m_pT))->gw[0]; }
 	double* Hr(int n) { return ((FEBeamElementTraits*)(m_pT))->Gr[n]; }
+
+public:
+	double	m_L0;	// initial length of beam
 };

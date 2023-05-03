@@ -2103,3 +2103,44 @@ public:
 	//! project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao) const override;
 };
+
+//=============================================================================
+//
+//   FEBeam3_
+//   
+//=============================================================================
+
+//=============================================================================
+//! Base class for three-point beam
+class FEBeam3_ : public FEBeamElementTraits
+{
+public:
+	enum { NELN = 3 };
+
+public:
+	//! constructor
+	FEBeam3_(int ni, FE_Element_Type et) : FEBeamElementTraits(ni, NELN, ET_LINE3, et) {}
+
+	//! shape function at (r)
+	void shape(double* H, double r);
+
+	//! shape function derivatives at (r)
+	void shape_deriv(double* Gr, double r);
+
+	//! shape function derivatives at (r)
+	void shape_deriv2(double* Grr, double r);
+};
+
+//=============================================================================
+class FEBeam3G2 : public FEBeam3_
+{
+public:
+	enum { NINT = 2 };
+
+public:
+	//! constructor
+	FEBeam3G2();
+
+	//! project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao) const override;
+};

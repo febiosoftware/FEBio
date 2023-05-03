@@ -40,6 +40,9 @@ public: // from FEDomain
 	// create function
 	bool Create(int elements, FE_Element_Spec espec) override;
 
+	// initialize
+	bool Init() override;
+
 	//! Get the list of dofs on this domain
 	const FEDofList& GetDOFList() const override;
 
@@ -61,6 +64,9 @@ public: // from FEMeshPartition
 
 	// update data that depends on the incremental solution update
 	void IncrementalUpdate(std::vector<double>& ui) override;
+
+	// update material point data
+	void PreSolveUpdate(const FETimeInfo& tp) override;
 
 public:
 	//! return a beam element
