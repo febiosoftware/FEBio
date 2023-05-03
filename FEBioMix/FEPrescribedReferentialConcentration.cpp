@@ -49,6 +49,7 @@ FEPrescribedReferentialConcentration::FEPrescribedReferentialConcentration(FEMod
 bool FEPrescribedReferentialConcentration::Init()
 {
 	if (FEPrescribedDOF::Init() == false) return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
