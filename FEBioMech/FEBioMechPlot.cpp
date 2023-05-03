@@ -858,6 +858,7 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+//SL!: Not working.
 bool FEPlotNodalTraceStresses::Save(FEDomain& dom, FEDataStream& a)
 {
 	writeNodalProjectedElementValues<double>(dom, a, FETraceStress());
@@ -4118,15 +4119,6 @@ bool FEPlotTraceStresses::Save(FEDomain& dom, FEDataStream& a)
 
 bool FEPlotGrowthElasticDeformationGradient::Save(FEDomain& dom, FEDataStream& a)
 {
-	//// Try to get the kinematic growth material.
-	//FEMaterial* mat = dom.GetMaterial();
-	//FEKinematicGrowth* kg = mat->ExtractProperty<FEKinematicGrowth>();
-	//// Check if we were successful.
-	//if (kg == nullptr) return false;
-	//FEGrowthTensor* gmat = kg->GetGrowthMaterial();
-	////FEVolumeGrowth* vg = dynamic_cast<FEVolumeGrowth*>(pmf);
-	//if (gmat == nullptr) return false;
-	////if (vg == nullptr) return false;
 	//// For each element get the growth tensor and then solve the average value.
 
 	FEKinematicGrowth* kgm = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();

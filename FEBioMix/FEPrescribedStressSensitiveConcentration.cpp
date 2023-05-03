@@ -152,7 +152,7 @@ double FEPrescribedStressSensitiveConcentration::GetNodalEffectiveJacobian(int n
 		J_eff += GetEffectiveJacobian(*ppe[i], node_id) * v;
 		vol += v;
 	}
-	J_eff = J_eff / nval;
+	J_eff = J_eff / vol;
 	return J_eff;
 }
 
@@ -189,5 +189,5 @@ void FEPrescribedStressSensitiveConcentration::GetNodalValues(int nodelid, std::
 	double m_S = m_a0 + m_a / (1.0 + (exp(-(s.tr() - m_b) / stress0)));
 	
 	double J_eff = GetNodalEffectiveJacobian(node_id);
-	val[0] = c / J_eff * m_S;
+	val[0] = max(c / J_eff * m_S,0.0);
 }

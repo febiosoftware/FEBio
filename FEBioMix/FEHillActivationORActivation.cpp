@@ -74,7 +74,7 @@ double FEHillActivationORActivation::ReactionRate(FEMaterialPoint& pt)
 		F[i] = (B * cn[i]) / (Kn + cn[i]);
 	}
 	double zhat = (m_Kmax * m_w / m_t) * (F[0] + F[1] - F[0] * F[1]);
-	return zhat;
+	return max(zhat, 0.0);
 }
 
 //-----------------------------------------------------------------------------

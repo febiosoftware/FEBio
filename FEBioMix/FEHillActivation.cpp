@@ -66,7 +66,7 @@ double FEHillActivation::ReactionRate(FEMaterialPoint& pt)
 	double cn = pow(c, m_n);
 	double Kn = pow(K, m_n);
 	double zhat = (m_Kmax * m_w / m_t) * (B * cn) / (Kn + cn);
-	return zhat;
+	return max(zhat,0.0);
 }
 
 //-----------------------------------------------------------------------------
