@@ -1177,12 +1177,20 @@ void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
 
-	int i, j;
 	int NE = dom.Elements();
+	int etype = dom.GetElementType();
 
 	// figure out element type
-	int ne = 2;
-	int dtype = PLT_ELEM_LINE2;
+	int ne = 0;
+	int dtype = 0;
+	switch (etype)
+	{
+	case FE_BEAM2G1: ne = 2; dtype = PLT_ELEM_LINE2; break;
+	case FE_BEAM3G2: ne = 3; dtype = PLT_ELEM_LINE3; break;
+	default:
+		assert(false);
+		return;
+	}
 
 	// write the header
 	m_ar.BeginChunk(PLT_DOMAIN_HDR);
@@ -1197,11 +1205,11 @@ void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 	int n[5];
 	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
 	{
-		for (i=0; i<NE; ++i)
+		for (int i=0; i<NE; ++i)
 		{
 			FEElement& el = dom.ElementRef(i);
 			n[0] = el.GetID();
-			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
+			for (int j=0; j<ne; ++j) n[j+1] = el.m_node[j];
 			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
 		}
 	}

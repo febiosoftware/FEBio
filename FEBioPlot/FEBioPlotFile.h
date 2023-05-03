@@ -44,8 +44,9 @@ class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
-	// 32: added PLT_ELEMENTSET_SECTION
-	enum { PLT_VERSION = 0x0032 };
+	// 3.2: added PLT_ELEMENTSET_SECTION
+	// 3.3: added PLT_ELEM_LINE3
+	enum { PLT_VERSION = 0x0033 };
 
 	// file tags
 	enum { 
@@ -183,7 +184,8 @@ public:
 		PLT_ELEM_TRI10,
 		PLT_ELEM_PYRA5,
 		PLT_ELEM_TET5,
-        PLT_ELEM_PYRA13
+        PLT_ELEM_PYRA13,
+		PLT_ELEM_LINE3			// added in 3.3
     };
 
 	// size of name variables
