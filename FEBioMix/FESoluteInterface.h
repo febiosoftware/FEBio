@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/vec3d.h>
 #include <FEBioMech/FEKinematicGrowth.h>
 #include <FEBioMech/FEGrowthTensor.h>
+#include <FEBioMix/FEBiphasic.h>
 
 class FESolute;
 class FESolidBoundMolecule;
