@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEReactionRateStressSensitive.h"
 #include "FEBiphasic.h"
 #include "FEBioMech/FERemodelingElasticMaterial.h"
-#include <FECore\log.h>
 #include "FEBioMech/FENeoHookean.h"
 #include <FEBioMech/FEKinematicGrowth.h>
 #include <FEBioMech/FEGrowthTensor.h>
