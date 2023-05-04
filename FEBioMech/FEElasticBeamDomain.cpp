@@ -88,7 +88,17 @@ bool FEElasticBeamDomain::Init()
 		// NOTE: This assumes the beam is initially straight!
 		//       This also assumes that nodes 0 and 1 define the boundary nodes. 
 		el.m_L0 = (r0[1] - r0[0]).Length();
+
+		vec3d e = r0[1] - r0[0]; e.Normalize();
+		quatd q(vec3d(0, 0, 1), e);
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FEElasticBeamMaterialPoint& mp = *el.GetMaterialPoint(n)->ExtractData< FEElasticBeamMaterialPoint>();
+			mp.m_Rt = mp.m_Rp = q;
+		}
 	}
+
+	return true;
 }
 
 //! Get the list of dofs on this domain
@@ -412,7 +422,7 @@ void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 		quatd qi = q.Conjugate();
 
 		// calculate material strain measures
-		mp.m_Gamma = qi * G0 - vec3d(1, 0, 0);
+		mp.m_Gamma = qi * G0 - vec3d(0, 0, 1);
 		mp.m_Kappa = qi * mp.m_w; // m_w is updated in Update(std::vector<double>& ui)
 
 		// evaluate the stress
