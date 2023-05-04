@@ -76,7 +76,7 @@ quatd::quatd(const mat3d & m)
 
 		double q[3];
 		q[i] = sqrt(0.5 * m(i, i) + 0.25 * (1.0 - M));
-		w = 0.5 * (m(k, j) - m(j, k)) / q[i];
+		w = 0.25 * (m(k, j) - m(j, k)) / q[i];
 		q[j] = 0.25 * (m(j, i) + m(i, j)) / q[i];
 		q[k] = 0.25 * (m(k, i) + m(i, k)) / q[i];
 
