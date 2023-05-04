@@ -3992,6 +3992,32 @@ bool FEPlotBeamStress::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-------------------------------------------------------------------------------
+bool FEPlotBeamStressCouple::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEElasticBeamDomain* beam = dynamic_cast<FEElasticBeamDomain*>(&dom);
+	if (beam == nullptr) return false;
+
+	for (int i = 0; i < beam->Elements(); ++i)
+	{
+		FEBeamElement& el = beam->Element(i);
+
+		vec3d m(0, 0, 0);
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			// get the material point
+			FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+			m += mp.m_m;
+		}
+		m /= (double)nint;
+		a << m;
+	}
+
+	return true;
+}
+
+//-------------------------------------------------------------------------------
 bool FEPlotBeamStrain::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEElasticBeamDomain* beam = dynamic_cast<FEElasticBeamDomain*>(&dom);

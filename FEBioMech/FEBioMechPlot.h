@@ -1216,6 +1216,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! beam element stress couple
+class FEPlotBeamStressCouple : public FEPlotDomainData
+{
+public:
+	FEPlotBeamStressCouple(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! beam element strain
 class FEPlotBeamStrain : public FEPlotDomainData
 {
