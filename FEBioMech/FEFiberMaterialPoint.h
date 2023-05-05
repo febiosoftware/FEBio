@@ -28,10 +28,11 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FEMaterial.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the fiber pre-stretch
-class FEFiberMaterialPoint : public FEMaterialPointData
+class FEBIOMECH_API FEFiberMaterialPoint : public FEMaterialPointData
 {
 public:
 	FEFiberMaterialPoint(FEMaterialPointData* pt);
