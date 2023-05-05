@@ -116,7 +116,7 @@ SOFTWARE.*/
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
 
-#include "FEInitialFluidPressure.h"
+#include "FEInitialMixtureFluidPressure.h"
 #include "FEInitialConcentration.h"
 #include "FENodalFluidFlux.h"
 
@@ -197,8 +197,8 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Initial conditions
-	REGISTER_FECORE_CLASS(FEInitialFluidPressure     , "initial fluid pressure");
-	REGISTER_FECORE_CLASS(FEInitialShellFluidPressure, "initial shell fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialMixtureFluidPressure, "initial fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialShellMixtureFluidPressure, "initial shell fluid pressure");
 	REGISTER_FECORE_CLASS(FEInitialConcentration     , "initial concentration");
 	REGISTER_FECORE_CLASS(FEInitialShellConcentration, "initial shell concentration");
 
