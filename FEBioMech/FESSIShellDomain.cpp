@@ -669,6 +669,44 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, dou
 }
 
 //-----------------------------------------------------------------------------
+//! calculates covariant basis vectors at an integration point
+void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3], const double alpha)
+{
+    int i;
+    
+    int neln = el.Nodes();
+    
+    // current nodal coordinates and directors
+    vec3d rt[FEElement::MAX_NODES], D[FEElement::MAX_NODES];
+    for (i=0; i<neln; ++i)
+    {
+        FENode& ni = m_pMesh->Node(el.m_node[i]);
+        rt[i] = ni.m_rt*alpha + ni.m_rp*(1-alpha);
+        D[i] = m_bnodalnormals ? ni.m_d0 : el.m_d0[i];
+        D[i] += (ni.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]))*alpha
+        + (ni.get_vec3d_prev(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]))*(1-alpha);
+    }
+    
+    double eta = t;
+    
+    double M[FEElement::MAX_NODES];
+    double Mr[FEElement::MAX_NODES];
+    double Ms[FEElement::MAX_NODES];
+    el.shape_fnc(M, r, s);
+    el.shape_deriv(Mr, Ms, r, s);
+    
+    // initialize covariant basis vectors
+    g[0] = g[1] = g[2] = vec3d(0,0,0);
+    
+    for (i=0; i<neln; ++i)
+    {
+        g[0] += (rt[i] - D[i]*(1-eta)/2)*Mr[i];
+        g[1] += (rt[i] - D[i]*(1-eta)/2)*Ms[i];
+        g[2] += D[i]*(M[i]/2);
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! calculates contravariant basis vectors at an integration point
 void FESSIShellDomain::ContraBaseVectors(FEShellElement& el, int n, vec3d gcnt[3])
 {
@@ -713,6 +751,24 @@ void FESSIShellDomain::ContraBaseVectors(FEShellElement& el, double r, double s,
 {
     vec3d gcov[3];
     CoBaseVectors(el, r, s, t, gcov);
+    
+    mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
+                    gcov[0].y, gcov[1].y, gcov[2].y,
+                    gcov[0].z, gcov[1].z, gcov[2].z);
+    mat3d Ji = J.inverse();
+    
+    gcnt[0] = vec3d(Ji(0,0),Ji(0,1),Ji(0,2));
+    gcnt[1] = vec3d(Ji(1,0),Ji(1,1),Ji(1,2));
+    gcnt[2] = vec3d(Ji(2,0),Ji(2,1),Ji(2,2));
+    
+}
+
+//-----------------------------------------------------------------------------
+//! calculates contravariant basis vectors at an integration point
+void FESSIShellDomain::ContraBaseVectors(FEShellElement& el, double r, double s, double t, vec3d gcnt[3], const double alpha)
+{
+    vec3d gcov[3];
+    CoBaseVectors(el, r, s, t, gcov, alpha);
     
     mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
                     gcov[0].y, gcov[1].y, gcov[2].y,
