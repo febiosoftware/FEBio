@@ -40,3 +40,13 @@ services:
     working_dir: /FEBio
     volumes:
       - ./TestSuite/:/FEBio/TestSuite
+
+  febio-runtime-lambda:
+    build:
+      context: ./infrastructure
+      dockerfile: DockerfileRuntimeLambda
+    image: febiosoftware/febio-runtime-lambda:latest
+    ports:
+      - "9000:8080"
+    volumes:
+      - ./TestSuite/:/FEBio/TestSuite
