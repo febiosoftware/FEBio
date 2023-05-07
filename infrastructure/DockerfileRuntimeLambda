@@ -1,7 +1,7 @@
 FROM febiosoftware/febio-runtime:ubuntu-22.04
 
 # Define custom function directory
-ARG FUNCTION_DIR="/function"
+ARG FUNCTION_DIR="/var/run/task"
 
 # Install aws-lambda-cpp build dependencies
 RUN apt-get update && \
@@ -19,7 +19,7 @@ RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
 
 # Copy function code
 RUN mkdir -p ${FUNCTION_DIR}
-COPY aws-lambda/src/* ${FUNCTION_DIR}
+COPY aws-lambda/src ${FUNCTION_DIR}
 
 # Copy febio code
 COPY ../cmbuild/bin /usr/local/bin/
@@ -37,8 +37,8 @@ ENV PATH "$PATH:/usr/local/bin:/usr/local/lib"
 # Set working directory to function root directory
 WORKDIR ${FUNCTION_DIR}
 ADD https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/latest/download/aws-lambda-rie /usr/bin/aws-lambda-rie
-RUN chmod +x /usr/bin/aws-lambda-rie
 COPY aws-lambda/entry.sh /
+RUN chmod +x /usr/bin/aws-lambda-rie /entry.sh
 
 ENTRYPOINT [ "/entry.sh" ]
-CMD [ "app.handler" ]
+CMD [ "main.handle" ]
