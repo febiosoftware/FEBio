@@ -34,7 +34,7 @@ class Handler:
         self.logger.info("Parsing Targets")
         targets = Targets(s3_event.key)
 
-        self.logger.info("Downloading febio input: s3://%s:%s" % s3_event.bucket, s3_event.key)  # noqa: E501
+        self.logger.info("Downloading febio input: s3://%s/%s", s3_event.bucket, s3_event.key)  # noqa: E501
         self.__download_input(s3_event, targets)
 
         self.logger.info("Building command")
@@ -46,7 +46,7 @@ class Handler:
         if not os.path.exists(targets.target_dir):
             os.makedirs(targets.target_dir)
 
-        with open(targets.target_file) as target:
+        with open(targets.target_file, "wb") as target:
             self.s3.download_file(s3_event.bucket, s3_event.key, target)
 
     def __build_command(self, targets):
@@ -66,5 +66,5 @@ class Handler:
 
     def __run(self, cmd):
         self.logger.info("Building FEBio plot")
-        # result = subprocess.run(cmd, capture_output=True, text=True)
-        # self.logger.debug(result.stdout)
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        self.logger.debug(result.stdout)
