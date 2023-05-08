@@ -169,7 +169,7 @@ public:
 		double J_e = kp.m_Je;
 		FEBiphasicMaterialPoint& bp = *mp.ExtractData<FEBiphasicMaterialPoint>();
 		double phisr = bp.m_phi0t;
-		return spt->m_ca[soluteIndex] * (J - phisr);
+		return max(spt->m_ca[soluteIndex] * (J - phisr),0.0);
 	}
 	double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
 		T* spt = mp.ExtractData<T>();

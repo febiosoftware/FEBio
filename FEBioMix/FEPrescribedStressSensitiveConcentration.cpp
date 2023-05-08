@@ -36,6 +36,8 @@ SOFTWARE.*/
 #include <FECore/FENodeElemList.h>
 #include <FEBioMix/FESolutesMaterialPoint.h>
 #include <FEBioMix/FEBiphasic.h>
+#include <FEBioMech/FEKinematicGrowth.h>
+
 BEGIN_FECORE_CLASS(FEPrescribedStressSensitiveConcentration, FEPrescribedDOF)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
 	ADD_PARAMETER(m_value, "value");
@@ -85,6 +87,7 @@ double FEPrescribedStressSensitiveConcentration::GetEffectiveJacobian(FEElement&
 		FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
 		FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
 		FEBiphasicMaterialPoint* bp = pt->ExtractData<FEBiphasicMaterialPoint>();
+		FEKinematicMaterialPoint* kp = pt->ExtractData<FEKinematicMaterialPoint>();
 		mat3dd I = mat3dd(1.0);
 		if (ep && bp)
 			ai[i] = ep->m_J - bp->m_phi0;
@@ -124,14 +127,11 @@ mat3ds FEPrescribedStressSensitiveConcentration::GetNodalStress(int node_id)
 
 	// Get the elements that the node belongs to
 	mat3ds s = mat3ds(0.0);
-	double vol = 0.0;
 	for (int i = 0; i < nval; ++i)
 	{
-		double v = GetMesh().ElementVolume(*ppe[i]);
-		s += GetStress(*ppe[i], node_id) * v;
-		vol += v;
+		s += GetStress(*ppe[i], node_id);
 	}
-	s = s / vol;
+	s = s / nval;
 	return s;
 }
 
@@ -145,14 +145,11 @@ double FEPrescribedStressSensitiveConcentration::GetNodalEffectiveJacobian(int n
 
 	// Get the elements that the node belongs to
 	double J_eff = 0.0;
-	double vol = 0.0;
 	for (int i = 0; i < nval; ++i)
 	{
-		double v = GetMesh().ElementVolume(*ppe[i]);
-		J_eff += GetEffectiveJacobian(*ppe[i], node_id) * v;
-		vol += v;
+		J_eff += GetEffectiveJacobian(*ppe[i], node_id);
 	}
-	J_eff = J_eff / vol;
+	J_eff = J_eff / nval;
 	return J_eff;
 }
 
@@ -167,14 +164,12 @@ double FEPrescribedStressSensitiveConcentration::GetNodalConcentration(int node_
 
 	// Get the elements that the node belongs to
 	double s = 0.0;
-	double vol = 0.0;
+	//double vol = 0.0;
 	for (int i = 0; i < nval; ++i)
 	{
-		double v = GetMesh().ElementVolume(*ppe[i]);
-		s += GetConcentration(*ppe[i], node_id) * v;
-		vol += v;
+		s += GetConcentration(*ppe[i], node_id);
 	}
-	s = s / vol;
+	s = s / nval;
 	return s;
 }
 
@@ -187,7 +182,6 @@ void FEPrescribedStressSensitiveConcentration::GetNodalValues(int nodelid, std::
 	mat3ds s = GetNodalStress(node_id);
 	double c = GetNodalConcentration(node_id);
 	double m_S = m_a0 + m_a / (1.0 + (exp(-(s.tr() - m_b) / stress0)));
-	
 	double J_eff = GetNodalEffectiveJacobian(node_id);
 	val[0] = max(c / J_eff * m_S,0.0);
 }

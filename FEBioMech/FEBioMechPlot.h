@@ -1230,7 +1230,7 @@ public:
 class FEPlotGrowthTensor : public FEPlotDomainData
 {
 public:
-	FEPlotGrowthTensor(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+	FEPlotGrowthTensor(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
