@@ -9,7 +9,7 @@ RUN echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https:/
 WORKDIR /FEBio
 RUN apt-get update && apt-get install intel-oneapi-runtime-libs -y
 
-COPY cmbuild/bin/* bin/
-COPY cmbuild/lib/* lib/
-RUN chmod +x bin/febio4
-CMD ["bin/febio4", "-i", "/FEBio/TestSuite/Verify3/bi04.feb", "-o", "/FEBio/TestSuite/Verify3/bi04.log", "-p", "/FEBio/TestSuite/Verify3/bi04.xplt"]
+COPY cmbuild/bin/* /usr/local/bin/
+COPY cmbuild/lib/* /usr/local/lib/
+ENV PATH "$PATH:/usr/local/bin:/usr/local/lib"
+RUN chmod +x /usr/local/bin/febio4
