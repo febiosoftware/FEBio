@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: infrastructure/DockerfileRuntime
-    image: febiosoftware/febio-runtime:ubuntu-22.04
+    image: ${DOCKER_REPO}febio-runtime:ubuntu-22.04
     working_dir: /FEBio
     volumes:
       - ./TestSuite/:/FEBio/TestSuite
