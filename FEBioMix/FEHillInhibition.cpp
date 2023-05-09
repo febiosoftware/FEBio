@@ -65,7 +65,7 @@ double FEHillInhibition::ReactionRate(FEMaterialPoint& pt)
 	double K = pow((B - 1.0), (1 / m_n));
 	double cn = pow(c, m_n);
 	double Kn = pow(K, m_n);
-	double zhat = (m_Kmax * m_w / m_t) * (1.0 - (B * cn) / (Kn + cn));
+	double zhat = (m_Kmax * m_w / m_t) * (1.0 - ((B * cn) / (Kn + cn)));
 	return max(zhat, 0.0);
 }
 
