@@ -34,11 +34,11 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidRCRLoad, FESurfaceLoad)
-    ADD_PARAMETER(m_R, "R");
-    ADD_PARAMETER(m_Rd, "Rd");
-    ADD_PARAMETER(m_p0, "initial_pressure");
-    ADD_PARAMETER(m_pd, "pressure_offset");
-    ADD_PARAMETER(m_C, "capacitance");
+    ADD_PARAMETER(m_R , "R")->setUnits("F.t/L^5");
+    ADD_PARAMETER(m_Rd, "Rd")->setUnits("F.t/L^5");
+    ADD_PARAMETER(m_p0, "initial_pressure")->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_pd, "pressure_offset")->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_C , "capacitance")->setUnits("L^5/F");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

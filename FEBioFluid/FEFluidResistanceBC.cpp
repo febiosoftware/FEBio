@@ -33,8 +33,8 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidResistanceBC, FEPrescribedSurface)
-	ADD_PARAMETER(m_R , "R");
-	ADD_PARAMETER(m_p0, "pressure_offset");
+	ADD_PARAMETER(m_R , "R")->setUnits("F.t/L^5");
+	ADD_PARAMETER(m_p0, "pressure_offset")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

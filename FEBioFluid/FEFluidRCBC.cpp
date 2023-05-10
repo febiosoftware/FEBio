@@ -33,9 +33,9 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidRCBC, FEPrescribedSurface)
-    ADD_PARAMETER(m_R , "R");
-    ADD_PARAMETER(m_p0, "initial_pressure");
-    ADD_PARAMETER(m_C, "capacitance");
+    ADD_PARAMETER(m_R , "R")->setUnits("F.t/L^5");
+    ADD_PARAMETER(m_p0, "initial_pressure")->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_C , "capacitance")->setUnits("L^5/F");
     ADD_PARAMETER(m_Bern, "Bernoulli");
 END_FECORE_CLASS();
 

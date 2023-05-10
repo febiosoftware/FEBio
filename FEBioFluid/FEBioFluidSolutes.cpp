@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include "FEFluidSolutesPressure.h"
 #include "FEFluidSolutesPressureBC.h"
 #include "FEFluidSolutesResistanceBC.h"
+#include "FEFluidSolutesRCRBC.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEFluidSolutesPressureLC.h"
 #include "FEFluidSolutesGradientLC.h"
@@ -105,8 +106,9 @@ void FEBioFluidSolutes::InitModule()
     REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       , FECORE_EXPERIMENTAL);
 
     // bcs
-    REGISTER_FECORE_CLASS(FEFluidSolutesPressureBC, "fluid pressure");
-    REGISTER_FECORE_CLASS(FEFluidSolutesResistanceBC, "fluid resistance");
+    REGISTER_FECORE_CLASS(FEFluidSolutesPressureBC     , "fluid pressure"  );
+    REGISTER_FECORE_CLASS(FEFluidSolutesResistanceBC   , "fluid resistance");
+    REGISTER_FECORE_CLASS(FEFluidSolutesRCRBC          , "fluid RCR"       );
 
     // ics
     REGISTER_FECORE_CLASS(FEInitialFluidSolutesPressure, "initial fluid pressure");

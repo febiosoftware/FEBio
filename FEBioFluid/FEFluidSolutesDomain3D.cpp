@@ -249,7 +249,7 @@ void FEFluidSolutesDomain3D::InitMaterialPoints()
             ps.m_Ie = m_pMat->CurrentDensity(mp);
             
             for (int isol = 0; isol<nsol; ++isol)
-                ps.m_j[isol] = m_pMat->SoluteFlux(mp, isol);
+                ps.m_j[isol] = m_newFormulation ? m_pMat->SoluteDiffusiveFlux(mp, isol) : m_pMat->SoluteFlux(mp, isol);
         }
     }
 }
@@ -1709,7 +1709,7 @@ void FEFluidSolutesDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         // calculate the solute flux and actual concentration
         for (int isol=0; isol < nsol; ++isol)
         {
-            spt.m_j[isol] = m_pMat->SoluteFlux(mp, isol);
+            spt.m_j[isol] = m_newFormulation ? m_pMat->SoluteDiffusiveFlux(mp, isol) : m_pMat->SoluteFlux(mp, isol);
             spt.m_ca[isol] = m_pMat->ConcentrationActual(mp, isol);
         }
         

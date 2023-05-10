@@ -24,25 +24,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #include "stdafx.h"
-#include "FEFluidSolutesResistanceBC.h"
+#include "FEFluidSolutesRCRBC.h"
 #include "FEBioFluidSolutes.h"
+#include <FECore/FEAnalysis.h>
+#include <FECore/log.h>
 #include <FECore/FEModel.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEFluidSolutesResistanceBC, FEPrescribedSurface)
-	ADD_PARAMETER(m_R , "R")->setUnits("F.t/L^5");
-	ADD_PARAMETER(m_p0, "pressure_offset")->setUnits(UNIT_PRESSURE);
+BEGIN_FECORE_CLASS(FEFluidSolutesRCRBC, FEPrescribedSurface)
+    ADD_PARAMETER(m_R , "R")->setUnits("F.t/L^5");
+    ADD_PARAMETER(m_Rd, "Rd")->setUnits("F.t/L^5");
+    ADD_PARAMETER(m_p0, "initial_pressure")->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_pd, "pressure_offset")->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(m_C , "capacitance")->setUnits("L^5/F");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidSolutesResistanceBC::FEFluidSolutesResistanceBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
+FEFluidSolutesRCRBC::FEFluidSolutesRCRBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
 {
     m_R = 0.0;
     m_p0 = 0;
+    m_Rd = 0.0;
+    m_pd = 0.0;
+    m_C = 0.0;
     m_dofEF = -1;
     m_dofC = -1;
     m_Rgas = 0;
@@ -51,48 +57,59 @@ FEFluidSolutesResistanceBC::FEFluidSolutesResistanceBC(FEModel* pfem) : FEPrescr
 
 //-----------------------------------------------------------------------------
 //! initialize
-bool FEFluidSolutesResistanceBC::Init()
+//! TODO: Generalize to include the initial conditions
+bool FEFluidSolutesRCRBC::Init()
 {
     m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
     m_dofEF = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
     m_dofC = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
     SetDOFList(m_dofEF);
 
-	if (FEPrescribedSurface::Init() == false) return false;
+    if (FEPrescribedSurface::Init() == false) return false;
+    
     m_Rgas = GetFEModel()->GetGlobalConstant("R");
     m_Tabs = GetFEModel()->GetGlobalConstant("T");
 
     m_e.assign(GetSurface()->Nodes(), 0.0);
     
+    m_pn = m_pp = m_p0;
+    m_pdn = m_pdp = m_pd;
+    m_qn = m_qp = 0;
+    m_tp = 0;
+    
     return true;
 }
 
 //-----------------------------------------------------------------------------
-//! serialization
-void FEFluidSolutesResistanceBC::Serialize(DumpStream& ar)
+void FEFluidSolutesRCRBC::Update()
 {
-    FEPrescribedSurface::Serialize(ar);
-    ar & m_e;
-    if (ar.IsShallow()) return;
-    ar & m_dofW & m_dofEF & m_dofC;
-    ar & m_Rgas & m_Tabs;
-}
-
-//-----------------------------------------------------------------------------
-void FEFluidSolutesResistanceBC::Update()
-{
+    // Check if we started a new time, if so, update variables
+    FETimeInfo& timeInfo = GetFEModel()->GetTime();
+    double time = timeInfo.currentTime;
+    int iter = timeInfo.currentIteration;
+    double dt = timeInfo.timeIncrement;
+    if ((time > m_tp) && (iter == 0)) {
+        m_pp = m_pn;
+        m_qp = m_qn;
+        m_pdp = m_pdn;
+        m_tp = time;
+    }
+    
+    // evaluate the flow rate at the current time
+    m_qn = FlowRate();
+    m_pdn = m_pd;
+    
+    double tau = m_Rd * m_C;
+    
+    // calculate the RCR pressure
+    m_pn = m_pdn + (m_Rd / (1 + tau / dt) + m_R) * m_qn + tau / (dt + tau) * (m_pp - m_pdp - m_R * m_qp);
+    
     // prescribe this dilatation at the nodes
     FESurface* ps = GetSurface();
     
     int N = ps->Nodes();
     std::vector<vector<double>> efNodes(N, vector<double>());
     std::vector<vector<double>> caNodes(N, vector<double>());
-    
-    // evaluate the flow rate
-    double Q = FlowRate();
-    
-    // calculate the resistance pressure
-    double p = m_R*Q;
     
     // Project mean of osmotic coefficient and partition coefficient from int points to nodes on surface
     // Use these to evaluate osmolarity at each node on surface
@@ -129,7 +146,7 @@ void FEFluidSolutesResistanceBC::Update()
                         osm += node.get(m_dofC+psi->GetSolute(k)->GetSoluteID()-1)*kappa[k];
                     // evaluate dilatation at this node
                     double c = m_Rgas*osc*osm;
-                    bool good = pfl->Dilatation(0, p+m_p0 - m_Rgas*m_Tabs*osc*osm, efo[j]);
+                    bool good = pfl->Dilatation(0, m_pn - m_Rgas*m_Tabs*osc*osm, efo[j]);
                     assert(good);
                 }
             }
@@ -138,7 +155,7 @@ void FEFluidSolutesResistanceBC::Update()
                 for (int j=0; j<el.Nodes(); ++j) {
                     FENode& node = ps->Node(el.m_lnode[j]);
                     // evaluate dilatation at this node
-                    bool good = pfl->Dilatation(0, p+m_p0, efo[j]);
+                    bool good = pfl->Dilatation(0, m_pn, efo[j]);
                     assert(good);
                 }
             }
@@ -169,8 +186,8 @@ void FEFluidSolutesResistanceBC::Update()
 }
 
 //-----------------------------------------------------------------------------
-//! evaluate the flow rate across this surface at the current time
-double FEFluidSolutesResistanceBC::FlowRate()
+//! evaluate the flow rate across this surface at current time
+double FEFluidSolutesRCRBC::FlowRate()
 {
     double Q = 0;
     
@@ -180,7 +197,7 @@ double FEFluidSolutesResistanceBC::FlowRate()
     const FETimeInfo& tp = GetTimeInfo();
     double alpha = tp.alpha;
     double alphaf = tp.alphaf;
-
+    
     // prescribe this dilatation at the nodes
     FESurface* ps = GetSurface();
     
@@ -228,20 +245,32 @@ double FEFluidSolutesResistanceBC::FlowRate()
             Q += q*w[n];
         }
     }
-
+    
     return Q;
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesResistanceBC::GetNodalValues(int nodelid, std::vector<double>& val)
+void FEFluidSolutesRCRBC::GetNodalValues(int nodelid, std::vector<double>& val)
 {
     val[0] = m_e[nodelid];
 }
 
 //-----------------------------------------------------------------------------
 // copy data from another class
-void FEFluidSolutesResistanceBC::CopyFrom(FEBoundaryCondition* pbc)
+void FEFluidSolutesRCRBC::CopyFrom(FEBoundaryCondition* pbc)
 {
     // TODO: implement this
     assert(false);
+}
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FEFluidSolutesRCRBC::Serialize(DumpStream& ar)
+{
+    FEPrescribedSurface::Serialize(ar);
+    ar & m_e;
+    ar & m_pn & m_pp & m_qn & m_qp & m_pdn & m_pdp & m_tp & m_e;
+    if (ar.IsShallow()) return;
+    ar & m_dofW & m_dofEF & m_dofC;
+    ar & m_Rgas & m_Tabs;
 }

@@ -108,6 +108,8 @@ void FESoluteBackflowStabilization::Update()
     {
         FENode& node = ps->Node(i);
         // set node as having prescribed DOF (concentration at previous time)
+        if (node.get_bc(dofc) == DOF_PRESCRIBED) node.set(dofc,node.get_prev(dofc));
+        /*
         //Otherwise set node as having concentration of adjacent node
         if (node.m_ID[dofc] < -1)
             node.set(dofc, node.get_prev(dofc));
@@ -159,7 +161,7 @@ void FESoluteBackflowStabilization::Update()
             }
             else
                 node.set(dofc, 0);
-        }
+        }*/
     }
 }
 

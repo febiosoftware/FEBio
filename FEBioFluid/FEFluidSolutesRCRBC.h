@@ -24,33 +24,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
 #pragma once
 #include <FECore/FEPrescribedBC.h>
 #include "FEFluidSolutes.h"
 
 //-----------------------------------------------------------------------------
-//! FEFluidSolutesResistanceBC is a fluid-solutes surface that has a normal
-//! pressure proportional to the flow rate (resistance).
+//! FEFluidRCRBC is a fluid surface load that implements a 3-element Windkessel model
 //!
-class FEBIOFLUID_API FEFluidSolutesResistanceBC : public FEPrescribedSurface
+class FEBIOFLUID_API FEFluidSolutesRCRBC : public FEPrescribedSurface
 {
 public:
     //! constructor
-    FEFluidSolutesResistanceBC(FEModel* pfem);
+    FEFluidSolutesRCRBC(FEModel* pfem);
+    
+    //! set the dilatation
+    void Update() override;
     
     //! evaluate flow rate
     double FlowRate();
     
     //! initialize
     bool Init() override;
-
-    //! serialize data to archive
+    
+    //! serialization
     void Serialize(DumpStream& ar) override;
 
-	void Update() override;
-    
 public:
     // return the value for node i, dof j
     void GetNodalValues(int nodelid, std::vector<double>& val) override;
@@ -59,15 +57,25 @@ public:
     void CopyFrom(FEBoundaryCondition* pbc) override;
 
 private:
-    double			m_R;        //!< flow resistance
-    double          m_p0;       //!< fluid pressure offset
-    vector<double>  m_e;        //!< fluid dilatation
-
+    double          m_R;        //!< flow resistance
+    double          m_Rd;       //!< distal resistance
+    double          m_p0;       //!< initial fluid pressure
+    double          m_C;        //!< capacitance
+    double          m_pd;       //!< downstream pressure
+    
 private:
+    double              m_pn;   //!< fluid pressure at current time point
+    double              m_pp;   //!< fluid pressure at previous time point
+    double              m_qn;   //!< flow rate at current time point
+    double              m_qp;   //!< flow rate at previous time point
+    double              m_pdn;  //!< downstream fluid pressure at current time point
+    double              m_pdp;  //!< downstream fluid pressure at previous time point
+    double              m_tp;   //!< previous time
+    vector<double>      m_e;    //!< fluid dilatation
+
     double          m_Rgas;
     double          m_Tabs;
-    
-	FEDofList       m_dofW;
+    FEDofList       m_dofW;
     int             m_dofEF;
     int             m_dofC;
 
