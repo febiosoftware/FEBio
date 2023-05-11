@@ -23,21 +23,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #include "stdafx.h"
-#include "FEFluidSolutesPressureBC.h"
+#include "FEFluidSolutesResistanceBC.h"
 #include "FEBioFluidSolutes.h"
 #include <FECore/FEModel.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEFluidSolutesPressureBC, FEPrescribedSurface)
-    ADD_PARAMETER(m_p, "pressure")->setUnits("P")->setLongName("fluid pressure");
+BEGIN_FECORE_CLASS(FEFluidSolutesResistanceBC, FEPrescribedSurface)
+	ADD_PARAMETER(m_R , "R")->setUnits("F.t/L^5");
+	ADD_PARAMETER(m_p0, "pressure_offset")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidSolutesPressureBC::FEFluidSolutesPressureBC(FEModel* pfem) : FEPrescribedSurface(pfem)
+FEFluidSolutesResistanceBC::FEFluidSolutesResistanceBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
 {
-    m_p = 0;
+    m_R = 0.0;
+    m_p0 = 0;
     m_dofEF = -1;
     m_dofC = -1;
     m_Rgas = 0;
@@ -46,13 +51,14 @@ FEFluidSolutesPressureBC::FEFluidSolutesPressureBC(FEModel* pfem) : FEPrescribed
 
 //-----------------------------------------------------------------------------
 //! initialize
-bool FEFluidSolutesPressureBC::Init()
+bool FEFluidSolutesResistanceBC::Init()
 {
+    m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
     m_dofEF = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
     m_dofC = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
     SetDOFList(m_dofEF);
 
-    if (FEPrescribedSurface::Init() == false) return false;
+	if (FEPrescribedSurface::Init() == false) return false;
     m_Rgas = GetFEModel()->GetGlobalConstant("R");
     m_Tabs = GetFEModel()->GetGlobalConstant("T");
 
@@ -62,28 +68,37 @@ bool FEFluidSolutesPressureBC::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Evaluate and prescribe the resistance pressure
-void FEFluidSolutesPressureBC::Update()
+//! serialization
+void FEFluidSolutesResistanceBC::Serialize(DumpStream& ar)
+{
+    FEPrescribedSurface::Serialize(ar);
+    ar & m_e;
+    if (ar.IsShallow()) return;
+    ar & m_dofW & m_dofEF & m_dofC;
+    ar & m_Rgas & m_Tabs;
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidSolutesResistanceBC::Update()
 {
     // prescribe this dilatation at the nodes
     FESurface* ps = GetSurface();
-
+    
     int N = ps->Nodes();
     std::vector<vector<double>> efNodes(N, vector<double>());
     std::vector<vector<double>> caNodes(N, vector<double>());
-
-    //Project sum of all ca and osc values from int points to nodes on surface
-    //All values put into map, including duplicates
+    
+    // evaluate the flow rate
+    double Q = FlowRate();
+    
+    // calculate the resistance pressure
+    double p = m_R*Q;
+    
+    // Project mean of osmotic coefficient and partition coefficient from int points to nodes on surface
+    // Use these to evaluate osmolarity at each node on surface
     for (int i=0; i<ps->Elements(); ++i)
     {
         FESurfaceElement& el = ps->Element(i);
-        // evaluate average prescribed pressure on this face
-        double p = 0;
-        for (int j=0; j<el.GaussPoints(); ++j) {
-            FEMaterialPoint* pt = el.GetMaterialPoint(j);
-            p += m_p(*pt);
-        }
-        p /= el.GaussPoints();
         FEElement* e = el.m_elem[0];
         FEMaterial* pm = GetFEModel()->GetMaterial(e->GetMatID());
         FEFluid* pfl = pm->ExtractProperty<FEFluid>();
@@ -113,7 +128,8 @@ void FEFluidSolutesPressureBC::Update()
                     for (int k=0; k<nsol; ++k)
                         osm += node.get(m_dofC+psi->GetSolute(k)->GetSoluteID()-1)*kappa[k];
                     // evaluate dilatation at this node
-                    bool good = pfl->Dilatation(0, p - m_Rgas*m_Tabs*osc*osm, efo[j]);
+                    double c = m_Rgas*osc*osm;
+                    bool good = pfl->Dilatation(0, p+m_p0 - m_Rgas*m_Tabs*osc*osm, efo[j]);
                     assert(good);
                 }
             }
@@ -122,7 +138,7 @@ void FEFluidSolutesPressureBC::Update()
                 for (int j=0; j<el.Nodes(); ++j) {
                     FENode& node = ps->Node(el.m_lnode[j]);
                     // evaluate dilatation at this node
-                    bool good = pfl->Dilatation(0, p, efo[j]);
+                    bool good = pfl->Dilatation(0, p+m_p0, efo[j]);
                     assert(good);
                 }
             }
@@ -144,35 +160,88 @@ void FEFluidSolutesPressureBC::Update()
         for (int j = 0; j < efNodes[i].size(); ++j)
             ef += efNodes[i][j];
         ef /= efNodes[i].size();
-            
+        
         // store value for now
         m_e[i] = ef;
     }
- 
+    
     FEPrescribedSurface::Update();
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesPressureBC::GetNodalValues(int nodelid, std::vector<double>& val)
+//! evaluate the flow rate across this surface at the current time
+double FEFluidSolutesResistanceBC::FlowRate()
+{
+    double Q = 0;
+    
+    vec3d rt[FEElement::MAX_NODES];
+    vec3d vt[FEElement::MAX_NODES];
+    
+    const FETimeInfo& tp = GetTimeInfo();
+    double alpha = tp.alpha;
+    double alphaf = tp.alphaf;
+
+    // prescribe this dilatation at the nodes
+    FESurface* ps = GetSurface();
+    
+    for (int iel=0; iel<ps->Elements(); ++iel)
+    {
+        FESurfaceElement& el = ps->Element(iel);
+        
+        // nr integration points
+        int nint = el.GaussPoints();
+        
+        // nr of element nodes
+        int neln = el.Nodes();
+        
+        // nodal coordinates
+        for (int i=0; i<neln; ++i) {
+            FENode& node = ps->Node(el.m_lnode[i]);
+            rt[i] = node.m_rt;
+            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
+        }
+        
+        double* Nr, *Ns;
+        double* N;
+        double* w  = el.GaussWeights();
+        
+        vec3d dxr, dxs, v;
+        
+        // repeat over integration points
+        for (int n=0; n<nint; ++n)
+        {
+            N  = el.H(n);
+            Nr = el.Gr(n);
+            Ns = el.Gs(n);
+            
+            // calculate the velocity and tangent vectors at integration point
+            dxr = dxs = v = vec3d(0,0,0);
+            for (int i=0; i<neln; ++i)
+            {
+                v += vt[i]*N[i];
+                dxr += rt[i]*Nr[i];
+                dxs += rt[i]*Ns[i];
+            }
+            
+            vec3d normal = dxr ^ dxs;
+            double q = normal*v;
+            Q += q*w[n];
+        }
+    }
+
+    return Q;
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidSolutesResistanceBC::GetNodalValues(int nodelid, std::vector<double>& val)
 {
     val[0] = m_e[nodelid];
 }
 
 //-----------------------------------------------------------------------------
 // copy data from another class
-void FEFluidSolutesPressureBC::CopyFrom(FEBoundaryCondition* pbc)
+void FEFluidSolutesResistanceBC::CopyFrom(FEBoundaryCondition* pbc)
 {
     // TODO: implement this
     assert(false);
-}
-
-//-----------------------------------------------------------------------------
-//! serialization
-void FEFluidSolutesPressureBC::Serialize(DumpStream& ar)
-{
-    FEPrescribedSurface::Serialize(ar);
-    ar & m_e;
-    if (ar.IsShallow()) return;
-    ar & m_dofC & m_dofEF;
-    ar & m_Rgas & m_Tabs;
 }

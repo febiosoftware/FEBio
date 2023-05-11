@@ -32,6 +32,8 @@ SOFTWARE.*/
 #include "FESlidingElasticInterface.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FE3FieldElasticShellDomain.h"
+#include "FEElasticEASShellDomain.h"
+#include "FEElasticANSShellDomain.h"
 #include "FEBodyForce.h"
 #include "FEResidualVector.h"
 #include "FEUncoupledMaterial.h"
@@ -226,8 +228,12 @@ bool FESolidSolver2::Init()
 	{
 		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
         FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
+        FEElasticEASShellDomain* seas = dynamic_cast<FEElasticEASShellDomain*>(&mesh.Domain(i));
+        FEElasticANSShellDomain* sans = dynamic_cast<FEElasticANSShellDomain*>(&mesh.Domain(i));
 		if (d) d->SetDynamicUpdateFlag(b);
         if (s) s->SetDynamicUpdateFlag(b);
+        if (seas) seas->SetDynamicUpdateFlag(b);
+        if (sans) sans->SetDynamicUpdateFlag(b);
 	}
 
 	return true;

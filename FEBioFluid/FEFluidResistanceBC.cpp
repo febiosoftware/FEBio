@@ -33,8 +33,8 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidResistanceBC, FEPrescribedSurface)
-	ADD_PARAMETER(m_R , "R");
-	ADD_PARAMETER(m_p0, "pressure_offset");
+	ADD_PARAMETER(m_R , "R")->setUnits("F.t/L^5");
+	ADD_PARAMETER(m_p0, "pressure_offset")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void FEFluidResistanceBC::UpdateDilatation()
     
     // calculate the dilatation
     m_e = 0;
-    bool good = m_pfluid->Dilatation(0,p+m_p0,0, m_e);
+    bool good = m_pfluid->Dilatation(0,p+m_p0, m_e);
     assert(good);
 }
 

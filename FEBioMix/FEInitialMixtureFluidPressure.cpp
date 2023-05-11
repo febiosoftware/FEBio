@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,54 +23,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "FEInitialMixtureFluidPressure.h"
 
-
-#include "stdafx.h"
-#include "FENodalForce.h"
-#include "FEBioMech.h"
-#include <FECore/FENodeSet.h>
-#include <FECore/FEMaterialPoint.h>
-#include <FECore/FENode.h>
-
-BEGIN_FECORE_CLASS(FENodalForce, FENodalLoad)
-	ADD_PARAMETER(m_f, "value")->setUnits(UNIT_FORCE)->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
-	ADD_PARAMETER(m_shellBottom, "shell_bottom");
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialMixtureFluidPressure, FEInitialCondition)
+	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FENodalForce::FENodalForce(FEModel* fem) : FENodalLoad(fem)
+FEInitialMixtureFluidPressure::FEInitialMixtureFluidPressure(FEModel* fem) : FEInitialDOF(fem)
 {
-	m_f = vec3d(0, 0, 0);
-	m_shellBottom = false;
 }
 
-// set the value
-void FENodalForce::SetValue(const vec3d& v)
+bool FEInitialMixtureFluidPressure::Init()
 {
-	m_f = v;
+	if (SetDOF("p") == false) return false;
+	return FEInitialDOF::Init();
 }
 
-bool FENodalForce::SetDofList(FEDofList& dofList)
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialShellMixtureFluidPressure, FEInitialCondition)
+	ADD_PARAMETER(m_data, "value");
+END_FECORE_CLASS();
+
+FEInitialShellMixtureFluidPressure::FEInitialShellMixtureFluidPressure(FEModel* fem) : FEInitialDOF(fem)
 {
-	if (m_shellBottom)
-		return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
-	else
-		return dofList.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 }
 
-void FENodalForce::GetNodalValues(int inode, std::vector<double>& val)
+bool FEInitialShellMixtureFluidPressure::Init()
 {
-	assert(val.size() == 3);
-	const FENodeSet& nset = *GetNodeSet();
-	int nid = nset[inode];
-	const FENode& node = *nset.Node(inode);
-
-	FEMaterialPoint mp;
-	mp.m_r0 = node.m_r0;
-	mp.m_index = inode;
-
-	vec3d f = m_f(mp);
-
-	val[0] = f.x;
-	val[1] = f.y;
-	val[2] = f.z;
+	if (SetDOF("q") == false) return false;
+	return FEInitialDOF::Init();
 }

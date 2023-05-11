@@ -876,7 +876,7 @@ bool FEPlotElementMixtureStress::Save(FEDomain& dom, FEDataStream& a)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 			FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
-			if (mmp)
+			if (mmp && (m_comp < mmp->Components()))
 			{
 				FEElasticMaterialPoint& ep = *mmp->GetPointData(m_comp)->ExtractData<FEElasticMaterialPoint>();
 				savg += ep.m_s;
@@ -2435,7 +2435,7 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
-                if (mmp)
+                if (mmp && (m_comp < mmp->Components()))
                 {
                     FEDamageMaterialPoint* dp = mmp->GetPointData(m_comp)->ExtractData<FEDamageMaterialPoint>();
                     if (dp) D += dp->m_D;
@@ -2496,7 +2496,7 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
-                if (mmp)
+                if (mmp && (m_comp < mmp->Components()))
                 {
                     FEReactiveFatigueMaterialPoint* ppr = mmp->GetPointData(m_comp)->ExtractData<FEReactiveFatigueMaterialPoint>();
                     FEReactivePlasticityMaterialPoint* prp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticityMaterialPoint>();
@@ -2562,7 +2562,7 @@ bool FEPlotFatigueBondFraction::Save(FEDomain &dom, FEDataStream& a)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
-                if (mmp)
+                if (mmp && (m_comp < mmp->Components()))
                 {
                     FEReactiveFatigueMaterialPoint* ppr = mmp->GetPointData(m_comp)->ExtractData<FEReactiveFatigueMaterialPoint>();
                     FEReactiveViscoelasticMaterialPoint* pve = mmp->GetPointData(m_comp)->ExtractData<FEReactiveViscoelasticMaterialPoint>();
@@ -2618,7 +2618,7 @@ bool FEPlotYieldedBondFraction::Save(FEDomain &dom, FEDataStream& a)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
-                if (mmp)
+                if (mmp && (m_comp < mmp->Components()))
                 {
                     const FEReactivePlasticityMaterialPoint* prp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticityMaterialPoint>();
                     const FEReactivePlasticDamageMaterialPoint* ppp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
@@ -2671,7 +2671,7 @@ bool FEPlotReactivePlasticityHeatSupply::Save(FEDomain &dom, FEDataStream& a)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
-                if (mmp)
+                if (mmp && (m_comp < mmp->Components()))
                 {
                     const FEReactivePlasticityMaterialPoint* prp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticityMaterialPoint>();
                     const FEReactivePlasticDamageMaterialPoint* ppp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
@@ -2725,7 +2725,7 @@ bool FEPlotOctahedralPlasticStrain::Save(FEDomain &dom, FEDataStream& a)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
-                if (mmp)
+                if (mmp && (m_comp < mmp->Components()))
                 {
                     const FEReactivePlasticityMaterialPoint* prp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticityMaterialPoint>();
                     const FEReactivePlasticDamageMaterialPoint* ppp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticDamageMaterialPoint>();

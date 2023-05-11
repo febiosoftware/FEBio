@@ -79,6 +79,7 @@ SOFTWARE.*/
 #include "FEPrescribedFluidDilatation.h"
 #include "FEInitialFluidDilatation.h"
 #include "FEInitialFluidVelocity.h"
+#include "FEInitialFluidPressure.h"
 
 #include "FEConstFluidBodyForce.h"
 #include "FECentrifugalFluidBodyForce.h"
@@ -184,6 +185,7 @@ REGISTER_FECORE_CLASS(FEFluidResistanceBC        , "fluid resistance");
 // initial conditions
 REGISTER_FECORE_CLASS(FEInitialFluidDilatation, "initial fluid dilatation");
 REGISTER_FECORE_CLASS(FEInitialFluidVelocity  , "initial fluid velocity");
+REGISTER_FECORE_CLASS(FEInitialFluidPressure  , "initial fluid pressure");
 
 //-----------------------------------------------------------------------------
 // Contact interfaces

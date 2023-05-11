@@ -208,6 +208,12 @@ public:
 	//! calculate the surface normal at an integration point
 	vec3d SurfaceNormal(const FESurfaceElement& el, int n) const;
 
+    //! calculate the nodal normals
+    void UpdateNodeNormals();
+    
+    //! return the nodal normals
+    vec3d NodeNormal(const int inode) { return m_nn[inode]; }
+    
 	//! calculate the global position of a point on the surface
 	vec3d Local2Global(FESurfaceElement& el, double r, double s);
 
@@ -306,6 +312,7 @@ public:
 protected:
 	FEFacetSet*					m_surf;		//!< the facet set from which this surface is built
 	vector<FESurfaceElement>	m_el;		//!< surface elements
+    vector<vec3d>               m_nn;       //!< node normals
     bool                        m_bitfc;    //!< interface status
     double                      m_alpha;    //!< intermediate time fraction
 	bool						m_bshellb;	//!< true if this surface is the bottom of a shell domain

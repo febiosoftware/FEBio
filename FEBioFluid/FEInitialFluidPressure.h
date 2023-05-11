@@ -23,35 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEInitialFluidPressure.h"
+#pragma once
+#include <FECore/FEInitialCondition.h>
 
-//=============================================================================
-BEGIN_FECORE_CLASS(FEInitialFluidPressure, FEInitialCondition)
-	ADD_PARAMETER(m_data, "value");
-END_FECORE_CLASS();
-
-FEInitialFluidPressure::FEInitialFluidPressure(FEModel* fem) : FEInitialDOF(fem)
+class FEInitialFluidPressure : public FENodalIC
 {
-}
+public:
+    FEInitialFluidPressure(FEModel* fem);
+	bool Init() override;
+    void Activate() override;
+    
+    void SetPDOF(int ndof);
+    bool SetPDOF(const char* szdof);
 
-bool FEInitialFluidPressure::Init()
-{
-	if (SetDOF("p") == false) return false;
-	return FEInitialDOF::Init();
-}
+    void GetNodalValues(int inode, std::vector<double>& values) override;
 
+    void Serialize(DumpStream& ar) override;
 
-//=============================================================================
-BEGIN_FECORE_CLASS(FEInitialShellFluidPressure, FEInitialCondition)
-	ADD_PARAMETER(m_data, "value");
-END_FECORE_CLASS();
+protected:
+    int     m_dofEF;
+    FEParamDouble   m_Pdata;
+    vector<double>  m_e;
 
-FEInitialShellFluidPressure::FEInitialShellFluidPressure(FEModel* fem) : FEInitialDOF(fem)
-{
-}
-
-bool FEInitialShellFluidPressure::Init()
-{
-	if (SetDOF("q") == false) return false;
-	return FEInitialDOF::Init();
-}
+	DECLARE_FECORE_CLASS();
+};

@@ -149,7 +149,7 @@ double FENonlinearElasticFluid::Tangent_cv_Temperature(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-bool FENonlinearElasticFluid::Dilatation(const double T, const double p, const double c, double& e)
+bool FENonlinearElasticFluid::Dilatation(const double T, const double p, double& e)
 {
     e = 1.0/(1+p/m_k)-1.0;
     return true;
