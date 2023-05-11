@@ -934,6 +934,7 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffnessNew(FEBodyForce& BF, FESol
     int nsol = m_pMat->Solutes();
     int ndpn = 4+nsol;
     vec3d f, k;
+    double divf;
     
     // gradient of shape functions
     vector<vec3d> gradN(neln);
@@ -961,6 +962,14 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffnessNew(FEBodyForce& BF, FESol
         vector<double> d0(nsol);
         vector<double> s(nsol);
         vector<vector<double>> d0p(nsol, vector<double>(nsol));
+        vector<vec3d> gradk(nsol);
+        vector<double> wkJ(nsol), wkce(nsol,0);
+        vector<vector<double>> wkc(nsol, vector<double>(nsol));
+        double wkJe = 0;
+        
+        // get the force
+        f = BF.force(mp);
+        divf = BF.divforce(mp);
         
         for (int isol=0; isol<nsol; ++isol) {
             // get the charge number
@@ -968,14 +977,17 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffnessNew(FEBodyForce& BF, FESol
             M[isol] = m_pMat->GetSolute(isol)->MolarMass();
             d0[isol] = m_pMat->GetSolute(isol)->m_pDiff->Free_Diffusivity(mp);
             s[isol] = d0[isol]*M[isol]/(R*T);
+            wkJ[isol] = s[isol]*spt.m_dkdJ[isol]*(spt.m_c[isol]*divf + spt.m_gradc[isol]*f);
+            wkJe += z[isol]*wkJ[isol];
+            gradk[isol] = pt.m_gradef*spt.m_dkdJ[isol];
             for (int jsol=0; jsol<nsol; ++jsol)
             {
                 d0p[isol][jsol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp, jsol);
+                wkc[isol][jsol] = s[isol]*spt.m_dkdc[isol][jsol]*(spt.m_c[isol]*divf + spt.m_gradc[isol]*f);
+                wkce[isol] += z[jsol]*wkc[isol][jsol];
+                gradk[isol] += spt.m_gradc[jsol]*spt.m_dkdc[isol][jsol];
             }
         }
-        
-        // get the force
-        f = BF.force(mp);
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -1001,18 +1013,25 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffnessNew(FEBodyForce& BF, FESol
                 for (int isol = 0; isol<nsol; ++isol)
                 {
                     vec3d kvc = vec3d(0.0);
-                    double kcc = (gradN[i]*f)*(s[isol]*H[j]);
+                    double kcJ = H[i]*H[j]*(wkJ[isol] + wkJe);
+                    ke[i4+4+isol][j4+3] += kcJ*detJ;
+                    double kcc = 0;
+                    double coef;
                     for(int jsol=0; jsol<nsol; ++jsol)
                     {
                         if (isol == jsol)
                         {
-                            kcc *= 2;
+                            coef = 1 + z[jsol];
                             kvc += f*(spt.m_dkdc[isol][isol]*spt.m_c[isol]+spt.m_k[isol])*M[isol]*H[i]*H[j];
                         }
                         else
                         {
+                            coef = z[jsol];
                             kvc += f*spt.m_c[jsol]*spt.m_dkdc[jsol][isol]*M[jsol]*H[i]*H[j];
                         }
+                        kcc = coef*s[jsol]*H[i]*((spt.m_k[jsol]*divf + gradk[jsol]*f)*H[j] + (gradN[j]*f)*spt.m_k[jsol])
+                        + H[i]*H[j]*(wkc[isol][jsol] + wkce[jsol]);
+                        
                         ke[i4+4+isol][j4+4+jsol] += kcc*detJ;
                     }
                     ke[i4  ][j4+4+isol] += kvc.x*detJ*dms;

@@ -37,6 +37,7 @@ public:
 	FEPointBodyForce(FEModel* pfem);
 
 	vec3d force(FEMaterialPoint& mp) override;
+    double divforce(FEMaterialPoint& mp) override;
 	mat3ds stiffness(FEMaterialPoint& mp) override;
 
 	void Serialize(DumpStream& ar) override;
