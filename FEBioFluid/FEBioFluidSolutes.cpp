@@ -64,8 +64,8 @@ const char* FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_SOLUTES_
         case DISPLACEMENT                : return "displacement"               ; break;
         case RELATIVE_FLUID_VELOCITY     : return "relative fluid velocity"    ; break;
         case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
-        case FLUID_DILATATION            : return "fluid dilatation"             ; break;
-        case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"      ; break;
+        case FLUID_DILATATION            : return "fluid dilatation"           ; break;
+        case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"    ; break;
         case FLUID_CONCENTRATION         : return "concentration"              ; break;
         case FLUID_CONCENTRATION_TDERIV  : return "concentration tderiv"       ; break;
     }
@@ -101,7 +101,7 @@ void FEBioFluidSolutes::InitModule()
     // loads
     REGISTER_FECORE_CLASS(FEFluidSolutesFlux           , "solute flux"                  );
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
-    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux");
+    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux"          , FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FEFluidSolutesPressure       , "fluid pressure"               , 0x0300); // deprecated, use BC version
     REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       , FECORE_EXPERIMENTAL);
 
@@ -114,7 +114,7 @@ void FEBioFluidSolutes::InitModule()
     REGISTER_FECORE_CLASS(FEInitialFluidSolutesPressure, "initial fluid pressure");
 
     // constraints
-    REGISTER_FECORE_CLASS(FEFluidSolutesPressureLC     , "fluid pressure constraint", FECORE_EXPERIMENTAL);
+    REGISTER_FECORE_CLASS(FEFluidSolutesPressureLC     , "fluid pressure constraint"  , FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FEFluidSolutesGradientLC     , "zero concentration gradient", FECORE_EXPERIMENTAL);
     
     //-----------------------------------------------------------------------------
