@@ -295,11 +295,10 @@ bool FEODFFiberDistribution::Init()
 
                 // Add element odf object to map
                 #pragma omp critical
-                m_ElODF[element.GetID()] = odf;
-
-                #pragma omp critical
-                ids.push_back(element.GetID());
-
+                {
+                    m_ElODF[element.GetID()] = odf;
+                    ids.push_back(element.GetID());
+                }
             }
         }
 
