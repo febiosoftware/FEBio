@@ -46,7 +46,7 @@ public:
 	virtual vec3d force(FEMaterialPoint& pt) = 0;
 
     //! calculate the divergence of the body force at a material point
-    virtual double divforce(FEMaterialPoint& pt) = 0;
+    virtual double divforce(FEMaterialPoint& pt) { return (stiffness(pt)).tr(); }
     
 	//! calculate constribution to stiffness matrix
 	virtual mat3ds stiffness(FEMaterialPoint& pt) = 0;
