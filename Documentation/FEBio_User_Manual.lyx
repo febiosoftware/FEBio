@@ -113569,7 +113569,7 @@ This iterative linear solver, from the MKL library, implements the Conjugate
  Gradient algorithm, which is an efficient Krylov-based iterative solution
  strategy for symmetric systems.
  It requires several configuration parameters, listed below, and only works
- with unsymmetric matrices.
+ with symmetric matrices.
  In the table below, 
 \series bold
 N
