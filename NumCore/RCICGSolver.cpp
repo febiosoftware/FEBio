@@ -82,7 +82,7 @@ bool RCICGSolver::SetSparseMatrix(SparseMatrix* A)
 //-----------------------------------------------------------------------------
 void RCICGSolver::SetLeftPreconditioner(LinearSolver* P)
 {
-	m_P = P;
+	m_P = dynamic_cast<Preconditioner*>(P);
 }
 
 //-----------------------------------------------------------------------------
