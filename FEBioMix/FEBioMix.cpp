@@ -75,7 +75,7 @@ SOFTWARE.*/
 #include "FEActiveConstantSupply.h"
 #include "FEPorousNeoHookean.h"
 
-#include "FEPoroTraction.h"
+#include "FEMixtureNormalTraction.h"
 #include "FEFluidFlux.h"
 #include "FESoluteFlux.h"
 #include "FESoluteNaturalFlux.h"
@@ -152,7 +152,7 @@ void FEBioMix::InitModule()
 	febio.SetActiveModule("solid");
 	REGISTER_FECORE_CLASS(FECarterHayes     , "Carter-Hayes");
 	REGISTER_FECORE_CLASS(FEPorousNeoHookean, "porous neo-Hookean");
-	REGISTER_FECORE_CLASS(FEPoroNormalTraction, "normal_traction");
+	REGISTER_FECORE_CLASS(FEMixtureNormalTraction, "normal_traction");
 
 //======================================================================
 // setup the "biphasic" module
