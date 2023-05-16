@@ -84,6 +84,9 @@ public:
     // update material point at each iteration
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
+    //! Get the elastic deformation
+    FEMaterialPoint GetElasticDeformationMaterialPoint(FEMaterialPoint& mp);
+    
 private:
     FEElasticMaterial*  m_pBase;        //!< pointer to elastic solid material
     FEGrowthTensor*     m_pGrowth;      //!< pointer to growth tensor
