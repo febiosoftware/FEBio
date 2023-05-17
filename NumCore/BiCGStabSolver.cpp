@@ -34,7 +34,7 @@ BEGIN_FECORE_CLASS(BiCGStabSolver, IterativeLinearSolver)
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_maxiter, "max_iter");
 	ADD_PARAMETER(m_fail_max_iter, "fail_max_iters");
-	ADD_PROPERTY(m_P, "pc_left");
+	ADD_PROPERTY(m_P, "pc_left")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ bool BiCGStabSolver::SetSparseMatrix(SparseMatrix* A)
 //-----------------------------------------------------------------------------
 void BiCGStabSolver::SetLeftPreconditioner(LinearSolver* P)
 {
-	m_P = P;
+	m_P = dynamic_cast<Preconditioner*>(P);
 }
 
 //-----------------------------------------------------------------------------
@@ -139,6 +139,8 @@ bool BiCGStabSolver::BackSolve(double* x, double* b)
 	double rho_p = 1, alpha = 1, w_p = 1;
 	vector<double> v_p(neq, 0.0), p_p(neq, 0.0), p_i(neq), y(neq, 0.0), h(neq), s(neq), z(neq), t(neq), q(neq);
 
+	int max_iter = m_maxiter;
+	if (max_iter == 0) max_iter = (neq < 150 ? neq : 150);
 	int iter = 0;
 	bool converged = false;
 	do
@@ -203,7 +205,7 @@ bool BiCGStabSolver::BackSolve(double* x, double* b)
 
 		// check max iterations
 		iter++;
-		if (iter > m_maxiter) break;
+		if (iter > max_iter) break;
 
 		if (m_print_level > 1)
 		{
@@ -216,6 +218,8 @@ bool BiCGStabSolver::BackSolve(double* x, double* b)
 	{
 		feLog("%d:%lg, %lg\n", iter, normi, norm0);
 	}
+
+	UpdateStats(iter);
 
 	return (m_fail_max_iter ? converged : true);
 }

@@ -1649,7 +1649,11 @@ void FETiedMultiphasicInterface::Serialize(DumpStream &ar)
     // store contact surface data
     m_ms.Serialize(ar);
     m_ss.Serialize(ar);
-    
+
+    // serialize element pointers
+    SerializeElementPointers(m_ss, m_ms, ar);
+    SerializeElementPointers(m_ms, m_ss, ar);
+
 	// serialize interface data
 	ar & m_epsp;
 	ar & m_epsc;
@@ -1657,10 +1661,10 @@ void FETiedMultiphasicInterface::Serialize(DumpStream &ar)
 	ar & m_ssl;
 	ar & m_msl;
 	ar & m_sz;
-
-	// serialize element pointers
-	SerializeElementPointers(m_ss, m_ms, ar);
-	SerializeElementPointers(m_ms, m_ss, ar);
+    
+    if (ar.IsShallow()) return;
+    ar & m_dofP & m_dofC;
+    ar & m_Rgas & m_Tabs;
 }
 
 //-----------------------------------------------------------------------------

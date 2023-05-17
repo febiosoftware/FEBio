@@ -23,42 +23,46 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/Preconditioner.h>
-#include <FECore/CompactSymmMatrix.h>
 
-class BiCGStabSolver : public IterativeLinearSolver
+
+
+#pragma once
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEModelParam.h>
+#include "febiomix_api.h"
+
+//-----------------------------------------------------------------------------
+//! This boundary condition applies a mixture normal traction on a surface
+//!
+class FEBIOMIX_API FEMixtureNormalTraction : public FESurfaceLoad
 {
 public:
-	BiCGStabSolver(FEModel* fem);
-	bool PreProcess() override;
-	bool Factor() override;
-	bool BackSolve(double* x, double* b) override;
-	void Destroy() override;
+	//! constructor
+    FEMixtureNormalTraction(FEModel* pfem);
 
-public:
-	bool HasPreconditioner() const override;
+	bool Init() override;
 
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	//! Set the surface to apply the load to
+	void SetSurface(FESurface* ps) override;
 
-	bool SetSparseMatrix(SparseMatrix* A) override;
+	void SetLinear(bool blinear) { m_blinear = blinear; }
 
-	void SetLeftPreconditioner(LinearSolver* P) override;
-	LinearSolver* GetLeftPreconditioner() override;
+	void SetEffective(bool beff) { m_beffective = beff; }
 
-	void SetMaxIterations(int n) { m_maxiter = n; }
-	void SetTolerance(double tol) { m_tol = tol; }
-	void SetPrintLevel(int n) override { m_print_level = n; }
+	//! calculate pressure stiffness
+	void StiffnessMatrix(FELinearSystem& LS) override;
+
+	//! calculate residual
+	void LoadVector(FEGlobalVector& R) override;
+
+private:
+	double Traction(FESurfaceMaterialPoint& mp);
 
 protected:
-	SparseMatrix*		m_pA;
-	Preconditioner*		m_P;
-
-	int		m_maxiter;		// max nr of iterations
-	double	m_tol;			// residual relative tolerance
-	double	m_abstol;		// absolute residual tolerance
-	int		m_print_level;	// output level
-	double	m_fail_max_iter;
+	FEParamDouble	m_traction;		//!< traction value
+	bool	m_blinear;		//!< linear or not (true is non-follower, false is follower)
+    bool    m_bshellb;      //!< flag for prescribing traction on shell bottom
+	bool	m_beffective;	//!< effective or total normal traction
 
 	DECLARE_FECORE_CLASS();
 };
