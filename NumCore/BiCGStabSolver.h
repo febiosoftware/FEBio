@@ -24,10 +24,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/LinearSolver.h>
+#include <FECore/Preconditioner.h>
 #include <FECore/CompactSymmMatrix.h>
 
-// This class implements an interface to the RCI CG iterative solver from the MKL math library.
 class BiCGStabSolver : public IterativeLinearSolver
 {
 public:
@@ -53,7 +52,7 @@ public:
 
 protected:
 	SparseMatrix*		m_pA;
-	LinearSolver*		m_P;
+	Preconditioner*		m_P;
 
 	int		m_maxiter;		// max nr of iterations
 	double	m_tol;			// residual relative tolerance
