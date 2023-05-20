@@ -47,6 +47,9 @@ void FEKinematicMaterialPoint::Init()
     
     // intialize data
     m_rhor = 0;
+    m_Fe = mat3dd(1);
+    m_Je = 1;
+    m_Fg = mat3dd(1);
 }
 
 //-----------------------------------------------------------------------------
@@ -89,11 +92,8 @@ FEKinematicGrowth::FEKinematicGrowth(FEModel* pfem) : FEElasticMaterial(pfem)
 //! create material point
 FEMaterialPointData* FEKinematicGrowth::CreateMaterialPointData()
 {
-    FEGrowthTensor* pmf = GetGrowthMaterial();
-    FEMaterialPointData* mp = pmf->CreateMaterialPointData();
     FEElasticMaterial* pme = GetBaseMaterial();
     FEMaterialPointData* ep = pme->CreateMaterialPointData();
-    ep->Append(mp);
     return new FEKinematicMaterialPoint(ep);
 }
 
@@ -142,10 +142,9 @@ bool FEKinematicGrowth::Init()
 //! Returns the Cauchy stress
 mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
 {
-    FEMaterialPoint pt = GetElasticDeformationMaterialPoint(mp);
     // evaluate stress
     FEElasticMaterial* emat = GetBaseMaterial();
-    mat3ds s = emat->Stress(pt);
+    mat3ds s = emat->Stress(mp);
 
     return s;
 }
@@ -154,10 +153,9 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
 //! Returns the spatial tangent
 tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
 {
-    FEMaterialPoint pt = GetElasticDeformationMaterialPoint(mp);
     // evaluate tangent
     FEElasticMaterial* emat = GetBaseMaterial();
-    tens4ds c = emat->Tangent(pt);
+    tens4ds c = emat->Tangent(mp);
 
     return c;
 }
@@ -166,10 +164,9 @@ tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
 //! Returns the strain energy density
 double FEKinematicGrowth::StrainEnergyDensity(FEMaterialPoint& mp)
 {
-    FEMaterialPoint pt = GetElasticDeformationMaterialPoint(mp);
     // evaluate sed
     FEElasticMaterial* emat = GetBaseMaterial();
-    double sed = emat->StrainEnergyDensity(pt);
+    double sed = emat->StrainEnergyDensity(mp);
 
     return sed;
 }
@@ -187,8 +184,22 @@ void FEKinematicGrowth::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
     // convert to global coordinates
     vec3d a0 = Q * fiber;
     
+    FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
+    
+    // Get the deformation gradient and evaluate elastic deformation
+    mat3d Fg = gmat->GrowthTensor(mp, a0);
+    mat3d Fe = pe.m_F*gmat->GrowthTensorInverse(mp, a0);
+
     // extract Kinematic growth material point
     FEKinematicMaterialPoint& pt = *mp.ExtractData<FEKinematicMaterialPoint>();
     
+    pt.m_Fg = Fg;
+    pt.m_Fe = Fe;
+    pt.m_Je = Fe.det();
     pt.m_rhor = GetBaseMaterial()->Density(mp)*GetGrowthMaterial()->GrowthDensity(mp, a0);
+    
+    // overwrite the elastic material point deformation gradient information
+    // to match elastic deformation gradient of kinematic growth material
+    pe.m_F = pt.m_Fe;
+    pe.m_J = pt.m_Je;
 }

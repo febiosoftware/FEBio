@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEBioMechPlot.h"
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
+#include "FEKinematicGrowth.h"
 #include "FEReactiveFatigue.h"
 #include "FEReactivePlasticity.h"
 #include "FEReactivePlasticDamage.h"
@@ -3962,3 +3963,252 @@ bool FEPlotTrussStretch::Save(FEDomain& dom, FEDataStream& a)
 	}
 	return true;
 }
+
+//=============================================================================
+//! Store the average growth  Lagrangian strain
+class FEGrowthLagrangeStrain
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
+        const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+        if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+        mat3d Fg = kp->m_Fg;
+        
+        mat3d C = Fg.transpose()*Fg;
+        mat3ds E = ((C - mat3dd(1.0))*0.5).sym();
+        return E;
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEKinematicGrowth* pme = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
+    if (pme == nullptr) return false;
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+            if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
+            const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+            if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            mat3d Fg = kp->m_Fg;
+            FEElasticMaterialPoint pe2;
+            pe2.m_F = Fg;
+            
+            return pe2.Strain();
+        });
+    }
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom); assert(sd);
+        
+        FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(&dom);
+        FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(&dom);
+        if (easd || ansd)
+        {
+            return false;
+        }
+        else
+        {
+            writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+                const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+                if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
+                const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+                if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+                mat3d Fg = kp->m_Fg;
+                FEElasticMaterialPoint pe2;
+                pe2.m_F = Fg;
+                
+                return pe2.Strain();
+            });
+        }
+    }
+    else return false;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthInfStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEKinematicGrowth* pme = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
+    if (pme == nullptr) return false;
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+            if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
+            const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+            if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            mat3d Fg = kp->m_Fg;
+
+            // displacement tensor
+            mat3d U = Fg - mat3dd(1.0);
+            
+            // evaluate small strain tensor eij = 0.5*(Uij + Uji)
+            mat3ds e = U.sym();
+            
+            return e;
+        });
+    }
+    else return false;
+    
+    return true;
+}
+
+//=============================================================================
+//! Store the average right stretch
+class FEGrowthRightStretch
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
+        const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+        if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+        mat3d Fg = kp->m_Fg;
+        FEElasticMaterialPoint pe2;
+        pe2.m_F = Fg;
+        
+        return pe2.RightStretch();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthRightStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEKinematicGrowth* pme = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FEGrowthRightStretch());
+    return true;
+}
+
+//=============================================================================
+//! Store the average right stretch
+class FEGrowthLeftStretch
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
+        const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+        if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+        mat3d Fg = kp->m_Fg;
+        FEElasticMaterialPoint pe2;
+        pe2.m_F = Fg;
+        
+        return pe2.LeftStretch();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthLeftStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEKinematicGrowth* pme = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FEGrowthLeftStretch());
+    return true;
+}
+
+//=============================================================================
+//! Store the average growth right Hencky
+class FEGrowthRightHencky
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
+        const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+        if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+        mat3d Fg = kp->m_Fg;
+        FEElasticMaterialPoint pe2;
+        pe2.m_F = Fg;
+        
+        return pe2.RightHencky();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthRightHencky::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEKinematicGrowth* pme = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FEGrowthRightHencky());
+    return true;
+}
+
+//=============================================================================
+//! Store the average left Hencky
+class FEGrowthLeftHencky
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
+        const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+        if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+        mat3d Fg = kp->m_Fg;
+        FEElasticMaterialPoint pe2;
+        pe2.m_F = Fg;
+
+        return pe2.LeftHencky();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthLeftHencky::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEKinematicGrowth* pme = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FEGrowthLeftHencky());
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotGrowthRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
+{
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+            if (pe == nullptr) return 0.0;
+            const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+            return (kp ? kp->m_Fg.det() : 0.0);
+        });
+    }
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        // TODO: implement relative volume calculation for kinematic growth material in EAS and ANS shells
+        FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom); assert(sd);
+        
+        FEShellDomainNew* newsd = dynamic_cast<FEShellDomainNew*>(sd);
+        FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(newsd);
+        FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(newsd);
+        if (easd || ansd) {
+            return false;
+        }
+        else {
+            writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+                const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+                if (pe == nullptr) return 0.0;
+                const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+                return (kp ? kp->m_Fg.det() : 0.0);
+            });
+        }
+        return true;
+    }
+    else return false;
+    
+    return true;
+}
+

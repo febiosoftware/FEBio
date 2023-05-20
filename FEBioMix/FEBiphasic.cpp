@@ -239,5 +239,12 @@ void FEBiphasic::Permeability(double k[3][3], FEMaterialPoint& pt)
 //-----------------------------------------------------------------------------
 mat3ds FEBiphasic::Permeability(FEMaterialPoint& mp)
 {
-	return m_pPerm->Permeability(mp);
+    return m_pPerm->Permeability(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! return tangent of permeability with strain
+tens4dmm FEBiphasic::Tangent_Permeability_Strain(FEMaterialPoint& mp)
+{
+    return m_pPerm->Tangent_Permeability_Strain(mp);
 }

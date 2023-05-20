@@ -47,9 +47,10 @@ public:
     void Serialize(DumpStream& ar) override;
     
 public:
-    FEParamMat3d    m_Fe;       //!< elastic deformation
-    FEParamMat3d    m_Fg;       //!< growth deformation
-    FEParamDouble   m_rhor;     //!< solid referential density
+    mat3d   m_Fe;       //!< elastic deformation
+    double  m_Je;       //!< elastic relative volume
+    mat3d   m_Fg;       //!< growth deformation
+    double  m_rhor;     //!< solid referential density
 };
 
 //-----------------------------------------------------------------------------
