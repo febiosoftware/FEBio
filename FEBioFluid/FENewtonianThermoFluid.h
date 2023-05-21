@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2023 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,58 +27,51 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEAugLagLinearConstraint.h>
-#include <FECore/FESurface.h>
-#include "febiofluid_api.h"
+#include "FEViscousFluid.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
-//! The FEFluidSolutesPressureLC class implements a fluid surface with prescribed pressure
-//! as a linear constraint between nodal dilatation and effective concentrations.
+// This class evaluates the viscous stress in a Newtonian fluid
 
-class FEBIOFLUID_API FEFluidSolutesPressureLC : public FESurfaceConstraint
+class FEBIOFLUID_API FENewtonianThermoFluid :	public FEViscousFluid
 {
 public:
     //! constructor
-    FEFluidSolutesPressureLC(FEModel* pfem);
-    
-    //! destructor
-    ~FEFluidSolutesPressureLC() {}
-    
-    //! Activation
-    void Activate() override;
+    FENewtonianThermoFluid(FEModel* pfem);
     
     //! initialization
     bool Init() override;
     
-    //! Get the surface
-    FESurface* GetSurface() override { return &m_surf; }
-    
-public:
-    //! serialize data to archive
+    //! Serialization
     void Serialize(DumpStream& ar) override;
-    
-    //! add the linear constraint contributions to the residual
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-    
-    //! add the linear constraint contributions to the stiffness matrix
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
-    
-    //! do the augmentation
-    bool Augment(int naug, const FETimeInfo& tp) override;
-    
-    //! build connectivity for matrix profile
-    void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
-protected:
-    void UnpackLM(vector<int>& lm);
+    //! viscous stress
+    mat3ds Stress(FEMaterialPoint& pt) override;
     
-protected:
-    FESurface	m_surf;
-    FELinearConstraintSet   m_lc;
+    //! tangent of stress with respect to strain J
+    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
+    
+    //! tangent of stress with respect to rate of deformation tensor D
+    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
+    
+    //! tangent of stress with respect to temperature
+    mat3ds Tangent_Temperature(FEMaterialPoint& mp) override;
+    
+    //! dynamic viscosity
+    double ShearViscosity(FEMaterialPoint& mp) override;
+    double TangentShearViscosityTemperature(FEMaterialPoint& mp);
 
-    // degrees of freedom
-    int         m_dofEF;
-    int         m_dofC;
+    //! bulk viscosity
+    double BulkViscosity(FEMaterialPoint& mp) override;
+    double TangentBulkViscosityTemperature(FEMaterialPoint& mp);
 
+public:
+    double	m_kappa;	//!< bulk viscosity
+    double	m_mu;		//!< shear viscosity
+    double  m_Tr;       //!< referential temperature
+    FEFunction1D*   m_kappahat; //!< normalized bulk viscosity vs normalized temperature
+    FEFunction1D*   m_muhat;    //!< normalized shear viscosity vs normalized temperature
+
+    // declare parameter list
     DECLARE_FECORE_CLASS();
 };
