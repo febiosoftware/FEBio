@@ -98,6 +98,9 @@ public:
     //! calculate solute molar flux
     vec3d SoluteFlux(const FEMaterialPoint& pt, const int sol);
     
+    //! calculate diffusive solute molar flux
+    vec3d SoluteDiffusiveFlux(const FEMaterialPoint& pt, const int sol);
+    
     //! actual concentration (as opposed to effective concentration)
     double ConcentrationActual(const FEMaterialPoint& pt, const int sol);
     
@@ -140,6 +143,7 @@ public:
     FEOsmoticCoefficient* GetOsmoticCoefficient() override { return m_pOsmC;  }
     double GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override;
     double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override { return ConcentrationActual(mp, soluteIndex); }
+    double GetFreeDiffusivity(FEMaterialPoint& mp, int soluteIndex) override;
     double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override;
     vec3d GetSoluteFlux(FEMaterialPoint& mp, int soluteIndex) override { return SoluteFlux(mp, soluteIndex); }
     double GetOsmolarity(const FEMaterialPoint& mp) override;

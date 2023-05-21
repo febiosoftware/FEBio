@@ -110,25 +110,27 @@ void FEThermoFluidPressureBC::Update()
                 T /= el.Nodes();
                 double efi[FEElement::MAX_INTPOINTS] = {0};
                 double efo[FEElement::MAX_NODES] = {0};
-                bool good = true;
+/*                bool good = true;
                 for (int j=0; j<se->GaussPoints(); ++j) {
                     FEMaterialPoint* pt = se->GetMaterialPoint(j);
                     good = good && ptfl->Dilatation(T, p, 0, efi[j]);
+                    if (!good) break;
                 }
-                // project dilatations from integration points to nodes
-                se->project_to_nodes(efi, efo);
                 // only keep the dilatations at the nodes of the surface face
                 if (good) {
+                    // project dilatations from integration points to nodes
+                    se->project_to_nodes(efi, efo);
                     for (int j=0; j<el.Nodes(); ++j)
                         efNodes[el.m_lnode[j]].push_back(efo[j]);
                 }
-                else {
+                else {*/
                     for (int j=0; j<el.Nodes(); ++j) {
                         FENode& node = mesh.Node(el.m_node[j]);
                         efo[j] = node.get_prev(m_dofEF);
+                        ptfl->Dilatation(T, p, efo[j]);
                         efNodes[el.m_lnode[j]].push_back(efo[j]);
                     }
-                }
+//                }
             }
             else if (pfl) {
                 double efi[FEElement::MAX_INTPOINTS] = {0};
@@ -136,12 +138,13 @@ void FEThermoFluidPressureBC::Update()
                 bool good = true;
                 for (int j=0; j<se->GaussPoints(); ++j) {
                     FEMaterialPoint* pt = se->GetMaterialPoint(j);
-                    good = good && pfl->Dilatation(0, p, 0, efi[j]);
+                    good = good && pfl->Dilatation(0, p, efi[j]);
+                    if (!good) break;
                 }
-                // project dilatations from integration points to nodes
-                se->project_to_nodes(efi, efo);
                 // only keep the dilatations at the nodes of the surface face
                 if (good) {
+                    // project dilatations from integration points to nodes
+                    se->project_to_nodes(efi, efo);
                     for (int j=0; j<el.Nodes(); ++j)
                         efNodes[el.m_lnode[j]].push_back(efo[j]);
                 }
@@ -149,6 +152,7 @@ void FEThermoFluidPressureBC::Update()
                     for (int j=0; j<el.Nodes(); ++j) {
                         FENode& node = mesh.Node(el.m_node[j]);
                         efo[j] = node.get_prev(m_dofEF);
+                        pfl->Dilatation(0, p, efo[j]);
                         efNodes[el.m_lnode[j]].push_back(efo[j]);
                     }
                 }

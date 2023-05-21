@@ -56,7 +56,6 @@ public:
 
 	SparseMatrix* GetSparseMatrix() { return m_A; }
 
-protected:
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override { return nullptr; }
 
 private:

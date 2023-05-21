@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEInitialFluidDilatation, FEInitialCondition)
-	ADD_PARAMETER(m_data, "value");
+	ADD_PARAMETER(m_data, "value")->setUnits(UNIT_NONE);
 END_FECORE_CLASS();
 
 FEInitialFluidDilatation::FEInitialFluidDilatation(FEModel* fem) : FEInitialDOF(fem)

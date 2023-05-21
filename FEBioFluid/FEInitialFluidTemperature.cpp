@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEInitialFluidTemperature, FEInitialCondition)
-	ADD_PARAMETER(m_data, "value");
+	ADD_PARAMETER(m_data, "value")->setUnits(UNIT_RELATIVE_TEMPERATURE);
 END_FECORE_CLASS();
 
 FEInitialFluidTemperature::FEInitialFluidTemperature(FEModel* fem) : FEInitialDOF(fem)

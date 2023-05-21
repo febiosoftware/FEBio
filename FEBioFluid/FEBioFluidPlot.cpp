@@ -1431,3 +1431,99 @@ bool FEPlotPolarFluidCoupleStress::Save(FEDomain& dom, FEDataStream& a)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidRelativeReynoldsNumber::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<double>(dom, a, [&pfluid](const FEMaterialPoint& mp) {
+        const FEFluidMaterialPoint* fpt = mp.ExtractData<FEFluidMaterialPoint>();
+        const FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        double nu = pfluid->KinematicViscosity(mp_noconst);
+        vec3d v(0,0,0);
+        if (ept) v = ept->m_v;
+        return (fpt->m_vft - v).Length()/nu;
+    });
+    
+    return true;
+}
+
+//=================================================================================================
+//-----------------------------------------------------------------------------
+FEPlotFluidRelativePecletNumber::FEPlotFluidRelativePecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
+{
+    DOFS& dofs = pfem->GetDOFS();
+    int nsol = dofs.GetVariableSize("concentration");
+    SetArraySize(nsol);
+    
+    // collect the names
+    int ndata = pfem->GlobalDataItems();
+    vector<string> s;
+    for (int i = 0; i<ndata; ++i)
+    {
+        FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+        if (ps)
+        {
+            s.push_back(ps->GetName());
+            m_sol.push_back(ps->GetID());
+        }
+    }
+    assert(nsol == (int)s.size());
+    SetArrayNames(s);
+    SetUnits(UNIT_RECIPROCAL_LENGTH);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidRelativePecletNumber::Save(FEDomain &dom, FEDataStream& a)
+{
+    FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+    if (pm == 0) return false;
+    
+    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
+    if (pfluid == 0) return false;
+    
+    // figure out the local solute IDs. This depends on the material
+    int nsols = (int)m_sol.size();
+    vector<int> lid(nsols, -1);
+    int negs = 0;
+    for (int i = 0; i<(int)m_sol.size(); ++i)
+    {
+        lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+        if (lid[i] < 0) negs++;
+    }
+    if (negs == nsols) return false;
+    
+    // loop over all elements
+    int N = dom.Elements();
+    for (int i = 0; i<N; ++i)
+    {
+        FEElement& el = dom.ElementRef(i);
+        
+        for (int k=0; k<nsols; ++k)
+        {
+            int nsid = lid[k];
+            if (nsid == -1) a << 0.f;
+            else
+            {
+                // calculate average relative Peclet number
+                double ew = 0;
+                for (int j = 0; j<el.GaussPoints(); ++j)
+                {
+                    FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                    const FEFluidMaterialPoint* fpt = mp.ExtractData<FEFluidMaterialPoint>();
+                    const FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
+                    vec3d v(0,0,0);
+                    if (ept) v = ept->m_v;
+                    ew += (fpt->m_vft - v).Length()/pm->GetFreeDiffusivity(mp, nsid);
+                }
+                ew /= el.GaussPoints();
+                a << ew;
+            }
+        }
+        
+    }
+    return true;
+}
+

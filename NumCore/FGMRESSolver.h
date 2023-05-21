@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/LinearSolver.h>
+#include <FECore/Preconditioner.h>
 #include <FECore/SparseMatrix.h>
 
 //-----------------------------------------------------------------------------
@@ -119,8 +119,8 @@ private:
 
 private:
 	SparseMatrix*	m_pA;		//!< the sparse matrix format
-	LinearSolver*	m_P;		//!< the left preconditioner
-	LinearSolver*	m_R;		//!< the right preconditioner
+	Preconditioner*	m_P;		//!< the left preconditioner
+	Preconditioner*	m_R;		//!< the right preconditioner
 	vector<double>	m_tmp;
 	vector<double>	m_Rv;		//!< used when a right preconditioner is ued
 	vector<double>	m_W;		//!< Jacobi preconditioner

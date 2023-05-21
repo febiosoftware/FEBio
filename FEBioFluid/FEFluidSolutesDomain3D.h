@@ -105,21 +105,21 @@ public:
     
     //! calculates the solid element stiffness matrix
     void ElementStiffness(FESolidElement& el, matrix& ke);
-    
+
     //! calculates the solid element mass matrix
     void ElementMassMatrix(FESolidElement& el, matrix& ke);
     
     //! calculates the stiffness matrix due to body forces
     void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);
-    
+
     // --- R E S I D U A L ---
     
     //! Calculates the internal stress vector for solid elements
     void ElementInternalForce(FESolidElement& el, vector<double>& fe);
-    
+
     //! Calculatess external body forces for solid elements
     void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
-    
+
     //! Calculates the inertial force vector for solid elements
     void ElementInertialForce(FESolidElement& el, vector<double>& fe);
     

@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/FENode.h>
 
 BEGIN_FECORE_CLASS(FEInitialFluidVelocity, FENodalIC)
-ADD_PARAMETER(m_v0, "value");
+    ADD_PARAMETER(m_v0, "value")->setUnits(UNIT_VELOCITY);
 END_FECORE_CLASS();
 
 FEInitialFluidVelocity::FEInitialFluidVelocity(FEModel* fem) : FENodalIC(fem)

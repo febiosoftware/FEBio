@@ -172,6 +172,44 @@ void FEFluidSolutesNaturalFlux::LoadVector(FEGlobalVector& R)
             fa[0] = 0;
             return;
         }
+        FEFluidSolutes* pmat = dynamic_cast<FEFluidSolutes*>(pm);
+        int sid = psi->FindLocalSoluteID(flux->m_isol);
+        vec3d dxt = mp.dxr ^ mp.dxs;
+        
+        // get element-averaged diffusive flux
+        vec3d jd(0,0,0);
+        int nint = pe->GaussPoints();
+        for (int n=0; n<nint; ++n) {
+            FEMaterialPoint& pt = *pe->GetMaterialPoint(n);
+            jd += pmat->SoluteDiffusiveFlux(pt, m_isol-1);
+        }
+        jd /= nint;
+        
+        // evaluate desired natural solute flux = normal convective flux * area
+        double jn = jd*dxt*tp.alphaf;
+        
+        
+        double H_i = dof_a.shape;
+        fa[0] = H_i * jn;
+    });
+}
+/*{
+    FEFluidSolutesNaturalFlux* flux = this;
+    m_psurf->LoadVector(R, m_dofC, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, std::vector<double>& fa) {
+        
+        const FETimeInfo& tp = GetTimeInfo();
+        
+        // get surface element
+        FESurfaceElement& el = *mp.SurfaceElement();
+        // get underlying solid element
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        // get the local solute id
+        FESoluteInterface* psi = dynamic_cast<FESoluteInterface*>(pm);
+        if (psi == nullptr) {
+            fa[0] = 0;
+            return;
+        }
         int sid = psi->FindLocalSoluteID(flux->m_isol);
         vec3d dxt = mp.dxr ^ mp.dxs;
 
@@ -209,11 +247,12 @@ void FEFluidSolutesNaturalFlux::LoadVector(FEGlobalVector& R)
         double H_i = dof_a.shape;
         fa[0] = H_i * f;
     });
-}
+}*/
 
 //-----------------------------------------------------------------------------
 void FEFluidSolutesNaturalFlux::StiffnessMatrix(FELinearSystem& LS)
-{
+{}
+/*{
     FEFluidSolutesNaturalFlux* flux = this;
     m_psurf->LoadStiffness(LS, m_dofC, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
         
@@ -268,4 +307,4 @@ void FEFluidSolutesNaturalFlux::StiffnessMatrix(FELinearSystem& LS)
         Kab[0][2] = -kcv.z;
         Kab[0][3] = -kcc;
     });
-}
+}*/

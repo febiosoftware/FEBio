@@ -786,6 +786,11 @@ bool FEFluidSolutesSolver::Quasin()
 			{
 				// zero the velocity residual
 				for (int i = 0; i < veq; ++i) m_R1[i] = 0.0;
+                // if solving sequentially with ctol = 0, ignore solute residual
+                if (m_Ctol == 0) {
+                    // zero the solute residual
+                    for (int i = veq; i < m_neq; ++i) m_R1[i] = 0.0;
+                }
 			}
 		}
 

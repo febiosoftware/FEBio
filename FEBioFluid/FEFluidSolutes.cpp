@@ -678,12 +678,39 @@ vec3d FEFluidSolutes::SoluteFlux(const FEMaterialPoint& pt, const int sol)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculate diffusive solute molar flux
+
+vec3d FEFluidSolutes::SoluteDiffusiveFlux(const FEMaterialPoint& pt, const int sol)
+{
+    const FEFluidSolutesMaterialPoint& spt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    const FEFluidMaterialPoint& fpt = *pt.ExtractData<FEFluidMaterialPoint>();
+    
+    // concentration gradient
+    vec3d gradc = spt.m_gradc[sol];
+    
+    // solute free diffusivity
+    FEMaterialPoint mp = pt;
+    double D0 = m_pSolute[sol]->m_pDiff->Free_Diffusivity(mp);
+    double kappa = PartitionCoefficient(pt, sol);
+    
+    // diffusive solute flux j
+    vec3d jd = -gradc*D0*kappa;
+    
+    return jd;
+}
+
+//-----------------------------------------------------------------------------
 // solute interface functions
 
 double FEFluidSolutes::GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex)
 {
     FEFluidSolutesMaterialPoint& spt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
     return spt.m_c[soluteIndex];
+}
+
+double FEFluidSolutes::GetFreeDiffusivity(FEMaterialPoint& mp, int soluteIndex)
+{
+    return m_pSolute[soluteIndex]->m_pDiff->Free_Diffusivity(mp);
 }
 
 double FEFluidSolutes::GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex)

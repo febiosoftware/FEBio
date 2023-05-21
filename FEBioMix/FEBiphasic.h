@@ -126,6 +126,9 @@ public:
 	//! return the permeability as a tensor
 	mat3ds Permeability(FEMaterialPoint& pt);
 
+    //! return tangent of permeability with strain
+    tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp);
+    
 	//! return the permeability property
 	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
 	

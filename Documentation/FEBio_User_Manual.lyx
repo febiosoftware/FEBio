@@ -8347,7 +8347,7 @@ Only output at must points
 \begin_inset Text
 
 \begin_layout Plain Layout
-PRINT_MAJOR_ITRS
+OUTPUT_MAJOR_ITRS
 \end_layout
 
 \end_inset
@@ -8367,7 +8367,7 @@ Output at end of each time step
 \begin_inset Text
 
 \begin_layout Plain Layout
-PRINT_MINOR_ITRS
+OUTPUT_MINOR_ITRS
 \end_layout
 
 \end_inset
@@ -16232,6 +16232,13 @@ Example:
 
 \begin_layout Subsection
 The Prestrain Initial Condition
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Prestrain-Initial-Condition"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -16413,6 +16420,99 @@ init
  
 \end_layout
 
+\begin_layout Subsection
+Fluid Pressure Initial Condition
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Pressure-IC"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fluid pressure initial condition can be used in biphasic and multiphasic
+ analyses, and in fluid, fluid-FSI, and fluid-solutes analyses.
+ In all cases it sets the initial value of the effective fluid pressure
+ 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+.
+ If the analysis includes solutes (multiphasic or fluid-solutes), it is
+ the user's responsibility to evaluate 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ using eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, knowing the values of the universal gas constant 
+\begin_inset Formula $R$
+\end_inset
+
+ and absolute temperature 
+\begin_inset Formula $T$
+\end_inset
+
+ specified in the Globals section (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Globals-Section"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), and the values of initial effective solute concentrations 
+\begin_inset Formula $\tilde{c}$
+\end_inset
+
+ in the given multiphasic or fluid-solutes domain.
+\end_layout
+
+\begin_layout Standard
+In biphasic and multiphasic analyses the value of 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is prescribed directly as a nodal degree of freedom.
+ In a fluid, fluid-FSI, or fluid-solutes analysis, the effective fluid pressure
+ 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is converted internally to the corresponding initial value of the fluid
+ dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, based on the constitutive models presented in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -16462,7 +16562,7 @@ attribute.
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="3">
+<lyxtabular version="3" rows="18" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -16571,6 +16671,111 @@ solid
 \begin_layout Plain Layout
 
 \family typewriter
+zero fluid pressure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fix the biphasic or multiphasic effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+biphasic
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+zero concentration
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fix the effective solute concentration 
+\begin_inset Formula $\tilde{c}$
+\end_inset
+
+ (multiphasic or fluid-solutes)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solute
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+zero fluid dilatation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fix the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fluid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
 prescribed displacement
 \end_layout
 
@@ -16664,6 +16869,111 @@ solid
 \begin_layout Plain Layout
 
 \family typewriter
+prescribed fluid pressure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the biphasic or multiphasic effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+biphasic
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+prescribed concentration
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the effective solute concentration 
+\begin_inset Formula $\tilde{c}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+solute
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+prescribed fluid dilatation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fluid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
 normal displacement
 \end_layout
 
@@ -16745,6 +17055,84 @@ The nodes are attached to a rigid body
 
 \begin_layout Plain Layout
 solid
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+fluid pressure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe the actual fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ on a surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiple
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+fluid resistance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prescribe a fluid resistance 
+\begin_inset Formula $R$
+\end_inset
+
+ such that 
+\begin_inset Formula $p=Rq$
+\end_inset
+
+, 
+\begin_inset Formula $q=$
+\end_inset
+
+volumetric flux
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiple
 \end_layout
 
 \end_inset
@@ -17001,8 +17389,11 @@ name "subsec:Zero-Fluid-Pressure"
 \end_layout
 
 \begin_layout Standard
-To fix the effective fluid pressure in a biphasic or multiphasic analysis,
- use the 
+To fix the effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ in a biphasic or multiphasic analysis, use the 
 \emph on
 zero fluid pressure
 \emph default
@@ -17025,8 +17416,12 @@ name "subsec:Zero-Concentration"
 \end_layout
 
 \begin_layout Standard
-To fix an effective solute concentration degree of freedom (c_dof) in a
- multiphasic analysis, use the 
+To fix an effective solute concentration 
+\begin_inset Formula $\tilde{c}$
+\end_inset
+
+ degree of freedom (c_dof) in a multiphasic or fluid-solutes analysis, use
+ the 
 \emph on
 zero concentration
 \emph default
@@ -17043,6 +17438,65 @@ zero concentration
 
 \begin_layout LyX-Code
 </bc>
+\end_layout
+
+\begin_layout Subsection
+Zero Fluid Dilatation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Zero-Dilatation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To fix the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ in a fluid or fluid-FSI or fluid-solutes analysis, use the 
+\emph on
+zero fluid dilatation
+\emph default
+ boundary condition.
+\end_layout
+
+\begin_layout LyX-Code
+<bc node_set="set01" type="zero fluid dilatation"/>
+\end_layout
+
+\begin_layout Standard
+Zero fluid dilatation is the same as setting the effective fluid pressure
+ 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ to zero in fluid analyses.
+ If you want to set the actual fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ to some value (such as zero) in a fluid analysis, use the 
+\emph on
+fluid pressure
+\emph default
+ boundary condition (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Pressure-BC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsection
@@ -17535,7 +17989,11 @@ The
 \emph on
 prescribed fluid pressure
 \emph default
- boundary condition can be used to prescribed the effective fluid pressure
+ boundary condition can be used to prescribe the effective fluid pressure
+ 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
  on the boundary of a biphasic or multiphasic material.
  This boundary condition takes the following parameters.
 \end_layout
@@ -17746,7 +18204,11 @@ The
 prescribed concentration
 \emph default
  boundary condition can be used to prescribe the value of the effective
- solute concentration in a multiphasic analysis.
+ solute concentration 
+\begin_inset Formula $\tilde{c}$
+\end_inset
+
+ in a multiphasic or fluid-solutes analysis.
  This boundary condition takes the following parameters.
 \end_layout
 
@@ -18193,6 +18655,219 @@ set1
 
 \begin_layout LyX-Code
 <bc>
+\end_layout
+
+\begin_layout Subsection
+Prescribed Fluid Dilatation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Prescribed-Fluid-Dilatation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+prescribed fluid dilatation
+\emph default
+ boundary condition can be used to prescribe the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ on the boundary of a fluid, fluid-FSI or fluid-solutes material.
+ This boundary condition takes the following parameters.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The prescribed value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag that defines whether the value is absolute or relative (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+If the relative flag is set to 1, then the value is relative with respect
+ to the current position of the node at the time the boundary condition
+ becomes active.
+ This only has an effect in multi-step analyses.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="prescribed fluid dilatation" node_set="
+\shape italic
+\emph on
+set1
+\shape default
+\emph default
+">
+\end_layout
+
+\begin_layout LyX-Code
+  <value lc="1">-1e-8</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative>0</relative>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
+\end_layout
+
+\begin_layout Standard
+Although the 
+\shape italic
+prescribed 
+\shape default
+\emph on
+fluid dilatation
+\shape italic
+\emph default
+ 
+\shape default
+element with a value of zero can also be used to fix the effective fluid
+ pressure, the user should use the 
+\emph on
+zero fluid dilatation
+\emph default
+ boundary condition whenever possible, since this option causes the equation
+ corresponding to that degree of freedom to be removed from the linear system
+ of equations.
+ This results in fewer equations that need to be solved for and thus reduces
+ the run time of the FE analysis.
 \end_layout
 
 \begin_layout Subsection
@@ -18677,6 +19352,405 @@ Mesh
  
 \shape default
 section.
+\end_layout
+
+\begin_layout Subsection
+Multiphasic Fluid Pressure
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Multiphasic-Fluid-Pressure"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a multiphasic mixture the nodal degree of freedom for fluid pressure
+ represents the effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+, which is related to the actual fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ according to eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ One may assign the value of 
+\begin_inset Formula $p$
+\end_inset
+
+ directly on a boundary, by using the 
+\emph on
+actual fluid pressure 
+\emph default
+boundary condition.
+\end_layout
+
+\begin_layout LyX-Code
+<bc surface="FluidPressure1" type="actual fluid pressure">
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure>0</pressure>
+\end_layout
+
+\begin_layout LyX-Code
+  <shell_bottom>0</shell_bottom>
+\end_layout
+
+\begin_layout LyX-Code
+</bc>
+\end_layout
+
+\begin_layout Standard
+This surface load evaluates 
+\begin_inset Formula $p$
+\end_inset
+
+ from nodal values of 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ on the surface, and using the average values of 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ and 
+\begin_inset Formula $c^{\alpha}$
+\end_inset
+
+ at the integration points of the underlying element.
+ This surface load is particularly useful when the effective solute concentratio
+ns 
+\begin_inset Formula $\tilde{c}^{\alpha}$
+\end_inset
+
+ are not prescribed as boundary conditions on that surface, but evolve with
+ the analysis solution.
+ the 
+\emph on
+shell_bottom
+\emph default
+ boolean flag (0=false, 1=true) should be set to true when prescribing this
+ pressure on the bottom of a multiphasic shell domain.
+\end_layout
+
+\begin_layout Subsection
+Fluid Pressure
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Pressure-BC"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To set the actual fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ in a fluid, fluid-FSI, or fluid-solutes analysis, use the 
+\emph on
+fluid pressure
+\emph default
+ boundary condition.
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="fluid pressure" surface="FluidPressure1">
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure lc="1">100</pressure>
+\end_layout
+
+\begin_layout LyX-Code
+</bc>
+\end_layout
+
+\begin_layout Standard
+The optional 
+\shape italic
+lc 
+\shape default
+parameter associates a load curve (a user-defined scale factor that evolves
+ with time) which multiplies the value of <pressure>.
+ The surface must be defined in the 
+\emph on
+Mesh
+\shape italic
+\emph default
+ 
+\shape default
+section.
+ For a biphasic analysis the actual fluid pressure is equal to the effective
+ fluid pressure (
+\begin_inset Formula $p=\tilde{p}$
+\end_inset
+
+), in which case use 
+\emph on
+prescribed fluid pressure
+\emph default
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Prescribed-Fluid-Pressure"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+Fluid Resistance
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Resistance"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a fluid, fluid-FSI or fluid-solutes analysis, this boundary condition
+ prescribes an elastic pressure 
+\begin_inset Formula $p=R\,q+p_{d}$
+\end_inset
+
+ on a surface, where 
+\begin_inset Formula $R$
+\end_inset
+
+ is the flow resistance and 
+\begin_inset Formula $q$
+\end_inset
+
+ is the volumetric flow rate across the surface (calculated internally);
+ 
+\begin_inset Formula $p_{d}$
+\end_inset
+
+ is an optional offset pressure.
+ The pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ is converted to a dilatation and prescribed as an essential boundary condition
+ at the nodes of the facets.
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="fluid resistance" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <R lc="1">7.93e+07</R>
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure_offset lc="2">10640</pressure_offset>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
+\end_layout
+
+\begin_layout Subsection
+Fluid RCR
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-RCR"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This surface load models a three-element Windkessel outflow condition on
+ a surface in a fluid, fluid-FSI or fluid-solutes analysis, as described
+ in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Vignon-Clementel06"
+literal "false"
+
+\end_inset
+
+.
+ It prescribes an elastic pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ on a surface, which satisfies the ordinary differential equation
+\begin_inset Formula 
+\[
+p+\tau\frac{dp}{dt}=\left(R_{d}+R\right)q+R\tau\frac{dq}{dt}+p_{d}+\tau\frac{dp_{d}}{dt},\quad\tau=R_{d}C
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $R$
+\end_inset
+
+ is the upstream flow resistance (series resistance), 
+\begin_inset Formula $R_{d}$
+\end_inset
+
+ is the downstream flow resistance and 
+\begin_inset Formula $C$
+\end_inset
+
+ is the downstream flow capacitance (parallel 
+\begin_inset Formula $R_{d}C$
+\end_inset
+
+ element downstream of 
+\begin_inset Formula $R$
+\end_inset
+
+), whereas 
+\begin_inset Formula $q$
+\end_inset
+
+ is the volumetric flow rate across the surface (calculated internally);
+ 
+\begin_inset Formula $p_{d}$
+\end_inset
+
+ is an optional downstream offset pressure, which may be associated with
+ a loadcurve to produce a function of time.
+ The actual pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ obtained by solving this differential equation is converted to a dilatation
+ and prescribed as an essential boundary condition at the nodes of the facets.
+ Since the pressure is the solution of an ordinary differential equation,
+ the user may also optionally specify the initial condition for the pressure.
+\end_layout
+
+\begin_layout LyX-Code
+<bc name="FluidRCR1" type="fluid RCR" surface="FluidRCR1">
+\end_layout
+
+\begin_layout LyX-Code
+  <R>1</R>
+\end_layout
+
+\begin_layout LyX-Code
+  <Rd>10</Rd>
+\end_layout
+
+\begin_layout LyX-Code
+  <capacitance>0.5</capacitance>
+\end_layout
+
+\begin_layout LyX-Code
+  <pressure_offset>0</pressure_offset>
+\end_layout
+
+\begin_layout LyX-Code
+  <initial_pressure>0</initial_pressure>
+\end_layout
+
+\begin_layout LyX-Code
+</bc>
+\end_layout
+
+\begin_layout Standard
+By setting 
+\begin_inset Formula $C=0$
+\end_inset
+
+ we recover the fluid resistance surface load described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Resistance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, with flow resistance equal to 
+\begin_inset Formula $R_{d}+R$
+\end_inset
+
+.
+ By setting 
+\begin_inset Formula $R$
+\end_inset
+
+ to zero we can have simulate a parallel 
+\begin_inset Formula $R_{d}C$
+\end_inset
+
+ circuit.
+\end_layout
+
+\begin_layout Standard
+Internally, the ordinary differential equation presented above is solved
+ numerically using a standard finite difference scheme,
+\begin_inset Formula 
+\[
+p_{n+1}=\left(\frac{R_{d}}{1+\frac{\tau}{\Delta t}}+R\right)q_{n+1}+\frac{\tau}{\Delta t+\tau}\left(p_{n}-p_{d,n}-Rq_{n}\right)+p_{d,n+1}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $f_{n+1}$
+\end_inset
+
+ is the value of any function 
+\begin_inset Formula $f\left(t\right)$
+\end_inset
+
+ at the current time step 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+, 
+\begin_inset Formula $f_{n}$
+\end_inset
+
+ is its value at the previous time step 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+, and 
+\begin_inset Formula $\Delta t=t_{n+1}-t_{n}$
+\end_inset
+
+ is the time increment.
 \end_layout
 
 \begin_layout Subsection
@@ -26954,25 +28028,84 @@ name "subsec:Solute-Flux"
 \end_layout
 
 \begin_layout Standard
-The molar flux of solute relative to the solid matrix is given by the vector
- 
-\begin_inset Formula $\mathbf{j}$
+In biphasic-solute and multiphasic analyses the molar flux of a solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+, given by the vector 
+\begin_inset Formula $\mathbf{j}^{\iota}=\varphi^{w}c^{\iota}\left(\mathbf{v}^{\iota}-\mathbf{v}^{s}\right)$
+\end_inset
+
+, is evaluated relative to the solid matrix; it includes a diffusive component
+ as well as a convective component contributed by the fluid flux 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ relative to the solid, see eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:bs-fluxes-w-j"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
 .
- Since solute viscosity is not explicitly modeled in a biphasic-solute material,
- the tangential component of 
-\begin_inset Formula $\mathbf{j}$
+ In fluid-solutes analyses the molar flux of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+, given by the vector 
+\begin_inset Formula $\mathbf{j}^{\iota}=c^{\iota}\left(\mathbf{v}^{\iota}-\mathbf{v}^{f}\right)$
+\end_inset
+
+, is evaluated relative to the solvent (fluid); it only includes a diffusive
+ contribution relative to the solvent.
+ Since solute viscosity is not explicitly modeled, the tangential component
+ of 
+\begin_inset Formula $\mathbf{j}^{\iota}$
 \end_inset
 
  on a boundary surface may not be prescribed.
  Only the normal component of the relative solute flux, 
-\begin_inset Formula $j_{n}=\mathbf{j}\cdot\mathbf{n}$
+\begin_inset Formula $j_{n}^{\iota}=\mathbf{j}^{\iota}\cdot\mathbf{n}$
 \end_inset
 
 , represents a natural boundary condition.
+ Since a multiphasic or fluid-solutes mixture may contain electrically charged
+ solutes, the solute flux that must be prescribed as a boundary condition
+ is the effective solute flux 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}=j_{n}^{\iota}+\sum_{\gamma}z^{\gamma}j_{n}^{\gamma}$
+\end_inset
+
+, such as that in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:normal-effective-solute-flux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for fluid-solutes analyses, as also explained in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Prescribed-Effective-Solute-Flux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
  To prescribe a value for 
-\begin_inset Formula $j_{n}$
+\begin_inset Formula $\tilde{j}_{n}^{\iota}$
 \end_inset
 
  on a surface, use:
@@ -26991,7 +28124,7 @@ The molar flux of solute relative to the solid matrix is given by the vector
 \end_layout
 
 \begin_layout LyX-Code
-  <solute_id>1</solute_id>
+  <solute_id>solute_name</solute_id>
 \end_layout
 
 \begin_layout LyX-Code
@@ -26999,12 +28132,12 @@ The molar flux of solute relative to the solid matrix is given by the vector
 \end_layout
 
 \begin_layout Standard
-The optional parameter 
+The parameter 
 \shape italic
 solute_id
 \shape default
  specifies to which solute this flux condition applies, referencing the
- corresponding list in the Globals section (Section
+ corresponding list of solute names in the Globals section (Section
 \begin_inset space ~
 \end_inset
 
@@ -27016,11 +28149,6 @@ reference "subsec:Solutes"
 \end_inset
 
 ).
- If 
-\shape italic
-solute_id
-\shape default
- is not defined, the default value is 1.
 \end_layout
 
 \begin_layout Standard
@@ -27136,7 +28264,7 @@ area in current configuration.
 \end_layout
 
 \begin_layout Subsubsection
-Solute Natural Flux
+Multiphasic Solute Natural Flux
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Solute-Natural-Flux"
@@ -27147,8 +28275,8 @@ name "subsec:Solute-Natural-Flux"
 \end_layout
 
 \begin_layout Standard
-This surface load can be prescribed on a boundary where a natural solute
- flux is desired.
+This surface load can be prescribed on a multiphasic boundary where a natural
+ solute flux is desired.
  On this boundary, the solute is convected with the solvent according to
  
 \begin_inset Formula $j_{n}=cw_{n}$
@@ -27191,7 +28319,7 @@ This surface load can be prescribed on a boundary where a natural solute
 \end_layout
 
 \begin_layout LyX-Code
-  <solute_id>1</solute_id>
+  <solute_id>solute_name</solute_id>
 \end_layout
 
 \begin_layout LyX-Code
@@ -27207,12 +28335,12 @@ This surface load can be prescribed on a boundary where a natural solute
 \end_layout
 
 \begin_layout Standard
-The optional parameter 
+The parameter 
 \shape italic
 solute_id
 \shape default
  specifies to which solute this flux condition applies, referencing the
- corresponding list in the Globals section (Section
+ corresponding list of solute names in the Globals section (Section
 \begin_inset space ~
 \end_inset
 
@@ -27224,11 +28352,6 @@ reference "subsec:Solutes"
 \end_inset
 
 ).
- If 
-\shape italic
-solute_id
-\shape default
- is not defined, the default value is 1.
  The parameter 
 \emph on
 update
@@ -27257,88 +28380,12 @@ true
 true
 \emph default
  when the iterative numerical solution fails to converge.
-\end_layout
-
-\begin_layout Subsubsection
-Multiphasic Fluid Pressure
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Multiphasic-Fluid-Pressure"
-
+ This surface load is only needed for biphasic-solute and multiphasic analyses,
+ since 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}=0$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-In a multiphasic mixture, the nodal degree of freedom for fluid pressure
- represents the effective fluid pressure 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
-, which is related to the actual fluid pressure 
-\begin_inset Formula $p$
-\end_inset
-
- according to eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:mp-effective-p-c"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-.
- One may assign the value of 
-\begin_inset Formula $p$
-\end_inset
-
- directly on a boundary, by using the 
-\emph on
-fluid pressure 
-\emph default
-surface load.
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load surface="FluidPressure1" type="fluid pressure">
-\end_layout
-
-\begin_layout LyX-Code
-  <pressure>0</pressure>
-\end_layout
-
-\begin_layout LyX-Code
-</surface_load>
-\end_layout
-
-\begin_layout Standard
-This surface load evaluates 
-\begin_inset Formula $p$
-\end_inset
-
- from nodal values of 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
- on the surface, and using the average values of 
-\begin_inset Formula $\Phi$
-\end_inset
-
- and 
-\begin_inset Formula $c^{\alpha}$
-\end_inset
-
- at the integration points of the underlying element.
- This surface load is particularly useful when the effective solute concentratio
-ns 
-\begin_inset Formula $\tilde{c}^{\alpha}$
-\end_inset
-
- are not prescribed as boundary conditions on that surface, but evolve with
- the analysis solution.
+ is the natural boundary condition for fluid-solutes analyses.
 \end_layout
 
 \begin_layout Subsubsection
@@ -27580,6 +28627,33 @@ fluid pressure
 </surface_load>
 \end_layout
 
+\begin_layout Standard
+This boundary condition internally solves for the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ for the user-prescribed pressure 
+\begin_inset Formula $p$
+\end_inset
+
+, using the user-selected equation of state from the list given in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Then 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+is prescribed as an essential boundary condition on the selected surface.
+\end_layout
+
 \begin_layout Subsubsection
 Fluid Normal Traction
 \begin_inset CommandInset label
@@ -27697,7 +28771,7 @@ reference "subsec:Fluid-Traction"
 \end_layout
 
 \begin_layout LyX-Code
-<surface_load type="fluid backflow stabilization" surface="surface1">>
+<surface_load type="fluid backflow stabilization" surface="surface1">
 \end_layout
 
 \begin_layout LyX-Code
@@ -28207,219 +29281,6 @@ Though this boundary condition may be used in fluid-FSI analyses, it is
 \end_layout
 
 \begin_layout Subsubsection
-Fluid Resistance
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fluid-Resistance"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-In a fluid or fluid-FSI analysis, this boundary condition prescribes an
- elastic pressure 
-\begin_inset Formula $p=R\,q+p_{d}$
-\end_inset
-
- on a surface, where 
-\begin_inset Formula $R$
-\end_inset
-
- is the flow resistance and 
-\begin_inset Formula $q$
-\end_inset
-
- is the volumetric flow rate across the surface (calculated internally);
- 
-\begin_inset Formula $p_{d}$
-\end_inset
-
- is an optional offset pressure.
- The pressure 
-\begin_inset Formula $p$
-\end_inset
-
- is converted to a dilatation and prescribed as an essential boundary condition
- at the nodes of the facets.
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load type="fluid resistance" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <R lc="1">7.93e+07</R>
-\end_layout
-
-\begin_layout LyX-Code
-  <pressure_offset lc="2">10640</pressure_offset>
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load>
-\end_layout
-
-\begin_layout Subsubsection
-Fluid RCR
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Fluid-RCR"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This surface load models a three-element Windkessel outflow condition on
- a surface, as described in 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Vignon-Clementel06"
-literal "false"
-
-\end_inset
-
-.
- It prescribes an elastic pressure 
-\begin_inset Formula $p$
-\end_inset
-
- on a surface, which satisfies the ordinary differential equation
-\begin_inset Formula 
-\[
-p+\tau\frac{dp}{dt}=\left(R_{d}+R\right)q+R\tau\frac{dq}{dt}+p_{d}+\tau\frac{dp_{d}}{dt},\quad\tau=R_{d}C
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $R$
-\end_inset
-
- is the upstream flow resistance, 
-\begin_inset Formula $R_{d}$
-\end_inset
-
- is the downstream flow resistance, and 
-\begin_inset Formula $C$
-\end_inset
-
- is the downstream flow capacitance, whereas 
-\begin_inset Formula $q$
-\end_inset
-
- is the volumetric flow rate across the surface (calculated internally);
- 
-\begin_inset Formula $p_{d}$
-\end_inset
-
- is an optional downstream offset pressure, which may be associated with
- a loadcurve to produce a function of time.
- The pressure 
-\begin_inset Formula $p$
-\end_inset
-
- obtained by solving this differential equation is converted to a dilatation
- and prescribed as an essential boundary condition at the nodes of the facets.
- Since the pressure is the solution of an ordinary differential equation,
- the user may also specify the initial condition for the pressure.
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load name="FluidRCR1" type="fluid RCR" surface="FluidRCR1">
-\end_layout
-
-\begin_layout LyX-Code
-  <R>1</R>
-\end_layout
-
-\begin_layout LyX-Code
-  <Rd>10</Rd>
-\end_layout
-
-\begin_layout LyX-Code
-  <capacitance>0.5</capacitance>
-\end_layout
-
-\begin_layout LyX-Code
-  <pressure_offset>0</pressure_offset>
-\end_layout
-
-\begin_layout LyX-Code
-  <initial_pressure>0</initial_pressure>
-\end_layout
-
-\begin_layout LyX-Code
-</surface_load>
-\end_layout
-
-\begin_layout Standard
-By setting 
-\begin_inset Formula $C=0$
-\end_inset
-
- we recover the fluid resistance surface load described in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Fluid-Resistance"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-, with flow resistance equal to 
-\begin_inset Formula $R_{d}+R$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Internally, the ordinary differential equation presented above is solved
- numerically using a standard finite difference scheme,
-\begin_inset Formula 
-\[
-p_{n+1}=\left(\frac{R_{d}}{1+\frac{\tau}{\Delta t}}+R\right)q_{n+1}+\frac{\tau}{\Delta t+\tau}\left(p_{n}-p_{d,n}-Rq_{n}\right)+p_{d,n+1}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $f_{n+1}$
-\end_inset
-
- is the value of any function 
-\begin_inset Formula $f\left(t\right)$
-\end_inset
-
- at the current time step 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
-, 
-\begin_inset Formula $f_{n}$
-\end_inset
-
- is its value at the previous time step 
-\begin_inset Formula $t_{n}$
-\end_inset
-
-, and 
-\begin_inset Formula $\Delta t=t_{n+1}-t_{n}$
-\end_inset
-
- is the time increment.
-\end_layout
-
-\begin_layout Subsubsection
 Fluid-FSI Traction
 \begin_inset CommandInset label
 LatexCommand label
@@ -28501,6 +29362,49 @@ This surface load must also be prescribed on free fluid surfaces (such as
  to deform in response to the fluid stresses (e.g., producing surface waves).
  (Do not apply this surface load on inlet or outlet boundaries through which
  fluid flows.)
+\end_layout
+
+\begin_layout Subsubsection
+Solute Backflow Stabilization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Solute-Backflow-Stabilization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a fluid-solutes analysis this surface load checks for the presence of
+ solvent (fluid) backflow, i.e., when 
+\begin_inset Formula $v_{n}^{f}=\mathbf{v}^{f}\cdot\mathbf{n}$
+\end_inset
+
+ is negative.
+ When this condition is encountered, the effective concentration of the
+ selected solute (
+\emph on
+solute_id
+\emph default
+) is set to its converged value from the previous time step.
+ Otherwise, the natural boundary condition 
+\begin_inset Formula $\tilde{j}_{n}=0$
+\end_inset
+
+ (zero diffusive solute flux relative to the solvent) prevails.
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="solute backflow stabilization" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+	<solute_id>neutral</solute_id>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
 \end_layout
 
 \begin_layout Subsection
@@ -28933,7 +29837,7 @@ type
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="2">
+<lyxtabular version="3" rows="6" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top" width="3in">
@@ -29037,7 +29941,7 @@ A joint between two rigid bodies
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -29046,13 +29950,33 @@ tied,sticky, tied-biphasic
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 A tied interface (solid-solid, solid-rigid, solid-biphasic, rigid-biphasic)
  or tied-biphasic interface (biphasic-biphasic).
  
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+contact potential
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A potential based sliding contact interface 
 \end_layout
 
 \end_inset
@@ -29270,8 +30194,53 @@ literal "true"
  
 \end_layout
 
+\begin_layout Description
+contact 
+\series bold
+potential
+\series default
+ 
+\series bold
+(CP)
+\series default
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+contact potential
+\begin_inset Quotes erd
+\end_inset
+
+ contact interface implements the method by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "KAMENSKY2018522"
+literal "false"
+
+\end_inset
+
+.
+ This method defines a contact potential that generates a (repulsing) force
+ that prevents penetration from occurring.
+ This contact formulation is not based on the augmented Lagrangian formulation
+ and does not have any of the parameters in the table below.
+ Instead, please see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:contact-potential"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details on this method.
+ 
+\end_layout
+
 \begin_layout Standard
-The following table lists the properties that are defined for sliding interfaces.
+The following table lists the properties that are defined for sliding interfaces
+ (except contact potential).
  It is important to note that the three different sliding implementations
  cannot be used interchangeably: not all features are available for each
  method.
@@ -34956,6 +35925,446 @@ parameter is used in determining the minimum distance that a primary surface
  The initial value is zero, meaning a node must have penetrated the secondary
  surface before it will be tied to it.
  
+\end_layout
+
+\begin_layout Subsection
+Contact Potential
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:contact-potential"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The contact potential method is based on the formulation by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "KAMENSKY2018522"
+literal "false"
+
+\end_inset
+
+.
+ In this formulation, a repulsive potential is defined between two opposing
+ surfaces.
+ A force is generated that aims to prevent physical contact between the
+ two surfaces.
+ As a result, there will always be a small gap between the contacting surfaces.
+ Note that this is the opposite of what happens for the other sliding contact
+ interfaces, which require physical contact (and even a little bit of penetratio
+n) before a contact force can be generated.
+ 
+\end_layout
+
+\begin_layout Standard
+The type attribute for this sliding interface is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+contact potential
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ amd the following parameters can be defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+kc
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+force scale factor (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+p
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+order of polynomial that defines the potential (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+R_in
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Inner radius (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+R_out
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Outer radius (3)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+R0_min
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimum separation in reference frame
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+w_tol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+threshold for angle criterion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+kc 
+\emph default
+parameter defines the scale factor for the force.
+ This has a similar purpose as the penalty factor in other sliding contact
+ interfaces.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The parameter 
+\emph on
+p 
+\emph default
+defines the order of the potential.
+ The paper discusses why the value 4 is in a sense an optimal value so it
+ is recommend to use the default value.
+\end_layout
+
+\begin_layout Enumerate
+The potential is divided in an 
+\begin_inset Quotes eld
+\end_inset
+
+inner
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+outer
+\begin_inset Quotes erd
+\end_inset
+
+ region.
+ If 
+\emph on
+r 
+\emph default
+is the distance from a point on the primary contact surface to the opposing
+ secondary surface, then the 
+\begin_inset Quotes eld
+\end_inset
+
+inner
+\begin_inset Quotes erd
+\end_inset
+
+ region is defined by the criterion 
+\begin_inset Formula $0<r<R_{in}$
+\end_inset
+
+and the 
+\begin_inset Quotes eld
+\end_inset
+
+outer
+\begin_inset Quotes erd
+\end_inset
+
+ region is defined by 
+\begin_inset Formula $R_{in}<r<R_{out}$
+\end_inset
+
+.
+ The contact force is stronger in the inner region.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+R0_min
+\emph default
+ parameter defines the minimum distance between two potential contacting
+ points in the reference configuration.
+ In other words, two points whose initial distance was smaller than 
+\emph on
+R0_min
+\emph default
+ will not be considered as a valid contact pair.
+ This parameter is important in self-contact to avoid neighboring points
+ from generating contact forces.
+ The default value of 0 indicates that this criterion is not used.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\emph on
+w_tol 
+\emph default
+parameter defines a local normal criterion for a potential pair: If the
+ absolute value of the cosine of the angle between the two local normals
+ is 
+\series bold
+less
+\series default
+ than w_tol, the two points are 
+\series bold
+not
+\series default
+ considered in contact.
+ In other words, the two normals have to point in the 
+\begin_inset Quotes eld
+\end_inset
+
+same direction
+\begin_inset Quotes erd
+\end_inset
+
+ in order for the two contacting points to be in contact.
+ This criterion can be useful in cases of self-contact in order to avoid
+ invalid contact pairs.
+ A value of 0 effectively ignores this criterion.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<contact type="contact potential" name="FacetOnFacetSliding1" surface_pair="Face
+tOnFacetSliding1">
+\end_layout
+
+\begin_layout LyX-Code
+    <kc>1e-6</kc>
+\end_layout
+
+\begin_layout LyX-Code
+    <p>4</p>
+\end_layout
+
+\begin_layout LyX-Code
+    <R_in>0.01</R_in>
+\end_layout
+
+\begin_layout LyX-Code
+    <R_out>0.05</R_out>
+\end_layout
+
+\begin_layout LyX-Code
+</contact>
 \end_layout
 
 \begin_layout Standard
@@ -100016,23 +101425,34 @@ where
 
  is the viscous stress resulting from the fluid viscosity and its rate of
  deformation.
- The fluid pressure is evaluated from
-\begin_inset Formula 
-\begin{equation}
-p=K\left(1-J^{f}\right)=-K\,e^{f}\,,\label{eq:cfd-pressure}
-\end{equation}
+ The fluid pressure is evaluated from the dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ (the relative change in volume, or volumetric strain) using the user-specified
+ model from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
-whre 
-\begin_inset Formula $J^{f}$
-\end_inset
-
- is the fluid volume ratio and 
+ (the default is 
+\emph on
+linear
+\emph default
+), where 
 \begin_inset Formula $e^{f}=J^{f}-1$
 \end_inset
 
- is the dilatation (the relative change in volume).
+ and 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ is the fluid volume ratio.
  The fluid density 
 \begin_inset Formula $\rho^{f}$
 \end_inset
@@ -100291,6 +101711,16 @@ In general, prescribing
 
  is only a function of 
 \begin_inset Formula $e^{f}$
+\end_inset
+
+ according to eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
 .
@@ -102835,6 +104265,267 @@ Example:
 \begin_layout Standard
 The value of <density> in the <fluid> and <solid> materials represents the
  true mass density of each constituent.
+\end_layout
+
+\begin_layout Subsection
+General Specification of Fluid-Solutes Materials
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:General-Fluid-Solutes"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a fluid-solutes material is 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ This type of material is used for fluid flow and solute mass transport
+ through a fixed mesh.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<fluid>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of fluid model
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<osmotic_coefficient>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of osmotic coefficient for fluid-solutes mixture
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<solute>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of (any number of) solute(s)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The <fluid> tag encloses a description of the fluid, as given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:General-Specification-Fluid"
+
+\end_inset
+
+.
+ The <solid> tag encloses a description of the solid, which should be modeled
+ as an unconstrained elastic solid, as given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Materials"
+
+\end_inset
+
+.
+ The recommended choice is the unconstrained neo-Hookean solid defined in
+ Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Neo-Hookean"
+
+\end_inset
+
+, with 
+\begin_inset Formula $\nu=0$
+\end_inset
+
+ and 
+\begin_inset Formula $E$
+\end_inset
+
+ set to a very small (but non-zero) value.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Fluid-FSI domain" type="fluid-FSI">
+\end_layout
+
+\begin_layout LyX-Code
+  <fluid type="fluid">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>1000</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <k>2.2e9</k>
+\end_layout
+
+\begin_layout LyX-Code
+    <viscous type="Newtonian fluid">
+\end_layout
+
+\begin_layout LyX-Code
+      <mu>0.001</mu>
+\end_layout
+
+\begin_layout LyX-Code
+      <kappa>0</kappa>
+\end_layout
+
+\begin_layout LyX-Code
+    </viscous>
+\end_layout
+
+\begin_layout LyX-Code
+  </fluid>
+\end_layout
+
+\begin_layout LyX-Code
+  <solid type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>0</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>1e-9</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </solid>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+The value of <density> in the <solid> material is internally set to zero
+ regardless of the user-defined value, since the deforming mesh should not
+ be subjected to inertial forces.
 \end_layout
 
 \begin_layout Section
@@ -111036,6 +112727,352 @@ name "sec:Guidelines-Fluid-Analyses"
 
 \end_layout
 
+\begin_layout Standard
+Currently, the fluid solvers of FEBio can be used to solve for isothermal
+ fluid mechanics problems (
+\begin_inset Quotes eld
+\end_inset
+
+fluid
+\begin_inset Quotes erd
+\end_inset
+
+ solver), isothermal fluid-structure interaction problems (
+\begin_inset Quotes eld
+\end_inset
+
+fluid-FSI
+\begin_inset Quotes erd
+\end_inset
+
+ solver, Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Structure-Interactions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) and isothermal fluid mechanics with solute (mass) transport (
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+ solver).
+ When solutes are included in an analysis, their treatment is very similar
+ to the 
+\begin_inset Quotes eld
+\end_inset
+
+multiphasic
+\begin_inset Quotes erd
+\end_inset
+
+ solver described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Triphasic-Multiphasic-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ and solute concentrations 
+\begin_inset Formula $c^{\iota}$
+\end_inset
+
+ in a fluid-solutes domain are thus related to the effective fluid pressure
+ 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ and effective solute concentrations 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+ as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, to account for the possibility that the solutes are electrically charged.
+ The theoretical treatment of solutes in the 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+ solver follows that of the 
+\begin_inset Quotes eld
+\end_inset
+
+multiphasic
+\begin_inset Quotes erd
+\end_inset
+
+ solver, with the following simplifications: (a) The effective solubility
+ 
+\begin_inset Formula $\hat{\kappa}^{\iota}$
+\end_inset
+
+ appearing in the expression for the partition coefficient 
+\begin_inset Formula $\tilde{\kappa}^{\iota}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ only embodies non-ideal physico-chemical behavior (whereas 
+\begin_inset Formula $\hat{\kappa}^{\iota}$
+\end_inset
+
+ in a multiphasic mixture with a porous solid matrix can also embody the
+ steric volume exclusion of solutes from the pore space); therefore, one
+ should always set 
+\begin_inset Formula $\hat{\kappa}^{\iota}=1$
+\end_inset
+
+ when modeling ideal behavior in a 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+ analysis.
+ (b) Since there is no porous solid matrix that can hinder solute transport,
+ the diffusivity tensor 
+\begin_inset Formula $\mathbf{d}^{\iota}$
+\end_inset
+
+ of a solute in a 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+ mixture is always equal to 
+\begin_inset Formula $d_{0}^{\iota}\mathbf{I}$
+\end_inset
+
+, where 
+\begin_inset Formula $d_{0}^{\iota}$
+\end_inset
+
+ is the solute diffusivity in free solution.
+ Thus, even though FEBio requires users to specify a value for 
+\begin_inset Formula $\mathbf{d}^{\iota}$
+\end_inset
+
+, that value is essentially ignored in the 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+ solver code, where it is replaced by 
+\begin_inset Formula $d_{0}^{\iota}\mathbf{I}$
+\end_inset
+
+.
+ If users would like to neglect osmotic pressure in a 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+ analysis, the osmotic coefficient 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ should be set to zero, producing 
+\begin_inset Formula $\tilde{p}=p$
+\end_inset
+
+.
+ Moreover, in the absence of solutes (
+\begin_inset Formula $c^{\iota}=0$
+\end_inset
+
+ for all 
+\begin_inset Formula $\iota$
+\end_inset
+
+, as in the 
+\begin_inset Quotes eld
+\end_inset
+
+fluid
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-FSI
+\begin_inset Quotes erd
+\end_inset
+
+ solvers) this relation holds automatically.
+ Therefore, when dealing with the 
+\begin_inset Quotes eld
+\end_inset
+
+fluid
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-FSI
+\begin_inset Quotes erd
+\end_inset
+
+ solvers, we do not need to add the 
+\begin_inset Quotes eld
+\end_inset
+
+effective
+\begin_inset Quotes erd
+\end_inset
+
+ modifier when mentioning the fluid pressure.
+\end_layout
+
+\begin_layout Standard
+There are two broad categories of materials available for 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-FSI
+\begin_inset Quotes erd
+\end_inset
+
+ analyses: (1) 
+\emph on
+fluid-FSI
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:General-Fluid-FSI-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), and (2) 
+\emph on
+biphasic-FSI
+\emph default
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:General-Fluid-BFSI-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ A 
+\emph on
+fluid-FSI
+\emph default
+ material is used to describe a fluid domain whose mesh is deformable; though
+ a solid material (typically 
+\emph on
+neo-Hookean
+\emph default
+) must be assigned to the mesh of a 
+\emph on
+fluid-FSI
+\emph default
+ material, its mass density is ignored and it is the user's responsibility
+ to ascribe a negligible elasticity to this solid domain, whose sole purpose
+ is to regularize the mesh deformation.
+ A 
+\emph on
+biphasic-FSI
+\emph default
+ material considers that the deformable domain is a biphasic material (see
+ Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Biphasic-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), with a porous-permeable solid domain that has non-negligible mass density,
+ solid volume fraction, solid matrix stiffness, and hydraulic permeability.
+ The interstitial fluid of such a domain may also be ascribed a viscosity
+ (Newtonian or non-Newtonian).
+\end_layout
+
 \begin_layout Subsection
 Degrees of Freedom and Boundary Conditions
 \begin_inset CommandInset label
@@ -111048,13 +113085,122 @@ name "subsec:Fluid-DOFs-BCs"
 \end_layout
 
 \begin_layout Standard
+The nodal degrees of freedom for 
+\begin_inset Quotes eld
+\end_inset
+
+fluid
+\begin_inset Quotes erd
+\end_inset
+
+ analyses are the nodal fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ and nodal fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+.
+ For a 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-FSI
+\begin_inset Quotes erd
+\end_inset
+
+ analysis the nodal fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ is replaced with the relative fluid flux 
+\begin_inset Formula $\mathbf{w}=\varphi^{f}\left(\mathbf{v}^{f}-\mathbf{v}^{s}\right)$
+\end_inset
+
+ and supplemented with the nodal solid displacement, 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+, whose material time derivative equals the solid velocity 
+\begin_inset Formula $\mathbf{v}^{s}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\varphi^{f}$
+\end_inset
+
+ represents the fluid volume fraction (porosity) of the fluid-FSI domain,
+ which is prescribed by the user in a 
+\emph on
+biphasic-FSI
+\emph default
+ material (via the complementary solid volume fraction) or automatically
+ set to 
+\begin_inset Formula $\varphi^{f}=1$
+\end_inset
+
+ in a 
+\emph on
+fluid-FSI
+\emph default
+ material.
+ Thus, the degrees of freedom of a fluid-FSI analysis reduce to those of
+ a fluid (or fluid-solutes) analysis in the limit when 
+\begin_inset Formula $\varphi^{f}\to1$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}^{s}\to\mathbf{0}$
+\end_inset
+
+.
+ For 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+ analyses, the nodal degrees of freedom include the effective solute concentrati
+ons 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+; as for 
+\begin_inset Quotes eld
+\end_inset
+
+multiphasic
+\begin_inset Quotes erd
+\end_inset
+
+ analyses, it is assumed that solutes occupy a negligible volume fraction
+ in the mixture (thus 
+\begin_inset Formula $\varphi^{f}=1$
+\end_inset
+
+ for 
+\begin_inset Quotes eld
+\end_inset
+
+fluid-solutes
+\begin_inset Quotes erd
+\end_inset
+
+ analyses).
+\end_layout
+
+\begin_layout Standard
 FEBio's fluid solver differs from most computational fluid dynamics programs
  by its use of fluid dilatation 
 \begin_inset Formula $e^{f}$
 \end_inset
 
-, instead of fluid pressure 
-\begin_inset Formula $p$
+, instead of the effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
 \end_inset
 
 , as a nodal degree of freedom.
@@ -111062,37 +113208,104 @@ FEBio's fluid solver differs from most computational fluid dynamics programs
 \emph on
 fluid
 \emph default
- module, these two variables are related by the constitutive relation, 
-\begin_inset Formula $p\left(e^{f}\right)=K\left(\frac{1}{1+e^{f}}-1\right)$
+ module, these two variables are related by a constitutive relation, such
+ as
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\tilde{p}\left(e^{f}\right) & =-Ke^{f} & \text{linear}\\
+\tilde{p}\left(e^{f}\right) & =K\left(\frac{1}{1+e^{f}}-1\right) & \text{nonlinear}\\
+\tilde{p}\left(e^{f}\right) & =-K\frac{\ln\left(1+e^{f}\right)}{1+e^{f}} & \text{log nonlinear}
+\end{aligned}
+\label{eq:fluid-pressure-state}
+\end{equation}
+
 \end_inset
 
-, where 
+where 
 \begin_inset Formula $K$
 \end_inset
 
- is the fluid's bulk modulus.
+ is the fluid's bulk modulus (a physical property that may be looked up
+ or measured).
  The reason for selecting 
 \begin_inset Formula $e^{f}$
 \end_inset
 
  instead of 
-\begin_inset Formula $p$
+\begin_inset Formula $\tilde{p}$
 \end_inset
 
- is that the dilatation is a kinematic measure, just like the fluid velocity
- 
+ is that the dilatation (volumetric strain) is a kinematic measure, just
+ like the fluid velocity 
 \begin_inset Formula $\mathbf{v}^{f}$
 \end_inset
 
- (the other nodal degree of freedom), whereas the pressure is a function
- of state (it needs to be formulated as a function of the deformation, just
- like the viscous fluid stress 
+ (the other nodal degree of freedom) and its associated rate of deformation
+ tensor, whereas the pressure is a function of state (it needs to be formulated
+ as a function of the deformation, just like the viscous fluid stress 
 \begin_inset Formula $\boldsymbol{\tau}$
 \end_inset
 
 ).
+ Here, 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is called the 
+\emph on
+elastic pressure
+\emph default
+ because it represents the elastic response (equivalent to the stress-strain
+ response in hyperelasticity for solid mechanics) of the fluid under isothermal
+ conditions.
+ The 
+\emph on
+linear
+\emph default
+ model in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is useful for nearly-incompressible flow, typically used for liquids.
+ However, if one expects high volumetric strains in the flow (e.g., at a stagnatio
+n point in a high-velocity fluid flow problem), it may be better to employ
+ one of the two 
+\emph on
+nonlinear
+\emph default
+ formulations in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
  The fluid Cauchy stress is given by 
 \begin_inset Formula $\boldsymbol{\sigma}^{f}=-p\mathbf{I}+\boldsymbol{\tau}$
+\end_inset
+
+, where 
+\begin_inset Formula $p$
+\end_inset
+
+ is the actual (not the effective) fluid pressure, as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
 \end_inset
 
 .
@@ -111112,7 +113325,8 @@ Newtonian fluid
 \end_layout
 
 \begin_layout Standard
-In a fluid analysis, the user may prescribe any of the components of 
+In any of the fluid analysis types, the user may prescribe any of the components
+ of 
 \begin_inset Formula $\mathbf{w}$
 \end_inset
 
@@ -111140,7 +113354,7 @@ In a fluid analysis, the user may prescribe any of the components of
 \end_inset
 
  (or 
-\begin_inset Formula $p\left(e^{f}\right)$
+\begin_inset Formula $\tilde{p}\left(e^{f}\right)$
 \end_inset
 
 , see Section
@@ -111558,8 +113772,11 @@ reference "sec:Module-Section"
  The fluid flows through the deforming mesh, just as it does in standard
  computational fluid dynamics (CFD) analyses with fixed meshes.
  The deformation of the fluid domain may be controlled by prescribing suitable
- boundary conditions (so-called moving boundary problems) and by interactions
- with solid domains.
+ boundary conditions (so-called 
+\emph on
+moving boundary problems
+\emph default
+) and by interactions with solid domains.
  For example, fluid may flow inside a flexible tube and the fluid pressure
  may cause the tube to expand or contract; the tube itself may be pinched
  at some location, reducing the cross-section through which fluid flows.
@@ -111882,6 +114099,133 @@ n, therefore analyses and meshes need to be designed to minimize this effect
  these types of boundary conditions may lead to dynamic oscillations and
  potential instabilities in an FSI analysis; therefore, users must be more
  considerate when prescribing boundary conditions for FSI analyses.
+\end_layout
+
+\begin_layout Subsection
+Fluid-Solutes Analyses
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Fluid-Solutes-Analyses"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Fluid-solutes analyses introduce two types of molar fluxes into an analysis:
+ (1) The diffusive molar flux 
+\begin_inset Formula $\mathbf{j}_{d}^{\iota}=-\tilde{\kappa}^{\iota}d_{0}^{\iota}\grad\tilde{c}^{\iota}$
+\end_inset
+
+ and (2) the sedimentation flux 
+\begin_inset Formula $\mathbf{j}_{b}^{\iota}=s^{\iota}c^{\iota}\mathbf{b}^{\iota}$
+\end_inset
+
+, where 
+\begin_inset Formula $s^{\iota}\equiv d_{0}^{\iota}\frac{M^{\iota}}{R\theta}$
+\end_inset
+
+ is the sedimentation coefficient and 
+\begin_inset Formula $\mathbf{b}^{\iota}$
+\end_inset
+
+ is the body force acting on solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+.
+ These molar fluxes represent the flux of the solute relative to the solvent.
+ Since the sedimentation flux is produced by externally applied body forces,
+ it does not enter into the natural boundary condition for the solute flux.
+ Therefore, the natural boundary condition for solutes is 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}=0$
+\end_inset
+
+, where 
+\begin_inset Formula 
+\begin{equation}
+\tilde{j}_{n}^{\iota}=\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)\cdot\mathbf{n}\label{eq:normal-effective-solute-flux}
+\end{equation}
+
+\end_inset
+
+is the normal component of the effective diffusive molar flux 
+\begin_inset Formula $\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}$
+\end_inset
+
+ on a boundary.
+ The effective diffusive molar flux is constructed in this manner to enforce
+ the electroneutrality condition,
+\begin_inset Formula 
+\begin{equation}
+\sum_{\iota}z^{\iota}c^{\iota}=0\label{eq:electroneutrality-condition}
+\end{equation}
+
+\end_inset
+
+as also done in 
+\begin_inset Quotes eld
+\end_inset
+
+multiphasic
+\begin_inset Quotes erd
+\end_inset
+
+ analyses (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Prescribed-Effective-Solute-Flux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Zero natural flux 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}$
+\end_inset
+
+ implies that the solute moves at the velocity of the solvent (the fluid).
+ Therefore, if the fluid satisfies
+\begin_inset Formula $v_{n}^{f}=0$
+\end_inset
+
+ on that boundary, the solute will not transport across it.
+ But if the fluid is allowed to transport across the boundary (e.g., using
+ a prescribed fluid pressure), the solute can also transport across the
+ boundary via convection.
+\end_layout
+
+\begin_layout Standard
+The fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ in a fluid-solutes analysis is given by eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ To prescribe the fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ on the boundary of a fluid-solutes domain, use 
 \end_layout
 
 \begin_layout Section
@@ -113656,7 +116000,7 @@ This iterative linear solver, from the MKL library, implements the Conjugate
  Gradient algorithm, which is an efficient Krylov-based iterative solution
  strategy for symmetric systems.
  It requires several configuration parameters, listed below, and only works
- with unsymmetric matrices.
+ with symmetric matrices.
  In the table below, 
 \series bold
 N

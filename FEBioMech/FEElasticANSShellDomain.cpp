@@ -39,13 +39,20 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 
 //-----------------------------------------------------------------------------
-FEElasticANSShellDomain::FEElasticANSShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofSA(pfem), m_dofR(pfem), m_dof(pfem)
+FEElasticANSShellDomain::FEElasticANSShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofV(pfem), m_dofSV(pfem), m_dofSA(pfem), m_dofR(pfem), m_dof(pfem)
 {
     m_pMat = nullptr;
 
+    m_update_dynamic = true; // default for backward compatibility
+    
+    m_secant_stress = false;
+    m_secant_tangent = false;
+    
     // TODO: Can this be done in Init, since there is no error checking
     if (pfem)
     {
+        m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+        m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
         m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
         m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
     }
@@ -57,6 +64,25 @@ FEElasticANSShellDomain& FEElasticANSShellDomain::operator = (FEElasticANSShellD
     m_Elem = d.m_Elem;
     m_pMesh = d.m_pMesh;
     return (*this);
+}
+
+//-----------------------------------------------------------------------------
+//! Set flag for update for dynamic quantities
+void FEElasticANSShellDomain::SetDynamicUpdateFlag(bool b)
+{
+    m_update_dynamic = b;
+}
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FEElasticANSShellDomain::Serialize(DumpStream& ar)
+{
+    //erialize the base class, which instantiates the elements
+    FESSIShellDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
+    
+    // serialize class variables
+    ar & m_update_dynamic;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,6 +140,9 @@ void FEElasticANSShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
         for (int j=0; j<n; ++j)
         {
             FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+            FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+            pt.m_Wp = pt.m_Wt;
+            
             mp.Update(timeInfo);
         }
     }
@@ -301,70 +330,66 @@ void FEElasticANSShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElementNe
 // Calculate inertial forces
 void FEElasticANSShellDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
-    FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(GetMaterial()); assert(pme);
-    
-    const int MN = FEElement::MAX_NODES;
-    vec3d at[MN], aqt[MN];
-    
-    // acceleration at integration point
-    vec3d a;
-    
-    // loop over all elements
-    int NE = Elements();
-    
+    int NE = (int)m_Elem.size();
 #pragma omp parallel for shared (NE)
-    for (int iel=0; iel<NE; ++iel)
+    for (int i=0; i<NE; ++i)
     {
+        // element force vector
         vector<double> fe;
         vector<int> lm;
         
-        FEShellElement& el = Element(iel);
+        // get the element
+        FEShellElementNew& el = m_Elem[i];
         
-        int nint = el.GaussPoints();
-        int neln = el.Nodes();
+        // get the element force vector and initialize it to zero
+        int ndof = 6*el.Nodes();
+        fe.assign(ndof, 0);
         
-        fe.assign(6*neln,0);
+        // calculate internal force vector
+        ElementInertialForce(el, fe);
         
-        // get the nodal accelerations
-        for (int i=0; i<neln; ++i)
-        {
-            at[i] = m_pMesh->Node(el.m_node[i]).m_at;
-            aqt[i] = m_pMesh->Node(el.m_node[i]).get_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
-        }
-        
-        // evaluate the element inertial force vector
-        for (int n=0; n<nint; ++n)
-        {
-			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-
-            double J0 = detJ0(el, n)*el.GaussWeights()[n];
-			double d = pme->Density(mp);
-            // get the acceleration for this integration point
-            a = evaluate(el, at, aqt, n);
-            
-            double* M = el.H(n);
-            double eta = el.gt(n);
-            
-            for (int i=0; i<neln; ++i)
-            {
-                vec3d fu = a*(d*M[i]*(1+eta)/2*J0);
-                vec3d fd = a*(d*M[i]*(1-eta)/2*J0);
-                
-                fe[6*i  ] -= fu.x;
-                fe[6*i+1] -= fu.y;
-                fe[6*i+2] -= fu.z;
-                
-                fe[6*i+3] -= fd.x;
-                fe[6*i+4] -= fd.y;
-                fe[6*i+5] -= fd.z;
-            }
-        }
-        
-        // get the element degrees of freedom
+        // get the element's LM vector
         UnpackLM(el, lm);
         
-        // assemble fe into R
+        // assemble element 'fe'-vector into global R vector
         R.Assemble(el.m_node, lm, fe, true);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticANSShellDomain::ElementInertialForce(FEShellElementNew& el, vector<double>& fe)
+{
+    const FETimeInfo& tp = GetFEModel()->GetTime();
+    double alpham = tp.alpham;
+    
+    int nint = el.GaussPoints();
+    int neln = el.Nodes();
+    
+    // evaluate the element inertial force vector
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        
+        double J0 = detJ0(el, n)*el.GaussWeights()[n];
+        double d = m_pMat->Density(mp);
+        
+        double* M = el.H(n);
+        double eta = el.gt(n);
+        
+        for (int i=0; i<neln; ++i)
+        {
+            vec3d fu = pt.m_a*(d*M[i]*(1+eta)/2*J0);
+            vec3d fd = pt.m_a*(d*M[i]*(1-eta)/2*J0);
+            
+            fe[6*i  ] -= fu.x;
+            fe[6*i+1] -= fu.y;
+            fe[6*i+2] -= fu.z;
+            
+            fe[6*i+3] -= fd.x;
+            fe[6*i+4] -= fd.y;
+            fe[6*i+5] -= fd.z;
+        }
     }
 }
 
@@ -852,54 +877,131 @@ void FEElasticANSShellDomain::ElementBodyForce(FEModel& fem, FEShellElementNew& 
 //-----------------------------------------------------------------------------
 void FEElasticANSShellDomain::Update(const FETimeInfo& tp)
 {
-	FESSIShellDomain::Update(tp);
-
-    FEMesh& mesh = *GetMesh();
-    const int MELN = FEElement::MAX_NODES;
-    vec3d r0[MELN], rt[MELN];
+    FESSIShellDomain::Update(tp);
     
-    int n;
-    for (int i=0; i<(int) m_Elem.size(); ++i)
+    bool berr = false;
+    int NE = Elements();
+#pragma omp parallel for shared(NE, berr)
+    for (int i=0; i<NE; ++i)
     {
-        // get the solid element
-		FEShellElementNew& el = m_Elem[i];
-        
-        // get the number of integration points
-        int nint = el.GaussPoints();
-        
-        // number of nodes
-        int neln = el.Nodes();
-        
-        // nodal coordinates
+        try
+        {
+            FEShellElement& el = Element(i);
+            if (el.isActive())
+            {
+                UpdateElementStress(i, tp);
+            }
+        }
+        catch (NegativeJacobian e)
+        {
+#pragma omp critical
+            {
+                // reset the logfile mode
+                berr = true;
+                if (e.DoOutput()) feLogError(e.what());
+            }
+        }
+    }
+    
+    if (berr) throw NegativeJacobianDetected();
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticANSShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
+{
+    double dt = tp.timeIncrement;
+    
+    // get the solid element
+    FEShellElementNew& el = m_Elem[iel];
+    
+    // get the number of integration points
+    int nint = el.GaussPoints();
+    
+    // number of nodes
+    int neln = el.Nodes();
+    
+    const int NELN = FEElement::MAX_NODES;
+    vec3d r0[NELN], s0[NELN], r[NELN], s[NELN];
+    vec3d v[NELN], w[NELN];
+    vec3d a[NELN], b[NELN];
+    // nodal coordinates
+    GetCurrentNodalCoordinates(el, r, tp.alphaf, false);
+    GetCurrentNodalCoordinates(el, s, tp.alphaf, true);
+    GetReferenceNodalCoordinates(el, r0, false);
+    GetReferenceNodalCoordinates(el, s0, true);
+    
+    // update dynamic quantities
+    if (m_update_dynamic)
+    {
         for (int j=0; j<neln; ++j)
         {
-            FENode& nj = mesh.Node(el.m_node[j]);
-            r0[j] = nj.m_r0;
-            rt[j] = nj.m_rt;
+            FENode& node = m_pMesh->Node(el.m_node[j]);
+            v[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2])*tp.alphaf + node.m_vp*(1-tp.alphaf);
+            w[j] = node.get_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2])*tp.alphaf + node.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2])*(1-tp.alphaf);
+            a[j] = node.m_at*tp.alpham + node.m_ap*(1-tp.alpham);
+            b[j] = node.get_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2])*tp.alpham + node.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2])*(1-tp.alpham);
+        }
+    }
+    
+    // loop over the integration points and calculate
+    // the stress at the integration point
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *(el.GetMaterialPoint(n));
+        FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+        
+        // material point coordinates
+        // TODO: I'm not entirly happy with this solution
+        //         since the material point coordinates are used by most materials.
+        mp.m_r0 = evaluate(el, r0, s0, n);
+        mp.m_rt = evaluate(el, r, s, n);
+        
+        // get the deformation gradient and determinant at intermediate time
+        mat3d Ft, Fp;
+        double Jt = defgrad(el, Ft, n);
+        double Jp = defgradp(el, Fp, n);
+        if (tp.alphaf == 1.0)
+        {
+            pt.m_F = Ft;
+            pt.m_J = Jt;
+        }
+        else
+        {
+            pt.m_F = Ft * tp.alphaf + Fp * (1 - tp.alphaf);
+            pt.m_J = pt.m_F.det();
+        }
+        mat3d Fi = pt.m_F.inverse();
+        pt.m_L = (Ft - Fp)*Fi/dt;
+        if (m_update_dynamic)
+        {
+            pt.m_v = evaluate(el, v, w, n);
+            pt.m_a = evaluate(el, a, b, n);
         }
         
-        // loop over the integration points and calculate
-        // the stress at the integration point
-        for (n=0; n<nint; ++n)
+        // update specialized material points
+        m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
+        
+        // calculate the stress at this material point
+        mat3ds S = m_secant_stress ? m_pMat->SecantStress(mp, true) : m_pMat->PK2Stress(mp, el.m_E[n]);
+        pt.m_s = (pt.m_F*S*pt.m_F.transpose()).sym()/pt.m_J;
+        
+        // adjust stress for strain energy conservation
+        if (tp.alphaf == 0.5)
         {
-            FEMaterialPoint& mp = *(el.GetMaterialPoint(n));
-            FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+            // evaluate strain energy at current time
+            mat3d Ftmp = pt.m_F;
+            double Jtmp = pt.m_J;
+            pt.m_F = Ft;
+            pt.m_J = Jt;
+            FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
+            pt.m_Wt = pme->StrainEnergyDensity(mp);
+            pt.m_F = Ftmp;
+            pt.m_J = Jtmp;
             
-            // material point coordinates
-            // TODO: I'm not entirly happy with this solution
-            //         since the material point coordinates are used by most materials.
-            mp.m_r0 = el.Evaluate(r0, n);
-            mp.m_rt = el.Evaluate(rt, n);
-            
-            // get the deformation gradient and determinant
-            pt.m_J = defgrad(el, pt.m_F, n);
-            
-            // update specialized material points
-            m_pMat->UpdateSpecializedMaterialPoints(mp, tp);
-            
-            // calculate the stress at this material point
-            mat3ds S = m_pMat->PK2Stress(mp, el.m_E[n]);
-            pt.m_s = (pt.m_F*S*pt.m_F.transpose()).sym()/pt.m_J;
+            mat3ds D = pt.m_L.sym();
+            double D2 = D.dotdot(D);
+            if (D2 > 0)
+                pt.m_s += D*(((pt.m_Wt-pt.m_Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
         }
     }
 }
@@ -1016,6 +1118,8 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
                                                     vector< vector<vec3d>>& HU, vector< vector<vec3d>>& HW,
                                                     matrix& NS, matrix& NN)
 {
+    FETimeInfo& tp = GetFEModel()->GetTime();
+    
     // ANS method for 4-node quadrilaterials
     if (el.Nodes() == 4) {
         vec3d gcov[3], Gcov[3];
@@ -1029,7 +1133,7 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
         // Shear strains E13, E23
         // point A
         r = 0; s = -1; t = 0;
-        CoBaseVectors(el, r, s, t, gcov);
+        CoBaseVectors(el, r, s, t, gcov, tp.alphaf);
         CoBaseVectors0(el, r, s, t, Gcov);
         double E13A = (gcov[0]*gcov[2] - Gcov[0]*Gcov[2])/2;
         vector<vec3d> hu13A(neln);
@@ -1047,7 +1151,7 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
         
         // point B
         r = 1; s = 0; t = 0;
-        CoBaseVectors(el, r, s, t, gcov);
+        CoBaseVectors(el, r, s, t, gcov, tp.alphaf);
         CoBaseVectors0(el, r, s, t, Gcov);
         double E23B = (gcov[1]*gcov[2] - Gcov[1]*Gcov[2])/2;
         vector<vec3d> hu23B(neln);
@@ -1065,7 +1169,7 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
         
         // point C
         r = 0; s = 1; t = 0;
-        CoBaseVectors(el, r, s, t, gcov);
+        CoBaseVectors(el, r, s, t, gcov, tp.alphaf);
         CoBaseVectors0(el, r, s, t, Gcov);
         double E13C = (gcov[0]*gcov[2] - Gcov[0]*Gcov[2])/2;
         vector<vec3d> hu13C(neln);
@@ -1083,7 +1187,7 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
         
         // point D
         r = -1; s = 0; t = 0;
-        CoBaseVectors(el, r, s, t, gcov);
+        CoBaseVectors(el, r, s, t, gcov, tp.alphaf);
         CoBaseVectors0(el, r, s, t, Gcov);
         double E23D = (gcov[1]*gcov[2] - Gcov[1]*Gcov[2])/2;
         vector<vec3d> hu23D(neln);
@@ -1102,7 +1206,7 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
         // normal strain E33
         // point E
         r = -1; s = -1; t = 0;
-        CoBaseVectors(el, r, s, t, gcov);
+        CoBaseVectors(el, r, s, t, gcov, tp.alphaf);
         CoBaseVectors0(el, r, s, t, Gcov);
         double E33E = (gcov[2]*gcov[2] - Gcov[2]*Gcov[2])/2;
         vector<vec3d> hu33E(neln);
@@ -1117,7 +1221,7 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
         
         // point F
         r = 1; s = -1; t = 0;
-        CoBaseVectors(el, r, s, t, gcov);
+        CoBaseVectors(el, r, s, t, gcov, tp.alphaf);
         CoBaseVectors0(el, r, s, t, Gcov);
         double E33F = (gcov[2]*gcov[2] - Gcov[2]*Gcov[2])/2;
         vector<vec3d> hu33F(neln);
@@ -1132,7 +1236,7 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
         
         // point G
         r = 1; s = 1; t = 0;
-        CoBaseVectors(el, r, s, t, gcov);
+        CoBaseVectors(el, r, s, t, gcov, tp.alphaf);
         CoBaseVectors0(el, r, s, t, Gcov);
         double E33G = (gcov[2]*gcov[2] - Gcov[2]*Gcov[2])/2;
         vector<vec3d> hu33G(neln);
@@ -1147,7 +1251,7 @@ void FEElasticANSShellDomain::CollocationStrainsANS(FEShellElementNew& el, vecto
         
         // point H
         r = -1; s = 1; t = 0;
-        CoBaseVectors(el, r, s, t, gcov);
+        CoBaseVectors(el, r, s, t, gcov, tp.alphaf);
         CoBaseVectors0(el, r, s, t, Gcov);
         double E33H = (gcov[2]*gcov[2] - Gcov[2]*Gcov[2])/2;
         vector<vec3d> hu33H(neln);
@@ -1242,6 +1346,8 @@ void FEElasticANSShellDomain::EvaluateANS(FEShellElementNew& el, const int n, co
 void FEElasticANSShellDomain::EvaluateEh(FEShellElementNew& el, const int n, const vec3d* Gcnt, mat3ds& E,
                                          vector<matrix>& hu, vector<matrix>& hw, vector<vec3d>& Nu, vector<vec3d>& Nw)
 {
+    FETimeInfo& tp = GetFEModel()->GetTime();
+    
     const double* Mr, *Ms, *M;
     vec3d gcov[3];
     int neln = el.Nodes();
@@ -1251,7 +1357,7 @@ void FEElasticANSShellDomain::EvaluateEh(FEShellElementNew& el, const int n, con
     
     E = pt.Strain();
     
-    CoBaseVectors(el, n, gcov);
+    CoBaseVectors(el, n, gcov, tp.alphaf);
     double eta = el.gt(n);
     
     Mr = el.Hr(n);

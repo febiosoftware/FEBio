@@ -619,3 +619,23 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Element relative Reynolds number
+class FEPlotFluidRelativeReynoldsNumber : public FEPlotDomainData
+{
+public:
+    FEPlotFluidRelativeReynoldsNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RECIPROCAL_LENGTH); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element relative Peclet number
+class FEPlotFluidRelativePecletNumber : public FEPlotDomainData
+{
+public:
+    FEPlotFluidRelativePecletNumber(FEModel* pfem);
+    bool Save(FEDomain& dom, FEDataStream& a);
+protected:
+    vector<int>    m_sol;
+};
+
