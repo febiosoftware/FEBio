@@ -41,7 +41,6 @@ SOFTWARE.*/
 #include "FEFluidSolutesResistanceBC.h"
 #include "FEFluidSolutesRCRBC.h"
 #include "FESoluteConvectiveFlow.h"
-#include "FEFluidSolutesGradientLC.h"
 #include "FEFluidSolutesDomainFactory.h"
 #include "FESolutesSolver.h"
 #include "FESolutesMaterial.h"
