@@ -13571,6 +13571,1382 @@ noprefix "false"
  This jump condition would also need to be enforced explicitly.
 \end_layout
 
+\begin_layout Section
+Fluid-Solutes Analyses
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Fluid-Solutes-Analyses"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Fluid-solutes analyses combine solute transport with fluid mechanics.
+ The fluid-solutes domain, denoted by 
+\begin_inset Formula $\Omega^{f}$
+\end_inset
+
+, is a hybrid multiphasic domain without a deformable porous solid matrix
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim22a"
+literal "false"
+
+\end_inset
+
+.
+ Like the CFD domain, the CFD-solutes domain is fixed in space, and the
+ fluid flows within it and possibly across its boundaries.
+ The boundaries 
+\begin_inset Formula $\partial\Omega^{f}$
+\end_inset
+
+ of 
+\begin_inset Formula $\Omega^{f}$
+\end_inset
+
+, and interfaces within this domain (such as faces of adjoining finite elements)
+, are denoted generically by 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+.
+ In the current implementation, finite element domains that meet at these
+ interfaces share common nodes and element faces, though it is possible
+ to consider future extensions where tied interfaces are used to connect
+ dissimilar meshes.
+ The formulation and finite element implementation of this type of domain
+ are presented below, using only salient governing equations simplified
+ from the more general hybrid multiphasic theory presented in our recent
+ study 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim22a"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Governing Equations
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:CFD-Solutes-Equations"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We model the domain 
+\begin_inset Formula $\Omega^{f}$
+\end_inset
+
+ as a mixture of an isothermal, compressible, and viscous solvent which
+ is electrically neutral, and isothermal, intrinsically incompressible,
+ and dilute solute constituents which may be electrically charged.
+ All solute accelerations are neglected, since they contribute insignificantly
+ in comparison with diffusive forces, except in problems such as centrifugation,
+ where they can be represented by an external inertial body force.
+ Unlike the standard (Darcy flow through a porous-deformable) multiphasic
+ domain 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian2007,Ateshian13,Ateshian14"
+literal "false"
+
+\end_inset
+
+, the fluid-solutes domain is fixed in space.
+ We denote the mixture constituents using a superscripted 
+\begin_inset Formula $\alpha$
+\end_inset
+
+, where 
+\begin_inset Formula $\alpha=f,\iota$
+\end_inset
+
+ for solvent and solutes, respectively.
+ The volume fraction 
+\begin_inset Formula $\varphi^{\iota}$
+\end_inset
+
+ of each solute species 
+\begin_inset Formula $\iota$
+\end_inset
+
+ is assumed to be negligible (
+\begin_inset Formula $\varphi^{\iota}\ll1$
+\end_inset
+
+), therefore the volume fraction of the solvent is 
+\begin_inset Formula $\varphi^{f}=dV^{f}/dV\approx1$
+\end_inset
+
+.
+ The apparent density of each constituent 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is 
+\begin_inset Formula $\rho^{\alpha}=dm^{\alpha}/dV$
+\end_inset
+
+, which represents the ratio of the elemental mass 
+\begin_inset Formula $dm^{\alpha}$
+\end_inset
+
+ of constituent 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ in the elemental fluid mixture volume.
+ Under these assumptions, the true density of the solvent simplifies to
+ 
+\begin_inset Formula $\rho_{T}^{f}=\rho^{f}$
+\end_inset
+
+ while the true density 
+\begin_inset Formula $\rho_{T}^{\iota}$
+\end_inset
+
+ of each solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+ is constant due to its intrinsic incompressibility.
+ Since the solvent is compressible, as was done in the fluid mechanics formulati
+on 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian18"
+literal "false"
+
+\end_inset
+
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Fluid-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), the solvent volume ratio 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ was employed as a kinematic state variable to represent the fluid volumetric
+ strain,
+\begin_inset Formula 
+\begin{equation}
+J^{f}=\frac{\rho_{r}^{f}}{\rho^{f}}\thinspace,\label{eq:Fluid-Dil-CFDSol}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\rho_{r}^{f}$
+\end_inset
+
+ is the referential solvent density (
+\begin_inset Formula $\rho^{f}$
+\end_inset
+
+ in the reference configuration), which is a user-specified material constant.
+ An alternative representation of fluid volumetric strain is the fluid dilatatio
+n, 
+\begin_inset Formula $e^{f}=J^{f}-1$
+\end_inset
+
+, which is used in the actual finite element code.
+\end_layout
+
+\begin_layout Standard
+The axiom of mass balance for the mixture takes the form 
+\begin_inset Formula 
+\begin{equation}
+\frac{D^{f}J^{f}}{Dt}=J^{f}\left(\divg\mathbf{v}^{f}-\sum_{\iota}\frac{\hat{\rho}^{\iota}}{\rho_{T}^{\iota}}\right)\thinspace,\label{eq:Mix-Mass-Bal-CFDSol}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ is the velocity of the fluid constituent and 
+\begin_inset Formula $\hat{\rho}^{\iota}$
+\end_inset
+
+ is the mass density supply to 
+\begin_inset Formula $\iota$
+\end_inset
+
+ due to reactions with all other solutes.
+ It is assumed that reactions do not add or remove solvent mass (
+\begin_inset Formula $\hat{\rho}^{f}=0$
+\end_inset
+
+).
+ Here, 
+\begin_inset Formula $D^{f}\left(\cdot\right)/Dt=\partial\left(\cdot\right)/\partial t+\grad\left(\cdot\right)\cdot\mathbf{v}^{f}$
+\end_inset
+
+ is the material time derivative operator in the spatial frame, following
+ the fluid motion.
+ The mixture mass balance reproduces the kinematic constraint between the
+ fluid velocity and dilatation for the fluid mechanics formulation 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian18"
+literal "false"
+
+\end_inset
+
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Fluid-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), with the addition of reactive mass supply terms.
+ The axiom of mass balance for each solute takes the form 
+\begin_inset Formula 
+\begin{equation}
+\hat{c}^{\iota}=\frac{\partial c^{\iota}}{\partial t}+\divg\left(c^{\iota}\mathbf{v}^{\iota}\right)=\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}+\divg\mathbf{j}^{\iota}\thinspace,\label{eq:Mass-Bal-Solute-CFDSol}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{c}^{\iota}=\hat{\rho}^{\iota}/M^{\iota}$
+\end_inset
+
+ is the molar concentration supply and 
+\begin_inset Formula $c^{\iota}=\rho^{\iota}/M^{\iota}$
+\end_inset
+
+ is the molar concentration of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{j}^{\iota}=c^{\iota}\left(\mathbf{v}^{\iota}-\mathbf{v}^{f}\right)$
+\end_inset
+
+ is the molar flux of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+ relative to the solvent.
+ As shown previously 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim22a"
+literal "false"
+
+\end_inset
+
+, the molar solute flux may be evaluated from the solute momentum balance
+ when inertia terms have been neglected, 
+\begin_inset Formula 
+\begin{equation}
+\mathbf{j}^{\iota}=\tilde{\kappa}^{\iota}d_{0}^{\iota}\left(-\grad\tilde{c}^{\iota}+\frac{M^{\iota}}{R\theta}\tilde{c}^{\iota}\mathbf{b}^{\iota}\right)\thinspace,\label{eq:Solute-Flux-CFDSol}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{\kappa}^{\iota}$
+\end_inset
+
+ is the partition coefficient of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+ relative to an ideal solution 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Ogston1961,Laurent1964"
+literal "false"
+
+\end_inset
+
+.
+ It is given by 
+\begin_inset Formula 
+\begin{equation}
+\tilde{\kappa}^{\iota}=\frac{\kappa^{\iota}}{\gamma^{\iota}}\exp\left(-\frac{z^{\iota}F_{c}\psi}{R\theta}\right)\thinspace,\label{eq:Partition-Coeff-CFDSol}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\kappa^{\iota}$
+\end_inset
+
+ is the solubility of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+ in the mixture, or the fraction of fluid volume accessible to the solute
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Mauck03"
+literal "false"
+
+\end_inset
+
+ (
+\begin_inset Formula $\kappa^{\iota}=1$
+\end_inset
+
+ in a fluid mixture), and 
+\begin_inset Formula $\gamma^{\iota}$
+\end_inset
+
+ is the activity coefficient of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+.
+ The ratio 
+\begin_inset Formula $\kappa^{\iota}/\gamma^{\iota}$
+\end_inset
+
+ is a non-dimensional property that describes the deviation of the solute
+ chemical potential from that of an ideal, dilute solution 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Tinoco-Jr.95"
+literal "false"
+
+\end_inset
+
+.
+ We can represent this ratio as 
+\begin_inset Formula $\hat{\kappa}^{\iota}\equiv\kappa^{\iota}/\gamma^{\iota}$
+\end_inset
+
+, and call it the effective solubility of 
+\begin_inset Formula $\iota$
+\end_inset
+
+ in the solution 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Ateshian2011"
+literal "false"
+
+\end_inset
+
+.
+ In 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Partition-Coeff-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset Formula $z^{\iota}$
+\end_inset
+
+ is the charge number of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+, 
+\begin_inset Formula $F_{c}$
+\end_inset
+
+ is Faraday's constant, 
+\begin_inset Formula $\psi$
+\end_inset
+
+ is the electrical potential, 
+\begin_inset Formula $R$
+\end_inset
+
+ is the universal gas constant, and 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the absolute temperature.
+ In 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Solute-Flux-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset Formula $d_{0}^{\iota}$
+\end_inset
+
+ is the diffusivity of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+ in the fluid, 
+\begin_inset Formula $\mathbf{b}^{\iota}$
+\end_inset
+
+ is the body force per mass acting on solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+, and 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+ is the effective concentration of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+, such that 
+\begin_inset Formula 
+\begin{equation}
+\tilde{c}^{\iota}=c^{\iota}/\tilde{\kappa}^{\iota}\,.\label{eq:effective-actual-concentration}
+\end{equation}
+
+\end_inset
+
+The effective solute concentration represents an alternative form of the
+ solute electrochemical potential, expressed in units of molar concentration
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian07b,Ateshian13"
+literal "false"
+
+\end_inset
+
+.
+ The solute flux in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Solute-Flux-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ has contributions from diffusion (as represented by the term containing
+ 
+\begin_inset Formula $\grad\tilde{c}^{\iota}$
+\end_inset
+
+), sedimentation (
+\begin_inset Formula $\tilde{c}^{\iota}\mathbf{b}^{\iota}$
+\end_inset
+
+ when 
+\begin_inset Formula $\mathbf{b}^{\iota}$
+\end_inset
+
+ is proportional to an inertial force), electrophoresis (
+\begin_inset Formula $\tilde{c}^{\iota}\mathbf{b}^{\iota}$
+\end_inset
+
+ when 
+\begin_inset Formula $\mathbf{b}^{\iota}$
+\end_inset
+
+ is proportional to the Lorentz force acting on charged solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+), and convection (
+\begin_inset Formula $\tilde{c}^{\iota}\mathbf{v}^{f}$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The solute flux in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Solute-Flux-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may also be expressed in terms of its components,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{j}^{\iota}=\underbrace{-\tilde{\kappa}^{\iota}d_{0}^{\iota}\grad\tilde{c}^{\iota}}_{\mathbf{j}_{d}^{\iota}}+\underbrace{s^{\iota}c^{\iota}\mathbf{b}^{\iota}}_{\mathbf{j}_{b}^{\iota}}\label{eq:solute-flux-components}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+s^{\iota}\equiv d_{0}^{\iota}\frac{M^{\iota}}{R\theta}\label{eq:sedimentation-coeff}
+\end{equation}
+
+\end_inset
+
+is the 
+\emph on
+sedimentation coefficient
+\emph default
+.
+ In the expression of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:solute-flux-components"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ 
+\begin_inset Formula $\mathbf{j}_{d}^{\iota}$
+\end_inset
+
+ represents the diffusive flux, and 
+\begin_inset Formula $\mathbf{j}_{b}^{\iota}$
+\end_inset
+
+ is the sedimentation flux.
+ Now the mass balance expression in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mass-Bal-Solute-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be combined with eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mix-Mass-Bal-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to produce
+\begin_inset Formula 
+\begin{equation}
+\hat{c}^{\iota}-c^{\iota}\sum_{\gamma}\mathcal{V}^{\gamma}\hat{c}^{\gamma}=\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}+\divg\left(\mathbf{j}_{d}^{\iota}+\mathbf{j}_{b}^{\iota}\right)\label{eq:solute-mass-alt}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathcal{V}^{\iota}\equiv\nicefrac{M^{\iota}}{\rho_{T}^{\iota}}$
+\end_inset
+
+ is the molar volume of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+.
+ Since we have neglected the volume fraction of solutes in the current mixture
+ formulation, it follows that 
+\begin_inset Formula $c^{\iota}\mathcal{V}^{\iota}\ll1$
+\end_inset
+
+.
+ Thus, we may neglect the second term on the left-hand side of the above
+ equation, as well as the related term on the right-hand side of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mix-Mass-Bal-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The fluid momentum balance is given by
+\begin_inset Formula 
+\begin{equation}
+\rho^{f}\mathbf{a}^{f}=-\grad\tilde{p}+\divg\boldsymbol{\tau}+\rho^{f}\mathbf{b}^{f}+\sum_{\iota}\left(-R\theta\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}+M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)\thinspace,\label{eq:Fluid-Mtm-Bal-CFDSol}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{a}^{f}=D^{f}\mathbf{v}^{f}/Dt$
+\end_inset
+
+ is the fluid acceleration, 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is the fluid viscous stress, 
+\begin_inset Formula $\mathbf{b}^{f}$
+\end_inset
+
+ is the body force per mass acting on the fluid 
+\begin_inset Formula $f$
+\end_inset
+
+, and 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is the effective fluid pressure, related to the fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ via 
+\begin_inset Formula 
+\begin{equation}
+p=\tilde{p}+R\theta\Phi\sum_{\iota}c^{\iota}\thinspace.\label{eq:Total-fluid-p-CFDSol}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ is the osmotic coefficient, a non-dimensional property that describes the
+ deviation of the osmotic pressure from the ideal behavior known as van't
+ Hoff's law 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "McNaught97"
+literal "false"
+
+\end_inset
+
+, and 
+\begin_inset Formula $R\theta\Phi\sum_{\iota}c^{\iota}$
+\end_inset
+
+ is the osmotic or chemical contribution to the fluid pressure.
+ Therefore, 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+, which is an alternative form of the solvent mechano-chemical potential,
+ may be interpreted as the mechanical or hydraulic contribution to 
+\begin_inset Formula $p$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Previously, we showed that the effective pressure must only depend on the
+ fluid volume ratio, such that 
+\begin_inset Formula $\tilde{p}=\tilde{p}\left(J^{f}\right)$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim22a"
+literal "false"
+
+\end_inset
+
+.
+ Based on mass, momentum and energy jump conditions for this type of mixture,
+ it can also be shown that 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ (or alternatively 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+) is continuous across interfaces 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+, and thus may be used as a nodal degree of freedom (DOF).
+ We may choose a constitutive relation valid for arbitrary (but strictly
+ positive) values of 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+\tilde{p}=K\left(\frac{1}{J^{f}}-1\right)\,,\label{eq:Eff-Pressure-CFDSol}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K$
+\end_inset
+
+ is the solvent's bulk modulus (a user-specified material property).
+\end_layout
+
+\begin_layout Standard
+The solute-dependent terms appearing on the right side of the solvent momentum
+ balance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Fluid-Mtm-Bal-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ are typically neglected in classical CFD-solutes formulations, but we included
+ them here since they emerged naturally to describe the phenomena of osmosis
+ (solvent flow due to solute diffusion or sedimentation), and electro-osmosis
+ (solvent flow due to solute electrophoresis).
+ To reproduce classical formulations, by default we turned off these terms
+ (within the summation on the right-hand side of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Fluid-Mtm-Bal-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), and we added a user-defined flag (
+\begin_inset Quotes eld
+\end_inset
+
+include osmosis
+\begin_inset Quotes erd
+\end_inset
+
+) to optionally turn them back on.
+ In addition, users can turn off osmotic pressure by setting the osmotic
+ coefficient 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ to zero, in which case 
+\begin_inset Formula $p=\tilde{p}$
+\end_inset
+
+ according to eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Total-fluid-p-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Both of these approaches were investigated in the test problems described
+ below.
+\end_layout
+
+\begin_layout Standard
+As done in the standard multiphasic formulation (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Triphasic-Multiphasic-Materials"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), we assumed there can be no electric charge accumulation in the mixture,
+ so we enforce the electroneutrality condition
+\begin_inset Formula 
+\begin{equation}
+\sum_{\iota}z^{\iota}c^{\iota}=0\,.\label{eq:Electroneutrality-CFDSol}
+\end{equation}
+
+\end_inset
+
+Multiplying the mass balances from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mass-Bal-Solute-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ by 
+\begin_inset Formula $z^{\iota}$
+\end_inset
+
+ and taking the sum over all the constituents, making use of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Electroneutrality-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and adopting the assumption that reactive processes maintain electroneutrality
+ (
+\begin_inset Formula $\sum_{\iota}z^{\iota}\nu^{\iota}=0$
+\end_inset
+
+ where 
+\begin_inset Formula $\nu^{\alpha}$
+\end_inset
+
+ is the net stoichiometric coefficient of 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian2014"
+literal "false"
+
+\end_inset
+
+) produces the constraint
+\begin_inset Formula 
+\begin{equation}
+0=\divg\sum_{\iota}z^{\iota}\mathbf{j}^{\iota}\,,\label{eq:Current-Density-Constraint}
+\end{equation}
+
+\end_inset
+
+or equivalently 
+\begin_inset Formula $\divg\mathbf{I}_{e}=0$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{I}_{e}=F_{c}\sum_{\iota}z^{\iota}\mathbf{j}^{\iota}$
+\end_inset
+
+ is the electric current density.
+\end_layout
+
+\begin_layout Standard
+In the CFD-solutes implementation the fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+, fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, and effective solute concentrations 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+ are the nodal degrees of freedom 
+\begin_inset Formula $\left(\mathbf{v}^{f},e^{f},\tilde{c}^{\iota}\right)$
+\end_inset
+
+, as further addressed in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:CFD-Solutes-Jump"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ These choices imply that 
+\begin_inset Formula $\mathbf{\mathbf{v}}^{f}$
+\end_inset
+
+, 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, and 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+ are continuous across finite element boundaries, as justified below when
+ we review jump conditions across interfaces.
+ Note that in the absence of solutes, the governing equations 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mix-Mass-Bal-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Fluid-Mtm-Bal-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ simplify to the original CFD equations, with 
+\begin_inset Formula $p=\tilde{p}$
+\end_inset
+
+.
+ More information on calculating the supply terms 
+\begin_inset Formula $\hat{c}^{\iota}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\rho}^{\iota}$
+\end_inset
+
+ can be found in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Salt-Dissociation-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The electric potential 
+\begin_inset Formula $\psi$
+\end_inset
+
+ can be determined as described in the previous standard multiphasic solver
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian2013,Ateshian2014"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Jump Conditions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:CFD-Solutes-Jump"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Jump conditions on the axioms of mass, momentum and energy balance are needed
+ to determine which variables may be selected as nodal degrees of freedom
+ in the finite element implementation, and which tractions are naturally
+ continuous across an interface.
+ The jump conditions for the CFD-solutes material were determined from the
+ jump conditions of the general hybrid multiphasic material 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim22a"
+literal "false"
+
+\end_inset
+
+.
+ Here, we summarize the relevant results, which apply to any interface 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+.
+ Here, since the domain is fixed in space, the interface 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+ is stationary.
+ We employ the notation 
+\begin_inset Formula $\left[\left[f\right]\right]=f_{+}-f_{-}$
+\end_inset
+
+ to denote the jump in an arbitrary function 
+\begin_inset Formula $f$
+\end_inset
+
+ across the interface 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+, with 
+\begin_inset Formula $f_{+}$
+\end_inset
+
+ and 
+\begin_inset Formula $f_{-}$
+\end_inset
+
+ denoting the values of 
+\begin_inset Formula $f$
+\end_inset
+
+ on either side of 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+.
+ The unit normal on 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+ is 
+\series bold
+
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+
+\series default
+, which points away from the 
+\begin_inset Formula $+$
+\end_inset
+
+ side.
+ A variable 
+\begin_inset Formula $f$
+\end_inset
+
+ which is continuous across 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+ satisfies 
+\begin_inset Formula $\left[\left[f\right]\right]=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Based on the jump condition on the axiom of mass balance for the fluid,
+ the normal component of the mass flux of the fluid is continuous across
+ 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+, 
+\begin_inset Formula $\left[\left[\rho^{f}\mathbf{v}^{f}\right]\right]\cdot\mathbf{n}=0$
+\end_inset
+
+.
+ Furthermore, a sufficient condition to satisfy the jump on the axiom of
+ energy balance is to enforce continuity of the solvent specific free enthalpy
+ (or Gibbs function), such that 
+\begin_inset Formula $\left[\left[\psi^{f}+p/\rho_{T}^{f}\right]\right]=\left[\left[\mu^{f}\right]\right]=0$
+\end_inset
+
+, where 
+\begin_inset Formula $\psi^{f}$
+\end_inset
+
+ is the fluid specific free energy.
+ In the multiphasic mixture literature, the solvent specific free enthalpy
+ 
+\begin_inset Formula $\mu^{f}$
+\end_inset
+
+ is also called the mechano-chemical potential 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian16"
+literal "false"
+
+\end_inset
+
+.
+ This jump condition applies only when there is solvent on both sides of
+ the interface, such as across 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+.
+ In an isothermal framework, the solvent mechano-chemical potential is a
+ function of state that only depends on 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ such that 
+\begin_inset Formula $\mu^{f}=\mu^{f}\left(J^{f}\right)$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim22a"
+literal "false"
+
+\end_inset
+
+.
+ Therefore this energy jump condition implies that 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ must be continuous across 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+, thus
+\begin_inset Formula 
+\begin{equation}
+\left[\left[J^{f}\right]\right]=0\,,\label{eq:J-Jump-CFDSol}
+\end{equation}
+
+\end_inset
+
+also implying that 
+\begin_inset Formula $\left[\left[\tilde{p}\right]\right]=0$
+\end_inset
+
+.
+ Given 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Fluid-Dil-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, it follows that 
+\begin_inset Formula $\left[\left[\rho^{f}\right]\right]=0$
+\end_inset
+
+ and the fluid mass balance jump condition reduces to 
+\begin_inset Formula $\left[\left[\mathbf{v}^{f}\right]\right]\cdot\mathbf{n}=0$
+\end_inset
+
+, implying that the fluid velocity component normal to 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+ must be continuous.
+ For the tangential component of 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ on 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+ we use the no-slip condition for viscous fluids, which states that the
+ velocity component tangential to 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+ must be continuous across that interface, as is standard in CFD solvers.
+ Combining these two jump conditions produces
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\mathbf{v}^{f}\right]\right]=0\,.\label{eq:Mass-Jump-Final-CFDSol}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From the solute mass jump condition, we can show that the normal component
+ of the molar solute flux is continuous across 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\mathbf{j}^{\iota}\right]\right]\cdot\mathbf{n}=0\,.\label{eq:Mass-Jump-Sol-CFDSol}
+\end{equation}
+
+\end_inset
+
+The momentum jump condition requires that the mixture traction be continuous
+ across 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+, thus 
+\begin_inset Formula $\left[\left[-p\mathbf{I}+\boldsymbol{\tau}\right]\right]\cdot\mathbf{n}=\mathbf{0}$
+\end_inset
+
+.
+ Another relation which is thermodynamically sufficient to satisfy the jump
+ condition on the energy balance is the continuity of the viscous fluid
+ traction,
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\boldsymbol{\tau}\right]\right]\cdot\mathbf{n}=0\,.\label{eq:Fluid-Mtm-Jump-CFDSol}
+\end{equation}
+
+\end_inset
+
+This jump condition 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Fluid-Mtm-Jump-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, which also applies only if fluid is present on both sides of 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, implies that 
+\begin_inset Formula $\left[\left[p\right]\right]=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Finally, the last relation that is thermodynamically sufficient to satisfy
+ the energy balance jump condition applies to the electrochemical potential
+ for the solutes, where 
+\begin_inset Formula $\left[\left[\tilde{\mu}^{\iota}\right]\right]=0$
+\end_inset
+
+.
+ For a solute, the general constitutive relation for the electrochemical
+ potential is 
+\begin_inset Formula $\tilde{\mu}^{\iota}=\frac{R\theta}{M^{\iota}}\ln\frac{c^{\iota}}{\tilde{\kappa}^{\alpha}c_{0}^{\iota}}$
+\end_inset
+
+, and the jump can be simplified to 
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\tilde{c}^{\iota}\right]\right]=0\,.\label{eq:Conc-Jump-CFDSol}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus, letting 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+, 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, and 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+ be nodal degrees of freedom automatically enforces the jump conditions
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:J-Jump-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mass-Jump-Final-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Conc-Jump-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, acting as essential boundary conditions.
+ As stated earlier, the jump conditions are the same as the previous CFD
+ formulation in the case of zero solute concentration (all 
+\begin_inset Formula $\tilde{c}^{\iota}=0$
+\end_inset
+
+) 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian18"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Chapter
 The Nonlinear FE Method
 \begin_inset CommandInset label
@@ -23704,6 +25080,680 @@ where
 \end_inset
 
  represents the skew-symmetric tensor form of the bracketed vector.
+\end_layout
+
+\begin_layout Section
+Weak Formulation for Fluid-Solutes Analyses
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Weak-Fluid-Solutes"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Virtual Work and Weak form for Fluid-Solutes
+\end_layout
+
+\begin_layout Standard
+The virtual work statement is used to enforce the governing equations needed
+ to solve for the nodal 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+, 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, and all 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+, namely the mixture mass balance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mix-Mass-Bal-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the fluid momentum balance 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Fluid-Mtm-Bal-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, and the solute mass balances 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mass-Bal-Solute-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, in addition to the current density constraint 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Current-Density-Constraint"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The virtual work statement for a Galerkin finite element formulation 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bonet2008"
+literal "true"
+
+\end_inset
+
+ is 
+\begin_inset Formula $\delta W=0$
+\end_inset
+
+, where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W= & \int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(-\grad\tilde{p}+\divg\boldsymbol{\tau}-\sum_{\iota}R\theta\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}+\rho^{f}\left(\mathbf{b}^{f}-\mathbf{a}^{f}\right)+M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)dv\\
+ & +\int_{\Omega^{f}}\delta J^{f}\left(-\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\divg\mathbf{v}^{f}\right)dv\\
+ & +\sum_{\iota}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}+\divg\left(\mathbf{j}_{d}^{\iota}+\mathbf{j}_{b}^{\iota}\right)-\hat{c}^{\iota}+\sum_{\beta}z^{\beta}\divg\left(\mathbf{j}_{d}^{\beta}+\mathbf{j}_{b}^{\beta}\right)\right)dv\,.
+\end{aligned}
+\label{eq:CFDSol-Virtual-Work}
+\end{equation}
+
+\end_inset
+
+These integrals are evaluated in the current (time-invariant) configuration
+ of 
+\begin_inset Formula $\Omega^{f}$
+\end_inset
+
+.
+ Here, 
+\begin_inset Formula $\delta\mathbf{v}^{f}$
+\end_inset
+
+ is the virtual fluid velocity, 
+\begin_inset Formula $\delta J^{f}$
+\end_inset
+
+ is the virtual fluid energy density, and 
+\begin_inset Formula $\delta\tilde{c}^{\iota}$
+\end_inset
+
+ is the virtual molar energy of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+.
+ Integrating by parts and using the divergence theorem, the weak form of
+ this statement may be written as 
+\begin_inset Formula $0=\delta W=\delta W_{ext}-\delta W_{int}$
+\end_inset
+
+ where the internal virtual work is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{int}= & \int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\grad\tilde{p}+\rho^{f}\mathbf{a}^{f}+\sum_{\iota}R\theta\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}\right)+\boldsymbol{\tau}:\grad\delta\mathbf{v}^{f}dv\\
+ & +\int_{\Omega^{f}}\delta J^{f}\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\grad\delta J^{f}\cdot\mathbf{v}^{f}dv\\
+ & +\sum_{\iota}\int_{\Omega^{f}}-\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\hat{c}^{\iota}\right)+\grad\delta\tilde{c}^{\iota}\cdot\left(\mathbf{j}_{d}^{\iota}+\sum_{\beta}z^{\beta}\mathbf{j}_{d}^{\beta}\right)dv\,.
+\end{aligned}
+\label{eq:Int-Virtual-Work-CFDSol}
+\end{equation}
+
+\end_inset
+
+The external virtual work is 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta W_{ext}= & \int_{\Gamma^{f}}\delta\mathbf{v}^{f}\cdot\mathbf{t}^{\tau}da+\int_{\Gamma^{f}}\delta J^{f}v_{n}^{f}da+\int_{\Gamma^{f}}\delta\tilde{c}^{\iota}\tilde{j}_{n}^{\iota}da\\
+ & +\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\rho^{f}\mathbf{b}^{f}+\sum_{\iota}M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)dv\\
+ & +\sum_{\iota}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\divg\left(\mathbf{j}_{b}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{b}^{\gamma}\right)\,dv\,,
+\end{aligned}
+\label{eq:Ext-Virt-Work-CFDSol}
+\end{equation}
+
+\end_inset
+
+ where
+\begin_inset Formula 
+\begin{equation}
+\tilde{j}_{n}^{\iota}=\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)\cdot\mathbf{n}\,.\label{eq:Normal-Sol-Flux-CFDSol}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\mathbf{t}^{\tau}=\boldsymbol{\tau}\cdot\mathbf{n}$
+\end_inset
+
+ is the fluid viscous traction, 
+\begin_inset Formula $v_{n}^{f}=\mathbf{v}^{f}\cdot\mathbf{n}$
+\end_inset
+
+ is the normal component of the fluid velocity on the boundary 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+, and 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}$
+\end_inset
+
+ is the normal effective diffusive flux of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+ on the boundary 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is the outward normal to 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+.
+ The integrands of the surface integrals represent the natural boundary
+ conditions for this formulation.
+ If boundary conditions are not set explicitly on 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+, the natural boundary conditions are 
+\begin_inset Formula $\mathbf{t}^{\tau}=\mathbf{0}$
+\end_inset
+
+, 
+\begin_inset Formula $v_{n}^{f}=0$
+\end_inset
+
+, and 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}=0$
+\end_inset
+
+.
+ These natural boundary conditions are consistent with the jump conditions
+ presented above in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Fluid-Mtm-Jump-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mass-Jump-Final-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mass-Jump-Sol-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Essential boundary conditions are prescribed on the fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+, fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, and effective solute concentration 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+, which are also consistent with the above jump conditions in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:J-Jump-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Mass-Jump-Final-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Conc-Jump-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ For example, an essential no-slip boundary condition may be prescribed
+ on 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+ by setting 
+\begin_inset Formula $\mathbf{v}^{f}=\mathbf{0}$
+\end_inset
+
+.
+ A symmetry plane may be prescribed from the natural boundary conditions
+ 
+\begin_inset Formula $\mathbf{t}^{\tau}=\mathbf{0}$
+\end_inset
+
+, 
+\begin_inset Formula $v_{n}^{f}=0$
+\end_inset
+
+, and 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}=0$
+\end_inset
+
+.
+ In this formulation, the mixture traction is defined as 
+\begin_inset Formula $\mathbf{t}=-p\mathbf{n}+\mathbf{t}^{\tau}$
+\end_inset
+
+.
+ Because of the way we chose to split the internal and external virtual
+ work in 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Int-Virtual-Work-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Ext-Virt-Work-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ is not a natural boundary condition in this formulation.
+ Thus, when 
+\begin_inset Formula $\mathbf{t}=\mathbf{0}$
+\end_inset
+
+ is desired, it has to be enforced by satisfying the natural boundary condition
+ 
+\begin_inset Formula $\mathbf{t}^{\tau}=\mathbf{0}$
+\end_inset
+
+, and selecting suitable values for the essential boundary conditions 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+ using 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Total-fluid-p-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Eff-Pressure-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to produce 
+\begin_inset Formula $p=0$
+\end_inset
+
+, as explained next.
+\end_layout
+
+\begin_layout Standard
+The actual fluid gauge pressure in this fluid-solutes mixture is 
+\begin_inset Formula $p$
+\end_inset
+
+, as given in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Total-fluid-p-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ To prescribe a desired value 
+\begin_inset Formula $p=p^{*}$
+\end_inset
+
+ on a boundary, we implemented a 
+\begin_inset Quotes eld
+\end_inset
+
+fluid pressure
+\begin_inset Quotes erd
+\end_inset
+
+ boundary condition that prescribed the correct value of 
+\begin_inset Formula $J^{f}$
+\end_inset
+
+ according to the current values of all 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+, using the user-selected constitutive model for 
+\begin_inset Formula $\tilde{p}\left(J^{f}\right)$
+\end_inset
+
+.
+ For example, using eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Eff-Pressure-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, this 
+\begin_inset Quotes eld
+\end_inset
+
+fluid pressure
+\begin_inset Quotes erd
+\end_inset
+
+ boundary condition actually prescribes 
+\begin_inset Formula $J^{f}=1/\left(1+\left(p^{*}-R\theta\Phi\sum_{\iota}\tilde{\kappa}^{\iota}\tilde{c}^{\iota}\right)/K\right)$
+\end_inset
+
+ as an essential boundary condition at nodes of 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+.
+ The values of 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{\kappa}^{\iota}$
+\end_inset
+
+ are obtained from the finite element of the domain 
+\begin_inset Formula $\Omega^{f}$
+\end_inset
+
+ right underneath the face 
+\begin_inset Formula $\Gamma^{f}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Linearization for Fluid-Solutes
+\end_layout
+
+\begin_layout Standard
+We can rewrite the internal work of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:CFDSol-Virtual-Work"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+\begin{aligned}\delta W_{int} & =\delta W_{int}^{v}+\delta W_{int}^{J}+\delta W_{int}^{c}\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\delta W_{int}^{v} & =\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\grad\tilde{p}+\rho^{f}\mathbf{a}^{f}+\sum_{\iota}R\theta\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}\right)+\boldsymbol{\tau}:\grad\delta\mathbf{v}^{f}dv\\
+\delta W_{int}^{J} & =\int_{\Omega^{f}}\delta J^{f}\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\grad\delta J^{f}\cdot\mathbf{v}^{f}dv\\
+\delta W_{int}^{c} & =\sum_{\iota}\int_{\Omega^{f}}-\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\hat{c}^{\iota}\right)+\grad\delta\tilde{c}^{\iota}\cdot\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)dv\,.
+\end{aligned}
+\]
+
+\end_inset
+
+Recall that 
+\begin_inset Formula $\hat{c}^{\iota}=\nu^{\iota}\hat{\zeta}$
+\end_inset
+
+.
+ The linearizations of each of these terms along increments in the degrees
+ of freedom are obtained using
+\begin_inset Formula 
+\[
+\begin{aligned}D\mathbf{a}^{f}\left[\Delta\mathbf{v}^{f}\right] & =\frac{\alpha_{m}}{\gamma}\frac{\Delta\mathbf{v}^{f}}{\Delta t}+\alpha_{f}\left(\grad\Delta\mathbf{v}^{f}\cdot\mathbf{v}^{f}+\mathbf{L}^{f}\cdot\Delta\mathbf{v}^{f}\right)\\
+D\left(\frac{D^{f}J^{f}}{Dt}\right)\left[\Delta\mathbf{v}_{f}\right] & =\alpha_{f}\grad J^{f}\cdot\Delta\mathbf{v}_{f}\\
+D\boldsymbol{\tau}\left[\Delta\mathbf{v}^{f}\right] & =\alpha_{f}\boldsymbol{\mathcal{C}}^{\tau}:\frac{1}{2}\left(\grad\Delta\mathbf{v}^{f}+\grad^{T}\Delta\mathbf{v}^{f}\right)\\
+D\left(\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\right)\left[\Delta\mathbf{v}^{f}\right] & =\alpha_{f}\grad\left(J^{f}c^{\iota}\right)\cdot\Delta\mathbf{v}^{f}
+\end{aligned}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\grad\tilde{p}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\left(\tilde{p}_{J}^{\prime}\grad\Delta J^{f}+\Delta J^{f}\tilde{p}_{J}^{\prime\prime}\grad J^{f}\right)\\
+D\rho^{f}\left[\Delta J^{f}\right] & =-\alpha_{f}\frac{\rho^{f}}{J^{f}}\Delta J^{f}\\
+D\boldsymbol{\tau}\left[\Delta J^{f}\right] & =\alpha_{f}\boldsymbol{\tau}_{J}^{\prime}\Delta J^{f}\\
+D\left(\frac{D^{f}J^{f}}{Dt}\right)\left[\Delta J^{f}\right] & =\frac{\alpha_{m}}{\gamma}\frac{\Delta J^{f}}{\Delta t}+\alpha_{f}\grad J^{f}\cdot\Delta\mathbf{v}^{f}\\
+D\tilde{\kappa}^{\iota}\left[\Delta J^{f}\right] & =\alpha_{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\Delta J^{f}\\
+D\left(\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\tilde{c}^{\iota}}{\Delta t}\left(\tilde{\kappa}^{\iota}+J^{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\Delta J^{f}+\Delta J^{f}\grad\left(\tilde{\kappa}^{\iota}\tilde{c}^{\iota}+J^{f}\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\cdot\mathbf{v}^{f}+\left(c^{\iota}+J^{f}\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\grad\Delta J^{f}\cdot\mathbf{v}^{f}\right)\\
+D\hat{c}^{\iota}\left[\Delta J^{f}\right] & =\alpha_{f}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial J^{f}}\Delta J^{f}\\
+D\mathbf{j}_{d}^{\iota}\left[\Delta J^{f}\right] & =-\alpha_{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\Delta J^{f}d_{0}^{\iota}\grad\tilde{c}^{\iota}
+\end{aligned}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\tilde{\kappa}^{\iota}\tilde{c}^{\iota}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\Delta\tilde{c}^{\beta}\\
+D\left(\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}\grad\Delta\tilde{c}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\Delta\tilde{c}^{\beta}\grad\tilde{c}^{\iota}\right)\\
+D\left(\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}J^{f}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\frac{\Delta\tilde{c}^{\beta}}{\Delta t}\right)\\
+ & +\alpha_{f}\left(\Delta\tilde{c}^{\beta}\grad\left(J^{f}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\right)\cdot\mathbf{v}^{f}+J^{f}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\Delta\tilde{c}^{\beta}\cdot\mathbf{v}^{f}\right)\\
+D\hat{c}^{\iota}\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\beta}}\Delta\tilde{c}^{\beta}\\
+D\mathbf{j}_{d}^{\iota}\left[\Delta\tilde{c}^{\beta}\right] & =-\alpha_{f}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad\Delta\tilde{c}^{\beta}+\Delta\tilde{c}^{\beta}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}d_{0}^{\iota}+\tilde{\kappa}^{\iota}\frac{\partial d_{0}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\iota}\right)
+\end{aligned}
+\]
+
+\end_inset
+
+Then we can evaluate the linearizations as follows,
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta W_{int}^{v}\right)\left[\Delta\mathbf{v}^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\rho^{f}\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\Delta\mathbf{v}^{f}}{\Delta t}+\left(\grad\Delta\mathbf{v}^{f}\cdot\mathbf{v}^{f}+\mathbf{L}^{f}\cdot\Delta\mathbf{v}^{f}\right)\right)dv\\
+ & +\alpha_{f}\int_{\Omega^{f}}\grad\delta\mathbf{v}^{f}:\boldsymbol{\mathcal{C}}^{\tau}:\frac{1}{2}\left(\grad\Delta\mathbf{v}^{f}+\grad^{T}\Delta\mathbf{v}^{f}\right)dv\\
+D\left(\delta W_{int}^{v}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\tilde{p}_{J}^{\prime}\grad\Delta J^{f}+\Delta J^{f}\tilde{p}_{J}^{\prime\prime}\grad J^{f}+\Delta J^{f}\sum_{\iota}R\theta\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\grad\tilde{c}^{\iota}\right)dv\\
+ & -\alpha_{f}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\frac{\rho^{f}}{J^{f}}\Delta J^{f}\mathbf{a}^{f}dv+\alpha_{f}\int_{\Omega^{f}}\boldsymbol{\tau}_{J}^{\prime}\Delta J^{f}:\grad\delta\mathbf{v}^{f}dv\\
+D\left(\delta W_{int}^{v}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot R\theta\sum_{\iota}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}\grad\Delta\tilde{c}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\Delta\tilde{c}^{\beta}\grad\tilde{c}^{\iota}\right)dv
+\end{aligned}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta W_{int}^{J}\right)\left[\Delta\mathbf{v}^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\left(\delta J^{f}\frac{1}{J^{f}}\grad J^{f}+\grad\delta J^{f}\right)\cdot\Delta\mathbf{v}^{f}dv\\
+D\left(\delta W_{int}^{J}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta J^{f}\frac{1}{J^{f}}\left(-\frac{\Delta J^{f}}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\Delta J^{f}}{\Delta t}+\grad J^{f}\cdot\Delta\mathbf{v}^{f}\right)dv\\
+D\left(\delta W_{int}^{J}\right)\left[\Delta\tilde{c}^{\beta}\right] & =0
+\end{aligned}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta W_{int}^{c}\right)\left[\Delta\mathbf{v}^{f}\right] & =\sum_{\iota}-\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{1}{J^{f}}\grad\left(J^{f}c^{\iota}\right)\cdot\Delta\mathbf{v}^{f}dv\,.\\
+D\left(\delta W_{int}^{c}\right)\left[\Delta J^{f}\right] & =\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{1}{J^{f}}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\tilde{c}^{\iota}}{\Delta t}\left(\tilde{\kappa}^{\iota}+J^{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)-\grad\left(\tilde{\kappa}^{\iota}\tilde{c}^{\iota}+J^{f}\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\cdot\mathbf{v}^{f}\right)\Delta J^{f}dv\\
+ & -\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{1}{J^{f}}\left(c^{\iota}+J^{f}\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\grad\Delta J^{f}\cdot\mathbf{v}^{f}dv\\
+ & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial J^{f}}\Delta J^{f}dv\\
+ & -\alpha_{f}\sum_{\iota}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\Delta J^{f}d_{0}^{\iota}\grad\tilde{c}^{\iota}+\sum_{\gamma}z^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\Delta J^{f}d_{0}^{\gamma}\grad\tilde{c}^{\gamma}\right)dv\\
+D\left(\delta W_{int}^{c}\right)\left[\Delta\tilde{c}^{\beta}\right] & =-\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{\alpha_{m}}{\alpha_{f}\gamma}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\frac{\Delta\tilde{c}^{\beta}}{\Delta t}dv\\
+ & -\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\Delta\tilde{c}^{\beta}\grad\left(J^{f}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\right)\cdot\mathbf{v}^{f}+\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\Delta\tilde{c}^{\beta}\cdot\mathbf{v}^{f}\right)dv\\
+ & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\beta}}\Delta\tilde{c}^{\beta}dv\\
+ & -\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad\Delta\tilde{c}^{\beta}+\Delta\tilde{c}^{\beta}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}d_{0}^{\iota}+\tilde{\kappa}^{\iota}\frac{\partial d_{0}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\iota}\right)dv\\
+ & -\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(z^{\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad\Delta\tilde{c}^{\beta}+\Delta\tilde{c}^{\beta}\sum_{\gamma}z^{\gamma}\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}d_{0}^{\gamma}+\tilde{\kappa}^{\gamma}\frac{\partial d_{0}^{\gamma}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\gamma}\right)dv
+\end{aligned}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Similarly, we can rewrite eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Ext-Virt-Work-CFDSol"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+\begin{aligned}\delta W_{ext}= & \int_{\Gamma^{f}}\delta\mathbf{v}^{f}\cdot\mathbf{t}^{\tau}da+\int_{\Gamma^{f}}\delta J^{f}v_{n}^{f}da+\int_{\Gamma^{f}}\delta\tilde{c}^{\iota}\tilde{j}_{n}^{\iota}da\\
+ & +\delta G_{ext}^{v}+\delta G_{ext}^{c}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\delta G_{ext}^{v} & =\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\rho^{f}\mathbf{b}^{f}+\sum_{\iota}M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)dv\\
+\delta G_{ext}^{c} & =\sum_{\iota}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\divg\left(\mathbf{j}_{b}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{b}^{\gamma}\right)\,dv
+\end{aligned}
+\]
+
+\end_inset
+
+and we can linearize 
+\begin_inset Formula $\delta G_{ext}^{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta G_{ext}^{c}$
+\end_inset
+
+ as
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta G_{ext}^{v}\right)\left[\Delta\mathbf{v}^{f}\right] & =\mathbf{0}\\
+D\left(\delta G_{ext}^{v}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(-\frac{\rho^{f}}{J^{f}}\mathbf{b}^{f}+\sum_{\iota}M^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\mathbf{b}^{\iota}\right)\Delta J^{f}dv\\
+D\left(\delta G_{ext}^{v}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{\iota}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot M^{\iota}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\Delta\tilde{c}^{\beta}\mathbf{b}^{\iota}dv
+\end{aligned}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta G_{ext}^{c}\right)\left[\Delta\mathbf{v}^{f}\right] & =\mathbf{0}\\
+D\left(\delta G_{ext}^{c}\right)\left[\Delta J^{f}\right] & =\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\left(s^{\iota}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\divg\mathbf{b}^{\iota}+\grad\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\right)\cdot\mathbf{b}^{\iota}\right)\right)\Delta J^{f}+s^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\grad\Delta J^{f}\cdot\mathbf{b}^{\iota}\right)\,dv\\
+ & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\sum_{\gamma}z^{\gamma}\left(s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\divg\mathbf{b}^{\gamma}+\grad\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\right)\cdot\mathbf{b}^{\gamma}\right)\Delta J^{f}+\sum_{\gamma}z^{\gamma}s^{\gamma}\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\right)\mathbf{b}^{\gamma}\cdot\grad\Delta J^{f}\right)\,dv\\
+D\left(\delta G_{ext}^{c}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}s^{\iota}\left(\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\divg\mathbf{b}^{\iota}+\grad\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\cdot\mathbf{b}^{\iota}\right)\Delta\tilde{c}^{\beta}\,dv\\
+ & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}s^{\iota}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\grad\Delta\tilde{c}^{\beta}\cdot\mathbf{b}^{\iota}\,dv\\
+ & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(z^{\beta}s^{\beta}\tilde{\kappa}^{\beta}\divg\mathbf{b}^{\beta}+z^{\beta}s^{\beta}\grad\tilde{\kappa}^{\beta}\cdot\mathbf{b}^{\beta}\right)\Delta\tilde{c}^{\beta}\,dv\\
+ & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(z^{\beta}s^{\beta}\tilde{\kappa}^{\beta}\mathbf{b}^{\beta}+\sum_{\gamma}z^{\gamma}s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\mathbf{b}^{\gamma}\right)\cdot\grad\Delta\tilde{c}^{\beta}\,dv\\
+ & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\sum_{\gamma}z^{\gamma}s^{\gamma}\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\divg\mathbf{b}^{\gamma}+\grad\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\right)\cdot\mathbf{b}^{\gamma}\right)\Delta\tilde{c}^{\beta}\,dv
+\end{aligned}
+\]
+
+\end_inset
+
+under the assumption that 
+\begin_inset Formula $D\mathbf{b}^{\alpha}\left[\Delta\mathbf{v}^{f}\right]=\mathbf{0}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discretization for Fluid-Solutes
 \end_layout
 
 \begin_layout Section
