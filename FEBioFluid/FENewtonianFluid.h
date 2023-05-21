@@ -59,18 +59,13 @@ public:
     
     //! dynamic viscosity
     double ShearViscosity(FEMaterialPoint& mp) override;
-    double TangentShearViscosityTemperature(FEMaterialPoint& mp);
 
     //! bulk viscosity
     double BulkViscosity(FEMaterialPoint& mp) override;
-    double TangentBulkViscosityTemperature(FEMaterialPoint& mp);
 
 public:
     double	m_kappa;	//!< bulk viscosity
     double	m_mu;		//!< shear viscosity
-    double  m_Tr;       //!< referential temperature
-    FEFunction1D*   m_kappahat; //!< normalized bulk viscosity vs normalized temperature
-    FEFunction1D*   m_muhat;    //!< normalized shear viscosity vs normalized temperature
 
     // declare parameter list
     DECLARE_FECORE_CLASS();
