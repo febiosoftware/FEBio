@@ -26,19 +26,19 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEInitialCondition.h>
 
-class FEInitialMixtureFluidPressure : public FEInitialDOF
+class FEInitialEffectiveFluidPressure : public FEInitialDOF
 {
 public:
-	FEInitialMixtureFluidPressure(FEModel* fem);
+	FEInitialEffectiveFluidPressure(FEModel* fem);
 	bool Init() override;
 
 	DECLARE_FECORE_CLASS();
 };
 
-class FEInitialShellMixtureFluidPressure : public FEInitialDOF
+class FEInitialShellEffectiveFluidPressure : public FEInitialDOF
 {
 public:
-	FEInitialShellMixtureFluidPressure(FEModel* fem);
+	FEInitialShellEffectiveFluidPressure(FEModel* fem);
 	bool Init() override;
 
 	DECLARE_FECORE_CLASS();
