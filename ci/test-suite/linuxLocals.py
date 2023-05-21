@@ -31,7 +31,7 @@ FEBIOUPLOADPATH = FEBIOPATH
 # HEATREMOTEDIR = "Linux/stage/lib"
 
 TESTDIR = path.join(FEBIODIR, "TestSuite/")
-VERIFYDIR = path.join(TESTDIR, "Verify3/")
+VERIFYDIR = path.join(TESTDIR, "Verify4/")
 LOGDIR = path.join(TESTDIR, "Logs")
 WORKINGDIR = VERIFYDIR
 
