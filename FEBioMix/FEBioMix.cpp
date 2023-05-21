@@ -115,6 +115,7 @@ SOFTWARE.*/
 #include "FEPrescribedNodalFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
+#include "FEMultiphasicFluidPressureBC.h"
 
 #include "FEInitialMixtureFluidPressure.h"
 #include "FEInitialConcentration.h"
@@ -318,12 +319,13 @@ void FEBioMix::InitModule()
 	// Surface loads
 	REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
     REGISTER_FECORE_CLASS(FESoluteNaturalFlux, "solute natural flux");
-    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureLoad, "fluid pressure");
+    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureLoad, "fluid pressure", 0x0300); // Deprecated, use the BC version.
 
 	//-----------------------------------------------------------------------------
 	// boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
 	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
+    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureBC, "fluid pressure");
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
