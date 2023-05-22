@@ -143,7 +143,7 @@ REGISTER_FECORE_CLASS(FECrossFluid        , "Cross"         );
 
 // elastic fluids
 REGISTER_FECORE_CLASS(FEIdealGasIsentropic, "ideal gas isentropic");
-REGISTER_FECORE_CLASS(FEIdealGasIsothermal, "ideal gas isothermal");
+//REGISTER_FECORE_CLASS(FEIdealGasIsothermal, "ideal gas isothermal");
 REGISTER_FECORE_CLASS(FELinearElasticFluid, "linear"        );
 REGISTER_FECORE_CLASS(FENonlinearElasticFluid, "nonlinear"  );
 REGISTER_FECORE_CLASS(FELogNonlinearElasticFluid, "log-nonlinear");
