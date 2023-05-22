@@ -95142,6 +95142,16 @@ In multiphasic analyses, FEBio solves for the solid displacement
 \end_inset
 
  of solid-bound molecules by solving the corresponding mass balance equation
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cr-sbm-mass-balance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
  at integration points, in a single numerical integration step.
  This approach reduces the number of degrees of freedom that need to be
  solved simultaneously by the FEBio solver.
@@ -95151,15 +95161,16 @@ In multiphasic analyses, FEBio solves for the solid displacement
 
  may produce numerical round-off errors that may get amplified as the analysis
  time progresses.
+ 
 \end_layout
 
 \begin_layout Standard
 An alternative to using solid-bound molecules is to define solutes 
-\begin_inset Formula $\alpha$
+\begin_inset Formula $\sigma$
 \end_inset
 
  whose diffusivity 
-\begin_inset Formula $\mathbf{d}^{\alpha}$
+\begin_inset Formula $\mathbf{d}^{\sigma}$
 \end_inset
 
  in the mixture is set to 
@@ -95167,12 +95178,12 @@ An alternative to using solid-bound molecules is to define solutes
 \end_inset
 
  (however, the free diffusivity 
-\begin_inset Formula $d_{0}^{\alpha}$
+\begin_inset Formula $d_{0}^{\sigma}$
 \end_inset
 
  should not be set to zero, to prevent a division by zero; its exact value
  is not important, thus let 
-\begin_inset Formula $d_{0}^{\alpha}=1$
+\begin_inset Formula $d_{0}^{\sigma}=1$
 \end_inset
 
 ).
@@ -95193,17 +95204,77 @@ al fluid; (2) their concentration contributes to the fixed charge density
  be prescribed, it must not contribute to the prescribed initial effective
  fluid pressure, and the user should not prescribe any boundary conditions
  on the effective concentration of these solutes.
- However, unlike solid-bound molecules, these solutes always have negligible
- volume fraction, therefore they don't alter the value of the referential
- solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
-\end_inset
-
-.
  Using these 'solid-bound' solutes increases the number of degrees of freedom
  in an FEBio analysis; however, unlike solid-bound molecules, the solution
  for the effective concentration of these solutes remains as accurate as
  all other degrees of freedom in an analysis.
+\end_layout
+
+\begin_layout Standard
+To evaluate the contribution of these solutes to the referential solid volume
+ fraction 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ and to chemical reactions, it should be recalled that the concentration
+ 
+\begin_inset Formula $c^{\sigma}$
+\end_inset
+
+ is related to the referential mass density 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ via eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:concentration-density-relations"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Using the expression for 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cr-referential-solid-vol-frac"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we find that
+\begin_inset Formula 
+\[
+\varphi_{r}^{s}=\varphi_{0}^{s}+\left(J-\varphi_{r}^{s}\right)\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}
+\]
+
+\end_inset
+
+which can be solved for 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ using the concentrations 
+\begin_inset Formula $c^{\sigma}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\varphi_{r}^{s}=\frac{\varphi_{0}^{s}+J\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}}{1+\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}}\,.
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -101481,9 +101552,11 @@ name "sec:Fluids"
 Fluid mechanics analyses may be used to examine fluid flow over fixed domains.
  Fluid-structure interactions (FSI) may be used to examine fluid flow over
  deforming domains.
- FEBio's fluid and fluid-FSI modules treat the fluid as isothermal (constant
- and uniform temperature) and compressible; incompressible flow is simulated
- by prescribing a physically realistic bulk modulus 
+ It is also possible to perform solute (mass) transport analyses in fluid
+ mixtures using the fluid-solutes module.
+ FEBio's fluid, fluid-FSI and fluid-solutes modules treat the fluid as isotherma
+l (constant and uniform temperature) and compressible; incompressible flow
+ is simulated by prescribing a physically realistic bulk modulus 
 \begin_inset Formula $K$
 \end_inset
 
@@ -101508,13 +101581,275 @@ where
 \begin_inset Formula $p$
 \end_inset
 
- is the fluid pressure arising from the elastic response and 
+ is the fluid pressure arising from the elastic and osmotic responses and
+ 
 \begin_inset Formula $\boldsymbol{\tau}$
 \end_inset
 
  is the viscous stress resulting from the fluid viscosity and its rate of
  deformation.
- The fluid pressure is evaluated from the dilatation 
+ FEBio's fluid solver uses the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, instead of the 
+\emph on
+effective fluid pressure
+\emph default
+ 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+, as a nodal degree of freedom.
+ The effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ may differ from the actual fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ if solutes are present in the fluid mixture, as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In fluid analyses the effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is also the elastic contribution to the fluid pressure, resulting from
+ changes in 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+.
+ FEBio provides several alternative constitutive models for the elastic
+ response 
+\begin_inset Formula $\tilde{p}\left(e^{f}\right)$
+\end_inset
+
+, including
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\tilde{p}\left(e^{f}\right) & =-Ke^{f} & \text{linear}\\
+\tilde{p}\left(e^{f}\right) & =K\left(\frac{1}{1+e^{f}}-1\right) & \text{nonlinear}\\
+\tilde{p}\left(e^{f}\right) & =-K\frac{\ln\left(1+e^{f}\right)}{1+e^{f}} & \text{log nonlinear}
+\end{aligned}
+\label{eq:fluid-pressure-state}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K$
+\end_inset
+
+ is the fluid's bulk modulus (a physical property that may be looked up
+ or measured).
+ The reason for selecting 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ instead of 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is that the dilatation (volumetric strain) is a kinematic measure, just
+ like the fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ (the other nodal degree of freedom) and its associated rate of deformation
+ tensor, whereas 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is a function of state (it needs to be formulated as a function of the
+ deformation, just like the viscous fluid stress 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+).
+ Here, 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is called the 
+\emph on
+elastic pressure
+\emph default
+ because it represents the elastic response (equivalent to the stress-strain
+ response in hyperelasticity for solid mechanics) of the fluid under isothermal
+ conditions.
+ The 
+\emph on
+linear
+\emph default
+ model in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is useful for nearly-incompressible flow, typically used for liquids.
+ However, if one expects high volumetric strains in the flow (e.g., at a stagnatio
+n point in a high-velocity fluid flow problem), it may be better to employ
+ one of the two 
+\emph on
+nonlinear
+\emph default
+ formulations in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In particular, for an ideal gas, the gauge pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{equation}
+\tilde{p}=P_{r}\left(\frac{\theta}{J^{f}\theta_{r}}-1\right)\quad J^{f}=1+e^{f}\label{eq:ideal-gas-pressure}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\theta_{r}$
+\end_inset
+
+ is the (arbitrarily selected) reference temperature and 
+\begin_inset Formula $P_{r}$
+\end_inset
+
+ is the corresponding referential absolute pressure (at 
+\begin_inset Formula $\theta=\theta_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $J^{f}=1$
+\end_inset
+
+).
+ When an ideal gas undergoes an isothermal process (
+\begin_inset Formula $\theta=\theta_{r}$
+\end_inset
+
+), eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ideal-gas-pressure"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ reduces to the 
+\emph on
+nonlinear
+\emph default
+ model in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, with bulk modulus 
+\begin_inset Formula $K=P_{r}$
+\end_inset
+
+.
+ Thus, the 
+\emph on
+nonlinear
+\emph default
+ model is consistent with ideal gas law under isothermal processes.
+ Isothermal processes produce zero heat flux, 
+\begin_inset Formula $\mathbf{q}=\mathbf{0}$
+\end_inset
+
+, however heat is generated by the fluid viscosity at the rate 
+\begin_inset Formula $\boldsymbol{\tau}:\mathbf{D}^{f}$
+\end_inset
+
+ where 
+\begin_inset Formula $\mathbf{D}^{f}$
+\end_inset
+
+ is the rate of deformation tensor for the fluid (see below).
+ Therefore, to maintain isothermal conditions, we must assume that this
+ heat is implicitly radiated into or out of the fluid domain.
+ For isentropic processes it can be shown that the temperature variation
+ in an ideal gas obeys 
+\begin_inset Formula $\theta/\theta_{r}=\left(J^{f}\right)^{1-\gamma}$
+\end_inset
+
+, where 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ is the ratio of isobaric to isochoric specific heat capacities, 
+\begin_inset Formula $\gamma=c_{p0}/c_{v0}$
+\end_inset
+
+.
+ In that case, the pressure in an ideal gas evolves according to 
+\begin_inset Formula $\tilde{p}=P_{r}\left(\left(1+e^{f}\right)^{-\gamma}-1\right)$
+\end_inset
+
+, which represents a fourth alternative to the three models presented in
+ eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, with 
+\begin_inset Formula $K=P_{r}$
+\end_inset
+
+.
+ Contrary to the simplifying assumptions found in thermodynamic textbooks,
+ an isentropic process is not automatically adiabatic (although the reverse
+ is true).
+ Therefore, when modeling ideal gases undergoing isentropic processes, it
+ is also assumed that the equation of energy balance is implicitly satisfied
+ by suitably radiating heat into or out of the fluid domain.
+\end_layout
+
+\begin_layout Standard
+The fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is evaluated from the dilatation 
 \begin_inset Formula $e^{f}$
 \end_inset
 
@@ -113283,103 +113618,7 @@ fluid-solutes
 \end_layout
 
 \begin_layout Standard
-FEBio's fluid solver differs from most computational fluid dynamics programs
- by its use of fluid dilatation 
-\begin_inset Formula $e^{f}$
-\end_inset
-
-, instead of the effective fluid pressure 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
-, as a nodal degree of freedom.
- In the 
-\emph on
-fluid
-\emph default
- module, these two variables are related by a constitutive relation, such
- as
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\tilde{p}\left(e^{f}\right) & =-Ke^{f} & \text{linear}\\
-\tilde{p}\left(e^{f}\right) & =K\left(\frac{1}{1+e^{f}}-1\right) & \text{nonlinear}\\
-\tilde{p}\left(e^{f}\right) & =-K\frac{\ln\left(1+e^{f}\right)}{1+e^{f}} & \text{log nonlinear}
-\end{aligned}
-\label{eq:fluid-pressure-state}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula $K$
-\end_inset
-
- is the fluid's bulk modulus (a physical property that may be looked up
- or measured).
- The reason for selecting 
-\begin_inset Formula $e^{f}$
-\end_inset
-
- instead of 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
- is that the dilatation (volumetric strain) is a kinematic measure, just
- like the fluid velocity 
-\begin_inset Formula $\mathbf{v}^{f}$
-\end_inset
-
- (the other nodal degree of freedom) and its associated rate of deformation
- tensor, whereas the pressure is a function of state (it needs to be formulated
- as a function of the deformation, just like the viscous fluid stress 
-\begin_inset Formula $\boldsymbol{\tau}$
-\end_inset
-
-).
- Here, 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
- is called the 
-\emph on
-elastic pressure
-\emph default
- because it represents the elastic response (equivalent to the stress-strain
- response in hyperelasticity for solid mechanics) of the fluid under isothermal
- conditions.
- The 
-\emph on
-linear
-\emph default
- model in eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:fluid-pressure-state"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
- is useful for nearly-incompressible flow, typically used for liquids.
- However, if one expects high volumetric strains in the flow (e.g., at a stagnatio
-n point in a high-velocity fluid flow problem), it may be better to employ
- one of the two 
-\emph on
-nonlinear
-\emph default
- formulations in eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:fluid-pressure-state"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-.
- The fluid Cauchy stress is given by 
+The fluid Cauchy stress is given by 
 \begin_inset Formula $\boldsymbol{\sigma}^{f}=-p\mathbf{I}+\boldsymbol{\tau}$
 \end_inset
 
