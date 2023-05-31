@@ -580,7 +580,6 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidE
     int nsol = m_pMat->Solutes();
     int ndpn = 4+nsol;
     vec3d f;
-    double divf;
     
     // gradient of shape functions
     vector<vec3d> gradN(neln);
@@ -608,19 +607,13 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidE
         vector<double> d0(nsol);
         vector<double> s(nsol);
         vector<vector<double>> d0p(nsol, vector<double>(nsol));
-        vector<vec3d> gradk(nsol);
         vector<vector<double>> wkcc(nsol, vector<double>(nsol));
         vector<double> wkce(nsol,0);
-        vector<vector<vec3d>> vkcc(nsol, vector<vec3d>(nsol));
-        vector<vec3d> vkce(nsol, vec3d(0,0,0));
         vector<vec3d> wkvc(nsol);
         vector<double> wkcJ(nsol,0);
-        vector<vec3d> vkcJ(nsol);
-        vec3d vkcJe(0,0,0);
 
         // get the force
         f = BF.force(mp);
-        divf = BF.divforce(mp);
         
         vec3d wkvJ = f*(-dens/(1+pt.m_ef));
         double wkcJe = 0;
@@ -630,21 +623,15 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidE
             M[isol] = m_pMat->GetSolute(isol)->MolarMass();
             d0[isol] = m_pMat->GetSolute(isol)->m_pDiff->Free_Diffusivity(mp);
             s[isol] = d0[isol]*M[isol]/(R*T);
-            gradk[isol] = pt.m_gradef*spt.m_dkdJ[isol];
             wkvJ += f*(M[isol]*spt.m_dkdJ[isol]*spt.m_c[isol]*dms);
             wkvc[isol] = f*(M[isol]*spt.m_k[isol]*dms);
             wkcJ[isol] = s[isol]*spt.m_dkdJ[isol]*spt.m_c[isol];
             wkcJe += z[isol]*wkcJ[isol];
-            vkcJ[isol] = spt.m_gradc[isol]*(s[isol]*spt.m_dkdJ[isol]);
-            vkcJe += vkcJ[isol]*z[isol];
             for (int jsol=0; jsol<nsol; ++jsol)
             {
                 d0p[isol][jsol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp, jsol);
                 wkcc[isol][jsol] = s[isol]*spt.m_dkdc[isol][jsol]*spt.m_c[isol];
                 wkce[jsol] += z[isol]*wkcc[isol][jsol];
-                vkcc[isol][jsol] = spt.m_gradc[isol]*(s[isol]*spt.m_dkdc[isol][jsol]);
-                vkce[jsol] += vkcc[isol][jsol]*z[isol];
-                gradk[isol] += spt.m_gradc[jsol]*spt.m_dkdc[isol][jsol];
                 wkvc[isol] += f*(M[jsol]*spt.m_dkdc[jsol][isol]*spt.m_c[jsol]*dms);
             }
         }
@@ -677,19 +664,15 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidE
                     ke[i4+1][j4+4+isol] += kvc.y;
                     ke[i4+2][j4+4+isol] += kvc.z;
                     
-                    double kcJ = H[i]*H[j]*((wkcJ[isol] + wkcJe)*divf + (vkcJ[isol] + vkcJe)*f)
-                    + (f*gradN[j])*H[i]*(wkcJ[isol] + wkcJe);
-                    ke[i4+4+isol][j4+3] += kcJ*detJ;
+                    double kcJ = -(gradN[i]*f)*H[j]*(wkcJ[isol] + wkcJe)*detJ;
+                    ke[i4+4+isol][j4+3] += kcJ;
                     
-                    double kcc = 0;
                     for(int jsol=0; jsol<nsol; ++jsol)
                     {
                         double kd = (isol == jsol) ? 1 : 0;
-                        kcc = (((kd+z[jsol])*s[jsol]*spt.m_k[jsol]+wkcc[isol][jsol] + wkce[jsol])*divf
-                        + (gradk[jsol]*((kd+z[jsol])*s[jsol]) + vkcc[isol][jsol] + vkce[jsol])*f)*H[i]*H[j]
-                        + ((kd+z[jsol])*s[jsol]*spt.m_k[jsol] + wkcc[isol][jsol] + wkce[jsol])*H[i]*(gradN[j]*f);
-                        
-                        ke[i4+4+isol][j4+4+jsol] += kcc*detJ;
+                        double kcc = -(gradN[i]*f)*H[j]*((kd + z[jsol])*s[jsol]*spt.m_k[jsol] + wkcc[isol][jsol] + wkce[jsol])*detJ;
+
+                        ke[i4+4+isol][j4+4+jsol] += kcc;
                     }
                 }
             }
