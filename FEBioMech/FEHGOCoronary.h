@@ -45,7 +45,7 @@ public:
 	double		m_k1;
 	double		m_k2;
 
-	FEParamVec3 m_fiber;
+	FEVec3dValuator* m_fiber;
 
 public:
 	//! calculate deviatoric stress at material point
