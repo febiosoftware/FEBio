@@ -239,15 +239,29 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	// find the element set
-	const char* szset = tag.AttributeValue("elem_set");
+	// process the attributes
+	const char* szset  = nullptr;
+	const char* sztype = nullptr;
+	const char* szname = nullptr;
+	const char* szdataType = nullptr;
+	const char* szfmt = nullptr;
+	for (XMLAtt& att : tag.m_att)
+	{
+		if      (strcmp(att.name(), "elem_set" ) == 0) szset  = att.cvalue();
+		else if (strcmp(att.name(), "type"     ) == 0) sztype = att.cvalue();
+		else if (strcmp(att.name(), "name"     ) == 0) szname = att.cvalue();
+		else if (strcmp(att.name(), "data_type") == 0) szdataType = att.cvalue();
+		else if (strcmp(att.name(), "format"   ) == 0) szfmt  = att.cvalue();
+		else throw XMLReader::InvalidAttribute(tag, att.name());
+	}
+
+	// name is required
+	if (szname == nullptr) throw XMLReader::MissingAttribute(tag, "name");
 
 	// find the element set in the mesh
+	if (szset == nullptr) throw XMLReader::MissingAttribute(tag, "elem_set");
 	FEElementSet* elset = mesh.FindElementSet(szset);
 	if (elset == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szset);
-
-	// get the type
-	const char* sztype = tag.AttributeValue("type", true);
 
 	if (sztype)
 	{
@@ -256,9 +270,6 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 		else if (strcmp(sztype, "fiber"          ) == 0) ParseMaterialFibers(tag, *elset);
 		else
 		{
-			// get the name (required!)
-			const char* szname = tag.AttributeValue("name");
-
 			// allocate generator
 			FEElemDataGenerator* gen = dynamic_cast<FEElemDataGenerator*>(fecore_new<FEMeshDataGenerator>(sztype, &fem));
 			if (gen == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
@@ -279,14 +290,10 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	}
 	else
 	{
-		// get the name (required!)
-		const char* szname = tag.AttributeValue("name");
-
-		if (szname == nullptr) throw XMLReader::InvalidAttributeValue(tag, "name");
+		// copy the name
 		string name = szname;
 
 		// get the data type
-		const char* szdataType = tag.AttributeValue("data_type", true);
 		if (szdataType == nullptr) szdataType = "scalar";
 		FEDataType dataType = str2datatype(szdataType);
 		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "data_type", szdataType);
@@ -295,11 +302,10 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 		Storage_Fmt fmt = (((dataType == FE_MAT3D) || (dataType == FE_MAT3DS)) ? Storage_Fmt::FMT_ITEM : Storage_Fmt::FMT_MULT);
 
 		// format overrider?
-		const char* szfmt = tag.AttributeValue("format", true);
 		if (szfmt)
 		{
-			if (szcmp(szfmt, "MAT_POINTS") == 0) fmt = Storage_Fmt::FMT_MATPOINTS;
-			else if (szcmp(szfmt, "ITEM") == 0) fmt = Storage_Fmt::FMT_ITEM;
+			if      (szcmp(szfmt, "MAT_POINTS") == 0) fmt = Storage_Fmt::FMT_MATPOINTS;
+			else if (szcmp(szfmt, "ITEM"      ) == 0) fmt = Storage_Fmt::FMT_ITEM;
 			else throw XMLReader::InvalidAttributeValue(tag, "format", szfmt);
 		}
 
