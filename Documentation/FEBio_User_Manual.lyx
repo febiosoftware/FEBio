@@ -67073,7 +67073,11 @@ porous neo-Hookean
  Thus, upon pore closure, the material behavior needs to switch from compressibl
 e to incompressible.
  This material may be used to model the porous solid matrix of a biphasic
- or multiphasic material.
+ or multiphasic material, in which case it inherits the value of 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ from that parent material.
 \end_layout
 
 \begin_layout Standard
@@ -108911,437 +108915,350 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
-
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
-
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
-
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
-
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
-
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
-
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
-
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
-
 		</material>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
-
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
-
 			<points>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
-
 			</points>
 \end_layout
 
 \begin_layout Verbatim
-
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
-
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
-
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
-
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
-
 </febio_spec>
 \end_layout
 
@@ -114464,27 +114381,29 @@ Fluid-solutes analyses introduce two types of molar fluxes into an analysis:
 
 .
  These molar fluxes represent the flux of the solute relative to the solvent.
- Since the sedimentation flux is produced by externally applied body forces,
- it does not enter into the natural boundary condition for the solute flux.
- Therefore, the natural boundary condition for solutes is 
+ The natural boundary condition for solutes is 
 \begin_inset Formula $\tilde{j}_{n}^{\iota}=0$
 \end_inset
 
 , where 
 \begin_inset Formula 
 \begin{equation}
-\tilde{j}_{n}^{\iota}=\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)\cdot\mathbf{n}\label{eq:normal-effective-solute-flux}
+\tilde{j}_{n}^{\iota}=\left(\mathbf{j}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}^{\gamma}\right)\cdot\mathbf{n}\label{eq:normal-effective-solute-flux}
 \end{equation}
 
 \end_inset
 
-is the normal component of the effective diffusive molar flux 
-\begin_inset Formula $\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}$
+is the normal component of the effective molar flux 
+\begin_inset Formula $\mathbf{j}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}^{\gamma}$
 \end_inset
 
- on a boundary.
- The effective diffusive molar flux is constructed in this manner to enforce
- the electroneutrality condition,
+ on a boundary, with 
+\begin_inset Formula $\mathbf{j}^{\iota}=\mathbf{j}_{d}^{\iota}+\mathbf{j}_{b}^{\iota}$
+\end_inset
+
+ representing the sum of diffusive and sedimentation fluxes.
+ The effective molar flux is constructed in this manner to enforce the electrone
+utrality condition,
 \begin_inset Formula 
 \begin{equation}
 \sum_{\iota}z^{\iota}c^{\iota}=0\label{eq:electroneutrality-condition}
@@ -114523,7 +114442,7 @@ Zero natural flux
 \end_inset
 
  implies that the solute moves at the velocity of the solvent (the fluid).
- Therefore, if the fluid satisfies
+ Therefore, if the fluid satisfies 
 \begin_inset Formula $v_{n}^{f}=0$
 \end_inset
 
@@ -114531,6 +114450,67 @@ Zero natural flux
  But if the fluid is allowed to transport across the boundary (e.g., using
  a prescribed fluid pressure), the solute can also transport across the
  boundary via convection.
+ Therefore, for open flows or flows through conduits, where the fluid pressure
+ is prescribed (e.g., set to zero) at an outlet boundary, no specific boundary
+ condition needs to be prescribed on the solute in order for the latter
+ to convect freely with the solvent at that outlet boundary.
+ However, if the solvent exhibits back flow on that boundary in a manner
+ that requires the application of the 
+\emph on
+fluid backflow stabilization
+\emph default
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Backflow-Stabilization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) and 
+\emph on
+fluid tangential stabilization
+\emph default
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Tangential-Stabilization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) surfaces loads, then consider also using the 
+\emph on
+solute backflow stabilization
+\emph default
+ surface load (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solute-Backflow-Stabilization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) on that boundary, to produce more physically-realistic solute flows on
+ such truncated domains, and improve numerical convergence.
 \end_layout
 
 \begin_layout Standard
@@ -114553,7 +114533,258 @@ noprefix "false"
 \begin_inset Formula $p$
 \end_inset
 
- on the boundary of a fluid-solutes domain, use 
+ on the boundary of a fluid-solutes domain, use the fluid pressure boundary
+ condition specified in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Pressure-BC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+By default, the fluid-solutes solver employs the 
+\emph on
+staggered
+\emph default
+ 
+\emph on
+equation_scheme
+\emph default
+ format for the stiffness matrix, and solves for the nodal fluid velocity
+ 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+, nodal dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ and nodal effective solute concentrations 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+ using a 
+\emph on
+coupled
+\emph default
+ 
+\emph on
+solve_strategy
+\emph default
+.
+ This default settings works well when the Peclet number (the ratio of solute
+ convective velocity to solute diffusive velocity) is relatively low (e.g.,
+ less than 100).
+ For these problems, using the default value of 
+\emph on
+ctol=0.01
+\emph default
+ is generally appropriate.
+ However, if users notice significant convergence difficulties on the solute
+ concentration as the Peclet number approaches 100 or greater, consider
+ setting 
+\emph on
+ctol=0
+\emph default
+.
+ When solving strongly convective solute transport problems with high Peclet
+ numbers (e.g., greater than 1000), diffusion will be negligible compared
+ to convection.
+ In that case, users should switch to 
+\emph on
+equation_scheme=block
+\emph default
+ and 
+\emph on
+solve_strategy=sequential
+\emph default
+ and set 
+\emph on
+ctol=0
+\emph default
+ to increase the chances of achieving a converged numerical solution.
+ The rationale for these choices is explained in the FEBio journal article
+ associated with this fluid-solutes solver 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim23"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+As done in the multiphasic solver, the solute volume fraction is considered
+ negligible in fluid mixtures modeled in the fluid-solutes solver.
+ Therefore, the volume of a fluid mixture will not change with increasing
+ solute concentrations.
+ When a solute is convected by the solvent, it means that the solvent exerts
+ a frictional force on the solute, whose magnitude is inversely proportional
+ to the solute diffusivity 
+\begin_inset Formula $d_{0}^{\iota}$
+\end_inset
+
+.
+ In the fluid-solutes solver, the acceleration of solutes is considered
+ negligible, implying that the velocity of the solute in the solvent reaches
+ its terminal velocity instantaneously (thus, inertial forces are negligible
+ compared to the drag force between solute and solvent).
+\end_layout
+
+\begin_layout Standard
+According to Newton's third law stating that every action force has an equal
+ and opposite reaction force, the drag force exerted by the solvent on the
+ solute is balanced by an equal and opposite reaction force exerted by the
+ solute on the solvent.
+ However, by default, this reaction force on the solvent is turned off in
+ the fluid-solutes solver.
+ In other words, the motion of the solvent affects that of the solute, but
+ the motion of the solute does not affect the solvent.
+ This default setting is adopted because it represent the common form of
+ diffusion-reaction equations modeled in most of the mass transport literature.
+ Therefore, when modeling solute diffusion problems in a stationary solvent
+ (e.g., in the absence of pressure or velocity-driven solvent flows), the
+ diffusive flux of a solute will not drag the solvent, keeping it in a stationar
+y state.
+ When the solvent motion is driven by solute concentration gradients, we
+ call it 
+\emph on
+osmosis
+\emph default
+.
+ There is no common term describing solvent motion caused by solute sedimentatio
+n (motion of solute under the action of a body force), so we use the term
+ 
+\emph on
+osmosis
+\emph default
+ to describe this phenomenon as well.
+ Users can override the default setting of the fluid-solutes solver by checking
+ the 
+\emph on
+include osmosis 
+\emph default
+box in the fluid-solutes material definition.
+ When this box is checked, the solvent will have a force exerted on it by
+ the solute (either due to diffusion or sedimentation, or both), causing
+ it to move.
+\end_layout
+
+\begin_layout Standard
+High-Peclet number flows are notoriously difficult to solve numerically.
+ In FEBio we have reported valid solutions for a Peclet number as high as
+ 
+\begin_inset Formula $10^{11}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim23"
+literal "false"
+
+\end_inset
+
+, thanks to the specific finite element formulation employed in the fluid-solute
+s solver, and the use of the sequential solver when needed.
+ Nevertheless, the fluid-solutes solver is not fool-proof.
+ In some problems, spurious increases in solute concentration can occur,
+ seemingly randomly in the mesh, even when using a highly regular mesh.
+ In many of these cases, this type of numerical artifact may go away by
+ simply refining the mesh.
+ However, users should be aware that this artifact may emerge 'silently',
+ meaning that it does not necessarily produce slower numerical convergence
+ that could hint at this problem.
+\end_layout
+
+\begin_layout Standard
+The explanation for this behavior is that the numerical solutions to the
+ effective solute concentrations at large Peclet numbers are effectively
+ solutions to the partial differential equation 
+\begin_inset Formula $D^{f}\left(J^{f}c^{\iota}\right)/Dt=0$
+\end_inset
+
+, as reviewed in the Theory Manual.
+ This integration is performed based on the current solution for 
+\begin_inset Formula $J^{f}=1+e^{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ as well as the structure of the mesh.
+ Any ill-conditioning in the mesh (such as a mesh which is too coarse) may
+ introduce a numerical round-off error in the calculation of 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+, and there is no other sufficiently dominant term in the solute mass balance
+ equation that can dampen or correct for such numerical round-offs.
+ Thus, they may grow over time.
+ Mesh refinements are required when encountering these circumstances.
+\end_layout
+
+\begin_layout Standard
+Other boundary conditions for the solute (such as the essential boundary
+ condition 
+\begin_inset Formula $\tilde{c}^{\iota}=0$
+\end_inset
+
+) may also improve predictions when using relatively coarse meshes, preventing
+ the occurrence of spurious rises which often initiate on boundaries.
+ Unfortunately, in some problems, this option forces users to adopt a non-physic
+al boundary condition which may produce unacceptable results.
+ This workaround may not be needed when using a sufficiently refined mesh,
+ though finer meshes typically require longer solution times.
+ Also note that highly irregular meshes near no-slip boundaries may cause
+ spurious rises in solute concentration in high Peclet number flows.
+ Therefore, it is recommended to use suitable meshing techniques for generating
+ boundary layer meshes, such as stacking pentahedral elements atop tetrahedral
+ elements when using unstructured tetrahedral meshes.
+ For diffusion-dominated or reaction-dominated flows however, these numerical
+ concerns may not arise.
+ Nevertheless, a thorough understanding of the underlying physics of these
+ problems is essential for properly prescribing boundary conditions, and
+ the number and size of time increments in a finite element analysis.
+\end_layout
+
+\begin_layout Standard
+The default settings for the fluid-solutes solver force it to reform the
+ stiffness matrix at the start of each time step.
+ This is a standard requirement in most of the FEBio solvers (including
+ solid and structural mechanics, and standard biphasic and multiphasic domains),
+ though it had previously been demonstrated that the fluid solver could
+ avoid reforming the stiffness matrix even after achieving convergence at
+ a given time step, producing a very efficient computational scheme.
+ Unfortunately, this increased efficiency is not always an option with the
+ fluid-solutes solver, because the stiffness matrix contains terms that
+ depend significantly on the solute concentrations.
+ As these concentrations evolve over time and space, it becomes essential
+ to update the stiffness matrix to reflect those changes.
+ Therefore, consider using the direct sparse solver from the Intel MKL library
+ (
+\emph on
+linear_solver=Mkl dss
+\emph default
+) to improve computational efficiency during matrix factorization, in comparison
+ to the Pardiso solver from the same library.
+ Moreover, in applications where the initial solute concentration is non-zero,
+ and non-negligible compared to the prescribed change in concentration on
+ an inlet boundary, it may be possible to solve a fluid-solutes problem
+ more efficiently without reforming the stiffness matrix at each time step.
 \end_layout
 
 \begin_layout Section

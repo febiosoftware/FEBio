@@ -32,7 +32,7 @@ BEGIN_FECORE_CLASS(FEHGOCoronary, FEUncoupledMaterial)
 	ADD_PARAMETER(m_k1 , "k1");
 	ADD_PARAMETER(m_k2 , "k2");
 
-	ADD_PARAMETER(m_fiber, "fiber");
+	ADD_PROPERTY(m_fiber, "fiber");
 	
 END_FECORE_CLASS();
 
@@ -46,7 +46,7 @@ FEHGOCoronary::FEHGOCoronary(FEModel* pfem) : FEUncoupledMaterial(pfem)
 	m_rho = 0.0;
 	m_k1 = 0.0;
 	m_k2 = 1.0;
-	m_fiber = vec3d(1,0,0);
+	m_fiber = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,8 +66,9 @@ mat3ds FEHGOCoronary::DevStress(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// fiber vector
+	vec3d fiber = m_fiber->unitVector(mp);
 	mat3d Q = GetLocalCS(mp);
-	vec3d a0 = Q*m_fiber(mp); a0.unit();
+	vec3d a0 = Q*fiber; a0.unit();
 	vec3d a = F * a0;
 	double lam = Jm13 * a.unit();
 	mat3ds m = dyad(a);
@@ -121,8 +122,9 @@ tens4ds FEHGOCoronary::DevTangent(FEMaterialPoint& mp)
 	mat3ds B2 = B.sqr();
 
 	// fiber vector
+	vec3d fiber = m_fiber->unitVector(mp);
 	mat3d Q = GetLocalCS(mp);
-	vec3d a0 = Q*m_fiber(mp); a0.unit();
+	vec3d a0 = Q*fiber; a0.unit();
 	vec3d a = F * a0;
 	double lam = Jm13 * a.unit();
 	mat3ds m = dyad(a);
@@ -197,8 +199,9 @@ double FEHGOCoronary::DevStrainEnergyDensity(FEMaterialPoint& mp)
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// fiber vector
+	vec3d fiber = m_fiber->unitVector(mp);
 	mat3d Q = GetLocalCS(mp);
-	vec3d a0 = Q*m_fiber(mp); a0.unit();
+	vec3d a0 = Q*fiber; a0.unit();
 	vec3d a = F * a0;
 	double lam = Jm13 * a.unit();
 
