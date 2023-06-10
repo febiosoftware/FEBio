@@ -203,7 +203,8 @@ bool poly1FS(vector<double> a, double& x)
 {
     if (a[1]) {
         x = -a[0]/a[1];
-        return true;
+        if (x > 0) return true;
+        else return false;
     } else {
         return false;
     }
@@ -214,7 +215,8 @@ bool poly2FS(vector<double> a, double& x)
 {
     if (a[2]) {
         x = (-a[1]+sqrt(SQR(a[1])-4*a[0]*a[2]))/(2*a[2]);
-        return true;
+        if (x > 0) return true;
+        else return false;
     } else {
         return poly1FS(a,x);
     }
