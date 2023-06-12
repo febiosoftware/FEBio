@@ -179,13 +179,16 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
     int iter = 0;
     do {
         wbi = pd.m_wbt;
+        // get current and previous k value
+        double kn1 = k0*(pow(fabs(pd.m_aXit)*pd.m_wbt,beta));
+        double kn = k0*(pow(fabs(pd.m_aXip)*pd.m_wbp,beta));
         // evaluate mass supply from fatigue of intact bonds
-        double dwf = k0*dt/2*(pow(fabs(pd.m_aXit)*pd.m_wbt,beta)*pd.m_wit+pow(fabs(pd.m_aXip)*pd.m_wbp,beta)*pd.m_wip);
+        double dwf = ((kn1*dt + kn*dt)/(2 + kn1*dt))*pd.m_wip;
         double Fdwf = m_pFdmg->cdf(pt,Xftrl);
         
         // kinetics of intact bonds
-        pd.m_wit = (pd.m_Fip < 1) ? pd.m_wip*(1-pd.m_Fit)/(1-pd.m_Fip) - dwf : pd.m_wip;
-        pd.m_wbt = (pd.m_Fip < 1) ? pd.m_wbp + pd.m_wip*(pd.m_Fit - pd.m_Fip)/(1-pd.m_Fip) : pd.m_wbp;
+        pd.m_wit = (pd.m_Fip < 1) ? (pd.m_wip - dwf)*(1-pd.m_Fit)/(1-pd.m_Fip) : pd.m_wip;
+        pd.m_wbt = (pd.m_Fip < 1) ? pd.m_wbp + (pd.m_wip - dwf)*(pd.m_Fit - pd.m_Fip)/(1-pd.m_Fip) : pd.m_wbp;
         // add or update new generation
         if ((pd.m_fb.size() == 0) || pd.m_fb.back().m_time < tp.currentTime) {
             // add generation of fatigued bonds
