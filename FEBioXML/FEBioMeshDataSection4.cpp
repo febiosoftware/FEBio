@@ -255,9 +255,6 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 		else throw XMLReader::InvalidAttribute(tag, att.name());
 	}
 
-	// name is required
-	if (szname == nullptr) throw XMLReader::MissingAttribute(tag, "name");
-
 	// find the element set in the mesh
 	if (szset == nullptr) throw XMLReader::MissingAttribute(tag, "elem_set");
 	FEElementSet* elset = mesh.FindElementSet(szset);
@@ -290,6 +287,9 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	}
 	else
 	{
+		// name is required
+		if (szname == nullptr) throw XMLReader::MissingAttribute(tag, "name");
+
 		// copy the name
 		string name = szname;
 
