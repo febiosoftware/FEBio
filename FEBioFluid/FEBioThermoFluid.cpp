@@ -40,8 +40,10 @@ SOFTWARE.*/
 #include "FEFluidHeatSupplyConst.h"
 #include "FEFluidNormalHeatFlux.h"
 #include "FEFluidNaturalHeatFlux.h"
+#include "FENewtonianThermoFluid.h"
 #include "FEIdealGas.h"
 #include "FERealGas.h"
+#include "FERealVapor.h"
 #include "FERealLiquid.h"
 #include "FEFluidConstantConductivity.h"
 #include "FETempDependentConductivity.h"
@@ -121,11 +123,23 @@ void FEBioThermoFluid::InitModule()
     
     //-----------------------------------------------------------------------------
     // Materials
+    
+    // viscous thermofluids
+    REGISTER_FECORE_CLASS(FENewtonianThermoFluid, "Newtonian fluid");
+    
+    // elastic fluids
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
     REGISTER_FECORE_CLASS(FERealGas    , "real gas"    );
+    REGISTER_FECORE_CLASS(FERealVapor  , "real vapor"  );
     REGISTER_FECORE_CLASS(FERealLiquid , "real liquid" );
+    
+    // thermal conductivity
     REGISTER_FECORE_CLASS(FEFluidConstantConductivity, "constant thermal conductivity");
     REGISTER_FECORE_CLASS(FETempDependentConductivity, "temp-dependent thermal conductivity");
+    
+    
+    //-----------------------------------------------------------------------------
+    // loads
     REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure");
 
     //-----------------------------------------------------------------------------
