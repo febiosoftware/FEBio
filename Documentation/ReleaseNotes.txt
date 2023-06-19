@@ -45,8 +45,6 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
-* Added FERealVapor material model for thermo-fluid analyses. Included FENewtonianThermoFluid as material in thermo-fluid module. Added long name for molar mass in FEIdealGas and FEIdealGasIsothermal.
-* Implemented Brandon's fixes to the reactive fatigue algorithm.
 * Fixed issue with name attribute of ElementData tag.
 * Fixed crash if no analysis steps are defined.
 * Modified how attributes are processed in FEBioMeshDataSection4::ParseElementData so that invalid attributes can be identified.
@@ -60,19 +58,17 @@ at https://forums.febio.org/.
 * Updated FEFluidSolutesDomain to handle osmosis and sedimentation better (when requested).
 * Exporting additional symbols from febiorve (to make them available to plugins on Windows).
 * Fixed bug in FEFluidSolutesDomain3D to calculate sum of reaction rates from all reactions (instead of just one reaction). Simplified some calculations of internal work and stiffness matrix.
-* Removed 'ideal gas isothermal' from list of fluid materials (since it is equivalent to 'nonlinear' fluid). Modified 'ideal gas isentropic' to be a FEElasticFluid material, showing up as alternative to other elastic fluids. Modified initialization of FEFluid to account for ideal gas isentropic and to properly initialize elastic fluids.
 * Updated User Manual to improve description of elastic fluid materials and to explain that solutes that represent solid-bound-molecules can now contribute to the referential solid volume fraction
 * Added out-of-bounds check to ImageMap::gradient.
 * Modified multiphasic framework so that solutes that represent solid-bound-molecules do contribute to the referential solid volume fraction of the multiphasic mixture, by modifying FEMultiphasic::SolidReferentialVolumeFraction. Also updated order of initialization of material points in FEMultiphasicSolidDomain::InitMaterialPoints and FEMultiphasicShellDomain::InitMaterialPoints.
 * Updated User Manual description for solute molar flux in fluid-solutes materials
-* Release FEFluidSolutesModule.
+* Released the FEFluidSolutesModule.
 * Updated Theory and User Manuals to include fluid-solutes analyses and other surface BCs that had not been described.  More work TBD with Theory Manual.
 * Deleted deprecated FEPoroTraction files
 * Deprecated FEMultipihasicFluidPressureLoad for versions > 4.0. Changed FEMulatiphasicFluidPressureBC description to "actual fluid pressure" to avoid conflict with "fluid pressure" BCs in fluid, fluid-FSI and fluid-solutes analyses. Minor fix to FEBioFluidSolutes.cpp.
 * Deleted deprecated fluid-solutes surface loads
 * Delete FEFluidSolutesPressure and FEFluidSolutesPressureLC. Commented out FEInitialFluidSolutesPressure (not sure if we need to keep it).  Added FENewtonianThermoFluid.
 * Simplified formulation of FESoluteBackflowStabilization.
-* Reverted FENewtonianFluid to its original version (discarded temperature-dependent viscosity).
 * Added FEMultiphasicFluidPressureBC as a BC that supersedes deprecated FEMultiphasicFluidPressureLoad.
 * Added plot variables for various strain measures derived from the growth tensor of a kinematic growth material. Updated the kinematic growth material so that it correctly stores the elastic and growth deformation gradients. Cleaned up the method for creating material point data for the kinematic growth material. Fixed the UpdateSpecializedMaterialPoints function of FEKinematicGrowth to properly replace the deformation gradient calculated from the deformation with the elastic deformation gradient evaluated from the multiplicative decomposition. This provides the correct deformation gradient for calculation of strain-dependent stress, permeability, etc., and associated tangents.
 *	Added description of the "contact potential" formulation ot user manual.
@@ -83,7 +79,7 @@ at https://forums.febio.org/.
 * Fixed error in description of CG iterative solver.
 * Added default calculation of divergence of body force from trace of stiffness (its spatial gradient).
 * Updated fluid-solutes module to discard old formulation in FEFluidSolutesDomain3D and FESoluteBackflowStabilization. Converted unneeded boundary conditions to EXPERIMENTAL status.
-* Updated body force class to include a function for the calculation of the divergence of the body force.  Updated derived classes to perform that calculation. Fixed the calculation of the body force stiffness matrix in the fluid-solutes domain, using divergence of body force.
+* Updated body force class to include a function for the calculation of the divergence of the body force. Updated derived classes to perform that calculation. Fixed the calculation of the body force stiffness matrix in the fluid-solutes domain, using divergence of body force.
 * Added NodeNormal and UpdateNormals functions to FESurface.
 * Created version of fluid RCR boundary condition for fluid-solutes solver. Added units to parameters in FEFluidRCBC, FEFluidRCRBC, FEFluidRCRLoad, FEFluidResistanceBC, FEFluidResistanceLoad, FEFluidSolutesResistanceBC.  Updated new formulation for fluid-solutes module. Modified sequential solver in fluid-solutes module to ignore concentration residual when ctol=0. Updated solutes back flow stabilization for new formulation of fluid-solutes solver.
 * Added units of length for gap tolerance and search radius fields for several contact interfaces.
@@ -102,7 +98,6 @@ at https://forums.febio.org/.
 * Added serialization to FEPorousNeoHookean.
 * Fixed problem with copying valuators.
 * Update FEPorousNeoHookean to be more robust to inclusion in an elastic mixture which is the solid part of a biphasic/biphasic-solute or multiphasic material.
-* Added some features to thermofluid solver (may have to be removed or hidden later)
 * Fixed issue with initialization of load controllers added in restart input file.
 * Fixed bug in serialization of rigid nodeset.
 * Added FEStiffnessDiagnostic.
@@ -110,14 +105,12 @@ at https://forums.febio.org/.
 * Fixed issue with rigid shell initialization.
 * Added support for feb4 step section in restart input file.
 * Fixed bug with setting dump file name.
-* Fixed bug in implementation of FEInitialFluidPressureTemperature
 * Fixed several serialization issues.
 * Now storing covariant and contravariant vectors in shell element instead of recomputing each time.
 * Minor changes to omp logic in FEExplicitSolver::DoSolve.
 * Fixed serialization of FEMathValuator.
 * Improved serialization for fluid-related solvers, materials, boundary conditions and domains.
 * Initialized L0 in bool FEElasticTrussDomain::Init().
-* Introduced initial condition that specifies initial pressure and temperature in thermofluid problems (converts it to initial fluid dilatation and temperature). Fixed a few serialization issues in fluid, thermo-fluid and fluid-solute analyses. Converted constant fluid thermal conductivity to FEParamDouble.
 * Removed serialization of m_dof in FESurfaceLoad since it's already serialized in FEModelLoad.
 
 
