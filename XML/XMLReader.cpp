@@ -326,7 +326,7 @@ void XMLTag::value(vector<double>& l)
 	while (sz && *sz)
 	{
 		// skip space
-		while (*sz == ' ') ++sz;
+		while (isspace(*sz)) ++sz;
 
 		// read the value
 		if (sz && *sz)
@@ -348,7 +348,7 @@ void XMLTag::value2(std::vector<int>& l)
 	while (sz && *sz)
 	{
 		// skip space
-		while (*sz == ' ') ++sz;
+		while (isspace(*sz)) ++sz;
 
 		// read the value
 		if (sz && *sz)
