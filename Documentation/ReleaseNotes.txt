@@ -41,44 +41,27 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
- R E L E A S E   4.2   6/19/2023
+ R E L E A S E   4.2   6/20/2023
 
 ===========================================================================
 
-* Fixed issue with name attribute of ElementData tag.
-* Fixed crash if no analysis steps are defined.
-* Modified how attributes are processed in FEBioMeshDataSection4::ParseElementData so that invalid attributes can be identified.
-* Modified how the fibers are defined for the HGO-coronary material so that they show up correctly in febio studio.
+New Features:
+* A fluid-solutes module has been introduced, for fluid analyses with solute transport and reactive processes.
+
+Improvements:
 * Updated description of porous neo-Hookean material to indicate that solid volume fraction is inherited from parent material if biphasic or multiphasic
-* Updated User Manual to include better guidelines for fluid-solutes analyses
-* Improved robustness of electric potential calculation in FEFluidSolutes.
-* Updated Theory Manual to combine sedimentation and diffusive solute fluxes as natural BCs in fluid-solutes analyses
-* Modified FEFluidSolutesDomain3D to combine sedimentation flux with diffusive flux as natural BC. Added units to FESoluteData and FESBMData.
-* Added complete derivation of discretized weak virtual work for fluid-solutes formulation in Theory Manual
-* Updated FEFluidSolutesDomain to handle osmosis and sedimentation better (when requested).
 * Exporting additional symbols from febiorve (to make them available to plugins on Windows).
-* Fixed bug in FEFluidSolutesDomain3D to calculate sum of reaction rates from all reactions (instead of just one reaction). Simplified some calculations of internal work and stiffness matrix.
-* Updated User Manual to improve description of elastic fluid materials and to explain that solutes that represent solid-bound-molecules can now contribute to the referential solid volume fraction
 * Added out-of-bounds check to ImageMap::gradient.
 * Modified multiphasic framework so that solutes that represent solid-bound-molecules do contribute to the referential solid volume fraction of the multiphasic mixture, by modifying FEMultiphasic::SolidReferentialVolumeFraction. Also updated order of initialization of material points in FEMultiphasicSolidDomain::InitMaterialPoints and FEMultiphasicShellDomain::InitMaterialPoints.
-* Updated User Manual description for solute molar flux in fluid-solutes materials
-* Released the FEFluidSolutesModule.
-* Updated Theory and User Manuals to include fluid-solutes analyses and other surface BCs that had not been described.  More work TBD with Theory Manual.
+* Updated User Manual to improve description of elastic fluid materials and to explain that solutes that represent solid-bound-molecules can now contribute to the referential solid volume fraction
 * Deleted deprecated FEPoroTraction files
 * Deprecated FEMultipihasicFluidPressureLoad for versions > 4.0. Changed FEMulatiphasicFluidPressureBC description to "actual fluid pressure" to avoid conflict with "fluid pressure" BCs in fluid, fluid-FSI and fluid-solutes analyses. Minor fix to FEBioFluidSolutes.cpp.
-* Deleted deprecated fluid-solutes surface loads
-* Delete FEFluidSolutesPressure and FEFluidSolutesPressureLC. Commented out FEInitialFluidSolutesPressure (not sure if we need to keep it).  Added FENewtonianThermoFluid.
-* Simplified formulation of FESoluteBackflowStabilization.
 * Added FEMultiphasicFluidPressureBC as a BC that supersedes deprecated FEMultiphasicFluidPressureLoad.
 * Added plot variables for various strain measures derived from the growth tensor of a kinematic growth material. Updated the kinematic growth material so that it correctly stores the elastic and growth deformation gradients. Cleaned up the method for creating material point data for the kinematic growth material. Fixed the UpdateSpecializedMaterialPoints function of FEKinematicGrowth to properly replace the deformation gradient calculated from the deformation with the elastic deformation gradient evaluated from the multiplicative decomposition. This provides the correct deformation gradient for calculation of strain-dependent stress, permeability, etc., and associated tangents.
-*	Added description of the "contact potential" formulation ot user manual.
-* Fixed some issues with setting the preconditioner for the cg, fgmres, and bicgstab iterative solvers
+* Added description of the "contact potential" formulation ot user manual.
 * Fixed bug in FEKinematicGrowth that prevented proper integration with solid mixtures.
 * Updated FEPoroTraction to FEMixtureNormalTraction. Modified FECarterHayes to accept sbm specification as name instead of number. Added units to FEInitialConcentration. Added long names to parameters of FESolidBoundMolecule. Minor tweaks to serialization of FETiedMultiphasicInterface.
-* Fixed issue with incomplete Cholesky and CG iterative solver.
-* Fixed error in description of CG iterative solver.
 * Added default calculation of divergence of body force from trace of stiffness (its spatial gradient).
-* Updated fluid-solutes module to discard old formulation in FEFluidSolutesDomain3D and FESoluteBackflowStabilization. Converted unneeded boundary conditions to EXPERIMENTAL status.
 * Updated body force class to include a function for the calculation of the divergence of the body force. Updated derived classes to perform that calculation. Fixed the calculation of the body force stiffness matrix in the fluid-solutes domain, using divergence of body force.
 * Added NodeNormal and UpdateNormals functions to FESurface.
 * Created version of fluid RCR boundary condition for fluid-solutes solver. Added units to parameters in FEFluidRCBC, FEFluidRCRBC, FEFluidRCRLoad, FEFluidResistanceBC, FEFluidResistanceLoad, FEFluidSolutesResistanceBC.  Updated new formulation for fluid-solutes module. Modified sequential solver in fluid-solutes module to ignore concentration residual when ctol=0. Updated solutes back flow stabilization for new formulation of fluid-solutes solver.
@@ -86,32 +69,41 @@ at https://forums.febio.org/.
 * Added dynamic analysis capability to EAS and ANS shell domains using generalized-alpha method.  Added units to initial velocity condition. Modified secant stress and secant tangent routines to return material stress and elasticity tensors when requested.
 * Added FEBIOMECH_API to FEFiberMaterialPoint (for plugins on Windows).
 * Renamed FEInitialFluidPressure to FEInitialMixtureFluidPressure to avoid naming conflict with FEBioFluid library.
-* Fixed incorrect values for output_level.
-* Fixed issue with serialization of data maps.
-* Added initial fluid pressure in FEBioFluid and separate version in FEBioFluidSolutes.  Added FEFluidSolutesResistanceBC class. Changed call to Dilatation virtual function in FEElasticFluid to exclude solute concentration. Added function to evaluate solute diffusive flux in FEFluidSolutes. Updated FEFluidSolutesDomain3D to introduce a new formulation for fluid-solutes calculations (leaving old formulation for now, to perform more comparisons). Updated FEFluidSolutesNaturalFlux load to account for new formulation. Added units to various initial conditions.
+* Added initial fluid pressure in FEBioFluid and separate version in FEBioFluidSolutes.  Added FEFluidSolutesResistanceBC class. Changed call to Dilatation virtual function in FEElasticFluid to exclude solute concentration.  Added units to various initial conditions.
 * Added default load curve flags on nodal force and nodal load parameters.
-* Fixed bug in plotting solid mixture nested variables, when plotting component that doesn't exist.
 * Added plot variables for fluid relative Reynolds number and solute relative Peclet number.
 * Added new fiber models FEFiberCDF and FEFiberCDFUncoupled.  Added plot variable for 'deviatoric elasticity' which saves the DevTangent of uncoupled materials.
-* Simplified evaluation of FEPorousNeoHookean::ReferentialSolidVolumeFraction. Fixed serialization of FENodalLoad.
-* Removed unnecessary serialization from FEPorousNeoHookean.
-* Added serialization to FEPorousNeoHookean.
-* Fixed problem with copying valuators.
+* Simplified evaluation of FEPorousNeoHookean::ReferentialSolidVolumeFraction.
+* Changed serialization from FEPorousNeoHookean.
 * Update FEPorousNeoHookean to be more robust to inclusion in an elastic mixture which is the solid part of a biphasic/biphasic-solute or multiphasic material.
-* Fixed issue with initialization of load controllers added in restart input file.
-* Fixed bug in serialization of rigid nodeset.
 * Added FEStiffnessDiagnostic.
 * Added set command to febio prompt.
-* Fixed issue with rigid shell initialization.
 * Added support for feb4 step section in restart input file.
-* Fixed bug with setting dump file name.
-* Fixed several serialization issues.
 * Now storing covariant and contravariant vectors in shell element instead of recomputing each time.
 * Minor changes to omp logic in FEExplicitSolver::DoSolve.
-* Fixed serialization of FEMathValuator.
 * Improved serialization for fluid-related solvers, materials, boundary conditions and domains.
 * Initialized L0 in bool FEElasticTrussDomain::Init().
 * Removed serialization of m_dof in FESurfaceLoad since it's already serialized in FEModelLoad.
+
+Bug Fixes:
+* Fixed issue with name attribute of ElementData tag.
+* Fixed crash if no analysis steps are defined.
+* Modified how attributes are processed in FEBioMeshDataSection4::ParseElementData so that invalid attributes can be identified.
+* Modified how the fibers are defined for the HGO-coronary material so that they show up correctly in febio studio.
+* Fixed some issues with setting the preconditioner for the cg, fgmres, and bicgstab iterative solvers
+* Fixed issue with incomplete Cholesky and CG iterative solver.
+* Fixed error in description of CG iterative solver.
+* Fixed incorrect values for output_level.
+* Fixed issue with serialization of data maps.
+* Fixed bug in plotting solid mixture nested variables, when plotting component that doesn't exist.
+* Fixed serialization of FENodalLoad.
+* Fixed problem with copying valuators.
+* Fixed issue with initialization of load controllers added in restart input file.
+* Fixed bug in serialization of rigid nodeset.
+* Fixed issue with rigid shell initialization.
+* Fixed bug with setting dump file name.
+* Fixed several serialization issues.
+* Fixed serialization of FEMathValuator.
 
 
 ===========================================================================
