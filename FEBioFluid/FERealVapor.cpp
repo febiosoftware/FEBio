@@ -29,7 +29,7 @@
 #include <FECore/log.h>
 #include <FECore/FEFunction1D.h>
 #include <FECore/sys.h>
-#include <FECore/FEPolySolve.h>
+#include <FECore/tools.h>
 #include "FEFluidMaterialPoint.h"
 #include "FEThermoFluidMaterialPoint.h"
 
@@ -423,7 +423,6 @@ double FERealVapor::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 //! dilatation from temperature and pressure
 bool FERealVapor::Dilatation(const double T, const double p, double& e)
 {
-    FEPolySolve* ps;
     double Phat = 1 + p/m_Pr;
     double That = (T+m_Tr)/m_Tr;
     double Psat = 1 + m_psat->value(That);
@@ -437,7 +436,7 @@ bool FERealVapor::Dilatation(const double T, const double p, double& e)
     if (m_nvp == 1) { e = J - 1; return true; }
     // solve iteratively for J using Newton's method
     double x = Jsat/J;
-    bool convgd = ps->solvepoly(m_nvp, B, x, false);
+    bool convgd = solvepoly(m_nvp, B, x, false);
     J = Jsat/x;
     e = J - 1;
     return convgd;

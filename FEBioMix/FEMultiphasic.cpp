@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/log.h>
 #include <FECore/tens4d.h>
-#include <FECore/FEPolySolve.h>
+#include <FECore/tools.h>
 #include <complex>
 using namespace std;
 
@@ -296,7 +296,6 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 //! Electric potential
 double FEMultiphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 {
-    FEPolySolve* ps;
 	// check if solution is neutral
 	if (m_ndeg == 0) {
 		if (eform) return 1.0;
@@ -341,7 +340,7 @@ double FEMultiphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 	// solve polynomial
 	double psi = set.m_psi;		// use previous solution as initial guess
 	double zeta = exp(-m_Fc*psi/m_Rgas/m_Tabs);
-	if (!ps->solvepoly(n, a, zeta)) {
+	if (!solvepoly(n, a, zeta)) {
 		zeta = 1.0;
 	}
 	
@@ -780,8 +779,6 @@ vec3d FEMultiphasic::SoluteFlux(FEMaterialPoint& pt, const int sol)
 //! actual fluid pressure
 double FEMultiphasic::Pressure(FEMaterialPoint& pt)
 {
-	int i;
-	
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	const int nsol = (int)m_pSolute.size();
