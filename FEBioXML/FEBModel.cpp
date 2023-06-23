@@ -94,6 +94,24 @@ void FEBModel::ElementSet::SetElementList(const vector<int>& elem) { m_elem = el
 const vector<int>& FEBModel::ElementSet::ElementList() const { return m_elem; }
 
 //=============================================================================
+FEBModel::PartList::PartList() {}
+FEBModel::PartList::PartList(const std::string& name) : m_name(name) {}
+
+void FEBModel::PartList::SetName(const std::string& name) { m_name = name; }
+const std::string& FEBModel::PartList::Name() const { return m_name; }
+
+void FEBModel::PartList::SetPartList(const std::vector<std::string>& parts) { m_parts = parts; }
+const std::vector<std::string>& FEBModel::PartList::GetPartList() const { return m_parts; }
+
+FEBModel::PartList* FEBModel::Part::FindPartList(const string& name)
+{
+	for (PartList* ps  : m_PList) {
+		if (ps->Name() == name) return ps;
+	}
+	return nullptr;
+}
+
+//=============================================================================
 FEBModel::SurfacePair::SurfacePair() {}
 FEBModel::SurfacePair::SurfacePair(const SurfacePair& surfPair)
 {

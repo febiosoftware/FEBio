@@ -186,6 +186,23 @@ public:
 		std::vector<int>	m_elem;
 	};
 
+	class PartList
+	{
+	public:
+		PartList();
+		PartList(const std::string& name);
+
+		void SetName(const std::string& name);
+		const std::string& Name() const;
+
+		void SetPartList(const std::vector<std::string>& parts);
+		const std::vector<std::string>& GetPartList() const;
+
+	private:
+		std::string					m_name;
+		std::vector<std::string>	m_parts;
+	};
+
 	class SurfacePair
 	{
 	public:
@@ -261,6 +278,11 @@ public:
 		ElementSet* GetElementSet(int i) { return m_ESet[i]; }
 		ElementSet* FindElementSet(const std::string& name);
 
+		int PartLists() const { return (int)m_PList.size(); }
+		void AddPartList(PartList* plist) { m_PList.push_back(plist); }
+		PartList* GetPartList(int i) { return m_PList[i]; }
+		PartList* FindPartList(const std::string& name);
+
 		int SurfacePairs() const { return (int)m_SurfPair.size(); }
 		void AddSurfacePair(SurfacePair* sp) { m_SurfPair.push_back(sp); }
 		SurfacePair* GetSurfacePair(int i) { return m_SurfPair[i]; }
@@ -281,6 +303,7 @@ public:
 		std::vector<NodeSet*>		m_NSet;
 		std::vector<EdgeSet*>		m_LSet;
 		std::vector<ElementSet*>	m_ESet;
+		std::vector<PartList*>		m_PList;
 		std::vector<SurfacePair*>	m_SurfPair;
 		std::vector<DiscreteSet*>	m_DiscSet;
 	};
