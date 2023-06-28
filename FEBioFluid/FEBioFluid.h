@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! The FEBioFluid module
 
-//! The FEBioFluid module adds fluid capabilites to FEBio.
+//! The FEBioFluid module adds fluid capabilities to FEBio.
 //!
 namespace FEBioFluid {
 

@@ -89,7 +89,7 @@ void FEBioThermoFluid::InitModule()
     febio.AddModuleDependency("fluid");
 
     //-----------------------------------------------------------------------------
-    // analyis classes (default type must match module name!)
+    // analysis classes (default type must match module name!)
     REGISTER_FECORE_CLASS(FEThermoFluidAnalysis, "thermo-fluid");
 
     //-----------------------------------------------------------------------------

@@ -530,7 +530,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Specific gage enthalpy
+//! Specific gauge enthalpy
 class FEPlotFluidSpecificGageEnthalpy : public FEPlotDomainData
 {
 public:

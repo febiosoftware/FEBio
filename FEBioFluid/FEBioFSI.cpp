@@ -85,7 +85,7 @@ void FEBioFSI::InitModule()
 	febio.AddModuleDependency("biphasic");	// also pulls in "solid"
 
 	//-----------------------------------------------------------------------------
-	// analyis classes (default type must match module name!)
+	// analysis classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FEFluidFSIAnalysis, "fluid-FSI");
 
 	//-----------------------------------------------------------------------------
