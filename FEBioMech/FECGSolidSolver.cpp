@@ -51,6 +51,8 @@ SOFTWARE.*/
 #include "FECore/vector.h"
 #include "FEMechModel.h"
 #include "FEBioMech.h"
+#include "FESolidAnalysis.h"
+#include <FECore/FENLConstraint.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -311,7 +313,9 @@ void FECGSolidSolver::PrepStep()
 	vector<double> dummy(m_neq, 0.0);
 	zero(m_Fn);
 	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-	NodalLoads(Fn, tp);
+
+	// TODO: This function does not exist
+//	NodalLoads(Fn, tp);
 
 	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
@@ -332,7 +336,7 @@ void FECGSolidSolver::PrepStep()
 	// calculate local rigid displacements
 	for (int i = 0; i<fem.RigidPrescribedBCs(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
 		if (DC.IsActive()) DC.InitTimeStep();
 	}
 
@@ -419,7 +423,7 @@ void FECGSolidSolver::PrepStep()
 	}
 
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		FEMesh& mesh = fem.GetMesh();
 
@@ -599,7 +603,7 @@ bool FECGSolidSolver::SolveStep()
 
 		// check for nans
 		double du = m_ui*m_ui;
-		if (ISNAN(du)) throw NANDetected();
+		if (ISNAN(du)) throw NANInSolutionDetected();
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
@@ -1112,30 +1116,8 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 		dom.InternalForces(RHS);
 	}
 
-	// calculate the body forces
-	for (int j = 0; j<fem.BodyLoads(); ++j)
-	{
-		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(j));
-		if (pbf && pbf->IsActive())
-		{
-			for (int i = 0; i<pbf->Domains(); ++i)
-			{
-				FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(*pbf->Domain(i));
-				dom.BodyForce(RHS, *pbf);
-			}
-		}
-	}
-
 	// calculate inertial forces for dynamic problems
-	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
-
-	// calculate forces due to surface loads
-	int nsl = fem.SurfaceLoads();
-	for (int i = 0; i<nsl; ++i)
-	{
-		FESurfaceLoad* psl = fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->LoadVector(RHS, tp);
-	}
+	if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC) InertialForces(RHS);
 
 	// calculate contact forces
 	if (fem.SurfacePairConstraints() > 0)
@@ -1158,7 +1140,7 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 		FEModelLoad& mli = *fem.ModelLoad(i);
 		if (mli.IsActive())
 		{
-			mli.LoadVector(RHS, tp);
+			mli.LoadVector(RHS);
 		}
 	}
 
@@ -1327,7 +1309,7 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	const int NRD = fem.RigidPrescribedBCs();
 	for (int i = 0; i<NRD; ++i)
 	{
-		FERigidBodyDisplacement& dc = *fem.GetRigidPrescribedBC(i);
+		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
 		if (dc.IsActive())
 		{
 			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
