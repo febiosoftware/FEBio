@@ -978,6 +978,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorY, "fiber_y");
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, "fiber_z");
 	REGISTER_FECORE_CLASS(FELogDamage, "D");
+    REGISTER_FECORE_CLASS(FELogIntactBonds, "wi");
+    REGISTER_FECORE_CLASS(FELogYieldedBonds, "wy");
+    REGISTER_FECORE_CLASS(FELogFatigueBonds, "wf");
     REGISTER_FECORE_CLASS(FELogOctahedralPlasticStrain, "ops");
     REGISTER_FECORE_CLASS(FELogDiscreteElementStretch   , "discrete element stretch");
     REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");

@@ -40,22 +40,22 @@ public:
     //! constructor
     FEReactivePlasticDamageMaterialPoint(FEMaterialPointData *pt, FEReactivePlasticDamage* pmat) : FEDamageMaterialPoint(pt) { m_pMat = pmat; }
     
-    FEMaterialPointData* Copy();
+    FEMaterialPointData* Copy() override;
     
     //! Initialize material point data
-    void Init();
+    void Init() override;
 
     //! Update material point data
-    void Update(const FETimeInfo& timeInfo);
+    void Update(const FETimeInfo& timeInfo) override;
     
     //! Serialize data to archive
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
     //! Evaluate net mass fraction of yielded bonds
-    double YieldedBonds() const;
+    double YieldedBonds() const override;
     
     // evaluate net mass fraction of intact bonds
-    double IntactBonds() const;
+    double IntactBonds() const override;
     
 public:
     vector<mat3d>           m_Fusi;     //!< inverse of plastic deformation gradient at previous yield

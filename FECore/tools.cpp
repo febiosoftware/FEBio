@@ -918,7 +918,7 @@ bool polym(int n, std::vector<double> a, double& x)
 
 	muller(fnreal, &zeros[0], n, 0, maxit, ep1, ep2, a);
 	for (int i = 0; i < n; ++i) {
-		if (zeros[i].real() != 0) {
+		if (fabs(zeros[i].imag()) < ep2) {
 			x = zeros[i].real();
 			return true;
 		}

@@ -172,50 +172,66 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
     // evaluate time derivative of intact bond criterion
     pd.m_aXit = (pd.m_Xitrl - pd.m_Xip)/dt;
     
-    // solve for bond mass fractions iteratively
-    double eps = 1e-6;
-    int maxit = 10;
-    double wbi = 0;
-    int iter = 0;
-    do {
-        wbi = pd.m_wbt;
-        // get current and previous k value
-        double kn1 = k0*(pow(fabs(pd.m_aXit)*pd.m_wbt,beta));
-        double kn = k0*(pow(fabs(pd.m_aXip)*pd.m_wbp,beta));
-        // evaluate mass supply from fatigue of intact bonds
-        double dwf = ((kn1*dt + kn*dt)/(2 + kn1*dt))*pd.m_wip;
-        double Fdwf = m_pFdmg->cdf(pt,Xftrl);
-        
-        // kinetics of intact bonds
-        pd.m_wit = (pd.m_Fip < 1) ? (pd.m_wip - dwf)*(1-pd.m_Fit)/(1-pd.m_Fip) : pd.m_wip;
-        pd.m_wbt = (pd.m_Fip < 1) ? pd.m_wbp + (pd.m_wip - dwf)*(pd.m_Fit - pd.m_Fip)/(1-pd.m_Fip) : pd.m_wbp;
-        // add or update new generation
-        if ((pd.m_fb.size() == 0) || pd.m_fb.back().m_time < tp.currentTime) {
-            // add generation of fatigued bonds
-            FatigueBond fb;
-            fb.m_Fft = Fdwf;
-            fb.m_wfp = dwf;
-            fb.m_Xftrl = Xftrl;
-            fb.m_time = tp.currentTime;
-            pd.m_fb.push_back(fb);
-        }
-        else {
-            pd.m_fb.back().m_Fft = Fdwf;
-            pd.m_fb.back().m_wfp = dwf;
-            pd.m_fb.back().m_Xftrl = Xftrl;
-        }
-        // damage kinetics of fatigued bonds
-        for (int ig=0; ig < pd.m_fb.size(); ++ig) {
-            pd.m_fb[ig].m_wft = (pd.m_fb[ig].m_Ffp < 1) ? pd.m_fb[ig].m_wfp*(1-pd.m_fb[ig].m_Fft)/(1-pd.m_fb[ig].m_Ffp) : 0;
-            pd.m_wbt += (pd.m_fb[ig].m_Ffp < 1) ? pd.m_fb[ig].m_wfp*(pd.m_fb[ig].m_Fft-pd.m_fb[ig].m_Ffp)/(1-pd.m_fb[ig].m_Ffp) : pd.m_fb[ig].m_wfp;
-        }
-        // roundoff corrections
-        if (pd.m_wit < 0) pd.m_wit = 0;
-        if (pd.m_wbt > 1) pd.m_wbt = 1;
-        // evaluate fatigue bond fraction
-        pd.m_wft = 0;
-        for (int ig=0; ig < pd.m_fb.size(); ++ig) pd.m_wft += pd.m_fb[ig].m_wft;
-    } while ((pd.m_wbt > 0) && (pd.m_wbt < 1) && (fabs(wbi-pd.m_wbt) > eps*pd.m_wbt) && (++iter<maxit));
+    // evaluate increment in broken bond mass fraction from breaking of intact bonds
+    double dwb_ib = (pd.m_Fip < 1) ? (pd.m_Fit-pd.m_Fip)/(1-pd.m_Fip)*pd.m_wip : 0;
+    // kinetics of intact bonds
+    pd.m_wbt = pd.m_wbp + dwb_ib;
+    // wit must be properly initialized before evaluating the fatigue reaction
+    pd.m_wit = pd.m_wip - dwb_ib;
+
+    // solve for fatigue bond mass fractions at current iteration
+    double kt = k0*pow(fabs(pd.m_aXit)*pd.m_wbt,beta);
+    double kp = k0*pow(fabs(pd.m_aXip)*pd.m_wbp,beta);
+    // evaluate increment in fatigue bond mass fraction from fatigue of intact bonds
+    double dwf_if = dt/2*(kt*pd.m_wit+kp*pd.m_wip);
+
+    // kinetics of intact bonds
+    pd.m_wit -= dwf_if;
     
+    // add or update new generation
+    if ((pd.m_fb.size() == 0) || pd.m_fb.back().m_time < tp.currentTime) {
+        // add generation of fatigued bonds
+        FatigueBond fb;
+        fb.m_Ffp = 0;
+        fb.m_Fft = m_pFdmg->cdf(pt,Xftrl);
+        fb.m_wfp = 0;
+        fb.m_wft = dwf_if;
+        fb.m_Xftrl = Xftrl;
+        fb.m_time = tp.currentTime;
+        pd.m_fb.push_back(fb);
+    }
+    else {
+        for (int ig=0; ig < pd.m_fb.size(); ++ig) pd.m_fb[ig].m_wft = pd.m_fb[ig].m_wfp;
+        pd.m_fb.back().m_Fft = m_pFdmg->cdf(pt,Xftrl);
+        pd.m_fb.back().m_wft += dwf_if;
+        pd.m_fb.back().m_Xftrl = Xftrl;
+    }
+    // damage kinetics of fatigued bonds
+    for (int ig=0; ig < pd.m_fb.size(); ++ig) {
+        double dwb_fb = (pd.m_fb[ig].m_Ffp < 1) ? (pd.m_fb[ig].m_Fft-pd.m_fb[ig].m_Ffp)/(1-pd.m_fb[ig].m_Ffp)*pd.m_fb[ig].m_wfp : 0;
+        pd.m_fb[ig].m_wft -= dwb_fb;
+        pd.m_wbt += dwb_fb;
+    }
+    // evaluate fatigue bond fraction
+    pd.m_wft = 0;
+    for (int ig=0; ig < pd.m_fb.size(); ++ig) pd.m_wft += pd.m_fb[ig].m_wft;
+    // fix round-off errors
+    double wbd = 0;
+    if (pd.m_wbt < pd.m_wbp) {
+        wbd = pd.m_wbp - pd.m_wbt;
+        pd.m_wbt = pd.m_wbp;
+    }
+    else if (pd.m_wbt > 1) {
+        pd.m_wbt = 1;
+    }
+    double wid = 0;
+    if (pd.m_wit > pd.m_wip) {
+        wid = pd.m_wit - pd.m_wip;
+        pd.m_wit = pd.m_wip;
+    }
+    else if (pd.m_wit < 0) {
+        pd.m_wit = 0;
+    }
+    pd.m_wft = 1 - pd.m_wit - pd.m_wbt - wid + wbd;
     pd.m_D = pd.m_wbt;
 }

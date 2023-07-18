@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2023 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEReactiveMaterialPoint.h"
+#include <FECore/FEMaterialPoint.h>
 #include "febiomech_api.h"
 
 #ifdef WIN32
@@ -35,24 +35,14 @@ SOFTWARE.*/
 #endif
 
 //-----------------------------------------------------------------------------
-// Define a material point that stores the damage variable.
-class FEBIOMECH_API FEDamageMaterialPoint : public FEReactiveMaterialPoint
+// Define a reactive material point that defines various virtual functions.
+class FEBIOMECH_API FEReactiveMaterialPoint : public FEMaterialPointData
 {
 public:
-    FEDamageMaterialPoint(FEMaterialPointData*pt) : FEReactiveMaterialPoint(pt) {}
+    FEReactiveMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
     
-	FEMaterialPointData* Copy() override;
-    
-    void Init() override;
-    void Update(const FETimeInfo& timeInfo) override;
-    
-    void Serialize(DumpStream& ar) override;
-    
-    double BrokenBonds() const override { return m_D; }
-    double IntactBonds() const override { return 1 - m_D; }
-    
-public:
-	double	m_Etrial;		//!< trial damage criterion at time t
-	double	m_Emax;			//!< max damage criterion up to time t
-	double	m_D;			//!< damage (0 = no damage, 1 = complete damage)
+    virtual double BrokenBonds() const { return 0.0; }
+    virtual double IntactBonds() const { return 1.0; }
+    virtual double YieldedBonds() const { return 0.0; }
+    virtual double FatigueBonds() const { return 0.0; }
 };
