@@ -292,7 +292,7 @@ void FESolutesSolver::UpdateKinematics(vector<double>& ui)
     }
     
 
-    // make sure the prescribed dofs are fullfilled
+    // make sure the prescribed dofs are fulfilled
     int nbc = fem.BoundaryConditions();
     for (int i=0; i<nbc; ++i)
     {
@@ -503,7 +503,7 @@ void FESolutesSolver::PrepStep()
         if (pml.IsActive() && HasActiveDofs(pml.GetDofList())) pml.Update();
     }
 
-    // intialize material point data
+    // initialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
     //       the material point data is initialized
