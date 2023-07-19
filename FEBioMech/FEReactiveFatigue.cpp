@@ -173,7 +173,7 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
     pd.m_aXit = (pd.m_Xitrl - pd.m_Xip)/dt;
     
     // evaluate increment in broken bond mass fraction from breaking of intact bonds
-    double dwb_ib = (pd.m_Fip < 1) ? (pd.m_Fit-pd.m_Fip)/(1-pd.m_Fip)*pd.m_wip : 0;
+    double dwb_ib = (pd.m_Fip < 1) ? (pd.m_Fit-pd.m_Fip)/(1-pd.m_Fip)*pd.m_wip : pd.m_wip;
     // kinetics of intact bonds
     pd.m_wbt = pd.m_wbp + dwb_ib;
     // wit must be properly initialized before evaluating the fatigue reaction
@@ -187,6 +187,7 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
 
     // kinetics of intact bonds
     pd.m_wit -= dwf_if;
+    pd.m_wft = pd.m_wfp + dwf_if;
     
     // add or update new generation
     if ((pd.m_fb.size() == 0) || pd.m_fb.back().m_time < tp.currentTime) {
@@ -208,13 +209,15 @@ void FEReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, con
     }
     // damage kinetics of fatigued bonds
     for (int ig=0; ig < pd.m_fb.size(); ++ig) {
-        double dwb_fb = (pd.m_fb[ig].m_Ffp < 1) ? (pd.m_fb[ig].m_Fft-pd.m_fb[ig].m_Ffp)/(1-pd.m_fb[ig].m_Ffp)*pd.m_fb[ig].m_wfp : 0;
+        double dwb_fb = (pd.m_fb[ig].m_Ffp < 1) ? (pd.m_fb[ig].m_Fft-pd.m_fb[ig].m_Ffp)/(1-pd.m_fb[ig].m_Ffp)*pd.m_fb[ig].m_wfp
+        : pd.m_fb[ig].m_wft;
         pd.m_fb[ig].m_wft -= dwb_fb;
         pd.m_wbt += dwb_fb;
+        pd.m_wft -= dwb_fb;
     }
     // evaluate fatigue bond fraction
-    pd.m_wft = 0;
-    for (int ig=0; ig < pd.m_fb.size(); ++ig) pd.m_wft += pd.m_fb[ig].m_wft;
+//    pd.m_wft = 0;
+//    for (int ig=0; ig < pd.m_fb.size(); ++ig) pd.m_wft += pd.m_fb[ig].m_wft;
     // fix round-off errors
     double wbd = 0;
     if (pd.m_wbt < pd.m_wbp) {

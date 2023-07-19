@@ -96,7 +96,8 @@ public:
     double      m_wbp;          //!< broken (damaged) bond fraction at previous time
     
     double      m_wft;          //!< fatigue bond fraction at current time
-    
+    double      m_wfp;          //!< fatigue bond fraction at previous time
+
     
     std::deque <FatigueBond> m_fb;   //!< generations of fatigued bonds
 };

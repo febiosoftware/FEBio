@@ -85,7 +85,8 @@ FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEMaterialPointDa
     m_wbt = 0;
     m_wbp = 0;
     m_wft = 0;
-    
+    m_wfp = 0;
+
     m_fb.clear();
 }
 
@@ -106,7 +107,8 @@ FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(const FEReactiveF
     m_wbt = rfmp.m_wbt;
     m_wbp = rfmp.m_wbp;
     m_wft = rfmp.m_wft;
-    
+    m_wfp = rfmp.m_wfp;
+
     m_fb.clear();
     for (int ig=0; ig<m_fb.size(); ++ig)
         m_fb.push_back(rfmp.m_fb[ig]);
@@ -127,7 +129,8 @@ FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEReactiveFatigue
     m_wbt = rfmp.m_wbt;
     m_wbp = rfmp.m_wbp;
     m_wft = rfmp.m_wft;
-    
+    m_wfp = rfmp.m_wfp;
+
     m_fb.clear();
     for (int ig=0; ig<m_fb.size(); ++ig)
         m_fb.push_back(rfmp.m_fb[ig]);
@@ -157,7 +160,7 @@ void FEReactiveFatigueMaterialPoint::Init()
     m_Fip = m_Fit = 0;
     
     // initialize broken and fatigue bond fraction to 0
-    m_wbp = m_wbt = m_wft = 0;
+    m_wbp = m_wbt = m_wfp = m_wft = 0;
     
     // clear the fatigue bond structure
     m_fb.clear();
@@ -177,6 +180,7 @@ void FEReactiveFatigueMaterialPoint::Update(const FETimeInfo& timeInfo)
             double Xfmax = m_fb[ig].m_Xfmax;
             if (Xfmax <= m_fb.back().m_Xftrl) {
                 m_fb.back().m_wft += m_fb[ig].m_wft;
+                m_fb.back().m_wfp += m_fb[ig].m_wfp;
                 m_fb[ig].m_erase = true;
             }
         }
@@ -197,6 +201,7 @@ void FEReactiveFatigueMaterialPoint::Update(const FETimeInfo& timeInfo)
     // update intact and damage bonds
     m_wip = m_wit;
     m_wbp = m_wbt;
+    m_wfp = m_wft;
 }
 
 //-----------------------------------------------------------------------------
@@ -204,7 +209,7 @@ void FEReactiveFatigueMaterialPoint::Serialize(DumpStream& ar)
 {
     FEDamageMaterialPoint::Serialize(ar);
     ar & m_wit & m_wip & m_Ximax & m_Xitrl & m_Xip & m_aXit & m_aXip & m_Fit & m_Fip;
-    ar & m_wbt & m_wbp & m_wft;
+    ar & m_wbt & m_wbp & m_wfp & m_wft;
     
     // handle deques and boolean
     if (ar.IsSaving()) {
