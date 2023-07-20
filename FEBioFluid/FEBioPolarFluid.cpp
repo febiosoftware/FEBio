@@ -79,7 +79,7 @@ void FEBioPolarFluid::InitModule()
     febio.AddModuleDependency("fluid");
     
     //-----------------------------------------------------------------------------
-    // analyis classes (default type must match module name!)
+    // analysis classes (default type must match module name!)
     REGISTER_FECORE_CLASS(FEPolarFluidAnalysis, "polar fluid");
     
     //-----------------------------------------------------------------------------

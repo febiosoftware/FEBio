@@ -58,7 +58,7 @@ tens4dmm FESolidMaterial::SolidTangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FESolidMaterial::SecantStress(FEMaterialPoint& pt)
+mat3ds FESolidMaterial::SecantStress(FEMaterialPoint& pt, bool PK2)
 {
     assert(false);
     return mat3ds(0.0);
@@ -140,7 +140,7 @@ tens4dmm FESolidMaterial::MaterialTangent(FEMaterialPoint& mp, const mat3ds E)
 
 //-----------------------------------------------------------------------------
 //! calculate spatial tangent stiffness at material point, using secant method
-tens4dmm FESolidMaterial::SecantTangent(FEMaterialPoint& mp)
+tens4dmm FESolidMaterial::SecantTangent(FEMaterialPoint& mp, bool mat)
 {
     // extract the deformation gradient
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -173,9 +173,13 @@ tens4dmm FESolidMaterial::SecantTangent(FEMaterialPoint& mp)
         }
     }
     
-    // push from material to spatial frame
-    tens4dmm c = C.pp(F)/J;
-    
-    // return secant tangent
-    return c;
+    if (mat) return C;
+    else {
+        
+        // push from material to spatial frame
+        tens4dmm c = C.pp(F)/J;
+        
+        // return secant tangent
+        return c;
+    }
 }

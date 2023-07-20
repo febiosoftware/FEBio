@@ -23,23 +23,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEInitialCondition.h>
+#include "FEInitialEffectiveFluidPressure.h"
 
-class FEInitialFluidPressure : public FEInitialDOF
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialEffectiveFluidPressure, FEInitialCondition)
+	ADD_PARAMETER(m_data, "value");
+END_FECORE_CLASS();
+
+FEInitialEffectiveFluidPressure::FEInitialEffectiveFluidPressure(FEModel* fem) : FEInitialDOF(fem)
 {
-public:
-	FEInitialFluidPressure(FEModel* fem);
-	bool Init() override;
+}
 
-	DECLARE_FECORE_CLASS();
-};
-
-class FEInitialShellFluidPressure : public FEInitialDOF
+bool FEInitialEffectiveFluidPressure::Init()
 {
-public:
-	FEInitialShellFluidPressure(FEModel* fem);
-	bool Init() override;
+	if (SetDOF("p") == false) return false;
+	return FEInitialDOF::Init();
+}
 
-	DECLARE_FECORE_CLASS();
-};
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialShellEffectiveFluidPressure, FEInitialCondition)
+	ADD_PARAMETER(m_data, "value");
+END_FECORE_CLASS();
+
+FEInitialShellEffectiveFluidPressure::FEInitialShellEffectiveFluidPressure(FEModel* fem) : FEInitialDOF(fem)
+{
+}
+
+bool FEInitialShellEffectiveFluidPressure::Init()
+{
+	if (SetDOF("q") == false) return false;
+	return FEInitialDOF::Init();
+}

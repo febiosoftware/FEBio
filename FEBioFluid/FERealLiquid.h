@@ -50,7 +50,7 @@ public:
     //! Serialization
     void Serialize(DumpStream& ar) override;
 
-    //! gage pressure
+    //! gauge pressure
     double Pressure(FEMaterialPoint& pt) override;
     
     //! tangent of pressure with respect to strain J
@@ -100,7 +100,7 @@ public:
     double      m_Pr;       //!< referential absolute pressure
     double      m_Tr;       //!< referential absolute temperature
     double      m_rhor;     //!< referential mass density
-    FEFunction1D*   m_psat;         //!< normalized gage pressure on saturation curve (multiply by m_Pr to get actual value)
+    FEFunction1D*   m_psat;         //!< normalized gauge pressure on saturation curve (multiply by m_Pr to get actual value)
     FEFunction1D*   m_asat;         //!< normalized specific free energy on saturation curve (multiply by m_Pr/m_rhor to get actual value)
     FEFunction1D*   m_ssat;         //!< normalized specific entropy on saturation curve (multiply by m_Pr/m_rhor*m_Tr to get actual value)
     FEFunction1D*   m_esat;         //!< dilatation on saturation curve

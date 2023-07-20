@@ -47,9 +47,10 @@ public:
     void Serialize(DumpStream& ar) override;
     
 public:
-    FEParamMat3d    m_Fe;       //!< elastic deformation
-    FEParamMat3d    m_Fg;       //!< growth deformation
-    FEParamDouble   m_rhor;     //!< solid referential density
+    mat3d   m_Fe;       //!< elastic deformation
+    double  m_Je;       //!< elastic relative volume
+    mat3d   m_Fg;       //!< growth deformation
+    double  m_rhor;     //!< solid referential density
 };
 
 //-----------------------------------------------------------------------------
@@ -83,6 +84,9 @@ public:
     
     // update material point at each iteration
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+    
+    //! Get the elastic deformation
+    FEMaterialPoint GetElasticDeformationMaterialPoint(FEMaterialPoint& mp);
     
 private:
     FEElasticMaterial*  m_pBase;        //!< pointer to elastic solid material

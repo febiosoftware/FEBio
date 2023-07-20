@@ -67,7 +67,6 @@ private:
     double          m_Rgas;
     double          m_Tabs;
     
-
 	FEDofList       m_dofW;
     int             m_dofEF;
     int             m_dofC;

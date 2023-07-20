@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2023 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,35 +23,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEInitialFluidPressure.h"
 
-//=============================================================================
-BEGIN_FECORE_CLASS(FEInitialFluidPressure, FEInitialCondition)
-	ADD_PARAMETER(m_data, "value");
-END_FECORE_CLASS();
 
-FEInitialFluidPressure::FEInitialFluidPressure(FEModel* fem) : FEInitialDOF(fem)
+
+#pragma once
+#include <FECore/FEMaterialPoint.h>
+#include "febiomech_api.h"
+
+#ifdef WIN32
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
+//-----------------------------------------------------------------------------
+// Define a reactive material point that defines various virtual functions.
+class FEBIOMECH_API FEReactiveMaterialPoint : public FEMaterialPointData
 {
-}
-
-bool FEInitialFluidPressure::Init()
-{
-	if (SetDOF("p") == false) return false;
-	return FEInitialDOF::Init();
-}
-
-
-//=============================================================================
-BEGIN_FECORE_CLASS(FEInitialShellFluidPressure, FEInitialCondition)
-	ADD_PARAMETER(m_data, "value");
-END_FECORE_CLASS();
-
-FEInitialShellFluidPressure::FEInitialShellFluidPressure(FEModel* fem) : FEInitialDOF(fem)
-{
-}
-
-bool FEInitialShellFluidPressure::Init()
-{
-	if (SetDOF("q") == false) return false;
-	return FEInitialDOF::Init();
-}
+public:
+    FEReactiveMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
+    
+    virtual double BrokenBonds() const { return 0.0; }
+    virtual double IntactBonds() const { return 1.0; }
+    virtual double YieldedBonds() const { return 0.0; }
+    virtual double FatigueBonds() const { return 0.0; }
+};

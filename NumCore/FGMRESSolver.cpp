@@ -81,14 +81,14 @@ FGMRESSolver::FGMRESSolver(FEModel* fem) : IterativeLinearSolver(fem), m_pA(0)
 // set the preconditioner
 void FGMRESSolver::SetLeftPreconditioner(LinearSolver* P)
 {
-	m_P = P;
+	m_P = dynamic_cast<Preconditioner*>(P);
 }
 
 //-----------------------------------------------------------------------------
 //! Set the right preconditioner
 void FGMRESSolver::SetRightPreconditioner(LinearSolver* R)
 {
-	m_R = R;
+	m_R = dynamic_cast<Preconditioner*>(R);
 }
 
 //-----------------------------------------------------------------------------

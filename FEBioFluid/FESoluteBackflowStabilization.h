@@ -74,7 +74,7 @@ protected:
 private:
     FEDofList   m_dofW;
     int         m_dofC;
-    FENodeNodeList m_nnlist;
+    vector<int> m_ndof;
 
     DECLARE_FECORE_CLASS();
 };

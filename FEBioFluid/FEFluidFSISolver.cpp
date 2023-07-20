@@ -274,7 +274,7 @@ bool FEFluidFSISolver::InitEquations()
 
 	if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
 	{
-		// merge the second and third parition
+		// merge the second and third partition
 		if (m_part.size() == 3)
 		{
 			vector<int> newPart(2);
@@ -508,7 +508,7 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
         }
     }
 
-    // make sure the prescribed BCs are fullfilled
+    // make sure the prescribed BCs are fulfilled
 	int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
@@ -1151,7 +1151,7 @@ bool FEFluidFSISolver::StiffnessMatrix()
 
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
-    // constrainst enforced with augmented lagrangian
+    // constraints enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);    
    
     // add contributions from rigid bodies

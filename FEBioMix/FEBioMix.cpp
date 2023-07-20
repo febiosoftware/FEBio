@@ -75,7 +75,7 @@ SOFTWARE.*/
 #include "FEActiveConstantSupply.h"
 #include "FEPorousNeoHookean.h"
 
-#include "FEPoroTraction.h"
+#include "FEMixtureNormalTraction.h"
 #include "FEFluidFlux.h"
 #include "FESoluteFlux.h"
 #include "FESoluteNaturalFlux.h"
@@ -115,8 +115,9 @@ SOFTWARE.*/
 #include "FEPrescribedNodalFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
+#include "FEMultiphasicFluidPressureBC.h"
 
-#include "FEInitialFluidPressure.h"
+#include "FEInitialEffectiveFluidPressure.h"
 #include "FEInitialConcentration.h"
 #include "FENodalFluidFlux.h"
 
@@ -152,7 +153,7 @@ void FEBioMix::InitModule()
 	febio.SetActiveModule("solid");
 	REGISTER_FECORE_CLASS(FECarterHayes     , "Carter-Hayes");
 	REGISTER_FECORE_CLASS(FEPorousNeoHookean, "porous neo-Hookean");
-	REGISTER_FECORE_CLASS(FEPoroNormalTraction, "normal_traction");
+	REGISTER_FECORE_CLASS(FEMixtureNormalTraction, "normal_traction");
 
 //======================================================================
 // setup the "biphasic" module
@@ -197,8 +198,8 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Initial conditions
-	REGISTER_FECORE_CLASS(FEInitialFluidPressure     , "initial fluid pressure");
-	REGISTER_FECORE_CLASS(FEInitialShellFluidPressure, "initial shell fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialEffectiveFluidPressure, "initial fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialShellEffectiveFluidPressure, "initial shell fluid pressure");
 	REGISTER_FECORE_CLASS(FEInitialConcentration     , "initial concentration");
 	REGISTER_FECORE_CLASS(FEInitialShellConcentration, "initial shell concentration");
 
@@ -318,12 +319,13 @@ void FEBioMix::InitModule()
 	// Surface loads
 	REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
     REGISTER_FECORE_CLASS(FESoluteNaturalFlux, "solute natural flux");
-    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureLoad, "fluid pressure");
+    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureLoad, "fluid pressure", 0x0400); // Deprecated, use the BC version.
 
 	//-----------------------------------------------------------------------------
 	// boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
 	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
+    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureBC, "actual fluid pressure");
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces

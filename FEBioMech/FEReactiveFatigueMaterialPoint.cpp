@@ -72,28 +72,22 @@ void FatigueBond::Update()
 // default constructor
 FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEMaterialPointData*pt) : FEDamageMaterialPoint(pt)
 {
-	// TODO: Is this working properly? I don't see how this ExtractData could work?
-	 
-    // get the reactive fatigue material point data
-    FEReactiveFatigueMaterialPoint& rfmp = *pt->ExtractData<FEReactiveFatigueMaterialPoint>();
-    
-    m_D = rfmp.m_D;
-    m_wit = rfmp.m_wit;
-    m_wip = rfmp.m_wip;
-    m_Ximax = rfmp.m_Ximax;
-    m_Xitrl = rfmp.m_Xitrl;
-    m_Xip = rfmp.m_Xip;
-    m_aXit = rfmp.m_aXit;
-    m_aXip = rfmp.m_aXip;
-    m_Fit = rfmp.m_Fit;
-    m_Fip = rfmp.m_Fip;
-    m_wbt = rfmp.m_wbt;
-    m_wbp = rfmp.m_wbp;
-    m_wft = rfmp.m_wft;
-    
+    m_D = 0;
+    m_wit = 1;
+    m_wip = 1;
+    m_Ximax = 0;
+    m_Xitrl = 0;
+    m_Xip = 0;
+    m_aXit = 0;
+    m_aXip = 0;
+    m_Fit = 0;
+    m_Fip = 0;
+    m_wbt = 0;
+    m_wbp = 0;
+    m_wft = 0;
+    m_wfp = 0;
+
     m_fb.clear();
-    for (int ig=0; ig<m_fb.size(); ++ig)
-        m_fb.push_back(rfmp.m_fb[ig]);
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +107,8 @@ FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(const FEReactiveF
     m_wbt = rfmp.m_wbt;
     m_wbp = rfmp.m_wbp;
     m_wft = rfmp.m_wft;
-    
+    m_wfp = rfmp.m_wfp;
+
     m_fb.clear();
     for (int ig=0; ig<m_fb.size(); ++ig)
         m_fb.push_back(rfmp.m_fb[ig]);
@@ -134,7 +129,8 @@ FEReactiveFatigueMaterialPoint::FEReactiveFatigueMaterialPoint(FEReactiveFatigue
     m_wbt = rfmp.m_wbt;
     m_wbp = rfmp.m_wbp;
     m_wft = rfmp.m_wft;
-    
+    m_wfp = rfmp.m_wfp;
+
     m_fb.clear();
     for (int ig=0; ig<m_fb.size(); ++ig)
         m_fb.push_back(rfmp.m_fb[ig]);
@@ -164,7 +160,7 @@ void FEReactiveFatigueMaterialPoint::Init()
     m_Fip = m_Fit = 0;
     
     // initialize broken and fatigue bond fraction to 0
-    m_wbp = m_wbt = m_wft = 0;
+    m_wbp = m_wbt = m_wfp = m_wft = 0;
     
     // clear the fatigue bond structure
     m_fb.clear();
@@ -175,12 +171,16 @@ void FEReactiveFatigueMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
 	FEMaterialPointData::Update(timeInfo);
     
+    // update damage response for fatigues bonds
+    for (int ig=0; ig<m_fb.size(); ++ig) m_fb[ig].Update();
+    
     // let's check overlapping generations of fatigued bonds
     if (m_fb.size() > 1) {
         for (int ig=0; ig < m_fb.size() - 1; ++ig) {
-            double Xfmax = max(m_fb[ig].m_Xftrl,m_fb[ig].m_Xfmax);
+            double Xfmax = m_fb[ig].m_Xfmax;
             if (Xfmax <= m_fb.back().m_Xftrl) {
                 m_fb.back().m_wft += m_fb[ig].m_wft;
+                m_fb.back().m_wfp += m_fb[ig].m_wfp;
                 m_fb[ig].m_erase = true;
             }
         }
@@ -192,36 +192,24 @@ void FEReactiveFatigueMaterialPoint::Update(const FETimeInfo& timeInfo)
         else ++it;
     }
     
-    // update intact and damage bonds
-    m_wip = m_wit;
-    m_wbp = m_wbt;
-    
     // update damage response for intact bonds
     if (m_Xitrl > m_Ximax) m_Ximax = m_Xitrl;
     m_Xip = m_Xitrl;
     m_aXip = m_aXit;
     m_Fip = m_Fit;
     
-    // update damage response for fatigues bonds
-    for (int ig=0; ig<m_fb.size(); ++ig) m_fb[ig].Update();
-
-    // evaluate total fatigue bond fraction
-    m_wft = 0;
-    for (int ig=0; ig<m_fb.size(); ++ig) m_wft += m_fb[ig].m_wft;
-    
-    // evaluate total damage at current time
-    m_D = 1 - m_wit - m_wft;
-    if (m_D < 0) m_D = 0;
-    if (m_D > 1) m_D = 1;
+    // update intact and damage bonds
+    m_wip = m_wit;
+    m_wbp = m_wbt;
+    m_wfp = m_wft;
 }
 
 //-----------------------------------------------------------------------------
 void FEReactiveFatigueMaterialPoint::Serialize(DumpStream& ar)
 {
-	FEMaterialPointData::Serialize(ar);
-    ar & m_D;
+    FEDamageMaterialPoint::Serialize(ar);
     ar & m_wit & m_wip & m_Ximax & m_Xitrl & m_Xip & m_aXit & m_aXip & m_Fit & m_Fip;
-    ar & m_wbt & m_wbp & m_wft;
+    ar & m_wbt & m_wbp & m_wfp & m_wft;
     
     // handle deques and boolean
     if (ar.IsSaving()) {

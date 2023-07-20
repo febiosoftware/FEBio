@@ -45,7 +45,7 @@ public:
     // serialization
     void Serialize(DumpStream& ar) override;
 
-    //! gage pressure
+    //! gauge pressure
     double Pressure(FEMaterialPoint& pt) override;
     
     //! tangent of pressure with respect to strain J

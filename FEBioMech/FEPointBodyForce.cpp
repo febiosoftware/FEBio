@@ -56,6 +56,17 @@ vec3d FEPointBodyForce::force(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+double FEPointBodyForce::divforce(FEMaterialPoint& mp)
+{
+    vec3d x = mp.m_rt;
+    vec3d n = x - m_rc;
+    double l = n.unit();
+    
+    double g = m_a*exp(-m_b*l);
+    return (3-m_b*l)*g;
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEPointBodyForce::stiffness(FEMaterialPoint &mp)
 {
 	vec3d x = mp.m_rt;

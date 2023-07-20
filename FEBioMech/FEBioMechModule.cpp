@@ -816,6 +816,13 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotStrongBondDevSED, "deviatoric strong bond SED");
     REGISTER_FECORE_CLASS(FEPlotWeakBondDevSED, "deviatoric weak bond SED");
     REGISTER_FECORE_CLASS(FEPlotTrussStretch  , "truss stretch");
+    REGISTER_FECORE_CLASS(FEPlotGrowthLagrangeStrain, "growth Lagrange strain");
+    REGISTER_FECORE_CLASS(FEPlotGrowthInfStrain, "growth infinitesimal strain");
+    REGISTER_FECORE_CLASS(FEPlotGrowthRightStretch, "growth right stretch");
+    REGISTER_FECORE_CLASS(FEPlotGrowthLeftStretch, "growth left stretch");
+    REGISTER_FECORE_CLASS(FEPlotGrowthRightHencky, "growth right Hencky");
+    REGISTER_FECORE_CLASS(FEPlotGrowthLeftHencky, "growth left Hencky");
+    REGISTER_FECORE_CLASS(FEPlotGrowthRelativeVolume, "growth relative volume");
 
 
 	// 2O continuum fields
@@ -971,6 +978,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorY, "fiber_y");
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, "fiber_z");
 	REGISTER_FECORE_CLASS(FELogDamage, "D");
+    REGISTER_FECORE_CLASS(FELogIntactBonds, "wi");
+    REGISTER_FECORE_CLASS(FELogYieldedBonds, "wy");
+    REGISTER_FECORE_CLASS(FELogFatigueBonds, "wf");
     REGISTER_FECORE_CLASS(FELogOctahedralPlasticStrain, "ops");
     REGISTER_FECORE_CLASS(FELogDiscreteElementStretch   , "discrete element stretch");
     REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
