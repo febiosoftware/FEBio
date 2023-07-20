@@ -258,6 +258,15 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 //! not constraint)
 bool FELinearConstraintManager::Initialize()
 {
+	int nlin = LinearConstraints();
+	if (nlin == 0) return true;
+
+	for (int i = 0; i < nlin; ++i)
+	{
+		FELinearConstraint& lci = *m_LinC[i];
+		if (lci.Init() == false) return false;
+	}
+
 	return true;
 }
 
