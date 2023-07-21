@@ -88,7 +88,7 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 	m_nreq = 0;
 
 	m_CGmethod = 0; // 0 = Hager-Zhang, 1 = steepest descent
-	m_precon = 1; // 0 = no preconditioner, 1 = diagonal stiffness
+	m_precon = 0; // 0 = no preconditioner, 1 = diagonal stiffness
 
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;
@@ -709,12 +709,9 @@ bool FECGSolidSolver::SolveStep()
 				}
 				betapcg = m_ui * m_R0;	// m_ui*gk+1
 				betapcg = -betapcg / bdiv;
-				// Original H-Z truncation formula
-				//double modR=sqrt(m_R0*m_R0);
-				//double etak=-1.0/(moddU*min(0.01,modR));
-				// improved truncation from L-CG DESCENT:
 				if (m_precon == 1)
 				{
+					// improved truncation from L-CG DESCENT:
 					double dPd = 0.0;
 					for (i = 0; i < m_neq; ++i) {
 						if (m_Mi[i] != 0) {  // m_Mi=0 for prescribed displacements, so skip those dofs
@@ -728,6 +725,7 @@ bool FECGSolidSolver::SolveStep()
 				}
 				else
 				{
+					// Original H-Z truncation formula
 					double modR = sqrt(m_R0 * m_R0);
 					double etak = -1.0 / (moddU * min(0.01, modR));
 					betapcg = max(etak, betapcg);
@@ -1015,6 +1013,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 	AA = 0.0;
 	r0 = FA;
 	F[0] = FA;
+	A[0] = 0.0;
 	
 	double rmin = fabs(FA);
 
@@ -1049,6 +1048,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 						
 		}
 	} while (failed == true);
+
 	if (s != -1) {
 		// calculate energies
 		FB = m_ui * m_R1;
@@ -1056,7 +1056,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 		F[1] = FB;
 		A[1] = AB;
 
-		if (FB < rmin) { // remember best values in case we need them later
+		if (fabs(FB) < rmin) { // remember best values in case we need them later
 			rmin = FB;
 			smin = s;
 		}
@@ -1072,13 +1072,13 @@ double FECGSolidSolver::LineSearchCG(double s)
 			{
 				if (n < 4) { // use linear fitting algorithm
 					if (fabs(FB - FA) < fabs(FB * 0.01)) { // if FB=FA (or nearly) the next step won't work, so make s bigger
-						if (AB != 0) s = AB * 200; // try a much bigger value
+						if (AB != 0) s = max(AA, AB) * 200; // try a much bigger value
 						else if (AA != 0) s = AA * 200;
 						else s = 1e-6; // should never happen!
 					}
 					else {
 						s = (AA * FB - AB * FA) / (FB - FA);  // use linear interpolation for first few attempts
-						s = min(s, 1e-3); // limit how much s can grow to avoid over-extrapolating
+						//s = min(s, 1e-3); // limit how much s can grow to avoid over-extrapolating
 					}
 				}
 				else { // use quadratic curve fit to try to find a minimum if multiple linear attempts have failed
@@ -1220,31 +1220,8 @@ double FECGSolidSolver::LineSearchCG(double s)
 		if (n >= nmax)
 		{
 			// max nr of iterations reached.
-			// we choose the line step that reached the smallest energy
-			//s = smin;
-			// recalculate residual at this point, reducing s if necessary
-			//do
-			//{
-				// Update geometry using the initial guess s
-				//vcopys(ul, m_ui, s);
-				//failed = false;
-				//try
-				//{
-					//Update(ul);
-					//Residual(m_R1);
-				//}
-				//catch (...)
-				//{
-					//					feLog("reducing s after failed line search");
-				//						feLog("\tstep from line search         = %15le\n", s);
-					//failed = true;
-					//s = 0.1*s;
-				//}
-			//} while (failed == true);
 			s = -1;// this signals to the main algorithm that the line search has failed and a restart is needed
 		}
-		//if (err < 0) s = 1.5 * s;
-		//else s = 0.5 * s;
 	}
 	return s;
 }
