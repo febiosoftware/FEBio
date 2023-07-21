@@ -126,6 +126,7 @@ SOFTWARE.*/
 #include "FEBiphasicSoluteAnalysis.h"
 #include "FEMultiphasicAnalysis.h"
 #include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
@@ -268,6 +269,17 @@ void FEBioMix::InitModule()
 		})
 	);
 
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 25;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 15;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEBiphasicAnalysis>([](FEBiphasicAnalysis* pc) {
+        pc->m_nanalysis = FEBiphasicAnalysis::TRANSIENT;
+    }));
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)
