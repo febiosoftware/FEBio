@@ -50,6 +50,10 @@ public:
 	//! Performs a CG step
 	bool SolveStep() override;
 
+private:
+	bool CalculatePreconditioner();
+
+public:
 	//! update model
 	void Update(std::vector<double>& u) override;
 
@@ -93,6 +97,9 @@ public:
 	double	m_LStol;
 	double	m_LSmin;
 	int		m_LSiter;
+	int		m_CGmethod;
+	int		m_precon;
+	vector<double> m_Mi;	//!< inverse mass vector for explicit analysis
 
 	// Newmark parameters (for dynamic analyses)
 	double	m_beta;			//!< Newmark parameter beta (displacement integration)
@@ -110,7 +117,7 @@ private:
 
 	int				m_neq;
 	int				m_nreq;
-	int m_CGmethod; // 0 =  Hager-Zhang (default), 1 = steepest descent
+	//int m_CGmethod; // 0 =  Hager-Zhang (default), 1 = steepest descent
 
 protected:
 	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ,m_dofSU, m_dofSV, m_dofSA, m_rigidSolver;

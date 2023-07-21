@@ -67,7 +67,8 @@ BEGIN_FECORE_CLASS(FECGSolidSolver, FESolver)
 	ADD_PARAMETER(m_LSmin , "lsmin");
 	ADD_PARAMETER(m_LSiter, "lsiter");
 	ADD_PARAMETER(m_CGmethod, "cgmethod");
-	END_FECORE_CLASS();
+	ADD_PARAMETER(m_precon, "preconditioner");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FECGSolidSolver::FECGSolidSolver(FEModel* pfem) : FESolver(pfem), m_rigidSolver(pfem), \
@@ -87,6 +88,7 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 	m_nreq = 0;
 
 	m_CGmethod = 0; // 0 = Hager-Zhang, 1 = steepest descent
+	m_precon = 1; // 0 = no preconditioner, 1 = diagonal stiffness
 
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;
@@ -141,6 +143,107 @@ void FECGSolidSolver::Clean()
 }
 
 //-----------------------------------------------------------------------------
+bool FECGSolidSolver::CalculatePreconditioner()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	vector<double> dummy(m_Mi);
+	FEGlobalVector Mi(fem, m_Mi, dummy);
+	matrix me;
+	vector <int> lm;
+
+	FETimeInfo& tp = fem.GetTime();
+	matrix ke;
+	vector <double> el_diagonal_stiffness;
+
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	{
+		// check whether it is a solid domain
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		if (pbd)  // it is an elastic solid domain
+		{
+			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial());
+
+			// loop over all the elements
+			for (int iel = 0; iel < pbd->Elements(); ++iel)
+			{
+				FESolidElement& el = pbd->Element(iel);
+				pbd->UnpackLM(el, lm);
+
+				//int nint = el.GaussPoints();
+				long int neln = el.Nodes();
+
+				// set up, zero and calculate the element stiffness matrix
+				ke.resize(neln * 3, neln * 3);
+				ke.zero();
+				pbd->ElementStiffness(tp, iel, ke);
+
+				// set up the diagonal stiffness vector and copy in the diagonal values from ke
+				el_diagonal_stiffness.assign(3 * neln, 0.0);
+				for (int i = 0; i < neln * 3; ++i)
+				{
+					el_diagonal_stiffness[i] = ke[i][i];
+				}
+
+				// assemble element stiffness vector into the global stiffness vector 
+				Mi.Assemble(el.m_node, lm, el_diagonal_stiffness);
+
+			} // loop over elements
+		}
+		else if (dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd)))
+		{
+			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(psd->GetMaterial());
+			// loop over all the elements
+			for (int iel = 0; iel < psd->Elements(); ++iel)
+			{
+				FEShellElement& el = psd->Element(iel);
+				psd->UnpackLM(el, lm);
+
+				// create the element's stiffness matrix
+				FEElementMatrix ke(el);
+				int neln = el.Nodes();
+				int ndof = 6 * el.Nodes();
+				ke.resize(ndof, ndof);
+				ke.zero();
+
+				// calculate element stiffness matrix
+				psd->ElementStiffness(iel, ke);
+
+				// pick out the diagonal stiffness values
+				el_diagonal_stiffness.assign(ndof, 0.0);
+				for (int i = 0; i < ndof; ++i)
+				{
+					el_diagonal_stiffness[i] = ke[i][i];
+				}
+
+				// assemble element matrix into inv_mass vector 
+				Mi.Assemble(el.m_node, lm, el_diagonal_stiffness);
+			}
+		}
+		else
+		{
+			// TODO: we can only do solid domains right now.
+			return false;
+		}
+	}
+
+	// we need the inverse of the nodal stiffnesses later
+	// Also, make sure everything is positive.
+	for (int i = 0; i < m_Mi.size(); ++i)
+	{
+		if (m_Mi[i] < 0.0)
+		{
+			return false;
+		}
+		if (m_Mi[i] != 0.0) m_Mi[i] = 1.0 / m_Mi[i]; // note prescribed dofs will have zero mass so we need to skip them
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! Allocates and initializes the data structures used by the FESolidSolver
 //
 bool FECGSolidSolver::Init()
@@ -164,6 +267,9 @@ bool FECGSolidSolver::Init()
 	m_Fr.assign(neq, 0);
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
+	m_R0.assign(neq, 0);
+	m_R1.assign(neq, 0);
+	m_Mi.assign(neq, 0.0);
 
 	// we need to fill the total displacement vector m_Ut
 	FEModel& fem = *GetFEModel();
@@ -177,6 +283,16 @@ bool FECGSolidSolver::Init()
 	gather(m_Ut, mesh, m_dofSU[0]);
 	gather(m_Ut, mesh, m_dofSU[1]);
 	gather(m_Ut, mesh, m_dofSU[2]);
+
+	// calculate the inverse mass vector to use as a preconditioner
+	if (m_precon == 1)
+	{
+		if (CalculatePreconditioner() == false)
+		{
+			feLogError("Failed building preconditioner.");
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -299,13 +415,13 @@ void FECGSolidSolver::PrepStep()
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
 	FEMesh& mesh = fem.GetMesh();
-	for (int i = 0; i<mesh.Nodes(); ++i)
-	{
-		FENode& ni = mesh.Node(i);
-		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
-		ni.m_ap = ni.m_at;
-	}
+	//for (int i = 0; i<mesh.Nodes(); ++i)
+	//{
+	//	FENode& ni = mesh.Node(i);
+	//	ni.m_rp = ni.m_rt;
+	//	ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+	//	ni.m_ap = ni.m_at;
+	//}
 
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
@@ -425,28 +541,33 @@ void FECGSolidSolver::PrepStep()
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
-		FEMesh& mesh = fem.GetMesh();
-
-		// set the initial velocities of all rigid nodes
-		for (int i = 0; i<mesh.Nodes(); ++i)
-		{
-			FENode& n = mesh.Node(i);
-			if (n.m_rid >= 0)
-			{
-				FERigidBody& rb = *fem.GetRigidBody(n.m_rid);
-				vec3d V = rb.m_vt;
-				vec3d W = rb.m_wt;
-				vec3d r = n.m_rt - rb.m_rt;
-
-				vec3d v = V + (W ^ r);
-				n.m_vp = v;
-				n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], v);
-
-				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
-				n.m_ap = n.m_at = a;
-			}
-		}
+		feLogError("The CG-Solid solver cannot be used for dynamic analysis");
+		throw FatalError();
 	}
+
+	//{
+	//	FEMesh& mesh = fem.GetMesh();
+
+	//	// set the initial velocities of all rigid nodes
+	//	for (int i = 0; i<mesh.Nodes(); ++i)
+	//	{
+	//		FENode& n = mesh.Node(i);
+	//		if (n.m_rid >= 0)
+	//		{
+	//			FERigidBody& rb = *fem.GetRigidBody(n.m_rid);
+	//			vec3d V = rb.m_vt;
+	//			vec3d W = rb.m_wt;
+	//			vec3d r = n.m_rt - rb.m_rt;
+
+	//			vec3d v = V + (W ^ r);
+	//			n.m_vp = v;
+	//			n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], v);
+
+	//			vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
+	//			n.m_ap = n.m_at = a;
+	//		}
+	//	}
+	//}
 
 	// store the current rigid body reaction forces
 	for (int i = 0; i<fem.RigidBodies(); ++i)
@@ -512,6 +633,8 @@ bool FECGSolidSolver::SolveStep()
 	// initialize flags
 	bool breform = false;	// reformation flag
 	bool sdstep = true; // set to true on a steepest descent iteration - if this fails we will give up
+	int cgits = 0; // count CG iterations to trigger periodic restart
+	int maxits = 100; // how many to do before restarting
 
 	// Get the current step
 	FEModel& fem = *GetFEModel();
@@ -541,8 +664,7 @@ bool FECGSolidSolver::SolveStep()
 	double s = 1e-6;
 	double olds = 1e-6;
 	double oldolds = 1e-6;  // line search step lengths from the current iteration and the two previous ones
-	//s=1e-6; olds=s; oldolds=s;
-
+	
 	// loop until converged or when max nr of reformations reached
 	bool bconv = false;		// convergence flag
 	do
@@ -568,32 +690,81 @@ bool FECGSolidSolver::SolveStep()
 				betapcg=0.0;
 				sdstep = true;
 			}
-    		else {
-				double RR2=RR*RR;	// yk^2
-               		// use m_ui as a temporary vector
-				for (i=0; i<m_neq; ++i) {
-					m_ui[i] = RR[i]-2.0*u0[i]*RR2/bdiv;	// yk-2*dk*yk^2/(dk.yk)
+			else {
+				double RR2 = RR * RR;	// yk^2
+				// use m_ui as a temporary vector
+				if (m_precon == 1)
+				{
+					for (i = 0; i < m_neq; ++i) {
+						// improved formula from L-CG DESCENT (*2 removed):
+						m_ui[i] = m_Mi[i] * (RR[i] - u0[i] * RR2 / bdiv);	// yk-2*dk*yk^2/(dk.yk)
 					}
-				betapcg=m_ui*m_R0;	// m_ui*gk+1
-				betapcg=-betapcg/bdiv;   
-          		double modR=sqrt(m_R0*m_R0);
-          		double etak=-1.0/(moddU*min(0.01,modR));
-          		betapcg=max(etak,betapcg);
-				// try Fletcher - Reeves instead
-				// betapcg=(m_R0*m_R0)/(m_Rold*m_Rold);
-				// betapcg=0.0;
+				}
+				else
+				{
+					for (i = 0; i < m_neq; ++i) {
+						// formula from CG DESCENT (without *2 removed):
+						m_ui[i] = RR[i] - 2.0 * u0[i] * RR2 / bdiv;	// yk-2*dk*yk^2/(dk.yk)
+					}
+				}
+				betapcg = m_ui * m_R0;	// m_ui*gk+1
+				betapcg = -betapcg / bdiv;
+				// Original H-Z truncation formula
+				//double modR=sqrt(m_R0*m_R0);
+				//double etak=-1.0/(moddU*min(0.01,modR));
+				// improved truncation from L-CG DESCENT:
+				if (m_precon == 1)
+				{
+					double dPd = 0.0;
+					for (i = 0; i < m_neq; ++i) {
+						if (m_Mi[i] != 0) {  // m_Mi=0 for prescribed displacements, so skip those dofs
+							dPd += u0[i] * u0[i] / m_Mi[i];
+						}
+					}
+					double etak = 0.4 * (u0 * Rold) / dPd;
+					betapcg = max(etak, betapcg);
+					if (ISNAN(betapcg)) throw; // NANDetected(); TODO: update this error
+
+				}
+				else
+				{
+					double modR = sqrt(m_R0 * m_R0);
+					double etak = -1.0 / (moddU * min(0.01, modR));
+					betapcg = max(etak, betapcg);
+				}
+
+
+
 				sdstep = false;
 			}
 
-			for (i=0; i<m_neq; ++i) 
+			if (m_precon == 1) // use LMM preconditioner
 			{
-            	m_ui[i]=m_R0[i]+betapcg*u0[i];
+				for (i = 0; i < m_neq; ++i)  // calculate new search direction m_ui
+				{
+					m_ui[i] = m_Mi[i] * m_R0[i] + betapcg * u0[i];
+				}
+			}
+			else
+			{
+				for (i = 0; i < m_neq; ++i)  // calculate new search direction m_ui
+				{
+					m_ui[i] = m_R0[i] + betapcg * u0[i];
+				}
 			}
 		}
 		else 
 		{
 			// use steepest descent for first iteration or when a restart is needed
-            m_ui=m_R0;
+			if (m_precon == 1) // use LMM preconditioner
+			{
+				for (i = 0; i < m_neq; ++i)  // calculate new search direction m_ui
+				{
+					m_ui[i] = m_Mi[i] * m_R0[i];
+				}
+			}
+			else m_ui = m_R0;
+
 			breform=false;
 			if (m_niter > 0) m_nref += 1;
 			sdstep = true;
@@ -685,6 +856,7 @@ bool FECGSolidSolver::SolveStep()
 				oldolds = 1e-6; // reset step lengths for restart
 				olds = 1e-6;
 			}
+			// check for diverging
 			else if (normE1 > 1000*normEm) // less strict divergence check than for BFGS
 				// as norms tend to increase at first as deformation propagates
 			{
