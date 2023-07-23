@@ -47,7 +47,7 @@ double FEElasticFluid::SpecificInternalEnergy(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! specific gauge enthalpy
-double FEElasticFluid::SpecificGageEnthalpy(FEMaterialPoint& mp)
+double FEElasticFluid::SpecificGaugeEnthalpy(FEMaterialPoint& mp)
 {
     FEThermoFluid* pMat = dynamic_cast<FEThermoFluid*>(GetParent());
     

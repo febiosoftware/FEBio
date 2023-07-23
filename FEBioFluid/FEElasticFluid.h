@@ -96,7 +96,7 @@ public:
     double SpecificInternalEnergy(FEMaterialPoint& mp);
     
     //! specific gauge enthalpy
-    double SpecificGageEnthalpy(FEMaterialPoint& mp);
+    double SpecificGaugeEnthalpy(FEMaterialPoint& mp);
     
     //! specific free enthalpy
     double SpecificFreeEnthalpy(FEMaterialPoint& mp);

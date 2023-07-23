@@ -195,4 +195,3 @@ bool FEFluid::Dilatation(const double T, const double p, double& e)
     e = -p/m_k;
     return true;
 }
-
