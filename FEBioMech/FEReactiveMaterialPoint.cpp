@@ -26,25 +26,5 @@ SOFTWARE.*/
 
 
 
-#pragma once
-#include "febiofluid_api.h"
-
-//-----------------------------------------------------------------------------
-//! The FEBioFluid module
-
-//! The FEBioFluid module adds fluid capabilities to FEBio.
-//!
-namespace FEBioFluid {
-
-	FEBIOFLUID_API void InitModule();
-
-	enum FLUID_VARIABLE {
-		DISPLACEMENT,
-		RELATIVE_FLUID_VELOCITY,
-		FLUID_DILATATION,
-		RELATIVE_FLUID_ACCELERATION,
-		FLUID_DILATATION_TDERIV,
-	};
-
-	FEBIOFLUID_API const char* GetVariableName(FLUID_VARIABLE var);
-}
+#include "stdafx.h"
+#include "FEDamageMaterialPoint.h"

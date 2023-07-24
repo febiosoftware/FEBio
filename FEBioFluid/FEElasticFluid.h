@@ -41,7 +41,7 @@ public:
     FEElasticFluid(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEElasticFluid() {}
     
-    //! gage pressure
+    //! gauge pressure
     virtual double Pressure(FEMaterialPoint& pt) = 0;
     
     //! tangent of pressure with respect to strain J
@@ -95,8 +95,8 @@ public:
     //! specific internal energy
     double SpecificInternalEnergy(FEMaterialPoint& mp);
     
-    //! specific gage enthalpy
-    double SpecificGageEnthalpy(FEMaterialPoint& mp);
+    //! specific gauge enthalpy
+    double SpecificGaugeEnthalpy(FEMaterialPoint& mp);
     
     //! specific free enthalpy
     double SpecificFreeEnthalpy(FEMaterialPoint& mp);

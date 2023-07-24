@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2023 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,24 +27,34 @@ SOFTWARE.*/
 
 
 #pragma once
+#include <FECore/FEMaterial.h>
 #include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! The FEBioFluid module
-
-//! The FEBioFluid module adds fluid capabilities to FEBio.
+//! Base class for solvent supply.
+//! These materials need to define the supply and tangent supply functions.
 //!
-namespace FEBioFluid {
+class FEBIOFLUID_API FEFluidSupply : public FEMaterialProperty
+{
+public:
+    FEFluidSupply(FEModel* pfem) : FEMaterialProperty(pfem) {}
+	virtual ~FEFluidSupply(){}
+	
+	//! fluid supply
+	virtual double Supply(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of fluid supply with respect to strain
+	virtual mat3d Tangent_Supply_Strain(FEMaterialPoint& mp) = 0;
+	
+	//! tangent of fluid supply with respect to pressure
+	virtual double Tangent_Supply_Dilatation(FEMaterialPoint& mp) = 0;
+	
+    //! tangent of fluid supply with respect to rate of deformation
+    virtual mat3ds Tangent_Supply_RateOfDeformation(FEMaterialPoint& mp) = 0;
+    
+	//! tangent of fluid supply with respect to concentration
+	virtual double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
 
-	FEBIOFLUID_API void InitModule();
+	FECORE_BASE_CLASS(FEFluidSupply)
+};
 
-	enum FLUID_VARIABLE {
-		DISPLACEMENT,
-		RELATIVE_FLUID_VELOCITY,
-		FLUID_DILATATION,
-		RELATIVE_FLUID_ACCELERATION,
-		FLUID_DILATATION_TDERIV,
-	};
-
-	FEBIOFLUID_API const char* GetVariableName(FLUID_VARIABLE var);
-}

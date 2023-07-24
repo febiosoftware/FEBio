@@ -704,6 +704,9 @@ bool FEModel::InitBCs()
 		}
 	}
 
+	// check the linear constraints
+	if (GetLinearConstraintManager().Initialize() == false) return false;
+
     return true;
 }
 

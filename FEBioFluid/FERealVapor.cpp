@@ -117,7 +117,7 @@ void FERealVapor::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! gage pressure
+//! gauge pressure
 double FERealVapor::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
@@ -423,9 +423,21 @@ double FERealVapor::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 //! dilatation from temperature and pressure
 bool FERealVapor::Dilatation(const double T, const double p, double& e)
 {
+    // check that the prescribed gauge pressure is valid (positive)
+    if (p < 0) return false;
+    // if valid, continue
     double Phat = 1 + p/m_Pr;
     double That = (T+m_Tr)/m_Tr;
     double Psat = 1 + m_psat->value(That);
+    // check to make sure that we are in the vapor phase
+    if (Phat > Psat) return false;
+    // check to see if we are infinitesimally close to the saturation curve
+    if (fabs(Phat - Psat) < 1e-3) {
+        // if nearly on saturation curve, use saturation curve dilatation
+        e = m_esat->value(That);
+        return true;
+    }
+    // then continue
     double Jsat = 1 + m_esat->value(That);
     vector <double> B(m_nvp+1,0);
     for (int k=0; k<m_nvp; ++k) B[k+1] = m_B[k]->value(That);
@@ -436,7 +448,7 @@ bool FERealVapor::Dilatation(const double T, const double p, double& e)
     if (m_nvp == 1) { e = J - 1; return true; }
     // solve iteratively for J using Newton's method
     double x = Jsat/J;
-    bool convgd = solvepoly(m_nvp, B, x, false);
+    bool convgd = solvepoly(m_nvp, B, x, true);
     J = Jsat/x;
     e = J - 1;
     return convgd;

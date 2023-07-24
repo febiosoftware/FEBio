@@ -1275,14 +1275,14 @@ bool FEPlotFluidSpecificInternalEnergy::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidSpecificGageEnthalpy::Save(FEDomain &dom, FEDataStream& a)
+bool FEPlotFluidSpecificGaugeEnthalpy::Save(FEDomain &dom, FEDataStream& a)
 {
     FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
     if (pfluid == 0) return false;
 
     writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
         FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->SpecificGageEnthalpy(mp_noconst);
+        return pfluid->SpecificGaugeEnthalpy(mp_noconst);
     });
 
     return true;

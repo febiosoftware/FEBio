@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2023 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,25 +26,13 @@ SOFTWARE.*/
 
 
 
-#pragma once
-#include "febiofluid_api.h"
+#include "stdafx.h"
+#include "FEFluidSupply.h"
 
 //-----------------------------------------------------------------------------
-//! The FEBioFluid module
-
-//! The FEBioFluid module adds fluid capabilities to FEBio.
-//!
-namespace FEBioFluid {
-
-	FEBIOFLUID_API void InitModule();
-
-	enum FLUID_VARIABLE {
-		DISPLACEMENT,
-		RELATIVE_FLUID_VELOCITY,
-		FLUID_DILATATION,
-		RELATIVE_FLUID_ACCELERATION,
-		FLUID_DILATATION_TDERIV,
-	};
-
-	FEBIOFLUID_API const char* GetVariableName(FLUID_VARIABLE var);
+// Derivative of supply w.r.t. solute concentration at material point
+// Set this to zero by default because biphasic problems do not require it
+double FEFluidSupply::Tangent_Supply_Concentration(FEMaterialPoint& pt, const int isol)
+{
+	return 0;
 }

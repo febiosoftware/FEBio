@@ -23,28 +23,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "febiofluid_api.h"
+#include "FEFluidSupply.h"
 
 //-----------------------------------------------------------------------------
-//! The FEBioFluid module
-
-//! The FEBioFluid module adds fluid capabilities to FEBio.
-//!
-namespace FEBioFluid {
-
-	FEBIOFLUID_API void InitModule();
-
-	enum FLUID_VARIABLE {
-		DISPLACEMENT,
-		RELATIVE_FLUID_VELOCITY,
-		FLUID_DILATATION,
-		RELATIVE_FLUID_ACCELERATION,
-		FLUID_DILATATION_TDERIV,
-	};
-
-	FEBIOFLUID_API const char* GetVariableName(FLUID_VARIABLE var);
-}
+// This class implements a material that has a fluid supply following
+// Starling's equation
+class FEBIOFLUID_API FEFluidSupplyStarling :	public FEFluidSupply
+{
+public:
+	//! constructor
+    FEFluidSupplyStarling(FEModel* pfem);
+	
+	//! Solute supply
+	double Supply(FEMaterialPoint& pt) override;
+	
+	//! Tangent of supply with respect to solid strain
+	mat3d Tangent_Supply_Strain(FEMaterialPoint& mp) override;
+	
+	//! Tangent of supply with respect to pressure
+	double Tangent_Supply_Dilatation(FEMaterialPoint& mp) override;
+	
+    //! tangent of fluid supply with respect to rate of deformation
+    mat3ds Tangent_Supply_RateOfDeformation(FEMaterialPoint& mp) override { return mat3ds(0); }
+    
+	//! Tangent of supply with respect to concentration
+//	double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
+	
+   
+public:
+	FEParamDouble		m_kp;				//!< coefficient of pressure drop
+    FEParamDouble		m_pv;				//!< prescribed (e.g., vascular) pressure
+//	vector<double>		m_qc;       //!< coefficients of concentration drops
+//	vector<double>		m_cv;       //!< prescribed (e.g., vascular) concentrations
+	
+	// declare parameter list
+	DECLARE_FECORE_CLASS();
+};

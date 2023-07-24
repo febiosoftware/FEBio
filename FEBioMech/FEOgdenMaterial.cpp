@@ -98,8 +98,12 @@ mat3ds FEOgdenMaterial::DevStress(FEMaterialPoint &mp)
     lam[1] = sqrt(lam2[1]);
     lam[2] = sqrt(lam2[2]);
 
-    double c[MAX_TERMS] = { 0 };
-    for (int i = 0; i < MAX_TERMS; ++i) c[i] = m_c[i](mp);
+    double ci[MAX_TERMS] = { 0 }, mi[MAX_TERMS] = {0};
+	for (int i = 0; i < MAX_TERMS; ++i)
+	{
+		ci[i] = m_c[i](mp);
+		mi[i] = m_m[i](mp);
+	}
     
     // stress
     mat3ds s;
@@ -108,7 +112,7 @@ mat3ds FEOgdenMaterial::DevStress(FEMaterialPoint &mp)
     for (int i=0; i<3; ++i) {
         T = 0;
         for (int j=0; j<MAX_TERMS; ++j)
-            T += c[j]/m_m[j]*(pow(lam[i], m_m[j]) - 1)/J;
+            T += ci[j]/mi[j]*(pow(lam[i], mi[j]) - 1)/J;
         s += dyad(ev[i])*T;
     }
     
@@ -142,20 +146,23 @@ tens4ds FEOgdenMaterial::DevTangent(FEMaterialPoint& mp)
         lam[i] = sqrt(lam2[i]);
         N[i] = dyad(ev[i]);
     }
-    
+
+	double ci[MAX_TERMS] = { 0 }, mi[MAX_TERMS] = { 0 };
+	for (int i = 0; i < MAX_TERMS; ++i)
+	{
+		ci[i] = m_c[i](mp);
+		mi[i] = m_m[i](mp);
+	}
+
     // calculate the powers of eigenvalues
     double lamp[3][MAX_TERMS];
     for (j=0; j<MAX_TERMS; ++j)
     {
-        lamp[0][j] = pow(lam[0], m_m[j]);
-        lamp[1][j] = pow(lam[1], m_m[j]);
-        lamp[2][j] = pow(lam[2], m_m[j]);
+        lamp[0][j] = pow(lam[0], mi[j]);
+        lamp[1][j] = pow(lam[1], mi[j]);
+        lamp[2][j] = pow(lam[2], mi[j]);
     }
 
-    // evaluate coefficients at material points
-    double ci[MAX_TERMS] = { 0 };
-    for (int i = 0; i < MAX_TERMS; ++i) ci[i] = m_c[i](mp);
-    
     // principal stresses
     mat3ds s;
     s.zero();
@@ -163,7 +170,7 @@ tens4ds FEOgdenMaterial::DevTangent(FEMaterialPoint& mp)
     for (i=0; i<3; ++i) {
         T[i] = 0;
         for (j=0; j<MAX_TERMS; ++j)
-            T[i] += ci[j]/m_m[j]*(lamp[i][j] - 1)/J;
+            T[i] += ci[j]/mi[j]*(lamp[i][j] - 1)/J;
         s += N[i]*T[i];
     }
     
@@ -172,7 +179,7 @@ tens4ds FEOgdenMaterial::DevTangent(FEMaterialPoint& mp)
     for (j=0; j<3; ++j) {
         D[j][j] = 0;
         for (k=0; k<MAX_TERMS; ++k)
-            D[j][j] += ci[k]/m_m[k]*((m_m[k]-2)*lamp[j][k]+2)/J;
+            D[j][j] += ci[k]/mi[k]*((mi[k]-2)*lamp[j][k]+2)/J;
         for (i=j+1; i<3; ++i) {
             D[i][j] = 0;
             if (lam2[j] != lam2[i])
@@ -180,7 +187,7 @@ tens4ds FEOgdenMaterial::DevTangent(FEMaterialPoint& mp)
             else {
                 E[i][j] = 0;
                 for (k=0; k<MAX_TERMS; ++k)
-                    E[i][j] += ci[k]/m_m[k]*((m_m[k]-2)*lamp[j][k]+2)/J;
+                    E[i][j] += ci[k]/mi[k]*((mi[k]-2)*lamp[j][k]+2)/J;
             }
         }
     }
@@ -226,15 +233,18 @@ double FEOgdenMaterial::DevStrainEnergyDensity(FEMaterialPoint& mp)
     lam[1] = sqrt(lam2[1]);
     lam[2] = sqrt(lam2[2]);
     
-    // evaluate coefficients at material points
-    double ci[MAX_TERMS] = { 0 };
-    for (int i = 0; i < MAX_TERMS; ++i) ci[i] = m_c[i](mp);
+	double ci[MAX_TERMS] = { 0 }, mi[MAX_TERMS] = { 0 };
+	for (int i = 0; i < MAX_TERMS; ++i)
+	{
+		ci[i] = m_c[i](mp);
+		mi[i] = m_m[i](mp);
+	}
 
     // strain energy density
     double sed = 0;
     for (int j=0; j<MAX_TERMS; ++j)
-        sed += ci[j]/(m_m[j]*m_m[j])*
-        (pow(lam[0], m_m[j]) + pow(lam[1], m_m[j]) + pow(lam[2], m_m[j]) - 3);
+        sed += ci[j]/(mi[j]*mi[j])*
+        (pow(lam[0], mi[j]) + pow(lam[1], mi[j]) + pow(lam[2], mi[j]) - 3);
     
     return sed;
 }

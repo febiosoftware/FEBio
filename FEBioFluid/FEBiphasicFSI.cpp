@@ -37,6 +37,7 @@ ADD_PARAMETER(m_phi0 , FE_RANGE_CLOSED(0.0, 1.0), "phi0");
 
 // material properties
 ADD_PROPERTY(m_pPerm, "permeability");
+ADD_PROPERTY(m_pSupp, "solvent_supply", FEProperty::Optional);
 
 END_FECORE_CLASS();
 
@@ -83,7 +84,8 @@ FEBiphasicFSI::FEBiphasicFSI(FEModel* pfem) : FEFluidFSI(pfem)
     m_rhoTw = 0;
     m_phi0 = 0;
     
-    m_pPerm = 0;
+    m_pPerm = nullptr;
+    m_pSupp = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,6 +104,9 @@ FEMaterialPointData* FEBiphasicFSI::CreateMaterialPointData()
 bool FEBiphasicFSI::Init()
 {
     m_rhoTw = m_pFluid->m_rhor;
+    
+    m_pPerm->Init();
+    if (m_pSupp) m_pSupp->Init();
     
     return FEMaterial::Init();
 }

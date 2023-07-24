@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEModel.h"
 #include "DumpStream.h"
+#include "log.h"
 
 BEGIN_FECORE_CLASS(FELinearConstraintDOF, FECoreClass)
 	ADD_PARAMETER(dof, "dof", 0, "$(dof_list)");
@@ -211,11 +212,22 @@ void FELinearConstraint::AddChildDof(FELinearConstraintDOF* dof)
 bool FELinearConstraint::Init()
 {
 	if (m_parentDof == nullptr) return false;
+	if (m_parentDof->node < 0)
+	{
+		feLogError("Invalid node ID for parent node of linear constraint.");
+		return false;
+	}
+
 	int n = (int)m_childDof.size();
 	for (int i=0; i<n; ++i)
 	{
 		FELinearConstraintDOF& childNode = *m_childDof[i];
 		if ((childNode.node == m_parentDof->node) && (childNode.dof == m_parentDof->dof)) return false;
+		if (childNode.node < 0)
+		{
+			feLogError("Invalid node ID for child node  of linear constraint.");
+			return false;
+		}
 	}
 	return true;
 }

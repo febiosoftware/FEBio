@@ -83,7 +83,7 @@ void FEIdealGas::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! gage pressure
+//! gauge pressure
 double FEIdealGas::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();

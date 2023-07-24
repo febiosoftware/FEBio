@@ -530,11 +530,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Specific gage enthalpy
-class FEPlotFluidSpecificGageEnthalpy : public FEPlotDomainData
+//! Specific gauge enthalpy
+class FEPlotFluidSpecificGaugeEnthalpy : public FEPlotDomainData
 {
 public:
-    FEPlotFluidSpecificGageEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
+    FEPlotFluidSpecificGaugeEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
