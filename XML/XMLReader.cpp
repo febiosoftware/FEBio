@@ -222,6 +222,32 @@ int XMLTag::value(std::vector<string>& stringList, int n)
 }
 
 //-----------------------------------------------------------------------------
+void XMLTag::value(std::vector<string>& stringList)
+{
+	stringList.clear();
+
+	char tmp[256] = { 0 };
+
+	const char* sz = m_szval.c_str();
+	while (sz && *sz)
+	{
+		const char* sze = strchr(sz, ',');
+		if (sze)
+		{
+			int l = (int)(sze - sz);
+			if (l > 0) strncpy(tmp, sz, l);
+			tmp[l] = 0;
+
+			stringList.push_back(tmp);
+		}
+		else stringList.push_back(sz);
+
+		if (sze) sz = sze + 1;
+		else break;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void XMLTag::value(bool& val)
 { 
 	int n=0; 
