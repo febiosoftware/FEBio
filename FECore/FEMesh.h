@@ -239,6 +239,7 @@ public:
 	//! boutside : include all exterior facets
 	//! binside  : include all interior facets
 	FESurface* ElementBoundarySurface(std::vector<FEDomain*> domains, bool boutside = true, bool binside = false);
+	FEFacetSet* DomainBoundary(std::vector<FEDomain*> domains, bool boutside = true, bool binside = false);
 
 	//! get the nodal coordinates in reference configuration
 	void GetInitialNodalCoordinates(const FEElement& el, vec3d* node);
