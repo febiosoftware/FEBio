@@ -106,12 +106,18 @@ public:
 		double	m_defaultShellThickness;
 	};
 
+	class PartList;
+
+	// a surface can be defined explicitly (using a list of facets)
+	// or implicitly via a part list (in this case, the facet list will be empty 
+	// and the part list can be found via GetPartList()
 	class Surface
 	{
 	public:
 		Surface();
 		Surface(const Surface& surf);
 		Surface(const std::string& name);
+		Surface(const std::string& name, PartList* partList);
 
 		void SetName(const std::string& name);
 		const std::string& Name() const;
@@ -124,9 +130,12 @@ public:
 		int Facets() const { return (int) m_Face.size(); }
 		FACET& GetFacet(int i) { return m_Face[i]; }
 
+		PartList* GetPartList() { return m_partList; }
+
 	private:
 		std::string	m_name;
 		std::vector<FACET>	m_Face;
+		PartList* m_partList;
 	};
 
 	class NodeSet

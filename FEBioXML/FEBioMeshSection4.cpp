@@ -375,14 +375,14 @@ void FEBioMeshSection4::ParseSurfacePairSection(XMLTag& tag, FEBModel::Part* par
 			const char* sz = tag.szvalue();
 			FEBModel::Surface* surf = part->FindSurface(sz);
 			if (surf == nullptr) throw XMLReader::InvalidValue(tag);
-			surfPair->m_primary = sz;
+			surfPair->m_primary = surf->Name();
 		}
 		else if (tag == "secondary")
 		{
 			const char* sz = tag.szvalue();
 			FEBModel::Surface* surf = part->FindSurface(sz);
 			if (surf == nullptr) throw XMLReader::InvalidValue(tag);
-			surfPair->m_secondary = sz;
+			surfPair->m_secondary = surf->Name();
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
