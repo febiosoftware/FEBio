@@ -9939,6 +9939,213 @@ convergence tolerance on displacement
 
 \end_layout
 
+\begin_layout Standard
+When using the 
+\begin_inset Quotes eld
+\end_inset
+
+CG-solid
+\begin_inset Quotes erd
+\end_inset
+
+ solver, the following parameters are defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cgmethod
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Select solution algorithm (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+preconditioner
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Select the preconditioner (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lsiter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+maximum number of line search iterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The solution algorithm can be:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+0 : Hager-Zhang conjugate gradient (This is the default and should be preferred
+ since its faster.)
+\end_layout
+
+\begin_layout Enumerate
+1 : steepest descent
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Set 0 for no preconditioner, 1 for diagonal stiffness preconditioner.
+ The diagonal stiffness preconditioner greatly improves convergence when
+ there are different size elements, mixed materials, or quadratic elements
+ with midside nodes.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<solver type="CG-solid">
+\end_layout
+
+\begin_layout LyX-Code
+  <cgmethod>0</cgmethod>
+\end_layout
+
+\begin_layout LyX-Code
+  <preconditioner>1</preconditioner>
+\end_layout
+
+\begin_layout LyX-Code
+  <lsiter>10</lsiter>
+\end_layout
+
+\begin_layout LyX-Code
+</solver>
+\end_layout
+
 \begin_layout Subsection
 Solver Parameters for Biphasic Analysis
 \begin_inset CommandInset label
@@ -108915,350 +109122,437 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
@@ -114963,6 +115257,139 @@ Then, in the Control section of the second step, restore the plot level
 \begin_layout Standard
 Now, the new reference configuration resulting after the prestrain analysis
  step, will be the reference configuration that is used in the plot file.
+ 
+\end_layout
+
+\begin_layout Section
+Guidelines for using the CG-solid solver
+\end_layout
+
+\begin_layout Standard
+The nonlinear conjugate gradient solver, CG-solid, is an alternative solution
+ algorithm for static solid mechanics problems.
+ It does not currently support dynamic problems, fluids, etc.
+ This solver has advantages in several situations: 
+\end_layout
+
+\begin_layout Itemize
+It uses much less memory and therefore allows bigger problems to be solved
+ on a given computer than the standard Newton-based solvers
+\end_layout
+
+\begin_layout Itemize
+Its performance scales better for large problems and it may be faster for
+ very large problems (but see the limitations below); 
+\end_layout
+
+\begin_layout Itemize
+For nonlinear problems with buckling or other instabilities it can converge
+ much more reliably than the standard solver; 
+\end_layout
+
+\begin_layout Itemize
+For many problems it will converge in a single timestep.
+ 
+\end_layout
+
+\begin_layout Standard
+However, it also has some disadvantages: 
+\end_layout
+
+\begin_layout Itemize
+For small models it is typically slower than the BFGS solver; 
+\end_layout
+
+\begin_layout Itemize
+Although it usually converges in a single timestep, it requires a much larger
+ number of iterations to do so.
+ It is therefore inefficient if many timesteps are needed to produce intermediat
+e results or follow the progression of a problem;
+\end_layout
+
+\begin_layout Itemize
+The number of iterations it requires to converge is proportional to the
+ number of elements across the longest dimension of the mesh.
+ It therefore performs best for compact problems with similar numbers of
+ elements in each direction.
+ For example a cube with equal numbers of elements in each direction would
+ solve much faster than a flat sheet or a long, thin beam with the same
+ total number of elements; 
+\end_layout
+
+\begin_layout Itemize
+It does not currently work well for shell elements or freely moving rigid
+ bodies.
+ The way it works is quite different from the Newton-based solver and the
+ problem may need to be defined differently for optimum results: 
+\end_layout
+
+\begin_layout Itemize
+The convergence criteria in FEBio measure the change in the solution on
+ each iteration as a fraction of the total change for the timestep.
+ Because the CG solver converges in a much larger number of smaller steps,
+ the convergence criteria must be set smaller than for the BFGS solver.
+ The default values are dtol=1e-6 and etol=0.001, but it may be necessary
+ to reduce these further to ensure full convergence.
+ Check the solution carefully to make sure that it is correct and reduce
+ dtol further if necessary.
+\end_layout
+
+\begin_layout Itemize
+The rate of convergence is quite slow near to the solution so if the convergence
+ tolerance is set too small the solution may take much longer.
+ 
+\end_layout
+
+\begin_layout Itemize
+It is usually best to use a single timestep if possible, rather than many
+ smaller steps as is normal for the Newton solver.
+ More timesteps will greatly increase the solution time.
+ 
+\end_layout
+
+\begin_layout Itemize
+Unlike the Newton-based solvers, prescribed displacements are applied only
+ to the nodes they affect at first and take many iterations to propagate
+ through the adjoining mesh.
+ This means that they can often cause excessive deformation of the adjacent
+ elements, for example a compressive prescribed displacement can push the
+ surface layer of nodes right through the adjoining elements causing a negative
+ Jacobian error.
+ Unlike the BFGS solver, where prescribed displacements often give more
+ stable convergence, it is better to apply forces where possible and to
+ avoid prescribed displacements.
+ 
+\end_layout
+
+\begin_layout Itemize
+If prescribed displacements are essential, it may be necessary to use smaller
+ timesteps to avoid excessive distortion of the adjoining elements.
+ In this case it is possible to slacken the convergence criteria for the
+ intermediate steps and then apply a tighter tolerance for the final step
+ to generate a correct solution.
+ 
+\end_layout
+
+\begin_layout Itemize
+The preconditioner improves convergence when the stiffness of the nodes
+ varies, for example because of different element sizes, different materials
+ or features such as quadratic elements with midside nodes.
+ For problems where all the elements are the same it offers no great advantage
+ and may even cause slower convergence in some cases.
+ It is therefore best to use it for irregular meshes, multiple materials,
+ quadratic elements and contact problems, but for problems with regular
+ meshes where all the elements are a similar size it may be better to turn
+ it off.
+ 
+\end_layout
+
+\begin_layout Itemize
+For problems with large deformation and displacements the solver may take
+ a very large number of iterations to converge.
+ The solver proceeds by many small, cautious steps, unlike the Newton-based
+ solvers, which attempt to jump straight to the final answer on each iteration.
+ It is therefore much more reliable but may need thousands or tens of thousands
+ of iterations to reach the solution.
  
 \end_layout
 

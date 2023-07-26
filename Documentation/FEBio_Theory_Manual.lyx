@@ -26602,6 +26602,199 @@ reference "eq369"
  is satisfied.
 \end_layout
 
+\begin_layout Subsection
+Conjugate gradient solution method
+\end_layout
+
+\begin_layout Standard
+The Newton-Raphson solution algorithms are highly effective for nearly linear
+ problems, but they have two major limitations.
+ Firstly, for very large models, the size of the stiffness matrix K can
+ grow very large as well.
+ The factorization of this matrix, which is needed when using direct linear
+ solvers, can become very time consuming and requires a large amount of
+ memory.
+ This is the main factor that limits the size of model that can be solved
+ on a given computer.
+ Secondly, where the stiffness is small, it can overestimate the displacement,
+ resulting in excessive distortion of the mesh and the familiar negative
+ Jacobian failure.
+ This can occur when a material has a low initial stiffness that increases
+ at higher strains (we work around this by using a large number of small
+ timesteps to reduce the nonlinearity on each increment), when buckling
+ causes a temporary low or negative stiffness, when a part of the model
+ is not sufficiently constrained, or when contacts cause sudden changes
+ of stiffness.
+ For these reasons the Newton-Raphson algorithms often fail to converge
+ for very nonlinear materials, models with contacts or unstable structures
+ that can buckle or crumple under load.
+\end_layout
+
+\begin_layout Standard
+An alternative strategy is to estimate a direction to move each node directly
+ from the residual R:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u=-}\boldsymbol{R\left(x_{k}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then a line search is needed to find the appropriate distance to move in
+ that direction.
+ This is the steepest descent method, which has the disadvantage that it
+ converges slowly in a series of decreasing zig-zag steps.
+ Its convergence is much improved by adding a fraction β of the previous
+ step:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}_{k}=-\boldsymbol{R}\left(\boldsymbol{x}_{k}\right)+\beta\boldsymbol{u}_{k-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There are many different ways to calculate β; one method which has excellent
+ convergence for nonlinear problems is due to Hager and Zhang:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{y}_{i}=\boldsymbol{R}_{i-1}-\boldsymbol{R}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta_{i}=\frac{-1}{\boldsymbol{u}_{i-1}\cdot\boldsymbol{y}_{i}}\left(\boldsymbol{y}_{i}-2\boldsymbol{u}_{i-1}\frac{\left\Vert \boldsymbol{y}_{i}\right\Vert ^{2}}{\boldsymbol{u}_{i-1}\cdot\boldsymbol{y}_{i}}\right)\cdot\boldsymbol{R}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\eta_{i}=\frac{-1}{\left\Vert \boldsymbol{u}_{i-1}\right\Vert min\left\{ \eta,\left\Vert \boldsymbol{R}_{i-1}\right\Vert \right\} }
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta_{i}=max\left\{ \beta_{i},\eta_{i}\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A limitation of this method is that the distance each node moves is proportional
+ to the residual; stiffer nodes produce a larger residual for a given displaceme
+nt and therefore move further, whereas in fact they need to move less than
+ more compliant nodes.
+ This results in mesh distortion where the element size varies, for midside
+ nodes in quadratic elements or for mixed materials.
+ This problem can be reduced by using a preconditioner, dividing the residual
+ at each node by an estimate of its stiffness.
+ This requires changes also to the calculation of β:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta_{i}=\frac{-1}{\boldsymbol{u}_{i-1}\cdot\boldsymbol{y}_{i}}\left(\boldsymbol{y_{i}^{T}P}-2\boldsymbol{u}_{i-1}\frac{\boldsymbol{y_{i}^{T}Py}_{i}}{\boldsymbol{u}_{i-1}\cdot\boldsymbol{y}_{i}}\right)\cdot\boldsymbol{R}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\eta_{i}=0.4\frac{\Delta\boldsymbol{u}_{i-1}^{T}\boldsymbol{R}_{i}}{\boldsymbol{u_{i-1}^{T}P^{-1}u_{i-1}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta_{i}=max\left\{ \beta_{i},\eta_{i}\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}_{i+1}=\boldsymbol{P}\boldsymbol{R}_{i}+\beta_{i}\boldsymbol{u}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The preconditioner 
+\series bold
+P
+\series default
+ can be found in various ways; a convenient approximation is to use the
+ reciprocal of the main diagonal of the stiffness matrix:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{P}^{-1}=diag\left(\boldsymbol{K}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is calculated once at the beginning of the solution.
+\end_layout
+
 \begin_layout Section
 Generalized 
 \begin_inset Formula $\alpha-$
