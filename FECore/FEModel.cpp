@@ -1956,6 +1956,9 @@ void FEModel::CopyFrom(FEModel& fem)
 	// clear the current model data
 	Clear();
 
+	// copy the active module
+	SetActiveModule(fem.GetModuleName());
+
 	// --- Parameters ---
 
 	// copy parameters (not sure if I need/want to copy all of these)
