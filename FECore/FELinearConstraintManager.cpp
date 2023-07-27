@@ -409,6 +409,11 @@ void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<doub
 {
 	FEMesh& mesh = m_fem->GetMesh();
 
+	// make sure we have a node list
+	// (rigid matrices will not have the node list set and therefore should be ignored, since
+	// you cannot use rigid nodes in linear constraints)
+	if (en.size() == 0) return;
+
 	int ndof = ke.rows();
 	int ndn = ndof / (int)en.size();
 	const int nodes = (int)en.size();
