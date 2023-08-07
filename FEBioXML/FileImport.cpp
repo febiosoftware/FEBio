@@ -988,7 +988,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 						// these maps may not be defined yet.
 						// So, we add them to the FEBioModel, which will process mapped 
 						// parameters after the rest of the file is processed
-						GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue(), i);
+						GetBuilder()->AddMappedParameter(pp, pc, s[i].c_str(), i);
 
 						// assign the valuator to the parameter
 						pi.setValuator(val);
