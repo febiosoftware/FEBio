@@ -376,6 +376,7 @@ protected:
 	bool ReadDictionary();
 	bool ReadDicList();
 	void BuildSurfaceTable();
+	void Clear();
 
 protected:
 	Dictionary	m_dic;	// dictionary

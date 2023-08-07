@@ -570,10 +570,24 @@ void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::Dictionary::Clear()
 {
+	list<DICTIONARY_ITEM>::iterator it = m_Glob.begin();
+	for (int i = 0; i < (int)m_Glob.size(); ++i, ++it) delete it->m_psave;
 	m_Glob.clear();
+
+	it = m_Mat.begin();
+	for (int i = 0; i < (int)m_Mat.size(); ++i, ++it) delete it->m_psave;
 	m_Mat.clear();
+
+	it = m_Node.begin();
+	for (int i = 0; i < (int)m_Node.size(); ++i, ++it) delete it->m_psave;
 	m_Node.clear();
+
+	it = m_Elem.begin();
+	for (int i = 0; i < (int)m_Elem.size(); ++i, ++it) delete it->m_psave;
 	m_Elem.clear();
+
+	it = m_Face.begin();
+	for (int i = 0; i < (int)m_Face.size(); ++i, ++it) delete it->m_psave;
 	m_Face.clear();
 }
 
@@ -612,21 +626,8 @@ FEBioPlotFile::~FEBioPlotFile(void)
 	// close the archive
 	Close();
 
-	// clear all arrays
-	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Glob.begin();
-	for (int i=0; i<(int) m_dic.m_Glob.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Mat.begin();
-	for (int i=0; i<(int) m_dic.m_Mat.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Node.begin();
-	for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Elem.begin();
-	for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Face.begin();
-	for (int i=0; i<(int) m_dic.m_Face.size(); ++i, ++it) delete it->m_psave;
+	// clear everything
+	Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -729,6 +730,15 @@ void FEBioPlotFile::Close()
 }
 
 //-----------------------------------------------------------------------------
+void FEBioPlotFile::Clear()
+{
+	m_dic.Clear();
+	m_Surf.clear();
+	for (PointObject* p : m_Points) delete p; m_Points.clear();
+	for (LineObject* l : m_Lines) delete l; m_Lines.clear();
+}
+
+//-----------------------------------------------------------------------------
 bool FEBioPlotFile::Open(const char *szfile)
 {
 	FEModel* fem = GetFEModel();
@@ -739,6 +749,9 @@ bool FEBioPlotFile::Open(const char *szfile)
 	// set compression
 	FEPlotDataStore& pltData = fem->GetPlotDataStore();
 	SetCompression(pltData.GetPlotCompression());
+
+	// clear any existing plot structures
+	Clear();
 
 	// add plot variables
 	for (int n = 0; n < pltData.PlotVariables(); ++n)

@@ -1553,27 +1553,6 @@ bool FEBioModel::Reset()
 		if (InitLogFile() == false) return false;
 	}
 
-	// open plot database file
-	FEAnalysis* step =  GetCurrentStep();
-	if (step->GetPlotLevel() != FE_PLOT_NEVER)
-	{
-		int hint = step->GetPlotHint();
-		if (m_plot == 0) 
-		{
-			m_plot = new FEBioPlotFile(this);
-			hint = 0;
-		}
-
-		if (hint != FE_PLOT_APPEND)
-		{
-			if (m_plot->Open(m_splot.c_str()) == false)
-			{
-				feLogError("Failed creating PLOT database.");
-				return false;
-			}
-		}
-	}
-
 	m_stats.ntimeSteps = 0;
 	m_stats.ntotalIters = 0;
 	m_stats.ntotalRHS = 0;
