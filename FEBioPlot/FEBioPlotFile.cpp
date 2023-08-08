@@ -751,7 +751,7 @@ bool FEBioPlotFile::Open(const char *szfile)
 	SetCompression(pltData.GetPlotCompression());
 
 	// clear any existing plot structures
-	Clear();
+	m_dic.Clear();
 
 	// add plot variables
 	for (int n = 0; n < pltData.PlotVariables(); ++n)
