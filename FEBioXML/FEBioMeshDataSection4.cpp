@@ -247,11 +247,11 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 	const char* szfmt = nullptr;
 	for (XMLAtt& att : tag.m_att)
 	{
-		if      (strcmp(att.name(), "elem_set" ) == 0) szset  = att.cvalue();
-		else if (strcmp(att.name(), "type"     ) == 0) sztype = att.cvalue();
-		else if (strcmp(att.name(), "name"     ) == 0) szname = att.cvalue();
-		else if (strcmp(att.name(), "data_type") == 0) szdataType = att.cvalue();
-		else if (strcmp(att.name(), "format"   ) == 0) szfmt  = att.cvalue();
+		if (strcmp(att.name(), "elem_set") == 0) { szset = att.cvalue(); att.m_bvisited = true; }
+		else if (strcmp(att.name(), "type"     ) == 0) { sztype = att.cvalue(); att.m_bvisited = true;}
+		else if (strcmp(att.name(), "name"     ) == 0) { szname = att.cvalue();  att.m_bvisited = true;}
+		else if (strcmp(att.name(), "data_type") == 0) { szdataType = att.cvalue(); att.m_bvisited = true;}
+		else if (strcmp(att.name(), "format"   ) == 0) { szfmt  = att.cvalue(); att.m_bvisited = true;}
 		else throw XMLReader::InvalidAttribute(tag, att.name());
 	}
 
