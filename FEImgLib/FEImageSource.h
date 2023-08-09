@@ -87,7 +87,6 @@ private:
 
 private:
 	std::string		m_file;
-	int		m_dummy;
 
 	DECLARE_FECORE_CLASS();
 };

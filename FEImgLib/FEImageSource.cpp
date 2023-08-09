@@ -137,13 +137,11 @@ bool FERawImage::Load(const char* szfile, Image& im, Image::ImageFormat fmt, boo
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FENRRDImage, FEImageSource)
-	ADD_PARAMETER(m_file, "file", FE_PARAM_ATTRIBUTE);
-	ADD_PARAMETER(m_dummy, "dummy");
+	ADD_PARAMETER(m_file, "file");
 END_FECORE_CLASS();
 
 FENRRDImage::FENRRDImage(FEModel* fem) : FEImageSource(fem)
 {
-	m_dummy = 0;
 }
 
 bool FENRRDImage::GetImage3D(Image& im)
