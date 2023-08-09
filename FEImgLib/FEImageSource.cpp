@@ -24,6 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FEImageSource.h"
+#include <FECore/log.h>
 
 FEImageSource::FEImageSource(FEModel* fem) : FECoreClass(fem)
 {
@@ -131,5 +132,120 @@ bool FERawImage::Load(const char* szfile, Image& im, Image::ImageFormat fmt, boo
 	// all done
 	delete[] pb;
 	fclose(fp);
+	return true;
+}
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FENRRDImage, FEImageSource)
+	ADD_PARAMETER(m_file, "file", FE_PARAM_ATTRIBUTE);
+	ADD_PARAMETER(m_dummy, "dummy");
+END_FECORE_CLASS();
+
+FENRRDImage::FENRRDImage(FEModel* fem) : FEImageSource(fem)
+{
+	m_dummy = 0;
+}
+
+bool FENRRDImage::GetImage3D(Image& im)
+{
+	if (m_file.empty()) return false;
+	const char* szfile = m_file.c_str();
+	return Load(szfile, im);
+}
+
+bool nrrd_read_line(FILE* fp, char* buf)
+{
+	char c;
+	while (fread(&c, 1, 1, fp))
+	{
+		if ((c != '\r') && (c != '\n')) *buf++ = c;
+		if (c == '\n') {
+			*buf = 0; return true;
+		}
+	}
+	return false;
+}
+
+bool nrrd_read_key_value(const char* szline, char* key, char* val)
+{
+	const char* c = szline;
+	char* d = key;
+	bool skip_space = true;
+	while (*c)
+	{
+		if (*c == ':')
+		{
+			*d = 0;
+			d = val;
+			skip_space = true;
+		}
+		else if (skip_space) {
+			if (isspace(*c) == 0) {
+				*d++ = *c;
+				skip_space = false;
+			}
+		}
+		else *d++ = *c;
+		c++;
+	}
+	*d = 0;
+	return true;
+}
+
+bool FENRRDImage::Load(const char* szfile, Image& im)
+{
+	if (szfile == nullptr) return false;
+
+	FILE* fp = fopen(szfile, "rb");
+	if (fp == nullptr) return false;
+
+	// read the header
+	char buf[1024] = { 0 }, key[256] = { 0 }, val[256] = { 0 };
+	nrrd_read_line(fp, buf);
+	if (strncmp(buf, "NRRD", 4) != 0) { fclose(fp); return false; }
+
+	NRRD_TYPE imType = NRRD_INVALID;
+	int dim = 0;
+	int sizes[3] = { 0 };
+	NRRD_ENCODING enc = NRRD_RAW;
+
+	while (nrrd_read_line(fp, buf))
+	{
+		if (buf[0] == 0) break;
+
+		// read key-value
+		if (buf[0] != '#')
+		{
+			if (nrrd_read_key_value(buf, key, val) == false) { fclose(fp); return false; }
+
+			if (strcmp(key, "type") == 0)
+			{
+				if (strcmp(val, "float") == 0) imType = NRRD_FLOAT;
+			}
+			else if (strcmp(key, "dimension") == 0) dim = atoi(val);
+			else if (strcmp(key, "sizes") == 0) sscanf(val, "%d %d %d", sizes, sizes + 1, sizes + 2);
+			else if (strcmp(key, "encoding") == 0)
+			{
+				if (strcmp(val, "raw") == 0) enc = NRRD_RAW;
+				if (strcmp(val, "ascii") == 0) enc = NRRD_ASCII;
+			}
+		}
+	}
+
+	// read the image
+	if (imType != NRRD_FLOAT) { feLog("Invalid image format (only float supported)"); fclose(fp); return false; }
+	if (dim != 3) { feLog("Invalid image dimensions (must be 3)"); fclose(fp); return false; }
+	if (enc != NRRD_RAW) { feLog("Invalid encoding (only raw supported)"); fclose(fp); return false; }
+
+	int nsize = sizes[0] * sizes[1] * sizes[2];
+	if (nsize <= 0) { feLog("Invalid image sizes"); fclose(fp); return false; }
+
+	im.Create(sizes[0], sizes[1], sizes[2]);
+	float* pf = im.data();
+	int nread = fread(pf, sizeof(float), nsize, fp);
+	if (nread != nsize) { feLog("Failed reading image data"); fclose(fp); return false; }
+	
+	fclose(fp);
+
 	return true;
 }

@@ -61,3 +61,33 @@ protected:
 
 	DECLARE_FECORE_CLASS();
 };
+
+//---------------------------------------------------------------------------
+// Class for reading NRRD images
+class FEIMGLIB_API FENRRDImage : public FEImageSource
+{
+	enum NRRD_TYPE {
+		NRRD_INVALID,
+		NRRD_FLOAT
+	};
+
+	enum NRRD_ENCODING {
+		NRRD_RAW,
+		NRRD_ASCII
+	};
+
+public:
+	FENRRDImage(FEModel* fem);
+
+	bool GetImage3D(Image& im) override;
+
+private:
+	// load image data from file
+	bool Load(const char* szfile, Image& im);
+
+private:
+	std::string		m_file;
+	int		m_dummy;
+
+	DECLARE_FECORE_CLASS();
+};
