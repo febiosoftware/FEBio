@@ -310,6 +310,21 @@ void FEBioMeshSection4::ParsePartListSection(XMLTag& tag, FEBModel::Part* part)
 	if (partList.empty()) throw XMLReader::InvalidTag(tag);
 
 	ps->SetPartList(partList);
+
+	// we'll also create an element set of this
+	FEBModel::ElementSet* es = new FEBModel::ElementSet("@part_list:" + string(szname));
+	part->AddElementSet(es);
+
+	vector<int> elemList;
+	for (string s : partList)
+	{
+		FEBModel::ElementSet* a = part->FindElementSet(s);
+		if (a == nullptr) throw XMLReader::InvalidValue(tag);
+		
+		const vector<int>& aList = a->ElementList();
+		elemList.insert(elemList.end(), aList.begin(), aList.end());
+	}
+	es->SetElementList(elemList);
 }
 
 //-----------------------------------------------------------------------------
