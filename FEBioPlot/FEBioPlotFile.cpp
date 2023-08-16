@@ -35,6 +35,8 @@ SOFTWARE.*/
 #include <FECore/FESurface.h>
 #include <FECore/FEPlotDataStore.h>
 #include <FECore/log.h>
+#include <FECore/FEPIDController.h>
+#include <sstream>
 
 FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
 {
@@ -384,8 +386,9 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		ps->SetDomainName(szdom);
 		switch (ps->RegionType())
 		{
-		case FE_REGION_NODE: return AddNodalVariable(ps, szfield, item);
-		case FE_REGION_DOMAIN: return AddDomainVariable(ps, szfield, item);
+		case FE_REGION_GLOBAL : return AddGlobalVariable(ps, szfield);
+		case FE_REGION_NODE   : return AddNodalVariable(ps, szfield, item);
+		case FE_REGION_DOMAIN : return AddDomainVariable(ps, szfield, item);
 		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, szfield, item);
 		default:
 			assert(false);
@@ -472,6 +475,23 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Dictionary::AddGlobalVariable(FEPlotData* ps, const char* szname)
 {
+	assert(ps->RegionType() == FE_REGION_GLOBAL);
+	if (ps->RegionType() == FE_REGION_GLOBAL)
+	{
+		DICTIONARY_ITEM it;
+		it.m_ntype = ps->DataType();
+		it.m_nfmt  = ps->StorageFormat();
+		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
+		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
+		m_Glob.push_back(it);
+		return true;
+	}
 	return false;
 }
 
@@ -565,6 +585,24 @@ void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
 		AddVariable(&fem, "displacement", l);
 		AddVariable(&fem, "stress", l);
 	}
+
+	// Define default global variables
+	if (m_Glob.empty())
+	{
+		// add all the PID controllers
+		std::vector<int> dummy;
+		for (int i = 0; i < fem.LoadControllers(); ++i)
+		{
+			FEPIDController* pid = dynamic_cast<FEPIDController*>(fem.GetLoadController(i));
+			if (pid)
+			{
+				stringstream ss;
+				ss << "pid controller['" << pid->GetName() << "']=" << pid->GetName();
+				string s = ss.str();
+				AddVariable(&fem, s.c_str(), dummy);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -636,8 +674,9 @@ bool FEBioPlotFile::AddVariable(FEPlotData* ps, const char* szname)
 	vector<int> dummy;
 	switch (ps->RegionType())
 	{
-	case FE_REGION_NODE: return m_dic.AddNodalVariable(ps, szname, dummy);
-	case FE_REGION_DOMAIN: return m_dic.AddDomainVariable(ps, szname, dummy);
+	case FE_REGION_GLOBAL : return m_dic.AddGlobalVariable (ps, szname);
+	case FE_REGION_NODE   : return m_dic.AddNodalVariable  (ps, szname, dummy);
+	case FE_REGION_DOMAIN : return m_dic.AddDomainVariable (ps, szname, dummy);
 	case FE_REGION_SURFACE: return m_dic.AddSurfaceVariable(ps, szname, dummy);
 	default:
 		assert(false);
@@ -1629,7 +1668,21 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteGlobalData(FEModel& fem)
 {
-
+	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Glob.begin();
+	for (int i = 0; i < (int)m_dic.m_Glob.size(); ++i, ++it)
+	{
+		m_ar.BeginChunk(PLT_STATE_VARIABLE);
+		{
+			unsigned int nid = i + 1;
+			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
+			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
+			{
+				if (it->m_psave) WriteGlobalDataField(fem, it->m_psave);
+			}
+			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1689,6 +1742,20 @@ void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 			m_ar.EndChunk();
 		}
 		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteGlobalDataField(FEModel& fem, FEPlotData* pd)
+{
+	int ndata = pd->VarSize(pd->DataType());
+	FEDataStream a; a.reserve(ndata);
+	if (pd->Save(a))
+	{
+		// pad mismatches
+		assert(a.size() == ndata);
+		if (a.size() != ndata) a.resize(ndata, 0.f);
+		m_ar.WriteData(0, a.data());
 	}
 }
 

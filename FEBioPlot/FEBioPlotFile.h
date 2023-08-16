@@ -366,6 +366,7 @@ protected:
 	void WriteObjectsState();
 	void WriteObjectData(PlotObject* po);
 
+	void WriteGlobalDataField(FEModel& fem, FEPlotData* pd);
 	void WriteNodeDataField(FEModel& fem, FEPlotData* pd);
 	void WriteDomainDataField(FEModel& fem, FEPlotData* pd);
 	void WriteSurfaceDataField(FEModel& fem, FEPlotData* pd);
