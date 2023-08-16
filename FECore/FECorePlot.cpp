@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include "FESurfaceLoad.h"
 #include "FEDomainMap.h"
 #include "FEModel.h"
+#include "FEPIDController.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -471,4 +472,37 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 
 
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+FEPlotPIDController::FEPlotPIDController(FEModel* pfem) : FEPlotGlobalData(pfem, PLT_FLOAT)
+{
+	m_pid = nullptr;
+}
+
+bool FEPlotPIDController::SetFilter(const char* sz)
+{
+	if (sz == nullptr) return false;
+	FEModel* fem = GetFEModel(); assert(fem);
+	if (fem == nullptr) return false;
+
+	for (int i = 0; i < fem->LoadControllers(); ++i)
+	{
+		FEPIDController* pid = dynamic_cast<FEPIDController*>(fem->GetLoadController(i));
+		if (pid && (pid->GetName() == string(sz)))
+		{
+			m_pid = pid;
+			return true;
+		}
+	}
+
+	m_pid = nullptr;
+	return false;
+}
+
+bool FEPlotPIDController::Save(FEDataStream& a)
+{
+	if (m_pid == nullptr) return false;
+	a << m_pid->Value();
+	return true;
 }

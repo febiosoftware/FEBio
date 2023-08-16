@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEPlotData.h"
+#include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FEMaterial;
@@ -36,7 +37,7 @@ class FEFacetSet;
 
 //-----------------------------------------------------------------------------
 // class for exporting element specific material parameters to plot file
-class FEPlotParameter : public FEPlotData
+class FECORE_API FEPlotParameter : public FEPlotData
 {
 	FECORE_BASE_CLASS(FEPlotParameter)
 
@@ -60,4 +61,18 @@ private:
 	FEFacetSet*			m_surf;
 
 	std::string		m_filter;
+};
+
+//-----------------------------------------------------------------------------
+class FEPIDController;
+
+class FECORE_API FEPlotPIDController : public FEPlotGlobalData
+{
+public:
+	FEPlotPIDController(FEModel* pfem);
+	bool SetFilter(const char* sz) override;
+	bool Save(FEDataStream& a) override;
+
+private:
+	FEPIDController* m_pid;
 };
