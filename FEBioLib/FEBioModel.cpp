@@ -904,9 +904,9 @@ void FEBioModel::UpdatePlotObjects()
 
 	FEModel& fem = *GetFEModel();
 
+	int nid = 1;
 	if (plt->PointObjects() == 0)
 	{
-		int nid = 1;
 		for (int i = 0; i < nrb; ++i)
 		{
 			FERigidBody* rb = GetRigidBody(i);
@@ -1104,8 +1104,6 @@ void FEBioModel::UpdatePlotObjects()
 
 	if (plt->LineObjects() == 0)
 	{
-		int nid = 1;
-
 		// check rigid connectors
 		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 		{
@@ -1116,7 +1114,7 @@ void FEBioModel::UpdatePlotObjects()
 				if (name.empty())
 				{
 					stringstream ss;
-					ss << "Object" << nid;
+					ss << "LineObject" << nid;
 					name = ss.str();
 				}
 
@@ -1178,6 +1176,7 @@ void FEBioModel::UpdatePlotObjects()
                     po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rcf));
                 }
 			}
+			nid++;
 		}
 	}
 	else
