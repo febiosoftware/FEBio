@@ -1572,6 +1572,15 @@ void FEBioPlotFile::WriteObject(PlotObject* po)
 	float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
 	m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
 
+	if (dynamic_cast<LineObject*>(po))
+	{
+		LineObject* pl = dynamic_cast<LineObject*>(po);
+		vec3d r1 = pl->m_r1;
+		vec3d r2 = pl->m_r2;
+		float c[6] = { (float)r1.x, (float)r1.y, (float)r1.z, (float)r2.x, (float)r2.y, (float)r2.z };
+		m_ar.WriteChunk(PLT_LINE_COORDS, c, 6);
+	}
+
 	list<DICTIONARY_ITEM>::iterator it = po->m_data.begin();
 	for (int j = 0; j < po->m_data.size(); ++j, ++it)
 	{

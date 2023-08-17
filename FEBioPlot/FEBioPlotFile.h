@@ -255,6 +255,7 @@ public:
 	{
 	public:
 		PlotObject() {}
+		virtual ~PlotObject() {}
 
 		void AddData(const char* szname, Var_Type type, FEPlotData* psave = nullptr);
 
