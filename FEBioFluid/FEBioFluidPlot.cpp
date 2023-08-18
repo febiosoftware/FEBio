@@ -614,37 +614,33 @@ bool FEPlotFluidTemperature::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-// NOTE: This is not thread safe!
 class FEFluidVolumeRatio
 {
 public:
-	FEFluidVolumeRatio(FEModel* fem, FESolidDomain& dom) : m_dom(dom), m_el(0)
+	FEFluidVolumeRatio(FEModel* fem, FESolidDomain& dom) : m_dom(dom)
 	{
-		dofEF = fem->GetDOFIndex("ef");
+		m_dofEF = fem->GetDOFIndex("ef");
 	}
 
 	double operator()(const FEMaterialPoint& mp)
 	{
-		if (m_el != mp.m_elem)
-		{
-			m_el = dynamic_cast<FESolidElement*>(mp.m_elem);
-			FESolidElement& el = *m_el;
-			FEMesh& mesh = *m_dom.GetMesh();
-			int neln = el.Nodes();
-			for (int j = 0; j<neln; ++j)
-				et[j] = mesh.Node(el.m_node[j]).get(dofEF);
-		}
+		FESolidElement* pel = dynamic_cast<FESolidElement*>(mp.m_elem);
+		if (pel == nullptr) return 0.0;
 
-		double  Jf = 1 + m_el->Evaluate(et, mp.m_index);
+		FESolidElement& el = *pel;
+		FEMesh& mesh = *m_dom.GetMesh();
+		int neln = el.Nodes();
+		double et[FEElement::MAX_NODES];
+		for (int j = 0; j<neln; ++j)
+				et[j] = mesh.Node(el.m_node[j]).get(m_dofEF);
+		
+		double  Jf = 1.0 + el.Evaluate(et, mp.m_index);
 		return Jf;
 	}
 
 private:
 	FESolidDomain&	m_dom;
-	FESolidElement*	m_el;
-	int dofEF;
-
-	double et[FEElement::MAX_NODES];
+	int m_dofEF;
 };
 
 bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
@@ -662,39 +658,35 @@ bool FEPlotFluidVolumeRatio::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-// NOTE: This is not thread safe!
 class FEFluidDensity
 {
 public:
-	FEFluidDensity(FEModel* fem, FESolidDomain& dom, FEFluidMaterial* pm) : m_dom(dom), m_mat(pm), m_el(0)
+	FEFluidDensity(FEModel* fem, FESolidDomain& dom, FEFluidMaterial* pm) : m_dom(dom), m_mat(pm)
 	{
-		dofEF = fem->GetDOFIndex("ef");
+		m_dofEF = fem->GetDOFIndex("ef");
 	}
 
 	double operator()(const FEMaterialPoint& mp)
 	{
-		if (m_el != mp.m_elem)
-		{
-			m_el = dynamic_cast<FESolidElement*>(mp.m_elem);
-			FESolidElement& el = *m_el;
-			FEMesh& mesh = *m_dom.GetMesh();
-			int neln = el.Nodes();
-			for (int j = 0; j<neln; ++j)
-				et[j] = mesh.Node(el.m_node[j]).get(dofEF);
-		}
+		FESolidElement* pel = dynamic_cast<FESolidElement*>(mp.m_elem);
+		if (pel == nullptr) return 0.0;
+			
+		FESolidElement& el = *pel;
+		FEMesh& mesh = *m_dom.GetMesh();
+		int neln = el.Nodes();
+		double et[FEElement::MAX_NODES];
+		for (int j = 0; j<neln; ++j)
+			et[j] = mesh.Node(el.m_node[j]).get(m_dofEF);
 
 		double rhor = m_mat->m_rhor;
-		double Jf = 1 + m_el->Evaluate(et, mp.m_index);
+		double Jf = 1 + el.Evaluate(et, mp.m_index);
 		return rhor / Jf;
 	}
 
 private:
 	FESolidDomain&	m_dom;
-	FESolidElement*	m_el;
 	FEFluidMaterial*	m_mat;
-	int dofEF;
-
-	double et[FEElement::MAX_NODES];
+	int m_dofEF;
 };
 
 bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
@@ -712,37 +704,36 @@ bool FEPlotFluidDensity::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-// NOTE: This is not thread safe!
 class FEFluidDensityRate
 {
 public:
-	FEFluidDensityRate(FEModel* fem, FESolidDomain& dom, FEFluidMaterial* pm) : m_dom(dom), m_el(0), m_mat(pm)
+	FEFluidDensityRate(FEModel* fem, FESolidDomain& dom, FEFluidMaterial* pm) : m_dom(dom), m_mat(pm)
 	{
-		dofVX = fem->GetDOFIndex("vx");
-		dofVY = fem->GetDOFIndex("vy");
-		dofVZ = fem->GetDOFIndex("vz");
-		dofEF = fem->GetDOFIndex("ef");
-		dofAEF = fem->GetDOFIndex("aef");
+		m_dofVX = fem->GetDOFIndex("vx");
+		m_dofVY = fem->GetDOFIndex("vy");
+		m_dofVZ = fem->GetDOFIndex("vz");
+		m_dofEF = fem->GetDOFIndex("ef");
+		m_dofAEF = fem->GetDOFIndex("aef");
 	}
 
 	double operator()(const FEMaterialPoint& mp)
 	{
-		if (m_el != mp.m_elem)
-		{
-			m_el = dynamic_cast<FESolidElement*>(mp.m_elem);
+		FESolidElement* pel = dynamic_cast<FESolidElement*>(mp.m_elem);
+		if (pel == nullptr) return 0.0;
 
-			FESolidElement& el = *m_el;
-			FEMesh& mesh = *m_dom.GetMesh();
+		FESolidElement& el = *pel;
+		FEMesh& mesh = *m_dom.GetMesh();
 
-			int neln = m_el->Nodes();
-			for (int j = 0; j<neln; ++j) {
-				vt[j] = mesh.Node(el.m_node[j]).get_vec3d(dofVX, dofVY, dofVZ);
-				et[j] = mesh.Node(el.m_node[j]).get(dofEF);
-				aet[j] = mesh.Node(el.m_node[j]).get(dofAEF);
-			}
+		vec3d vt[FEElement::MAX_NODES];
+		double et[FEElement::MAX_NODES];
+		double aet[FEElement::MAX_NODES];
+		int neln = el.Nodes();
+		for (int j = 0; j<neln; ++j) {
+			vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofVX, m_dofVY, m_dofVZ);
+			et[j] = mesh.Node(el.m_node[j]).get(m_dofEF);
+			aet[j] = mesh.Node(el.m_node[j]).get(m_dofAEF);
 		}
 
-		FESolidElement& el = *m_el;
 		double rhor = m_mat->m_rhor;
 		double Jf = 1.0 + el.Evaluate(et, mp.m_index);
 		double Jfdot = el.Evaluate(aet, mp.m_index);
@@ -753,14 +744,10 @@ public:
 
 private:
 	FESolidDomain&	m_dom;
-	FESolidElement*	m_el;
 	FEFluidMaterial* m_mat;
 
-	int dofVX, dofVY, dofVZ;
-	int dofEF, dofAEF;
-	vec3d vt[FEElement::MAX_NODES];
-	double et[FEElement::MAX_NODES];
-	double aet[FEElement::MAX_NODES];
+	int m_dofVX, m_dofVY, m_dofVZ;
+	int m_dofEF, m_dofAEF;
 };
 
 bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
