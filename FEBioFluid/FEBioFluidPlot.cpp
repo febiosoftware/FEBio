@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEBioFluidPlot.h"
 #include "FEFluidDomain3D.h"
 #include "FEFluidMaterial.h"
+#include "FEPolarFluidMaterial.h"
 #include "FEFluid.h"
 #include "FEPolarFluid.h"
 #include "FEFluidDomain.h"
@@ -215,6 +216,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
 
             // see if this is a fluid element
             if (pfluid) {
+                FEPolarFluidMaterial* polar = pfluid->ExtractProperty<FEPolarFluidMaterial>();
                 // evaluate the average stress in this element
                 int nint = pe->GaussPoints();
                 mat3d s(mat3dd(0));
@@ -223,8 +225,8 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
                     FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
                     FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
                     s += pt.m_sf;
-                    if (pfluid->GetViscousPolar())
-                        s += pfluid->GetViscousPolar()->SkewStress(mp);
+                    if (polar)
+                        s += polar->GetViscousPolar()->SkewStress(mp);
                 }
                 s /= nint;
                 
@@ -273,11 +275,11 @@ bool FEPlotFluidSurfaceMoment::Save(FESurface &surf, FEDataStream &a)
         {
             // get the material
             FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+            FEPolarFluidMaterial* pfluid = pm->ExtractProperty<FEPolarFluidMaterial>();
             
             if (!pfluid) {
                 pe = el.m_elem[1];
-                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEPolarFluidMaterial>();
             }
             
             // see if this is a fluid element
