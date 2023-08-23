@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include "FEDomainMap.h"
 #include "FEModel.h"
 #include "FEPIDController.h"
+#include "FEDataMap.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -513,4 +514,159 @@ bool FEPlotPIDController::Save(FEDataStream& a)
 	a << m_pid->GetError();
 	a << m_pid->Value();
 	return true;
+}
+
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FEPlotMeshData::FEPlotMeshData(FEModel* pfem) : FEPlotData(pfem)
+{
+	m_map = nullptr;
+	m_dom = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+// This plot field requires a filter which defines the material name and 
+// the material parameter in the format [materialname.parametername].
+bool FEPlotMeshData::SetFilter(const char* sz)
+{
+	// store the filter for serialization
+	m_filter = sz;
+
+	// find the map
+	m_map = GetFEModel()->GetMesh().FindDataMap(sz);
+	if (m_map == nullptr) return false;
+
+	switch (m_map->DataMapType())
+	{
+	case FE_DOMAIN_MAP:
+	{
+		FEDomainMap* map = dynamic_cast<FEDomainMap*>(m_map); assert(map);
+		FEDataType dataType = map->DataType();
+
+		SetRegionType(FE_REGION_DOMAIN);
+		SetStorageFormat((Storage_Fmt)map->StorageFormat());
+
+		if (map->StorageFormat() == FMT_MATPOINTS) SetStorageFormat(FMT_MULT);
+		
+		switch (dataType)
+		{
+		case FE_DOUBLE: SetVarType(PLT_FLOAT); break;
+		default:
+			assert(false);
+			return false;
+		}
+
+		const FEElementSet* set = map->GetElementSet();
+		if (set == nullptr) return false;
+
+		m_dom = &(set->GetDomainList());
+	}
+	break;
+	default:
+		assert(false);
+		return false;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPlotMeshData::Serialize(DumpStream& ar)
+{
+	FEPlotData::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+		ar << m_filter;
+	else
+	{
+		string filter;
+		ar >> filter;
+		SetFilter(filter.c_str());
+	}
+}
+
+//-----------------------------------------------------------------------------
+// The Save function stores the material parameter data to the plot file.
+bool FEPlotMeshData::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDomainMap* map = dynamic_cast<FEDomainMap*>(m_map);
+	if (map == nullptr) return false;
+	if (m_dom == nullptr) return false;
+
+	if (m_dom->IsMember(&dom))
+	{
+		if (StorageFormat() == FMT_NODE)
+		{
+			if (DataType() == PLT_FLOAT)
+			{
+				int n = dom.Nodes();
+				for (int i = 0; i < n; ++i)
+				{
+					int m = dom.NodeIndex(i);
+					double v = map->NodalValue(m);
+					a << v;
+				}
+				return true;
+			}
+		}
+		else if (StorageFormat() == FMT_ITEM)
+		{
+			if (DataType() == PLT_FLOAT)
+			{
+				int n = dom.Elements();
+				for (int i = 0; i < n; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					FEMaterialPoint mp;
+					mp.m_elem = &el;
+					mp.m_index = 0;
+					double v = map->value(mp);
+					a << v;
+				}
+				return true;
+			}
+		}
+		else if (map->StorageFormat() == FMT_MATPOINTS)
+		{
+			// Note that for this map type, the plot format was changed to FMT_MULT
+			if (DataType() == PLT_FLOAT)
+			{
+				int NE = dom.Elements();
+				double vi[FEElement::MAX_INTPOINTS] = { 0 };
+				double vn[FEElement::MAX_NODES] = { 0 };
+				for (int i = 0; i < NE; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					for (int j = 0; j < el.GaussPoints(); ++j)
+					{
+						FEMaterialPoint mp;
+						mp.m_elem = &el;
+						mp.m_index = j;
+						vi[j] = map->value(mp);
+					}
+
+					el.project_to_nodes(vi, vn);
+					for (int j=0; j<el.Nodes(); ++j)
+						a << vn[j];
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// The Save function stores the material parameter data to the plot file.
+bool FEPlotMeshData::Save(FESurface& dom, FEDataStream& a)
+{
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotMeshData::Save(FEMesh& mesh, FEDataStream& a)
+{
+	return false;
 }

@@ -34,6 +34,7 @@ SOFTWARE.*/
 class FEMaterial;
 class FEDomainList;
 class FEFacetSet;
+class FEDataMap;
 
 //-----------------------------------------------------------------------------
 // class for exporting element specific material parameters to plot file
@@ -75,4 +76,26 @@ public:
 
 private:
 	FEPIDController* m_pid;
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEPlotMeshData : public FEPlotData
+{
+	FECORE_BASE_CLASS(FEPlotMeshData)
+
+public:
+	FEPlotMeshData(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+	bool Save(FESurface& dom, FEDataStream& a);
+	bool Save(FEMesh& mesh, FEDataStream& a);
+
+	bool SetFilter(const char* sz) override;
+
+	void Serialize(DumpStream& ar) override;
+
+protected:
+	FEDataMap*	m_map;		//!< parameter
+
+	const FEDomainList*	m_dom;
+	std::string		m_filter;
 };
