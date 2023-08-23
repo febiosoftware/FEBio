@@ -182,68 +182,84 @@ bool FEElemDataGenerator::Generate(FEDomainMap& map)
 	FEMesh& mesh = *set.GetMesh();
 
 	FEDataType dataType = map.DataType();
-	int N = set.Elements();
-	for (int i = 0; i<N; ++i)
+	if (map.StorageFormat() == FMT_NODE)
 	{
-		FEElement& el = *mesh.FindElementFromID(set[i]);
+		assert(dataType == FE_DOUBLE);
+		if (dataType != FE_DOUBLE) return false;
+		FENodeList nodeList = set.GetNodeList();
+		for (int i = 0; i < nodeList.Size(); ++i)
+		{
+			FENode* pn = nodeList.Node(i);
+			double v = 0.;
+			value(pn->m_r0, v);
+			map.setValue(i, v);
+		}
+	}
+	else
+	{
+		int N = set.Elements();
+		for (int i = 0; i < N; ++i)
+		{
+			FEElement& el = *mesh.FindElementFromID(set[i]);
 
-		switch (map.StorageFormat())
-		{
-		case FMT_MULT:
-		{
-			int ne = el.Nodes();
-			for (int j = 0; j < ne; ++j)
+			switch (map.StorageFormat())
 			{
-				vec3d ri = mesh.Node(el.m_node[j]).m_r0;
-				switch (dataType)
+			case FMT_MULT:
+			{
+				int ne = el.Nodes();
+				for (int j = 0; j < ne; ++j)
 				{
-				case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
-                case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
+					vec3d ri = mesh.Node(el.m_node[j]).m_r0;
+					switch (dataType)
+					{
+					case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
+					case FE_VEC2D: { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
+					case FE_VEC3D: { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
+					case FE_MAT3D: { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+					case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
+					}
 				}
 			}
-		}
-		break;
-		case FMT_ITEM:
-		{
-			// calculate element center
-			vec3d r(0, 0, 0);
-			int ne = el.Nodes();
-			for (int j = 0; j < ne; ++j) r += mesh.Node(el.m_node[j]).m_r0;
-			r /= ne;
+			break;
+			case FMT_ITEM:
+			{
+				// calculate element center
+				vec3d r(0, 0, 0);
+				int ne = el.Nodes();
+				for (int j = 0; j < ne; ++j) r += mesh.Node(el.m_node[j]).m_r0;
+				r /= ne;
 
-			// evaluate
-			switch (dataType)
-			{
-			case FE_DOUBLE: { double d; value(r, d); map.setValue(i, d); } break;
-			case FE_VEC2D : { vec2d  d; value(r, d); map.setValue(i, d); } break;
-			case FE_VEC3D : { vec3d  d; value(r, d); map.setValue(i, d); } break;
-			case FE_MAT3D : { mat3d  d; value(r, d); map.setValue(i, d); } break;
-            case FE_MAT3DS: { mat3ds d; value(r, d); map.setValue(i, d); } break;
-			}
-		}
-		break;
-		case FMT_MATPOINTS:
-		{
-			int ni = el.GaussPoints();
-			for (int j = 0; j < ni; ++j)
-			{
-				FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-				vec3d ri = pt.m_r0;
+				// evaluate
 				switch (dataType)
 				{
-				case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
-				case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
-                case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
+				case FE_DOUBLE: { double d; value(r, d); map.setValue(i, d); } break;
+				case FE_VEC2D: { vec2d  d; value(r, d); map.setValue(i, d); } break;
+				case FE_VEC3D: { vec3d  d; value(r, d); map.setValue(i, d); } break;
+				case FE_MAT3D: { mat3d  d; value(r, d); map.setValue(i, d); } break;
+				case FE_MAT3DS: { mat3ds d; value(r, d); map.setValue(i, d); } break;
 				}
 			}
+			break;
+			case FMT_MATPOINTS:
+			{
+				int ni = el.GaussPoints();
+				for (int j = 0; j < ni; ++j)
+				{
+					FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+					vec3d ri = pt.m_r0;
+					switch (dataType)
+					{
+					case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
+					case FE_VEC2D: { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
+					case FE_VEC3D: { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
+					case FE_MAT3D: { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
+					case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
+					}
+				}
+			}
+			break;
+			};
 		}
-		break;
-		};
 	}
 	return true;
 }
