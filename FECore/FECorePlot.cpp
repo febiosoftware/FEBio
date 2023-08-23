@@ -475,9 +475,15 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotPIDController::FEPlotPIDController(FEModel* pfem) : FEPlotGlobalData(pfem, PLT_FLOAT)
+FEPlotPIDController::FEPlotPIDController(FEModel* pfem) : FEPlotGlobalData(pfem, PLT_ARRAY)
 {
 	m_pid = nullptr;
+	SetArraySize(3);
+	std::vector<std::string> names;
+	names.push_back("measurement");
+	names.push_back("error");
+	names.push_back("output");
+	SetArrayNames(names);
 }
 
 bool FEPlotPIDController::SetFilter(const char* sz)
@@ -503,6 +509,8 @@ bool FEPlotPIDController::SetFilter(const char* sz)
 bool FEPlotPIDController::Save(FEDataStream& a)
 {
 	if (m_pid == nullptr) return false;
+	a << m_pid->GetParameterValue();
+	a << m_pid->GetError();
 	a << m_pid->Value();
 	return true;
 }
