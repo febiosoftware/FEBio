@@ -349,6 +349,32 @@ bool FERigidSystem::CreateObjects()
 		m_RB.push_back(prb);
 	}
 
+	// initialize rigid body COM
+	// only set the rigid body com if this is the main rigid body material
+	for (int i = 0; i < m_RB.size(); ++i )
+	{
+		FERigidBody& rb = *m_RB[i];
+
+		// first, calculate the mass
+		rb.UpdateMass();
+
+		FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(rb.m_mat));
+		assert(prm);
+
+		// next, calculate the center of mass, or just set it
+		if (prm->m_com == false)
+		{
+			rb.UpdateCOM();
+		}
+		else
+		{
+			rb.SetCOM(prm->m_rc);
+		}
+
+		// finally, determine moi
+		rb.UpdateMOI();
+	}
+
 	return true;
 }
 
