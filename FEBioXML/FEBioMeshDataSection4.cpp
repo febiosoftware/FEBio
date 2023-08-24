@@ -265,6 +265,7 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 		if      (strcmp(sztype, "shell thickness") == 0) ParseShellThickness(tag, *elset);
 		else if (strcmp(sztype, "mat_axis"       ) == 0) ParseMaterialAxes  (tag, *elset);
 		else if (strcmp(sztype, "fiber"          ) == 0) ParseMaterialFibers(tag, *elset);
+		else if (strstr(sztype, ".fiber"         )) ParseMaterialFibers(tag, *elset);
 		else
 		{
 			// allocate generator
@@ -554,7 +555,9 @@ void FEBioMeshDataSection4::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 	if (mat == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
 
 	// get the fiber property
-	FEProperty* fiber = mat->FindProperty("fiber");
+	const char* sztype = tag.Attribute("type").cvalue();
+	ParamString ps(sztype);
+	FEProperty* fiber = mat->FindProperty(ps);
 	if (fiber == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", "fiber");
 	if (fiber->GetSuperClassID() != FEVEC3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "type", "fiber");
 
