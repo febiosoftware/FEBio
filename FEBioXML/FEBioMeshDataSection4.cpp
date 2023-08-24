@@ -555,8 +555,8 @@ void FEBioMeshDataSection4::ParseMaterialFibers(XMLTag& tag, FEElementSet& set)
 
 	// get the fiber property
 	FEProperty* fiber = mat->FindProperty("fiber");
-	if (fiber == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
-	if (fiber->GetSuperClassID() != FEVEC3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "elem_set", name.c_str());
+	if (fiber == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", "fiber");
+	if (fiber->GetSuperClassID() != FEVEC3DVALUATOR_ID) throw XMLReader::InvalidAttributeValue(tag, "type", "fiber");
 
 	// create a domain map
 	FEDomainMap* map = new FEDomainMap(FE_VEC3D, FMT_ITEM);
