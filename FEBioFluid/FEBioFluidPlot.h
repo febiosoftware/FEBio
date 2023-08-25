@@ -107,11 +107,10 @@ public:
 class FEPlotFluidSurfaceForce : public FEPlotSurfaceData
 {
 private:
-    bool                m_binit;
     vector<vec3d>       m_area;
     
 public:
-    FEPlotFluidSurfaceForce(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_REGION){ m_binit = true; SetUnits(UNIT_FORCE); }
+    FEPlotFluidSurfaceForce(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_REGION){ SetUnits(UNIT_FORCE); }
     bool Save(FESurface& surf, FEDataStream& a);
 };
 

@@ -185,15 +185,12 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
     int NF = pcs->Elements();
     vec3d fn(0,0,0);    // initialize
     
-    // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
-    if (m_binit) {
-        m_area.resize(NF);
-        for (int j=0; j<NF; ++j)
-        {
-            FESurfaceElement& el = pcs->Element(j);
-            m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
-        }
-        m_binit = false;
+    // calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    m_area.resize(NF);
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
     }
     
     // calculate net fluid force
