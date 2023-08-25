@@ -584,6 +584,64 @@ FEProperty* FECoreBase::PropertyClass(int i)
 }
 
 //-----------------------------------------------------------------------------
+FEProperty* FECoreBase::FindProperty(const ParamString& prop)
+{
+	int NP = (int)m_Prop.size();
+	for (int i = 0; i < NP; ++i)
+	{
+		FEProperty* mp = m_Prop[i];
+
+		if (prop == mp->GetName())
+		{
+			if (mp->IsArray())
+			{
+				// get the number of items in this property
+				int nsize = mp->size();
+				int index = prop.Index();
+				if ((index >= 0) && (index < nsize))
+				{
+					FECoreBase* pc = mp->get(index);
+					if (pc)
+					{
+						ParamString next = prop.next();
+						if (next.count() == 0) return nullptr;
+						else return pc->FindProperty(next);
+					}
+				}
+				else
+				{
+					int nid = prop.ID();
+					if (nid != -1)
+					{
+						FECoreBase* pc = mp->getFromID(nid);
+						// TODO: What to do here? 
+						assert(false);
+					}
+					else if (prop.IDString())
+					{
+						FECoreBase* pc = mp->get(prop.IDString());
+						if (pc)
+						{
+							ParamString next = prop.next();
+							if (next.count() == 0) return nullptr;
+							else return pc->FindProperty(next);
+						}
+					}
+				}
+			}
+			else
+			{
+				ParamString next = prop.next();
+				if (next.count() == 0) return mp;
+				else return FindProperty(next);
+			}
+		}
+	}
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 FECoreBase* FECoreBase::GetProperty(const ParamString& prop)
 {
 	int NP = (int) m_Prop.size();
