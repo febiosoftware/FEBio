@@ -35,7 +35,7 @@
 #include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEPolarFluid, FEFluidMaterial)
+BEGIN_FECORE_CLASS(FEPolarFluid, FEPolarFluidMaterial)
 // material properties
     ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE);
     ADD_PARAMETER(m_kg   , FE_RANGE_GREATER_OR_EQUAL(0.0), "kg");
@@ -50,7 +50,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FEFluidFSI constructor
 
-FEPolarFluid::FEPolarFluid(FEModel* pfem) : FEFluidMaterial(pfem)
+FEPolarFluid::FEPolarFluid(FEModel* pfem) : FEPolarFluidMaterial(pfem)
 {
     m_kg = 0;
     m_k = 0;
@@ -93,7 +93,7 @@ bool FEPolarFluid::Init()
 //-----------------------------------------------------------------------------
 void FEPolarFluid::Serialize(DumpStream& ar)
 {
-    FEFluidMaterial::Serialize(ar);
+    FEPolarFluidMaterial::Serialize(ar);
     if (ar.IsShallow()) return;
     
     ar & m_Tr;

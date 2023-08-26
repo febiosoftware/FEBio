@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
 #include "FEKinematicGrowth.h"
+#include "FEReactiveMaterialPoint.h"
 #include "FEReactiveFatigue.h"
 #include "FEReactivePlasticity.h"
 #include "FEReactivePlasticDamage.h"
@@ -2419,9 +2420,9 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
 {
     if (m_comp == -1) {
         writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
-            const FEDamageMaterialPoint* ppd = mp.ExtractData<FEDamageMaterialPoint>();
+            const FEReactiveMaterialPoint* ppd = mp.ExtractData<FEReactiveMaterialPoint>();
             double D = 0.0;
-            if (ppd) D = (float)ppd->m_D;
+            if (ppd) D = (float)ppd->BrokenBonds();
             return D;
         });
         return true;
@@ -2438,8 +2439,8 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
                 if (mmp && (m_comp < mmp->Components()))
                 {
-                    FEDamageMaterialPoint* dp = mmp->GetPointData(m_comp)->ExtractData<FEDamageMaterialPoint>();
-                    if (dp) D += dp->m_D;
+                    FEReactiveMaterialPoint* dp = mmp->GetPointData(m_comp)->ExtractData<FEReactiveMaterialPoint>();
+                    if (dp) D += dp->BrokenBonds();
                 }
             }
             D /= (float)el.GaussPoints();
@@ -2470,18 +2471,12 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
         writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& pt) {
 			FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
             double D = 0.0;
-            FEReactiveFatigueMaterialPoint* ppr = mp.ExtractData<FEReactiveFatigueMaterialPoint>();
-            FEReactivePlasticityMaterialPoint* prp = mp.ExtractData<FEReactivePlasticityMaterialPoint>();
-            FEReactivePlasticDamageMaterialPoint* prd = mp.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-            FEDamageMaterialPoint* ppd = mp.ExtractData<FEDamageMaterialPoint>();
+            FEReactiveMaterialPoint* prm = mp.ExtractData<FEReactiveMaterialPoint>();
             FEReactiveViscoelasticMaterialPoint* pve = mp.ExtractData<FEReactiveViscoelasticMaterialPoint>();
-            if (prp) D = (float) (1-prp->YieldedBonds());
-            else if (prd) D = (float) prd->IntactBonds();
-            else if (ppd) D = (float) (1 - ppd->m_D);
-            else if (ppr) D = (float) ppr->m_wit;
+            if (prm) D = (float) prm->IntactBonds();
             else if (pve) {
-                const FEReactiveFatigueMaterialPoint* pr = pve->GetPointData(0)->ExtractData< FEReactiveFatigueMaterialPoint>();
-                if (pr) D = (float) pr->m_wit;
+                const FEReactiveMaterialPoint* pr = pve->GetPointData(0)->ExtractData< FEReactiveMaterialPoint>();
+                if (pr) D = (float) pr->IntactBonds();
             }
             return D;
         });
@@ -2499,18 +2494,12 @@ bool FEPlotIntactBondFraction::Save(FEDomain &dom, FEDataStream& a)
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
                 if (mmp && (m_comp < mmp->Components()))
                 {
-                    FEReactiveFatigueMaterialPoint* ppr = mmp->GetPointData(m_comp)->ExtractData<FEReactiveFatigueMaterialPoint>();
-                    FEReactivePlasticityMaterialPoint* prp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticityMaterialPoint>();
-                    FEReactivePlasticDamageMaterialPoint* prd = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
-                    FEDamageMaterialPoint* ppd = mmp->GetPointData(m_comp)->ExtractData<FEDamageMaterialPoint>();
+                    FEReactiveMaterialPoint* prm = mmp->GetPointData(m_comp)->ExtractData<FEReactiveMaterialPoint>();
                     FEReactiveViscoelasticMaterialPoint* pve = mmp->GetPointData(m_comp)->ExtractData<FEReactiveViscoelasticMaterialPoint>();
-                    if (prp) D += (float) (1-prp->YieldedBonds());
-                    else if (prd) D += (float) prd->IntactBonds();
-                    else if (ppd) D += (float) (1 - ppd->m_D);
-                    else if (ppr) D += (float) ppr->m_wit;
+                    if (prm) D += (float) prm->IntactBonds();
                     else if (pve) {
-                        FEReactiveFatigueMaterialPoint* pr = pve->GetPointData(0)->ExtractData<FEReactiveFatigueMaterialPoint>();
-                        if (pr) D += (float) pr->m_wit;
+                        FEReactiveMaterialPoint* pr = pve->GetPointData(0)->ExtractData<FEReactiveMaterialPoint>();
+                        if (pr) D += (float) pr->IntactBonds();
                     }
                 }
             }
@@ -2542,12 +2531,12 @@ bool FEPlotFatigueBondFraction::Save(FEDomain &dom, FEDataStream& a)
         writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& pt) {
 			FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
             float wf = 0.0;
-            FEReactiveFatigueMaterialPoint* ppr = mp.ExtractData<FEReactiveFatigueMaterialPoint>();
+            FEReactiveMaterialPoint* prm = mp.ExtractData<FEReactiveMaterialPoint>();
             FEReactiveViscoelasticMaterialPoint* pve = mp.ExtractData<FEReactiveViscoelasticMaterialPoint>();
-            if (ppr) wf = (float) ppr->m_wft;
+            if (prm) wf = (float) prm->FatigueBonds();
             else if (pve) {
-                FEReactiveFatigueMaterialPoint* pr = pve->GetPointData(0)->ExtractData<FEReactiveFatigueMaterialPoint>();
-                if (pr) wf = (float) pr->m_wft;
+                FEReactiveMaterialPoint* pr = pve->GetPointData(0)->ExtractData<FEReactiveMaterialPoint>();
+                if (pr) wf = (float) pr->FatigueBonds();
             }
             return wf;
         });
@@ -2565,12 +2554,12 @@ bool FEPlotFatigueBondFraction::Save(FEDomain &dom, FEDataStream& a)
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
                 if (mmp && (m_comp < mmp->Components()))
                 {
-                    FEReactiveFatigueMaterialPoint* ppr = mmp->GetPointData(m_comp)->ExtractData<FEReactiveFatigueMaterialPoint>();
+                    FEReactiveMaterialPoint* ppr = mmp->GetPointData(m_comp)->ExtractData<FEReactiveMaterialPoint>();
                     FEReactiveViscoelasticMaterialPoint* pve = mmp->GetPointData(m_comp)->ExtractData<FEReactiveViscoelasticMaterialPoint>();
-                    if (ppr) wf += (float) ppr->m_wft;
+                    if (ppr) wf += (float) ppr->FatigueBonds();
                     else if (pve) {
-                        FEReactiveFatigueMaterialPoint* pr = pve->GetPointData(0)->ExtractData<FEReactiveFatigueMaterialPoint>();
-                        if (pr) wf += (float) pr->m_wft;
+                        FEReactiveMaterialPoint* pr = pve->GetPointData(0)->ExtractData<FEReactiveMaterialPoint>();
+                        if (pr) wf += (float) pr->FatigueBonds();
                     }
                 }
             }
@@ -2601,10 +2590,8 @@ bool FEPlotYieldedBondFraction::Save(FEDomain &dom, FEDataStream& a)
     if (m_comp == -1) {
         writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
             float wy = 0.0;
-            const FEReactivePlasticityMaterialPoint* prp = mp.ExtractData<FEReactivePlasticityMaterialPoint>();
-            const FEReactivePlasticDamageMaterialPoint* ppp = mp.ExtractData<FEReactivePlasticDamageMaterialPoint>();
+            const FEReactiveMaterialPoint* prp = mp.ExtractData<FEReactiveMaterialPoint>();
             if (prp) wy = (float) prp->YieldedBonds();
-            else if (ppp) wy = (float) ppp->YieldedBonds();
             return wy;
         });
         return true;
@@ -2621,10 +2608,8 @@ bool FEPlotYieldedBondFraction::Save(FEDomain &dom, FEDataStream& a)
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
                 if (mmp && (m_comp < mmp->Components()))
                 {
-                    const FEReactivePlasticityMaterialPoint* prp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticityMaterialPoint>();
-                    const FEReactivePlasticDamageMaterialPoint* ppp = mmp->GetPointData(m_comp)->ExtractData<FEReactivePlasticDamageMaterialPoint>();
+                    const FEReactiveMaterialPoint* prp = mmp->GetPointData(m_comp)->ExtractData<FEReactiveMaterialPoint>();
                     if (prp) wy += (float) prp->YieldedBonds();
-                    else if (ppp) wy += (float) ppp->YieldedBonds();
                 }
             }
             wy /= (float)el.GaussPoints();

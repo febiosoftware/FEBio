@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include <FECore/FEShellDomain.h>
 #include <FECore/log.h>
+#include <FECore/FESurface.h>
 using namespace std;
 
 //=============================================================================
@@ -94,6 +95,24 @@ void FEBModel::ElementSet::SetElementList(const vector<int>& elem) { m_elem = el
 const vector<int>& FEBModel::ElementSet::ElementList() const { return m_elem; }
 
 //=============================================================================
+FEBModel::PartList::PartList() {}
+FEBModel::PartList::PartList(const std::string& name) : m_name(name) {}
+
+void FEBModel::PartList::SetName(const std::string& name) { m_name = name; }
+const std::string& FEBModel::PartList::Name() const { return m_name; }
+
+void FEBModel::PartList::SetPartList(const std::vector<std::string>& parts) { m_parts = parts; }
+const std::vector<std::string>& FEBModel::PartList::GetPartList() const { return m_parts; }
+
+FEBModel::PartList* FEBModel::Part::FindPartList(const string& name)
+{
+	for (PartList* ps  : m_PList) {
+		if (ps->Name() == name) return ps;
+	}
+	return nullptr;
+}
+
+//=============================================================================
 FEBModel::SurfacePair::SurfacePair() {}
 FEBModel::SurfacePair::SurfacePair(const SurfacePair& surfPair)
 {
@@ -136,15 +155,18 @@ void FEBModel::Domain::SetElementList(const vector<ELEMENT>& el) { m_Elem = el; 
 const vector<FEBModel::ELEMENT>& FEBModel::Domain::ElementList() const { return m_Elem; }
 
 //=============================================================================
-FEBModel::Surface::Surface() {}
+FEBModel::Surface::Surface() { m_partList = nullptr; }
 
 FEBModel::Surface::Surface(const FEBModel::Surface& surf)
 {
 	m_name = surf.m_name;
 	m_Face = surf.m_Face;
+	m_partList = surf.m_partList;
 }
 
-FEBModel::Surface::Surface(const string& name) : m_name(name) {}
+FEBModel::Surface::Surface(const string& name) : m_name(name), m_partList(nullptr) {}
+
+FEBModel::Surface::Surface(const string& name, PartList* partList) : m_name(name), m_partList(partList) {}
 
 const string& FEBModel::Surface::Name() const { return m_name; }
 
@@ -228,10 +250,30 @@ void FEBModel::Part::AddSurface(FEBModel::Surface* surf) { m_Surf.push_back(surf
 
 FEBModel::Surface* FEBModel::Part::FindSurface(const string& name)
 {
-	for (size_t i = 0; i < m_Surf.size(); ++i)
+	if (name.compare(0, 11, "@part_list:") == 0)
 	{
-		Surface* surf = m_Surf[i];
-		if (surf->Name() == name) return surf;
+		// make sure this part list exists
+		string partListName = name.substr(11);
+		PartList* partList = FindPartList(partListName);
+		if (partList == nullptr) return nullptr;
+
+		// see if a surface already exists
+		Surface* surf = FindSurface(partListName);
+		if (surf) return surf;
+
+		// create the new surface
+		surf = new Surface(partListName, partList);
+		AddSurface(surf);
+
+		return surf;
+	}
+	else
+	{
+		for (size_t i = 0; i < m_Surf.size(); ++i)
+		{
+			Surface* surf = m_Surf[i];
+			if (surf->Name() == name) return surf;
+		}
 	}
 	return nullptr;
 }
@@ -512,24 +554,46 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		Surface* surf = part.GetSurface(i);
 		int faces = surf->Facets();
 
-		// create a new facet set
-		FEFacetSet* fset = new FEFacetSet(&fem);
-		string name = partName + surf->Name();
-		fset->SetName(name.c_str());
-
-		// copy data
-		fset->Create(faces);
-		for (int j=0; j<faces; ++j)
+		FEFacetSet* fset = nullptr;
+		if ((faces == 0) && surf->GetPartList())
 		{
-			FACET& srcFacet = surf->GetFacet(j);
-			FEFacetSet::FACET& face = fset->Face(j);
+			// build the domain list
+			FEBModel::PartList* partList = surf->GetPartList();
+			std::vector<string> partNames = partList->GetPartList();
+			std::vector<FEDomain*> domList;
+			for (string s : partNames)
+			{
+				FEDomain* dom = mesh.FindDomain(s);
+				assert(dom);
+				if (dom == nullptr) return false;
+				domList.push_back(dom);
+			}
 
-			face.ntype = srcFacet.ntype;
-			int nf = srcFacet.ntype;	// we assume that the type also identifies the number of nodes
-			for (int n=0; n<nf; ++n) face.node[n] = NLT[srcFacet.node[n] - noff];
+			// we need to extract the surface from a list of parts
+			fset = mesh.DomainBoundary(domList);
+		}
+		else
+		{
+			// create a new facet set
+			fset = new FEFacetSet(&fem);
+
+			// copy data
+			fset->Create(faces);
+			for (int j = 0; j < faces; ++j)
+			{
+				FACET& srcFacet = surf->GetFacet(j);
+				FEFacetSet::FACET& face = fset->Face(j);
+
+				face.ntype = srcFacet.ntype;
+				int nf = srcFacet.ntype;	// we assume that the type also identifies the number of nodes
+				for (int n = 0; n < nf; ++n) face.node[n] = NLT[srcFacet.node[n] - noff];
+			}
 		}
 
 		// add it to the mesh
+		assert(fset);
+		string name = partName + surf->Name();
+		fset->SetName(name.c_str());
 		mesh.AddFacetSet(fset);
 	}
 

@@ -64,26 +64,6 @@ bool FERigidMaterial::Init()
 		FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 		FERigidBody& rb = *fem.GetRigidBody(GetRigidBodyID());
 
-		// only set the rigid body com if this is the main rigid body material
-		if (rb.GetMaterialID() == GetID()-1)
-		{
-			// first, calculate the mass
-			rb.UpdateMass();
-
-			// next, calculate the center of mass, or just set it
-			if (m_com == false)
-			{
-				rb.UpdateCOM();
-			}
-			else
-			{
-				rb.SetCOM(m_rc); 
-			}
-
-			// finally, determine moi
-			rb.UpdateMOI();
-		}
-
 		if (m_pmid  > -1)
 		{
 			FERigidMaterial* ppm = dynamic_cast<FERigidMaterial*>(GetFEModel()->GetMaterial(m_pmid-1));

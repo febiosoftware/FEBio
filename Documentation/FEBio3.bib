@@ -1,7 +1,7 @@
 %% This BibTeX bibliography file was created using BibDesk.
 %% http://bibdesk.sourceforge.net/
 
-%% Created for Gerard Ateshian at 2023-05-16 21:02:14 -0400 
+%% Created for Gerard Ateshian at 2023-05-31 13:48:52 -0400 
 
 
 %% Saved with string encoding Unicode (UTF-8) 
@@ -22,6 +22,86 @@
 	keywords = {Heart valves, Contact problems, Pinball algorithm, Isogeometric analysis},
 	abstract = {This work formulates frictionless contact between solid bodies in terms of a repulsive potential energy term and illustrates how numerical integration of the resulting forces is computationally similar to the “pinball algorithm” proposed and studied by Belytschko and collaborators in the 1990s. We thereby arrive at a numerical approach that has both the theoretical advantages of a potential-based formulation and the algorithmic simplicity, computational efficiency, and geometrical versatility of pinball contact. The singular nature of the contact potential requires a specialized nonlinear solver and an adaptive time stepping scheme to ensure reliable convergence of implicit dynamic calculations. We illustrate the effectiveness of this numerical method by simulating several benchmark problems and the structural mechanics of the right atrioventricular (tricuspid) heart valve. Atrioventricular valve closure involves contact between every combination of shell surfaces, edges of shells, and cables, but our formulation handles all contact scenarios in a unified manner. We take advantage of this versatility to demonstrate the effects of chordal rupture on tricuspid valve coaptation behavior.}
 }
+
+@incollection{Ateshian16,
+	author = {Gerard A. Ateshian},
+	booktitle = {Studies in Mechanobiology, Tissue Engineering and Biomaterials},
+	date-added = {2023-05-16 21:01:13 -0400},
+	date-modified = {2023-05-16 21:01:17 -0400},
+	doi = {10.1007/978-3-319-41475-1_1},
+	pages = {1--51},
+	publisher = {Springer International Publishing},
+	title = {Mixture Theory for Modeling Biological Tissues: Illustrations from Articular Cartilage},
+	year = {2016},
+	bdsk-url-1 = {https://doi.org/10.1007/978-3-319-41475-1_1}}
+
+@book{McNaught97,
+	address = {Oxford England Malden, MA, USA},
+	author = {McNaught, Alan},
+	date-added = {2023-05-16 18:23:14 -0400},
+	date-modified = {2023-05-16 18:23:16 -0400},
+	isbn = {0865426848},
+	publisher = {Blackwell Science},
+	title = {Compendium of chemical terminology : IUPAC recommendations},
+	year = {1997}}
+
+@article{Ateshian13,
+	author = {Gerard A. Ateshian and Steve Maas and Jeffrey A. Weiss},
+	date-added = {2023-05-16 18:17:50 -0400},
+	date-modified = {2023-05-16 18:17:53 -0400},
+	doi = {10.1115/1.4024823},
+	journal = {J. Biomech. Eng.},
+	number = {11},
+	publisher = {{ASME} International},
+	title = {Multiphasic Finite Element Framework for Modeling Hydrated Mixtures With Multiple Neutral and Charged Solutes},
+	volume = {135},
+	year = {2013},
+	bdsk-url-1 = {https://doi.org/10.1115/1.4024823}}
+
+@article{Ateshian14,
+	author = {Gerard A. Ateshian and Robert J. Nims and Steve Maas and Jeffrey A. Weiss},
+	date-added = {2023-05-16 18:17:50 -0400},
+	date-modified = {2023-05-16 18:17:56 -0400},
+	doi = {10.1007/s10237-014-0560-1},
+	journal = {Biomech. Model. Mechanobiol.},
+	number = {5},
+	pages = {1105--1120},
+	publisher = {Springer Science and Business Media {LLC}},
+	title = {Computational modeling of chemical reactions and interstitial growth and remodeling involving charged solutes and solid-bound molecules},
+	volume = {13},
+	year = {2014},
+	bdsk-url-1 = {https://doi.org/10.1007/s10237-014-0560-1}}
+
+@article{Shim23,
+	abstract = {The objective of this study was to implement a novel fluid-solutes solver into the open-source finite element software FEBio, that extended available modeling capabilities for biological fluids and fluid-solute mixtures. Using a reactive mixture framework, this solver accommodates diffusion, convection, chemical reactions, electrical charge effects, and external body forces, without requiring stabilization methods that were deemed necessary in previous computational implementations of the convection-diffusion-reaction equation at high Peclet numbers. Verification and validation problems demonstrated the ability of this solver to produce solutions for Peclet numbers as high as 1e11, spanning the range of physiological conditions for convection-dominated solute transport. This outcome was facilitated by the use of a formulation that accommodates realistic values for solvent compressibility, and by expressing the solute mass balance such that it properly captured convective transport by the solvent and produced a natural boundary condition of zero diffusive solute flux at outflow boundaries. Since this numerical scheme was not necessarily foolproof, guidelines were included to achieve better outcomes that minimize or eliminate the potential occurrence of numerical artifacts. The fluid-solutes solver presented in this study represents an important and novel advancement in the modeling capabilities for biomechanics and biophysics as it allows modeling of mechanobiological processes via the incorporation of chemical reactions involving neutral or charged solutes within dynamic fluid flow. The incorporation of charged solutes in a reactive framework represents a significant novelty of this solver. This framework also applies to a broader range of non-biological applications.},
+	author = {Shim, Jay J and Maas, Steve A and Weiss, Jeffrey A and Ateshian, Gerard A},
+	date-added = {2023-05-31 13:48:25 -0400},
+	date-modified = {2023-05-31 13:48:50 -0400},
+	doi = {10.1115/1.4062594},
+	journal = {J Biomech Eng},
+	journal-full = {Journal of biomechanical engineering},
+	month = {May},
+	pages = {1-26},
+	pmid = {37219843},
+	pst = {aheadofprint},
+	title = {Finite Element Implementation Of Computational Fluid Dynamics With Reactive Neutral And Charged Solute Transport In Febio},
+	year = {2023},
+	bdsk-url-1 = {https://doi.org/10.1115/1.4062594}}
+
+@article{KAMENSKY2018522,
+	abstract = {This work formulates frictionless contact between solid bodies in terms of a repulsive potential energy term and illustrates how numerical integration of the resulting forces is computationally similar to the ``pinball algorithm'' proposed and studied by Belytschko and collaborators in the 1990s. We thereby arrive at a numerical approach that has both the theoretical advantages of a potential-based formulation and the algorithmic simplicity, computational efficiency, and geometrical versatility of pinball contact. The singular nature of the contact potential requires a specialized nonlinear solver and an adaptive time stepping scheme to ensure reliable convergence of implicit dynamic calculations. We illustrate the effectiveness of this numerical method by simulating several benchmark problems and the structural mechanics of the right atrioventricular (tricuspid) heart valve. Atrioventricular valve closure involves contact between every combination of shell surfaces, edges of shells, and cables, but our formulation handles all contact scenarios in a unified manner. We take advantage of this versatility to demonstrate the effects of chordal rupture on tricuspid valve coaptation behavior.},
+	author = {David Kamensky and Fei Xu and Chung-Hao Lee and Jinhui Yan and Yuri Bazilevs and Ming-Chen Hsu},
+	doi = {https://doi.org/10.1016/j.cma.2017.11.007},
+	issn = {0045-7825},
+	journal = {Computer Methods in Applied Mechanics and Engineering},
+	keywords = {Heart valves, Contact problems, Pinball algorithm, Isogeometric analysis},
+	pages = {522-546},
+	title = {A contact formulation based on a volumetric potential: Application to isogeometric simulations of atrioventricular valves},
+	url = {https://www.sciencedirect.com/science/article/pii/S0045782517307120},
+	volume = {330},
+	year = {2018},
+	bdsk-url-1 = {https://www.sciencedirect.com/science/article/pii/S0045782517307120},
+	bdsk-url-2 = {https://doi.org/10.1016/j.cma.2017.11.007}}
 
 @incollection{Ateshian16,
 	author = {Gerard A. Ateshian},

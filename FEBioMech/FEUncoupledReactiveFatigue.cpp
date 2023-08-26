@@ -61,6 +61,9 @@ FEUncoupledReactiveFatigue::FEUncoupledReactiveFatigue(FEModel* pfem) : FEUncoup
     m_pFdmg = 0;
     m_pIcrt = 0;
     m_pFcrt = 0;
+    
+    m_k0 = 0;
+    m_beta = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +136,9 @@ double FEUncoupledReactiveFatigue::Damage(FEMaterialPoint& pt)
 void FEUncoupledReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp)
 {
     double dt = tp.timeIncrement;
-    
+    double k0 = m_k0(pt);
+    double beta = m_beta(pt);
+
     // get the fatigue material point data
     FEReactiveFatigueMaterialPoint& pd = *pt.ExtractData<FEReactiveFatigueMaterialPoint>();
     
@@ -165,13 +170,16 @@ void FEUncoupledReactiveFatigue::UpdateSpecializedMaterialPoints(FEMaterialPoint
     int iter = 0;
     do {
         wbi = pd.m_wbt;
+        // get current and previous k value
+        double kn1 = k0*(pow(fabs(pd.m_aXit)*pd.m_wbt,beta));
+        double kn = k0*(pow(fabs(pd.m_aXip)*pd.m_wbp,beta));
         // evaluate mass supply from fatigue of intact bonds
-        double dwf = m_k0*dt/2*(pow(fabs(pd.m_aXit)*pd.m_wbt,m_beta)*pd.m_wit+pow(fabs(pd.m_aXip)*pd.m_wbp,m_beta)*pd.m_wip);
+        double dwf = ((kn1*dt + kn*dt)/(2 + kn1*dt))*pd.m_wip;
         double Fdwf = m_pFdmg->cdf(pt,Xftrl);
         
         // kinetics of intact bonds
-        pd.m_wit = (pd.m_Fip < 1) ? pd.m_wip*(1-pd.m_Fit)/(1-pd.m_Fip) - dwf : 0;
-        pd.m_wbt = (pd.m_Fip < 1) ? pd.m_wbp + pd.m_wip*(pd.m_Fit - pd.m_Fip)/(1-pd.m_Fip) : pd.m_wbp;
+        pd.m_wit = (pd.m_Fip < 1) ? (pd.m_wip - dwf)*(1-pd.m_Fit)/(1-pd.m_Fip) : pd.m_wip;
+        pd.m_wbt = (pd.m_Fip < 1) ? pd.m_wbp + (pd.m_wip - dwf)*(pd.m_Fit - pd.m_Fip)/(1-pd.m_Fip) : pd.m_wbp;
         // add or update new generation
         if ((pd.m_fb.size() == 0) || pd.m_fb.back().m_time < tp.currentTime) {
             // add generation of fatigued bonds

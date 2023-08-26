@@ -343,7 +343,8 @@ void FEAnalysis::Deactivate()
 	for (size_t i=0; i<(int) m_MC.size(); ++i) m_MC[i]->Deactivate();
 
 	// clean up solver data (i.e. destroy linear solver)
-	GetFESolver()->Clean();
+	FESolver* solver = GetFESolver();
+	if (solver) solver->Clean();
 
 	// deactivate the time step
 	m_bactive = false;

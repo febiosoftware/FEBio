@@ -976,11 +976,38 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Damage reduction factor
+//! Damage (fraction of broken bonds))
 class FELogDamage : public FELogElemData
 {
 public:
     FELogDamage(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Fraction of intact bonds
+class FELogIntactBonds : public FELogElemData
+{
+public:
+    FELogIntactBonds(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Fraction of fatigued bonds
+class FELogFatigueBonds : public FELogElemData
+{
+public:
+    FELogFatigueBonds(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Fraction of yielded bonds
+class FELogYieldedBonds : public FELogElemData
+{
+public:
+    FELogYieldedBonds(FEModel* pfem) : FELogElemData(pfem){}
     double value(FEElement& el);
 };
 

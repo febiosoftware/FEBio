@@ -162,13 +162,13 @@ status open
 
 \end_inset
 
-User's Manual Version 4.1
+User's Manual Version 4.2
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: March 24, 2023
+Last Updated: June 19, 2023
 \end_layout
 
 \begin_layout Standard
@@ -9937,6 +9937,213 @@ convergence tolerance on displacement
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+When using the 
+\begin_inset Quotes eld
+\end_inset
+
+CG-solid
+\begin_inset Quotes erd
+\end_inset
+
+ solver, the following parameters are defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cgmethod
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Select solution algorithm (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+preconditioner
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Select the preconditioner (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lsiter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+maximum number of line search iterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+The solution algorithm can be:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+0 : Hager-Zhang conjugate gradient (This is the default and should be preferred
+ since its faster.)
+\end_layout
+
+\begin_layout Enumerate
+1 : steepest descent
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Set 0 for no preconditioner, 1 for diagonal stiffness preconditioner.
+ The diagonal stiffness preconditioner greatly improves convergence when
+ there are different size elements, mixed materials, or quadratic elements
+ with midside nodes.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<solver type="CG-solid">
+\end_layout
+
+\begin_layout LyX-Code
+  <cgmethod>0</cgmethod>
+\end_layout
+
+\begin_layout LyX-Code
+  <preconditioner>1</preconditioner>
+\end_layout
+
+\begin_layout LyX-Code
+  <lsiter>10</lsiter>
+\end_layout
+
+\begin_layout LyX-Code
+</solver>
 \end_layout
 
 \begin_layout Subsection
@@ -28017,7 +28224,7 @@ For example, this boundary condition may be used when modeling a permeation
 \end_layout
 
 \begin_layout Subsubsection
-Solute Flux
+Multiphasic Solute Flux
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Solute-Flux"
@@ -28052,16 +28259,6 @@ noprefix "false"
 \end_inset
 
 .
- In fluid-solutes analyses the molar flux of solute 
-\begin_inset Formula $\iota$
-\end_inset
-
-, given by the vector 
-\begin_inset Formula $\mathbf{j}^{\iota}=c^{\iota}\left(\mathbf{v}^{\iota}-\mathbf{v}^{f}\right)$
-\end_inset
-
-, is evaluated relative to the solvent (fluid); it only includes a diffusive
- contribution relative to the solvent.
  Since solute viscosity is not explicitly modeled, the tangential component
  of 
 \begin_inset Formula $\mathbf{j}^{\iota}$
@@ -28073,23 +28270,13 @@ noprefix "false"
 \end_inset
 
 , represents a natural boundary condition.
- Since a multiphasic or fluid-solutes mixture may contain electrically charged
- solutes, the solute flux that must be prescribed as a boundary condition
- is the effective solute flux 
+ Since a multiphasic mixture may contain electrically charged solutes, the
+ solute flux that must be prescribed as a boundary condition is the effective
+ solute flux 
 \begin_inset Formula $\tilde{j}_{n}^{\iota}=j_{n}^{\iota}+\sum_{\gamma}z^{\gamma}j_{n}^{\gamma}$
 \end_inset
 
-, such as that in eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:normal-effective-solute-flux"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
- for fluid-solutes analyses, as also explained in Section
+, as explained in Section
 \begin_inset space ~
 \end_inset
 
@@ -28125,6 +28312,10 @@ noprefix "false"
 
 \begin_layout LyX-Code
   <solute_id>solute_name</solute_id>
+\end_layout
+
+\begin_layout LyX-Code
+  <shell_bottom>0</shell_bottom>
 \end_layout
 
 \begin_layout LyX-Code
@@ -28208,15 +28399,7 @@ t
  be the surface area in the reference configuration (a constant).
  Using 
 \shape italic
-
-\begin_inset Quotes eld
-\end_inset
-
 linear
-\begin_inset Quotes erd
-\end_inset
-
-
 \shape default
  means that the user prescribes 
 \begin_inset Formula $Q$
@@ -28261,6 +28444,119 @@ type
 \end_inset
 
 area in current configuration.
+ The 
+\emph on
+shell_bottom
+\emph default
+ tag should be set to 1 (true) when prescribing the flux on the bottom surface
+ of a multiphasic shell.
+\end_layout
+
+\begin_layout Subsubsection
+Solute Flux
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Solute-Flux-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In fluid-solutes analyses the molar flux of solute 
+\begin_inset Formula $\iota$
+\end_inset
+
+, given by the vector 
+\begin_inset Formula $\mathbf{j}^{\iota}=c^{\iota}\left(\mathbf{v}^{\iota}-\mathbf{v}^{f}\right)$
+\end_inset
+
+, is evaluated relative to the solvent (fluid); it only includes a diffusive
+ contribution relative to the solvent.
+ Since solute viscosity is not explicitly modeled, the tangential component
+ of 
+\begin_inset Formula $\mathbf{j}^{\iota}$
+\end_inset
+
+ on a boundary surface may not be prescribed.
+ Only the normal component of the relative solute flux, 
+\begin_inset Formula $j_{n}^{\iota}=\mathbf{j}^{\iota}\cdot\mathbf{n}$
+\end_inset
+
+, represents a natural boundary condition.
+ Since a fluid-solutes mixture may contain electrically charged solutes,
+ the solute flux that must be prescribed as a boundary condition is the
+ effective solute flux 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}=j_{n}^{\iota}+\sum_{\gamma}z^{\gamma}j_{n}^{\gamma}$
+\end_inset
+
+, such as that in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:normal-effective-solute-flux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ To prescribe a value for 
+\begin_inset Formula $\tilde{j}_{n}^{\iota}$
+\end_inset
+
+ on a surface, use:
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="solute flux" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <flux lc="1">1.0</flux>
+\end_layout
+
+\begin_layout LyX-Code
+  <solute_id>solute_name</solute_id>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Standard
+The parameter 
+\shape italic
+solute_id
+\shape default
+ specifies to which solute this flux condition applies, referencing the
+ corresponding list of solute names in the Globals section (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solutes"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+flux 
+\shape default
+element defines the flux magnitude.
+ The optional parameter 
+\shape italic
+lc
+\shape default
+ defines a loadcurve for the normal flux evolution.
+ If omitted a constant flux is applied.
 \end_layout
 
 \begin_layout Subsubsection
@@ -66984,7 +67280,11 @@ porous neo-Hookean
  Thus, upon pore closure, the material behavior needs to switch from compressibl
 e to incompressible.
  This material may be used to model the porous solid matrix of a biphasic
- or multiphasic material.
+ or multiphasic material, in which case it inherits the value of 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ from that parent material.
 \end_layout
 
 \begin_layout Standard
@@ -95053,6 +95353,16 @@ In multiphasic analyses, FEBio solves for the solid displacement
 \end_inset
 
  of solid-bound molecules by solving the corresponding mass balance equation
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cr-sbm-mass-balance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
  at integration points, in a single numerical integration step.
  This approach reduces the number of degrees of freedom that need to be
  solved simultaneously by the FEBio solver.
@@ -95062,15 +95372,16 @@ In multiphasic analyses, FEBio solves for the solid displacement
 
  may produce numerical round-off errors that may get amplified as the analysis
  time progresses.
+ 
 \end_layout
 
 \begin_layout Standard
 An alternative to using solid-bound molecules is to define solutes 
-\begin_inset Formula $\alpha$
+\begin_inset Formula $\sigma$
 \end_inset
 
  whose diffusivity 
-\begin_inset Formula $\mathbf{d}^{\alpha}$
+\begin_inset Formula $\mathbf{d}^{\sigma}$
 \end_inset
 
  in the mixture is set to 
@@ -95078,12 +95389,12 @@ An alternative to using solid-bound molecules is to define solutes
 \end_inset
 
  (however, the free diffusivity 
-\begin_inset Formula $d_{0}^{\alpha}$
+\begin_inset Formula $d_{0}^{\sigma}$
 \end_inset
 
  should not be set to zero, to prevent a division by zero; its exact value
  is not important, thus let 
-\begin_inset Formula $d_{0}^{\alpha}=1$
+\begin_inset Formula $d_{0}^{\sigma}=1$
 \end_inset
 
 ).
@@ -95104,17 +95415,77 @@ al fluid; (2) their concentration contributes to the fixed charge density
  be prescribed, it must not contribute to the prescribed initial effective
  fluid pressure, and the user should not prescribe any boundary conditions
  on the effective concentration of these solutes.
- However, unlike solid-bound molecules, these solutes always have negligible
- volume fraction, therefore they don't alter the value of the referential
- solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
-\end_inset
-
-.
  Using these 'solid-bound' solutes increases the number of degrees of freedom
  in an FEBio analysis; however, unlike solid-bound molecules, the solution
  for the effective concentration of these solutes remains as accurate as
  all other degrees of freedom in an analysis.
+\end_layout
+
+\begin_layout Standard
+To evaluate the contribution of these solutes to the referential solid volume
+ fraction 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ and to chemical reactions, it should be recalled that the concentration
+ 
+\begin_inset Formula $c^{\sigma}$
+\end_inset
+
+ is related to the referential mass density 
+\begin_inset Formula $\rho_{r}^{\sigma}$
+\end_inset
+
+ via eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:concentration-density-relations"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Using the expression for 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:cr-referential-solid-vol-frac"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we find that
+\begin_inset Formula 
+\[
+\varphi_{r}^{s}=\varphi_{0}^{s}+\left(J-\varphi_{r}^{s}\right)\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}
+\]
+
+\end_inset
+
+which can be solved for 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ using the concentrations 
+\begin_inset Formula $c^{\sigma}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\varphi_{r}^{s}=\frac{\varphi_{0}^{s}+J\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}}{1+\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}}\,.
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -101392,9 +101763,11 @@ name "sec:Fluids"
 Fluid mechanics analyses may be used to examine fluid flow over fixed domains.
  Fluid-structure interactions (FSI) may be used to examine fluid flow over
  deforming domains.
- FEBio's fluid and fluid-FSI modules treat the fluid as isothermal (constant
- and uniform temperature) and compressible; incompressible flow is simulated
- by prescribing a physically realistic bulk modulus 
+ It is also possible to perform solute (mass) transport analyses in fluid
+ mixtures using the fluid-solutes module.
+ FEBio's fluid, fluid-FSI and fluid-solutes modules treat the fluid as isotherma
+l (constant and uniform temperature) and compressible; incompressible flow
+ is simulated by prescribing a physically realistic bulk modulus 
 \begin_inset Formula $K$
 \end_inset
 
@@ -101419,13 +101792,275 @@ where
 \begin_inset Formula $p$
 \end_inset
 
- is the fluid pressure arising from the elastic response and 
+ is the fluid pressure arising from the elastic and osmotic responses and
+ 
 \begin_inset Formula $\boldsymbol{\tau}$
 \end_inset
 
  is the viscous stress resulting from the fluid viscosity and its rate of
  deformation.
- The fluid pressure is evaluated from the dilatation 
+ FEBio's fluid solver uses the fluid dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+, instead of the 
+\emph on
+effective fluid pressure
+\emph default
+ 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+, as a nodal degree of freedom.
+ The effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ may differ from the actual fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ if solutes are present in the fluid mixture, as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mp-effective-p-c"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In fluid analyses the effective fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is also the elastic contribution to the fluid pressure, resulting from
+ changes in 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+.
+ FEBio provides several alternative constitutive models for the elastic
+ response 
+\begin_inset Formula $\tilde{p}\left(e^{f}\right)$
+\end_inset
+
+, including
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\tilde{p}\left(e^{f}\right) & =-Ke^{f} & \text{linear}\\
+\tilde{p}\left(e^{f}\right) & =K\left(\frac{1}{1+e^{f}}-1\right) & \text{nonlinear}\\
+\tilde{p}\left(e^{f}\right) & =-K\frac{\ln\left(1+e^{f}\right)}{1+e^{f}} & \text{log nonlinear}
+\end{aligned}
+\label{eq:fluid-pressure-state}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K$
+\end_inset
+
+ is the fluid's bulk modulus (a physical property that may be looked up
+ or measured).
+ The reason for selecting 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ instead of 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is that the dilatation (volumetric strain) is a kinematic measure, just
+ like the fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ (the other nodal degree of freedom) and its associated rate of deformation
+ tensor, whereas 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is a function of state (it needs to be formulated as a function of the
+ deformation, just like the viscous fluid stress 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+).
+ Here, 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is called the 
+\emph on
+elastic pressure
+\emph default
+ because it represents the elastic response (equivalent to the stress-strain
+ response in hyperelasticity for solid mechanics) of the fluid under isothermal
+ conditions.
+ The 
+\emph on
+linear
+\emph default
+ model in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is useful for nearly-incompressible flow, typically used for liquids.
+ However, if one expects high volumetric strains in the flow (e.g., at a stagnatio
+n point in a high-velocity fluid flow problem), it may be better to employ
+ one of the two 
+\emph on
+nonlinear
+\emph default
+ formulations in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ In particular, for an ideal gas, the gauge pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is given by
+\begin_inset Formula 
+\begin{equation}
+\tilde{p}=P_{r}\left(\frac{\theta}{J^{f}\theta_{r}}-1\right)\quad J^{f}=1+e^{f}\label{eq:ideal-gas-pressure}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\theta_{r}$
+\end_inset
+
+ is the (arbitrarily selected) reference temperature and 
+\begin_inset Formula $P_{r}$
+\end_inset
+
+ is the corresponding referential absolute pressure (at 
+\begin_inset Formula $\theta=\theta_{r}$
+\end_inset
+
+ and 
+\begin_inset Formula $J^{f}=1$
+\end_inset
+
+).
+ When an ideal gas undergoes an isothermal process (
+\begin_inset Formula $\theta=\theta_{r}$
+\end_inset
+
+), eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ideal-gas-pressure"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ reduces to the 
+\emph on
+nonlinear
+\emph default
+ model in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, with bulk modulus 
+\begin_inset Formula $K=P_{r}$
+\end_inset
+
+.
+ Thus, the 
+\emph on
+nonlinear
+\emph default
+ model is consistent with ideal gas law under isothermal processes.
+ Isothermal processes produce zero heat flux, 
+\begin_inset Formula $\mathbf{q}=\mathbf{0}$
+\end_inset
+
+, however heat is generated by the fluid viscosity at the rate 
+\begin_inset Formula $\boldsymbol{\tau}:\mathbf{D}^{f}$
+\end_inset
+
+ where 
+\begin_inset Formula $\mathbf{D}^{f}$
+\end_inset
+
+ is the rate of deformation tensor for the fluid (see below).
+ Therefore, to maintain isothermal conditions, we must assume that this
+ heat is implicitly radiated into or out of the fluid domain.
+ For isentropic processes it can be shown that the temperature variation
+ in an ideal gas obeys 
+\begin_inset Formula $\theta/\theta_{r}=\left(J^{f}\right)^{1-\gamma}$
+\end_inset
+
+, where 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ is the ratio of isobaric to isochoric specific heat capacities, 
+\begin_inset Formula $\gamma=c_{p0}/c_{v0}$
+\end_inset
+
+.
+ In that case, the pressure in an ideal gas evolves according to 
+\begin_inset Formula $\tilde{p}=P_{r}\left(\left(1+e^{f}\right)^{-\gamma}-1\right)$
+\end_inset
+
+, which represents a fourth alternative to the three models presented in
+ eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, with 
+\begin_inset Formula $K=P_{r}$
+\end_inset
+
+.
+ Contrary to the simplifying assumptions found in thermodynamic textbooks,
+ an isentropic process is not automatically adiabatic (although the reverse
+ is true).
+ Therefore, when modeling ideal gases undergoing isentropic processes, it
+ is also assumed that the equation of energy balance is implicitly satisfied
+ by suitably radiating heat into or out of the fluid domain.
+\end_layout
+
+\begin_layout Standard
+The fluid pressure 
+\begin_inset Formula $\tilde{p}$
+\end_inset
+
+ is evaluated from the dilatation 
 \begin_inset Formula $e^{f}$
 \end_inset
 
@@ -113194,103 +113829,7 @@ fluid-solutes
 \end_layout
 
 \begin_layout Standard
-FEBio's fluid solver differs from most computational fluid dynamics programs
- by its use of fluid dilatation 
-\begin_inset Formula $e^{f}$
-\end_inset
-
-, instead of the effective fluid pressure 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
-, as a nodal degree of freedom.
- In the 
-\emph on
-fluid
-\emph default
- module, these two variables are related by a constitutive relation, such
- as
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\tilde{p}\left(e^{f}\right) & =-Ke^{f} & \text{linear}\\
-\tilde{p}\left(e^{f}\right) & =K\left(\frac{1}{1+e^{f}}-1\right) & \text{nonlinear}\\
-\tilde{p}\left(e^{f}\right) & =-K\frac{\ln\left(1+e^{f}\right)}{1+e^{f}} & \text{log nonlinear}
-\end{aligned}
-\label{eq:fluid-pressure-state}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula $K$
-\end_inset
-
- is the fluid's bulk modulus (a physical property that may be looked up
- or measured).
- The reason for selecting 
-\begin_inset Formula $e^{f}$
-\end_inset
-
- instead of 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
- is that the dilatation (volumetric strain) is a kinematic measure, just
- like the fluid velocity 
-\begin_inset Formula $\mathbf{v}^{f}$
-\end_inset
-
- (the other nodal degree of freedom) and its associated rate of deformation
- tensor, whereas the pressure is a function of state (it needs to be formulated
- as a function of the deformation, just like the viscous fluid stress 
-\begin_inset Formula $\boldsymbol{\tau}$
-\end_inset
-
-).
- Here, 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
- is called the 
-\emph on
-elastic pressure
-\emph default
- because it represents the elastic response (equivalent to the stress-strain
- response in hyperelasticity for solid mechanics) of the fluid under isothermal
- conditions.
- The 
-\emph on
-linear
-\emph default
- model in eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:fluid-pressure-state"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
- is useful for nearly-incompressible flow, typically used for liquids.
- However, if one expects high volumetric strains in the flow (e.g., at a stagnatio
-n point in a high-velocity fluid flow problem), it may be better to employ
- one of the two 
-\emph on
-nonlinear
-\emph default
- formulations in eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:fluid-pressure-state"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-.
- The fluid Cauchy stress is given by 
+The fluid Cauchy stress is given by 
 \begin_inset Formula $\boldsymbol{\sigma}^{f}=-p\mathbf{I}+\boldsymbol{\tau}$
 \end_inset
 
@@ -114136,27 +114675,29 @@ Fluid-solutes analyses introduce two types of molar fluxes into an analysis:
 
 .
  These molar fluxes represent the flux of the solute relative to the solvent.
- Since the sedimentation flux is produced by externally applied body forces,
- it does not enter into the natural boundary condition for the solute flux.
- Therefore, the natural boundary condition for solutes is 
+ The natural boundary condition for solutes is 
 \begin_inset Formula $\tilde{j}_{n}^{\iota}=0$
 \end_inset
 
 , where 
 \begin_inset Formula 
 \begin{equation}
-\tilde{j}_{n}^{\iota}=\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)\cdot\mathbf{n}\label{eq:normal-effective-solute-flux}
+\tilde{j}_{n}^{\iota}=\left(\mathbf{j}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}^{\gamma}\right)\cdot\mathbf{n}\label{eq:normal-effective-solute-flux}
 \end{equation}
 
 \end_inset
 
-is the normal component of the effective diffusive molar flux 
-\begin_inset Formula $\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}$
+is the normal component of the effective molar flux 
+\begin_inset Formula $\mathbf{j}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}^{\gamma}$
 \end_inset
 
- on a boundary.
- The effective diffusive molar flux is constructed in this manner to enforce
- the electroneutrality condition,
+ on a boundary, with 
+\begin_inset Formula $\mathbf{j}^{\iota}=\mathbf{j}_{d}^{\iota}+\mathbf{j}_{b}^{\iota}$
+\end_inset
+
+ representing the sum of diffusive and sedimentation fluxes.
+ The effective molar flux is constructed in this manner to enforce the electrone
+utrality condition,
 \begin_inset Formula 
 \begin{equation}
 \sum_{\iota}z^{\iota}c^{\iota}=0\label{eq:electroneutrality-condition}
@@ -114195,7 +114736,7 @@ Zero natural flux
 \end_inset
 
  implies that the solute moves at the velocity of the solvent (the fluid).
- Therefore, if the fluid satisfies
+ Therefore, if the fluid satisfies 
 \begin_inset Formula $v_{n}^{f}=0$
 \end_inset
 
@@ -114203,6 +114744,67 @@ Zero natural flux
  But if the fluid is allowed to transport across the boundary (e.g., using
  a prescribed fluid pressure), the solute can also transport across the
  boundary via convection.
+ Therefore, for open flows or flows through conduits, where the fluid pressure
+ is prescribed (e.g., set to zero) at an outlet boundary, no specific boundary
+ condition needs to be prescribed on the solute in order for the latter
+ to convect freely with the solvent at that outlet boundary.
+ However, if the solvent exhibits back flow on that boundary in a manner
+ that requires the application of the 
+\emph on
+fluid backflow stabilization
+\emph default
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Backflow-Stabilization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) and 
+\emph on
+fluid tangential stabilization
+\emph default
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Tangential-Stabilization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) surfaces loads, then consider also using the 
+\emph on
+solute backflow stabilization
+\emph default
+ surface load (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Solute-Backflow-Stabilization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) on that boundary, to produce more physically-realistic solute flows on
+ such truncated domains, and improve numerical convergence.
 \end_layout
 
 \begin_layout Standard
@@ -114225,7 +114827,258 @@ noprefix "false"
 \begin_inset Formula $p$
 \end_inset
 
- on the boundary of a fluid-solutes domain, use 
+ on the boundary of a fluid-solutes domain, use the fluid pressure boundary
+ condition specified in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-Pressure-BC"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+By default, the fluid-solutes solver employs the 
+\emph on
+staggered
+\emph default
+ 
+\emph on
+equation_scheme
+\emph default
+ format for the stiffness matrix, and solves for the nodal fluid velocity
+ 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+, nodal dilatation 
+\begin_inset Formula $e^{f}$
+\end_inset
+
+ and nodal effective solute concentrations 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+ using a 
+\emph on
+coupled
+\emph default
+ 
+\emph on
+solve_strategy
+\emph default
+.
+ This default settings works well when the Peclet number (the ratio of solute
+ convective velocity to solute diffusive velocity) is relatively low (e.g.,
+ less than 100).
+ For these problems, using the default value of 
+\emph on
+ctol=0.01
+\emph default
+ is generally appropriate.
+ However, if users notice significant convergence difficulties on the solute
+ concentration as the Peclet number approaches 100 or greater, consider
+ setting 
+\emph on
+ctol=0
+\emph default
+.
+ When solving strongly convective solute transport problems with high Peclet
+ numbers (e.g., greater than 1000), diffusion will be negligible compared
+ to convection.
+ In that case, users should switch to 
+\emph on
+equation_scheme=block
+\emph default
+ and 
+\emph on
+solve_strategy=sequential
+\emph default
+ and set 
+\emph on
+ctol=0
+\emph default
+ to increase the chances of achieving a converged numerical solution.
+ The rationale for these choices is explained in the FEBio journal article
+ associated with this fluid-solutes solver 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim23"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+As done in the multiphasic solver, the solute volume fraction is considered
+ negligible in fluid mixtures modeled in the fluid-solutes solver.
+ Therefore, the volume of a fluid mixture will not change with increasing
+ solute concentrations.
+ When a solute is convected by the solvent, it means that the solvent exerts
+ a frictional force on the solute, whose magnitude is inversely proportional
+ to the solute diffusivity 
+\begin_inset Formula $d_{0}^{\iota}$
+\end_inset
+
+.
+ In the fluid-solutes solver, the acceleration of solutes is considered
+ negligible, implying that the velocity of the solute in the solvent reaches
+ its terminal velocity instantaneously (thus, inertial forces are negligible
+ compared to the drag force between solute and solvent).
+\end_layout
+
+\begin_layout Standard
+According to Newton's third law stating that every action force has an equal
+ and opposite reaction force, the drag force exerted by the solvent on the
+ solute is balanced by an equal and opposite reaction force exerted by the
+ solute on the solvent.
+ However, by default, this reaction force on the solvent is turned off in
+ the fluid-solutes solver.
+ In other words, the motion of the solvent affects that of the solute, but
+ the motion of the solute does not affect the solvent.
+ This default setting is adopted because it represent the common form of
+ diffusion-reaction equations modeled in most of the mass transport literature.
+ Therefore, when modeling solute diffusion problems in a stationary solvent
+ (e.g., in the absence of pressure or velocity-driven solvent flows), the
+ diffusive flux of a solute will not drag the solvent, keeping it in a stationar
+y state.
+ When the solvent motion is driven by solute concentration gradients, we
+ call it 
+\emph on
+osmosis
+\emph default
+.
+ There is no common term describing solvent motion caused by solute sedimentatio
+n (motion of solute under the action of a body force), so we use the term
+ 
+\emph on
+osmosis
+\emph default
+ to describe this phenomenon as well.
+ Users can override the default setting of the fluid-solutes solver by checking
+ the 
+\emph on
+include osmosis 
+\emph default
+box in the fluid-solutes material definition.
+ When this box is checked, the solvent will have a force exerted on it by
+ the solute (either due to diffusion or sedimentation, or both), causing
+ it to move.
+\end_layout
+
+\begin_layout Standard
+High-Peclet number flows are notoriously difficult to solve numerically.
+ In FEBio we have reported valid solutions for a Peclet number as high as
+ 
+\begin_inset Formula $10^{11}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim23"
+literal "false"
+
+\end_inset
+
+, thanks to the specific finite element formulation employed in the fluid-solute
+s solver, and the use of the sequential solver when needed.
+ Nevertheless, the fluid-solutes solver is not fool-proof.
+ In some problems, spurious increases in solute concentration can occur,
+ seemingly randomly in the mesh, even when using a highly regular mesh.
+ In many of these cases, this type of numerical artifact may go away by
+ simply refining the mesh.
+ However, users should be aware that this artifact may emerge 'silently',
+ meaning that it does not necessarily produce slower numerical convergence
+ that could hint at this problem.
+\end_layout
+
+\begin_layout Standard
+The explanation for this behavior is that the numerical solutions to the
+ effective solute concentrations at large Peclet numbers are effectively
+ solutions to the partial differential equation 
+\begin_inset Formula $D^{f}\left(J^{f}c^{\iota}\right)/Dt=0$
+\end_inset
+
+, as reviewed in the Theory Manual.
+ This integration is performed based on the current solution for 
+\begin_inset Formula $J^{f}=1+e^{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ as well as the structure of the mesh.
+ Any ill-conditioning in the mesh (such as a mesh which is too coarse) may
+ introduce a numerical round-off error in the calculation of 
+\begin_inset Formula $\tilde{c}^{\iota}$
+\end_inset
+
+, and there is no other sufficiently dominant term in the solute mass balance
+ equation that can dampen or correct for such numerical round-offs.
+ Thus, they may grow over time.
+ Mesh refinements are required when encountering these circumstances.
+\end_layout
+
+\begin_layout Standard
+Other boundary conditions for the solute (such as the essential boundary
+ condition 
+\begin_inset Formula $\tilde{c}^{\iota}=0$
+\end_inset
+
+) may also improve predictions when using relatively coarse meshes, preventing
+ the occurrence of spurious rises which often initiate on boundaries.
+ Unfortunately, in some problems, this option forces users to adopt a non-physic
+al boundary condition which may produce unacceptable results.
+ This workaround may not be needed when using a sufficiently refined mesh,
+ though finer meshes typically require longer solution times.
+ Also note that highly irregular meshes near no-slip boundaries may cause
+ spurious rises in solute concentration in high Peclet number flows.
+ Therefore, it is recommended to use suitable meshing techniques for generating
+ boundary layer meshes, such as stacking pentahedral elements atop tetrahedral
+ elements when using unstructured tetrahedral meshes.
+ For diffusion-dominated or reaction-dominated flows however, these numerical
+ concerns may not arise.
+ Nevertheless, a thorough understanding of the underlying physics of these
+ problems is essential for properly prescribing boundary conditions, and
+ the number and size of time increments in a finite element analysis.
+\end_layout
+
+\begin_layout Standard
+The default settings for the fluid-solutes solver force it to reform the
+ stiffness matrix at the start of each time step.
+ This is a standard requirement in most of the FEBio solvers (including
+ solid and structural mechanics, and standard biphasic and multiphasic domains),
+ though it had previously been demonstrated that the fluid solver could
+ avoid reforming the stiffness matrix even after achieving convergence at
+ a given time step, producing a very efficient computational scheme.
+ Unfortunately, this increased efficiency is not always an option with the
+ fluid-solutes solver, because the stiffness matrix contains terms that
+ depend significantly on the solute concentrations.
+ As these concentrations evolve over time and space, it becomes essential
+ to update the stiffness matrix to reflect those changes.
+ Therefore, consider using the direct sparse solver from the Intel MKL library
+ (
+\emph on
+linear_solver=Mkl dss
+\emph default
+) to improve computational efficiency during matrix factorization, in comparison
+ to the Pardiso solver from the same library.
+ Moreover, in applications where the initial solute concentration is non-zero,
+ and non-negligible compared to the prescribed change in concentration on
+ an inlet boundary, it may be possible to solve a fluid-solutes problem
+ more efficiently without reforming the stiffness matrix at each time step.
 \end_layout
 
 \begin_layout Section
@@ -114404,6 +115257,139 @@ Then, in the Control section of the second step, restore the plot level
 \begin_layout Standard
 Now, the new reference configuration resulting after the prestrain analysis
  step, will be the reference configuration that is used in the plot file.
+ 
+\end_layout
+
+\begin_layout Section
+Guidelines for using the CG-solid solver
+\end_layout
+
+\begin_layout Standard
+The nonlinear conjugate gradient solver, CG-solid, is an alternative solution
+ algorithm for static solid mechanics problems.
+ It does not currently support dynamic problems, fluids, etc.
+ This solver has advantages in several situations: 
+\end_layout
+
+\begin_layout Itemize
+It uses much less memory and therefore allows bigger problems to be solved
+ on a given computer than the standard Newton-based solvers
+\end_layout
+
+\begin_layout Itemize
+Its performance scales better for large problems and it may be faster for
+ very large problems (but see the limitations below); 
+\end_layout
+
+\begin_layout Itemize
+For nonlinear problems with buckling or other instabilities it can converge
+ much more reliably than the standard solver; 
+\end_layout
+
+\begin_layout Itemize
+For many problems it will converge in a single timestep.
+ 
+\end_layout
+
+\begin_layout Standard
+However, it also has some disadvantages: 
+\end_layout
+
+\begin_layout Itemize
+For small models it is typically slower than the BFGS solver; 
+\end_layout
+
+\begin_layout Itemize
+Although it usually converges in a single timestep, it requires a much larger
+ number of iterations to do so.
+ It is therefore inefficient if many timesteps are needed to produce intermediat
+e results or follow the progression of a problem;
+\end_layout
+
+\begin_layout Itemize
+The number of iterations it requires to converge is proportional to the
+ number of elements across the longest dimension of the mesh.
+ It therefore performs best for compact problems with similar numbers of
+ elements in each direction.
+ For example a cube with equal numbers of elements in each direction would
+ solve much faster than a flat sheet or a long, thin beam with the same
+ total number of elements; 
+\end_layout
+
+\begin_layout Itemize
+It does not currently work well for shell elements or freely moving rigid
+ bodies.
+ The way it works is quite different from the Newton-based solver and the
+ problem may need to be defined differently for optimum results: 
+\end_layout
+
+\begin_layout Itemize
+The convergence criteria in FEBio measure the change in the solution on
+ each iteration as a fraction of the total change for the timestep.
+ Because the CG solver converges in a much larger number of smaller steps,
+ the convergence criteria must be set smaller than for the BFGS solver.
+ The default values are dtol=1e-6 and etol=0.001, but it may be necessary
+ to reduce these further to ensure full convergence.
+ Check the solution carefully to make sure that it is correct and reduce
+ dtol further if necessary.
+\end_layout
+
+\begin_layout Itemize
+The rate of convergence is quite slow near to the solution so if the convergence
+ tolerance is set too small the solution may take much longer.
+ 
+\end_layout
+
+\begin_layout Itemize
+It is usually best to use a single timestep if possible, rather than many
+ smaller steps as is normal for the Newton solver.
+ More timesteps will greatly increase the solution time.
+ 
+\end_layout
+
+\begin_layout Itemize
+Unlike the Newton-based solvers, prescribed displacements are applied only
+ to the nodes they affect at first and take many iterations to propagate
+ through the adjoining mesh.
+ This means that they can often cause excessive deformation of the adjacent
+ elements, for example a compressive prescribed displacement can push the
+ surface layer of nodes right through the adjoining elements causing a negative
+ Jacobian error.
+ Unlike the BFGS solver, where prescribed displacements often give more
+ stable convergence, it is better to apply forces where possible and to
+ avoid prescribed displacements.
+ 
+\end_layout
+
+\begin_layout Itemize
+If prescribed displacements are essential, it may be necessary to use smaller
+ timesteps to avoid excessive distortion of the adjoining elements.
+ In this case it is possible to slacken the convergence criteria for the
+ intermediate steps and then apply a tighter tolerance for the final step
+ to generate a correct solution.
+ 
+\end_layout
+
+\begin_layout Itemize
+The preconditioner improves convergence when the stiffness of the nodes
+ varies, for example because of different element sizes, different materials
+ or features such as quadratic elements with midside nodes.
+ For problems where all the elements are the same it offers no great advantage
+ and may even cause slower convergence in some cases.
+ It is therefore best to use it for irregular meshes, multiple materials,
+ quadratic elements and contact problems, but for problems with regular
+ meshes where all the elements are a similar size it may be better to turn
+ it off.
+ 
+\end_layout
+
+\begin_layout Itemize
+For problems with large deformation and displacements the solver may take
+ a very large number of iterations to converge.
+ The solver proceeds by many small, cautious steps, unlike the Newton-based
+ solvers, which attempt to jump straight to the final answer on each iteration.
+ It is therefore much more reliable but may need thousands or tens of thousands
+ of iterations to reach the solution.
  
 \end_layout
 

@@ -438,10 +438,4 @@ CMakeCache.txt
 Documentation/FEBio_Theory_Manual.pdf
 Documentation/FEBio_User_Manual.html.LyXconv/
 
-## Docker
-!Docker/build
-
-## direnv
-.env*
-.terraform
-febio
+/FEBioMech/FECGSolidSolver - Copy.cpp

@@ -39,7 +39,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidNormalVelocity, FESurfaceLoad)
-	ADD_PARAMETER(m_velocity, "velocity"                  );
+	ADD_PARAMETER(m_velocity, "velocity"                  )->setUnits(UNIT_VELOCITY);
     ADD_PARAMETER(m_bpv     , "prescribe_nodal_velocities");
     ADD_PARAMETER(m_bpar    , "parabolic");
     ADD_PARAMETER(m_brim    , "prescribe_rim_pressure"    );

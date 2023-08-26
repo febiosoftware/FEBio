@@ -87,7 +87,7 @@ void FEBioFluidSolutes::InitModule()
     febio.AddModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
     
     //-----------------------------------------------------------------------------
-    // analyis classes (default type must match module name!)
+    // analysis classes (default type must match module name!)
     REGISTER_FECORE_CLASS(FEFluidSolutesAnalysis, "fluid-solutes");
 
 	// monolithic fluid-solutes solver

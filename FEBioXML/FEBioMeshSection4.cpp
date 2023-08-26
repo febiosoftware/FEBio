@@ -64,6 +64,7 @@ void FEBioMeshSection4::Parse(XMLTag& tag)
 		else if (tag == "Surface"    ) ParseSurfaceSection    (tag, part);
 		else if (tag == "Edge"       ) ParseEdgeSection       (tag, part);
 		else if (tag == "ElementSet" ) ParseElementSetSection (tag, part);
+		else if (tag == "PartList"   ) ParsePartListSection   (tag, part);
 		else if (tag == "SurfacePair") ParseSurfacePairSection(tag, part);
 		else if (tag == "DiscreteSet") ParseDiscreteSetSection(tag, part);
 		else throw XMLReader::InvalidTag(tag);
@@ -290,6 +291,43 @@ void FEBioMeshSection4::ParseElementSetSection(XMLTag& tag, FEBModel::Part* part
 }
 
 //-----------------------------------------------------------------------------
+void FEBioMeshSection4::ParsePartListSection(XMLTag& tag, FEBModel::Part* part)
+{
+	// get the required name attribute
+	const char* szname = tag.AttributeValue("name");
+
+	// see if this part list was already defined
+	FEBModel::PartList* ps = part->FindPartList(szname);
+	if (ps) throw FEBioImport::RepeatedPartList(szname);
+
+	// create a new part list
+	ps = new FEBModel::PartList(szname);
+	part->AddPartList(ps);
+
+	// read the part names
+	vector<string> partList;
+	tag.value(partList);
+	if (partList.empty()) throw XMLReader::InvalidTag(tag);
+
+	ps->SetPartList(partList);
+
+	// we'll also create an element set of this
+	FEBModel::ElementSet* es = new FEBModel::ElementSet("@part_list:" + string(szname));
+	part->AddElementSet(es);
+
+	vector<int> elemList;
+	for (string s : partList)
+	{
+		FEBModel::ElementSet* a = part->FindElementSet(s);
+		if (a == nullptr) throw XMLReader::InvalidValue(tag);
+		
+		const vector<int>& aList = a->ElementList();
+		elemList.insert(elemList.end(), aList.begin(), aList.end());
+	}
+	es->SetElementList(elemList);
+}
+
+//-----------------------------------------------------------------------------
 void FEBioMeshSection4::ParseEdgeSection(XMLTag& tag, FEBModel::Part* part)
 {
 	// get the mesh
@@ -352,14 +390,14 @@ void FEBioMeshSection4::ParseSurfacePairSection(XMLTag& tag, FEBModel::Part* par
 			const char* sz = tag.szvalue();
 			FEBModel::Surface* surf = part->FindSurface(sz);
 			if (surf == nullptr) throw XMLReader::InvalidValue(tag);
-			surfPair->m_primary = sz;
+			surfPair->m_primary = surf->Name();
 		}
 		else if (tag == "secondary")
 		{
 			const char* sz = tag.szvalue();
 			FEBModel::Surface* surf = part->FindSurface(sz);
 			if (surf == nullptr) throw XMLReader::InvalidValue(tag);
-			surfPair->m_secondary = sz;
+			surfPair->m_secondary = surf->Name();
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

@@ -255,6 +255,7 @@ public:
 	{
 	public:
 		PlotObject() {}
+		virtual ~PlotObject() {}
 
 		void AddData(const char* szname, Var_Type type, FEPlotData* psave = nullptr);
 
@@ -366,6 +367,7 @@ protected:
 	void WriteObjectsState();
 	void WriteObjectData(PlotObject* po);
 
+	void WriteGlobalDataField(FEModel& fem, FEPlotData* pd);
 	void WriteNodeDataField(FEModel& fem, FEPlotData* pd);
 	void WriteDomainDataField(FEModel& fem, FEPlotData* pd);
 	void WriteSurfaceDataField(FEModel& fem, FEPlotData* pd);
@@ -376,6 +378,7 @@ protected:
 	bool ReadDictionary();
 	bool ReadDicList();
 	void BuildSurfaceTable();
+	void Clear();
 
 protected:
 	Dictionary	m_dic;	// dictionary

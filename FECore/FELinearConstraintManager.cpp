@@ -258,6 +258,15 @@ void FELinearConstraintManager::BuildMatrixProfile(FEGlobalMatrix& G)
 //! not constraint)
 bool FELinearConstraintManager::Initialize()
 {
+	int nlin = LinearConstraints();
+	if (nlin == 0) return true;
+
+	for (int i = 0; i < nlin; ++i)
+	{
+		FELinearConstraint& lci = *m_LinC[i];
+		if (lci.Init() == false) return false;
+	}
+
 	return true;
 }
 
@@ -399,6 +408,11 @@ void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>&
 void FELinearConstraintManager::AssembleStiffness(FEGlobalMatrix& G, vector<double>& R, vector<double>& ui, const vector<int>& en, const vector<int>& lmi, const vector<int>& lmj, const matrix& ke)
 {
 	FEMesh& mesh = m_fem->GetMesh();
+
+	// make sure we have a node list
+	// (rigid matrices will not have the node list set and therefore should be ignored, since
+	// you cannot use rigid nodes in linear constraints)
+	if (en.size() == 0) return;
 
 	int ndof = ke.rows();
 	int ndn = ndof / (int)en.size();

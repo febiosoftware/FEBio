@@ -68,13 +68,16 @@ public:
     FEReactiveFatigueMaterialPoint(const FEReactiveFatigueMaterialPoint& rfmp);
     FEReactiveFatigueMaterialPoint(FEReactiveFatigueMaterialPoint& rfmp);
     
-	FEMaterialPointData* Copy();
+	FEMaterialPointData* Copy() override;
     
-    void Init();
-    void Update(const FETimeInfo& timeInfo);
+    void Init() override;
+    void Update(const FETimeInfo& timeInfo) override;
     
-    void Serialize(DumpStream& ar);
+    void Serialize(DumpStream& ar) override;
     
+    double IntactBonds() const override { return m_wit; }
+    double FatigueBonds() const override { return m_wft; }
+
 public:
     double      m_wit;          //!< intact bond mass fraction at current time
     double      m_wip;          //!< intact bond mass fraction at previous time
@@ -93,7 +96,8 @@ public:
     double      m_wbp;          //!< broken (damaged) bond fraction at previous time
     
     double      m_wft;          //!< fatigue bond fraction at current time
-    
+    double      m_wfp;          //!< fatigue bond fraction at previous time
+
     
     std::deque <FatigueBond> m_fb;   //!< generations of fatigued bonds
 };

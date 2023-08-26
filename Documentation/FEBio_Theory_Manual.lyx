@@ -179,11 +179,11 @@ status open
 
 
 \series default
-Theory Manual Version 4.1 
+Theory Manual Version 4.2 
 \end_layout
 
 \begin_layout Date
-Last Updated: March 24, 2023
+Last Updated: June 19, 2023
 \end_layout
 
 \begin_layout Paragraph*
@@ -25169,7 +25169,7 @@ literal "true"
 \begin{equation}
 \begin{aligned}\delta W= & \int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(-\grad\tilde{p}+\divg\boldsymbol{\tau}-\sum_{\iota}R\theta\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}+\rho^{f}\left(\mathbf{b}^{f}-\mathbf{a}^{f}\right)+M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)dv\\
  & +\int_{\Omega^{f}}\delta J^{f}\left(-\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\divg\mathbf{v}^{f}\right)dv\\
- & +\sum_{\iota}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}+\divg\left(\mathbf{j}_{d}^{\iota}+\mathbf{j}_{b}^{\iota}\right)-\hat{c}^{\iota}+\sum_{\beta}z^{\beta}\divg\left(\mathbf{j}_{d}^{\beta}+\mathbf{j}_{b}^{\beta}\right)\right)dv\,.
+ & +\sum_{\iota}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}+\divg\mathbf{j}^{\iota}-\hat{c}^{\iota}+\sum_{\beta}z^{\beta}\divg\mathbf{j}^{\iota}\right)dv\,.
 \end{aligned}
 \label{eq:CFDSol-Virtual-Work}
 \end{equation}
@@ -25209,7 +25209,7 @@ These integrals are evaluated in the current (time-invariant) configuration
 \begin{equation}
 \begin{aligned}\delta W_{int}= & \int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\grad\tilde{p}+\rho^{f}\mathbf{a}^{f}+\sum_{\iota}R\theta\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}\right)+\boldsymbol{\tau}:\grad\delta\mathbf{v}^{f}dv\\
  & +\int_{\Omega^{f}}\delta J^{f}\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\grad\delta J^{f}\cdot\mathbf{v}^{f}dv\\
- & +\sum_{\iota}\int_{\Omega^{f}}-\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\hat{c}^{\iota}\right)+\grad\delta\tilde{c}^{\iota}\cdot\left(\mathbf{j}_{d}^{\iota}+\sum_{\beta}z^{\beta}\mathbf{j}_{d}^{\beta}\right)dv\,.
+ & +\sum_{\iota}\int_{\Omega^{f}}\left(\grad\delta\tilde{c}^{\iota}\cdot\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)-\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\hat{c}^{\iota}\right)\right)dv\,.
 \end{aligned}
 \label{eq:Int-Virtual-Work-CFDSol}
 \end{equation}
@@ -25221,7 +25221,7 @@ The external virtual work is
 \begin{equation}
 \begin{aligned}\delta W_{ext}= & \int_{\Gamma^{f}}\delta\mathbf{v}^{f}\cdot\mathbf{t}^{\tau}da+\int_{\Gamma^{f}}\delta J^{f}v_{n}^{f}da+\int_{\Gamma^{f}}\delta\tilde{c}^{\iota}\tilde{j}_{n}^{\iota}da\\
  & +\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\rho^{f}\mathbf{b}^{f}+\sum_{\iota}M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)dv\\
- & +\sum_{\iota}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\divg\left(\mathbf{j}_{b}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{b}^{\gamma}\right)\,dv\,,
+ & -\sum_{\iota}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\tilde{\mathbf{j}}_{b}^{\iota}dv\,,
 \end{aligned}
 \label{eq:Ext-Virt-Work-CFDSol}
 \end{equation}
@@ -25231,7 +25231,7 @@ The external virtual work is
  where
 \begin_inset Formula 
 \begin{equation}
-\tilde{j}_{n}^{\iota}=\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)\cdot\mathbf{n}\,.\label{eq:Normal-Sol-Flux-CFDSol}
+\tilde{j}_{n}^{\iota}=\left(\mathbf{j}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}^{\gamma}\right)\cdot\mathbf{n}\,.\label{eq:Normal-Sol-Flux-CFDSol}
 \end{equation}
 
 \end_inset
@@ -25580,7 +25580,7 @@ where
 \[
 \begin{aligned}\delta W_{int}^{v} & =\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\grad\tilde{p}+\rho^{f}\mathbf{a}^{f}+\sum_{\iota}R\theta\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}\right)+\boldsymbol{\tau}:\grad\delta\mathbf{v}^{f}dv\\
 \delta W_{int}^{J} & =\int_{\Omega^{f}}\delta J^{f}\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\grad\delta J^{f}\cdot\mathbf{v}^{f}dv\\
-\delta W_{int}^{c} & =\sum_{\iota}\int_{\Omega^{f}}-\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\hat{c}^{\iota}\right)+\grad\delta\tilde{c}^{\iota}\cdot\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)dv\,.
+\delta W_{int}^{c} & =\sum_{\iota}\int_{\Omega^{f}}\left(\grad\delta\tilde{c}^{\iota}\cdot\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)-\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\hat{c}^{\iota}\right)\right)dv\,.
 \end{aligned}
 \]
 
@@ -25591,7 +25591,36 @@ Recall that
 \end_inset
 
 .
- The linearizations of each of these terms along increments in the degrees
+ Also note that
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{a}^{f} & =\frac{\partial\mathbf{v}^{f}}{\partial t}+\grad\mathbf{v}^{f}\cdot\mathbf{v}^{f}\\
+\frac{D^{f}J^{f}}{Dt} & =\frac{\partial J^{f}}{\partial t}+\grad J^{f}\cdot\mathbf{v}^{f}\\
+\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt} & =\tilde{c}^{\iota}\left(\tilde{\kappa}^{\iota}+J^{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\frac{D^{f}J^{f}}{Dt}+J^{f}\left(\tilde{\kappa}^{\iota}\frac{D^{f}\tilde{c}^{\iota}}{Dt}+\tilde{c}^{\iota}\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\gamma}}\frac{D^{f}\tilde{c}^{\gamma}}{Dt}\right)\\
+\frac{D^{f}c^{\iota}}{Dt} & =\frac{\partial c^{\iota}}{\partial t}+\grad c^{\iota}\cdot\mathbf{v}^{f}\\
+ & =\tilde{\kappa}^{\iota}\frac{\partial\tilde{c}^{\iota}}{\partial t}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial t}+\left(\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}+\tilde{c}^{\iota}\grad\tilde{\kappa}^{\iota}\right)\cdot\mathbf{v}^{f}\\
+\frac{\partial\tilde{\kappa}^{\iota}}{\partial t} & =\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\frac{\partial J^{f}}{\partial t}+\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\gamma}}\frac{\partial\tilde{c}^{\gamma}}{\partial t}\\
+\grad\tilde{\kappa}^{\iota} & =\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\grad J+\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\gamma}}\grad\tilde{c}^{\gamma}
+\end{aligned}
+\]
+
+\end_inset
+
+Using the temporal discretization approach outlined in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:CFD-Discretization-Linearization"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the linearizations of each of these terms along increments in the degrees
  of freedom are obtained using
 \begin_inset Formula 
 \[
@@ -25610,9 +25639,12 @@ D\left(\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\right)\left[\Delta\mathbf{v}^
 \begin{aligned}D\left(\grad\tilde{p}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\left(\tilde{p}_{J}^{\prime}\grad\Delta J^{f}+\Delta J^{f}\tilde{p}_{J}^{\prime\prime}\grad J^{f}\right)\\
 D\rho^{f}\left[\Delta J^{f}\right] & =-\alpha_{f}\frac{\rho^{f}}{J^{f}}\Delta J^{f}\\
 D\boldsymbol{\tau}\left[\Delta J^{f}\right] & =\alpha_{f}\boldsymbol{\tau}_{J}^{\prime}\Delta J^{f}\\
-D\left(\frac{D^{f}J^{f}}{Dt}\right)\left[\Delta J^{f}\right] & =\frac{\alpha_{m}}{\gamma}\frac{\Delta J^{f}}{\Delta t}+\alpha_{f}\grad J^{f}\cdot\Delta\mathbf{v}^{f}\\
+D\left(\frac{D^{f}J^{f}}{Dt}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\Delta J^{f}}{\Delta t}+\grad\Delta J^{f}\cdot\mathbf{v}^{f}\right)\\
 D\tilde{\kappa}^{\iota}\left[\Delta J^{f}\right] & =\alpha_{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\Delta J^{f}\\
-D\left(\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\tilde{c}^{\iota}}{\Delta t}\left(\tilde{\kappa}^{\iota}+J^{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\Delta J^{f}+\Delta J^{f}\grad\left(\tilde{\kappa}^{\iota}\tilde{c}^{\iota}+J^{f}\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\cdot\mathbf{v}^{f}+\left(c^{\iota}+J^{f}\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\grad\Delta J^{f}\cdot\mathbf{v}^{f}\right)\\
+D\left(\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\tilde{c}^{\iota}\left(\tilde{\kappa}^{\iota}+J^{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\Delta J^{f}}{\Delta t}+\grad\Delta J^{f}\cdot\mathbf{v}^{f}\right)\\
+ & +\alpha_{f}\tilde{c}^{\iota}\frac{D^{f}J^{f}}{Dt}\left(2\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}+J^{f}\frac{\partial^{2}\tilde{\kappa}^{\iota}}{\partial\left(J^{f}\right)^{2}}\right)\Delta J^{f}\\
+ & +\alpha_{f}\left(\tilde{\kappa}^{\iota}\frac{D^{f}\tilde{c}^{\iota}}{Dt}+\tilde{c}^{\iota}\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\gamma}}\frac{D^{f}\tilde{c}^{\gamma}}{Dt}\right)\Delta J^{f}\\
+ & +\alpha_{f}J^{f}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\frac{D^{f}\tilde{c}^{\iota}}{Dt}+\tilde{c}^{\iota}\sum_{\gamma}\left(\frac{\partial^{2}\tilde{\kappa}^{\iota}}{\partial J^{f}\partial\tilde{c}^{\gamma}}\right)\frac{D^{f}\tilde{c}^{\gamma}}{Dt}\right)\Delta J^{f}\\
 D\hat{c}^{\iota}\left[\Delta J^{f}\right] & =\alpha_{f}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial J^{f}}\Delta J^{f}\\
 D\mathbf{j}_{d}^{\iota}\left[\Delta J^{f}\right] & =-\alpha_{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\Delta J^{f}d_{0}^{\iota}\grad\tilde{c}^{\iota}
 \end{aligned}
@@ -25625,8 +25657,7 @@ D\mathbf{j}_{d}^{\iota}\left[\Delta J^{f}\right] & =-\alpha_{f}\frac{\partial\ti
 \[
 \begin{aligned}D\left(\tilde{\kappa}^{\iota}\tilde{c}^{\iota}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\Delta\tilde{c}^{\beta}\\
 D\left(\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}\grad\Delta\tilde{c}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\Delta\tilde{c}^{\beta}\grad\tilde{c}^{\iota}\right)\\
-D\left(\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}J^{f}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\frac{\Delta\tilde{c}^{\beta}}{\Delta t}\right)\\
- & +\alpha_{f}\left(\Delta\tilde{c}^{\beta}\grad\left(J^{f}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\right)\cdot\mathbf{v}^{f}+J^{f}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\Delta\tilde{c}^{\beta}\cdot\mathbf{v}^{f}\right)\\
+D\left(\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}J^{f}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}+\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}\right)\Delta\tilde{c}^{\beta}+\grad\Delta\tilde{c}^{\beta}\cdot\mathbf{v}^{f}\right)\\
 D\hat{c}^{\iota}\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\beta}}\Delta\tilde{c}^{\beta}\\
 D\mathbf{j}_{d}^{\iota}\left[\Delta\tilde{c}^{\beta}\right] & =-\alpha_{f}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad\Delta\tilde{c}^{\beta}+\Delta\tilde{c}^{\beta}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}d_{0}^{\iota}+\tilde{\kappa}^{\iota}\frac{\partial d_{0}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\iota}\right)
 \end{aligned}
@@ -25651,7 +25682,7 @@ D\left(\delta W_{int}^{v}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{
 \begin_inset Formula 
 \[
 \begin{aligned}D\left(\delta W_{int}^{J}\right)\left[\Delta\mathbf{v}^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\left(\delta J^{f}\frac{1}{J^{f}}\grad J^{f}+\grad\delta J^{f}\right)\cdot\Delta\mathbf{v}^{f}dv\\
-D\left(\delta W_{int}^{J}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta J^{f}\frac{1}{J^{f}}\left(-\frac{\Delta J^{f}}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\Delta J^{f}}{\Delta t}+\grad J^{f}\cdot\Delta\mathbf{v}^{f}\right)dv\\
+D\left(\delta W_{int}^{J}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta J^{f}\frac{1}{J^{f}}\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}-\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}\right)\Delta J^{f}+\grad\Delta J^{f}\cdot\mathbf{v}^{f}\right)dv\\
 D\left(\delta W_{int}^{J}\right)\left[\Delta\tilde{c}^{\beta}\right] & =0
 \end{aligned}
 \]
@@ -25661,16 +25692,17 @@ D\left(\delta W_{int}^{J}\right)\left[\Delta\tilde{c}^{\beta}\right] & =0
 
 \begin_inset Formula 
 \[
-\begin{aligned}D\left(\delta W_{int}^{c}\right)\left[\Delta\mathbf{v}^{f}\right] & =\sum_{\iota}-\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{1}{J^{f}}\grad\left(J^{f}c^{\iota}\right)\cdot\Delta\mathbf{v}^{f}dv\,.\\
-D\left(\delta W_{int}^{c}\right)\left[\Delta J^{f}\right] & =\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{1}{J^{f}}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\tilde{c}^{\iota}}{\Delta t}\left(\tilde{\kappa}^{\iota}+J^{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)-\grad\left(\tilde{\kappa}^{\iota}\tilde{c}^{\iota}+J^{f}\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\cdot\mathbf{v}^{f}\right)\Delta J^{f}dv\\
- & -\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{1}{J^{f}}\left(c^{\iota}+J^{f}\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\grad\Delta J^{f}\cdot\mathbf{v}^{f}dv\\
- & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial J^{f}}\Delta J^{f}dv\\
- & -\alpha_{f}\sum_{\iota}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\Delta J^{f}d_{0}^{\iota}\grad\tilde{c}^{\iota}+\sum_{\gamma}z^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\Delta J^{f}d_{0}^{\gamma}\grad\tilde{c}^{\gamma}\right)dv\\
-D\left(\delta W_{int}^{c}\right)\left[\Delta\tilde{c}^{\beta}\right] & =-\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{\alpha_{m}}{\alpha_{f}\gamma}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\frac{\Delta\tilde{c}^{\beta}}{\Delta t}dv\\
- & -\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\frac{1}{J^{f}}\Delta\tilde{c}^{\beta}\grad\left(J^{f}\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\right)\cdot\mathbf{v}^{f}+\left(\tilde{\kappa}^{\iota}\delta_{\iota\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\Delta\tilde{c}^{\beta}\cdot\mathbf{v}^{f}\right)dv\\
- & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\beta}}\Delta\tilde{c}^{\beta}dv\\
- & -\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad\Delta\tilde{c}^{\beta}+\Delta\tilde{c}^{\beta}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}d_{0}^{\iota}+\tilde{\kappa}^{\iota}\frac{\partial d_{0}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\iota}\right)dv\\
- & -\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(z^{\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad\Delta\tilde{c}^{\beta}+\Delta\tilde{c}^{\beta}\sum_{\gamma}z^{\gamma}\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}d_{0}^{\gamma}+\tilde{\kappa}^{\gamma}\frac{\partial d_{0}^{\gamma}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\gamma}\right)dv
+\begin{aligned}D\left(\delta W_{int}^{c}\right)\left[\Delta\mathbf{v}^{f}\right] & =\sum_{\iota}\int_{\Omega^{f}}-\delta\tilde{c}^{\iota}\frac{1}{J^{f}}\grad\left(J^{f}c^{\iota}\right)\cdot\alpha_{f}\Delta\mathbf{v}_{f}\\
+D\left(\delta W_{int}^{c}\right)\left[\Delta J^{f}\right] & =\sum_{\iota}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\frac{\alpha_{f}\Delta J^{f}}{\left(J^{f}\right)^{2}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\\
+ & -\delta\tilde{c}^{\iota}\alpha_{f}\frac{\tilde{c}^{\iota}}{J^{f}}\left(\tilde{\kappa}^{\iota}+J^{f}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\Delta J^{f}}{\Delta t}+\grad\Delta J^{f}\cdot\mathbf{v}^{f}\right)\\
+ & -\delta\tilde{c}^{\iota}\alpha_{f}\frac{\tilde{c}^{\iota}}{J^{f}}\frac{D^{f}J^{f}}{Dt}\left(2\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}+J^{f}\frac{\partial^{2}\tilde{\kappa}^{\iota}}{\partial\left(J^{f}\right)^{2}}\right)\Delta J^{f}\\
+ & -\delta\tilde{c}^{\iota}\alpha_{f}\frac{1}{J^{f}}\left(\tilde{\kappa}^{\iota}\frac{D^{f}\tilde{c}^{\iota}}{Dt}+\tilde{c}^{\iota}\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\gamma}}\frac{D^{f}\tilde{c}^{\gamma}}{Dt}\right)\Delta J^{f}\\
+ & -\delta\tilde{c}^{\iota}\alpha_{f}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\frac{D^{f}\tilde{c}^{\iota}}{Dt}+\tilde{c}^{\iota}\sum_{\gamma}\left(\frac{\partial^{2}\tilde{\kappa}^{\iota}}{\partial J^{f}\partial\tilde{c}^{\gamma}}\right)\frac{D^{f}\tilde{c}^{\gamma}}{Dt}\right)\Delta J^{f}\\
+ & +\alpha_{f}\delta\tilde{c}^{\iota}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial J^{f}}\Delta J^{f}-\alpha_{f}\grad\delta\tilde{c}^{\iota}\cdot\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}d_{0}^{\iota}\grad\tilde{c}^{\iota}+\sum_{\gamma}z^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}d_{0}^{\gamma}\grad\tilde{c}^{\gamma}\right)\Delta J^{f}dv\\
+D\left(\delta W_{int}^{c}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{\iota}\int_{\Omega^{f}}-\delta\tilde{c}^{\iota}\alpha_{f}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}+\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}\right)\Delta\tilde{c}^{\beta}+\grad\Delta\tilde{c}^{\beta}\cdot\mathbf{v}^{f}\right)\\
+ & +\delta\tilde{c}^{\iota}\alpha_{f}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\beta}}\Delta\tilde{c}^{\beta}\\
+ & -\alpha_{f}\grad\delta\tilde{c}^{\iota}\cdot\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad\Delta\tilde{c}^{\beta}+\Delta\tilde{c}^{\beta}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}d_{0}^{\iota}+\tilde{\kappa}^{\iota}\frac{\partial d_{0}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\iota}\right)\\
+ & -\alpha_{f}\grad\delta\tilde{c}^{\iota}\cdot\left(z^{\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad\Delta\tilde{c}^{\beta}+\Delta\tilde{c}^{\beta}\sum_{\gamma}z^{\gamma}\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}d_{0}^{\gamma}+\tilde{\kappa}^{\gamma}\frac{\partial d_{0}^{\gamma}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\gamma}\right)dv
 \end{aligned}
 \]
 
@@ -25704,7 +25736,7 @@ where
 \begin_inset Formula 
 \[
 \begin{aligned}\delta G_{ext}^{v} & =\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(\rho^{f}\mathbf{b}^{f}+\sum_{\iota}M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)dv\\
-\delta G_{ext}^{c} & =\sum_{\iota}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\divg\left(\mathbf{j}_{b}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{b}^{\gamma}\right)\,dv
+\delta G_{ext}^{c} & =-\sum_{\iota}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(\mathbf{j}_{b}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{b}^{\gamma}\right)dv
 \end{aligned}
 \]
 
@@ -25723,7 +25755,7 @@ and we can linearize
 \[
 \begin{aligned}D\left(\delta G_{ext}^{v}\right)\left[\Delta\mathbf{v}^{f}\right] & =\mathbf{0}\\
 D\left(\delta G_{ext}^{v}\right)\left[\Delta J^{f}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(-\frac{\rho^{f}}{J^{f}}\mathbf{b}^{f}+\sum_{\iota}M^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\mathbf{b}^{\iota}\right)\Delta J^{f}dv\\
-D\left(\delta G_{ext}^{v}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{\iota}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot M^{\iota}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\Delta\tilde{c}^{\beta}\mathbf{b}^{\iota}dv
+D\left(\delta G_{ext}^{v}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\alpha_{f}\int_{\Omega^{f}}\delta\mathbf{v}^{f}\cdot\left(M^{\beta}\tilde{\kappa}^{\beta}\mathbf{b}^{\beta}+\sum_{\gamma}M^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\mathbf{b}^{\gamma}\right)\Delta\tilde{c}^{\beta}dv
 \end{aligned}
 \]
 
@@ -25733,13 +25765,8 @@ and
 \begin_inset Formula 
 \[
 \begin{aligned}D\left(\delta G_{ext}^{c}\right)\left[\Delta\mathbf{v}^{f}\right] & =\mathbf{0}\\
-D\left(\delta G_{ext}^{c}\right)\left[\Delta J^{f}\right] & =\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\left(s^{\iota}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\divg\mathbf{b}^{\iota}+\grad\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\right)\cdot\mathbf{b}^{\iota}\right)\right)\Delta J^{f}+s^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\grad\Delta J^{f}\cdot\mathbf{b}^{\iota}\right)\,dv\\
- & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(\sum_{\gamma}z^{\gamma}\left(s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\divg\mathbf{b}^{\gamma}+\grad\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\right)\cdot\mathbf{b}^{\gamma}\right)\Delta J^{f}+\sum_{\gamma}z^{\gamma}s^{\gamma}\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\right)\mathbf{b}^{\gamma}\cdot\grad\Delta J^{f}\right)\,dv\\
-D\left(\delta G_{ext}^{c}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}s^{\iota}\left(\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\divg\mathbf{b}^{\iota}+\grad\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\cdot\mathbf{b}^{\iota}\right)\Delta\tilde{c}^{\beta}\,dv\\
- & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}s^{\iota}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\right)\grad\Delta\tilde{c}^{\beta}\cdot\mathbf{b}^{\iota}\,dv\\
- & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(z^{\beta}s^{\beta}\tilde{\kappa}^{\beta}\divg\mathbf{b}^{\beta}+z^{\beta}s^{\beta}\grad\tilde{\kappa}^{\beta}\cdot\mathbf{b}^{\beta}\right)\Delta\tilde{c}^{\beta}\,dv\\
- & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\left(z^{\beta}s^{\beta}\tilde{\kappa}^{\beta}\mathbf{b}^{\beta}+\sum_{\gamma}z^{\gamma}s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\mathbf{b}^{\gamma}\right)\cdot\grad\Delta\tilde{c}^{\beta}\,dv\\
- & +\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\delta\tilde{c}^{\iota}\sum_{\gamma}z^{\gamma}s^{\gamma}\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\divg\mathbf{b}^{\gamma}+\grad\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\right)\cdot\mathbf{b}^{\gamma}\right)\Delta\tilde{c}^{\beta}\,dv
+D\left(\delta G_{ext}^{c}\right)\left[\Delta J^{f}\right] & =-\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(s^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\mathbf{b}^{\iota}+\sum_{\gamma}z^{\gamma}s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\mathbf{b}^{\gamma}\right)\Delta J^{f}dv\\
+D\left(\delta G_{ext}^{c}\right)\left[\Delta\tilde{c}^{\beta}\right] & =-\sum_{\iota}\alpha_{f}\int_{\Omega^{f}}\grad\delta\tilde{c}^{\iota}\cdot\left(\left(\delta_{\iota\beta}+z^{\beta}\right)s^{\beta}\tilde{\kappa}^{\beta}\mathbf{b}^{\beta}+s^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\mathbf{b}^{\iota}+\sum_{\gamma}z^{\gamma}s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\mathbf{b}^{\gamma}\right)\Delta\tilde{c}^{\beta}\,dv
 \end{aligned}
 \]
 
@@ -25754,6 +25781,282 @@ under the assumption that
 
 \begin_layout Subsection
 Discretization for Fluid-Solutes
+\end_layout
+
+\begin_layout Standard
+To evaluate the discretized form of the virtual work and its linearizations
+ we use
+\begin_inset Formula 
+\[
+\begin{aligned}\delta\mathbf{v}^{f} & =\sum_{a}N_{a}\delta\mathbf{v}_{a}^{f} & \Delta\mathbf{v}^{f} & =\sum_{b}N_{b}\Delta\mathbf{v}_{b}^{f}\\
+\delta J^{f} & =\sum_{a}N_{a}\delta J_{a}^{f} & \Delta J^{f} & =\sum_{b}N_{b}\Delta J_{b}^{f}\\
+\delta\tilde{c}^{\iota} & =\sum_{a}N_{a}\delta\tilde{c}_{a}^{\iota} & \Delta\tilde{c}^{\beta} & =\sum_{b}N_{b}\Delta\tilde{c}_{b}^{\beta}
+\end{aligned}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $N_{a}$
+\end_inset
+
+ are shape functions.
+ Then, the discretized form of the virtual work takes the form
+\begin_inset Formula 
+\[
+\begin{aligned}\delta W_{int}^{v} & =\sum_{a}\delta\mathbf{v}_{a}^{f}\cdot\mathbf{f}_{a}^{v}\\
+\delta W_{int}^{J} & =\sum_{a}\delta J_{a}^{f}f_{a}^{J}\\
+\delta W_{int}^{c} & =\sum_{\iota}\sum_{a}\delta\tilde{c}_{a}^{\iota}f_{a}^{\iota}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{f}_{a}^{v} & =\int_{\Omega^{f}}N_{a}\left(\grad\tilde{p}+\rho^{f}\mathbf{a}^{f}+\sum_{\iota}R\theta\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}\right)+\boldsymbol{\tau}\cdot\grad N_{a}dv\\
+f_{a}^{J} & =\int_{\Omega^{f}}N_{a}\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\grad N_{a}\cdot\mathbf{v}^{f}dv\\
+f_{a}^{\iota} & =\int_{\Omega^{f}}-N_{a}\left(\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}-\hat{c}^{\iota}\right)+\grad N_{a}\cdot\left(\mathbf{j}_{d}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{d}^{\gamma}\right)dv
+\end{aligned}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt} & =\frac{c^{\iota}}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\tilde{\kappa}^{\iota}\frac{D^{f}\tilde{c}^{\iota}}{Dt}+\tilde{c}^{\iota}\frac{D^{f}\tilde{\kappa}^{\iota}}{Dt}\end{aligned}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\begin{aligned}\delta G_{ext}^{v} & =\sum_{a}\delta\mathbf{v}_{a}^{f}\cdot\mathbf{b}_{a}^{v}\\
+\delta G_{ext}^{c} & =\sum_{\iota}\sum_{a}\delta\tilde{c}_{a}^{\iota}b_{a}^{\iota}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{b}_{a}^{v} & =\int_{\Omega^{f}}N_{a}\left(\rho^{f}\mathbf{b}^{f}+\sum_{\iota}M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)dv\\
+b_{a}^{\iota} & =\int_{\Omega^{f}}N_{a}\divg\left(\mathbf{j}_{b}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{b}^{\gamma}\right)\,dv
+\end{aligned}
+\]
+
+\end_inset
+
+Note that
+\begin_inset Formula 
+\[
+\begin{aligned}\frac{D^{f}J^{f}}{Dt} & =\frac{\partial J^{f}}{\partial t}+\grad J^{f}\cdot\mathbf{v}^{f}\\
+\frac{D^{f}c^{\iota}}{Dt} & =\frac{\partial c^{\iota}}{\partial t}+\grad c^{\iota}\cdot\mathbf{v}^{f}\\
+ & =\tilde{\kappa}^{\iota}\frac{\partial\tilde{c}^{\iota}}{\partial t}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial t}+\left(\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}+\tilde{c}^{\iota}\grad\tilde{\kappa}^{\iota}\right)\cdot\mathbf{v}^{f}\\
+\frac{D^{f}\tilde{\kappa}^{\iota}}{Dt} & =\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\frac{D^{f}J^{f}}{Dt}+\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\gamma}}\frac{D\tilde{c}^{\gamma}}{Dt}\\
+\grad\tilde{\kappa}^{\iota} & =\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\grad J+\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\gamma}}\grad\tilde{c}^{\gamma}\\
+\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt} & =c^{\iota}\frac{D^{f}J^{f}}{Dt}+J^{f}\frac{D^{f}c^{\iota}}{Dt}
+\end{aligned}
+\]
+
+\end_inset
+
+The linearization of 
+\begin_inset Formula $\delta W_{int}^{v}$
+\end_inset
+
+ gets discretized into
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta W_{int}^{v}\right)\left[\Delta\mathbf{v}^{f}\right] & =\sum_{a}\delta\mathbf{v}_{a}^{f}\cdot\sum_{b}\alpha_{f}\mathbf{K}_{ab}^{vv}\cdot\Delta\mathbf{v}_{b}^{f}\\
+D\left(\delta W_{int}^{v}\right)\left[\Delta J^{f}\right] & =\sum_{a}\delta\mathbf{v}_{a}^{f}\cdot\sum_{b}\alpha_{f}\mathbf{k}_{ab}^{vJ}\Delta J_{b}^{f}\\
+D\left(\delta W_{int}^{v}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{a}\delta\mathbf{v}_{a}^{f}\cdot\sum_{b}\alpha_{f}\mathbf{k}_{ab}^{v\beta}\Delta\tilde{c}_{b}^{\beta}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{K}_{ab}^{vv} & =\int_{\Omega^{f}}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{\tau}\cdot\grad N_{b}dv\\
+ & +\int_{\Omega^{f}}N_{a}\rho^{f}\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{N_{b}}{\Delta t}+\grad N_{b}\cdot\mathbf{v}^{f}\right)\mathbf{I}+N_{b}\mathbf{L}^{f}\right)dv\\
+\mathbf{k}_{ab}^{vJ} & =\int_{\Omega^{f}}N_{a}\left(\tilde{p}_{J}^{\prime}\grad N_{b}+N_{b}\left(\tilde{p}_{J}^{\prime\prime}\grad J^{f}+R\theta\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\grad\tilde{c}^{\gamma}\right)\right)dv\\
+ & +\int_{\Omega^{f}}N_{b}\boldsymbol{\tau}_{J}^{\prime}\cdot\grad N_{a}dv-\alpha_{f}\int_{\Omega^{f}}N_{a}N_{b}\frac{\rho^{f}}{J^{f}}\mathbf{a}^{f}dv\\
+\mathbf{k}_{ab}^{v\beta} & =\int_{\Omega^{f}}N_{a}R\theta\left(\tilde{\kappa}^{\beta}\grad N_{b}+N_{b}\sum_{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\grad\tilde{c}^{\gamma}\right)dv
+\end{aligned}
+\]
+
+\end_inset
+
+The linearization of 
+\begin_inset Formula $\delta W_{int}^{J}$
+\end_inset
+
+ gets discretized into
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta W_{int}^{J}\right)\left[\Delta\mathbf{v}^{f}\right] & =\sum_{a}\delta J_{a}^{f}\sum_{b}\alpha_{f}\mathbf{k}_{ab}^{Jv}\cdot\Delta\mathbf{v}_{b}^{f}\\
+D\left(\delta W_{int}^{J}\right)\left[\Delta J^{f}\right] & =\sum_{a}\delta J_{a}^{f}\sum_{b}\alpha_{f}k_{ab}^{JJ}\Delta J_{b}^{f}\\
+D\left(\delta W_{int}^{J}\right)\left[\Delta\tilde{c}^{\beta}\right] & =0
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{k}_{ab}^{Jv} & =\int_{\Omega^{f}}N_{b}\left(N_{a}\frac{1}{J^{f}}\grad J^{f}+\grad N_{a}\right)dv\\
+k_{ab}^{JJ} & =\int_{\Omega^{f}}\frac{N_{a}}{J^{f}}\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}-\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}\right)N_{b}+\grad N_{b}\cdot\mathbf{v}^{f}\right)dv
+\end{aligned}
+\]
+
+\end_inset
+
+Finally, the linearization of 
+\begin_inset Formula $\delta W_{int}^{c}$
+\end_inset
+
+ gets discretized into
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta W_{int}^{c}\right)\left[\Delta\mathbf{v}^{f}\right] & =\sum_{\iota}\sum_{a}\delta\tilde{c}_{a}^{\iota}\sum_{b}\alpha_{f}\mathbf{k}_{ab}^{\iota v}\cdot\Delta\mathbf{v}_{b}^{f}\\
+D\left(\delta W_{int}^{c}\right)\left[\Delta J^{f}\right] & =\sum_{\iota}\sum_{a}\delta\tilde{c}_{a}^{\iota}\sum_{b}\alpha_{f}k_{ab}^{\iota J}\Delta J_{b}^{f}\\
+D\left(\delta W_{int}^{c}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{\iota}\sum_{a}\delta\tilde{c}_{a}^{\iota}\sum_{b}\alpha_{f}k^{\iota\beta}\,\Delta\tilde{c}_{b}^{\beta}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{k}_{ab}^{\iota v} & =-\int_{\Omega^{f}}N_{a}N_{b}\frac{1}{J^{f}}\grad\left(J^{f}c^{\iota}\right)\,dv\\
+k_{ab}^{\iota J} & =\int_{\Omega^{f}}N_{a}N_{b}\frac{1}{\left(J^{f}\right)^{2}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt}\\
+ & -N_{a}\tilde{c}^{\iota}\left(\frac{\tilde{\kappa}^{\iota}}{J^{f}}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{N_{b}}{\Delta t}+\grad N_{b}\cdot\mathbf{v}^{f}\right)\\
+ & -N_{a}N_{b}\frac{\tilde{c}^{\iota}}{J^{f}}\frac{D^{f}J^{f}}{Dt}\left(2\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}+J^{f}\frac{\partial^{2}\tilde{\kappa}^{\iota}}{\partial\left(J^{f}\right)^{2}}\right)\\
+ & -N_{a}N_{b}\left(\left(\frac{\tilde{\kappa}^{\iota}}{J^{f}}+\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\right)\frac{D^{f}\tilde{c}^{\iota}}{Dt}+\tilde{c}^{\iota}\sum_{\gamma}\left(\frac{1}{J^{f}}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\gamma}}+\frac{\partial^{2}\tilde{\kappa}^{\iota}}{\partial J^{f}\partial\tilde{c}^{\gamma}}\right)\frac{D^{f}\tilde{c}^{\gamma}}{Dt}\right)\\
+ & +N_{a}N_{b}\nu^{\iota}\underbrace{\frac{\partial\hat{\zeta}}{\partial J^{f}}}_{=0\text{ currently}}-N_{b}\grad N_{a}\cdot\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}d_{0}^{\iota}\grad\tilde{c}^{\iota}+\sum_{\gamma}z^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}d_{0}^{\gamma}\grad\tilde{c}^{\gamma}\right)dv\\
+k^{\iota\beta} & =\int_{\Omega^{f}}-N_{a}\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}+\tilde{c}^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}+\frac{1}{J^{f}}\frac{D^{f}J^{f}}{Dt}\right)N_{b}+\grad N_{b}\cdot\mathbf{v}^{f}\right)\\
+ & +N_{a}N_{b}\nu^{\iota}\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\beta}}\\
+ & -\grad N_{a}\cdot\left(\delta_{\iota\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad N_{b}+N_{b}\left(\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}d_{0}^{\iota}+\tilde{\kappa}^{\iota}\frac{\partial d_{0}^{\iota}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\iota}\right)\\
+ & -\grad N_{a}\cdot\left(z^{\beta}\tilde{\kappa}^{\beta}d_{0}^{\beta}\grad N_{b}+N_{b}\sum_{\gamma}z^{\gamma}\left(\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}d_{0}^{\gamma}+\tilde{\kappa}^{\gamma}\frac{\partial d_{0}^{\gamma}}{\partial\tilde{c}^{\beta}}\right)\grad\tilde{c}^{\gamma}\right)dv
+\end{aligned}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}\frac{1}{J^{f}}\grad\left(J^{f}c^{\iota}\right) & =\frac{1}{J^{f}}c^{\iota}\grad J^{f}+\tilde{\kappa}^{\iota}\grad\tilde{c}^{\iota}+\tilde{c}^{\iota}\grad\tilde{\kappa}^{\iota}\\
+\frac{1}{J^{f}}\frac{D^{f}\left(J^{f}c^{\iota}\right)}{Dt} & =\frac{c^{\iota}}{J^{f}}\frac{D^{f}J^{f}}{Dt}+\tilde{\kappa}^{\iota}\frac{D^{f}\tilde{c}^{\iota}}{Dt}+\tilde{c}^{\iota}\frac{D^{f}\tilde{\kappa}^{\iota}}{Dt}
+\end{aligned}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the external work contributions from body forces, the discretized forms
+ are
+\begin_inset Formula 
+\[
+\begin{aligned}\delta G_{ext}^{v} & =\sum_{a}\delta\mathbf{v}_{a}^{f}\cdot\mathbf{b}_{a}^{v}\\
+\delta G_{ext}^{c} & =\sum_{\iota}\sum_{a}\delta\tilde{c}_{a}^{\iota}b_{a}^{\iota}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{b}_{a}^{v} & =\int_{\Omega^{f}}N_{a}\left(\rho^{f}\mathbf{b}^{f}+\sum_{\iota}M^{\iota}c^{\iota}\mathbf{b}^{\iota}\right)dv\\
+b_{a}^{\iota} & =-\int_{\Omega^{f}}\grad N_{a}\cdot\left(\mathbf{j}_{b}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}_{b}^{\gamma}\right)dv
+\end{aligned}
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta G_{ext}^{v}\right)\left[\Delta\mathbf{v}^{f}\right] & =\mathbf{0}\\
+D\left(\delta G_{ext}^{v}\right)\left[\Delta J^{f}\right] & =\sum_{a}\delta\mathbf{v}_{a}^{f}\cdot\sum_{b}\alpha_{f}\mathbf{b}_{ab}^{vJ}\Delta J_{b}^{f}\\
+D\left(\delta G_{ext}^{v}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{a}\delta\mathbf{v}_{a}^{f}\cdot\sum_{b}\alpha_{f}\mathbf{b}_{ab}^{v\beta}\Delta\tilde{c}_{b}^{\beta}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{b}_{ab}^{vJ} & =\int_{\Omega^{f}}N_{a}N_{b}\left(-\frac{\rho^{f}}{J^{f}}\mathbf{b}^{f}+\sum_{\gamma}M^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\iota}\mathbf{b}^{\gamma}\right)dv\\
+\mathbf{b}_{ab}^{v\beta} & =\int_{\Omega^{f}}N_{a}N_{b}\left(M^{\beta}\tilde{\kappa}^{\beta}\mathbf{b}^{\beta}+\sum_{\gamma}M^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\mathbf{b}^{\gamma}\right)dv
+\end{aligned}
+\]
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(\delta G_{ext}^{c}\right)\left[\Delta\mathbf{v}^{f}\right] & =\mathbf{0}\\
+D\left(\delta G_{ext}^{c}\right)\left[\Delta J^{f}\right] & =\sum_{\iota}\sum_{a}\delta\tilde{c}_{a}^{\iota}\sum_{b}\alpha_{f}b_{ab}^{\iota J}\Delta J_{b}^{f}\\
+D\left(\delta G_{ext}^{c}\right)\left[\Delta\tilde{c}^{\beta}\right] & =\sum_{\iota}\sum_{a}\delta\tilde{c}_{a}^{\iota}\sum_{b}\alpha_{f}b_{ab}^{\iota\beta}\Delta\tilde{c}_{b}^{\beta}
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}b_{ab}^{\iota J} & =-\int_{\Omega^{f}}N_{b}\grad N_{a}\cdot\left(s^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota}\mathbf{b}^{\iota}+\sum_{\gamma}z^{\gamma}s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\mathbf{b}^{\gamma}\right)dv\\
+b_{ab}^{\iota\beta} & =-\int_{\Omega^{f}}N_{b}\grad N_{a}\cdot\left(\left(\delta_{\iota\beta}+z^{\beta}\right)s^{\beta}\tilde{\kappa}^{\beta}\mathbf{b}^{\beta}+s^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota}\mathbf{b}^{\iota}+\sum_{\gamma}z^{\gamma}s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}\mathbf{b}^{\gamma}\right)\,dv
+\end{aligned}
+\]
+
+\end_inset
+
+In the special case when the body force acting on each constituent is the
+ same, 
+\begin_inset Formula $\mathbf{b}^{f}=\mathbf{b}^{\iota}\equiv\mathbf{b}$
+\end_inset
+
+, these expressions simplify further,
+\begin_inset Formula 
+\[
+\begin{aligned}b_{ab}^{\iota J} & =-\int_{\Omega^{f}}N_{b}\left(w^{\iota J}+w_{e}^{cJ}\right)\grad N_{a}\cdot\mathbf{b}dv\\
+b_{ab}^{\iota\beta} & =-\int_{\Omega^{f}}N_{b}\left(\left(\delta_{\iota\beta}+z^{\beta}\right)s^{\beta}\tilde{\kappa}^{\beta}+w^{\iota\beta}+w_{e}^{c\beta}\right)\grad N_{a}\cdot\mathbf{b}\,dv
+\end{aligned}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\begin{aligned}w^{\iota J} & \equiv s^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial J^{f}}\tilde{c}^{\iota} & w_{e}^{cJ} & \equiv\sum_{\gamma}z^{\gamma}s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial J^{f}}\tilde{c}^{\gamma}\\
+w^{\iota\beta} & \equiv s^{\iota}\frac{\partial\tilde{\kappa}^{\iota}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\iota} & w_{e}^{c\beta} & \equiv\sum_{\gamma}z^{\gamma}s^{\gamma}\frac{\partial\tilde{\kappa}^{\gamma}}{\partial\tilde{c}^{\beta}}\tilde{c}^{\gamma}
+\end{aligned}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -26297,6 +26600,199 @@ reference "eq369"
 \end_inset
 
  is satisfied.
+\end_layout
+
+\begin_layout Subsection
+Conjugate gradient solution method
+\end_layout
+
+\begin_layout Standard
+The Newton-Raphson solution algorithms are highly effective for nearly linear
+ problems, but they have two major limitations.
+ Firstly, for very large models, the size of the stiffness matrix K can
+ grow very large as well.
+ The factorization of this matrix, which is needed when using direct linear
+ solvers, can become very time consuming and requires a large amount of
+ memory.
+ This is the main factor that limits the size of model that can be solved
+ on a given computer.
+ Secondly, where the stiffness is small, it can overestimate the displacement,
+ resulting in excessive distortion of the mesh and the familiar negative
+ Jacobian failure.
+ This can occur when a material has a low initial stiffness that increases
+ at higher strains (we work around this by using a large number of small
+ timesteps to reduce the nonlinearity on each increment), when buckling
+ causes a temporary low or negative stiffness, when a part of the model
+ is not sufficiently constrained, or when contacts cause sudden changes
+ of stiffness.
+ For these reasons the Newton-Raphson algorithms often fail to converge
+ for very nonlinear materials, models with contacts or unstable structures
+ that can buckle or crumple under load.
+\end_layout
+
+\begin_layout Standard
+An alternative strategy is to estimate a direction to move each node directly
+ from the residual R:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u=-}\boldsymbol{R\left(x_{k}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then a line search is needed to find the appropriate distance to move in
+ that direction.
+ This is the steepest descent method, which has the disadvantage that it
+ converges slowly in a series of decreasing zig-zag steps.
+ Its convergence is much improved by adding a fraction β of the previous
+ step:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}_{k}=-\boldsymbol{R}\left(\boldsymbol{x}_{k}\right)+\beta\boldsymbol{u}_{k-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There are many different ways to calculate β; one method which has excellent
+ convergence for nonlinear problems is due to Hager and Zhang:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{y}_{i}=\boldsymbol{R}_{i-1}-\boldsymbol{R}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta_{i}=\frac{-1}{\boldsymbol{u}_{i-1}\cdot\boldsymbol{y}_{i}}\left(\boldsymbol{y}_{i}-2\boldsymbol{u}_{i-1}\frac{\left\Vert \boldsymbol{y}_{i}\right\Vert ^{2}}{\boldsymbol{u}_{i-1}\cdot\boldsymbol{y}_{i}}\right)\cdot\boldsymbol{R}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\eta_{i}=\frac{-1}{\left\Vert \boldsymbol{u}_{i-1}\right\Vert min\left\{ \eta,\left\Vert \boldsymbol{R}_{i-1}\right\Vert \right\} }
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta_{i}=max\left\{ \beta_{i},\eta_{i}\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A limitation of this method is that the distance each node moves is proportional
+ to the residual; stiffer nodes produce a larger residual for a given displaceme
+nt and therefore move further, whereas in fact they need to move less than
+ more compliant nodes.
+ This results in mesh distortion where the element size varies, for midside
+ nodes in quadratic elements or for mixed materials.
+ This problem can be reduced by using a preconditioner, dividing the residual
+ at each node by an estimate of its stiffness.
+ This requires changes also to the calculation of β:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta_{i}=\frac{-1}{\boldsymbol{u}_{i-1}\cdot\boldsymbol{y}_{i}}\left(\boldsymbol{y_{i}^{T}P}-2\boldsymbol{u}_{i-1}\frac{\boldsymbol{y_{i}^{T}Py}_{i}}{\boldsymbol{u}_{i-1}\cdot\boldsymbol{y}_{i}}\right)\cdot\boldsymbol{R}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\eta_{i}=0.4\frac{\Delta\boldsymbol{u}_{i-1}^{T}\boldsymbol{R}_{i}}{\boldsymbol{u_{i-1}^{T}P^{-1}u_{i-1}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\beta_{i}=max\left\{ \beta_{i},\eta_{i}\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}_{i+1}=\boldsymbol{P}\boldsymbol{R}_{i}+\beta_{i}\boldsymbol{u}_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The preconditioner 
+\series bold
+P
+\series default
+ can be found in various ways; a convenient approximation is to use the
+ reciprocal of the main diagonal of the stiffness matrix:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{P}^{-1}=diag\left(\boldsymbol{K}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is calculated once at the beginning of the solution.
 \end_layout
 
 \begin_layout Section
