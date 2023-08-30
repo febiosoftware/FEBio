@@ -41,6 +41,51 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   4.3   8/30/2023
+
+===========================================================================
+
+New Features:
+* The "CG-solver" now supports preconditioners (#67)
+* Added fluid supply function to biphasic-FSI materials. 
+* Added Starling fluid supply constitutive model for biphasic-FSI fluid supplies.
+* Implemented nrrd image reader.
+* Added support for storing global data in plot file. By default, PID controller values are now stored to the plot file.
+* Added "mesh_data" plot variable, which allows storing mesh data in the plot file.
+
+Improvements:
+* Added support for reading part lists from feb4 file.
+* Improved error detection in fluid dilatation calculation of FERealVapor.
+* Added check for node ID numbers in linear constraints.
+* Updated default analysis type for biphasic analyses to be TRANSIENT.
+* The "m" parameters of Ogden materials now supports maps.
+* Added support for reading vector of strings as xml tag.
+* Modified default settings for biphasic-solute and multiphasic analyses to be TRANSIENT (instead of STEADY-STATE).
+* Added units for coefficients c1 and c2 of Mooney-Rivlin materials that were missing them.
+* Added units to velocity in fluid normal velocity.
+* Added documentation on CG-solid solver.
+* Added error message when a fixed constraints has no dofs fixed.
+* Now, storing initial line coordinates of line object.
+* Updated some plot variables that were not thread-safe.
+* Added support for domain data stored as FMT_NODE.
+* The Surface-to-surface map is now evaluated at the nodes so that it can be replicated more accurately in a plot variable.
+* Updated error message when the fiber property of a material cannot be found when parsing ElementData section.
+* Added support for .fiber variable in ElementData. (which allows the "old" way of assigning user fiber data to mixture components.)
+
+
+Bug Fixes:
+* Fixed bug in assembling stiffness of linear constraints.
+* Fixed bug in FEBioPlotFile::Open.
+* Fixed bug with assigning maps to array parameters.
+* Fixed issue with model reset.
+* Fixed issue with attributes getting processed twice.
+* Fixed issue with default name for line objects.
+* Fixed issue with initialization of rigid body COM so the correct values are available for PID controllers that reference these parameters.
+* Fixed bug in "fluid surface force" plot variable to update surface area and surface normal at each time point, producing correct results for fluid-FSI problems. Fluid problems not affected.
+
+
+===========================================================================
+
  R E L E A S E   4.2   6/20/2023
 
 ===========================================================================
