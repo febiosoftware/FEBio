@@ -141,6 +141,7 @@ SOFTWARE.*/
 #include "FEDamageMaterial.h"
 #include "FEDamageMaterialUC.h"
 #include "FERVEDamageMaterial.h"
+#include "FERVEFatigueMaterial.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
 #include "FEPlasticFlowCurve.h"
@@ -365,6 +366,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageMaterial, "elastic damage");
 	REGISTER_FECORE_CLASS(FERVEDamageMaterial, "reactive viscoelastic damage");
 	REGISTER_FECORE_CLASS(FEReactiveFatigue, "reactive fatigue", FECORE_EXPERIMENTAL);
+    REGISTER_FECORE_CLASS(FERVEFatigueMaterial, "reactive viscoelastic fatigue", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEReactivePlasticity, "reactive plasticity");
 	REGISTER_FECORE_CLASS(FEReactivePlasticDamage, "reactive plastic damage");
 
