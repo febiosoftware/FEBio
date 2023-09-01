@@ -23,61 +23,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <vector>
-#include "fecore_api.h"
 
-class FEMesh;
-class FEElementList;
-class FEDomain;
+#include "FEEdgeList.h"
+#include "FESurface.h"
+#include "FEDomain.h"
+#include "FEBoundingBox.h"
 
-class FECORE_API FEEdgeList
-{
-public:
-	struct EDGE
-	{
-		int ntype;		// 2 = linear, 3 = quadratic
-		int	node[3];
-		double tag;		// general purpose tag
-	};
+// Build the bounding box of a surface
+FEBoundingBox CalculateBoundingBox(FESurface* ps);
 
-public:
-	FEEdgeList();
-	FEEdgeList(FEMesh* mesh);
 
-	bool Create(FEMesh* mesh);
-
-	bool Create(FEDomain* dom);
-
-	void Add(int n0, int n1, double tag = 0.0);
-
-	int Edges() const;
-
-	const EDGE& operator[] (int i);
-	const EDGE& Edge(int i) const;
-
-	FEMesh* GetMesh();
-
-	int FindEdge(int a, int b);
-
-private:
-	FEMesh*				m_mesh;
-	std::vector<EDGE>	m_edgeList;
-};
-
-class FECORE_API FEElementEdgeList
-{
-public:
-	FEElementEdgeList();
-
-	bool Create(FEElementList& elemList, FEEdgeList& edgeList);
-
-	int Edges(int elem) const;
-	const std::vector<int>& EdgeList(int elem) const;
-
-private:
-	std::vector<std::vector<int> >	m_EEL;
-};
+// Calculate the intersected edges of a domain and an immersed boundary
+FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps);

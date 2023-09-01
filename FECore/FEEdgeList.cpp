@@ -40,6 +40,19 @@ FEEdgeList::FEEdgeList() : m_mesh(nullptr)
 
 }
 
+FEEdgeList::FEEdgeList(FEMesh* mesh) : m_mesh(mesh) {}
+
+void FEEdgeList::Add(int n0, int n1, double tag)
+{
+	EDGE e; 
+	e.ntype = 2;
+	e.node[0] = n0;
+	e.node[1] = n1;
+	e.node[2] = -1;
+	e.tag = tag;
+	m_edgeList.push_back(e);
+}
+
 int FEEdgeList::Edges() const
 {
 	return (int) m_edgeList.size();
