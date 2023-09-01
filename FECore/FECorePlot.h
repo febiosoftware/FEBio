@@ -99,3 +99,13 @@ protected:
 	const FEDomainList*	m_dom;
 	std::string		m_filter;
 };
+
+//--------------------------------------------------------------
+class FECORE_API FEPlotEdgeIntersection : public FEPlotNodeData
+{
+	FECORE_BASE_CLASS(FEPlotEdgeIntersection)
+
+public:
+	FEPlotEdgeIntersection(FEModel* fem);
+	bool Save(FEMesh& mesh, FEDataStream& a);
+};

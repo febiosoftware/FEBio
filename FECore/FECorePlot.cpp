@@ -42,6 +42,8 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEPIDController.h"
 #include "FEDataMap.h"
+#include "FEEdgeList.h"
+#include "MeshTools.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -669,4 +671,34 @@ bool FEPlotMeshData::Save(FESurface& dom, FEDataStream& a)
 bool FEPlotMeshData::Save(FEMesh& mesh, FEDataStream& a)
 {
 	return false;
+}
+
+//=============================================================================
+FEPlotEdgeIntersection::FEPlotEdgeIntersection(FEModel* fem) : FEPlotNodeData(fem, Var_Type::PLT_FLOAT, Storage_Fmt::FMT_ITEM) {}
+
+bool FEPlotEdgeIntersection::Save(FEMesh& mesh, FEDataStream& a)
+{
+	// we assume that the first domain is the "fluid" domain
+	FEDomain& dom = mesh.Domain(0);
+
+	int N = mesh.Nodes();
+	vector<double> val(N, 0.0);
+
+	for (int i = 0; i < mesh.Surfaces(); ++i)
+	{
+		FESurface& surf = mesh.Surface(i);
+
+		FEEdgeList EL = FindIntersectedEdges(&dom, &surf);
+		for (int j = 0; j < EL.Edges(); ++j)
+		{
+			const FEEdgeList::EDGE& edge = EL.Edge(j);
+			val[edge.node[0]] = -1;
+			val[edge.node[1]] =  1;
+		}
+	}
+
+	for (int i = 0; i < N; ++i)
+		a << val[i];
+
+	return true;
 }

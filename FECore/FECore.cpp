@@ -123,6 +123,7 @@ REGISTER_FECORE_CLASS(FEAugLagLinearConstraintDOF, "node");
 REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");
 REGISTER_FECORE_CLASS(FEPlotPIDController, "pid controller");
 REGISTER_FECORE_CLASS(FEPlotMeshData, "mesh_data");
+REGISTER_FECORE_CLASS(FEPlotEdgeIntersection, "edge intersection");
 
 // load curves
 REGISTER_FECORE_CLASS(FEPointFunction , "point");
