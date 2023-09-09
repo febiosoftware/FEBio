@@ -78,7 +78,7 @@ public:
 	void Reset() override;
 
 	//! initialize shells 
-	void InitShells() override;
+//	void InitShells() override;
 
 public:
 	//! calculates the global stiffness matrix for this domain

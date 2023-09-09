@@ -101,10 +101,10 @@ bool FERigidShellDomain::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidShellDomain::InitShells()
-{
-	FEShellDomain::InitShells();
-}
+//void FERigidShellDomain::InitShells()
+//{
+//	FEShellDomain::InitShells();
+//}
 
 //-----------------------------------------------------------------------------
 // We need to override it since the base class version will not work for rigid domains.

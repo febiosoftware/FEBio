@@ -54,6 +54,9 @@ public:
 	// reset
 	bool Reset() override;
 
+	// initialize mesh
+	bool InitMesh() override;
+
 	//! Initialize shells
 	void InitShells() override;
 

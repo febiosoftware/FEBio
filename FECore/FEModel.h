@@ -139,7 +139,7 @@ public:
 	bool InitBCs();
 
 	//! Initialize the mesh
-	bool InitMesh();
+	virtual bool InitMesh();
 
 	//! Initialize shells
 	virtual void InitShells();

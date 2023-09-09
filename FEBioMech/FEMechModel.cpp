@@ -157,6 +157,13 @@ bool FEMechModel::Reset()
 }
 
 //-----------------------------------------------------------------------------
+bool FEMechModel::InitMesh()
+{
+	if (FEModel::InitMesh() == false) return false;
+	return m_prs->InitRigidBodies();
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize shells
 void FEMechModel::InitShells()
 {
