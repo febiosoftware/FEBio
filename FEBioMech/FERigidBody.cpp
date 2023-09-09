@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FERigidBody.h"
 #include <FECore/FEMaterial.h>
 #include <FECore/FESolidDomain.h>
+#include "FEElasticShellDomain.h"
 #include <FECore/FEModel.h>
 #include "RigidBC.h"
 #include "FERigidMaterial.h"
@@ -212,6 +213,34 @@ void FERigidBody::UpdateMass()
 				}
 			}
 		}
+		else if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
+		{
+			FEElasticShellDomain* psd = static_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(psd->GetMaterial());
+			// make sure this element belongs to the rigid body
+			if (pm && (pm->GetRigidBodyID() == m_nID))
+			{
+				// loop over all elements
+				for (int iel = 0; iel < psd->Elements(); ++iel)
+				{
+					FEShellElement& el = psd->Element(iel);
+
+					// loop over integration points
+					int nint = el.GaussPoints();
+					double* gw = el.GaussWeights();
+					for (int n = 0; n < nint; ++n)
+					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+						// calculate jacobian
+						double detJ = psd->detJ0(el, n);
+
+						// add to total mass
+						m_mass += pm->Density(mp) * detJ * gw[n];
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -281,6 +310,52 @@ void FERigidBody::UpdateCOM()
 				}
 			}
 		}
+		else if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
+		{
+			FEElasticShellDomain* psd = static_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(psd->GetMaterial());
+			// make sure this element belongs to the rigid body
+			if (pm && (pm->GetRigidBodyID() == m_nID))
+			{
+				// loop over all elements
+				for (int iel = 0; iel < psd->Elements(); ++iel)
+				{
+					FEShellElement& el = psd->Element(iel);
+
+					// nr of integration points
+					int nint = el.GaussPoints();
+
+					// number of nodes
+					int neln = el.Nodes();
+
+					// initial coordinates
+					for (int i = 0; i < neln; ++i) r0[i] = psd->GetMesh()->Node(el.m_node[i]).m_r0;
+
+					// integration weights
+					double* gw = el.GaussWeights();
+
+					// loop over integration points
+					for (int n = 0; n < nint; ++n)
+					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+						// calculate jacobian
+ 						double detJ = psd->detJ0(el, n);
+
+						// shape functions at integration point
+						double* H = el.H(n);
+
+						double dens = pm->Density(mp);
+
+						// add to com
+						for (int i = 0; i < el.Nodes(); ++i)
+						{
+							rc += r0[i] * H[i] * detJ * gw[n] * dens;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// normalize com
@@ -345,6 +420,50 @@ void FERigidBody::UpdateMOI()
 							for (int j = 0; j<neln; ++j)
 							{
 								moi += ((r0[i] * r0[j])*I - (r0[i] & r0[j]))*H[i] * H[j] * detJ*gw[n] * dens;
+							}
+						}
+					}
+				}
+			}
+		}
+		else if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
+		{
+			FEElasticShellDomain* psd = static_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(psd->GetMaterial());
+			// make sure this element belongs to the rigid body
+			if (pm && (pm->GetRigidBodyID() == m_nID))
+			{
+				// loop over all elements
+				for (int iel = 0; iel < psd->Elements(); ++iel)
+				{
+					FEShellElement& el = psd->Element(iel);
+
+					// initial coordinates
+					int neln = el.Nodes();
+					for (int i = 0; i < neln; ++i) r0[i] = psd->GetMesh()->Node(el.m_node[i]).m_r0;
+
+					// loop over integration points
+					double* gw = el.GaussWeights();
+					int nint = el.GaussPoints();
+					for (int n = 0; n < nint; ++n)
+					{
+						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+						// calculate jacobian
+						double detJ = psd->detJ0(el, n);
+
+						// shape functions at integration point
+						double* H = el.H(n);
+
+						double dens = pm->Density(mp);
+
+						// add to moi
+						for (int i = 0; i < neln; ++i)
+						{
+							for (int j = 0; j < neln; ++j)
+							{
+								mat3d Iij = ((r0[i] * r0[j]) * I - (r0[i] & r0[j])) * detJ * gw[n] * dens;
+								moi +=  Iij*(H[i] * H[j]);
 							}
 						}
 					}
