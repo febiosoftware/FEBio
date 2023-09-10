@@ -29,10 +29,11 @@ SOFTWARE.*/
 #include "FESurface.h"
 #include "FEDomain.h"
 #include "FEBoundingBox.h"
+#include "fecore_api.h"
 
 // Build the bounding box of a surface
-FEBoundingBox CalculateBoundingBox(FESurface* ps);
+FECORE_API FEBoundingBox CalculateBoundingBox(FESurface* ps);
 
 
 // Calculate the intersected edges of a domain and an immersed boundary
-FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags);
+FECORE_API FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags);
