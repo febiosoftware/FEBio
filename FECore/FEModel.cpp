@@ -473,50 +473,14 @@ bool FEModel::Init()
 		if (pd->Init() == false) return false;
 	}
 */
-	// create and initialize the rigid body data
-	// NOTE: Do this first, since some BC's look at the nodes' rigid id.
-	if (InitRigidSystem() == false) return false;
+	// Initialize all load controllers and evaluate at the initial time
+	if (InitLoadControllers() == false) return false;
 
-	// evaluate all load controllers at the initial time
-	for (int i = 0; i < LoadControllers(); ++i)
-	{
-		FELoadController* plc = m_imp->m_LC[i];
-		if (plc->Init() == false)
-		{
-			std::string s = plc->GetName();
-			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
-			feLogError("Load controller %d (%s) failed to initialize", i + 1, sz);
-			return false;
-		}
-		plc->Evaluate(0);
-	}
+	// Initialize and evaluate all mesh data generators
+	if (InitMeshDataGenerators() == false) return false;
 
-	// evaluate all mesh data generators
-	for (int i = 0; i < MeshDataGenerators(); ++i)
-	{
-		FEMeshDataGenerator* pmd = m_imp->m_MD[i];
-		if (pmd->Init() == false)
-		{
-			std::string s = pmd->GetName();
-			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
-			feLogError("Node data generator %d (%s) failed to initialize", i + 1, sz);
-			return false;
-		}
-		pmd->Evaluate(0);
-	}
-
-	// check step data
-	for (int i = 0; i<(int)m_imp->m_Step.size(); ++i)
-	{
-		FEAnalysis& step = *m_imp->m_Step[i];
-		if (step.Init() == false)
-		{
-			std::string s = step.GetName();
-			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
-			feLogError("Step %d (%s) failed to initialize", i + 1, sz);
-			return false;
-		}
-	}
+	// initialize step data
+	if (InitSteps() == false) return false;
 
 	// validate BC's
 	if (InitBCs() == false) return false;
@@ -544,17 +508,7 @@ bool FEModel::Init()
 	if (InitConstraints() == false) return false;
 
 	// initialize mesh adaptors
-	for (int i = 0; i < MeshAdaptors(); ++i)
-	{
-		FEMeshAdaptor* ma = MeshAdaptor(i);
-		if (ma->Init() == false)
-		{
-			std::string s = ma->GetName();
-			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
-			feLogError("Mesh adaptor %d (%s) failed to initialize", i + 1, sz);
-			return false;
-		}
-	}
+	if (InitMeshAdaptors() == false) return false;
 
 	// evaluate all load parameters
 	// Do this last in case any model components redefined their load curves.
@@ -600,6 +554,79 @@ bool FEModel::Init()
 
 	// do the callback
 	return ret;
+}
+
+//-----------------------------------------------------------------------------
+//! initialization of load controllers
+bool FEModel::InitLoadControllers()
+{
+	for (int i = 0; i < LoadControllers(); ++i)
+	{
+		FELoadController* plc = m_imp->m_LC[i];
+		if (plc->Init() == false)
+		{
+			std::string s = plc->GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Load controller %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
+		plc->Evaluate(0);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! initialize mesh data generators
+bool FEModel::InitMeshDataGenerators()
+{
+	for (int i = 0; i < MeshDataGenerators(); ++i)
+	{
+		FEMeshDataGenerator* pmd = m_imp->m_MD[i];
+		if (pmd->Init() == false)
+		{
+			std::string s = pmd->GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Node data generator %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
+		pmd->Evaluate(0);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! initialize steps
+bool FEModel::InitSteps()
+{
+	for (int i = 0; i < (int)m_imp->m_Step.size(); ++i)
+	{
+		FEAnalysis& step = *m_imp->m_Step[i];
+		if (step.Init() == false)
+		{
+			std::string s = step.GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Step %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::InitMeshAdaptors()
+{
+	for (int i = 0; i < MeshAdaptors(); ++i)
+	{
+		FEMeshAdaptor* ma = MeshAdaptor(i);
+		if (ma->Init() == false)
+		{
+			std::string s = ma->GetName();
+			const char* sz = (s.empty() ? "<unnamed>" : s.c_str());
+			feLogError("Mesh adaptor %d (%s) failed to initialize", i + 1, sz);
+			return false;
+		}
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------

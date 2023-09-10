@@ -45,6 +45,9 @@ public:
 	// clear all model data
 	void Clear() override;
 
+	// model initialization
+	bool Init() override;
+
 	// model activation
 	void Activate() override;
 
@@ -77,7 +80,7 @@ public:
 	FERigidSystem* GetRigidSystem();
 
 	// initialize the rigid system
-	bool InitRigidSystem() override;
+	bool InitRigidSystem();
 
 	// number of rigid bodies
 	int RigidBodies() const;
