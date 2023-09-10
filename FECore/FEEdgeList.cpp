@@ -274,7 +274,14 @@ bool FEEdgeList::Create(FEDomain* dom)
 	set< EDGE, EDGE_less>::iterator edgeIter = edgeSet.begin();
 	for (size_t i = 0; i < edges; ++i, ++edgeIter)
 	{
-		m_edgeList[i] = *edgeIter;
+		const FEEdgeList::EDGE& edge = *edgeIter;
+		EDGE& Edge = m_edgeList[i];
+		Edge.ntype = 2;
+		int n0 = edge.node[0];
+		int n1 = edge.node[1];
+		if (n0 > n1) { int tmp = n0; n0 = n1; n1 = tmp; }
+		Edge.node[0] = n0;
+		Edge.node[1] = n1;
 	}
 
 	return true;
@@ -439,8 +446,8 @@ bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
 			EELi.resize(6);
 			for (int j = 0; j < 6; ++j)
 			{
-				int n0 = el.m_node[ETET[j][0]];
-				int n1 = el.m_node[ETET[j][1]];
+				int n0 = el.m_lnode[ETET[j][0]];
+				int n1 = el.m_lnode[ETET[j][1]];
 
 				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
 
@@ -462,8 +469,8 @@ bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
 			EELi.resize(12);
 			for (int j = 0; j < 12; ++j)
 			{
-				int n0 = el.m_node[EHEX[j][0]];
-				int n1 = el.m_node[EHEX[j][1]];
+				int n0 = el.m_lnode[EHEX[j][0]];
+				int n1 = el.m_lnode[EHEX[j][1]];
 
 				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
 
@@ -485,8 +492,8 @@ bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
             EELi.resize(9);
             for (int j = 0; j < 9; ++j)
             {
-                int n0 = el.m_node[EPEN[j][0]];
-                int n1 = el.m_node[EPEN[j][1]];
+                int n0 = el.m_lnode[EPEN[j][0]];
+                int n1 = el.m_lnode[EPEN[j][1]];
                 
                 if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
                 
