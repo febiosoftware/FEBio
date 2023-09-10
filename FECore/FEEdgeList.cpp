@@ -357,3 +357,78 @@ bool FEElementEdgeList::Create(FEElementList& elemList, FEEdgeList& edgeList)
 	}
 	return true;
 }
+
+// NOTE: This only works for TET4 and HEX8 elements!
+bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
+{
+	FEMesh& mesh = *edgeList.GetMesh();
+
+	const int ETET[6][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 0, 3 },{ 1, 3 },{ 2, 3 } };
+	const int EHEX[12][2] = { { 0, 1 },{ 1, 2 },{ 2, 3 },{ 3, 0 },{ 4, 5 },{ 5, 6 },{ 6, 7 },{ 7, 4 },{ 0, 4 },{ 1, 5 },{ 2, 6 },{ 3, 7 } };
+
+	int NN = mesh.Nodes();
+	vector<pair<int, int> > NI;
+	NI.resize(NN);
+	for (int i = 0; i < NN; ++i) NI[i].second = 0;
+	for (int i = edgeList.Edges() - 1; i >= 0; --i)
+	{
+		const FEEdgeList::EDGE& et = edgeList.Edge(i);
+		NI[et.node[0]].first = i;
+		NI[et.node[0]].second++;
+	}
+
+	int NE = domain.Elements();
+	m_EEL.resize(NE);
+	for (int i=0; i < NE; ++i)
+	{
+		const FEElement& el = domain.ElementRef(i);
+		vector<int>& EELi = m_EEL[i];
+		if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5))
+		{
+			EELi.resize(6);
+			for (int j = 0; j < 6; ++j)
+			{
+				int n0 = el.m_node[ETET[j][0]];
+				int n1 = el.m_node[ETET[j][1]];
+
+				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
+
+				int l0 = NI[n0].first;
+				int ln = NI[n0].second;
+				for (int l = 0; l < ln; ++l)
+				{
+					assert(edgeList[l0 + l].node[0] == n0);
+					if (edgeList[l0 + l].node[1] == n1)
+					{
+						EELi[j] = l0 + l;
+						break;
+					}
+				}
+			}
+		}
+		else if (el.Shape() == FE_Element_Shape::ET_HEX8)
+		{
+			EELi.resize(12);
+			for (int j = 0; j < 12; ++j)
+			{
+				int n0 = el.m_node[EHEX[j][0]];
+				int n1 = el.m_node[EHEX[j][1]];
+
+				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
+
+				int l0 = NI[n0].first;
+				int ln = NI[n0].second;
+				for (int l = 0; l < ln; ++l)
+				{
+					assert(edgeList[l0 + l].node[0] == n0);
+					if (edgeList[l0 + l].node[1] == n1)
+					{
+						EELi[j] = l0 + l;
+						break;
+					}
+				}
+			}
+		}
+	}
+	return true;
+}
