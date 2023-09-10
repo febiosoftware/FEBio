@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "MeshTools.h"
 #include "FEBoundingBox.h"
 #include "FEMesh.h"
+#include <map>
 
 // Build the bounding box of a surface
 FEBoundingBox CalculateBoundingBox(FESurface* ps)
@@ -45,9 +46,13 @@ FEBoundingBox CalculateBoundingBox(FESurface* ps)
 }
 
 // Calculate the intersected edges of a domain and an immersed boundary
-FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps)
+FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags)
 {
-	// we'll need the mesh
+    // tag all nodes of this domain
+    std::map<int,int> ntag;
+    for (int i=0; i<dom->Nodes(); ++i) ntag[dom->NodeIndex(i)] = 0;
+
+    // we'll need the mesh
 	FEMesh* pm = (dom ? dom->GetMesh() : nullptr); assert(pm);
 
 	// the intersected edge list that we'll return 
@@ -102,6 +107,8 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps)
 					if ((g > 0) && (g < 1))
 					{
 						IEL.Add(n0, n1, g);
+                        ntag[n0] = -1;
+                        ntag[n1] =  1;
 					}
 				}
 				else if (ps->Intersect(el, r1, -n, rs, g, eps))
@@ -111,12 +118,73 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps)
 					if ((g > 0) && (g < 1))
 					{
 						IEL.Add(n1, n0, 1.0 - g);
+                        ntag[n0] =  1;
+                        ntag[n1] = -1;
 					}
 				}
 			}
 		}
 	}
-
+    
+    // loop over all the edges
+    for (int i = 0; i < EL.Edges(); ++i)
+    {
+        const FEEdgeList::EDGE& e = EL[i];
+        
+        // get the two node positions
+        vec3d r0 = dom->Node(e.node[0]).m_rt;
+        vec3d r1 = dom->Node(e.node[1]).m_rt;
+        
+        int n0 = dom->NodeIndex(e.node[0]);
+        int n1 = dom->NodeIndex(e.node[1]);
+        
+        if ((ntag[n0] == 0) || (ntag[n1] == 0)) {
+            // do a quick test to see of this edge has both nodes inside the bounding box
+            if (box.IsInside(r0) && box.IsInside(r1)) {
+                {
+                    vec3d n = r1 - r0;
+                    
+                    // see if this edge intersects with the surface
+                    int NF = ps->Elements();
+                    for (int j = 0; j < NF; ++j)
+                    {
+                        FESurfaceElement& el = ps->Element(j);
+                        
+                        // find the intersection with the element
+                        // This function will only return true if the ray
+                        // intersects from the positive side, so we need to test twice
+                        double rs[2] = { 0 }, g(0.0), eps(1e-5);
+                        if (ps->Intersect(el, r0, n, rs, g, eps))
+                        {
+                            // we found an intersection with the ray (r0, n), but
+                            // does the edge actually intersect the surface?
+                            if (g <= 0)
+                                if (ntag[n0] == 0) ntag[n0] = 2;
+                            if (g >= 1)
+                                if (ntag[n1] == 0) ntag[n1] = 2;
+                        }
+                        else if (ps->Intersect(el, r1, -n, rs, g, eps))
+                        {
+                            // we found an intersection with the ray (r0, n), but
+                            // does the edge actually intersect the surface?
+                            if (g <= 0)
+                                if (ntag[n1] == 0) ntag[n1] = 2;
+                            if (g >= 1)
+                                if (ntag[n0] == 0) ntag[n0] = 2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // evaluate useful nodal tag
+    nodetags.assign(dom->Nodes(),0);
+    for (int i=0; i<dom->Nodes(); ++i) {
+        int n = dom->NodeIndex(i);
+        nodetags[i] = ntag[n];
+    }
+    
 	// all done
 	return IEL;
 }

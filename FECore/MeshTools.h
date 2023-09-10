@@ -35,4 +35,4 @@ FEBoundingBox CalculateBoundingBox(FESurface* ps);
 
 
 // Calculate the intersected edges of a domain and an immersed boundary
-FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps);
+FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags);

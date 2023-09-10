@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include "FEFluidModule.h"
 #include "FEFluidFSIAnalysis.h"
 #include "FEFluidSupplyStarling.h"
+#include "FEConstraintImmersedBody.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -109,6 +110,8 @@ void FEBioFSI::InitModule()
     REGISTER_FECORE_CLASS(FEBiphasicFSIDomain3D, "biphasic-FSI-3D");
 
     REGISTER_FECORE_CLASS(FEFluidSupplyStarling, "Starling");
+    
+    REGISTER_FECORE_CLASS(FEConstraintImmersedBody, "constrained immersed body");
     
     //-----------------------------------------------------------------------------
     // Reset solver parameters to preferred default settings

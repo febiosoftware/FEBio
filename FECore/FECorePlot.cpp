@@ -683,18 +683,16 @@ bool FEPlotEdgeIntersection::Save(FEMesh& mesh, FEDataStream& a)
 
 	int N = mesh.Nodes();
 	vector<double> val(N, 0.0);
+    vector<int> nodetags;
 
 	for (int i = 0; i < mesh.Surfaces(); ++i)
 	{
 		FESurface& surf = mesh.Surface(i);
 
-		FEEdgeList EL = FindIntersectedEdges(&dom, &surf);
-		for (int j = 0; j < EL.Edges(); ++j)
-		{
-			const FEEdgeList::EDGE& edge = EL.Edge(j);
-			val[edge.node[0]] = -1;
-			val[edge.node[1]] =  1;
-		}
+		FEEdgeList EL = FindIntersectedEdges(&dom, &surf, nodetags);
+        for (int i=0; i< dom.Nodes(); ++i) {
+            val[dom.NodeIndex(i)] = nodetags[i];
+        }
 	}
 
 	for (int i = 0; i < N; ++i)
