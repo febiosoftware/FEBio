@@ -2011,6 +2011,11 @@ double FELogRigidBodyR32::value(FERigidBody& rb) { return (rb.GetRotation().Rota
 double FELogRigidBodyR33::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(2, 2)); }
 
 //-----------------------------------------------------------------------------
+double FELogRigidBodyEulerX::value(FERigidBody& rb) { double x, y, z; rb.GetRotation().GetEuler(x, y, z); return x; }
+double FELogRigidBodyEulerY::value(FERigidBody& rb) { double x, y, z; rb.GetRotation().GetEuler(x, y, z); return y; }
+double FELogRigidBodyEulerZ::value(FERigidBody& rb) { double x, y, z; rb.GetRotation().GetEuler(x, y, z); return z; }
+
+//-----------------------------------------------------------------------------
 double FELogRigidBodyPosX::value(FERigidBody& rb) { return rb.m_rt.x; }
 double FELogRigidBodyPosY::value(FERigidBody& rb) { return rb.m_rt.y; }
 double FELogRigidBodyPosZ::value(FERigidBody& rb) { return rb.m_rt.z; }

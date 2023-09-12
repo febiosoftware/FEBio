@@ -1345,6 +1345,30 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogRigidBodyEulerX : public FELogObjectData
+{
+public:
+	FELogRigidBodyEulerX(FEModel* pfem) : FELogObjectData(pfem) {}
+	double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyEulerY : public FELogObjectData
+{
+public:
+	FELogRigidBodyEulerY(FEModel* pfem) : FELogObjectData(pfem) {}
+	double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyEulerZ : public FELogObjectData
+{
+public:
+	FELogRigidBodyEulerZ(FEModel* pfem) : FELogObjectData(pfem) {}
+	double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
 class FELogRigidBodyForceX : public FELogObjectData
 {
 public:
