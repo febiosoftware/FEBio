@@ -190,6 +190,26 @@ public:
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Fluid surface traction
+//!
+class FEPlotFluidSurfaceTraction : public FEPlotSurfaceData
+{
+public:
+    FEPlotFluidSurfaceTraction(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_ITEM){ SetUnits(UNIT_PRESSURE); }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Fluid surface couple traction
+//!
+class FEPlotFluidSurfaceCouple : public FEPlotSurfaceData
+{
+public:
+    FEPlotFluidSurfaceCouple(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_ITEM){ SetUnits("F/L"); }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

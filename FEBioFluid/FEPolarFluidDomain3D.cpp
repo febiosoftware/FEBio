@@ -955,6 +955,7 @@ void FEPolarFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         // calculate the stress at this material point
         pt.m_sf = m_pMat->Stress(mp);
         pf.m_sfa = m_pMat->GetViscousPolar()->SkewStress(mp);
+        pf.m_M = m_pMat->GetViscousPolar()->CoupleStress(mp);
         
         // calculate the fluid pressure
         pt.m_pf = m_pMat->Pressure(mp);

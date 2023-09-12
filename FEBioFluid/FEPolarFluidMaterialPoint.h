@@ -57,4 +57,5 @@ public:
     vec3d       m_hf;       //!< fluid relative angular velocity
     mat3da      m_sfa;      //!< antisymmetric part of fluid stress
     mat3d       m_Psi;      //!< gradient of fluid angular velocity
+    mat3d       m_M;        //!< couple stress
 };

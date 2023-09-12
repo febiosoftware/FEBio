@@ -569,6 +569,100 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSurfaceTraction::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    writeElementValue<vec3d>(surf, a, [=](int nface) {
+        FESurfaceElement& el = pcs->Element(nface);
+        FEElement* pe = el.m_elem[0];
+        vec3d nu = pcs->SurfaceNormal(el,0,0);
+        if (pe) {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+
+            if (!pfluid) {
+                pe = el.m_elem[1];
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+
+            // see if this is a fluid element
+            if (pfluid) {
+                FEPolarFluidMaterial* polar = pfluid->ExtractProperty<FEPolarFluidMaterial>();
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                mat3d s(mat3dd(0));
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += pt.m_sf;
+                    if (polar)
+                        s += polar->GetViscousPolar()->SkewStress(mp);
+                }
+                s /= nint;
+                
+                return s*nu;
+            }
+            else
+                return vec3d(0,0,0);
+        }
+        else return vec3d(0,0,0);
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSurfaceCouple::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    writeElementValue<vec3d>(surf, a, [=](int nface) {
+        FESurfaceElement& el = pcs->Element(nface);
+        FEElement* pe = el.m_elem[0];
+        vec3d nu = pcs->SurfaceNormal(el,0,0);
+        if (pe) {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+
+            if (!pfluid) {
+                pe = el.m_elem[1];
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+
+            // see if this is a fluid element
+            if (pfluid) {
+                FEPolarFluidMaterial* polar = pfluid->ExtractProperty<FEPolarFluidMaterial>();
+                if (polar) {
+                    // evaluate the average stress in this element
+                    int nint = pe->GaussPoints();
+                    mat3d M(mat3dd(0));
+                    for (int n=0; n<nint; ++n)
+                    {
+                        FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                        FEPolarFluidMaterialPoint& pt = *(mp.ExtractData<FEPolarFluidMaterialPoint>());
+                        M += pt.m_M;
+                    }
+                    M /= nint;
+                    
+                    return M*nu;
+                }
+            }
+            else
+                return vec3d(0,0,0);
+        }
+        else return vec3d(0,0,0);
+    });
+    
+    return true;
+}
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

@@ -42,6 +42,7 @@
 #include "FEPrescribedFluidAngularVelocity.h"
 #include "FEBioFluidPlot.h"
 #include "FEConstFluidBodyMoment.h"
+#include "FEPolarFluidRelativeAngularVelocity.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -107,6 +108,10 @@ void FEBioPolarFluid::InitModule()
     //-----------------------------------------------------------------------------
     // Surface loads
     REGISTER_FECORE_CLASS(FETangentialFlowPFStabilization   , "fluid tangential stabilization"   );
+    
+    //-----------------------------------------------------------------------------
+    // Surface BCs
+    REGISTER_FECORE_CLASS(FEPolarFluidRelativeAngularVelocity, "fluid relative angular velocity" );
     
     //-----------------------------------------------------------------------------
     // Body loads
