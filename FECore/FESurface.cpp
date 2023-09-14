@@ -33,6 +33,9 @@ SOFTWARE.*/
 #include "FEElemElemList.h"
 #include "DumpStream.h"
 #include "matrix.h"
+#include "FEClosestPointProjection.h"
+#include "FEBoundingBox.h"
+#include "MeshTools.h"
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -339,6 +342,33 @@ bool FESurface::Init()
     UpdateNodeNormals();
     
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! check to see if a node is inside the surface
+bool FESurface::IsInsideSurface(int nodeIndex, bool& reset, double tol)
+{
+    FEBoundingBox box = CalculateBoundingBox(this);
+    static FEClosestPointProjection cpp(*this);
+    FEMesh& mesh = *GetMesh();
+    if (reset) {
+        cpp.SetTolerance(tol);
+        cpp.SetSearchRadius(box.radius());
+        cpp.HandleSpecialCases(true);
+        cpp.Init();
+        reset = false;
+    }
+    vec2d rs = vec2d(0,0);
+    vec3d q(0,0,0);
+    FESurfaceElement* pme = cpp.Project(nodeIndex, q, rs);
+    if (pme) {
+        FENode& node = mesh.Node(nodeIndex);
+        vec3d p = node.m_rt;
+        vec3d nu = SurfaceNormal(*pme, rs.x(), rs.y());
+        if ((q-p)*nu > 0) return true;
+        else return false;
+    }
+    else return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1618,6 +1648,17 @@ bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 		rp = 1.0 - 2.0*rs[0];
 		sp = 1.0 - 2.0*rs[1];
 	}
+    // extract special cases
+    if (((fabs(rs[0]) <= eps) && (fabs(rs[1]) <= eps))
+    || ((fabs(rs[0]) <= eps) && (fabs(rs[1]-1) <= eps))
+    || ((fabs(rs[0]-1) <= eps) && (fabs(rs[1]) <= eps))
+    || ((fabs(rs[0]-1) <= eps) && (fabs(rs[1]-1) <= eps)))
+    {
+        g = 0;
+        rs[0] = rp;
+        rs[1] = sp;
+        return true;
+    }
 
 	// if one of the triangels was intersected,
 	// we calculate a more accurate projection

@@ -58,8 +58,6 @@ public:
     //! Get the surface
     FESurface* GetSurface() override { return &m_surf; }
     
-    void Update() override;
-    
 public:
     //! serialize data to archive
     void Serialize(DumpStream& ar) override;

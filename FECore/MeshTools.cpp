@@ -50,7 +50,14 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
 {
     // tag all nodes of this domain
     std::map<int,int> ntag;
-    for (int i=0; i<dom->Nodes(); ++i) ntag[dom->NodeIndex(i)] = 0;
+    bool reset = true;
+    for (int i=0; i<dom->Nodes(); ++i) {
+        int nodeIndex = dom->NodeIndex(i);
+        if (ps->IsInsideSurface(nodeIndex, reset))
+            ntag[dom->NodeIndex(i)] = 2;
+        else
+            ntag[dom->NodeIndex(i)] = 0;
+    }
 
     // we'll need the mesh
 	FEMesh* pm = (dom ? dom->GetMesh() : nullptr); assert(pm);
@@ -125,58 +132,6 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
 			}
 		}
 	}
-    
-    // loop over all the edges
-    for (int i = 0; i < EL.Edges(); ++i)
-    {
-        const FEEdgeList::EDGE& e = EL[i];
-        
-        // get the two node positions
-        vec3d r0 = dom->Node(e.node[0]).m_rt;
-        vec3d r1 = dom->Node(e.node[1]).m_rt;
-        
-        int n0 = dom->NodeIndex(e.node[0]);
-        int n1 = dom->NodeIndex(e.node[1]);
-        
-        if ((ntag[n0] == 0) || (ntag[n1] == 0)) {
-            // do a quick test to see of this edge has both nodes inside the bounding box
-            if (box.IsInside(r0) && box.IsInside(r1)) {
-                {
-                    vec3d n = r1 - r0;
-                    
-                    // see if this edge intersects with the surface
-                    int NF = ps->Elements();
-                    for (int j = 0; j < NF; ++j)
-                    {
-                        FESurfaceElement& el = ps->Element(j);
-                        
-                        // find the intersection with the element
-                        // This function will only return true if the ray
-                        // intersects from the positive side, so we need to test twice
-                        double rs[2] = { 0 }, g(0.0), eps(1e-5);
-                        if (ps->Intersect(el, r0, n, rs, g, eps))
-                        {
-                            // we found an intersection with the ray (r0, n), but
-                            // does the edge actually intersect the surface?
-                            if (g <= 0)
-                                if (ntag[n0] == 0) ntag[n0] = 2;
-                            if (g >= 1)
-                                if (ntag[n1] == 0) ntag[n1] = 2;
-                        }
-                        else if (ps->Intersect(el, r1, -n, rs, g, eps))
-                        {
-                            // we found an intersection with the ray (r0, n), but
-                            // does the edge actually intersect the surface?
-                            if (g <= 0)
-                                if (ntag[n1] == 0) ntag[n1] = 2;
-                            if (g >= 1)
-                                if (ntag[n0] == 0) ntag[n0] = 2;
-                        }
-                    }
-                }
-            }
-        }
-    }
     
     // evaluate useful nodal tag
     nodetags.assign(dom->Nodes(),0);

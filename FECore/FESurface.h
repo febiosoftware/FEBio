@@ -121,6 +121,9 @@ public:
     //! Set alpha parameter for intermediate time
     void SetAlpha(const double alpha) { m_alpha = alpha; }
 
+    //! check to see if a node is inside the surface
+    bool IsInsideSurface(int nodeIndex, bool& reset, double tol = 0);
+
 public:
 
 	//! return number of surface elements
