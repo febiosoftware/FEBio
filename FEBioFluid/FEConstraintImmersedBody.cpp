@@ -82,18 +82,7 @@ bool FEConstraintImmersedBody::Init()
             m_nodeBCs[i][k] = node.get_bc(m_dofW[k]);
         m_nodeBCs[i][3] = node.get_bc(m_dofEF[0]);
     }
-    /*
-    // evaluate the current average value of the dilatation for nodes with tag = +1
-    double ef = 0;
-    int in = 0;
-    for (int i=0; i<m_nodetag.size(); ++i) {
-        if (m_nodetag[i] == 1) {
-            FENode& node = dom.Node(i);
-            ef += node.get(m_dofEF[0]);
-            ++in;
-        }
-    }
-    if (in) ef /= in;*/
+
     // for fluid nodes inside the immersed body, prescribe the degrees of freedom
     for (int i=0; i<m_nodetag.size(); ++i) {
         if (m_nodetag[i] == 2) {
@@ -104,6 +93,11 @@ bool FEConstraintImmersedBody::Init()
                     node.set_bc(m_dofW[k], DOF_PRESCRIBED);
                     node.set(m_dofW[k], 0);
                 }
+            }
+            // prevent dilatation growing out of bounds inside solid domain
+            if (m_nodeBCs[i][3] == DOF_OPEN) {
+                node.set_bc(m_dofEF[0], DOF_PRESCRIBED);
+                node.set(m_dofEF[0], node.get_prev(m_dofEF[0]));
             }
         }
     }
