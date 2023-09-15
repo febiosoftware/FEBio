@@ -46,15 +46,24 @@ FEBoundingBox CalculateBoundingBox(FESurface* ps)
 }
 
 // Calculate the intersected edges of a domain and an immersed boundary
-FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags)
+// nodetags(nodeIndex):
+//              0 if node does not belong to an intersecting edge and is outside immersed boundary
+//             -1 if node belongs to intersected edge outside immersed boundary
+//              1 if node belongs to intersected edge insde immersed boundary
+//              2 if node does not belong to an intersecting edge and is inside immersed boundary
+// edgetags(edgeIndex):
+//              edgeIndex is local edge index for immersion domain
+//             -1 if this edge does not intersect the immersed boundary
+//              i index of intersected edge number in FEEdgeList
+FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags, vector<int>& edgetags)
 {
-    // tag all nodes of this domain
+    // initialize node tags
     std::map<int,int> ntag;
     bool reset = true;
     for (int i=0; i<dom->Nodes(); ++i) {
         int nodeIndex = dom->NodeIndex(i);
         if (ps->IsInsideSurface(nodeIndex, reset))
-            ntag[dom->NodeIndex(i)] = 2;
+            ntag[dom->NodeIndex(i)] = 2;    // this value may be overwritten to 1 below
         else
             ntag[dom->NodeIndex(i)] = 0;
     }
@@ -69,6 +78,7 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
 	// Build the complete edge list of the domain
 	FEEdgeList EL; 
 	if (EL.Create(dom) == false) { assert(false); return IEL; }
+    edgetags.assign(EL.Edges(),-1);
 
 	// calculate a bounding box of the surface so we can quickly
 	// eliminate edges that definitely won't intersect the surface. 
@@ -113,9 +123,10 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
 					// does the edge actually intersect the surface? 
 					if ((g > 0) && (g < 1))
 					{
-						IEL.Add(n0, n1, g);
+						IEL.Add(n0, n1, g, vec2d(rs[0],rs[1]), j);
                         ntag[n0] = -1;
                         ntag[n1] =  1;
+                        edgetags[i] = IEL.Edges() - 1;
 					}
 				}
 				else if (ps->Intersect(el, r1, -n, rs, g, eps))
@@ -124,9 +135,10 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
 					// does the edge actually intersect the surface? 
 					if ((g > 0) && (g < 1))
 					{
-						IEL.Add(n1, n0, 1.0 - g);
+						IEL.Add(n1, n0, 1.0 - g, vec2d(rs[0],rs[1]), j);
                         ntag[n0] =  1;
                         ntag[n1] = -1;
+                        edgetags[i] = IEL.Edges() - 1;
 					}
 				}
 			}

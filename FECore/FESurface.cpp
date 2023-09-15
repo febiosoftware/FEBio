@@ -1648,17 +1648,6 @@ bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 		rp = 1.0 - 2.0*rs[0];
 		sp = 1.0 - 2.0*rs[1];
 	}
-    // extract special cases
-    if (((fabs(rs[0]) <= eps) && (fabs(rs[1]) <= eps))
-    || ((fabs(rs[0]) <= eps) && (fabs(rs[1]-1) <= eps))
-    || ((fabs(rs[0]-1) <= eps) && (fabs(rs[1]) <= eps))
-    || ((fabs(rs[0]-1) <= eps) && (fabs(rs[1]-1) <= eps)))
-    {
-        g = 0;
-        rs[0] = rp;
-        rs[1] = sp;
-        return true;
-    }
 
 	// if one of the triangels was intersected,
 	// we calculate a more accurate projection

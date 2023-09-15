@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <vector>
 #include "fecore_api.h"
+#include "vec2d.h"
 
 class FEMesh;
 class FEElementList;
@@ -42,6 +43,8 @@ public:
 		int ntype;		// 2 = linear, 3 = quadratic
 		int	node[3];
 		double tag;		// general purpose tag
+        vec2d rs;       // parametric coordinates of intersection point
+        int selid;      // index of intersected surface element
 	};
 
 public:
@@ -52,7 +55,7 @@ public:
 
 	bool Create(FEDomain* dom);
 
-	void Add(int n0, int n1, double tag = 0.0);
+	void Add(int n0, int n1, double tag = 0.0, vec2d rs = vec2d(0,0), int selid = -1);
 
 	int Edges() const;
 

@@ -31,6 +31,8 @@ SOFTWARE.*/
 #include "FEBioFluid.h"
 #include <FECore/FEElementList.h>
 #include <FECore/FEEdgeList.h>
+#include <FECore/FECoreKernel.h>
+#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FEConstraintImmersedBody, FESurfaceConstraint)
     ADD_PARAMETER(m_lc.m_laugon, "laugon");
@@ -44,11 +46,21 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEConstraintImmersedBody::FEConstraintImmersedBody(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem), m_lc(pfem), m_dofW(pfem), m_dofEF(pfem)
 {
+    static int ns = 0;
     // TODO: Can this be done in Init, since  there is no error checking
     if (pfem)
     {
         m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
         m_dofEF.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
+        m_nodalLoad = fecore_alloc(FENodalDOFLoad, pfem);
+        m_nodalLoad->SetDOF(m_dofEF[0]);
+        m_nodalLoad->SetLoad(0);
+        char name[256];
+        snprintf(name,256,"ImmersedBodyZeroFluidFlux%d",ns++);
+        m_nodalLoad->SetName(name);
+        FENodeSet* nset = new FENodeSet(GetFEModel());
+        m_nodalLoad->SetNodeSet(nset);
+        pfem->AddModelLoad(m_nodalLoad);
     }
 }
 
@@ -59,6 +71,7 @@ void FEConstraintImmersedBody::Activate()
     // don't forget to call base class
     FENLConstraint::Activate();
     m_lc.Activate();
+    m_nodalLoad->Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -125,12 +138,20 @@ bool FEConstraintImmersedBody::Init()
         m_lc.add(pLC2);
     }
 
-    /*
+    // populate the node set for the nodal load
+    FENodeSet* nset = m_nodalLoad->GetNodeSet();
+    for (int i=0; i<m_nodetag[i]; ++i) {
+        if ((m_nodetag[i] == 1) || (m_nodetag[i] == -1)) {
+            FENode& node = dom.Node(i);
+            nset->Add(node.m_ID);
+        }
+    }
+    
     // create an FEEdgeList for this domain
     FEEdgeList edgeList;
     edgeList.Create(&dom);
     FEElementEdgeList elemEdgeList;
-    elemEdgeList.Create(dom, edgeList);*/
+    elemEdgeList.Create(dom, edgeList);
     
     return     m_surf.Init();
 }
@@ -141,7 +162,7 @@ void FEConstraintImmersedBody::GetIntersectedEdges()
     FEMesh& mesh = GetMesh();
     // we assume that the first domain is the "fluid" domain
     FEDomain& dom = mesh.Domain(0);
-    m_EL = FindIntersectedEdges(&dom, &m_surf, m_nodetag);
+    m_EL = FindIntersectedEdges(&dom, &m_surf, m_nodetag, m_edgetag);
 }
 
 //-----------------------------------------------------------------------------

@@ -36,4 +36,4 @@ FECORE_API FEBoundingBox CalculateBoundingBox(FESurface* ps);
 
 
 // Calculate the intersected edges of a domain and an immersed boundary
-FECORE_API FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags);
+FECORE_API FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags, vector<int>& edgetags);

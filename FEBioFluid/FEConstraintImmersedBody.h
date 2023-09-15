@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FESurface.h>
 #include <FECore/MeshTools.h>
+#include <FECore/FENodalLoad.h>
 #include <map>
 
 //-----------------------------------------------------------------------------
@@ -82,7 +83,9 @@ protected:
     FELinearConstraintSet   m_lc;
     vector< vector<int> >   m_nodeBCs;
     vector<int>             m_nodetag;
+    vector<int>             m_edgetag;
     FEEdgeList              m_EL;
+    FENodalDOFLoad*         m_nodalLoad;
 
     FEDofList    m_dofW;
     FEDofList   m_dofEF;

@@ -42,7 +42,7 @@ FEEdgeList::FEEdgeList() : m_mesh(nullptr)
 
 FEEdgeList::FEEdgeList(FEMesh* mesh) : m_mesh(mesh) {}
 
-void FEEdgeList::Add(int n0, int n1, double tag)
+void FEEdgeList::Add(int n0, int n1, double tag, vec2d rs, int selid)
 {
 	EDGE e; 
 	e.ntype = 2;
@@ -50,6 +50,8 @@ void FEEdgeList::Add(int n0, int n1, double tag)
 	e.node[1] = n1;
 	e.node[2] = -1;
 	e.tag = tag;
+    e.rs = rs;
+    e.selid = selid;
 	m_edgeList.push_back(e);
 }
 
