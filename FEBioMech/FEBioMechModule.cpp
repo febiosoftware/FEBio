@@ -563,6 +563,7 @@ void FEBioMech::InitModule()
 	// domain classes
 	REGISTER_FECORE_CLASS(FERigidSolidDomain, "rigid-solid");
 	REGISTER_FECORE_CLASS(FERigidShellDomain, "rigid-shell");
+	REGISTER_FECORE_CLASS(FERigidShellDomainNew, "rigid-shell-new");
 	REGISTER_FECORE_CLASS(FERigidShellDomainOld, "rigid-shell-old");
 	REGISTER_FECORE_CLASS(FERemodelingElasticDomain, "remodeling-solid");
 	REGISTER_FECORE_CLASS(FE3FieldElasticSolidDomain, "three-field-solid");

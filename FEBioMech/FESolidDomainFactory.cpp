@@ -129,7 +129,7 @@ FEDomain* FESolidDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh
 		if (dynamic_cast<FERigidMaterial*>(pmat))
 		{
 			if (spec.m_shell_formulation == OLD_SHELL) sztype = "rigid-shell-old";
-			else sztype = "rigid-shell";
+			else sztype = "rigid-shell-new";
 		}
 		else if (dynamic_cast<FESolidMaterial*>(pmat))
 		{

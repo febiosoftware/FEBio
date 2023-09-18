@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include "RigidBC.h"
 #include "FERigidMaterial.h"
+#include "FERigidShellDomain.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidBody, FECoreBase)
@@ -215,7 +216,7 @@ void FERigidBody::UpdateMass()
 		}
 		else if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
-			FEElasticShellDomain* psd = static_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+			FERigidShellDomainNew* psd = dynamic_cast<FERigidShellDomainNew*>(&mesh.Domain(nd)); assert(psd);
 			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(psd->GetMaterial());
 			// make sure this element belongs to the rigid body
 			if (pm && (pm->GetRigidBodyID() == m_nID))
@@ -312,7 +313,7 @@ void FERigidBody::UpdateCOM()
 		}
 		else if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
-			FEElasticShellDomain* psd = static_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+			FERigidShellDomainNew* psd = dynamic_cast<FERigidShellDomainNew*>(&mesh.Domain(nd)); assert(psd);
 			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(psd->GetMaterial());
 			// make sure this element belongs to the rigid body
 			if (pm && (pm->GetRigidBodyID() == m_nID))
@@ -428,7 +429,7 @@ void FERigidBody::UpdateMOI()
 		}
 		else if (mesh.Domain(nd).Class() == FE_DOMAIN_SHELL)
 		{
-			FEElasticShellDomain* psd = static_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+			FERigidShellDomainNew* psd = dynamic_cast<FERigidShellDomainNew*>(&mesh.Domain(nd)); assert(psd);
 			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(psd->GetMaterial());
 			// make sure this element belongs to the rigid body
 			if (pm && (pm->GetRigidBodyID() == m_nID))

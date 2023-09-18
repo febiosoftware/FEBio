@@ -144,6 +144,7 @@ enum FE_Element_Type {
     FE_QUAD9NI,
 
 	// shell elements
+    FE_SHELL_QUAD4G4,
     FE_SHELL_QUAD4G8,
     FE_SHELL_QUAD4G12,
     FE_SHELL_QUAD8G18,

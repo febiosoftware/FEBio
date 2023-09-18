@@ -30,6 +30,9 @@ SOFTWARE.*/
 #include "FEElasticShellDomain.h"
 #include "FEElasticShellDomainOld.h"
 
+class FEBodyForce;
+class FERigidMaterial;
+
 //-----------------------------------------------------------------------------
 //! domain class for 3D rigid shell elements
 //!
@@ -95,4 +98,74 @@ public:
 
 	// update domain data
 	void Update(const FETimeInfo& tp) override;
+};
+
+//-----------------------------------------------------------------------------
+// Implements a rigid shell domain. We need to inherit from FEShellDomain and FEElasticDomain.
+// The latter is needed because most of the solid solver classes assume that domains inherit this class.
+class FERigidShellDomainNew : public FEShellDomain, public FEElasticDomain
+{
+public:
+	FERigidShellDomainNew(FEModel* fem);
+
+public: // from FEMeshPartition
+	//! return number of elements
+	int Elements() const override { return (int)m_Elem.size(); };
+
+	//! return a reference to an element \todo this is not the preferred interface but I've added it for now
+	FEElement& ElementRef(int i) override { return m_Elem[i]; };
+	const FEElement& ElementRef(int i) const override { return m_Elem[i]; };
+
+public: // from FEDomain
+	// create function
+	bool Create(int elements, FE_Element_Spec espec) override;
+
+	const FEDofList& GetDOFList() const override { return m_dof; }
+
+	void Update(const FETimeInfo& tp) override;
+
+	void Reset() override;
+
+	void SetMaterial(FEMaterial* pm) override;
+
+	//! get the material (overridden from FEDomain)
+	FEMaterial* GetMaterial() override;
+
+public: // from FEShellDomain
+	// get a shell element
+	FEShellElement& Element(int i) override { return m_Elem[i]; }
+
+	void AssignDefaultShellThickness() override;
+
+public: // from FEElasticDomain
+	void InternalForces(FEGlobalVector& R) override;
+
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override;
+
+	void InertialForces(FEGlobalVector& R, std::vector<double>& F) override;
+
+	void StiffnessMatrix(FELinearSystem& LS) override;
+
+	void BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) override;
+
+	void MassMatrix(FELinearSystem& LS, double scale) override;
+
+private:
+	//! Calculate extenral body forces for shell elements
+	void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
+
+	void ElementBodyForceStiffness(FEBodyForce& BF, FEShellElement& el, matrix& ke);
+
+public:
+	double detJ0(FEShellElement& el, int n);
+
+protected:
+	double	m_h0; // TODO: move to base class?
+
+protected:
+	std::vector<FEShellElement>	m_Elem;
+	FEDofList	m_dof;
+	FERigidMaterial* m_pMat;
+
+	DECLARE_FECORE_CLASS();
 };

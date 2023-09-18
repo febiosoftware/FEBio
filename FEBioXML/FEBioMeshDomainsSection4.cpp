@@ -311,7 +311,7 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 	}
 
 	// process element data
-	FEShellDomainNew* shellDomain = dynamic_cast<FEShellDomainNew*>(dom);
+	FEShellDomain* shellDomain = dynamic_cast<FEShellDomain*>(dom);
 	if (shellDomain)
 	{
 		for (int j = 0; j < elems; ++j)

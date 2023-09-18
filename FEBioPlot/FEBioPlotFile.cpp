@@ -1183,6 +1183,7 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 	int dtype = 0;
 	switch (etype)
 	{
+        case FE_SHELL_QUAD4G4 :
         case FE_SHELL_QUAD4G8 :
         case FE_SHELL_QUAD4G12 :
             ne = 4; dtype = PLT_ELEM_QUAD; break;

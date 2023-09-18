@@ -1435,6 +1435,26 @@ public:
     
 };
 
+
+//=============================================================================
+// 4-node quadrilateral elements with 4 point (membrane) gaussian quadrature
+class FEShellQuad4G4 : public FEShellQuad4_
+{
+public:
+	enum { NINT = 4 };
+
+public:
+	FEShellQuad4G4();
+
+	void project_to_nodes(double* ai, double* ao) const override;
+
+protected:
+	// use these integration points to project to nodes
+	static int ni[NELN];
+
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+};
+
 //=============================================================================
 // 4-node quadrilateral elements with 4*2-point gaussian quadrature
 //

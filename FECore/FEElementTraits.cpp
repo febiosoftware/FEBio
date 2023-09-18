@@ -2694,6 +2694,33 @@ void FEShellQuad4_::shape_deriv(double* Hr, double* Hs, double r, double s)
 }
 
 //*****************************************************************************
+//                          S H E L L Q U A D 4 G 4
+//*****************************************************************************
+
+FEShellQuad4G4::FEShellQuad4G4() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G4)
+{
+	const double a = 1.0 / sqrt(3.0);
+	gr[0] = -a; gs[0] = -a; gw[0] = 1;
+	gr[1] =  a; gs[1] = -a; gw[1] = 1;
+	gr[2] =  a; gs[2] =  a; gw[2] = 1;
+	gr[3] = -a; gs[3] =  a; gw[3] = 1;
+	init(); 
+	m_Hi = m_H.inverse();
+}
+
+void FEShellQuad4G4::project_to_nodes(double* ai, double* ao) const
+{
+	int ni = NINT;
+	int ne = NELN;
+	assert(ni == ne);
+	for (int i = 0; i < ne; ++i)
+	{
+		ao[i] = 0;
+		for (int j = 0; j < ni; ++j) ao[i] += m_Hi[i][j] * ai[j];
+	}
+}
+
+//*****************************************************************************
 //                          S H E L L Q U A D 4 G 8
 //*****************************************************************************
 

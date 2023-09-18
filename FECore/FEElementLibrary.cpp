@@ -122,6 +122,7 @@ FEElementLibrary* FEElementLibrary::GetInstance()
         n = m_pThis->RegisterTraits(new FEQuad8NI   ); assert(n==FE_QUAD8NI  );
 		n = m_pThis->RegisterTraits(new FEQuad9G9   ); assert(n==FE_QUAD9G9  );
         n = m_pThis->RegisterTraits(new FEQuad9NI   ); assert(n==FE_QUAD9NI  );
+        n = m_pThis->RegisterTraits(new FEShellQuad4G4  ); assert(n==FE_SHELL_QUAD4G4 );
         n = m_pThis->RegisterTraits(new FEShellQuad4G8  ); assert(n==FE_SHELL_QUAD4G8 );
         n = m_pThis->RegisterTraits(new FEShellQuad4G12 ); assert(n==FE_SHELL_QUAD4G12);
         n = m_pThis->RegisterTraits(new FEShellQuad8G18 ); assert(n==FE_SHELL_QUAD8G18);
