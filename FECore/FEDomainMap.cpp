@@ -256,6 +256,8 @@ void FEDomainMap::Serialize(DumpStream& ar)
 	ar & m_name;
 	ar & m_elset;
 	ar & m_fmt;
+	ar & m_NLT;
+	ar & m_imin;
 }
 
 //-----------------------------------------------------------------------------

@@ -39,7 +39,7 @@ void FESegmentSet::SEGMENT::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-FESegmentSet::FESegmentSet(FEModel* fem) : FEItemList(fem)
+FESegmentSet::FESegmentSet(FEModel* fem) : FEItemList(fem, FEItemList::FE_ELEMENT_SET)
 {
 }
 

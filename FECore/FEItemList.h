@@ -36,8 +36,16 @@ class FEMesh;
 class FECORE_API FEItemList// : public FECoreBase
 {
 public:
-	FEItemList(FEModel* fem);	// TODO: remove
-	FEItemList(FEMesh* mesh);
+	enum FEItemType {
+		FE_NODE_SET,
+		FE_ELEMENT_SET,
+		FE_FACET_SET,
+		FE_SEGMENT_SET
+	};
+
+public:
+	FEItemList(FEModel* fem, FEItemType type);	// TODO: remove
+	FEItemList(FEMesh* mesh, FEItemType type);
 	virtual ~FEItemList();
 
 	// get the mesh
@@ -48,14 +56,17 @@ public:
 	const std::string& GetName() const;
 	void SetName(const std::string& name);
 
+	FEItemType Type() const { return m_type; }
+
 public:
-	void Serialize(DumpStream& ar);
+	virtual void Serialize(DumpStream& ar);
 
 	static FEItemList* LoadClass(DumpStream& ar, FEItemList* p);
 	static void SaveClass(DumpStream& ar, FEItemList* p);
 
 protected:
 	FEMesh*		m_mesh;
+	FEItemType	m_type;
 
 	std::string	m_name;
 };

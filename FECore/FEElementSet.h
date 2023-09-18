@@ -88,7 +88,7 @@ public:
 	FENodeList GetNodeList() const;
 
 public:
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	static void SaveClass(DumpStream& ar, FEElementSet* p);
 	static FEElementSet* LoadClass(DumpStream& ar, FEElementSet* p);
