@@ -340,9 +340,9 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R)
 
 		// add to the residual
 		int n;
-		n = rb.m_LM[0]; if (n >= 0) { R[n] += f.x; rb.m_Fr.x -= f.x; }
-		n = rb.m_LM[1]; if (n >= 0) { R[n] += f.y; rb.m_Fr.y -= f.y; }
-		n = rb.m_LM[2]; if (n >= 0) { R[n] += f.z; rb.m_Fr.z -= f.z; }
+		n = rb.m_LM[0]; if (n >= 0) R[n] += f.x;
+		n = rb.m_LM[1]; if (n >= 0) R[n] += f.y;
+		n = rb.m_LM[2]; if (n >= 0) R[n] += f.z;
 	}
 	else
 	{
@@ -367,13 +367,6 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R)
 
 				double f = f0 * (1.0 - w) + f1 * w;
 				incVal = f;
-			}
-
-			switch (m_dof)
-			{
-			case 0: rb.m_Fr.x -= incVal; break;
-			case 1: rb.m_Fr.y -= incVal; break;
-			case 2: rb.m_Fr.z -= incVal; break;
 			}
 
 			R[I] += incVal;
@@ -502,13 +495,6 @@ void FERigidBodyMoment::LoadVector(FEGlobalVector& R)
 
 			double M = M0 * (1.0 - w) + M1 * w;
 			incVal = M;
-		}
-
-		switch (m_dof)
-		{
-		case 0: rb.m_Mr.x -= incVal; break;
-		case 1: rb.m_Mr.y -= incVal; break;
-		case 2: rb.m_Mr.z -= incVal; break;
 		}
 
 		R[I] += incVal;
