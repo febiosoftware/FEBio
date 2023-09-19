@@ -60,4 +60,12 @@ public:
 
 	// update domain data
 	void Update(const FETimeInfo& tp) override;
+
+public:
+	// calculate contribution of MOI for this domain
+	mat3d CalculateMOI();
+
+	double CalculateMass();
+
+	vec3d CalculateCOM();
 };

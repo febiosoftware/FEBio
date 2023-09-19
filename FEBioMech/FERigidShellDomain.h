@@ -150,6 +150,14 @@ public: // from FEElasticDomain
 
 	void MassMatrix(FELinearSystem& LS, double scale) override;
 
+public:
+	// calculate contribution of MOI for this domain
+	mat3d CalculateMOI();
+
+	double CalculateMass();
+
+	vec3d CalculateCOM();
+
 private:
 	//! Calculate extenral body forces for shell elements
 	void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
