@@ -1187,6 +1187,7 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
         case FE_SHELL_QUAD4G8 :
         case FE_SHELL_QUAD4G12 :
             ne = 4; dtype = PLT_ELEM_QUAD; break;
+        case FE_SHELL_TRI3G3  :
         case FE_SHELL_TRI3G6  :
         case FE_SHELL_TRI3G9  :
             ne = 3; dtype = PLT_ELEM_TRI; break;

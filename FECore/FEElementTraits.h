@@ -1449,9 +1449,6 @@ public:
 	void project_to_nodes(double* ai, double* ao) const override;
 
 protected:
-	// use these integration points to project to nodes
-	static int ni[NELN];
-
 	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
@@ -1513,6 +1510,23 @@ public:
     //! values of shape function derivatives
     void shape_deriv(double* Hr, double* Hs, double r, double s);
     
+};
+
+//=============================================================================
+// 3-node triangular elements with 1-point (membrane) gaussian quadrature
+//
+class FEShellTri3G3 : public FEShellTri3_
+{
+public:
+	enum { NINT = 3 };
+
+public:
+	FEShellTri3G3();
+
+	void project_to_nodes(double* ai, double* ao) const override;
+
+private:
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================
