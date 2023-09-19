@@ -340,33 +340,44 @@ void FERigidBodyForce::LoadVector(FEGlobalVector& R)
 
 		// add to the residual
 		int n;
-		n = rb.m_LM[0]; if (n >= 0) R[n] += f.x;
-		n = rb.m_LM[1]; if (n >= 0) R[n] += f.y;
-		n = rb.m_LM[2]; if (n >= 0) R[n] += f.z;
+		n = rb.m_LM[0]; if (n >= 0) { R[n] += f.x; rb.m_Fr.x -= f.x; }
+		n = rb.m_LM[1]; if (n >= 0) { R[n] += f.y; rb.m_Fr.y -= f.y; }
+		n = rb.m_LM[2]; if (n >= 0) { R[n] += f.z; rb.m_Fr.z -= f.z; }
 	}
-	else if (m_ntype == FORCE_LOAD)
+	else
 	{
 		int I = rb.m_LM[m_dof];
 		if (I >= 0)
 		{
-			R[I] += m_force + m_force0;
+			double incVal = 0.0;
+			if (m_ntype == FORCE_LOAD)
+			{
+				incVal = m_force + m_force0;
+			}
+			else if (m_ntype == FORCE_TARGET)
+			{
+				// get the current analysis step
+				FEAnalysis* pstep = fem.GetCurrentStep();
+
+				double t0 = pstep->m_tstart;
+				double t1 = pstep->m_tend;
+				double w = (t - t0) / (t1 - t0);
+				assert((w >= -0.0000001) && (w <= 1.0000001));
+				double f0 = m_force0, f1 = m_force;
+
+				double f = f0 * (1.0 - w) + f1 * w;
+				incVal = f;
+			}
+
+			switch (m_dof)
+			{
+			case 0: rb.m_Fr.x -= incVal; break;
+			case 1: rb.m_Fr.y -= incVal; break;
+			case 2: rb.m_Fr.z -= incVal; break;
+			}
+
+			R[I] += incVal;
 		}
-	}
-	else if (m_ntype == FORCE_TARGET)
-	{
-		// get the current analysis step
-		FEAnalysis* pstep = fem.GetCurrentStep();
-
-		double t0 = pstep->m_tstart;
-		double t1 = pstep->m_tend;
-		double w = (t - t0) / (t1 - t0);
-		assert((w >= -0.0000001) && (w <= 1.0000001));
-		double f0 = m_force0, f1 = m_force;
-
-		double f = f0 * (1.0 - w) + f1 * w;
-
-		int I = rb.m_LM[m_dof];
-		R[I] += f;
 	}
 }
 
@@ -473,9 +484,10 @@ void FERigidBodyMoment::LoadVector(FEGlobalVector& R)
 	int I = rb.m_LM[m_dof + 3];
 	if (I >= 0)
 	{
+		double incVal = 0.0;
 		if (m_ntype == MOMENT_LOAD)
 		{
-			R[I] += m_value + m_value0;
+			incVal = m_value + m_value0;
 		}
 		else if (m_ntype == MOMENT_TARGET)
 		{
@@ -489,8 +501,17 @@ void FERigidBodyMoment::LoadVector(FEGlobalVector& R)
 			double M0 = m_value0, M1 = m_value;
 
 			double M = M0 * (1.0 - w) + M1 * w;
-			R[I] += M;
+			incVal = M;
 		}
+
+		switch (m_dof)
+		{
+		case 0: rb.m_Mr.x -= incVal; break;
+		case 1: rb.m_Mr.y -= incVal; break;
+		case 2: rb.m_Mr.z -= incVal; break;
+		}
+
+		R[I] += incVal;
 	}
 }
 
