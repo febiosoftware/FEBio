@@ -120,6 +120,8 @@ public: // from FEDomain
 	// create function
 	bool Create(int elements, FE_Element_Spec espec) override;
 
+	void Activate() override;
+
 	const FEDofList& GetDOFList() const override { return m_dof; }
 
 	void Update(const FETimeInfo& tp) override;

@@ -188,6 +188,12 @@ bool FERigidShellDomainNew::Create(int nelems, FE_Element_Spec espec)
 }
 
 //-----------------------------------------------------------------------------
+void FERigidShellDomainNew::Activate()
+{
+	// don't need to do anything here
+}
+
+//-----------------------------------------------------------------------------
 void FERigidShellDomainNew::AssignDefaultShellThickness()
 {
 	double h0 = m_h0;
