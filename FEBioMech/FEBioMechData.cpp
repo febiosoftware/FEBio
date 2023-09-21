@@ -168,17 +168,37 @@ double FENodeForceZ::value(const FENode& node)
 //-----------------------------------------------------------------------------
 double FELogContactGap::value(FESurfaceElement& el)
 {
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	// returned contact gap
 	double g = 0.0;
-	for (int i = 0; i < el.GaussPoints(); ++i)
+
+	// NOTE: the sliding surface does not use material points, so we need this little hack. 
+	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(ps);
+	if (ss)
 	{
-		FEMaterialPoint* mp = el.GetMaterialPoint(i);
-		FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
-		if (cp)
+		for (int j = 0; j < el.Nodes(); ++j)
 		{
-			g += cp->m_gap;
+			double gj = ss->m_data[el.m_lnode[j]].m_gap;
+			g += gj;
 		}
+		g /= el.Nodes();
+		return g;
 	}
-	g /= (double)el.GaussPoints();
+	else
+	{
+		for (int i = 0; i < el.GaussPoints(); ++i)
+		{
+			FEMaterialPoint* mp = el.GetMaterialPoint(i);
+			FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
+			if (cp)
+			{
+				g += cp->m_gap;
+			}
+		}
+		g /= (double)el.GaussPoints();
+	}
 
 	return g;
 }
