@@ -41,7 +41,7 @@ public:
 	struct EDGE
 	{
 		int ntype;		// 2 = linear, 3 = quadratic
-		int	node[3];
+		int	node[3];    // edge node indices
 		double tag;		// general purpose tag
         vec2d rs;       // parametric coordinates of intersection point
         int selid;      // index of intersected surface element

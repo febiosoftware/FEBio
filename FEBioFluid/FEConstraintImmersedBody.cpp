@@ -77,9 +77,6 @@ void FEConstraintImmersedBody::Activate()
 //-----------------------------------------------------------------------------
 bool FEConstraintImmersedBody::Init()
 {
-    // initialize surface
-//    m_surf.Init();
-    
     // get the current edge intersection list
     GetIntersectedEdges();
     
@@ -118,20 +115,22 @@ bool FEConstraintImmersedBody::Init()
     // prescribe linear constraints on intersected edges
     for (int i=0; i<m_EL.Edges(); ++i) {
         FEEdgeList::EDGE EL = m_EL.Edge(i);
-        FENode& node0 = mesh.Node(EL.node[0]);
-        FENode& node1 = mesh.Node(EL.node[1]);
+        FENode& node0 = dom.Node(EL.node[0]);
+        FENode& node1 = dom.Node(EL.node[1]);
+        int nid0 = node0.GetID();
+        int nid1 = node1.GetID();
         double g = EL.tag;
-        
+
         // create linear constraints
         FEAugLagLinearConstraint* pLC0 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-        pLC0->AddDOF(node0.GetID(), m_dofW[0], 1-g);
-        pLC0->AddDOF(node1.GetID(), m_dofW[0],   g);
+        pLC0->AddDOF(nid0, m_dofW[0], 1-g);
+        pLC0->AddDOF(nid1, m_dofW[0],   g);
         FEAugLagLinearConstraint* pLC1 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-        pLC1->AddDOF(node0.GetID(), m_dofW[1], 1-g);
-        pLC1->AddDOF(node1.GetID(), m_dofW[1],   g);
+        pLC1->AddDOF(nid0, m_dofW[1], 1-g);
+        pLC1->AddDOF(nid1, m_dofW[1],   g);
         FEAugLagLinearConstraint* pLC2 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-        pLC2->AddDOF(node0.GetID(), m_dofW[2], 1-g);
-        pLC2->AddDOF(node1.GetID(), m_dofW[2],   g);
+        pLC2->AddDOF(nid0, m_dofW[2], 1-g);
+        pLC2->AddDOF(nid1, m_dofW[2],   g);
         // add the linear constraint to the system
         m_lc.add(pLC0);
         m_lc.add(pLC1);
@@ -142,8 +141,8 @@ bool FEConstraintImmersedBody::Init()
     FENodeSet* nset = m_nodalLoad->GetNodeSet();
     for (int i=0; i<m_nodetag[i]; ++i) {
         if ((m_nodetag[i] == 1) || (m_nodetag[i] == -1)) {
-            FENode& node = dom.Node(i);
-            nset->Add(node.m_ID);
+            int nid = dom.NodeIndex(i);
+            nset->Add(nid);
         }
     }
     

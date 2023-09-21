@@ -349,11 +349,14 @@ bool FESurface::Init()
 bool FESurface::IsInsideSurface(int nodeIndex, bool& reset, double tol)
 {
     FEBoundingBox box = CalculateBoundingBox(this);
+    double dR = tol*box.radius();
+    box.inflate(dR, dR, dR);
+    double R = box.radius();
     static FEClosestPointProjection cpp(*this);
     FEMesh& mesh = *GetMesh();
     if (reset) {
         cpp.SetTolerance(tol);
-        cpp.SetSearchRadius(box.radius());
+        cpp.SetSearchRadius(R);
         cpp.HandleSpecialCases(true);
         cpp.Init();
         reset = false;
@@ -365,7 +368,7 @@ bool FESurface::IsInsideSurface(int nodeIndex, bool& reset, double tol)
         FENode& node = mesh.Node(nodeIndex);
         vec3d p = node.m_rt;
         vec3d nu = SurfaceNormal(*pme, rs.x(), rs.y());
-        if ((q-p)*nu > 0) return true;
+        if ((q-p)*nu >= 0) return true;
         else return false;
     }
     else return false;

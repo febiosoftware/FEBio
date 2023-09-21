@@ -57,12 +57,13 @@ FEBoundingBox CalculateBoundingBox(FESurface* ps)
 //              i index of intersected edge number in FEEdgeList
 FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodetags, vector<int>& edgetags)
 {
+    double tol = 1e-5;
     // initialize node tags
     std::map<int,int> ntag;
     bool reset = true;
     for (int i=0; i<dom->Nodes(); ++i) {
         int nodeIndex = dom->NodeIndex(i);
-        if (ps->IsInsideSurface(nodeIndex, reset))
+        if (ps->IsInsideSurface(nodeIndex, reset, tol))
             ntag[dom->NodeIndex(i)] = 2;    // this value may be overwritten to 1 below
         else
             ntag[dom->NodeIndex(i)] = 0;
@@ -85,7 +86,7 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
 	FEBoundingBox box = CalculateBoundingBox(ps);
 
 	// inflate it a little to avoid any numerical rounding issues
-	double dR = 1e-5*box.radius(); 
+	double dR = tol*box.radius();
 	box.inflate(dR, dR, dR);
 
 	// loop over all the edges
@@ -97,8 +98,8 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
 		vec3d r0 = dom->Node(e.node[0]).m_rt;
 		vec3d r1 = dom->Node(e.node[1]).m_rt;
 
-		int n0 = dom->NodeIndex(e.node[0]);
-		int n1 = dom->NodeIndex(e.node[1]);
+		int n0 = e.node[0];
+		int n1 = e.node[1];
 
 		// do a quick test to see of this edge intersects the bounding box
 		// (There might be cases where neither point is in the box, but the edge

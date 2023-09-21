@@ -85,14 +85,6 @@ bool FEConstraintImmersedFSIBody::Init()
     FEDomain& soliddom = mesh.Domain(1);
     FESolidDomain* sdom = dynamic_cast<FESolidDomain*>(&soliddom);
     if (sdom == nullptr) return false;
-/*    int count = 0;
-    for (int i=0; i<fluiddom.Nodes(); ++i) {
-        FENode& node = fluiddom.Node(i);
-        vec3d p = node.m_rt;
-        double r[3];
-        FESolidElement* s = sdom->FindElement(p, r);
-        if (s) { m_nodetag[i] = 2; ++count; }
-    }*/
     
     // find the surface of the FluidFSITraction by name
     FESurface* FSItsrf = mesh.FindSurface("FluidFSITraction2");
@@ -101,9 +93,8 @@ bool FEConstraintImmersedFSIBody::Init()
     bool reset = true;
     int count = 0;
     for (int i=0; i<fluiddom.Nodes(); ++i) {
-        FENode& node = fluiddom.Node(i);
-        vec3d p = node.m_rt;
-        if (FSItsrf->IsInsideSurface(node.GetID(), reset,0.001)) {
+        int nidx = fluiddom.NodeIndex(i);
+        if (FSItsrf->IsInsideSurface(nidx, reset,0.001)) {
             m_nodetag[i] = 2;
             ++count;
         }
@@ -148,6 +139,7 @@ bool FEConstraintImmersedFSIBody::Init()
     }
 
     // prescribe linear constraints on elements
+    double kappa = 1e2;
     for (int i=0; i<m_surf.Nodes(); ++i) {
         FENode& node = m_surf.Node(i);
         FESolidElement* se = sel[i];
@@ -162,13 +154,13 @@ bool FEConstraintImmersedFSIBody::Init()
         pLCX->AddDOF(node.GetID(), m_dofW[0], -1);
         pLCY->AddDOF(node.GetID(), m_dofW[1], -1);
         pLCZ->AddDOF(node.GetID(), m_dofW[2], -1);
-        pLCE->AddDOF(node.GetID(), m_dofEF[0],-1);
+        pLCE->AddDOF(node.GetID(), m_dofEF[0],-1*kappa);
         for (int j=0; j<se->Nodes(); ++j) {
             FENode& enode = mesh.Node(se->m_node[j]);
             pLCX->AddDOF(enode.GetID(), m_dofW[0], H[j]);
             pLCY->AddDOF(enode.GetID(), m_dofW[1], H[j]);
             pLCZ->AddDOF(enode.GetID(), m_dofW[2], H[j]);
-            pLCE->AddDOF(enode.GetID(), m_dofEF[0], H[j]);
+            pLCE->AddDOF(enode.GetID(), m_dofEF[0], H[j]*kappa);
         }
         // add the linear constraint to the system
         m_lc.add(pLCX);
