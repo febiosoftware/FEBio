@@ -74,7 +74,10 @@ public:
 
     //! build connectivity for matrix profile
     void BuildMatrixProfile(FEGlobalMatrix& M) override;
-
+    
+    //! prep step
+    void PrepStep() override;
+    
 private:
     void GetIntersectedEdges();
     

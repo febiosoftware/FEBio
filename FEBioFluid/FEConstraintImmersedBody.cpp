@@ -77,6 +77,19 @@ void FEConstraintImmersedBody::Activate()
 //-----------------------------------------------------------------------------
 bool FEConstraintImmersedBody::Init()
 {
+/*
+    // create an FEEdgeList for this domain
+    FEEdgeList edgeList;
+    edgeList.Create(&dom);
+    FEElementEdgeList elemEdgeList;
+    elemEdgeList.Create(dom, edgeList);
+*/
+    return     m_surf.Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEConstraintImmersedBody::PrepStep()
+{
     // get the current edge intersection list
     GetIntersectedEdges();
     
@@ -86,7 +99,6 @@ bool FEConstraintImmersedBody::Init()
     // tag DOFs of all nodes of this domain
     m_nodeBCs.assign(dom.Nodes(),vector<int>(4));
     for (int i=0; i<dom.Nodes(); ++i) {
-        int n = dom.NodeIndex(i);
         FENode& node = dom.Node(i);
         for (int k=0; k<3; ++k)
             m_nodeBCs[i][k] = node.get_bc(m_dofW[k]);
@@ -95,7 +107,7 @@ bool FEConstraintImmersedBody::Init()
 
     // for fluid nodes inside the immersed body, prescribe the degrees of freedom
     for (int i=0; i<m_nodetag.size(); ++i) {
-        if (m_nodetag[i] == 2) {
+        if (m_nodetag[i] > 0) {
             FENode& node = dom.Node(i);
             // for now, set the velocity DOFs to zero
             for (int k=0; k<3; ++k) {
@@ -111,8 +123,9 @@ bool FEConstraintImmersedBody::Init()
             }
         }
     }
-    
+
     // prescribe linear constraints on intersected edges
+    m_lc.m_LC.clear();
     for (int i=0; i<m_EL.Edges(); ++i) {
         FEEdgeList::EDGE EL = m_EL.Edge(i);
         FENode& node0 = dom.Node(EL.node[0]);
@@ -139,20 +152,13 @@ bool FEConstraintImmersedBody::Init()
 
     // populate the node set for the nodal load
     FENodeSet* nset = m_nodalLoad->GetNodeSet();
+    nset->Clear();
     for (int i=0; i<m_nodetag[i]; ++i) {
         if ((m_nodetag[i] == 1) || (m_nodetag[i] == -1)) {
             int nid = dom.NodeIndex(i);
             nset->Add(nid);
         }
     }
-    
-    // create an FEEdgeList for this domain
-    FEEdgeList edgeList;
-    edgeList.Create(&dom);
-    FEElementEdgeList elemEdgeList;
-    elemEdgeList.Create(dom, edgeList);
-    
-    return     m_surf.Init();
 }
 
 //-----------------------------------------------------------------------------

@@ -76,7 +76,7 @@ public:
     void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
 private:
-    void GetIntersectedEdges();
+    void GetIntersectedEdges(FESurface* surf);
     
 protected:
     FESurface               m_surf;
@@ -85,6 +85,7 @@ protected:
     vector<int>             m_nodetag;
     vector<int>             m_edgetag;
     FEEdgeList              m_EL;
+    FENodalDOFLoad*         m_nodalLoad;
     double                  m_penalty;
 
     FEDofList    m_dofW;

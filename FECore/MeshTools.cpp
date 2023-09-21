@@ -64,9 +64,9 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
     for (int i=0; i<dom->Nodes(); ++i) {
         int nodeIndex = dom->NodeIndex(i);
         if (ps->IsInsideSurface(nodeIndex, reset, tol))
-            ntag[dom->NodeIndex(i)] = 2;    // this value may be overwritten to 1 below
+            ntag[i] = 2;    // this value may be overwritten to 1 below
         else
-            ntag[dom->NodeIndex(i)] = 0;
+            ntag[i] = 0;
     }
 
     // we'll need the mesh
@@ -149,8 +149,7 @@ FEEdgeList FindIntersectedEdges(FEDomain* dom, FESurface* ps, vector<int>& nodet
     // evaluate useful nodal tag
     nodetags.assign(dom->Nodes(),0);
     for (int i=0; i<dom->Nodes(); ++i) {
-        int n = dom->NodeIndex(i);
-        nodetags[i] = ntag[n];
+        nodetags[i] = ntag[i];
     }
     
 	// all done
