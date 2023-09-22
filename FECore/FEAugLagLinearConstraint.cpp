@@ -53,6 +53,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 void FEAugLagLinearConstraint::ClearDOFs()
 {
+    m_rhs = 0.0;
 	for (int i = 0; i < m_dof.size(); ++i) delete m_dof[i];
 	m_dof.clear();
 }
@@ -71,7 +72,7 @@ void FEAugLagLinearConstraint::AddDOF(int node, int bc, double val)
 void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
 {
     FECoreClass::Serialize(ar);
-    ar & m_dof & m_lam;
+    ar & m_dof & m_lam & m_rhs;
 }
 
 //-----------------------------------------------------------------------------
@@ -124,7 +125,7 @@ void FELinearConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
 double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 {
 	int n = (int)LC.m_dof.size();
-	double c = 0;
+	double c = -LC.m_rhs;
 	vector<FEAugLagLinearConstraintDOF*>::iterator it = LC.m_dof.begin();
 	double u;
 	FEMesh& mesh = GetMesh();

@@ -686,7 +686,8 @@ bool FEPlotEdgeIntersection::Save(FEMesh& mesh, FEDataStream& a)
     vector<int> nodetags;
     vector<int> edgetags;
 
-	for (int i = 0; i < mesh.Surfaces(); ++i)
+//    for (int i = 0; i < mesh.Surfaces(); ++i)
+	for (int i = mesh.Surfaces()-1; i < mesh.Surfaces(); ++i)
 	{
 		FESurface& surf = mesh.Surface(i);
 

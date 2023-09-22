@@ -60,17 +60,20 @@ public:
 
 public:
 	//! constructor
-	FEAugLagLinearConstraint(FEModel* fem) : FECoreClass(fem) { m_lam = 0; }
+    FEAugLagLinearConstraint(FEModel* fem) : FECoreClass(fem) { m_lam = 0; m_rhs = 0; }
 
 	//! serialize data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	void ClearDOFs();
 
 	void AddDOF(int node, int bc, double val);
+    
+    void SetRHS(double rhs) { m_rhs = rhs; }
 
 public:
 	std::vector<FEAugLagLinearConstraintDOF*>	m_dof;	//!< list of participating dofs
+    double                                  m_rhs;      //!< right-hand-side of this constraint
 	double									m_lam;	//!< lagrange multiplier
 
 	DECLARE_FECORE_CLASS();

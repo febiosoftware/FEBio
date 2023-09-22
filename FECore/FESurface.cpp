@@ -363,10 +363,11 @@ bool FESurface::IsInsideSurface(int nodeIndex, bool& reset, double tol)
     }
     vec2d rs = vec2d(0,0);
     vec3d q(0,0,0);
+    FENode& node = mesh.Node(nodeIndex);
+    vec3d p = node.m_rt;
+    if (!box.IsInside(p)) return false;
     FESurfaceElement* pme = cpp.Project(nodeIndex, q, rs);
     if (pme) {
-        FENode& node = mesh.Node(nodeIndex);
-        vec3d p = node.m_rt;
         vec3d nu = SurfaceNormal(*pme, rs.x(), rs.y());
         if ((q-p)*nu >= 0) return true;
         else return false;

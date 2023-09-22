@@ -162,12 +162,15 @@ void FEConstraintImmersedBody::PrepStep()
         FEAugLagLinearConstraint* pLC0 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
         pLC0->AddDOF(nid0, m_dofW[0], 1-g);
         pLC0->AddDOF(nid1, m_dofW[0],   g);
+        pLC0->SetRHS(0.0);
         FEAugLagLinearConstraint* pLC1 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
         pLC1->AddDOF(nid0, m_dofW[1], 1-g);
         pLC1->AddDOF(nid1, m_dofW[1],   g);
+        pLC1->SetRHS(0.0);
         FEAugLagLinearConstraint* pLC2 = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
         pLC2->AddDOF(nid0, m_dofW[2], 1-g);
         pLC2->AddDOF(nid1, m_dofW[2],   g);
+        pLC2->SetRHS(0.0);
         // add the linear constraint to the system
         m_lc.add(pLC0);
         m_lc.add(pLC1);
