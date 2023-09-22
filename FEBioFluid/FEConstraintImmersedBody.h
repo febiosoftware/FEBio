@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include <FECore/FESurface.h>
 #include <FECore/MeshTools.h>
 #include <FECore/FENodalLoad.h>
+#include <FECore/FEPrescribedBC.h>
 #include <map>
 
 //-----------------------------------------------------------------------------
@@ -89,6 +90,11 @@ protected:
     vector<int>             m_edgetag;
     FEEdgeList              m_EL;
     FENodalDOFLoad*         m_nodalLoad;
+    bool                    m_breset;
+    FEPrescribedNodeSet*    m_pbcwx;
+    FEPrescribedNodeSet*    m_pbcwy;
+    FEPrescribedNodeSet*    m_pbcwz;
+    FEPrescribedNodeSet*    m_pbcef;
 
     FEDofList    m_dofW;
     FEDofList   m_dofEF;

@@ -46,6 +46,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEConstraintImmersedBody::FEConstraintImmersedBody(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem), m_lc(pfem), m_dofW(pfem), m_dofEF(pfem)
 {
+    m_breset = true;
     static int ns = 0;
     // TODO: Can this be done in Init, since  there is no error checking
     if (pfem)
@@ -61,6 +62,24 @@ FEConstraintImmersedBody::FEConstraintImmersedBody(FEModel* pfem) : FESurfaceCon
         FENodeSet* nset = new FENodeSet(GetFEModel());
         m_nodalLoad->SetNodeSet(nset);
         pfem->AddModelLoad(m_nodalLoad);
+
+        FEMesh& mesh = GetMesh();
+        int nbc = pfem->BoundaryConditions();
+        for (int i=0; i<nbc; ++i)
+        {
+            FEBoundaryCondition* bc = pfem->BoundaryCondition(i);
+            FEPrescribedNodeSet* nset = dynamic_cast<FEPrescribedNodeSet*>(bc);
+            if (nset) {
+                if (nset->GetName() == string("PrescribedFluidVelocityX")) m_pbcwx = nset;
+                else if (nset->GetName() == string("PrescribedFluidVelocityY")) m_pbcwy = nset;
+                else if (nset->GetName() == string("PrescribedFluidVelocityZ")) m_pbcwz = nset;
+                else if (nset->GetName() == string("PrescribedFluidDilatation")) m_pbcef = nset;
+            }
+        }
+        if (m_pbcwx) m_pbcwx->GetNodeSet()->Clear();
+        if (m_pbcwy) m_pbcwy->GetNodeSet()->Clear();
+        if (m_pbcwz) m_pbcwz->GetNodeSet()->Clear();
+        if (m_pbcef) m_pbcef->GetNodeSet()->Clear();
     }
 }
 
@@ -96,33 +115,38 @@ void FEConstraintImmersedBody::PrepStep()
     // we assume that the first domain is the "fluid" domain
     FEMesh& mesh = GetMesh();
     FEDomain& dom = mesh.Domain(0);
-    // tag DOFs of all nodes of this domain
-    m_nodeBCs.assign(dom.Nodes(),vector<int>(4));
-    for (int i=0; i<dom.Nodes(); ++i) {
-        FENode& node = dom.Node(i);
-        for (int k=0; k<3; ++k)
-            m_nodeBCs[i][k] = node.get_bc(m_dofW[k]);
-        m_nodeBCs[i][3] = node.get_bc(m_dofEF[0]);
+/*
+    if (m_breset) {
+        // tag DOFs of all nodes of this domain
+        m_nodeBCs.assign(dom.Nodes(),vector<int>(4));
+        for (int i=0; i<dom.Nodes(); ++i) {
+            FENode& node = dom.Node(i);
+            for (int k=0; k<3; ++k)
+                m_nodeBCs[i][k] = node.get_bc(m_dofW[k]);
+            m_nodeBCs[i][3] = node.get_bc(m_dofEF[0]);
+        }
+        m_breset = false;
     }
-
+*/
     // for fluid nodes inside the immersed body, prescribe the degrees of freedom
+    if (m_pbcwx) m_pbcwx->GetNodeSet()->Clear();
+    if (m_pbcwy) m_pbcwy->GetNodeSet()->Clear();
+    if (m_pbcwz) m_pbcwz->GetNodeSet()->Clear();
+    if (m_pbcef) m_pbcef->GetNodeSet()->Clear();
     for (int i=0; i<m_nodetag.size(); ++i) {
         if (m_nodetag[i] > 0) {
-            FENode& node = dom.Node(i);
+            int nid = dom.NodeIndex(i);
             // for now, set the velocity DOFs to zero
-            for (int k=0; k<3; ++k) {
-                if (m_nodeBCs[i][k] == DOF_OPEN) {
-                    node.set_bc(m_dofW[k], DOF_PRESCRIBED);
-                    node.set(m_dofW[k], 0);
-                }
-            }
-            // prevent dilatation growing out of bounds inside solid domain
-            if (m_nodeBCs[i][3] == DOF_OPEN) {
-                node.set_bc(m_dofEF[0], DOF_PRESCRIBED);
-                node.set(m_dofEF[0], node.get_prev(m_dofEF[0]));
-            }
+            if (m_pbcwx) m_pbcwx->GetNodeSet()->Add(nid);
+            if (m_pbcwy) m_pbcwy->GetNodeSet()->Add(nid);
+            if (m_pbcwz) m_pbcwz->GetNodeSet()->Add(nid);
+            if (m_pbcef) m_pbcef->GetNodeSet()->Add(nid);
         }
     }
+    if (m_pbcwx) { m_pbcwx->Activate(); m_pbcwx->Repair(); }
+    if (m_pbcwy) { m_pbcwy->Activate(); m_pbcwy->Repair(); }
+    if (m_pbcwz) { m_pbcwz->Activate(); m_pbcwz->Repair(); }
+    if (m_pbcef) { m_pbcef->Activate(); m_pbcef->Repair(); }
 
     // prescribe linear constraints on intersected edges
     m_lc.m_LC.clear();

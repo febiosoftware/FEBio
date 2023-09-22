@@ -798,6 +798,13 @@ void FEFluidFSISolver::PrepStep()
         }
     }
     
+    int nnl = fem.NonlinearConstraints();
+    for (int i=0; i<nnl; ++i)
+    {
+        FENLConstraint& nlc = *fem.NonlinearConstraint(i);
+        if (nlc.IsActive()) nlc.PrepStep();
+    }
+
     // apply prescribed velocities
     // we save the prescribed velocity increments in the ui vector
     vector<double>& ui = m_ui;
@@ -823,13 +830,6 @@ void FEFluidFSISolver::PrepStep()
     // initialize rigid bodies
     m_rigidSolver.PrepStep(tp, ui);
     
-    int nnl = fem.NonlinearConstraints();
-    for (int i=0; i<nnl; ++i)
-    {
-        FENLConstraint& nlc = *fem.NonlinearConstraint(i);
-        if (nlc.IsActive()) nlc.PrepStep();
-    }
-
    // initialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
