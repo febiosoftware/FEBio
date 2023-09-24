@@ -66,35 +66,35 @@ jobs:
           path: |
             TestSuite/Verify3/*.log
             TestSuite/Logs*.txt
-  #repo-artifacts:
-  #  name: Upload artifacts to repo
-  #  needs:
-  #    - build # required to get output from the start-runner job
-  #  runs-on: self-hosted
-  #  if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
-  #  steps:
-  #    - name: Checkout
-  #      uses: actions/checkout@v3
-  #      with:
-  #        submodules: 'true'
-  #    - uses: actions/download-artifact@v3
-  #      with:
-  #        name: febio4-${{runner.os}}-${{runner.arch}}
-  #        path: |
-  #          cmbuild
-  #    - name: Configure SSH
-  #      run: |
-  #        ci/common/linux/configure-ssh.sh
-  #      env:
-  #        SSH_USER: ${{ secrets.REPO_USER }}
-  #        SSH_KEY: ${{ secrets.REPO_KEY }}
-  #        SSH_HOST: ${{ secrets.REPO_HOST }}
-  #    - name: Stage Build to Repo
-  #      run: |
-  #        ci/macos/scp-to-repo.sh
-  #    - name: Make Dev Release
-  #      run: |
-  #        ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -l"
+  repo-artifacts:
+    name: Upload artifacts to repo
+    needs:
+      - build # required to get output from the start-runner job
+    runs-on: self-hosted
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - uses: actions/download-artifact@v3
+        with:
+          name: febio4-${{runner.os}}-${{runner.arch}}
+          path: |
+            cmbuild
+      - name: Configure SSH
+        run: |
+          ci/common/linux/configure-ssh.sh
+        env:
+          SSH_USER: ${{ secrets.REPO_USER }}
+          SSH_KEY: ${{ secrets.REPO_KEY }}
+          SSH_HOST: ${{ secrets.REPO_HOST }}
+      - name: Stage Build to Repo
+        run: |
+          ci/macos/scp-to-repo.sh
+      - name: Make Dev Release
+        run: |
+          ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -l"
   publish-to-s3:
     name: Publish to S3
     needs:
