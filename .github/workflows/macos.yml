@@ -82,13 +82,6 @@ jobs:
           name: febio4-${{runner.os}}-${{runner.arch}}
           path: |
             cmbuild
-      - name: Configure SSH
-        run: |
-          ci/common/linux/configure-ssh.sh
-        env:
-          SSH_USER: ${{ secrets.REPO_USER }}
-          SSH_KEY: ${{ secrets.REPO_KEY }}
-          SSH_HOST: ${{ secrets.REPO_HOST }}
       - name: Stage Build to Repo
         run: |
           ci/macos/scp-to-repo.sh
