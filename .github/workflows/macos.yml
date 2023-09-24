@@ -127,7 +127,7 @@ jobs:
       - name: Publish to S3
         env:
           BUCKET_NAME: febio-packages
-          OS: ${{ env.os }}
+          OS: ${{runner.os}}
           REF_NAME: ${{ github.ref_name}}
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
