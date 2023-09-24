@@ -349,7 +349,7 @@ bool FETiedMultiphasicInterface::Init()
                 m_sid.push_back(m_ss.m_sid[is]);
                 m_ssl.push_back(is);
                 m_msl.push_back(im);
-                FESoluteData* sd = FindSoluteData(m_ss.m_sid[is]);
+                FESoluteData* sd = FindSoluteData(m_ss.m_sid[is] + 1);
                 m_sz.push_back(sd->m_z);
             }
         }
@@ -768,7 +768,6 @@ void FETiedMultiphasicInterface::ProjectSurface(FETiedMultiphasicSurface& ss, FE
     FEMesh& mesh = GetFEModel()->GetMesh();
     FESurfaceElement* pme;
     vec3d r;
-    double rs[2];
     
     const int MN = FEElement::MAX_NODES;
     double ps[MN], p1;
@@ -837,7 +836,7 @@ void FETiedMultiphasicInterface::ProjectSurface(FETiedMultiphasicSurface& ss, FE
                     int sid = m_sid[isol];
                     double cm[MN];
                     for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).get(m_dofC + sid);
-                    double c2 = pme->eval(cm, rs[0], rs[1]);
+                    double c2 = pme->eval(cm, pt.m_rs[0], pt.m_rs[1]);
                     pt.m_cg[m_ssl[isol]] = c1[isol] - c2;
                 }
             }

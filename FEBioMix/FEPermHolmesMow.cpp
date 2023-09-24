@@ -46,6 +46,20 @@ FEPermHolmesMow::FEPermHolmesMow(FEModel* pfem) : FEHydraulicPermeability(pfem)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPermHolmesMow::Init()
+{
+	// make sure the ancestor implements the biphasic interface
+	FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
+	if (pbm == nullptr)
+	{
+		feLogError("Parent material needs to be biphasic or multiphasic.");
+		return false;
+	}
+
+	return FEHydraulicPermeability::Init();
+}
+
+//-----------------------------------------------------------------------------
 //! Permeability tensor.
 mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 {

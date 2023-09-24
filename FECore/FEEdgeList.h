@@ -71,6 +71,9 @@ public:
 
 	bool Create(FEElementList& elemList, FEEdgeList& edgeList);
 
+	// Create the element edge list of a domain
+	bool Create(FEDomain& domain, FEEdgeList& edgeList);
+
 	int Edges(int elem) const;
 	const std::vector<int>& EdgeList(int elem) const;
 

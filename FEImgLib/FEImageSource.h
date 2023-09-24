@@ -38,6 +38,11 @@ public:
 	FEImageSource(FEModel* fem);
 
 	virtual bool GetImage3D(Image& im) = 0;
+
+	std::string GetFileName() { return m_file; }
+
+protected:
+	std::string		m_file;
 };
 
 //---------------------------------------------------------------------------
@@ -54,7 +59,6 @@ private:
 	bool Load(const char* szfile, Image& im, Image::ImageFormat fmt, bool endianess = false);
 
 protected:
-	std::string		m_file;
 	int				m_dim[3];
 	int				m_format;
 	bool			m_bend;
@@ -86,7 +90,6 @@ private:
 	bool Load(const char* szfile, Image& im);
 
 private:
-	std::string		m_file;
 
 	DECLARE_FECORE_CLASS();
 };
