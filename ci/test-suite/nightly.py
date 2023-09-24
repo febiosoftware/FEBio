@@ -16,8 +16,8 @@ buildResults["FEBio"] = build("FEBio", FEBIODIR, FEBIOBUILDDIR, FEBIOPATH)
 # updateResults["FEBioStudio"] = update("FEBioStudio", FBSDIR, "develop")
 # buildResults["FEBioStudio"] = build("FEBioStudio", FBSDIR, FBSBUILDDIR, FBSPATH)
 
-if OSNAME == "MACOS":
-    macPostBuild()
+# if OSNAME == "MACOS":
+#     macPostBuild()
 
 updateResults["TestSuite"] = update("TestSuite", TESTDIR)
 

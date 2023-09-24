@@ -1,42 +1,46 @@
-OSNAME = "MACOS"
+import os
+from os import path
 
-NUMCORES = 4
+OSNAME = "LINUX"
+
+NUMCORES = os.cpu_count()
 
 BUILDCOMMAND = ["make", "-j" + str(NUMCORES)]
 CLEANCOMMAND = ["make", "clean"]
 
-FBSDIR = "/Users/mherron/Projects/FEBioStudio/"
-FBSBUILDDIR = FBSDIR + "build/"
-FBSPATH = FBSBUILDDIR + "bin/FEBioStudio.app/Contents/MacOS/FEBioStudio"
-FBSREMOTEDIR = "macOS/stage/FEBioStudio.app/Contents/MacOS"
+FEBIODIR = os.getcwd()
+FEBIOBUILDDIR = path.join(FEBIODIR, "cmbuild")
+FEBIOPATH = path.join(FEBIOBUILDDIR, "bin", "febio4")
+FEBIOUPLOADPATH = FEBIOPATH
 
-FEBIODIR = "/Users/mherron/Projects/FEBio/"
-FEBIOBUILDDIR = FEBIODIR + "cbuild/Release/"
-FEBIOPATH = FEBIOBUILDDIR + "bin/febio3"
-FEBIOUPLOADPATH = FBSBUILDDIR + "bin/FEBioStudio.app/Contents/MacOS/febio3"
-FEBIOREMOTEDIR = "macOS/stage/FEBioStudio.app/Contents/MacOS"
+# FEBIOREMOTEDIR = "Linux/stage/bin"
 
-CHEMDIR = "/Users/mherron/Projects/Plugins/FEBioChem/"
-CHEMBUILDDIR = CHEMDIR + "cbuild/"
-CHEMPATH = CHEMBUILDDIR + "lib/libFEBioChem.dylib"
-CHEMREMOTEDIR = "macOS/stage/FEBioStudio.app/Contents/Frameworks"
+# FBSDIR = "/home/sci/mherron/Projects/FEBioStudio/"
+# FBSBUILDDIR = FBSDIR + "build/"
+# FBSPATH = FBSBUILDDIR + "bin/FEBioStudio"
+# FBSREMOTEDIR = "Linux/stage/bin"
 
-HEATDIR = "/Users/mherron/Projects/Plugins/FEBioHeat/"
-HEATBUILDDIR = HEATDIR + "cbuild/"
-HEATPATH = HEATBUILDDIR + "lib/libFEBioHeat.dylib"
-HEATREMOTEDIR = "macOS/stage/FEBioStudio.app/Contents/Frameworks"
+# CHEMDIR = "/home/sci/mherron/Projects/Plugins/FEBioChem/"
+# CHEMBUILDDIR = CHEMDIR + "cbuild/"
+# CHEMPATH = CHEMBUILDDIR + "lib/libFEBioChem.so"
+# CHEMREMOTEDIR = "Linux/stage/lib"
+#
+# HEATDIR = "/home/sci/mherron/Projects/Plugins/FEBioHeat/"
+# HEATBUILDDIR = HEATDIR + "cbuild/"
+# HEATPATH = HEATBUILDDIR + "lib/libFEBioHeat.so"
+# HEATREMOTEDIR = "Linux/stage/lib"
 
-TESTDIR = "/Users/mherron/Projects/TestSuite/"
-VERIFYDIR = TESTDIR + "Verify3/"
-LOGDIR = TESTDIR + "Logs/"
-WORKINGDIR = "/Users/mherron/scratch/FEBioTests/"
+TESTDIR = path.join(FEBIODIR, "TestSuite/")
+VERIFYDIR = path.join(TESTDIR, "Verify4/")
+LOGDIR = path.join(TESTDIR, "Logs")
+WORKINGDIR = VERIFYDIR
 
-AUTOMATIONDIR = "/Users/mherron/Projects/automation/"
-GOLDSTANDARDS = "macOSGoldStandards.py"
-RELEASELOG = AUTOMATIONDIR + "release.log"
+AUTOMATIONDIR = path.join(FEBIODIR, "ci/test-suite/")
+GOLDSTANDARDS = "linuxGoldStandards.py"
+RELEASELOG = path.join(AUTOMATIONDIR, "release.log")
 
-REMOTESCRIPT = "/root/update2/FEBioStudioDev/makeDevReleaseMacOS.sh"
+# REMOTESCRIPT = "/root/update2/FEBioStudioDev/makeDevReleaseLinux.sh"
 
-pluginPaths = {'heat': HEATPATH, 'chem': CHEMPATH}
+# pluginPaths = {'heat': HEATPATH, 'chem': CHEMPATH}
 
 localExemptTests = []

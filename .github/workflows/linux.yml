@@ -1,8 +1,8 @@
 on:
   #schedule:
   #  - cron: '30 6 * * *' #0630 UTC kick off full build and regression
-  push:
-    branches: [ ci/* ]
+  # push:
+  #   branches: [ ci/* ]
   workflow_dispatch:
     inputs:
       runTests:

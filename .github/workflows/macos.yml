@@ -1,38 +1,61 @@
 on:
+  push:
+    branches: [ ci/* ]
   workflow_dispatch:
 
 jobs:
   build:
-    if: github.event.schedule == '30 6 * * *'
     name: Clone and build
-    runs-on: self-hosted # run the job on the newly created runner
+    runs-on: self-hosted
+    outputs:
+      git_describe: ${{ steps.git-describe.outputs.git_describe }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - id: git-describe
+        run: |
+          echo "git_describe=$(git describe --tags)" >> "$GITHUB_OUTPUT"
       - name: Build
         run: |
-          ci/mac.sh
+          ci/linux/build.sh
+      - name: Create SDK
+        run: |
+          ci/linux/create-febio-sdk.sh
+      - name: Upload SDK
+        uses: actions/upload-artifact@v3
+        with:
+          name: febio4-sdk-${{runner.os}}-${{runner.arch}}
+          path: |
+            febio-sdk
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: febio3-${{runner.os}}-${{runner.arch}}
-          path: cmbuild/bin
+          name: febio4-${{runner.os}}-${{runner.arch}}
+          path: |
+            cmbuild/bin
+            cmbuild/lib
+            !cmbuild/lib/*.a
   tests:
-    if: github.event.schedule == '30 6 * * *'
+    if: ${{inputs.runTests}}
     name: Run test suite
-    runs-on: self-hosted # run the job on the newly created runner
+    needs:
+      - build
+    runs-on: self-hosted
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
       - uses: actions/download-artifact@v3
         with:
-          name: febio3-${{runner.os}}-${{runner.arch}}
-          path: cmbuild/bin
+          name: febio4-${{runner.os}}-${{runner.arch}}
+          path: |
+            cmbuild
       - name: Run test suite
         run: |
-          ci/linux-test.sh
+          ci/linux/test.sh
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -40,3 +63,70 @@ jobs:
           path: |
             TestSuite/Verify3/*.log
             TestSuite/Logs*.txt
+  repo-artifacts:
+    name: Upload artifacts to repo
+    needs:
+      - build # required to get output from the start-runner job
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - uses: actions/download-artifact@v3
+        with:
+          name: febio4-${{runner.os}}-${{runner.arch}}
+          path: |
+            cmbuild
+      - name: Configure SSH
+        run: |
+          ci/common/linux/configure-ssh.sh
+        env:
+          SSH_USER: ${{ secrets.REPO_USER }}
+          SSH_KEY: ${{ secrets.REPO_KEY }}
+          SSH_HOST: ${{ secrets.REPO_HOST }}
+      - name: Stage Build to Repo
+        run: |
+          ci/linux/scp-to-repo.sh
+      - name: Make Dev Release
+        run: |
+          ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -l"
+  publish-to-s3:
+    name: Publish to S3
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Download SDK
+        uses: actions/download-artifact@v3
+        with:
+          name: febio4-sdk-${{runner.os}}-${{runner.arch}}
+          path: |
+            artifacts/febio-sdk
+      - name: Download febio
+        uses: actions/download-artifact@v3
+        with:
+          name: febio4-${{runner.os}}-${{runner.arch}}
+          path: |
+            artifacts/febio
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Publish to S3
+        env:
+          BUCKET_NAME: febio-packages
+          OS: ${{ env.os }}
+          REF_NAME: ${{ github.ref_name}}
+          PACKAGE_NAME: febio
+          GIT_TAG: ${{ needs.build.outputs.git_describe }}
+        run: |
+          ci/linux/publish-to-s3.sh
