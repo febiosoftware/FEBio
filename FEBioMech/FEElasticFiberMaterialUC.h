@@ -82,7 +82,10 @@ class FEElasticFiberMaterialUC_T : public FEElasticFiberMaterialUC
 public: 
 	FEElasticFiberMaterialUC_T(FEModel* fem) : FEElasticFiberMaterialUC(fem), m_fib(fem) {}
 
-	bool Init() override { return m_fib.Init(); }
+	bool Init() override {
+		if (m_fib.Init() == false) return false;
+		return FEElasticFiberMaterialUC::Init();
+	}
 	bool Validate() override { return m_fib.Validate(); }
 	FEMaterialPointData* CreateMaterialPointData() override
 	{
