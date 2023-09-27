@@ -1,24 +1,33 @@
 on:
-  workflow_dispatch:
-    inputs:
-      runTests:
-        description: "Run tests?"
-        required: false
-        type: boolean
-        default: false
-
   workflow_call:
     inputs:
+      aws-region:
+        required: false
+        default: us-east-1
+      os:
+        required: false
+        default: macOS
+      arch:
+        required: false
+        default: X64
       runTests:
         description: "Run tests?"
         required: false
         type: boolean
         default: false
-
-env:
-  AWS_REGION: us-east-1
-  OS: macOS
-  ARCH: X64
+      secrets:
+        ssh-user:
+          required: true
+        ssh-key:
+          required: true
+        ssh-host:
+          required: true
+        aws-access-key-id:
+          required: true
+        aws-secret-access-key:
+          required: true
+        aws-region:
+          required: true
 
 jobs:
   build:
@@ -93,16 +102,16 @@ jobs:
           submodules: 'true'
       - uses: actions/download-artifact@v3
         with:
-          name: febio4-${{env.OS}}-${{env.ARCH}}
+          name: febio4-${{inputs.os}}-${{inputs.arch}}
           path: |
             cmbuild
       - name: Configure SSH
         run: |
           ci/common/linux/configure-ssh.sh
         env:
-          SSH_USER: ${{ secrets.REPO_USER }}
-          SSH_KEY: ${{ secrets.REPO_KEY }}
-          SSH_HOST: ${{ secrets.REPO_HOST }}
+          SSH_USER: ${{ secrets.ssh-user }}
+          SSH_KEY: ${{ secrets.ssh-key }}
+          SSH_HOST: ${{ secrets.ssh-host }}
       - name: Stage Build to Repo
         run: |
           ci/macos/scp-to-repo.sh
@@ -123,25 +132,25 @@ jobs:
       - name: Download SDK
         uses: actions/download-artifact@v3
         with:
-          name: febio4-sdk-${{env.OS}}-${{env.ARCH}}
+          name: febio4-sdk-${{inputs.os}}-${{inputs.arch}}
           path: |
             artifacts/febio-sdk
       - name: Download febio
         uses: actions/download-artifact@v3
         with:
-          name: febio4-${{env.OS}}-${{env.ARCH}}
+          name: febio4-${{inputs.os}}-${{inputs.arch}}
           path: |
             artifacts/febio
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.aws_access_key_id }}
+          aws-secret-access-key: ${{ secrets.aws_secret_access_key }}
+          aws-region: ${{ inputs.aws-region }}
       - name: Publish to S3
         env:
           BUCKET_NAME: febio-packages
-          OS: ${{env.OS}}
+          OS: ${{inputs.os}}
           REF_NAME: ${{ github.ref_name}}
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}

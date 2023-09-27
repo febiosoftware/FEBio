@@ -12,4 +12,11 @@ jobs:
   call_workflow:
     uses: febiosoftware/FEBio/.github/workflows/macos-reusable.yml@ci/reusable-workflow-macos
     with:
-      runTests: false
+      runTests: ${{inputs.runTests}}
+    secrets:
+      ssh-user: ${{ secrets.REPO_USER }}
+      ssh-key:  ${{ secrets.REPO_KEY }}
+      ssh-host: ${{ secrets.REPO_HOST }}
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
