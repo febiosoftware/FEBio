@@ -26,16 +26,17 @@ runs:
   using: "composite"
   steps:
     - name: Build
+      shell: bash
       run: |
         echo "${{ inputs.script }}"
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ inputs.package-name }}-${{inputs.os}}-${{inputs.arch}}
-        path: |
-          cmbuild/bin
-          cmbuild/lib
-          !cmbuild/lib/*.a
+        #- name: Upload Artifacts
+        #  uses: actions/upload-artifact@v3
+        #  with:
+        #    name: ${{ inputs.package-name }}-${{inputs.os}}-${{inputs.arch}}
+        #    path: |
+        #      cmbuild/bin
+        #      cmbuild/lib
+        #      !cmbuild/lib/*.a
 #- name: Create and upload SDK
 #  if: ${{ inputs.package-sdk }}
 #  uses: actions/creates-sdk.yml

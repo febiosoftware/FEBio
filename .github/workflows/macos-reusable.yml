@@ -38,6 +38,7 @@ on:
         required: true
 
 jobs:
+
   build:
     name: Clone and build
     runs-on: self-hosted
@@ -52,7 +53,7 @@ jobs:
         run: |
           echo "git_describe=$(git describe --tags)" >> "$GITHUB_OUTPUT"
       - name: Build
-        uses: ./.github/actions/build.yml
+        uses: ./.github/actions/build
         with:
           package-name: ${{ inputs.package-name }}
           script: ci/${{inputs.os}}/build.sh
