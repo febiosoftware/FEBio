@@ -28,7 +28,7 @@ runs:
     - name: Build
       shell: bash
       run: |
-        echo "${{ inputs.script }}"
+        ${{ inputs.script }}
         #- name: Upload Artifacts
         #  uses: actions/upload-artifact@v3
         #  with:
