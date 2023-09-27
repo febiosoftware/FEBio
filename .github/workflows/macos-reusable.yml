@@ -1,6 +1,4 @@
 on:
-  push:
-    branches: [ ci/* ]
   workflow_dispatch:
     inputs:
       runTests:
@@ -21,6 +19,7 @@ env:
   AWS_REGION: us-east-1
   OS: macOS
   ARCH: X64
+
 jobs:
   build:
     name: Clone and build

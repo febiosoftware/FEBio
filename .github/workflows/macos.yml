@@ -10,6 +10,6 @@ on:
         default: false
 jobs:
   call_workflow:
-    uses: ./github/workflows/macos-reusable.yml@ci/reusable-workflow-macos
+    uses: febiosoftware/FEBio/.github/workflows/macos-reusable.yml@ci/reusable-workflow-macos
     with:
       runTests: false
