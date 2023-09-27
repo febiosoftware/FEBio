@@ -10,7 +10,7 @@ on:
         default: false
 jobs:
   call_workflow:
-    uses: febiosoftware/FEBio/.github/workflows/macos-reusable.yml@ci/reusable-workflow-macos
+    uses: ./.github/workflows/macos-reusable.yml
     with:
       runTests: ${{inputs.runTests}}
     secrets:

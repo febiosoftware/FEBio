@@ -2,32 +2,33 @@ on:
   workflow_call:
     inputs:
       aws-region:
-        required: false
         default: us-east-1
+        required: false
+        type: string
       os:
-        required: false
         default: macOS
-      arch:
         required: false
+        type: string
+      arch:
         default: X64
+        required: false
+        type: string
       runTests:
         description: "Run tests?"
         required: false
         type: boolean
         default: false
-      secrets:
-        ssh-user:
-          required: true
-        ssh-key:
-          required: true
-        ssh-host:
-          required: true
-        aws-access-key-id:
-          required: true
-        aws-secret-access-key:
-          required: true
-        aws-region:
-          required: true
+    secrets:
+      ssh-user:
+        required: true
+      ssh-key:
+        required: true
+      ssh-host:
+        required: true
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
 
 jobs:
   build:
