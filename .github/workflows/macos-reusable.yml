@@ -56,6 +56,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           package-name: ${{ inputs.package-name }}
+          package-sdk: ${{ inputs.package-sdk }}
           script: ci/${{inputs.os}}/build.sh
           os: ${{inputs.os}}
           arch: ${{inputs.arch}}
