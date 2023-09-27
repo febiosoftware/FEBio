@@ -51,13 +51,13 @@ jobs:
       - id: git-describe
         run: |
           echo "git_describe=$(git describe --tags)" >> "$GITHUB_OUTPUT"
-          #      - name: Build
-          #        uses: febiosoftware/FEBio/.github/actions/build.yml
-          #        with:
-          #          package-name: ${{ inputs.package-name }} 
-          #          script: ci/${{inputs.os}}/build.sh
-          #          os: ${{inputs.os}}
-          #          arch: ${{inputs.arch}}
+      - name: Build
+        uses: ./.github/actions/build.yml
+        with:
+          package-name: ${{ inputs.package-name }}
+          script: ci/${{inputs.os}}/build.sh
+          os: ${{inputs.os}}
+          arch: ${{inputs.arch}}
 
 # tests:
 #   if: ${{inputs.runTests}}
