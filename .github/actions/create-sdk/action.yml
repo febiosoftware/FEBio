@@ -8,10 +8,6 @@ inputs:
   script:
     required: true
     type: string
-  sdk-name:
-    default: false
-    required: false
-    type: boolean
   os:
     required: true
     type: string
@@ -23,6 +19,7 @@ runs:
   using: "composite"
   steps:
     - name: Create SDK
+      shell: bash
       run: |
         ${{ inputs.script }}
     - name: Upload SDK
@@ -30,4 +27,4 @@ runs:
       with:
         name: ${{ inputs.package-name }}-sdk-${{inputs.os}}-${{inputs.arch}}
         path: |
-          ${inputs.sdk-name}}
+          ${{ inputs.package-name }}-sdk

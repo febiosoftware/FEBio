@@ -14,6 +14,7 @@ jobs:
     with:
       runTests: ${{ inputs.runTests && true || false }}
       package-name: febio4
+      package-sdk: true
     secrets:
       ssh-user: ${{ secrets.REPO_USER }}
       ssh-key:  ${{ secrets.REPO_KEY }}

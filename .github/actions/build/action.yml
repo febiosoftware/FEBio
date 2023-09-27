@@ -29,17 +29,19 @@ runs:
       shell: bash
       run: |
         ${{ inputs.script }}
-        #- name: Upload Artifacts
-        #  uses: actions/upload-artifact@v3
-        #  with:
-        #    name: ${{ inputs.package-name }}-${{inputs.os}}-${{inputs.arch}}
-        #    path: |
-        #      cmbuild/bin
-        #      cmbuild/lib
-        #      !cmbuild/lib/*.a
-#- name: Create and upload SDK
-#  if: ${{ inputs.package-sdk }}
-#  uses: actions/creates-sdk.yml
-#  with:
-#    package-name: ${{ inputs.package-name }}
-#    script: ci/${{inputs.os}}/create-sdk.sh
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.package-name }}-${{inputs.os}}-${{inputs.arch}}
+        path: |
+          cmbuild/bin
+          cmbuild/lib
+          !cmbuild/lib/*.a
+    - name: Create and upload SDK
+      if: ${{ inputs.package-sdk }}
+      uses: ./.github/actions/create-sdk
+      with:
+        package-name: ${{ inputs.package-name }}
+        script: ci/${{inputs.os}}/create-sdk.sh
+        os: ${{inputs.os}}
+        arch: ${{inputs.arch}}
