@@ -1,0 +1,33 @@
+name: 'SDK'
+description: 'Creates SDK and Uploads artifacts'
+inputs:
+  package-name:
+    default: febio
+    required: false
+    type: string
+  script:
+    required: true
+    type: string
+  sdk-name:
+    default: false
+    required: false
+    type: boolean
+  os:
+    required: true
+    type: string
+  arch:
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create SDK
+      run: |
+        ${{ inputs.script }}
+    - name: Upload SDK
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.package-name }}-sdk-${{inputs.os}}-${{inputs.arch}}
+        path: |
+          ${inputs.sdk-name}}

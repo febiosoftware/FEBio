@@ -1,0 +1,44 @@
+name: 'Build'
+description: 'Builds project and uploads artifacts'
+inputs:
+  package-name:
+    required: true
+    type: string
+  package-sdk:
+    default: false
+    required: false
+    type: boolean
+  script:
+    required: true
+    type: string
+  sdk-name:
+    default: false
+    required: false
+    type: boolean
+  os:
+    required: true
+    type: string
+  arch:
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build
+      run: |
+        echo "${{ inputs.script }}"
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.package-name }}-${{inputs.os}}-${{inputs.arch}}
+        path: |
+          cmbuild/bin
+          cmbuild/lib
+          !cmbuild/lib/*.a
+#- name: Create and upload SDK
+#  if: ${{ inputs.package-sdk }}
+#  uses: actions/creates-sdk.yml
+#  with:
+#    package-name: ${{ inputs.package-name }}
+#    script: ci/${{inputs.os}}/create-sdk.sh

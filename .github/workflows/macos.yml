@@ -10,9 +10,10 @@ on:
         default: false
 jobs:
   call_workflow:
-    uses: ./.github/workflows/macos-reusable.yml
+    uses: febiosoftware/FEBio/.github/workflows/macos-reusable.yml@ci/reusable-workflow-macos
     with:
       runTests: ${{ inputs.runTests && true || false }}
+      package-name: febio4
     secrets:
       ssh-user: ${{ secrets.REPO_USER }}
       ssh-key:  ${{ secrets.REPO_KEY }}
