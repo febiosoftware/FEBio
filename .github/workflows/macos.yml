@@ -12,7 +12,7 @@ jobs:
   call_workflow:
     uses: ./.github/workflows/macos-reusable.yml
     with:
-      runTests: ${{inputs.runTests}}
+      runTests: ${{ inputs.runTests && true || false }}
     secrets:
       ssh-user: ${{ secrets.REPO_USER }}
       ssh-key:  ${{ secrets.REPO_KEY }}
