@@ -103,7 +103,7 @@ jobs:
           SSH_HOST: ${{ secrets.ssh-host }}
       - name: Stage Build to Repo
         run: |
-          ci/macos/scp-to-repo.sh
+          ci/macOS/scp-to-repo.sh
       - name: Make Dev Release
         run: |
           ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -l"
@@ -144,4 +144,4 @@ jobs:
           PACKAGE_NAME: febio
           GIT_TAG: ${{ needs.build.outputs.git_describe }}
         run: |
-          ci/macos/publish-to-s3.sh
+          ci/macOS/publish-to-s3.sh
