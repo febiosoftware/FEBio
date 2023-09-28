@@ -61,7 +61,7 @@ jobs:
           os: ${{inputs.os}}
           arch: ${{inputs.arch}}
   tests:
-    if: ${{inputs.runTests}}
+    #if: ${{inputs.runTests}}
     name: Run test suite
     needs:
       - build

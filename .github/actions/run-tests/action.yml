@@ -20,6 +20,7 @@ runs:
         path: |
           cmbuild
     - name: Run test suite
+      shell: bash
       run: |
         ci/${{inputs.os}}/test.sh
     - name: Upload Artifacts
