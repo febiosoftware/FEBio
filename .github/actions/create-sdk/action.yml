@@ -20,6 +20,8 @@ runs:
   steps:
     - name: Create SDK
       shell: bash
+      env:
+        TARGET_DIR: ${{ inputs.package-name }}-sdk
       run: |
         ${{ inputs.script }}
     - name: Upload SDK
