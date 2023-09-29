@@ -1,6 +1,9 @@
 name: 'Build'
 description: 'Builds project and uploads artifacts'
 inputs:
+  shell:
+    require: true
+    type: string
   package-name:
     required: true
     type: string
@@ -26,7 +29,7 @@ runs:
   using: "composite"
   steps:
     - name: Build
-      shell: bash
+      shell: ${{inputs.shell}}
       run: |
         ${{ inputs.script }}
     - name: Upload Artifacts
@@ -41,6 +44,7 @@ runs:
       if: ${{ inputs.package-sdk }}
       uses: ./.github/actions/create-sdk
       with:
+        shell: ${{ inputs.shell }}
         package-name: ${{ inputs.package-name }}
         script: ci/${{inputs.os}}/create-sdk.sh
         os: ${{inputs.os}}

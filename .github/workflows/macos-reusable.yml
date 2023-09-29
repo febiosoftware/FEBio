@@ -1,6 +1,10 @@
 on:
   workflow_call:
     inputs:
+      shell:
+        require: false
+        default: bash
+        type: string
       package-name:
         required: true
         type: string
@@ -54,6 +58,7 @@ jobs:
       - name: Build
         uses: ./.github/actions/build
         with:
+          shell: ${{ inputs.shell }}
           package-name: ${{ inputs.package-name }}
           package-sdk: ${{ inputs.package-sdk }}
           script: ci/${{inputs.os}}/build.sh
@@ -73,6 +78,7 @@ jobs:
       - name: Tests
         uses: ./.github/actions/run-tests
         with:
+          shell: ${{ inputs.shell }}
           package-name: ${{ inputs.package-name }}
           os: ${{inputs.os}}
           arch: ${{inputs.arch}}
@@ -90,6 +96,7 @@ jobs:
       - name: Repo Artifacts
         uses: ./.github/actions/repo-artifacts
         with:
+          shell: ${{ inputs.shell }}
           package-name: ${{ inputs.package-name }}
           os: ${{inputs.os}}
           arch: ${{inputs.arch}}

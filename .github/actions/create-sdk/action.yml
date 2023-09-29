@@ -1,6 +1,9 @@
 name: 'SDK'
 description: 'Creates SDK and Uploads artifacts'
 inputs:
+  shell:
+    require: true
+    type: string
   package-name:
     default: febio
     required: false
@@ -19,7 +22,7 @@ runs:
   using: "composite"
   steps:
     - name: Create SDK
-      shell: bash
+      shell: ${{ inputs.shell }}
       env:
         TARGET_DIR: ${{ inputs.package-name }}-sdk
       run: |
