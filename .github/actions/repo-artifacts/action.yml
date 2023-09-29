@@ -13,32 +13,37 @@ inputs:
   arch:
     required: true
     type: string
-  secrets:
-    ssh-user:
-      required: true
-    ssh-key:
-      required: true
-    ssh-host:
-      required: true
+  ssh-user:
+    required: true
+    type: string
+  ssh-key:
+    required: true
+    type: string
+  ssh-host:
+    required: true
+    type: string
+
 runs:
   using: "composite"
   steps:
     - uses: actions/download-artifact@v3
-      shell: ${{inputs.shell}}
       with:
         name: ${{inputs.package-name}}-${{inputs.os}}-${{inputs.arch}}
         path: |
           cmbuild
     - name: Configure SSH
+      shell: ${{inputs.shell}}
       run: |
         ci/common/linux/configure-ssh.sh
       env:
-        SSH_USER: ${{ secrets.ssh-user }}
-        SSH_KEY: ${{ secrets.ssh-key }}
-        SSH_HOST: ${{ secrets.ssh-host }}
+        SSH_USER: ${{ inputs.ssh-user }}
+        SSH_KEY: ${{ inputs.ssh-key }}
+        SSH_HOST: ${{ inputs.ssh-host }}
     - name: Stage Build to Repo
+      shell: ${{inputs.shell}}
       run: |
         ci/${{inputs.os}}/scp-to-repo.sh
     - name: Make Dev Release
+      shell: ${{inputs.shell}}
       run: |
         ssh repo "python3 update2/FEBioStudio2Dev/makeDevRelease.py -l"

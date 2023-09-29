@@ -96,6 +96,9 @@ jobs:
       - name: Repo Artifacts
         uses: ./.github/actions/repo-artifacts
         with:
+          ssh-user: ${{ secrets.ssh-user }}
+          ssh-key: ${{ secrets.ssh-key }}
+          ssh-host: ${{ secrets.ssh-host }}
           shell: ${{ inputs.shell }}
           package-name: ${{ inputs.package-name }}
           os: ${{inputs.os}}
