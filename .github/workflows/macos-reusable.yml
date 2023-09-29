@@ -2,7 +2,7 @@ on:
   workflow_call:
     inputs:
       shell:
-        require: false
+        required: false
         default: bash
         type: string
       package-name:
@@ -82,25 +82,3 @@ jobs:
           package-name: ${{ inputs.package-name }}
           os: ${{inputs.os}}
           arch: ${{inputs.arch}}
-  repo-artifacts:
-    name: Upload artifacts to repo
-    needs:
-      - build # required to get output from the start-runner job
-    runs-on: ubuntu-latest
-    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: 'true'
-      - name: Repo Artifacts
-        uses: ./.github/actions/repo-artifacts
-        with:
-          shell: ${{ inputs.shell }}
-          package-name: ${{ inputs.package-name }}
-          os: ${{inputs.os}}
-          arch: ${{inputs.arch}}
-        secrets:
-          ssh-user: ${{ secrets.REPO_USER }}
-          ssh-key:  ${{ secrets.REPO_KEY }}
-          ssh-host: ${{ secrets.REPO_HOST }}
