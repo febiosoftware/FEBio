@@ -103,3 +103,26 @@ jobs:
           package-name: ${{ inputs.package-name }}
           os: ${{inputs.os}}
           arch: ${{inputs.arch}}
+  publish-to-s3:
+    name: Publish to S3
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Publish To S3
+        uses: ./.github/actions/publish-to-s3
+        with:
+          shell: ${{ inputs.shell }}
+          package-name: ${{ inputs.package-name }}
+          package-sdk: ${{ inputs.package-sdk }}
+          os: ${{inputs.os}}
+          arch: ${{inputs.arch}}
+          git-tag: ${{ needs.build.outputs.git_describe }}
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: ${{ inputs.aws-region }}
