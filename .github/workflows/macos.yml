@@ -15,9 +15,4 @@ jobs:
       runTests: ${{ inputs.runTests && true || false }}
       package-name: febio4
       package-sdk: true
-    secrets:
-      ssh-user: ${{ secrets.REPO_USER }}
-      ssh-key:  ${{ secrets.REPO_KEY }}
-      ssh-host: ${{ secrets.REPO_HOST }}
-      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    secrets: inherit
