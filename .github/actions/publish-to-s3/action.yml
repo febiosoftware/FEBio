@@ -39,7 +39,7 @@ runs:
       with:
         name: ${{inputs.package-name}}-sdk-${{inputs.os}}-${{inputs.arch}}
         path: |
-          artifacts/febio-sdk
+          artifacts/${{inputs.package-name}}-sdk
     - name: Download ${{inputs.package-name}}
       uses: actions/download-artifact@v3
       with:
@@ -59,6 +59,6 @@ runs:
         OS: ${{inputs.os}}
         REF_NAME: ${{ github.ref_name}}
         PACKAGE_NAME: ${{inputs.package-name}}
-        GIT_TAG: ${{ inputs.git_tag }}
+        GIT_TAG: ${{ inputs.git-tag }}
       run: |
         ci/${{inputs.os}}/publish-to-s3.sh
