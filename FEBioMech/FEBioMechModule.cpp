@@ -621,7 +621,7 @@ void FEBioMech::InitModule()
 
 	REGISTER_FECORE_CLASS(FEGenericBodyForce, "body force");
 	REGISTER_FECORE_CLASS(FECentrifugalBodyForce, "centrifugal");
-	REGISTER_FECORE_CLASS(FEPointBodyForce, "point");
+	REGISTER_FECORE_CLASS(FEPointBodyForce, "point", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FESurfaceAttractionBodyForce, "surface attraction");
 	REGISTER_FECORE_CLASS(FEMassDamping, "mass damping");
 
