@@ -55,7 +55,7 @@ runs:
     - name: Publish to S3
       shell: ${{inputs.shell}}
       env:
-        BUCKET_NAME: ${{inputs.package-name}}-packages
+        BUCKET_NAME: febio-packages
         OS: ${{inputs.os}}
         REF_NAME: ${{ github.ref_name}}
         PACKAGE_NAME: ${{inputs.package-name}}
