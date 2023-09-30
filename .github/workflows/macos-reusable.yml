@@ -114,6 +114,6 @@ jobs:
           os: ${{inputs.os}}
           arch: ${{inputs.arch}}
           git-tag: ${{ needs.build.outputs.git_describe }}
-          aws-access-key-id: ${{ secrets.aws-access-key-id }}
-          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ inputs.aws-region }}
