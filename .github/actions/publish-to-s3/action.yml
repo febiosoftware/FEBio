@@ -33,10 +33,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        submodules: 'true'
     - name: Download SDK
       if: ${{ inputs.package-sdk }}
       uses: actions/download-artifact@v3
@@ -44,25 +40,25 @@ runs:
         name: ${{inputs.package-name}}-sdk-${{inputs.os}}-${{inputs.arch}}
         path: |
           artifacts/febio-sdk
-    - name: Download febio
+    - name: Download ${{inputs.package-name}}
       uses: actions/download-artifact@v3
       with:
         name: ${{inputs.package-name}}-${{inputs.os}}-${{inputs.arch}}
         path: |
-          artifacts/febio
+          artifacts/${{inputs.package-name}}
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
-        aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: ${{ inputs.aws-region }}
     - name: Publish to S3
       shell: ${{inputs.shell}}
       env:
-        BUCKET_NAME: ${{input.package-name}-packages
+        BUCKET_NAME: ${{inputs.package-name}}-packages
         OS: ${{inputs.os}}
         REF_NAME: ${{ github.ref_name}}
-        PACKAGE_NAME: febio
+        PACKAGE_NAME: ${{inputs.package-name}}
         GIT_TAG: ${{ inputs.git_tag }}
       run: |
         ci/${{inputs.os}}/publish-to-s3.sh
