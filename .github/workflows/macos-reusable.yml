@@ -53,8 +53,9 @@ jobs:
         with:
           fetch-depth: 0
       - id: git-describe
-        run: |
-          echo "git_describe=$(git describe --tags)" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/git-describe
+        with:
+          shell: ${{ inputs.shell }}
       - name: Build
         uses: ./.github/actions/build
         with:
