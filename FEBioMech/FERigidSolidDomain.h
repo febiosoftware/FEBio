@@ -61,6 +61,8 @@ public:
 	// update domain data
 	void Update(const FETimeInfo& tp) override;
 
+	void BodyForce(FEGlobalVector& R, FEBodyForce& BF) override;
+
 public:
 	// calculate contribution of MOI for this domain
 	mat3d CalculateMOI();

@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FERigidSolidDomain.h"
 #include "FERigidMaterial.h"
 #include <FECore/FEMesh.h>
+#include "FEBodyForce.h"
 
 //-----------------------------------------------------------------------------
 FERigidSolidDomain::FERigidSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}
@@ -215,4 +216,32 @@ vec3d FERigidSolidDomain::CalculateCOM()
 	}
 
 	return rc;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
+{
+	// define some parameters that will be passed to lambda
+	FEBodyForce* bodyForce = &BF;
+
+	// evaluate the residual contribution
+	LoadVector(R, m_dofU, [=](FEMaterialPoint& mp, int node_a, std::vector<double>& fa) {
+
+		// evaluate density
+		double density = m_pMat->Density(mp);
+
+		// get the force
+		vec3d f = bodyForce->force(mp);
+
+		// get element shape functions
+		double* H = mp.m_shape;
+
+		// get the initial Jacobian
+		double J0 = mp.m_J0;
+
+		// set integrand
+		fa[0] = -H[node_a] * density * f.x * J0;
+		fa[1] = -H[node_a] * density * f.y * J0;
+		fa[2] = -H[node_a] * density * f.z * J0;
+	});
 }

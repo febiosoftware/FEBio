@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/sys.h>
 #include "FEBioMech.h"
 #include <FECore/FELinearSystem.h>
+#include "FEResidualVector.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -256,6 +257,9 @@ void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 	// TODO: a remaining issue here is that dofU does not consider the shell displacement
 	// dofs for interface nodes (see UnpackLM). Is that an issue?
 
+	FEResidualVector& RHS = dynamic_cast<FEResidualVector&>(R);
+	RHS.m_assembleRigid = false;
+
 	// evaluate the residual contribution
 	LoadVector(R, m_dofU, [=](FEMaterialPoint& mp, int node_a, std::vector<double>& fa) {
 
@@ -276,6 +280,8 @@ void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 		fa[1] = -H[node_a] * density* f.y * J0;
 		fa[2] = -H[node_a] * density* f.z * J0;
 	});
+
+	RHS.m_assembleRigid = true;
 }
 
 //-----------------------------------------------------------------------------

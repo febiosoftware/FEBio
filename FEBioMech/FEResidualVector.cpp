@@ -87,7 +87,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
         
         // If there are rigid bodies we need to look for rigid dofs
 		FEMechModel* fem = dynamic_cast<FEMechModel*>(&m_fem);
-        if (fem && (fem->RigidBodies() > 0))
+        if (fem && (fem->RigidBodies() > 0) && m_assembleRigid)
         {
             int *lm;
             for (i=0; i<ndof; i+=ndn)
