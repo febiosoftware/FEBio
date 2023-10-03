@@ -51,7 +51,4 @@ public:
 
 	//! Assemble into this global vector
 	void Assemble(int node, int dof, double f) override;
-
-public:
-	bool	m_assembleRigid = true;
 };
