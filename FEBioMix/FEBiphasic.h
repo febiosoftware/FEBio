@@ -88,6 +88,8 @@ public:
 
 	//! solid referential volume fraction
 	virtual double SolidReferentialVolumeFraction(FEMaterialPoint& pt) { return 0.0; };
+    
+    virtual double TangentSRVFStrain(FEMaterialPoint& pt) { return 0.0; }
 
 	// TODO: This is a bit of a hack to get the fluid pressure. 
 	virtual double GetActualFluidPressure(const FEMaterialPoint& pt) { return 0.0; }
