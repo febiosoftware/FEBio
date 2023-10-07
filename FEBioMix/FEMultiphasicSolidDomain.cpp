@@ -801,7 +801,7 @@ void FEMultiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector
             fe[ndpn*i+3] -= dt*(w*gradN + H[i]*phiwhat)*detJt;
             for (isol=0; isol<nsol; ++isol)
                 fe[ndpn*i+4+isol] -= dt*(gradN*(j[isol]+je*m_pMat->m_penalty)
-                                         + H[i]*(chat[isol] - (phiw*spt.m_ca[isol] - spt.m_crp[isol]/pt.m_J)/dt)
+                                         + H[i]*phiw*chat[isol]
                                          )*detJt;
         }
     }
