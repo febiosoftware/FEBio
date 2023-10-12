@@ -57743,7 +57743,7 @@ This example defines a thin soft tissue material where fibers are distributed
 \end_layout
 
 \begin_layout Subsubsection
-isotropic Lee-Sacks uncoupled
+Isotropic Lee-Sacks uncoupled
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Kamensky-uncoupled"
@@ -58017,6 +58017,164 @@ isotropic Lee-Sacks
 
 \begin_layout LyX-Code
   <c2>9.046</c2>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Subsubsection
+Yeoh Material
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Yeoh-Material"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material implements a Yeoh material, as presented online (https://en.wikiped
+ia.org/wiki/Yeoh_hyperelastic_model).
+ The material formulation is selected by setting the type attribute to "Yeoh".
+ It defines the following parameters: 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="3in">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<c1>...<c6>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Elastic moduli of Yeoh material (up to 6)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bulk modulus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The strain-energy density function for this material combines a neo-Hookean
+ matrix with a Fung-type exponential term, and is defined as follows.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi=\sum_{i=1}^{6}c_{i}\left(\tilde{I}_{1}-3\right)^{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="material1" type="Yeoh">
+\end_layout
+
+\begin_layout LyX-Code
+  <k>100</k>
+\end_layout
+
+\begin_layout LyX-Code
+  <c1>0.75</c0>
+\end_layout
+
+\begin_layout LyX-Code
+  <c1>-0.04</c1>
+\end_layout
+
+\begin_layout LyX-Code
+  <c2>0.08</c2>
 \end_layout
 
 \begin_layout LyX-Code
@@ -66306,7 +66464,7 @@ The strain-energy function is given by the following expression.
  
 \begin_inset Formula 
 \[
-W=c_{1}\left(I_{1}-3\right)+c_{2}\left(I_{2}-3\right)-2\left(c_{1}+2c_{2}\right)\ln J+\frac{\lambda}{2}\left(\ln J\right)^{2}
+W=c_{1}\left(I_{1}-3\right)+c_{2}\left(I_{2}-3\right)-2\left(c_{1}+2c_{2}\right)\ln J+\frac{k}{2}\left(\ln J\right)^{2}
 \]
 
 \end_inset

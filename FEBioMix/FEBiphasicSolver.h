@@ -75,6 +75,12 @@ public:
 	//! calculates the global stiffness matrix (overridden from FESolidSolver2)
 	bool StiffnessMatrix() override;
 
+    //! Internal forces
+    void InternalForces(FEGlobalVector& R);
+    
+    //! external forces
+    void ExternalForces(FEGlobalVector& R);
+
 protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
