@@ -27,34 +27,33 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBodyForce.h"
-#include <FECore/FESolidElement.h>
+#include "FEUncoupledMaterial.h"
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
-class FEBIOMECH_API FEPointBodyForce : public FEBodyForce
+//! Yeoh material
+
+class FEYeoh : public FEUncoupledMaterial
 {
 public:
-	FEPointBodyForce(FEModel* pfem);
-
-	vec3d force(FEMaterialPoint& mp) override;
-    double divforce(FEMaterialPoint& mp) override;
-	mat3ds stiffness(FEMaterialPoint& mp) override;
-
-	void Serialize(DumpStream& ar) override;
-
-	bool Init() override;
-	void Update() override;
+    enum { MAX_TERMS = 6 };
 
 public:
-	double	m_a, m_b;           //!< coefficients of exponential decay of body force
-	vec3d	m_rc;               //!< center point of body force
-	
-	int		m_inode;            //!< node number of center of body force, or -1 if not a node
+	FEYeoh(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
-	bool	m_brigid;           //!< flag if center point is located within a rigid body
+public:
+	FEParamDouble	m_c[MAX_TERMS];	//!< Yeoh coefficients
 
-	FESolidElement* m_pel;		//!< element in which point m_r0 lies
-	double			m_rs[3];	//!< isoparametric coordinates
+public:
+	//! calculate deviatoric stress at material point
+	mat3ds DevStress(FEMaterialPoint& pt) override;
 
+	//! calculate deviatoric tangent stiffness at material point
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
+
+	//! calculate deviatoric strain energy density
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
+    
+	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };

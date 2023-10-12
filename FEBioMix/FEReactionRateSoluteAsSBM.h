@@ -27,34 +27,25 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBodyForce.h"
-#include <FECore/FESolidElement.h>
+#include "FEChemicalReaction.h"
 
-//-----------------------------------------------------------------------------
-class FEBIOMECH_API FEPointBodyForce : public FEBodyForce
+class FEBIOMIX_API FEReactionRateSoluteAsSBM : public FEReactionRate
 {
 public:
-	FEPointBodyForce(FEModel* pfem);
-
-	vec3d force(FEMaterialPoint& mp) override;
-    double divforce(FEMaterialPoint& mp) override;
-	mat3ds stiffness(FEMaterialPoint& mp) override;
-
-	void Serialize(DumpStream& ar) override;
-
-	bool Init() override;
-	void Update() override;
-
-public:
-	double	m_a, m_b;           //!< coefficients of exponential decay of body force
-	vec3d	m_rc;               //!< center point of body force
+	//! constructor
+    FEReactionRateSoluteAsSBM(FEModel* pfem);
 	
-	int		m_inode;            //!< node number of center of body force, or -1 if not a node
-
-	bool	m_brigid;           //!< flag if center point is located within a rigid body
-
-	FESolidElement* m_pel;		//!< element in which point m_r0 lies
-	double			m_rs[3];	//!< isoparametric coordinates
-
-	DECLARE_FECORE_CLASS();
+	//! reaction rate at material point
+	double ReactionRate(FEMaterialPoint& pt) override;
+	
+	//! tangent of reaction rate with strain at material point
+	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
+	
+	//! tangent of reaction rate with effective fluid pressure at material point
+	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+	
+public:
+	FEParamDouble   m_k0;					//!< reaction rate constant
+	
+	DECLARE_FECORE_CLASS();	
 };

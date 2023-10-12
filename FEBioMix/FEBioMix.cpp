@@ -61,6 +61,7 @@ SOFTWARE.*/
 #include "FEReactionRateHuiskes.h"
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
+#include "FEReactionRateSoluteAsSBM.h"
 #include "FEMembraneReactionRateConst.h"
 #include "FEMembraneReactionRateIonChannel.h"
 #include "FEMembraneReactionRateVoltageGated.h"
@@ -453,6 +454,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  , "Huiskes reaction rate"     );
 	REGISTER_FECORE_CLASS(FEReactionRateNims		    	  , "Nims reaction rate"        );
 	REGISTER_FECORE_CLASS(FEReactionRateExpSED                , "exp-sed reaction rate"     );
+    REGISTER_FECORE_CLASS(FEReactionRateSoluteAsSBM           , "solute-as-sbm reaction rate");
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateConst         , "membrane constant reaction rate");
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateIonChannel    , "membrane ion channel reaction rate");
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateVoltageGated  , "membrane voltage-gated reaction rate");
