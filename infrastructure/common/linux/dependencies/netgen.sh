@@ -18,7 +18,7 @@ install_deps() {
 }
 
 NETGEN="https://github.com/NGSolve/netgen.git"
-BRANCH="v6.2.2204"
+BRANCH="v6.2.2009"
 build_and_install() {
 	local source=$1
 	local branch=$2
