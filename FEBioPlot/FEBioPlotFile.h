@@ -45,7 +45,8 @@ class FEBioPlotFile : public PlotFile
 public:
 	// file version
 	// 32: added PLT_ELEMENTSET_SECTION
-	enum { PLT_VERSION = 0x0032 };
+	// 33: node IDs are now stored in Node Section
+	enum { PLT_VERSION = 0x0033 };
 
 	// file tags
 	enum { 

@@ -1082,7 +1082,8 @@ void FEBioPlotFile::WriteNodeSection(FEMesh& m)
 	for (int i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);
-		*((int*) (&X[0] + 4*i)) = i;
+		// as of 3.3 we store the node IDs. (Previously the node index was stored)
+		*((int*) (&X[0] + 4*i)) = node.GetID();
 		X[4*i+1] = (float) node.m_r0.x;
 		X[4*i+2] = (float) node.m_r0.y;
 		X[4*i+3] = (float) node.m_r0.z;
