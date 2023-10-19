@@ -55,45 +55,32 @@ bool FEPrescribedReferentialConcentration::Init()
 //-----------------------------------------------------------------------------
 double FEPrescribedReferentialConcentration::GetEffectiveJacobian(FEElement& m_elem, int node_id)
 {
-	double ai[FEElement::MAX_INTPOINTS];
-	double ao[FEElement::MAX_NODES];
-
+	double ji = 0.0;
 	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
 		FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
 		FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
-		FEBiphasicMaterialPoint* bp = pt->ExtractData<FEBiphasicMaterialPoint>();
-		mat3dd I = mat3dd(1.0);
-		if (ep && bp)
-			ai[i] = ep->m_J - bp->m_phi0;
-		else if (ep)
-			ai[i] = ep->m_J;
-		else
-			ai[i] = 0.0;
+		ji += ep->m_J;
 	}
-	m_elem.project_to_nodes(ai, ao);
-	return ao[m_elem.FindNode(m_elem.m_node[node_id])];
+	ji /= m_elem.GaussPoints();
+	return ji;
 }
 
 //-----------------------------------------------------------------------------
 double FEPrescribedReferentialConcentration::GetConcentration(FEElement& m_elem, int node_id)
 {
-	double ai[FEElement::MAX_INTPOINTS];
-	double ao[FEElement::MAX_NODES];
-
+	double ci = 0.0;
 	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
 		FEMaterialPoint& pt = *m_elem.GetMaterialPoint(i);
-		if (&pt)
-			ai[i] = m_value(pt);
-		else
-			ai[i] = 0.0;
+		ci += m_value(pt);
 	}
-	m_elem.project_to_nodes(ai, ao);
-	return ao[m_elem.FindNode(m_elem.m_node[node_id])];
+	ci /= m_elem.GaussPoints();
+	return ci;
 }
 
 //-----------------------------------------------------------------------------
 double FEPrescribedReferentialConcentration::GetNodalEffectiveJacobian(int node_id)
 {
+	
 	// get the mesh to which this surface belongs
 	FENodeElemList& NEL = GetMesh().NodeElementList();
 	int nval = NEL.Valence(node_id);
@@ -101,14 +88,11 @@ double FEPrescribedReferentialConcentration::GetNodalEffectiveJacobian(int node_
 
 	// Get the elements that the node belongs to
 	double J_eff = 0.0;
-	double vol = 0.0;
 	for (int i = 0; i < nval; ++i)
 	{
-		double v = GetMesh().ElementVolume(*ppe[i]);
-		J_eff += GetEffectiveJacobian(*ppe[i], i) * v;
-		vol += v;
+		J_eff += GetEffectiveJacobian(*ppe[i], node_id);
 	}
-	J_eff = J_eff / vol;
+	J_eff = J_eff / nval;
 	return J_eff;
 }
 
@@ -116,6 +100,7 @@ double FEPrescribedReferentialConcentration::GetNodalEffectiveJacobian(int node_
 //-----------------------------------------------------------------------------
 double FEPrescribedReferentialConcentration::GetNodalConcentration(int node_id)
 {
+
 	// get the mesh to which this surface belongs
 	FENodeElemList& NEL = GetMesh().NodeElementList();
 	int nval = NEL.Valence(node_id);
@@ -123,14 +108,11 @@ double FEPrescribedReferentialConcentration::GetNodalConcentration(int node_id)
 
 	// Get the elements that the node belongs to
 	double s = 0.0;
-	double vol = 0.0;
 	for (int i = 0; i < nval; ++i)
 	{
-		double v = GetMesh().ElementVolume(*ppe[i]);
-		s += GetConcentration(*ppe[i], i) * v;
-		vol += v;
+		s += GetConcentration(*ppe[i], node_id);
 	}
-	s = s / vol;
+	s = s / nval;
 	return s;
 }
 
@@ -142,5 +124,5 @@ void FEPrescribedReferentialConcentration::GetNodalValues(int nodelid, std::vect
 	// get the stress
 	double c = GetNodalConcentration(node_id);
 	double J_eff = GetNodalEffectiveJacobian(node_id);
-	val[0] = c / J_eff;
+	val[0] = max(c / J_eff, 0.0);
 }

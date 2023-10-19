@@ -97,8 +97,14 @@ public:
 	// get first derivative of k (partition coefficient) w.r.p. concentration
 	virtual double dkdc(const FEMaterialPoint& mp, int i, int j) { return 0.0; }
 
+	// get first derivative of k (partition coefficient) w.r.p. concentration
+	virtual double dkdc_referential(const FEMaterialPoint& mp, int i, int j) { return 0.0; }
+
 	// get first derivative of k (partition coefficient) w.r.p. J
 	virtual double dkdJ(const FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+
+	// get first derivative of k (partition coefficient) w.r.p. J
+	virtual double dkdJ_referential(const FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
 
 	// return the number of solid-bound molecules
 	virtual int SBMs() const { return 0; }
@@ -165,11 +171,12 @@ public:
 		T* spt = mp.ExtractData<T>();
 		FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 		double J = ep.m_J;
-		FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
-		double J_e = kp.m_Je;
+		//FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
+		//double J_e = kp.m_Je;
+		//double J_g = kp.m_Jg;
 		FEBiphasicMaterialPoint& bp = *mp.ExtractData<FEBiphasicMaterialPoint>();
 		double phisr = bp.m_phi0t;
-		return max(spt->m_ca[soluteIndex] * (J - phisr),0.0);
+		return max((spt->m_ca[soluteIndex] * (J - phisr)), 0.0);
 	}
 	double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
 		T* spt = mp.ExtractData<T>();
@@ -195,8 +202,14 @@ public:
 		const T* spt = mp.ExtractData<T>();
 		return spt->m_dkdc[i][j];
 	}
+	double dkdc_referential(const FEMaterialPoint& mp, int i, int j) override {
+		return 0.0;
+	}
 	double dkdJ(const FEMaterialPoint& mp, int soluteIndex) override {
 		const T* spt = mp.ExtractData<T>();
 		return spt->m_dkdJ[soluteIndex];
+	}
+	double dkdJ_referential(const FEMaterialPoint& mp, int soluteIndex) override {
+		return 0.0;
 	}
 };

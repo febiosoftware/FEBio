@@ -1656,12 +1656,14 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
         FENode& node = mesh.Node(el.m_node[j]);
         r0[j] = node.m_r0;
         rt[j] = node.m_rt;
-        if (el.m_bitfc.size()>0 && el.m_bitfc[j]) {
+        if (el.m_bitfc.size()>0 && el.m_bitfc[j]) 
+        {
             pn[j] = (node.m_ID[m_dofQ] != -1) ? node.get(m_dofQ) : node.get(m_dofP);
             for (k=0; k<nsol; ++k)
                 ct[k][j] = (node.m_ID[m_dofD + sid[k]] != -1) ? node.get(m_dofD + sid[k]) : node.get(m_dofC + sid[k]);
         }
-        else {
+        else 
+        {
             pn[j] = node.get(m_dofP);
             for (k=0; k<nsol; ++k)
                 ct[k][j] = node.get(m_dofC + sid[k]);

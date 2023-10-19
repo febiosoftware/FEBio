@@ -39,6 +39,7 @@ BEGIN_FECORE_CLASS(FEHillActivation, FEReactionRate)
 	ADD_PARAMETER(m_n, "Hill_coeff");
 	ADD_PARAMETER(m_sol_id, "sol_id_act");
 	ADD_PARAMETER(m_sbm_id, "sbm_id_act");
+	ADD_PARAMETER(m_referential, "referential_concentration");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -51,14 +52,20 @@ FEHillActivation::FEHillActivation(FEModel* pfem) : FEReactionRate(pfem)
 //! reaction rate at material point
 double FEHillActivation::ReactionRate(FEMaterialPoint& pt)
 {
+	FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
 	double c = 0.0;
 	if (m_sol_id > 0)
 	{
-		c = m_pReact->m_psm->GetReferentialSoluteConcentration(pt, m_sol_id-1);
+		if (m_referential) {
+			c = m_pReact->m_psm->GetReferentialSoluteConcentration(pt, m_sol_id - 1);
+		}
+		else {
+			c = m_pReact->m_psm->GetActualSoluteConcentration(pt, m_sol_id - 1);
+		}
 	}
 	else if (m_sbm_id > 0)
 	{
-		c = m_pReact->m_psm->SBMReferentialConcentration(pt, m_sbm_id-1);
+		c = m_pReact->m_psm->SBMConcentration(pt, m_sbm_id-1);
 	}
 	double En = pow(m_E50, m_n);
 	double B = (En - 1.0) / (2.0 * En - 1.0);
@@ -73,7 +80,11 @@ double FEHillActivation::ReactionRate(FEMaterialPoint& pt)
 //! tangent of reaction rate with strain at material point
 mat3ds FEHillActivation::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
-	return mat3ds(0.0);
+	double zhat = ReactionRate(pt);
+	mat3dd I(1);
+	mat3ds dzhatde = I * (-zhat);
+	return dzhatde;
+	//return mat3ds(0.0);
 }
 
 //-----------------------------------------------------------------------------

@@ -734,6 +734,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSPRLinearStresses, "SPR-P1 stress");
 	REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses, "SPR principal stress");
 	REGISTER_FECORE_CLASS(FEPlotNodalStresses, "nodal stress");
+	REGISTER_FECORE_CLASS(FEPlotNodalPressure, "nodal pressure");
 	REGISTER_FECORE_CLASS(FEPlotNodalTraceStresses, "nodal stress trace");
 	REGISTER_FECORE_CLASS(FEPlotShellStrain, "shell strain");
 	REGISTER_FECORE_CLASS(FEPlotDeformationGradient, "deformation gradient");
@@ -825,6 +826,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotJacobian, "Jacobian");
 	REGISTER_FECORE_CLASS(FEPlotGrowthElasticJacobian, "growth elastic Jacobian");
 	REGISTER_FECORE_CLASS(FEPlotGrowthJacobian, "growth Jacobian");
+	REGISTER_FECORE_CLASS(FEPlotGrowthK, "growth activation");
+	REGISTER_FECORE_CLASS(FEPlotGrowthPhi, "growth phi");
 
 
 

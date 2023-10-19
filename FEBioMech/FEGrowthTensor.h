@@ -49,14 +49,22 @@ public:
     
     //! referential solid density
     virtual double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) = 0;
-    
+
     double SoluteConcentration(FEMaterialPoint& pt);
 
     double SBMConcentration(FEMaterialPoint& pt);
 
-    //double Multiplier(FEMaterialPoint& pt, const vec3d& a0) { };
+    vec3d UpdateNormal(FEMaterialPoint& pt, const vec3d& a0);
 
     double SpeciesGrowth(FEMaterialPoint& pt);
+
+    double ActivationFunction(FEMaterialPoint& pt);
+
+    double EnvironmentalFunction(FEMaterialPoint& pt);
+
+    double Sigmoid(double a, double x, double x0, double b);
+
+    double GrowthRate(FEMaterialPoint& pt);
 
     //! initialize
     bool Init() override;
@@ -68,7 +76,14 @@ public:
     //!SL: temporary place holder. Intent is to allow scaling by value of some state variable. In this case we are saying SBM id number to identify which SBM to base growth on. Will implement general solution later for more options.
     int             m_sbm_id = -1;   //! Which sbm should be used? Optional for now...
     int             m_sol_id = -1;
-
+    double          theta_gamma = 0.2;      //!<1/2 width of bandpass function (where each sigmoid is centered)
+    double          k_center = 0;   //!<1/2 width of bandpass function (where each sigmoid is centered)
+    double          k_width = 4;
+    double          k_min = -1;
+    double          k_max = 1;
+    //!SL: Flag to choose whether growth is based on current or referential concentration.
+    bool m_referential_concentration_flag = true;
+    bool m_referential_normal_flag = true;
 protected:
     DECLARE_FECORE_CLASS();
 };
@@ -115,7 +130,7 @@ public:
     
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
-    
+
 public:
     FEVec3dValuator* m_fiber_0;
     FEVec3dValuator* m_fiber_1;

@@ -867,6 +867,16 @@ public:
 //-----------------------------------------------------------------------------
 //! Class that projects stresses from integration points to the nodes
 //! TODO: This only works with tet10 and hex8 -domains
+class FEPlotNodalPressure : public FEPlotDomainData
+{
+public:
+	FEPlotNodalPressure(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_MULT) { SetUnits(UNIT_PRESSURE); }
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that projects stresses from integration points to the nodes
+//! TODO: This only works with tet10 and hex8 -domains
 class FEPlotNodalTraceStresses : public FEPlotDomainData
 {
 public:
@@ -1230,7 +1240,7 @@ public:
 class FEPlotGrowthTensor : public FEPlotDomainData
 {
 public:
-	FEPlotGrowthTensor(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
+	FEPlotGrowthTensor(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -1275,5 +1285,19 @@ class FEPlotGrowthJacobian : public FEPlotDomainData
 {
 public:
 	FEPlotGrowthJacobian(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotGrowthK : public FEPlotDomainData
+{
+public:
+	FEPlotGrowthK(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotGrowthPhi : public FEPlotDomainData
+{
+public:
+	FEPlotGrowthPhi(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };

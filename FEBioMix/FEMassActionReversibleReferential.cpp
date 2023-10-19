@@ -46,6 +46,7 @@ FEMassActionReversibleReferential::FEMassActionReversibleReferential(FEModel* pf
 //! molar supply at material point
 double FEMassActionReversibleReferential::FwdReactionSupply(FEMaterialPoint& pt)
 {
+    FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
     // get forward reaction rate
     double k = m_pFwd->ReactionRate(pt);
 
@@ -72,13 +73,14 @@ double FEMassActionReversibleReferential::FwdReactionSupply(FEMaterialPoint& pt)
         }
     }
 
-    return zhat;
+    return zhat / ep->m_J;
 }
 
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEMassActionReversibleReferential::RevReactionSupply(FEMaterialPoint& pt)
 {
+    FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
     // get forward reaction rate
     double k = m_pRev->ReactionRate(pt);
 
@@ -105,7 +107,7 @@ double FEMassActionReversibleReferential::RevReactionSupply(FEMaterialPoint& pt)
         }
     }
 
-    return zhat;
+    return zhat / ep->m_J;
 }
 
 //-----------------------------------------------------------------------------
@@ -121,47 +123,34 @@ double FEMassActionReversibleReferential::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of molar supply with strain at material point
 mat3ds FEMassActionReversibleReferential::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
-    //const int nsol = m_nsol;
-    //const int nsbm = (int)m_v.size() - nsol;
-
-    //// forward reaction
-    //double kF = m_pFwd->ReactionRate(pt);
-    //double zhatF = FwdReactionSupply(pt);
-    //mat3ds dzhatFde = mat3dd(0);
-    mat3ds I = mat3dd(1);
-    //for (int isbm = 0; isbm < nsbm; ++isbm)
-    //    dzhatFde += I * (m_vR[nsol + isbm]);
-
-    //dzhatFde *= zhatF;
-
-    ////// reverse reaction
-    //double kR = m_pRev->ReactionRate(pt);
-    //double zhatR = RevReactionSupply(pt);
-    //mat3ds dzhatRde = mat3dd(0);
-
-    //for (int isbm = 0; isbm < nsbm; ++isbm)
-    //    dzhatRde -= I * (m_vP[nsol + isbm]);
-
-    //dzhatRde *= zhatR;
-
-    //return dzhatFde - dzhatRde;
-    return I * 0.0;
+    //double zhat = ReactionSupply(pt);
+    //mat3dd I(1);
+    //// evaluate the reaction molar supply
+    //FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
+    //double phi0 = pbm->GetReferentialSolidVolumeFraction(pt);
+    //FEElasticMaterialPoint& mp = *pt.ExtractData<FEElasticMaterialPoint>();
+    //double J = mp.m_J;
+    //mat3ds dzde = I * (-J / (J - phi0)) * zhat;
+    //return dzde;
+    return mat3ds(0.0);
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of molar supply with effective pressure at material point
 double FEMassActionReversibleReferential::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
 {
-    double dzhatFdp = 0;
-    double dzhatRdp = 0;
-    return dzhatFdp - dzhatRdp;
+    //double dzhatFdp = 0;
+    //double dzhatRdp = 0;
+    //return dzhatFdp - dzhatRdp;
+    return 0.0;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of molar supply with effective concentration at material point
 double FEMassActionReversibleReferential::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
-    double dzhatFdc = 0;
-    double dzhatRdc = 0;
-    return dzhatFdc - dzhatRdc;
+    //double dzhatFdc = 0;
+    //double dzhatRdc = 0;
+    //return dzhatFdc - dzhatRdc;
+    return 0.0;
 }

@@ -61,20 +61,6 @@ bool FEPrescribedStressSensitiveConcentration::Init()
 //-----------------------------------------------------------------------------
 mat3ds FEPrescribedStressSensitiveConcentration::GetStress(FEElement& m_elem, int node_id)
 {
-	/*mat3ds si[FEElement::MAX_INTPOINTS];
-	mat3ds so[FEElement::MAX_NODES];
-
-	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
-		FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
-		FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
-		mat3dd I = mat3dd(1.0);
-		if (ep)
-			si[i] = ep->m_s;
-		else
-			si[i].zero();
-	}
-	m_elem.project_to_nodes(si, so);
-	return so[m_elem.FindNode(node_id)];*/
 	mat3ds si;
 	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
 		FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
@@ -88,28 +74,13 @@ mat3ds FEPrescribedStressSensitiveConcentration::GetStress(FEElement& m_elem, in
 //-----------------------------------------------------------------------------
 double FEPrescribedStressSensitiveConcentration::GetEffectiveJacobian(FEElement& m_elem, int node_id)
 {
-	//double ai[FEElement::MAX_INTPOINTS];
-	//double ao[FEElement::MAX_NODES];
-
-	//for (int i = 0; i < m_elem.GaussPoints(); ++i) {
-	//	FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
-	//	FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
-	//	FEBiphasicMaterialPoint* bp = pt->ExtractData<FEBiphasicMaterialPoint>();
-	//	FEKinematicMaterialPoint* kp = pt->ExtractData<FEKinematicMaterialPoint>();
-	//	mat3dd I = mat3dd(1.0);
-	//	if (ep && bp)
-	//		ai[i] = ep->m_J - bp->m_phi0;
-	//	else if (ep)
-	//		ai[i] = ep->m_J;
-	//	else
-	//		ai[i] = 0.0;
-	//}
-	//m_elem.project_to_nodes(ai, ao);
-	//return ao[m_elem.FindNode(node_id)];
 	double ji = 0.0;
 	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
 		FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
 		FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
+		FEKinematicMaterialPoint* kp = pt->ExtractData<FEKinematicMaterialPoint>();
+		double J_e = kp->m_Je;
+		double J_g = kp->m_Jg;
 		ji += ep->m_J;
 	}
 	ji /= m_elem.GaussPoints();
@@ -119,18 +90,6 @@ double FEPrescribedStressSensitiveConcentration::GetEffectiveJacobian(FEElement&
 //-----------------------------------------------------------------------------
 double FEPrescribedStressSensitiveConcentration::GetConcentration(FEElement& m_elem, int node_id)
 {
-	//double ai[FEElement::MAX_INTPOINTS];
-	//double ao[FEElement::MAX_NODES];
-
-	//for (int i = 0; i < m_elem.GaussPoints(); ++i) {
-	//	FEMaterialPoint& pt = *m_elem.GetMaterialPoint(i);
-	//	if (&pt)
-	//		ai[i] = m_value(pt);
-	//	else
-	//		ai[i] = 0.0;
-	//}
-	//m_elem.project_to_nodes(ai, ao);
-	//return ao[m_elem.FindNode(node_id)];
 	double ci = 0.0;
 	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
 		FEMaterialPoint& pt = *m_elem.GetMaterialPoint(i);
@@ -206,5 +165,5 @@ void FEPrescribedStressSensitiveConcentration::GetNodalValues(int nodelid, std::
 	double c = GetNodalConcentration(node_id);
 	double m_S = m_a0 + m_a / (1.0 + (exp(-(s.tr() - m_b) / stress0)));
 	double J_eff = GetNodalEffectiveJacobian(node_id);
-	val[0] = max(c / J_eff * m_S,0.0);
+	val[0] = max((c / J_eff) * m_S,0.0);
 }

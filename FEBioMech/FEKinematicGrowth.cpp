@@ -32,8 +32,6 @@ SOFTWARE.*/
 #include "FEGrowthTensor.h"
 
 //============================================================================
-// FEBiphasicMaterialPoint
-//============================================================================
 //FEKinematicMaterialPoint::FEKinematicMaterialPoint(FEMaterialPointData* ppt) : FEMaterialPointData(ppt) {}
 
 //-----------------------------------------------------------------------------
@@ -54,6 +52,8 @@ void FEKinematicMaterialPoint::Init()
     m_Fg = mat3dd(1.0);
     m_Je = 1.0;
     m_Jg = 1.0;
+    m_theta = 0.0;
+    m_theta_p = 0.0;
     m_rhor = 0;
     FEMaterialPointData::Init();
 }
@@ -61,6 +61,7 @@ void FEKinematicMaterialPoint::Init()
 //-----------------------------------------------------------------------------
 void FEKinematicMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
+    m_theta_p = m_theta;
     FEMaterialPointData::Update(timeInfo);
 }
 
@@ -69,11 +70,11 @@ void FEKinematicMaterialPoint::Serialize(DumpStream& ar)
 {
     if (ar.IsSaving())
     {
-        ar << m_Fe << m_Fg << m_Je << m_Jg <<m_rhor;
+        ar << m_Fe << m_Fg << m_Je << m_Jg << m_theta << m_theta_p << m_rhor;
     }
     else
     {
-        ar >> m_Fe >> m_Fg >> m_Je >> m_Jg >> m_rhor;
+        ar >> m_Fe >> m_Fg >> m_Je >> m_Jg >> m_theta << m_theta_p >> m_rhor;
     }
     FEMaterialPointData::Serialize(ar);
 }
@@ -114,7 +115,6 @@ bool FEKinematicGrowth::Init()
         feLogError("Elastic material should not be of type uncoupled");
         return false;
     }
-    //this->m_pGrowth->Init();
     
     return FEElasticMaterial::Init();
 }
@@ -134,7 +134,6 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
     
     mat3d Fgi = gmat->GrowthTensorInverse(mp, a0);
     double Jgi = Fgi.det();
-
     // Get the deformation gradient and evaluate elastic deformation
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     mat3d Fe = pt.m_F * Fgi;
@@ -147,8 +146,8 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
     pt.m_J = Je;
     // evaluate stress
     FEElasticMaterial* emat = GetBaseMaterial();
-    mat3ds s = emat->Stress(mp);
-    //mat3ds s = mat3d(Fgi * emat->Stress(mp) * Fgi.transpose()).sym();
+    // The base class stress function divides by Je rather than J when pushing forward. Thus the cauchy stress is the base class stress divided by Jg.
+    mat3ds s = emat->Stress(mp) * Jgi;
     // restore safe copy
     pt.m_F = F;
     pt.m_J = J;
@@ -182,13 +181,10 @@ tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
     // substitute elastic deformation in material point
     pt.m_F = Fe;
     pt.m_J = Je;
-    // evaluate stress
     FEElasticMaterial* emat = GetBaseMaterial();
-    tens4ds c = emat->Tangent(mp);
-    // restore safe copy
-    pt.m_F = F;
-    pt.m_J = J;
-
+    // The base class tangent function divides by Je rather than J when pushing forward. Thus the tangent is the base class tangent divided by Jg.
+    tens4d cstar = emat->Tangent(mp);
+    tens4ds c = Jgi * cstar.supersymm();
     return c;
 }
 
@@ -240,7 +236,7 @@ void FEKinematicGrowth::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
     vec3d fiber = gmat->m_fiber.unitVector(mp);
     // convert to global coordinates
     vec3d a0 = Q * fiber;
-    
+
     // extract Elastic growth material point
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
     // extract Kinematic growth material point
@@ -249,6 +245,7 @@ void FEKinematicGrowth::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
     kp.m_Fe = ep.m_F * kp.m_Fg.inverse();
     kp.m_Je = kp.m_Fe.det();
     kp.m_Jg = kp.m_Fg.det();
-    
+    double dt = GetTimeInfo().timeIncrement;
+    kp.m_theta = kp.m_theta_p + gmat->GrowthRate(mp) * dt;
     kp.m_rhor = GetBaseMaterial()->Density(mp)*GetGrowthMaterial()->GrowthDensity(mp, a0);
 }

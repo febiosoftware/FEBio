@@ -789,8 +789,8 @@ void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 				double ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 				if ((ct < 0.0) && m_forcePositive) ct = 0.0;
 				node.set(m_dofC + j, ct);
+				}
 			}
-		}
         for (int j=0; j<MAX_DDOFS; ++j) {
             int n = node.m_ID[m_dofD+j];
             // Force the concentrations to remain positive

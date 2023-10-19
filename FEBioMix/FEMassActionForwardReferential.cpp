@@ -46,6 +46,7 @@ FEMassActionForwardReferential::FEMassActionForwardReferential(FEModel* pfem) : 
 //! molar supply at material point
 double FEMassActionForwardReferential::ReactionSupply(FEMaterialPoint& pt)
 {
+    FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
     // get reaction rate
     double kF = m_pFwd->ReactionRate(pt);
 
@@ -76,32 +77,46 @@ double FEMassActionForwardReferential::ReactionSupply(FEMaterialPoint& pt)
         }
     }
 
-    return zhat;
+    return zhat / ep->m_J;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of molar supply with strain at material point
 mat3ds FEMassActionForwardReferential::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
+
     //const int nsol = m_nsol;
     //const int nsbm = (int)m_v.size() - nsol;
 
     //FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
+
     //FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 
+    //double J = ept.m_J;
+    //double phi0 = pbm->GetReferentialSolidVolumeFraction(pt);
+
     //double kF = m_pFwd->ReactionRate(pt);
-    ////mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);
+    //mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);
     //double zhat = ReactionSupply(pt);
     //mat3ds dzhatde = mat3dd(0);
-    mat3ds I = mat3dd(1);
+    //if (kF > 0) {
+    //    dzhatde += dkFde / kF;
+    //}
+    //mat3ds I = mat3dd(1);
+    //for (int isol = 0; isol < nsol; ++isol)
+    //{
+    //    double dkdJ = m_psm->dkdJ_referential(pt, isol);
+    //    double k = m_psm->GetPartitionCoefficient(pt, isol);
+    //    dzhatde += I * (m_vR[isol] * dkdJ / k);
+    //}
 
     //for (int isbm = 0; isbm < nsbm; ++isbm)
-    //    dzhatde -= I * (m_vR[nsol + isbm]);
+    //    dzhatde -= I * ((m_vR[nsol + isbm]));
 
     //dzhatde *= zhat;
-    //mat3ds dzde = -1.0 * zhat * I;
-    mat3ds dzde = 0.0 * I;
-    return dzde;
+
+    //return dzhatde;
+    return mat3ds(0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -110,12 +125,43 @@ double FEMassActionForwardReferential::Tangent_ReactionSupply_Pressure(FEMateria
 {
     double dzhatdp = 0;
     return dzhatdp;
+    /*double kF = m_pFwd->ReactionRate(pt);
+    double dkFdp = m_pFwd->Tangent_ReactionRate_Pressure(pt);
+    double zhat = ReactionSupply(pt);
+    double dzhatdp = 0;
+    if (kF > 0) {
+        dzhatdp = dkFdp * zhat / kF;
+    }
+    return dzhatdp;*/
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of molar supply with effective concentration at material point
 double FEMassActionForwardReferential::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
-    double dzhatdc = 0;
-    return dzhatdc;
+    ////double dzhatdc = 0;
+    ////return dzhatdc;
+    //const int nsol = m_nsol;
+
+    //// if the derivative is taken with respect to a solid-bound molecule, return 0
+    //if (sol >= nsol) {
+    //    return 0;
+    //}
+
+    //double zhat = ReactionSupply(pt);
+    //double dzhatdc = 0;
+    //for (int isol = 0; isol < nsol; ++isol)
+    //{
+    //    double dkdc = m_psm->dkdc_referential(pt, isol, sol);
+    //    double k = m_psm->GetPartitionCoefficient(pt, isol);
+    //    double c = m_psm->GetReferentialSoluteConcentration(pt, sol);
+    //    dzhatdc += m_vR[isol] * dkdc / k;
+    //    if ((isol == sol) && (c > 0))
+    //        dzhatdc += m_vR[isol] / c;
+    //}
+
+    //dzhatdc *= zhat;
+
+    //return dzhatdc;
+    return 0.0;
 }

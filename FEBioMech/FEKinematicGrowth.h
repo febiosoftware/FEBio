@@ -52,6 +52,8 @@ public:
     mat3d    m_Fg;       //!< growth deformation
     double   m_Je;
     double   m_Jg;
+    double   m_theta;    //!< growth rate
+    double   m_theta_p;  //!< growth rate on previous step
     FEParamDouble   m_rhor;     //!< solid referential density
 };
 
@@ -77,16 +79,16 @@ public:
     
     //! Returns the spatial tangent
     tens4ds Tangent(FEMaterialPoint& mp) override;
-    
+
     //! Returns the strain energy density
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
     // returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
-    
+
     // update material point at each iteration
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
-    
+
 private:
     FEElasticMaterial*  m_pBase;        //!< pointer to elastic solid material
     FEGrowthTensor*     m_pGrowth;      //!< pointer to growth tensor

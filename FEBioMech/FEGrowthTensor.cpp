@@ -37,9 +37,11 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEGrowthTensor, FEMaterialProperty)
     ADD_PARAMETER(m_fiber, "fiber");
-    ADD_PARAMETER(m_gm, "multiplier")->setLongName("time_multiplier");
+    ADD_PARAMETER(m_gm, "multiplier")->setLongName("growth_multiplier");
     ADD_PARAMETER(m_sbm_id, "sbm_id")->setLongName("sbm id for scaling growth");
     ADD_PARAMETER(m_sol_id, "sol_id")->setLongName("sol id for scaling growth");
+    ADD_PARAMETER(m_referential_concentration_flag, "referential_concentration");
+    ADD_PARAMETER(m_referential_normal_flag, "referential_normal_direction");
 END_FECORE_CLASS();
 
 FEGrowthTensor::FEGrowthTensor(FEModel* pfem) : FEMaterialProperty(pfem)
@@ -62,12 +64,11 @@ bool FEGrowthTensor::Init()
 //! growth tensor
 mat3d FEVolumeGrowth::GrowthTensor(FEMaterialPoint& pt, const vec3d& n0)
 {
-    FEElement* m_e = pt.m_elem;
-    FEDomain* dom = dynamic_cast<FEDomain*>(m_e->GetMeshPartition());
-    // calculate the element volume
-    FEMesh* mesh = dom->GetMesh();
-    double g = 1.0 + m_gm(pt) * SpeciesGrowth(pt);
-    return mat3dd(g);
+    FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
+    FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
+    double theta = kp->m_theta;
+    double gmani = 1.0 + theta;
+    return mat3dd(gmani);
 }
 
 //-----------------------------------------------------------------------------
@@ -82,8 +83,10 @@ mat3d FEVolumeGrowth::GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& n0)
 //! referential solid density
 double FEVolumeGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 {
-    mat3d Fg = GrowthTensor(pt, n0);
-    return pow(Fg[0][0], 3);
+    /*mat3d Fg = GrowthTensor(pt, n0);
+    return pow(Fg[0][0], 3);*/
+    FEKinematicMaterialPoint& kp = *pt.ExtractData<FEKinematicMaterialPoint>();
+    return pow(kp.m_theta,3);
 }
 
 //-----------------------------------------------------------------------------
@@ -94,10 +97,13 @@ double FEVolumeGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 //! growth tensor
 mat3d FEAreaGrowth::GrowthTensor(FEMaterialPoint& pt, const vec3d& n0)
 {
-    //! Gerard's implementation
-    double gmiso = 1.0 + m_gm(pt) * SpeciesGrowth(pt);
-    double gmani = 2.0 - gmiso;
-    mat3d Fg = mat3dd(gmiso) + (n0 & n0) * (gmani - 1);
+    FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
+    FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
+    double theta = kp->m_theta;
+    double gmiso = 1.0;
+    //double gmani = 2.0 - gmiso;
+    vec3d n = m_referential_normal_flag ? n0 : UpdateNormal(pt, n0);
+    mat3d Fg = mat3dd(theta) - ((n & n) * theta);
     return Fg;
 }
 
@@ -113,7 +119,9 @@ mat3d FEAreaGrowth::GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& n0)
 //! referential solid density
 double FEAreaGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 {
-    return m_gm(pt);
+    //return m_gm(pt);
+    FEKinematicMaterialPoint& kp = *pt.ExtractData<FEKinematicMaterialPoint>();
+    return kp.m_theta;
 }
 
 //-----------------------------------------------------------------------------
@@ -124,9 +132,13 @@ double FEAreaGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 //! growth tensor
 mat3d FEFiberGrowth::GrowthTensor(FEMaterialPoint& pt, const vec3d& n0)
 {
-    double gmiso = 1;
-    double gmani = 1.0 + m_gm(pt) * SpeciesGrowth(pt);
-    mat3d Fg = mat3dd(gmiso) + (n0 & n0)*(gmani - 1);
+    FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
+    FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
+    double theta = kp->m_theta;
+    double gmiso = 1.0;
+    double gmani = 1.0 + theta;
+    vec3d n = m_referential_normal_flag ? n0 : UpdateNormal(pt, n0);
+    mat3d Fg = mat3dd(gmiso) + (n & n) * (gmani - 1);
     return Fg;
 }
 
@@ -139,10 +151,41 @@ mat3d FEFiberGrowth::GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& n0)
 }
 
 //-----------------------------------------------------------------------------
+//! bandpass activation function k(theta)
+double FEGrowthTensor::ActivationFunction(FEMaterialPoint& pt)
+{
+    FEKinematicMaterialPoint & kp = *(pt.ExtractData<FEKinematicMaterialPoint>());
+    double theta = kp.m_theta;
+    double theta0 = k_center - (k_width / 2.0);
+    double s_act = Sigmoid(1.0, theta, theta0, theta_gamma);
+    double s_inh = Sigmoid(1.0, theta, -1.0 * theta0, theta_gamma);
+    double k_theta = k_min + 2.0 * k_max * (s_act - s_inh);
+    return k_theta;
+}
+
+//-----------------------------------------------------------------------------
+//! microenvironmental function phi(dC/dt)
+//! 
+double FEGrowthTensor::EnvironmentalFunction(FEMaterialPoint& pt)
+{
+    FEElement* m_el = pt.m_elem;
+    int nint = m_el->GaussPoints();
+    FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
+    FESolutesMaterialPoint& sp = *(pt.ExtractData<FESolutesMaterialPoint>());
+    FEMultiphasic* pm = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
+    double c_n = pm->GetReferentialSoluteConcentration(pt, m_sol_id - 1);
+    double c_n_p = sp.m_crp[m_sol_id - 1];
+    double dt = GetTimeInfo().timeIncrement;
+    double phi = (c_n - c_n_p) / dt;
+    return phi;
+}
+//-----------------------------------------------------------------------------
 //! referential solid density
 double FEFiberGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 {
-    return m_gm(pt);
+    //return m_gm(pt);
+    FEKinematicMaterialPoint& kp = *pt.ExtractData<FEKinematicMaterialPoint>();
+    return kp.m_theta;
 }
 
 //-----------------------------------------------------------------------------
@@ -154,7 +197,14 @@ double FEGrowthTensor::SoluteConcentration(FEMaterialPoint& pt)
     FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
     FESolutesMaterialPoint& pd = *(pt.ExtractData<FESolutesMaterialPoint>());
     FEMultiphasic* pm = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
-    return pm->GetReferentialSoluteConcentration(pt, m_sol_id - 1);
+    if (m_referential_concentration_flag)
+    {
+        return pm->GetReferentialSoluteConcentration(pt, m_sol_id - 1);
+    }
+    else
+    {
+        return pm->GetActualSoluteConcentration(pt, m_sol_id - 1);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -166,7 +216,15 @@ double FEGrowthTensor::SBMConcentration(FEMaterialPoint & pt)
     FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
     FESolutesMaterialPoint& pd = *(pt.ExtractData<FESolutesMaterialPoint>());
     FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom->GetMaterial());
-    return pm->SBMConcentration(pt, m_sbm_id - 1);
+    if (m_referential_concentration_flag)
+    {
+        return pm->SBMReferentialConcentration(pt, m_sbm_id - 1);
+    }
+    else
+    {
+        return pm->SBMConcentration(pt, m_sbm_id - 1);
+    }
+    
 }
 
 double FEGrowthTensor::SpeciesGrowth(FEMaterialPoint& pt)
@@ -196,4 +254,25 @@ double FEGrowthTensor::SpeciesGrowth(FEMaterialPoint& pt)
     {
         return 1.0;
     }
+}
+
+vec3d FEGrowthTensor::UpdateNormal(FEMaterialPoint& pt, const vec3d& n0)
+{
+    FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
+    vec3d n = ep->m_F * n0;
+    return n.normalized();
+}
+
+double FEGrowthTensor::Sigmoid(double a, double x, double x0, double b)
+{
+    double s = a / (1.0 + exp(-(x - x0) / b));
+    return s;
+}
+
+double FEGrowthTensor::GrowthRate(FEMaterialPoint& pt)
+{
+    double k_theta = ActivationFunction(pt);
+    double phi = EnvironmentalFunction(pt);
+    double dtheta = k_theta * phi;
+    return dtheta;
 }
