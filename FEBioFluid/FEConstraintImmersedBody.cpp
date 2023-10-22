@@ -134,7 +134,8 @@ void FEConstraintImmersedBody::PrepStep()
     if (m_pbcwz) m_pbcwz->GetNodeSet()->Clear();
     if (m_pbcef) m_pbcef->GetNodeSet()->Clear();
     for (int i=0; i<m_nodetag.size(); ++i) {
-        if (m_nodetag[i] > 0) {
+//        if (m_nodetag[i] > 0) {
+        if (m_nodetag[i] == 2) {
             int nid = dom.NodeIndex(i);
             // for now, set the velocity DOFs to zero
             if (m_pbcwx) m_pbcwx->GetNodeSet()->Add(nid);
@@ -186,6 +187,9 @@ void FEConstraintImmersedBody::PrepStep()
             nset->Add(nid);
         }
     }
+
+    // force mesh update
+    GetFEModel()->SetMeshUpdateFlag(true);
 }
 
 //-----------------------------------------------------------------------------
