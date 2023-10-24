@@ -79,15 +79,23 @@ public:
     //! prep step
     void PrepStep() override;
     
+    //! create intersection surface
+    FESurface* IntersectionSurface();
+    
+    // find parametric coordinates of point in element
+    bool FindPoint(FESolidElement& el, const vec3d x, double& r, double& s, double& t);
+    
 private:
     void GetIntersectedEdges();
     
 protected:
     FESurface               m_surf;
     FELinearConstraintSet   m_lc;
-    vector< vector<int> >   m_nodeBCs;
     vector<int>             m_nodetag;
     vector<int>             m_edgetag;
+    vector< vector<int> >   m_nodal_elems;
+    vector<vec3d>           m_vs;
+    vector<double>          m_vsn;
     FEEdgeList              m_EL;
     FENodalDOFLoad*         m_nodalLoad;
     bool                    m_breset;
@@ -95,9 +103,14 @@ protected:
     FEPrescribedNodeSet*    m_pbcwy;
     FEPrescribedNodeSet*    m_pbcwz;
     FEPrescribedNodeSet*    m_pbcef;
+    vector<FESolidElement*> m_int_elem;
+    vector<vec3d>           m_int_rst;
+    vector<int>             m_int_selid;
+    vector<int>             m_int_semp;
 
-    FEDofList    m_dofW;
+    FEDofList   m_dofW;
     FEDofList   m_dofEF;
+    FEDofList   m_dofV;
     
     DECLARE_FECORE_CLASS();
 };
