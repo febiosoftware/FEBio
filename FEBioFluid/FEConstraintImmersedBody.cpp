@@ -54,15 +54,6 @@ FEConstraintImmersedBody::FEConstraintImmersedBody(FEModel* pfem) : FESurfaceCon
         m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
         m_dofEF.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION));
         m_dofV.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::VELOCITY));
-        m_nodalLoad = fecore_alloc(FENodalDOFLoad, pfem);
-        m_nodalLoad->SetDOF(m_dofEF[0]);
-        m_nodalLoad->SetLoad(0);
-        char name[256];
-        snprintf(name,256,"ImmersedBodyZeroFluidFlux%d",ns++);
-        m_nodalLoad->SetName(name);
-        FENodeSet* nset = new FENodeSet(GetFEModel());
-        m_nodalLoad->SetNodeSet(nset);
-        pfem->AddModelLoad(m_nodalLoad);
 
         FEMesh& mesh = GetMesh();
         int nbc = pfem->BoundaryConditions();
@@ -91,7 +82,6 @@ void FEConstraintImmersedBody::Activate()
     // don't forget to call base class
     FENLConstraint::Activate();
     m_lc.Activate();
-    m_nodalLoad->Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -172,16 +162,6 @@ void FEConstraintImmersedBody::PrepStep()
         m_lc.add(pLC2);
     }
 
-    // populate the node set for the nodal load
-    FENodeSet* nset = m_nodalLoad->GetNodeSet();
-    nset->Clear();
-    for (int i=0; i<m_nodetag[i]; ++i) {
-        if ((m_nodetag[i] == 1) || (m_nodetag[i] == -1)) {
-            int nid = dom.NodeIndex(i);
-            nset->Add(nid);
-        }
-    }
-
     // force mesh update
     GetFEModel()->SetMeshUpdateFlag(true);
 }
@@ -211,8 +191,13 @@ FESurface* FEConstraintImmersedBody::IntersectionSurface()
     // surface normal at the intersection points
     vec3d normal(0,0,0);
     // fluid elements thad include an intersected edge
-    vector< vector<int>> edge_elems(m_EL.Edges());
+    m_elem_edges.clear();
+    m_elem_edges.resize(dom.Elements());
     
+    int dofVX = GetFEModel()->GetDOFIndex("vfx");
+    int dofVY = GetFEModel()->GetDOFIndex("vfy");
+    int dofVZ = GetFEModel()->GetDOFIndex("vfz");
+
     for (int i=0; i<m_EL.Edges(); ++i)
     {
         FEEdgeList::EDGE edge = m_EL.Edge(i);
@@ -223,121 +208,99 @@ FESurface* FEConstraintImmersedBody::IntersectionSurface()
         vec3d vs[FEElement::MAX_NODES];
         for (int j=0; j<sel.Nodes(); ++j) {
             FENode& node = m_surf.Node(sel.m_lnode[j]);
-            vs[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2])*tp.alphaf + node.get_vec3d_prev(m_dofV[0], m_dofV[1], m_dofV[2])*(1-tp.alphaf);
+            vs[j] = node.get_vec3d(dofVX, dofVY, dofVZ)*tp.alphaf + node.get_vec3d_prev(dofVX, dofVY, dofVZ)*(1-tp.alphaf);
         }
-        m_vs[i] = sel.eval(vs, edge.rs.x(), edge.rs.y());
-        m_vsn[i] = m_vs[i]*normal;
+        m_vs[i] = -sel.eval(vs, edge.rs.x(), edge.rs.y());
+        m_vsn[i] = -m_vs[i]*normal;
         
         // Find the elements that contain this edge
         int n1 = edge.node[0];
         int n2 = edge.node[1];
         for (int j=0; j<m_nodal_elems[n1].size(); ++j) {
             for (int k=0; k<m_nodal_elems[n2].size(); ++k) {
-                if (m_nodal_elems[n1][j] == m_nodal_elems[n2][k])
-                    edge_elems[i].push_back(m_nodal_elems[n1][j]);
-            }
-        }
-    }
-    
-    // Generate a list of elements that contain the integration points of the immersed surface, and their parametric coordinates
-    m_int_elem.resize(0);
-    m_int_rst.resize(0);
-    m_int_selid.resize(0);
-    m_int_semp.resize(0);
-    for (int i=0; i<m_EL.Edges(); ++i)
-    {
-        FEEdgeList::EDGE edge = m_EL.Edge(i);
-        // Find the normal to the solid face at the edge intersection point
-        FESurfaceElement& sel = m_surf.Element(edge.selid);
-        for (int j=0; j<sel.GaussPoints(); ++j) {
-            FEMaterialPoint& pt = *(sel.GetMaterialPoint(j));
-            vec3d x = pt.m_rt;
-            for (int k=0; k<edge_elems[i].size(); ++k) {
-                FEElement* e = &dom.ElementRef(edge_elems[i][k]);
-                FESolidElement* el = dynamic_cast<FESolidElement*>(e);
-                if (el) {
-                    FEBoundingBox box;
-                    for (int l=0; l<el->Nodes(); ++l) {
-                        FENode& node = dom.Node(el->m_lnode[l]);
-                        box.add(node.m_rt);
-                    }
-                    if (box.IsInside(x)) {
-                        double r = 0, s = 0, t = 0;
-                        if (FindPoint(*el, x, r, s, t)) {
-                            m_int_elem.push_back(el);
-                            vec3d rst(r,s,t);
-                            m_int_rst.push_back(rst);
-                            m_int_selid.push_back(edge.selid);
-                            m_int_semp.push_back(j);
-                        }
-                    }
+                if (m_nodal_elems[n1][j] == m_nodal_elems[n2][k]) {
+                    m_elem_edges[m_nodal_elems[n1][j]].push_back(i);
                 }
             }
         }
     }
+    
+    // cull the element list of elements that have fewer than 3 intersections
+    for (int i=0; i<dom.Elements(); ++i) {
+        int n = m_elem_edges[i].size();
+        if ((n > 0) && (n < 3)) {
+            m_elem_edges[i].clear();
+        }
+    }
 }
 
+//-----------------------------------------------------------------------------
+void FEConstraintImmersedBody::Serialize(DumpStream& ar) {
+    m_lc.Serialize(ar);
+    
+    if (ar.IsShallow()) return;
+
+    ar & m_nodal_elems;
+}
 
 //-----------------------------------------------------------------------------
-bool FEConstraintImmersedBody::FindPoint(FESolidElement& el, const vec3d x, double& r, double& s, double& t)
+void FEConstraintImmersedBody::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+{
+    m_lc.LoadVector(R, tp);
+    
+    // we assume that the first domain is the "fluid" domain
+    FEMesh& mesh = GetMesh();
+    FEDomain& dom = mesh.Domain(0);
+    
+    // prescribe the load vector on the fluid dilatation DOF which corresponds to the
+    // fluid normal velocity matching the immersed solid's normal velocity
+    int nn[8];
+    for (int i=0; i < dom.Elements(); ++i) {
+        int n = m_elem_edges[i].size();
+        for (int j=0; j<n; ++j) nn[j] = m_elem_edges[i][j];
+        if (n > 0) ElementForce(R, tp, n, nn);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FEConstraintImmersedBody::ElementForce(FEGlobalVector& R, const FETimeInfo& tp, const int n, int* nn)
 {
     // we assume that the first domain is the "fluid" domain
     FEMesh& mesh = GetMesh();
     FEDomain& dom = mesh.Domain(0);
     
-    bool    found = false;
-    double  errrel = 1e-6;
-    double  errabs = 1e-9;
-    int     maxiter = 20;
-    double  tol = 1e-5;
-    
-    bool convgd = false;
-    int iter = 0;
-    int neln = el.Nodes();
-    double *N, *Nr, *Ns, *Nt;
-    vec3d f(0,0,0);
-    vec3d df[3];
-    mat3d gradf;
-    do {
-        el.shape_fnc(N,r,s,t);
-        el.shape_deriv(Nr, Ns, Nt, r, s, t);
-        f = -x;
-        df[0] = df[1] = df[2] = vec3d(0,0,0);
-        for (int i=0; i<neln; ++i) {
-            FENode& node = dom.Node(el.m_lnode[i]);
-            f += node.m_rt*N[i];
-            df[0] += node.m_rt*Nr[i];
-            df[1] += node.m_rt*Ns[i];
-            df[2] += node.m_rt*Nt[i];
-        }
-        mat3d gradf(df[0].x, df[1].x, df[2].x,
-                    df[0].y, df[1].y, df[2].y,
-                    df[0].z, df[1].z, df[2].z);
-        vec3d dr = -(gradf.inverse()*f);
-        r += dr.x; s += dr.y; t += dr.z;
-        double rmag = sqrt(r*r+s*s+t*t);
-        double drmag = dr.Length();
-        double fmag = f.Length();
-        if (drmag <= errrel*rmag) convgd = true;
-        if (fmag <= errabs) convgd = true;
-        ++iter;
-    } while (!convgd && (iter < maxiter));
-    
-    if (convgd) {
-        if ((r >= -1-tol) && (r <= 1+tol)
-            && (s >= -1-tol) && (s <= 1+tol)
-            && (t >= -1-tol) && (t <= 1+tol))
-            found = true;
+    vector<vec3d> x(n);
+    // get surface area of triangular face
+    for (int j=0; j<n; ++j) {
+        FEEdgeList::EDGE edge = m_EL.Edge(nn[j]);
+        FENode& node0 = dom.Node(edge.node[0]);
+        FENode& node1 = dom.Node(edge.node[1]);
+        double g = edge.tag;
+        x[j] = node0.m_rt*(1-g) + node1.m_rt*g;
     }
-    else found = false;
     
-    return found;
+    int mm[3];
+    if (n == 3) {
+        mm[0] = nn[0];
+        mm[1] = nn[1];
+        mm[2] = nn[2];
+        double A = ((x[1] - x[0]) ^ (x[2] - x[0])).Length();
+        // prescribe the forces on the nodes
+        for (int j=0; j<n; ++j) {
+            FEEdgeList::EDGE edge = m_EL.Edge(nn[j]);
+            FENode& node0 = dom.Node(edge.node[0]);
+            FENode& node1 = dom.Node(edge.node[1]);
+            double g = edge.tag;
+            double vf = -m_vsn[mm[j]];
+            int lm0 = node0.m_ID[m_dofEF[0]];
+            int lm1 = node1.m_ID[m_dofEF[0]];
+            R[lm0] -= vf*(1-g);
+            R[lm1] -= vf*g;
+        }
+    }
 }
 
-
 //-----------------------------------------------------------------------------
-void FEConstraintImmersedBody::Serialize(DumpStream& ar) { m_lc.Serialize(ar); }
-void FEConstraintImmersedBody::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lc.LoadVector(R, tp); }
 void FEConstraintImmersedBody::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
 bool FEConstraintImmersedBody::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }
 void FEConstraintImmersedBody::BuildMatrixProfile(FEGlobalMatrix& M) { m_lc.BuildMatrixProfile(M); }

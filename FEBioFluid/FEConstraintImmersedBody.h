@@ -82,8 +82,7 @@ public:
     //! create intersection surface
     FESurface* IntersectionSurface();
     
-    // find parametric coordinates of point in element
-    bool FindPoint(FESolidElement& el, const vec3d x, double& r, double& s, double& t);
+    void ElementForce(FEGlobalVector& R, const FETimeInfo& tp, const int n, int* nn);
     
 private:
     void GetIntersectedEdges();
@@ -93,20 +92,16 @@ protected:
     FELinearConstraintSet   m_lc;
     vector<int>             m_nodetag;
     vector<int>             m_edgetag;
-    vector< vector<int> >   m_nodal_elems;
-    vector<vec3d>           m_vs;
-    vector<double>          m_vsn;
-    FEEdgeList              m_EL;
-    FENodalDOFLoad*         m_nodalLoad;
+    vector< vector<int> >   m_nodal_elems;  // list of elements associated with each node of the fluid domain
+    vector<vec3d>           m_vs;           // solid velocity at intersection of immersed body with fluid domain edge
+    vector<double>          m_vsn;          // normal solid velocity at same intersection
+    FEEdgeList              m_EL;           // list of intersected edges
+    vector< vector<int>>    m_elem_edges;   // list of intersected edges in each element of the fluid domain
     bool                    m_breset;
     FEPrescribedNodeSet*    m_pbcwx;
     FEPrescribedNodeSet*    m_pbcwy;
     FEPrescribedNodeSet*    m_pbcwz;
     FEPrescribedNodeSet*    m_pbcef;
-    vector<FESolidElement*> m_int_elem;
-    vector<vec3d>           m_int_rst;
-    vector<int>             m_int_selid;
-    vector<int>             m_int_semp;
 
     FEDofList   m_dofW;
     FEDofList   m_dofEF;
