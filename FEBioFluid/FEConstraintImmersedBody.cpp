@@ -247,7 +247,7 @@ void FEConstraintImmersedBody::Serialize(DumpStream& ar) {
 void FEConstraintImmersedBody::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     m_lc.LoadVector(R, tp);
-    
+
     // we assume that the first domain is the "fluid" domain
     FEMesh& mesh = GetMesh();
     FEDomain& dom = mesh.Domain(0);
@@ -278,25 +278,37 @@ void FEConstraintImmersedBody::ElementForce(FEGlobalVector& R, const FETimeInfo&
         double g = edge.tag;
         x[j] = node0.m_rt*(1-g) + node1.m_rt*g;
     }
-    
-    int mm[3];
-    if (n == 3) {
-        mm[0] = nn[0];
-        mm[1] = nn[1];
-        mm[2] = nn[2];
-        double A = ((x[1] - x[0]) ^ (x[2] - x[0])).Length();
-        // prescribe the forces on the nodes
-        for (int j=0; j<n; ++j) {
-            FEEdgeList::EDGE edge = m_EL.Edge(nn[j]);
-            FENode& node0 = dom.Node(edge.node[0]);
-            FENode& node1 = dom.Node(edge.node[1]);
-            double g = edge.tag;
-            double vf = -m_vsn[mm[j]];
-            int lm0 = node0.m_ID[m_dofEF[0]];
-            int lm1 = node1.m_ID[m_dofEF[0]];
-            R[lm0] -= vf*(1-g);
-            R[lm1] -= vf*g;
+    vector<double> A(n,0.0);
+    switch (n) {
+        case 3:
+        {
+            A[0] = A[1] = A[2] = ((x[1] - x[0]) ^ (x[2] - x[0])).Length()/6.0;
         }
+            break;
+            
+        case 4:
+        {
+            A[0] = ((x[0]*2+x[1]-x[2]-x[3]*2)^(x[0]*2-x[1]*2-x[2]+x[3])).Length()/36.0;
+            A[1] = ((x[0]+x[1]*2-x[2]*2-x[3])^(x[0]*2-x[1]*2-x[2]+x[3])).Length()/36.0;
+            A[2] = ((x[0]+x[1]*2-x[2]*2-x[3])^(x[0]-x[1]-x[2]*2+x[3]*2)).Length()/36.0;
+            A[3] = ((x[0]*2+x[1]-x[2]-x[3]*2)^(x[0]-x[1]-x[2]*2+x[3]*2)).Length()/36.0;
+        }
+            break;
+            
+        default:
+            break;
+    }
+    // prescribe the forces on the nodes
+    for (int j=0; j<n; ++j) {
+        FEEdgeList::EDGE edge = m_EL.Edge(nn[j]);
+        FENode& node0 = dom.Node(edge.node[0]);
+        FENode& node1 = dom.Node(edge.node[1]);
+        double g = edge.tag;
+        double vf = m_vsn[nn[j]];
+        int lm0 = node0.m_ID[m_dofEF[0]];
+        int lm1 = node1.m_ID[m_dofEF[0]];
+        R[lm0] -= vf*(1-g)*A[n];
+        R[lm1] -= vf*g*A[n];
     }
 }
 
