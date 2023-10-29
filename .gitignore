@@ -442,4 +442,5 @@ Documentation/FEBio_User_Manual.html.LyXconv/
 
 /FEBioMech/FECGSolidSolver - Copy.cpp
 
-febio-sdk
+febio*-sdk
+.envrc
