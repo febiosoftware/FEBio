@@ -59173,9 +59173,337 @@ name "sec:Tied-Fluid-Interface"
 \end_layout
 
 \begin_layout Standard
-A tied fluid interface may be used to enforces continuity of viscous shear
- traction and normal fluid velocity at the interface between dissimilar
- meshes.
+Under isothermal conditions which preclude any heat flux and for which the
+ entropy is zero, the interface jump conditions derived from mass, linear
+ momentum and energy balance across an interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ which is permeable to the fluid are
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\rho\mathbf{u}^{\Gamma}\right]\right]\cdot\mathbf{n}^{\Gamma}=0\,,\label{eq:jump-mass}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\boldsymbol{\sigma}-\rho\mathbf{u}^{\Gamma}\otimes\mathbf{u}^{\Gamma}\right]\right]\cdot\mathbf{n}^{\Gamma}=\mathbf{0}\,,\label{eq:jump-linear-momentum}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\rho\left(\psi+\frac{1}{2}\mathbf{u}^{\Gamma}\cdot\mathbf{u}^{\Gamma}\right)\mathbf{u}^{\Gamma}-\boldsymbol{\sigma}^{T}\cdot\mathbf{u}^{\Gamma}\right]\right]\cdot\mathbf{n}^{\Gamma}=0\label{eq:jump-energy}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{u}^{\Gamma}\equiv\mathbf{v}-\mathbf{v}^{\Gamma}\label{eq:Gamma-diffusive-velocity}
+\end{equation}
+
+\end_inset
+
+ 
+\begin_inset Formula $\rho$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi$
+\end_inset
+
+ are the mass density, velocity, stress tensor and specific free energy
+ of the fluid, respectively, and 
+\begin_inset Formula $\mathbf{v}^{\Gamma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}^{\Gamma}$
+\end_inset
+
+ are the velocity of, and outward unit normal to 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, respectively.
+ A tied fluid interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, which allows fluid to cross 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, must enforce these continuity requirements.
+ For fluid analyses, we let
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}=-p\mathbf{I}+\boldsymbol{\tau}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $p$
+\end_inset
+
+ is the fluid pressure and 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is the viscous shear stress.
+ Susbtituting this relation into the energy jump of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-energy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, neglecting the contribution of 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ relative to that of 
+\begin_inset Formula $p$
+\end_inset
+
+, and making use of the jump condition from mass balance in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-mass"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we find that
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\psi+\frac{p}{\rho}+\frac{1}{2}\mathbf{u}^{\Gamma}\cdot\mathbf{u}^{\Gamma}\right]\right]=0\,.\label{eq:jump-energy-redux}
+\end{equation}
+
+\end_inset
+
+Since 
+\begin_inset Formula $\psi$
+\end_inset
+
+ and 
+\begin_inset Formula $p$
+\end_inset
+
+ are functions of state that only depend on the fluid volume ratio 
+\begin_inset Formula $J$
+\end_inset
+
+ (in an isothermal analysis, see eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:elastic-pressure"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), letting 
+\begin_inset Formula $J$
+\end_inset
+
+ be continuous across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ implies from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-balance-integrated"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ that 
+\begin_inset Formula $\rho$
+\end_inset
+
+ is continuous across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+; thus, from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-balance-integrated"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we conclude that 
+\begin_inset Formula $\mathbf{u}^{\Gamma}\cdot\mathbf{n}$
+\end_inset
+
+ is continuous, hence eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-energy-redux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is satisfied.
+ In other words, letting 
+\begin_inset Formula $\left[\left[J\right]\right]=0$
+\end_inset
+
+ is a sufficient (but not necessary) condition to satisfy the jump conditions
+ from mass and energy balance, as long as we also enforce 
+\begin_inset Formula $\left[\left[\mathbf{u}^{\Gamma}\right]\right]\cdot\mathbf{n}=0$
+\end_inset
+
+.
+ For a viscous fluid, we also assume that the no-slip condition holds, implying
+ that our jump requirement for the fluid velocity is even more stringent,
+ namely 
+\begin_inset Formula $\left[\left[\mathbf{u}^{\Gamma}\right]\right]=\mathbf{0}$
+\end_inset
+
+ (or equivalently, 
+\begin_inset Formula $\left[\left[\mathbf{v}\right]\right]=\mathbf{0}$
+\end_inset
+
+).
+ According to the above relations between the stress and pressure, and recognizi
+ng that 
+\begin_inset Formula $\left[\left[J\right]\right]=0$
+\end_inset
+
+ implies 
+\begin_inset Formula $\left[\left[p\right]\right]=0$
+\end_inset
+
+, we may also simplify the linear momentum jump condition of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-linear-momentum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to 
+\begin_inset Formula $\left[\left[\boldsymbol{\tau}\right]\right]\cdot\mathbf{n}^{\Gamma}=\mathbf{0}$
+\end_inset
+
+.
+ Therefore, the jump conditions that we need to enforce for a tied fluid
+ interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ are
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\left[\left[J\right]\right] & =0\\
+\left[\left[\mathbf{v}\right]\right] & =\mathbf{0}\\
+\left[\left[\boldsymbol{\tau}\right]\right]\cdot\mathbf{n}^{\Gamma} & =\mathbf{0}
+\end{aligned}
+\,.\label{eq:jump-tied-fluid}
+\end{equation}
+
+\end_inset
+
+These jump conditions are consistent with the choice of nodal degrees of
+ freedom for fluid analyses (namely, 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $J$
+\end_inset
+
+).
+ On a tied (or sliding) fluid interface, we don't have continuity of the
+ mesh, therefore we can only enforce continuity of 
+\begin_inset Formula $J$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ by enforcing continuity of the fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ and viscous traction 
+\begin_inset Formula $\mathbf{t}^{\tau}\equiv\boldsymbol{\tau}\cdot\mathbf{n}^{\Gamma}$
+\end_inset
+
+.
+ However, in our fluid finite element formulation, 
+\begin_inset Formula $p$
+\end_inset
+
+ is not a natural boundary condition since it is calculated directly from
+ 
+\begin_inset Formula $J$
+\end_inset
+
+.
+ Instead, as explained in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Computational-Fluid-Dynamics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the natural boundary condition for the fluid dilatation governing equation
+ is continuity of 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+ across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, thus 
+\begin_inset Formula $\left[\left[\mathbf{v}\right]\right]\cdot\mathbf{n}^{\Gamma}=0$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -59280,7 +59608,7 @@ Now the contact integral may be rewritten as
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\,\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}\\
- & -\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}
 \end{aligned}
 \,,\label{eq699-2}
 \end{equation}
@@ -59375,19 +59703,11 @@ The vector gap function
 \begin_inset Formula $\mathbf{g}$
 \end_inset
 
-, representing the difference between tangential velocities across the interface
-, is defined by 
+, representing the difference between velocities across the interface, is
+ defined by 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{g}=\mathbf{v}_{t}^{\left(2\right)}-\mathbf{v}_{t}^{\left(1\right)}\,,\label{TFI-vt-gap}
-\end{equation}
-
-\end_inset
-
-where the tangential velocity is evaluate from
-\begin_inset Formula 
-\begin{equation}
-\mathbf{v}_{t}^{\left(i\right)}=\left(\mathbf{I}-\mathbf{n}^{\left(i\right)}\otimes\mathbf{n}^{\left(i\right)}\right)\cdot\mathbf{v}^{\left(i\right)}\,.\label{eq:TFI-vt}
+\mathbf{g}=\mathbf{v}^{\left(2\right)}-\mathbf{v}^{\left(1\right)}\,,\label{TFI-vt-gap}
 \end{equation}
 
 \end_inset
@@ -59396,19 +59716,16 @@ We may similarly define the scalar gap function
 \begin_inset Formula $\pi$
 \end_inset
 
-, representing the difference between fluid pressures across the interface,
+, representing the difference between fluid dilatations (or volume ratios)
+ across the interface,
 \begin_inset Formula 
 \begin{equation}
-\pi=K\left(J^{\left(2\right)}-J^{\left(1\right)}\right)=K\left(e^{\left(2\right)}-e^{\left(1\right)}\right)\,,\label{eq:TFI-e-gap}
+\pi=J^{\left(2\right)}-J^{\left(1\right)}\,.\label{eq:TFI-e-gap}
 \end{equation}
 
 \end_inset
 
-where 
-\begin_inset Formula $K$
-\end_inset
 
- is the fluid bulk modulus.
 \end_layout
 
 \begin_layout Subsection
@@ -59451,7 +59768,7 @@ where
  Similarly, let 
 \begin_inset Formula 
 \begin{equation}
-v_{n}=\varepsilon_{n}\pi=K\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\,,\label{eq:TFI-v-penalty}
+v_{n}=\varepsilon_{n}\pi=\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\,,\label{eq:TFI-v-penalty}
 \end{equation}
 
 \end_inset
@@ -59469,12 +59786,12 @@ where
 \begin_inset Formula $\varepsilon_{n}$
 \end_inset
 
- has units of length per viscosity.
+ has units of velocity.
  It follows that 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\mathbf{t}^{\tau} & =\varepsilon_{t}\left(\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}-\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
-Dv_{n} & =K\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
+\begin{aligned}D\mathbf{t}^{\tau} & =\varepsilon_{t}\left(\Delta\mathbf{v}^{\left(2\right)}-\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
+Dv_{n} & =\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
 \end{aligned}
 \label{eq:TFI-penalty-linearization}
 \end{equation}
@@ -59490,7 +59807,7 @@ Given these relations, it can be shown that the directional derivatives
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned} & -D\left(J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\right)=\\
- & \varepsilon_{t}J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}-\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}\right)
+ & \varepsilon_{t}J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\Delta\mathbf{v}^{\left(1\right)}-\Delta\mathbf{v}^{\left(2\right)}\right)
 \end{aligned}
 \,,\label{eq:TFI-G-linearization-v}
 \end{equation}
@@ -59500,7 +59817,7 @@ Given these relations, it can be shown that the directional derivatives
 
 \begin_inset Formula 
 \begin{equation}
-D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J_{\eta}^{\left(1\right)}\right)=-\varepsilon_{n}KJ_{\eta}^{\left(1\right)}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
+D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J_{\eta}^{\left(1\right)}\right)=-\varepsilon_{n}J_{\eta}^{\left(1\right)}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
 \end{equation}
 
 \end_inset
