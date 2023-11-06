@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FELineSearch.h"
 #include "FENewtonSolver.h"
+#include "FEException.h"
 #include "DumpStream.h"
 #include <vector>
 using namespace std;
@@ -84,8 +85,21 @@ double FELineSearch::DoLineSearch(double s)
 	do
 	{
 		// Update geometry
-		vcopys(ul, ui, s);
-		m_pns->Update(ul);
+		bool negJacFree = true;
+		do {
+			negJacFree = true;
+			vcopys(ul, ui, s);
+			try {
+				m_pns->Update(ul);
+			}
+			catch (NegativeJacobianDetected e)
+			{
+				negJacFree = false;
+				s *= 0.5;
+				n++;
+				if (n > nmax) throw;
+			}
+		} while (!negJacFree);
 
 		// calculate residual at this point
 		ns->Residual(R1, false);
