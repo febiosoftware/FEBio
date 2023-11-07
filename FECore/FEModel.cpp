@@ -626,7 +626,15 @@ void FEModel::Update()
 	// update mesh
 	FEMesh& mesh = GetMesh();
 	const FETimeInfo& tp = GetTime();
-	mesh.Update(tp);
+	try {
+		mesh.Update(tp);
+	}
+	catch (NegativeJacobianDetected e)
+	{
+		// for debug modes we do want to see inverted elements on the post side
+		DoCallback(CB_MODEL_UPDATE);
+		throw;
+	}
 
 	// set the mesh update flag to false
 	// If any load sets this to true, the

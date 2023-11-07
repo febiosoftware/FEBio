@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FENewtonSolver.h"
 #include "FEException.h"
 #include "DumpStream.h"
+#include "log.h"
 #include <vector>
 using namespace std;
 
@@ -96,6 +97,7 @@ double FELineSearch::DoLineSearch(double s)
 			{
 				negJacFree = false;
 				s *= 0.5;
+				feLogWarningEx(m_pns->GetFEModel(), "line search cutback : %lg\n", s);
 				n++;
 				if (n > nmax) throw;
 			}
