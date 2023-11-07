@@ -49,4 +49,7 @@ protected:
 	void ParseEdgeSection       (XMLTag& tag, FEBModel::Part* part);
 	void ParseSurfacePairSection(XMLTag& tag, FEBModel::Part* part);
 	void ParseDiscreteSetSection(XMLTag& tag, FEBModel::Part* part);
+
+private:
+	int m_maxNodeId;
 };
