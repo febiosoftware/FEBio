@@ -76,7 +76,7 @@ public:
 
 private:
     FEParamDouble	m_T0;       // prescribed active stress
-    FEParamVec3     m_n0;		// unit vector along fiber direction (local coordinate system)
+	FEVec3dValuator* m_fiber;  // unit vector along fiber direction (local coordinate system)
 
     DECLARE_FECORE_CLASS();
 };
