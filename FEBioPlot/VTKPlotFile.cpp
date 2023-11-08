@@ -269,8 +269,10 @@ void VTKPlotFile::WriteCellData()
 	PlotFile::Dictionary& dic = GetDictionary();
 	if (dic.DomainVariables() == 0) return;
 
-	// write the part IDs first
+	// write cell data
 	fprintf(m_fp, "\nCELL_DATA %d\n", elems);
+
+	// write the part IDs first
 	fprintf(m_fp, "SCALARS part_id int\n");
 	fprintf(m_fp, "LOOKUP_TABLE default\n");
 	for (int i = 0; i < mesh.Domains(); ++i)
@@ -280,7 +282,6 @@ void VTKPlotFile::WriteCellData()
 		for (int n = 0; n < NE; ++n) fprintf(m_fp, "%d\n", i);
 	}
 
-	fprintf(m_fp, "\nCELL_DATA %d\n", elems);
 	auto& elemData = dic.DomainVariableList();
 	list<DICTIONARY_ITEM>::iterator it = elemData.begin();
 	for (int n = 0; n < elemData.size(); ++n, ++it)
