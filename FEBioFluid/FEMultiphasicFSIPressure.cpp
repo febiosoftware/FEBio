@@ -158,12 +158,12 @@ void FEMultiphasicFSIPressure::Update()
             ca /= caNodes[node.GetID()].size();
             osc /= caNodes[node.GetID()].size();
             
-            double c = osc*ca*R;
+            double pc = R*T*osc*ca;
             
             //get correct ef for desired pressure
             double e = 0;
             bool good = false;
-            good = m_pfs->Fluid()->Dilatation(T, m_p, c, e);
+            good = m_pfs->Fluid()->Dilatation(0, m_p - pc, e);
             assert(good);
             
             // set node as having prescribed DOF

@@ -99,19 +99,11 @@ void FEInitialFluidPressureTemperature::Activate()
     
     FEMesh& mesh = *m_nodeSet->GetMesh();
 
-    // Project dilatation values from int points to nodes
+    // evaluate average prescribed pressure and temperature in each element
+    // project them from int points to nodes
     for (int i=0; i<mesh.Elements(); ++i)
     {
         FEElement& el = *mesh.Element(i);
-        // evaluate average prescribed pressure and temperature in this element
-        double p = 0, T = 0;
-        for (int j=0; j<el.GaussPoints(); ++j) {
-            FEMaterialPoint* pt = el.GetMaterialPoint(j);
-            p += m_Pdata(*pt);
-            T += m_Tdata(*pt);
-        }
-        p /= el.GaussPoints();
-        T /= el.GaussPoints();
         // get material
         FEMaterial* pm = GetFEModel()->GetMaterial(el.GetMatID());
         FEThermoFluid* ptfl = pm->ExtractProperty<FEThermoFluid>();
@@ -122,18 +114,18 @@ void FEInitialFluidPressureTemperature::Activate()
             bool good = true;
             for (int j=0; j<el.GaussPoints(); ++j) {
                 FEMaterialPoint* pt = el.GetMaterialPoint(j);
-                good = good && ptfl->Dilatation(T, p, 0, efi[j]);
+                good = good && ptfl->Dilatation(m_Tdata(*pt), m_Pdata(*pt), efi[j]);
             }
             // project dilatations from integration points to nodes
             el.project_to_nodes(efi, efo);
             if (good) {
                 for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_lnode[j]].push_back(efo[j]);
+                    efNodes[el.m_node[j]].push_back(efo[j]);
             }
             else {
                 for (int j=0; j<el.Nodes(); ++j) {
                     efo[j] = 0;
-                    efNodes[el.m_lnode[j]].push_back(efo[j]);
+                    efNodes[el.m_node[j]].push_back(efo[j]);
                 }
             }
         }
@@ -143,18 +135,18 @@ void FEInitialFluidPressureTemperature::Activate()
             bool good = true;
             for (int j=0; j<el.GaussPoints(); ++j) {
                 FEMaterialPoint* pt = el.GetMaterialPoint(j);
-                good = good && pfl->Dilatation(0, p, 0, efi[j]);
+                good = good && pfl->Dilatation(0, m_Pdata(*pt), efi[j]);
             }
             // project dilatations from integration points to nodes
             el.project_to_nodes(efi, efo);
             if (good) {
                 for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_lnode[j]].push_back(efo[j]);
+                    efNodes[el.m_node[j]].push_back(efo[j]);
             }
             else {
                 for (int j=0; j<el.Nodes(); ++j) {
                     efo[j] = 0;
-                    efNodes[el.m_lnode[j]].push_back(efo[j]);
+                    efNodes[el.m_node[j]].push_back(efo[j]);
                 }
             }
         }
@@ -206,18 +198,6 @@ void FEInitialFluidPressureTemperature::GetNodalValues(int inode, std::vector<do
 {
     values[0] = m_e[inode];
     values[1] = m_T[inode];
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::SetPValue(double v)
-{
-    m_Pdata = v;
-}
-
-//-----------------------------------------------------------------------------
-void FEInitialFluidPressureTemperature::SetTValue(double v)
-{
-    m_Tdata = v;
 }
 
 //-----------------------------------------------------------------------------

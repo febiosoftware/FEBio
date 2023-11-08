@@ -29,40 +29,30 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelParam.h>
-#include "febiomix_api.h"
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! This boundary condition applies a poro-elastic normal traction on a surface
-//!
-class FEBIOMIX_API FEPoroNormalTraction : public FESurfaceLoad
+//! FEFluidNormalHeatFlux is a thermo-fluid surface that has a normal
+//! heat flux prescribed on it, equal to what's coming underneath it
+class FEBIOFLUID_API FEFluidNaturalHeatFlux : public FESurfaceLoad
 {
 public:
-	//! constructor
-	FEPoroNormalTraction(FEModel* pfem);
-
-	bool Init() override;
-
-	//! Set the surface to apply the load to
-	void SetSurface(FESurface* ps) override;
-
-	void SetLinear(bool blinear) { m_blinear = blinear; }
-
-	void SetEffective(bool beff) { m_beffective = beff; }
-
-	//! calculate pressure stiffness
-	void StiffnessMatrix(FELinearSystem& LS) override;
-
-	//! calculate residual
-	void LoadVector(FEGlobalVector& R) override;
-
-private:
-	double Traction(FESurfaceMaterialPoint& mp);
-
-protected:
-	FEParamDouble	m_traction;		//!< traction value
-	bool	m_blinear;		//!< linear or not (true is non-follower, false is follower)
-    bool    m_bshellb;      //!< flag for prescribing traction on shell bottom
-	bool	m_beffective;	//!< effective or total normal traction
-
-	DECLARE_FECORE_CLASS();
+    //! constructor
+    FEFluidNaturalHeatFlux(FEModel* pfem);
+    
+    //! initialization
+    bool Init() override;
+    
+    //! Set the surface to apply the load to
+    void SetSurface(FESurface* ps) override;
+    
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R) override;
+    
+    //! calculate heat flux stiffness (there is none)
+    void StiffnessMatrix(FELinearSystem& LS) override {}
+    
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
 };

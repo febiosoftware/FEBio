@@ -133,7 +133,7 @@ FEDomainMap* FESurfaceToSurfaceMap::Generate()
 	FEElementSet* elset = GetElementSet();
 	if (elset == nullptr) return nullptr;
 
-	FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_MATPOINTS);
+	FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_NODE);
 	map->Create(elset);
 	if (FEElemDataGenerator::Generate(*map) == false)
 	{

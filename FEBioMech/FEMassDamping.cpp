@@ -43,6 +43,13 @@ vec3d FEMassDamping::force(FEMaterialPoint& mp)
 	return ep.m_v*m_C;
 }
 
+//! calculate the divergence of the body force at a material point
+double FEMassDamping::divforce(FEMaterialPoint& mp)
+{
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    return ep.m_L.trace()*m_C;
+}
+
 //! calculate constribution to stiffness matrix
 mat3ds FEMassDamping::stiffness(FEMaterialPoint& pt)
 {

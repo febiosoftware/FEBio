@@ -91,6 +91,9 @@ public:
     //! calculates covariant basis vectors at any point
     void CoBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3]);
     
+    //! calculates covariant basis vectors at any point
+    void CoBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3], const double alpha);
+    
     //! calculates covariant basis vectors at an integration point at previous time
     void CoBaseVectorsP(FEShellElement& el, int n, vec3d g[3]);
     
@@ -105,6 +108,9 @@ public:
     
     //! calculates contravariant basis vectors at any point
     void ContraBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3]);
+    
+    //! calculates contravariant basis vectors at any point
+    void ContraBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3], const double alpha);
     
     // jacobian with respect to current frame at an integration point
     double detJ(FEShellElement& el, int n);

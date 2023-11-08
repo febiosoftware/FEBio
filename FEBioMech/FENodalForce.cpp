@@ -33,7 +33,7 @@ SOFTWARE.*/
 #include <FECore/FENode.h>
 
 BEGIN_FECORE_CLASS(FENodalForce, FENodalLoad)
-	ADD_PARAMETER(m_f, "value")->setUnits(UNIT_FORCE);
+	ADD_PARAMETER(m_f, "value")->setUnits(UNIT_FORCE)->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_shellBottom, "shell_bottom");
 END_FECORE_CLASS();
 

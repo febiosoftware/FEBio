@@ -161,6 +161,12 @@ public:
 	public: RepeatedElementSet(const std::string& name);
 	};
 
+	// repeated part list
+	class RepeatedPartList : public FEFileException
+	{
+	public: RepeatedPartList(const std::string& name);
+	};
+
 public:
 	//! constructor
 	FEBioImport();

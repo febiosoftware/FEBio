@@ -43,12 +43,14 @@ public:
     FEPorousNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) { m_phisr = 1; m_lam = 0; }
     
 public:
-    double  m_E;        //!< Young's modulus
-    double  m_lam;      //!< first Lamé coefficient
-    double  m_mu;       //!< second Lamé coefficient
-    double  m_phisr;    //!< referential solidity
+    FEParamDouble   m_E;        //!< Young's modulus
+    FEParamDouble   m_lam;      //!< first Lamé coefficient
+    FEParamDouble   m_phisr;    //!< referential solidity
     
 public:
+    //! initialize the material
+    bool Init() override;
+    
     //! calculate stress at material point
     mat3ds Stress(FEMaterialPoint& pt) override;
     

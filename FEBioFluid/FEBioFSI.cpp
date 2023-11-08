@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include "FEBiphasicFSIDomain3D.h"
 #include "FEFluidModule.h"
 #include "FEFluidFSIAnalysis.h"
+#include "FEFluidSupplyStarling.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -85,7 +86,7 @@ void FEBioFSI::InitModule()
 	febio.AddModuleDependency("biphasic");	// also pulls in "solid"
 
 	//-----------------------------------------------------------------------------
-	// analyis classes (default type must match module name!)
+	// analysis classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FEFluidFSIAnalysis, "fluid-FSI");
 
 	//-----------------------------------------------------------------------------
@@ -107,6 +108,8 @@ void FEBioFSI::InitModule()
     
     REGISTER_FECORE_CLASS(FEBiphasicFSIDomain3D, "biphasic-FSI-3D");
 
+    REGISTER_FECORE_CLASS(FEFluidSupplyStarling, "Starling");
+    
     //-----------------------------------------------------------------------------
     // Reset solver parameters to preferred default settings
     febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {

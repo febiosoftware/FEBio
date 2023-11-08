@@ -168,7 +168,13 @@ void mat3ds::exact_eigen(double l[3]) const
 	}
 	else
 	{
-		l[0] = l[1] = l[2] = 0.0;
+        // check it matrix is exact diagonal
+        if ((m[1] == 0) && (m[3] == 0) && (m[4] == 0)) {
+            l[0] = m[0]; l[1] = m[2]; l[2] = m[5];
+        }
+        else {
+            l[0] = l[1] = l[2] = 0.0;
+        }
 	}
 }
 

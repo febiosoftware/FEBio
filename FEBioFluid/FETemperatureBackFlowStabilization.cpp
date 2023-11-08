@@ -60,7 +60,6 @@ bool FETemperatureBackFlowStabilization::Init()
     m_dof.AddDof(m_dofT);
 
     FESurface* ps = &GetSurface();
-    m_backflow.assign(ps->Nodes(), false);
 
     m_nnlist.Create(fem.GetMesh());
 
@@ -146,7 +145,7 @@ void FETemperatureBackFlowStabilization::Update()
                 node.set(m_dofT, cnode->get(m_dofT));
             }
             else
-                node.set(m_dofT, 0);
+                node.set(m_dofT, node.get_prev(m_dofT));
         }
     }
 }
@@ -245,6 +244,5 @@ void FETemperatureBackFlowStabilization::Serialize(DumpStream& ar)
     if (ar.IsShallow()) return;
 	ar & m_dofW;
 	ar & m_dofT;
-	ar & m_backflow;
     m_nnlist.Create(GetFEModel()->GetMesh());
 }

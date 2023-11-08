@@ -130,6 +130,21 @@ vec3d FESurfaceAttractionBodyForce::force(FEMaterialPoint& mp)
     return f;
 }
 
+//-----------------------------------------------------------------------------
+double FESurfaceAttractionBodyForce::divforce(FEMaterialPoint& mp)
+{
+    // get element number for this material point
+    int eid = mp.m_elem->GetID() - 1;
+    
+    vec3d q = m_q[eid][mp.m_index];
+    
+    // calculate net force
+    vec3d g = mp.m_r0 - q;
+    double r = g.unit();
+    
+    return (3-r/m_blt)*(m_bsf*exp(-r/m_blt));
+}
+
 mat3ds FESurfaceAttractionBodyForce::stiffness(FEMaterialPoint& mp)
 {
     return mat3ds(0,0,0,0,0,0);

@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! The FEBioThermoFluid module
 
-//! The FEBioThermoFluid module adds thermofluid capabilites to FEBio.
+//! The FEBioThermoFluid module adds thermofluid capabilities to FEBio.
 //!
 namespace FEBioThermoFluid {
 

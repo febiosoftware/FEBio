@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEIdealGasIsothermal, FEFluid)
-	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    );
+	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    )->setUnits(UNIT_MOLAR_MASS)->setLongName("molar mass");
 END_FECORE_CLASS();
 
 //============================================================================
@@ -128,8 +128,8 @@ double FEIdealGasIsothermal::StrainEnergyDensity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! invert pressure-dilatation relation
-bool FEIdealGasIsothermal::Dilatation(const double T, const double p, const double c, double& e)
+//! invert effective pressure-dilatation relation
+bool FEIdealGasIsothermal::Dilatation(const double T, const double p, double& e)
 {
     double J = m_Pr/(p+m_Pr);
     e = J - 1;

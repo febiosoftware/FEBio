@@ -34,6 +34,9 @@ public:
 	//! calculate the body force at a material point
 	vec3d force(FEMaterialPoint& pt) override;
 
+    //! calculate the divergence of the body force at a material point
+    double divforce(FEMaterialPoint& pt) override;
+    
 	//! calculate constribution to stiffness matrix
 	mat3ds stiffness(FEMaterialPoint& pt) override;
 

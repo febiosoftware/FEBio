@@ -40,8 +40,6 @@ public:
     bool SetTDOF(const char* szdof);
 
     void GetNodalValues(int inode, std::vector<double>& values) override;
-    void SetPValue(double v);
-    void SetTValue(double v);
 
     void Serialize(DumpStream& ar) override;
 

@@ -627,6 +627,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element elasticity tensor
+class FEPlotElementDevElasticity : public FEPlotDomainData
+{
+public:
+    FEPlotElementDevElasticity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_TENS4FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Damage reduction factor
 class FEPlotDamage : public FEPlotDomainData
 {
@@ -1196,3 +1205,76 @@ public:
 	FEPlotTrussStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Growth deformation gradient (Kinematic Growth)
+class FEPlotGrowthDeformationGradient : public FEPlotDomainData
+{
+public:
+    FEPlotGrowthDeformationGradient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3F, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Growth  Lagrange strains
+class FEPlotGrowthLagrangeStrain : public FEPlotDomainData
+{
+public:
+    FEPlotGrowthLagrangeStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+// Growth infinitesimal strain
+class FEPlotGrowthInfStrain : public FEPlotDomainData
+{
+public:
+    FEPlotGrowthInfStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Growth right stretch
+class FEPlotGrowthRightStretch : public FEPlotDomainData
+{
+public:
+    FEPlotGrowthRightStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Growth left stretch
+class FEPlotGrowthLeftStretch : public FEPlotDomainData
+{
+public:
+    FEPlotGrowthLeftStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Growth right Hencky
+class FEPlotGrowthRightHencky : public FEPlotDomainData
+{
+public:
+    FEPlotGrowthRightHencky(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Growth left Hencky
+class FEPlotGrowthLeftHencky : public FEPlotDomainData
+{
+public:
+    FEPlotGrowthLeftHencky(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Growth relative volume
+class FEPlotGrowthRelativeVolume : public FEPlotDomainData
+{
+public:
+    FEPlotGrowthRelativeVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

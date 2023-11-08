@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2023 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,63 +23,49 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FEAugLagLinearConstraint.h>
-#include <FECore/FESurface.h>
-#include "febiofluid_api.h"
+#include <FECore/FEPrescribedBC.h>
+#include <FECore/FEModelParam.h>
+#include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
-//! The FEFluidSolutesGradientLC class implements a fluid surface with prescribed pressure
-//! as a linear constraint between nodal dilatation and effective concentrations.
-
-class FEBIOFLUID_API FEFluidSolutesGradientLC : public FESurfaceConstraint
+//! Prescribe the actual fluid pressure in a multiphasic mixture
+//!
+class FEBIOMIX_API FEMultiphasicFluidPressureBC : public FEPrescribedSurface
 {
 public:
     //! constructor
-    FEFluidSolutesGradientLC(FEModel* pfem);
-    
-    //! destructor
-    ~FEFluidSolutesGradientLC() {}
-    
-    //! Activation
-    void Activate() override;
-    
-    //! initialization
+    FEMultiphasicFluidPressureBC(FEModel* pfem);
+
+    //! set the dilatation
+    void Update() override;
+
+    //! initialize
     bool Init() override;
-    
-    //! Get the surface
-    FESurface* GetSurface() override { return &m_surf; }
-    
-public:
-    //! serialize data to archive
+
+    //! serialization
     void Serialize(DumpStream& ar) override;
-    
-    //! add the linear constraint contributions to the residual
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-    
-    //! add the linear constraint contributions to the stiffness matrix
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
-    
-    //! do the augmentation
-    bool Augment(int naug, const FETimeInfo& tp) override;
-    
-    //! build connectivity for matrix profile
-    void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
-protected:
-    void UnpackLM(vector<int>& lm);
-    
-protected:
-    FESurface	m_surf;
-    FELinearConstraintSet   m_lc;
-    bool        m_binit;
+public:
+    // return the value for node i, dof j
+    void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
-    // degrees of freedom
+    // copy data from another class
+    void CopyFrom(FEBoundaryCondition* pbc) override;
+
+private:
+    FEParamDouble   m_p;        //!< prescribed fluid pressure
+    vector<double>  m_pe;       //!< effective fluid pressure
+
+private:
+    double      m_Rgas;
+    double      m_Tabs;
+
+    int         m_dofP;
     int         m_dofC;
-    int         m_isol;
+
+public:
+    bool        m_bshellb;      //!< flag for prescribing pressure on shell bottom
 
     DECLARE_FECORE_CLASS();
 };

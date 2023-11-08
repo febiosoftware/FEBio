@@ -33,7 +33,7 @@ class FEMaterialPoint;
 
 //-----------------------------------------------------------------------------
 // Base class for RVE probes
-class FERVEProbe : public FECallBack
+class FEBIORVE_API FERVEProbe : public FECallBack
 {
 	FECORE_BASE_CLASS(FERVEProbe);
 

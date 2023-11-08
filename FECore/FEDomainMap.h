@@ -57,6 +57,9 @@ public:
 	mat3d valueMat3d(const FEMaterialPoint& pt) override;
 	mat3ds valueMat3ds(const FEMaterialPoint& pt) override;
 
+	//! get the value at a node (only works with FMT_NODE!!)
+	double NodalValue(int nid);
+
 	//! Get the element set
 	const FEElementSet* GetElementSet() const { return m_elset; }
 
