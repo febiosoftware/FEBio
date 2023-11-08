@@ -866,7 +866,7 @@ bool FEBioPlotFile::WriteDictionary(FEModel& fem)
 	}
 
 	// store surface data
-	if (!dic.SurfaceVariables())
+	if (dic.SurfaceVariables())
 	{
 		m_ar.BeginChunk(PLT_DIC_SURFACE);
 		{
