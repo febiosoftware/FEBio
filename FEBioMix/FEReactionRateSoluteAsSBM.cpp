@@ -27,71 +27,53 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FENodeSet.h"
-#include "FEMesh.h"
-#include "DumpStream.h"
-#include "FEModel.h"
+#include "FEReactionRateSoluteAsSBM.h"
+#include "FEBiphasic.h"
+#include "FEBioMech/FERemodelingElasticMaterial.h"
 
-//=============================================================================
-// FENodeSet
-//-----------------------------------------------------------------------------
-FENodeSet::FENodeSet(FEModel* fem) : FEItemList(fem, FEItemList::FE_ELEMENT_SET), m_Node(&fem->GetMesh())
-{
-	SetMesh(&fem->GetMesh());
-}
+// Material parameters for the FEMultiphasic material
+BEGIN_FECORE_CLASS(FEReactionRateSoluteAsSBM, FEReactionRate)
+	ADD_PARAMETER(m_k0, "k0");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-void FENodeSet::Add(int id)
+FEReactionRateSoluteAsSBM::FEReactionRateSoluteAsSBM(FEModel* pfem) : FEReactionRate(pfem)
 {
-	m_Node.Add(id);
+    m_k0 = 0;
 }
 
 //-----------------------------------------------------------------------------
-void FENodeSet::Add(const std::vector<int>& ns)
+//! reaction rate at material point
+double FEReactionRateSoluteAsSBM::ReactionRate(FEMaterialPoint& pt)
 {
-	m_Node.Add(ns);
+    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
+    double phisr = pbm->SolidReferentialVolumeFraction(pt);
+	
+	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+    double J = et.m_J;
+	double zhat = m_k0(pt)/(J-phisr);
+	return zhat;
 }
 
 //-----------------------------------------------------------------------------
-void FENodeSet::Add(const FENodeList& ns)
+//! tangent of reaction rate with strain at material point
+mat3ds FEReactionRateSoluteAsSBM::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
-	m_Node.Add(ns);
+    FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
+    double phisr = pbm->SolidReferentialVolumeFraction(pt);
+    double dphisrdJ = pbm->TangentSRVFStrain(pt);
+
+    FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+    
+    double J = et.m_J;
+    double dzhatdJ = -(1-dphisrdJ)*m_k0(pt)/pow(J-phisr,2);
+	return mat3dd(dzhatdJ);
 }
 
 //-----------------------------------------------------------------------------
-void FENodeSet::Clear()
+//! tangent of reaction rate with effective fluid pressure at material point
+double FEReactionRateSoluteAsSBM::Tangent_ReactionRate_Pressure(FEMaterialPoint& pt)
 {
-	m_Node.Clear();
+	return 0;
 }
 
-//-----------------------------------------------------------------------------
-FENode* FENodeSet::Node(int i)
-{
-	FEMesh* mesh = GetMesh();
-	return (mesh ? &mesh->Node(m_Node[i]) : nullptr);
-}
-
-//-----------------------------------------------------------------------------
-const FENode* FENodeSet::Node(int i) const
-{
-	FEMesh* mesh = GetMesh();
-	return (mesh ? &mesh->Node(m_Node[i]) : nullptr);
-}
-
-//-----------------------------------------------------------------------------
-void FENodeSet::Serialize(DumpStream& ar)
-{
-	FEItemList::Serialize(ar);
-	if (ar.IsShallow()) return;
-	ar & m_Node;
-}
-
-void FENodeSet::SaveClass(DumpStream& ar, FENodeSet* p)
-{
-}
-
-FENodeSet* FENodeSet::LoadClass(DumpStream& ar, FENodeSet* p)
-{
-	p = new FENodeSet(&ar.GetFEModel());
-	return p;
-}

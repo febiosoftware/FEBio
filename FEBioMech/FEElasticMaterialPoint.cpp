@@ -74,6 +74,7 @@ void FEElasticMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPointData::Serialize(ar);
     ar & m_F & m_J & m_s & m_v & m_a & m_gradJ & m_L & m_Wt & m_Wp & m_p;
+	ar & m_buncoupled;
 }
 
 //-----------------------------------------------------------------------------

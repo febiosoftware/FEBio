@@ -46,6 +46,7 @@ SOFTWARE.*/
 #include "FEVolumeConstraint.h"
 #include "FEContactSurface.h"
 #include "FEDiscreteElasticMaterial.h"
+#include "FESlidingInterface.h"
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(const FENode& node)
@@ -167,17 +168,37 @@ double FENodeForceZ::value(const FENode& node)
 //-----------------------------------------------------------------------------
 double FELogContactGap::value(FESurfaceElement& el)
 {
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
+	// returned contact gap
 	double g = 0.0;
-	for (int i = 0; i < el.GaussPoints(); ++i)
+
+	// NOTE: the sliding surface does not use material points, so we need this little hack. 
+	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(ps);
+	if (ss)
 	{
-		FEMaterialPoint* mp = el.GetMaterialPoint(i);
-		FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
-		if (cp)
+		for (int j = 0; j < el.Nodes(); ++j)
 		{
-			g += cp->m_gap;
+			double gj = ss->m_data[el.m_lnode[j]].m_gap;
+			g += gj;
 		}
+		g /= el.Nodes();
+		return g;
 	}
-	g /= (double)el.GaussPoints();
+	else
+	{
+		for (int i = 0; i < el.GaussPoints(); ++i)
+		{
+			FEMaterialPoint* mp = el.GetMaterialPoint(i);
+			FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
+			if (cp)
+			{
+				g += cp->m_gap;
+			}
+		}
+		g /= (double)el.GaussPoints();
+	}
 
 	return g;
 }
@@ -185,17 +206,35 @@ double FELogContactGap::value(FESurfaceElement& el)
 //-----------------------------------------------------------------------------
 double FELogContactPressure::value(FESurfaceElement& el)
 {
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
+	if (ps == nullptr) return 0.0;
+
 	double Lm = 0.0;
-	for (int i = 0; i < el.GaussPoints(); ++i)
+
+	// NOTE: the sliding surface does not use material points, so we need this little hack. 
+	FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(ps);
+	if (ss)
 	{
-		FEMaterialPoint* mp = el.GetMaterialPoint(i);
-		FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
-		if (cp)
+		for (int j = 0; j < el.Nodes(); ++j)
 		{
-			Lm += cp->m_Ln;
+			double Lmj = ss->m_data[el.m_lnode[j]].m_Ln;
+			Lm += Lmj;
 		}
+		Lm /= el.Nodes();
 	}
-	Lm /= (double)el.GaussPoints();
+	else
+	{
+		for (int i = 0; i < el.GaussPoints(); ++i)
+		{
+			FEMaterialPoint* mp = el.GetMaterialPoint(i);
+			FEContactMaterialPoint* cp = dynamic_cast<FEContactMaterialPoint*>(mp);
+			if (cp)
+			{
+				Lm += cp->m_Ln;
+			}
+		}
+		Lm /= (double)el.GaussPoints();
+	}
 
 	return Lm;
 }
@@ -2009,6 +2048,11 @@ double FELogRigidBodyR23::value(FERigidBody& rb) { return (rb.GetRotation().Rota
 double FELogRigidBodyR31::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(2, 0)); }
 double FELogRigidBodyR32::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(2, 1)); }
 double FELogRigidBodyR33::value(FERigidBody& rb) { return (rb.GetRotation().RotationMatrix()(2, 2)); }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyEulerX::value(FERigidBody& rb) { double x, y, z; rb.GetRotation().GetEuler(x, y, z); return x; }
+double FELogRigidBodyEulerY::value(FERigidBody& rb) { double x, y, z; rb.GetRotation().GetEuler(x, y, z); return y; }
+double FELogRigidBodyEulerZ::value(FERigidBody& rb) { double x, y, z; rb.GetRotation().GetEuler(x, y, z); return z; }
 
 //-----------------------------------------------------------------------------
 double FELogRigidBodyPosX::value(FERigidBody& rb) { return rb.m_rt.x; }

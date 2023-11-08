@@ -122,6 +122,7 @@ void FENode::Serialize(DumpStream& ar)
 		ar & m_ID;
 		ar & m_BC;
 		ar & m_r0;
+		ar & m_ra;
 		ar & m_rid;
 		ar & m_d0;
 	}

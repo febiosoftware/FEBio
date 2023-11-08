@@ -34,6 +34,9 @@ SOFTWARE.*/
 #include <FECore/NodeDataRecord.h>
 #include <FECore/FaceDataRecord.h>
 #include <FECore/ElementDataRecord.h>
+#include <FECore/SurfaceDataRecord.h>
+#include <FECore/DomainDataRecord.h>
+#include <FECore/FEModelDataRecord.h>
 #include <FEBioMech/ObjectDataRecord.h>
 #include <FECore/NLConstraintDataRecord.h>
 #include <FEBioMech/FERigidConnector.h>
@@ -1396,11 +1399,14 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 			DataRecord* pd = 0;
 			switch(ntype)
 			{
-			case FE_DATA_NODE: pd = new NodeDataRecord        (this); break;
-			case FE_DATA_FACE: pd = new FaceDataRecord        (this); break;
-			case FE_DATA_ELEM: pd = new ElementDataRecord     (this); break;
-			case FE_DATA_RB  : pd = new ObjectDataRecord      (this); break;
-			case FE_DATA_NLC : pd = new NLConstraintDataRecord(this); break;
+			case FE_DATA_NODE   : pd = new NodeDataRecord        (this); break;
+			case FE_DATA_FACE   : pd = new FaceDataRecord        (this); break;
+			case FE_DATA_ELEM   : pd = new ElementDataRecord     (this); break;
+			case FE_DATA_RB     : pd = new ObjectDataRecord      (this); break;
+			case FE_DATA_NLC    : pd = new NLConstraintDataRecord(this); break;
+			case FE_DATA_SURFACE: pd = new FESurfaceDataRecord   (this); break;
+			case FE_DATA_DOMAIN : pd = new FEDomainDataRecord    (this); break;
+			case FE_DATA_MODEL  : pd = new FEModelDataRecord     (this); break;
 			}
 			assert(pd);
 			pd->Serialize(ar);

@@ -27,32 +27,33 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBiphasic.h"
+#include "FEUncoupledMaterial.h"
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
-// This class implements a poroelastic material that has a strain-dependent
-// permeability according to the constitutive relation of Holmes & Mow (JB 1990)
+//! Yeoh material
 
-class FEBIOMIX_API FEPermHolmesMow :	public FEHydraulicPermeability
+class FEYeoh : public FEUncoupledMaterial
 {
 public:
-	//! constructor
-	FEPermHolmesMow(FEModel* pfem);
+    enum { MAX_TERMS = 6 };
 
-	//! initialization
-	bool Init() override;
-		
-	//! permeability
-	mat3ds Permeability(FEMaterialPoint& pt) override;
-		
-	//! Tangent of permeability
-	tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
-		
 public:
-	double	m_perm;			//!< permeability
-	double	m_M;			//!< nonlinear exponential coefficient
-	double	m_alpha;		//!< nonlinear power exponent
-		
-	// declare parameter list
+	FEYeoh(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
+
+public:
+	FEParamDouble	m_c[MAX_TERMS];	//!< Yeoh coefficients
+
+public:
+	//! calculate deviatoric stress at material point
+	mat3ds DevStress(FEMaterialPoint& pt) override;
+
+	//! calculate deviatoric tangent stiffness at material point
+	tens4ds DevTangent(FEMaterialPoint& pt) override;
+
+	//! calculate deviatoric strain energy density
+	double DevStrainEnergyDensity(FEMaterialPoint& mp) override;
+    
+	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };

@@ -169,6 +169,7 @@ SOFTWARE.*/
 #include "FELungMaterial.h"
 #include "FEGrowthTensor.h"
 #include "FEKinematicGrowth.h"
+#include "FEYeoh.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -410,6 +411,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
 	REGISTER_FECORE_CLASS(FEShenoyMaterial, "Shenoy");
 	REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean, "fiber neo-Hookean");
+    REGISTER_FECORE_CLASS(FEYeoh, "Yeoh");
 
 	// fiber materials (derived from FEFiberMaterial)
     REGISTER_FECORE_CLASS(FEFiberCDF         , "fiber-CDF"           );
@@ -620,7 +622,7 @@ void FEBioMech::InitModule()
 
 	REGISTER_FECORE_CLASS(FEGenericBodyForce, "body force");
 	REGISTER_FECORE_CLASS(FECentrifugalBodyForce, "centrifugal");
-	REGISTER_FECORE_CLASS(FEPointBodyForce, "point");
+	REGISTER_FECORE_CLASS(FEPointBodyForce, "point", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FESurfaceAttractionBodyForce, "surface attraction");
 	REGISTER_FECORE_CLASS(FEMassDamping, "mass damping");
 
@@ -1044,6 +1046,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogRigidBodyR31, "R31");
 	REGISTER_FECORE_CLASS(FELogRigidBodyR32, "R32");
 	REGISTER_FECORE_CLASS(FELogRigidBodyR33, "R33");
+	REGISTER_FECORE_CLASS(FELogRigidBodyEulerX, "EulerX");
+	REGISTER_FECORE_CLASS(FELogRigidBodyEulerY, "EulerY");
+	REGISTER_FECORE_CLASS(FELogRigidBodyEulerZ, "EulerZ");
 	REGISTER_FECORE_CLASS(FELogRigidBodyForceX, "Fx");
 	REGISTER_FECORE_CLASS(FELogRigidBodyForceY, "Fy");
 	REGISTER_FECORE_CLASS(FELogRigidBodyForceZ, "Fz");

@@ -27,32 +27,25 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBiphasic.h"
+#include "FEChemicalReaction.h"
 
-//-----------------------------------------------------------------------------
-// This class implements a poroelastic material that has a strain-dependent
-// permeability according to the constitutive relation of Holmes & Mow (JB 1990)
-
-class FEBIOMIX_API FEPermHolmesMow :	public FEHydraulicPermeability
+class FEBIOMIX_API FEReactionRateSoluteAsSBM : public FEReactionRate
 {
 public:
 	//! constructor
-	FEPermHolmesMow(FEModel* pfem);
-
-	//! initialization
-	bool Init() override;
-		
-	//! permeability
-	mat3ds Permeability(FEMaterialPoint& pt) override;
-		
-	//! Tangent of permeability
-	tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
-		
+    FEReactionRateSoluteAsSBM(FEModel* pfem);
+	
+	//! reaction rate at material point
+	double ReactionRate(FEMaterialPoint& pt) override;
+	
+	//! tangent of reaction rate with strain at material point
+	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
+	
+	//! tangent of reaction rate with effective fluid pressure at material point
+	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+	
 public:
-	double	m_perm;			//!< permeability
-	double	m_M;			//!< nonlinear exponential coefficient
-	double	m_alpha;		//!< nonlinear power exponent
-		
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
+	FEParamDouble   m_k0;					//!< reaction rate constant
+	
+	DECLARE_FECORE_CLASS();	
 };

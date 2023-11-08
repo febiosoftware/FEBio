@@ -39,13 +39,17 @@ SOFTWARE.*/
 #include <sstream>
 
 //-----------------------------------------------------------------------------
-FEBioMeshSection4::FEBioMeshSection4(FEBioImport* pim) : FEBioFileSection(pim) {}
+FEBioMeshSection4::FEBioMeshSection4(FEBioImport* pim) : FEBioFileSection(pim) 
+{
+	m_maxNodeId = 0;
+}
 
 //-----------------------------------------------------------------------------
 void FEBioMeshSection4::Parse(XMLTag& tag)
 {
 	FEModelBuilder* builder = GetBuilder();
 	builder->m_maxid = 0;
+	m_maxNodeId = 0;
 
 	// create a default part
 	// NOTE: Do not specify a name for the part, otherwise
@@ -104,6 +108,10 @@ void FEBioMeshSection4::ParseNodeSection(XMLTag& tag, FEBModel::Part* part)
 
 		// get the nodal ID
 		tag.AttributeValue("id", nd.id);
+
+		// make sure node IDs are incrementing
+		if (nd.id <= m_maxNodeId) throw XMLReader::InvalidAttributeValue(tag, "id");
+		m_maxNodeId = nd.id;
 
 		// add it to the pile
 		node.push_back(nd);
