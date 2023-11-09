@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECore/FEGlobalVector.h"
 #include <FECore/FETimeInfo.h>
 #include <FECore/FEDofList.h>
+#include "FERigidSolver.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a nonlinear explicit solver for solid mechanics
@@ -66,6 +67,9 @@ public:
 
 	//! Serialize data
 	void Serialize(DumpStream& ar) override;
+
+	//! initialize equations
+	bool InitEquations() override;
 
 public:
 	//! update kinematics
@@ -108,6 +112,8 @@ public:
 protected:
 	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ;
 	FEDofList	m_dofSU, m_dofSV, m_dofSA;
+
+	FERigidSolverNew m_rigidSolver;
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
