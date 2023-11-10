@@ -40,9 +40,6 @@ public:
 	//! Constructor
 	FELinearTrussDomain(FEModel* pfem);
 
-	//! copy operator
-	FELinearTrussDomain& operator = (FELinearTrussDomain& d);
-
 	//! Initialize data
 	bool Init() override;
 
@@ -79,7 +76,7 @@ public: // overloads from FEElasticDomain
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override { assert(false); }
 
 	//! Calculates inertial forces for dynamic problems
-	void InertialForces(FEGlobalVector& R, vector<double>& F) override { assert(false); }
+	void InertialForces(FEGlobalVector& R, vector<double>& F) override;
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FELinearSystem& LS) override;
@@ -95,10 +92,13 @@ public: // overloads from FEElasticDomain
 
 protected:
 	//! calculates the truss element stiffness matrix
-	void ElementStiffness(int iel, matrix& ke);
+	void ElementStiffness(FETrussElement&, matrix& ke);
 
-	//! Calculates the internal stress vector for solid elements
+	//! Calculates the internal stress vector for truss elements
 	void ElementInternalForces(FETrussElement& el, vector<double>& fe);
+
+	//! Calculates the inertial contribution for truss elements
+	void ElementInertialForces(FETrussElement& el, vector<double>& fe);
 
 protected:
 	FETrussMaterial*	m_pMat;

@@ -254,6 +254,7 @@ public:
 	double	m_lam;	// current stretch ratio
 	double	m_tau;	// Kirchoff stress
 	double	m_L0;	// initial length
+	double	m_Lt;	// current length
 };
 
 //-----------------------------------------------------------------------------

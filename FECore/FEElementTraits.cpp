@@ -3219,7 +3219,9 @@ void FEShellTri6G21::project_to_nodes(double* ai, double* ao) const
 
 void FETrussElementTraits::init()
 {
-
+	double r = 0; // gauss-point location
+	m_H[0][0] = 0.5 * (1 - r);
+	m_H[0][1] = 0.5 * (1 + r);
 }
 
 //=============================================================================

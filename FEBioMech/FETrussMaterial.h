@@ -46,18 +46,18 @@ public:
 	void Serialize(DumpStream& ar)
 	{
 		FEMaterialPointData::Serialize(ar);
-		ar & m_l & m_tau;
+		ar & m_lam & m_tau;
 	}
 
 	void Init()
 	{
 		FEMaterialPointData::Init();
-		m_l = 1;
+		m_lam = 1;
 		m_tau = 0;
 	}
 
 public:
-	double	m_l;	// stretch
+	double	m_lam;	// stretch
 	double	m_tau;	// Kirchoff stress
 };
 

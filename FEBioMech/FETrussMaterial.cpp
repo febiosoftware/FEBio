@@ -69,7 +69,7 @@ FELinearTrussMaterial::FELinearTrussMaterial(FEModel* fem) : FETrussMaterial(fem
 double FELinearTrussMaterial::Stress(FEMaterialPoint &mp)
 {
 	FETrussMaterialPoint& pt = *mp.ExtractData<FETrussMaterialPoint>();
-	return m_E*log(pt.m_l);
+	return m_E*log(pt.m_lam);
 }
 
 //-----------------------------------------------------------------------------
