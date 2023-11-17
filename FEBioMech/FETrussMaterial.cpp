@@ -55,13 +55,15 @@ double FETrussMaterial::Density()
 //=============================================================================
 // define the material parameters
 BEGIN_FECORE_CLASS(FELinearTrussMaterial, FETrussMaterial)
-	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_v, FE_RANGE_CLOSED(-1, 0.5), "v");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FELinearTrussMaterial::FELinearTrussMaterial(FEModel* fem) : FETrussMaterial(fem)
 {
 	m_E = 0.0;
+	m_v = 0.5;
 }
 
 //-----------------------------------------------------------------------------

@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FELinearTrussDomain.h"
 #include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
+#include "FEBodyForce.h"
 #include "FEBioMech.h"
 #include <FECore/log.h>
 
@@ -37,11 +38,12 @@ BEGIN_FECORE_CLASS(FELinearTrussDomain, FETrussDomain)
 	ADD_PARAMETER(m_a0, "cross_sectional_area");
 END_FECORE_CLASS();
 
-FELinearTrussDomain::FELinearTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem)
+FELinearTrussDomain::FELinearTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofV(pfem)
 {
 	m_pMat = nullptr;
 	m_a0 = 0.0;
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
 }
 
 const FEDofList& FELinearTrussDomain::GetDOFList() const
@@ -291,24 +293,125 @@ void FELinearTrussDomain::ElementInertialForces(FETrussElement& el, vector<doubl
 	fe[5] = -(me[1][0] * a[0].z + me[1][1] * a[1].z);
 }
 
+//! calculate body force on a truss domain
+void FELinearTrussDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
+{
+	vector<double> fe(6);
+	vector<int> lm;
+
+	double density = m_pMat->Density();
+
+	for (FETrussElement& el : m_Elem)
+	{
+		zero(fe);
+		int nint = el.GaussPoints();
+		double* w = el.GaussWeights();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			// get the force
+			vec3d f = bf.force(mp);
+
+			// get element shape functions
+			double* H = el.H(n);
+
+			// get the initial Jacobian
+			double J0 = el.m_a0 * el.m_L0 / 2.0;
+
+			// set integrand
+			fe[0] -= H[0] * density * f.x * J0 * w[n];
+			fe[1] -= H[0] * density * f.y * J0 * w[n];
+			fe[2] -= H[0] * density * f.z * J0 * w[n];
+			fe[3] -= H[1] * density * f.x * J0 * w[n];
+			fe[4] -= H[1] * density * f.y * J0 * w[n];
+			fe[5] -= H[1] * density * f.z * J0 * w[n];
+		}
+
+		UnpackLM(el, lm);
+		R.Assemble(el.m_node, lm, fe);
+	}
+}
+
+//! body force stiffness matrix
+void FELinearTrussDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
+{
+	double density = m_pMat->Density();
+
+	vector<int> lm;
+	for (FETrussElement& el : m_Elem)
+	{
+		FEElementMatrix ke(6, 6); ke.zero();
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+		double* gw = el.GaussWeights();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			double* H = el.H(n);
+
+			double J0 = el.m_a0 * el.m_L0 / 2.0;
+
+			double Jdw = J0 * density * gw[n];
+
+			mat3d K = bf.stiffness(mp);
+
+			// put it together
+			for (int a=0; a<neln; ++a)
+				for (int b = 0; b < neln; ++b)
+				{
+					ke.sub(3 * a, 3 * b, K * (H[a] * H[b] * Jdw));
+				}
+		}
+
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+		ke.SetNodes(el.m_node);
+		LS.Assemble(ke);
+	}
+}
+
 void FELinearTrussDomain::Update(const FETimeInfo& tp)
 {
+	// get the poisson's ratio. 
+	FELinearTrussMaterial* mat = dynamic_cast<FELinearTrussMaterial*>(m_pMat);
+	double nu = (mat ? mat->m_v : 0.5);
+
 	FEMesh& mesh = *m_pMesh;
 	for (FETrussElement& el : m_Elem)
 	{
-		FEMaterialPoint& mp = *(el.GetMaterialPoint(0));
-		FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
-
 		// calculate the current length
-		vec3d rt[2];
-		rt[0] = mesh.Node(el.m_node[0]).m_rt;
-		rt[1] = mesh.Node(el.m_node[1]).m_rt;
+		vec3d rt[2], vt[2], at[2];
+		for (int j = 0; j < el.Nodes(); ++j)
+		{
+			FENode& node = m_pMesh->Node(el.m_node[j]);
+			rt[j] = node.m_rt;
+			vt[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+			at[j] = node.m_at;
+		}
+
 		el.m_Lt = (rt[1] - rt[0]).norm();
+		vec3d e = (rt[1] - rt[0]).normalized();
 
-		// calculate stretch
-		pt.m_lam = el.m_Lt / el.m_L0;
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FEMaterialPoint& mp = *(el.GetMaterialPoint(n));
+			FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
 
-		// calculate stress
-		pt.m_tau = m_pMat->Stress(mp);
+			mp.m_rt = el.Evaluate(rt, n);
+			pt.m_v = el.Evaluate(vt, n);
+			pt.m_a = el.Evaluate(at, n);
+
+			// calculate stretch
+			pt.m_lam = el.m_Lt / el.m_L0;
+
+			// volume ratio (this assume linear truss material!)
+			double J = pow(pt.m_lam, 1.0 - 2.0 * nu);
+
+			// calculate stress
+			pt.m_tau = m_pMat->Stress(mp);
+			pt.m_s = dyad(e) * (pt.m_tau / J);
+		}
 	}
 }

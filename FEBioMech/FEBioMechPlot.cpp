@@ -65,6 +65,7 @@ SOFTWARE.*/
 #include "FESlidingElasticInterface.h"
 #include "FETiedContactSurface.h"
 #include "FEReactiveVEMaterialPoint.h"
+#include "FELinearTrussDomain.h"
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FETrussDomain.h>
@@ -761,6 +762,15 @@ public:
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 {
+	if (dynamic_cast<FELinearTrussDomain*>(&dom))
+	{
+		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+			const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			return pt.m_s;
+		});
+		return true;
+	}
+
 	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
 	if ((pme == 0) || pme->IsRigid()) return false;
 

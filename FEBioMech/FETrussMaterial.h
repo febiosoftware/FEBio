@@ -28,12 +28,12 @@ SOFTWARE.*/
 
 #pragma once
 
-#include "FECore/FEMaterial.h"
+#include "FEElasticMaterial.h"
 #include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 // Material point class for truss materials
-class FETrussMaterialPoint : public FEMaterialPointData
+class FETrussMaterialPoint : public FEElasticMaterialPoint
 {
 public:
 	FEMaterialPointData* Copy()
@@ -45,13 +45,13 @@ public:
 
 	void Serialize(DumpStream& ar)
 	{
-		FEMaterialPointData::Serialize(ar);
+		FEElasticMaterialPoint::Serialize(ar);
 		ar & m_lam & m_tau;
 	}
 
 	void Init()
 	{
-		FEMaterialPointData::Init();
+		FEElasticMaterialPoint::Init();
 		m_lam = 1;
 		m_tau = 0;
 	}
@@ -102,8 +102,9 @@ public:
 	//! calculate elastic tangent
 	double Tangent(FEMaterialPoint& pt) override;
 
-private:
+public:
 	double	m_E;	// Elastic modulus
+	double	m_v;	// Poisson's ratio
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
