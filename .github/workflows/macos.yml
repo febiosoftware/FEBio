@@ -1,6 +1,6 @@
 on:
-  # push:
-  #   branches: [ ci/* ]
+  push:
+    branches: [ ci/* ]
   workflow_dispatch:
     inputs:
       runTests:
