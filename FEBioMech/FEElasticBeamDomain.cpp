@@ -90,12 +90,7 @@ bool FEElasticBeamDomain::Init()
 		el.m_L0 = (r0[1] - r0[0]).Length();
 
 		vec3d e = r0[1] - r0[0]; e.Normalize();
-		quatd q(vec3d(0, 0, 1), e);
-		for (int n = 0; n < el.GaussPoints(); ++n)
-		{
-			FEElasticBeamMaterialPoint& mp = *el.GetMaterialPoint(n)->ExtractData< FEElasticBeamMaterialPoint>();
-			mp.m_Rt = mp.m_Rp = q;
-		}
+		el.m_E3 = e;
 	}
 
 	return true;
@@ -206,7 +201,7 @@ void FEElasticBeamDomain::ElementInternalForces(FEBeamElement& el, std::vector<d
 	}
 }
 
-//! Calculate global stiffness matrix (only contribution from internal force derivative)
+//! Calculate global stiffness matrix
 void FEElasticBeamDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	for (int iel = 0; iel < Elements(); ++iel)
@@ -220,10 +215,6 @@ void FEElasticBeamDomain::StiffnessMatrix(FELinearSystem& LS)
 
 		FEElementMatrix ke(el, lm); ke.zero();
 		ElementStiffnessMatrix(el, ke);
-
-		matrix& kem = static_cast<matrix&>(ke);
-		fecore_watch(kem);
-//		fecore_break();
 
 		LS.Assemble(ke);
 	}
@@ -307,7 +298,7 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 	}
 }
 
-void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
+void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui, bool finalFlag)
 {
 	// update the rotations at the material points
 	for (int i = 0; i < Elements(); ++i)
@@ -353,12 +344,11 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 			// extract quaternion
 			quatd dq(dR);
 
-			// update rotations (TODO: what about line searches!)
-			mp.m_Ri = dq * mp.m_Ri;
-			mp.m_Rt = mp.m_Ri * mp.m_Rp;
+			// update rotations
+			mp.m_Rt = (dq*mp.m_Ri) * mp.m_Rp;
 
 			// update spatial curvature
-			mat3da Wn(mp.m_w);
+			mat3da Wn(mp.m_wn);
 			mat3d W = dR * Wn * dR.transpose(); // this should be a skew-symmetric matrix!
 
 			vec3d w2(-W[1][2], W[0][2], -W[0][1]);
@@ -376,6 +366,12 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui)
 
 			// update curvature
 			mp.m_w = w1 + w2;
+
+			if (finalFlag)
+			{
+				mp.m_Ri = dq * mp.m_Ri;
+				mp.m_wn = mp.m_w;
+			}
 		}
 	}
 }
@@ -422,10 +418,10 @@ void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 		quatd qi = q.Conjugate();
 
 		// calculate material strain measures
-		mp.m_Gamma = qi * G0 - vec3d(0, 0, 1);
-		mp.m_Kappa = qi * mp.m_w; // m_w is updated in Update(std::vector<double>& ui)
+		mp.m_Gamma = qi * G0 - el.m_E3;
+		mp.m_Kappa = qi * mp.m_w; // m_w is updated in IncrementalUpdate(std::vector<double>& ui)
 
-		// evaluate the stress
+		// evaluate the (spatial) stress
 		m_mat->Stress(mp);
 	}
 }

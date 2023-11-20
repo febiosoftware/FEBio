@@ -149,7 +149,7 @@ void FEDomain::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEDomain::IncrementalUpdate(std::vector<double>& ui)
+void FEDomain::IncrementalUpdate(std::vector<double>& ui, bool finalFlag)
 {
 
 }

@@ -77,9 +77,10 @@ public:
 	//! Activate the domain
 	virtual void Activate();
 
-	//! gives domains a chance to update any data
-	//! that depends on the displacement increments.
-	virtual void IncrementalUpdate(std::vector<double>& ui);
+	//! Gives domains a chance to update any data that depends on the displacement increments.
+	//! This function is called during the line search as well. The finalFlag
+	//! indicates whether it is safe to commit the updates.
+	virtual void IncrementalUpdate(std::vector<double>& ui, bool finalFlag);
 
 protected:
 	// helper function for activating dof lists

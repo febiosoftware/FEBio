@@ -63,7 +63,7 @@ public: // from FEMeshPartition
 	void Update(const FETimeInfo& tp) override;
 
 	// update data that depends on the incremental solution update
-	void IncrementalUpdate(std::vector<double>& ui) override;
+	void IncrementalUpdate(std::vector<double>& ui, bool finalFlag) override;
 
 	// update material point data
 	void PreSolveUpdate(const FETimeInfo& tp) override;

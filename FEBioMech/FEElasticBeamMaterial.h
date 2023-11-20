@@ -52,6 +52,7 @@ public:
 	quatd	m_Rt;	// current rotation
 
 	vec3d	m_w;	// spatial curvature
+	vec3d	m_wn;	// spatial curvature at current increment (temp storage)
 };
 
 class FEElasticBeamMaterial : public FEMaterial

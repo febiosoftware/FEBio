@@ -492,6 +492,12 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 		FENLConstraint* plc = fem.NonlinearConstraint(i);
 		if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
 	}
+
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		dom.IncrementalUpdate(ui, true);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -514,7 +520,7 @@ void FESolidSolver2::Update(vector<double>& ui)
 	for (int i = 0; i < mesh.Domains(); ++i)
 	{
 		FEDomain& dom = mesh.Domain(i);
-		dom.IncrementalUpdate(ui);
+		dom.IncrementalUpdate(ui, false);
 	}
 
 	// update model state
