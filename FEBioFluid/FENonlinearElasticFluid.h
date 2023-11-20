@@ -45,7 +45,7 @@ public:
     // serialization
     void Serialize(DumpStream& ar) override;
 
-    //! gage pressure
+    //! gauge pressure
     double Pressure(FEMaterialPoint& pt) override;
     
     //! tangent of pressure with respect to strain J
@@ -85,7 +85,7 @@ public:
     double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
     
     //! dilatation from temperature and pressure
-    bool Dilatation(const double T, const double p, const double c, double& e) override;
+    bool Dilatation(const double T, const double p, double& e) override;
     
 public:
     double      m_k;        //!< bulk modulus

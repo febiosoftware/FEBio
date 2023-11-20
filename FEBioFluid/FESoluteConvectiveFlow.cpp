@@ -37,7 +37,7 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FESoluteConvectiveFlow, FESurfaceLoad)
-ADD_PARAMETER(m_sol, "sol");
+    ADD_PARAMETER(m_sol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

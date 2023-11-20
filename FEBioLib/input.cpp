@@ -529,11 +529,11 @@ void FEBioModel::echo_input()
 		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(pplt);
 		feLog("\tplotfile format ........................... : FEBIO\n");
 
-		const FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
+		FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
 
 		for (int i = 0; i < 5; ++i)
 		{
-			const list<FEBioPlotFile::DICTIONARY_ITEM>* pl = 0;
+			list<FEBioPlotFile::DICTIONARY_ITEM>* pl = 0;
 			const char* szn = 0;
 			switch (i)
 			{

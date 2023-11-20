@@ -346,10 +346,9 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
-            // initialize effective fluid pressure, its gradient, and fluid flux
+            // initialize effective fluid pressure and its gradient
             pt.m_p = el.Evaluate(p0, n);
             pt.m_gradp = gradient(el, p0, n);
-            pt.m_w = m_pMat->FluidFlux(mp);
             
             // initialize multiphasic solutes
             ps.m_nsol = nsol;
@@ -361,22 +360,29 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
                 ps.m_gradc[isol] = gradient(el, c0[isol], n);
             }
             
-            ps.m_psi = m_pMat->ElectricPotential(mp);
-            for (int isol = 0; isol<nsol; ++isol) {
-                ps.m_ca[isol] = m_pMat->Concentration(mp, isol);
-                ps.m_j[isol] = m_pMat->SoluteFlux(mp, isol);
-                ps.m_crp[isol] = pm.m_J*m_pMat->Porosity(mp)*ps.m_ca[isol];
-            }
-            pt.m_pa = m_pMat->Pressure(mp);
-            
             // determine if solute is 'solid-bound'
             for (int isol = 0; isol<nsol; ++isol) {
                 FESolute* soli = m_pMat->GetSolute(isol);
                 if (soli->m_pDiff->Diffusivity(mp).norm() == 0) ps.m_bsb[isol] = true;
+                // initialize solute concentrations
+                ps.m_ca[isol] = m_pMat->Concentration(mp, isol);
             }
             
             // initialize referential solid volume fraction
             pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
+            
+            // initialize electric potential
+            ps.m_psi = m_pMat->ElectricPotential(mp);
+            
+            // initialize fluxes
+            pt.m_w = m_pMat->FluidFlux(mp);
+            
+            for (int isol = 0; isol<nsol; ++isol) {
+                ps.m_j[isol] = m_pMat->SoluteFlux(mp, isol);
+                ps.m_crp[isol] = pm.m_J*m_pMat->Porosity(mp)*ps.m_ca[isol];
+            }
+            
+            pt.m_pa = m_pMat->Pressure(mp);
             
             // calculate FCD, current and stress
             ps.m_cF = m_pMat->FixedChargeDensity(mp);

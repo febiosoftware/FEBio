@@ -35,6 +35,8 @@ SOFTWARE.*/
 #include <FECore/FESurface.h>
 #include <FECore/FEPlotDataStore.h>
 #include <FECore/log.h>
+#include <FECore/FEPIDController.h>
+#include <sstream>
 
 FEBioPlotFile::DICTIONARY_ITEM::DICTIONARY_ITEM()
 {
@@ -384,8 +386,9 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		ps->SetDomainName(szdom);
 		switch (ps->RegionType())
 		{
-		case FE_REGION_NODE: return AddNodalVariable(ps, szfield, item);
-		case FE_REGION_DOMAIN: return AddDomainVariable(ps, szfield, item);
+		case FE_REGION_GLOBAL : return AddGlobalVariable(ps, szfield);
+		case FE_REGION_NODE   : return AddNodalVariable(ps, szfield, item);
+		case FE_REGION_DOMAIN : return AddDomainVariable(ps, szfield, item);
 		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, szfield, item);
 		default:
 			assert(false);
@@ -472,6 +475,23 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Dictionary::AddGlobalVariable(FEPlotData* ps, const char* szname)
 {
+	assert(ps->RegionType() == FE_REGION_GLOBAL);
+	if (ps->RegionType() == FE_REGION_GLOBAL)
+	{
+		DICTIONARY_ITEM it;
+		it.m_ntype = ps->DataType();
+		it.m_nfmt  = ps->StorageFormat();
+		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
+		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
+		m_Glob.push_back(it);
+		return true;
+	}
 	return false;
 }
 
@@ -565,15 +585,47 @@ void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
 		AddVariable(&fem, "displacement", l);
 		AddVariable(&fem, "stress", l);
 	}
+
+	// Define default global variables
+	if (m_Glob.empty())
+	{
+		// add all the PID controllers
+		std::vector<int> dummy;
+		for (int i = 0; i < fem.LoadControllers(); ++i)
+		{
+			FEPIDController* pid = dynamic_cast<FEPIDController*>(fem.GetLoadController(i));
+			if (pid)
+			{
+				stringstream ss;
+				ss << "pid controller['" << pid->GetName() << "']=" << pid->GetName();
+				string s = ss.str();
+				AddVariable(&fem, s.c_str(), dummy);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::Dictionary::Clear()
 {
+	list<DICTIONARY_ITEM>::iterator it = m_Glob.begin();
+	for (int i = 0; i < (int)m_Glob.size(); ++i, ++it) delete it->m_psave;
 	m_Glob.clear();
+
+	it = m_Mat.begin();
+	for (int i = 0; i < (int)m_Mat.size(); ++i, ++it) delete it->m_psave;
 	m_Mat.clear();
+
+	it = m_Node.begin();
+	for (int i = 0; i < (int)m_Node.size(); ++i, ++it) delete it->m_psave;
 	m_Node.clear();
+
+	it = m_Elem.begin();
+	for (int i = 0; i < (int)m_Elem.size(); ++i, ++it) delete it->m_psave;
 	m_Elem.clear();
+
+	it = m_Face.begin();
+	for (int i = 0; i < (int)m_Face.size(); ++i, ++it) delete it->m_psave;
 	m_Face.clear();
 }
 
@@ -604,57 +656,6 @@ FEBioPlotFile::FEBioPlotFile(FEModel* fem) : PlotFile(fem)
 	m_ncompress = 0;
 	m_meshesWritten = 0;
 	m_exportUnitsFlag = false;
-}
-
-//-----------------------------------------------------------------------------
-FEBioPlotFile::~FEBioPlotFile(void)
-{
-	// close the archive
-	Close();
-
-	// clear all arrays
-	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Glob.begin();
-	for (int i=0; i<(int) m_dic.m_Glob.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Mat.begin();
-	for (int i=0; i<(int) m_dic.m_Mat.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Node.begin();
-	for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Elem.begin();
-	for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it) delete it->m_psave;
-
-	it = m_dic.m_Face.begin();
-	for (int i=0; i<(int) m_dic.m_Face.size(); ++i, ++it) delete it->m_psave;
-}
-
-//-----------------------------------------------------------------------------
-bool FEBioPlotFile::AddVariable(FEPlotData* ps, const char* szname)
-{
-	vector<int> dummy;
-	switch (ps->RegionType())
-	{
-	case FE_REGION_NODE: return m_dic.AddNodalVariable(ps, szname, dummy);
-	case FE_REGION_DOMAIN: return m_dic.AddDomainVariable(ps, szname, dummy);
-	case FE_REGION_SURFACE: return m_dic.AddSurfaceVariable(ps, szname, dummy);
-	default:
-		assert(false);
-		return false;
-	}
-}
-
-//-----------------------------------------------------------------------------
-bool FEBioPlotFile::AddVariable(const char* sz)
-{
-	vector<int> dummy;
-	return AddVariable(sz, dummy);
-}
-
-//-----------------------------------------------------------------------------
-bool FEBioPlotFile::AddVariable(const char* sz, vector<int>& item, const char* szdom)
-{ 
-	return m_dic.AddVariable(GetFEModel(), sz, item, szdom); 
 }
 
 //-----------------------------------------------------------------------------
@@ -729,6 +730,16 @@ void FEBioPlotFile::Close()
 }
 
 //-----------------------------------------------------------------------------
+void FEBioPlotFile::Clear()
+{
+	PlotFile::Dictionary& dic = GetDictionary();
+	dic.Clear();
+	m_Surf.clear();
+	for (PointObject* p : m_Points) delete p; m_Points.clear();
+	for (LineObject* l : m_Lines) delete l; m_Lines.clear();
+}
+
+//-----------------------------------------------------------------------------
 bool FEBioPlotFile::Open(const char *szfile)
 {
 	FEModel* fem = GetFEModel();
@@ -740,20 +751,7 @@ bool FEBioPlotFile::Open(const char *szfile)
 	FEPlotDataStore& pltData = fem->GetPlotDataStore();
 	SetCompression(pltData.GetPlotCompression());
 
-	// add plot variables
-	for (int n = 0; n < pltData.PlotVariables(); ++n)
-	{
-		FEPlotVariable& vi = pltData.GetPlotVariable(n);
-		const std::string& varName = vi.Name();
-		const std::string& domName = vi.DomainName();
-
-		// add the plot output variable
-		if (AddVariable(varName.c_str(), vi.m_item, domName.c_str()) == false)
-		{
-			feLog("FATAL ERROR: Output variable \"%s\" is not defined\n", varName.c_str());
-			throw "FATAL ERROR";
-		}
-	}
+	BuildDictionary();
 
 	try
 	{
@@ -833,45 +831,46 @@ bool FEBioPlotFile::WriteHeader(FEModel& fem)
 bool FEBioPlotFile::WriteDictionary(FEModel& fem)
 {
 	// setup defaults for the dictionary
-	m_dic.Defaults(fem);
+	PlotFile::Dictionary& dic = GetDictionary();
+	dic.Defaults(fem);
 
 	// Next, we save the dictionary
 	// Global variables
-	if (!m_dic.m_Glob.empty())
+	if (dic.GlobalVariables() > 0)
 	{
 		m_ar.BeginChunk(PLT_DIC_GLOBAL);
 		{
-			WriteDicList(m_dic.m_Glob);
+			WriteDicList(dic.GlobalVariableList());
 		}
 		m_ar.EndChunk();
 	}
 
 	// store nodal variables
-	if (!m_dic.m_Node.empty())
+	if (dic.NodalVariables() > 0)
 	{
 		m_ar.BeginChunk(PLT_DIC_NODAL);
 		{
-			WriteDicList(m_dic.m_Node);
+			WriteDicList(dic.NodalVariableList());
 		}
 		m_ar.EndChunk();
 	}
 
 	// store element variables
-	if (!m_dic.m_Elem.empty())
+	if (dic.DomainVariables())
 	{
 		m_ar.BeginChunk(PLT_DIC_DOMAIN);
 		{
-			WriteDicList(m_dic.m_Elem);
+			WriteDicList(dic.DomainVariableList());
 		}
 		m_ar.EndChunk();
 	}
 
 	// store surface data
-	if (!m_dic.m_Face.empty())
+	if (dic.SurfaceVariables())
 	{
 		m_ar.BeginChunk(PLT_DIC_SURFACE);
 		{
-			WriteDicList(m_dic.m_Face);
+			WriteDicList(dic.SurfaceVariableList());
 		}
 		m_ar.EndChunk();
 	}
@@ -904,7 +903,7 @@ void FEBioPlotFile::WriteDictionaryItem(DICTIONARY_ITEM& it)
 	{
 		for (int i = 0; i < (int)it.m_arraySize; ++i)
 		{
-			string& si = it.m_arrayNames[i];
+			const string& si = it.m_arrayNames[i];
 			const char* c = si.c_str();
 			m_ar.WriteChunk(PLT_DIC_ITEM_ARRAYNAME, (char*)c, STR_SIZE);
 		}
@@ -1030,7 +1029,8 @@ void FEBioPlotFile::WriteNodeSection(FEMesh& m)
 	for (int i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);
-		*((int*) (&X[0] + 4*i)) = i;
+		// as of 3.3 we store the node IDs. (Previously the node index was stored)
+		*((int*) (&X[0] + 4*i)) = node.GetID();
 		X[4*i+1] = (float) node.m_r0.x;
 		X[4*i+2] = (float) node.m_r0.y;
 		X[4*i+3] = (float) node.m_r0.z;
@@ -1528,6 +1528,15 @@ void FEBioPlotFile::WriteObject(PlotObject* po)
 	float a[4] = { (float)q.x, (float)q.y, (float)q.z, (float)q.w };
 	m_ar.WriteChunk(PLT_OBJECT_ROT, a, 4);
 
+	if (dynamic_cast<LineObject*>(po))
+	{
+		LineObject* pl = dynamic_cast<LineObject*>(po);
+		vec3d r1 = pl->m_r1;
+		vec3d r2 = pl->m_r2;
+		float c[6] = { (float)r1.x, (float)r1.y, (float)r1.z, (float)r2.x, (float)r2.y, (float)r2.z };
+		m_ar.WriteChunk(PLT_LINE_COORDS, c, 6);
+	}
+
 	list<DICTIONARY_ITEM>::iterator it = po->m_data.begin();
 	for (int j = 0; j < po->m_data.size(); ++j, ++it)
 	{
@@ -1543,6 +1552,7 @@ void FEBioPlotFile::WriteObject(PlotObject* po)
 bool FEBioPlotFile::Write(float ftime, int flag)
 {
 	FEModel& fem = *GetFEModel();
+	PlotFile::Dictionary& dic = GetDictionary();
 
 	// compress these sections if requested
 	m_ar.SetCompression(m_ncompress);
@@ -1566,7 +1576,7 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 		m_ar.BeginChunk(PLT_STATE_DATA);
 		{
 			// Global Data
-			if (!m_dic.m_Glob.empty())
+			if (dic.GlobalVariables() > 0)
 			{
 				m_ar.BeginChunk(PLT_GLOBAL_DATA);
 				{
@@ -1576,7 +1586,7 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 			}
 
 			// Node Data
-			if (!m_dic.m_Node.empty())
+			if (dic.NodalVariables() > 0)
 			{
 				m_ar.BeginChunk(PLT_NODE_DATA);
 				{
@@ -1586,7 +1596,7 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 			}
 
 			// Element Data
-			if (!m_dic.m_Elem.empty())
+			if (dic.DomainVariables() > 0)
 			{
 				m_ar.BeginChunk(PLT_ELEMENT_DATA);
 				{
@@ -1596,7 +1606,7 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 			}
 
 			// surface data
-			if (!m_dic.m_Face.empty())
+			if (dic.SurfaceVariables() > 0)
 			{
 				m_ar.BeginChunk(PLT_FACE_DATA);
 				{
@@ -1624,14 +1634,33 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteGlobalData(FEModel& fem)
 {
-
+	PlotFile::Dictionary& dic = GetDictionary();
+	dic.Clear();
+	auto& globData = dic.GlobalVariableList();
+	list<DICTIONARY_ITEM>::iterator it = globData.begin();
+	for (int i = 0; i < (int)globData.size(); ++i, ++it)
+	{
+		m_ar.BeginChunk(PLT_STATE_VARIABLE);
+		{
+			unsigned int nid = i + 1;
+			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
+			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
+			{
+				if (it->m_psave) WriteGlobalDataField(fem, it->m_psave);
+			}
+			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
+	}
 }
 
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteNodeData(FEModel& fem)
 {
-	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Node.begin();
-	for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it)
+	PlotFile::Dictionary& dic = GetDictionary();
+	auto& nodeData = dic.NodalVariableList();
+	list<DICTIONARY_ITEM>::iterator it = nodeData.begin();
+	for (int i=0; i<(int)nodeData.size(); ++i, ++it)
 	{
 		m_ar.BeginChunk(PLT_STATE_VARIABLE);
 		{
@@ -1650,8 +1679,10 @@ void FEBioPlotFile::WriteNodeData(FEModel& fem)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteDomainData(FEModel& fem)
 {
-	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Elem.begin();
-	for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it)
+	PlotFile::Dictionary& dic = GetDictionary();
+	auto& elemData = dic.DomainVariableList();
+	list<DICTIONARY_ITEM>::iterator it = elemData.begin();
+	for (int i=0; i<(int)elemData.size(); ++i, ++it)
 	{
 		m_ar.BeginChunk(PLT_STATE_VARIABLE);
 		{
@@ -1670,8 +1701,10 @@ void FEBioPlotFile::WriteDomainData(FEModel& fem)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 {
-	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Face.begin();
-	for (int i=0; i<(int) m_dic.m_Face.size(); ++i, ++it)
+	PlotFile::Dictionary& dic = GetDictionary();
+	auto& surfData = dic.SurfaceVariableList();
+	list<DICTIONARY_ITEM>::iterator it = surfData.begin();
+	for (int i=0; i<(int)surfData.size(); ++i, ++it)
 	{
 		m_ar.BeginChunk(PLT_STATE_VARIABLE);
 		{
@@ -1684,6 +1717,20 @@ void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 			m_ar.EndChunk();
 		}
 		m_ar.EndChunk();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteGlobalDataField(FEModel& fem, FEPlotData* pd)
+{
+	int ndata = pd->VarSize(pd->DataType());
+	FEDataStream a; a.reserve(ndata);
+	if (pd->Save(a))
+	{
+		// pad mismatches
+		assert(a.size() == ndata);
+		if (a.size() != ndata) a.resize(ndata, 0.f);
+		m_ar.WriteData(0, a.data());
 	}
 }
 
@@ -1916,7 +1963,8 @@ bool FEBioPlotFile::Append(const char *szfile)
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::ReadDictionary()
 {
-	m_dic.Clear();
+	PlotFile::Dictionary& dic = GetDictionary();
+	dic.Clear();
 
 	while (m_ar.OpenChunk() == IO_OK)
 	{

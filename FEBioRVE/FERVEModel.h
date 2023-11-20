@@ -29,11 +29,12 @@ SOFTWARE.*/
 #pragma once
 #include "FECore/FEModel.h"
 #include <FECore/tens4d.h>
+#include "febiorve_api.h"
 
 //-----------------------------------------------------------------------------
 // Class describing the RVE model.
 // This is used by the homogenization code.
-class FERVEModel : public FEModel
+class FEBIORVE_API FERVEModel : public FEModel
 {
 public:
 	enum RVE_TYPE

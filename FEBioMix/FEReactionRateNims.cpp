@@ -35,7 +35,7 @@ SOFTWARE.*/
 
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactionRateNims, FEReactionRate)
-	ADD_PARAMETER(m_sol, "sol");
+    ADD_PARAMETER(m_sol  , "sol")->setEnums("$(solutes)");
 	ADD_PARAMETER(m_k0, "k0");
 	ADD_PARAMETER(m_kc, "kc");
 	ADD_PARAMETER(m_kr, "kr");
@@ -75,7 +75,7 @@ bool FEReactionRateNims::Init()
         
         // convert global sol value to local id
         FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
-		m_lid = psm->FindLocalSoluteID(m_sol - 1);
+		m_lid = psm->FindLocalSoluteID(m_sol);
         
         // check validity of local id
 		if (m_lid == -1) {

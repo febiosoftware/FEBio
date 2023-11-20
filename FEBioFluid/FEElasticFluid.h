@@ -41,7 +41,7 @@ public:
     FEElasticFluid(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEElasticFluid() {}
     
-    //! gage pressure
+    //! gauge pressure
     virtual double Pressure(FEMaterialPoint& pt) = 0;
     
     //! tangent of pressure with respect to strain J
@@ -80,8 +80,8 @@ public:
     //! isobaric specific heat capacity
     virtual double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) = 0;
             
-    //! calculate dilatation for given pressure and temperature
-    virtual bool Dilatation(const double T, const double p, const double c, double& e) = 0;
+    //! calculate dilatation for given (effective) pressure and temperature
+    virtual bool Dilatation(const double T, const double p, double& e) = 0;
     
     //! calculate fluid pressure and its derivatives from state variables
     double Pressure(const double ef, const double T);
@@ -95,8 +95,8 @@ public:
     //! specific internal energy
     double SpecificInternalEnergy(FEMaterialPoint& mp);
     
-    //! specific gage enthalpy
-    double SpecificGageEnthalpy(FEMaterialPoint& mp);
+    //! specific gauge enthalpy
+    double SpecificGaugeEnthalpy(FEMaterialPoint& mp);
     
     //! specific free enthalpy
     double SpecificFreeEnthalpy(FEMaterialPoint& mp);

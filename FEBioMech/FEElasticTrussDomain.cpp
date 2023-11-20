@@ -227,8 +227,7 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 	// axial force T = s*a = t*V/l
 	double T = tau*V/l;
 
-	// element normal
-	vec3d n = TrussNormal(el);
+	vec3d n = GetTrussAxisVector(el);
 
 	// calculate the tangent matrix
 	ke.resize(6, 6);
@@ -290,8 +289,7 @@ void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<doub
 	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
-	// get the element's normal
-	vec3d n = TrussNormal(el);
+	vec3d n = GetTrussAxisVector(el);
 
 	// nodal coordinates
 	vec3d r0[2] = {

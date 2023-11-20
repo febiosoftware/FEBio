@@ -38,7 +38,7 @@
 class FEBIOFLUID_API FERealGas : public FEElasticFluid
 {
 public:
-    enum { MAX_NVC = 7 };
+    enum { MAX_NVA = 7, MAX_NVC = 4 };
     
 public:
     FERealGas(FEModel* pfem);
@@ -50,7 +50,7 @@ public:
     //! Serialization
     void Serialize(DumpStream& ar) override;
 
-    //! gage pressure
+    //! gauge pressure
     double Pressure(FEMaterialPoint& pt) override;
     
     //! tangent of pressure with respect to strain J
@@ -90,17 +90,19 @@ public:
     double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
     
     //! dilatation from temperature and pressure
-    bool Dilatation(const double T, const double p, const double c, double& e) override;
+    bool Dilatation(const double T, const double p, double& e) override;
 
 public:
     double      m_R;        //!< universal gas constant
     double      m_Pr;       //!< referential absolute pressure
     double      m_Tr;       //!< referential absolute temperature
     double      m_rhor;     //!< referential mass density
-    int             m_nvc;          //!< number of virial coefficients for pressure constitutive relation
+    int             m_nva;          //!< number of virial coefficients for pressure constitutive relation
+    int             m_nvc;          //!< number of virial coefficients for isochoric specific heat capacity
     FEFunction1D*   m_a0;           //!< specific free energy at zero pressure
-    FEFunction1D*   m_A[MAX_NVC];   //!< non-dimensional virial coefficients for pressure constitutive relation
-    
+    FEFunction1D*   m_A[MAX_NVA];   //!< non-dimensional virial coefficients for pressure constitutive relation
+    FEFunction1D*   m_C[MAX_NVC];   //!< non-dimensional virial coefficients for isochoric specific heat capacity
+
     FEThermoFluid*  m_pMat; //!< parent thermo-fluid material
     
     // declare parameter list

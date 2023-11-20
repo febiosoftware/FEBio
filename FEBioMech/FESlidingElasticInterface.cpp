@@ -38,7 +38,7 @@ SOFTWARE.*/
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_atol     , "tolerance"          );
-	ADD_PARAMETER(m_gtol     , "gaptol"             );
+	ADD_PARAMETER(m_gtol     , "gaptol"             )->setUnits(UNIT_LENGTH);
 	ADD_PARAMETER(m_epsn     , "penalty"            );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
     ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
@@ -46,7 +46,7 @@ BEGIN_FECORE_CLASS(FESlidingElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_knmult   , "knmult"             );
 	ADD_PARAMETER(m_stol     , "search_tol"         );
 	ADD_PARAMETER(m_bsymm    , "symmetric_stiffness");
-	ADD_PARAMETER(m_srad     , "search_radius"      );
+    ADD_PARAMETER(m_srad     , "search_radius"      )->setUnits(UNIT_LENGTH);;
 	ADD_PARAMETER(m_nsegup   , "seg_up"             );
 	ADD_PARAMETER(m_btension , "tension"            );
 	ADD_PARAMETER(m_naugmin  , "minaug"             );

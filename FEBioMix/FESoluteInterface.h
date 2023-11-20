@@ -61,6 +61,9 @@ public:
 	// return the actual solution concentration at this material point
 	virtual double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
 
+    // return the partition coefficient at this material point
+    virtual double GetFreeDiffusivity(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
+    
 	// return the partition coefficient at this material point
 	virtual double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
 

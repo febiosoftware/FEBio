@@ -256,6 +256,8 @@ void FEDomainMap::Serialize(DumpStream& ar)
 	ar & m_name;
 	ar & m_elset;
 	ar & m_fmt;
+	ar & m_NLT;
+	ar & m_imin;
 }
 
 //-----------------------------------------------------------------------------
@@ -282,6 +284,20 @@ double FEDomainMap::value(const FEMaterialPoint& pt)
 		{
 			double vi = value<double>(lid, i);
 			v += vi*H[i];
+		}
+	}
+	else if (m_fmt == FMT_NODE)
+	{
+		// get shape functions
+		double* H = pe->H(pt.m_index);
+
+		int ne = pe->Nodes();
+		for (int i = 0; i < ne; ++i)
+		{
+			int n = pe->m_node[i];
+			int m = m_NLT[n - m_imin];
+			double vi = value<double>(0, m);
+			v += vi * H[i];
 		}
 	}
 	else if (m_fmt == FMT_ITEM)
@@ -402,6 +418,15 @@ mat3ds FEDomainMap::valueMat3ds(const FEMaterialPoint& pt)
 	}
 
 	return Q;
+}
+
+//-----------------------------------------------------------------------------
+double FEDomainMap::NodalValue(int nid)
+{
+	if (StorageFormat() != FMT_NODE) { assert(false); return 0.0; }
+	int m = m_NLT[nid - m_imin];
+	double v = value<double>(0, m);
+	return v;
 }
 
 //-----------------------------------------------------------------------------

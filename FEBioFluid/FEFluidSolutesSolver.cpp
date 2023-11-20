@@ -421,7 +421,7 @@ void FEFluidSolutesSolver::UpdateKinematics(vector<double>& ui)
         }
     }
     
-    // make sure the prescribed velocities are fullfilled
+    // make sure the prescribed velocities are fulfilled
     int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
@@ -680,7 +680,7 @@ void FEFluidSolutesSolver::PrepStep()
         if (pml.IsActive()) pml.Update();
     }
 
-    // intialize material point data
+    // initialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
     //       the material point data is initialized
@@ -786,6 +786,11 @@ bool FEFluidSolutesSolver::Quasin()
 			{
 				// zero the velocity residual
 				for (int i = 0; i < veq; ++i) m_R1[i] = 0.0;
+                // if solving sequentially with ctol = 0, ignore solute residual
+                if (m_Ctol == 0) {
+                    // zero the solute residual
+                    for (int i = veq; i < m_neq; ++i) m_R1[i] = 0.0;
+                }
 			}
 		}
 
@@ -1036,7 +1041,7 @@ bool FEFluidSolutesSolver::StiffnessMatrix(FELinearSystem& LS)
     
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
-    // constrainst enforced with augmented lagrangian
+    // constraints enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);
     
     return true;

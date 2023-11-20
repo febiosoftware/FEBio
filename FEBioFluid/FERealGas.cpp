@@ -35,25 +35,33 @@
 BEGIN_FECORE_CLASS(FERealGas, FEElasticFluid)
 
 // material parameters
-ADD_PARAMETER(m_nvc  , FE_RANGE_GREATER_OR_EQUAL(0), "nvc");
+ADD_PARAMETER(m_nva  , FE_RANGE_GREATER_OR_EQUAL(0), "nva")->setLongName("no. of p virial coeffs");
+ADD_PARAMETER(m_nvc  , FE_RANGE_GREATER_OR_EQUAL(0), "nvc")->setLongName("no. of cv virial coeffs");
 
-ADD_PROPERTY(m_a0  , "a0");
-ADD_PROPERTY(m_A[0], "A1", FEProperty::Optional);
-ADD_PROPERTY(m_A[1], "A2", FEProperty::Optional);
-ADD_PROPERTY(m_A[2], "A3", FEProperty::Optional);
-ADD_PROPERTY(m_A[3], "A4", FEProperty::Optional);
-ADD_PROPERTY(m_A[4], "A5", FEProperty::Optional);
-ADD_PROPERTY(m_A[5], "A6", FEProperty::Optional);
-ADD_PROPERTY(m_A[6], "A7", FEProperty::Optional);
+ADD_PROPERTY(m_a0  , "a0")->SetLongName("normalized specific free energy 0");
+ADD_PROPERTY(m_A[0], "A1", FEProperty::Optional)->SetLongName("1st p virial coeff");
+ADD_PROPERTY(m_A[1], "A2", FEProperty::Optional)->SetLongName("2nd p virial coeff");
+ADD_PROPERTY(m_A[2], "A3", FEProperty::Optional)->SetLongName("3rd p virial coeff");
+ADD_PROPERTY(m_A[3], "A4", FEProperty::Optional)->SetLongName("4th p virial coeff");
+ADD_PROPERTY(m_A[4], "A5", FEProperty::Optional)->SetLongName("5th p virial coeff");
+ADD_PROPERTY(m_A[5], "A6", FEProperty::Optional)->SetLongName("6th p virial coeff");
+ADD_PROPERTY(m_A[6], "A7", FEProperty::Optional)->SetLongName("7th p virial coeff");
+
+ADD_PROPERTY(m_C[0], "C0")->SetLongName("1st cv virial coeff");
+ADD_PROPERTY(m_C[1], "C1", FEProperty::Optional)->SetLongName("2nd cv virial coeff");
+ADD_PROPERTY(m_C[2], "C2", FEProperty::Optional)->SetLongName("3rd cv virial coeff");
+ADD_PROPERTY(m_C[3], "C3", FEProperty::Optional)->SetLongName("4th cv virial coeff");
 
 END_FECORE_CLASS();
 
 FERealGas::FERealGas(FEModel* pfem) : FEElasticFluid(pfem)
 {
-    m_nvc = 0;
+    m_nva = 0;
+    m_nvc = 1;
     m_R = m_Pr = m_Tr = 0;
     m_a0 = nullptr;
     m_A[0] = m_A[1] = m_A[2] = m_A[3] = m_A[4] = m_A[5] = m_A[6] = nullptr;
+    m_C[0] = m_C[1] = m_C[2] = m_C[3] = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -72,15 +80,17 @@ bool FERealGas::Init()
     m_rhor = m_pMat->ReferentialDensity();
 
     // check if we should assume ideal gas
-    if (m_nvc == 0) {
+    if (m_nva == 0) {
 		m_A[0] = fecore_alloc(FEConstFunction, GetFEModel());
 		m_A[0]->SetParameter("value", 1.0);
-        m_nvc = 1;
+        m_nva = 1;
     }
     m_a0->Init();
-    for (int k=0; k<m_nvc; ++k)
+    for (int k=0; k<m_nva; ++k)
         if (m_A[k]) m_A[k]->Init();
-    
+    for (int k=0; k<m_nvc; ++k)
+        if (m_C[k]) m_C[k]->Init();
+
     return true;
 }
 
@@ -95,18 +105,20 @@ void FERealGas::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! gage pressure
+//! gauge pressure
 double FERealGas::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
     double J = 1 + fp.m_ef;
-    double x = (1+dq)/J - 1;
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double x = That/J;
+    double y = x - 1;
     double p = 0;
-    for (int k=1; k<=m_nvc; ++k)
-        p += m_A[k-1]->value(dq)*pow(x,k);
+    for (int k=1; k<=m_nva; ++k)
+        p += m_A[k-1]->value(That)*pow(y,k);
     
     return p*m_Pr;
 }
@@ -118,15 +130,16 @@ double FERealGas::Tangent_Strain(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
     double J = 1 + fp.m_ef;
-    double x = q/J - 1;
-    double dpJ = m_A[0]->value(dq);
-    for (int k=2; k<=m_nvc; ++k)
-        dpJ += k*m_A[k-1]->value(dq)*pow(x,k-1);
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double x = That/J;
+    double y = x - 1;
+    double dpJ = m_A[0]->value(That);
+    for (int k=2; k<=m_nva; ++k)
+        dpJ += k*m_A[k-1]->value(That)*pow(y,k-1);
 
-    return -dpJ*m_Pr*q/pow(J,2);
+    return -dpJ*m_Pr*That/pow(J,2);
 }
 
 //-----------------------------------------------------------------------------
@@ -136,15 +149,16 @@ double FERealGas::Tangent_Strain_Strain(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
     double J = 1 + fp.m_ef;
-    double x = q/J - 1;
-    double dpJ2 = 2*m_A[0]->value(dq);
-    for (int k=2; k<=m_nvc; ++k)
-        dpJ2 += k*m_A[k-1]->value(dq)*(2*x+(k-1)*q/J)*pow(x,k-2);
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double x = That/J;
+    double y = x - 1;
+    double dpJ2 = 2*m_A[0]->value(That);
+    for (int k=2; k<=m_nva; ++k)
+        dpJ2 += k*m_A[k-1]->value(That)*(2*y+(k-1)*That/J)*pow(y,k-2);
 
-    return dpJ2*m_Pr*q/pow(J,3);
+    return dpJ2*m_Pr*That/pow(J,3);
 }
 
 //-----------------------------------------------------------------------------
@@ -154,13 +168,13 @@ double FERealGas::Tangent_Temperature(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
     double J = 1 + fp.m_ef;
-    double x = q/J - 1;
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double y = That/J - 1;
     double dpT = 0;
-    for (int k=1; k<=m_nvc; ++k)
-        dpT += (m_A[k-1]->derive(dq)*x + k/J*m_A[k-1]->value(dq))*pow(x,k-1);
+    for (int k=1; k<=m_nva; ++k)
+        dpT += (m_A[k-1]->derive(That)*y + k/J*m_A[k-1]->value(That))*pow(y,k-1);
 
     return dpT*m_Pr/m_Tr;
 }
@@ -172,14 +186,14 @@ double FERealGas::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
     double J = 1 + fp.m_ef;
-    double x = q/J - 1;
-    double dpT2 = m_A[0]->deriv2(dq)*x + 2/J*m_A[0]->derive(dq);
-    for (int k=2; k<=m_nvc; ++k)
-        dpT2 += (m_A[k-1]->deriv2(dq)*pow(x,2) + 2*k/J*m_A[k-1]->derive(dq)*x
-                 + k*(k-1)/pow(J,2)*m_A[k-1]->value(dq))*pow(x,k-2);
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double y = That/J - 1;
+    double dpT2 = m_A[0]->deriv2(That)*y + 2/J*m_A[0]->derive(That);
+    for (int k=2; k<=m_nva; ++k)
+        dpT2 += (m_A[k-1]->deriv2(That)*pow(y,2) + 2*k/J*m_A[k-1]->derive(That)*y
+                 + k*(k-1)/pow(J,2)*m_A[k-1]->value(That))*pow(y,k-2);
 
     return dpT2*m_Pr/pow(m_Tr,2);
 }
@@ -191,13 +205,14 @@ double FERealGas::Tangent_Strain_Temperature(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
     double J = 1 + fp.m_ef;
-    double x = q/J - 1;
-    double dpJT = m_A[0]->value(dq) + q*m_A[0]->derive(dq);
-    for (int k=2; k<=m_nvc; ++k)
-        dpJT += k*(q*m_A[k-1]->derive(dq)*x + m_A[k-1]->value(dq)*(x+(k-1)*q/J))*pow(x,k-2);
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double x = That/J;
+    double y = x - 1;
+    double dpJT = m_A[0]->value(That) + That*m_A[0]->derive(That);
+    for (int k=2; k<=m_nva; ++k)
+        dpJT += k*(That*m_A[k-1]->derive(That)*y + m_A[k-1]->value(That)*(k*x-1))*pow(y,k-2);
 
     return -dpJT*m_Pr/(m_Tr*pow(J, 2));
 }
@@ -209,29 +224,26 @@ double FERealGas::SpecificFreeEnergy(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
-    double q2 = q*q, q3 = q2*q, q4 = q3*q, q5 = q4*q, q6 = q5*q, q7 = q6*q;
-    double lnq = log(q);
     double J = 1 + fp.m_ef;
-    double J2 = J*J, J3 = J2*J, J4 = J3*J, J5 = J4*J, J6 = J5*J, J7 = J6*J;
-    double lnJ = log(J);
-    double A[MAX_NVC];
-    for (int k=0; k<m_nvc; ++k)
-        A[k] = m_A[k]->value(dq);
-    double a = m_a0->value(dq);
-    a += (-60*J6*q*A[0] - 60*J6*lnJ*q*A[0] + 60*J6*lnq*q*A[0] + 120*J6*lnJ*q*A[1] -
-          120*J6*lnq*q*A[1] + 60*J5*q2*A[1] + 90*J6*q*A[2] - 180*J6*lnJ*q*A[2] +
-          180*J6*lnq*q*A[2] - 180*J5*q2*A[2] + 30*J4*q3*A[2] - 200*J6*q*A[3] +
-          240*J6*lnJ*q*A[3] - 240*J6*lnq*q*A[3] + 360*J5*q2*A[3] - 120*J4*q3*A[3] +
-          20*J3*q4*A[3] + 325*J6*q*A[4] - 300*J6*lnJ*q*A[4] + 300*J6*lnq*q*A[4] -
-          600*J5*q2*A[4] + 300*J4*q3*A[4] - 100*J3*q4*A[4] + 15*J2*q5*A[4] -
-          462*J6*q*A[5] + 360*J6*lnJ*q*A[5] - 360*J6*lnq*q*A[5] + 900*J5*q2*A[5] -
-          600*J4*q3*A[5] + 300*J3*q4*A[5] - 90*J2*q5*A[5] + 12*J*q6*A[5] + 609*J6*q*A[6] -
-          420*J6*lnJ*q*A[6] + 420*J6*lnq*q*A[6] - 1260*J5*q2*A[6] + 1050*J4*q3*A[6] -
-          700*J3*q4*A[6] + 315*J2*q5*A[6] - 84*J*q6*A[6] + 10*q7*A[6] +
-          60*J7*(A[0] - A[1] + A[2] - A[3] + A[4] - A[5] + A[6]))/
-    (60.*J6);
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double x = That/J;
+    double y = x - 1;
+    double x2 = x*x, x3 = x2*x, x4 = x3*x, x5 = x4*x, x6 = x5*x;
+    double lnx = log(x);
+    double A[MAX_NVA], f[MAX_NVA];
+    f[0] =  1 + x*(lnx-1);
+    f[1] = -1 + x*(x-2*lnx);
+    f[2] =  1 + x*(1.5+3*lnx) - 3*x2 + x3/2;
+    f[3] = -1 - x*(10./3.+4*lnx) + 6*x2 - 2*x3 + x4/3;
+    f[4] =  1 + x*(65./12.+5*lnx) - 10*x2 + 5*x3 - 5*x4/3 + x5/4;
+    f[5] = -1 - x*(77./10.+6*lnx) + 15*x2 - 10*x3 + 5*x4 - 1.5*x5 + x6/5;
+    f[6] =  1 + x*(203./20.+7*lnx) - 21*x2 + 35*x3/2 - 35*x4/3 + 21*x5/4 - 7*x6/5;
+    for (int k=0; k<m_nva; ++k)
+        A[k] = m_A[k]->value(That);
+    double a = m_a0->value(That);
+    for (int k=0; k<m_nva; ++k)
+        a += A[k]*J*f[k];
 
     return a*m_Pr/m_rhor;
 }
@@ -243,39 +255,35 @@ double FERealGas::SpecificEntropy(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
-    double q2 = q*q, q3 = q2*q, q4 = q3*q, q5 = q4*q, q6 = q5*q, q7 = q6*q;
-    double lnq = log(q);
     double J = 1 + fp.m_ef;
-    double J2 = J*J, J3 = J2*J, J4 = J3*J, J5 = J4*J, J6 = J5*J, J7 = J6*J;
-    double lnJ = log(J);
-    double A[MAX_NVC], dA[MAX_NVC];
-    for (int k=0; k<m_nvc; ++k) {
-        A[k] = m_A[k]->value(dq);
-        dA[k] = m_A[k]->derive(dq);
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double x = That/J;
+    double y = x - 1;
+    double x2 = x*x, x3 = x2*x, x4 = x3*x, x5 = x4*x, x6 = x5*x;
+    double lnx = log(x);
+    double A[MAX_NVA], dA[MAX_NVA], f[MAX_NVA], df[MAX_NVA];
+    f[0] =  1 + x*(lnx-1);
+    f[1] = -1 + x*(x-2*lnx);
+    f[2] =  1 + x*(1.5+3*lnx) - 3*x2 + x3/2;
+    f[3] = -1 - x*(10./3.+4*lnx) + 6*x2 - 2*x3 + x4/3;
+    f[4] =  1 + x*(65./12.+5*lnx) - 10*x2 + 5*x3 - 5*x4/3 + x5/4;
+    f[5] = -1 - x*(77./10.+6*lnx) + 15*x2 - 10*x3 + 5*x4 - 1.5*x5 + x6/5;
+    f[6] =  1 + x*(203./20.+7*lnx) - 21*x2 + 35*x3/2 - 35*x4/3 + 21*x5/4 - 7*x6/5;
+    df[0] = lnx;
+    df[1] = 2*(-1 + x - lnx);
+    df[2] = 1.5*(3 - 4*x + x2 + 2*lnx);
+    df[3] = 2./3.*(-11 + 18*x - 9*x2 + 2*x3 - 6*lnx);
+    df[4] = 5./12.*(25 - 48*x + 36*x2 - 16*x3 + 3*x4 + 12*lnx);
+    df[5] = -13.7 + 30*x - 30*x2 + 20*x3 - 7.5*x4 + 1.2*x5 - 6*lnx;
+    df[6] = 7./60.*(147 - 360*x + 450*x2 - 400*x3 + 225*x4 - 72*x5 + 10*x6 + 60*lnx);
+    for (int k=0; k<m_nva; ++k) {
+        A[k] = m_A[k]->value(That);
+        dA[k] = m_A[k]->derive(That);
     }
-    double da0 = m_a0->derive(dq);
-    double s = -((60*da0*J6 + 120*J5*q*A[1] - 360*J5*q*A[2] + 90*J4*q2*A[2] + 720*J5*q*A[3] -
-                       360*J4*q2*A[3] + 80*J3*q3*A[3] - 1200*J5*q*A[4] + 900*J4*q2*A[4] -
-                       400*J3*q3*A[4] + 75*J2*q4*A[4] + 1800*J5*q*A[5] - 1800*J4*q2*A[5] +
-                       1200*J3*q3*A[5] - 450*J2*q4*A[5] + 72*J*q5*A[5] - 2520*J5*q*A[6] +
-                       3150*J4*q2*A[6] - 2800*J3*q3*A[6] + 1575*J2*q4*A[6] - 504*J*q5*A[6] +
-                       70*q6*A[6] + 60*J7*dA[0] - 60*J7*dA[1] + 60*J5*q2*dA[1] + 60*J7*dA[2] -
-                       180*J5*q2*dA[2] + 30*J4*q3*dA[2] - 60*J7*dA[3] + 360*J5*q2*dA[3] -
-                       120*J4*q3*dA[3] + 20*J3*q4*dA[3] + 60*J7*dA[4] - 600*J5*q2*dA[4] +
-                       300*J4*q3*dA[4] - 100*J3*q4*dA[4] + 15*J2*q5*dA[4] - 60*J7*dA[5] +
-                       900*J5*q2*dA[5] - 600*J4*q3*dA[5] + 300*J3*q4*dA[5] - 90*J2*q5*dA[5] +
-                       12*J*q6*dA[5] + 60*J7*dA[6] - 1260*J5*q2*dA[6] + 1050*J4*q3*dA[6] -
-                       700*J3*q4*dA[6] + 315*J2*q5*dA[6] - 84*J*q6*dA[6] + 10*q7*dA[6] +
-                       J6*(-120*A[1] + 270*A[2] - 440*A[3] + 625*A[4] - 822*A[5] + 1029*A[6] -
-                           60*q*dA[0] + 90*q*dA[2] - 200*q*dA[3] + 325*q*dA[4] - 462*q*dA[5] +
-                           609*q*dA[6] - 60*lnJ*(A[0] - 2*A[1] + 3*A[2] - 4*A[3] + 5*A[4] - 6*A[5] +
-                                                 7*A[6] + q*dA[0] - 2*q*dA[1] + 3*q*dA[2] - 4*q*dA[3] + 5*q*dA[4] -
-                                                 6*q*dA[5] + 7*q*dA[6]) +
-                           60*lnq*(A[0] - 2*A[1] + 3*A[2] - 4*A[3] + 5*A[4] - 6*A[5] + 7*A[6] +
-                                   q*dA[0] - 2*q*dA[1] + 3*q*dA[2] - 4*q*dA[3] + 5*q*dA[4] - 6*q*dA[5] +
-                                   7*q*dA[6]))))/(60.*J6);
+    double s = -m_a0->derive(That);
+    for (int k=0; k<m_nva; ++k)
+        s -= A[k]*df[k] + J*dA[k]*f[k];
 
     return s*m_Pr/(m_Tr*m_rhor);
 }
@@ -288,8 +296,9 @@ double FERealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
     
     // get the specific free energy
     double a = SpecificFreeEnergy(mp);
-    double dq = tf.m_T/m_Tr;
-    double a0 = m_a0->value(dq)*m_Pr/m_rhor;
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double a0 = m_a0->value(That)*m_Pr/m_rhor;
     
     // the specific strain energy is the difference between these two values
     return a - a0;
@@ -302,47 +311,13 @@ double FERealGas::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
 
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
-    double q2 = q*q, q3 = q2*q, q4 = q3*q, q5 = q4*q, q6 = q5*q, q7 = q6*q;
-    double lnq = log(q);
     double J = 1 + fp.m_ef;
-    double J2 = J*J, J3 = J2*J, J4 = J3*J, J5 = J4*J, J6 = J5*J, J7 = J6*J;
-    double lnJ = log(J);
-    double A[MAX_NVC], dA[MAX_NVC], d2A[MAX_NVC];
-    for (int k=0; k<m_nvc; ++k) {
-        A[k] = m_A[k]->value(dq);
-        dA[k] = m_A[k]->derive(dq);
-        d2A[k] = m_A[k]->deriv2(dq);
-    }
-    double d2a0 = m_a0->deriv2(dq);
-    double cv = -q*(60*d2a0*J6 + 120*J5*A[1] - (120*J*J5*A[1])/q - 360*J5*A[2] + 180*J4*q*A[2] +
-                    720*J5*A[3] - 720*J4*q*A[3] + 240*J3*q2*A[3] - 1200*J5*A[4] + 1800*J4*q*A[4] -
-                    1200*J3*q2*A[4] + 300*J2*q3*A[4] + 1800*J5*A[5] - 3600*J4*q*A[5] +
-                    3600*J3*q2*A[5] - 1800*J2*q3*A[5] + 360*J*q4*A[5] - 2520*J5*A[6] +
-                    6300*J4*q*A[6] - 8400*J3*q2*A[6] + 6300*J2*q3*A[6] - 2520*J*q4*A[6] +
-                    420*q5*A[6] + 60*J7*d2A[0] - 60*J7*d2A[1] + 60*J5*q2*d2A[1] + 60*J7*d2A[2] -
-                    180*J5*q2*d2A[2] + 30*J4*q3*d2A[2] - 60*J7*d2A[3] + 360*J5*q2*d2A[3] -
-                    120*J4*q3*d2A[3] + 20*J3*q4*d2A[3] + 60*J7*d2A[4] - 600*J5*q2*d2A[4] +
-                    300*J4*q3*d2A[4] - 100*J3*q4*d2A[4] + 15*J2*q5*d2A[4] - 60*J7*d2A[5] +
-                    900*J5*q2*d2A[5] - 600*J4*q3*d2A[5] + 300*J3*q4*d2A[5] - 90*J2*q5*d2A[5] +
-                    12*J*q6*d2A[5] + 60*J7*d2A[6] - 1260*J5*q2*d2A[6] + 1050*J4*q3*d2A[6] -
-                    700*J3*q4*d2A[6] + 315*J2*q5*d2A[6] - 84*J*q6*d2A[6] + 10*q7*d2A[6] +
-                    240*J5*q*dA[1] - 720*J5*q*dA[2] + 180*J4*q2*dA[2] + 1440*J5*q*dA[3] -
-                    720*J4*q2*dA[3] + 160*J3*q3*dA[3] - 2400*J5*q*dA[4] + 1800*J4*q2*dA[4] -
-                    800*J3*q3*dA[4] + 150*J2*q4*dA[4] + 3600*J5*q*dA[5] - 3600*J4*q2*dA[5] +
-                    2400*J3*q3*dA[5] - 900*J2*q4*dA[5] + 144*J*q5*dA[5] - 5040*J5*q*dA[6] +
-                    6300*J4*q2*dA[6] - 5600*J3*q3*dA[6] + 3150*J2*q4*dA[6] - 1008*J*q5*dA[6] +
-                    140*q6*dA[6] + J6*((60*(A[0] + 3*A[2] - 4*A[3] + 5*A[4] - 6*A[5] + 7*A[6]))/q +
-                                       q*(-60*(1 + lnJ - lnq)*d2A[0] - 120*lnq*d2A[1] + 90*d2A[2] +
-                                          180*lnq*d2A[2] - 200*d2A[3] - 240*lnq*d2A[3] + 325*d2A[4] +
-                                          300*lnq*d2A[4] - 462*d2A[5] - 360*lnq*d2A[5] +
-                                          60*lnJ*(2*d2A[1] - 3*d2A[2] + 4*d2A[3] - 5*d2A[4] + 6*d2A[5] -
-                                                  7*d2A[6]) + 609*d2A[6] + 420*lnq*d2A[6]) -
-                                       2*(120*dA[1] - 270*dA[2] + 440*dA[3] - 625*dA[4] + 822*dA[5] - 1029*dA[6] +
-                                          60*lnJ*(dA[0] - 2*dA[1] + 3*dA[2] - 4*dA[3] + 5*dA[4] - 6*dA[5] +
-                                                  7*dA[6]) - 60*lnq*(dA[0] - 2*dA[1] + 3*dA[2] - 4*dA[3] + 5*dA[4] -
-                                                                     6*dA[5] + 7*dA[6]))))/(60.*J6);
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double y = That/J - 1;
+    double cv = m_C[0]->value(That);
+    for (int k=1; k<m_nvc; ++k)
+        cv += m_C[k]->value(That)*pow(y,k);
 
     return cv*m_Pr/(m_Tr*m_rhor);
 }
@@ -354,59 +329,33 @@ double FERealGas::Tangent_cv_Strain(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double dq = tf.m_T/m_Tr;
-    double q = 1 + dq;
-    double q2 = q*q, q3 = q2*q, q4 = q3*q, q5 = q4*q, q6 = q5*q, q7 = q6*q;
-    double lnq = log(q);
     double J = 1 + fp.m_ef;
-    double J2 = J*J, J3 = J2*J, J4 = J3*J, J5 = J4*J, J6 = J5*J, J7 = J6*J;
-    double lnJ = log(J);
-    double A[MAX_NVC], dA[MAX_NVC], d2A[MAX_NVC];
-    for (int k=0; k<m_nvc; ++k) {
-        A[k] = m_A[k]->value(dq);
-        dA[k] = m_A[k]->derive(dq);
-        d2A[k] = m_A[k]->deriv2(dq);
-    }
-    double d2a0 = m_a0->deriv2(dq);
-    double dcvJ = -(q*(60*d2a0*J6 + 120*J5*A[1] - (120*J*J5*A[1])/q - 360*J5*A[2] + 180*J4*q*A[2] +
-                            720*J5*A[3] - 720*J4*q*A[3] + 240*J3*q2*A[3] - 1200*J5*A[4] + 1800*J4*q*A[4] -
-                            1200*J3*q2*A[4] + 300*J2*q3*A[4] + 1800*J5*A[5] - 3600*J4*q*A[5] +
-                            3600*J3*q2*A[5] - 1800*J2*q3*A[5] + 360*J*q4*A[5] - 2520*J5*A[6] +
-                            6300*J4*q*A[6] - 8400*J3*q2*A[6] + 6300*J2*q3*A[6] - 2520*J*q4*A[6] +
-                            420*q5*A[6] + 60*J7*d2A[0] - 60*J7*d2A[1] + 60*J5*q2*d2A[1] + 60*J7*d2A[2] -
-                            180*J5*q2*d2A[2] + 30*J4*q3*d2A[2] - 60*J7*d2A[3] + 360*J5*q2*d2A[3] -
-                            120*J4*q3*d2A[3] + 20*J3*q4*d2A[3] + 60*J7*d2A[4] - 600*J5*q2*d2A[4] +
-                            300*J4*q3*d2A[4] - 100*J3*q4*d2A[4] + 15*J2*q5*d2A[4] - 60*J7*d2A[5] +
-                            900*J5*q2*d2A[5] - 600*J4*q3*d2A[5] + 300*J3*q4*d2A[5] - 90*J2*q5*d2A[5] +
-                            12*J*q6*d2A[5] + 60*J7*d2A[6] - 1260*J5*q2*d2A[6] + 1050*J4*q3*d2A[6] -
-                            700*J3*q4*d2A[6] + 315*J2*q5*d2A[6] - 84*J*q6*d2A[6] + 10*q7*d2A[6] +
-                            240*J5*q*dA[1] - 720*J5*q*dA[2] + 180*J4*q2*dA[2] + 1440*J5*q*dA[3] -
-                            720*J4*q2*dA[3] + 160*J3*q3*dA[3] - 2400*J5*q*dA[4] + 1800*J4*q2*dA[4] -
-                            800*J3*q3*dA[4] + 150*J2*q4*dA[4] + 3600*J5*q*dA[5] - 3600*J4*q2*dA[5] +
-                            2400*J3*q3*dA[5] - 900*J2*q4*dA[5] + 144*J*q5*dA[5] - 5040*J5*q*dA[6] +
-                            6300*J4*q2*dA[6] - 5600*J3*q3*dA[6] + 3150*J2*q4*dA[6] - 1008*J*q5*dA[6] +
-                            140*q6*dA[6] + J6*((60*(A[0] + 3*A[2] - 4*A[3] + 5*A[4] - 6*A[5] + 7*A[6]))/q +
-                                               q*(-60*(1 + lnJ - lnq)*d2A[0] - 120*lnq*d2A[1] + 90*d2A[2] +
-                                                  180*lnq*d2A[2] - 200*d2A[3] - 240*lnq*d2A[3] + 325*d2A[4] +
-                                                  300*lnq*d2A[4] - 462*d2A[5] - 360*lnq*d2A[5] +
-                                                  60*lnJ*(2*d2A[1] - 3*d2A[2] + 4*d2A[3] - 5*d2A[4] + 6*d2A[5] -
-                                                          7*d2A[6]) + 609*d2A[6] + 420*lnq*d2A[6]) -
-                                               2*(120*dA[1] - 270*dA[2] + 440*dA[3] - 625*dA[4] + 822*dA[5] - 1029*dA[6] +
-                                                  60*lnJ*(dA[0] - 2*dA[1] + 3*dA[2] - 4*dA[3] + 5*dA[4] - 6*dA[5] +
-                                                          7*dA[6]) - 60*lnq*(dA[0] - 2*dA[1] + 3*dA[2] - 4*dA[3] + 5*dA[4] -
-                                                                             6*dA[5] + 7*dA[6])))))/(60.*J6);
-    
-    return dcvJ*m_Pr/(m_Tr*m_rhor);
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double x = That/J;
+    double y = x - 1;
+    double dcvJ = 0;
+    for (int k=1; k<m_nvc; ++k)
+        dcvJ -= m_C[k]->value(That)*pow(y,k-1);
+    return dcvJ*m_Pr/(m_Tr*m_rhor)*x/J;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of isochoric specific heat capacity with respect to temperature T
 double FERealGas::Tangent_cv_Temperature(FEMaterialPoint& mp)
 {
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = m_Tr + tf.m_T;
-    double dcvT = IsochoricSpecificHeatCapacity(mp)/T;  // this is incomplete
-    return dcvT;
+    
+    double J = 1 + fp.m_ef;
+    double T = tf.m_T + m_Tr;
+    double That = T/m_Tr;
+    double x = That/J;
+    double y = x - 1;
+    double dcvT = m_C[0]->derive(That);
+    for (int k=1; k<m_nvc; ++k)
+        dcvT += (m_C[k]->derive(That)*y+k/J*m_C[k]->value(That))*pow(y,k-1);
+    return dcvT*m_Pr/(pow(m_Tr,2)*m_rhor);
 }
 
 //-----------------------------------------------------------------------------
@@ -424,12 +373,12 @@ double FERealGas::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-bool FERealGas::Dilatation(const double T, const double p, const double c, double& e)
+bool FERealGas::Dilatation(const double T, const double p, double& e)
 {
     double errrel = 1e-6;
     double errabs = 1e-6;
     int maxiter = 100;
-    switch (m_nvc) {
+    switch (m_nva) {
         case 0:
             return false;
             break;

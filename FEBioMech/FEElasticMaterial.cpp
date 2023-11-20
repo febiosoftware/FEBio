@@ -53,7 +53,7 @@ FEMaterialPointData* FEElasticMaterial::CreateMaterialPointData()
 
 //-----------------------------------------------------------------------------
 //! calculate spatial tangent stiffness at material point, using secant method
-mat3ds FEElasticMaterial::SecantStress(FEMaterialPoint& mp)
+mat3ds FEElasticMaterial::SecantStress(FEMaterialPoint& mp, bool PK2)
 {
 	// extract the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -86,15 +86,18 @@ mat3ds FEElasticMaterial::SecantStress(FEMaterialPoint& mp)
 		}
 	}
 
-	// push from material to spatial frame
-	mat3ds s = pt.push_forward(S);
-
-	// restore values
-	pt.m_F = F;
-	pt.m_J = J;
-
-	// return secant stress
-	return s;
+    // restore values
+    pt.m_F = F;
+    pt.m_J = J;
+    
+    if (PK2) return S;
+    else {
+        // push from material to spatial frame
+        mat3ds s = pt.push_forward(S);
+        
+        // return secant stress
+        return s;
+    }
 }
 
 //-----------------------------------------------------------------------------

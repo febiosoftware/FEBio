@@ -52,7 +52,7 @@ protected:
 public:
 	FEParamDouble	m_cp;				//!< coefficient mu prime
 	FEParamDouble	m_c[MAX_TERMS];		//!< coefficients mu
-	double	m_m[MAX_TERMS];				//!< powers
+	FEParamDouble	m_m[MAX_TERMS];		//!< powers
 	
 	DECLARE_FECORE_CLASS();
 };

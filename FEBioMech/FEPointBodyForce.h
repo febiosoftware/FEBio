@@ -37,6 +37,7 @@ public:
 	FEPointBodyForce(FEModel* pfem);
 
 	vec3d force(FEMaterialPoint& mp) override;
+    double divforce(FEMaterialPoint& mp) override;
 	mat3ds stiffness(FEMaterialPoint& mp) override;
 
 	void Serialize(DumpStream& ar) override;
@@ -45,12 +46,12 @@ public:
 	void Update() override;
 
 public:
-	double	m_a, m_b;
-	vec3d	m_rc;
+	double	m_a, m_b;           //!< coefficients of exponential decay of body force
+	vec3d	m_rc;               //!< center point of body force
 	
-	int		m_inode;
+	int		m_inode;            //!< node number of center of body force, or -1 if not a node
 
-	bool	m_brigid;
+	bool	m_brigid;           //!< flag if center point is located within a rigid body
 
 	FESolidElement* m_pel;		//!< element in which point m_r0 lies
 	double			m_rs[3];	//!< isoparametric coordinates

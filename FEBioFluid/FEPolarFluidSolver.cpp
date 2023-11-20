@@ -469,7 +469,7 @@ void FEPolarFluidSolver::UpdateKinematics(vector<double>& ui)
         }
     }
     
-    // make sure the prescribed BCs are fullfilled
+    // make sure the prescribed BCs are fulfilled
     int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
@@ -1039,7 +1039,7 @@ bool FEPolarFluidSolver::StiffnessMatrix(FELinearSystem& LS)
     
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
-    // constrainst enforced with augmented lagrangian
+    // constraints enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);
     
     return true;

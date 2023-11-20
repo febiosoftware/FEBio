@@ -92,7 +92,7 @@ void FEPrescribedFluidPressure::UpdateDilatation()
 			double efo[FEElement::MAX_NODES] = { 0 };
 			for (int j = 0; j < se->GaussPoints(); ++j) {
 				FEMaterialPoint* pt = se->GetMaterialPoint(j);
-				bool good = pfl->Dilatation(0, p, 0, efi[j]);
+				bool good = pfl->Dilatation(0, p, efi[j]);
 				assert(good);
 			}
 			// project dilatations from integration points to nodes

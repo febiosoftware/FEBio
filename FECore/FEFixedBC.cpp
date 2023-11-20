@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FENodeSet.h"
 #include "FENode.h"
 #include "DumpStream.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 FEFixedBC::FEFixedBC(FEModel* pfem) : FENodalBC(pfem)
@@ -48,7 +49,11 @@ FEFixedBC::FEFixedBC(FEModel* pfem, int dof, FENodeSet* ps) : FENodalBC(pfem)
 bool FEFixedBC::Init()
 {
 	if (GetNodeSet() == nullptr) return false;
-	if (GetDofList().Size() == 0) return false;
+	if (GetDofList().Size() == 0)
+	{
+		feLogError("No degrees of freedom are constrained in %s", GetName().c_str());
+		return false;
+	}
 
 	return FENodalBC::Init();
 }

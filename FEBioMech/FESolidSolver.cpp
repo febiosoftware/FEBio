@@ -289,6 +289,9 @@ void FESolidSolver::PrepStep()
 	// zero total displacements
 	zero(m_Ui);
 
+	const FETimeInfo& tp = GetFEModel()->GetTime();
+	double dt = tp.timeIncrement;
+
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
 	FEModel& fem = *GetFEModel();
@@ -299,9 +302,12 @@ void FESolidSolver::PrepStep()
 		ni.m_rp = ni.m_rt;
 		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
-	}
 
-	const FETimeInfo& tp = fem.GetTime();
+		// initial guess at start of new time step
+		ni.m_at = ni.m_ap * (1 - 0.5 / m_beta) - ni.m_vp / (m_beta * dt);
+		vec3d vs = ni.m_vp + (ni.m_at * m_gamma + ni.m_ap * (1 - m_gamma)) * dt;
+		ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vs);
+	}
 
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry

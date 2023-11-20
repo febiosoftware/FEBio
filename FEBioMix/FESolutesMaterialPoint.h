@@ -37,7 +37,7 @@ class FEBIOMIX_API FESolutesMaterialPoint : public FEMaterialPointData
 {
 public:
 	//! Constructor
-	FESolutesMaterialPoint(FEMaterialPointData* ppt) : FEMaterialPointData(ppt) {}
+	FESolutesMaterialPoint(FEMaterialPointData* ppt);
 	
 	//! Create a shallow copy
 	FEMaterialPointData* Copy();

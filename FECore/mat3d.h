@@ -685,6 +685,14 @@ public:
 	float& operator () (int i, int j) { return d[i][j]; }
 	float operator () (int i, int j) const { return d[i][j]; }
 
+	mat3f operator * (float a) const
+	{
+		return mat3f(\
+			d[0][0] * a, d[0][1] * a, d[0][2] * a, \
+			d[1][0] * a, d[1][1] * a, d[1][2] * a, \
+			d[2][0] * a, d[2][1] * a, d[2][2] * a);
+	}
+
 	mat3f operator * (mat3f& m)
 	{
 		mat3f a;
@@ -723,6 +731,22 @@ public:
 		d[1][0] /= g;	d[1][1] /= g; d[1][2] /= g;
 		d[2][0] /= g;	d[2][1] /= g; d[2][2] /= g;
 		return (*this);
+	}
+
+	mat3f operator + (const mat3f& a) const
+	{
+		return mat3f( \
+			d[0][0] + a.d[0][0], d[0][1] + a.d[0][1], d[0][2] + a.d[0][2], \
+			d[1][0] + a.d[1][0], d[1][1] + a.d[1][1], d[1][2] + a.d[1][2], \
+			d[2][0] + a.d[2][0], d[2][1] + a.d[2][1], d[2][2] + a.d[2][2]);
+	}
+
+	mat3f operator - (const mat3f& a) const
+	{
+		return mat3f(\
+			d[0][0] - a.d[0][0], d[0][1] - a.d[0][1], d[0][2] - a.d[0][2], \
+			d[1][0] - a.d[1][0], d[1][1] - a.d[1][1], d[1][2] - a.d[1][2], \
+			d[2][0] - a.d[2][0], d[2][1] - a.d[2][1], d[2][2] - a.d[2][2]);
 	}
 
 	mat3f operator += (const mat3f& a)

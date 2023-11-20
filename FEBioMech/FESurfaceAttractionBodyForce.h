@@ -40,6 +40,8 @@ public:
 
     vec3d force(FEMaterialPoint& mp) override;
 
+    double divforce(FEMaterialPoint& mp) override;
+    
     mat3ds stiffness(FEMaterialPoint& mp) override;
     
     // initialize

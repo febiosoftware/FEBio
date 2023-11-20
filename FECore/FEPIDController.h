@@ -37,6 +37,11 @@ public:
 
 	bool Init() override;
 
+	double GetParameterValue() const { return m_paramVal; }
+	double GetError() const { return m_error; }
+
+	void Serialize(DumpStream& ar);
+
 protected:
 	double GetValue(double time) override;
 
@@ -48,10 +53,12 @@ private:
 	double	m_Kd;
 	double	m_Ki;
 
-	FEParamValue	m_param;
-	double			m_prev;
-	double			m_prevTime;
-	double			m_int;
+	FEParamValue	m_param;		//!< parameter that is tracked
+	double			m_paramVal;		//!< current parameter value
+	double			m_error;		//!< current error
+	double			m_prev;			//!< error at previous time step
+	double			m_prevTime;		//!< previous time step
+	double			m_int;			//!< integral value
 
 	DECLARE_FECORE_CLASS();
 };

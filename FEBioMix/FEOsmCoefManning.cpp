@@ -61,7 +61,7 @@ bool FEOsmCoefManning::Init()
 	}
     
     // extract the local id of the solute from the global id
-    // m_sol must be zero-based
+    // m_sol must be one-based
     m_lsol = psm->FindLocalSoluteID(m_sol);
 	if (m_lsol == -1) {
 		feLogError("Invalid value for sol");

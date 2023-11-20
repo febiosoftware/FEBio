@@ -146,6 +146,7 @@ bool FETiedMultiphasicSurface::Init()
     // store concentration index
     DOFS& dofs = GetFEModel()->GetDOFS();
     m_dofC = dofs.GetDOF("concentration", 0);
+	if (m_dofC < 0) return false;
     
     // allocate node normals
     m_nn.assign(Nodes(), vec3d(0,0,0));
@@ -279,6 +280,7 @@ void FETiedMultiphasicSurface::UpdateNodeNormals()
 void FETiedMultiphasicSurface::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactSurface::Serialize(ar);
+	ar & m_dofC;
 	ar & m_bporo;
 	ar & m_bsolu;
 	ar & m_poro;
@@ -349,7 +351,7 @@ bool FETiedMultiphasicInterface::Init()
                 m_sid.push_back(m_ss.m_sid[is]);
                 m_ssl.push_back(is);
                 m_msl.push_back(im);
-                FESoluteData* sd = FindSoluteData(m_ss.m_sid[is]);
+                FESoluteData* sd = FindSoluteData(m_ss.m_sid[is] + 1);
                 m_sz.push_back(sd->m_z);
             }
         }
@@ -768,7 +770,6 @@ void FETiedMultiphasicInterface::ProjectSurface(FETiedMultiphasicSurface& ss, FE
     FEMesh& mesh = GetFEModel()->GetMesh();
     FESurfaceElement* pme;
     vec3d r;
-    double rs[2];
     
     const int MN = FEElement::MAX_NODES;
     double ps[MN], p1;
@@ -837,7 +838,7 @@ void FETiedMultiphasicInterface::ProjectSurface(FETiedMultiphasicSurface& ss, FE
                     int sid = m_sid[isol];
                     double cm[MN];
                     for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).get(m_dofC + sid);
-                    double c2 = pme->eval(cm, rs[0], rs[1]);
+                    double c2 = pme->eval(cm, pt.m_rs[0], pt.m_rs[1]);
                     pt.m_cg[m_ssl[isol]] = c1[isol] - c2;
                 }
             }
@@ -1649,7 +1650,11 @@ void FETiedMultiphasicInterface::Serialize(DumpStream &ar)
     // store contact surface data
     m_ms.Serialize(ar);
     m_ss.Serialize(ar);
-    
+
+    // serialize element pointers
+    SerializeElementPointers(m_ss, m_ms, ar);
+    SerializeElementPointers(m_ms, m_ss, ar);
+
 	// serialize interface data
 	ar & m_epsp;
 	ar & m_epsc;
@@ -1657,10 +1662,10 @@ void FETiedMultiphasicInterface::Serialize(DumpStream &ar)
 	ar & m_ssl;
 	ar & m_msl;
 	ar & m_sz;
-
-	// serialize element pointers
-	SerializeElementPointers(m_ss, m_ms, ar);
-	SerializeElementPointers(m_ms, m_ss, ar);
+    
+    if (ar.IsShallow()) return;
+    ar & m_dofP & m_dofC;
+    ar & m_Rgas & m_Tabs;
 }
 
 //-----------------------------------------------------------------------------

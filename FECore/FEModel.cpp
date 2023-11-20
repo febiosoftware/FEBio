@@ -704,6 +704,9 @@ bool FEModel::InitBCs()
 		}
 	}
 
+	// check the linear constraints
+	if (GetLinearConstraintManager().Initialize() == false) return false;
+
     return true;
 }
 
@@ -930,7 +933,14 @@ bool FEModel::InitMesh()
 
 	// reset data
 	// TODO: Not sure why this is here
-	mesh.Reset();
+	try {
+		mesh.Reset();
+	}
+	catch (NegativeJacobian e)
+	{
+		feLogError("Negative jacobian detected during mesh initialization.");
+		return false;
+	}
 
 	// initialize all domains
 	// Initialize shell domains first (in order to establish SSI)
@@ -1952,6 +1962,9 @@ void FEModel::CopyFrom(FEModel& fem)
 {
 	// clear the current model data
 	Clear();
+
+	// copy the active module
+	SetActiveModule(fem.GetModuleName());
 
 	// --- Parameters ---
 

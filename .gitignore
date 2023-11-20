@@ -427,6 +427,7 @@ DerivedData/
 ## cmake build directories
 cbuild/
 cmbuild*/
+vs22/
 
 ##cmake files
 CMakeLists.txt
@@ -439,3 +440,4 @@ CMakeCache.txt
 Documentation/FEBio_Theory_Manual.pdf
 Documentation/FEBio_User_Manual.html.LyXconv/
 
+/FEBioMech/FECGSolidSolver - Copy.cpp

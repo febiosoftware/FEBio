@@ -47,6 +47,12 @@ public:
     //! Unpack shell element data
     void UnpackLM(FEElement& el, vector<int>& lm) override;
     
+    //! Set flag for update for dynamic quantities
+    void SetDynamicUpdateFlag(bool b);
+    
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
     //! get the material (overridden from FEDomain)
     FEMaterial* GetMaterial() override { return m_pMat; }
     
@@ -69,6 +75,9 @@ public: // overrides from FEElasticDomain
     
     // update stresses
     void Update(const FETimeInfo& tp) override;
+    
+    // update the element stress
+    void UpdateElementStress(int iel, const FETimeInfo& tp);
     
     //! initialize elements for this domain
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
@@ -103,6 +112,9 @@ public:
     //! Calculate extenral body forces for shell elements
 	void ElementBodyForce(FEBodyForce& BF, FEShellElementNew& el, vector<double>& fe);
     
+    //! Calculates the inertial force for shell elements
+    void ElementInertialForce(FEShellElementNew& el, vector<double>& fe);
+    
     //! calculates the solid element mass matrix
 	void ElementMassMatrix(FEShellElementNew& el, matrix& ke, double a);
     
@@ -127,7 +139,15 @@ public:
     
 protected:
     FESolidMaterial*    m_pMat;
-	FEDofList			m_dofSA;
-	FEDofList			m_dofR;
-	FEDofList			m_dof;
+    int                 m_nEAS;
+    bool                m_update_dynamic;    //!< flag for updating quantities only used in dynamic analysis
+    
+    bool    m_secant_stress;    //!< use secant approximation to stress
+    bool    m_secant_tangent;   //!< flag for using secant tangent
+    
+    FEDofList   m_dofV;
+    FEDofList   m_dofSV;
+    FEDofList    m_dofSA;
+    FEDofList    m_dofR;
+    FEDofList    m_dof;
 };
