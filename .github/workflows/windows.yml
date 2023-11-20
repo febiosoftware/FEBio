@@ -10,7 +10,7 @@ on:
         default: false
 jobs:
   call_workflow:
-    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable.yml@reusable-worfklow-windows
+    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable.yml@develop
     with:
       runTests: ${{ inputs.runTests && true || false }}
       package-name: febio4
