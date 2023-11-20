@@ -65,6 +65,7 @@ SOFTWARE.*/
 #include "FESlidingElasticInterface.h"
 #include "FETiedContactSurface.h"
 #include "FEReactiveVEMaterialPoint.h"
+#include "FELinearTrussDomain.h"
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FETrussDomain.h>
@@ -761,6 +762,15 @@ public:
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 {
+	if (dynamic_cast<FELinearTrussDomain*>(&dom))
+	{
+		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+			const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			return pt.m_s;
+		});
+		return true;
+	}
+
 	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
 	if ((pme == 0) || pme->IsRigid()) return false;
 
@@ -2419,10 +2429,35 @@ bool FEPlotDamage::SetFilter(const char* szfilter)
 bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
 {
     if (m_comp == -1) {
-        writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
-            const FEReactiveMaterialPoint* ppd = mp.ExtractData<FEReactiveMaterialPoint>();
-            double D = 0.0;
-            if (ppd) D = (float)ppd->BrokenBonds();
+        writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& pt) {
+			const FEReactiveMaterialPoint* ppd = pt.ExtractData<FEReactiveMaterialPoint>();
+			FEElasticMixtureMaterialPoint* pem = const_cast<FEElasticMixtureMaterialPoint*>(pt.ExtractData<FEElasticMixtureMaterialPoint>());
+			FEMultigenerationMaterialPoint* pmg = const_cast<FEMultigenerationMaterialPoint*>(pt.ExtractData<FEMultigenerationMaterialPoint>());
+			double D = 0.0;
+			if (ppd) D += (float)ppd->BrokenBonds();
+			else if (pem) {
+				for (int k = 0; k < pem->Components(); ++k)
+				{
+					const FEReactiveMaterialPoint* ppd = pem->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
+					if (ppd) D += (float)ppd->BrokenBonds();
+				}
+			}
+			else if (pmg) {
+				for (int k = 0; k < pmg->Components(); ++k)
+				{
+					FEReactiveMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
+					FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+					if (ppd) D += (float)ppd->BrokenBonds();
+					else if (pem)
+					{
+						for (int l = 0; l < pem->Components(); ++l)
+						{
+							FEReactiveMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEReactiveMaterialPoint>();
+							if (ppd) D += (float)ppd->BrokenBonds();
+						}
+					}
+				}
+			}
             return D;
         });
         return true;

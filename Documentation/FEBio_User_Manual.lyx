@@ -162,13 +162,13 @@ status open
 
 \end_inset
 
-User's Manual Version 4.3
+User's Manual Version 4.4
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: August 30, 2023
+Last Updated: November 15, 2023
 \end_layout
 
 \begin_layout Standard
@@ -43604,7 +43604,7 @@ element or for all rigid bodies if no list is defined.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="30" columns="2">
+<lyxtabular version="3" rows="33" columns="2">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -44195,7 +44195,7 @@ z-component of the rigid body reaction torque
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -44204,11 +44204,71 @@ KE
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 kinetic energy 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+EulerX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+X-Euler angle
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+EulerY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Y-Euler angle
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+EulerZ
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Z-Euler angle
 \end_layout
 
 \end_inset
@@ -44680,12 +44740,8 @@ status collapsed
 \end_inset
 
 .
- This section describes how to customize the data that is stored in the
- 
-\shape italic
-xplt 
-\shape default
-format.
+ This section describes how to customize the data that is stored to the
+ plotfile.
 \end_layout
 
 \begin_layout Standard
@@ -44710,7 +44766,7 @@ The
 type 
 \emph default
 attribute defines the output format.
- Currently, only 
+ As of version 4.4, the user can choose between 
 \begin_inset Quotes eld
 \end_inset
 
@@ -44718,7 +44774,41 @@ febio
 \begin_inset Quotes erd
 \end_inset
 
- is supported, and thus defining the type attribute is optional.
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+vtk
+\begin_inset Quotes erd
+\end_inset
+
+.
+ When choosing 
+\begin_inset Quotes eld
+\end_inset
+
+febio
+\begin_inset Quotes erd
+\end_inset
+
+, which is the default, the results will be stored in the standard binary
+ 
+\emph on
+xplt 
+\emph default
+format.
+ When choosing 
+\begin_inset Quotes eld
+\end_inset
+
+vtk
+\begin_inset Quotes erd
+\end_inset
+
+, the output is stored as individual VTK (legacy format) files, one for
+ each completed time step.
+ Note that due to limitations of the vtk format, not all plot variables
+ can be exported to VTK file.
  
 \end_layout
 

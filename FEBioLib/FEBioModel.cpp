@@ -29,11 +29,15 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioModel.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "FEBioPlot/VTKPlotFile.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioXML/FERestartImport.h"
 #include <FECore/NodeDataRecord.h>
 #include <FECore/FaceDataRecord.h>
 #include <FECore/ElementDataRecord.h>
+#include <FECore/SurfaceDataRecord.h>
+#include <FECore/DomainDataRecord.h>
+#include <FECore/FEModelDataRecord.h>
 #include <FEBioMech/ObjectDataRecord.h>
 #include <FECore/NLConstraintDataRecord.h>
 #include <FEBioMech/FERigidConnector.h>
@@ -1327,8 +1331,20 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 		if (m_plot) { delete m_plot; m_plot = 0; }
 
 		// create the plot file
-		FEBioPlotFile* pplt = new FEBioPlotFile(this);
-		m_plot = pplt;
+		FEPlotDataStore& data = GetPlotDataStore();
+		if (data.GetPlotFileType() == "febio")
+		{
+			FEBioPlotFile* xplt = new FEBioPlotFile(this);
+
+			// set the software string
+			const char* szver = febio::getVersionString();
+			char szbuf[256] = { 0 };
+			sprintf(szbuf, "FEBio %s", szver);
+			xplt->SetSoftwareString(szbuf);
+
+			m_plot = xplt;
+		}
+		else if (data.GetPlotFileType() == "vtk") m_plot = new VTKPlotFile(this);
 
 		if (m_pltAppendOnRestart)
 		{
@@ -1338,14 +1354,6 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 				printf("FATAL ERROR: Failed reopening plot database %s\n", m_splot.c_str());
 				throw "FATAL ERROR";
 			}
-		}
-		else
-		{
-			// set the software string
-			const char* szver = febio::getVersionString();
-			char szbuf[256] = { 0 };
-			sprintf(szbuf, "FEBio %s", szver);
-			pplt->SetSoftwareString(szbuf);
 		}
 
 		// data records
@@ -1389,11 +1397,14 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 			DataRecord* pd = 0;
 			switch(ntype)
 			{
-			case FE_DATA_NODE: pd = new NodeDataRecord        (this); break;
-			case FE_DATA_FACE: pd = new FaceDataRecord        (this); break;
-			case FE_DATA_ELEM: pd = new ElementDataRecord     (this); break;
-			case FE_DATA_RB  : pd = new ObjectDataRecord      (this); break;
-			case FE_DATA_NLC : pd = new NLConstraintDataRecord(this); break;
+			case FE_DATA_NODE   : pd = new NodeDataRecord        (this); break;
+			case FE_DATA_FACE   : pd = new FaceDataRecord        (this); break;
+			case FE_DATA_ELEM   : pd = new ElementDataRecord     (this); break;
+			case FE_DATA_RB     : pd = new ObjectDataRecord      (this); break;
+			case FE_DATA_NLC    : pd = new NLConstraintDataRecord(this); break;
+			case FE_DATA_SURFACE: pd = new FESurfaceDataRecord   (this); break;
+			case FE_DATA_DOMAIN : pd = new FEDomainDataRecord    (this); break;
+			case FE_DATA_MODEL  : pd = new FEModelDataRecord     (this); break;
 			}
 			assert(pd);
 			pd->Serialize(ar);
@@ -1410,26 +1421,49 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 // Initialize plot file
 bool FEBioModel::InitPlotFile()
 {
-	FEBioPlotFile* pplt = new FEBioPlotFile(this);
-	m_plot = pplt;
+	FEPlotDataStore& data = GetPlotDataStore();
 
-	// set the software string
-	const char* szver = febio::getVersionString();
-	char szbuf[256] = { 0 };
-	sprintf(szbuf, "FEBio %s", szver);
-	pplt->SetSoftwareString(szbuf);
-	
-	// see if a valid plot file name is defined.
-	const std::string& splt = GetPlotFileName();
-	if (splt.empty())
+	if (data.GetPlotFileType() == "febio")
 	{
-		// if not, we take the input file name and set the extension to .xplt
-		char sz[1024] = { 0 };
-		strcpy(sz, GetInputFileName().c_str());
-		char* ch = strrchr(sz, '.');
-		if (ch) *ch = 0;
-		strcat(sz, ".xplt");
-		SetPlotFilename(sz);
+		FEBioPlotFile* xplt = new FEBioPlotFile(this);
+		// set the software string
+		const char* szver = febio::getVersionString();
+		char szbuf[256] = { 0 };
+		sprintf(szbuf, "FEBio %s", szver);
+		xplt->SetSoftwareString(szbuf);
+
+		m_plot = xplt;
+
+		// see if a valid plot file name is defined.
+		const std::string& splt = GetPlotFileName();
+		if (splt.empty())
+		{
+			// if not, we take the input file name and set the extension to .xplt
+			char sz[1024] = { 0 };
+			strcpy(sz, GetInputFileName().c_str());
+			char* ch = strrchr(sz, '.');
+			if (ch) *ch = 0;
+			strcat(sz, ".xplt");
+			SetPlotFilename(sz);
+		}
+	}
+	else if (data.GetPlotFileType() == "vtk")
+	{
+		VTKPlotFile* vtk = new VTKPlotFile(this);
+		m_plot = vtk;
+
+		// see if a valid plot file name is defined.
+		const std::string& splt = GetPlotFileName();
+		if (splt.empty())
+		{
+			// if not, we take the input file name and set the extension to .vtk
+			char sz[1024] = { 0 };
+			strcpy(sz, GetInputFileName().c_str());
+			char* ch = strrchr(sz, '.');
+			if (ch) *ch = 0;
+			strcat(sz, ".vtk");
+			SetPlotFilename(sz);
+		}
 	}
 
 	return true;
@@ -1550,6 +1584,29 @@ bool FEBioModel::Reset()
 	if (m_logLevel != 0)
 	{
 		if (InitLogFile() == false) return false;
+	}
+
+	// open plot database file
+	FEAnalysis* step =  GetCurrentStep();
+	if (step->GetPlotLevel() != FE_PLOT_NEVER)
+	{
+		int hint = step->GetPlotHint();
+		if (m_plot == 0) 
+		{
+			FEPlotDataStore& data = GetPlotDataStore();
+			if      (data.GetPlotFileType() == "febio") m_plot = new FEBioPlotFile(this);
+			else if (data.GetPlotFileType() == "vtk"  ) m_plot = new VTKPlotFile(this);
+			hint = 0;
+		}
+
+		if (hint != FE_PLOT_APPEND)
+		{
+			if (m_plot->Open(m_splot.c_str()) == false)
+			{
+				feLogError("Failed creating PLOT database.");
+				return false;
+			}
+		}
 	}
 
 	m_stats.ntimeSteps = 0;

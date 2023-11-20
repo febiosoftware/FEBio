@@ -146,6 +146,7 @@ bool FETiedMultiphasicSurface::Init()
     // store concentration index
     DOFS& dofs = GetFEModel()->GetDOFS();
     m_dofC = dofs.GetDOF("concentration", 0);
+	if (m_dofC < 0) return false;
     
     // allocate node normals
     m_nn.assign(Nodes(), vec3d(0,0,0));
@@ -279,6 +280,7 @@ void FETiedMultiphasicSurface::UpdateNodeNormals()
 void FETiedMultiphasicSurface::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactSurface::Serialize(ar);
+	ar & m_dofC;
 	ar & m_bporo;
 	ar & m_bsolu;
 	ar & m_poro;

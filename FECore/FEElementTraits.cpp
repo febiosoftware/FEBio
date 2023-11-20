@@ -3217,9 +3217,25 @@ void FEShellTri6G21::project_to_nodes(double* ai, double* ao) const
 //                          F E T R U S S E L E M E N T
 //=============================================================================
 
+FETrussElementTraits::FETrussElementTraits() : FEElementTraits(NINT, NELN, FE_ELEM_TRUSS, ET_TRUSS2, FE_TRUSS) 
+{ 
+	gr.resize(NINT, 0);
+	gw.resize(NINT, 0);
+
+	init(); 
+}
+
 void FETrussElementTraits::init()
 {
+	const double a = 1.0 / 3.0;
+	gr[0] = -a; gr[1] =  a;
+	gw[0] = gw[1] = 1;
 
+	m_H[0][0] = 0.5 * (1 - gr[0]);
+	m_H[0][1] = 0.5 * (1 + gr[0]);
+
+	m_H[1][0] = 0.5 * (1 - gr[1]);
+	m_H[1][1] = 0.5 * (1 + gr[1]);
 }
 
 //=============================================================================

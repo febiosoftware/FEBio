@@ -41,6 +41,53 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   4.4   11/15/2023
+
+===========================================================================
+
+New Features:
+* FEBio can now output directly in the VTK file format. (Use <plotfile type="vtk"> to output febio results to a VTK file instead of the standard FEBio plot file.)
+* Added Yeoh constitutive model for uncoupled solid materials
+* Implemented dynamics for linear truss elements.
+* Added reaction rate for solutes modeled as SBMs for consistency with constant reaction rate for SBMs.
+* Added log variables "EulerX", "EulerY", and "EulerZ" for exporting rigid body Euler angles to the log file.
+
+Improvements:
+* Expanded description of building plugin on windows in developer's manual.
+* Added check for valid rigid body ID in rigid initial conditions.
+* Modified FEPrescribedActiveContractionFiber so that it works better with FEBio Studio.
+* Added check for nodal IDs
+* Updated theory for tied-fluid interface
+* Made output of "damage" plot variable consistent with output of "D" log variable.
+* Nodal IDs are now stored on the mesh when reading feb files and written to the plot file.
+* Improved calculation of multiphasic tangent stiffness by accounting for tangents of referential solid volume fraction with respect to strain. 
+* Updated documentation to include description of Yeoh material
+* Added units to material parameters of Holzapfel-Gasser-Ogden materials
+* Added support for creating node sets from part lists when reading the febio input file.
+* Added check to ensure that the parent material of "perm-Holmes-Mow" is biphasic or multiphasic.
+* Added initialization of the "E" parameter of the linear spring material.
+
+Bug Fixes:
+* Fixed issue with restarts that use surface, domain, or model log data.
+* Fixed restart issue for prescribed normal displacement.
+* Fixed some serialization issuess with solutes and tied multiphasic interface.
+* Fixed bug with calculation of stv parameter in FEActiveFiberStress and FEActiveFiberStressUC
+* Fixed issue with "cylindrical" fiber generator.
+* Fixed bug with selection of solute id for Nims reaction rate.
+* Fixed bug where exact_eigen now returns correct eigenvalues for a diagonal matrix
+* Fixed typo in user's manual for coupled MR.
+* Added dllexport to some fecore debug functions.
+* Fixed issue with old solid solver for dynamic problems.
+* Fixed bug with initialization of elastic fiber materials.
+* Fixed issue with output of contact gap log variable for node-on-facet contact interface.
+* Fixed couple bugs in "tied-multiphasic" contact interface.
+* Fixed issue with log output of contact pressure (issue #71).
+* Fixed issue with serialization of item lists and domain maps.
+* Fixed issue with serialization of mesh nodes.
+
+
+===========================================================================
+
  R E L E A S E   4.3   8/30/2023
 
 ===========================================================================

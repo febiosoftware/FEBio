@@ -306,7 +306,8 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 	const char* sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
-		if ((strcmp(sz, "febio") != 0) && (strcmp(sz, "febio2") != 0)) throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+		if ((strcmp(sz, "febio" ) != 0) && 
+			(strcmp(sz, "vtk"   ) != 0)) throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 	else sz = "febio";
 	plotData.SetPlotFileType(sz);

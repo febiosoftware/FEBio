@@ -24,54 +24,37 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "fecore_api.h"
-#include <vector>
-#include <string>
+#include "PlotFile.h"
+#include <stdio.h>
 
-class DumpStream;
-
-class FECORE_API FEPlotVariable
+//! This class stores the FEBio results to a family of VTK files. 
+class VTKPlotFile : public PlotFile
 {
 public:
-	FEPlotVariable();
-	FEPlotVariable(const FEPlotVariable& pv);
-	void operator = (const FEPlotVariable& pv);
+	VTKPlotFile(FEModel* fem);
 
-	FEPlotVariable(const std::string& var, std::vector<int>& item, const char* szdom = "");
+	//! Open the plot database
+	bool Open(const char* szfile) override;
 
-	void Serialize(DumpStream& ar);
+	//! Open for appending
+	bool Append(const char* szfile) override;
 
-	const std::string& Name() const { return m_svar; }
-	const std::string& DomainName() const { return m_sdom; }
+	//! Write current FE state to plot database
+	bool Write(float ftime, int flag = 0) override;
 
-public:
-	std::string			m_svar;		//!< name of output variable
-	std::string			m_sdom;		//!< (optional) name of domain
-	std::vector<int>	m_item;		//!< (optional) list of items
-};
-
-class FECORE_API FEPlotDataStore
-{
-public:
-	FEPlotDataStore();
-	FEPlotDataStore(const FEPlotDataStore&);
-	void operator = (const FEPlotDataStore&);
-
-	void AddPlotVariable(const char* szvar, std::vector<int>& item, const char* szdom = "");
-
-	int GetPlotCompression() const;
-	void SetPlotCompression(int n);
-
-	void SetPlotFileType(const std::string& fileType);
-	std::string GetPlotFileType();
-
-	void Serialize(DumpStream& ar);
-
-	int PlotVariables() const { return (int)m_plot.size(); }
-	FEPlotVariable& GetPlotVariable(int n) { return m_plot[n]; }
+	//! see if the plot file is valid
+	bool IsValid() const override;
 
 private:
-	std::string					m_splot_type;
-	std::vector<FEPlotVariable>	m_plot;
-	int							m_nplot_compression;
+	void WriteHeader();
+	void WritePoints();
+	void WriteCells();
+	void WritePointData();
+	void WriteCellData();
+
+private:
+	FILE*	m_fp;
+	int		m_count;
+	bool	m_valid;
+	std::string	m_filename;
 };
