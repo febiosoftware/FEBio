@@ -565,7 +565,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEInSituStretchGradient, "in-situ stretch");
 
 	// beam materials
-	REGISTER_FECORE_CLASS(FEElasticBeamMaterial, "elastic-beam");
+	REGISTER_FECORE_CLASS(FEElasticBeamMaterial, "linear-beam");
 
 	//-----------------------------------------------------------------------------
 	// domain classes
@@ -585,7 +585,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEElasticANSShellDomain, "elastic-shell-ans");
 	REGISTER_FECORE_CLASS(FELinearTrussDomain, "linear-truss");
 	REGISTER_FECORE_CLASS(FEElasticTrussDomain, "elastic-truss");
-	REGISTER_FECORE_CLASS(FEElasticBeamDomain, "elastic-beam");
+	REGISTER_FECORE_CLASS(FEElasticBeamDomain, "linear-beam");
 	REGISTER_FECORE_CLASS(FEDiscreteElasticDomain, "discrete");
 	REGISTER_FECORE_CLASS(FEDeformableSpringDomain, "deformable-spring");
 	REGISTER_FECORE_CLASS(FEDeformableSpringDomain2, "deformable-spring2");
