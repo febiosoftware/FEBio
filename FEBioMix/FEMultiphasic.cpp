@@ -57,7 +57,6 @@ BEGIN_FECORE_CLASS(FEMultiphasic, FEMaterial)
     ADD_PROPERTY(m_pMReact, "membrane_reaction"  , FEProperty::Optional);
 
 	ADD_PROPERTY(m_Q, "mat_axis", FEProperty::Optional);
-
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -283,6 +282,8 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_pPerm = 0;
 	m_pOsmC = 0;
 	m_pSupp = 0;
+
+	m_bool_refC = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -359,7 +360,9 @@ bool FEMultiphasic::Init()
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
-	
+	m_bool_refC = GetFEModel()->GetGlobalConstant("referential_concentration");
+
+
 	if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
 	if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");	 return false; }
 	if ((zmin || zmax) && (m_Fc <= 0)) {
@@ -402,12 +405,12 @@ void FEMultiphasic::Serialize(DumpStream& ar)
 //! Solid referential apparent density
 double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 {
-	FEBiphasicMaterialPoint& pet = *pt.ExtractData<FEBiphasicMaterialPoint>();
+	FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 		
 	// evaluate referential apparent density of base solid
 	double density = m_pSolid->Density(pt);
-	double rhosr = pet.m_phi0t*density;
+	double rhosr = bpt.m_phi0t * density;
 
 	// add contribution from solid-bound molecules
 	for (int isbm=0; isbm<(int)spt.m_sbmr.size(); ++isbm)
@@ -419,8 +422,8 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 //! Return solid referential apparent density
 double FEMultiphasic::GetReferentialSolidVolumeFraction(const FEMaterialPoint& pt)
 {
-    const FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-    return bt.m_phi0t;
+    const FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    return bpt.m_phi0t;
 }
 
 //-----------------------------------------------------------------------------
@@ -434,8 +437,8 @@ double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
 		phisr += SBMReferentialVolumeFraction(pt, isbm);
 	
-    FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-    bt.m_phi0t = phisr;
+    FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+    bpt.m_phi0t = phisr;
     
 	return phisr;
 }
@@ -445,13 +448,13 @@ double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 double FEMultiphasic::Porosity(FEMaterialPoint& pt)
 {
 	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+	FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// solid referential volume fraction
-	double phisr = bt.m_phi0t;
+	double phisr = bpt.m_phi0t;
     
 	// relative volume
-	double J = et.m_J;
+	double J = (m_bool_refC) ? 1.0 : et.m_J;
 	
 	double phiw = 1 - phisr/J;
 	// check for pore collapse
@@ -466,25 +469,28 @@ double FEMultiphasic::Porosity(FEMaterialPoint& pt)
 double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 {
 	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
-	FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+	FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// relative volume
-	double J = et.m_J;
-	double phi0 = bt.m_phi0t;
-	double ce = 0;
+	double J = (m_bool_refC) ? 1.0 : et.m_J;
+	double phi0 = bpt.m_phi0t;
+	double ce = 0.0;
 
 	// add contribution from charged solid-bound molecules
-	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
-		ce += SBMChargeNumber(isbm)*spt.m_sbmr[isbm]/SBMMolarMass(isbm);
+	for (int isbm = 0; isbm < (int)m_pSBM.size(); ++isbm)
+		ce += SBMChargeNumber(isbm) * spt.m_sbmr[isbm] / SBMMolarMass(isbm);
     
     double cFr = m_cFr(pt);
-	double cF = (cFr*(1-bt.m_phi0)+ce)/(J-phi0);
+	double cF = (cFr * (1 - bpt.m_phi0) + ce) / (J - phi0);
     
     // add contribution from solid-bound 'solutes'
     const int nsol = (int)m_pSolute.size();
-    for (int isol=0; isol<nsol; ++isol)
-        if (spt.m_bsb[isol]) cF += spt.m_ca[isol]*m_pSolute[isol]->ChargeNumber();
+	for (int isol = 0; isol < nsol; ++isol)
+	{
+		if (spt.m_bsb[isol])
+			cF += spt.m_ca[isol] * m_pSolute[isol]->ChargeNumber();
+	}
 
 	return cF;
 }
@@ -581,7 +587,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
     int isbm;
 	
 	FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-	FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+	FEBiphasicMaterialPoint& bpt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 	FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
 	
 	const int nsol = (int)m_pSolute.size();
@@ -627,7 +633,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
 	
 	// get the charge density and its derivatives
 	double J = ept.m_J;
-	double phi0 = ppt.m_phi0t;
+	double phi0 = bpt.m_phi0t;
 	double cF = FixedChargeDensity(mp);
 	double dcFdJ = -cF/(J - phi0);
 	double dcFdJJ = 2*cF/SQR(J-phi0);
@@ -643,93 +649,108 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
 	vector<double> zidzdcc2(nsol,0);
 	double zidzdcc3 = 0;
 
-	if (den > 0) {
+	if (den > 0) 
+	{
 		
-		for (isol=0; isol<nsol; ++isol)
-			zidzdJ += z[isol]*zz[isol]*dkhdJ[isol]*c[isol];
-		zidzdJ = -(dcFdJ+zidzdJ)/den;
+		for (isol = 0; isol < nsol; ++isol)
+			zidzdJ += z[isol] * zz[isol] * dkhdJ[isol] * c[isol];
+		zidzdJ = -(dcFdJ + zidzdJ) / den;
 		
-		for (isol=0; isol<nsol; ++isol) {
-			for (jsol=0; jsol<nsol; ++jsol) {
-				zidzdJJ1 += SQR(z[jsol])*c[jsol]*(z[jsol]*zidzdJ*kappa[jsol]+zz[jsol]*dkhdJ[jsol]);
-				zidzdJJ2 += z[jsol]*zz[jsol]*c[jsol]*(zidzdJ*z[jsol]*dkhdJ[jsol]+dkhdJJ[jsol]);
-				zidzdc[isol] += z[jsol]*zz[jsol]*dkhdc[jsol][isol]*c[jsol];
+		for (isol = 0; isol < nsol; ++isol)
+		{
+			for (jsol = 0; jsol < nsol; ++jsol)
+			{
+				zidzdJJ1 += SQR(z[jsol]) * c[jsol] * (z[jsol] * zidzdJ * kappa[jsol] + zz[jsol] * dkhdJ[jsol]);
+				zidzdJJ2 += z[jsol] * zz[jsol] * c[jsol] * (zidzdJ * z[jsol] * dkhdJ[jsol] + dkhdJJ[jsol]);
+				zidzdc[isol] += z[jsol] * zz[jsol] * dkhdc[jsol][isol] * c[jsol];
 			}
-			zidzdc[isol] = -(z[isol]*kappa[isol]+zidzdc[isol])/den;
-			zidzdcc3 += pow(double(z[isol]),3)*kappa[isol]*c[isol];
+			zidzdc[isol] = -(z[isol] * kappa[isol] + zidzdc[isol]) / den;
+			zidzdcc3 += pow(double(z[isol]), 3) * kappa[isol] * c[isol];
 		}
-		zidzdJJ = zidzdJ*(zidzdJ-zidzdJJ1/den)-(dcFdJJ+zidzdJJ2)/den;
+		zidzdJJ = zidzdJ * (zidzdJ - zidzdJJ1 / den) - (dcFdJJ + zidzdJJ2) / den;
 		
-		for (isol=0; isol<nsol; ++isol) {
-			for (jsol=0; jsol<nsol; ++jsol) {
-				zidzdJc1[isol] += SQR(z[jsol])*c[jsol]*(zidzdc[isol]*z[jsol]*kappa[jsol]+zz[jsol]*dkhdc[jsol][isol]);
-				zidzdJc2[isol] += z[jsol]*zz[jsol]*c[jsol]*(zidzdc[isol]*z[jsol]*dkhdJ[jsol]+dkhdJc[jsol][isol]);
-				zidzdcc2[isol] += SQR(z[jsol])*zz[jsol]*c[jsol]*dkhdc[jsol][isol];
-				for (ksol=0; ksol<nsol; ++ksol)
-					zidzdcc1[isol][jsol] += z[ksol]*zz[ksol]*c[ksol]*dkhdcc[ksol][isol][jsol];
+		for (isol = 0; isol < nsol; ++isol)
+		{
+			for (jsol = 0; jsol < nsol; ++jsol)
+			{
+				zidzdJc1[isol] += SQR(z[jsol]) * c[jsol] * (zidzdc[isol] * z[jsol] * kappa[jsol] + zz[jsol] * dkhdc[jsol][isol]);
+				zidzdJc2[isol] += z[jsol] * zz[jsol] * c[jsol] * (zidzdc[isol] * z[jsol] * dkhdJ[jsol] + dkhdJc[jsol][isol]);
+				zidzdcc2[isol] += SQR(z[jsol]) * zz[jsol] * c[jsol] * dkhdc[jsol][isol];
+				for (ksol = 0; ksol < nsol; ++ksol)
+					zidzdcc1[isol][jsol] += z[ksol] * zz[ksol] * c[ksol] * dkhdcc[ksol][isol][jsol];
 			}
-			zidzdJc[isol] = zidzdJ*(zidzdc[isol]-(SQR(z[isol])*kappa[isol] + zidzdJc1[isol])/den)
-			-(z[isol]*zz[isol]*dkhdJ[isol] + zidzdJc2[isol])/den;
+			zidzdJc[isol] = zidzdJ * (zidzdc[isol] - (SQR(z[isol]) * kappa[isol] + zidzdJc1[isol]) / den)
+				- (z[isol] * zz[isol] * dkhdJ[isol] + zidzdJc2[isol]) / den;
 		}
 		
-		for (isol=0; isol<nsol; ++isol) {
-			for (jsol=0; jsol<nsol; ++jsol) {
-				zidzdcc[isol][jsol] = zidzdc[isol]*zidzdc[jsol]*(1 - zidzdcc3/den)
-				- zidzdcc1[isol][jsol]/den
-				- z[isol]*(z[isol]*kappa[isol]*zidzdc[jsol]+zz[isol]*dkhdc[isol][jsol])/den
-				- z[jsol]*(z[jsol]*kappa[jsol]*zidzdc[isol]+zz[jsol]*dkhdc[jsol][isol])/den
-				- zidzdc[jsol]*zidzdcc2[isol]/den
-				- zidzdc[isol]*zidzdcc2[jsol]/den;
+		for (isol = 0; isol < nsol; ++isol)
+		{
+			for (jsol = 0; jsol < nsol; ++jsol)
+			{
+				zidzdcc[isol][jsol] = zidzdc[isol] * zidzdc[jsol] * (1 - zidzdcc3 / den)
+					- zidzdcc1[isol][jsol] / den
+					- z[isol] * (z[isol] * kappa[isol] * zidzdc[jsol] + zz[isol] * dkhdc[isol][jsol]) / den
+					- z[jsol] * (z[jsol] * kappa[jsol] * zidzdc[isol] + zz[jsol] * dkhdc[jsol][isol]) / den
+					- zidzdc[jsol] * zidzdcc2[isol] / den
+					- zidzdc[isol] * zidzdcc2[jsol] / den;
 			}
 		}
 	}
 	
 	dkdJ.resize(nsol);
-	dkdc.resize(nsol, vector<double>(nsol,0));
+	dkdc.resize(nsol, vector<double>(nsol, 0));
 	
-	for (isol=0; isol<nsol; ++isol) {
-		dkdJ[isol] = zz[isol]*dkhdJ[isol]+z[isol]*kappa[isol]*zidzdJ;
-		for (jsol=0; jsol<nsol; ++jsol) {
-			dkdc[isol][jsol] = zz[isol]*dkhdc[isol][jsol]+z[isol]*kappa[isol]*zidzdc[jsol];
+	for (isol=0; isol<nsol; ++isol) 
+	{
+		dkdJ[isol] = zz[isol] * dkhdJ[isol] + z[isol] * kappa[isol] * zidzdJ;
+		for (jsol = 0; jsol < nsol; ++jsol)
+		{
+			dkdc[isol][jsol] = zz[isol] * dkhdc[isol][jsol] + z[isol] * kappa[isol] * zidzdc[jsol];
 		}
 	}
-    vector<double> zidzdr(nsbm,0);
-    vector<double> zidzdJr(nsbm,0);
-	vector< vector<double> > zidzdrc(nsbm, vector<double>(nsol,0));
+	vector<double> zidzdr(nsbm, 0);
+	vector<double> zidzdJr(nsbm, 0);
+	vector< vector<double> > zidzdrc(nsbm, vector<double>(nsol, 0));
 	dkdr.resize(nsol, vector<double>(nsbm));
 	dkdJr.resize(nsol, vector<double>(nsbm));
 	dkdrc.resize(nsol, zidzdrc);	// use zidzdrc for initialization only
     
-	if (den > 0) {
-		
-        for (isbm=0; isbm<nsbm; ++isbm) {
-            zidzdr[isbm] = -(cF/SBMDensity(isbm) + SBMChargeNumber(isbm)/SBMMolarMass(isbm))/(J-phi0)/den;
+	if (den > 0) 
+	{	
+		for (isbm = 0; isbm < nsbm; ++isbm)
+		{
+			zidzdr[isbm] = -(cF / SBMDensity(isbm) + SBMChargeNumber(isbm) / SBMMolarMass(isbm)) / (J - phi0) / den;
             
-            for (isol=0; isol<nsol; ++isol) {
-                zidzdJr[isbm] += SQR(z[isol])*dkdJ[isol]*c[isol];
+			for (isol = 0; isol < nsol; ++isol)
+			{
+				zidzdJr[isbm] += SQR(z[isol]) * dkdJ[isol] * c[isol];
             }
-            zidzdJr[isbm] = 1/(J-phi0) + zidzdJr[isbm]/den;
-            zidzdJr[isbm] = (zidzdJr[isbm] + zidzdJ)*zidzdr[isbm];
-            zidzdJr[isbm] += cF/SBMDensity(isbm)/SQR(J-phi0)/den;
+			zidzdJr[isbm] = 1 / (J - phi0) + zidzdJr[isbm] / den;
+			zidzdJr[isbm] = (zidzdJr[isbm] + zidzdJ) * zidzdr[isbm];
+			zidzdJr[isbm] += cF / SBMDensity(isbm) / SQR(J - phi0) / den;
             
-            for (isol=0; isol<nsol; ++isol) {
-                zidzdrc[isbm][isol] = SQR(z[isol])*kappa[isol];
-                for (jsol=0; jsol<nsol; ++jsol)
-                    zidzdrc[isbm][isol] += SQR(z[jsol])*zz[jsol]*c[jsol]*dkhdc[jsol][isol];
-                zidzdrc[isbm][isol] = zidzdr[isbm]*(zidzdc[isol]*(1+num/den) - zidzdrc[isbm][isol]/den);
+			for (isol = 0; isol < nsol; ++isol)
+			{
+				zidzdrc[isbm][isol] = SQR(z[isol]) * kappa[isol];
+				for (jsol = 0; jsol < nsol; ++jsol)
+					zidzdrc[isbm][isol] += SQR(z[jsol]) * zz[jsol] * c[jsol] * dkhdc[jsol][isol];
+				zidzdrc[isbm][isol] = zidzdr[isbm] * (zidzdc[isol] * (1 + num / den) - zidzdrc[isbm][isol] / den);
             }
         }
 	}
     
-    for (isbm=0; isbm<nsbm; ++isbm) {
-        for (isol=0; isol<nsol; ++isol) {
-            dkdr[isol][isbm] = z[isol]*kappa[isol]*zidzdr[isbm];
-            dkdJr[isol][isbm] = z[isol]*((dkhdJ[isol]*zz[isol]+(z[isol]-1)*kappa[isol]*zidzdJ)*zidzdr[isbm]
-                                         +kappa[isol]*zidzdJr[isbm]);
-            for (jsol=0; jsol<nsol; ++jsol) {
-                dkdrc[isol][isbm][jsol] = z[isol]*(zz[isol]*dkhdc[isol][jsol]*zidzdr[isbm]
-                                                   +(z[isol]-1)*kappa[isol]*zidzdr[isbm]*zidzdc[jsol]
-                                                   +kappa[isol]*zidzdrc[isbm][jsol]);
+	for (isbm = 0; isbm < nsbm; ++isbm)
+	{
+		for (isol = 0; isol < nsol; ++isol)
+		{
+			dkdr[isol][isbm] = z[isol] * kappa[isol] * zidzdr[isbm];
+			dkdJr[isol][isbm] = z[isol] * ((dkhdJ[isol] * zz[isol] + (z[isol] - 1) * kappa[isol] * zidzdJ) * zidzdr[isbm]
+				+ kappa[isol] * zidzdJr[isbm]);
+			for (jsol = 0; jsol < nsol; ++jsol)
+			{
+				dkdrc[isol][isbm][jsol] = z[isol] * (zz[isol] * dkhdc[isol][jsol] * zidzdr[isbm]
+					+ (z[isol] - 1) * kappa[isol] * zidzdr[isbm] * zidzdc[jsol]
+					+ kappa[isol] * zidzdrc[isbm][jsol]);
             }
         }
     }
@@ -791,20 +812,20 @@ tens4ds FEMultiphasic::Tangent(FEMaterialPoint& mp)
 	
 	// call solid tangent routine
 	tens4ds C = m_pSolid->Tangent(mp);
-	double D[6][6] = {0};
+	double D[6][6] = { 0 };
 	C.extract(D);
-	
+
 	// relative volume and solid volume fraction
 	double J = ept.m_J;
 	double phi0 = bpt.m_phi0t;
-	
+
 	// get the charge density and its derivatives
 	double cF = FixedChargeDensity(mp);
-	double dcFdJ = -cF/(J - phi0);
-	
+	double dcFdJ = -cF / (J - phi0);
+
 	// fluid pressure and solute concentration
 	double p = Pressure(mp);
-	
+
 	// get remaining variables
 	double zeta = ElectricPotential(mp, true);
 	vector<double> c(nsol);
@@ -814,51 +835,52 @@ tens4ds FEMultiphasic::Tangent(FEMaterialPoint& mp)
 	vector<double> zz(nsol);
 	vector<double> kappa(nsol);
 	double den = 0;
-	for (i=0; i<nsol; ++i) {
+	for (i = 0; i < nsol; ++i) {
 		c[i] = spt.m_c[i];
 		z[i] = m_pSolute[i]->ChargeNumber();
 		khat[i] = m_pSolute[i]->m_pSolub->Solubility(mp);
 		dkhdJ[i] = m_pSolute[i]->m_pSolub->Tangent_Solubility_Strain(mp);
 		zz[i] = pow(zeta, z[i]);
-		kappa[i] = zz[i]*khat[i];
-		den += SQR(z[i])*kappa[i]*c[i];
+		kappa[i] = zz[i] * khat[i];
+		den += SQR(z[i]) * kappa[i] * c[i];
 	}
-	
+
 	// evaluate electric potential (nondimensional exponential form) and its derivatives
 	// also evaluate partition coefficients and their derivatives
 	double zidzdJ = 0;
 	if (den > 0) {
 		zidzdJ = dcFdJ;
-		for (i=0; i<nsol; ++i)
-			zidzdJ += z[i]*zz[i]*dkhdJ[i]*c[i];
-		zidzdJ = -zidzdJ/den;
+		for (i = 0; i < nsol; ++i)
+			zidzdJ += z[i] * zz[i] * dkhdJ[i] * c[i];
+		zidzdJ = -zidzdJ / den;
 	}
 	vector<double> dkdJ(nsol);
-	for (i=0; i<nsol; ++i) dkdJ[i] = zz[i]*dkhdJ[i]+z[i]*kappa[i]*zidzdJ;
-	
+	for (i = 0; i < nsol; ++i) dkdJ[i] = zz[i] * dkhdJ[i] + z[i] * kappa[i] * zidzdJ;
+
+
 	// osmotic coefficient and its derivative w.r.t. strain
 	double osmc = m_pOsmC->OsmoticCoefficient(mp);
 	double dodJ = m_pOsmC->Tangent_OsmoticCoefficient_Strain(mp);
-	
+
 	double dp = 0;
-	for (i=0; i<nsol; ++i) {
-		dp += c[i]*(osmc*dkdJ[i]+dodJ*kappa[i]);
+	for (i = 0; i < nsol; ++i) {
+		dp += c[i] * (osmc * dkdJ[i] + dodJ * kappa[i]);
 	}
-	dp *= m_Rgas*m_Tabs*J;
-	
+	dp *= m_Rgas * m_Tabs * J;
+
 	// adjust tangent for pressures
 	D[0][0] -= -p + dp;
 	D[1][1] -= -p + dp;
 	D[2][2] -= -p + dp;
-	
+
 	D[0][1] -= p + dp; D[1][0] -= p + dp;
 	D[1][2] -= p + dp; D[2][1] -= p + dp;
 	D[0][2] -= p + dp; D[2][0] -= p + dp;
-	
+
 	D[3][3] -= -p;
 	D[4][4] -= -p;
 	D[5][5] -= -p;
-	
+
 	return tens4ds(D);
 }
 
@@ -869,7 +891,7 @@ vec3d FEMultiphasic::FluidFlux(FEMaterialPoint& pt)
 {
 	int i;
 	
-	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+	FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	const int nsol = (int)m_pSolute.size();
 	vector<double> c(nsol);
@@ -885,7 +907,7 @@ vec3d FEMultiphasic::FluidFlux(FEMaterialPoint& pt)
 	double phiw = Porosity(pt);
 	
 	// pressure gradient
-	vec3d gradp = ppt.m_gradp;
+	vec3d gradp = bpt.m_gradp;
 	
 	// electric potential
 	double zeta = ElectricPotential(pt, true);
@@ -978,12 +1000,12 @@ double FEMultiphasic::Pressure(FEMaterialPoint& pt)
 {
 	int i;
 	
-	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+	FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	const int nsol = (int)m_pSolute.size();
 	
 	// effective pressure
-	double p = ppt.m_p;
+	double p = bpt.m_p;
 	
 	// osmolarity
     double c = spt.Osmolarity();
@@ -1060,84 +1082,96 @@ mat3ds FEMultiphasic::EffectivePermeability(FEMaterialPoint& pt)
 //! Evaluate tangent of effective permeability w.r.t. strain
 tens4dmm FEMultiphasic::TangentPermeabilityStrain(FEMaterialPoint& pt, const mat3ds& Ke)
 {
-    // get the hydraulic permeability strain tangent
-    tens4dmm dKdE = GetPermeability()->Tangent_Permeability_Strain(pt);
-    
-    const int nsol = Solutes();
-    
-    // if there are no solutes in this mixture, we're done
-    if (nsol == 0) return dKdE;
-    
-    // evaluate the inverse of the hydraulic permeability
-    mat3ds Ki = GetPermeability()->Permeability(pt).inverse();
-    
-    // fluid volume fraction (porosity) in current configuration
-    double phiw = Porosity(pt);
-    mat3dd I(1.0);
-    
-    FEElasticMaterialPoint&  ept = *(pt.ExtractData<FEElasticMaterialPoint >());
-    FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
-    
-    tens4dmm dKedE;
-    dKedE.zero();
-    
-    // add solute contributions
-    for (int isol=0; isol<nsol; ++isol) {
-        // concentration
-        double ca = spt.m_ca[isol];
-        // solute free diffusivity
-        double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
-        // solute diffusivity in mixture, normalized by D0
-        mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt)/D0;
-        // solute diffusiviety strain tangent, normalized by D0
-        tens4dmm dDdE = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Strain(pt)/D0;
-        
-        dKedE += (dDdE + (dyad4mm(I, D) + dyad4mm(D,I) - dyad4mm(I,I))*2
-        - dyad1mm(D,I) + dyad1mm(I-D,I)*(1./phiw - ept.m_J*spt.m_dkdJ[isol]/spt.m_k[isol]))*ca/D0;
-    }
-    
-    dKedE = dKedE*(m_Rgas*m_Tabs/phiw) + ddot(dyad2mm(Ki,Ki), dKdE);
-    
-    return ddot(dyad2mm(Ke, Ke), dKedE);
+	if (m_bool_refC) {
+		return tens4dmm(0.0);
+	}
+	else {
+		// get the hydraulic permeability strain tangent
+		tens4dmm dKdE = GetPermeability()->Tangent_Permeability_Strain(pt);
+
+		const int nsol = Solutes();
+
+		// if there are no solutes in this mixture, we're done
+		if (nsol == 0) return dKdE;
+
+		// evaluate the inverse of the hydraulic permeability
+		mat3ds Ki = GetPermeability()->Permeability(pt).inverse();
+
+		// fluid volume fraction (porosity) in current configuration
+		double phiw = Porosity(pt);
+		mat3dd I(1.0);
+
+		FEElasticMaterialPoint& ept = *(pt.ExtractData<FEElasticMaterialPoint >());
+		FESolutesMaterialPoint& spt = *(pt.ExtractData<FESolutesMaterialPoint >());
+
+		tens4dmm dKedE;
+		dKedE.zero();
+
+		// add solute contributions
+		for (int isol = 0; isol < nsol; ++isol) {
+			// concentration
+			double ca = spt.m_ca[isol];
+			// solute free diffusivity
+			double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+			// solute diffusivity in mixture, normalized by D0
+			mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt) / D0;
+			// solute diffusiviety strain tangent, normalized by D0
+			tens4dmm dDdE = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Strain(pt) / D0;
+
+			dKedE += (dDdE + (dyad4mm(I, D) + dyad4mm(D, I) - dyad4mm(I, I)) * 2
+				- dyad1mm(D, I) + dyad1mm(I - D, I) * (1. / phiw - ept.m_J * spt.m_dkdJ[isol] / spt.m_k[isol])) * ca / D0;
+		}
+
+		dKedE = dKedE * (m_Rgas * m_Tabs / phiw) + ddot(dyad2mm(Ki, Ki), dKdE);
+
+		return ddot(dyad2mm(Ke, Ke), dKedE);
+	}
 }
 
 //-----------------------------------------------------------------------------
 //! Evaluate tangent of effective permeability w.r.t. concentration
 mat3ds FEMultiphasic::TangentPermeabilityConcentration(FEMaterialPoint& pt, const int sol, const mat3ds& Ke)
 {
-    mat3ds dKedc(0,0,0,0,0,0);
-    
-    const int nsol = Solutes();
-    
-    if (nsol == 0) return dKedc;
-    
-    // fluid volume fraction (porosity) in current configuration
-    double phiw = Porosity(pt);
-    mat3dd I(1.0);
-    
-    FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
-    
-    // add solute contributions
-    for (int isol=0; isol<nsol; ++isol) {
-        // concentration
-        double ca = spt.m_ca[isol];
-        // solute free diffusivity
-        double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
-        // solute diffusivity in mixture, normalized by D0
-        mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt)/D0;
-        // solute free diffusivity concentration tangent
-        double dD0dc = m_pSolute[isol]->m_pDiff->Tangent_Free_Diffusivity_Concentration(pt, sol);
-        // solute diffusivity concentration tangent
-        mat3ds dDdc = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Concentration(pt,sol);
-        
-        double kd = (isol == sol) ? 1 : 0;
-        dKedc += (I-D)*((spt.m_dkdc[isol][sol]*spt.m_c[isol] + spt.m_k[isol]*kd - dD0dc*ca/D0)/D0)
-        - (dDdc - D*dD0dc)*(ca/D0/D0);
-    }
-    
-    dKedc *= m_Rgas*m_Tabs/phiw;
-    
-    return -(Ke*dKedc*Ke).sym();
+	if (m_bool_refC)
+	{
+		return mat3ds(0.0);
+	}
+	else
+	{
+		mat3ds dKedc(0, 0, 0, 0, 0, 0);
+
+		const int nsol = Solutes();
+
+		if (nsol == 0) return dKedc;
+
+		// fluid volume fraction (porosity) in current configuration
+		double phiw = Porosity(pt);
+		mat3dd I(1.0);
+
+		FESolutesMaterialPoint& spt = *(pt.ExtractData<FESolutesMaterialPoint >());
+
+		// add solute contributions
+		for (int isol = 0; isol < nsol; ++isol) {
+			// concentration
+			double ca = spt.m_ca[isol];
+			// solute free diffusivity
+			double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
+			// solute diffusivity in mixture, normalized by D0
+			mat3ds D = m_pSolute[isol]->m_pDiff->Diffusivity(pt) / D0;
+			// solute free diffusivity concentration tangent
+			double dD0dc = m_pSolute[isol]->m_pDiff->Tangent_Free_Diffusivity_Concentration(pt, sol);
+			// solute diffusivity concentration tangent
+			mat3ds dDdc = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Concentration(pt, sol);
+
+			double kd = (isol == sol) ? 1 : 0;
+			dKedc += (I - D) * ((spt.m_dkdc[isol][sol] * spt.m_c[isol] + spt.m_k[isol] * kd - dD0dc * ca / D0) / D0)
+				- (dDdc - D * dD0dc) * (ca / D0 / D0);
+		}
+
+		dKedc *= m_Rgas * m_Tabs / phiw;
+
+		return -(Ke * dKedc * Ke).sym();
+	}
 }
 
 double FEMultiphasic::GetReferentialFixedChargeDensity(const FEMaterialPoint& mp)

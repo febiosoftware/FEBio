@@ -157,6 +157,7 @@ public:
     double    m_Rgas;            //!< universal gas constant
     double    m_Tabs;            //!< absolute temperature
     double    m_Fc;              //!< Faraday's constant
+    bool      m_bool_refC;       //!< Flag for referential concentrations
 
 private: // material properties
 	std::vector<FESolute*>  m_pSolute;      //!< pointer to solute materials

@@ -55,6 +55,7 @@ FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEReaction(pfem)
     m_nsbm = -1;
 
 	m_pFwd = m_pRev = 0;
+    m_bool_refC = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -156,6 +157,7 @@ bool FEChemicalReaction::Init()
 		return false;
 	}
 
+    m_bool_refC = GetFEModel()->GetGlobalConstant("referential_concentration");
 	return true;
 }
 
@@ -167,6 +169,7 @@ void FEChemicalReaction::Serialize(DumpStream& ar)
     
     if (ar.IsShallow() == false)
     {
+        ar & m_bool_refC;
         if (ar.IsSaving())
         {
             itrmap p;

@@ -67,11 +67,9 @@ SOFTWARE.*/
 #include "FEMembraneReactionRateVoltageGated.h"
 #include "FEMassActionForward.h"
 #include "FEMassActionForwardEffective.h"
-#include "FEMassActionForwardReferential.h"
 #include "FEMichaelisMenten.h"
 #include "FEMassActionReversible.h"
 #include "FEMassActionReversibleEffective.h"
-#include "FEMassActionReversibleReferential.h"
 #include "FEConcentrationIndependentReaction.h"
 #include "FEMembraneMassActionForward.h"
 #include "FEMembraneMassActionReversible.h"
@@ -346,7 +344,6 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration     , "effective solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveShellSoluteConcentration, "effective shell solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration        , "solute concentration");
-	REGISTER_FECORE_CLASS(FEPlotReferentialSoluteConcentration   , "referential solute concentration");
     REGISTER_FECORE_CLASS(FEPlotPartitionCoefficient             , "partition coefficient");
 	REGISTER_FECORE_CLASS(FEPlotSoluteFlux		                 , "solute flux"                     );
     REGISTER_FECORE_CLASS(FEPlotSoluteVolumetricFlux             , "solute volumetric flux"          );
@@ -446,12 +443,10 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateVoltageGated  , "membrane voltage-gated reaction rate");
 	REGISTER_FECORE_CLASS(FEMassActionForward		    	  , "mass-action-forward"       );
 	REGISTER_FECORE_CLASS(FEMassActionForwardEffective		  , "mass-action-forward-effective");
-	REGISTER_FECORE_CLASS(FEMassActionForwardReferential	  , "mass-action-forward-referential");
 	REGISTER_FECORE_CLASS(FEMembraneMassActionForward         , "membrane-mass-action-forward");
 	REGISTER_FECORE_CLASS(FEConcentrationIndependentReaction  , "concentration-independent");
 	REGISTER_FECORE_CLASS(FEMassActionReversible              , "mass-action-reversible"   );
 	REGISTER_FECORE_CLASS(FEMassActionReversibleEffective     , "mass-action-reversible-effective");
-	REGISTER_FECORE_CLASS(FEMassActionReversibleReferential   , "mass-action-reversible-referential");
 	REGISTER_FECORE_CLASS(FEMembraneMassActionReversible      , "membrane-mass-action-reversible");
 	REGISTER_FECORE_CLASS(FEMichaelisMenten                   , "Michaelis-Menten"         );
 	REGISTER_FECORE_CLASS(FESolidBoundMolecule                , "solid_bound"              );

@@ -53,9 +53,11 @@ double FEMassActionForward::ReactionSupply(FEMaterialPoint& pt)
     
     // start with contribution from solutes
 	int nsol = m_psm->Solutes();
-	for (int i = 0; i < nsol; ++i) {
+	for (int i = 0; i < nsol; ++i) 
+    {
 		int vR = m_vR[i];
-		if (vR > 0) {
+		if (vR > 0) 
+        {
 			double c = m_psm->GetActualSoluteConcentration(pt, i);
 			zhat *= pow(c, vR);
 		}
@@ -63,9 +65,11 @@ double FEMassActionForward::ReactionSupply(FEMaterialPoint& pt)
 
 	// add contribution of solid-bound molecules
 	const int nsbm = m_psm->SBMs();
-	for (int i = 0; i < nsbm; ++i) {
+	for (int i = 0; i < nsbm; ++i) 
+    {
 		int vR = m_vR[nsol + i];
-		if (vR > 0) {
+		if (vR > 0) 
+        {
 			double c = m_psm->SBMConcentration(pt, i);
 			zhat *= pow(c, vR);
 		}
@@ -78,24 +82,26 @@ double FEMassActionForward::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of molar supply with strain at material point
 mat3ds FEMassActionForward::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
-	const int nsol = m_nsol;
-	const int nsbm = (int)m_v.size() - nsol;
+    // if the reaction supply is insensitive to strain
+    if (m_bool_refC)
+        return mat3ds(0.0);
+
+    const int nsol = m_nsol;
+    const int nsbm = (int)m_v.size() - nsol;
 
     FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
-    
- 	FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+    FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 
-    double J = ept.m_J;
     double phi0 = pbm->GetReferentialSolidVolumeFraction(pt);
-        
+    mat3ds dzhatde = mat3dd(0.0);
+    double zhat = ReactionSupply(pt);
+    mat3ds I = mat3dd(1);
+
     double kF = m_pFwd->ReactionRate(pt);
     mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);
-    double zhat = ReactionSupply(pt);
-    mat3ds dzhatde = mat3dd(0);
-    if (kF > 0) {
-        dzhatde += dkFde/kF;
-    }
-    mat3ds I = mat3dd(1);
+    if (kF > 0.0)
+        dzhatde += dkFde / kF;
+
     for (int isol = 0; isol < nsol; ++isol)
     {
         double dkdJ = m_psm->dkdJ(pt, isol);
@@ -103,11 +109,12 @@ mat3ds FEMassActionForward::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
         dzhatde += I * (m_vR[isol] * dkdJ / k);
     }
 
-    for (int isbm = 0; isbm<nsbm; ++isbm)
-        dzhatde -= I*(m_vR[nsol+isbm]/(J-phi0));
-        
+    double J = ept.m_J;
+    for (int isbm = 0; isbm < nsbm; ++isbm)
+        dzhatde -= I * (m_vR[nsol + isbm] / (J - phi0));
+
     dzhatde *= zhat;
-        
+
     return dzhatde;
 }
 
@@ -115,40 +122,48 @@ mat3ds FEMassActionForward::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 //! tangent of molar supply with effective pressure at material point
 double FEMassActionForward::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
 {
-	double kF = m_pFwd->ReactionRate(pt);
-	double dkFdp = m_pFwd->Tangent_ReactionRate_Pressure(pt);
-	double zhat = ReactionSupply(pt);
-	double dzhatdp = 0;
-	if (kF > 0) {
-		dzhatdp = dkFdp*zhat/kF;
-	}
-	return dzhatdp;
+    // if the reaction supply is insensitive to pressure
+    if (m_bool_refC) 
+        return 0.0;
+
+    double kF = m_pFwd->ReactionRate(pt);
+    double dkFdp = m_pFwd->Tangent_ReactionRate_Pressure(pt);
+    double zhat = ReactionSupply(pt);
+    double dzhatdp = 0.0;
+    if (kF > 0.0)
+        dzhatdp = dkFdp * zhat / kF;
+
+    return dzhatdp;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of molar supply with effective concentration at material point
 double FEMassActionForward::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
+    // if the reaction supply is insensitive to concentration
+    if (m_bool_refC)
+        return 0.0;
+
     const int nsol = m_nsol;
-    
+
     // if the derivative is taken with respect to a solid-bound molecule, return 0
-    if (sol >= nsol) {
-        return 0;
-    }
-    
+    if (sol >= nsol)
+        return 0.0;
+
     double zhat = ReactionSupply(pt);
-    double dzhatdc = 0;
-	for (int isol = 0; isol < nsol; ++isol) 
-	{
-		double dkdc = m_psm->dkdc(pt, isol, sol);
-		double k = m_psm->GetPartitionCoefficient(pt, isol);
-		double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-		dzhatdc += m_vR[isol]*dkdc/k;
-        if ((isol == sol) && (c > 0))
-            dzhatdc += m_vR[isol]/c;
+    double dzhatdc = 0.0;
+    for (int isol = 0; isol < nsol; ++isol)
+    {
+        double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+        double dkdc = m_psm->dkdc(pt, isol, sol);
+        double k = m_psm->GetPartitionCoefficient(pt, isol);
+        dzhatdc += m_vR[isol] * dkdc / k;
+
+        if ((isol == sol) && (c > 0.0))
+            dzhatdc += m_vR[isol] / c;
     }
-    
+
     dzhatdc *= zhat;
-    
+
     return dzhatdc;
 }

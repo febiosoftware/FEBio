@@ -279,6 +279,7 @@ public:
 	double	m_Fc;			//!< Faraday's constant
 	int		m_zmin;			//!< minimum charge number in mixture
 	int		m_ndeg;			//!< polynomial degree of zeta in electroneutrality
+	bool	m_bool_refC;	//!< flag to use referential concentration (ignore volume/changing effects)
 
 protected:
 	// material properties

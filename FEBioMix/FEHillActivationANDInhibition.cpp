@@ -41,7 +41,6 @@ BEGIN_FECORE_CLASS(FEHillActivationANDInhibition, FEReactionRate)
 	ADD_PARAMETER(m_sbm_id[0], "sbm_id_act");	
 	ADD_PARAMETER(m_sol_id[1], "sol_id_inh");
 	ADD_PARAMETER(m_sbm_id[1], "sbm_id_inh");
-	ADD_PARAMETER(m_referential, "referential_concentration");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -65,18 +64,9 @@ double FEHillActivationANDInhibition::ReactionRate(FEMaterialPoint& pt)
 	for (int i = 0; i < 2; ++i)
 	{
 		if (m_sol_id[i] > 0)
-		{
-			if (m_referential) {
-				c[i] = m_pReact->m_psm->GetReferentialSoluteConcentration(pt, m_sol_id[i] - 1);
-			}
-			else {
-				c[i] = m_pReact->m_psm->GetActualSoluteConcentration(pt, m_sol_id[i] - 1);
-			}
-		}
+			c[i] = m_pReact->m_psm->GetActualSoluteConcentration(pt, m_sol_id[i] - 1);
 		else if (m_sbm_id[i] > 0)
-		{
 			c[i] = m_pReact->m_psm->SBMConcentration(pt, m_sbm_id[i] - 1);
-		}
 		cn[i] = pow(c[i], m_n);
 		F[i] = (B * cn[i]) / (Kn + cn[i]);
 	}
@@ -88,17 +78,20 @@ double FEHillActivationANDInhibition::ReactionRate(FEMaterialPoint& pt)
 //! tangent of reaction rate with strain at material point
 mat3ds FEHillActivationANDInhibition::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
+	// if the reaction supply is insensitive to strain
+	if (m_pReact->m_bool_refC)
+		return mat3ds(0.0);
+
 	double zhat = ReactionRate(pt);
 	mat3dd I(1);
 	mat3ds dzhatde = I * (-zhat);
 	return dzhatde;
-	//return mat3ds(0.0);
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of reaction rate with effective fluid pressure at material point
 double FEHillActivationANDInhibition::Tangent_ReactionRate_Pressure(FEMaterialPoint& pt)
 {
-	return 0;
+	return 0.0;
 }
 

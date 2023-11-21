@@ -38,6 +38,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEMembraneMassActionReversible::FEMembraneMassActionReversible(FEModel* pfem) : FEMembraneReaction(pfem)
 {
+
 }
 
 //-----------------------------------------------------------------------------
@@ -52,9 +53,11 @@ double FEMembraneMassActionReversible::FwdReactionSupply(FEMaterialPoint& pt)
     
     // start with contribution from solutes
     const int nsol = (int) m_psm->Solutes();
-    for (int i=0; i<nsol; ++i) {
+    for (int i = 0; i < nsol; ++i)
+    {
         int vR = m_vR[i];
-        if (vR > 0) {
+        if (vR > 0)
+        {
             double c = m_psm->GetActualSoluteConcentration(pt, i);
             zhat *= pow(c, vR);
         }
@@ -62,9 +65,11 @@ double FEMembraneMassActionReversible::FwdReactionSupply(FEMaterialPoint& pt)
     
     // add contribution of solid-bound molecules
     const int nsbm = (int) m_psm->SBMs();
-    for (int i=0; i<nsbm; ++i) {
+    for (int i = 0; i < nsbm; ++i)
+    {
         int vR = m_vR[nsol+i];
-        if (vR > 0) {
+        if (vR > 0)
+        {
             double c = m_psm->SBMArealConcentration(pt, i);
             zhat *= pow(c, vR);
         }
@@ -72,18 +77,22 @@ double FEMembraneMassActionReversible::FwdReactionSupply(FEMaterialPoint& pt)
     
     // add contribution from internal and external solutes
     const int nse = (int) m_psm->SolutesExternal(pt);
-    for (int i=0; i<nse; ++i) {
+    for (int i = 0; i < nse; ++i)
+    {
         int vRe = m_vRe[m_psm->GetSoluteIDExternal(pt,i)];
-        if (vRe > 0) {
+        if (vRe > 0)
+        {
             // evaluate nodal effective concentrations
             double c = m_psm->GetEffectiveSoluteConcentrationExternal(pt,i);
             zhat *= pow(c, vRe);
         }
     }
     const int nsi = (int) m_psm->SolutesInternal(pt);
-    for (int i=0; i<nsi; ++i) {
+    for (int i = 0; i < nsi; ++i)
+    {
         int vRi = m_vRi[m_psm->GetSoluteIDInternal(pt,i)];
-        if (vRi > 0) {
+        if (vRi > 0) 
+        {
             // evaluate nodal effective concentrations
             double c = m_psm->GetEffectiveSoluteConcentrationInternal(pt,i);
             zhat *= pow(c, vRi);
@@ -105,9 +114,11 @@ double FEMembraneMassActionReversible::RevReactionSupply(FEMaterialPoint& pt)
     
     // start with contribution from solutes
     const int nsol = (int) m_psm->Solutes();
-    for (int i=0; i<nsol; ++i) {
+    for (int i = 0; i < nsol; ++i)
+    {
         int vP = m_vP[i];
-        if (vP > 0) {
+        if (vP > 0) 
+        {
             double c = m_psm->GetActualSoluteConcentration(pt, i);
             zhat *= pow(c, vP);
         }
@@ -115,9 +126,11 @@ double FEMembraneMassActionReversible::RevReactionSupply(FEMaterialPoint& pt)
     
     // add contribution of solid-bound molecules
     const int nsbm = (int) m_psm->SBMs();
-    for (int i=0; i<nsbm; ++i) {
+    for (int i = 0; i < nsbm; ++i)
+    {
         int vP = m_vP[nsol+i];
-        if (vP > 0) {
+        if (vP > 0)
+        {
             double c = m_psm->SBMArealConcentration(pt, i);
             zhat *= pow(c, vP);
         }
@@ -125,18 +138,22 @@ double FEMembraneMassActionReversible::RevReactionSupply(FEMaterialPoint& pt)
     
     // add contribution from internal and external solutes
     const int nse = (int) m_psm->SolutesExternal(pt);
-    for (int i=0; i<nse; ++i) {
+    for (int i = 0; i < nse; ++i)
+    {
         int vPe = m_vPe[m_psm->GetSoluteIDExternal(pt,i)];
-        if (vPe > 0) {
+        if (vPe > 0)
+        {
             // evaluate nodal effective concentrations
             double c = m_psm->GetEffectiveSoluteConcentrationExternal(pt,i);
             zhat *= pow(c, vPe);
         }
     }
     const int nsi = (int) m_psm->SolutesInternal(pt);
-    for (int i=0; i<nsi; ++i) {
+    for (int i = 0; i < nsi; ++i)
+    {
         int vPi = m_vPi[m_psm->GetSoluteIDInternal(pt,i)];
-        if (vPi > 0) {
+        if (vPi > 0)
+        {
             // evaluate nodal effective concentrations
             double c = m_psm->GetEffectiveSoluteConcentrationInternal(pt,i);
             zhat *= pow(c, vPi);
@@ -159,19 +176,25 @@ double FEMembraneMassActionReversible::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of molar supply with strain at material point
 double FEMembraneMassActionReversible::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
+    // if the reaction supply is insensitive to strain
+    if (m_bool_refC)
+        return 0.0;
+
     // forward reaction
     double kF = m_pFwd->ReactionRate(pt);
     double dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);
     double zhatF = FwdReactionSupply(pt);
-    double dzhatFde = 0;
-    if (kF > 0) dzhatFde = dkFde*(zhatF/kF);
+    double dzhatFde = 0.0;
+    if (kF > 0.0)
+        dzhatFde = dkFde * (zhatF / kF);
     
     // reverse reaction
     double kR = m_pRev->ReactionRate(pt);
     double dkRde = m_pRev->Tangent_ReactionRate_Strain(pt);
     double zhatR = RevReactionSupply(pt);
-    double dzhatRde = 0;
-    if (kR > 0) dzhatRde = dkRde*(zhatR/kR);
+    double dzhatRde = 0.0;
+    if (kR > 0.0)
+        dzhatRde = dkRde * (zhatR / kR);
     
     return dzhatFde - dzhatRde;
 }
@@ -180,22 +203,28 @@ double FEMembraneMassActionReversible::Tangent_ReactionSupply_Strain(FEMaterialP
 //! tangent of molar supply with effective pressure at material point
 double FEMembraneMassActionReversible::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
 {
+    // if the reaction supply is insensitive to pressure
+    if (m_bool_refC)
+        return 0.0;
+
     // forward reaction
     double kF = m_pFwd->ReactionRate(pt);
-    double dzhatFdp = 0;
-    if (kF > 0) {
+    double dzhatFdp = 0.0;
+    if (kF > 0.0)
+    {
         double dkFdp = m_pFwd->Tangent_ReactionRate_Pressure(pt);
         double zhatF = FwdReactionSupply(pt);
-        dzhatFdp = dkFdp*zhatF/kF;
+        dzhatFdp = dkFdp * zhatF / kF;
     }
     
     // reverse reaction
     double kR = m_pRev->ReactionRate(pt);
-    double dzhatRdp = 0;
-    if (kR > 0) {
+    double dzhatRdp = 0.0;
+    if (kR > 0.0)
+    {
         double dkRdp = m_pRev->Tangent_ReactionRate_Pressure(pt);
         double zhatR = RevReactionSupply(pt);
-        dzhatRdp = dkRdp*zhatR/kR;
+        dzhatRdp = dkRdp * zhatR / kR;
     }
     
     return dzhatFdp - dzhatRdp;
@@ -205,37 +234,42 @@ double FEMembraneMassActionReversible::Tangent_ReactionSupply_Pressure(FEMateria
 //! tangent of molar supply with effective pressure at material point
 double FEMembraneMassActionReversible::Tangent_ReactionSupply_Pi(FEMaterialPoint& pt)
 {
-    return 0;
+    return 0.0;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of molar supply with effective pressure at material point
 double FEMembraneMassActionReversible::Tangent_ReactionSupply_Pe(FEMaterialPoint& pt)
 {
-    return 0;
+    return 0.0;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of molar supply with effective concentration at material point
 double FEMembraneMassActionReversible::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
+    // if the reaction supply is insensitive to concentration
+    if (m_bool_refC)
+        return 0.0;
+
     const int nsol = m_nsol;
     
     // if the derivative is taken with respect to a solid-bound molecule, return 0
-    if (sol >= nsol) {
-        return 0;
-    }
+    if (sol >= nsol)
+        return 0.0;
     
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
-    double dzhatFdc = 0;
+    double dzhatFdc = 0.0;
     double c = m_psm->GetActualSoluteConcentration(pt, sol);
-    if ((zhatF > 0) && (c > 0)) dzhatFdc = m_vR[sol]*zhatF/c;
+    if ((zhatF > 0.0) && (c > 0.0))
+        dzhatFdc = m_vR[sol] * zhatF / c;
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
-    double dzhatRdc = 0;
-    if ((zhatR > 0) && (c > 0)) dzhatRdc = m_vP[sol]*zhatR/c;
+    double dzhatRdc = 0.0;
+    if ((zhatR > 0.0) && (c > 0.0))
+        dzhatRdc = m_vP[sol] * zhatR / c;
     
     return dzhatFdc - dzhatRdc;
 }
@@ -244,23 +278,31 @@ double FEMembraneMassActionReversible::Tangent_ReactionSupply_Concentration(FEMa
 //! tangent of molar supply with effective concentration at material point
 double FEMembraneMassActionReversible::Tangent_ReactionSupply_Ci(FEMaterialPoint& pt, const int sol)
 {
+    // if the reaction supply is insensitive to concentration
+    if (m_bool_refC)
+        return 0.0;
+
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
     double kF = m_pFwd->ReactionRate(pt);
     double dkFdci = m_pFwd->Tangent_ReactionRate_Ci(pt, sol);
-    double dzhatFdc = 0;
-    if (kF != 0) dzhatFdc = dkFdci/kF*zhatF;
+    double dzhatFdc = 0.0;
+    if (kF != 0.0)
+        dzhatFdc = dkFdci / kF * zhatF;
     double ci = m_psm->GetEffectiveSoluteConcentrationInternal(pt, sol);
     int IDi = m_psm->GetSoluteIDInternal(pt, sol);
-    if ((zhatF > 0) && (ci > 0)) dzhatFdc = m_vRi[IDi]*zhatF/ci;
+    if ((zhatF > 0.0) && (ci > 0.0))
+        dzhatFdc = m_vRi[IDi] * zhatF / ci;
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
     double kR = m_pRev->ReactionRate(pt);
     double dkRdci = m_pRev->Tangent_ReactionRate_Ci(pt, sol);
-    double dzhatRdc = 0;
-    if (kR != 0) dzhatRdc = dkRdci/kR*zhatR;
-    if ((zhatR > 0) && (ci > 0)) dzhatRdc += m_vPi[IDi]*zhatR/ci;
+    double dzhatRdc = 0.0;
+    if (kR != 0.0)
+        dzhatRdc = dkRdci / kR * zhatR;
+    if ((zhatR > 0) && (ci > 0))
+        dzhatRdc += m_vPi[IDi]*zhatR/ci;
     
     return dzhatFdc - dzhatRdc;
 }
@@ -269,23 +311,31 @@ double FEMembraneMassActionReversible::Tangent_ReactionSupply_Ci(FEMaterialPoint
 //! tangent of molar supply with effective concentration at material point
 double FEMembraneMassActionReversible::Tangent_ReactionSupply_Ce(FEMaterialPoint& pt, const int sol)
 {
+    // if the reaction supply is insensitive to concentration
+    if (m_bool_refC)
+        return 0.0;
+
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
     double kF = m_pFwd->ReactionRate(pt);
     double dkFdce = m_pFwd->Tangent_ReactionRate_Ce(pt, sol);
-    double dzhatFdc = 0;
-    if (kF != 0) dzhatFdc = dkFdce/kF*zhatF;
+    double dzhatFdc = 0.0;
+    if (kF != 0.0)
+        dzhatFdc = dkFdce / kF * zhatF;
     double ce = m_psm->GetEffectiveSoluteConcentrationExternal(pt, sol);
     int IDe = m_psm->GetSoluteIDExternal(pt, sol);
-    if ((zhatF > 0) && (ce > 0)) dzhatFdc = m_vRe[IDe]*zhatF/ce;
+    if ((zhatF > 0.0) && (ce > 0.0))
+        dzhatFdc = m_vRe[IDe] * zhatF / ce;
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
     double kR = m_pRev->ReactionRate(pt);
     double dkRdce = m_pRev->Tangent_ReactionRate_Ce(pt, sol);
-    double dzhatRdc = 0;
-    if (kR != 0) dzhatRdc = dkRdce/kR*zhatR;
-    if ((zhatR > 0) && (ce > 0)) dzhatRdc += m_vPe[IDe]*zhatR/ce;
+    double dzhatRdc = 0.0;
+    if (kR != 0.0)
+        dzhatRdc = dkRdce / kR * zhatR;
+    if ((zhatR > 0.0) && (ce > 0.0))
+        dzhatRdc += m_vPe[IDe] * zhatR / ce;
     
     return dzhatFdc - dzhatRdc;
 }

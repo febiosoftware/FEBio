@@ -102,6 +102,7 @@ FESolutesMaterial::FESolutesMaterial(FEModel* pfem) : FEMaterial(pfem)
 {
     m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
     m_pOsmC = 0;
+    m_bool_refC = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -130,6 +131,7 @@ bool FESolutesMaterial::Init()
     m_Rgas = GetGlobalConstant("R");
     m_Tabs = GetGlobalConstant("T");
     m_Fc   = GetGlobalConstant("Fc");
+    m_bool_refC = GetGlobalConstant("referential_concentration");
     
     if (m_Rgas <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section"); return false; }
     if (m_Tabs <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");     return false; }
@@ -148,7 +150,7 @@ void FESolutesMaterial::Serialize(DumpStream& ar)
     
     if (ar.IsShallow()) return;
     
-    ar & m_Rgas & m_Tabs & m_Fc;
+    ar & m_Rgas & m_Tabs & m_Fc & m_bool_refC;
 }
 
 //-----------------------------------------------------------------------------

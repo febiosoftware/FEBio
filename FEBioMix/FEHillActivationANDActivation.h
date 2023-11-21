@@ -54,6 +54,5 @@ public:
 	double	m_n = 1.2;
 	int		m_sol_id[2] = { -1, -1 };
 	int		m_sbm_id[2] = { -1, -1 };
-	bool   m_referential = false;
 	DECLARE_FECORE_CLASS();
 };

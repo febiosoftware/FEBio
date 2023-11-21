@@ -37,6 +37,7 @@ SOFTWARE.*/
 FEReaction::FEReaction(FEModel* pfem) : FEMaterialProperty(pfem)
 {
     m_psm = nullptr;
+    m_bool_refC = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -45,11 +46,14 @@ bool FEReaction::Init()
     // make sure the parent class is set
     m_psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
     assert(m_psm);
-    if (m_psm == 0) {
+    if (m_psm == 0) 
+    {
         feLogError("Parent class not set or of incorrect type");
         return false;
     }
     
+    m_bool_refC = GetFEModel()->GetGlobalConstant("referential_concentration");
+
     // now call base class
     return FEMaterialProperty::Init();
 }

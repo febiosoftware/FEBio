@@ -196,7 +196,7 @@ void FESolutesDomain::InitMaterialPoints()
 			for (int isol = 0; isol<nsol; ++isol) {
                 ps.m_c[isol] = el.Evaluate(c0[isol], n);
                 ps.m_ca[isol] = m_pMat->ConcentrationActual(mp, isol);
-                ps.m_gradc[isol] = gradient(el, c0[isol], n);
+                ps.m_gradc[isol] = (m_pMat->m_bool_refC) ? Gradient(el, c0[isol], n) : gradient(el, c0[isol], n);
 			}
 
 			for (int isol = 0; isol<nsol; ++isol)

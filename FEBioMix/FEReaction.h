@@ -55,6 +55,9 @@ public:
 
 public: //TODO: Make this protected again
     FESoluteInterface* m_psm;   //!< solute interface to parent class
+
+public:
+    bool	m_bool_refC;	//!< flag to use referential concentration (ignore volume/changing effects)
 };
 
 

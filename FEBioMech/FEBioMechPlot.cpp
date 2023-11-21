@@ -4017,7 +4017,6 @@ bool FEPlotGrowthRatio::Save(FEDomain& dom, FEDataStream& a)
 			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
 			FEKinematicMaterialPoint& kp = *pt.ExtractData<FEKinematicMaterialPoint>();
 			g += kp.m_theta;
-			//g += 1.0 + pmf->m_gm(pt) * pmf->SpeciesGrowth(pt);
 		}
 		g /= (double)el.GaussPoints();
 		a << g;

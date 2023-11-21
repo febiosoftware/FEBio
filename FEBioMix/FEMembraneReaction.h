@@ -190,6 +190,9 @@ public:
     vector<int>     m_vPe;          //!< stoichiometric coefficients of products
     vector<int>     m_ve;           //!< net stoichiometric coefficients of reactants and products
 
+public:
+    bool	m_bool_refC;	//!< flag to use referential concentration (ignore volume/changing effects)
+
     DECLARE_FECORE_CLASS();
     FECORE_BASE_CLASS(FEMembraneReaction)
 };

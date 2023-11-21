@@ -40,13 +40,13 @@ public:
 public:
     FEGrowthTensor(FEModel* pfem);
     virtual ~FEGrowthTensor();
-    
+
     //! growth tensor
     virtual mat3d GrowthTensor(FEMaterialPoint& pt, const vec3d& a0) = 0;
-    
+
     //! inverse of growth tensor
     virtual mat3d GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& a0) = 0;
-    
+
     //! referential solid density
     virtual double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) = 0;
 
@@ -68,7 +68,7 @@ public:
 
     //! initialize
     bool Init() override;
-    
+
 public:
     FEParamVec3 m_fiber;
     //FEVec3dValuator* m_fiber;
@@ -76,13 +76,11 @@ public:
     //!SL: temporary place holder. Intent is to allow scaling by value of some state variable. In this case we are saying SBM id number to identify which SBM to base growth on. Will implement general solution later for more options.
     int             m_sbm_id = -1;   //! Which sbm should be used? Optional for now...
     int             m_sol_id = -1;
-    double          theta_gamma = 0.2;      //!<1/2 width of bandpass function (where each sigmoid is centered)
-    double          k_center = 0;   //!<1/2 width of bandpass function (where each sigmoid is centered)
-    double          k_width = 4;
-    double          k_min = -1;
-    double          k_max = 1;
+    double          theta_gamma = 0.2;
+    double          theta_a = -2.0;
+    double          k_min = 0.0;
+    double          k_max = 1.0;
     //!SL: Flag to choose whether growth is based on current or referential concentration.
-    bool m_referential_concentration_flag = true;
     bool m_referential_normal_flag = true;
 protected:
     DECLARE_FECORE_CLASS();
@@ -95,19 +93,19 @@ class FEVolumeGrowth : public FEGrowthTensor
 {
 public:
     FEVolumeGrowth(FEModel* pfem) : FEGrowthTensor(pfem) { m_gm = 1; }
-    virtual ~FEVolumeGrowth(){}
-    
+    virtual ~FEVolumeGrowth() {}
+
     //! growth tensor
     mat3d GrowthTensor(FEMaterialPoint& pt, const vec3d& a0) override;
-    
+
     //! inverse of growth tensor
     mat3d GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& a0) override;
-    
+
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
 
 public:
-    
+
     // declare the parameter list
     //DECLARE_FECORE_CLASS();
 
@@ -120,14 +118,14 @@ class FEAreaGrowth : public FEGrowthTensor
 {
 public:
     FEAreaGrowth(FEModel* pfem) : FEGrowthTensor(pfem) { m_gm = 1; }
-    virtual ~FEAreaGrowth(){}
-    
+    virtual ~FEAreaGrowth() {}
+
     //! growth tensor
     mat3d GrowthTensor(FEMaterialPoint& pt, const vec3d& a0) override;
-    
+
     //! inverse of growth tensor
     mat3d GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& a0) override;
-    
+
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
 
@@ -145,17 +143,17 @@ class FEFiberGrowth : public FEGrowthTensor
 {
 public:
     FEFiberGrowth(FEModel* pfem) : FEGrowthTensor(pfem) { m_gm = 1; }
-    virtual ~FEFiberGrowth(){}
-    
+    virtual ~FEFiberGrowth() {}
+
     //! growth tensor
     mat3d GrowthTensor(FEMaterialPoint& pt, const vec3d& a0) override;
-    
+
     //! inverse of growth tensor
     mat3d GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& a0) override;
-    
+
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
-    
+
 public:
 
     // declare the parameter list

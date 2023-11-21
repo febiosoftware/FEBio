@@ -64,9 +64,6 @@ public:
 	// return the actual solution concentration at this material point
 	virtual double GetActualSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
 
-	// return the actual solution concentration at this material point
-	virtual double GetReferentialSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
-
     // return the free diffusivity at this material point
     virtual double GetFreeDiffusivity(FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
     
@@ -167,17 +164,6 @@ public:
 		T* spt = mp.ExtractData<T>();
 		return spt->m_ca[soluteIndex];
 	};
-	double GetReferentialSoluteConcentration(FEMaterialPoint& mp, int soluteIndex) override {
-		T* spt = mp.ExtractData<T>();
-		FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
-		double J = ep.m_J;
-		//FEKinematicMaterialPoint& kp = *mp.ExtractData<FEKinematicMaterialPoint>();
-		//double J_e = kp.m_Je;
-		//double J_g = kp.m_Jg;
-		FEBiphasicMaterialPoint& bp = *mp.ExtractData<FEBiphasicMaterialPoint>();
-		double phisr = bp.m_phi0t;
-		return max((spt->m_ca[soluteIndex] * (J - phisr)), 0.0);
-	}
 	double GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex) override {
 		T* spt = mp.ExtractData<T>();
 		return spt->m_k[soluteIndex];

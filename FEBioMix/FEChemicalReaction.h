@@ -135,6 +135,9 @@ public:
     double          m_Vbar;     //!< weighted molar volume of reactants and products
     bool            m_Vovr;     //!< override flag for m_Vbar
 
+public:
+    bool	m_bool_refC;	//!< flag to use referential concentration (ignore volume/changing effects)
+
 	DECLARE_FECORE_CLASS();
     FECORE_BASE_CLASS(FEChemicalReaction)
 };

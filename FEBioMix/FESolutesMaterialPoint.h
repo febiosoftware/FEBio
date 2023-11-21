@@ -71,14 +71,14 @@ public:
 	std::vector<double>	m_sbmrmin;	//!< minimum value of m_sbmr
 	std::vector<double>	m_sbmrmax;	//!< maximum value of m_sbmr
 	std::vector<double>	m_k;		//!< solute partition coefficient
-	std::vector<double>	m_dkdJ;		//!< 1st deriv of m_k with strain (J)
-	std::vector<double>	m_dkdJJ;	//!< 2nd deriv of m_k with strain (J)
-	std::vector< std::vector<double> >	m_dkdc;			//!< 1st deriv of m_k with effective concentration
-	std::vector< std::vector<double> >	m_dkdJc;		//!< cross deriv of m_k with J and c
-	std::vector< std::vector< std::vector<double> > > m_dkdcc;	// 2nd deriv of m_k with c
-	std::vector< std::vector<double> >	m_dkdr;			//!< 1st deriv of m_k with m_sbmr
-	std::vector< std::vector<double> >	m_dkdJr;		//!< cross deriv of m_k with J and m_sbmr
-	std::vector< std::vector< std::vector<double> > > m_dkdrc;	//!< cross deriv of m_k with m_sbmr and c
+	std::vector<double>	m_dkdJ;		//!< 1st deriv of solute partition coefficient (m_k) wrt strain (J)
+	std::vector<double>	m_dkdJJ;	//!< 2nd deriv of solute partition coefficient (m_k) wrt strain (J)
+	std::vector< std::vector<double> >	m_dkdc;			//!< 1st deriv of solute partition coefficient (m_k) wrt effective concentration
+	std::vector< std::vector<double> >	m_dkdJc;		//!< cross deriv of solute partition coefficient (m_k) wrt J and c
+	std::vector< std::vector< std::vector<double> > > m_dkdcc;	// 2nd deriv of solute partition coefficient (m_k) wrt c
+	std::vector< std::vector<double> >	m_dkdr;			//!< 1st deriv of solute partition coefficient (m_k) with m_sbmr
+	std::vector< std::vector<double> >	m_dkdJr;		//!< cross deriv of solute partition coefficient (m_k) wrt J and m_sbmr
+	std::vector< std::vector< std::vector<double> > > m_dkdrc;	//!< cross deriv of solute partition coefficient (m_k) wrt m_sbmr and c
     std::vector<int>     m_cri;      //!< optional integer data needed for chemical reactions
     std::vector<double>  m_crd;      //!< optional double data needed for chemical reactions
     double          m_strain;   //!< areal strain
