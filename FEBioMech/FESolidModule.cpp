@@ -62,4 +62,12 @@ void FESolidModule::InitModel(FEModel* fem)
 	dofs.SetDOFName(varSA, 0, "sax");
 	dofs.SetDOFName(varSA, 1, "say");
 	dofs.SetDOFName(varSA, 2, "saz");
+	int varBW = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_VELOCITY), VAR_VEC3);
+	dofs.SetDOFName(varBW, 0, "bwx");
+	dofs.SetDOFName(varBW, 1, "bwy");
+	dofs.SetDOFName(varBW, 2, "bwz");
+	int varBA = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_ACCELERATION), VAR_VEC3);
+	dofs.SetDOFName(varBA, 0, "bax");
+	dofs.SetDOFName(varBA, 1, "bay");
+	dofs.SetDOFName(varBA, 2, "baz");
 }

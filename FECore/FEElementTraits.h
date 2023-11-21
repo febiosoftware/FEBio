@@ -2110,6 +2110,20 @@ public:
 };
 
 //=============================================================================
+class FEBeam2G2 : public FEBeam2_
+{
+public:
+	enum { NINT = 2 };
+
+public:
+	//! constructor
+	FEBeam2G2();
+
+	//! project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao) const override;
+};
+
+//=============================================================================
 //
 //   FEBeam3_
 //   

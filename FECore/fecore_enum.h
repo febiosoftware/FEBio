@@ -172,6 +172,7 @@ enum FE_Element_Type {
 
 	// beam elements
 	FE_BEAM2G1,
+	FE_BEAM2G2,
 	FE_BEAM3G2,
 
 	// unspecified

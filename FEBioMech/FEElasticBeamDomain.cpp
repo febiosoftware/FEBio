@@ -29,10 +29,12 @@ SOFTWARE.*/
 #include "FEElasticBeamMaterial.h"
 #include "FEBioMech.h"
 #include <FECore/FEMesh.h>
+#include <FECore/FEModel.h>
 #include <FECore/fecore_debug.h>
 
 
-FEElasticBeamDomain::FEElasticBeamDomain(FEModel* fem) : FEBeamDomain(fem), FEElasticDomain(fem), m_dofs(fem)
+FEElasticBeamDomain::FEElasticBeamDomain(FEModel* fem) : FEBeamDomain(fem), FEElasticDomain(fem), 
+	m_dofs(fem), m_dofQ(fem), m_dofV(fem), m_dofW(fem), m_dofA(fem)
 {
 	m_mat = nullptr;
 
@@ -40,6 +42,11 @@ FEElasticBeamDomain::FEElasticBeamDomain(FEModel* fem) : FEBeamDomain(fem), FEEl
 	{
 		m_dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 		m_dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+
+		m_dofQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+		m_dofW.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_VELOCITY));
+		m_dofA.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_ACCELERATION));
 	}
 }
 
@@ -67,7 +74,7 @@ bool FEElasticBeamDomain::Create(int elements, FE_Element_Spec espec)
 	}
 
 	// set element type
-	int etype = (espec.eshape == ET_LINE3 ? FE_BEAM3G2 : FE_BEAM2G1);
+	int etype = (espec.eshape == ET_LINE3 ? FE_BEAM3G2 : FE_BEAM2G2);
 	ForEachElement([=](FEElement& el) { el.SetType(etype); });
 
 	return true;
@@ -89,8 +96,14 @@ bool FEElasticBeamDomain::Init()
 		//       This also assumes that nodes 0 and 1 define the boundary nodes. 
 		el.m_L0 = (r0[1] - r0[0]).Length();
 
-		vec3d e = r0[1] - r0[0]; e.Normalize();
-		el.m_E3 = e;
+		// construct beam coordinate system
+		vec3d E3 = r0[1] - r0[0]; E3.Normalize();
+		vec3d E1, E2;
+		if (fabs(E3 * vec3d(1, 0, 0)) > 0.5) E2 = E3 ^ vec3d(0, 1, 0);
+		else E2 = E3 ^ vec3d(1,0,0);
+		E2.Normalize();
+		E1 = E2 ^ E3;
+		el.m_E = mat3d(E1, E2, E3);
 	}
 
 	return true;
@@ -140,7 +153,7 @@ void FEElasticBeamDomain::InternalForces(FEGlobalVector& R)
 
 		ElementInternalForces(el, fe);
 
-		vector<int> lm;
+		vector<int> lm(6*ne);
 		UnpackLM(el, lm);
 		R.Assemble(lm, fe);
 	}
@@ -232,6 +245,9 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 	for (int n = 0; n < nint; ++n)
 	{
 		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+		// copy local coordinate system (Probably don't need to do this every time)
+		mp.m_Q = el.m_E;
 
 		// get stress from beam element
 		vec3d t = mp.m_t;	// stress traction
@@ -348,7 +364,7 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui, bool finalF
 			mp.m_Rt = (dq*mp.m_Ri) * mp.m_Rp;
 
 			// update spatial curvature
-			mat3da Wn(mp.m_wn);
+			mat3da Wn(mp.m_kn);
 			mat3d W = dR * Wn * dR.transpose(); // this should be a skew-symmetric matrix!
 
 			vec3d w2(-W[1][2], W[0][2], -W[0][1]);
@@ -365,12 +381,12 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui, bool finalF
 			vec3d w1 = drdS*g1 + e*((1.0 - g1)*(e*drdS)) + (dr ^ drdS)*(0.5*g2*g2);
 
 			// update curvature
-			mp.m_w = w1 + w2;
+			mp.m_k = w1 + w2;
 
 			if (finalFlag)
 			{
 				mp.m_Ri = dq * mp.m_Ri;
-				mp.m_wn = mp.m_w;
+				mp.m_kn = mp.m_k;
 			}
 		}
 	}
@@ -389,13 +405,37 @@ void FEElasticBeamDomain::Update(const FETimeInfo& tp)
 void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 {
 	// get the nodal positions
-	vec3d rt[FEElement::MAX_NODES];
+	constexpr int NMAX = FEElement::MAX_NODES;
+	vec3d rt[NMAX], vt[NMAX], at[NMAX], wt[NMAX], alt[NMAX];
 	int ne = el.Nodes();
-	for (int i = 0; i < ne; ++i) rt[i] = Node(el.m_lnode[i]).m_rt;
+	for (int i = 0; i < ne; ++i)
+	{
+		FENode& node = Node(el.m_lnode[i]);
+		rt[i] = node.m_rt;
+		vt[i] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+		at[i] = node.m_at;
+
+		wt[i]  = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
+		alt[i] = node.get_vec3d(m_dofA[0], m_dofA[1], m_dofA[2]);
+	}
 
 	// initial length
 	double L0 = el.m_L0;
 	double J = L0 / 2;
+
+	FEElasticBeamMaterial& mat = *m_mat;
+	double rho = mat.m_density;
+	double A_rho = mat.m_A * rho;
+
+	double I1 = rho * mat.m_I1;
+	double I2 = rho * mat.m_I2;
+	double I3 = I1 + I2;
+
+	vec3d E1 = el.m_E.col(0);
+	vec3d E2 = el.m_E.col(1);
+	vec3d E3 = el.m_E.col(2);
+
+	mat3d I0 = (E1 & E1)*I1 + (E2 & E2)*I2 + (E3 & E3) * I3; // material inertia tensor
 
 	// loop over all integration points
 	int nint = el.GaussPoints();
@@ -403,6 +443,24 @@ void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 	{
 		// get the material point
 		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+		// update quantities for dynamics
+		mp.m_vt = el.Evaluate(vt, n);
+		mp.m_at = el.Evaluate(at, n);
+		mp.m_dpt = mp.m_at * A_rho;
+
+		// (spatial) rotational quantities
+		vec3d w = el.Evaluate(wt, n);
+		vec3d al = el.Evaluate(alt, n);
+		mp.m_wt = w;
+		mp.m_alt = al;
+
+		// calculate the spatial inertia tensor
+		mat3d R = mp.m_Rt.RotationMatrix();
+		mat3d I = R * I0 * R.transpose();
+
+		// calculate rate of angular momentum
+		mp.m_dht = I * al + (w ^ (I * w));
 
 		// evaluate G0 = dphi0/dS
 		double* Hr = el.Hr(n);
@@ -418,19 +476,154 @@ void FEElasticBeamDomain::UpdateElement(FEBeamElement& el)
 		quatd qi = q.Conjugate();
 
 		// calculate material strain measures
-		mp.m_Gamma = qi * G0 - el.m_E3;
-		mp.m_Kappa = qi * mp.m_w; // m_w is updated in IncrementalUpdate(std::vector<double>& ui)
+		mp.m_Gamma = qi * G0 - E3;
+		mp.m_Kappa = qi * mp.m_k; // m_k is updated in IncrementalUpdate(std::vector<double>& ui)
 
 		// evaluate the (spatial) stress
+		mp.m_Q = el.m_E;
 		m_mat->Stress(mp);
 	}
 }
 
-//! TODO: calculate the interial forces (for dynamic problems)
-void FEElasticBeamDomain::InertialForces(FEGlobalVector& R, std::vector<double>& F) { assert(false); }
+//! Calculates the inertial forces (for dynamic problems)
+void FEElasticBeamDomain::InertialForces(FEGlobalVector& R, std::vector<double>& F)
+{
+	for (auto& el : m_Elem)
+	{
+		int neln = el.Nodes();
+		vector<double> fe(6 * neln, 0.0);
+		ElementInertialForce(el, fe);
+		vector<int> lm(6 * neln);
+		UnpackLM(el, lm);
+		R.Assemble(lm, fe);
+	}
+}
 
-//! TODO: calculate the mass matrix (for dynamic problems)
-void FEElasticBeamDomain::MassMatrix(FELinearSystem& LS, double scale) { assert(false); }
+void FEElasticBeamDomain::ElementInertialForce(FEBeamElement& el, std::vector<double>& fe)
+{
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+	double* gw = el.GaussWeights();
+	for (int n = 0; n < nint; ++n)
+	{
+		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+		double* H = el.H(n);
+
+		double J = el.m_L0 / 2.0;
+		double Jw = J * gw[n];
+
+		vec3d dp = mp.m_dpt;
+		vec3d dh = mp.m_dht;
+
+		for (int i = 0; i < neln; ++i)
+		{
+			fe[6*i    ] -= H[i]*dp.x*Jw;
+			fe[6*i + 1] -= H[i]*dp.y*Jw;
+			fe[6*i + 2] -= H[i]*dp.z*Jw;
+			fe[6*i + 3] -= H[i]*dh.x*Jw;
+			fe[6*i + 4] -= H[i]*dh.y*Jw;
+			fe[6*i + 5] -= H[i]*dh.z*Jw;
+		}
+	}
+}
+
+//! Calculates the mass matrix (for dynamic problems)
+void FEElasticBeamDomain::MassMatrix(FELinearSystem& LS, double scale) 
+{
+	for (auto& el : m_Elem)
+	{
+		int neln = el.Nodes();
+		FEElementMatrix ke(6 * neln, 6 * neln); ke.zero();
+		ElementMassMatrix(el, ke);
+		vector<int> lm(6 * neln);
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+		ke.SetNodes(el.m_node);
+		LS.Assemble(ke);
+	}
+}
+
+// tanx = tan(x)/x
+double tanx(double x)
+{
+	double r = (fabs(x) < 1e-9 ? 1.0 : tan(x) / x);
+	return r;
+}
+
+void FEElasticBeamDomain::ElementMassMatrix(FEBeamElement& el, FEElementMatrix& ke)
+{
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+	double* gw = el.GaussWeights();
+
+	FEElasticBeamMaterial& mat = *m_mat;
+	double rho = mat.m_density;
+	double A_rho = mat.m_A * rho;
+
+	double I1 = rho * mat.m_I1;
+	double I2 = rho * mat.m_I2;
+	double I3 = I1 + I2;
+
+	vec3d E1 = el.m_E.col(0);
+	vec3d E2 = el.m_E.col(1);
+	vec3d E3 = el.m_E.col(2);
+
+	mat3d I0 = (E1 & E1) * I1 + (E2 & E2) * I2 + (E3 & E3) * I3; // material inertia tensor
+
+	FETimeInfo& ti = GetFEModel()->GetTime();
+	double h = ti.timeIncrement;
+	double b = ti.beta;
+	double g = ti.gamma;
+	double h2bi = 1.0 / (h * h * b);
+	double hg = h * g;
+
+	for (int n = 0; n < nint; ++n)
+	{
+		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
+
+		vec3d ri = mp.m_Ri.GetRotationVector();
+		vec3d e = ri.Normalized();
+		double th = ri.norm();
+		mat3da ts(ri);
+		mat3dd I(1.0);
+		mat3ds exe = dyad(e);
+		mat3d T = exe + (I - exe)*(1.0/tanx(th*0.5)) - ts*0.5;
+
+		double* H = el.H(n);
+
+		double J = el.m_L0 / 2.0;
+		double Jw = J * gw[n];
+
+		mat3d Rt = mp.m_Rt.RotationMatrix();
+		mat3d Rp = mp.m_Rp.RotationMatrix();
+
+		vec3d Wt = Rt.transpose() * mp.m_wt;
+		vec3d At = Rt.transpose() * mp.m_alt;
+		mat3da W_hat(Wt);
+		mat3da Hs(I0 * At + (Wt ^ (I0 * Wt)));
+		mat3da IW(I0 * Wt);
+
+		double M11 = A_rho * Jw * h2bi;
+		mat3d M22 = (-Rt * Hs + Rt * (I0 - IW * hg + (W_hat * I0) * hg)*h2bi)* Rp.transpose()* T;
+
+		for (int i=0; i<neln; ++i)
+			for (int j = 0; j < neln; ++j)
+			{
+				mat3d m1; m1.zero();
+				m1[0][0] = M11 * H[i] * H[j];
+				m1[1][1] = M11 * H[i] * H[j];
+				m1[2][2] = M11 * H[i] * H[j];
+
+				mat3d m2;
+				m2 = M22 * (H[i] * H[j] * Jw);
+
+				int I = 6*i, J = 6*j;
+				ke.add(I, J, m1);
+				ke.add(I + 3, J + 3, m2);
+			}
+	}
+}
 
 //! TODO: Calculate the body force vector
 void FEElasticBeamDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf) { assert(false); }

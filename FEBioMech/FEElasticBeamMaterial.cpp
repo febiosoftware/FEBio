@@ -40,6 +40,11 @@ void FEElasticBeamMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
 	m_Rp = m_Rt;
 	m_Ri = quatd(0, 0, 0);
+
+	m_vp = m_vt;
+	m_ap = m_at;
+	m_wp = m_wt;
+	m_alp = m_alt;
 }
 
 //=======================================================================================
@@ -64,26 +69,36 @@ FEElasticBeamMaterial::FEElasticBeamMaterial(FEModel* fem) : FEMaterial(fem)
 
 void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
 {
-	vec3d gamma = mp.m_Gamma;
-	vec3d kappa = mp.m_Kappa;
-	quatd R = mp.m_Rt;
+	mat3d Q = mp.m_Q;
+	mat3d Qt = Q.transpose();
+
+	vec3d gamma = Qt * mp.m_Gamma;
+	vec3d kappa = Qt * mp.m_Kappa;
 	double J = m_I1 + m_I2;
 
 	// material vectors
-	vec3d N = vec3d(m_G * m_A1 * gamma.x, m_G*m_A2*gamma.y, m_E*m_A*gamma.z);
-	vec3d M = vec3d(m_E * m_I1 * kappa.x, m_E*m_I2*kappa.y, m_G*  J*kappa.z);
+	vec3d N = Q*vec3d(m_G * m_A1 * gamma.x, m_G*m_A2*gamma.y, m_E*m_A*gamma.z);
+	vec3d M = Q*vec3d(m_E * m_I1 * kappa.x, m_E*m_I2*kappa.y, m_G*  J*kappa.z);
 
 	// spatial vectors
+	quatd R = mp.m_Rt;
 	mp.m_t = R * N;
 	mp.m_m = R * M;
 }
 
 void FEElasticBeamMaterial::Tangent(FEElasticBeamMaterialPoint& mp, matrix& C)
 {
+	mat3d E = mp.m_Q;
+	mat3d Et = E.transpose();
+
 	double J = m_I1 + m_I2;
 
-	mat3dd C1(m_G * m_A1, m_G * m_A2, m_E * m_A);
-	mat3dd C2(m_E * m_I1, m_E * m_I2, m_G *   J);
+	mat3dd D1(m_G * m_A1, m_G * m_A2, m_E * m_A);
+	mat3dd D2(m_E * m_I1, m_E * m_I2, m_G *   J);
+
+	mat3d C1 = E * D1 * Et;
+	mat3d C2 = E * D2 * Et;
+
 	quatd R = mp.m_Rt;
 	mat3d Q = R.RotationMatrix();
 	mat3d Qt = Q.transpose();

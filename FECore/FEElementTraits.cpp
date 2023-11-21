@@ -3227,7 +3227,7 @@ FETrussElementTraits::FETrussElementTraits() : FEElementTraits(NINT, NELN, FE_EL
 
 void FETrussElementTraits::init()
 {
-	const double a = 1.0 / 3.0;
+	const double a = 1.0 / sqrt(3.0);
 	gr[0] = -a; gr[1] =  a;
 	gw[0] = gw[1] = 1;
 
@@ -3893,6 +3893,27 @@ void FEBeam2G1::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];
+}
+
+//=============================================================================
+//                          FEBeam2G2 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FEBeam2G2::FEBeam2G2() : FEBeam2_(NINT, FE_BEAM2G2)
+{
+	const double a = 1.0 / sqrt(3.0);
+	gr[0] = -a; gw[0] = 1.0;
+	gr[1] =  a; gw[1] = 1.0;
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FEBeam2G2::project_to_nodes(double* ai, double* ao) const
+{
+	// TODO: implement better!
+	ao[0] = ai[0];
+	ao[1] = ai[1];
 }
 
 

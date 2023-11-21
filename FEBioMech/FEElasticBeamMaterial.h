@@ -41,6 +41,9 @@ public:
 	vec3d	m_t;	// stress vector
 	vec3d	m_m;	// moment vector
 
+	// local coordinate system
+	mat3d	m_Q;
+
 	// strain measures
 	vec3d	m_G0;
 	vec3d	m_Gamma;
@@ -51,8 +54,17 @@ public:
 	quatd	m_Ri;	// increment at current time step
 	quatd	m_Rt;	// current rotation
 
-	vec3d	m_w;	// spatial curvature
-	vec3d	m_wn;	// spatial curvature at current increment (temp storage)
+	vec3d	m_k;	// spatial curvature
+	vec3d	m_kn;	// spatial curvature at current increment (temp storage)
+
+	// dynamics
+	vec3d	m_vt, m_vp;	// linear velocity at current and previous time
+	vec3d	m_at, m_ap;	// linear acceleration at current and previous time
+	vec3d	m_wt, m_wp;	// (spatial) angular velocity at current and previous time
+	vec3d	m_alt, m_alp;	// (spatial) angular acceleration at current and previous time
+
+	vec3d	m_dpt;	// rate of linear momentum (current)
+	vec3d	m_dht;	// rate of angular momentum (current)
 };
 
 class FEElasticBeamMaterial : public FEMaterial
@@ -66,7 +78,7 @@ public:
 
 	FEMaterialPointData* CreateMaterialPointData() override;
 
-private:
+public:
 	double	m_density;
 	double	m_A, m_A1, m_A2;
 	double	m_E, m_G;

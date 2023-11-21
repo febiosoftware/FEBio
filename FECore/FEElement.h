@@ -330,5 +330,5 @@ public:
 
 public:
 	double	m_L0;	// initial length of beam
-	vec3d	m_E3;	// axial unit vector
+	mat3d	m_E;	// columns are local beam orientation
 };

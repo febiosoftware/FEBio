@@ -97,10 +97,18 @@ private:
 
 	void ElementStiffnessMatrix(FEBeamElement& el, FEElementMatrix& ke);
 
+	void ElementInertialForce(FEBeamElement& el, std::vector<double>& fe);
+
+	void ElementMassMatrix(FEBeamElement& el, FEElementMatrix& ke);
+
 	void UpdateElement(FEBeamElement& el);
 
 private:
 	FEDofList	m_dofs;
+	FEDofList	m_dofQ;
+	FEDofList	m_dofV;
+	FEDofList	m_dofW;
+	FEDofList	m_dofA;
 	FEElasticBeamMaterial* m_mat;
 	std::vector<FEBeamElement>	m_Elem;
 };

@@ -1185,7 +1185,9 @@ void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 	int dtype = 0;
 	switch (etype)
 	{
+	case FE_TRUSS  : ne = 2; dtype = PLT_ELEM_LINE2; break;
 	case FE_BEAM2G1: ne = 2; dtype = PLT_ELEM_LINE2; break;
+	case FE_BEAM2G2: ne = 2; dtype = PLT_ELEM_LINE2; break;
 	case FE_BEAM3G2: ne = 3; dtype = PLT_ELEM_LINE3; break;
 	default:
 		assert(false);
