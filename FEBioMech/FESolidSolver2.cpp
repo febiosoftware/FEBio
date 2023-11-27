@@ -456,15 +456,33 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 				vec3d Wp = Qp_T * wp;
 				vec3d Ap = Qp_T * ap;
 
+				// get equation numbers for rotations
+				// (and ensure that they are all free or all prescribed)
+				int eq[3] = { n.m_ID[m_dofSQ[0]], n.m_ID[m_dofSQ[1]], n.m_ID[m_dofSQ[2]] };
+				assert(((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0)) ||
+					   ((eq[0] <  0) && (eq[1] <  0) && (eq[2] <  0)));
+
 				// get rotation increment
 				vec3d ri, Ri;
 				int m;
-				m = n.m_ID[m_dofSQ[0]]; if (m >= 0) { ri.x = ui[m]; Ri.x = m_Ui[m]; }
-				m = n.m_ID[m_dofSQ[1]]; if (m >= 0) { ri.y = ui[m]; Ri.y = m_Ui[m]; }
-				m = n.m_ID[m_dofSQ[2]]; if (m >= 0) { ri.z = ui[m]; Ri.z = m_Ui[m]; }
+				m = eq[0]; if (m >= 0) { ri.x = ui[m]; Ri.x = m_Ui[m]; }
+				m = eq[1]; if (m >= 0) { ri.y = ui[m]; Ri.y = m_Ui[m]; }
+				m = eq[2]; if (m >= 0) { ri.z = ui[m]; Ri.z = m_Ui[m]; }
 				quatd dq(ri), qi(Ri);
 				quatd qn = dq * qi;
 				vec3d rn = qn.GetRotationVector();
+
+				// check for prescribed values
+				if ((eq[0] < 0) && (eq[1] < 0) && (eq[2] < 0))
+				{
+					vec3d Rt;
+					m = eq[0]; if (m < -1) { Rt.x = n.get(m_dofSQ[0]); }
+					m = eq[1]; if (m < -1) { Rt.y = n.get(m_dofSQ[1]); }
+					m = eq[2]; if (m < -1) { Rt.z = n.get(m_dofSQ[2]); }
+					quatd Qt(Rt);
+					qn = Qp.Conjugate() * Qt;
+					rn = qn.GetRotationVector();
+				}
 
 				// convert to material increment
 				vec3d Qn = Qp_T * rn;
@@ -479,8 +497,11 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 				vec3d at = Qt * At;
 
 				// store updated values
-				vec3d Rt = Qt.GetRotationVector();
-				n.set_vec3d(m_dofSQ[0], m_dofSQ[1], m_dofSQ[2], Rt);
+				if ((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0))
+				{
+					vec3d Rt = Qt.GetRotationVector();
+					n.set_vec3d(m_dofSQ[0], m_dofSQ[1], m_dofSQ[2], Rt);
+				}
 				n.set_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2], wt);
 				n.set_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2], at);
 			}
@@ -559,10 +580,18 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 		if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
 	}
 
-	for (int i = 0; i < mesh.Domains(); ++i)
+	// TODO: This is a hack!
+	// The problem is that I only want to call the domain's IncrementalUpdate during
+	// the quasi-Newtoon loop. However, this function is also called after the loop
+	// converges. The emap parameter is used here to detect wether we are inside the 
+	// loop (emap == false), or not (emap == true).
+	if (emap == false)
 	{
-		FEDomain& dom = mesh.Domain(i);
-		dom.IncrementalUpdate(ui, true);
+		for (int i = 0; i < mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			dom.IncrementalUpdate(ui, true);
+		}
 	}
 }
 

@@ -30,6 +30,8 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 #include <FECore/FEMesh.h>
 #include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
+#include <FECore/FESolver.h>
 #include <FECore/fecore_debug.h>
 
 
@@ -316,6 +318,9 @@ void FEElasticBeamDomain::ElementStiffnessMatrix(FEBeamElement& el, FEElementMat
 
 void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui, bool finalFlag)
 {
+	// We need this for the incremental update of prescribed rotational dofs
+	int niter = GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter;
+
 	// update the rotations at the material points
 	for (int i = 0; i < Elements(); ++i)
 	{
@@ -328,14 +333,33 @@ void FEElasticBeamDomain::IncrementalUpdate(std::vector<double>& ui, bool finalF
 		double J = L0 / 2.0;
 
 		// get the nodal values of the incremental rotations
+		// NOTE: The ui vector does not contain the prescribed displacement updates!!
 		vector<vec3d> dri(ne);
 		for (int j = 0; j < ne; ++j)
 		{
-			std::vector<int>& id = Node(el.m_lnode[j]).m_ID;
+			FENode& node = Node(el.m_lnode[j]);
+			std::vector<int>& id = node.m_ID;
+			int eq[3] = { id[m_dofs[3]], id[m_dofs[4]], id[m_dofs[5]] };
 			vec3d d(0, 0, 0);
-			if (id[m_dofs[3]] >= 0) d.x = ui[id[m_dofs[3]]];
-			if (id[m_dofs[4]] >= 0) d.y = ui[id[m_dofs[4]]];
-			if (id[m_dofs[5]] >= 0) d.z = ui[id[m_dofs[5]]];
+			if (eq[0] >= 0) d.x = ui[eq[0]];
+			if (eq[1] >= 0) d.y = ui[eq[1]];
+			if (eq[2] >= 0) d.z = ui[eq[2]];
+
+			// for prescribed nodes, determine the rotation increment
+			if ((eq[0] < 0) && (eq[1] < 0) && (eq[2] < 0))
+			{
+				if (niter == 0)
+				{
+					vec3d Rp, Rt;
+					int n;
+					n = -eq[0] - 1; if (n >= 0) { Rt.x = node.get(m_dofs[3]); Rp.x = node.get_prev(m_dofs[3]); }
+					n = -eq[1] - 1; if (n >= 0) { Rt.y = node.get(m_dofs[4]); Rp.y = node.get_prev(m_dofs[4]); }
+					n = -eq[2] - 1; if (n >= 0) { Rt.z = node.get(m_dofs[5]); Rp.z = node.get_prev(m_dofs[5]); }
+					quatd Qp(Rp), Qt(Rt);
+					quatd dQ = Qp.Conjugate() * Qt;
+					d = dQ.GetRotationVector();
+				}
+			}
 
 			dri[j] = d;
 		}
