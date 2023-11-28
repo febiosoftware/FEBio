@@ -773,6 +773,24 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 		return true;
 	}
 
+	if (dynamic_cast<FEElasticBeamDomain*>(&dom))
+	{
+		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
+			const FEElasticBeamMaterialPoint& pt = *mp.ExtractData<FEElasticBeamMaterialPoint>();
+			mat3d Q = pt.m_Q;
+			vec3d E1 = Q.col(0);
+			vec3d E2 = Q.col(1);
+			vec3d E3 = Q.col(2);
+			quatd Rt = pt.m_Rt;
+			vec3d t1 = Rt * E1;
+			vec3d t2 = Rt * E2;
+			vec3d t3 = Rt * E3;
+			vec3d t = pt.m_t;
+			return (dyad(t1)*(t*t1) + dyad(t2)*(t*t2) + dyad(t3)*(t*t3));
+			});
+		return true;
+	}
+
 	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
 	if ((pme == 0) || pme->IsRigid()) return false;
 
