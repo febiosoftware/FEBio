@@ -52,6 +52,11 @@ private:
 	void WritePointData();
 	void WriteCellData();
 
+	void WriteScalarData(std::vector<float>& val, const char* szname);
+	void WriteVectorData(std::vector<float>& val, const char* szname);
+	void WriteMat3FSData(std::vector<float>& val, const char* szname);
+	void WriteMat3FDData(std::vector<float>& val, const char* szname);
+
 private:
 	FILE*	m_fp;
 	int		m_count;
