@@ -46,7 +46,7 @@ void FESolidModule::InitModel(FEModel* fem)
 	dofs.SetDOFName(varQR, 0, "Ru");
 	dofs.SetDOFName(varQR, 1, "Rv");
 	dofs.SetDOFName(varQR, 2, "Rw");
-	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
+	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY), VAR_VEC3);
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
 	dofs.SetDOFName(varV, 2, "vz");

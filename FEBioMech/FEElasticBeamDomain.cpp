@@ -46,7 +46,7 @@ FEElasticBeamDomain::FEElasticBeamDomain(FEModel* fem) : FEBeamDomain(fem), FEEl
 		m_dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
 
 		m_dofQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
-		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
 		m_dofW.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_VELOCITY));
 		m_dofA.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_ACCELERATION));
 	}

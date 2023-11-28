@@ -36,7 +36,7 @@ const char* FEBioMech::GetVariableName(FEBioMech::MECH_VARIABLE var)
 	case SHELL_ROTATION           : return "shell rotation"             ; break;
 	case RIGID_ROTATION           : return "rigid rotation"             ; break;
 	case SHELL_DISPLACEMENT       : return "shell displacement"         ; break;
-	case VELOCTIY                 : return "velocity"                   ; break;
+	case VELOCITY                 : return "velocity"                   ; break;
 	case SHELL_VELOCITY           : return "shell velocity"             ; break;
 	case SHELL_ACCELERATION       : return "shell acceleration"         ; break;
 	case BEAM_ANGULAR_VELOCITY    : return "vorticity"                  ; break;

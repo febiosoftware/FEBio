@@ -43,7 +43,7 @@ FELinearTrussDomain::FELinearTrussDomain(FEModel* pfem) : FETrussDomain(pfem), F
 	m_pMat = nullptr;
 	m_a0 = 0.0;
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
 }
 
 const FEDofList& FELinearTrussDomain::GetDOFList() const
