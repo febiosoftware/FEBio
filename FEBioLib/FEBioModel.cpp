@@ -652,11 +652,22 @@ void FEBioModel::WriteData(unsigned int nevent)
 	case CB_INIT: if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true; break;
 	case CB_MINOR_ITERS: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
 	case CB_MAJOR_ITERS:
-		if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
+	{
+		if (nout == FE_OUTPUT_MAJOR_ITRS)
+		{
+			bout = ((pstep->m_ntimesteps % pstep->m_noutput_stride) == 0);
+		}
 		if ((nout == FE_OUTPUT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
-		break;
+	}
+	break;
 	case CB_SOLVED:
 		if (nout == FE_OUTPUT_FINAL) bout = true;
+
+		// make sure that the final solve data is output
+		if (nout == FE_OUTPUT_MAJOR_ITRS)
+		{
+			bout = !((pstep->m_ntimesteps % pstep->m_noutput_stride) == 0);
+		}
 		break;
 	}
 
