@@ -381,6 +381,22 @@ protected:
 bool FEEdgeToSurfaceContact::Init()
 {
 	if (FESurfaceConstraint::Init() == false) return false;
+
+	for (int i = 0; i < m_edge.Elements(); ++i)
+	{
+		FELineElement& el = m_edge.Element(i);
+
+		vec3d r0[FEElement::MAX_NODES];
+		m_edge.GetReferenceNodalCoordinates(el, r0);
+
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			mp.m_r0 = el.Evaluate(r0, n);
+		}
+	}
+	
 	return true;
 }
 
@@ -411,7 +427,7 @@ void FEEdgeToSurfaceContact::Update()
 
 	// build the list of active elements
 	m_activeElements.resize(m_edge.Elements());
-#pragma omp parallel for shared(g) schedule(dynamic)
+//#pragma omp parallel for shared(g) schedule(dynamic)
 	for (int i = 0; i < m_edge.Elements(); ++i)
 	{
 		FELineElement& el1 = m_edge.Element(i);
