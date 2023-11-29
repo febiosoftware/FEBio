@@ -35,7 +35,7 @@
 #include <FECore/DumpStream.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEPolarFluid, FEFluidMaterial)
+BEGIN_FECORE_CLASS(FEPolarFluid, FEPolarFluidMaterial)
 // material properties
     ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE);
     ADD_PARAMETER(m_kg   , FE_RANGE_GREATER_OR_EQUAL(0.0), "kg");
@@ -50,7 +50,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FEFluidFSI constructor
 
-FEPolarFluid::FEPolarFluid(FEModel* pfem) : FEFluidMaterial(pfem)
+FEPolarFluid::FEPolarFluid(FEModel* pfem) : FEPolarFluidMaterial(pfem)
 {
     m_kg = 0;
     m_k = 0;
@@ -88,6 +88,15 @@ bool FEPolarFluid::Init()
         pLNL->m_rhor = m_rhor;
     }
     return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPolarFluid::Serialize(DumpStream& ar)
+{
+    FEPolarFluidMaterial::Serialize(ar);
+    if (ar.IsShallow()) return;
+    
+    ar & m_Tr;
 }
 
 //-----------------------------------------------------------------------------
@@ -172,18 +181,9 @@ double FEPolarFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! invert pressure-dilatation relation
-bool FEPolarFluid::Dilatation(const double T, const double p, const double c, double& e)
+bool FEPolarFluid::Dilatation(const double T, const double p, double& e)
 {
-    //    e = 1/(1+p/m_k)-1;
     e = -p/m_k;
-    
-    // for solute cases, assume that p = actual pressure and c = Phi*R*c_effective
-    if (c != 0)
-    {
-        //        e = 1/(1+(p-T*c)/m_k)-1;
-        e = -(p-T*c)/m_k;
-    }
-    
     return true;
 }
 

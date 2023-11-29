@@ -30,11 +30,13 @@ SOFTWARE.*/
 #include "FENewtonianFluid.h"
 #include "FEFluid.h"
 #include "FEBiphasicFSI.h"
+#include "FEThermoFluid.h"
+#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianFluid, FEViscousFluid)
-    ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits("P.t")->setLongName("bulk viscosity");
-    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits("P.t")->setLongName("shear viscosity");
+    ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits(UNIT_VISCOSITY)->setLongName("bulk viscosity");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("shear viscosity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -46,6 +48,22 @@ FENewtonianFluid::FENewtonianFluid(FEModel* pfem) : FEViscousFluid(pfem)
 }
 
 //-----------------------------------------------------------------------------
+//! initialization
+bool FENewtonianFluid::Init()
+{
+    return FEViscousFluid::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FENewtonianFluid::Serialize(DumpStream& ar)
+{
+    FEViscousFluid::Serialize(ar);
+    
+    if (ar.IsShallow()) return;
+    
+}
+
+//-----------------------------------------------------------------------------
 //! viscous stress
 mat3ds FENewtonianFluid::Stress(FEMaterialPoint& pt)
 {
@@ -53,7 +71,10 @@ mat3ds FENewtonianFluid::Stress(FEMaterialPoint& pt)
     
     mat3ds D = vt.RateOfDeformation();
     
-    mat3ds s = mat3dd(1.0)*(D.tr()*(m_kappa - 2.*m_mu/3.)) + D*(2*m_mu);
+    double mu = ShearViscosity(pt);
+    double kappa = BulkViscosity(pt);
+    
+    mat3ds s = mat3dd(1.0)*(D.tr()*(kappa - 2.*mu/3.)) + D*(2*mu);
         
     return s;
 }
@@ -70,9 +91,19 @@ mat3ds FENewtonianFluid::Tangent_Strain(FEMaterialPoint& mp)
 tens4ds FENewtonianFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
 {
     mat3dd I(1.0);
-    tens4ds c = dyad1s(I)*(m_kappa - 2.*m_mu/3.) + dyad4s(I)*(2*m_mu);
+    double mu = ShearViscosity(mp);
+    double kappa = BulkViscosity(mp);
+    
+    tens4ds c = dyad1s(I)*(kappa - 2.*mu/3.) + dyad4s(I)*(2*mu);
     
     return c;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of stress with respect to temperature T
+mat3ds FENewtonianFluid::Tangent_Temperature(FEMaterialPoint& mp)
+{
+    return mat3ds(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -83,7 +114,7 @@ double FENewtonianFluid::ShearViscosity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! bulke viscosity
+//! bulk viscosity
 double FENewtonianFluid::BulkViscosity(FEMaterialPoint& mp)
 {
     return m_kappa;

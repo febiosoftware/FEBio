@@ -130,6 +130,16 @@ void FESolutesDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
+void FESolutesDomain::Serialize(DumpStream& ar)
+{
+    FESolidDomain::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_pMat;
+    ar & m_dofC & m_dofAC;
+    ar & m_dof;
+}
+
+//-----------------------------------------------------------------------------
 void FESolutesDomain::Activate()
 {
 	const int nsol = m_pMat->Solutes();

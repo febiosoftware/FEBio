@@ -93,8 +93,8 @@ namespace febio {
 			// Find the root element
 			XMLTag tag;
 			if (xml.FindTag("febio_config", tag) == false) return false;
-
-			if (strcmp(tag.m_att[0].m_szatv, "3.0") == 0)
+			const char* szversion = tag.AttributeValue("version");
+			if (strcmp(szversion, "3.0") == 0)
 			{
 				if (!tag.isleaf())
 				{
@@ -126,6 +126,10 @@ namespace febio {
 						else if (tag == "print_model_params")
 						{
 							tag.value(config.m_printParams);
+						}
+						else if (tag == "show_warnings_and_errors")
+						{
+							tag.value(config.m_bshowErrors);
 						}
 						else
 						{

@@ -327,6 +327,9 @@ bool FEAnalysis::Activate()
             dom.Activate();
     }
 
+	// active the linear constraints
+	fem.GetLinearConstraintManager().Activate();
+
 	return true;
 }
 
@@ -340,7 +343,8 @@ void FEAnalysis::Deactivate()
 	for (size_t i=0; i<(int) m_MC.size(); ++i) m_MC[i]->Deactivate();
 
 	// clean up solver data (i.e. destroy linear solver)
-	GetFESolver()->Clean();
+	FESolver* solver = GetFESolver();
+	if (solver) solver->Clean();
 
 	// deactivate the time step
 	m_bactive = false;
@@ -610,7 +614,12 @@ int FEAnalysis::SolveTimeStep()
 		feLogError(e.what());
 		nerr = 2;
 	}
-	catch (NANDetected e)
+	catch (NANInResidualDetected e)
+	{
+		feLogError(e.what());
+		nerr = 1;	// don't abort, instead let's retry the step
+	}	
+	catch (NANInSolutionDetected e)
 	{
 		feLogError(e.what());
 		nerr = 1;	// don't abort, instead let's retry the step

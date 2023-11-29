@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/DumpStream.h>
 #include <FECore/log.h>
+#include <FECore/tools.h>
 #include <complex>
 using namespace std;
 
@@ -42,220 +43,13 @@ using namespace std;
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEFluidSolutes, FEMaterial)
 // material properties
-ADD_PARAMETER(m_penalty, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty"      );
-ADD_PARAMETER(m_diffMtmSupp , "dms");
+// ADD_PARAMETER(m_penalty, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty"      );
+ADD_PARAMETER(m_diffMtmSupp , "dms")->setLongName("include osmosis");
 ADD_PROPERTY(m_pFluid, "fluid");
 ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
 ADD_PROPERTY(m_pSolute, "solute"             , FEProperty::Optional);
 ADD_PROPERTY(m_pReact , "reaction"           , FEProperty::Optional);
 END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
-//! Polynomial root solver
-
-// function whose roots needs to be evaluated
-void fnFS(complex<double>& z, complex<double>& fz, vector<double> a)
-{
-    int n = (int)a.size()-1;
-    fz = a[0];
-    complex<double> x(1,0);
-    
-    for (int i=1; i<=n; ++i) {
-        x *= z;
-        fz += a[i]*x;
-    }
-    return;
-}
-
-// deflation
-bool dflateFS(complex<double> zero, const int i, int& kount,
-            complex<double>& fzero, complex<double>& fzrdfl,
-            complex<double>* zeros, vector<double> a)
-{
-    complex<double> den;
-    ++kount;
-    fnFS(zero, fzero, a);
-    fzrdfl = fzero;
-    if (i < 1) return false;
-    for (int j=0; j<i; ++j) {
-        den = zero - zeros[j];
-        if (abs(den) == 0) {
-            zeros[i] = zero*1.001;
-            return true;
-        } else {
-            fzrdfl = fzrdfl/den;
-        }
-    }
-    return false;
-}
-
-// Muller's method for solving roots of a function
-void mullerFS(bool fnreal, complex<double>* zeros, const int n, const int nprev,
-            const int maxit, const double ep1, const double ep2, vector<double> a)
-{
-    int kount;
-    complex<double> dvdf1p, fzrprv, fzrdfl, divdf1, divdf2;
-    complex<double> fzr, zero, c, den, sqr, z;
-    
-    // initialization
-    double eps1 = (ep1 > 1e-12) ? ep1:1e-12;
-    double eps2 = (ep2 > 1e-20) ? ep2:1e-20;
-    
-    for (int i=nprev; i<n; ++i) {
-        kount = 0;
-    eloop:
-        zero = zeros[i];
-        complex<double> h = 0.5;
-        complex<double> hprev = -1.0;
-        
-        // compute first three estimates for zero as
-        // zero+0.5, zero-0.5, zero
-        z = zero + 0.5;
-        if (dflateFS(z, i, kount, fzr, dvdf1p, zeros, a)) goto eloop;
-        z = zero - 0.5;
-        if (dflateFS(z, i, kount, fzr, fzrprv, zeros, a)) goto eloop;
-        dvdf1p = (fzrprv - dvdf1p)/hprev;
-        if (dflateFS(zero, i, kount, fzr, fzrdfl, zeros, a)) goto eloop;
-        do {
-            divdf1 = (fzrdfl - fzrprv)/h;
-            divdf2 = (divdf1 - dvdf1p)/(h+hprev);
-            hprev = h;
-            dvdf1p = divdf1;
-            c = divdf1 + h*divdf2;
-            sqr = c*c - 4.*fzrdfl*divdf2;
-            if (fnreal && (sqr.real() < 0)) sqr = 0;
-            sqr = sqrt(sqr);
-            if (c.real()*sqr.real()+c.imag()*sqr.imag() < 0) {
-                den = c - sqr;
-            } else {
-                den = c + sqr;
-            }
-            if (abs(den) <= 0.) den = 1.;
-            h = -2.*fzrdfl/den;
-            fzrprv = fzrdfl;
-            zero = zero + h;
-        dloop:
-            fnFS(zero,fzrdfl,a);
-            // check for convergence
-            if (abs(h) < eps1*abs(zero)) break;
-            if (abs(fzrdfl) < eps2) break;
-            // check for divergence
-            if (abs(fzrdfl) >= 10.*abs(fzrprv)) {
-                h /= 2.;
-                zero -= h;
-                goto dloop;
-            }
-        } while (kount < maxit);
-        zeros[i] = zero;
-    }
-    return;
-}
-
-// Newton's method for finding nearest root of a polynomial
-bool newtonFS(double& zero, const int n, const int maxit,
-            const double ep1, const double ep2, vector<double> a)
-{
-    bool done = false;
-    bool conv = false;
-    int it = 0;
-    double f, df, x, dx, xi;
-    x = zero;
-    
-    while (!done) {
-        // Evaluate function and its derivative
-        xi = x;
-        f = a[0] + a[1]*xi;
-        df = a[1];
-        for (int i=2; i<=n; ++i) {
-            df += i*a[i]*xi;
-            xi *= x;
-            f += a[i]*xi;
-        }
-        if (df == 0) break;
-        // check absolute convergence and don't update x if met
-        if (abs(f) < ep2) {
-            done = true;
-            conv = true;
-            zero = x;
-            break;
-        }
-        // evaluate increment in x
-        dx = -f/df;
-        x += dx;
-        ++it;
-        // check relative convergence
-        if (abs(dx) < ep1*abs(x)) {
-            done = true;
-            conv = true;
-            zero = x;
-        }
-        // check iteration count
-        else if (it > maxit) {
-            done = true;
-            zero = x;
-        }
-    }
-    return conv;
-}
-
-// linear
-bool poly1FS(vector<double> a, double& x)
-{
-    if (a[1]) {
-        x = -a[0]/a[1];
-        return true;
-    } else {
-        return false;
-    }
-}
-
-// quadratic
-bool poly2FS(vector<double> a, double& x)
-{
-    if (a[2]) {
-        x = (-a[1]+sqrt(SQR(a[1])-4*a[0]*a[2]))/(2*a[2]);
-        return true;
-    } else {
-        return poly1FS(a,x);
-    }
-}
-
-// higher order
-bool polynFS(int n, vector<double> a, double& x)
-{
-    //    bool fnreal = true;
-    //    vector< complex<double> > zeros(n,complex<double>(1,0));
-    int maxit = 100;
-    double ep1 = 1e-6;
-    double ep2 = 1e-12;
-    
-    /*    mullerFS(fnreal, &zeros[0], n, 0, maxit, ep1, ep2, a);
-     for (int i=0; i<n; ++i) {
-     if (zeros[i].real() > 0) {
-     x = zeros[i].real();
-     return true;
-     }
-     }*/
-    return newtonFS(x, n, maxit,ep1, ep2, a);
-}
-
-bool solvepolyFS(int n, vector<double> a, double& x)
-{
-    switch (n) {
-        case 1:
-            return poly1FS(a, x);
-            break;
-        case 2:
-            return poly2FS(a, x);
-        default:
-            if (a[n]) {
-                return polynFS(n, a, x);
-            } else {
-                return solvepolyFS(n-1, a, x);
-            }
-            break;
-    }
-}
 
 //============================================================================
 // FEFluidSolutesMaterialPoint
@@ -323,7 +117,7 @@ FEFluidSolutes::FEFluidSolutes(FEModel* pfem) : FEMaterial(pfem)
 {
     m_pFluid = 0;
     m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
-    m_diffMtmSupp = 1.0;
+    m_diffMtmSupp = false;
     m_penalty = 1;
     m_pOsmC = 0;
 }
@@ -392,7 +186,7 @@ void FEFluidSolutes::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Electric potential
-double FEFluidSolutes::ElectricPotential(FEMaterialPoint& pt, const bool eform)
+double FEFluidSolutes::ElectricPotential(const FEMaterialPoint& pt, const bool eform)
 {
     // check if solution is neutral
     if (m_ndeg == 0) {
@@ -403,16 +197,17 @@ double FEFluidSolutes::ElectricPotential(FEMaterialPoint& pt, const bool eform)
     int i, j;
     
     // if not neutral, solve electroneutrality polynomial for zeta
-    FEFluidSolutesMaterialPoint& set = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    const FEFluidSolutesMaterialPoint& set = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
     const int nsol = (int)m_pSolute.size();
     double cF = 0.0;
     
+    FEMaterialPoint mp = pt;
     vector<double> c(nsol);        // effective concentration
     vector<double> khat(nsol);    // solubility
     vector<int> z(nsol);        // charge number
     for (i=0; i<nsol; ++i) {
         c[i] = set.m_c[i];
-        khat[i] = m_pSolute[i]->m_pSolub->Solubility(pt);
+        khat[i] = m_pSolute[i]->m_pSolub->Solubility(mp);
         z[i] = m_pSolute[i]->ChargeNumber();
     }
     
@@ -436,7 +231,7 @@ double FEFluidSolutes::ElectricPotential(FEMaterialPoint& pt, const bool eform)
     // solve polynomial
     double psi = set.m_psi;        // use previous solution as initial guess
     double zeta = exp(-m_Fc*psi/m_Rgas/m_Tabs);
-    if (!solvepolyFS(n, a, zeta)) {
+    if (!solvepoly(n, a, zeta)) {
         zeta = 1.0;
     }
     
@@ -451,11 +246,11 @@ double FEFluidSolutes::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 
 //-----------------------------------------------------------------------------
 //! partition coefficient
-double FEFluidSolutes::PartitionCoefficient(FEMaterialPoint& pt, const int sol)
+double FEFluidSolutes::PartitionCoefficient(const FEMaterialPoint& pt, const int sol)
 {
-    
+    FEMaterialPoint mp = pt;
     // solubility
-    double khat = m_pSolute[sol]->m_pSolub->Solubility(pt);
+    double khat = m_pSolute[sol]->m_pSolub->Solubility(mp);
     // charge number
     int z = m_pSolute[sol]->ChargeNumber();
     // electric potential
@@ -469,7 +264,7 @@ double FEFluidSolutes::PartitionCoefficient(FEMaterialPoint& pt, const int sol)
 
 //-----------------------------------------------------------------------------
 //! partition coefficients and their derivatives
-void FEFluidSolutes::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
+void FEFluidSolutes::PartitionCoefficientFunctions(const FEMaterialPoint& mp, vector<double>& kappa,
                                                   vector<double>& dkdJ,
                                                   vector< vector<double> >& dkdc)
 {
@@ -477,8 +272,9 @@ void FEFluidSolutes::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<d
     
     int isol, jsol, ksol;
     
-    FEFluidMaterialPoint& fpt = *(mp.ExtractData<FEFluidMaterialPoint>());
-    FEFluidSolutesMaterialPoint& spt = *(mp.ExtractData<FEFluidSolutesMaterialPoint>());
+    const FEFluidMaterialPoint& fpt = *(mp.ExtractData<FEFluidMaterialPoint>());
+    const FEFluidSolutesMaterialPoint& spt = *(mp.ExtractData<FEFluidSolutesMaterialPoint>());
+    FEMaterialPoint pt = mp;
     
     const int nsol = (int)m_pSolute.size();
     
@@ -503,15 +299,15 @@ void FEFluidSolutes::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<d
         // get the charge number
         z[isol] = m_pSolute[isol]->ChargeNumber();
         // evaluate the solubility and its derivatives w.r.t. J and c
-        khat[isol] = m_pSolute[isol]->m_pSolub->Solubility(mp);
-        dkhdJ[isol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain(mp);
-        dkhdJJ[isol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Strain(mp);
+        khat[isol] = m_pSolute[isol]->m_pSolub->Solubility(pt);
+        dkhdJ[isol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain(pt);
+        dkhdJJ[isol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Strain(pt);
         for (jsol=0; jsol<nsol; ++jsol) {
-            dkhdc[isol][jsol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration(mp,jsol);
-            dkhdJc[isol][jsol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,jsol);
+            dkhdc[isol][jsol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration(pt,jsol);
+            dkhdJc[isol][jsol] = m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Concentration(pt,jsol);
             for (ksol=0; ksol<nsol; ++ksol) {
                 dkhdcc[isol][jsol][ksol] =
-                m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,jsol,ksol);
+                m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration_Concentration(pt,jsol,ksol);
             }
         }
         zz[isol] = pow(zeta, z[isol]);
@@ -585,7 +381,7 @@ void FEFluidSolutes::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<d
 
 //-----------------------------------------------------------------------------
 //! Current density
-vec3d FEFluidSolutes::CurrentDensity(FEMaterialPoint& pt)
+vec3d FEFluidSolutes::CurrentDensity(const FEMaterialPoint& pt)
 {
     int i;
     const int nsol = (int)m_pSolute.size();
@@ -605,9 +401,9 @@ vec3d FEFluidSolutes::CurrentDensity(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! actual concentration
-double FEFluidSolutes::ConcentrationActual(FEMaterialPoint& pt, const int sol)
+double FEFluidSolutes::ConcentrationActual(const FEMaterialPoint& pt, const int sol)
 {
-    FEFluidSolutesMaterialPoint& spt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    const FEFluidSolutesMaterialPoint& spt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
     
     // effective concentration
     double c = spt.m_c[sol];
@@ -622,12 +418,12 @@ double FEFluidSolutes::ConcentrationActual(FEMaterialPoint& pt, const int sol)
 
 //-----------------------------------------------------------------------------
 //! actual fluid pressure
-double FEFluidSolutes::PressureActual(FEMaterialPoint& pt)
+double FEFluidSolutes::PressureActual(const FEMaterialPoint& pt)
 {
     int i;
     
-    FEFluidMaterialPoint& fpt = *pt.ExtractData<FEFluidMaterialPoint>();
-    FEFluidSolutesMaterialPoint& spt = *(pt.ExtractData<FEFluidSolutesMaterialPoint>());
+    const FEFluidMaterialPoint& fpt = *pt.ExtractData<FEFluidMaterialPoint>();
+    const FEFluidSolutesMaterialPoint& spt = *(pt.ExtractData<FEFluidSolutesMaterialPoint>());
     const int nsol = (int)m_pSolute.size();
     
     // effective pressure
@@ -639,7 +435,8 @@ double FEFluidSolutes::PressureActual(FEMaterialPoint& pt)
         c[i] = ConcentrationActual(pt, i);
     
     // osmotic coefficient
-    double osmc = m_pOsmC->OsmoticCoefficient(pt);
+    FEMaterialPoint mp = pt;
+    double osmc = m_pOsmC->OsmoticCoefficient(mp);
     
     // actual pressure
     double pa = 0;
@@ -652,16 +449,17 @@ double FEFluidSolutes::PressureActual(FEMaterialPoint& pt)
 //-----------------------------------------------------------------------------
 //! Calculate solute molar flux
 
-vec3d FEFluidSolutes::SoluteFlux(FEMaterialPoint& pt, const int sol)
+vec3d FEFluidSolutes::SoluteFlux(const FEMaterialPoint& pt, const int sol)
 {
-    FEFluidSolutesMaterialPoint& spt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
-    FEFluidMaterialPoint& fpt = *pt.ExtractData<FEFluidMaterialPoint>();
+    const FEFluidSolutesMaterialPoint& spt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    const FEFluidMaterialPoint& fpt = *pt.ExtractData<FEFluidMaterialPoint>();
     
     // concentration gradient
     vec3d gradc = spt.m_gradc[sol];
     
     // solute free diffusivity
-    double D0 = m_pSolute[sol]->m_pDiff->Free_Diffusivity(pt);
+    FEMaterialPoint mp = pt;
+    double D0 = m_pSolute[sol]->m_pDiff->Free_Diffusivity(mp);
     double kappa = PartitionCoefficient(pt, sol);
     
     double c = spt.m_c[sol];
@@ -671,4 +469,61 @@ vec3d FEFluidSolutes::SoluteFlux(FEMaterialPoint& pt, const int sol)
     vec3d j = -gradc*D0*kappa + v*c*kappa;
     
     return j;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate diffusive solute molar flux
+
+vec3d FEFluidSolutes::SoluteDiffusiveFlux(const FEMaterialPoint& pt, const int sol)
+{
+    const FEFluidSolutesMaterialPoint& spt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
+    const FEFluidMaterialPoint& fpt = *pt.ExtractData<FEFluidMaterialPoint>();
+    
+    // concentration gradient
+    vec3d gradc = spt.m_gradc[sol];
+    
+    // solute free diffusivity
+    FEMaterialPoint mp = pt;
+    double D0 = m_pSolute[sol]->m_pDiff->Free_Diffusivity(mp);
+    double kappa = PartitionCoefficient(pt, sol);
+    
+    // diffusive solute flux j
+    vec3d jd = -gradc*D0*kappa;
+    
+    return jd;
+}
+
+//-----------------------------------------------------------------------------
+// solute interface functions
+
+double FEFluidSolutes::GetEffectiveSoluteConcentration(FEMaterialPoint& mp, int soluteIndex)
+{
+    FEFluidSolutesMaterialPoint& spt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    return spt.m_c[soluteIndex];
+}
+
+double FEFluidSolutes::GetFreeDiffusivity(FEMaterialPoint& mp, int soluteIndex)
+{
+    return m_pSolute[soluteIndex]->m_pDiff->Free_Diffusivity(mp);
+}
+
+double FEFluidSolutes::GetPartitionCoefficient(FEMaterialPoint& mp, int soluteIndex)
+{
+    FEFluidSolutesMaterialPoint& spt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    return spt.m_k[soluteIndex];
+}
+
+double FEFluidSolutes::GetOsmolarity(const FEMaterialPoint& mp)
+{
+    double osm = 0;
+    const FEFluidSolutesMaterialPoint& spt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    const int nsol = (int)m_pSolute.size();
+    for (int i=0; i<nsol; ++i) osm += spt.m_ca[i];
+    return osm;
+}
+
+double FEFluidSolutes::dkdc(const FEMaterialPoint& mp, int i, int j)
+{
+    const FEFluidSolutesMaterialPoint& spt = *mp.ExtractData<FEFluidSolutesMaterialPoint>();
+    return spt.m_dkdc[i][j];
 }

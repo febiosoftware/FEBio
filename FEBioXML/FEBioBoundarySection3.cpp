@@ -179,6 +179,20 @@ void FEBioBoundarySection3::ParseLinearConstraint(XMLTag& tag)
 		{
 			lc->SetParentDof(dofs.GetDOF(tag.szvalue()));
 		}
+		else if (tag == "offset")
+		{
+			double d = 0.0;
+			tag.value(d);
+			lc->SetOffset(d);
+
+			const char* szlc = tag.AttributeValue("lc", true);
+			if (szlc)
+			{
+				int l = atoi(szlc) - 1;
+				FEParam* pp = lc->FindParameter("offset"); assert(pp);
+				if (pp) fem.AttachLoadController(pp, l);
+			}
+		}
 		else if (tag == "child_dof")
 		{
 			FELinearConstraintDOF* dof = new FELinearConstraintDOF(&fem);

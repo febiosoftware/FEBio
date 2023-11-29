@@ -168,6 +168,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 				// if all rotation dofs are fixed or prescribed, set the flag
 				if (m_bAllowMixedBCs==false)
 				{
+					RB.m_bpofr = false;
 					if (RB.m_pDC[3] || RB.m_pDC[4] || RB.m_pDC[5])
 					{
 						bool bpofr[3] = { false };

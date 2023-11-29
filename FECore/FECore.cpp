@@ -121,9 +121,12 @@ REGISTER_FECORE_CLASS(FEAugLagLinearConstraintDOF, "node");
 
 // plot field
 REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");
+REGISTER_FECORE_CLASS(FEPlotPIDController, "pid controller");
+REGISTER_FECORE_CLASS(FEPlotMeshData, "mesh_data");
 
 // load curves
 REGISTER_FECORE_CLASS(FEPointFunction , "point");
+REGISTER_FECORE_CLASS(FEConstFunction, "const");
 REGISTER_FECORE_CLASS(FELinearFunction, "linear ramp");
 REGISTER_FECORE_CLASS(FEStepFunction  , "step");
 REGISTER_FECORE_CLASS(FEMathFunction  , "math");

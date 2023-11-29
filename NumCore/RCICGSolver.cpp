@@ -47,7 +47,7 @@ BEGIN_FECORE_CLASS(RCICGSolver, IterativeLinearSolver)
 	ADD_PARAMETER(m_tol, "tol");
 	ADD_PARAMETER(m_maxiter, "max_iter");
 	ADD_PARAMETER(m_fail_max_iters, "fail_max_iters");
-	ADD_PROPERTY(m_P, "pc_left");
+	ADD_PROPERTY(m_P, "pc_left")->SetFlags(FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -65,6 +65,7 @@ SparseMatrix* RCICGSolver::CreateSparseMatrix(Matrix_Type ntype)
 #ifdef MKL_ISS
 	if (ntype != REAL_SYMMETRIC) return 0;
 	m_pA = new CompactSymmMatrix(1);
+	if (m_P) m_P->SetSparseMatrix(m_pA);
 	return m_pA;
 #else
 	return 0;
@@ -81,7 +82,7 @@ bool RCICGSolver::SetSparseMatrix(SparseMatrix* A)
 //-----------------------------------------------------------------------------
 void RCICGSolver::SetLeftPreconditioner(LinearSolver* P)
 {
-	m_P = P;
+	m_P = dynamic_cast<Preconditioner*>(P);
 }
 
 //-----------------------------------------------------------------------------
@@ -106,7 +107,7 @@ bool RCICGSolver::PreProcess()
 bool RCICGSolver::Factor()
 {
 	if (m_pA == 0) return false;
-	return true;
+	return (m_P ? m_P->Factor() : true);
 }
 
 //-----------------------------------------------------------------------------

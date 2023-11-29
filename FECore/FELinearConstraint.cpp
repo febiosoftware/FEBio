@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEModel.h"
 #include "DumpStream.h"
+#include "log.h"
 
 BEGIN_FECORE_CLASS(FELinearConstraintDOF, FECoreClass)
 	ADD_PARAMETER(dof, "dof", 0, "$(dof_list)");
@@ -41,13 +42,14 @@ END_FECORE_CLASS();
 FELinearConstraintDOF::FELinearConstraintDOF(FEModel* fem) : FECoreClass(fem)
 {
 	node = dof = -1;
-	val = 0.0;
+	val = 1.0;
 }
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FELinearConstraint, FEBoundaryCondition)
 	ADD_PARAMETER(m_parentDof->dof, "dof", 0, "$(dof_list)");
 	ADD_PARAMETER(m_parentDof->node, "node");
+	ADD_PARAMETER(m_off, "offset");
 
 	ADD_PROPERTY(m_childDof, "child_dof");
 END_FECORE_CLASS();
@@ -210,11 +212,22 @@ void FELinearConstraint::AddChildDof(FELinearConstraintDOF* dof)
 bool FELinearConstraint::Init()
 {
 	if (m_parentDof == nullptr) return false;
+	if (m_parentDof->node < 0)
+	{
+		feLogError("Invalid node ID for parent node of linear constraint.");
+		return false;
+	}
+
 	int n = (int)m_childDof.size();
 	for (int i=0; i<n; ++i)
 	{
 		FELinearConstraintDOF& childNode = *m_childDof[i];
 		if ((childNode.node == m_parentDof->node) && (childNode.dof == m_parentDof->dof)) return false;
+		if (childNode.node < 0)
+		{
+			feLogError("Invalid node ID for child node  of linear constraint.");
+			return false;
+		}
 	}
 	return true;
 }

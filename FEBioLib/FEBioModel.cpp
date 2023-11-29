@@ -29,11 +29,15 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioModel.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "FEBioPlot/VTKPlotFile.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioXML/FERestartImport.h"
 #include <FECore/NodeDataRecord.h>
 #include <FECore/FaceDataRecord.h>
 #include <FECore/ElementDataRecord.h>
+#include <FECore/SurfaceDataRecord.h>
+#include <FECore/DomainDataRecord.h>
+#include <FECore/FEModelDataRecord.h>
 #include <FEBioMech/ObjectDataRecord.h>
 #include <FECore/NLConstraintDataRecord.h>
 #include <FEBioMech/FERigidConnector.h>
@@ -126,6 +130,8 @@ FEBioModel::FEBioModel()
 
 	m_lastUpdate = -1;
 
+	m_bshowErrors = true;
+
 	// Add the output callback
 	// We call this function always since we want to flush the logfile for each event.
 	AddCallback(handleCB, CB_ALWAYS, this);
@@ -137,6 +143,18 @@ FEBioModel::~FEBioModel()
 	// close the plot file
 	if (m_plot) { delete m_plot; m_plot = 0; }
 	m_log.close();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::ShowWarningsAndErrors(bool b)
+{
+	m_bshowErrors = b;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioModel::ShowWarningsAndErrors() const
+{
+	return m_bshowErrors;
 }
 
 //-----------------------------------------------------------------------------
@@ -395,6 +413,28 @@ void FEBioModel::Write(unsigned int nevent)
 	// get the current step
 	FEAnalysis* pstep = GetCurrentStep();
 
+	// echo fem data to the logfile
+	// we do this here (and not e.g. directly after input)
+	// since the data can be changed after input, which is the case,
+	// for instance, in the parameter optimization module
+	if ((nevent == CB_INIT) && m_becho)
+	{
+		Logfile::MODE old_mode = m_log.GetMode();
+
+		// don't output when no output is requested
+		if (old_mode != Logfile::LOG_NEVER)
+		{
+			// we only output this data to the log file and not the screen
+			m_log.SetMode(Logfile::LOG_FILE);
+
+			// write output
+			echo_input();
+
+			// reset log mode
+			m_log.SetMode(old_mode);
+		}
+	}
+
 	// update plot file
 	WritePlot(nevent);
 
@@ -609,6 +649,7 @@ void FEBioModel::WriteData(unsigned int nevent)
 	bool bout = false;
 	switch (nevent)
 	{
+	case CB_INIT: if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true; break;
 	case CB_MINOR_ITERS: if (nout == FE_OUTPUT_MINOR_ITRS) bout = true; break;
 	case CB_MAJOR_ITERS:
 		if (nout == FE_OUTPUT_MAJOR_ITRS) bout = true;
@@ -674,8 +715,8 @@ void FEBioModel::DumpData(int nevent)
 void FEBioModel::Log(int ntag, const char* szmsg)
 {
 	if      (ntag == 0) m_log.printf(szmsg);
-	else if (ntag == 1) m_log.printbox("WARNING", szmsg);
-	else if (ntag == 2) m_log.printbox("ERROR", szmsg);
+	else if ((ntag == 1) && m_bshowErrors) m_log.printbox("WARNING", szmsg);
+	else if ((ntag == 2) && m_bshowErrors) m_log.printbox("ERROR", szmsg);
 	else if (ntag == 3) m_log.printbox(nullptr, szmsg);
 	else if (ntag == 4)
 	{
@@ -867,9 +908,9 @@ void FEBioModel::UpdatePlotObjects()
 
 	FEModel& fem = *GetFEModel();
 
+	int nid = 1;
 	if (plt->PointObjects() == 0)
 	{
-		int nid = 1;
 		for (int i = 0; i < nrb; ++i)
 		{
 			FERigidBody* rb = GetRigidBody(i);
@@ -1067,8 +1108,6 @@ void FEBioModel::UpdatePlotObjects()
 
 	if (plt->LineObjects() == 0)
 	{
-		int nid = 1;
-
 		// check rigid connectors
 		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 		{
@@ -1079,7 +1118,7 @@ void FEBioModel::UpdatePlotObjects()
 				if (name.empty())
 				{
 					stringstream ss;
-					ss << "Object" << nid;
+					ss << "LineObject" << nid;
 					name = ss.str();
 				}
 
@@ -1141,6 +1180,7 @@ void FEBioModel::UpdatePlotObjects()
                     po->AddData("Reaction moment (GCS)", PLT_VEC3F, new FEPlotRigidConnectorMoment(this, rcf));
                 }
 			}
+			nid++;
 		}
 	}
 	else
@@ -1291,8 +1331,20 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 		if (m_plot) { delete m_plot; m_plot = 0; }
 
 		// create the plot file
-		FEBioPlotFile* pplt = new FEBioPlotFile(this);
-		m_plot = pplt;
+		FEPlotDataStore& data = GetPlotDataStore();
+		if (data.GetPlotFileType() == "febio")
+		{
+			FEBioPlotFile* xplt = new FEBioPlotFile(this);
+
+			// set the software string
+			const char* szver = febio::getVersionString();
+			char szbuf[256] = { 0 };
+			sprintf(szbuf, "FEBio %s", szver);
+			xplt->SetSoftwareString(szbuf);
+
+			m_plot = xplt;
+		}
+		else if (data.GetPlotFileType() == "vtk") m_plot = new VTKPlotFile(this);
 
 		if (m_pltAppendOnRestart)
 		{
@@ -1302,14 +1354,6 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 				printf("FATAL ERROR: Failed reopening plot database %s\n", m_splot.c_str());
 				throw "FATAL ERROR";
 			}
-		}
-		else
-		{
-			// set the software string
-			const char* szver = febio::getVersionString();
-			char szbuf[256] = { 0 };
-			sprintf(szbuf, "FEBio %s", szver);
-			pplt->SetSoftwareString(szbuf);
 		}
 
 		// data records
@@ -1353,11 +1397,14 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 			DataRecord* pd = 0;
 			switch(ntype)
 			{
-			case FE_DATA_NODE: pd = new NodeDataRecord        (this); break;
-			case FE_DATA_FACE: pd = new FaceDataRecord        (this); break;
-			case FE_DATA_ELEM: pd = new ElementDataRecord     (this); break;
-			case FE_DATA_RB  : pd = new ObjectDataRecord      (this); break;
-			case FE_DATA_NLC : pd = new NLConstraintDataRecord(this); break;
+			case FE_DATA_NODE   : pd = new NodeDataRecord        (this); break;
+			case FE_DATA_FACE   : pd = new FaceDataRecord        (this); break;
+			case FE_DATA_ELEM   : pd = new ElementDataRecord     (this); break;
+			case FE_DATA_RB     : pd = new ObjectDataRecord      (this); break;
+			case FE_DATA_NLC    : pd = new NLConstraintDataRecord(this); break;
+			case FE_DATA_SURFACE: pd = new FESurfaceDataRecord   (this); break;
+			case FE_DATA_DOMAIN : pd = new FEDomainDataRecord    (this); break;
+			case FE_DATA_MODEL  : pd = new FEModelDataRecord     (this); break;
 			}
 			assert(pd);
 			pd->Serialize(ar);
@@ -1374,26 +1421,49 @@ void FEBioModel::SerializeDataStore(DumpStream& ar)
 // Initialize plot file
 bool FEBioModel::InitPlotFile()
 {
-	FEBioPlotFile* pplt = new FEBioPlotFile(this);
-	m_plot = pplt;
+	FEPlotDataStore& data = GetPlotDataStore();
 
-	// set the software string
-	const char* szver = febio::getVersionString();
-	char szbuf[256] = { 0 };
-	sprintf(szbuf, "FEBio %s", szver);
-	pplt->SetSoftwareString(szbuf);
-	
-	// see if a valid plot file name is defined.
-	const std::string& splt = GetPlotFileName();
-	if (splt.empty())
+	if (data.GetPlotFileType() == "febio")
 	{
-		// if not, we take the input file name and set the extension to .xplt
-		char sz[1024] = { 0 };
-		strcpy(sz, GetInputFileName().c_str());
-		char* ch = strrchr(sz, '.');
-		if (ch) *ch = 0;
-		strcat(sz, ".xplt");
-		SetPlotFilename(sz);
+		FEBioPlotFile* xplt = new FEBioPlotFile(this);
+		// set the software string
+		const char* szver = febio::getVersionString();
+		char szbuf[256] = { 0 };
+		sprintf(szbuf, "FEBio %s", szver);
+		xplt->SetSoftwareString(szbuf);
+
+		m_plot = xplt;
+
+		// see if a valid plot file name is defined.
+		const std::string& splt = GetPlotFileName();
+		if (splt.empty())
+		{
+			// if not, we take the input file name and set the extension to .xplt
+			char sz[1024] = { 0 };
+			strcpy(sz, GetInputFileName().c_str());
+			char* ch = strrchr(sz, '.');
+			if (ch) *ch = 0;
+			strcat(sz, ".xplt");
+			SetPlotFilename(sz);
+		}
+	}
+	else if (data.GetPlotFileType() == "vtk")
+	{
+		VTKPlotFile* vtk = new VTKPlotFile(this);
+		m_plot = vtk;
+
+		// see if a valid plot file name is defined.
+		const std::string& splt = GetPlotFileName();
+		if (splt.empty())
+		{
+			// if not, we take the input file name and set the extension to .vtk
+			char sz[1024] = { 0 };
+			strcpy(sz, GetInputFileName().c_str());
+			char* ch = strrchr(sz, '.');
+			if (ch) *ch = 0;
+			strcat(sz, ".vtk");
+			SetPlotFilename(sz);
+		}
 	}
 
 	return true;
@@ -1424,21 +1494,14 @@ bool FEBioModel::Init()
 		if (m_plot == 0) InitPlotFile();
 	}
 
-	// initialize model data
-	if (FEMechModel::Init() == false) 
-	{
-		feLogError("Model initialization failed");
-		return false;
-	}
-
 	// see if a valid dump file name is defined.
 	const std::string& sdmp = GetDumpFileName();
-	if (sdmp.empty() == 0)
+	if (sdmp.empty())
 	{
 		// if not, we take the input file name and set the extension to .dmp
-		char sz[1024] = {0};
+		char sz[1024] = { 0 };
 		strcpy(sz, GetInputFileName().c_str());
-		char *ch = strrchr(sz, '.');
+		char* ch = strrchr(sz, '.');
 		if (ch) *ch = 0;
 		strcat(sz, ".dmp");
 		SetDumpFilename(sz);
@@ -1446,31 +1509,16 @@ bool FEBioModel::Init()
 
 	// initialize data records
 	DataStore& dataStore = GetDataStore();
-	for (int i=0; i<dataStore.Size(); ++i)
+	for (int i = 0; i < dataStore.Size(); ++i)
 	{
 		if (dataStore.GetDataRecord(i)->Initialize() == false) return false;
 	}
 
-	// echo fem data to the logfile
-	// we do this here (and not e.g. directly after input)
-	// since the data can be changed after input, which is the case,
-	// for instance, in the parameter optimization module
-	if (m_becho) 
+	// initialize model data
+	if (FEMechModel::Init() == false) 
 	{
-		Logfile::MODE old_mode = m_log.GetMode();
-
-		// don't output when no output is requested
-		if (old_mode != Logfile::LOG_NEVER)
-		{
-			// we only output this data to the log file and not the screen
-			m_log.SetMode(Logfile::LOG_FILE);
-
-			// write output
-			echo_input();
-
-			// reset log mode
-			m_log.SetMode(old_mode);
-		}
+		feLogError("Model initialization failed");
+		return false;
 	}
 
 	// Alright, all initialization is done, so let's get busy !
@@ -1545,7 +1593,9 @@ bool FEBioModel::Reset()
 		int hint = step->GetPlotHint();
 		if (m_plot == 0) 
 		{
-			m_plot = new FEBioPlotFile(this);
+			FEPlotDataStore& data = GetPlotDataStore();
+			if      (data.GetPlotFileType() == "febio") m_plot = new FEBioPlotFile(this);
+			else if (data.GetPlotFileType() == "vtk"  ) m_plot = new VTKPlotFile(this);
 			hint = 0;
 		}
 

@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FECore/FEMesh.h"
 #include "FECore/log.h"
 #include "FEContactInterface.h"
+#include "FESSIShellDomain.h"
 #include "FEUncoupledMaterial.h"
 #include "FEResidualVector.h"
 #include "FEElasticDomain.h"
@@ -45,12 +46,13 @@ SOFTWARE.*/
 #include <FECore/FEModelLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FELinearConstraintManager.h>
-#include <FECore/FENLConstraint.h>
 #include "FEBodyForce.h"
 #include "FECore/sys.h"
+#include "FECore/vector.h"
 #include "FEMechModel.h"
 #include "FEBioMech.h"
 #include "FESolidAnalysis.h"
+#include <FECore/FENLConstraint.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -65,6 +67,7 @@ BEGIN_FECORE_CLASS(FECGSolidSolver, FESolver)
 	ADD_PARAMETER(m_LSmin , "lsmin");
 	ADD_PARAMETER(m_LSiter, "lsiter");
 	ADD_PARAMETER(m_CGmethod, "cgmethod");
+	ADD_PARAMETER(m_precon, "preconditioner");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -85,6 +88,7 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 	m_nreq = 0;
 
 	m_CGmethod = 0; // 0 = Hager-Zhang, 1 = steepest descent
+	m_precon = 0; // 0 = no preconditioner, 1 = diagonal stiffness
 
 	// default Newmark parameters for unconditionally stable time integration
 	m_beta = 0.25;
@@ -104,7 +108,7 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 	dofs.SetDOFName(varQR, 0, "Ru");
 	dofs.SetDOFName(varQR, 1, "Rv");
 	dofs.SetDOFName(varQR, 2, "Rw");
-	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY), VAR_VEC3);
+	int varV = dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY), VAR_VEC3);
 	dofs.SetDOFName(varV, 0, "vx");
 	dofs.SetDOFName(varV, 1, "vy");
 	dofs.SetDOFName(varV, 2, "vz");
@@ -123,20 +127,120 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 
 	// get the DOF indices
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
 	m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
 	m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 	m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 	m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
 	m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
-
-	}
-
+	
+}
 
 //-----------------------------------------------------------------------------
 void FECGSolidSolver::Clean()
 {
 
+}
+
+//-----------------------------------------------------------------------------
+bool FECGSolidSolver::CalculatePreconditioner()
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	vector<double> dummy(m_Mi);
+	FEGlobalVector Mi(fem, m_Mi, dummy);
+	matrix me;
+	vector <int> lm;
+
+	FETimeInfo& tp = fem.GetTime();
+	matrix ke;
+	vector <double> el_diagonal_stiffness;
+
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	{
+		// check whether it is a solid domain
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		if (pbd)  // it is an elastic solid domain
+		{
+			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial());
+
+			// loop over all the elements
+			for (int iel = 0; iel < pbd->Elements(); ++iel)
+			{
+				FESolidElement& el = pbd->Element(iel);
+				pbd->UnpackLM(el, lm);
+
+				//int nint = el.GaussPoints();
+				long int neln = el.Nodes();
+
+				// set up, zero and calculate the element stiffness matrix
+				ke.resize(neln * 3, neln * 3);
+				ke.zero();
+				pbd->ElementStiffness(tp, iel, ke);
+
+				// set up the diagonal stiffness vector and copy in the diagonal values from ke
+				el_diagonal_stiffness.assign(3 * neln, 0.0);
+				for (int i = 0; i < neln * 3; ++i)
+				{
+					el_diagonal_stiffness[i] = ke[i][i];
+				}
+
+				// assemble element stiffness vector into the global stiffness vector 
+				Mi.Assemble(el.m_node, lm, el_diagonal_stiffness);
+
+			} // loop over elements
+		}
+		else if (dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd)))
+		{
+			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(psd->GetMaterial());
+			// loop over all the elements
+			for (int iel = 0; iel < psd->Elements(); ++iel)
+			{
+				FEShellElement& el = psd->Element(iel);
+				psd->UnpackLM(el, lm);
+
+				// create the element's stiffness matrix
+				FEElementMatrix ke(el);
+				int neln = el.Nodes();
+				int ndof = 6 * el.Nodes();
+				ke.resize(ndof, ndof);
+				ke.zero();
+
+				// calculate element stiffness matrix
+				psd->ElementStiffness(iel, ke);
+
+				// pick out the diagonal stiffness values
+				el_diagonal_stiffness.assign(ndof, 0.0);
+				for (int i = 0; i < ndof; ++i)
+				{
+					el_diagonal_stiffness[i] = ke[i][i];
+				}
+
+				// assemble element matrix into inv_mass vector 
+				Mi.Assemble(el.m_node, lm, el_diagonal_stiffness);
+			}
+		}
+		else
+		{
+			// TODO: we can only do solid domains right now.
+			return false;
+		}
+	}
+
+	// we need the inverse of the nodal stiffnesses later
+	// Also, make sure everything is positive.
+	for (int i = 0; i < m_Mi.size(); ++i)
+	{
+		if (m_Mi[i] < 0.0)
+		{
+			return false;
+		}
+		if (m_Mi[i] != 0.0) m_Mi[i] = 1.0 / m_Mi[i]; // note prescribed dofs will have zero mass so we need to skip them
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -165,6 +269,7 @@ bool FECGSolidSolver::Init()
 	m_Ut.assign(neq, 0);
 	m_R0.assign(neq, 0);
 	m_R1.assign(neq, 0);
+	m_Mi.assign(neq, 0.0);
 
 	// we need to fill the total displacement vector m_Ut
 	FEModel& fem = *GetFEModel();
@@ -178,6 +283,16 @@ bool FECGSolidSolver::Init()
 	gather(m_Ut, mesh, m_dofSU[0]);
 	gather(m_Ut, mesh, m_dofSU[1]);
 	gather(m_Ut, mesh, m_dofSU[2]);
+
+	// calculate the inverse mass vector to use as a preconditioner
+	if (m_precon == 1)
+	{
+		if (CalculatePreconditioner() == false)
+		{
+			feLogError("Failed building preconditioner.");
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -300,13 +415,23 @@ void FECGSolidSolver::PrepStep()
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
 	FEMesh& mesh = fem.GetMesh();
-	for (int i = 0; i<mesh.Nodes(); ++i)
-	{
-		FENode& ni = mesh.Node(i);
-		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
-		ni.m_ap = ni.m_at;
-	}
+	//for (int i = 0; i<mesh.Nodes(); ++i)
+	//{
+	//	FENode& ni = mesh.Node(i);
+	//	ni.m_rp = ni.m_rt;
+	//	ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+	//	ni.m_ap = ni.m_at;
+	//}
+
+	// apply concentrated nodal forces
+	// since these forces do not depend on the geometry
+	// we can do this once outside the NR loop.
+	vector<double> dummy(m_neq, 0.0);
+	zero(m_Fn);
+	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
+
+	// TODO: This function does not exist
+//	NodalLoads(Fn, tp);
 
 	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
@@ -414,12 +539,35 @@ void FECGSolidSolver::PrepStep()
 	}
 
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	// check this is not a dynamic analysis
 	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
 		feLogError("The CG-Solid solver cannot be used for dynamic analysis");
 		throw FatalError();
 	}
+
+	//{
+	//	FEMesh& mesh = fem.GetMesh();
+
+	//	// set the initial velocities of all rigid nodes
+	//	for (int i = 0; i<mesh.Nodes(); ++i)
+	//	{
+	//		FENode& n = mesh.Node(i);
+	//		if (n.m_rid >= 0)
+	//		{
+	//			FERigidBody& rb = *fem.GetRigidBody(n.m_rid);
+	//			vec3d V = rb.m_vt;
+	//			vec3d W = rb.m_wt;
+	//			vec3d r = n.m_rt - rb.m_rt;
+
+	//			vec3d v = V + (W ^ r);
+	//			n.m_vp = v;
+	//			n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], v);
+
+	//			vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
+	//			n.m_ap = n.m_at = a;
+	//		}
+	//	}
+	//}
 
 	// store the current rigid body reaction forces
 	for (int i = 0; i<fem.RigidBodies(); ++i)
@@ -440,7 +588,7 @@ void FECGSolidSolver::PrepStep()
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-		if (ci.IsActive() && (ci.m_laugon != 1)) m_baugment = true;
+		if (ci.IsActive() && (ci.m_laugon == 1)) m_baugment = true;
 	}
 
 	// see if we need to do incompressible augmentations
@@ -485,6 +633,8 @@ bool FECGSolidSolver::SolveStep()
 	// initialize flags
 	bool breform = false;	// reformation flag
 	bool sdstep = true; // set to true on a steepest descent iteration - if this fails we will give up
+	int cgits = 0; // count CG iterations to trigger periodic restart
+	int maxits = 100; // how many to do before restarting
 
 	// Get the current step
 	FEModel& fem = *GetFEModel();
@@ -498,6 +648,7 @@ bool FECGSolidSolver::SolveStep()
 	// before we have moved any of the flexible nodes
 	// We also calculate the initial residual
 	// TODO: I think some of this update is duplicated in PrepStep and could just be done here
+	//if (Residual(m_R0) == false) return false;
 	try
 	{
 		Update(m_ui); // m_ui contains the prescribed displacements calculated in PrepStep
@@ -505,13 +656,15 @@ bool FECGSolidSolver::SolveStep()
 	}
 	catch (...) // negative Jacobian if prescribed disps are too big
 	{
-		feLogError("Time step too big, prescribed displacements caused negative Jacobian");
-		return false;
+			feLogError("Time step too big, prescribed displacements caused negative Jacobian");
+			return false;
 	}
 
 	// set the initial step length estimates to 1.0e-6
-	double s = 1e-6, olds = 1e-6, oldolds = 1e-6;  // line search step lengths from the current iteration and the two previous ones
-
+	double s = 1e-6;
+	double olds = 1e-6;
+	double oldolds = 1e-6;  // line search step lengths from the current iteration and the two previous ones
+	
 	// loop until converged or when max nr of reformations reached
 	bool bconv = false;		// convergence flag
 	do
@@ -520,57 +673,106 @@ bool FECGSolidSolver::SolveStep()
 
 		// assume we'll converge. 
 		bconv = true;
-		if ((m_niter > 0) && (breform == false) && (m_CGmethod == 0))  // no need to restart CG
-		{
+		if ((m_niter>0)&&(breform==false)&&(m_CGmethod == 0))  // no need to restart CG
+		{ 
 			// calculate Hager- Zhang direction
         	double moddU=sqrt(u0*u0);  // needed later for the step length calculation
 
-				// calculate yk
+			// calculate yk
 			vector<double> RR(m_neq);
-			RR = m_R0 - Rold;
+			RR=m_R0-Rold;
+
 			// calculate dk.yk
-			double bdiv = u0 * RR;
+			double bdiv=u0*RR;
 			double betapcg;
-			if (bdiv == 0.0) // use steepest descent method if necessary
+			if (bdiv==0.0) // use steepest descent method if necessary
 			{
-				betapcg = 0.0;
+				betapcg=0.0;
 				sdstep = true;
 			}
 			else {
 				double RR2 = RR * RR;	// yk^2
 				// use m_ui as a temporary vector
-				for (i = 0; i < m_neq; ++i) {
-					m_ui[i] = RR[i] - 2.0 * u0[i] * RR2 / bdiv;	// yk-2*dk*yk^2/(dk.yk)
+				if (m_precon == 1)
+				{
+					for (i = 0; i < m_neq; ++i) {
+						// improved formula from L-CG DESCENT (*2 removed):
+						m_ui[i] = m_Mi[i] * (RR[i] - u0[i] * RR2 / bdiv);	// yk-2*dk*yk^2/(dk.yk)
+					}
+				}
+				else
+				{
+					for (i = 0; i < m_neq; ++i) {
+						// formula from CG DESCENT (without *2 removed):
+						m_ui[i] = RR[i] - 2.0 * u0[i] * RR2 / bdiv;	// yk-2*dk*yk^2/(dk.yk)
+					}
 				}
 				betapcg = m_ui * m_R0;	// m_ui*gk+1
 				betapcg = -betapcg / bdiv;
-				double modR = sqrt(m_R0 * m_R0);
-				double etak = -1.0 / (moddU * min(0.01, modR));
-				betapcg = max(etak, betapcg);
-				// try Fletcher - Reeves instead
-				// betapcg=(m_R0*m_R0)/(m_Rold*m_Rold);
-				// betapcg=0.0;
+				if (m_precon == 1)
+				{
+					// improved truncation from L-CG DESCENT:
+					double dPd = 0.0;
+					for (i = 0; i < m_neq; ++i) {
+						if (m_Mi[i] != 0) {  // m_Mi=0 for prescribed displacements, so skip those dofs
+							dPd += u0[i] * u0[i] / m_Mi[i];
+						}
+					}
+					double etak = 0.4 * (u0 * Rold) / dPd;
+					betapcg = max(etak, betapcg);
+					if (ISNAN(betapcg)) throw; // NANDetected(); TODO: update this error
+
+				}
+				else
+				{
+					// Original H-Z truncation formula
+					double modR = sqrt(m_R0 * m_R0);
+					double etak = -1.0 / (moddU * min(0.01, modR));
+					betapcg = max(etak, betapcg);
+				}
+
+
+
 				sdstep = false;
 			}
-			for (i=0; i<m_neq; ++i)  // calculate new search direction m_ui
+
+			if (m_precon == 1) // use LMM preconditioner
 			{
-				m_ui[i] = m_R0[i] + betapcg * u0[i];
+				for (i = 0; i < m_neq; ++i)  // calculate new search direction m_ui
+				{
+					m_ui[i] = m_Mi[i] * m_R0[i] + betapcg * u0[i];
+				}
+			}
+			else
+			{
+				for (i = 0; i < m_neq; ++i)  // calculate new search direction m_ui
+				{
+					m_ui[i] = m_R0[i] + betapcg * u0[i];
+				}
 			}
 		}
 		else 
 		{
 			// use steepest descent for first iteration or when a restart is needed
-            m_ui=m_R0;
+			if (m_precon == 1) // use LMM preconditioner
+			{
+				for (i = 0; i < m_neq; ++i)  // calculate new search direction m_ui
+				{
+					m_ui[i] = m_Mi[i] * m_R0[i];
+				}
+			}
+			else m_ui = m_R0;
+
 			breform=false;
 			if (m_niter > 0) m_nref += 1;
 			sdstep = true;
-		}
+       	}
 		Rold=m_R0;		// store residual for use next time
 		u0=m_ui;		// store direction for use on the next iteration
 
 		// check for nans
 		double du = m_ui*m_ui;
-		if (ISNAN(du)) throw NANDetected();
+		if (ISNAN(du)) throw NANInSolutionDetected();
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
@@ -588,19 +790,19 @@ bool FECGSolidSolver::SolveStep()
 		else { // the line search has failed and we need to restart
 			breform = true;
 			feLogWarning("Line search failed. Restarting conjugate gradient algorithm");
-			oldolds = 1e-6; // reset the stored step lengths for future iterations
+			oldolds = 1e-6;
 			olds = 1e-6;
 		}
 		// set initial convergence norms if on the first iteration
 		if (m_niter == 0)
 		{
 			normRi = fabs(m_R0 * m_R0);
-			normEi = fabs(m_ui * m_R0) * s;
-			normUi = fabs(m_ui * m_ui) * s * s;
+			normEi = fabs(m_ui * m_R0)*s;
+			normUi = fabs(m_ui * m_ui)*s*s;
 			normEm = normEi;
 		}
 
-		// calculate norms
+		// calculate norms (using actual step from line search=s*m_ui)
 		normR1 = m_R1*m_R1;
 		normu  = (m_ui*m_ui)*(s*s);
 		normU  = m_Ui*m_Ui;
@@ -624,8 +826,8 @@ bool FECGSolidSolver::SolveStep()
 		// print convergence summary
 		feLog(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		feLog("\tright hand side evaluations   = %d\n", m_nrhs);
-		feLog("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_LStol > 0) feLog("\tstep from line search         = %lf\n", s);
+		feLog("\tconjugate gradient restarts = %d\n", m_nref);
+		if (m_LStol > 0) feLog("\tstep from line search         = %15le\n", s);
 		feLog("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
 		feLog("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		feLog("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
@@ -641,7 +843,6 @@ bool FECGSolidSolver::SolveStep()
 		}
 
 		// check if we have converged. 
-		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
 			if (fabs(s) < m_LSmin)
@@ -657,6 +858,7 @@ bool FECGSolidSolver::SolveStep()
 			else if (normE1 > 1000*normEm) // less strict divergence check than for BFGS
 				// as norms tend to increase at first as deformation propagates
 			{
+				// check for diverging
 				feLogWarning("Solution is diverging. Restarting conjugate gradient algorithm");
 				normEm = normE1;
 				normEi = normE1;
@@ -667,21 +869,24 @@ bool FECGSolidSolver::SolveStep()
 			}
 
 			// zero displacement increments
-			// we must set this to zero before the reformation
+			// we must set this to zero before the next iteration
 			// because we assume that the prescribed displacements are stored 
 			// in the m_ui vector.
-			// TODO: is this correct? I think we calculate a new m_ui
 			zero(m_ui);
 
 			// copy last calculated residual
 			m_R0 = m_R1;
+			//Rold = m_R1;		// store residual for use next time
 		}
 		else if (m_baugment)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
+
 			feLog("\n........................ augmentation # %d\n", m_naug+1);
+
 			// do the augmentations
 			bconv = Augment();
+
 			// update counter
 			++m_naug;
 
@@ -706,7 +911,7 @@ bool FECGSolidSolver::SolveStep()
 		// do minor iterations callbacks
 		fem.DoCallback(CB_MINOR_ITERS);
 	}
-	while ((bconv == false) && ((s != -1) || (sdstep == false))); // give up if a steepest descent iteration fails
+	while ((bconv == false)&&((s!=-1)||(sdstep==false))); // give up if a steepest descent iteration fails
 
 	// if converged we update the total displacements
 	if (bconv)
@@ -797,22 +1002,23 @@ double FECGSolidSolver::LineSearchCG(double s)
 	double coeffs[3];
 	double temp, term;
 
+
 	// max nr of line search iterations
 	int nmax = m_LSiter;
 	int n = 0;
-	int i, j, k;
+	int i, j,k;
 
 	// initial energy
-	FA = m_ui * m_R0;
+	FA = m_ui*m_R0;
 	AA = 0.0;
 	r0 = FA;
 	F[0] = FA;
 	A[0] = 0.0;
-
+	
 	double rmin = fabs(FA);
 
 	vector<double> ul(m_ui.size());  // temporary vector for trial displacements
-
+	
 	// so we can set AA = 0 and FA= r0
 	// AB=s and we need to evaluate FB (called r1)
 	// n is a count of the number of linesearch attempts
@@ -830,16 +1036,16 @@ double FECGSolidSolver::LineSearchCG(double s)
 				}
 		catch (...) // negative Jacobian if s is much too big
 		{
-			//feLog("reducing s at initial evaluation");
-			//feLog("\tstep from line search         = %15le\n", s); 
-			failed = true;
-			if (s > 10 * m_LSmin) s = 0.1 * s; // make s smaller and try again until we don't get a -ve J
-			else {
-				feLogError("Direction invalid, line search failed");
-				s = -1;
-				failed = false;
-			}
-
+						//feLog("reducing s at initial evaluation");
+						//feLog("\tstep from line search         = %15le\n", s); 
+						failed = true;
+						if (s > 10 * m_LSmin) s = 0.1 * s; // make s smaller and try again until we don't get a -ve J
+						else {
+							feLogError("Direction invalid, line search failed");
+							s= -1;
+							failed = false;
+						}
+						
 		}
 	} while (failed == true);
 
@@ -850,7 +1056,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 		F[1] = FB;
 		A[1] = AB;
 
-		if (fabs(FB) < rmin) {
+		if (fabs(FB) < rmin) { // remember best values in case we need them later
 			rmin = FB;
 			smin = s;
 		}
@@ -866,7 +1072,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 			{
 				if (n < 4) { // use linear fitting algorithm
 					if (fabs(FB - FA) < fabs(FB * 0.01)) { // if FB=FA (or nearly) the next step won't work, so make s bigger
-						if (AB != 0) s = max(AA,AB) * 200; // try a much bigger value than the biggest previous one
+						if (AB != 0) s = max(AA, AB) * 200; // try a much bigger value
 						else if (AA != 0) s = AA * 200;
 						else s = 1e-6; // should never happen!
 					}
@@ -927,7 +1133,7 @@ double FECGSolidSolver::LineSearchCG(double s)
 						}
 						coeffs[i] = coeffs[i] / B[i][i];
 					}
-					s = -coeffs[1] * 0.5 / coeffs[2]; // quadratic estimate
+					s = -coeffs[1]*0.5/coeffs[2]; // quadratic estimate
 					//feLog("\tQuadratic curve fit coeffs s %15le %15le %15le %15le\n", coeffs[0], coeffs[1], coeffs[2], s);
 				}
 				if (s == 0) { // check just in case
@@ -1001,16 +1207,15 @@ double FECGSolidSolver::LineSearchCG(double s)
 				F[n + 2] = FC;
 				A[n + 2] = s;
 				++n;
-				 feLog("\tF %15le %15le %15le %15le %15le\n", F[0], F[1], F[2], F[3], F[4]);
-				 feLog("\tA %15le %15le %15le %15le %15le\n", A[0], A[1], A[2], A[3], A[4]);
-				 if (n > 3) {
+				feLog("\tF %15le %15le %15le %15le %15le\n", F[0], F[1], F[2], F[3], F[4]);
+				feLog("\tA %15le %15le %15le %15le %15le\n", A[0], A[1], A[2], A[3], A[4]);
+				if (n > 3) {
 					feLog("\tF %15le %15le %15le %15le %15le\n", F[5], F[6], F[7], F[8], F[9]);
 					feLog("\tA %15le %15le %15le %15le %15le\n", A[5], A[6], A[7], A[8], A[9]);
-					}
+				}
 			}
 		} while ((((r > m_LStol) && (n <= 5)) || ((r >= 1) && (n > 3))) && (n < nmax));
 		// try to find a better solution within m_LStol, but if we haven't after five tries, accept any improvement
-
 
 		if (n >= nmax)
 		{
@@ -1030,18 +1235,25 @@ double FECGSolidSolver::LineSearchCG(double s)
 bool FECGSolidSolver::Residual(vector<double>& R)
 {
 	// get the time information
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	const FETimeInfo& tp = fem.GetTime();
 
-		// zero nodal reaction forces
+	// initialize residual with concentrated nodal loads
+	R = m_Fn;
+
+	// zero nodal reaction forces
 	zero(m_Fr);
 
 	// setup the global vector
-	zero(R);
 	FEResidualVector RHS(fem, R, m_Fr);
 
 	// zero rigid body reaction forces
-	m_rigidSolver.Residual();
+	int NRB = fem.RigidBodies();
+	for (int i = 0; i<NRB; ++i)
+	{
+		FERigidBody& RB = *fem.GetRigidBody(i);
+		RB.m_Fr = RB.m_Mr = vec3d(0, 0, 0);
+	}
 
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
@@ -1049,25 +1261,13 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	// calculate the internal (stress) forces
 	for (int i = 0; i<mesh.Domains(); ++i)
 	{
-		FEElasticDomain* dom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
-	//	dom.InternalForces(RHS);
-		if (dom) dom->InternalForces(RHS);
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		dom.InternalForces(RHS);
 	}
 
-	// calculate nodal reaction forces
-	for (int i = 0; i < m_neq; ++i) m_Fr[i] -= R[i];
+	// calculate inertial forces for dynamic problems
+	if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC) InertialForces(RHS);
 
-	// calculate external forces
-	// apply loads
-	for (int j = 0; j < fem.ModelLoads(); ++j)
-	{
-		FEModelLoad* pml = fem.ModelLoad(j);
-		if (pml->IsActive()) pml->LoadVector(RHS);
-	}
-
-	// calculate inertial forces for dynamic problems (not supported)
-	//if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC) InertialForces(RHS);
-	
 	// calculate contact forces
 	if (fem.SurfacePairConstraints() > 0)
 	{
@@ -1082,6 +1282,17 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 	// forces due to point constraints
 	//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
 
+	// add model loads
+	int NML = fem.ModelLoads();
+	for (int i = 0; i<NML; ++i)
+	{
+		FEModelLoad& mli = *fem.ModelLoad(i);
+		if (mli.IsActive())
+		{
+			mli.LoadVector(RHS);
+		}
+	}
+
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
 	for (int i = 0; i<mesh.Nodes(); ++i)
@@ -1092,16 +1303,9 @@ bool FECGSolidSolver::Residual(vector<double>& R)
 		node.set_load(m_dofU[2], 0);
 
 		int n;
-		// this section updated from CGSolidSolver2
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
 		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
-
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
 		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
-
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
 		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
-
 	}
 
 	// increase RHS counter
@@ -1138,7 +1342,6 @@ void FECGSolidSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeI
 
 //-----------------------------------------------------------------------------
 //! This function calculates the inertial forces for dynamic problems
-//! Currently not supported by this solver and so not used
 
 void FECGSolidSolver::InertialForces(FEGlobalVector& R)
 {

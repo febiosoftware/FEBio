@@ -415,7 +415,6 @@ void FEPolarFluidSolver::Serialize(DumpStream& ar)
 {
     // Serialize parameters
     FENewtonSolver::Serialize(ar);
-    if (ar.IsShallow()) return;
 
     ar & m_nrhs;
     ar & m_niter;
@@ -423,10 +422,6 @@ void FEPolarFluidSolver::Serialize(DumpStream& ar)
     
     ar & m_neq & m_nveq & m_ngeq & m_nfeq;
 
-    ar & m_rhoi & m_alphaf & m_alpham;
-    ar & m_beta & m_gamma;
-    ar & m_pred;
-    
     ar & m_Fr & m_Ui & m_Ut;
     ar & m_Vi & m_Gi & m_Fi;
     
@@ -437,6 +432,12 @@ void FEPolarFluidSolver::Serialize(DumpStream& ar)
         m_Gi.assign(m_ngeq,0);
         m_Fi.assign(m_nfeq,0);
     }
+    
+    if (ar.IsShallow()) return;
+    ar & m_rhoi & m_alphaf & m_alpham;
+    ar & m_beta & m_gamma;
+    ar & m_pred;
+    
 }
 
 //-----------------------------------------------------------------------------
@@ -468,7 +469,7 @@ void FEPolarFluidSolver::UpdateKinematics(vector<double>& ui)
         }
     }
     
-    // make sure the prescribed BCs are fullfilled
+    // make sure the prescribed BCs are fulfilled
     int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
@@ -857,7 +858,7 @@ bool FEPolarFluidSolver::Quasin()
         normE1 = s*fabs(m_ui*m_R1);
         
         // check for nans
-        if (ISNAN(normR1)) throw NANDetected();
+        if (ISNAN(normR1)) throw NANInResidualDetected();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
@@ -1038,7 +1039,7 @@ bool FEPolarFluidSolver::StiffnessMatrix(FELinearSystem& LS)
     
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
-    // constrainst enforced with augmented lagrangian
+    // constraints enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);
     
     return true;

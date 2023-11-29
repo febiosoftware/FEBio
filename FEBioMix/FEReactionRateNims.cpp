@@ -35,7 +35,7 @@ SOFTWARE.*/
 
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactionRateNims, FEReactionRate)
-	ADD_PARAMETER(m_sol, "sol");
+    ADD_PARAMETER(m_sol  , "sol")->setEnums("$(solutes)");
 	ADD_PARAMETER(m_k0, "k0");
 	ADD_PARAMETER(m_kc, "kc");
 	ADD_PARAMETER(m_kr, "kr");
@@ -75,7 +75,7 @@ bool FEReactionRateNims::Init()
         
         // convert global sol value to local id
         FESoluteInterface* psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
-		m_lid = psm->FindLocalSoluteID(m_sol - 1);
+		m_lid = psm->FindLocalSoluteID(m_sol);
         
         // check validity of local id
 		if (m_lid == -1) {
@@ -102,18 +102,23 @@ double FEReactionRateNims::ReactionRate(FEMaterialPoint& pt)
     double c = spt.m_ca[m_lid];
     double cmax = max(c,spt.m_crd[m_cmax]);
     
-    double k = m_k0;
+    double k = m_k0(pt);
+    double kr = m_kr(pt);
+    double kc = m_kc(pt);
+    double trel = m_trel(pt);
+    double cr = m_cr(pt);
+    double cc = m_cc(pt);
     
     // if we are past the release time and got exposed to the solute
-    if ((m_trel > 0) && (t >= m_trel)) {
-        if (cmax < m_cr) k += (m_kr - m_k0)*cmax/m_cr;
-        else k = m_kr;
+    if ((trel > 0) && (t >= trel)) {
+        if (cmax < cr) k += (kr - k)*cmax/cr;
+        else k = kr;
     }
     // otherwise
     else {
         // evaluate reaction rate
-        if (cmax < m_cc) k += (m_kc - m_k0)*cmax/m_cc;
-        else k = m_kc;
+        if (cmax < cc) k += (kc - k)*cmax/cc;
+        else k = kc;
     }
 
 	return k;

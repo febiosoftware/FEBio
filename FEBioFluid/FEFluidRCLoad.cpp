@@ -132,7 +132,7 @@ void FEFluidRCLoad::Update()
 
     // calculate the dilatation
     double e = 0;
-    bool good = m_pfluid->Dilatation(0, m_pt + m_p0, 0, e);
+    bool good = m_pfluid->Dilatation(0, m_pt + m_p0, e);
     assert(good);
 
     // prescribe this dilatation at the nodes
@@ -219,9 +219,8 @@ void FEFluidRCLoad::LoadVector(FEGlobalVector& R)
 void FEFluidRCLoad::Serialize(DumpStream& ar)
 {
 	FESurfaceLoad::Serialize(ar);
-    ar& m_pfluid;
-    ar& m_pt;
-    ar& m_dpt;
-    ar& m_qt;
-    ar& m_dqt;
+    ar & m_pt & m_dpt & m_qt & m_dqt;
+    if (ar.IsShallow()) return;
+    ar & m_pfluid;
+    ar & m_dofW & m_dofEF;
 }

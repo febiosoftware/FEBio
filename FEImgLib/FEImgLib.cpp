@@ -8,6 +8,7 @@ void FEImgLib::InitModule()
 {
 	// image sources
 	REGISTER_FECORE_CLASS(FERawImage, "raw");
+	REGISTER_FECORE_CLASS(FENRRDImage, "nrrd");
 
 	// data maps
 	REGISTER_FECORE_CLASS(FEImageDataMap, "image map");

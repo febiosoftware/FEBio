@@ -33,6 +33,9 @@ class FECORE_API FEBeamDomain : public FEDomain
 	FECORE_SUPER_CLASS(FEBEAMDOMAIN_ID)
 	FECORE_BASE_CLASS(FEBeamDomain)
 
+	// get the element type (TODO: Move to FEDomain class?)
+	int GetElementType() { return ElementRef(0).Type(); };
+
 public:
 	FEBeamDomain(FEModel* pm);
 };

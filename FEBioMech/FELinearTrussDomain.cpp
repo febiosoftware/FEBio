@@ -30,40 +30,27 @@ SOFTWARE.*/
 #include "FELinearTrussDomain.h"
 #include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
+#include "FEBodyForce.h"
 #include "FEBioMech.h"
 #include <FECore/log.h>
 
-//-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FELinearTrussDomain, FETrussDomain)
 	ADD_PARAMETER(m_a0, "cross_sectional_area");
 END_FECORE_CLASS();
 
-//-----------------------------------------------------------------------------
-//! Constructor
-FELinearTrussDomain::FELinearTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem)
+FELinearTrussDomain::FELinearTrussDomain(FEModel* pfem) : FETrussDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofV(pfem)
 {
-	m_pMat = 0;
+	m_pMat = nullptr;
 	m_a0 = 0.0;
 	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
 }
 
-//-----------------------------------------------------------------------------
-//! copy operator
-FELinearTrussDomain& FELinearTrussDomain::operator = (FELinearTrussDomain& d)
-{ 
-	m_Elem = d.m_Elem; 
-	m_pMesh = d.m_pMesh; 
-	return (*this); 
-}
-
-//-----------------------------------------------------------------------------
-//! get the dof list
 const FEDofList& FELinearTrussDomain::GetDOFList() const
 {
 	return m_dofU;
 }
 
-//-----------------------------------------------------------------------------
 void FELinearTrussDomain::SetMaterial(FEMaterial* pmat)
 {
 	FETrussDomain::SetMaterial(pmat);
@@ -71,8 +58,6 @@ void FELinearTrussDomain::SetMaterial(FEMaterial* pmat)
 	assert(m_pMat);
 }
 
-//-----------------------------------------------------------------------------
-//! initialize the domain
 bool FELinearTrussDomain::Init()
 {
 	if (m_a0 <= 0.0)
@@ -81,16 +66,14 @@ bool FELinearTrussDomain::Init()
 		return false;
 	}
 
-	for (int i = 0; i < Elements(); ++i)
+	for (FETrussElement& el : m_Elem)
 	{
-		FETrussElement& el = Element(i);
 		el.m_a0 = m_a0;
 	}
 	
 	return FETrussDomain::Init();
 }
 
-//-----------------------------------------------------------------------------
 void FELinearTrussDomain::Reset()
 {
 	ForEachMaterialPoint([](FEMaterialPoint& mp) {
@@ -98,7 +81,6 @@ void FELinearTrussDomain::Reset()
 	});
 }
 
-//-----------------------------------------------------------------------------
 void FELinearTrussDomain::UnpackLM(FEElement &el, vector<int>& lm)
 {
 	lm.resize(6);
@@ -112,7 +94,6 @@ void FELinearTrussDomain::UnpackLM(FEElement &el, vector<int>& lm)
 	lm[5] = n2.m_ID[m_dofU[2]];
 }
 
-//-----------------------------------------------------------------------------
 void FELinearTrussDomain::Activate()
 {
 	for (int i=0; i<Nodes(); ++i)
@@ -130,7 +111,6 @@ void FELinearTrussDomain::Activate()
 	}
 }
 
-//-----------------------------------------------------------------------------
 void FELinearTrussDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	ForEachMaterialPoint([&](FEMaterialPoint& mp) {
@@ -138,72 +118,63 @@ void FELinearTrussDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 	});
 }
 
-//-----------------------------------------------------------------------------
+void FELinearTrussDomain::MassMatrix(FELinearSystem& LS, double scale)
+{
+	for (FETrussElement& el : m_Elem)
+	{
+		matrix me(2, 2); me.zero();
+		ElementMassMatrix(el, me);
+
+		// The element mass matrix calculated above only evaluates the 2x2 mass matrix
+		// Thus, we need to inlate it to a 6x6 mass matrix.
+		FEElementMatrix Me(6, 6); Me.zero();
+		for (int i=0; i<2; ++i)
+		{ 
+			for (int j = 0; j < 2; ++j)
+			{
+				Me[3 * i    ][3 * j    ] = scale*me[i][j];
+				Me[3 * i + 1][3 * j + 1] = scale*me[i][j];
+				Me[3 * i + 2][3 * j + 2] = scale*me[i][j];
+			}
+		}
+
+		vector<int> lm;
+		UnpackLM(el, lm);
+		Me.SetIndices(lm);
+		LS.Assemble(Me);
+	}
+}
+
+void FELinearTrussDomain::ElementMassMatrix(FETrussElement& el, matrix& me)
+{
+	double L = el.m_L0;
+	double A = el.m_a0;
+	double rho = m_pMat->Density();
+
+	me[0][0] = rho * A * L / 3.0; me[0][1] = rho * A * L / 6.0;
+	me[1][0] = rho * A * L / 6.0; me[1][1] = rho * A * L / 3.0;
+}
 
 void FELinearTrussDomain::StiffnessMatrix(FELinearSystem& LS)
 {
-	int NT = (int)m_Elem.size();
 	vector<int> lm;
-	for (int iel =0; iel<NT; ++iel)
+	for (FETrussElement& el : m_Elem)
 	{
-		FETrussElement& el = m_Elem[iel];
 		FEElementMatrix ke(el);
-		ElementStiffness(iel, ke);
+		ElementStiffness(el, ke);
 		UnpackLM(el, lm);
 		ke.SetIndices(lm);
 		LS.Assemble(ke);
 	}
 }
 
-//-----------------------------------------------------------------------------
-//! intertial stiffness matrix \todo implement this
-void FELinearTrussDomain::MassMatrix(FELinearSystem& LS, double scale)
+void FELinearTrussDomain::ElementStiffness(FETrussElement& el, matrix& ke)
 {
-	for (int n = 0; n < Elements(); ++n)
-	{
-		FETrussElement& el = Element(n);
-
-		matrix me(2, 2); me.zero();
-		ElementMassMatrix(el, me);
-
-		FEElementMatrix Me(6, 6); Me.zero();
-		for (int i=0; i<2; ++i)
-		{ 
-			for (int j = 0; j < 2; ++j)
-			{
-				Me[3 * i    ][3 * j    ] = me[i][j];
-				Me[3 * i + 1][3 * j + 1] = me[i][j];
-				Me[3 * i + 2][3 * j + 2] = me[i][j];
-			}
-		}
-
-		vector<int> lm;
-		UnpackLM(el, lm);
-
-		Me.SetIndices(lm);
-
-		LS.Assemble(Me);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FELinearTrussDomain::ElementStiffness(int iel, matrix& ke)
-{
-	FETrussElement& el = Element(iel);
-
-	// nodal coordinates
-	vec3d r0[2], rt[2];
-	for (int i=0; i<2; ++i)
-	{
-		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-	}
-
 	// intial length
-	double L = (r0[1] - r0[0]).norm();
+	double L = el.m_L0;
 
 	// current length
-	double l = (rt[1] - rt[0]).norm();
+	double l = el.m_Lt;
 
 	// get the elastic tangent
 	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
@@ -222,8 +193,7 @@ void FELinearTrussDomain::ElementStiffness(int iel, matrix& ke)
 	// axial force T = s*a = t*V/l
 	double T = tau*V/l;
 
-	// element normal
-	vec3d n = TrussNormal(el);
+	vec3d n = GetTrussAxisVector(el);
 
 	// calculate the tangent matrix
 	ke.resize(6, 6);
@@ -241,68 +211,36 @@ void FELinearTrussDomain::ElementStiffness(int iel, matrix& ke)
 	ke[2][3] = ke[3][2] = -ke[2][0]; ke[2][4] = ke[4][2] = -ke[2][1]; ke[2][5] = ke[5][2] = -ke[2][2];
 }
 
-//----------------------------------------------------------------------------
-//! elemental mass matrix
-void FELinearTrussDomain::ElementMassMatrix(FETrussElement& el, matrix& me)
-{
-	// nodal coordinates
-	vec3d r0[2];
-	for (int i = 0; i < 2; ++i)
-	{
-		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-	}
-
-	double L = (r0[1] - r0[0]).norm();
-	double A = el.m_a0;
-	double rho = m_pMat->Density();
-
-	me[0][0] = rho * A * L / 3.0; me[0][1] = rho * A * L / 6.0;
-	me[1][0] = rho * A * L / 6.0; me[1][1] = rho * A * L / 3.0;
-}
-
-//----------------------------------------------------------------------------
 void FELinearTrussDomain::InternalForces(FEGlobalVector& R)
 {
 	// element force vector
 	vector<double> fe;
 	vector<int> lm;
-	int NT = (int)m_Elem.size();
-	for (int i=0; i<NT; ++i)
+	for (FETrussElement& el : m_Elem)
 	{
-		FETrussElement& el = m_Elem[i];
 		ElementInternalForces(el, fe);
 		UnpackLM(el, lm);
 		R.Assemble(el.m_node, lm, fe);
 	}
 }
 
-//-----------------------------------------------------------------------------
 void FELinearTrussDomain::ElementInternalForces(FETrussElement& el, vector<double>& fe)
 {
 	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
 	FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
 
-	// get the element's normal
-	vec3d n = TrussNormal(el);
+	vec3d n = GetTrussAxisVector(el);
 
 	// get the element's Kirchhoff stress
 	double tau = pt.m_tau;
 
-	// nodal coordinates
-	vec3d r0[2], rt[2];
-	for (int i=0; i<2; ++i)
-	{
-		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-	}
-
 	// initial length
-	double L = (r0[1] - r0[0]).norm();
+	double L = el.m_L0;
 
 	// current length
-	double l = (rt[1] - rt[0]).norm();
+	double l = el.m_Lt;
 
-	// elements initial volume
+	// initial volume
 	double V = L*el.m_a0;
 
 	// calculate nodal forces
@@ -315,35 +253,165 @@ void FELinearTrussDomain::ElementInternalForces(FETrussElement& el, vector<doubl
 	fe[5] = -fe[2];
 }
 
-//-----------------------------------------------------------------------------
-//! Update the truss' stresses
-void FELinearTrussDomain::Update(const FETimeInfo& tp)
+//! Calculates inertial forces for dynamic analyses
+void FELinearTrussDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
-	// loop over all elements
-	vec3d r0[2], rt[2];
-	for (int i=0; i<(int) m_Elem.size(); ++i)
+	vector<double> fe;
+	vector<int> lm;
+	for (FETrussElement& el : m_Elem)
 	{
-		// unpack the element
-		FETrussElement& el = m_Elem[i];
+		ElementInertialForces(el, fe);
+		UnpackLM(el, lm);
+		R.Assemble(el.m_node, lm, fe);
+	}
+}
 
-		// setup the material point
-		FEMaterialPoint& mp = *(el.GetMaterialPoint(0));
-		FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
+void FELinearTrussDomain::ElementInertialForces(FETrussElement& el, vector<double>& fe)
+{
+	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+	FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
 
-		// nodal coordinates
-		for (int j=0; j<2; ++j)
+	// get the nodal accelerations
+	vec3d a[2];
+	int neln = el.Nodes();
+	for (int i = 0; i < neln; ++i)
+	{
+		FENode& node = m_pMesh->Node(el.m_node[i]);
+		a[i] = node.m_at;
+	}
+
+	// calculate element contribution to inertial force
+	matrix me(2, 2);
+	ElementMassMatrix(el, me);
+
+	fe.resize(6, 0.0);
+	fe[0] = -(me[0][0] * a[0].x + me[0][1] * a[1].x);
+	fe[1] = -(me[0][0] * a[0].y + me[0][1] * a[1].y);
+	fe[2] = -(me[0][0] * a[0].z + me[0][1] * a[1].z);
+	fe[3] = -(me[1][0] * a[0].x + me[1][1] * a[1].x);
+	fe[4] = -(me[1][0] * a[0].y + me[1][1] * a[1].y);
+	fe[5] = -(me[1][0] * a[0].z + me[1][1] * a[1].z);
+}
+
+//! calculate body force on a truss domain
+void FELinearTrussDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
+{
+	vector<double> fe(6);
+	vector<int> lm;
+
+	double density = m_pMat->Density();
+
+	for (FETrussElement& el : m_Elem)
+	{
+		zero(fe);
+		int nint = el.GaussPoints();
+		double* w = el.GaussWeights();
+		for (int n = 0; n < nint; ++n)
 		{
-			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
-			rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			// get the force
+			vec3d f = bf.force(mp);
+
+			// get element shape functions
+			double* H = el.H(n);
+
+			// get the initial Jacobian
+			double J0 = el.m_a0 * el.m_L0 / 2.0;
+
+			// set integrand
+			fe[0] -= H[0] * density * f.x * J0 * w[n];
+			fe[1] -= H[0] * density * f.y * J0 * w[n];
+			fe[2] -= H[0] * density * f.z * J0 * w[n];
+			fe[3] -= H[1] * density * f.x * J0 * w[n];
+			fe[4] -= H[1] * density * f.y * J0 * w[n];
+			fe[5] -= H[1] * density * f.z * J0 * w[n];
 		}
 
-		double l = (rt[1] - rt[0]).norm();
-		double L = (r0[1] - r0[0]).norm();
+		UnpackLM(el, lm);
+		R.Assemble(el.m_node, lm, fe);
+	}
+}
 
-		// calculate strain
-		pt.m_l = l / L;
+//! body force stiffness matrix
+void FELinearTrussDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
+{
+	double density = m_pMat->Density();
 
-		// calculate stress
-		pt.m_tau = m_pMat->Stress(mp);
+	vector<int> lm;
+	for (FETrussElement& el : m_Elem)
+	{
+		FEElementMatrix ke(6, 6); ke.zero();
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+		double* gw = el.GaussWeights();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			double* H = el.H(n);
+
+			double J0 = el.m_a0 * el.m_L0 / 2.0;
+
+			double Jdw = J0 * density * gw[n];
+
+			mat3d K = bf.stiffness(mp);
+
+			// put it together
+			for (int a=0; a<neln; ++a)
+				for (int b = 0; b < neln; ++b)
+				{
+					ke.sub(3 * a, 3 * b, K * (H[a] * H[b] * Jdw));
+				}
+		}
+
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+		ke.SetNodes(el.m_node);
+		LS.Assemble(ke);
+	}
+}
+
+void FELinearTrussDomain::Update(const FETimeInfo& tp)
+{
+	// get the poisson's ratio. 
+	FELinearTrussMaterial* mat = dynamic_cast<FELinearTrussMaterial*>(m_pMat);
+	double nu = (mat ? mat->m_v : 0.5);
+
+	FEMesh& mesh = *m_pMesh;
+	for (FETrussElement& el : m_Elem)
+	{
+		// calculate the current length
+		vec3d rt[2], vt[2], at[2];
+		for (int j = 0; j < el.Nodes(); ++j)
+		{
+			FENode& node = m_pMesh->Node(el.m_node[j]);
+			rt[j] = node.m_rt;
+			vt[j] = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+			at[j] = node.m_at;
+		}
+
+		el.m_Lt = (rt[1] - rt[0]).norm();
+		vec3d e = (rt[1] - rt[0]).normalized();
+
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FEMaterialPoint& mp = *(el.GetMaterialPoint(n));
+			FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
+
+			mp.m_rt = el.Evaluate(rt, n);
+			pt.m_v = el.Evaluate(vt, n);
+			pt.m_a = el.Evaluate(at, n);
+
+			// calculate stretch
+			pt.m_lam = el.m_Lt / el.m_L0;
+
+			// volume ratio (this assume linear truss material!)
+			double J = pow(pt.m_lam, 1.0 - 2.0 * nu);
+
+			// calculate stress
+			pt.m_tau = m_pMat->Stress(mp);
+			pt.m_s = dyad(e) * (pt.m_tau / J);
+		}
 	}
 }

@@ -29,12 +29,13 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/FEFunction1D.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for bond relaxation of reactive viscoelastic materials.
 //! These materials need to define a relaxation function.
 //!
-class FEBondRelaxation : public FEMaterialProperty
+class FEBIOMECH_API FEBondRelaxation : public FEMaterialProperty
 {
 public:
 	FEBondRelaxation(FEModel* pfem) : FEMaterialProperty(pfem) {}

@@ -44,6 +44,9 @@ public:
     //! assignment operator
     FEPolarFluidDomain3D& operator = (FEPolarFluidDomain3D& d);
     
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
     
@@ -75,7 +78,7 @@ public: // overrides from FEElasticDomain
     //! body moments
     void BodyMoment(FEGlobalVector& R, FEBodyMoment& bm) override;
     
-    //! intertial forces for dynamic problems
+    //! inertial forces for dynamic problems
     void InertialForces(FEGlobalVector& R) override;
     
     //! calculates the global stiffness matrix for this domain
@@ -110,10 +113,10 @@ public:
     //! Calculates the internal stress vector for solid elements
     void ElementInternalForce(FESolidElement& el, vector<double>& fe);
     
-    //! Calculatess external body forces for solid elements
+    //! Calculates external body forces for solid elements
     void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
     
-    //! Calculatess external body moments for solid elements
+    //! Calculates external body moments for solid elements
     void ElementBodyMoment(FEBodyMoment& bm, FESolidElement& elem, vector<double>& fe);
     
     //! Calculates the inertial force vector for solid elements

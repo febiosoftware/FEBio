@@ -228,6 +228,8 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
         FEElasticMaterialPoint& epi = *mpi.ExtractData<FEElasticMaterialPoint>();
 
 		// copy the material point data to the components
+		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
 		mpi.m_rt = mp.m_rt;
 		mpi.m_r0 = mp.m_r0;
 
@@ -274,7 +276,9 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
         double Ji = epi.m_J;
         
         // copy the elastic material point data to the components
-        mpi.m_rt = mp.m_rt;
+		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
         mpi.m_r0 = mp.m_r0;
         
         // evaluate relative deformation gradient
@@ -316,7 +320,9 @@ double FEElasticMultigeneration::StrainEnergyDensity(FEMaterialPoint& mp)
         double Ji = epi.m_J;
         
         // copy the elastic material point data to the components
-        mpi.m_rt = mp.m_rt;
+		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
         mpi.m_r0 = mp.m_r0;
         
         // evaluate relative deformation gradient
@@ -359,7 +365,9 @@ double FEElasticMultigeneration::StrongBondSED(FEMaterialPoint& mp)
         double Ji = epi.m_J;
         
         // copy the elastic material point data to the components
-        mpi.m_rt = mp.m_rt;
+		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
         mpi.m_r0 = mp.m_r0;
         
         // evaluate relative deformation gradient
@@ -402,7 +410,9 @@ double FEElasticMultigeneration::WeakBondSED(FEMaterialPoint& mp)
         double Ji = epi.m_J;
         
         // copy the elastic material point data to the components
-        mpi.m_rt = mp.m_rt;
+		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
         mpi.m_r0 = mp.m_r0;
         
         // evaluate relative deformation gradient

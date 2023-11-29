@@ -274,7 +274,7 @@ bool FEFluidFSISolver::InitEquations()
 
 	if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
 	{
-		// merge the second and third parition
+		// merge the second and third partition
 		if (m_part.size() == 3)
 		{
 			vector<int> newPart(2);
@@ -451,30 +451,28 @@ void FEFluidFSISolver::Serialize(DumpStream& ar)
 {
     // Serialize parameters
     FENewtonSolver::Serialize(ar);
-    if (ar.IsShallow()) return;
+    // serialize rigid solver
+    m_rigidSolver.Serialize(ar);
+    if (ar.IsShallow()) {
+        ar & m_Ui & m_Ut & m_Fr;
+        ar & m_Di & m_Vi & m_Fi;
+    }
+    else {
+        ar & m_nrhs;
+        ar & m_niter;
+        ar & m_nref & m_ntotref;
 
-    ar & m_nrhs;
-    ar & m_niter;
-    ar & m_nref & m_ntotref;
+        ar & m_nreq & m_ndeq & m_nfeq & m_nveq;
 
-    ar & m_nreq & m_ndeq & m_nfeq & m_nveq;
+        ar & m_rhoi & m_alphaf & m_alpham;
+        ar & m_beta & m_gamma;
+        ar & m_pred;
 
-	ar & m_rhoi & m_alphaf & m_alpham;
-	ar & m_beta & m_gamma;
-	ar & m_pred;
-
-	ar & m_Ui & m_Ut & m_Fr;
-	ar & m_Di & m_Vi & m_Fi;
-    
-    if (ar.IsLoading())
-    {
         m_Fr.assign(m_neq, 0);
         m_Di.assign(m_ndeq,0);
         m_Vi.assign(m_nveq,0);
         m_Fi.assign(m_nfeq,0);
     }
-    // serialize rigid solver
-    m_rigidSolver.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -510,8 +508,8 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
         }
     }
 
-    // make sure the prescribed BCs are fullfilled
-    int nvel = fem.BoundaryConditions();
+    // make sure the prescribed BCs are fulfilled
+	int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
         FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
@@ -519,7 +517,7 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     }
     
     // apply prescribed DOFs for specialized surface loads
-    int nml = fem.ModelLoads();
+	int nml = fem.ModelLoads();
     for (int i=0; i<nml; ++i)
     {
         FEModelLoad& pml = *fem.ModelLoad(i);
@@ -529,7 +527,7 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
     // enforce the linear constraints
     // TODO: do we really have to do this? Shouldn't the algorithm
     // already guarantee that the linear constraints are satisfied?
-    FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
+	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
     if (LCM.LinearConstraints() > 0)
     {
         LCM.Update();
@@ -600,6 +598,7 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
             double aeft = aefp*cgi + (eft - efp)/(m_gamma*dt);
             n.set(m_dofAEF, aeft);
         }
+		int _a = 0;
     }
 }
 
@@ -946,7 +945,7 @@ bool FEFluidFSISolver::Quasin()
         normE1 = s*fabs(m_ui*m_R1);
             
         // check for nans
-        if (ISNAN(normR1)) throw NANDetected();
+        if (ISNAN(normR1)) throw NANInResidualDetected();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
@@ -1152,7 +1151,7 @@ bool FEFluidFSISolver::StiffnessMatrix()
 
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
-    // constrainst enforced with augmented lagrangian
+    // constraints enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);    
    
     // add contributions from rigid bodies

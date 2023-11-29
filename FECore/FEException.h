@@ -116,10 +116,16 @@ public: MaxResidualError() : FEException("Maximum residual exceeded.", FEExcepti
 
 struct FECORE_API FENodalDofInfo;
 
-class FECORE_API NANDetected : public FEException {
+class FECORE_API NANInResidualDetected : public FEException {
 public: 
-	NANDetected() : FEException("NAN detected") {}
-	NANDetected(const FENodalDofInfo& ndi);
+	NANInResidualDetected() : FEException("NAN detected") {}
+	NANInResidualDetected(const FENodalDofInfo& ndi);
+};
+
+class FECORE_API NANInSolutionDetected : public FEException {
+public:
+	NANInSolutionDetected() : FEException("NAN detected") {}
+	NANInSolutionDetected(const FENodalDofInfo& ndi);
 };
 
 class FECORE_API FatalError : public FEException{
@@ -147,3 +153,10 @@ public: FactorizationError() : FEException("Fatal error in factorization of stif
 class FECORE_API NegativeJacobianDetected : public FEException {
 public: NegativeJacobianDetected() : FEException("Negative jacobian was detected.") {}
 };
+
+class FECORE_API ConcentrationChangeDetected : public FEException {
+public:
+    ConcentrationChangeDetected() : FEException("Concentration change detected") {}
+    ConcentrationChangeDetected(const FENodalDofInfo& ndi);
+};
+

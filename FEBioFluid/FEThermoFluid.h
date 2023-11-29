@@ -45,6 +45,9 @@ public:
     // returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
 public:
     //! calculate stress at material point
     mat3ds Stress(FEMaterialPoint& pt) override;
@@ -84,7 +87,7 @@ public:
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
     //! invert pressure-dilatation relation
-    bool Dilatation(const double T, const double p, const double c, double& e) override { return GetElastic()->Dilatation(T,p,0,e); }
+    bool Dilatation(const double T, const double p, double& e) override { return GetElastic()->Dilatation(T,p,e); }
     
     //! fluid pressure from state variables
     double Pressure(const double ef, const double T) override { return GetElastic()->Pressure(ef, T); };

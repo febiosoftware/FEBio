@@ -129,6 +129,8 @@ public:
 
 	double DefaultShellThickness() const { return m_h0; }
 
+	void AssignDefaultShellThickness();
+
 protected:
 	double	m_h0;
 

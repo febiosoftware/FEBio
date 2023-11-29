@@ -37,104 +37,116 @@
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
+#include "FEFluidSolutesDomain3D.h"
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_FECORE_CLASS(FEFluidSolutesNaturalFlux, FESurfaceLoad)
-ADD_PARAMETER(m_beta, "beta");
-ADD_PARAMETER(m_isol   , "solute_id");
+    ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
+    ADD_PARAMETER(m_bup    , "update");
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEFluidSolutesNaturalFlux::FEFluidSolutesNaturalFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem), m_dofC(pfem)
+FEFluidSolutesNaturalFlux::FEFluidSolutesNaturalFlux(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem), m_dofEF(pfem), m_dofC(pfem)
 {
-    m_beta = 1.0;
-    m_isol = 1;
+    m_isol = -1;
+    m_bup = false;
 }
 
 //-----------------------------------------------------------------------------
-//! initialize
-bool FEFluidSolutesNaturalFlux::Init()
+//! allocate storage
+void FEFluidSolutesNaturalFlux::SetSurface(FESurface* ps)
 {
-    if (m_isol == -1) return false;
-    
-    // set up the dof lists
-    FEModel* fem = GetFEModel();
-    m_dofC.Clear();
-    m_dofW.Clear();
-
-    m_dofC.AddDof(fem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), m_isol-1));
-    
-    m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
-
-    m_dof.Clear();
-    m_dof.AddDofs(m_dofW);
-    m_dof.AddDofs(m_dofC);
-    
-    FESurface& surf = GetSurface();
-    if (FESurfaceLoad::Init() == false) return false;
-    
-    // get the list of FluidSolutes elements connected to this interface
-    int NF = surf.Elements();
-    m_elem.resize(NF);
-    
-    for (int j = 0; j<NF; ++j)
-    {
-        FESurfaceElement& el = surf.Element(j);
-        // extract the first of two elements on this interface
-        m_elem[j] = el.m_elem[0];
-        // get its material and check if FluidSolutes
-        FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
-        FEFluidSolutes* pfsi = dynamic_cast<FEFluidSolutes*>(pm);
-        if (pfsi == nullptr) {
-            pm = fem->GetMaterial(el.m_elem[1]->GetMatID());
-            pfsi = dynamic_cast<FEFluidSolutes*>(pm);
-            if (pfsi == nullptr) return false;
-            m_elem[j] = el.m_elem[1];
-        }
-    }
-    
-    return true;
+    FESurfaceLoad::SetSurface(ps);
 }
 
 //-----------------------------------------------------------------------------
-
+//! serialization
 void FEFluidSolutesNaturalFlux::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
     
     if (ar.IsShallow() == false)
     {
-        ar & m_dofC & m_dofW;
+        ar & m_dofC & m_dofW & m_dofEF;
     }
-    if (ar.IsShallow() == false)
-    {
-        if (ar.IsSaving())
+}
+
+//-----------------------------------------------------------------------------
+bool FEFluidSolutesNaturalFlux::Init()
+{
+    if (m_isol <= 0) return false;
+    
+    // set up the dof lists
+    FEModel* fem = GetFEModel();
+    m_dofC.Clear();
+    m_dofW.Clear();
+    m_dofEF.Clear();
+    m_dofC.AddDof(fem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), m_isol - 1));
+    m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
+    m_dofEF.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION));
+
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDofs(m_dofC);
+
+    return FESurfaceLoad::Init();
+}
+
+//-----------------------------------------------------------------------------
+void FEFluidSolutesNaturalFlux::Update()
+{
+    if (m_bup) {
+        for (int is=0; is<m_psurf->Elements(); ++is)
         {
-            int NE = (int)m_elem.size();
-            ar << NE;
-            for (int i = 0; i < NE; ++i)
-            {
-                FEElement* pe = m_elem[i];
-                int nid = (pe ? pe->GetID() : -1);
-                ar << nid;
+            // get surface element
+            FESurfaceElement& el = m_psurf->Element(is);
+            // get underlying solid element
+            FESolidElement* pe = dynamic_cast<FESolidElement*>(el.m_elem[0]);
+            if (pe == nullptr) break;
+            // get element data
+            int neln = pe->Nodes();
+            int nint = pe->GaussPoints();
+            
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            // get the local solute id
+            FESoluteInterface* psi = dynamic_cast<FESoluteInterface*>(pm);
+            if (psi == nullptr) break;
+            int sid = psi->FindLocalSoluteID(m_isol);
+            if (sid == -1) break;
+            
+            // identify nodes on the surface
+            vector<bool> nsrf(neln,false);
+            for (int j=0; j<neln; ++j) {
+                for (int k=0; k < el.Nodes(); ++k) {
+                    if (el.m_node[k] == pe->m_node[j]) nsrf[j] = true;
+                }
             }
-        }
-        else
-        {
-            FEMesh& mesh = ar.GetFEModel().GetMesh();
-            int NE, nid;
-            ar >> NE;
-            m_elem.resize(NE, nullptr);
-            for (int i = 0; i < NE; ++i)
-            {
-                ar >> nid;
-                if (nid != -1)
-                {
-                    FEElement* pe = mesh.FindElementFromID(nid);
-                    assert(pe);
-                    m_elem[i] = pe;
+            
+            // get average effective concentration of nodes not on surface
+            double cavg = 0;
+            int m = 0;
+            for (int i=0; i<neln; ++i) {
+                if (!nsrf[i]) {
+                    int n = pe->m_node[i];
+                    FENode& node = GetMesh().Node(n);
+                    int dof = m_dofC[m_isol-1];
+                    if (dof != -1) {
+                        cavg += node.get(dof);
+                        ++m;
+                    }
+                }
+            }
+            // assign this average value to surface nodes as initial guess
+            if (m) {
+                cavg /= m;
+                for (int i=0; i<neln; ++i) {
+                    if (nsrf[i]) {
+                        int n = pe->m_node[i];
+                        FENode& node = GetMesh().Node(n);
+                        int dof = m_dofC[m_isol-1];
+                        if (dof != -1) node.set(dof, cavg);
+                    }
                 }
             }
         }
@@ -142,193 +154,157 @@ void FEFluidSolutesNaturalFlux::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidSolutesNaturalFlux::StiffnessMatrix(FELinearSystem& LS)
-{
-    const FETimeInfo& tp = GetTimeInfo();
-
-    m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
-        
-        FESurfaceElement& el = *mp.SurfaceElement();
-        int iel = el.m_lid;
-        int neln = el.Nodes();
-        
-        // get the diffusivity
-        FEElement* pe = el.m_elem[0];
-        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-        FEFluidSolutes* pfsm = dynamic_cast<FEFluidSolutes*>(pm);
-        double d0 = pfsm->GetSolute(m_isol-1)->m_pDiff->Free_Diffusivity(mp);
-        double d0p = pfsm->GetSolute(m_isol-1)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp, m_isol-1);
-        
-        double* N  = el.H (mp.m_index);
-        double* Gr = el.Gr(mp.m_index);
-        double* Gs = el.Gs(mp.m_index);
-        
-        // tangent vectors
-        vec3d rt[FEElement::MAX_NODES];
-        m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
-        vec3d dxr = el.eval_deriv1(rt, mp.m_index);
-        vec3d dxs = el.eval_deriv2(rt, mp.m_index);
-        
-        vec3d n = dxr ^ dxs;
-        //double da = n.unit();
-        
-        double alpha = tp.alphaf;
-        
-        vector<vec3d> gradN(neln);
-        
-        // Fluid velocity
-        vec3d v = FluidVelocity(mp, tp.alphaf);
-        double c = EffectiveConcentration(mp, tp.alphaf);
-        //vec3d v = FluidVelocityElm(mp);
-        //double c = EffectiveConcentrationElm(mp);
-        vec3d gradc = EffectiveCGrad(mp);
-        
-        vec3d gcnt[2], gcntp[2];
-        m_psurf->ContraBaseVectors(el, mp.m_index, gcnt);
-        m_psurf->ContraBaseVectorsP(el, mp.m_index, gcntp);
-        for (int i = 0; i<neln; ++i)
-            gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*Gr[i] +
-            (gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i];
-        
-        Kab.zero();
-        
-        // calculate stiffness component
-        int i = dof_a.index;
-        int j = dof_b.index;
-        vec3d kcw = n*(N[i]*N[j]*c*tp.alphaf);
-        double kcc = n*((-gradc*d0p+v)*N[j]-gradN[j]*d0)*(tp.alphaf*N[i]);
-        
-        Kab[3][0] -= kcw.x;
-        Kab[3][1] -= kcw.y;
-        Kab[3][2] -= kcw.z;
-        Kab[3][3] -= kcc;
-    });
-}
-
-//-----------------------------------------------------------------------------
-vec3d FEFluidSolutesNaturalFlux::FluidVelocity(FESurfaceMaterialPoint& mp, double alpha)
-{
-    vec3d vt[FEElement::MAX_NODES];
-    FESurfaceElement& el = *mp.SurfaceElement();
-    int neln = el.Nodes();
-    for (int j = 0; j<neln; ++j) {
-        FENode& node = m_psurf->Node(el.m_lnode[j]);
-        vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*alpha + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1 - alpha);
-    }
-    return el.eval(vt, mp.m_index);
-}
-
-//-----------------------------------------------------------------------------
-double FEFluidSolutesNaturalFlux::EffectiveConcentration(FESurfaceMaterialPoint& mp, double alpha)
-{
-    double c = 0;
-    FESurfaceElement& el = *mp.SurfaceElement();
-    double* H = el.H(mp.m_index);
-    int neln = el.Nodes();
-    for (int j = 0; j < neln; ++j) {
-        FENode& node = m_psurf->Node(el.m_lnode[j]);
-        double cj = node.get(m_dofC[0])*alpha + node.get_prev(m_dofC[0])*(1.0 - alpha);
-        c += cj*H[j];
-    }
-    return c;
-}
-
-//-----------------------------------------------------------------------------
-vec3d FEFluidSolutesNaturalFlux::EffectiveCGrad(FESurfaceMaterialPoint& pt)
-{
-    FESurfaceElement& face = *pt.SurfaceElement();
-    int iel = face.m_lid;
-    
-    // Get the fluid stress from the fluid-FSI element
-    vec3d gradc(0.0);
-    FEElement* pe = m_elem[iel];
-    int nint = pe->GaussPoints();
-    for (int n = 0; n<nint; ++n)
-    {
-        FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-        FEFluidSolutesMaterialPoint& spt = *(mp.ExtractData<FEFluidSolutesMaterialPoint>());
-        gradc += spt.m_gradc[m_isol-1];
-    }
-    gradc /= nint;
-    return gradc;
-}
-
-//-----------------------------------------------------------------------------
-double FEFluidSolutesNaturalFlux::EffectiveConcentrationElm(FESurfaceMaterialPoint& pt)
-{
-    FESurfaceElement& face = *pt.SurfaceElement();
-    int iel = face.m_lid;
-    
-    // Get the fluid stress from the fluid-FSI element
-    double c = 0.0;
-    FEElement* pe = m_elem[iel];
-    int nint = pe->GaussPoints();
-    for (int n = 0; n<nint; ++n)
-    {
-        FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-        FEFluidSolutesMaterialPoint& spt = *(mp.ExtractData<FEFluidSolutesMaterialPoint>());
-        c += spt.m_c[m_isol-1];
-    }
-    c /= nint;
-    return c;
-}
-
-//-----------------------------------------------------------------------------
-vec3d FEFluidSolutesNaturalFlux::FluidVelocityElm(FESurfaceMaterialPoint& pt)
-{
-    FESurfaceElement& face = *pt.SurfaceElement();
-    int iel = face.m_lid;
-    
-    // Get the fluid stress from the fluid-FSI element
-    vec3d v(0.0);
-    FEElement* pe = m_elem[iel];
-    int nint = pe->GaussPoints();
-    for (int n = 0; n<nint; ++n)
-    {
-        FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
-        FEFluidMaterialPoint& fpt = *(mp.ExtractData<FEFluidMaterialPoint>());
-        v += fpt.m_vft;
-    }
-    v /= nint;
-    return v;
-}
-
-//-----------------------------------------------------------------------------
 void FEFluidSolutesNaturalFlux::LoadVector(FEGlobalVector& R)
 {
-    const FETimeInfo& tp = GetTimeInfo();
-
-    m_psurf->LoadVector(R, m_dofC, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
+    FEFluidSolutesNaturalFlux* flux = this;
+    m_psurf->LoadVector(R, m_dofC, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, std::vector<double>& fa) {
         
+        const FETimeInfo& tp = GetTimeInfo();
+        
+        // get surface element
         FESurfaceElement& el = *mp.SurfaceElement();
-        
-        // get the diffusivity
+        // get underlying solid element
         FEElement* pe = el.m_elem[0];
         FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-        FEFluidSolutes* pfsm = dynamic_cast<FEFluidSolutes*>(pm);
-        double d0 = pfsm->GetSolute(m_isol-1)->m_pDiff->Free_Diffusivity(mp);
+        // get the local solute id
+        FESoluteInterface* psi = dynamic_cast<FESoluteInterface*>(pm);
+        if (psi == nullptr) {
+            fa[0] = 0;
+            return;
+        }
+        FEFluidSolutes* pmat = dynamic_cast<FEFluidSolutes*>(pm);
+        int sid = psi->FindLocalSoluteID(flux->m_isol);
+        vec3d dxt = mp.dxr ^ mp.dxs;
         
-        // tangent vectors
-        vec3d rt[FEElement::MAX_NODES];
-        m_psurf->GetNodalCoordinates(el, tp.alphaf, rt);
-        vec3d dxr = el.eval_deriv1(rt, mp.m_index);
-        vec3d dxs = el.eval_deriv2(rt, mp.m_index);
+        // get element-averaged diffusive flux
+        vec3d jd(0,0,0);
+        int nint = pe->GaussPoints();
+        for (int n=0; n<nint; ++n) {
+            FEMaterialPoint& pt = *pe->GetMaterialPoint(n);
+            jd += pmat->SoluteDiffusiveFlux(pt, m_isol-1);
+        }
+        jd /= nint;
         
-        // normal and area element
-        vec3d n = dxr ^ dxs;
-        //double da = n.unit();
+        // evaluate desired natural solute flux = normal convective flux * area
+        double jn = jd*dxt*tp.alphaf;
         
-        // fluid velocity
-        vec3d v = FluidVelocity(mp, tp.alphaf);
-        double c = EffectiveConcentration(mp, tp.alphaf);
-        //vec3d v = FluidVelocityElm(mp);
-        //double c = EffectiveConcentrationElm(mp);
-        vec3d gradc = EffectiveCGrad(mp);
         
-        // force vector (change sign for inflow vs outflow)
-        double f = n*(-gradc*d0+v*c)*(m_beta);
-        
-        double H = dof_a.shape;
-        fa[0] = H * f;
+        double H_i = dof_a.shape;
+        fa[0] = H_i * jn;
     });
 }
+/*{
+    FEFluidSolutesNaturalFlux* flux = this;
+    m_psurf->LoadVector(R, m_dofC, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, std::vector<double>& fa) {
+        
+        const FETimeInfo& tp = GetTimeInfo();
+        
+        // get surface element
+        FESurfaceElement& el = *mp.SurfaceElement();
+        // get underlying solid element
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        // get the local solute id
+        FESoluteInterface* psi = dynamic_cast<FESoluteInterface*>(pm);
+        if (psi == nullptr) {
+            fa[0] = 0;
+            return;
+        }
+        int sid = psi->FindLocalSoluteID(flux->m_isol);
+        vec3d dxt = mp.dxr ^ mp.dxs;
+
+        // get element-averaged partition coefficient
+        double kappa = 0;
+        int nint = pe->GaussPoints();
+        for (int n=0; n<nint; ++n) {
+            FEMaterialPoint& pt = *pe->GetMaterialPoint(n);
+            FEFluidSolutesMaterialPoint& ps = *(pt.ExtractData<FEFluidSolutesMaterialPoint>());
+            kappa += ps.m_k[sid];
+        }
+        kappa /= nint;
+
+        // evaluate average effective solute concentration and fluid velocity at nodes
+        vec3d w(0,0,0);
+        double ce = 0, cp = 0;
+        for (int i=0; i<el.Nodes(); ++i) {
+            FENode& node = m_psurf->Node(el.m_lnode[i]);
+            w += node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
+            ce += node.get(m_dofC[m_isol-1])*tp.alphaf + node.get_prev(m_dofC[m_isol-1])*(1-tp.alphaf);
+            cp += node.get_prev(m_dofC[m_isol-1]);
+        }
+        w /= el.Nodes();
+        ce /= el.Nodes();
+        cp /= el.Nodes();
+
+        // evaluate desired natural solute flux = normal convective flux * area
+        double wn = w*dxt;
+        double jn = kappa*ce*wn;
+
+        // molar flow rate (if negative, use previous value of concentration)
+        double f = (wn >= 0) ? jn : kappa*cp*wn;
+//        double f = (jn > 0) ? jn : 0;
+
+        double H_i = dof_a.shape;
+        fa[0] = H_i * f;
+    });
+}*/
+
+//-----------------------------------------------------------------------------
+void FEFluidSolutesNaturalFlux::StiffnessMatrix(FELinearSystem& LS)
+{}
+/*{
+    FEFluidSolutesNaturalFlux* flux = this;
+    m_psurf->LoadStiffness(LS, m_dofC, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
+        
+        const FETimeInfo& tp = GetTimeInfo();
+        
+        // get surface element
+        FESurfaceElement& el = *mp.SurfaceElement();
+        // get underlying solid element
+        FEElement* pe = el.m_elem[0];
+        FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+        // get the local solute id
+        FESoluteInterface* psi = dynamic_cast<FESoluteInterface*>(pm);
+        if (psi == nullptr) return;
+        int sid = psi->FindLocalSoluteID(flux->m_isol);
+        
+        // get element-averaged solute partition coefficient
+        double kappa = 0, d0 = 0;
+        int nint = pe->GaussPoints();
+        for (int n=0; n<nint; ++n) {
+            FEMaterialPoint& pt = *pe->GetMaterialPoint(n);
+            FEFluidSolutesMaterialPoint& ps = *(pt.ExtractData<FEFluidSolutesMaterialPoint>());
+            kappa += ps.m_k[sid];
+            d0 += psi->GetSolute(sid)->m_pDiff->Free_Diffusivity(pt);
+        }
+        kappa /= nint;
+        d0 /= nint;
+
+        // evaluate average effective solute concentration and fluid velocity
+        vec3d w(0,0,0);
+        double ce = 0;
+        for (int i=0; i<el.Nodes(); ++i) {
+            FENode& node = m_psurf->Node(el.m_lnode[i]);
+            w += node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
+            ce += node.get(m_dofC[m_isol-1])*tp.alphaf + node.get_prev(m_dofC[m_isol-1])*(1-tp.alphaf);
+        }
+        w /= el.Nodes();
+        ce /= el.Nodes();
+
+        // shape functions and derivatives
+        double H_i  = dof_a.shape;
+        double H_j  = dof_b.shape;
+        
+        // calculate surface normal
+        vec3d dxt = mp.dxr ^ mp.dxs;
+        
+        // calculate stiffness component
+        vec3d kcv = dxt*(H_i*H_j*kappa*ce*tp.alphaf);
+        double kcc = (dxt*w)*(H_i*H_j*kappa)*tp.alphaf;
+        
+        Kab[0][0] = -kcv.x;
+        Kab[0][1] = -kcv.y;
+        Kab[0][2] = -kcv.z;
+        Kab[0][3] = -kcc;
+    });
+}*/

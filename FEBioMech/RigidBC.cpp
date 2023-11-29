@@ -51,6 +51,8 @@ bool FERigidBC::Init()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
 	if (pm == nullptr) return false;
 
+	m_rb = pm->GetRigidBodyID(); assert(m_rb >= 0);
+
 	m_binit = true;
 
 	return FEBoundaryCondition::Init();
@@ -61,16 +63,6 @@ void FERigidBC::CopyFrom(FEBoundaryCondition* pbc)
 	FERigidBC* rbc = dynamic_cast<FERigidBC*>(pbc);
 	GetParameterList() = rbc->GetParameterList();
 	m_rb = rbc->m_rb;
-}
-
-void FERigidBC::Activate()
-{
-	// Get the Rigidbody ID
-	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1)); assert(pm);
-	m_rb = pm->GetRigidBodyID(); assert(m_rb >= 0);
-
-	FEBoundaryCondition::Activate();
 }
 
 void FERigidBC::Serialize(DumpStream& ar)
@@ -380,9 +372,17 @@ FERigidIC::FERigidIC(FEModel* fem) : FEInitialCondition(fem)
 
 bool FERigidIC::Init()
 {
-	// Make sure the rigid material ID is valid
 	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
+
+	int matIndex = m_rigidMat - 1;
+	if ((matIndex < 0) || (matIndex >= fem.Materials()))
+	{
+		feLogError("Invalid value for rb");
+		return false;
+	}
+
+	// Make sure the rigid material ID is valid
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(matIndex));
 	if (pm == nullptr) return false;
 
 	return FEInitialCondition::Init();

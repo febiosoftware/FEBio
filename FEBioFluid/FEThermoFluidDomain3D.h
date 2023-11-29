@@ -28,13 +28,14 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FESolidDomain.h>
-#include "FEThermoFluidDomain.h"
+#include "FEFluidDomain.h"
 #include "FEThermoFluid.h"
+#include "FEFluidHeatSupply.h"
 
 //-----------------------------------------------------------------------------
 //! domain described by 3D volumetric elements
 //!
-class FEBIOFLUID_API FEThermoFluidDomain3D : public virtual FESolidDomain, public FEThermoFluidDomain
+class FEBIOFLUID_API FEThermoFluidDomain3D : public virtual FESolidDomain, public FEFluidDomain
 {
 public:
     //! constructor
@@ -43,6 +44,12 @@ public:
     
     //! assignment operator
     FEThermoFluidDomain3D& operator = (FEThermoFluidDomain3D& d);
+    
+    //! initialize
+    bool Init() override;
+    
+    //! serialize
+    void Serialize(DumpStream& ar) override;
     
     //! initialize elements
     void PreSolveUpdate(const FETimeInfo& timeInfo) override;
@@ -73,16 +80,16 @@ public: // overrides from FEElasticDomain
     void BodyForce(FEGlobalVector& R, FEBodyForce& BF) override;
     
     //! Calculate the heat supply
-    void HeatSupply(FEGlobalVector& R, FEFluidHeatSupply& r) override;
+    void HeatSupply(FEGlobalVector& R, FEFluidHeatSupply& r);
 
-    //! intertial forces for dynamic problems
+    //! inertial forces for dynamic problems
     void InertialForces(FEGlobalVector& R) override;
     
     //! calculates the global stiffness matrix for this domain
     void StiffnessMatrix(FELinearSystem& LS) override;
     
     //! Calculate stiffness contribution of heat supplies
-    void HeatSupplyStiffness(FELinearSystem& LS, FEFluidHeatSupply& bf) override;
+    void HeatSupplyStiffness(FELinearSystem& LS, FEFluidHeatSupply& bf);
     
     //! calculates inertial stiffness
     void MassMatrix(FELinearSystem& LS) override;
@@ -110,10 +117,10 @@ public:
     //! Calculates the internal stress vector for solid elements
     void ElementInternalForce(FESolidElement& el, vector<double>& fe);
     
-    //! Calculatess external body forces for solid elements
+    //! Calculates external body forces for solid elements
     void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
     
-    //! Calculatess external supplies for solid elements
+    //! Calculates external supplies for solid elements
     void ElementHeatSupply(FEFluidHeatSupply& BF, FESolidElement& elem, vector<double>& fe);
     
     //! Calculates the inertial force vector for solid elements
@@ -121,7 +128,8 @@ public:
     
 protected:
     FEThermoFluid*  m_pMat;
-    
+    double          m_Tr;       // referential absolute temperature
+
 protected:
     FEDofList   m_dofW;
     FEDofList   m_dofAW;

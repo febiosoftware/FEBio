@@ -63,12 +63,18 @@ public:
     //! serialization
     void Serialize(DumpStream& ar) override;
     
+    //! Set the surface to apply the load to
+    void SetSurface(FESurface* ps) override;
+    
+    void SetSolute(int isol) { m_isol = isol; }
+
+protected:
+    int         m_isol;          //!< solute id
+
 private:
-    int         m_sol;          //!< solute id
     FEDofList   m_dofW;
     int         m_dofC;
-    vector<bool> m_backflow;    //!< flag for nodes that have backflow
-    FENodeNodeList m_nnlist;
+    vector<int> m_ndof;
 
     DECLARE_FECORE_CLASS();
 };

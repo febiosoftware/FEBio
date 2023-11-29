@@ -27,21 +27,21 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEPoroTraction.h"
+#include "FEMixtureNormalTraction.h"
 #include "FECore/FEModel.h"
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEPoroNormalTraction, FESurfaceLoad)
-	ADD_PARAMETER(m_traction  , "traction" );
+BEGIN_FECORE_CLASS(FEMixtureNormalTraction, FESurfaceLoad)
+	ADD_PARAMETER(m_traction  , "traction" )->setLongName("mixture normal traction");
 	ADD_PARAMETER(m_blinear   , "linear"   );
-    ADD_PARAMETER(m_bshellb   , "shell_bottom");
+    ADD_PARAMETER(m_bshellb   , "shell_bottom")->setLongName("apply on shell bottom");
 	ADD_PARAMETER(m_beffective, "effective");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
+FEMixtureNormalTraction::FEMixtureNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
 { 
 	m_traction = 1.0;
 	m_blinear = false; 
@@ -51,14 +51,14 @@ FEPoroNormalTraction::FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem)
 
 //-----------------------------------------------------------------------------
 //! allocate storage
-void FEPoroNormalTraction::SetSurface(FESurface* ps)
+void FEMixtureNormalTraction::SetSurface(FESurface* ps)
 { 
 	FESurfaceLoad::SetSurface(ps);
 	m_traction.SetItemList(ps->GetFacetSet());
 }
 
 //-----------------------------------------------------------------------------
-bool FEPoroNormalTraction::Init()
+bool FEMixtureNormalTraction::Init()
 {
 	FEModel* fem = GetFEModel();
 	m_dof.Clear();
@@ -80,7 +80,7 @@ bool FEPoroNormalTraction::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS)
+void FEMixtureNormalTraction::StiffnessMatrix(FELinearSystem& LS)
 {
 	if (m_blinear) return;
 
@@ -88,7 +88,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS)
 
 	bool bsymm = LS.IsSymmetric();
 
-	FEPoroNormalTraction* traction = this;
+    FEMixtureNormalTraction* traction = this;
 	m_psurf->LoadStiffness(LS, m_dof, m_dof, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
 			double H_i  = dof_a.shape;
@@ -167,7 +167,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FELinearSystem& LS)
 }
 
 //-----------------------------------------------------------------------------
-double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
+double FEMixtureNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 {
 	FESurfaceElement& el = *mp.SurfaceElement();
 
@@ -185,11 +185,11 @@ double FEPoroNormalTraction::Traction(FESurfaceMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::LoadVector(FEGlobalVector& R)
+void FEMixtureNormalTraction::LoadVector(FEGlobalVector& R)
 {
 	m_psurf->SetShellBottom(m_bshellb);
 
-	FEPoroNormalTraction* traction = this;
+    FEMixtureNormalTraction* traction = this;
 	m_psurf->LoadVector(R, m_dof, m_blinear, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
 		// traction at integration points

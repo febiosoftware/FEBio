@@ -76,11 +76,6 @@ enum TypeID
 //! to implement the actual storage mechanism.
 class FECORE_API DumpStream
 {
-	struct Pointer {
-		void*			pd;
-		unsigned int	id;
-	};
-
 public: 
 	class DataBlock
 	{
@@ -214,7 +209,6 @@ public: // input operators
 
 private:
 	int FindPointer(void* p);
-	int FindPointer(int id);
 	void AddPointer(void* p);
 
 	DumpStream& write_matrix(matrix& o);
@@ -246,9 +240,9 @@ private:
 	size_t	m_bytes_serialized;	//!< number or bytes serialized
 
 	bool					m_ptr_lock;
-	std::vector<Pointer>	m_ptr;
+	std::map<void*, int>	m_ptrOut;	// used for writing
+	std::vector<void*>		m_ptrIn;	// user for reading
 };
-
 
 template <typename T> class typeInfo {};
 template <> class typeInfo<int>          { public: static uchar typeId() { return (uchar)TypeID::TYPE_INT;     }};
@@ -348,7 +342,7 @@ template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>
 {
 	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
 	DumpStream& This = *this;
-	int N;
+	int N = 0;
 	m_bytes_serialized += read(&N, sizeof(int), 1);
 	if (N > 0)
 	{
@@ -485,7 +479,7 @@ template <typename T> DumpStream& DumpStream::operator >> (T* &a)
 	ar >> pid;
 	if (pid != -1)
 	{
-		a = (T*)(m_ptr[pid].pd);
+		a = (T*)(m_ptrIn[pid]);
 		return ar;
 	}
 

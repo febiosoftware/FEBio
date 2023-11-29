@@ -45,7 +45,7 @@ BEGIN_FECORE_CLASS(FEFacet2FacetSliding, FEContactInterface)
 		ADD_PARAMETER(m_bupdtpen , "update_penalty");
 		ADD_PARAMETER(m_atol     , "tolerance"    );
 		ADD_PARAMETER(m_btwo_pass, "two_pass"     );
-		ADD_PARAMETER(m_gtol     , "gaptol"       )->setLongName("gap tolerance");
+        ADD_PARAMETER(m_gtol     , "gaptol"       )->setLongName("gap tolerance")->setUnits(UNIT_LENGTH);;
 		ADD_PARAMETER(m_naugmin  , "minaug"       )->setLongName("min. augmentations");
 		ADD_PARAMETER(m_naugmax  , "maxaug"       )->setLongName("max. augmentations");
 		ADD_PARAMETER(m_bsmaug   , "smooth_aug"   )->setLongName("Smooth augmentations");
@@ -53,7 +53,7 @@ BEGIN_FECORE_CLASS(FEFacet2FacetSliding, FEContactInterface)
 
 	BEGIN_PARAM_GROUP("Projection");
 		ADD_PARAMETER(m_stol     , "search_tol"   );
-		ADD_PARAMETER(m_srad     , "search_radius");
+        ADD_PARAMETER(m_srad     , "search_radius")->setUnits(UNIT_LENGTH);;
 		ADD_PARAMETER(m_nsegup   , "seg_up"       )->setLongName("max. segment updates");
 		ADD_PARAMETER(m_breloc   , "node_reloc")->setLongName("node relocation");
 	END_PARAM_GROUP();

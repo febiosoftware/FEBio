@@ -331,7 +331,7 @@ void FETiedFluidInterface::CalcAutoPressurePenalty(FETiedFluidSurface& s)
         // calculate a penalty
         double eps = AutoPressurePenalty(el, s);
         
-        // assign to integation points of surface element
+        // assign to integration points of surface element
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
@@ -1018,4 +1018,8 @@ void FETiedFluidInterface::Serialize(DumpStream &ar)
 	// serialize element pointers
 	SerializeElementPointers(m_ss, m_ms, ar);
 	SerializeElementPointers(m_ms, m_ss, ar);
+    
+    if (ar.IsShallow()) return;
+    ar & m_pfluid;
+    ar & m_dofWE;
 }

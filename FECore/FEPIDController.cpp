@@ -44,6 +44,8 @@ FEPIDController::FEPIDController(FEModel* fem) : FELoadController(fem)
 	m_prev = 0;
 	m_int = 0;
 	m_prevTime = 0.0;
+	m_paramVal = 0.0;
+	m_error = 0.0;
 }
 
 bool FEPIDController::Init()
@@ -60,26 +62,50 @@ bool FEPIDController::Init()
 
 double FEPIDController::GetValue(double time)
 {
-	double val = m_param.value<double>();
-	double error = m_trg - val;
+	m_paramVal = m_param.value<double>();
+	m_error = m_trg - m_paramVal;
 
-	double newVal = m_Kp*error;
+	double newVal = m_Kp* m_error;
 
 	double dt = time - m_prevTime;
 	if (dt != 0.0)
 	{
-		double der = (error - m_prev) / dt;
-		m_int += error*dt;
+		double der = (m_error - m_prev) / dt;
+		m_int += m_error *dt;
 		newVal += m_Kd*der + m_Ki*m_int;
 	}
 
-	m_prev = error;
+	m_prev = m_error;
 	m_prevTime = time;
 
-	feLog("PID controller %d:\n", GetID());
-	feLog("\tparameter = %lg\n", val);
-	feLog("\terror     = %lg\n", error);
-	feLog("\tvalue     = %lg\n", newVal);
+	if (GetFEModel()->GetPrintParametersFlag())
+	{
+		feLog("PID controller %d:\n", GetID());
+		feLog("\tparameter = %lg\n", m_paramVal);
+		feLog("\terror     = %lg\n", m_error);
+		feLog("\tvalue     = %lg\n", newVal);
+	}
 
 	return newVal;
+}
+
+void FEPIDController::Serialize(DumpStream& ar)
+{
+	FELoadController::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_paramVal << m_error << m_prev << m_prevTime << m_int;
+	}
+	else
+	{
+		ar >> m_paramVal >> m_error >> m_prev >> m_prevTime >> m_int;
+
+		if (ar.IsShallow())
+		{
+			FEModel& fem = *GetFEModel();
+			ParamString ps(m_paramName.c_str());
+			m_param = fem.GetParameterValue(ps);
+			assert(m_param.isValid());
+		}
+	}
 }

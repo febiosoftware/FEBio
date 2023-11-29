@@ -34,13 +34,13 @@ SOFTWARE.*/
 #include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
-FEElementSet::FEElementSet(FEModel* fem) : FEItemList(fem)
+FEElementSet::FEElementSet(FEModel* fem) : FEItemList(fem, FEItemList::FE_ELEMENT_SET)
 {
 	m_minID = -1;
 	m_maxID = -1;
 }
 
-FEElementSet::FEElementSet(FEMesh* mesh) : FEItemList(mesh)
+FEElementSet::FEElementSet(FEMesh* mesh) : FEItemList(mesh, FEItemList::FE_ELEMENT_SET)
 {
 	m_minID = -1;
 	m_maxID = -1;

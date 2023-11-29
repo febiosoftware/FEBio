@@ -26,13 +26,33 @@ SOFTWARE.*/
 
 
 
-#include "stdafx.h"
-#include "FEThermoFluidDomain.h"
-#include "FECore/FESolidDomain.h"
-#include "FECore/FEModel.h"
+#pragma once
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEModelParam.h>
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-FEThermoFluidDomain::FEThermoFluidDomain(FEModel* pfem)
+//! FEFluidNormalHeatFlux is a thermo-fluid surface that has a normal
+//! heat flux prescribed on it, equal to what's coming underneath it
+class FEBIOFLUID_API FEFluidNaturalHeatFlux : public FESurfaceLoad
 {
-    m_Tr = 0;
-}
+public:
+    //! constructor
+    FEFluidNaturalHeatFlux(FEModel* pfem);
+    
+    //! initialization
+    bool Init() override;
+    
+    //! Set the surface to apply the load to
+    void SetSurface(FESurface* ps) override;
+    
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R) override;
+    
+    //! calculate heat flux stiffness (there is none)
+    void StiffnessMatrix(FELinearSystem& LS) override {}
+    
+    //! serialization
+    void Serialize(DumpStream& ar) override;
+    
+};

@@ -26,7 +26,7 @@
 
 
 #pragma once
-#include "FEFluidMaterial.h"
+#include "FEPolarFluidMaterial.h"
 #include "FEFluidMaterialPoint.h"
 #include "FEElasticFluid.h"
 #include "FEPolarFluidMaterialPoint.h"
@@ -39,7 +39,7 @@
 //!       which is used in FEReactionRateExpSED and FEReactionRateHuiskes.
 //!       Note sure yet if there is a better alternative.
 
-class FEBIOFLUID_API FEPolarFluid : public FEFluidMaterial, public FEBiphasicInterface
+class FEBIOFLUID_API FEPolarFluid : public FEPolarFluidMaterial, public FEBiphasicInterface
 {
 public:
     FEPolarFluid(FEModel* pfem);
@@ -51,6 +51,9 @@ public:
     //! performs initialization
     bool Init() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
     //! calculate stress at material point
     mat3ds Stress(FEMaterialPoint& pt) override;
     
@@ -77,7 +80,7 @@ public:
     double Temperature(FEMaterialPoint& mp) override { return m_Tr; }
     
     //! evaluate dilatation from pressure
-    bool Dilatation(const double T, const double p, const double c, double& e) override;
+    bool Dilatation(const double T, const double p, double& e) override;
     
     //! return elastic fluid
     FEElasticFluid* GetElastic() { return m_pElastic; }

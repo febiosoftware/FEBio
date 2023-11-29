@@ -98,7 +98,7 @@ void FEFluidPressureLoad::Update()
             FENode& node = ps->Node(i);
             // calculate the dilatation
             double e = node.get(m_dofEF);
-            bool good = m_pfluid->Dilatation(0,m_p0,0,e);
+            bool good = m_pfluid->Dilatation(0,m_p0,e);
             assert(good);
             // set node as having prescribed DOF
             node.set(m_dofEF, e);
@@ -113,5 +113,7 @@ void FEFluidPressureLoad::Update()
 void FEFluidPressureLoad::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofEF;
     ar & m_pfluid;
 }

@@ -37,14 +37,14 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FESoluteConvectiveFlow, FESurfaceLoad)
-ADD_PARAMETER(m_sol, "sol");
+    ADD_PARAMETER(m_sol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
 FESoluteConvectiveFlow::FESoluteConvectiveFlow(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
-    m_sol = 0;
+    m_sol = -1;
     
     m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
     m_dofEF = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
@@ -174,4 +174,6 @@ void FESoluteConvectiveFlow::Update()
 void FESoluteConvectiveFlow::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofW & m_dofEF & m_dofC;
 }

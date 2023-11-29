@@ -142,6 +142,14 @@ vec3d ImageMap::gradient(const vec3d& r)
 	}
 	else
 	{
+		int nx = m_img.width();
+		int ny = m_img.height();
+		int nz = m_img.depth();
+
+		if ((p.i < 0) || (p.i >= nx - 1)) return vec3d(0,0,0);
+		if ((p.j < 0) || (p.j >= ny - 1)) return vec3d(0,0,0);
+		if ((p.k < 0) || (p.k >= nz - 1)) return vec3d(0,0,0);
+
 		// get the x-gradient values
 		double gx[8];
 		gx[0] = grad_x(p.i  , p.j  , p.k  );

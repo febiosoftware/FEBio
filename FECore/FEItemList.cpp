@@ -30,16 +30,21 @@ SOFTWARE.*/
 #include "FEItemList.h"
 #include "DumpStream.h"
 #include "FEModel.h"
+#include "FENodeSet.h"
+#include "FEFacetSet.h"
+#include "FEElementSet.h"
+#include "FESegmentSet.h"
 
-FEItemList::FEItemList(FEModel* fem)// : FECoreBase(fem)
+FEItemList::FEItemList(FEModel* fem, FEItemType type) : m_type(type)
 {
+	m_mesh = nullptr;
 	if (fem)
 	{
 		m_mesh = &fem->GetMesh();
 	}
 }
 
-FEItemList::FEItemList(FEMesh* mesh)// : FECoreBase(fem)
+FEItemList::FEItemList(FEMesh* mesh, FEItemType type) : m_type(type)
 {
 	m_mesh = mesh;
 }
@@ -74,11 +79,26 @@ void FEItemList::SetName(const std::string& name)
 
 FEItemList* FEItemList::LoadClass(DumpStream& ar, FEItemList* p)
 {
-	assert(false);
-	return nullptr;
+	int ntype = -1;
+	ar >> ntype;
+	FEItemList* pi = nullptr;
+	FEModel* fem = &ar.GetFEModel();
+	switch (ntype)
+	{
+	case FE_NODE_SET   : pi = new FENodeSet   (fem); break;
+	case FE_FACET_SET  : pi = new FEFacetSet  (fem); break;
+	case FE_ELEMENT_SET: pi = new FEElementSet(fem); break;
+	case FE_SEGMENT_SET: pi = new FESegmentSet(fem); break;
+	default:
+		assert(false);
+		break;
+	}
+	
+	return pi;
 }
 
 void FEItemList::SaveClass(DumpStream& ar, FEItemList* p)
 {
-	assert(false);
+	int ntype = (int) p->Type();
+	ar << (int)ntype;
 }

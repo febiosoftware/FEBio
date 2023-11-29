@@ -28,47 +28,49 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FESoluteBackflowStabilization.h"
-#include "FEFluid.h"
+#include "FEFluidSolutes.h"
 #include "FEBioFluidSolutes.h"
 #include <FECore/FENodeNodeList.h>
 #include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FESoluteBackflowStabilization, FESurfaceLoad)
-ADD_PARAMETER(m_sol , "sol");
+    ADD_PARAMETER(m_isol   , "solute_id")->setEnums("$(solutes)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! constructor
 FESoluteBackflowStabilization::FESoluteBackflowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
-    m_sol = 0;
+    m_isol = -1;
     m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
-    m_nnlist = FENodeNodeList();
+}
+
+//-----------------------------------------------------------------------------
+//! allocate storage
+void FESoluteBackflowStabilization::SetSurface(FESurface* ps)
+{
+    FESurfaceLoad::SetSurface(ps);
 }
 
 //-----------------------------------------------------------------------------
 //! initialize
 bool FESoluteBackflowStabilization::Init()
 {
-    if (FESurfaceLoad::Init() == false) return false;
-    
     // determine the nr of concentration equations
     FEModel& fem = *GetFEModel();
     DOFS& fedofs = fem.GetDOFS();
     m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
     int MAX_CDOFS = fedofs.GetVariableSize(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
-    if ((m_sol < 1) || (m_sol > MAX_CDOFS)) return false;
+    if ((m_isol < 1) || (m_isol > MAX_CDOFS)) return false;
     
     m_dof.AddDofs(m_dofW);
 	m_dof.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION));
 
     FESurface* ps = &GetSurface();
-    m_backflow.assign(ps->Nodes(), false);
+    ps->UpdateNodeNormals();
     
-    m_nnlist.Create(fem.GetMesh());
-
-    return true;
+    return FESurfaceLoad::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -77,13 +79,14 @@ void FESoluteBackflowStabilization::Activate()
 {
     FESurface* ps = &GetSurface();
     
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
+    
+    m_ndof.assign(ps->Nodes(),DOF_OPEN);
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
-        // mark node as having prescribed DOF
-        node.set_bc(dofc, DOF_OPEN);
+        m_ndof[i] = node.get_bc(dofc);
     }
     
     FESurfaceLoad::Activate();
@@ -99,63 +102,14 @@ void FESoluteBackflowStabilization::Update()
     // prescribe solute backflow constraint at the nodes
     FESurface* ps = &GetSurface();
     
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
-        FENode& node = ps->Node(i);
-        // set node as having prescribed DOF (concentration at previous time)
-        //Otherwise set node as having concentration of adjacent node
-        if (node.m_ID[dofc] < -1)
-            node.set(dofc, node.get_prev(dofc));
-        else
-        {
-            node.set_bc(dofc, DOF_PRESCRIBED);
-            node.m_ID[dofc] = -node.m_ID[dofc] - 2;
-            int nid = node.GetID()-1; //0 based
-            int val = m_nnlist.Valence(nid);
-            int* nlist = m_nnlist.NodeList(nid);
-            
-            vector<int> connectnidarray;
-            int connectnid=0;
-            //check which connecting nodes are not on surface
-            for (int j = 0; j<val; ++j)
-            {
-                int cnid = *(nlist+j);
-                bool isSurf = false;
-                for (int k=0; k<ps->Nodes(); ++k)
-                {
-                    if (cnid==ps->Node(k).GetID()-1)
-                        isSurf = true;
-                }
-                if (!isSurf)
-                {
-                    connectnidarray.push_back(cnid);
-                }
-            }
-            //find closest connecting node
-            if (connectnidarray.size()>0)
-            {
-                int cnodeIndex = 0;
-                FENode* cnodeArray = GetFEModel()->GetMesh().FindNodeFromID(connectnidarray[cnodeIndex]+1);
-                double smallDist = sqrt(pow((node.m_rt.x-cnodeArray->m_rt.x),2)+pow((node.m_rt.y-cnodeArray->m_rt.y),2)+pow((node.m_rt.z-cnodeArray->m_rt.z),2));
-                for (int j = 1; j<connectnidarray.size(); ++j)
-                {
-                    FENode* tempNode = GetFEModel()->GetMesh().FindNodeFromID(connectnidarray[j]+1);
-                    double temp = sqrt(pow((node.m_rt.x-tempNode->m_rt.x),2)+pow((node.m_rt.y-tempNode->m_rt.y),2)+pow((node.m_rt.z-tempNode->m_rt.z),2));
-                    if(temp<smallDist)
-                    {
-                        cnodeIndex = j;
-                        cnodeArray = tempNode;
-                        smallDist = temp;
-                    }
-                }
-                connectnid = connectnidarray[cnodeIndex];
-                FENode* cnode = GetFEModel()->GetMesh().FindNodeFromID(connectnid+1);
-                node.set(dofc, cnode->get(dofc));
-            }
-            else
-                node.set(dofc, 0);
+        if (m_ndof[i] == DOF_OPEN) {
+            FENode& node = ps->Node(i);
+            // set node as having prescribed DOF (concentration at previous time)
+            if (node.get_bc(dofc) == DOF_PRESCRIBED) node.set(dofc,node.get_prev(dofc));
         }
     }
 }
@@ -164,78 +118,23 @@ void FESoluteBackflowStabilization::Update()
 //! evaluate the flow rate across this surface
 void FESoluteBackflowStabilization::MarkBackFlow()
 {
+    const FETimeInfo& tp = GetTimeInfo();
+    
     // Mark all nodes on this surface to have open concentration DOF
     FESurface* ps = &GetSurface();
-    int dofc = m_dofC + m_sol - 1;
+    int dofc = m_dofC + m_isol - 1;
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
-        // mark node as having free DOF
-        if (node.m_ID[dofc] < -1) {
+        if (m_ndof[i] == DOF_OPEN) {
             node.set_bc(dofc, DOF_OPEN);
-            node.m_ID[dofc] = -node.m_ID[dofc] - 2;
-        }
-    }
-
-    const FETimeInfo& tp = GetTimeInfo();
-
-    // Calculate normal flow velocity on each face to determine
-    // backflow condition
-    vec3d rt[FEElement::MAX_NODES];
-    vec3d vt[FEElement::MAX_NODES];
-    
-    for (int iel=0; iel<m_psurf->Elements(); ++iel)
-    {
-        FESurfaceElement& el = m_psurf->Element(iel);
-        
-        // nr integration points
-        int nint = el.GaussPoints();
-        
-        // nr of element nodes
-        int neln = el.Nodes();
-        
-        // nodal coordinates
-        for (int i=0; i<neln; ++i) {
-            FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-            rt[i] = node.m_rt*tp.alpha + node.m_rp*(1-tp.alpha);
-            vt[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
-        }
-        
-        double* Nr, *Ns;
-        double* N;
-        double* w  = el.GaussWeights();
-        
-        vec3d dxr, dxs, v;
-        double vn = 0;
-
-        // repeat over integration points
-        for (int n=0; n<nint; ++n)
-        {
-            N  = el.H(n);
-            Nr = el.Gr(n);
-            Ns = el.Gs(n);
-            
-            // calculate the velocity and tangent vectors at integration point
-            dxr = dxs = v = vec3d(0,0,0);
-            for (int i=0; i<neln; ++i)
-            {
-                v += vt[i]*N[i];
-                dxr += rt[i]*Nr[i];
-                dxs += rt[i]*Ns[i];
-            }
-            
-            vec3d normal = dxr ^ dxs;
-            normal.unit();
-            vn += (normal*v)*w[n];
-        }
-        
-        if (vn < 0) {
-            for (int i=0; i<neln; ++i) {
-                FENode& node = m_psurf->GetMesh()->Node(el.m_node[i]);
-                if (node.m_ID[dofc] > -1) {
-                    node.set_bc(dofc, DOF_PRESCRIBED);
-                    node.m_ID[dofc] = -node.m_ID[dofc] - 2;
-                }
+            if (node.m_ID[dofc] < -1) node.m_ID[dofc] = -node.m_ID[dofc] - 2;
+            // check velocity normal to surface at this node
+            vec3d v = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
+            double vn = v*ps->NodeNormal(i);
+            if (vn < 0) {
+                node.set_bc(dofc, DOF_PRESCRIBED);
+                node.m_ID[dofc] = -node.m_ID[dofc] - 2;
             }
         }
     }
@@ -252,8 +151,6 @@ void FESoluteBackflowStabilization::LoadVector(FEGlobalVector& R)
 void FESoluteBackflowStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-	ar & m_dofW;
-	ar & m_dofC;
-	ar & m_backflow;
-    //ar & m_nnlist;
+    if (ar.IsShallow()) return;
+	ar & m_dofW & m_dofC;
 }

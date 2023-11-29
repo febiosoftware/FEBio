@@ -292,7 +292,7 @@ void FESolutesSolver::UpdateKinematics(vector<double>& ui)
     }
     
 
-    // make sure the prescribed dofs are fullfilled
+    // make sure the prescribed dofs are fulfilled
     int nbc = fem.BoundaryConditions();
     for (int i=0; i<nbc; ++i)
     {
@@ -503,7 +503,7 @@ void FESolutesSolver::PrepStep()
         if (pml.IsActive() && HasActiveDofs(pml.GetDofList())) pml.Update();
     }
 
-    // intialize material point data
+    // initialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
     //       the material point data is initialized
@@ -577,7 +577,7 @@ bool FESolutesSolver::Quasin()
         normE1 = s*fabs(m_ui*m_R1);
         
         // check for nans
-        if (ISNAN(normR1)) throw NANDetected();
+        if (ISNAN(normR1)) throw NANInResidualDetected();
         
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
@@ -781,12 +781,26 @@ bool FESolutesSolver::Residual(vector<double>& R)
 void FESolutesSolver::Serialize(DumpStream& ar)
 {
     FENewtonSolver::Serialize(ar);
+
+    ar & m_neq & m_nceq;
+    ar & m_nrhs & m_niter & m_nref & m_ntotref;
+
+    ar & m_Fr & m_Ui & m_Ut;
+    ar & m_Ci;
+
+    if (ar.IsLoading())
+    {
+        m_Fr.assign(m_neq, 0);
+        for (int i=0; i<m_nceq.size(); ++i) {
+            m_ci[i].assign(m_nceq[i], 0);
+            m_Ci[i].assign(m_nceq[i], 0);
+        }
+    }
+    
     if (ar.IsShallow()) return;
+
     ar & m_alphaf & m_alpham;
     ar & m_gammaf;
     ar & m_pred;
-    
-    ar & m_Fr & m_Ui &m_Ut;
-
-    ar & m_ci & m_Ci;
+    ar & m_dofC & m_dofAC;
 }

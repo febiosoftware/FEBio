@@ -505,6 +505,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
     else if (strcmp(sztype, "q4ans"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = ANS_SHELL; }   // default shell type for q4ans
 	else if (strcmp(sztype, "truss2" ) == 0) eshape = ET_TRUSS2;
 	else if (strcmp(sztype, "line2"  ) == 0) eshape = ET_TRUSS2;
+	else if (strcmp(sztype, "line3"  ) == 0) eshape = ET_LINE3;
 	else if (strcmp(sztype, "ut4"    ) == 0) { eshape = ET_TET4; m_but4 = true; }
 	else
 	{
@@ -581,6 +582,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	case ET_QUAD8  : etype = (NDIM == 3 ? stype : FE2D_QUAD8G9); break;
 	case ET_QUAD9  : etype = FE2D_QUAD9G9; break;
 	case ET_TRUSS2 : etype = FE_TRUSS; break;
+	case ET_LINE3  : etype = FE_BEAM3G2; break;
 	default:
 		assert(false);
 	}
@@ -789,6 +791,26 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 		ps = new FENodeSet(&m_fem);
 		ps->Add(nodeList);
 		ps->SetName(esetName);
+		mesh.AddNodeSet(ps);
+
+		return ps;
+	}
+	else if (setName.compare(0, 11, "@part_list:") == 0)
+	{
+		// see if we can find an element set
+		FEElementSet* part = mesh.FindElementSet(setName);
+		if (part == nullptr) return nullptr;
+
+		// we might have been here before. If so, we already create a nodeset
+		// with the same name as the surface, so look for that first.
+		FENodeSet* ps = mesh.FindNodeSet(setName);
+		if (ps) return ps;
+
+		// okay, first time here, so let's create a node set from this element set
+		FENodeList nodeList = part->GetNodeList();
+		ps = new FENodeSet(&m_fem);
+		ps->Add(nodeList);
+		ps->SetName(setName);
 		mesh.AddNodeSet(ps);
 
 		return ps;

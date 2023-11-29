@@ -47,7 +47,10 @@ public:
     //! initialization
     bool Init() override;
     
-    //! gage pressure
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
+    //! gauge pressure
     double Pressure(FEMaterialPoint& pt) override;
     
     //! tangent of pressure with respect to strain J
@@ -87,7 +90,7 @@ public:
     double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
     
     //! dilatation from temperature and pressure
-    bool Dilatation(const double T, const double p, const double c, double& e) override;
+    bool Dilatation(const double T, const double p, double& e) override;
     
     //! fluid pressure from state variables
     double Pressure(const double ef, const double T);
@@ -97,12 +100,14 @@ public:
     double      m_Pr;       //!< referential absolute pressure
     double      m_Tr;       //!< referential absolute temperature
     double      m_rhor;     //!< referential mass density
-    FEFunction1D*   m_psat;         //!< normalized gage pressure on saturation curve (multiply by m_Pr to get actual value)
-    FEFunction1D*   m_asat;         //!< normalized specific free energy on saturation curve (multiply by m_rhor/m_Pr to get actual value)
-    FEFunction1D*   m_ssat;         //!< normalized specific entropy on saturation curve (multiply by m_rhor*m_Tr/m_Pr to get actual value)
+    FEFunction1D*   m_psat;         //!< normalized gauge pressure on saturation curve (multiply by m_Pr to get actual value)
+    FEFunction1D*   m_asat;         //!< normalized specific free energy on saturation curve (multiply by m_Pr/m_rhor to get actual value)
+    FEFunction1D*   m_ssat;         //!< normalized specific entropy on saturation curve (multiply by m_Pr/m_rhor*m_Tr to get actual value)
     FEFunction1D*   m_esat;         //!< dilatation on saturation curve
-    int             m_nvc;          //!< number of virial coefficients for pressure constitutive relation
+    int             m_nvc;          //!< number of virial coefficients for pressure and cv constitutive relation
     FEFunction1D*   m_B[MAX_NVC];   //!< non-dimensional virial coefficients for pressure constitutive relation
+    FEFunction1D*   m_cvsat;        //!< normalized isochoric specific heat capacity on saturation curve (multiply by m_Pr/m_rhor*m_Tr to get actual value)
+    FEFunction1D*   m_C[MAX_NVC];   //!< non-dimensional virial coefficients for isochoric specific heat capacity
 
     FEThermoFluid*  m_pMat; //!< parent thermo-fluid material
     

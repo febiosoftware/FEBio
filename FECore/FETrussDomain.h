@@ -39,6 +39,8 @@ public:
 public:
 	bool Create(int nsize, FE_Element_Spec espec) override;
 
+	bool Init() override;
+
 	int Elements() const override { return (int)m_Elem.size(); }
 
 	FETrussElement& Element(int i) { return m_Elem[i]; }
@@ -51,7 +53,7 @@ public:
 
 public:
 	//! Calculate the truss normal
-	vec3d TrussNormal(FETrussElement& el);
+	vec3d GetTrussAxisVector(FETrussElement& el);
 
 protected:
 	vector<FETrussElement>	m_Elem;

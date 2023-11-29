@@ -44,6 +44,11 @@ class FELinearSystem;
 class FEBIOFLUID_API FEThermoFluidSolver : public FENewtonSolver
 {
 public:
+    enum SOLVE_STRATEGY {
+        SOLVE_COUPLED,          // monolithic solution approach
+        SOLVE_SEQUENTIAL        // first solve velocity+dilatation, then temperature
+    };
+    
     //! constructor
     FEThermoFluidSolver(FEModel* pfem);
     
@@ -59,7 +64,7 @@ public:
     //! Initialize linear equation system
     bool InitEquations() override;
     bool InitEquations2() override;
-    
+
 public:
     //{ --- evaluation and update ---
     //! Perform an update
@@ -116,6 +121,10 @@ public:
     double  m_Ftol;         //!< dilatation tolerance
     double  m_Ttol;         //!< temperature tolerance
     double  m_minJf;        //!< minimum allowable compression ratio
+    double  m_minT;         //!< minimum allowable absolute temperature
+    double  m_Tmin;     //!< threshold for detecting sudden drop in concentration
+    double  m_Tmax;     //!< threshold for detecting sudden increase in concentration
+    int     m_Tnum;     //!< minimum number of points at which C drops suddenly
 
 public:
     // equation numbers
@@ -147,6 +156,11 @@ protected:
     int         m_dofAEF;
     int         m_dofAT;
 
+    int                m_solve_strategy;
+    
+private:
+    bool            m_sudden_T_change;
+    
     // declare the parameter list
     DECLARE_FECORE_CLASS();
 };

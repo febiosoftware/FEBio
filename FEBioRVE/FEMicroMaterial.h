@@ -30,12 +30,13 @@ SOFTWARE.*/
 #include "FEPeriodicBoundary1O.h"
 #include "FECore/FECallBack.h"
 #include "FERVEModel.h"
+#include "febiorve_api.h"
 
 class FERVEProbe;
 
 //-----------------------------------------------------------------------------
 //! Material point class for the micro-material
-class FEMicroMaterialPoint : public FEElasticMaterialPoint
+class FEBIORVE_API FEMicroMaterialPoint : public FEElasticMaterialPoint
 {
 public:
 	//! constructor

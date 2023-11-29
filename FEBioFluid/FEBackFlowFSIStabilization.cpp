@@ -72,6 +72,8 @@ bool FEBackFlowFSIStabilization::Init()
 void FEBackFlowFSIStabilization::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofU & m_dofW;
 }
 
 //-----------------------------------------------------------------------------

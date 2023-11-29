@@ -38,6 +38,11 @@ public:
 	FEImageSource(FEModel* fem);
 
 	virtual bool GetImage3D(Image& im) = 0;
+
+	std::string GetFileName() { return m_file; }
+
+protected:
+	std::string		m_file;
 };
 
 //---------------------------------------------------------------------------
@@ -54,10 +59,37 @@ private:
 	bool Load(const char* szfile, Image& im, Image::ImageFormat fmt, bool endianess = false);
 
 protected:
-	std::string		m_file;
 	int				m_dim[3];
 	int				m_format;
 	bool			m_bend;
+
+	DECLARE_FECORE_CLASS();
+};
+
+//---------------------------------------------------------------------------
+// Class for reading NRRD images
+class FEIMGLIB_API FENRRDImage : public FEImageSource
+{
+	enum NRRD_TYPE {
+		NRRD_INVALID,
+		NRRD_FLOAT
+	};
+
+	enum NRRD_ENCODING {
+		NRRD_RAW,
+		NRRD_ASCII
+	};
+
+public:
+	FENRRDImage(FEModel* fem);
+
+	bool GetImage3D(Image& im) override;
+
+private:
+	// load image data from file
+	bool Load(const char* szfile, Image& im);
+
+private:
 
 	DECLARE_FECORE_CLASS();
 };

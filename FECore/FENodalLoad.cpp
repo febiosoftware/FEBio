@@ -51,7 +51,7 @@ void FENodalLoad::Serialize(DumpStream& ar)
 {
 	FEModelComponent::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_dofs;
+	ar & m_dofs & m_nodeSet;
 }
 
 //-----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void FENodalLoad::StiffnessMatrix(FELinearSystem& LS)
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalDOFLoad, FENodalLoad)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list)");
-	ADD_PARAMETER(m_scale, "scale");
+	ADD_PARAMETER(m_scale, "scale")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

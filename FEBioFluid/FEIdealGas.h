@@ -43,7 +43,10 @@ public:
     //! initialization
     bool Init() override;
     
-    //! gage pressure
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
+    //! gauge pressure
     double Pressure(FEMaterialPoint& pt) override;
     
     //! tangent of pressure with respect to strain J
@@ -83,7 +86,7 @@ public:
     double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
     
     //! dilatation from temperature and pressure
-    bool Dilatation(const double T, const double p, const double c, double& e) override;
+    bool Dilatation(const double T, const double p, double& e) override;
 
 public:
     double      m_R;        //!< universal gas constant

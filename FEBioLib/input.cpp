@@ -359,6 +359,7 @@ void FEBioModel::echo_input()
 			if (i>0) feLog("---------------------------------------------------------------------------\n");
 			feLog("Rigid Body %d:\n", rb.m_nID+1);
 			feLog("\tmaterial id    : %d\n", rb.m_mat+1);
+			feLog("\tname           : %s\n", rb.GetName().c_str());
 			feLog("\tcenter of mass : %lg, %lg, %lg\n", rb.m_r0.x, rb.m_r0.y, rb.m_r0.z);
             feLog("\tmass           : %lg\n", rb.m_mass);
             feLog("\tIxx Ixy Ixz    : %lg, %lg, %lg\n", rb.m_moi.xx(), rb.m_moi.xy(), rb.m_moi.xz());
@@ -528,11 +529,11 @@ void FEBioModel::echo_input()
 		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(pplt);
 		feLog("\tplotfile format ........................... : FEBIO\n");
 
-		const FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
+		FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
 
 		for (int i = 0; i < 5; ++i)
 		{
-			const list<FEBioPlotFile::DICTIONARY_ITEM>* pl = 0;
+			list<FEBioPlotFile::DICTIONARY_ITEM>* pl = 0;
 			const char* szn = 0;
 			switch (i)
 			{

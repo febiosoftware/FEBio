@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "febiofluid_api.h"
 #include <FECore/FESurfaceLoad.h>
+#include <FECore/FENodeNodeList.h>
 
 //-----------------------------------------------------------------------------
 //! FETemperatureBackflowStabilization is a fluid surface where temperature
@@ -62,8 +63,12 @@ public:
     //! serialization
     void Serialize(DumpStream& ar) override;
     
+    //! Set the surface to apply the load to
+    void SetSurface(FESurface* ps) override;
+    
 private:
     FEDofList   m_dofW;
     int         m_dofT;
-    vector<bool> m_backflow;    //!< flag for nodes that have backflow
+    FENodeNodeList m_nnlist;
+
 };

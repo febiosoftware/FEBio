@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // TODO: This was introduced so that the FEGenerationMaterial fits in the current
 //       framework, which assumes that all features classes are derived from base-classes.
-class FEGenerationBase : public FEMaterialProperty
+class FEBIOMECH_API FEGenerationBase : public FEMaterialProperty
 {
 public:
 	FEGenerationBase(FEModel* fem);

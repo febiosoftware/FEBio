@@ -40,18 +40,34 @@ BEGIN_FECORE_CLASS(FEPorousNeoHookean, FEElasticMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
+bool FEPorousNeoHookean::Init()
+{
+    FECoreBase* ancestor = GetAncestor();
+    FEBiphasic* bparnt = dynamic_cast<FEBiphasic*>(ancestor);
+    FEBiphasicSolute* bsprnt = dynamic_cast<FEBiphasicSolute*>(ancestor);
+    FEMultiphasic* mparnt = dynamic_cast<FEMultiphasic*>(ancestor);
+    if (bparnt) m_phisr = bparnt->m_phi0;
+    else if (bsprnt) m_phisr = bsprnt->m_phi0;
+    else if (mparnt) m_phisr = mparnt->m_phi0;
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEPorousNeoHookean::Stress(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+    double E = m_E(mp);
+    double lam = m_lam(mp);
     
     double phisr = ReferentialSolidVolumeFraction(mp);
     double phiwr = 1 - phisr;
-    m_mu  = m_E/3*(1+0.5*phiwr*phiwr);
+    double mu  = E/3*(1+0.5*phiwr*phiwr);
     double J = pt.m_J;
     double Jbar = (J-phisr)/phiwr;
     double lnJbar = log(Jbar);
     double R = pow(Jbar/J, 2./3.);
-    double mu1 = m_mu/J;
+    double mu1 = mu/J;
 
     // calculate left Cauchy-Green tensor
     mat3ds b = pt.LeftCauchyGreen();
@@ -61,7 +77,7 @@ mat3ds FEPorousNeoHookean::Stress(FEMaterialPoint& mp)
     mat3dd I(1);
     
     // calculate stress
-    mat3ds s = b*(mu1*R) + I*((mu1*(phisr*R*I1/3. - J) + m_lam*lnJbar)/(J - phisr));
+    mat3ds s = b*(mu1*R) + I*((mu1*(phisr*R*I1/3. - J) + lam*lnJbar)/(J - phisr));
     
     return s;
 }
@@ -71,15 +87,18 @@ tens4ds FEPorousNeoHookean::Tangent(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
+    double E = m_E(mp);
+    double lam = m_lam(mp);
+    
     double phisr = ReferentialSolidVolumeFraction(mp);
     double phiwr = 1 - phisr;
-    m_mu  = m_E/3*(1+0.5*phiwr*phiwr);
+    double mu  = E/3*(1+0.5*phiwr*phiwr);
     double J = pt.m_J;
     double Jbar = (J-phisr)/phiwr;
     double lnJbar = log(Jbar);
     double R = pow(Jbar/J, 2./3.);
-    double mu1 = m_mu/J;
-    double lam1 = m_lam/J;
+    double mu1 = mu/J;
+    double lam1 = lam/J;
     
     double g = mu1*R*phisr/(J-phisr);
     double h = (lam1*lnJbar - mu1)*J/(J-phisr);
@@ -106,9 +125,12 @@ double FEPorousNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
 {
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
+    double E = m_E(mp);
+    double lam = m_lam(mp);
+    
     double phisr = ReferentialSolidVolumeFraction(mp);
     double phiwr = 1 - phisr;
-    m_mu  = m_E/3*(1+0.5*phiwr*phiwr);
+    double mu  = E/3*(1+0.5*phiwr*phiwr);
     double J = pt.m_J;
     double Jbar = (J-phisr)/phiwr;
     double lnJbar = log(Jbar);
@@ -117,7 +139,7 @@ double FEPorousNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
     mat3ds b = pt.LeftCauchyGreen();
     double I1bar = b.tr()*pow(Jbar/J, 2./3.);
     
-    double sed = m_mu*((I1bar-3)/2.0 - lnJbar)+m_lam*lnJbar*lnJbar/2.0;
+    double sed = mu*((I1bar-3)/2.0 - lnJbar)+lam*lnJbar*lnJbar/2.0;
     
     return sed;
 }
@@ -125,8 +147,5 @@ double FEPorousNeoHookean::StrainEnergyDensity(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 double FEPorousNeoHookean::ReferentialSolidVolumeFraction(FEMaterialPoint& mp)
 {
-    if (m_phisr < 1) return m_phisr;
-    
-    FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-    return pt.m_phi0t;
+    return m_phisr(mp);
 }

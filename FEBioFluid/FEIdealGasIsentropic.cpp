@@ -26,14 +26,15 @@ SOFTWARE.*/
 
 
 
-#include "stdafx.h"
 #include "FEIdealGasIsentropic.h"
+#include "FEFluidMaterialPoint.h"
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEIdealGasIsentropic, FEFluid)
-	ADD_PARAMETER(m_gamma, FE_RANGE_GREATER(0.0), "gamma");
-	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    );
+BEGIN_FECORE_CLASS(FEIdealGasIsentropic, FEElasticFluid)
+	ADD_PARAMETER(m_gamma, FE_RANGE_GREATER(0.0), "gamma")->setLongName("specific heat capacity ratio");
+	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    )->setLongName("molar mass")->setUnits(UNIT_MOLAR_MASS);
+    ADD_PARAMETER(m_cv0  , FE_RANGE_GREATER(0.0), "cv0"  )->setLongName("isochoric specific heat capacity")->setUnits(UNIT_SPECIFIC_ENTROPY);
 END_FECORE_CLASS();
 
 //============================================================================
@@ -43,12 +44,13 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FEIdealGasIsentropic constructor
 
-FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEFluid(pfem)
+FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEElasticFluid(pfem)
 {
     m_rhor = 0;
     m_k = 0;
     m_gamma = 0;
     m_M = 0;
+    m_cv0 = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,9 +65,19 @@ bool FEIdealGasIsentropic::Init()
 	if (m_Tr <= 0) { feLogError("A positive ambient absolute temperature T must be defined in Globals section"); return false; }
 	if (m_Pr <= 0) { feLogError("A positive ambient absolute pressure P must be defined in Globals section"); return false; }
 
-    m_rhor = m_M*m_Pr/(m_R*m_Tr);
+    if (m_rhor == 0) m_rhor = m_M*m_Pr/(m_R*m_Tr);
+    if (m_k == 0) m_k = m_Pr;
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEIdealGasIsentropic::Serialize(DumpStream& ar)
+{
+    FEElasticFluid::Serialize(ar);
+    if (ar.IsShallow()) return;
+    
+    ar & m_R & m_Pr & m_Tr & m_rhor;
 }
 
 //-----------------------------------------------------------------------------
@@ -73,63 +85,108 @@ bool FEIdealGasIsentropic::Init()
 double FEIdealGasIsentropic::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    return Pressure(fp.m_ef,0);
+    double p =m_k*(pow(1+fp.m_ef,-m_gamma)-1);
+    return p;
 }
 
 //-----------------------------------------------------------------------------
-//! elastic pressure from dilatation
-double FEIdealGasIsentropic::Pressure(const double e, const double T)
-{
-    double J = 1 + e;
-    return m_Pr*(pow(J, -m_gamma) - 1);
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of elastic pressure with respect to strain J
-double FEIdealGasIsentropic::Tangent_Pressure_Strain(FEMaterialPoint& mp)
+//! tangent of pressure with respect to strain J
+double FEIdealGasIsentropic::Tangent_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = 1 + fp.m_ef;
-    double dp = -m_gamma*m_Pr*pow(J, -m_gamma-1);
-    return dp;
+    double dpJ = -m_k*m_gamma*pow(1+fp.m_ef,-1-m_gamma);
+    return dpJ;
 }
 
 //-----------------------------------------------------------------------------
-//! 2nd tangent of elastic pressure with respect to strain J
-double FEIdealGasIsentropic::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
+//! 2nd tangent of pressure with respect to strain J
+double FEIdealGasIsentropic::Tangent_Strain_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = 1+ fp.m_ef;
-    double d2p = m_gamma*(m_gamma+1)*m_Pr*pow(J, -m_gamma-2);
-    return d2p;
+    double d2pJ = m_k*m_gamma*(1+m_gamma)*pow(1+fp.m_ef,-2-m_gamma);
+    return d2pJ;
 }
 
 //-----------------------------------------------------------------------------
-//! evaluate temperature
-double FEIdealGasIsentropic::Temperature(FEMaterialPoint& mp)
+//! tangent of pressure with respect to temperature T
+double FEIdealGasIsentropic::Tangent_Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = 1 + fp.m_ef;
-    double T = m_Tr*pow(J, 1-m_gamma);
-    return T;
+    double dpT = m_k/(1+fp.m_ef)/m_Tr;
+    return dpT;
 }
 
 //-----------------------------------------------------------------------------
-//! calculate free energy density (per reference volume)
-double FEIdealGasIsentropic::StrainEnergyDensity(FEMaterialPoint& mp)
+//! 2nd tangent of pressure with respect to temperature T
+double FEIdealGasIsentropic::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
+{
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of pressure with respect to strain J and temperature T
+double FEIdealGasIsentropic::Tangent_Strain_Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double J = 1 + fp.m_ef;
-    double sed = m_Pr*(J-1+(pow(J, 1-m_gamma)-1)/(m_gamma-1));
-    return sed;
+    double dpTJ = -m_k/pow(1+fp.m_ef,2)/m_Tr;
+    return 0;
 }
 
 //-----------------------------------------------------------------------------
-//! invert pressure-dilatation relation
-bool FEIdealGasIsentropic::Dilatation(const double T, const double p, const double c, double& e)
+//! specific free energy
+double FEIdealGasIsentropic::SpecificFreeEnergy(FEMaterialPoint& mp)
 {
-    double J = pow(p/m_Pr+1, -1./m_gamma);
-    e = J - 1;
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    double a = m_Tr*(m_R/m_M*fp.m_ef + m_cv0*(pow(1+fp.m_ef,1-m_gamma)-1));
+    return a;
+}
+
+//-----------------------------------------------------------------------------
+//! specific entropy
+double FEIdealGasIsentropic::SpecificEntropy(FEMaterialPoint& mp)
+{
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! specific strain energy
+double FEIdealGasIsentropic::SpecificStrainEnergy(FEMaterialPoint& mp)
+{
+    return SpecificFreeEnergy(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! isobaric specific heat capacity
+double FEIdealGasIsentropic::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
+{
+    return m_cv0 + m_R/m_M;
+}
+
+//-----------------------------------------------------------------------------
+//! isochoric specific heat capacity
+double FEIdealGasIsentropic::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
+{
+    return m_cv0;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of isochoric specific heat capacity with respect to strain J
+double FEIdealGasIsentropic::Tangent_cv_Strain(FEMaterialPoint& mp)
+{
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of isochoric specific heat capacity with respect to temperature T
+double FEIdealGasIsentropic::Tangent_cv_Temperature(FEMaterialPoint& mp)
+{
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! dilatation from temperature and pressure
+bool FEIdealGasIsentropic::Dilatation(const double T, const double p, double& e)
+{
+    e = pow(1+p/m_k,-1/m_gamma)-1.0;
     return true;
 }
-

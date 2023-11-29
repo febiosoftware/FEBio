@@ -35,6 +35,8 @@ elseif(APPLE)
     add_definitions(-DHAS_ACCEL)
 else()
 	add_definitions(-DLINUX)
+    
+    option(USE_STATIC_STDLIBS "Helps to create more portable binaries" ON)
 endif()
 
 ##### Search for library and include directories #####
@@ -244,11 +246,10 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
         set(CMD git rev-parse --abbrev-ref HEAD)
         crossExecProcess(BRANCH_NAME)
 
-        string(COMPARE EQUAL ${BRANCH_NAME} "develop" ISDEVELOP)
-        string(COMPARE EQUAL ${BRANCH_NAME} "febio4"  ISFEBIO4)
+        string(COMPARE EQUAL ${BRANCH_NAME} "master" ISMASTER)
         
         # Get the commit info and set the DEVCOMMIT macro
-        if(SUCCESS EQUAL 0 AND (ISDEVELOP OR ISFEBIO4))
+        if(SUCCESS EQUAL 0 AND NOT ISMASTER)
             
             set(CMD git rev-parse --short=9 HEAD)
             crossExecProcess(DEVCOMMIT)
@@ -393,9 +394,25 @@ endif()
 if(WIN32 OR APPLE)
 	target_link_libraries(febio4 fecore febiolib)
 else()
-	target_link_libraries(febio4 -Wl,--start-group fecore febiolib -Wl,--end-group)
+    if(USE_STATIC_STDLIBS)
+        target_link_libraries(numcore PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febioxml PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiotest PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiorve PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febioplot PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febioopt PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiomix PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiomech PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiofluid PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(feimglib PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(feamr PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiolib PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(fecore PRIVATE -static-libstdc++ -static-libgcc)
         
-    target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
+        target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
+    endif()
+
+	target_link_libraries(febio4 -Wl,--start-group fecore febiolib -Wl,--end-group)
     
     # Extra compiler flags for intel compiler
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")

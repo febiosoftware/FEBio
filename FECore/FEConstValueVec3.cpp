@@ -41,7 +41,7 @@ FEConstValueVec3::FEConstValueVec3(FEModel* fem) : FEVec3dValuator(fem) {}
 
 FEVec3dValuator* FEConstValueVec3::copy()
 {
-	FEConstValueVec3* val = new FEConstValueVec3(GetFEModel());
+	FEConstValueVec3* val = fecore_alloc(FEConstValueVec3, GetFEModel());
 	val->m_val = m_val;
 	return val;
 }
@@ -112,7 +112,7 @@ vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)
 //---------------------------------------------------------------------------------------
 FEVec3dValuator* FEMathValueVec3::copy()
 {
-	FEMathValueVec3* newVal = new FEMathValueVec3(GetFEModel());
+	FEMathValueVec3* newVal = fecore_alloc(FEMathValueVec3, GetFEModel());
 	newVal->m_math[0] = m_math[0];
 	newVal->m_math[1] = m_math[1];
 	newVal->m_math[2] = m_math[2];
@@ -154,6 +154,19 @@ void FEMappedValueVec3::Serialize(DumpStream& ar)
 	ar & m_val;
 }
 
+bool FEMappedValueVec3::Init()
+{
+	if (m_val == nullptr)
+	{
+		FEModel& fem = *GetFEModel();
+		FEMesh& mesh = fem.GetMesh();
+		FEDataMap* map = mesh.FindDataMap(m_mapName);
+		if (map == nullptr) return false;
+		setDataMap(map);
+	}
+	return FEVec3dValuator::Init();
+}
+
 //=================================================================================================
 BEGIN_FECORE_CLASS(FELocalVectorGenerator, FEVec3dValuator)
 	ADD_PARAMETER(m_n, 2, "local");
@@ -191,7 +204,7 @@ vec3d FELocalVectorGenerator::operator () (const FEMaterialPoint& mp)
 
 FEVec3dValuator* FELocalVectorGenerator::copy()
 {
-	FELocalVectorGenerator* map = new FELocalVectorGenerator(GetFEModel());
+	FELocalVectorGenerator* map = fecore_alloc(FELocalVectorGenerator, GetFEModel());
 	map->m_n[0] = m_n[0];
 	map->m_n[1] = m_n[1];
 	return map;
@@ -218,7 +231,7 @@ bool FESphericalVectorGenerator::Init()
 
 FEVec3dValuator* FESphericalVectorGenerator::copy()
 {
-	FESphericalVectorGenerator* map = new FESphericalVectorGenerator(GetFEModel());
+	FESphericalVectorGenerator* map = fecore_alloc(FESphericalVectorGenerator, GetFEModel());
 	map->m_center = m_center;
 	map->m_vector = m_vector;
 	return map;
@@ -267,15 +280,18 @@ vec3d FECylindricalVectorGenerator::operator () (const FEMaterialPoint& mp)
 	vec3d p = mp.m_r0 - m_center;
 
 	// find the vector to the axis
-	vec3d b = p - m_axis * (m_axis*p);
+	vec3d a = m_axis; a.unit();
+	vec3d b = p - a * (a*p);
 	b.unit();
 
 	// setup the rotation
 	vec3d e1(1, 0, 0);
+	quatd qz(vec3d(0, 0, 1), a);
+	qz.RotateVector(e1);
 	quatd q(e1, b);
 
 	vec3d r = m_vector;
-	//	r.unit();	
+	r.unit();	
 	q.RotateVector(r);
 
 	return r;
@@ -283,7 +299,7 @@ vec3d FECylindricalVectorGenerator::operator () (const FEMaterialPoint& mp)
 
 FEVec3dValuator* FECylindricalVectorGenerator::copy()
 {
-	FECylindricalVectorGenerator* map = new FECylindricalVectorGenerator(GetFEModel());
+	FECylindricalVectorGenerator* map = fecore_alloc(FECylindricalVectorGenerator, GetFEModel());
 	map->m_center = m_center;
 	map->m_axis = m_axis;
 	map->m_vector = m_vector;

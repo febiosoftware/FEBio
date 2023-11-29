@@ -64,15 +64,14 @@ public:
     //! strain energy density
     virtual double StrainEnergyDensity(FEMaterialPoint& mp) = 0;
     
-    //! invert pressure-dilatation relation
-    virtual bool Dilatation(const double T, const double p, const double c, double& e) = 0;
+    //! invert effective pressure-dilatation relation
+    virtual bool Dilatation(const double T, const double p, double& e) = 0;
     
     //! evaluate temperature
     virtual double Temperature(FEMaterialPoint& mp) = 0;
     
     //! return viscous part
     FEViscousFluid* GetViscous() { return m_pViscous; }
-    FEViscousPolarFluid* GetViscousPolar() { return m_pViscpol; }
 
     //! tangent of stress with respect to rate of deformation tensor D
     tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp)  { return m_pViscous->Tangent_RateOfDeformation(mp); }
@@ -100,7 +99,6 @@ public:
     
 private: // material properties
     FEViscousFluid*         m_pViscous; //!< pointer to viscous part of fluid material
-    FEViscousPolarFluid*    m_pViscpol; //!< pointer to viscous polar part of fluid material
 
 public:
     double      m_rhor;     //!< referential fluid density

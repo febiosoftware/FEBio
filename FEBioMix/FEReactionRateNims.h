@@ -62,15 +62,15 @@ public:
     void UpdateElementData(FEMaterialPoint& mp) override;
     
 public:
-    int     m_sol;                  //!< solute id (1-based)
-    int     m_lid;                  //!< local id of solute (zero-based)
-    double  m_k0;                   //!< reaction rate at zero concentration
-    double  m_cc;                   //!< concentration cc
-    double  m_kc;                   //!< reaction rate at cc;
-    double  m_cr;                   //!< concentration cr;
-    double  m_kr;                   //!< reaction rate at cr;
-    double  m_trel;                 //!< release time;
-    int     m_cmax;                 //!< index of entry in m_crd
+    int             m_sol;                  //!< solute id (1-based)
+    int             m_lid;                  //!< local id of solute (zero-based)
+    FEParamDouble   m_k0;                   //!< reaction rate at zero concentration
+    FEParamDouble   m_cc;                   //!< concentration cc
+    FEParamDouble   m_kc;                   //!< reaction rate at cc;
+    FEParamDouble   m_cr;                   //!< concentration cr;
+    FEParamDouble   m_kr;                   //!< reaction rate at cr;
+    FEParamDouble   m_trel;                 //!< release time;
+    int             m_cmax;                 //!< index of entry in m_crd
 	
 	DECLARE_FECORE_CLASS();
 };

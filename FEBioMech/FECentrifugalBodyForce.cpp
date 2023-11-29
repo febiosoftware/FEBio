@@ -53,3 +53,8 @@ mat3ds FECentrifugalBodyForce::stiffness(FEMaterialPoint& mp)
 { 
 	return (mat3dd(1) - dyad(n))*(-w*w); 
 }
+
+double FECentrifugalBodyForce::divforce(FEMaterialPoint& mp)
+{
+    return -2*w*w;
+}

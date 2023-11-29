@@ -294,10 +294,9 @@ void FEFluidFSITraction::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
 
-	ar & m_s;
-
 	if (ar.IsShallow() == false)
 	{
+        ar & m_s;
 		if (ar.IsSaving())
 		{
 			int NE = (int)m_elem.size();

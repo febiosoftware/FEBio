@@ -121,6 +121,27 @@ void FESSIShellDomain::InitShells()
             }
         }
     }
+
+	FEMesh& mesh = *GetMesh();
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FEShellElementNew& el = ShellElement(i);
+		int ni = el.GaussPoints();
+		vec3d g0[3];
+		for (int j = 0; j < ni; ++j)
+		{
+			//NOTE: calculate covariant first since contravariant depends on it!
+			CoBaseVectors0(el, j, g0);
+			el.m_gt[0][j] = el.m_gp[0][j] = el.m_g0[0][j] = g0[0];
+			el.m_gt[1][j] = el.m_gp[1][j] = el.m_g0[1][j] = g0[1];
+			el.m_gt[2][j] = el.m_gp[2][j] = el.m_g0[2][j] = g0[2];
+
+			ContraBaseVectors0(el, j, g0);
+			el.m_G0[0][j] = el.m_Gt[0][j] = g0[0];
+			el.m_G0[1][j] = el.m_Gt[1][j] = g0[1];
+			el.m_G0[2][j] = el.m_Gt[2][j] = g0[2];
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -393,7 +414,10 @@ void FESSIShellDomain::CoBaseVectors0(FEShellElement& el, double r, double s, do
 void FESSIShellDomain::ContraBaseVectors0(FEShellElement& el, int n, vec3d gcnt[3])
 {
 	vec3d gcov[3];
-	CoBaseVectors0(el, n, gcov);
+//	CoBaseVectors0(el, n, gcov);
+	gcov[0] = el.m_g0[0][n];
+	gcov[1] = el.m_g0[1][n];
+	gcov[2] = el.m_g0[2][n];
 
 	mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
 		gcov[0].y, gcov[1].y, gcov[2].y,
@@ -428,7 +452,10 @@ void FESSIShellDomain::ContraBaseVectors0(FEShellElement& el, double r, double s
 double FESSIShellDomain::invjac0(FEShellElement& el, double Ji[3][3], int n)
 {
 	vec3d gcov[3];
-	CoBaseVectors0(el, n, gcov);
+//	CoBaseVectors0(el, n, gcov);
+	gcov[0] = el.m_g0[0][n];
+	gcov[1] = el.m_g0[1][n];
+	gcov[2] = el.m_g0[2][n];
 
 	mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
 		gcov[0].y, gcov[1].y, gcov[2].y,
@@ -495,7 +522,10 @@ double FESSIShellDomain::invjac0(FEShellElement& el, double Ji[3][3], double r, 
 double FESSIShellDomain::detJ0(FEShellElement &el, int n)
 {
 	vec3d gcov[3];
-	CoBaseVectors0(el, n, gcov);
+//	CoBaseVectors0(el, n, gcov);
+	gcov[0] = el.m_g0[0][n];
+	gcov[1] = el.m_g0[1][n];
+	gcov[2] = el.m_g0[2][n];
 
 	mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
 		gcov[0].y, gcov[1].y, gcov[2].y,
@@ -520,13 +550,11 @@ double FESSIShellDomain::detJ0(FEShellElement& el, double r, double s, double t)
 //! calculates covariant basis vectors at an integration point
 void FESSIShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3])
 {
-    int i;
-    
     int neln = el.Nodes();
     
     // current nodal coordinates and directors
     vec3d r[FEElement::MAX_NODES], D[FEElement::MAX_NODES];
-    for (i=0; i<neln; ++i)
+    for (int i=0; i<neln; ++i)
     {
         FENode& ni = m_pMesh->Node(el.m_node[i]);
         r[i] = ni.m_rt;
@@ -543,7 +571,7 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3])
     // initialize covariant basis vectors
     g[0] = g[1] = g[2] = vec3d(0,0,0);
     
-    for (i=0; i<neln; ++i)
+    for (int i=0; i<neln; ++i)
     {
         g[0] += (r[i] - D[i]*(1-eta)/2)*Mr[i];
         g[1] += (r[i] - D[i]*(1-eta)/2)*Ms[i];
@@ -591,8 +619,14 @@ void FESSIShellDomain::CoBaseVectorsP(FEShellElement& el, int n, vec3d g[3])
 void FESSIShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3], const double alpha)
 {
     vec3d gt[3], gp[3];
-    CoBaseVectors(el, n, gt);
-    CoBaseVectorsP(el, n, gp);
+//    CoBaseVectors(el, n, gt);
+	gt[0] = el.m_gt[0][n];
+	gt[1] = el.m_gt[1][n];
+	gt[2] = el.m_gt[2][n];
+//    CoBaseVectorsP(el, n, gp);
+	gp[0] = el.m_gp[0][n];
+	gp[1] = el.m_gp[1][n];
+	gp[2] = el.m_gp[2][n];
     for (int i=0; i<3; ++i)
         g[i] = gt[i]*alpha + gp[i]*(1-alpha);
 }
@@ -635,11 +669,52 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, dou
 }
 
 //-----------------------------------------------------------------------------
+//! calculates covariant basis vectors at an integration point
+void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3], const double alpha)
+{
+    int i;
+    
+    int neln = el.Nodes();
+    
+    // current nodal coordinates and directors
+    vec3d rt[FEElement::MAX_NODES], D[FEElement::MAX_NODES];
+    for (i=0; i<neln; ++i)
+    {
+        FENode& ni = m_pMesh->Node(el.m_node[i]);
+        rt[i] = ni.m_rt*alpha + ni.m_rp*(1-alpha);
+        D[i] = m_bnodalnormals ? ni.m_d0 : el.m_d0[i];
+        D[i] += (ni.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]))*alpha
+        + (ni.get_vec3d_prev(m_dofU[0], m_dofU[1], m_dofU[2]) - ni.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]))*(1-alpha);
+    }
+    
+    double eta = t;
+    
+    double M[FEElement::MAX_NODES];
+    double Mr[FEElement::MAX_NODES];
+    double Ms[FEElement::MAX_NODES];
+    el.shape_fnc(M, r, s);
+    el.shape_deriv(Mr, Ms, r, s);
+    
+    // initialize covariant basis vectors
+    g[0] = g[1] = g[2] = vec3d(0,0,0);
+    
+    for (i=0; i<neln; ++i)
+    {
+        g[0] += (rt[i] - D[i]*(1-eta)/2)*Mr[i];
+        g[1] += (rt[i] - D[i]*(1-eta)/2)*Ms[i];
+        g[2] += D[i]*(M[i]/2);
+    }
+}
+
+//-----------------------------------------------------------------------------
 //! calculates contravariant basis vectors at an integration point
 void FESSIShellDomain::ContraBaseVectors(FEShellElement& el, int n, vec3d gcnt[3])
 {
     vec3d gcov[3];
-    CoBaseVectors(el, n, gcov);
+//    CoBaseVectors(el, n, gcov);
+	gcov[0] = el.m_gt[0][n];
+	gcov[1] = el.m_gt[1][n];
+	gcov[2] = el.m_gt[2][n];
     
     mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
                     gcov[0].y, gcov[1].y, gcov[2].y,
@@ -689,11 +764,32 @@ void FESSIShellDomain::ContraBaseVectors(FEShellElement& el, double r, double s,
 }
 
 //-----------------------------------------------------------------------------
+//! calculates contravariant basis vectors at an integration point
+void FESSIShellDomain::ContraBaseVectors(FEShellElement& el, double r, double s, double t, vec3d gcnt[3], const double alpha)
+{
+    vec3d gcov[3];
+    CoBaseVectors(el, r, s, t, gcov, alpha);
+    
+    mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
+                    gcov[0].y, gcov[1].y, gcov[2].y,
+                    gcov[0].z, gcov[1].z, gcov[2].z);
+    mat3d Ji = J.inverse();
+    
+    gcnt[0] = vec3d(Ji(0,0),Ji(0,1),Ji(0,2));
+    gcnt[1] = vec3d(Ji(1,0),Ji(1,1),Ji(1,2));
+    gcnt[2] = vec3d(Ji(2,0),Ji(2,1),Ji(2,2));
+    
+}
+
+//-----------------------------------------------------------------------------
 // jacobian with respect to current frame
 double FESSIShellDomain::detJ(FEShellElement& el, int n)
 {
     vec3d gcov[3];
-    CoBaseVectors(el, n, gcov);
+//    CoBaseVectors(el, n, gcov);
+	gcov[0] = el.m_gt[0][n];
+	gcov[1] = el.m_gt[1][n];
+	gcov[2] = el.m_gt[2][n];
     
     mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
                     gcov[0].y, gcov[1].y, gcov[2].y,
@@ -706,9 +802,15 @@ double FESSIShellDomain::detJ(FEShellElement& el, int n)
 double FESSIShellDomain::detJ(FEShellElement& el, int n, const double alpha)
 {
     vec3d gcovt[3], gcovp[3], gcov[3];
-    CoBaseVectors(el, n, gcovt);
-    CoBaseVectorsP(el, n, gcovp);
-    for (int i=0; i<3; ++i)
+//    CoBaseVectors(el, n, gcovt);
+	gcovt[0] = el.m_gt[0][n];
+	gcovt[1] = el.m_gt[1][n];
+	gcovt[2] = el.m_gt[2][n];
+//    CoBaseVectorsP(el, n, gcovp);
+	gcovp[0] = el.m_gp[0][n];
+	gcovp[1] = el.m_gp[1][n];
+	gcovp[2] = el.m_gp[2][n];
+	for (int i=0; i<3; ++i)
         gcov[i] = gcovt[i]*alpha + gcovp[i]*(1-alpha);
 
     mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
@@ -734,9 +836,15 @@ double FESSIShellDomain::detJ(FEShellElement& el, double r, double s, double t)
 double FESSIShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 {
     vec3d gcov[3], Gcnt[3];
-    CoBaseVectors(el, n, gcov);
-    ContraBaseVectors0(el, n, Gcnt);
-    
+//    CoBaseVectors(el, n, gcov);
+	gcov[0] = el.m_gt[0][n];
+	gcov[1] = el.m_gt[1][n];
+	gcov[2] = el.m_gt[2][n];
+//	ContraBaseVectors0(el, n, Gcnt);
+	Gcnt[0] = el.m_G0[0][n];
+	Gcnt[1] = el.m_G0[1][n];
+	Gcnt[2] = el.m_G0[2][n];
+
     F = (gcov[0] & Gcnt[0]) + (gcov[1] & Gcnt[1]) + (gcov[2] & Gcnt[2]);
     double J = F.det();
     if (J <= 0) throw NegativeJacobian(el.GetID(), n, J, &el);
@@ -748,9 +856,15 @@ double FESSIShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 double FESSIShellDomain::defgradp(FEShellElement& el, mat3d& F, int n)
 {
     vec3d gcov[3], Gcnt[3];
-    CoBaseVectorsP(el, n, gcov);
-    ContraBaseVectors0(el, n, Gcnt);
-    
+//    CoBaseVectorsP(el, n, gcov);
+	gcov[0] = el.m_gp[0][n];
+	gcov[1] = el.m_gp[1][n];
+	gcov[2] = el.m_gp[2][n];
+//    ContraBaseVectors0(el, n, Gcnt);
+	Gcnt[0] = el.m_G0[0][n];
+	Gcnt[1] = el.m_G0[1][n];
+	Gcnt[2] = el.m_G0[2][n];
+
     F = (gcov[0] & Gcnt[0]) + (gcov[1] & Gcnt[1]) + (gcov[2] & Gcnt[2]);
     double J = F.det();
     if (J <= 0) throw NegativeJacobian(el.GetID(), n, J, &el);
@@ -776,24 +890,20 @@ double FESSIShellDomain::defgrad(FEShellElement& el, mat3d& F, double r, double 
 //! evaluate a vector function over the shell
 vec3d FESSIShellDomain::evaluate(FEShellElement& el, vec3d* vn, vec3d* dvn, int n)
 {
-    const double *M;
-    double eta;
-    vec3d gcnt[3];
-    double Mu, Md;
-    vec3d v(0,0,0);
-    
-    eta = el.gt(n);
-    
-    M  = el.H(n);
-    
-    ContraBaseVectors(el, n, gcnt);
-    
-    int neln = el.Nodes();
-    
-    for (int i=0; i<neln; ++i)
+	vec3d gcnt[3];
+//	ContraBaseVectors(el, n, gcnt);
+	gcnt[0] = el.m_Gt[0][n];
+	gcnt[1] = el.m_Gt[1][n];
+	gcnt[2] = el.m_Gt[2][n];
+
+	double eta = el.gt(n);
+	const double* M = el.H(n);
+	vec3d v(0, 0, 0);
+	int neln = el.Nodes();
+	for (int i=0; i<neln; ++i)
     {
-        Mu = (1+eta)/2*M[i];
-        Md = (1-eta)/2*M[i];
+        double Mu = (1+eta)/2*M[i];
+        double Md = (1-eta)/2*M[i];
         v += vn[i]*Mu + dvn[i]*Md;
     }
     
@@ -807,7 +917,10 @@ vec3d FESSIShellDomain::evaluate(FEShellElement& el, vec3d* vn, vec3d* dvn, int 
 double FESSIShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
 {
     vec3d gcov[3];
-    CoBaseVectors(el, n, gcov);
+//    CoBaseVectors(el, n, gcov);
+	gcov[0] = el.m_gt[0][n];
+	gcov[1] = el.m_gt[1][n];
+	gcov[2] = el.m_gt[2][n];
     
     mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
                     gcov[0].y, gcov[1].y, gcov[2].y,
@@ -840,24 +953,20 @@ double FESSIShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
 //! evaluate a scalar function over the shell
 double FESSIShellDomain::evaluate(FEShellElement& el, double* pn, double* dpn, int n)
 {
-    const double *M;
-    double eta;
-    vec3d gcnt[3];
-    double Mu, Md;
-    double p = 0;
-    
-    eta = el.gt(n);
-    
-    M  = el.H(n);
-    
-    ContraBaseVectors(el, n, gcnt);
-    
-    int neln = el.Nodes();
-    
+	vec3d gcnt[3];
+//    ContraBaseVectors(el, n, gcnt);
+	gcnt[0] = el.m_Gt[0][n];
+	gcnt[1] = el.m_Gt[1][n];
+	gcnt[2] = el.m_Gt[2][n];
+
+	double eta = el.gt(n);
+	const double* M = el.H(n);
+	double p = 0;
+	int neln = el.Nodes();
     for (int i=0; i<neln; ++i)
     {
-        Mu = (1+eta)/2*M[i];
-        Md = (1-eta)/2*M[i];
+        double Mu = (1+eta)/2*M[i];
+        double Md = (1-eta)/2*M[i];
         p += Mu*pn[i] + Md*dpn[i];
     }
     
@@ -868,27 +977,25 @@ double FESSIShellDomain::evaluate(FEShellElement& el, double* pn, double* dpn, i
 //! calculate the gradient of a scalar function over the shell
 vec3d FESSIShellDomain::gradient(FEShellElement& el, double* pn, double* dpn, int n)
 {
-    const double* Mr, *Ms, *M;
-    double eta;
-    vec3d gcnt[3];
-    vec3d gradM, gradMu, gradMd;
-    vec3d gradp(0,0,0);
-    
-    eta = el.gt(n);
-    
-    Mr = el.Hr(n);
-    Ms = el.Hs(n);
-    M  = el.H(n);
-    
-    ContraBaseVectors(el, n, gcnt);
-    
-    int neln = el.Nodes();
-    
+	vec3d gcnt[3];
+//    ContraBaseVectors(el, n, gcnt);
+	gcnt[0] = el.m_Gt[0][n];
+	gcnt[1] = el.m_Gt[1][n];
+	gcnt[2] = el.m_Gt[2][n];
+
+	double eta = el.gt(n);
+
+	const double* Mr = el.Hr(n);
+	const double* Ms = el.Hs(n);
+	const double* M = el.H(n);
+
+	vec3d gradp(0, 0, 0);
+	int neln = el.Nodes();
     for (int i=0; i<neln; ++i)
     {
-        gradM = gcnt[0]*Mr[i] + gcnt[1]*Ms[i];
-        gradMu = (gradM*(1+eta) + gcnt[2]*M[i])/2;
-        gradMd = (gradM*(1-eta) - gcnt[2]*M[i])/2;
+        vec3d gradM = gcnt[0]*Mr[i] + gcnt[1]*Ms[i];
+		vec3d gradMu = (gradM*(1+eta) + gcnt[2]*M[i])/2;
+		vec3d gradMd = (gradM*(1-eta) - gcnt[2]*M[i])/2;
         gradp += gradMu*pn[i] + gradMd*dpn[i];
     }
     
@@ -899,24 +1006,21 @@ vec3d FESSIShellDomain::gradient(FEShellElement& el, double* pn, double* dpn, in
 //! evaluate a scalar function over the shell
 double FESSIShellDomain::evaluate(FEShellElement& el, vector<double> pn, vector<double> dpn, int n)
 {
-    const double *M;
-    double eta;
-    vec3d gcnt[3];
-    double Mu, Md;
-    double p = 0;
-    
-    eta = el.gt(n);
-    
-    M  = el.H(n);
-    
-    ContraBaseVectors(el, n, gcnt);
-    
-    int neln = el.Nodes();
-    
+	vec3d gcnt[3];
+//    ContraBaseVectors(el, n, gcnt);
+	gcnt[0] = el.m_Gt[0][n];
+	gcnt[1] = el.m_Gt[1][n];
+	gcnt[2] = el.m_Gt[2][n];
+
+	double eta = el.gt(n);
+	const double* M = el.H(n);
+
+	double p = 0;
+	int neln = el.Nodes();
     for (int i=0; i<neln; ++i)
     {
-        Mu = (1+eta)/2*M[i];
-        Md = (1-eta)/2*M[i];
+        double Mu = (1+eta)/2*M[i];
+        double Md = (1-eta)/2*M[i];
         p += Mu*pn[i] + Md*dpn[i];
     }
     
@@ -927,27 +1031,24 @@ double FESSIShellDomain::evaluate(FEShellElement& el, vector<double> pn, vector<
 //! calculate the gradient of a scalar function over the shell
 vec3d FESSIShellDomain::gradient(FEShellElement& el, vector<double> pn, vector<double> dpn, int n)
 {
-    const double* Mr, *Ms, *M;
-    double eta;
-    vec3d gcnt[3];
-    vec3d gradM, gradMu, gradMd;
-    vec3d gradp(0,0,0);
-    
-    eta = el.gt(n);
-    
-    Mr = el.Hr(n);
-    Ms = el.Hs(n);
-    M  = el.H(n);
-    
-    ContraBaseVectors(el, n, gcnt);
-    
+	vec3d gcnt[3];
+//    ContraBaseVectors(el, n, gcnt);
+	gcnt[0] = el.m_Gt[0][n];
+	gcnt[1] = el.m_Gt[1][n];
+	gcnt[2] = el.m_Gt[2][n];
+
+	double eta = el.gt(n);
+	const double* Mr = el.Hr(n);
+	const double* Ms = el.Hs(n);
+	const double* M = el.H(n);
+
     int neln = el.Nodes();
-    
-    for (int i=0; i<neln; ++i)
+	vec3d gradp(0, 0, 0);
+	for (int i=0; i<neln; ++i)
     {
-        gradM = gcnt[0]*Mr[i] + gcnt[1]*Ms[i];
-        gradMu = (gradM*(1+eta) + gcnt[2]*M[i])/2;
-        gradMd = (gradM*(1-eta) - gcnt[2]*M[i])/2;
+        vec3d gradM = gcnt[0]*Mr[i] + gcnt[1]*Ms[i];
+        vec3d gradMu = (gradM*(1+eta) + gcnt[2]*M[i])/2;
+        vec3d gradMd = (gradM*(1-eta) - gcnt[2]*M[i])/2;
         gradp += gradMu*pn[i] + gradMd*dpn[i];
     }
     
@@ -958,7 +1059,11 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 {
 	int NS = Elements();
 	FEMesh& mesh = *GetMesh();
-	ForEachShellElement([=, &mesh](FEShellElement& e) {
+	int NE = Elements();
+#pragma omp parallel for
+	for (int i = 0; i < NE; ++i)
+	{
+		FEShellElement& e = Element(i);
 
 		int n = e.Nodes();
 		for (int j = 0; j<n; ++j)
@@ -969,7 +1074,28 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 
 			e.m_ht[j] = h;
 		}
-	});
+
+		vec3d g[3];
+		int ni = e.GaussPoints();
+		for (int j = 0; j < ni; ++j)
+		{
+			CoBaseVectors(e, j, g);
+			e.m_gt[0][j] = g[0];
+			e.m_gt[1][j] = g[1];
+			e.m_gt[2][j] = g[2];
+
+			CoBaseVectorsP(e, j, g);
+			e.m_gp[0][j] = g[0];
+			e.m_gp[1][j] = g[1];
+			e.m_gp[2][j] = g[2];
+
+			// NOTE: calculate covariant vectors first since contravariant depends on them
+			ContraBaseVectors(e, j, g);
+			e.m_Gt[0][j] = g[0];
+			e.m_Gt[1][j] = g[1];
+			e.m_Gt[2][j] = g[2];
+		}
+	};
 }
 
 //=================================================================================================

@@ -189,6 +189,10 @@ public:
 	//! Get the stats 
 	ModelStats GetModelStats() const;
 
+	// flag to show warnings and errors
+	void ShowWarningsAndErrors(bool b);
+	bool ShowWarningsAndErrors() const;
+
 private:
 	void print_parameter(FEParam& p, int level = 0);
 	void print_parameter_list(FEParameterList& pl, int level = 0);
@@ -207,6 +211,8 @@ private:
 	bool		m_becho;		//!< echo input to logfile
 	int			m_ndebug;		//!< debug level flag
 	bool		m_writeMesh;	//!< write a new mesh section
+
+	bool		m_bshowErrors;	//!< print warnings and errors
 
 	int			m_logLevel;		//!< output level for log file
 

@@ -46,11 +46,12 @@ bool FELogNonlinearElasticFluid::Init()
 // serialization
 void FELogNonlinearElasticFluid::Serialize(DumpStream& ar)
 {
-    ar& m_k& m_rhor;
+    if (ar.IsLoading()) return;
+    ar & m_k & m_rhor;
 }
 
 //-----------------------------------------------------------------------------
-//! gage pressure
+//! gauge pressure
 double FELogNonlinearElasticFluid::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
@@ -150,7 +151,7 @@ double FELogNonlinearElasticFluid::Tangent_cv_Temperature(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-bool FELogNonlinearElasticFluid::Dilatation(const double T, const double p, const double c, double& e)
+bool FELogNonlinearElasticFluid::Dilatation(const double T, const double p, double& e)
 {
     double errabs = 1e-3;
     double errrel = 1e-3;

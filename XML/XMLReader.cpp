@@ -38,31 +38,29 @@ using namespace std;
 //! The constructor sets the name and value to zero strings
 XMLAtt::XMLAtt()
 {
-	m_szatt[0] = 0;
-	m_szatv[0] = 0;
 	m_bvisited = false;
 }
 
 //-----------------------------------------------------------------------------
-//! Returns true if the attribute's name is the same as the string that is passed.
+//! Returns true if the attribute's value is the same as the string that is passed.
 //! Note that the comparison is case-sensitive 
 bool XMLAtt::operator == (const char* sz)
 {
-	return (strcmp(m_szatv, sz) == 0);
+	return (strcmp(m_val.c_str(), sz) == 0);
 }
 
 bool XMLAtt::operator != (const char* szval) 
 { 
-	return (strcmp(szval, m_szatv) != 0); 
+	return (strcmp(szval, m_val.c_str()) != 0); 
 }
 
 int XMLAtt::value(double* pf, int n)
 {
-	char* sz = m_szatv;
+	const char* sz = m_val.c_str();
 	int nr = 0;
 	for (int i = 0; i < n; ++i)
 	{
-		char* sze = strchr(sz, ',');
+		const char* sze = strchr(sz, ',');
 
 		pf[i] = atof(sz);
 		nr++;
@@ -82,21 +80,18 @@ XMLTag::XMLTag()
 {
 	m_preader = 0;
 	m_bend = false;
-
-	m_sztag[0] = 0;
-	m_nlevel = 0;
-	
-	m_natt = 0;
-	for (int i=0; i<MAX_LEVEL; ++i) m_szroot[i][0] = 0;
+	m_bleaf = true;
+	m_bempty = false;
 }
 
 //-----------------------------------------------------------------------------
 //! Clear tag data
 void XMLTag::clear()
 {
-	m_sztag[0] = 0;
+	m_sztag.clear();
 	m_szval.clear();
-	m_natt = 0;
+	m_att.clear();
+//	m_path.clear(); // NOTE: Do not clear the path!
 	m_bend = false;
 	m_bleaf = true;
 	m_bempty = false;
@@ -109,9 +104,9 @@ std::string XMLTag::relpath(const char* szroot) const
 	int m = -1;
 	if (szroot)
 	{
-		for (int i = 0; i <= m_nlevel; ++i)
+		for (int i = 0; i < m_path.size(); ++i)
 		{
-			if (strcmp(szroot, m_szroot[i]) == 0)
+			if (strcmp(szroot, m_path[i].c_str()) == 0)
 			{
 				m = i;
 				break;
@@ -121,12 +116,16 @@ std::string XMLTag::relpath(const char* szroot) const
 
 	if (m != -1)
 	{
-		for (int i = m+1; i <= m_nlevel; i++)
+		for (int i = m+1; i < m_path.size(); i++)
 		{
 			if (i != m+1) s += ".";
-			s += m_szroot[i];
+			s += m_path[i];
 		}
 	}
+
+	if (s.empty() == false) s += ".";
+	s += m_sztag;
+
 	return s;
 }
 
@@ -220,6 +219,32 @@ int XMLTag::value(std::vector<string>& stringList, int n)
 		else break;
 	}
 	return nr;
+}
+
+//-----------------------------------------------------------------------------
+void XMLTag::value(std::vector<string>& stringList)
+{
+	stringList.clear();
+
+	char tmp[256] = { 0 };
+
+	const char* sz = m_szval.c_str();
+	while (sz && *sz)
+	{
+		const char* sze = strchr(sz, ',');
+		if (sze)
+		{
+			int l = (int)(sze - sz);
+			if (l > 0) strncpy(tmp, sz, l);
+			tmp[l] = 0;
+
+			stringList.push_back(tmp);
+		}
+		else stringList.push_back(sz);
+
+		if (sze) sz = sze + 1;
+		else break;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -327,7 +352,7 @@ void XMLTag::value(vector<double>& l)
 	while (sz && *sz)
 	{
 		// skip space
-		while (*sz == ' ') ++sz;
+		while (isspace(*sz)) ++sz;
 
 		// read the value
 		if (sz && *sz)
@@ -349,7 +374,7 @@ void XMLTag::value2(std::vector<int>& l)
 	while (sz && *sz)
 	{
 		// skip space
-		while (*sz == ' ') ++sz;
+		while (isspace(*sz)) ++sz;
 
 		// read the value
 		if (sz && *sz)
@@ -379,12 +404,14 @@ int XMLTag::children()
 const char* XMLTag::AttributeValue(const char* szat, bool bopt)
 {
 	// find the attribute
-	for (int i=0; i<m_natt; ++i)
-		if (strcmp(m_att[i].m_szatt, szat) == 0)
+	for (XMLAtt& att : m_att)
+	{
+		if (strcmp(att.m_name.c_str(), szat) == 0)
 		{
-			m_att[i].m_bvisited = true;
-			return m_att[i].m_szatv;
+			att.m_bvisited = true;
+			return att.m_val.c_str();
 		}
+	}
 
 	// If the attribute was not optional, we throw a fit
 	if (!bopt) throw XMLReader::MissingAttribute(*this, szat);
@@ -404,12 +431,14 @@ XMLAtt* XMLTag::AttributePtr(const char* szat)
 XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
 {
 	// find the attribute
-	for (int i=0; i<m_natt; ++i)
-		if (strcmp(m_att[i].m_szatt, szat) == 0)
+	for (XMLAtt& att : m_att)
+	{
+		if (strcmp(att.m_name.c_str(), szat) == 0)
 		{
-			m_att[i].m_bvisited = true;
-			return m_att + i;
+			att.m_bvisited = true;
+			return &(att);
 		}
+	}
 
 	// If the attribute was not optional, we throw a fit
 	if (!bopt) throw XMLReader::MissingAttribute(*this, szat);
@@ -423,12 +452,14 @@ XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
 XMLAtt& XMLTag::Attribute(const char* szat)
 {
 	// find the attribute
-	for (int i=0; i<m_natt; ++i)
-		if (strcmp(m_att[i].m_szatt, szat) == 0)
+	for (XMLAtt& att : m_att)
+	{
+		if (strcmp(att.m_name.c_str(), szat) == 0)
 		{
-			m_att[i].m_bvisited = true;
-			return m_att[i];
+			att.m_bvisited = true;
+			return att;
 		}
+	}
 
 	// throw a fit
 	throw XMLReader::MissingAttribute(*this, szat);
@@ -660,7 +691,7 @@ public:
 		TAG& t = m_tag[m_index];
 
 		// do tag name compare?
-		if (strcmp(t.tag, tag.m_sztag) != 0) return false;
+		if (strcmp(t.tag, tag.Name()) != 0) return false;
 
 		// if tag requires attribute, make sure it exist
 		if (t.att)
@@ -798,27 +829,34 @@ void XMLReader::NextTag(XMLTag& tag)
 		m_eof = false;
 	}
 
+	// update the path
+	if (!tag.isend() && !tag.isempty() && !tag.isleaf())
+	{
+		// keep a copy of the name
+		tag.m_path.push_back(tag.m_sztag);
+	}
+	else if (tag.isend())
+	{
+		// make sure the name is the same as the root
+		if (strcmp(tag.m_sztag.c_str(), tag.m_path.back().c_str()) != 0) throw UnmatchedEndTag(tag);
+
+		tag.m_path.erase(--tag.m_path.end());
+	}
+
 	// clear tag's content
 	tag.clear();
 
 	// read the start tag
 	ReadTag(tag);
 
-	try
+	// read value and end tag if tag is not empty
+	if (!tag.isempty() && !tag.isend())
 	{
-		// read value and end tag if tag is not empty
-		if (!tag.isempty())
-		{
-			// read the value
-			ReadValue(tag);
+		// read the value
+		ReadValue(tag);
 
-			// read the end tag
-			ReadEndTag(tag);
-		}
-	}
-	catch (EndOfFile)
-	{
-		if (!tag.isend()) throw UnexpectedEOF();
+		// read the end tag
+		ReadEndTag(tag);
 	}
 
 	// store current line number
@@ -838,7 +876,7 @@ inline bool isvalid(char c)
 void XMLReader::ReadTag(XMLTag& tag)
 {
 	// find the start token
-	char ch, *sz;
+	char ch;
 	while (true)
 	{
 		while ((ch=GetChar())!='<') 
@@ -919,15 +957,13 @@ void XMLReader::ReadTag(XMLTag& tag)
 
 	// read the tag name
 	if (!isvalid(ch)) throw XMLSyntaxError(m_nline);
-	sz = tag.m_sztag;
-	*sz++ = ch;
-	while (isvalid(ch=GetChar())) *sz++ = ch;
-	*sz = 0;
+	tag.m_sztag.clear();
+	tag.m_sztag.push_back(ch);
+	while (isvalid(ch=GetChar())) tag.m_sztag.push_back(ch);
 
 	// read attributes
-	tag.m_natt = 0;
+	tag.m_att.clear();
 	int n = 0;
-	sz = 0;
 	while (true)
 	{
 		// skip whitespace
@@ -942,11 +978,12 @@ void XMLReader::ReadTag(XMLTag& tag)
 		else if (ch == '>') break;
 
 		// read the attribute's name
-		sz = tag.m_att[n].m_szatt;
+		XMLAtt att;
+		std::string& name = att.m_name;
+		name.clear();
 		if (!isvalid(ch)) throw XMLSyntaxError(m_nline);
-		*sz++ = ch;
-		while (isvalid(ch=GetChar())) *sz++ = ch;
-		*sz=0; sz=0;
+		name.push_back(ch);
+		while (isvalid(ch=GetChar())) name.push_back(ch);
 
 		// skip whitespace
 		while (isspace(ch)) ch=GetChar();
@@ -959,23 +996,16 @@ void XMLReader::ReadTag(XMLTag& tag)
 		if ((ch != '"')&&(ch != '\'')) throw XMLSyntaxError(m_nline);
 		char quot = ch;
 
-		sz = tag.m_att[n].m_szatv;
-		while ((ch=GetChar())!=quot) *sz++ = ch;
-		*sz=0; sz=0;
+		// read the value
+		std::string& val = att.m_val;
+		while ((ch=GetChar())!=quot) val.push_back(ch);
 		ch=GetChar();
 
 		// mark tag as unvisited
-		tag.m_att[n].m_bvisited = false;
+		att.m_bvisited = false;
 
 		++n;
-		++tag.m_natt;
-	}
-
-	if (!tag.isend() && !tag.isempty())
-	{
-		// keep a copy of the name
-		strcpy(tag.m_szroot[tag.m_nlevel], tag.m_sztag);
-		tag.m_nlevel++;
+		tag.m_att.push_back(att);
 	}
 }
 
@@ -998,15 +1028,14 @@ void XMLReader::ReadValue(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void XMLReader::ReadEndTag(XMLTag& tag)
 {
-	char ch, *sz = tag.m_sztag;
+	char ch;
+	const char* sz = tag.m_sztag.c_str();
 	if (!tag.isend())
 	{
 		ch = GetChar();
 		if (ch == '/')
 		{
 			// this is the end tag
-			// make sure it matches the tag name
-			--tag.m_nlevel;
 
 			// skip whitespace
 			while (isspace(ch=GetChar()));
@@ -1019,14 +1048,14 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 				++n;
 			}
 			while (!isspace(ch) && (ch!='>'));
-			if (n != (int) strlen(tag.m_sztag)) throw UnmatchedEndTag(tag);
+			if (n != (int) tag.m_sztag.size()) throw UnmatchedEndTag(tag);
 
 			// skip whitespace
 			while (isspace(ch)) ch=GetChar();
 			if (ch != '>') throw XMLSyntaxError(m_nline);
 
 			// find the start of the next tag
-			if (tag.m_nlevel)
+			if (tag.m_path.empty() == false)
 			{
 				while (isspace(ch=GetChar()));
 				if (ch != '<') throw XMLSyntaxError(m_nline);
@@ -1045,11 +1074,6 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 	else
 	{
 		rewind(1);
-
-		--tag.m_nlevel;
-
-		// make sure the name is the same as the root
-		if (strcmp(tag.m_sztag, tag.m_szroot[tag.m_nlevel]) != 0) throw UnmatchedEndTag(tag);
 	}
 }
 
@@ -1060,7 +1084,7 @@ char XMLReader::readNextChar()
 	{
 		if (m_eof) 
         {
-            throw EndOfFile();
+            throw UnexpectedEOF();
         }
 
         m_stream->read(m_buf, BUF_SIZE);

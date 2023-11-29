@@ -41,6 +41,9 @@ public:
     //! initialization
     bool Init() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
     //! elastic pressure
     double Pressure(FEMaterialPoint& mp) override;
     double Pressure(const double e, const double T = 0) override;
@@ -54,8 +57,8 @@ public:
     //! strain energy density
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
-    //! invert pressure-dilatation relation
-    bool Dilatation(const double T, const double p, const double c, double& e) override;
+    //! invert effective pressure-dilatation relation
+    bool Dilatation(const double T, const double p, double& e) override;
     
     //! evaluate temperature
     double Temperature(FEMaterialPoint& mp) override;

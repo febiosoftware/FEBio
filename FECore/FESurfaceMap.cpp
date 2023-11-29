@@ -171,10 +171,9 @@ void FESurfaceMap::fillValue(const mat3ds& v)
 //-----------------------------------------------------------------------------
 void FESurfaceMap::Serialize(DumpStream& ar)
 {
-	FEDataArray::Serialize(ar);
+	FEDataMap::Serialize(ar);
 	if (ar.IsShallow()) return;
-	ar & m_maxFaceNodes;
-	ar & m_name;
+	ar & m_maxFaceNodes & m_format;
 	if (ar.IsSaving())
 	{
 		FEFacetSet* fs = const_cast<FEFacetSet*>(m_surf);

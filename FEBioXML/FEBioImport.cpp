@@ -171,6 +171,11 @@ FEBioImport::RepeatedElementSet::RepeatedElementSet(const std::string& name)
 	SetErrorString("An element set with name \"%s\" was already defined.", name.c_str());
 }
 
+FEBioImport::RepeatedPartList::RepeatedPartList(const std::string& name)
+{
+	SetErrorString("An part list with name \"%s\" was already defined.", name.c_str());
+}
+
 //-----------------------------------------------------------------------------
 FEBioImport::FEBioImport()
 {

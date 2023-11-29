@@ -27,25 +27,30 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include "FEFluidModule.h"
 #include "FEBioFluidSolutes.h"
-#include <FECore/FECoreKernel.h>
 #include "FEFluidSolutesSolver.h"
 #include "FEFluidSolutes.h"
 #include "FEFluidSolutesDomain3D.h"
 #include "FEFluidSolutesDomainFactory.h"
 #include "FESoluteBackflowStabilization.h"
+#include "FEInitialFluidSolutesPressure.h"
 #include "FEFluidSolutesFlux.h"
 #include "FEFluidSolutesNaturalFlux.h"
-#include "FEFluidSolutesPressure.h"
 #include "FEFluidSolutesPressureBC.h"
+#include "FEFluidSolutesResistanceBC.h"
+#include "FEFluidSolutesRCRBC.h"
 #include "FESoluteConvectiveFlow.h"
 #include "FEFluidSolutesDomainFactory.h"
 #include "FESolutesSolver.h"
 #include "FESolutesMaterial.h"
 #include "FESolutesDomain.h"
 #include "FESolutesDomainFactory.h"
+#include "FEBioFluidPlot.h"
 #include <FEBioMix/FESoluteFlux.h>
-#include "FEFluidModule.h"
+#include <FECore/FECoreKernel.h>
+#include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 #include "FEFluidSolutesAnalysis.h"
 
 //-----------------------------------------------------------------------------
@@ -56,8 +61,8 @@ const char* FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_SOLUTES_
         case DISPLACEMENT                : return "displacement"               ; break;
         case RELATIVE_FLUID_VELOCITY     : return "relative fluid velocity"    ; break;
         case RELATIVE_FLUID_ACCELERATION : return "relative fluid acceleration"; break;
-        case FLUID_DILATATION            : return "fluid dilatation"             ; break;
-        case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"      ; break;
+        case FLUID_DILATATION            : return "fluid dilatation"           ; break;
+        case FLUID_DILATATION_TDERIV     : return "fluid dilatation tderiv"    ; break;
         case FLUID_CONCENTRATION         : return "concentration"              ; break;
         case FLUID_CONCENTRATION_TDERIV  : return "concentration tderiv"       ; break;
     }
@@ -73,12 +78,16 @@ void FEBioFluidSolutes::InitModule()
     febio.RegisterDomain(new FEFluidSolutesDomainFactory);
     
     // define the fsi module
-    febio.CreateModule(new FEFluidSolutesModule, "fluid-solutes");
+    febio.CreateModule(new FEFluidSolutesModule, "fluid-solutes",
+                       "{"
+                       "   \"title\" : \"Fluid-Solutes\","
+                       "   \"info\"  : \"Fluid analysis with solute transport and reactive processes.\""
+                       "}");
 	febio.AddModuleDependency("fluid");
     febio.AddModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
     
     //-----------------------------------------------------------------------------
-    // analyis classes (default type must match module name!)
+    // analysis classes (default type must match module name!)
     REGISTER_FECORE_CLASS(FEFluidSolutesAnalysis, "fluid-solutes");
 
 	// monolithic fluid-solutes solver
@@ -89,17 +98,48 @@ void FEBioFluidSolutes::InitModule()
     // loads
     REGISTER_FECORE_CLASS(FEFluidSolutesFlux           , "solute flux"                  );
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
-    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux"          );
-    REGISTER_FECORE_CLASS(FEFluidSolutesPressure       , "fluid pressure"               , 0x0300); // deprecated, use BC version
-    REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       );
+    REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux"          , FECORE_EXPERIMENTAL);
+    REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       , FECORE_EXPERIMENTAL);
 
     // bcs
-    REGISTER_FECORE_CLASS(FEFluidSolutesPressureBC, "fluid pressure");
+    REGISTER_FECORE_CLASS(FEFluidSolutesPressureBC     , "fluid pressure"  );
+    REGISTER_FECORE_CLASS(FEFluidSolutesResistanceBC   , "fluid resistance");
+    REGISTER_FECORE_CLASS(FEFluidSolutesRCRBC          , "fluid RCR"       );
+
+    // ics
+//    REGISTER_FECORE_CLASS(FEInitialFluidSolutesPressure, "initial fluid pressure");
+
+    //-----------------------------------------------------------------------------
+    // classes derived from FEPlotData
+    REGISTER_FECORE_CLASS(FEPlotFluidRelativePecletNumber, "solute relative Peclet number");
 
 	// solutes solver classes
 	febio.RegisterDomain(new FESolutesDomainFactory);
 	REGISTER_FECORE_CLASS(FESolutesSolver, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesMaterial, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesDomain, "solutes-3D");
-	febio.SetActiveModule(0);
+
+    //-----------------------------------------------------------------------------
+    // Reset solver parameters to preferred default settings
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 20;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 100;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEFluidSolutesAnalysis>([](FEFluidSolutesAnalysis* pc) {
+        pc->m_nanalysis = FEFluidSolutesAnalysis::DYNAMIC;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 5;
+        pc->m_Rmax = 1.0e+20;
+        // turn off reform on each time step and diverge reform
+        pc->m_breformtimestep = true;
+        pc->m_bdivreform = false;
+    }));
+    
+    febio.SetActiveModule(0);
 }

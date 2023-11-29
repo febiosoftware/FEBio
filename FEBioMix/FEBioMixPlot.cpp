@@ -161,24 +161,21 @@ bool FEPlotFluidForce::Save(FESurface &surf, FEDataStream &a)
 }
 
 //-----------------------------------------------------------------------------
-// NOTE: This is not thread safe!
 class FEFluidForce2
 {
 public:
-	FEFluidForce2(FESurface& surf, vector<double>& nodalPressures) : m_surf(surf), m_pe(nullptr), m_nodalPressures(nodalPressures) {}
+	FEFluidForce2(FESurface& surf, vector<double>& nodalPressures) : m_surf(surf), m_nodalPressures(nodalPressures) {}
 
-	FEFluidForce2(const FEFluidForce2& fl) : m_surf(fl.m_surf), m_nodalPressures(fl.m_nodalPressures), m_pe(0) {}
+	FEFluidForce2(const FEFluidForce2& fl) : m_surf(fl.m_surf), m_nodalPressures(fl.m_nodalPressures) {}
 
 	vec3d operator ()(const FEMaterialPoint& mp)
 	{
-		if (m_pe != mp.m_elem)
-		{ 
-			m_pe = mp.m_elem;
-			int neln = m_pe->Nodes();
-			for (int j = 0; j<neln; ++j) pn[j] = m_nodalPressures[m_pe->m_node[j]];
-		}
+		FEElement* pe = mp.m_elem;
+		double pn[FEElement::MAX_NODES];
+		int neln = pe->Nodes();
+		for (int j = 0; j<neln; ++j) pn[j] = m_nodalPressures[pe->m_node[j]];
 
-		FESurfaceElement& face = static_cast<FESurfaceElement&>(*m_pe);
+		FESurfaceElement& face = static_cast<FESurfaceElement&>(*pe);
 
 		// get the base vectors
 		vec3d g[2];
@@ -199,8 +196,6 @@ public:
 
 private:
 	FESurface&	m_surf;
-	FEElement* m_pe;
-	double pn[FEElement::MAX_NODES];
 	vector<double>& m_nodalPressures;
 };
 
@@ -254,6 +249,33 @@ bool FEPlotFluidLoadSupport::Save(FESurface &surf, FEDataStream &a)
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
+
+//-----------------------------------------------------------------------------
+class FEMPSpecificStrainEnergy
+{
+public:
+    FEMPSpecificStrainEnergy(FEMultiphasic* pm) : m_mat(pm) {}
+    double operator()(const FEMaterialPoint& mp)
+    {
+        return m_mat->GetElasticMaterial()->StrainEnergyDensity(const_cast<FEMaterialPoint&>(mp))/m_mat->SolidReferentialApparentDensity(const_cast<FEMaterialPoint&>(mp));
+    }
+private:
+    FEMultiphasic*    m_mat;
+};
+
+bool FEPlotMPSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEMultiphasic* pme = dom.GetMaterial()->ExtractProperty<FEMultiphasic>();
+    if (pme == 0) return false;
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FEMPSpecificStrainEnergy psi(pme);
+        writeAverageElementValue<double>(dom, a, psi);
+        return true;
+    }
+    return false;
+}
 
 //-----------------------------------------------------------------------------
 bool FEPlotActualFluidPressure::Save(FEDomain &dom, FEDataStream& a)

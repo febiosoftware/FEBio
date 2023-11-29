@@ -73,8 +73,8 @@ public:
     FEDamageCriterion*      m_pFcrt;    // fatigue criterion
     
 public:
-    double      m_k0;       // reaction rate for fatigue reaction
-    double      m_beta;     // power exponent for fatigue reaction
-    
+    FEParamDouble           m_k0;       // reaction rate for fatigue reaction
+    FEParamDouble           m_beta;     // power exponent for fatigue reaction
+
     DECLARE_FECORE_CLASS();
 };

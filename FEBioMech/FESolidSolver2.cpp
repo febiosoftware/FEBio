@@ -32,6 +32,8 @@ SOFTWARE.*/
 #include "FESlidingElasticInterface.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FE3FieldElasticShellDomain.h"
+#include "FEElasticEASShellDomain.h"
+#include "FEElasticANSShellDomain.h"
 #include "FEBodyForce.h"
 #include "FEResidualVector.h"
 #include "FEUncoupledMaterial.h"
@@ -75,7 +77,8 @@ END_FECORE_CLASS();
 //! FESolidSolver2 Construction
 //
 FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem),\
-m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
+m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),
+m_dofBW(pfem), m_dofBA(pfem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 
@@ -110,10 +113,12 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV
 		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 		m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
 		m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
-		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
 		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 		m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
 		m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
+		m_dofBW.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_VELOCITY));
+		m_dofBA.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_ACCELERATION));
 	}
 }
 
@@ -226,8 +231,12 @@ bool FESolidSolver2::Init()
 	{
 		FEElasticSolidDomain* d = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
         FEElasticShellDomain* s = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(i));
+        FEElasticEASShellDomain* seas = dynamic_cast<FEElasticEASShellDomain*>(&mesh.Domain(i));
+        FEElasticANSShellDomain* sans = dynamic_cast<FEElasticANSShellDomain*>(&mesh.Domain(i));
 		if (d) d->SetDynamicUpdateFlag(b);
         if (s) s->SetDynamicUpdateFlag(b);
+        if (seas) seas->SetDynamicUpdateFlag(b);
+        if (sans) sans->SetDynamicUpdateFlag(b);
 	}
 
 	return true;
@@ -422,16 +431,82 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 			n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vt);
             
             // shell kinematics
-            vec3d qt = n.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
-            vec3d qp = n.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
-            vec3d vqp = n.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
-            vec3d aqp = n.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
-            vec3d aqt = (qt - qp)*b - vqp*a + aqp*c;
-            vec3d vqt = vqp + (aqp*(1.0 - m_gamma) + aqt*m_gamma)*dt;
-            n.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
-            n.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
-        }
-    }
+			{
+				vec3d qt = n.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+				vec3d qp = n.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+				vec3d vqp = n.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
+				vec3d aqp = n.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
+				vec3d aqt = (qt - qp) * b - vqp * a + aqp * c;
+				vec3d vqt = vqp + (aqp * (1.0 - m_gamma) + aqt * m_gamma) * dt;
+				n.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
+				n.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
+			}
+
+			// beam kinematics
+			{
+				vec3d Rp = n.get_vec3d_prev(m_dofSQ[0], m_dofSQ[1], m_dofSQ[2]);
+				vec3d wp = n.get_vec3d_prev(m_dofBW[0], m_dofBW[1], m_dofBW[2]);
+				vec3d ap = n.get_vec3d_prev(m_dofBA[0], m_dofBA[1], m_dofBA[2]);
+
+				// rotation at previous time step
+				quatd Qp(Rp);
+				quatd Qp_T = Qp.Conjugate();
+
+				// convert to material quantities
+				vec3d Wp = Qp_T * wp;
+				vec3d Ap = Qp_T * ap;
+
+				// get equation numbers for rotations
+				// (and ensure that they are all free or all prescribed)
+				int eq[3] = { n.m_ID[m_dofSQ[0]], n.m_ID[m_dofSQ[1]], n.m_ID[m_dofSQ[2]] };
+				assert(((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0)) ||
+					   ((eq[0] <  0) && (eq[1] <  0) && (eq[2] <  0)));
+
+				// get rotation increment
+				vec3d ri, Ri;
+				int m;
+				m = eq[0]; if (m >= 0) { ri.x = ui[m]; Ri.x = m_Ui[m]; }
+				m = eq[1]; if (m >= 0) { ri.y = ui[m]; Ri.y = m_Ui[m]; }
+				m = eq[2]; if (m >= 0) { ri.z = ui[m]; Ri.z = m_Ui[m]; }
+				quatd dq(ri), qi(Ri);
+				quatd qn = dq * qi;
+				vec3d rn = qn.GetRotationVector();
+
+				// check for prescribed values
+				if ((eq[0] < 0) && (eq[1] < 0) && (eq[2] < 0))
+				{
+					vec3d Rt;
+					m = eq[0]; if (m < -1) { Rt.x = n.get(m_dofSQ[0]); }
+					m = eq[1]; if (m < -1) { Rt.y = n.get(m_dofSQ[1]); }
+					m = eq[2]; if (m < -1) { Rt.z = n.get(m_dofSQ[2]); }
+					quatd Qt(Rt);
+					qn = Qp.Conjugate() * Qt;
+					rn = qn.GetRotationVector();
+				}
+
+				// convert to material increment
+				vec3d Qn = Qp_T * rn;
+
+				// update material angular velocity and angular acceleration
+				vec3d At = (Qn - Wp * dt) * b + Ap * c;
+				vec3d Wt = Qn * (m_gamma * a) + Wp * (1.0 - m_gamma / m_beta) + Ap * (dt * (1.0 - 0.5*m_gamma / m_beta));
+
+				// convert to spatial
+				quatd Qt = qn * Qp;
+				vec3d wt = Qt * Wt;
+				vec3d at = Qt * At;
+
+				// store updated values
+				if ((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0))
+				{
+					vec3d Rt = Qt.GetRotationVector();
+					n.set_vec3d(m_dofSQ[0], m_dofSQ[1], m_dofSQ[2], Rt);
+				}
+				n.set_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2], wt);
+				n.set_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2], at);
+			}
+		}
+	}
 
 	// update nonlinear constraints (needed for updating Lagrange Multiplier)
 	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
@@ -471,20 +546,52 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) Ui[n] += ui[n];
         
         // rotational dofs
-        if ((n = node.m_ID[m_dofSQ[0]]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofSQ[1]]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofSQ[2]]) >= 0) Ui[n] += ui[n];
+		// This was used by the old shell formulation, but we've repurposed these dofs for beam rotation
+		/*
+		if ((n = node.m_ID[m_dofSQ[0]]) >= 0) Ui[n] += ui[n];
+		if ((n = node.m_ID[m_dofSQ[1]]) >= 0) Ui[n] += ui[n];
+		if ((n = node.m_ID[m_dofSQ[2]]) >= 0) Ui[n] += ui[n];
+		*/
+		// beam rotations
+		{
+			vec3d ri, Ri;
+			if ((n = node.m_ID[m_dofSQ[0]]) >= 0) { ri.x = ui[n]; Ri.x = Ui[n]; }
+			if ((n = node.m_ID[m_dofSQ[1]]) >= 0) { ri.y = ui[n]; Ri.y = Ui[n]; }
+			if ((n = node.m_ID[m_dofSQ[2]]) >= 0) { ri.z = ui[n]; Ri.z = Ui[n]; }
+			quatd qi(ri), Qi(Ri);
+			quatd Qn = qi * Qi;
+			vec3d rn = Qn.GetRotationVector();
+			if ((n = node.m_ID[m_dofSQ[0]]) >= 0) { Ui[n] = rn.x; }
+			if ((n = node.m_ID[m_dofSQ[1]]) >= 0) { Ui[n] = rn.y; }
+			if ((n = node.m_ID[m_dofSQ[2]]) >= 0) { Ui[n] = rn.z; }
+		}
         
         // shell dofs
-        if ((n = node.m_ID[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
+		{
+			if ((n = node.m_ID[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
+			if ((n = node.m_ID[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
+			if ((n = node.m_ID[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
+		}
 	}
 
 	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 	{
 		FENLConstraint* plc = fem.NonlinearConstraint(i);
 		if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
+	}
+
+	// TODO: This is a hack!
+	// The problem is that I only want to call the domain's IncrementalUpdate during
+	// the quasi-Newtoon loop. However, this function is also called after the loop
+	// converges. The emap parameter is used here to detect wether we are inside the 
+	// loop (emap == false), or not (emap == true).
+	if (emap == false)
+	{
+		for (int i = 0; i < mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			dom.IncrementalUpdate(ui, true);
+		}
 	}
 }
 
@@ -502,6 +609,14 @@ void FESolidSolver2::Update(vector<double>& ui)
 
 	// update kinematics
 	UpdateKinematics(ui);
+
+	// update domains 
+	FEMesh& mesh = fem.GetMesh();
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		dom.IncrementalUpdate(ui, false);
+	}
 
 	// update model state
 	UpdateModel();
@@ -640,6 +755,33 @@ void FESolidSolver2::PrepStep()
         ni.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
         vec3d vqt = vqp + (aqt*m_gamma + aqp*(1-m_gamma))*dt;
         ni.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
+
+		// beams (rotational kinematics)
+		{
+			// get rotation
+			vec3d rp = ni.get_vec3d_prev(m_dofSQ[0], m_dofSQ[1], m_dofSQ[2]);
+			quatd Q(rp);
+			quatd Qt = Q.Conjugate();
+
+			// get previous spatial quantities
+			vec3d wp = ni.get_vec3d_prev(m_dofBW[0], m_dofBW[1], m_dofBW[2]);
+			vec3d ap = ni.get_vec3d_prev(m_dofBA[0], m_dofBA[1], m_dofBA[2]);
+
+			// convert to material frame
+			vec3d Wp = Qt * wp;
+			vec3d Ap = Qt * ap;
+
+			// initial guess 
+			vec3d At = Ap * (1.0 - 0.5/m_beta) - Wp / (m_beta*dt);
+			vec3d Wt = Wp + (Ap * (1.0 - m_gamma) + At*m_gamma)*dt;
+
+			// back to spatial frame
+			vec3d at = Q * At;
+			vec3d wt = Q * Wt;
+
+			ni.set_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2], wt);
+			ni.set_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2], at);
+		}
     }
 
     // apply concentrated nodal forces
@@ -795,7 +937,8 @@ bool FESolidSolver2::Quasin()
 		normE1 = fabs(ui*m_R1);
 
 		// check for nans
-		if (ISNAN(normR1) || ISNAN(normu)) throw NANDetected();
+		if (ISNAN(normR1)) throw NANInResidualDetected();
+		if (ISNAN(normu)) throw NANInSolutionDetected();
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	

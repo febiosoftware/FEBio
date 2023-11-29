@@ -88,6 +88,8 @@ public:
 
 	//! solid referential volume fraction
 	virtual double SolidReferentialVolumeFraction(FEMaterialPoint& pt) { return 0.0; };
+    
+    virtual double TangentSRVFStrain(FEMaterialPoint& pt) { return 0.0; }
 
 	// TODO: This is a bit of a hack to get the fluid pressure. 
 	virtual double GetActualFluidPressure(const FEMaterialPoint& pt) { return 0.0; }
@@ -126,6 +128,9 @@ public:
 	//! return the permeability as a tensor
 	mat3ds Permeability(FEMaterialPoint& pt);
 
+    //! return tangent of permeability with strain
+    tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp);
+    
 	//! return the permeability property
 	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
 	

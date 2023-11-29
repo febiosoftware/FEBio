@@ -62,6 +62,14 @@ bool FETangentialDamping::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FETangentialDamping::Serialize(DumpStream& ar)
+{
+    FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_dofW;
+}
+
+//-----------------------------------------------------------------------------
 //! allocate storage
 void FETangentialDamping::SetSurface(FESurface* ps)
 {

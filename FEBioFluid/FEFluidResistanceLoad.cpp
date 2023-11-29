@@ -33,8 +33,8 @@ SOFTWARE.*/
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidResistanceLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_R , "R");
-	ADD_PARAMETER(m_p0, "pressure_offset");
+	ADD_PARAMETER(m_R , "R")->setUnits("F.t/L^5");
+	ADD_PARAMETER(m_p0, "pressure_offset")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -80,6 +80,16 @@ bool FEFluidResistanceLoad::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! serialization
+void FEFluidResistanceLoad::Serialize(DumpStream& ar)
+{
+    FESurfaceLoad::Serialize(ar);
+    if (ar.IsShallow()) return;
+    ar & m_pfluid;
+    ar & m_dofW & m_dofEF;
+}
+
+//-----------------------------------------------------------------------------
 //! Activate the degrees of freedom for this BC
 void FEFluidResistanceLoad::Activate()
 {
@@ -107,7 +117,7 @@ void FEFluidResistanceLoad::Update()
     
     // calculate the dilatation
     double e = 0;
-    bool good = m_pfluid->Dilatation(0,p+m_p0,0, e);
+    bool good = m_pfluid->Dilatation(0,p+m_p0, e);
     assert(good);
     
     // prescribe this dilatation at the nodes

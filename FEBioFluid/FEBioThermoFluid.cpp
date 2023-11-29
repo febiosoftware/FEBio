@@ -33,14 +33,24 @@ SOFTWARE.*/
 #include "FEThermoFluid.h"
 #include "FEThermoFluidDomain3D.h"
 #include "FEThermoFluidDomainFactory.h"
+#include "FEFixedFluidTemperature.h"
+#include "FEInitialFluidTemperature.h"
+#include "FEInitialFluidPressureTemperature.h"
+#include "FEPrescribedFluidTemperature.h"
+#include "FEFluidHeatSupplyConst.h"
 #include "FEFluidNormalHeatFlux.h"
+#include "FEFluidNaturalHeatFlux.h"
+#include "FENewtonianThermoFluid.h"
 #include "FEIdealGas.h"
 #include "FERealGas.h"
+#include "FERealVapor.h"
 #include "FERealLiquid.h"
 #include "FEFluidConstantConductivity.h"
 #include "FETempDependentConductivity.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
+#include "FEThermoFluidPressureBC.h"
+#include "FEThermoFluidTemperatureBC.h"
 #include "FEFluidModule.h"
 #include "FEThermoFluidAnalysis.h"
 #include <FECore/FEModelUpdate.h>
@@ -71,11 +81,15 @@ void FEBioThermoFluid::InitModule()
     febio.RegisterDomain(new FEThermoFluidDomainFactory);
 
     // define the thermo-fluid module
-    febio.CreateModule(new FEThermoFluidModule, "thermo-fluid");
+    febio.CreateModule(new FEThermoFluidModule, "thermo-fluid",
+                       "{"
+                       "   \"title\" : \"Thermofluid\","
+                       "   \"info\"  : \"Fluid analysis with heat transfer and thermodynamics.\""
+                       "}");
     febio.AddModuleDependency("fluid");
 
     //-----------------------------------------------------------------------------
-    // analyis classes (default type must match module name!)
+    // analysis classes (default type must match module name!)
     REGISTER_FECORE_CLASS(FEThermoFluidAnalysis, "thermo-fluid");
 
     //-----------------------------------------------------------------------------
@@ -85,14 +99,47 @@ void FEBioThermoFluid::InitModule()
 
     REGISTER_FECORE_CLASS(FEThermoFluidDomain3D, "thermo-fluid-3D");
 
+    //-----------------------------------------------------------------------------
+    // initial conditions
+    REGISTER_FECORE_CLASS(FEInitialFluidTemperature  , "initial fluid temperature");
+    REGISTER_FECORE_CLASS(FEInitialFluidPressureTemperature  , "initial fluid pressure and temperature");
+
+    //-----------------------------------------------------------------------------
+    // boundary conditions
+    REGISTER_FECORE_CLASS(FEFixedFluidTemperature       , "zero fluid temperature"      );
+    REGISTER_FECORE_CLASS(FEPrescribedFluidTemperature  , "prescribed fluid temperature");
+    REGISTER_FECORE_CLASS(FEThermoFluidPressureBC       , "fluid pressure");
+    REGISTER_FECORE_CLASS(FEThermoFluidTemperatureBC    , "natural temperature");
+
+    //-----------------------------------------------------------------------------
+    // Surface loads
     REGISTER_FECORE_CLASS(FEFluidNormalHeatFlux, "fluid heat flux");
+    REGISTER_FECORE_CLASS(FEFluidNaturalHeatFlux, "fluid natural heat flux");
     REGISTER_FECORE_CLASS(FETemperatureBackFlowStabilization, "temperature backflow stabilization");
 
+    //-----------------------------------------------------------------------------
+    // Body loads
+    REGISTER_FECORE_CLASS(FEFluidHeatSupplyConst   , "constant fluid heat supply");
+    
+    //-----------------------------------------------------------------------------
+    // Materials
+    
+    // viscous thermofluids
+    REGISTER_FECORE_CLASS(FENewtonianThermoFluid, "Newtonian fluid");
+    
+    // elastic fluids
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
     REGISTER_FECORE_CLASS(FERealGas    , "real gas"    );
+    REGISTER_FECORE_CLASS(FERealVapor  , "real vapor"  );
     REGISTER_FECORE_CLASS(FERealLiquid , "real liquid" );
+    
+    // thermal conductivity
     REGISTER_FECORE_CLASS(FEFluidConstantConductivity, "constant thermal conductivity");
     REGISTER_FECORE_CLASS(FETempDependentConductivity, "temp-dependent thermal conductivity");
+    
+    
+    //-----------------------------------------------------------------------------
+    // loads
     REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure");
 
     //-----------------------------------------------------------------------------

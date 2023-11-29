@@ -39,9 +39,9 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
 BEGIN_FECORE_CLASS(FESoluteData, FEGlobalData)
-	ADD_PARAMETER(m_rhoT, "density");
-	ADD_PARAMETER(m_M, "molar_mass");
-	ADD_PARAMETER(m_z, "charge_number");
+	ADD_PARAMETER(m_rhoT, "density")->setUnits(UNIT_DENSITY);
+	ADD_PARAMETER(m_M, "molar_mass")->setUnits(UNIT_MOLAR_MASS);
+	ADD_PARAMETER(m_z, "charge_number")->setUnits(UNIT_NONE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -65,11 +65,12 @@ bool FESoluteData::Init()
 	int cdofs = fedofs.GetVariableSize(varC);
     int ddofs = fedofs.GetVariableSize(varD);
 	char sz[8] = {0};
-	sprintf(sz, "c%d", cdofs+1);
+    int max_len = sizeof sz;
+	snprintf(sz, max_len, "c%d", cdofs+1);
 	fedofs.AddDOF(varC, sz);
-    sprintf(sz, "d%d", ddofs+1);
+    snprintf(sz, max_len, "d%d", ddofs+1);
     fedofs.AddDOF(varD, sz);
-    sprintf(sz, "ac%d", cdofs+1);
+    snprintf(sz, max_len, "ac%d", cdofs+1);
     fedofs.AddDOF(varAC, sz);
 
 	return true;
@@ -160,6 +161,7 @@ void FESolute::Serialize(DumpStream& ar)
 {
 	FEMaterialProperty::Serialize(ar);
 	ar & m_ID & m_LID;
+	ar & m_rhoT& m_M& m_z;
 }
 
 //=============================================================================
@@ -169,9 +171,9 @@ void FESolute::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
 BEGIN_FECORE_CLASS(FESBMData, FEGlobalData)
-	ADD_PARAMETER(m_rhoT, "density"      );
-	ADD_PARAMETER(m_M   , "molar_mass"   );
-	ADD_PARAMETER(m_z   , "charge_number");
+	ADD_PARAMETER(m_rhoT, "density"      )->setUnits(UNIT_DENSITY);
+	ADD_PARAMETER(m_M   , "molar_mass"   )->setUnits(UNIT_MOLAR_MASS);
+	ADD_PARAMETER(m_z   , "charge_number")->setUnits(UNIT_NONE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -191,9 +193,9 @@ BEGIN_FECORE_CLASS(FESolidBoundMolecule, FEMaterialProperty)
 
 	ADD_PARAMETER(m_ID, "sbm", FE_PARAM_ATTRIBUTE, "$(sbms)");
 
-	ADD_PARAMETER(m_rho0  , "rho0"  );
-	ADD_PARAMETER(m_rhomin, "rhomin");
-	ADD_PARAMETER(m_rhomax, "rhomax");
+	ADD_PARAMETER(m_rho0  , "rho0"  )->setLongName("initial density")->setUnits(UNIT_DENSITY);
+	ADD_PARAMETER(m_rhomin, "rhomin")->setLongName("minimum density")->setUnits(UNIT_DENSITY);
+	ADD_PARAMETER(m_rhomax, "rhomax")->setLongName("maximum density")->setUnits(UNIT_DENSITY);
 
 END_FECORE_CLASS();
 
