@@ -195,12 +195,6 @@ public:
 		Error(XMLTag& tag, const std::string& err);
 	};
 
-	// End of file was discovered 
-	class EndOfFile : public Error {
-	public: 
-		EndOfFile() : Error("End of file") {}
-	};
-
 	// the end of file was detected unexpectedly.
 	class UnexpectedEOF : public Error {
 	public:
