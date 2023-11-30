@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FEBioMix/FEMultiphasic.h>
 #include <FECore/log.h>
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 //! Growth tensor
@@ -218,7 +219,7 @@ double FEGrowthTensor::SpeciesGrowth(FEMaterialPoint& pt)
 {
     FEElement* m_el = pt.m_elem;
     int nint = m_el->GaussPoints();
-    // if the growth tensor doesn't depend on an sbm concentration...
+    // if the growth tensor doesn't depend on concentration...
     if (m_sbm_id < 0 && m_sol_id < 0)
     {
         return 1.0;

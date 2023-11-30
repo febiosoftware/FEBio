@@ -84,7 +84,9 @@ mat3ds FEMassActionForward::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
     // if the reaction supply is insensitive to strain
     if (m_bool_refC)
+    {
         return mat3ds(0.0);
+    }
 
     const int nsol = m_nsol;
     const int nsbm = (int)m_v.size() - nsol;

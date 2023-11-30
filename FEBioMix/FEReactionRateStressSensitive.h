@@ -28,12 +28,13 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEChemicalReaction.h"
+#include <FECore/FEElement.h>
 
 class FEBIOMIX_API FEReactionRateStressSensitive : public FEReactionRate
 {
 public:
 	//! constructor
-	FEReactionRateStressSensitive(FEModel* pfem);
+	FEReactionRateStressSensitive(FEModel* pfem) : FEReactionRate(pfem) { m_k = 0; }
 	
 	//! reaction rate at material point
 	double ReactionRate(FEMaterialPoint& pt) override;
@@ -47,8 +48,8 @@ public:
 public:
 	double m_a0		= 1.0;
 	double m_a		= 1.0;
-	double m_b		= 0.5;
-	double stress0	= 1.0;
+	double m_b		= 1.0;
+	double m_s0		= 1.0;
 	FEParamDouble m_k;
 	DECLARE_FECORE_CLASS();	
 };
