@@ -59,7 +59,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : 
 	FESolver(pfem), 
-	m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem),
+	m_dofU(pfem), m_dofV(pfem), m_dofQ(pfem), m_dofRQ(pfem),
 	m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
 {
 	m_dyn_damping = 1;
@@ -77,7 +77,7 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) :
 		dofs.SetDOFName(varD, 0, "x");
 		dofs.SetDOFName(varD, 1, "y");
 		dofs.SetDOFName(varD, 2, "z");
-		int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
+		int varQ = dofs.AddVariable("rotation", VAR_VEC3);
 		dofs.SetDOFName(varQ, 0, "u");
 		dofs.SetDOFName(varQ, 1, "v");
 		dofs.SetDOFName(varQ, 2, "w");
@@ -105,7 +105,7 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) :
 		// get the DOF indices
 		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
-		m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::ROTATION));
 		m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 		m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
@@ -472,9 +472,9 @@ bool FEExplicitSolidSolver::Init()
 	gather(m_Ut, mesh, m_dofU[0]);
 	gather(m_Ut, mesh, m_dofU[1]);
 	gather(m_Ut, mesh, m_dofU[2]);
-	gather(m_Ut, mesh, m_dofSQ[0]);
-	gather(m_Ut, mesh, m_dofSQ[1]);
-	gather(m_Ut, mesh, m_dofSQ[2]);
+	gather(m_Ut, mesh, m_dofQ[0]);
+	gather(m_Ut, mesh, m_dofQ[1]);
+	gather(m_Ut, mesh, m_dofQ[2]);
 	gather(m_Ut, mesh, m_dofSU[0]);
 	gather(m_Ut, mesh, m_dofSU[1]);
 	gather(m_Ut, mesh, m_dofSU[2]);
@@ -548,9 +548,9 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	// rotational dofs
 	// TODO: Commenting this out, since this is only needed for the old shells, which I'm not sure
 	//       if they would work with the explicit solver anyways.
-//	scatter(U, mesh, m_dofSQ[0]);
-//	scatter(U, mesh, m_dofSQ[1]);
-//	scatter(U, mesh, m_dofSQ[2]);
+//	scatter(U, mesh, m_dofQ[0]);
+//	scatter(U, mesh, m_dofQ[1]);
+//	scatter(U, mesh, m_dofQ[2]);
 
 	// shell displacement
 	scatter3(U, mesh, m_dofSU[0], m_dofSU[1], m_dofSU[2]);

@@ -106,7 +106,7 @@ public:
 	vector<double> m_R1;	//!< residual at iteration i
 
 protected:
-	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ;
+	FEDofList	m_dofU, m_dofV, m_dofQ, m_dofRQ;
 	FEDofList	m_dofSU, m_dofSV, m_dofSA;
 
 	// declare the parameter list

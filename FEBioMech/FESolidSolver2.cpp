@@ -77,7 +77,7 @@ END_FECORE_CLASS();
 //! FESolidSolver2 Construction
 //
 FESolidSolver2::FESolidSolver2(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem),\
-m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),
+m_dofU(pfem), m_dofV(pfem), m_dofQ(pfem), m_dofRQ(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),
 m_dofBW(pfem), m_dofBA(pfem)
 {
 	// default values
@@ -111,7 +111,7 @@ m_dofBW(pfem), m_dofBA(pfem)
 	if (pfem)
 	{
 		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-		m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::ROTATION));
 		m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
 		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
@@ -210,9 +210,9 @@ bool FESolidSolver2::Init()
 	gather(m_Ut, mesh, m_dofU[0]);
 	gather(m_Ut, mesh, m_dofU[1]);
 	gather(m_Ut, mesh, m_dofU[2]);
-	gather(m_Ut, mesh, m_dofSQ[0]);
-	gather(m_Ut, mesh, m_dofSQ[1]);
-	gather(m_Ut, mesh, m_dofSQ[2]);
+	gather(m_Ut, mesh, m_dofQ[0]);
+	gather(m_Ut, mesh, m_dofQ[1]);
+	gather(m_Ut, mesh, m_dofQ[2]);
     gather(m_Ut, mesh, m_dofSU[0]);
     gather(m_Ut, mesh, m_dofSU[1]);
     gather(m_Ut, mesh, m_dofSU[2]);
@@ -376,9 +376,9 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 	scatter(U, mesh, m_dofU[1]);
 	scatter(U, mesh, m_dofU[2]);
 	// rotational dofs
-	scatter(U, mesh, m_dofSQ[0]);
-	scatter(U, mesh, m_dofSQ[1]);
-	scatter(U, mesh, m_dofSQ[2]);
+	scatter(U, mesh, m_dofQ[0]);
+	scatter(U, mesh, m_dofQ[1]);
+	scatter(U, mesh, m_dofQ[2]);
     // shell dofs
     scatter(U, mesh, m_dofSU[0]);
     scatter(U, mesh, m_dofSU[1]);
@@ -444,7 +444,7 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 
 			// beam kinematics
 			{
-				vec3d Rp = n.get_vec3d_prev(m_dofSQ[0], m_dofSQ[1], m_dofSQ[2]);
+				vec3d Rp = n.get_vec3d_prev(m_dofQ[0], m_dofQ[1], m_dofQ[2]);
 				vec3d wp = n.get_vec3d_prev(m_dofBW[0], m_dofBW[1], m_dofBW[2]);
 				vec3d ap = n.get_vec3d_prev(m_dofBA[0], m_dofBA[1], m_dofBA[2]);
 
@@ -458,7 +458,7 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 
 				// get equation numbers for rotations
 				// (and ensure that they are all free or all prescribed)
-				int eq[3] = { n.m_ID[m_dofSQ[0]], n.m_ID[m_dofSQ[1]], n.m_ID[m_dofSQ[2]] };
+				int eq[3] = { n.m_ID[m_dofQ[0]], n.m_ID[m_dofQ[1]], n.m_ID[m_dofQ[2]] };
 				assert(((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0)) ||
 					   ((eq[0] <  0) && (eq[1] <  0) && (eq[2] <  0)));
 
@@ -476,9 +476,9 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 				if ((eq[0] < 0) && (eq[1] < 0) && (eq[2] < 0))
 				{
 					vec3d Rt;
-					m = eq[0]; if (m < -1) { Rt.x = n.get(m_dofSQ[0]); }
-					m = eq[1]; if (m < -1) { Rt.y = n.get(m_dofSQ[1]); }
-					m = eq[2]; if (m < -1) { Rt.z = n.get(m_dofSQ[2]); }
+					m = eq[0]; if (m < -1) { Rt.x = n.get(m_dofQ[0]); }
+					m = eq[1]; if (m < -1) { Rt.y = n.get(m_dofQ[1]); }
+					m = eq[2]; if (m < -1) { Rt.z = n.get(m_dofQ[2]); }
 					quatd Qt(Rt);
 					qn = Qp.Conjugate() * Qt;
 					rn = qn.GetRotationVector();
@@ -500,7 +500,7 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 				if ((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0))
 				{
 					vec3d Rt = Qt.GetRotationVector();
-					n.set_vec3d(m_dofSQ[0], m_dofSQ[1], m_dofSQ[2], Rt);
+					n.set_vec3d(m_dofQ[0], m_dofQ[1], m_dofQ[2], Rt);
 				}
 				n.set_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2], wt);
 				n.set_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2], at);
@@ -544,29 +544,22 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 		if ((n = node.m_ID[m_dofU[0]]) >= 0) Ui[n] += ui[n];
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) Ui[n] += ui[n];
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) Ui[n] += ui[n];
-        
-        // rotational dofs
-		// This was used by the old shell formulation, but we've repurposed these dofs for beam rotation
-		/*
-		if ((n = node.m_ID[m_dofSQ[0]]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[m_dofSQ[1]]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[m_dofSQ[2]]) >= 0) Ui[n] += ui[n];
-		*/
+ 
 		// beam rotations
 		{
 			vec3d ri, Ri;
-			if ((n = node.m_ID[m_dofSQ[0]]) >= 0) { ri.x = ui[n]; Ri.x = Ui[n]; }
-			if ((n = node.m_ID[m_dofSQ[1]]) >= 0) { ri.y = ui[n]; Ri.y = Ui[n]; }
-			if ((n = node.m_ID[m_dofSQ[2]]) >= 0) { ri.z = ui[n]; Ri.z = Ui[n]; }
+			if ((n = node.m_ID[m_dofQ[0]]) >= 0) { ri.x = ui[n]; Ri.x = Ui[n]; }
+			if ((n = node.m_ID[m_dofQ[1]]) >= 0) { ri.y = ui[n]; Ri.y = Ui[n]; }
+			if ((n = node.m_ID[m_dofQ[2]]) >= 0) { ri.z = ui[n]; Ri.z = Ui[n]; }
 			quatd qi(ri), Qi(Ri);
 			quatd Qn = qi * Qi;
 			vec3d rn = Qn.GetRotationVector();
-			if ((n = node.m_ID[m_dofSQ[0]]) >= 0) { Ui[n] = rn.x; }
-			if ((n = node.m_ID[m_dofSQ[1]]) >= 0) { Ui[n] = rn.y; }
-			if ((n = node.m_ID[m_dofSQ[2]]) >= 0) { Ui[n] = rn.z; }
+			if ((n = node.m_ID[m_dofQ[0]]) >= 0) { Ui[n] = rn.x; }
+			if ((n = node.m_ID[m_dofQ[1]]) >= 0) { Ui[n] = rn.y; }
+			if ((n = node.m_ID[m_dofQ[2]]) >= 0) { Ui[n] = rn.z; }
 		}
-        
-        // shell dofs
+
+		// shell dofs
 		{
 			if ((n = node.m_ID[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
 			if ((n = node.m_ID[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
@@ -759,7 +752,7 @@ void FESolidSolver2::PrepStep()
 		// beams (rotational kinematics)
 		{
 			// get rotation
-			vec3d rp = ni.get_vec3d_prev(m_dofSQ[0], m_dofSQ[1], m_dofSQ[2]);
+			vec3d rp = ni.get_vec3d_prev(m_dofQ[0], m_dofQ[1], m_dofQ[2]);
 			quatd Q(rp);
 			quatd Qt = Q.Conjugate();
 
