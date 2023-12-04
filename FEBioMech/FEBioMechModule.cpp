@@ -841,6 +841,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotBeamStrain      , "beam strain");
 	REGISTER_FECORE_CLASS(FEPlotBeamCurvature   , "beam curvature");
 
+	REGISTER_FECORE_CLASS(FEPlotBeamReferenceStress      , "beam reference stress");
+	REGISTER_FECORE_CLASS(FEPlotBeamReferenceStressCouple, "beam reference stress couple");
+
 	// 2O continuum fields
 	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "s norm");
 

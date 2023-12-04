@@ -1289,11 +1289,29 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! beam element stress in reference frame
+class FEPlotBeamReferenceStress : public FEPlotDomainData
+{
+public:
+	FEPlotBeamReferenceStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! beam element stress couple
 class FEPlotBeamStressCouple : public FEPlotDomainData
 {
 public:
 	FEPlotBeamStressCouple(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! beam element stress couple in reference frame
+class FEPlotBeamReferenceStressCouple : public FEPlotDomainData
+{
+public:
+	FEPlotBeamReferenceStressCouple(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
