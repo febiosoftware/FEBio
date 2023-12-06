@@ -24,18 +24,42 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEDomain.h"
+#include "PlotFile.h"
+#include <stdio.h>
 
-//-----------------------------------------------------------------------------
-//! Abstract base class for beam domains
-class FECORE_API FEBeamDomain : public FEDomain
+//! This class stores the FEBio results to a family of VTK files. 
+class VTKPlotFile : public PlotFile
 {
-	FECORE_SUPER_CLASS(FEBEAMDOMAIN_ID)
-	FECORE_BASE_CLASS(FEBeamDomain)
-
-	// get the element type (TODO: Move to FEDomain class?)
-	int GetElementType() { return ElementRef(0).Type(); };
-
 public:
-	FEBeamDomain(FEModel* pm);
+	VTKPlotFile(FEModel* fem);
+
+	//! Open the plot database
+	bool Open(const char* szfile) override;
+
+	//! Open for appending
+	bool Append(const char* szfile) override;
+
+	//! Write current FE state to plot database
+	bool Write(float ftime, int flag = 0) override;
+
+	//! see if the plot file is valid
+	bool IsValid() const override;
+
+private:
+	void WriteHeader();
+	void WritePoints();
+	void WriteCells();
+	void WritePointData();
+	void WriteCellData();
+
+	void WriteScalarData(std::vector<float>& val, const char* szname);
+	void WriteVectorData(std::vector<float>& val, const char* szname);
+	void WriteMat3FSData(std::vector<float>& val, const char* szname);
+	void WriteMat3FDData(std::vector<float>& val, const char* szname);
+
+private:
+	FILE*	m_fp;
+	int		m_count;
+	bool	m_valid;
+	std::string	m_filename;
 };

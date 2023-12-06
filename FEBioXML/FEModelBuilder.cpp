@@ -436,7 +436,7 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varD, 0, "x");
 	dofs.SetDOFName(varD, 1, "y");
 	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
+	int varQ = dofs.AddVariable("rotation", VAR_VEC3);
 	dofs.SetDOFName(varQ, 0, "u");
 	dofs.SetDOFName(varQ, 1, "v");
 	dofs.SetDOFName(varQ, 2, "w");
@@ -528,6 +528,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	else if (strcmp(sztype, "q4s"    ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G4; m_default_shell = -1; } // should only be used for rigid shells
 	else if (strcmp(sztype, "truss2" ) == 0) eshape = ET_TRUSS2;
 	else if (strcmp(sztype, "line2"  ) == 0) eshape = ET_TRUSS2;
+	else if (strcmp(sztype, "line3"  ) == 0) eshape = ET_LINE3;
 	else if (strcmp(sztype, "ut4"    ) == 0) { eshape = ET_TET4; m_but4 = true; }
 	else
 	{
@@ -604,6 +605,7 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	case ET_QUAD8  : etype = (NDIM == 3 ? stype : FE2D_QUAD8G9); break;
 	case ET_QUAD9  : etype = FE2D_QUAD9G9; break;
 	case ET_TRUSS2 : etype = FE_TRUSS; break;
+	case ET_LINE3  : etype = FE_BEAM3G2; break;
 	default:
 		assert(false);
 	}

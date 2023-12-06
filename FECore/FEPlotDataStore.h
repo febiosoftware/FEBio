@@ -63,6 +63,7 @@ public:
 	void SetPlotCompression(int n);
 
 	void SetPlotFileType(const std::string& fileType);
+	std::string GetPlotFileType();
 
 	void Serialize(DumpStream& ar);
 

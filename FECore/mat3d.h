@@ -466,6 +466,9 @@ public:
 	// calculate the skew-symmetric matrix from a vector
 	void skew(const vec3d& v);
 
+	// calculate the exponential map
+	void exp(const vec3d& v);
+
 	// calculate the one-norm
 	double norm() const;
 

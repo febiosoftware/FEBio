@@ -372,9 +372,17 @@ FERigidIC::FERigidIC(FEModel* fem) : FEInitialCondition(fem)
 
 bool FERigidIC::Init()
 {
-	// Make sure the rigid material ID is valid
 	FEModel& fem = *GetFEModel();
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_rigidMat - 1));
+
+	int matIndex = m_rigidMat - 1;
+	if ((matIndex < 0) || (matIndex >= fem.Materials()))
+	{
+		feLogError("Invalid value for rb");
+		return false;
+	}
+
+	// Make sure the rigid material ID is valid
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(matIndex));
 	if (pm == nullptr) return false;
 
 	return FEInitialCondition::Init();

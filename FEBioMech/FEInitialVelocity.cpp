@@ -50,7 +50,7 @@ void FEInitialVelocity::SetValue(const vec3d& v0)
 bool FEInitialVelocity::Init()
 {
 	FEDofList dofs(GetFEModel());
-	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY)) == false) return false;
+	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY)) == false) return false;
 	SetDOFList(dofs);
 	return true;
 }
