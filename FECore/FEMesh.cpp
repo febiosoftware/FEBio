@@ -125,9 +125,9 @@ void FEMesh::Serialize(DumpStream& ar)
 		ar << m_FaceSet;
 
 		// write surface pairs
-		int surfPairs = m_SurfPair.size();
+		int surfPairs = (int)m_SurfPair.size();
 		ar << surfPairs;
-		for (int i = 0; i < m_SurfPair.size(); ++i)
+		for (int i = 0; i < surfPairs; ++i)
 		{
 			FESurfacePair& sp = *m_SurfPair[i];
 			ar << sp.GetName();

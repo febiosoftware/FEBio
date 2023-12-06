@@ -2438,8 +2438,8 @@ FEPlotDamage::FEPlotDamage(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FM
 //-----------------------------------------------------------------------------
 bool FEPlotDamage::SetFilter(const char* szfilter)
 {
-    sscanf(szfilter, "solid[%d]", &m_comp);
-    return true;
+    int nread = sscanf(szfilter, "solid[%d]", &m_comp);
+	return (nread == 1);
 }
 
 //-----------------------------------------------------------------------------
