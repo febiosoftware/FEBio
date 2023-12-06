@@ -2377,9 +2377,6 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
     const int dof_X = GetFEModel()->GetDOFIndex("x");
     const int dof_Y = GetFEModel()->GetDOFIndex("y");
     const int dof_Z = GetFEModel()->GetDOFIndex("z");
-	const int dof_U = GetFEModel()->GetDOFIndex("u");
-	const int dof_V = GetFEModel()->GetDOFIndex("v");
-	const int dof_W = GetFEModel()->GetDOFIndex("w");
     const int dof_SX = GetFEModel()->GetDOFIndex("sx");
     const int dof_SY = GetFEModel()->GetDOFIndex("sy");
     const int dof_SZ = GetFEModel()->GetDOFIndex("sz");
@@ -2397,7 +2394,7 @@ bool FEPlotShellDirector::Save(FEDomain &dom, FEDataStream &a)
 				for (int j = 0; j<n; ++j)
 				{
 					FENode& nj = mesh.Node(e.m_node[j]);
-					vec3d D = e.m_D0[j] + nj.get_vec3d(dof_U, dof_V, dof_W);
+					vec3d D = e.m_D0[j] + nj.get_vec3d(dof_SX, dof_SY, dof_SZ);
 					a << D;
 				}
 			}
