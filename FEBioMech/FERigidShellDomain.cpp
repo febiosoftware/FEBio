@@ -88,81 +88,16 @@ void FERigidShellDomainOld::InertialForces(FEGlobalVector& R, std::vector<double
 	// chirp, chirp ...
 }
 
-//===========================================================================================================
-
-//-----------------------------------------------------------------------------
-FERigidShellDomain::FERigidShellDomain(FEModel* pfem) : FEElasticShellDomain(pfem) {}
-
-//-----------------------------------------------------------------------------
-// NOTE: Although this function doesn't do anything, we need it since 
-//       for rigid shell domains we don't want to call the FEElasticShellDomain::Initialize member.
-bool FERigidShellDomain::Init()
-{
-	// just call the base class
-	return FEShellDomain::Init();
-}
-
-//-----------------------------------------------------------------------------
-//void FERigidShellDomain::InitShells()
-//{
-//	FEShellDomain::InitShells();
-//}
-
-//-----------------------------------------------------------------------------
-// We need to override it since the base class version will not work for rigid domains.
-void FERigidShellDomain::Reset()
-{
-	// nothing here
-}
-
-//-----------------------------------------------------------------------------
-//! Calculate stiffness contributions for rigid shells.
-//! Since rigid elements don't generate stress, we don't need to do
-//! anything here.
-void FERigidShellDomain::StiffnessMatrix(FELinearSystem& LS)
-{
-	// Caught you looking!
-}
-
-
-//-----------------------------------------------------------------------------
-//! calculate residual forces for rigid shells
-//!
-void FERigidShellDomain::InternalForces(FEGlobalVector& R)
-{
-	// Nothing to do.
-}
-
-//-----------------------------------------------------------------------------
-//! update stresses for rigid shells.
-//!
-void FERigidShellDomain::Update(const FETimeInfo& tp)
-{
-	// Nothing to see here. Please move on.
-}
-
-
-//-----------------------------------------------------------------------------
-void FERigidShellDomain::MassMatrix(FELinearSystem& LS, double scale)
-{
-	// Only crickets here ... 
-}
-
-//-----------------------------------------------------------------------------
-void FERigidShellDomain::InertialForces(FEGlobalVector& R, std::vector<double>& F)
-{
-	// chirp, chirp ...
-}
-
 //=======================================================================
-BEGIN_FECORE_CLASS(FERigidShellDomainNew, FEShellDomain)
+BEGIN_FECORE_CLASS(FERigidShellDomain, FEShellDomain)
 	ADD_PARAMETER(m_h0, "shell_thickness");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FERigidShellDomainNew::FERigidShellDomainNew(FEModel* fem) : FEShellDomain(fem), FEElasticDomain(fem), m_dof(fem)
+FERigidShellDomain::FERigidShellDomain(FEModel* fem) : FEShellDomain(fem), FEElasticDomain(fem), m_dof(fem)
 {
 	m_h0 = 0.0;
+	m_pMat = nullptr;
 
 	// TODO: Can this be done in Init, since there is no error checking
 	if (fem)
@@ -171,7 +106,7 @@ FERigidShellDomainNew::FERigidShellDomainNew(FEModel* fem) : FEShellDomain(fem),
 	}
 }
 
-bool FERigidShellDomainNew::Create(int nelems, FE_Element_Spec espec)
+bool FERigidShellDomain::Create(int nelems, FE_Element_Spec espec)
 {
 	m_Elem.resize(nelems);
 	for (int i = 0; i < nelems; ++i)
@@ -188,13 +123,13 @@ bool FERigidShellDomainNew::Create(int nelems, FE_Element_Spec espec)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidShellDomainNew::Activate()
+void FERigidShellDomain::Activate()
 {
 	// don't need to do anything here
 }
 
 //-----------------------------------------------------------------------------
-void FERigidShellDomainNew::AssignDefaultShellThickness()
+void FERigidShellDomain::AssignDefaultShellThickness()
 {
 	double h0 = m_h0;
 	if (h0 <= 0.0) return;
@@ -207,33 +142,33 @@ void FERigidShellDomainNew::AssignDefaultShellThickness()
 	}
 }
 
-void FERigidShellDomainNew::SetMaterial(FEMaterial* pm)
+void FERigidShellDomain::SetMaterial(FEMaterial* pm)
 {
 	m_pMat = dynamic_cast<FERigidMaterial*>(pm); assert(m_pMat);
 	FEShellDomain::SetMaterial(pm);
 }
 
-FEMaterial* FERigidShellDomainNew::GetMaterial() 
+FEMaterial* FERigidShellDomain::GetMaterial()
 { 
 	return m_pMat; 
 }
 
-void FERigidShellDomainNew::Update(const FETimeInfo& tp)
+void FERigidShellDomain::Update(const FETimeInfo& tp)
 {
 	// nothing to do
 }
 
-void FERigidShellDomainNew::Reset()
+void FERigidShellDomain::Reset()
 {
 	// nothing to do
 }
 
-void FERigidShellDomainNew::InternalForces(FEGlobalVector& R)
+void FERigidShellDomain::InternalForces(FEGlobalVector& R)
 {
 	// nothing to do
 }
 
-void FERigidShellDomainNew::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
+void FERigidShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
 {
 	int NS = (int)m_Elem.size();
 #pragma omp parallel for
@@ -264,7 +199,7 @@ void FERigidShellDomainNew::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
 //-----------------------------------------------------------------------------
 //! Calculates element body forces for shells
 
-void FERigidShellDomainNew::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe)
+void FERigidShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe)
 {
 	// integration weights
 	double* gw = el.GaussWeights();
@@ -297,17 +232,17 @@ void FERigidShellDomainNew::ElementBodyForce(FEBodyForce& BF, FEShellElement& el
 	}
 }
 
-void FERigidShellDomainNew::InertialForces(FEGlobalVector& R, std::vector<double>& F)
+void FERigidShellDomain::InertialForces(FEGlobalVector& R, std::vector<double>& F)
 {
 	// nothing to do
 }
 
-void FERigidShellDomainNew::StiffnessMatrix(FELinearSystem& LS)
+void FERigidShellDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	// nothing to do
 }
 
-void FERigidShellDomainNew::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
+void FERigidShellDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
 	// repeat over all shell elements
 	int NE = (int)m_Elem.size();
@@ -337,7 +272,7 @@ void FERigidShellDomainNew::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& 
 
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
-void FERigidShellDomainNew::ElementBodyForceStiffness(FEBodyForce& BF, FEShellElement &el, matrix &ke)
+void FERigidShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellElement &el, matrix &ke)
 {
 	int neln = el.Nodes();
 
@@ -371,12 +306,12 @@ void FERigidShellDomainNew::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEl
 	}
 }
 
-void FERigidShellDomainNew::MassMatrix(FELinearSystem& LS, double scale)
+void FERigidShellDomain::MassMatrix(FELinearSystem& LS, double scale)
 {
 	// nothing to do here
 }
 
-double FERigidShellDomainNew::detJ0(FEShellElement& el, int n)
+double FERigidShellDomain::detJ0(FEShellElement& el, int n)
 {
 	vector<vec3d> X(FEElement::MAX_NODES);
 	for (int i = 0; i < el.Nodes(); ++i) X[i] = Node(el.m_lnode[i]).m_r0;
@@ -402,7 +337,7 @@ double FERigidShellDomainNew::detJ0(FEShellElement& el, int n)
 	return J0*h;
 }
 
-mat3d FERigidShellDomainNew::CalculateMOI()
+mat3d FERigidShellDomain::CalculateMOI()
 {
 	mat3d moi; moi.zero();
 	FEMesh* pm = GetMesh();
@@ -449,7 +384,7 @@ mat3d FERigidShellDomainNew::CalculateMOI()
 	return moi;
 }
 
-double FERigidShellDomainNew::CalculateMass()
+double FERigidShellDomain::CalculateMass()
 {
 	double mass = 0.0;
 	// loop over all elements
@@ -474,7 +409,7 @@ double FERigidShellDomainNew::CalculateMass()
 	return mass;
 }
 
-vec3d FERigidShellDomainNew::CalculateCOM()
+vec3d FERigidShellDomain::CalculateCOM()
 {
 	vector<vec3d> r0(FEElement::MAX_NODES);
 	vec3d rc(0, 0, 0);

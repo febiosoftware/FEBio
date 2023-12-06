@@ -66,47 +66,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! domain class for 3D rigid shell elements
-//!
-class FERigidShellDomain : public FEElasticShellDomain
-{
-public:
-	//! constructor
-	FERigidShellDomain(FEModel* pfem);
-
-	//! Initialize
-	bool Init() override;
-
-	//! reset data
-	void Reset() override;
-
-	//! initialize shells 
-//	void InitShells() override;
-
-public:
-	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FELinearSystem& LS) override;
-
-	//! calculates the internal forces (nothing to do)
-	void InternalForces(FEGlobalVector& R) override;
-
-	//! calculates mass matrix (nothing to do)
-	void MassMatrix(FELinearSystem& LS, double scale) override;
-
-	//! calculates the inertial forces (nothing to do)
-	void InertialForces(FEGlobalVector& R, std::vector<double>& F) override;
-
-	// update domain data
-	void Update(const FETimeInfo& tp) override;
-};
-
-//-----------------------------------------------------------------------------
 // Implements a rigid shell domain. We need to inherit from FEShellDomain and FEElasticDomain.
 // The latter is needed because most of the solid solver classes assume that domains inherit this class.
-class FERigidShellDomainNew : public FEShellDomain, public FEElasticDomain
+class FERigidShellDomain : public FEShellDomain, public FEElasticDomain
 {
 public:
-	FERigidShellDomainNew(FEModel* fem);
+	FERigidShellDomain(FEModel* fem);
 
 public: // from FEMeshPartition
 	//! return number of elements

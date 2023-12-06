@@ -187,7 +187,7 @@ void FERigidBody::UpdateMass()
 			FERigidSolidDomain* pbd = dynamic_cast<FERigidSolidDomain*>(&dom);
 			if (pbd) m_mass += pbd->CalculateMass();
 
-			FERigidShellDomainNew* psd = dynamic_cast<FERigidShellDomainNew*>(&dom);
+			FERigidShellDomain* psd = dynamic_cast<FERigidShellDomain*>(&dom);
 			if (psd) m_mass += psd->CalculateMass();
 		}
 	}
@@ -214,7 +214,7 @@ void FERigidBody::UpdateCOM()
 			FERigidSolidDomain* pbd = dynamic_cast<FERigidSolidDomain*>(&dom);
 			if (pbd) rc += pbd->CalculateCOM();
 
-			FERigidShellDomainNew* psd = dynamic_cast<FERigidShellDomainNew*>(&dom);
+			FERigidShellDomain* psd = dynamic_cast<FERigidShellDomain*>(&dom);
 			if (psd) rc += psd->CalculateCOM();
 		}
 	}
@@ -244,7 +244,7 @@ void FERigidBody::UpdateMOI()
 			FERigidSolidDomain* pbd = dynamic_cast<FERigidSolidDomain*>(&dom);
 			if (pbd) moi += pbd->CalculateMOI();
 
-			FERigidShellDomainNew* psd = dynamic_cast<FERigidShellDomainNew*>(&dom);
+			FERigidShellDomain* psd = dynamic_cast<FERigidShellDomain*>(&dom);
 			if (psd) moi += psd->CalculateMOI();
 		}
 	}
