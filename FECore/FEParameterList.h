@@ -201,16 +201,18 @@ public:
 	FEParam* AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum);
 	FEParam* AddParameter(std::string& s, const char* sz, unsigned int flags, const char* szenum = nullptr);
 
-	template <typename T> void SetParameter(const char* sz, T v);
+	template <typename T> bool SetParameter(const char* sz, T v);
 
 private:
 	FEParameterList*	m_pParam;	//!< parameter list
 };
 
 //-----------------------------------------------------------------------------
-template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
+template <typename T> bool FEParamContainer::SetParameter(const char* sz, T v)
 {
-	FEParam* p = m_pParam->FindFromName(sz); p->value<T>() = v;
+	FEParam* p = m_pParam->FindFromName(sz);
+	if (p) p->value<T>() = v;
+	return (p != nullptr);
 }
 
 //-----------------------------------------------------------------------------

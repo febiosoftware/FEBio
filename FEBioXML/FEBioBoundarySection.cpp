@@ -1278,7 +1278,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	FENodalBC* prn = fecore_new_class<FENodalBC>("FERigidNodeSet", &fem);
 
 	// the default shell bc depends on the shell formulation
-	prn->SetParameter("clamped_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
+	prn->SetParameter("clamp_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
 	prn->SetParameter("rb", rb);
 	prn->SetNodeSet(nodeSet);
 
