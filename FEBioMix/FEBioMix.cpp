@@ -121,7 +121,6 @@ SOFTWARE.*/
 #include "FEPrescribedNodalFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
-#include "FEPrescribedReferentialConcentration.h"
 #include "FEPrescribedStressSensitiveConcentration.h"
 
 #include "FEInitialFluidPressure.h"
@@ -332,7 +331,6 @@ void FEBioMix::InitModule()
 	// boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
 	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
-	REGISTER_FECORE_CLASS(FEPrescribedReferentialConcentration, "prescribed referential concentration");
 	REGISTER_FECORE_CLASS(FEPrescribedStressSensitiveConcentration, "prescribed stress sensitive concentration")
 
 	//-----------------------------------------------------------------------------

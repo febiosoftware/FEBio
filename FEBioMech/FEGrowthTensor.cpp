@@ -104,10 +104,8 @@ mat3d FEAreaGrowth::GrowthTensor(FEMaterialPoint& pt, const vec3d& n0)
     FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
     FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
     double theta = kp->m_theta;
-    double gmiso = 1.0;
-    //double gmani = 2.0 - gmiso;
     vec3d n = m_referential_normal_flag ? n0 : UpdateNormal(pt, n0);
-    mat3d Fg = mat3dd(theta) - ((n & n) * theta);
+    mat3d Fg = mat3dd(1.0) + (mat3dd(1.0) - (n & n)) * theta;
     return Fg;
 }
 
@@ -261,6 +259,6 @@ double FEGrowthTensor::GrowthRate(FEMaterialPoint& pt)
 {
     double k_theta = ActivationFunction(pt);
     double phi = EnvironmentalFunction(pt);
-    double dtheta = k_theta * phi;
+    double dtheta = m_gm(pt) * k_theta * phi;
     return dtheta;
 }
