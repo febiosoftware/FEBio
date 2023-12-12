@@ -72,22 +72,6 @@ mat3ds FEPrescribedStressSensitiveConcentration::GetStress(FEElement& m_elem, in
 }
 
 //-----------------------------------------------------------------------------
-double FEPrescribedStressSensitiveConcentration::GetEffectiveJacobian(FEElement& m_elem, int node_id)
-{
-	double ji = 0.0;
-	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
-		FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
-		FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
-		FEKinematicMaterialPoint* kp = pt->ExtractData<FEKinematicMaterialPoint>();
-		double J_e = kp->m_Je;
-		double J_g = kp->m_Jg;
-		ji += ep->m_J;
-	}
-	ji /= m_elem.GaussPoints();
-	return ji;
-}
-
-//-----------------------------------------------------------------------------
 double FEPrescribedStressSensitiveConcentration::GetConcentration(FEElement& m_elem, int node_id)
 {
 	double ci = 0.0;
@@ -118,25 +102,6 @@ mat3ds FEPrescribedStressSensitiveConcentration::GetNodalStress(int node_id)
 }
 
 //-----------------------------------------------------------------------------
-double FEPrescribedStressSensitiveConcentration::GetNodalEffectiveJacobian(int node_id)
-{
-	// get the mesh to which this surface belongs
-	FENodeElemList& NEL = GetMesh().NodeElementList();
-	int nval = NEL.Valence(node_id);
-	FEElement** ppe = NEL.ElementList(node_id);
-
-	// Get the elements that the node belongs to
-	double J_eff = 0.0;
-	for (int i = 0; i < nval; ++i)
-	{
-		J_eff += GetEffectiveJacobian(*ppe[i], node_id);
-	}
-	J_eff = J_eff / nval;
-	return J_eff;
-}
-
-
-//-----------------------------------------------------------------------------
 double FEPrescribedStressSensitiveConcentration::GetNodalConcentration(int node_id)
 {
 	// get the mesh to which this surface belongs
@@ -164,6 +129,5 @@ void FEPrescribedStressSensitiveConcentration::GetNodalValues(int nodelid, std::
 	mat3ds s = GetNodalStress(node_id);
 	double c = GetNodalConcentration(node_id);
 	double m_S = m_a0 + m_a / (1.0 + (exp(-(s.tr() - m_b) / stress0)));
-	double J_eff = GetNodalEffectiveJacobian(node_id);
-	val[0] = max((c / J_eff) * m_S,0.0);
+	val[0] = max(c * m_S,0.0);
 }

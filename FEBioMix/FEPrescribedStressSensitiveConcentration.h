@@ -46,17 +46,11 @@ public:
 	//! get integration point stress
 	mat3ds GetStress(FEElement& m_elem, int nodelid);
 
-	//! get integration point Jacobian
-	double GetEffectiveJacobian(FEElement& m_elem, int nodelid);
-
 	//! get integration point concentration
 	double GetConcentration(FEElement& m_elem, int nodelid);
 
 	//! get stress projected at the nodes
 	mat3ds GetNodalStress(int nodelid);
-
-	//! get Jacobian projected at the nodes
-	double GetNodalEffectiveJacobian(int nodelid);
 
 	//! get concentration projected at the nodes
 	double GetNodalConcentration(int nodelid);
