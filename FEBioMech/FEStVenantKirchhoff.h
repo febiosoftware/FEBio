@@ -38,7 +38,7 @@ SOFTWARE.*/
 class FEStVenantKirchhoff : public FEElasticMaterial
 {
 public:
-	FEStVenantKirchhoff(FEModel* pfem) : FEElasticMaterial(pfem) {}
+	FEStVenantKirchhoff(FEModel* pfem);
 
 public:
 	double	m_E;	//!< Young's modulus
