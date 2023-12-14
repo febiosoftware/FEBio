@@ -126,10 +126,6 @@ double FEMassActionForwardEffective::Tangent_ReactionSupply_Pressure(FEMaterialP
 //! tangent of molar supply with effective concentration at material point
 double FEMassActionForwardEffective::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
-    // if the reaction supply is insensitive to concentration
-    if (m_bool_refC)
-        return 0.0;
-
     const int nsol = m_nsol;
     
     // if the derivative is taken with respect to a solid-bound molecule, return 0

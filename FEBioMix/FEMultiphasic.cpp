@@ -913,7 +913,8 @@ vec3d FEMultiphasic::FluidFlux(FEMaterialPoint& pt)
 	double zeta = ElectricPotential(pt, true);
 	
 	
-	for (i=0; i<nsol; ++i) {
+	for (i = 0; i < nsol; ++i)
+	{
 		// concentration
 		c[i] = spt.m_c[i];
 
@@ -942,15 +943,15 @@ vec3d FEMultiphasic::FluidFlux(FEMaterialPoint& pt)
 	// effective hydraulic permeability
 	mat3ds ke;
 	ke.zero();
-	for (i=0; i<nsol; ++i)
-		ke += (I-D[i]/D0[i])*(kappa[i]*c[i]/D0[i]);
-	ke = (kt.inverse() + ke*(m_Rgas*m_Tabs/phiw)).inverse();
+	for (i = 0; i < nsol; ++i)
+		ke += (I - D[i] / D0[i]) * (kappa[i] * c[i] / D0[i]);
+	ke = (kt.inverse() + ke * (m_Rgas * m_Tabs / phiw)).inverse();
 	
 	// fluid flux w
 	vec3d w(0,0,0);
-	for (i=0; i<nsol; ++i)
-		w += (D[i]*gradc[i])*(kappa[i]/D0[i]);
-	w = -(ke*(gradp + w*m_Rgas*m_Tabs));
+	for (i = 0; i < nsol; ++i)
+		w += (D[i] * gradc[i]) * (kappa[i] / D0[i]);
+	w = -(ke * (gradp + w * m_Rgas * m_Tabs));
 	
 	return w;
 }
@@ -989,7 +990,7 @@ vec3d FEMultiphasic::SoluteFlux(FEMaterialPoint& pt, const int sol)
 	vec3d w = bpt.m_w;
 	
 	// solute flux j
-	vec3d j = (D*(w*(c/D0) - gradc*phiw))*kappa;
+	vec3d j = (D * (w * (c / D0) - gradc * phiw)) * kappa;
 	
 	return j;
 }
@@ -1029,10 +1030,11 @@ vec3d FEMultiphasic::CurrentDensity(FEMaterialPoint& pt)
 	vector<vec3d> j(nsol);
 	vector<int> z(nsol);
 	vec3d Ie(0,0,0);
-	for (i=0; i<nsol; ++i) {
+	for (i = 0; i < nsol; ++i)
+	{
 		j[i] = SoluteFlux(pt, i);
 		z[i] = m_pSolute[i]->ChargeNumber();
-		Ie += j[i]*z[i];
+		Ie += j[i] * z[i];
 	}
 	Ie *= m_Fc;
 	
@@ -1062,8 +1064,10 @@ mat3ds FEMultiphasic::EffectivePermeability(FEMaterialPoint& pt)
     FESolutesMaterialPoint&  spt = *(pt.ExtractData<FESolutesMaterialPoint >());
 
     // add solute contributions (but not 'solid-bound' solutes)
-    for (int isol=0; isol<nsol; ++isol) {
-        if (!spt.m_bsb[isol]) {
+	for (int isol = 0; isol < nsol; ++isol)
+	{
+		if (!spt.m_bsb[isol])
+		{
             // concentration
             double ca = spt.m_ca[isol];
             // solute diffusivity in mixture
@@ -1071,7 +1075,7 @@ mat3ds FEMultiphasic::EffectivePermeability(FEMaterialPoint& pt)
             // solute free diffusivity
             double D0 = m_pSolute[isol]->m_pDiff->Free_Diffusivity(pt);
             
-            Ke += (I - D/D0)*(tmp*ca/D0);
+			Ke += (I - D / D0) * (tmp * ca / D0);
         }
     }
         
@@ -1082,10 +1086,11 @@ mat3ds FEMultiphasic::EffectivePermeability(FEMaterialPoint& pt)
 //! Evaluate tangent of effective permeability w.r.t. strain
 tens4dmm FEMultiphasic::TangentPermeabilityStrain(FEMaterialPoint& pt, const mat3ds& Ke)
 {
-	if (m_bool_refC) {
+	if (m_bool_refC)
 		return tens4dmm(0.0);
-	}
-	else {
+
+	else 
+	{
 		// get the hydraulic permeability strain tangent
 		tens4dmm dKdE = GetPermeability()->Tangent_Permeability_Strain(pt);
 
@@ -1108,7 +1113,8 @@ tens4dmm FEMultiphasic::TangentPermeabilityStrain(FEMaterialPoint& pt, const mat
 		dKedE.zero();
 
 		// add solute contributions
-		for (int isol = 0; isol < nsol; ++isol) {
+		for (int isol = 0; isol < nsol; ++isol)
+		{
 			// concentration
 			double ca = spt.m_ca[isol];
 			// solute free diffusivity
@@ -1133,9 +1139,8 @@ tens4dmm FEMultiphasic::TangentPermeabilityStrain(FEMaterialPoint& pt, const mat
 mat3ds FEMultiphasic::TangentPermeabilityConcentration(FEMaterialPoint& pt, const int sol, const mat3ds& Ke)
 {
 	if (m_bool_refC)
-	{
 		return mat3ds(0.0);
-	}
+
 	else
 	{
 		mat3ds dKedc(0, 0, 0, 0, 0, 0);
@@ -1151,7 +1156,8 @@ mat3ds FEMultiphasic::TangentPermeabilityConcentration(FEMaterialPoint& pt, cons
 		FESolutesMaterialPoint& spt = *(pt.ExtractData<FESolutesMaterialPoint >());
 
 		// add solute contributions
-		for (int isol = 0; isol < nsol; ++isol) {
+		for (int isol = 0; isol < nsol; ++isol)
+		{
 			// concentration
 			double ca = spt.m_ca[isol];
 			// solute free diffusivity

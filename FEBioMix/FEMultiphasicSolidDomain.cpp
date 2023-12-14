@@ -287,23 +287,23 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
             int neln = el.Nodes();
             vector<double> cic(nsol,0);
             // get the solute concentrations from nodes not attached to shells
-            for (int j=0; j<neln; ++j)
+            for (int j = 0; j < neln; ++j)
             {
                 FENode& node = m.Node(el.m_node[j]);
-                if (!el.m_bitfc[j]) 
+                if (!el.m_bitfc[j])
                 {
-                    for (int l=0; l<nsol; ++l)
+                    for (int l = 0; l < nsol; ++l)
                         cic[l] = node.get(m_dofC + m_pMat->GetSolute(l)->GetSoluteDOF());
                     break;
                 }
             }
             // assign those concentrations to nodes attached to shells
-            for (int j=0; j<neln; ++j)
+            for (int j = 0; j < neln; ++j)
             {
                 FENode& node = m.Node(el.m_node[j]);
-                if (el.m_bitfc[j]) 
+                if (el.m_bitfc[j])
                 {
-                    for (int l=0; l<nsol; ++l)
+                    for (int l = 0; l < nsol; ++l)
                         node.set(m_dofD + m_pMat->GetSolute(l)->GetSoluteDOF(), cic[l]);
                 }
             }
@@ -316,7 +316,8 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
     double p0[NE];
     vector< vector<double> > c0(nsol, vector<double>(NE));
     vector<int> sid(nsol);
-    for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteDOF();
+    for (int j = 0; j < nsol; ++j)
+        sid[j] = m_pMat->GetSolute(j)->GetSoluteDOF();
     
     for (int j = 0; j < (int)m_Elem.size(); ++j)
     {
@@ -342,7 +343,7 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
             {
                 FENode& ni = m.Node(el.m_node[i]);
                 p0[i] = el.m_bitfc[i] ? ni.get(m_dofQ) : ni.get(m_dofP);
-                for (int isol = 0; isol<nsol; ++isol)
+                for (int isol = 0; isol < nsol; ++isol)
                     c0[isol][i] = (ni.m_ID[m_dofD + isol] != -1) ? ni.get(m_dofD + sid[isol]) : ni.get(m_dofC + sid[isol]);
             }
         }
@@ -638,7 +639,7 @@ void FEMultiphasicSolidDomain::ElementInternalForce(FESolidElement& el, vector<d
         {
             // get the charge number
             z[isol] = m_pMat->GetSolute(isol)->ChargeNumber();
-            je += j[isol]*z[isol];
+            je += j[isol] * z[isol];
         }
         
         // evaluate the porosity, its derivative w.r.t. J, and its gradient
@@ -678,9 +679,9 @@ void FEMultiphasicSolidDomain::ElementInternalForce(FESolidElement& el, vector<d
             fe[ndpn*i+2] -= fu.z*detJt;
             fe[ndpn*i+3] -= dt * (w * gradN + (phiwhat - divv) * H[i]) * detJt;
             for (isol = 0; isol < nsol; ++isol)
-                fe[ndpn*i+4+isol] -= dt*(gradN*(j[isol]+je*m_pMat->m_penalty)
-                                         + H[i]*(chat[isol] - (phiw*spt.m_ca[isol] - spt.m_crp[isol]/J_eval)/dt)
-                                         )*detJt;
+                fe[ndpn*i+4+isol] -= dt * (gradN * (j[isol] + je * m_pMat->m_penalty)
+                                         + H[i] * (chat[isol] - (phiw * spt.m_ca[isol] - spt.m_crp[isol] / J_eval) / dt)
+                                         ) * detJt;
         }
     }
 }

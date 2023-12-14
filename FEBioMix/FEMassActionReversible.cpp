@@ -215,8 +215,6 @@ double FEMassActionReversible::Tangent_ReactionSupply_Pressure(FEMaterialPoint& 
 //! tangent of molar supply with effective concentration at material point
 double FEMassActionReversible::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
-    if (m_bool_refC) 
-        return 0;
     const int nsol = m_nsol;
 
     // if the derivative is taken with respect to a solid-bound molecule, return 0
@@ -226,12 +224,16 @@ double FEMassActionReversible::Tangent_ReactionSupply_Concentration(FEMaterialPo
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
     double dzhatFdc = 0;
-    for (int isol = 0; isol < nsol; ++isol) 
+    for (int isol = 0; isol < nsol; ++isol)
     {
-        double dkdc = m_psm->dkdc(pt, isol, sol);
-        double k = m_psm->GetPartitionCoefficient(pt, isol);
         double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-        dzhatFdc += m_vR[isol] * dkdc / k;
+        // if the reaction supply is sensitive to concentration
+        if (!m_bool_refC)
+        {
+            double dkdc = m_psm->dkdc(pt, isol, sol);
+            double k = m_psm->GetPartitionCoefficient(pt, isol);
+            dzhatFdc += m_vR[isol] * dkdc / k;
+        }
         if ((isol == sol) && (c > 0))
             dzhatFdc += m_vR[isol] / c;
     }
@@ -241,13 +243,17 @@ double FEMassActionReversible::Tangent_ReactionSupply_Concentration(FEMaterialPo
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
     double dzhatRdc = 0;
-    for (int isol = 0; isol < nsol; ++isol) 
-    {
-        double dkdc = m_psm->dkdc(pt, isol, sol);
-        double k = m_psm->GetPartitionCoefficient(pt, isol);
-        double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+    double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
 
-        dzhatRdc += m_vP[isol] * dkdc / k;
+    for (int isol = 0; isol < nsol; ++isol)
+    {
+        // if the reaction supply is sensitive to concentration
+        if (!m_bool_refC)
+        {
+            double dkdc = m_psm->dkdc(pt, isol, sol);
+            double k = m_psm->GetPartitionCoefficient(pt, isol);
+            dzhatRdc += m_vP[isol] * dkdc / k;
+        }
         if ((isol == sol) && (c > 0))
             dzhatRdc += m_vP[isol] / c;
     }
