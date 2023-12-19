@@ -140,10 +140,6 @@ double FEMassActionForward::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
 //! tangent of molar supply with effective concentration at material point
 double FEMassActionForward::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
 {
-    // if the reaction supply is sensitive to concentration
-    if (!m_bool_refC)
-        return 0.0;
-
     const int nsol = m_nsol;
 
     // if the derivative is taken with respect to a solid-bound molecule, return 0
@@ -152,15 +148,18 @@ double FEMassActionForward::Tangent_ReactionSupply_Concentration(FEMaterialPoint
 
     double zhat = ReactionSupply(pt);
     double dzhatdc = 0.0;
-    for (int isol = 0; isol < nsol; ++isol)
+    double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+    if (c > 0.0)
+        dzhatdc += m_vR[sol] / c;
+    // if the reaction supply is sensitive to concentration
+    if (!m_bool_refC)
     {
-        double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-        double dkdc = m_psm->dkdc(pt, isol, sol);
-        double k = m_psm->GetPartitionCoefficient(pt, isol);
-        dzhatdc += m_vR[isol] * dkdc / k;
-
-        if ((isol == sol) && (c > 0.0))
-            dzhatdc += m_vR[isol] / c;
+        for (int isol = 0; isol < nsol; ++isol)
+        {
+            double dkdc = m_psm->dkdc(pt, isol, sol);
+            double k = m_psm->GetPartitionCoefficient(pt, isol);
+            dzhatdc += m_vR[isol] * dkdc / k;
+        }
     }
 
     dzhatdc *= zhat;

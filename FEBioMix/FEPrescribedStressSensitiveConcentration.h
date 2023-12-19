@@ -56,10 +56,10 @@ public:
 	double GetNodalConcentration(int nodelid);
 
 public:
-	double stress0	= 0.1;
+	double m_s0		= 0.2;
 	double m_a0		= 1.0;
 	double m_a		= 1.0;
-	double m_b		= 0.5;
+	double m_b		= 0.05;
 	FEParamDouble m_value;
 	DECLARE_FECORE_CLASS();
 protected:

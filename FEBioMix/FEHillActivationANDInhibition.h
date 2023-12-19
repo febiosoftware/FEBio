@@ -31,20 +31,30 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for forward chemical reaction.
-class FEBIOMIX_API FEHillActivationANDInhibition : public FEReactionRate
+class FEBIOMIX_API FEHillActivationANDInhibition : public FEChemicalReaction
 {
 public:
 	//! constructor
 	FEHillActivationANDInhibition(FEModel* pfem);
 
+	//! initialization
+	bool Init() override;
+
 	//! reaction rate at material point
-	double ReactionRate(FEMaterialPoint& pt) override;
+	double ReactionSupply(FEMaterialPoint& pt) override;
 
 	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
+	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
 
 	//! tangent of reaction rate with effective fluid pressure at material point
-	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+	double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt) override;
+
+	//! tangent of molar supply with effective concentration at material point
+	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
+
+	double f_Hill(FEMaterialPoint& pt, const int sol);
+
+	double dfdc(FEMaterialPoint& pt, const int sol);
 
 public:
 	double	m_Kmax		= 1.0;
@@ -52,7 +62,13 @@ public:
 	double	m_t			= 1.0;
 	double	m_E50		= 0.5;
 	double	m_n			= 1.2;
-	int		m_sol_id[2] = { -1, -1 };
-	int		m_sbm_id[2] = { -1, -1 };
+	int		u_sol_id_a = -1;
+	int		u_sol_id_b = -1;
+	int		m_sol_id_a = -1;
+	int		m_sol_id_b = -1;
+	double m_B = 0.0;
+	double m_K = 0.0;
+	double m_Kn = 0.0;
+	double m_Kb = 0.0;
 	DECLARE_FECORE_CLASS();
 };

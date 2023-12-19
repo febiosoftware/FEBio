@@ -40,8 +40,9 @@ SOFTWARE.*/
 
 BEGIN_FECORE_CLASS(FEPrescribedStressSensitiveConcentration, FEPrescribedDOF)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
-	ADD_PARAMETER(m_value, "value");
-	ADD_PARAMETER(stress0, "residual_stress")->setLongName("initial residual stress");
+	ADD_PARAMETER(m_value, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
+	ADD_PARAMETER(m_brelative, "relative");
+	ADD_PARAMETER(m_s0, "stress0")->setLongName("equilibrium stress");
 	ADD_PARAMETER(m_a0, "min_stress_scale");
 	ADD_PARAMETER(m_a, "stress_scale_amplitude");
 	ADD_PARAMETER(m_b, "stress_scale_width");
@@ -61,21 +62,34 @@ bool FEPrescribedStressSensitiveConcentration::Init()
 //-----------------------------------------------------------------------------
 mat3ds FEPrescribedStressSensitiveConcentration::GetStress(FEElement& m_elem, int node_id)
 {
-	mat3ds si;
-	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
+	mat3ds si[FEElement::MAX_INTPOINTS];
+	mat3ds so[FEElement::MAX_NODES];
+
+	for (int i = 0; i < m_elem.GaussPoints(); ++i) 
+	{
 		FEMaterialPoint* pt = m_elem.GetMaterialPoint(i);
 		FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
-		si += ep->m_s;
+		FEKinematicMaterialPoint* kp = pt->ExtractData<FEKinematicMaterialPoint>();
+		//if(kp)
+		//	si[i] = kp->m_s;
+		//else if (ep)
+		//	si[i] = ep->m_s;
+		if (ep)
+			si[i] = ep->m_s;
+		else
+			si[i].zero();
 	}
-	si /= m_elem.GaussPoints();
-	return si;
+
+	m_elem.project_to_nodes(si, so);
+	return so[m_elem.FindNode(node_id)];
 }
 
 //-----------------------------------------------------------------------------
 double FEPrescribedStressSensitiveConcentration::GetConcentration(FEElement& m_elem, int node_id)
 {
 	double ci = 0.0;
-	for (int i = 0; i < m_elem.GaussPoints(); ++i) {
+	for (int i = 0; i < m_elem.GaussPoints(); ++i)
+	{
 		FEMaterialPoint& pt = *m_elem.GetMaterialPoint(i);
 		ci += m_value(pt);
 	}
@@ -95,6 +109,7 @@ mat3ds FEPrescribedStressSensitiveConcentration::GetNodalStress(int node_id)
 	mat3ds s = mat3ds(0.0);
 	for (int i = 0; i < nval; ++i)
 	{
+		double v = GetMesh().ElementVolume(*ppe[i]);
 		s += GetStress(*ppe[i], node_id);
 	}
 	s = s / nval;
@@ -111,11 +126,8 @@ double FEPrescribedStressSensitiveConcentration::GetNodalConcentration(int node_
 
 	// Get the elements that the node belongs to
 	double s = 0.0;
-	//double vol = 0.0;
 	for (int i = 0; i < nval; ++i)
-	{
 		s += GetConcentration(*ppe[i], node_id);
-	}
 	s = s / nval;
 	return s;
 }
@@ -128,6 +140,7 @@ void FEPrescribedStressSensitiveConcentration::GetNodalValues(int nodelid, std::
 	// get the stress
 	mat3ds s = GetNodalStress(node_id);
 	double c = GetNodalConcentration(node_id);
-	double m_S = m_a0 + m_a / (1.0 + (exp(-(s.tr() - m_b) / stress0)));
+	double I1 = s.tr();
+	double m_S = m_a0 + m_a / (1.0 + (exp(-(I1 - m_s0) / m_b)));
 	val[0] = max(c * m_S,0.0);
 }

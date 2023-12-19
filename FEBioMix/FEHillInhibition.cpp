@@ -30,50 +30,56 @@ SOFTWARE.*/
 #include "FESoluteInterface.h"
 #include "FEBiphasic.h"
 #include "FEHillInhibition.h"
+#include <FECore/log.h>
 
-BEGIN_FECORE_CLASS(FEHillInhibition, FEReactionRate)
+BEGIN_FECORE_CLASS(FEHillInhibition, FEChemicalReaction)
 	ADD_PARAMETER(m_Kmax, "Kmax");
 	ADD_PARAMETER(m_w, "reaction_weight");
 	ADD_PARAMETER(m_t, "degradation_rate");
 	ADD_PARAMETER(m_E50, "E_50");
 	ADD_PARAMETER(m_n, "Hill_coeff");
-	ADD_PARAMETER(m_sol_id, "sol_id");
-	ADD_PARAMETER(m_sbm_id, "sbm_id");
+	ADD_PARAMETER(u_sol_id, "sol_id_inh");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEHillInhibition::FEHillInhibition(FEModel* pfem) : FEReactionRate(pfem)
+FEHillInhibition::FEHillInhibition(FEModel* pfem) : FEChemicalReaction(pfem)
 {
+	// set material properties
+	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+}
 
+bool FEHillInhibition::Init()
+{
+	m_B = (pow(m_E50, m_n) - 1.0) / (2.0 * pow(m_E50, m_n) - 1.0);
+	m_K = pow((m_B - 1.0), (1.0 / m_n));
+	m_Kn = pow(m_K, m_n);
+	m_Kb = m_Kmax * m_w / m_t;
+	if (m_sol_id < 0)
+	{
+		feLogError("sol_id_act: param not valid");
+		return false;
+	}
+
+	return FEChemicalReaction::Init();
 }
 
 //-----------------------------------------------------------------------------
 //! reaction rate at material point
-double FEHillInhibition::ReactionRate(FEMaterialPoint& pt)
+double FEHillInhibition::ReactionSupply(FEMaterialPoint& pt)
 {
-	double c = 0.0;
-	if (m_sol_id > 0)
-		c = m_pReact->m_psm->GetActualSoluteConcentration(pt, m_sol_id - 1);
-	else if (m_sbm_id > 0)
-		c = m_pReact->m_psm->SBMConcentration(pt, m_sbm_id - 1);
-	double En = pow(m_E50, m_n);
-	double B = (En - 1.0) / (2.0 * En - 1.0);
-	double K = pow((B - 1.0), (1 / m_n));
-	double cn = pow(c, m_n);
-	double Kn = pow(K, m_n);
-	double zhat = (m_Kmax * m_w / m_t) * (1.0 - ((B * cn) / (Kn + cn)));
+	double zhat = m_Kb * (1.0 - f_Hill(pt, m_sol_id));
 	return max(zhat, 0.0);
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of reaction rate with strain at material point
-mat3ds FEHillInhibition::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
+mat3ds FEHillInhibition::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
 	// if the reaction supply is insensitive to strain
-	if (m_pReact->m_bool_refC)
+	if (m_bool_refC)
 		return mat3ds(0.0);
 
-	double zhat = ReactionRate(pt);
+	double zhat = ReactionSupply(pt);
 	mat3dd I(1);
 	mat3ds dzhatde = I * (-zhat);
 	return dzhatde;
@@ -81,8 +87,42 @@ mat3ds FEHillInhibition::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! tangent of reaction rate with effective fluid pressure at material point
-double FEHillInhibition::Tangent_ReactionRate_Pressure(FEMaterialPoint& pt)
+double FEHillInhibition::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
 {
 	return 0.0;
 }
 
+//-----------------------------------------------------------------------------
+//! tangent of molar supply with effective concentration at material point
+double FEHillInhibition::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
+{
+	// if the derivative is taken with respect to a non-participating molecule, return 0
+	if (sol != m_sol_id)
+		return 0.0;
+	// if the derivative is taken with respect to a solid-bound molecule, return 0
+	if (sol >= m_nsol)
+		return 0.0;
+
+	double c_act = m_psm->GetActualSoluteConcentration(pt, sol);
+	double c_eff = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+	if (c_act > 0.0 && c_eff > 0.0)
+		return -1.0 * dfdc(pt, sol) * m_Kb;
+
+	else
+		return 0.0;
+}
+
+double FEHillInhibition::f_Hill(FEMaterialPoint& pt, const int sol)
+{
+	double cn = pow(m_psm->GetActualSoluteConcentration(pt, sol), m_n);
+	double f_h = (m_B * cn) / (m_Kn + cn);
+	return f_h;
+}
+
+double FEHillInhibition::dfdc(FEMaterialPoint& pt, const int sol)
+{
+	double c_eff = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+	double cn = pow(m_psm->GetActualSoluteConcentration(pt, sol), m_n);
+	double dfdc = (m_Kn * m_n * f_Hill(pt, sol)) / (c_eff * (m_Kn + cn));
+	return dfdc;
+}

@@ -30,59 +30,59 @@ SOFTWARE.*/
 #include "FESoluteInterface.h"
 #include "FEBiphasic.h"
 #include "FEHillActivationANDInhibition.h"
+#include <FECore/log.h>
 
-BEGIN_FECORE_CLASS(FEHillActivationANDInhibition, FEReactionRate)
+BEGIN_FECORE_CLASS(FEHillActivationANDInhibition, FEChemicalReaction)
 	ADD_PARAMETER(m_Kmax, "Kmax");
 	ADD_PARAMETER(m_w, "reaction_weight");
 	ADD_PARAMETER(m_t, "degradation_rate");
 	ADD_PARAMETER(m_E50, "E_50");
 	ADD_PARAMETER(m_n, "Hill_coeff");
-	ADD_PARAMETER(m_sol_id[0], "sol_id_act");
-	ADD_PARAMETER(m_sbm_id[0], "sbm_id_act");	
-	ADD_PARAMETER(m_sol_id[1], "sol_id_inh");
-	ADD_PARAMETER(m_sbm_id[1], "sbm_id_inh");
+	ADD_PARAMETER(u_sol_id_a, "sol_id_act");
+	ADD_PARAMETER(u_sol_id_b, "sol_id_inh");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEHillActivationANDInhibition::FEHillActivationANDInhibition(FEModel* pfem) : FEReactionRate(pfem)
+FEHillActivationANDInhibition::FEHillActivationANDInhibition(FEModel* pfem) : FEChemicalReaction(pfem)
 {
+	// set material properties
+	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+}
 
+bool FEHillActivationANDInhibition::Init()
+{
+	m_B = (pow(m_E50, m_n) - 1.0) / (2.0 * pow(m_E50, m_n) - 1.0);
+	m_K = pow((m_B - 1.0), (1.0 / m_n));
+	m_Kn = pow(m_K, m_n);
+	m_Kb = m_Kmax * m_w / m_t;
+	m_sol_id_a = u_sol_id_a - 1; m_sol_id_b = u_sol_id_b - 1;
+	if ((m_sol_id_a < 0) || (m_sol_id_b < 0))
+	{
+		feLogError("sol_id: param not valid");
+		return false;
+	}
+	return FEChemicalReaction::Init();
 }
 
 //-----------------------------------------------------------------------------
 //! reaction rate at material point
-double FEHillActivationANDInhibition::ReactionRate(FEMaterialPoint& pt)
+double FEHillActivationANDInhibition::ReactionSupply(FEMaterialPoint& pt)
 {
-	FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
-	double c[2] = { 0.0 };
-	double En = pow(m_E50, m_n);
-	double B = (En - 1.0) / (2.0 * En - 1.0);
-	double K = pow((B - 1.0), (1.0 / m_n));
-	double Kn = pow(K, m_n);
-	double cn[2] = { 0.0 };
-	double F[2] = { 0.0 };
-	for (int i = 0; i < 2; ++i)
-	{
-		if (m_sol_id[i] > 0)
-			c[i] = m_pReact->m_psm->GetActualSoluteConcentration(pt, m_sol_id[i] - 1);
-		else if (m_sbm_id[i] > 0)
-			c[i] = m_pReact->m_psm->SBMConcentration(pt, m_sbm_id[i] - 1);
-		cn[i] = pow(c[i], m_n);
-		F[i] = (B * cn[i]) / (Kn + cn[i]);
-	}
-	double zhat = (m_Kmax * m_w / m_t) * (F[0] * (1.0 - F[1]));
-	return max(zhat, 0.0);
+	double fa = f_Hill(pt, m_sol_id_a);
+	double fb = f_Hill(pt, m_sol_id_b);
+	double zhat = m_Kb * fa * (1.0 - fb);
+	return zhat;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of reaction rate with strain at material point
-mat3ds FEHillActivationANDInhibition::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
+mat3ds FEHillActivationANDInhibition::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
 	// if the reaction supply is insensitive to strain
-	if (m_pReact->m_bool_refC)
+	if (m_bool_refC)
 		return mat3ds(0.0);
 
-	double zhat = ReactionRate(pt);
+	double zhat = ReactionSupply(pt);
 	mat3dd I(1);
 	mat3ds dzhatde = I * (-zhat);
 	return dzhatde;
@@ -90,8 +90,48 @@ mat3ds FEHillActivationANDInhibition::Tangent_ReactionRate_Strain(FEMaterialPoin
 
 //-----------------------------------------------------------------------------
 //! tangent of reaction rate with effective fluid pressure at material point
-double FEHillActivationANDInhibition::Tangent_ReactionRate_Pressure(FEMaterialPoint& pt)
+double FEHillActivationANDInhibition::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
 {
 	return 0.0;
 }
 
+//-----------------------------------------------------------------------------
+//! tangent of molar supply with effective concentration at material point
+double FEHillActivationANDInhibition::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
+{
+	double c_act = m_psm->GetActualSoluteConcentration(pt, sol);
+	double c_eff = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+
+	//dzdc_act
+	if (sol == m_sol_id_a)
+	{
+		if (c_act > 0.0 && c_eff > 0.0)
+			return dfdc(pt, m_sol_id_a) * m_Kb * (1.0 - f_Hill(pt, m_sol_id_b));
+	}
+
+	//dzdc_inh
+	else if (sol == m_sol_id_b)
+	{
+		if (c_act > 0.0 && c_eff > 0.0)
+			return - 1.0 * dfdc(pt, m_sol_id_b) * m_Kb * f_Hill(pt, m_sol_id_a);
+	}
+
+	//dzdc_gamma
+	else
+		return 0.0;
+}
+
+double FEHillActivationANDInhibition::f_Hill(FEMaterialPoint& pt, const int sol)
+{
+	double cn = pow(m_psm->GetActualSoluteConcentration(pt, sol), m_n);
+	double f_h = (m_B * cn) / (m_Kn + cn);
+	return f_h;
+}
+
+double FEHillActivationANDInhibition::dfdc(FEMaterialPoint& pt, const int sol)
+{
+	double c_eff = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+	double cn = pow(m_psm->GetActualSoluteConcentration(pt, sol), m_n);
+	double dfdc = (m_Kn * m_n * f_Hill(pt, sol)) / (c_eff * (m_Kn + cn));
+	return dfdc;
+}
