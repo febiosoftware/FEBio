@@ -39,9 +39,9 @@ class FEDofList;
 
 double FECORE_API operator*(const std::vector<double>& a, const std::vector<double>& b);
 std::vector<double> FECORE_API operator - (std::vector<double>& a, std::vector<double>& b);
-template<typename T> void zero(std::vector<T>& a) { fill(a.begin(), a.end(), T(0)); }
-template<> inline void zero<vec3d>(std::vector<vec3d>& a) { fill(a.begin(), a.end(), vec3d(0,0,0)); }
-template<typename T> void assign(std::vector<T>& a, const T& v) { fill(a.begin(), a.end(), v); }
+template<typename T> void zero(std::vector<T>& a) { std::fill(a.begin(), a.end(), T(0)); }
+template<> inline void zero<vec3d>(std::vector<vec3d>& a) { std::fill(a.begin(), a.end(), vec3d(0,0,0)); }
+template<typename T> void assign(std::vector<T>& a, const T& v) { std::fill(a.begin(), a.end(), v); }
 void FECORE_API operator+=(std::vector<double>& a, const std::vector<double>& b);
 void FECORE_API operator-=(std::vector<double>& a, const std::vector<double>& b);
 void FECORE_API operator*=(std::vector<double>& a, double b);
