@@ -1123,15 +1123,19 @@ bool FEModel::Solve()
 		m_imp->m_nStep = (int)nstep;
 		m_imp->m_pStep = m_imp->m_Step[(int)nstep];
 
-		// intitialize step data
-		if (m_imp->m_pStep->Activate() == false)
+		// In the case we restarted, the current step can already be active
+		// so don't activate it again. 
+		if (m_imp->m_pStep->IsActive() == false)
 		{
-			bok = false;
-			break;
-		}
+			if (m_imp->m_pStep->Activate() == false)
+			{
+				bok = false;
+				break;
+			}
 
-		// do callback
-		DoCallback(CB_STEP_ACTIVE);
+			// do callback
+			DoCallback(CB_STEP_ACTIVE);
+		}
 
 		// solve the analaysis step
 		bok = m_imp->m_pStep->Solve();
@@ -2286,6 +2290,16 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		// since they can depend on other model parameters.
 		ar & m_LC;
 		ar & m_Param;
+
+		// if the model was solved, then start at the next step
+		if (ar.IsLoading())
+		{
+			if (m_bsolved)
+			{
+				m_bsolved = false;
+				m_nStep++;
+			}
+		}
 	}
 }
 

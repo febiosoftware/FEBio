@@ -939,7 +939,7 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 		m_ar.EndChunk();
 
 		// surface section
-		if (m.Surfaces() > 0)
+		if (m.FacetSets() > 0)
 		{
 			BuildSurfaceTable();
 			m_ar.BeginChunk(PLT_SURFACE_SECTION);
@@ -1312,17 +1312,17 @@ void FEBioPlotFile::BuildSurfaceTable()
 
 	FEMesh& mesh = fem.GetMesh();
 	m_Surf.clear();
-	for (int ns = 0; ns < mesh.Surfaces(); ++ns)
+	for (int ns = 0; ns < mesh.FacetSets(); ++ns)
 	{
-		FESurface& s = mesh.Surface(ns);
-		int NF = s.Elements();
+		FEFacetSet& s = mesh.FacetSet(ns);
+		int NF = s.Faces();
 
 		// find the max nodes
 		int maxNodes = 0;
 		for (int i = 0; i < NF; ++i)
 		{
-			FESurfaceElement& el = s.Element(i);
-			if (el.Nodes() > maxNodes) maxNodes = el.Nodes();
+			FEFacetSet::FACET& el = s.Face(i);
+			if (el.ntype > maxNodes) maxNodes = el.ntype;
 		}
 
 		Surface surf;
@@ -1335,11 +1335,11 @@ void FEBioPlotFile::BuildSurfaceTable()
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 {
-	for (int ns = 0; ns<m.Surfaces(); ++ns)
+	for (int ns = 0; ns< m_Surf.size(); ++ns)
 	{
 		Surface& surf = m_Surf[ns];
-		FESurface& s = *surf.surf;
-		int NF = s.Elements();
+		FEFacetSet& s = *surf.surf;
+		int NF = s.Faces();
 		int maxNodes = surf.maxNodes;
 
 		m_ar.BeginChunk(PLT_SURFACE);
@@ -1359,11 +1359,11 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 				int n[FEElement::MAX_NODES + 2];
 				for (int i=0; i<NF; ++i)
 				{
-					FESurfaceElement& f = s.Element(i);
+					FEFacetSet::FACET& f = s.Face(i);
 					int nf = f.Nodes();
 					n[0] = i+1;
 					n[1] = nf;
-					for (int i=0; i<nf; ++i) n[i+2] = f.m_node[i];
+					for (int i=0; i<nf; ++i) n[i+2] = f.node[i];
 					m_ar.WriteChunk(PLT_FACE, n, maxNodes + 2);
 				}
 			}
@@ -1767,69 +1767,72 @@ void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 
 	// loop over all surfaces
 	FEMesh& m = fem.GetMesh();
-	int NS = m.Surfaces();
-	for (int i = 0; i<NS; ++i)
+	for (int i = 0; i<m_Surf.size(); ++i)
 	{
-		FESurface& S = m.Surface(i);
-
-		if (domName.empty() || (domName == S.GetName()))
+		FEFacetSet& facetSet = *m_Surf[i].surf;
+		int maxNodes = m_Surf[i].maxNodes;
+		if (domName.empty() || (domName == facetSet.GetName()))
 		{
-			Surface& surf = m_Surf[i];
-			assert(surf.surf == &S);
-
-			// Determine data size.
-			// Note that for the FMT_MULT case we are 
-			// assuming 9 data entries per facet
-			// regardless of the nr of nodes a facet really has
-			// this is because for surfaces, all elements are not
-			// necessarily of the same type
-			// TODO: Fix the assumption of the FMT_MULT
-			int datasize = pd->VarSize(pd->DataType());
-			int nsize = datasize;
-			switch (pd->StorageFormat())
+			// Find the surface with the same name
+			FESurface* surf = m.FindSurface(facetSet.GetName());
+			if (surf)
 			{
-			case FMT_NODE: nsize *= S.Nodes(); break;
-			case FMT_ITEM: nsize *= S.Elements(); break;
-			case FMT_MULT: nsize *= surf.maxNodes * S.Elements(); break;
-			case FMT_REGION:
-				// one value per surface so nsize remains unchanged
-				break;
-			default:
-				assert(false);
-			}
+				FESurface& S = *surf;
 
-			// save data
-			FEDataStream a; a.reserve(nsize);
-			if (pd->Save(S, a))
-			{
-				// in FEBio 3.0, the data streams are assumed to have no padding, but for now we still need to pad 
-				// the data stream before we write it to the file
-				if (a.size() == nsize)
+				// Determine data size.
+				// Note that for the FMT_MULT case we are 
+				// assuming 9 data entries per facet
+				// regardless of the nr of nodes a facet really has
+				// this is because for surfaces, all elements are not
+				// necessarily of the same type
+				// TODO: Fix the assumption of the FMT_MULT
+				int datasize = pd->VarSize(pd->DataType());
+				int nsize = datasize;
+				switch (pd->StorageFormat())
 				{
-					// assumed padding is already there, or not needed
-					m_ar.WriteData(i + 1, a.data());
+				case FMT_NODE: nsize *= S.Nodes(); break;
+				case FMT_ITEM: nsize *= S.Elements(); break;
+				case FMT_MULT: nsize *= maxNodes * S.Elements(); break;
+				case FMT_REGION:
+					// one value per surface so nsize remains unchanged
+					break;
+				default:
+					assert(false);
 				}
-				else
+
+				// save data
+				FEDataStream a; a.reserve(nsize);
+				if (pd->Save(S, a))
 				{
-					// this is only needed for FMT_MULT storage
-					assert(pd->StorageFormat() == FMT_MULT);
-
-					// add padding
-					const int M = surf.maxNodes;
-					int m = 0;
-					FEDataStream b; b.assign(nsize, 0.f);
-					for (int n = 0; n < S.Elements(); ++n)
+					// in FEBio 3.0, the data streams are assumed to have no padding, but for now we still need to pad 
+					// the data stream before we write it to the file
+					if (a.size() == nsize)
 					{
-						FESurfaceElement& el = S.Element(n);
-						int ne = el.Nodes();
-						for (int j = 0; j < ne; ++j)
-						{
-							for (int k = 0; k < datasize; ++k) b[n * M * datasize + j * datasize + k] = a[m++];
-						}
+						// assumed padding is already there, or not needed
+						m_ar.WriteData(i + 1, a.data());
 					}
+					else
+					{
+						// this is only needed for FMT_MULT storage
+						assert(pd->StorageFormat() == FMT_MULT);
 
-					// write the padded data
-					m_ar.WriteData(i + 1, b.data());
+						// add padding
+						const int M = maxNodes;
+						int m = 0;
+						FEDataStream b; b.assign(nsize, 0.f);
+						for (int n = 0; n < S.Elements(); ++n)
+						{
+							FESurfaceElement& el = S.Element(n);
+							int ne = el.Nodes();
+							for (int j = 0; j < ne; ++j)
+							{
+								for (int k = 0; k < datasize; ++k) b[n * M * datasize + j * datasize + k] = a[m++];
+							}
+						}
+
+						// write the padded data
+						m_ar.WriteData(i + 1, b.data());
+					}
 				}
 			}
 		}
