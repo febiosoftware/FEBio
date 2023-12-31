@@ -38,7 +38,6 @@ SOFTWARE.*/
 #include "FEBioGeometrySection.h"
 #include "FEBioBoundarySection.h"
 #include "FEBioBoundarySection3.h"
-#include "FEBioCodeSection.h"
 #include "FEBioLoadsSection.h"
 #include "FEBioContactSection.h"
 #include "FEBioConstraintsSection.h"

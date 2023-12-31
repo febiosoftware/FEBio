@@ -35,7 +35,6 @@ SOFTWARE.*/
 #include <FECore/FELoadCurve.h>
 #include "FECore/log.h"
 #include <FECore/FECoreKernel.h>
-#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // Helper function to print a matrix

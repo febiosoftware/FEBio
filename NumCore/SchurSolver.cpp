@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "SchurSolver.h"
 #include "ILU0_Preconditioner.h"
 #include <FECore/SchurComplement.h>
-#include "ILU0_Preconditioner.h"
 #include "IncompleteCholesky.h"
 #include "HypreGMRESsolver.h"
 #include "RCICGSolver.h"

@@ -47,7 +47,6 @@ SOFTWARE.*/
 #include "FEDataArray.h"
 #include "FESurfaceConstraint.h"
 #include "FEModelParam.h"
-#include "FEShellDomain.h"
 #include "FEEdge.h"
 #include "FEMeshAdaptor.h"
 #include <string>

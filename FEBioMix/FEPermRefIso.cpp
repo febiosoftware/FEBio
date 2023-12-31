@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include <FECore/log.h>
 #include "FEPermRefIso.h"
-#include <FECore/log.h>
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
 
