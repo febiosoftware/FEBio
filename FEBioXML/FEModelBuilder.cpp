@@ -41,11 +41,8 @@ SOFTWARE.*/
 #include <FECore/FEDomainMap.h>
 #include <FECore/FEEdge.h>
 #include <FECore/FEConstValueVec3.h>
-#include <FECore/log.h>
 #include <FECore/FEDataGenerator.h>
-#include <FECore/FEModule.h>
 #include <FECore/FEPointFunction.h>
-#include <FECore/FEBodyLoad.h>
 #include <FECore/FESurfacePairConstraint.h>
 #include <FECore/FENLConstraint.h>
 #include <sstream>

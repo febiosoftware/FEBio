@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioMaterialSection.h"
 #include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
 #include "FECore/FEMaterial.h"
 #include <FECore/log.h>
 #include <sstream>

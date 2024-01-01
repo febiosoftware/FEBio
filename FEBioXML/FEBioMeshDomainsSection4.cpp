@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FECoreKernel.h>
-#include <FECore/FENodeNodeList.h>
 #include <sstream>
 
 FEBioMeshDomainsSection4::FEBioMeshDomainsSection4(FEBioImport* pim) : FEBioFileSection(pim) 

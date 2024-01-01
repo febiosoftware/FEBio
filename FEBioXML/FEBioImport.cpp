@@ -57,15 +57,9 @@ SOFTWARE.*/
 #include "FEBioMeshSection4.h"
 #include "FEBioMeshDomainsSection4.h"
 #include "FEBioStepSection3.h"
-#include "FECore/DataStore.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/FESurfaceMap.h>
-#include <FECore/FEFunction1D.h>
-#include <FECore/tens3d.h>
-#include "FECore/DOFS.h"
 #include <string.h>
-#include <stdarg.h>
 #include "xmltool.h"
 
 FEBioFileSection::FEBioFileSection(FEBioImport* feb) : FEFileSection(feb) {}

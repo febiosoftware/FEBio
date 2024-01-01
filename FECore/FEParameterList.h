@@ -36,7 +36,6 @@ SOFTWARE.*/
 #include "FEParam.h"
 #include "FEParamValidator.h"
 #include "ParamString.h"
-#include "MathObject.h"
 #include "fecore_api.h"
 #include <stdio.h>
 using namespace std;
@@ -51,7 +50,6 @@ class FEParamMat3ds;
 class FEDataArray;
 class tens3drs;
 class FEMaterialPointProperty;
-class Image;
 
 //-----------------------------------------------------------------------------
 typedef std::list<FEParam>::iterator FEParamIterator;
@@ -180,8 +178,6 @@ public:
 	FEParam* AddParameter(std::vector<vec2d>&  v, const char* sz);
 	FEParam* AddParameter(std::vector<std::string>& v, const char* sz);
 	FEParam* AddParameter(FEMaterialPointProperty& v, const char* sz);
-	FEParam* AddParameter(MSimpleExpression& m, const char* sz);
-	FEParam* AddParameter(Image& im           , const char* sz);
 
 	FEParam* AddParameter(int&           v, RANGE rng, const char* sz);
 	FEParam* AddParameter(double&        v, RANGE rng, const char* sz);
