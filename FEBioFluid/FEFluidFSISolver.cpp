@@ -54,7 +54,6 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/DumpStream.h>
-#include <NumCore/NumCore.h>
 #include "FEFluidFSIAnalysis.h"
 
 //-----------------------------------------------------------------------------
