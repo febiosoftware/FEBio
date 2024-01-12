@@ -1,6 +1,7 @@
 version: "3"
 services:
   febiobase:
+    platform: "linux/amd64"
     build:
       context: ./infrastructure
       dockerfile: DockerfileBase
@@ -10,17 +11,20 @@ services:
       - ./:/FEBio
 
   febio: &default
+    platform: "linux/amd64"
     build:
       context: ./infrastructure
+      dockerfile: Dockerfile
     image: febiosoftware/febio:ubuntu-22.04
     working_dir: /FEBio
     volumes:
       - ./:/FEBio
+    command: bash
 
   febio-dev:
     <<: *default
     container_name: febio-dev
-    command: sleep infinity
+    command: bash
 
   febio-build:
     <<: *default

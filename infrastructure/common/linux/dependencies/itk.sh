@@ -5,24 +5,25 @@ set -o verbose
 # shellcheck disable=1091
 . ./common-functions.sh
 
-NETGEN="https://github.com/NGSolve/netgen.git"
-BRANCH="v6.2.2009"
+ITK="https://github.com/InsightSoftwareConsortium/ITK.git"
+BRANCH="v5.2.1"
 build_and_install() {
 	local source=$1
 	local branch=$2
 
 	git clone --depth 1 --branch "$branch" "$source" "$branch"
 	pushd $branch || exit 1
-	git submodule update --init --recursive
-	cmake .  -LA -B cmbuild \
+	cmake . -B cmbuild \
 		-DCMAKE_INSTALL_PREFIX="/usr/local" \
-		-DUSE_PYTHON=OFF \
-		-DUSE_GUI=OFF \
-		-DUSE_NATIVE_ARCH=OFF \
-		-DUSE_OCC=ON \
-		-DUSE_SUPERBUILD=OFF
+		-DBUILD_EXAMPLES:BOOL=OFF \
+		-DBUILD_SHARED_LIBS:BOOL=OFF \
+		-DBUILD_TESTING:BOOL=OFF \
+		-DITK_WRAP_PYTHON:BOOL=OFF \
+		-DITK_DOXYGEN_HTML:BOOL=OFF \
+		-DCMAKE_BUILD_TYPE=Release
+
 	pushd cmbuild
-	make -j "$(nproc)"
+	make -j "$(nproc --ignore 2)"
 	sudo make install
 	popd || exit 1
 	popd || exit 1
@@ -30,8 +31,7 @@ build_and_install() {
 
 main() {
 	pushd "$BUILD_PATH" || exit 1
-	install_deps
-	build_and_install "$NETGEN" "$BRANCH"
+	build_and_install "$ITK" "$BRANCH"
 	popd || exit 1
 }
 

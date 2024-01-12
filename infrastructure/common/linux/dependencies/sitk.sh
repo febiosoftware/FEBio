@@ -18,9 +18,8 @@ build_and_install() {
 		-DWRAP_DEFAULT:BOOL=OFF \
 		-DBUILD_EXAMPLES:BOOL=OFF \
 		-DBUILD_TESTING:BOOL=OFF \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DSimpleITK_USE_ELASTIX:BOOL=ON \
-		-DSimpleITK_USE_SYSTEM_ITK:BOOL=OFF
+		-DBUILD_SHARED_LIBS:BOOL=OFF \
+		-DCMAKE_BUILD_TYPE=Release
 
 	pushd cmbuild
 	make -j "$(nproc --ignore 2)"

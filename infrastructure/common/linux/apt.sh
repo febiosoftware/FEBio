@@ -11,7 +11,7 @@ $SUDO apt-get update
 # $SUDO apt-get install linux-headers-$(uname -r) -y
 $SUDO apt-get install linux-headers-generic -y
 $SUDO apt-get install software-properties-common wget gpg sudo -y
-$SUDO apt-get install python3-vtkgdcm libvtkgdcm-tools libvtkgdcm-cil libvtkgdcm-java libvtkgdcm-dev libvtkgdcm-java libvtkgdcm3.0 -y
+#$SUDO apt-get install python3-vtkgdcm libvtkgdcm-tools libvtkgdcm-cil libvtkgdcm-java libvtkgdcm-dev libvtkgdcm-java libvtkgdcm3.0 -y
 $SUDO apt-get update --fix-missing
 
 
