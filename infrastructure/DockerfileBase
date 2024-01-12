@@ -17,4 +17,4 @@ RUN ./openapi.sh
 RUN ./aws.sh
 
 WORKDIR /FEBio
-CMD ["sleep", "infinity"]
+CMD ["bash"]

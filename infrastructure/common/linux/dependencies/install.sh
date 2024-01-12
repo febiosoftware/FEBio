@@ -12,7 +12,7 @@ main() {
 	local dir=$1
 	pushd $dir
 
-	local installers=(hypre levmar mmg tetgen itk sitk) #occt netgen )
+	local installers=(hypre levmar mmg tetgen itk sitk occt netgen )
 	for installer in ${installers[@]}; do
 		./${installer}.sh
 	done

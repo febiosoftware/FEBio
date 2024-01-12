@@ -27,3 +27,5 @@ libinsighttoolkit5-dev
 swig
 libxorg-gtest-dev
 jq
+libteem-dev
+libteem2
