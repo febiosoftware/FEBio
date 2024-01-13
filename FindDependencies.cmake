@@ -39,6 +39,7 @@ if(MKLROOT)
             PATHS
               ${MKLROOT}/../compiler/latest/*/compiler/lib/
               ${MKLROOT}/../../compiler/latest/*/compiler/lib/
+              ${MKLROOT}/../../compiler/latest/lib/
             PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
