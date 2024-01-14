@@ -9,6 +9,7 @@ services:
     working_dir: /FEBio
     volumes:
       - ./:/FEBio
+    command: bash
 
   febio: &default
     platform: "linux/amd64"
