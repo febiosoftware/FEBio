@@ -241,7 +241,7 @@ bool FEElasticSolidDomain2O::FEInternalSurface2O::Initialize(FEElasticSolidDomai
 				m_data[nnf].ksi[k] = map_facet_to_solid(mesh, face, ek, h1, h2);
 			}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			// This checks that the two integration points coincide physically at the same point
 			FESolidElement& ea = static_cast<FESolidElement&>(*face.m_elem[0]);
 			FESolidElement& eb = static_cast<FESolidElement&>(*face.m_elem[1]);

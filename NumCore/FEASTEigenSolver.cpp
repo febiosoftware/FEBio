@@ -70,7 +70,7 @@ bool FEASTEigenSolver::Init()
 	//           fpm[63]=0 (default): Extended Eigensolver routines use the Intel MKL PARDISO default iparm settings defined by calling the pardisoinit subroutine.
 	//	         fpm[63]=1 : The values from fpm[64] to fpm[127] correspond to iparm[0] to iparm[63] respectively according to the formula fpm[64 + i] = iparm[i] for i = 0, 1, ..., 63
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_fpm[0] = 1; // turn on FEAST output
 #endif
 
