@@ -79716,7 +79716,11 @@ Power exponent
 \begin_inset Formula $\beta$
 \end_inset
 
- 
+ (
+\begin_inset Formula $\ge1$
+\end_inset
+
+)
 \end_layout
 
 \end_inset
@@ -79749,7 +79753,7 @@ These parameters must satisfy
 
 .
  When 
-\begin_inset Formula $\beta\ne1$
+\begin_inset Formula $\beta>1$
 \end_inset
 
 , the reduced relaxation function for this material type is given by

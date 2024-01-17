@@ -61,24 +61,96 @@ double gammainv(double x) {
 
 //---------------------------------------------------------------------------------
 // evaluate the incomplete Gamma function
+// adapted from Numerical Recipes in Fortran
+
+bool gser(double& gamser, double a, double x, double& gln) {
+    const int ITMAX = 100;
+    const double EPS = 3e-7;
+    gln = gammaln(a);
+    if (x > 0) {
+        double ap = a;
+        double sum = 1./a;
+        double del = sum;
+        bool cnvgd = true;
+        for (int n=1; n<=ITMAX; ++n) {
+            ap += 1;
+            del*= x/ap;
+            sum += del;
+            if (abs(del) < abs(sum)*EPS) break;
+            if (n == ITMAX) cnvgd = false;
+        }
+        if (!cnvgd) return false;
+        gamser = sum*exp(-x+a*log(x)-gln);
+    }
+    else {
+        gamser = 0;
+        return false;
+    }
+}
+
+bool gcf(double& gammcf, double a, double x, double& gln) {
+    const int ITMAX = 100;
+    const double EPS = 3e-7, FPMIN = 10*std::numeric_limits<double>::epsilon();
+    gln = gammaln(a);
+    double b = x+1-a;
+    double c = 1./FPMIN;
+    double d = 1./b;
+    double h = d;
+    bool cnvgd = true;
+    for (int i=1; i<=ITMAX; ++i) {
+        double an = -i*(i-a);
+        b += 2;
+        d = an*d+b;
+        if (abs(d) < FPMIN) d = FPMIN;
+        c = b + an/c;
+        if (abs(c) < FPMIN) c = FPMIN;
+        d = 1./d;
+        double del = d*c;
+        h *= del;
+        if (abs(del-1) < EPS) break;
+        if (i == ITMAX) cnvgd = false;
+    }
+    if (!cnvgd) return false;
+    gammcf = exp(-x+a*log(x)-gln)*h;
+    return true;
+}
+
 double gamma_inc_P(double a, double x)
 {
-    const int MAXITER = 100;
-    const double eps = 10*std::numeric_limits<double>::epsilon();
-    bool convgd = false;
-    int i = 0;
-    double d = gammainv(a+1);
-    double P = d;
-    while (!convgd) {
-        ++i;
-        d *= x/(a+i);
-        P += d;
-        if ((fabs(d) < eps*fabs(P)) || (i > MAXITER)) convgd = true;
+    // returns the lower incomplete Gamma function
+    if ((x >= 0) && (a >= 0)) {
+        if (x < a+1) {
+            double gamser, gln;
+            gser(gamser,a,x,gln);
+            return gamser*exp(gln);
+        }
+        else {
+            double gammcf, gln;
+            gcf(gammcf, a, x, gln);
+            return (1-gammcf)*exp(gln);
+        }
     }
-    return P*exp(-x)*pow(x, a);
+    return 0.0;
 }
 
 double gamma_inc_Q(double a, double x)
 {
-    return 1 - gamma_inc_P(a,x);
+    // returns the upper incomplete Gamma function
+    if ((x >= 0) && (a >= 0)) {
+        if (x < a+1) {
+            double gamser, gln;
+            gser(gamser,a,x,gln);
+            return (1-gamser)*exp(gln);
+        }
+        else {
+            double gammcf, gln;
+            gcf(gammcf, a, x, gln);
+            return gammcf*exp(gln);
+        }
+    }
+    return 0.0;
+}
+
+double gammp(double a, double x)
+{
 }

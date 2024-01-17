@@ -38918,6 +38918,15 @@ noprefix "false"
 \end_inset
 
 .
+ For proper evaluation of the 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ function we must have 
+\begin_inset Formula $\beta\ge1$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
