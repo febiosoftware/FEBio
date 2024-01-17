@@ -25,7 +25,7 @@ build_and_install() {
 
 main() {
 	pushd "$BUILD_PATH" || exit 1
-	build_and_install "$TETGEN_GIT" "TETGEN_SOURCE_DIR"
+	build_and_install "$TETGEN_GIT" "$TETGEN_SOURCE_DIR"
 	popd || exit 1
 }
 
