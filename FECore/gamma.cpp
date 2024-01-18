@@ -76,7 +76,7 @@ bool gser(double& gamser, double a, double x, double& gln) {
             ap += 1;
             del*= x/ap;
             sum += del;
-            if (abs(del) < abs(sum)*EPS) break;
+            if (fabs(del) < fabs(sum)*EPS) break;
             if (n == ITMAX) cnvgd = false;
         }
         if (!cnvgd) return false;
@@ -86,6 +86,7 @@ bool gser(double& gamser, double a, double x, double& gln) {
         gamser = 0;
         return false;
     }
+	return true;
 }
 
 bool gcf(double& gammcf, double a, double x, double& gln) {
@@ -101,13 +102,13 @@ bool gcf(double& gammcf, double a, double x, double& gln) {
         double an = -i*(i-a);
         b += 2;
         d = an*d+b;
-        if (abs(d) < FPMIN) d = FPMIN;
+        if (fabs(d) < FPMIN) d = FPMIN;
         c = b + an/c;
-        if (abs(c) < FPMIN) c = FPMIN;
+        if (fabs(c) < FPMIN) c = FPMIN;
         d = 1./d;
         double del = d*c;
         h *= del;
-        if (abs(del-1) < EPS) break;
+        if (fabs(del-1) < EPS) break;
         if (i == ITMAX) cnvgd = false;
     }
     if (!cnvgd) return false;
@@ -149,8 +150,4 @@ double gamma_inc_Q(double a, double x)
         }
     }
     return 0.0;
-}
-
-double gammp(double a, double x)
-{
 }
