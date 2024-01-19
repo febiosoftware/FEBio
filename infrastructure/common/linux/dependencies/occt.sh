@@ -21,8 +21,8 @@ build_and_install() {
 		-DBUILD_LIBRARY_TYPE:STRING=Shared \
 		-DBUILD_MODULE_ApplicationFramework:BOOL=OFF \
 		-DBUILD_MODULE_DETools:BOOL=OFF \
-		-DBUILD_MODULE_DataExchange:BOOL=OFF \
-		-DBUILD_MODULE_Draw:BOOL=TRUE \
+		-DBUILD_MODULE_DataExchange:BOOL=ON \
+		-DBUILD_MODULE_Draw:BOOL=OFF \
 		-DBUILD_MODULE_FoundationClasses:BOOL=TRUE \
 		-DBUILD_MODULE_ModelingAlgorithms:BOOL=TRUE \
 		-DBUILD_MODULE_ModelingData:BOOL=OFF \

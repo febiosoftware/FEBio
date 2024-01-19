@@ -2,5 +2,4 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 choco install git -y
 # Set Path for git-bash
-$userpath=[Environment]::GetEnvironmentVariable("Path", "User")
-setx PATH "$userpath;C:\Program Files\Git\bin"
+setx PATH "$env:PATH;C:\Program Files\Git\bin"

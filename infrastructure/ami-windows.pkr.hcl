@@ -18,7 +18,7 @@ locals {
 }
 
 variable "installation_path" {
-  default = "c:\\local"
+  default = "c:\\usr\local"
 }
 
 data "amazon-parameterstore" "winrm_password" {
@@ -45,7 +45,7 @@ data "amazon-ami" "windows" {
 
 variable "skip_create_ami" {
   type    = bool
-  default = true
+  default = false
 }
 
 source "amazon-ebs" "windows" {
@@ -102,44 +102,49 @@ build {
   }
 
   # paths
-  provisioner "powershell" {
-    inline = [<<EOF
-$userpath=[Environment]::GetEnvironmentVariable("Path", "User")
-setx PATH "$userpath;${local.installation_path}"
-EOF
-    ]
-  }
+  #provisioner "powershell" {
+  #  inline = [<<EOF
+$u#serpath=[Environment]::GetEnvironmentVariable("Path", "User")
+se#tx PATH "$userpath;${local.installation_path}"
+EO#F
+  #  ]
+  #}
+
+  #vcpkg
+  #provisioner "powershell" {
+  #  script = "./common/windows/vcpkg.ps1"
+  #}
 
   # ZLIB
-  provisioner "windows-shell" {
-    script = "./common/windows/zlib.bat"
-  }
+  # provisioner "windows-shell" {
+  #   script = "./common/windows/zlib.bat"
+  # }
 
-  # HYPRE
-  provisioner "windows-shell" {
-    script = "./common/windows/hypre.bat"
-  }
+  # # HYPRE
+  # provisioner "windows-shell" {
+  #   script = "./common/windows/hypre.bat"
+  # }
 
-  # levmar
-  provisioner "windows-shell" {
-    script = "./common/windows/levmar.bat"
-  }
+  # # levmar
+  # provisioner "windows-shell" {
+  #   script = "./common/windows/levmar.bat"
+  # }
 
-  # levmar header path
-  provisioner "powershell" {
-    inline = [<<EOF
-$userpath=[Environment]::GetEnvironmentVariable("Path", "User")
-setx PATH "$userpath;${local.installation_path}\include\levmar"
-EOF
-    ]
-  }
+  # # levmar header path
+  # provisioner "powershell" {
+  #   inline = [<<EOF
+#$userpath=[Environment]::GetEnvironmentVariable("Path", "User")
+#setx PATH "$userpath;${local.installation_path}\include\levmar"
+#EOF
+  #   ]
+  # }
 
-  # mmg
-  provisioner "windows-shell" {
-    script = "./common/windows/mmg.bat"
-  }
+  # # mmg
+  # provisioner "windows-shell" {
+  #   script = "./common/windows/mmg.bat"
+  # }
 
-  # sysprep for next launch
+  # # sysprep for next launch
   provisioner "powershell" {
     inline = [
       "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
