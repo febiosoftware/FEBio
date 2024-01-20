@@ -244,6 +244,68 @@ double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! Evaluate and return tangent of solid referential volume fraction w.r.t. relative volume
+double FEMultiphasic::TangentSRVFStrain(FEMaterialPoint& pt)
+{
+    // get referential apparent density of base solid (assumed constant)
+    double phis0 = m_phi0(pt);
+    double phisr = SolidReferentialVolumeFraction(pt);
+    
+    // add contribution from solid-bound 'solutes'
+    FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+    double J = et.m_J;
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    const int nsol = (int)m_pSolute.size();
+    double f = 0;
+    double s = 0;
+    for (int isol=0; isol<nsol; ++isol) {
+        if (spt.m_bsb[isol]) {
+            f += spt.m_ca[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density();
+            s += spt.m_ca[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density()*spt.m_dkdJ[isol]/spt.m_k[isol];
+        }
+    }
+    double d = 1+f;
+    double dphisrdJ = f/d + (J-phis0)*s/(d*d);
+    
+    // add contribution from solid-bound molecules
+    f = s = 0;
+    for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm) {
+        f += spt.m_sbmr[isbm]/m_pSBM[isbm]->Density();
+    }
+    dphisrdJ += f/(J-phisr + f);
+    
+    return dphisrdJ;
+}
+
+//-----------------------------------------------------------------------------
+//! evaluate and return tangent of  solid referential volume fraction w.r.t. to concentration
+double FEMultiphasic::TangentSRVFConcentration(FEMaterialPoint& pt, const int sol)
+{
+    // get referential apparent density of base solid (assumed constant)
+    double phis0 = m_phi0(pt);
+    double phisr = SolidReferentialVolumeFraction(pt);
+    
+    // add contribution from solid-bound 'solutes'
+    FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+    double J = et.m_J;
+    FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+    const int nsol = (int)m_pSolute.size();
+    double f = 0;
+    if (spt.m_bsb[sol]) {
+        for (int isol=0; isol<nsol; ++isol) {
+            if (spt.m_bsb[isol]) {
+                f += spt.m_ca[isol]*spt.m_dkdc[isol][sol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density();
+                if (isol == sol) f += spt.m_k[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density();
+            }
+        }
+    }
+    double dphisrdc = pow(J-phisr,2)/(J-phis0)*f;
+    
+    return dphisrdc;
+}
+
+
+//-----------------------------------------------------------------------------
 //! Porosity in current configuration
 double FEMultiphasic::Porosity(FEMaterialPoint& pt)
 {

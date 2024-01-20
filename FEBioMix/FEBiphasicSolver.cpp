@@ -34,7 +34,6 @@ SOFTWARE.*/
 #include "FESlidingInterfaceBiphasic.h"
 #include "FESlidingInterfaceBiphasicMixed.h"
 #include <FEBioMech/FEElasticDomain.h>
-#include <FEBioMech/FEElasticDomain.h>
 #include <FEBioMech/FEPressureLoad.h>
 #include <FEBioMech/FEResidualVector.h>
 #include <FEBioMech/FESolidLinearSystem.h>
@@ -358,80 +357,75 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
 
-	// initialize residual with concentrated nodal loads
-	zero(R);
-
 	// zero nodal reaction forces
 	zero(m_Fr);
 
 	// setup global RHS vector
+    zero(R);
 	FEResidualVector RHS(fem, R, m_Fr);
 
 	// zero rigid body reaction forces
 	m_rigidSolver.Residual();
 
-	// get the mesh
-	FEMesh& mesh = fem.GetMesh();
-
 	// calculate internal stress force
-	if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE)
-	{
-		for (int i=0; i<mesh.Domains(); ++i)
-		{
-			FEBiphasicDomain* pdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->InternalForcesSS(RHS);
+    InternalForces(RHS);
+
+    // calculate nodal reaction forces
+    for (int i = 0; i < m_neq; ++i) m_Fr[i] -= R[i];
+    
+    // extract the internal forces
+    // (only when we really need it, below)
+    if (m_logSolve && fem.GetCurrentStep()->m_ntimesteps > 0)
+    {
+        m_Fint = R;
+    }
+    
+    if (m_arcLength > 0)
+    {
+        // Note the negative sign. This is because during residual assembly
+        // a negative sign is applied to the internal force vector.
+        // The model loads assume the residual is Fe - Fi (i.e. -R)
+        m_Fint = -R;
+    }
+    
+    // calculate external forces
+    ExternalForces(RHS);
+    
+    // For arc-length we need the external loads
+    if (m_arcLength > 0)
+    {
+        // extract the external force
+        m_Fext = R + m_Fint;
+        
+        // we need to apply the arc-length factor to the external loads
+        for (int i=0; i<R.size();++i) R[i] = m_Fext[i]* m_al_lam - m_Fint[i];
+    }
+    
+    // apply the residual transformation
+    // NOTE: This is an implementation of Ankush Aggarwal method to accelerate the Newton convergence
+    if (m_logSolve && fem.GetCurrentStep()->m_ntimesteps > 0)
+    {
+        double TOL = 1.e-8;
+        bool logused = false;
+        vector<double> RHSlog;
+        RHSlog.resize(R.size());
+        for (int i = 0; i<m_Fint.size(); ++i)
+        {
+            if (fabs(RHS[i] - m_Fint[i])>TOL && fabs(m_Fint[i])>TOL && (m_Fint[i] - RHS[i]) / m_Fint[i]>0)
+            {
+                RHSlog[i] = -m_Fint[i] * log((m_Fint[i] - RHS[i]) / m_Fint[i]);
+                logused = true;
+            }
             else
             {
-                FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-                dom.InternalForces(RHS);
+                RHSlog[i] = RHS[i];
             }
         }
-	}
-	else
-	{
-		for (int i=0; i<mesh.Domains(); ++i)
-		{
-			FEBiphasicDomain* pdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->InternalForces(RHS);
-            else
-            {
-                FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-                dom.InternalForces(RHS);
-            }
-		}
-	}
-
-	// calculate contact forces
-	ContactForces(RHS);
-
-	// calculate nonlinear constraint forces
-	// note that these are the linear constraints
-	// enforced using the augmented lagrangian
-	NonLinearConstraintForces(RHS, tp);
-
-	// add model loads
-	int NML = fem.ModelLoads();
-	for (int i=0; i<NML; ++i)
-	{
-		FEModelLoad& mli = *fem.ModelLoad(i);
-		if (mli.IsActive()) mli.LoadVector(RHS);
-	}
-
-	// set the nodal reaction forces
-	// TODO: Is this a good place to do this?
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		node.set_load(m_dofU[0], 0);
-		node.set_load(m_dofU[1], 0);
-		node.set_load(m_dofU[2], 0);
-
-		int n;
-		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
-		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
-		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
-	}
-
+        for (int i = 0; i<m_Fint.size(); ++i) R[i] = RHSlog[i];
+        if (logused)
+            feLog("Log method used\n");
+    }
+    
 	// increase RHS counter
 	m_nrhs++;
 
@@ -688,3 +682,100 @@ void FEBiphasicSolver::Serialize(DumpStream& ar)
 	ar & m_nceq;
 	ar & m_di & m_Di & m_pi & m_Pi;
 }
+
+//-----------------------------------------------------------------------------
+//! Internal forces
+void FEBiphasicSolver::InternalForces(FEGlobalVector& RHS)
+{
+    // get the time information
+    FEModel& fem = *GetFEModel();
+    const FETimeInfo& tp = fem.GetTime();
+    
+    // get the mesh
+    FEMesh& mesh = fem.GetMesh();
+    
+    // calculate internal stress force
+    if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicAnalysis::STEADY_STATE)
+    {
+        for (int i=0; i<mesh.Domains(); ++i)
+        {
+            FEBiphasicDomain* pdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+            if (pdom) pdom->InternalForcesSS(RHS);
+            else
+            {
+                FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+                dom.InternalForces(RHS);
+            }
+        }
+    }
+    else
+    {
+        for (int i=0; i<mesh.Domains(); ++i)
+        {
+            FEBiphasicDomain* pdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
+            if (pdom) pdom->InternalForces(RHS);
+            else
+            {
+                FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+                dom.InternalForces(RHS);
+            }
+        }
+    }
+    
+}
+
+//-----------------------------------------------------------------------------
+//! External forces
+void FEBiphasicSolver::ExternalForces(FEGlobalVector& RHS)
+{
+    // get the time information
+    FEModel& fem = *GetFEModel();
+    const FETimeInfo& tp = fem.GetTime();
+    
+    // get the mesh
+    FEMesh& mesh = fem.GetMesh();
+    
+    // add model loads
+    int NML = fem.ModelLoads();
+    for (int i=0; i<NML; ++i)
+    {
+        FEModelLoad& mli = *fem.ModelLoad(i);
+        if (mli.IsActive()) mli.LoadVector(RHS);
+    }
+    
+    // calculate contact forces
+    ContactForces(RHS);
+    
+    // calculate nonlinear constraint forces
+    // note that these are the linear constraints
+    // enforced using the augmented lagrangian
+    NonLinearConstraintForces(RHS, tp);
+    
+    // set the nodal reaction forces
+    // TODO: Is this a good place to do this?
+    for (int i=0; i<mesh.Nodes(); ++i)
+    {
+        FENode& node = mesh.Node(i);
+        node.set_load(m_dofU[0], 0);
+        node.set_load(m_dofU[1], 0);
+        node.set_load(m_dofU[2], 0);
+        node.set_load(m_dofP[0], 0);
+
+        int n;
+        if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
+        if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
+        
+        if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
+        if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
+        
+        if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
+        if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
+        
+        if ((n = node.m_ID[m_dofP[0]]) >= 0) node.set_load(m_dofP[0], -m_Fr[n]);
+        if ((n = -node.m_ID[m_dofP[0]] - 2) >= 0) node.set_load(m_dofP[0], -m_Fr[n]);
+        
+        // add nodal loads
+        double s = (m_arcLength>0 ? m_al_lam : 1.0);
+    }
+}
+

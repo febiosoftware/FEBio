@@ -175,6 +175,7 @@ public:
 		int		m_nplot;		//!< plot level
 		int		m_noutput;		//!< data output level
 		int		m_nplot_stride;	//!< stride for plotting
+		int		m_noutput_stride;	//!< stride for data output
 		int		m_nplotRange[2];	//!< plot range
 		bool	m_bplotZero;		//!< Force plotting of time step "zero"
 		int		m_plotHint;			//!< the plot mode

@@ -60,6 +60,7 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 		ADD_PARAMETER(m_nplot, "plot_level", 0, "PLOT_NEVER\0PLOT_MAJOR_ITRS\0PLOT_MINOR_ITRS\0PLOT_MUST_POINTS\0PLOT_FINAL\0PLOT_AUGMENTATIONS\0PLOT_STEP_FINAL\0");
 		ADD_PARAMETER(m_noutput, "output_level", 0, "OUTPUT_NEVER\0OUTPUT_MAJOR_ITRS\0OUTPUT_MINOR_ITRS\0OUTPUT_MUST_POINTS\0OUTPUT_FINAL\0");
 		ADD_PARAMETER(m_nplot_stride, "plot_stride");
+		ADD_PARAMETER(m_noutput_stride, "output_stride");
 	END_PARAM_GROUP();
 
 	BEGIN_PARAM_GROUP("Advanced settings");
@@ -104,6 +105,7 @@ FEAnalysis::FEAnalysis(FEModel* fem) : FECoreBase(fem)
 	m_nplot   = FE_PLOT_MAJOR_ITRS;
 	m_noutput = FE_OUTPUT_MAJOR_ITRS;
 	m_nplot_stride = 1;
+	m_noutput_stride = 1;
 	m_nplotRange[0] = 0; // by default, will store step zero.
 	m_nplotRange[1] = -1; // by default, store last time step
 	m_bplotZero = false; // don't force plotting step zero.
@@ -255,6 +257,7 @@ bool FEAnalysis::Init()
 		if (m_timeController->Init() == false) return false;
 	}
 	if (m_nplot_stride <= 0) return false;
+	if (m_noutput_stride <= 0) return false;
 	return Validate();
 }
 
@@ -669,7 +672,6 @@ void FEAnalysis::Serialize(DumpStream& ar)
 	// --- I/O Data ---
 	ar & m_nplot;
 	ar & m_noutput;
-	ar & m_nplot_stride;
 	ar & m_nplotRange;
 	ar & m_bplotZero;
 

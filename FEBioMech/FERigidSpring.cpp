@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FERigidSpring.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FERigidBody.h"
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------

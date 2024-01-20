@@ -105,14 +105,16 @@ tens4ds FEPrescribedActiveContractionUniaxial::Tangent(FEMaterialPoint &mp)
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPrescribedActiveContractionFiber, FEElasticMaterial)
 	ADD_PARAMETER(m_T0 , "T0"   );
-	ADD_PARAMETER(m_n0 , "fiber"   );
+
+	ADD_PROPERTY(m_fiber, "fiber")->SetDefaultType("vector");
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEPrescribedActiveContractionFiber::FEPrescribedActiveContractionFiber(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_T0 = 0.0;
-    m_n0 = vec3d(1, 0, 0);
+	m_fiber = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,7 +130,7 @@ mat3ds FEPrescribedActiveContractionFiber::Stress(FEMaterialPoint &mp)
 	mat3d Q = GetLocalCS(mp);
 
     // evaluate fiber direction in global coordinate system
-    vec3d n0 = Q*m_n0.unitVector(mp);
+    vec3d n0 = Q*m_fiber->unitVector(mp);
 
     // evaluate the deformed fiber direction
     vec3d nt = F*n0;

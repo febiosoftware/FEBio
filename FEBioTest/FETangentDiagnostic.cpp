@@ -35,25 +35,22 @@ SOFTWARE.*/
 #include <FECore/FELoadCurve.h>
 #include "FECore/log.h"
 #include <FECore/FECoreKernel.h>
-#include <FECore/log.h>
 
-//-----------------------------------------------------------------------------
 // Helper function to print a matrix
 void print_matrix(FILE* fp, matrix& m)
 {
-	int i, j;
 	int N = m.rows();
 	int M = m.columns();
 
 	fprintf(fp, "\n    ");
-	for (i=0; i<N; ++i) fprintf(fp, "%15d ", i);
+	for (int i=0; i<N; ++i) fprintf(fp, "%15d ", i);
 	fprintf(fp, "\n----");
-	for (i=0; i<N; ++i) fprintf(fp, "----------------");
+	for (int i=0; i<N; ++i) fprintf(fp, "----------------");
 
-	for (i=0; i<N; ++i)
+	for (int i=0; i<N; ++i)
 	{
 		fprintf(fp, "\n%2d: ", i);
-		for (j=0; j<M; ++j)
+		for (int j=0; j<M; ++j)
 		{
 			fprintf(fp, "%15lg ", m[i][j]);
 		}
@@ -61,8 +58,42 @@ void print_matrix(FILE* fp, matrix& m)
 	fprintf(fp, "\n");
 }
 
+// helper function for creating a box mesh
+void BuildBoxMesh(FEMesh& mesh, FEMaterial* mat)
+{
+	constexpr int N = 8;
+	vec3d r[N] = {
+		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
+		vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
+	};
+
+	mesh.CreateNodes(N);
+	for (int i = 0; i < N; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.m_rt = node.m_r0 = r[i];
+	}
+
+	FE_Element_Spec es;
+	es.eclass = FE_Element_Class::FE_ELEM_SOLID;
+	es.eshape = FE_Element_Shape::ET_HEX8;
+	es.etype = FE_Element_Type::FE_HEX8G8;
+
+	// create a solid domain
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	FEElasticSolidDomain* pd = dynamic_cast<FEElasticSolidDomain*>(fecore.CreateDomain(es, &mesh, mat));
+	pd->Create(1, es);
+	pd->SetMatID(0);
+	mesh.AddDomain(pd);
+	FESolidElement& el = pd->Element(0);
+	el.SetID(1);
+	for (int i = 0; i < 8; ++i) el.m_node[i] = i;
+
+	pd->CreateMaterialPointData();
+}
+
 //////////////////////////////////////////////////////////////////////
-// Construction/Destruction
+// FETangentUniaxial
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
@@ -75,16 +106,25 @@ bool FETangentUniaxial::Init()
 {
 	FEModel& fem = *GetDiagnostic()->GetFEModel();
 
-	int i;
-	vec3d r[8] = {
-		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
-		vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
-	};
-
 	int BC[8][3] = {
 		{-1,-1,-1},{ 0,-1,-1},{ 0, 0,-1}, {-1, 0,-1},
 		{-1,-1, 0},{ 0,-1, 0},{ 0, 0, 0}, {-1, 0, 0}
 	};
+
+	// --- create the FE problem ---
+	// get the material (must already be defined)
+	if (fem.Materials() == 0) return false;
+	FEMaterial* pmat = fem.GetMaterial(0);
+
+	// create the mesh
+	FEMesh& m = fem.GetMesh();
+	BuildBoxMesh(m, pmat);
+
+	// build boundary conditions
+	FENodeSet* nset[3];
+	nset[0] = new FENodeSet(&fem);
+	nset[1] = new FENodeSet(&fem);
+	nset[2] = new FENodeSet(&fem);
 
 	// get the degrees of freedom
 	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
@@ -92,22 +132,10 @@ bool FETangentUniaxial::Init()
 	const int dof_Y = fem.GetDOFIndex("y");
 	const int dof_Z = fem.GetDOFIndex("z");
 
-	// --- create the FE problem ---
-	// create the mesh
-	FEMesh& m = fem.GetMesh();
-	m.CreateNodes(8);
 	m.SetDOFS(MAX_DOFS);
-
-	FENodeSet* nset[3];
-	nset[0] = new FENodeSet(&fem);
-	nset[1] = new FENodeSet(&fem);
-	nset[2] = new FENodeSet(&fem);
-
-	for (i=0; i<8; ++i)
+	for (int i=0; i<8; ++i)
 	{
 		FENode& n = m.Node(i);
-		n.m_rt = n.m_r0 = r[i];
-
 		// set displacement BC's
 		if (BC[i][0] == -1) nset[0]->Add(i);
 		if (BC[i][1] == -1) nset[1]->Add(i);
@@ -117,29 +145,6 @@ bool FETangentUniaxial::Init()
 	FEFixedBC* bc_x = new FEFixedBC(&fem, dof_X, nset[0]); fem.AddBoundaryCondition(bc_x);
 	FEFixedBC* bc_y = new FEFixedBC(&fem, dof_Y, nset[1]); fem.AddBoundaryCondition(bc_y);
 	FEFixedBC* bc_z = new FEFixedBC(&fem, dof_Z, nset[2]); fem.AddBoundaryCondition(bc_z);
-
-	// get the material
-	FEMaterial* pmat = fem.GetMaterial(0);
-
-	FE_Element_Spec es;
-	es.eclass = FE_Element_Class::FE_ELEM_SOLID;
-	es.eshape = FE_Element_Shape::ET_HEX8;
-	es.etype = FE_Element_Type::FE_HEX8G8;
-
-	// create a solid domain
-	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	FEElasticSolidDomain* pd = dynamic_cast<FEElasticSolidDomain*>(fecore.CreateDomain(es, &m, pmat));
-	pd->Create(1, es);
-	pd->SetMatID(0);
-	m.AddDomain(pd);
-	FESolidElement& el = pd->Element(0);
-	el.SetID(1);
-	for (i=0; i<8; ++i) el.m_node[i] = i;
-
-	pd->CreateMaterialPointData();
-
-	// convert strain to a displacement
-	double d = sqrt(2*m_strain+1) - 1;
 
 	// get the simulation time
 	FEAnalysis* step = fem.GetStep(0);
@@ -152,9 +157,12 @@ bool FETangentUniaxial::Init()
 	fem.AddLoadController(plc);
 
 	// Add a prescribed BC
-	int nd[4] = {1, 2, 5, 6};
+	std::vector<int> prescribedNodes = {1, 2, 5, 6};
 	FENodeSet* dc = new FENodeSet(&fem);
-	for (i = 0; i<4; ++i) dc->Add(nd[i]);
+	dc->Add(prescribedNodes);
+
+	// convert strain to a displacement
+	double d = sqrt(2 * m_strain + 1) - 1;
 
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_X, dc);
 	pdc->SetScale(d, 0);
@@ -173,12 +181,6 @@ bool FETangentSimpleShear::Init()
 {
 	FEModel& fem = *GetDiagnostic()->GetFEModel();
 
-	int i;
-	vec3d r[8] = {
-		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
-		vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
-	};
-
 	int BC[8][3] = {
 		{-1,-1,-1},{-1,-1,-1},{-1, 0,-1}, {-1, 0,-1},
 		{ 0,-1,-1},{ 0,-1,-1},{ 0, 0,-1}, { 0, 0,-1}
@@ -191,20 +193,23 @@ bool FETangentSimpleShear::Init()
 	const int dof_Z = fem.GetDOFIndex("z");
 
 	// --- create the FE problem ---
+	// get the material (must already be defined)
+	if (fem.Materials() == 0) return false;
+	FEMaterial* pmat = fem.GetMaterial(0);
+	 
 	// create the mesh
 	FEMesh& m = fem.GetMesh();
-	m.CreateNodes(8);
+	BuildBoxMesh(m, pmat);
+
 	m.SetDOFS(MAX_DOFS);
 	FENodeSet* nset[3];
 	nset[0] = new FENodeSet(&fem);
 	nset[1] = new FENodeSet(&fem);
 	nset[2] = new FENodeSet(&fem);
 
-	for (i = 0; i<8; ++i)
+	for (int i = 0; i<8; ++i)
 	{
 		FENode& n = m.Node(i);
-		n.m_rt = n.m_r0 = r[i];
-
 		// set displacement BC's
 		if (BC[i][0] == -1) nset[0]->Add(i);
 		if (BC[i][1] == -1) nset[1]->Add(i);
@@ -215,34 +220,23 @@ bool FETangentSimpleShear::Init()
 	FEFixedBC* bc_y = new FEFixedBC(&fem, dof_Y, nset[1]); fem.AddBoundaryCondition(bc_y);
 	FEFixedBC* bc_z = new FEFixedBC(&fem, dof_Z, nset[2]); fem.AddBoundaryCondition(bc_z);
 
-	// get the material
-	FEMaterial* pmat = fem.GetMaterial(0);
-
-	// create a solid domain
-	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&fem);
-	pd->SetMaterial(pmat);
-	pd->Create(1, FEElementLibrary::GetElementSpecFromType(FE_HEX8G8));
-	pd->SetMatID(0);
-	m.AddDomain(pd);
-	FESolidElement& el = pd->Element(0);
-	el.SetID(1);
-	for (i=0; i<8; ++i) el.m_node[i] = i;
-
-	pd->CreateMaterialPointData();
-
-	// convert strain to a displacement
-	double d = 2*m_strain;
+	// get the simulation time
+	FEAnalysis* step = fem.GetStep(0);
+	double tend = step->m_ntime * step->m_dt0;
 
 	// Add a loadcurve
 	FELoadCurve* plc = new FELoadCurve(&fem);
 	plc->Add(0.0, 0.0);
-	plc->Add(1.0, 1.0);
+	plc->Add(tend, 1.0);
 	fem.AddLoadController(plc);
 
 	// Add a prescribed BC
-	int nd[4] = { 4, 5, 6, 7 };
+	std::vector<int> precribedNodes = { 4, 5, 6, 7 };
 	FENodeSet* dc = new FENodeSet(&fem);
-	for (i = 0; i<4; ++i) dc->Add(nd[i]);
+	dc->Add(precribedNodes);
+
+	// convert strain to a displacement
+	double d = 2 * m_strain;
 
 	FEPrescribedDOF* pdc = new FEPrescribedDOF(&fem, dof_X, dc);
 	pdc->SetScale(d, 0);
@@ -252,7 +246,172 @@ bool FETangentSimpleShear::Init()
 }
 
 //-----------------------------------------------------------------------------
-// Constructor
+BEGIN_FECORE_CLASS(FETangentBiaxial, FEDiagnosticScenario)
+	ADD_PARAMETER(m_strain, "strain");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+bool FETangentBiaxial::Init()
+{
+	FEModel& fem = *GetDiagnostic()->GetFEModel();
+
+	int BC[8][3] = {
+		{-1,-1,-1},{ 0,-1,-1},{ 0, 0,-1}, {-1, 0,-1},
+		{-1,-1, 0},{ 0,-1, 0},{ 0, 0, 0}, {-1, 0, 0}
+	};
+
+	// --- create the FE problem ---
+	// get the material (must already be defined)
+	if (fem.Materials() == 0) return false;
+	FEMaterial* pmat = fem.GetMaterial(0);
+
+	// create the mesh
+	FEMesh& m = fem.GetMesh();
+	BuildBoxMesh(m, pmat);
+
+	// build boundary conditions
+	FENodeSet* nset[3];
+	nset[0] = new FENodeSet(&fem);
+	nset[1] = new FENodeSet(&fem);
+	nset[2] = new FENodeSet(&fem);
+
+	// get the degrees of freedom
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+
+	m.SetDOFS(MAX_DOFS);
+	for (int i = 0; i < 8; ++i)
+	{
+		FENode& n = m.Node(i);
+		// set displacement BC's
+		if (BC[i][0] == -1) nset[0]->Add(i);
+		if (BC[i][1] == -1) nset[1]->Add(i);
+		if (BC[i][2] == -1) nset[2]->Add(i);
+	}
+
+	FEFixedBC* bc_x = new FEFixedBC(&fem, dof_X, nset[0]); fem.AddBoundaryCondition(bc_x);
+	FEFixedBC* bc_y = new FEFixedBC(&fem, dof_Y, nset[1]); fem.AddBoundaryCondition(bc_y);
+	FEFixedBC* bc_z = new FEFixedBC(&fem, dof_Z, nset[2]); fem.AddBoundaryCondition(bc_z);
+
+	// get the simulation time
+	FEAnalysis* step = fem.GetStep(0);
+	double tend = step->m_ntime * step->m_dt0;
+
+	// Add a loadcurve
+	FELoadCurve* plc = new FELoadCurve(&fem);
+	plc->Add(0.0, 0.0);
+	plc->Add(tend, 1.0);
+	fem.AddLoadController(plc);
+
+	// Add two prescribed BCs, one for X and one for Y
+	FENodeSet* dcx = new FENodeSet(&fem);
+	dcx->Add({ 1, 2, 5, 6 });
+
+	FENodeSet* dcy = new FENodeSet(&fem);
+	dcy->Add({ 2, 3, 6, 7 });
+
+	// convert strain to a displacement
+	double d = sqrt(2 * m_strain + 1) - 1;
+
+	FEPrescribedDOF* pdcx = new FEPrescribedDOF(&fem, dof_X, dcx);
+	pdcx->SetScale(d, 0);
+	fem.AddBoundaryCondition(pdcx);
+
+	FEPrescribedDOF* pdcy = new FEPrescribedDOF(&fem, dof_Y, dcy);
+	pdcy->SetScale(d, 0);
+	fem.AddBoundaryCondition(pdcy);
+
+	return true;
+}
+
+BEGIN_FECORE_CLASS(FETangentTriaxial, FEDiagnosticScenario)
+	ADD_PARAMETER(m_strain, "strain");
+END_FECORE_CLASS();
+
+bool FETangentTriaxial::Init()
+{
+	FEModel& fem = *GetDiagnostic()->GetFEModel();
+
+	int BC[8][3] = {
+		{-1,-1,-1},{ 0,-1,-1},{ 0, 0,-1}, {-1, 0,-1},
+		{-1,-1, 0},{ 0,-1, 0},{ 0, 0, 0}, {-1, 0, 0}
+	};
+
+	// --- create the FE problem ---
+	// get the material (must already be defined)
+	if (fem.Materials() == 0) return false;
+	FEMaterial* pmat = fem.GetMaterial(0);
+
+	// create the mesh
+	FEMesh& m = fem.GetMesh();
+	BuildBoxMesh(m, pmat);
+
+	// build boundary conditions
+	FENodeSet* nset[3];
+	nset[0] = new FENodeSet(&fem);
+	nset[1] = new FENodeSet(&fem);
+	nset[2] = new FENodeSet(&fem);
+
+	// get the degrees of freedom
+	int MAX_DOFS = fem.GetDOFS().GetTotalDOFS();
+	const int dof_X = fem.GetDOFIndex("x");
+	const int dof_Y = fem.GetDOFIndex("y");
+	const int dof_Z = fem.GetDOFIndex("z");
+
+	m.SetDOFS(MAX_DOFS);
+	for (int i = 0; i < 8; ++i)
+	{
+		FENode& n = m.Node(i);
+		// set displacement BC's
+		if (BC[i][0] == -1) nset[0]->Add(i);
+		if (BC[i][1] == -1) nset[1]->Add(i);
+		if (BC[i][2] == -1) nset[2]->Add(i);
+	}
+
+	FEFixedBC* bc_x = new FEFixedBC(&fem, dof_X, nset[0]); fem.AddBoundaryCondition(bc_x);
+	FEFixedBC* bc_y = new FEFixedBC(&fem, dof_Y, nset[1]); fem.AddBoundaryCondition(bc_y);
+	FEFixedBC* bc_z = new FEFixedBC(&fem, dof_Z, nset[2]); fem.AddBoundaryCondition(bc_z);
+
+	// get the simulation time
+	FEAnalysis* step = fem.GetStep(0);
+	double tend = step->m_ntime * step->m_dt0;
+
+	// Add a loadcurve
+	FELoadCurve* plc = new FELoadCurve(&fem);
+	plc->Add(0.0, 0.0);
+	plc->Add(tend, 1.0);
+	fem.AddLoadController(plc);
+
+	// Add 3 prescribed BCs, one for X, Y, and Z
+	FENodeSet* dcx = new FENodeSet(&fem);
+	dcx->Add({ 1, 2, 5, 6 });
+
+	FENodeSet* dcy = new FENodeSet(&fem);
+	dcy->Add({ 2, 3, 6, 7 });
+
+	FENodeSet* dcz = new FENodeSet(&fem);
+	dcz->Add({ 4, 5, 6, 7 });
+
+	// convert strain to a displacement
+	double d = sqrt(2 * m_strain + 1) - 1;
+
+	FEPrescribedDOF* pdcx = new FEPrescribedDOF(&fem, dof_X, dcx);
+	pdcx->SetScale(d, 0);
+	fem.AddBoundaryCondition(pdcx);
+
+	FEPrescribedDOF* pdcy = new FEPrescribedDOF(&fem, dof_Y, dcy);
+	pdcy->SetScale(d, 0);
+	fem.AddBoundaryCondition(pdcy);
+
+	FEPrescribedDOF* pdcz = new FEPrescribedDOF(&fem, dof_Z, dcz);
+	pdcz->SetScale(d, 0);
+	fem.AddBoundaryCondition(pdcz);
+
+	return true;
+}
+
 FETangentDiagnostic::FETangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 {
 	// make sure the correct module is active

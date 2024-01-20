@@ -28,14 +28,11 @@ SOFTWARE.*/
 #include "FileImport.h"
 #include <FECore/FENodeDataMap.h>
 #include <FECore/FESurfaceMap.h>
-#include <FECore/FEFunction1D.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
-#include <FECore/FEBodyLoad.h>
-#include <FECore/FEDomainMap.h>
 #include <FECore/FEPointFunction.h>
 #include <FECore/FEGlobalData.h>
 #include <FECore/log.h>

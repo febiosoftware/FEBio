@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioMeshDataSection.h"
 #include "FECore/FEModel.h"
-#include "FECore/DOFS.h"
 #include <FECore/FEDataGenerator.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEDataMathGenerator.h>

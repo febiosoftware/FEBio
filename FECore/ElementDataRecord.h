@@ -66,6 +66,8 @@ public:
 
 	void SetItemList(FEItemList* itemList, const vector<int>& selection) override;
 
+	using DataRecord::SetItemList;
+
 protected:
 	void BuildELT();
 

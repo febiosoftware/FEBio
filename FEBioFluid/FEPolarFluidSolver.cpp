@@ -55,7 +55,6 @@
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FENLConstraint.h>
 #include <FECore/DumpStream.h>
-#include <NumCore/NumCore.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

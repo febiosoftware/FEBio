@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FECoreKernel.h>
-#include <FECore/FENodeNodeList.h>
 #include <sstream>
 
 FEBioMeshDomainsSection4::FEBioMeshDomainsSection4(FEBioImport* pim) : FEBioFileSection(pim) 
@@ -311,7 +310,7 @@ void FEBioMeshDomainsSection4::ParseShellDomainSection(XMLTag& tag)
 	}
 
 	// process element data
-	FEShellDomainNew* shellDomain = dynamic_cast<FEShellDomainNew*>(dom);
+	FEShellDomain* shellDomain = dynamic_cast<FEShellDomain*>(dom);
 	if (shellDomain)
 	{
 		for (int j = 0; j < elems; ++j)

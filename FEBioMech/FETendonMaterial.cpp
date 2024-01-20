@@ -124,19 +124,26 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 		ksi = (1.0/(w*w-1))*(1 - w*b2/sqrt(w*w-1));
 	}
 
+	// evaluate parameters
+	double G1 = m_G1(mp);
+	double G2 = m_G2(mp);
+	double L1 = m_L1(mp);
+	double L2 = m_L2(mp);
+	double lam1 = m_lam1(mp);
+
 	// ----- calculate strain derivatives -----
 
 	// We assume that W(I1, I4, I5, alpha) = F1(B1(I4, I5)) + F2(B2(I1,I4,I5)) + F3(lam(I4), alpha)
 	double W1, W2, W4, W5;
 
 	// calculate derivatives for F1
-	double F1D4 = -2*m_G1*(I5/(I4*I4*I4));
-	double F1D5 = m_G1/(I4*I4);
+	double F1D4 = -2*G1*(I5/(I4*I4*I4));
+	double F1D5 = G1/(I4*I4);
 
 	// calculate derivatives for F2
-	double F2D1 =  m_G2*beta*lat;
-	double F2D4 =  m_G2*beta*(I1*I4 + I5)*0.5*pow(I4, -1.5);
-	double F2D5 = -m_G2*beta/lat;
+	double F2D1 =  G2*beta*lat;
+	double F2D4 =  G2*beta*(I1*I4 + I5)*0.5*pow(I4, -1.5);
+	double F2D5 = -G2*beta/lat;
 
 	// calculate passive fiber force
 	double Fp;
@@ -144,16 +151,16 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 	{
 		Fp = 0;
 	}
-	else if (lat < m_lam1)
+	else if (lat < lam1)
 	{
-		Fp = m_L1*(exp(m_L2*(lat - 1)) - 1);
+		Fp = L1*(exp(L2*(lat - 1)) - 1);
 	}
 	else
 	{
 		double L3, L4;
 
-		L3 = m_L1*m_L2*exp(m_L2*(m_lam1 - 1));
-		L4 = m_L1*(exp(m_L2*(m_lam1 - 1)) - 1) - L3*m_lam1;
+		L3 = L1*L2*exp(L2*(lam1 - 1));
+		L4 = L1*(exp(L2*(lam1 - 1)) - 1) - L3*lam1;
 
 		Fp = L3*lat + L4;
 	}
@@ -248,29 +255,36 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 		ksi = (1.0/(w*w-1))*(1 - w*b2/sqrt(w*w-1));
 	}
 
+	// evaluate parameters
+	double G1 = m_G1(mp);
+	double G2 = m_G2(mp);
+	double L1 = m_L1(mp);
+	double L2 = m_L2(mp);
+	double lam1 = m_lam1(mp);
+
 	// --- strain energy derivatives ---
 	// We assume that W(I1, I4, I5, alpha) = F1(B1(I4, I5)) + F2(B2(I1,I4,I5)) + F3(lam(I4), alpha)
 	double W1, W2, W4, W5;
 
 	// -- A. matrix contribution --
 	// calculate derivatives for F1
-	double F1D4 = -2*m_G1*(I5/(I4*I4*I4));
-	double F1D5 = m_G1/(I4*I4);
+	double F1D4 = -2*G1*(I5/(I4*I4*I4));
+	double F1D5 = G1/(I4*I4);
 
-	double F1D44 = 6*m_G1*(I5/(I4*I4*I4*I4));
-	double F1D45 = -2*m_G1/(I4*I4*I4);
+	double F1D44 = 6*G1*(I5/(I4*I4*I4*I4));
+	double F1D45 = -2*G1/(I4*I4*I4);
 
 	// calculate derivatives for F2
-	double F2D1 =  m_G2*beta*lat;
-	double F2D4 =  m_G2*beta*(I1*I4 + I5)*0.5*pow(I4, -1.5);
-	double F2D5 = -m_G2*beta/lat;
+	double F2D1 =  G2*beta*lat;
+	double F2D4 =  G2*beta*(I1*I4 + I5)*0.5*pow(I4, -1.5);
+	double F2D5 = -G2*beta/lat;
 
-	double F2D11 = ksi*m_G2*I4*0.5;
-	double F2D44 = 2.0*m_G2*ksi*pow(0.25*(I1*I4+I5)/pow(I4, 1.5), 2) - m_G2*beta*(0.25*(I1*I4 + 3*I5) / pow(I4, 2.5));
-	double F2D55 = 0.5*m_G2*ksi/I4;
-	double F2D14 = m_G2*beta*0.5/lat + m_G2*ksi*(I1*I4+I5)*0.25/I4;
-	double F2D15 = -0.5*m_G2*ksi;
-	double F2D45 = m_G2*beta*0.5*pow(I4, -1.5) - m_G2*ksi*0.25*(I1*I4+I5)/(I4*I4);
+	double F2D11 = ksi*G2*I4*0.5;
+	double F2D44 = 2.0*G2*ksi*pow(0.25*(I1*I4+I5)/pow(I4, 1.5), 2) - G2*beta*(0.25*(I1*I4 + 3*I5) / pow(I4, 2.5));
+	double F2D55 = 0.5*G2*ksi/I4;
+	double F2D14 = G2*beta*0.5/lat + G2*ksi*(I1*I4+I5)*0.25/I4;
+	double F2D15 = -0.5*G2*ksi;
+	double F2D45 = G2*beta*0.5*pow(I4, -1.5) - G2*ksi*0.25*(I1*I4+I5)/(I4*I4);
 
 	// -- B. fiber contribution --
 
@@ -281,17 +295,17 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 		Fp = 0;
 		FpDl = 0;
 	}
-	else if (lat < m_lam1)
+	else if (lat < lam1)
 	{
-		Fp = m_L1*(exp(m_L2*(lat - 1)) - 1);
-		FpDl = m_L1*m_L2*exp(m_L2*(lat - 1));
+		Fp = L1*(exp(L2*(lat - 1)) - 1);
+		FpDl = L1*L2*exp(L2*(lat - 1));
 	}
 	else
 	{
 		double L3, L4;
 
-		L3 = m_L1*m_L2*exp(m_L2*(m_lam1 - 1));
-		L4 = m_L1*(exp(m_L2*(m_lam1 - 1)) - 1) - L3*m_lam1;
+		L3 = L1*L2*exp(L2*(lam1 - 1));
+		L4 = L1*(exp(L2*(lam1 - 1)) - 1) - L3*lam1;
 
 		Fp = L3*lat + L4;
 		FpDl = L3;

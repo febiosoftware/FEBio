@@ -111,6 +111,14 @@ void init_function_lists()
 }
 
 //-----------------------------------------------------------------------------
+bool MObjBuilder::Add1DFunction(const std::string& name, double (*f)(double))
+{
+	if (FNC.find(name) != FNC.end()) return false;
+	FNC[name] = f;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 MObjBuilder::MObjBuilder()
 {
 	static bool bfirst = true;

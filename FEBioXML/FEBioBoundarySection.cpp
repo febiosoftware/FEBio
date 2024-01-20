@@ -37,10 +37,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FEPeriodicLinearConstraint.h>
-//#include <FEBioRVE/FEPeriodicLinearConstraint2O.h>
 #include <FECore/FEMergedConstraint.h>
-#include <FEBioMech/FEMechModel.h>
-#include <FEBioMech/FERigidMaterial.h>
 #include <FECore/FEFacetSet.h>
 #include <FECore/log.h>
 #include <FECore/FEModelLoad.h>
@@ -1278,7 +1275,7 @@ void FEBioBoundarySection25::ParseBCRigid(XMLTag& tag)
 	FENodalBC* prn = fecore_new_class<FENodalBC>("FERigidNodeSet", &fem);
 
 	// the default shell bc depends on the shell formulation
-	prn->SetParameter("clamped_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
+	prn->SetParameter("clamp_shells", feb->m_default_shell == OLD_SHELL ? 0 : 1);
 	prn->SetParameter("rb", rb);
 	prn->SetNodeSet(nodeSet);
 

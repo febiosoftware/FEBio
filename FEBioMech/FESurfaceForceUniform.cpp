@@ -34,7 +34,7 @@
 //=============================================================================
 BEGIN_FECORE_CLASS(FESurfaceForceUniform, FESurfaceLoad)
     ADD_PARAMETER(m_scale   , "scale");
-    ADD_PARAMETER(m_force   , "force");
+    ADD_PARAMETER(m_force   , "force")->SetFlags(0)->setUnits(UNIT_FORCE);
     ADD_PARAMETER(m_bshellb , "shell_bottom");
 END_FECORE_CLASS();
 

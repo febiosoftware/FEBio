@@ -98,7 +98,13 @@ public:
 	//! evaluate and return solid referential volume fraction
 	double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
 
-	//! actual concentration (as opposed to effective concentration)
+    //! evaluate and return tangent of  solid referential volume fraction w.r.t. to J (volume ratio)
+    double TangentSRVFStrain(FEMaterialPoint& pt) override;
+    
+    //! evaluate and return tangent of  solid referential volume fraction w.r.t. to concentration
+    double TangentSRVFConcentration(FEMaterialPoint& pt, const int sol);
+
+    //! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt, const int sol);
 
 	//! porosity

@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FERigidSolidDomain.h"
 #include "FERigidMaterial.h"
 #include <FECore/FEMesh.h>
+#include "FEBodyForce.h"
 
 //-----------------------------------------------------------------------------
 FERigidSolidDomain::FERigidSolidDomain(FEModel* pfem) : FEElasticSolidDomain(pfem) {}
@@ -96,4 +97,151 @@ void FERigidSolidDomain::MassMatrix(FELinearSystem& LS, double scale)
 void FERigidSolidDomain::InertialForces(FEGlobalVector& R, std::vector<double>& F)
 {
 	// chirp, chirp ...
+}
+
+//-----------------------------------------------------------------------------
+mat3d FERigidSolidDomain::CalculateMOI()
+{
+	mat3dd I(1);        // identity tensor
+
+	// nodal coordinates
+	vec3d r0[FEElement::MAX_NODES];
+
+	mat3d moi; moi.zero();
+
+	// loop over all elements
+	for (int iel = 0; iel < Elements(); ++iel)
+	{
+		FESolidElement& el = Element(iel);
+
+		// initial coordinates
+		int neln = el.Nodes();
+		for (int i = 0; i < neln; ++i) r0[i] = GetMesh()->Node(el.m_node[i]).m_r0;
+
+		// loop over integration points
+		double* gw = el.GaussWeights();
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			// calculate jacobian
+			double Jw = detJ0(el, n) * gw[n];
+
+			// shape functions at integration point
+			double* H = el.H(n);
+
+			double dens = m_pMat->Density(mp);
+
+			// add to moi
+			for (int i = 0; i < neln; ++i)
+			{
+				for (int j = 0; j < neln; ++j)
+				{
+					mat3d Iij = (r0[i] * r0[j]) * I - (r0[i] & r0[j]);
+					moi += Iij * (H[i] * H[j] * Jw * dens);
+				}
+			}
+		}
+	}
+
+	return moi;
+}
+
+double FERigidSolidDomain::CalculateMass()
+{
+	double mass = 0.0;
+	for (int iel = 0; iel < Elements(); ++iel)
+	{
+		FESolidElement& el = Element(iel);
+
+		// loop over integration points
+		int nint = el.GaussPoints();
+		double* gw = el.GaussWeights();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			// calculate jacobian
+			double detJ = detJ0(el, n);
+
+			// add to total mass
+			mass += m_pMat->Density(mp) * detJ * gw[n];
+		}
+	}
+	return mass;
+}
+
+vec3d FERigidSolidDomain::CalculateCOM()
+{
+	vector<vec3d> r0(FEElement::MAX_NODES);
+	vec3d rc(0, 0, 0);
+
+	// loop over all elements
+	for (int iel = 0; iel < Elements(); ++iel)
+	{
+		FESolidElement& el = Element(iel);
+
+		// nr of integration points
+		int nint = el.GaussPoints();
+
+		// number of nodes
+		int neln = el.Nodes();
+
+		// initial coordinates
+		for (int i = 0; i < neln; ++i) r0[i] = GetMesh()->Node(el.m_node[i]).m_r0;
+
+		// integration weights
+		double* gw = el.GaussWeights();
+
+		// loop over integration points
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			// calculate jacobian
+			double detJ = detJ0(el, n);
+
+			// shape functions at integration point
+			double* H = el.H(n);
+
+			double dens = m_pMat->Density(mp);
+
+			// add to com and moi
+			for (int i = 0; i < el.Nodes(); ++i)
+			{
+				rc += r0[i] * H[i] * detJ * gw[n] * dens;
+			}
+		}
+	}
+
+	return rc;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
+{
+	// define some parameters that will be passed to lambda
+	FEBodyForce* bodyForce = &BF;
+
+	// evaluate the residual contribution
+	LoadVector(R, m_dofU, [=](FEMaterialPoint& mp, int node_a, std::vector<double>& fa) {
+
+		// evaluate density
+		double density = m_pMat->Density(mp);
+
+		// get the force
+		vec3d f = bodyForce->force(mp);
+
+		// get element shape functions
+		double* H = mp.m_shape;
+
+		// get the initial Jacobian
+		double J0 = mp.m_J0;
+
+		// set integrand
+		fa[0] = -H[node_a] * density * f.x * J0;
+		fa[1] = -H[node_a] * density * f.y * J0;
+		fa[2] = -H[node_a] * density * f.z * J0;
+	});
 }

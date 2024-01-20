@@ -179,11 +179,11 @@ status open
 
 
 \series default
-Theory Manual Version 4.3 
+Theory Manual Version 4.5 
 \end_layout
 
 \begin_layout Date
-Last Updated: August 30, 2023
+Last Updated: January 16, 2024
 \end_layout
 
 \begin_layout Paragraph*
@@ -10785,6 +10785,101 @@ c^{\sigma}=\frac{1}{J-\varphi_{r}^{s}}\frac{\rho_{r}^{\sigma}}{M^{\sigma}}\,.\la
 
 \end_inset
 
+An alternative to using solid-bound molecules is to define solutes 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ whose diffusivity 
+\begin_inset Formula $\mathbf{d}^{\sigma}$
+\end_inset
+
+ in the mixture is set to 
+\begin_inset Formula $\mathbf{0}$
+\end_inset
+
+ (however, the free diffusivity 
+\begin_inset Formula $d_{0}^{\sigma}$
+\end_inset
+
+ should not be set to zero, to prevent a division by zero; its exact value
+ is not important, thus let 
+\begin_inset Formula $d_{0}^{\sigma}=1$
+\end_inset
+
+).
+ Then, FEBio treats these solutes as equivalent to solid-bound molecules:
+ (1) Their concentration does not contribute to the osmolarity of the interstiti
+al fluid; (2) their concentration contributes to the fixed charge density
+ 
+\begin_inset Formula $c^{F}$
+\end_inset
+
+ in the current configuration; (3) these solutes do not contribute to the
+ effective hydraulic permeability 
+\begin_inset Formula $\tilde{\mathbf{k}}$
+\end_inset
+
+ of the porous multiphasic mixture; (4) these solutes can be involved in
+ chemical reactions; (5) while their initial effective concentration may
+ be prescribed, it must not contribute to the prescribed initial effective
+ fluid pressure, and the user should not prescribe any boundary conditions
+ on the effective concentration of these solutes.
+ Using these 'solid-bound' solutes increases the number of degrees of freedom
+ in an FEBio analysis; however, unlike solid-bound molecules, the solution
+ for the effective concentration of these solutes remains as accurate as
+ all other degrees of freedom in an analysis.
+\end_layout
+
+\begin_layout Standard
+To evaluate the contribution of these solutes to the referential solid volume
+ fraction 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ and to chemical reactions, we use eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:sbm-molar-concentration"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ above and substitute it into eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:referential-solid-volume-fraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to produce
+\begin_inset Formula 
+\[
+\varphi_{r}^{s}=\varphi_{0}^{s}+\left(J-\varphi_{r}^{s}\right)\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}
+\]
+
+\end_inset
+
+which can be solved for 
+\begin_inset Formula $\varphi_{r}^{s}$
+\end_inset
+
+ using the concentrations 
+\begin_inset Formula $c^{\sigma}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\varphi_{r}^{s}=\frac{\varphi_{0}^{s}+J\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}}{1+\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}}\,.\label{eq:phirs-solutes-as-SBMs}
+\end{equation}
+
+\end_inset
+
 
 \end_layout
 
@@ -10995,7 +11090,93 @@ reference "eq163"
 
 \end_inset
 
+From the mass balance equation for the solvent we have
+\begin_inset Formula 
+\[
+\begin{aligned}\hat{\varphi}^{w} & =\frac{D^{s}\varphi^{w}}{Dt}+\grad\varphi^{w}\cdot\left(\mathbf{v}^{w}-\mathbf{v}^{s}\right)+\varphi^{w}\divg\mathbf{v}^{w}\end{aligned}
+\]
 
+\end_inset
+
+so that the mixture mass balance takes the form
+\begin_inset Formula 
+\[
+\begin{aligned}\divg\left(\mathbf{v}^{s}+\mathbf{w}\right) & =\frac{D^{s}\varphi^{w}}{Dt}+\grad\varphi^{w}\cdot\left(\mathbf{v}^{w}-\mathbf{v}^{s}\right)+\varphi^{w}\divg\mathbf{v}^{w}+\sum\limits _{\alpha\ne w}\frac{\hat{\rho}^{\alpha}}{\rho_{T}^{\alpha}}\,\end{aligned}
+\]
+
+\end_inset
+
+Using 
+\begin_inset Formula $\varphi^{w}+\varphi^{s}=1$
+\end_inset
+
+ this relation further simplifies to
+\begin_inset Formula 
+\[
+\varphi^{s}\divg\mathbf{v}^{s}+\frac{D^{s}\varphi^{s}}{Dt}=\sum\limits _{\alpha\ne w}\frac{\hat{\rho}^{\alpha}}{\rho_{T}^{\alpha}}\,.
+\]
+
+\end_inset
+
+Now we use the kinematic relation 
+\begin_inset Formula $\divg\mathbf{v}^{s}=\frac{1}{J}\frac{D^{s}J}{Dt}$
+\end_inset
+
+ to reduce this equation further to
+\begin_inset Formula 
+\[
+\frac{D^{s}\left(J\varphi^{s}\right)}{Dt}=J\sum\limits _{\alpha\ne w}\frac{\hat{\rho}^{\alpha}}{\rho_{T}^{\alpha}}\,.
+\]
+
+\end_inset
+
+But recall that
+\begin_inset Formula 
+\[
+J\varphi^{s}=\varphi_{r}^{s}
+\]
+
+\end_inset
+
+thus the mixture mass balance now simplifies to
+\begin_inset Formula 
+\[
+\frac{1}{J}\frac{D^{s}\varphi_{r}^{s}}{Dt}=\sum\limits _{\alpha\ne w}\frac{\hat{\rho}^{\alpha}}{\rho_{T}^{\alpha}}
+\]
+
+\end_inset
+
+Since
+\begin_inset Formula 
+\[
+\hat{\rho}^{\alpha}=\left(1-\varphi^{s}\right)M^{\alpha}\hat{c}^{\alpha}
+\]
+
+\end_inset
+
+it follows that
+\begin_inset Formula 
+\[
+\frac{D^{s}\varphi_{r}^{s}}{Dt}=J\left(1-\varphi^{s}\right)\sum\limits _{\alpha\ne w}\frac{M^{\alpha}\hat{c}^{\alpha}}{\rho_{T}^{\alpha}}
+\]
+
+\end_inset
+
+Another way of presenting these results is to restate the mixture mass balance
+ as
+\begin_inset Formula 
+\begin{equation}
+\divg\left(\mathbf{v}^{s}+\mathbf{w}\right)=\hat{\varphi}_{0}^{w}+\frac{1}{J}\frac{D^{s}\varphi_{r}^{s}}{Dt}\label{eq:mixture-mass-reactive}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\hat{\varphi}_{0}^{w}$
+\end_inset
+
+ is the solvent supply from user-specified sources (not from the chemical
+ reactions).
 \end_layout
 
 \begin_layout Subsection
@@ -11196,7 +11377,7 @@ reference "eq163b"
  may now be rewritten as 
 \begin_inset Formula 
 \begin{equation}
-\divg\left(\mathbf{v}^{s}+\mathbf{w}^{w}\right)=\hat{\varphi}^{w}+\left(1-\varphi^{s}\right)\hat{\zeta}\overline{\mathcal{V}}\,,\label{eq170}
+\divg\left(\mathbf{v}^{s}+\mathbf{w}^{w}\right)=\hat{\varphi}_{0}^{w}+\left(1-\varphi^{s}\right)\hat{\zeta}\overline{\mathcal{V}}\,,\label{eq170}
 \end{equation}
 
 \end_inset
@@ -11215,7 +11396,7 @@ where
 
 .
  (Currently in FEBio, 
-\begin_inset Formula $\hat{\varphi}^{w}$
+\begin_inset Formula $\hat{\varphi}_{0}^{w}$
 \end_inset
 
  is specified independently of 
@@ -11249,7 +11430,7 @@ reference "eq168"
 
 , that involve the solvent, it is necessary to explicitly provide a solvent
  supply function compatible with the above relations, namely 
-\begin_inset Formula $\hat{\varphi}^{w}=\left(1-\varphi^{s}\right)\hat{\zeta}\nu^{w}\mathcal{V}^{w}$
+\begin_inset Formula $\hat{\varphi}_{0}^{w}=\left(1-\varphi^{s}\right)\hat{\zeta}\nu^{w}\mathcal{V}^{w}$
 \end_inset
 
 .) Similarly, the solute mass balance in eq.
@@ -19939,6 +20120,14 @@ The contribution to
 
 , where 
 \begin_inset Formula 
+\[
+\divg\left(\mathbf{v}^{s}+\mathbf{w}\right)=\hat{\varphi}^{w}+\left(1-\varphi^{s}\right)\hat{\zeta}\sum_{\alpha}\nu^{\alpha}\mathcal{V}^{\alpha}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
 \begin{equation}
 \delta G=\int_{b}\delta\tilde{p}\left[\hat{\varphi}^{w}+\left(1-\varphi^{s}\right)\hat{\zeta}\overline{\mathcal{V}}\right]\,dv+\sum\limits _{\iota}\nu^{\iota}\int_{b}\delta\tilde{c}^{\iota}\left(1-\varphi^{s}\right)\hat{\zeta}\,dv\,.\label{eq354}
 \end{equation}
@@ -19958,7 +20147,7 @@ The linearization of
 \begin{equation}
 \begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =\int_{b}\delta\tilde{p}\,\left(\hat{\varphi}^{w}\,\divg\Delta\mathbf{u}+\hat{\boldsymbol{\varphi}}_{\varepsilon}^{w}:\Delta\boldsymbol{\varepsilon}\right)\,dv\\
  & +\overline{\mathcal{V}}\int_{b}\delta\tilde{p}\left[\hat{\zeta}\,\divg\Delta\mathbf{u}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}:\Delta\boldsymbol{\varepsilon}\right]\,dv\\
- & +\sum_{\iota}\nu^{\iota}\int_{b}\delta\tilde{c}^{\iota}\left[\hat{\zeta}\,\divg\Delta\mathbf{u}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}:\Delta\boldsymbol{\varepsilon}\right]\,dv
+ & +\sum_{\iota}\nu^{\iota}\int_{b}\delta\tilde{c}^{\iota}\left[\hat{\zeta}\left(1-\frac{\partial\varphi_{r}^{s}}{\partial J}\right)\,\divg\Delta\mathbf{u}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}:\Delta\boldsymbol{\varepsilon}\right]\,dv
 \end{aligned}
 \,,\label{eq354b}
 \end{equation}
@@ -19968,12 +20157,39 @@ The linearization of
 where
 \begin_inset Formula 
 \begin{equation}
-\hat{\boldsymbol{\varphi}}_{\varepsilon}^{w}=\mathbf{F}\cdot\frac{\partial\hat{\varphi}^{w}}{\partial\mathbf{E}}\cdot\mathbf{F}^{T}\,,\quad\hat{\boldsymbol{\zeta}}_{\varepsilon}=J^{-1}\mathbf{F}\cdot\frac{\partial\hat{\zeta}}{\partial\mathbf{E}}\cdot\mathbf{F}^{T}\,.\label{eq354c}
+\hat{\boldsymbol{\varphi}}_{\varepsilon}^{w}=\mathbf{F}\cdot\frac{\partial\hat{\varphi}^{w}}{\partial\mathbf{E}}\cdot\mathbf{F}^{T}\,,\quad\hat{\boldsymbol{\zeta}}_{\varepsilon}=J^{-1}\mathbf{F}\cdot\frac{\partial\hat{\zeta}}{\partial\mathbf{E}}\cdot\mathbf{F}^{T}\,,\label{eq354c}
 \end{equation}
 
 \end_inset
 
-Currently, 
+and
+\begin_inset Formula 
+\[
+\frac{\partial\varphi_{r}^{s}}{\partial J}=\frac{\sum_{\sigma}\frac{M^{\sigma}}{\rho_{T}^{\sigma}}c^{\sigma}\left(1+\sum_{\sigma}\frac{M^{\sigma}}{\rho_{T}^{\sigma}}c^{\sigma}\right)+\left(J-\varphi_{0}^{s}\right)\sum_{\sigma}\frac{M^{\sigma}}{\rho_{T}^{\sigma}}\frac{1}{\tilde{\kappa}^{\sigma}}\frac{\partial\tilde{\kappa}^{\sigma}}{\partial J}c^{\sigma}}{\left(1+\sum\limits _{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}\right)^{2}}
+\]
+
+\end_inset
+
+for solutes-as-SBMs, and
+\begin_inset Formula 
+\[
+\frac{\partial\varphi_{r}^{s}}{\partial J}=\frac{\sum_{\sigma}\frac{\rho_{r}^{\sigma}}{\rho_{T}^{\sigma}}\left(J\varphi^{w}+\sum_{\sigma}\frac{\rho_{r}^{\sigma}}{\rho_{T}^{\sigma}}\right)+J\varphi^{w}\left(J-\varphi_{0}^{s}\right)\sum_{\sigma}\frac{\rho_{r}^{\sigma}}{\rho_{T}^{\sigma}}\frac{1}{\tilde{\kappa}^{\sigma}}\frac{\partial\tilde{\kappa}^{\sigma}}{\partial J}}{\left(J\varphi^{w}+\sum\limits _{\sigma}\frac{\rho_{r}^{\sigma}}{\rho_{T}^{\sigma}}\right)^{2}}
+\]
+
+\end_inset
+
+for SBMs, as obtained from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:phirs-solutes-as-SBMs"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Currently, 
 \begin_inset Formula $\hat{\zeta}$
 \end_inset
 
@@ -20003,14 +20219,35 @@ Finally, the linearization along a concentration increment
 \begin{equation}
 \begin{aligned}D\delta G\left[\Delta\tilde{c}^{\iota}\right] & =\int_{b}\delta\tilde{p}\,\frac{\partial\hat{\varphi}^{w}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv\\
  & +\overline{\mathcal{V}}\int_{b}\delta\tilde{p}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv\\
- & +\sum_{\gamma}\nu^{\gamma}\int_{b}\delta\tilde{c}^{\gamma}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv
+ & +\sum_{\gamma}\nu^{\gamma}\int_{b}\delta\tilde{c}^{\gamma}\left(\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}-\frac{1}{J}\frac{\partial\varphi_{r}^{s}}{\partial\tilde{c}^{\iota}}\hat{\zeta}\right)\Delta\tilde{c}^{\iota}\,dv
 \end{aligned}
 \,.\label{eq354e}
 \end{equation}
 
 \end_inset
 
+where
+\begin_inset Formula 
+\[
+\frac{\partial\varphi_{r}^{s}}{\partial\tilde{c}^{\iota}}=\begin{cases}
+\frac{\left(J-\varphi_{r}^{s}\right)^{2}}{J-\varphi_{0}^{s}}\sum_{\sigma}\frac{M^{\sigma}}{\rho_{T}^{\sigma}}\left(\tilde{\kappa}^{\sigma}+\tilde{c}^{\sigma}\frac{\partial\tilde{\kappa}^{\sigma}}{\partial\tilde{c}^{\sigma}}\right) & \iota=\sigma\\
+\frac{\left(J-\varphi_{r}^{s}\right)^{2}}{J-\varphi_{0}^{s}}\sum_{\sigma}\frac{M^{\alpha}}{\rho_{T}^{\sigma}}\tilde{c}^{\sigma}\frac{\partial\tilde{\kappa}^{\sigma}}{\partial\tilde{c}^{\iota}} & \iota\ne\sigma
+\end{cases}
+\]
 
+\end_inset
+
+for solutes-as-SBMs, as obtained from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:phirs-solutes-as-SBMs"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -20048,8 +20285,8 @@ where
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{k}_{ab}^{pu} & =\int_{b}N_{a}\left(\hat{\varphi}^{w}\mathbf{I}+\hat{\boldsymbol{\varphi}}_{\varepsilon}^{w}\right)\cdot\grad N_{b}\,dv\\
- & +\bar{\mathcal{V}}\int_{a}N_{a}\left[\hat{\zeta}\mathbf{I}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}\right]\cdot\grad N_{b}\,dv\\
-\mathbf{k}_{ab}^{\gamma u} & =\nu^{\gamma}\int_{a}N_{a}\left[\hat{\zeta}\mathbf{I}+\left(J-\varphi_{r}^{s}\right)\hat{\boldsymbol{\zeta}}_{\varepsilon}\right]\cdot\grad N_{b}\,dv
+ & +\bar{\mathcal{V}}\int_{a}N_{a}\left[\hat{\zeta}\mathbf{I}+J\varphi^{w}\hat{\boldsymbol{\zeta}}_{\varepsilon}\right]\cdot\grad N_{b}\,dv\\
+\mathbf{k}_{ab}^{\gamma u} & =\nu^{\gamma}\int_{a}N_{a}\left[\left(1-\frac{\partial\varphi_{r}^{s}}{\partial J}\right)\hat{\zeta}\mathbf{I}+J\varphi^{w}\hat{\boldsymbol{\zeta}}_{\varepsilon}\right]\cdot\grad N_{b}\,dv
 \end{aligned}
 \,.\label{eq354i}
 \end{equation}
@@ -20087,7 +20324,7 @@ where
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}k_{ab}^{p\iota} & =\int_{b}N_{a}N_{b}\frac{\partial\hat{\varphi}^{w}}{\partial\tilde{c}^{\iota}}\,dv+\bar{\mathcal{V}}\int_{b}N_{a}N_{b}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\,dv\\
-k_{ab}^{\gamma\iota} & =\nu^{\gamma}\int_{b}N_{a}N_{b}\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\,dv
+k_{ab}^{\gamma\iota} & =\nu^{\gamma}\int_{b}N_{a}N_{b}\left(\left(1-\varphi^{s}\right)\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}-\frac{1}{J}\frac{\partial\varphi_{r}^{s}}{\partial\tilde{c}^{\iota}}\hat{\zeta}\right)\,dv
 \end{aligned}
 \,.\label{eq354m}
 \end{equation}
@@ -38678,6 +38915,15 @@ plural "false"
 caps "false"
 noprefix "false"
 
+\end_inset
+
+.
+ For proper evaluation of the 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ function we must have 
+\begin_inset Formula $\beta\ge1$
 \end_inset
 
 .
@@ -58936,9 +59182,337 @@ name "sec:Tied-Fluid-Interface"
 \end_layout
 
 \begin_layout Standard
-A tied fluid interface may be used to enforces continuity of viscous shear
- traction and normal fluid velocity at the interface between dissimilar
- meshes.
+Under isothermal conditions which preclude any heat flux and for which the
+ entropy is zero, the interface jump conditions derived from mass, linear
+ momentum and energy balance across an interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ which is permeable to the fluid are
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\rho\mathbf{u}^{\Gamma}\right]\right]\cdot\mathbf{n}^{\Gamma}=0\,,\label{eq:jump-mass}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\boldsymbol{\sigma}-\rho\mathbf{u}^{\Gamma}\otimes\mathbf{u}^{\Gamma}\right]\right]\cdot\mathbf{n}^{\Gamma}=\mathbf{0}\,,\label{eq:jump-linear-momentum}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\rho\left(\psi+\frac{1}{2}\mathbf{u}^{\Gamma}\cdot\mathbf{u}^{\Gamma}\right)\mathbf{u}^{\Gamma}-\boldsymbol{\sigma}^{T}\cdot\mathbf{u}^{\Gamma}\right]\right]\cdot\mathbf{n}^{\Gamma}=0\label{eq:jump-energy}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{u}^{\Gamma}\equiv\mathbf{v}-\mathbf{v}^{\Gamma}\label{eq:Gamma-diffusive-velocity}
+\end{equation}
+
+\end_inset
+
+ 
+\begin_inset Formula $\rho$
+\end_inset
+
+, 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+, 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi$
+\end_inset
+
+ are the mass density, velocity, stress tensor and specific free energy
+ of the fluid, respectively, and 
+\begin_inset Formula $\mathbf{v}^{\Gamma}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}^{\Gamma}$
+\end_inset
+
+ are the velocity of, and outward unit normal to 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, respectively.
+ A tied fluid interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, which allows fluid to cross 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, must enforce these continuity requirements.
+ For fluid analyses, we let
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}=-p\mathbf{I}+\boldsymbol{\tau}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $p$
+\end_inset
+
+ is the fluid pressure and 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ is the viscous shear stress.
+ Susbtituting this relation into the energy jump of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-energy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, neglecting the contribution of 
+\begin_inset Formula $\boldsymbol{\tau}$
+\end_inset
+
+ relative to that of 
+\begin_inset Formula $p$
+\end_inset
+
+, and making use of the jump condition from mass balance in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-mass"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we find that
+\begin_inset Formula 
+\begin{equation}
+\left[\left[\psi+\frac{p}{\rho}+\frac{1}{2}\mathbf{u}^{\Gamma}\cdot\mathbf{u}^{\Gamma}\right]\right]=0\,.\label{eq:jump-energy-redux}
+\end{equation}
+
+\end_inset
+
+Since 
+\begin_inset Formula $\psi$
+\end_inset
+
+ and 
+\begin_inset Formula $p$
+\end_inset
+
+ are functions of state that only depend on the fluid volume ratio 
+\begin_inset Formula $J$
+\end_inset
+
+ (in an isothermal analysis, see eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:elastic-pressure"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), letting 
+\begin_inset Formula $J$
+\end_inset
+
+ be continuous across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ implies from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-balance-integrated"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ that 
+\begin_inset Formula $\rho$
+\end_inset
+
+ is continuous across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+; thus, from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-balance-integrated"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ we conclude that 
+\begin_inset Formula $\mathbf{u}^{\Gamma}\cdot\mathbf{n}$
+\end_inset
+
+ is continuous, hence eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-energy-redux"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is satisfied.
+ In other words, letting 
+\begin_inset Formula $\left[\left[J\right]\right]=0$
+\end_inset
+
+ is a sufficient (but not necessary) condition to satisfy the jump conditions
+ from mass and energy balance, as long as we also enforce 
+\begin_inset Formula $\left[\left[\mathbf{u}^{\Gamma}\right]\right]\cdot\mathbf{n}=0$
+\end_inset
+
+.
+ For a viscous fluid, we also assume that the no-slip condition holds, implying
+ that our jump requirement for the fluid velocity is even more stringent,
+ namely 
+\begin_inset Formula $\left[\left[\mathbf{u}^{\Gamma}\right]\right]=\mathbf{0}$
+\end_inset
+
+ (or equivalently, 
+\begin_inset Formula $\left[\left[\mathbf{v}\right]\right]=\mathbf{0}$
+\end_inset
+
+).
+ According to the above relations between the stress and pressure, and recognizi
+ng that 
+\begin_inset Formula $\left[\left[J\right]\right]=0$
+\end_inset
+
+ implies 
+\begin_inset Formula $\left[\left[p\right]\right]=0$
+\end_inset
+
+, we may also simplify the linear momentum jump condition of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-linear-momentum"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to 
+\begin_inset Formula $\left[\left[\boldsymbol{\tau}\right]\right]\cdot\mathbf{n}^{\Gamma}=\mathbf{0}$
+\end_inset
+
+.
+ Therefore, the jump conditions that we need to enforce for a tied fluid
+ interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ are
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\left[\left[J\right]\right] & =0\\
+\left[\left[\mathbf{v}\right]\right] & =\mathbf{0}\\
+\left[\left[\boldsymbol{\tau}\right]\right]\cdot\mathbf{n}^{\Gamma} & =\mathbf{0}
+\end{aligned}
+\,.\label{eq:jump-tied-fluid}
+\end{equation}
+
+\end_inset
+
+These jump conditions are consistent with the choice of nodal degrees of
+ freedom for fluid analyses (namely, 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $J$
+\end_inset
+
+).
+ On a tied (or sliding) fluid interface, we don't have continuity of the
+ mesh, therefore we can only enforce continuity of 
+\begin_inset Formula $J$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ by enforcing continuity of the fluid pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ and viscous traction 
+\begin_inset Formula $\mathbf{t}^{\tau}\equiv\boldsymbol{\tau}\cdot\mathbf{n}^{\Gamma}$
+\end_inset
+
+.
+ However, in our fluid finite element formulation, 
+\begin_inset Formula $p$
+\end_inset
+
+ is not a natural boundary condition since it is calculated directly from
+ 
+\begin_inset Formula $J$
+\end_inset
+
+.
+ Instead, as explained in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Computational-Fluid-Dynamics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the natural boundary condition for the fluid dilatation governing equation
+ is continuity of 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+ across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+, thus 
+\begin_inset Formula $\left[\left[\mathbf{v}\right]\right]\cdot\mathbf{n}^{\Gamma}=0$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -59043,7 +59617,7 @@ Now the contact integral may be rewritten as
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\,\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}\\
- & -\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\left|\mathbf{g}_{1}^{\left(1\right)}\times\mathbf{g}_{2}^{\left(1\right)}\right|\,d\eta_{\left(1\right)}^{1}d\eta_{\left(1\right)}^{2}
 \end{aligned}
 \,,\label{eq699-2}
 \end{equation}
@@ -59138,19 +59712,11 @@ The vector gap function
 \begin_inset Formula $\mathbf{g}$
 \end_inset
 
-, representing the difference between tangential velocities across the interface
-, is defined by 
+, representing the difference between velocities across the interface, is
+ defined by 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{g}=\mathbf{v}_{t}^{\left(2\right)}-\mathbf{v}_{t}^{\left(1\right)}\,,\label{TFI-vt-gap}
-\end{equation}
-
-\end_inset
-
-where the tangential velocity is evaluate from
-\begin_inset Formula 
-\begin{equation}
-\mathbf{v}_{t}^{\left(i\right)}=\left(\mathbf{I}-\mathbf{n}^{\left(i\right)}\otimes\mathbf{n}^{\left(i\right)}\right)\cdot\mathbf{v}^{\left(i\right)}\,.\label{eq:TFI-vt}
+\mathbf{g}=\mathbf{v}^{\left(2\right)}-\mathbf{v}^{\left(1\right)}\,,\label{TFI-vt-gap}
 \end{equation}
 
 \end_inset
@@ -59159,19 +59725,16 @@ We may similarly define the scalar gap function
 \begin_inset Formula $\pi$
 \end_inset
 
-, representing the difference between fluid pressures across the interface,
+, representing the difference between fluid dilatations (or volume ratios)
+ across the interface,
 \begin_inset Formula 
 \begin{equation}
-\pi=K\left(J^{\left(2\right)}-J^{\left(1\right)}\right)=K\left(e^{\left(2\right)}-e^{\left(1\right)}\right)\,,\label{eq:TFI-e-gap}
+\pi=J^{\left(2\right)}-J^{\left(1\right)}\,.\label{eq:TFI-e-gap}
 \end{equation}
 
 \end_inset
 
-where 
-\begin_inset Formula $K$
-\end_inset
 
- is the fluid bulk modulus.
 \end_layout
 
 \begin_layout Subsection
@@ -59214,7 +59777,7 @@ where
  Similarly, let 
 \begin_inset Formula 
 \begin{equation}
-v_{n}=\varepsilon_{n}\pi=K\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\,,\label{eq:TFI-v-penalty}
+v_{n}=\varepsilon_{n}\pi=\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\,,\label{eq:TFI-v-penalty}
 \end{equation}
 
 \end_inset
@@ -59232,12 +59795,12 @@ where
 \begin_inset Formula $\varepsilon_{n}$
 \end_inset
 
- has units of length per viscosity.
+ has units of velocity.
  It follows that 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\mathbf{t}^{\tau} & =\varepsilon_{t}\left(\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}-\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
-Dv_{n} & =K\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
+\begin{aligned}D\mathbf{t}^{\tau} & =\varepsilon_{t}\left(\Delta\mathbf{v}^{\left(2\right)}-\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
+Dv_{n} & =\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
 \end{aligned}
 \label{eq:TFI-penalty-linearization}
 \end{equation}
@@ -59253,7 +59816,7 @@ Given these relations, it can be shown that the directional derivatives
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned} & -D\left(J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\right)=\\
- & \varepsilon_{t}J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}-\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}\right)
+ & \varepsilon_{t}J_{\eta}^{\left(1\right)}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\Delta\mathbf{v}^{\left(1\right)}-\Delta\mathbf{v}^{\left(2\right)}\right)
 \end{aligned}
 \,,\label{eq:TFI-G-linearization-v}
 \end{equation}
@@ -59263,7 +59826,7 @@ Given these relations, it can be shown that the directional derivatives
 
 \begin_inset Formula 
 \begin{equation}
-D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J_{\eta}^{\left(1\right)}\right)=-\varepsilon_{n}KJ_{\eta}^{\left(1\right)}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
+D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J_{\eta}^{\left(1\right)}\right)=-\varepsilon_{n}J_{\eta}^{\left(1\right)}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
 \end{equation}
 
 \end_inset

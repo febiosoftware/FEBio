@@ -43,7 +43,7 @@ protected:
 };
 
 
-class MObjBuilder
+class FECORE_API MObjBuilder
 {
 private:
 	enum Token_value {
@@ -61,6 +61,8 @@ public:
 	MathObject* Create(const std::string& ex , bool eval);
 
 	void setAutoVars(bool b) { m_autoVars = b; }
+
+	static bool Add1DFunction(const std::string& name, double (*f)(double));
 
 protected:
 	MItem*	create();

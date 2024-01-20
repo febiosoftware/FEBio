@@ -190,6 +190,40 @@ bool FERigidSystem::Init()
 }
 
 //-----------------------------------------------------------------------------
+bool FERigidSystem::InitRigidBodies()
+{
+	FEModel& fem = m_fem;
+
+	// initialize rigid body COM
+	// only set the rigid body com if this is the main rigid body material
+	for (int i = 0; i < m_RB.size(); ++i)
+	{
+		FERigidBody& rb = *m_RB[i];
+
+		// first, calculate the mass
+		rb.UpdateMass();
+
+		FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(rb.m_mat));
+		assert(prm);
+
+		// next, calculate the center of mass, or just set it
+		if (prm->m_com == false)
+		{
+			rb.UpdateCOM();
+		}
+		else
+		{
+			rb.SetCOM(prm->m_rc);
+		}
+
+		// finally, determine moi
+		rb.UpdateMOI();
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! In FEBio rigid bodies are defined implicitly through a list of rigid materials.
 //! However, a rigid body can be composed of multiple rigid materials, so we can't
 //! just create a rigid body for each rigid material. We must look at the connectivity
@@ -347,32 +381,6 @@ bool FERigidSystem::CreateObjects()
 
 		// add it to the pile
 		m_RB.push_back(prb);
-	}
-
-	// initialize rigid body COM
-	// only set the rigid body com if this is the main rigid body material
-	for (int i = 0; i < m_RB.size(); ++i )
-	{
-		FERigidBody& rb = *m_RB[i];
-
-		// first, calculate the mass
-		rb.UpdateMass();
-
-		FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(rb.m_mat));
-		assert(prm);
-
-		// next, calculate the center of mass, or just set it
-		if (prm->m_com == false)
-		{
-			rb.UpdateCOM();
-		}
-		else
-		{
-			rb.SetCOM(prm->m_rc);
-		}
-
-		// finally, determine moi
-		rb.UpdateMOI();
 	}
 
 	return true;

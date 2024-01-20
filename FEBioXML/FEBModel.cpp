@@ -34,7 +34,6 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include <FECore/FEShellDomain.h>
 #include <FECore/log.h>
-#include <FECore/FESurface.h>
 using namespace std;
 
 //=============================================================================
@@ -413,7 +412,9 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		NODE& partNode = part.GetNode(j);
 		FENode& meshNode = mesh.Node(N0 + n++);
 
-		meshNode.SetID(++nid);
+		// TODO: This is going to break multi-part models
+		meshNode.SetID(partNode.id);
+
 		meshNode.m_r0 = T.Apply(partNode.r);
 		meshNode.m_rt = meshNode.m_r0;
 	}
@@ -462,7 +463,9 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 				const ELEMENT& domElement = partDomain.GetElement(j);
 
 				FEElement& el = dom->ElementRef(j);
-				el.SetID(++eid);
+
+				// TODO: This is going to break multi-part models
+				el.SetID(domElement.id);
 
 				int ne = el.Nodes();
 				for (int n = 0; n < ne; ++n) el.m_node[n] = NLT[domElement.node[n] - noff];

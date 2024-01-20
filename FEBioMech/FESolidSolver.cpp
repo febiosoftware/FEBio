@@ -65,7 +65,7 @@ END_FECORE_CLASS();
 //! FESolidSolver Construction
 //
 FESolidSolver::FESolidSolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem),\
-m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
+m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofRQ(pfem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 
@@ -89,8 +89,8 @@ m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem)
 	if (pfem)
 	{
 		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
-		m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
+		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 		m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 	}
 }
@@ -121,9 +121,9 @@ bool FESolidSolver::Init()
 	gather(m_Ut, mesh, m_dofU[0]);
 	gather(m_Ut, mesh, m_dofU[1]);
 	gather(m_Ut, mesh, m_dofU[2]);
-	gather(m_Ut, mesh, m_dofSQ[0]);
-	gather(m_Ut, mesh, m_dofSQ[1]);
-	gather(m_Ut, mesh, m_dofSQ[2]);
+	gather(m_Ut, mesh, m_dofSU[0]);
+	gather(m_Ut, mesh, m_dofSU[1]);
+	gather(m_Ut, mesh, m_dofSU[2]);
 
 	// set the dynamic update flag only if we are running a dynamic analysis
 	bool b = (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC ? true : false);
@@ -216,9 +216,9 @@ void FESolidSolver::UpdateKinematics(vector<double>& ui)
 	scatter(U, mesh, m_dofU[1]);
 	scatter(U, mesh, m_dofU[2]);
 	// rotational dofs
-	scatter(U, mesh, m_dofSQ[0]);
-	scatter(U, mesh, m_dofSQ[1]);
-	scatter(U, mesh, m_dofSQ[2]);
+	scatter(U, mesh, m_dofSU[0]);
+	scatter(U, mesh, m_dofSU[1]);
+	scatter(U, mesh, m_dofSU[2]);
 
 	// make sure the boundary conditions are fullfilled
 	int nbcs = fem.BoundaryConditions();
@@ -289,6 +289,9 @@ void FESolidSolver::PrepStep()
 	// zero total displacements
 	zero(m_Ui);
 
+	const FETimeInfo& tp = GetFEModel()->GetTime();
+	double dt = tp.timeIncrement;
+
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
 	FEModel& fem = *GetFEModel();
@@ -299,9 +302,12 @@ void FESolidSolver::PrepStep()
 		ni.m_rp = ni.m_rt;
 		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		ni.m_ap = ni.m_at;
-	}
 
-	const FETimeInfo& tp = fem.GetTime();
+		// initial guess at start of new time step
+		ni.m_at = ni.m_ap * (1 - 0.5 / m_beta) - ni.m_vp / (m_beta * dt);
+		vec3d vs = ni.m_vp + (ni.m_at * m_gamma + ni.m_ap * (1 - m_gamma)) * dt;
+		ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vs);
+	}
 
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry

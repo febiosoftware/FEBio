@@ -46,7 +46,7 @@ FEElasticShellDomainOld::FEElasticShellDomainOld(FEModel* pfem) : FEShellDomainO
 	if (pfem)
 	{
 		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-		m_dofSR.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofSR.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 		m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 	}
 }

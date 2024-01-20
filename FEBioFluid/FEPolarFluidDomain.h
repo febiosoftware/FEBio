@@ -23,13 +23,8 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.*/
-
-
-
 #pragma once
-#include <vector>
 #include "febiofluid_api.h"
-using namespace std;
 
 class FEModel;
 class FELinearSystem;
@@ -38,7 +33,6 @@ class FEBodyMoment;
 class FEGlobalVector;
 class FETimeInfo;
 
-//-----------------------------------------------------------------------------
 //! Abstract interface class for polar fluid domains.
 
 //! A polar fluid domain is used by the polar fluid mechanics solver.

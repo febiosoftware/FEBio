@@ -53,15 +53,29 @@ bool FETrussDomain::Create(int nsize, FE_Element_Spec espec)
 }
 
 //-----------------------------------------------------------------------------
-vec3d FETrussDomain::TrussNormal(FETrussElement& el)
+bool FETrussDomain::Init()
+{
+	if (FEBeamDomain::Init() == false) return false;
+	FEMesh& mesh = *GetMesh();
+	for (FETrussElement& el : m_Elem)
+	{
+		vec3d r0[2];
+		r0[0] = mesh.Node(el.m_node[0]).m_r0;
+		r0[1] = mesh.Node(el.m_node[1]).m_r0;
+
+		el.m_L0 = (r0[1] - r0[0]).Length();
+		el.m_Lt = el.m_L0;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FETrussDomain::GetTrussAxisVector(FETrussElement& el)
 {
 	vec3d rt[2];
 	rt[0] = m_pMesh->Node(el.m_node[0]).m_rt;
 	rt[1] = m_pMesh->Node(el.m_node[1]).m_rt;
-
-	vec3d a = rt[0];
-	vec3d b = rt[1];
-	vec3d n = b - a;
+	vec3d n = rt[1] - rt[0];
 	n.unit();
 	return n;
 }
@@ -69,10 +83,8 @@ vec3d FETrussDomain::TrussNormal(FETrussElement& el)
 //-----------------------------------------------------------------------------
 void FETrussDomain::ForEachTrussElement(std::function<void(FETrussElement& el)> f)
 {
-	int N = Elements();
-	for (int i = 0; i < N; ++i)
+	for (FETrussElement& el : m_Elem)
 	{
-		FETrussElement& el = m_Elem[i];
 		f(el);
 	}
 }

@@ -36,7 +36,6 @@ SOFTWARE.*/
 #include "FEParam.h"
 #include "FEParamValidator.h"
 #include "ParamString.h"
-#include "MathObject.h"
 #include "fecore_api.h"
 #include <stdio.h>
 using namespace std;
@@ -51,7 +50,6 @@ class FEParamMat3ds;
 class FEDataArray;
 class tens3drs;
 class FEMaterialPointProperty;
-class Image;
 
 //-----------------------------------------------------------------------------
 typedef std::list<FEParam>::iterator FEParamIterator;
@@ -180,8 +178,6 @@ public:
 	FEParam* AddParameter(std::vector<vec2d>&  v, const char* sz);
 	FEParam* AddParameter(std::vector<std::string>& v, const char* sz);
 	FEParam* AddParameter(FEMaterialPointProperty& v, const char* sz);
-	FEParam* AddParameter(MSimpleExpression& m, const char* sz);
-	FEParam* AddParameter(Image& im           , const char* sz);
 
 	FEParam* AddParameter(int&           v, RANGE rng, const char* sz);
 	FEParam* AddParameter(double&        v, RANGE rng, const char* sz);
@@ -201,16 +197,18 @@ public:
 	FEParam* AddParameter(std::vector<int>& v, const char* sz, unsigned int flags, const char* szenum);
 	FEParam* AddParameter(std::string& s, const char* sz, unsigned int flags, const char* szenum = nullptr);
 
-	template <typename T> void SetParameter(const char* sz, T v);
+	template <typename T> bool SetParameter(const char* sz, T v);
 
 private:
 	FEParameterList*	m_pParam;	//!< parameter list
 };
 
 //-----------------------------------------------------------------------------
-template <typename T> void FEParamContainer::SetParameter(const char* sz, T v)
+template <typename T> bool FEParamContainer::SetParameter(const char* sz, T v)
 {
-	FEParam* p = m_pParam->FindFromName(sz); p->value<T>() = v;
+	FEParam* p = m_pParam->FindFromName(sz);
+	if (p) p->value<T>() = v;
+	return (p != nullptr);
 }
 
 //-----------------------------------------------------------------------------

@@ -40,7 +40,7 @@ void FEFacetSet::FACET::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-FEFacetSet::FEFacetSet(FEModel* fem) : FEItemList(fem)
+FEFacetSet::FEFacetSet(FEModel* fem) : FEItemList(fem, FEItemList::FE_ELEMENT_SET)
 {
 	m_surface = nullptr;
 }

@@ -161,6 +161,7 @@ void FESolute::Serialize(DumpStream& ar)
 {
 	FEMaterialProperty::Serialize(ar);
 	ar & m_ID & m_LID;
+	ar & m_rhoT& m_M& m_z;
 }
 
 //=============================================================================

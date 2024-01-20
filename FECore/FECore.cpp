@@ -64,7 +64,6 @@ SOFTWARE.*/
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
 #include "FELogSolutionNorm.h"
-#include "FELinearConstraint.h"
 #include "LUSolver.h"
 #include "FETimeStepController.h"
 #include "FEModifiedNewtonStrategy.h"

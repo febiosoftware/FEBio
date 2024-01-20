@@ -26,8 +26,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioControlSection4.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/FEModel.h"
-#include "FECore/FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
 FEBioControlSection4::FEBioControlSection4(FEFileImport* pim) : FEFileSection(pim)

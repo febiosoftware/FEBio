@@ -256,8 +256,6 @@ void FESolver::BuildMatrixProfile(FEGlobalMatrix& G, bool breset)
 	// (otherwise we only build the "dynamic" profile)
 	if (breset)
 	{
-		vector<int> elm;
-
 		// Add all elements to the profile
 		// Loop over all active domains
 		for (int nd = 0; nd<mesh.Domains(); ++nd)

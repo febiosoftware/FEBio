@@ -126,10 +126,8 @@ SOFTWARE.*/
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
 #include "FEHGOCoronary.h"
-#include "FESpringMaterial.h"
 #include "FENonlinearSpring.h"
 #include "FEDiscreteElementMaterial.h"
-#include "FEElasticMultigeneration.h"
 #include "FEPRLig.h"
 #include "FECoupledMooneyRivlin.h"
 #include "FECoupledVerondaWestmann.h"
@@ -169,6 +167,7 @@ SOFTWARE.*/
 #include "FELungMaterial.h"
 #include "FEGrowthTensor.h"
 #include "FEKinematicGrowth.h"
+#include "FEYeoh.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -236,6 +235,7 @@ SOFTWARE.*/
 #include "FELinearTrussDomain.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
+#include "FEElasticBeamDomain.h"
 #include "FERemodelingElasticDomain.h"
 #include "FEUDGHexDomain.h"
 #include "FEUT4Domain.h"
@@ -277,6 +277,8 @@ SOFTWARE.*/
 
 #include "FESolidAnalysis.h"
 #include <FECore/FEModelUpdate.h>
+
+#include "FEElasticBeamMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -410,6 +412,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
 	REGISTER_FECORE_CLASS(FEShenoyMaterial, "Shenoy");
 	REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean, "fiber neo-Hookean");
+    REGISTER_FECORE_CLASS(FEYeoh, "Yeoh");
 
 	// fiber materials (derived from FEFiberMaterial)
     REGISTER_FECORE_CLASS(FEFiberCDF         , "fiber-CDF"           );
@@ -559,6 +562,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEConstPrestrainGradient, "prestrain gradient");
 	REGISTER_FECORE_CLASS(FEInSituStretchGradient, "in-situ stretch");
 
+	// beam materials
+	REGISTER_FECORE_CLASS(FEElasticBeamMaterial, "linear-beam");
+
 	//-----------------------------------------------------------------------------
 	// domain classes
 	REGISTER_FECORE_CLASS(FERigidSolidDomain, "rigid-solid");
@@ -577,6 +583,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEElasticANSShellDomain, "elastic-shell-ans");
 	REGISTER_FECORE_CLASS(FELinearTrussDomain, "linear-truss");
 	REGISTER_FECORE_CLASS(FEElasticTrussDomain, "elastic-truss");
+	REGISTER_FECORE_CLASS(FEElasticBeamDomain, "linear-beam");
 	REGISTER_FECORE_CLASS(FEDiscreteElasticDomain, "discrete");
 	REGISTER_FECORE_CLASS(FEDeformableSpringDomain, "deformable-spring");
 	REGISTER_FECORE_CLASS(FEDeformableSpringDomain2, "deformable-spring2");
@@ -619,7 +626,7 @@ void FEBioMech::InitModule()
 
 	REGISTER_FECORE_CLASS(FEGenericBodyForce, "body force");
 	REGISTER_FECORE_CLASS(FECentrifugalBodyForce, "centrifugal");
-	REGISTER_FECORE_CLASS(FEPointBodyForce, "point");
+	REGISTER_FECORE_CLASS(FEPointBodyForce, "point", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FESurfaceAttractionBodyForce, "surface attraction");
 	REGISTER_FECORE_CLASS(FEMassDamping, "mass damping");
 
@@ -826,6 +833,14 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotGrowthLeftHencky, "growth left Hencky");
     REGISTER_FECORE_CLASS(FEPlotGrowthRelativeVolume, "growth relative volume");
 
+	// beam variables
+	REGISTER_FECORE_CLASS(FEPlotBeamStress      , "beam stress");
+	REGISTER_FECORE_CLASS(FEPlotBeamStressCouple, "beam stress couple");
+	REGISTER_FECORE_CLASS(FEPlotBeamStrain      , "beam strain");
+	REGISTER_FECORE_CLASS(FEPlotBeamCurvature   , "beam curvature");
+
+	REGISTER_FECORE_CLASS(FEPlotBeamReferenceStress      , "beam reference stress");
+	REGISTER_FECORE_CLASS(FEPlotBeamReferenceStressCouple, "beam reference stress couple");
 
 	// 2O continuum fields
 	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "s norm");
