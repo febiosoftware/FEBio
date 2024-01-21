@@ -66,6 +66,7 @@ protected:
 public:
     double          m_m0;       //!< threshold of couple traction
     double          m_ksi;      //!< slope of linear angular velocity-couple traction variation
+    bool            m_brel;     //!< relative flag
     vector<vec3d>   m_v;        //!< nodal values of linear velocity
     vector<vec3d>   m_g;        //!< nodal values of angular velocity
     

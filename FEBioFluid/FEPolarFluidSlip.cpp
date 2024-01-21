@@ -33,6 +33,7 @@
 BEGIN_FECORE_CLASS(FEPolarFluidSlip, FEPrescribedSurface)
     ADD_PARAMETER(m_m0, "m0")->setUnits(UNIT_STIFFNESS)->setLongName("couple traction threshold");
     ADD_PARAMETER(m_ksi, "ksi")->setUnits("t/M")->setLongName("slope");
+    ADD_PARAMETER(m_brel, "relative");
 END_FECORE_CLASS();
 
 
@@ -46,6 +47,8 @@ FEPolarFluidSlip::FEPolarFluidSlip(FEModel* fem) : FEPrescribedSurface(fem), m_d
 
     m_dofW.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::RELATIVE_FLUID_VELOCITY));
     m_dofG.AddVariable(FEBioPolarFluid::GetVariableName(FEBioPolarFluid::FLUID_ANGULAR_VELOCITY));
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDofs(m_dofG);
 }
 
 //-----------------------------------------------------------------------------
@@ -53,6 +56,7 @@ FEPolarFluidSlip::FEPolarFluidSlip(FEModel* fem) : FEPrescribedSurface(fem), m_d
 bool FEPolarFluidSlip::Init()
 {
     
+    SetRelativeFlag(m_brel);
     if (FEPrescribedSurface::Init() == false) return false;
     
     m_psurf = GetSurface();
@@ -98,13 +102,18 @@ void FEPolarFluidSlip::UpdateAngularVelocity()
                     // evaluate the average stress in this element
                     int nint = pe->GaussPoints();
                     mat3d M(mat3dd(0));
+                    vec3d w(0,0,0);
                     for (int n=0; n<nint; ++n)
                     {
                         FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                        FEFluidMaterialPoint& pf = *(mp.ExtractData<FEFluidMaterialPoint>());
+                        mat3da W(pf.m_Lf);
+                        w += W.vec();
                         FEPolarFluidMaterialPoint& pt = *(mp.ExtractData<FEPolarFluidMaterialPoint>());
                         M += pt.m_M;
                     }
                     M /= nint;
+                    w /= nint;
                     // value of couple traction on this surface element
                     vec3d mt = M*nu;
                     vec3d v(0,0,0);
@@ -112,10 +121,10 @@ void FEPolarFluidSlip::UpdateAngularVelocity()
                     // if above threshold, calculate tangential angular velocity
                     double mtlen = mt.unit();
                     if (mtlen > m_m0) {
-                        g = mt*((m_m0-mtlen)*m_ksi);
-                        v = (mat3dd(1) - (nu & nu))*g*(-pf->m_kg);
+                        g = mt*((mtlen - m_m0)*m_ksi);
+                        v = g ^ (nu*pf->m_kg); // evaluate slip velocity from pure rolling
                     }
-                    for (int j=0; j<pe->Nodes(); ++j) {
+                    for (int j=0; j<el.Nodes(); ++j) {
                         gNodes[el.m_lnode[j]].push_back(g);
                         vNodes[el.m_lnode[j]].push_back(v);
                     }
@@ -133,8 +142,8 @@ void FEPolarFluidSlip::UpdateAngularVelocity()
             v += vNodes[i][j];
             g += gNodes[i][j];
         }
-        v /= vNodes[i].size();
-        g /= gNodes[i].size();
+        if (vNodes[i].size()) v /= vNodes[i].size();
+        if (gNodes[i].size()) g /= gNodes[i].size();
 
         // store value for now
         m_v[i] = v;
@@ -170,11 +179,6 @@ void FEPolarFluidSlip::GetNodalValues(int nodelid, std::vector<double>& val)
     val[3] = m_g[nodelid].x;
     val[4] = m_g[nodelid].y;
     val[5] = m_g[nodelid].z;
-
-    FENode& node = GetMesh().Node(m_nodeList[nodelid]);
-    node.set_vec3d(m_dofW[0], m_dofW[1], m_dofW[2], m_v[nodelid]);
-    node.set_vec3d(m_dofG[0], m_dofG[1], m_dofG[2], m_g[nodelid]);
-    
 }
 
 void FEPolarFluidSlip::CopyFrom(FEBoundaryCondition* pbc)

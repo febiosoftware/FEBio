@@ -292,6 +292,7 @@ public:
 
 	// constructors
 	mat3da(double xy, double yz, double xz);
+    mat3da(mat3d L);
 
 	// calculates the antisymmetric matrix from a vector
 	// A.b = a x b where A = mat3da(a).

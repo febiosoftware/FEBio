@@ -38,7 +38,7 @@
 BEGIN_FECORE_CLASS(FEPolarFluid, FEPolarFluidMaterial)
 // material properties
     ADD_PARAMETER(m_k   , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE);
-    ADD_PARAMETER(m_kg   , FE_RANGE_GREATER_OR_EQUAL(0.0), "kg");
+    ADD_PARAMETER(m_kg   , FE_RANGE_GREATER_OR_EQUAL(0.0), "kg")->setUnits(UNIT_LENGTH);
     ADD_PROPERTY(m_pElastic, "elastic", FEProperty::Optional);
 
 END_FECORE_CLASS();

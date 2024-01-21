@@ -532,6 +532,12 @@ inline mat3da::mat3da(double xy, double yz, double xz)
 	d[0] = xy; d[1] = yz; d[2] = xz;
 }
 
+// construct antisymmetric 3D matrix from a general 3D matrix L as 0.5*(L + L.transpose)
+inline mat3da::mat3da(mat3d L)
+{
+    d[0] = 0.5*(L[0][1]-L[1][0]); d[1] = 0.5*(L[1][2]-L[2][1]); d[2] = 0.5*(L[0][2]-L[2][0]);
+}
+
 // calculates the antisymmetric matrix from a vector such that for any b,
 // A.b = a x b where A = mat3da(a).
 inline mat3da::mat3da(const vec3d& a)

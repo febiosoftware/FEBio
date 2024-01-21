@@ -43,6 +43,7 @@
 #include "FEBioFluidPlot.h"
 #include "FEConstFluidBodyMoment.h"
 #include "FEPolarFluidRelativeAngularVelocity.h"
+#include "FEPolarFluidSlip.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -112,7 +113,8 @@ void FEBioPolarFluid::InitModule()
     //-----------------------------------------------------------------------------
     // Surface BCs
     REGISTER_FECORE_CLASS(FEPolarFluidRelativeAngularVelocity, "fluid relative angular velocity" );
-    
+    REGISTER_FECORE_CLASS(FEPolarFluidSlip                   , "polar fluid slip" );
+
     //-----------------------------------------------------------------------------
     // Body loads
     REGISTER_FECORE_CLASS(FEConstFluidBodyMoment   , "polar fluid body moment");
