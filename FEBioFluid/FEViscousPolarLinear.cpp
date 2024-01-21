@@ -33,10 +33,10 @@
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEViscousPolarLinear, FEViscousPolarFluid)
-    ADD_PARAMETER(m_tau, FE_RANGE_GREATER_OR_EQUAL(0.0), "tau");
-    ADD_PARAMETER(m_alpha, "alpha");
-    ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(0.0), "beta");
-    ADD_PARAMETER(m_gamma, FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
+    ADD_PARAMETER(m_tau, FE_RANGE_GREATER_OR_EQUAL(0.0), "tau")->setLongName("rotational viscosity")->setUnits(UNIT_VISCOSITY);
+    ADD_PARAMETER(m_alpha, "alpha")->setUnits("F.t");
+    ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(0.0), "beta")->setUnits("F.t");
+    ADD_PARAMETER(m_gamma, FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma")->setUnits("F.t");
 END_FECORE_CLASS();
 
 
