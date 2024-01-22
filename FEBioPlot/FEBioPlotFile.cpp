@@ -744,6 +744,8 @@ bool FEBioPlotFile::Open(const char *szfile)
 {
 	FEModel* fem = GetFEModel();
 
+	m_meshesWritten = 0;
+
 	// open the archive
 	m_ar.Create(szfile);
 
