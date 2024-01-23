@@ -140,7 +140,7 @@ void FEBioThermoFluid::InitModule()
     
     //-----------------------------------------------------------------------------
     // loads
-    REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure");
+    REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure constraint");
 
     //-----------------------------------------------------------------------------
     // Reset solver parameters to preferred default settings
