@@ -39,7 +39,8 @@ if(MKLROOT)
             PATHS
               ${MKLROOT}/../compiler/latest/*/compiler/lib/
               ${MKLROOT}/../../compiler/latest/*/compiler/lib/
-            PATH_SUFFIXES "intel64"
+              ${MKLROOT}/../../compiler/latest/lib/
+            PATH_SUFFIXES "intel64" "mac"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
             
@@ -159,10 +160,11 @@ endif()
 # LEVMAR
 if(WIN32)
 	find_path(LEVMAR_INC levmar.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-		DOC "Levmar include directory")
+      PATH_SUFFIXES "levmar"
+      DOC "Levmar include directory")
 	find_library(LEVMAR_LIB levmar PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
-        PATH_SUFFIXES "vs2017/Release"
-		DOC "Levmar library path")
+      PATH_SUFFIXES "vs2017/Release"
+      DOC "Levmar library path")
 else()
 	find_path(LEVMAR_INC levmar.h PATHS /usr/local/ /opt/levmar* $ENV{HOME}/* $ENV{HOME}/*/*
 		DOC "Levmar include directory")

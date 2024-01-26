@@ -24,7 +24,7 @@ data "amazon-ami" "ubuntu" {
 
 variable "skip_create_ami" {
   type    = bool
-  default = true
+  default = false
 }
 
 source "amazon-ebs" "ubuntu" {

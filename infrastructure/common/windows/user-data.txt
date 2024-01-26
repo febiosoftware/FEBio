@@ -4,6 +4,7 @@ net user Administrator SuperS3cr3t!!!!
 wmic useraccount where "name='Administrator'" set PasswordExpires=FALSE
 
 # First, make sure WinRM can't be connected to
+netsh advfirewall firewall delete rule name="Windows Remote Management (HTTP-In)" 2>$Null
 netsh advfirewall firewall set rule name="Windows Remote Management (HTTP-In)" new enable=yes action=block
 
 # Delete any existing WinRM listeners
