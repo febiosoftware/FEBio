@@ -95,6 +95,11 @@ build {
   }
 
   provisioner "powershell" {
+    script = "./common/windows/jq.ps1"
+    env    = local.environment
+  }
+
+  provisioner "powershell" {
     script = "./common/windows/msmpi.ps1"
     env    = local.environment
   }
