@@ -2,7 +2,6 @@
   "dependencies": [
     "eigen3",
     "glew",
-    "levmar",
     "libssh",
     "mpi",
     "opengl",
