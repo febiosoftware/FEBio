@@ -62723,6 +62723,454 @@ D\delta G=-\alpha\left[\begin{array}{cc}
 
 \end_layout
 
+\begin_layout Section
+Nonlinear Constraints
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Nonlinear-Constraints"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Nonlinear constraints are equations of the form 
+\begin_inset Formula $f\left(x_{i}\right)=0$
+\end_inset
+
+, where 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ represent nodal degrees of freedom.
+ These constraints may be enforced using the penalty method, with or without
+ augmented Lagrangian, or the method of Lagrange multipliers.
+ Each method has its own advantages and disadvantages.
+\end_layout
+
+\begin_layout Subsection
+Penalty Method with Augmented Lagrangian
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Penalty-Method"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The penalty method employs the penalty parameter 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ to enforce 
+\begin_inset Formula $W=\frac{1}{2}\varepsilon f^{2}=0$
+\end_inset
+
+, where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ serves as the 'stiffness' or spring constant in the 'spring' whose 'elongation'
+ is 
+\begin_inset Formula $f$
+\end_inset
+
+, such that 
+\begin_inset Formula $W$
+\end_inset
+
+ represents the stored energy in the spring.
+ The virtual work statement for this type of analysis becomes 
+\begin_inset Formula $\delta W=\varepsilon f\,\delta f=0$
+\end_inset
+
+, where
+\begin_inset Formula 
+\begin{equation}
+\delta f=\sum_{i}\frac{\partial f}{\partial x_{i}}\delta x_{i}\label{eq:nlc-virtual-force}
+\end{equation}
+
+\end_inset
+
+If we are concerned that the value of 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ may become too large to produce good numerical convergence, we may augment
+ this expression by using 
+\begin_inset Formula $\delta W=\left(\lambda+\varepsilon f\right)\delta f=0$
+\end_inset
+
+, where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is the Lagrangian augmentation parameter, which gets updated at each iteration
+ to help us avoid using a value of 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ that's too large.
+ We may let 
+\begin_inset Formula $c=\lambda+\varepsilon f$
+\end_inset
+
+ represent the constraint that needs to be satisfied.
+ Substituing eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:nlc-virtual-force"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ into this relation allows us to express 
+\begin_inset Formula $\delta W$
+\end_inset
+
+ in matrix form,
+\begin_inset Formula 
+\begin{equation}
+\delta W=\left[\begin{array}{ccc}
+\delta x_{1} & \cdots & \delta x_{n}\end{array}\right]\left[\begin{array}{c}
+c\frac{\partial f}{\partial x_{1}}\\
+\vdots\\
+c\frac{\partial f}{\partial x_{n}}
+\end{array}\right]=0\,.\label{eq:nlc-pm-virtual-work}
+\end{equation}
+
+\end_inset
+
+The linearization of 
+\begin_inset Formula $\delta W$
+\end_inset
+
+ along increments 
+\begin_inset Formula $\Delta x_{i}$
+\end_inset
+
+ of the degrees of freedom takes the form
+\begin_inset Formula 
+\begin{equation}
+D\delta W=\left[\begin{array}{ccc}
+\delta x_{1} & \cdots & \delta x_{n}\end{array}\right]\left[\begin{array}{ccc}
+\varepsilon\left(\frac{\partial f}{\partial x_{1}}\right)^{2}+c\frac{\partial^{2}f}{\partial x_{1}^{2}} & \cdots & \varepsilon\frac{\partial f}{\partial x_{1}}\frac{\partial f}{\partial x_{n}}+c\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}}\\
+\vdots & \ddots & \vdots\\
+\varepsilon\frac{\partial f}{\partial x_{n}}\frac{\partial f}{\partial x_{1}}+c\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}} & \cdots & \varepsilon\left(\frac{\partial f}{\partial x_{n}}\right)^{2}+c\frac{\partial^{2}f}{\partial x_{n}^{2}}
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}
+\end{array}\right]\,,\label{eq:nlc-pm-stiffness}
+\end{equation}
+
+\end_inset
+
+so that the system of equations that needs to be added to the global system
+ is given by 
+\begin_inset Formula $\delta W+D\delta W\approx0$
+\end_inset
+
+, which reduces to
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{ccc}
+\varepsilon\left(\frac{\partial f}{\partial x_{1}}\right)^{2}+c\frac{\partial^{2}f}{\partial x_{1}^{2}} & \cdots & \varepsilon\frac{\partial f}{\partial x_{1}}\frac{\partial f}{\partial x_{n}}+c\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}}\\
+\vdots & \ddots & \vdots\\
+\varepsilon\frac{\partial f}{\partial x_{n}}\frac{\partial f}{\partial x_{1}}+c\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}} & \cdots & \varepsilon\left(\frac{\partial f}{\partial x_{n}}\right)^{2}+c\frac{\partial^{2}f}{\partial x_{n}^{2}}
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}
+\end{array}\right]=-\left[\begin{array}{c}
+c\frac{\partial f}{\partial x_{1}}\\
+\vdots\\
+c\frac{\partial f}{\partial x_{n}}
+\end{array}\right]\label{eq:nlc-pm-equations}
+\end{equation}
+
+\end_inset
+
+when we drop out the virtual increments, as normally done in this type of
+ analysis.
+ 
+\end_layout
+
+\begin_layout Standard
+Lagrangian augmentation is performed at each iteration 
+\begin_inset Formula $k$
+\end_inset
+
+ by letting
+\begin_inset Formula 
+\[
+\lambda^{\left(k+1\right)}\leftarrow\lambda^{\left(k\right)}+\varepsilon c
+\]
+
+\end_inset
+
+The penalty method with augmented Lagrangian does not increase the number
+ of equations that need to be solved globally.
+ However, it does require users to specify the parameter 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+, and to provide a convergence tolerance for Lagrange augmentation.
+\end_layout
+
+\begin_layout Example
+\begin_inset CommandInset label
+LatexCommand label
+name "exa:Linear-Constraints-Penalty"
+
+\end_inset
+
+For linear constraints of the form
+\begin_inset Formula 
+\[
+f=a_{0}+\sum_{j}a_{j}x_{j}=0
+\]
+
+\end_inset
+
+we find that 
+\begin_inset Formula $\frac{\partial f}{\partial x_{i}}=a_{i}$
+\end_inset
+
+ and second derivatives are all zero, so that the system of equations takes
+ the form
+\begin_inset Formula 
+\[
+\left[\begin{array}{ccc}
+\varepsilon a_{1}^{2} & \cdots & \varepsilon a_{1}a_{n}\\
+\vdots & \ddots & \vdots\\
+\varepsilon a_{n}a_{1} & \cdots & \varepsilon a_{n}^{2}
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}
+\end{array}\right]=-\left[\begin{array}{c}
+ca_{1}\\
+\vdots\\
+ca_{n}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Method of Lagrange Multipliers
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Lagrange-Multipliers"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When using the method of Lagrange multipliers we have to include equations
+ that solve for the multipliers.
+ Typically, we let the work done by the constraint be represented by 
+\begin_inset Formula $W=\lambda f$
+\end_inset
+
+, where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is the multiplier (if 
+\begin_inset Formula $f$
+\end_inset
+
+ is a vector equation, we can use 
+\begin_inset Formula $W=\boldsymbol{\lambda}\cdot\mathbf{f}$
+\end_inset
+
+).
+ Then, we solve for 
+\begin_inset Formula $\delta W=\lambda\,\delta f+\delta\lambda\,f=0$
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $\delta f$
+\end_inset
+
+ is given as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:nlc-virtual-force"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset Formula $\delta W=0$
+\end_inset
+
+ may be written in matrix form as
+\begin_inset Formula 
+\begin{equation}
+\delta W=\left[\begin{array}{cccc}
+\delta x_{1} & \cdots & \delta x_{n} & \delta\lambda\end{array}\right]\left[\begin{array}{c}
+\lambda\frac{\partial f}{\partial x_{1}}\\
+\vdots\\
+\lambda\frac{\partial f}{\partial x_{n}}\\
+f
+\end{array}\right]=0\,.\label{eq:nlc-lm-virtual-work}
+\end{equation}
+
+\end_inset
+
+The linearization of 
+\begin_inset Formula $\delta W$
+\end_inset
+
+ along increments 
+\begin_inset Formula $\Delta x_{j}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Delta\lambda$
+\end_inset
+
+ takes the form
+\begin_inset Formula 
+\begin{equation}
+D\delta W=\sum_{i}\delta x_{i}\frac{\partial f}{\partial x_{i}}\Delta\lambda+\sum_{i}\delta x_{i}\sum_{j}\lambda\frac{\partial^{2}f}{\partial x_{i}\partial x_{j}}\Delta x_{j}+\delta\lambda\,\sum_{j}\frac{\partial f}{\partial x_{j}}\Delta x_{j}\,.\label{eq:nlc-lm-linearization}
+\end{equation}
+
+\end_inset
+
+The corresponding stiffness matrix is
+\begin_inset Formula 
+\begin{equation}
+D\delta W=\left[\begin{array}{cccc}
+\delta x_{1} & \cdots & \delta x_{n} & \delta\lambda\end{array}\right]\left[\begin{array}{cccc}
+\lambda\frac{\partial^{2}f}{\partial x_{1}^{2}} & \cdots & \lambda\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}} & \frac{\partial f}{\partial x_{1}}\\
+\vdots & \ddots & \vdots & \vdots\\
+\lambda\frac{\partial^{2}f}{\partial x_{n}\partial x_{1}} & \cdots & \lambda\frac{\partial^{2}f}{\partial x_{n}^{2}} & \frac{\partial f}{\partial x_{n}}\\
+\frac{\partial f}{\partial x_{1}} & \cdots & \frac{\partial f}{\partial x_{n}} & 0
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}\\
+\Delta\lambda
+\end{array}\right]\,,\label{eq:nlc-lm-stiffness}
+\end{equation}
+
+\end_inset
+
+so that the global system of equations becomes supplemented by 
+\begin_inset Formula $\delta W+D\delta W\approx0$
+\end_inset
+
+, which reduces to
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{cccc}
+\lambda\frac{\partial^{2}f}{\partial x_{1}^{2}} & \cdots & \lambda\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}} & \frac{\partial f}{\partial x_{1}}\\
+\vdots & \ddots & \vdots & \vdots\\
+\lambda\frac{\partial^{2}f}{\partial x_{n}\partial x_{1}} & \cdots & \lambda\frac{\partial^{2}f}{\partial x_{n}^{2}} & \frac{\partial f}{\partial x_{n}}\\
+\frac{\partial f}{\partial x_{1}} & \cdots & \frac{\partial f}{\partial x_{n}} & 0
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}\\
+\Delta\lambda
+\end{array}\right]=-\left[\begin{array}{c}
+\lambda\frac{\partial f}{\partial x_{1}}\\
+\vdots\\
+\lambda\frac{\partial f}{\partial x_{n}}\\
+f
+\end{array}\right]\label{eq:nlc-lm-equations}
+\end{equation}
+
+\end_inset
+
+when we drop out the virtual increments, as normally done in this type of
+ analysis.
+ This system of equations requires 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ to part of the solution, and to be updated at each iteration 
+\begin_inset Formula $k$
+\end_inset
+
+ according to 
+\begin_inset Formula $\lambda^{\left(k+1\right)}\leftarrow\lambda^{\left(k\right)}+\Delta\lambda$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The method of Lagrange multipliers increases the number of equations that
+ need to be solved globally.
+ However, it does not require users to specify additional parameters.
+\end_layout
+
+\begin_layout Example
+\begin_inset CommandInset label
+LatexCommand label
+name "exa:Linear-System-Multiplier"
+
+\end_inset
+
+For linear constraints of the form
+\begin_inset Formula 
+\[
+f=a_{0}+\sum_{j}a_{j}x_{j}=0
+\]
+
+\end_inset
+
+we find that 
+\begin_inset Formula $\frac{\partial f}{\partial x_{i}}=a_{i}$
+\end_inset
+
+ and second derivatives are all zero, so that the system of equations takes
+ the form
+\begin_inset Formula 
+\[
+\left[\begin{array}{cccc}
+0 & \cdots & 0 & a_{1}\\
+\vdots & \ddots & \vdots & \vdots\\
+0 & \cdots & 0 & a_{n}\\
+a_{1} & \cdots & a_{n} & 0
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}\\
+\Delta\lambda
+\end{array}\right]=-\left[\begin{array}{c}
+\lambda a_{1}\\
+\vdots\\
+\lambda a_{n}\\
+f
+\end{array}\right]
+\]
+
+\end_inset
+
+Note that this stiffness matrix is singular, which emphasizes that these
+ constraints are just that.
+ They cannot be used alone to solve for the unknown degrees of freedom.
+\end_layout
+
 \begin_layout Chapter
 Optimization
 \end_layout
