@@ -91,6 +91,19 @@ bool FEPlotNodeDisplacement::Save(FEMesh& m, FEDataStream& a)
 	return true;
 }
 
+bool FEPlotNodeRotation::Save(FEMesh& m, FEDataStream& a)
+{
+	FEModel* fem = GetFEModel();
+	const int dof_U = fem->GetDOFIndex("u");
+	const int dof_V = fem->GetDOFIndex("v");
+	const int dof_W = fem->GetDOFIndex("w");
+
+	writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
+		return node.get_vec3d(dof_U, dof_V, dof_W);
+		});
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 {

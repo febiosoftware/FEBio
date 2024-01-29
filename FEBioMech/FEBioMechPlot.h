@@ -45,6 +45,14 @@ public:
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 
+//! Nodal rotations
+class FEPlotNodeRotation : public FEPlotNodeData
+{
+public:
+	FEPlotNodeRotation(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) { SetUnits(UNIT_RADIAN); }
+	bool Save(FEMesh& m, FEDataStream& a);
+};
+
 //-----------------------------------------------------------------------------
 //! Nodal velocities
 //!
