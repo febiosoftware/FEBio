@@ -63692,7 +63692,7 @@ and
  modulus and Poisson's ratio in the usual manner: 
 \begin_inset Formula 
 \[
-\begin{aligned}\lambda & =\frac{E}{\left(1+\nu\right)\left(1-2\nu\right)}\\
+\begin{aligned}\lambda & =\frac{E\nu}{\left(1+\nu\right)\left(1-2\nu\right)}\\
 \mu & =\frac{E}{2\left(1+\nu\right)}
 \end{aligned}
 \,.
