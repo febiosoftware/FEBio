@@ -65,7 +65,17 @@ SOFTWARE.*/
 #include "FEDataGenerator.h"
 #include "FEModule.h"
 #include <stdarg.h>
+#include <sstream>
 using namespace std;
+
+template <class T> int findComponentInVector(std::vector<T*>& v, FECoreBase* item)
+{
+	for (size_t i = 0; i < v.size(); ++i)
+	{
+		if (v[i] == item) return (int) i;
+	}
+	return -1;
+}
 
 //-----------------------------------------------------------------------------
 // Implementation class for the FEModel class
@@ -166,6 +176,23 @@ public:
 
 		return true;
 	}
+
+	std::pair<int, int> FindComponent(FECoreBase* pc)
+	{
+		int n = -1;
+		n = findComponentInVector<FEMaterial             >(m_MAT , pc); if (n >= 0) return { FEMATERIAL_ID, n };
+		n = findComponentInVector<FEBoundaryCondition    >(m_BC  , pc); if (n >= 0) return { FEBC_ID, n };
+		n = findComponentInVector<FEModelLoad            >(m_ML  , pc); if (n >= 0) return { FELOAD_ID, n };
+		n = findComponentInVector<FEInitialCondition     >(m_IC  , pc); if (n >= 0) return { FEIC_ID, n };
+		n = findComponentInVector<FESurfacePairConstraint>(m_CI  , pc); if (n >= 0) return { FESURFACEINTERFACE_ID, n };
+		n = findComponentInVector<FENLConstraint         >(m_NLC , pc); if (n >= 0) return { FENLCONSTRAINT_ID, n };
+		n = findComponentInVector<FELoadController       >(m_LC  , pc); if (n >= 0) return { FELOADCONTROLLER_ID, n };
+		n = findComponentInVector<FEAnalysis             >(m_Step, pc); if (n >= 0) return { FEANALYSIS_ID, n };
+		n = findComponentInVector<FEMeshAdaptor          >(m_MA  , pc); if (n >= 0) return { FEMESHADAPTOR_ID, n };
+		n = findComponentInVector<FEMeshDataGenerator    >(m_MD  , pc); if (n >= 0) return { FEMESHDATAGENERATOR_ID, n };
+		return { -1,-1 };
+	}
+
 
 public: // TODO: Find a better place for these parameters
 	FETimeInfo	m_timeInfo;			//!< current time value
@@ -860,6 +887,19 @@ void FEModel::AttachLoadController(FEParam* param, int lc)
 	m_imp->m_Param.push_back(lp);
 }
 
+//! return the number of load-controlled parameters
+int FEModel::LoadParams() const
+{
+	return (int)m_imp->m_Param.size();
+}
+
+//! return a load-controlled parameter
+FEParam* FEModel::GetLoadParam(int n)
+{
+	if ((n < 0) || (n >= LoadParams())) return nullptr;
+	return m_imp->m_Param[n].param;
+}
+
 //-----------------------------------------------------------------------------
 void FEModel::AttachLoadController(FEParam* p, FELoadController* plc)
 {
@@ -1503,6 +1543,71 @@ FEParamValue GetComponent(vec3d& r, const ParamString& c)
 	if (c == "y") return FEParamValue(0, &r.y, FE_PARAM_DOUBLE);
 	if (c == "z") return FEParamValue(0, &r.z, FE_PARAM_DOUBLE);
 	return FEParamValue();
+}
+
+//! return the parameter string for a parameter
+std::string FEModel::GetParamString(FEParam* p)
+{
+	if (p == nullptr) return string();
+
+	FECoreBase* pc = dynamic_cast<FECoreBase*>(p->parent());
+	if (pc == nullptr) return string();
+
+	string paramName = p->name();
+	while (pc->GetParent())
+	{
+		FECoreBase* parent = pc->GetParent();
+		FEProperty* prop = parent->FindProperty(pc);
+		if (prop == nullptr) return string();
+
+		if (prop->IsArray())
+		{
+			int n = -1;
+			for (int i = 0; i < prop->size(); ++i)
+				if (prop->get(i) == pc)
+				{
+					n = i;
+					break;
+				}
+			if (n == -1) return string();
+			stringstream ss;
+			ss << prop->GetName() << "[" << n << "].";
+			paramName = ss.str() + paramName;
+		}
+		else
+		{
+			paramName = string(prop->GetName()) + "." + paramName;
+		}
+		pc = parent;
+	}
+	if (paramName.empty()) return string();
+
+	std::pair<int, int> item = m_imp->FindComponent(pc);
+	int typeId = item.first;
+	int index = item.second;
+	if ((typeId == -1) || (index == -1)) return string();
+
+	string typeStr;
+	switch (typeId)
+	{
+	case FEMATERIAL_ID         : typeStr = "material"; break;
+	case FEBC_ID               : typeStr = "bc"; break;
+	case FELOAD_ID             : typeStr = "load"; break;
+	case FEIC_ID               : typeStr = "initial"; break;
+	case FESURFACEINTERFACE_ID : typeStr = "contact"; break;
+	case FENLCONSTRAINT_ID     : typeStr = "constraint"; break;
+	case FEMESHADAPTOR_ID      : typeStr = "mesh_adaptor"; break;
+	case FELOADCONTROLLER_ID   : typeStr = "load_controller"; break;
+	case FEMESHDATAGENERATOR_ID: typeStr = "mesh_data"; break;
+	case FEANALYSIS_ID         : typeStr = "step"; break;
+	default:
+		return string();
+	}
+
+	stringstream ss;
+	ss << "fem." << typeStr << "[" << index << "]." << paramName;
+	string s = ss.str();
+	return s;
 }
 
 //-----------------------------------------------------------------------------

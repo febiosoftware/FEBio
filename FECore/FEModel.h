@@ -167,6 +167,12 @@ public:	// --- Load controller functions ----
 	//! Detach a load controller from a parameter
 	bool DetachLoadController(FEParam* p);
 
+	//! return the number of load-controlled parameters
+	int LoadParams() const;
+
+	//! return a load-controlled parameter
+	FEParam* GetLoadParam(int n);
+
 	//! Get a load controller for a parameter (returns null if the param is not under load control)
 	FELoadController* GetLoadController(FEParam* p);
 
@@ -340,6 +346,9 @@ public: // --- parameter functions ---
 
 	//! return a reference to the named parameter
 	virtual FEParamValue GetParameterValue(const ParamString& param);
+
+	//! return the parameter string for a parameter
+	std::string GetParamString(FEParam* p);
 
 	//! Find property 
 	//! Note: Can't call this FindProperty, since this is already defined in base class
