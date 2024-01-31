@@ -412,7 +412,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 
 			char* szver = febio::getVersionString();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			fprintf(fp, "FEBio version  = %s (DEBUG)\n", szver);
 #else
 			fprintf(fp, "FEBio version  = %s\n", szver);

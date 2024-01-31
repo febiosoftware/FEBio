@@ -166,12 +166,13 @@ public:
 
 protected:
 	FEDofList	m_dofU, m_dofV;
-	FEDofList	m_dofSQ;
+	FEDofList	m_dofQ;
 	FEDofList	m_dofRQ;
 	FEDofList	m_dofSU, m_dofSV, m_dofSA;
-    
+	FEDofList	m_dofBW, m_dofBA;
+
 protected:
-    FERigidSolverNew	m_rigidSolver;
+	FERigidSolverNew	m_rigidSolver;
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

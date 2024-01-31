@@ -55,7 +55,6 @@ SOFTWARE.*/
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/FENLConstraint.h>
-#include <NumCore/NumCore.h>
 #include "FEThermoFluidAnalysis.h"
 
 //-----------------------------------------------------------------------------

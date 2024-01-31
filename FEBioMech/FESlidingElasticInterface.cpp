@@ -58,7 +58,7 @@ BEGIN_FECORE_CLASS(FESlidingElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_bflipm   , "flip_secondary"     );
     ADD_PARAMETER(m_bshellbs , "shell_bottom_primary"  );
     ADD_PARAMETER(m_bshellbm , "shell_bottom_secondary");
-    ADD_PARAMETER(m_offset   , "offset"             );
+    ADD_PARAMETER(m_offset   , "offset"             )->setUnits(UNIT_LENGTH);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

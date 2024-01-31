@@ -41,6 +41,40 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   4.5   1/16/2024
+
+===========================================================================
+
+New Features:
+* A simple beam formulation has been implemented in FEBio. The stress-strain relation is linear, but allows for large deformations. It can be used in both quasi-static and dynamic analysis.
+* Added option to stiffness_test diagnostic to output the actual and approximate stiffness matrices.
+* Added output_stride option to control data output frequency.
+* Added support for body loads to linear trusses. 
+* Added support for exporting stresses for linear trusses.
+
+Improvements:
+* Made parameters of muscle and tendon materials mappable.
+* Added unit specification to offset parameter in sliding-elastic contact interface
+* Added check to see if XML writer failed to create the file.
+* Modified "force" parameter definition of the surface "force" load so that it shows units and cannot be assigned a load controller.
+* Added units and initial values for "isotropic elastic" material.
+* Added check in reading Elements section of input file to make sure element IDs are increasing.
+* Added support for writing element data with NODE format to VTK file (as point data).
+
+Bug fixes:
+* Fixed some bugs in node-element list and element-element list classes.
+* Plot file now stores the FEFacetSets, not the FESurfaces because the latter can change in restarts, which could corrupt the plot file.
+* Fixed typo when reading rigid bc from 2.5 format. Also added check when setting parameter value to avoid crash.
+* Fixed bug in FindSSI function that assumed one-based node indexing.
+* Fixed issue with beam's reference frame. Line searches can now be used with beams.
+* Fixed minor issue in output of shell directors.
+
+Documentation:
+* The plot file format is now described in Appendix D of the FEBio user manual.
+
+
+===========================================================================
+
  R E L E A S E   4.4   11/15/2023
 
 ===========================================================================

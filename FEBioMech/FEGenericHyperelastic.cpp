@@ -83,7 +83,7 @@ bool FEGenericHyperelastic::BuildMathExpressions()
     MITEM WJJ = MDerive(m_WJ.GetExpression(), *m_WJ.Variable(2), 1);
 	m_WJJ.AddVariables(vars); m_WJJ.SetExpression(WJJ);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	MObj2String o2s;
 	string sW1 = o2s.Convert(m_W1); feLog("W1  = %s\n", sW1.c_str());
 	string sW2 = o2s.Convert(m_W2); feLog("W2  = %s\n", sW2.c_str());

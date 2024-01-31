@@ -37,7 +37,7 @@ DumpStream::DumpStream(FEModel& fem) : m_fem(fem)
 	m_bytes_serialized = 0;
 	m_ptr_lock = false;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_btypeInfo = false;
 #else
 	m_btypeInfo = false;

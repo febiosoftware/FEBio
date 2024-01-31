@@ -122,10 +122,12 @@ FEElementLibrary* FEElementLibrary::GetInstance()
         n = m_pThis->RegisterTraits(new FEQuad8NI   ); assert(n==FE_QUAD8NI  );
 		n = m_pThis->RegisterTraits(new FEQuad9G9   ); assert(n==FE_QUAD9G9  );
         n = m_pThis->RegisterTraits(new FEQuad9NI   ); assert(n==FE_QUAD9NI  );
+        n = m_pThis->RegisterTraits(new FEShellQuad4G4  ); assert(n==FE_SHELL_QUAD4G4 );
         n = m_pThis->RegisterTraits(new FEShellQuad4G8  ); assert(n==FE_SHELL_QUAD4G8 );
         n = m_pThis->RegisterTraits(new FEShellQuad4G12 ); assert(n==FE_SHELL_QUAD4G12);
         n = m_pThis->RegisterTraits(new FEShellQuad8G18 ); assert(n==FE_SHELL_QUAD8G18);
         n = m_pThis->RegisterTraits(new FEShellQuad8G27 ); assert(n==FE_SHELL_QUAD8G27);
+        n = m_pThis->RegisterTraits(new FEShellTri3G3   ); assert(n==FE_SHELL_TRI3G3);
         n = m_pThis->RegisterTraits(new FEShellTri3G6   ); assert(n==FE_SHELL_TRI3G6);
         n = m_pThis->RegisterTraits(new FEShellTri3G9   ); assert(n==FE_SHELL_TRI3G9);
         n = m_pThis->RegisterTraits(new FEShellTri6G14  ); assert(n==FE_SHELL_TRI6G14);
@@ -138,6 +140,9 @@ FEElementLibrary* FEElementLibrary::GetInstance()
 		n = m_pThis->RegisterTraits(new FE2DQuad8G9 ); assert(n==FE2D_QUAD8G9);
 		n = m_pThis->RegisterTraits(new FE2DQuad9G9 ); assert(n==FE2D_QUAD9G9);
 		n = m_pThis->RegisterTraits(new FELine2G1   ); assert(n==FE_LINE2G1);
+		n = m_pThis->RegisterTraits(new FEBeam2G1   ); assert(n==FE_BEAM2G1);
+		n = m_pThis->RegisterTraits(new FEBeam2G2   ); assert(n==FE_BEAM2G2);
+		n = m_pThis->RegisterTraits(new FEBeam3G2   ); assert(n==FE_BEAM3G2);
 	}
 	return m_pThis;
 }

@@ -44,9 +44,10 @@ class FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
-	// 32: added PLT_ELEMENTSET_SECTION
-	// 33: node IDs are now stored in Node Section
-	enum { PLT_VERSION = 0x0033 };
+	// 3.2: added PLT_ELEMENTSET_SECTION
+	// 3.3: node IDs are now stored in Node Section
+	// 3.4: added PLT_ELEM_LINE3
+	enum { PLT_VERSION = 0x0034 };
 
 	// file tags
 	enum { 
@@ -184,13 +185,14 @@ public:
 		PLT_ELEM_TRI10,
 		PLT_ELEM_PYRA5,
 		PLT_ELEM_TET5,
-        PLT_ELEM_PYRA13
+        PLT_ELEM_PYRA13,
+		PLT_ELEM_LINE3			// added in 3.4
     };
 
 	struct Surface
 	{
 		int			maxNodes;
-		FESurface*	surf;
+		FEFacetSet*	surf;
 	};
 
 	class PlotObject

@@ -35,7 +35,6 @@ SOFTWARE.*/
 #include "FEBioLoadsSection.h"
 #include "FEBioContactSection.h"
 #include "FEBioInitialSection.h"
-#include "FEBioBoundarySection3.h"
 
 //-----------------------------------------------------------------------------
 void FEBioStepSection::Parse(XMLTag& tag)

@@ -43,16 +43,20 @@ public:
 
 	void SetOutputFileName(const char* szfilename);
 
+	void SetOutputVariables(const std::string& xout, const std::string& yout);
+
 	std::vector<std::pair<double, double> > GetOutputData() { return m_data; }
 
 private:
 	static bool cb(FEModel* fem, unsigned int when, void* pd) { return ((FEMaterialTest*)pd)->cb(); }
 	bool cb();
 
-public:
+private:
 	FEDiagnosticScenario* m_pscn;
 	
 	const char* m_szoutfile;
+
+	std::string m_xout, m_yout;
 
 	FELogElemData* m_strain;
 	FELogElemData* m_stress;

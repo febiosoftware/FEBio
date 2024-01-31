@@ -314,3 +314,21 @@ public:
 
 	void SetTraits(FEElementTraits* pt);
 };
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEBeamElement : public FEElement
+{
+public:
+	FEBeamElement();
+
+	FEBeamElement(const FEBeamElement& el);
+
+	FEBeamElement& operator = (const FEBeamElement& el);
+
+	double* GaussWeights() { return &((FEBeamElementTraits*)(m_pT))->gw[0]; }
+	double* Hr(int n) { return ((FEBeamElementTraits*)(m_pT))->Gr[n]; }
+
+public:
+	double	m_L0;	// initial length of beam
+	mat3d	m_E;	// columns are local beam orientation
+};

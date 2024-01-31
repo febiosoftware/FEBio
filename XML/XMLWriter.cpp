@@ -226,6 +226,7 @@ bool XMLWriter::open(const char* szfile)
 	if (szfile == nullptr) return false;
 
     m_stream = new ofstream(szfile, std::ios_base::out);
+	if (m_stream && m_stream->fail()) return false;
 
 	// write the first line
     if(m_stream)

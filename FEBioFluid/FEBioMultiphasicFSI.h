@@ -36,7 +36,7 @@ namespace FEBioMultiphasicFSI {
     enum MULTIPHASIC_FSI_VARIABLE {
         DISPLACEMENT,
         VELOCITY,
-        SHELL_ROTATION,
+        ROTATION,
         SHELL_DISPLACEMENT,
         SHELL_VELOCITY,
         SHELL_ACCELERATION,

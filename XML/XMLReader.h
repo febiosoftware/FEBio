@@ -60,6 +60,7 @@ public:
 
 public:
 	void value(int& val) { val = atoi(m_val.c_str()); }
+	int value(int* v, int n);
 	int value(double* v, int n);
 	template <typename T> T value() { return T(0); }
 
@@ -193,12 +194,6 @@ public:
 	public:
 		Error(const std::string& err) : std::runtime_error(err) {}
 		Error(XMLTag& tag, const std::string& err);
-	};
-
-	// End of file was discovered 
-	class EndOfFile : public Error {
-	public: 
-		EndOfFile() : Error("End of file") {}
 	};
 
 	// the end of file was detected unexpectedly.

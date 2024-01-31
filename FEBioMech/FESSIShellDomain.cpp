@@ -315,8 +315,7 @@ void FESSIShellDomain::FindSSI()
             if (sldmn) {
                 // for each node in this shell domain, check the solid elements it belongs to
                 for (int j=0; j<psdom->Nodes(); ++j) {
-                    FENode& node = psdom->Node(j);
-                    int nid = node.GetID() - 1;
+                    int nid = psdom->NodeIndex(j);
                     int nval = NEL.Valence(nid);
                     FEElement** pe = NEL.ElementList(nid);
                     for (int k=0; k<nval; ++k)

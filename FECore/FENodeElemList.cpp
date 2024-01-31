@@ -157,37 +157,42 @@ void FENodeElemList::Create(FEMesh& mesh)
 	for (nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEDomain& d = mesh.Domain(nd);
-        if (d.Class() == FE_DOMAIN_SHELL) {
-            for (i=0; i<d.Elements(); ++i, ++nindex)
-            {
-                FEElement& el = d.ElementRef(i);
-                for (j=0; j<el.Nodes(); ++j)
-                {
-                    n = el.m_node[j];
-                    m_eref[m_pn[n] + m_nval[n]] = &el;
+		if (d.Class() == FE_DOMAIN_SHELL) {
+			for (i = 0; i < d.Elements(); ++i, ++nindex)
+			{
+				FEElement& el = d.ElementRef(i);
+				for (j = 0; j < el.Nodes(); ++j)
+				{
+					n = el.m_node[j];
+					m_eref[m_pn[n] + m_nval[n]] = &el;
 					m_iref[m_pn[n] + m_nval[n]] = nindex;
 					m_nval[n]++;
-                }
-            }
-        }
+				}
+			}
+		}
+		else nindex += d.Elements();
 	}
+	assert(nindex == mesh.Elements());
+	nindex = 0;
     for (nd=0; nd<mesh.Domains(); ++nd)
     {
         FEDomain& d = mesh.Domain(nd);
-        if (d.Class() != FE_DOMAIN_SHELL) {
-            for (i=0; i<d.Elements(); ++i, ++nindex)
-            {
-                FEElement& el = d.ElementRef(i);
-                for (j=0; j<el.Nodes(); ++j)
-                {
-                    n = el.m_node[j];
-                    m_eref[m_pn[n] + m_nval[n]] = &el;
+		if (d.Class() != FE_DOMAIN_SHELL) {
+			for (i = 0; i < d.Elements(); ++i, ++nindex)
+			{
+				FEElement& el = d.ElementRef(i);
+				for (j = 0; j < el.Nodes(); ++j)
+				{
+					n = el.m_node[j];
+					m_eref[m_pn[n] + m_nval[n]] = &el;
 					m_iref[m_pn[n] + m_nval[n]] = nindex;
 					m_nval[n]++;
-                }
-            }
-        }
+				}
+			}
+		}
+		else nindex += d.Elements();
     }
+	assert(nindex == mesh.Elements());
 }
 
 //-----------------------------------------------------------------------------

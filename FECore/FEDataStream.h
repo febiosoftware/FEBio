@@ -115,5 +115,9 @@ private:
 
 template <class T> inline T FEDataStream::get(int i) { return T(0.0);  }
 
+template <> inline float  FEDataStream::get<float >(int i) { return m_a[i]; }
 template <> inline double FEDataStream::get<double>(int i) { return (double) m_a[i]; }
 template <> inline vec3d  FEDataStream::get<vec3d >(int i) { return vec3d(m_a[3*i], m_a[3*i+1], m_a[3*i+2]); }
+template <> inline vec3f  FEDataStream::get<vec3f >(int i) { return vec3f(m_a[3*i], m_a[3*i+1], m_a[3*i+2]); }
+template <> inline mat3fs FEDataStream::get<mat3fs>(int i) { float* v = &m_a[6*i]; return mat3fs(v[0],v[1],v[2],v[3],v[4],v[5]); }
+template <> inline mat3f  FEDataStream::get<mat3f >(int i) { float* v = &m_a[9*i]; return mat3f(v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8]); }

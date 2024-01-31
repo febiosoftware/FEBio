@@ -172,3 +172,34 @@ class FECORE_API FEPlotSurfaceData : public FEPlotData
 public:
 	FEPlotSurfaceData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_SURFACE, t, s) {}
 };
+
+// helper class for parsing the type string of plot fields
+class FECORE_API FEPlotFieldDescriptor
+{
+private:
+	enum FilterType {
+		NO_FILTER,
+		NUMBER_FILTER,
+		STRING_FILTER
+	};
+
+public:
+	FEPlotFieldDescriptor(const std::string& typeString);
+
+	bool isValid() const { return m_valid; }
+
+	bool HasFilter() const { return (m_filterType != NO_FILTER); }
+	bool IsNumberFilter() const { return (m_filterType == NUMBER_FILTER); }
+	bool IsStringFilter() const { return (m_filterType == STRING_FILTER); }
+
+public:
+	string	fieldName;
+	string	alias;
+
+	int		numFilter = -1;
+	string	strFilter;
+
+private:
+	FilterType m_filterType = NO_FILTER;
+	bool m_valid = false;
+};

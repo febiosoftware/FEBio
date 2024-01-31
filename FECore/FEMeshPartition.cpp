@@ -151,7 +151,7 @@ bool FEMeshPartition::Init()
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// make sure all nodes are assigned a local index
 	for (int i = 0; i<nn; ++i)
 	{
