@@ -2,7 +2,6 @@ on:
   push:
     branches:
       - 'ci/*'
-      - 'windows-infrastructure'
   workflow_dispatch:
     inputs:
       runTests:

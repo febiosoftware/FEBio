@@ -2,7 +2,6 @@ on:
   push:
     branches:
       - 'ci/*'
-      - 'linux-infrastructure-wip'
   workflow_dispatch:
     inputs:
       runTests:
