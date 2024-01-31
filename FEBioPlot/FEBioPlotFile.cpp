@@ -315,81 +315,38 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 {
 	FECoreKernel& febio = FECoreKernel::GetInstance();
 
-	// create a copy so we can strip the alias and the filter from the name
-	char sz[1024] = { 0 };
-	strcpy(sz, szname);
+	FEPlotFieldDescriptor PD(szname);
+	if (!PD.isValid()) return false;
 
-	// This is the name that will be stored in the plot file
-	const char* szfield = sz;
-
-	// see if there is an alias defined
-	char* ch = strchr(sz, '=');
-	if (ch)
-	{
-		// replace the equal sign with a null character.
-		*ch++ = 0;
-
-		// make sure there is an alias
-		if (ch == 0) return false;
-
-		// store the alias instead of the actual name
-		szfield = ch;
-	}
-
-	// extract the filter
-	char* szflt = strchr(sz, '[');
-	int index = 0;
-	int fltType = 0;
-	if (szflt)
-	{
-		*szflt++ = 0;
-		char* ch = strrchr(szflt, ']');
-		if (ch == 0) return false;
-		*ch = 0;
-
-		// see if the filter is a number or a string
-		ch = strchr(szflt, '\'');
-		if (ch)
-		{
-			*szflt++ = 0;
-			// find the end character
-			char* ch2 = strrchr(szflt, '\'');
-			if (ch2 == 0) return false;
-			*ch2 = 0;
-		}
-		else
-		{
-			fltType = 1;
-			index = atoi(szflt);
-		}
-	}
+	const char* szfield = PD.fieldName.c_str();
 
 	// create the plot variable
-	FEPlotData* ps = fecore_new<FEPlotData>(sz, pfem);
+	FEPlotData* ps = fecore_new<FEPlotData>(szfield, pfem);
 	if (ps)
 	{
 		// set the optional item list and filter
 		ps->SetItemList(item);
-		if (szflt)
+		if (PD.HasFilter())
 		{
-			if (fltType == 0)
+			if (PD.IsStringFilter())
 			{
-				if (ps->SetFilter(szflt) == false) return false;
+				if (ps->SetFilter(PD.strFilter.c_str()) == false) return false;
 			}
-			else if (fltType == 1)
+			else if (PD.IsNumberFilter())
 			{
-				if (ps->SetFilter(index) == false) return false;
+				if (ps->SetFilter(PD.numFilter) == false) return false;
 			}
 		}
 
+		const char* sz = PD.alias.c_str();
 		// add the field to the plot file
 		ps->SetDomainName(szdom);
 		switch (ps->RegionType())
 		{
-		case FE_REGION_GLOBAL : return AddGlobalVariable(ps, szfield);
-		case FE_REGION_NODE   : return AddNodalVariable(ps, szfield, item);
-		case FE_REGION_DOMAIN : return AddDomainVariable(ps, szfield, item);
-		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, szfield, item);
+		case FE_REGION_GLOBAL : return AddGlobalVariable(ps, sz);
+		case FE_REGION_NODE   : return AddNodalVariable(ps, sz, item);
+		case FE_REGION_DOMAIN : return AddDomainVariable(ps, sz, item);
+		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, sz, item);
 		default:
 			assert(false);
 			return false;
@@ -436,35 +393,33 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 
 		// If we still didn't find it, maybe it's a model variable.
 		DOFS& dofs = pfem->GetDOFS();
-		int nvar = dofs.GetVariableIndex(sz);
+		int nvar = dofs.GetVariableIndex(szfield);
 		if (nvar >= 0)
 		{
 			int vartype = dofs.GetVariableType(nvar);
 			if (vartype == VAR_SCALAR)
 			{
-				ps = new FEBioPlotVariable(pfem, sz, PLT_FLOAT, FMT_NODE);
+				ps = new FEBioPlotVariable(pfem, szfield, PLT_FLOAT, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
 			else if (vartype == VAR_VEC3)
 			{
-				ps = new FEBioPlotVariable(pfem, sz, PLT_VEC3F, FMT_NODE);
+				ps = new FEBioPlotVariable(pfem, szfield, PLT_VEC3F, FMT_NODE);
 				return AddNodalVariable(ps, szname, item);
 			}
 			else if (vartype == VAR_ARRAY)
 			{
-				int ndofs = dofs.GetVariableSize(sz);
-				if (fltType == 0)
+				int ndofs = dofs.GetVariableSize(szfield);
+				int index = -1;
+				if (PD.IsNumberFilter()) index = PD.numFilter;
+				else if (PD.IsStringFilter())
 				{
-					index = -1;
-					if (szflt)
-					{
-
-						index = dofs.GetIndex(sz, szflt);
-						if ((index < 0) || (index >= ndofs)) return false;
-					}
+					const char* szflt = PD.strFilter.c_str();
+					index = dofs.GetIndex(szfield, szflt);
 				}
+				if ((index < 0) || (index >= ndofs)) return false;
 
-				ps = new FEPlotArrayVariable(pfem, sz, index);
+				ps = new FEPlotArrayVariable(pfem, szfield, index);
 				return AddDomainVariable(ps, szname, item);
 			}
 		}
