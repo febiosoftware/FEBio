@@ -12,12 +12,14 @@ LEVMAR_PATH="${LEVMAR_ARCHIVE%.*}"
 build_and_install() {
 	local source=$1
 	local patchfile=$2
-	local build_dir=cmake-build
 	pushd "$source" || exit 1
 	dos2unix CMakeLists.txt CMakeLists.txt
 	patch --ignore-whitespace -p0 < "$patchfile"
-	cmake -DCMAKE_POSITION_INDEPENDENT_CODE=On -DBUILD_DEMO:BOOLEAN=false . -B $build_dir
-	pushd $build_dir || exit 1
+	cmake  . -B cmbuild \
+		-DCMAKE_INSTALL_PREFIX="/usr/local" \
+		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+		-DBUILD_DEMO:BOOLEAN=false
+	pushd cmbuild || exit 1
 	make -j "$(nproc)"
 	sudo make install
 	popd || exit 1

@@ -13,7 +13,10 @@ build_and_install() {
 	local source=$1
 	pushd "$source" || exit 1
 	pushd src || exit 1
-	cmake .  -LA -B cmbuild -DCMAKE_INSTALL_PREFIX="/usr/local" -DHYPRE_HAVE_MPI=Off -DHYPRE_WITH_MPI=Off -DCMAKE_POSITION_INDEPENDENT_CODE=On
+	cmake .  -LA -B cmbuild \
+		-DCMAKE_INSTALL_PREFIX="/usr/local" \
+		-DHYPRE_HAVE_MPI=Off -DHYPRE_WITH_MPI=Off \
+		-DCMAKE_POSITION_INDEPENDENT_CODE=On
 	pushd cmbuild
 	make -j "$(nproc)"
 	sudo make install

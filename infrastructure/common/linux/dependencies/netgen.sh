@@ -2,9 +2,6 @@
 set -o errexit
 set -o verbose
 
-# shellcheck disable=1091
-. ./common-functions.sh
-
 NETGEN="https://github.com/NGSolve/netgen.git"
 BRANCH="v6.2.2307"
 
