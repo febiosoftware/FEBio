@@ -1,9 +1,12 @@
 call "%ONEAPI_ROOT%setvars.bat" --force
-cd %TEMP%
+pushd %SOURCE_PATH%
 git clone https://github.com/MmgTools/mmg.git
-cd mmg
-cmake . -LA -B cmbuild -DCMAKE_INSTALL_PREFIX="c:\local"
-cd cmbuild
+pushd mmg
+cmake . -LA -B cmbuild ^
+  -DCMAKE_INSTALL_PREFIX=%INSTALLATION_PATH%
+pushd cmbuild
 msbuild /P:Configuration=Release /m:%NUMBER_OF_PROCESSORS% INSTALL.vcxproj
-cd %TEMP%
+popd
+popd
 RD /S /Q mmg
+popd
