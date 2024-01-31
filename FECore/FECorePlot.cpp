@@ -628,6 +628,37 @@ bool FEPlotMeshData::Save(FEDomain& dom, FEDataStream& a)
 				return true;
 			}
 		}
+		else if (StorageFormat() == FMT_MULT)
+		{
+			if (DataType() == PLT_FLOAT)
+			{
+				int n = dom.Elements();
+				for (int i = 0; i < n; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					for (int j = 0; j < el.Nodes(); ++j)
+					{
+						double v = map->value<double>(i, j);
+						a << v;
+					}
+				}
+				return true;
+			}
+			else if (DataType() == PLT_VEC3F)
+			{
+				int n = dom.Elements();
+				for (int i = 0; i < n; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					for (int j = 0; j < el.Nodes(); ++j)
+					{
+						vec3d v = map->value<vec3d>(i, j);
+						a << v;
+					}
+				}
+				return true;
+			}
+		}
 		else if (map->StorageFormat() == FMT_MATPOINTS)
 		{
 			// Note that for this map type, the plot format was changed to FMT_MULT
