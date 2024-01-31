@@ -701,3 +701,54 @@ bool FEPlotMeshData::Save(FEMesh& mesh, FEDataStream& a)
 {
 	return false;
 }
+
+FEPlotFieldVariable::FEPlotFieldVariable(FEModel* pfem) : FEPlotNodeData(pfem, Var_Type::PLT_FLOAT, Storage_Fmt::FMT_ITEM)
+{
+
+}
+
+bool FEPlotFieldVariable::SetFilter(const char* sz)
+{
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int nvar = dofs.GetVariableIndex(sz);
+	if (nvar == -1) return false;
+	dofs.GetDOFList(sz, m_dofs);
+	int vartype = dofs.GetVariableType(nvar);
+	switch (vartype)
+	{
+	case VAR_SCALAR: SetVarType(PLT_FLOAT); break;
+	case VAR_VEC3  : SetVarType(PLT_VEC3F); break;
+	case VAR_ARRAY :
+	{
+		SetVarType(Var_Type::PLT_ARRAY);
+		SetArraySize(m_dofs.size());
+		vector<string> dofNames;
+		for (int i = 0; i < m_dofs.size(); ++i) dofNames.push_back(dofs.GetDOFName(nvar, i));
+		SetArrayNames(dofNames);
+	}
+	break;
+	default:
+		return false;
+	}
+	return true;
+}
+
+bool FEPlotFieldVariable::Save(FEMesh& mesh, FEDataStream& a)
+{
+	if (m_dofs.empty()) return false;
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int j = 0; j < m_dofs.size(); ++j)
+		{
+			a << node.get(m_dofs[j]);
+		}
+	}
+	return true;
+}
+
+void FEPlotFieldVariable::Serialize(DumpStream& ar)
+{
+	FEPlotNodeData::Serialize(ar);
+	ar & m_dofs;
+}
