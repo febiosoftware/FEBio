@@ -9,5 +9,4 @@ fi
 $SUDO apt-get update
 $SUDO apt-get install -y \
 	qt6-base-dev \
-	libqt6widgets6 \
-	libqt6core5compat6-dev
+	libqt6widgets6
