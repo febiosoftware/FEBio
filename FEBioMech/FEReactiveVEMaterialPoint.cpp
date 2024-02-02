@@ -71,7 +71,6 @@ void FEReactiveVEMaterialPoint::Init()
 	m_f.clear();
     
     m_Et = 0;
-    m_Em = 0;
     m_wv.clear();
     
     // don't forget to initialize the base class
@@ -81,8 +80,6 @@ void FEReactiveVEMaterialPoint::Init()
 void FEReactiveVEMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
 	FEMaterialPointData::Update(timeInfo);
-    
-    m_Em = max(m_Em, m_Et);
 }
 
 //-----------------------------------------------------------------------------
@@ -96,6 +93,10 @@ void FEReactiveVEMaterialPoint::Serialize(DumpStream& ar)
         int n = (int)m_Uv.size();
         ar << n;
         for (int i=0; i<n; ++i) ar << m_Uv[i] << m_Jv[i] << m_v[i] << m_f[i];
+        ar << m_Et;
+        int m = (int)m_wv.size();
+        ar << m;
+        for (int i=0; i<m; ++i) ar << m_wv[i];
     }
     else
     {
@@ -106,5 +107,9 @@ void FEReactiveVEMaterialPoint::Serialize(DumpStream& ar)
 		m_v.resize(n);
 		m_f.resize(n);
         for (int i=0; i<n; ++i) ar >> m_Uv[i] >> m_Jv[i] >> m_v[i] >> m_f[i];
+        ar >> m_Et;
+        int m;
+        ar >> m;
+        for (int i=0; i<m; ++i) ar >> m_wv[i];
     }
 }

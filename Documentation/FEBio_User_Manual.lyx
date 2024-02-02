@@ -77822,9 +77822,9 @@ literal "true"
  For a compressive reactive viscoelastic solid, the strain energy density
  is given by 
 \begin_inset Formula 
-\[
-\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)
-\]
+\begin{equation}
+\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\label{eq:rvs-sed}
+\end{equation}
 
 \end_inset
 
@@ -77910,21 +77910,21 @@ generation bonds reforming in an unloaded state during the time interval
 
 , Type I bond kinetics provides a solution of the form 
 \begin_inset Formula 
-\[
+\begin{equation}
 w^{u}\left(\mathbf{X},t\right)=\begin{cases}
 0 & t<u\\
 f^{u}\left(\mathbf{X},t\right) & u\leqslant t<v\\
 f^{u}\left(\mathbf{X},v\right)g\left(\mathbf{F}\left(v\right);\mathbf{X},t-v\right) & v\leqslant t
-\end{cases}
-\]
+\end{cases}\label{eq:rvs-mass-fractions}
+\end{equation}
 
 \end_inset
 
 where 
 \begin_inset Formula 
-\[
-f^{u}\left(\mathbf{X},t\right)=1-\sum\limits _{\gamma<u}w^{\gamma}\left(\mathbf{X},t\right)
-\]
+\begin{equation}
+f^{u}\left(\mathbf{X},t\right)=1-\sum\limits _{\gamma<u}w^{\gamma}\left(\mathbf{X},t\right)\label{eq:rvs-reformed-bond-fraction}
+\end{equation}
 
 \end_inset
 
@@ -77998,13 +77998,13 @@ generation.
 For Type II bond kinetics, the solution for the mass fractions is given
  by 
 \begin_inset Formula 
-\[
+\begin{equation}
 w^{u}\left(t\right)=\begin{cases}
 0 & t<u\\
 1-g\left(t-u\right) & u\leqslant t<v\\
 g\left(t-v\right)-g\left(t-u\right) & v\leqslant t
-\end{cases}\,.
-\]
+\end{cases}\,.\label{eq:rvs-mass-fractions-II}
+\end{equation}
 
 \end_inset
 
@@ -78033,9 +78033,9 @@ For all bond kinetics, it is also possible to constrain the occurrence of
 For a material with an uncoupled formulation, the strain energy density
  has the form 
 \begin_inset Formula 
-\[
-\Psi_{r}\left(\mathbf{F}\right)=U\left(J\right)+\tilde{\Psi}_{r}^{e}\left(\mathbf{\tilde{F}}\right)+\sum\limits _{u}w^{u}\tilde{\Psi}_{0}^{b}\left(\mathbf{\tilde{F}}^{u}\right)
-\]
+\begin{equation}
+\Psi_{r}\left(\mathbf{F}\right)=U\left(J\right)+\tilde{\Psi}_{r}^{e}\left(\mathbf{\tilde{F}}\right)+\sum\limits _{u}w^{u}\tilde{\Psi}_{0}^{b}\left(\mathbf{\tilde{F}}^{u}\right)\label{eq:rvs-sed-uncoupled}
+\end{equation}
 
 \end_inset
 
@@ -78341,9 +78341,52 @@ The <kinetics> parameter should be set to 1 for Type I bond kinetics or
  The <trigger> parameter should be set 0 when weak bonds break and reform
  in response to any form of the strain; it should be set to 1 when the trigger
  is distortional strain; and it should be set to 2 when the trigger is dilatatio
-nal strain.
- The <elastic> and <bond> materials may be selected from the list of unconstrain
-ed elastic materials given in Section
+nal strain,
+\begin_inset Formula 
+\begin{equation}
+\text{trigger}=\begin{cases}
+1\text{ for any strain} & \left\Vert \Delta\mathbf{E}\right\Vert \\
+2\text{ for distortional strain} & \left\Vert \dev\Delta\boldsymbol{\eta}\right\Vert \\
+3\text{ for dilatational strain} & \left|\ln\left(\det\Delta\mathbf{F}\right)\right|
+\end{cases}\label{eq:rvs-trigger}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Delta\mathbf{E}=\frac{1}{2}\left(\Delta\mathbf{F}^{T}\cdot\Delta\mathbf{F}-\mathbf{I}\right)$
+\end_inset
+
+ is the incremental Lagrange strain, 
+\begin_inset Formula $\Delta\boldsymbol{\eta}=\ln\Delta\mathbf{V}$
+\end_inset
+
+ is the incremental natural strain, where 
+\begin_inset Formula $\Delta\mathbf{V}$
+\end_inset
+
+ is the left stretch tensor of 
+\begin_inset Formula $\Delta\mathbf{F}$
+\end_inset
+
+, and 
+\begin_inset Formula $\Delta\mathbf{F}=\mathbf{F}\left(t_{n+1}\right)\cdot\mathbf{F}^{-1}\left(t^{m}\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+ is the current time and 
+\begin_inset Formula $t^{m}$
+\end_inset
+
+ is the birth time of the most recent weak bond generation.
+\end_layout
+
+\begin_layout Standard
+The <elastic> and <bond> materials may be selected from the list of unconstraine
+d elastic materials given in Section
 \begin_inset space ~
 \end_inset
 
@@ -78382,7 +78425,8 @@ uncoupled reactive viscoelastic
 \end_inset
 
 ).
- The <relaxation> material may be selected from the list provided in Section
+ The <relaxation> material may be selected from the list of reduced relaxation
+ functions provided in Section
 \begin_inset space ~
 \end_inset
 
@@ -78394,7 +78438,15 @@ reference "subsec:Relaxation-Functions"
 \end_inset
 
 .
- The <recruitment> material may be selected from the list provided in Section
+\end_layout
+
+\begin_layout Standard
+The <recruitment> material may be selected from the list of weak bond recruitmen
+t functions 
+\begin_inset Formula $F\left(\Xi\right)$
+\end_inset
+
+ provided in Section
 \begin_inset space ~
 \end_inset
 
@@ -78409,6 +78461,55 @@ noprefix "false"
 \end_inset
 
 .
+ This optional material specification can be used to model nonlinear viscoelasti
+city where the weak bond response becomes more significant with increasing
+ strain, substituting eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rvs-reformed-bond-fraction"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ with
+\begin_inset Formula 
+\begin{equation}
+f^{u}\left(\mathbf{X},t\right)=F\left(\Xi\left(t^{v}\right)\right)-\sum\limits _{\gamma<u}w^{\gamma}\left(\mathbf{X},t\right)\,,\quad t\ge t^{v}\,.\label{eq:rvs-reformed-with-recruitment}
+\end{equation}
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\Xi$
+\end_inset
+
+ is a measure of the current state of strain, similar to the measures shown
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:rvs-trigger"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Thus, 
+\begin_inset Formula $\Xi=\left\Vert \mathbf{E}\right\Vert $
+\end_inset
+
+, or 
+\begin_inset Formula $\Xi=\left\Vert \dev\boldsymbol{\eta}\right\Vert $
+\end_inset
+
+, or 
+\begin_inset Formula $\Xi=\left|\ln\left(\det\mathbf{F}\right)\right|$
+\end_inset
+
+, based on the choice of the <trigger> parameter.
 \end_layout
 
 \begin_layout Standard
@@ -78522,7 +78623,7 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-  <recruitment type="CDF power">
+  <recruitment type="recruitment power">
 \end_layout
 
 \begin_layout LyX-Code
@@ -81824,6 +81925,701 @@ The coefficients
 
 \end_layout
 
+\begin_layout Subsection
+Weak Bond Recruitment Functions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Weak-Bond-Recruitment"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Weak bond recruitment functions make it possible to model highly nonlinear
+ viscoelastic responses, where the viscous part of the response increases
+ with increasing strain.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Power
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-power"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a power weak bond recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment power
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{1}$
+\end_inset
+
+ (default=0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power exponent 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (default=2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<scale>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Scale factor 
+\begin_inset Formula $s$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the recruitment function is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=\mu_{0}+\mu_{1}\left(\frac{\Xi}{s}\right)^{\alpha},
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\Xi$
+\end_inset
+
+ is the measure of strain that triggers a new reactive weak bond generation.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment power">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu0>1</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu1>10</mu1>
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>2</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <scale>0.06</scale>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Exponential
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-exponential"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for an exponential weak bond recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment exponential
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{1}$
+\end_inset
+
+ (default=0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power exponent 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<scale>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Scale factor 
+\begin_inset Formula $s$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the recruitment function is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=\mu_{0}\exp\left(\mu_{1}\left(\frac{\Xi}{s}\right)^{\alpha}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\Xi$
+\end_inset
+
+ is the measure of strain that triggers a new reactive weak bond generation.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment exponential">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu0>1</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu1>2</mu1>
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>0.5</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <scale>0.06</scale>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Polynomial
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-poly"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a polynomial weak bond recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment polynomial
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+ (default=1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu1>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{1}$
+\end_inset
+
+ (default=0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu2>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{2}$
+\end_inset
+
+ (default=0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the recruitment function is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=\mu_{0}+\mu_{1}\Xi+\mu_{2}\Xi^{2}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\Xi$
+\end_inset
+
+ is the measure of strain that triggers a new reactive weak bond generation.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment poly">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu0>1</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu1>0</mu1>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu3>50</mu3>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Reactive Damage Mechanics
 \begin_inset CommandInset label
@@ -83531,277 +84327,6 @@ Example:
 
 \begin_layout LyX-Code
   <mu>1.0</mu>
-\end_layout
-
-\begin_layout LyX-Code
-  <Dmax>1</Dmax>
-\end_layout
-
-\begin_layout LyX-Code
-</damage>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Power
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:CDF-power"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The material type for a power c.d.f.
- is 
-\begin_inset Quotes eld
-\end_inset
-
-
-\shape italic
-CDF power
-\begin_inset Quotes erd
-\end_inset
-
-
-\shape default
-.
- The following material parameters must be defined:
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<mu0>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Parameter 
-\begin_inset Formula $\mu_{0}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<mu1>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Parameter 
-\begin_inset Formula $\mu_{1}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<alpha>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Power exponent 
-\begin_inset Formula $\alpha$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<scale>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Scale factor 
-\begin_inset Formula $s$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\begin_inset Formula $\Xi$
-\end_inset
-
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<Dmax>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Maximum allowable damage (optional, default is 1)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For this material the c.d.f.
- is given by 
-\begin_inset Formula 
-\[
-F\left(\Xi\right)=\mu_{0}+\mu_{1}\left(\frac{\Xi}{s}\right)^{\alpha}.
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Example:
-\end_layout
-
-\begin_layout LyX-Code
-<damage type="CDF power">
-\end_layout
-
-\begin_layout LyX-Code
-  <mu0>0.1</mu0>
-\end_layout
-
-\begin_layout LyX-Code
-  <mu1>10</mu1>
-\end_layout
-
-\begin_layout LyX-Code
-  <alpha>0.5</alpha>
-\end_layout
-
-\begin_layout LyX-Code
-  <scale>100</scale>
 \end_layout
 
 \begin_layout LyX-Code
@@ -109374,350 +109899,437 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
