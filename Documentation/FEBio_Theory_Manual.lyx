@@ -63220,7 +63220,15 @@ The linearization of
 \begin_inset Formula $\Delta x_{i}$
 \end_inset
 
- of the degrees of freedom takes the form
+ of the degrees of freedom employs
+\begin_inset Formula 
+\begin{equation}
+Df=\sum_{j}\frac{\partial f}{\partial x_{j}}\Delta x_{j}\label{eq:nlc-pm-f-linearization}
+\end{equation}
+
+\end_inset
+
+and takes the form
 \begin_inset Formula 
 \begin{equation}
 D\delta W=\left[\begin{array}{ccc}
@@ -63264,7 +63272,7 @@ c\frac{\partial f}{\partial x_{n}}
 
 when we drop out the virtual increments, as normally done in this type of
  analysis.
- 
+ The stiffness matrix is symmetric for this analysis.
 \end_layout
 
 \begin_layout Standard
@@ -63337,6 +63345,17 @@ Method of Lagrange Multipliers
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Lagrange-Multipliers"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Linear Work
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:LM-Linear-Work"
 
 \end_inset
 
@@ -63481,12 +63500,20 @@ when we drop out the virtual increments, as normally done in this type of
 \end_inset
 
 .
+ The stiffness matrix is symmetric for this analysis.
 \end_layout
 
 \begin_layout Standard
 The method of Lagrange multipliers increases the number of equations that
  need to be solved globally.
  However, it does not require users to specify additional parameters.
+ Unfortunately, this form of the method of Lagrange multipliers introduces
+ a zero coefficient in the stiffness matrix for the equation corresponding
+ to 
+\begin_inset Formula $\Delta\lambda$
+\end_inset
+
+, which may become problematic for some solvers.
 \end_layout
 
 \begin_layout Example
@@ -63535,6 +63562,269 @@ f
 Note that this stiffness matrix is singular, which emphasizes that these
  constraints are just that.
  They cannot be used alone to solve for the unknown degrees of freedom.
+\end_layout
+
+\begin_layout Subsubsection
+Quadratic Work
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:LM-Quadratic-Work"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To resolve the concern with having a zero entry on the diagonal of the stiffness
+ matrix, now consider that we let the work done by the constraint be represented
+ by 
+\begin_inset Formula $W=\frac{1}{2}\left(\lambda f\right)^{2}$
+\end_inset
+
+, where 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is the multiplier.
+ Then, we solve for 
+\begin_inset Formula $\delta W=\lambda f\left(\delta\lambda f+\lambda\delta f\right)=0$
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $\delta f$
+\end_inset
+
+ is given as per eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:nlc-virtual-force"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset Formula $\delta W=0$
+\end_inset
+
+ may be written in matrix form as
+\begin_inset Formula 
+\begin{equation}
+\delta W=\left[\begin{array}{cccc}
+\delta x_{1} & \cdots & \delta x_{n} & \delta\lambda\end{array}\right]\left[\begin{array}{c}
+\lambda^{2}f\frac{\partial f}{\partial x_{1}}\\
+\vdots\\
+\lambda^{2}f\frac{\partial f}{\partial x_{n}}\\
+\lambda f^{2}
+\end{array}\right]=0\,.\label{eq:nlc-lmq-virtual-work}
+\end{equation}
+
+\end_inset
+
+The linearization of 
+\begin_inset Formula $\delta W$
+\end_inset
+
+ along increments 
+\begin_inset Formula $\Delta x_{j}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Delta\lambda$
+\end_inset
+
+ takes the form
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W & =\delta\lambda f^{2}\Delta\lambda+\sum_{i}\delta x_{i}2\lambda f\frac{\partial f}{\partial x_{i}}\Delta\lambda+\delta\lambda\sum_{j}2\lambda f\frac{\partial f}{\partial x_{j}}\Delta x_{j}\\
+ & +\sum_{i}\delta x_{i}\sum_{j}\lambda^{2}\left(\frac{\partial f}{\partial x_{i}}\frac{\partial f}{\partial x_{j}}+f\frac{\partial^{2}f}{\partial x_{i}\partial x_{j}}\right)\Delta x_{j}
+\end{aligned}
+\,.\label{eq:nlc-lmq-linearization}
+\end{equation}
+
+\end_inset
+
+The corresponding stiffness matrix is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta W & =\left[\begin{array}{cccc}
+\delta x_{1} & \cdots & \delta x_{n} & \delta\lambda\end{array}\right]\cdot\\
+ & \left[\begin{array}{cccc}
+\lambda^{2}\left(\left(\frac{\partial f}{\partial x_{1}}\right)^{2}+f\frac{\partial^{2}f}{\partial x_{1}^{2}}\right) & \cdots & \lambda^{2}\left(\frac{\partial f}{\partial x_{1}}\frac{\partial f}{\partial x_{n}}+f\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}}\right) & 2\lambda f\frac{\partial f}{\partial x_{1}}\\
+\vdots & \ddots & \vdots & \vdots\\
+\lambda^{2}\left(\frac{\partial f}{\partial x_{n}}\frac{\partial f}{\partial x_{1}}+f\frac{\partial^{2}f}{\partial x_{n}\partial x_{1}}\right) & \cdots & \lambda^{2}\left(\left(\frac{\partial f}{\partial x_{n}}\right)^{2}+f\frac{\partial^{2}f}{\partial x_{n}^{2}}\right) & 2\lambda f\frac{\partial f}{\partial x_{n}}\\
+2\lambda f\frac{\partial f}{\partial x_{1}} & \cdots & 2\lambda f\frac{\partial f}{\partial x_{n}} & f^{2}
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}\\
+\Delta\lambda
+\end{array}\right]
+\end{aligned}
+\,,\label{eq:nlc-lmq-stiffness}
+\end{equation}
+
+\end_inset
+
+so that the global system of equations becomes supplemented by 
+\begin_inset Formula $\delta W+D\delta W\approx0$
+\end_inset
+
+, which reduces to
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & \left[\begin{array}{cccc}
+\lambda^{2}\left(\left(\frac{\partial f}{\partial x_{1}}\right)^{2}+f\frac{\partial^{2}f}{\partial x_{1}^{2}}\right) & \cdots & \lambda^{2}\left(\frac{\partial f}{\partial x_{1}}\frac{\partial f}{\partial x_{n}}+f\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}}\right) & 2\lambda f\frac{\partial f}{\partial x_{1}}\\
+\vdots & \ddots & \vdots & \vdots\\
+\lambda^{2}\left(\frac{\partial f}{\partial x_{n}}\frac{\partial f}{\partial x_{1}}+f\frac{\partial^{2}f}{\partial x_{n}\partial x_{1}}\right) & \cdots & \lambda^{2}\left(\left(\frac{\partial f}{\partial x_{n}}\right)^{2}+f\frac{\partial^{2}f}{\partial x_{n}^{2}}\right) & 2\lambda f\frac{\partial f}{\partial x_{n}}\\
+2\lambda f\frac{\partial f}{\partial x_{1}} & \cdots & 2\lambda f\frac{\partial f}{\partial x_{n}} & f^{2}
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}\\
+\Delta\lambda
+\end{array}\right]\\
+ & =-\left[\begin{array}{c}
+\lambda^{2}f\frac{\partial f}{\partial x_{1}}\\
+\vdots\\
+\lambda^{2}f\frac{\partial f}{\partial x_{n}}\\
+\lambda f^{2}
+\end{array}\right]
+\end{aligned}
+\label{eq:nlc-lmq-equations}
+\end{equation}
+
+\end_inset
+
+when we drop out the virtual increments, as normally done in this type of
+ analysis.
+ This system of equations requires 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ to part of the solution, and to be updated at each iteration 
+\begin_inset Formula $k$
+\end_inset
+
+ according to 
+\begin_inset Formula $\lambda^{\left(k+1\right)}\leftarrow\lambda^{\left(k\right)}+\Delta\lambda$
+\end_inset
+
+.
+ The stiffness matrix is symmetric for this analysis.
+ It is also interesting to note that the order of derivatives of the function
+ 
+\begin_inset Formula $f$
+\end_inset
+
+ remains the same as for the case of linear work (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:LM-Linear-Work"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+This quadratic formulation for the work generally produces a non-zero diagonal
+ entry, 
+\begin_inset Formula $f^{2}$
+\end_inset
+
+, for the equation used to solve for 
+\begin_inset Formula $\Delta\lambda$
+\end_inset
+
+.
+ This diagonal coefficient only reduces to zero when the constraint is finally
+ enforced.
+ However, when 
+\begin_inset Formula $f\approx0$
+\end_inset
+
+ several other terms in the stiffness matrix reduce to zero.
+ In that case the system of equations may be set to
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{cccc}
+\lambda^{2}\left(\frac{\partial f}{\partial x_{1}}\right)^{2} & \cdots & \lambda^{2}\frac{\partial f}{\partial x_{1}}\frac{\partial f}{\partial x_{n}} & 0\\
+\vdots & \ddots & \vdots & \vdots\\
+\lambda^{2}\frac{\partial f}{\partial x_{n}}\frac{\partial f}{\partial x_{1}} & \cdots & \lambda^{2}\left(\frac{\partial f}{\partial x_{n}}\right)^{2} & 0\\
+0 & \cdots & 0 & 1
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}\\
+\Delta\lambda
+\end{array}\right]=\left[\begin{array}{c}
+0\\
+\vdots\\
+0\\
+0
+\end{array}\right]\label{eq:nlc-lmq-f-zero}
+\end{equation}
+
+\end_inset
+
+to assist with convergence.
+\end_layout
+
+\begin_layout Example
+\begin_inset CommandInset label
+LatexCommand label
+name "exa:Linear-System-Multiplier-Quadratic"
+
+\end_inset
+
+For linear constraints of the form
+\begin_inset Formula 
+\[
+f=a_{0}+\sum_{j}a_{j}x_{j}=0
+\]
+
+\end_inset
+
+we find that 
+\begin_inset Formula $\frac{\partial f}{\partial x_{i}}=a_{i}$
+\end_inset
+
+ and second derivatives are all zero, so that the system of equations takes
+ the form
+\begin_inset Formula 
+\[
+\left[\begin{array}{cccc}
+\lambda^{2}a_{1}^{2} & \cdots & 0 & 2\lambda fa_{1}\\
+\vdots & \ddots & \vdots & \vdots\\
+0 & \cdots & \lambda^{2}a_{n}^{2} & 2\lambda fa_{n}\\
+2\lambda fa_{1} & \cdots & 2\lambda fa_{n} & f^{2}
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}\\
+\Delta\lambda
+\end{array}\right]=-\left[\begin{array}{c}
+\lambda^{2}fa_{1}\\
+\vdots\\
+\lambda^{2}fa_{n}\\
+\lambda f^{2}
+\end{array}\right]
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
