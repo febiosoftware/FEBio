@@ -136,6 +136,7 @@ SOFTWARE.*/
 #include "FEReactiveViscoelastic.h"
 #include "FEUncoupledReactiveViscoelastic.h"
 #include "FEBondRelaxation.h"
+#include "FEBondRecruitment.h"
 #include "FEDamageMaterial.h"
 #include "FEDamageMaterialUC.h"
 #include "FERVEDamageMaterial.h"
@@ -528,6 +529,12 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEBondRelaxationCSexp, "relaxation-CSexp");
     REGISTER_FECORE_CLASS(FEBondRelaxationCSexpDistUser, "relaxation-CSexp-dist-user");
 
+    // bond recruitment materials (used by reactive visco-elastic materials)
+    REGISTER_FECORE_CLASS(FEBondRecruitmentUser, "recruitment user");
+    REGISTER_FECORE_CLASS(FEBondRecruitmentPower, "recruitment power");
+    REGISTER_FECORE_CLASS(FEBondRecruitmentExp, "recruitment exponential");
+    REGISTER_FECORE_CLASS(FEBondRecruitmentPoly, "recruitment polynomial");
+
 	// damage cumulative distribution functions (used by damage materials)
 	REGISTER_FECORE_CLASS(FEDamageCDFSimo, "CDF Simo");
 	REGISTER_FECORE_CLASS(FEDamageCDFLogNormal, "CDF log-normal");
@@ -536,8 +543,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCDFPQP, "CDF quintic");
 	REGISTER_FECORE_CLASS(FEDamageCDFGamma, "CDF gamma");
 	REGISTER_FECORE_CLASS(FEDamageCDFUser, "CDF user");
-    REGISTER_FECORE_CLASS(FEDamageCDFPower, "CDF power");
-    REGISTER_FECORE_CLASS(FEDamageCDFExp, "CDF exponential");
 
 	// damage criterion (used by damage and plastic materials)
 	REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo");

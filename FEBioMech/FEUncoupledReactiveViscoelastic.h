@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEUncoupledMaterial.h"
 #include "FEBondRelaxation.h"
+#include "FEBondRecruitment.h"
 #include "FEReactiveVEMaterialPoint.h"
 #include "FEDamageMaterialUC.h"
 #include "FEUncoupledReactiveFatigue.h"
@@ -109,7 +110,7 @@ private:
     FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
 	FEUncoupledMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds
 	FEBondRelaxation*		m_pRelx;    //!< pointer to bond relaxation material for reactive bonds
-    FEDamageCDF*            m_pWCDF;    //!< pointer to weak bond recruitment CDF
+    FEBondRecruitment*      m_pWCDF;    //!< pointer to weak bond recruitment function
     
 private:
     FEDamageMaterialUC*                 m_pDmg; //!< pointer to base material if it is a FEDamageMaterialUC

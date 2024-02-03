@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FEBioThermoFluid.h"
+#include "FEThermoFluidSolver.h"
 #include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
 
@@ -42,6 +43,7 @@ FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceC
 {
     m_pfluid = nullptr;
     m_p = 0;
+    m_tol = 0;
     
     m_dofEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0);
     m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
@@ -66,9 +68,9 @@ bool FEThermoFluidPressureLoad::Init()
     if (m_pfluid == nullptr) return false;
     
     m_EQ.resize(m_surf.Nodes(), -1);
-    m_Lm.resize(m_surf.Nodes(), 0.0);
-    m_Lmp.resize(m_surf.Nodes(), 0.0);
-
+    m_Lm.resize(m_surf.Nodes(), 1.0);
+    m_Lmp.resize(m_surf.Nodes(), 1.0);
+    
     return true;
 }
 
@@ -177,9 +179,10 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& 
         double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
         double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
         double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
-        fe[0] = lam*dpJ;
-        fe[1] = lam*dpT;
-        fe[2] = p - p0;
+        double f = p - p0;
+        fe[0] = -lam*lam*f*dpJ;
+        fe[1] = -lam*lam*f*dpT;
+        fe[2] = -lam*f*f;
         vector<int> lm;
         UnpackLM(lm,i);
         R.Assemble(lm, fe);
@@ -195,23 +198,50 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
     FEElementMatrix ke;
     ke.resize(ndof, ndof);
     double alpha = tp.alphaf;
+    // get the residual tolerance from the solver
+    if (m_tol == 0) {
+        FESolver* solver = LS.GetSolver();
+        FEThermoFluidSolver* tfsolver = dynamic_cast<FEThermoFluidSolver*>(solver);
+        m_tol = pow(tfsolver->m_Ftol,2);
+        if (m_tol == 0) m_tol = 1e-6;
+    }
+    
+    // for now assume that the prescribed pressure is the same on the entire surface
+    FESurfaceElement& el = m_surf.Element(0);
+    // evaluate average prescribed pressure on this face
+    double p0 = 0;
+    for (int j=0; j<el.GaussPoints(); ++j) {
+        FEMaterialPoint* pt = el.GetMaterialPoint(j);
+        p0 += m_p(*pt);
+    }
+    p0 /= el.GaussPoints();
     
     for (int i=0; i<m_surf.Nodes(); ++i) {
         ke.zero();
         FENode& node = m_surf.Node(i);
         double e = node.get(m_dofEF)*alpha + node.get_prev(m_dofEF)*(1-alpha);
         double T = node.get(m_dofT)*alpha + node.get_prev(m_dofT)*(1-alpha);
+        double p = m_pfluid->GetElastic()->Pressure(e, T);
         double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
         double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
         double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
+        double f = p - p0;
         double dpJ2 = m_pfluid->GetElastic()->Tangent_Strain_Strain(e, T);
         double dpJT = m_pfluid->GetElastic()->Tangent_Strain_Temperature(e, T);
         double dpT2 = m_pfluid->GetElastic()->Tangent_Temperature_Temperature(e, T);
         
-        mat3d Kab(lam*dpJ2, lam*dpJT, dpJ,
-                  lam*dpJT, lam*dpT2, dpT,
-                  dpJ, dpT, 0);
-        ke.sub(0, 0, Kab);
+        mat3d Kab;
+        if (fabs(f) > m_tol) {
+            Kab = mat3d(lam*lam*(dpJ*dpJ+f*dpJ2), lam*lam*(dpJ*dpT+f*dpJT), 2*lam*f*dpJ,
+                      lam*lam*(dpJ*dpT+f*dpJT), lam*lam*(dpT*dpT+f*dpT2), 2*lam*f*dpT,
+                      2*lam*f*dpJ, 2*lam*f*dpT, f*f);
+        }
+        else {
+            Kab = mat3d(lam*lam*(dpJ*dpJ), lam*lam*(dpJ*dpT), 0,
+                        lam*lam*(dpJ*dpT), lam*lam*(dpT*dpT), 0,
+                        0, 0, 1.0);
+        }
+        ke.add(0, 0, Kab);
 
         // unpack LM
         vector<int> lm;
