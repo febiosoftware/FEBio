@@ -99,6 +99,8 @@ private:
 
 	void ElementInertialForce(FEBeamElement& el, std::vector<double>& fe);
 
+	void ElementBodyForce(FEBeamElement& el, std::vector<double>& fe, FEBodyForce& f);
+
 	void ElementMassMatrix(FEBeamElement& el, FEElementMatrix& ke);
 
 	void UpdateElement(FEBeamElement& el);
