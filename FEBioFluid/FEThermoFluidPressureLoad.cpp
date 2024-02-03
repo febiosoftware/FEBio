@@ -202,7 +202,7 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
     if (m_tol == 0) {
         FESolver* solver = LS.GetSolver();
         FEThermoFluidSolver* tfsolver = dynamic_cast<FEThermoFluidSolver*>(solver);
-        m_tol = pow(tfsolver->m_Ftol,2);
+        m_tol = (tfsolver) ? pow(tfsolver->m_Ftol,2) : 0;
         if (m_tol == 0) m_tol = 1e-6;
     }
     
