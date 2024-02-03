@@ -36,7 +36,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEBondRecruitmentUser, FEBondRecruitment)
-    ADD_PROPERTY(m_cdf, "cdf");
+    ADD_PROPERTY(m_cdf, "function");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

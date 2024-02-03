@@ -78078,7 +78078,7 @@ uncoupled reactive viscoelastic
 <lyxtabular version="3" rows="8" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
+<column alignment="left" valignment="middle" width="40page%">
 <column alignment="left" valignment="top">
 <row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -78090,7 +78090,7 @@ uncoupled reactive viscoelastic
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell multirow="3" alignment="left" valignment="middle" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -78148,7 +78148,7 @@ Strain invariants that trigger weak bond breakage and reformation
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -78181,7 +78181,7 @@ Bond mass fraction threshold
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -78305,7 +78305,7 @@ Reduced relaxation function
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -81942,13 +81942,6 @@ Weak bond recruitment functions make it possible to model highly nonlinear
  with increasing strain.
 \end_layout
 
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsubsection
 Power
 \begin_inset CommandInset label
@@ -82176,13 +82169,6 @@ Example:
 
 \begin_layout LyX-Code
 </recruitment>
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsubsection
@@ -82414,13 +82400,6 @@ Example:
 </recruitment>
 \end_layout
 
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsubsection
 Polynomial
 \begin_inset CommandInset label
@@ -82607,6 +82586,148 @@ Example:
 
 \begin_layout LyX-Code
   <mu3>50</mu3>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+User
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-user"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a user-defined bond recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment user
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="1" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<function>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specify a user function type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the recruitment function 
+\begin_inset Formula $F\left(\Xi\right)$
+\end_inset
+
+ is specified by the user.
+ It can be a constant, linear ramp, mathematical expression, a series of
+ points, or a step function.
+ It is the user's responsibility to ensure that the function starts at 1
+ and rises monotonically.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment user">
+\end_layout
+
+\begin_layout LyX-Code
+  <function type="point">
+\end_layout
+
+\begin_layout LyX-Code
+    <interpolate>linear</interpolate>
+\end_layout
+
+\begin_layout LyX-Code
+    <extend>constant</extend>
+\end_layout
+
+\begin_layout LyX-Code
+    <points>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>0,1</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>0.063,1</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>0.13,1.8</pt>
+\end_layout
+
+\begin_layout LyX-Code
+    </points>
+\end_layout
+
+\begin_layout LyX-Code
+  </function>
 \end_layout
 
 \begin_layout LyX-Code
@@ -84335,6 +84456,168 @@ Example:
 
 \begin_layout LyX-Code
 </damage>
+\end_layout
+
+\begin_layout Subsubsection
+User
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:CDF-user"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a user-defined CDF is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+CDF user
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="1" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<cdf>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specify a user function type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the CDF 
+\begin_inset Formula $F\left(\Xi\right)$
+\end_inset
+
+ is specified by the user.
+ It can be a constant, linear ramp, mathematical expression, a series of
+ points, or a step function.
+ It is the user's responsibility to ensure that the function rises monotonically
+ from 0 to 1 and does not exceed unity.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<damage type="CDF user">
+\end_layout
+
+\begin_layout LyX-Code
+  <cdf type="point">
+\end_layout
+
+\begin_layout LyX-Code
+    <interpolate>control points</interpolate>
+\end_layout
+
+\begin_layout LyX-Code
+    <extend>constant</extend>
+\end_layout
+
+\begin_layout LyX-Code
+    <points>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>0,0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>0.49,0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+	  <pt>0.5,0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>0.99,0</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>1.01,1</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>1.49,1</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>1.5,1</pt>
+\end_layout
+
+\begin_layout LyX-Code
+      <pt>2.5,1</pt>
+\end_layout
+
+\begin_layout LyX-Code
+    </points>
+\end_layout
+
+\begin_layout LyX-Code
+  </cdf>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
 \end_layout
 
 \begin_layout Standard
@@ -109899,437 +110182,350 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
-
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
-
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
-
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
-
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
-
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
-
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
-
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
-
 		</material>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
-
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
-
 			<points>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
-
 			</points>
 \end_layout
 
 \begin_layout Verbatim
-
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
-
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
-
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
-
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
-
 </febio_spec>
 \end_layout
 
