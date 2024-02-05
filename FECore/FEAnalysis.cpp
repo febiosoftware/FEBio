@@ -396,6 +396,8 @@ bool FEAnalysis::Solve()
 	double endtime = m_tend;
 	const double eps = endtime*1e-7;
 
+	int m_ntsiter = 0; //number of timestep iterations
+
 	// if we restarted we need to update the timestep
 	// before continuing
 	if (m_ntimesteps != 0)
@@ -469,8 +471,10 @@ bool FEAnalysis::Solve()
 		m_ntotiter += psolver->m_niter;
 		m_ntotrhs  += psolver->m_nrhs;
 
+		int min_restarts = 4;
+		
 		// see if we have converged
-		if (ierr == 0)
+		if ((ierr == 0) && (m_ntsiter > min_restarts) && (psolver->m_niter == 1))
 		{
 			bconv = true;
 
@@ -488,11 +492,22 @@ bool FEAnalysis::Solve()
 				break;
 			}
 
+			m_ntsiter = 0;
+			m_dt = m_dt0;
+
 			// reset retry counter
 			if (m_timeController) m_timeController->m_nretries = 0;
 
 			// update time step
 			if (m_timeController && (fem.GetCurrentTime() + eps < endtime)) m_timeController->AutoTimeStep(psolver->m_niter);
+		}
+		else if (ierr == 0) {
+
+			m_ntsiter += 1;
+
+			feLog("\n(Analysis)------- restarting at time : %lg restart number %d \n\n", fem.GetCurrentTime(), m_ntsiter);
+
+			m_dt = 0;
 		}
 		else 
 		{
