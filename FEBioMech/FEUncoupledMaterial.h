@@ -113,11 +113,47 @@ public:
 		}
     }
 
+    virtual double U(double J, double J_star) {
+        switch (m_npmodel) {
+            case 0: return 0.5*m_K*pow(log(J/J_star),2); break;    // FEBio default
+            case 1: return 0.25*m_K*(J/J_star*J/J_star - 2.0*log(J/J_star) - 1.0); break;    // NIKE3D's Ogden material
+            case 2: return 0.5*m_K*(J/J_star-1)*(J/J_star-1); break;      // ABAQUS
+            case 3: return 0.5*m_K*((J/J_star*J/J_star-1)/2-log(J/J_star)); break;      // ABAQUS - GOH
+            default: { assert(false); return 0; }
+        }
+    }
+
+	//! pressure, i.e. first derivative of U(J)
+	virtual double UJ(double J, double J_star) {
+        switch (m_npmodel) {
+            case 0: return m_K*log(J/J_star)/J; break;
+            case 1: return 0.5*m_K*(J/(J_star*J_star) - 1.0/J); break;
+            case 2: return m_K*(J/J_star-1); break;
+            case 3: return 0.5*m_K*(J/(J_star*J_star)-1.0/J); break;
+			default: { assert(false); return 0; }
+		}
+    }
+
+	//! second derivative of U(J) 
+	virtual double UJJ(double J, double J_star) {
+        switch (m_npmodel) {
+            case 0: return m_K*(1-log(J/J_star))/(J*J); break;
+            case 1: return 0.5*m_K*(1/(J_star*J_star) + 1.0/(J*J)); break;
+            case 2: return m_K/J_star; break;
+            case 3: return 0.5*m_K*(1/(J_star*J_star) + 1.0/(J*J)); break;
+			default: { assert(false); return 0; }
+		}
+    }
+
 public:
 	// incompressibility constraint fnc and derivs
 	double h  (double J) { return log(J); }
 	double hp (double J) { return 1.0 / J; }
 	double hpp(double J) { return -1.0 / (J*J); }
+
+	double h  (double J, double J_star) { return log(J/J_star); }
+	double hp (double J, double J_star) { return 1.0 / J; }
+	double hpp(double J, double J_star) { return -1.0 / (J*J); }
 
 public:
 	//! total Cauchy stress (do not overload!)

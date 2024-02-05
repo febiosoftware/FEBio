@@ -48,6 +48,7 @@ void FE3FieldElasticSolidDomain::ELEM_DATA::Serialize(DumpStream& ar)
 	ar & Lk;
 	ar & eJt;
 	ar & eJp;
+	ar & eJ_star;
 }
 
 //-----------------------------------------------------------------------------
@@ -91,7 +92,7 @@ bool FE3FieldElasticSolidDomain::Init()
 	for (int i=0; i<NE; ++i)
 	{
 		ELEM_DATA& d = m_Data[i];
-		d.eJ = d.eJt = d.eJp = 1.0;
+		d.eJ = d.eJt = d.eJp = d.eJ_star = 1.0;
 		d.ep = 0.0;
 		d.Lk = 0.0;
 	}
@@ -108,7 +109,7 @@ void FE3FieldElasticSolidDomain::Reset()
 	for (size_t i=0; i<NE; ++i)
 	{
 		ELEM_DATA& d = m_Data[i];
-        d.eJ = d.eJt = d.eJp = 1.0;
+        d.eJ = d.eJt = d.eJp = d.eJ_star = 1.0;
         d.ep = 0.0;
         d.Lk = 0.0;
 	}
@@ -239,12 +240,12 @@ void FE3FieldElasticSolidDomain::ElementDilatationalStiffness(FEModel& fem, int 
 	}
 
 	// get effective modulus
-	double k = pmi->UJJ(ed.eJ);
+	double k = pmi->UJJ(ed.eJ, ed.eJ_star);
 
 	// next, we add the Lagrangian contribution
 	// note that this term will always be zero if the material does not
 	// use the augmented lagrangian
-	k += ed.Lk*pmi->hpp(ed.eJ);
+	k += ed.Lk*pmi->hpp(ed.eJ, ed.eJ_star);
 
 	// divide by initial volume
 	k /= Ve;
@@ -447,6 +448,8 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 //! This function loops over all elements and updates the stress
 void FE3FieldElasticSolidDomain::Update(const FETimeInfo& tp)
 {
+
+	feLog("FE3FieldElasticSolidDomain Update ----- \n");
 	bool berr = false;
 	int NE = (int) m_Elem.size();
 	#pragma omp parallel for shared(NE, berr)
@@ -506,23 +509,28 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 	}
 
 	// calculate the average dilatation and pressure
-	double v = 0, vt = 0, V = 0;
+	double v = 0, vt = 0, V = 0, v_star = 0;
 	for (int n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
 		v += detJt(el, n, m_alphaf)*gw[n];
         vt+= detJt(el, n)*gw[n];
 		V += detJ0(el, n)*gw[n];
+		v_star += pt.m_J_star;
 	}
 
 	// calculate volume ratio
+	ed.eJ_star = v_star / nint;
 	ed.eJ = v / V;
     ed.eJt = vt / V;
-    double eUt = mat.U(ed.eJt);
-    double eUp = mat.U(ed.eJp);
+    double eUt = mat.U(ed.eJt, ed.eJ_star);
+    double eUp = mat.U(ed.eJp, ed.eJ_star);
 
 	// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
 	//      <--- Lag. mult. -->  <-- penalty -->
-	ed.ep = ed.Lk*mat.hp(ed.eJ) + mat.UJ(ed.eJ);
+	ed.ep = ed.Lk*mat.hp(ed.eJ, ed.eJ_star) + mat.UJ(ed.eJ, ed.eJ_star);
 //	ed.ep = mat.UJ(ed.eJ);
 
 	// loop over the integration points and calculate
