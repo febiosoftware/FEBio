@@ -39,9 +39,11 @@ protected:
 	{
 		double	eJ;		// average element jacobian at intermediate time
 		double	ep;		// average pressure
+		double	epp;	// average pressure at previous timestep
 		double	Lk;		// Lagrangian multiplier
         double  eJt;    // average element jacobian at current time
         double  eJp;    // average element jacobian at previous time
+        double  eJpp;    // average element jacobian at previous time
 		double	eJ_star;// average desired element jacobian at intermediate time
 
 		void Serialize(DumpStream& ar);
