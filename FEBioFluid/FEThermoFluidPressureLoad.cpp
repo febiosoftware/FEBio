@@ -103,6 +103,7 @@ bool FEThermoFluidPressureLoad::Init()
             break;
     }
     
+    m_surf.ProjectToNodes(m_p, m_pn);
     return true;
 }
 
@@ -156,6 +157,7 @@ void FEThermoFluidPressureLoad::Update(const std::vector<double>& Ui, const std:
 
 void FEThermoFluidPressureLoad::PrepStep()
 {
+    m_surf.ProjectToNodes(m_p, m_pn);
     if (m_laugon < 2) return;
     for (int i = 0; i < m_surf.Nodes(); ++i)
     {
@@ -189,16 +191,6 @@ void FEThermoFluidPressureLoad::Serialize(DumpStream& ar)
 //! \todo Why is this class not using the FESolver for assembly?
 void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    // for now assume that the prescribed pressure is the same on the entire surface
-    FESurfaceElement& el = m_surf.Element(0);
-    // evaluate average prescribed pressure on this face
-    double p0 = 0;
-    for (int j=0; j<el.GaussPoints(); ++j) {
-        FEMaterialPoint* pt = el.GetMaterialPoint(j);
-        p0 += m_p(*pt);
-    }
-    p0 /= el.GaussPoints();
-
     double alpha = tp.alphaf;
     
     if (m_laugon == 2) {
@@ -213,6 +205,7 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& 
             double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
             double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
             double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
+            double p0 = m_pn[i];
             double f = p - p0;
             fe[0] = -lam*f*dpJ;
             fe[1] = -lam*f*dpT;
@@ -234,6 +227,7 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& 
             double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
             double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
             double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
+            double p0 = m_pn[i];
             double f = p - p0;
             fe[0] = -lam*dpJ;
             fe[1] = -lam*dpT;
@@ -254,6 +248,7 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& 
             double p = m_pfluid->GetElastic()->Pressure(e, T);
             double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
             double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
+            double p0 = m_pn[i];
             double c = m_Lm[i] + m_eps*(p - p0);
             fe[0] = -c*dpJ;
             fe[1] = -c*dpT;
@@ -271,16 +266,6 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
 {
     double alpha = tp.alphaf;
     
-    // for now assume that the prescribed pressure is the same on the entire surface
-    FESurfaceElement& el = m_surf.Element(0);
-    // evaluate average prescribed pressure on this face
-    double p0 = 0;
-    for (int j=0; j<el.GaussPoints(); ++j) {
-        FEMaterialPoint* pt = el.GetMaterialPoint(j);
-        p0 += m_p(*pt);
-    }
-    p0 /= el.GaussPoints();
-    
     if (m_laugon == 2) {
         int ndof = 3;
         FEElementMatrix ke;
@@ -294,6 +279,7 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
             double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
             double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
             double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
+            double p0 = m_pn[i];
             double f = p - p0;
             double dpJ2 = m_pfluid->GetElastic()->Tangent_Strain_Strain(e, T);
             double dpJT = m_pfluid->GetElastic()->Tangent_Strain_Temperature(e, T);
@@ -334,6 +320,7 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
             double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
             double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
             double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
+            double p0 = m_pn[i];
             double f = p - p0;
             double dpJ2 = m_pfluid->GetElastic()->Tangent_Strain_Strain(e, T);
             double dpJT = m_pfluid->GetElastic()->Tangent_Strain_Temperature(e, T);
@@ -363,6 +350,7 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
             double e = node.get(m_dofEF)*alpha + node.get_prev(m_dofEF)*(1-alpha);
             double T = node.get(m_dofT)*alpha + node.get_prev(m_dofT)*(1-alpha);
             double p = m_pfluid->GetElastic()->Pressure(e, T);
+            double p0 = m_pn[i];
             double dpJ = m_pfluid->GetElastic()->Tangent_Strain(e, T);
             double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
             double c = m_Lm[i] + m_eps*(p - p0);
@@ -391,16 +379,6 @@ bool FEThermoFluidPressureLoad::Augment(int naug, const FETimeInfo& tp)
 {
     if (m_laugon != 1) return true;
     
-    // for now assume that the prescribed pressure is the same on the entire surface
-    FESurfaceElement& el = m_surf.Element(0);
-    // evaluate average prescribed pressure on this face
-    double p0 = 0;
-    for (int j=0; j<el.GaussPoints(); ++j) {
-        FEMaterialPoint* pt = el.GetMaterialPoint(j);
-        p0 += m_p(*pt);
-    }
-    p0 /= el.GaussPoints();
-    
     double alpha = tp.alphaf;
     
     // calculate lag multipliers
@@ -410,6 +388,7 @@ bool FEThermoFluidPressureLoad::Augment(int naug, const FETimeInfo& tp)
         double e = node.get(m_dofEF)*alpha + node.get_prev(m_dofEF)*(1-alpha);
         double T = node.get(m_dofT)*alpha + node.get_prev(m_dofT)*(1-alpha);
         double p = m_pfluid->GetElastic()->Pressure(e, T);
+        double p0 = m_pn[i];
         double lam = m_Lm[i] + m_eps*(p - p0);
         L0 += m_Lm[i]*m_Lm[i];
         L1 += lam*lam;
