@@ -626,7 +626,7 @@ bool FE3FieldElasticSolidDomain::Augment(int naug)
 		L0 = ed.Lk;
 		normL0 += L0*L0;
 
-		L1 = L0 + k*pmi->h(ed.eJ);
+		L1 = L0 + k*pmi->h(ed.eJ, ed.eJ_star);
 		normL1 += L1*L1;
 	}
 
@@ -654,9 +654,9 @@ bool FE3FieldElasticSolidDomain::Augment(int naug)
 		{
 			ELEM_DATA& ed = m_Data[n];
 
-			double hi = pmi->h(ed.eJ);
-			ed.Lk += k*pmi->h(ed.eJ);
-			ed.ep = ed.Lk*pmi->hp(ed.eJ) + k*log(ed.eJ)/ed.eJ;
+			double hi = pmi->h(ed.eJ, ed.eJ_star);
+			ed.Lk += k*pmi->h(ed.eJ, ed.eJ_star);
+			ed.ep = ed.Lk*pmi->hp(ed.eJ, ed.eJ_star) + k*log(ed.eJ/ed.eJ_star)/ed.eJ;
 		}
 	}
 
