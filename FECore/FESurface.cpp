@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "matrix.h"
 #include <FECore/log.h>
+#include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
@@ -2494,4 +2495,30 @@ void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, co
 		// assemble element matrix in global stiffness matrix
 		LS.Assemble(ke);
 	}
+}
+
+//-----------------------------------------------------------------------------
+// project FEParamDouble pd to nodes and store nodal values in vector<double> d
+void FESurface::ProjectToNodes(FEParamDouble& pd, std::vector<double>& d)
+{
+    d.assign(Nodes(), 0.0);
+    std::vector<int> nd(Nodes(),0);
+    for (int i=0; i<Elements(); ++i) {
+        FESurfaceElement& el = Element(i);
+        double ei[FEElement::MAX_INTPOINTS];
+        for (int j=0; j<el.GaussPoints(); ++j) {
+            FEMaterialPoint* pt = el.GetMaterialPoint(j);
+            ei[j] = pd(*pt);
+        }
+        double en[FEElement::MAX_NODES];
+        el.project_to_nodes(ei, en);
+        for (int j=0; j<el.Nodes(); ++j) {
+            d[el.m_lnode[j]] += en[j];
+            ++nd[el.m_lnode[j]];
+        }
+    }
+    
+    // evaluate average
+    for (int i=0; i<Nodes(); ++i)
+        if (nd[i]) d[i] /= nd[i];
 }

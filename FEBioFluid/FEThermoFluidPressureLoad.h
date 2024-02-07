@@ -82,6 +82,7 @@ protected:
     vector<int>     m_EQ;
     vector<double>  m_Lm, m_Lmp;
     FESurface       m_surf;
+    vector<double>  m_pn;       //!< prescribed fluid pressure at nodes
     
     FEThermoFluid*    m_pfluid; //!< pointer to thermo-fluid material
 
