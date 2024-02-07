@@ -192,7 +192,9 @@ void FERigidShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
 		UnpackLM(el, lm);
 
 		// assemble the residual
-		R.Assemble(el.m_node, lm, fe, true);
+		// NOTE: Setting bdom parameter to false to avoid crash, but
+		//       need to look further what effect this really has. 
+		R.Assemble(el.m_node, lm, fe, false);
 	}
 }
 
