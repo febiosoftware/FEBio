@@ -63282,9 +63282,9 @@ Lagrangian augmentation is performed at each iteration
 
  by letting
 \begin_inset Formula 
-\[
-\lambda^{\left(k+1\right)}\leftarrow\lambda^{\left(k\right)}+\varepsilon c
-\]
+\begin{equation}
+\lambda^{\left(k+1\right)}\leftarrow\lambda^{\left(k\right)}+\varepsilon f\label{eq:nlc-pm-augment}
+\end{equation}
 
 \end_inset
 
@@ -63306,9 +63306,9 @@ name "exa:Linear-Constraints-Penalty"
 
 For linear constraints of the form
 \begin_inset Formula 
-\[
-f=a_{0}+\sum_{j}a_{j}x_{j}=0
-\]
+\begin{equation}
+f=a_{0}+\sum_{j}a_{j}x_{j}=0\label{eq:nlc-linear-constraint}
+\end{equation}
 
 \end_inset
 
@@ -63319,7 +63319,7 @@ we find that
  and second derivatives are all zero, so that the system of equations takes
  the form
 \begin_inset Formula 
-\[
+\begin{equation}
 \left[\begin{array}{ccc}
 \varepsilon a_{1}^{2} & \cdots & \varepsilon a_{1}a_{n}\\
 \vdots & \ddots & \vdots\\
@@ -63332,8 +63332,8 @@ we find that
 ca_{1}\\
 \vdots\\
 ca_{n}
-\end{array}\right]
-\]
+\end{array}\right]\,.\label{eq:nlc-pm-linear}
+\end{equation}
 
 \end_inset
 
@@ -63538,7 +63538,7 @@ we find that
  and second derivatives are all zero, so that the system of equations takes
  the form
 \begin_inset Formula 
-\[
+\begin{equation}
 \left[\begin{array}{cccc}
 0 & \cdots & 0 & a_{1}\\
 \vdots & \ddots & \vdots & \vdots\\
@@ -63554,8 +63554,8 @@ a_{1} & \cdots & a_{n} & 0
 \vdots\\
 \lambda a_{n}\\
 f
-\end{array}\right]
-\]
+\end{array}\right]\label{eq:nlc-lm-linear}
+\end{equation}
 
 \end_inset
 
@@ -63699,6 +63699,36 @@ so that the global system of equations becomes supplemented by
 
 \end_inset
 
+Finally, we can divide each equation across by 
+\begin_inset Formula $\lambda$
+\end_inset
+
+, to reduce the magnitude of the residual.
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned} & \left[\begin{array}{cccc}
+\lambda\left(\left(\frac{\partial f}{\partial x_{1}}\right)^{2}+f\frac{\partial^{2}f}{\partial x_{1}^{2}}\right) & \cdots & \lambda\left(\frac{\partial f}{\partial x_{1}}\frac{\partial f}{\partial x_{n}}+f\frac{\partial^{2}f}{\partial x_{1}\partial x_{n}}\right) & 2f\frac{\partial f}{\partial x_{1}}\\
+\vdots & \ddots & \vdots & \vdots\\
+\lambda\left(\frac{\partial f}{\partial x_{n}}\frac{\partial f}{\partial x_{1}}+f\frac{\partial^{2}f}{\partial x_{n}\partial x_{1}}\right) & \cdots & \lambda\left(\left(\frac{\partial f}{\partial x_{n}}\right)^{2}+f\frac{\partial^{2}f}{\partial x_{n}^{2}}\right) & 2f\frac{\partial f}{\partial x_{n}}\\
+2f\frac{\partial f}{\partial x_{1}} & \cdots & 2f\frac{\partial f}{\partial x_{n}} & f^{2}/\lambda
+\end{array}\right]\left[\begin{array}{c}
+\Delta x_{1}\\
+\vdots\\
+\Delta x_{n}\\
+\Delta\lambda
+\end{array}\right]\\
+ & =-\left[\begin{array}{c}
+\lambda f\frac{\partial f}{\partial x_{1}}\\
+\vdots\\
+\lambda f\frac{\partial f}{\partial x_{n}}\\
+f^{2}
+\end{array}\right]
+\end{aligned}
+\label{eq:nlc-lmq-eqns-divided}
+\end{equation}
+
+\end_inset
+
 when we drop out the virtual increments, as normally done in this type of
  analysis.
  This system of equations requires 
@@ -63759,9 +63789,9 @@ This quadratic formulation for the work generally produces a non-zero diagonal
 \begin_inset Formula 
 \begin{equation}
 \left[\begin{array}{cccc}
-\lambda^{2}\left(\frac{\partial f}{\partial x_{1}}\right)^{2} & \cdots & \lambda^{2}\frac{\partial f}{\partial x_{1}}\frac{\partial f}{\partial x_{n}} & 0\\
+\lambda\left(\frac{\partial f}{\partial x_{1}}\right)^{2} & \cdots & \lambda\frac{\partial f}{\partial x_{1}}\frac{\partial f}{\partial x_{n}} & 0\\
 \vdots & \ddots & \vdots & \vdots\\
-\lambda^{2}\frac{\partial f}{\partial x_{n}}\frac{\partial f}{\partial x_{1}} & \cdots & \lambda^{2}\left(\frac{\partial f}{\partial x_{n}}\right)^{2} & 0\\
+\lambda\frac{\partial f}{\partial x_{n}}\frac{\partial f}{\partial x_{1}} & \cdots & \lambda\left(\frac{\partial f}{\partial x_{n}}\right)^{2} & 0\\
 0 & \cdots & 0 & 1
 \end{array}\right]\left[\begin{array}{c}
 \Delta x_{1}\\
@@ -63803,24 +63833,24 @@ we find that
  and second derivatives are all zero, so that the system of equations takes
  the form
 \begin_inset Formula 
-\[
+\begin{equation}
 \left[\begin{array}{cccc}
-\lambda^{2}a_{1}^{2} & \cdots & 0 & 2\lambda fa_{1}\\
+\lambda a_{1}^{2} & \cdots & 0 & 2fa_{1}\\
 \vdots & \ddots & \vdots & \vdots\\
-0 & \cdots & \lambda^{2}a_{n}^{2} & 2\lambda fa_{n}\\
-2\lambda fa_{1} & \cdots & 2\lambda fa_{n} & f^{2}
+0 & \cdots & \lambda a_{n}^{2} & 2fa_{n}\\
+2fa_{1} & \cdots & 2fa_{n} & f^{2}/\lambda
 \end{array}\right]\left[\begin{array}{c}
 \Delta x_{1}\\
 \vdots\\
 \Delta x_{n}\\
 \Delta\lambda
 \end{array}\right]=-\left[\begin{array}{c}
-\lambda^{2}fa_{1}\\
+\lambda fa_{1}\\
 \vdots\\
-\lambda^{2}fa_{n}\\
-\lambda f^{2}
-\end{array}\right]
-\]
+\lambda fa_{n}\\
+f^{2}
+\end{array}\right]\,.\label{eq:nlc-lmq-linear}
+\end{equation}
 
 \end_inset
 

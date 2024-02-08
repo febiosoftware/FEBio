@@ -109,6 +109,17 @@ vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)
 	return vec3d(vx, vy, vz);
 }
 
+void FEMathValueVec3::Serialize(DumpStream& ar)
+{
+	FEVec3dValuator::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	if (ar.IsLoading())
+	{
+		Init();
+	}
+}
+
 //---------------------------------------------------------------------------------------
 FEVec3dValuator* FEMathValueVec3::copy()
 {

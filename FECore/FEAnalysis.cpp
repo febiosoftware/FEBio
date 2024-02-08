@@ -514,11 +514,11 @@ bool FEAnalysis::Solve()
 			// We failed to converge. 
 			bconv = false;
 
-			// This will allow states that have negative Jacobians to be stored
-			fem.DoCallback(CB_MINOR_ITERS);
-
 			// Report the sad news to the user.
 			feLog("\n\n------- failed to converge at time : %lg\n\n", fem.GetCurrentTime());
+
+			// This will allow states that have negative Jacobians to be stored
+			fem.DoCallback(CB_TIMESTEP_FAILED);
 
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_timeController && (m_timeController->m_nretries < m_timeController->m_maxretries))

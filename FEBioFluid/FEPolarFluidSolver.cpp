@@ -544,30 +544,24 @@ void FEPolarFluidSolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
-    // update flexible nodes
-    int n;
-    for (int i=0; i<mesh.Nodes(); ++i)
-    {
-        FENode& node = mesh.Node(i);
-        
-        // fluid relative velocity
-        if ((n = node.m_ID[m_dofW[0]]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofW[1]]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofW[2]]) >= 0) Ui[n] += ui[n];
-        
-        // fluid angular velocity
-        if ((n = node.m_ID[m_dofG[0]]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofG[1]]) >= 0) Ui[n] += ui[n];
-        if ((n = node.m_ID[m_dofG[2]]) >= 0) Ui[n] += ui[n];
-        
-        // fluid dilatation
-        if ((n = node.m_ID[m_dofEF[0]]) >= 0) Ui[n] += ui[n];
-    }
-
     for (int i = 0; i < fem.NonlinearConstraints(); ++i)
     {
         FENLConstraint* plc = fem.NonlinearConstraint(i);
         if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
+    }
+
+    // TODO: This is a hack!
+    // The problem is that I only want to call the domain's IncrementalUpdate during
+    // the quasi-Newtoon loop. However, this function is also called after the loop
+    // converges. The emap parameter is used here to detect wether we are inside the
+    // loop (emap == false), or not (emap == true).
+    if (emap == false)
+    {
+        for (int i = 0; i < mesh.Domains(); ++i)
+        {
+            FEDomain& dom = mesh.Domain(i);
+            dom.IncrementalUpdate(ui, true);
+        }
     }
 }
 
@@ -833,7 +827,6 @@ bool FEPolarFluidSolver::Quasin()
             normEm = normEi;
         }
         
-        // calculate norms
         // update all degrees of freedom
         for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
         
@@ -845,6 +838,9 @@ bool FEPolarFluidSolver::Quasin()
         
         // update dilatations
         for (int i = 0; i<m_nfeq; ++i) m_Fi[i] += s*m_fi[i];
+        
+        // update other increments (e.g., Lagrange multipliers)
+        UpdateIncrements(m_Ui, m_ui, false);
         
         // calculate the norms
         normR1 = m_R1*m_R1;

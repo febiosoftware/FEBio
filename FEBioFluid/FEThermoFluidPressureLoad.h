@@ -50,9 +50,6 @@ public:
     //! calculate load vector (there is none for this load)
     void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
     
-    //! set the dilatation
-    void Update() override;
-    
     //! initialize
     bool Init() override;
     
@@ -62,6 +59,9 @@ public:
     //! serialization
     void Serialize(DumpStream& ar) override;
 
+    //! augmentation
+    bool Augment(int naug, const FETimeInfo& tp) override;
+    
     // return the surface
     FESurface* GetSurface() override { return &m_surf; }
 
@@ -82,12 +82,17 @@ protected:
     vector<int>     m_EQ;
     vector<double>  m_Lm, m_Lmp;
     FESurface       m_surf;
-    double          m_tol;
+    vector<double>  m_pn;       //!< prescribed fluid pressure at nodes
     
     FEThermoFluid*    m_pfluid; //!< pointer to thermo-fluid material
 
 public:
     FEParamDouble   m_p;        // prescribed pressure
-    
+    int             m_laugon;
+    double          m_tol;
+    double          m_eps;
+    int             m_naugmin;
+    int             m_naugmax;
+
     DECLARE_FECORE_CLASS();
 };

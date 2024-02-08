@@ -75,6 +75,11 @@ public:
 
     //! used by JFNK
     void Update2(const vector<double>& ui) override;
+    
+    void UpdateConstraints();
+    
+    //! update DOF increments
+    void UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap);
     //}
     
     //{ --- Solution functions ---
