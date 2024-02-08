@@ -111,7 +111,6 @@ public:
     // allocate equations
     int InitEquations(int neq) override;
     
-protected:
     void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
     void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
     
