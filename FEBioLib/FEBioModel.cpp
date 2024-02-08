@@ -529,7 +529,7 @@ void FEBioModel::WritePlot(unsigned int nevent)
 
 			if (ndebug == 1)
 			{
-				if ((nevent == CB_INIT) || (nevent == CB_MODEL_UPDATE) || (nevent == CB_MINOR_ITERS) || (nevent == CB_SOLVED) || (nevent == CB_REMESH))
+				if ((nevent == CB_INIT) || (nevent == CB_MODEL_UPDATE) || (nevent == CB_MINOR_ITERS) || (nevent == CB_SOLVED) || (nevent == CB_REMESH) || (nevent == CB_TIMESTEP_FAILED))
 				{
 					bout = true;
 				}

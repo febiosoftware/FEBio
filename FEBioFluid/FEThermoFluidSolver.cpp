@@ -503,6 +503,17 @@ void FEThermoFluidSolver::UpdateKinematics(vector<double>& ui)
             n.set(m_dofAT, aTt);
         }
     }
+    // update nonlinear constraints (needed for updating Lagrange Multiplier)
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* nlc = fem.NonlinearConstraint(i);
+        if (nlc->IsActive()) nlc->Update(m_Ui, ui);
+    }
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc->IsActive()) spc->Update(ui);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -554,6 +565,52 @@ void FEThermoFluidSolver::Update(vector<double>& ui)
     // update model state
 //    GetFEModel()->Update();
     UpdateModel();
+}
+
+//-----------------------------------------------------------------------------
+//! Update DOF increments
+void FEThermoFluidSolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap)
+{
+    FEModel& fem = *GetFEModel();
+    
+    // get the mesh
+    FEMesh& mesh = fem.GetMesh();
+    
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
+        if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
+    }
+    
+    // TODO: This is a hack!
+    // The problem is that I only want to call the domain's IncrementalUpdate during
+    // the quasi-Newtoon loop. However, this function is also called after the loop
+    // converges. The emap parameter is used here to detect wether we are inside the
+    // loop (emap == false), or not (emap == true).
+    if (emap == false)
+    {
+        for (int i = 0; i < mesh.Domains(); ++i)
+        {
+            FEDomain& dom = mesh.Domain(i);
+            dom.IncrementalUpdate(ui, true);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Update nonlinear constraints
+void FEThermoFluidSolver::UpdateConstraints()
+{
+    FEModel& fem = *GetFEModel();
+    FETimeInfo& tp = fem.GetTime();
+    tp.currentIteration = m_niter;
+    
+    // Update all nonlinear constraints
+    for (int i = 0; i<fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* pci = fem.NonlinearConstraint(i);
+        if (pci->IsActive()) pci->Update();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -675,6 +732,12 @@ void FEThermoFluidSolver::PrepStep()
     // update stresses
     fem.Update();
     
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
+        if (plc && plc->IsActive()) plc->PrepStep();
+    }
+    
     // see if we need to do contact augmentations
     m_baugment = false;
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
@@ -782,7 +845,6 @@ bool FEThermoFluidSolver::Quasin()
             normEm = normEi;
         }
         
-        // calculate norms
         // update all degrees of freedom
         for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
             
@@ -795,6 +857,9 @@ bool FEThermoFluidSolver::Quasin()
         // update temperatures
         for (int i = 0; i<m_nteq; ++i) m_Ti[i] += s*m_ti[i];
             
+        // update other increments (e.g., Lagrange multipliers)
+        UpdateIncrements(m_Ui, m_ui, false);
+        
         // calculate the norms
         normR1 = m_R1*m_R1;
         normv  = (m_vi*m_vi)*(s*s);

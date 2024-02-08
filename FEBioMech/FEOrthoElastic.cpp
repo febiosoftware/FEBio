@@ -33,12 +33,12 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEOrthoElastic, FEElasticMaterial)
-	ADD_PARAMETER(m_E1 , FE_RANGE_GREATER(0.0), "E1")->setLongName("E1 modulus");
-	ADD_PARAMETER(m_E2 , FE_RANGE_GREATER(0.0), "E2")->setLongName("E2 modulus");
-	ADD_PARAMETER(m_E3 , FE_RANGE_GREATER(0.0), "E3")->setLongName("E3 modulus");
-	ADD_PARAMETER(m_G12, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12")->setLongName("G12 shear modulus");
-	ADD_PARAMETER(m_G23, FE_RANGE_GREATER_OR_EQUAL(0.0), "G23")->setLongName("G23 shear modulus");
-	ADD_PARAMETER(m_G31, FE_RANGE_GREATER_OR_EQUAL(0.0), "G31")->setLongName("G31 shear modulus");
+	ADD_PARAMETER(m_E1 , FE_RANGE_GREATER(0.0), "E1")->setLongName("E1 modulus")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_E2 , FE_RANGE_GREATER(0.0), "E2")->setLongName("E2 modulus")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_E3 , FE_RANGE_GREATER(0.0), "E3")->setLongName("E3 modulus")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_G12, FE_RANGE_GREATER_OR_EQUAL(0.0), "G12")->setLongName("G12 shear modulus")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_G23, FE_RANGE_GREATER_OR_EQUAL(0.0), "G23")->setLongName("G23 shear modulus")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_G31, FE_RANGE_GREATER_OR_EQUAL(0.0), "G31")->setLongName("G31 shear modulus")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_v12, "v12");
 	ADD_PARAMETER(m_v23, "v23");
 	ADD_PARAMETER(m_v31, "v31");
