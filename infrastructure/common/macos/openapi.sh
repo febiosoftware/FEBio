@@ -1,5 +1,10 @@
 #!/bin/bash
-set -ex
+set -e
+
+if [ -f /opt/intel/oneapi/setvars.sh ]; then
+	echo "Oneapi was previously installed"
+	exit 0
+fi
 
 TARGET_DIR="/tmp/intel"
 ONEAPI_FILE="m_BaseKit_p_2023.2.0.49398_offline"

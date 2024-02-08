@@ -1,6 +1,8 @@
 on:
   push:
-    branches: [ ci/* ]
+    branches:
+      - 'ci/develop'
+      - 'macos-infrastructure'
   workflow_dispatch:
     inputs:
       runTests:

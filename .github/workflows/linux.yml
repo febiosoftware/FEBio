@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - 'ci/*'
+      - 'ci/develop'
   workflow_dispatch:
     inputs:
       runTests:
