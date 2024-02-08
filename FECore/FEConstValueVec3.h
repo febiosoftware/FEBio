@@ -71,6 +71,8 @@ public:
 
 	bool UpdateParams() override;
 
+	void Serialize(DumpStream& ar) override;
+
 private:
 	std::string			m_expr;
 	FEMathExpression	m_math[3];

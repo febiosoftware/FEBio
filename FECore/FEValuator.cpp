@@ -23,28 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEValuator.h"
+#include "FEModelParam.h"
 
+FEValuator::FEValuator(FEModel* fem) : FECoreBase(fem), m_param(nullptr) {}
 
+FEValuator::~FEValuator() {}
 
-#pragma once
-#include "FECoreBase.h"
+void FEValuator::SetModelParam(FEModelParam* p) { m_param = p; }
 
-class FEMaterialPoint;
+FEModelParam* FEValuator::GetModelParam() { return m_param; }
 
-class FEModelParam;
-
-// Base class for evaluating model parameters
-class FECORE_API FEValuator : public FECoreBase
+void FEValuator::Serialize(DumpStream& ar)
 {
-public:
-	FEValuator(FEModel* fem);
-	virtual ~FEValuator();
-
-	void SetModelParam(FEModelParam* p);
-	FEModelParam* GetModelParam();
-
-	void Serialize(DumpStream& ar) override;
-
-private:
-	FEModelParam*	m_param;	//!< the model param that is using this valuator
-};
+	FECoreBase::Serialize(ar);
+	if (!ar.IsShallow()) ar& m_param;
+}
