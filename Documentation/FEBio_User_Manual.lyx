@@ -107161,6 +107161,14 @@ literal "false"
 
 \end_inset
 
+] and is further detailed in [
+\begin_inset CommandInset citation
+LatexCommand citep
+key "ALLAN2022105342"
+literal "false"
+
+\end_inset
+
 ].
  
 \end_layout
