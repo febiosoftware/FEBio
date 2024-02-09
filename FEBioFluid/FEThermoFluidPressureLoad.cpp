@@ -52,7 +52,7 @@ FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceC
     m_pfluid = nullptr;
     m_p = 0;
     m_tol = 1e-6;
-    m_laugon = 2;
+    m_laugon = 0;
     m_eps = 1.0;
     m_naugmin = 0;
     m_naugmax = 10;
@@ -88,8 +88,8 @@ bool FEThermoFluidPressureLoad::Init()
         case 2:
         {
             m_EQ.resize(m_surf.Nodes(), -1);
-            m_Lm.resize(m_surf.Nodes(), 1.0);
-            m_Lmp.resize(m_surf.Nodes(), 1.0);
+            m_Lm.resize(m_surf.Nodes(), 0.0);
+            m_Lmp.resize(m_surf.Nodes(), 0.0);
         }
             break;
         default:
@@ -124,7 +124,7 @@ void FEThermoFluidPressureLoad::UnpackLM(vector<int>& lm, int n)
     FENode& node = m_surf.Node(n);
     lm.push_back(node.m_ID[m_dofEF]);
     lm.push_back(node.m_ID[m_dofT]);
-    if (m_laugon >= 2) lm.push_back(m_EQ[n]);
+    if (m_laugon > 1) lm.push_back(m_EQ[n]);
 }
 
 //-----------------------------------------------------------------------------
@@ -161,6 +161,7 @@ void FEThermoFluidPressureLoad::PrepStep()
     }
 }
 
+//-----------------------------------------------------------------------------
 void FEThermoFluidPressureLoad::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
 {
     if (m_laugon < 2) return;
@@ -179,7 +180,7 @@ void FEThermoFluidPressureLoad::Serialize(DumpStream& ar)
     ar & m_pfluid;
     ar & m_dofT & m_dofEF;
     if (m_laugon == 1) ar & m_Lm;
-    else if (m_laugon >= 2)
+    else if (m_laugon > 1)
         ar & m_Lm & m_Lmp;
 }
 
@@ -202,9 +203,9 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& 
             double dpT = m_pfluid->GetElastic()->Tangent_Temperature(e, T);
             double lam = m_Lm[i]*alpha + m_Lmp[i]*(1-alpha);
             double f = p - m_pn[i];
-            fe[0] = -lam*f*dpJ;
-            fe[1] = -lam*f*dpT;
-            fe[2] = -f*f/2;
+            fe[0] = -lam*dpJ;
+            fe[1] = -lam*dpT;
+            fe[2] = -f;
             vector<int> lm;
             UnpackLM(lm,i);
             R.Assemble(lm, fe);
@@ -257,15 +258,9 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
             double dpJT = m_pfluid->GetElastic()->Tangent_Strain_Temperature(e, T);
             double dpT2 = m_pfluid->GetElastic()->Tangent_Temperature_Temperature(e, T);
             
-            mat3d Kab;
-            if (fabs(f) > m_tol)
-                Kab = mat3d(lam*(dpJ*dpJ+f*dpJ2), lam*(dpJ*dpT+f*dpJT), f*dpJ,
-                            lam*(dpT*dpJ+f*dpJT), lam*(dpT*dpT+f*dpT2), f*dpT,
-                            f*dpJ, f*dpT, 0);
-            else
-                Kab = mat3d(lam*dpJ*dpJ, lam*dpJ*dpT, 0,
-                            lam*dpT*dpJ, lam*dpT*dpT, 0,
-                            0, 0, 1);
+            mat3d Kab(lam*dpJ2, lam*dpJT, dpJ,
+                      lam*dpJT, lam*dpT2, dpT,
+                      dpJ, dpT, 0);
             ke.add(0, 0, Kab);
             
             // unpack LM

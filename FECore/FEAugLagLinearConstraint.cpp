@@ -76,7 +76,7 @@ void FEAugLagLinearConstraint::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FELinearConstraintSet, FENLConstraint)
-    ADD_PARAMETER(m_laugon , "laugon"        )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0QLAGMULT\0");
+    ADD_PARAMETER(m_laugon , "laugon"        )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
 	ADD_PARAMETER(m_tol    , "tol");
 	ADD_PARAMETER(m_eps    , "penalty");
     ADD_PARAMETER(m_rhs    , "rhs");
@@ -238,25 +238,6 @@ void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
             R[m_EQ[m]] -= f;
         }
     }
-    else if (m_laugon == 3) {
-        double alpha = tp.alphaf;
-        
-        for (int m=0; m<M; ++m, ++im)
-        {
-            FEAugLagLinearConstraint& LC = *(*im);
-            int n = (int)LC.m_dof.size();
-            double f = constraint(LC) - m_rhs;
-            double lam = m_Lm[m]*alpha + m_Lmp[m]*(1-alpha);
-            FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin();
-            for (int i=0; i<n; ++i, ++it)
-            {
-                int neq = mesh.Node((*it)->m_node - 1).m_ID[(*it)->m_bc];
-                if (neq >= 0)
-                    R[neq] -= lam * f * (*it)->m_val;
-            }
-            R[m_EQ[m]] -= f*f/2;
-        }
-    }
     else {
         for (int m=0; m<M; ++m, ++im)
         {
@@ -306,44 +287,6 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
                 ke[i][n] = (*it)->m_val;
             }
             ke[n][n] = 0;
-            
-            en.resize(n+1);
-            elm.resize(n+1);
-            it = LC.m_dof.begin();
-            for (int i=0; i<n; ++i, ++it)
-            {
-                en[i] = (*it)->m_node - 1;
-                int neq = mesh.Node((*it)->m_node - 1).m_ID[(*it)->m_bc];
-                elm[i] = neq;
-            }
-            en[n] = -1;
-            elm[n] = m_EQ[m];
-            ke.SetNodes(en);
-            ke.SetIndices(elm);
-            LS.Assemble(ke);
-        }
-    }
-    else if (m_laugon == 3) {
-        double alpha = tp.alphaf;
-        for (int m=0; m<M; ++m, ++im)
-        {
-            FEAugLagLinearConstraint& LC = *(*im);
-            int n = (int)LC.m_dof.size();
-            double lam = m_Lm[m]*alpha + m_Lmp[m]*(1-alpha);
-            double f = constraint(LC) - m_rhs;
-            ke.resize(n+1, n+1);
-            ke.zero();
-            FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin(), jt;
-            for (int i=0; i<n; ++i, ++it)
-            {
-                ke[n][i] = f * (*it)->m_val;
-                ke[i][n] = f * (*it)->m_val;
-                jt = LC.m_dof.begin();
-                for (int j=0; j<n; ++j, ++jt) {
-                    ke[i][j] = lam * (*it)->m_val * (*jt)->m_val;
-                }
-            }
-            ke[n][n] = (fabs(f) > m_tol) ? 0 : 1.0;
             
             en.resize(n+1);
             elm.resize(n+1);
@@ -417,11 +360,6 @@ bool FELinearConstraintSet::Init()
         m_EQ.resize(M, -1);
         m_Lm.resize(M, 0.0);
         m_Lmp.resize(M, 0.0);
-    }
-    else if (m_laugon == 3) {
-        m_EQ.resize(M, -1);
-        m_Lm.resize(M, 1.0);
-        m_Lmp.resize(M, 1.0);
     }
 
     return true;
