@@ -52,6 +52,15 @@ public:
     //! Get the surface
     FESurface* GetSurface() override { return &m_surf; }
 
+    // allocate equations
+    int InitEquations(int neq) override;
+    
+protected:
+    void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+    void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
+    
+    void PrepStep() override;
+    
 public:
     //! serialize data to archive
     void Serialize(DumpStream& ar) override;
