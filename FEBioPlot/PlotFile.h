@@ -119,6 +119,8 @@ public:
 	//! see if the plot file is valid
 	virtual bool IsValid() const = 0;
 
+	virtual void Serialize(DumpStream& ar) {}
+
 public:
 	Dictionary& GetDictionary() { return m_dic; }
 
