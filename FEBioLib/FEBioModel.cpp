@@ -1316,6 +1316,8 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 
 		SerializePlotData(ar);
 
+		if (m_plot) m_plot->Serialize(ar);
+
 		// data records
 		SerializeDataStore(ar);
 	}
@@ -1363,6 +1365,8 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 			m_plot = xplt;
 		}
 		else if (data.GetPlotFileType() == "vtk") m_plot = new VTKPlotFile(this);
+
+		if (m_plot) m_plot->Serialize(ar);
 
 		if (m_pltAppendOnRestart)
 		{
