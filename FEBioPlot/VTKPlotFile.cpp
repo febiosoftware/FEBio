@@ -102,9 +102,9 @@ void VTKPlotFile::Serialize(DumpStream& ar)
 bool VTKPlotFile::Write(float ftime, int flag)
 {
 	FEModel& fem = *GetFEModel();
-
+	
 	std::stringstream ss;
-	ss << m_filename << "." << m_count++ << ".vtk";
+	ss << m_filename << "." << ftime << ".vtk";
 	string fileName = ss.str();
 	
 	m_fp = fopen(fileName.c_str(), "wt");
