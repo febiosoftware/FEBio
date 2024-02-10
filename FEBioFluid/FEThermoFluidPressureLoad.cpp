@@ -51,7 +51,7 @@ FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceC
 {
     m_pfluid = nullptr;
     m_p = 0;
-    m_tol = 1e-6;
+    m_tol = 0.1;
     m_laugon = 0;
     m_eps = 1.0;
     m_naugmin = 0;
