@@ -63,6 +63,9 @@ namespace NumCore
 	// inf-norm of a vector
 	NUMCORE_API double infNorm(const std::vector<double>& x);
 
+	// 1-norm of a vector
+	NUMCORE_API double oneNorm(const std::vector<double>& x);
+
 	// print matrix sparsity pattern to svn file
 	NUMCORE_API void print_svg(CompactMatrix* m, std::ostream &out, int i0 = 0, int j0 = 0, int i1 = -1, int j1 = -1);
 
