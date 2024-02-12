@@ -106,6 +106,8 @@ m_dofBW(pfem), m_dofBA(pfem)
 	m_al_inc = 0.0;
 	m_al_ds = 0.0;
 
+	m_solutionNorm.push_back(ConvergenceInfo());
+
     // get the DOF indices
 	// TODO: Can this be done in Init, since there is no error checking
 	if (pfem)
@@ -912,6 +914,10 @@ bool FESolidSolver2::Quasin()
 			normEi = fabs(m_ui*m_R0);
 			normUi = fabs(m_ui*m_ui);
 			normEm = normEi;
+
+			m_residuNorm.norm0 = normRi;
+			m_energyNorm.norm0 = normEi;
+			m_solutionNorm[0].norm0 = normUi;
 		}
 
 		// calculate actual displacement increment
@@ -928,6 +934,10 @@ bool FESolidSolver2::Quasin()
 		normu  = ui*ui;
 		normU  = m_Ui*m_Ui;
 		normE1 = fabs(ui*m_R1);
+
+		m_residuNorm.norm = normR1;
+		m_energyNorm.norm = normR1;
+		m_solutionNorm[0].norm = normu;
 
 		// check for nans
 		if (ISNAN(normR1)) throw NANInResidualDetected();
