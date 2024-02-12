@@ -2,14 +2,13 @@ on:
   push:
     branches:
       - 'ci/develop'
-      - 'macos-infrastructure'
   workflow_dispatch:
     inputs:
       runTests:
         description: "Run tests?"
-        required: false
+        required: true
         type: boolean
-        default: false
+        default: true
 jobs:
   call_workflow:
     uses: febiosoftware/febio-workflows/.github/workflows/macos-reusable.yml@develop

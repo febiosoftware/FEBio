@@ -6,9 +6,9 @@ on:
     inputs:
       runTests:
         description: "Run tests?"
-        required: false
+        required: true
         type: boolean
-        default: false
+        default: true
 jobs:
   call_workflow:
     uses: febiosoftware/febio-workflows/.github/workflows/linux-reusable.yml@develop
