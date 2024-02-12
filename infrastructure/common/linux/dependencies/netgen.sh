@@ -13,6 +13,7 @@ build_and_install() {
 	pushd $branch || exit 1
 	git submodule update --init --recursive
 	cmake .  -LA -B cmbuild \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_INSTALL_PREFIX="/usr/local" \
 		-DUSE_CCACHE:BOOL=OFF \
 		-DUSE_CGNS:BOOL=OFF \

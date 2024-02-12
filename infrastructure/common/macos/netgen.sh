@@ -4,7 +4,8 @@ pushd $SOURCE_PATH
 git clone --depth 1 --branch "v6.2.2307" "https://github.com/NGSolve/netgen.git"
 pushd netgen
  cmake .  -L -B cmbuild \
-	-DCMAKE_INSTALL_PREFIX="$INSTALLATION_PATH" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX="$INSTALLATION_PATH" \
   -DUSE_CCACHE:BOOL=OFF \
   -DUSE_CGNS:BOOL=OFF \
   -DUSE_CSG:BOOL=ON \
@@ -24,11 +25,12 @@ pushd netgen
   -DUSE_SUPERBUILD:BOOL=OFF \
   -DENABLE_CPP_CORE_GUIDELINES_CHECK:BOOL=OFF \
   -DENABLE_UNIT_TESTS:BOOL=OFF \
-	-DCMAKE_OSX_ARCHITECTURES="x86_64" \
-	-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+  -DCMAKE_OSX_ARCHITECTURES="x86_64" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
 
 pushd cmbuild
-make install -j $(sysctl -n hw.ncpu)
+make -j $(sysctl -n hw.ncpu)
+make install
 popd
 popd
 rm -rf netgen

@@ -7,6 +7,7 @@ git clone --depth 1 --branch "%BRANCH%" "%SOURCE%" "%BRANCH%"
 pushd %BRANCH%
 git submodule update --init --recursive
 cmake .  -LA -B cmbuild ^
+  -DCMAKE_BUILD_TYPE=Release ^
   -DCMAKE_INSTALL_PREFIX="c:/usr/local" ^
   -DUSE_CCACHE:BOOL=OFF ^
   -DUSE_CGNS:BOOL=OFF ^
