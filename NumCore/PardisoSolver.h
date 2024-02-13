@@ -51,7 +51,7 @@ public:
 
 	void PrintConditionNumber(bool b);
 
-	double condition_number();
+	double ConditionNumber() override;
 
 	void UseIterativeFactorization(bool b);
 

@@ -43,6 +43,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEConstraintFrictionlessWall::FEConstraintFrictionlessWall(FEModel* pfem) : FESurfaceConstraint(pfem), m_surf(pfem), m_lc(pfem)
 {
+    m_binit = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -50,68 +51,42 @@ FEConstraintFrictionlessWall::FEConstraintFrictionlessWall(FEModel* pfem) : FESu
 void FEConstraintFrictionlessWall::Activate()
 {
     // don't forget to call base class
-    FENLConstraint::Activate();
-    m_lc.Activate();
+    FESurfaceConstraint::Activate();
+    
+    if (m_binit == false) {
+        
+        // evaluate the nodal normals
+        m_surf.UpdateNodeNormals();
+        
+        // get the dofs
+        int dof_wx = GetDOFIndex("wx");
+        int dof_wy = GetDOFIndex("wy");
+        int dof_wz = GetDOFIndex("wz");
+
+        // create linear constraints
+        // for a frictionless wall the constraint on (vx, vy, vz) is
+        // nx*vx + ny*vy + nz*vz = 0
+        for (int i=0; i<m_surf.Nodes(); ++i) {
+            FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
+            FENode& node = m_surf.Node(i);
+            vec3d nn = m_surf.NodeNormal(i);
+            pLC->AddDOF(node.GetID(), dof_wx, nn.x);
+            pLC->AddDOF(node.GetID(), dof_wy, nn.y);
+            pLC->AddDOF(node.GetID(), dof_wz, nn.z);
+            // add the linear constraint to the system
+            m_lc.add(pLC);
+        }
+        m_lc.Init();
+        m_lc.Activate();
+        m_binit = true;
+    }
 }
 
 //-----------------------------------------------------------------------------
 bool FEConstraintFrictionlessWall::Init()
 {
     // initialize surface
-    m_surf.Init();
-    
-    // evaluate the nodal normals
-    int N = m_surf.Nodes(), jp1, jm1;
-    vec3d y[FEElement::MAX_NODES], n;
-    vector<vec3d>m_nn(N,vec3d(0,0,0));
-    
-    // loop over all elements
-    for (int i=0; i<m_surf.Elements(); ++i)
-    {
-        FESurfaceElement& el = m_surf.Element(i);
-        int ne = el.Nodes();
-        
-        // get the nodal coordinates
-        for (int j=0; j<ne; ++j) y[j] = m_surf.Node(el.m_lnode[j]).m_rt;
-        
-        // calculate the normals
-        for (int j=0; j<ne; ++j)
-        {
-            jp1 = (j+1)%ne;
-            jm1 = (j+ne-1)%ne;
-            n = (y[jp1] - y[j]) ^ (y[jm1] - y[j]);
-            m_nn[el.m_lnode[j]] += n;
-        }
-    }
-    
-    // normalize all vectors
-    for (int i=0; i<N; ++i) m_nn[i].unit();
-
-    // get the dofs
-    int dof_wx = GetDOFIndex("wx");
-    int dof_wy = GetDOFIndex("wy");
-    int dof_wz = GetDOFIndex("wz");
-
-    // create linear constraints
-    // for a frictionless wall the constraint on (vx, vy, vz) is
-    // nx*vx + ny*vy + nz*vz = 0
-    for (int i=0; i<N; ++i) {
-        FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-        for (int j=0; j<3; ++j) {
-            FENode& node = m_surf.Node(i);
-            switch (j) {
-            case 0: pLC->AddDOF(node.GetID(), dof_wx, m_nn[i].x); break;
-            case 1: pLC->AddDOF(node.GetID(), dof_wy, m_nn[i].y); break;
-            case 2: pLC->AddDOF(node.GetID(), dof_wz, m_nn[i].z); break;
-            default:
-                break;
-            }
-        }
-        // add the linear constraint to the system
-        m_lc.add(pLC);
-    }
-   
-    return m_lc.Init();
+    return m_surf.Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -120,3 +95,7 @@ void FEConstraintFrictionlessWall::LoadVector(FEGlobalVector& R, const FETimeInf
 void FEConstraintFrictionlessWall::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
 bool FEConstraintFrictionlessWall::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }
 void FEConstraintFrictionlessWall::BuildMatrixProfile(FEGlobalMatrix& M) { m_lc.BuildMatrixProfile(M); }
+int FEConstraintFrictionlessWall::InitEquations(int neq) { return m_lc.InitEquations(neq); }
+void FEConstraintFrictionlessWall::Update(const std::vector<double>& Ui, const std::vector<double>& ui) { m_lc.Update(Ui, ui); }
+void FEConstraintFrictionlessWall::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) { m_lc.UpdateIncrements(Ui, ui); }
+void FEConstraintFrictionlessWall::PrepStep() { m_lc.PrepStep(); }
