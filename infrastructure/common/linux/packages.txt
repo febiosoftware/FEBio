@@ -27,3 +27,4 @@ libinsighttoolkit5-dev
 swig
 libxorg-gtest-dev
 jq
+yasm
