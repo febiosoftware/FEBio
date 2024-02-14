@@ -195,28 +195,13 @@ double FEFiberExpLinear::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec
         double c5 = m_c5(mp);
         double lam1 = m_lam1(mp);
         
-        if (c3 == 0) {
-            c3 = c5/c4*exp(-c4*(lam1-1));
-            double c6 = c3*(exp(c4*(lam1-1))*(1-c4*lam1)-1);
-            if (lam < lam1)
-                sed = c3*exp(-c4)*(expint_Ei(c4*lam) - expint_Ei(c4)) - c3*log(lam);
-            else
-                sed = c5 * (lam - lam1) + c6 * log(lam/lam1)
-                + c3*exp(-c4)*(expint_Ei(c4*lam1) - expint_Ei(c4)) - c3*log(lam1);
-        }
-        else {
-            if (lam < lam1)
-            {
-                sed = c3 * (exp(-c4)*
-                    (expint_Ei(c4*lam) - expint_Ei(c4))
-                    - log(lam));
-            }
-            else
-            {
-                double c6 = c3 * (exp(c4*(lam1 - 1)) - 1) - c5 * lam1;
-                sed = c5 * (lam - 1) + c6 * log(lam);
-            }
-        }
+        if (c3 == 0) c3 = c5/c4*exp(-c4*(lam1-1));
+        double c6 = c3*(exp(c4*(lam1-1))*(1-c4*lam1)-1);
+        if (lam < lam1)
+            sed = c3*exp(-c4)*(expint_Ei(c4*lam) - expint_Ei(c4)) - c3*log(lam);
+        else
+            sed = c5 * (lam - lam1) + c6 * log(lam/lam1)
+            + c3*exp(-c4)*(expint_Ei(c4*lam1) - expint_Ei(c4)) - c3*log(lam1);
 	}
 
 	return sed;
