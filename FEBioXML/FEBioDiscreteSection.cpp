@@ -154,6 +154,7 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 	int elems = fem.GetMesh().Elements();
 	int maxid = elems + 1;
 
+	vector<FEDomain*> discreteDomains;
 	++tag;
 	do
 	{
@@ -235,16 +236,7 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 			FEParameterList& pl = pd->GetParameterList();
 			ReadParameterList(tag, pl);
 
-			// create an element set for this domain
-			FEElementSet* elset = new FEElementSet(&fem);
-			elset->Create(pd);
-			elset->SetName(pd->GetName());
-			mesh.AddElementSet(elset);
-
-			// create material point data for this domain
-
-			// initialize domain
-			pd->CreateMaterialPointData();
+			discreteDomains.push_back(pd);
 		}
 		else if (tag == "rigid_axial_force") ParseRigidAxialForce(tag);
 		else if (tag == "rigid_cable") ParseRigidCable(tag);
@@ -252,6 +244,19 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
+
+	// initialize the discrete domains
+	for (FEDomain* dom : discreteDomains)
+	{
+		// create an element set for this domain
+		FEElementSet* elset = new FEElementSet(&fem);
+		elset->Create(dom);
+		elset->SetName(dom->GetName());
+		mesh.AddElementSet(elset);
+
+		// create material point data for this domain
+		dom->CreateMaterialPointData();
+	}
 }
 
 //---------------------------------------------------------------------------------
