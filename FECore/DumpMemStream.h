@@ -58,4 +58,6 @@ private:
 	char*	m_pd;			//!< position to insert a new value
 	size_t	m_nsize;		//!< size of stream
 	size_t	m_nreserved;	//!< size of reserved buffer
+	size_t	m_growsize;		//!< size to grow the buffer
+	size_t	m_growcounter;	//!< number of times we had to grow the buffer
 };
