@@ -48,6 +48,9 @@ public:
 	//! stiffness
 	mat3ds stiffness(FEMaterialPoint& pt) override;
 
+private:
+	void StiffnessMatrix(FELinearSystem& LS) override;
+
 public:
 	FEParamVec3 m_force;
 
