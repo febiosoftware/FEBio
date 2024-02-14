@@ -72663,6 +72663,101 @@ Fiber stretch for straightened fibers
 \end_layout
 
 \begin_layout Standard
+While this material enforces continuity of the stress at 
+\begin_inset Formula $\lambda_{m}$
+\end_inset
+
+, it does not enforce continuity of the strain energy density nor the elasticity.
+ To enforce continuity of all three parameters, one may use a slightly different
+ form of the strain energy density,
+\begin_inset Formula 
+\[
+F_{2}\left(\lambda\right)=\begin{cases}
+0 & \lambda<1\\
+C_{3}\left(e^{-C_{4}}\left(\Ei\left(C_{4}\lambda\right)-\Ei\left(C_{4}\right)\right)-\ln\lambda\right) & 1\le\lambda<\lambda_{m}\\
+C_{5}\left(\lambda-\lambda_{m}\right)+C_{6}\ln\frac{\lambda}{\lambda_{m}}+C_{3}\left(e^{-C_{4}}\Ei\left(C_{4}\lambda_{m}\right)-\Ei\left(C_{4}\right)-\ln\lambda_{m}\right) & \lambda_{m}\le\lambda
+\end{cases}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $C_{3}$
+\end_inset
+
+ is not a user-adjustable parameter, as it must satisfy
+\begin_inset Formula 
+\[
+C_{3}=\frac{C_{5}}{C_{4}}e^{-C_{4}\left(\lambda_{m}-1\right)}
+\]
+
+\end_inset
+
+The parameter 
+\begin_inset Formula $C_{6}$
+\end_inset
+
+ is also not adjustable, as it must satisfy
+\begin_inset Formula 
+\[
+C_{6}=C_{3}\left(e^{C_{4}\left(\lambda_{m}-1\right)}\left(1-C_{4}\lambda_{m}\right)-1\right)
+\]
+
+\end_inset
+
+To use this second form of 
+\begin_inset Formula $F_{2}$
+\end_inset
+
+, the user may set 
+\begin_inset Formula $C_{3}=0$
+\end_inset
+
+ in the input file, and specify 
+\begin_inset Formula $C_{4}$
+\end_inset
+
+ and 
+\begin_inset Formula $C_{5}$
+\end_inset
+
+ as explained above.
+ When 
+\begin_inset Formula $C_{3}=0$
+\end_inset
+
+ the code will automatically employ this second form and recalculate 
+\begin_inset Formula $C_{3}$
+\end_inset
+
+ internally.
+ The first and second forms of 
+\begin_inset Formula $F_{2}$
+\end_inset
+
+ differ in the 
+\begin_inset Quotes eld
+\end_inset
+
+linear
+\begin_inset Quotes erd
+\end_inset
+
+ fiber response: The first form produces a lesser decrease in the elastic
+ modulus with increasing strain than the second form.
+ Using the above formula to calculate 
+\begin_inset Formula $C_{3}$
+\end_inset
+
+ for use in the first form can enforce continuity of the elastic modulus
+ at 
+\begin_inset Formula $\lambda_{m}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 
 \shape italic
 Example
@@ -72679,11 +72774,11 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <E>1e6</E>
+    <E>1e-6</E>
 \end_layout
 
 \begin_layout LyX-Code
-    <v>0.32</v>
+    <v>0</v>
 \end_layout
 
 \begin_layout LyX-Code
@@ -72695,15 +72790,15 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <c3>1</c3>
+    <c3>0.0023</c3>
 \end_layout
 
 \begin_layout LyX-Code
-    <c4>1</c4>
+    <c4>43</c4>
 \end_layout
 
 \begin_layout LyX-Code
-    <c5>1</c5>
+    <c5>3</c5>
 \end_layout
 
 \begin_layout LyX-Code
@@ -74472,6 +74567,101 @@ Fiber distribution option
 \end_layout
 
 \begin_layout Standard
+While this material enforces continuity of the stress at 
+\begin_inset Formula $\lambda_{m}$
+\end_inset
+
+, it does not enforce continuity of the strain energy density nor the elasticity.
+ To enforce continuity of all three parameters, one may use a slightly different
+ form of the strain energy density,
+\begin_inset Formula 
+\[
+F_{2}\left(\tilde{\lambda}\right)=\begin{cases}
+0 & \tilde{\lambda}<1\\
+C_{3}\left(e^{-C_{4}}\left(\Ei\left(C_{4}\tilde{\lambda}\right)-\Ei\left(C_{4}\right)\right)-\ln\tilde{\lambda}\right) & 1\le\tilde{\lambda}<\lambda_{m}\\
+C_{5}\left(\tilde{\lambda}-\lambda_{m}\right)+C_{6}\ln\frac{\tilde{\lambda}}{\lambda_{m}}+C_{3}\left(e^{-C_{4}}\Ei\left(C_{4}\lambda_{m}\right)-\Ei\left(C_{4}\right)-\ln\lambda_{m}\right) & \lambda_{m}\le\tilde{\lambda}
+\end{cases}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $C_{3}$
+\end_inset
+
+ is not a user-adjustable parameter, as it must satisfy
+\begin_inset Formula 
+\[
+C_{3}=\frac{C_{5}}{C_{4}}e^{-C_{4}\left(\lambda_{m}-1\right)}
+\]
+
+\end_inset
+
+The parameter 
+\begin_inset Formula $C_{6}$
+\end_inset
+
+ is also not adjustable, as it must satisfy
+\begin_inset Formula 
+\[
+C_{6}=C_{3}\left(e^{C_{4}\left(\lambda_{m}-1\right)}\left(1-C_{4}\lambda_{m}\right)-1\right)
+\]
+
+\end_inset
+
+To use this second form of 
+\begin_inset Formula $F_{2}$
+\end_inset
+
+, the user may set 
+\begin_inset Formula $C_{3}=0$
+\end_inset
+
+ in the input file, and specify 
+\begin_inset Formula $C_{4}$
+\end_inset
+
+ and 
+\begin_inset Formula $C_{5}$
+\end_inset
+
+ as explained above.
+ When 
+\begin_inset Formula $C_{3}=0$
+\end_inset
+
+ the code will automatically employ this second form and recalculate 
+\begin_inset Formula $C_{3}$
+\end_inset
+
+ internally.
+ The first and second forms of 
+\begin_inset Formula $F_{2}$
+\end_inset
+
+ differ in the 
+\begin_inset Quotes eld
+\end_inset
+
+linear
+\begin_inset Quotes erd
+\end_inset
+
+ fiber response: The first form produces a lesser decrease in the elastic
+ modulus with increasing strain than the second form.
+ Using the above formula to calculate 
+\begin_inset Formula $C_{3}$
+\end_inset
+
+ for use in the first form can enforce continuity of the elastic modulus
+ at 
+\begin_inset Formula $\lambda_{m}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 
 \shape italic
 Example
@@ -74484,7 +74674,7 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-  <k>1e4</k>
+  <k>10</k>
 \end_layout
 
 \begin_layout LyX-Code
@@ -74492,7 +74682,7 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <c1>1</c1>
+    <c1>2.5e-07</c1>
 \end_layout
 
 \begin_layout LyX-Code
@@ -74508,15 +74698,15 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <c3>1</c3>
+    <c3>0.00234</c3>
 \end_layout
 
 \begin_layout LyX-Code
-    <c4>1</c4>
+    <c4>43</c4>
 \end_layout
 
 \begin_layout LyX-Code
-    <c5>1</c5>
+    <c5>3</c5>
 \end_layout
 
 \begin_layout LyX-Code
@@ -110190,350 +110380,437 @@ t boundary condition.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0, 0.5, 0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0, 0.5, 1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
