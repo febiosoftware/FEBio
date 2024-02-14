@@ -43,7 +43,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEFiberExpLinearUC::FEFiberExpLinearUC(FEModel* pfem) : FEFiberMaterialUncoupled(pfem)
 {
-	m_c3 = m_c4 = m_c5 = 0;
+    m_c3 = 0;
+    m_c4 = 0;
+    m_c5 = 0;
 	m_lam1 = 1;
 }
 
@@ -71,37 +73,57 @@ mat3ds FEFiberExpLinearUC::DevFiberStress(FEMaterialPoint &mp, const vec3d& a0)
 	// invariant I4
 	double I4 = lamd*lamd;
 
-	// strain energy derivative
-	double W4 = 0;
+    // calculate stress:
+    mat3ds s; s.zero();
+
 	if (lamd >= 1)
 	{
-		double lamdi = 1.0 / lamd;
-		double Wl;
-		if (lamd < m_lam1)
-		{
-			Wl = lamdi*m_c3*(exp(m_c4*(lamd - 1)) - 1);
-		}
-		else
-		{
-			double c6 = m_c3*(exp(m_c4*(m_lam1 - 1)) - 1) - m_c5*m_lam1;
-			Wl = lamdi*(m_c5*lamd + c6);
-		}
-		W4 = 0.5*lamdi*Wl;
+        double c3 = m_c3(mp);
+        double c4 = m_c4(mp);
+        double c5 = m_c5(mp);
+        double lam1 = m_lam1(mp);
+        
+        // calculate dyad of a: AxA = (a x a)
+        mat3ds AxA = dyad(a);
+
+        mat3ds T;
+
+        if (c3 == 0) {
+            c3 = c5/c4*exp(-c4*(lam1-1));
+            double c6 = c3*(exp(c4*(lam1-1))*(1-c4*lam1)-1);
+            
+            // calculate fiber stress
+            double sn = 0.0;
+            if (lamd < lam1)
+                sn = c3*(exp(c4*(lamd - 1.0)) - 1.0);
+            else
+                sn = c5*lamd + c6;
+            T = AxA*(sn / J);
+            s = T.dev();
+        }
+        else {
+            // strain energy derivative
+            double W4 = 0;
+            double lamdi = 1.0 / lamd;
+            double Wl;
+            if (lamd < lam1)
+            {
+                Wl = lamdi*c3*(exp(c4*(lamd - 1)) - 1);
+            }
+            else
+            {
+                double c6 = c3*(exp(c4*(lam1 - 1)) - 1) - c5*lam1;
+                Wl = lamdi*(c5*lamd + c6);
+            }
+            W4 = 0.5*lamdi*Wl;
+            // ---
+            // calculate FdWf/dCFt = I4*W4*(a x a)
+            T = AxA*(W4*I4);
+
+            // calculate stress:
+            s = T.dev()*twoJi;
+        }
 	}
-	else
-	{
-		W4 = 0;
-	}
-
-	// calculate dyad of a: AxA = (a x a)
-	mat3ds AxA = dyad(a);
-
-	// ---
-	// calculate FdWf/dCFt = I4*W4*(a x a)
-	mat3ds T = AxA*(W4*I4);
-
-	// calculate stress: 
-	mat3ds s = T.dev()*twoJi;
 
 	return s;
 }
@@ -130,49 +152,71 @@ tens4ds FEFiberExpLinearUC::DevFiberTangent(FEMaterialPoint &mp, const vec3d& a0
 
 	const double eps = 0;// std::numeric_limits<double>::epsilon();
 
-	double W4, W44;
+    tens4ds c; c.zero();
+    
 	if (lamd >= 1 + eps)
 	{
-		double lamdi = 1.0 / lamd;
-		double Wl, Wll;
-		if (lamd < m_lam1)
-		{
-			Wl = lamdi*m_c3*(exp(m_c4*(lamd - 1)) - 1);
-			Wll = m_c3*lamdi*(m_c4*exp(m_c4*(lamd - 1)) - lamdi*(exp(m_c4*(lamd - 1)) - 1));
-		}
-		else
-		{
-			double c6 = m_c3*(exp(m_c4*(m_lam1 - 1)) - 1) - m_c5*m_lam1;
-			Wl = lamdi*(m_c5*lamd + c6);
-			Wll = -c6*lamdi*lamdi;
-		}
-		W4 = 0.5*lamdi*Wl;
-		W44 = 0.25*lamdi*lamdi*(Wll - lamdi*Wl);
-	}
-	else
-	{
-		W4 = 0;
-		W44 = 0;
-	}
+        double c3 = m_c3(mp);
+        double c4 = m_c4(mp);
+        double c5 = m_c5(mp);
+        double lam1 = m_lam1(mp);
+        
+        mat3dd I(1);    // Identity
+        tens4ds IxI = dyad1s(I);
+        tens4ds Id4 = dyad4s(I);
 
-	// --- calculate tangent ---
+        mat3ds AxA = dyad(a);
+        tens4ds AxAxAxA = dyad1s(AxA);
 
-	// calculate dWdC:C
-	double WC = W4*I4;
+        if (c3 == 0) {
+            c3 = c5/c4*exp(-c4*(lam1-1));
+            double c6 = c3*(exp(c4*(lam1-1))*(1-c4*lam1)-1);
+            
+            double sn = 0;
+            double cn = 0;
+            if (lamd < lam1) {
+                sn = c3*(exp(c4*(lamd - 1.0)) - 1.0);
+                cn = c3*(2+exp(c4*(lamd-1))*(c4*lamd-2));
+            }
+            else {
+                sn = c5*lamd + c6;
+                cn = -c5*lamd - 2*c6;
+            }
+            mat3ds T = AxA*(sn / J);
+            c = AxAxAxA*(cn / J);
+            c += - 1./3.*(ddots(c,IxI) - IxI*(c.tr()/3.))
+            + 2./3.*((Id4-IxI/3.)*T.tr()-dyad1s(T.dev(),I));
+        }
+        else {
+            double W4, W44;
+            double lamdi = 1.0 / lamd;
+            double Wl, Wll;
+            if (lamd < lam1)
+            {
+                Wl = lamdi*c3*(exp(c4*(lamd - 1)) - 1);
+                Wll = c3*lamdi*(c4*exp(c4*(lamd - 1)) - lamdi*(exp(c4*(lamd - 1)) - 1));
+            }
+            else
+            {
+                double c6 = c3*(exp(c4*(lam1 - 1)) - 1) - c5*lam1;
+                Wl = lamdi*(c5*lamd + c6);
+                Wll = -c6*lamdi*lamdi;
+            }
+            W4 = 0.5*lamdi*Wl;
+            W44 = 0.25*lamdi*lamdi*(Wll - lamdi*Wl);
+            // --- calculate tangent ---
 
-	// calculate C:d2WdCdC:C
-	double CWWC = W44*I4*I4;
+            // calculate dWdC:C
+            double WC = W4*I4;
 
-	mat3dd I(1);	// Identity
-	tens4ds IxI = dyad1s(I);
-	tens4ds Id4 = dyad4s(I);
+            // calculate C:d2WdCdC:C
+            double CWWC = W44*I4*I4;
 
-	mat3ds AxA = dyad(a);
-	tens4ds AxAxAxA = dyad1s(AxA);
+            tens4ds cw = AxAxAxA*(4.0*Ji*W44*I4*I4) - dyad1s(I, AxA)*(4.0 / 3.0*Ji*W44*I4*I4);
 
-	tens4ds cw = AxAxAxA*(4.0*Ji*W44*I4*I4) - dyad1s(I, AxA)*(4.0 / 3.0*Ji*W44*I4*I4);
-
-	tens4ds c = (Id4 - IxI / 3.0)*(4.0 / 3.0*Ji*WC) + IxI*(4.0 / 9.0*Ji*CWWC) + cw;
+            c = (Id4 - IxI / 3.0)*(4.0 / 3.0*Ji*WC) + IxI*(4.0 / 9.0*Ji*CWWC) + cw;
+        }
+    }
 
 	return c;
 }
@@ -200,19 +244,34 @@ double FEFiberExpLinearUC::DevFiberStrainEnergyDensity(FEMaterialPoint &mp, cons
 	double sed = 0.0;
 	if (lamd >= 1)
 	{
-		if (lamd < m_lam1)
-		{
-			sed = m_c3*(exp(-m_c4)*
-				(expint_Ei(m_c4*lamd) - expint_Ei(m_c4))
-				- log(lamd));
-		}
-		else
-		{
-			double c6 = m_c3*(exp(m_c4*(m_lam1 - 1)) - 1) - m_c5*m_lam1;
-			sed = m_c5*(lamd - 1) + c6*log(lamd);
-		}
+        double c3 = m_c3(mp);
+        double c4 = m_c4(mp);
+        double c5 = m_c5(mp);
+        double lam1 = m_lam1(mp);
+        
+        if (c3 == 0) {
+            c3 = c5/c4*exp(-c4*(lam1-1));
+            double c6 = c3*(exp(c4*(lam1-1))*(1-c4*lam1)-1);
+            if (lamd < lam1)
+                sed = c3*exp(-c4)*(expint_Ei(c4*lamd) - expint_Ei(c4)) - c3*log(lamd);
+            else
+                sed = c5 * (lamd - lam1) + c6 * log(lamd/lam1)
+                + c3*exp(-c4)*(expint_Ei(c4*lam1) - expint_Ei(c4)) - c3*log(lam1);
+        }
+        else {
+            if (lamd < lam1)
+            {
+                sed = c3*(exp(-c4)*
+                    (expint_Ei(c4*lamd) - expint_Ei(c4))
+                    - log(lamd));
+            }
+            else
+            {
+                double c6 = c3*(exp(c4*(lam1 - 1)) - 1) - c5*lam1;
+                sed = c5*(lamd - 1) + c6*log(lamd);
+            }
+        }
 	}
-	// --- active contraction contribution to sed is zero ---
 
 	return sed;
 }
