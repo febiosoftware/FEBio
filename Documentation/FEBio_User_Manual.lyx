@@ -74326,7 +74326,7 @@ is the modulus of the straightened fibers.
 \begin_inset Formula $\lambda_{m}$
 \end_inset
 
-.
+ (see below).
 \end_layout
 
 \begin_layout Standard
@@ -74557,10 +74557,14 @@ The parameter
 \begin_inset Formula $C_{6}$
 \end_inset
 
- must satisfy
+ is chosen so that the stress defined above is continuous 
+\begin_inset Formula $\lambda_{m}$
+\end_inset
+
+ and is determined by,
 \begin_inset Formula 
 \[
-C_{6}=C_{3}\left(e^{C_{4}\left(\lambda_{m}-1\right)}\left(1-C_{4}\lambda_{m}\right)-1\right)
+C_{6}=C_{3}\left(e^{C_{4}\left(\lambda_{m}-1\right)}-1\right)-C_{5}\lambda_{m}
 \]
 
 \end_inset
@@ -74569,7 +74573,7 @@ To enforce contintuity of the elasticity at
 \begin_inset Formula $\lambda_{m}$
 \end_inset
 
- the user may set 
+ the user may also set 
 \begin_inset Formula $C_{3}=0$
 \end_inset
 
@@ -74656,7 +74660,7 @@ Example
 \end_layout
 
 \begin_layout LyX-Code
-    <fiber type="const">1,0,0</fiber>
+    <fiber type="vector">1,0,0</fiber>
 \end_layout
 
 \begin_layout LyX-Code
