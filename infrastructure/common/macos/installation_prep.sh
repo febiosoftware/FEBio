@@ -6,6 +6,7 @@ if [ -d "${INSTALLATION_PATH}" ]; then
   exit
 fi
 
+mkdir -p "${SOURCE_PATH}"
 mkdir -p "${INSTALLATION_PATH}"
 chown -R "${SSH_USER}" "${INSTALLATION_PATH}"
 

@@ -14,7 +14,7 @@ locals {
   installation_path = var.installation_path
   homebrew_prefix   = "${local.installation_path}/homebrew"
   homebrew_bin      = "${local.homebrew_prefix}/bin/brew"
-  src_path          = "/tmp"
+  src_path          = "${local.installation_path}/src"
   ssh_user          = var.ssh_user
   environment = {
     "HOMEBREW_PREFIX"   = local.homebrew_prefix
@@ -95,13 +95,15 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = local.zsh_command
     script = "./common/macos/ffmpeg.sh"
     env    = local.environment
   }
 
   provisioner "shell" {
-    script = "./common/macos/qt.sh"
-    env    = local.environment
+    execute_command = local.zsh_command
+    script          = "./common/macos/qt.sh"
+    env             = local.environment
   }
 
   provisioner "shell" {
