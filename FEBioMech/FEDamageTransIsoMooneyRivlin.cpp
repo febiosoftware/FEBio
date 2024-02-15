@@ -70,9 +70,9 @@ void FETIMRDamageMaterialPoint::Serialize(DumpStream& ar)
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDamageTransIsoMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1");
-	ADD_PARAMETER(m_c2, "c2");
-	ADD_PARAMETER(m_c3, "c3");
+	ADD_PARAMETER(m_c1, FE_RANGE_GREATER(0.0), "c1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c2, "c2")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c3, "c3")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_c4, FE_RANGE_GREATER(0.0), "c4");
 	ADD_PARAMETER(m_Mbeta, "Mbeta");
 	ADD_PARAMETER(m_Msmin, "Msmin");
