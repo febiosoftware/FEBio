@@ -1,8 +1,12 @@
 choco install ffmpeg-shared -y --version 6.1.1
-# Set path for ffmpeg
+
+# Conditionally set path for ffmpeg
 $machinepath=[Environment]::GetEnvironmentVariable("Path", "MACHINE")
 $ffmpegPath = "C:\Program Files\FFMpeg"
 $paths = $machinepath -split ';'
-$paths = $paths + $ffmpegPath
-$paths = $paths -join ';'
-[Environment]::SetEnvironmentVariable("Path", $paths, "MACHINE")
+
+if ($ffmpegPath -notin $paths) {
+  $paths = $paths + $ffmpegPath
+  $paths = $paths -join ';'
+  [Environment]::SetEnvironmentVariable("Path", $paths, "MACHINE")
+}
