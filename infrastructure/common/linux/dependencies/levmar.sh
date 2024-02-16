@@ -2,24 +2,19 @@
 set -o errexit
 set -o verbose
 
-# shellcheck disable=1091
-. ./common-functions.sh
-
-LEVMAR_SOURCE=http://users.ics.forth.gr/~lourakis/levmar/levmar-2.6.tgz
-LEVMAR_ARCHIVE=$(basename $LEVMAR_SOURCE)
-LEVMAR_PATH="${LEVMAR_ARCHIVE%.*}"
+REPO=https://github.com/jturney/levmar.git
+DIR=levmar
 
 build_and_install() {
-	local source=$1
-	local patchfile=$2
-	pushd "$source" || exit 1
-	dos2unix CMakeLists.txt CMakeLists.txt
-	patch --ignore-whitespace -p0 < "$patchfile"
+	local repo=$1
+	local dir=$2
+	git clone $repo $dir
+	pushd $dir
 	cmake  . -B cmbuild \
 		-DCMAKE_INSTALL_PREFIX="/usr/local" \
 		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 		-DBUILD_DEMO:BOOLEAN=false
-	pushd cmbuild || exit 1
+	pushd cmbuild
 	make -j "$(nproc)"
 	sudo make install
 	popd || exit 1
@@ -27,12 +22,8 @@ build_and_install() {
 }
 
 main() {
-	# shellcheck disable=2155
-	local patchfile="$(pwd)/levmar-install.patch"
-	pushd "$BUILD_PATH" || exit 1
-	download_source "$LEVMAR_SOURCE"
-	tar xzf "$LEVMAR_ARCHIVE"
-	build_and_install "$LEVMAR_PATH" "$patchfile"
+	pushd $BUILD_PATH
+	build_and_install $REPO $DIR
 	popd || exit 1
 }
 
