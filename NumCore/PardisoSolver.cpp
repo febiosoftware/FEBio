@@ -358,6 +358,6 @@ void PardisoSolver::Destroy() {}
 SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype) { return nullptr; }
 bool PardisoSolver::SetSparseMatrix(SparseMatrix* pA) { return false; }
 void PardisoSolver::PrintConditionNumber(bool b) {}
-double PardisoSolver::condition_number() { return 0; }
+double PardisoSolver::ConditionNumber() { return 0; }
 void PardisoSolver::UseIterativeFactorization(bool b) {}
 #endif
