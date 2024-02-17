@@ -35,6 +35,8 @@ source "amazon-ebs" "ubuntu" {
 
   skip_create_ami = var.skip_create_ami
 
+  iam_instance_profile = "s3-read-access"
+
   aws_polling {
     delay_seconds = 60
     max_attempts  = 90
@@ -73,16 +75,22 @@ build {
     script        = "./common/linux/apt.sh"
   }
 
+  # awscli
+  provisioner "shell" {
+    script = "./common/linux/aws.sh"
+  }
+
+  provisioner "shell" {
+    remote_folder = "${var.image_build_path}/linux"
+    script        = "./common/linux/install-builder.sh"
+  }
+
   provisioner "shell" {
     script = "./common/linux/qt.sh"
   }
 
   provisioner "shell" {
     script = "./common/linux/openapi.sh"
-  }
-
-  provisioner "shell" {
-    script = "./common/linux/ffmpeg.sh"
   }
 
   # Latest version of cmake (v3.23.2)

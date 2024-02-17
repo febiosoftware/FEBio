@@ -58,6 +58,8 @@ source "amazon-ebs" "windows" {
 
   skip_create_ami = var.skip_create_ami
 
+  iam_instance_profile = "s3-read-access"
+
   aws_polling {
     delay_seconds = 60
     max_attempts  = 90
@@ -106,6 +108,11 @@ build {
 
   provisioner "powershell" {
     script = "./common/windows/aws.ps1"
+    env    = local.environment
+  }
+
+  provisioner "powershell" {
+    script = "./common/windows/install-builder.ps1"
     env    = local.environment
   }
 
