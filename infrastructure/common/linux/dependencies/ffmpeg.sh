@@ -23,8 +23,8 @@ build_and_install() {
     --enable-muxer=mpeg1video \
     --prefix="/usr/local"
 
-  make -j $(nproc)
-  make install
+  sudo make -j $(nproc)
+  sudo make install
   popd
 }
 
