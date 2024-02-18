@@ -462,7 +462,14 @@ void FEBioModel::WritePlot(unsigned int nevent)
 		if ((nevent == CB_INIT) || (nevent == CB_STEP_ACTIVE))
 		{
 			// If the first step did not request output, m_plot can still be null
-			if (m_plot == 0) InitPlotFile();
+			if (m_plot == nullptr)
+			{
+				if (InitPlotFile() == false)
+				{
+					feLogError("Failed to initialize plot file.");
+					return;
+				}
+			}
 
 			if (m_plot->IsValid() == false)
 			{
@@ -1316,6 +1323,8 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 
 		SerializePlotData(ar);
 
+		if (m_plot) m_plot->Serialize(ar);
+
 		// data records
 		SerializeDataStore(ar);
 	}
@@ -1363,6 +1372,8 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 			m_plot = xplt;
 		}
 		else if (data.GetPlotFileType() == "vtk") m_plot = new VTKPlotFile(this);
+
+		if (m_plot) m_plot->Serialize(ar);
 
 		if (m_pltAppendOnRestart)
 		{
@@ -1483,6 +1494,7 @@ bool FEBioModel::InitPlotFile()
 			SetPlotFilename(sz);
 		}
 	}
+	else return false;
 
 	return true;
 }
@@ -1509,7 +1521,10 @@ bool FEBioModel::Init()
 	FEAnalysis* step = GetCurrentStep();
 	if (step->GetPlotLevel() != FE_PLOT_NEVER)
 	{
-		if (m_plot == 0) InitPlotFile();
+		if (m_plot == nullptr)
+		{
+			if (InitPlotFile() == false) { feLogError("Failed to initialize plot file."); return false; }
+		}
 	}
 
 	// see if a valid dump file name is defined.

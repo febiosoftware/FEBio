@@ -576,6 +576,23 @@ void FEThermoFluidSolver::UpdateIncrements(vector<double>& Ui, vector<double>& u
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
+    // extract the velocity and dilatation increments
+    GetVelocityData(m_vi, ui);
+    GetDilatationData(m_di, ui);
+    GetTemperatureData(m_ti, ui);
+
+    // update all degrees of freedom
+    for (int i=0; i<m_neq; ++i) Ui[i] += ui[i];
+        
+    // update velocities
+    for (int i = 0; i<m_nveq; ++i) m_Vi[i] += m_vi[i];
+
+    // update dilatations
+    for (int i = 0; i<m_ndeq; ++i) m_Di[i] += m_di[i];
+        
+    // update temperatures
+    for (int i = 0; i<m_nteq; ++i) m_Ti[i] += m_ti[i];
+        
     for (int i = 0; i < fem.NonlinearConstraints(); ++i)
     {
         FENLConstraint* plc = fem.NonlinearConstraint(i);
@@ -807,8 +824,11 @@ bool FEThermoFluidSolver::Quasin()
             }
         }
         
-        // solve the equations (returns line search; solution stored in m_ui)
-        double s = QNSolve();
+        // solve the equations
+        SolveEquations(m_ui, m_R0);
+
+        // do the line search
+        double s = DoLineSearch();
 
         // for sequential solve, we set one of the residual components to zero
         if (m_solve_strategy == SOLVE_SEQUENTIAL)
@@ -829,11 +849,6 @@ bool FEThermoFluidSolver::Quasin()
             }
         }
         
-        // extract the velocity and dilatation increments
-        GetVelocityData(m_vi, m_ui);
-        GetDilatationData(m_di, m_ui);
-        GetTemperatureData(m_ti, m_ui);
-
         // set initial convergence norms
         if (m_niter == 0)
         {
@@ -845,30 +860,24 @@ bool FEThermoFluidSolver::Quasin()
             normEm = normEi;
         }
         
-        // update all degrees of freedom
-        for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
-            
-        // update velocities
-        for (int i = 0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
+        // calculate actual increment
+        // NOTE: We don't apply the line search directly to m_ui since we need the unscaled search direction for the QN update below
+        int neq = (int)m_Ui.size();
+        vector<double> ui(m_ui);
+        for (int i = 0; i<neq; ++i) ui[i] *= s;
 
-        // update dilatations
-        for (int i = 0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
-            
-        // update temperatures
-        for (int i = 0; i<m_nteq; ++i) m_Ti[i] += s*m_ti[i];
-            
         // update other increments (e.g., Lagrange multipliers)
-        UpdateIncrements(m_Ui, m_ui, false);
+        UpdateIncrements(m_Ui, ui, false);
         
         // calculate the norms
         normR1 = m_R1*m_R1;
-        normv  = (m_vi*m_vi)*(s*s);
+        normv  = m_vi*m_vi;
         normV  = m_Vi*m_Vi;
-        normd  = (m_di*m_di)*(s*s);
+        normd  = m_di*m_di;
         normD  = m_Di*m_Di;
-        normt  = (m_ti*m_ti)*(s*s);
+        normt  = m_ti*m_ti;
         normT  = m_Ti*m_Ti;
-        normE1 = s*fabs(m_ui*m_R1);
+        normE1 = fabs(m_ui*m_R1);
         
         // check for nans
         if (ISNAN(normR1)) throw NANInResidualDetected();
@@ -989,8 +998,9 @@ bool FEThermoFluidSolver::Quasin()
     // if converged we update the total velocities
     if (bconv)
     {
-        m_Ut += m_Ui;
+        UpdateIncrements(m_Ut, m_Ui, true);
         zero(m_Ui);
+        zero(m_Di); zero(m_Vi); zero(m_Ti);
     }
     
     return bconv;

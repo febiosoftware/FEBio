@@ -23,58 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEValuator.h"
+#include "FEModelParam.h"
 
+FEValuator::FEValuator(FEModel* fem) : FECoreBase(fem), m_param(nullptr) {}
 
+FEValuator::~FEValuator() {}
 
-#pragma once
-#include <FECore/LinearSolver.h>
-#include <FECore/CompactUnSymmMatrix.h>
-#include <FECore/CompactSymmMatrix.h>
+void FEValuator::SetModelParam(FEModelParam* p) { m_param = p; }
 
-//! The Pardiso solver is included in the Intel Math Kernel Library (MKL).
-//! It can also be installed as a shared object library from
-//!		http://www.pardiso-project.org
+FEModelParam* FEValuator::GetModelParam() { return m_param; }
 
-
-class PardisoSolver : public LinearSolver
+void FEValuator::Serialize(DumpStream& ar)
 {
-public:
-	PardisoSolver(FEModel* fem);
-	~PardisoSolver();
-	bool PreProcess() override;
-	bool Factor() override;
-	bool BackSolve(double* x, double* y) override;
-	void Destroy() override;
-
-	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
-	bool SetSparseMatrix(SparseMatrix* pA) override;
-
-	void PrintConditionNumber(bool b);
-
-	double ConditionNumber() override;
-
-	void UseIterativeFactorization(bool b);
-
-protected:
-
-	CompactMatrix*	m_pA;
-	int				m_mtype; // matrix type
-
-	// Pardiso control parameters
-	int m_iparm[64];
-	int m_maxfct, m_mnum, m_msglvl;
-	double m_dparm[64];
-
-	bool m_iparm3;	// use direct-iterative method
-
-	// Matrix data
-	int m_n, m_nnz, m_nrhs;
-
-	bool	m_print_cn;	// estimate and print the condition number
-
-	bool	m_isFactored;
-
-	void* m_pt[64]; // Internal solver memory pointer
-
-	DECLARE_FECORE_CLASS();
-};
+	FECoreBase::Serialize(ar);
+	if (!ar.IsShallow()) ar& m_param;
+}

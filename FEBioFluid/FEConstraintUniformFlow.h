@@ -56,6 +56,15 @@ public:
     //! update
     void Update() override;
     
+    // allocate equations
+    int InitEquations(int neq) override;
+    
+protected:
+    void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+    void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
+    
+    void PrepStep() override;
+    
 public:
     //! serialize data to archive
     void Serialize(DumpStream& ar) override;
@@ -75,6 +84,7 @@ public:
 protected:
     FESurface	m_surf;
     FELinearConstraintSet   m_lc;
+    bool        m_binit;
     
     double          m_vbar;     //! mean normal velocity
     vector<vec3d>   m_nn;       //! nodal normals at initialization

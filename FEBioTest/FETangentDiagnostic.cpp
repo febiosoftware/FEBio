@@ -423,8 +423,10 @@ FETangentDiagnostic::FETangentDiagnostic(FEModel* fem) : FEDiagnostic(fem)
 	FEAnalysis* pstep = new FEAnalysis(fem);
 
 	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>("solid", fem);
+	FENewtonSolver* pnew_solver = dynamic_cast<FENewtonSolver*>(fecore_new<FESolver>("solid", fem));
 	assert(pnew_solver);
+	pnew_solver->SetSolutionStrategy(fecore_new<FENewtonStrategy>("full Newton", fem));
+	
 	pstep->SetFESolver(pnew_solver);
 
 	// keep a pointer to the fem object

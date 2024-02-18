@@ -812,7 +812,7 @@ bool FENewtonSolver::QNInit()
 	GetFEModel()->DoCallback(CB_MATRIX_REFORM);
 
 	return true;
-}
+}	
 
 //-----------------------------------------------------------------------------
 //! solve the equations

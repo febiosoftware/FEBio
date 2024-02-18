@@ -70,7 +70,6 @@ bool VTKPlotFile::Open(const char* szfile)
 	if (n != std::string::npos) m_filename.erase(n, std::string::npos);
 
 	BuildDictionary();
-	m_count = 0;
 	m_valid = true;
 	return true;
 }
@@ -78,14 +77,25 @@ bool VTKPlotFile::Open(const char* szfile)
 //! Open for appending
 bool VTKPlotFile::Append(const char* szfile)
 {
-	// TODO: need to find the file with the largest index. 
-	return false;
+	m_filename = szfile;
+	size_t n = m_filename.rfind('.');
+	if (n != std::string::npos) m_filename.erase(n, std::string::npos);
+
+	BuildDictionary();
+	m_valid = true;
+	return true;
 }
 
 //! see if the plot file is valid
 bool VTKPlotFile::IsValid() const
 {
 	return m_valid;
+}
+
+void VTKPlotFile::Serialize(DumpStream& ar)
+{
+	if (ar.IsShallow()) return;
+	ar& m_count;
 }
 
 //! Write current FE state to plot database
