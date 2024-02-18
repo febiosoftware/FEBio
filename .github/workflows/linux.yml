@@ -16,5 +16,5 @@ jobs:
       runTests: ${{ inputs.runTests && true || false }}
       package-name: febio4
       package-sdk: true
-      aws-ami-id: ami-098154f774f68e105
+      aws-ami-id: ami-0590ebdb5afffb782
     secrets: inherit
