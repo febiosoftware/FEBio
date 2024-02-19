@@ -270,7 +270,11 @@ void FEMesh::AddNodes(int nodes)
 void FEMesh::SetDOFS(int n)
 {
 	int NN = Nodes();
-	for (int i=0; i<NN; ++i) m_Node[i].SetDOFS(n);
+#pragma omp parallel for
+	for (int i = 0; i < NN; ++i)
+	{
+		m_Node[i].SetDOFS(n);
+	}
 }
 
 //-----------------------------------------------------------------------------
