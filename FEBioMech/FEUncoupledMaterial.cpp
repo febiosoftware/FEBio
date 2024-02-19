@@ -81,7 +81,7 @@ mat3ds FEUncoupledMaterial::Stress(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// calculate the stress as a sum of deviatoric stress and pressure
-    pt.m_p = UJ(pt.m_J);
+    pt.m_p = UJ(pt.m_J, pt.m_J_star);
 	return mat3dd(pt.m_p) + DevStress(mp);
 }
 
@@ -104,7 +104,7 @@ tens4ds FEUncoupledMaterial::Tangent(FEMaterialPoint &mp)
 	tens4ds I4  = dyad4s(I);
 	
 	// pressure
-	pt.m_p = UJ(pt.m_J);
+	pt.m_p = UJ(pt.m_J, pt.m_J_star);
 	
 	// tangent is sum of three terms
 	// C = c_tilde + c_pressure + c_k
@@ -117,7 +117,7 @@ tens4ds FEUncoupledMaterial::Tangent(FEMaterialPoint &mp)
 	// but we do need to add it here.
 	//
 	//        c_tilde         c_pressure            c_k
-	return DevTangent(mp) + (IxI - I4*2)*pt.m_p + IxI*(UJJ(pt.m_J)*pt.m_J);
+	return DevTangent(mp) + (IxI - I4*2)*pt.m_p + IxI*(UJJ(pt.m_J, pt.m_J_star)*pt.m_J);
 }
 
 //-----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ double FEUncoupledMaterial::StrainEnergyDensity(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
 	// calculate the stress as a sum of deviatoric stress and pressure
-	return U(pt.m_J) + DevStrainEnergyDensity(mp);
+	return U(pt.m_J, pt.m_J_star) + DevStrainEnergyDensity(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -139,7 +139,7 @@ double FEUncoupledMaterial::StrongBondSED(FEMaterialPoint &mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     
     // calculate the stress as a sum of deviatoric stress and pressure
-    return U(pt.m_J) + StrongBondDevSED(mp);
+    return U(pt.m_J, pt.m_J_star) + StrongBondDevSED(mp);
 }
 
 //-----------------------------------------------------------------------------

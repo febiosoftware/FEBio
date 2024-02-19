@@ -45,7 +45,6 @@ void FE3FieldElasticSolidDomain::ELEM_DATA::Serialize(DumpStream& ar)
 {
 	ar & eJ;
 	ar & ep;
-	ar & epp;
 	ar & Lk;
 	ar & eJt;
 	ar & eJp;
@@ -96,7 +95,6 @@ bool FE3FieldElasticSolidDomain::Init()
 		ELEM_DATA& d = m_Data[i];
 		d.eJ = d.eJt = d.eJp = d.eJ_star = d.eJpp = 1.0;
 		d.ep = 0.0;
-		d.epp = 0.0;
 		d.Lk = 0.0;
 	}
 
@@ -114,7 +112,6 @@ void FE3FieldElasticSolidDomain::Reset()
 		ELEM_DATA& d = m_Data[i];
         d.eJ = d.eJt = d.eJp = d.eJ_star = d.eJpp = 1.0;
         d.ep = 0.0;
-        d.epp = 0.0;
         d.Lk = 0.0;
 	}
 }
