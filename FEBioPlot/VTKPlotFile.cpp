@@ -59,6 +59,7 @@ VTKPlotFile::VTKPlotFile(FEModel* fem) : PlotFile(fem)
 {
 	m_fp = nullptr;
 	m_count = 0;
+	m_ftime = -1;
 	m_valid = false;
 }
 
@@ -96,15 +97,26 @@ void VTKPlotFile::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
 	ar& m_count;
+	ar& m_ftime;
 }
 
 //! Write current FE state to plot database
 bool VTKPlotFile::Write(float ftime, int flag)
 {
 	FEModel& fem = *GetFEModel();
+
+	if (ftime == m_ftime) {
+		m_count++;
+	} else {
+		m_count == 0;
+	}
+
+	m_ftime = ftime;
 	
 	std::stringstream ss;
-	ss << m_filename << "." << m_count++ << ".vtk";
+
+	ss << m_filename << "." << ftime << ".vtk";
+
 	string fileName = ss.str();
 	
 	m_fp = fopen(fileName.c_str(), "wt");
