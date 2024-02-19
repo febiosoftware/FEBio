@@ -49,12 +49,12 @@ void FEElasticBeamMaterialPoint::Update(const FETimeInfo& timeInfo)
 
 //=======================================================================================
 BEGIN_FECORE_CLASS(FEElasticBeamMaterial, FEMaterial)
-	ADD_PARAMETER(m_density, "density");
-	ADD_PARAMETER(m_E , "E" );
-	ADD_PARAMETER(m_G , "G" );
-	ADD_PARAMETER(m_A , "A" );
-	ADD_PARAMETER(m_A1, "A1");
-	ADD_PARAMETER(m_A2, "A2");
+	ADD_PARAMETER(m_density, "density")->setUnits(UNIT_DENSITY);
+	ADD_PARAMETER(m_E , "E" )->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_G , "G" )->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_A , "A" )->setUnits(UNIT_AREA);
+	ADD_PARAMETER(m_A1, "A1")->setUnits(UNIT_AREA);
+	ADD_PARAMETER(m_A2, "A2")->setUnits(UNIT_AREA);
 	ADD_PARAMETER(m_I1, "I1");
 	ADD_PARAMETER(m_I2, "I2");
 END_FECORE_CLASS();

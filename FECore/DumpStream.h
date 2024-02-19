@@ -352,6 +352,29 @@ template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>
 	return This;
 }
 
+template <> inline DumpStream& DumpStream::operator << (std::vector<double>& o)
+{
+	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
+	int N = (int)o.size();
+	m_bytes_serialized += write(&N, sizeof(int), 1);
+	write(o.data(), sizeof(double), N);
+	return *this;
+}
+
+template <> inline DumpStream& DumpStream::operator >> (std::vector<double>& o)
+{
+	if (m_btypeInfo) readType(TypeID::TYPE_UNKNOWN);
+	DumpStream& This = *this;
+	int N = 0;
+	m_bytes_serialized += read(&N, sizeof(int), 1);
+	if (N > 0)
+	{
+		o.resize(N);
+		read(o.data(), sizeof(double), N);
+	}
+	return This;
+}
+
 template <> inline DumpStream& DumpStream::operator << (std::vector<bool>& o)
 {
 	if (m_btypeInfo) writeType(TypeID::TYPE_UNKNOWN);
