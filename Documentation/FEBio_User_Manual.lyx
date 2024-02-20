@@ -2128,7 +2128,7 @@ command prompt
 \end_layout
 
 \begin_layout LyX-Code
-febio [-o1 [arg1] | -o2 [arg2] | ...
+febio4 [-o1 [arg1] | -o2 [arg2] | ...
  ]
 \end_layout
 
@@ -2163,7 +2163,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="3">
+<lyxtabular version="3" rows="18" columns="3">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top">
@@ -2469,6 +2469,35 @@ dump file name
 \begin_inset Text
 
 \begin_layout Plain Layout
+-dump_stride[=n]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the dump interval.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 -config
 \end_layout
 
@@ -2692,10 +2721,6 @@ List of command line options.
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -2740,7 +2765,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb
+> febio4 
+\series bold
+-i input.feb
 \end_layout
 
 \begin_layout Standard
@@ -2749,7 +2776,7 @@ This is the most common way to start an FEBio run.
 \end_layout
 
 \begin_layout LyX-Code
-> febio input.feb
+> febio4 input.feb
 \end_layout
 
 \begin_layout Standard
@@ -2767,7 +2794,7 @@ It is also allowed to omit the .feb extension for FEBio input files.
 \end_layout
 
 \begin_layout LyX-Code
-> febio input
+> febio4 input
 \end_layout
 
 \begin_layout Description
@@ -2804,7 +2831,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -r file.feb
+> febio4 
+\series bold
+-r file.feb
 \end_layout
 
 \begin_layout Description
@@ -2838,7 +2867,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –g
+> febio4 -i input.feb 
+\series bold
+–g
 \end_layout
 
 \begin_layout Description
@@ -2875,7 +2906,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –p out.xplt
+> febio4 -i input.feb 
+\series bold
+–p out.xplt
 \end_layout
 
 \begin_layout Description
@@ -2911,7 +2944,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –o out.log
+> febio4 -i input.feb 
+\series bold
+–o out.log
 \end_layout
 
 \begin_layout Description
@@ -2945,7 +2980,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio –i file.feb –s control.opt
+> febio4 –i file.feb 
+\series bold
+–s control.opt
 \end_layout
 
 \begin_layout Description
@@ -2971,7 +3008,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio –d diagnostic.feb
+> febio4 
+\series bold
+–d diagnostic.feb
 \end_layout
 
 \begin_layout Description
@@ -3002,7 +3041,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio –i file.feb –break 1.0
+> febio4 –i file.feb 
+\series bold
+–break 1.0
 \end_layout
 
 \begin_layout Description
@@ -3061,7 +3102,28 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –dump out.dmp
+> febio4 -i input.feb 
+\series bold
+–dump out.dmp
+\end_layout
+
+\begin_layout Description
+-dump_stride Sets the interval between writing dump files.
+ The default is 1 (although the dump level may affect this as well.) The
+ following example will write a dump file after every 10 timesteps.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+> febio4 -i input.feb –dump out.dmp 
+\series bold
+-dump_stride=10
 \end_layout
 
 \begin_layout Description
@@ -3112,7 +3174,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –config C:
+> febio4 -i input.feb 
+\series bold
+–config C:
 \begin_inset Formula $\backslash$
 \end_inset
 
@@ -3168,7 +3232,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –nosplash
+> febio4 -i input.feb 
+\series bold
+–nosplash
 \end_layout
 
 \begin_layout Description
@@ -3187,7 +3253,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio –import myplugin.dll
+> febio4 
+\series bold
+–import myplugin.dll
 \end_layout
 
 \begin_layout Description
@@ -3208,7 +3276,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –silent
+> febio4 -i input.feb 
+\series bold
+–silent
 \end_layout
 
 \begin_layout Description
@@ -3239,7 +3309,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –task=optimize control.opt
+> febio4 -i input.feb 
+\series bold
+–task=optimize control.opt
 \end_layout
 
 \begin_layout Section
