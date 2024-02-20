@@ -1161,6 +1161,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Weak bond recruitment ratio in reactive viscoelastic material point
+class FEPlotRVErecruitment : public FEPlotDomainData
+{
+public:
+    FEPlotRVErecruitment(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Reactive viscoelastic strain measure for bond-breaking trigger and bond recruitment
 class FEPlotRVEstrain : public FEPlotDomainData
 {
