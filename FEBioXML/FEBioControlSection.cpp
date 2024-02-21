@@ -35,6 +35,10 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FECore/FENewtonSolver.h>
 
+#ifndef WIN32
+#define strnicmp strncasecmp
+#endif
+
 class FEObsoleteParamHandler25 : public FEObsoleteParamHandler
 {
 public:
