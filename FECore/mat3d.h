@@ -682,6 +682,8 @@ public:
 	}
 
 	float* operator [] (int i) { return d[i]; }
+	const float* operator [] (int i) const { return d[i]; }
+
 	float& operator () (int i, int j) { return d[i][j]; }
 	float operator () (int i, int j) const { return d[i][j]; }
 
@@ -816,6 +818,22 @@ public:
 public:
 	float d[3][3];
 };
+
+inline mat3f to_mat3f(const mat3d& m)
+{
+	return mat3f(
+		(float)m[0][0], (float)m[0][1], (float)m[0][2],
+		(float)m[1][0], (float)m[1][1], (float)m[1][2],
+		(float)m[2][0], (float)m[2][1], (float)m[2][2]);
+}
+
+inline mat3d to_mat3d(const mat3f& m)
+{
+	return mat3d(
+		m[0][0], m[0][1], m[0][2],
+		m[1][0], m[1][1], m[1][2],
+		m[2][0], m[2][1], m[2][2]);
+}
 
 // The following file contains the actual definition of the class functions
 #include "mat3d.hpp"
