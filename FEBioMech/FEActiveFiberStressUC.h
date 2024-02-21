@@ -70,6 +70,8 @@ public:
 		{
 			// TODO:
 		}
+
+		void Serialize(DumpStream& ar) override;
 	};
 
 public:
