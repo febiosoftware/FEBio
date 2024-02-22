@@ -183,6 +183,9 @@ FEBioImport::~FEBioImport()
 // Build the file section map based on the version number
 void FEBioImport::BuildFileSectionMap(int nversion)
 {
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	if (nversion < 0x0400) fecore.ShowDeprecationWarnings(false);
+
 	// define the file structure
 	m_map["Module"     ] = new FEBioModuleSection     (this);
 	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
