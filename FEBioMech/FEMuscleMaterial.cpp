@@ -41,11 +41,11 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEMuscleMaterial, FEUncoupledMaterial)
-	ADD_PARAMETER(m_G1, "g1");
-	ADD_PARAMETER(m_G2, "g2");
-	ADD_PARAMETER(m_G3, "g3");
-	ADD_PARAMETER(m_P1, "p1");
-	ADD_PARAMETER(m_P2, "p2");
+	ADD_PARAMETER(m_G1, "g1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_G2, "g2")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_G3, "g3")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_P1, "p1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_P2, "p2")->setUnits(UNIT_NONE);
 	ADD_PARAMETER(m_Lofl, "Lofl");
 	ADD_PARAMETER(m_smax, "smax");
 	ADD_PARAMETER(m_lam1, "lam_max");
@@ -129,48 +129,59 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 		ksi = (1.0/(w*w-1))*(1 - w*b2/sqrt(w*w-1));
 	}
 
+	// evaluate material parameters
+	double G1 = m_G1(mp);
+	double G2 = m_G2(mp);
+	double G3 = m_G3(mp);
+	double P1 = m_P1(mp);
+	double P2 = m_P2(mp);
+	double Lofl = m_Lofl(mp);
+	double lam1 = m_lam1(mp);
+	double alpha = m_alpha(mp);
+	double smax  = m_smax(mp);
+
 	// ----- calculate strain derivatives -----
 
 	// We assume that W(I1, I4, I5, alpha) = F1(B1(I4, I5)) + F2(B2(I1,I4,I5)) + F3(lam(I4), alpha)
 	double W1, W2, W4, W5;
 
 	// calculate derivatives for F1
-	double F1D4 = -2*m_G1*(I5/(I4*I4*I4));
-	double F1D5 = m_G1/(I4*I4);
+	double F1D4 = -2*G1*(I5/(I4*I4*I4));
+	double F1D5 = G1/(I4*I4);
 
 	// calculate derivatives for F2
-	double F2D1 =  m_G2*beta*lat;
-	double F2D4 =  m_G2*beta*(I1*I4 + I5)*0.5*pow(I4, -1.5);
-	double F2D5 = -m_G2*beta/lat;
+	double F2D1 =  G2*beta*lat;
+	double F2D4 =  G2*beta*(I1*I4 + I5)*0.5*pow(I4, -1.5);
+	double F2D5 = -G2*beta/lat;
 
 	// calculate derivatives for F3
 	// these terms are proposed to fix the zero-stress problem
-	double F3D4 = 9.0*m_G3*0.125*log(I4)/I4;
+	double F3D4 = 9.0*G3*0.125*log(I4)/I4;
 
 	// calculate passive fiber force
 	double Fp;
-	if (lat <= m_Lofl)
+	if (lat <= Lofl)
 	{
 		Fp = 0;
 	}
-	else if (lat < m_lam1)
+	else if (lat < lam1)
 	{
-		Fp = m_P1*(exp(m_P2*(lat/m_Lofl - 1)) - 1);
+		Fp = P1*(exp(P2*(lat/Lofl - 1)) - 1);
 	}
 	else
 	{
 		double P3, P4;
 
-		P3 = m_P1*m_P2*exp(m_P2*(m_lam1/m_Lofl - 1));
-		P4 = m_P1*(exp(m_P2*(m_lam1/m_Lofl - 1)) - 1) - P3*m_lam1/m_Lofl;
+		P3 = P1*P2*exp(P2*(lam1/Lofl - 1));
+		P4 = P1*(exp(P2*(lam1/Lofl - 1)) - 1) - P3*lam1/Lofl;
 
-		Fp = P3*lat/m_Lofl + P4;
+		Fp = P3*lat/Lofl + P4;
 	}
 
 	// calculate active fiber force
 	double Fa = 0;
 
-	if ((lat <= 0.4*m_Lofl) || (lat >= 1.6*m_Lofl))
+	if ((lat <= 0.4*Lofl) || (lat >= 1.6*Lofl))
 	{
 		// we have added this part to make sure that 
 		// Fa is zero outside the range [0.4, 1.6] *m_Lofl
@@ -178,22 +189,22 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 	}
 	else
 	{
-		if (lat <= 0.6*m_Lofl)
+		if (lat <= 0.6*Lofl)
 		{
-			Fa = 9*SQR(lat/m_Lofl - 0.4);
+			Fa = 9*SQR(lat/Lofl - 0.4);
 		}
-		else if (lat >= 1.4*m_Lofl)
+		else if (lat >= 1.4*Lofl)
 		{
-			Fa = 9*SQR(lat/m_Lofl - 1.6);
+			Fa = 9*SQR(lat/Lofl - 1.6);
 		}
-		else if ((lat >= 0.6*m_Lofl) && (lat <= 1.4*m_Lofl))
+		else if ((lat >= 0.6*Lofl) && (lat <= 1.4*Lofl))
 		{
-			Fa = 1 - 4*SQR(1 - lat/m_Lofl);
+			Fa = 1 - 4*SQR(1 - lat/Lofl);
 		}
 	}
 
 	// calculate total fiber force
-	double FfDl = m_smax*(Fp + m_alpha*Fa)/m_Lofl;
+	double FfDl = smax*(Fp + alpha*Fa)/Lofl;
 	double FfD4  = 0.5*FfDl/lat;
 
 	// add all derivatives
@@ -280,64 +291,75 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 		ksi = (1.0/(w*w-1))*(1 - w*b2/sqrt(w*w-1));
 	}
 
+	// evaluate material parameters
+	double G1 = m_G1(mp);
+	double G2 = m_G2(mp);
+	double G3 = m_G3(mp);
+	double P1 = m_P1(mp);
+	double P2 = m_P2(mp);
+	double Lofl = m_Lofl(mp);
+	double lam1 = m_lam1(mp);
+	double alpha = m_alpha(mp);
+	double smax = m_smax(mp);
+
 	// --- strain energy derivatives ---
 	// We assume that W(I1, I4, I5, alpha) = F1(B1(I4, I5)) + F2(B2(I1,I4,I5)) + F3(lam(I4), alpha)
 	double W1, W2, W4, W5;
 
 	// -- A. matrix contribution --
 	// calculate derivatives for F1
-	double F1D4 = -2*m_G1*(I5/(I4*I4*I4));
-	double F1D5 = m_G1/(I4*I4);
+	double F1D4 = -2*G1*(I5/(I4*I4*I4));
+	double F1D5 = G1/(I4*I4);
 
-	double F1D44 = 6*m_G1*(I5/(I4*I4*I4*I4));
-	double F1D45 = -2*m_G1/(I4*I4*I4);
+	double F1D44 = 6*G1*(I5/(I4*I4*I4*I4));
+	double F1D45 = -2*G1/(I4*I4*I4);
 
 	// calculate derivatives for F2
-	double F2D1 =  m_G2*beta*lat;
-	double F2D4 =  m_G2*beta*(I1*I4 + I5)*0.5*pow(I4, -1.5);
-	double F2D5 = -m_G2*beta/lat;
+	double F2D1 =  G2*beta*lat;
+	double F2D4 =  G2*beta*(I1*I4 + I5)*0.5*pow(I4, -1.5);
+	double F2D5 = -G2*beta/lat;
 
-	double F2D11 = ksi*m_G2*I4*0.5;
-	double F2D44 = 2.0*m_G2*ksi*pow(0.25*(I1*I4+I5)/pow(I4, 1.5), 2) - m_G2*beta*(0.25*(I1*I4 + 3*I5) / pow(I4, 2.5));
-	double F2D55 = 0.5*m_G2*ksi/I4;
-	double F2D14 = m_G2*beta*0.5/lat + m_G2*ksi*(I1*I4+I5)*0.25/I4;
-	double F2D15 = -0.5*m_G2*ksi;
-	double F2D45 = m_G2*beta*0.5*pow(I4, -1.5) - m_G2*ksi*0.25*(I1*I4+I5)/(I4*I4);
+	double F2D11 = ksi*G2*I4*0.5;
+	double F2D44 = 2.0*G2*ksi*pow(0.25*(I1*I4+I5)/pow(I4, 1.5), 2) - G2*beta*(0.25*(I1*I4 + 3*I5) / pow(I4, 2.5));
+	double F2D55 = 0.5*G2*ksi/I4;
+	double F2D14 = G2*beta*0.5/lat + G2*ksi*(I1*I4+I5)*0.25/I4;
+	double F2D15 = -0.5*G2*ksi;
+	double F2D45 = G2*beta*0.5*pow(I4, -1.5) - G2*ksi*0.25*(I1*I4+I5)/(I4*I4);
 
 	// calculate derivatives for F3
 	// these terms are proposed to fix the zero-stress problem
-	double F3D4  = 9.0*m_G3*0.125*log(I4)/I4;
-	double F3D44 = 9.0*m_G3*0.125*(1 - log(I4))/(I4*I4);
+	double F3D4  = 9.0*G3*0.125*log(I4)/I4;
+	double F3D44 = 9.0*G3*0.125*(1 - log(I4))/(I4*I4);
 
 	// -- B. fiber contribution --
 
 	// calculate passive fiber force
 	double Fp, FpDl;
-	if (lat <= m_Lofl)
+	if (lat <= Lofl)
 	{
 		Fp = 0;
 		FpDl = 0;
 	}
-	else if (lat < m_lam1)
+	else if (lat < lam1)
 	{
-		Fp = m_P1*(exp(m_P2*(lat/m_Lofl - 1)) - 1);
-		FpDl = m_P1*m_P2*exp(m_P2*(lat/m_Lofl-1))/m_Lofl;
+		Fp = P1*(exp(P2*(lat/Lofl - 1)) - 1);
+		FpDl = P1*P2*exp(P2*(lat/Lofl-1))/Lofl;
 	}
 	else
 	{
 		double P3, P4;
 
-		P3 = m_P1*m_P2*exp(m_P2*(m_lam1/m_Lofl - 1));
-		P4 = m_P1*(exp(m_P2*(m_lam1/m_Lofl - 1)) - 1) - P3*m_lam1/m_Lofl;
+		P3 = P1*P2*exp(P2*(lam1/Lofl - 1));
+		P4 = P1*(exp(P2*(lam1/Lofl - 1)) - 1) - P3*lam1/Lofl;
 
-		Fp = P3*lat/m_Lofl + P4;
-		FpDl = P3/m_Lofl;
+		Fp = P3*lat/Lofl + P4;
+		FpDl = P3/Lofl;
 	}
 
 	// calculate active fiber force
 	double Fa = 0, FaDl = 0;
 
-	if ((lat <= 0.4*m_Lofl) || (lat >= 1.6*m_Lofl))
+	if ((lat <= 0.4*Lofl) || (lat >= 1.6*Lofl))
 	{
 		// we have added this part to make sure that 
 		// Fa is zero outside the range [0.4, 1.6] *m_Lofl
@@ -346,28 +368,28 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 	}
 	else
 	{
-		if (lat <= 0.6*m_Lofl)
+		if (lat <= 0.6*Lofl)
 		{
-			Fa = 9*SQR(lat/m_Lofl - 0.4);
-			FaDl = 18*(lat/m_Lofl - 0.4)/m_Lofl;
+			Fa = 9*SQR(lat/Lofl - 0.4);
+			FaDl = 18*(lat/Lofl - 0.4)/Lofl;
 		}
-		else if (lat >= 1.4*m_Lofl)
+		else if (lat >= 1.4*Lofl)
 		{
-			Fa = 9*SQR(lat/m_Lofl - 1.6);
-			FaDl = 18*(lat/m_Lofl - 1.6)/m_Lofl;
+			Fa = 9*SQR(lat/Lofl - 1.6);
+			FaDl = 18*(lat/Lofl - 1.6)/Lofl;
 		}
-		else if ((lat >= 0.6*m_Lofl) && (lat <= 1.4*m_Lofl))
+		else if ((lat >= 0.6*Lofl) && (lat <= 1.4*Lofl))
 		{
-			Fa = 1 - 4*SQR(1 - lat/m_Lofl);
-			FaDl = 8*(1 - lat/m_Lofl)/m_Lofl;
+			Fa = 1 - 4*SQR(1 - lat/Lofl);
+			FaDl = 8*(1 - lat/Lofl)/Lofl;
 		}
 	}
 
 	// calculate total fiber force
-	double FfDl = m_smax*(Fp + m_alpha*Fa)/m_Lofl;
+	double FfDl = smax*(Fp + alpha*Fa)/Lofl;
 	double FfD4  = 0.5*FfDl/lat;
 
-	double FfDll = m_smax*(FpDl + m_alpha*FaDl)/m_Lofl;
+	double FfDll = smax*(FpDl + alpha*FaDl)/Lofl;
 	double FfD44 = 0.25*(FfDll - FfDl / lat)/I4;
 
 	// add all derivatives

@@ -38,6 +38,8 @@ DumpMemStream::DumpMemStream(FEModel& fem) : DumpStream(fem)
 	m_pd = 0;
 	m_nsize = 0;
 	m_nreserved = 0;
+	m_growsize = 16777216;
+	m_growcounter = 0;
 
 	Open(true, true);
 }
@@ -45,11 +47,8 @@ DumpMemStream::DumpMemStream(FEModel& fem) : DumpStream(fem)
 //-----------------------------------------------------------------------------
 void DumpMemStream::clear()
 {
-	delete [] m_pb;
-	m_pb = 0;
-	m_pd = 0;
+	m_pd = m_pb;
 	m_nsize = 0;
-	m_nreserved = 0;
 
 	// Since we can't read from an empty stream
 	// we restore write mode.
@@ -72,7 +71,7 @@ bool DumpMemStream::EndOfStream() const
 //-----------------------------------------------------------------------------
 DumpMemStream::~DumpMemStream()
 {
-	clear();
+	delete[] m_pb;
 }
 
 //-----------------------------------------------------------------------------
@@ -87,7 +86,11 @@ void DumpMemStream::grow_buffer(size_t l)
 {
 	if (l <= 0) return;
 
-	char* pnew = new char[m_nreserved + l];
+	if (l > m_growsize) m_growsize = l;
+
+	size_t newSize = m_nreserved + m_growsize;
+
+	char* pnew = new char[newSize];
 	if (m_pb)
 	{
 		memcpy(pnew, m_pb, m_nreserved);
@@ -95,7 +98,10 @@ void DumpMemStream::grow_buffer(size_t l)
 	}
 	m_pb = pnew;
 	m_pd = m_pb + m_nsize;
-	m_nreserved += l;
+	m_nreserved = newSize;
+	m_growsize = m_nreserved / 2;
+
+	m_growcounter++;
 }
 
 //-----------------------------------------------------------------------------
@@ -104,7 +110,7 @@ size_t DumpMemStream::write(const void* pd, size_t size, size_t count)
 	assert(IsSaving());
 	size_t nsize = count*size;
 	size_t lpos = (size_t)(m_pd - m_pb);
-	if (lpos + nsize > m_nreserved) grow_buffer(nsize + 3*m_nreserved/2);
+	if (lpos + nsize > m_nreserved) grow_buffer(nsize);
 	memcpy(m_pd, pd, nsize);
 
 	m_pd += nsize;

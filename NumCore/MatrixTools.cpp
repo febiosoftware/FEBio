@@ -283,7 +283,7 @@ void NumCore::randomVector(vector<double>& R, double vmin, double vmax)
 	}
 }
 
-// norm of a vector
+// inf-norm of a vector
 double NumCore::infNorm(const std::vector<double>& x)
 {
 	double m = 0.0;
@@ -291,6 +291,17 @@ double NumCore::infNorm(const std::vector<double>& x)
 	{
 		double xi = fabs(x[i]);
 		if (xi > m) m = xi;
+	}
+	return m;
+}
+
+// 1-norm of a vector
+double NumCore::oneNorm(const std::vector<double>& x)
+{
+	double m = 0.0;
+	for (double xi : x)
+	{
+		m += fabs(xi);
 	}
 	return m;
 }

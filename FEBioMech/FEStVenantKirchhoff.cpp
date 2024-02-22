@@ -31,13 +31,19 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEStVenantKirchhoff, FEElasticMaterial)
-	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 END_FECORE_CLASS();
 
 //////////////////////////////////////////////////////////////////////
 // FEStVenantKirchhoff
 //////////////////////////////////////////////////////////////////////
+
+FEStVenantKirchhoff::FEStVenantKirchhoff(FEModel* pfem) : FEElasticMaterial(pfem) 
+{
+	m_E = 0.0;
+	m_v = 0.0;
+}
 
 //-----------------------------------------------------------------------------
 mat3ds FEStVenantKirchhoff::Stress(FEMaterialPoint& mp)

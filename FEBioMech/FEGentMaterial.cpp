@@ -103,8 +103,8 @@ tens4ds FEGentMaterial::DevTangent(FEMaterialPoint& mp)
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FECompressibleGentMaterial, FEElasticMaterial)
-	ADD_PARAMETER(m_G , FE_RANGE_GREATER(0.0), "G");
-	ADD_PARAMETER(m_K , FE_RANGE_GREATER(0.0), "K");
+	ADD_PARAMETER(m_G , FE_RANGE_GREATER(0.0), "G")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_K , FE_RANGE_GREATER(0.0), "K")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_Jm, FE_RANGE_GREATER(0.0), "Jm");
 END_FECORE_CLASS();
 

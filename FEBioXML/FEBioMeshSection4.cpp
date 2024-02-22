@@ -28,14 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBioMeshSection4.h"
-#include <FECore/FESolidDomain.h>
-#include <FECore/FEShellDomain.h>
-#include <FECore/FETrussDomain.h>
-#include <FECore/FEDomain2D.h>
 #include <FECore/FEModel.h>
-#include <FECore/FEMaterial.h>
-#include <FECore/FECoreKernel.h>
-#include <FECore/FENodeNodeList.h>
 #include <sstream>
 
 //-----------------------------------------------------------------------------
@@ -174,6 +167,12 @@ void FEBioMeshSection4::ParseElementSection(XMLTag& tag, FEBModel::Part* part)
 	dom->Reserve(10000);
 	vector<int> elemList; elemList.reserve(10000);
 
+	// keep track of largest ID
+	// we need to enforce that element IDs are increasing
+	// (This is currently only done for each domain. Need to modify this
+	// so it's done on the whole model.)
+	int maxID = -1;
+
 	// read element data
 	++tag;
 	do
@@ -182,6 +181,9 @@ void FEBioMeshSection4::ParseElementSection(XMLTag& tag, FEBModel::Part* part)
 
 		// get the element ID
 		tag.AttributeValue("id", el.id);
+
+		if ((maxID == -1) || (el.id > maxID)) maxID = el.id;
+		else throw XMLReader::InvalidAttributeValue(tag, "id");
 
 		// read the element data
 		tag.value(el.node, FEElement::MAX_NODES);

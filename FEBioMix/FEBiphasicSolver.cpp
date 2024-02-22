@@ -34,7 +34,6 @@ SOFTWARE.*/
 #include "FESlidingInterfaceBiphasic.h"
 #include "FESlidingInterfaceBiphasicMixed.h"
 #include <FEBioMech/FEElasticDomain.h>
-#include <FEBioMech/FEElasticDomain.h>
 #include <FEBioMech/FEPressureLoad.h>
 #include <FEBioMech/FEResidualVector.h>
 #include <FEBioMech/FESolidLinearSystem.h>

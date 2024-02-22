@@ -68,7 +68,13 @@ public:
 	void Clear();
 
 	//! Initialization
+	//! This creates the rigid bodies.
+	//! (This must be called before any rigid materials are initialized!)
 	bool Init();
+
+	//! Initialization of Rigid bodies
+	//! (Must be called after the mesh domains are initialized!)
+	bool InitRigidBodies();
 
 	//! Reset data
 	bool Reset();

@@ -78,6 +78,5 @@ public:
 public:
     // weak bond recruitment parameters
     double m_Et;            //!< trial strain value at time t
-    double m_Em;            //!< max strain value up to time t
     deque <double> m_wv;    //!< total mass fraction of weak bonds
 };

@@ -454,23 +454,43 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 
 	if (StorageFormat() == FMT_MULT)
 	{
-		assert(DataType() == FE_DOUBLE);
-
-		// get the max element nodes
-		int maxElemNodes = m_maxElemNodes;
-		if (map.m_maxElemNodes > maxElemNodes) maxElemNodes = map.m_maxElemNodes;
-		Realloc(newElems, maxElemNodes);
-
-		// set the new values of the map
-		for (int i = 0; i < set2->Elements(); ++i)
+		if (DataType() == FE_DOUBLE)
 		{
-			int n = set2->Element(i).Nodes();
-			for (int j = 0; j < n; ++j)
+			// get the max element nodes
+			int maxElemNodes = m_maxElemNodes;
+			if (map.m_maxElemNodes > maxElemNodes) maxElemNodes = map.m_maxElemNodes;
+			Realloc(newElems, maxElemNodes);
+
+			// set the new values of the map
+			for (int i = 0; i < set2->Elements(); ++i)
 			{
-				double v = map.value<double>(i, j);
-				setValue<double>(oldElems + i, j, v);
+				int n = set2->Element(i).Nodes();
+				for (int j = 0; j < n; ++j)
+				{
+					double v = map.value<double>(i, j);
+					setValue<double>(oldElems + i, j, v);
+				}
 			}
 		}
+		else if (DataType() == FE_VEC3D)
+		{
+			// get the max element nodes
+			int maxElemNodes = m_maxElemNodes;
+			if (map.m_maxElemNodes > maxElemNodes) maxElemNodes = map.m_maxElemNodes;
+			Realloc(newElems, maxElemNodes);
+
+			// set the new values of the map
+			for (int i = 0; i < set2->Elements(); ++i)
+			{
+				int n = set2->Element(i).Nodes();
+				for (int j = 0; j < n; ++j)
+				{
+					vec3d v = map.value<vec3d>(i, j);
+					setValue<vec3d>(oldElems + i, j, v);
+				}
+			}
+		}
+		else assert(false);
 	}
 	else if (StorageFormat() == FMT_MATPOINTS)
 	{

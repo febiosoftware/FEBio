@@ -38,7 +38,6 @@ SOFTWARE.*/
 #include "FEBioGeometrySection.h"
 #include "FEBioBoundarySection.h"
 #include "FEBioBoundarySection3.h"
-#include "FEBioCodeSection.h"
 #include "FEBioLoadsSection.h"
 #include "FEBioContactSection.h"
 #include "FEBioConstraintsSection.h"
@@ -58,15 +57,9 @@ SOFTWARE.*/
 #include "FEBioMeshSection4.h"
 #include "FEBioMeshDomainsSection4.h"
 #include "FEBioStepSection3.h"
-#include "FECore/DataStore.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include <FECore/FESurfaceMap.h>
-#include <FECore/FEFunction1D.h>
-#include <FECore/tens3d.h>
-#include "FECore/DOFS.h"
 #include <string.h>
-#include <stdarg.h>
 #include "xmltool.h"
 
 FEBioFileSection::FEBioFileSection(FEBioImport* feb) : FEFileSection(feb) {}
@@ -190,6 +183,9 @@ FEBioImport::~FEBioImport()
 // Build the file section map based on the version number
 void FEBioImport::BuildFileSectionMap(int nversion)
 {
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	if (nversion < 0x0400) fecore.ShowDeprecationWarnings(false);
+
 	// define the file structure
 	m_map["Module"     ] = new FEBioModuleSection     (this);
 	m_map["Globals"    ] = new FEBioGlobalsSection    (this);

@@ -190,6 +190,40 @@ bool FERigidSystem::Init()
 }
 
 //-----------------------------------------------------------------------------
+bool FERigidSystem::InitRigidBodies()
+{
+	FEModel& fem = m_fem;
+
+	// initialize rigid body COM
+	// only set the rigid body com if this is the main rigid body material
+	for (int i = 0; i < m_RB.size(); ++i)
+	{
+		FERigidBody& rb = *m_RB[i];
+
+		// first, calculate the mass
+		rb.UpdateMass();
+
+		FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(rb.m_mat));
+		assert(prm);
+
+		// next, calculate the center of mass, or just set it
+		if (prm->m_com == false)
+		{
+			rb.UpdateCOM();
+		}
+		else
+		{
+			rb.SetCOM(prm->m_rc);
+		}
+
+		// finally, determine moi
+		rb.UpdateMOI();
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! In FEBio rigid bodies are defined implicitly through a list of rigid materials.
 //! However, a rigid body can be composed of multiple rigid materials, so we can't
 //! just create a rigid body for each rigid material. We must look at the connectivity
@@ -349,32 +383,6 @@ bool FERigidSystem::CreateObjects()
 		m_RB.push_back(prb);
 	}
 
-	// initialize rigid body COM
-	// only set the rigid body com if this is the main rigid body material
-	for (int i = 0; i < m_RB.size(); ++i )
-	{
-		FERigidBody& rb = *m_RB[i];
-
-		// first, calculate the mass
-		rb.UpdateMass();
-
-		FERigidMaterial* prm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(rb.m_mat));
-		assert(prm);
-
-		// next, calculate the center of mass, or just set it
-		if (prm->m_com == false)
-		{
-			rb.UpdateCOM();
-		}
-		else
-		{
-			rb.SetCOM(prm->m_rc);
-		}
-
-		// finally, determine moi
-		rb.UpdateMOI();
-	}
-
 	return true;
 }
 
@@ -460,23 +468,17 @@ FEParamValue FERigidSystem::GetParameterValue(const ParamString& paramString)
 void FERigidSystem::UpdateMesh()
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	int NRB = Objects();
-	for (int i=0; i<NRB; ++i)
+	int N = mesh.Nodes();
+#pragma omp parallel for
+	for (int i = 0; i < N; ++i)
 	{
-		// get the rigid body
-		FERigidBody& RB = *Object(i);
-
-		// update the mesh' nodes
-		int N = mesh.Nodes();
-		for (int i=0; i<N; ++i)
+		FENode& node = mesh.Node(i);
+		if (node.m_rid >= 0)
 		{
-			FENode& node = mesh.Node(i);
-			if (node.m_rid == RB.m_nID)
-			{
-				vec3d a0 = node.m_ra - RB.m_r0;
-				vec3d at = RB.GetRotation()*a0;
-				node.m_rt = RB.m_rt + at;
-			}
+			FERigidBody& RB = *Object(node.m_rid);
+			vec3d a0 = node.m_ra - RB.m_r0;
+			vec3d at = RB.GetRotation()*a0;
+			node.m_rt = RB.m_rt + at;
 		}
 	}
 }

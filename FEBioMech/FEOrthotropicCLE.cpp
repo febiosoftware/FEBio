@@ -33,18 +33,18 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEOrthotropicCLE, FEElasticMaterial)
-	ADD_PARAMETER(lp11, "lp11");
-	ADD_PARAMETER(lm11, "lm11");
-	ADD_PARAMETER(lp22, "lp22");
-	ADD_PARAMETER(lm22, "lm22");
-	ADD_PARAMETER(lp33, "lp33");
-	ADD_PARAMETER(lm33, "lm33");
-	ADD_PARAMETER(l12, "l12");
-	ADD_PARAMETER(l23, "l23");
-	ADD_PARAMETER(l31, "l31");
-	ADD_PARAMETER(mu1, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu1");
-	ADD_PARAMETER(mu2, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu2");
-	ADD_PARAMETER(mu3, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu3");
+	ADD_PARAMETER(lp11, "lp11")->setLongName("lambda_11 tensile")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(lm11, "lm11")->setLongName("lambda_11 compressive")->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(lp22, "lp22")->setLongName("lambda_22 tensile")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(lm22, "lm22")->setLongName("lambda_22 compressive")->setUnits(UNIT_PRESSURE);
+    ADD_PARAMETER(lp33, "lp33")->setLongName("lambda_33 tensile")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(lm33, "lm33")->setLongName("lambda_33 compressive")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(l12, "l12")->setLongName("lambda_12")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(l23, "l23")->setLongName("lambda_23")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(l31, "l31")->setLongName("lambda_13")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(mu1, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu1")->setLongName("mu_1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(mu2, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu2")->setLongName("mu_2")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(mu3, FE_RANGE_GREATER_OR_EQUAL(0.0), "mu3")->setLongName("mu_3")->setUnits(UNIT_PRESSURE);
 
     ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 

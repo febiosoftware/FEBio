@@ -45,6 +45,14 @@ public:
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 
+//! Nodal rotations
+class FEPlotNodeRotation : public FEPlotNodeData
+{
+public:
+	FEPlotNodeRotation(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) { SetUnits(UNIT_RADIAN); }
+	bool Save(FEMesh& m, FEDataStream& a);
+};
+
 //-----------------------------------------------------------------------------
 //! Nodal velocities
 //!
@@ -1153,6 +1161,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Weak bond recruitment ratio in reactive viscoelastic material point
+class FEPlotRVErecruitment : public FEPlotDomainData
+{
+public:
+    FEPlotRVErecruitment(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Reactive viscoelastic strain measure for bond-breaking trigger and bond recruitment
 class FEPlotRVEstrain : public FEPlotDomainData
 {
@@ -1278,3 +1295,57 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+
+//-----------------------------------------------------------------------------
+//! beam element stress
+class FEPlotBeamStress : public FEPlotDomainData
+{
+public:
+	FEPlotBeamStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! beam element stress in reference frame
+class FEPlotBeamReferenceStress : public FEPlotDomainData
+{
+public:
+	FEPlotBeamReferenceStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! beam element stress couple
+class FEPlotBeamStressCouple : public FEPlotDomainData
+{
+public:
+	FEPlotBeamStressCouple(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! beam element stress couple in reference frame
+class FEPlotBeamReferenceStressCouple : public FEPlotDomainData
+{
+public:
+	FEPlotBeamReferenceStressCouple(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! beam element strain
+class FEPlotBeamStrain : public FEPlotDomainData
+{
+public:
+	FEPlotBeamStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! beam element curvature
+class FEPlotBeamCurvature : public FEPlotDomainData
+{
+public:
+	FEPlotBeamCurvature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

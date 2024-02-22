@@ -55,7 +55,6 @@ SOFTWARE.*/
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/FENLConstraint.h>
-#include <NumCore/NumCore.h>
 #include "FEThermoFluidAnalysis.h"
 
 //-----------------------------------------------------------------------------
@@ -504,6 +503,17 @@ void FEThermoFluidSolver::UpdateKinematics(vector<double>& ui)
             n.set(m_dofAT, aTt);
         }
     }
+    // update nonlinear constraints (needed for updating Lagrange Multiplier)
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* nlc = fem.NonlinearConstraint(i);
+        if (nlc->IsActive()) nlc->Update(m_Ui, ui);
+    }
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc->IsActive()) spc->Update(ui);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -555,6 +565,69 @@ void FEThermoFluidSolver::Update(vector<double>& ui)
     // update model state
 //    GetFEModel()->Update();
     UpdateModel();
+}
+
+//-----------------------------------------------------------------------------
+//! Update DOF increments
+void FEThermoFluidSolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap)
+{
+    FEModel& fem = *GetFEModel();
+    
+    // get the mesh
+    FEMesh& mesh = fem.GetMesh();
+    
+    // extract the velocity and dilatation increments
+    GetVelocityData(m_vi, ui);
+    GetDilatationData(m_di, ui);
+    GetTemperatureData(m_ti, ui);
+
+    // update all degrees of freedom
+    for (int i=0; i<m_neq; ++i) Ui[i] += ui[i];
+        
+    // update velocities
+    for (int i = 0; i<m_nveq; ++i) m_Vi[i] += m_vi[i];
+
+    // update dilatations
+    for (int i = 0; i<m_ndeq; ++i) m_Di[i] += m_di[i];
+        
+    // update temperatures
+    for (int i = 0; i<m_nteq; ++i) m_Ti[i] += m_ti[i];
+        
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
+        if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
+    }
+    
+    // TODO: This is a hack!
+    // The problem is that I only want to call the domain's IncrementalUpdate during
+    // the quasi-Newtoon loop. However, this function is also called after the loop
+    // converges. The emap parameter is used here to detect wether we are inside the
+    // loop (emap == false), or not (emap == true).
+    if (emap == false)
+    {
+        for (int i = 0; i < mesh.Domains(); ++i)
+        {
+            FEDomain& dom = mesh.Domain(i);
+            dom.IncrementalUpdate(ui, true);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Update nonlinear constraints
+void FEThermoFluidSolver::UpdateConstraints()
+{
+    FEModel& fem = *GetFEModel();
+    FETimeInfo& tp = fem.GetTime();
+    tp.currentIteration = m_niter;
+    
+    // Update all nonlinear constraints
+    for (int i = 0; i<fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* pci = fem.NonlinearConstraint(i);
+        if (pci->IsActive()) pci->Update();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -676,6 +749,12 @@ void FEThermoFluidSolver::PrepStep()
     // update stresses
     fem.Update();
     
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
+        if (plc && plc->IsActive()) plc->PrepStep();
+    }
+    
     // see if we need to do contact augmentations
     m_baugment = false;
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
@@ -745,8 +824,11 @@ bool FEThermoFluidSolver::Quasin()
             }
         }
         
-        // solve the equations (returns line search; solution stored in m_ui)
-        double s = QNSolve();
+        // solve the equations
+        SolveEquations(m_ui, m_R0);
+
+        // do the line search
+        double s = DoLineSearch();
 
         // for sequential solve, we set one of the residual components to zero
         if (m_solve_strategy == SOLVE_SEQUENTIAL)
@@ -767,11 +849,6 @@ bool FEThermoFluidSolver::Quasin()
             }
         }
         
-        // extract the velocity and dilatation increments
-        GetVelocityData(m_vi, m_ui);
-        GetDilatationData(m_di, m_ui);
-        GetTemperatureData(m_ti, m_ui);
-
         // set initial convergence norms
         if (m_niter == 0)
         {
@@ -783,28 +860,24 @@ bool FEThermoFluidSolver::Quasin()
             normEm = normEi;
         }
         
-        // calculate norms
-        // update all degrees of freedom
-        for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
-            
-        // update velocities
-        for (int i = 0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
+        // calculate actual increment
+        // NOTE: We don't apply the line search directly to m_ui since we need the unscaled search direction for the QN update below
+        int neq = (int)m_Ui.size();
+        vector<double> ui(m_ui);
+        for (int i = 0; i<neq; ++i) ui[i] *= s;
 
-        // update dilatations
-        for (int i = 0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
-            
-        // update temperatures
-        for (int i = 0; i<m_nteq; ++i) m_Ti[i] += s*m_ti[i];
-            
+        // update other increments (e.g., Lagrange multipliers)
+        UpdateIncrements(m_Ui, ui, false);
+        
         // calculate the norms
         normR1 = m_R1*m_R1;
-        normv  = (m_vi*m_vi)*(s*s);
+        normv  = m_vi*m_vi;
         normV  = m_Vi*m_Vi;
-        normd  = (m_di*m_di)*(s*s);
+        normd  = m_di*m_di;
         normD  = m_Di*m_Di;
-        normt  = (m_ti*m_ti)*(s*s);
+        normt  = m_ti*m_ti;
         normT  = m_Ti*m_Ti;
-        normE1 = s*fabs(m_ui*m_R1);
+        normE1 = fabs(m_ui*m_R1);
         
         // check for nans
         if (ISNAN(normR1)) throw NANInResidualDetected();
@@ -925,8 +998,9 @@ bool FEThermoFluidSolver::Quasin()
     // if converged we update the total velocities
     if (bconv)
     {
-        m_Ut += m_Ui;
+        UpdateIncrements(m_Ut, m_Ui, true);
         zero(m_Ui);
+        zero(m_Di); zero(m_Vi); zero(m_Ti);
     }
     
     return bconv;

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterial.h"
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
 //! This class represents a fiber material with an exponential toe-region
@@ -49,10 +50,10 @@ public:
 	double FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& a0) override;
 
 public:
-	double	m_c3;		//!< Exponential stress coefficient
-	double	m_c4;		//!< Fiber uncrimping coefficient
-	double	m_c5;		//!< Modulus of straightened fibers
-	double	m_lam1;		//!< fiber stretch for straightened fibers
+	FEParamDouble   m_c3;		//!< Exponential stress coefficient
+    FEParamDouble   m_c4;       //!< fiber uncrimping coefficient
+    FEParamDouble   m_c5;       //!< modulus of straightened fibers
+    FEParamDouble   m_lam1;		//!< fiber stretch for straightened fibers
 	double	m_epsf;
 
 	DECLARE_FECORE_CLASS();

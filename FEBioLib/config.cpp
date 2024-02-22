@@ -105,23 +105,23 @@ namespace febio {
 						// parse the tags
 						if (tag == "if_debug")
 						{
-#ifdef _DEBUG
+#ifndef NDEBUG
 							++tag;
 							if (parse_tags(tag) == false) return false;
 							++tag;
 #else
 							tag.skip();
-#endif // DEBUG
+#endif // NDEBUG
 						}
 						else if (tag == "if_release")
 						{
-#ifndef _DEBUG
+#ifdef NDEBUG
 							++tag;
 							if (parse_tags(tag) == false) return false;
 							++tag;
 #else
 							tag.skip();
-#endif // !_DEBUG
+#endif // NDEBUG
 						}
 						else if (tag == "print_model_params")
 						{

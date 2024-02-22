@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include <FECore/JFNKMatrix.h>
 #include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/log.h>
-#include <FECore/FEModel.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <XML/XMLReader.h>
 

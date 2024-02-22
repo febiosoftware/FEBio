@@ -43,18 +43,18 @@ public:
 
 public:
 	// transverse constants
-	double m_G1; //!< along-fiber shear modulus
-	double m_G2; //!< cross-fiber shear modulus
-	double m_G3; //!< new term
+	FEParamDouble m_G1; //!< along-fiber shear modulus
+	FEParamDouble m_G2; //!< cross-fiber shear modulus
+	FEParamDouble m_G3; //!< new term
 
 	// along fiber constants
-	double	m_P1; //!< muscle fiber constant P1
-	double	m_P2; //!< muscle fiber constant P2
+	FEParamDouble	m_P1; //!< muscle fiber constant P1
+	FEParamDouble	m_P2; //!< muscle fiber constant P2
 		
-	double	m_Lofl;  //!< optimal sarcomere length
-	double	m_smax;  //!< maximum isometric stretch
-	double	m_lam1;
-	double	m_alpha;	//!< activation parameter
+	FEParamDouble	m_Lofl;  //!< optimal sarcomere length
+	FEParamDouble	m_smax;  //!< maximum isometric stretch
+	FEParamDouble	m_lam1;
+	FEParamDouble	m_alpha;	//!< activation parameter
 
 	FEVec3dValuator*	m_fiber;
 

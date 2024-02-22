@@ -53,16 +53,15 @@ void FEElemElemList::Init()
 	m_ref.resize(NE);
 
 	// count nr of neighbors
-	int NN = 0, n = 0, nf;
-	m_ref[0] = 0;
+	int NN = 0, n = 0;
 	for (int i=0; i<m.Domains(); ++i)
 	{
 		FEDomain& dom = m.Domain(i);
 		for (int j=0; j<dom.Elements(); ++j, ++n)
 		{
 			FEElement& el = dom.ElementRef(j);
-			nf = el.Faces();
-			if (n != 0) m_ref[n] = m_ref[n-1] + nf;
+			int nf = el.Faces();
+			m_ref[n] = NN;
 			NN += nf;
 		}
 	}

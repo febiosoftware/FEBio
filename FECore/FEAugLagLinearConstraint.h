@@ -105,6 +105,17 @@ public:
 	//! serialization
 	void Serialize(DumpStream& ar) override;
 
+    //! initialize
+    bool Init() override;
+    
+    // allocate equations
+    int InitEquations(int neq) override;
+    
+    void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+    void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
+    
+    void PrepStep() override;
+    
 protected:
 	//! calculate the constraint value
 	double constraint(FEAugLagLinearConstraint& LC);
@@ -113,7 +124,7 @@ public:
 	std::vector<FEAugLagLinearConstraint*>	m_LC;	//!< list of linear constraints
 
 public:
-	bool	m_laugon;	//!< augmentation flag
+	int 	m_laugon;	//!< contact enforcement method
 	double	m_tol;	//!< augmentation tolerance
 	double	m_eps;	//!< penalty factor
     double  m_rhs;  //!< right-hand-side of linear constraint equation
@@ -122,5 +133,9 @@ public:
 
 	int	m_nID;		//!< ID of manager
 
-	DECLARE_FECORE_CLASS();
+protected:
+    vector<int>     m_EQ;
+    vector<double>  m_Lm, m_Lmp;
+    
+    DECLARE_FECORE_CLASS();
 };

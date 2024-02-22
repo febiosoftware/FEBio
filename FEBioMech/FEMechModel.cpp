@@ -65,6 +65,16 @@ void FEMechModel::Clear()
 }
 
 //-----------------------------------------------------------------------------
+bool FEMechModel::Init()
+{
+	// create and initialize the rigid bodies
+	if (InitRigidSystem() == false) return false;
+
+	// initialize the rest of the model
+	return FEModel::Init();
+}
+
+//-----------------------------------------------------------------------------
 // number of rigid bodies
 int FEMechModel::RigidBodies() const
 {
@@ -154,6 +164,13 @@ bool FEMechModel::Reset()
 {
 	if (m_prs->Reset() == false) return false;
 	return FEModel::Reset();
+}
+
+//-----------------------------------------------------------------------------
+bool FEMechModel::InitMesh()
+{
+	if (FEModel::InitMesh() == false) return false;
+	return m_prs->InitRigidBodies();
 }
 
 //-----------------------------------------------------------------------------

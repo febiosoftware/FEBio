@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FERestartImport.h"
 #include "FECore/FESolver.h"
 #include "FECore/FEAnalysis.h"
-#include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
 #include <FECore/FETimeStepController.h>

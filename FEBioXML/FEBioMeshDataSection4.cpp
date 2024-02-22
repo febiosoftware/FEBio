@@ -29,17 +29,10 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioMeshDataSection.h"
 #include "FECore/FEModel.h"
-#include "FECore/DOFS.h"
 #include <FECore/FEDataGenerator.h>
 #include <FECore/FECoreKernel.h>
-#include <FECore/FEDataMathGenerator.h>
 #include <FECore/FEMaterial.h>
-#include <FECore/FEModelParam.h>
 #include <FECore/FEDomainMap.h>
-#include <FECore/FESurfaceLoad.h>
-#include <FECore/FEBodyLoad.h>
-#include <FECore/FEPrescribedDOF.h>
-#include <FECore/FEMaterialPointProperty.h>
 #include <FECore/FEConstDataGenerator.h>
 #include <FECore/FEConstValueVec3.h>
 #include <sstream>
