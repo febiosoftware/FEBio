@@ -190,12 +190,16 @@ public:
 
 	void BlockEvents(bool b);
 
+	void ShowDeprecationWarnings(bool b);
+
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
 
 	std::vector<FECreateHandler*>		m_createHandlers;
 	bool								m_blockEvents;
+
+	bool	m_bshowDeprecationWarning;
 
 	std::map<unsigned int, const char*>	m_sidMap;	// super class ID map
 

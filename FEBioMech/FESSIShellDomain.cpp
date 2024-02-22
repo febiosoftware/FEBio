@@ -202,6 +202,7 @@ void FESSIShellDomain::FindSSI()
 					break;
 				}
 			}
+			if (hasNodes) break;
 		}
 
 		// if the solid domain shares nodes with this shell domain,
@@ -293,9 +294,8 @@ void FESSIShellDomain::FindSSI()
     // check for elements that only have one or two shell nodes
     // but don't share a whole face
 
-    // create the node element list
-    FENodeElemList NEL;
-    NEL.Create(mesh);
+    // get the node element list
+    FENodeElemList& NEL = mesh.NodeElementList();
     
     for (int i = 0; i<ndom; ++i) {
         FEDomain& pdom = mesh.Domain(i);

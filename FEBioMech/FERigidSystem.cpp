@@ -468,23 +468,17 @@ FEParamValue FERigidSystem::GetParameterValue(const ParamString& paramString)
 void FERigidSystem::UpdateMesh()
 {
 	FEMesh& mesh = m_fem.GetMesh();
-	int NRB = Objects();
-	for (int i=0; i<NRB; ++i)
+	int N = mesh.Nodes();
+#pragma omp parallel for
+	for (int i = 0; i < N; ++i)
 	{
-		// get the rigid body
-		FERigidBody& RB = *Object(i);
-
-		// update the mesh' nodes
-		int N = mesh.Nodes();
-		for (int i=0; i<N; ++i)
+		FENode& node = mesh.Node(i);
+		if (node.m_rid >= 0)
 		{
-			FENode& node = mesh.Node(i);
-			if (node.m_rid == RB.m_nID)
-			{
-				vec3d a0 = node.m_ra - RB.m_r0;
-				vec3d at = RB.GetRotation()*a0;
-				node.m_rt = RB.m_rt + at;
-			}
+			FERigidBody& RB = *Object(node.m_rid);
+			vec3d a0 = node.m_ra - RB.m_r0;
+			vec3d at = RB.GetRotation()*a0;
+			node.m_rt = RB.m_rt + at;
 		}
 	}
 }

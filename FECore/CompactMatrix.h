@@ -83,6 +83,9 @@ public:
 	//! calculate bandwidth of matrix
 	int bandWidth();
 
+	//! count the actual nr. of nonzeroes
+	size_t actualNonZeroes();
+
 protected:
 	double*	m_pd;			//!< matrix values
 	int*	m_pindices;		//!< indices
