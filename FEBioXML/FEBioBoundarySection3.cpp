@@ -73,7 +73,7 @@ void FEBioBoundarySection3::ParseBC(XMLTag& tag)
 
 	// create the boundary condition
 	FEBoundaryCondition* pbc = fecore_new<FEBoundaryCondition>(sztype, fem);
-	if (pbc == 0) throw XMLReader::InvalidTag(tag);
+	if (pbc == 0) throw XMLReader::InvalidAttributeValue(tag, "type");
 
 	// read the (optional) name 
 	const char* szname = tag.AttributeValue("name", true);

@@ -192,7 +192,32 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 	// see if there is a generator
 	if (sztype)
 	{
-		FEFaceDataGenerator* gen = dynamic_cast<FEFaceDataGenerator*>(fecore_new<FEMeshDataGenerator>(sztype, &fem));
+		const char* szdataType = tag.AttributeValue("data_type", true);
+		if (szdataType == nullptr) szdataType = "scalar";
+		FEDataType dataType = str2datatype(szdataType);
+		if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "data_type", szdataType);
+
+		FESurfaceMap* map = nullptr;
+		FEFaceDataGenerator* gen = 0;
+		if (strcmp(sztype, "const") == 0)
+		{
+			if      (dataType == FE_DOUBLE) gen = new FEConstDataGenerator<double, FEFaceDataGenerator>(&fem);
+			else if (dataType == FE_VEC3D ) gen = new FEConstDataGenerator<vec3d , FEFaceDataGenerator>(&fem);
+			else if (dataType == FE_MAT3D ) gen = new FEConstDataGenerator<mat3d , FEFaceDataGenerator>(&fem);
+			else if (dataType == FE_MAT3DS) gen = new FEConstDataGenerator<mat3ds, FEFaceDataGenerator>(&fem);
+
+			// create the data map
+			map = new FESurfaceMap(dataType);
+			map->Create(surf);
+			map->SetName(szname);
+
+			// add it to the mesh
+			mesh.AddDataMap(map);
+		}
+		else
+		{
+			gen = fecore_new<FEFaceDataGenerator>(sztype, &fem);
+		}
 		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 		gen->SetFacetSet(surf);
@@ -204,7 +229,7 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 		ReadParameterList(tag, gen);
 
 		// Add it to the list (will be applied after the rest of the model was read in)
-		GetBuilder()->AddMeshDataGenerator(gen, nullptr, nullptr);
+		GetBuilder()->AddMeshDataGenerator(gen, map, nullptr);
 	}
 	else
 	{

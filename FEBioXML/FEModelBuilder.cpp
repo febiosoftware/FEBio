@@ -657,7 +657,7 @@ void FEModelBuilder::AddMappedParameter(FEParam* p, FECoreBase* parent, const ch
 	m_mappedParams.push_back(mp);
 }
 
-void FEModelBuilder::AddMeshDataGenerator(FEMeshDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp)
+void FEModelBuilder::AddMeshDataGenerator(FEMeshDataGenerator* gen, FEDataMap* map, FEParamDouble* pp)
 {
 	m_mapgen.push_back(DataGen{ gen, map, pp });
 }
@@ -905,16 +905,24 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 		FEFaceDataGenerator* fgen = dynamic_cast<FEFaceDataGenerator*>(gen);
 		if (fgen)
 		{
-			FESurfaceMap* map = fgen->Generate();
-			if (map == nullptr) return false;
-			map->SetName(fgen->GetName());
-			mesh.AddDataMap(map);
+			FESurfaceMap* map = dynamic_cast<FESurfaceMap*>(m_mapgen[i].map);
+			if (map)
+			{
+				if (fgen->Generate(*map) == false) return false;
+			}
+			else
+			{
+				FESurfaceMap* map = fgen->Generate();
+				if (map == nullptr) return false;
+				map->SetName(fgen->GetName());
+				mesh.AddDataMap(map);
+			}
 		}
 
 		FEElemDataGenerator* egen = dynamic_cast<FEElemDataGenerator*>(gen);
 		if (egen)
 		{
-			FEDomainMap* map = m_mapgen[i].map;
+			FEDomainMap* map = dynamic_cast<FEDomainMap*>(m_mapgen[i].map);
 			FEParamDouble* pp = m_mapgen[i].pp;
 
 			// generate the data
