@@ -534,6 +534,10 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEBondRecruitmentPower, "recruitment power");
     REGISTER_FECORE_CLASS(FEBondRecruitmentExp, "recruitment exponential");
     REGISTER_FECORE_CLASS(FEBondRecruitmentPoly, "recruitment polynomial");
+    REGISTER_FECORE_CLASS(FEBondRecruitmentLogNormal, "recruitment log-normal");
+    REGISTER_FECORE_CLASS(FEBondRecruitmentWeibull, "recruitment Weibull");
+    REGISTER_FECORE_CLASS(FEBondRecruitmentPQP, "recruitment quintic");
+    REGISTER_FECORE_CLASS(FEBondRecruitmentGamma, "recruitment gamma");
 
 	// damage cumulative distribution functions (used by damage materials)
 	REGISTER_FECORE_CLASS(FEDamageCDFSimo, "CDF Simo");
