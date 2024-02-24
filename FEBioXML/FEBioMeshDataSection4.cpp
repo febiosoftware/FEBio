@@ -217,13 +217,13 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 		else
 		{
 			gen = fecore_new<FEFaceDataGenerator>(sztype, &fem);
+			if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 		}
-		if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 		gen->SetFacetSet(surf);
 		gen->SetName(szname);
 
-		GetBuilder()->GetFEModel().AddMeshDataGenerator(gen);
 
 		// read the parameters
 		ReadParameterList(tag, gen);
