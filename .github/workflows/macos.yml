@@ -1,4 +1,10 @@
+name: CI
 on:
+  pull_request:
+    types:
+      - opened
+      - synchronized
+      - closed
   push:
     branches:
       - 'ci/develop'
@@ -7,13 +13,13 @@ on:
       runTests:
         description: "Run tests?"
         required: false
-        type: boolean
         default: false
+
 jobs:
   call_workflow:
     uses: tundranerd/febio-workflows/.github/workflows/macos-reusable.yml@develop
     with:
-      runTests: ${{ inputs.runTests && true || false }}
+      runTests: ${{ inputs.runTests == 'true' || github.event_name == 'pull_request' }}
       package-name: febio4
       package-sdk: true
     secrets: inherit
