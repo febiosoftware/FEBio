@@ -3,6 +3,7 @@ on:
   pull_request:
     types:
       - opened
+      - edited
       - synchronized
       - closed
   push:
@@ -17,7 +18,7 @@ on:
 
 jobs:
   call_workflow:
-    uses: tundranerd/febio-workflows/.github/workflows/macos-reusable.yml@develop
+    uses: febiosoftware/febio-workflows/.github/workflows/macos-reusable.yml@develop
     with:
       runTests: ${{ inputs.runTests == 'true' || github.event_name == 'pull_request' }}
       package-name: febio4
