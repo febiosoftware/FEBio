@@ -3,6 +3,7 @@ on:
   pull_request:
     types:
       - opened
+      - edited
       - synchronized
       - closed
   push:
