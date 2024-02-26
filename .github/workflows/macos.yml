@@ -17,7 +17,7 @@ on:
 
 jobs:
   call_workflow:
-    uses: febiosoftware/febio-workflows/.github/workflows/macos-reusable.yml@develop
+    uses: tundranerd/febio-workflows/.github/workflows/macos-reusable.yml@develop
     with:
       runTests: ${{ inputs.runTests == 'true' || github.event_name == 'pull_request' }}
       package-name: febio4
