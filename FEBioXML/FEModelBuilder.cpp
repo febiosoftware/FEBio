@@ -914,7 +914,7 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 			if (map == nullptr) return false;
 
 			// see if this map is already defined
-			string mapName = map->GetName();
+			string mapName = gen->GetName();
 			FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(mapName));
 			if (oldMap)
 			{
