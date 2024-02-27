@@ -109,7 +109,7 @@ FEDataMap* FEParabolicMap::Generate()
 	if (neq == 0)
 	{
 		feLogError("Unable to set parabolic map\n");
-		return false;
+		return nullptr;
 	}
 
 	// create a linear solver
@@ -120,7 +120,7 @@ FEDataMap* FEParabolicMap::Generate()
 	if (plinsolve == 0)
 	{
 		feLogError("Unknown solver type selected\n");
-		return false;
+		return nullptr;
 	}
 
 	SparseMatrix* pS = plinsolve->CreateSparseMatrix(REAL_SYMMETRIC);
@@ -128,7 +128,7 @@ FEDataMap* FEParabolicMap::Generate()
 	if (pK == 0)
 	{
 		feLogError("Failed allocating stiffness matrix\n\n");
-		return false;
+		return nullptr;
 	}
 	// build matrix profile for normal velocity at non-boundary nodes
 	pK->build_begin(neq);
@@ -226,7 +226,7 @@ FEDataMap* FEParabolicMap::Generate()
 	if (plinsolve->BackSolve(v, rhs) == false)
 	{
 		feLogError("Unable to solve for parabolic field\n");
-		return false;
+		return nullptr;
 	}
 	plinsolve->Destroy();
 
