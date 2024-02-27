@@ -80,7 +80,7 @@ FEDataMap* FEDeformationMapGenerator::Generate()
 	for (int i = 0; i < N; ++i)
 	{
 		FESolidElement* pel = dynamic_cast<FESolidElement*>(mesh.FindElementFromID(set[i]));
-		if (pel == nullptr) return false;
+		if (pel == nullptr) return nullptr;
 		FESolidElement& el = *pel;
 
 		int ne = el.Nodes();
