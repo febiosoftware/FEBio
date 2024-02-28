@@ -83,6 +83,7 @@ SOFTWARE.*/
 #include "FEMuscleMaterial.h"
 #include "FENaturalNeoHookean.h"
 #include "FENeoHookean.h"
+#include "FENeoHookeanAD.h"
 #include "FENeoHookeanTransIso.h"
 #include "FENewtonianViscousSolid.h"
 #include "FENewtonianViscousSolidUC.h"
@@ -335,6 +336,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FECoupledVerondaWestmann, "coupled Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FENaturalNeoHookean, "natural neo-Hookean");
 	REGISTER_FECORE_CLASS(FENeoHookean, "neo-Hookean");
+	REGISTER_FECORE_CLASS(FENeoHookeanAD, "neo-Hookean AD");
 	REGISTER_FECORE_CLASS(FENeoHookeanTransIso, "neo-Hookean transiso");
     REGISTER_FECORE_CLASS(FETraceFreeNeoHookean, "trace-free neo-Hookean");
 	REGISTER_FECORE_CLASS(FENewtonianViscousSolid, "Newtonian viscous solid");
