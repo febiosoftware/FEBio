@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEElasticMaterial.h"
 #include <FECore/FEModelParam.h>
+#include <FECore/ad.h>
 
 //! Implementation of a neo-Hookean hyperelastic material using automatic differentation
 class FEBIOMECH_API FENeoHookeanAD : public FEElasticMaterial
@@ -55,6 +56,10 @@ public:
 
 	//! calculate material tangent stiffness at material point
 	tens4dmm MaterialTangent(FEMaterialPoint& pt, const mat3ds E) override;
+
+public:
+	ad::number StrainEnergy_AD(FEMaterialPoint& mp, ad::mat3ds& C);
+	ad::mat3ds PK2Stress_AD(FEMaterialPoint& mp, ad::mat3ds& C);
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

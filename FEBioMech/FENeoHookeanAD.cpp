@@ -28,21 +28,59 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FENeoHookeanAD.h"
-#include <FECore/fad.h>
+#include <FECore/ad.h>
+#include <functional>
 
-double _lam = 0.0;
-double _mu = 0.0;
-
-// the strain energy function to use with AD
-fad::number W_nh(const fad::Mat3ds& C)
+inline double lambdaFromEV(double E, double v)
 {
-	fad::number I1 = C.Trace();
-	fad::number J2 = C.Det();
-	fad::number J = fad::Sqrt(J2);
-	fad::number lnJ = fad::Ln(J);
+	return v* E / ((1.0 + v) * (1.0 - 2.0 * v));
+}
 
-	fad::number sed = _mu * ((I1 - 3) / 2.0 - lnJ) + _lam * lnJ * lnJ / 2.0;
-	return sed;
+inline double muFromEV(double E, double v)
+{
+	return 0.5 * E / (1.0 + v);
+}
+
+namespace ad {
+
+	template <class T>
+	double StrainEnergy(T* p, FEMaterialPoint& mp)
+	{
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		::mat3ds C = pt.RightCauchyGreen();
+		auto W = std::bind(&T::StrainEnergy_AD, p, mp, std::placeholders::_1);
+		return ad::Evaluate(W, C);
+	}
+
+	template <class T>
+	::mat3ds PK2Stress(T* p, FEMaterialPoint& mp, ::mat3ds& C)
+	{
+		auto W = std::bind(&T::StrainEnergy_AD, p, mp, std::placeholders::_1);
+		return ad::Derive(W, C) * 2.0;
+	}
+
+	template <class T>
+	::mat3ds PK2Stress(T* p, FEMaterialPoint& mp)
+	{
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		::mat3ds C = pt.RightCauchyGreen();
+		return PK2Stress(p, mp, C);
+	}
+
+	template <class T>
+	::tens4ds Tangent(T* p, FEMaterialPoint& mp, ::mat3ds& C)
+	{
+		auto S = std::bind(&T::PK2Stress_AD, p, mp, std::placeholders::_1);
+		return Derive(S, C)*2.0;
+	}
+
+	template <class T>
+	::tens4ds Tangent(T* p, FEMaterialPoint& mp)
+	{
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		::mat3ds C = pt.RightCauchyGreen();
+		return Tangent(p, mp, C);
+	}
 }
 
 // define the material parameters
@@ -54,116 +92,79 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FENeoHookeanAD::FENeoHookeanAD(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
-//-----------------------------------------------------------------------------
-mat3ds FENeoHookeanAD::Stress(FEMaterialPoint& mp)
+ad::number FENeoHookeanAD::StrainEnergy_AD(FEMaterialPoint& mp, ad::mat3ds& C)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
 	// get the material parameters
 	double E = m_E(mp);
 	double v = m_v(mp);
+	double lam = lambdaFromEV(E, v);
+	double mu = muFromEV(E, v);
 
-	// lame parameters
-	_lam = v * E / ((1 + v) * (1 - 2 * v));
-	_mu = 0.5 * E / (1 + v);
+	ad::number I1 = C.tr();
+	ad::number J = ad::sqrt(C.det());
+	ad::number lnJ = ad::log(J);
 
+	ad::number sed = mu * ((I1 - 3) / 2.0 - lnJ) + lam * lnJ * lnJ / 2.0;
+	return sed;
+}
+
+ad::mat3ds FENeoHookeanAD::PK2Stress_AD(FEMaterialPoint& mp, ad::mat3ds& C)
+{
+	// get the material parameters
+	double E = m_E(mp);
+	double v = m_v(mp);
+	double lam = lambdaFromEV(E, v);
+	double mu = muFromEV(E, v);
+
+	ad::mat3ds I(1.0);
+	ad::mat3ds Ci = C.inverse();
+	ad::number J = ad::sqrt(C.det());
+	ad::number lnJ = ad::log(J);
+
+	ad::mat3ds S = (I - Ci) * mu + Ci * (lam * lnJ);
+
+	return S;
+}
+
+mat3ds FENeoHookeanAD::Stress(FEMaterialPoint& mp)
+{
 	// calculate PK2 stress
-	mat3ds C = pt.RightCauchyGreen();
-	mat3ds S = fad::Derive(W_nh, C)*2.0;
+	mat3ds S = ad::PK2Stress<FENeoHookeanAD>(this, mp);
 
 	// push-forward to obtain Cauchy-stress
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	mat3ds s = pt.push_forward(S);
 
 	return s;
 }
 
-//-----------------------------------------------------------------------------
 tens4ds FENeoHookeanAD::Tangent(FEMaterialPoint& mp)
 {
+	// calculate material tangent
+	tens4ds C4 = ad::Tangent<FENeoHookeanAD>(this, mp);
+
+	// push forward to get spatial tangent
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	tens4ds c4 = pt.push_forward(C4);
 
-	// deformation gradient
-	double detF = pt.m_J;
-
-	// get the material parameters
-	double E = m_E(mp);
-	double v = m_v(mp);
-
-	// lame parameters
-	double lam = v * E / ((1 + v) * (1 - 2 * v));
-	double mu = 0.5 * E / (1 + v);
-
-	double lam1 = lam / detF;
-	double mu1 = (mu - lam * log(detF)) / detF;
-
-	mat3dd I(1);
-
-	return dyad1s(I) * lam1 + dyad4s(I) * (2 * mu1);
+	return c4;
 }
 
-//-----------------------------------------------------------------------------
 double FENeoHookeanAD::StrainEnergyDensity(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	// get the material parameters
-	double E = m_E(mp);
-	double v = m_v(mp);
-
-	// lame parameters
-	_lam = v * E / ((1 + v) * (1 - 2 * v));
-	_mu = 0.5 * E / (1 + v);
-
-	mat3ds C = pt.RightCauchyGreen();
-	double sed = fad::Evaluate(W_nh, C);
-
-	return sed;
+	return ad::StrainEnergy<FENeoHookeanAD>(this, mp);
 }
 
-//-----------------------------------------------------------------------------
-mat3ds FENeoHookeanAD::PK2Stress(FEMaterialPoint& pt, const mat3ds ES)
+mat3ds FENeoHookeanAD::PK2Stress(FEMaterialPoint& mp, const mat3ds ES)
 {
-	// Identity
-	mat3dd I(1);
-
-	// calculate right Cauchy-Green tensor
-	mat3ds C = I + ES * 2;
-	mat3ds Ci = C.inverse();
-
-	double detF = sqrt(C.det());
-	double lndetF = log(detF);
-
-	// get the material parameters
-	double E = m_E(pt);
-	double v = m_v(pt);
-
-	// lame parameters
-	double lam = v * E / ((1 + v) * (1 - 2 * v));
-	double mu = 0.5 * E / (1 + v);
-
-	// calculate stress
-	mat3ds S = (I - Ci) * mu + Ci * (lam * lndetF);
-
+	mat3ds C = mat3dd(1) + ES * 2;
+	mat3ds S = ad::PK2Stress<FENeoHookeanAD>(this, mp, C);
 	return S;
 }
 
-//-----------------------------------------------------------------------------
-tens4dmm FENeoHookeanAD::MaterialTangent(FEMaterialPoint& pt, const mat3ds ES)
+tens4dmm FENeoHookeanAD::MaterialTangent(FEMaterialPoint& mp, const mat3ds ES)
 {
-	// calculate right Cauchy-Green tensor
 	mat3ds C = mat3dd(1) + ES * 2;
-	mat3ds Ci = C.inverse();
-	double J = sqrt(C.det());
-
-	// get the material parameters
-	double E = m_E(pt);
-	double v = m_v(pt);
-
-	// lame parameters
-	double lam = v * E / ((1 + v) * (1 - 2 * v));
-	double mu = 0.5 * E / (1 + v);
-
-	tens4dmm c = dyad1s(Ci) * lam + dyad4s(Ci) * (2 * (mu - lam * log(J)));
-
-	return c;
+	tens4ds C4 = ad::Tangent<FENeoHookeanAD>(this, mp, C);
+	return tens4dmm(C4);
 }
