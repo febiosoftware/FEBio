@@ -1,20 +1,25 @@
-name: CI
+name: CI - MacOS
 on:
   pull_request:
     types:
       - opened
       - edited
-      - synchronized
+      - synchronize
       - closed
   push:
     branches:
       - 'ci/develop'
+      - 'ci/pull_request_test'
   workflow_dispatch:
     inputs:
       runTests:
         description: "Run tests?"
         required: false
         default: false
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
 
 jobs:
   call_workflow:
