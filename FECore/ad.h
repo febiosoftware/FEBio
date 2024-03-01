@@ -196,7 +196,14 @@ namespace ad {
 				+ m[XZ] * (m[XY] * m[YZ] - m[YY] * m[XZ]));
 		}
 
-		inline mat3ds inverse() const
+		// double contraction
+		number dotdot(const mat3ds& B) const
+		{
+			const number* n = B.m;
+			return m[XX] * n[XX] + m[YY] * n[YY] + m[ZZ] * n[ZZ] + 2.0 * (m[XY] * n[XY] + m[YZ] * n[YZ] + m[XZ] * n[XZ]);
+		}
+
+		mat3ds inverse() const
 		{
 			number Di = 1.0 / det();
 
@@ -207,6 +214,19 @@ namespace ad {
 				Di * (m[XZ] * m[YZ] - m[XY] * m[ZZ]),
 				Di * (m[XY] * m[XZ] - m[XX] * m[YZ]),
 				Di * (m[XY] * m[YZ] - m[YY] * m[XZ]));
+		}
+
+		// return the square 
+		mat3ds sqr() const
+		{
+			return mat3ds(
+				m[XX] * m[XX] + m[XY] * m[XY] + m[XZ] * m[XZ],
+				m[XY] * m[XY] + m[YY] * m[YY] + m[YZ] * m[YZ],
+				m[XZ] * m[XZ] + m[YZ] * m[YZ] + m[ZZ] * m[ZZ],
+				m[XX] * m[XY] + m[XY] * m[YY] + m[XZ] * m[YZ],
+				m[XY] * m[XZ] + m[YY] * m[YZ] + m[YZ] * m[ZZ],
+				m[XX] * m[XZ] + m[XY] * m[YZ] + m[XZ] * m[ZZ]
+			);
 		}
 	};
 

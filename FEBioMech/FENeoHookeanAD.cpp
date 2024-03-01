@@ -23,13 +23,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FENeoHookeanAD.h"
 #include <FECore/ad.h>
-#include <functional>
+#include "adcm.h"
 
 inline double lambdaFromEV(double E, double v)
 {
@@ -39,48 +36,6 @@ inline double lambdaFromEV(double E, double v)
 inline double muFromEV(double E, double v)
 {
 	return 0.5 * E / (1.0 + v);
-}
-
-namespace ad {
-
-	template <class T>
-	double StrainEnergy(T* p, FEMaterialPoint& mp)
-	{
-		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		::mat3ds C = pt.RightCauchyGreen();
-		auto W = std::bind(&T::StrainEnergy_AD, p, mp, std::placeholders::_1);
-		return ad::Evaluate(W, C);
-	}
-
-	template <class T>
-	::mat3ds PK2Stress(T* p, FEMaterialPoint& mp, ::mat3ds& C)
-	{
-		auto W = std::bind(&T::StrainEnergy_AD, p, mp, std::placeholders::_1);
-		return ad::Derive(W, C) * 2.0;
-	}
-
-	template <class T>
-	::mat3ds PK2Stress(T* p, FEMaterialPoint& mp)
-	{
-		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		::mat3ds C = pt.RightCauchyGreen();
-		return PK2Stress(p, mp, C);
-	}
-
-	template <class T>
-	::tens4ds Tangent(T* p, FEMaterialPoint& mp, ::mat3ds& C)
-	{
-		auto S = std::bind(&T::PK2Stress_AD, p, mp, std::placeholders::_1);
-		return Derive(S, C)*2.0;
-	}
-
-	template <class T>
-	::tens4ds Tangent(T* p, FEMaterialPoint& mp)
-	{
-		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		::mat3ds C = pt.RightCauchyGreen();
-		return Tangent(p, mp, C);
-	}
 }
 
 // define the material parameters

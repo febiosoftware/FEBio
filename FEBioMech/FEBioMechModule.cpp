@@ -79,6 +79,7 @@ SOFTWARE.*/
 #include "FEIncompNeoHookean.h"
 #include "FEIsotropicElastic.h"
 #include "FEMooneyRivlin.h"
+#include "FEMooneyRivlinAD.h"
 #include "FEMRVonMisesFibers.h"
 #include "FEMuscleMaterial.h"
 #include "FENaturalNeoHookean.h"
@@ -389,6 +390,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGentMaterial, "Gent");
 	REGISTER_FECORE_CLASS(FEIncompNeoHookean, "incomp neo-Hookean");
 	REGISTER_FECORE_CLASS(FEMooneyRivlin, "Mooney-Rivlin");
+	REGISTER_FECORE_CLASS(FEMooneyRivlinAD, "Mooney-Rivlin AD");
 	REGISTER_FECORE_CLASS(FEMuscleMaterial, "muscle material");
 	REGISTER_FECORE_CLASS(FENewtonianViscousSolidUC, "Newtonian viscous solid uncoupled");
 	REGISTER_FECORE_CLASS(FEOgdenMaterial, "Ogden");
