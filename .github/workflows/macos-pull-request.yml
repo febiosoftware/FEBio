@@ -11,7 +11,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 jobs:
   call_workflow:
-    uses: tundranerd/febio-workflows/.github/workflows/macos-reusable.yml@develop
+    uses: tundranerd/febio-workflows/.github/workflows/macos-reusable-pull-request.yml@oidc-wip-aws
     with:
       runTests: true
       package-name: febio4
