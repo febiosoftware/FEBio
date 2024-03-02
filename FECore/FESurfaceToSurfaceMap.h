@@ -43,14 +43,13 @@ public:
 
 	bool Init() override;
 
-	void value(const vec3d& x, double& data) override;
+	FEDataMap* Generate() override;
 
-	FEDomainMap* Generate() override;
+private:
+	double value(const vec3d& x);
 
 private:
 	FEFunction1D*	m_func;
-	
-private:
 	FESurface*	m_surf1;
 	FESurface*	m_surf2;
 	FEClosestPointProjection*	m_ccp1;
