@@ -12,7 +12,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 jobs:
   call_workflow:
-    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable.yml@develop
+    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable-pull-request.yml@develop
     with:
       runTests: true
       package-name: febio4
