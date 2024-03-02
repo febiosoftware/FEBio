@@ -114,6 +114,39 @@ namespace ad {
 		return number(s, 0.5 * a.dr / s);
 	}
 
+	inline number exp(const number& a)
+	{
+		double e = ::exp(a.r);
+		return number(e, e * a.dr);
+	}
+
+	inline number pow(const number& a, double e)
+	{
+		if (e == 0.0) return number(1.0);
+		double b = ::pow(a.r, e - 1.0);
+		return number(a.r * b, e * b * a.dr);
+	}
+
+	inline number sin(const number& a)
+	{
+		return number(::sin(a.r), ::cos(a.r) * a.dr);
+	}
+
+	inline number cos(const number& a)
+	{
+		return number(::cos(a.r), -::sin(a.r) * a.dr);
+	}
+
+	inline number cosh(const number& a)
+	{
+		return number(::cosh(a.r), ::sinh(a.r) * a.dr);
+	}
+
+	inline number sinh(const number& a)
+	{
+		return number(::sinh(a.r), ::cosh(a.r) * a.dr);
+	}
+
 	struct mat3ds
 	{
 		// This enumeration can be used to remember the order
@@ -291,15 +324,7 @@ namespace ad {
 		);
 	}
 
-	typedef number (*ScalarFunctionOfMat3ds)(const mat3ds& C);
-	typedef mat3ds (*Mat3dsFunctionOfMat3ds)(const mat3ds& C);
-
-	FECORE_API double Evaluate(ScalarFunctionOfMat3ds W, const ::mat3ds& C);
 	FECORE_API double Evaluate(std::function<number(mat3ds& C)> W, const ::mat3ds& C);
-
-	FECORE_API ::mat3ds Derive(ScalarFunctionOfMat3ds W, const ::mat3ds& C);
 	FECORE_API ::mat3ds Derive(std::function<number(mat3ds& C)> W, const ::mat3ds& C);
-
-	FECORE_API ::tens4ds Derive(Mat3dsFunctionOfMat3ds S, const ::mat3ds& C);
 	FECORE_API ::tens4ds Derive(std::function<mat3ds(mat3ds& C)> S, const ::mat3ds& C);
 }

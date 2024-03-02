@@ -154,6 +154,78 @@ namespace ad2 {
 			);
 	}
 
+	inline number exp(const number& a)
+	{
+		double e = ::exp(a.r);
+		return number(
+			e, 
+			e * a.d1,
+			e * a.d2,
+			e * (a.d1*a.d2 + a.dd)
+			);
+	}
+
+	inline number pow(const number& a, double e)
+	{
+		if (e == 0.0) return number(1.0);
+
+		double b = ::pow(a.r, e - 2.0);
+		return number(
+			b * a.r * a.r, 
+			e * a.r * b * a.d1,
+			e * a.r * b * a.d2,
+			e * b * ((e - 1.0)* a.d1 * a.d2 + a.r * a.dd)
+		);
+	}
+
+	inline number sin(const number& a)
+	{
+		double sa = ::sin(a.r);
+		double ca = ::cos(a.r);
+		return number(
+			sa,
+			ca * a.d1,
+			ca * a.d2,
+			ca * a.dd - sa * a.d1 * a.d2
+		);
+	}
+
+	inline number cos(const number& a)
+	{
+		double sa = ::sin(a.r);
+		double ca = ::cos(a.r);
+		return number(
+			ca,
+			-sa*a.d1,
+			-sa*a.d2,
+			-sa*a.dd - ca*a.d1*a.d2
+			);
+	}
+
+	inline number cosh(const number& a)
+	{
+		double sa = ::sinh(a.r);
+		double ca = ::cosh(a.r);
+		return number(
+			ca,
+			sa * a.d1,
+			sa * a.d2,
+			ca * a.d1 * a.d2 + sa * a.dd
+			);
+	}
+
+	inline number sinh(const number& a)
+	{
+		double sa = ::sinh(a.r);
+		double ca = ::cosh(a.r);
+		return number(
+			sa,
+			ca * a.d1,
+			ca * a.d2,
+			sa * a.d1 * a.d2 + ca * a.dd
+		);
+	}
+
 	struct mat3ds
 	{
 		// This enumeration can be used to remember the order
