@@ -63,6 +63,22 @@ ad::number FENeoHookeanAD::StrainEnergy_AD(FEMaterialPoint& mp, ad::mat3ds& C)
 	return sed;
 }
 
+ad2::number FENeoHookeanAD::StrainEnergy_AD2(FEMaterialPoint& mp, ad2::mat3ds& C)
+{
+	// get the material parameters
+	double E = m_E(mp);
+	double v = m_v(mp);
+	double lam = lambdaFromEV(E, v);
+	double mu = muFromEV(E, v);
+
+	ad2::number I1 = C.tr();
+	ad2::number J = ad2::sqrt(C.det());
+	ad2::number lnJ = ad2::log(J);
+
+	ad2::number sed = mu * ((I1 - 3) / 2.0 - lnJ) + lam * lnJ * lnJ / 2.0;
+	return sed;
+}
+
 ad::mat3ds FENeoHookeanAD::PK2Stress_AD(FEMaterialPoint& mp, ad::mat3ds& C)
 {
 	// get the material parameters
@@ -84,7 +100,8 @@ ad::mat3ds FENeoHookeanAD::PK2Stress_AD(FEMaterialPoint& mp, ad::mat3ds& C)
 mat3ds FENeoHookeanAD::Stress(FEMaterialPoint& mp)
 {
 	// calculate PK2 stress
-	mat3ds S = ad::PK2Stress<FENeoHookeanAD>(this, mp);
+//	mat3ds S = ad::PK2Stress<FENeoHookeanAD>(this, mp);
+	mat3ds S = ad2::PK2Stress<FENeoHookeanAD>(this, mp);
 
 	// push-forward to obtain Cauchy-stress
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -96,7 +113,8 @@ mat3ds FENeoHookeanAD::Stress(FEMaterialPoint& mp)
 tens4ds FENeoHookeanAD::Tangent(FEMaterialPoint& mp)
 {
 	// calculate material tangent
-	tens4ds C4 = ad::Tangent<FENeoHookeanAD>(this, mp);
+//	tens4ds C4 = ad::Tangent<FENeoHookeanAD>(this, mp);
+	tens4ds C4 = ad2::Tangent<FENeoHookeanAD>(this, mp);
 
 	// push forward to get spatial tangent
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

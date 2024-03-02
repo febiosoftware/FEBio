@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/ad.h>
+#include <FECore/ad2.h>
 
 namespace ad {
 
@@ -68,3 +69,22 @@ namespace ad {
 	}
 }
 
+namespace ad2 {
+	template <class T>
+	::mat3ds PK2Stress(T* p, FEMaterialPoint& mp)
+	{
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		::mat3ds C = pt.RightCauchyGreen();
+		auto W = std::bind(&T::StrainEnergy_AD2, p, mp, std::placeholders::_1);
+		return ad2::Derive(W, C) * 2.0;
+	}
+
+	template <class T>
+	::tens4ds Tangent(T* p, FEMaterialPoint& mp)
+	{
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		::mat3ds C = pt.RightCauchyGreen();
+		auto W = std::bind(&T::StrainEnergy_AD2, p, mp, std::placeholders::_1);
+		return ad2::Derive2(W, C) * 4.0;
+	}
+}

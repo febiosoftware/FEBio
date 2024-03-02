@@ -23,45 +23,44 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "ad2.h"
 
-
-
-#pragma once
-#include "FEElasticMaterial.h"
-#include <FECore/FEModelParam.h>
-#include "adcm.h"
-
-//! Implementation of a neo-Hookean hyperelastic material using automatic differentation
-class FEBIOMECH_API FENeoHookeanAD : public FEElasticMaterial
+double ad2::Evaluate(std::function<ad2::number(ad2::mat3ds& C)> W, const ::mat3ds& C)
 {
-public:
-	FENeoHookeanAD(FEModel* pfem);
+	ad2::mat3ds dC(C);
+	return W(dC).r;
+}
 
-public:
-	FEParamDouble		m_E;	//!< Young's modulus
-	FEParamDouble		m_v;	//!< Poisson's ratio
+::mat3ds ad2::Derive(std::function<ad2::number(ad2::mat3ds& C)> W, const ::mat3ds& C)
+{
+	ad2::mat3ds dC(C);
+	double S[6] = { 0.0 };
+	for (int i = 0; i < 6; ++i)
+	{
+		dC[i].d1 = 1;
+		S[i] = W(dC).d1;
+		dC[i].d1 = 0;
+	}
+	return ::mat3ds(S[0], S[2], S[5], 0.5 * S[1], 0.5 * S[4], 0.5 * S[3]);
+}
 
-public:
-	//! calculate stress at material point
-	mat3ds Stress(FEMaterialPoint& pt) override;
+::tens4ds ad2::Derive2(std::function<ad2::number(ad2::mat3ds& C)> W, const ::mat3ds& C)
+{
+	constexpr int l[6] = { 0, 2, 5, 1, 4, 3 };
+	constexpr double w[6] = { 1.0, 1.0, 1.0, 0.5, 0.5, 0.5 };
+	ad2::mat3ds dC(C);
+	double D[6][6] = { 0 };
+	for (int i = 0; i < 6; ++i)
+		for (int j = 0; j < 6; ++j)
+		{
+			dC[l[i]].d1 = 1;
+			dC[l[j]].d2 = 1;
+			double ddW = W(dC).dd;
+			dC[l[i]].d1 = 0;
+			dC[l[j]].d2 = 0;
 
-	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt) override;
+			D[i][j] = ddW*w[i]*w[j];
+		}
 
-	//! calculate strain energy density at material point
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
-
-	//! calculate the 2nd Piola-Kirchhoff stress at material point
-	mat3ds PK2Stress(FEMaterialPoint& pt, const mat3ds E) override;
-
-	//! calculate material tangent stiffness at material point
-	tens4dmm MaterialTangent(FEMaterialPoint& pt, const mat3ds E) override;
-
-public:
-	ad::number StrainEnergy_AD(FEMaterialPoint& mp, ad::mat3ds& C);
-	ad::mat3ds PK2Stress_AD(FEMaterialPoint& mp, ad::mat3ds& C);
-	ad2::number StrainEnergy_AD2(FEMaterialPoint& mp, ad2::mat3ds& C);
-
-	// declare the parameter list
-	DECLARE_FECORE_CLASS();
-};
+	return ::tens4ds(D);
+}
