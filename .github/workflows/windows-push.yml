@@ -17,7 +17,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 jobs:
   call_workflow:
-    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable.yml@develop
+    uses: tundranerd/febio-workflows/.github/workflows/windows-reusable-push.yml@oidc-wip-aws
     with:
       runTests: ${{ inputs.runTests == 'true' }}
       package-name: febio4
