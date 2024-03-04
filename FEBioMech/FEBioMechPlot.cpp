@@ -3550,6 +3550,46 @@ bool FEPlotDiscreteElementPercentElongation::Save(FEDomain& dom, FEDataStream& a
 	return true;
 }
 
+bool FEPlotDiscreteElementDirection::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteDomain* pdiscreteDomain = dynamic_cast<FEDiscreteDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteDomain& discreteDomain = *pdiscreteDomain;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+		vec3d ra = mesh.Node(el.m_node[0]).m_rt;
+		vec3d rb = mesh.Node(el.m_node[1]).m_rt;
+		vec3d e = (rb - ra); e.unit();
+		a << e;
+	}
+
+	return true;
+}
+
+bool FEPlotDiscreteElementLength::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteDomain* pdiscreteDomain = dynamic_cast<FEDiscreteDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteDomain& discreteDomain = *pdiscreteDomain;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+		vec3d ra = mesh.Node(el.m_node[0]).m_rt;
+		vec3d rb = mesh.Node(el.m_node[1]).m_rt;
+		double L = (rb - ra).Length();
+		a << L;
+	}
+
+	return true;
+}
+
 bool FEPlotDiscreteElementForce::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEDiscreteElasticDomain* pdiscreteDomain = dynamic_cast<FEDiscreteElasticDomain*>(&dom);
