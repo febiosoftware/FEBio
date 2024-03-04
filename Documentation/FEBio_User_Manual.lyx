@@ -2128,7 +2128,7 @@ command prompt
 \end_layout
 
 \begin_layout LyX-Code
-febio [-o1 [arg1] | -o2 [arg2] | ...
+febio4 [-o1 [arg1] | -o2 [arg2] | ...
  ]
 \end_layout
 
@@ -2163,7 +2163,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="3">
+<lyxtabular version="3" rows="18" columns="3">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top">
@@ -2469,6 +2469,35 @@ dump file name
 \begin_inset Text
 
 \begin_layout Plain Layout
+-dump_stride[=n]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the dump interval.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 -config
 \end_layout
 
@@ -2692,10 +2721,6 @@ List of command line options.
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -2740,7 +2765,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb
+> febio4 
+\series bold
+-i input.feb
 \end_layout
 
 \begin_layout Standard
@@ -2749,7 +2776,7 @@ This is the most common way to start an FEBio run.
 \end_layout
 
 \begin_layout LyX-Code
-> febio input.feb
+> febio4 input.feb
 \end_layout
 
 \begin_layout Standard
@@ -2767,7 +2794,7 @@ It is also allowed to omit the .feb extension for FEBio input files.
 \end_layout
 
 \begin_layout LyX-Code
-> febio input
+> febio4 input
 \end_layout
 
 \begin_layout Description
@@ -2804,7 +2831,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -r file.feb
+> febio4 
+\series bold
+-r file.feb
 \end_layout
 
 \begin_layout Description
@@ -2838,7 +2867,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –g
+> febio4 -i input.feb 
+\series bold
+–g
 \end_layout
 
 \begin_layout Description
@@ -2875,7 +2906,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –p out.xplt
+> febio4 -i input.feb 
+\series bold
+–p out.xplt
 \end_layout
 
 \begin_layout Description
@@ -2911,7 +2944,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –o out.log
+> febio4 -i input.feb 
+\series bold
+–o out.log
 \end_layout
 
 \begin_layout Description
@@ -2945,7 +2980,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio –i file.feb –s control.opt
+> febio4 –i file.feb 
+\series bold
+–s control.opt
 \end_layout
 
 \begin_layout Description
@@ -2971,7 +3008,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio –d diagnostic.feb
+> febio4 
+\series bold
+–d diagnostic.feb
 \end_layout
 
 \begin_layout Description
@@ -3002,7 +3041,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio –i file.feb –break 1.0
+> febio4 –i file.feb 
+\series bold
+–break 1.0
 \end_layout
 
 \begin_layout Description
@@ -3061,7 +3102,28 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –dump out.dmp
+> febio4 -i input.feb 
+\series bold
+–dump out.dmp
+\end_layout
+
+\begin_layout Description
+-dump_stride Sets the interval between writing dump files.
+ The default is 1 (although the dump level may affect this as well.) The
+ following example will write a dump file after every 10 timesteps.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+> febio4 -i input.feb –dump out.dmp 
+\series bold
+-dump_stride=10
 \end_layout
 
 \begin_layout Description
@@ -3112,7 +3174,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –config C:
+> febio4 -i input.feb 
+\series bold
+–config C:
 \begin_inset Formula $\backslash$
 \end_inset
 
@@ -3168,7 +3232,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –nosplash
+> febio4 -i input.feb 
+\series bold
+–nosplash
 \end_layout
 
 \begin_layout Description
@@ -3187,7 +3253,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio –import myplugin.dll
+> febio4 
+\series bold
+–import myplugin.dll
 \end_layout
 
 \begin_layout Description
@@ -3208,7 +3276,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –silent
+> febio4 -i input.feb 
+\series bold
+–silent
 \end_layout
 
 \begin_layout Description
@@ -3239,7 +3309,9 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-> febio -i input.feb –task=optimize control.opt
+> febio4 -i input.feb 
+\series bold
+–task=optimize control.opt
 \end_layout
 
 \begin_layout Section
@@ -77988,7 +78060,7 @@ where
 \end_inset
 
 generation weak bonds, such that 
-\begin_inset Formula $\mathbf{F}^{u}=\mathbf{R}\left(u\right)$
+\begin_inset Formula $\mathbf{F}^{u}\left(u\right)=\mathbf{R}\left(u\right)$
 \end_inset
 
  (the rotation tensor in the polar decomposition of 
@@ -77997,6 +78069,18 @@ generation weak bonds, such that
 
 ) at time 
 \begin_inset Formula $u$
+\end_inset
+
+, thus 
+\begin_inset Formula $\mathbf{F}^{u}\left(t\right)=\mathbf{F}\left(t\right)\cdot\mathbf{U}^{-1}\left(u\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ is the right-stretch tensor of 
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
 \end_inset
 
 .
@@ -78602,7 +78686,7 @@ city where the weak bond response becomes more significant with increasing
  strain, substituting eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:rvs-reformed-bond-fraction"
+reference "eq:rvs-sed"
 plural "false"
 caps "false"
 noprefix "false"
@@ -78612,7 +78696,7 @@ noprefix "false"
  with
 \begin_inset Formula 
 \begin{equation}
-f^{u}\left(\mathbf{X},t\right)=F\left(\Xi\left(t^{v}\right)\right)-\sum\limits _{\gamma<u}w^{\gamma}\left(\mathbf{X},t\right)\,,\quad t\ge t^{v}\,.\label{eq:rvs-reformed-with-recruitment}
+\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits _{u}w^{u}F\left(\Xi\left(u\right)\right)\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\,.\label{eq:rvs-reformed-with-recruitment}
 \end{equation}
 
 \end_inset
@@ -78646,6 +78730,15 @@ noprefix "false"
 \end_inset
 
 , based on the choice of the <trigger> parameter.
+ In effect, 
+\begin_inset Formula $F\left(\Xi\left(u\right)\right)$
+\end_inset
+
+ enhances the weak bond response of generation 
+\begin_inset Formula $u$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -82275,6 +82368,16 @@ where
 \end_inset
 
  is the measure of strain that triggers a new reactive weak bond generation.
+ This function is unbounded with increasing 
+\begin_inset Formula $\Xi$
+\end_inset
+
+.
+ Users should typically employ 
+\begin_inset Formula $\mu_{0}=1$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -82504,6 +82607,16 @@ where
 \end_inset
 
  is the measure of strain that triggers a new reactive weak bond generation.
+ This function is unbounded with increasing 
+\begin_inset Formula $\Xi$
+\end_inset
+
+.
+ Users should typically employ 
+\begin_inset Formula $\mu_{0}=1$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -82700,6 +82813,16 @@ where
 \end_inset
 
  is the measure of strain that triggers a new reactive weak bond generation.
+ This function is unbounded with increasing 
+\begin_inset Formula $\Xi$
+\end_inset
+
+.
+ Users should typically employ 
+\begin_inset Formula $\mu_{0}=1$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -82864,6 +82987,884 @@ Example:
 
 \begin_layout LyX-Code
   </function>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+Log-Normal
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-log-normal"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a log-normal recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment log-normal
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<sigma>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ (
+\begin_inset Formula $\sigma>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum increase 
+\begin_inset Formula $r$
+\end_inset
+
+ in bond recruitment from 1 (default is 0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the recruitment function is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=1+\frac{r}{2}\text{erfc}\left[-\frac{\ln\left(\Xi/\mu\right)}{\sigma\sqrt{2}}\right]\,.
+\]
+
+\end_inset
+
+Its minimum value is 
+\begin_inset Formula $1$
+\end_inset
+
+ and its maximum value is 
+\begin_inset Formula $1+r$
+\end_inset
+
+ as 
+\begin_inset Formula $\Xi/\mu\to\infty$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment log-normal">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.3</mu>
+\end_layout
+
+\begin_layout LyX-Code
+  <sigma>0.25</sigma>
+\end_layout
+
+\begin_layout LyX-Code
+  <max>4</max>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+Weibull
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-Weibull"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a Weibull recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment Weibull
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum increase 
+\begin_inset Formula $r$
+\end_inset
+
+ in bond recruitment from 1 (default is 0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the recruitment functions is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=1+r\left(1-\exp\left[-\left(\Xi/\mu\right)^{\alpha}\right]\right)\,.
+\]
+
+\end_inset
+
+Its minimum value is 
+\begin_inset Formula $1$
+\end_inset
+
+ and its maximum value is 
+\begin_inset Formula $1+r$
+\end_inset
+
+ as 
+\begin_inset Formula $\Xi/\mu\to\infty$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.3</mu>
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>2.0</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <max>4</max>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+Quintic Polynomial
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-quintic"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a quintic polynomial bond recruitment function is
+ 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment quintic
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mumin>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{\min}$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu_{\min}>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mumax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{\max}$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu_{\max}>\mu_{\min})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum increase 
+\begin_inset Formula $r$
+\end_inset
+
+ in bond recruitment from 1 (default is 0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the bond recruitment function is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=\begin{cases}
+1 & \Xi\leqslant\mu_{\min}\\
+1+rx^{3}\left(10-15x+6x^{2}\right) & \mu_{\min}<\Xi\leqslant\mu_{\max}\\
+1+r & \mu_{\max}<\Xi
+\end{cases}\,,\quad x=\frac{\Xi-\mu_{\min}}{\mu_{\max}-\mu_{\min}}\,.
+\]
+
+\end_inset
+
+Its minimum value is 
+\begin_inset Formula $1$
+\end_inset
+
+ and its maximum value is 
+\begin_inset Formula $1+r$
+\end_inset
+
+ when 
+\begin_inset Formula $\Xi\ge\mu_{\text{max}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment quintic">
+\end_layout
+
+\begin_layout LyX-Code
+  <mumin>0.2</mumin>
+\end_layout
+
+\begin_layout LyX-Code
+  <mumax>0.4</mumax>
+\end_layout
+
+\begin_layout LyX-Code
+  <Dmax>4</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+Gamma
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-gamma"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a gamma recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment gamma
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha>0$
+\end_inset
+
+) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum increase 
+\begin_inset Formula $r$
+\end_inset
+
+ in bond recruitment from 1 (default is 0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the bond recruitment functions is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=1+r\frac{\gamma\left(\alpha,\Xi/\mu\right)}{\Gamma\left(\alpha,0\right)}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\gamma\left(\alpha,z\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma\left(\alpha,z\right)$
+\end_inset
+
+ are the lower and upper incomplete gamma functions, respectively.
+ The normalization by 
+\begin_inset Formula $\Gamma\left(\alpha,0\right)$
+\end_inset
+
+ ensures that this function is bounded by 
+\begin_inset Formula $1\le F\left(\Xi\right)\le1+r$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment gamma">
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>3</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.4</mu>
+\end_layout
+
+\begin_layout LyX-Code
+  <max>4</max>
 \end_layout
 
 \begin_layout LyX-Code
@@ -84400,6 +85401,224 @@ Example:
 
 \begin_layout LyX-Code
   <Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+</damage>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Gamma
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:CDF-gamma"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a gamma c.d.f.
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+CDF gamma
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the c.d.f.
+ is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=\frac{\gamma\left(\alpha,\Xi/\mu\right)}{\Gamma\left(\alpha,0\right)}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\gamma\left(\alpha,z\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma\left(\alpha,z\right)$
+\end_inset
+
+ are the lower and upper incomplete gamma functions, respectively.
+ The normalization by 
+\begin_inset Formula $\Gamma\left(\alpha,0\right)$
+\end_inset
+
+ ensures that this function is bounded by 
+\begin_inset Formula $0\le F\left(\Xi\right)\le1$
+\end_inset
+
+.
+ The figure below uses 
+\begin_inset Formula $\mu=0.15$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Graphics
+	filename Figures/FigDamageCDFgamma.png
+	lyxscale 50
+	width 4in
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<damage type="CDF gamma">
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>3</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.15</mu>
 \end_layout
 
 \begin_layout LyX-Code

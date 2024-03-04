@@ -370,21 +370,20 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 
 	// total displacements
 	vector<double> U(m_Ut.size());
-	for (size_t i=0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
+	int U_size = (int)U.size();
+#pragma omp parallel for
+	for (int i = 0; i < U_size; ++i)
+	{
+		U[i] = ui[i] + m_Ui[i] + m_Ut[i];
+	}
 
 	// update flexible nodes
 	// translational dofs
-	scatter(U, mesh, m_dofU[0]);
-	scatter(U, mesh, m_dofU[1]);
-	scatter(U, mesh, m_dofU[2]);
+	scatter3(U, mesh, m_dofU[0], m_dofU[1], m_dofU[2]);
 	// rotational dofs
-	scatter(U, mesh, m_dofQ[0]);
-	scatter(U, mesh, m_dofQ[1]);
-	scatter(U, mesh, m_dofQ[2]);
-    // shell dofs
-    scatter(U, mesh, m_dofSU[0]);
-    scatter(U, mesh, m_dofSU[1]);
-    scatter(U, mesh, m_dofSU[2]);
+	scatter3(U, mesh, m_dofQ[0], m_dofQ[1], m_dofQ[2]);
+	// shell dofs
+	scatter3(U, mesh, m_dofSU[0], m_dofSU[1], m_dofSU[2]);
 
 	// make sure the boundary conditions are fullfilled
 	int nbcs = fem.BoundaryConditions();
@@ -405,107 +404,112 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 
 	// Update the spatial nodal positions
 	// Don't update rigid nodes since they are already updated
-	for (int i = 0; i<mesh.Nodes(); ++i)
+	int NN = mesh.Nodes();
+	#pragma omp parallel
 	{
-		FENode& node = mesh.Node(i);
-        if (node.m_rid == -1) {
-			node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
-        }
-        node.m_dt = node.m_d0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2])
-        - node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
-	}
-
-	// update velocity and accelerations
-	// for dynamic simulations
-	FEAnalysis* pstep = fem.GetCurrentStep();
-	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
-	{
-		int N = mesh.Nodes();
-		double dt = fem.GetTime().timeIncrement;
-		double a = 1.0 / (m_beta*dt);
-		double b = a / dt;
-		double c = 1.0 - 0.5/m_beta;
-		for (int i=0; i<N; ++i)
+		#pragma omp for
+		for (int i = 0; i < NN; ++i)
 		{
-			FENode& n = mesh.Node(i);
-			n.m_at = (n.m_rt - n.m_rp)*b - n.m_vp*a + n.m_ap*c;
-			vec3d vt = n.m_vp + (n.m_ap*(1.0 - m_gamma) + n.m_at*m_gamma)*dt;
-			n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vt);
-            
-            // shell kinematics
-			{
-				vec3d qt = n.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
-				vec3d qp = n.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
-				vec3d vqp = n.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
-				vec3d aqp = n.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
-				vec3d aqt = (qt - qp) * b - vqp * a + aqp * c;
-				vec3d vqt = vqp + (aqp * (1.0 - m_gamma) + aqt * m_gamma) * dt;
-				n.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
-				n.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
+			FENode& node = mesh.Node(i);
+			if (node.m_rid == -1) {
+				node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
 			}
+			node.m_dt = node.m_d0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2])
+				- node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+		}
 
-			// beam kinematics
+		// update velocity and accelerations
+		// for dynamic simulations
+		FEAnalysis* pstep = fem.GetCurrentStep();
+		if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
+		{
+			double dt = fem.GetTime().timeIncrement;
+			double a = 1.0 / (m_beta * dt);
+			double b = a / dt;
+			double c = 1.0 - 0.5 / m_beta;
+			#pragma omp for nowait
+			for (int i = 0; i < NN; ++i)
 			{
-				vec3d Rp = n.get_vec3d_prev(m_dofQ[0], m_dofQ[1], m_dofQ[2]);
-				vec3d wp = n.get_vec3d_prev(m_dofBW[0], m_dofBW[1], m_dofBW[2]);
-				vec3d ap = n.get_vec3d_prev(m_dofBA[0], m_dofBA[1], m_dofBA[2]);
+				FENode& n = mesh.Node(i);
+				n.m_at = (n.m_rt - n.m_rp) * b - n.m_vp * a + n.m_ap * c;
+				vec3d vt = n.m_vp + (n.m_ap * (1.0 - m_gamma) + n.m_at * m_gamma) * dt;
+				n.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vt);
 
-				// rotation at previous time step
-				quatd Qp(Rp);
-				quatd Qp_T = Qp.Conjugate();
-
-				// convert to material quantities
-				vec3d Wp = Qp_T * wp;
-				vec3d Ap = Qp_T * ap;
-
-				// get equation numbers for rotations
-				// (and ensure that they are all free or all prescribed)
-				int eq[3] = { n.m_ID[m_dofQ[0]], n.m_ID[m_dofQ[1]], n.m_ID[m_dofQ[2]] };
-				assert(((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0)) ||
-					   ((eq[0] <  0) && (eq[1] <  0) && (eq[2] <  0)));
-
-				// get rotation increment
-				vec3d ri, Ri;
-				int m;
-				m = eq[0]; if (m >= 0) { ri.x = ui[m]; Ri.x = m_Ui[m]; }
-				m = eq[1]; if (m >= 0) { ri.y = ui[m]; Ri.y = m_Ui[m]; }
-				m = eq[2]; if (m >= 0) { ri.z = ui[m]; Ri.z = m_Ui[m]; }
-				quatd dq(ri), qi(Ri);
-				quatd qn = dq * qi;
-				vec3d rn = qn.GetRotationVector();
-
-				// check for prescribed values
-				if ((eq[0] < 0) && (eq[1] < 0) && (eq[2] < 0))
+				// shell kinematics
 				{
-					vec3d Rt;
-					m = eq[0]; if (m < -1) { Rt.x = n.get(m_dofQ[0]); }
-					m = eq[1]; if (m < -1) { Rt.y = n.get(m_dofQ[1]); }
-					m = eq[2]; if (m < -1) { Rt.z = n.get(m_dofQ[2]); }
-					quatd Qt(Rt);
-					qn = Qp.Conjugate() * Qt;
-					rn = qn.GetRotationVector();
+					vec3d qt = n.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+					vec3d qp = n.get_vec3d_prev(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+					vec3d vqp = n.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
+					vec3d aqp = n.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
+					vec3d aqt = (qt - qp) * b - vqp * a + aqp * c;
+					vec3d vqt = vqp + (aqp * (1.0 - m_gamma) + aqt * m_gamma) * dt;
+					n.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
+					n.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
 				}
 
-				// convert to material increment
-				vec3d Qn = Qp_T * rn;
-
-				// update material angular velocity and angular acceleration
-				vec3d At = (Qn - Wp * dt) * b + Ap * c;
-				vec3d Wt = Qn * (m_gamma * a) + Wp * (1.0 - m_gamma / m_beta) + Ap * (dt * (1.0 - 0.5*m_gamma / m_beta));
-
-				// convert to spatial
-				quatd Qt = qn * Qp;
-				vec3d wt = Qt * Wt;
-				vec3d at = Qt * At;
-
-				// store updated values
-				if ((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0))
+				// beam kinematics
 				{
-					vec3d Rt = Qt.GetRotationVector();
-					n.set_vec3d(m_dofQ[0], m_dofQ[1], m_dofQ[2], Rt);
+					vec3d Rp = n.get_vec3d_prev(m_dofQ[0], m_dofQ[1], m_dofQ[2]);
+					vec3d wp = n.get_vec3d_prev(m_dofBW[0], m_dofBW[1], m_dofBW[2]);
+					vec3d ap = n.get_vec3d_prev(m_dofBA[0], m_dofBA[1], m_dofBA[2]);
+
+					// rotation at previous time step
+					quatd Qp(Rp);
+					quatd Qp_T = Qp.Conjugate();
+
+					// convert to material quantities
+					vec3d Wp = Qp_T * wp;
+					vec3d Ap = Qp_T * ap;
+
+					// get equation numbers for rotations
+					// (and ensure that they are all free or all prescribed)
+					int eq[3] = { n.m_ID[m_dofQ[0]], n.m_ID[m_dofQ[1]], n.m_ID[m_dofQ[2]] };
+					assert(((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0)) ||
+						((eq[0] < 0) && (eq[1] < 0) && (eq[2] < 0)));
+
+					// get rotation increment
+					vec3d ri, Ri;
+					int m;
+					m = eq[0]; if (m >= 0) { ri.x = ui[m]; Ri.x = m_Ui[m]; }
+					m = eq[1]; if (m >= 0) { ri.y = ui[m]; Ri.y = m_Ui[m]; }
+					m = eq[2]; if (m >= 0) { ri.z = ui[m]; Ri.z = m_Ui[m]; }
+					quatd dq(ri), qi(Ri);
+					quatd qn = dq * qi;
+					vec3d rn = qn.GetRotationVector();
+
+					// check for prescribed values
+					if ((eq[0] < 0) && (eq[1] < 0) && (eq[2] < 0))
+					{
+						vec3d Rt;
+						m = eq[0]; if (m < -1) { Rt.x = n.get(m_dofQ[0]); }
+						m = eq[1]; if (m < -1) { Rt.y = n.get(m_dofQ[1]); }
+						m = eq[2]; if (m < -1) { Rt.z = n.get(m_dofQ[2]); }
+						quatd Qt(Rt);
+						qn = Qp.Conjugate() * Qt;
+						rn = qn.GetRotationVector();
+					}
+
+					// convert to material increment
+					vec3d Qn = Qp_T * rn;
+
+					// update material angular velocity and angular acceleration
+					vec3d At = (Qn - Wp * dt) * b + Ap * c;
+					vec3d Wt = Qn * (m_gamma * a) + Wp * (1.0 - m_gamma / m_beta) + Ap * (dt * (1.0 - 0.5 * m_gamma / m_beta));
+
+					// convert to spatial
+					quatd Qt = qn * Qp;
+					vec3d wt = Qt * Wt;
+					vec3d at = Qt * At;
+
+					// store updated values
+					if ((eq[0] >= 0) && (eq[1] >= 0) && (eq[2] >= 0))
+					{
+						vec3d Rt = Qt.GetRotationVector();
+						n.set_vec3d(m_dofQ[0], m_dofQ[1], m_dofQ[2], Rt);
+					}
+					n.set_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2], wt);
+					n.set_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2], at);
 				}
-				n.set_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2], wt);
-				n.set_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2], at);
 			}
 		}
 	}

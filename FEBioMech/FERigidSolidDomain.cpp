@@ -102,47 +102,55 @@ void FERigidSolidDomain::InertialForces(FEGlobalVector& R, std::vector<double>& 
 //-----------------------------------------------------------------------------
 mat3d FERigidSolidDomain::CalculateMOI()
 {
-	mat3dd I(1);        // identity tensor
-
-	// nodal coordinates
-	vec3d r0[FEElement::MAX_NODES];
+	mat3dd I(1); // identity tensor
 
 	mat3d moi; moi.zero();
 
-	// loop over all elements
-	for (int iel = 0; iel < Elements(); ++iel)
+#pragma omp parallel 
 	{
-		FESolidElement& el = Element(iel);
+		vec3d r0[FEElement::MAX_NODES];
+		mat3d moi_n; moi_n.zero();
 
-		// initial coordinates
-		int neln = el.Nodes();
-		for (int i = 0; i < neln; ++i) r0[i] = GetMesh()->Node(el.m_node[i]).m_r0;
-
-		// loop over integration points
-		double* gw = el.GaussWeights();
-		int nint = el.GaussPoints();
-		for (int n = 0; n < nint; ++n)
+		// loop over all elements
+		int NE = Elements();
+#pragma omp for nowait
+		for (int iel = 0; iel < NE; ++iel)
 		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FESolidElement& el = Element(iel);
 
-			// calculate jacobian
-			double Jw = detJ0(el, n) * gw[n];
+			// initial coordinates
+			int neln = el.Nodes();
+			for (int i = 0; i < neln; ++i) r0[i] = GetMesh()->Node(el.m_node[i]).m_r0;
 
-			// shape functions at integration point
-			double* H = el.H(n);
-
-			double dens = m_pMat->Density(mp);
-
-			// add to moi
-			for (int i = 0; i < neln; ++i)
+			// loop over integration points
+			double* gw = el.GaussWeights();
+			int nint = el.GaussPoints();
+			for (int n = 0; n < nint; ++n)
 			{
-				for (int j = 0; j < neln; ++j)
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+				// calculate jacobian
+				double Jw = detJ0(el, n) * gw[n];
+
+				// shape functions at integration point
+				double* H = el.H(n);
+
+				double dens = m_pMat->Density(mp);
+
+				// add to moi
+				for (int i = 0; i < neln; ++i)
 				{
-					mat3d Iij = (r0[i] * r0[j]) * I - (r0[i] & r0[j]);
-					moi += Iij * (H[i] * H[j] * Jw * dens);
+					for (int j = 0; j < neln; ++j)
+					{
+						mat3d Iij = (r0[i] * r0[j]) * I - (r0[i] & r0[j]);
+						moi_n += Iij * (H[i] * H[j] * Jw * dens);
+					}
 				}
 			}
 		}
+
+#pragma omp critical
+		moi += moi_n;
 	}
 
 	return moi;
@@ -151,7 +159,9 @@ mat3d FERigidSolidDomain::CalculateMOI()
 double FERigidSolidDomain::CalculateMass()
 {
 	double mass = 0.0;
-	for (int iel = 0; iel < Elements(); ++iel)
+	int NE = Elements();
+#pragma omp parallel for reduction(+:mass)
+	for (int iel = 0; iel < NE; ++iel)
 	{
 		FESolidElement& el = Element(iel);
 
@@ -174,45 +184,54 @@ double FERigidSolidDomain::CalculateMass()
 
 vec3d FERigidSolidDomain::CalculateCOM()
 {
-	vector<vec3d> r0(FEElement::MAX_NODES);
 	vec3d rc(0, 0, 0);
 
 	// loop over all elements
-	for (int iel = 0; iel < Elements(); ++iel)
+	int NE = Elements();
+	#pragma omp parallel
 	{
-		FESolidElement& el = Element(iel);
-
-		// nr of integration points
-		int nint = el.GaussPoints();
-
-		// number of nodes
-		int neln = el.Nodes();
-
-		// initial coordinates
-		for (int i = 0; i < neln; ++i) r0[i] = GetMesh()->Node(el.m_node[i]).m_r0;
-
-		// integration weights
-		double* gw = el.GaussWeights();
-
-		// loop over integration points
-		for (int n = 0; n < nint; ++n)
+		vector<vec3d> r0(FEElement::MAX_NODES);
+		vec3d rc_n(0, 0, 0);
+#pragma omp for nowait
+		for (int iel = 0; iel < NE; ++iel)
 		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FESolidElement& el = Element(iel);
 
-			// calculate jacobian
-			double detJ = detJ0(el, n);
+			// nr of integration points
+			int nint = el.GaussPoints();
 
-			// shape functions at integration point
-			double* H = el.H(n);
+			// number of nodes
+			int neln = el.Nodes();
 
-			double dens = m_pMat->Density(mp);
+			// initial coordinates
+			for (int i = 0; i < neln; ++i) r0[i] = GetMesh()->Node(el.m_node[i]).m_r0;
 
-			// add to com and moi
-			for (int i = 0; i < el.Nodes(); ++i)
+			// integration weights
+			double* gw = el.GaussWeights();
+
+			// loop over integration points
+			for (int n = 0; n < nint; ++n)
 			{
-				rc += r0[i] * H[i] * detJ * gw[n] * dens;
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+				// calculate jacobian
+				double detJ = detJ0(el, n);
+
+				// shape functions at integration point
+				double* H = el.H(n);
+
+				double dens = m_pMat->Density(mp);
+
+				// add to com and moi
+				for (int i = 0; i < el.Nodes(); ++i)
+				{
+					rc_n += r0[i] * H[i] * detJ * gw[n] * dens;
+				}
 			}
 		}
+
+		#pragma omp critical
+		rc += rc_n;
 	}
 
 	return rc;

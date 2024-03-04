@@ -56,6 +56,11 @@ protected:
 	void ParseMaterialFiberProperty(XMLTag& tag, FEElementSet& set);
 
 private:
+	void ParseNodeData(XMLTag& tag);
+	void ParseEdgeData(XMLTag& tag);
+	void ParseSurfaceData(XMLTag& tag);
+	void ParseElementData(XMLTag& tag);
+
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
 	void ParseElementData(XMLTag& tag, FEDomainMap& map);
 	void ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag);

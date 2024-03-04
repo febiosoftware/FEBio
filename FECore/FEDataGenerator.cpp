@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEDataGenerator.h"
 #include "FEMesh.h"
 #include "FENodeDataMap.h"
-#include "FESurfaceMap.h"
 #include "FEDomainMap.h"
 #include "FEElementSet.h"
 #include "log.h"
@@ -69,42 +68,20 @@ FENodeSet* FENodeDataGenerator::GetNodeSet()
 	return m_nodeSet;
 }
 
-// generate the data array for the given node set
-bool FENodeDataGenerator::Generate(FENodeDataMap& map)
-{
-	const FENodeSet& set = *map.GetNodeSet();
-	int N = set.Size();
-	map.Create(&set);
-	vector<double> p(3, 0.0);
-
-	FEDataType dataType = map.DataType();
-	for (int i = 0; i<N; ++i)
-	{
-		const FENode* ni = set.Node(i);
-		vec3d ri = ni->m_r0;
-		switch (dataType)
-		{
-		case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, d); } break;
-		case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, d); } break;
-		case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, d); } break;
-		case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, d); } break;
-        case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, d); } break;
-		}
-	}
-
-	return true;
-}
-
-FENodeDataMap* FENodeDataGenerator::Generate()
-{
-	assert(false);
-	return nullptr;
-}
-
 //-----------------------------------------------------------------------------
 FEEdgeDataGenerator::FEEdgeDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
 {
+	m_edgeList = nullptr;
+}
 
+void FEEdgeDataGenerator::SetEdgeList(FEEdgeList* edgeSet)
+{
+	m_edgeList = edgeSet;
+}
+
+FEEdgeList* FEEdgeDataGenerator::GetEdgeList()
+{
+	return m_edgeList;
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +90,6 @@ FEFaceDataGenerator::FEFaceDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem
 	m_surf = nullptr;
 }
 
-//-----------------------------------------------------------------------------
 void FEFaceDataGenerator::SetFacetSet(FEFacetSet* surf)
 {
 	m_surf = surf;
@@ -125,47 +101,6 @@ FEFacetSet* FEFaceDataGenerator::GetFacetSet()
 }
 
 //-----------------------------------------------------------------------------
-// generate the data array for the given facet set
-bool FEFaceDataGenerator::Generate(FESurfaceMap& map)
-{
-	const FEFacetSet& surf = *map.GetFacetSet();
-
-	const FEMesh& mesh = *surf.GetMesh();
-
-	FEDataType dataType = map.DataType();
-
-	int N = surf.Faces();
-	map.Create(&surf);
-    Init();
-	for (int i = 0; i<N; ++i)
-	{
-		const FEFacetSet::FACET& face = surf.Face(i);
-
-		int nf = face.ntype;
-		for (int j=0; j<nf; ++j)
-		{
-			vec3d ri = mesh.Node(face.node[j]).m_r0;
-			switch (dataType)
-			{
-			case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
-			case FE_VEC2D : { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
-			case FE_VEC3D : { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
-			case FE_MAT3D : { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
-            case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
-			}
-		}
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-FESurfaceMap* FEFaceDataGenerator::Generate()
-{
-	assert(false);
-	return nullptr;
-}
-
-//-----------------------------------------------------------------------------
 FEElemDataGenerator::FEElemDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem)
 {
 	m_elemSet = nullptr;
@@ -173,99 +108,3 @@ FEElemDataGenerator::FEElemDataGenerator(FEModel* fem) : FEMeshDataGenerator(fem
 
 void FEElemDataGenerator::SetElementSet(FEElementSet* elset) { m_elemSet = elset; }
 FEElementSet* FEElemDataGenerator::GetElementSet() { return m_elemSet; }
-
-// generate the data array for the given element set
-bool FEElemDataGenerator::Generate(FEDomainMap& map)
-{
-	const FEElementSet& set = *map.GetElementSet();
-
-	FEMesh& mesh = *set.GetMesh();
-
-	FEDataType dataType = map.DataType();
-	if (map.StorageFormat() == FMT_NODE)
-	{
-		assert(dataType == FE_DOUBLE);
-		if (dataType != FE_DOUBLE) return false;
-		FENodeList nodeList = set.GetNodeList();
-		for (int i = 0; i < nodeList.Size(); ++i)
-		{
-			FENode* pn = nodeList.Node(i);
-			double v = 0.;
-			value(pn->m_r0, v);
-			map.setValue(i, v);
-		}
-	}
-	else
-	{
-		int N = set.Elements();
-		for (int i = 0; i < N; ++i)
-		{
-			FEElement& el = *mesh.FindElementFromID(set[i]);
-
-			switch (map.StorageFormat())
-			{
-			case FMT_MULT:
-			{
-				int ne = el.Nodes();
-				for (int j = 0; j < ne; ++j)
-				{
-					vec3d ri = mesh.Node(el.m_node[j]).m_r0;
-					switch (dataType)
-					{
-					case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
-					case FE_VEC2D: { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
-					case FE_VEC3D: { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
-					case FE_MAT3D: { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
-					case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
-					}
-				}
-			}
-			break;
-			case FMT_ITEM:
-			{
-				// calculate element center
-				vec3d r(0, 0, 0);
-				int ne = el.Nodes();
-				for (int j = 0; j < ne; ++j) r += mesh.Node(el.m_node[j]).m_r0;
-				r /= ne;
-
-				// evaluate
-				switch (dataType)
-				{
-				case FE_DOUBLE: { double d; value(r, d); map.setValue(i, d); } break;
-				case FE_VEC2D: { vec2d  d; value(r, d); map.setValue(i, d); } break;
-				case FE_VEC3D: { vec3d  d; value(r, d); map.setValue(i, d); } break;
-				case FE_MAT3D: { mat3d  d; value(r, d); map.setValue(i, d); } break;
-				case FE_MAT3DS: { mat3ds d; value(r, d); map.setValue(i, d); } break;
-				}
-			}
-			break;
-			case FMT_MATPOINTS:
-			{
-				int ni = el.GaussPoints();
-				for (int j = 0; j < ni; ++j)
-				{
-					FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-					vec3d ri = pt.m_r0;
-					switch (dataType)
-					{
-					case FE_DOUBLE: { double d; value(ri, d); map.setValue(i, j, d); } break;
-					case FE_VEC2D: { vec2d  d; value(ri, d); map.setValue(i, j, d); } break;
-					case FE_VEC3D: { vec3d  d; value(ri, d); map.setValue(i, j, d); } break;
-					case FE_MAT3D: { mat3d  d; value(ri, d); map.setValue(i, j, d); } break;
-					case FE_MAT3DS: { mat3ds d; value(ri, d); map.setValue(i, j, d); } break;
-					}
-				}
-			}
-			break;
-			};
-		}
-	}
-	return true;
-}
-
-FEDomainMap* FEElemDataGenerator::Generate()
-{
-	assert(false);
-	return nullptr;
-}

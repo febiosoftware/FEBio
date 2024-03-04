@@ -77,7 +77,7 @@ void FESolidLinearSystem::Assemble(const FEElementMatrix& ke)
 		FELinearConstraintManager& LCM = fem->GetLinearConstraintManager();
 		if (LCM.LinearConstraints() > 0)
 		{
-			#pragma omp critical 
+			#pragma omp critical (LCM_assemble)
 			LCM.AssembleStiffness(m_K, m_F, m_u, ke.Nodes(), ke.RowIndices(), ke.ColumnsIndices(), ke);
 		}
 
@@ -121,7 +121,7 @@ void FESolidLinearSystem::Assemble(const FEElementMatrix& ke)
 		}
 
 		// see if there are any rigid body dofs here
-		#pragma omp critical 
+		#pragma omp critical (rigidStiffness)
 		m_rigidSolver->RigidStiffness(m_K, m_u, m_F, ke, m_alpha);
 	}
 }

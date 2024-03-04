@@ -32,26 +32,23 @@ SOFTWARE.*/
 #include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
-// Virtual base class for damage cumulative distribution functions
+// Virtual base class for damage bond recruitment functions
 
 class FEBIOMECH_API FEBondRecruitment : public FEMaterialProperty
 {
 public:
     FEBondRecruitment(FEModel* pfem) : FEMaterialProperty(pfem) {}
     
-    //! cumulative distribution function
-    virtual double cdf(FEMaterialPoint& mp, const double X) = 0;
+    //! bond recruitment function
+    virtual double brf(FEMaterialPoint& mp, const double X) = 0;
     
-    //! probability density function
-    virtual double pdf(FEMaterialPoint& mp, const double X) = 0;
-
 public:
     
     FECORE_BASE_CLASS(FEBondRecruitment)
 };
 
 //-----------------------------------------------------------------------------
-// User-specified load curve for damage cumulative distribution function
+// User-specified load curve for damage bond recruitment function
 
 class FEBondRecruitmentUser : public FEBondRecruitment
 {
@@ -59,14 +56,11 @@ public:
     FEBondRecruitmentUser(FEModel* pfem);
     ~FEBondRecruitmentUser() {}
     
-    //! cumulative distribution function
-    double cdf(FEMaterialPoint& mp, const double X) override;
-    
-    //! probability density function
-    double pdf(FEMaterialPoint& mp, const double X) override;
+    //! bond recruitment function
+    double brf(FEMaterialPoint& mp, const double X) override;
     
 public:
-    FEFunction1D*    m_cdf;           //!< user-defined CDF
+    FEFunction1D*    m_brf;           //!< user-defined BRF
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
@@ -81,11 +75,8 @@ public:
     FEBondRecruitmentPower(FEModel* pfem);
     ~FEBondRecruitmentPower() {}
     
-    //! cumulative distribution function
-    double cdf(FEMaterialPoint& mp, const double X) override;
-    
-    //! probability density function
-    double pdf(FEMaterialPoint& mp, const double X) override;
+    //! bond recruitment function
+    double brf(FEMaterialPoint& mp, const double X) override;
     
 public:
     FEParamDouble    m_alpha;            //!< power exponent alpha
@@ -106,11 +97,8 @@ public:
     FEBondRecruitmentExp(FEModel* pfem);
     ~FEBondRecruitmentExp() {}
     
-    //! cumulative distribution function
-    double cdf(FEMaterialPoint& mp, const double X) override;
-    
-    //! probability density function
-    double pdf(FEMaterialPoint& mp, const double X) override;
+    //! bond recruitment function
+    double brf(FEMaterialPoint& mp, const double X) override;
     
 public:
     FEParamDouble    m_alpha;            //!< power exponent alpha
@@ -131,16 +119,100 @@ public:
     FEBondRecruitmentPoly(FEModel* pfem);
     ~FEBondRecruitmentPoly() {}
     
-    //! cumulative distribution function
-    double cdf(FEMaterialPoint& mp, const double X) override;
-    
-    //! probability density function
-    double pdf(FEMaterialPoint& mp, const double X) override;
+    //! bond recruitment function
+    double brf(FEMaterialPoint& mp, const double X) override;
     
 public:
     FEParamDouble    m_mu0;              //!< constant coeff
     FEParamDouble    m_mu1;              //!< coeff of linear term
     FEParamDouble    m_mu2;              //!< coeff of quadratic term
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Log-normal damage bond recruitment function
+
+class FEBondRecruitmentLogNormal : public FEBondRecruitment
+{
+public:
+    FEBondRecruitmentLogNormal(FEModel* pfem);
+    ~FEBondRecruitmentLogNormal() {}
+    
+    //! bond recruitment function
+    double brf(FEMaterialPoint& mp, const double X) override;
+    
+public:
+    FEParamDouble   m_mu;       //!< mean on log scale
+    FEParamDouble   m_sigma;    //!< standard deviation on log scale
+    FEParamDouble   m_max;      //!< maximum increase in recruitment
+    
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Weibull damage bond recruitment function
+
+class FEBondRecruitmentWeibull : public FEBondRecruitment
+{
+public:
+    FEBondRecruitmentWeibull(FEModel* pfem);
+    ~FEBondRecruitmentWeibull() {}
+    
+    //! bond recruitment function
+    double brf(FEMaterialPoint& mp, const double X) override;
+    
+public:
+    FEParamDouble   m_alpha;    //!< exponent alpha
+    FEParamDouble   m_mu;       //!< mean mu
+    FEParamDouble   m_ploc;     //!< location parameter
+    FEParamDouble   m_max;      //!< maximum increase in recruitment
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Piecewise S-shaped quintic polynomial bond recruitment function
+
+class FEBondRecruitmentPQP : public FEBondRecruitment
+{
+public:
+    FEBondRecruitmentPQP(FEModel* pfem);
+    ~FEBondRecruitmentPQP() {}
+    
+    //! bond recruitment function
+    double brf(FEMaterialPoint& mp, const double X) override;
+    
+    bool Validate() override;
+    
+public:
+    FEParamDouble   m_mumin;    //!< mu threshold
+    FEParamDouble   m_mumax;    //!< mu cap
+    FEParamDouble   m_max;      //!< maximum increase in recruitment
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Gamma damage bond recruitment function
+
+class FEBondRecruitmentGamma : public FEBondRecruitment
+{
+public:
+    FEBondRecruitmentGamma(FEModel* pfem);
+    ~FEBondRecruitmentGamma() {}
+    
+    //! bond recruitment function
+    double brf(FEMaterialPoint& mp, const double X) override;
+    
+public:
+    FEParamDouble   m_alpha;    //!< exponent alpha
+    FEParamDouble   m_mu;       //!< pdf expected mean mu
+    FEParamDouble   m_max;      //!< maximum increase in recruitment
 
     // declare parameter list
     DECLARE_FECORE_CLASS();
