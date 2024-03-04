@@ -68,13 +68,6 @@ FECoreBase* FECoreFactory::CreateInstance(FEModel* pfem) const
 	// build the class descriptor
 	if (pclass->BuildClass() == false) return 0;
 
-	if (m_spec != -1)
-	{
-		int n1 = FECORE_SPEC_MAJOR(m_spec);
-		int n2 = FECORE_SPEC_MINOR(m_spec);
-		if (pfem) feLogWarningEx(pfem, "\"%s\" is deprecated in spec %d.%d!", m_szalias, n1, n2);
-	}
-
 	// return the pointer
 	return pclass;
 }

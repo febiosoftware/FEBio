@@ -428,6 +428,7 @@ DerivedData/
 cbuild/
 cmbuild*/
 vs22/
+CMakeFiles/
 
 ##cmake files
 !CMakeLists.txt

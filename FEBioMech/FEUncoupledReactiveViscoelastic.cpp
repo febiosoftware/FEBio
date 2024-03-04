@@ -291,8 +291,8 @@ double FEUncoupledReactiveViscoelasticMaterial::ReformingBondMassFraction(FEMate
     // get current number of generations
     int ng = (int)pt.m_Uv.size();
     
-    double f = (!pt.m_wv.empty()) ? pt.m_wv.back() : 1;
-    
+    double f = 1;
+
     for (int ig=0; ig<ng-1; ++ig)
     {
         // evaluate deformation gradient when this generation starts breaking
@@ -364,7 +364,7 @@ mat3ds FEUncoupledReactiveViscoelasticMaterial::DevStressWeakBonds(FEMaterialPoi
             // evaluate bond mass fraction for this generation
             ep.m_F = pt.m_Uv[ig];
             ep.m_J = pt.m_Jv[ig];
-            w = BreakingBondMassFraction(wb, ig, D);
+            w = BreakingBondMassFraction(wb, ig, D)*pt.m_wv[ig];
             // evaluate relative deformation gradient for this generation
             if (ig > 0) {
                 ep.m_F = F*pt.m_Uv[ig-1].inverse();
@@ -453,7 +453,7 @@ tens4ds FEUncoupledReactiveViscoelasticMaterial::DevTangentWeakBonds(FEMaterialP
             // evaluate bond mass fraction for this generation
             ep.m_F = pt.m_Uv[ig];
             ep.m_J = pt.m_Jv[ig];
-            w = BreakingBondMassFraction(wb, ig, D);
+            w = BreakingBondMassFraction(wb, ig, D)*pt.m_wv[ig];
             // evaluate relative deformation gradient for this generation
             if (ig > 0) {
                 ep.m_F = F*pt.m_Uv[ig-1].inverse();
@@ -542,7 +542,7 @@ double FEUncoupledReactiveViscoelasticMaterial::WeakBondDevSED(FEMaterialPoint& 
             // evaluate bond mass fraction for this generation
             ep.m_F = pt.m_Uv[ig];
             ep.m_J = pt.m_Jv[ig];
-            w = BreakingBondMassFraction(wb, ig, D);
+            w = BreakingBondMassFraction(wb, ig, D)*pt.m_wv[ig];
             // evaluate relative deformation gradient for this generation
             if (ig > 0) {
                 ep.m_F = F*pt.m_Uv[ig-1].inverse();
@@ -607,11 +607,11 @@ void FEUncoupledReactiveViscoelasticMaterial::CullGenerations(FEMaterialPoint& m
     // always check oldest generation
     ep.m_F = pt.m_Uv[0];
     ep.m_J = pt.m_Jv[0];
-    double w0 = BreakingBondMassFraction(mp, 0, D);
+    double w0 = BreakingBondMassFraction(mp, 0, D)*pt.m_wv[0];
     if (w0 < m_wmin) {
         ep.m_F = pt.m_Uv[1];
         ep.m_J = pt.m_Jv[1];
-        double w1 = BreakingBondMassFraction(mp, 1, D);
+        double w1 = BreakingBondMassFraction(mp, 1, D)*pt.m_wv[1];
         pt.m_v[1] = (w0*pt.m_v[0] + w1*pt.m_v[1])/(w0+w1);
         pt.m_Uv[1] = (pt.m_Uv[0]*w0 + pt.m_Uv[1]*w1)/(w0+w1);
         pt.m_Jv[1] = pt.m_Uv[1].det();
@@ -663,7 +663,7 @@ void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FE
             pt.m_f.push_back(f);
             if (m_pWCDF) {
                 pt.m_Et = ScalarStrain(wb);
-                pt.m_wv.push_back(m_pWCDF->cdf(mp,pt.m_Et));
+                pt.m_wv.push_back(m_pWCDF->brf(mp,pt.m_Et));
             }
             else pt.m_wv.push_back(1);
             CullGenerations(wb);
@@ -675,7 +675,7 @@ void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FE
         pt.m_Jv.back() = Jv;
         if (m_pWCDF) {
             pt.m_Et = ScalarStrain(wb);
-            pt.m_wv.back() = m_pWCDF->cdf(mp,pt.m_Et);
+            pt.m_wv.back() = m_pWCDF->brf(mp,pt.m_Et);
         }
         pt.m_f.back() = ReformingBondMassFraction(wb);
     }

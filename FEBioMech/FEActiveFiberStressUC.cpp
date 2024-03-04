@@ -31,6 +31,12 @@ SOFTWARE.*/
 #include "FEElasticMaterial.h"
 #include <FECore/log.h>
 
+void FEActiveFiberStressUC::Data::Serialize(DumpStream& ar)
+{
+	FEMaterialPointData::Serialize(ar);
+	ar & m_lamp;
+}
+
 //=====================================================================================
 
 BEGIN_FECORE_CLASS(FEActiveFiberStressUC, FEUncoupledMaterial);

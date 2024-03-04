@@ -53,37 +53,24 @@ void FEParabolicMap::SetDOFConstraint(const FEDofList& dofs)
 	m_dofs = dofs;
 }
 
-FESurfaceMap* FEParabolicMap::Generate()
+FEDataMap* FEParabolicMap::Generate()
 {
+	const FEFacetSet& facetSet = *GetFacetSet();
 	FESurfaceMap* map = new FESurfaceMap(FEDataType::FE_DOUBLE);
-	if (Generate(*map) == false)
-	{
-		delete map;
-		map = nullptr;
-	}
-	return map;
-}
+	map->Create(&facetSet, 0.0, FMT_NODE);
 
-bool FEParabolicMap::Generate(FESurfaceMap& map)
-{
-	const FEFacetSet& surf = *map.GetFacetSet();
-
-	// make sure this is for a scalar map
-	if (map.DataType() != FE_DOUBLE) return false;
-
-	// create a temp surface of the facet set
-	FESurface* ps = fecore_alloc(FESurface, GetFEModel());
-	ps->Create(surf);
-	ps->InitSurface();
-	map.Create(&surf, 0.0, FMT_NODE);
+	// create temporary surface
+	FESurface surf(GetFEModel());
+	surf.Create(facetSet);
+	surf.InitSurface();
 
 	// find surface boundary nodes
 	FEElemElemList EEL;
-	EEL.Create(ps);
+	EEL.Create(&surf);
 
-	vector<bool> boundary(ps->Nodes(), false);
-	for (int i = 0; i<ps->Elements(); ++i) {
-		FESurfaceElement& el = ps->Element(i);
+	vector<bool> boundary(surf.Nodes(), false);
+	for (int i = 0; i<surf.Elements(); ++i) {
+		FESurfaceElement& el = surf.Element(i);
 		for (int j = 0; j<el.facet_edges(); ++j) {
 			FEElement* nel = EEL.Neighbor(i, j);
 			if (nel == nullptr) {
@@ -100,9 +87,9 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	if (m_dofs.IsEmpty() == false)
 	{
 		// only consider nodes with fixed dofs as boundary nodes
-		for (int i = 0; i < ps->Nodes(); ++i)
+		for (int i = 0; i < surf.Nodes(); ++i)
 			if (boundary[i]) {
-				FENode& node = ps->Node(i);
+				FENode& node = surf.Node(i);
 
 				bool b = false;
 				for (int j = 0; j < m_dofs.Size(); ++j)
@@ -116,14 +103,13 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 
 	// count number of non-boundary nodes
 	int neq = 0;
-	vector<int> glm(ps->Nodes(), -1);
-	for (int i = 0; i<ps->Nodes(); ++i)
+	vector<int> glm(surf.Nodes(), -1);
+	for (int i = 0; i< surf.Nodes(); ++i)
 		if (!boundary[i]) glm[i] = neq++;
 	if (neq == 0)
 	{
 		feLogError("Unable to set parabolic map\n");
-		delete ps;
-		return false;
+		return nullptr;
 	}
 
 	// create a linear solver
@@ -134,8 +120,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	if (plinsolve == 0)
 	{
 		feLogError("Unknown solver type selected\n");
-		delete ps;
-		return false;
+		return nullptr;
 	}
 
 	SparseMatrix* pS = plinsolve->CreateSparseMatrix(REAL_SYMMETRIC);
@@ -143,13 +128,12 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	if (pK == 0)
 	{
 		feLogError("Failed allocating stiffness matrix\n\n");
-		delete ps;
-		return false;
+		return nullptr;
 	}
 	// build matrix profile for normal velocity at non-boundary nodes
 	pK->build_begin(neq);
-	for (int i = 0; i<ps->Elements(); ++i) {
-		FESurfaceElement& el = ps->Element(i);
+	for (int i = 0; i< surf.Elements(); ++i) {
+		FESurfaceElement& el = surf.Element(i);
 		vector<int> elm(el.Nodes(), -1);
 		for (int j = 0; j<el.Nodes(); ++j)
 			elm[j] = glm[el.m_lnode[j]];
@@ -173,10 +157,10 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	vector<double> fe;
 	vector<int> lm;
 
-	for (int m = 0; m<ps->Elements(); ++m)
+	for (int m = 0; m< surf.Elements(); ++m)
 	{
 		// get the surface element
-		FESurfaceElement& el = ps->Element(m);
+		FESurfaceElement& el = surf.Element(m);
 
 		int neln = el.Nodes();
 
@@ -193,7 +177,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 		double* w = el.GaussWeights();
 
 		// nodal coordinates
-		FEMesh& mesh = *ps->GetMesh();
+		FEMesh& mesh = *surf.GetMesh();
 		vec3d rt[FEElement::MAX_NODES];
 		for (int j = 0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
 
@@ -206,7 +190,7 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 			double* N = el.H(n);
 			double* Gr = el.Gr(n);
 			double* Gs = el.Gs(n);
-			ps->ContraBaseVectors(el, n, gcnt);
+			surf.ContraBaseVectors(el, n, gcnt);
 
 			vec3d dxr(0, 0, 0), dxs(0, 0, 0);
 			for (int i = 0; i<neln; ++i)
@@ -242,31 +226,30 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 	if (plinsolve->BackSolve(v, rhs) == false)
 	{
 		feLogError("Unable to solve for parabolic field\n");
-		delete ps;
-		return false;
+		return nullptr;
 	}
 	plinsolve->Destroy();
 
 	// set the nodal normal velocity scale factors
-	vector<double> VN(ps->Nodes(), 0.0);
-	for (int i = 0; i<ps->Nodes(); ++i) {
+	vector<double> VN(surf.Nodes(), 0.0);
+	for (int i = 0; i< surf.Nodes(); ++i) {
 		if (glm[i] == -1) VN[i] = 0;
 		else VN[i] = v[glm[i]];
 	}
 
 	// evaluate net area and volumetric flow rate
 	double A = 0, Q = 0;
-	for (int m = 0; m<ps->Elements(); ++m)
+	for (int m = 0; m< surf.Elements(); ++m)
 	{
 		// get the surface element
-		FESurfaceElement& el = ps->Element(m);
+		FESurfaceElement& el = surf.Element(m);
 
 		int neln = el.Nodes();
 		int nint = el.GaussPoints();
 		double* w = el.GaussWeights();
 
 		// nodal coordinates
-		FEMesh& mesh = *ps->GetMesh();
+		FEMesh& mesh = *surf.GetMesh();
 		vec3d rt[FEElement::MAX_NODES];
 		for (int j = 0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
 
@@ -297,17 +280,14 @@ bool FEParabolicMap::Generate(FESurfaceMap& map)
 
 	// normalize nodal velocity cards
 	double vbar = Q / A;
-	for (int i = 0; i<ps->Nodes(); ++i) VN[i] /= vbar;
+	for (int i = 0; i< surf.Nodes(); ++i) VN[i] /= vbar;
 
 	// assign nodal values to surface map
-	map.set<double>(0.0);
-	for (int i = 0; i < ps->Nodes(); ++i)
+	map->set<double>(0.0);
+	for (int i = 0; i < surf.Nodes(); ++i)
 	{
-		map.set<double>(i, VN[i] * m_scale);
+		map->set<double>(i, VN[i] * m_scale);
 	}
 
-	// clean up
-	delete ps;
-
-	return true;
+	return map;
 }

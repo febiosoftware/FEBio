@@ -98,7 +98,7 @@ void FELinearSystem::Assemble(const FEElementMatrix& ke)
 		}
 	}
 
-#pragma omp critical
+#pragma omp critical (LC_assemble)
 	{
 	FEModel* fem = m_solver->GetFEModel();
 	FELinearConstraintManager& LCM = fem->GetLinearConstraintManager();

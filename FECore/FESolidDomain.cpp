@@ -2633,6 +2633,8 @@ void FESolidDomain::LoadVector(
 //-----------------------------------------------------------------------------
 void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, const FEDofList& dofList_b, FEVolumeMatrixIntegrand f)
 {
+#pragma omp parallel shared(f)
+	{
 	FEElementMatrix ke;
 
 	int dofPerNode_a = dofList_a.Size();
@@ -2644,7 +2646,8 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 	matrix kab(dofPerNode_a, dofPerNode_b);
 
 	int NE = Elements();
-	for (int m = 0; m<NE; ++m)
+	#pragma omp for nowait
+	for (int m = 0; m < NE; ++m)
 	{
 		// get the element
 		FESolidElement& el = Element(m);
@@ -2666,7 +2669,7 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 
 		// repeat over integration points
 		ke.zero();
-		for (int n = 0; n<nint; ++n)
+		for (int n = 0; n < nint; ++n)
 		{
 			FEMaterialPoint& pt = *el.GetMaterialPoint(n);
 
@@ -2674,8 +2677,8 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 			pt.m_shape = el.H(n);
 
 			// calculate stiffness component
-			for (int i = 0; i<neln; ++i)
-				for (int j = 0; j<neln; ++j)
+			for (int i = 0; i < neln; ++i)
+				for (int j = 0; j < neln; ++j)
 				{
 					// evaluate integrand
 					kab.zero();
@@ -2695,13 +2698,14 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 			std::vector<int>& ID = node.m_ID;
 
 			for (int k = 0; k < dofPerNode_a; ++k)
-				lma[dofPerNode_a*j + k] = ID[dofList_a[k]];
+				lma[dofPerNode_a * j + k] = ID[dofList_a[k]];
 
 			for (int k = 0; k < dofPerNode_b; ++k)
-				lmb[dofPerNode_b*j + k] = ID[dofList_b[k]];
+				lmb[dofPerNode_b * j + k] = ID[dofList_b[k]];
 		}
 
 		// assemble element matrix in global stiffness matrix
 		LS.Assemble(ke);
 	}
+	} // omp parallel
 }

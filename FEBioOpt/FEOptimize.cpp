@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEOptimizeData.h"
 #include "FECore/FECoreKernel.h"
 #include "FECore/log.h"
+#include "FECore/Timer.h"
 
 //-----------------------------------------------------------------------------
 #define VERSION 2
@@ -67,8 +68,17 @@ bool FEOptimize::Init(const char* szfile)
 //-----------------------------------------------------------------------------
 bool FEOptimize::Run()
 {
+	Timer timer;
+	timer.start();
+
 	// solve the problem
 	bool bret = m_opt.Solve();
+
+	timer.stop();
+	double elapsedTime = timer.GetTime();
+	char sztime[64];
+	Timer::time_str(elapsedTime, sztime);
+	feLog("\n\tTotal elapsed time : %s (%lg sec)\n\n", sztime, elapsedTime);
 
 	if (bret)
 		feLog("\n\n N O R M A L   T E R M I N A T I O N\n\n");

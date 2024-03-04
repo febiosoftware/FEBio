@@ -180,5 +180,9 @@ void FEMeshPartition::ForEachMaterialPoint(std::function<void(FEMaterialPoint& m
 void FEMeshPartition::ForEachElement(std::function<void(FEElement& el)> f)
 {
 	int NE = Elements();
-	for (int i = 0; i < NE; ++i) f(ElementRef(i));
+#pragma omp parallel for shared(f)
+	for (int i = 0; i < NE; ++i)
+	{
+		f(ElementRef(i));
+	}
 }

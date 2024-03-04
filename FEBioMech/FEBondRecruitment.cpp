@@ -36,27 +36,21 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEBondRecruitmentUser, FEBondRecruitment)
-    ADD_PROPERTY(m_cdf, "function");
+    ADD_PROPERTY(m_brf, "function");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEBondRecruitmentUser::FEBondRecruitmentUser(FEModel* pfem) : FEBondRecruitment(pfem)
 {
-    m_cdf = nullptr;
+    m_brf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 // User-defined loadcurve for bond recruitment function
-double FEBondRecruitmentUser::cdf(FEMaterialPoint& mp, const double X)
+double FEBondRecruitmentUser::brf(FEMaterialPoint& mp, const double X)
 {
-    return m_cdf->value(X);
-}
-
-// Derivative of user-defined loadcurve damage probability density function
-double FEBondRecruitmentUser::pdf(FEMaterialPoint& mp, const double X)
-{
-    return m_cdf->derive(X);
+    return m_brf->value(X);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,35 +75,19 @@ FEBondRecruitmentPower::FEBondRecruitmentPower(FEModel* pfem) : FEBondRecruitmen
 
 //-----------------------------------------------------------------------------
 // Power bond recruitment function
-double FEBondRecruitmentPower::cdf(FEMaterialPoint& mp, const double X)
+double FEBondRecruitmentPower::brf(FEMaterialPoint& mp, const double X)
 {
-    double cdf = 0;
+    double brf = 0;
     double alpha = m_alpha(mp);
     double mu0 = m_mu0(mp);
     double mu1 = m_mu1(mp);
     double s = m_s(mp);
 
-    // this CDF only admits positive values
+    // this brf only admits positive values
     if (X > 0)
-        cdf = mu0 + mu1*pow(X/s,alpha);
+        brf = mu0 + mu1*pow(X/s,alpha);
     
-    return cdf;
-}
-
-// Power bond recruitment function
-double FEBondRecruitmentPower::pdf(FEMaterialPoint& mp, const double X)
-{
-    double pdf = 0;
-    double alpha = m_alpha(mp);
-    double mu0 = m_mu0(mp);
-    double mu1 = m_mu1(mp);
-    double s = m_s(mp);
-
-    // this CDF only admits positive values
-    if (X > 0)
-        pdf = mu1*alpha/s*pow(X/s,alpha-1);
-    
-    return pdf;
+    return brf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -134,35 +112,19 @@ FEBondRecruitmentExp::FEBondRecruitmentExp(FEModel* pfem) : FEBondRecruitment(pf
 
 //-----------------------------------------------------------------------------
 // Exponential bond recruitment function
-double FEBondRecruitmentExp::cdf(FEMaterialPoint& mp, const double X)
+double FEBondRecruitmentExp::brf(FEMaterialPoint& mp, const double X)
 {
-    double cdf = 0;
+    double brf = 0;
     double alpha = m_alpha(mp);
     double mu0 = m_mu0(mp);
     double mu1 = m_mu1(mp);
     double s = m_s(mp);
 
-    // this CDF only admits positive values
+    // this brf only admits positive values
     if (X > 0)
-        cdf = mu0*exp(mu1*pow(X/s,alpha));
+        brf = mu0*exp(mu1*pow(X/s,alpha));
     
-    return cdf;
-}
-
-// Exponential probability density function
-double FEBondRecruitmentExp::pdf(FEMaterialPoint& mp, const double X)
-{
-    double pdf = 0;
-    double alpha = m_alpha(mp);
-    double mu0 = m_mu0(mp);
-    double mu1 = m_mu1(mp);
-    double s = m_s(mp);
-
-    // this CDF only admits positive values
-    if (X > 0)
-        pdf = mu0*mu1*alpha/s*pow(X/s,alpha-1)*exp(mu1*pow(X/s,alpha));
-    
-    return pdf;
+    return brf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,32 +147,166 @@ FEBondRecruitmentPoly::FEBondRecruitmentPoly(FEModel* pfem) : FEBondRecruitment(
 
 //-----------------------------------------------------------------------------
 // Poly bond recruitment function
-double FEBondRecruitmentPoly::cdf(FEMaterialPoint& mp, const double X)
+double FEBondRecruitmentPoly::brf(FEMaterialPoint& mp, const double X)
 {
-    double cdf = 0;
+    double brf = 0;
     double mu0 = m_mu0(mp);
     double mu1 = m_mu1(mp);
     double mu2 = m_mu2(mp);
 
-    // this CDF only admits positive arguments
+    // this brf only admits positive arguments
     if (X > 0)
-        cdf = mu0 + mu1*X + mu2*X*X;
+        brf = mu0 + mu1*X + mu2*X*X;
     
-    return cdf;
+    return brf;
 }
 
-// Poly2 probability density function
-double FEBondRecruitmentPoly::pdf(FEMaterialPoint& mp, const double X)
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRecruitmentLogNormal, FEBondRecruitment)
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER(0.0), "mu");
+    ADD_PARAMETER(m_sigma, FE_RANGE_GREATER(0.0), "sigma");
+    ADD_PARAMETER(m_max  , FE_RANGE_GREATER_OR_EQUAL(0.0), "max")->setLongName("max recruitment increase");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRecruitmentLogNormal::FEBondRecruitmentLogNormal(FEModel* pfem) : FEBondRecruitment(pfem)
 {
-    double pdf = 0;
-    double mu0 = m_mu0(mp);
-    double mu1 = m_mu1(mp);
-    double mu2 = m_mu2(mp);
-
-    // this PDF only admits positive arguments
-    if (X > 0)
-        pdf = mu1 + 2*mu2*X;
-    
-    return pdf;
+    m_mu = 1;
+    m_sigma = 1;
+    m_max = 0;
 }
 
+//-----------------------------------------------------------------------------
+// Lognormal damage cumulative distribution function
+double FEBondRecruitmentLogNormal::brf(FEMaterialPoint& mp, const double X)
+{
+    double brf = 0;
+    double mu = m_mu(mp);
+    double sigma = m_sigma(mp);
+    double maxr = m_max(mp);
+    // this brf only admits positive values
+    if (X >= 0)
+        brf = 1.0 + maxr*(0.5*erfc(-log(X/mu)/sigma/sqrt(2.)));
+    
+    return brf;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRecruitmentWeibull, FEBondRecruitment)
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
+    ADD_PARAMETER(m_ploc, "ploc");
+    ADD_PARAMETER(m_max  , FE_RANGE_GREATER_OR_EQUAL(0.0), "max")->setLongName("max recruitment increase");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRecruitmentWeibull::FEBondRecruitmentWeibull(FEModel* pfem) : FEBondRecruitment(pfem)
+{
+    m_alpha = 1;
+    m_mu = 1;
+    m_ploc = 0;
+    m_max = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Weibull damage cumulative distribution function
+double FEBondRecruitmentWeibull::brf(FEMaterialPoint& mp, const double X)
+{
+    double brf = 0;
+    double alpha = m_alpha(mp);
+    double mu = m_mu(mp);
+    double ploc = m_ploc(mp);
+    double maxr = m_max(mp);
+
+    // this brf only admits positive values
+    if (X > ploc)
+        brf = 1 + maxr*(1 - exp(-pow((X-ploc)/mu,alpha)));
+    
+    return brf;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRecruitmentPQP, FEBondRecruitment)
+    ADD_PARAMETER(m_mumin, FE_RANGE_GREATER_OR_EQUAL(0.0), "mumin");
+    ADD_PARAMETER(m_mumax, "mumax");
+    ADD_PARAMETER(m_max  , FE_RANGE_GREATER_OR_EQUAL(0.0), "max")->setLongName("max recruitment increase");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRecruitmentPQP::FEBondRecruitmentPQP(FEModel* pfem) : FEBondRecruitment(pfem)
+{
+    m_mumin = 0;
+    m_mumax = 1;
+    m_max = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialization.
+bool FEBondRecruitmentPQP::Validate()
+{
+    return FEBondRecruitment::Validate();
+}
+
+//-----------------------------------------------------------------------------
+// Piecewise S-shaped quintic polynomial damage bond recruitment function
+double FEBondRecruitmentPQP::brf(FEMaterialPoint& mp, const double X)
+{
+    double brf = 0;
+    double mumin = m_mumin(mp);
+    double mumax = m_mumax(mp);
+    double maxr = m_max(mp);
+
+    if (X <= mumin) brf = 1;
+    else if (X >= mumax) brf = 1+maxr;
+    else
+    {
+        double x = (X - mumin)/(mumax - mumin);
+        brf = 1 + maxr*(pow(x,3)*(10 - 15*x + 6*x*x));
+    }
+    
+    return brf;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_FECORE_CLASS(FEBondRecruitmentGamma, FEBondRecruitment)
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0), "alpha");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   );
+    ADD_PARAMETER(m_max  , FE_RANGE_GREATER_OR_EQUAL(0.0), "max")->setLongName("max recruitment increase");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! Constructor.
+FEBondRecruitmentGamma::FEBondRecruitmentGamma(FEModel* pfem) : FEBondRecruitment(pfem)
+{
+    m_alpha = 2;
+    m_mu = 4;
+    m_max = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Gamma damage cumulative distribution function
+double FEBondRecruitmentGamma::brf(FEMaterialPoint& mp, const double X)
+{
+    double brf = 1;
+    double alpha = m_alpha(mp);
+    double mu = m_mu(mp);
+    double maxr = m_max(mp);
+
+    // this CDF only admits positive values
+    double scale = gamma_inc_Q(alpha,0);
+    if (X > 0)
+        brf = 1 + maxr*gamma_inc_P(alpha,X/mu)/scale;
+    
+    return brf;
+}
