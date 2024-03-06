@@ -29,6 +29,8 @@ SOFTWARE.*/
 #include "ImageMap.h"
 #include "feimglib_api.h"
 
+class FEDomainMap;
+
 class FEIMGLIB_API FEImageDataMap : public FEElemDataGenerator
 {
 public:
@@ -36,11 +38,12 @@ public:
 
 	bool Init() override;
 
-	void value(const vec3d& x, double& data) override;
-
-	FEDomainMap* Generate() override;
+	FEDataMap* Generate() override;
 
 	void Evaluate(double time) override;
+
+private:
+	void GenerateData();
 
 private:
 	vec3d	m_r0;

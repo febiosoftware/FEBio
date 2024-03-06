@@ -672,7 +672,7 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
             pt.m_Jv.push_back(Jv);
             if (m_pWCDF) {
                 pt.m_Et = ScalarStrain(mp);
-                pt.m_wv.push_back(m_pWCDF->cdf(mp,pt.m_Et));
+                pt.m_wv.push_back(m_pWCDF->brf(mp,pt.m_Et));
             }
             else pt.m_wv.push_back(1);
             double f = (!pt.m_v.empty()) ? ReformingBondMassFraction(wb) : 1;
@@ -686,7 +686,7 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
         pt.m_Jv.back() = Jv;
         if (m_pWCDF) {
             pt.m_Et = ScalarStrain(mp);
-            pt.m_wv.back() = m_pWCDF->cdf(mp,pt.m_Et);
+            pt.m_wv.back() = m_pWCDF->brf(mp,pt.m_Et);
         }
         pt.m_f.back() = ReformingBondMassFraction(wb);
     }
