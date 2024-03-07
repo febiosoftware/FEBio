@@ -580,9 +580,9 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 			double Wp = pt.m_Wp;
             mat3ds D = pt.RateOfDeformation();
             double D2 = D.dotdot(D);
-            if (D2 > 0)
+            if (D2 > std::numeric_limits<double>::epsilon())
                 pt.m_s += D*(((Wt-Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
-            if (ed.eJt != ed.eJp)
+            if (fabs(ed.eJt - ed.eJp) > std::numeric_limits<double>::epsilon())
                 pt.m_s += mat3dd((eUt-eUp)/(ed.eJ*(ed.eJt-ed.eJp)));
         }
         else

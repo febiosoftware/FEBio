@@ -133,6 +133,10 @@ public:
 		void ExternalForces(FEGlobalVector& R);
 	//}
 
+private:
+	//! Calculate initial accelerations for dynamics problems
+	bool InitAccelerations();
+
 public:
 	// convergence tolerances
 	double	m_Dtol;			//!< displacement tolerance
