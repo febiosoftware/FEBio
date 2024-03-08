@@ -345,25 +345,17 @@ void FEMultiphasicSolver::PrepStep()
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& ni = mesh.Node(i);
+		vec3d vs = (ni.m_rt - ni.m_rp)/dt;
+		vec3d vq = (ni.m_dt - ni.m_dp)/dt;
 		ni.m_rp = ni.m_rt;
 		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
-		ni.m_ap = ni.m_at;
 		ni.m_dp = ni.m_dt;
 		ni.UpdateValues();
 
-		// initial guess at start of new time step
-		// solid
-		ni.m_at = ni.m_ap * (1 - 0.5 / m_beta) - ni.m_vp / (m_beta * dt);
-		vec3d vs = ni.m_vp + (ni.m_at * m_gamma + ni.m_ap * (1 - m_gamma)) * dt;
 		ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vs);
 
 		// solid shell
-		vec3d aqp = ni.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
-		vec3d vqp = ni.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
-		vec3d aqt = aqp * (1 - 0.5 / m_beta) - vqp / (m_beta * dt);
-		ni.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
-		vec3d vqt = vqp + (aqt * m_gamma + aqp * (1 - m_gamma)) * dt;
-		ni.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
+		ni.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vs - vq);
 	}
 
 	// apply concentrated nodal forces
