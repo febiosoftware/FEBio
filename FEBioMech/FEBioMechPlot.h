@@ -378,6 +378,7 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a) override;
 protected:
 	int		m_comp;
+	int		m_mat;
 };
 
 //-----------------------------------------------------------------------------
