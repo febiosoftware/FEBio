@@ -73,6 +73,7 @@ BEGIN_FECORE_CLASS(FESolidSolver2, FENewtonSolver)
 		ADD_PARAMETER(m_logSolve  , "logSolve"    );
 		ADD_PARAMETER(m_arcLength , "arc_length"  );
 		ADD_PARAMETER(m_al_scale  , "arc_length_scale");
+		ADD_PARAMETER(m_init_accelerations, "init_accelerations")->SetFlags(FE_PARAM_HIDDEN);
 	END_PARAM_GROUP();
 END_FECORE_CLASS();
 
@@ -101,6 +102,8 @@ m_dofBW(pfem), m_dofBA(pfem)
     m_alpham = 1.0;
 	m_beta  = 0.25;
 	m_gamma = 0.5;
+
+	m_init_accelerations = true;
 
 	// arc-length parameters
 	m_arcLength = ARC_LENGTH_METHOD::NONE; // no arc-length
@@ -247,11 +250,14 @@ bool FESolidSolver2::Init()
 	// For dynamic problems we need to calculate the initial accelerations
 	// TODO: We currently only do this when time == 0. But what if the first step is static and the
 	// second is dynamic? 
-	FEAnalysis* pstep = fem.GetCurrentStep();
-	double currentTime = fem.GetTime().currentTime;
-	if ((pstep->m_nanalysis == FESolidAnalysis::DYNAMIC) && (currentTime == 0.0))
+	if (m_init_accelerations)
 	{
-		if (InitAccelerations() == false) return false;
+		FEAnalysis* pstep = fem.GetCurrentStep();
+		double currentTime = fem.GetTime().currentTime;
+		if ((pstep->m_nanalysis == FESolidAnalysis::DYNAMIC) && (currentTime == 0.0))
+		{
+			if (InitAccelerations() == false) return false;
+		}
 	}
 
 	return true;

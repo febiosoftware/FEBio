@@ -160,6 +160,8 @@ public:
 	double	m_beta;			//!< Newmark parameter beta (displacement integration)
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
 
+	bool	m_init_accelerations;	//!< calculate initial accelerations for dynamic problems
+
 	// arc-length parameters
 	int		m_arcLength;	//!< arc-length method flag (0 = off, 1 = Crisfield)
 	double	m_al_scale;		//!< arc-length scaling parameter (i.e. psi).
