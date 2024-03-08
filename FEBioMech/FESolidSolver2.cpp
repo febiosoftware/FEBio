@@ -310,6 +310,12 @@ bool FESolidSolver2::InitAccelerations()
 			n = nodei.m_ID[m_dofU[0]]; if (n >= 0) nodei.m_at.x = a0[n];
 			n = nodei.m_ID[m_dofU[1]]; if (n >= 0) nodei.m_at.y = a0[n];
 			n = nodei.m_ID[m_dofU[2]]; if (n >= 0) nodei.m_at.z = a0[n];
+
+			vec3d aqt(0, 0, 0);
+			n = nodei.m_ID[m_dofSU[0]]; if (n >= 0) aqt.x = a0[n];
+			n = nodei.m_ID[m_dofSU[1]]; if (n >= 0) aqt.y = a0[n];
+			n = nodei.m_ID[m_dofSU[2]]; if (n >= 0) aqt.z = a0[n];
+			nodei.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
 		}
 
 		// apply to rigid bodies
@@ -320,6 +326,9 @@ bool FESolidSolver2::InitAccelerations()
 			n = rb.m_LM[0]; if (n >= 0) rb.m_at.x = rb.m_ap.x = a0[n];
 			n = rb.m_LM[1]; if (n >= 0) rb.m_at.y = rb.m_ap.y = a0[n];
 			n = rb.m_LM[2]; if (n >= 0) rb.m_at.z = rb.m_ap.z = a0[n];
+			n = rb.m_LM[3]; if (n >= 0) rb.m_alt.x = rb.m_alp.x = a0[n];
+			n = rb.m_LM[4]; if (n >= 0) rb.m_alt.y = rb.m_alp.y = a0[n];
+			n = rb.m_LM[5]; if (n >= 0) rb.m_alt.z = rb.m_alp.z = a0[n];
 		}
 
 		// since rigid nodes don't get equations assigned, we'll grab
@@ -332,6 +341,7 @@ bool FESolidSolver2::InitAccelerations()
 				FERigidBody& rb = *mech.GetRigidBody(nodei.m_rid);
 				// TODO: What if the rb has initial rotation or rotational acceleration?
 				nodei.m_at = rb.m_at;
+				nodei.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], rb.m_at);
 			}
 		}
 
