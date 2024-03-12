@@ -2694,6 +2694,33 @@ void FEShellQuad4_::shape_deriv(double* Hr, double* Hs, double r, double s)
 }
 
 //*****************************************************************************
+//                          S H E L L Q U A D 4 G 4
+//*****************************************************************************
+
+FEShellQuad4G4::FEShellQuad4G4() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G4)
+{
+	const double a = 1.0 / sqrt(3.0);
+	gr[0] = -a; gs[0] = -a; gw[0] = 1;
+	gr[1] =  a; gs[1] = -a; gw[1] = 1;
+	gr[2] =  a; gs[2] =  a; gw[2] = 1;
+	gr[3] = -a; gs[3] =  a; gw[3] = 1;
+	init(); 
+	m_Hi = m_H.inverse();
+}
+
+void FEShellQuad4G4::project_to_nodes(double* ai, double* ao) const
+{
+	int ni = NINT;
+	int ne = NELN;
+	assert(ni == ne);
+	for (int i = 0; i < ne; ++i)
+	{
+		ao[i] = 0;
+		for (int j = 0; j < ni; ++j) ao[i] += m_Hi[i][j] * ai[j];
+	}
+}
+
+//*****************************************************************************
 //                          S H E L L Q U A D 4 G 8
 //*****************************************************************************
 
@@ -2812,6 +2839,32 @@ void FEShellTri3_::shape_deriv(double* Hr, double* Hs, double r, double s)
     Hs[2] =  1;
 }
 
+//*****************************************************************************
+//                          F E S H E L L T R I G 3 
+//*****************************************************************************
+
+//-----------------------------------------------------------------------------
+FEShellTri3G3::FEShellTri3G3() : FEShellTri3_(NINT, FE_SHELL_TRI3G3)
+{
+	const double a = 1.0 / 6.0;
+	const double b = 2.0 / 3.0;
+	gr[0] = a; gs[0] = a; gw[0] = a;
+	gr[1] = b; gs[1] = a; gw[1] = a;
+	gr[2] = a; gs[2] = b; gw[2] = a;
+	init();
+	m_Hi = m_H.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FEShellTri3G3::project_to_nodes(double* ai, double* ao) const
+{
+	assert(NINT == NELN);
+	for (int i = 0; i < NELN; ++i)
+	{
+		ao[i] = 0;
+		for (int j = 0; j < NINT; ++j) ao[i] += m_Hi[i][j] * ai[j];
+	}
+}
 //*****************************************************************************
 //                          S H E L L T R I 3 G 6
 //*****************************************************************************

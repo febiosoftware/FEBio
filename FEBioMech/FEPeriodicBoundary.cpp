@@ -26,6 +26,9 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEPeriodicBoundary.h"
 #include <FECore/FEMesh.h>
+#include <FECore/FENormalProjection.h>
+#include <FECore/FELinearSystem.h>
+#include <FECore/log.h>
 
 FEPeriodicSurface::Data::Data()
 {
@@ -45,12 +48,6 @@ void FEPeriodicSurface::Data::Serialize(DumpStream& ar)
 	ar & m_Tn;
 	ar & m_Fr;
 }
-
-#include "stdafx.h"
-#include "FEPeriodicBoundary.h"
-#include <FECore/FENormalProjection.h>
-#include <FECore/FELinearSystem.h>
-#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

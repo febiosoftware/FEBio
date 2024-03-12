@@ -54,7 +54,6 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/DumpStream.h>
-#include <NumCore/NumCore.h>
 #include "FEFluidFSIAnalysis.h"
 
 //-----------------------------------------------------------------------------
@@ -600,6 +599,18 @@ void FEFluidFSISolver::UpdateKinematics(vector<double>& ui)
         }
 		int _a = 0;
     }
+
+    // update nonlinear constraints (needed for updating Lagrange Multiplier)
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* nlc = fem.NonlinearConstraint(i);
+        if (nlc->IsActive()) nlc->Update(m_Ui, ui);
+    }
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc->IsActive()) spc->Update(ui);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -614,7 +625,21 @@ void FEFluidFSISolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, 
     // update rigid bodies
     m_rigidSolver.UpdateIncrements(Ui, ui, emap);
     
-    // update flexible nodes
+    // extract the velocity and dilatation increments
+    GetDisplacementData(m_di, ui);
+    GetVelocityData(m_vi, ui);
+    GetDilatationData(m_fi, ui);
+        
+    // update displacements
+    for (int i = 0; i<m_ndeq; ++i) m_Di[i] += m_di[i];
+        
+    // update velocities
+    for (int i = 0; i<m_nveq; ++i) m_Vi[i] += m_vi[i];
+        
+    // update dilatations
+    for (int i = 0; i<m_nfeq; ++i) m_Fi[i] += m_fi[i];
+    
+   // update flexible nodes
     int n;
     for (int i=0; i<mesh.Nodes(); ++i)
     {
@@ -638,6 +663,26 @@ void FEFluidFSISolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, 
         
         // fluid dilatation
         if ((n = node.m_ID[m_dofEF[0]]) >= 0) Ui[n] += ui[n];
+    }
+
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
+        if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
+    }
+
+    // TODO: This is a hack!
+    // The problem is that I only want to call the domain's IncrementalUpdate during
+    // the quasi-Newtoon loop. However, this function is also called after the loop
+    // converges. The emap parameter is used here to detect wether we are inside the
+    // loop (emap == false), or not (emap == true).
+    if (emap == false)
+    {
+        for (int i = 0; i < mesh.Domains(); ++i)
+        {
+            FEDomain& dom = mesh.Domain(i);
+            dom.IncrementalUpdate(ui, true);
+        }
     }
 }
 
@@ -837,6 +882,12 @@ void FEFluidFSISolver::PrepStep()
     // update model state
 	UpdateModel();
     
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
+        if (plc && plc->IsActive()) plc->PrepStep();
+    }
+
     // see if we need to do contact augmentations
     m_baugment = false;
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
@@ -902,14 +953,12 @@ bool FEFluidFSISolver::Quasin()
         // assume we'll converge.
         bconv = true;
         
-		// solve the equations (returns line search; solution stored in m_ui)
-		double s = QNSolve();
-            
-        // extract the velocity and dilatation increments
-        GetDisplacementData(m_di, m_ui);
-        GetVelocityData(m_vi, m_ui);
-        GetDilatationData(m_fi, m_ui);
-            
+        // solve the equations
+        SolveEquations(m_ui, m_R0);
+
+        // do the line search
+        double s = DoLineSearch();
+
         // set initial convergence norms
         if (m_niter == 0)
         {
@@ -921,32 +970,31 @@ bool FEFluidFSISolver::Quasin()
             normEm = normEi;
         }
         
-        // calculate norms
-        // update all degrees of freedom
-        for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
-            
-        // update displacements
-		for (int i = 0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
-            
-        // update velocities
-		for (int i = 0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
-            
-        // update dilatations
-		for (int i = 0; i<m_nfeq; ++i) m_Fi[i] += s*m_fi[i];
-            
+        // calculate actual displacement increment
+        // NOTE: We don't apply the line search directly to m_ui since we need the unscaled search direction for the QN update below
+        int neq = (int)m_Ui.size();
+        vector<double> ui(m_ui);
+        for (int i = 0; i<neq; ++i) ui[i] *= s;
+
+        // update increments (including Lagrange multipliers)
+        UpdateIncrements(m_Ui, ui, false);
+        
         // calculate the norms
         normR1 = m_R1*m_R1;
-        normd  = (m_di*m_di)*(s*s);
+        normd  = m_di*m_di;
         normD  = m_Di*m_Di;
-        normv  = (m_vi*m_vi)*(s*s);
+        normv  = m_vi*m_vi;
         normV  = m_Vi*m_Vi;
-        normf  = (m_fi*m_fi)*(s*s);
+        normf  = m_fi*m_fi;
         normF  = m_Fi*m_Fi;
-        normE1 = s*fabs(m_ui*m_R1);
+        normE1 = fabs(ui*m_R1);
             
         // check for nans
         if (ISNAN(normR1)) throw NANInResidualDetected();
-        
+        if (ISNAN(normv)) throw NANInResidualDetected();
+        if (ISNAN(normd)) throw NANInResidualDetected();
+        if (ISNAN(normf)) throw NANInResidualDetected();
+
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
         
@@ -1045,6 +1093,8 @@ bool FEFluidFSISolver::Quasin()
     {
         UpdateIncrementsEAS(m_Ui, false);
         UpdateIncrements(m_Ut, m_Ui, true);
+        zero(m_Ui);
+        zero(m_Di); zero(m_Vi); zero(m_Fi);
     }
     
     return bconv;

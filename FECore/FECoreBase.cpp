@@ -698,6 +698,23 @@ FECoreBase* FECoreBase::GetProperty(const ParamString& prop)
 	return 0;
 }
 
+FEProperty* FECoreBase::FindProperty(FECoreBase* pc)
+{
+	for (int i = 0; i < PropertyClasses(); ++i)
+	{
+		FEProperty* prop = PropertyClass(i);
+		if (prop)
+		{
+			int N = prop->size();
+			for (int j = 0; j < N; ++j)
+			{
+				if (prop->get(j) == pc) return prop;
+			}
+		}
+	}
+	return nullptr;
+}
+
 //-----------------------------------------------------------------------------
 bool FECoreBase::BuildClass()
 {

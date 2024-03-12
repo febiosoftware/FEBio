@@ -425,31 +425,31 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_DOUBLE_MAPPED:
 			{
 				FEParamDouble& p = value<FEParamDouble>();
-				p.Serialize(ar);
+				ar << p;
 			}
 			break;
 			case FE_PARAM_VEC3D_MAPPED:
 			{
 				FEParamVec3& p = value<FEParamVec3>();
-				p.Serialize(ar);
+				ar << p;
 			}
 			break;
 			case FE_PARAM_MAT3D_MAPPED:
 			{
 				FEParamMat3d& p = value<FEParamMat3d>();
-				p.Serialize(ar);
+				ar << p;
 			}
 			break;
 			case FE_PARAM_STD_VECTOR_INT:
 			{
 				vector<int>& p = value< vector<int> >();
-				ar & p;
+				ar << p;
 			}
 			break;
 			case FE_PARAM_STD_VECTOR_DOUBLE:
 			{
 				vector<double>& p = value< vector<double> >();
-				ar & p;
+				ar << p;
 			}
 			break;
 			default:
@@ -529,33 +529,34 @@ void FEParam::Serialize(DumpStream& ar)
 			case FE_PARAM_DOUBLE_MAPPED:
 			{
 				FEParamDouble& p = value<FEParamDouble>();
-				p.Serialize(ar);
+				ar >> p;
 			}
 			break;
 			case FE_PARAM_VEC3D_MAPPED:
 			{
 				FEParamVec3& p = value<FEParamVec3>();
-				p.Serialize(ar);
+				ar >> p;
 			}
 			break;
 			case FE_PARAM_MAT3D_MAPPED:
 			{
 				FEParamMat3d& p = value<FEParamMat3d>();
-				p.Serialize(ar);
+				ar >> p;
 			}
 			break;
 			case FE_PARAM_STD_VECTOR_INT:
 			{
 				vector<int>& p = value< vector<int> >();
-				ar & p;
+				ar >> p;
 			}
 			break;
 			case FE_PARAM_STD_VECTOR_DOUBLE:
 			{
 				vector<double>& p = value< vector<double> >();
-				ar & p;
+				ar >> p;
 			}
-			break;			default:
+			break;
+			default:
 				assert(false);
 			}
 		}

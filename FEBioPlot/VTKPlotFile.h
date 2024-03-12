@@ -45,6 +45,8 @@ public:
 	//! see if the plot file is valid
 	bool IsValid() const override;
 
+	void Serialize(DumpStream& ar) override;
+
 private:
 	void WriteHeader();
 	void WritePoints();

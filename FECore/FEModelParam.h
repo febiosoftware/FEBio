@@ -53,8 +53,13 @@ public:
 	// return the scale factor
 	double GetScaleFactor() const { return m_scl; }
 
-	// serialization
+public: // serialization
+
 	virtual void Serialize(DumpStream& ar);
+
+	// these are never called, but we need them to compile some templates
+	static void SaveClass(DumpStream& ar, FEModelParam*& a) { assert(false); }
+	static FEModelParam* LoadClass(DumpStream& ar, FEModelParam* a) { assert(false); return nullptr; }
 
 protected:
 	double			m_scl;	//!< scale factor. Used to store load curve value

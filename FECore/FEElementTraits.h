@@ -1435,6 +1435,23 @@ public:
     
 };
 
+
+//=============================================================================
+// 4-node quadrilateral elements with 4 point (membrane) gaussian quadrature
+class FEShellQuad4G4 : public FEShellQuad4_
+{
+public:
+	enum { NINT = 4 };
+
+public:
+	FEShellQuad4G4();
+
+	void project_to_nodes(double* ai, double* ao) const override;
+
+protected:
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+};
+
 //=============================================================================
 // 4-node quadrilateral elements with 4*2-point gaussian quadrature
 //
@@ -1493,6 +1510,23 @@ public:
     //! values of shape function derivatives
     void shape_deriv(double* Hr, double* Hs, double r, double s);
     
+};
+
+//=============================================================================
+// 3-node triangular elements with 1-point (membrane) gaussian quadrature
+//
+class FEShellTri3G3 : public FEShellTri3_
+{
+public:
+	enum { NINT = 3 };
+
+public:
+	FEShellTri3G3();
+
+	void project_to_nodes(double* ai, double* ao) const override;
+
+private:
+	matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
 };
 
 //=============================================================================

@@ -60,6 +60,7 @@ public:
 
 public:
 	void value(int& val) { val = atoi(m_val.c_str()); }
+	int value(int* v, int n);
 	int value(double* v, int n);
 	template <typename T> T value() { return T(0); }
 

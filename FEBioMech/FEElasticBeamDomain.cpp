@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include "FEElasticBeamMaterial.h"
 #include "FEBioMech.h"
+#include "FEBodyForce.h"
 #include <FECore/FEMesh.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
@@ -43,9 +44,9 @@ FEElasticBeamDomain::FEElasticBeamDomain(FEModel* fem) : FEBeamDomain(fem), FEEl
 	if (fem)
 	{
 		m_dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-		m_dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::ROTATION));
 
-		m_dofQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::ROTATION));
 		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
 		m_dofW.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_VELOCITY));
 		m_dofA.AddVariable(FEBioMech::GetVariableName(FEBioMech::BEAM_ANGULAR_ACCELERATION));
@@ -649,8 +650,63 @@ void FEElasticBeamDomain::ElementMassMatrix(FEBeamElement& el, FEElementMatrix& 
 	}
 }
 
-//! TODO: Calculate the body force vector
-void FEElasticBeamDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf) { assert(false); }
+void FEElasticBeamDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf) 
+{
+	for (int iel = 0; iel < Elements(); ++iel)
+	{
+		FEBeamElement& el = Element(iel);
+
+		int ne = el.Nodes();
+		int ndof = ne * 6;
+		vector<double> fe(ndof, 0.0);
+
+		ElementBodyForce(el, fe, bf);
+
+		vector<int> lm(6 * ne);
+		UnpackLM(el, lm);
+		R.Assemble(lm, fe);
+	}
+}
+
+void FEElasticBeamDomain::ElementBodyForce(FEBeamElement& el, std::vector<double>& fe, FEBodyForce& bf)
+{
+	// reference length of beam
+	double L0 = el.m_L0;
+
+	FEElasticBeamMaterial& mat = *m_mat;
+	double rho = mat.m_density;
+	double A_rho = mat.m_A * rho;
+
+	// loop over integration points
+	int nint = el.GaussPoints();
+	int ne = el.Nodes();
+	double* w = el.GaussWeights();
+	for (int n = 0; n < nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticBeamMaterialPoint& ebm = *(mp.ExtractData<FEElasticBeamMaterialPoint>());
+
+		// shape functions
+		double* H = el.H(n);
+
+		// J = dS / dr
+		double J = L0 / 2.0;
+
+		double wJA = w[n] * J * A_rho;
+
+		vec3d fn = bf.force(mp);
+
+		for (int i = 0; i < ne; ++i)
+		{
+			fe[i * 6    ] += H[i] * fn.x * wJA;
+			fe[i * 6 + 1] += H[i] * fn.y * wJA;
+			fe[i * 6 + 2] += H[i] * fn.z * wJA;
+		}
+	}
+}
 
 //! TODO: Calculate stiffness contribution of body forces
-void FEElasticBeamDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) { assert(false); }
+void FEElasticBeamDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) 
+{
+
+}

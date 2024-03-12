@@ -73,7 +73,7 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 	char* szver = febio::getVersionString();
 
 	char szvers[64] = {0};
-#ifdef _DEBUG
+#ifndef NDEBUG
 	sprintf(szvers, "FEBio (DEBUG) %s", szver);
 #else
 	sprintf(szvers, "FEBio %s", szver);

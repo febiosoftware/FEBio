@@ -60,6 +60,8 @@ public:
 	// Initialize shell data (Called from FEMesh::InitShells)
 	virtual void InitShells();
 
+	virtual void AssignDefaultShellThickness() {}
+
 public:
     //! get the current nodal coordinates
     void GetCurrentNodalCoordinates(const FEShellElement& el, vec3d* rt, const bool back = false);
@@ -129,7 +131,7 @@ public:
 
 	double DefaultShellThickness() const { return m_h0; }
 
-	void AssignDefaultShellThickness();
+	void AssignDefaultShellThickness() override;
 
 protected:
 	double	m_h0;

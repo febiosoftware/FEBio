@@ -192,7 +192,7 @@ public:
 	struct Surface
 	{
 		int			maxNodes;
-		FESurface*	surf;
+		FEFacetSet*	surf;
 	};
 
 	class PlotObject

@@ -64,6 +64,8 @@ public:
 
 		void Serialize(DumpStream& ar);
 
+		int Nodes() const { return ntype; }
+
 		FACET() { ntype = FACET::INVALID; }
 	};
 

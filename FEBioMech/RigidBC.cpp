@@ -447,4 +447,8 @@ void FERigidBodyAngularVelocity::Activate()
 	FERigidIC::Activate();
 	FERigidBody& RB = GetRigidBody();
 	RB.m_wp = RB.m_wt = m_w;
+
+	// TODO: We need to set the initial angular momentum as well,
+	//       but I'd rather have the RB do this somewhere else instead.
+	RB.m_hp = RB.m_ht = RB.m_moi * m_w;
 }

@@ -99,3 +99,18 @@ protected:
 	const FEDomainList*	m_dom;
 	std::string		m_filter;
 };
+
+//! Plot variable for field variables
+class FECORE_API FEPlotFieldVariable : public FEPlotNodeData
+{
+public:
+	FEPlotFieldVariable(FEModel* pfem);
+	bool Save(FEMesh& mesh, FEDataStream& a);
+
+	bool SetFilter(const char* sz) override;
+
+	void Serialize(DumpStream& ar) override;
+
+protected:
+	std::vector<int>	m_dofs;
+};

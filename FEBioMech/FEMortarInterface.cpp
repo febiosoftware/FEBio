@@ -155,7 +155,7 @@ void FEMortarInterface::UpdateMortarWeights(FESurface& ss, FESurface& ms)
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Sanity check: sum should add up to contact area
 	// This is for a hardcoded problem. Remove or generalize this!
 	double sum1 = 0.0;

@@ -23,20 +23,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include <assert.h>
 #include "vector.h"
 #include "FEMesh.h"
 #include "FEDofList.h"
 #include <algorithm>
+using namespace std;
 
 double operator*(const vector<double>& a, const vector<double>& b)
 {
+	// This algorithm sums positive and negative products separately, 
+	// which is more accurate then just doing the running sum.
+	assert(a.size() == b.size());
 	double sum_p = 0, sum_n = 0;
-	for (size_t i = 0; i < a.size(); i++)
+	size_t n = a.size();
+	for (size_t i = 0; i < n; i++)
 	{
 		double ab = a[i] * b[i];
 		if (ab >= 0.0) sum_p += ab; else sum_n += ab;
@@ -47,8 +49,8 @@ double operator*(const vector<double>& a, const vector<double>& b)
 vector<double> operator - (vector<double>& a, vector<double>& b)
 {
 	vector<double> c(a);
-	int n = (int) c.size();
-	for (int i=0; i<n; ++i) c[i] -= b[i];
+	size_t n = c.size();
+	for (size_t i=0; i<n; ++i) c[i] -= b[i];
 	return c;
 }
 
@@ -114,7 +116,7 @@ vector<double> operator*(const vector<double>& a, double g)
 	return s;
 }
 
-vector<double> FECORE_API operator - (const vector<double>& a)
+vector<double> operator - (const vector<double>& a)
 {
 	vector<double> s(a.size());
 	for (size_t i = 0; i < s.size(); ++i) s[i] = -a[i];

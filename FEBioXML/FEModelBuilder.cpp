@@ -41,11 +41,8 @@ SOFTWARE.*/
 #include <FECore/FEDomainMap.h>
 #include <FECore/FEEdge.h>
 #include <FECore/FEConstValueVec3.h>
-#include <FECore/log.h>
 #include <FECore/FEDataGenerator.h>
-#include <FECore/FEModule.h>
 #include <FECore/FEPointFunction.h>
-#include <FECore/FEBodyLoad.h>
 #include <FECore/FESurfacePairConstraint.h>
 #include <FECore/FENLConstraint.h>
 #include <sstream>
@@ -415,7 +412,7 @@ void FEModelBuilder::SetDefaultVariables()
 	dofs.SetDOFName(varD, 0, "x");
 	dofs.SetDOFName(varD, 1, "y");
 	dofs.SetDOFName(varD, 2, "z");
-	int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
+	int varQ = dofs.AddVariable("rotation", VAR_VEC3);
 	dofs.SetDOFName(varQ, 0, "u");
 	dofs.SetDOFName(varQ, 1, "v");
 	dofs.SetDOFName(varQ, 2, "w");
@@ -500,9 +497,11 @@ FE_Element_Spec FEModelBuilder::ElementSpec(const char* sztype)
 	else if (strcmp(sztype, "quad8"  ) == 0) { eshape = ET_QUAD8; stype = FE_SHELL_QUAD8G18; }   // default shell type for quad8
 	else if (strcmp(sztype, "quad9"  ) == 0) eshape = ET_QUAD9;
 	else if (strcmp(sztype, "tri3"   ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G6; }     // default shell type for tri3
+	else if (strcmp(sztype, "tri3s"  ) == 0) { eshape = ET_TRI3; stype = FE_SHELL_TRI3G3; }     // should only be used for rigid shells
 	else if (strcmp(sztype, "tri6"   ) == 0) { eshape = ET_TRI6; stype = FE_SHELL_TRI6G14; }     // default shell type for tri6
-    else if (strcmp(sztype, "q4eas"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = EAS_SHELL; }   // default shell type for q4eas
-    else if (strcmp(sztype, "q4ans"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = ANS_SHELL; }   // default shell type for q4ans
+	else if (strcmp(sztype, "q4eas"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = EAS_SHELL; }   // default shell type for q4eas
+	else if (strcmp(sztype, "q4ans"  ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G8; m_default_shell = ANS_SHELL; }   // default shell type for q4ans
+	else if (strcmp(sztype, "q4s"    ) == 0) { eshape = ET_QUAD4; stype = FE_SHELL_QUAD4G4; m_default_shell = -1; } // should only be used for rigid shells
 	else if (strcmp(sztype, "truss2" ) == 0) eshape = ET_TRUSS2;
 	else if (strcmp(sztype, "line2"  ) == 0) eshape = ET_TRUSS2;
 	else if (strcmp(sztype, "line3"  ) == 0) eshape = ET_LINE3;
@@ -637,9 +636,9 @@ void FEModelBuilder::AddMappedParameter(FEParam* p, FECoreBase* parent, const ch
 	m_mappedParams.push_back(mp);
 }
 
-void FEModelBuilder::AddMeshDataGenerator(FEMeshDataGenerator* gen, FEDomainMap* map, FEParamDouble* pp)
+void FEModelBuilder::AddMeshDataGenerator(FEMeshDataGenerator* gen, FEDataMap* pmap, FEParamDouble* pp)
 {
-	m_mapgen.push_back(DataGen{ gen, map, pp });
+	m_mapgen.push_back(DataGen{ gen, pmap, pp });
 }
 
 void FEModelBuilder::ApplyParameterMaps()
@@ -855,61 +854,46 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 		FENodeDataGenerator* ngen = dynamic_cast<FENodeDataGenerator*>(gen);
 		if (ngen)
 		{
-			// generate the node data map
-			FENodeDataMap* map = ngen->Generate();
-			if (map == nullptr) return false;
-
-			map->SetName(ngen->GetName());
-
 			// see if this map is already defined
-			string mapName = map->GetName();
+			string mapName = ngen->GetName();
 			FENodeDataMap* oldMap = dynamic_cast<FENodeDataMap*>(mesh.FindDataMap(mapName));
-			if (oldMap)
-			{
-				// TODO: implement merge
-				assert(false);
-				// it is, so merge it
-//				oldMap->Merge(*map);
+			if (oldMap) return false;
 
-				// we can now delete this map
-				delete map;
-			}
-			else
-			{
-				// nope, so add it
-				map->SetName(mapName);
-				mesh.AddDataMap(map);
-			}
+			// generate the node data map
+			if (ngen->Init() == false) return false;
+			FEDataMap* map = ngen->Generate();
+			if (map == nullptr) return false;
+			map->SetName(mapName);
+			mesh.AddDataMap(map);
 		}
 
 		FEFaceDataGenerator* fgen = dynamic_cast<FEFaceDataGenerator*>(gen);
 		if (fgen)
 		{
-			FESurfaceMap* map = fgen->Generate();
+			// see if this map is already defined
+			string mapName = ngen->GetName();
+			FESurfaceMap* oldMap = dynamic_cast<FESurfaceMap*>(mesh.FindDataMap(mapName));
+			if (oldMap) return false;
+
+			// generate data
+			if (fgen->Init() == false) return false;
+			FEDataMap* map = fgen->Generate();
 			if (map == nullptr) return false;
-			map->SetName(fgen->GetName());
+			map->SetName(mapName);
 			mesh.AddDataMap(map);
 		}
 
 		FEElemDataGenerator* egen = dynamic_cast<FEElemDataGenerator*>(gen);
 		if (egen)
 		{
-			FEDomainMap* map = m_mapgen[i].map;
-			FEParamDouble* pp = m_mapgen[i].pp;
+			if (egen->Init() == false) return false;
 
 			// generate the data
-			if (map)
-			{
-				if (egen->Generate(*map) == false) return false;
-			}
-			else
-			{
-				map = egen->Generate();
-				map->SetName(egen->GetName());
-			}
+			FEDomainMap* map = dynamic_cast<FEDomainMap*>(egen->Generate());
+			if (map == nullptr) return false;
 
 			// see if this map is already defined
-			string mapName = map->GetName();
+			string mapName = gen->GetName();
 			FEDomainMap* oldMap = dynamic_cast<FEDomainMap*>(mesh.FindDataMap(mapName));
 			if (oldMap)
 			{
@@ -926,6 +910,7 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 				mesh.AddDataMap(map);
 
 				// apply the map
+				FEParamDouble* pp = m_mapgen[i].pp;
 				if (pp)
 				{
 					FEMappedValue* val = fecore_alloc(FEMappedValue, &fem);

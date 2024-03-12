@@ -54,6 +54,21 @@ bool XMLAtt::operator != (const char* szval)
 	return (strcmp(szval, m_val.c_str()) != 0); 
 }
 
+int XMLAtt::value(int* v, int n)
+{
+	const char* sz = m_val.c_str();
+	int nr = 0;
+	for (int i = 0; i < n; ++i)
+	{
+		const char* sze = strchr(sz, ',');
+		v[i] = atoi(sz);
+		nr++;
+		if (sze) sz = sze + 1;
+		else break;
+	}
+	return nr;
+}
+
 int XMLAtt::value(double* pf, int n)
 {
 	const char* sz = m_val.c_str();

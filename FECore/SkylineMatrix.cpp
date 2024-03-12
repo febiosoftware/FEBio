@@ -187,7 +187,7 @@ void SkylineMatrix::set(int i, int j, double v)
 	// only add to the upper triangular part
 	if (j >= i)
 	{
-		#pragma omp critical
+		#pragma omp critical (SKY_set)
 		m_pd[m_ppointers[j] + j - i] = v;
 	}
 }

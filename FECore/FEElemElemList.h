@@ -60,7 +60,7 @@ public:
 	int NeighborIndex(int n, int j) { return m_peli[m_ref[n] + j]; }
 
 	//! Return the size of the neighbor vector
-	int NeighborSize() { return m_pel.size()/m_ref.size(); }
+	int NeighborSize() { return (int)(m_pel.size()/m_ref.size()); }
 
 protected:
 	//! Initialization

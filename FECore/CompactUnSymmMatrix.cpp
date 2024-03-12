@@ -298,7 +298,7 @@ void CRSSparseMatrix::set(int i, int j, double v)
 	{
 		if (pi[n] == j + m_offset)
 		{
-#pragma omp critical
+#pragma omp critical (CM_set)
 			m_pd[m_ppointers[i] + n - m_offset] = v;
 			return;
 		}
@@ -707,7 +707,7 @@ void CCSSparseMatrix::set(int i, int j, double v)
 	{
 		if (pi[n] == i + m_offset)
 		{
-#pragma omp critical
+#pragma omp critical (CC_set)
 			m_pd[m_ppointers[j] + n - m_offset] = v;
 			return;
 		}

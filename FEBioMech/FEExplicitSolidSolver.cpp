@@ -59,8 +59,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : 
 	FESolver(pfem), 
-	m_dofU(pfem), m_dofV(pfem), m_dofSQ(pfem), m_dofRQ(pfem),
-	m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem)
+	m_dofU(pfem), m_dofV(pfem), m_dofQ(pfem), m_dofRQ(pfem),
+	m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),
+	m_rigidSolver(pfem)
 {
 	m_dyn_damping = 1;
 	m_niter = 0;
@@ -77,7 +78,7 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) :
 		dofs.SetDOFName(varD, 0, "x");
 		dofs.SetDOFName(varD, 1, "y");
 		dofs.SetDOFName(varD, 2, "z");
-		int varQ = dofs.AddVariable("shell rotation", VAR_VEC3);
+		int varQ = dofs.AddVariable("rotation", VAR_VEC3);
 		dofs.SetDOFName(varQ, 0, "u");
 		dofs.SetDOFName(varQ, 1, "v");
 		dofs.SetDOFName(varQ, 2, "w");
@@ -105,7 +106,7 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) :
 		// get the DOF indices
 		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
-		m_dofSQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ROTATION));
+		m_dofQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::ROTATION));
 		m_dofRQ.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
 		m_dofSU.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_DISPLACEMENT));
 		m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
@@ -436,11 +437,23 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 }
 
 //-----------------------------------------------------------------------------
+//! initialize equations
+bool FEExplicitSolidSolver::InitEquations()
+{
+	if (FESolver::InitEquations() == false) return false;
+
+	// allocate rigid body equation numbers
+	m_neq = m_rigidSolver.InitEquations(m_neq);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEExplicitSolidSolver::Init()
 {
 	if (FESolver::Init() == false) return false;
 
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = dynamic_cast<FEMechModel&>(*GetFEModel());
 	FEMesh& mesh = fem.GetMesh();
 
 	// set the dynamic update flag only if we are running a dynamic analysis
@@ -466,15 +479,15 @@ bool FEExplicitSolidSolver::Init()
 	m_Ut.assign(neq, 0);
 	m_Mi.assign(neq, 0.0);
 
-	GetFEModel()->Update();
+	fem.Update();
 
 	// we need to fill the total displacement vector m_Ut
 	gather(m_Ut, mesh, m_dofU[0]);
 	gather(m_Ut, mesh, m_dofU[1]);
 	gather(m_Ut, mesh, m_dofU[2]);
-	gather(m_Ut, mesh, m_dofSQ[0]);
-	gather(m_Ut, mesh, m_dofSQ[1]);
-	gather(m_Ut, mesh, m_dofSQ[2]);
+	gather(m_Ut, mesh, m_dofQ[0]);
+	gather(m_Ut, mesh, m_dofQ[1]);
+	gather(m_Ut, mesh, m_dofQ[2]);
 	gather(m_Ut, mesh, m_dofSU[0]);
 	gather(m_Ut, mesh, m_dofSU[1]);
 	gather(m_Ut, mesh, m_dofSU[2]);
@@ -488,7 +501,7 @@ bool FEExplicitSolidSolver::Init()
 
 	// calculate the initial acceleration
 	// (Only when the totiter == 0, in case of a restart)
-	if (GetFEModel()->GetCurrentStep()->m_ntotiter == 0)
+	if (fem.GetCurrentStep()->m_ntotiter == 0)
 	{
 		// Calculate initial residual to be used on the first time step
 		if (Residual(m_R0) == false) return false;
@@ -504,6 +517,24 @@ bool FEExplicitSolidSolver::Init()
 			if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
 			if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
 			if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
+		}
+
+		// do rigid bodies
+		for (int i = 0; i < fem.RigidBodies(); ++i)
+		{
+			FERigidBody& rb = *fem.GetRigidBody(i);
+			vec3d Fn, Mn;
+			int n;
+			if ((n = rb.m_LM[0]) >= 0) { Fn.x = m_R0[n]; }
+			if ((n = rb.m_LM[1]) >= 0) { Fn.y = m_R0[n]; }
+			if ((n = rb.m_LM[2]) >= 0) { Fn.z = m_R0[n]; }
+			if ((n = rb.m_LM[3]) >= 0) { Mn.x = m_R0[n]; }
+			if ((n = rb.m_LM[4]) >= 0) { Mn.y = m_R0[n]; }
+			if ((n = rb.m_LM[5]) >= 0) { Mn.z = m_R0[n]; }
+
+			rb.m_at = Fn / rb.m_mass;
+
+			// TODO: angular acceleration
 		}
 	}
 
@@ -548,9 +579,9 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	// rotational dofs
 	// TODO: Commenting this out, since this is only needed for the old shells, which I'm not sure
 	//       if they would work with the explicit solver anyways.
-//	scatter(U, mesh, m_dofSQ[0]);
-//	scatter(U, mesh, m_dofSQ[1]);
-//	scatter(U, mesh, m_dofSQ[2]);
+//	scatter(U, mesh, m_dofQ[0]);
+//	scatter(U, mesh, m_dofQ[1]);
+//	scatter(U, mesh, m_dofQ[2]);
 
 	// shell displacement
 	scatter3(U, mesh, m_dofSU[0], m_dofSU[1], m_dofSU[2]);
@@ -894,7 +925,7 @@ void FEExplicitSolidSolver::PrepStep()
 bool FEExplicitSolidSolver::DoSolve()
 {
 	// Get the current step
-	FEModel& fem = *GetFEModel();
+	FEMechModel& fem = dynamic_cast<FEMechModel&>(*GetFEModel());
 	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// prepare for solve
@@ -924,6 +955,25 @@ bool FEExplicitSolidSolver::DoSolve()
 		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { un[n] = node.get(m_dofSU[2]); vn[n] = node.get(m_dofSV[2]); an[n] = node.get(m_dofSA[2]); }
 	}
 
+	// do rigid bodies
+	for (int i = 0; i < fem.RigidBodies(); ++i)
+	{
+		FERigidBody& rb = *fem.GetRigidBody(i);
+		int n;
+		if ((n = rb.m_LM[0]) >= 0) { un[n] = rb.m_rt.x - rb.m_r0.x; vn[n] = rb.m_vt.x; an[n] = rb.m_at.x; }
+		if ((n = rb.m_LM[1]) >= 0) { un[n] = rb.m_rt.y - rb.m_r0.y; vn[n] = rb.m_vt.y; an[n] = rb.m_at.y; }
+		if ((n = rb.m_LM[2]) >= 0) { un[n] = rb.m_rt.z - rb.m_r0.z; vn[n] = rb.m_vt.z; an[n] = rb.m_at.z; }
+		
+		// convert to rigid frame
+		quatd Q = rb.GetRotation();
+		quatd Qi = Q.Inverse();
+		vec3d Wn = Qi * rb.m_wt;
+		vec3d An = Qi * rb.m_alt;
+		if ((n = rb.m_LM[3]) >= 0) { vn[n] = Wn.x; an[n] = An.x; }
+		if ((n = rb.m_LM[4]) >= 0) { vn[n] = Wn.y; an[n] = An.y; }
+		if ((n = rb.m_LM[5]) >= 0) { vn[n] = Wn.z; an[n] = An.z; }
+	}
+
 	vector<double> v_pred(m_neq, 0.0);
 	double Dnorm = 0.0;
 #pragma omp parallel for shared(v_pred, vn, an) reduction(+: Dnorm)
@@ -939,8 +989,25 @@ bool FEExplicitSolidSolver::DoSolve()
 		Dnorm += m_ui[i] * m_ui[i];
 	}
 	Dnorm = sqrt(Dnorm);
-
 	feLog("\t displacement norm : %lg\n", Dnorm);
+
+	// the update is done in the spatial frame, so we need to update
+	// rigid body rotation increment
+	for (int i = 0; i < fem.RigidBodies(); ++i)
+	{
+		FERigidBody& rb = *fem.GetRigidBody(i);
+		quatd Q = rb.GetRotation();
+		vec3d dq(0, 0, 0);
+		int n;
+		if ((n = rb.m_LM[3]) >= 0) { dq.x = m_ui[n]; }
+		if ((n = rb.m_LM[4]) >= 0) { dq.y = m_ui[n]; }
+		if ((n = rb.m_LM[5]) >= 0) { dq.z = m_ui[n]; }
+		vec3d qt = Q * dq;
+		if ((n = rb.m_LM[3]) >= 0) { m_ui[n] = qt.x; }
+		if ((n = rb.m_LM[4]) >= 0) { m_ui[n] = qt.y; }
+		if ((n = rb.m_LM[5]) >= 0) { m_ui[n] = qt.z; }
+	}
+
 	Update(m_ui);
 
 	// evaluate acceleration
@@ -992,6 +1059,57 @@ bool FEExplicitSolidSolver::DoSolve()
 		}
 	}
 
+	// do rigid bodies
+	for (int i = 0; i < fem.RigidBodies(); ++i)
+	{
+		FERigidBody& rb = *fem.GetRigidBody(i);
+		quatd Q = rb.GetRotation();
+		quatd Qi = Q.Inverse();
+
+		// get the force and moment
+		vec3d Fn(0, 0, 0), Mn;
+		int n;
+		if ((n = rb.m_LM[0]) >= 0) Fn.x = m_R1[n];
+		if ((n = rb.m_LM[1]) >= 0) Fn.y = m_R1[n];
+		if ((n = rb.m_LM[2]) >= 0) Fn.z = m_R1[n];
+		if ((n = rb.m_LM[3]) >= 0) Mn.x = m_R1[n];
+		if ((n = rb.m_LM[4]) >= 0) Mn.y = m_R1[n];
+		if ((n = rb.m_LM[5]) >= 0) Mn.z = m_R1[n];
+
+		// convert to rigid frame
+		Mn = Qi * Mn;
+
+		// linear momentum update
+		vec3d An = Fn / rb.m_mass;
+		rb.m_at = Q*An;
+
+		vec3d Vn(0,0,0);
+		if ((n = rb.m_LM[0]) >= 0) Vn.x = m_dyn_damping * (v_pred[n] + An.x * dt * 0.5);
+		if ((n = rb.m_LM[1]) >= 0) Vn.y = m_dyn_damping * (v_pred[n] + An.y * dt * 0.5);
+		if ((n = rb.m_LM[2]) >= 0) Vn.z = m_dyn_damping * (v_pred[n] + An.z * dt * 0.5);
+		rb.m_vt = Q * Vn;
+
+		// angular momentum update
+		// NOTE: This currently adds a_{n}, not a_{n+1}, because in order
+		//       to evaluate a_{n+1}, I need W_{n+1}. This looks like a nonlinear problem
+		//       so probably need to do something else here. 
+		vec3d Wn(0,0,0);
+		if ((n = rb.m_LM[3]) >= 0) Wn.x = m_dyn_damping * (v_pred[n] + an[n] * dt*0.5);
+		if ((n = rb.m_LM[4]) >= 0) Wn.y = m_dyn_damping * (v_pred[n] + an[n] * dt*0.5);
+		if ((n = rb.m_LM[5]) >= 0) Wn.z = m_dyn_damping * (v_pred[n] + an[n] * dt*0.5);
+		rb.m_wt = Q * Wn;
+
+		mat3ds I0 = rb.m_moi;
+		mat3ds I0inv = I0.inverse();
+		vec3d Pn = I0inv * (Mn - (Wn ^ (I0 * Wn)));
+		rb.m_alt = Q * Pn;
+
+		// update some other stuff
+		mat3d R = Q.RotationMatrix();
+		mat3d It = R * I0 * R.transpose();
+		rb.m_ht = It * rb.m_wt;
+	}
+
 	// increase iteration number
 	m_niter++;
 
@@ -1020,7 +1138,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	zero(m_Fr);
 
 	// setup the global vector
-	FEGlobalVector RHS(fem, R, m_Fr);
+	FEResidualVector RHS(fem, R, m_Fr);
 
 	// zero rigid body reaction forces
 	int NRB = fem.RigidBodies();

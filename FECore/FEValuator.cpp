@@ -23,25 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEValuator.h"
+#include "FEModelParam.h"
 
+FEValuator::FEValuator(FEModel* fem) : FECoreBase(fem), m_param(nullptr) {}
 
+FEValuator::~FEValuator() {}
 
-#pragma once
-#include "FEDataGenerator.h"
-#include "fecore_type.h"
+void FEValuator::SetModelParam(FEModelParam* p) { m_param = p; }
 
-template<class T, class TBase> class FEConstDataGenerator : public TBase
+FEModelParam* FEValuator::GetModelParam() { return m_param; }
+
+void FEValuator::Serialize(DumpStream& ar)
 {
-public:
-	FEConstDataGenerator(FEModel* fem) : TBase(fem), m_val(0.0) {}
-
-	void value(const vec3d& r, T& d) override { d = m_val; }
-
-	void BuildParamList() override
-	{
-		TBase::AddParameter(m_val, "value");
-	}
-
-private:
-	T	m_val;
-};
+	FECoreBase::Serialize(ar);
+	if (!ar.IsShallow()) ar& m_param;
+}

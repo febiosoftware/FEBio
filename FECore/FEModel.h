@@ -110,10 +110,6 @@ public:
 	//       This is called after remeshed
 	virtual void Reactivate();
 
-	// TODO: This function was introduced in order to call the initialization of the rigid system 
-	// at the correct time. Should look in better way.
-	virtual bool InitRigidSystem() { return true; }
-
 	//! Call this function whenever the geometry of the model has changed.
 	virtual void Update();
 
@@ -139,7 +135,7 @@ public:
 	bool InitBCs();
 
 	//! Initialize the mesh
-	bool InitMesh();
+	virtual bool InitMesh();
 
 	//! Initialize shells
 	virtual void InitShells();
@@ -171,8 +167,17 @@ public:	// --- Load controller functions ----
 	//! Detach a load controller from a parameter
 	bool DetachLoadController(FEParam* p);
 
+	//! return the number of load-controlled parameters
+	int LoadParams() const;
+
+	//! return a load-controlled parameter
+	FEParam* GetLoadParam(int n);
+
 	//! Get a load controller for a parameter (returns null if the param is not under load control)
 	FELoadController* GetLoadController(FEParam* p);
+
+	//! initialization of load controllers
+	bool InitLoadControllers();
 
 public:	// --- mesh data generators ---
 
@@ -184,6 +189,9 @@ public:	// --- mesh data generators ---
 
 	//! get the number of mesh data generators
 	int MeshDataGenerators() const;
+
+	//! initialize mesh data generators
+	bool InitMeshDataGenerators();
 
 public: // --- Material functions ---
 
@@ -265,6 +273,9 @@ public: // --- Analysis steps functions ---
 	//! set the current time step
 	void SetCurrentTimeStep(double dt);
 
+	//! initialize steps
+	bool InitSteps();
+
 public: // --- Contact interface functions ---
 
 	//! return number of surface pair constraints
@@ -316,6 +327,9 @@ public:	// --- Mesh adaptors ---
 	//! add a mesh adaptor
 	void AddMeshAdaptor(FEMeshAdaptor* meshAdaptor);
 
+	//! initialize mesh adaptors
+	bool InitMeshAdaptors();
+
 public: // --- parameter functions ---
 
 	//! evaluate all load controllers at some time
@@ -332,6 +346,9 @@ public: // --- parameter functions ---
 
 	//! return a reference to the named parameter
 	virtual FEParamValue GetParameterValue(const ParamString& param);
+
+	//! return the parameter string for a parameter
+	std::string GetParamString(FEParam* p);
 
 	//! Find property 
 	//! Note: Can't call this FindProperty, since this is already defined in base class

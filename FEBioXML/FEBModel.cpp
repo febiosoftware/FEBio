@@ -34,7 +34,6 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include <FECore/FEShellDomain.h>
 #include <FECore/log.h>
-#include <FECore/FESurface.h>
 using namespace std;
 
 //=============================================================================

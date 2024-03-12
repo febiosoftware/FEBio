@@ -507,7 +507,7 @@ void solve_3x3(double A[3][3], double b[3], double x[3])
 	x[2] = (Ai[2][0] * b[0] + Ai[2][1] * b[1] + Ai[2][2] * b[2]) / D;
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	double r[3];
 	r[0] = b[0] - (A[0][0] * x[0] + A[0][1] * x[1] + A[0][2] * x[2]);
 	r[1] = b[1] - (A[1][0] * x[0] + A[1][1] * x[1] + A[1][2] * x[2]);

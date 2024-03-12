@@ -52,7 +52,7 @@ const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
 	{
 	case DISPLACEMENT                : return "displacement"               ; break;
 	case VELOCITY                    : return "velocity"                   ; break;
-	case SHELL_ROTATION              : return "shell rotation"             ; break;
+	case ROTATION                    : return "rotation"                   ; break;
 	case SHELL_DISPLACEMENT          : return "shell displacement"         ; break;
 	case SHELL_VELOCITY              : return "shell velocity"             ; break;
 	case SHELL_ACCELERATION          : return "shell acceleration"         ; break;

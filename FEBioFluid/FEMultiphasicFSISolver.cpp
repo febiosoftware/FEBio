@@ -43,7 +43,6 @@
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
-#include "NumCore/NumCore.h"
 #include <assert.h>
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/sys.h"

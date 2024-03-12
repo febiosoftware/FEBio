@@ -111,7 +111,7 @@ string MObj2String::OpNeg(const MNeg* po)
 {
 	const MItem* pi = po->Item();
 	string s = Convert(pi);
-#ifdef _DEBUG
+#ifndef NDEBUG
 	s = "-[" + s + "]";
 #else
 	if (is_add(pi) || is_sub(pi) || is_neg(pi)) s = "-(" + s + ")"; else s = "-" + s;
@@ -127,7 +127,7 @@ string MObj2String::OpAdd(const MAdd* po)
 	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (is_binary(pl)) s = "(" + sl + ")"; else s = sl;
 	s += '+';
 	if (is_binary(pr)) s += "(" + sr + ")"; else s += sr;
@@ -147,7 +147,7 @@ string MObj2String::OpSub(const MSub* po)
 	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (is_binary(pl)) s = "(" + sl + ")"; else s = sl;
 	s += '-';
 	if (is_binary(pr)) s += "(" + sr + ")"; else s += sr;
@@ -167,7 +167,7 @@ string MObj2String::OpMul(const MMul* po)
 	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (is_binary(pl)) s = "(" + sl + ")"; else s = sl;
 	s += '*';
 	if (is_binary(pr)) s += "(" + sr + ")"; else s += sr;
@@ -187,7 +187,7 @@ string MObj2String::OpDiv(const MDiv* po)
 	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (is_binary(pl)) s = "(" + sl + ")"; else s = sl;
 	s += '/';
 	if (is_binary(pr)) s += "(" + sr + ")"; else s += sr;
@@ -207,7 +207,7 @@ string MObj2String::OpPow(const MPow* po)
 	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (is_binary(pl)) s = "(" + sl + ")"; else s = sl;
 	s += '^';
 	if (is_binary(pr)) s += "(" + sr + ")"; else s += sr;
@@ -227,7 +227,7 @@ string MObj2String::OpEqual(const MEquation* po)
 	const MItem* pr = po->RightItem();
 	string sl = Convert(pl);
 	string sr = Convert(pr);
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (is_binary(pl)) s = "(" + sl + ")"; else s = sl;
 	s += '=';
 	if (is_binary(pr)) s += "(" + sr + ")"; else s += sr;

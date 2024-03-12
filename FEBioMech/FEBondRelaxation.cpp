@@ -581,7 +581,7 @@ double FEBondRelaxationProny::Relaxation(FEMaterialPoint& mp, const double t, co
 BEGIN_FECORE_CLASS(FEBondRelaxationMalkin, FEBondRelaxation)
 ADD_PARAMETER(m_tau1 , FE_RANGE_GREATER(0.0), "tau1")->setLongName("min. relaxation time");
 ADD_PARAMETER(m_tau2 , FE_RANGE_GREATER(0.0), "tau2")->setLongName("max. relaxation time");
-ADD_PARAMETER(m_beta , FE_RANGE_GREATER(0.0), "beta")->setLongName("power exponent");
+ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(1.0), "beta")->setLongName("power exponent");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -603,16 +603,10 @@ double FEBondRelaxationMalkin::Relaxation(FEMaterialPoint& mp, const double t, c
     
     if (beta != 1) {
         double bm1 = beta - 1;
-#ifdef __APPLE__
-        double Ga = tgamma(bm1);
-#else
-        double Ga = gamma(bm1);
-#endif
         double Q1 = gamma_inc_Q(bm1, t/tau1);
-        double G1 = Ga*Q1;
+        double den = pow(tau1,-bm1) - pow(tau2,-bm1);
         double Q2 = gamma_inc_Q(bm1, t/tau2);
-        double G2 = Ga*Q2;
-        g = bm1*pow(t,-bm1)/(pow(tau1, -bm1) - pow(tau2, -bm1))*(G2-G1);
+        g = bm1*pow(t,-bm1)*(Q2-Q1)/den;
     }
     else {
         g = (expint_Ei(-t/tau2) - expint_Ei(-t/tau1))/(log(tau1/tau2));
@@ -672,16 +666,10 @@ double FEBondRelaxationMalkinDist::Relaxation(FEMaterialPoint& mp, const double 
     
     if (beta != 1) {
         double bm1 = beta - 1;
-#ifdef __APPLE__
-        double Ga = tgamma(bm1);
-#else
-        double Ga = gamma(bm1);
-#endif
         double Q1 = gamma_inc_Q(bm1, t/tau1);
-        double G1 = Ga*Q1;
+        double den = pow(tau1,-bm1) - pow(tau2,-bm1);
         double Q2 = gamma_inc_Q(bm1, t/tau2);
-        double G2 = Ga*Q2;
-        g = bm1*pow(t,-bm1)/(pow(tau1, -bm1) - pow(tau2, -bm1))*(G2-G1);
+        g = bm1*pow(t,-bm1)*(Q2-Q1)/den;
     }
     else {
         g = (expint_Ei(-t/tau2) - expint_Ei(-t/tau1))/(log(tau1/tau2));
@@ -743,16 +731,10 @@ double FEBondRelaxationMalkinDistUser::Relaxation(FEMaterialPoint& mp, const dou
     
     if (beta != 1) {
         double bm1 = beta - 1;
-#ifdef __APPLE__
-        double Ga = tgamma(bm1);
-#else
-        double Ga = gamma(bm1);
-#endif
         double Q1 = gamma_inc_Q(bm1, t/tau1);
-        double G1 = Ga*Q1;
+        double den = pow(tau1,-bm1) - pow(tau2,-bm1);
         double Q2 = gamma_inc_Q(bm1, t/tau2);
-        double G2 = Ga*Q2;
-        g = bm1*pow(t,-bm1)/(pow(tau1, -bm1) - pow(tau2, -bm1))*(G2-G1);
+        g = bm1*pow(t,-bm1)*(Q2-Q1)/den;
     }
     else {
         g = (expint_Ei(-t/tau2) - expint_Ei(-t/tau1))/(log(tau1/tau2));

@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FEImageDataMap.h"
 #include <FECore/FEDomainMap.h>
+#include <FECore/FEMesh.h>
 #include "image_tools.h"
 
 BEGIN_FECORE_CLASS(FEImageDataMap, FEElemDataGenerator)
@@ -55,25 +56,36 @@ bool FEImageDataMap::Init()
 	return FEElemDataGenerator::Init();
 }
 
-void FEImageDataMap::value(const vec3d& x, double& data)
-{
-	data = m_map.value(m_map.map(x));
-}
-
-FEDomainMap* FEImageDataMap::Generate()
+FEDataMap* FEImageDataMap::Generate()
 {
 	FEElementSet* elset = GetElementSet();
 	if (elset == nullptr) return nullptr;
 
 	// TODO: Can I use FMT_NODE?
-	FEDomainMap* map = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_MULT);
-	map->Create(elset);
-	if (FEElemDataGenerator::Generate(*map) == false)
+	if (m_data == nullptr) m_data = new FEDomainMap(FEDataType::FE_DOUBLE, Storage_Fmt::FMT_MULT);
+	m_data->Create(elset);
+
+	GenerateData();
+	return m_data;
+}
+
+void FEImageDataMap::GenerateData()
+{
+	assert(m_data);
+	FEElementSet& set = *GetElementSet();
+	FEMesh& mesh = *set.GetMesh();
+	int N = set.Elements();
+	for (int i = 0; i < N; ++i)
 	{
-		delete map; map = nullptr;
+		FEElement& el = set.Element(i);
+		int ne = el.Nodes();
+		for (int j = 0; j < ne; ++j)
+		{
+			vec3d ri = mesh.Node(el.m_node[j]).m_r0;
+			double d = m_map.value(m_map.map(ri));
+			m_data->setValue(i, j, d);
+		}
 	}
-	m_data = map;
-	return map;
 }
 
 void FEImageDataMap::Evaluate(double time)
@@ -85,5 +97,5 @@ void FEImageDataMap::Evaluate(double time)
 	}
 	else m_im = m_im0;
 
-	FEElemDataGenerator::Generate(*m_data);
+	GenerateData();
 }
