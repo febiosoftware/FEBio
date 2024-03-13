@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include "FECore/DOFS.h"
 #include <FECore/FEInitialCondition.h>
 #include <FECore/FECoreKernel.h>
-#include <FECore/FEMaterial.h>
 
 //-----------------------------------------------------------------------------
 void FEBioInitialSection::Parse(XMLTag& tag)

@@ -98,6 +98,9 @@ public:
     //! calculate solute molar flux
     vec3d SoluteFlux(const FEMaterialPoint& pt, const int sol);
     
+    //! calculate diffusive solute molar flux
+    vec3d SoluteDiffusiveFlux(const FEMaterialPoint& pt, const int sol);
+    
     //! actual concentration (as opposed to effective concentration)
     double ConcentrationActual(const FEMaterialPoint& pt, const int sol);
     

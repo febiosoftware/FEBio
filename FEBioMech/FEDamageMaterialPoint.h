@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FEMaterialPoint.h"
+#include "FEReactiveMaterialPoint.h"
 #include "febiomech_api.h"
 
 #ifdef WIN32
@@ -36,10 +36,10 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // Define a material point that stores the damage variable.
-class FEBIOMECH_API FEDamageMaterialPoint : public FEMaterialPointData
+class FEBIOMECH_API FEDamageMaterialPoint : public FEReactiveMaterialPoint
 {
 public:
-    FEDamageMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
+    FEDamageMaterialPoint(FEMaterialPointData*pt) : FEReactiveMaterialPoint(pt) {}
     
 	FEMaterialPointData* Copy() override;
     
@@ -47,6 +47,9 @@ public:
     void Update(const FETimeInfo& timeInfo) override;
     
     void Serialize(DumpStream& ar) override;
+    
+    double BrokenBonds() const override { return m_D; }
+    double IntactBonds() const override { return 1 - m_D; }
     
 public:
 	double	m_Etrial;		//!< trial damage criterion at time t

@@ -46,8 +46,7 @@ bool FEReaction::Init()
     // make sure the parent class is set
     m_psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
     assert(m_psm);
-    if (m_psm == 0) 
-    {
+    if (m_psm == 0) {
         feLogError("Parent class not set or of incorrect type");
         return false;
     }

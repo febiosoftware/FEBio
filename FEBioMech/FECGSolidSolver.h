@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include <FECore/FESolver.h>
 #include <FECore/FEGlobalVector.h>
 #include <FECore/FETimeInfo.h>
-#include "FERigidSolver.h"
 #include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
@@ -51,6 +50,10 @@ public:
 	//! Performs a CG step
 	bool SolveStep() override;
 
+private:
+	bool CalculatePreconditioner();
+
+public:
 	//! update model
 	void Update(std::vector<double>& u) override;
 
@@ -94,7 +97,9 @@ public:
 	double	m_LStol;
 	double	m_LSmin;
 	int		m_LSiter;
-	int m_CGmethod;
+	int		m_CGmethod;
+	int		m_precon;
+	vector<double> m_Mi;	//!< inverse mass vector for explicit analysis
 
 	// Newmark parameters (for dynamic analyses)
 	double	m_beta;			//!< Newmark parameter beta (displacement integration)
@@ -106,19 +111,16 @@ private:
 	vector<double>	m_Ui;
 	vector<double>	m_ui;
 	vector<double>	m_Ut;
+	vector<double>	m_Fn;
 	vector<double>	m_Fd;
 	vector<double>	m_Fr;
-	vector<double>	m_Fn;
 
 	int				m_neq;
 	int				m_nreq;
+	//int m_CGmethod; // 0 =  Hager-Zhang (default), 1 = steepest descent
 
 protected:
-	FEDofList	m_dofU, m_dofV, m_dofSQ, m_dofRQ, m_dofSU,m_dofSV, m_dofSA;
-
-protected:
-	FERigidSolverNew	m_rigidSolver;
-
+	FEDofList	m_dofU, m_dofV, m_dofQ, m_dofRQ,m_dofSU, m_dofSV, m_dofSA, m_rigidSolver;
 
 	DECLARE_FECORE_CLASS();
 };

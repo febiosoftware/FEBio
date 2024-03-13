@@ -249,11 +249,14 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
+	double* GaussWeights() const { return &((FETrussElementTraits*)(m_pT))->gw[0]; }
+
 public:
 	double	m_a0;	// cross-sectional area
 	double	m_lam;	// current stretch ratio
 	double	m_tau;	// Kirchoff stress
 	double	m_L0;	// initial length
+	double	m_Lt;	// current length
 };
 
 //-----------------------------------------------------------------------------
@@ -310,4 +313,22 @@ public:
 	FELineElement& operator = (const FELineElement& el);
 
 	void SetTraits(FEElementTraits* pt);
+};
+
+//-----------------------------------------------------------------------------
+class FECORE_API FEBeamElement : public FEElement
+{
+public:
+	FEBeamElement();
+
+	FEBeamElement(const FEBeamElement& el);
+
+	FEBeamElement& operator = (const FEBeamElement& el);
+
+	double* GaussWeights() { return &((FEBeamElementTraits*)(m_pT))->gw[0]; }
+	double* Hr(int n) { return ((FEBeamElementTraits*)(m_pT))->Gr[n]; }
+
+public:
+	double	m_L0;	// initial length of beam
+	mat3d	m_E;	// columns are local beam orientation
 };

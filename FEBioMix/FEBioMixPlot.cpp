@@ -161,24 +161,21 @@ bool FEPlotFluidForce::Save(FESurface &surf, FEDataStream &a)
 }
 
 //-----------------------------------------------------------------------------
-// NOTE: This is not thread safe!
 class FEFluidForce2
 {
 public:
-	FEFluidForce2(FESurface& surf, vector<double>& nodalPressures) : m_surf(surf), m_pe(nullptr), m_nodalPressures(nodalPressures) {}
+	FEFluidForce2(FESurface& surf, vector<double>& nodalPressures) : m_surf(surf), m_nodalPressures(nodalPressures) {}
 
-	FEFluidForce2(const FEFluidForce2& fl) : m_surf(fl.m_surf), m_nodalPressures(fl.m_nodalPressures), m_pe(0) {}
+	FEFluidForce2(const FEFluidForce2& fl) : m_surf(fl.m_surf), m_nodalPressures(fl.m_nodalPressures) {}
 
 	vec3d operator ()(const FEMaterialPoint& mp)
 	{
-		if (m_pe != mp.m_elem)
-		{ 
-			m_pe = mp.m_elem;
-			int neln = m_pe->Nodes();
-			for (int j = 0; j<neln; ++j) pn[j] = m_nodalPressures[m_pe->m_node[j]];
-		}
+		FEElement* pe = mp.m_elem;
+		double pn[FEElement::MAX_NODES];
+		int neln = pe->Nodes();
+		for (int j = 0; j<neln; ++j) pn[j] = m_nodalPressures[pe->m_node[j]];
 
-		FESurfaceElement& face = static_cast<FESurfaceElement&>(*m_pe);
+		FESurfaceElement& face = static_cast<FESurfaceElement&>(*pe);
 
 		// get the base vectors
 		vec3d g[2];
@@ -199,8 +196,6 @@ public:
 
 private:
 	FESurface&	m_surf;
-	FEElement* m_pe;
-	double pn[FEElement::MAX_NODES];
 	vector<double>& m_nodalPressures;
 };
 
@@ -974,77 +969,6 @@ bool FEPlotSBMArealConcentration::Save(FEDomain &dom, FEDataStream& a)
     }
     return true;
 }
-
-//=================================================================================================
-// FEPlotSBMReferentialConcentration
-//=================================================================================================
-
-//-----------------------------------------------------------------------------
-FEPlotSBMReferentialConcentration::FEPlotSBMReferentialConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
-{
-	// count SBMs
-	int sbms = 0;
-	int ndata = pfem->GlobalDataItems();
-	vector<string> names;
-	for (int i = 0; i < ndata; ++i)
-	{
-		FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
-		if (sbm)
-		{
-			names.push_back(sbm->GetName());
-			m_sbm.push_back(sbm->GetID());
-			sbms++;
-		}
-	}
-
-	SetArraySize(sbms);
-	SetArrayNames(names);
-	SetUnits(UNIT_CONCENTRATION);
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotSBMReferentialConcentration::Save(FEDomain& dom, FEDataStream& a)
-{
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
-	if (pm == 0) return false;
-
-	// figure out the local SBM IDs. This depend on the material
-	int nsbm = (int)m_sbm.size();
-	vector<int> lid(nsbm, -1);
-	for (int i = 0; i < (int)m_sbm.size(); ++i)
-	{
-		lid[i] = GetLocalSBMID(pm, m_sbm[i]);
-	}
-
-	int N = dom.Elements();
-	for (int i = 0; i < N; ++i)
-	{
-		FEElement& el = dom.ElementRef(i);
-
-		for (int k = 0; k < nsbm; ++k)
-		{
-			int nk = lid[k];
-			if (nk == -1) a << 0.f;
-			else
-			{
-				// calculate average concentration
-				double ew = 0;
-				for (int j = 0; j < el.GaussPoints(); ++j)
-				{
-					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-					FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
-
-					if (pt) ew += pm->SBMReferentialConcentration(mp, nk);
-				}
-				ew /= el.GaussPoints();
-
-				a << ew;
-			}
-		}
-	}
-	return true;
-}
-
 
 //-----------------------------------------------------------------------------
 bool FEPlotElectricPotential::Save(FEDomain &dom, FEDataStream& a)

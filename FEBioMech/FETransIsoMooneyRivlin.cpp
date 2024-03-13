@@ -31,12 +31,12 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FETransIsoMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1          , "c1");
-	ADD_PARAMETER(m_c2          , "c2");
-	ADD_PARAMETER(m_fib.m_c3  , "c3");
-	ADD_PARAMETER(m_fib.m_c4  , "c4");
-	ADD_PARAMETER(m_fib.m_c5  , "c5");
-	ADD_PARAMETER(m_fib.m_lam1, "lam_max");
+	ADD_PARAMETER(m_c1          , "c1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c2          , "c2")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_fib.m_c3  , "c3")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_fib.m_c4  , "c4")->setUnits(UNIT_NONE);
+	ADD_PARAMETER(m_fib.m_c5  , "c5")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_fib.m_lam1, "lam_max")->setUnits(UNIT_NONE);
 	
 	ADD_PROPERTY(m_fiber, "fiber")->SetDefaultType("vector");
 

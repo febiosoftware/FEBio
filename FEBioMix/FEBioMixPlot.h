@@ -197,16 +197,6 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEPlotSBMReferentialConcentration : public FEPlotDomainData
-{
-public:
-	FEPlotSBMReferentialConcentration(FEModel* pfem);
-	bool Save(FEDomain& dom, FEDataStream& a);
-protected:
-	vector<int>	m_sbm;
-};
-
-//-----------------------------------------------------------------------------
 //! Electric potential
 class FEPlotElectricPotential : public FEPlotDomainData
 {

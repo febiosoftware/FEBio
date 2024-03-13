@@ -216,14 +216,14 @@ bool PardisoSolver::Factor()
 		return false;
 	}
 
+	m_isFactored = true;
+
 	// calculate and print the condition number
 	if (m_print_cn)
 	{
-		double c = condition_number();
+		double c = ConditionNumber();
 		feLog("\tcondition number (est.) ................... : %lg\n\n", c);
 	}
-
-	m_isFactored = true;
 
 	return true;
 }
@@ -255,47 +255,77 @@ bool PardisoSolver::BackSolve(double* x, double* b)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// This algorithm (naively) estimates the condition number. It is based on the observation that
-// for a linear system of equations A.x = b, the following holds
-// || A^-1 || >= ||x||.||b||
-// Thus the condition number can be estimated by
-// c = ||A||.||A^-1|| >= ||A|| . ||x|| / ||b||
-// This algorithm tries for some random b vectors with norm ||b||=1 to maxize the ||x||.
-// The returned value will be an underestimate of the condition number
-double PardisoSolver::condition_number()
+double PardisoSolver::ConditionNumber()
 {
+	if (m_isFactored == false) return 0.0;
+
 	// This assumes that the factorization is already done!
 	int N = m_pA->Rows();
 
 	// get the norm of the matrix
-	double normA = m_pA->infNorm();
+	double normA = m_pA->oneNorm();
 
 	// estimate the norm of the inverse of A
 	double normAi = 0.0;
 
 	// choose max iterations
-	int iters = (N < 50 ? N : 50);
+	// this method should converge, but just in case
+	int iters = 50;
+	int steps = 3;
 
-	vector<double> b(N, 0), x(N, 0);
-	for (int i = 0; i < iters; ++i)
+	vector<double> b(N, 0), y(N, 0), z(N,0), x(N, 0), v(N, 1);
+	for (int n = 0; n < steps; ++n)
 	{
-		// create a random vector
-		NumCore::randomVector(b, -1.0, 1.0);
-		for (int j = 0; j < N; ++j) b[j] = (b[j] >= 0.0 ? 1.0 : -1.0);
+		// initialize x
+		double m = 0.0;
+		for (int i = 0; i < N; ++i)
+		{
+			x[i] = v[i];
+			m += v[i];
+		}
+		for (int i = 0; i < N; ++i) x[i] /= m;
 
-		// calculate solution
-		BackSolve(&x[0], &b[0]);
+		for (int i = 0; i < iters; ++i)
+		{
+			BackSolve(&y[0], &x[0]);
 
-		double normb = NumCore::infNorm(b);
-		double normx = NumCore::infNorm(x);
-		if (normx > normAi) normAi = normx;
+			for (int j = 0; j < N; ++j)
+			{
+				if (y[j] >= 0) b[j] = 1;
+				else b[j] = -1;
+			}
 
-		int pct = (100 * i) / (iters - 1);
-		fprintf(stderr, "calculating condition number: %d%%\r", pct);
+			// Solve transpose
+			m_iparm[11] = 2;
+			BackSolve(&z[0], &b[0]);
+			m_iparm[11] = 0;
+
+			double zmax = 0.0;
+			int jmax = 0;
+			double z_dot_x = 0.0;
+			for (int j = 0; j < N; ++j)
+			{
+				if (fabs(z[j]) > zmax)
+				{
+					zmax = fabs(z[j]);
+					jmax = j;
+				}
+				z_dot_x += z[j] * x[j];
+			}
+			v[jmax] = 0;
+
+			if (zmax <= z_dot_x) break;
+
+			for (int j = 0; j < N; ++j)
+				x[j] = (j == jmax ? 1.0 : 0.0);
+		}
+
+		double normAi_n = NumCore::oneNorm(y);
+		if (normAi_n > normAi) normAi = normAi_n;
+		else break;
 	}
 
-	double c = normA*normAi;
+	double c = normA * normAi;
 	return c;
 }
 
@@ -328,6 +358,6 @@ void PardisoSolver::Destroy() {}
 SparseMatrix* PardisoSolver::CreateSparseMatrix(Matrix_Type ntype) { return nullptr; }
 bool PardisoSolver::SetSparseMatrix(SparseMatrix* pA) { return false; }
 void PardisoSolver::PrintConditionNumber(bool b) {}
-double PardisoSolver::condition_number() { return 0; }
+double PardisoSolver::ConditionNumber() { return 0; }
 void PardisoSolver::UseIterativeFactorization(bool b) {}
 #endif

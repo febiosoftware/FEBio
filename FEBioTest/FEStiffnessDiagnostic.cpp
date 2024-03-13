@@ -34,14 +34,20 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEStiffnessDiagnostic::FEStiffnessDiagnostic(FEModel* fem) : FECoreTask(fem)
 {
-
+	m_fp = nullptr;
+	m_writeMatrix = false;
 }
 
 //-----------------------------------------------------------------------------
 // Initialize the diagnostic. In this function we build the FE model depending
 // on the scenario.
-bool FEStiffnessDiagnostic::Init(const char* szfile)
+bool FEStiffnessDiagnostic::Init(const char* szarg)
 {
+	if (szarg && szarg[0])
+	{
+		if (strcmp(szarg, "v") == 0) m_writeMatrix = true;
+		else return false;
+	}
 	return GetFEModel()->Init();
 }
 
@@ -63,6 +69,12 @@ bool FEStiffnessDiagnostic::Run()
 
 	fem.AddCallback(stiffness_diagnostic_cb, CB_MATRIX_REFORM, (void*)this);
 
+	// create a file name for the log file
+	string logfile("diagnostic.log");
+	m_fp = fopen(logfile.c_str(), "wt");
+	fprintf(m_fp, "FEBio Stiffness Diagnostics:\n");
+	fprintf(m_fp, "============================\n");
+
 	fem.BlockLog();
 	bool bret = fem.Solve();
 	fem.UnBlockLog();
@@ -72,15 +84,10 @@ bool FEStiffnessDiagnostic::Run()
 		return false;
 	}
 
-	// create a file name for the log file
-	string logfile("diagnostic.log");
-	FILE* fp = fopen(logfile.c_str(), "wt");
+	fprintf(m_fp, "diagnostic completed.\n");
 
-	fprintf(fp, "FEBio Stiffness Diagnostics Results:\n");
-	fprintf(fp, "==================================\n");
-	fprintf(fp, "All good!\n");
-
-	fclose(fp);
+	fclose(m_fp);
+	m_fp = nullptr;
 
 	return true;
 }
@@ -104,6 +111,7 @@ bool FEStiffnessDiagnostic::Diagnose()
 	std::vector<double> R0(neq, 0);
 	nlsolve->Residual(R0);
 	double max_err = 0.0;
+	int i_max = -1, j_max = -1;
 	for (int j = 0; j < neq; ++j)
 	{
 		std::vector<double> u(neq, 0);
@@ -120,11 +128,22 @@ bool FEStiffnessDiagnostic::Diagnose()
 			double kt_ij = pA->get(i, j);
 
 			double err = fabs(kt_ij - ka_ij);
-			if (err > max_err) max_err = err;
+			if (err > max_err)
+			{
+				max_err = err;
+				i_max = i;
+				j_max = j;
+			}
+
+			if (m_writeMatrix)
+			{
+				fprintf(m_fp, "%d, %d : %lg, %lg (%lg)\n", i, j, kt_ij, ka_ij, err);
+			}
 		}
 	}
 
-	printf("Max error: %lg\n", max_err);
+	printf("Max error: %lg (%d, %d)\n", max_err, i_max, j_max);
+	fprintf(m_fp, "Max error: %lg (%d, %d)\n", max_err, i_max, j_max);
 
 	return true;
 }

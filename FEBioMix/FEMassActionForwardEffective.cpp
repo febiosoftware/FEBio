@@ -55,11 +55,9 @@ double FEMassActionForwardEffective::ReactionSupply(FEMaterialPoint& pt)
     
     // start with contribution from solutes
     int nsol = m_psm->Solutes();
-    for (int i = 0; i < nsol; ++i)
-    {
+    for (int i=0; i<nsol; ++i) {
         int vR = m_vR[i];
-        if (vR > 0)
-        {
+        if (vR > 0) {
             double c = m_psm->GetEffectiveSoluteConcentration(pt, i);
             zhat *= pow(c, vR);
         }
@@ -67,11 +65,9 @@ double FEMassActionForwardEffective::ReactionSupply(FEMaterialPoint& pt)
     
     // add contribution of solid-bound molecules
     const int nsbm = m_psm->SBMs();
-    for (int i = 0; i < nsbm; ++i)
-    {
+    for (int i=0; i<nsbm; ++i) {
         int vR = m_vR[nsol+i];
-        if (vR > 0)
-        {
+        if (vR > 0) {
             double c = m_psm->SBMConcentration(pt, i);
             zhat *= pow(c, vR);
         }
@@ -86,7 +82,7 @@ mat3ds FEMassActionForwardEffective::Tangent_ReactionSupply_Strain(FEMaterialPoi
 {
     // if the reaction supply is insensitive to strain
     if (m_bool_refC)
-        return mat3ds(0.0);
+        return mat3ds(0);
 
     FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
     FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
@@ -98,8 +94,7 @@ mat3ds FEMassActionForwardEffective::Tangent_ReactionSupply_Strain(FEMaterialPoi
     mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);
     double zhat = ReactionSupply(pt);
     mat3ds dzhatde = mat3dd(0.0);
-    if (kF > 0.0)
-        dzhatde = dkFde * (zhat / kF);
+    if (kF > 0) dzhatde = dkFde*(zhat/kF);
         
     return dzhatde;
 }
@@ -115,9 +110,8 @@ double FEMassActionForwardEffective::Tangent_ReactionSupply_Pressure(FEMaterialP
     double kF = m_pFwd->ReactionRate(pt);
     double dkFdp = m_pFwd->Tangent_ReactionRate_Pressure(pt);
     double zhat = ReactionSupply(pt);
-    double dzhatdp = 0.0;
-    if (kF > 0.0)
-        dzhatdp = dkFdp * zhat / kF;
+    double dzhatdp = 0;
+    if (kF > 0) dzhatdp = dkFdp*zhat/kF;
 
     return dzhatdp;
 }
@@ -129,14 +123,12 @@ double FEMassActionForwardEffective::Tangent_ReactionSupply_Concentration(FEMate
     const int nsol = m_nsol;
     
     // if the derivative is taken with respect to a solid-bound molecule, return 0
-    if (sol >= nsol) 
-        return 0.0;
+    if (sol >= nsol) return 0;
     
     double zhat = ReactionSupply(pt);
     double dzhatdc = 0;
     double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-    if ((zhat > 0) && (c > 0))
-        dzhatdc = m_vR[sol] / c * zhat;
+    if ((zhat > 0) && (c > 0)) dzhatdc = m_vR[sol]/c*zhat;
     
     return dzhatdc;
 }

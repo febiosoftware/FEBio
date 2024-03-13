@@ -88,6 +88,12 @@ const LinearSolverStats& LinearSolver::GetStats() const
 	return	m_stats;
 }
 
+double LinearSolver::ConditionNumber()
+{
+	// returns an invalid value for the condition number
+	return 0.0;
+}
+
 //-----------------------------------------------------------------------------
 void LinearSolver::ResetStats()
 {

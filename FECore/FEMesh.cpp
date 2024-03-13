@@ -125,9 +125,9 @@ void FEMesh::Serialize(DumpStream& ar)
 		ar << m_FaceSet;
 
 		// write surface pairs
-		int surfPairs = m_SurfPair.size();
+		int surfPairs = (int)m_SurfPair.size();
 		ar << surfPairs;
-		for (int i = 0; i < m_SurfPair.size(); ++i)
+		for (int i = 0; i < surfPairs; ++i)
 		{
 			FESurfacePair& sp = *m_SurfPair[i];
 			ar << sp.GetName();
@@ -150,8 +150,7 @@ void FEMesh::Serialize(DumpStream& ar)
 		for (int i = 0; i < maps; ++i)
 		{
 			FEDataMap* map = GetDataMap(i);
-			ar << map->DataMapType();
-			map->Serialize(ar);
+			ar << map;
 		}
 	}
 	else
@@ -207,16 +206,13 @@ void FEMesh::Serialize(DumpStream& ar)
 
 		// write data maps
 		ClearDataMaps();
-		int maps = 0, mapType;
+		int maps = 0;
 		string mapName;
 		ar >> maps;
 		for (int i = 0; i < maps; ++i)
 		{
-			ar >> mapType;
-
-			FEDataMap* map = CreateDataMap(mapType);
-			assert(map);
-			map->Serialize(ar);
+			FEDataMap* map = nullptr;
+			ar >> map;
 			AddDataMap(map);
 		}
 
@@ -274,7 +270,11 @@ void FEMesh::AddNodes(int nodes)
 void FEMesh::SetDOFS(int n)
 {
 	int NN = Nodes();
-	for (int i=0; i<NN; ++i) m_Node[i].SetDOFS(n);
+#pragma omp parallel for
+	for (int i = 0; i < NN; ++i)
+	{
+		m_Node[i].SetDOFS(n);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -777,6 +777,7 @@ FESurface* FEMesh::ElementBoundarySurface(bool boutside, bool binside)
 	// all done
 	return ps;
 }
+
 FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool boutside, bool binside)
 {
 	if ((boutside == false) && (binside == false)) return nullptr;
@@ -859,6 +860,85 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 	// initialize the surface. 
 	// This will set the local surface element ID's and also set the m_nelem IDs.
 	ps->Init();
+
+	// all done
+	return ps;
+}
+
+FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside, bool binside)
+{
+	if ((boutside == false) && (binside == false)) return nullptr;
+
+	// create the element neighbor list
+	FEElemElemList EEL;
+	EEL.Create(this);
+
+	// get the number of elements in this mesh
+	int NE = Elements();
+
+	// count the number of facets we have to create
+	int NF = 0;
+
+	for (int i = 0; i < domains.size(); i++)
+	{
+		for (int j = 0; j < domains[i]->Elements(); j++)
+		{
+			FEElement& el = domains[i]->ElementRef(j);
+			int nf = el.Faces();
+			for (int k = 0; k < nf; ++k)
+			{
+				FEElement* pen = EEL.Neighbor(el.GetID() - 1, k);
+				if ((pen == nullptr) && boutside) ++NF;
+				else if (pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ++NF;
+				if ((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())) ++NF;
+			}
+		}
+	}
+
+	// create the surface
+	FEFacetSet* ps = new FEFacetSet(GetFEModel());
+	if (NF == 0) return ps;
+	ps->Create(NF);
+
+	// build the surface elements
+	int faceNodes[FEElement::MAX_NODES];
+	NF = 0;
+	for (int i = 0; i < domains.size(); i++)
+	{
+		for (int j = 0; j < domains[i]->Elements(); j++)
+		{
+			FEElement& el = domains[i]->ElementRef(j);
+			int nf = el.Faces();
+			for (int k = 0; k < nf; ++k)
+			{
+				FEElement* pen = EEL.Neighbor(el.GetID() - 1, k);
+				if (((pen == nullptr) && boutside) ||
+					(pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ||
+					((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())))
+				{
+					FEFacetSet::FACET& f = ps->Face(NF++);
+					int fn = el.GetFace(k, faceNodes);
+
+					switch (fn)
+					{
+					case 4: f.ntype = FEFacetSet::FACET::QUAD4; break;
+					case 8: f.ntype = FEFacetSet::FACET::QUAD8; break;
+					case 9: f.ntype = FEFacetSet::FACET::QUAD9; break;
+					case 3: f.ntype = FEFacetSet::FACET::TRI3; break;
+					case 6: f.ntype = FEFacetSet::FACET::TRI6; break;
+					case 7: f.ntype = FEFacetSet::FACET::TRI7; break;
+					default:
+						assert(false);
+					}
+
+					for (int p = 0; p < fn; ++p)
+					{
+						f.node[p] = faceNodes[p];
+					}
+				}
+			}
+		}
+	}
 
 	// all done
 	return ps;

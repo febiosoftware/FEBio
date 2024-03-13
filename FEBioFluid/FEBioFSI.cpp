@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include "FEBiphasicFSIDomain3D.h"
 #include "FEFluidModule.h"
 #include "FEFluidFSIAnalysis.h"
+#include "FEFluidSupplyStarling.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -51,7 +52,7 @@ const char* FEBioFSI::GetVariableName(FEBioFSI::FSI_VARIABLE var)
 	{
 	case DISPLACEMENT                : return "displacement"               ; break;
 	case VELOCITY                    : return "velocity"                   ; break;
-	case SHELL_ROTATION              : return "shell rotation"             ; break;
+	case ROTATION                    : return "rotation"                   ; break;
 	case SHELL_DISPLACEMENT          : return "shell displacement"         ; break;
 	case SHELL_VELOCITY              : return "shell velocity"             ; break;
 	case SHELL_ACCELERATION          : return "shell acceleration"         ; break;
@@ -85,7 +86,7 @@ void FEBioFSI::InitModule()
 	febio.AddModuleDependency("biphasic");	// also pulls in "solid"
 
 	//-----------------------------------------------------------------------------
-	// analyis classes (default type must match module name!)
+	// analysis classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FEFluidFSIAnalysis, "fluid-FSI");
 
 	//-----------------------------------------------------------------------------
@@ -107,6 +108,8 @@ void FEBioFSI::InitModule()
     
     REGISTER_FECORE_CLASS(FEBiphasicFSIDomain3D, "biphasic-FSI-3D");
 
+    REGISTER_FECORE_CLASS(FEFluidSupplyStarling, "Starling");
+    
     //-----------------------------------------------------------------------------
     // Reset solver parameters to preferred default settings
     febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {

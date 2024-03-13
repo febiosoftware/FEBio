@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEBioLoadDataSection.h"
 #include <FECore/FEModel.h>
 #include <FECore/FELoadController.h>
-#include <FECore/FEPointFunction.h>
 
 //-----------------------------------------------------------------------------
 FEBioLoadDataSection3::FEBioLoadDataSection3(FEFileImport* pim) : FEFileSection(pim) 

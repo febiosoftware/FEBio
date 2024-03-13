@@ -110,18 +110,19 @@ FENode& FENode::operator = (const FENode& n)
 // Serialize
 void FENode::Serialize(DumpStream& ar)
 {
-	ar & m_nID;
 	ar & m_rt & m_at;
 	ar & m_rp & m_vp & m_ap;
 	ar & m_Fr;
 	ar & m_val_t & m_val_p;
-    ar & m_dt & m_dp;
+	ar & m_dt & m_dp;
 	if (ar.IsShallow() == false)
 	{
+		ar & m_nID;
 		ar & m_nstate;
 		ar & m_ID;
 		ar & m_BC;
 		ar & m_r0;
+		ar & m_ra;
 		ar & m_rid;
 		ar & m_d0;
 	}

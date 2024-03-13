@@ -32,8 +32,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEMooneyRivlin, FEUncoupledMaterial)
-	ADD_PARAMETER(m_c1, "c1");
-	ADD_PARAMETER(m_c2, "c2");
+	ADD_PARAMETER(m_c1, "c1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_c2, "c2")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

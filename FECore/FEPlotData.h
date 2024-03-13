@@ -36,6 +36,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Region types
 enum Region_Type {
+	FE_REGION_GLOBAL,
 	FE_REGION_NODE,
 	FE_REGION_DOMAIN,
 	FE_REGION_SURFACE
@@ -97,6 +98,7 @@ protected:
 	void SetStorageFormat(Storage_Fmt sf) { m_sfmt = sf; }
 
 public: // override one of these functions depending on the Region_Type
+	virtual bool Save(FEDataStream& a) { return false; }					// for FE_REGION_GLOBAL
 	virtual bool Save(FEMesh&    m, FEDataStream& a) { return false; }		// for FE_REGION_NODE
 	virtual bool Save(FEDomain&  D, FEDataStream& a) { return false; }		// for FE_REGION_DOMAIN
 	virtual bool Save(FESurface& S, FEDataStream& a) { return false; }		// for FE_REGION_SURFACE
@@ -125,6 +127,17 @@ private:
 	const char*		m_szunit;
 	int				m_arraySize;	//!< size of arrays (used by arrays)
 	vector<string>	m_arrayNames;	//!< optional names of array components (used by arrays)
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for global data. Data that wish to store data that is not directly
+//! evaluated on a part of the mesh should inherit from this class. 
+class FECORE_API FEPlotGlobalData : public FEPlotData
+{
+	FECORE_BASE_CLASS(FEPlotGlobalData)
+
+public:
+	FEPlotGlobalData(FEModel* fem, Var_Type t) : FEPlotData(fem, FE_REGION_GLOBAL, t, FMT_ITEM) {}
 };
 
 //-----------------------------------------------------------------------------
@@ -158,4 +171,35 @@ class FECORE_API FEPlotSurfaceData : public FEPlotData
 
 public:
 	FEPlotSurfaceData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_SURFACE, t, s) {}
+};
+
+// helper class for parsing the type string of plot fields
+class FECORE_API FEPlotFieldDescriptor
+{
+private:
+	enum FilterType {
+		NO_FILTER,
+		NUMBER_FILTER,
+		STRING_FILTER
+	};
+
+public:
+	FEPlotFieldDescriptor(const std::string& typeString);
+
+	bool isValid() const { return m_valid; }
+
+	bool HasFilter() const { return (m_filterType != NO_FILTER); }
+	bool IsNumberFilter() const { return (m_filterType == NUMBER_FILTER); }
+	bool IsStringFilter() const { return (m_filterType == STRING_FILTER); }
+
+public:
+	string	fieldName;
+	string	alias;
+
+	int		numFilter = -1;
+	string	strFilter;
+
+private:
+	FilterType m_filterType = NO_FILTER;
+	bool m_valid = false;
 };

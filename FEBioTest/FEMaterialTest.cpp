@@ -31,14 +31,15 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEDomain.h>
 
-//-----------------------------------------------------------------------------
-// Constructor
 FEMaterialTest::FEMaterialTest(FEModel* fem) : FEDiagnostic(fem)
 {
 	m_szoutfile = "stress.txt";
 
 	// make sure the correct module is active
 	fem->SetActiveModule("solid");
+
+	m_xout = "Ex";
+	m_yout = "sx";
 
 	m_pscn = nullptr;
 	m_strain = nullptr;
@@ -70,12 +71,36 @@ void FEMaterialTest::SetOutputFileName(const char* szfilename)
 	m_szoutfile = szfilename;
 }
 
+void FEMaterialTest::SetOutputVariables(const std::string& xout, const std::string& yout)
+{
+	m_xout = xout;
+	m_yout = yout;
+}
+
 //-----------------------------------------------------------------------------
 FEDiagnosticScenario* FEMaterialTest::CreateScenario(const std::string& sname)
 {
-	if (sname == "uni-axial"   ) return (m_pscn = new FETangentUniaxial(this));
-	if (sname == "simple shear") return (m_pscn = new FETangentSimpleShear(this));
-	return 0;
+	if (sname == "uni-axial")
+	{
+		m_pscn = new FETangentUniaxial(this);
+		SetOutputVariables("Ex", "sx");
+	}
+	else if (sname == "biaxial")
+	{
+		m_pscn = new FETangentBiaxial(this);
+		SetOutputVariables("Ex", "sx");
+	}
+	else if (sname == "triaxial")
+	{
+		m_pscn = new FETangentTriaxial(this);
+		SetOutputVariables("Ex", "sx");
+	}
+	else if (sname == "simple shear")
+	{
+		m_pscn = new FETangentSimpleShear(this);
+		SetOutputVariables("Exz", "sx");
+	}
+	return m_pscn;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,8 +117,8 @@ bool FEMaterialTest::Init()
 	FEModel* fem = GetFEModel();
 	fem->AddCallback(cb, CB_INIT | CB_MAJOR_ITERS, this);
 
-	m_strain = fecore_new<FELogElemData>("Ex", fem);
-	m_stress = fecore_new<FELogElemData>("sx", fem);
+	m_strain = fecore_new<FELogElemData>(m_xout.c_str(), fem); assert(m_strain);
+	m_stress = fecore_new<FELogElemData>(m_yout.c_str(), fem); assert(m_stress);
 
 	// add the stress output 
 	if (m_szoutfile)
@@ -104,7 +129,7 @@ bool FEMaterialTest::Init()
 		es->Create(&dom);
 		std::vector<int> dummy;
 		pdr->SetItemList(es, dummy);
-		pdr->SetData("Ex;sx");
+		pdr->SetData("Exy;sx");
 		pdr->SetComments(false);
 
 		pdr->SetFileName(m_szoutfile);
@@ -123,10 +148,10 @@ bool FEMaterialTest::cb()
 	FEDomain& dom= fem->GetMesh().Domain(0);
 	FEElement& el = dom.ElementRef(0);
 	
-	double Ex = m_strain->value(el);
-	double sx = m_stress->value(el);
+	double E = (m_strain ? m_strain->value(el) : 0);
+	double s = (m_stress ? m_stress->value(el) : 0);
 
-	m_data.push_back(pair<double, double>(Ex, sx));
+	m_data.push_back(pair<double, double>(E, s));
 
 	return true;
 }

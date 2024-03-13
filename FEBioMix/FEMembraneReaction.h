@@ -39,13 +39,13 @@ class FEBIOMIX_API FEMembraneReactionRate : public FEMaterialProperty
 public:
     //! constructor
     FEMembraneReactionRate(FEModel* pfem) : FEMaterialProperty(pfem), m_pReact(nullptr) {}
-    
+
     //! reaction rate at material point
     virtual double ReactionRate(FEMaterialPoint& pt) = 0;
-    
+
     //! tangent of reaction rate with area strain at material point
     virtual double Tangent_ReactionRate_Strain(FEMaterialPoint& pt) = 0;
-    
+
     //! tangent of reaction rate with effective fluid pressure at material point
     virtual double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) = 0;
     virtual double Tangent_ReactionRate_Pe(FEMaterialPoint& pt) = 0;
@@ -55,14 +55,14 @@ public:
     virtual double Tangent_ReactionRate_Concentration(FEMaterialPoint& pt, const int isol) = 0;
     virtual double Tangent_ReactionRate_Ce(FEMaterialPoint& pt, const int isol) = 0;
     virtual double Tangent_ReactionRate_Ci(FEMaterialPoint& pt, const int isol) = 0;
-    
+
     //! reset, initialize and update chemical reaction data in the FESolutesMaterialPoint
     virtual void ResetElementData(FEMaterialPoint& mp) {}
     virtual void InitializeElementData(FEMaterialPoint& mp) {}
     virtual void UpdateElementData(FEMaterialPoint& mp) {}
-    
+
 public:
-    FEReaction*    m_pReact;    //!< pointer to parent reaction
+    FEReaction* m_pReact;    //!< pointer to parent reaction
 
     FECORE_BASE_CLASS(FEMembraneReactionRate)
 };
@@ -101,20 +101,20 @@ class FEBIOMIX_API FEMembraneReaction : public FEReaction
 public:
     //! constructor
     FEMembraneReaction(FEModel* pfem);
-    
+
     //! get solute (use only during initialization)
     FESoluteData* GetSolute(int nsol);
-    
+
     //! initialization
     bool Init() override;
-    
+
 public:
     //! set the forward reaction rate
     void SetForwardReactionRate(FEMembraneReactionRate* pfwd) { m_pFwd = pfwd; }
-    
+
     //! set the reverse reaction rate
     void SetReverseReactionRate(FEMembraneReactionRate* prev) { m_pRev = prev; }
-    
+
 public:
     //! reset, initialize and update optional chemical reaction data in the FESolutesMaterialPoint
     void ResetElementData(FEMaterialPoint& mp)
@@ -132,14 +132,14 @@ public:
         if (m_pFwd) m_pFwd->UpdateElementData(mp);
         if (m_pRev) m_pRev->UpdateElementData(mp);
     }
-    
+
 public:
     //! molar supply at material point
     virtual double ReactionSupply(FEMaterialPoint& pt) = 0;
-    
+
     //! tangent of molar supply with strain at material point
     virtual double Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) = 0;
-    
+
     //! tangent of molar supply with effective pressure at material point
     virtual double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt) = 0;
     virtual double Tangent_ReactionSupply_Pe(FEMaterialPoint& pt) = 0;
@@ -153,11 +153,11 @@ public:
 public:
     //! Serialization
     void Serialize(DumpStream& ar) override;
-    
+
 public:
-    FEMembraneReactionRate*    m_pFwd;        //!< pointer to forward reaction rate
-    FEMembraneReactionRate*    m_pRev;        //!< pointer to reverse reaction rate
-    
+    FEMembraneReactionRate* m_pFwd;        //!< pointer to forward reaction rate
+    FEMembraneReactionRate* m_pRev;        //!< pointer to reverse reaction rate
+
     vector<FEReactantSpeciesRef*> m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
     vector<FEProductSpeciesRef*> m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
     vector<FEInternalReactantSpeciesRef*> m_vRitmp;	//!< helper variable for reading in stoichiometric coefficients for internal reactants
@@ -189,9 +189,6 @@ public:
     vector<int>     m_vRe;          //!< stoichiometric coefficients of reactants
     vector<int>     m_vPe;          //!< stoichiometric coefficients of products
     vector<int>     m_ve;           //!< net stoichiometric coefficients of reactants and products
-
-public:
-    bool	m_bool_refC;	//!< flag to use referential concentration (ignore volume/changing effects)
 
     DECLARE_FECORE_CLASS();
     FECORE_BASE_CLASS(FEMembraneReaction)

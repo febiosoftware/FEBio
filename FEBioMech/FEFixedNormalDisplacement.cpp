@@ -63,58 +63,34 @@ void FEFixedNormalDisplacement::Activate()
         DOFS& dofs = fem.GetDOFS();
 
         // evaluate the nodal normals
-        FENodeList nl = m_surf.GetNodeList();
-        int N = nl.Size();
-        vector<vec3d> nn(N, vec3d(0, 0, 0));
-        vec3d nu(0, 0, 0);
-
-        // loop over all elements to get nodal normals
-        for (int i = 0; i < m_surf.Elements(); ++i)
-        {
-            FESurfaceElement& el = m_surf.Element(i);
-            nu = m_surf.SurfaceNormal(el, 0);
-            for (int j = 0; j < el.Nodes(); ++j) {
-                nn[nl.GlobalToLocalID(el.m_node[j])] += nu;
-            }
-        }
-        for (int i = 0; i < N; ++i) nn[i].unit();
+        m_surf.UpdateNodeNormals();
 
         // create linear constraints
         // for a symmetry plane the constraint on (ux, uy, uz) is
         // nx*ux + ny*uy + nz*uz = 0
         if (m_bshellb == false) {
-            for (int i = 0; i < N; ++i) {
+            for (int i = 0; i < m_surf.Nodes(); ++i) {
                 FENode node = m_surf.Node(i);
                 if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
+                    vec3d nn = m_surf.NodeNormal(i);
                     FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, &fem);
-                    for (int j = 0; j < 3; ++j) {
-                        switch (j) {
-                        case 0: pLC->AddDOF(node.GetID(), dofs.GetDOF("x"), nn[i].x); break;
-                        case 1: pLC->AddDOF(node.GetID(), dofs.GetDOF("y"), nn[i].y); break;
-                        case 2: pLC->AddDOF(node.GetID(), dofs.GetDOF("z"), nn[i].z); break;
-                        default:
-                            break;
-                        }
-                    }
+                    pLC->AddDOF(node.GetID(), dofs.GetDOF("x"), nn.x);
+                    pLC->AddDOF(node.GetID(), dofs.GetDOF("y"), nn.y);
+                    pLC->AddDOF(node.GetID(), dofs.GetDOF("z"), nn.z);
                     // add the linear constraint to the system
                     m_lc.add(pLC);
                 }
             }
         }
         else {
-            for (int i = 0; i < N; ++i) {
+            for (int i = 0; i < m_surf.Nodes(); ++i) {
                 FENode node = m_surf.Node(i);
                 if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
+                    vec3d nn = m_surf.NodeNormal(i);
                     FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, &fem);
-                    for (int j = 0; j < 3; ++j) {
-                        switch (j) {
-                        case 0: pLC->AddDOF(node.GetID(), dofs.GetDOF("sx"), nn[i].x); break;
-                        case 1: pLC->AddDOF(node.GetID(), dofs.GetDOF("sy"), nn[i].y); break;
-                        case 2: pLC->AddDOF(node.GetID(), dofs.GetDOF("sz"), nn[i].z); break;
-                        default:
-                            break;
-                        }
-                    }
+                    pLC->AddDOF(node.GetID(), dofs.GetDOF("sx"), nn.x);
+                    pLC->AddDOF(node.GetID(), dofs.GetDOF("sy"), nn.y);
+                    pLC->AddDOF(node.GetID(), dofs.GetDOF("sz"), nn.z);
                     // add the linear constraint to the system
                     m_lc.add(pLC);
                 }
@@ -123,6 +99,7 @@ void FEFixedNormalDisplacement::Activate()
 
         m_lc.Init();
         m_lc.Activate();
+        m_binit = true;
     }
 }
 
@@ -139,3 +116,7 @@ void FEFixedNormalDisplacement::LoadVector(FEGlobalVector& R, const FETimeInfo& 
 void FEFixedNormalDisplacement::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
 bool FEFixedNormalDisplacement::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }
 void FEFixedNormalDisplacement::BuildMatrixProfile(FEGlobalMatrix& M) { m_lc.BuildMatrixProfile(M); }
+int FEFixedNormalDisplacement::InitEquations(int neq) { return m_lc.InitEquations(neq); }
+void FEFixedNormalDisplacement::Update(const std::vector<double>& Ui, const std::vector<double>& ui) { m_lc.Update(Ui, ui); }
+void FEFixedNormalDisplacement::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) { m_lc.UpdateIncrements(Ui, ui); }
+void FEFixedNormalDisplacement::PrepStep() { m_lc.PrepStep(); }

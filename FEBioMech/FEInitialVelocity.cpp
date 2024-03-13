@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include <FECore/FENode.h>
 
 BEGIN_FECORE_CLASS(FEInitialVelocity, FENodalIC)
-	ADD_PARAMETER(m_v0, "value");
+	ADD_PARAMETER(m_v0, "value")->setUnits(UNIT_VELOCITY);
 END_FECORE_CLASS();
 
 FEInitialVelocity::FEInitialVelocity(FEModel* fem) : FENodalIC(fem)
@@ -50,7 +50,7 @@ void FEInitialVelocity::SetValue(const vec3d& v0)
 bool FEInitialVelocity::Init()
 {
 	FEDofList dofs(GetFEModel());
-	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY)) == false) return false;
+	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY)) == false) return false;
 	SetDOFList(dofs);
 	return true;
 }

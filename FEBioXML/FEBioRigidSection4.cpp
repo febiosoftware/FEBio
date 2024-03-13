@@ -27,7 +27,6 @@ SOFTWARE.*/
 #include "FEBioRigidSection4.h"
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
-#include <FECore/FEModelComponent.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FENLConstraint.h>
 #include <FECore/FEBoundaryCondition.h>

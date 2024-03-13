@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "Timer.h"
 #include "FEModule.h"
 #include <stdarg.h>
+#include "log.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -80,6 +81,7 @@ FECoreKernel::FECoreKernel()
 	m_nspec = -1;
 	m_default_solver = nullptr;
 	m_blockEvents = true;
+	m_bshowDeprecationWarning = true;
 
 	// build the super class ID table
 	ADD_SUPER_CLASS(FEINVALID_ID);
@@ -397,6 +399,15 @@ bool FECoreKernel::IsModuleActive(int moduleID)
 FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 {
 	FECoreBase* pc = fac->CreateInstance(fem);
+
+	int nspec = fac->GetSpecID();
+	if (m_bshowDeprecationWarning && (nspec != -1))
+	{
+		int n1 = FECORE_SPEC_MAJOR(nspec);
+		int n2 = FECORE_SPEC_MINOR(nspec);
+		if (fem) feLogWarningEx(fem, "\"%s\" is deprecated in spec %d.%d!", fac->GetTypeStr(), n1, n2);
+	}
+
 	if ((m_blockEvents == false) && pc && (m_createHandlers.empty() == false))
 	{
 		for (int i = 0; i < m_createHandlers.size(); ++i)
@@ -793,4 +804,9 @@ void FECoreKernel::OnCreateEvent(FECreateHandler* pf)
 void FECoreKernel::BlockEvents(bool b)
 {
 	m_blockEvents = b;
+}
+
+void FECoreKernel::ShowDeprecationWarnings(bool b)
+{
+	m_bshowDeprecationWarning = b;
 }

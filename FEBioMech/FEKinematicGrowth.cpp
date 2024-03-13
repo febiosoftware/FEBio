@@ -144,6 +144,7 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
     // substitute elastic deformation in material point
     pt.m_F = Fe;
     pt.m_J = Je;
+    pt.m_J = Je;
     // evaluate stress
     FEElasticMaterial* emat = GetBaseMaterial();
     // The base class stress function divides by Je rather than J when pushing forward. Thus the cauchy stress is the base class stress divided by Jg.

@@ -35,10 +35,10 @@
 //! Base class for the viscous part of the fluid response.
 //! These materials provide the viscous stress and its tangents.
 //!
-class FEBIOFLUID_API FEViscousPolarFluid : public FEMaterial
+class FEBIOFLUID_API FEViscousPolarFluid : public FEMaterialProperty
 {
 public:
-    FEViscousPolarFluid(FEModel* pfem) : FEMaterial(pfem) {}
+    FEViscousPolarFluid(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEViscousPolarFluid() {}
     
     //! dual vector non-symmetric part of viscous stress in polar fluid
@@ -70,5 +70,6 @@ public:
     
     //! dynamic viscosity
     virtual double RelativeRotationalViscosity(FEMaterialPoint& mp) = 0;
-    
+
+    FECORE_BASE_CLASS(FEViscousPolarFluid)
 };

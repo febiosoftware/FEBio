@@ -28,7 +28,7 @@ SOFTWARE.*/
 //=============================================================================
 BEGIN_FECORE_CLASS(FEInitialConcentration, FEInitialCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)")->setLongName("Solute");
-	ADD_PARAMETER(m_data, "value");
+	ADD_PARAMETER(m_data, "value")->setUnits(UNIT_CONCENTRATION);
 END_FECORE_CLASS();
 
 FEInitialConcentration::FEInitialConcentration(FEModel* fem) : FEInitialDOF(fem)

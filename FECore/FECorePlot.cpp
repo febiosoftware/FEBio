@@ -40,6 +40,8 @@ SOFTWARE.*/
 #include "FESurfaceLoad.h"
 #include "FEDomainMap.h"
 #include "FEModel.h"
+#include "FEPIDController.h"
+#include "FEDataMap.h"
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -471,4 +473,282 @@ bool FEPlotParameter::Save(FEMesh& mesh, FEDataStream& a)
 
 
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+FEPlotPIDController::FEPlotPIDController(FEModel* pfem) : FEPlotGlobalData(pfem, PLT_ARRAY)
+{
+	m_pid = nullptr;
+	SetArraySize(3);
+	std::vector<std::string> names;
+	names.push_back("measurement");
+	names.push_back("error");
+	names.push_back("output");
+	SetArrayNames(names);
+}
+
+bool FEPlotPIDController::SetFilter(const char* sz)
+{
+	if (sz == nullptr) return false;
+	FEModel* fem = GetFEModel(); assert(fem);
+	if (fem == nullptr) return false;
+
+	for (int i = 0; i < fem->LoadControllers(); ++i)
+	{
+		FEPIDController* pid = dynamic_cast<FEPIDController*>(fem->GetLoadController(i));
+		if (pid && (pid->GetName() == string(sz)))
+		{
+			m_pid = pid;
+			return true;
+		}
+	}
+
+	m_pid = nullptr;
+	return false;
+}
+
+bool FEPlotPIDController::Save(FEDataStream& a)
+{
+	if (m_pid == nullptr) return false;
+	a << m_pid->GetParameterValue();
+	a << m_pid->GetError();
+	a << m_pid->Value();
+	return true;
+}
+
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FEPlotMeshData::FEPlotMeshData(FEModel* pfem) : FEPlotData(pfem)
+{
+	m_map = nullptr;
+	m_dom = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+// This plot field requires a filter which defines the material name and 
+// the material parameter in the format [materialname.parametername].
+bool FEPlotMeshData::SetFilter(const char* sz)
+{
+	// store the filter for serialization
+	m_filter = sz;
+
+	// find the map
+	m_map = GetFEModel()->GetMesh().FindDataMap(sz);
+	if (m_map == nullptr) return false;
+
+	switch (m_map->DataMapType())
+	{
+	case FE_DOMAIN_MAP:
+	{
+		FEDomainMap* map = dynamic_cast<FEDomainMap*>(m_map); assert(map);
+		FEDataType dataType = map->DataType();
+
+		SetRegionType(FE_REGION_DOMAIN);
+		SetStorageFormat((Storage_Fmt)map->StorageFormat());
+
+		if (map->StorageFormat() == FMT_MATPOINTS) SetStorageFormat(FMT_MULT);
+		
+		switch (dataType)
+		{
+		case FE_DOUBLE: SetVarType(PLT_FLOAT); break;
+		default:
+			assert(false);
+			return false;
+		}
+
+		const FEElementSet* set = map->GetElementSet();
+		if (set == nullptr) return false;
+
+		m_dom = &(set->GetDomainList());
+	}
+	break;
+	default:
+		assert(false);
+		return false;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPlotMeshData::Serialize(DumpStream& ar)
+{
+	FEPlotData::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	if (ar.IsSaving())
+		ar << m_filter;
+	else
+	{
+		string filter;
+		ar >> filter;
+		SetFilter(filter.c_str());
+	}
+}
+
+//-----------------------------------------------------------------------------
+// The Save function stores the material parameter data to the plot file.
+bool FEPlotMeshData::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDomainMap* map = dynamic_cast<FEDomainMap*>(m_map);
+	if (map == nullptr) return false;
+	if (m_dom == nullptr) return false;
+
+	if (m_dom->IsMember(&dom))
+	{
+		if (StorageFormat() == FMT_NODE)
+		{
+			if (DataType() == PLT_FLOAT)
+			{
+				int n = dom.Nodes();
+				for (int i = 0; i < n; ++i)
+				{
+					int m = dom.NodeIndex(i);
+					double v = map->NodalValue(m);
+					a << v;
+				}
+				return true;
+			}
+		}
+		else if (StorageFormat() == FMT_ITEM)
+		{
+			if (DataType() == PLT_FLOAT)
+			{
+				int n = dom.Elements();
+				for (int i = 0; i < n; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					FEMaterialPoint mp;
+					mp.m_elem = &el;
+					mp.m_index = 0;
+					double v = map->value(mp);
+					a << v;
+				}
+				return true;
+			}
+		}
+		else if (StorageFormat() == FMT_MULT)
+		{
+			if (DataType() == PLT_FLOAT)
+			{
+				int n = dom.Elements();
+				for (int i = 0; i < n; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					for (int j = 0; j < el.Nodes(); ++j)
+					{
+						double v = map->value<double>(i, j);
+						a << v;
+					}
+				}
+				return true;
+			}
+			else if (DataType() == PLT_VEC3F)
+			{
+				int n = dom.Elements();
+				for (int i = 0; i < n; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					for (int j = 0; j < el.Nodes(); ++j)
+					{
+						vec3d v = map->value<vec3d>(i, j);
+						a << v;
+					}
+				}
+				return true;
+			}
+		}
+		else if (map->StorageFormat() == FMT_MATPOINTS)
+		{
+			// Note that for this map type, the plot format was changed to FMT_MULT
+			if (DataType() == PLT_FLOAT)
+			{
+				int NE = dom.Elements();
+				double vi[FEElement::MAX_INTPOINTS] = { 0 };
+				double vn[FEElement::MAX_NODES] = { 0 };
+				for (int i = 0; i < NE; ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					for (int j = 0; j < el.GaussPoints(); ++j)
+					{
+						FEMaterialPoint mp;
+						mp.m_elem = &el;
+						mp.m_index = j;
+						vi[j] = map->value(mp);
+					}
+
+					el.project_to_nodes(vi, vn);
+					for (int j=0; j<el.Nodes(); ++j)
+						a << vn[j];
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// The Save function stores the material parameter data to the plot file.
+bool FEPlotMeshData::Save(FESurface& dom, FEDataStream& a)
+{
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotMeshData::Save(FEMesh& mesh, FEDataStream& a)
+{
+	return false;
+}
+
+FEPlotFieldVariable::FEPlotFieldVariable(FEModel* pfem) : FEPlotNodeData(pfem, Var_Type::PLT_FLOAT, Storage_Fmt::FMT_ITEM)
+{
+
+}
+
+bool FEPlotFieldVariable::SetFilter(const char* sz)
+{
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int nvar = dofs.GetVariableIndex(sz);
+	if (nvar == -1) return false;
+	dofs.GetDOFList(sz, m_dofs);
+	int vartype = dofs.GetVariableType(nvar);
+	switch (vartype)
+	{
+	case VAR_SCALAR: SetVarType(PLT_FLOAT); break;
+	case VAR_VEC3  : SetVarType(PLT_VEC3F); break;
+	case VAR_ARRAY :
+	{
+		SetVarType(Var_Type::PLT_ARRAY);
+		SetArraySize(m_dofs.size());
+		vector<string> dofNames;
+		for (int i = 0; i < m_dofs.size(); ++i) dofNames.push_back(dofs.GetDOFName(nvar, i));
+		SetArrayNames(dofNames);
+	}
+	break;
+	default:
+		return false;
+	}
+	return true;
+}
+
+bool FEPlotFieldVariable::Save(FEMesh& mesh, FEDataStream& a)
+{
+	if (m_dofs.empty()) return false;
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int j = 0; j < m_dofs.size(); ++j)
+		{
+			a << node.get(m_dofs[j]);
+		}
+	}
+	return true;
+}
+
+void FEPlotFieldVariable::Serialize(DumpStream& ar)
+{
+	FEPlotNodeData::Serialize(ar);
+	ar & m_dofs;
 }

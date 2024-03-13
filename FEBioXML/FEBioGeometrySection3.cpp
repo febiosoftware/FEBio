@@ -29,12 +29,8 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioGeometrySection.h"
 #include "FECore/FESolidDomain.h"
-#include "FECore/FEShellDomain.h"
-#include "FECore/FETrussDomain.h"
-#include "FECore/FEDomain2D.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
-#include "FECore/FECoreKernel.h"
 #include <FECore/FENodeNodeList.h>
 
 //-----------------------------------------------------------------------------

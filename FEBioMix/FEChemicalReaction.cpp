@@ -103,8 +103,7 @@ bool FEChemicalReaction::Init()
 	itrmap it;
 	intmap solR = m_solR;
 	intmap solP = m_solP;
-    for (isol = 0; isol < nsol; ++isol)
-    {
+    for (isol = 0; isol<nsol; ++isol) {
         int sid = m_psm->GetSolute(isol)->GetSoluteID() - 1;
 		it = solR.find(sid);
 		if (it != solR.end()) m_vR[isol] = it->second;
@@ -116,8 +115,7 @@ bool FEChemicalReaction::Init()
 	// and determine if they participate in this reaction
 	intmap sbmR = m_sbmR;
 	intmap sbmP = m_sbmP;
-    for (isbm = 0; isbm < nsbm; ++isbm)
-    {
+    for (isbm = 0; isbm<nsbm; ++isbm) {
 		int sid = m_psm->GetSBM(isbm)->GetSBMID() - 1;
 		it = sbmR.find(sid);
 		if (it != sbmR.end()) m_vR[nsol + isbm] = it->second;
@@ -126,17 +124,17 @@ bool FEChemicalReaction::Init()
 	}
 
 	// evaluate the net stoichiometric coefficient
-    for (itot = 0; itot < ntot; ++itot)
-		m_v[itot] = m_vP[itot] - m_vR[itot];
+    for (itot = 0; itot<ntot; ++itot) {
+        m_v[itot] = m_vP[itot] - m_vR[itot];
+    }
 
 	// evaluate the weighted molar volume of reactants and products
-	if (!m_Vovr) 
-    {
-		m_Vbar = 0.0;
+	if (!m_Vovr) {
+		m_Vbar = 0;
         // only calculate Vbar if concentrations/reactions are strain-dependent
         if(!m_bool_refC)
         {
-            for (isol = 0; isol < nsol; ++isol)
+            for (isol = 0; isol<nsol; ++isol)
             {
                 FESolute* sol = m_psm->GetSolute(isol);
                 m_Vbar += m_v[isol] * sol->MolarMass() / sol->Density();
@@ -151,7 +149,7 @@ bool FEChemicalReaction::Init()
 
 	// check that the chemical reaction satisfies electroneutrality
 	int znet = 0;
-    for (isol = 0; isol < nsol; ++isol)
+    for (isol = 0; isol<nsol; ++isol)
     {
         znet += m_v[isol] * m_psm->GetSolute(isol)->ChargeNumber();
     }
@@ -160,8 +158,7 @@ bool FEChemicalReaction::Init()
         znet += m_v[nsol + isbm] * m_psm->GetSBM(isbm)->ChargeNumber();
     }
 
-	if (znet != 0) 
-    {
+	if (znet != 0) {
 		feLogError("chemical reaction must satisfy electroneutrality");
 		return false;
 	}
@@ -200,25 +197,25 @@ void FEChemicalReaction::Serialize(DumpStream& ar)
             ar >> m_nsol >> m_vR >> m_vP >> m_v >> m_Vovr;
             int size, id, vR;
             ar >> size;
-            for (int i = 0; i < size; ++i);
+            for (int i=0; i<size; ++i);
             {
                 ar >> id; ar >> vR;
                 SetStoichiometricCoefficient(m_solR, id, vR);
             }
             ar >> size;
-            for (int i = 0; i < size; ++i)
+            for (int i=0; i<size; ++i)
             {
                 ar >> id; ar >> vR;
                 SetStoichiometricCoefficient(m_solP, id, vR);
             }
             ar >> size;
-            for (int i = 0; i < size; ++i)
+            for (int i=0; i<size; ++i)
             {
                 ar >> id; ar >> vR;
                 SetStoichiometricCoefficient(m_sbmR, id, vR);
             }
             ar >> size;
-            for (int i = 0; i < size; ++i)
+            for (int i=0; i<size; ++i)
             {
                 ar >> id; ar >> vR;
                 SetStoichiometricCoefficient(m_sbmP, id, vR);

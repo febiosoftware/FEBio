@@ -238,7 +238,7 @@ int FEBioCmd_Version::run(int nargs, char** argv)
 {
 	char* szver = febio::getVersionString();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	fprintf(stderr, "\nFEBio version %s (DEBUG)\n", szver);
 #else
 	fprintf(stderr, "\nFEBio version %s\n", szver);

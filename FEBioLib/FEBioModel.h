@@ -108,6 +108,9 @@ public: //! --- serialization for restarts ---
 	//! Write or read data from archive
 	void Serialize(DumpStream& ar) override;
 
+	//! restart from dump file or restart input file
+	bool Restart(const char* szfile);
+
 private:
 	static bool handleCB(FEModel* fem, unsigned int nwhen, void* pd);
 	bool processEvent(int nevent);

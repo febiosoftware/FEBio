@@ -114,7 +114,7 @@ void FEInitialFluidPressureTemperature::Activate()
             bool good = true;
             for (int j=0; j<el.GaussPoints(); ++j) {
                 FEMaterialPoint* pt = el.GetMaterialPoint(j);
-                good = good && ptfl->Dilatation(m_Tdata(*pt), m_Pdata(*pt), 0, efi[j]);
+                good = good && ptfl->Dilatation(m_Tdata(*pt), m_Pdata(*pt), efi[j]);
             }
             // project dilatations from integration points to nodes
             el.project_to_nodes(efi, efo);
@@ -135,7 +135,7 @@ void FEInitialFluidPressureTemperature::Activate()
             bool good = true;
             for (int j=0; j<el.GaussPoints(); ++j) {
                 FEMaterialPoint* pt = el.GetMaterialPoint(j);
-                good = good && pfl->Dilatation(0, m_Pdata(*pt), 0, efi[j]);
+                good = good && pfl->Dilatation(0, m_Pdata(*pt), efi[j]);
             }
             // project dilatations from integration points to nodes
             el.project_to_nodes(efi, efo);

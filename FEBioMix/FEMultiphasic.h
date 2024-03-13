@@ -98,7 +98,13 @@ public:
 	//! evaluate and return solid referential volume fraction
 	double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
 
-	//! actual concentration (as opposed to effective concentration)
+    //! evaluate and return tangent of  solid referential volume fraction w.r.t. to J (volume ratio)
+    double TangentSRVFStrain(FEMaterialPoint& pt) override;
+    
+    //! evaluate and return tangent of  solid referential volume fraction w.r.t. to concentration
+    double TangentSRVFConcentration(FEMaterialPoint& pt, const int sol);
+
+    //! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt, const int sol);
 
 	//! porosity
@@ -150,14 +156,6 @@ public:
 		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 		return spt.m_sbmr[sbm] / SBMMolarMass(sbm) * h / ept.m_J;
-	}
-
-	//! SBM actual concentration (molar concentration per fluid volume in current configuration)
-	double SBMReferentialConcentration(FEMaterialPoint& pt, const int sbm) override {
-		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
-		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-		return spt.m_sbmr[sbm] / SBMMolarMass(sbm);
 	}
 
     // return the number of solutes on external side

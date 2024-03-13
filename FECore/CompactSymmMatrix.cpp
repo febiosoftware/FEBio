@@ -347,7 +347,7 @@ void CompactSymmMatrix::set(int i, int j, double v)
 			{
 				int k = m_ppointers[j] + n;
 				k -= m_offset;
-#pragma omp critical
+#pragma omp critical (CSM_set)
 				m_pd[k] = v;
 				return;
 			}

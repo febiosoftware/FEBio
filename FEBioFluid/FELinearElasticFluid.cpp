@@ -53,7 +53,7 @@ void FELinearElasticFluid::Serialize(DumpStream& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! gage pressure
+//! gauge pressure
 double FELinearElasticFluid::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
@@ -150,7 +150,7 @@ double FELinearElasticFluid::Tangent_cv_Temperature(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
-bool FELinearElasticFluid::Dilatation(const double T, const double p, const double c, double& e)
+bool FELinearElasticFluid::Dilatation(const double T, const double p, double& e)
 {
     e = -p/m_k;
     return true;

@@ -94,14 +94,8 @@ public:
 	// get first derivative of k (partition coefficient) w.r.p. concentration
 	virtual double dkdc(const FEMaterialPoint& mp, int i, int j) { return 0.0; }
 
-	// get first derivative of k (partition coefficient) w.r.p. concentration
-	virtual double dkdc_referential(const FEMaterialPoint& mp, int i, int j) { return 0.0; }
-
 	// get first derivative of k (partition coefficient) w.r.p. J
 	virtual double dkdJ(const FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
-
-	// get first derivative of k (partition coefficient) w.r.p. J
-	virtual double dkdJ_referential(const FEMaterialPoint& mp, int soluteIndex) { return 0.0; }
 
 	// return the number of solid-bound molecules
 	virtual int SBMs() const { return 0; }
@@ -114,9 +108,6 @@ public:
 
 	//! SBM areal concentration (mole per shell area) -- should only be called from shell domains
 	virtual double SBMArealConcentration(FEMaterialPoint& pt, const int sbm) { return 0.0; }
-
-	//! SBM referential concentration (molar concentration in current configuration)
-	virtual double SBMReferentialConcentration(FEMaterialPoint& pt, const int sbm) { return 0.0; }
 
     // return the number of solutes on external side
     virtual int SolutesExternal(FEMaterialPoint& pt) { return 0; }
@@ -188,14 +179,8 @@ public:
 		const T* spt = mp.ExtractData<T>();
 		return spt->m_dkdc[i][j];
 	}
-	double dkdc_referential(const FEMaterialPoint& mp, int i, int j) override {
-		return 0.0;
-	}
 	double dkdJ(const FEMaterialPoint& mp, int soluteIndex) override {
 		const T* spt = mp.ExtractData<T>();
 		return spt->m_dkdJ[soluteIndex];
-	}
-	double dkdJ_referential(const FEMaterialPoint& mp, int soluteIndex) override {
-		return 0.0;
 	}
 };

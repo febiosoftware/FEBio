@@ -228,6 +228,10 @@ bool FEBiphasicSoluteSolver::Quasin()
 			normEi = fabs(m_ui*m_R0);
 			normDi = fabs(m_di*m_di);
 			normEm = normEi;
+
+			m_residuNorm.norm0 = normRi;
+			m_energyNorm.norm0 = normEi;
+			m_solutionNorm[0].norm0 = normDi;
 		}
 
 		// update all degrees of freedom
@@ -241,6 +245,10 @@ bool FEBiphasicSoluteSolver::Quasin()
 		normd  = (m_di*m_di)*(s*s);
 		normD  = m_Di*m_Di;
 		normE1 = s*fabs(m_ui*m_R1);
+
+		m_residuNorm.norm = normR1;
+		m_energyNorm.norm = normR1;
+		m_solutionNorm[0].norm = normd;
 
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	

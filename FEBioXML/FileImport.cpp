@@ -28,14 +28,11 @@ SOFTWARE.*/
 #include "FileImport.h"
 #include <FECore/FENodeDataMap.h>
 #include <FECore/FESurfaceMap.h>
-#include <FECore/FEFunction1D.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
-#include <FECore/FEBodyLoad.h>
-#include <FECore/FEDomainMap.h>
 #include <FECore/FEPointFunction.h>
 #include <FECore/FEGlobalData.h>
 #include <FECore/log.h>
@@ -48,6 +45,15 @@ SOFTWARE.*/
 #ifndef WIN32
 #define strnicmp strncasecmp
 #endif
+
+//-----------------------------------------------------------------------------
+// helper function to see if a string is a number
+bool is_number(const char* sz)
+{
+	char* cend;
+	double tmp = strtod(sz, &cend);
+	return ((cend == nullptr) || (cend[0] == 0));
+}
 
 //-----------------------------------------------------------------------------
 FEObsoleteParamHandler::FEObsoleteParamHandler(XMLTag& tag, FECoreBase* pc) : m_pc(pc) 
@@ -179,7 +185,9 @@ void FEFileSection::SetInvalidTagHandler(FEInvalidTagHandler* ith)
 //-----------------------------------------------------------------------------
 void FEFileSection::value(XMLTag& tag, int& n)
 {
-	n = atoi(tag.szvalue());
+	const char* val = tag.szvalue();
+	if (is_number(val) == false) throw XMLReader::InvalidValue(tag);
+	n = atoi(val);
 }
 
 //-----------------------------------------------------------------------------
@@ -386,15 +394,6 @@ int enumValue(const char* val, const char* szenum)
 		n++;
 	}
 	return -1;
-}
-
-//-----------------------------------------------------------------------------
-// helper function to see if a string is a number
-bool is_number(const char* sz)
-{
-	char* cend;
-	double tmp = strtod(sz, &cend);
-	return ((cend == nullptr) || (cend[0] == 0));
 }
 
 //-----------------------------------------------------------------------------
@@ -988,7 +987,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 						// these maps may not be defined yet.
 						// So, we add them to the FEBioModel, which will process mapped 
 						// parameters after the rest of the file is processed
-						GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue(), i);
+						GetBuilder()->AddMappedParameter(pp, pc, s[i].c_str(), i);
 
 						// assign the valuator to the parameter
 						pi.setValuator(val);

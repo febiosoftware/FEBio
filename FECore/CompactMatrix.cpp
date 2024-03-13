@@ -128,3 +128,15 @@ int CompactMatrix::bandWidth()
 
 	return kmax;
 }
+
+size_t CompactMatrix::actualNonZeroes()
+{
+	size_t NNZ = NonZeroes();
+	size_t nnz = 0;
+	double* v = Values();
+	for (size_t i = 0; i < NNZ; ++i)
+	{
+		if (v[i] != 0.0) nnz++;
+	}
+	return nnz;
+}

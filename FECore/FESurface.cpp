@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "matrix.h"
 #include <FECore/log.h>
+#include "FEModelParam.h"
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
@@ -334,6 +335,10 @@ bool FESurface::Init()
 		}
 	}
 
+    // allocate node normals and evaluate them in initial configuration
+    m_nn.assign(Nodes(), vec3d(0,0,0));
+    UpdateNodeNormals();
+    
 	return true;
 }
 
@@ -1253,6 +1258,44 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s) const
     if (m_bshellb) np = -np;
 	
 	return np;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the node normal. Due to the piecewise continuity
+//! of the surface elements this normal is not uniquely defined so in order to
+//! obtain a unique normal the normal is averaged for each node over all the
+//! element normals at the node
+
+void FESurface::UpdateNodeNormals()
+{
+    const int MN = FEElement::MAX_NODES;
+    vec3d y[MN];
+    
+    // zero nodal normals
+    zero(m_nn);
+    
+    // loop over all elements
+    for (int i=0; i<Elements(); ++i)
+    {
+        FESurfaceElement& el = Element(i);
+        int ne = el.Nodes();
+        
+        // get the nodal coordinates
+        for (int j=0; j<ne; ++j) y[j] = Node(el.m_lnode[j]).m_rt;
+        
+        // calculate the normals
+        for (int j=0; j<ne; ++j)
+        {
+            int jp1 = (j+1)%ne;
+            int jm1 = (j+ne-1)%ne;
+            vec3d n = (y[jp1] - y[j]) ^ (y[jm1] - y[j]);
+            m_nn[el.m_lnode[j]] += n;
+        }
+    }
+    
+    // normalize all vectors
+    const int N = Nodes();
+    for (int i=0; i<N; ++i) m_nn[i].unit();
 }
 
 //-----------------------------------------------------------------------------
@@ -2452,4 +2495,30 @@ void FESurface::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, co
 		// assemble element matrix in global stiffness matrix
 		LS.Assemble(ke);
 	}
+}
+
+//-----------------------------------------------------------------------------
+// project FEParamDouble pd to nodes and store nodal values in vector<double> d
+void FESurface::ProjectToNodes(FEParamDouble& pd, std::vector<double>& d)
+{
+    d.assign(Nodes(), 0.0);
+    std::vector<int> nd(Nodes(),0);
+    for (int i=0; i<Elements(); ++i) {
+        FESurfaceElement& el = Element(i);
+        double ei[FEElement::MAX_INTPOINTS];
+        for (int j=0; j<el.GaussPoints(); ++j) {
+            FEMaterialPoint* pt = el.GetMaterialPoint(j);
+            ei[j] = pd(*pt);
+        }
+        double en[FEElement::MAX_NODES];
+        el.project_to_nodes(ei, en);
+        for (int j=0; j<el.Nodes(); ++j) {
+            d[el.m_lnode[j]] += en[j];
+            ++nd[el.m_lnode[j]];
+        }
+    }
+    
+    // evaluate average
+    for (int i=0; i<Nodes(); ++i)
+        if (nd[i]) d[i] /= nd[i];
 }

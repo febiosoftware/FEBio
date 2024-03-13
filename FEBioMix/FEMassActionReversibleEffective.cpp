@@ -56,11 +56,9 @@ double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
     // start with contribution from solutes
     int nsol = 0;
     nsol = m_psm->Solutes();
-    for (int i = 0; i < nsol; ++i)
-    {
+    for (int i=0; i<nsol; ++i) {
         int vR = m_vR[i];
-        if (vR > 0) 
-        {
+        if (vR > 0) {
             double c = m_psm->GetEffectiveSoluteConcentration(pt, i);
             zhat *= pow(c, vR);
         }
@@ -68,11 +66,10 @@ double FEMassActionReversibleEffective::FwdReactionSupply(FEMaterialPoint& pt)
     
     // add contribution of solid-bound molecules
     const int nsbm = m_psm->SBMs();
-    for (int i = 0; i < nsbm; ++i)
+    for (int i=0; i<nsbm; ++i)
     {
         int vR = m_vR[nsol+i];
-        if (vR > 0) 
-        {
+        if (vR > 0) {
             double c = m_psm->SBMConcentration(pt, i);
             zhat *= pow(c, vR);
         }
@@ -93,11 +90,9 @@ double FEMassActionReversibleEffective::RevReactionSupply(FEMaterialPoint& pt)
     
     // start with contribution from solutes
     int nsol = m_psm->Solutes();
-    for (int i = 0; i < nsol; ++i)
-    {
+    for (int i = 0; i < nsol; ++i) {
         int vP = m_vP[i];
-        if (vP > 0) 
-        {
+        if (vP > 0) {
             double c = m_psm->GetEffectiveSoluteConcentration(pt, i);
             zhat *= pow(c, vP);
         }
@@ -105,12 +100,10 @@ double FEMassActionReversibleEffective::RevReactionSupply(FEMaterialPoint& pt)
     
     // add contribution of solid-bound molecules
     const int nsbm = m_psm->SBMs();
-    for (int i = 0; i < nsbm; ++i)
-    {
+    for (int i = 0; i < nsbm; ++i) {
         int vP = m_vP[nsol+i];
-        if (vP > 0) 
-        {
-            double c = m_psm->SBMReferentialConcentration(pt, i);
+        if (vP > 0) {
+            double c = m_psm->SBMConcentration(pt, i);
             zhat *= pow(c, vP);
         }
     }
@@ -133,7 +126,7 @@ mat3ds FEMassActionReversibleEffective::Tangent_ReactionSupply_Strain(FEMaterial
 {
     // if the reaction supply is insensitive to strain
     if (m_bool_refC)
-        return mat3ds(0.0);
+        return mat3ds(0);
 
     FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
     FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
@@ -148,16 +141,14 @@ mat3ds FEMassActionReversibleEffective::Tangent_ReactionSupply_Strain(FEMaterial
     mat3ds dkFde = m_pFwd->Tangent_ReactionRate_Strain(pt);
     double zhatF = FwdReactionSupply(pt);
     mat3ds dzhatFde = mat3dd(0.0);
-    if (kF > 0.0)
-        dzhatFde = dkFde * (zhatF / kF);
+    if (kF > 0.0) dzhatFde = dkFde*(zhatF/kF);
     
     // reverse reaction
     double kR = m_pRev->ReactionRate(pt);
     mat3ds dkRde = m_pRev->Tangent_ReactionRate_Strain(pt);
     double zhatR = RevReactionSupply(pt);
     mat3ds dzhatRde = mat3dd(0.0);
-    if (kR > 0.0)
-        dzhatRde = dkRde * (zhatR / kR);
+    if (kR > 0) dzhatRde = dkRde*(zhatR/kR);
     
     return dzhatFde - dzhatRde;
 }
@@ -168,26 +159,24 @@ double FEMassActionReversibleEffective::Tangent_ReactionSupply_Pressure(FEMateri
 {
     // if the reaction supply is insensitive to pressure
     if (m_bool_refC)
-        return 0.0;
+        return 0;
 
     // forward reaction
     double kF = m_pFwd->ReactionRate(pt);
     double dzhatFdp = 0.0;
-    if (kF > 0.0) 
-    {
+    if (kF > 0.0) {
         double dkFdp = m_pFwd->Tangent_ReactionRate_Pressure(pt);
         double zhatF = FwdReactionSupply(pt);
-        dzhatFdp = dkFdp * zhatF / kF;
+        dzhatFdp = dkFdp*zhatF/kF;
     }
     
     // reverse reaction
     double kR = m_pRev->ReactionRate(pt);
-    double dzhatRdp = 0.0;
-    if (kR > 0.0) 
-    {
+    double dzhatRdp = 0;
+    if (kR > 0) {
         double dkRdp = m_pRev->Tangent_ReactionRate_Pressure(pt);
         double zhatR = RevReactionSupply(pt);
-        dzhatRdp = dkRdp * zhatR / kR;
+        dzhatRdp = dkRdp*zhatR/kR;
     }
     
     return dzhatFdp - dzhatRdp;
@@ -199,26 +188,25 @@ double FEMassActionReversibleEffective::Tangent_ReactionSupply_Concentration(FEM
 {
     // if the reaction supply is insensitive to concentration
     if (m_bool_refC)
-        return 0.0;
+        return 0;
 
     const int nsol = m_nsol;
     
     // if the derivative is taken with respect to a solid-bound molecule, return 0
-    if (sol >= nsol)
-        return 0.0;
+    if (sol >= nsol) {
+        return 0;
+    }
     
     // forward reaction
     double zhatF = FwdReactionSupply(pt);
-    double dzhatFdc = 0.0;
+    double dzhatFdc = 0;
     double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-    if ((zhatF > 0.0) && (c > 0.0))
-        dzhatFdc = m_vR[sol] * zhatF / c;
+    if ((zhatF > 0) && (c > 0)) dzhatFdc = m_vR[sol]*zhatF/c;
     
     // reverse reaction
     double zhatR = RevReactionSupply(pt);
     double dzhatRdc = 0.0;
-    if ((zhatR > 0.0) && (c > 0.0))
-        dzhatRdc = m_vP[sol] * zhatR / c;
+    if ((zhatR > 0) && (c > 0)) dzhatRdc = m_vP[sol]*zhatR/c;
 
     return dzhatFdc - dzhatRdc;
 }

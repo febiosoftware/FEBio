@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
-#include "NumCore/NumCore.h"
 #include <assert.h>
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/sys.h"
@@ -343,7 +342,7 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
         }
     }
 
-    // make sure the prescribed velocities are fullfilled
+    // make sure the prescribed velocities are fulfilled
     int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
@@ -386,6 +385,61 @@ void FEFluidSolver::UpdateKinematics(vector<double>& ui)
             double aefp = n.get_prev(m_dofAEF);
             double aeft = aefp*cgi + (eft - efp)/(m_gammaf*dt);
             n.set(m_dofAEF, aeft);
+        }
+    }
+
+    // update nonlinear constraints (needed for updating Lagrange Multiplier)
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* nlc = fem.NonlinearConstraint(i);
+        if (nlc->IsActive()) nlc->Update(m_Ui, ui);
+    }
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc->IsActive()) spc->Update(ui);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Update DOF increments
+void FEFluidSolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap)
+{
+    FEModel& fem = *GetFEModel();
+    
+    // get the mesh
+    FEMesh& mesh = fem.GetMesh();
+    
+    // extract the velocity and dilatation increments
+    GetVelocityData(m_vi, ui);
+    GetDilatationData(m_di, ui);
+        
+    // update all degrees of freedom
+    for (int i=0; i<m_neq; ++i) Ui[i] += ui[i];
+        
+    // update velocities
+    for (int i = 0; i<m_nveq; ++i) m_Vi[i] += m_vi[i];
+
+    // update dilatations
+    for (int i = 0; i<m_ndeq; ++i) m_Di[i] += m_di[i];
+
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
+        if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
+    }
+
+    // TODO: This is a hack!
+    // The problem is that I only want to call the domain's IncrementalUpdate during
+    // the quasi-Newtoon loop. However, this function is also called after the loop
+    // converges. The emap parameter is used here to detect wether we are inside the
+    // loop (emap == false), or not (emap == true).
+    if (emap == false)
+    {
+        for (int i = 0; i < mesh.Domains(); ++i)
+        {
+            FEDomain& dom = mesh.Domain(i);
+            dom.IncrementalUpdate(ui, true);
         }
     }
 }
@@ -437,6 +491,22 @@ void FEFluidSolver::Update(vector<double>& ui)
     
     // update model state
 	GetFEModel()->Update();
+}
+
+//-----------------------------------------------------------------------------
+//! Update nonlinear constraints
+void FEFluidSolver::UpdateConstraints()
+{
+    FEModel& fem = *GetFEModel();
+    FETimeInfo& tp = fem.GetTime();
+    tp.currentIteration = m_niter;
+    
+    // Update all nonlinear constraints
+    for (int i = 0; i<fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* pci = fem.NonlinearConstraint(i);
+        if (pci->IsActive()) pci->Update();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -543,7 +613,7 @@ void FEFluidSolver::PrepStep()
         if (pml.IsActive()) pml.Update();
     }
 
-    // intialize material point data
+    // initialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
     //       the material point data is initialized
@@ -599,13 +669,12 @@ bool FEFluidSolver::Quasin()
         // assume we'll converge.
         bconv = true;
         
-		// solve the equations (returns line search; solution stored in m_ui)
-		double s = QNSolve();
+        // solve the equations
+        SolveEquations(m_ui, m_R0);
 
-        // extract the velocity and dilatation increments
-        GetVelocityData(m_vi, m_ui);
-        GetDilatationData(m_di, m_ui);
-            
+        // do the line search
+        double s = DoLineSearch();
+
         // set initial convergence norms
         if (m_niter == 0)
         {
@@ -616,27 +685,28 @@ bool FEFluidSolver::Quasin()
             normEm = normEi;
         }
         
-        // calculate norms
-        // update all degrees of freedom
-        for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
-            
-        // update velocities
-		for (int i = 0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
+        // calculate actual displacement increment
+        // NOTE: We don't apply the line search directly to m_ui since we need the unscaled search direction for the QN update below
+        int neq = (int)m_Ui.size();
+        vector<double> ui(m_ui);
+        for (int i = 0; i<neq; ++i) ui[i] *= s;
 
-        // update dilatations
-		for (int i = 0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
-            
+        // update increments (including Lagrange multipliers)
+        UpdateIncrements(m_Ui, ui, false);
+        
         // calculate the norms
         normR1 = m_R1*m_R1;
-		normv  = (m_vi*m_vi)*(s*s);
+		normv  = m_vi*m_vi;
         normV  = m_Vi*m_Vi;
-        normd  = (m_di*m_di)*(s*s);
+        normd  = m_di*m_di;
         normD  = m_Di*m_Di;
-        normE1 = s*fabs(m_ui*m_R1);
+        normE1 = fabs(ui*m_R1);
         
 		// check for nans
 		if (ISNAN(normR1)) throw NANInResidualDetected();
-        
+        if (ISNAN(normv)) throw NANInSolutionDetected();
+        if (ISNAN(normd)) throw NANInSolutionDetected();
+
         // check residual norm
         if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;
         
@@ -728,7 +798,7 @@ bool FEFluidSolver::Quasin()
     // if converged we update the total velocities
     if (bconv)
     {
-        m_Ut += m_Ui;
+        UpdateIncrements(m_Ut, m_Ui, true);
 		zero(m_Ui);
     }
     
@@ -791,7 +861,7 @@ bool FEFluidSolver::StiffnessMatrix(FELinearSystem& LS)
     
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
-    // constrainst enforced with augmented lagrangian
+    // constraints enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);
     
     return true;

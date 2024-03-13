@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,25 +23,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEDataGenerator.h"
-#include "fecore_type.h"
+#include <FECore/FEInitialCondition.h>
 
-template<class T, class TBase> class FEConstDataGenerator : public TBase
+class FEInitialEffectiveFluidPressure : public FEInitialDOF
 {
 public:
-	FEConstDataGenerator(FEModel* fem) : TBase(fem), m_val(0.0) {}
+	FEInitialEffectiveFluidPressure(FEModel* fem);
+	bool Init() override;
 
-	void value(const vec3d& r, T& d) override { d = m_val; }
+	DECLARE_FECORE_CLASS();
+};
 
-	void BuildParamList() override
-	{
-		TBase::AddParameter(m_val, "value");
-	}
+class FEInitialShellEffectiveFluidPressure : public FEInitialDOF
+{
+public:
+	FEInitialShellEffectiveFluidPressure(FEModel* fem);
+	bool Init() override;
 
-private:
-	T	m_val;
+	DECLARE_FECORE_CLASS();
 };

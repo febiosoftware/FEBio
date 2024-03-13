@@ -77,7 +77,7 @@ void FEFluidFSIModule::InitModel(FEModel* fem)
     dofs.SetDOFName(varV, 1, "vy");
     dofs.SetDOFName(varV, 2, "vz");
 
-    int varQ = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_ROTATION), VAR_VEC3);
+    int varQ = dofs.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::ROTATION), VAR_VEC3);
     dofs.SetDOFName(varQ, 0, "u");
     dofs.SetDOFName(varQ, 1, "v");
     dofs.SetDOFName(varQ, 2, "w");
@@ -146,7 +146,7 @@ void FEMultiphasicFSIModule::InitModel(FEModel* fem)
     dofs.SetDOFName(varV, 1, "vy");
     dofs.SetDOFName(varV, 2, "vz");
 
-    int varQ = dofs.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::SHELL_ROTATION), VAR_VEC3);
+    int varQ = dofs.AddVariable(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::ROTATION), VAR_VEC3);
     dofs.SetDOFName(varQ, 0, "u");
     dofs.SetDOFName(varQ, 1, "v");
     dofs.SetDOFName(varQ, 2, "w");
@@ -275,8 +275,7 @@ void FEPolarFluidModule::InitModel(FEModel* fem)
 }
 
 //=============================================================================
-FEFluidSolutesModule::FEFluidSolutesModule() { SetStatus(EXPERIMENTAL); }
-//FEFluidSolutesModule::FEFluidSolutesModule() { SetStatus(RELEASED); }
+FEFluidSolutesModule::FEFluidSolutesModule() { SetStatus(RELEASED); }
 void FEFluidSolutesModule::InitModel(FEModel* fem)
 {
     // Allocate degrees of freedom

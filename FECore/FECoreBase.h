@@ -107,6 +107,8 @@ public: // interface for getting/setting properties
 
 	//! return a property (class)
 	FEProperty* FindProperty(const char* sz, bool searchChildren = false);
+	FEProperty* FindProperty(const ParamString& prop);
+	FEProperty* FindProperty(FECoreBase* pc);
 
 	//! return a property from a paramstring
 	FECoreBase* GetProperty(const ParamString& prop);

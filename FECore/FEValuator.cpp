@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,35 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEInitialFluidPressure.h"
+#include "stdafx.h"
+#include "FEValuator.h"
+#include "FEModelParam.h"
 
-//=============================================================================
-BEGIN_FECORE_CLASS(FEInitialFluidPressure, FEInitialCondition)
-	ADD_PARAMETER(m_data, "value");
-END_FECORE_CLASS();
+FEValuator::FEValuator(FEModel* fem) : FECoreBase(fem), m_param(nullptr) {}
 
-FEInitialFluidPressure::FEInitialFluidPressure(FEModel* fem) : FEInitialDOF(fem)
+FEValuator::~FEValuator() {}
+
+void FEValuator::SetModelParam(FEModelParam* p) { m_param = p; }
+
+FEModelParam* FEValuator::GetModelParam() { return m_param; }
+
+void FEValuator::Serialize(DumpStream& ar)
 {
-}
-
-bool FEInitialFluidPressure::Init()
-{
-	if (SetDOF("p") == false) return false;
-	return FEInitialDOF::Init();
-}
-
-
-//=============================================================================
-BEGIN_FECORE_CLASS(FEInitialShellFluidPressure, FEInitialCondition)
-	ADD_PARAMETER(m_data, "value");
-END_FECORE_CLASS();
-
-FEInitialShellFluidPressure::FEInitialShellFluidPressure(FEModel* fem) : FEInitialDOF(fem)
-{
-}
-
-bool FEInitialShellFluidPressure::Init()
-{
-	if (SetDOF("q") == false) return false;
-	return FEInitialDOF::Init();
+	FECoreBase::Serialize(ar);
+	if (!ar.IsShallow()) ar& m_param;
 }

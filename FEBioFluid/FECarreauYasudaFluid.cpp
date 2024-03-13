@@ -36,7 +36,7 @@ BEGIN_FECORE_CLASS(FECarreauYasudaFluid, FEViscousFluid)
 	ADD_PARAMETER(m_mui, FE_RANGE_GREATER_OR_EQUAL(0.0), "mui")->setUnits("P.t")->setLongName("infinite shear rate viscosity");
 	ADD_PARAMETER(m_lam, FE_RANGE_GREATER_OR_EQUAL(0.0), "lambda")->setUnits(UNIT_TIME)->setLongName("relaxation time");
 	ADD_PARAMETER(m_n  , FE_RANGE_GREATER_OR_EQUAL(0.0), "n")->setLongName("power index");
-	ADD_PARAMETER(m_a  , FE_RANGE_GREATER_OR_EQUAL(2.0), "a")->setLongName("power denominator");
+    ADD_PARAMETER(m_a  , FE_RANGE_GREATER_OR_EQUAL(0.0), "a")->setLongName("power denominator");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -80,8 +80,8 @@ tens4ds FECarreauYasudaFluid::Tangent_RateOfDeformation(FEMaterialPoint& pt)
     double lamga = pow(m_lam*gdot,m_a);
     
     double mu = m_mui + (m_mu0 - m_mui)*pow(1+lamga, (m_n-1)/m_a);
-    double dmu = 2*(m_mu0 - m_mui)*(m_n-1)*pow(m_lam,m_a)*pow(gdot,m_a-2)
-    *pow(1+lamga, (m_n-m_a-1)/m_a);
+    double dmu = (m_a >= 2) ? 2*(m_mu0 - m_mui)*(m_n-1)*pow(m_lam,m_a)*pow(gdot,m_a-2)
+    *pow(1+lamga, (m_n-m_a-1)/m_a) : 0;
     mat3dd I(1.0);
     tens4ds c = dyad1s(D)*(2*dmu) + dyad4s(I)*(2*mu);
     return c;

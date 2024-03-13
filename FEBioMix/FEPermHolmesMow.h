@@ -38,6 +38,9 @@ class FEBIOMIX_API FEPermHolmesMow :	public FEHydraulicPermeability
 public:
 	//! constructor
 	FEPermHolmesMow(FEModel* pfem);
+
+	//! initialization
+	bool Init() override;
 		
 	//! permeability
 	mat3ds Permeability(FEMaterialPoint& pt) override;

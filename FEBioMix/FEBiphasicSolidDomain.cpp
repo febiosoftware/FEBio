@@ -648,7 +648,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->Permeability(mp);
-        tens4dmm dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
+        tens4dmm dKdE = m_pMat->Tangent_Permeability_Strain(mp);
         
         // evaluate the solvent supply and its derivatives
         double phiwhat = 0;
@@ -803,7 +803,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->Permeability(mp);
-        tens4dmm dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
+        tens4dmm dKdE = m_pMat->Tangent_Permeability_Strain(mp);
         
         // evaluate the solvent supply and its derivatives
         double phiwhat = 0;
@@ -933,16 +933,9 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 
 	// get the nodal data
 	FEMesh& mesh = *m_pMesh;
-	vec3d r0[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 	double pn[FEElement::MAX_NODES];
-	for (int j=0; j<nel_d; ++j)
-	{
-        FENode& node = mesh.Node(el.m_node[j]);
-		r0[j] = node.m_r0;
-		rt[j] = node.m_rt;
-	}
-
+    GetCurrentNodalCoordinates(el, rt, 1.0);
 	for (int j = 0; j<nel_p; ++j)
 	{
 		FENode& node = mesh.Node(el.m_node[j]);
@@ -962,7 +955,6 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		mp.m_r0 = el.Evaluate(r0, n);
 		mp.m_rt = el.Evaluate(rt, n);
 			
 		// get the deformation gradient and determinant
@@ -1104,7 +1096,7 @@ void FEBiphasicSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->Permeability(mp);
-        tens4dmm dKdE = m_pMat->GetPermeability()->Tangent_Permeability_Strain(mp);
+        tens4dmm dKdE = m_pMat->Tangent_Permeability_Strain(mp);
         
         N = el.H(n);
         

@@ -33,9 +33,9 @@ FECORE_API double gammaln(double x);
 // inverse of Gamma function (any x)
 FECORE_API double gammainv(double x);
 
-// incomplete Gamma function P
+// lower incomplete Gamma function P
 FECORE_API double gamma_inc_P(double a, double x);
 
-// complementary incomplete Gamma function Q
+// upper incomplete Gamma function Q
 FECORE_API double gamma_inc_Q(double a, double x);
 
