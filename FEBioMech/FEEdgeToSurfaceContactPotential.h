@@ -29,8 +29,7 @@ SOFTWARE.*/
 #include "FEContactSurface.h"
 #include <set>
 
-//=======================================================================================
-class FEE2SContactPoint : public FELineMaterialPoint
+class FEE2SCPPoint : public FELineMaterialPoint
 {
 public:
 	double	m_gap = 0.0;
@@ -44,20 +43,18 @@ public:
 	}
 };
 
-//=======================================================================================
-class FEEdgeToSurfaceContactSurface : public FESurface
+class FEE2SCPSurface : public FESurface
 {
 public:
-	FEEdgeToSurfaceContactSurface(FEModel* fem);
+	FEE2SCPSurface(FEModel* fem);
 
 	void Update();
 };
 
-//=======================================================================================
-class FEEdgeToSurfaceContactEdge : public FEEdge
+class FEE2SCPEdge : public FEEdge
 {
 public:
-	FEEdgeToSurfaceContactEdge(FEModel* fem);
+	FEE2SCPEdge(FEModel* fem);
 
 	FEMaterialPoint* CreateMaterialPoint() override;
 
@@ -66,11 +63,10 @@ public:
 	bool Create(FESegmentSet& eset) override;
 };
 
-//=======================================================================================
-class FEEdgeToSurfaceContact : public FESurfaceConstraint
+class FEEdgeToSurfaceContactPotential : public FESurfaceConstraint
 {
 public:
-	FEEdgeToSurfaceContact(FEModel* fem);
+	FEEdgeToSurfaceContactPotential(FEModel* fem);
 
 public:
 	//! return the surface
@@ -103,8 +99,8 @@ protected:
 	double PotentialDerive2(double r);
 
 protected:
-	FEEdgeToSurfaceContactEdge	m_edge;
-	FEEdgeToSurfaceContactSurface	m_surf;
+	FEE2SCPEdge	m_edge;
+	FEE2SCPSurface	m_surf;
 
 protected:
 	double	m_kc;

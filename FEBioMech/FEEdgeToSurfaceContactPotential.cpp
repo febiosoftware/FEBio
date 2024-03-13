@@ -24,27 +24,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEEdgeToSurfaceContact.h"
+#include "FEEdgeToSurfaceContactPotential.h"
 #include <FECore/FENode.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEBox.h>
 #include <stdexcept>
 
-vec3d MaterialPointPosition(FESurfaceElement& el, int n)
-{
-	FESurface* surf = dynamic_cast<FESurface*>(el.GetMeshPartition());
-	vec3d r(0, 0, 0);
-	double* H = el.H(n);
-	for (int i = 0; i < el.Nodes(); ++i)
-	{
-		vec3d ri = surf->Node(el.m_lnode[i]).m_rt;
-		r += ri * H[i];
-	}
-	return r;
-}
-
-void FEEdgeToSurfaceContactSurface::Update()
+void FEE2SCPSurface::Update()
 {
 // This assumes we are inside a omp parallel region!
 #pragma omp for
@@ -69,28 +56,28 @@ void FEEdgeToSurfaceContactSurface::Update()
 	}
 }
 
-FEEdgeToSurfaceContactSurface::FEEdgeToSurfaceContactSurface(FEModel* fem) : FESurface(fem)
+FEE2SCPSurface::FEE2SCPSurface(FEModel* fem) : FESurface(fem)
 {
 
 }
 
 //=================================================================================================
-FEEdgeToSurfaceContactEdge::FEEdgeToSurfaceContactEdge(FEModel* fem) : FEEdge(fem)
+FEE2SCPEdge::FEE2SCPEdge(FEModel* fem) : FEEdge(fem)
 {
 
 }
 
-FEMaterialPoint* FEEdgeToSurfaceContactEdge::CreateMaterialPoint()
+FEMaterialPoint* FEE2SCPEdge::CreateMaterialPoint()
 {
-	return new FEE2SContactPoint();
+	return new FEE2SCPPoint();
 }
 
-bool FEEdgeToSurfaceContactEdge::Create(FESegmentSet& eset)
+bool FEE2SCPEdge::Create(FESegmentSet& eset)
 {
 	return FEEdge::Create(eset, FE_LINE2NI);
 }
 
-void FEEdgeToSurfaceContactEdge::Update()
+void FEE2SCPEdge::Update()
 {
 	// This assumes we are inside a omp parallel region!
 #pragma omp for
@@ -106,7 +93,7 @@ void FEEdgeToSurfaceContactEdge::Update()
 
 		for (int n = 0; n < el.GaussPoints(); ++n)
 		{
-			FEE2SContactPoint& mp = static_cast<FEE2SContactPoint&>(*el.GetMaterialPoint(n));
+			FEE2SCPPoint& mp = static_cast<FEE2SCPPoint&>(*el.GetMaterialPoint(n));
 			mp.m_rt = el.eval(rt, n);
 			mp.m_Jt = J;
 			mp.m_gap = 0.0;
@@ -116,7 +103,7 @@ void FEEdgeToSurfaceContactEdge::Update()
 }
 
 //=================================================================================================
-BEGIN_FECORE_CLASS(FEEdgeToSurfaceContact, FESurfaceConstraint)
+BEGIN_FECORE_CLASS(FEEdgeToSurfaceContactPotential, FESurfaceConstraint)
 	ADD_PARAMETER(m_kc, "kc");
 	ADD_PARAMETER(m_p, "p");
 	ADD_PARAMETER(m_Rin, "R_in");
@@ -128,7 +115,7 @@ BEGIN_FECORE_CLASS(FEEdgeToSurfaceContact, FESurfaceConstraint)
 
 END_FECORE_CLASS();
 
-FEEdgeToSurfaceContact::FEEdgeToSurfaceContact(FEModel* fem) : FESurfaceConstraint(fem), m_edge(fem), m_surf(fem)
+FEEdgeToSurfaceContactPotential::FEEdgeToSurfaceContactPotential(FEModel* fem) : FESurfaceConstraint(fem), m_edge(fem), m_surf(fem)
 {
 	m_kc = 0.0;
 	m_p = 4;
@@ -138,7 +125,7 @@ FEEdgeToSurfaceContact::FEEdgeToSurfaceContact(FEModel* fem) : FESurfaceConstrai
 	m_wtol = 0.0;
 }
 
-FESurface* FEEdgeToSurfaceContact::GetSurface()
+FESurface* FEEdgeToSurfaceContactPotential::GetSurface()
 {
 	return &m_surf;
 }
@@ -378,7 +365,7 @@ protected:
 };
 
 // initialization
-bool FEEdgeToSurfaceContact::Init()
+bool FEEdgeToSurfaceContactPotential::Init()
 {
 	if (FESurfaceConstraint::Init() == false) return false;
 
@@ -396,12 +383,14 @@ bool FEEdgeToSurfaceContact::Init()
 			mp.m_r0 = el.Evaluate(r0, n);
 		}
 	}
-	
+
+	m_activeElements.resize(m_edge.Elements());
+
 	return true;
 }
 
 // update
-void FEEdgeToSurfaceContact::Update()
+void FEEdgeToSurfaceContactPotential::Update()
 {
 	FESurfaceConstraint::Update();
 
@@ -426,7 +415,6 @@ void FEEdgeToSurfaceContact::Update()
 	}
 
 	// build the list of active elements
-	m_activeElements.resize(m_edge.Elements());
 //#pragma omp parallel for shared(g) schedule(dynamic)
 	for (int i = 0; i < m_edge.Elements(); ++i)
 	{
@@ -441,7 +429,7 @@ void FEEdgeToSurfaceContact::Update()
 
 		for (int n = 0; n < el1.GaussPoints(); ++n)
 		{
-			FEE2SContactPoint& mp1 = static_cast<FEE2SContactPoint&>(*el1.GetMaterialPoint(n));
+			FEE2SCPPoint& mp1 = static_cast<FEE2SCPPoint&>(*el1.GetMaterialPoint(n));
 			mp1.m_gap = 0.0;
 			vec3d r1 = mp1.m_rt;
 			vec3d R1 = mp1.m_r0;
@@ -506,7 +494,7 @@ void FEEdgeToSurfaceContact::Update()
 }
 
 // Build the matrix profile
-void FEEdgeToSurfaceContact::BuildMatrixProfile(FEGlobalMatrix& M)
+void FEEdgeToSurfaceContactPotential::BuildMatrixProfile(FEGlobalMatrix& M)
 {
 	// connect every element of the edge list to the surface
 	for (int i = 0; i < m_edge.Elements(); ++i)
@@ -539,7 +527,7 @@ void FEEdgeToSurfaceContact::BuildMatrixProfile(FEGlobalMatrix& M)
 	}
 }
 
-double FEEdgeToSurfaceContact::PotentialDerive(double r)
+double FEEdgeToSurfaceContactPotential::PotentialDerive(double r)
 {
 	double f = 0.0;
 	if (r < m_Rin)
@@ -553,7 +541,7 @@ double FEEdgeToSurfaceContact::PotentialDerive(double r)
 	return f;
 }
 
-double FEEdgeToSurfaceContact::PotentialDerive2(double r)
+double FEEdgeToSurfaceContactPotential::PotentialDerive2(double r)
 {
 	double f = 0.0;
 	if (r < m_Rin)
@@ -568,7 +556,7 @@ double FEEdgeToSurfaceContact::PotentialDerive2(double r)
 }
 
 // The LoadVector function evaluates the "forces" that contribute to the residual of the system
-void FEEdgeToSurfaceContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEEdgeToSurfaceContactPotential::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	const int ndof = 3;
 
@@ -579,7 +567,7 @@ void FEEdgeToSurfaceContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		FELineElement& el = m_edge.Element(i);
 		for (int n = 0; n < el.GaussPoints(); ++n)
 		{
-			FEE2SContactPoint& cp = static_cast<FEE2SContactPoint&>(*el.GetMaterialPoint(n));
+			FEE2SCPPoint& cp = static_cast<FEE2SCPPoint&>(*el.GetMaterialPoint(n));
 			cp.m_Ln = 0.0;
 			cp.m_tc = vec3d(0, 0, 0);
 		}
@@ -636,14 +624,14 @@ void FEEdgeToSurfaceContact::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			FELineElement& el = m_edge.Element(i);
 			for (int n = 0; n < el.GaussPoints(); ++n)
 			{
-				FEE2SContactPoint& cp = static_cast<FEE2SContactPoint&>(*el.GetMaterialPoint(n));
+				FEE2SCPPoint& cp = static_cast<FEE2SCPPoint&>(*el.GetMaterialPoint(n));
 				cp.m_Ln = cp.m_tc.norm();
 			}
 		}
 	}
 }
 
-void FEEdgeToSurfaceContact::ElementForce(FELineElement& el1, FESurfaceElement& el2, vector<double>& fe)
+void FEEdgeToSurfaceContactPotential::ElementForce(FELineElement& el1, FESurfaceElement& el2, vector<double>& fe)
 {
 	int na = el1.Nodes();
 	int nb = el2.Nodes();
@@ -653,7 +641,7 @@ void FEEdgeToSurfaceContact::ElementForce(FELineElement& el1, FESurfaceElement& 
 	for (int n = 0; n < el1.GaussPoints(); ++n)
 	{
 		const double* H1 = el1.H(n);
-		FEE2SContactPoint& mp1 = static_cast<FEE2SContactPoint&>(*el1.GetMaterialPoint(n));
+		FEE2SCPPoint& mp1 = static_cast<FEE2SCPPoint&>(*el1.GetMaterialPoint(n));
 		double Jw1 = mp1.m_Jt*w1[n];
 		vec3d r1 = mp1.m_rt;
 
@@ -700,7 +688,7 @@ void FEEdgeToSurfaceContact::ElementForce(FELineElement& el1, FESurfaceElement& 
 }
 
 // Evaluates the contriubtion to the stiffness matrix
-void FEEdgeToSurfaceContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEEdgeToSurfaceContactPotential::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	const int ndof = 3;
 
@@ -748,7 +736,7 @@ void FEEdgeToSurfaceContact::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
 	}
 }
 
-void FEEdgeToSurfaceContact::ElementStiffness(FELineElement& el1, FESurfaceElement& el2, matrix& ke)
+void FEEdgeToSurfaceContactPotential::ElementStiffness(FELineElement& el1, FESurfaceElement& el2, matrix& ke)
 {
 	double* w1 = el1.GaussWeights();
 	double* w2 = el2.GaussWeights();
@@ -759,7 +747,7 @@ void FEEdgeToSurfaceContact::ElementStiffness(FELineElement& el1, FESurfaceEleme
 	for (int n = 0; n < el1.GaussPoints(); ++n)
 	{
 		const double* H1 = el1.H(n);
-		FEE2SContactPoint& mp1 = static_cast<FEE2SContactPoint&>(*el1.GetMaterialPoint(n));
+		FEE2SCPPoint& mp1 = static_cast<FEE2SCPPoint&>(*el1.GetMaterialPoint(n));
 		double Jw1 = mp1.m_Jt*w1[n];
 
 		vec3d r1 = mp1.m_rt;
@@ -831,7 +819,7 @@ void FEEdgeToSurfaceContact::ElementStiffness(FELineElement& el1, FESurfaceEleme
 	ke *= -1.0;
 }
 
-void FEEdgeToSurfaceContact::Serialize(DumpStream& ar)
+void FEEdgeToSurfaceContactPotential::Serialize(DumpStream& ar)
 {
 	FESurfaceConstraint::Serialize(ar);
 	m_edge.Serialize(ar);
