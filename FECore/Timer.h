@@ -23,21 +23,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "fecore_api.h"
-#include "FECoreKernel.h"
-#include <vector>
-#include <string>
-#include <chrono>
 
-using dseconds = std::chrono::duration<double>;
-using dminutes = std::chrono::duration<double, std::ratio<60>>;
-using dhours = std::chrono::duration<double, std::ratio<3600>>;
+class FEModel;
 
-//-----------------------------------------------------------------------------
 //! This class implements a simple timer. 
 
 //! The start function starts the timer, the stop
@@ -46,6 +36,8 @@ using dhours = std::chrono::duration<double, std::ratio<3600>>;
 
 class FECORE_API Timer
 {
+	struct Imp;
+
 public:
 	//! constructor
 	Timer();
@@ -75,17 +67,14 @@ public:
 	double peek();
 
 	//! see if the timer is running
-	bool isRunning() const { return m_brunning; }
+	bool isRunning() const;
 
 public:
 	static void time_str(double fsec, char* sz);
 	static void GetTime(double fsec, int& nhour, int& nmin, int& nsec);
 
 private:
-	void*	m_pimpl;	//!< local timing data (using PIMPL ididom to hide OS specifics)
-
-	bool	m_brunning;	//!< flag indicating whether start was called
-    dseconds m_total; //!< accumulated time so far in seconds
+	Imp*	m;	//!< local timing data (using PIMPL ididom)
 };
 
 //-----------------------------------------------------------------------------
