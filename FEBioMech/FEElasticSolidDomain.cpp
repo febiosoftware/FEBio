@@ -661,8 +661,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 		pt.m_s = (m_secant_stress ? m_pMat->SecantStress(mp) : m_pMat->Stress(mp));
         
         // adjust stress for strain energy conservation
-		// (Apply only for mid-point rule)
-		if (m_alphaf == 0.5)
+        if (m_alphaf == 0.5) 
 		{
 			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
 
@@ -677,10 +676,8 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 
             mat3ds D = pt.RateOfDeformation();
             double D2 = D.dotdot(D);
-			if (D2 > std::numeric_limits<double>::epsilon())
-			{
-				pt.m_s += D * (((pt.m_Wt - pt.m_Wp) / (dt * pt.m_J) - pt.m_s.dotdot(D)) / D2);
-			}
+            if (D2 > 0)
+                pt.m_s += D*(((pt.m_Wt-pt.m_Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
         }
     }
 }
@@ -813,8 +810,7 @@ bool FEElasticSolidDomain::Augment(int naug)
 			L0 = pt.m_Lk;
 			normL0 += L0*L0;
 
-			L1 = L0 + pmi->UJ(pt.m_J, pt.m_J_star);
-			//L1 = L0 + k*pmi->h(pt.m_J, pt.m_J_star);
+			L1 = L0 + k*pmi->h(pt.m_J, pt.m_J_star);
 			normL1 += L1*L1;
 		}
 	}
@@ -851,14 +847,9 @@ bool FEElasticSolidDomain::Augment(int naug)
 				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
-				pt.m_Lk = pt.m_p;
-
-				//printf("----------------------\n");
-				//printf("pt.m_Lk: %f\n",pt.m_Lk * 3.);
-
-				//double hi = pmi->h(pt.m_J, pt.m_J_star);
-				//pt.m_Lk += k*pmi->h(pt.m_J, pt.m_J_star);
-				//pt.m_p = pt.m_Lk*pmi->hp(pt.m_J, pt.m_J_star) + k*log(pt.m_J/pt.m_J_star)/pt.m_J;
+				double hi = pmi->h(pt.m_J, pt.m_J_star);
+				pt.m_Lk += k*pmi->h(pt.m_J, pt.m_J_star);
+				pt.m_p = pt.m_Lk*pmi->hp(pt.m_J, pt.m_J_star) + k*log(pt.m_J/pt.m_J_star)/pt.m_J;
 			}
 		}
 	}
