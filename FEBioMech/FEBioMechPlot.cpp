@@ -888,20 +888,34 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 //=============================================================================
 FEPlotElementMixtureStress::FEPlotElementMixtureStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) 
 {
+	m_mat = -1;
 	m_comp = -1;
 	SetUnits(UNIT_PRESSURE);
 }
 
 bool FEPlotElementMixtureStress::SetFilter(const char* szfilter)
 {
-	sscanf(szfilter, "solid[%d]", &m_comp);
+	if (strncmp(szfilter, "material", 8) == 0)
+	{
+		if (sscanf(szfilter, "material[%d].solid[%d]", &m_mat, &m_comp) != 2) return false;
+	}
+	else
+	{
+		if (sscanf(szfilter, "solid[%d]", &m_comp) != 1) return false;
+	}
 	return true;
 }
 
 bool FEPlotElementMixtureStress::Save(FEDomain& dom, FEDataStream& a)
 {
+	FEMaterial* pm = dom.GetMaterial();
+	if (m_mat != -1)
+	{
+		if (pm != GetFEModel()->GetMaterial(m_mat)) return false;
+	}
+
 	// make sure we start from the elastic component
-	FEElasticMaterial* pmat = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	FEElasticMaterial* pmat = pm->ExtractProperty<FEElasticMaterial>();
 	if (pmat == nullptr) return false;
 
 	// make sure this is a mixture

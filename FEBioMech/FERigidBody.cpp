@@ -165,7 +165,7 @@ bool FERigidBody::Init()
 //! Set the rigid body's center of mass directly
 void FERigidBody::SetCOM(vec3d rc)
 {
-	m_r0 = m_rt = rc;
+	m_r0 = m_rp = m_rt = rc;
 }
 
 //-----------------------------------------------------------------------------
@@ -223,7 +223,7 @@ void FERigidBody::UpdateCOM()
 	if (m_mass != 0) rc /= m_mass;
 
 	// store com
-	m_r0 = m_rt = rc;
+	SetCOM(rc);
 }
 
 //-----------------------------------------------------------------------------

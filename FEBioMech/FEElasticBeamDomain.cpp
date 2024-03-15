@@ -603,6 +603,10 @@ void FEElasticBeamDomain::ElementMassMatrix(FEBeamElement& el, FEElementMatrix& 
 	double h2bi = 1.0 / (h * h * b);
 	double hg = h * g;
 
+	// When evaluating at time 0 (to determine initial accelerations), we need 
+	// to make a minor change. 
+	if (ti.currentTime == 0.0) { h2bi = hg = 1.0; }
+
 	for (int n = 0; n < nint; ++n)
 	{
 		FEElasticBeamMaterialPoint& mp = *(el.GetMaterialPoint(n)->ExtractData<FEElasticBeamMaterialPoint>());
