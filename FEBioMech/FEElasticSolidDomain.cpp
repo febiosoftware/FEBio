@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 #include <FECore/FELinearSystem.h>
 #include "FEResidualVector.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -51,6 +52,11 @@ FEElasticSolidDomain::FEElasticSolidDomain(FEModel* pfem) : FESolidDomain(pfem),
 
 	m_secant_stress = false;
 	m_secant_tangent = false;
+
+	m_blaugon = false;
+	m_augtol = 0.01;
+	m_naugmin = 0;
+	m_naugmax = 0;
 
 	// TODO: Can this be done in Init, since  there is no error checking
 	if (pfem)
@@ -116,6 +122,14 @@ void FEElasticSolidDomain::Activate()
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+bool FEElasticSolidDomain::DoAugmentations() const
+{
+	// make sure the domain material uses an uncoupled formulation
+	if (dynamic_cast<FEUncoupledMaterial*>(m_pMat) == 0) return false;
+	return m_blaugon;
 }
 
 //-----------------------------------------------------------------------------
@@ -765,11 +779,99 @@ void FEElasticSolidDomain::ElementInertialForce(FESolidElement& el, vector<doubl
     }
 }
 
+//! Do augmentation
+bool FEElasticSolidDomain::Augment(int naug)
+{
+	FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_pMat);
+	assert(pmi);
+
+	// make sure Augmented Lagrangian flag is on
+	if (m_blaugon == false) return true;
+
+	// do the augmentation
+	int n;
+	double normL0 = 0, normL1 = 0, L0, L1;
+	double k = pmi->m_K;
+	FEMesh& mesh = *m_pMesh;
+	int NE = Elements();
+
+	for (int iel=0; iel<NE; ++iel)
+	{
+		// get the solid element
+		FESolidElement& el = m_Elem[iel];
+		int nint = el.GaussPoints();
+
+		// loop over the integration points and calculate
+		for (int n=0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+			L0 = pt.m_Lk;
+			normL0 += L0*L0;
+
+			L1 = L0 + pmi->UJ(pt.m_J, pt.m_J_star);
+			//L1 = L0 + k*pmi->h(pt.m_J, pt.m_J_star);
+			normL1 += L1*L1;
+		}
+	}
+
+	normL0 = sqrt(normL0);
+	normL1 = sqrt(normL1);
+
+	// check convergence
+	double pctn = 0;
+	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
+
+	feLog(" material %d\n", pmi->GetID());
+	feLog("                        CURRENT         CHANGE        REQUIRED\n");
+	feLog("   pressure norm : %15le%15le%15le\n", normL1, pctn, m_augtol);
+
+	// check convergence
+	bool bconv = true;
+	if (pctn >= m_augtol) bconv = false;
+	if (m_naugmin > naug) bconv = false;
+	if ((m_naugmax > 0) && (m_naugmax <= naug)) bconv = true;
+
+	// do the augmentation only if we have not yet converged
+	if (bconv == false)
+	{
+		for (int iel=0; iel<NE; ++iel)
+		{
+			// get the solid element
+			FESolidElement& el = m_Elem[iel];
+			int nint = el.GaussPoints();
+
+			// loop over the integration points and calculate
+			for (int n=0; n<nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+				pt.m_Lk = pt.m_p;
+
+				//printf("----------------------\n");
+				//printf("pt.m_Lk: %f\n",pt.m_Lk * 3.);
+
+				//double hi = pmi->h(pt.m_J, pt.m_J_star);
+				//pt.m_Lk += k*pmi->h(pt.m_J, pt.m_J_star);
+				//pt.m_p = pt.m_Lk*pmi->hp(pt.m_J, pt.m_J_star) + k*log(pt.m_J/pt.m_J_star)/pt.m_J;
+			}
+		}
+	}
+
+	return bconv;
+}
+
 
 //=================================================================================================
 
 BEGIN_FECORE_CLASS(FEStandardElasticSolidDomain, FEElasticSolidDomain)
 	ADD_PARAMETER(m_elemType, "elem_type", FE_PARAM_ATTRIBUTE, "$(solid_element)\0");
+	ADD_PARAMETER(m_blaugon, "laugon");
+	ADD_PARAMETER(m_augtol , "atol");
+	ADD_PARAMETER(m_naugmin, "minaug");
+	ADD_PARAMETER(m_naugmax, "maxaug");
 END_FECORE_CLASS();
 
 FEStandardElasticSolidDomain::FEStandardElasticSolidDomain(FEModel* fem) : FEElasticSolidDomain(fem)

@@ -105,17 +105,19 @@ bool VTKPlotFile::Write(float ftime, int flag)
 {
 	FEModel& fem = *GetFEModel();
 
+	/*
 	if (ftime == m_ftime) {
 		m_count++;
 	} else {
 		m_count == 0;
 	}
+	*/
 
 	m_ftime = ftime;
 	
 	std::stringstream ss;
 
-	ss << m_filename << "." << ftime << ".vtk";
+	ss << m_filename << "." << m_count++ << ".vtk";
 
 	string fileName = ss.str();
 	

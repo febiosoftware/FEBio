@@ -47,6 +47,11 @@ public:
 	//! activate
 	void Activate() override;
 
+	//! augmentation
+	bool Augment(int naug) override;
+
+	bool DoAugmentations() const;
+
 	//! initialize elements
 	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
 
@@ -124,6 +129,11 @@ protected:
 
 	bool	m_secant_stress;	//!< use secant approximation to stress
 	bool	m_secant_tangent;   //!< flag for using secant tangent
+
+	bool	m_blaugon;		//!< augmented lagrangian flag
+	double	m_augtol;		//!< augmented lagrangian tolerance
+	int		m_naugmin;		//!< minimum number of augmentations
+	int		m_naugmax;		//!< max number of augmentations
 
 protected:
 	FEDofList	m_dofU;		// displacement dofs

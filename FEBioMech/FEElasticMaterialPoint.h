@@ -101,4 +101,7 @@ public:
     
     // previous time data
     double      m_Wp;       //!< strain energy density
+    
+    // augmented Lagrangian variable
+    double      m_Lk;       //!< strain energy density
 };

@@ -846,6 +846,9 @@ void FESolidSolver2::PrepStep()
 
 		FE3FieldElasticShellDomain* dom3fs = dynamic_cast<FE3FieldElasticShellDomain*>(dom);
 		if (dom3fs && dom3fs->DoAugmentations()) m_baugment = true;
+
+		FEElasticSolidDomain* doms = dynamic_cast<FEElasticSolidDomain*>(dom);
+		if (doms && doms->DoAugmentations()) m_baugment = true;
 	}
 
 	// see if we have to do nonlinear constraint augmentations
