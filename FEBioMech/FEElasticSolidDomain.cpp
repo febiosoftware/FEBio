@@ -810,7 +810,8 @@ bool FEElasticSolidDomain::Augment(int naug)
 			L0 = pt.m_Lk;
 			normL0 += L0*L0;
 
-			L1 = L0 + k*pmi->h(pt.m_J, pt.m_J_star);
+			//L1 = L0 + k*pmi->h(pt.m_J, pt.m_J_star);
+			L1 = pt.m_p;
 			normL1 += L1*L1;
 		}
 	}
@@ -847,9 +848,12 @@ bool FEElasticSolidDomain::Augment(int naug)
 				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
+				//Question: What is hi used for?
 				double hi = pmi->h(pt.m_J, pt.m_J_star);
-				pt.m_Lk += k*pmi->h(pt.m_J, pt.m_J_star);
-				pt.m_p = pt.m_Lk*pmi->hp(pt.m_J, pt.m_J_star) + k*log(pt.m_J/pt.m_J_star)/pt.m_J;
+				//pt.m_Lk += k*pmi->h(pt.m_J, pt.m_J_star);
+				pt.m_Lk = pt.m_p;
+				//Question: Why reassign m_p here, doesn't it get overwritten?
+				//pt.m_p = pt.m_Lk*pmi->hp(pt.m_J, pt.m_J_star) + k*log(pt.m_J/pt.m_J_star)/pt.m_J;
 			}
 		}
 	}
