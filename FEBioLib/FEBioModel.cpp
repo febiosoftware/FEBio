@@ -1541,16 +1541,6 @@ bool FEBioModel::Init()
 	FEBioPlotFile* pplt = nullptr;
 	m_lastUpdate = -1;
 
-	// open plot database file
-	FEAnalysis* step = GetCurrentStep();
-	if (step->GetPlotLevel() != FE_PLOT_NEVER)
-	{
-		if (m_plot == nullptr)
-		{
-			if (InitPlotFile() == false) { feLogError("Failed to initialize plot file."); return false; }
-		}
-	}
-
 	// see if a valid dump file name is defined.
 	const std::string& sdmp = GetDumpFileName();
 	if (sdmp.empty())
@@ -1576,6 +1566,16 @@ bool FEBioModel::Init()
 	{
 		feLogError("Model initialization failed");
 		return false;
+	}
+
+	// open plot database file
+	FEAnalysis* step = GetCurrentStep();
+	if (step->GetPlotLevel() != FE_PLOT_NEVER)
+	{
+		if (m_plot == nullptr)
+		{
+			if (InitPlotFile() == false) { feLogError("Failed to initialize plot file."); return false; }
+		}
 	}
 
 	// Alright, all initialization is done, so let's get busy !
