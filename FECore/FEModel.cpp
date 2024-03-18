@@ -1892,7 +1892,14 @@ DOFS& FEModel::GetDOFS()
 //-----------------------------------------------------------------------------
 int FEModel::GetDOFIndex(const char* sz) const
 {
-	return m_imp->m_dofs.GetDOF(sz);
+	int n = m_imp->m_dofs.GetDOF(sz);
+	if (n < 0)
+	{
+		// NOTE: This is a hack so that concentration variables can
+		// also be referenced by the solute name
+		n = FindGlobalDataIndex(sz);
+	}
+	return n;
 }
 
 //-----------------------------------------------------------------------------
@@ -2034,7 +2041,7 @@ FEGlobalData* FEModel::FindGlobalData(const char* szname)
 }
 
 //-----------------------------------------------------------------------------
-int FEModel::FindGlobalDataIndex(const char* szname)
+int FEModel::FindGlobalDataIndex(const char* szname) const
 {
 	for (int i = 0; i < m_imp->m_GD.size(); ++i)
 	{
