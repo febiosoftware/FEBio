@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FE3FieldElasticShellDomain.h"
 #include "FEUncoupledMaterial.h"
 #include <FECore/FEModel.h>
