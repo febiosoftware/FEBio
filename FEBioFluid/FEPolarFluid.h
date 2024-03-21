@@ -26,7 +26,7 @@
 
 
 #pragma once
-#include "FEFluidMaterial.h"
+#include "FEPolarFluidMaterial.h"
 #include "FEFluidMaterialPoint.h"
 #include "FEElasticFluid.h"
 #include "FEPolarFluidMaterialPoint.h"
@@ -39,7 +39,7 @@
 //!       which is used in FEReactionRateExpSED and FEReactionRateHuiskes.
 //!       Note sure yet if there is a better alternative.
 
-class FEBIOFLUID_API FEPolarFluid : public FEFluidMaterial, public FEBiphasicInterface
+class FEBIOFLUID_API FEPolarFluid : public FEPolarFluidMaterial, public FEBiphasicInterface
 {
 public:
     FEPolarFluid(FEModel* pfem);

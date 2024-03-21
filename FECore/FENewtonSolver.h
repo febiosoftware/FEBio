@@ -209,6 +209,11 @@ public:
 	//! Update the model
 	virtual void UpdateModel();
 
+public:
+	ConvergenceInfo GetResidualConvergence() { return m_residuNorm; }
+	ConvergenceInfo GetEnergyConvergence() { return m_energyNorm; }
+	ConvergenceInfo GetSolutionConvergence(int n) { return m_solutionNorm[n]; }
+
 protected:
 	bool AllocateLinearSystem();
 
@@ -257,7 +262,7 @@ public:
 private:
 	double	m_ls;	//!< line search factor calculated in last call to QNSolve
 
-private:
+protected:
 	ConvergenceInfo			m_residuNorm;	// residual convergence info
 	ConvergenceInfo			m_energyNorm;	// energy convergence info
 	vector<ConvergenceInfo>	m_solutionNorm;	// converge info for solution variables

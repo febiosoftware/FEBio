@@ -63,6 +63,7 @@ void FEPlotVariable::Serialize(DumpStream& ar)
 //=======================================================================================
 FEPlotDataStore::FEPlotDataStore()
 {
+	m_splot_type = "febio";
     m_plot.clear();
     m_nplot_compression = 0;
 }
@@ -106,6 +107,11 @@ void FEPlotDataStore::SetPlotCompression(int n)
 void FEPlotDataStore::SetPlotFileType(const std::string& fileType)
 {
     m_splot_type = fileType;
+}
+
+std::string FEPlotDataStore::GetPlotFileType()
+{
+	return m_splot_type;
 }
 
 void FEPlotDataStore::Serialize(DumpStream& ar)

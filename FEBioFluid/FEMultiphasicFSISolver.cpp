@@ -43,7 +43,6 @@
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
-#include "NumCore/NumCore.h"
 #include <assert.h>
 #include "FECore/FEGlobalMatrix.h"
 #include "FECore/sys.h"
@@ -311,7 +310,7 @@ bool FEMultiphasicFSISolver::InitEquations()
     
     if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
     {
-        // merge the second and third parition
+        // merge the second and third partition
         if (m_part.size() == 3)
         {
             vector<int> newPart(2);
@@ -615,7 +614,7 @@ void FEMultiphasicFSISolver::UpdateKinematics(vector<double>& ui)
         }
     }
     
-    // make sure the prescribed BCs are fullfilled
+    // make sure the prescribed BCs are fulfilled
     int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
@@ -1342,7 +1341,7 @@ bool FEMultiphasicFSISolver::StiffnessMatrix()
     
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
-    // constrainst enforced with augmented lagrangian
+    // constraints enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);
     
     // calculate the stiffness contributions for the rigid forces

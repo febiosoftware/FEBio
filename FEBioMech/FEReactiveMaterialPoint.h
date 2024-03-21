@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2023 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,21 +27,22 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEDataGenerator.h"
-#include "fecore_type.h"
+#include <FECore/FEMaterialPoint.h>
+#include "febiomech_api.h"
 
-template<class T, class TBase> class FEConstDataGenerator : public TBase
+#ifdef WIN32
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
+//-----------------------------------------------------------------------------
+// Define a reactive material point that defines various virtual functions.
+class FEBIOMECH_API FEReactiveMaterialPoint : public FEMaterialPointData
 {
 public:
-	FEConstDataGenerator(FEModel* fem) : TBase(fem), m_val(0.0) {}
-
-	void value(const vec3d& r, T& d) override { d = m_val; }
-
-	void BuildParamList() override
-	{
-		TBase::AddParameter(m_val, "value");
-	}
-
-private:
-	T	m_val;
+    FEReactiveMaterialPoint(FEMaterialPointData*pt) : FEMaterialPointData(pt) {}
+    
+    virtual double BrokenBonds() const { return 0.0; }
+    virtual double IntactBonds() const { return 1.0; }
+    virtual double YieldedBonds() const { return 0.0; }
+    virtual double FatigueBonds() const { return 0.0; }
 };

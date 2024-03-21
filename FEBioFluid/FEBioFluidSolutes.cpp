@@ -37,14 +37,10 @@ SOFTWARE.*/
 #include "FEInitialFluidSolutesPressure.h"
 #include "FEFluidSolutesFlux.h"
 #include "FEFluidSolutesNaturalFlux.h"
-#include "FEFluidSolutesPressure.h"
 #include "FEFluidSolutesPressureBC.h"
 #include "FEFluidSolutesResistanceBC.h"
 #include "FEFluidSolutesRCRBC.h"
 #include "FESoluteConvectiveFlow.h"
-#include "FEFluidSolutesPressureLC.h"
-#include "FEFluidSolutesGradientLC.h"
-#include "FEFluidSolutesDomainFactory.h"
 #include "FESolutesSolver.h"
 #include "FESolutesMaterial.h"
 #include "FESolutesDomain.h"
@@ -90,7 +86,7 @@ void FEBioFluidSolutes::InitModule()
     febio.AddModuleDependency("multiphasic"); // also pulls in solid, biphasic, solutes
     
     //-----------------------------------------------------------------------------
-    // analyis classes (default type must match module name!)
+    // analysis classes (default type must match module name!)
     REGISTER_FECORE_CLASS(FEFluidSolutesAnalysis, "fluid-solutes");
 
 	// monolithic fluid-solutes solver
@@ -102,7 +98,6 @@ void FEBioFluidSolutes::InitModule()
     REGISTER_FECORE_CLASS(FEFluidSolutesFlux           , "solute flux"                  );
     REGISTER_FECORE_CLASS(FESoluteBackflowStabilization, "solute backflow stabilization");
     REGISTER_FECORE_CLASS(FEFluidSolutesNaturalFlux    , "solute natural flux"          , FECORE_EXPERIMENTAL);
-    REGISTER_FECORE_CLASS(FEFluidSolutesPressure       , "fluid pressure"               , 0x0300); // deprecated, use BC version
     REGISTER_FECORE_CLASS(FESoluteConvectiveFlow       , "solute convective flow"       , FECORE_EXPERIMENTAL);
 
     // bcs
@@ -111,12 +106,8 @@ void FEBioFluidSolutes::InitModule()
     REGISTER_FECORE_CLASS(FEFluidSolutesRCRBC          , "fluid RCR"       );
 
     // ics
-    REGISTER_FECORE_CLASS(FEInitialFluidSolutesPressure, "initial fluid pressure");
+//    REGISTER_FECORE_CLASS(FEInitialFluidSolutesPressure, "initial fluid pressure");
 
-    // constraints
-    REGISTER_FECORE_CLASS(FEFluidSolutesPressureLC     , "fluid pressure constraint"  , FECORE_EXPERIMENTAL);
-    REGISTER_FECORE_CLASS(FEFluidSolutesGradientLC     , "zero concentration gradient", FECORE_EXPERIMENTAL);
-    
     //-----------------------------------------------------------------------------
     // classes derived from FEPlotData
     REGISTER_FECORE_CLASS(FEPlotFluidRelativePecletNumber, "solute relative Peclet number");

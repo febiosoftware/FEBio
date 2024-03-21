@@ -812,7 +812,7 @@ bool FENewtonSolver::QNInit()
 	GetFEModel()->DoCallback(CB_MATRIX_REFORM);
 
 	return true;
-}
+}	
 
 //-----------------------------------------------------------------------------
 //! solve the equations
@@ -943,6 +943,8 @@ bool FENewtonSolver::QNUpdate()
 
 	// copy last calculated residual
 	m_R0 = m_R1;
+
+	if (breform && m_bdoreforms) GetFEModel()->DoCallback(CB_MATRIX_REFORM);
 
 	return true;
 }

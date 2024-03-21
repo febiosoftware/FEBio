@@ -976,11 +976,38 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Damage reduction factor
+//! Damage (fraction of broken bonds))
 class FELogDamage : public FELogElemData
 {
 public:
     FELogDamage(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Fraction of intact bonds
+class FELogIntactBonds : public FELogElemData
+{
+public:
+    FELogIntactBonds(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Fraction of fatigued bonds
+class FELogFatigueBonds : public FELogElemData
+{
+public:
+    FELogFatigueBonds(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+//! Fraction of yielded bonds
+class FELogYieldedBonds : public FELogElemData
+{
+public:
+    FELogYieldedBonds(FEModel* pfem) : FELogElemData(pfem){}
     double value(FEElement& el);
 };
 
@@ -1314,6 +1341,30 @@ class FELogRigidBodyR33 : public FELogObjectData
 {
 public:
 	FELogRigidBodyR33(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyEulerX : public FELogObjectData
+{
+public:
+	FELogRigidBodyEulerX(FEModel* pfem) : FELogObjectData(pfem) {}
+	double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyEulerY : public FELogObjectData
+{
+public:
+	FELogRigidBodyEulerY(FEModel* pfem) : FELogObjectData(pfem) {}
+	double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyEulerZ : public FELogObjectData
+{
+public:
+	FELogRigidBodyEulerZ(FEModel* pfem) : FELogObjectData(pfem) {}
 	double value(FERigidBody& rb) override;
 };
 

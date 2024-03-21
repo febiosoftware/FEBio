@@ -63,23 +63,24 @@ bool FEDeformationMapGenerator::Init()
 }
 
 // generate the data array for the given element set
-bool FEDeformationMapGenerator::Generate(FEDomainMap& map)
+FEDataMap* FEDeformationMapGenerator::Generate()
 {
-	const FEElementSet& set = *map.GetElementSet();
+	FEElementSet& set = *GetElementSet();
+
+	FEDomainMap* map = new FEDomainMap(FE_MAT3D, FMT_MATPOINTS);
+	if (map->Create(&set) == false)
+	{
+		assert(false);
+		return nullptr;
+	}
 
 	FEMesh& mesh = *set.GetMesh();
-
-	FEDataType dataType = map.DataType();
-	if (dataType != FE_MAT3D) return false;
-
-	int storageFormat = map.StorageFormat();
-	if (storageFormat != FMT_MATPOINTS) return false;
 
 	int N = set.Elements();
 	for (int i = 0; i < N; ++i)
 	{
 		FESolidElement* pel = dynamic_cast<FESolidElement*>(mesh.FindElementFromID(set[i]));
-		if (pel == nullptr) return false;
+		if (pel == nullptr) return nullptr;
 		FESolidElement& el = *pel;
 
 		int ne = el.Nodes();
@@ -95,10 +96,10 @@ bool FEDeformationMapGenerator::Generate(FEDomainMap& map)
 		{
 			mat3d F;
 			defgrad(el, X, u, F, j);
-			map.setValue(i, j, F);
+			map->setValue(i, j, F);
 		}
 	}
-	return true;
+	return map;
 }
 
 double invjac0(FESolidElement &el, std::vector<vec3d>& r0, double Ji[3][3], int n)

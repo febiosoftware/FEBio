@@ -37,6 +37,18 @@ using namespace std;
 
 
 //-----------------------------------------------------------------------------
+FESolutesMaterialPoint::FESolutesMaterialPoint(FEMaterialPointData* ppt) : FEMaterialPointData(ppt) 
+{
+	m_nsol = 0;
+	m_psi  = 0;
+	m_cF   = 0;
+	m_nsbm = 0;
+	m_rhor = 0;
+	m_strain = 0;
+	m_pe = m_pi = 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Create a shallow copy of the material point data
 FEMaterialPointData* FESolutesMaterialPoint::Copy()
 {
@@ -92,16 +104,17 @@ void FESolutesMaterialPoint::Init()
 void FESolutesMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPointData::Serialize(ar);
-	ar & m_nsol & m_psi & m_cF & m_Ie & m_nsbm;
-	ar & m_c & m_gradc & m_j & m_ca & m_crp & m_k & m_dkdJ;
-	ar & m_dkdc;
-	ar & m_sbmr & m_sbmrp & m_sbmrhat & m_sbmrhatp;
+	ar & m_nsol & m_psi & m_cF & m_Ie & m_nsbm & m_rhor;
+	ar & m_c & m_gradc & m_j & m_ca & m_crp & m_k & m_dkdJ & m_dkdJJ;
+	ar & m_dkdc & m_dkdJc & m_dkdcc;
+	ar & m_dkdr & m_dkdJr & m_dkdrc;
+	ar & m_sbmr & m_sbmrp & m_sbmrhat & m_sbmrhatp & m_sbmrmin& m_sbmrmax;
 	ar & m_cri;
 	ar & m_crd;
 	ar & m_strain & m_pe & m_pi;
 	ar & m_ce & m_ide;
 	ar & m_ci & m_idi;
-    ar & m_bsb;
+	ar & m_bsb;
 }
 
 //-----------------------------------------------------------------------------

@@ -109,6 +109,17 @@ vec3d FEMathValueVec3::operator()(const FEMaterialPoint& pt)
 	return vec3d(vx, vy, vz);
 }
 
+void FEMathValueVec3::Serialize(DumpStream& ar)
+{
+	FEVec3dValuator::Serialize(ar);
+	if (ar.IsShallow()) return;
+
+	if (ar.IsLoading())
+	{
+		Init();
+	}
+}
+
 //---------------------------------------------------------------------------------------
 FEVec3dValuator* FEMathValueVec3::copy()
 {
@@ -280,15 +291,18 @@ vec3d FECylindricalVectorGenerator::operator () (const FEMaterialPoint& mp)
 	vec3d p = mp.m_r0 - m_center;
 
 	// find the vector to the axis
-	vec3d b = p - m_axis * (m_axis*p);
+	vec3d a = m_axis; a.unit();
+	vec3d b = p - a * (a*p);
 	b.unit();
 
 	// setup the rotation
 	vec3d e1(1, 0, 0);
+	quatd qz(vec3d(0, 0, 1), a);
+	qz.RotateVector(e1);
 	quatd q(e1, b);
 
 	vec3d r = m_vector;
-	//	r.unit();	
+	r.unit();	
 	q.RotateVector(r);
 
 	return r;

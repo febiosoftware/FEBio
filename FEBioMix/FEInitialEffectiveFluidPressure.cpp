@@ -23,18 +23,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEInitialMixtureFluidPressure.h"
+#include "FEInitialEffectiveFluidPressure.h"
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEInitialMixtureFluidPressure, FEInitialCondition)
+BEGIN_FECORE_CLASS(FEInitialEffectiveFluidPressure, FEInitialCondition)
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FEInitialMixtureFluidPressure::FEInitialMixtureFluidPressure(FEModel* fem) : FEInitialDOF(fem)
+FEInitialEffectiveFluidPressure::FEInitialEffectiveFluidPressure(FEModel* fem) : FEInitialDOF(fem)
 {
 }
 
-bool FEInitialMixtureFluidPressure::Init()
+bool FEInitialEffectiveFluidPressure::Init()
 {
 	if (SetDOF("p") == false) return false;
 	return FEInitialDOF::Init();
@@ -42,15 +42,15 @@ bool FEInitialMixtureFluidPressure::Init()
 
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEInitialShellMixtureFluidPressure, FEInitialCondition)
+BEGIN_FECORE_CLASS(FEInitialShellEffectiveFluidPressure, FEInitialCondition)
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FEInitialShellMixtureFluidPressure::FEInitialShellMixtureFluidPressure(FEModel* fem) : FEInitialDOF(fem)
+FEInitialShellEffectiveFluidPressure::FEInitialShellEffectiveFluidPressure(FEModel* fem) : FEInitialDOF(fem)
 {
 }
 
-bool FEInitialShellMixtureFluidPressure::Init()
+bool FEInitialShellEffectiveFluidPressure::Init()
 {
 	if (SetDOF("q") == false) return false;
 	return FEInitialDOF::Init();

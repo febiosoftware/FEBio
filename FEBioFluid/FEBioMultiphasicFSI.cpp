@@ -53,7 +53,7 @@ const char* FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::MULTIPHASI
     {
         case DISPLACEMENT                : return "displacement"               ; break;
         case VELOCITY                    : return "velocity"                   ; break;
-        case SHELL_ROTATION              : return "shell rotation"             ; break;
+        case ROTATION                    : return "rotation"                   ; break;
         case SHELL_DISPLACEMENT          : return "shell displacement"         ; break;
         case SHELL_VELOCITY              : return "shell velocity"             ; break;
         case SHELL_ACCELERATION          : return "shell acceleration"         ; break;
@@ -84,7 +84,7 @@ void FEBioMultiphasicFSI::InitModule()
     febio.AddModuleDependency("multiphasic");    // also pulls in solid, biphasic, solutes
     
     //-----------------------------------------------------------------------------
-    // analyis classes (default type must match module name!)
+    // analysis classes (default type must match module name!)
     REGISTER_FECORE_CLASS(FEMultiphasicFSIAnalysis, "multiphasic-FSI");
 
     //-----------------------------------------------------------------------------

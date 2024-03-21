@@ -87,6 +87,11 @@ BEGIN_FECORE_CLASS(FELinearSpring, FESpringMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 END_FECORE_CLASS();
 
+FELinearSpring::FELinearSpring(FEModel* pfem) : FESpringMaterial(pfem) 
+{
+	m_E = 1.0;
+}
+
 double FELinearSpring::force(double dl)
 {
 	return m_E*dl;

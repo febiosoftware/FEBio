@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEIdealGasIsothermal, FEFluid)
-	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    );
+	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    )->setUnits(UNIT_MOLAR_MASS)->setLongName("molar mass");
 END_FECORE_CLASS();
 
 //============================================================================

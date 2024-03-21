@@ -54,6 +54,21 @@ bool XMLAtt::operator != (const char* szval)
 	return (strcmp(szval, m_val.c_str()) != 0); 
 }
 
+int XMLAtt::value(int* v, int n)
+{
+	const char* sz = m_val.c_str();
+	int nr = 0;
+	for (int i = 0; i < n; ++i)
+	{
+		const char* sze = strchr(sz, ',');
+		v[i] = atoi(sz);
+		nr++;
+		if (sze) sz = sze + 1;
+		else break;
+	}
+	return nr;
+}
+
 int XMLAtt::value(double* pf, int n)
 {
 	const char* sz = m_val.c_str();
@@ -222,6 +237,32 @@ int XMLTag::value(std::vector<string>& stringList, int n)
 }
 
 //-----------------------------------------------------------------------------
+void XMLTag::value(std::vector<string>& stringList)
+{
+	stringList.clear();
+
+	char tmp[256] = { 0 };
+
+	const char* sz = m_szval.c_str();
+	while (sz && *sz)
+	{
+		const char* sze = strchr(sz, ',');
+		if (sze)
+		{
+			int l = (int)(sze - sz);
+			if (l > 0) strncpy(tmp, sz, l);
+			tmp[l] = 0;
+
+			stringList.push_back(tmp);
+		}
+		else stringList.push_back(sz);
+
+		if (sze) sz = sze + 1;
+		else break;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void XMLTag::value(bool& val)
 { 
 	int n=0; 
@@ -326,7 +367,7 @@ void XMLTag::value(vector<double>& l)
 	while (sz && *sz)
 	{
 		// skip space
-		while (*sz == ' ') ++sz;
+		while (isspace(*sz)) ++sz;
 
 		// read the value
 		if (sz && *sz)
@@ -348,7 +389,7 @@ void XMLTag::value2(std::vector<int>& l)
 	while (sz && *sz)
 	{
 		// skip space
-		while (*sz == ' ') ++sz;
+		while (isspace(*sz)) ++sz;
 
 		// read the value
 		if (sz && *sz)
@@ -823,21 +864,14 @@ void XMLReader::NextTag(XMLTag& tag)
 	// read the start tag
 	ReadTag(tag);
 
-	try
+	// read value and end tag if tag is not empty
+	if (!tag.isempty() && !tag.isend())
 	{
-		// read value and end tag if tag is not empty
-		if (!tag.isempty())
-		{
-			// read the value
-			ReadValue(tag);
+		// read the value
+		ReadValue(tag);
 
-			// read the end tag
-			ReadEndTag(tag);
-		}
-	}
-	catch (EndOfFile)
-	{
-		if (!tag.isend()) throw UnexpectedEOF();
+		// read the end tag
+		ReadEndTag(tag);
 	}
 
 	// store current line number
@@ -1065,7 +1099,7 @@ char XMLReader::readNextChar()
 	{
 		if (m_eof) 
         {
-            throw EndOfFile();
+            throw UnexpectedEOF();
         }
 
         m_stream->read(m_buf, BUF_SIZE);

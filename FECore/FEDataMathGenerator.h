@@ -45,12 +45,7 @@ public:
 	// set the math expression
 	void setExpression(const std::string& math);
 
-	using FENodeDataGenerator::Generate; // from base class
-	FENodeDataMap* Generate() override;
-
-private:
-	void value(const vec3d& r, double& data) override;
-	void value(const vec3d& r, vec3d& data) override;
+	FEDataMap* Generate() override;
 
 private:
 	std::string			m_math;

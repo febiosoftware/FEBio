@@ -152,6 +152,37 @@ bool FESolidDomain::Init()
 // Reset data
 void FESolidDomain::Reset()
 {
+	// re-evaluate the material points initial position and jacobian
+	ForEachSolidElement([=](FESolidElement& el) {
+
+		// evaluate nodal coordinates
+		const int NELN = FEElement::MAX_NODES;
+		vec3d r0[NELN], r[NELN], v[NELN], a[NELN];
+		int neln = el.Nodes();
+		for (int j = 0; j < neln; ++j)
+		{
+			FENode& node = m_pMesh->Node(el.m_node[j]);
+			r0[j] = node.m_r0;
+		}
+
+		// initialize reference Jacobians
+		double Ji[3][3];
+
+		// loop over the integration points
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			// initial Jacobian
+			mp.m_J0 = invjac0(el, Ji, n);
+			el.m_J0i[n] = mat3d(Ji);
+
+			// material point coordinates
+			mp.m_r0 = el.Evaluate(r0, n);
+		}
+	});
+
 	ForEachMaterialPoint([](FEMaterialPoint& mp) {
 		mp.Init();
 	});
@@ -2602,6 +2633,8 @@ void FESolidDomain::LoadVector(
 //-----------------------------------------------------------------------------
 void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a, const FEDofList& dofList_b, FEVolumeMatrixIntegrand f)
 {
+#pragma omp parallel shared(f)
+	{
 	FEElementMatrix ke;
 
 	int dofPerNode_a = dofList_a.Size();
@@ -2613,7 +2646,8 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 	matrix kab(dofPerNode_a, dofPerNode_b);
 
 	int NE = Elements();
-	for (int m = 0; m<NE; ++m)
+	#pragma omp for nowait
+	for (int m = 0; m < NE; ++m)
 	{
 		// get the element
 		FESolidElement& el = Element(m);
@@ -2635,7 +2669,7 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 
 		// repeat over integration points
 		ke.zero();
-		for (int n = 0; n<nint; ++n)
+		for (int n = 0; n < nint; ++n)
 		{
 			FEMaterialPoint& pt = *el.GetMaterialPoint(n);
 
@@ -2643,8 +2677,8 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 			pt.m_shape = el.H(n);
 
 			// calculate stiffness component
-			for (int i = 0; i<neln; ++i)
-				for (int j = 0; j<neln; ++j)
+			for (int i = 0; i < neln; ++i)
+				for (int j = 0; j < neln; ++j)
 				{
 					// evaluate integrand
 					kab.zero();
@@ -2664,13 +2698,14 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 			std::vector<int>& ID = node.m_ID;
 
 			for (int k = 0; k < dofPerNode_a; ++k)
-				lma[dofPerNode_a*j + k] = ID[dofList_a[k]];
+				lma[dofPerNode_a * j + k] = ID[dofList_a[k]];
 
 			for (int k = 0; k < dofPerNode_b; ++k)
-				lmb[dofPerNode_b*j + k] = ID[dofList_b[k]];
+				lmb[dofPerNode_b * j + k] = ID[dofList_b[k]];
 		}
 
 		// assemble element matrix in global stiffness matrix
 		LS.Assemble(ke);
 	}
+	} // omp parallel
 }

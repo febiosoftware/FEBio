@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FEElasticShellDomain.h"
 #include "FEElasticMaterial.h"
 #include "FEBodyForce.h"
@@ -52,7 +53,7 @@ FEElasticShellDomain::FEElasticShellDomain(FEModel* pfem) : FESSIShellDomain(pfe
     // TODO: Can this be done in Init, since there is no error checking
     if (pfem)
     {
-        m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCTIY));
+        m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
         m_dofSV.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY));
         m_dofSA.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_ACCELERATION));
         m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
@@ -886,7 +887,7 @@ void FEElasticShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 
             mat3ds D = pt.m_L.sym();
             double D2 = D.dotdot(D);
-            if (D2 > 0)
+            if (D2 > std::numeric_limits<double>::epsilon())
                 pt.m_s += D*(((pt.m_Wt-pt.m_Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
         }
     }

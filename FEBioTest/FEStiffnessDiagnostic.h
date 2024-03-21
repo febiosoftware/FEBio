@@ -41,4 +41,8 @@ public:
 
 protected:
 	void deriv_residual(matrix& ke);
+
+private:
+	FILE*	m_fp;
+	bool	m_writeMatrix;
 };

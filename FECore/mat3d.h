@@ -466,6 +466,9 @@ public:
 	// calculate the skew-symmetric matrix from a vector
 	void skew(const vec3d& v);
 
+	// calculate the exponential map
+	void exp(const vec3d& v);
+
 	// calculate the one-norm
 	double norm() const;
 
@@ -679,8 +682,18 @@ public:
 	}
 
 	float* operator [] (int i) { return d[i]; }
+	const float* operator [] (int i) const { return d[i]; }
+
 	float& operator () (int i, int j) { return d[i][j]; }
 	float operator () (int i, int j) const { return d[i][j]; }
+
+	mat3f operator * (float a) const
+	{
+		return mat3f(\
+			d[0][0] * a, d[0][1] * a, d[0][2] * a, \
+			d[1][0] * a, d[1][1] * a, d[1][2] * a, \
+			d[2][0] * a, d[2][1] * a, d[2][2] * a);
+	}
 
 	mat3f operator * (mat3f& m)
 	{
@@ -720,6 +733,22 @@ public:
 		d[1][0] /= g;	d[1][1] /= g; d[1][2] /= g;
 		d[2][0] /= g;	d[2][1] /= g; d[2][2] /= g;
 		return (*this);
+	}
+
+	mat3f operator + (const mat3f& a) const
+	{
+		return mat3f( \
+			d[0][0] + a.d[0][0], d[0][1] + a.d[0][1], d[0][2] + a.d[0][2], \
+			d[1][0] + a.d[1][0], d[1][1] + a.d[1][1], d[1][2] + a.d[1][2], \
+			d[2][0] + a.d[2][0], d[2][1] + a.d[2][1], d[2][2] + a.d[2][2]);
+	}
+
+	mat3f operator - (const mat3f& a) const
+	{
+		return mat3f(\
+			d[0][0] - a.d[0][0], d[0][1] - a.d[0][1], d[0][2] - a.d[0][2], \
+			d[1][0] - a.d[1][0], d[1][1] - a.d[1][1], d[1][2] - a.d[1][2], \
+			d[2][0] - a.d[2][0], d[2][1] - a.d[2][1], d[2][2] - a.d[2][2]);
 	}
 
 	mat3f operator += (const mat3f& a)
@@ -789,6 +818,22 @@ public:
 public:
 	float d[3][3];
 };
+
+inline mat3f to_mat3f(const mat3d& m)
+{
+	return mat3f(
+		(float)m[0][0], (float)m[0][1], (float)m[0][2],
+		(float)m[1][0], (float)m[1][1], (float)m[1][2],
+		(float)m[2][0], (float)m[2][1], (float)m[2][2]);
+}
+
+inline mat3d to_mat3d(const mat3f& m)
+{
+	return mat3d(
+		m[0][0], m[0][1], m[0][2],
+		m[1][0], m[1][1], m[1][2],
+		m[2][0], m[2][1], m[2][2]);
+}
 
 // The following file contains the actual definition of the class functions
 #include "mat3d.hpp"

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,46 +23,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <FECore/FESurfaceLoad.h>
-#include <FECore/FEModelParam.h>
-#include "febiomix_api.h"
+#include <FECore/FEInitialCondition.h>
 
-//-----------------------------------------------------------------------------
-//! This boundary condition applies a poro-elastic normal traction on a surface
-//!
-class FEBIOMIX_API FEPoroNormalTraction : public FESurfaceLoad
+class FEInitialEffectiveFluidPressure : public FEInitialDOF
 {
 public:
-	//! constructor
-	FEPoroNormalTraction(FEModel* pfem);
-
+	FEInitialEffectiveFluidPressure(FEModel* fem);
 	bool Init() override;
 
-	//! Set the surface to apply the load to
-	void SetSurface(FESurface* ps) override;
+	DECLARE_FECORE_CLASS();
+};
 
-	void SetLinear(bool blinear) { m_blinear = blinear; }
-
-	void SetEffective(bool beff) { m_beffective = beff; }
-
-	//! calculate pressure stiffness
-	void StiffnessMatrix(FELinearSystem& LS) override;
-
-	//! calculate residual
-	void LoadVector(FEGlobalVector& R) override;
-
-private:
-	double Traction(FESurfaceMaterialPoint& mp);
-
-protected:
-	FEParamDouble	m_traction;		//!< traction value
-	bool	m_blinear;		//!< linear or not (true is non-follower, false is follower)
-    bool    m_bshellb;      //!< flag for prescribing traction on shell bottom
-	bool	m_beffective;	//!< effective or total normal traction
+class FEInitialShellEffectiveFluidPressure : public FEInitialDOF
+{
+public:
+	FEInitialShellEffectiveFluidPressure(FEModel* fem);
+	bool Init() override;
 
 	DECLARE_FECORE_CLASS();
 };

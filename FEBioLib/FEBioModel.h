@@ -96,6 +96,11 @@ public: // --- I/O functions ---
 	// get the log file
 	Logfile& GetLogFile() { return m_log; }
 
+	// get the report
+	std::string GetReport() const { return m_report; }
+
+	void CreateReport(bool b) { m_createReport = b; }
+
 public:
 	//! set the problem title
 	void SetTitle(const char* sz);
@@ -107,6 +112,9 @@ public: //! --- serialization for restarts ---
 	
 	//! Write or read data from archive
 	void Serialize(DumpStream& ar) override;
+
+	//! restart from dump file or restart input file
+	bool Restart(const char* szfile);
 
 private:
 	static bool handleCB(FEModel* fem, unsigned int nwhen, void* pd);
@@ -238,6 +246,8 @@ protected:
 
 private:
 	Logfile	m_log;
+	std::string	m_report;
+	bool	m_createReport;
 
 	DECLARE_FECORE_CLASS();
 };

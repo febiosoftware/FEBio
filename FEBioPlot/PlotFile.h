@@ -39,6 +39,65 @@ class FEModel;
 class PlotFile
 {
 public:
+	// size of name variables
+	enum { STR_SIZE = 64 };
+
+	// Dictionary entry
+	class DICTIONARY_ITEM
+	{
+	public:
+		DICTIONARY_ITEM();
+		DICTIONARY_ITEM(const DICTIONARY_ITEM& item);
+
+	public:
+		FEPlotData* m_psave;
+		unsigned int	m_ntype;	// data type
+		unsigned int	m_nfmt;		// storage format
+		unsigned int	m_arraySize;	// size of arrays (only used by arrays)
+		std::vector<string>	m_arrayNames;	// names of array components (optional)
+		char			m_szname[STR_SIZE];
+		char			m_szunit[STR_SIZE];
+	};
+
+	class Dictionary
+	{
+	public:
+		bool AddVariable(FEModel* pfem, const char* szname, std::vector<int>& item, const char* szdom = "");
+
+		int GlobalVariables() { return (int)m_Glob.size(); }
+		int NodalVariables() { return (int)m_Node.size(); }
+		int DomainVariables() { return (int)m_Elem.size(); }
+		int SurfaceVariables() { return (int)m_Face.size(); }
+
+		void Defaults(FEModel& fem);
+
+		void Clear();
+
+	public:
+		list<DICTIONARY_ITEM>& GlobalVariableList() { return m_Glob; }
+		list<DICTIONARY_ITEM>& MaterialVariableList() { return m_Mat; }
+		list<DICTIONARY_ITEM>& NodalVariableList() { return m_Node; }
+		list<DICTIONARY_ITEM>& DomainVariableList() { return m_Elem; }
+		list<DICTIONARY_ITEM>& SurfaceVariableList() { return m_Face; }
+
+	protected:
+		bool AddGlobalVariable(FEPlotData* ps, const char* szname);
+		bool AddMaterialVariable(FEPlotData* ps, const char* szname);
+		bool AddNodalVariable(FEPlotData* ps, const char* szname, std::vector<int>& item);
+		bool AddDomainVariable(FEPlotData* ps, const char* szname, std::vector<int>& item);
+		bool AddSurfaceVariable(FEPlotData* ps, const char* szname, std::vector<int>& item);
+
+	protected:
+		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
+		list<DICTIONARY_ITEM>	m_Mat;		// Material variables
+		list<DICTIONARY_ITEM>	m_Node;		// Node variables
+		list<DICTIONARY_ITEM>	m_Elem;		// Domain variables
+		list<DICTIONARY_ITEM>	m_Face;		// Surface variables
+
+		friend class PlotFile;
+	};
+
+public:
 	//! constructor
 	PlotFile(FEModel* fem);
 
@@ -60,9 +119,23 @@ public:
 	//! see if the plot file is valid
 	virtual bool IsValid() const = 0;
 
+	virtual void Serialize(DumpStream& ar) {}
+
+public:
+	Dictionary& GetDictionary() { return m_dic; }
+
 protected:
 	FEModel* GetFEModel() { return m_pfem; }
 
+	// build the dictionary
+	void BuildDictionary();
+
+	//! Add a variable to the dictionary
+	bool AddVariable(FEPlotData* ps, const char* szname);
+	bool AddVariable(const char* sz);
+	bool AddVariable(const char* sz, std::vector<int>& item, const char* szdom = "");
+
 private:
-	FEModel*	m_pfem;		//!< pointer to FE model
+	Dictionary	m_dic;	//!< dictionary
+	FEModel*	m_pfem;	//!< pointer to FE model
 };

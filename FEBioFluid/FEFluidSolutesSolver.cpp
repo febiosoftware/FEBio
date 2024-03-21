@@ -40,7 +40,6 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/DOFS.h>
-#include <NumCore/NumCore.h>
 #include <assert.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/sys.h>
@@ -421,7 +420,7 @@ void FEFluidSolutesSolver::UpdateKinematics(vector<double>& ui)
         }
     }
     
-    // make sure the prescribed velocities are fullfilled
+    // make sure the prescribed velocities are fulfilled
     int nvel = fem.BoundaryConditions();
     for (int i=0; i<nvel; ++i)
     {
@@ -680,7 +679,7 @@ void FEFluidSolutesSolver::PrepStep()
         if (pml.IsActive()) pml.Update();
     }
 
-    // intialize material point data
+    // initialize material point data
     // NOTE: do this before the stresses are updated
     // TODO: does it matter if the stresses are updated before
     //       the material point data is initialized
@@ -1041,7 +1040,7 @@ bool FEFluidSolutesSolver::StiffnessMatrix(FELinearSystem& LS)
     
     // calculate nonlinear constraint stiffness
     // note that this is the contribution of the
-    // constrainst enforced with augmented lagrangian
+    // constraints enforced with augmented lagrangian
     NonLinearConstraintStiffness(LS, tp);
     
     return true;

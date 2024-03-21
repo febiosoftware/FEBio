@@ -118,6 +118,10 @@ public:
 
 	void ResetStats();
 
+	// Calculate (or estimate) condition number. Must be implemented by derived class.
+	// Base class returns 0;
+	virtual double ConditionNumber();
+
 protected:
 	// used by derived classes to update stats.
 	// Should be called after each backsolve. Will increment backsolves by one and add iterations

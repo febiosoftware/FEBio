@@ -179,6 +179,9 @@ public:
     //! Determine if a face on this surface is pointing away or into a specified element
     double FacePointing(FESurfaceElement& se, FEElement& el);
     
+    //! Project a FEParamDouble to nodes of the surface
+    void ProjectToNodes(FEParamDouble& pd, std::vector<double>& d);
+    
 
 public:
 	//! calculate the reference surface area of a surface element

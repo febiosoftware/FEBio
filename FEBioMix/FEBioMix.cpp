@@ -61,6 +61,7 @@ SOFTWARE.*/
 #include "FEReactionRateHuiskes.h"
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
+#include "FEReactionRateSoluteAsSBM.h"
 #include "FEMembraneReactionRateConst.h"
 #include "FEMembraneReactionRateIonChannel.h"
 #include "FEMembraneReactionRateVoltageGated.h"
@@ -115,8 +116,9 @@ SOFTWARE.*/
 #include "FEPrescribedNodalFluidPressure.h"
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
+#include "FEMultiphasicFluidPressureBC.h"
 
-#include "FEInitialMixtureFluidPressure.h"
+#include "FEInitialEffectiveFluidPressure.h"
 #include "FEInitialConcentration.h"
 #include "FENodalFluidFlux.h"
 
@@ -125,6 +127,7 @@ SOFTWARE.*/
 #include "FEBiphasicSoluteAnalysis.h"
 #include "FEMultiphasicAnalysis.h"
 #include <FECore/FEModelUpdate.h>
+#include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
 const char* FEBioMix::GetVariableName(FEBioMix::FEBIOMIX_VARIABLE var)
@@ -197,8 +200,8 @@ void FEBioMix::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Initial conditions
-	REGISTER_FECORE_CLASS(FEInitialMixtureFluidPressure, "initial fluid pressure");
-	REGISTER_FECORE_CLASS(FEInitialShellMixtureFluidPressure, "initial shell fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialEffectiveFluidPressure, "initial fluid pressure");
+	REGISTER_FECORE_CLASS(FEInitialShellEffectiveFluidPressure, "initial shell fluid pressure");
 	REGISTER_FECORE_CLASS(FEInitialConcentration     , "initial concentration");
 	REGISTER_FECORE_CLASS(FEInitialShellConcentration, "initial shell concentration");
 
@@ -267,6 +270,17 @@ void FEBioMix::InitModule()
 		})
 	);
 
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 25;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 15;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEBiphasicAnalysis>([](FEBiphasicAnalysis* pc) {
+        pc->m_nanalysis = FEBiphasicAnalysis::TRANSIENT;
+    }));
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)
@@ -318,12 +332,13 @@ void FEBioMix::InitModule()
 	// Surface loads
 	REGISTER_FECORE_CLASS(FESoluteFlux, "soluteflux");
     REGISTER_FECORE_CLASS(FESoluteNaturalFlux, "solute natural flux");
-    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureLoad, "fluid pressure");
+    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureLoad, "fluid pressure", 0x0400); // Deprecated, use the BC version.
 
 	//-----------------------------------------------------------------------------
 	// boundary conditions
 	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
 	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
+    REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureBC, "actual fluid pressure");
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
@@ -389,6 +404,18 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogElemSoluteFluxY_T, 7, "j8y");
 	REGISTER_FECORE_CLASS_T(FELogElemSoluteFluxZ_T, 7, "j8z");
 
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 25;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 15;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEBiphasicSoluteAnalysis>([](FEBiphasicSoluteAnalysis* pc) {
+        pc->m_nanalysis = FEBiphasicSoluteAnalysis::TRANSIENT;
+    }));
+
 //======================================================================
 // setup the "multiphasic" module
 	febio.CreateModule(new FEMultiphasicModule, "multiphasic",
@@ -427,6 +454,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  , "Huiskes reaction rate"     );
 	REGISTER_FECORE_CLASS(FEReactionRateNims		    	  , "Nims reaction rate"        );
 	REGISTER_FECORE_CLASS(FEReactionRateExpSED                , "exp-sed reaction rate"     );
+    REGISTER_FECORE_CLASS(FEReactionRateSoluteAsSBM           , "solute-as-sbm reaction rate");
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateConst         , "membrane constant reaction rate");
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateIonChannel    , "membrane ion channel reaction rate");
 	REGISTER_FECORE_CLASS(FEMembraneReactionRateVoltageGated  , "membrane voltage-gated reaction rate");
@@ -509,6 +537,18 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 5, "c6_integral");
 	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 6, "c7_integral");
 	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 7, "c8_integral");
+
+    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+        pc->m_maxups = 25;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+        pc->m_iteopt = 15;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FEMultiphasicAnalysis>([](FEMultiphasicAnalysis* pc) {
+        pc->m_nanalysis = FEMultiphasicAnalysis::TRANSIENT;
+    }));
 
 	febio.SetActiveModule(0);
 }

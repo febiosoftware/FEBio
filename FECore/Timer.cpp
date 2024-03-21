@@ -30,61 +30,73 @@ SOFTWARE.*/
 #include "Timer.h"
 #include <stdio.h>
 #include <string>
+#include <chrono>
 #include "FEModel.h"
-
 using namespace std::chrono;
 
-//-----------------------------------------------------------------------------
+using dseconds = duration<double>;
+
+// data storing timing info
+struct	Timer::Imp {
+	time_point<steady_clock>	start;	//!< time at start
+	time_point<steady_clock>	stop;		//!< time at last stop
+
+	bool	isRunning;	//!< flag indicating whether start was called
+	dseconds total; //!< accumulated time so far in seconds
+};
+
 Timer::Timer()
 {
+	m = new Imp;
 	reset(); 
 }
 
-//-----------------------------------------------------------------------------
+Timer::~Timer()
+{
+	delete m;
+}
+
 void Timer::start()
 {
-    m_start = steady_clock::now();
-	m_brunning = true;
+	m->start = steady_clock::now();
+	m->isRunning = true;
 }
 
-//-----------------------------------------------------------------------------
 void Timer::stop()
 {
-	m_stop = steady_clock::now();
-	m_brunning = false;
+	m->stop = steady_clock::now();
+	m->isRunning = false;
 
-	m_total += m_stop - m_start;
+	m->total += m->stop - m->start;
 }
 
-//-----------------------------------------------------------------------------
 void Timer::reset()
 {
-	m_total = duration_cast<dseconds>(system_clock::duration::zero());
-	m_brunning = false;
+	m->total = dseconds(0);
+	m->isRunning = false;
 }
 
-//-----------------------------------------------------------------------------
+bool Timer::isRunning() const { return m->isRunning; }
+
 double Timer::peek()
 {
-	if (m_brunning)
+	if (m->isRunning)
 	{
-        time_point<steady_clock> pause = steady_clock::now();
-        return duration_cast<dseconds>(m_total + (pause - m_start)).count();
+		time_point<steady_clock> pause = steady_clock::now();
+		return duration_cast<dseconds>(m->total + (pause - m->start)).count();
 	}
 	else 
 	{
-		return m_total.count();
+		return m->total.count();
 	}
 }
 
-//-----------------------------------------------------------------------------
 void Timer::GetTime(int& nhour, int& nmin, int& nsec)
 {
-	double sec = (m_brunning? peek() : m_total.count());
+	double sec = (m->isRunning? peek() : m->total.count());
 	GetTime(sec, nhour, nmin, nsec);
 }
 
-//-----------------------------------------------------------------------------
 void Timer::GetTime(double fsec, int& nhour, int& nmin, int& nsec)
 {
 	nhour = (int) (fsec / 3600.0); fsec -= nhour*3600;
@@ -92,13 +104,11 @@ void Timer::GetTime(double fsec, int& nhour, int& nmin, int& nsec)
 	nsec  = (int) (fsec + 0.5);
 }
 
-//-----------------------------------------------------------------------------
 double Timer::GetTime()
 {
-	return (m_brunning? peek() : m_total.count());
+	return (m->isRunning? peek() : m->total.count());
 }
 
-//-----------------------------------------------------------------------------
 void Timer::time_str(char* sz)
 {
 	int nhour, nmin, nsec;
@@ -106,7 +116,6 @@ void Timer::time_str(char* sz)
 	sprintf(sz, "%d:%02d:%02d", nhour, nmin, nsec);
 }
 
-//-----------------------------------------------------------------------------
 void Timer::time_str(double fsec, char* sz)
 {
 	int nhour, nmin, nsec;

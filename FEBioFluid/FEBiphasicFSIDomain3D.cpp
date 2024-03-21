@@ -285,7 +285,9 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         km1 = m_pMat->InvPermeability(mp);
         //get pI
         pi = mat3dd(m_pMat->Fluid()->Pressure(mp));
-        
+        // get fluid supply (if present)
+        double phifhat = 0;
+        if (m_pMat->FluidSupply()) phifhat = m_pMat->FluidSupply()->Supply(mp);
         H = el.H(n);
         Gr = el.Gr(n);
         Gs = el.Gs(n);
@@ -309,7 +311,7 @@ void FEBiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<doub
         {
             vec3d fs = ((se-sv*phis)*gradN[i] + (sv*bt.m_gradJ/(phif*et.m_J)*phis - km1*ft.m_w)*H[i])*detJ;
             vec3d ff = (sv*gradN[i] + (gradp + km1*ft.m_w - sv*bt.m_gradJ*phis/(phif*et.m_J))*H[i])*detJ;
-            double fJ = (H[i]*(dJfdotf*phif/Jf - dJsoJ) + gradN[i]*ft.m_w)*detJ;
+            double fJ = (H[i]*(dJfdotf*phif/Jf - dJsoJ + phifhat) + gradN[i]*ft.m_w)*detJ;
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
@@ -560,6 +562,18 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         //Include dependence of permeability on displacement
         tens4dmm K = m_pMat->Permeability_Tangent(mp);
         
+        // include contributions from fluid supply (if present)
+        double phifhat = 0;
+        mat3d dphifhatdE(mat3dd(0));
+        double dphifhatdef = 0;
+        mat3ds dphifhatdD(0);
+        if (m_pMat->FluidSupply()) {
+            phifhat = m_pMat->FluidSupply()->Supply(mp);
+            dphifhatdE = m_pMat->FluidSupply()->Tangent_Supply_Strain(mp);
+            dphifhatdef = m_pMat->FluidSupply()->Tangent_Supply_Dilatation(mp);
+            dphifhatdD = m_pMat->FluidSupply()->Tangent_Supply_RateOfDeformation(mp);
+        }
+        
         // evaluate spatial gradient of shape functions
         for (i=0; i<neln; ++i)
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
@@ -598,9 +612,11 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                 mat3d Kww = ((vdotTdotv(bpt.m_gradJ, cv, (gradphif*H[j]/phif-gradN[j]))*phis/(phif*phif*et.m_J) + km1*H[j])*H[i] + vdotTdotv(gradN[i], cv, (-gradphif*H[j]/phif+gradN[j]))/phif)*detJ; //fluid adjusted visc stress
                 
                 vec3d kwJ = ((svJ*gradN[i])*H[j] +(gradN[j]*dp+(pt.m_gradef*d2p - svJ*bpt.m_gradJ*phis/(phif*et.m_J))*H[j])*H[i])*detJ; //fluid adjusted visc stress
-                vec3d kJu = (((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w)) * gradN[i] + ((gradN[j]*pt.m_efdot + ((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w))*pt.m_gradef)/Jf - gradN[j]*(dJsoJ + a*dtrans) + et.m_L.transpose()*gradN[j]*dtrans)*H[i])*detJ;
-                vec3d kJw = ((pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j])*detJ;
-                double kJJ = ((c*phif*dtrans - (pt.m_efdot*phif + pt.m_gradef*fpt.m_w)/Jf)*H[j] + gradN[j]*fpt.m_w)*H[i]/Jf*detJ;
+                vec3d kJu = (((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w)) * gradN[i] + ((gradN[j]*pt.m_efdot + ((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w))*pt.m_gradef)/Jf - gradN[j]*(dJsoJ + a*dtrans) + et.m_L.transpose()*gradN[j]*dtrans
+                                                                                           + (dphifhatdE+mat3dd(phifhat))*gradN[j])*H[i])*detJ;
+                vec3d kJw = ((pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j] + dphifhatdD*(gradN[j]-gradphif*(H[j]/phif))*(H[i]/phif))*detJ;
+                double kJJ = (((c*phif*dtrans - (pt.m_efdot*phif + pt.m_gradef*fpt.m_w)/Jf)*H[j] + gradN[j]*fpt.m_w)*H[i]/Jf
+                              +H[i]*H[j]*dphifhatdef)*detJ;
 
                 ke[i7  ][j7  ] += Kuu(0,0); ke[i7  ][j7+1] += Kuu(0,1); ke[i7  ][j7+2] += Kuu(0,2);
                 ke[i7+1][j7  ] += Kuu(1,0); ke[i7+1][j7+1] += Kuu(1,1); ke[i7+1][j7+2] += Kuu(1,2);

@@ -27,6 +27,7 @@ SOFTWARE.*/
 #pragma once
 #include <FEBioMech/FEElasticMaterial.h>
 #include "FEFluidFSI.h"
+#include "FEFluidSupply.h"
 #include <FEBioMix/FEHydraulicPermeability.h>
 #include <FEBioMix/FEBiphasic.h>
 #include <FEBioMech/FEBodyForce.h>
@@ -127,6 +128,8 @@ public: // overridden from FEBiphasicInterface
     //! solid referential volume fraction
     double SolidReferentialVolumeFraction(FEMaterialPoint& pt) override;
 
+    FEFluidSupply* FluidSupply() { return m_pSupp; }
+    
 public: // material parameters
     double      m_rhoTw; //!< true fluid density
     FEParamDouble      m_phi0;  //!< solid volume fraction in reference configuration
@@ -135,6 +138,7 @@ public: // material parameters
     
 protected: // material properties
     FEHydraulicPermeability*    m_pPerm;    //!< pointer to permeability material
-    
+    FEFluidSupply*              m_pSupp;    //!< pointer to (optional) fluid supply material
+
     DECLARE_FECORE_CLASS();
 };

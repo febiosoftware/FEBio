@@ -23,16 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEBioOutputSection.h"
-#include <FECore/NodeDataRecord.h>
-#include <FECore/FaceDataRecord.h>
-#include <FECore/ElementDataRecord.h>
-#include <FEBioMech/ObjectDataRecord.h>
-#include <FECore/NLConstraintDataRecord.h>
 #include <FECore/SurfaceDataRecord.h>
 #include <FECore/DomainDataRecord.h>
 #include <FECore/FEModelDataRecord.h>
@@ -306,7 +298,8 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 	const char* sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
-		if ((strcmp(sz, "febio") != 0) && (strcmp(sz, "febio2") != 0)) throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+		if ((strcmp(sz, "febio" ) != 0) && 
+			(strcmp(sz, "vtk"   ) != 0)) throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 	else sz = "febio";
 	plotData.SetPlotFileType(sz);

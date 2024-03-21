@@ -59,11 +59,10 @@ void FEPrescribedNormalDisplacement::Activate()
 	const FESurface& surf = *GetSurface();
 
 	int N = surf.Nodes();
-	m_node.resize(N);
+	m_normals.resize(N);
 	for (int i=0; i<N; ++i)
 	{
-		m_node[i].nodeId = surf.NodeIndex(i);
-		m_node[i].normal = vec3d(0,0,0);
+		m_normals[i] = vec3d(0,0,0);
 	}
 
 	if (m_hint == 0)
@@ -87,7 +86,7 @@ void FEPrescribedNormalDisplacement::Activate()
 
 					vec3d nu = (rp - r0) ^ (rm - r0);
 
-					m_node[i0].normal += nu;
+					m_normals[i0] += nu;
 				}
 			}
 			else if (nn == 6)
@@ -120,13 +119,13 @@ void FEPrescribedNormalDisplacement::Activate()
 					normals[n0] = (normals[n1] + normals[n2]) * 0.5;
 				}
 
-				for (int n=0; n<6; ++n) m_node[el.m_lnode[n]].normal += normals[n];
+				for (int n=0; n<6; ++n) m_normals[el.m_lnode[n]] += normals[n];
 			}
 		}
 
 		for (int i = 0; i<N; ++i)
 		{
-			m_node[i].normal.unit();
+			m_normals[i].unit();
 		}
 	}
 	else
@@ -136,7 +135,7 @@ void FEPrescribedNormalDisplacement::Activate()
 		{
 			vec3d ri = -surf.Node(i).m_r0;
 			ri.unit();
-			m_node[i].normal = ri;
+			m_normals[i] = ri;
 		}
 	}
 
@@ -146,7 +145,7 @@ void FEPrescribedNormalDisplacement::Activate()
 // return the values for node nodelid
 void FEPrescribedNormalDisplacement::GetNodalValues(int nodelid, std::vector<double>& val)
 {
-	vec3d v = m_node[nodelid].normal*m_scale;
+	vec3d v = m_normals[nodelid]*m_scale;
 	val[0] = v.x;
 	val[1] = v.y;
 	val[2] = v.z;
@@ -158,6 +157,15 @@ void FEPrescribedNormalDisplacement::CopyFrom(FEBoundaryCondition* pbc)
 	FEPrescribedNormalDisplacement* pnd = dynamic_cast<FEPrescribedNormalDisplacement*>(pbc);
 	assert(pnd);
 	m_scale = pnd->m_scale;
-	m_node = pnd->m_node;
+	m_normals = pnd->m_normals;
 	CopyParameterListState(pnd->GetParameterList());
+}
+
+void FEPrescribedNormalDisplacement::Serialize(DumpStream& ar)
+{
+	FEPrescribedSurface::Serialize(ar);
+	if (ar.IsShallow() == false)
+	{
+		ar & m_normals;
+	}
 }

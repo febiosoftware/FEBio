@@ -36,10 +36,11 @@ SOFTWARE.*/
 #include "FEBioFluid.h"
 #include <FECore/FEParabolicMap.h>
 #include <FECore/FEFacetSet.h>
+#include <FECore/FEMesh.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFluidNormalVelocity, FESurfaceLoad)
-	ADD_PARAMETER(m_velocity, "velocity"                  );
+	ADD_PARAMETER(m_velocity, "velocity"                  )->setUnits(UNIT_VELOCITY);
     ADD_PARAMETER(m_bpv     , "prescribe_nodal_velocities");
     ADD_PARAMETER(m_bpar    , "parabolic");
     ADD_PARAMETER(m_brim    , "prescribe_rim_pressure"    );
@@ -314,20 +315,22 @@ void FEFluidNormalVelocity::Update()
 //! Evaluate normal velocities by solving Poiseuille flow across the surface
 bool FEFluidNormalVelocity::SetParabolicVelocity()
 {
-    FEParabolicMap gen(GetFEModel());
-    FESurfaceMap* map = new FESurfaceMap(FE_DOUBLE);
-    FEFacetSet* surf = GetSurface().GetFacetSet(); assert(surf);
+	FEFacetSet* surf = GetSurface().GetFacetSet(); assert(surf);
+	if (surf == nullptr) return false;
 
-    // only consider fluid dofs
-    gen.SetDOFConstraint(m_dofW);
+	FEParabolicMap gen(GetFEModel());
+	gen.SetFacetSet(surf);
 
-    if (surf == nullptr) return false;
-    map->Create(surf);
-    if (gen.Generate(*map) == false)
-    {
-        assert(false);
-        return false;
-    }
+	// only consider fluid dofs
+	gen.SetDOFConstraint(m_dofW);
+
+	FEDataMap* map = gen.Generate();
+	if (map == nullptr)
+	{
+		assert(false);
+		return false;
+	}
+	GetMesh().AddDataMap(map);
 
     FEMappedValue* val = fecore_alloc(FEMappedValue, GetFEModel());
     val->setDataMap(map);

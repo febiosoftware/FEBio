@@ -1153,3 +1153,21 @@ inline bool mat3f::invert()
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+inline void mat3d::exp(const vec3d& v)
+{
+	double l = v.norm();
+	if (l == 0.0) *this = mat3d::identity();
+	else
+	{
+		double a = 0.5 * (tan(0.5 * l) / (0.5 * l));
+		vec3d w = v * a;
+		mat3da S(w);
+		mat3d S2 = S * S;
+		mat3dd I(1.0);
+		mat3d E = I + (S2 + S) * (2.0 / (1.0 + w.norm2()));
+
+		*this = E;
+	}
+}

@@ -51,15 +51,8 @@ void FEDonnanEquilibriumMaterialPoint::Init()
 
 void FEDonnanEquilibriumMaterialPoint::Serialize(DumpStream& ar)
 {
-    if (ar.IsSaving())
-    {
-        ar << m_cF << m_osm << m_p << m_bpi;
-    }
-    else
-    {
-        ar >> m_cF >> m_osm >> m_p >> m_bpi;
-    }
 	FEMaterialPointData::Serialize(ar);
+	ar & m_cFr & m_cF & m_osm & m_p & m_bpi;
 }
 
 //-----------------------------------------------------------------------------
