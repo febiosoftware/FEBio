@@ -105,11 +105,8 @@ void FEBioModelBuilder::AddRigidComponent(FEStepComponent* pmc)
 
 	AddComponent(pmc);
 
-	FERigidFixedBC* prc = dynamic_cast<FERigidFixedBC*>(pmc);
-	if (prc) { fem.AddRigidFixedBC(prc); return; }
-
-	FERigidPrescribedBC* prf = dynamic_cast<FERigidPrescribedBC*>(pmc);
-	if (prf) { fem.AddRigidPrescribedBC(prf); return; }
+	FERigidBC* prc = dynamic_cast<FERigidBC*>(pmc);
+	if (prc) { fem.AddRigidBC(prc); return; }
 
 	FERigidIC* ric = dynamic_cast<FERigidIC*>(pmc);
 	if (ric) { fem.AddRigidInitialCondition(ric); return; }

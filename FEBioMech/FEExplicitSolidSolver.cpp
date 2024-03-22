@@ -642,15 +642,17 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 
 	// for prescribed displacements, the displacement increments are evaluated differently
 	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
-	const int NRD = fem.RigidPrescribedBCs();
-	for (int i=0; i<NRD; ++i)
+	for (int i = 0; i < NRB; ++i)
 	{
-		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
-		if (dc.IsActive())
+		FERigidBody& RB = *fem.GetRigidBody(i);
+		for (int j = 0; j < 6; ++j)
 		{
-			FERigidBody& RB = dc.GetRigidBody();
-			int I = dc.GetBC();
-			RB.m_du[I] = dc.Value() - RB.m_Up[I];
+			FERigidPrescribedBC* dc = RB.m_pDC[j];
+			if (dc)
+			{
+				int I = dc->GetBC();
+				RB.m_du[I] = dc->Value() - RB.m_Up[I];
+			}
 		}
 	}
 
@@ -820,14 +822,17 @@ void FEExplicitSolidSolver::PrepStep()
 	for (i=0; i<NO; ++i) fem.GetRigidBody(i)->Init();
 
 	// calculate local rigid displacements
-	for (i=0; i<(int) fem.RigidPrescribedBCs(); ++i)
+	for (i = 0; i < NO; ++i)
 	{
-		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
-		if (DC.IsActive())
+		FERigidBody& rb = *fem.GetRigidBody(i);
+		for (int j = 0; j < 6; ++j)
 		{
-			FERigidBody& RB = DC.GetRigidBody();
-			int I = DC.GetBC();
-			RB.m_dul[I] = DC.Value() - RB.m_Ut[I];
+			FERigidPrescribedBC* dc = rb.m_pDC[j];
+			if (dc)
+			{
+				int I = dc->GetBC();
+				rb.m_dul[I] = dc->Value() - rb.m_Ut[I];
+			}
 		}
 	}
 
