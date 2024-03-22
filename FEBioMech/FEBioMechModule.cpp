@@ -248,6 +248,7 @@ SOFTWARE.*/
 #include "RigidBC.h"
 #include "FERigidNodeSet.h"
 #include "FERigidRotationVector.h"
+#include "FERigidEulerAngles.h"
 #include "FEFixedDisplacement.h"
 #include "FEFixedShellDisplacement.h"
 #include "FEFixedRotation.h"
@@ -691,6 +692,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FERigidDisplacement   , "rigid_displacement"    );
 	REGISTER_FECORE_CLASS(FERigidRotation       , "rigid_rotation"        );
 	REGISTER_FECORE_CLASS(FERigidRotationVector , "rigid_rotation_vector" );
+	REGISTER_FECORE_CLASS(FERigidEulerAngles    , "rigid_euler_angles"    );
 
 	REGISTER_FECORE_CLASS(FERigidFixedBCOld     , "rigid_fixed_old"     , 0x300);	// obsolete in 4.0
 	REGISTER_FECORE_CLASS(FERigidPrescribedOld  , "rigid_prescribed_old", 0x300);	// obsolete in 4.0
