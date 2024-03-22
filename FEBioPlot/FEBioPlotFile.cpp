@@ -416,6 +416,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 				{
 					const char* szflt = PD.strFilter.c_str();
 					index = dofs.GetIndex(szfield, szflt);
+					if (index < 0) index = pfem->GetDOFIndex(szflt);
 				}
 				if ((index < 0) || (index >= ndofs)) return false;
 
