@@ -811,8 +811,10 @@ bool FEElasticSolidDomain::Augment(int naug)
 			normL0 += L0*L0;
 
 			//L1 = L0 + k*pmi->h(pt.m_J, pt.m_J_star);
-			L1 = pt.m_p;
+			L1 = L0 + pmi->UJ(pt.m_J, pt.m_J_star);
 			normL1 += L1*L1;
+
+			//printf("%f %f %f %f %f %f\n", mp.m_r0(0), mp.m_r0(1), mp.m_r0(2), pt.m_J, pt.m_J_star, k*pmi->h(pt.m_J, pt.m_J_star));
 		}
 	}
 
@@ -820,6 +822,7 @@ bool FEElasticSolidDomain::Augment(int naug)
 	normL1 = sqrt(normL1);
 
 	// check convergence
+	// Note: Use absolute tolerance instead of relative?? or L0_0 at first augmentation relative to that
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
 
@@ -849,11 +852,12 @@ bool FEElasticSolidDomain::Augment(int naug)
 				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 				//Question: What is hi used for?
-				double hi = pmi->h(pt.m_J, pt.m_J_star);
+				//double hi = pmi->h(pt.m_J, pt.m_J_star);
 				//pt.m_Lk += k*pmi->h(pt.m_J, pt.m_J_star);
-				pt.m_Lk = pt.m_p;
 				//Question: Why reassign m_p here, doesn't it get overwritten?
 				//pt.m_p = pt.m_Lk*pmi->hp(pt.m_J, pt.m_J_star) + k*log(pt.m_J/pt.m_J_star)/pt.m_J;
+
+				pt.m_Lk += pmi->UJ(pt.m_J, pt.m_J_star);
 			}
 		}
 	}

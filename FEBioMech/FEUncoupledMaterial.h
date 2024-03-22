@@ -151,9 +151,13 @@ public:
 	double hp (double J) { return 1.0 / J; }
 	double hpp(double J) { return -1.0 / (J*J); }
 
-	double h  (double J, double J_star) { return log(J/J_star); }
-	double hp (double J, double J_star) { return 1.0 / J; }
-	double hpp(double J, double J_star) { return -1.0 / (J*J); }
+	//double h  (double J, double J_star) { return (J / J_star - 1); }
+	//double hp (double J, double J_star) { return J / J_star; }
+	//double hpp(double J, double J_star) { return 1 / J_star; }
+
+	double h  (double J, double J_star) { return  J_star * log(J/J_star); }
+	double hp (double J, double J_star) { return  J_star / J; }
+	double hpp(double J, double J_star) { return -J_star / (J*J); }
 
 public:
 	//! total Cauchy stress (do not overload!)
