@@ -117,7 +117,7 @@ bool VTKPlotFile::Write(float ftime, int flag)
 	
 	std::stringstream ss;
 
-	ss << m_filename << "." << m_count++ << ".vtk";
+	ss << m_filename << "." << ftime << ".vtk";
 
 	string fileName = ss.str();
 	
