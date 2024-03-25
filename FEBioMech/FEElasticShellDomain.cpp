@@ -387,7 +387,7 @@ void FEElasticShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEle
     double detJ;
     double *M;
     double* gw = el.GaussWeights();
-    mat3ds K;
+    mat3d K;
     
     double Mu[FEElement::MAX_NODES], Md[FEElement::MAX_NODES];
     
