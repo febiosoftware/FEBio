@@ -48,6 +48,11 @@ void FEModelLoad::Serialize(DumpStream& ar)
 	ar & m_dof;
 }
 
+void FEModelLoad::PrepStep()
+{
+
+}
+
 //-----------------------------------------------------------------------------
 void FEModelLoad::LoadVector(FEGlobalVector& R)
 {

@@ -51,6 +51,8 @@ public:
 	
 	void Serialize(DumpStream& ar) override;
 
+	virtual void PrepStep();
+
 public:
 	// all classes derived from this base class must implement
 	// the following functions.

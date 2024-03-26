@@ -941,6 +941,12 @@ void FESolidSolver2::PrepStep()
 		if (plc && plc->IsActive()) plc->PrepStep();
 	}
 
+	for (int i = 0; i < fem.ModelLoads(); ++i)
+	{
+		FEModelLoad* pl = fem.ModelLoad(i);
+		if (pl->IsActive()) pl->PrepStep();
+	}
+
 	// see if we need to do contact augmentations
 	m_baugment = false;
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
