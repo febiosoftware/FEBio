@@ -32,7 +32,7 @@ class FEMovingFrameLoad : public FEBodyForce
 public:
 	FEMovingFrameLoad(FEModel* fem);
 
-	bool Init() override;
+	void Activate() override;
 
 	void PrepStep() override;
 

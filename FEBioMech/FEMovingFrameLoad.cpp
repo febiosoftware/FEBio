@@ -44,22 +44,24 @@ FEMovingFrameLoad::FEMovingFrameLoad(FEModel* fem) : FEBodyForce(fem)
 	m_q = quatd(0, vec3d(0, 0, 1));
 }
 
-bool FEMovingFrameLoad::Init()
+void FEMovingFrameLoad::Activate()
 {
 	m_wp = m_w;
-	return FEBodyForce::Init();
+	FEBodyForce::Activate();
 }
 
 void FEMovingFrameLoad::PrepStep()
 {
 	double dt = GetTimeInfo().timeIncrement;
 	m_al = (m_w - m_wp) / dt;
-	m_wp = m_w;
+
+	vec3d wa = (m_w + m_wp) * 0.5;
 
 	quatd qn = m_q;
-	quatd wn(m_w.x, m_w.y, m_w.z, 0.0);
+	quatd wn(wa.x, wa.y, wa.z, 0.0);
 	m_q = qn + (wn * qn) * (0.5 * dt);
 	m_q.MakeUnit();
+	m_wp = m_w;
 
 	vec3d R = m_q.GetRotationVector();
 
@@ -71,9 +73,13 @@ vec3d FEMovingFrameLoad::force(FEMaterialPoint& pt)
 {
 	FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
 
+	quatd qi = m_q.Inverse();
+
 	vec3d r = pt.m_rt;
 	vec3d v = ep.m_v;
-	vec3d f = m_a + (m_al ^ r) + (m_w ^ (m_w ^ r)) + (m_w ^ v) * 2.0;
+	vec3d w = qi * m_w;
+	vec3d al = qi * m_al;
+	vec3d f = qi*m_a + (al ^ r) + (w ^ (w ^ r)) + (w ^ v) * 2.0;
 	return f;
 }
 
@@ -86,8 +92,12 @@ mat3d FEMovingFrameLoad::stiffness(FEMaterialPoint& pt)
 	double gamma = tp.gamma;
 	double dt = tp.timeIncrement;
 
-	mat3da Sw(m_w);
-	mat3da A(m_al);
+	quatd qi = m_q.Inverse();
+	vec3d w = qi * m_w;
+	vec3d al = qi * m_al;
+
+	mat3da Sw(w);
+	mat3da A(al);
 	mat3d S2 = Sw * Sw;
 	mat3d K = S2 + A + Sw * (4.0 * gamma / dt);
 
