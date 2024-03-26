@@ -1343,6 +1343,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 		double TMT = Tt[0]*(Mki[0][0]*Tt[0] + Mki[0][1]*Tt[1]) + Tt[1]*(Mki[1][0]*Tt[0] + Mki[1][1]*Tt[1]);
 
 		// calculate the normalized traction vector
+		// pt should be defined using contra basis vectors, not co basis vectors tau[0] and tau[1]
 		vec3d pt = tau[0]*Tt[0] + tau[1]*Tt[1];
 		pt.unit();
 		
@@ -1471,7 +1472,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 				kij += Tb11[i]*D1[j] + Tb21[i]*D2[j];
 				kij += D1[i]*Tb11[j] + D2[i]*Tb21[j];
 				kij += gap*(N11[i]*D1[j] + N12[i]*D2[j] + D1[i]*N11[j] + D2[i]*N12[j]);
-				kij -= N[i]*Nb1[j] - Nb1[i]*N[j];
+				kij -= N[i]*Nb1[j] + Nb1[i]*N[j]; // It should be + if - is put on the left hand side
 				kij -= T1[i]*Mi[0][0]*Tb11[j] + T1[i]*Mi[0][1]*Tb21[j] + T2[i]*Mi[1][0]*Tb11[j] + T2[i]*Mi[1][1]*Tb21[j];
 				kij -= Tb11[i]*Mi[0][0]*T1[j] + Tb21[i]*Mi[0][1]*T1[j] + Tb11[i]*Mi[1][0]*T2[j] + Tb21[i]*Mi[1][1]*T2[j];
 
@@ -1484,7 +1485,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 				kij += Tb12[i]*D1[j] + Tb22[i]*D2[j];
 				kij += D1[i]*Tb12[j] + D2[i]*Tb22[j];
 				kij += gap*(N21[i]*D1[j] + N22[i]*D2[j] + D1[i]*N21[j] + D2[i]*N22[j]);
-				kij -= N[i]*Nb2[j] - Nb2[i]*N[j];
+				kij -= N[i]*Nb2[j] + Nb2[i]*N[j]; // It should be + if - is put on the left hand side
 				kij -= T1[i]*Mi[0][0]*Tb12[j] + T1[i]*Mi[0][1]*Tb22[j] + T2[i]*Mi[1][0]*Tb12[j] + T2[i]*Mi[1][1]*Tb22[j];
 				kij -= Tb12[i]*Mi[0][0]*T1[j] + Tb22[i]*Mi[0][1]*T1[j] + Tb12[i]*Mi[1][0]*T2[j] + Tb22[i]*Mi[1][1]*T2[j];
 
@@ -1499,8 +1500,8 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 				else
 				{
 					kij  = (1.0 - Ptc[0]*Pt[0])*(Mk[0][0]*D1[i]*D1[j]+Mk[0][1]*D1[i]*D2[j]);
-					kij += (    - Ptc[0]*Pt[1])*(Mk[1][0]*D1[i]*D1[j]+Mk[1][1]*D1[i]*D2[j]);
-					kij += (    - Ptc[1]*Pt[0])*(Mk[0][0]*D2[i]*D1[j]+Mk[0][1]*D2[i]*D2[j]);
+					kij += (    - Ptc[1]*Pt[0])*(Mk[1][0]*D1[i]*D1[j]+Mk[1][1]*D1[i]*D2[j]); // I'm not sure whether I am correct or not.
+					kij += (    - Ptc[0]*Pt[1])*(Mk[0][0]*D2[i]*D1[j]+Mk[0][1]*D2[i]*D2[j]); // I'm not sure whether I am correct or not.
 					kij += (1.0 - Ptc[1]*Pt[1])*(Mk[1][0]*D2[i]*D1[j]+Mk[1][1]*D2[i]*D2[j]);
 					
 					ke[i][j] += m_ktmult*m_epsf*m_mu*tn/sqrt(TMT)*kij;
