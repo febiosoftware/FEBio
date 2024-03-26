@@ -64,3 +64,11 @@ void FEMultiphasicModule::InitModel(FEModel* fem)
 {
 	FEBiphasicSoluteModule::InitModel(fem);
 }
+
+//=============================================================================
+FEElasticSoluteModule::FEElasticSoluteModule() {}
+
+void FEElasticSoluteModule::InitModel(FEModel* fem)
+{
+	FEBiphasicSoluteModule::InitModel(fem);
+}

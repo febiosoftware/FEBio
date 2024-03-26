@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FEMultiphasicStandard.h"
+#include "FEElasticSoluteStandard.h"
 #include "FEMultiphasicMultigeneration.h"
 #include "FESolute.h"
 #include "FETriphasic.h"
@@ -102,6 +103,7 @@ SOFTWARE.*/
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"
 #include "FEMultiphasicSolver.h"
+#include "FEElasticSoluteSolver.h"
 
 #include "FEBioMixPlot.h"
 #include "FEBioMixData.h"
@@ -113,6 +115,7 @@ SOFTWARE.*/
 #include "FEBiphasicSoluteShellDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicSolidDomain.h"
+#include "FEElasticSoluteSolidDomain.h"
 #include "FEMultiphasicShellDomain.h"
 
 #include "FESBMPointSource.h"
@@ -133,6 +136,7 @@ SOFTWARE.*/
 #include "FEBiphasicAnalysis.h"
 #include "FEBiphasicSoluteAnalysis.h"
 #include "FEMultiphasicAnalysis.h"
+#include "FEElasticSoluteAnalysis.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -563,6 +567,68 @@ void FEBioMix::InitModule()
     febio.OnCreateEvent(CallWhenCreating<FEMultiphasicAnalysis>([](FEMultiphasicAnalysis* pc) {
         pc->m_nanalysis = FEMultiphasicAnalysis::TRANSIENT;
     }));
+
+//======================================================================
+// setup the "elastic solute" module
+	febio.CreateModule(new FEElasticSoluteModule, "elastic-solute",
+		"{"
+		"   \"title\" : \"Elastic Solute Analysis\","
+		"   \"info\"  : \"Transient analysis with solutes.\""
+		"}");
+
+	febio.AddModuleDependency("solute");
+
+	//-----------------------------------------------------------------------------
+	// Global data classes
+
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEElasticSoluteAnalysis, "elastic-solute");
+
+	//-----------------------------------------------------------------------------
+	// solver classes
+	REGISTER_FECORE_CLASS(FEElasticSoluteSolver, "elastic-solute");
+
+	//-----------------------------------------------------------------------------
+	// Domain classes
+	REGISTER_FECORE_CLASS(FEElasticSoluteSolidDomain, "elastic-solute-solid");
+
+	//-----------------------------------------------------------------------------
+	// Materials
+	REGISTER_FECORE_CLASS(FEElasticSoluteStandard, "elastic-solute");
+
+	//-----------------------------------------------------------------------------
+	// Surface loads
+
+	//-----------------------------------------------------------------------------
+	// Boundary conditions
+
+	//-----------------------------------------------------------------------------
+	// Body loads
+
+	//-----------------------------------------------------------------------------
+	// Contact interfaces
+
+	//-----------------------------------------------------------------------------
+	// classes derived from FEPlotData
+
+	//-----------------------------------------------------------------------------
+	// Element log data
+
+	//-----------------------------------------------------------------------------
+	// domain log data
+
+	febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
+		pc->m_maxups = 25;
+		}));
+
+	febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
+		pc->m_iteopt = 15;
+		}));
+
+	febio.OnCreateEvent(CallWhenCreating<FEMultiphasicAnalysis>([](FEMultiphasicAnalysis* pc) {
+		pc->m_nanalysis = FEMultiphasicAnalysis::TRANSIENT;
+		}));
 
 	febio.SetActiveModule(0);
 }
