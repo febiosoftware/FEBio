@@ -40,7 +40,7 @@ BEGIN_FECORE_CLASS(FERigidAxialForce, FERigidLoad);
 	ADD_PARAMETER(m_idb      , "rbB"     )->setEnums("$(rigid_materials)");
 	ADD_PARAMETER(m_ra0      , "ra"      );
 	ADD_PARAMETER(m_rb0      , "rb"      );
-	ADD_PARAMETER(m_s        , "force"   );
+	ADD_PARAMETER(m_s        , "force"   )->setUnits(UNIT_FORCE);
 	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
