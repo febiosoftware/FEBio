@@ -203,22 +203,22 @@ void VTKPlotFile::WriteCells()
     }
 }
 
-void VTKPlotFile::WriteScalarData(std::vector<float>& val, const char* szname)
+void VTKPlotFile::WriteScalarData(std::vector<float>& val, const std::string& name)
 {
-	fprintf(m_fp, "%s %s %s\n", "SCALARS", szname, "float");
+	fprintf(m_fp, "%s %s %s\n", "SCALARS", name.c_str(), "float");
 	fprintf(m_fp, "%s %s\n", "LOOKUP_TABLE", "default");
 	for (int i = 0; i < val.size(); ++i) fprintf(m_fp, "%g\n", val[i]);
 }
 
-void VTKPlotFile::WriteVectorData(std::vector<float>& val, const char* szname)
+void VTKPlotFile::WriteVectorData(std::vector<float>& val, const std::string& name)
 {
-	fprintf(m_fp, "%s %s %s\n", "VECTORS", szname, "float");
+	fprintf(m_fp, "%s %s %s\n", "VECTORS", name.c_str(), "float");
 	for (int i = 0; i < val.size(); i += 3) fprintf(m_fp, "%g %g %g\n", val[i], val[i + 1], val[i + 2]);
 }
 
-void VTKPlotFile::WriteMat3FSData(std::vector<float>& val, const char* szname)
+void VTKPlotFile::WriteMat3FSData(std::vector<float>& val, const std::string& name)
 {
-	fprintf(m_fp, "%s %s %s\n", "TENSORS", szname, "float");
+	fprintf(m_fp, "%s %s %s\n", "TENSORS", name.c_str(), "float");
 	for (int i = 0; i < val.size(); i += 6)
 		fprintf(m_fp, "%g %g %g\n%g %g %g\n%g %g %g\n\n",
 			val[i    ], val[i + 3], val[i + 5],
@@ -226,14 +226,62 @@ void VTKPlotFile::WriteMat3FSData(std::vector<float>& val, const char* szname)
 			val[i + 5], val[i + 4], val[i + 2]);
 }
 
-void VTKPlotFile::WriteMat3FDData(std::vector<float>& val, const char* szname)
+void VTKPlotFile::WriteMat3FDData(std::vector<float>& val, const std::string& name)
 {
-	fprintf(m_fp, "%s %s %s\n", "TENSORS", szname, "float");
+	fprintf(m_fp, "%s %s %s\n", "TENSORS", name.c_str(), "float");
 	for (int i = 0; i < val.size(); i += 3)
 		fprintf(m_fp, "%g %g %g\n%g %g %g\n%g %g %g\n\n",
 			val[i], 0.f, 0.f,
 			0.f, val[i + 1], 0.f,
 			0.f, 0.f, val[i + 2]);
+}
+
+static void Space2_(string& s)
+{
+	int n = (int)s.size();
+	for (int i = 0; i < n; ++i)
+		if (s[i] == ' ') s[i] = '_';
+}
+
+void VTKPlotFile::WriteArrayData(std::vector<float>& val, const std::string& name, FEPlotData* pd)
+{
+	int arraySize = pd->GetArraysize();
+	fprintf(m_fp, "FIELD %s %d\n", name.c_str(), arraySize);
+	std::vector<string> arrayNames = pd->GetArrayNames();
+	int NE = val.size() / arraySize;
+	for (int j = 0; j < arraySize; ++j)
+	{
+		string name = arrayNames[j];
+		Space2_(name);
+		fprintf(m_fp, "%s %d %d float\n", name.c_str(), 1, NE);
+		for (int i = 0; i < NE; ++i)
+		{
+			float f = val[arraySize*i + j];
+			fprintf(m_fp, "%g\n", f);
+		}
+	}
+}
+
+void VTKPlotFile::WriteArrayVec3fData(std::vector<float>& val, const std::string& name, FEPlotData* pd)
+{
+	int arraySize = pd->GetArraysize();
+	fprintf(m_fp, "FIELD %s %d\n", name.c_str(), arraySize);
+	std::vector<string> arrayNames = pd->GetArrayNames();
+	int NE = val.size() / (3*arraySize);
+	for (int j = 0; j < arraySize; ++j)
+	{
+		string name = arrayNames[j];
+		Space2_(name);
+		fprintf(m_fp, "%s %d %d float\n", name.c_str(), 3, NE);
+		float f[3];
+		for (int i = 0; i < NE; ++i)
+		{
+			f[0] = val[3*arraySize * i + 3*j    ];
+			f[1] = val[3*arraySize * i + 3*j + 1];
+			f[2] = val[3*arraySize * i + 3*j + 2];
+			fprintf(m_fp, "%g %g %g\n", f[0], f[1], f[2]);
+		}
+	}
 }
 
 void VTKPlotFile::WritePointData()
@@ -308,8 +356,7 @@ void VTKPlotFile::WritePointData()
 			{
 				// must remove all whitespace
 				string dataName = it->m_szname;
-				for (size_t i = 0; i < dataName.size(); ++i)
-					if (isspace(dataName[i])) dataName[i] = '_';
+				Space2_(dataName);
 				const char* szname = dataName.c_str();
 
 				int ndata = pd->VarSize(pd->DataType());
@@ -344,6 +391,8 @@ void VTKPlotFile::WritePointData()
 				case PLT_VEC3F : WriteVectorData(val, szname); break;
 				case PLT_MAT3FS: WriteMat3FSData(val, szname); break;
 				case PLT_MAT3FD: WriteMat3FDData(val, szname); break;
+				case PLT_ARRAY : WriteArrayData (val, szname, pd); break;
+				case PLT_ARRAY_VEC3F: WriteArrayVec3fData(val, szname, pd); break;
 				default:
 					assert(false);
 				}
@@ -429,6 +478,8 @@ void VTKPlotFile::WriteCellData()
 				case PLT_VEC3F : WriteVectorData(val, szname); break;
 				case PLT_MAT3FS: WriteMat3FSData(val, szname); break;
 				case PLT_MAT3FD: WriteMat3FDData(val, szname); break;
+				case PLT_ARRAY : WriteArrayData (val, szname, pd); break;
+				case PLT_ARRAY_VEC3F: WriteArrayVec3fData(val, szname, pd); break;
 				default:
 					assert(false);
 				}
