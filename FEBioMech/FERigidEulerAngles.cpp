@@ -86,7 +86,10 @@ void FERigidEulerAngles::InitTimeStep()
 void FERigidEulerAngles::UpdateRotations()
 {
 	quatd q; 
-	q.SetEuler(m_Ex, m_Ey, m_Ez);
+	double Ex = DEG2RAD * m_Ex;
+	double Ey = DEG2RAD * m_Ey;
+	double Ez = DEG2RAD * m_Ez;
+	q.SetEuler(Ex, Ey, Ez);
 	vec3d r = q.GetRotationVector();
 	m_rc[0]->SetValue(r.x);
 	m_rc[1]->SetValue(r.y);
