@@ -28,3 +28,5 @@ swig
 libxorg-gtest-dev
 jq
 yasm
+patchelf
+zip
