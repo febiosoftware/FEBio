@@ -445,3 +445,6 @@ Documentation/FEBio_User_Manual.html.LyXconv/
 
 febio*-sdk
 .envrc
+
+TestSuite
+*.gz
