@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 #include <FECore/FEMesh.h>
 #include <FECore/FELinearSystem.h>
+#include <FECore/FEModel.h>
 
 FEDiscreteElasticDomain::FEDiscreteElasticDomain(FEModel* fem) : FEDiscreteDomain(fem), FEElasticDomain(fem), m_dofU(fem), m_dofR(fem), m_dof(fem)
 {
@@ -203,7 +204,14 @@ void FEDiscreteElasticDomain::StiffnessMatrix(FELinearSystem& LS)
 	}
 }
 
-//-----------------------------------------------------------------------------
+bool FEDiscreteElasticDomain::Init()
+{
+	if (FEDiscreteDomain::Init() == false) return false;
+	FETimeInfo& tp = GetFEModel()->GetTime();
+	Update(tp);
+	return true;
+}
+
 //! update domain data
 void FEDiscreteElasticDomain::Update(const FETimeInfo& tp)
 {

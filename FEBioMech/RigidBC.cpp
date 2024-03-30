@@ -44,6 +44,16 @@ FERigidBC::FERigidBC(FEModel* fem) : FEBoundaryCondition(fem)
 	m_binit = false;
 }
 
+void FERigidBC::SetRigidMaterial(int rigidMat)
+{
+	m_rigidMat = rigidMat;
+}
+
+void FERigidBC::InitTimeStep()
+{
+
+}
+
 bool FERigidBC::Init()
 {
 	// Make sure the rigid material ID is valid

@@ -145,7 +145,7 @@ double FESurfaceAttractionBodyForce::divforce(FEMaterialPoint& mp)
     return (3-r/m_blt)*(m_bsf*exp(-r/m_blt));
 }
 
-mat3ds FESurfaceAttractionBodyForce::stiffness(FEMaterialPoint& mp)
+mat3d FESurfaceAttractionBodyForce::stiffness(FEMaterialPoint& mp)
 {
     return mat3ds(0,0,0,0,0,0);
 }

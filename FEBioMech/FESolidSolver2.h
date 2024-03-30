@@ -133,6 +133,10 @@ public:
 		void ExternalForces(FEGlobalVector& R);
 	//}
 
+private:
+	//! Calculate initial accelerations for dynamics problems
+	bool InitAccelerations();
+
 public:
 	// convergence tolerances
 	double	m_Dtol;			//!< displacement tolerance
@@ -155,6 +159,8 @@ public:
 	double	m_alpha;		//!< Newmark parameter alpha (force integration)
 	double	m_beta;			//!< Newmark parameter beta (displacement integration)
 	double	m_gamma;		//!< Newmark parameter gamme (velocity integration)
+
+	bool	m_init_accelerations;	//!< calculate initial accelerations for dynamic problems
 
 	// arc-length parameters
 	int		m_arcLength;	//!< arc-length method flag (0 = off, 1 = Crisfield)

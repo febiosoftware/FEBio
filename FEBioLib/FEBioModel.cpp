@@ -121,6 +121,7 @@ FEBioModel::FEBioModel()
 	m_becho = true;
 	m_plot = nullptr;
 	m_writeMesh = false;
+	m_createReport = false;
 
 	m_stats.ntimeSteps = 0;
 	m_stats.ntotalIters = 0;
@@ -730,6 +731,19 @@ void FEBioModel::DumpData(int nevent)
 	}
 }
 
+string removeNewLines(const char* sz)
+{
+	string tmp; tmp.reserve(128);
+	const char* c = sz;
+	while ((c != 0) && (*c != 0))
+	{
+		if ((*c != '\n') && (*c != '\r')) tmp.push_back(*c);
+		else tmp.push_back(' ');
+		c++;
+	}
+	return tmp;
+}
+
 //-----------------------------------------------------------------------------
 void FEBioModel::Log(int ntag, const char* szmsg)
 {
@@ -741,6 +755,14 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 	{
 		if (GetDebugLevel() > 0)
 			m_log.printf("debug>%s\n", szmsg);
+	}
+
+	if (m_createReport)
+	{
+		string msg = removeNewLines(szmsg);
+		msg.push_back('\n');
+		if (ntag == 1) m_report += "Warning: " + msg;
+		if (ntag == 2) m_report += "Error: " + msg;
 	}
 
 	// Flushing the logfile each time we get here might be a bit overkill.
@@ -1514,18 +1536,10 @@ bool FEBioModel::Init()
 		if (InitLogFile() == false) return false;
 	}
 
+	m_report.clear();
+
 	FEBioPlotFile* pplt = nullptr;
 	m_lastUpdate = -1;
-
-	// open plot database file
-	FEAnalysis* step = GetCurrentStep();
-	if (step->GetPlotLevel() != FE_PLOT_NEVER)
-	{
-		if (m_plot == nullptr)
-		{
-			if (InitPlotFile() == false) { feLogError("Failed to initialize plot file."); return false; }
-		}
-	}
 
 	// see if a valid dump file name is defined.
 	const std::string& sdmp = GetDumpFileName();
@@ -1552,6 +1566,16 @@ bool FEBioModel::Init()
 	{
 		feLogError("Model initialization failed");
 		return false;
+	}
+
+	// open plot database file
+	FEAnalysis* step = GetCurrentStep();
+	if (step->GetPlotLevel() != FE_PLOT_NEVER)
+	{
+		if (m_plot == nullptr)
+		{
+			if (InitPlotFile() == false) { feLogError("Failed to initialize plot file."); return false; }
+		}
 	}
 
 	// Alright, all initialization is done, so let's get busy !

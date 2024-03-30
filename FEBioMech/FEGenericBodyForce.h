@@ -42,11 +42,11 @@ public:
 	//! evaluate the body force
 	vec3d force(FEMaterialPoint& pt) override;
 
-    //! evaluate the divergence of the body force
-    double divforce(FEMaterialPoint& pt) override { return 0; }
-    
+	//! evaluate the divergence of the body force
+	double divforce(FEMaterialPoint& pt) override { return 0; }
+
 	//! stiffness
-	mat3ds stiffness(FEMaterialPoint& pt) override;
+	mat3d stiffness(FEMaterialPoint& pt) override;
 
 private:
 	void StiffnessMatrix(FELinearSystem& LS) override;
@@ -66,7 +66,7 @@ public:
 	FEConstBodyForceOld(FEModel* pfem) : FEBodyForce(pfem) { m_f = vec3d(0, 0, 0); }
 	vec3d force(FEMaterialPoint& pt) override { return m_f; }
     double divforce(FEMaterialPoint& pt) override { return 0; }
-	mat3ds stiffness(FEMaterialPoint& pt) override { return mat3ds(0, 0, 0, 0, 0, 0); }
+	mat3d stiffness(FEMaterialPoint& pt) override { return mat3ds(0, 0, 0, 0, 0, 0); }
 
 protected:
 	vec3d	m_f;
@@ -83,7 +83,7 @@ public:
 	FENonConstBodyForceOld(FEModel* fem);
 	vec3d force(FEMaterialPoint& pt) override;
     double divforce(FEMaterialPoint& pt) override { return 0; }
-	mat3ds stiffness(FEMaterialPoint& pt) override { return mat3ds(0, 0, 0, 0, 0, 0); }
+	mat3d stiffness(FEMaterialPoint& pt) override { return mat3ds(0, 0, 0, 0, 0, 0); }
 
 private:
 	FEParamDouble	m_f[3];

@@ -46,6 +46,8 @@ FEDiscreteContractileMaterial::FEDiscreteContractileMaterial(FEModel* fem) : FED
 	m_ac   = 0.0;
 	m_Fmax = 1.0;
 	m_L0   = 0.0;
+	m_Ksh  = 1.0;
+	m_Lmax = 1.0;
 
 	m_Sv = nullptr;
 	m_Ftl = nullptr;
