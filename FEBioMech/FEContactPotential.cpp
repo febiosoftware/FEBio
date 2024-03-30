@@ -395,6 +395,7 @@ bool FEContactPotential::Init()
 {
 	if (FEContactInterface::Init() == false) return false;
 	BuildNeighborTable();
+	m_activeElements.resize(m_surf1.Elements());
 	return true;
 }
 
@@ -445,7 +446,6 @@ void FEContactPotential::Update()
 	}
 
 	// build the list of active elements
-	m_activeElements.resize(m_surf1.Elements());
 #pragma omp parallel for shared(g) schedule(dynamic)
 	for (int i = 0; i < m_surf1.Elements(); ++i)
 	{

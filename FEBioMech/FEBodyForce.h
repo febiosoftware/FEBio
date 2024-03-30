@@ -45,11 +45,12 @@ public:
 	//! calculate the body force at a material point
 	virtual vec3d force(FEMaterialPoint& pt) = 0;
 
-    //! calculate the divergence of the body force at a material point
-    virtual double divforce(FEMaterialPoint& pt) { return (stiffness(pt)).tr(); }
-    
+	//! calculate the divergence of the body force at a material point
+	//! TODO: Is this used anywhere?
+	virtual double divforce(FEMaterialPoint& pt);
+
 	//! calculate constribution to stiffness matrix
-	virtual mat3ds stiffness(FEMaterialPoint& pt) = 0;
+	virtual mat3d stiffness(FEMaterialPoint& pt) = 0;
 
 public:
 	void LoadVector(FEGlobalVector& R) override;

@@ -888,20 +888,34 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 //=============================================================================
 FEPlotElementMixtureStress::FEPlotElementMixtureStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) 
 {
+	m_mat = -1;
 	m_comp = -1;
 	SetUnits(UNIT_PRESSURE);
 }
 
 bool FEPlotElementMixtureStress::SetFilter(const char* szfilter)
 {
-	sscanf(szfilter, "solid[%d]", &m_comp);
+	if (strncmp(szfilter, "material", 8) == 0)
+	{
+		if (sscanf(szfilter, "material[%d].solid[%d]", &m_mat, &m_comp) != 2) return false;
+	}
+	else
+	{
+		if (sscanf(szfilter, "solid[%d]", &m_comp) != 1) return false;
+	}
 	return true;
 }
 
 bool FEPlotElementMixtureStress::Save(FEDomain& dom, FEDataStream& a)
 {
+	FEMaterial* pm = dom.GetMaterial();
+	if (m_mat != -1)
+	{
+		if (pm != GetFEModel()->GetMaterial(m_mat)) return false;
+	}
+
 	// make sure we start from the elastic component
-	FEElasticMaterial* pmat = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+	FEElasticMaterial* pmat = pm->ExtractProperty<FEElasticMaterial>();
 	if (pmat == nullptr) return false;
 
 	// make sure this is a mixture
@@ -3545,6 +3559,46 @@ bool FEPlotDiscreteElementPercentElongation::Save(FEDomain& dom, FEDataStream& a
 
 		double l = (Lt - L0)/L0;
 		a << l;
+	}
+
+	return true;
+}
+
+bool FEPlotDiscreteElementDirection::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteDomain* pdiscreteDomain = dynamic_cast<FEDiscreteDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteDomain& discreteDomain = *pdiscreteDomain;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+		vec3d ra = mesh.Node(el.m_node[0]).m_rt;
+		vec3d rb = mesh.Node(el.m_node[1]).m_rt;
+		vec3d e = (rb - ra); e.unit();
+		a << e;
+	}
+
+	return true;
+}
+
+bool FEPlotDiscreteElementLength::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEDiscreteDomain* pdiscreteDomain = dynamic_cast<FEDiscreteDomain*>(&dom);
+	if (pdiscreteDomain == nullptr) return false;
+	FEDiscreteDomain& discreteDomain = *pdiscreteDomain;
+
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = discreteDomain.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEDiscreteElement& el = discreteDomain.Element(i);
+		vec3d ra = mesh.Node(el.m_node[0]).m_rt;
+		vec3d rb = mesh.Node(el.m_node[1]).m_rt;
+		double L = (rb - ra).Length();
+		a << L;
 	}
 
 	return true;

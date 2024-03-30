@@ -42,7 +42,7 @@ public:
 
     double divforce(FEMaterialPoint& mp) override;
     
-    mat3ds stiffness(FEMaterialPoint& mp) override;
+    mat3d stiffness(FEMaterialPoint& mp) override;
     
     // initialize
     bool Init() override;
