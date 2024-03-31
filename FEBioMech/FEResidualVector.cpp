@@ -94,8 +94,10 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 					FERigidBody& RB = *fem->GetRigidBody(node.m_rid);
 
 					// add to total torque of this body
+					double alpha = fem->GetTime().alphaf;
 					vec3d f = F;
-					vec3d a = node.m_rt - RB.m_rt;
+					vec3d a = (node.m_rt - RB.m_rt)* alpha + (node.m_rp - RB.m_rp) * (1 - alpha);
+//					vec3d a = node.m_rt - RB.m_rt;
 					vec3d m = a ^ F;
 
 					// TODO: This code is only relevant when called from the shell domain residual and applies

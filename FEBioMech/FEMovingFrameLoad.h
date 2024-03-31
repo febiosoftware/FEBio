@@ -23,44 +23,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include "FEBodyForce.h"
 
-
-
-#include "stdafx.h"
-#include "FEModelLoad.h"
-#include "FESolver.h"
-
-//-----------------------------------------------------------------------------
-FEModelLoad::FEModelLoad(FEModel* pfem) : FEStepComponent(pfem), m_dof(pfem)
+//! This body load emulates the effect of a moving frame
+class FEMovingFrameLoad : public FEBodyForce
 {
-}
+public:
+	FEMovingFrameLoad(FEModel* fem);
 
-//-----------------------------------------------------------------------------
-const FEDofList& FEModelLoad::GetDofList() const
-{
-	return m_dof;
-}
+	void Activate() override;
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::Serialize(DumpStream& ar)
-{
-	FEStepComponent::Serialize(ar);
-	ar & m_dof;
-}
+	void PrepStep() override;
 
-void FEModelLoad::PrepStep()
-{
+	vec3d force(FEMaterialPoint& pt) override;
 
-}
+	mat3d stiffness(FEMaterialPoint& pt) override;
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::LoadVector(FEGlobalVector& R)
-{
-	// base class does nothing
-}
+private:
+	vec3d	m_w;	// angular velocity of frame
+	vec3d	m_a;	// linear acceleration of frame
+	
+	quatd	m_q;
+	vec3d	m_wp;
+	vec3d	m_al;
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::StiffnessMatrix(FELinearSystem& LS)
-{
-	// base class does nothing.
-}
+	DECLARE_FECORE_CLASS();
+};

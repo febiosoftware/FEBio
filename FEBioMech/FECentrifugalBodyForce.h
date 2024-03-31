@@ -41,7 +41,7 @@ public:
 
     double divforce(FEMaterialPoint& mp) override;
     
-	mat3ds stiffness(FEMaterialPoint& mp) override;
+	mat3d stiffness(FEMaterialPoint& mp) override;
 
 public:
 	vec3d	n;	// rotation axis

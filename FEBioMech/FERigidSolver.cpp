@@ -150,10 +150,11 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 	for (int i = 0; i<NO; ++i) fem.GetRigidBody(i)->Init();
 
 	// calculate local rigid displacements
-	for (int i = 0; i<fem.RigidPrescribedBCs(); ++i)
+	int NRBC = fem.RigidBCs();
+	for (int i = 0; i < NRBC; ++i)
 	{
-		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
-		if (DC.IsActive()) DC.InitTimeStep();
+		FERigidBC& rbc = *fem.GetRigidBC(i);
+		if (rbc.IsActive()) rbc.InitTimeStep();
 	}
 
 	// calculate global rigid displacements
@@ -270,6 +271,10 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 		}
 	}
 
+	double beta = timeInfo.beta;
+	double gamma = timeInfo.gamma;
+	double dt = timeInfo.timeIncrement;
+
 	FEAnalysis* pstep = m_fem->GetCurrentStep();
 	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
 	{
@@ -282,6 +287,10 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 			if (n.m_rid >= 0)
 			{
 				FERigidBody& rb = *fem.GetRigidBody(n.m_rid);
+
+				rb.m_at = rb.m_ap * (1 - 0.5 / beta) - rb.m_vp / (beta * dt);
+				vec3d vs = rb.m_vp + (rb.m_at * gamma + rb.m_ap * (1 - gamma)) * dt;
+
 				vec3d V = rb.m_vt;
 				vec3d W = rb.m_wt;
 				vec3d r = n.m_rt - rb.m_rt;
@@ -290,8 +299,9 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 				n.m_vp = v;
 				n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, v);
 
-				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
-				n.m_ap = n.m_at = a;
+				// NOTE: check this! I think this assumes a constant rotational velocity! 
+				vec3d a = rb.m_at + (W ^ V)*2.0 + (W ^ (W ^ r));
+//				n.m_at = a;
 			}
 		}
 	}
@@ -409,28 +419,28 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
 							mat3d M;
 
 							// Kuu transformation to Krr
-							M = Kuu * alpha;
+							M = Kuu;
 							KR[0][0] = M[0][0]; KR[0][1] = M[0][1]; KR[0][2] = M[0][2];
 							KR[1][0] = M[1][0]; KR[1][1] = M[1][1]; KR[1][2] = M[1][2];
 							KR[2][0] = M[2][0]; KR[2][1] = M[2][1]; KR[2][2] = M[2][2];
 
 
 							// Kuu transformation to Krq
-							M = Kuu * Zj*(-alpha);
+							M = Kuu * Zj*(-1);
 							KR[0][3] = M[0][0]; KR[0][4] = M[0][1]; KR[0][5] = M[0][2];
 							KR[1][3] = M[1][0]; KR[1][4] = M[1][1]; KR[1][5] = M[1][2];
 							KR[2][3] = M[2][0]; KR[2][4] = M[2][1]; KR[2][5] = M[2][2];
 
 
 							// Kuu transformation to Kqr
-							M = Zi * Kuu*alpha;
+							M = Zi * Kuu;
 							KR[3][0] = M[0][0]; KR[3][1] = M[0][1]; KR[3][2] = M[0][2];
 							KR[4][0] = M[1][0]; KR[4][1] = M[1][1]; KR[4][2] = M[1][2];
 							KR[5][0] = M[2][0]; KR[5][1] = M[2][1]; KR[5][2] = M[2][2];
 
 
 							// Kuu transformation to Kqq
-							M = Zi * Kuu*Zj*(-alpha);
+							M = Zi * Kuu*Zj*(-1);
 							KR[3][3] = M[0][0]; KR[3][4] = M[0][1]; KR[3][5] = M[0][2];
 							KR[4][3] = M[1][0]; KR[4][4] = M[1][1]; KR[4][5] = M[1][2];
 							KR[5][3] = M[2][0]; KR[5][4] = M[2][1]; KR[5][5] = M[2][2];
@@ -457,9 +467,9 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
 							// rigid dofs of node j
 							for (int k = 3; k < ndof; ++k) {
 								vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
-								vec3d m = kpu * alpha;
+								vec3d m = kpu;
 								KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-								m = Zj * kpu*alpha;
+								m = Zj * kpu;
 								KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
 							}
 
@@ -513,9 +523,9 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
 							// Kij
 							for (int k = 0; k < ndof; ++k) {
 								vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
-								vec3d m = kpu * alpha;
+								vec3d m = kpu;
 								KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-								m = Zj * kpu*alpha;
+								m = Zj * kpu;
 								KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
 							}
 
@@ -695,28 +705,28 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     mat3d M;
                     
                     // Kuu transformation
-                    M = (Kuu + Kwu + Kuw + Kww)*alpha;
+                    M = (Kuu + Kwu + Kuw + Kww);
                     KR[0][0] = M[0][0]; KR[0][1] = M[0][1]; KR[0][2] = M[0][2];
                     KR[1][0] = M[1][0]; KR[1][1] = M[1][1]; KR[1][2] = M[1][2];
                     KR[2][0] = M[2][0]; KR[2][1] = M[2][1]; KR[2][2] = M[2][2];
                     
                     
                     // Kuw transformation
-                    M = ((Kuu + Kwu)*Aj + (Kuw + Kww)*Bj)*(-alpha);
+                    M = ((Kuu + Kwu)*Aj + (Kuw + Kww)*Bj)*(-1);
                     KR[0][3] = M[0][0]; KR[0][4] = M[0][1]; KR[0][5] = M[0][2];
                     KR[1][3] = M[1][0]; KR[1][4] = M[1][1]; KR[1][5] = M[1][2];
                     KR[2][3] = M[2][0]; KR[2][4] = M[2][1]; KR[2][5] = M[2][2];
                     
                     
                     // Kwu transformation
-                    M = (Ai*(Kuu + Kuw) + Bi*(Kwu + Kww))*alpha;
+                    M = (Ai*(Kuu + Kuw) + Bi*(Kwu + Kww));
                     KR[3][0] = M[0][0]; KR[3][1] = M[0][1]; KR[3][2] = M[0][2];
                     KR[4][0] = M[1][0]; KR[4][1] = M[1][1]; KR[4][2] = M[1][2];
                     KR[5][0] = M[2][0]; KR[5][1] = M[2][1]; KR[5][2] = M[2][2];
                     
                     
                     // Kww transformation
-                    M = ((Ai*Kuu + Bi*Kwu)*Aj + (Ai*Kuw + Bi*Kww)*Bj)*(-alpha);
+                    M = ((Ai*Kuu + Bi*Kwu)*Aj + (Ai*Kuw + Bi*Kww)*Bj)*(-1);
                     KR[3][3] = M[0][0]; KR[3][4] = M[0][1]; KR[3][5] = M[0][2];
                     KR[4][3] = M[1][0]; KR[4][4] = M[1][1]; KR[4][5] = M[1][2];
                     KR[5][3] = M[2][0]; KR[5][4] = M[2][1]; KR[5][5] = M[2][2];
@@ -744,9 +754,9 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     for (k = 6; k<ndof; ++k) {
                         vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
                         vec3d kpw(kij[k][3], kij[k][4], kij[k][5]);
-                        vec3d m = (kpu + kpw)*alpha;
+                        vec3d m = (kpu + kpw);
                         KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-                        m = (Aj*kpu + Bj*kpw)*alpha;
+                        m = (Aj*kpu + Bj*kpw);
                         KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
                     }
                     
@@ -803,9 +813,9 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     for (k = 0; k<ndof; ++k) {
                         vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
                         vec3d kpw(kij[k][3], kij[k][4], kij[k][5]);
-                        vec3d m = (kpu + kpw)*alpha;
+                        vec3d m = (kpu + kpw);
                         KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-                        m = (Aj*kpu + Bj*kpw)*alpha;
+                        m = (Aj*kpu + Bj*kpw);
                         KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
                     }
                     
@@ -1070,6 +1080,11 @@ void FERigidSolver::RigidMassMatrix(FELinearSystem& LS, const FETimeInfo& timeIn
 	double gamma = timeInfo.gamma;
 	double a = 1. / (beta*dt*dt);
 
+	if (timeInfo.currentTime == 0)
+	{
+		a = alpham = 1;
+	}
+
 	for (int i=0; i<fem.RigidBodies(); ++i)
 	{
 		FERigidBody& RB = *fem.GetRigidBody(i);
@@ -1230,17 +1245,20 @@ void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui,
 
 	// for prescribed displacements, the displacement increments are evaluated differently
 	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
-	const int NRD = fem.RigidPrescribedBCs();
-	for (int i = 0; i<NRD; ++i)
+	for (int i = 0; i < NRB; ++i)
 	{
-		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
-		if (dc.IsActive())
+		// get the rigid body
+		FERigidBody& RB = *fem.GetRigidBody(i);
+		if (RB.m_prb == nullptr)
 		{
-			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
-			if (RB.m_prb == 0)
+			for (int j = 0; j < 6; ++j)
 			{
-				int I = dc.GetBC();
-				RB.m_du[I] = dc.Value() - RB.m_Up[I];
+				FERigidPrescribedBC* dc = RB.m_pDC[j];
+				if (dc && dc->IsActive())
+				{
+					int I = dc->GetBC();
+					RB.m_du[I] = dc->Value() - RB.m_Up[I];
+				}
 			}
 		}
 	}

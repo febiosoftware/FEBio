@@ -43,11 +43,15 @@ public:
 
 	bool Init() override;
 
+	virtual void InitTimeStep();
+
 	void Serialize(DumpStream& ar) override;
 
 	FERigidBody& GetRigidBody();
 
 	void CopyFrom(FEBoundaryCondition* pbc) override;
+
+	void SetRigidMaterial(int rigidMat);
 
 private:
 	int		m_rb;			// rigid body ID
@@ -138,7 +142,7 @@ public:
 
 	double Value();
 
-	void InitTimeStep();
+	void InitTimeStep() override;
 
 	void Serialize(DumpStream& ar) override;
 

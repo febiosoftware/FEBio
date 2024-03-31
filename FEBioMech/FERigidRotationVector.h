@@ -23,44 +23,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include "RigidBC.h"
+#include "febiomech_api.h"
 
-
-
-#include "stdafx.h"
-#include "FEModelLoad.h"
-#include "FESolver.h"
-
-//-----------------------------------------------------------------------------
-FEModelLoad::FEModelLoad(FEModel* pfem) : FEStepComponent(pfem), m_dof(pfem)
+class FEBIOMECH_API FERigidRotationVector : public FERigidBC
 {
-}
+public:
+	FERigidRotationVector(FEModel* fem);
+	~FERigidRotationVector();
 
-//-----------------------------------------------------------------------------
-const FEDofList& FEModelLoad::GetDofList() const
-{
-	return m_dof;
-}
+	bool Init() override;
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::Serialize(DumpStream& ar)
-{
-	FEStepComponent::Serialize(ar);
-	ar & m_dof;
-}
+	void Activate() override;
 
-void FEModelLoad::PrepStep()
-{
+	void Deactivate() override;
 
-}
+	void InitTimeStep() override;
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::LoadVector(FEGlobalVector& R)
-{
-	// base class does nothing
-}
+	void Serialize(DumpStream& ar) override;
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::StiffnessMatrix(FELinearSystem& LS)
-{
-	// base class does nothing.
-}
+private:
+	double	m_vx, m_vy, m_vz;
+
+	FERigidPrescribedBC*	m_rc[3];
+
+	DECLARE_FECORE_CLASS();
+};

@@ -378,6 +378,7 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a) override;
 protected:
 	int		m_comp;
+	int		m_mat;
 };
 
 //-----------------------------------------------------------------------------
@@ -1061,6 +1062,20 @@ class FEPlotDiscreteElementPercentElongation : public FEPlotDomainData
 {
 public:
 	FEPlotDiscreteElementPercentElongation(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotDiscreteElementDirection : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementDirection(FEModel* fem) : FEPlotDomainData(fem, PLT_VEC3F, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotDiscreteElementLength : public FEPlotDomainData
+{
+public:
+	FEPlotDiscreteElementLength(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 

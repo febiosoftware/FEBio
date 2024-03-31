@@ -44,7 +44,7 @@ FECentrifugalFluidBodyForce::FECentrifugalFluidBodyForce(FEModel* pfem) : FEBody
 
 vec3d FECentrifugalFluidBodyForce::force(FEMaterialPoint& mp)
 {
-	mat3ds K = stiffness(mp);
+	mat3d K = stiffness(mp);
 	return K*(mp.m_rt - c);
 }
 
@@ -53,7 +53,7 @@ double FECentrifugalFluidBodyForce::divforce(FEMaterialPoint& mp)
     return -2*w*w;
 }
 
-mat3ds FECentrifugalFluidBodyForce::stiffness(FEMaterialPoint& mp)
+mat3d FECentrifugalFluidBodyForce::stiffness(FEMaterialPoint& mp)
 { 
 	return (mat3dd(1) - dyad(n))*(-w*w); 
 }

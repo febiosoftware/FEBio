@@ -1097,7 +1097,7 @@ void FEBiphasicShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEl
     vec3d gcnt[3];
     
     vec3d b;
-    mat3ds gradb;
+    mat3d gradb;
     mat3d Kuu, Kud, Kdu, Kdd;
     vec3d kpu, kpd, kqu, kqd;
     
