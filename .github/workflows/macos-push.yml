@@ -16,7 +16,9 @@ jobs:
   call_workflow:
     uses: febiosoftware/febio-workflows/.github/workflows/macos-reusable-push.yml@develop
     with:
-      runTests: ${{ inputs.runTests == 'true' }}
+      runTests: ${{ inputs.runTests == 'true' || contains('
+          refs/heads/develop
+        ', github.ref_name) }}
       package-name: febio4
       package-sdk: true
     secrets: inherit

@@ -18,7 +18,9 @@ jobs:
   call_workflow:
     uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable-push.yml@develop
     with:
-      runTests: ${{ inputs.runTests == 'true' }}
+      runTests: ${{ inputs.runTests == 'true' || contains('
+          refs/heads/develop
+        ', github.ref_name) }}
       package-name: febio4
       package-sdk: true
       aws-ami-id: ami-0b18c665dbe9efa75
