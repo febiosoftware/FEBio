@@ -1,3 +1,4 @@
+name: CI - Linux - On Push
 on:
   push:
     branches:
@@ -9,11 +10,14 @@ on:
         required: false
         type: boolean
         default: false
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
 jobs:
   call_workflow:
-    uses: febiosoftware/febio-workflows/.github/workflows/linux-reusable.yml@develop
+    uses: febiosoftware/febio-workflows/.github/workflows/linux-reusable-push.yml@develop
     with:
-      runTests: ${{ inputs.runTests && true || false }}
+      runTests: ${{ inputs.runTests == 'true' }}
       package-name: febio4
       package-sdk: true
       aws-ami-id: ami-0590ebdb5afffb782

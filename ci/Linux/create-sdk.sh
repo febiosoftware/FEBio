@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e
 TARGET_DIR="${TARGET_DIR:-febio4-sdk}"
 mkdir -p ${TARGET_DIR}/{include,lib,bin}
 # Gotta use rsync macos cp doesn't support --parent
