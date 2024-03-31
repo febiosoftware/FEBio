@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - 'ci/develop'
-      - 'ci/pull_request_test'
   workflow_dispatch:
     inputs:
       runTests:
