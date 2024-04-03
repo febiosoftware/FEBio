@@ -122766,7 +122766,7 @@ Parsers should read this number and use it to identify whether the file
 \series bold
 \emph on
 NOTE: Note that the FEBio tag is not followed by a size tag.
- The reason is because when FEBio is writing the file it does not know the
+ The reason is that when FEBio is writing the file it does not know the
  length of the final file yet.
 \end_layout
 
