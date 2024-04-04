@@ -1073,7 +1073,7 @@ void FEBiphasicSolidDomain::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEl
     double Gr, Gs, Gt;
     
     vec3d b, kpu;
-    mat3ds gradb;
+    mat3d gradb;
     mat3d Kw, Kuu;
     
     // loop over integration points

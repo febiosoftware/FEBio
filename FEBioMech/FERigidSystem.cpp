@@ -80,7 +80,6 @@ void FERigidSystem::Clear()
 {
 	for (int i=0; i<(int)m_RB.size (); ++i) delete m_RB [i]; m_RB.clear ();
 	for (int i=0; i<(int)m_RBC.size(); ++i) delete m_RBC[i]; m_RBC.clear();
-	for (int i=0; i<(int)m_RDC.size(); ++i) delete m_RDC[i]; m_RDC.clear();
 	for (int i=0; i<(int)m_RIC.size(); ++i) delete m_RIC[i]; m_RIC.clear();
 }
 
@@ -95,23 +94,27 @@ void FERigidSystem::Serialize(DumpStream& ar)
 	{
 		if (ar.IsSaving())
 		{
-			// rigid objects
-			int nrb = Objects();
-			ar << nrb;
-			for (int i=0; i<nrb; ++i) Object(i)->Serialize(ar);
-
-			// fixed rigid body dofs
-			ar & m_RBC;
-
-			// rigid body displacements
-			ar & m_RDC;
+			// rigid body constraints
+			ar << m_RBC;
 
 			// rigid body initial conditions
-			ar & m_RIC;
+			ar << m_RIC;
+
+			// rigid objects
+			// (Do these last, since they contain references to rbcs)
+			int nrb = Objects();
+			ar << nrb;
+			for (int i = 0; i < nrb; ++i) m_RB[i]->Serialize(ar);
 		}
 		else
 		{
 			Clear();
+
+			// rigid body constraints
+			ar >> m_RBC;
+
+			// rigid body initial conditions
+			ar >> m_RIC;
 
 			// rigid bodies
 			int nrb = 0;
@@ -122,15 +125,6 @@ void FERigidSystem::Serialize(DumpStream& ar)
 				prb->Serialize(ar);
 				AddRigidBody(prb);
 			}
-
-			// fixed rigid body dofs
-			ar & m_RBC;
-
-			// rigid body displacements
-			ar & m_RDC;
-
-			// rigid body initial conditions
-			ar & m_RIC;
 		}
 	}
 }
@@ -138,17 +132,10 @@ void FERigidSystem::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FERigidSystem::Activate()
 {
-	// rigid body displacements
-	for (int i=0; i<(int) m_RDC.size(); ++i)
-	{
-		FERigidPrescribedBC& rc = *m_RDC[i];
-		if (rc.IsActive()) rc.Activate();
-	}
-
 	// fixed rigid body dofs
 	for (int i=0; i<(int) m_RBC.size(); ++i)
 	{
-		FERigidFixedBC& rc = *m_RBC[i];
+		FERigidBC& rc = *m_RBC[i];
 		if (rc.IsActive()) rc.Activate();
 	}
 
@@ -172,13 +159,8 @@ bool FERigidSystem::Init()
 	FEModel& fem = m_fem;
 	for (int i=0; i<(int) m_RBC.size(); ++i)
 	{
-		FERigidFixedBC& BC = *m_RBC[i];
+		FERigidBC& BC = *m_RBC[i];
 		if (BC.Init() == false) return false;
-	}
-	for (int i=0; i<(int) m_RDC.size(); ++i)
-	{
-		FERigidPrescribedBC& DC = *m_RDC[i];
-		if (DC.Init() == false) return false;
 	}
 	for (int i=0; i<(int) m_RIC.size(); ++i)
 	{

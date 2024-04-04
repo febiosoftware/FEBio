@@ -39,7 +39,7 @@ vec3d FEConstFluidBodyForce::force(FEMaterialPoint& pt)
     return m_force(pt);
 }
 
-mat3ds FEConstFluidBodyForce::stiffness(FEMaterialPoint& pt) 
+mat3d FEConstFluidBodyForce::stiffness(FEMaterialPoint& pt) 
 { 
 	return mat3ds(0, 0, 0, 0, 0, 0); 
 }

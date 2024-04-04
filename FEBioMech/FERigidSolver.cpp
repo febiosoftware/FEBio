@@ -150,10 +150,11 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 	for (int i = 0; i<NO; ++i) fem.GetRigidBody(i)->Init();
 
 	// calculate local rigid displacements
-	for (int i = 0; i<fem.RigidPrescribedBCs(); ++i)
+	int NRBC = fem.RigidBCs();
+	for (int i = 0; i < NRBC; ++i)
 	{
-		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
-		if (DC.IsActive()) DC.InitTimeStep();
+		FERigidBC& rbc = *fem.GetRigidBC(i);
+		if (rbc.IsActive()) rbc.InitTimeStep();
 	}
 
 	// calculate global rigid displacements
@@ -1244,17 +1245,20 @@ void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui,
 
 	// for prescribed displacements, the displacement increments are evaluated differently
 	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
-	const int NRD = fem.RigidPrescribedBCs();
-	for (int i = 0; i<NRD; ++i)
+	for (int i = 0; i < NRB; ++i)
 	{
-		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
-		if (dc.IsActive())
+		// get the rigid body
+		FERigidBody& RB = *fem.GetRigidBody(i);
+		if (RB.m_prb == nullptr)
 		{
-			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
-			if (RB.m_prb == 0)
+			for (int j = 0; j < 6; ++j)
 			{
-				int I = dc.GetBC();
-				RB.m_du[I] = dc.Value() - RB.m_Up[I];
+				FERigidPrescribedBC* dc = RB.m_pDC[j];
+				if (dc && dc->IsActive())
+				{
+					int I = dc->GetBC();
+					RB.m_du[I] = dc->Value() - RB.m_Up[I];
+				}
 			}
 		}
 	}

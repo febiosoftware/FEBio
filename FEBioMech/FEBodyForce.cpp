@@ -59,3 +59,8 @@ void FEBodyForce::StiffnessMatrix(FELinearSystem& LS)
 		if (edom) edom->BodyForceStiffness(LS, *this);
 	}
 }
+
+double FEBodyForce::divforce(FEMaterialPoint& pt)
+{ 
+	return (stiffness(pt)).trace(); 
+}

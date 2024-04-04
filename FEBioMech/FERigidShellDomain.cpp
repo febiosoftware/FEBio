@@ -290,7 +290,7 @@ void FERigidShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEleme
 		double Jw = detJ0(el, n) * gw[n] * alphaf;
 
 		// get the stiffness
-		mat3ds K = BF.stiffness(mp)*m_pMat->Density(mp)*Jw;
+		mat3d K = BF.stiffness(mp)*(m_pMat->Density(mp)*Jw);
 
 		double* M = el.H(n);
 

@@ -38,7 +38,7 @@ public:
     double divforce(FEMaterialPoint& pt) override;
     
 	//! calculate constribution to stiffness matrix
-	mat3ds stiffness(FEMaterialPoint& pt) override;
+	mat3d stiffness(FEMaterialPoint& pt) override;
 
 private:
 	double	m_C;
