@@ -2,12 +2,11 @@
 # Uncomment next line if not global on target machine
 set -e
 
-chmod +x cmbuild/bin/febio4
-
 FEBIO_XML="$(dirname $0)/febio.xml"
 FEBIO_DIR=$(realpath ./cmbuild/bin)
 FEBIO_LIB=$(realpath ./cmbuild/lib)
 FEBIO_BIN="${FEBIO_DIR}/febio4"
+chmod +x $FEBIO_BIN
 
 FEBIOHEAT=$(realpath ./febioheat/lib/libFEBioHeat.dylib)
 FEBIOCHEM=$(realpath ./febiochem/lib/libFEBioChem.dylib)
