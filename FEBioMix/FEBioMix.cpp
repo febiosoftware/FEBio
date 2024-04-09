@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FEMultiphasicStandard.h"
-#include "FEElasticSoluteStandard.h"
+#include "FEElasticReactionDiffusionStandard.h"
 #include "FEMultiphasicMultigeneration.h"
 #include "FESolute.h"
 #include "FETriphasic.h"
@@ -60,7 +60,7 @@ SOFTWARE.*/
 #include "FECarterHayes.h"
 #include "FEReactionRateConst.h"
 #include "FEReactionRateHuiskes.h"
-#include "FEReactionRateStressSensitive.h"
+
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
 #include "FEReactionRateSoluteAsSBM.h"
@@ -77,11 +77,18 @@ SOFTWARE.*/
 #include "FEMembraneMassActionReversible.h"
 #include "FEActiveConstantSupply.h"
 #include "FEPorousNeoHookean.h"
+
+#include "FEReactionRateConstERD.h"
+#include "FEConcentrationIndependentReactionERD.h"
+#include "FEMassActionForwardERD.h"
+#include "FEMassActionReversibleERD.h"
 #include "FEHillActivation.h"
 #include "FEHillInhibition.h"
 #include "FEHillActivationANDActivation.h"
 #include "FEHillActivationANDInhibition.h"
 #include "FEHillActivationORActivation.h"
+#include "FEReactionRateStressSensitiveERD.h"
+#include "FEPrescribedStressSensitiveConcentrationERD.h"
 
 #include "FEMixtureNormalTraction.h"
 #include "FEFluidFlux.h"
@@ -103,7 +110,7 @@ SOFTWARE.*/
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"
 #include "FEMultiphasicSolver.h"
-#include "FEElasticSoluteSolver.h"
+#include "FEElasticReactionDiffusionSolver.h"
 
 #include "FEBioMixPlot.h"
 #include "FEBioMixData.h"
@@ -115,7 +122,7 @@ SOFTWARE.*/
 #include "FEBiphasicSoluteShellDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicSolidDomain.h"
-#include "FEElasticSoluteSolidDomain.h"
+#include "FEElasticReactionDiffusionSolidDomain.h"
 #include "FEMultiphasicShellDomain.h"
 
 #include "FESBMPointSource.h"
@@ -126,7 +133,7 @@ SOFTWARE.*/
 #include "FEFixedConcentration.h"
 #include "FEPrescribedConcentration.h"
 #include "FEMultiphasicFluidPressureBC.h"
-#include "FEPrescribedStressSensitiveConcentration.h"
+
 
 #include "FEInitialEffectiveFluidPressure.h"
 #include "FEInitialConcentration.h"
@@ -136,7 +143,7 @@ SOFTWARE.*/
 #include "FEBiphasicAnalysis.h"
 #include "FEBiphasicSoluteAnalysis.h"
 #include "FEMultiphasicAnalysis.h"
-#include "FEElasticSoluteAnalysis.h"
+#include "FEElasticReactionDiffusionAnalysis.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -350,7 +357,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEFixedConcentration, "zero concentration");
 	REGISTER_FECORE_CLASS(FEPrescribedConcentration, "prescribed concentration");
     REGISTER_FECORE_CLASS(FEMultiphasicFluidPressureBC, "actual fluid pressure");
-	REGISTER_FECORE_CLASS(FEPrescribedStressSensitiveConcentration, "prescribed stress sensitive concentration")
+	
 
 	//-----------------------------------------------------------------------------
 	// Contact interfaces
@@ -464,7 +471,6 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberPowLinearSBM                 , "fiber-pow-linear sbm");
 	REGISTER_FECORE_CLASS(FEReactionRateConst		    	  , "constant reaction rate"    );
 	REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  , "Huiskes reaction rate"     );
-	REGISTER_FECORE_CLASS(FEReactionRateStressSensitive		  , "stress sensitive reaction rate");
 	REGISTER_FECORE_CLASS(FEReactionRateNims		    	  , "Nims reaction rate"        );
 	REGISTER_FECORE_CLASS(FEReactionRateExpSED                , "exp-sed reaction rate"     );
     REGISTER_FECORE_CLASS(FEReactionRateSoluteAsSBM           , "solute-as-sbm reaction rate");
@@ -480,11 +486,6 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEMembraneMassActionReversible      , "membrane-mass-action-reversible");
 	REGISTER_FECORE_CLASS(FEMichaelisMenten                   , "Michaelis-Menten"         );
 	REGISTER_FECORE_CLASS(FESolidBoundMolecule                , "solid_bound"              );
-	REGISTER_FECORE_CLASS(FEHillActivation					  , "Hill activation"		   );
-	REGISTER_FECORE_CLASS(FEHillInhibition					  , "Hill inhibition"		   );
-	REGISTER_FECORE_CLASS(FEHillActivationANDActivation		  , "Hill activation AND activation");
-	REGISTER_FECORE_CLASS(FEHillActivationANDInhibition		  , "Hill activation AND inhibition");
-	REGISTER_FECORE_CLASS(FEHillActivationORActivation		  , "Hill activation OR activation");
 
 	REGISTER_FECORE_CLASS(FEReactantSpeciesRef, "vR");
 	REGISTER_FECORE_CLASS(FEProductSpeciesRef , "vP");
@@ -569,54 +570,77 @@ void FEBioMix::InitModule()
     }));
 
 //======================================================================
-// setup the "elastic solute" module
-	febio.CreateModule(new FEElasticSoluteModule, "elastic-solute",
+// setup the "elastic reaction diffusion" module
+	febio.CreateModule(new FEElasticReactionDiffusionModule, "elastic-reaction-diffusion",
 		"{"
-		"   \"title\" : \"Elastic Solute Analysis\","
+		"   \"title\" : \"Elastic Reaction Diffusion Analysis\","
 		"   \"info\"  : \"Transient analysis with solutes.\""
 		"}");
 
+	//febio.AddModuleDependency("solid");
+	//febio.AddModuleDependency("biphasic");
 	febio.AddModuleDependency("solute");
+	//febio.AddModuleDependency("multiphasic");
 
 	//-----------------------------------------------------------------------------
 	// Global data classes
 
 	//-----------------------------------------------------------------------------
 	// analyis classes (default type must match module name!)
-	REGISTER_FECORE_CLASS(FEElasticSoluteAnalysis, "elastic-solute");
+	REGISTER_FECORE_CLASS(FEElasticReactionDiffusionAnalysis, "elastic-reaction-diffusion");
 
 	//-----------------------------------------------------------------------------
 	// solver classes
-	REGISTER_FECORE_CLASS(FEElasticSoluteSolver, "elastic-solute");
+	REGISTER_FECORE_CLASS(FEElasticReactionDiffusionSolver, "elastic-reaction-diffusion");
 
 	//-----------------------------------------------------------------------------
 	// Domain classes
-	REGISTER_FECORE_CLASS(FEElasticSoluteSolidDomain, "elastic-solute-solid");
+	REGISTER_FECORE_CLASS(FEElasticReactionDiffusionSolidDomain, "elastic-reaction-diffusion-solid");
 
 	//-----------------------------------------------------------------------------
 	// Materials
-	REGISTER_FECORE_CLASS(FEElasticSoluteStandard, "elastic-solute");
+	REGISTER_FECORE_CLASS(FEElasticReactionDiffusionStandard, "elastic-reaction-diffusion");
+	REGISTER_FECORE_CLASS(FEReactionRateConstERD, "constant reaction rate erd");
+	REGISTER_FECORE_CLASS(FEConcentrationIndependentReactionERD, "concentration-independent-erd");
+	REGISTER_FECORE_CLASS(FEMassActionForwardERD, "mass-action-forward-erd");
+	REGISTER_FECORE_CLASS(FEMassActionReversibleERD, "mass-action-reversible-erd");
+	REGISTER_FECORE_CLASS(FEReactionRateStressSensitiveERD, "stress sensitive reaction rate erd");
+	
+	REGISTER_FECORE_CLASS(FEHillActivation, "Hill activation");
+	REGISTER_FECORE_CLASS(FEHillInhibition, "Hill inhibition");
+	REGISTER_FECORE_CLASS(FEHillActivationANDActivation, "Hill activation AND activation");
+	REGISTER_FECORE_CLASS(FEHillActivationANDInhibition, "Hill activation AND inhibition");
+	REGISTER_FECORE_CLASS(FEHillActivationORActivation, "Hill activation OR activation");
+	//REGISTER_FECORE_CLASS(FEMichaelisMenten, "Michaelis-Menten");
 
-	//-----------------------------------------------------------------------------
-	// Surface loads
-
-	//-----------------------------------------------------------------------------
-	// Boundary conditions
-
-	//-----------------------------------------------------------------------------
-	// Body loads
-
-	//-----------------------------------------------------------------------------
-	// Contact interfaces
+	REGISTER_FECORE_CLASS(FEReactantSpeciesRefERD, "vR");
+	REGISTER_FECORE_CLASS(FEProductSpeciesRefERD, "vP");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEPlotData
-
+	REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentrationERD, "solute concentration erd");
+	REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentrationERD, "effective solute concentration erd");
+	REGISTER_FECORE_CLASS(FEPlotSoluteFluxERD, "solute flux erd");
+	
 	//-----------------------------------------------------------------------------
-	// Element log data
+	// Body loads
+	//REGISTER_FECORE_CLASS(FESolutePointSource, "solute point source");
+	
+	//-----------------------------------------------------------------------------
+	// Boundary conditions
+	REGISTER_FECORE_CLASS(FEPrescribedStressSensitiveConcentrationERD, "prescribed stress sensitive concentration erd")
 
 	//-----------------------------------------------------------------------------
 	// domain log data
+
+	//REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 0, "c1_integral");
+	//REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 1, "c2_integral");
+	//REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 2, "c3_integral");
+	//REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 3, "c4_integral");
+	//REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 4, "c5_integral");
+	//REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 5, "c6_integral");
+	//REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 6, "c7_integral");
+	//REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 7, "c8_integral");
 
 	febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
 		pc->m_maxups = 25;
@@ -626,8 +650,8 @@ void FEBioMix::InitModule()
 		pc->m_iteopt = 15;
 		}));
 
-	febio.OnCreateEvent(CallWhenCreating<FEMultiphasicAnalysis>([](FEMultiphasicAnalysis* pc) {
-		pc->m_nanalysis = FEMultiphasicAnalysis::TRANSIENT;
+	febio.OnCreateEvent(CallWhenCreating<FEElasticReactionDiffusionAnalysis>([](FEElasticReactionDiffusionAnalysis* pc) {
+		pc->m_nanalysis = FEElasticReactionDiffusionAnalysis::TRANSIENT;
 		}));
 
 	febio.SetActiveModule(0);

@@ -27,12 +27,12 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FESoluteInterface.h"
+#include "FEElasticReactionDiffusionInterface.h"
 #include "FEBiphasic.h"
 #include "FEHillActivationANDActivation.h"
 #include <FECore/log.h>
 
-BEGIN_FECORE_CLASS(FEHillActivationANDActivation, FEChemicalReaction)
+BEGIN_FECORE_CLASS(FEHillActivationANDActivation, FEChemicalReactionERD)
 	ADD_PARAMETER(m_Kmax, "Kmax");
 	ADD_PARAMETER(m_w, "reaction_weight");
 	ADD_PARAMETER(m_t, "degradation_rate");
@@ -43,7 +43,7 @@ BEGIN_FECORE_CLASS(FEHillActivationANDActivation, FEChemicalReaction)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEHillActivationANDActivation::FEHillActivationANDActivation(FEModel* pfem) : FEChemicalReaction(pfem)
+FEHillActivationANDActivation::FEHillActivationANDActivation(FEModel* pfem) : FEChemicalReactionERD(pfem)
 {
 	// set material properties
 	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
@@ -61,7 +61,7 @@ bool FEHillActivationANDActivation::Init()
 		feLogError("sol_id: param not valid");
 		return false;
 	}
-	return FEChemicalReaction::Init();
+	return FEChemicalReactionERD::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -78,21 +78,7 @@ double FEHillActivationANDActivation::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of reaction rate with strain at material point
 mat3ds FEHillActivationANDActivation::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
-	// if the reaction supply is insensitive to strain
-	if (m_bool_refC)
-		return mat3ds(0.0);
-
-	double zhat = ReactionSupply(pt);
-	mat3dd I(1);
-	mat3ds dzhatde = I * (-zhat);
-	return dzhatde;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of reaction rate with effective fluid pressure at material point
-double FEHillActivationANDActivation::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
-{
-	return 0.0;
+	return mat3ds(0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -131,8 +117,8 @@ double FEHillActivationANDActivation::f_Hill(FEMaterialPoint& pt, const int sol)
 
 double FEHillActivationANDActivation::dfdc(FEMaterialPoint& pt, const int sol)
 {
-	double c_eff = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-	double cn = pow(m_psm->GetActualSoluteConcentration(pt, sol), m_n);
-	double dfdc = (m_Kn * m_n * f_Hill(pt, sol)) / (c_eff * (m_Kn + cn));
+	double c = m_psm->GetActualSoluteConcentration(pt, sol);
+	double cn = pow(c, m_n);
+	double dfdc = (m_Kn * m_n * f_Hill(pt, sol)) / (c * (m_Kn + cn));
 	return dfdc;
 }

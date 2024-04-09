@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2024 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,18 +26,18 @@ SOFTWARE.*/
 
 
 
-#pragma once
-#include "FEElasticSolute.h"
+#include "stdafx.h"
+#include "FEElasticReactionDiffusionStandard.h"
 
 //-----------------------------------------------------------------------------
-//! Standard elastic solute material.
-
-class FEBIOMIX_API FEElasticSoluteStandard : public FEElasticSolute
+//! FEMultiphasicStandard constructor
+FEElasticReactionDiffusionStandard::FEElasticReactionDiffusionStandard(FEModel* pfem) : FEElasticReactionDiffusion(pfem)
 {
-public:
-	//! constructor
-	FEElasticSoluteStandard(FEModel* pfem);
-    
-    //! returns a pointer to a new material point object
-	FEMaterialPointData* CreateMaterialPointData();
-};
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPointData* FEElasticReactionDiffusionStandard::CreateMaterialPointData()
+{
+	return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
+}
+

@@ -27,23 +27,23 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEChemicalReaction.h"
+#include "FEChemicalReactionERD.h"
 #include <FECore/FEElement.h>
 
-class FEBIOMIX_API FEReactionRateStressSensitive : public FEReactionRate
+class FEBIOMIX_API FEReactionRateStressSensitiveERD : public FEReactionRateERD
 {
 public:
 	//! constructor
-	FEReactionRateStressSensitive(FEModel* pfem) : FEReactionRate(pfem) { m_k = 0; }
+	FEReactionRateStressSensitiveERD(FEModel* pfem) : FEReactionRateERD(pfem) { m_k = 0; }
 	
 	//! reaction rate at material point
 	double ReactionRate(FEMaterialPoint& pt) override;
 
 	//! tangent of reaction rate with strain at material point
 	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
-	
-	//! tangent of reaction rate with effective fluid pressure at material point
-	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+
+	//! tangent of reaction rate with strain at material point
+	mat3ds Tangent_ReactionRate_Stress(FEMaterialPoint& pt);
 
 public:
 	double m_a0		= 1.0;

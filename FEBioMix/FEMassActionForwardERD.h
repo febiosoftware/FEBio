@@ -27,43 +27,24 @@ SOFTWARE.*/
 
 
 #pragma once
-#include <FECore/FEPrescribedDOF.h>
-#include <FECore/tens3d.h>
-#include <FEBioMech/FEBioMech.h>
-#include "febiomix_api.h"
-#include <FECore/FEElement.h>
+#include "FEChemicalReactionERD.h"
 
 //-----------------------------------------------------------------------------
-class FEBIOMIX_API FEPrescribedStressSensitiveConcentration : public FEPrescribedDOF
+//! Law of mass action for forward chemical reaction, using effective concentrations
+class FEBIOMIX_API FEMassActionForwardERD : public FEChemicalReactionERD
 {
 public:
-	//! constructor
-	FEPrescribedStressSensitiveConcentration(FEModel* pfem);
+    //! constructor
+    FEMassActionForwardERD(FEModel* pfem);
 
-	//! initializer
-	bool Init() override;
+    //! molar supply at material point
+    double ReactionSupply(FEMaterialPoint& pt) override;
 
-	//! get integration point stress
-	mat3ds GetStress(FEElement& m_elem, int nodelid);
+    //! tangent of molar supply with strain (J) at material point
+    mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
 
-	//! get integration point concentration
-	double GetConcentration(FEElement& m_elem, int nodelid);
+    //! tangent of molar supply with effective concentration at material point
+    double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
 
-	//! get stress projected at the nodes
-	mat3ds GetNodalStress(int nodelid);
-
-	//! get concentration projected at the nodes
-	double GetNodalConcentration(int nodelid);
-
-public:
-	double m_s0		= 0.2;
-	double m_a0		= 1.0;
-	double m_a		= 1.0;
-	double m_b		= 0.05;
-	FEParamDouble m_value;
-	DECLARE_FECORE_CLASS();
-protected:
-	void GetNodalValues(int nodelid, std::vector<double>& val) override;
-
-protected:
+    DECLARE_FECORE_CLASS();
 };

@@ -149,13 +149,13 @@ double FEMassActionForward::Tangent_ReactionSupply_Concentration(FEMaterialPoint
     // if the reaction supply is sensitive to concentration
     if (!m_bool_refC)
     {
-        for (int isol = 0; isol < nsol; ++isol)
-        {
-            double dkdc = m_psm->dkdc(pt, isol, sol);
-            double k = m_psm->GetPartitionCoefficient(pt, isol);
-            double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-            dzhatdc += m_vR[isol]*dkdc/k;
-            if ((isol == sol) && (c > 0))
+    for (int isol = 0; isol < nsol; ++isol)
+    {
+        double dkdc = m_psm->dkdc(pt, isol, sol);
+        double k = m_psm->GetPartitionCoefficient(pt, isol);
+        double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+        dzhatdc += m_vR[isol]*dkdc/k;
+        if ((isol == sol) && (c > 0))
                 dzhatdc += m_vR[isol]/c;
         }
     }

@@ -8110,10 +8110,10 @@ solutes) in the mixture.
 \end_layout
 
 \begin_layout Section
-Elastic-Solute Materials
+Elastic Reaction-Diffusion Materials
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Elastic-Solute-Materials"
+name "sec:Elastic-Reaction-Diffusion-Materials"
 
 \end_inset
 
@@ -8121,8 +8121,8 @@ name "sec:Elastic-Solute-Materials"
 \end_layout
 
 \begin_layout Standard
-Elastic-solute materials represent a simplification of the biphasic-solute
- and multiphasic materials, where there is no explicitly modeled porous
+Elastic reaction-diffusion materials represent a simplification of the biphasic-
+solute and multiphasic materials, where there is no explicitly modeled porous
  media or fluid phase.
  Solid mechanics and chemical reaction-diffusion kinetics are formulated
  to be nearly independent of each other aside from additional user-defined
@@ -8140,8 +8140,8 @@ Elastic-solute materials represent a simplification of the biphasic-solute
 \end_layout
 
 \begin_layout Standard
-Elastic-solute analyses deviate from biphasic-solute and multuphasic analyses
- by assuming that solute 
+Elastic reaction-diffusion analyses deviate from biphasic-solute and multuphasic
+ analyses by assuming that solute 
 \begin_inset Formula $\tilde{c}^{\alpha}$
 \end_inset
 
@@ -8191,7 +8191,7 @@ This analysis should not be used when modeling electrochemistry or short-time
 Governing Equations
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ES-governing-equations"
+name "subsec:ERD-governing-equations"
 
 \end_inset
 
@@ -8552,7 +8552,7 @@ where
 Continuous Variables
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ES-continuous-variables"
+name "subsec:ERD-continuous-variables"
 
 \end_inset
 
@@ -8592,7 +8592,7 @@ Here, the actual solute concentration is a continuous nodal variable that
  the surrounding elements (see 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:ES-discretization"
+reference "subsec:ERD-discretization"
 plural "false"
 caps "false"
 noprefix "false"
@@ -19340,7 +19340,7 @@ The linearization of the first term in
  yields 
 \begin_inset Formula 
 \begin{equation}
-\left(\mathbf{S}:\delta\mathbf{\dot{E}}\right)\left[\Delta\mathbf{u}\right]\,dV=\left[\delta\mathbf{d}^{s}:\boldsymbol{\mathcal{C}}:\Delta\boldsymbol{\varepsilon}+\boldsymbol{\sigma}:\left(\grad^{T}\Delta\mathbf{u}\cdot\grad\delta\mathbf{v}\right)\right]\,dv\,,\label{eq292}
+D\left(\mathbf{S}:\delta\mathbf{\dot{E}}\right)\left[\Delta\mathbf{u}\right]\,dV=\left[\delta\mathbf{d}^{s}:\boldsymbol{\mathcal{C}}:\Delta\boldsymbol{\varepsilon}+\boldsymbol{\sigma}:\left(\grad^{T}\Delta\mathbf{u}\cdot\grad\delta\mathbf{v}\right)\right]\,dv\,,\label{eq292}
 \end{equation}
 
 \end_inset
@@ -19460,7 +19460,7 @@ where
 and 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\mathcal{G}}=\frac{R\theta}{\varphi^{w}}\sum_{\alpha}\frac{\tilde{\kappa}^{\alpha}\tilde{c}^{\alpha}}{d_{0}^{\alpha}}\left(\begin{aligned}\left(\frac{1}{\varphi^{w}}-\frac{J}{\tilde{\kappa}^{\alpha}}\frac{\partial\tilde{\kappa}^{\alpha}}{\partial J}\right)\left(\mathbf{I}-\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\right)\otimes\mathbf{I}\\
+\boldsymbol{\mathcal{G}}=\frac{R\theta}{\varphi^{w}}\sum_{\alpha}\frac{\tilde{\kappa}^{\alpha}\tilde{c}^{\alpha}}{d_{0}^{\alpha}}\left(\begin{aligned}\left(\frac{1}{\varphi^{w}}-\frac{J}{\tilde{\kappa}^{\alpha}}\frac{\partial\tilde{\kappa}^{\alpha}}{\partial J}\right)\left(\mathbf{\mathbf{q}_{b}^{pu}I}-\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\right)\otimes\mathbf{I}\\
 +2\left(\mathbf{I}\odot\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}+\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\odot\mathbf{I}-\mathbf{I}\odot\mathbf{I}\right)\\
 -\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\otimes\mathbf{I}+\frac{\boldsymbol{\mathcal{D}}^{\alpha}}{d_{0}^{\alpha}}
 \end{aligned}
@@ -20906,10 +20906,10 @@ where
 \end_layout
 
 \begin_layout Section
-Weak Formulation for Elastic Solute Materials
+Weak Formulation for Elastic Reaction-Diffusion Materials
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:ES-weak-formulation"
+name "sec:ERD-weak-formulation"
 
 \end_inset
 
@@ -20920,9 +20920,13 @@ name "sec:ES-weak-formulation"
 The virtual work integral for a mixture of intrinsically incompressible
  constituents combines the balance of momentum for the mixture, the balance
  of mass for the mixture, and the balance of mass for each of the solutes.
- For the elastic solute materials, it is assumed that there is a large differenc
-e in time scales between displacements and solute transport and kinetics
- (such as during some growth and remodeling simulations).
+ 
+\end_layout
+
+\begin_layout Standard
+For the elastic reaction-diffusion materials, it is assumed that there is
+ a large difference in time scales between displacements and solute transport
+ and kinetics (such as during some growth and remodeling simulations).
  The first consequence of this is that solute 
 \begin_inset Formula $\tilde{c}^{\alpha}$
 \end_inset
@@ -20968,8 +20972,8 @@ ents and concentration displacements) are not evaluated (
 \end_inset
 
  may be non-zero under certain kinematic growth constitutive relations).
- Thus, this analysis should not be used if modeling electrochemistry or
- short-time mechano-chemical phenomena are desired (e.g.
+ This analysis should not be used if modeling electrochemistry or short-time
+ mechano-chemical phenomena are desired (e.g.
  osmotic pressure, non-negligible solute volume fractions, convection).
  
 \end_layout
@@ -21128,7 +21132,7 @@ Linearization along
 
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ES-linearization-du"
+name "subsec:ERD-linearization-du"
 
 \end_inset
 
@@ -21160,12 +21164,17 @@ where
  The second term is given by 
 \begin_inset Formula 
 \begin{equation}
-D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\mathbf{u}\right]\,dV=0\,.
+D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\mathbf{u}\right]\,dV=0\,,
 \end{equation}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Since it is assumed that concentration is unaffected by deformation and
+ molar flux is unaffected by rotation.
 \end_layout
 
 \begin_layout Standard
@@ -21192,7 +21201,7 @@ Linearization along
 
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ES-linearization-dc"
+name "subsec:ERD-linearization-dc"
 
 \end_inset
 
@@ -21241,11 +21250,35 @@ D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\
 
 \end_inset
 
+
+\begin_inset Formula 
+\[
+D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\tilde{c}^{\gamma}\right]\,dV=\grad N_{a}\tilde{c}^{\alpha}\cdot\mathbf{j}_{\gamma}^{\alpha\prime}\,dv\,,
+\]
+
+\end_inset
+
 where 
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{j}_{\gamma}^{\alpha\prime} & \equiv D\mathbf{J}^{\alpha}\left[\Delta\tilde{c}^{\gamma}\right]=-\delta_{\alpha\gamma}\mathbf{d}^{\alpha}\cdot\grad\Delta\tilde{c}^{\gamma}\,.\end{aligned}
 \end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathbf{j}_{\gamma}^{\alpha\prime}\equiv D\mathbf{J}^{\alpha}\left[\Delta\tilde{c}^{\gamma}\right]=-\delta_{\alpha\gamma}\mathbf{d}^{\alpha}\cdot\grad N_{b}\tilde{c}^{\gamma}\,.
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\tilde{c}^{\gamma}\right]\,dV=-\delta_{\alpha\gamma}\grad N_{a}\tilde{c}^{\alpha}\cdot\mathbf{d}^{\alpha}\cdot\grad N_{b}\tilde{c}^{\gamma}\,dv\,,
+\]
 
 \end_inset
 
@@ -21265,7 +21298,7 @@ where we similarly used a backward difference scheme to discretize the time
 Linearization of External Virtual Work
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ES-linearization-external"
+name "subsec:ERD-linearization-external"
 
 \end_inset
 
@@ -21424,7 +21457,7 @@ The linearizations along
 Discretization
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ES-discretization"
+name "subsec:ERD-discretization"
 
 \end_inset
 
@@ -21662,7 +21695,7 @@ n along
 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{k}_{ab}^{\alpha u}=\left(\mathbf{j}_{b}^{\alpha u}\right)^{T}\cdot\grad N_{a}+N_{a}\mathbf{q}_{b}^{\alpha u}\,,
+\mathbf{k}_{ab}^{\alpha u}=0\,,
 \end{equation}
 
 \end_inset
@@ -21670,15 +21703,7 @@ n along
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{j}_{b}^{\alpha u} & =-\mathbf{d}^{\alpha}\cdot\grad\tilde{c}^{\alpha}\otimes\grad N_{b}\,,\end{aligned}
-\end{equation}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{equation}
-\mathbf{q}_{b}^{pu}=-\frac{1}{\Delta t}\grad N_{b}\,,
+\begin{aligned}\mathbf{j}_{b}^{\alpha u} & =0\,,\end{aligned}
 \end{equation}
 
 \end_inset
@@ -21687,13 +21712,6 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\mathbf{q}_{b}^{\alpha u} & =\tilde{c}^{\alpha}\mathbf{q}_{b}^{pu}\end{aligned}
-\end{equation}
-
-\end_inset
-
 The terms in the remaining columns of the stiffness matrix in 
 \begin_inset CommandInset ref
 LatexCommand eqref
@@ -21719,7 +21737,7 @@ reference "eq267"
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-k_{ab}^{\alpha\gamma}=\grad N_{a}\cdot\mathbf{j}_{b}^{\alpha\gamma}+N_{a}q_{b}^{\alpha\gamma}\,,
+k_{ab}^{\alpha\gamma}=\delta_{\alpha\gamma}(\grad N_{a}\cdot\mathbf{j}_{b}^{\alpha\gamma}+N_{a}N_{b}\frac{1}{\Delta t})\,,
 \end{equation}
 
 \end_inset
@@ -21727,15 +21745,7 @@ k_{ab}^{\alpha\gamma}=\grad N_{a}\cdot\mathbf{j}_{b}^{\alpha\gamma}+N_{a}q_{b}^{
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{j}_{b}^{\alpha\gamma} & =-\delta_{\alpha\gamma}\mathbf{d}^{\alpha}\cdot\grad N_{b}\,,\end{aligned}
-\end{equation}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{equation}
-q_{b}^{\alpha\gamma}=-\delta_{\alpha\gamma}N_{b}\frac{1}{\Delta t}\,.
+\begin{aligned}\mathbf{j}_{b}^{\alpha\gamma} & =\varphi^{w}\mathbf{d}^{\alpha}\cdot\grad N_{b}\,,\end{aligned}
 \end{equation}
 
 \end_inset
@@ -21803,7 +21813,7 @@ where
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{K}_{ab}^{uu} & =t_{n}N_{a}\boldsymbol{\mathcal{A}}\left\{ \frac{\partial N_{b}}{\partial\eta^{1}}\mathbf{g}_{2}-\frac{\partial N_{b}}{\partial\eta^{2}}\mathbf{g}_{1}\right\} \,,\\
-\mathbf{k}_{ab}^{\alpha u} & =-j_{n}^{\alpha}N_{a}\left(\frac{\partial N_{b}}{\partial\eta^{1}}\mathbf{g}_{2}-\frac{\partial N_{b}}{\partial\eta^{2}}\mathbf{g}_{1}\right)\times\mathbf{n}.
+\mathbf{k}_{ab}^{\alpha u} & =\mathbf{0}.
 \end{aligned}
 \end{equation}
 
@@ -21832,7 +21842,7 @@ In this expression,
 Chemical Reactions
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ES-chemical-reactions"
+name "subsec:ERD-chemical-reactions"
 
 \end_inset
 
@@ -21861,10 +21871,18 @@ The contribution to
 \begin_inset Formula $\delta G$
 \end_inset
 
-, where 
+ (with summation over each species 
+\begin_inset Formula $\iota$
+\end_inset
+
+ and each reaction 
+\begin_inset Formula $r$
+\end_inset
+
+
 \begin_inset Formula 
 \begin{equation}
-\delta G=\sum\limits _{\iota}\nu^{\iota}\int_{b}\delta\tilde{c}^{\iota}\hat{\zeta}\,dv\,.
+\delta G=\sum\limits _{\iota}\sum_{r}\nu_{r}^{\iota}\int_{b}\delta\tilde{c}^{\iota}\varphi^{w}\hat{\zeta}_{r}\,dv\,.
 \end{equation}
 
 \end_inset
@@ -21878,6 +21896,7 @@ The linearization of
 \end_inset
 
  is zero unless there is either a stress- or strain- dependent relationship
+ (as may be the case for kinematic growth models):
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =0\end{aligned}
@@ -21890,10 +21909,14 @@ The linearization along a concentration increment
 \begin_inset Formula $\Delta\tilde{c}^{\iota}$
 \end_inset
 
- is
+ is summed over each reaction 
+\begin_inset Formula $r$
+\end_inset
+
+
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\delta G\left[\Delta\tilde{c}^{\iota}\right] & =\sum_{\gamma}\nu^{\gamma}\int_{b}\delta\tilde{c}^{\gamma}\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv\end{aligned}
+\begin{aligned}D\delta G\left[\Delta\tilde{c}^{\iota}\right] & =\sum_{r}\sum_{\gamma}\nu_{r}^{\gamma}\int_{b}\delta\tilde{c}^{\gamma}\frac{\partial\hat{\zeta}_{r}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv\end{aligned}
 \,.
 \end{equation}
 
@@ -21914,7 +21937,7 @@ The discretized form of these expressions is given by
 where
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}r_{a}^{\gamma} & =\nu^{\gamma}\int_{b}N_{a}\hat{\zeta}\,dv\end{aligned}
+\begin{aligned}r_{a}^{\gamma} & =\sum_{r}\nu_{r}^{\gamma}\int_{b}N_{a}\varphi^{w}\hat{\zeta}_{r}\,dv\end{aligned}
 \,.
 \end{equation}
 
@@ -21941,7 +21964,7 @@ Finally,
 where
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}k_{ab}^{\gamma\iota} & =\nu^{\gamma}\int_{b}N_{a}N_{b}\frac{\partial\hat{\zeta}}{\partial\tilde{c}^{\iota}}\,dv\end{aligned}
+\begin{aligned}k_{ab}^{\gamma\iota} & =\sum_{r}\nu^{\gamma}\int_{b}N_{a}N_{b}\varphi^{w}\frac{\partial\hat{\zeta}_{r}}{\partial\tilde{c}^{\iota}}\,dv\end{aligned}
 \,.
 \end{equation}
 

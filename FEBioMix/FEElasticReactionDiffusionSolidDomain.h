@@ -27,21 +27,23 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/FESolidDomain.h"
-#include "FEElasticSolute.h"
-#include "FEElasticSoluteDomain.h"
+#include <FECore/FESolidDomain.h>
+#include <FECore/FECoreKernel.h>
+#include "FEElasticReactionDiffusion.h"
+#include "FEElasticReactionDiffusionStandard.h"
+#include "FEElasticReactionDiffusionDomain.h"
 #include <FECore/FEDofList.h>
 
 //-----------------------------------------------------------------------------
-//! Domain class for elastic solute 3D solid elements
-//! Note that this class inherits from FEElasticSoluteSolidDomain since this domain
+//! Domain class for elastic reaction diffusion 3D solid elements
+//! Note that this class inherits from FEElasticReactionDiffusionSolidDomain since this domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FEBIOMIX_API FEElasticSoluteSolidDomain : public FESolidDomain, public FEElasticSoluteDomain
+class FEBIOMIX_API FEElasticReactionDiffusionSolidDomain : public FESolidDomain, public FEElasticReactionDiffusionDomain
 {
 public:
     //! constructor
-    FEElasticSoluteSolidDomain(FEModel* pfem);
+    FEElasticReactionDiffusionSolidDomain(FEModel* pfem);
     
     //! Reset data
     void Reset() override;
@@ -89,7 +91,7 @@ public:
     void ElementInternalForce(FESolidElement& el, vector<double>& fe);
         
     //! calculates the element triphasic stiffness matrix
-    bool ElementElasticSoluteStiffness(FESolidElement& el, matrix& ke, bool bsymm);
+    bool ElementElasticReactionDiffusionStiffness(FESolidElement& el, matrix& ke, bool bsymm);
     
 protected: // overridden from FEElasticDomain, but not implemented in this domain
     void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override {}

@@ -23,49 +23,45 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEConcentrationIndependentReactionERD.h"
 
-
-
-#pragma once
-#include "FEChemicalReactionERD.h"
+BEGIN_FECORE_CLASS(FEConcentrationIndependentReactionERD, FEChemicalReactionERD)
+// set material properties
+ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-//! Law of mass action for forward chemical reaction.
-class FEBIOMIX_API FEHillActivationANDActivation : public FEChemicalReactionERD
+FEConcentrationIndependentReactionERD::FEConcentrationIndependentReactionERD(FEModel* pfem) : FEChemicalReactionERD(pfem)
 {
-public:
-	//! constructor
-	FEHillActivationANDActivation(FEModel* pfem);
 
-	//! initialization
-	bool Init() override;
+}
 
-	//! reaction rate at material point
-	double ReactionSupply(FEMaterialPoint& pt) override;
+//-----------------------------------------------------------------------------
+//! molar supply at material point
+double FEConcentrationIndependentReactionERD::ReactionSupply(FEMaterialPoint& pt)
+{
+	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 
-	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
+	// get reaction rate
+	double kF = m_pFwd->ReactionRate(pt);
 
-	//! tangent of molar supply with effective concentration at material point
-	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
+	// evaluate the reaction molar supply
+	double zhat = kF;
 
-	double f_Hill(FEMaterialPoint& pt, const int sol);
+	return zhat;
+}
 
-	double dfdc(FEMaterialPoint& pt, const int sol);
+//-----------------------------------------------------------------------------
+//! tangent of molar supply with strain at material point
+mat3ds FEConcentrationIndependentReactionERD::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
+{
+	return mat3ds(0.0);
+}
 
-public:
-	double	m_Kmax = 1.0;
-	double	m_w = 1.0;
-	double	m_t = 1.0;
-	double	m_E50 = 0.5;
-	double	m_n = 1.2;
-	int		u_sol_id_a = -1;
-	int		u_sol_id_b = -1;
-	int		m_sol_id_a = -1;
-	int		m_sol_id_b = -1;
-	double m_B = 0.0;
-	double m_K = 0.0;
-	double m_Kn = 0.0;
-	double m_Kb = 0.0;
-	DECLARE_FECORE_CLASS();
-};
+//-----------------------------------------------------------------------------
+//! tangent of molar supply with effective concentration at material point
+double FEConcentrationIndependentReactionERD::Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol)
+{
+	return 0;
+}

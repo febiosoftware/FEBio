@@ -27,12 +27,12 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FESoluteInterface.h"
+#include "FEElasticReactionDiffusionInterface.h"
 #include "FEBiphasic.h"
 #include "FEHillInhibition.h"
 #include <FECore/log.h>
 
-BEGIN_FECORE_CLASS(FEHillInhibition, FEChemicalReaction)
+BEGIN_FECORE_CLASS(FEHillInhibition, FEChemicalReactionERD)
 	ADD_PARAMETER(m_Kmax, "Kmax");
 	ADD_PARAMETER(m_w, "reaction_weight");
 	ADD_PARAMETER(m_t, "degradation_rate");
@@ -42,7 +42,7 @@ BEGIN_FECORE_CLASS(FEHillInhibition, FEChemicalReaction)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEHillInhibition::FEHillInhibition(FEModel* pfem) : FEChemicalReaction(pfem)
+FEHillInhibition::FEHillInhibition(FEModel* pfem) : FEChemicalReactionERD(pfem)
 {
 	// set material properties
 	ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
@@ -60,7 +60,7 @@ bool FEHillInhibition::Init()
 		return false;
 	}
 
-	return FEChemicalReaction::Init();
+	return FEChemicalReactionERD::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -75,21 +75,7 @@ double FEHillInhibition::ReactionSupply(FEMaterialPoint& pt)
 //! tangent of reaction rate with strain at material point
 mat3ds FEHillInhibition::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 {
-	// if the reaction supply is insensitive to strain
-	if (m_bool_refC)
-		return mat3ds(0.0);
-
-	double zhat = ReactionSupply(pt);
-	mat3dd I(1);
-	mat3ds dzhatde = I * (-zhat);
-	return dzhatde;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of reaction rate with effective fluid pressure at material point
-double FEHillInhibition::Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt)
-{
-	return 0.0;
+	return mat3ds(0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -121,8 +107,8 @@ double FEHillInhibition::f_Hill(FEMaterialPoint& pt, const int sol)
 
 double FEHillInhibition::dfdc(FEMaterialPoint& pt, const int sol)
 {
-	double c_eff = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-	double cn = pow(m_psm->GetActualSoluteConcentration(pt, sol), m_n);
-	double dfdc = (m_Kn * m_n * f_Hill(pt, sol)) / (c_eff * (m_Kn + cn));
+	double c = m_psm->GetActualSoluteConcentration(pt, sol);
+	double cn = pow(c, m_n);
+	double dfdc = (m_Kn * m_n * f_Hill(pt, sol)) / (c * (m_Kn + cn));
 	return dfdc;
 }

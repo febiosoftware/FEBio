@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEConstValueVec3.h>
 #include <FECore/FEModel.h>
 #include <FEBioMix/FEMultiphasic.h>
+#include <FEBioMix/FEElasticReactionDiffusion.h>
 #include <FECore/log.h>
 #include <iostream>
 
@@ -121,7 +122,6 @@ mat3d FEAreaGrowth::GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& n0)
 //! referential solid density
 double FEAreaGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 {
-    //return m_gm(pt);
     FEKinematicMaterialPoint& kp = *pt.ExtractData<FEKinematicMaterialPoint>();
     return kp.m_theta;
 }
@@ -194,11 +194,14 @@ double FEGrowthTensor::EnvironmentalFunction(FEMaterialPoint& pt)
 double FEGrowthTensor::SoluteConcentration(FEMaterialPoint& pt)
 {
     FEElement* m_el = pt.m_elem;
-    int nint = m_el->GaussPoints();
-    FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
-    FESolutesMaterialPoint& pd = *(pt.ExtractData<FESolutesMaterialPoint>());
-    FEMultiphasic* pm = dynamic_cast<FEMultiphasic*>(dom->GetMaterial());
-    return pm->GetActualSoluteConcentration(pt, m_sol_id - 1);
+    FEDomain& dom = dynamic_cast<FEDomain&>(*m_el->GetMeshPartition());
+    FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
+    if(pm)
+        return pm->GetActualSoluteConcentration(pt, m_sol_id - 1);
+    else {
+        FEElasticReactionDiffusionInterface* pm = dynamic_cast<FEElasticReactionDiffusionInterface*>(dom.GetMaterial());
+        return pm->GetActualSoluteConcentration(pt, m_sol_id - 1);
+    }
 }
 
 //-----------------------------------------------------------------------------

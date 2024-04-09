@@ -24,48 +24,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-
-
-#pragma once
-#include "FEChemicalReactionERD.h"
+#include "stdafx.h"
+#include <FECore/FEMaterialPoint.h>
+#include "FEElasticReactionDiffusionInterface.h"
+#include <FEBioMix/FESolute.h>
 
 //-----------------------------------------------------------------------------
-//! Law of mass action for forward chemical reaction.
-class FEBIOMIX_API FEHillActivationANDActivation : public FEChemicalReactionERD
+//! Returns the local solute index given the global ID
+int FEElasticReactionDiffusionInterface::FindLocalSoluteID(int nid)
 {
-public:
-	//! constructor
-	FEHillActivationANDActivation(FEModel* pfem);
-
-	//! initialization
-	bool Init() override;
-
-	//! reaction rate at material point
-	double ReactionSupply(FEMaterialPoint& pt) override;
-
-	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
-
-	//! tangent of molar supply with effective concentration at material point
-	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
-
-	double f_Hill(FEMaterialPoint& pt, const int sol);
-
-	double dfdc(FEMaterialPoint& pt, const int sol);
-
-public:
-	double	m_Kmax = 1.0;
-	double	m_w = 1.0;
-	double	m_t = 1.0;
-	double	m_E50 = 0.5;
-	double	m_n = 1.2;
-	int		u_sol_id_a = -1;
-	int		u_sol_id_b = -1;
-	int		m_sol_id_a = -1;
-	int		m_sol_id_b = -1;
-	double m_B = 0.0;
-	double m_K = 0.0;
-	double m_Kn = 0.0;
-	double m_Kb = 0.0;
-	DECLARE_FECORE_CLASS();
-};
+	int lsid = -1;
+	for (int isol = 0; isol < Solutes(); ++isol)
+		if (GetSolute(isol)->GetSoluteID() == nid) {
+			lsid = isol;
+			break;
+		}
+	return lsid;
+}

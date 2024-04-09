@@ -27,15 +27,15 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include "febiomix_api.h"
 
-class FEBIOMIX_API FEElasticSoluteAnalysis : public FEAnalysis
+class FEBIOMIX_API FEElasticReactionDiffusionAnalysis : public FEAnalysis
 {
 public:
-	enum FEElasticSoluteType {
+	enum FEElasticReactionDiffusionType {
 		TRANSIENT
 	};
 
 public:
-	FEElasticSoluteAnalysis(FEModel* fem);
+	FEElasticReactionDiffusionAnalysis(FEModel* fem);
 
 	DECLARE_FECORE_CLASS();
 };

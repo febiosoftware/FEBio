@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2024 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,16 +26,32 @@ SOFTWARE.*/
 
 
 
-#include "stdafx.h"
-#include "FEElasticSoluteDomain.h"
-#include "FECore/FEModel.h"
+#pragma once
+#include "FEChemicalReactionERD.h"
 
 //-----------------------------------------------------------------------------
-FEElasticSoluteDomain::FEElasticSoluteDomain(FEModel* pfem) : FEElasticDomain(pfem)
+//! Law of mass action for reversible chemical reaction
+//! using  concentrations.
+class FEBIOMIX_API FEMassActionReversibleERD : public FEChemicalReactionERD
 {
-    m_pMat = 0;
-    
-    m_dofC = pfem->GetDOFIndex("concentration", 0);
-    
-    m_breset = false;
-}
+public:
+    //! constructor
+    FEMassActionReversibleERD(FEModel* pfem);
+
+    //! molar supply at material point
+    double ReactionSupply(FEMaterialPoint& pt) override;
+
+    //! tangent of molar supply with strain (J) at material point
+    mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
+
+    //! tangent of molar supply with  concentration at material point
+    double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
+
+    //! molar supply at material point
+    double FwdReactionSupply(FEMaterialPoint& pt);
+
+    //! molar supply at material point
+    double RevReactionSupply(FEMaterialPoint& pt);
+
+    DECLARE_FECORE_CLASS();
+};

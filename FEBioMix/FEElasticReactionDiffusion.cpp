@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEElasticSolute.h"
+#include "FEElasticReactionDiffusion.h"
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/log.h>
@@ -40,8 +40,8 @@ using namespace std;
 #define SQR(x) ((x)*(x))
 #endif
 
-// Material parameters for the FEElasticSolute material
-BEGIN_FECORE_CLASS(FEElasticSolute, FEMaterial)
+// Material parameters for the FEElasticReactionDiffusion material
+BEGIN_FECORE_CLASS(FEElasticReactionDiffusion, FEMaterial)
 	ADD_PARAMETER(m_phi0   , FE_RANGE_CLOSED     (0.0, 1.0), "phi0"         );
 
 	// define the material properties
@@ -54,12 +54,12 @@ BEGIN_FECORE_CLASS(FEElasticSolute, FEMaterial)
 END_FECORE_CLASS();
 
 //=============================================================================
-//   FEMultiphasic
+//   FEElasticReactionDiffusion
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-//! FEMultiphasic constructor
-FEElasticSolute::FEElasticSolute(FEModel* pfem) : FEMaterial(pfem)
+//! FEElasticReactionDiffusion constructor
+FEElasticReactionDiffusion::FEElasticReactionDiffusion(FEModel* pfem) : FEMaterial(pfem)
 {	
 	m_Rgas = 0; m_Tabs = 0;
 
@@ -67,13 +67,13 @@ FEElasticSolute::FEElasticSolute(FEModel* pfem) : FEMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolute::AddChemicalReaction(FEChemicalReaction* pcr)
+void FEElasticReactionDiffusion::AddChemicalReaction(FEChemicalReactionERD* pcr)
 {
 	m_pReact.push_back(pcr);
 }
 
 //-----------------------------------------------------------------------------
-bool FEElasticSolute::Init()
+bool FEElasticReactionDiffusion::Init()
 {
 	// set the solute IDs first, since they are referenced in FESolute::Init()
 	for (int i = 0; i<Solutes(); ++i) {
@@ -101,7 +101,7 @@ bool FEElasticSolute::Init()
 
 //-----------------------------------------------------------------------------
 // update specialized material points
-void FEElasticSolute::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+void FEElasticReactionDiffusion::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
 {
     m_pSolid->UpdateSpecializedMaterialPoints(mp, tp);
     for (int i=0; i<Solutes(); ++i)
@@ -111,7 +111,7 @@ void FEElasticSolute::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolute::Serialize(DumpStream& ar)
+void FEElasticReactionDiffusion::Serialize(DumpStream& ar)
 {
 	FEMaterial::Serialize(ar);
 	if (ar.IsShallow()) return;
@@ -121,7 +121,7 @@ void FEElasticSolute::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! Porosity in current configuration
-double FEElasticSolute::Porosity(FEMaterialPoint& pt)
+double FEElasticReactionDiffusion::Porosity(FEMaterialPoint& pt)
 {	
 	// solid referential volume fraction
 	double phisr = m_phi0(pt);
@@ -136,7 +136,7 @@ double FEElasticSolute::Porosity(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! actual concentration
-double FEElasticSolute::Concentration(FEMaterialPoint& pt, const int sol)
+double FEElasticReactionDiffusion::Concentration(FEMaterialPoint& pt, const int sol)
 {
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
@@ -152,7 +152,7 @@ double FEElasticSolute::Concentration(FEMaterialPoint& pt, const int sol)
 //! so you do not have to reimplement it in a derived class, unless additional
 //! pressure terms are required.
 
-mat3ds FEElasticSolute::Stress(FEMaterialPoint& mp)
+mat3ds FEElasticReactionDiffusion::Stress(FEMaterialPoint& mp)
 {
 	// calculate solid material stress
 	return m_pSolid->Stress(mp);
@@ -163,7 +163,7 @@ mat3ds FEElasticSolute::Stress(FEMaterialPoint& mp)
 //! that this function is declared in the base class, so you don't have to 
 //! reimplement it unless additional tangent components are required.
 
-tens4ds FEElasticSolute::Tangent(FEMaterialPoint& mp)
+tens4ds FEElasticReactionDiffusion::Tangent(FEMaterialPoint& mp)
 {	
 	// call solid tangent routine
 	return m_pSolid->Tangent(mp);
@@ -172,7 +172,7 @@ tens4ds FEElasticSolute::Tangent(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 //! Calculate solute molar flux
 
-vec3d FEElasticSolute::SoluteFlux(FEMaterialPoint& pt, const int sol)
+vec3d FEElasticReactionDiffusion::SoluteFlux(FEMaterialPoint& pt, const int sol)
 {
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	

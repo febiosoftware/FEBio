@@ -23,15 +23,21 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEElasticSoluteAnalysis.h"
 
-BEGIN_FECORE_CLASS(FEElasticSoluteAnalysis, FEAnalysis)
-	// The analysis parameter is already defined in the FEAnalysis base class. 
-	// Here, we just need to set the enum values for the analysis parameter.
-	FindParameterFromData(&m_nanalysis)->setEnums("TRANSIENT\0");
-END_FECORE_CLASS()
 
-FEElasticSoluteAnalysis::FEElasticSoluteAnalysis(FEModel* fem) : FEAnalysis(fem)
+
+#pragma once
+#include "FEElasticReactionDiffusion.h"
+
+//-----------------------------------------------------------------------------
+//! Standard elastic reaction diffusion material.
+
+class FEBIOMIX_API FEElasticReactionDiffusionStandard : public FEElasticReactionDiffusion
 {
-
-}
+public:
+	//! constructor
+	FEElasticReactionDiffusionStandard(FEModel* pfem);
+    
+    //! returns a pointer to a new material point object
+	FEMaterialPointData* CreateMaterialPointData();
+};

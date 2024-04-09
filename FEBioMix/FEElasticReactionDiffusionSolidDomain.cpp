@@ -26,7 +26,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEElasticSoluteSolidDomain.h"
+#include "FEElasticReactionDiffusionSolidDomain.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/log.h>
@@ -34,13 +34,15 @@ SOFTWARE.*/
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/sys.h>
+#include <FECore/FESolidDomain.h>
+#include <iostream>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
 #endif
 
 //-----------------------------------------------------------------------------
-FEElasticSoluteSolidDomain::FEElasticSoluteSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticSoluteDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
+FEElasticReactionDiffusionSolidDomain::FEElasticReactionDiffusionSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEElasticReactionDiffusionDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
 {
     m_pMat = nullptr;
 	
@@ -53,23 +55,23 @@ FEElasticSoluteSolidDomain::FEElasticSoluteSolidDomain(FEModel* pfem) : FESolidD
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::SetMaterial(FEMaterial* pmat)
+void FEElasticReactionDiffusionSolidDomain::SetMaterial(FEMaterial* pmat)
 {
 	FEDomain::SetMaterial(pmat);
-    m_pMat = dynamic_cast<FEElasticSolute*>(pmat);
+    m_pMat = dynamic_cast<FEElasticReactionDiffusion*>(pmat);
     assert(m_pMat);
 }
 
 //-----------------------------------------------------------------------------
 // get total dof list
-const FEDofList& FEElasticSoluteSolidDomain::GetDOFList() const
+const FEDofList& FEElasticReactionDiffusionSolidDomain::GetDOFList() const
 {
 	return m_dof;
 }
 
 //-----------------------------------------------------------------------------
 //! Unpack the element LM data.
-void FEElasticSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
+void FEElasticReactionDiffusionSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
     // get nodal DOFS
     const int n_sol = m_pMat->Solutes();
@@ -99,7 +101,7 @@ void FEElasticSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
         
         // rigid rotational dofs
         // TODO: Do we really need this?
-        int lm_r_a = n_dpn * i_a + 3 * i_a;
+        int lm_r_a = n_dpn * n_m + 3 * i_a;
         lm[lm_r_a  ] = id[m_dofR[0]];
         lm[lm_r_a+1] = id[m_dofR[1]];
         lm[lm_r_a+2] = id[m_dofR[2]];
@@ -107,7 +109,7 @@ void FEElasticSoluteSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-bool FEElasticSoluteSolidDomain::Init()
+bool FEElasticReactionDiffusionSolidDomain::Init()
 {
     // initialize base class
 	if (FESolidDomain::Init() == false) return false;
@@ -130,7 +132,7 @@ bool FEElasticSoluteSolidDomain::Init()
             FEMaterialPoint& mp = *el.GetMaterialPoint(i_k);
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
-            // initialize elastic solute solutes
+            // initialize elastic reaction diffusion solutes
             ps.m_nsol = n_sol;
             ps.m_c.assign(n_sol,0);
             ps.m_ca.assign(n_sol,0);
@@ -158,7 +160,7 @@ bool FEElasticSoluteSolidDomain::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::Activate()
+void FEElasticReactionDiffusionSolidDomain::Activate()
 {
     for (int i = 0; i < Nodes(); ++i)
     {
@@ -192,7 +194,7 @@ void FEElasticSoluteSolidDomain::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::InitMaterialPoints()
+void FEElasticReactionDiffusionSolidDomain::InitMaterialPoints()
 {
     const int n_sol = m_pMat->Solutes();
     FEMesh& mesh = *GetMesh();
@@ -238,6 +240,7 @@ void FEElasticSoluteSolidDomain::InitMaterialPoints()
             }
             
             for (int i_sol = 0; i_sol < n_sol; ++i_sol) {
+                ps.m_ca[i_sol] = m_pMat->Concentration(mp, i_sol);
                 ps.m_j[i_sol] = m_pMat->SoluteFlux(mp, i_sol);
                 ps.m_crp[i_sol] = m_pMat->Porosity(mp) * ps.m_ca[i_sol];
             }
@@ -246,7 +249,7 @@ void FEElasticSoluteSolidDomain::InitMaterialPoints()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::Reset()
+void FEElasticReactionDiffusionSolidDomain::Reset()
 {
     // reset base class
     FESolidDomain::Reset();
@@ -288,7 +291,7 @@ void FEElasticSoluteSolidDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
+void FEElasticReactionDiffusionSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
     FESolidDomain::PreSolveUpdate(timeInfo);
     
@@ -300,7 +303,7 @@ void FEElasticSoluteSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
     {
         FESolidElement& el = m_Elem[i_e];
         int tot_eln = el.Nodes();
-        for (int i_a = 0; i_a < n_m; ++i_a)
+        for (int i_a = 0; i_a < tot_eln; ++i_a)
         {
             x0[i_a] = mesh.Node(el.m_node[i_a]).m_r0;
             xt[i_a] = mesh.Node(el.m_node[i_a]).m_rt;
@@ -338,7 +341,7 @@ void FEElasticSoluteSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::InternalForces(FEGlobalVector& R)
+void FEElasticReactionDiffusionSolidDomain::InternalForces(FEGlobalVector& R)
 {
     size_t n_e = m_Elem.size();
     
@@ -374,7 +377,7 @@ void FEElasticSoluteSolidDomain::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FEElasticSoluteSolidDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
+void FEElasticReactionDiffusionSolidDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {    
     // jacobian matrix, inverse jacobian matrix and determinants
     double Ji[3][3], detJt;
@@ -426,7 +429,7 @@ void FEElasticSoluteSolidDomain::ElementInternalForce(FESolidElement& el, vector
         
         // chemical reactions
         for (int i_r = 0; i_r < n_r; ++i_r) {
-            FEChemicalReaction* pri = m_pMat->GetReaction(i_r);
+            FEChemicalReactionERD* pri = m_pMat->GetReaction(i_r);
             double zhat = pri->ReactionSupply(mp);
             for (int i_sol = 0; i_sol < n_sol; ++i_sol)
                 chat[i_sol] += phiw * zhat * pri->m_v[i_sol];
@@ -453,10 +456,8 @@ void FEElasticSoluteSolidDomain::ElementInternalForce(FESolidElement& el, vector
             fe[i_fe_sy] -= fu.y * detJt * gw[i_k];
             fe[i_fe_sz] -= fu.z * detJt * gw[i_k];
             for (int i_sol = 0; i_sol < n_sol; ++i_sol) {
-                double fc = 0.0;
-                fc += gradNa * j[i_sol] + N[i_a] * (chat[i_sol] - (phiw * spt.m_ca[i_sol] - spt.m_crp[i_sol]) / dt);
-                fc *= dt;
-                fe[i_fe_c+i_sol] -= fc * detJt * gw[i_k];
+                double dcdt = (spt.m_ca[i_sol] - spt.m_crp[i_sol]) / dt;
+                fe[i_fe_c+i_sol] -= ((gradNa * j[i_sol] + N[i_a] * chat[i_sol] * phiw - N[i_a]* phiw * dcdt) * (dt * detJt * gw[i_k]));
             }
                 
         }
@@ -464,7 +465,7 @@ void FEElasticSoluteSolidDomain::ElementInternalForce(FESolidElement& el, vector
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
+void FEElasticReactionDiffusionSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 {
     const int n_sol = m_pMat->Solutes();
     int n_dpn = 3 + n_sol;
@@ -486,7 +487,7 @@ void FEElasticSoluteSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
         ke.resize(ndof, ndof);
         
         // calculate the element stiffness matrix
-        ElementElasticSoluteStiffness(el, ke, bsymm);
+        ElementElasticReactionDiffusionStiffness(el, ke, bsymm);
 
 		// get the lm vector
 		vector<int> lm;
@@ -501,18 +502,18 @@ void FEElasticSoluteSolidDomain::StiffnessMatrix(FELinearSystem& LS, bool bsymm)
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 //!
-bool FEElasticSoluteSolidDomain::ElementElasticSoluteStiffness(FESolidElement& el, matrix& ke, bool bsymm)
+bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiffness(FESolidElement& el, matrix& ke, bool bsymm)
 {
     int n_int = el.GaussPoints();
     int n_m = el.Nodes();
     
-    double *Gr, *Gs, *Gt, *N;
+    double* H;
     
     // jacobian
-    double Ji[3][3], detJ;
+    double detJ;
     
     // Gradient of shape functions
-    vector<vec3d> gradN(n_m);
+    vec3d gradN[FEElement::MAX_NODES];
     
     // gauss-weights
     double* gw = el.GaussWeights();
@@ -535,21 +536,10 @@ bool FEElasticSoluteSolidDomain::ElementElasticSoluteStiffness(FESolidElement& e
         FESolutesMaterialPoint&  spt = *(mp.ExtractData<FESolutesMaterialPoint >());
         
         // calculate jacobian
-        detJ = invjact(el, Ji, i_k);
+        detJ = ShapeGradient(el, i_k, gradN);
         
-        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
-        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
-        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+        H = el.H(i_k);
         
-        Gr = el.Gr(i_k);
-        Gs = el.Gs(i_k);
-        Gt = el.Gt(i_k);
-        
-        N = el.H(i_k);
-        
-        // calculate global gradient of shape functions
-        for (int i_a = 0; i_a < n_m; ++i_a)
-            gradN[i_a] = g1*Gr[i_a] + g2*Gs[i_a] + g3*Gt[i_a];
         
         // get stress tensor
         mat3ds s = ept.m_s;
@@ -578,19 +568,21 @@ bool FEElasticSoluteSolidDomain::ElementElasticSoluteStiffness(FESolidElement& e
         
         // chemical reactions
 		vector<double> reactionSupply(n_r, 0.0);
+        //vector<mat3ds> tangentReactionSupplyStrain(n_r);
 		vector< vector<double> > tangentReactionSupplyConcentration(n_r, vector<double>(n_sol));
         for (int i_r = 0; i_r < n_r; ++i_r)
 		{
-			FEChemicalReaction* reacti = m_pMat->GetReaction(i_r);
+			FEChemicalReactionERD* reacti = m_pMat->GetReaction(i_r);
 
 			reactionSupply[i_r] = reacti->ReactionSupply(mp);
+            //tangentReactionSupplyStrain[i_r] = reacti->Tangent_ReactionSupply_Strain(mp);
 
 			for (int i_sol = 0; i_sol < n_sol; ++i_sol)
 				tangentReactionSupplyConcentration[i_r][i_sol] = reacti->Tangent_ReactionSupply_Concentration(mp, i_sol);
 		}
         
         for (int i_sol = 0; i_sol < n_sol; ++i_sol) {
-			FESolute* soli = m_pMat->GetSolute(i_sol);
+            FESolute* soli = m_pMat->GetSolute(i_sol);
 
             // evaluate the diffusivity tensor
             D[i_sol] = soli->m_pDiff->Diffusivity(mp);
@@ -599,11 +591,10 @@ bool FEElasticSoluteSolidDomain::ElementElasticSoluteStiffness(FESolidElement& e
             dchatde[i_sol].zero();
             //SL: this will create a dependence on the strain. Maybe the correct tangent reaction supply would be one that zeros this out?
             //SL: for now zero this.
-            //SL: Check thisif (!m_pMat->m_bool_refC) {
                 for (int i_r = 0; i_r < n_r; ++i_r) {
-                    FEChemicalReaction* reacti = m_pMat->GetReaction(i_r);
-                    dchatde[i_sol] += reacti->m_v[i_sol] * (I * reactionSupply[i_r]);
-                    Phic[i_sol] += phiw* reacti->m_Vbar*tangentReactionSupplyConcentration[i_r][i_sol];
+                    //FEChemicalReactionERD* reacti = m_pMat->GetReaction(i_r);
+                    //dchatde[i_sol] += reacti->m_v[i_sol] * (I * reactionSupply[i_r]);
+                    //Phic[i_sol] += phiw* reacti->m_Vbar*tangentReactionSupplyConcentration[i_r][i_sol];
                 }
             //}
         }
@@ -613,12 +604,9 @@ bool FEElasticSoluteSolidDomain::ElementElasticSoluteStiffness(FESolidElement& e
         double T = m_pMat->m_Tabs;
         
         // calculate all the matrices
-        vec3d vtmp,gp,qpu;
-        vector<vec3d> gc(n_sol),qcu(n_sol),wc(n_sol),jce(n_sol);
-        vector< vector<vec3d> > jc(n_sol, vector<vec3d>(n_sol));
-        vector<mat3d> ju(n_sol);
-        vector< vector<double> > qcc(n_sol, vector<double>(n_sol));
-        vector< vector<double> > dchatdc(n_sol, vector<double>(n_sol));
+        vector< vector<vec3d> > jc(n_sol, vector<vec3d>(n_sol,vec3d(0.0)));
+        vector< vector<double> > qcc(n_sol, vector<double>(n_sol,0.0));
+        vector< vector<double> > dchatdc(n_sol, vector<double>(n_sol,0.0));
         for (int i_a = 0; i_a < n_m; ++i_a)
         {
             for (int i_b = 0; i_b < n_m; ++i_b)
@@ -627,32 +615,45 @@ bool FEElasticSoluteSolidDomain::ElementElasticSoluteStiffness(FESolidElement& e
                 mat3d Kuu = (mat3dd(gradN[i_a] * (s * gradN[i_b])) + vdotTdotv(gradN[i_a], C, gradN[i_b])) * detJ * gw[i_k];
                 ke.add(n_dpn*i_a, n_dpn*i_b, Kuu);
 
-                // do nothing for the kcu matrix?
-                //for (int isol = 0; isol < n_sol; ++isol) {
-                //    ke[n_dpn*a+3+isol][n_dpn*b] += 0.0;
-                //    ke[n_dpn*a+3+isol][n_dpn*b+1] += 0.0;
-                //    ke[n_dpn*a+3+isol][n_dpn*b+2] += 0.0;
-                    
-                    // do nothing for the kuc matrix?
-                    //ke[n_dpn*a][n_dpn*b+3+isol] += 0.0;
-                    //ke[n_dpn*a+1][n_dpn*b+3+isol] += 0.0;
-                    //ke[n_dpn*a+2][n_dpn*b+3+isol] += 0.0;                    
                 //}
                 
+                //set kcu and kuc to 0
+                for (int isol = 0; isol < n_sol; ++isol) {
+                    ke[n_dpn * i_a + 3 + isol][n_dpn * i_b] = 0.0;
+                    ke[n_dpn * i_a + 3 + isol][n_dpn * i_b + 1] = 0.0;
+                    ke[n_dpn * i_a + 3 + isol][n_dpn * i_b + 2] = 0.0;
+                    ke[n_dpn * i_a][n_dpn * i_b + 3 + isol] = 0.0;
+                    ke[n_dpn * i_a + 1][n_dpn * i_b + 3 + isol] = 0.0;
+                    ke[n_dpn * i_a + 2][n_dpn * i_b + 3 + isol] = 0.0;
+                }
+
                 // calculate data for the kcc matrix
                 for (int isol = 0; isol < n_sol; ++isol) {
                     for (int jsol = 0; jsol < n_sol; ++jsol) {
-                        if (jsol = isol)
-                            jc[isol][jsol] = -(D[isol] * (gradN[i_b] * (phiw)));
+                        
+                        dchatdc[isol][jsol] = 0.0;
+                        if (jsol == isol) {
+                            jc[isol][jsol] = D[isol] * gradN[i_b] * (-phiw);
+                            qcc[isol][jsol] =  (-phiw) / dt;
+                        }
+                        else {
+                            jc[isol][jsol] = vec3d(0.0);
+                            qcc[isol][jsol] = 0.0;
+                        }
+                        for (int i_r = 0; i_r < n_r; ++i_r)
+                        {
+                            FEChemicalReactionERD* reacti = m_pMat->GetReaction(i_r);
+                            dchatdc[isol][jsol] += reacti->m_v[isol]*reacti->Tangent_ReactionSupply_Concentration(mp, jsol);
+                        }
                     }
                 }
                 
                 // calculate the kcc matrix
                 int ke_c_a = n_dpn * i_a + 3;
                 int ke_c_b = n_dpn * i_b + 3;
-                for (int i_sol = 0; i_sol < n_sol; ++i_sol) {
-                    for (int j_sol = 0; j_sol < n_sol; ++j_sol) {
-                        ke[ke_c_a+i_sol][ke_c_b+j_sol] += (gradN[i_a] * jc[i_sol][j_sol] + N[i_a] * (qcc[i_sol][j_sol] + N[i_b] * phiw * dchatdc[i_sol][j_sol])) * (detJ * gw[i_k] * dt);
+                for (int isol = 0; isol < n_sol; ++isol) {
+                    for (int jsol = 0; jsol < n_sol; ++jsol) {
+                        ke[ke_c_a+isol][ke_c_b+jsol] += (gradN[i_a] * jc[isol][jsol] + H[i_a] * H[i_b] * qcc[isol][jsol] + H[i_a] * H[i_b] * phiw * dchatdc[isol][jsol]) * (detJ * gw[i_k] * dt);
                     }
                 }
             }
@@ -673,7 +674,7 @@ bool FEElasticSoluteSolidDomain::ElementElasticSoluteStiffness(FESolidElement& e
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::Update(const FETimeInfo& tp)
+void FEElasticReactionDiffusionSolidDomain::Update(const FETimeInfo& tp)
 {
     FEModel& fem = *GetFEModel();
     bool berr = false;
@@ -700,7 +701,7 @@ void FEElasticSoluteSolidDomain::Update(const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolidDomain::UpdateElementStress(int i_e, double dt)
+void FEElasticReactionDiffusionSolidDomain::UpdateElementStress(int i_e, double dt)
 {
     double* gw;
     vec3d r0[FEElement::MAX_NODES];
@@ -709,8 +710,8 @@ void FEElasticSoluteSolidDomain::UpdateElementStress(int i_e, double dt)
     // get the mesh
     FEMesh& mesh = *m_pMesh;
     
-    // get the elastic solute material and dependencies
-    FEElasticSolute* pmb = m_pMat;
+    // get the elastic reaction diffusion material and dependencies
+    FEElasticReactionDiffusion* pmb = m_pMat;
     // get the number of solutes
     const int n_sol = (int)pmb->Solutes();
     // get the number of reactions

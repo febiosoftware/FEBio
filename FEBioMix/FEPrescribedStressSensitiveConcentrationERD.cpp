@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEPrescribedStressSensitiveConcentration.h"
+#include "FEPrescribedStressSensitiveConcentrationERD.h"
 #include <FECore/FEMesh.h>
 #include <FEBioMech/FEBioMech.h>
 #include "FEBioMix.h"
@@ -38,7 +38,7 @@ SOFTWARE.*/
 #include <FEBioMix/FEBiphasic.h>
 #include <FEBioMech/FEKinematicGrowth.h>
 
-BEGIN_FECORE_CLASS(FEPrescribedStressSensitiveConcentration, FEPrescribedDOF)
+BEGIN_FECORE_CLASS(FEPrescribedStressSensitiveConcentrationERD, FEPrescribedDOF)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
 	ADD_PARAMETER(m_value, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_brelative, "relative");
@@ -48,19 +48,19 @@ BEGIN_FECORE_CLASS(FEPrescribedStressSensitiveConcentration, FEPrescribedDOF)
 	ADD_PARAMETER(m_b, "stress_scale_width");
 END_FECORE_CLASS();
 
-FEPrescribedStressSensitiveConcentration::FEPrescribedStressSensitiveConcentration(FEModel* pfem) : FEPrescribedDOF(pfem)
+FEPrescribedStressSensitiveConcentrationERD::FEPrescribedStressSensitiveConcentrationERD(FEModel* pfem) : FEPrescribedDOF(pfem)
 {
 
 }
 
-bool FEPrescribedStressSensitiveConcentration::Init()
+bool FEPrescribedStressSensitiveConcentrationERD::Init()
 {
 	if (FEPrescribedDOF::Init() == false) return false;
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEPrescribedStressSensitiveConcentration::GetStress(FEElement& m_elem, int node_id)
+mat3ds FEPrescribedStressSensitiveConcentrationERD::GetStress(FEElement& m_elem, int node_id)
 {
 	mat3ds si[FEElement::MAX_INTPOINTS];
 	mat3ds so[FEElement::MAX_NODES];
@@ -85,7 +85,7 @@ mat3ds FEPrescribedStressSensitiveConcentration::GetStress(FEElement& m_elem, in
 }
 
 //-----------------------------------------------------------------------------
-double FEPrescribedStressSensitiveConcentration::GetConcentration(FEElement& m_elem, int node_id)
+double FEPrescribedStressSensitiveConcentrationERD::GetConcentration(FEElement& m_elem, int node_id)
 {
 	double ci = 0.0;
 	for (int i = 0; i < m_elem.GaussPoints(); ++i)
@@ -98,7 +98,7 @@ double FEPrescribedStressSensitiveConcentration::GetConcentration(FEElement& m_e
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FEPrescribedStressSensitiveConcentration::GetNodalStress(int node_id)
+mat3ds FEPrescribedStressSensitiveConcentrationERD::GetNodalStress(int node_id)
 {
 	// get the mesh to which this surface belongs
 	FENodeElemList& NEL = GetMesh().NodeElementList();
@@ -117,7 +117,7 @@ mat3ds FEPrescribedStressSensitiveConcentration::GetNodalStress(int node_id)
 }
 
 //-----------------------------------------------------------------------------
-double FEPrescribedStressSensitiveConcentration::GetNodalConcentration(int node_id)
+double FEPrescribedStressSensitiveConcentrationERD::GetNodalConcentration(int node_id)
 {
 	// get the mesh to which this surface belongs
 	FENodeElemList& NEL = GetMesh().NodeElementList();
@@ -133,7 +133,7 @@ double FEPrescribedStressSensitiveConcentration::GetNodalConcentration(int node_
 }
 
 //-----------------------------------------------------------------------------
-void FEPrescribedStressSensitiveConcentration::GetNodalValues(int nodelid, std::vector<double>& val)
+void FEPrescribedStressSensitiveConcentrationERD::GetNodalValues(int nodelid, std::vector<double>& val)
 {
 	FENode* p_n = GetNodeSet()->Node(nodelid);
 	int node_id = p_n->GetID() - 1;

@@ -32,10 +32,12 @@ SOFTWARE.*/
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
+#include "FEElasticReactionDiffusion.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicDomain.h"
+#include "FEElasticReactionDiffusionDomain.h"
 #include <FECore/FEShellDomain.h>
 
 //-----------------------------------------------------------------------------
@@ -53,6 +55,7 @@ FEDomain* FEMixDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* 
 		else if (dynamic_cast<FEBiphasicSolute*>(pmat)) sztype = "biphasic-solute-solid";
 		else if (dynamic_cast<FETriphasic*     >(pmat)) sztype = "triphasic-solid";
 		else if (dynamic_cast<FEMultiphasic*   >(pmat)) sztype = "multiphasic-solid";
+		else if (dynamic_cast<FEElasticReactionDiffusion* >(pmat)) sztype = "elastic-reaction-diffusion-solid";
 
 		if (sztype) pd = fecore_new<FESolidDomain>(sztype, pfem);
 	}

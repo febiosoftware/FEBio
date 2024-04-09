@@ -27,20 +27,21 @@ SOFTWARE.*/
 
 
 #pragma once
+#include "FEBiphasic.h"
 #include "FESolutesMaterialPoint.h"
 #include "FESolute.h"
-#include "FEChemicalReaction.h"
-#include "FESoluteInterface.h"
+#include "FEChemicalReactionERD.h"
+#include "FEElasticReactionDiffusionInterface.h"
 #include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
-//! Base class for elastic solute materials.
+//! Base class for elastic reaction diffusion materials.
 
-class FEBIOMIX_API FEElasticSolute : public FEMaterial, public FESoluteInterface_T<FESolutesMaterialPoint>
+class FEBIOMIX_API FEElasticReactionDiffusion : public FEMaterial, public FEElasticReactionDiffusionInterface_T<FESolutesMaterialPoint>
 {
 public:
 	//! constructor
-	FEElasticSolute(FEModel* pfem);
+	FEElasticReactionDiffusion(FEModel* pfem);
 
 	//! initialization
 	bool Init() override;
@@ -78,7 +79,7 @@ public:
 	double SoluteMolarMass(const int sol) { return m_pSolute[sol]->MolarMass(); }
 
 	//! Add a chemical reaction
-	void AddChemicalReaction(FEChemicalReaction* pcr);
+	void AddChemicalReaction(FEChemicalReactionERD* pcr);
 
 	// solute interface
 public:
@@ -87,7 +88,7 @@ public:
 
 public:
 	FEElasticMaterial* GetSolid() { return m_pSolid; }
-	FEChemicalReaction* GetReaction(int i) { return m_pReact[i]; }
+	FEChemicalReactionERD* GetReaction(int i) { return m_pReact[i]; }
 
 public:
 	int Reactions() { return (int)m_pReact.size(); }
@@ -103,7 +104,7 @@ protected:
 	// material properties
 	FEElasticMaterial* m_pSolid;		//!< pointer to elastic solid material
 	std::vector<FESolute*>				m_pSolute;		//!< pointer to solute materials
-	std::vector<FEChemicalReaction*>	m_pReact;		//!< pointer to chemical reactions
+	std::vector<FEChemicalReactionERD*>	m_pReact;		//!< pointer to chemical reactions
 	
 	DECLARE_FECORE_CLASS();
 };

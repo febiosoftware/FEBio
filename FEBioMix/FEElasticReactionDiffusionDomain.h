@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FECore/FESolidDomain.h"
-#include "FEElasticSolute.h"
+#include "FEElasticReactionDiffusion.h"
 #include "FEBioMech/FEElasticDomain.h"
 
 //-----------------------------------------------------------------------------
@@ -40,16 +40,16 @@ class FESolver;
 //-----------------------------------------------------------------------------
 //! Abstract interface class for multiphasic domains.
 
-//! An elastic solute domain is used by the elastic solute solver.
+//! An elastic reaction diffusion domain is used by the elastic reaction diffusion solver.
 //! This interface defines the functions that have to be implemented by an
-//! elastic solute domain. There are basically two categories: residual functions
+//! elastic reaction diffusion domain. There are basically two categories: residual functions
 //! that contribute to the global residual vector. And stiffness matrix
 //! function that calculate contributions to the global stiffness matrix.
-class FEBIOMIX_API FEElasticSoluteDomain : public FEElasticDomain
+class FEBIOMIX_API FEElasticReactionDiffusionDomain : public FEElasticDomain
 {
 public:
-    FEElasticSoluteDomain(FEModel* pfem);
-    virtual ~FEElasticSoluteDomain(){}
+    FEElasticReactionDiffusionDomain(FEModel* pfem);
+    virtual ~FEElasticReactionDiffusionDomain(){}
     
     // --- R E S I D U A L ---
     
@@ -62,7 +62,7 @@ public:
     virtual void StiffnessMatrix(FELinearSystem& LS, bool bsymm) = 0;
     
 protected:
-    FEElasticSolute*    m_pMat;
+    FEElasticReactionDiffusion*    m_pMat;
     int                 m_dofC;		//!< concentration dof index
     int                 m_dofVX;
     int                 m_dofVY;

@@ -27,11 +27,11 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEChemicalReaction.h"
+#include "FEChemicalReactionERD.h"
 
 //-----------------------------------------------------------------------------
 //! Law of mass action for forward chemical reaction.
-class FEBIOMIX_API FEHillInhibition : public FEChemicalReaction
+class FEBIOMIX_API FEHillInhibition : public FEChemicalReactionERD
 {
 public:
 	//! constructor
@@ -45,9 +45,6 @@ public:
 
 	//! tangent of reaction rate with strain at material point
 	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
-
-	//! tangent of reaction rate with effective fluid pressure at material point
-	double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt) override;
 
 	//! tangent of molar supply with effective concentration at material point
 	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;

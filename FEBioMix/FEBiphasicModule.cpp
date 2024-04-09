@@ -66,9 +66,9 @@ void FEMultiphasicModule::InitModel(FEModel* fem)
 }
 
 //=============================================================================
-FEElasticSoluteModule::FEElasticSoluteModule() {}
+FEElasticReactionDiffusionModule::FEElasticReactionDiffusionModule() {}
 
-void FEElasticSoluteModule::InitModel(FEModel* fem)
+void FEElasticReactionDiffusionModule::InitModel(FEModel* fem)
 {
 	FEBiphasicSoluteModule::InitModel(fem);
 }

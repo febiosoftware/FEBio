@@ -35,12 +35,12 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FESolidSolver2 to solve
 // solute problems. 
-class FEBIOMIX_API FEElasticSoluteSolver : public FENewtonSolver
+class FEBIOMIX_API FEElasticReactionDiffusionSolver : public FENewtonSolver
 {
 public:
 	//! con/descructor
-	FEElasticSoluteSolver(FEModel* pfem);
-	virtual ~FEElasticSoluteSolver(){}
+	FEElasticReactionDiffusionSolver(FEModel* pfem);
+	virtual ~FEElasticReactionDiffusionSolver(){}
 
 	//! Initialize data structures
 	bool Init() override;

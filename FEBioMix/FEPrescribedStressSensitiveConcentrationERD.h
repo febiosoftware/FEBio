@@ -27,45 +27,43 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEChemicalReactionERD.h"
+#include <FECore/FEPrescribedDOF.h>
+#include <FECore/tens3d.h>
+#include <FEBioMech/FEBioMech.h>
+#include "febiomix_api.h"
+#include <FECore/FEElement.h>
 
 //-----------------------------------------------------------------------------
-//! Law of mass action for forward chemical reaction.
-class FEBIOMIX_API FEHillActivationANDActivation : public FEChemicalReactionERD
+class FEBIOMIX_API FEPrescribedStressSensitiveConcentrationERD : public FEPrescribedDOF
 {
 public:
 	//! constructor
-	FEHillActivationANDActivation(FEModel* pfem);
+	FEPrescribedStressSensitiveConcentrationERD(FEModel* pfem);
 
-	//! initialization
+	//! initializer
 	bool Init() override;
 
-	//! reaction rate at material point
-	double ReactionSupply(FEMaterialPoint& pt) override;
+	//! get integration point stress
+	mat3ds GetStress(FEElement& m_elem, int nodelid);
 
-	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
+	//! get integration point concentration
+	double GetConcentration(FEElement& m_elem, int nodelid);
 
-	//! tangent of molar supply with effective concentration at material point
-	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
+	//! get stress projected at the nodes
+	mat3ds GetNodalStress(int nodelid);
 
-	double f_Hill(FEMaterialPoint& pt, const int sol);
-
-	double dfdc(FEMaterialPoint& pt, const int sol);
+	//! get concentration projected at the nodes
+	double GetNodalConcentration(int nodelid);
 
 public:
-	double	m_Kmax = 1.0;
-	double	m_w = 1.0;
-	double	m_t = 1.0;
-	double	m_E50 = 0.5;
-	double	m_n = 1.2;
-	int		u_sol_id_a = -1;
-	int		u_sol_id_b = -1;
-	int		m_sol_id_a = -1;
-	int		m_sol_id_b = -1;
-	double m_B = 0.0;
-	double m_K = 0.0;
-	double m_Kn = 0.0;
-	double m_Kb = 0.0;
+	double m_s0		= 0.2;
+	double m_a0		= 1.0;
+	double m_a		= 1.0;
+	double m_b		= 0.05;
+	FEParamDouble m_value;
 	DECLARE_FECORE_CLASS();
+protected:
+	void GetNodalValues(int nodelid, std::vector<double>& val) override;
+
+protected:
 };

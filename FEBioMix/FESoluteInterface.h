@@ -177,7 +177,7 @@ public:
 	}
 	double dkdc(const FEMaterialPoint& mp, int i, int j) override {
 		const T* spt = mp.ExtractData<T>();
-		return spt->m_dkdc[i][j];
+			return spt->m_dkdc[i][j];
 	}
 	double dkdJ(const FEMaterialPoint& mp, int soluteIndex) override {
 		const T* spt = mp.ExtractData<T>();

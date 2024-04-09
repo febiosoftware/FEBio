@@ -27,7 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEReactionRateStressSensitive.h"
+#include "FEReactionRateStressSensitiveERD.h"
 #include "FEBiphasic.h"
 #include "FEBioMech/FERemodelingElasticMaterial.h"
 #include "FEBioMech/FENeoHookean.h"
@@ -37,9 +37,11 @@ SOFTWARE.*/
 #include <FECore/FESPRProjection.h>
 #include <FECore/FESolidDomain.h>
 #include <iostream>
+#include <FEBioMix/FEElasticReactionDiffusionSolidDomain.h>
+#include <FEBioMix/FEElasticReactionDiffusionDomain.h>
 
 // Material parameters for the FEMultiphasic material
-BEGIN_FECORE_CLASS(FEReactionRateStressSensitive, FEReactionRate)
+BEGIN_FECORE_CLASS(FEReactionRateStressSensitiveERD, FEReactionRateERD)
 	ADD_PARAMETER(m_k, "k");
 	ADD_PARAMETER(m_a0, "a0");
 	ADD_PARAMETER(m_a, "a");
@@ -49,7 +51,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! reaction rate at material point
-double FEReactionRateStressSensitive::ReactionRate(FEMaterialPoint& pt)
+double FEReactionRateStressSensitiveERD::ReactionRate(FEMaterialPoint& pt)
 {
 	FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
 	double I1 = ep.m_s.tr();
@@ -61,30 +63,37 @@ double FEReactionRateStressSensitive::ReactionRate(FEMaterialPoint& pt)
 //-----------------------------------------------------------------------------
 //! tangent of reaction rate with strain at material point
 //! SL! Todo: Figure out what to do with rhor for solutes.
-mat3ds FEReactionRateStressSensitive::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
+mat3ds FEReactionRateStressSensitiveERD::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 {
-	if (m_pReact->m_bool_refC)
-	{
-		return mat3ds(0.0);
-	}
-	else
-	{
-		FEBiphasicInterface* pbm = dynamic_cast<FEBiphasicInterface*>(GetAncestor());
-		double phir = pbm->SolidReferentialVolumeFraction(pt);
-		FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
-		double J = ep.m_J;
-		vec3d pos = pt.m_r0;
+	//FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
+	//FEElement* el = pt.m_elem;
+	//FEDomain& dom = dynamic_cast<FEDomain&>(*el->GetMeshPartition());
+	//FEElasticReactionDiffusionDomain& bd = dynamic_cast<FEElasticReactionDiffusionDomain&>(dom);
+	////FEElasticSolidDomain& esd = dynamic_cast<FEElasticSolidDomain&>(bd);
 
-		mat3ds I = mat3ds(1.0);
-		double zhat = ReactionRate(pt);
-		mat3ds dzde = -1.0 * zhat * I;
-		return dzde;
-	}
+	//double I1 = ep.m_s.tr();
+	//double dzdI = (m_a * m_k(pt) * exp((m_s0 + I1) / m_b)) / (m_b * pow(exp(m_s0 / m_b) + exp(I1 / m_b), 2.0));
+	//mat3d I = mat3d(1.0);
+	//
+	//tens4ds C = bd.m_pmat
+
+	return mat3ds(0.0);
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of reaction rate with effective fluid pressure at material point
-double FEReactionRateStressSensitive::Tangent_ReactionRate_Pressure(FEMaterialPoint& pt)
+//! tangent of reaction rate with stress at material point
+//! SL! Todo: Figure out what to do with rhor for solutes.
+mat3ds FEReactionRateStressSensitiveERD::Tangent_ReactionRate_Stress(FEMaterialPoint& pt)
 {
-	return 0;
+	FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
+	FEElement* el = pt.m_elem;
+	FEDomain& dom = dynamic_cast<FEDomain&>(*el->GetMeshPartition());
+	FEElasticReactionDiffusionDomain& bd = dynamic_cast<FEElasticReactionDiffusionDomain&>(dom);
+	//FEElasticSolidDomain& esd = dynamic_cast<FEElasticSolidDomain&>(bd);
+
+	double I1 = ep.m_s.tr();
+	double dzdI = (m_a * m_k(pt) * exp((m_s0 + I1) / m_b)) / (m_b * pow(exp(m_s0 / m_b) + exp(I1 / m_b), 2.0));
+	mat3dd I = mat3dd(1.0);
+	return I * dzdI;
+
 }

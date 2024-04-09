@@ -49,9 +49,9 @@ public:
 	void InitModel(FEModel* fem) override;
 };
 
-class FEBIOMIX_API FEElasticSoluteModule : public FEBiphasicSoluteModule
+class FEBIOMIX_API FEElasticReactionDiffusionModule : public FEBiphasicSoluteModule
 {
 public:
-	FEElasticSoluteModule();
+	FEElasticReactionDiffusionModule();
 	void InitModel(FEModel* fem) override;
 };

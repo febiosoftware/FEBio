@@ -27,9 +27,9 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FEElasticSoluteSolver.h"
+#include "FEElasticReactionDiffusionSolver.h"
 #include "FEBioMech/FEElasticDomain.h"
-#include "FEElasticSoluteDomain.h"
+#include "FEElasticReactionDiffusionDomain.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FEBioMech/FEResidualVector.h"
@@ -46,11 +46,14 @@ SOFTWARE.*/
 #include <FECore/FEBoundaryCondition.h>
 #include <FECore/FENLConstraint.h>
 #include <FECore/FELinearConstraintManager.h>
-#include "FEElasticSoluteAnalysis.h"
+#include "FEElasticReactionDiffusionAnalysis.h"
+
+#include "FEBiphasicDomain.h"
+#include "FEBiphasicSoluteDomain.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_FECORE_CLASS(FEElasticSoluteSolver, FENewtonSolver)
+BEGIN_FECORE_CLASS(FEElasticReactionDiffusionSolver, FENewtonSolver)
 	BEGIN_PARAM_GROUP("Nonlinear solver");	// make sure this matches FENewtonSolver. 
 		ADD_PARAMETER(m_Dtol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "dtol"        );
 		ADD_PARAMETER(m_Etol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol");
@@ -71,7 +74,7 @@ BEGIN_FECORE_CLASS(FEElasticSoluteSolver, FENewtonSolver)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEElasticSoluteSolver::FEElasticSoluteSolver(FEModel* pfem) : FENewtonSolver(pfem),
+FEElasticReactionDiffusionSolver::FEElasticReactionDiffusionSolver(FEModel* pfem) : FENewtonSolver(pfem),
 	m_dofU(pfem), m_dofV(pfem), m_dofRQ(pfem),
 	m_rigidSolver(pfem)
 {
@@ -105,7 +108,7 @@ FEElasticSoluteSolver::FEElasticSoluteSolver(FEModel* pfem) : FENewtonSolver(pfe
 //-----------------------------------------------------------------------------
 //! Allocates and initializes the data structures.
 //
-bool FEElasticSoluteSolver::Init()
+bool FEElasticReactionDiffusionSolver::Init()
 {
 	// initialize base class
 	if (FENewtonSolver::Init() == false) return false;
@@ -159,7 +162,7 @@ bool FEElasticSoluteSolver::Init()
 
 //-----------------------------------------------------------------------------
 //! Initialize equations
-bool FEElasticSoluteSolver::InitEquations()
+bool FEElasticReactionDiffusionSolver::InitEquations()
 {
 	// First call the base class.
 	// This will initialize all equation numbers, except the rigid body equation numbers
@@ -225,7 +228,7 @@ bool FEElasticSoluteSolver::InitEquations()
 }
 
 //! Generate warnings if needed
-void FEElasticSoluteSolver::SolverWarnings()
+void FEElasticReactionDiffusionSolver::SolverWarnings()
 {
 	FEModel& fem = *GetFEModel();
 
@@ -259,7 +262,7 @@ void FEElasticSoluteSolver::SolverWarnings()
 }
 
 //! Prepares the data for the first QN iteration. 
-void FEElasticSoluteSolver::PrepStep()
+void FEElasticReactionDiffusionSolver::PrepStep()
 {
 	for (int j=0; j<(int)m_nceq.size(); ++j) if (m_nceq[j]) zero(m_Ci[j]);
 
@@ -309,10 +312,6 @@ void FEElasticSoluteSolver::PrepStep()
 	// apply concentrated nodal forces
 	// since these forces do not depend on the geometry
 	// we can do this once outside the NR loop.
-//	vector<double> dummy(m_neq, 0.0);
-//	zero(m_Fn);
-//	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-//	NodalLoads(Fn, tp);
 
 	// apply boundary conditions
 	// we save the prescribed displacements increments in the ui vector
@@ -367,7 +366,7 @@ void FEElasticSoluteSolver::PrepStep()
 //! The details of this implementation of the BFGS method can be found in:
 //!   "Finite Element Procedures", K.J. Bathe, p759 and following
 //!
-bool FEElasticSoluteSolver::Quasin()
+bool FEElasticReactionDiffusionSolver::Quasin()
 {
 	// convergence norms
 	double	normR1;		// residual norm
@@ -565,7 +564,7 @@ bool FEElasticSoluteSolver::Quasin()
 //! This is because they do not depend on the geometry 
 //! so we only calculate them once (in Quasin) and then add them here.
 
-bool FEElasticSoluteSolver::Residual(vector<double>& R)
+bool FEElasticReactionDiffusionSolver::Residual(vector<double>& R)
 {
 	int i;
 
@@ -593,7 +592,7 @@ bool FEElasticSoluteSolver::Residual(vector<double>& R)
 	{
         FEDomain& dom = mesh.Domain(i);
         FEElasticDomain* ped = dynamic_cast<FEElasticDomain*>(&dom);
-        FEElasticSoluteDomain*    psd = dynamic_cast<FEElasticSoluteDomain*   >(&dom);
+        FEElasticReactionDiffusionDomain*    psd = dynamic_cast<FEElasticReactionDiffusionDomain*   >(&dom);
         if (psd) {
 			psd->InternalForces(RHS);
         }
@@ -641,7 +640,7 @@ bool FEElasticSoluteSolver::Residual(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEElasticSoluteSolver::StiffnessMatrix()
+bool FEElasticReactionDiffusionSolver::StiffnessMatrix()
 {
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
@@ -654,36 +653,16 @@ bool FEElasticSoluteSolver::StiffnessMatrix()
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	bool bsymm = (m_msymm == REAL_SYMMETRIC);
-	/*if (pstep->m_nanalysis == FEElasticSoluteAnalysis::STEADY_STATE)
+
+	for (int i = 0; i<mesh.Domains(); ++i)
 	{
-	*/	//for (int i=0; i<mesh.Domains(); ++i) 
-		//{
-		//	FEDomain& dom = mesh.Domain(i);
-		//	FEElasticDomain*        pde = dynamic_cast<FEElasticDomain*  >(&dom);
-		//	FEBiphasicDomain*       pbd = dynamic_cast<FEBiphasicDomain* >(&dom);
-		//	FEBiphasicSoluteDomain* pbs = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
-		//	FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
-		//	FEMultiphasicDomain*    pmd = dynamic_cast<FEMultiphasicDomain*   >(&dom);
+		FEDomain& dom = mesh.Domain(i);
+		FEElasticDomain*        pde = dynamic_cast<FEElasticDomain*  >(&dom);
+		FEElasticReactionDiffusionDomain*  psd = dynamic_cast<FEElasticReactionDiffusionDomain*   >(&dom);
 
-		//	if      (pbd) pbd->StiffnessMatrixSS(LS, bsymm);
-		//	else if (pbs) pbs->StiffnessMatrixSS(LS, bsymm);
-		//	else if (ptd) ptd->StiffnessMatrixSS(LS, bsymm);
-		//	else if (pmd) pmd->StiffnessMatrixSS(LS, bsymm);
-  //          else if (pde) pde->StiffnessMatrix(LS);
-		//}
-	//}
-	//else
-	//{
-		for (int i = 0; i<mesh.Domains(); ++i)
-		{
-			FEDomain& dom = mesh.Domain(i);
-			FEElasticDomain*        pde = dynamic_cast<FEElasticDomain*  >(&dom);
-			FEElasticSoluteDomain*  psd = dynamic_cast<FEElasticSoluteDomain*   >(&dom);
-
-			if (psd) psd->StiffnessMatrix(LS, bsymm);
-            else if (pde) pde->StiffnessMatrix(LS);
-		}
-	//}
+		if (psd) psd->StiffnessMatrix(LS, bsymm);
+        else if (pde) pde->StiffnessMatrix(LS);
+	}
 
 	// calculate contact stiffness
 	ContactStiffness(LS);
@@ -708,7 +687,7 @@ bool FEElasticSoluteSolver::StiffnessMatrix()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolver::GetDisplacementData(vector<double> &di, vector<double> &ui)
+void FEElasticReactionDiffusionSolver::GetDisplacementData(vector<double> &di, vector<double> &ui)
 {
 	FEModel& fem = *GetFEModel();
 	int N = fem.GetMesh().Nodes(), nid, m = 0;
@@ -741,7 +720,7 @@ void FEElasticSoluteSolver::GetDisplacementData(vector<double> &di, vector<doubl
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSoluteSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui, const int sol)
+void FEElasticReactionDiffusionSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui, const int sol)
 {
 	FEModel& fem = *GetFEModel();
 	int N = fem.GetMesh().Nodes(), nid, m = 0;
@@ -762,7 +741,7 @@ void FEElasticSoluteSolver::GetConcentrationData(vector<double> &ci, vector<doub
 
 //! Update the model's kinematic data. This is overriden from FEBiphasicSolver so
 //! that solute data is updated
-void FEElasticSoluteSolver::UpdateKinematics(vector<double>& ui)
+void FEElasticReactionDiffusionSolver::UpdateKinematics(vector<double>& ui)
 {
 	// first update all solid-mechanics kinematics
 	FEModel& fem = *GetFEModel();
@@ -835,7 +814,7 @@ void FEElasticSoluteSolver::UpdateKinematics(vector<double>& ui)
 
 //-----------------------------------------------------------------------------
 //! Updates the solute data
-void FEElasticSoluteSolver::UpdateSolute(vector<double>& ui)
+void FEElasticReactionDiffusionSolver::UpdateSolute(vector<double>& ui)
 {
 	int i, j, n;
 	
@@ -866,7 +845,7 @@ void FEElasticSoluteSolver::UpdateSolute(vector<double>& ui)
 }
 
 //! Updates the current state of the model
-void FEElasticSoluteSolver::Update(vector<double>& ui)
+void FEElasticReactionDiffusionSolver::Update(vector<double>& ui)
 {
 	FEModel& fem = *GetFEModel();
 	FETimeInfo& tp = fem.GetTime();
@@ -887,7 +866,7 @@ void FEElasticSoluteSolver::Update(vector<double>& ui)
 	UpdateModel();
 }
 
-void FEElasticSoluteSolver::UpdateModel()
+void FEElasticReactionDiffusionSolver::UpdateModel()
 {
 	// mark all free-draining surfaces
 	FEModel& fem = *GetFEModel();
@@ -927,7 +906,7 @@ void FEElasticSoluteSolver::UpdateModel()
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FEElasticSoluteSolver::Serialize(DumpStream& ar)
+void FEElasticReactionDiffusionSolver::Serialize(DumpStream& ar)
 {
 	// Serialize parameters
 	FENewtonSolver::Serialize(ar);
@@ -962,7 +941,7 @@ void FEElasticSoluteSolver::Serialize(DumpStream& ar)
 }
 
 //! Calculates the contact forces
-void FEElasticSoluteSolver::ContactForces(FEGlobalVector& R)
+void FEElasticReactionDiffusionSolver::ContactForces(FEGlobalVector& R)
 {
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
@@ -974,7 +953,7 @@ void FEElasticSoluteSolver::ContactForces(FEGlobalVector& R)
 }
 
 //! This function calculates the contact stiffness matrix
-void FEElasticSoluteSolver::ContactStiffness(FELinearSystem& LS)
+void FEElasticReactionDiffusionSolver::ContactStiffness(FELinearSystem& LS)
 {
 	FEModel& fem = *GetFEModel();
 	const FETimeInfo& tp = fem.GetTime();
@@ -986,7 +965,7 @@ void FEElasticSoluteSolver::ContactStiffness(FELinearSystem& LS)
 }
 
 //! calculate the nonlinear constraint forces 
-void FEElasticSoluteSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp)
+void FEElasticReactionDiffusionSolver::NonLinearConstraintForces(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
 	int N = fem.NonlinearConstraints();
@@ -998,7 +977,7 @@ void FEElasticSoluteSolver::NonLinearConstraintForces(FEGlobalVector& R, const F
 }
 
 //! Calculate the stiffness contribution due to nonlinear constraints
-void FEElasticSoluteSolver::NonLinearConstraintStiffness(FELinearSystem& LS, const FETimeInfo& tp)
+void FEElasticReactionDiffusionSolver::NonLinearConstraintStiffness(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
 	int N = fem.NonlinearConstraints();

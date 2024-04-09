@@ -26,46 +26,10 @@ SOFTWARE.*/
 
 
 
-#pragma once
-#include "FEChemicalReactionERD.h"
+#include "stdafx.h"
+#include "FEReactionRateConstERD.h"
 
-//-----------------------------------------------------------------------------
-//! Law of mass action for forward chemical reaction.
-class FEBIOMIX_API FEHillActivationANDActivation : public FEChemicalReactionERD
-{
-public:
-	//! constructor
-	FEHillActivationANDActivation(FEModel* pfem);
-
-	//! initialization
-	bool Init() override;
-
-	//! reaction rate at material point
-	double ReactionSupply(FEMaterialPoint& pt) override;
-
-	//! tangent of reaction rate with strain at material point
-	mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
-
-	//! tangent of molar supply with effective concentration at material point
-	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
-
-	double f_Hill(FEMaterialPoint& pt, const int sol);
-
-	double dfdc(FEMaterialPoint& pt, const int sol);
-
-public:
-	double	m_Kmax = 1.0;
-	double	m_w = 1.0;
-	double	m_t = 1.0;
-	double	m_E50 = 0.5;
-	double	m_n = 1.2;
-	int		u_sol_id_a = -1;
-	int		u_sol_id_b = -1;
-	int		m_sol_id_a = -1;
-	int		m_sol_id_b = -1;
-	double m_B = 0.0;
-	double m_K = 0.0;
-	double m_Kn = 0.0;
-	double m_Kb = 0.0;
-	DECLARE_FECORE_CLASS();
-};
+// Material parameters for the FEReactionRateConst material
+BEGIN_FECORE_CLASS(FEReactionRateConstERD, FEReactionRateERD)
+ADD_PARAMETER(m_k, FE_RANGE_GREATER_OR_EQUAL(0.0), "k");
+END_FECORE_CLASS();
