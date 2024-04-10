@@ -183,9 +183,13 @@ bool FEOptimizeData::Solve()
 	{
 		feLog("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
+		vector<double> xmin(ymin.size(), 0);
+		for (int i = 0; i < (int)ymin.size(); ++i) xmin[i] = i + 1;
+		m_obj->GetXValues(xmin);
+
 		feLog("\tFunction values:\n\n");
 		for (int i=0; i<(int) ymin.size(); ++i)
-			feLog("\t\t%15lg\n", ymin[i]);
+			feLog("\t\t%15lg %15lg\n", xmin[i], ymin[i]);
 
 		// evaluate final regression coefficient
 		vector<double> y0;

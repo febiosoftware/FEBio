@@ -72,6 +72,8 @@ public:
 	// print output to screen or not
 	void SetVerbose(bool b) { m_verbose = b; }
 
+	bool IsVerbose() const { return m_verbose; }
+
 	// return the FE model
 	FEModel* GetFEModel() { return m_fem; }
 
@@ -88,6 +90,9 @@ public: // These functions need to be implemented by derived classes
 
 	// get the measurement vector (i.e. the y_i above)
 	virtual void GetMeasurements(std::vector<double>& y) = 0;
+
+	// get the x values (ignore if not applicable)
+	virtual void GetXValues(std::vector<double>& x) {}
 
 private:
 	FEModel*	m_fem;
@@ -128,9 +133,12 @@ public:
 	// get the measurement vector
 	void GetMeasurements(std::vector<double>& y);
 
+	void GetXValues(std::vector<double>& x);
+
 private:
 	PointCurve			m_lc;		//!< data load curve for evaluating measurements
 	FEDataSource*		m_src;		//!< source for evaluating functions
+	std::vector<double>	m_x;
 };
 
 //=============================================================================
