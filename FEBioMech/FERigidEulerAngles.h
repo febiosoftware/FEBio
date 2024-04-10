@@ -23,44 +23,38 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#pragma once
+#include "RigidBC.h"
+#include "febiomech_api.h"
 
-
-
-#include "stdafx.h"
-#include "FEModelLoad.h"
-#include "FESolver.h"
-
-//-----------------------------------------------------------------------------
-FEModelLoad::FEModelLoad(FEModel* pfem) : FEStepComponent(pfem), m_dof(pfem)
+class FEBIOMECH_API FERigidEulerAngles : public FERigidBC
 {
-}
+	enum EulerConvention {
+		EULER_ZXY
+	};
 
-//-----------------------------------------------------------------------------
-const FEDofList& FEModelLoad::GetDofList() const
-{
-	return m_dof;
-}
+public:
+	FERigidEulerAngles(FEModel* fem);
+	~FERigidEulerAngles();
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::Serialize(DumpStream& ar)
-{
-	FEStepComponent::Serialize(ar);
-	ar & m_dof;
-}
+	bool Init() override;
 
-void FEModelLoad::PrepStep()
-{
+	void Activate() override;
 
-}
+	void Deactivate() override;
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::LoadVector(FEGlobalVector& R)
-{
-	// base class does nothing
-}
+	void InitTimeStep() override;
 
-//-----------------------------------------------------------------------------
-void FEModelLoad::StiffnessMatrix(FELinearSystem& LS)
-{
-	// base class does nothing.
-}
+	void Serialize(DumpStream& ar) override;
+
+private:
+	void UpdateRotations();
+
+private:
+	int	m_convention;
+	double	m_Ex, m_Ey, m_Ez;
+
+	FERigidPrescribedBC* m_rc[3];
+
+	DECLARE_FECORE_CLASS();
+};

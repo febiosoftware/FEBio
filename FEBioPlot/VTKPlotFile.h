@@ -54,10 +54,12 @@ private:
 	void WritePointData();
 	void WriteCellData();
 
-	void WriteScalarData(std::vector<float>& val, const char* szname);
-	void WriteVectorData(std::vector<float>& val, const char* szname);
-	void WriteMat3FSData(std::vector<float>& val, const char* szname);
-	void WriteMat3FDData(std::vector<float>& val, const char* szname);
+	void WriteScalarData(std::vector<float>& val, const std::string& szname);
+	void WriteVectorData(std::vector<float>& val, const std::string& szname);
+	void WriteMat3FSData(std::vector<float>& val, const std::string& szname);
+	void WriteMat3FDData(std::vector<float>& val, const std::string& szname);
+	void WriteArrayData (std::vector<float>& val, const std::string& name, FEPlotData* pd);
+	void WriteArrayVec3fData(std::vector<float>& val, const std::string& name, FEPlotData* pd);
 
 private:
 	FILE*	m_fp;

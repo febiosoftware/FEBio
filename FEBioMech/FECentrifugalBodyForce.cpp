@@ -45,11 +45,11 @@ FECentrifugalBodyForce::FECentrifugalBodyForce(FEModel* pfem) : FEBodyForce(pfem
 
 vec3d FECentrifugalBodyForce::force(FEMaterialPoint& mp)
 {
-	mat3ds K = stiffness(mp);
+	mat3d K = stiffness(mp);
 	return K*(mp.m_rt - c);
 }
 
-mat3ds FECentrifugalBodyForce::stiffness(FEMaterialPoint& mp) 
+mat3d FECentrifugalBodyForce::stiffness(FEMaterialPoint& mp) 
 { 
 	return (mat3dd(1) - dyad(n))*(-w*w); 
 }
