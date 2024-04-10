@@ -187,16 +187,17 @@ bool FEOptimizeData::Solve()
 		for (int i = 0; i < (int)ymin.size(); ++i) xmin[i] = i + 1;
 		m_obj->GetXValues(xmin);
 
-		feLog("\tFunction values:\n\n");
+		feLog("\tFunction values:\n");
+		feLog("              X            F(X)\n");
 		for (int i=0; i<(int) ymin.size(); ++i)
-			feLog("\t\t%15lg %15lg\n", xmin[i], ymin[i]);
+			feLog("%15lg %15lg\n", xmin[i], ymin[i]);
 
 		// evaluate final regression coefficient
 		vector<double> y0;
 		m_obj->GetMeasurements(y0);
 		double minR2 = m_obj->RegressionCoefficient(y0, ymin);
 
-		feLog("\tTotal iterations ........ : %15d\n\n", m_niter);
+		feLog("\n\tTotal iterations ........ : %15d\n\n", m_niter);
 		feLog("\tFinal objective value ... : %15lg\n\n", minObj);
         feLog("\tFinal regression coef ... : %15lg\n\n", minR2);
 		feLog("\tOptimal parameters:\n\n");
