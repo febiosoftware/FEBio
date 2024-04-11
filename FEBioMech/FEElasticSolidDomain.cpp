@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FEElasticSolidDomain.h"
 #include "FEElasticMaterial.h"
 #include "FEBodyForce.h"

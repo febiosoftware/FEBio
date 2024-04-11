@@ -118,7 +118,6 @@ public:
 	vector<int>		m_nceq;	//!< number of equations related to concentration dofs
 
 	vector<double> m_Fr;	//!< nodal reaction forces
-	vector<double> m_Uip;	//!< previous converged displacement increment
 
 	// poro data
 	vector<double>	m_di;	//!< displacement increment vector

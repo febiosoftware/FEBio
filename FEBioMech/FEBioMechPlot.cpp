@@ -1898,7 +1898,7 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotShellRelativeVolume::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom); assert(sd);
+	FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
 	if (sd == nullptr) return false;
 
 	// a filter to get J from a strain tensor

@@ -1967,24 +1967,25 @@ double FELogDiscreteElementForce::value(FEElement& el)
 	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
-	// get the (one) material point data
-	FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
-
 	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
 	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
 	vec3d e = rb1 - ra1; e.unit();
 
-	vec3d F = mp.m_Ft;
-
-	double Fm = F * e;
-
-	return Fm;
+	FEDiscreteElasticMaterialPoint* mp = el.GetMaterialPoint(0)->ExtractData<FEDiscreteElasticMaterialPoint>();
+	assert(mp);
+	if (mp)
+	{
+		vec3d F = mp->m_Ft;
+		double Fm = F * e;
+		return Fm;
+	}
+	else return 0.0;
 }
 
 //-----------------------------------------------------------------------------
 double FELogDiscreteElementForceX::value(FEElement& el)
 {
-	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	FEDiscreteElasticMaterialPoint* mp = el.GetMaterialPoint(0)->ExtractData<FEDiscreteElasticMaterialPoint>();
 	if (mp) return mp->m_Ft.x;
 	else return 0.0;
 }

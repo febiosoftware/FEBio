@@ -96,6 +96,11 @@ public: // --- I/O functions ---
 	// get the log file
 	Logfile& GetLogFile() { return m_log; }
 
+	// get the report
+	std::string GetReport() const { return m_report; }
+
+	void CreateReport(bool b) { m_createReport = b; }
+
 public:
 	//! set the problem title
 	void SetTitle(const char* sz);
@@ -241,6 +246,8 @@ protected:
 
 private:
 	Logfile	m_log;
+	std::string	m_report;
+	bool	m_createReport;
 
 	DECLARE_FECORE_CLASS();
 };
