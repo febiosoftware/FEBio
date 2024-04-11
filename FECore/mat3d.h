@@ -220,6 +220,9 @@ public:
 	mat3ds& operator += (const mat3dd& d);
 	mat3ds& operator -= (const mat3dd& d);
 
+	// comparison
+	bool operator == (const mat3ds& d);
+
 	// matrix-vector multiplication
 	vec3d operator * (const vec3d& r) const;
 
