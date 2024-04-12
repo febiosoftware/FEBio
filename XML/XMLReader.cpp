@@ -1033,8 +1033,9 @@ void XMLReader::ReadValue(XMLTag& tag)
 		tag.m_szval.clear();
 		tag.m_szval.reserve(256);
 		while ((ch=GetChar())!='<') 
-		{ 
-			tag.m_szval.push_back(ch);
+		{
+			if ((ch != '\r') && (ch != '\n') && (ch != '\t'))
+				tag.m_szval.push_back(ch);
 		}
 	}
 	else while ((ch=GetChar())!='<');

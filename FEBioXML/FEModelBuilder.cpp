@@ -327,32 +327,11 @@ bool FEModelBuilder::BuildSurface(FESurface& s, FEFacetSet& fs, bool bnodal)
 //-----------------------------------------------------------------------------
 bool FEModelBuilder::BuildEdge(FEEdge& e, FESegmentSet& es)
 {
-	FEMesh& m = m_fem.GetMesh();
-	int NN = m.Nodes();
-
-	// count nr of segments
-	int nsegs = es.Segments();
-
-	// allocate storage for faces
-	e.Create(nsegs);
-
-	// read segments
-	for (int i = 0; i<nsegs; ++i)
-	{
-		FELineElement& el = e.Element(i);
-		FESegmentSet::SEGMENT& si = es.Segment(i);
-
-		if (si.ntype == 2) el.SetType(FE_LINE2G1);
-		else return false;
-
-		int N = el.Nodes(); assert(N == si.ntype);
-		for (int j = 0; j<N; ++j) el.m_node[j] = si.node[j];
-	}
-
 	// copy the name
 	e.SetName(es.GetName());
 
-	return true;
+	// create the edge
+	return e.Create(es);
 }
 
 //-----------------------------------------------------------------------------

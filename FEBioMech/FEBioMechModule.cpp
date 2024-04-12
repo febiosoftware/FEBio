@@ -79,10 +79,12 @@ SOFTWARE.*/
 #include "FEIncompNeoHookean.h"
 #include "FEIsotropicElastic.h"
 #include "FEMooneyRivlin.h"
+#include "FEMooneyRivlinAD.h"
 #include "FEMRVonMisesFibers.h"
 #include "FEMuscleMaterial.h"
 #include "FENaturalNeoHookean.h"
 #include "FENeoHookean.h"
+#include "FENeoHookeanAD.h"
 #include "FENeoHookeanTransIso.h"
 #include "FENewtonianViscousSolid.h"
 #include "FENewtonianViscousSolidUC.h"
@@ -198,6 +200,8 @@ SOFTWARE.*/
 #include "FEMortarSlidingContact.h"
 #include "FEMortarTiedContact.h"
 #include "FEContactPotential.h"
+#include "FEEdgeToSurfaceContactPotential.h"
+#include "FEEdgeToSurfaceSlidingContact.h"
 
 #include "FESymmetryPlane.h"
 #include "FERigidJoint.h"
@@ -338,6 +342,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FECoupledVerondaWestmann, "coupled Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FENaturalNeoHookean, "natural neo-Hookean");
 	REGISTER_FECORE_CLASS(FENeoHookean, "neo-Hookean");
+	REGISTER_FECORE_CLASS(FENeoHookeanAD, "neo-Hookean AD");
 	REGISTER_FECORE_CLASS(FENeoHookeanTransIso, "neo-Hookean transiso");
     REGISTER_FECORE_CLASS(FETraceFreeNeoHookean, "trace-free neo-Hookean");
 	REGISTER_FECORE_CLASS(FENewtonianViscousSolid, "Newtonian viscous solid");
@@ -390,6 +395,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGentMaterial, "Gent");
 	REGISTER_FECORE_CLASS(FEIncompNeoHookean, "incomp neo-Hookean");
 	REGISTER_FECORE_CLASS(FEMooneyRivlin, "Mooney-Rivlin");
+	REGISTER_FECORE_CLASS(FEMooneyRivlinAD, "Mooney-Rivlin AD");
 	REGISTER_FECORE_CLASS(FEMuscleMaterial, "muscle material");
 	REGISTER_FECORE_CLASS(FENewtonianViscousSolidUC, "Newtonian viscous solid uncoupled");
 	REGISTER_FECORE_CLASS(FEOgdenMaterial, "Ogden");
@@ -687,6 +693,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMortarSlidingContact, "mortar-sliding", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEMortarTiedContact, "mortar-tied", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEContactPotential, "contact potential");
+	
+	REGISTER_FECORE_CLASS(FEEdgeToSurfaceContactPotential, "edge-to-surface contact potential");
+	REGISTER_FECORE_CLASS(FEEdgeToSurfaceSlidingContact, "edge-to-surface sliding contact");
 
 	//-----------------------------------------------------------------------------
 	// classes derived directly from FERigidBC

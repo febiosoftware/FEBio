@@ -24,52 +24,53 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEContactInterface.h"
+#include <FECore/FESurfaceConstraint.h>
+#include <FECore/FEEdge.h>
 #include "FEContactSurface.h"
 #include <set>
 
-class FEContactPotentialSurface : public FEContactSurface
+class FEE2SCPPoint : public FELineMaterialPoint
 {
 public:
-	class Data : public FEContactMaterialPoint
+	double	m_gap = 0.0;
+	double	m_Ln = 0.0;
+	vec3d	m_tc;
+
+	void Serialize(DumpStream& ar) override
 	{
-	public:
-		vec3d	m_tc;
-
-		void Serialize(DumpStream& ar) override
-		{
-			FEContactMaterialPoint::Serialize(ar);
-			ar & m_tc;
-		}
-	};
-
-public:
-	FEContactPotentialSurface(FEModel* fem);
-
-	void GetContactTraction(int nelem, vec3d& tc) override;
-
-	double GetContactArea() override;
-
-	FEMaterialPoint* CreateMaterialPoint() override;
+		FELineMaterialPoint::Serialize(ar);
+		ar& m_tc & m_gap;
+	}
 };
 
-typedef FEContactPotentialSurface::Data FECPContactPoint;
-
-class FEContactPotential : public FEContactInterface
+class FEE2SCPSurface : public FESurface
 {
 public:
-	FEContactPotential(FEModel* fem);
+	FEE2SCPSurface(FEModel* fem);
 
-	// -- From FESurfacePairConstraint
+	void Update();
+};
+
+class FEE2SCPEdge : public FEEdge
+{
 public:
-	//! return the primary surface
-	FESurface* GetPrimarySurface() override;
+	FEE2SCPEdge(FEModel* fem);
 
-	//! return the secondary surface
-	FESurface* GetSecondarySurface() override;
+	FEMaterialPoint* CreateMaterialPoint() override;
 
-	//! temporary construct to determine if contact interface uses nodal integration rule (or facet)
-	bool UseNodalIntegration() override;
+	void Update();
+
+	bool Create(FESegmentSet& eset) override;
+};
+
+class FEEdgeToSurfaceContactPotential : public FESurfaceConstraint
+{
+public:
+	FEEdgeToSurfaceContactPotential(FEModel* fem);
+
+public:
+	//! return the surface
+	FESurface* GetSurface() override;
 
 	// Build the matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
@@ -83,7 +84,6 @@ public:
 	// serialization
 	void Serialize(DumpStream& ar) override;
 
-	// -- from FEContactInterface
 public:
 	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
 	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
@@ -92,19 +92,15 @@ public:
 	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 protected:
-	void ElementForce(FESurfaceElement& el1, FESurfaceElement& el2, std::vector<double>& fe);
-	void ElementStiffness(FESurfaceElement& el1, FESurfaceElement& el2, matrix& ke);
+	void ElementForce(FELineElement& el1, FESurfaceElement& el2, std::vector<double>& fe);
+	void ElementStiffness(FELineElement& el1, FESurfaceElement& el2, matrix& ke);
 
 	double PotentialDerive(double r);
 	double PotentialDerive2(double r);
 
-	void BuildNeighborTable();
-
-	void UpdateSurface(FESurface& surface);
-
 protected:
-	FEContactPotentialSurface	m_surf1;
-	FEContactPotentialSurface	m_surf2;
+	FEE2SCPEdge	m_edge;
+	FEE2SCPSurface	m_surf;
 
 protected:
 	double	m_kc;
@@ -117,8 +113,6 @@ protected:
 	double	m_c1, m_c2;
 
 	std::vector< std::set<FESurfaceElement*> >	m_activeElements;
-	std::vector< std::set<FESurfaceElement*> >	m_elemNeighbors;
 
 	DECLARE_FECORE_CLASS();
 };
-

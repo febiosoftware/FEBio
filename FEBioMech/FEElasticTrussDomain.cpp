@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEUncoupledMaterial.h"
 #include "FEElasticMaterialPoint.h"
 #include "FEBioMech.h"
+#include "FEBodyForce.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEElasticTrussDomain, FETrussDomain)
@@ -68,6 +69,16 @@ FEElasticTrussDomain& FEElasticTrussDomain::operator = (FEElasticTrussDomain& d)
 const FEDofList& FEElasticTrussDomain::GetDOFList() const
 {
 	return m_dofU;
+}
+
+//-----------------------------------------------------------------------------
+double FEElasticTrussDomain::detJt(FETrussElement& el) const
+{
+	const FENode& n0 = Node(el.m_lnode[0]);
+	const FENode& n1 = Node(el.m_lnode[1]);
+
+	vec3d d = n1.m_rt - n0.m_rt;
+	return d.Length() * 0.5;
 }
 
 //-----------------------------------------------------------------------------
@@ -328,6 +339,67 @@ void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<doub
 	fe[3] = -fe[0];
 	fe[4] = -fe[1];
 	fe[5] = -fe[2];
+}
+
+//! calculate body force \todo implement this
+void FEElasticTrussDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
+{
+	FEMesh& mesh = *GetMesh();
+
+	// loop over all the elements
+	int NE = Elements();
+#pragma omp parallel for 
+	for (int i = 0; i < NE; ++i)
+	{
+		// get the next element
+		FETrussElement& el = Element(i);
+		int neln = el.Nodes();
+
+		// only consider active elements
+		if (el.isActive())
+		{
+			// total size of the element vector
+			int ndof = 3* el.Nodes();
+
+			// setup the element vector
+			vector<double> fe;
+			fe.assign(ndof, 0);
+
+			// jacobian
+			double Jt = detJt(el);
+
+			// loop over integration points
+			double* w = el.GaussWeights();
+			int nint = el.GaussPoints();
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+				double* H = el.H(n);
+				mp.m_Jt = Jt;
+				mp.m_shape = el.H(n);
+
+				// get the value of the integrand for this node
+				vec3d f = bf.force(mp);
+
+				// loop over all nodes
+				for (int j = 0; j < neln; ++j)
+				{
+					// add it all up
+					fe[3 * j   ] += H[j] * f.x * w[n];
+					fe[3 * j +1] += H[j] * f.y * w[n];
+					fe[3 * j +2] += H[j] * f.z * w[n];
+				}
+			}
+
+			// get the element's LM vector
+			vector<int> lm(ndof, -1);
+			UnpackLM(el, lm);
+
+			// Assemble into global vector
+			R.Assemble(el.m_node, lm, fe);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

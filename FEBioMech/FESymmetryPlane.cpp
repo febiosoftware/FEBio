@@ -111,7 +111,13 @@ bool FESymmetryPlane::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESymmetryPlane::Serialize(DumpStream& ar) { m_lc.Serialize(ar); }
+void FESymmetryPlane::Serialize(DumpStream& ar) 
+{ 
+	FESurfaceConstraint::Serialize(ar);
+	ar& m_binit;
+	m_lc.Serialize(ar); 
+	m_surf.Serialize(ar);
+}
 void FESymmetryPlane::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lc.LoadVector(R, tp); }
 void FESymmetryPlane::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lc.StiffnessMatrix(LS, tp); }
 bool FESymmetryPlane::Augment(int naug, const FETimeInfo& tp) { return m_lc.Augment(naug, tp); }

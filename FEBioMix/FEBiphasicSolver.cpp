@@ -132,7 +132,6 @@ bool FEBiphasicSolver::Init()
 	m_Fr.assign(m_neq, 0);
 	m_Ui.assign(m_neq, 0);
 	m_Ut.assign(m_neq, 0);
-	m_Uip.assign(m_neq, 0);
 
 	// we need to fill the total displacement vector m_Ut
 	FEMesh& mesh = fem.GetMesh();

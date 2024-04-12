@@ -411,6 +411,18 @@ inline vec3d mat3ds::operator* (const vec3d& r) const
 	);
 }
 
+// comparison
+inline bool mat3ds::operator == (const mat3ds& d)
+{
+	return (
+		(m[XX] == d.m[XX]) &&
+		(m[XY] == d.m[XY]) &&
+		(m[YY] == d.m[YY]) &&
+		(m[XZ] == d.m[XZ]) &&
+		(m[YZ] == d.m[YZ]) &&
+		(m[ZZ] == d.m[ZZ]));
+}
+
 // trace
 inline double mat3ds::tr() const
 {

@@ -29,12 +29,30 @@ SOFTWARE.*/
 #pragma once
 #include "FEMeshPartition.h"
 #include "FENodeList.h"
+#include "FESegmentSet.h"
 #include <vector>
+
+//-----------------------------------------------------------------------------
+class FECORE_API FELineMaterialPoint : public FEMaterialPoint
+{
+public:
+	// return the surface element
+	FELineElement* LineElement() { return (FELineElement*)m_elem; }
+
+	void Serialize(DumpStream& ar) override
+	{
+		FEMaterialPoint::Serialize(ar);
+	}
+};
 
 //-----------------------------------------------------------------------------
 // This class represents an edge of a domain.
 class FECORE_API FEEdge : public FEMeshPartition
 {
+public:
+	FECORE_SUPER_CLASS(FEEDGE_ID)
+	FECORE_BASE_CLASS(FEEdge)
+
 public:
 	//! constructor
 	FEEdge(FEModel* fem);
@@ -47,6 +65,9 @@ public:
 
 	//! creates edge
 	void Create(int nelems, int elemType = -1);
+
+	//! create from edge set
+	virtual bool Create(FESegmentSet& es);
 
 	//! extract node set
 	FENodeList GetNodeList();
@@ -62,6 +83,21 @@ public:
 	//! returns reference to element
 	FEElement& ElementRef(int n) override { return m_Elem[n]; }
 	const FEElement& ElementRef(int n) const override { return m_Elem[n]; }
+
+	// Create material point data for this surface
+	virtual FEMaterialPoint* CreateMaterialPoint();
+
+	void CreateMaterialPointData();
+
+public:
+	// Get current coordinates
+	void GetNodalCoordinates(FELineElement& el, vec3d* rt);
+
+	// Get reference coordinates
+	void GetReferenceNodalCoordinates(FELineElement& el, vec3d* rt);
+
+protected:
+	bool Create(FESegmentSet& es, int elemType);
 
 protected:
 	std::vector<FELineElement>	m_Elem;

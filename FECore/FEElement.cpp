@@ -557,10 +557,10 @@ FELineElement& FELineElement::operator = (const FELineElement& el)
 
 void FELineElement::SetTraits(FEElementTraits* pt)
 {
-	// we don't allocate state data for surface elements
 	m_pT = pt;
 	m_node.resize(Nodes());
 	m_lnode.resize(Nodes());
+	m_State.Create(GaussPoints());
 }
 
 //=============================================================================

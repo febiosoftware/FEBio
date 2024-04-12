@@ -123,5 +123,84 @@ void FEEdge::Create(int nelems, int elemType)
 	}
 
 	if (elemType != -1)
-		for (int i=0; i<nelems; ++i) m_Elem[i].SetType(elemType);
+	{
+		for (int i = 0; i < nelems; ++i) m_Elem[i].SetType(elemType);
+		CreateMaterialPointData();
+	}
+}
+
+//-----------------------------------------------------------------------------
+bool FEEdge::Create(FESegmentSet& es)
+{
+	return Create(es, FE_LINE2G1);
+}
+
+//-----------------------------------------------------------------------------
+bool FEEdge::Create(FESegmentSet& es, int elemType)
+{
+	FEMesh& m = *GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of segments
+	int nsegs = es.Segments();
+
+	// allocate storage for faces
+	Create(nsegs);
+
+	// read segments
+	for (int i = 0; i < nsegs; ++i)
+	{
+		FELineElement& el = Element(i);
+		FESegmentSet::SEGMENT& si = es.Segment(i);
+
+		if (si.ntype == 2) el.SetType(elemType);
+		else return false;
+
+		int N = el.Nodes(); assert(N == si.ntype);
+		for (int j = 0; j < N; ++j) el.m_node[j] = si.node[j];
+	}
+
+	CreateMaterialPointData();
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEEdge::CreateMaterialPointData()
+{
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FELineElement& el = m_Elem[i];
+		int nint = el.GaussPoints();
+		el.ClearData();
+		for (int n = 0; n < nint; ++n)
+		{
+			FELineMaterialPoint* pt = dynamic_cast<FELineMaterialPoint*>(CreateMaterialPoint());
+			assert(pt);
+			el.SetMaterialPointData(pt, n);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Create material point data for this surface
+FEMaterialPoint* FEEdge::CreateMaterialPoint()
+{
+	return new FELineMaterialPoint;
+}
+
+//-----------------------------------------------------------------------------
+void FEEdge::GetNodalCoordinates(FELineElement& el, vec3d* rt)
+{
+	FEMesh& mesh = *GetMesh();
+	int neln = el.Nodes();
+	for (int j = 0; j < neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
+}
+
+//-----------------------------------------------------------------------------
+void FEEdge::GetReferenceNodalCoordinates(FELineElement& el, vec3d* rt)
+{
+	FEMesh& mesh = *GetMesh();
+	int neln = el.Nodes();
+	for (int j = 0; j < neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_r0;
 }

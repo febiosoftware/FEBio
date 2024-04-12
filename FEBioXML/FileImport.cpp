@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FESurface.h>
+#include <FECore/FEEdge.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEPointFunction.h>
 #include <FECore/FEGlobalData.h>
@@ -1183,6 +1184,16 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					mesh.AddSurface(surface);
 
 					prop->SetProperty(surface);
+				}
+				else if (classID == FEEDGE_ID)
+				{
+					FEModelBuilder* builder = GetBuilder();
+					FESegmentSet* edgeList = mesh.FindSegmentSet(szref);
+					if (edgeList == nullptr) throw XMLReader::InvalidValue(tag);
+
+					FEEdge* edge = dynamic_cast<FEEdge*>(prop->get(0));
+					GetBuilder()->BuildEdge(*edge, *edgeList);
+//					mesh.AddEdge(edge); // I think that makes the mesh the owner, which is not the case!
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}

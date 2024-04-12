@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <iostream>
 #include <stdarg.h>
 #include "version.h"
+#include <assert.h>
 using namespace std;
 
 std::list<FECoreDebugger::Variable*>	FECoreDebugger::m_var;
@@ -225,4 +226,52 @@ template <> void fecore_print_T<std::vector<int> >(std::vector<int>* pv)
 	vector<int>& v = *pv;
 	int n = (int)v.size();
 	for (int i=0; i<n; ++i) cout << v[i] << endl;
+}
+
+//=============================================================================
+
+FECoreDebugStream::FECoreDebugStream()
+{
+	m_mode = STREAM_MODE::WRITING_MODE;
+	m_fp = nullptr;
+	m_counter = 0;
+}
+
+FECoreDebugStream::FECoreDebugStream(const char* szfilename, STREAM_MODE mode)
+{
+	m_mode = mode;
+	m_fp = nullptr;
+	m_counter = 0;
+	Open(szfilename, mode);
+}
+
+FECoreDebugStream::~FECoreDebugStream()
+{
+	if (m_fp) fclose(m_fp);
+	m_fp = nullptr;
+}
+
+bool FECoreDebugStream::Open(const char* szfilename, FECoreDebugStream::STREAM_MODE mode)
+{
+	m_counter = 0;
+	m_mode = mode;
+	if (mode == WRITING_MODE)
+		m_fp = fopen(szfilename, "wb");
+	else
+		m_fp = fopen(szfilename, "rb");
+	return (m_fp != nullptr);
+}
+
+size_t FECoreDebugStream::write(const void* pd, size_t size, size_t count)
+{
+	m_counter++;
+	assert(is_writing());
+	return fwrite(pd, size, count, m_fp);
+}
+
+size_t FECoreDebugStream::read(void* pd, size_t size, size_t count)
+{
+	m_counter++;
+	assert(is_reading());
+	return fread(pd, size, count, m_fp);
 }
