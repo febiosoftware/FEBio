@@ -38,8 +38,9 @@ BEGIN_FECORE_CLASS(FEFiberExpPowSBM, FEElasticMaterial)
 	ADD_PARAMETER(m_ksi0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi0" )->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_rho0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" )->setUnits(UNIT_DENSITY);
 	ADD_PARAMETER(m_g    , FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
-    ADD_PARAMETER(m_n0   , "fiber");
     ADD_PARAMETER(m_sbm , "sbm")->setEnums("$(sbms)");
+
+    ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -64,9 +65,6 @@ bool FEFiberExpPowSBM::Init()
 		return false;
 	}
     
-    // fiber direction in local coordinate system (reference configuration)
-    m_n0.Normalize();
-    
 	return true;
 }
 
@@ -85,17 +83,20 @@ mat3ds FEFiberExpPowSBM::Stress(FEMaterialPoint& mp)
     double J = pt.m_J;
     
     // loop over all integration points
-    vec3d n0, nt;
+    vec3d nt;
     double In_1, Wl;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     mat3ds s;
     
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
+    // get the material coordinate system
+    mat3d Q = GetLocalCS(mp);
 
-    // evaluate fiber direction in global coordinate system
-    n0 = Q*m_n0;
+    // get local fiber direction
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d n0 = Q*fiber;
     
     // Calculate In = n0*C*n0
     In_1 = n0*(C*n0) - 1.0;
@@ -138,17 +139,20 @@ tens4ds FEFiberExpPowSBM::Tangent(FEMaterialPoint& mp)
     double J = pt.m_J;
     
     // loop over all integration points
-    vec3d n0, nt;
+    vec3d nt;
     double In_1, Wll;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     tens4ds c;
     
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
+    // get the material coordinate system
+    mat3d Q = GetLocalCS(mp);
 
-    // evaluate fiber direction in global coordinate system
-    n0 = Q*m_n0;
+    // get local fiber direction
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d n0 = Q*fiber;
     
     // Calculate In = n0*C*n0
     In_1 = n0*(C*n0) - 1.0;
@@ -191,16 +195,18 @@ double FEFiberExpPowSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     double ksi = FiberModulus(rhor);
     
     // loop over all integration points
-    vec3d n0;
     double In_1;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
+    // get the material coordinate system
+    mat3d Q = GetLocalCS(mp);
 
-    // evaluate fiber direction in global coordinate system
-    n0 = Q*m_n0;
+    // get local fiber direction
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d n0 = Q*fiber;
     
     // Calculate In = n0*C*n0
     In_1 = n0*(C*n0) - 1.0;

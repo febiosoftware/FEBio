@@ -84,13 +84,12 @@ void FEMultiphasicStandard::UpdateSolidBoundMolecules(FEMaterialPoint& mp)
             // perform the time integration (midpoint rule)
             sbmr[isbm] = spt.m_sbmrp[isbm] + dt*(spt.m_sbmrhat[isbm]+spt.m_sbmrhatp[isbm])/2;
             // check bounds
-            if (sbmr[isbm] < GetSBM(isbm)->m_rhomin)
-                sbmr[isbm] = GetSBM(isbm)->m_rhomin;
-            if ((GetSBM(isbm)->m_rhomax > 0) && (sbmr[isbm] > GetSBM(isbm)->m_rhomax))
-                sbmr[isbm] = GetSBM(isbm)->m_rhomax;
+            if (sbmr[isbm] < spt.m_sbmrmin[isbm])
+                sbmr[isbm] = spt.m_sbmrmin[isbm];
+            if ((spt.m_sbmrmax[isbm] > 0) && (sbmr[isbm] > spt.m_sbmrmax[isbm]))
+                sbmr[isbm] = spt.m_sbmrmax[isbm];
         }
         // now update spt.m_sbmr
         spt.m_sbmr = sbmr;
     }
 }
-
