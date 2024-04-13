@@ -27,7 +27,8 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBioMech/FEElasticMaterial.h"
+#include <FEBioMech/FEElasticMaterial.h>
+#include <FEBioMech/FERemodelingElasticMaterial.h>
 #include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
@@ -35,10 +36,10 @@ SOFTWARE.*/
 //! Power law - linear
 //! Fiber modulus depends on SBM content
 
-class FEBIOMIX_API FEFiberPowLinearSBM : public FEElasticMaterial
+class FEBIOMIX_API FEFiberPowLinearSBM : public FEElasticMaterial, public FERemodelingInterface
 {
 public:
-    FEFiberPowLinearSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_sbm = 0; }
+    FEFiberPowLinearSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_sbm = -1; }
     
     //! Initialization
     bool Init() override;
@@ -55,6 +56,17 @@ public:
     //! return fiber modulus
     double FiberModulus(double rhor) { return m_E0*pow(rhor/m_rho0, m_g);}
     
+public: // --- remodeling interface ---
+
+    //! calculate strain energy density at material point
+    double StrainEnergy(FEMaterialPoint& pt) override;
+
+    //! calculate tangent of strain energy density with mass density
+    double Tangent_SE_Density(FEMaterialPoint& pt) override;
+    
+    //! calculate tangent of stress with mass density
+    mat3ds Tangent_Stress_Density(FEMaterialPoint& pt) override;
+
     // declare the parameter list
     DECLARE_FECORE_CLASS();
     

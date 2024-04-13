@@ -35,10 +35,11 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFiberExpPowSBM, FEElasticMaterial)
 	ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
-	ADD_PARAMETER(m_ksi0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi0" );
-	ADD_PARAMETER(m_rho0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" );
+	ADD_PARAMETER(m_ksi0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi0" )->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_rho0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" )->setUnits(UNIT_DENSITY);
 	ADD_PARAMETER(m_g    , FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
-	ADD_PARAMETER(m_sbm  , "sbm"  );
+    ADD_PARAMETER(m_n0   , "fiber");
+    ADD_PARAMETER(m_sbm , "sbm")->setEnums("$(sbms)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -219,3 +220,29 @@ double FEFiberExpPowSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     
     return sed;
 }
+
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FEFiberExpPowSBM::StrainEnergy(FEMaterialPoint& mp)
+{
+    return StrainEnergyDensity(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! calculate tangent of strain energy density with mass density
+double FEFiberExpPowSBM::Tangent_SE_Density(FEMaterialPoint& mp)
+{
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    double rhor = spt.m_sbmr[m_lsbm];
+    return StrainEnergy(mp)*m_g/rhor;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate tangent of stress with mass density
+mat3ds FEFiberExpPowSBM::Tangent_Stress_Density(FEMaterialPoint& mp)
+{
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    double rhor = spt.m_sbmr[m_lsbm];
+    return Stress(mp)*m_g/rhor;
+}
+
