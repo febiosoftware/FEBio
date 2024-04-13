@@ -39,7 +39,7 @@ SOFTWARE.*/
 class FEBIOMIX_API FEFiberExpPowSBM : public FEElasticMaterial, public FERemodelingInterface
 {
 public:
-    FEFiberExpPowSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_sbm = -1; }
+    FEFiberExpPowSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_sbm = -1; m_fiber = nullptr; }
     
     //! Initialization
     bool Init() override;
@@ -66,9 +66,6 @@ public: // --- remodeling interface ---
     
     //! calculate tangent of stress with mass density
     mat3ds Tangent_Stress_Density(FEMaterialPoint& pt) override;
-
-    // declare the parameter list
-    DECLARE_FECORE_CLASS();
     
 public:
     double	m_alpha;	// coefficient of (In-1) in exponential
@@ -78,5 +75,10 @@ public:
     double  m_g;        // gamma
     int		m_sbm;      //!< global id of solid-bound molecule
     int		m_lsbm;     //!< local id of solid-bound molecule
-    vec3d	m_n0;		// unit vector along fiber direction (local coordinate system)
+
+public:
+    FEVec3dValuator*    m_fiber;    //!< fiber orientation
+
+    // declare the parameter list
+    DECLARE_FECORE_CLASS();
 };
