@@ -66,9 +66,7 @@ bool FEFiberPowLinearSBM::Init()
 	}
     
     // fiber direction in local coordinate system (reference configuration)
-    m_n0.x = 1;
-    m_n0.y = 0;
-    m_n0.z = 0;
+    m_n0.Normalize();
 
 	return true;
 }
