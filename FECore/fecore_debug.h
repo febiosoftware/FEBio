@@ -75,6 +75,8 @@ public:
 	bool is_writing() const { return m_mode == STREAM_MODE::WRITING_MODE; }
 	bool is_reading() const { return m_mode == STREAM_MODE::READING_MODE; }
 
+	bool ReopenForReading();
+
 	template <typename T> bool check(T& v)
 	{
 		if (is_writing())
@@ -121,5 +123,6 @@ private:
 private:
 	STREAM_MODE	m_mode;
 	FILE* m_fp;
+	std::string	m_filename;
 	int	m_counter;
 };

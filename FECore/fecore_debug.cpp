@@ -254,11 +254,21 @@ FECoreDebugStream::~FECoreDebugStream()
 bool FECoreDebugStream::Open(const char* szfilename, FECoreDebugStream::STREAM_MODE mode)
 {
 	m_counter = 0;
+	m_filename = szfilename;
 	m_mode = mode;
 	if (mode == WRITING_MODE)
 		m_fp = fopen(szfilename, "wb");
 	else
 		m_fp = fopen(szfilename, "rb");
+	return (m_fp != nullptr);
+}
+
+bool FECoreDebugStream::ReopenForReading()
+{
+	if (is_reading()) return true;
+	if (m_fp) fclose(m_fp);
+	m_mode = READING_MODE;
+	m_fp = fopen(m_filename.c_str(), "rb");
 	return (m_fp != nullptr);
 }
 
