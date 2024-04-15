@@ -129,10 +129,9 @@ void FENewtonSolver::SetSolutionStrategy(FENewtonStrategy* pstrategy)
 //-----------------------------------------------------------------------------
 FENewtonSolver::~FENewtonSolver()
 {
-	Clean();
-
 	if (m_plinsolve) delete m_plinsolve;
 	m_plinsolve = nullptr;
+	Clean();
 }
 
 //-----------------------------------------------------------------------------

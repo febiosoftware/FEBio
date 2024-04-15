@@ -104,7 +104,6 @@ PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 //-----------------------------------------------------------------------------
 PardisoSolver::~PardisoSolver()
 {
-	Destroy();
 #ifdef PARDISO
 	MKL_Free_Buffers();
 #endif
