@@ -1106,7 +1106,7 @@ void FEFacet2FacetSliding::UpdateContactPressures()
 bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	bool bconv = true;
 

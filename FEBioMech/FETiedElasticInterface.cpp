@@ -963,7 +963,7 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
 bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
-    if (m_laugon != 1) return true;
+    if (m_laugon != FECore::AUGLAG_METHOD) return true;
     
     int i;
     vec3d Ln;

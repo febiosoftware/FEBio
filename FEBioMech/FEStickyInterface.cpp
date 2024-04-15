@@ -597,7 +597,7 @@ void FEStickyInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 bool FEStickyInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	int i;
 

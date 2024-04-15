@@ -50,7 +50,7 @@ END_FECORE_CLASS();
 
 FEContactInterface::FEContactInterface(FEModel* pfem) : FESurfacePairConstraint(pfem)
 {
-	m_laugon = 0;	// penalty method by default
+	m_laugon = FECore::PENALTY_METHOD;	// penalty method by default
     m_psf = 1.0;    // default scale factor is 1
     m_psfmax = 0;   // default max scale factor is not set
 }

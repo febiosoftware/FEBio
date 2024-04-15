@@ -1728,7 +1728,7 @@ void FESlidingInterface2::UpdateContactPressures()
 bool FESlidingInterface2::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	double Ln, Lp;
 	bool bconv = true;

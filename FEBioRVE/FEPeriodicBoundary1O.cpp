@@ -593,7 +593,7 @@ void FEPeriodicBoundary1O::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 bool FEPeriodicBoundary1O::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	int i;
 

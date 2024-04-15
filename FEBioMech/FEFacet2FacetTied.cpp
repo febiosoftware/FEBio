@@ -634,7 +634,7 @@ void FEFacet2FacetTied::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 bool FEFacet2FacetTied::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	// calculate initial norms
 	double normL0 = 0;

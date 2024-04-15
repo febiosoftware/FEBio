@@ -370,3 +370,12 @@ enum Matrix_Type {
 	REAL_SYMMETRIC,				// symmetric (not necessarily positive definite)
 	REAL_SYMM_STRUCTURE			// structurally symmetric
 };
+
+//! Constraint enforcement method
+namespace FECore {
+	enum CONSTRAINT_ENFORCEMENT {
+		PENALTY_METHOD,
+		AUGLAG_METHOD,
+		LAGMULT_METHOD
+	};
+}

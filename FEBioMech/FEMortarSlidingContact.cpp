@@ -512,7 +512,7 @@ void FEMortarSlidingContact::ContactNormalStiffness(FELinearSystem& LS)
 //! calculate Lagrangian augmentations
 bool FEMortarSlidingContact::Augment(int naug, const FETimeInfo& tp)
 {
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	double max_err = 0.0;
 	int NS = m_ss.Nodes();
