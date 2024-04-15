@@ -37,6 +37,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define tied interface parameters
 BEGIN_FECORE_CLASS(FEFacet2FacetTied, FEContactInterface)
+	ADD_PARAMETER(m_laugon , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol   , "tolerance"       );
 	ADD_PARAMETER(m_eps    , "penalty"         );
 	ADD_PARAMETER(m_naugmin, "minaug"          );
@@ -53,6 +54,16 @@ FEFacetTiedSurface::Data::Data()
 	m_Lm = vec3d(0,0,0);
 	m_rs = vec2d(0,0);
 	m_pme = (FESurfaceElement*) 0;
+}
+
+void FEFacetTiedSurface::Data::Init()
+{
+	FEContactMaterialPoint::Init();
+	m_vgap = vec3d(0, 0, 0);
+	m_vgap0 = vec3d(0, 0, 0);
+	m_Lm = vec3d(0, 0, 0);
+	m_rs = vec2d(0, 0);
+	m_pme = (FESurfaceElement*)0;
 }
 
 void FEFacetTiedSurface::Data::Serialize(DumpStream& ar)
@@ -634,7 +645,7 @@ void FEFacet2FacetTied::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 bool FEFacet2FacetTied::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	// calculate initial norms
 	double normL0 = 0;

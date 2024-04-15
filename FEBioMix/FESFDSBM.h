@@ -37,19 +37,19 @@ SOFTWARE.*/
 class FEBIOMIX_API FESFDSBM : public FEElasticMaterial
 {
 public:
-	FESFDSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_alpha = 0;}
+    FESFDSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_alpha = 0; m_sbm = -1; }
 	
 	//! Initialization
 	bool Init() override;
 	
 	//! Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp) override;
+	mat3ds Stress(FEMaterialPoint& mp) override;
 	
 	// Spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp) override;
+	tens4ds Tangent(FEMaterialPoint& mp) override;
 	
 	// Strain energy density
-	virtual double StrainEnergyDensity(FEMaterialPoint& mp) override;
+	double StrainEnergyDensity(FEMaterialPoint& mp) override;
 	
 	//! return fiber modulus
 	double FiberModulus(double rhor) { return m_ksi0*pow(rhor/m_rho0, m_g);}

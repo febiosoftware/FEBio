@@ -50,11 +50,11 @@ class FECORE_API FEDomainDataRecord : public DataRecord
 {
 public:
     FEDomainDataRecord(FEModel* pfem);
-    double Evaluate(int item, int ndata);
+    double Evaluate(int item, int ndata) override;
     void SetData(const char* sz) override;
-    void SelectAllItems();
+    void SelectAllItems() override;
     void SetDomain(int domainIndex);
-    int Size() const;
+    int Size() const override;
 
 private:
     vector<FELogDomainData*>	m_Data;
@@ -68,7 +68,7 @@ public:
     ~FELogAvgDomainData();
     double value(FEDomain& rc) override;
 
-    bool SetParameters(std::vector<std::string>& params);
+    bool SetParameters(std::vector<std::string>& params) override;
 
 private:
     FELogElemData* m_elemData;
@@ -82,7 +82,7 @@ public:
     ~FELogPctDomainData();
     double value(FEDomain& rc) override;
 
-    bool SetParameters(std::vector<std::string>& params);
+    bool SetParameters(std::vector<std::string>& params) override;
 
 private:
     double          m_pct;
@@ -97,7 +97,7 @@ public:
 	~FELogIntegralDomainData();
 	double value(FEDomain& rc) override;
 
-	bool SetParameters(std::vector<std::string>& params);
+	bool SetParameters(std::vector<std::string>& params) override;
 
 private:
 	FELogElemData* m_elemData;

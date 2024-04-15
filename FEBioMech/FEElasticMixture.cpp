@@ -84,7 +84,9 @@ FEMaterialPointData* FEElasticMixture::CreateMaterialPointData()
 	int NMAT = Materials();
 	for (int i=0; i<NMAT; ++i) 
 	{
-		FEMaterialPoint* pi = new FEMaterialPoint(m_pMat[i]->CreateMaterialPointData());
+		FEMaterialPointData* mpi = m_pMat[i]->CreateMaterialPointData();
+		mpi->SetPrev(pt);
+		FEMaterialPoint* pi = new FEMaterialPoint(mpi);
 		pt->AddMaterialPoint(pi);
 	}
 	return pt;

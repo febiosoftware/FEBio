@@ -40,6 +40,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterface3, FEContactInterface)
+	ADD_PARAMETER(m_laugon   , "laugon"               )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol     , "tolerance"            );
     ADD_PARAMETER(m_gtol     , "gaptol"               )->setUnits(UNIT_LENGTH);;
 	ADD_PARAMETER(m_ptol     , "ptol"                 );
@@ -2019,7 +2020,7 @@ void FESlidingInterface3::UpdateContactPressures()
 bool FESlidingInterface3::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	double Ln, Lp, Lc;
 	bool bconv = true;

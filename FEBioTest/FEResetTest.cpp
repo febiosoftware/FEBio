@@ -66,7 +66,7 @@ bool FEResetTest::Run()
 	cerr << "Running model for the first time.\n";
 	if (fem->Solve() == false)
 	{
-		feLogEx(fem, "Failed to run model.");
+		cerr << "Failed to run model.\nTest aborted.\n\n";
 		return false;
 	}
 
@@ -79,11 +79,25 @@ bool FEResetTest::Run()
 	cerr << "total rhs     = " << stats1.ntotalRHS     << endl;
 	cerr << "solution norm = " << std::setprecision(15) << norm1 << endl;
 
+	// change the name of the logfile so we can compare
+	std::string logfileName = fem->GetLogfileName();
+	size_t n = logfileName.rfind('.');
+	string extension;
+	string filebase;
+	if (n != std::string::npos)
+	{
+		extension = logfileName.substr(n);
+		filebase = logfileName.substr(0, n);
+	}
+	filebase += "_2";
+	logfileName = filebase + extension;
+	fem->SetLogFilename(logfileName);
+
 	// reset the model
 	std::cerr << "Resetting model.\n";
 	if (fem->Reset() == false)
 	{
-		feLogEx(fem, "Failed to reset model.");
+		cerr << "Failed to reset model.\nTest aborted.\n\n";
 		return false;
 	}
 
@@ -91,7 +105,7 @@ bool FEResetTest::Run()
 	std::cerr << "Running model for the second time.\n";
 	if (fem->Solve() == false)
 	{
-		feLogEx(fem, "Failed to run model second time.");
+		cerr << "Failed to run model second time.\nTest aborted.\n\n";
 		return false;
 	}
 

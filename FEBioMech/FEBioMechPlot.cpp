@@ -1084,20 +1084,192 @@ bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 class FESpecificStrainEnergy
 {
 public:
+    FESpecificStrainEnergy(FEElasticMaterial* pm, int comp) : m_mat(pm), m_comp(comp) {}
 	double operator()(const FEMaterialPoint& mp)
 	{
-		const FERemodelingMaterialPoint* rpt = mp.ExtractData<FERemodelingMaterialPoint>();
-		return (rpt ? rpt->m_sed / rpt->m_rhor : 0.0);
+        if (dynamic_cast<FERemodelingInterface*>(m_mat) == 0) return 0;
+        FEMaterialPoint lmp(mp);
+		FERemodelingMaterialPoint* rpt = lmp.ExtractData<FERemodelingMaterialPoint>();
+        if (rpt == nullptr) {
+            FEMaterialPoint* pt = lmp.ExtractData<FEElasticMixtureMaterialPoint>()->GetPointData(m_comp);
+            rpt = pt->ExtractData<FERemodelingMaterialPoint>();
+        }
+		return (((rpt != nullptr) && (rpt->m_rhor > 0)) ? rpt->m_sed / rpt->m_rhor : 0.0);
 	}
+private:
+    FEElasticMaterial*    m_mat;
+    int                   m_comp;
 };
 
 bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
-	if (dom.Class() != FE_DOMAIN_SOLID) return false;
-	FESpecificStrainEnergy E;
-	writeAverageElementValue<double>(dom, a, E);
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == 0) return false;
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESpecificStrainEnergy w(pme, -1);
+        writeAverageElementValue<double>(dom, a, w);
+        return true;
+    }
+    return false;
+}
 
-	return true;
+//=============================================================================
+FEPlotMixtureStrainEnergyDensity::FEPlotMixtureStrainEnergyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+{
+    m_mat = -1;
+    m_comp = -1;
+    SetUnits(UNIT_PRESSURE);
+}
+
+bool FEPlotMixtureStrainEnergyDensity::SetFilter(const char* szfilter)
+{
+    if (strncmp(szfilter, "material", 8) == 0)
+    {
+        if (sscanf(szfilter, "material[%d].solid[%d]", &m_mat, &m_comp) != 2) return false;
+    }
+    else
+    {
+        if (sscanf(szfilter, "solid[%d]", &m_comp) != 1) return false;
+    }
+    return true;
+}
+
+bool FEPlotMixtureStrainEnergyDensity::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEMaterial* pm = dom.GetMaterial();
+    if (m_mat != -1)
+    {
+        if (pm != GetFEModel()->GetMaterial(m_mat)) return false;
+    }
+
+    // make sure we start from the elastic component
+    FEElasticMaterial* pmat = pm->ExtractProperty<FEElasticMaterial>();
+    if (pmat == nullptr) return false;
+
+    // make sure this is a mixture
+    FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pmat);
+    FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pmat);
+    if ((pmm == nullptr) && (pum == nullptr)) return false;
+
+    // get the mixture component
+    if (m_comp < 0) return false;
+    FEElasticMaterial* pme = nullptr;
+    if (pmm) pme = pmm->GetMaterial(m_comp);
+    else if (pum) pme = pum->GetMaterial(m_comp);
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FEStrainEnergy W(pme);
+        writeAverageElementValue<double>(dom, a, W);
+        return true;
+    }
+    return false;
+}
+
+//=============================================================================
+FEPlotMixtureDevStrainEnergyDensity::FEPlotMixtureDevStrainEnergyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+{
+    m_mat = -1;
+    m_comp = -1;
+    SetUnits(UNIT_PRESSURE);
+}
+
+bool FEPlotMixtureDevStrainEnergyDensity::SetFilter(const char* szfilter)
+{
+    if (strncmp(szfilter, "material", 8) == 0)
+    {
+        if (sscanf(szfilter, "material[%d].solid[%d]", &m_mat, &m_comp) != 2) return false;
+    }
+    else
+    {
+        if (sscanf(szfilter, "solid[%d]", &m_comp) != 1) return false;
+    }
+    return true;
+}
+
+bool FEPlotMixtureDevStrainEnergyDensity::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEMaterial* pm = dom.GetMaterial();
+    if (m_mat != -1)
+    {
+        if (pm != GetFEModel()->GetMaterial(m_mat)) return false;
+    }
+
+    // make sure we start from the elastic component
+    FEElasticMaterial* pmat = pm->ExtractProperty<FEElasticMaterial>();
+    if (pmat == nullptr) return false;
+
+    // make sure this is a mixture
+    FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pmat);
+    if (pum == nullptr) return false;
+
+    // get the mixture component
+    if (m_comp < 0) return false;
+    FEElasticMaterial* pme = pum->GetMaterial(m_comp);
+    FEUncoupledMaterial* pmu = pme->ExtractProperty<FEUncoupledMaterial>();
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FEDevStrainEnergy devW(pmu);
+        writeAverageElementValue<double>(dom, a, devW);
+        return true;
+    }
+    return false;
+}
+
+//=============================================================================
+FEPlotMixtureSpecificStrainEnergy::FEPlotMixtureSpecificStrainEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+{
+    m_mat = -1;
+    m_comp = -1;
+    SetUnits(UNIT_SPECIFIC_ENERGY);
+}
+
+bool FEPlotMixtureSpecificStrainEnergy::SetFilter(const char* szfilter)
+{
+    if (strncmp(szfilter, "material", 8) == 0)
+    {
+        if (sscanf(szfilter, "material[%d].solid[%d]", &m_mat, &m_comp) != 2) return false;
+    }
+    else
+    {
+        if (sscanf(szfilter, "solid[%d]", &m_comp) != 1) return false;
+    }
+    return true;
+}
+
+bool FEPlotMixtureSpecificStrainEnergy::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEMaterial* pm = dom.GetMaterial();
+    if (m_mat != -1)
+    {
+        if (pm != GetFEModel()->GetMaterial(m_mat)) return false;
+    }
+
+    // make sure we start from the elastic component
+    FEElasticMaterial* pmat = pm->ExtractProperty<FEElasticMaterial>();
+    if (pmat == nullptr) return false;
+
+    // make sure this is a mixture
+    FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pmat);
+    FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pmat);
+    if ((pmm == nullptr) && (pum == nullptr)) return false;
+
+    // get the mixture component
+    if (m_comp < 0) return false;
+    FEElasticMaterial* pme = nullptr;
+    if (pmm) pme = pmm->GetMaterial(m_comp);
+    else if (pum) pme = pum->GetMaterial(m_comp);
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESpecificStrainEnergy w(pme, m_comp);
+        writeAverageElementValue<double>(dom, a, w);
+        return true;
+    }
+    return false;
 }
 
 //-----------------------------------------------------------------------------

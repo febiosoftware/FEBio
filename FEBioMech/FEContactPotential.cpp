@@ -104,6 +104,9 @@ double FEContactPotentialSurface::GetContactArea()
 
 
 BEGIN_FECORE_CLASS(FEContactPotential, FEContactInterface)
+	// just adding this parameter for backward compatibility. 
+	ADD_PARAMETER(m_laugon, "laugon")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+
 	ADD_PARAMETER(m_kc, "kc");
 	ADD_PARAMETER(m_p, "p");
 	ADD_PARAMETER(m_Rin, "R_in");

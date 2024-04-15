@@ -731,6 +731,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementPK2Stress, "PK2 stress");
 	REGISTER_FECORE_CLASS(FEPlotElementPK1Stress, "PK1 stress");
 	REGISTER_FECORE_CLASS(FEPlotElementMixtureStress, "mixture stress");
+    REGISTER_FECORE_CLASS(FEPlotMixtureStrainEnergyDensity, "mixture strain energy density");
+    REGISTER_FECORE_CLASS(FEPlotMixtureDevStrainEnergyDensity, "mixture deviatoric strain energy density");
+    REGISTER_FECORE_CLASS(FEPlotMixtureSpecificStrainEnergy, "mixture specific strain energy");
 	REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, "uncoupled pressure");
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");
     REGISTER_FECORE_CLASS(FEPlotElementDevElasticity, "deviatoric elasticity");

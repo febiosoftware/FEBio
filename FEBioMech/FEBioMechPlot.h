@@ -427,6 +427,45 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Strain energy density in mixture components
+class FEPlotMixtureStrainEnergyDensity : public FEPlotDomainData
+{
+public:
+    FEPlotMixtureStrainEnergyDensity(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& dom, FEDataStream& a) override;
+protected:
+    int        m_comp;
+    int        m_mat;
+};
+
+//-----------------------------------------------------------------------------
+//! Deviatoric strain energy density in mixture components
+class FEPlotMixtureDevStrainEnergyDensity : public FEPlotDomainData
+{
+public:
+    FEPlotMixtureDevStrainEnergyDensity(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& dom, FEDataStream& a) override;
+protected:
+    int        m_comp;
+    int        m_mat;
+};
+
+//-----------------------------------------------------------------------------
+//! Specific strain energy in mixture components
+class FEPlotMixtureSpecificStrainEnergy : public FEPlotDomainData
+{
+public:
+    FEPlotMixtureSpecificStrainEnergy(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& dom, FEDataStream& a) override;
+protected:
+    int        m_comp;
+    int        m_mat;
+};
+
+//-----------------------------------------------------------------------------
 //! Kinetic energy density
 class FEPlotKineticEnergyDensity : public FEPlotDomainData
 {
