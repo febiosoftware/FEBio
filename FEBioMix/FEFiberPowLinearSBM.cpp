@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEFiberPowLinearSBM.h"
 #include "FEMultiphasic.h"
 #include <FECore/log.h>
+#include <FEBioMech/FEElasticMixture.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
@@ -66,7 +67,36 @@ bool FEFiberPowLinearSBM::Init()
 		return false;
 	}
     
-	return true;
+    FEElasticMaterial* pem = pMP->GetSolid();
+    FEElasticMixture* psm = dynamic_cast<FEElasticMixture*>(pem);
+    if (psm == nullptr) m_comp = -1;    // in case material is not a solid mixture
+    for (int i=0; i<psm->Materials(); ++i) {
+        pem = psm->GetMaterial(i);
+        if (pem == this) {
+            m_comp = i;
+            break;
+        }
+    }
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Create material point data
+FEMaterialPointData* FEFiberPowLinearSBM::CreateMaterialPointData()
+{
+    return new FERemodelingMaterialPoint(new FEElasticMaterialPoint);
+}
+
+//-----------------------------------------------------------------------------
+//! update specialize material point data
+void FEFiberPowLinearSBM::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FERemodelingMaterialPoint* rpt = mp.ExtractData<FERemodelingMaterialPoint>();
+    rpt->m_rhor = spt.m_sbmr[m_lsbm];
+    rpt->m_rhorp = spt.m_sbmrp[m_lsbm];
+    rpt->m_sed = StrainEnergyDensity(mp);
 }
 
 //-----------------------------------------------------------------------------

@@ -45,7 +45,7 @@ public: // parameters
 	double	m_g;	//!< gamma exponent for calculation of Young's modulus
 	double	m_v;	//!< prescribed Poisson's ratio
     double  m_rho0; //!< reference sbm density
-	int		m_sbm;	//!< global id of solid-bound molecule
+//	int		m_sbm;	//!< global id of solid-bound molecule
 
 protected:
 	int		m_lsbm;	//!< local id of solid-bound molecule
@@ -68,6 +68,9 @@ public:
 	
     //! calculate strain energy density at material point
     double StrainEnergyDensity(FEMaterialPoint& pt) override { return StrainEnergy(pt); }
+    
+    //! update specialize material point data
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
 public: // --- remodeling interface ---
 

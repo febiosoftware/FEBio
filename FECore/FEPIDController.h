@@ -40,7 +40,7 @@ public:
 	double GetParameterValue() const { return m_paramVal; }
 	double GetError() const { return m_error; }
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 protected:
 	double GetValue(double time) override;

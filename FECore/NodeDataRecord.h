@@ -53,10 +53,10 @@ class FECORE_API NodeDataRecord : public DataRecord
 {
 public:
 	NodeDataRecord(FEModel* pfem);
-	double Evaluate(int item, int ndata);
+	double Evaluate(int item, int ndata) override;
 	void SetData(const char* sz) override;
-	void SelectAllItems();
-	int Size() const;
+	void SelectAllItems() override;
+	int Size() const override;
 
 	void SetItemList(FEItemList* items, const std::vector<int>& selection) override;
 

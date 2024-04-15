@@ -56,6 +56,12 @@ public:
     //! return fiber modulus
     double FiberModulus(double rhor) { return m_ksi0*pow(rhor/m_rho0, m_g);}
     
+    //! Create material point data
+    FEMaterialPointData* CreateMaterialPointData() override;
+    
+    //! update specialize material point data
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+    
 public: // --- remodeling interface ---
 
     //! calculate strain energy density at material point
@@ -73,7 +79,7 @@ public:
     double	m_ksi0;		// fiber modulus ksi = ksi0*(rhor/rho0)^gamma
     double  m_rho0;     // rho0
     double  m_g;        // gamma
-    int		m_sbm;      //!< global id of solid-bound molecule
+//    int		m_sbm;      //!< global id of solid-bound molecule
     int		m_lsbm;     //!< local id of solid-bound molecule
 
 public:

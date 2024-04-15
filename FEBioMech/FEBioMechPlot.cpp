@@ -1084,14 +1084,20 @@ bool FEPlotDevStrainEnergyDensity::Save(FEDomain &dom, FEDataStream& a)
 class FESpecificStrainEnergy
 {
 public:
-    FESpecificStrainEnergy(FEElasticMaterial* pm) : m_mat(pm) {}
+    FESpecificStrainEnergy(FEElasticMaterial* pm, int comp) : m_mat(pm), m_comp(comp) {}
 	double operator()(const FEMaterialPoint& mp)
 	{
-		const FERemodelingMaterialPoint* rpt = mp.ExtractData<FERemodelingMaterialPoint>();
+        FEMaterialPoint lmp(mp);
+		FERemodelingMaterialPoint* rpt = lmp.ExtractData<FERemodelingMaterialPoint>();
+        if (rpt == nullptr) {
+            FEMaterialPoint* pt = lmp.ExtractData<FEElasticMixtureMaterialPoint>()->GetPointData(m_comp);
+            rpt = pt->ExtractData<FERemodelingMaterialPoint>();
+        }
 		return (rpt ? rpt->m_sed / rpt->m_rhor : 0.0);
 	}
 private:
     FEElasticMaterial*    m_mat;
+    int                   m_comp;
 };
 
 bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
@@ -1101,7 +1107,7 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
     
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
-        FESpecificStrainEnergy w(pme);
+        FESpecificStrainEnergy w(pme, -1);
         writeAverageElementValue<double>(dom, a, w);
         return true;
     }
@@ -1258,7 +1264,7 @@ bool FEPlotMixtureSpecificStrainEnergy::Save(FEDomain& dom, FEDataStream& a)
 
     if (dom.Class() == FE_DOMAIN_SOLID)
     {
-        FESpecificStrainEnergy w(pme);
+        FESpecificStrainEnergy w(pme, m_comp);
         writeAverageElementValue<double>(dom, a, w);
         return true;
     }
