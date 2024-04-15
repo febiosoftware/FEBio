@@ -82,6 +82,24 @@ FESlidingSurfaceBiphasic::Data::Data()
     m_bstick = false;
 }
 
+void FESlidingSurfaceBiphasic::Data::Init()
+{
+	FEBiphasicContactPoint::Init();
+
+	m_Lmd = 0.0;
+	m_Lmt = m_tr = vec3d(0, 0, 0);
+	m_Lmp = 0.0;
+	m_epsn = 1.0;
+	m_epsp = 1.0;
+	m_pg = 0.0;
+	m_p1 = 0.0;
+	m_mueff = 0.0;
+	m_fls = 0.0;
+	m_nu = m_s1 = m_dg = vec3d(0, 0, 0);
+	m_rs = m_rsp = vec2d(0, 0);
+	m_bstick = false;
+}
+
 //-----------------------------------------------------------------------------
 void FESlidingSurfaceBiphasic::Data::Serialize(DumpStream& ar)
 {

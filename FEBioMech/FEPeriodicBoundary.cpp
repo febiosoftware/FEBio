@@ -39,6 +39,17 @@ FEPeriodicSurface::Data::Data()
 	m_Fr = vec3d(0, 0, 0);
 }
 
+void FEPeriodicSurface::Data::Init()
+{
+	FEContactMaterialPoint::Init();
+
+	m_gap = vec3d(0, 0, 0);
+	m_rs = vec2d(0, 0);
+	m_Lm = vec3d(0, 0, 0);
+	m_Tn = vec3d(0, 0, 0);
+	m_Fr = vec3d(0, 0, 0);
+}
+
 void FEPeriodicSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);

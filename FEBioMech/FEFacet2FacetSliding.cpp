@@ -77,6 +77,15 @@ FEFacetSlidingSurface::Data::Data()
 	m_rs = vec2d(0,0);
 }
 
+void FEFacetSlidingSurface::Data::Init()
+{
+	FEContactMaterialPoint::Init();
+	m_Lm = 0.0;
+	m_eps = 1.0;
+	m_nu = vec3d(0, 0, 0);
+	m_rs = vec2d(0, 0);
+}
+
 //-----------------------------------------------------------------------------
 void FEFacetSlidingSurface::Data::Serialize(DumpStream& ar)
 {
