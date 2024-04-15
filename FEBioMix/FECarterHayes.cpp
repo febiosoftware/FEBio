@@ -63,7 +63,11 @@ bool FECarterHayes::Init()
 
     FEElasticMaterial* pem = pMP->GetSolid();
     FEElasticMixture* psm = dynamic_cast<FEElasticMixture*>(pem);
-    if (psm == nullptr) m_comp = -1;    // in case material is not a solid mixture
+    if (psm == nullptr) {
+        m_comp = -1;    // in case material is not a solid mixture
+        return true;
+    }
+    
     for (int i=0; i<psm->Materials(); ++i) {
         pem = psm->GetMaterial(i);
         if (pem == this) {
