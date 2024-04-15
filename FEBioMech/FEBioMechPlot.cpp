@@ -1087,13 +1087,14 @@ public:
     FESpecificStrainEnergy(FEElasticMaterial* pm, int comp) : m_mat(pm), m_comp(comp) {}
 	double operator()(const FEMaterialPoint& mp)
 	{
+        if (dynamic_cast<FERemodelingInterface*>(m_mat) == 0) return 0;
         FEMaterialPoint lmp(mp);
 		FERemodelingMaterialPoint* rpt = lmp.ExtractData<FERemodelingMaterialPoint>();
         if (rpt == nullptr) {
             FEMaterialPoint* pt = lmp.ExtractData<FEElasticMixtureMaterialPoint>()->GetPointData(m_comp);
             rpt = pt->ExtractData<FERemodelingMaterialPoint>();
         }
-		return (rpt ? rpt->m_sed / rpt->m_rhor : 0.0);
+		return (((rpt != nullptr) && (rpt->m_rhor > 0)) ? rpt->m_sed / rpt->m_rhor : 0.0);
 	}
 private:
     FEElasticMaterial*    m_mat;
