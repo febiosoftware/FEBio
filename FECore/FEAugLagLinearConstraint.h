@@ -63,7 +63,7 @@ public:
 	FEAugLagLinearConstraint(FEModel* fem) : FECoreClass(fem) { m_lam = 0; }
 
 	//! serialize data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	void ClearDOFs();
 

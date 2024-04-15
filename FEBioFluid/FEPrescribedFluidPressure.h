@@ -47,7 +47,7 @@ public:
     //! serialization
     void Serialize(DumpStream& ar) override;
 
-	void PrepStep(std::vector<double>& ui, bool brel);
+	void PrepStep(std::vector<double>& ui, bool brel) override;
     
     // return the value for node i, dof j
     void GetNodalValues(int nodelid, std::vector<double>& val) override;
