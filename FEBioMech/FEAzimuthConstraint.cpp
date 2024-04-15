@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEAzimuthConstraint, FENodeSetConstraint)
-	ADD_PARAMETER(m_laugon, "laugon");
+	ADD_PARAMETER(m_laugon, "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
 	ADD_PARAMETER(m_tol, "augtol");
 	ADD_PARAMETER(m_eps, "penalty");
 	ADD_PARAMETER(m_minaug, "minaug");

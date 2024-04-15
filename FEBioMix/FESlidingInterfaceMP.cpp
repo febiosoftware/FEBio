@@ -54,7 +54,8 @@ FEAmbientConcentration::FEAmbientConcentration(FEModel* fem) : FECoreClass(fem)
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterfaceMP, FEContactInterface)
-    ADD_PARAMETER(m_atol     , "tolerance"            );
+	ADD_PARAMETER(m_laugon   , "laugon"               )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+	ADD_PARAMETER(m_atol     , "tolerance"            );
     ADD_PARAMETER(m_gtol     , "gaptol"               )->setUnits(UNIT_LENGTH);;
     ADD_PARAMETER(m_ptol     , "ptol"                 );
     ADD_PARAMETER(m_ctol     , "ctol"                 );

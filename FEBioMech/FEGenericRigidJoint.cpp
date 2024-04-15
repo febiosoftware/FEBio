@@ -34,7 +34,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEGenericRigidJoint, FERigidConnector);
-	ADD_PARAMETER(m_laugon , "laugon" );
+	ADD_PARAMETER(m_laugon , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
 	ADD_PARAMETER(m_eps    , "penalty");
 	ADD_PARAMETER(m_tol    , "tolerance");
 	ADD_PARAMETER(m_q0     , "joint"  );

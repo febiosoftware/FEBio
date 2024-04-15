@@ -39,7 +39,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEFacet2FacetSliding, FEContactInterface)
-	BEGIN_PARAM_GROUP("Augmentation");
+	BEGIN_PARAM_GROUP("Enforcement");
+		ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 		ADD_PARAMETER(m_epsn     , "penalty"      );
 		ADD_PARAMETER(m_bautopen , "auto_penalty" );
 		ADD_PARAMETER(m_bupdtpen , "update_penalty");

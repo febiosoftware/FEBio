@@ -77,6 +77,7 @@ void FESlidingSurface::FESlidingPoint::Init()
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterface, FEContactInterface)
+	ADD_PARAMETER(m_laugon       , "laugon"       )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol         , "tolerance"    );
 	ADD_PARAMETER(m_eps          , "penalty"      );
 	ADD_PARAMETER(m_bautopen     , "auto_penalty" );
