@@ -1640,6 +1640,8 @@ bool FEBioModel::Reset()
 	// re-initialize the log file
 	if (m_logLevel != 0)
 	{
+		if (m_log.is_valid()) m_log.close();
+
 		if (InitLogFile() == false) return false;
 	}
 

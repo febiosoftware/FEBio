@@ -79,6 +79,20 @@ bool FEResetTest::Run()
 	cerr << "total rhs     = " << stats1.ntotalRHS     << endl;
 	cerr << "solution norm = " << std::setprecision(15) << norm1 << endl;
 
+	// change the name of the logfile so we can compare
+	std::string logfileName = fem->GetLogfileName();
+	size_t n = logfileName.rfind('.');
+	string extension;
+	string filebase;
+	if (n != std::string::npos)
+	{
+		extension = logfileName.substr(n);
+		filebase = logfileName.substr(0, n);
+	}
+	filebase += "_2";
+	logfileName = filebase + extension;
+	fem->SetLogFilename(logfileName);
+
 	// reset the model
 	std::cerr << "Resetting model.\n";
 	if (fem->Reset() == false)
