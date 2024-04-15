@@ -1093,7 +1093,7 @@ public:
             FEMaterialPoint* pt = lmp.ExtractData<FEElasticMixtureMaterialPoint>()->GetPointData(m_comp);
             rpt = pt->ExtractData<FERemodelingMaterialPoint>();
         }
-		return (rpt ? rpt->m_sed / rpt->m_rhor : 0.0);
+		return (((rpt != nullptr) && (rpt->m_rhor > 0)) ? rpt->m_sed / rpt->m_rhor : 0.0);
 	}
 private:
     FEElasticMaterial*    m_mat;
