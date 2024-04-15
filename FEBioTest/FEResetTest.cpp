@@ -66,7 +66,7 @@ bool FEResetTest::Run()
 	cerr << "Running model for the first time.\n";
 	if (fem->Solve() == false)
 	{
-		feLogEx(fem, "Failed to run model.");
+		cerr << "Failed to run model.\nTest aborted.\n\n";
 		return false;
 	}
 
@@ -83,7 +83,7 @@ bool FEResetTest::Run()
 	std::cerr << "Resetting model.\n";
 	if (fem->Reset() == false)
 	{
-		feLogEx(fem, "Failed to reset model.");
+		cerr << "Failed to reset model.\nTest aborted.\n\n";
 		return false;
 	}
 
@@ -91,7 +91,7 @@ bool FEResetTest::Run()
 	std::cerr << "Running model for the second time.\n";
 	if (fem->Solve() == false)
 	{
-		feLogEx(fem, "Failed to run model second time.");
+		cerr << "Failed to run model second time.\nTest aborted.\n\n";
 		return false;
 	}
 
