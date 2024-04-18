@@ -1640,7 +1640,11 @@ bool FEBioModel::Reset()
 	// re-initialize the log file
 	if (m_logLevel != 0)
 	{
-		if (m_log.is_valid()) m_log.close();
+		// TODO: I added this so that log files can be compared using the reset_test
+		// but this messes up the output for optimization problems.
+		// I want the optimization create its own log file, so it is decoupled from the model's
+		// log file. But since all the logging stuff lives in FEBioLib, I can't do this yet.
+//		if (m_log.is_valid()) m_log.close();
 
 		if (InitLogFile() == false) return false;
 	}

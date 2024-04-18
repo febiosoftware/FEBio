@@ -48,12 +48,13 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEConstrainedLMOptimizeMethod::FEConstrainedLMOptimizeMethod(FEModel* fem) : FEOptimizeMethod(fem)
 {
+	m_pOpt = nullptr;
 	m_tau = 1e-3;
 	m_objtol = 0.001;
 	m_fdiff  = 0.001;
 	m_nmax   = 100;
 	m_scaleParams = false;
-    m_loglevel = LogLevel::LOG_NEVER;
+	m_loglevel = LogLevel::LOG_NEVER;
 }
 
 //-----------------------------------------------------------------------------
