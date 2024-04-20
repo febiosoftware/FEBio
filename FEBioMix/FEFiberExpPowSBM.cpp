@@ -256,6 +256,22 @@ double FEFiberExpPowSBM::StrainEnergyDensity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+//! evaluate referential mass density
+double FEFiberExpPowSBM::Density(FEMaterialPoint& pt)
+{
+    FERemodelingMaterialPoint* rpt = pt.ExtractData<FERemodelingMaterialPoint>();
+    if (rpt) return rpt->m_rhor;
+    else {
+        FEElasticMixtureMaterialPoint* emp = pt.ExtractData<FEElasticMixtureMaterialPoint>();
+        if (emp) {
+            rpt = emp->GetPointData(m_comp)->ExtractData<FERemodelingMaterialPoint>();
+            if (rpt) return rpt->m_rhor;
+        }
+    }
+    return 0.0;
+}
+
+//-----------------------------------------------------------------------------
 //! calculate strain energy density at material point
 double FEFiberExpPowSBM::StrainEnergy(FEMaterialPoint& mp)
 {

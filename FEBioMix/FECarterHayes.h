@@ -63,6 +63,9 @@ public:
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt) override;
 
+    //! evaluate referential mass density
+    double Density(FEMaterialPoint& pt) override;
+    
 	//! Create material point data
 	FEMaterialPointData* CreateMaterialPointData() override;
 	

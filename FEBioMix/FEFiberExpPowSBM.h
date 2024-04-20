@@ -53,6 +53,9 @@ public:
     //! Strain energy density
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
+    //! evaluate referential mass density
+    double Density(FEMaterialPoint& pt) override;
+    
     //! return fiber modulus
     double FiberModulus(double rhor) { return m_ksi0*pow(rhor/m_rho0, m_g);}
     

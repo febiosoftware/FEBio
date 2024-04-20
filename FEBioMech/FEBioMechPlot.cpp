@@ -1407,8 +1407,8 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		FEElasticMaterial* em = dynamic_cast<FEElasticMaterial*>(bd.GetMaterial());
-		if (em == 0) return false;
+		FEElasticMaterial* em = bd.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+        if (em == 0) return false;
 
 		FERemodelingElasticMaterial* rm = dynamic_cast<FERemodelingElasticMaterial*>(em);
 		if (rm)
@@ -1426,7 +1426,7 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 	}
 	else if (dom.Class() == FE_DOMAIN_SHELL)
 	{
-		FEElasticMaterial* em = dynamic_cast<FEElasticMaterial*>(dom.GetMaterial());
+        FEElasticMaterial* em = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 		if (em == 0) return false;
 		FEDensity dens(em);
 		writeAverageElementValue<double>(dom, a, dens);

@@ -111,6 +111,9 @@ public:
 	
 	//! tangent function of stress with strain
 	tens4ds Tangent(FEMaterialPoint& pt) override;
+    
+    //! evaluate referential mass density
+    double Density(FEMaterialPoint& pt) override;
 	
 	//! tangent function of strain energy density with solid mass density
 	double Tangent_SE_Density(FEMaterialPoint& pt);
