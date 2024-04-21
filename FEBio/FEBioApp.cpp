@@ -259,7 +259,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	{
 		char szpath[1024] = { 0 };
 		febio::get_app_path(szpath, 1023);
-		sprintf(ops.szcnf, "%sfebio.xml", szpath);
+		snprintf(ops.szcnf, 1024, "%sfebio.xml", szpath);
 	}
 
 	// loop over the arguments
@@ -337,7 +337,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			if (szext == 0)
 			{
 				// we assume a default extension of .feb if none is provided
-				sprintf(ops.szfile, "%s.feb", argv[i]);
+				snprintf(ops.szfile, sizeof(ops.szfile), "%s.feb", argv[i]);
 			}
 			else strcpy(ops.szfile, argv[i]);
 			ops.binteractive = false;
@@ -448,7 +448,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 				if (szext == 0)
 				{
 					// we assume a default extension of .feb if none is provided
-					sprintf(ops.szfile, "%s.feb", sz);
+					snprintf(ops.szfile, sizeof(ops.szfile), "%s.feb", sz);
 				}
 				else
 				{
@@ -494,9 +494,9 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		}
 		else strcpy(szlogbase, szbase);
 
-		if (!blog) sprintf(ops.szlog, "%s.log", szlogbase);
-		if (!bplt) sprintf(ops.szplt, "%s.xplt", szbase);
-		if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
+		if (!blog) snprintf(ops.szlog, sizeof(ops.szlog), "%s.log", szlogbase);
+		if (!bplt) snprintf(ops.szplt, sizeof(ops.szplt), "%s.xplt", szbase);
+		if (!bdmp) snprintf(ops.szdmp, sizeof(ops.szdmp), "%s.dmp", szbase);
 	}
 	else if (ops.szctrl[0])
 	{
@@ -505,9 +505,9 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		char* ch = strrchr(szbase, '.');
 		if (ch) *ch = 0;
 
-		if (!blog) sprintf(ops.szlog, "%s.log", szbase);
-		if (!bplt) sprintf(ops.szplt, "%s.xplt", szbase);
-		if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
+		if (!blog) snprintf(ops.szlog, sizeof(ops.szlog), "%s.log", szbase);
+		if (!bplt) snprintf(ops.szplt, sizeof(ops.szplt), "%s.xplt", szbase);
+		if (!bdmp) snprintf(ops.szdmp, sizeof(ops.szdmp), "%s.dmp", szbase);
 	}
 
 	return brun;

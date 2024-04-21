@@ -155,7 +155,7 @@ FEFileException::FEFileException(const char* sz, ...)
 
 	// make the message
 	va_start(args, sz);
-	vsprintf(m_szerr, sz, args);
+	vsnprintf(m_szerr, 2048, sz, args);
 	va_end(args);
 }
 
@@ -167,7 +167,7 @@ void FEFileException::SetErrorString(const char* sz, ...)
 
 	// make the message
 	va_start(args, sz);
-	vsprintf(m_szerr, sz, args);
+	vsnprintf(m_szerr, sizeof(m_szerr), sz, args);
 	va_end(args);
 }
 
@@ -1530,7 +1530,7 @@ bool FEFileImport::errf(const char* szerr, ...)
 
 	// copy to string
 	va_start(args, szerr);
-	vsprintf(m_szerr, szerr, args);
+	vsnprintf(m_szerr, sizeof(m_szerr), szerr, args);
 	va_end(args);
 
 	// close the file
