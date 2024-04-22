@@ -681,3 +681,32 @@ FESurface* FEBioImport::ParseSurface(XMLTag& tag, const char* szatt)
 
 	return psurf;
 }
+
+template <> void string_to_type<vec2i>(const std::string& s, vec2i& v)
+{
+	sscanf(s.c_str(), "%d,%d", &v.x, &v.y);
+}
+
+template <> void string_to_type<vec3f>(const std::string& s, vec3f& v)
+{
+	sscanf(s.c_str(), "%g,%g,%g", &v.x, &v.y, &v.z);
+}
+
+template <> void string_to_type<vec3d>(const std::string& s, vec3d& v)
+{
+	sscanf(s.c_str(), "%lg,%lg,%lg", &v.x, &v.y, &v.z);
+}
+
+template <> void string_to_type<mat3d>(const std::string& s, mat3d& v)
+{
+	double a[9] = { 0 };
+	sscanf(s.c_str(), "%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg", a, a + 1, a + 2, a + 3, a + 4, a + 5, a + 6, a + 7, a + 8);
+	v = mat3d(a);
+}
+
+template <> void string_to_type<mat3ds>(const std::string& s, mat3ds& v)
+{
+	double a[9] = { 0 };
+	sscanf(s.c_str(), "%lg,%lg,%lg,%lg,%lg,%lg", a, a + 1, a + 2, a + 3, a + 4, a + 5);
+	v = mat3ds(a[0], a[1], a[2], a[3], a[4], a[5]);
+}

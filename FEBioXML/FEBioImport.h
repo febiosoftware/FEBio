@@ -208,3 +208,9 @@ public:
 public:
 	std::vector<DataRecord*>		m_data;
 };
+
+template <> void string_to_type<vec2i>(const std::string& s, vec2i& v);
+template <> void string_to_type<vec3f>(const std::string& s, vec3f& v);
+template <> void string_to_type<vec3d>(const std::string& s, vec3d& v);
+template <> void string_to_type<mat3d>(const std::string& s, mat3d& v);
+template <> void string_to_type<mat3ds>(const std::string& s, mat3ds& v);
