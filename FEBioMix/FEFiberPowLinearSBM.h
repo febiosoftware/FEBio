@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FEBioMech/FEElasticMaterial.h>
 #include <FEBioMech/FERemodelingElasticMaterial.h>
+#include <FECore/FEModelParam.h>
 #include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
@@ -57,7 +58,7 @@ public:
     double Density(FEMaterialPoint& pt) override;
     
     //! return fiber modulus
-    double FiberModulus(double rhor) { return m_E0*pow(rhor/m_rho0, m_g);}
+    double FiberModulus(FEMaterialPoint& pt, double rhor) { return m_E0(pt)*pow(rhor/m_rho0(pt), m_g(pt));}
     
     //! Create material point data
     FEMaterialPointData* CreateMaterialPointData() override;
@@ -77,13 +78,12 @@ public: // --- remodeling interface ---
     mat3ds Tangent_Stress_Density(FEMaterialPoint& pt) override;
 
 public:
-    double	m_E0;		// fiber modulus E = E0*(rhor/rho0)^gamma
-    double  m_lam0;     // stretch ratio at end of toe region
-    double  m_beta;     // power law exponent in toe region
-    double  m_rho0;     // rho0
-    double  m_g;        // gamma
-//    int		m_sbm;      //!< global id of solid-bound molecule
-    int		m_lsbm;     //!< local id of solid-bound molecule
+    FEParamDouble   m_E0;		// fiber modulus E = E0*(rhor/rho0)^gamma
+    FEParamDouble   m_lam0;     // stretch ratio at end of toe region
+    FEParamDouble   m_beta;     // power law exponent in toe region
+    FEParamDouble   m_rho0;     // rho0
+    FEParamDouble   m_g;        // gamma
+    int             m_lsbm;     //!< local id of solid-bound molecule
 
 public:
     FEVec3dValuator*    m_fiber;    //!< fiber orientation

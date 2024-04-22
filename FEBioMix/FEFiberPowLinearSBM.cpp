@@ -105,12 +105,15 @@ mat3ds FEFiberPowLinearSBM::Stress(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
+    double lam0 = m_lam0(mp);
+    double beta = m_beta(mp);
+    
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double E = FiberModulus(rhor);
-    double I0 = m_lam0*m_lam0;
-    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
-    double b = ksi*pow(I0-1, m_beta-1) + E/2/sqrt(I0);
+    double E = FiberModulus(mp, rhor);
+    double I0 = lam0*lam0;
+    double ksi = E/4/(beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-beta);
+    double b = ksi*pow(I0-1, beta-1) + E/2/sqrt(I0);
     
     // deformation gradient
     mat3d &F = pt.m_F;
@@ -146,7 +149,7 @@ mat3ds FEFiberPowLinearSBM::Stress(FEMaterialPoint& mp)
         
         // calculate the fiber stress magnitude
         sn = (In < I0) ?
-        2*In*ksi*pow(In-1, m_beta-1) :
+        2*In*ksi*pow(In-1, beta-1) :
         2*b*In - E*sqrt(In);
         
         // calculate the fiber stress
@@ -166,11 +169,14 @@ tens4ds FEFiberPowLinearSBM::Tangent(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
+    double lam0 = m_lam0(mp);
+    double beta = m_beta(mp);
+    
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double E = FiberModulus(rhor);
-    double I0 = m_lam0*m_lam0;
-    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
+    double E = FiberModulus(mp, rhor);
+    double I0 = lam0*lam0;
+    double ksi = E/4/(beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-beta);
     
     // deformation gradient
     mat3d &F = pt.m_F;
@@ -207,7 +213,7 @@ tens4ds FEFiberPowLinearSBM::Tangent(FEMaterialPoint& mp)
         
         // calculate modulus
         cn = (In < I0) ?
-        4*In*In*ksi*(m_beta-1)*pow(In-1, m_beta-2) :
+        4*In*In*ksi*(beta-1)*pow(In-1, beta-2) :
         E*sqrt(In);
         
         // calculate the fiber tangent
@@ -229,12 +235,15 @@ double FEFiberPowLinearSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
+    double lam0 = m_lam0(mp);
+    double beta = m_beta(mp);
+    
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double E = FiberModulus(rhor);
-    double I0 = m_lam0*m_lam0;
-    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
-    double b = ksi*pow(I0-1, m_beta-1) + E/2/sqrt(I0);
+    double E = FiberModulus(mp, rhor);
+    double I0 = lam0*lam0;
+    double ksi = E/4/(beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-beta);
+    double b = ksi*pow(I0-1, beta-1) + E/2/sqrt(I0);
     
     // loop over all integration points
     double In;
@@ -258,8 +267,8 @@ double FEFiberPowLinearSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     {
         // calculate strain energy density
         sed = (In < I0) ?
-        ksi/m_beta*pow(In-1, m_beta) :
-        b*(In-I0) - E*(sqrt(In)-sqrt(I0)) + ksi/m_beta*pow(I0-1, m_beta);
+        ksi/beta*pow(In-1, beta) :
+        b*(In-I0) - E*(sqrt(In)-sqrt(I0)) + ksi/beta*pow(I0-1, beta);
     }
     
     return sed;
@@ -294,7 +303,7 @@ double FEFiberPowLinearSBM::Tangent_SE_Density(FEMaterialPoint& mp)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     double rhor = spt.m_sbmr[m_lsbm];
-    return StrainEnergy(mp)*m_g/rhor;
+    return StrainEnergy(mp)*m_g(mp)/rhor;
 }
 
 //-----------------------------------------------------------------------------
@@ -303,6 +312,6 @@ mat3ds FEFiberPowLinearSBM::Tangent_Stress_Density(FEMaterialPoint& mp)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     double rhor = spt.m_sbmr[m_lsbm];
-    return Stress(mp)*m_g/rhor;
+    return Stress(mp)*m_g(mp)/rhor;
 }
 
