@@ -257,9 +257,9 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	// set initial configuration file name
 	if (ops.szcnf[0] == 0)
 	{
-		char szpath[1024] = { 0 };
-		febio::get_app_path(szpath, 1023);
-		snprintf(ops.szcnf, 1024, "%sfebio.xml", szpath);
+		char szpath[512] = { 0 };
+		febio::get_app_path(szpath, 511);
+		snprintf(ops.szcnf, 512, "%sfebio.xml", szpath);
 	}
 
 	// loop over the arguments
