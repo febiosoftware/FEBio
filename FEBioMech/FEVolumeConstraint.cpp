@@ -53,7 +53,7 @@ bool FEVolumeSurface::Init()
 	if (FESurface::Init() == false) return false;
 
 	// evaluate the initial volume
-	m_V0 = Volume();
+	m_V0 = CalculateSurfaceVolume(*this);
 	m_Vt = m_V0;
 
 	return (m_V0 != 0.0);
@@ -81,51 +81,6 @@ void FEVolumeSurface::Serialize(DumpStream& ar)
 {
 	FESurface::Serialize(ar);
 	ar & m_Lp & m_p & m_V0 & m_Vt;
-}
-
-//-----------------------------------------------------------------------------
-//! Calculate the initial volume
-double FEVolumeSurface::Volume()
-{
-	// get the mesh
-	FEMesh& mesh = *GetMesh();
-
-	// loop over all elements
-	double vol = 0.0;
-	int NE = Elements();
-	vec3d x[FEElement::MAX_NODES];
-	for (int i=0; i<NE; ++i)
-	{
-		// get the next element
-		FESurfaceElement& el = Element(i);
-
-		// get the nodal coordinates
-		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j) x[j] = mesh.Node(el.m_node[j]).m_rt;
-
-		// loop over integration points
-		double* w = el.GaussWeights();
-		int nint = el.GaussPoints();
-		for (int n=0; n<nint; ++n)
-		{
-			// evaluate the position vector at this point
-			vec3d r = el.eval(x, n);
-
-			// calculate the tangent vectors
-			double* Gr = el.Gr(n);
-			double* Gs = el.Gs(n);
-			vec3d dxr(0,0,0), dxs(0,0,0);
-			for (int j=0; j<neln; ++j) 
-			{
-				dxr += x[j]*Gr[j];
-				dxs += x[j]*Gs[j];
-			}
-
-			// update volume
-			vol += w[n]*(r*(dxr^dxs));
-		}
-	}
-	return vol/3.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -450,7 +405,7 @@ void FEVolumeConstraint::Update()
 	FEVolumeSurface& s = *m_s;
 
 	// calculate the current volume
-	s.m_Vt = s.Volume();
+	s.m_Vt = CalculateSurfaceVolume(s);
 
 	// update pressure variable
 	s.m_p = s.m_Lp + m_eps*(s.m_Vt - s.m_V0);

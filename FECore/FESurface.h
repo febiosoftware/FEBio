@@ -320,3 +320,6 @@ protected:
     double                      m_alpha;    //!< intermediate time fraction
 	bool						m_bshellb;	//!< true if this surface is the bottom of a shell domain
 };
+
+// Calculates the volume inside a (closed) surface. 
+FECORE_API double CalculateSurfaceVolume(FESurface& s);

@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "matrix.h"
 #include <FECore/log.h>
 #include "FEModelParam.h"
+#include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
 FESurface::FESurface(FEModel* fem) : FEMeshPartition(FE_DOMAIN_SURFACE, fem)
@@ -2521,4 +2522,47 @@ void FESurface::ProjectToNodes(FEParamDouble& pd, std::vector<double>& d)
     // evaluate average
     for (int i=0; i<Nodes(); ++i)
         if (nd[i]) d[i] /= nd[i];
+}
+
+FECORE_API double CalculateSurfaceVolume(FESurface& s)
+{
+	// get the mesh
+	FEMesh& mesh = *s.GetMesh();
+
+	// loop over all elements
+	double vol = 0.0;
+	int NE = s.Elements();
+	vec3d x[FEElement::MAX_NODES];
+	for (int i = 0; i < NE; ++i)
+	{
+		// get the next element
+		FESurfaceElement& el = s.Element(i);
+
+		// get the nodal coordinates
+		int neln = el.Nodes();
+		for (int j = 0; j < neln; ++j) x[j] = mesh.Node(el.m_node[j]).m_rt;
+
+		// loop over integration points
+		double* w = el.GaussWeights();
+		int nint = el.GaussPoints();
+		for (int n = 0; n < nint; ++n)
+		{
+			// evaluate the position vector at this point
+			vec3d r = el.eval(x, n);
+
+			// calculate the tangent vectors
+			double* Gr = el.Gr(n);
+			double* Gs = el.Gs(n);
+			vec3d dxr(0, 0, 0), dxs(0, 0, 0);
+			for (int j = 0; j < neln; ++j)
+			{
+				dxr += x[j] * Gr[j];
+				dxs += x[j] * Gs[j];
+			}
+
+			// update volume
+			vol += w[n] * (r * (dxr ^ dxs));
+		}
+	}
+	return vol / 3.0;
 }
