@@ -45,6 +45,9 @@ public:
 	void Update() override;
 
 public:
+	double GetCurrentPressure() const { return m_currentPressure; }
+
+public:
 	//! calculate residual
 	void LoadVector(FEGlobalVector& R) override;
 

@@ -26,7 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEIdealGasPressure.h"
 #include "FEBioMech.h"
-#include <FECore/FEFacetSet.h>
+#include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEIdealGasPressure, FESurfaceLoad)
 	ADD_PARAMETER(m_initialPressure, "P0")->setUnits(UNIT_PRESSURE);
@@ -39,6 +39,8 @@ FEIdealGasPressure::FEIdealGasPressure(FEModel* pfem) : FESurfaceLoad(pfem)
 	m_initialPressure = 0.0;
 	m_bsymm = true;
 	m_bshellb = false;
+	m_currentPressure = 0;
+	m_currentVolume = 0;
 }
 
 bool FEIdealGasPressure::Init()
@@ -64,6 +66,8 @@ void FEIdealGasPressure::Activate()
 	m_currentVolume = m_initialVolume;
 	
 	m_currentPressure = m_initialPressure;
+
+	feLogDebug("initial volume: %lg\n", m_initialVolume);
 	
 	FESurfaceLoad::Activate();
 }
@@ -72,6 +76,9 @@ void FEIdealGasPressure::Update()
 {
 	m_currentVolume = CalculateSurfaceVolume(GetSurface());
 	m_currentPressure = m_initialPressure * (m_initialVolume / m_currentVolume);
+
+	feLogDebug("volume: %lg, pressure: %lg\n", m_currentVolume, m_currentPressure);
+
 	FESurfaceLoad::Update();
 }
 

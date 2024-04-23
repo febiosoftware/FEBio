@@ -865,6 +865,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotGrowthRightHencky, "growth right Hencky");
     REGISTER_FECORE_CLASS(FEPlotGrowthLeftHencky, "growth left Hencky");
     REGISTER_FECORE_CLASS(FEPlotGrowthRelativeVolume, "growth relative volume");
+    REGISTER_FECORE_CLASS(FEPlotIdealGasPressure, "ideal gas pressure");
 
 	// beam variables
 	REGISTER_FECORE_CLASS(FEPlotBeamStress      , "beam stress");

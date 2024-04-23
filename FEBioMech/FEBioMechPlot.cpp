@@ -72,6 +72,7 @@ SOFTWARE.*/
 #include <FECore/FEElement.h>
 #include <FEBioMech/FEElasticBeamDomain.h>
 #include <FEBioMech/FEElasticBeamMaterial.h>
+#include "FEIdealGasPressure.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -4660,3 +4661,33 @@ bool FEPlotGrowthRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
     return true;
 }
 
+
+bool FEPlotIdealGasPressure::Init()
+{
+	FEModel* fem = GetFEModel();
+	if (fem == nullptr) return false;
+
+	for (int i = 0; i < fem->ModelLoads(); ++i)
+	{
+		m_load = dynamic_cast<FEIdealGasPressure*>(fem->ModelLoad(i));
+		if (m_load) return true;
+	}
+	return (m_load != nullptr);
+}
+
+bool FEPlotIdealGasPressure::Save(FESurface& surf, FEDataStream& a)
+{
+	if (m_binit == false)
+	{
+		if (!Init()) return false;
+		m_binit = true;
+	}
+	if (m_load == nullptr) return false;
+
+	if (&m_load->GetSurface() == &surf)
+	{
+		a << m_load->GetCurrentPressure();
+		return true;
+	}
+	else return false;
+}
