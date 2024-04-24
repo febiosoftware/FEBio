@@ -4684,7 +4684,7 @@ bool FEPlotIdealGasPressure::Save(FESurface& surf, FEDataStream& a)
 	}
 	if (m_load == nullptr) return false;
 
-	if (&m_load->GetSurface() == &surf)
+	if (m_load->GetSurface().GetFacetSet() == surf.GetFacetSet())
 	{
 		a << m_load->GetCurrentPressure();
 		return true;
