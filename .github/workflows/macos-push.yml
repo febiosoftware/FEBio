@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - 'develop'
-      - 'ci/tag-previous-s3-objects'
   workflow_dispatch:
     inputs:
       runTests:
