@@ -23,29 +23,46 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
-#include "stdafx.h"
-#include "FEBioIncludeSection.h"
+#pragma once
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEModelParam.h>
 
 //-----------------------------------------------------------------------------
-//! Parse the Include section (new in version 2.0)
-//! This section includes the contents of another FEB file.
-void FEBioIncludeSection::Parse(XMLTag& tag)
+//! The pressure surface is a surface domain that sustains pressure boundary
+//! conditions
+//!
+class FEIdealGasPressure : public FESurfaceLoad
 {
-	// see if we need to pre-pend a path
-	char szin[512];
-	strcpy(szin, tag.szvalue());
-	char* ch = strrchr(szin, '\\');
-	if (ch==0) ch = strrchr(szin, '/');
-	if (ch==0)
-	{
-		// pre-pend the name with the input path
-		snprintf(szin, 512, "%s%s", GetFileReader()->GetFilePath(), tag.szvalue());
-	}
+public:
+	//! constructor
+	FEIdealGasPressure(FEModel* pfem);
 
-	// read the file
-	if (GetFEBioImport()->ReadFile(szin, false) == false)
-		throw XMLReader::InvalidValue(tag);
-}
+	//! initialization
+	bool Init() override;
+
+	void Activate() override;
+
+	void Update() override;
+
+public:
+	double GetCurrentPressure() const { return m_currentPressure; }
+
+public:
+	//! calculate residual
+	void LoadVector(FEGlobalVector& R) override;
+
+	//! calculate stiffness
+	void StiffnessMatrix(FELinearSystem& LS) override;
+
+protected:
+	double	m_initialPressure;	//!< initial pressure value
+	bool	m_bsymm;			//!< use symmetric formulation
+	bool	m_bshellb;			//!< flag for prescribing pressure on shell bottom
+
+private:
+	double	m_initialVolume;
+	double	m_currentVolume;
+	double	m_currentPressure;
+
+	DECLARE_FECORE_CLASS();
+};

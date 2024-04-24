@@ -72,6 +72,7 @@ SOFTWARE.*/
 #include <FECore/FEElement.h>
 #include <FEBioMech/FEElasticBeamDomain.h>
 #include <FEBioMech/FEElasticBeamMaterial.h>
+#include "FEIdealGasPressure.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -1407,8 +1408,8 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 	if (dom.Class() == FE_DOMAIN_SOLID)
 	{
 		FESolidDomain& bd = static_cast<FESolidDomain&>(dom);
-		FEElasticMaterial* em = dynamic_cast<FEElasticMaterial*>(bd.GetMaterial());
-		if (em == 0) return false;
+		FEElasticMaterial* em = bd.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+        if (em == 0) return false;
 
 		FERemodelingElasticMaterial* rm = dynamic_cast<FERemodelingElasticMaterial*>(em);
 		if (rm)
@@ -1426,7 +1427,7 @@ bool FEPlotDensity::Save(FEDomain &dom, FEDataStream& a)
 	}
 	else if (dom.Class() == FE_DOMAIN_SHELL)
 	{
-		FEElasticMaterial* em = dynamic_cast<FEElasticMaterial*>(dom.GetMaterial());
+        FEElasticMaterial* em = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
 		if (em == 0) return false;
 		FEDensity dens(em);
 		writeAverageElementValue<double>(dom, a, dens);
@@ -4660,3 +4661,33 @@ bool FEPlotGrowthRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
     return true;
 }
 
+
+bool FEPlotIdealGasPressure::Init()
+{
+	FEModel* fem = GetFEModel();
+	if (fem == nullptr) return false;
+
+	for (int i = 0; i < fem->ModelLoads(); ++i)
+	{
+		m_load = dynamic_cast<FEIdealGasPressure*>(fem->ModelLoad(i));
+		if (m_load) return true;
+	}
+	return (m_load != nullptr);
+}
+
+bool FEPlotIdealGasPressure::Save(FESurface& surf, FEDataStream& a)
+{
+	if (m_binit == false)
+	{
+		if (!Init()) return false;
+		m_binit = true;
+	}
+	if (m_load == nullptr) return false;
+
+	if (m_load->GetSurface().GetFacetSet() == surf.GetFacetSet())
+	{
+		a << m_load->GetCurrentPressure();
+		return true;
+	}
+	else return false;
+}

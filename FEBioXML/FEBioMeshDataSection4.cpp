@@ -212,7 +212,7 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 					switch (dataType)
 					{
 					case FE_DOUBLE: { double v; tag.value(v); map->fillValue(v); } break;
-					case FE_VEC2D : { vec3d  v; tag.value(v); map->fillValue(v); } break;
+					case FE_VEC2D : { vec2d  v; tag.value(v); map->fillValue(v); } break;
 					case FE_VEC3D : { vec3d  v; tag.value(v); map->fillValue(v); } break;
 					case FE_MAT3D : { mat3d  v; tag.value(v); map->fillValue(v); } break;
 					case FE_MAT3DS: { mat3ds v; tag.value(v); map->fillValue(v); } break;

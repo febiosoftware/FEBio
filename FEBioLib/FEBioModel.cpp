@@ -1388,7 +1388,7 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 			// set the software string
 			const char* szver = febio::getVersionString();
 			char szbuf[256] = { 0 };
-			sprintf(szbuf, "FEBio %s", szver);
+			snprintf(szbuf, 256, "FEBio %s", szver);
 			xplt->SetSoftwareString(szbuf);
 
 			m_plot = xplt;
@@ -1480,7 +1480,7 @@ bool FEBioModel::InitPlotFile()
 		// set the software string
 		const char* szver = febio::getVersionString();
 		char szbuf[256] = { 0 };
-		sprintf(szbuf, "FEBio %s", szver);
+		snprintf(szbuf, 256, "FEBio %s", szver);
 		xplt->SetSoftwareString(szbuf);
 
 		m_plot = xplt;

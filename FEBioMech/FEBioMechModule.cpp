@@ -176,6 +176,7 @@ SOFTWARE.*/
 #include "FETractionLoad.h"
 #include "FESurfaceForceUniform.h"
 #include "FEBearingLoad.h"
+#include "FEIdealGasPressure.h"
 #include "FEGenericBodyForce.h"
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
@@ -634,8 +635,9 @@ void FEBioMech::InitModule()
 	// classes derived from FESurfaceLoad
 	REGISTER_FECORE_CLASS(FEPressureLoad, "pressure");
 	REGISTER_FECORE_CLASS(FETractionLoad, "traction");
-    REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
-    REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
+	REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
+	REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
+	REGISTER_FECORE_CLASS(FEIdealGasPressure, "ideal gas pressure");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
@@ -863,6 +865,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotGrowthRightHencky, "growth right Hencky");
     REGISTER_FECORE_CLASS(FEPlotGrowthLeftHencky, "growth left Hencky");
     REGISTER_FECORE_CLASS(FEPlotGrowthRelativeVolume, "growth relative volume");
+    REGISTER_FECORE_CLASS(FEPlotIdealGasPressure, "ideal gas pressure");
 
 	// beam variables
 	REGISTER_FECORE_CLASS(FEPlotBeamStress      , "beam stress");

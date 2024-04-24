@@ -26,26 +26,37 @@ SOFTWARE.*/
 
 
 
-#include "stdafx.h"
-#include "FEBioIncludeSection.h"
+#pragma once
+#include "FEChemicalReaction.h"
+#include <FECore/FEVec3dValuator.h>
 
-//-----------------------------------------------------------------------------
-//! Parse the Include section (new in version 2.0)
-//! This section includes the contents of another FEB file.
-void FEBioIncludeSection::Parse(XMLTag& tag)
+class FEBIOMIX_API FEReactionRateRuberti : public FEReactionRate
 {
-	// see if we need to pre-pend a path
-	char szin[512];
-	strcpy(szin, tag.szvalue());
-	char* ch = strrchr(szin, '\\');
-	if (ch==0) ch = strrchr(szin, '/');
-	if (ch==0)
-	{
-		// pre-pend the name with the input path
-		snprintf(szin, 512, "%s%s", GetFileReader()->GetFilePath(), tag.szvalue());
-	}
+public:
+	//! constructor
+    FEReactionRateRuberti(FEModel* pfem);
+	
+    //! initialization
+    bool Init() override;
+    
+	//! reaction rate at material point
+	double ReactionRate(FEMaterialPoint& pt) override;
+	
+	//! tangent of reaction rate with strain at material point
+	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override;
+	
+	//! tangent of reaction rate with effective fluid pressure at material point
+	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+	
+public:
+	FEParamDouble   m_kd;					//!< maximum sbm degradation rate
+    FEParamDouble   m_sig;					//!< stretch standard deviation
 
-	// read the file
-	if (GetFEBioImport()->ReadFile(szin, false) == false)
-		throw XMLReader::InvalidValue(tag);
-}
+private:
+    int             m_comp;                 //!< component of solid mixture (if applicable)
+    FEVec3dValuator*    m_fiber;            //!< fiber material
+    double          m_M;                    //!< molar mass of sbm
+    int             m_lsbm;                 //!< local sbm value
+
+	DECLARE_FECORE_CLASS();	
+};

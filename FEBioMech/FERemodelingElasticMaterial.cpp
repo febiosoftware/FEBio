@@ -96,6 +96,14 @@ double FERemodelingElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+//! evaluate referential mass density
+double FERemodelingElasticMaterial::Density(FEMaterialPoint& mp)
+{
+    FERemodelingMaterialPoint& rpt = *(mp.ExtractData<FERemodelingMaterialPoint>());
+    return rpt.m_rhor;
+}
+
+//-----------------------------------------------------------------------------
 //! Stress function
 mat3ds FERemodelingElasticMaterial::Stress(FEMaterialPoint& mp)
 {

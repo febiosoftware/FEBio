@@ -59,6 +59,7 @@ SOFTWARE.*/
 #include "FECarterHayes.h"
 #include "FEReactionRateConst.h"
 #include "FEReactionRateHuiskes.h"
+#include "FEReactionRateRuberti.h"
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
 #include "FEReactionRateSoluteAsSBM.h"
@@ -452,6 +453,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FESFDSBM                            , "spherical fiber distribution sbm");
 	REGISTER_FECORE_CLASS(FEReactionRateConst		    	  , "constant reaction rate"    );
 	REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  , "Huiskes reaction rate"     );
+    REGISTER_FECORE_CLASS(FEReactionRateRuberti               , "Ruberti reaction rate"     );
 	REGISTER_FECORE_CLASS(FEReactionRateNims		    	  , "Nims reaction rate"        );
 	REGISTER_FECORE_CLASS(FEReactionRateExpSED                , "exp-sed reaction rate"     );
     REGISTER_FECORE_CLASS(FEReactionRateSoluteAsSBM           , "solute-as-sbm reaction rate");

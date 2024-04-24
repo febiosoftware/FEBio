@@ -123,7 +123,7 @@ void FECoreDebugger::Print(const char* szformat, ...)
 	if (m_fp == nullptr)
 	{
 		char fileName[256] = { 0 };
-		sprintf(fileName, "febio_%d.%d.%d_debug.log", FE_SDK_MAJOR_VERSION, FE_SDK_SUB_VERSION, FE_SDK_SUBSUB_VERSION);
+		snprintf(fileName, 256, "febio_%d.%d.%d_debug.log", FE_SDK_MAJOR_VERSION, FE_SDK_SUB_VERSION, FE_SDK_SUBSUB_VERSION);
 		m_fp = fopen(fileName, "wt"); assert(m_fp);
 	}
 

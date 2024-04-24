@@ -1415,3 +1415,17 @@ public:
 	FEPlotBeamCurvature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+// plot the current pressure value of the FEIdealGasPressure load
+class FEIdealGasPressure;
+class FEPlotIdealGasPressure : public FEPlotSurfaceData
+{
+public:
+	FEPlotIdealGasPressure(FEModel* fem) : FEPlotSurfaceData(fem, PLT_FLOAT, FMT_REGION) {}
+	bool Save(FESurface& surf, FEDataStream& a) override;
+
+private:
+	bool Init() override;
+	bool m_binit = false;
+	FEIdealGasPressure* m_load = nullptr;
+};

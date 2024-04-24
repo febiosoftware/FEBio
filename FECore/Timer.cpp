@@ -113,14 +113,14 @@ void Timer::time_str(char* sz)
 {
 	int nhour, nmin, nsec;
 	GetTime(nhour, nmin, nsec);
-	sprintf(sz, "%d:%02d:%02d", nhour, nmin, nsec);
+	snprintf(sz, 64, "%d:%02d:%02d", nhour, nmin, nsec);
 }
 
 void Timer::time_str(double fsec, char* sz)
 {
 	int nhour, nmin, nsec;
 	GetTime(fsec, nhour, nmin, nsec);
-	sprintf(sz, "%d:%02d:%02d", nhour, nmin, nsec);
+	snprintf(sz, 64, "%d:%02d:%02d", nhour, nmin, nsec);
 }
 
 //============================================================================

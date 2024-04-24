@@ -106,7 +106,7 @@ mat3ds FEFiberExpPowSBM::Stress(FEMaterialPoint& mp)
     
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double ksi = FiberModulus(rhor);
+    double ksi = FiberModulus(mp, rhor);
     
     // deformation gradient
     mat3d &F = pt.m_F;
@@ -134,6 +134,9 @@ mat3ds FEFiberExpPowSBM::Stress(FEMaterialPoint& mp)
     // only take fibers in tension into consideration
     if (In_1 >= eps)
     {
+        double alpha = m_alpha(mp);
+        double beta = m_beta(mp);
+        
         // get the global spatial fiber direction in current configuration
         nt = F*n0;
         
@@ -141,7 +144,7 @@ mat3ds FEFiberExpPowSBM::Stress(FEMaterialPoint& mp)
         mat3ds N = dyad(nt);
         
         // calculate strain energy derivative
-        Wl = ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+        Wl = ksi*pow(In_1, beta-1.0)*exp(alpha*pow(In_1, beta));
         
         // calculate the fiber stress
         s = N*(2.0*Wl/J);
@@ -162,7 +165,7 @@ tens4ds FEFiberExpPowSBM::Tangent(FEMaterialPoint& mp)
     
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double ksi = FiberModulus(rhor);
+    double ksi = FiberModulus(mp, rhor);
     
     // deformation gradient
     mat3d &F = pt.m_F;
@@ -190,6 +193,9 @@ tens4ds FEFiberExpPowSBM::Tangent(FEMaterialPoint& mp)
     // only take fibers in tension into consideration
     if (In_1 >= eps)
     {
+        double alpha = m_alpha(mp);
+        double beta = m_beta(mp);
+        
         // get the global spatial fiber direction in current configuration
         nt = F*n0;
         
@@ -198,8 +204,8 @@ tens4ds FEFiberExpPowSBM::Tangent(FEMaterialPoint& mp)
         tens4ds NxN = dyad1s(N);
         
         // calculate strain energy 2nd derivative
-        double tmp = m_alpha*pow(In_1, m_beta);
-        Wll = ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
+        double tmp = alpha*pow(In_1, beta);
+        Wll = ksi*pow(In_1, beta-2.0)*((tmp+1)*beta-1.0)*exp(tmp);
         
         // calculate the fiber tangent
         c = NxN*(4.0*Wll/J);
@@ -222,7 +228,7 @@ double FEFiberExpPowSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double ksi = FiberModulus(rhor);
+    double ksi = FiberModulus(mp, rhor);
     
     // loop over all integration points
     double In_1;
@@ -244,15 +250,34 @@ double FEFiberExpPowSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     // only take fibers in tension into consideration
     if (In_1 >= eps)
     {
+        double alpha = m_alpha(mp);
+        double beta = m_beta(mp);
+        
         // calculate strain energy derivative
-        if (m_alpha > 0) {
-            sed = ksi/(m_alpha*m_beta)*(exp(m_alpha*pow(In_1, m_beta))-1);
+        if (alpha > 0) {
+            sed = ksi/(alpha*beta)*(exp(alpha*pow(In_1, beta))-1);
         }
         else
-            sed = ksi/m_beta*pow(In_1, m_beta);
+            sed = ksi/beta*pow(In_1, beta);
     }
     
     return sed;
+}
+
+//-----------------------------------------------------------------------------
+//! evaluate referential mass density
+double FEFiberExpPowSBM::Density(FEMaterialPoint& pt)
+{
+    FERemodelingMaterialPoint* rpt = pt.ExtractData<FERemodelingMaterialPoint>();
+    if (rpt) return rpt->m_rhor;
+    else {
+        FEElasticMixtureMaterialPoint* emp = pt.ExtractData<FEElasticMixtureMaterialPoint>();
+        if (emp) {
+            rpt = emp->GetPointData(m_comp)->ExtractData<FERemodelingMaterialPoint>();
+            if (rpt) return rpt->m_rhor;
+        }
+    }
+    return 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -268,7 +293,7 @@ double FEFiberExpPowSBM::Tangent_SE_Density(FEMaterialPoint& mp)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     double rhor = spt.m_sbmr[m_lsbm];
-    return StrainEnergy(mp)*m_g/rhor;
+    return StrainEnergy(mp)*m_g(mp)/rhor;
 }
 
 //-----------------------------------------------------------------------------
@@ -277,6 +302,6 @@ mat3ds FEFiberExpPowSBM::Tangent_Stress_Density(FEMaterialPoint& mp)
 {
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     double rhor = spt.m_sbmr[m_lsbm];
-    return Stress(mp)*m_g/rhor;
+    return Stress(mp)*m_g(mp)/rhor;
 }
 
