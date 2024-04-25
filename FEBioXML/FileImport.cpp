@@ -207,6 +207,13 @@ void FEFileSection::value(XMLTag& tag, bool& b)
 }
 
 //-----------------------------------------------------------------------------
+void FEFileSection::value(XMLTag& tag, vec2d& v)
+{
+	const char* sz = tag.szvalue();
+	int n = sscanf(sz, "%lg,%lg", &v.r[0], &v.r[1]);
+	if (n != 3) throw XMLReader::XMLSyntaxError(tag.m_nstart_line);
+}
+
 void FEFileSection::value(XMLTag& tag, vec3d& v)
 {
 	const char* sz = tag.szvalue();
