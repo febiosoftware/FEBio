@@ -16,7 +16,7 @@ jobs:
   call_workflow:
     uses: febiosoftware/febio-workflows/.github/workflows/linux-reusable-push.yml@develop
     with:
-      runTests: ${{ (github.event_name == 'workflow_dispatch' && inputs.runTests) || (github.event_name == 'push' && contains(fromJSON('["develop", "ci/tag-previous-s3-objects"]'), github.ref_name)) }}
+      runTests: ${{ (github.event_name == 'workflow_dispatch' && inputs.runTests) || (github.event_name == 'push' && contains(fromJSON('["develop"]'), github.ref_name)) }}
       package-name: febio4
       package-sdk: true
       aws-ami-id: ami-0590ebdb5afffb782
