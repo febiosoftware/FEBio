@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
+#include "FEExplicitSolidSolver.h"
 #include "FERigidBody.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
@@ -155,12 +156,20 @@ double FENodeForceY::value(const FENode& node)
 //-----------------------------------------------------------------------------
 double FENodeForceZ::value(const FENode& node)
 {
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
+	FESolver* solver = GetFEModel()->GetCurrentStep()->GetFESolver();
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(solver);
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
 		const vector<int>& id = node.m_ID;
 		return (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
+	}
+	FEExplicitSolidSolver* explicitSolver = dynamic_cast<FEExplicitSolidSolver*>(solver);
+	if (explicitSolver)
+	{
+		vector<double>& Fr = explicitSolver->m_Fr;
+		const vector<int>& id = node.m_ID;
+		return (-id[2] - 2 >= 0 ? Fr[-id[2] - 2] : 0);
 	}
 	return 0;
 }
