@@ -83,6 +83,7 @@ SOFTWARE.*/
 
 #include "FEConstFluidBodyForce.h"
 #include "FECentrifugalFluidBodyForce.h"
+#include "FEFluidMovingFrameLoad.h"
 
 #include "FEFluidModule.h"
 
@@ -171,6 +172,7 @@ REGISTER_FECORE_CLASS(FEFluidRCLoad                , "fluid RC"                 
 // body loads
 REGISTER_FECORE_CLASS(FEConstFluidBodyForce      , "fluid body force");
 REGISTER_FECORE_CLASS(FECentrifugalFluidBodyForce, "fluid centrifugal force");
+REGISTER_FECORE_CLASS(FEFluidMovingFrameLoad     , "fluid moving frame");
 
 //-----------------------------------------------------------------------------
 // boundary conditions
