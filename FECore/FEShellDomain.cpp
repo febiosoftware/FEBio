@@ -31,6 +31,10 @@ SOFTWARE.*/
 #include "FEMesh.h"
 #include "FEMaterial.h"
 
+BEGIN_FECORE_CLASS(FEShellDomain, FEDomain)
+	ADD_PROPERTY(m_matAxis, "mat_axis");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 //! constructor
 FEShellDomain::FEShellDomain(FEModel* fem) : FEDomain(FE_DOMAIN_SHELL, fem)

@@ -75,6 +75,8 @@ public:
     
 public:
 	void ForEachShellElement(std::function<void(FEShellElement& el)> f);
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------

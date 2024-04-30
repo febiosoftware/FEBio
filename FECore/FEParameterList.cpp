@@ -369,7 +369,6 @@ FEParam* FEParamContainer::AddParameter(vec2d&                    v, const char*
 FEParam* FEParamContainer::AddParameter(vec3d&                    v, const char* sz) { return AddParameter(&v, FE_PARAM_VEC3D, 1, sz); }
 FEParam* FEParamContainer::AddParameter(mat3d&                    v, const char* sz) { return AddParameter(&v, FE_PARAM_MAT3D, 1, sz); }
 FEParam* FEParamContainer::AddParameter(mat3ds&                   v, const char* sz) { return AddParameter(&v, FE_PARAM_MAT3DS, 1, sz); }
-FEParam* FEParamContainer::AddParameter(quatd&                    v, const char* sz) { return AddParameter(&v, FE_PARAM_QUAT, 1, sz); }
 FEParam* FEParamContainer::AddParameter(FEParamDouble&            v, const char* sz) { return AddParameter(&v, FE_PARAM_DOUBLE_MAPPED, 1, sz); }
 FEParam* FEParamContainer::AddParameter(FEParamVec3&              v, const char* sz) { return AddParameter(&v, FE_PARAM_VEC3D_MAPPED, 1, sz); }
 FEParam* FEParamContainer::AddParameter(FEParamMat3d&             v, const char* sz) { return AddParameter(&v, FE_PARAM_MAT3D_MAPPED, 1, sz); }

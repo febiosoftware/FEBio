@@ -96,12 +96,6 @@ void FEBioModel::print_parameter(FEParam& p, int level)
 				feLog("%s : %lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg\n", sz, m(0,0), m(0,1), m(0,2), m(1,0), m(1,1), m(1,2), m(2,0), m(2,1), m(2,2));
 			}
 			break;
-		case FE_PARAM_QUAT:
-			{
-				quatd v = p.value<quatd>();
-				feLog("%s : %lg,%lg,%lg,%lg\n", sz, v.x, v.y, v.z, v.w);
-			}
-			break;
 		case FE_PARAM_TENS3DRS:
 			{
 				tens3drs m = p.value<tens3drs>();

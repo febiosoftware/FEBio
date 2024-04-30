@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include "FEModel.h"
 
 BEGIN_FECORE_CLASS(FESolidDomain, FEDomain)
-	ADD_PARAMETER(m_matAxis, "mat_axis");
+	ADD_PROPERTY(m_matAxis, "mat_axis");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

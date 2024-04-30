@@ -64,7 +64,6 @@ enum FEParamType {
 	FE_PARAM_MAT3D_MAPPED,
 	FE_PARAM_MAT3DS_MAPPED,
 	FE_PARAM_MATERIALPOINT,
-	FE_PARAM_QUAT
 };
 
 //-----------------------------------------------------------------------------

@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "vec2d.h"
 #include "vec3d.h"
 #include "mat3d.h"
-#include "quatd.h"
 #include <assert.h>
 #include <list>
 #include <memory>
@@ -167,7 +166,6 @@ public:
 	FEParam* AddParameter(vec3d&               v, const char* sz);
 	FEParam* AddParameter(mat3d&               v, const char* sz);
 	FEParam* AddParameter(mat3ds&              v, const char* sz);
-	FEParam* AddParameter(quatd&               v, const char* sz);
 	FEParam* AddParameter(FEParamDouble&       v, const char* sz);
 	FEParam* AddParameter(FEParamVec3&         v, const char* sz);
 	FEParam* AddParameter(FEParamMat3d&        v, const char* sz);
