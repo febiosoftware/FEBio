@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FEMaterial.h"
 
 BEGIN_FECORE_CLASS(FEShellDomain, FEDomain)
-	ADD_PROPERTY(m_matAxis, "mat_axis");
+	ADD_PROPERTY(m_matAxis, "mat_axis", FEProperty::Optional);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
