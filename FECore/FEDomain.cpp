@@ -33,7 +33,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEDomain::FEDomain(int nclass, FEModel* fem) : FEMeshPartition(nclass, fem)
 {
-
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -66,6 +66,7 @@ void FEDomain::CreateMaterialPointData()
 		for (int k = 0; k < el.GaussPoints(); ++k)
 		{
 			FEMaterialPoint* mp = new FEMaterialPoint(pmat->CreateMaterialPointData());
+			mp->m_Q = m_matAxis;
 			mp->m_r0 = el.Evaluate(r, k);
 			mp->m_index = k;
 			el.SetMaterialPointData(mp, k);

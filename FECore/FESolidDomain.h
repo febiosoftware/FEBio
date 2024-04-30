@@ -290,4 +290,6 @@ protected:
 
 	FEDofList	m_dofU;
 	FEDofList	m_dofSU;
+
+	DECLARE_FECORE_CLASS();
 };

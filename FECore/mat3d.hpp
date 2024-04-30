@@ -696,6 +696,23 @@ inline mat3d::mat3d(const vec3d& e1, const vec3d& e2, const vec3d& e3)
 	d[2][0] = e1.z; d[2][1] = e2.z; d[2][2] = e3.z;
 }
 
+inline mat3d::mat3d(const vec3d& a, const vec3d& b)
+{
+	vec3d e1(a);
+	vec3d e3 = a ^ b;
+	vec3d e2 = e3 ^ e1;
+
+	// normalize
+	e1.unit();
+	e2.unit();
+	e3.unit();
+
+	// set the value
+	d[0][0] = e1.x; d[0][1] = e2.x; d[0][2] = e3.x;
+	d[1][0] = e1.y; d[1][1] = e2.y; d[1][2] = e3.y;
+	d[2][0] = e1.z; d[2][1] = e2.z; d[2][2] = e3.z;
+}
+
 // assignment operators
 inline mat3d& mat3d::operator = (const mat3dd& m)
 {

@@ -88,4 +88,7 @@ protected:
 
 	// helper function for unpacking element dofs
 	void UnpackLM(FEElement& el, const FEDofList& dof, vector<int>& lm);
+
+protected:
+	quatd	m_matAxis; // initial material axis
 };

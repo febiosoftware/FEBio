@@ -671,6 +671,41 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		case FE_PARAM_TENS3DRS: value(tag, pp->value<tens3drs>()); break;
 		case FE_PARAM_STRING: value(tag, pp->cvalue()); break;
 		case FE_PARAM_STD_STRING: value(tag, pp->value<string>()); break;
+		case FE_PARAM_QUAT:
+		{
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype == nullptr) sztype = "vector";
+			if (strcmp(sztype, "vector") == 0)
+			{
+				vec3d a(1,0,0), d(0,1,0);
+				if (tag.isleaf()) throw XMLReader::InvalidValue(tag);
+
+				++tag;
+				do {
+					if      (tag == "a") value(tag, a);
+					else if (tag == "d") value(tag, d);
+					++tag;
+				} while (!tag.isend());
+
+				mat3d Q(a, d);
+				pp->value<quatd>() = quatd(Q);
+			}
+			else if (strcmp(sztype, "mat3") == 0)
+			{
+				mat3d Q;
+				value(tag, Q);
+				pp->value<quatd>() = quatd(Q);
+			}
+			else if (strcmp(sztype, "quat") == 0)
+			{
+				double v[4] = { 0,0,0,1 };
+				int nr = tag.value(v, 4);
+				if (nr != 4) throw XMLReader::InvalidValue(tag);
+				pp->value<quatd>() = quatd(v[0], v[1], v[2], v[3]);
+			}
+			else throw XMLReader::InvalidAttributeValue(tag, "type");
+		}
+		break;
 		case FE_PARAM_DATA_ARRAY:
 		{
 			// get the surface map
