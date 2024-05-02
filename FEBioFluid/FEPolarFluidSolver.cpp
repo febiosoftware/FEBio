@@ -759,6 +759,14 @@ void FEPolarFluidSolver::PrepStep()
         if (plc && plc->IsActive()) plc->PrepStep();
     }
     
+    // apply prescribed DOFs for specialized surface loads
+    int nsl = fem.ModelLoads();
+    for (int i = 0; i < nsl; ++i)
+    {
+        FEModelLoad& pml = *fem.ModelLoad(i);
+        if (pml.IsActive()) pml.PrepStep();
+    }
+
     // see if we need to do contact augmentations
     m_baugment = false;
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)

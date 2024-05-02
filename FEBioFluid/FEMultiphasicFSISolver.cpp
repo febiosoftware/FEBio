@@ -960,7 +960,7 @@ void FEMultiphasicFSISolver::PrepStep()
     for (int i = 0; i < nsl; ++i)
     {
         FEModelLoad& pml = *fem.ModelLoad(i);
-        if (pml.IsActive()) pml.Update();
+        if (pml.IsActive()) pml.PrepStep();
     }
 
     // do the linear constraints
