@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEModel.h>
+#include <FECore/FENLConstraint.h>
 #include "FEBioFluidSolutes.h"
 #include <assert.h>
 #include "FEFluidSolutesAnalysis.h"

@@ -686,9 +686,9 @@ void FEFluidSolutesSolver::PrepStep()
     // update domain data
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
     
-    // update stresses
-    fem.Update();
-    
+    // update model state
+    UpdateModel();
+
     // see if we need to do contact augmentations
     m_baugment = false;
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)

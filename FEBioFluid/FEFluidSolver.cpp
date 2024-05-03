@@ -615,8 +615,11 @@ void FEFluidSolver::PrepStep()
 	// update domain data
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
     
-    // update stresses
-	fem.Update();
+    // update model state
+    UpdateModel();
+
+//    // update stresses
+//	fem.Update();
     
     for (int i = 0; i < fem.NonlinearConstraints(); ++i)
     {
