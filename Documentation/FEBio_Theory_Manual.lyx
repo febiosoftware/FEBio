@@ -35887,6 +35887,163 @@ and
 
 \end_layout
 
+\begin_layout Subsection
+HGO Unconstrained
+\end_layout
+
+\begin_layout Standard
+A coupled formulation of the Holzapfel-Gasser-Ogden material is implemented
+ in the 
+\begin_inset Quotes eld
+\end_inset
+
+HGO unconstrained
+\begin_inset Quotes erd
+\end_inset
+
+ material.
+ 
+\end_layout
+
+\begin_layout Standard
+The strain energy density is given by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi_{r}=\frac{c}{2}\left(I_{1}-3\right)-c\ln J+\frac{k_{1}}{2k_{2}}\sum_{\alpha}\left(\exp\left(k_{2}\left\langle E_{\alpha}\right\rangle ^{2}\right)-1\right)+\frac{K_{0}}{2}\left(\frac{J^{2}-1}{2}-\ln J\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The fiber strain is
+\begin_inset Formula 
+\[
+E_{\alpha}=\kappa\left(I_{1}-3\right)+\left(1-3\kappa\right)\left(I_{4\alpha}-1\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $I_{1}=\tr\mathbf{C}$
+\end_inset
+
+ and 
+\begin_inset Formula $I_{4\alpha}=\mathbf{a}_{\alpha r}\cdot\mathbf{C}\cdot\mathbf{a}_{\alpha r}$
+\end_inset
+
+.
+ The Macaulay brackets around 
+\begin_inset Formula $\left\langle E_{\alpha}\right\rangle $
+\end_inset
+
+ indicate that this term is zero when 
+\begin_inset Formula $E_{\alpha}<0$
+\end_inset
+
+ and equal to 
+\begin_inset Formula $E_{\alpha}$
+\end_inset
+
+ when this strain is positive.There are two fiber families along the vectors
+ 
+\begin_inset Formula $\mathbf{a}_{\alpha r}$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha=1,2$
+\end_inset
+
+), lying in the 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2}\right\} $
+\end_inset
+
+ plane of the local material axes 
+\begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
+\end_inset
+
+, making an angle 
+\begin_inset Formula $\pm\gamma$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+.
+ Each fiber family has a dispersion 
+\begin_inset Formula $\kappa$
+\end_inset
+
+, where 
+\begin_inset Formula $0\le\kappa\le\frac{1}{3}$
+\end_inset
+
+.
+ When 
+\begin_inset Formula $\kappa=0$
+\end_inset
+
+ there is no fiber dispersion, implying that all the fibers in that family
+ act along the angle 
+\begin_inset Formula $\pm\gamma$
+\end_inset
+
+; the value 
+\begin_inset Formula $\kappa=\frac{1}{3}$
+\end_inset
+
+ represents an isotropic fiber dispersion.
+\end_layout
+
+\begin_layout Standard
+The Cauchy stress is given by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbf{\sigma}=\frac{1}{J}\left[c\left(\mathbf{b}-\mathbf{1}\right)+\frac{k}{2}\left(J^{2}-1\right)\mathbf{1}\right]+\frac{1}{J}\left[{\displaystyle \underset{\alpha}{\sum}2k_{1}\left\langle E_{\alpha}\right\rangle \exp\left(k_{2}\left\langle E_{\alpha}\right\rangle ^{2}\right)\mathbf{h}_{\alpha}}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where, 
+\begin_inset Formula $\mathbf{h}_{\alpha}=\kappa\mathbf{b}+\left(1-3\kappa\right)\mathbf{A}_{\alpha}$
+\end_inset
+
+, and 
+\begin_inset Formula $\mathbf{A}_{\alpha}=\mathbf{a}_{\alpha}\otimes\mathbf{a}_{\alpha}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The spatial elasticity tensor is given by,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{c}=\frac{1}{J}\left\{ kJ^{2}\mathbf{1}\otimes\mathbf{1}+\left[2c-k\left(J^{2}-1\right)\right]\mathbf{1}\odot\mathbf{1}\right\} +\frac{1}{J}\left[{\displaystyle \underset{\alpha}{\sum}4k_{1}\left(1+2k_{2}\left\langle E_{\alpha}\right\rangle ^{2}\right)\exp\left(k_{2}\left\langle E_{\alpha}\right\rangle ^{2}\right)\mathbf{h}_{\alpha}\otimes\mathbf{h}_{\alpha}}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Nearly-Incompressible Materials
 \begin_inset CommandInset label
