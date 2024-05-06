@@ -79,7 +79,8 @@ mat3ds FEHolzapfelUnconstrained::Stress(FEMaterialPoint& mp)
     ar[1] = n[0]*cg - n[1]*sg; a[1] = pt.m_F*ar[1];
     
     // Evaluate the ground matrix stress
-    mat3ds s = c*(b-mat3dd(1)) + mat3dd(J-1.0/J)*(k/2);
+	mat3dd I(1.0);
+    mat3ds s = c*(b-I) + I*((J*J-1.0)*(k*0.5));
     
     // Evaluate the structural tensors in the current configuration
     // and the fiber strains and stress contributions
@@ -155,7 +156,7 @@ tens4ds FEHolzapfelUnconstrained::Tangent(FEMaterialPoint& mp)
     mat3dd I(1);
     tens4ds IoI = dyad4s(I);
     tens4ds IxI = dyad1s(I);
-    tens4ds ce = IoI*(2*c-(J-1.0/J)*k) + IxI*(J*k);
+    tens4ds ce = IoI*(2*c-(J*J-1.0)*k) + IxI*(J*J*k);
     if (E0 >= 0) ce += dyad1s(h0)*(4.*k1*(1 + 2 * k2*E0*E0)*exp(k2*E0*E0));
     if (E1 >= 0) ce += dyad1s(h1)*(4.*k1*(1 + 2 * k2*E1*E1)*exp(k2*E1*E1));
     
