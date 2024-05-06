@@ -41,12 +41,13 @@ public:
 	mat3d stiffness(FEMaterialPoint& pt) override;
 
 private:
-	vec3d	m_w;	// angular velocity of frame
-	vec3d	m_a;	// linear acceleration of frame
+	vec3d	m_wt;	// angular velocity of frame
+	vec3d	m_at;	// linear acceleration of frame
 	
-	quatd	m_q;
-	vec3d	m_wp;
-	vec3d	m_al;
+	vec3d	m_wp, m_w;
+	vec3d	m_ap, m_a;
+	vec3d	m_alt, m_alp, m_al;
+	quatd	m_qt, m_qp, m_q;
 
 	DECLARE_FECORE_CLASS();
 };
