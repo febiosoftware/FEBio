@@ -1,0 +1,23 @@
+name: CI - Linux - On Push
+on:
+  push:
+    branches:
+      - 'develop'
+  workflow_dispatch:
+    inputs:
+      runTests:
+        description: "Run tests?"
+        type: boolean
+        required: false
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+jobs:
+  call_workflow:
+    uses: febiosoftware/febio-workflows/.github/workflows/linux-reusable-push.yml@develop
+    with:
+      runTests: ${{ (github.event_name == 'workflow_dispatch' && inputs.runTests) || (github.event_name == 'push' && contains(fromJSON('["develop"]'), github.ref_name)) }}
+      package-name: febio4
+      package-sdk: true
+      aws-ami-id: ami-0590ebdb5afffb782
+    secrets: inherit

@@ -79,10 +79,12 @@ SOFTWARE.*/
 #include "FEIncompNeoHookean.h"
 #include "FEIsotropicElastic.h"
 #include "FEMooneyRivlin.h"
+#include "FEMooneyRivlinAD.h"
 #include "FEMRVonMisesFibers.h"
 #include "FEMuscleMaterial.h"
 #include "FENaturalNeoHookean.h"
 #include "FENeoHookean.h"
+#include "FENeoHookeanAD.h"
 #include "FENeoHookeanTransIso.h"
 #include "FENewtonianViscousSolid.h"
 #include "FENewtonianViscousSolidUC.h"
@@ -179,6 +181,7 @@ SOFTWARE.*/
 #include "FETractionLoad.h"
 #include "FESurfaceForceUniform.h"
 #include "FEBearingLoad.h"
+#include "FEIdealGasPressure.h"
 #include "FEGenericBodyForce.h"
 #include "FECentrifugalBodyForce.h"
 #include "FEPointBodyForce.h"
@@ -203,6 +206,8 @@ SOFTWARE.*/
 #include "FEMortarSlidingContact.h"
 #include "FEMortarTiedContact.h"
 #include "FEContactPotential.h"
+#include "FEEdgeToSurfaceContactPotential.h"
+#include "FEEdgeToSurfaceSlidingContact.h"
 
 #include "FESymmetryPlane.h"
 #include "FERigidJoint.h"
@@ -343,6 +348,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FECoupledVerondaWestmann, "coupled Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FENaturalNeoHookean, "natural neo-Hookean");
 	REGISTER_FECORE_CLASS(FENeoHookean, "neo-Hookean");
+	REGISTER_FECORE_CLASS(FENeoHookeanAD, "neo-Hookean AD");
 	REGISTER_FECORE_CLASS(FENeoHookeanTransIso, "neo-Hookean transiso");
     REGISTER_FECORE_CLASS(FETraceFreeNeoHookean, "trace-free neo-Hookean");
 	REGISTER_FECORE_CLASS(FENewtonianViscousSolid, "Newtonian viscous solid");
@@ -399,6 +405,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEGentMaterial, "Gent");
 	REGISTER_FECORE_CLASS(FEIncompNeoHookean, "incomp neo-Hookean");
 	REGISTER_FECORE_CLASS(FEMooneyRivlin, "Mooney-Rivlin");
+	REGISTER_FECORE_CLASS(FEMooneyRivlinAD, "Mooney-Rivlin AD");
 	REGISTER_FECORE_CLASS(FEMuscleMaterial, "muscle material");
 	REGISTER_FECORE_CLASS(FENewtonianViscousSolidUC, "Newtonian viscous solid uncoupled");
 	REGISTER_FECORE_CLASS(FEOgdenMaterial, "Ogden");
@@ -641,8 +648,9 @@ void FEBioMech::InitModule()
 	// classes derived from FESurfaceLoad
 	REGISTER_FECORE_CLASS(FEPressureLoad, "pressure");
 	REGISTER_FECORE_CLASS(FETractionLoad, "traction");
-    REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
-    REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
+	REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
+	REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
+	REGISTER_FECORE_CLASS(FEIdealGasPressure, "ideal gas pressure");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
@@ -700,6 +708,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMortarSlidingContact, "mortar-sliding", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEMortarTiedContact, "mortar-tied", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEContactPotential, "contact potential");
+	
+	REGISTER_FECORE_CLASS(FEEdgeToSurfaceContactPotential, "edge-to-surface contact potential");
+	REGISTER_FECORE_CLASS(FEEdgeToSurfaceSlidingContact, "edge-to-surface sliding contact");
 
 	//-----------------------------------------------------------------------------
 	// classes derived directly from FERigidBC
@@ -735,6 +746,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementPK2Stress, "PK2 stress");
 	REGISTER_FECORE_CLASS(FEPlotElementPK1Stress, "PK1 stress");
 	REGISTER_FECORE_CLASS(FEPlotElementMixtureStress, "mixture stress");
+    REGISTER_FECORE_CLASS(FEPlotMixtureStrainEnergyDensity, "mixture strain energy density");
+    REGISTER_FECORE_CLASS(FEPlotMixtureDevStrainEnergyDensity, "mixture deviatoric strain energy density");
+    REGISTER_FECORE_CLASS(FEPlotMixtureSpecificStrainEnergy, "mixture specific strain energy");
 	REGISTER_FECORE_CLASS(FEPlotElementUncoupledPressure, "uncoupled pressure");
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");
     REGISTER_FECORE_CLASS(FEPlotElementDevElasticity, "deviatoric elasticity");
@@ -864,6 +878,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotGrowthRightHencky, "growth right Hencky");
     REGISTER_FECORE_CLASS(FEPlotGrowthLeftHencky, "growth left Hencky");
     REGISTER_FECORE_CLASS(FEPlotGrowthRelativeVolume, "growth relative volume");
+    REGISTER_FECORE_CLASS(FEPlotIdealGasPressure, "ideal gas pressure");
 
 	// beam variables
 	REGISTER_FECORE_CLASS(FEPlotBeamStress      , "beam stress");

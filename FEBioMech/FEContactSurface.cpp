@@ -35,14 +35,19 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEContactSurface::FEContactSurface(FEModel* pfem) : FESurface(pfem), m_pfem(pfem)
 {
-	m_pSibling = 0; 
+	m_pContactInterface = nullptr;
+	m_pSibling = nullptr; 
 	m_dofX = -1;
 	m_dofY = -1;
 	m_dofZ = -1;
 }
 
 //-----------------------------------------------------------------------------
-FEContactSurface::~FEContactSurface() { m_pSibling = 0; m_pContactInterface = 0; }
+FEContactSurface::~FEContactSurface()
+{
+	m_pSibling = nullptr; 
+	m_pContactInterface = nullptr; 
+}
 
 //-----------------------------------------------------------------------------
 bool FEContactSurface::Init()
@@ -53,7 +58,7 @@ bool FEContactSurface::Init()
 	m_dofY = dofs.GetDOF("y");
 	m_dofZ = dofs.GetDOF("z");
 
-    SetInterfaceStatus(true);
+	SetInterfaceStatus(true);
 	return FESurface::Init();
 }
 

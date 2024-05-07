@@ -37,6 +37,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEPeriodicBoundary1O, FEContactInterface)
+	ADD_PARAMETER(m_laugon   , "laugon"   )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol     , "tolerance");
 	ADD_PARAMETER(m_eps      , "penalty"  );
 	ADD_PARAMETER(m_btwo_pass, "two_pass" );
@@ -593,7 +594,7 @@ void FEPeriodicBoundary1O::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 bool FEPeriodicBoundary1O::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	int i;
 

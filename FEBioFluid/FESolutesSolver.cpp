@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEModel.h>
+#include <FECore/FENLConstraint.h>
 #include "FEBioFluidSolutes.h"
 #include <assert.h>
 #include "FEFluidSolutesAnalysis.h"
@@ -495,13 +496,8 @@ void FESolutesSolver::PrepStep()
         if (bc.IsActive() && HasActiveDofs(bc.GetDofList())) bc.PrepStep(ui);
     }
     
-    // apply prescribed DOFs for specialized surface loads
-    int nsl = fem.ModelLoads();
-    for (int i = 0; i < nsl; ++i)
-    {
-        FEModelLoad& pml = *fem.ModelLoad(i);
-        if (pml.IsActive() && HasActiveDofs(pml.GetDofList())) pml.Update();
-    }
+    // do the linear constraints
+    fem.GetLinearConstraintManager().PrepStep();
 
     // initialize material point data
     // NOTE: do this before the stresses are updated
@@ -513,8 +509,19 @@ void FESolutesSolver::PrepStep()
     // update stresses
     fem.Update();
     
+    // apply prescribed DOFs for specialized surface loads
+    int nsl = fem.ModelLoads();
+    for (int i = 0; i < nsl; ++i)
+    {
+        FEModelLoad& pml = *fem.ModelLoad(i);
+        if (pml.IsActive() && HasActiveDofs(pml.GetDofList())) pml.PrepStep();
+    }
+
     // see if we need to do contact augmentations
     m_baugment = false;
+    
+    // see if we have to do nonlinear constraint augmentations
+    if (fem.NonlinearConstraints() != 0) m_baugment = true;
 }
 
 //-----------------------------------------------------------------------------

@@ -1960,7 +1960,7 @@ void FEModel::Logf(int ntag, const char* msg, ...)
 	// make the message
 	char sztxt[2048] = { 0 };
 	va_start(args, msg);
-	vsprintf(sztxt, msg, args);
+	vsnprintf(sztxt, 2048, msg, args);
 	va_end(args);
 
 	Log(ntag, sztxt);

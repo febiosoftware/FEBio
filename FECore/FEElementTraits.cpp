@@ -3283,12 +3283,23 @@ void FETrussElementTraits::init()
 	const double a = 1.0 / sqrt(3.0);
 	gr[0] = -a; gr[1] =  a;
 	gw[0] = gw[1] = 1;
+	assert(m_nint > 0);
+	assert(m_neln > 0);
 
-	m_H[0][0] = 0.5 * (1 - gr[0]);
-	m_H[0][1] = 0.5 * (1 + gr[0]);
+	// evaluate shape functions
+	const int NE = FEElement::MAX_NODES;
+	double N[NE];
+	for (int n = 0; n < m_nint; ++n)
+	{
+		shape(N, gr[n]);
+		for (int i = 0; i < m_neln; ++i) m_H[n][i] = N[i];
+	}
+}
 
-	m_H[1][0] = 0.5 * (1 - gr[1]);
-	m_H[1][1] = 0.5 * (1 + gr[1]);
+void FETrussElementTraits::shape(double* H, double r)
+{
+	H[0] = 0.5 * (1.0 - r);
+	H[1] = 0.5 * (1.0 + r);
 }
 
 //=============================================================================
@@ -3862,6 +3873,25 @@ void FELine2G1::project_to_nodes(double* ai, double* ao) const
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];
+}
+
+//=============================================================================
+//                          FELine2NI 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FELine2NI::FELine2NI() : FELine2_(NINT, FE_LINE2NI)
+{
+	gr[0] = -1; gr[1] = 1;
+	gw[0] = gw[1] = 1.0;
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FELine2NI::project_to_nodes(double* ai, double* ao) const
+{
+	ao[0] = ai[0];
+	ao[1] = ai[1];
 }
 
 //=============================================================================

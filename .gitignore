@@ -431,9 +431,9 @@ vs22/
 CMakeFiles/
 
 ##cmake files
-CMakeLists.txt
+!CMakeLists.txt
 CMakeCache.txt
-*.cmake
+!*.cmake
 
 ## Visual Studio Code
 .vscode/
@@ -442,3 +442,9 @@ Documentation/FEBio_Theory_Manual.pdf
 Documentation/FEBio_User_Manual.html.LyXconv/
 
 /FEBioMech/FECGSolidSolver - Copy.cpp
+
+febio*-sdk
+.envrc
+
+TestSuite
+*.gz

@@ -27,7 +27,9 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBioMech/FEElasticMaterial.h"
+#include <FEBioMech/FEElasticMaterial.h>
+#include <FEBioMech/FERemodelingElasticMaterial.h>
+#include <FECore/FEModelParam.h>
 #include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
@@ -35,10 +37,10 @@ SOFTWARE.*/
 //! Exponential-power law
 //! Fiber modulus depends on SBM content
 
-class FEBIOMIX_API FEFiberExpPowSBM : public FEElasticMaterial
+class FEBIOMIX_API FEFiberExpPowSBM : public FEElasticMaterial, public FERemodelingInterface
 {
 public:
-    FEFiberExpPowSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_sbm = 0; }
+    FEFiberExpPowSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_sbm = -1; m_fiber = nullptr; }
     
     //! Initialization
     bool Init() override;
@@ -52,19 +54,40 @@ public:
     //! Strain energy density
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
-    //! return fiber modulus
-    double FiberModulus(double rhor) { return m_ksi0*pow(rhor/m_rho0, m_g);}
+    //! evaluate referential mass density
+    double Density(FEMaterialPoint& pt) override;
     
-    // declare the parameter list
-    DECLARE_FECORE_CLASS();
+    //! return fiber modulus
+    double FiberModulus(FEMaterialPoint& pt, double rhor) { return m_ksi0(pt)*pow(rhor/m_rho0(pt), m_g(pt));}
+    
+    //! Create material point data
+    FEMaterialPointData* CreateMaterialPointData() override;
+    
+    //! update specialize material point data
+    void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
+    
+public: // --- remodeling interface ---
+
+    //! calculate strain energy density at material point
+    double StrainEnergy(FEMaterialPoint& pt) override;
+
+    //! calculate tangent of strain energy density with mass density
+    double Tangent_SE_Density(FEMaterialPoint& pt) override;
+    
+    //! calculate tangent of stress with mass density
+    mat3ds Tangent_Stress_Density(FEMaterialPoint& pt) override;
     
 public:
-    double	m_alpha;	// coefficient of (In-1) in exponential
-    double	m_beta;		// power of (In-1) in exponential
-    double	m_ksi0;		// fiber modulus ksi = ksi0*(rhor/rho0)^gamma
-    double  m_rho0;     // rho0
-    double  m_g;        // gamma
-    int		m_sbm;      //!< global id of solid-bound molecule
-    int		m_lsbm;     //!< local id of solid-bound molecule
-    vec3d	m_n0;		// unit vector along fiber direction (local coordinate system)
+    FEParamDouble   m_alpha;	// coefficient of (In-1) in exponential
+    FEParamDouble   m_beta;		// power of (In-1) in exponential
+    FEParamDouble   m_ksi0;		// fiber modulus ksi = ksi0*(rhor/rho0)^gamma
+    FEParamDouble   m_rho0;     // rho0
+    FEParamDouble   m_g;        // gamma
+    int             m_lsbm;     //!< local id of solid-bound molecule
+
+public:
+    FEVec3dValuator*    m_fiber;    //!< fiber orientation
+
+    // declare the parameter list
+    DECLARE_FECORE_CLASS();
 };

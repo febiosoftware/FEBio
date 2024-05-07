@@ -140,7 +140,6 @@ bool FEMultiphasicSolidDomain::Init()
     // extract the initial concentrations of the solid-bound molecules
     const int nsbm = m_pMat->SBMs();
     const int nsol = m_pMat->Solutes();
-    vector<double> sbmr(nsbm, 0);
     
     for (int i = 0; i<(int)m_Elem.size(); ++i)
     {
@@ -157,10 +156,6 @@ bool FEMultiphasicSolidDomain::Init()
             FEBiphasicMaterialPoint& pb = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
-            // initialize sbm apparent densities
-            for (int i = 0; i<nsbm; ++i)
-                sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
-            
             // initialize multiphasic solutes
             ps.m_nsol = nsol;
             ps.m_c.assign(nsol,0);
@@ -173,11 +168,20 @@ bool FEMultiphasicSolidDomain::Init()
             ps.m_j.assign(nsol,vec3d(0,0,0));
             ps.m_bsb.assign(nsol, false);
             ps.m_nsbm = nsbm;
-            ps.m_sbmr = sbmr;
-            ps.m_sbmrp = sbmr;
+            ps.m_sbmr.assign(nsbm,0);
+            ps.m_sbmrp.assign(nsbm,0);
             ps.m_sbmrhat.assign(nsbm,0);
             ps.m_sbmrhatp.assign(nsbm,0);
-            
+            ps.m_sbmrmin.assign(nsbm,0);
+            ps.m_sbmrmax.assign(nsbm,0);
+
+            // assign bounds on apparent densities of the solid-bound molecules
+            for (int i = 0; i<nsbm; ++i) {
+                ps.m_sbmr[i] = ps.m_sbmrp[i] = m_pMat->GetSBM(i)->m_rho0(mp);
+                ps.m_sbmrmin[i] = m_pMat->GetSBM(i)->m_rhomin;
+                ps.m_sbmrmax[i] = m_pMat->GetSBM(i)->m_rhomax;
+            }
+
             // initialize referential solid volume fraction
             pb.m_phi0 = pb.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);
             if (pb.m_phi0 > 1.0) {
@@ -401,9 +405,6 @@ void FEMultiphasicSolidDomain::Reset()
     const int nsol = m_pMat->Solutes();
     const int nsbm = m_pMat->SBMs();
     
-    // extract the initial concentrations of the solid-bound molecules
-    vector<double> sbmr(nsbm,0);
-    
     for (int i=0; i<(int) m_Elem.size(); ++i)
     {
         // get the solid element
@@ -419,10 +420,6 @@ void FEMultiphasicSolidDomain::Reset()
             FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
             FESolutesMaterialPoint& ps = *(mp.ExtractData<FESolutesMaterialPoint>());
             
-            // initialize sbm apparent densities
-            for (int i = 0; i<nsbm; ++i)
-                sbmr[i] = m_pMat->GetSBM(i)->m_rho0(mp);
-            
             // initialize multiphasic solutes
             ps.m_nsol = nsol;
             ps.m_c.assign(nsol,0);
@@ -435,10 +432,19 @@ void FEMultiphasicSolidDomain::Reset()
             ps.m_j.assign(nsol,vec3d(0,0,0));
             ps.m_bsb.assign(nsol, false);
             ps.m_nsbm = nsbm;
-            ps.m_sbmr = sbmr;
-            ps.m_sbmrp = sbmr;
+            ps.m_sbmr.assign(nsbm,0);
+            ps.m_sbmrp.assign(nsbm,0);
             ps.m_sbmrhat.assign(nsbm,0);
             ps.m_sbmrhatp.assign(nsbm,0);
+            ps.m_sbmrmin.assign(nsbm,0);
+            ps.m_sbmrmax.assign(nsbm,0);
+
+            // assign bounds on apparent densities of the solid-bound molecules
+            for (int i = 0; i<nsbm; ++i) {
+                ps.m_sbmr[i] = ps.m_sbmrp[i] = m_pMat->GetSBM(i)->m_rho0(mp);
+                ps.m_sbmrmin[i] = m_pMat->GetSBM(i)->m_rhomin;
+                ps.m_sbmrmax[i] = m_pMat->GetSBM(i)->m_rhomax;
+            }
 
             // initialize referential solid volume fraction
             pt.m_phi0 = pt.m_phi0t = m_pMat->SolidReferentialVolumeFraction(mp);

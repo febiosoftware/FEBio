@@ -33,6 +33,10 @@ SOFTWARE.*/
 #include "log.h"
 #include "FEModel.h"
 
+BEGIN_FECORE_CLASS(FESolidDomain, FEDomain)
+	ADD_PROPERTY(m_matAxis, "mat_axis", FEProperty::Optional);
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FESolidDomain::FESolidDomain(FEModel* pfem) : FEDomain(FE_DOMAIN_SOLID, pfem), m_dofU(pfem), m_dofSU(pfem)
 {

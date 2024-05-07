@@ -47,11 +47,11 @@ class FECORE_API FESurfaceDataRecord : public DataRecord
 {
 public:
     FESurfaceDataRecord(FEModel* pfem);
-    double Evaluate(int item, int ndata);
+    double Evaluate(int item, int ndata) override;
     void SetData(const char* sz) override;
     void SetSurface(int surfIndex);
-    void SelectAllItems();
-    int Size() const;
+    void SelectAllItems() override;
+    int Size() const override;
 
 private:
     vector<FELogSurfaceData*>	m_Data;

@@ -39,6 +39,17 @@ FEPeriodicSurface::Data::Data()
 	m_Fr = vec3d(0, 0, 0);
 }
 
+void FEPeriodicSurface::Data::Init()
+{
+	FEContactMaterialPoint::Init();
+
+	m_gap = vec3d(0, 0, 0);
+	m_rs = vec2d(0, 0);
+	m_Lm = vec3d(0, 0, 0);
+	m_Tn = vec3d(0, 0, 0);
+	m_Fr = vec3d(0, 0, 0);
+}
+
 void FEPeriodicSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
@@ -52,6 +63,7 @@ void FEPeriodicSurface::Data::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEPeriodicBoundary, FEContactInterface)
+	ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol     , "tolerance");
 	ADD_PARAMETER(m_eps      , "penalty"  );
 	ADD_PARAMETER(m_btwo_pass, "two_pass" );
@@ -685,7 +697,7 @@ void FEPeriodicBoundary::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& t
 bool FEPeriodicBoundary::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	int i;
 

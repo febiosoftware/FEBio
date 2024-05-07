@@ -35,6 +35,9 @@ public:
 	//! constructor
 	FEReactionRateHuiskes(FEModel* pfem);
 	
+    //! initialization
+    bool Init() override;
+    
 	//! reaction rate at material point
 	double ReactionRate(FEMaterialPoint& pt) override;
 	
@@ -47,6 +50,9 @@ public:
 public:
 	FEParamDouble   m_B;					//!< mass supply coefficient
     FEParamDouble   m_psi0;					//!< specific strain energy at homeostasis
-	
+
+private:
+    int             m_comp;                 //!< component of solid mixture (if applicable)
+
 	DECLARE_FECORE_CLASS();	
 };

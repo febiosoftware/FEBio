@@ -37,6 +37,9 @@ public:
 	{
 	public:
 		Data();
+
+		void Init() override;
+
 		void Serialize(DumpStream& ar) override;
 
 	public:

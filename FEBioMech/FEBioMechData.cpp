@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
+#include "FEExplicitSolidSolver.h"
 #include "FERigidBody.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
@@ -155,12 +156,20 @@ double FENodeForceY::value(const FENode& node)
 //-----------------------------------------------------------------------------
 double FENodeForceZ::value(const FENode& node)
 {
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
+	FESolver* solver = GetFEModel()->GetCurrentStep()->GetFESolver();
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(solver);
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
 		const vector<int>& id = node.m_ID;
 		return (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
+	}
+	FEExplicitSolidSolver* explicitSolver = dynamic_cast<FEExplicitSolidSolver*>(solver);
+	if (explicitSolver)
+	{
+		vector<double>& Fr = explicitSolver->m_Fr;
+		const vector<int>& id = node.m_ID;
+		return (-id[2] - 2 >= 0 ? Fr[-id[2] - 2] : 0);
 	}
 	return 0;
 }
@@ -1967,24 +1976,25 @@ double FELogDiscreteElementForce::value(FEElement& el)
 	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
-	// get the (one) material point data
-	FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
-
 	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
 	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
 	vec3d e = rb1 - ra1; e.unit();
 
-	vec3d F = mp.m_Ft;
-
-	double Fm = F * e;
-
-	return Fm;
+	FEDiscreteElasticMaterialPoint* mp = el.GetMaterialPoint(0)->ExtractData<FEDiscreteElasticMaterialPoint>();
+	assert(mp);
+	if (mp)
+	{
+		vec3d F = mp->m_Ft;
+		double Fm = F * e;
+		return Fm;
+	}
+	else return 0.0;
 }
 
 //-----------------------------------------------------------------------------
 double FELogDiscreteElementForceX::value(FEElement& el)
 {
-	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	FEDiscreteElasticMaterialPoint* mp = el.GetMaterialPoint(0)->ExtractData<FEDiscreteElasticMaterialPoint>();
 	if (mp) return mp->m_Ft.x;
 	else return 0.0;
 }

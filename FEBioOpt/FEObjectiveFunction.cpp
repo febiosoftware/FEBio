@@ -73,17 +73,21 @@ double FEObjectiveFunction::Evaluate(vector<double>& y)
 	// get the measurement vector
 	vector<double> y0(ndata);
 	GetMeasurements(y0);
-    
-    // evaluate regression coefficient R^2
+
+	vector<double> x(ndata);
+	for (int i = 0; i < ndata; ++i) x[i] = i + 1;
+	GetXValues(x);
+
+	// evaluate regression coefficient R^2
 	double rsq = RegressionCoefficient(y0, y);
 
 	double chisq = 0.0;
-	if (m_verbose) feLog("               CURRENT        REQUIRED      DIFFERENCE\n");
+	if (m_verbose) feLog("                        CURRENT        REQUIRED      DIFFERENCE\n");
 	for (int i = 0; i<ndata; ++i)
 	{
 		double dy = (y[i] - y0[i]);
 		chisq += dy*dy;
-		if (m_verbose) feLog("%5d: %15.10lg %15.10lg %15lg\n", i + 1, y[i], y0[i], fabs(y[i] - y0[i]));
+		if (m_verbose) feLog("%15.10lg %15.10lg %15.10lg %15lg\n", x[i], y[i], y0[i], fabs(y[i] - y0[i]));
 	}
 	feLog("objective value: %lg\n", chisq);
     feLog("regression coef: %lg\n", rsq);
@@ -184,13 +188,20 @@ void FEDataFitObjective::GetMeasurements(vector<double>& y0)
 	for (int i = 0; i<ndata; ++i) y0[i] = m_lc.Point(i).y();
 }
 
+void FEDataFitObjective::GetXValues(std::vector<double>& x)
+{
+	x = m_x;
+}
+
 //----------------------------------------------------------------------------
 void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 {
 	int ndata = m_lc.Points();
+	m_x.resize(ndata);
 	for (int i = 0; i<ndata; ++i)
 	{
 		double xi = m_lc.Point(i).x();
+		m_x[i] = xi;
 		f[i] = m_src->Evaluate(xi);
 	}
 }

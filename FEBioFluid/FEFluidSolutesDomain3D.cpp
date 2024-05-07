@@ -413,6 +413,7 @@ void FEFluidSolutesDomain3D::ElementInternalForce(FESolidElement& el, vector<dou
         }
         
         vector<double> dkdt(nsol,0);
+        vector<vec3d> gradk(nsol,vec3d(0,0,0));
         for (int isol=0; isol<nsol; ++isol)
         {
             dkdt[isol] = pt.m_efdot*spt.m_dkdJ[isol];

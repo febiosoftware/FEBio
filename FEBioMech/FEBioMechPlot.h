@@ -427,6 +427,45 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Strain energy density in mixture components
+class FEPlotMixtureStrainEnergyDensity : public FEPlotDomainData
+{
+public:
+    FEPlotMixtureStrainEnergyDensity(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& dom, FEDataStream& a) override;
+protected:
+    int        m_comp;
+    int        m_mat;
+};
+
+//-----------------------------------------------------------------------------
+//! Deviatoric strain energy density in mixture components
+class FEPlotMixtureDevStrainEnergyDensity : public FEPlotDomainData
+{
+public:
+    FEPlotMixtureDevStrainEnergyDensity(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& dom, FEDataStream& a) override;
+protected:
+    int        m_comp;
+    int        m_mat;
+};
+
+//-----------------------------------------------------------------------------
+//! Specific strain energy in mixture components
+class FEPlotMixtureSpecificStrainEnergy : public FEPlotDomainData
+{
+public:
+    FEPlotMixtureSpecificStrainEnergy(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& dom, FEDataStream& a) override;
+protected:
+    int        m_comp;
+    int        m_mat;
+};
+
+//-----------------------------------------------------------------------------
 //! Kinetic energy density
 class FEPlotKineticEnergyDensity : public FEPlotDomainData
 {
@@ -1375,4 +1414,18 @@ class FEPlotBeamCurvature : public FEPlotDomainData
 public:
 	FEPlotBeamCurvature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+// plot the current pressure value of the FEIdealGasPressure load
+class FEIdealGasPressure;
+class FEPlotIdealGasPressure : public FEPlotSurfaceData
+{
+public:
+	FEPlotIdealGasPressure(FEModel* fem) : FEPlotSurfaceData(fem, PLT_FLOAT, FMT_REGION) {}
+	bool Save(FESurface& surf, FEDataStream& a) override;
+
+private:
+	bool Init() override;
+	bool m_binit = false;
+	FEIdealGasPressure* m_load = nullptr;
 };

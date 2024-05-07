@@ -605,13 +605,8 @@ void FEFluidSolver::PrepStep()
         if (bc.IsActive() && HasActiveDofs(bc.GetDofList())) bc.PrepStep(ui);
     }
   
-    // apply prescribed DOFs for specialized surface loads
-    int nsl = fem.ModelLoads();
-    for (int i = 0; i < nsl; ++i)
-    {
-        FEModelLoad& pml = *fem.ModelLoad(i);
-        if (pml.IsActive()) pml.Update();
-    }
+    // do the linear constraints
+    fem.GetLinearConstraintManager().PrepStep();
 
     // initialize material point data
     // NOTE: do this before the stresses are updated
@@ -620,15 +615,32 @@ void FEFluidSolver::PrepStep()
 	// update domain data
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
     
-    // update stresses
-	fem.Update();
+    // update model state
+    UpdateModel();
+
+//    // update stresses
+//	fem.Update();
     
+    for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+    {
+        FENLConstraint* plc = fem.NonlinearConstraint(i);
+        if (plc && plc->IsActive()) plc->PrepStep();
+    }
+
+    // apply prescribed DOFs for specialized surface loads
+    int nsl = fem.ModelLoads();
+    for (int i = 0; i < nsl; ++i)
+    {
+        FEModelLoad& pml = *fem.ModelLoad(i);
+        if (pml.IsActive()) pml.PrepStep();
+    }
+
     // see if we need to do contact augmentations
     m_baugment = false;
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-        if (ci.IsActive() && (ci.m_laugon == 1)) m_baugment = true;
+        if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
     }
     
     // see if we have to do nonlinear constraint augmentations

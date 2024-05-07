@@ -35,7 +35,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidCylindricalJoint, FERigidConnector);
-	ADD_PARAMETER(m_laugon, "laugon");
+	ADD_PARAMETER(m_laugon, "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
 	ADD_PARAMETER(m_atol, "tolerance"     );
 	ADD_PARAMETER(m_gtol, "gaptol"        );
 	ADD_PARAMETER(m_qtol, "angtol"        );
@@ -72,7 +72,7 @@ FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnect
     m_Mp = 0;
     m_bq = false;
 	m_bautopen = false;
-	m_laugon = 1;	// default to augmented Lagrangian
+	m_laugon = FECore::AUGLAG_METHOD;	// default to augmented Lagrangian
 	m_eps = m_ups = 1.0;
 
 	m_F = vec3d(0, 0, 0);
@@ -151,7 +151,7 @@ bool FERigidCylindricalJoint::Init()
 int FERigidCylindricalJoint::InitEquations(int neq)
 {
 	m_EQ.resize(4, -1);
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		// we allocate three equations
 		m_EQ[0] = neq;
@@ -177,7 +177,7 @@ void FERigidCylindricalJoint::BuildMatrixProfile(FEGlobalMatrix& M)
 //-----------------------------------------------------------------------------
 void FERigidCylindricalJoint::Update(const std::vector<double>& ui)
 {
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		m_F.x += ui[m_EQ[0]];
 		m_F.y += ui[m_EQ[1]];
@@ -207,7 +207,7 @@ void FERigidCylindricalJoint::UnpackLM(vector<int>& lm)
 	lm.push_back(m_rbB->m_LM[5]);
 
 	// add the LM equations
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		lm.push_back(m_EQ[0]);
 		lm.push_back(m_EQ[1]);
@@ -235,7 +235,7 @@ void FERigidCylindricalJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	if (m_laugon != 2)
+	if (m_laugon != FECore::LAGMULT_METHOD)
 	{
 		// --- Penalty / Augmented Lagrangian ---
 		vector<double> fa(6);
@@ -417,7 +417,7 @@ void FERigidCylindricalJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	if (m_laugon != 2)
+	if (m_laugon != FECore::LAGMULT_METHOD)
 	{
 		double alpha = tp.alphaf;
 
@@ -703,7 +703,7 @@ void FERigidCylindricalJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 //-----------------------------------------------------------------------------
 bool FERigidCylindricalJoint::Augment(int naug, const FETimeInfo& tp)
 {
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
@@ -825,7 +825,7 @@ bool FERigidCylindricalJoint::Augment(int naug, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FERigidCylindricalJoint::Update()
 {
-	if (m_laugon == 2) return;
+	if (m_laugon == FECore::LAGMULT_METHOD) return;
 
     vec3d ra, rb;
     vec3d za, zb;

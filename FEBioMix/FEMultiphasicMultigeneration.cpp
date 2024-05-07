@@ -131,8 +131,8 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
                     spt.m_sbmr[isbm] += dsbmr;
                     
                     // check bounds
-                    if ((GetSBM(isbm)->m_rhomax > 0) && (spt.m_sbmr[isbm] > GetSBM(isbm)->m_rhomax)) {
-                        dsbmr = GetSBM(isbm)->m_rhomax - spt.m_sbmr[isbm];
+                    if ((spt.m_sbmrmax[isbm] > 0) && (spt.m_sbmr[isbm] > spt.m_sbmrmax[isbm])) {
+                        dsbmr = spt.m_sbmrmax[isbm] - spt.m_sbmr[isbm];
                         mpt.m_gsbmr[ngen-1][isbm] += dsbmr;
                         spt.m_sbmr[isbm] += dsbmr;
                     }
@@ -150,8 +150,8 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
                     spt.m_sbmr[isbm] += dsbmr;
                     
                     // check bounds
-                    if (spt.m_sbmr[isbm] < GetSBM(isbm)->m_rhomin) {
-                        dsbmr = GetSBM(isbm)->m_rhomin - spt.m_sbmr[isbm];
+                    if (spt.m_sbmr[isbm] < spt.m_sbmrmin[isbm]) {
+                        dsbmr = spt.m_sbmrmin[isbm] - spt.m_sbmr[isbm];
                         for (int igen=0; igen<ngen; ++igen)
                             mpt.m_gsbmr[igen][isbm] += mf[igen]*dsbmr;
                         spt.m_sbmr[isbm] += dsbmr;
@@ -183,8 +183,8 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
                     spt.m_sbmr[isbm] += dsbmr;
                     
                     // check bounds
-                    if ((GetSBM(isbm)->m_rhomax > 0) && (spt.m_sbmr[isbm] > GetSBM(isbm)->m_rhomax)) {
-                        dsbmr = GetSBM(isbm)->m_rhomax - spt.m_sbmr[isbm];
+                    if ((spt.m_sbmrmax[isbm] > 0) && (spt.m_sbmr[isbm] > spt.m_sbmrmax[isbm])) {
+                        dsbmr = spt.m_sbmrmax[isbm] - spt.m_sbmr[isbm];
                         mpt.m_gsbmr[ngen-1][isbm] += dsbmr;
                         spt.m_sbmr[isbm] += dsbmr;
                     }
@@ -202,8 +202,8 @@ void FEMultiphasicMultigeneration::UpdateSolidBoundMolecules(FEMaterialPoint& mp
                     spt.m_sbmr[isbm] += dsbmr;
                     
                     // check bounds
-                    if (spt.m_sbmr[isbm] < GetSBM(isbm)->m_rhomin) {
-                        dsbmr = GetSBM(isbm)->m_rhomin - spt.m_sbmr[isbm];
+                    if (spt.m_sbmr[isbm] < spt.m_sbmrmin[isbm]) {
+                        dsbmr = spt.m_sbmrmin[isbm] - spt.m_sbmr[isbm];
                         for (int igen=0; igen<ngen; ++igen)
                             mpt.m_gsbmr[igen][isbm] += mf[igen]*dsbmr;
                         spt.m_sbmr[isbm] += dsbmr;

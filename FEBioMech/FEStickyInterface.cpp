@@ -50,6 +50,7 @@ void FEStickySurface::Data::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEStickyInterface, FEContactInterface)
+	ADD_PARAMETER(m_laugon , "laugon"          )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol   , "tolerance"       );
 	ADD_PARAMETER(m_eps    , "penalty"         );
 	ADD_PARAMETER(m_naugmin, "minaug"          );
@@ -597,7 +598,7 @@ void FEStickyInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 bool FEStickyInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	int i;
 

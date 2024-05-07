@@ -31,20 +31,7 @@ SOFTWARE.*/
 #include <FECore/FEBox.h>
 #include <stdexcept>
 
-vec3d MaterialPointPosition(FESurfaceElement& el, int n)
-{
-	FESurface* surf = dynamic_cast<FESurface*>(el.GetMeshPartition());
-	vec3d r(0, 0, 0);
-	double* H = el.H(n);
-	for (int i = 0; i < el.Nodes(); ++i)
-	{
-		vec3d ri = surf->Node(el.m_lnode[i]).m_rt;
-		r += ri * H[i];
-	}
-	return r;
-}
-
-void UpdateSurface(FESurface& surface)
+void FEContactPotential::UpdateSurface(FESurface& surface)
 {
 // This assumes we are inside a omp parallel region!
 #pragma omp for
@@ -58,7 +45,7 @@ void UpdateSurface(FESurface& surface)
 		for (int n = 0; n < el.GaussPoints(); ++n)
 		{
 			FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
-			mp.m_rt = MaterialPointPosition(el, n);
+			mp.m_rt = surface.Position(el, n);
 			
 			// kinematics at integration points
 			mp.dxr = el.eval_deriv1(re, n);
@@ -117,6 +104,9 @@ double FEContactPotentialSurface::GetContactArea()
 
 
 BEGIN_FECORE_CLASS(FEContactPotential, FEContactInterface)
+	// just adding this parameter for backward compatibility. 
+	ADD_PARAMETER(m_laugon, "laugon")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+
 	ADD_PARAMETER(m_kc, "kc");
 	ADD_PARAMETER(m_p, "p");
 	ADD_PARAMETER(m_Rin, "R_in");

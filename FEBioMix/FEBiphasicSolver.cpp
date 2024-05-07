@@ -132,7 +132,6 @@ bool FEBiphasicSolver::Init()
 	m_Fr.assign(m_neq, 0);
 	m_Ui.assign(m_neq, 0);
 	m_Ut.assign(m_neq, 0);
-	m_Uip.assign(m_neq, 0);
 
 	// we need to fill the total displacement vector m_Ut
 	FEMesh& mesh = fem.GetMesh();
@@ -369,7 +368,7 @@ void FEBiphasicSolver::PrepStep()
 	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-		if (ci.IsActive() && (ci.m_laugon == 1)) m_baugment = true;
+		if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
 	}
 
 	// see if we have to do nonlinear constraint augmentations

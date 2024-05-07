@@ -676,7 +676,7 @@ void FEFluidSolutesSolver::PrepStep()
     for (int i = 0; i < nsl; ++i)
     {
         FEModelLoad& pml = *fem.ModelLoad(i);
-        if (pml.IsActive()) pml.Update();
+        if (pml.IsActive()) pml.PrepStep();
     }
 
     // initialize material point data
@@ -686,15 +686,15 @@ void FEFluidSolutesSolver::PrepStep()
     // update domain data
     for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
     
-    // update stresses
-    fem.Update();
-    
+    // update model state
+    UpdateModel();
+
     // see if we need to do contact augmentations
     m_baugment = false;
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-        if (ci.IsActive() && (ci.m_laugon == 1)) m_baugment = true;
+        if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
     }
     
     // see if we have to do nonlinear constraint augmentations

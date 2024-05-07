@@ -61,7 +61,7 @@ void FSPath::filePath(char* filename, char* path)
     char sep = '/';
 #endif
 
-    sprintf(path,"%s%c", name.substr(0,index).c_str(), sep);
+    snprintf(path, name.length(), "%s%c", name.substr(0,index).c_str(), sep);
 }
 
 

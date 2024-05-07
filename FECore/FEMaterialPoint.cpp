@@ -82,6 +82,9 @@ FEMaterialPoint::FEMaterialPoint(FEMaterialPointData* data)
 {
 	m_data = data;
 	m_elem = nullptr;
+	m_index = -1;
+	m_shape = nullptr;
+	m_J0 = m_Jt = 1;
 }
 
 FEMaterialPoint::~FEMaterialPoint()

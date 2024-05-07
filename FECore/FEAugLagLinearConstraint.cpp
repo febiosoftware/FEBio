@@ -92,7 +92,7 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfe
 	static int nc = 1;
 	m_nID = nc++;
 
-	m_laugon = 1;
+	m_laugon = FECore::AUGLAG_METHOD;
 	m_eps = 1;
 	m_tol = 0.1;
     m_rhs = 0;
@@ -108,7 +108,7 @@ void FELinearConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
 	vector<int> lm;
 	int N = (int)LC.size();
 	vector<FEAugLagLinearConstraint*>::iterator it = LC.begin();
-    if (m_laugon > 1) {
+    if (m_laugon > FECore::AUGLAG_METHOD) {
         for (int i=0; i<N; ++i, ++it)
         {
             int n = (int)(*it)->m_dof.size();
@@ -164,7 +164,7 @@ double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 
 bool FELinearConstraintSet::Augment(int naug, const FETimeInfo& tp)
 {	
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	int M = (int)m_LC.size(), i;
 	vector<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
@@ -219,7 +219,7 @@ void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	int M = (int)m_LC.size();
 	vector<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
-    if (m_laugon == 2) {
+    if (m_laugon == FECore::LAGMULT_METHOD) {
         double alpha = tp.alphaf;
         
         for (int m=0; m<M; ++m, ++im)
@@ -270,7 +270,7 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 
 	int M = (int)m_LC.size();
 	vector<FEAugLagLinearConstraint*>::iterator im = m_LC.begin();
-    if (m_laugon == 2) {
+    if (m_laugon == FECore::LAGMULT_METHOD) {
         double alpha = tp.alphaf;
         for (int m=0; m<M; ++m, ++im)
         {
@@ -344,7 +344,7 @@ void FELinearConstraintSet::Serialize(DumpStream& ar)
 	if (ar.IsShallow() == false)
 	{
 		ar & m_LC;
-        if (m_laugon > 1)
+        if (m_laugon > FECore::AUGLAG_METHOD)
             ar & m_EQ & m_Lm & m_Lmp;
 	}
 }
@@ -356,7 +356,7 @@ bool FELinearConstraintSet::Init()
     
     int M = (int)m_LC.size();
 
-    if (m_laugon == 2) {
+    if (m_laugon == FECore::LAGMULT_METHOD) {
         m_EQ.resize(M, -1);
         m_Lm.resize(M, 0.0);
         m_Lmp.resize(M, 0.0);
@@ -369,7 +369,7 @@ bool FELinearConstraintSet::Init()
 // allocate equations
 int FELinearConstraintSet::InitEquations(int neq)
 {
-    if (m_laugon < 2) return 0;
+    if (m_laugon < FECore::LAGMULT_METHOD) return 0;
     int n = neq;
     for (int i = 0; i < (int)m_LC.size(); ++i) m_EQ[i] = n++;
     
@@ -379,7 +379,7 @@ int FELinearConstraintSet::InitEquations(int neq)
 //-----------------------------------------------------------------------------
 void FELinearConstraintSet::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
-    if (m_laugon < 2) return;
+    if (m_laugon < FECore::LAGMULT_METHOD) return;
     for (int i = 0; i < (int)m_LC.size(); ++i)
     {
         if (m_EQ[i] != -1) m_Lm[i] = m_Lmp[i] + Ui[m_EQ[i]] + ui[m_EQ[i]];
@@ -388,7 +388,7 @@ void FELinearConstraintSet::Update(const std::vector<double>& Ui, const std::vec
 
 void FELinearConstraintSet::PrepStep()
 {
-    if (m_laugon < 2) return;
+    if (m_laugon < FECore::LAGMULT_METHOD) return;
     for (int i = 0; i < (int)m_LC.size(); ++i)
     {
         m_Lmp[i] = m_Lm[i];
@@ -397,7 +397,7 @@ void FELinearConstraintSet::PrepStep()
 
 void FELinearConstraintSet::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
 {
-    if (m_laugon < 2) return;
+    if (m_laugon < FECore::LAGMULT_METHOD) return;
     for (int i = 0; i < (int)m_LC.size(); ++i)
     {
         if (m_EQ[i] != -1) Ui[m_EQ[i]] += ui[m_EQ[i]];

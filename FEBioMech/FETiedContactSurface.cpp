@@ -41,6 +41,16 @@ FETiedContactSurface::Data::Data()
 	m_off = 0.0;
 }
 
+void FETiedContactSurface::Data::Init()
+{
+	FEContactMaterialPoint::Init();
+	m_vgap = vec3d(0, 0, 0);
+	m_rs = vec2d(0, 0);
+	m_Lm = vec3d(0, 0, 0);
+	m_Tc = vec3d(0, 0, 0);
+	m_off = 0.0;
+}
+
 void FETiedContactSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);

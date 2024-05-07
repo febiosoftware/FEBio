@@ -30,16 +30,19 @@ SOFTWARE.*/
 #include "FEFiberPowLinearSBM.h"
 #include "FEMultiphasic.h"
 #include <FECore/log.h>
+#include <FEBioMech/FEElasticMixture.h>
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberPowLinearSBM, FEElasticMaterial)
-	ADD_PARAMETER(m_E0   , FE_RANGE_GREATER_OR_EQUAL(0.0), "E0"   );
+    ADD_PARAMETER(m_E0   , FE_RANGE_GREATER_OR_EQUAL(0.0), "E0"   )->setUnits(UNIT_PRESSURE);;
 	ADD_PARAMETER(m_lam0 , FE_RANGE_GREATER         (1.0), "lam0" );
 	ADD_PARAMETER(m_beta , FE_RANGE_GREATER_OR_EQUAL(2.0), "beta" );
-	ADD_PARAMETER(m_rho0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" );
+    ADD_PARAMETER(m_rho0 , FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0" )->setUnits(UNIT_DENSITY);;
 	ADD_PARAMETER(m_g    , FE_RANGE_GREATER_OR_EQUAL(0.0), "gamma");
-	ADD_PARAMETER(m_sbm  , "sbm"  );
+    ADD_PARAMETER(m_sbm , "sbm")->setEnums("$(sbms)");
+
+    ADD_PROPERTY(m_fiber, "fiber");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -64,12 +67,36 @@ bool FEFiberPowLinearSBM::Init()
 		return false;
 	}
     
-    // fiber direction in local coordinate system (reference configuration)
-    m_n0.x = 1;
-    m_n0.y = 0;
-    m_n0.z = 0;
+    FEElasticMaterial* pem = pMP->GetSolid();
+    FEElasticMixture* psm = dynamic_cast<FEElasticMixture*>(pem);
+    if (psm == nullptr) m_comp = -1;    // in case material is not a solid mixture
+    for (int i=0; i<psm->Materials(); ++i) {
+        pem = psm->GetMaterial(i);
+        if (pem == this) {
+            m_comp = i;
+            break;
+        }
+    }
 
-	return true;
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Create material point data
+FEMaterialPointData* FEFiberPowLinearSBM::CreateMaterialPointData()
+{
+    return new FERemodelingMaterialPoint(new FEElasticMaterialPoint);
+}
+
+//-----------------------------------------------------------------------------
+//! update specialize material point data
+void FEFiberPowLinearSBM::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
+{
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    FERemodelingMaterialPoint* rpt = mp.ExtractData<FERemodelingMaterialPoint>();
+    rpt->m_rhor = spt.m_sbmr[m_lsbm];
+    rpt->m_rhorp = spt.m_sbmrp[m_lsbm];
+    rpt->m_sed = StrainEnergyDensity(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -78,29 +105,35 @@ mat3ds FEFiberPowLinearSBM::Stress(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
+    double lam0 = m_lam0(mp);
+    double beta = m_beta(mp);
+    
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double E = FiberModulus(rhor);
-    double I0 = m_lam0*m_lam0;
-    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
-    double b = ksi*pow(I0-1, m_beta-1) + E/2/sqrt(I0);
+    double E = FiberModulus(mp, rhor);
+    double I0 = lam0*lam0;
+    double ksi = E/4/(beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-beta);
+    double b = ksi*pow(I0-1, beta-1) + E/2/sqrt(I0);
     
     // deformation gradient
     mat3d &F = pt.m_F;
     double J = pt.m_J;
     
     // loop over all integration points
-    vec3d n0, nt;
+    vec3d nt;
     double In, sn;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     mat3ds s;
     
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
+    // get the material coordinate system
+    mat3d Q = GetLocalCS(mp);
 
-    // evaluate fiber direction in global coordinate system
-    n0 = Q*m_n0;
+    // get local fiber direction
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d n0 = Q*fiber;
     
     // Calculate In
     In = n0*(C*n0);
@@ -116,7 +149,7 @@ mat3ds FEFiberPowLinearSBM::Stress(FEMaterialPoint& mp)
         
         // calculate the fiber stress magnitude
         sn = (In < I0) ?
-        2*In*ksi*pow(In-1, m_beta-1) :
+        2*In*ksi*pow(In-1, beta-1) :
         2*b*In - E*sqrt(In);
         
         // calculate the fiber stress
@@ -136,28 +169,34 @@ tens4ds FEFiberPowLinearSBM::Tangent(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
+    double lam0 = m_lam0(mp);
+    double beta = m_beta(mp);
+    
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double E = FiberModulus(rhor);
-    double I0 = m_lam0*m_lam0;
-    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
+    double E = FiberModulus(mp, rhor);
+    double I0 = lam0*lam0;
+    double ksi = E/4/(beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-beta);
     
     // deformation gradient
     mat3d &F = pt.m_F;
     double J = pt.m_J;
     
     // loop over all integration points
-    vec3d n0, nt;
+    vec3d nt;
     double In, cn;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     tens4ds c;
     
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
+    // get the material coordinate system
+    mat3d Q = GetLocalCS(mp);
 
-    // evaluate fiber direction in global coordinate system
-    n0 = Q*m_n0;
+    // get local fiber direction
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d n0 = Q*fiber;
     
     // Calculate In
     In = n0*(C*n0);
@@ -174,7 +213,7 @@ tens4ds FEFiberPowLinearSBM::Tangent(FEMaterialPoint& mp)
         
         // calculate modulus
         cn = (In < I0) ?
-        4*In*In*ksi*(m_beta-1)*pow(In-1, m_beta-2) :
+        4*In*In*ksi*(beta-1)*pow(In-1, beta-2) :
         E*sqrt(In);
         
         // calculate the fiber tangent
@@ -196,24 +235,29 @@ double FEFiberPowLinearSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
     FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
     
+    double lam0 = m_lam0(mp);
+    double beta = m_beta(mp);
+    
     // initialize material constants
     double rhor = spt.m_sbmr[m_lsbm];
-    double E = FiberModulus(rhor);
-    double I0 = m_lam0*m_lam0;
-    double ksi = E/4/(m_beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-m_beta);
-    double b = ksi*pow(I0-1, m_beta-1) + E/2/sqrt(I0);
+    double E = FiberModulus(mp, rhor);
+    double I0 = lam0*lam0;
+    double ksi = E/4/(beta-1)*pow(I0, -3./2.)*pow(I0-1, 2-beta);
+    double b = ksi*pow(I0-1, beta-1) + E/2/sqrt(I0);
     
     // loop over all integration points
-    vec3d n0;
     double In;
     const double eps = 0;
     mat3ds C = pt.RightCauchyGreen();
     
-	// get the local coordinate systems
-	mat3d Q = GetLocalCS(mp);
+    // get the material coordinate system
+    mat3d Q = GetLocalCS(mp);
 
-    // evaluate fiber direction in global coordinate system
-    n0 = Q*m_n0;
+    // get local fiber direction
+    vec3d fiber = m_fiber->unitVector(mp);
+
+    // convert to global coordinates
+    vec3d n0 = Q*fiber;
     
     // Calculate In = n0*C*n0
     In = n0*(C*n0);
@@ -223,9 +267,51 @@ double FEFiberPowLinearSBM::StrainEnergyDensity(FEMaterialPoint& mp)
     {
         // calculate strain energy density
         sed = (In < I0) ?
-        ksi/m_beta*pow(In-1, m_beta) :
-        b*(In-I0) - E*(sqrt(In)-sqrt(I0)) + ksi/m_beta*pow(I0-1, m_beta);
+        ksi/beta*pow(In-1, beta) :
+        b*(In-I0) - E*(sqrt(In)-sqrt(I0)) + ksi/beta*pow(I0-1, beta);
     }
     
     return sed;
 }
+
+//-----------------------------------------------------------------------------
+//! evaluate referential mass density
+double FEFiberPowLinearSBM::Density(FEMaterialPoint& pt)
+{
+    FERemodelingMaterialPoint* rpt = pt.ExtractData<FERemodelingMaterialPoint>();
+    if (rpt) return rpt->m_rhor;
+    else {
+        FEElasticMixtureMaterialPoint* emp = pt.ExtractData<FEElasticMixtureMaterialPoint>();
+        if (emp) {
+            rpt = emp->GetPointData(m_comp)->ExtractData<FERemodelingMaterialPoint>();
+            if (rpt) return rpt->m_rhor;
+        }
+    }
+    return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate strain energy density at material point
+double FEFiberPowLinearSBM::StrainEnergy(FEMaterialPoint& mp)
+{
+    return StrainEnergyDensity(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! calculate tangent of strain energy density with mass density
+double FEFiberPowLinearSBM::Tangent_SE_Density(FEMaterialPoint& mp)
+{
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    double rhor = spt.m_sbmr[m_lsbm];
+    return StrainEnergy(mp)*m_g(mp)/rhor;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate tangent of stress with mass density
+mat3ds FEFiberPowLinearSBM::Tangent_Stress_Density(FEMaterialPoint& mp)
+{
+    FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+    double rhor = spt.m_sbmr[m_lsbm];
+    return Stress(mp)*m_g(mp)/rhor;
+}
+

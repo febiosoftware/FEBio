@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEMeshPartition.h"
+#include "FEMat3dValuator.h"
 
 // forward declaration of material class
 class FEMaterial;
@@ -88,4 +89,7 @@ protected:
 
 	// helper function for unpacking element dofs
 	void UnpackLM(FEElement& el, const FEDofList& dof, vector<int>& lm);
+
+protected:
+	FEMat3dValuator* m_matAxis; // initial material axis
 };

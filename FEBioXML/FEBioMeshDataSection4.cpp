@@ -212,10 +212,10 @@ void FEBioMeshDataSection4::ParseSurfaceData(XMLTag& tag)
 					switch (dataType)
 					{
 					case FE_DOUBLE: { double v; tag.value(v); map->fillValue(v); } break;
-					case FE_VEC2D : { vec3d  v; tag.value(v); map->fillValue(v); } break;
-					case FE_VEC3D : { vec3d  v; tag.value(v); map->fillValue(v); } break;
-					case FE_MAT3D : { mat3d  v; tag.value(v); map->fillValue(v); } break;
-					case FE_MAT3DS: { mat3ds v; tag.value(v); map->fillValue(v); } break;
+					case FE_VEC2D : { vec2d  v; value(tag, v); map->fillValue(v); } break;
+					case FE_VEC3D : { vec3d  v; value(tag, v); map->fillValue(v); } break;
+					case FE_MAT3D : { mat3d  v; value(tag, v); map->fillValue(v); } break;
+					case FE_MAT3DS: { mat3ds v; value(tag, v); map->fillValue(v); } break;
 					default:
 						throw XMLReader::InvalidAttributeValue(tag, "type");
 						break;
@@ -656,33 +656,18 @@ void FEBioMeshDataSection4::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 				if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
 				// read parameters
-				double a[3] = { 0 };
-				double d[3] = { 0 };
+				vec3d a, d;
 				++tag;
 				do
 				{
-					if (tag == "a") tag.value(a, 3);
-					else if (tag == "d") tag.value(d, 3);
+					if (tag == "a") value(tag, a);
+					else if (tag == "d") value(tag, d);
 					else throw XMLReader::InvalidTag(tag);
 					++tag;
 				} while (!tag.isend());
 
-				vec3d v1(a[0], a[1], a[2]);
-				vec3d v2(d[0], d[1], d[2]);
-
-				vec3d e1(v1);
-				vec3d e3 = v1 ^ v2;
-				vec3d e2 = e3 ^ e1;
-
-				// normalize
-				e1.unit();
-				e2.unit();
-				e3.unit();
-
-				// set the value
-				mat3d A(e1, e2, e3);
-
 				// convert to quaternion
+				mat3d A(a, d);
 				quatd Q(A);
 
 				// assign to all material points
@@ -764,31 +749,18 @@ void FEBioMeshDataSection4::ParseMaterialAxes(XMLTag& tag, FEElementSet& set)
 				if (el == 0) throw XMLReader::InvalidAttributeValue(tag, "lid", szlid);
 
 				// read parameters
-				double a[3] = { 0 };
-				double d[3] = { 0 };
+				vec3d a, d;
 				++tag;
 				do
 				{
-					if (tag == "a") tag.value(a, 3);
-					else if (tag == "d") tag.value(d, 3);
+					if (tag == "a") value(tag, a);
+					else if (tag == "d") value(tag, d);
 					else throw XMLReader::InvalidTag(tag);
 					++tag;
 				} while (!tag.isend());
 
-				vec3d v1(a[0], a[1], a[2]);
-				vec3d v2(d[0], d[1], d[2]);
-
-				vec3d e1(v1);
-				vec3d e3 = v1 ^ v2;
-				vec3d e2 = e3 ^ e1;
-
-				// normalize
-				e1.unit();
-				e2.unit();
-				e3.unit();
-
 				// set the value
-				mat3d Q(e1, e2, e3);
+				mat3d Q(a, d);
 				map->setValue(lid, Q);
 			}
 			else throw XMLReader::InvalidTag(tag);

@@ -39,7 +39,8 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FEFacet2FacetSliding, FEContactInterface)
-	BEGIN_PARAM_GROUP("Augmentation");
+	BEGIN_PARAM_GROUP("Enforcement");
+		ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 		ADD_PARAMETER(m_epsn     , "penalty"      );
 		ADD_PARAMETER(m_bautopen , "auto_penalty" );
 		ADD_PARAMETER(m_bupdtpen , "update_penalty");
@@ -74,6 +75,15 @@ FEFacetSlidingSurface::Data::Data()
 	m_eps = 1.0;
 	m_nu = vec3d(0,0,0);
 	m_rs = vec2d(0,0);
+}
+
+void FEFacetSlidingSurface::Data::Init()
+{
+	FEContactMaterialPoint::Init();
+	m_Lm = 0.0;
+	m_eps = 1.0;
+	m_nu = vec3d(0, 0, 0);
+	m_rs = vec2d(0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -1106,7 +1116,7 @@ void FEFacet2FacetSliding::UpdateContactPressures()
 bool FEFacet2FacetSliding::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	bool bconv = true;
 

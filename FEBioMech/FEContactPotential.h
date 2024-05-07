@@ -100,6 +100,8 @@ protected:
 
 	void BuildNeighborTable();
 
+	void UpdateSurface(FESurface& surface);
+
 protected:
 	FEContactPotentialSurface	m_surf1;
 	FEContactPotentialSurface	m_surf2;
