@@ -115900,9 +115900,9 @@ name "subsec:Augmented-Lagrangian-Method"
 In theory, in the presence of constraints, the corresponding Lagrange multiplier
 s must be calculated which, in the case of contact, correspond to the contact
  forces that enforce the contact constraint exactly.
- Unfortunately, the exact evaluation of these Lagrange multiplies is numerically
- very challenging and therefore in FEBio it was decided to evaluate these
- Lagrange multipliers in an iterative method, named the 
+ Unfortunately, the exact evaluation of these Lagrange multipliers is numericall
+y very challenging and therefore in FEBio it was decided to evaluate these
+ Lagrange multipliers using an iterative method, named the 
 \shape italic
 Augmented Lagrangian 
 \shape default
@@ -115943,9 +115943,15 @@ In many cases, users are only interested in the final time step.
  Lagrange method only in the final time step.
  This can be done by defining a loadcurve for the 
 \shape italic
-laugon 
+tolerance
 \shape default
-contact parameter.
+ contact parameter, which sets the convergence tolerance for the augmentations.
+ (Note that you still need to set the enforcement method, i.e.
+ the 
+\emph on
+laugon
+\emph default
+ paramerter, to AUGLAG (=1)).
  Then, define the corresponding loadcurve as zero everywhere except for
  the final time step.
  FEBio will now only use the augmented Lagrangian method in the final time
