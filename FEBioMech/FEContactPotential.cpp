@@ -52,9 +52,6 @@ void FEContactPotential::UpdateSurface(FESurface& surface)
 			mp.dxs = el.eval_deriv2(re, n);
 
 			mp.m_Jt = (mp.dxr ^ mp.dxs).norm();
-
-			mp.m_gap = 0.0;
-			mp.m_tc = vec3d(0, 0, 0);
 		}
 	}
 }
@@ -79,6 +76,24 @@ void FEContactPotentialSurface::GetContactTraction(int nelem, vec3d& tc)
 		tc += mp.m_tc;
 	}
 	tc /= (double)el.GaussPoints();
+}
+
+vec3d FEContactPotentialSurface::GetContactForce()
+{
+	vec3d F(0, 0, 0);
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		double* gw = el.GaussWeights();
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+			vec3d dA = mp.dxr ^ mp.dxs;
+			double da = dA.norm();
+			F += mp.m_tc * (da * gw[n]);
+		}
+	}
+	return F;
 }
 
 double FEContactPotentialSurface::GetContactArea()

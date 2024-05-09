@@ -51,6 +51,8 @@ public:
 	double GetContactArea() override;
 
 	FEMaterialPoint* CreateMaterialPoint() override;
+
+	vec3d GetContactForce() override;
 };
 
 typedef FEContactPotentialSurface::Data FECPContactPoint;
