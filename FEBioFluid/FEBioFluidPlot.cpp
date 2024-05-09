@@ -765,6 +765,44 @@ bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+class FEFluidBodyForce
+{
+public:
+    FEFluidBodyForce(FEModel* fem, FESolidDomain& dom) : m_fem(fem), m_dom(dom) {}
+    
+    vec3d operator()(const FEMaterialPoint& mp)
+    {
+        int NBL = m_fem->ModelLoads();
+        vec3d bf(0,0,0);
+        for (int j = 0; j<NBL; ++j)
+        {
+            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem->ModelLoad(j));
+            FEMaterialPoint pt(mp);
+            if (pbf && pbf->IsActive()) bf += pbf->force(pt);
+        }
+        return bf;
+    }
+
+private:
+    FESolidDomain&    m_dom;
+    FEModel*          m_fem;
+};
+
+bool FEPlotFluidBodyForce::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeAverageElementValue<vec3d>(dom, a, FEFluidBodyForce(GetFEModel(), sd));
+        return true;
+    }
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();

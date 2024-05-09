@@ -23259,7 +23259,7 @@ Now,
 
 \begin_inset Formula 
 \begin{equation}
-\boxed{D\left(\int_{B}\delta\mathbf{w}\cdot\rho^{f}J\mathbf{b}\,dV\right)\left[\Delta\mathbf{w}\right]=0}\label{eq:fsi-bf-2}
+\boxed{D\left(\int_{B}\delta\mathbf{w}\cdot\rho^{f}J\mathbf{b}\,dV\right)\left[\Delta\mathbf{w}\right]=\int_{b}\delta\mathbf{w}\cdot\rho^{f}D\mathbf{b}\left[\Delta\mathbf{w}\right]\,dv}\label{eq:fsi-bf-2}
 \end{equation}
 
 \end_inset
@@ -23295,7 +23295,7 @@ where
 
 \begin_inset Formula 
 \begin{equation}
-\boxed{\mathbf{K}_{ab}^{ww}=\mathbf{0}}\label{eq:fsi-bf-5}
+\boxed{\mathbf{K}_{ab}^{ww}=\alpha_{f}\rho^{f}N_{a}N_{b}\frac{\partial\mathbf{b}}{\partial\mathbf{w}}}\label{eq:fsi-bf-5}
 \end{equation}
 
 \end_inset

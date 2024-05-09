@@ -25,6 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FEBioMech/FEBodyForce.h>
+#include <FECore/quatd.h>
+#include <FECore/FEFunction1D.h>
 
 //! This body load emulates the effect of a moving frame
 class FEFluidMovingFrameLoad : public FEBodyForce
@@ -32,8 +34,8 @@ class FEFluidMovingFrameLoad : public FEBodyForce
 public:
 	FEFluidMovingFrameLoad(FEModel* fem);
 
-	void Activate() override;
-
+    bool Init() override;
+    
 	void PrepStep() override;
 
 	vec3d force(FEMaterialPoint& pt) override;
@@ -41,12 +43,16 @@ public:
 	mat3d stiffness(FEMaterialPoint& pt) override;
 
 private:
-	vec3d	m_w;	// angular velocity of frame
-	vec3d	m_a;	// linear acceleration of frame
-	
-	quatd	m_q;
-	vec3d	m_wp;
-	vec3d	m_al;
+    vec3d   m_omega;    // spatial angular velocity
+    vec3d   m_alpha;    // spatial angular acceleration
+    vec3d   m_c;        // linear translation
+    vec3d   m_cdot;     // linear velocity
+    vec3d   m_cddot;    // linear acceleration
+    quatd   m_q;        // angular position
+    
+public:
+    FEFunction1D*   m_ksi[3];   //!< frame rotation
+    FEFunction1D*   m_ct[3];     //!< frame translation
 
 	DECLARE_FECORE_CLASS();
 };

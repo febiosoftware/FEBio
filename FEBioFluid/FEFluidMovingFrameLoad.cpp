@@ -29,78 +29,70 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEFluidMovingFrameLoad, FEBodyForce)
-	ADD_PARAMETER(m_w.x, "wx")->setLongName("x-angular velocity")->setUnits(UNIT_ANGULAR_VELOCITY);
-	ADD_PARAMETER(m_w.y, "wy")->setLongName("y-angular velocity")->setUnits(UNIT_ANGULAR_VELOCITY);
-	ADD_PARAMETER(m_w.z, "wz")->setLongName("z-angular velocity")->setUnits(UNIT_ANGULAR_VELOCITY);
-	ADD_PARAMETER(m_a.x, "ax")->setLongName("x-linear acceleration")->setUnits(UNIT_ACCELERATION);
-	ADD_PARAMETER(m_a.y, "ay")->setLongName("y-linear acceleration")->setUnits(UNIT_ACCELERATION);
-	ADD_PARAMETER(m_a.z, "az")->setLongName("z-linear acceleration")->setUnits(UNIT_ACCELERATION);
+    ADD_PROPERTY(m_ksi[0], "qx");
+    ADD_PROPERTY(m_ksi[1], "qy");
+    ADD_PROPERTY(m_ksi[2], "qz");
+    ADD_PROPERTY(m_ct[0], "cx");
+    ADD_PROPERTY(m_ct[1], "cy");
+    ADD_PROPERTY(m_ct[2], "cz");
 END_FECORE_CLASS();
 
 FEFluidMovingFrameLoad::FEFluidMovingFrameLoad(FEModel* fem) : FEBodyForce(fem)
 {
-	m_w = vec3d(0, 0, 0);
-	m_al = vec3d(0, 0, 0);
-	m_q = quatd(0, vec3d(0, 0, 1));
+    m_omega = m_alpha = m_c = m_cdot = m_cddot = vec3d(0,0,0);
+    m_q = quatd(vec3d(0,0,0));
 }
 
-void FEFluidMovingFrameLoad::Activate()
+bool FEFluidMovingFrameLoad::Init()
 {
-	m_wp = m_w;
-	FEBodyForce::Activate();
+    for (int k=0; k<3; ++k) {
+        if (!m_ksi[k]->Init()) return false;
+        if (!m_ct[k]->Init()) return false;
+    }
+    
+    return FEBodyForce::Init();
 }
 
 void FEFluidMovingFrameLoad::PrepStep()
 {
-	double dt = GetTimeInfo().timeIncrement;
-	m_al = (m_w - m_wp) / dt;
+    const FETimeInfo& tp = GetTimeInfo();
+    double dt = tp.timeIncrement;
+    double t = tp.currentTime - (1-tp.alphaf)*dt;
 
-	vec3d wa = (m_w + m_wp) * 0.5;
-
-	quatd qn = m_q;
-	quatd wn(wa.x, wa.y, wa.z, 0.0);
-	m_q = qn + (wn * qn) * (0.5 * dt);
-	m_q.MakeUnit();
-	m_wp = m_w;
-
-	vec3d R = m_q.GetRotationVector();
-
-	feLogDebug("al : %lg, %lg, %lg\n", m_al.x, m_al.y, m_al.z);
-	feLogDebug("R : %lg, %lg, %lg\n", R.x, R.y, R.z);
+    vec3d ksi(m_ksi[0]->value(t), m_ksi[1]->value(t), m_ksi[2]->value(t));
+    m_q = quatd(ksi);
+    m_q.MakeUnit();
+    m_omega = vec3d(m_ksi[0]->derive(t), m_ksi[1]->derive(t), m_ksi[2]->derive(t));
+    m_alpha = vec3d(m_ksi[0]->deriv2(t), m_ksi[1]->deriv2(t), m_ksi[2]->deriv2(t));
+    m_c = vec3d(m_ct[0]->value(t), m_ct[1]->value(t), m_ct[2]->value(t));
+    m_cdot = vec3d(m_ct[0]->derive(t), m_ct[1]->derive(t), m_ct[2]->derive(t));
+    m_cddot = vec3d(m_ct[0]->deriv2(t), m_ct[1]->deriv2(t), m_ct[2]->deriv2(t));
 }
 
 vec3d FEFluidMovingFrameLoad::force(FEMaterialPoint& pt)
 {
-	FEFluidMaterialPoint& fp = *pt.ExtractData<FEFluidMaterialPoint>();
+    FEFluidMaterialPoint& fp = *pt.ExtractData<FEFluidMaterialPoint>();
+    
+    vec3d x = pt.m_r0;
+    m_q.RotateVector(x);
+    vec3d v = fp.m_vft;
+    m_q.RotateVector(v);
 
-	quatd qi = m_q.Inverse();
+    // FEBio negates the body force, so we use the negative of the value in the notes
+    vec3d f = (m_cddot + (m_alpha ^ x) + (m_omega ^ (m_omega ^ x)) + (m_omega ^ v)*2);
+    m_q.Inverse().RotateVector(f);
 
-	vec3d r = pt.m_rt;
-	vec3d v = fp.m_vft;
-	vec3d w = qi * m_w;
-	vec3d al = qi * m_al;
-	vec3d f = qi*m_a + (al ^ r) + (w ^ (w ^ r)) + (w ^ v) * 2.0;
-	return f;
+    return f;
 }
 
 mat3d FEFluidMovingFrameLoad::stiffness(FEMaterialPoint& pt)
 {
-	FEFluidMaterialPoint& fp = *pt.ExtractData<FEFluidMaterialPoint>();
-	vec3d v = fp.m_vft;
+    const FETimeInfo& tp = GetTimeInfo();
 
-	const FETimeInfo& tp = GetTimeInfo();
-	double gamma = tp.gamma;
-	double dt = tp.timeIncrement;
+    mat3d What; What.skew(m_omega);
 
-	quatd qi = m_q.Inverse();
-	vec3d w = qi * m_w;
-	vec3d al = qi * m_al;
+    // for fluid analyses the position is not variable
+    mat3d K = m_q.Inverse().RotationMatrix()*What*m_q.RotationMatrix()*(2*tp.alphaf);
 
-	mat3da Sw(w);
-	mat3da A(al);
-	mat3d S2 = Sw * Sw;
-	mat3d K = S2 + A + Sw * (4.0 * gamma / dt);
-
-	// NOTE: we need a negative sign, since the external load stiffness needs to be subtracted from the global stiffness
-	return -K;
+    return K;
 }

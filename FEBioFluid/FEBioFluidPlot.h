@@ -250,6 +250,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element fluid body force
+class FEPlotFluidBodyForce : public FEPlotDomainData
+{
+public:
+    FEPlotFluidBodyForce(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_FORCE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid velocity
 class FEPlotFluidVelocity : public FEPlotDomainData
 {

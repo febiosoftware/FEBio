@@ -74,7 +74,7 @@ END_FECORE_CLASS();
 //! FEFluidFSISolver Construction
 //
 FEFluidFSISolver::FEFluidFSISolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem), \
-m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofR(pfem), m_dofVF(pfem),m_dofAF(pfem),m_dofW(pfem), m_dofAW(pfem), m_dofEF(pfem)
+m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofQ(pfem),m_dofRQ(pfem), m_dofVF(pfem),m_dofAF(pfem),m_dofW(pfem), m_dofAW(pfem), m_dofEF(pfem)
 {
     // default values
     m_Rtol = 0.001;
@@ -119,7 +119,8 @@ m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofR(p
         m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
         m_dofSV.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_VELOCITY));
         m_dofSA.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_ACCELERATION));
-        m_dofR.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RIGID_ROTATION));
+        m_dofQ.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::ROTATION));
+        m_dofRQ.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RIGID_ROTATION));
         m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
         m_dofAW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_ACCELERATION));
         m_dofVF.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_VELOCITY));
@@ -300,12 +301,14 @@ bool FEFluidFSISolver::InitEquations()
     for (int i=0; i<mesh.Nodes(); ++i)
     {
         FENode& n = mesh.Node(i);
-        if (n.m_ID[m_dofU[0] ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofU[1] ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofU[2] ] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSU[0]] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSU[1]] != -1) m_ndeq++;
-        if (n.m_ID[m_dofSU[2]] != -1) m_ndeq++;
+        if (n.m_rid == -1) {
+            if (n.m_ID[m_dofU[0] ] != -1) m_ndeq++;
+            if (n.m_ID[m_dofU[1] ] != -1) m_ndeq++;
+            if (n.m_ID[m_dofU[2] ] != -1) m_ndeq++;
+            if (n.m_ID[m_dofSU[0]] != -1) m_ndeq++;
+            if (n.m_ID[m_dofSU[1]] != -1) m_ndeq++;
+            if (n.m_ID[m_dofSU[2]] != -1) m_ndeq++;
+        }
         if (n.m_ID[m_dofW[0] ] != -1) m_nveq++;
         if (n.m_ID[m_dofW[1] ] != -1) m_nveq++;
         if (n.m_ID[m_dofW[2] ] != -1) m_nveq++;
