@@ -387,7 +387,7 @@ void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEleme
     double *H, *Gr, *Gs, *Gt;
     double* gw = el.GaussWeights();
     vec3d f, kwJ;
-    mat3d Kwu;
+    mat3d Kwu, Kww, K;
     
     // gradient of shape functions
     vector<vec3d> gradN(neln);
@@ -411,7 +411,8 @@ void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEleme
         double dens = m_pMat->Fluid()->Density(mp);
         
         // get the force
-        f = BF.force(mp)*(dens*detJ);
+        f = BF.force(mp);
+        K = BF.stiffness(mp);
         
         H = el.H(n);
         Gr = el.Gr(n);
@@ -425,11 +426,15 @@ void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEleme
         for (int i=0; i<neln; ++i) {
             for (int j=0; j<neln; ++j)
             {
-                kwJ = f*(-H[i]*H[j]/(pt.m_ef+1));
-                Kwu = (f & gradN[j])*H[i];
+                kwJ = f*(-H[i]*H[j]*dens/(pt.m_ef+1)*detJ);
+                Kwu = (f & gradN[j])*(dens*H[i]*detJ);
+                Kww = K*(H[i]*H[j]*dens*detJ);
                 ke[ndof*i+3][ndof*j  ] += Kwu(0,0); ke[ndof*i+3][ndof*j+1] += Kwu(0,1); ke[ndof*i+3][ndof*j+2] += Kwu(0,2);
                 ke[ndof*i+4][ndof*j  ] += Kwu(1,0); ke[ndof*i+4][ndof*j+1] += Kwu(1,1); ke[ndof*i+4][ndof*j+2] += Kwu(1,2);
                 ke[ndof*i+5][ndof*j  ] += Kwu(2,0); ke[ndof*i+5][ndof*j+1] += Kwu(2,1); ke[ndof*i+5][ndof*j+2] += Kwu(2,2);
+                ke[ndof*i+3][ndof*j+3] += Kww(0,0); ke[ndof*i+3][ndof*j+4] += Kwu(0,1); ke[ndof*i+3][ndof*j+5] += Kwu(0,2);
+                ke[ndof*i+4][ndof*j+3] += Kww(1,0); ke[ndof*i+4][ndof*j+4] += Kwu(1,1); ke[ndof*i+4][ndof*j+5] += Kwu(1,2);
+                ke[ndof*i+5][ndof*j+3] += Kww(2,0); ke[ndof*i+5][ndof*j+4] += Kwu(2,1); ke[ndof*i+5][ndof*j+5] += Kwu(2,2);
                 ke[ndof*i+3][ndof*j+6] += kwJ.x;
                 ke[ndof*i+4][ndof*j+6] += kwJ.y;
                 ke[ndof*i+5][ndof*j+6] += kwJ.z;
