@@ -301,14 +301,12 @@ bool FEFluidFSISolver::InitEquations()
     for (int i=0; i<mesh.Nodes(); ++i)
     {
         FENode& n = mesh.Node(i);
-        if (n.m_rid == -1) {
-            if (n.m_ID[m_dofU[0] ] != -1) m_ndeq++;
-            if (n.m_ID[m_dofU[1] ] != -1) m_ndeq++;
-            if (n.m_ID[m_dofU[2] ] != -1) m_ndeq++;
-            if (n.m_ID[m_dofSU[0]] != -1) m_ndeq++;
-            if (n.m_ID[m_dofSU[1]] != -1) m_ndeq++;
-            if (n.m_ID[m_dofSU[2]] != -1) m_ndeq++;
-        }
+        if (n.m_ID[m_dofU[0] ] != -1) m_ndeq++;
+        if (n.m_ID[m_dofU[1] ] != -1) m_ndeq++;
+        if (n.m_ID[m_dofU[2] ] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[0]] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[1]] != -1) m_ndeq++;
+        if (n.m_ID[m_dofSU[2]] != -1) m_ndeq++;
         if (n.m_ID[m_dofW[0] ] != -1) m_nveq++;
         if (n.m_ID[m_dofW[1] ] != -1) m_nveq++;
         if (n.m_ID[m_dofW[2] ] != -1) m_nveq++;
