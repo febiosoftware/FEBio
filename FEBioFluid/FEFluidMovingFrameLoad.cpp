@@ -41,6 +41,13 @@ FEFluidMovingFrameLoad::FEFluidMovingFrameLoad(FEModel* fem) : FEBodyForce(fem)
 {
     m_omega = m_alpha = m_c = m_cdot = m_cddot = vec3d(0,0,0);
     m_q = quatd(vec3d(0,0,0));
+	m_ksi[0] = nullptr;
+	m_ksi[1] = nullptr;
+	m_ksi[2] = nullptr;
+
+	m_ct[0] = nullptr;
+	m_ct[1] = nullptr;
+	m_ct[2] = nullptr;
 }
 
 bool FEFluidMovingFrameLoad::Init()
