@@ -1118,6 +1118,26 @@ mat2d FESurface::MetricP(FESurfaceElement& el, int n)
 }
 
 //-----------------------------------------------------------------------------
+//! This function calculates the global location of an integration point in its reference configuration
+//!
+
+vec3d FESurface::Local2Global0(FESurfaceElement &el, int n)
+{
+    FEMesh& m = *m_pMesh;
+    
+    // get the shape functions at this integration point
+    double* H = el.H(n);
+    
+    // calculate the location
+    vec3d r(0);
+    int ne = el.Nodes();
+    if (!m_bshellb) for (int i=0; i<ne; ++i) r += m.Node(el.m_node[i]).m_r0*H[i];
+    else for (int i=0; i<ne; ++i) r += m.Node(el.m_node[i]).s0()*H[i];
+    
+    return r;
+}
+
+//-----------------------------------------------------------------------------
 //! Given an element an the natural coordinates of a point in this element, this
 //! function returns the global position vector.
 vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
@@ -1416,6 +1436,38 @@ void FESurface::CoBaseVectorsP(FESurfaceElement& el, int j, vec3d t[2])
     {
         t[0] += m.Node(el.m_node[i]).m_rp*Hr[i];
         t[1] += m.Node(el.m_node[i]).m_rp*Hs[i];
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the covariant base vectors of a surface element
+//! at an integration point in the reference configuration
+
+void FESurface::CoBaseVectors0(const FESurfaceElement& el, int j, vec3d t[2]) const
+{
+    FEMesh& m = *m_pMesh;
+    
+    // get the nr of nodes
+    int n = el.Nodes();
+    
+    // get the shape function derivatives
+    double* Hr = el.Gr(j);
+    double* Hs = el.Gs(j);
+    
+    t[0] = t[1] = vec3d(0,0,0);
+    if (!m_bshellb) {
+        for (int i=0; i<n; ++i)
+        {
+            t[0] += m.Node(el.m_node[i]).m_r0*Hr[i];
+            t[1] += m.Node(el.m_node[i]).m_r0*Hs[i];
+        }
+    }
+    else {
+        for (int i=0; i<n; ++i)
+        {
+            t[0] -= m.Node(el.m_node[i]).s0()*Hr[i];
+            t[1] -= m.Node(el.m_node[i]).s0()*Hs[i];
+        }
     }
 }
 

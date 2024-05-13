@@ -627,6 +627,26 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotEnclosedVolumeChange::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    writeIntegratedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+        FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
+        int n = mp.m_index;
+        vec3d xi = pcs->Local2Global(el, n);
+        vec3d g[2];
+        pcs->CoBaseVectors(el, n, g);
+        vec3d Xi = pcs->Local2Global0(el, n);
+        vec3d G[2];
+        pcs->CoBaseVectors0(el, n, G);
+        return (xi*(g[0] ^ g[1]) - Xi*(G[0] ^ G[1])) / 3;
+    });
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotSurfaceArea::Save(FESurface &surf, FEDataStream &a)
 {
     FESurface* pcs = &surf;
