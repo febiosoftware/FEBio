@@ -260,6 +260,22 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Enclosed volume change
+//!
+class FEPlotEnclosedVolumeChange : public FEPlotSurfaceData
+{
+private:
+    bool                m_binit;
+    vector<FEElement*>  m_elem;
+    vector<vec3d>       m_area;
+    
+public:
+    FEPlotEnclosedVolumeChange(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION){ m_binit = true; SetUnits(UNIT_VOLUME);
+    }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Surface area
 //!
 class FEPlotSurfaceArea : public FEPlotSurfaceData
