@@ -46026,7 +46026,7 @@ An asterisk (*) in the Category column denotes that the attribute is required
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="138" columns="3">
+<lyxtabular version="3" rows="139" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -47194,6 +47194,35 @@ Surface*
 
 \begin_layout Plain Layout
 Volume enclosed by named surface
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+enclosed volume change
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Change in volume enclosed by named surface
 \end_layout
 
 \end_inset
