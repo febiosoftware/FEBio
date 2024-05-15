@@ -34,25 +34,23 @@ class FEFluidMovingFrameLoad : public FEBodyForce
 public:
 	FEFluidMovingFrameLoad(FEModel* fem);
 
-    bool Init() override;
-    
+	void Activate() override;
+
 	void PrepStep() override;
 
 	vec3d force(FEMaterialPoint& pt) override;
 
 	mat3d stiffness(FEMaterialPoint& pt) override;
 
-private:
-    vec3d   m_omega;    // spatial angular velocity
-    vec3d   m_alpha;    // spatial angular acceleration
-    vec3d   m_c;        // linear translation
-    vec3d   m_cdot;     // linear velocity
-    vec3d   m_cddot;    // linear acceleration
-    quatd   m_q;        // angular position
-    
 public:
-    FEFunction1D*   m_ksi[3];   //!< frame rotation
-    FEFunction1D*   m_ct[3];     //!< frame translation
+	vec3d	m_at;
+	vec3d	m_wt;
+
+private:
+	vec3d	m_wp, m_w;
+	vec3d	m_ap, m_a;
+	vec3d	m_alt, m_alp, m_al;
+	quatd	m_qt, m_qp, m_q;
 
 	DECLARE_FECORE_CLASS();
 };

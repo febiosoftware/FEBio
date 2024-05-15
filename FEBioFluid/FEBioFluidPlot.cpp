@@ -780,7 +780,8 @@ public:
             FEMaterialPoint pt(mp);
             if (pbf && pbf->IsActive()) bf += pbf->force(pt);
         }
-        return bf;
+		// FEBio actually applies the negative of the body force
+        return -bf;
     }
 
 private:

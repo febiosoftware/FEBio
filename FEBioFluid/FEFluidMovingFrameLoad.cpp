@@ -29,77 +29,78 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEFluidMovingFrameLoad, FEBodyForce)
-    ADD_PROPERTY(m_ksi[0], "qx");
-    ADD_PROPERTY(m_ksi[1], "qy");
-    ADD_PROPERTY(m_ksi[2], "qz");
-    ADD_PROPERTY(m_ct[0], "cx");
-    ADD_PROPERTY(m_ct[1], "cy");
-    ADD_PROPERTY(m_ct[2], "cz");
+    ADD_PARAMETER(m_at.x, "ax");
+    ADD_PARAMETER(m_at.y, "ay");
+    ADD_PARAMETER(m_at.z, "az");
+	ADD_PARAMETER(m_wt.x, "wx");
+	ADD_PARAMETER(m_wt.y, "wy");
+	ADD_PARAMETER(m_wt.z, "wz");
 END_FECORE_CLASS();
 
 FEFluidMovingFrameLoad::FEFluidMovingFrameLoad(FEModel* fem) : FEBodyForce(fem)
 {
-    m_omega = m_alpha = m_c = m_cdot = m_cddot = vec3d(0,0,0);
-    m_q = quatd(vec3d(0,0,0));
-	m_ksi[0] = nullptr;
-	m_ksi[1] = nullptr;
-	m_ksi[2] = nullptr;
-
-	m_ct[0] = nullptr;
-	m_ct[1] = nullptr;
-	m_ct[2] = nullptr;
 }
 
-bool FEFluidMovingFrameLoad::Init()
+void FEFluidMovingFrameLoad::Activate()
 {
-    for (int k=0; k<3; ++k) {
-        if (!m_ksi[k]->Init()) return false;
-        if (!m_ct[k]->Init()) return false;
-    }
-    
-    return FEBodyForce::Init();
+	m_wp = m_wt;
+	m_ap = m_at;
+	m_alp = m_alt;
+	m_qp = m_qt;
+	FEBodyForce::Activate();
 }
 
 void FEFluidMovingFrameLoad::PrepStep()
 {
-    const FETimeInfo& tp = GetTimeInfo();
-    double dt = tp.timeIncrement;
-    double t = tp.currentTime - (1-tp.alphaf)*dt;
+	const FETimeInfo& tp = GetTimeInfo();
+	double dt = tp.timeIncrement;
+	double alpha = tp.alpha;
 
-    vec3d ksi(m_ksi[0]->value(t), m_ksi[1]->value(t), m_ksi[2]->value(t));
-    m_q = quatd(ksi);
-    m_q.MakeUnit();
-    m_omega = vec3d(m_ksi[0]->derive(t), m_ksi[1]->derive(t), m_ksi[2]->derive(t));
-    m_alpha = vec3d(m_ksi[0]->deriv2(t), m_ksi[1]->deriv2(t), m_ksi[2]->deriv2(t));
-    m_c = vec3d(m_ct[0]->value(t), m_ct[1]->value(t), m_ct[2]->value(t));
-    m_cdot = vec3d(m_ct[0]->derive(t), m_ct[1]->derive(t), m_ct[2]->derive(t));
-    m_cddot = vec3d(m_ct[0]->deriv2(t), m_ct[1]->deriv2(t), m_ct[2]->deriv2(t));
+	// evaluate quantities at current time (t) and intermediate time
+	m_a = m_at * alpha + m_ap * (1.0 - alpha);
+	m_ap = m_at;
+
+	m_alp = m_alt;
+	m_alt = (m_wt - m_wp) / dt;
+	m_al = m_alt * alpha + m_alp * (1.0 - alpha);
+
+	m_w = m_wt * alpha + m_wp * (1.0 - alpha);
+
+	quatd wa(m_w.x, m_w.y, m_w.z, 0.0);
+	quatd wt(m_wt.x, m_wt.y, m_wt.z, 0.0);
+
+	m_qt = m_qp + (wt * m_qp) * (0.5 * dt); m_qt.MakeUnit();
+	m_q = m_qp + (wa * m_qp) * (0.5 * dt * alpha); m_q.MakeUnit();
+
+	m_qp = m_qt;
+	m_wp = m_wt;
+
+	FEBodyForce::PrepStep();
 }
 
 vec3d FEFluidMovingFrameLoad::force(FEMaterialPoint& pt)
 {
-    FEFluidMaterialPoint& fp = *pt.ExtractData<FEFluidMaterialPoint>();
-    
-    vec3d x = pt.m_r0;
-    m_q.RotateVector(x);
-    vec3d v = fp.m_vft;
-    m_q.RotateVector(v);
+	FEFluidMaterialPoint& fp = *pt.ExtractData<FEFluidMaterialPoint>();
 
-    // FEBio negates the body force, so we use the negative of the value in the notes
-    vec3d f = (m_cddot + (m_alpha ^ x) + (m_omega ^ (m_omega ^ x)) + (m_omega ^ v)*2);
-    m_q.Inverse().RotateVector(f);
-
-    return f;
+	quatd qi = m_q.Inverse();
+	vec3d a = m_a;
+	vec3d w = m_w;
+	vec3d W = qi * w;
+	vec3d r = pt.m_r0;
+	vec3d V = fp.m_vft;
+	vec3d al = qi * m_al;
+	vec3d f = qi * a + (al ^ r) + (W ^ (W ^ r)) + (W ^ V) * 2.0;
+	return f;
 }
 
 mat3d FEFluidMovingFrameLoad::stiffness(FEMaterialPoint& pt)
 {
-    const FETimeInfo& tp = GetTimeInfo();
+	const FETimeInfo& tp = GetTimeInfo();
 
-    mat3d What; What.skew(m_omega);
+	quatd qi = m_q.Inverse();
+	vec3d W = qi * m_w;
+	mat3da Sw(W);
+	mat3d K = Sw* (2.0 * tp.alphaf);
 
-    // for fluid analyses the position is not variable
-    mat3d K = m_q.Inverse().RotationMatrix()*What*m_q.RotationMatrix()*(2*tp.alphaf);
-
-    return K;
+	return K;
 }

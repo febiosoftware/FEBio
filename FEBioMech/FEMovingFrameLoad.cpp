@@ -119,6 +119,5 @@ mat3d FEMovingFrameLoad::stiffness(FEMaterialPoint& pt)
 	mat3d S2 = Sw * Sw;
 	mat3d K = (S2 + A + Sw * (4.0 * gamma / dt))*alpha;
 
-	// NOTE: we need a negative sign, since the external load stiffness needs to be subtracted from the global stiffness
-	return -K;
+	return K;
 }
