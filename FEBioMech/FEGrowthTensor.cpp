@@ -25,13 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #include "stdafx.h"
+#include <FEBioMix/febiomix_api.h>
 #include "FEGrowthTensor.h"
 #include <FECore/FEConstValueVec3.h>
 #include <FECore/FEModel.h>
 #include <FEBioMix/FEMultiphasic.h>
 #include <FEBioMix/FEElasticReactionDiffusion.h>
+#include <FEBioMix/FEChemicalReactionERD.h>
+#include <FEBioMix/FEReactionERD.h>
 #include <FECore/log.h>
 #include <iostream>
+#include <limits>
 
 //-----------------------------------------------------------------------------
 //! Growth tensor
@@ -72,8 +76,8 @@ mat3d FEVolumeGrowth::GrowthTensor(FEMaterialPoint& pt, const vec3d& n0)
     FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
     FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
     double theta = kp->m_theta;
-    double gmani = 1.0 + theta;
-    return mat3dd(gmani);
+    double gmiso = 1.0 + theta;
+    return mat3dd(gmiso);
 }
 
 //-----------------------------------------------------------------------------
@@ -92,6 +96,29 @@ double FEVolumeGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
     return pow(Fg[0][0], 3);*/
     FEKinematicMaterialPoint& kp = *pt.ExtractData<FEKinematicMaterialPoint>();
     return pow(kp.m_theta, 3);
+}
+
+//-----------------------------------------------------------------------------
+//! returns dFgdtheta for volume-type growth
+mat3ds FEVolumeGrowth::dFgdtheta(FEMaterialPoint& pt, const vec3d& n0)
+{
+    double theta = this->GrowthRate(pt);
+    return (1.0 / 3.0) * pow(theta, -2.0 / 3.0) * mat3dd(1.0);
+}
+
+//-----------------------------------------------------------------------------
+//! returns dkdtheta for volume-type growth
+double FEVolumeGrowth::dkdtheta(FEMaterialPoint& pt)
+{
+    //double theta = GrowthRate(pt);
+    //double lhnum = exp((-theta_a - theta) / theta_gamma);
+    //double rhnum = exp((theta_a - theta) / theta_gamma);
+    //double lhden = theta_gamma * pow((lhnum + 1.0), 2.0);
+    //double rhden = theta_gamma * pow((rhnum + 1.0), 2.0);
+
+    //double dkdtheta = k_max * ((lhnum / lhden) + (rhnum / rhden));
+    //return dkdtheta;
+    return 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -127,6 +154,29 @@ double FEAreaGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 }
 
 //-----------------------------------------------------------------------------
+//! returns dFgdtheta for area-type growth
+mat3ds FEAreaGrowth::dFgdtheta(FEMaterialPoint& pt, const vec3d& n0)
+{
+    double theta = this->GrowthRate(pt);
+    return 0.5 * pow(theta, -0.5) * (mat3dd(1.0) - (n0 & n0)).sym();
+}
+
+//-----------------------------------------------------------------------------
+//! returns dkdtheta for area-type growth
+double FEAreaGrowth::dkdtheta(FEMaterialPoint& pt)
+{
+    //double theta = GrowthRate(pt);
+    //double lhnum = exp((-theta_a - theta) / theta_gamma);
+    //double rhnum = exp((theta_a - theta) / theta_gamma);
+    //double lhden = theta_gamma * pow((lhnum + 1.0), 2.0);
+    //double rhden = theta_gamma * pow((rhnum + 1.0), 2.0);
+
+    //double dkdtheta = k_max * ((lhnum / lhden) + (rhnum / rhden));
+    //return dkdtheta;+
+    return 0.0;
+}
+
+//-----------------------------------------------------------------------------
 //! Fiber growth
 //!
 
@@ -138,9 +188,9 @@ mat3d FEFiberGrowth::GrowthTensor(FEMaterialPoint& pt, const vec3d& n0)
     FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
     double theta = kp->m_theta;
     double gmiso = 1.0;
-    double gmani = 1.0 + theta;
+    double gmani = theta - 1.0;
     vec3d n = m_referential_normal_flag ? n0 : UpdateNormal(pt, n0);
-    mat3d Fg = mat3dd(gmiso) + (n & n) * (gmani - 1);
+    mat3d Fg = mat3dd(gmiso) + (n & n) * gmani;
     return Fg;
 }
 
@@ -158,7 +208,28 @@ double FEFiberGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 {
     //return m_gm(pt);
     FEKinematicMaterialPoint& kp = *pt.ExtractData<FEKinematicMaterialPoint>();
-    return kp.m_theta;
+    return m_gm(pt) * kp.m_theta;
+}
+
+//-----------------------------------------------------------------------------
+//! returns dFgdtheta for fiber-type growth
+mat3ds FEFiberGrowth::dFgdtheta(FEMaterialPoint& pt, const vec3d& n0)
+{
+    return (n0 & n0).sym();
+}
+
+//-----------------------------------------------------------------------------
+//! returns dkdtheta for fiber-type growth
+double FEFiberGrowth::dkdtheta(FEMaterialPoint& pt)
+{
+    double theta = GrowthRate(pt);
+    double lhnum = exp((-theta_a - theta) / theta_gamma);
+    double rhnum = exp((theta_a - theta) / theta_gamma);
+    double lhden = theta_gamma * pow((lhnum + 1.0), 2.0);
+    double rhden = theta_gamma * pow((rhnum + 1.0), 2.0);
+
+    double dkdtheta = k_max * ((lhnum / lhden) + (rhnum / rhden));
+    return dkdtheta;
 }
 
 //-----------------------------------------------------------------------------
@@ -196,7 +267,7 @@ double FEGrowthTensor::SoluteConcentration(FEMaterialPoint& pt)
     FEElement* m_el = pt.m_elem;
     FEDomain& dom = dynamic_cast<FEDomain&>(*m_el->GetMeshPartition());
     FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(dom.GetMaterial());
-    if(pm)
+    if (pm)
         return pm->GetActualSoluteConcentration(pt, m_sol_id - 1);
     else {
         FEElasticReactionDiffusionInterface* pm = dynamic_cast<FEElasticReactionDiffusionInterface*>(dom.GetMaterial());
@@ -260,8 +331,11 @@ double FEGrowthTensor::Sigmoid(double a, double x, double x0, double b)
 
 double FEGrowthTensor::GrowthRate(FEMaterialPoint& pt)
 {
+    FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
     double k_theta = ActivationFunction(pt);
     double phi = EnvironmentalFunction(pt);
     double dtheta = m_gm(pt) * k_theta * phi;
+    double dt = this->CurrentTimeIncrement();    
+
     return dtheta;
 }

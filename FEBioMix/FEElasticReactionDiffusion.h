@@ -33,6 +33,8 @@ SOFTWARE.*/
 #include "FEChemicalReactionERD.h"
 #include "FEElasticReactionDiffusionInterface.h"
 #include <FECore/FEModelParam.h>
+#include <FEBioMech/FEKinematicGrowth.h>
+#include <FEBioMech/FEGrowthTensor.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for elastic reaction diffusion materials.
@@ -54,6 +56,8 @@ public:
 
 	// return elastic material component
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
+
+	FEKinematicGrowth* GetKinematicGrowthMaterial() { return dynamic_cast<FEKinematicGrowth*>(m_pSolid); }
 
 public:
 	

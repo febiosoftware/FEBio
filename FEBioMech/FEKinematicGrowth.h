@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Material class that implements Kinematic growth model.
 //
-class FEKinematicGrowth : public FEElasticMaterial
+class FEBIOMECH_API FEKinematicGrowth : public FEElasticMaterial
 {
 public:
     FEKinematicGrowth(FEModel* pfem);
@@ -79,6 +79,15 @@ public:
     
     //! Returns the spatial tangent
     tens4ds Tangent(FEMaterialPoint& mp) override;
+
+    //! Returns the spatial tangent
+    mat3ds dSdtheta(FEMaterialPoint& mp);
+    
+    //! Returns dSdFg
+    tens4ds dSdFg(FEMaterialPoint& mp);
+
+    //! Returns dTdc
+    mat3ds dTdc(FEMaterialPoint& mp, int sol);
 
     //! Returns the strain energy density
     double StrainEnergyDensity(FEMaterialPoint& mp) override;

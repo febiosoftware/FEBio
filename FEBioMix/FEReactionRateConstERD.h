@@ -41,6 +41,9 @@ public:
 	//! tangent of reaction rate with strain at material point
 	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override { return mat3ds(0); }
 
+	//! tangent of reaction rate with Cauchy stress (sigma) at material point
+	mat3ds Tangent_ReactionRate_Stress(FEMaterialPoint& pt) override { return mat3ds(0); }
+
 public:
 	FEParamDouble   m_k;		//!< reaction rate
 

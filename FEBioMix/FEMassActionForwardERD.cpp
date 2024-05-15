@@ -32,15 +32,14 @@ SOFTWARE.*/
 #include "FEBiphasic.h"
 
 BEGIN_FECORE_CLASS(FEMassActionForwardERD, FEChemicalReactionERD)
-// set material properties
-ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
 END_FECORE_CLASS();
 
 //! constructor
 //-----------------------------------------------------------------------------
 FEMassActionForwardERD::FEMassActionForwardERD(FEModel* pfem) : FEChemicalReactionERD(pfem)
 {
-
+    // set material properties
+    ADD_PROPERTY(m_pFwd, "forward_rate", FEProperty::Optional);
 }
 
 //-----------------------------------------------------------------------------
@@ -90,4 +89,11 @@ double FEMassActionForwardERD::Tangent_ReactionSupply_Concentration(FEMaterialPo
         dzhatdc = (m_vR[sol] / c) * zhat;
 
     return dzhatdc;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of molar supply with Cauchy stress (sigma) at material point
+mat3ds FEMassActionForwardERD::Tangent_ReactionSupply_Stress(FEMaterialPoint& pt)
+{
+    return mat3ds(0);
 }

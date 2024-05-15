@@ -45,6 +45,9 @@ public:
     //! tangent of reaction rate with strain at material point
     virtual mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) = 0;
 
+    //! tangent of reaction rate with Cauchy stress (sigma) at material point
+    virtual mat3ds Tangent_ReactionRate_Stress(FEMaterialPoint& pt) = 0;
+
     //! reset, initialize and update chemical reaction data in the FESolutesMaterialPoint
     virtual void ResetElementData(FEMaterialPoint& mp) {}
     virtual void InitializeElementData(FEMaterialPoint& mp) {}
@@ -102,6 +105,9 @@ public:
 
     //! tangent of molar supply with effective concentration at material point
     virtual double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) = 0;
+
+    //! tangent of molar supply with Cauchy stress (sigma) at material point
+    virtual mat3ds Tangent_ReactionSupply_Stress(FEMaterialPoint& pt) = 0;
 
 public:
     //! Serialization

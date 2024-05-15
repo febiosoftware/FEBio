@@ -65,3 +65,10 @@ double FEConcentrationIndependentReactionERD::Tangent_ReactionSupply_Concentrati
 {
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+//! tangent of molar supply with Cauchy stress (sigma) at material point
+mat3ds FEConcentrationIndependentReactionERD::Tangent_ReactionSupply_Stress(FEMaterialPoint& pt)
+{
+	return mat3ds(0.0);
+}

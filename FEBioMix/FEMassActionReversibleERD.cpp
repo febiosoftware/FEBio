@@ -136,3 +136,12 @@ double FEMassActionReversibleERD::Tangent_ReactionSupply_Concentration(FEMateria
 
     return dzhatFdc - dzhatRdc;
 }
+
+//-----------------------------------------------------------------------------
+//! tangent of molar supply with Cauchy stress (sigma) at material point
+mat3ds FEMassActionReversibleERD::Tangent_ReactionSupply_Stress(FEMaterialPoint& pt)
+{
+    // if the reaction supply is insensitive to strain
+    return mat3ds(0);
+
+}

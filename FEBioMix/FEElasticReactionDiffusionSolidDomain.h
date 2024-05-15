@@ -33,6 +33,9 @@ SOFTWARE.*/
 #include "FEElasticReactionDiffusionStandard.h"
 #include "FEElasticReactionDiffusionDomain.h"
 #include <FECore/FEDofList.h>
+#include <FEBioMech/FEKinematicGrowth.h>
+#include <FEBioMech/FEGrowthTensor.h>
+
 
 //-----------------------------------------------------------------------------
 //! Domain class for elastic reaction diffusion 3D solid elements
@@ -92,7 +95,9 @@ public:
         
     //! calculates the element triphasic stiffness matrix
     bool ElementElasticReactionDiffusionStiffness(FESolidElement& el, matrix& ke, bool bsymm);
-    
+
+public:
+    FEKinematicGrowth* m_KG = nullptr;
 protected: // overridden from FEElasticDomain, but not implemented in this domain
     void BodyForce(FEGlobalVector& R, FEBodyForce& bf) override {}
     void InertialForces(FEGlobalVector& R, vector<double>& F) override {}

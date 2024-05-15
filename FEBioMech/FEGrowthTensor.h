@@ -28,6 +28,8 @@ SOFTWARE.*/
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterial.h"
 #include "febiomech_api.h"
+#include <FEBioMix/FEChemicalReactionERD.h>
+#include <FEBioMix/FEReactionERD.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for growth tensors.
@@ -49,6 +51,12 @@ public:
 
     //! referential solid density
     virtual double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) = 0;
+
+    //! dFgdtheta
+    virtual mat3ds dFgdtheta(FEMaterialPoint& pt, const vec3d& a0) = 0;
+
+    //! dkdtheta
+    virtual double dkdtheta(FEMaterialPoint& pt) = 0;
 
     double SoluteConcentration(FEMaterialPoint& pt);
 
@@ -104,6 +112,12 @@ public:
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
 
+    //! dFgdtheta
+    mat3ds dFgdtheta(FEMaterialPoint& pt, const vec3d& a0) override;
+
+    //! dkdtheta
+    virtual double dkdtheta(FEMaterialPoint& pt) override;
+
 public:
 
     // declare the parameter list
@@ -128,6 +142,12 @@ public:
 
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
+    
+    //! dFgdtheta
+    mat3ds dFgdtheta(FEMaterialPoint& pt, const vec3d& a0) override;
+
+    //! dkdtheta
+    virtual double dkdtheta(FEMaterialPoint& pt) override;
 
 public:
     FEVec3dValuator* m_fiber_0;
@@ -153,6 +173,12 @@ public:
 
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
+
+    //! dFgdtheta
+    mat3ds dFgdtheta(FEMaterialPoint& pt, const vec3d& a0) override;
+
+    //! dkdtheta
+    virtual double dkdtheta(FEMaterialPoint& pt) override;
 
 public:
 

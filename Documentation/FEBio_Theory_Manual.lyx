@@ -20982,7 +20982,7 @@ ents and concentration displacements) are not evaluated (
 The virtual work integral simplifies to: 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\delta W & =\int_{b}\delta\mathbf{v}\cdot\mbox{div}\boldsymbol{\sigma}\,dv\\
+\begin{aligned}\delta W & =\int_{b}\delta\mathbf{v}\cdot\divg\boldsymbol{\sigma}\,dv\\
  & +\sum\limits _{\alpha\ne s,w}\int_{b}\delta\tilde{c}^{\alpha}\left[\frac{D}{Dt}\tilde{c}^{\alpha}+\divg\mathbf{j}^{\alpha}\right]\,dv\,,
 \end{aligned}
 \end{equation}
@@ -21028,7 +21028,7 @@ where
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta W_{\text{int}} & =\int_{b}\boldsymbol{\sigma}:\delta\mathbf{D}\,dv\\
- & +\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\int_{b}\left[\mathbf{j}^{\alpha}\cdot\mbox{grad}\delta\tilde{c}^{\alpha}-\delta\tilde{c}^{\alpha}\frac{D}{Dt}\tilde{c}^{\alpha}\right]\,dv,
+ & +\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\int_{b}\left[\mathbf{j}^{\alpha}\cdot\grad\delta\tilde{c}^{\alpha}-\delta\tilde{c}^{\alpha}\frac{D}{Dt}\tilde{c}^{\alpha}\right]\,dv,
 \end{aligned}
 \end{equation}
 
@@ -21043,7 +21043,7 @@ and
 \end_inset
 
 In these expressions, 
-\begin_inset Formula $\delta\mathbf{D}=\left(\mbox{grad}\delta\mathbf{v}+\mbox{grad}^{T}\delta\mathbf{v}\right)/2$
+\begin_inset Formula $\delta\mathbf{D}=\left(\grad\delta\mathbf{v}+\grad^{T}\delta\mathbf{v}\right)/2$
 \end_inset
 
 , 
@@ -21250,35 +21250,11 @@ D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\
 
 \end_inset
 
-
-\begin_inset Formula 
-\[
-D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\tilde{c}^{\gamma}\right]\,dV=\grad N_{a}\tilde{c}^{\alpha}\cdot\mathbf{j}_{\gamma}^{\alpha\prime}\,dv\,,
-\]
-
-\end_inset
-
 where 
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{j}_{\gamma}^{\alpha\prime} & \equiv D\mathbf{J}^{\alpha}\left[\Delta\tilde{c}^{\gamma}\right]=-\delta_{\alpha\gamma}\mathbf{d}^{\alpha}\cdot\grad\Delta\tilde{c}^{\gamma}\,.\end{aligned}
 \end{equation}
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-\mathbf{j}_{\gamma}^{\alpha\prime}\equiv D\mathbf{J}^{\alpha}\left[\Delta\tilde{c}^{\gamma}\right]=-\delta_{\alpha\gamma}\mathbf{d}^{\alpha}\cdot\grad N_{b}\tilde{c}^{\gamma}\,.
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
-\[
-D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\tilde{c}^{\gamma}\right]\,dV=-\delta_{\alpha\gamma}\grad N_{a}\tilde{c}^{\alpha}\cdot\mathbf{d}^{\alpha}\cdot\grad N_{b}\tilde{c}^{\gamma}\,dv\,,
-\]
 
 \end_inset
 
@@ -21696,14 +21672,6 @@ n along
 \begin_inset Formula 
 \begin{equation}
 \mathbf{k}_{ab}^{\alpha u}=0\,,
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\mathbf{j}_{b}^{\alpha u} & =0\,,\end{aligned}
 \end{equation}
 
 \end_inset

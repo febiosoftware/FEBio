@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include "FEUncoupledMaterial.h"
 #include "FEGrowthTensor.h"
+#include <FEBioMix/FEElasticReactionDiffusion.h>
 
 //============================================================================
 //FEKinematicMaterialPoint::FEKinematicMaterialPoint(FEMaterialPointData* ppt) : FEMaterialPointData(ppt) {}
@@ -52,8 +53,8 @@ void FEKinematicMaterialPoint::Init()
     m_Fg = mat3dd(1.0);
     m_Je = 1.0;
     m_Jg = 1.0;
-    m_theta = 0.0;
-    m_theta_p = 0.0;
+    m_theta = 1.0;
+    m_theta_p = 1.0;
     m_rhor = 0;
     FEMaterialPointData::Init();
 }
@@ -148,7 +149,7 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
     // evaluate stress
     FEElasticMaterial* emat = GetBaseMaterial();
     // The base class stress function divides by Je rather than J when pushing forward. Thus the cauchy stress is the base class stress divided by Jg.
-    mat3ds s = emat->Stress(mp) * Jgi;
+    mat3ds s = emat->Stress(mp);
     // restore safe copy
     pt.m_F = F;
     pt.m_J = J;
@@ -157,7 +158,7 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! Returns the spatial tangent
+//! Returns the spatial elastic tangent
 tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
 {
     // Get the growth tensor inverse
@@ -174,8 +175,12 @@ tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
 
     // Get the deformation gradient and evaluate elastic deformation
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    mat3d Fe = pt.m_F*Fgi;
-    double Je = pt.m_J*Jgi;
+    mat3d Fe = pt.m_F * Fgi;
+    double Je = pt.m_J * Jgi;
+
+    mat3d Fei = Fe.inverse();
+    mat3d FeiT = Fei.transpose();
+
     // keep safe copy of deformation gradient.
     mat3d F = pt.m_F;
     double J = pt.m_J;
@@ -183,10 +188,103 @@ tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
     pt.m_F = Fe;
     pt.m_J = Je;
     FEElasticMaterial* emat = GetBaseMaterial();
-    // The base class tangent function divides by Je rather than J when pushing forward. Thus the tangent is the base class tangent divided by Jg.
-    tens4d cstar = emat->Tangent(mp);
-    tens4ds c = Jgi * cstar.supersymm();
-    return c;
+    // ce_ijkl = (1/Je) Le_MNPQ Fe_iM Fe_jN Fe_kP Fe_lQ
+    tens4ds ce = emat->Tangent(mp);
+    // restore deformation gradient in material point
+    pt.m_F = F;
+    pt.m_J = J;
+
+    return ce;
+}
+
+//-----------------------------------------------------------------------------
+//! Returns the spatial tangent
+mat3ds FEKinematicGrowth::dSdtheta(FEMaterialPoint& mp)
+{   
+    //Get common variables
+    // Get the growth tensor inverse
+    FEGrowthTensor* gmat = GetGrowthMaterial();
+    // material axes
+    mat3d Q = GetLocalCS(mp);
+    // get the fiber vector in local coordinates
+    vec3d fiber = gmat->m_fiber.unitVector(mp);
+    // convert to global coordinates
+    vec3d a0 = Q * fiber;
+    
+    return dSdFg(mp).dot(gmat->dFgdtheta(mp, a0));
+}
+
+//-----------------------------------------------------------------------------
+//! Returns the spatial tangent
+tens4ds FEKinematicGrowth::dSdFg(FEMaterialPoint& mp)
+{
+    //Get common variables
+    // Get the growth tensor inverse
+    FEGrowthTensor* gmat = GetGrowthMaterial();
+    // material axes
+    mat3d Q = GetLocalCS(mp);
+    // get the fiber vector in local coordinates
+    vec3d fiber = gmat->m_fiber.unitVector(mp);
+    // convert to global coordinates
+    vec3d a0 = Q * fiber;
+
+    mat3d Fg = gmat->GrowthTensor(mp, a0);
+    double Jg = Fg.det();
+    mat3d Fgi = gmat->GrowthTensorInverse(mp, a0);
+
+    // Get the deformation gradient and evaluate elastic deformation
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEKinematicMaterialPoint* kp = ep.ExtractData<FEKinematicMaterialPoint>();
+    double theta = std::max(kp->m_theta, 1.0e-20);
+
+    mat3d Fe = ep.m_F * Fgi;
+    double Je = Fe.det();
+    mat3ds Ce = (Fe.transpose() * Fe).sym();
+    double J = ep.m_J;
+    FEElasticMaterial* emat = GetBaseMaterial();
+    mat3d Fi = ep.m_F.inverse();
+    // The base class stress function divides by Je rather than J when pushing forward. Thus the cauchy stress is the base class stress divided by Jg.
+    mat3ds S = J * (Fi * emat->Stress(mp) * Fi.transpose()).sym();
+    double dt = this->CurrentTimeIncrement();
+
+    // solve dS/dFg
+    tens4ds Le = Je * Tangent(mp).pp(Fgi);
+    tens4ds L0 = Jg * Le.pp(Fgi);
+    tens4d SoFgiT = dyad1(S, Fgi.transpose());
+    tens4d FgixS = dyad4(Fgi, S);
+    tens4d SxFgi = dyad4(S, Fgi);
+    tens4d FgioFgi = dyad2(Fgi, Fgi);
+    tens4d CeoFgi = dyad2(Ce, Fgi);
+    tens4d FgioCe = dyad2(Fgi, Ce);
+
+    tens4ds dSdFg = (SoFgiT -FgixS - SxFgi - 0.5 * ddot(FgioFgi, ddot(Le, (CeoFgi + FgioCe)))).supersymm();
+    return dSdFg;
+}
+
+//-----------------------------------------------------------------------------
+//! Returns the spatial tangent
+mat3ds FEKinematicGrowth::dTdc(FEMaterialPoint& mp, int sol)
+{
+    mat3ds dTdc = mat3ds(0.0);
+    FEGrowthTensor* gmat = GetGrowthMaterial();
+    if (sol == gmat->m_sol_id - 1)
+    {
+        // Get the deformation gradient and evaluate elastic deformation
+        FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+        mat3d F = ep.m_F;
+        double J = ep.m_J;
+        double k = gmat->ActivationFunction(mp);
+
+        mat3d Q = GetLocalCS(mp);
+        // get the fiber vector in local coordinates
+        vec3d fiber = gmat->m_fiber.unitVector(mp);
+        // convert to global coordinates
+        vec3d a0 = Q * fiber;
+        double dt = CurrentTimeIncrement();
+
+        dTdc = (F * dSdtheta(mp) * F.transpose()).sym() * (k * dt / J);
+    }
+    return dTdc;
 }
 
 //-----------------------------------------------------------------------------

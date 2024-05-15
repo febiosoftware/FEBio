@@ -47,6 +47,9 @@ public:
     //! tangent of molar supply with  concentration at material point
     double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
 
+    //! tangent of molar supply with Cauchy stress (sigma) at material point
+    mat3ds Tangent_ReactionSupply_Stress(FEMaterialPoint& pt) override;
+
     //! molar supply at material point
     double FwdReactionSupply(FEMaterialPoint& pt);
 

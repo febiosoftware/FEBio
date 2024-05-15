@@ -44,7 +44,7 @@ class FEMaterialPoint;
 //       that support solutes, and instead provide a single consistent interface to features
 //       that need access to solute data (e.g. plot variables).
 //class FEBIOMIX_API FEElasticReactionDiffusionInterface
-class FEElasticReactionDiffusionInterface : FESoluteInterface
+class FEBIOMIX_API FEElasticReactionDiffusionInterface : FESoluteInterface
 {
 public:
 	FEElasticReactionDiffusionInterface() {}

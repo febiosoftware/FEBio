@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/tens4d.h>
 #include <FECore/tools.h>
 #include <complex>
+#include <FEBioMech/FEKinematicGrowth.h>
 using namespace std;
 
 #ifndef SQR

@@ -49,6 +49,9 @@ public:
 	//! tangent of molar supply with effective concentration at material point
 	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
 
+	//! tangent of reaction rate with Cauchy stress (sigma) at material point
+	mat3ds Tangent_ReactionSupply_Stress(FEMaterialPoint& pt) override;
+
 	double f_Hill(FEMaterialPoint& pt, const int sol);
 
 	double dfdc(FEMaterialPoint& pt, const int sol);

@@ -98,6 +98,13 @@ double FEHillInhibition::Tangent_ReactionSupply_Concentration(FEMaterialPoint& p
 		return 0.0;
 }
 
+//-----------------------------------------------------------------------------
+//! tangent of reaction rate with Cauchy stress (sigma) at material point
+mat3ds FEHillInhibition::Tangent_ReactionSupply_Stress(FEMaterialPoint& pt)
+{
+	return mat3ds(0.0);
+}
+
 double FEHillInhibition::f_Hill(FEMaterialPoint& pt, const int sol)
 {
 	double cn = pow(m_psm->GetActualSoluteConcentration(pt, sol), m_n);

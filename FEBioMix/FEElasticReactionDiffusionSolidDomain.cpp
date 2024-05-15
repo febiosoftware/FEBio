@@ -36,6 +36,8 @@ SOFTWARE.*/
 #include <FECore/sys.h>
 #include <FECore/FESolidDomain.h>
 #include <iostream>
+#include <FEBioMech/FEKinematicGrowth.h>
+#include <FEBioMech/FEGrowthTensor.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -59,6 +61,7 @@ void FEElasticReactionDiffusionSolidDomain::SetMaterial(FEMaterial* pmat)
 {
 	FEDomain::SetMaterial(pmat);
     m_pMat = dynamic_cast<FEElasticReactionDiffusion*>(pmat);
+    m_KG = dynamic_cast<FEKinematicGrowth*>(pmat);
     assert(m_pMat);
 }
 
@@ -524,6 +527,8 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
     int n_dpn = 3 + n_sol;
     
     const int n_r = m_pMat->Reactions();
+
+    FEKinematicGrowth* p_kg = m_pMat->GetKinematicGrowthMaterial();
     
     // zero stiffness matrix
     ke.zero();
@@ -532,26 +537,25 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
     for (int i_k = 0; i_k < n_int; ++i_k)
     {
         FEMaterialPoint& mp = *el.GetMaterialPoint(i_k);
-        FEElasticMaterialPoint&  ept = *(mp.ExtractData<FEElasticMaterialPoint >());
-        FESolutesMaterialPoint&  spt = *(mp.ExtractData<FESolutesMaterialPoint >());
+        FEElasticMaterialPoint&  ep = *(mp.ExtractData<FEElasticMaterialPoint >());
+        FESolutesMaterialPoint&  sp = *(mp.ExtractData<FESolutesMaterialPoint >());
         
         // calculate jacobian
         detJ = ShapeGradient(el, i_k, gradN);
         
         H = el.H(i_k);
         
-        
         // get stress tensor
-        mat3ds s = ept.m_s;
+        mat3ds s = ep.m_s;
         
         // get elasticity tensor
         tens4ds C = m_pMat->Tangent(mp);
         
         // next we get the determinant
-        double J = ept.m_J;
+        double J = ep.m_J;
                 
-        vector<double> c(spt.m_c);
-        vector<vec3d> gradc(spt.m_gradc);
+        vector<double> c(sp.m_c);
+        vector<vec3d> gradc(sp.m_gradc);
         
         // evaluate the porosity
         double phiw = m_pMat->Porosity(mp);
@@ -563,40 +567,80 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
         mat3dd I(1);
         
         // evaluate the solvent supply and its derivatives
-        vector<double> Phic(n_sol,0);
-        vector<mat3ds> dchatde(n_sol);
+        vector<double> dcdotdc(n_sol,0.0);
+
+        mat3ds dcdotdC = mat3ds(0.0);
+        vector<mat3ds> dTdc(n_sol,mat3ds(0.0));
+        vector<mat3ds> dzetahatdsigma(n_sol, mat3ds(0.0));
+        vector<mat3ds> dzhatdE(n_sol, mat3ds(0.0));
         
         // chemical reactions
 		vector<double> reactionSupply(n_r, 0.0);
         //vector<mat3ds> tangentReactionSupplyStrain(n_r);
 		vector< vector<double> > tangentReactionSupplyConcentration(n_r, vector<double>(n_sol));
-        for (int i_r = 0; i_r < n_r; ++i_r)
-		{
-			FEChemicalReactionERD* reacti = m_pMat->GetReaction(i_r);
 
-			reactionSupply[i_r] = reacti->ReactionSupply(mp);
+        FEGrowthTensor* gmat = p_kg->GetGrowthMaterial();
+        int g_sol;
+        if(p_kg)
+            g_sol = gmat->m_sol_id - 1;
+
+        mat3ds sum1 = mat3ds(0.0);
+
+        for (int i_r = 0; i_r < n_r; ++i_r)
+        {
+            FEChemicalReactionERD* reacti = m_pMat->GetReaction(i_r);
+
+            reactionSupply[i_r] = reacti->ReactionSupply(mp);
             //tangentReactionSupplyStrain[i_r] = reacti->Tangent_ReactionSupply_Strain(mp);
 
-			for (int i_sol = 0; i_sol < n_sol; ++i_sol)
-				tangentReactionSupplyConcentration[i_r][i_sol] = reacti->Tangent_ReactionSupply_Concentration(mp, i_sol);
-		}
+            for (int i_sol = 0; i_sol < n_sol; ++i_sol)
+                tangentReactionSupplyConcentration[i_r][i_sol] = reacti->Tangent_ReactionSupply_Concentration(mp, i_sol);
+
+            if (p_kg)
+            {
+                double dcdotdzeta;
+                mat3ds dzetadsigma;
+
+                dcdotdzeta = reacti->m_v[g_sol];
+                dzetadsigma = reacti->Tangent_ReactionSupply_Stress(mp);
+
+                sum1 += dcdotdzeta * dzetadsigma;
+            }
+        }
         
-        for (int i_sol = 0; i_sol < n_sol; ++i_sol) {
+        for (int i_sol = 0; i_sol < n_sol; ++i_sol) 
+        {
             FESolute* soli = m_pMat->GetSolute(i_sol);
 
             // evaluate the diffusivity tensor
             D[i_sol] = soli->m_pDiff->Diffusivity(mp);
-                                    
+
             // chemical reactions
-            dchatde[i_sol].zero();
-            //SL: this will create a dependence on the strain. Maybe the correct tangent reaction supply would be one that zeros this out?
-            //SL: for now zero this.
-                for (int i_r = 0; i_r < n_r; ++i_r) {
-                    //FEChemicalReactionERD* reacti = m_pMat->GetReaction(i_r);
-                    //dchatde[i_sol] += reacti->m_v[i_sol] * (I * reactionSupply[i_r]);
-                    //Phic[i_sol] += phiw* reacti->m_Vbar*tangentReactionSupplyConcentration[i_r][i_sol];
-                }
-            //}
+            //dchatde[i_sol].zero();
+            if(p_kg)
+                for (int i_r = 0; i_r < n_r; ++i_r)
+                    dcdotdc[i_sol] += tangentReactionSupplyConcentration[i_r][i_sol];
+        }
+
+        if (p_kg)
+        {
+            dTdc[g_sol] = p_kg->dTdc(mp, g_sol) * dcdotdc[g_sol];
+            //double ktheta = gmat->ActivationFunction(mp);
+            //double dkdtheta = gmat->dkdtheta(mp);
+
+            //double cdotg = (sp.m_ca[g_sol] - sp.m_crp[g_sol]) / dt;
+            //double dtemp = 1.0 / (1.0 - cdotg * dkdtheta * dt);
+            tens4ds dsigmadS = (1.0 / ep.m_J) * dyad2(ep.m_F, ep.m_F).supersymm();
+            tens4ds Cref = ep.m_J * C.pp(ep.m_F.inverse());
+            tens4ds ctemp = ddots(dsigmadS, Cref);
+            dcdotdC = 0.5 * ctemp.dot(sum1);
+            //mat3ds dthetadC = dt * dtemp * ktheta * dcdotdC;
+
+            //tens4ds Cg = 2.0 * dyad2(p_kg->dSdtheta(mp), dthetadC).supersymm();
+            //C += (1.0 / J) * Cg.pp(ep.m_F);
+
+            dzhatdE[g_sol] = (2.0 / J) * (ep.m_F * dcdotdC * ep.m_F.transpose()).sym();
+
         }
         
         // Miscellaneous constants
@@ -619,12 +663,32 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
                 
                 //set kcu and kuc to 0
                 for (int isol = 0; isol < n_sol; ++isol) {
-                    ke[n_dpn * i_a + 3 + isol][n_dpn * i_b] = 0.0;
-                    ke[n_dpn * i_a + 3 + isol][n_dpn * i_b + 1] = 0.0;
-                    ke[n_dpn * i_a + 3 + isol][n_dpn * i_b + 2] = 0.0;
-                    ke[n_dpn * i_a][n_dpn * i_b + 3 + isol] = 0.0;
-                    ke[n_dpn * i_a + 1][n_dpn * i_b + 3 + isol] = 0.0;
-                    ke[n_dpn * i_a + 2][n_dpn * i_b + 3 + isol] = 0.0;
+
+                    if(isol == g_sol)
+                    {
+                        //kcu
+                        vec3d kcu_tmp = H[i_a] * dzhatdE[g_sol] * gradN[i_b];
+                        ke[n_dpn * i_a + 3 + isol][n_dpn * i_b] = kcu_tmp.x;
+                        ke[n_dpn * i_a + 3 + isol][n_dpn * i_b + 1] = kcu_tmp.y;
+                        ke[n_dpn * i_a + 3 + isol][n_dpn * i_b + 2] = kcu_tmp.z;
+
+                        //kuc
+                        vec3d kuc_tmp = dTdc[isol] * gradN[i_a] * H[i_b] * detJ * gw[i_k];
+                        ke[n_dpn * i_a][n_dpn * i_b + 3 + isol] = kuc_tmp.x;
+                        ke[n_dpn * i_a + 1][n_dpn * i_b + 3 + isol] = kuc_tmp.y;
+                        ke[n_dpn * i_a + 2][n_dpn * i_b + 3 + isol] = kuc_tmp.z;
+                     }
+                    else 
+                    {
+                        ke[n_dpn * i_a + 3 + isol][n_dpn * i_b] = 0.0;
+                        ke[n_dpn * i_a + 3 + isol][n_dpn * i_b + 1] = 0.0;
+                        ke[n_dpn * i_a + 3 + isol][n_dpn * i_b + 2] = 0.0;
+
+                        ke[n_dpn * i_a][n_dpn * i_b + 3 + isol] = 0.0;
+                        ke[n_dpn * i_a + 1][n_dpn * i_b + 3 + isol] = 0.0;
+                        ke[n_dpn * i_a + 2][n_dpn * i_b + 3 + isol] = 0.0;
+                    }
+
                 }
 
                 // calculate data for the kcc matrix
