@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FECarreauYasudaFluid.h"
 #include "FEPowellEyringFluid.h"
 #include "FECrossFluid.h"
+#include "FEQuemadaFluid.h"
 #include "FEFluidFSI.h"
 #include "FEBiphasicFSI.h"
 #include "FEIdealGasIsentropic.h"
@@ -141,6 +142,7 @@ REGISTER_FECORE_CLASS(FECarreauFluid      , "Carreau"       );
 REGISTER_FECORE_CLASS(FECarreauYasudaFluid, "Carreau-Yasuda");
 REGISTER_FECORE_CLASS(FEPowellEyringFluid , "Powell-Eyring" );
 REGISTER_FECORE_CLASS(FECrossFluid        , "Cross"         );
+REGISTER_FECORE_CLASS(FEQuemadaFluid      , "Quemada"       );
 
 // elastic fluids
 REGISTER_FECORE_CLASS(FEIdealGasIsentropic, "ideal gas isentropic");
