@@ -34,3 +34,10 @@ public:
 
     DECLARE_FECORE_CLASS();
 };
+
+class FELogEnclosedVolumeChange : public FELogSurfaceData
+{
+public:
+	FELogEnclosedVolumeChange(FEModel* fem) : FELogSurfaceData(fem) {}
+	double value(FESurface& surface) override;
+};

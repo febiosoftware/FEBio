@@ -33,40 +33,43 @@ END_FECORE_CLASS();
 
 double FELogEnclosedVolume::value(FESurface& surface)
 {
-	// loop over all elements
 	double vol = 0.0;
 	int NE = surface.Elements();
-	vec3d x[FEElement::MAX_NODES];
 	for (int i = 0; i < NE; ++i)
 	{
-		// get the next element
 		FESurfaceElement& el = surface.Element(i);
-
-		// get the nodal coordinates
-		int neln = el.Nodes();
-		for (int j = 0; j < neln; ++j) x[j] = surface.Node(el.m_lnode[j]).m_rt;
-
-		// loop over integration points
 		double* w = el.GaussWeights();
-		int nint = el.GaussPoints();
-		for (int n = 0; n < nint; ++n)
+		for (int n = 0; n < el.GaussPoints(); ++n)
 		{
-			// evaluate the position vector at this point
-			vec3d r = el.eval(x, n);
-
-			// calculate the tangent vectors
-			double* Gr = el.Gr(n);
-			double* Gs = el.Gs(n);
-			vec3d dxr(0, 0, 0), dxs(0, 0, 0);
-			for (int j = 0; j < neln; ++j)
-			{
-				dxr += x[j] * Gr[j];
-				dxs += x[j] * Gs[j];
-			}
-
-			// update volume
-			vol += w[n] * (r * (dxr ^ dxs));
+			vec3d xi = surface.Local2Global(el, n);
+			vec3d g[2];
+			surface.CoBaseVectors(el, n, g);
+			double DVj = xi * (g[0] ^ g[1]) / 3;
+			vol += DVj * w[n];
 		}
 	}
-	return vol / 3.0;
+	return vol;
+}
+
+double FELogEnclosedVolumeChange::value(FESurface& surface)
+{
+	double DV = 0.0;
+	int NE = surface.Elements();
+	for (int i = 0; i < NE; ++i) {
+		FESurfaceElement& el = surface.Element(i);
+		double* w = el.GaussWeights();
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			vec3d xi = surface.Local2Global(el, n);
+			vec3d g[2];
+			surface.CoBaseVectors(el, n, g);
+			vec3d Xi = surface.Local2Global0(el, n);
+			vec3d G[2];
+			surface.CoBaseVectors0(el, n, G);
+			double DVj = (xi * (g[0] ^ g[1]) - Xi * (G[0] ^ G[1])) / 3;
+			DV += DVj * w[n];
+		}
+	}
+	return DV;
 }
