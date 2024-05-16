@@ -45,6 +45,9 @@ FEIdealGasPressure::FEIdealGasPressure(FEModel* pfem) : FESurfaceLoad(pfem)
 
 bool FEIdealGasPressure::Init()
 {
+	FESurface& surf = GetSurface();
+	surf.SetShellBottom(m_bshellb);
+
 	// get the degrees of freedom
 	m_dof.Clear();
 	if (m_bshellb == false)
@@ -84,10 +87,8 @@ void FEIdealGasPressure::Update()
 
 void FEIdealGasPressure::LoadVector(FEGlobalVector& R)
 {
-	FESurface& surf = GetSurface();
-	surf.SetShellBottom(m_bshellb);
-
 	// evaluate the integral
+	FESurface& surf = GetSurface();
 	surf.LoadVector(R, m_dof, false, [&](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
 
 		// evaluate pressure at this material point
@@ -110,10 +111,8 @@ void FEIdealGasPressure::LoadVector(FEGlobalVector& R)
 
 void FEIdealGasPressure::StiffnessMatrix(FELinearSystem& LS)
 {
-	FESurface& surf = GetSurface();
-	surf.SetShellBottom(m_bshellb);
-
 	// evaluate the integral
+	FESurface& surf = GetSurface();
 	surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& kab) {
 
 		// evaluate pressure at this material point
