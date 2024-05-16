@@ -131,9 +131,9 @@ mat3d FEAreaGrowth::GrowthTensor(FEMaterialPoint& pt, const vec3d& n0)
 {
     FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
     FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
-    double theta = kp->m_theta;
+    double sqrttheta = pow(kp->m_theta,0.5);
     vec3d n = m_referential_normal_flag ? n0 : UpdateNormal(pt, n0);
-    mat3d Fg = mat3dd(1.0) + (mat3dd(1.0) - (n & n)) * theta;
+    mat3d Fg = sqrttheta * mat3dd(1.0) + (n & n) * (1.0 - sqrttheta);
     return Fg;
 }
 
@@ -157,8 +157,11 @@ double FEAreaGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 //! returns dFgdtheta for area-type growth
 mat3ds FEAreaGrowth::dFgdtheta(FEMaterialPoint& pt, const vec3d& n0)
 {
-    double theta = this->GrowthRate(pt);
-    return 0.5 * pow(theta, -0.5) * (mat3dd(1.0) - (n0 & n0)).sym();
+    FEElasticMaterialPoint* ep = pt.ExtractData<FEElasticMaterialPoint>();
+    FEKinematicMaterialPoint* kp = pt.ExtractData<FEKinematicMaterialPoint>();
+    double sqrttheta = pow(kp->m_theta,0.5);
+    //return (mat3dd(1.0) - (n0 & n0)).sym();
+    return (0.5 / sqrttheta) * (mat3dd(1.0) - (n0 & n0)).sym();
 }
 
 //-----------------------------------------------------------------------------
