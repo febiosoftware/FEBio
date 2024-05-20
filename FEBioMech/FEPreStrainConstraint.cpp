@@ -111,7 +111,7 @@ bool FEPreStrainConstraint::Augment(FEDomain* psd, int n, int naug)
 			if (normU >= max_err) max_err = normU;
 		}
 	}
-	if (max_err >= m_tol) bconv = false;
+	if ((m_tol > 0) && (max_err >= m_tol)) bconv = false;
 
 	feLog("max norm = %lg (%lg)\n", max_err, m_tol);
 
