@@ -290,7 +290,7 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 				n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, v);
 
 				vec3d a = rb.m_at + (rb.m_alt ^ z) + (rb.m_wt ^ (rb.m_wt ^ z));
-				n.m_at = a;
+//				n.m_at = a;
 			}
 		}
 	}
