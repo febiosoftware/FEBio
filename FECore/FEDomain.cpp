@@ -72,6 +72,7 @@ void FEDomain::CreateMaterialPointData()
 			FEMaterialPoint* mp = new FEMaterialPoint(pmat->CreateMaterialPointData());
 			mp->m_Q = (m_matAxis ? m_matAxis->operator()(*mp) : mat3d::identity());
 			mp->m_r0 = el.Evaluate(r, k);
+			mp->m_rt = mp->m_r0;
 			mp->m_index = k;
 			el.SetMaterialPointData(mp, k);
 		}
