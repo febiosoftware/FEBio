@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "PointCurve.h"
 #include "BSpline.h"
+#include "AkimaSpline.h"
 #include <assert.h>
 #include <algorithm>
 
@@ -40,6 +41,8 @@ public:
 	int		ext;	//!< extend mode
 	std::vector<vec2d>	points;
 	BSpline* spline;    //!< B-spline
+    BSpline* sderiv;    //!< B-spline for 1st derivative
+    AkimaSpline* akima; //!< Akima spline
 };
 
 //-----------------------------------------------------------------------------
@@ -48,6 +51,8 @@ PointCurve::PointCurve() : im(new PointCurve::Imp)
 	im->fnc = LINEAR;
 	im->ext = CONSTANT;
 	im->spline = nullptr;
+    im->sderiv = nullptr;
+    im->akima = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,6 +62,8 @@ PointCurve::PointCurve(const PointCurve& pc) : im(new PointCurve::Imp)
 	im->ext = pc.im->ext;
 	im->points = pc.im->points;
 	im->spline = nullptr;
+    im->sderiv = nullptr;
+    im->akima = nullptr;
 	Update();
 }
 
@@ -67,6 +74,8 @@ void PointCurve::operator = (const PointCurve& pc)
 	im->ext = pc.im->ext;
 	im->points = pc.im->points;
     if (im->spline) delete im->spline;
+    if (im->sderiv) delete im->spline;
+    if (im->akima) delete im->akima;
 	Update();
 }
 
@@ -74,6 +83,8 @@ void PointCurve::operator = (const PointCurve& pc)
 PointCurve::~PointCurve()
 {
 	if (im->spline) delete im->spline;
+    if (im->sderiv) delete im->sderiv;
+    if (im->akima) delete im->akima;
 }
 
 //-----------------------------------------------------------------------------
@@ -104,6 +115,10 @@ void PointCurve::Clear()
 	im->points.clear();
 	if (im->spline) delete im->spline;
 	im->spline = nullptr;
+    if (im->sderiv) delete im->sderiv;
+    im->sderiv = nullptr;
+    if (im->akima) delete im->akima;
+    im->akima = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -258,13 +273,6 @@ double PointCurve::value(double time) const
 
 	double tmax = points[N].x();
 	double tmin = points[0].x();
-	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
-	{
-		if (time > tmax) return im->spline->eval(tmax);
-		else if (time < tmin) return im->spline->eval(tmin);
-		else return im->spline->eval(time);
-	}
-    
 
 	if (time < tmin) return ExtendValue(time);
 	if (time > tmax) return ExtendValue(time);
@@ -306,7 +314,12 @@ double PointCurve::value(double time) const
 
 		return f0 + (f1 - f0)*w3*(10.0 - 15.0*w + 6.0*w2);
 	}
-	else if (im->fnc == SMOOTH)
+    else if ((im->fnc == CSPLINE) || (im->fnc == CPOINTS) || (im->fnc == APPROX)) {
+        if (time > tmax) return im->spline->eval(tmax);
+        else if (time < tmin) return im->spline->eval(tmin);
+        else return im->spline->eval(time);
+    }
+    else if ((im->fnc == SMOOTH) || (im->fnc == C2SMOOTH))
 	{
 		if (nsize == 2)
 		{
@@ -421,6 +434,10 @@ double PointCurve::ExtendValue(double t) const
 		}
 		break;
 		case SMOOTH:
+        case CSPLINE:
+        case CPOINTS:
+        case APPROX:
+        case C2SMOOTH:
 		{
 			if (t < points[0].x()) return lerp(t, points[0].x(), points[0].y(), points[0].x() + dt, value(points[0].x() + dt));
 			else return lerp(t, points[N].x() - dt, value(points[N].x() - dt), points[N].x(), points[N].y());
@@ -507,53 +524,110 @@ double PointCurve::derive(double time) const
 	double tmax = im->points[N - 1].x();
 	double tmin = im->points[0].x();
 
-	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
-	{
-		if (time > tmax) return im->spline->eval_deriv(tmax);
-		else if (time < tmin) return im->spline->eval_deriv(tmin);
-		else return im->spline->eval_deriv(time);
-	}
-
-	double Dt = im->points[N - 1].x() - im->points[0].x();
-	double dt = Dt * 1e-9;
-	double D = 0;
-
-	if (time >= tmax) {
-		// use backward difference
-		double t2 = time - 2 * dt;
-		double t1 = time - dt;
-		double t0 = time;
-
-		double v2 = value(t2);
-		double v1 = value(t1);
-		double v0 = value(t0);
-
-		D = (v2 - 4 * v1 + 3 * v0) / (2 * dt);
-	}
-	else if (time <= tmin) {
-		// use forward difference
-		double t0 = time;
-		double t1 = time + dt;
-		double t2 = time + 2 * dt;
-
-		double v0 = value(t0);
-		double v1 = value(t1);
-		double v2 = value(t2);
-
-		D = (-v2 + 4 * v1 - 3 * v0) / (2 * dt);
-	}
-	else {
-		// use central difference
-		double t0 = time - dt;
-		double t1 = time + dt;
-
-		double v1 = value(t1);
-		double v0 = value(t0);
-
-		D = (v1 - v0) / (2 * dt);
-	}
-
-	return D;
+    double Dt = im->points[N - 1].x() - im->points[0].x();
+    double dt = Dt * 1e-9;
+    double D = 0;
+    
+    if (time > tmax) {
+        // use backward difference
+        double t2 = time - 2 * dt;
+        double t1 = time - dt;
+        double t0 = time;
+        
+        double v2 = value(t2);
+        double v1 = value(t1);
+        double v0 = value(t0);
+        
+        return (v2 - 4 * v1 + 3 * v0) / (2 * dt);
+    }
+    else if (time < tmin) {
+        // use forward difference
+        double t0 = time;
+        double t1 = time + dt;
+        double t2 = time + 2 * dt;
+        
+        double v0 = value(t0);
+        double v1 = value(t1);
+        double v2 = value(t2);
+        
+        return (-v2 + 4 * v1 - 3 * v0) / (2 * dt);
+    }
+    
+    if ((im->fnc == CSPLINE) || (im->fnc == CPOINTS) || (im->fnc == APPROX)) {
+        return im->spline->eval_deriv(time);
+    }
+    else if (im->fnc == C2SMOOTH)
+    {
+        if (N == 3)
+        {
+            double t0 = dpts[0].x();
+            double t1 = dpts[1].x();
+            double t2 = dpts[2].x();
+            
+            double f0 = dpts[0].y();
+            double f1 = dpts[1].y();
+            double f2 = dpts[2].y();
+            
+            return qerp(time, t0, f0, t1, f1, t2, f2);
+        }
+        else
+        {
+            int n = 0;
+            while (dpts[n].x() <= time) ++n;
+            
+            if (n == 1)
+            {
+                double t0 = dpts[0].x();
+                double t1 = dpts[1].x();
+                double t2 = dpts[2].x();
+                
+                double f0 = dpts[0].y();
+                double f1 = dpts[1].y();
+                double f2 = dpts[2].y();
+                
+                return qerp(time, t0, f0, t1, f1, t2, f2);
+            }
+            else if (n == N - 1)
+            {
+                double t0 = dpts[n - 2].x();
+                double t1 = dpts[n - 1].x();
+                double t2 = dpts[n].x();
+                
+                double f0 = dpts[n - 2].y();
+                double f1 = dpts[n - 1].y();
+                double f2 = dpts[n].y();
+                
+                return qerp(time, t0, f0, t1, f1, t2, f2);
+            }
+            else
+            {
+                double t0 = dpts[n - 2].x();
+                double t1 = dpts[n - 1].x();
+                double t2 = dpts[n].x();
+                double t3 = dpts[n + 1].x();
+                
+                double f0 = dpts[n - 2].y();
+                double f1 = dpts[n - 1].y();
+                double f2 = dpts[n].y();
+                double f3 = dpts[n + 1].y();
+                
+                double q1 = qerp(time, t0, f0, t1, f1, t2, f2);
+                double q2 = qerp(time, t1, f1, t2, f2, t3, f3);
+                
+                return lerp(time, t1, q1, t2, q2);
+            }
+        }
+    }
+    else {
+        // use central difference
+        double t0 = time - dt;
+        double t1 = time + dt;
+        
+        double v1 = value(t1);
+        double v0 = value(t0);
+        
+        return (v1 - v0) / (2 * dt);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -564,55 +638,49 @@ double PointCurve::deriv2(double time) const
 	double tmax = im->points[N - 1].x();
 	double tmin = im->points[0].x();
 
-	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
-	{
-		if (time > tmax) return im->spline->eval_deriv2(tmax);
-		else if (time < tmin) return im->spline->eval_deriv2(tmin);
-		else return im->spline->eval_deriv2(time);
-	}
-
-	double Dt = im->points[N - 1].x() - im->points[0].x();
-	double dt = Dt * 1e-3;
-	double D = 0;
-
-	if (time >= tmax) {
-		// use backward difference
-		double t2 = time - 2 * dt;
-		double t1 = time - dt;
-		double t0 = time;
-
-		double v2 = value(t2);
-		double v1 = value(t1);
-		double v0 = value(t0);
-
-		D = (v2 - 2 * v1 + v0) / (dt * dt);
-	}
-	else if (time <= tmin) {
-		// use forward difference
-		double t0 = time;
-		double t1 = time + dt;
-		double t2 = time + 2 * dt;
-
-		double v0 = value(t0);
-		double v1 = value(t1);
-		double v2 = value(t2);
-
-		D = (v2 - 2 * v1 + v0) / (dt * dt);
-	}
-	else {
-		// use central difference
-		double t0 = time - dt;
-		double t1 = time;
-		double t2 = time + dt;
-
-		double v0 = value(t0);
-		double v1 = value(t1);
-		double v2 = value(t2);
-
-		D = (v2 - 2 * v1 + v0) / (dt * dt);
-	}
-
-	return D;
+    double Dt = im->points[N - 1].x() - im->points[0].x();
+    double dt = Dt * 1e-3;
+    
+    if (time > tmax) {
+        // use backward difference
+        double t2 = time - 2 * dt;
+        double t1 = time - dt;
+        double t0 = time;
+        
+        double v2 = value(t2);
+        double v1 = value(t1);
+        double v0 = value(t0);
+        
+        return (v2 - 2 * v1 + v0) / (dt * dt);
+    }
+    else if (time < tmin) {
+        // use forward difference
+        double t0 = time;
+        double t1 = time + dt;
+        double t2 = time + 2 * dt;
+        
+        double v0 = value(t0);
+        double v1 = value(t1);
+        double v2 = value(t2);
+        
+        return (v2 - 2 * v1 + v0) / (dt * dt);
+    }
+    
+    if ((im->fnc == CSPLINE) || (im->fnc == CPOINTS) || (im->fnc == APPROX)) {
+        return im->spline->eval_deriv2(time);
+    }
+    else {
+        // use central difference
+        double t0 = time - dt;
+        double t1 = time;
+        double t2 = time + dt;
+        
+        double v0 = value(t0);
+        double v1 = value(t1);
+        double v2 = value(t2);
+        
+        return (v2 - 2 * v1 + v0) / (dt * dt);
+    }
 }
 
 double PointCurve::integrate(double a, double b) const
@@ -678,38 +746,77 @@ bool PointCurve::Update()
 {
 	bool bvalid = true;
 
-	if ((im->fnc > SMOOTH) && (im->fnc < SMOOTH_STEP))
+	if ((im->fnc > SMOOTH) && (im->fnc != SMOOTH_STEP))
 	{
 		const int N = Points();
 
-		// initialize B-spline
-        if (im->spline) delete im->spline;
-		im->spline = new BSpline();
 		switch (im->fnc) {
 		case CSPLINE:
 		{
-			int korder = min(N, 4);
+            // initialize B-spline
+            if (im->spline) delete im->spline;
+            im->spline = new BSpline();
+            int korder = min(N, 4);
 			if (!im->spline->init_interpolation(korder, im->points)) bvalid = false;
 		}
 		break;
 		case CPOINTS:
 		{
+            // initialize B-spline
+            if (im->spline) delete im->spline;
+            im->spline = new BSpline();
 			int korder = min(N, 4);
 			if (!im->spline->init(korder, im->points)) bvalid = false;
 		}
 		break;
 		case APPROX:
 		{
+            // initialize B-spline
+            if (im->spline) delete im->spline;
+            im->spline = new BSpline();
 			int korder = min(N / 2 + 1, 4);
 			if (!im->spline->init_approximation(korder, N / 2 + 1, im->points)) bvalid = false;
 		}
-		break;
+        break;
+        case C2SMOOTH:
+        {
+            if (N < 3) {
+                bvalid = false;
+                break;
+            }
+            
+            // evaluate control points of spline derivative using finite difference scheme (non-uniform)
+            dpts = im->points;
+            double d01, d10, d11, d20,d21, d02, d12;
+            // forward difference at first point
+            d10 = dpts[1].x() - dpts[0].x();
+            d20 = dpts[2].x() - dpts[0].x();
+            d21 = dpts[2].x() - dpts[1].x();
+            dpts[0].y() = (im->points[0].y()*(pow(d10,2)-pow(d20,2)) + im->points[1].y()*pow(d20,2) - im->points[2].y()*pow(d10,2))/(d10*d20*d21);
+            // backward difference at last point
+            int n = N-1;
+            d02 = dpts[n].x() - dpts[n-2].x();
+            d01 = dpts[n].x() - dpts[n-1].x();
+            d12 = dpts[n-1].x() - dpts[n-2].x();
+            dpts[n].y() = (im->points[n].y()*(pow(d02,2)-pow(d01,2)) - im->points[n-1].y()*pow(d02,2) + im->points[n-2].y()*pow(d01,2))/(d01*d02*d12);
+            // central difference at intermediate points
+            for (int i=1; i<n; ++i) {
+                d10 = dpts[i+1].x() - dpts[i].x();
+                d01 = dpts[i].x() - dpts[i-1].x();
+                d11 = dpts[i+1].x() - dpts[i-1].x();
+                dpts[i].y() = (im->points[i].y()*(pow(d10,2)-pow(d01,2)) - im->points[i-1].y()*pow(d10,2) + im->points[i+1].y()*pow(d01,2))/(d01*d10*d11);
+            }
+        }
+        break;
 		default:
 			bvalid = false;
 			assert(false);
 		}
 
-		if (bvalid == false) { delete im->spline; im->spline = nullptr; }
+        if (bvalid == false) {
+            if (im->spline) delete im->spline; im->spline = nullptr;
+            if (im->akima) delete im->akima; im->akima = nullptr;
+        }
 	}
 	return bvalid;
 }
