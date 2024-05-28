@@ -1370,6 +1370,34 @@ bool FEPlotFluidIsobaricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& 
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotFluidPressureTangentTemperature::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->Tangent_Temperature(mp_noconst);
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidPressureTangentStrain::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->Tangent_Strain(mp_noconst);
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidThermalConductivity::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluidThermalConductivity* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidThermalConductivity>();

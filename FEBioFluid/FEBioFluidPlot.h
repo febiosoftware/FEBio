@@ -583,6 +583,24 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Fluid pressure tangent temperature
+class FEPlotFluidPressureTangentTemperature : public FEPlotDomainData
+{
+public:
+    FEPlotFluidPressureTangentTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Fluid pressure tangent strain
+class FEPlotFluidPressureTangentStrain : public FEPlotDomainData
+{
+public:
+    FEPlotFluidPressureTangentStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Thermal conductivity
 class FEPlotFluidThermalConductivity : public FEPlotDomainData
 {

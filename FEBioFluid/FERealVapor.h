@@ -37,7 +37,7 @@
 class FEBIOFLUID_API FERealVapor : public FEElasticFluid
 {
 public:
-    enum { MAX_NVP = 7, MAX_NVC = 3 };
+    enum { MAX_NVP = 7, MAX_NVC = 4 };
     
 public:
     FERealVapor(FEModel* pfem);
@@ -52,21 +52,6 @@ public:
     //! gauge pressure
     double Pressure(FEMaterialPoint& pt) override;
     
-    //! tangent of pressure with respect to strain J
-    double Tangent_Strain(FEMaterialPoint& mp) override;
-    
-    //! 2nd tangent of pressure with respect to strain J
-    double Tangent_Strain_Strain(FEMaterialPoint& mp) override;
-    
-    //! tangent of pressure with respect to temperature T
-    double Tangent_Temperature(FEMaterialPoint& mp) override;
-    
-    //! 2nd tangent of pressure with respect to temperature T
-    double Tangent_Temperature_Temperature(FEMaterialPoint& mp) override;
-    
-    //! tangent of pressure with respect to strain J and temperature T
-    double Tangent_Strain_Temperature(FEMaterialPoint& mp) override;
-    
     //! specific free energy
     double SpecificFreeEnergy(FEMaterialPoint& mp) override;
     
@@ -78,12 +63,6 @@ public:
     
     //! isochoric specific heat capacity
     double IsochoricSpecificHeatCapacity(FEMaterialPoint& mp) override;
-    
-    //! tangent of isochoric specific heat capacity with respect to strain J
-    double Tangent_cv_Strain(FEMaterialPoint& mp) override;
-    
-    //! tangent of isochoric specific heat capacity with respect to temperature T
-    double Tangent_cv_Temperature(FEMaterialPoint& mp) override;
     
     //! isobaric specific heat capacity
     double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
@@ -97,7 +76,7 @@ public:
     double          m_rhor;         //!< referential mass density
     int             m_nvp;          //!< number of virial coefficients for pressure
     int             m_nvc;          //!< number of virial coefficients for isochoric specific heat capacity
-    FEFunction1D*   m_B[MAX_NVP];   //!< non-dimensional pressure coefficient (multiply by m_Pr to get actual value)
+    FEFunction1D*   m_D[MAX_NVP];   //!< non-dimensional pressure coefficient (multiply by m_Pr to get actual value)
     FEFunction1D*   m_psat;         //!< normalized gauge pressure on saturation curve (multiply by m_Pr to get actual value)
     FEFunction1D*   m_asat;         //!< normalized specific free energy on saturation curve (multiply by m_Pr/m_rhor to get actual value)
     FEFunction1D*   m_ssat;         //!< normalized specific entropy on saturation curve (multiply by m_Pr/m_rhor*m_Tr to get actual value)

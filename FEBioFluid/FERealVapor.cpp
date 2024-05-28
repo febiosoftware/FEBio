@@ -42,17 +42,18 @@ ADD_PROPERTY(m_psat , "psat" )->SetLongName("saturation gauge pressure normalize
 ADD_PROPERTY(m_asat , "asat" )->SetLongName("saturation free energy normalized");
 ADD_PROPERTY(m_ssat , "ssat" )->SetLongName("saturation entropy normalized");
 ADD_PROPERTY(m_cvsat, "cvsat")->SetLongName("saturation cv normalized");
-ADD_PROPERTY(m_B[0] , "B0"   )->SetLongName("0th normalized pressure coefficient");
-ADD_PROPERTY(m_B[1] , "B1" , FEProperty::Optional)->SetLongName("1st normalized pressure coefficient");
-ADD_PROPERTY(m_B[2] , "B2" , FEProperty::Optional)->SetLongName("2nd normalized pressure coefficient");
-ADD_PROPERTY(m_B[3] , "B3" , FEProperty::Optional)->SetLongName("3rd normalized pressure coefficient");
-ADD_PROPERTY(m_B[4] , "B4" , FEProperty::Optional)->SetLongName("4th normalized pressure coefficient");
-ADD_PROPERTY(m_B[5] , "B5" , FEProperty::Optional)->SetLongName("5th normalized pressure coefficient");
-ADD_PROPERTY(m_B[6] , "B6" , FEProperty::Optional)->SetLongName("6th normalized pressure coefficient");
+ADD_PROPERTY(m_D[0] , "D0"   )->SetLongName("0th normalized pressure coefficient");
+ADD_PROPERTY(m_D[1] , "D1" , FEProperty::Optional)->SetLongName("1st normalized pressure coefficient");
+ADD_PROPERTY(m_D[2] , "D2" , FEProperty::Optional)->SetLongName("2nd normalized pressure coefficient");
+ADD_PROPERTY(m_D[3] , "D3" , FEProperty::Optional)->SetLongName("3rd normalized pressure coefficient");
+ADD_PROPERTY(m_D[4] , "D4" , FEProperty::Optional)->SetLongName("4th normalized pressure coefficient");
+ADD_PROPERTY(m_D[5] , "D5" , FEProperty::Optional)->SetLongName("5th normalized pressure coefficient");
+ADD_PROPERTY(m_D[6] , "D6" , FEProperty::Optional)->SetLongName("6th normalized pressure coefficient");
 
-ADD_PROPERTY(m_C[0], "C0")->SetLongName("1st cv virial coeff");
-ADD_PROPERTY(m_C[1], "C1", FEProperty::Optional)->SetLongName("2nd cv virial coeff");
-ADD_PROPERTY(m_C[2], "C2", FEProperty::Optional)->SetLongName("3rd cv virial coeff");
+ADD_PROPERTY(m_C[0], "C0")->SetLongName("0th cv virial coeff");
+ADD_PROPERTY(m_C[1], "C1", FEProperty::Optional)->SetLongName("1st cv virial coeff");
+ADD_PROPERTY(m_C[2], "C2", FEProperty::Optional)->SetLongName("2nd cv virial coeff");
+ADD_PROPERTY(m_C[3], "C3", FEProperty::Optional)->SetLongName("3rd cv virial coeff");
 
 END_FECORE_CLASS();
 
@@ -61,7 +62,7 @@ FERealVapor::FERealVapor(FEModel* pfem) : FEElasticFluid(pfem)
     m_nvp = 0;
     m_nvc = 0;
     m_Pr = m_Tr = 0;
-    for (int k=0; k<MAX_NVP; ++k) m_B[k] = nullptr;
+    for (int k=0; k<MAX_NVP; ++k) m_D[k] = nullptr;
     for (int k=0; k<MAX_NVC; ++k) m_C[k] = nullptr;
     m_psat = m_asat = m_ssat = nullptr;
 }
@@ -86,8 +87,8 @@ bool FERealVapor::Init()
     m_cvsat->Init();
     m_nvp = 0;
     for (int k=0; k<MAX_NVP; ++k) {
-        if (m_B[k]) {
-            m_B[k]->Init();
+        if (m_D[k]) {
+            m_D[k]->Init();
             ++m_nvp;
         }
     }
@@ -128,155 +129,14 @@ double FERealVapor::Pressure(FEMaterialPoint& mp)
     double J = 1 + fp.m_ef;
     double Jsat = 1 + m_esat->value(That);
     double Psat = 1 + m_psat->value(That);
-    double B[MAX_NVP];
-    for (int k=0; k<m_nvp; ++k) B[k] = m_B[k]->value(That);
+    double D[MAX_NVP];
+    for (int k=0; k<m_nvp; ++k) D[k] = m_D[k]->value(That);
     double x = Jsat/J;
-    double y = 0;
-    for (int k=0; k<m_nvp; ++k) y += B[k]*pow(x,k+1);
-    double P = Psat*y;
+    double sum = 0;
+    for (int k=0; k<m_nvp; ++k) sum += D[k]*pow(x,k+1);
+    double p = Psat*(x + (1-x)*sum) - 1;
     
-    return (P-1)*m_Pr;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of pressure with respect to strain J
-double FERealVapor::Tangent_Strain(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double J = 1 + fp.m_ef;
-    double Jsat = 1 + m_esat->value(That);
-    double Psat = 1 + m_psat->value(That);
-    double B[MAX_NVP];
-    for (int k=0; k<m_nvp; ++k) B[k] = m_B[k]->value(That);
-    double x = Jsat/J;
-    double y = 0;
-    for (int k=0; k<m_nvp; ++k) y += B[k]*(k+1)*pow(x,k+1);
-    double dpJ = -Psat*y/J;
-
-    return dpJ*m_Pr;
-}
-
-//-----------------------------------------------------------------------------
-//! 2nd tangent of pressure with respect to strain J
-double FERealVapor::Tangent_Strain_Strain(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double J = 1 + fp.m_ef;
-    double Jsat = 1 + m_esat->value(That);
-    double Psat = 1 + m_psat->value(That);
-    double B[MAX_NVP];
-    for (int k=0; k<m_nvp; ++k) B[k] = m_B[k]->value(That);
-    double x = Jsat/J;
-    double y = 0;
-    for (int k=0; k<m_nvp; ++k) y += B[k]*(k+1)*(k+2)*pow(x,k+1);
-    double dpJ2 = Psat*y/pow(J,2);
-
-    return dpJ2*m_Pr;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of pressure with respect to temperature T
-double FERealVapor::Tangent_Temperature(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double J = 1 + fp.m_ef;
-    double Jsat = 1 + m_esat->value(That);
-    double dJsat = m_esat->derive(That);
-    double Psat = 1 + m_psat->value(That);
-    double dPsat = m_psat->derive(That);
-    double B[MAX_NVP], dB[MAX_NVP];
-    for (int k=0; k<m_nvp; ++k) {
-        B[k] = m_B[k]->value(That);
-        dB[k] = m_B[k]->derive(That);
-    }
-    double x = Jsat/J;
-    double dx = dJsat/J;
-    double dpT = 0;
-    for (int k=0; k<m_nvp; ++k)
-        dpT += (dPsat*B[k]+Psat*dB[k])*pow(x,k+1)
-        + Psat*(k+1)*B[k]*dx*pow(dx,k);
-    
-    return dpT*m_Pr/m_Tr;
-}
-
-//-----------------------------------------------------------------------------
-//! 2nd tangent of pressure with respect to temperature T
-double FERealVapor::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double J = 1 + fp.m_ef;
-    double Jsat = 1 + m_esat->value(That);
-    double dJsat = m_esat->derive(That);
-    double d2Jsat = m_esat->deriv2(That);
-    double Psat = 1 + m_psat->value(That);
-    double dPsat = m_psat->derive(That);
-    double d2Psat = m_psat->deriv2(That);
-    double B[MAX_NVP], dB[MAX_NVP], d2B[MAX_NVP];
-    for (int k=0; k<m_nvp; ++k) {
-        B[k] = m_B[k]->value(That);
-        dB[k] = m_B[k]->derive(That);
-        d2B[k] = m_B[k]->deriv2(That);
-    }
-    double x = Jsat/J;
-    double dx = dJsat/J;
-    double d2x = d2Jsat/J;
-    double dpT2 = 0;
-    for (int k=0; k<m_nvp; ++k) {
-        dpT2 += (d2Psat*B[k]+2*dPsat*dB[k]+Psat*d2B[k])*pow(x,k+1)
-        + (k+1)*(2*(dPsat*B[k]+Psat*dB[k])*dx
-                 +Psat*B[k]*d2x)*pow(x,k);
-    }
-    for (int k=1; k<m_nvp; ++k)
-        dpT2 += k*(k+1)*Psat*B[k]*pow(dx,2)*pow(x,k-1);
-
-    return dpT2*m_Pr/pow(m_Tr,2);
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of pressure with respect to strain J and temperature T
-double FERealVapor::Tangent_Strain_Temperature(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double J = 1 + fp.m_ef;
-    double Jsat = 1 + m_esat->value(That);
-    double Psat = 1 + m_psat->value(That);
-    double dJsat = m_esat->derive(That);
-    double dPsat = m_psat->derive(That);
-    double B[MAX_NVP], dB[MAX_NVP];
-    for (int k=0; k<m_nvp; ++k) {
-        B[k] = m_B[k]->value(That);
-        dB[k] = m_B[k]->derive(That);
-    }
-    double x = Jsat/J;
-    double dx = dJsat/J;
-    double dpTJ = 0;
-    for (int k=0; k<m_nvp; ++k) {
-        dpTJ -= (k+1)*pow(x,k+1)*(dPsat*B[k]+Psat*dB[k]
-                                  +(k+1)*Psat*B[k]*dx);
-    }
-    dpTJ /= J;
-
-    return dpTJ*m_Pr/m_Tr;
+    return p*m_Pr;
 }
 
 //-----------------------------------------------------------------------------
@@ -293,13 +153,16 @@ double FERealVapor::SpecificFreeEnergy(FEMaterialPoint& mp)
     double J = 1 + fp.m_ef;
     double Jsat = 1 + m_esat->value(That);
     double Psat = 1 + m_psat->value(That);
-    double B[MAX_NVP];
-    for (int k=0; k<m_nvp; ++k) B[k] = m_B[k]->value(That);
+    double D[MAX_NVP];
+    for (int k=0; k<m_nvp; ++k) D[k] = m_D[k]->value(That);
     double x = Jsat/J;
-    double a = B[0]*log(x);
-    for (int k=1; k<m_nvp; ++k)
-        a -= B[k]/k*(1-pow(x,k));
-    a = Psat*Jsat*a + asat + J - Jsat;
+    double sum = 0;
+    for (int k=1; k<m_nvp; ++k) {
+        double xk = pow(x,k);
+        double xkp = xk*x;
+        sum += D[k]*((1-xkp)/(k+1) - (1-xk)/k);
+    }
+    double a = asat - Jsat*(1-1/x) + Psat*Jsat*(log(x) + D[0]*(log(x)+1-x) + sum);
 
     return a*m_Pr/m_rhor;
 }
@@ -313,24 +176,33 @@ double FERealVapor::SpecificEntropy(FEMaterialPoint& mp)
     
     double T = tf.m_T + m_Tr;
     double That = T/m_Tr;
+    double ssat = m_ssat->value(That);
+    
     double J = 1 + fp.m_ef;
     double Jsat = 1 + m_esat->value(That);
     double Psat = 1 + m_psat->value(That);
     double dJsat = m_esat->derive(That);
     double dPsat = m_psat->derive(That);
-    double B[MAX_NVP], dB[MAX_NVP];
+    double D[MAX_NVP], dD[MAX_NVP];
     for (int k=0; k<m_nvp; ++k) {
-        B[k] = m_B[k]->value(That);
-        dB[k] = m_B[k]->derive(That);
+        D[k] = m_D[k]->value(That);
+        dD[k] = m_D[k]->derive(That);
     }
     double x = Jsat/J;
     double dx = dJsat/J;
-    double y = dPsat/Psat + dJsat/Jsat;
-    double s = m_ssat->value(That) + dJsat*Psat*(1-B[0]) - Jsat*Psat*(y*B[0]+dB[0])*log(x);
+    double sum1 = 0, sum2 = 0, sum3 = 0;
     for (int k=1; k<m_nvp; ++k) {
-        double px = pow(x,k);
-        s += Psat*(-dJsat*B[k]*px + Jsat*(y*B[k]+dB[k])/k*(1-px));
+        double xk = pow(x,k);
+        double xkp = xk*x;
+        double y = (1-xkp)/(k+1) - (1-xk)/k;
+        sum1 += D[k]*y;
+        sum2 += D[k]*xk;
+        sum3 += dD[k]*y;
     }
+    
+    double z = log(x)+1-x;
+    double s = ssat - (dPsat*Jsat + Psat*dJsat)*(log(x) + D[0]*z + sum1)
+    - Psat*(1-x)*dJsat*(D[0] + sum2) - Psat*Jsat*(dD[0]*z + sum3);
 
     return s*m_Pr/(m_Tr*m_rhor);
 }
@@ -364,46 +236,9 @@ double FERealVapor::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
     double Jsat = 1 + m_esat->value(That);
     double y = 1 - Jsat/J;
     double cv = m_cvsat->value(That);
-    for (int k=0; k<m_nvc; ++k) cv -= m_C[k]->value(That)*pow(y,k);
+    for (int k=0; k<m_nvc; ++k) cv += m_C[k]->value(That)*pow(y,k+1);
 
     return cv*m_Pr/(m_Tr*m_rhor);
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of isochoric specific heat capacity with respect to strain J
-double FERealVapor::Tangent_cv_Strain(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    
-    double J = 1 + fp.m_ef;
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double Jsat = 1 + m_esat->value(That);
-    double y = 1 - Jsat/J;
-    double dcvJ = 0;
-    for (int k=0; k<m_nvc; ++k) dcvJ -= (k+1)*m_C[k]->value(That)*pow(y,k);
-    dcvJ *= Jsat/(J*J);
-    
-    return dcvJ*m_Pr/(m_Tr*m_rhor);
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of isochoric specific heat capacity with respect to temperature T
-double FERealVapor::Tangent_cv_Temperature(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    
-    double J = 1 + fp.m_ef;
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double Jsat = 1 + m_esat->value(That);
-    double dJsat = m_esat->derive(That);
-    double y = 1 - Jsat/J;
-    double dcvT = m_cvsat->derive(That);
-    for (int k=0; k<m_nvc; ++k) dcvT -= (m_C[k]->derive(That)*y - (k+1)*dJsat/J*m_C[k]->value(That))*pow(y,k);
-    return dcvT*m_Pr/(pow(m_Tr,2)*m_rhor);
 }
 
 //-----------------------------------------------------------------------------
@@ -415,7 +250,8 @@ double FERealVapor::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
     double p = Pressure(mp);
     double dpT = Tangent_Temperature(mp);
     double dpJ = Tangent_Strain(mp);
-    double cp = cv + (dpT/dpJ)/m_rhor*(p - (m_Tr + tf.m_T)*dpT);
+    double T = m_Tr + tf.m_T;
+    double cp = cv - T/m_rhor*pow(dpT,2)/dpJ;
     return cp;
 }
 
@@ -431,23 +267,27 @@ bool FERealVapor::Dilatation(const double T, const double p, double& e)
     double Psat = 1 + m_psat->value(That);
     // check to make sure that we are in the vapor phase
     if (Phat > Psat) return false;
-    // check to see if we are infinitesimally close to the saturation curve
-    if (fabs(Phat - Psat) < 1e-3) {
-        // if nearly on saturation curve, use saturation curve dilatation
-        e = m_esat->value(That);
-        return true;
-    }
     // then continue
     double Jsat = 1 + m_esat->value(That);
-    vector <double> B(m_nvp+1,0);
-    for (int k=0; k<m_nvp; ++k) B[k+1] = m_B[k]->value(That);
+    double D[MAX_NVP];
+    vector <double> B(m_nvp+2,0);
+    for (int k=0; k<m_nvp; ++k) D[k] = m_D[k]->value(That);
     B[0] = -Phat/Psat;
+    B[1] = 1 + D[0];
+    B[m_nvp+1] = -D[m_nvp-1];
+    for (int k=0; k<m_nvp-1; ++k) B[k+2] = D[k+1] - D[k];
+    double x = (-B[1]+sqrt(B[1]*B[1]-4*B[0]*B[2]))/(2*B[2]);
+    // check to see if we are infinitesimally close to the saturation curve
+    if (Psat - Phat < 1e-3) {
+        // if nearly on saturation curve, use saturation curve dilatation
+        e = Jsat/x - 1;
+        return true;
+    }
     // initial guess for J depends if e = 0 or not
-    double J = (e == 0) ? B[1]*Jsat*Psat/Phat : 1 + e;
+    double J = (e == 0) ? Jsat/x : 1 + e;
     // if one virial coefficient only, we're done
     if (m_nvp == 1) { e = J - 1; return true; }
     // solve iteratively for J using Newton's method
-    double x = Jsat/J;
     bool convgd = solvepoly(m_nvp, B, x, true);
     J = Jsat/x;
     e = J - 1;
