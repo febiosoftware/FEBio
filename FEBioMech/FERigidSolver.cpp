@@ -271,30 +271,6 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 		}
 	}
 
-	FEAnalysis* pstep = m_fem->GetCurrentStep();
-	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
-	{
-		FEMesh& mesh = m_fem->GetMesh();
-
-		// set the initial velocities of all rigid nodes
-		for (int i = 0; i<mesh.Nodes(); ++i)
-		{
-			FENode& n = mesh.Node(i);
-			if (n.m_rid >= 0)
-			{
-				FERigidBody& rb = *fem.GetRigidBody(n.m_rid);
-                vec3d Z = n.m_r0 - rb.m_r0;
-                vec3d z = rb.GetRotation()*Z;
-
-                vec3d v = rb.m_vt + rb.GetRotation()*z;
-				n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, v);
-
-				vec3d a = rb.m_at + (rb.m_alt ^ z) + (rb.m_wt ^ (rb.m_wt ^ z));
-//				n.m_at = a;
-			}
-		}
-	}
-
     for (int i = 0; i<NO; ++i)
     {
         FERigidBody& RB = *fem.GetRigidBody(i);
