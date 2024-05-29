@@ -40,6 +40,7 @@ public:
 	int		fnc;	//!< interpolation function
 	int		ext;	//!< extend mode
 	std::vector<vec2d>	points;
+	std::vector<vec2d>	dpts;		// derivative points for C2SMOOTH option
 	BSpline* spline;    //!< B-spline
     BSpline* sderiv;    //!< B-spline for 1st derivative
     AkimaSpline* akima; //!< Akima spline
@@ -528,7 +529,7 @@ double PointCurve::derive(double time) const
     double dt = Dt * 1e-9;
     double D = 0;
     
-    if (time > tmax) {
+    if (time >= tmax) {
         // use backward difference
         double t2 = time - 2 * dt;
         double t1 = time - dt;
@@ -560,56 +561,56 @@ double PointCurve::derive(double time) const
     {
         if (N == 3)
         {
-            double t0 = dpts[0].x();
-            double t1 = dpts[1].x();
-            double t2 = dpts[2].x();
+            double t0 = im->dpts[0].x();
+            double t1 = im->dpts[1].x();
+            double t2 = im->dpts[2].x();
             
-            double f0 = dpts[0].y();
-            double f1 = dpts[1].y();
-            double f2 = dpts[2].y();
+            double f0 = im->dpts[0].y();
+            double f1 = im->dpts[1].y();
+            double f2 = im->dpts[2].y();
             
             return qerp(time, t0, f0, t1, f1, t2, f2);
         }
         else
         {
             int n = 0;
-            while (dpts[n].x() <= time) ++n;
+            while (im->dpts[n].x() <= time) ++n;
             
             if (n == 1)
             {
-                double t0 = dpts[0].x();
-                double t1 = dpts[1].x();
-                double t2 = dpts[2].x();
+                double t0 = im->dpts[0].x();
+                double t1 = im->dpts[1].x();
+                double t2 = im->dpts[2].x();
                 
-                double f0 = dpts[0].y();
-                double f1 = dpts[1].y();
-                double f2 = dpts[2].y();
+                double f0 = im->dpts[0].y();
+                double f1 = im->dpts[1].y();
+                double f2 = im->dpts[2].y();
                 
                 return qerp(time, t0, f0, t1, f1, t2, f2);
             }
             else if (n == N - 1)
             {
-                double t0 = dpts[n - 2].x();
-                double t1 = dpts[n - 1].x();
-                double t2 = dpts[n].x();
+                double t0 = im->dpts[n - 2].x();
+                double t1 = im->dpts[n - 1].x();
+                double t2 = im->dpts[n].x();
                 
-                double f0 = dpts[n - 2].y();
-                double f1 = dpts[n - 1].y();
-                double f2 = dpts[n].y();
+                double f0 = im->dpts[n - 2].y();
+                double f1 = im->dpts[n - 1].y();
+                double f2 = im->dpts[n].y();
                 
                 return qerp(time, t0, f0, t1, f1, t2, f2);
             }
             else
             {
-                double t0 = dpts[n - 2].x();
-                double t1 = dpts[n - 1].x();
-                double t2 = dpts[n].x();
-                double t3 = dpts[n + 1].x();
+                double t0 = im->dpts[n - 2].x();
+                double t1 = im->dpts[n - 1].x();
+                double t2 = im->dpts[n].x();
+                double t3 = im->dpts[n + 1].x();
                 
-                double f0 = dpts[n - 2].y();
-                double f1 = dpts[n - 1].y();
-                double f2 = dpts[n].y();
-                double f3 = dpts[n + 1].y();
+                double f0 = im->dpts[n - 2].y();
+                double f1 = im->dpts[n - 1].y();
+                double f2 = im->dpts[n].y();
+                double f3 = im->dpts[n + 1].y();
                 
                 double q1 = qerp(time, t0, f0, t1, f1, t2, f2);
                 double q2 = qerp(time, t1, f1, t2, f2, t3, f3);
@@ -786,7 +787,8 @@ bool PointCurve::Update()
             }
             
             // evaluate control points of spline derivative using finite difference scheme (non-uniform)
-            dpts = im->points;
+			std::vector<vec2d>& dpts = im->dpts;
+			dpts = im->points;
             double d01, d10, d11, d20,d21, d02, d12;
             // forward difference at first point
             d10 = dpts[1].x() - dpts[0].x();

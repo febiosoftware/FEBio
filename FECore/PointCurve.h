@@ -128,5 +128,4 @@ protected:
     
 private:
     Imp* im;
-    std::vector<vec2d> dpts;
 };
