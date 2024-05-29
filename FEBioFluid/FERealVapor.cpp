@@ -64,7 +64,7 @@ FERealVapor::FERealVapor(FEModel* pfem) : FEElasticFluid(pfem)
     m_Pr = m_Tr = 0;
     for (int k=0; k<MAX_NVP; ++k) m_D[k] = nullptr;
     for (int k=0; k<MAX_NVC; ++k) m_C[k] = nullptr;
-    m_psat = m_asat = m_ssat = nullptr;
+    m_psat = m_asat = m_ssat = m_esat = m_cvsat = nullptr;
 }
 
 //-----------------------------------------------------------------------------
