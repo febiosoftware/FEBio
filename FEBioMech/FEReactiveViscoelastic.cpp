@@ -74,6 +74,7 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
     
     m_pDmg = nullptr;
     m_pFtg = nullptr;
+    m_pRPD = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -99,6 +100,7 @@ bool FEReactiveViscoelasticMaterial::Init()
     
     m_pDmg = dynamic_cast<FEDamageMaterial*>(m_pBase);
     m_pFtg = dynamic_cast<FEReactiveFatigue*>(m_pBase);
+    m_pRPD = dynamic_cast<FEReactivePlasticDamage*>(m_pBase);
 
     return FEElasticMaterial::Init();
 }
@@ -753,5 +755,10 @@ double FEReactiveViscoelasticMaterial::Damage(FEMaterialPoint& mp)
     double D = 0;
     if (m_pDmg) D = m_pDmg->Damage(*GetBaseMaterialPoint(mp));
     else if (m_pFtg) D = m_pFtg->Damage(*GetBaseMaterialPoint(mp));
+    else if (m_pRPD) {
+        FEMaterialPoint& pt = *GetBaseMaterialPoint(mp);
+        const FEReactiveMaterialPoint* ppd = pt.ExtractData<FEReactiveMaterialPoint>();
+        D = ppd->BrokenBonds();
+    }
     return D;
 }
