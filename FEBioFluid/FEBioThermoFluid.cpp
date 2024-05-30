@@ -55,6 +55,7 @@ SOFTWARE.*/
 #include "FEThermoFluidTemperatureBC.h"
 #include "FEFluidModule.h"
 #include "FEThermoFluidAnalysis.h"
+#include "FEBioFluidPlot.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -144,6 +145,10 @@ void FEBioThermoFluid::InitModule()
     //-----------------------------------------------------------------------------
     // loads
     REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure constraint");
+
+    //-----------------------------------------------------------------------------
+    // classes derived from FEPlotData
+    REGISTER_FECORE_CLASS(FEPlotFluidRelativeThermalPecletNumber, "fluid relative thermal Peclet number");
 
     //-----------------------------------------------------------------------------
     // Reset solver parameters to preferred default settings

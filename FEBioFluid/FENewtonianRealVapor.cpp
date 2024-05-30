@@ -40,10 +40,10 @@ BEGIN_FECORE_CLASS(FENewtonianRealVapor, FEViscousFluid)
 // properties
     ADD_PROPERTY(m_esat , "esat",FEProperty::Optional)->SetLongName("saturation dilatation");
     ADD_PROPERTY(m_musat, "musat",FEProperty::Optional)->SetLongName("normalized saturation shear viscosity");
-    ADD_PROPERTY(m_C[0] , "C0", FEProperty::Optional)->SetLongName("0th mu virial coeff");
-    ADD_PROPERTY(m_C[1] , "C1", FEProperty::Optional)->SetLongName("1st mu virial coeff");
-    ADD_PROPERTY(m_C[2] , "C2", FEProperty::Optional)->SetLongName("2nd mu virial coeff");
-    ADD_PROPERTY(m_C[3] , "C3", FEProperty::Optional)->SetLongName("3rd mu virial coeff");
+    ADD_PROPERTY(m_C[0] , "C0", FEProperty::Optional)->SetLongName("1st mu virial coeff");
+    ADD_PROPERTY(m_C[1] , "C1", FEProperty::Optional)->SetLongName("2nd mu virial coeff");
+    ADD_PROPERTY(m_C[2] , "C2", FEProperty::Optional)->SetLongName("3rd mu virial coeff");
+    ADD_PROPERTY(m_C[3] , "C3", FEProperty::Optional)->SetLongName("4th mu virial coeff");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

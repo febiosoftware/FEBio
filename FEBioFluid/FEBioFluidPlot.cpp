@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 #include "FEPolarFluidMaterial.h"
 #include "FEFluid.h"
+#include "FEThermoFluid.h"
 #include "FEPolarFluid.h"
 #include "FEFluidDomain.h"
 #include "FEFluidFSIDomain.h"
@@ -1503,6 +1504,27 @@ bool FEPlotFluidRelativeReynoldsNumber::Save(FEDomain &dom, FEDataStream& a)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidRelativeThermalPecletNumber::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEThermoFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluid>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<double>(dom, a, [&pfluid](const FEMaterialPoint& mp) {
+        const FEFluidMaterialPoint* fpt = mp.ExtractData<FEFluidMaterialPoint>();
+//        const FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        double cp = pfluid->GetElastic()->IsobaricSpecificHeatCapacity(mp_noconst);
+        double K = pfluid->GetConduct()->ThermalConductivity(mp_noconst);
+        double rho = pfluid->Density(mp_noconst);
+        vec3d v(0,0,0);
+//        if (ept) v = ept->m_v;
+        return (fpt->m_vft - v).Length()*rho*cp/K;
+    });
+    
+    return true;
+}
+
 //=================================================================================================
 //-----------------------------------------------------------------------------
 FEPlotFluidRelativePecletNumber::FEPlotFluidRelativePecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
@@ -1579,4 +1601,3 @@ bool FEPlotFluidRelativePecletNumber::Save(FEDomain &dom, FEDataStream& a)
     }
     return true;
 }
-

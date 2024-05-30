@@ -665,3 +665,11 @@ protected:
     vector<int>    m_sol;
 };
 
+//-----------------------------------------------------------------------------
+//! Element relative thermal Peclet number
+class FEPlotFluidRelativeThermalPecletNumber : public FEPlotDomainData
+{
+public:
+    FEPlotFluidRelativeThermalPecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RECIPROCAL_LENGTH); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};

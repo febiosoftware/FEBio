@@ -42,18 +42,18 @@ ADD_PROPERTY(m_psat , "psat" )->SetLongName("saturation gauge pressure normalize
 ADD_PROPERTY(m_asat , "asat" )->SetLongName("saturation free energy normalized");
 ADD_PROPERTY(m_ssat , "ssat" )->SetLongName("saturation entropy normalized");
 ADD_PROPERTY(m_cvsat, "cvsat")->SetLongName("saturation cv normalized");
-ADD_PROPERTY(m_D[0] , "D0"   )->SetLongName("0th normalized pressure coefficient");
-ADD_PROPERTY(m_D[1] , "D1" , FEProperty::Optional)->SetLongName("1st normalized pressure coefficient");
-ADD_PROPERTY(m_D[2] , "D2" , FEProperty::Optional)->SetLongName("2nd normalized pressure coefficient");
-ADD_PROPERTY(m_D[3] , "D3" , FEProperty::Optional)->SetLongName("3rd normalized pressure coefficient");
-ADD_PROPERTY(m_D[4] , "D4" , FEProperty::Optional)->SetLongName("4th normalized pressure coefficient");
-ADD_PROPERTY(m_D[5] , "D5" , FEProperty::Optional)->SetLongName("5th normalized pressure coefficient");
-ADD_PROPERTY(m_D[6] , "D6" , FEProperty::Optional)->SetLongName("6th normalized pressure coefficient");
+ADD_PROPERTY(m_D[0] , "D0"   )->SetLongName("1st normalized pressure coefficient");
+ADD_PROPERTY(m_D[1] , "D1" , FEProperty::Optional)->SetLongName("2nd normalized pressure coefficient");
+ADD_PROPERTY(m_D[2] , "D2" , FEProperty::Optional)->SetLongName("3rd normalized pressure coefficient");
+ADD_PROPERTY(m_D[3] , "D3" , FEProperty::Optional)->SetLongName("4th normalized pressure coefficient");
+ADD_PROPERTY(m_D[4] , "D4" , FEProperty::Optional)->SetLongName("5th normalized pressure coefficient");
+ADD_PROPERTY(m_D[5] , "D5" , FEProperty::Optional)->SetLongName("6th normalized pressure coefficient");
+ADD_PROPERTY(m_D[6] , "D6" , FEProperty::Optional)->SetLongName("7th normalized pressure coefficient");
 
-ADD_PROPERTY(m_C[0], "C0")->SetLongName("0th cv virial coeff");
-ADD_PROPERTY(m_C[1], "C1", FEProperty::Optional)->SetLongName("1st cv virial coeff");
-ADD_PROPERTY(m_C[2], "C2", FEProperty::Optional)->SetLongName("2nd cv virial coeff");
-ADD_PROPERTY(m_C[3], "C3", FEProperty::Optional)->SetLongName("3rd cv virial coeff");
+ADD_PROPERTY(m_C[0], "C0")->SetLongName("1st cv virial coeff");
+ADD_PROPERTY(m_C[1], "C1", FEProperty::Optional)->SetLongName("2nd cv virial coeff");
+ADD_PROPERTY(m_C[2], "C2", FEProperty::Optional)->SetLongName("3rd cv virial coeff");
+ADD_PROPERTY(m_C[3], "C3", FEProperty::Optional)->SetLongName("4th cv virial coeff");
 
 END_FECORE_CLASS();
 
