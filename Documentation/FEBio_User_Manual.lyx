@@ -79112,7 +79112,11 @@ The material type for a compressive reactive viscoelastic solid is
 \begin_inset Quotes eld
 \end_inset
 
+
+\emph on
 reactive viscoelastic
+\emph default
+
 \begin_inset Quotes erd
 \end_inset
 
@@ -90958,6 +90962,1265 @@ DC von Mises stress
 
 \begin_layout LyX-Code
   <plastic_damage_criterion type="DC octahedral shear strain"/>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Viscoplasticity
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Viscoplasticity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A reactive viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) consists of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the equilibrium elastic response, and a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the viscous response.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response may be attributed to strong molecular bonds (e.g., covalent bonds)
+ in a material region, that don't break in the absence of damage, whereas
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response is attributed to weak molecular bonds (e.g., hydrogen bonds) in
+ the material region, that break under loading, and reform in a stress-free
+ state.
+\end_layout
+
+\begin_layout Standard
+To model viscoplasticity in a reactive framework, one may use a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plasticity
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) as the type of 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ material appearing in a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive viscoelastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material may be modeled as recommended previously (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive visoelasticity with reactive plasticity
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" name="Material2" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+		<isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+		<rtol>0.0001</rtol>
+\end_layout
+
+\begin_layout LyX-Code
+		<secant_tangent>1</secant_tangent>
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>73000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<yield_criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+		<flow_curve type="PFC paper">
+\end_layout
+
+\begin_layout LyX-Code
+			<Y0>330</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+			<Ymax>489</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+			<w0>0.967</w0>
+\end_layout
+
+\begin_layout LyX-Code
+			<we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+			<nf>15</nf>
+\end_layout
+
+\begin_layout LyX-Code
+			<r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+		</flow_curve>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+		<E>7300</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>1.5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Viscoelasticity and Viscoplasticity with Damage
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Viscoelasticity-Damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A reactive viscoelastic material may undergo damage as detailed in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+.
+ Reactive viscoelastic materials (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) consist of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the equilibrium elastic response, and a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the viscous response.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response may be attributed to strong molecular bonds (e.g., covalent bonds)
+ in a material region, that don't break in the absence of damage, whereas
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response is attributed to weak molecular bonds (e.g., hydrogen bonds) in
+ the material region, that break under loading, and reform in a stress-free
+ state.
+\end_layout
+
+\begin_layout Standard
+It follows from this definition that the 
+\begin_inset Quotes eld
+\end_inset
+
+elastic
+\begin_inset Quotes erd
+\end_inset
+
+ material of a 
+\begin_inset Quotes eld
+\end_inset
+
+reactive viscoelastic
+\begin_inset Quotes erd
+\end_inset
+
+ material may undergo damage, as described for example in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ This damage is cause by the breaking of strong molecular bonds in the material
+ region, and the associated damage variable 
+\begin_inset Formula $D$
+\end_inset
+
+ represents the mass fraction of the material region whose strong bonds
+ have broken.
+ However, when strong molecular bonds break, the gap between molecular constitue
+nts of that material region may increase, also preventing the formation
+ of weak moleculer bonds (e.g., since hydrogen bonds may only form when there
+ is sufficient proximity between moeities associated with these bonds).
+ Based on the work of Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+, we can adopt the constitutive assumption that the fraction of weak bonds
+ that fails is the same as the fraction 
+\begin_inset Formula $D$
+\end_inset
+
+ of strong bonds that fail 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+.
+ Therefore, the stress 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
+\end_inset
+
+ produced by strong bonds in a material region may be attenuated as 
+\begin_inset Formula $\left(1-D\right)\boldsymbol{\sigma}^{e}$
+\end_inset
+
+, just like the stress 
+\begin_inset Formula $\boldsymbol{\sigma}^{b}$
+\end_inset
+
+ produced by weak bonds may be reduced to 
+\begin_inset Formula $\left(1-D\right)\boldsymbol{\sigma}^{b}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+reactive viscoelastic
+\begin_inset Quotes erd
+\end_inset
+
+ material in FEBio automatically recognizes if its 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ component happens to be a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, or a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material.
+ In either of these cases, it will prescribe the damage 
+\begin_inset Formula $D$
+\end_inset
+
+ calculated from the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response to the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response.
+ In other words, it is possible to model viscoelastic damage and viscoplastic
+ damage in FEBio.
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive viscoelasticity with elastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Material1" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0.0001</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="elastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>1000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>2.5</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>125</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<E>2000</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive viscoelasticity with reactive plastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" name="Material2" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="reactive plastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+		<rtol>0.0001</rtol>
+\end_layout
+
+\begin_layout LyX-Code
+		<secant_tangent>1</secant_tangent>
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>73000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<yield_criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+		<flow_curve type="PFC paper">
+\end_layout
+
+\begin_layout LyX-Code
+			<Y0>330</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+			<Ymax>489</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+			<w0>0.967</w0>
+\end_layout
+
+\begin_layout LyX-Code
+			<we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+			<nf>15</nf>
+\end_layout
+
+\begin_layout LyX-Code
+			<r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+		</flow_curve>
+\end_layout
+
+\begin_layout LyX-Code
+		<plastic_damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>0.65</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>7.95</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</plastic_damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<plastic_damage_criterion type="DC octahedral shear strain"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<E>7300</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>1.5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Viscoelastic Damage
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Viscoelastic-Damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Viscoelastic-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is fundamentally a continuum representation of the Standard Solid in classical
+ viscoelasticity, valid under finite deformation in the context of quasilinear
+ viscoelasticity.
+ The standard solid consists of a spring 
+\begin_inset Formula $e$
+\end_inset
+
+ in parallel with a Maxwell element (a spring 
+\begin_inset Formula $s$
+\end_inset
+
+ and dashpot 
+\begin_inset Formula $d$
+\end_inset
+
+ in series).
+ The spring stiffness in the Maxwell element is assumed to be equal to 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ times the stiffness of the parallel spring.
+ The elastic spring response may be a nonlinear function of the strain but
+ the viscoelastic response must be linear (i.e., it must obey Boltzmann's
+ superposition principle, equivalent to stating that the Maxwell element
+ response is governed by a linear ordinary differential equation, or ODE).
+ In general, a viscoelastic material of this type may undergo damage, using
+ the framework provided by Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+.
+ In FEBio we model this framework by adopting additional constitutive assumption
+s not provided by Simo, but outlined in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+ and in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+.
+ The FEBio formulation for viscoelastic damage relies on a proper formulation
+ of the strain energy density of the Standard Solid, which is then employed
+ in the analysis of viscoelastic damage.
+ The strain energy density 
+\begin_inset Formula $\Psi_{r}\left(\mathbf{F}\right)$
+\end_inset
+
+ of the viscoelastic solid is given by 
+\begin_inset Formula 
+\[
+\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\gamma\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ is the (observable) deformation gradient of the material (also of the elastic
+ spring 
+\begin_inset Formula $e$
+\end_inset
+
+), 
+\begin_inset Formula $\mathbf{F}_{s}$
+\end_inset
+
+ is the deformation gradient associated with the Maxwell spring 
+\begin_inset Formula $s$
+\end_inset
+
+ (an internal variable which evolves based on a first-order ODE), and 
+\begin_inset Formula $\Psi_{r}^{e}$
+\end_inset
+
+ is the strain energy density of the elastic spring.
+ Let 
+\begin_inset Formula $\mathbf{S}^{e}$
+\end_inset
+
+ denote the second Piola-Kirchhoff stress in the elastic spring, obtained
+ from the standard hyperelasticity relation 
+\begin_inset Formula $\mathbf{S}^{e}=\partial\Psi_{r}\left(\mathbf{F}\right)/\partial\mathbf{E}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ is the Lagrange strain tensor evaluated from 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ It follows from the above relation for the strain energy density that 
+\begin_inset Formula $\mathbf{S}\left(\mathbf{F}\right)=\mathbf{S}^{e}\left(\mathbf{F}\right)+\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Damage 
+\begin_inset Formula $D^{e}$
+\end_inset
+
+ is produced in the elastic spring 
+\begin_inset Formula $e$
+\end_inset
+
+ according to the framework described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, based on a user-defined damage criterion 
+\begin_inset Formula $\Xi^{e}\left(\mathbf{F}\right)$
+\end_inset
+
+ (such as von Mises stress or maximum principal normal stress), such that
+ 
+\begin_inset Formula $0\le D^{e}\le1$
+\end_inset
+
+ represents the range from zero to complete damage.
+ The resulting stress in the elastic spring is now given by the attenuated
+ value 
+\begin_inset Formula $\left(1-D^{e}\right)\mathbf{S}^{e}$
+\end_inset
+
+
+\begin_inset Formula $\left(\mathbf{F}\right)$
+\end_inset
+
+.
+ Based on Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+, FEBio assumes that the damage in the Maxwell element is similarly given
+ by 
+\begin_inset Formula $\left(1-D^{e}\right)\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+.
+ Thus, the stress in a damaged viscoelastic material in FEBio is evaluated
+ from 
+\begin_inset Formula $\left(1-D^{e}\right)\mathbf{S}\left(\mathbf{F}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The specification of a material with 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+viscoelastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ takes the same form as that of a viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Viscoelastic-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), except that the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ component should now consist of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material type, whose specification is outlined in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: Viscoelastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Material1" type="viscoelastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<t1>5</t1>
+\end_layout
+
+\begin_layout LyX-Code
+	<t2>1</t2>
+\end_layout
+
+\begin_layout LyX-Code
+	<t3>1</t3>
+\end_layout
+
+\begin_layout LyX-Code
+	<t4>1</t4>
+\end_layout
+
+\begin_layout LyX-Code
+	<t5>1</t5>
+\end_layout
+
+\begin_layout LyX-Code
+	<t6>1</t6>
+\end_layout
+
+\begin_layout LyX-Code
+	<g0>1</g0>
+\end_layout
+
+\begin_layout LyX-Code
+	<g1>2</g1>
+\end_layout
+
+\begin_layout LyX-Code
+	<g2>0</g2>
+\end_layout
+
+\begin_layout LyX-Code
+	<g3>0</g3>
+\end_layout
+
+\begin_layout LyX-Code
+	<g4>0</g4>
+\end_layout
+
+\begin_layout LyX-Code
+	<g5>0</g5>
+\end_layout
+
+\begin_layout LyX-Code
+	<g6>0</g6>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="elastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>1000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>2.5</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>125</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
 \end_layout
 
 \begin_layout LyX-Code
