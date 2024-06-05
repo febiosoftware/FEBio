@@ -53,7 +53,7 @@ bool FEMathController::Init()
 
 		m_param.push_back(param);
 
-		snprintf(sz, 64, "var_%d", i);
+		snprintf(sz, sizeof(sz), "var_%d", i);
 		m_val.AddVariable(sz);
 	}
 

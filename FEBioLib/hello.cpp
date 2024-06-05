@@ -36,7 +36,7 @@ int febio::Hello(LogStream& log)
 {
 	char szversion[128] = { 0 };
 	char* szvernum = getVersionString();
-	snprintf(szversion, 128, "  version %s\n", szvernum);
+	snprintf(szversion, sizeof(szversion), "  version %s\n", szvernum);
 	
 	log.print("===========================================================================\n");
 	log.print("         ________    _________   _______       __     _________            \n");

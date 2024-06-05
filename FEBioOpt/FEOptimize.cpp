@@ -47,7 +47,7 @@ FEOptimize::FEOptimize(FEModel* pfem) : FECoreTask(pfem), m_opt(pfem)
 bool FEOptimize::Init(const char* szfile)
 {
 	char szversion[32] = { 0 };
-	snprintf(szversion, 32, "version %d.%d", VERSION, SUB_VERSION);
+	snprintf(szversion, sizeof(szversion), "version %d.%d", VERSION, SUB_VERSION);
 	feLog("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E\n%s\n\n", szversion);
 
 	// read the data from the xml input file
