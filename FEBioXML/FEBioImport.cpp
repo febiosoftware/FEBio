@@ -457,7 +457,7 @@ bool FEBioImport::ReadFile(const char* szfile, bool broot)
 
 					// find the section we are looking for
 					char sz[512] = {0};
-					snprintf(sz, 512, "febio_spec/%s", tag.Name());
+					snprintf(sz, sizeof(sz), "febio_spec/%s", tag.Name());
 					if (xml2.FindTag(sz, tag2) == false) return errf("FATAL ERROR: Couldn't find %s section in file %s.\n\n", tag.Name(), szinc);
 
 					// parse the section

@@ -259,7 +259,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	{
 		char szpath[512] = { 0 };
 		febio::get_app_path(szpath, 511);
-		snprintf(ops.szcnf, 512, "%sfebio.xml", szpath);
+		snprintf(ops.szcnf, sizeof(ops.szcnf), "%sfebio.xml", szpath);
 	}
 
 	// loop over the arguments

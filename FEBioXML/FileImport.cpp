@@ -155,7 +155,7 @@ FEFileException::FEFileException(const char* sz, ...)
 
 	// make the message
 	va_start(args, sz);
-	vsnprintf(m_szerr, 2048, sz, args);
+	vsnprintf(m_szerr, sizeof(m_szerr), sz, args);
 	va_end(args);
 }
 

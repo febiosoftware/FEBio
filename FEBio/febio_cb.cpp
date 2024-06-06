@@ -74,9 +74,9 @@ bool update_console_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 
 	char szvers[64] = {0};
 #ifndef NDEBUG
-	snprintf(szvers, 64, "FEBio (DEBUG) %s", szver);
+	snprintf(szvers, sizeof(szvers), "FEBio (DEBUG) %s", szver);
 #else
-	snprintf(szvers, 64, "FEBio %s", szver);
+	snprintf(szvers, sizeof(szvers), "FEBio %s", szver);
 #endif
 
 	// print progress in title bar

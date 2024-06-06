@@ -90,7 +90,7 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 	{
 		char szpath[1024] = { 0 };
 		febio::get_app_path(szpath, 1023);
-		snprintf(ops.szcnf, 1024, "%sfebio.xml", szpath);
+		snprintf(ops.szcnf, sizeof(ops.szcnf), "%sfebio.xml", szpath);
 	}
 
 	// loop over the arguments
@@ -151,7 +151,7 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 			if (szext == 0)
 			{
 				// we assume a default extension of .feb if none is provided
-				snprintf(ops.szfile, 1024, "%s.feb", sz);
+				snprintf(ops.szfile, sizeof(ops.szfile), "%s.feb", sz);
 			}
 			else strcpy(ops.szfile, sz);
 			ops.binteractive = false;
