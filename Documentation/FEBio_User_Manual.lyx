@@ -4992,7 +4992,350 @@ At the end of the analysis a summary is printed with heuristics that inform
 \end_layout
 
 \begin_layout Standard
-By default, all screen output will also be printed to the log flie.
+By default, all screen output will also be printed to the log file.
+ 
+\end_layout
+
+\begin_layout Standard
+The summary printed at the end of a run also provides some useful timing
+ information.
+ Below follows an explanation of the different reported timings.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+timing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Input time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time it took to process the FEBio input file.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initialization time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to initialize and check the model
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Solve time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The total time it took to solve the model.
+ This is the sum of the following timings:
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+IO-time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to write the output files (i.e.
+ the plot, dump, and data files)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+reforming stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to reform the stiffness matrix (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+evaluating stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the stiffness matrix (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+evaluating residual
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the residual (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+model update
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to update the model (4)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QN updates
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the Quasi-Newton updates (5)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+time in linear solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time spent in the linear solver (6)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Table listing descriptions of the different timings reported at the end
+ of an FEBio job.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+Internally, FEBio uses a sparse-matrix storage format to store the global
+ stiffness matrix efficiently.
+ A matrix reformation refers to the process of calculating the structure
+ of this sparse matrix.
+ The structure depends mostly on the nodal connectivity and for many problems
+ this only needs to be calculated once at the start of the run.
+ However, for some problems the connectivity may change during an analysis
+ and this may require a reformation of the global stiffness matrix.
+ (For instance, changes in contacting facets.) 
+\end_layout
+
+\begin_layout Enumerate
+The global stiffness matrix needs to be evaluated often as it is needed
+ by the Newton solver for finding the solution.
+ The total time to evaluate this stiffness matrix may often be a significant
+ portion of the total runtime, however, there are several parameters that
+ affect this.
+ For instance, the max_ups parameter sets the number of quasi-Newton updates.
+ During these updates, the full stiffness is not re-evaluated.
+ Instead, a rank-one update is performed, which often significantly reduces
+ the time to evaluate the stiffness matrices.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The residual, which is the difference between 
+\begin_inset Quotes eld
+\end_inset
+
+internal
+\begin_inset Quotes erd
+\end_inset
+
+ forces (i.e.
+ stresses) and external forces, is evaluated during each quasi-Newton iteration.
+ Although the residual is calculated many times during an analysis, its
+ evaluation rarely takes up a significant time of the total run time.
+ 
+\end_layout
+
+\begin_layout Enumerate
+During the model update, all quantities that depend on the solution variables
+ will be updated.
+ This includes nodal positions, element stress, etc.
+ This update is also called for each quasi-Newton iteration.
+ Although the update is usually fast, the fact that it is required for every
+ iteration may cause the total time spent in the model update to be significant.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The QN update refers to the process of calculating a rank-one update of
+ the stiffness matrix.
+ This is usually a fast process and does not take up a signifcant amount
+ of time.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The time in the linear solver usually takes up most of the total runtime.
+ Most of this time is spent calculating the factorization of the global
+ stiffness matrix.
  
 \end_layout
 
