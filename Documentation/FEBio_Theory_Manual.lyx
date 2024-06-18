@@ -34595,6 +34595,26 @@ and the spatial elasticity tensor is
 
 \end_inset
 
+In the limit as 
+\begin_inset Formula $\beta\to0$
+\end_inset
+
+ we find that
+\begin_inset Formula 
+\begin{equation}
+\lim_{\beta\to0}\Psi\left(I_{1},I_{2},J\right)=\frac{1}{4}\left[2\mu\left(I_{1}-3\right)+\lambda\left(I_{2}-I_{1}\right)-\left(\lambda+2\mu\right)\ln J^{2}\right]\label{eq:433-1}
+\end{equation}
+
+\end_inset
+
+in which case
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\frac{1}{2J}\left(\left(2\mu-\lambda\right)\mathbf{b}+\lambda\left(I_{1}\mathbf{b}-\mathbf{b}^{2}\right)-\left(\lambda+2\mu\right)\left(\ln J\right)\mathbf{I}\right)\label{eq:433-2}
+\end{equation}
+
+\end_inset
+
 
 \end_layout
 
