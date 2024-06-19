@@ -65,13 +65,11 @@ double FEElasticFluid::Tangent_Strain_Strain(FEMaterialPoint& mp)
     fp->m_ef = pf.m_ef+d;
     ft->m_T = tf.m_T;
     FEMaterialPoint tmp(ft);
-    double pp = Pressure(tmp);
+    double dpp = Tangent_Strain(tmp);
     fp->m_ef = pf.m_ef-d;
-    double pm = Pressure(tmp);
-    fp->m_ef = pf.m_ef;
-    double p = Pressure(tmp);
+    double dpm = Tangent_Strain(tmp);
     delete ft;
-    double dpJ2 = (pp - 2*p + pm)/(d*d);
+    double dpJ2 = (dpp - dpm)/(2*d);
     return dpJ2;
 }
 
@@ -111,13 +109,11 @@ double FEElasticFluid::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
     fp->m_ef = pf.m_ef;
     ft->m_T = tf.m_T+d;
     FEMaterialPoint tmp(ft);
-    double pp = Pressure(tmp);
+    double dpp = Tangent_Temperature(tmp);
     ft->m_T = tf.m_T-d;
-    double pm = Pressure(tmp);
-    ft->m_T = tf.m_T;
-    double p = Pressure(tmp);
+    double dpm = Tangent_Temperature(tmp);
     delete ft;
-    double dpT2 = (pp - 2*p + pm)/(d*d);
+    double dpT2 = (dpp - dpm)/(2*d);
     return dpT2;
 }
 
@@ -134,18 +130,13 @@ double FEElasticFluid::Tangent_Strain_Temperature(FEMaterialPoint& mp)
     FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
     FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
     fp->m_ef = pf.m_ef+dJ;
-    ft->m_T = tf.m_T+dT;
+    ft->m_T = tf.m_T;
     FEMaterialPoint tmp(ft);
-    double ppp = Pressure(tmp);
+    double dpp = Tangent_Temperature(tmp);
     fp->m_ef = pf.m_ef-dJ;
-    double ppm = Pressure(tmp);
-    ft->m_T = tf.m_T-dT;
-    double pmm = Pressure(tmp);
-    fp->m_ef = pf.m_ef+dJ;
-    double pmp = Pressure(tmp);
-
+    double dpm = Tangent_Temperature(tmp);
     delete ft;
-    double dpTJ = (ppp - ppm - pmp + pmm)/(4*dT*dJ);
+    double dpTJ = (dpp - dpm)/(2*dJ);
     return dpTJ;
 }
 
