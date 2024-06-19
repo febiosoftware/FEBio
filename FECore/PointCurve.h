@@ -110,9 +110,6 @@ public: // operations
     void Scale(double s);
     
 public:
-    //! returns the point interval in which x lies
-    size_t binarySearch(std::vector<vec2d> points, double x) const;
-
     //! returns the value of the load curve at time
     double value(double x) const;
     

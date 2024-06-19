@@ -48,11 +48,15 @@ FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem)
 FELoadCurve::FELoadCurve(const FELoadCurve& lc) : FELoadController(lc)
 {
 	m_fnc = lc.m_fnc;
+	m_int = lc.m_int;
+	m_ext = lc.m_ext;
 }
 
 void FELoadCurve::operator = (const FELoadCurve& lc)
 {
 	m_fnc = lc.m_fnc;
+	m_int = lc.m_int;
+	m_ext = lc.m_ext;
 }
 
 FELoadCurve::~FELoadCurve()
