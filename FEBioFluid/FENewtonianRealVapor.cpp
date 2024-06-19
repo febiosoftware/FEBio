@@ -78,6 +78,8 @@ bool FENewtonianRealVapor::Init()
             if (pRV) {
                 m_esat = pRV->m_esat;
                 m_esat->Init();
+                m_Tc = pRV->m_Tc;
+                m_alpha = pRV->m_alpha;
             }
             else return false;
         }
@@ -177,10 +179,11 @@ double FENewtonianRealVapor::ShearViscosity(FEMaterialPoint& mp)
         double T = tf.m_T + m_Tr;
         double That = T/m_Tr;
         double J = 1 + pf.m_ef;
-        mu = m_musat->value(That);
-        double Jsat = 1 + m_esat->value(That);
+        double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+        mu = m_musat->value(q);
+        double Jsat = exp(m_esat->value(q));
         double y = 1 - Jsat/J;
-        for (int k=0; k<m_nvc; ++k) mu += m_C[k]->value(That)*pow(y,k+1);
+        for (int k=0; k<m_nvc; ++k) mu += m_C[k]->value(q)*pow(y,k+1);
     }
     return mu*m_mu;
 }
