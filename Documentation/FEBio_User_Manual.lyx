@@ -162,13 +162,13 @@ status open
 
 \end_inset
 
-User's Manual Version 4.6
+User's Manual Version 4.7
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: March 29, 2024
+Last Updated: June 5, 2024
 \end_layout
 
 \begin_layout Standard
@@ -4992,7 +4992,350 @@ At the end of the analysis a summary is printed with heuristics that inform
 \end_layout
 
 \begin_layout Standard
-By default, all screen output will also be printed to the log flie.
+By default, all screen output will also be printed to the log file.
+ 
+\end_layout
+
+\begin_layout Standard
+The summary printed at the end of a run also provides some useful timing
+ information.
+ Below follows an explanation of the different reported timings.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+timing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Input time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time it took to process the FEBio input file.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initialization time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to initialize and check the model
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Solve time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The total time it took to solve the model.
+ This is the sum of the following timings:
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+IO-time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to write the output files (i.e.
+ the plot, dump, and data files)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+reforming stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to reform the stiffness matrix (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+evaluating stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the stiffness matrix (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+evaluating residual
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the residual (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+model update
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to update the model (4)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QN updates
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the Quasi-Newton updates (5)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+time in linear solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time spent in the linear solver (6)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Table listing descriptions of the different timings reported at the end
+ of an FEBio job.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+Internally, FEBio uses a sparse-matrix storage format to store the global
+ stiffness matrix efficiently.
+ A matrix reformation refers to the process of calculating the structure
+ of this sparse matrix.
+ The structure depends mostly on the nodal connectivity and for many problems
+ this only needs to be calculated once at the start of the run.
+ However, for some problems the connectivity may change during an analysis
+ and this may require a reformation of the global stiffness matrix.
+ (For instance, changes in contacting facets.) 
+\end_layout
+
+\begin_layout Enumerate
+The global stiffness matrix needs to be evaluated often as it is needed
+ by the Newton solver for finding the solution.
+ The total time to evaluate this stiffness matrix may often be a significant
+ portion of the total runtime, however, there are several parameters that
+ affect this.
+ For instance, the max_ups parameter sets the number of quasi-Newton updates.
+ During these updates, the full stiffness is not re-evaluated.
+ Instead, a rank-one update is performed, which often significantly reduces
+ the time to evaluate the stiffness matrices.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The residual, which is the difference between 
+\begin_inset Quotes eld
+\end_inset
+
+internal
+\begin_inset Quotes erd
+\end_inset
+
+ forces (i.e.
+ stresses) and external forces, is evaluated during each quasi-Newton iteration.
+ Although the residual is calculated many times during an analysis, its
+ evaluation rarely takes up a significant time of the total run time.
+ 
+\end_layout
+
+\begin_layout Enumerate
+During the model update, all quantities that depend on the solution variables
+ will be updated.
+ This includes nodal positions, element stress, etc.
+ This update is also called for each quasi-Newton iteration.
+ Although the update is usually fast, the fact that it is required for every
+ iteration may cause the total time spent in the model update to be significant.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The QN update refers to the process of calculating a rank-one update of
+ the stiffness matrix.
+ This is usually a fast process and does not take up a signifcant amount
+ of time.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The time in the linear solver usually takes up most of the total runtime.
+ Most of this time is spent calculating the factorization of the global
+ stiffness matrix.
  
 \end_layout
 
@@ -46026,7 +46369,7 @@ An asterisk (*) in the Category column denotes that the attribute is required
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="138" columns="3">
+<lyxtabular version="3" rows="139" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -47204,6 +47547,35 @@ Volume enclosed by named surface
 \begin_inset Text
 
 \begin_layout Plain Layout
+enclosed volume change
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Change in volume enclosed by named surface
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Euler angle 
 \end_layout
 
@@ -47992,7 +48364,10 @@ reference "eq:mp-effective-p-c"
 , and fluid materials, Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:cfd-pressure"
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -79080,7 +79455,11 @@ The material type for a compressive reactive viscoelastic solid is
 \begin_inset Quotes eld
 \end_inset
 
+
+\emph on
 reactive viscoelastic
+\emph default
+
 \begin_inset Quotes erd
 \end_inset
 
@@ -90926,6 +91305,1265 @@ DC von Mises stress
 
 \begin_layout LyX-Code
   <plastic_damage_criterion type="DC octahedral shear strain"/>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Viscoplasticity
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Viscoplasticity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A reactive viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) consists of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the equilibrium elastic response, and a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the viscous response.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response may be attributed to strong molecular bonds (e.g., covalent bonds)
+ in a material region, that don't break in the absence of damage, whereas
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response is attributed to weak molecular bonds (e.g., hydrogen bonds) in
+ the material region, that break under loading, and reform in a stress-free
+ state.
+\end_layout
+
+\begin_layout Standard
+To model viscoplasticity in a reactive framework, one may use a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plasticity
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) as the type of 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ material appearing in a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive viscoelastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material may be modeled as recommended previously (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive visoelasticity with reactive plasticity
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" name="Material2" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+		<isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+		<rtol>0.0001</rtol>
+\end_layout
+
+\begin_layout LyX-Code
+		<secant_tangent>1</secant_tangent>
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>73000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<yield_criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+		<flow_curve type="PFC paper">
+\end_layout
+
+\begin_layout LyX-Code
+			<Y0>330</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+			<Ymax>489</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+			<w0>0.967</w0>
+\end_layout
+
+\begin_layout LyX-Code
+			<we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+			<nf>15</nf>
+\end_layout
+
+\begin_layout LyX-Code
+			<r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+		</flow_curve>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+		<E>7300</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>1.5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Viscoelasticity and Viscoplasticity with Damage
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Viscoelasticity-Damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A reactive viscoelastic material may undergo damage as detailed in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+.
+ Reactive viscoelastic materials (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) consist of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the equilibrium elastic response, and a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the viscous response.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response may be attributed to strong molecular bonds (e.g., covalent bonds)
+ in a material region, that don't break in the absence of damage, whereas
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response is attributed to weak molecular bonds (e.g., hydrogen bonds) in
+ the material region, that break under loading, and reform in a stress-free
+ state.
+\end_layout
+
+\begin_layout Standard
+It follows from this definition that the 
+\begin_inset Quotes eld
+\end_inset
+
+elastic
+\begin_inset Quotes erd
+\end_inset
+
+ material of a 
+\begin_inset Quotes eld
+\end_inset
+
+reactive viscoelastic
+\begin_inset Quotes erd
+\end_inset
+
+ material may undergo damage, as described for example in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ This damage is cause by the breaking of strong molecular bonds in the material
+ region, and the associated damage variable 
+\begin_inset Formula $D$
+\end_inset
+
+ represents the mass fraction of the material region whose strong bonds
+ have broken.
+ However, when strong molecular bonds break, the gap between molecular constitue
+nts of that material region may increase, also preventing the formation
+ of weak moleculer bonds (e.g., since hydrogen bonds may only form when there
+ is sufficient proximity between moeities associated with these bonds).
+ Based on the work of Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+, we can adopt the constitutive assumption that the fraction of weak bonds
+ that fails is the same as the fraction 
+\begin_inset Formula $D$
+\end_inset
+
+ of strong bonds that fail 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+.
+ Therefore, the stress 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
+\end_inset
+
+ produced by strong bonds in a material region may be attenuated as 
+\begin_inset Formula $\left(1-D\right)\boldsymbol{\sigma}^{e}$
+\end_inset
+
+, just like the stress 
+\begin_inset Formula $\boldsymbol{\sigma}^{b}$
+\end_inset
+
+ produced by weak bonds may be reduced to 
+\begin_inset Formula $\left(1-D\right)\boldsymbol{\sigma}^{b}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+reactive viscoelastic
+\begin_inset Quotes erd
+\end_inset
+
+ material in FEBio automatically recognizes if its 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ component happens to be a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, or a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material.
+ In either of these cases, it will prescribe the damage 
+\begin_inset Formula $D$
+\end_inset
+
+ calculated from the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response to the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response.
+ In other words, it is possible to model viscoelastic damage and viscoplastic
+ damage in FEBio.
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive viscoelasticity with elastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Material1" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0.0001</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="elastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>1000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>2.5</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>125</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<E>2000</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive viscoelasticity with reactive plastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" name="Material2" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="reactive plastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+		<rtol>0.0001</rtol>
+\end_layout
+
+\begin_layout LyX-Code
+		<secant_tangent>1</secant_tangent>
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>73000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<yield_criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+		<flow_curve type="PFC paper">
+\end_layout
+
+\begin_layout LyX-Code
+			<Y0>330</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+			<Ymax>489</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+			<w0>0.967</w0>
+\end_layout
+
+\begin_layout LyX-Code
+			<we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+			<nf>15</nf>
+\end_layout
+
+\begin_layout LyX-Code
+			<r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+		</flow_curve>
+\end_layout
+
+\begin_layout LyX-Code
+		<plastic_damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>0.65</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>7.95</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</plastic_damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<plastic_damage_criterion type="DC octahedral shear strain"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<E>7300</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>1.5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Viscoelastic Damage
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Viscoelastic-Damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Viscoelastic-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is fundamentally a continuum representation of the Standard Solid in classical
+ viscoelasticity, valid under finite deformation in the context of quasilinear
+ viscoelasticity.
+ The standard solid consists of a spring 
+\begin_inset Formula $e$
+\end_inset
+
+ in parallel with a Maxwell element (a spring 
+\begin_inset Formula $s$
+\end_inset
+
+ and dashpot 
+\begin_inset Formula $d$
+\end_inset
+
+ in series).
+ The spring stiffness in the Maxwell element is assumed to be equal to 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ times the stiffness of the parallel spring.
+ The elastic spring response may be a nonlinear function of the strain but
+ the viscoelastic response must be linear (i.e., it must obey Boltzmann's
+ superposition principle, equivalent to stating that the Maxwell element
+ response is governed by a linear ordinary differential equation, or ODE).
+ In general, a viscoelastic material of this type may undergo damage, using
+ the framework provided by Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+.
+ In FEBio we model this framework by adopting additional constitutive assumption
+s not provided by Simo, but outlined in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+ and in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+.
+ The FEBio formulation for viscoelastic damage relies on a proper formulation
+ of the strain energy density of the Standard Solid, which is then employed
+ in the analysis of viscoelastic damage.
+ The strain energy density 
+\begin_inset Formula $\Psi_{r}\left(\mathbf{F}\right)$
+\end_inset
+
+ of the viscoelastic solid is given by 
+\begin_inset Formula 
+\[
+\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\gamma\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ is the (observable) deformation gradient of the material (also of the elastic
+ spring 
+\begin_inset Formula $e$
+\end_inset
+
+), 
+\begin_inset Formula $\mathbf{F}_{s}$
+\end_inset
+
+ is the deformation gradient associated with the Maxwell spring 
+\begin_inset Formula $s$
+\end_inset
+
+ (an internal variable which evolves based on a first-order ODE), and 
+\begin_inset Formula $\Psi_{r}^{e}$
+\end_inset
+
+ is the strain energy density of the elastic spring.
+ Let 
+\begin_inset Formula $\mathbf{S}^{e}$
+\end_inset
+
+ denote the second Piola-Kirchhoff stress in the elastic spring, obtained
+ from the standard hyperelasticity relation 
+\begin_inset Formula $\mathbf{S}^{e}=\partial\Psi_{r}\left(\mathbf{F}\right)/\partial\mathbf{E}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ is the Lagrange strain tensor evaluated from 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ It follows from the above relation for the strain energy density that 
+\begin_inset Formula $\mathbf{S}\left(\mathbf{F}\right)=\mathbf{S}^{e}\left(\mathbf{F}\right)+\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Damage 
+\begin_inset Formula $D^{e}$
+\end_inset
+
+ is produced in the elastic spring 
+\begin_inset Formula $e$
+\end_inset
+
+ according to the framework described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, based on a user-defined damage criterion 
+\begin_inset Formula $\Xi^{e}\left(\mathbf{F}\right)$
+\end_inset
+
+ (such as von Mises stress or maximum principal normal stress), such that
+ 
+\begin_inset Formula $0\le D^{e}\le1$
+\end_inset
+
+ represents the range from zero to complete damage.
+ The resulting stress in the elastic spring is now given by the attenuated
+ value 
+\begin_inset Formula $\left(1-D^{e}\right)\mathbf{S}^{e}$
+\end_inset
+
+
+\begin_inset Formula $\left(\mathbf{F}\right)$
+\end_inset
+
+.
+ Based on Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+, FEBio assumes that the damage in the Maxwell element is similarly given
+ by 
+\begin_inset Formula $\left(1-D^{e}\right)\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+.
+ Thus, the stress in a damaged viscoelastic material in FEBio is evaluated
+ from 
+\begin_inset Formula $\left(1-D^{e}\right)\mathbf{S}\left(\mathbf{F}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The specification of a material with 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+viscoelastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ takes the same form as that of a viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Viscoelastic-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), except that the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ component should now consist of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material type, whose specification is outlined in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: Viscoelastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Material1" type="viscoelastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<t1>5</t1>
+\end_layout
+
+\begin_layout LyX-Code
+	<t2>1</t2>
+\end_layout
+
+\begin_layout LyX-Code
+	<t3>1</t3>
+\end_layout
+
+\begin_layout LyX-Code
+	<t4>1</t4>
+\end_layout
+
+\begin_layout LyX-Code
+	<t5>1</t5>
+\end_layout
+
+\begin_layout LyX-Code
+	<t6>1</t6>
+\end_layout
+
+\begin_layout LyX-Code
+	<g0>1</g0>
+\end_layout
+
+\begin_layout LyX-Code
+	<g1>2</g1>
+\end_layout
+
+\begin_layout LyX-Code
+	<g2>0</g2>
+\end_layout
+
+\begin_layout LyX-Code
+	<g3>0</g3>
+\end_layout
+
+\begin_layout LyX-Code
+	<g4>0</g4>
+\end_layout
+
+\begin_layout LyX-Code
+	<g5>0</g5>
+\end_layout
+
+\begin_layout LyX-Code
+	<g6>0</g6>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="elastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>1000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>2.5</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>125</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
 \end_layout
 
 \begin_layout LyX-Code
@@ -107559,6 +109197,323 @@ Example:
 
 \end_layout
 
+\begin_layout Subsubsection
+Quemada Model
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Quemada-Fluid"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a Quemada model 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Quemada78"
+literal "true"
+
+\end_inset
+
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Quemada
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shear viscosity at zero shear rate suspension volume fraction, 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<H>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+suspension volume fraction, 
+\begin_inset Formula $H$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+intrinsic relative viscosity at zero shear rate, 
+\begin_inset Formula $k_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<kinf>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+intrinsic relative viscosity at infinite shear rate, 
+\begin_inset Formula $k_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<gc>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+critical shear rate, 
+\begin_inset Formula $\dot{\gamma}_{c}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+
+\begin_inset Formula $^{-1}$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The viscous shear stress for this material model is
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}=2\mu\mathbf{D}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mu=\frac{\mu_{0}}{\left(1-k\frac{H}{2}\right)^{2}}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+k=\frac{k_{0}+k_{\infty}\sqrt{\dot{\gamma}_{r}}}{1+\sqrt{\dot{\gamma}_{r}}}\,,\quad\dot{\gamma}_{r}=\frac{\dot{\gamma}}{\dot{\gamma}_{c}}
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\dot{\gamma}=\sqrt{2\mathbf{D}:\mathbf{D}}$
+\end_inset
+
+ is the engineering shear rate.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<viscous type="Quemada">
+\end_layout
+
+\begin_layout LyX-Code
+	<mu0>0.03</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+	<H>0.5</H>
+\end_layout
+
+\begin_layout LyX-Code
+	<k0>3.691</k0>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinf>1.778</kinf>
+\end_layout
+
+\begin_layout LyX-Code
+    <gc>2.30</gc>
+\end_layout
+
+\begin_layout LyX-Code
+</viscous>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 General Specification of Fluid-FSI Materials
 \begin_inset CommandInset label
@@ -115289,7 +117244,7 @@ negative jacobians
  You can request FEBio to print out a detailed list of the inverted elements,
  by setting the 
 \emph on
-output_negative_jacobian
+output_negative_jacobians
 \emph default
  configuration flag in the FEBio configuration file.
  (see 
@@ -115900,9 +117855,9 @@ name "subsec:Augmented-Lagrangian-Method"
 In theory, in the presence of constraints, the corresponding Lagrange multiplier
 s must be calculated which, in the case of contact, correspond to the contact
  forces that enforce the contact constraint exactly.
- Unfortunately, the exact evaluation of these Lagrange multiplies is numerically
- very challenging and therefore in FEBio it was decided to evaluate these
- Lagrange multipliers in an iterative method, named the 
+ Unfortunately, the exact evaluation of these Lagrange multipliers is numericall
+y very challenging and therefore in FEBio it was decided to evaluate these
+ Lagrange multipliers using an iterative method, named the 
 \shape italic
 Augmented Lagrangian 
 \shape default
@@ -115943,9 +117898,15 @@ In many cases, users are only interested in the final time step.
  Lagrange method only in the final time step.
  This can be done by defining a loadcurve for the 
 \shape italic
-laugon 
+tolerance
 \shape default
-contact parameter.
+ contact parameter, which sets the convergence tolerance for the augmentations.
+ (Note that you still need to set the enforcement method, i.e.
+ the 
+\emph on
+laugon
+\emph default
+ paramerter, to AUGLAG (=1)).
  Then, define the corresponding loadcurve as zero everywhere except for
  the final time step.
  FEBio will now only use the augmented Lagrangian method in the final time
@@ -118971,7 +120932,7 @@ Process child tags only for release versions of FEBio (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-output_negative_jacobian
+output_negative_jacobians
 \end_layout
 
 \end_inset
@@ -119130,7 +121091,7 @@ negative jacobians
  If you wish to see a detailed list of the inverted elements, you can set
  the 
 \emph on
-output_negative_jacobian
+output_negative_jacobians
 \emph default
  flag to 1.
 \end_layout

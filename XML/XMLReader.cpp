@@ -515,7 +515,7 @@ string format_string(const char* sz, ...)
 	// make the message
 	char szbuf[512];
 	va_start(args, sz);
-	vsnprintf(szbuf, 512, sz, args);
+	vsnprintf(szbuf, sizeof(szbuf), sz, args);
 	va_end(args);
 
 	return szbuf;

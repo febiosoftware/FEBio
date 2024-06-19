@@ -61,6 +61,9 @@ void FETractionLoad::SetSurface(FESurface* ps)
 // initialization
 bool FETractionLoad::Init()
 {
+	FESurface& surf = GetSurface();
+	surf.SetShellBottom(m_bshellb);
+
 	// get the degrees of freedom
 	m_dof.Clear();
 	if (m_bshellb == false)
@@ -79,10 +82,8 @@ bool FETractionLoad::Init()
 //-----------------------------------------------------------------------------
 void FETractionLoad::LoadVector(FEGlobalVector& R)
 {
-	FESurface& surf = GetSurface();
-	surf.SetShellBottom(m_bshellb);
-
 	// evaluate the integral
+	FESurface& surf = GetSurface();
 	FETractionLoad* load = this;
 	surf.LoadVector(R, m_dof, m_blinear, [=](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
 

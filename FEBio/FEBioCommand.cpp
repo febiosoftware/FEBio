@@ -510,7 +510,7 @@ int FEBioCmd_svg::run(int nargs, char **argv)
 		strcpy(buf, szfile);
 		char* ch = strrchr(buf, '.');
 		if (ch) *ch = 0;
-		snprintf(szsvg, 1024, "%s.svg", buf);
+		snprintf(szsvg, sizeof(szsvg), "%s.svg", buf);
 
 		std::filebuf fb;
 		fb.open(szsvg, std::ios::out);
@@ -547,8 +547,8 @@ int FEBioCmd_out::run(int nargs, char **argv)
 		strcpy(buf, szfile);
 		char* ch = strrchr(buf, '.');
 		if (ch) *ch = 0;
-		snprintf(szK, 1024, "%s.out", buf);
-		snprintf(szR, 1024, "%s_rhs.out", buf);
+		snprintf(szK, sizeof(szK), "%s.out", buf);
+		snprintf(szR, sizeof(szR), "%s_rhs.out", buf);
 
 		febio::write_hb(*A, szK, mode);
 		febio::write_vector(R, szR, mode);

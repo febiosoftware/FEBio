@@ -32,6 +32,158 @@ SOFTWARE.*/
 #include "FEThermoFluid.h"
 
 //-----------------------------------------------------------------------------
+//! tangent of pressure with respect to strain J
+double FEElasticFluid::Tangent_Strain(FEMaterialPoint& mp)
+{
+    double d = 1e-6;
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    FEFluidMaterialPoint& pf = *mp.ExtractData<FEFluidMaterialPoint>();
+
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = pf.m_ef+d;
+    ft->m_T = tf.m_T;
+    FEMaterialPoint tmp(ft);
+    double pp = Pressure(tmp);
+    fp->m_ef = pf.m_ef-d;
+    double pm = Pressure(tmp);
+    delete ft;
+    double dpJ = (pp - pm)/(2*d);
+    return dpJ;
+}
+
+//-----------------------------------------------------------------------------
+//! 2nd tangent of pressure with respect to strain J
+double FEElasticFluid::Tangent_Strain_Strain(FEMaterialPoint& mp)
+{
+    double d = 1e-6;
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    FEFluidMaterialPoint& pf = *mp.ExtractData<FEFluidMaterialPoint>();
+
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = pf.m_ef+d;
+    ft->m_T = tf.m_T;
+    FEMaterialPoint tmp(ft);
+    double dpp = Tangent_Strain(tmp);
+    fp->m_ef = pf.m_ef-d;
+    double dpm = Tangent_Strain(tmp);
+    delete ft;
+    double dpJ2 = (dpp - dpm)/(2*d);
+    return dpJ2;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of pressure with respect to temperature T
+double FEElasticFluid::Tangent_Temperature(FEMaterialPoint& mp)
+{
+    double Tr = GetGlobalConstant("T");
+    double d = 1e-6*Tr;
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    FEFluidMaterialPoint& pf = *mp.ExtractData<FEFluidMaterialPoint>();
+
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = pf.m_ef;
+    ft->m_T = tf.m_T+d;
+    FEMaterialPoint tmp(ft);
+    double pp = Pressure(tmp);
+    ft->m_T = tf.m_T-d;
+    double pm = Pressure(tmp);
+    delete ft;
+    double dpT = (pp - pm)/(2*d);
+    return dpT;
+}
+
+//-----------------------------------------------------------------------------
+//! 2nd tangent of pressure with respect to temperature T
+double FEElasticFluid::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
+{
+    double Tr = GetGlobalConstant("T");
+    double d = 1e-6*Tr;
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    FEFluidMaterialPoint& pf = *mp.ExtractData<FEFluidMaterialPoint>();
+
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = pf.m_ef;
+    ft->m_T = tf.m_T+d;
+    FEMaterialPoint tmp(ft);
+    double dpp = Tangent_Temperature(tmp);
+    ft->m_T = tf.m_T-d;
+    double dpm = Tangent_Temperature(tmp);
+    delete ft;
+    double dpT2 = (dpp - dpm)/(2*d);
+    return dpT2;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of pressure with respect to strain J and temperature T
+double FEElasticFluid::Tangent_Strain_Temperature(FEMaterialPoint& mp)
+{
+    double Tr = GetGlobalConstant("T");
+    double dJ = 1e-6;
+    double dT = 1e-6*Tr;
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    FEFluidMaterialPoint& pf = *mp.ExtractData<FEFluidMaterialPoint>();
+
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = pf.m_ef+dJ;
+    ft->m_T = tf.m_T;
+    FEMaterialPoint tmp(ft);
+    double dpp = Tangent_Temperature(tmp);
+    fp->m_ef = pf.m_ef-dJ;
+    double dpm = Tangent_Temperature(tmp);
+    delete ft;
+    double dpTJ = (dpp - dpm)/(2*dJ);
+    return dpTJ;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of isochoric specific heat capacity with respect to strain J
+double FEElasticFluid::Tangent_cv_Strain(FEMaterialPoint& mp)
+{
+    double d = 1e-6;
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    FEFluidMaterialPoint& pf = *mp.ExtractData<FEFluidMaterialPoint>();
+
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = pf.m_ef+d;
+    ft->m_T = tf.m_T;
+    FEMaterialPoint tmp(ft);
+    double cvp = IsochoricSpecificHeatCapacity(tmp);
+    fp->m_ef = pf.m_ef-d;
+    double cvm = IsochoricSpecificHeatCapacity(tmp);
+    delete ft;
+    double dcvJ = (cvp - cvm)/(2*d);
+    return dcvJ;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of isochoric specific heat capacity with respect to temperature T
+double FEElasticFluid::Tangent_cv_Temperature(FEMaterialPoint& mp)
+{
+    double Tr = GetGlobalConstant("T");
+    double d = 1e-6*Tr;
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    FEFluidMaterialPoint& pf = *mp.ExtractData<FEFluidMaterialPoint>();
+
+    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* ft = new FEThermoFluidMaterialPoint(fp);
+    fp->m_ef = pf.m_ef;
+    ft->m_T = tf.m_T+d;
+    FEMaterialPoint tmp(ft);
+    double cvp = IsochoricSpecificHeatCapacity(tmp);
+    ft->m_T = tf.m_T-d;
+    double cvm = IsochoricSpecificHeatCapacity(tmp);
+    delete ft;
+    double dcvT = (cvp - cvm)/(2*d);
+    return dcvT;
+}
+
+//-----------------------------------------------------------------------------
 //! specific internal energy
 double FEElasticFluid::SpecificInternalEnergy(FEMaterialPoint& mp)
 {

@@ -73,6 +73,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEElasticBeamDomain.h>
 #include <FEBioMech/FEElasticBeamMaterial.h>
 #include "FEIdealGasPressure.h"
+#include "FEBodyForce.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -623,6 +624,26 @@ bool FEPlotEnclosedVolume::Save(FESurface &surf, FEDataStream &a)
 		pcs->CoBaseVectors(el, n, g);
 		return xi*(g[0] ^ g[1]) / 3;
 	});
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEnclosedVolumeChange::Save(FESurface &surf, FEDataStream &a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    writeIntegratedElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+        FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
+        int n = mp.m_index;
+        vec3d xi = pcs->Local2Global(el, n);
+        vec3d g[2];
+        pcs->CoBaseVectors(el, n, g);
+        vec3d Xi = pcs->Local2Global0(el, n);
+        vec3d G[2];
+        pcs->CoBaseVectors0(el, n, G);
+        return (xi*(g[0] ^ g[1]) - Xi*(G[0] ^ G[1])) / 3;
+    });
     return true;
 }
 
@@ -4690,4 +4711,52 @@ bool FEPlotIdealGasPressure::Save(FESurface& surf, FEDataStream& a)
 		return true;
 	}
 	else return false;
+}
+
+class FEFluidBodyForce
+{
+public:
+	FEFluidBodyForce(FEModel* fem, FESolidDomain& dom) : m_fem(fem), m_dom(dom) {}
+
+	vec3d operator()(const FEMaterialPoint& mp)
+	{
+		int NBL = m_fem->ModelLoads();
+		vec3d bf(0, 0, 0);
+		for (int j = 0; j < NBL; ++j)
+		{
+			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem->ModelLoad(j));
+			FEMaterialPoint pt(mp);
+			if (pbf && pbf->IsActive()) bf += pbf->force(pt);
+		}
+		return bf;
+	}
+
+private:
+	FESolidDomain& m_dom;
+	FEModel* m_fem;
+};
+
+bool FEPlotBodyForce::Save(FEDomain& dom, FEDataStream& a)
+{
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FEModel* fem = GetFEModel();
+		FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+		writeAverageElementValue<vec3d>(dom, a, [&](const FEMaterialPoint& mp) {
+			int NBL = fem->ModelLoads();
+			vec3d bf(0, 0, 0);
+			for (int j = 0; j < NBL; ++j)
+			{
+				FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem->ModelLoad(j));
+				FEMaterialPoint pt(mp);
+				if (pbf && pbf->IsActive()) bf += pbf->force(pt);
+			}
+
+			// NOTE: We flip the sign because FEBio applies the negative of the body force.
+			// see FEElasticSolidDomain::BodyForce
+			return -bf;
+		});
+		return true;
+	}
+	return false;
 }

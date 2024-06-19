@@ -152,7 +152,8 @@ protected:
 	FEDofList	m_dofSU;	// shell displacement
 	FEDofList	m_dofSV;	// shell velocity
 	FEDofList	m_dofSA;	// shell acceleration
-	FEDofList	m_dofR;	    // rigid body rotations
+    FEDofList   m_dofQ;     // rotation
+    FEDofList   m_dofRQ;    // rigid rotation
 	FEDofList	m_dofVF;	// fluid velocity
 	FEDofList	m_dofAF;	// material time derivative of fluid velocity
 	FEDofList	m_dofW;	    // fluid velocity relative to solid

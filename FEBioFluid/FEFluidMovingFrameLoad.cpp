@@ -29,44 +29,53 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEFluidMovingFrameLoad, FEBodyForce)
-	ADD_PARAMETER(m_w.x, "wx")->setLongName("x-angular velocity")->setUnits(UNIT_ANGULAR_VELOCITY);
-	ADD_PARAMETER(m_w.y, "wy")->setLongName("y-angular velocity")->setUnits(UNIT_ANGULAR_VELOCITY);
-	ADD_PARAMETER(m_w.z, "wz")->setLongName("z-angular velocity")->setUnits(UNIT_ANGULAR_VELOCITY);
-	ADD_PARAMETER(m_a.x, "ax")->setLongName("x-linear acceleration")->setUnits(UNIT_ACCELERATION);
-	ADD_PARAMETER(m_a.y, "ay")->setLongName("y-linear acceleration")->setUnits(UNIT_ACCELERATION);
-	ADD_PARAMETER(m_a.z, "az")->setLongName("z-linear acceleration")->setUnits(UNIT_ACCELERATION);
+    ADD_PARAMETER(m_at.x, "ax");
+    ADD_PARAMETER(m_at.y, "ay");
+    ADD_PARAMETER(m_at.z, "az");
+	ADD_PARAMETER(m_wt.x, "wx");
+	ADD_PARAMETER(m_wt.y, "wy");
+	ADD_PARAMETER(m_wt.z, "wz");
 END_FECORE_CLASS();
 
 FEFluidMovingFrameLoad::FEFluidMovingFrameLoad(FEModel* fem) : FEBodyForce(fem)
 {
-	m_w = vec3d(0, 0, 0);
-	m_al = vec3d(0, 0, 0);
-	m_q = quatd(0, vec3d(0, 0, 1));
 }
 
 void FEFluidMovingFrameLoad::Activate()
 {
-	m_wp = m_w;
+	m_wp = m_wt;
+	m_ap = m_at;
+	m_alp = m_alt;
+	m_qp = m_qt;
 	FEBodyForce::Activate();
 }
 
 void FEFluidMovingFrameLoad::PrepStep()
 {
-	double dt = GetTimeInfo().timeIncrement;
-	m_al = (m_w - m_wp) / dt;
+	const FETimeInfo& tp = GetTimeInfo();
+	double dt = tp.timeIncrement;
+	double alpha = tp.alpha;
 
-	vec3d wa = (m_w + m_wp) * 0.5;
+	// evaluate quantities at current time (t) and intermediate time
+	m_a = m_at * alpha + m_ap * (1.0 - alpha);
+	m_ap = m_at;
 
-	quatd qn = m_q;
-	quatd wn(wa.x, wa.y, wa.z, 0.0);
-	m_q = qn + (wn * qn) * (0.5 * dt);
-	m_q.MakeUnit();
-	m_wp = m_w;
+	m_alp = m_alt;
+	m_alt = (m_wt - m_wp) / dt;
+	m_al = m_alt * alpha + m_alp * (1.0 - alpha);
 
-	vec3d R = m_q.GetRotationVector();
+	m_w = m_wt * alpha + m_wp * (1.0 - alpha);
 
-	feLogDebug("al : %lg, %lg, %lg\n", m_al.x, m_al.y, m_al.z);
-	feLogDebug("R : %lg, %lg, %lg\n", R.x, R.y, R.z);
+	quatd wa(m_w.x, m_w.y, m_w.z, 0.0);
+	quatd wt(m_wt.x, m_wt.y, m_wt.z, 0.0);
+
+	m_qt = m_qp + (wt * m_qp) * (0.5 * dt); m_qt.MakeUnit();
+	m_q = m_qp + (wa * m_qp) * (0.5 * dt * alpha); m_q.MakeUnit();
+
+	m_qp = m_qt;
+	m_wp = m_wt;
+
+	FEBodyForce::PrepStep();
 }
 
 vec3d FEFluidMovingFrameLoad::force(FEMaterialPoint& pt)
@@ -74,33 +83,24 @@ vec3d FEFluidMovingFrameLoad::force(FEMaterialPoint& pt)
 	FEFluidMaterialPoint& fp = *pt.ExtractData<FEFluidMaterialPoint>();
 
 	quatd qi = m_q.Inverse();
-
-	vec3d r = pt.m_rt;
-	vec3d v = fp.m_vft;
-	vec3d w = qi * m_w;
+	vec3d a = m_a;
+	vec3d w = m_w;
+	vec3d W = qi * w;
+	vec3d r = pt.m_r0;
+	vec3d V = fp.m_vft;
 	vec3d al = qi * m_al;
-	vec3d f = qi*m_a + (al ^ r) + (w ^ (w ^ r)) + (w ^ v) * 2.0;
+	vec3d f = qi * a + (al ^ r) + (W ^ (W ^ r)) + (W ^ V) * 2.0;
 	return f;
 }
 
 mat3d FEFluidMovingFrameLoad::stiffness(FEMaterialPoint& pt)
 {
-	FEFluidMaterialPoint& fp = *pt.ExtractData<FEFluidMaterialPoint>();
-	vec3d v = fp.m_vft;
-
 	const FETimeInfo& tp = GetTimeInfo();
-	double gamma = tp.gamma;
-	double dt = tp.timeIncrement;
 
 	quatd qi = m_q.Inverse();
-	vec3d w = qi * m_w;
-	vec3d al = qi * m_al;
+	vec3d W = qi * m_w;
+	mat3da Sw(W);
+	mat3d K = Sw* (2.0 * tp.alphaf);
 
-	mat3da Sw(w);
-	mat3da A(al);
-	mat3d S2 = Sw * Sw;
-	mat3d K = S2 + A + Sw * (4.0 * gamma / dt);
-
-	// NOTE: we need a negative sign, since the external load stiffness needs to be subtracted from the global stiffness
-	return -K;
+	return K;
 }

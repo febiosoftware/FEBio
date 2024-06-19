@@ -799,6 +799,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSurfaceTraction, "surface traction");
 	REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction, "nodal surface traction");
 	REGISTER_FECORE_CLASS(FEPlotEnclosedVolume, "enclosed volume");
+    REGISTER_FECORE_CLASS(FEPlotEnclosedVolumeChange, "enclosed volume change");
 	REGISTER_FECORE_CLASS(FEPlotSurfaceArea, "surface area");
 	REGISTER_FECORE_CLASS(FEPlotFacetArea, "facet area");
 	REGISTER_FECORE_CLASS(FEPlotStrainEnergyDensity, "strain energy density");
@@ -879,6 +880,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotGrowthLeftHencky, "growth left Hencky");
     REGISTER_FECORE_CLASS(FEPlotGrowthRelativeVolume, "growth relative volume");
     REGISTER_FECORE_CLASS(FEPlotIdealGasPressure, "ideal gas pressure");
+	REGISTER_FECORE_CLASS(FEPlotBodyForce, "body force");
 
 	// beam variables
 	REGISTER_FECORE_CLASS(FEPlotBeamStress      , "beam stress");

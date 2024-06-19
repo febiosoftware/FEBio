@@ -260,6 +260,22 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Enclosed volume change
+//!
+class FEPlotEnclosedVolumeChange : public FEPlotSurfaceData
+{
+private:
+    bool                m_binit;
+    vector<FEElement*>  m_elem;
+    vector<vec3d>       m_area;
+    
+public:
+    FEPlotEnclosedVolumeChange(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION){ m_binit = true; SetUnits(UNIT_VOLUME);
+    }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Surface area
 //!
 class FEPlotSurfaceArea : public FEPlotSurfaceData
@@ -1428,4 +1444,11 @@ private:
 	bool Init() override;
 	bool m_binit = false;
 	FEIdealGasPressure* m_load = nullptr;
+};
+
+class FEPlotBodyForce : public FEPlotDomainData
+{
+public:
+	FEPlotBodyForce(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_FORCE); }
+	bool Save(FEDomain& dom, FEDataStream& a);
 };

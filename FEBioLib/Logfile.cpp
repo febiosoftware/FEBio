@@ -101,7 +101,7 @@ void Logfile::printf(const char* sz, ...)
 	// make the message
 	char sztxt[2048] = {0};
 	va_start(args, sz);
-	vsnprintf(sztxt, 2048, sz, args);
+	vsnprintf(sztxt, sizeof(sztxt), sz, args);
 	va_end(args);
 	
 	// print to file
@@ -129,7 +129,7 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 	// print the box
 	char szmsg[1024] = {0};
 	char* ch = szmsg;
-	snprintf(szmsg,1024, "\n *************************************************************************\n"); ch += strlen(ch);
+	snprintf(szmsg,sizeof(szmsg), "\n *************************************************************************\n"); ch += strlen(ch);
 	// print the title
 	if (sztitle)
 	{

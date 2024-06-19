@@ -41,18 +41,21 @@ SOFTWARE.*/
 #include "FEFluidNormalHeatFlux.h"
 #include "FEFluidNaturalHeatFlux.h"
 #include "FENewtonianThermoFluid.h"
+#include "FENewtonianRealVapor.h"
 #include "FEIdealGas.h"
 #include "FERealGas.h"
 #include "FERealVapor.h"
 #include "FERealLiquid.h"
 #include "FEFluidConstantConductivity.h"
 #include "FETempDependentConductivity.h"
+#include "FEConductivityRealVapor.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
 #include "FEThermoFluidPressureBC.h"
 #include "FEThermoFluidTemperatureBC.h"
 #include "FEFluidModule.h"
 #include "FEThermoFluidAnalysis.h"
+#include "FEBioFluidPlot.h"
 #include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
@@ -126,7 +129,8 @@ void FEBioThermoFluid::InitModule()
     
     // viscous thermofluids
     REGISTER_FECORE_CLASS(FENewtonianThermoFluid, "Newtonian fluid");
-    
+    REGISTER_FECORE_CLASS(FENewtonianRealVapor, "Newtonian real vapor");
+
     // elastic fluids
     REGISTER_FECORE_CLASS(FEIdealGas   , "ideal gas"   );
     REGISTER_FECORE_CLASS(FERealGas    , "real gas"    );
@@ -136,11 +140,15 @@ void FEBioThermoFluid::InitModule()
     // thermal conductivity
     REGISTER_FECORE_CLASS(FEFluidConstantConductivity, "constant thermal conductivity");
     REGISTER_FECORE_CLASS(FETempDependentConductivity, "temp-dependent thermal conductivity");
-    
+    REGISTER_FECORE_CLASS(FEConductivityRealVapor    , "real vapor thermal conductivity");
     
     //-----------------------------------------------------------------------------
     // loads
     REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure constraint");
+
+    //-----------------------------------------------------------------------------
+    // classes derived from FEPlotData
+    REGISTER_FECORE_CLASS(FEPlotFluidRelativeThermalPecletNumber, "fluid relative thermal Peclet number");
 
     //-----------------------------------------------------------------------------
     // Reset solver parameters to preferred default settings

@@ -250,6 +250,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element fluid body force
+class FEPlotFluidBodyForce : public FEPlotDomainData
+{
+public:
+    FEPlotFluidBodyForce(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_FORCE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid velocity
 class FEPlotFluidVelocity : public FEPlotDomainData
 {
@@ -574,6 +583,24 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Fluid pressure tangent temperature
+class FEPlotFluidPressureTangentTemperature : public FEPlotDomainData
+{
+public:
+    FEPlotFluidPressureTangentTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Fluid pressure tangent strain
+class FEPlotFluidPressureTangentStrain : public FEPlotDomainData
+{
+public:
+    FEPlotFluidPressureTangentStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Thermal conductivity
 class FEPlotFluidThermalConductivity : public FEPlotDomainData
 {
@@ -638,3 +665,11 @@ protected:
     vector<int>    m_sol;
 };
 
+//-----------------------------------------------------------------------------
+//! Element relative thermal Peclet number
+class FEPlotFluidRelativeThermalPecletNumber : public FEPlotDomainData
+{
+public:
+    FEPlotFluidRelativeThermalPecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RECIPROCAL_LENGTH); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};

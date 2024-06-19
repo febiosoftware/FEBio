@@ -456,7 +456,7 @@ void XMLWriter::close_branch()
 		dec_level();
 
 		char szformat[256] = {0};
-		snprintf(szformat, 256, "%s</%%s>\n", m_sztab);
+		snprintf(szformat, sizeof(szformat), "%s</%%s>\n", m_sztab);
 
         *m_stream << m_sztab << "</" << m_tag[m_level] << ">\n";
 	}

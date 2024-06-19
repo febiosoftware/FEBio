@@ -1,0 +1,16 @@
+name: CI - FEBio Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  annotate-tag:
+    name: "Annotate Release Tag"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Annotated Tag"
+        id: annotated-tag
+        uses: febiosoftware/febio-workflows/.github/actions/annotated-tag@develop
+        with:
+          github-pat-token: ${{ secrets.GITHUB_TOKEN }}

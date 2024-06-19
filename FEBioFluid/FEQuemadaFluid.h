@@ -23,23 +23,47 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "log.h"
-#include "FEModel.h"
-#include <stdarg.h>
 
-void write_log(FEModel* fem, int ntag, const char* szmsg, ...)
+
+
+#pragma once
+#include "FEViscousFluid.h"
+
+//-----------------------------------------------------------------------------
+// This class evaluates the viscous stress in a Quemada fluid
+// see https://en.wikipedia.org/wiki/Hemorheology
+
+class FEBIOFLUID_API FEQuemadaFluid :	public FEViscousFluid
 {
-	assert(fem);
-	if (fem->LogBlocked()) return;
-
-	// get a pointer to the argument list
-	va_list	args;
-
-	// make the message
-	char sztxt[2048] = { 0 };
-	va_start(args, szmsg);
-	vsnprintf(sztxt, sizeof(sztxt), szmsg, args);
-	va_end(args);
-
-	fem->Log(ntag, sztxt);
-}
+public:
+    //! constructor
+    FEQuemadaFluid(FEModel* pfem);
+    
+    //! viscous stress
+    mat3ds Stress(FEMaterialPoint& pt) override;
+    
+    //! tangent of stress with respect to strain J
+    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
+    
+    //! tangent of stress with respect to rate of deformation tensor D
+    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
+    
+    //! tangent of stress with respect to temperature
+    mat3ds Tangent_Temperature(FEMaterialPoint& mp) override { return mat3ds(0); };
+    
+    //! dynamic viscosity
+    double ShearViscosity(FEMaterialPoint& mp) override;
+    
+    //! bulk viscosity
+    double BulkViscosity(FEMaterialPoint& mp) override;
+    
+public:
+    double	m_mu0;		//!< shear viscosity at zero shear rate
+    double  m_H;        //!< volume fraction occupied by particles
+    double  m_k0;
+    double  m_ki;
+    double  m_gc;
+    
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};

@@ -35,7 +35,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEPointFunction, FEFunction1D)
-	ADD_PARAMETER(m_int, "interpolate", 0, "linear\0step\0smooth\0cubic spline\0control points\0approximation\0");
+	ADD_PARAMETER(m_int, "interpolate", 0, "linear\0step\0smooth\0cubic spline\0control points\0approximation\0smooth-step\0C2-smooth\0");
 	ADD_PARAMETER(m_ext, "extend"     , 0, "constant\0extrapolate\0repeat\0repeat offset\0");
     ADD_PARAMETER(m_bln, "log")->SetFlags(FE_PARAM_HIDDEN);
 	ADD_PARAMETER(m_points, "points");

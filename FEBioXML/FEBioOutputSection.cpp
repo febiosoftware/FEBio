@@ -104,7 +104,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		if(!FSPath::isPath(szlog))
 		{
 			char szfile[1024] = {0};
-			snprintf(szfile, 1024, "%s%s", szpath, szlog);
+			snprintf(szfile, sizeof(szfile), "%s%s", szpath, szlog);
 			GetFEBioImport()->SetLogfileName(szfile);
 		}
 		else
@@ -126,7 +126,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			// if we have a path, prepend the path's name
 			if (szpath && szpath[0])
 			{
-				snprintf(szfilename, 1024, "%s%s", szpath, szfile);
+				snprintf(szfilename, sizeof(szfilename), "%s%s", szpath, szfile);
 			}
 			else strcpy(szfilename, szfile);
 			szfile = szfilename;
@@ -317,7 +317,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 			const char* szpath = GetFileReader()->GetFilePath();
 
 			char szfile[1024] = {0};
-			snprintf(szfile, 1024, "%s%s", szpath, szplt);
+			snprintf(szfile, sizeof(szfile), "%s%s", szpath, szplt);
 			GetFEBioImport()->SetPlotfileName(szfile);
 		}
 		else

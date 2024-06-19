@@ -369,6 +369,8 @@ void FEStepControlSection::Parse(XMLTag& tag)
 		throw FEBioImport::FailedAllocatingSolver(m.c_str());
 	}
 
+	FEObsoleteParamHandler25 ctrlParams(tag, pstep, GetBuilder());
+
 	++tag;
 	do
 	{
@@ -378,7 +380,10 @@ void FEStepControlSection::Parse(XMLTag& tag)
 			// next, check the solver parameters
 			if (ReadParameter(tag, psolver->GetParameterList()) == false)
 			{
-				throw XMLReader::InvalidTag(tag);
+				if (ctrlParams.ProcessTag(tag) == false)
+				{
+					throw XMLReader::InvalidTag(tag);
+				}
 			}
 		}
 
