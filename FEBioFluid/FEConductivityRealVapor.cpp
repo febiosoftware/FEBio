@@ -128,11 +128,12 @@ double FEConductivityRealVapor::ThermalConductivity(FEMaterialPoint& mp)
         double T = tf.m_T + m_Tr;
         double That = T/m_Tr;
         double J = 1 + pf.m_ef;
-        double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+        double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+        double q = log(1+pow(y,m_alpha));
         K = m_Ksat->value(q);
         double Jsat = exp(m_esat->value(q));
-        double y = 1 - Jsat/J;
-        for (int k=0; k<m_nvc; ++k) K += m_C[k]->value(q)*pow(y,k+1);
+        double x = 1 - Jsat/J;
+        for (int k=0; k<m_nvc; ++k) K += m_C[k]->value(q)*pow(x,k+1);
     }
     return K*m_Kr;
 }
