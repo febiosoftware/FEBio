@@ -38,7 +38,6 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FENewtonianRealVapor, FEViscousFluid)
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("referential shear viscosity");
 // properties
-    ADD_PROPERTY(m_esat , "esat",FEProperty::Optional)->SetLongName("saturation dilatation");
     ADD_PROPERTY(m_musat, "musat",FEProperty::Optional)->SetLongName("normalized saturation shear viscosity");
     ADD_PROPERTY(m_C[0] , "C0", FEProperty::Optional)->SetLongName("1st mu virial coeff");
     ADD_PROPERTY(m_C[1] , "C1", FEProperty::Optional)->SetLongName("2nd mu virial coeff");
@@ -69,22 +68,19 @@ bool FENewtonianRealVapor::Init()
         if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
     }
     
-    if (m_esat) m_esat->Init();
-    else {
-        FECoreBase* pMat = GetAncestor();
-        FEThermoFluid* pFluid = dynamic_cast<FEThermoFluid*>(pMat);
-        if (pFluid) {
-            FERealVapor* pRV = dynamic_cast<FERealVapor*>(pFluid->GetElastic());
-            if (pRV) {
-                m_esat = pRV->m_esat;
-                m_esat->Init();
-                m_Tc = pRV->m_Tc;
-                m_alpha = pRV->m_alpha;
-            }
-            else return false;
+    FECoreBase* pMat = GetAncestor();
+    FEThermoFluid* pFluid = dynamic_cast<FEThermoFluid*>(pMat);
+    if (pFluid) {
+        FERealVapor* pRV = dynamic_cast<FERealVapor*>(pFluid->GetElastic());
+        if (pRV) {
+            m_esat = pRV->m_esat;
+            m_esat->Init();
+            m_Tc = pRV->m_Tc;
+            m_alpha = pRV->m_alpha;
         }
         else return false;
     }
+    else return false;
     if (m_musat) m_musat->Init();
     m_nvc = 0;
     for (int k=0; k<MAX_NVC; ++k) {

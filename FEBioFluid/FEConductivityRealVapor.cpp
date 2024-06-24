@@ -43,7 +43,6 @@ BEGIN_FECORE_CLASS(FEConductivityRealVapor, FEFluidThermalConductivity)
     // parameters
     ADD_PARAMETER(m_Kr, "Kr")->setLongName("referential thermal conductivity")->setUnits(UNIT_THERMAL_CONDUCTIVITY);
     // properties
-    ADD_PROPERTY(m_esat , "esat", FEProperty::Optional)->SetLongName("saturation dilatation");
     ADD_PROPERTY(m_Ksat , "Ksat", FEProperty::Optional)->SetLongName("normalized saturation thermal conductivity");
     ADD_PROPERTY(m_C[0] , "C0"  , FEProperty::Optional)->SetLongName("1st K virial coeff");
     ADD_PROPERTY(m_C[1] , "C1"  , FEProperty::Optional)->SetLongName("2nd K virial coeff");
@@ -70,22 +69,19 @@ bool FEConductivityRealVapor::Init()
     
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
     
-    if (m_esat) m_esat->Init();
-    else {
-        FECoreBase* pMat = GetAncestor();
-        FEThermoFluid* pFluid = dynamic_cast<FEThermoFluid*>(pMat);
-        if (pFluid) {
-            FERealVapor* pRV = dynamic_cast<FERealVapor*>(pFluid->GetElastic());
-            if (pRV) {
-                m_esat = pRV->m_esat;
-                m_esat->Init();
-                m_Tc = pRV->m_Tc;
-                m_alpha = pRV->m_alpha;
-            }
-            else return false;
+    FECoreBase* pMat = GetAncestor();
+    FEThermoFluid* pFluid = dynamic_cast<FEThermoFluid*>(pMat);
+    if (pFluid) {
+        FERealVapor* pRV = dynamic_cast<FERealVapor*>(pFluid->GetElastic());
+        if (pRV) {
+            m_esat = pRV->m_esat;
+            m_esat->Init();
+            m_Tc = pRV->m_Tc;
+            m_alpha = pRV->m_alpha;
         }
         else return false;
     }
+    else return false;
     if (m_Ksat) m_Ksat->Init();
     m_nvc = 0;
     for (int k=0; k<MAX_NVC; ++k) {
