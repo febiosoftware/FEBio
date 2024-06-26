@@ -26,4 +26,4 @@ fi
 
 # Copy configuration in
 cp $FEBIO_XML $FEBIO_DIR
-./TestSuite/code/tools.py -r $FEBIO_BIN
+./TestSuite/code/tools.py -r $FEBIO_BIN -n
