@@ -879,15 +879,16 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 	// count the number of facets we have to create
 	int NF = 0;
 
+	int index = 0;
 	for (int i = 0; i < domains.size(); i++)
 	{
-		for (int j = 0; j < domains[i]->Elements(); j++)
+		for (int j = 0; j < domains[i]->Elements(); j++, ++index)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
 			int nf = el.Faces();
 			for (int k = 0; k < nf; ++k)
 			{
-				FEElement* pen = EEL.Neighbor(el.GetID() - 1, k);
+				FEElement* pen = EEL.Neighbor(index, k);
 				if ((pen == nullptr) && boutside) ++NF;
 				else if (pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ++NF;
 				if ((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())) ++NF;
@@ -903,15 +904,16 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 	// build the surface elements
 	int faceNodes[FEElement::MAX_NODES];
 	NF = 0;
+	index = 0;
 	for (int i = 0; i < domains.size(); i++)
 	{
-		for (int j = 0; j < domains[i]->Elements(); j++)
+		for (int j = 0; j < domains[i]->Elements(); j++, ++index)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
 			int nf = el.Faces();
 			for (int k = 0; k < nf; ++k)
 			{
-				FEElement* pen = EEL.Neighbor(el.GetID() - 1, k);
+				FEElement* pen = EEL.Neighbor(index, k);
 				if (((pen == nullptr) && boutside) ||
 					(pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ||
 					((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())))
