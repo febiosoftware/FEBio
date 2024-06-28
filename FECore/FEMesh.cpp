@@ -247,6 +247,7 @@ void FEMesh::CreateNodes(int nodes)
 	for (int i=0; i<nodes; ++i) Node(i).SetID(i+1);
 
 	m_NEL.Clear();
+	m_EEL.Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -396,6 +397,7 @@ void FEMesh::Clear()
 	m_SurfPair.clear();
 
 	m_NEL.Clear();
+	m_EEL.Clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
 }
 
@@ -677,6 +679,18 @@ FESolidElement* FEMesh::FindSolidElement(vec3d y, double r[3])
 	return 0;
 }
 
+FENodeElemList& FEMesh::NodeElementList()
+{
+	if (m_NEL.Size() != m_Node.size()) m_NEL.Create(*this);
+	return m_NEL;
+}
+
+FEElemElemList& FEMesh::ElementElementList()
+{
+	if (!m_EEL.IsValid()) m_EEL.Create(this);
+	return m_EEL;
+}
+
 //-----------------------------------------------------------------------------
 void FEMesh::ClearDomains()
 {
@@ -869,9 +883,8 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 {
 	if ((boutside == false) && (binside == false)) return nullptr;
 
-	// create the element neighbor list
-	FEElemElemList EEL;
-	EEL.Create(this);
+	// get the element neighbor list
+	FEElemElemList& EEL = ElementElementList();
 
 	// get the number of elements in this mesh
 	int NE = Elements();

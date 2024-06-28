@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FENode.h"
 #include "FENodeElemList.h"
+#include "FEElemElemList.h"
 #include "FENodeSet.h"
 #include "FEFacetSet.h"
 #include "FEDiscreteSet.h"
@@ -133,11 +134,9 @@ public:
 	//! Finds the solid element in which y lies
 	FESolidElement* FindSolidElement(vec3d y, double r[3]);
 
-	FENodeElemList& NodeElementList()
-	{
-		if (m_NEL.Size() != m_Node.size()) m_NEL.Create(*this);
-		return m_NEL;
-	}
+	FENodeElemList& NodeElementList();
+
+	FEElemElemList& ElementElementList();
 
 	//! See if all elements are of a particular shape
 	bool IsType(FE_Element_Shape eshape);
@@ -280,6 +279,8 @@ private:
 
 	FENodeElemList	m_NEL;
 	FEElementLUT*	m_LUT;
+
+	FEElemElemList	m_EEL;
 
 	FEModel*	m_fem;
 private:

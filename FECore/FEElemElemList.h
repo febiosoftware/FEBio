@@ -47,6 +47,10 @@ public:
 	//! destructor
 	~FEElemElemList(void);
 
+	bool IsValid() const;
+
+	void Clear();
+
 	//! create the element-element list
 	bool Create(FEMesh* pmesh);
 
