@@ -57,10 +57,14 @@ public:
 	FEElementLUT(FEMesh& mesh);
 
 	// Find an element from its ID
-	FEElement* Find(int nid);
+	FEElement* Find(int elemID) const;
+
+	// return an element's zero-based index
+	int FindIndex(int elemID) const;
 
 private:
 	vector<FEElement*>	m_elem;
+	vector<int>			m_elid;
 	int					m_minID, m_maxID;
 };
 
@@ -129,7 +133,9 @@ public:
 	FEElement* Element(int i);
 
 	//! Finds an element from a given ID
-	FEElement* FindElementFromID(int nid);
+	FEElement* FindElementFromID(int elemID);
+	
+	int FindElementIndexFromID(int elemID);
 
 	//! Finds the solid element in which y lies
 	FESolidElement* FindSolidElement(vec3d y, double r[3]);

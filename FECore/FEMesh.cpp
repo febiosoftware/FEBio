@@ -626,10 +626,16 @@ FENode* FEMesh::FindNodeFromID(int nid)
 //-----------------------------------------------------------------------------
 //! Find an element from a given ID. return 0 if the element cannot be found.
 
-FEElement* FEMesh::FindElementFromID(int nid)
+FEElement* FEMesh::FindElementFromID(int elemID)
 {
 	if (m_LUT == 0) m_LUT = new FEElementLUT(*this);
-	return m_LUT->Find(nid);
+	return m_LUT->Find(elemID);
+}
+
+int FEMesh::FindElementIndexFromID(int elemID)
+{
+	if (m_LUT == 0) m_LUT = new FEElementLUT(*this);
+	return m_LUT->FindIndex(elemID);
 }
 
 /*
@@ -892,12 +898,12 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 	// count the number of facets we have to create
 	int NF = 0;
 
-	int index = 0;
 	for (int i = 0; i < domains.size(); i++)
 	{
-		for (int j = 0; j < domains[i]->Elements(); j++, ++index)
+		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
+			int index = FindElementIndexFromID(el.GetID());
 			int nf = el.Faces();
 			for (int k = 0; k < nf; ++k)
 			{
@@ -917,12 +923,12 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 	// build the surface elements
 	int faceNodes[FEElement::MAX_NODES];
 	NF = 0;
-	index = 0;
 	for (int i = 0; i < domains.size(); i++)
 	{
-		for (int j = 0; j < domains[i]->Elements(); j++, ++index)
+		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
+			int index = FindElementIndexFromID(el.GetID());
 			int nf = el.Faces();
 			for (int k = 0; k < nf; ++k)
 			{
@@ -998,26 +1004,35 @@ FEElementLUT::FEElementLUT(FEMesh& mesh)
 	// allocate size
 	int nsize = m_maxID - m_minID + 1;
 	m_elem.resize(nsize, (FEElement*) 0);
+	m_elid.resize(nsize, -1);
 
 	// fill the table
+	int index = 0;
 	for (int i = 0; i<NDOM; ++i)
 	{
 		FEDomain& dom = mesh.Domain(i);
 		int NE = dom.Elements();
-		for (int j = 0; j<NE; ++j)
+		for (int j = 0; j<NE; ++j, ++index)
 		{
 			FEElement& el = dom.ElementRef(j);
 			int eid = el.GetID();
 			m_elem[eid - m_minID] = &el;
+			m_elid[eid - m_minID] = index;
 		}
 	}
 }
 
 // Find an element from its ID
-FEElement* FEElementLUT::Find(int nid)
+FEElement* FEElementLUT::Find(int elemID) const
 {
-	if ((nid < m_minID) || (nid > m_maxID)) return 0;
-	return m_elem[nid - m_minID];
+	if ((elemID < m_minID) || (elemID > m_maxID)) return nullptr;
+	return m_elem[elemID - m_minID];
+}
+
+int FEElementLUT::FindIndex(int elemID) const
+{
+	if ((elemID < m_minID) || (elemID > m_maxID)) return -1;
+	return m_elid[elemID - m_minID];
 }
 
 // update the domains of the mesh
