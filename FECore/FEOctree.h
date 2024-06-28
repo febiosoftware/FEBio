@@ -40,15 +40,15 @@ class FESurface;
 class OTnode
 {
 public:
-	OTnode() {}
-	~OTnode() {}
-	void Clear() {children.clear(); }
+	OTnode();
+	~OTnode();
+	void Clear();
 	void CreateChildren(const int max_level, const int max_elem);
-	void FillNode(std::vector<int> parent_selist);
+	void FillNode(const std::vector<int>& parent_selist);
 	bool ElementIntersectsNode(const int j);
 	void PrintNodeContent();
-	bool RayIntersectsNode(vec3d p, vec3d n);
-	void FindIntersectedLeaves(vec3d p, vec3d n, std::set<int>& sel, double srad);
+	bool RayIntersectsNode(const vec3d& p, const vec3d& n);
+	void FindIntersectedLeaves(const vec3d& p, const vec3d& n, std::set<int>& sel, double srad);
 	void CountNodes(int& nnode, int& nlevel);
 	
 public:

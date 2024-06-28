@@ -31,16 +31,30 @@ SOFTWARE.*/
 #include "FESurface.h"
 #include "FEMesh.h"
 
+OTnode::OTnode()
+{
+	m_ps = nullptr;
+	level = 0;
+}
+
+OTnode::~OTnode()
+{
+}
+
+void OTnode::Clear()
+{ 
+	children.clear(); 
+}
+
 //-----------------------------------------------------------------------------
 // Create the eight children of an octree node and find their contents
 
 void OTnode::CreateChildren(const int max_level, const int max_elem)
 {
-	int i,j,k;
 	vec3d dc = (cmax - cmin)/2;
-	for (i=0; i<=1; ++i) {
-		for (j=0; j<=1; ++j) {
-			for (k=0; k<=1; ++k) {
+	for (int i=0; i<=1; ++i) {
+		for (int j=0; j<=1; ++j) {
+			for (int k=0; k<=1; ++k) {
 				OTnode node;
 				node.m_ps = m_ps;
 				// evaluate bounding box by subdividing parent node box
@@ -72,12 +86,12 @@ void OTnode::CreateChildren(const int max_level, const int max_elem)
 //-----------------------------------------------------------------------------
 // Find all surface elements that fall inside a node
 
-void OTnode::FillNode(vector<int> parent_selist)
+void OTnode::FillNode(const vector<int>& parent_selist)
 {
-	int i, j;
 	// Loop over all surface elements in the parent node
-	for (i=0; i<(int)parent_selist.size(); ++i) {
-		j = parent_selist[i];
+	int nsize = (int)parent_selist.size();
+	for (int i=0; i<nsize; ++i) {
+		int j = parent_selist[i];
 		if (ElementIntersectsNode(j)) {
 			// add this surface element to the current node
 			selist.push_back(j);
@@ -90,25 +104,22 @@ void OTnode::FillNode(vector<int> parent_selist)
 
 bool OTnode::ElementIntersectsNode(const int iel)
 {
-	int i;
-
 	// Extract FE node coordinates from surface element
 	// and determine bounding box of surface element
 	FEMesh& mesh = *(m_ps->GetMesh());
 	FESurfaceElement& el = m_ps->Element(iel);
+	vec3d rn = mesh.Node(el.m_node[0]).m_rt;
+	vec3d fmin = rn;
+	vec3d fmax = rn;
 	int N = el.Nodes();
-	vector<vec3d> fenode(N);
-	fenode[0] = mesh.Node(el.m_node[0]).m_rt;
-	vec3d fmin = fenode[0];
-	vec3d fmax = fenode[0];
-	for (i=1; i<N; ++i) {
-		fenode[i] = mesh.Node(el.m_node[i]).m_rt;
-		if (fenode[i].x < fmin.x) fmin.x = fenode[i].x;
-		if (fenode[i].x > fmax.x) fmax.x = fenode[i].x;
-		if (fenode[i].y < fmin.y) fmin.y = fenode[i].y;
-		if (fenode[i].y > fmax.y) fmax.y = fenode[i].y;
-		if (fenode[i].z < fmin.z) fmin.z = fenode[i].z;
-		if (fenode[i].z > fmax.z) fmax.z = fenode[i].z;
+	for (int i=1; i<N; ++i) {
+		rn = mesh.Node(el.m_node[i]).m_rt;
+		if (rn.x < fmin.x) fmin.x = rn.x;
+		if (rn.x > fmax.x) fmax.x = rn.x;
+		if (rn.y < fmin.y) fmin.y = rn.y;
+		if (rn.y > fmax.y) fmax.y = rn.y;
+		if (rn.z < fmin.z) fmin.z = rn.z;
+		if (rn.z > fmax.z) fmax.z = rn.z;
 	}
 	
 	// Check if bounding boxes of OT node and surface element overlap
@@ -128,16 +139,14 @@ bool OTnode::ElementIntersectsNode(const int iel)
 // Determine if a ray intersects any of the faces of this node.
 // The ray originates at p and is directed along the unit vector n
 
-bool OTnode::RayIntersectsNode(vec3d p, vec3d n)
+bool OTnode::RayIntersectsNode(const vec3d& p, const vec3d& n)
 {
-	double t, x, y, z;
-	
 	// check intersection with x-faces
 	if (n.x) {
 		// face passing through cmin
-		t = (cmin.x - p.x)/n.x;
-		y = p.y + t*n.y;
-		z = p.z + t*n.z;
+		double t = (cmin.x - p.x)/n.x;
+		double y = p.y + t*n.y;
+		double z = p.z + t*n.z;
 		if ((y >= cmin.y) && (y <= cmax.y)
 			&& (z >= cmin.z) && (z <= cmax.z))
 			return true;
@@ -152,9 +161,9 @@ bool OTnode::RayIntersectsNode(vec3d p, vec3d n)
 	// check intersection with y-faces
 	if (n.y) {
 		// face passing through cmin
-		t = (cmin.y - p.y)/n.y;
-		x = p.x + t*n.x;
-		z = p.z + t*n.z;
+		double t = (cmin.y - p.y)/n.y;
+		double x = p.x + t*n.x;
+		double z = p.z + t*n.z;
 		if ((x >= cmin.x) && (x <= cmax.x)
 			&& (z >= cmin.z) && (z <= cmax.z))
 			return true;
@@ -169,9 +178,9 @@ bool OTnode::RayIntersectsNode(vec3d p, vec3d n)
 	// check intersection with z-faces
 	if (n.z) {
 		// face passing through cmin
-		t = (cmin.z - p.z)/n.z;
-		x = p.x + t*n.x;
-		y = p.y + t*n.y;
+		double t = (cmin.z - p.z)/n.z;
+		double x = p.x + t*n.x;
+		double y = p.y + t*n.y;
 		if ((x >= cmin.x) && (x <= cmax.x)
 			&& (y >= cmin.y) && (y <= cmax.y))
 			return true;
@@ -188,7 +197,7 @@ bool OTnode::RayIntersectsNode(vec3d p, vec3d n)
 
 //-----------------------------------------------------------------------------
 // Find intersected octree leaves and return a set of their surface elements
-void OTnode::FindIntersectedLeaves(vec3d p, vec3d n, set<int>& sel, double srad)
+void OTnode::FindIntersectedLeaves(const vec3d& p, const vec3d& n, set<int>& sel, double srad)
 {
 	// Check if octree node is within search radius from p.
 	bool bNodeWithinSRad = ( (cmin.x - srad <= p.x) && (cmax.x + srad >= p.x) &&
@@ -218,15 +227,14 @@ void OTnode::FindIntersectedLeaves(vec3d p, vec3d n, set<int>& sel, double srad)
 
 void OTnode::PrintNodeContent()
 {
-	int i;
 	int nel = (int)selist.size();
 	printf("Level = %d\n", level);
-	for (i=0; i<nel; ++i)
+	for (int i=0; i<nel; ++i)
 		printf("%d\n",selist[i]);
 	printf("-----------------------------------------------------\n");
 	
 	int nc = (int)children.size();
-	for (i=0; i<nc; ++i) {
+	for (int i=0; i<nc; ++i) {
 		printf("Child = %d\n", i);
 		children[i].PrintNodeContent();
 	}
@@ -267,7 +275,6 @@ FEOctree::~FEOctree()
 void FEOctree::Init(const double stol)
 {
 	assert(m_ps);
-	int i;
 	root.Clear();
 	
 	// Set up the root node in the octree
@@ -277,14 +284,14 @@ void FEOctree::Init(const double stol)
 	// Create the list of all surface elements in the root node
 	int nel = m_ps->Elements();
 	root.selist.resize(nel);
-	for (i=0; i<nel; ++i)
+	for (int i=0; i<nel; ++i)
 		root.selist[i] = i;
 	
 	// Find the bounding box of the surface
 	vec3d fenode = (m_ps->Node(0)).m_rt;
 	root.cmin = fenode;
 	root.cmax = fenode;
-	for (i=1; i<m_ps->Nodes(); ++i) {
+	for (int i=1; i<m_ps->Nodes(); ++i) {
 		fenode = (m_ps->Node(i)).m_rt;
 		if (fenode.x < root.cmin.x) root.cmin.x = fenode.x;
 		if (fenode.x > root.cmax.x) root.cmax.x = fenode.x;
