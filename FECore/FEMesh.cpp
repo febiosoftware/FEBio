@@ -247,6 +247,7 @@ void FEMesh::CreateNodes(int nodes)
 	for (int i=0; i<nodes; ++i) Node(i).SetID(i+1);
 
 	m_NEL.Clear();
+	m_EEL.Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -396,6 +397,7 @@ void FEMesh::Clear()
 	m_SurfPair.clear();
 
 	m_NEL.Clear();
+	m_EEL.Clear();
 	if (m_LUT) delete m_LUT; m_LUT = 0;
 }
 
@@ -624,10 +626,16 @@ FENode* FEMesh::FindNodeFromID(int nid)
 //-----------------------------------------------------------------------------
 //! Find an element from a given ID. return 0 if the element cannot be found.
 
-FEElement* FEMesh::FindElementFromID(int nid)
+FEElement* FEMesh::FindElementFromID(int elemID)
 {
 	if (m_LUT == 0) m_LUT = new FEElementLUT(*this);
-	return m_LUT->Find(nid);
+	return m_LUT->Find(elemID);
+}
+
+int FEMesh::FindElementIndexFromID(int elemID)
+{
+	if (m_LUT == 0) m_LUT = new FEElementLUT(*this);
+	return m_LUT->FindIndex(elemID);
 }
 
 /*
@@ -675,6 +683,18 @@ FESolidElement* FEMesh::FindSolidElement(vec3d y, double r[3])
 		}
 	}
 	return 0;
+}
+
+FENodeElemList& FEMesh::NodeElementList()
+{
+	if (m_NEL.Size() != m_Node.size()) m_NEL.Create(*this);
+	return m_NEL;
+}
+
+FEElemElemList& FEMesh::ElementElementList()
+{
+	if (!m_EEL.IsValid()) m_EEL.Create(this);
+	return m_EEL;
 }
 
 //-----------------------------------------------------------------------------
@@ -869,9 +889,8 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 {
 	if ((boutside == false) && (binside == false)) return nullptr;
 
-	// create the element neighbor list
-	FEElemElemList EEL;
-	EEL.Create(this);
+	// get the element neighbor list
+	FEElemElemList& EEL = ElementElementList();
 
 	// get the number of elements in this mesh
 	int NE = Elements();
@@ -884,10 +903,11 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
+			int index = FindElementIndexFromID(el.GetID());
 			int nf = el.Faces();
 			for (int k = 0; k < nf; ++k)
 			{
-				FEElement* pen = EEL.Neighbor(el.GetID() - 1, k);
+				FEElement* pen = EEL.Neighbor(index, k);
 				if ((pen == nullptr) && boutside) ++NF;
 				else if (pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ++NF;
 				if ((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())) ++NF;
@@ -908,10 +928,11 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
+			int index = FindElementIndexFromID(el.GetID());
 			int nf = el.Faces();
 			for (int k = 0; k < nf; ++k)
 			{
-				FEElement* pen = EEL.Neighbor(el.GetID() - 1, k);
+				FEElement* pen = EEL.Neighbor(index, k);
 				if (((pen == nullptr) && boutside) ||
 					(pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ||
 					((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())))
@@ -983,26 +1004,35 @@ FEElementLUT::FEElementLUT(FEMesh& mesh)
 	// allocate size
 	int nsize = m_maxID - m_minID + 1;
 	m_elem.resize(nsize, (FEElement*) 0);
+	m_elid.resize(nsize, -1);
 
 	// fill the table
+	int index = 0;
 	for (int i = 0; i<NDOM; ++i)
 	{
 		FEDomain& dom = mesh.Domain(i);
 		int NE = dom.Elements();
-		for (int j = 0; j<NE; ++j)
+		for (int j = 0; j<NE; ++j, ++index)
 		{
 			FEElement& el = dom.ElementRef(j);
 			int eid = el.GetID();
 			m_elem[eid - m_minID] = &el;
+			m_elid[eid - m_minID] = index;
 		}
 	}
 }
 
 // Find an element from its ID
-FEElement* FEElementLUT::Find(int nid)
+FEElement* FEElementLUT::Find(int elemID) const
 {
-	if ((nid < m_minID) || (nid > m_maxID)) return 0;
-	return m_elem[nid - m_minID];
+	if ((elemID < m_minID) || (elemID > m_maxID)) return nullptr;
+	return m_elem[elemID - m_minID];
+}
+
+int FEElementLUT::FindIndex(int elemID) const
+{
+	if ((elemID < m_minID) || (elemID > m_maxID)) return -1;
+	return m_elid[elemID - m_minID];
 }
 
 // update the domains of the mesh

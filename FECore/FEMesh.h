@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FENode.h"
 #include "FENodeElemList.h"
+#include "FEElemElemList.h"
 #include "FENodeSet.h"
 #include "FEFacetSet.h"
 #include "FEDiscreteSet.h"
@@ -56,10 +57,14 @@ public:
 	FEElementLUT(FEMesh& mesh);
 
 	// Find an element from its ID
-	FEElement* Find(int nid);
+	FEElement* Find(int elemID) const;
+
+	// return an element's zero-based index
+	int FindIndex(int elemID) const;
 
 private:
 	vector<FEElement*>	m_elem;
+	vector<int>			m_elid;
 	int					m_minID, m_maxID;
 };
 
@@ -128,16 +133,16 @@ public:
 	FEElement* Element(int i);
 
 	//! Finds an element from a given ID
-	FEElement* FindElementFromID(int nid);
+	FEElement* FindElementFromID(int elemID);
+	
+	int FindElementIndexFromID(int elemID);
 
 	//! Finds the solid element in which y lies
 	FESolidElement* FindSolidElement(vec3d y, double r[3]);
 
-	FENodeElemList& NodeElementList()
-	{
-		if (m_NEL.Size() != m_Node.size()) m_NEL.Create(*this);
-		return m_NEL;
-	}
+	FENodeElemList& NodeElementList();
+
+	FEElemElemList& ElementElementList();
 
 	//! See if all elements are of a particular shape
 	bool IsType(FE_Element_Shape eshape);
@@ -280,6 +285,8 @@ private:
 
 	FENodeElemList	m_NEL;
 	FEElementLUT*	m_LUT;
+
+	FEElemElemList	m_EEL;
 
 	FEModel*	m_fem;
 private:
