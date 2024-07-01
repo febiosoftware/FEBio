@@ -48,6 +48,7 @@ SOFTWARE.*/
 #include "FEContactSurface.h"
 #include "FEDiscreteElasticMaterial.h"
 #include "FESlidingInterface.h"
+#include "FEPreStrainElastic.h"
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(const FENode& node)
@@ -1568,6 +1569,28 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 		val += pt.m_F(2,2);
 	}
 	return val / (double) nint;
+}
+
+double FELogTotalDeformationGradient::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		FEPrestrainMaterialPoint* pp = mp.ExtractData<FEPrestrainMaterialPoint>();
+
+		mat3d F = pt.m_F;
+		if (pp)
+		{
+			mat3d Fp = pp->prestrain();
+			mat3d F = F * Fp;
+		}
+
+		val += F(m_r, m_c);
+	}
+	return val / (double)nint;
 }
 
 //-----------------------------------------------------------------------------
