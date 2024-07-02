@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEBioLoadDataSection.h"
 #include <FECore/FEModel.h>
 #include <FECore/FELoadController.h>
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 FEBioLoadDataSection3::FEBioLoadDataSection3(FEFileImport* pim) : FEFileSection(pim) 
@@ -87,6 +88,16 @@ void FEBioLoadDataSection3::Parse(XMLTag& tag)
 
 			// read the parameter list
 			ReadParameterList(tag, plc);
+
+			// make sure we have a name
+			string name = plc->GetName();
+			if (name.empty())
+			{
+				stringstream ss;
+				ss << "lc" << plc->GetID() + 1;
+				name = ss.str();
+				plc->SetName(name);
+			}
 
 			if (m_redefineCurves)
 			{
