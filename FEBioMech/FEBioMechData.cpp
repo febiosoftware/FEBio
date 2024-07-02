@@ -1585,7 +1585,7 @@ double FELogTotalDeformationGradient::value(FEElement& el)
 		if (pp)
 		{
 			mat3d Fp = pp->prestrain();
-			mat3d F = F * Fp;
+			F = F * Fp;
 		}
 
 		val += F(m_r, m_c);
