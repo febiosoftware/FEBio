@@ -382,7 +382,7 @@ status open
 \end_layout
 
 \begin_layout Standard
-MRL: 
+Weiss Lab: 
 \begin_inset ERT
 status open
 
@@ -390,7 +390,7 @@ status open
 
 
 \backslash
-url{http://mrl.sci.utah.edu}
+url{https://weisslabutah.org}
 \end_layout
 
 \end_inset
