@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/NLConstraintDataRecord.h>
 #include <FECore/FENLConstraint.h>
 #include <FECore/SurfaceDataRecord.h>
+#include <FECore/DomainDataRecord.h>
 
 //=============================================================================
 // N O D E  D A T A
@@ -1563,4 +1564,19 @@ class FELogContactArea : public FELogSurfaceData
 public:
 	FELogContactArea(FEModel* fem) : FELogSurfaceData(fem) {}
 	double value(FESurface& surface) override;
+};
+
+//=============================================================================
+// D O M A I N   D A T A
+//=============================================================================
+// from Gibbons, "Finite Element Modeling of Blast Lung Injury in Sheep", JBME 2015
+// this calculates the normalized time-summed internal energy
+class FENormalizedInternalEnergy : public FELogDomainData
+{
+public:
+	FENormalizedInternalEnergy(FEModel* fem) : FELogDomainData(fem), m_sum(0) {}
+	double value(FEDomain& dom) override;
+
+private:
+	double m_sum;
 };

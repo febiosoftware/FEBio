@@ -49,6 +49,7 @@ SOFTWARE.*/
 #include "FEDiscreteElasticMaterial.h"
 #include "FESlidingInterface.h"
 #include "FEPreStrainElastic.h"
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(const FENode& node)
@@ -2244,4 +2245,51 @@ double FELogContactArea::value(FESurface& surface)
 		return area;
 	}
 	return 0.0;
+}
+
+//=============================================================================
+double FENormalizedInternalEnergy::value(FEDomain& dom)
+{
+	double sum = 0.0;
+	double vol = 0.0;
+	FESolidDomain* solidDomain = dynamic_cast<FESolidDomain*>(&dom);
+	if (solidDomain == nullptr) return 0.0;
+
+	FEModel* fem = GetFEModel();
+	const FETimeInfo& ti = fem->GetTime();
+	double dt = ti.timeIncrement;
+
+	double P0 = fem->GetGlobalConstant("P");
+	if (P0 == 0.0) P0 = 1.0;
+
+	int NE = solidDomain->Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& el = solidDomain->Element(i);
+		double Ve = solidDomain->Volume(el);
+		vol += Ve;
+
+		mat3ds s(0), D(0);
+		int nint = el.GaussPoints();
+		double* gw = el.GaussWeights();
+		double w = 0.0;
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
+			s += ep.m_s * gw[n];
+			D += ep.RateOfDeformation();
+			w += gw[n];
+		}
+		s /= w;
+		D /= w;
+
+		double We = s.dotdot(D);
+
+		sum += We * dt * Ve;
+	}
+	m_sum += sum;
+	double NTSIE = m_sum / (P0 * vol);
+	return NTSIE;
 }
