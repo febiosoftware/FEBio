@@ -504,6 +504,7 @@ bool FEAnalysis::Solve()
 		else if (ierr == 0) {
 
 			m_ntsiter += 1;
+			fem.GetTime().currentRestart = m_ntsiter;
 
 			feLog("\n(Analysis)------- restarting at time : %lg restart number %d \n\n", fem.GetCurrentTime(), m_ntsiter);
 

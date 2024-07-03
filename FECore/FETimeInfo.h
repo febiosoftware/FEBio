@@ -45,7 +45,9 @@ public:
 	double	timeIncrement;		//!< current time step (difference between this time and previous one)
 	int		timeStep;			//!< current time step
 	int		currentIteration;	//!< iteration number
+	int		currentRestart;		//!< restart number
 	int		augmentation;		//!< augmentation
+	double	omega;				//!< omega for restart relaxation
 
 	// HHT time integration parameters
 	double	alpha;

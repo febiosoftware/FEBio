@@ -40,8 +40,10 @@ FETimeInfo::FETimeInfo()
 	alphaf = 1.0;
 	alpham = 1.0;
 	currentIteration = 0;
+	currentRestart = 0;
 	augmentation = 0;
 	timeStep = 0;
+	omega = 1.0;
 }
 
 FETimeInfo::FETimeInfo(double time, double tinc)
@@ -54,7 +56,9 @@ FETimeInfo::FETimeInfo(double time, double tinc)
 	alphaf = 1.0;
 	alpham = 1.0;
 	currentIteration = 0;
+	currentRestart = 0;
 	augmentation = 0;
+	omega = 1.0;
 }
 
 void FETimeInfo::Serialize(DumpStream& ar)
