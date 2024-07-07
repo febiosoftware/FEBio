@@ -565,6 +565,8 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				}
 				isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
 
+				bool isMustPoint = (pstep->m_timeController && (pstep->m_timeController->m_nmust >= 0));
+
 				switch (nevent)
 				{
 				case CB_MINOR_ITERS:
@@ -578,8 +580,8 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				}
 				break;
 				case CB_MAJOR_ITERS:
-					if ((nplt == FE_PLOT_MAJOR_ITRS) && inRange && isStride) bout = true;
-					if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
+					if ((nplt == FE_PLOT_MAJOR_ITRS) && inRange && (isStride || isMustPoint)) bout = true;
+					if ((nplt == FE_PLOT_MUST_POINTS) && isMustPoint) bout = true;
 					if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 					break;
 				case CB_AUGMENT:

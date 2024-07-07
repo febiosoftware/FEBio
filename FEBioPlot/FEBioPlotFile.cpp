@@ -1597,7 +1597,6 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 void FEBioPlotFile::WriteGlobalData(FEModel& fem)
 {
 	PlotFile::Dictionary& dic = GetDictionary();
-	dic.Clear();
 	auto& globData = dic.GlobalVariableList();
 	list<DICTIONARY_ITEM>::iterator it = globData.begin();
 	for (int i = 0; i < (int)globData.size(); ++i, ++it)

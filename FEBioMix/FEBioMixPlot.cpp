@@ -1408,77 +1408,34 @@ bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEDataStream& a)
 {
-    tens4ds c;
-    
-	if ((dom.Class() != FE_DOMAIN_SOLID)
-        && (dom.Class() != FE_DOMAIN_SHELL)) return false;
-	FESolidDomain* pbd = static_cast<FESolidDomain*>(&dom);
-    FEShellDomain* psd = static_cast<FEShellDomain*>(&dom);
-    
-    FEBiphasic*       pb  = dynamic_cast<FEBiphasic      *> (dom.GetMaterial());
-    FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
-    FETriphasic*      ptp = dynamic_cast<FETriphasic     *> (dom.GetMaterial());
-    FEMultiphasic*    pmp = dynamic_cast<FEMultiphasic   *> (dom.GetMaterial());
-    if ((pb == 0) && (pbs == 0) && (ptp == 0) && (pmp == 0)) return false;
+	FEBiphasic*       pb  = dynamic_cast<FEBiphasic      *> (dom.GetMaterial());
+	FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+	FETriphasic*      ptp = dynamic_cast<FETriphasic     *> (dom.GetMaterial());
+	FEMultiphasic*    pmp = dynamic_cast<FEMultiphasic   *> (dom.GetMaterial());
+	if ((pb == 0) && (pbs == 0) && (ptp == 0) && (pmp == 0)) return false;
 
-    if (pbd) {
-        for (int i=0; i<pbd->Elements(); ++i)
-        {
-            FESolidElement& el = pbd->Element(i);
-            
-            int nint = el.GaussPoints();
-            double f = 1.0 / (double) nint;
-            
-            // since the PLOT file requires floats we need to convert
-            // the doubles to single precision
-            // we output the average stress values of the gauss points
-            tens4ds s(0.0);
-            for (int j=0; j<nint; ++j)
-            {
-                FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
-                if (pb) c = pb->Tangent(pt);
-                else if (pbs) c = pbs->Tangent(pt);
-                else if (ptp) c = ptp->Tangent(pt);
-                else if (pmp) c = pmp->Tangent(pt);
-                
-                s += c;
-            }
-            s *= f;
-            
-            // store average elasticity
-            a << s;
-        }
-    }
-    else if (psd) {
-        for (int i=0; i<psd->Elements(); ++i)
-        {
-            FEShellElement& el = psd->Element(i);
-            
-            int nint = el.GaussPoints();
-            double f = 1.0 / (double) nint;
-            
-            // since the PLOT file requires floats we need to convert
-            // the doubles to single precision
-            // we output the average stress values of the gauss points
-            tens4ds s(0.0);
-            for (int j=0; j<nint; ++j)
-            {
-                FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
-                if (pb) c = pb->Tangent(pt);
-                else if (pbs) c = pbs->Tangent(pt);
-                else if (ptp) c = ptp->Tangent(pt);
-                else if (pmp) c = pmp->Tangent(pt);
-                
-                s += c;
-            }
-            s *= f;
-            
-            // store average elasticity
-            a << s;
-        }
-    }
-    
-    return true;
+	for (int i=0; i<dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+
+		tens4ds s(0.0);
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+			if      (pb ) s += pb->Tangent(pt);
+			else if (pbs) s += pbs->Tangent(pt);
+			else if (ptp) s += ptp->Tangent(pt);
+			else if (pmp) s += pmp->Tangent(pt);
+		}
+		s *= f;
+
+		// store average elasticity
+		a << s;
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------

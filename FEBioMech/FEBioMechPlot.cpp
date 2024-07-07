@@ -163,7 +163,7 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 
 	// make sure the corresponding contact interface is active
 	// (in case the parent was not set, we'll proceed regardless)
-	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	FEContactInterface* pci = pcs->GetContactInterface();
 	if ((pci == 0) || pci->IsActive())
 	{
 		// NOTE: the sliding surface does not use material points, so we need this little hack. 
@@ -244,7 +244,7 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
     
 	// make sure the corresponding contact interface is active
 	// (in case the parent was not set, we'll proceed regardless)
-	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	FEContactInterface* pci = pcs->GetContactInterface();
 	if ((pci == 0) || pci->IsActive())
 	{
 		// NOTE: the sliding surface does not use material points, so we need this little hack. 

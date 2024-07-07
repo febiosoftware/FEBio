@@ -382,7 +382,7 @@ status open
 \end_layout
 
 \begin_layout Standard
-MRL: 
+Weiss Lab: 
 \begin_inset ERT
 status open
 
@@ -390,7 +390,7 @@ status open
 
 
 \backslash
-url{http://mrl.sci.utah.edu}
+url{https://weisslabutah.org}
 \end_layout
 
 \end_inset
@@ -2212,8 +2212,9 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Graphics
-	filename Figures/FigKinematicsContinuum.pdf
+	filename Figures/FigKinematicsContinuum.png
 	lyxscale 25
 	scale 50
 
@@ -2889,8 +2890,9 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Graphics
-	filename Figures/FigShearStrain.pdf
+	filename Figures/FigShearStrain.png
 	lyxscale 25
 	scale 50
 
@@ -3522,8 +3524,9 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Graphics
-	filename Figures/FigReferentialVolume.pdf
+	filename Figures/FigReferentialVolume.png
 	lyxscale 25
 	scale 50
 
@@ -39077,7 +39080,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigRelaxationSpectrumMalkin.pdf
+	filename Figures/FigRelaxationSpectrumMalkin.png
 	lyxscale 50
 	width 4in
 
@@ -39195,7 +39198,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigRelaxationMalkin.pdf
+	filename Figures/FigRelaxationMalkin.png
 	lyxscale 50
 	width 4in
 
@@ -39337,7 +39340,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigRelaxationSpectrumExponential.pdf
+	filename Figures/FigRelaxationSpectrumExponential.png
 	lyxscale 50
 	width 4in
 
@@ -39441,7 +39444,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/FigContinuousExponentialRelaxation.pdf
+	filename Figures/FigContinuousExponentialRelaxation.png
 	lyxscale 50
 	width 5in
 

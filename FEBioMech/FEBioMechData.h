@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/NLConstraintDataRecord.h>
 #include <FECore/FENLConstraint.h>
 #include <FECore/SurfaceDataRecord.h>
+#include <FECore/DomainDataRecord.h>
 
 //=============================================================================
 // N O D E  D A T A
@@ -909,6 +910,24 @@ public:
 	double value(FEElement& el);
 };
 
+// This log variable outputs the total deformation gradient
+// For prestrain materials this will include the effect of the prestrain gradient
+// For other materials, this will output the same as the regular deformation gradient
+class FELogTotalDeformationGradient : public FELogElemData
+{
+public:
+	FELogTotalDeformationGradient(int r, int c, FEModel* fem) : FELogElemData(fem), m_r(r), m_c(c) {}
+	double value(FEElement& el) override;
+private:
+	int m_r, m_c;
+};
+
+template <int row, int col> class FELogTotalDeformationGradient_T : public FELogTotalDeformationGradient
+{
+public:
+	FELogTotalDeformationGradient_T(FEModel* fem) : FELogTotalDeformationGradient(row, col, fem){}
+};
+
 //-----------------------------------------------------------------------------
 // Base class for elasticity tensor output
 class FELogElemElasticity_ : public FELogElemData
@@ -1545,4 +1564,19 @@ class FELogContactArea : public FELogSurfaceData
 public:
 	FELogContactArea(FEModel* fem) : FELogSurfaceData(fem) {}
 	double value(FESurface& surface) override;
+};
+
+//=============================================================================
+// D O M A I N   D A T A
+//=============================================================================
+// from Gibbons, "Finite Element Modeling of Blast Lung Injury in Sheep", JBME 2015
+// this calculates the normalized time-summed internal energy
+class FENormalizedInternalEnergy : public FELogDomainData
+{
+public:
+	FENormalizedInternalEnergy(FEModel* fem) : FELogDomainData(fem), m_sum(0) {}
+	double value(FEDomain& dom) override;
+
+private:
+	double m_sum;
 };

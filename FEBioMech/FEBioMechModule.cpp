@@ -1060,6 +1060,18 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 3, "mixture_stress[2].xz");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 4, "mixture_stress[2].yz");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 5, "mixture_stress[2].zz");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 0, "Ft_xx");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 1, "Ft_xy");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 2, "Ft_xz");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 1, 0, "Ft_yx");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 1, 1, "Ft_yy");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 1, 2, "Ft_yz");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 0, "Ft_zx");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 1, "Ft_zy");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 2, "Ft_zz");
+
+	// derived from FELogDomainData
+	REGISTER_FECORE_CLASS(FENormalizedInternalEnergy, "normalized internal energy");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData
