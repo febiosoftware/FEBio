@@ -347,6 +347,26 @@ if(USE_MMG)
     target_link_libraries(feamr PRIVATE ${MMG_LIB})
 endif()
 
+# USE_SUITESPARSE
+if(USE_SUITESPARSE)
+	target_include_directories(numcore PRIVATE ${SUITESPARSE_INC})
+    target_compile_definitions(numcore PRIVATE HAS_SUITESPARSE)
+
+    if(WIN32)
+        set(SUITESPARSE_LIB_NAMES amd_static cholmod_static suitesparseconfig_static umfpack_static)
+    else()
+        set(SUITESPARSE_LIB_NAMES amd cholmod suitesparseconfig umfpack)
+    endif()
+
+    foreach(name IN LISTS SUITESPARSE_LIB_NAMES)
+        findLib(${name} SUITESPARSE_LIBDIR SUITESPARSE_LIB)
+        list(APPEND SUITESPARSE_LIBS ${SUITESPARSE_LIB})
+        unset(SUITESPARSE_LIB)
+    endforeach(name)    
+
+    target_link_libraries(numcore PRIVATE ${SUITESPARSE_LIBS})
+endif()
+
 # Link ZLIB
 if(USE_ZLIB)
     target_include_directories(febioplot PRIVATE ${ZLIB_INCLUDE_DIR})

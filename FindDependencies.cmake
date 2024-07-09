@@ -157,6 +157,11 @@ else()
     mark_as_advanced(CLEAR MMG_INC MMG_LIB)
 endif()
 
+# UMFPACK
+option(USE_SUITESPARSE "Use the UMFPACK linear solver from SuiteSparse" OFF)
+set(SUITESPARSE_INC CACHE PATH "Path to SuiteSparse include folder")
+set(SUITESPARSE_LIBDIR CACHE PATH "Path to SuiteSparse lib folder")
+
 # LEVMAR
 if(WIN32)
 	find_path(LEVMAR_INC levmar.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
