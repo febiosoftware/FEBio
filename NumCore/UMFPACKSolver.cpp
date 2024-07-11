@@ -36,6 +36,8 @@ public:
 	SparseMatrix* A = nullptr;
 	void* symbolic = nullptr;
 	void* numeric = nullptr;
+	std::vector<int64_t>	ind;
+	std::vector<int64_t>	ptr;
 };
 
 BEGIN_FECORE_CLASS(UMFPACKSolver, LinearSolver)
@@ -71,7 +73,16 @@ bool UMFPACKSolver::PreProcess()
 	int nr = A->Rows();
 	int nc = A->Columns();
 
-	int status = umfpack_di_symbolic(nr, nc, A->Pointers(), A->Indices(), A->Values(), &m->symbolic, nullptr, nullptr);
+	int* pA = A->Pointers();
+	int* iA = A->Indices();
+
+	int nnz = A->NonZeroes();
+	m->ptr.resize(nr + 1);
+	for (size_t n = 0; n <= nr; ++n) m->ptr[n] = pA[n];
+	m->ind.resize(nnz);
+	for (size_t n = 0; n < nnz;  ++n) m->ind[n] = iA[n];
+
+	int status = umfpack_dl_symbolic(nr, nc, m->ptr.data(), m->ind.data(), A->Values(), &m->symbolic, nullptr, nullptr);
 	return (status == UMFPACK_OK);
 #else
 	return false;
@@ -84,7 +95,7 @@ bool UMFPACKSolver::Factor()
 	SparseMatrix* A = m->A;
 	if (A == nullptr) return false;
 
-	int status = umfpack_di_numeric(A->Pointers(), A->Indices(), A->Values(), m->symbolic, &m->numeric, nullptr, nullptr);
+	int status = umfpack_dl_numeric(m->ptr.data(), m->ind.data(), A->Values(), m->symbolic, &m->numeric, nullptr, nullptr);
 	return (status == UMFPACK_OK);
 #else
 	return false;
@@ -97,7 +108,7 @@ bool UMFPACKSolver::BackSolve(double* x, double* y)
 	SparseMatrix* A = m->A;
 	if (A == nullptr) return false;
 
-	int status = umfpack_di_solve(UMFPACK_A, A->Pointers(), A->Indices(), A->Values(), x, y, m->numeric, nullptr, nullptr);
+	int status = umfpack_dl_solve(UMFPACK_A, m->ptr.data(), m->ind.data(), A->Values(), x, y, m->numeric, nullptr, nullptr);
 	return (status == UMFPACK_OK);
 #else
 	return false;

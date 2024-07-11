@@ -353,9 +353,9 @@ if(USE_SUITESPARSE)
     target_compile_definitions(numcore PRIVATE HAS_SUITESPARSE)
 
     if(WIN32)
-        set(SUITESPARSE_LIB_NAMES amd_static cholmod_static suitesparseconfig_static umfpack_static)
+        set(SUITESPARSE_LIB_NAMES amd_static cholmod_static colamd_static suitesparseconfig_static umfpack_static)
     else()
-        set(SUITESPARSE_LIB_NAMES amd cholmod suitesparseconfig umfpack)
+        set(SUITESPARSE_LIB_NAMES amd cholmod colamd suitesparseconfig umfpack)
     endif()
 
     foreach(name IN LISTS SUITESPARSE_LIB_NAMES)
