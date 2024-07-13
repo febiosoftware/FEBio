@@ -2457,6 +2457,25 @@ bool FEPlotSPRLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 	return true;
 }
 
+bool FEPlotSPRInfStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+	// For now, this is only available for solid domains
+	if (dom.Class() != FE_DOMAIN_SOLID) return false;
+	FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+	writeSPRElementValueMat3ds(sd, a, [](const FEMaterialPoint& mp) {
+		const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+		// displacement tensor
+		mat3d U = pt.m_F - mat3dd(1.0);
+
+		// evaluate small strain tensor eij = 0.5*(Uij + Uji)
+		mat3ds e = U.sym();
+
+		return e;
+	});
+	return true;
+}
+
 //=============================================================================
 //! Store the average right stretch
 class FERightStretch

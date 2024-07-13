@@ -972,6 +972,14 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//! SPR infinitesimal strains
+class FEPlotSPRInfStrain : public FEPlotDomainData
+{
+public:
+	FEPlotSPRInfStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_NODE) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //-----------------------------------------------------------------------------
 //! Right stretch
 class FEPlotRightStretch : public FEPlotDomainData
