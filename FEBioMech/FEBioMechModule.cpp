@@ -437,6 +437,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEVolumeGrowth     , "volume growth"       );
     REGISTER_FECORE_CLASS(FEAreaGrowth       , "area growth"         );
     REGISTER_FECORE_CLASS(FEFiberGrowth      , "fiber growth"        );
+    REGISTER_FECORE_CLASS(FEGeneralGrowth    , "general growth"      );
 
 	// Elastic Fiber materials (derived from FEElasticFiberMaterial)
     REGISTER_FECORE_CLASS(FEElasticFiberCDF         , "fiber-CDF"           );

@@ -61890,6 +61890,76 @@ fiber growth
 \end_inset
 
 .
+ For 
+\emph on
+general growth
+\emph default
+ the user specifies the desired values of 
+\begin_inset Formula $\vartheta^{\text{iso}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\vartheta^{\text{ani}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Internally, the calculations within FEBio require the evaluation of the
+ inverse of 
+\begin_inset Formula $\mathbf{F}^{g}$
+\end_inset
+
+, which is generall given by
+\begin_inset Formula 
+\[
+\left(\mathbf{F}^{g}\right)^{-1}=\frac{1}{\vartheta^{\text{iso}}+\vartheta^{\text{ani}}-1}\left(\left(1+\frac{\vartheta^{\text{ani}}-1}{\vartheta^{\text{iso}}}\right)\mathbf{I}-\frac{\vartheta^{\text{ani}}-1}{\vartheta^{\text{iso}}}\mathbf{n}_{r}\otimes\mathbf{n}_{r}\right)
+\]
+
+\end_inset
+
+The mass density of a growing material is evaluated from 
+\begin_inset Formula $\rho=\rho_{r}/J$
+\end_inset
+
+ where 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is the (invariant) referential mass density of the growing solid (when
+ there is neither growth nor deformation) and 
+\begin_inset Formula $J=\det\mathbf{F}=\det\mathbf{F}^{e}\det\mathbf{F}^{g}\equiv J^{e}J^{g}$
+\end_inset
+
+.
+ It follows that the mass density change produced only by the growth is
+ 
+\begin_inset Formula $\rho J^{e}\equiv\rho_{rg}=\rho_{r}/J^{g}$
+\end_inset
+
+, thus 
+\begin_inset Formula $J^{g}=\det\mathbf{F}^{g}$
+\end_inset
+
+ may be used to evaluate the evolving solid mass density 
+\begin_inset Formula $\rho_{rg}$
+\end_inset
+
+ due only to growth.
+ From the general expression for 
+\begin_inset Formula $\mathbf{F}^{g}$
+\end_inset
+
+ above it follows that
+\begin_inset Formula 
+\[
+J^{g}=\det\mathbf{F}^{g}=\left(\vartheta^{\text{iso}}\right)^{2}\left(\vartheta^{\text{iso}}+\vartheta^{\text{ani}}-1\right)
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
