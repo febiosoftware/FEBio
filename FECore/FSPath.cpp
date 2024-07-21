@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include <regex>
 #include <string>
+#include <cstring>
 #include "FSPath.h"
 
 
