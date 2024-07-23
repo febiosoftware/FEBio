@@ -60622,6 +60622,10 @@ J^{e}=\det\mathbf{F}^{e}\quad J^{g}=\det\mathbf{F}^{g}\,.
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 A constitutive model for the growth tensor was provided by 
 \begin_inset CommandInset citation
 LatexCommand citep
@@ -60706,6 +60710,517 @@ fiber growth
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsubsection
+Rate-Dependent Kinematic Growth
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Rate-Dependent-Kinematic-Growth"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for kinematic growth is 
+\emph on
+rate-dependent kinematic growth
+\emph default
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic material undergoing kinematic growth
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<growth>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the growth model (
+\emph on
+volume growth
+\emph default
+, 
+\emph on
+area growth
+\emph default
+, 
+\emph on
+fiber growth
+\emph default
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Kinematic growth, based on the framework first proposed in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Rodriguez94"
+literal "false"
+
+\end_inset
+
+, uses the multiplicative decomposition of the deformation gradient into
+\begin_inset Formula 
+\[
+\mathbf{F}=\mathbf{F}^{e}\cdot\mathbf{F}^{g}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{F}^{e}$
+\end_inset
+
+ represents the elastic deformation and 
+\begin_inset Formula $\mathbf{F}^{g}$
+\end_inset
+
+ represents the growth.
+ The related Jacobians are
+\begin_inset Formula 
+\[
+J^{e}=\det\mathbf{F}^{e}\quad J^{g}=\det\mathbf{F}^{g}\,.
+\]
+
+\end_inset
+
+The rate-dependent constitutive model for the growth tensor was provided
+ by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "kuhl2007,goktepe2010"
+literal "false"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\mathbf{F}^{g}=\mathbf{I}+(\vartheta-1)\mathbf{n}_{r}\otimes\mathbf{n}_{r}\,,
+\]
+
+\end_inset
+
+where the growth is given by
+\begin_inset Formula 
+\[
+\vartheta=k(\vartheta)\phi(\bullet)\,,
+\]
+
+\end_inset
+
+which is initialized to 
+\begin_inset Formula $\vartheta(t=0)=1$
+\end_inset
+
+.
+ The parameter 
+\begin_inset Formula $k(\vartheta)$
+\end_inset
+
+ bounds the solution via a sigmoid function to prevent uncontrolled growth
+ or contraction:
+\begin_inset Formula 
+\[
+k(\vartheta)=\vartheta_{\text{min}}+\frac{\vartheta_{\text{max}}}{1+\exp\left(-\frac{\vartheta-\vartheta_{\alpha}}{\vartheta_{\gamma}}\right)}\,.
+\]
+
+\end_inset
+
+The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k_min>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of 
+\begin_inset Formula $\vartheta_{\text{min}}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k_max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of 
+\begin_inset Formula $\vartheta_{\text{max}}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<theta_gamma>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of 
+\begin_inset Formula $\vartheta_{\gamma}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<theta_a>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of 
+\begin_inset Formula $\vartheta_{\alpha}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<fiber>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The parameter 
+\begin_inset Formula $\phi(\bullet)$
+\end_inset
+
+ may be defined to vary in relation to the deviation of a state variable
+ 
+\begin_inset Formula $\bullet$
+\end_inset
+
+ from an equilibrium value 
+\begin_inset Formula $\bullet_{eq}$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\phi(\bullet)=\bullet-\bullet_{eq}\,.
+\]
+
+\end_inset
+
+Currently, this parameter is restricted to the rate of chemical species
+ evolution.
+ For example, the rate may be made dependent on the deviation of a chemical
+ species:
+\begin_inset Formula 
+\[
+\phi(\dot{c}^{\alpha})=\dot{c}^{\alpha}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\bullet_{eq}\equiv\dot{c}_{eq}^{\alpha}=0$
+\end_inset
+
+.
+ This is defined by:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<sol_id>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ of the chemical species 
+\begin_inset Formula $c^{\alpha}$
+\end_inset
+
+ that affects growth.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<multiplier>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the growth rate scalar
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection

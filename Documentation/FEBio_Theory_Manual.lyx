@@ -262,6 +262,38 @@ status open
 
 \end_inset
 
+Steven LaBelle
+\end_layout
+
+\begin_layout Standard
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{mailto:steven.labelle@utah.edu}{steven.labelle@utah.edu}
+\end_layout
+
+\end_inset
+
+)
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+
+\end_layout
+
+\end_inset
+
 Dr.
  Jeffrey Weiss (
 \begin_inset ERT
@@ -8130,7 +8162,16 @@ solute and multiphasic materials, where there is no explicitly modeled porous
  chemical processes are defined.
  This approach is justified when there is a large difference in time scales
  between displacements associated with solid mechanics and those associated
- with solute transport and chemical kinetics.
+ with solute transport and chemical kinetics (a common assumption of kinematic
+ growth theory 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "ateshian2024"
+literal "false"
+
+\end_inset
+
+).
  Additionally, this approach introduces the assumption that the entire solid
  mass may turn over at each new time step, resulting in a new reference
  configuration defined by new extensive material properties (volume, shape,
@@ -8162,20 +8203,20 @@ are tracked only in an intensive sense (i.e., volumetric changes due to strain
  This treatment introduces implicit sources of extensive quantities such
  as mass and energy which either 1) have negligible contributions when volumetri
 c changes occur at a much longer time scale than chemical transport and
- kinetics, and/or 2) may be accounted for via implicit variables as is the
- case for theories of kinematic growth and plasticity.
+ kinetics, and/or 2) may be accounted for by implicit variables.
  Similar reasoning is used to justify the absence of porosity, hydraulic
  permeability, and fluid pressure (
 \begin_inset Formula $p$
 \end_inset
 
 ).
- In the absence of fluid state fields, only isotropic diffusivity is introduced
- for the time being.
- The final difference from prior analyses is that standard thermodynamic
- conditions are assumed throughout the analysis.
- Any deviations from standard conditions may be accoutned for when specifying
- the average material and constitutive behaviors during an analysis.
+ In the absence of fluid field variables, only isotropic diffusivity is
+ introduced for the time being.
+ One last distinction from biphasic and multiphasic materials is that standard
+ thermodynamic conditions are assumed throughout the analysis.
+ Any deviations from standard conditions may be implicitly accounted for
+ when specifying the average material and constitutive behaviors during
+ an analysis.
  
 \end_layout
 
@@ -8183,8 +8224,8 @@ c changes occur at a much longer time scale than chemical transport and
 This analysis should not be used when modeling electrochemistry or short-time
  mechano-chemical phenomena (e.g.
  osmotic pressure, non-negligible solute volume fractions, convection).
- The assumptions above are bold and it is the user's responsibility to ensure
- that they are appropriate for a given problem.
+ The user is responsible for ensuring that these assumptions are appropriate
+ for a given problem.
 \end_layout
 
 \begin_layout Subsection
@@ -8210,11 +8251,7 @@ literal "true"
 \end_inset
 
 .
- 
-\end_layout
-
-\begin_layout Standard
-The fundamental modeling assumptions adopted in this treatment are quasi-static
+ The fundamental modeling assumptions adopted in this treatment are quasi-static
  conditions for momentum balance (negligible effects of inertia), intrinsic
  incompressibility of all constituents (invariant true densities), isothermal
  conditions, negligible volume fraction of solute relative to the solid
@@ -8223,17 +8260,16 @@ The fundamental modeling assumptions adopted in this treatment are quasi-static
  solutes and the solid matrix.
  These assumptions are often made in studies of biological tissues and cells
  with the additional simplification that frictional interactions do not
- arise between the solutes and the solvent (which is included in the biphasic,
- biphasic-solute, triphasic, and multiphasic materials).
+ arise between the solutes and the solvent (in contrast to biphasic, biphasic-so
+lute, triphasic, and multiphasic material formulations).
 \end_layout
 
 \begin_layout Standard
-The two explicit classifications of constituents of the mixture are the
- solid matrix (
+Mixture constituents are classified as components of the solid matrix (
 \begin_inset Formula $\sigma)$
 \end_inset
 
- and the solutes (
+ or a solute (
 \begin_inset Formula $\alpha\in\{1,2,\dots,s\})$
 \end_inset
 
@@ -8243,19 +8279,20 @@ The two explicit classifications of constituents of the mixture are the
 \begin_inset Formula $\mathbf{u}$
 \end_inset
 
- and the solute concentrations 
+ while solute concentrations are described by 
 \begin_inset Formula $c^{\alpha}$
 \end_inset
 
  (unlike prior analyses).
- The stress may be described by the Cauchy stress tensor 
+ The solid stress is described by the Cauchy stress tensor 
 \begin_inset Formula $\boldsymbol{\sigma}$
 \end_inset
 
 .
- Under the established assumptions, it is common to solve the solid mechanics
- and chemical kinetics separately before superimposing the chemical solution
- on the mesh solved by the elastic equations of motion.
+ Under the established assumptions, it is common to solve the equations
+ of motion associated with the solid mechanics and chemical kinetics separately
+ before superimposing the chemical solution onto the mesh solved by the
+ elastic equations of motion.
  The conservation of mass and linear momentum for the solid reduce to 
 \begin_inset Formula 
 \begin{equation}
@@ -8264,8 +8301,7 @@ The two explicit classifications of constituents of the mixture are the
 
 \end_inset
 
-Similarly, the Similarly, the balance of linear momentum for the solutes
- is given by 
+Similarly, the balance of linear momentum for the solutes is given by 
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}-\rho^{\alpha}\grad\tilde{\mu}^{\alpha}-\mathbf{f}^{\alpha\sigma}\cdot\left(\mathbf{v}^{\alpha}-\mathbf{v}^{\sigma}\right) & -\mathbf{f}^{\alpha w}\cdot\left(\mathbf{v}^{\alpha}-\mathbf{v}^{w}\right)=\mathbf{0}\,,\end{aligned}
@@ -8304,7 +8340,15 @@ where
 
  are the diffusive drag tensor representing momentum exchange via frictional
  interactions between a given solute and the solid and implicit solvent
- (ref: Gu, Lai, Mow 1998).
+ (
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Gu98"
+literal "false"
+
+\end_inset
+
+).
  
 \end_layout
 
@@ -8325,11 +8369,7 @@ The mechano-chemical potential is the sum of the mechanical and chemical
 \end_inset
 
 .
- 
-\end_layout
-
-\begin_layout Standard
-From classical physical chemistry, the general form of a constitutive relation
+ From classical physical chemistry, the general form of a constitutive relation
  for the chemical potential is 
 \begin_inset Formula $\mu^{\alpha}=\mu_{0}^{\alpha}\left(\theta\right)+\left(R\theta/M^{\alpha}\right)\ln a^{\alpha}$
 \end_inset
@@ -8409,7 +8449,7 @@ literal "true"
  For the elastic-solute materials, we assume both ideal physico-chemical
  behavior, and no exclusion of the interstitial space of the porous solid
  matrix throughout the analysis (i.e., 
-\begin_inset Formula $\forall t>0\,\tilde{\kappa}^{\alpha}=\kappa^{\alpha}=\gamma^{\alpha}=1$
+\begin_inset Formula $\forall t\geq0\,\tilde{\kappa}^{\alpha}=\kappa^{\alpha}=\gamma^{\alpha}=1$
 \end_inset
 
 ).
@@ -8514,11 +8554,11 @@ noprefix "false"
 \end_inset
 
 Each constituent of the mixture must satisfy the axiom of mass balance.
- In the absence of chemical reactions involving constituent 
+ In the absence of chemical reactions the mass balance for constituent 
 \begin_inset Formula $\alpha$
 \end_inset
 
-, its mass balance equation is 
+ is 
 \begin_inset Formula 
 \begin{equation}
 \frac{\partial\rho^{\alpha}}{\partial t}+\divg\left(\rho^{\alpha}\mathbf{v}^{\alpha}\right)=0\,.\label{eq125-1}
@@ -8561,8 +8601,8 @@ name "subsec:ERD-continuous-variables"
 
 \begin_layout Standard
 In biphasic-solute and multiphasic analyses, mechano-chemical potentials
- were not practical choices for primary variables in a finite element implementa
-tion since their continuity across an interface did not imply continuity
+ are not practical choices for primary variables in a finite element implementat
+ion since their continuity across an interface did not imply continuity
  of the solute concentrations 
 \begin_inset Formula $c^{\alpha}$
 \end_inset
@@ -20928,7 +20968,7 @@ For the elastic reaction-diffusion materials, it is assumed that there is
  a large difference in time scales between displacements and solute transport
  and kinetics (such as during some growth and remodeling simulations).
  The first consequence of this is that solute 
-\begin_inset Formula $\tilde{c}^{\alpha}$
+\begin_inset Formula $c^{\alpha}$
 \end_inset
 
 concentrations, solute flux 
@@ -20945,17 +20985,18 @@ concentrations, solute flux
 
 ) or rotation.
  Thus, most of the cross linearization (i.e., interactions between solid displacem
-ents and concentration displacements) are not evaluated (
-\begin_inset Formula $\frac{\partial k}{\partial\mathbf{E}},\hat{\boldsymbol{\zeta}_{\varepsilon}},\mathcal{\boldsymbol{D}}^{\alpha},\frac{\delta\tilde{c}^{\alpha}}{J},\frac{\partial\tilde{\kappa}}{J},\mathbf{j}_{u}^{\prime},$
+ents and concentration displacements) are not evaluated unless they depend
+ on an implicitly modeled relationship (
+\begin_inset Formula $\frac{\partial k}{\partial\mathbf{E}},\hat{\boldsymbol{\zeta}_{\varepsilon}},\mathcal{\boldsymbol{D}}^{\alpha},\frac{\delta c^{\alpha}}{J},\frac{\partial\tilde{\kappa}}{J},\mathbf{j}_{u}^{\prime},$
 \end_inset
 
-).
+etc.).
  The second consequence is that fluid pressure (
 \begin_inset Formula $p,\tilde{p}$
 \end_inset
 
 ) and solute convection are assumed to be neglibible (as are 
-\begin_inset Formula $\mathcal{\boldsymbol{\mathcal{K}}},\tilde{\boldsymbol{\mathcal{K}}},\tilde{\mathbf{k}}_{c}^{\prime},\frac{\partial\tilde{\mathcal{K}}}{\partial\tilde{c}^{\alpha}},\mathbf{w}_{u}^{\prime},\mathbf{w}_{c}^{\prime}$
+\begin_inset Formula $\mathcal{\boldsymbol{\mathcal{K}}},\tilde{\boldsymbol{\mathcal{K}}},\tilde{\mathbf{k}}_{c}^{\prime},\frac{\partial\tilde{\mathcal{K}}}{\partial c^{\alpha}},\mathbf{w}_{u}^{\prime},\mathbf{w}_{c}^{\prime}$
 \end_inset
 
 ).
@@ -20968,10 +21009,10 @@ ents and concentration displacements) are not evaluated (
 ).
  We leave the possibility that the stress/strain and solute concentrations
  may contain interaction terms (e.g., 
-\begin_inset Formula $\boldsymbol{\sigma}_{c}^{\prime},\frac{\partial\mathbf{S}^{e}}{\partial\tilde{c}},\frac{\partial\tilde{c}}{\partial\boldsymbol{\sigma}}$
+\begin_inset Formula $\boldsymbol{\sigma}_{c}^{\prime},\frac{\partial\mathbf{S}}{\partial c},\frac{\partial c}{\partial\boldsymbol{\sigma}},\frac{\partial k}{\partial\mathbf{E}},\hat{\boldsymbol{\zeta}_{\varepsilon}}$
 \end_inset
 
- may be non-zero under certain kinematic growth constitutive relations).
+ may be non-zero under certain kinematic growth relations).
  This analysis should not be used if modeling electrochemistry or short-time
  mechano-chemical phenomena are desired (e.g.
  osmotic pressure, non-negligible solute volume fractions, convection).
@@ -20983,7 +21024,7 @@ The virtual work integral simplifies to:
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta W & =\int_{b}\delta\mathbf{v}\cdot\divg\boldsymbol{\sigma}\,dv\\
- & +\sum\limits _{\alpha\ne s,w}\int_{b}\delta\tilde{c}^{\alpha}\left[\frac{D}{Dt}\tilde{c}^{\alpha}+\divg\mathbf{j}^{\alpha}\right]\,dv\,,
+ & +\sum\limits _{\alpha\ne s,w}\int_{b}\delta c^{\alpha}\left[\frac{D}{Dt}c^{\alpha}+\divg\mathbf{j}^{\alpha}\right]\,dv\,,
 \end{aligned}
 \end{equation}
 
@@ -20994,7 +21035,7 @@ where
 \end_inset
 
  is the virtual velocity of the solid and 
-\begin_inset Formula $\delta\tilde{c}^{\alpha}$
+\begin_inset Formula $\delta c^{\alpha}$
 \end_inset
 
  is the virtual molar energy of solute 
@@ -21028,7 +21069,7 @@ where
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta W_{\text{int}} & =\int_{b}\boldsymbol{\sigma}:\delta\mathbf{D}\,dv\\
- & +\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\int_{b}\left[\mathbf{j}^{\alpha}\cdot\grad\delta\tilde{c}^{\alpha}-\delta\tilde{c}^{\alpha}\frac{D}{Dt}\tilde{c}^{\alpha}\right]\,dv,
+ & +\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\int_{b}\left[\mathbf{j}^{\alpha}\cdot\grad\delta c^{\alpha}-\delta c^{\alpha}\frac{D}{Dt}c^{\alpha}\right]\,dv,
 \end{aligned}
 \end{equation}
 
@@ -21037,7 +21078,7 @@ where
 and 
 \begin_inset Formula 
 \begin{equation}
-\delta W_{\text{ext}}=\int_{\partial b}\left[\delta\mathbf{v}\cdot\mathbf{t}+\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\delta\tilde{c}^{\alpha}j_{n}^{\alpha}\right]\,da\,.
+\delta W_{\text{ext}}=\int_{\partial b}\left[\delta\mathbf{v}\cdot\mathbf{t}+\sum\limits _{\alpha\ne s,w}\delta c^{\alpha}j_{n}^{\alpha}\right]\,da\,.
 \end{equation}
 
 \end_inset
@@ -21068,7 +21109,7 @@ In these expressions,
 \end_inset
 
  and 
-\begin_inset Formula $\tilde{c}^{\alpha}$
+\begin_inset Formula $c^{\alpha}$
 \end_inset
 
  are used as nodal variables, and essential boundary conditions may be prescribe
@@ -21099,7 +21140,7 @@ d on these variables.
 \end_inset
 
  and 
-\begin_inset Formula $\tilde{c}^{\alpha}$
+\begin_inset Formula $c^{\alpha}$
 \end_inset
 
 , it is necessary to linearize these equations, as shown for example in
@@ -21160,11 +21201,88 @@ where
 \begin_inset Formula $\boldsymbol{\mathcal{C}}$
 \end_inset
 
- is the spatial elasticity tensor of the solid matrix.
- The second term is given by 
+ is the spatial elasticity tensor of the mixture, 
 \begin_inset Formula 
 \begin{equation}
-D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\mathbf{u}\right]\,dV=0\,,
+\boldsymbol{\mathcal{C}}=J^{-1}\left[\mathbf{F}\oslash\mathbf{F}\right]:\mathbb{C}:\left[\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right]\,,\label{eq293-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbb{C}$
+\end_inset
+
+is the material elasticity tensor of the mixture arises from 
+\begin_inset Formula $\mathbb{C}^{e}$
+\end_inset
+
+due to elastic deformation and 
+\begin_inset Formula $\mathbb{C}^{g}$
+\end_inset
+
+due to growth:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbb{C}=2\frac{d\mathbf{S}(\mathbf{C},\vartheta)}{d\mathbf{C}}=\mathbb{C}^{e}+\mathbb{C}^{g}\,.
+\]
+
+\end_inset
+
+The elastic contribution is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbb{C}^{e}=2\frac{\partial\mathbf{S}(\mathbf{C},\vartheta)}{\partial\mathbf{C}}\Biggr|_{\vartheta}=J^{g}\left[\mathbf{F}^{g-1}\oslash\mathbf{F}^{g-1}\right]:\mathbb{L}^{e}:\left[\mathbf{F}^{g-T}\oslash\mathbf{F}^{g-T}\right]=J^{g}\mathbb{L}_{ABCD}^{e}F_{iA}^{g-1}F_{jB}^{g-1}F_{kC}^{g-1}F_{lD}^{g-1}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbb{L}^{e}$
+\end_inset
+
+is the elasticity tensor that arises due to elastic deformation when observed
+ from the intermediate configuration:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbb{L}^{e}=2\frac{\partial\mathbf{S}^{e}}{\partial\mathbf{C}^{e}}\Biggr|_{\vartheta}\,.
+\]
+
+\end_inset
+
+The growth contribution is given by 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "goktepe2010"
+literal "false"
+
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\mathbb{C}^{g}=2\left[\frac{\partial\mathbf{S}(\mathbf{C},\vartheta)}{\partial\mathbf{F}^{g}}\Biggr|_{\mathbf{C}}:\frac{\partial\mathbf{F}^{g}}{\partial\vartheta}\right]\otimes\frac{\partial\vartheta}{\partial\mathbf{C}}\,.
+\]
+
+\end_inset
+
+Currently, stress- and strain-dependent growth are not implemented in FEBio,
+ so the first partial derivative above evaluates to the 4th order 0 tensor.
+ Consequently there is no contribution of the growth tensor to the elasticity
+ tensor.
+ The spatial elasticity tensor is thus simplified as 
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{C}}=\boldsymbol{\mathcal{C}}^{e}=J^{-1}\left(\mathbf{F}\oslash\mathbf{F}\right):2\frac{\partial\mathbf{S}}{\partial\mathbf{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right)\,.\label{eq294-1}
 \end{equation}
 
 \end_inset
@@ -21173,29 +21291,38 @@ D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\
 \end_layout
 
 \begin_layout Standard
+The second term is given by 
+\begin_inset Formula 
+\begin{equation}
+D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta c^{\alpha}\right)\left[\Delta\mathbf{u}\right]\,dV=0\,,
+\end{equation}
+
+\end_inset
+
 Since it is assumed that concentration is unaffected by deformation and
  molar flux is unaffected by rotation.
+ 
 \end_layout
 
 \begin_layout Standard
-Unless the concentration depends on the strain or stress, the final term
- is similarly
+The last term is given by 
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-D\left(\delta\tilde{c}^{\alpha}\frac{\partial\tilde{c}^{\alpha}}{\partial t}\right)\left[\Delta\mathbf{u}\right]\,dV=0\,.
+D\left(\delta c^{\alpha}\frac{\partial c^{\alpha}}{\partial t}\right)\left[\Delta\mathbf{u}\right]\,dV=0\,.
 \end{equation}
 
 \end_inset
 
-
+for cases where growth is not formulated with a dependence on stress or
+ strain.
 \end_layout
 
 \begin_layout Subsection
 Linearization along 
-\begin_inset Formula $\Delta\tilde{c}^{\gamma}$
+\begin_inset Formula $\Delta c^{\gamma}$
 \end_inset
 
 
@@ -21214,38 +21341,108 @@ The linearization of the first term in
 \end_inset
 
  along 
-\begin_inset Formula $\Delta\tilde{c}^{\gamma}$
-\end_inset
-
- yields The linearization of the first term in 
-\begin_inset Formula $\delta W_{\text{int}}$
-\end_inset
-
- along 
-\begin_inset Formula $\Delta\tilde{c}^{\gamma}$
+\begin_inset Formula $\Delta c^{\gamma}$
 \end_inset
 
  yields 
 \begin_inset Formula 
 \begin{equation}
-D\left(\mathbf{S}:\delta\mathbf{\dot{E}}\right)\left[\Delta\tilde{c}^{\gamma}\right]dV=\Delta\tilde{c}^{\gamma}\left(\boldsymbol{\sigma}_{\gamma}^{\prime}:\delta\mathbf{d}\right)\,dv\,,
+D\left(\mathbf{S}:\delta\mathbf{\dot{E}}\right)\left[\Delta c^{\gamma}\right]dV=\Delta c^{\gamma}\left(\boldsymbol{\sigma}_{\gamma}^{\prime}:\delta\mathbf{d}\right)\,dv\,,
 \end{equation}
 
 \end_inset
 
-which is generally zero unless the user specifies a constitutive relation
- for 
+where 
+\begin_inset Formula $\boldsymbol{\sigma}'_{\gamma}$
+\end_inset
+
+is generally zero except for cases where chemical kinetics are mechanosensitive
+ (dependent on the stress or strain).
+ In this case, 
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}_{\gamma}^{\prime}=J^{-1}\mathbf{F}\cdot\frac{\partial\mathbf{S}^{e}}{\partial\tilde{c}^{\gamma}}\cdot\mathbf{F}^{T}\,.
+\boldsymbol{\sigma}_{\gamma}^{\prime}=J^{-1}\mathbf{F}\cdot\frac{\partial\mathbf{S}}{\partial c^{\gamma}}\cdot\mathbf{F}^{T}\,.
 \end{equation}
 
 \end_inset
 
-The next term is
+where symmetric growth tensors yield the expression
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\tilde{c}^{\gamma}\right]\,dV=\grad\delta\tilde{c}^{\alpha}\cdot\mathbf{j}_{\gamma}^{\alpha\prime}\,dv\,,
+\frac{\partial\mathbf{S}}{\partial c^{\gamma}}=\frac{\partial\mathbf{S}}{\mathbf{F}^{g}}:\frac{\partial\mathbf{F}^{g}}{\partial\vartheta}\frac{\partial\vartheta}{\partial\dot{\vartheta}}\frac{\partial\dot{\vartheta}}{\partial\dot{c}^{\gamma}}\frac{\partial\dot{c}^{\gamma}}{\partial c^{\gamma}}\,,
+\end{equation}
+
+\end_inset
+
+where
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\mathbf{S}}{\partial\mathbf{F}^{g}}=\mathbf{S}\otimes\mathbf{F}^{g-T}-\mathbf{F}^{g-1}\odot\mathbf{S}-\mathbf{S}\odot\mathbf{F}^{g-1}-J^{g}\left[\mathbf{F}^{g-1}\oslash\mathbf{F}^{g-1}\right]:\mathbb{L}^{e}:\left[\mathbf{C}^{e}\oslash\mathbf{F}^{g-1}+\mathbf{F}^{g-1}\oslash\mathbf{C}^{e}\right]\,,
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\mathbf{F}^{g}}{\partial\vartheta}=\sum_{i=1}^{N}\mathbf{n}_{i}\otimes\mathbf{n}_{i}\,,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\vartheta}{\partial\dot{\vartheta}}=\Delta t\,,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\dot{\vartheta}}{\partial\dot{c}^{\gamma}}=k(\vartheta)\,,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\dot{c}^{\gamma}}{\partial c^{\gamma}}=\sum\nu_{i}^{\gamma}\frac{\partial\hat{\zeta}_{i}}{\partial c^{\gamma}}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The second term is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta c^{\alpha}\right)\left[\Delta c^{\gamma}\right]\,dV=\grad\delta c^{\alpha}\cdot\mathbf{j}_{\gamma}^{\alpha\prime}\,dv\,,
 \end{equation}
 
 \end_inset
@@ -21253,7 +21450,7 @@ D\left(\mathbf{J}^{\alpha}\cdot\Grad\delta\tilde{c}^{\alpha}\right)\left[\Delta\
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{j}_{\gamma}^{\alpha\prime} & \equiv D\mathbf{J}^{\alpha}\left[\Delta\tilde{c}^{\gamma}\right]=-\delta_{\alpha\gamma}\mathbf{d}^{\alpha}\cdot\grad\Delta\tilde{c}^{\gamma}\,.\end{aligned}
+\begin{aligned}\mathbf{j}_{\gamma}^{\alpha\prime} & \equiv D\mathbf{J}^{\alpha}\left[\Delta c^{\gamma}\right]=-\delta_{\alpha\gamma}\mathbf{d}^{\alpha}\cdot\grad\Delta c^{\gamma}\,.\end{aligned}
 \end{equation}
 
 \end_inset
@@ -21261,7 +21458,7 @@ where
 The last term is 
 \begin_inset Formula 
 \begin{equation}
-D\left(\frac{\partial\tilde{c}^{\alpha}}{\partial t}\delta\tilde{c}^{\alpha}\right)\left[\Delta\tilde{c}^{\gamma}\right]\,dV=\delta\tilde{c}^{\alpha}\frac{1}{\Delta t}\frac{\partial\tilde{c}^{\alpha}}{\partial\tilde{c}^{\gamma}}\Delta\tilde{c}^{\gamma}\,dv\,,
+D\left(\frac{\partial c^{\alpha}}{\partial t}\delta c^{\alpha}\right)\left[\Delta c^{\gamma}\right]\,dV=\delta c^{\alpha}\frac{1}{\Delta t}\frac{\partial c^{\alpha}}{\partial c^{\gamma}}\Delta c^{\gamma}\,dv\,,
 \end{equation}
 
 \end_inset
@@ -21289,7 +21486,10 @@ The linearization of
  in 
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq289-1"
+reference "3.5.3"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -21370,7 +21570,7 @@ The elemental area on
  Consequently, the external virtual work integral may be rewritten as 
 \begin_inset Formula 
 \begin{equation}
-\delta W_{\text{ext}}=\int_{\partial b}\left(\delta\mathbf{v}\cdot\mathbf{t}+\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\delta\tilde{c}^{\alpha}j_{n}^{\alpha}\right)\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|\,d\eta^{1}d\eta^{2}\,,
+\delta W_{\text{ext}}=\int_{\partial b}\left(\delta\mathbf{v}\cdot\mathbf{t}+\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\delta c^{\alpha}j_{n}^{\alpha}\right)\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|\,d\eta^{1}d\eta^{2}\,,
 \end{equation}
 
 \end_inset
@@ -21413,17 +21613,17 @@ If we restrict traction boundary conditions to the special case of normal
  produces 
 \begin_inset Formula 
 \begin{equation}
-D\left(\delta W_{\text{ext}}\right)\left[\Delta\mathbf{u}\right]=\int_{\partial b}\left(t_{n}\delta\mathbf{v}+\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\delta\tilde{c}^{\alpha}j_{n}^{\alpha}\,\mathbf{n}\right)\cdot\left(\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\times\mathbf{g}_{2}+\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}\right)\,d\eta^{1}d\eta^{2}\,.
+D\left(\delta W_{\text{ext}}\right)\left[\Delta\mathbf{u}\right]=\int_{\partial b}\left(t_{n}\delta\mathbf{v}+\sum\limits _{\alpha\ne s,w}^{\alpha_{s}}\delta c^{\alpha}j_{n}^{\alpha}\,\mathbf{n}\right)\cdot\left(\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\times\mathbf{g}_{2}+\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}\right)\,d\eta^{1}d\eta^{2}\,.
 \end{equation}
 
 \end_inset
 
 The linearizations along 
-\begin_inset Formula $\Delta\tilde{c}^{\gamma}$
+\begin_inset Formula $\Delta c^{\gamma}$
 \end_inset
 
  reduces to zero, 
-\begin_inset Formula $D\left(\delta W_{\text{ext}}\right)\left[\Delta\tilde{c}^{\gamma}\right]=0$
+\begin_inset Formula $D\left(\delta W_{\text{ext}}\right)\left[\Delta c^{\gamma}\right]=0$
 \end_inset
 
 .
@@ -21445,7 +21645,7 @@ To discretize the virtual work relations, let
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta\mathbf{v} & =\sum\limits _{a=1}^{m}N_{a}\delta\mathbf{v}_{a}\,, & \Delta\mathbf{u} & =\sum\limits _{b=1}^{m}N_{b}\Delta\mathbf{u}_{b}\,,\\
-\delta\tilde{c}^{\alpha} & =\sum\limits _{a=1}^{m}N_{a}\delta\tilde{c}_{a}^{\alpha}\,, & \Delta\tilde{c}^{\gamma} & =\sum\limits _{b=1}^{m}N_{b}\Delta\tilde{c}_{b}^{\gamma}\,,
+\delta c^{\alpha} & =\sum\limits _{a=1}^{m}N_{a}\delta c_{a}^{\alpha}\,, & \Delta c^{\gamma} & =\sum\limits _{b=1}^{m}N_{b}\Delta c_{b}^{\gamma}\,,
 \end{aligned}
 \end{equation}
 
@@ -21460,7 +21660,7 @@ where
 \end_inset
 
 , 
-\begin_inset Formula $\delta\tilde{c}_{a}^{\alpha}$
+\begin_inset Formula $\delta c_{a}^{\alpha}$
 \end_inset
 
 , 
@@ -21468,7 +21668,7 @@ where
 \end_inset
 
 , and 
-\begin_inset Formula $\Delta\tilde{c}_{a}^{\gamma}$
+\begin_inset Formula $\Delta c_{a}^{\gamma}$
 \end_inset
 
  respectively represent the nodal values of 
@@ -21476,7 +21676,7 @@ where
 \end_inset
 
 , 
-\begin_inset Formula $\delta\tilde{c}^{\alpha}$
+\begin_inset Formula $\delta c^{\alpha}$
 \end_inset
 
 , 
@@ -21484,7 +21684,7 @@ where
 \end_inset
 
 , and 
-\begin_inset Formula $\Delta\tilde{c}^{\gamma}$
+\begin_inset Formula $\Delta c^{\gamma}$
 \end_inset
 
 ; 
@@ -21510,11 +21710,11 @@ reference "eq226"
 \begin_inset Formula 
 \begin{equation}
 \delta W_{\text{int}}=\sum\limits _{e=1}^{n_{e}}\sum\limits _{k=1}^{n_{\text{int}}^{\left(e\right)}}W_{k}J_{\eta}\sum\limits _{a=1}^{m}\left[\begin{array}{cccc}
-\delta\mathbf{v}_{a} & \delta\tilde{c}_{a}^{\alpha_{1}} & \cdots & \delta\tilde{c}_{a}^{\alpha_{s}}\end{array}\right]\cdot\left[\begin{array}{c}
+\delta\mathbf{v}_{a} & \delta c_{a}^{\alpha} & \cdots & \delta\alpha_{s}^{\omega}\end{array}\right]\cdot\left[\begin{array}{c}
 \mathbf{r}_{a}^{u}\\
-\:r_{a}^{\alpha_{1}}\\
+\:r_{a}^{\alpha}\\
 \vdots\\
-\:r_{a}^{\alpha_{s}}
+\:r_{a}^{\omega}
 \end{array}\right]\,,
 \end{equation}
 
@@ -21554,7 +21754,7 @@ th integration point, and
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{r}_{a}^{u} & =\boldsymbol{\sigma}\cdot\grad N_{a}\,,\\
-r_{a}^{\alpha_{\textrm{isol}}} & =\mathbf{j}^{\alpha_{\textrm{isol}}}\cdot\grad N_{a}-N_{a}\frac{\partial\tilde{c}^{\alpha_{\textrm{isol}}}}{\partial t}\,,
+r_{a}^{\alpha} & =\mathbf{j}^{\alpha}\cdot\grad N_{a}-N_{a}\frac{\partial c^{\alpha}}{\partial t}\,,
 \end{aligned}
 \end{equation}
 
@@ -21569,7 +21769,7 @@ and it is understood that
 \end_inset
 
 , and 
-\begin_inset Formula $r_{a}^{\alpha_{\textrm{isol}}}$
+\begin_inset Formula $r_{a}^{\alpha}\,\cdots\,r_{a}^{\omega}$
 \end_inset
 
  are evaluated at the parametric coordinates of the 
@@ -21608,7 +21808,7 @@ th integration point.
 
 \begin_layout Standard
 Similarly, the discretized form of 
-\begin_inset Formula $D\delta W_{\text{int}}=D\delta W_{\text{int}}\left[\Delta\mathbf{u}\right]+\sum\nolimits _{\gamma}D\delta W_{\text{int}}\left[\Delta\tilde{c}^{\gamma}\right]$
+\begin_inset Formula $D\delta W_{\text{int}}=D\delta W_{\text{int}}\left[\Delta\mathbf{u}\right]+\sum\nolimits _{\gamma}D\delta W_{\text{int}}\left[\Delta c^{\gamma}\right]$
 \end_inset
 
  may be written as 
@@ -21618,39 +21818,17 @@ Similarly, the discretized form of
 \begin_inset Formula 
 \[
 D\delta W_{\text{int}}=\sum\limits _{e=1}^{n_{e}}\sum\limits _{k=1}^{n_{\text{int}}^{\left(e\right)}}W_{k}J_{\eta}\sum\limits _{a=1}^{m}\sum\limits _{b=1}^{m}\left[\begin{array}{cccc}
-\delta\mathbf{v}_{a} & \delta\tilde{c}_{a}^{\alpha_{1}} & \cdots & \delta\tilde{c}_{a}^{\alpha_{s}}\end{array}\right]\cdot\left[\begin{array}{cccc}
-\mathbf{K}_{ab}^{uu} & \boldsymbol{0} & \cdots & \boldsymbol{0}\\
-\boldsymbol{0} & k_{\:a\:b}^{\alpha_{1}\alpha_{1}} & \cdots & k_{\:a\:b}^{\alpha_{1}\alpha_{s}}\\
+\delta\mathbf{v}_{a} & \delta c_{a}^{\alpha} & \cdots & \delta c_{a}^{\omega}\end{array}\right]\cdot\left[\begin{array}{cccc}
+\mathbf{K}_{ab}^{uu} & \mathbf{k}_{ab}^{u\alpha} & \cdots & \mathbf{k}_{ab}^{u\omega}\\
+\mathbf{k}_{ab}^{\alpha u} & k_{ab}^{\alpha\alpha} & \cdots & k_{ab}^{\alpha\omega}\\
 \vdots & \vdots & \ddots & \vdots\\
-\boldsymbol{0} & k_{\,\alpha\,b}^{\alpha_{s}\alpha_{1}} & \cdots & k_{\,a\:b}^{\alpha_{s}\alpha_{s}}
+\mathbf{k}_{ab}^{\omega u} & k_{ab}^{\omega\alpha} & \cdots & k_{ab}^{\omega\omega}
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}_{b}\\
-\:\Delta\tilde{c}_{b}^{\alpha_{1}}\\
+\:\Delta c_{b}^{\alpha}\\
 \vdots\\
-\:\Delta\tilde{c}_{b}^{\alpha_{s}}
+\:\Delta c_{b}^{\omega}
 \end{array}\right]\,,
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-D\delta W_{\text{int}}=\sum\limits _{e=1}^{n_{e}}\sum\limits _{k=1}^{n_{\text{int}}^{\left(e\right)}}W_{k}J_{\eta}\sum\limits _{a=1}^{m}\sum\limits _{b=1}^{m}\left[\begin{array}{cccc}
-\delta\mathbf{v}_{a} & \delta\tilde{c}_{a}^{\alpha} & \cdots & \delta\tilde{c}_{a}^{\beta}\end{array}\right]\cdot\left[\begin{array}{cccc}
-\mathbf{K}_{ab}^{uu} & \mathbf{k}_{a\,b}^{u\alpha_{1}} & \cdots & \mathbf{k}_{a\,b}^{u\alpha_{s}}\\
-\mathbf{k}_{ab}^{\alpha u} & k_{\,a\:b}^{\alpha_{1}\alpha_{1}} & \cdots & k_{\,a\:b}^{\alpha_{1}\alpha_{s}}\\
-\vdots & \vdots & \ddots & \vdots\\
-\mathbf{k}_{ab}^{\beta u} & k_{\,a\:b}^{\alpha_{s}\alpha_{1}} & \cdots & k_{\,a\:b}^{\alpha_{1}\alpha_{s}}
-\end{array}\right]\cdot\left[\begin{array}{c}
-\Delta\mathbf{u}_{b}\\
-\:\Delta\tilde{c}_{b}^{\alpha_{1}}\\
-\vdots\\
-\:\Delta\tilde{c}_{b}^{\alpha_{s}}
-\end{array}\right]
 \]
 
 \end_inset
@@ -21688,7 +21866,7 @@ reference "eq267"
 \end_inset
 
  are the discretized form of the linearization along 
-\begin_inset Formula $\Delta\tilde{c}^{\gamma}$
+\begin_inset Formula $\Delta c^{\gamma}$
 \end_inset
 
 : 
@@ -21713,7 +21891,7 @@ k_{ab}^{\alpha\gamma}=\delta_{\alpha\gamma}(\grad N_{a}\cdot\mathbf{j}_{b}^{\alp
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{j}_{b}^{\alpha\gamma} & =\varphi^{w}\mathbf{d}^{\alpha}\cdot\grad N_{b}\,,\end{aligned}
+\begin{aligned}\mathbf{j}_{b}^{\alpha\gamma} & =\mathbf{d}^{\alpha}\cdot\grad N_{b}\,,\end{aligned}
 \end{equation}
 
 \end_inset
@@ -21737,11 +21915,11 @@ has the form
 \begin_inset Formula 
 \begin{equation}
 \delta W_{\text{ext}}=\sum\limits _{e=1}^{n_{e}}\sum\limits _{k=1}^{n_{\text{int}}^{\left(e\right)}}W_{k}J_{\eta}\sum\limits _{a=1}^{m}\left[\begin{array}{cccc}
-\delta\mathbf{v}_{a} & \delta\tilde{c}_{a}^{\alpha_{1}} & \cdots & \delta\tilde{c}_{a}^{\alpha_{s}}\end{array}\right]\cdot\left[\begin{array}{c}
+\delta\mathbf{v}_{a} & \delta c_{a}^{\alpha} & \cdots & \delta c_{a}^{\omega}\end{array}\right]\cdot\left[\begin{array}{c}
 N_{a}t_{n}\mathbf{n}\\
-N_{a}j_{n}^{\alpha_{1}}\\
+N_{a}j_{n}^{\alpha}\\
 \vdots\\
-N_{a}j_{n}^{\alpha_{s}}
+N_{a}j_{n}^{\omega}
 \end{array}\right]\,,
 \end{equation}
 
@@ -21762,16 +21940,16 @@ where
 \begin_inset Formula 
 \begin{equation}
 -D\delta W_{\text{ext}}=\sum\limits _{e=1}^{n_{e}}\sum\limits _{k=1}^{n_{\mbox{int}}^{\left(e\right)}}W_{k}J_{\eta}\sum\limits _{a=1}^{m}\sum\limits _{b=1}^{m}\left[\begin{array}{cccc}
-\delta\mathbf{v}_{a} & \delta\tilde{c}_{a}^{\alpha_{1}} & \cdots & \delta\tilde{c}_{a}^{\alpha_{s}}\end{array}\right]\cdot\left[\begin{array}{cccc}
+\delta\mathbf{v}_{a} & \delta c_{a}^{\alpha} & \cdots & \delta c_{a}^{\omega}\end{array}\right]\cdot\left[\begin{array}{cccc}
 \mathbf{K}_{ab}^{uu} & \mathbf{0} & \cdots & \mathbf{0}\\
-\mathbf{k}_{\,a\,b}^{\alpha_{1}u} & 0 & \cdots & 0\\
+\mathbf{k}_{ab}^{\alpha u} & 0 & \cdots & 0\\
 \vdots & \vdots & \ddots & \vdots\\
-\mathbf{k}_{\,a\,b}^{\alpha_{s}u} & 0 & \cdots & 0
+\mathbf{k}_{ab}^{\omega u} & 0 & \cdots & 0
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}_{b}\\
-\:\Delta\tilde{c}_{b}^{\alpha_{1}}\\
+\:\Delta c_{b}^{\alpha}\\
 \vdots\\
-\:\Delta\tilde{c}_{b}^{\alpha_{1}}
+\:\Delta c_{b}^{\omega1}
 \end{array}\right]\,,
 \end{equation}
 
@@ -21850,7 +22028,7 @@ The contribution to
 
 \begin_inset Formula 
 \begin{equation}
-\delta G=\sum\limits _{\iota}\sum_{r}\nu_{r}^{\iota}\int_{b}\delta\tilde{c}^{\iota}\varphi^{w}\hat{\zeta}_{r}\,dv\,.
+\delta G=\sum\limits _{\iota}\sum_{r}\nu_{r}^{\iota}\int_{b}\delta c^{\iota}\hat{\zeta}_{r}\,dv\,.
 \end{equation}
 
 \end_inset
@@ -21873,18 +22051,113 @@ The linearization of
 
 \end_inset
 
+For the case of stress-dependent concentration kinetics we have
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =\sum_{r}\sum_{\iota}\nu_{r}^{\iota}\int_{b}\delta c^{\iota}\left[\hat{\zeta}_{r}\,\divg\Delta\mathbf{u}+\hat{\boldsymbol{\zeta}}_{\varepsilon,r}:\Delta\boldsymbol{\varepsilon}\right]\,dv\end{aligned}
+\,,
+\]
+
+\end_inset
+
+where 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{\zeta}}_{\varepsilon,r}=J^{-1}\mathbf{F}\cdot\frac{\partial\hat{\zeta}_{r}}{\partial\mathbf{E}}\cdot\mathbf{F}^{T}=\frac{\partial\hat{\zeta}_{r}}{\partial\mathbf{e}}\,,
+\]
+
+\end_inset
+
+is the tangent of the reaction rate to the strain which is dependent on
+ the specific reaction.
+ This tangent is zero unless there is a stress- or strain-dependent relationship.
+ For stress-dependent kinetics the tangent becomes
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{\zeta}}_{\varepsilon,r}=\frac{\partial\hat{\zeta}_{r}}{\partial\boldsymbol{\sigma}}:\boldsymbol{\mathcal{C}}\,,
+\]
+
+\end_inset
+
+where the specific reaction kinetics dictate 
+\begin_inset Formula $\partial\hat{\zeta}_{r}/\partial\boldsymbol{\sigma}$
+\end_inset
+
+.
+ For mass action forward reactions where the reaction rate is proportional
+ to the trace of stress as bounded by a sigmoidal function, i.e.,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\zeta}_{r}(\boldsymbol{\sigma})=k_{F}(1+\frac{a}{1+\exp\left(-\frac{\tr\left(\boldsymbol{\sigma}\right)-s_{0}}{b}\right)}\,,
+\]
+
+\end_inset
+
+the tangent is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\hat{\zeta}_{r}}{\partial\boldsymbol{\sigma}}=\frac{\partial\hat{\zeta}_{r}}{\partial\tr\left(\boldsymbol{\sigma}\right)}\cdot\frac{\partial\tr\left(\boldsymbol{\sigma}\right)}{\partial\boldsymbol{\sigma}}\,,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\hat{\zeta}_{r}}{\partial\tr\left(\boldsymbol{\sigma}\right)}=\frac{a\exp\left(-\frac{\tr\left(\boldsymbol{\sigma}\right)-s_{0}}{b}\right)}{b\left(1+\exp\left(-\frac{\tr\left(\boldsymbol{\sigma}\right)-s_{0}}{b}\right)\right)^{2}}\,,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\tr\left(\boldsymbol{\sigma}\right)}{\partial\boldsymbol{\sigma}}=\mathbf{I}\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 The linearization along a concentration increment 
-\begin_inset Formula $\Delta\tilde{c}^{\iota}$
+\begin_inset Formula $\Delta c^{\iota}$
 \end_inset
 
  is summed over each reaction 
 \begin_inset Formula $r$
 \end_inset
 
+ and chemical species 
+\begin_inset Formula $\iota$
+\end_inset
 
+.
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\delta G\left[\Delta\tilde{c}^{\iota}\right] & =\sum_{r}\sum_{\gamma}\nu_{r}^{\gamma}\int_{b}\delta\tilde{c}^{\gamma}\frac{\partial\hat{\zeta}_{r}}{\partial\tilde{c}^{\iota}}\Delta\tilde{c}^{\iota}\,dv\end{aligned}
+\begin{aligned}D\delta G\left[\Delta c^{\iota}\right] & =\sum_{r}\sum_{\gamma}\nu_{r}^{\gamma}\int_{b}\delta c^{\gamma}\frac{\partial\hat{\zeta}_{r}}{\partial c^{\iota}}\Delta c^{\iota}\,dv\end{aligned}
 \,.
 \end{equation}
 
@@ -21897,7 +22170,7 @@ The linearization along a concentration increment
 The discretized form of these expressions is given by
 \begin_inset Formula 
 \begin{equation}
-\delta G=\sum_{\gamma}\sum_{a}\delta\tilde{c}_{a}^{\gamma}r_{a}^{\gamma}\,,
+\delta G=\sum_{\gamma}\sum_{a}\delta c_{a}^{\gamma}r_{a}^{\gamma}\,,
 \end{equation}
 
 \end_inset
@@ -21905,7 +22178,7 @@ The discretized form of these expressions is given by
 where
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}r_{a}^{\gamma} & =\sum_{r}\nu_{r}^{\gamma}\int_{b}N_{a}\varphi^{w}\hat{\zeta}_{r}\,dv\end{aligned}
+\begin{aligned}r_{a}^{\gamma} & =\sum_{r}\nu_{r}^{\gamma}\int_{b}N_{a}\hat{\zeta}_{r}\,dv\end{aligned}
 \,.
 \end{equation}
 
@@ -21914,16 +22187,31 @@ where
 Similarly,
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =0\end{aligned}
-\,.
+\begin{aligned}D\delta G\left[\Delta\mathbf{u}\right] & =\sum_{\gamma}\sum_{a}\delta c_{a}^{\gamma}\sum_{b}\mathbf{k}_{ab}^{\gamma u}\cdot\Delta\mathbf{u}_{b}\end{aligned}
+\,,
 \end{equation}
 
 \end_inset
 
+where
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbf{k}_{ab}^{\gamma u}=\sum_{r}\nu_{r}^{\gamma}\int_{a}N_{a}\left[\hat{\zeta}_{r}\mathbf{I}+\hat{\boldsymbol{\zeta}}_{\varepsilon,r}\right]\cdot\grad N_{b}\,dv\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Finally,
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\delta G\left[\Delta\tilde{c}^{\iota}\right] & =\sum_{\gamma}\sum_{a}\delta\tilde{c}_{a}^{\gamma}\sum_{b}k_{ab}^{\gamma\iota}\Delta\tilde{c}_{b}^{\iota}\end{aligned}
+\begin{aligned}D\delta G\left[\Delta\tilde{c}^{\iota}\right] & =\sum_{\gamma}\sum_{a}\delta c_{a}^{\gamma}\sum_{b}k_{ab}^{\gamma\iota}\Delta c_{b}^{\iota}\end{aligned}
 \,,
 \end{equation}
 
@@ -21932,7 +22220,7 @@ Finally,
 where
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}k_{ab}^{\gamma\iota} & =\sum_{r}\nu^{\gamma}\int_{b}N_{a}N_{b}\varphi^{w}\frac{\partial\hat{\zeta}_{r}}{\partial\tilde{c}^{\iota}}\,dv\end{aligned}
+\begin{aligned}k_{ab}^{\gamma\iota} & =\sum_{r}\nu^{\gamma}\int_{b}N_{a}N_{b}\frac{\partial\hat{\zeta}_{r}}{\partial c^{\iota}}\,dv\end{aligned}
 \,.
 \end{equation}
 
