@@ -55,6 +55,9 @@ public:
 	//! tangent of fluid supply with respect to concentration
 	virtual double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
 
+    //! initialization
+    bool Init() override { FEMaterialProperty::Init(); }
+    
 	FECORE_BASE_CLASS(FEFluidSupply)
 };
 

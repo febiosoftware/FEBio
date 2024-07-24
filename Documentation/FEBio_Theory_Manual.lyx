@@ -8542,7 +8542,14 @@ noprefix "false"
 
 \end_inset
 
+However, if a constrained mixture of solid constituents represents an open
+ system (i.e., if fluid constituents are present in the mixture, either explicitly
+ or implicitly), then 
+\begin_inset Formula $\rho_{r}$
+\end_inset
 
+ is no longer necessarily constant, since there may be mass exchange between
+ fluid and solid constituents.
 \end_layout
 
 \begin_layout Subsection
@@ -8627,6 +8634,10 @@ where
 
 \end_layout
 
+\begin_layout Subsubsection
+Closed System of Solid Constituents
+\end_layout
+
 \begin_layout Standard
 In reactive frameworks where 
 \begin_inset Formula $\rho_{r}^{\sigma}$
@@ -8642,7 +8653,12 @@ noprefix "false"
 
 \end_inset
 
-, it may be convenient to define the mass fraction
+, and where 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ remains constant due to the fact that the solid mixture represents a closed
+ system, it may be convenient to define the mass fraction
 \begin_inset Formula 
 \begin{equation}
 w^{\sigma}=\frac{\rho_{r}^{\sigma}}{\rho_{r}}\,,\label{eq:mass-fraction}
@@ -8950,6 +8966,164 @@ It can be shown that these stresses are related according to
 
 FEBio does not use this calculation for solid mixtures, as all internal
  calculations employ the Cauchy stress.
+\end_layout
+
+\begin_layout Subsubsection
+Open System of Solid Constituents
+\end_layout
+
+\begin_layout Standard
+When 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ as defined in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mass-balance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ does not remain constant due to the implicit or explicit presence of fluid
+ constituents, we may choose to define the mass fraction 
+\begin_inset Formula $\omega^{\sigma}$
+\end_inset
+
+ of constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ based on the true density 
+\begin_inset Formula $\rho_{0}^{\sigma}$
+\end_inset
+
+ of the solid constituent,
+\begin_inset Formula 
+\begin{equation}
+\omega^{\sigma}=\frac{\rho_{r}^{\sigma}}{\rho_{0}^{\sigma}}\,,\label{eq:mass-fraction-1}
+\end{equation}
+
+\end_inset
+
+In this case, 
+\begin_inset Formula $\omega^{\sigma}=1$
+\end_inset
+
+ when the solid mixture consists entirely of constituent 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ Unlike 
+\begin_inset Formula $w^{\sigma}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-mass-balance"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the summation of 
+\begin_inset Formula $\omega^{\sigma}$
+\end_inset
+
+ over all 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is meaningless here, since the denominator in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:mass-fraction-1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is not common to all 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ Nevertheless, the mixture free energy density in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-free-energy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be rewritten conveniently as 
+\begin_inset Formula $\Psi_{r}=\sum_{\sigma}\omega^{\sigma}\Psi_{0}^{\sigma}$
+\end_inset
+
+ where 
+\begin_inset Formula $\Psi_{0}^{\sigma}\equiv\rho_{0}^{\sigma}\psi^{\sigma}$
+\end_inset
+
+ represents the free energy density of pure solid 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ Here again, 
+\begin_inset Formula $\psi^{\sigma}$
+\end_inset
+
+ is most conveniently expressed as a function of 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+, so that eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:general-total-def-grad"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ may be use to evaluate 
+\begin_inset Formula $\partial\mathbf{F}^{s}/\partial\mathbf{F}^{\sigma}=\mathbf{I}\oslash\left(\mathbf{F}^{\sigma s}\right)^{-T}$
+\end_inset
+
+ and calculate the mixture stress using the alternative form
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\sigma}=\frac{1}{J^{s}}\sum_{\sigma}\omega^{\sigma}\frac{\partial\Psi_{0}^{\sigma}}{\partial\mathbf{F}^{\sigma}}\cdot\left(\mathbf{F}^{\sigma}\right)^{T}\,.\label{eq:general-mixture-stress-redux-1}
+\end{equation}
+
+\end_inset
+
+This expression shows that the mixture stress may evolve not only due to
+ temporal changes in the state of strain but also due to reactive changes
+ in the mass fractions 
+\begin_inset Formula $\omega^{\sigma}$
+\end_inset
+
+.
+ In this type of open-system formulation it becomes the user's responsibility
+ to ensure that all other 
+\begin_inset Formula $\omega^{\sigma}$
+\end_inset
+
+ values reduce to zero when one of the 
+\begin_inset Formula $\omega^{\sigma}$
+\end_inset
+
+ reaches unity.
 \end_layout
 
 \begin_layout Subsection
