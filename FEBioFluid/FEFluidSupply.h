@@ -56,7 +56,7 @@ public:
 	virtual double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
 
     //! initialization
-    bool Init() override { FEMaterialProperty::Init(); }
+    bool Init() override { return FEMaterialProperty::Init(); }
     
 	FECORE_BASE_CLASS(FEFluidSupply)
 };
