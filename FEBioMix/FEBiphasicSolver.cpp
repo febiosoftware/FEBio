@@ -59,6 +59,7 @@ BEGIN_FECORE_CLASS(FEBiphasicSolver, FENewtonSolver)
 		ADD_PARAMETER(m_Etol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol");
 		ADD_PARAMETER(m_Rtol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 		ADD_PARAMETER(m_Ptol, "ptol"        );
+        ADD_PARAMETER(m_Ctol, "ctol"        );
 		ADD_PARAMETER(m_biphasicFormulation, "mixed_formulation");
 	END_PARAM_GROUP();
 
@@ -85,6 +86,7 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FENewtonSolver(pfem),
 	m_Dtol = 0.001;
 	m_Etol = 0.01;
 	m_Ptol = 0.01;
+    m_Ctol = 0; // only needed for biphasic-solute analyses
 	m_Rmin = 1.0e-20;
 	m_Rmax = 0;	// not used if zero
 

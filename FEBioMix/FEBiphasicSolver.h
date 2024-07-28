@@ -107,6 +107,7 @@ public:
 	// additional convergence norms
 	double	m_Dtol;			//!< displacement tolerance
 	double	m_Ptol;			//!< pressure tolerance
+    double  m_Ctol;         //!< needed only for biphasic-solute analyses
 
 	// biphasic formulation
 	int		m_biphasicFormulation;	// = 0: standard, =1: mixed (linear pressure)
