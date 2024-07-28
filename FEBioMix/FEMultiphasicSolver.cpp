@@ -101,6 +101,9 @@ FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FENewtonSolver(pfem),
 
 	m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
 
+    // Preferred strategy is Broyden's method
+    SetDefaultStrategy(QN_BROYDEN);
+    
 	m_forcePositive = true;	// force all concentrations to remain positive
 
 	m_solutionNorm.push_back(ConvergenceInfo());

@@ -95,6 +95,9 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FENewtonSolver(pfem),
 
 	m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
 
+    // Preferred strategy is Broyden's method
+    SetDefaultStrategy(QN_BROYDEN);
+    
 	// set default formulation (full shape functions)
 	m_biphasicFormulation = 0;
 
