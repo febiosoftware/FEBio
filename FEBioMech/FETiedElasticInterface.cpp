@@ -423,6 +423,9 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
     np.SetTolerance(m_stol);
     np.SetSearchRadius(m_srad);
     np.Init();
+
+	// let's count the number of contact pairs we find.
+	int contacts = 0;
     
     // loop over all integration points
     int n = 0;
@@ -455,6 +458,8 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
                 
                 // calculate the gap function
                 pt.m_Gap = q - r;
+
+				contacts++;
             }
             else
             {
@@ -463,6 +468,13 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
             }
         }
     }
+
+	// if we found no contact pairs, let's report this since this is probably not the user's intention
+	if (contacts == 0)
+	{
+		std::string name = GetName();
+		feLogWarning("No contact pairs found for tied interface \"%s\".\nThis contact interface may not have any effect.", name.c_str());
+	}
 }
 
 //-----------------------------------------------------------------------------
