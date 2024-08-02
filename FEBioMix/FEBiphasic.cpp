@@ -43,6 +43,8 @@ BEGIN_FECORE_CLASS(FEBiphasic, FEMaterial)
 	ADD_PROPERTY(m_pSupp, "solvent_supply", FEProperty::Optional);
 	ADD_PROPERTY(m_pAmom, "active_supply", FEProperty::Optional);
 
+    ADD_PROPERTY(m_Q, "mat_axis", FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 //============================================================================
