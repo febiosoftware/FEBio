@@ -147,7 +147,7 @@ FESolver* FEModelBuilder::BuildSolver(FEModel& fem)
 void FEModelBuilder::NextStep()
 {
 	// reset the step pointer
-	if (m_nsteps != 0) m_pStep = 0;
+	if (m_nsteps != 0) m_pStep = nullptr;
 
 	// increase the step section counter
 	++m_nsteps;
