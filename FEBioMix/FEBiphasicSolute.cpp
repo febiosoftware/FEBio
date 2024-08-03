@@ -48,6 +48,8 @@ BEGIN_FECORE_CLASS(FEBiphasicSolute, FEMaterial)
 	ADD_PROPERTY(m_pOsmC  , "osmotic_coefficient");
 	ADD_PROPERTY(m_pSolute, "solute");
 
+    ADD_PROPERTY(m_Q, "mat_axis", FEProperty::Optional);
+
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
