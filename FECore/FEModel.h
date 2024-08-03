@@ -137,6 +137,9 @@ public:
 	//! Initialize the mesh
 	virtual bool InitMesh();
 
+	//! mesh validation
+	void ValidateMesh();
+
 	//! Initialize shells
 	virtual void InitShells();
 

@@ -1032,8 +1032,35 @@ bool FEModel::InitMesh()
 		if (mesh.Surface(i).Init() == false) return false;
 	}
 
+	// do some additional mesh validation
+	ValidateMesh();
+
 	// All done
 	return true;
+}
+
+void FEModel::ValidateMesh()
+{
+	FEMesh& mesh = GetMesh();
+
+	for (int i = 0; i < mesh.NodeSets(); ++i)
+	{
+		FENodeSet* ns = mesh.NodeSet(i);
+		if (ns->Size() == 0)
+		{
+			std::string name = ns->GetName();
+			feLogWarning("The nodeset \"%s\" is empty!", name.c_str());
+		}
+	}
+	for (int i = 0; i < mesh.Surfaces(); ++i)
+	{
+		FESurface& surf = mesh.Surface(i);
+		if (surf.Elements() == 0)
+		{
+			std::string name = surf.GetName();
+			feLogWarning("The surface \"%s\" is empty!", name.c_str());
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
