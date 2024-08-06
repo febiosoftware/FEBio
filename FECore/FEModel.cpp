@@ -995,7 +995,11 @@ bool FEModel::InitMesh()
 
 	// Initialize shell data
 	// This has to be done before the domains are initialized below
-	InitShells();
+	if (!InitShells())
+	{
+		feLogError("Errors found during initialization of shells.");
+		return false;
+	}
 
 	// reset data
 	// TODO: Not sure why this is here
@@ -1064,7 +1068,7 @@ void FEModel::ValidateMesh()
 }
 
 //-----------------------------------------------------------------------------
-void FEModel::InitShells()
+bool FEModel::InitShells()
 {
 	FEMesh& mesh = GetMesh();
 
@@ -1120,9 +1124,11 @@ void FEModel::InitShells()
 		if (dom.Class() == FE_DOMAIN_SHELL)
 		{
 			FEShellDomain& shellDom = static_cast<FEShellDomain&>(dom);
-			shellDom.InitShells();
+			if (!shellDom.InitShells()) return false;
 		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

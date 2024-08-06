@@ -141,7 +141,7 @@ public:
 	void ValidateMesh();
 
 	//! Initialize shells
-	virtual void InitShells();
+	virtual bool InitShells();
 
 	//! Build the matrix profile for this model
 	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);

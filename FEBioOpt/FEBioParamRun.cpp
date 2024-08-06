@@ -87,7 +87,7 @@ bool FEBioParamRun::Init(const char* szfile)
 		FEShellDomainNew* shellDomain = dynamic_cast<FEShellDomainNew*>(&mesh.Domain(i));
 		if (shellDomain) shellDomain->AssignDefaultShellThickness();
 	}
-	fem->InitShells();
+	if (!fem->InitShells()) return false;
 
 	return true;
 }
