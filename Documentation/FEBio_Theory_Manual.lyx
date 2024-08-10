@@ -1413,6 +1413,34 @@ The Cartesian component forms of the operators
 \end_inset
 
 The fourth order identity tensors are defined as: 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\backslash
+obslash
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{A} & =\underline{\mathcal{I}}:\mathbf{A}\,,\\
@@ -15685,7 +15713,7 @@ This chapter discusses the basic principles of the nonlinear finite element
 \end_layout
 
 \begin_layout Section
-Weak formulation for Solid Materials
+/Weak formulation for Solid Materials
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Solid-weak-formulation"

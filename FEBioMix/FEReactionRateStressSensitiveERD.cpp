@@ -75,9 +75,10 @@ mat3ds FEReactionRateStressSensitiveERD::Tangent_ReactionRate_Stress(FEMaterialP
 	FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
 	FEElement* el = pt.m_elem;
 
-	double I1 = ep.m_s.tr();
-	double dzdI = (m_a * m_k(pt) * exp((m_s0 + I1) / m_b)) / (m_b * pow(exp(m_s0 / m_b) + exp(I1 / m_b), 2.0));
-	mat3dd I = mat3dd(1.0);
-	return I * dzdI;
+	double trs = ep.m_s.tr();
+	double m_S = m_a0 + m_a / (1.0 + (exp(-(trs - m_s0) / m_b)));
+	double temp_exp = exp(-(trs - m_s0) / m_b);
+	double zhat = ReactionRate(pt);
+	return ((zhat / m_b) * temp_exp / pow(m_b * (1.0 + temp_exp), 2.0)) * mat3dd(1.0);
 
 }
