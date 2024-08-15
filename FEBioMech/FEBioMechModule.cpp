@@ -267,6 +267,7 @@ SOFTWARE.*/
 #include "FEMaxStressCriterion.h"
 #include "FEMaxDamageCriterion.h"
 #include "FESpringRuptureCriterion.h"
+#include "FEContactGapCriterion.h"
 
 #include "FEInitialVelocity.h"
 #include "FENodalForce.h"
@@ -1149,6 +1150,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");
 	REGISTER_FECORE_CLASS(FESpringForceCriterion, "spring force");
 	REGISTER_FECORE_CLASS(FESpringStretchCriterion, "spring stretch");
+	REGISTER_FECORE_CLASS(FEContactGapCriterion, "contact gap");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FEElemDataGenerator
