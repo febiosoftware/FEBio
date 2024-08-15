@@ -403,36 +403,42 @@ void FESurface::FindElements(FESurfaceElement& el)
 	for (int i = 0; i < nval; ++i)
 	{
 		FEElement& sel = *ppe[i];
-            
-		// check all faces of this solid element
-		int nfaces = sel.Faces();
-		for (int j = 0; j<nfaces; ++j) 
+		if (sel.isActive())
 		{
-			int nf[9];
-			vec3d g[3];
-			int nn = sel.GetFace(j, nf);
-                
+			// check all faces of this solid element
 			int found = 0;
-			if (nn == el.Nodes())
+			int nfaces = sel.Faces();
+			for (int j = 0; j < nfaces; ++j)
 			{
-                switch (nn)
-                {
-                    case 3: found = el.HasNodes(nf,3); break;
-                    case 4: found = el.HasNodes(nf,4); break;
-                    case 6: found = el.HasNodes(nf,3); break;
-                    case 7: found = el.HasNodes(nf,3); break;
-                    case 8: found = el.HasNodes(nf,4); break;
-                    case 9: found = el.HasNodes(nf,4); break;
-                    default:
-                        assert(false);
-                }
-            }
-            if (found != 0) {
-                if (el.m_elem[0] == nullptr) { el.m_elem[0] = &sel; }
-                else if (el.m_elem[0] != &sel) el.m_elem[1] = &sel;
-            }
-        }
-    }
+				int nf[9];
+				vec3d g[3];
+				int nn = sel.GetFace(j, nf);
+				if (nn == el.Nodes())
+				{
+					switch (nn)
+					{
+					case 3: found = el.HasNodes(nf, 3); break;
+					case 4: found = el.HasNodes(nf, 4); break;
+					case 6: found = el.HasNodes(nf, 3); break;
+					case 7: found = el.HasNodes(nf, 3); break;
+					case 8: found = el.HasNodes(nf, 4); break;
+					case 9: found = el.HasNodes(nf, 4); break;
+					default:
+						assert(false);
+					}
+				}
+				if (found != 0) {
+					if (el.m_elem[0] == nullptr) { el.m_elem[0] = &sel; }
+					else if (el.m_elem[0] != &sel) el.m_elem[1] = &sel;
+
+					// if the surface element is an interior face, then
+					// we want to find the positive side
+					if (found == 1) break;
+				}
+			}
+			if (found == 1) break;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -223,6 +223,9 @@ public:
     //! return node list of edge
     void facet_edge(int j, int* en) const;
 
+	// see if this element has the list of nodes n
+	int HasNodes(int* n, const int ns) const;
+
 	//! serialize
 	void Serialize(DumpStream& ar) override;
 
