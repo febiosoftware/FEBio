@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include <FECore/FEMeshTopo.h>
 #include <algorithm>
 #include <stack>
+#include <set>
 
 BEGIN_FECORE_CLASS(FEErosionAdaptor, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxIters, "max_iters");
@@ -314,6 +315,7 @@ void FEErosionAdaptor::GrowErodedSurfaces(FEMeshTopo& topo)
 		if (doErode)
 		{
 			std::vector<FEFaceList::FACE> newFaces;
+			std::set<FEElement*> processedElements;
 			newFaces.reserve(surf.Elements());
 			int erodedFaces = 0;
 			for (int j = 0; j < surf.Elements(); ++j)
@@ -324,26 +326,32 @@ void FEErosionAdaptor::GrowErodedSurfaces(FEMeshTopo& topo)
 					FEElement* pe = face.m_elem[0].pe; assert(pe);
 					if (pe && (pe->isActive() == false))
 					{
-						int id = topo.GetElementIndexFromID(pe->GetID());
-						std::vector<FEElement*> nbrList = topo.ElementNeighborList(id);
-						for (int k = 0; k < nbrList.size(); ++k)
+						// make sure we didn't process this element yet
+						if (processedElements.find(pe) == processedElements.end())
 						{
-							FEElement* pk = nbrList[k];
-							if ((pk != nullptr) && pk->isActive())
+							int id = topo.GetElementIndexFromID(pe->GetID());
+							std::vector<FEElement*> nbrList = topo.ElementNeighborList(id);
+							for (int k = 0; k < nbrList.size(); ++k)
 							{
-								int node[FEElement::MAX_NODES] = { 0 };
-								int nf = pe->GetFace(k, node);
+								FEElement* pk = nbrList[k];
+								if ((pk != nullptr) && pk->isActive())
+								{
+									int node[FEElement::MAX_NODES] = { 0 };
+									int nf = pe->GetFace(k, node);
 
-								// Note that we invert the element to
-								// make sure the new face is outward pointing
-								FEFaceList::FACE newFace;
-								newFace.ntype = nf;
-								for (int l = 0; l < nf; ++l)
-									newFace.node[l] = node[nf - 1 - l];
+									// Note that we invert the element to
+									// make sure the new face is outward pointing
+									FEFaceList::FACE newFace;
+									newFace.ntype = nf;
+									for (int l = 0; l < nf; ++l)
+										newFace.node[l] = node[nf - 1 - l];
 
-								if (!newFace.IsEqual(face.m_node.data()))
-									newFaces.push_back(newFace);
+									if (!newFace.IsEqual(face.m_node.data()))
+										newFaces.push_back(newFace);
+								}
 							}
+
+							processedElements.insert(pe);
 						}
 
 						face.setInactive();
@@ -388,14 +396,6 @@ void FEErosionAdaptor::GrowErodedSurfaces(FEMeshTopo& topo)
 				{
 					fset->Create(surf);
 				}
-			}
-
-			feLog("New surface:\n");
-			for (int k = 0; k < surf.Elements(); ++k)
-			{
-				FESurfaceElement& face = surf.Element(k);
-				int* n = face.m_node.data();
-				feLog("\t%d %d %d %d\n", n[0], n[1], n[2], n[3]);
 			}
 		}
 	}
