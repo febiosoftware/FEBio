@@ -769,7 +769,7 @@ bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int
 				int nn = pe->GetFace(nf[1]-1, ne);
 				if (nn != N) throw XMLReader::InvalidValue(tag);
 				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
-				el.m_elem[0] = pe;
+				el.m_elem[0].pe = pe;
 			}
 			else throw XMLReader::InvalidValue(tag);
 		}

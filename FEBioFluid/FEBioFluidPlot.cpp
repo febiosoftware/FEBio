@@ -200,7 +200,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -208,7 +208,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
             FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
 
             if (!pfluid) {
-                pe = el.m_elem[1];
+                pe = el.m_elem[1].pe;
                 if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
             }
 
@@ -268,7 +268,7 @@ bool FEPlotFluidSurfaceMoment::Save(FESurface &surf, FEDataStream &a)
         FESurfaceElement& el = pcs->Element(j);
         
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -276,7 +276,7 @@ bool FEPlotFluidSurfaceMoment::Save(FESurface &surf, FEDataStream &a)
             FEPolarFluidMaterial* pfluid = pm->ExtractProperty<FEPolarFluidMaterial>();
             
             if (!pfluid) {
-                pe = el.m_elem[1];
+                pe = el.m_elem[1].pe;
                 if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEPolarFluidMaterial>();
             }
             
@@ -321,13 +321,13 @@ bool FEPlotFluidSurfacePressure::Save(FESurface &surf, FEDataStream& a)
         FESurfaceElement& el = pcs->Element(nface);
         double ef = pcs->Evaluate(nface, dof_EF);
         double T = pcs->Evaluate(nface, dof_T);
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe) {
             // get the material
             FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
             FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
             if (!fluid) {
-                pe = el.m_elem[1];
+                pe = el.m_elem[1].pe;
                 if (pe) fluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
             }
             if (fluid) return fluid->Pressure(ef, T);
@@ -365,7 +365,7 @@ bool FEPlotFluidSurfaceTractionPower::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -423,7 +423,7 @@ bool FEPlotFluidSurfaceEnergyFlux::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -478,7 +478,7 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -545,7 +545,7 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
 		// get the element this surface element belongs to
-		FEElement* pe = el.m_elem[0];
+		FEElement* pe = el.m_elem[0].pe;
 		if (pe)
 		{
 			// evaluate the average fluid flux in this element

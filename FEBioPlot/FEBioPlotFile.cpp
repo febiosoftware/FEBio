@@ -1117,7 +1117,7 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 	m_ar.EndChunk();
 
 	// write the element list
-	int n[9];
+	int n[FEElement::MAX_NODES + 1] = { 0 };
 	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
 	{
 		for (i=0; i<NE; ++i)

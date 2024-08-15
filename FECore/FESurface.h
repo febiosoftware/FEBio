@@ -137,7 +137,7 @@ public:
 	const FEElement& ElementRef(int n) const override { return m_el[n]; }
 
 	//! find the solid or shell element of a surface element
-	FEElement* FindElement(FESurfaceElement& el);
+	FESurfaceElement::ELEMENT_REF FindElement(FESurfaceElement& el);
 
     //! for interface surfaces, find the index of both solid elements
     //! on either side of the interface

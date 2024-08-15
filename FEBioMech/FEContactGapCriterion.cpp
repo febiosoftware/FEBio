@@ -72,7 +72,7 @@ FEMeshAdaptorSelection FEContactGapCriterion::GetElementSelection(FEElementSet* 
 
 						if (max_gap > m_gap)
 						{
-							FEElement* pe = face.m_elem[0];
+							FEElement* pe = face.m_elem[0].pe;
 							if (pe)
 							{
 								// TODO: Add check for duplicate element addition 

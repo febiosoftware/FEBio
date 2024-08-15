@@ -108,7 +108,7 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
         FESurfaceElement& el = pcs->Element(j);
         
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // evaluate the average fluid flux in this element
@@ -208,11 +208,11 @@ bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 	// this assumes that the surface sits on top of a single domain
 	// so that we can figure out the domain from a single element
 	FESurfaceElement& ref = surf.Element(0);
-	if (ref.m_elem[0] == nullptr) return false;
+	if (ref.m_elem[0].pe == nullptr) return false;
 
 	// get the element
 	FEMesh& mesh = *surf.GetMesh();
-	FEElement* el = ref.m_elem[0];
+	FEElement* el = ref.m_elem[0].pe;
 	if (el == 0) return false;
 
 	// get the domain this element belongs to

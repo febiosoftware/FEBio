@@ -35,7 +35,6 @@ SOFTWARE.*/
 FESurfaceElement::FESurfaceElement()
 {
 	m_lid = -1;
-	m_elem[0] = m_elem[1] = nullptr;
 }
 
 FESurfaceElement::FESurfaceElement(const FESurfaceElement& el) : FEElement(el)
@@ -178,6 +177,7 @@ int FESurfaceElement::HasNodes(int* n, const int ns) const
 		for (int i = 1; i < ns; ++i)
 		{
 			int m = (m0 + ns - i) % ns;
+			assert((m >= 0) && (m < ns));
 			if (m_node[i] != n[m])
 			{
 				order = 0;

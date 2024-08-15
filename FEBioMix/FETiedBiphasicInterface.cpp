@@ -117,7 +117,7 @@ bool FETiedBiphasicSurface::Init()
 		FESurfaceElement& se = Element(i);
 		
 		// get the element this surface element belongs to
-		FEElement* pe = se.m_elem[0];
+		FEElement* pe = se.m_elem[0].pe;
 		if (pe)
 		{
 			// get the material
@@ -422,7 +422,7 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 	n.unit();
 	
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == 0) return 0.0;
 
 	// get the material

@@ -147,7 +147,7 @@ void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 void FEBiphasicContactSurface::GetGPLocalFLS(int nface, double* pt, double pamb)
 {
     FESurfaceElement& el = Element(nface);
-    FEElement* e = el.m_elem[0];
+    FEElement* e = el.m_elem[0].pe;
     FESolidElement* se = dynamic_cast<FESolidElement*>(e);
     if (se) {
         mat3ds s; s.zero();

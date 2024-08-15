@@ -110,7 +110,7 @@ bool FESlidingSurface2::Init()
 		FESurfaceElement& se = Element(i);
 		
 		// get the element this surface element belongs to
-		FEElement* pe = se.m_elem[0];
+		FEElement* pe = se.m_elem[0].pe;
 		if (pe)
 		{
 			// get the material
@@ -232,7 +232,7 @@ vec3d FESlidingSurface2::GetContactForceFromElementStress()
     {
         FESurfaceElement& el = Element(n);
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         
         mat3ds s(0,0,0,0,0,0);
         for (int j=0; j<pe->GaussPoints(); ++j) {
@@ -361,7 +361,7 @@ vec3d FESlidingSurface2::GetFluidForceFromElementPressure()
     {
         FESurfaceElement& el = Element(n);
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         
         double p = 0;
         for (int j=0; j<pe->GaussPoints(); ++j) {
@@ -671,7 +671,7 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 	n.unit();
 
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == 0) return 0.0;
 
 	// get the material

@@ -275,7 +275,7 @@ void FEErosionAdaptor::ErodeSurfaces()
 		for (int j = 0; j < surf.Elements(); ++j)
 		{
 			FESurfaceElement& face = surf.Element(j);
-			FEElement* pe = face.m_elem[0]; assert(pe);
+			FEElement* pe = face.m_elem[0].pe; assert(pe);
 			if (pe && (pe->isActive() == false))
 			{
 				face.setInactive();
@@ -302,7 +302,7 @@ void FEErosionAdaptor::GrowErodedSurfaces(FEMeshTopo& topo)
 			FESurfaceElement& face = surf.Element(j);
 			if (face.isActive())
 			{
-				FEElement* pe = face.m_elem[0]; assert(pe);
+				FEElement* pe = face.m_elem[0].pe; assert(pe);
 				if (pe && (pe->isActive() == false))
 				{
 					doErode = true;
@@ -321,7 +321,7 @@ void FEErosionAdaptor::GrowErodedSurfaces(FEMeshTopo& topo)
 				FESurfaceElement& face = surf.Element(j);
 				if (face.isActive())
 				{
-					FEElement* pe = face.m_elem[0]; assert(pe);
+					FEElement* pe = face.m_elem[0].pe; assert(pe);
 					if (pe && (pe->isActive() == false))
 					{
 						int id = topo.GetElementIndexFromID(pe->GetID());
