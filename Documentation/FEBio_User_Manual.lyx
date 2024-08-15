@@ -15621,7 +15621,7 @@ criterion
 \emph default
  property, which evaluates the variable or metric that is used by the adaptor,
  and optionally, can be used to filter the elements to which the adaptor
- will be applier.
+ will be applied.
  How the criterion is used, depends on the adaptor.
  For instance, the erosion adaptor uses it to identify the elements to deactivat
 e.
@@ -15883,8 +15883,8 @@ The erosion adaptor
 \end_layout
 
 \begin_layout Standard
-The erosion adaptor can be used to remove or deactivate elements in a mesh,
- based on a user-defined criterion.
+The erosion adaptor can be used to deactivate elements in a mesh, based
+ on a user-defined criterion.
  It defines the following properties: 
 \end_layout
 
@@ -16158,7 +16158,7 @@ Mesh Adaptor Criteria
 
 \begin_layout Standard
 The purpose of the mesh adaptor criteria is to assign values to elements.
- Some adaptors also act as filters, that limit the effect of the adaptor
+ Some adaptors also act as filters that limit the effect of the adaptor
  to certain elements.
  These values will then be used by the mesh adaptor to modify the mesh.
  How these values are used depends on the adaptor.
@@ -16183,7 +16183,7 @@ The following criteria are currently available.
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="2">
+<lyxtabular version="3" rows="11" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -16373,7 +16373,7 @@ Specify the element value based on a mathematical expression.
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -16382,11 +16382,32 @@ min-max filter
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Selects elements whose value falls within a min-max range.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+contact gap
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Select elements that are in contact.
+ 
 \end_layout
 
 \end_inset
@@ -16554,7 +16575,7 @@ min-max filter
 
 \begin_layout Standard
 This criterion evaluates a metric for each element, but then filters out
- the element that have a value within a min-max range.
+ the elements that have values within a min-max range.
  
 \end_layout
 
@@ -16591,6 +16612,23 @@ data
 : Specify the metric to evaluate the element values.
  Any of the other criteria defined above can be used.
  
+\end_layout
+
+\begin_layout Subsubsection
+contact gap
+\end_layout
+
+\begin_layout Standard
+This criterion evaluates the contact gap for all elements that are in contact.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+gap
+\series default
+: contact gap threshold value.
 \end_layout
 
 \begin_layout Subsection
