@@ -40,6 +40,7 @@ public:
 	MeshTopoImp()
 	{
 		m_minId = -1;
+		m_mesh = nullptr;
 	}
 
 public:

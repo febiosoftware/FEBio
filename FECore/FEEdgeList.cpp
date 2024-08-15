@@ -135,7 +135,6 @@ bool FEEdgeList::Create(FEMesh* pmesh)
 				edgeSet.insert(edge);
 			}
 		}
-		else return false;
 	}
 
 	// copy set into a vector
@@ -226,7 +225,6 @@ bool FEEdgeList::Create(FEDomain* dom)
 				edgeSet.insert(edge);
 			}
 		}
-		else return false;
 	}
 
 	// copy set into a vector

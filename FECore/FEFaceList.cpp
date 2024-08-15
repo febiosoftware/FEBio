@@ -172,36 +172,39 @@ bool FEFaceList::Create(FEMesh& mesh, FEElemElemList& EEL)
 	for (int i = 0; i<NE; ++i, ++it)
 	{
 		FEElement& el = *it;
-		int nf = el.Faces();
-		for (int j = 0; j<nf; ++j)
+		if (el.Class() == FE_ELEM_SOLID)
 		{
-			FEElement* pen = EEL.Neighbor(i, j);
-			if ((pen == 0) || ((pen != 0) && (el.GetID() < pen->GetID())))
+			int nf = el.Faces();
+			for (int j = 0; j < nf; ++j)
 			{
-				FACE& se = m_faceList[NF++];
-				el.GetFace(j, face);
-
-				switch (el.Shape())
+				FEElement* pen = EEL.Neighbor(i, j);
+				if ((pen == 0) || ((pen != 0) && (el.GetID() < pen->GetID())))
 				{
-				case ET_HEX8:
-					se.ntype = 4;
-					break;
-				case ET_TET4:
-				case ET_TET5:
-					se.ntype = 3;
-					break;
-				default:
-					assert(false);
-				}
+					FACE& se = m_faceList[NF++];
+					el.GetFace(j, face);
 
-				int nn = se.ntype;
-				for (int k = 0; k<nn; ++k)
-				{
-					se.node[k] = face[k];
-				}
+					switch (el.Shape())
+					{
+					case ET_HEX8:
+						se.ntype = 4;
+						break;
+					case ET_TET4:
+					case ET_TET5:
+						se.ntype = 3;
+						break;
+					default:
+						assert(false);
+					}
 
-				// The facet is a surface facet if the element neighbor is null
-				se.nsurf = (pen == 0 ? 1 : 0);
+					int nn = se.ntype;
+					for (int k = 0; k < nn; ++k)
+					{
+						se.node[k] = face[k];
+					}
+
+					// The facet is a surface facet if the element neighbor is null
+					se.nsurf = (pen == 0 ? 1 : 0);
+				}
 			}
 		}
 	}
@@ -368,6 +371,12 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 					}
 				}
 			}
+		}
+		else if (el.Shape() == FE_Element_Shape::ET_QUAD4)
+		{
+		}
+		else if (el.Shape() == FE_Element_Shape::ET_TRI3)
+		{
 		}
 		else return false;
 	}
