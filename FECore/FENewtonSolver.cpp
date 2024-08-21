@@ -47,6 +47,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 		ADD_PARAMETER(m_lineSearch->m_LStol , FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
 		ADD_PARAMETER(m_lineSearch->m_LSmin , FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
 		ADD_PARAMETER(m_lineSearch->m_LSiter, FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
+		ADD_PARAMETER(m_lineSearch->m_checkJacobians, "ls_check_jacobians");
 	END_PARAM_GROUP();
 
 	BEGIN_PARAM_GROUP("Nonlinear solver");
