@@ -72,9 +72,13 @@ public:
 	static void clearFlag();
 	static bool IsThrown();
 
+	static int Count();
+	static void ResetCount();
+
 public:
-	static bool m_boutput;	//!< set to false to suppress output of negative jacobians
 	static bool m_bthrown;
+	static int	m_maxout; // max nr of negative jacobians reported (< 0 for unlimited, 0 = off, > 0 sets limit)
+	static int m_count;
 };
 
 class FECORE_API ZeroDiagonal : public FEException
@@ -151,7 +155,14 @@ public: FactorizationError() : FEException("Fatal error in factorization of stif
 };
 
 class FECORE_API NegativeJacobianDetected : public FEException {
-public: NegativeJacobianDetected() : FEException("Negative jacobian was detected.") {}
+public: NegativeJacobianDetected() {
+		int n = NegativeJacobian::Count();
+		if (n > 1)
+			what("%d negative jacobians detected.", n);
+		else
+			what("Negative jacobian detected.");
+		NegativeJacobian::ResetCount();
+	}
 };
 
 class FECORE_API ConcentrationChangeDetected : public FEException {

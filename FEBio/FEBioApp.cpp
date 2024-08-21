@@ -351,7 +351,6 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		else if ((strcmp(sz, "-g") == 0) || (strcmp(sz, "-g1") == 0))
 		{
 			ops.ndebug = 1;
-			NegativeJacobian::m_boutput = true;
 		}
 		else if (strcmp(sz, "-g2") == 0)
 		{
@@ -436,15 +435,13 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		}
 		else if (strncmp(sz, "-output_negative_jacobians", 26) == 0)
 		{
-			bool output = true;
+			int n = -1;
 			if (sz[26] == '=')
 			{
 				const char* szval = sz + 27;
-				if      (strcmp(szval, "0") == 0) output = false;
-				else if (strcmp(szval, "1") == 0) output = true;
-				else { fprintf(stderr, "Invalid value for output_negative_jacobian option\n"); return false; }
+				n = atoi(szval);
 			}
-			NegativeJacobian::m_boutput = output;
+			NegativeJacobian::m_maxout = n;
 		}
 		else if (sz[0] == '-')
 		{

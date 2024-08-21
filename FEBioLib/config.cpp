@@ -207,7 +207,7 @@ namespace febio {
 	{
 		int n;
 		tag.value(n);
-		NegativeJacobian::m_boutput = (n != 0);
+		NegativeJacobian::m_maxout = n;
 		return true;
 	}
 
