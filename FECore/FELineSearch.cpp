@@ -87,7 +87,7 @@ double FELineSearch::DoLineSearch(double s)
 	do
 	{
 		// Update geometry
-		s = UpdateModel(ui, ui, s);
+		s = UpdateModel(ul, ui, s);
 
 		// calculate residual at this point
 		ns->Residual(R1, false);
