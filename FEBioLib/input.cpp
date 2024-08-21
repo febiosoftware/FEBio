@@ -54,7 +54,7 @@ void FEBioModel::print_parameter(FEParam& p, int level)
 {
 	char sz[512] = {0};
 	int l = (int)strlen(p.name()) + 2*level;
-	sprintf(sz, "\t%*s %.*s", l, p.name(), 50-l, "..................................................");
+	snprintf(sz, sizeof(sz), "\t%*s %.*s", l, p.name(), 50-l, "..................................................");
 	if (p.dim() == 1)
 	{
 		switch (p.type())

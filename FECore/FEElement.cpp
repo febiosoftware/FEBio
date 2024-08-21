@@ -142,28 +142,6 @@ bool FEElement::HasNode(int n) const
 }
 
 //-----------------------------------------------------------------------------
-// see if this element has the list of nodes n. Return 0 if not, 1 if same order
-// and -1 if opposite order
-int FEElement::HasNodes(int* n, const int ns) const
-{
-    int order = 1;
-    int l = Nodes();
-    if (l < ns) return 0;
-    vector<int> num(ns,-1);
-    for (int j=0; j<ns; ++j) {
-        for (int i = 0; i<l; ++i)
-            if (m_node[i] == n[j]) num[j] = i;
-    }
-    for (int j=0; j<ns; ++j) {
-        if (num[j] == -1)
-            return 0;
-    }
-    if ((num[1] - num[0] < 0) || (num[2] - num[1] < 0)) order = -1;
-
-    return order;
-}
-
-//-----------------------------------------------------------------------------
 int FEElement::FindNode(int n) const
 {
 	int l = Nodes();
@@ -557,10 +535,10 @@ FELineElement& FELineElement::operator = (const FELineElement& el)
 
 void FELineElement::SetTraits(FEElementTraits* pt)
 {
-	// we don't allocate state data for surface elements
 	m_pT = pt;
 	m_node.resize(Nodes());
 	m_lnode.resize(Nodes());
+	m_State.Create(GaussPoints());
 }
 
 //=============================================================================

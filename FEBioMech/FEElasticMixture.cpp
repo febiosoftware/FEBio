@@ -84,7 +84,9 @@ FEMaterialPointData* FEElasticMixture::CreateMaterialPointData()
 	int NMAT = Materials();
 	for (int i=0; i<NMAT; ++i) 
 	{
-		FEMaterialPoint* pi = new FEMaterialPoint(m_pMat[i]->CreateMaterialPointData());
+		FEMaterialPointData* mpi = m_pMat[i]->CreateMaterialPointData();
+		mpi->SetPrev(pt);
+		FEMaterialPoint* pi = new FEMaterialPoint(mpi);
 		pt->AddMaterialPoint(pi);
 	}
 	return pt;
@@ -302,6 +304,10 @@ void FEElasticMixture::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, cons
     {
 		FEMaterialPoint& mpi = *pt.GetPointData(i);
 		mpi.m_elem = mp.m_elem;
+		mpi.m_index = mp.m_index;
+		mpi.m_rt = mp.m_rt;
+		mpi.m_r0 = mp.m_r0;
+
 		FEElasticMaterialPoint& epi = *mpi.ExtractData<FEElasticMaterialPoint>();
         FEMaterial* pmj = GetMaterial(i);
         pmj->UpdateSpecializedMaterialPoints(mpi, tp);

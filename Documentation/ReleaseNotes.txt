@@ -39,6 +39,162 @@ the FEBio User's Manual for a more detailed description of the new features.
 To report any bugs or request new features, please visit the FEBio forum 
 at https://forums.febio.org/.
 
+
+===========================================================================
+
+ R E L E A S E   4.7   6/6/2024
+
+===========================================================================
+
+New Features:
+* Added ability to select reactive plastic damage material as base (elastic) material of reactive viscoelastic materail, enabling viscoplastic damage analyses
+* Added C2-smooth option for loadcurves
+* Added "volume change" log variable.
+* A new body load "moving frame" was added to the solid module that simulates the effects of the model being embedded in a moving frame. A similar feature was added to the fluid module, where the load is called "fluid moving frame".
+* Added Quemada viscous fluid formulation
+* Added "body force" plot variable.
+* Added plot variable for enclosed volume change
+* Added plot variable for fluid body force. Improved formulation of stiffness matrix for body forces in fluid and fluid-FSI domains to include stiffness due to variation of fluid velocity. Minor tweaks to fluid-FSI solver.
+* Added the mat_axis domain property, which is used to initialize the material point material axis parameter.
+* Added option to export nodal reaction forces for explicit solver.
+* Added "ideal gas pressure" which applies a pressure based on the ideal gas law.
+* Added debug log output and a plot variable for outputting the current pressure of an ideal-gas-pressure load.
+* Introduced ReactionRateRuberti to model strain-dependent fiber degradation
+* Added FEVec3dValuator object to FEFiberExpPowSBM and FEFiberPowLinearSBM to make them behave consistently with other fiber models. 
+* An (internal) mechanism was added for auto-differentation of Stress and Tangent routines. This is available to plugin developers who wish to avoid calculating the explicit form of the Stress and/or Tangent. 
+* Added edge-to-surface sliding contact, which can be used to enforce contact between beams or trusses and a surface. Also renamed potential-based edge-to-surface contact.
+
+Improvements:
+* Added option to set element type to HEX8G6 in feb4 input file.
+* added missing s in some instances of output_negative_jacobians
+* Added default load curve to surface force load.
+* Added units of time for bond relaxation constants
+* Added descriptions for viscoelastic and reactive viscoelastic damage, and reactive viscoplasticity and reactive viscoplastic damage to User Manual
+* Changed long names of pressure- and cv-virial coefficients in real vapor, changed long name of viscosity-virial coefficient in Newtonian real vapor, added plot variable for fluid relative thermal Peclet number
+* Updated thermo-fluid module to use latest version of real vapor, added Newtonian real vapor and thermal conductivity real vapor material models. Added plot variables for tangents of fluid pressure with respect to volume and temperature. Used virtual functions to evaluate derivatives of functions of state with respect to volume and temperature
+* Added documentation for enclosed volume change
+* Updated Theory Manual to describe stiffness contribution from variations of fluid velocity to fluid body force calculation
+* Contact potential now also calculates total contact force.
+* Augmentations can now be done optionally for the sliding-elastic contact by attaching a load curve to the tolerance parameter.
+* Documented the stress and tangent of the "HGO unconstrained" material in the theory manual.
+* Improved consistency in PrepStep among fluid solvers, by calling UpdateModel instead of fem.Update in all the solvers.
+* Comments are now parsed in XMLReader::GetChar (this was to avoid a problem when a tag's value contains a comment)
+* Modified FiberExpPowSBM and FiberPowLinearSBM to use FEParamDouble properties.
+* Updated remodeling interface materials to calculate solid mass density for elastic solids, solid mixtures, and multiphasic materials
+* Implemented Init function for several contact material point classes.
+* Error messages for reset_test are printed to cerr instead of the log file.
+* Each contact interface now defines the laugon parameter so that the correct values can be specified.
+* added mechanism for plotting strain energy and specific strain energy for components of solid mixtures
+* Minor change to optimization output formatting.
+* X column now prints time for data-fit objective for optimization problems.
+* Implemented nodal integration rule for line elements. This is now default in edge-to-surface contact.
+* Added support for body forces for elastic-truss domain.
+
+Bug fixes:
+* Removed update of rigid nodal velocities in FERigidSolver::PrepStep since it was incorrect.
+* Initialized m_rt material point member when created.
+* Made sure augmentations of prestrain constraint are not done when tolerance is zero.
+* Allowed prestrain gradient to work with shell domains.
+* Fixed issue with rigid solver to improve convergence
+* Made sure shell bottom flag is set in initialization.
+* Fixed bug in initialization of FEInitialVelocity and FEInitialShellVelocity.
+* Fixed plugin paths in Windows scp-to-repo script [skip ci]
+* Initialized m_ksi and m_ct parameters of FEFluidMovingFrameLoad to fix crash on Windows.
+* Fixed errors in evaluation of stress and tangent of "HGO unconstrained".
+* Fixed issue with reading xml tag values that are space-delimited.
+* Fixed issue with new FEPlotIdealGasPressure plot variable.
+* Fixed crash on Linux caused by buffer overflow in snprintf call
+* Fixed typo in ParseSurfaceData when reading vec2d data.
+* Fixed sprintf deprecation warnings by using snprintf
+* Fixed issues with plotting specific strain energy
+* Fixed plotting of specific strain energy when density is zero
+* Fixed crash due to recent change in linear solver cleanup.
+* Fixed issues with remodeling solids that belong to a solid mixture. Finalized implementation of strain energy density and specific strain energy for solid components of a mixture
+* Linear solver is not deallocated in Deactivate since this may cause issues when resetting model.
+* Made minor changes to multiphasic domains to properly initialize sbmrmin and sbmrmax
+* Fixed issue with material point tree when using elastic mixtures.
+* Added serialization for FESymmetryPlane.
+* Now ignoring some white space characters when reading tag values.
+* Fixed dynamic cast issues when writing discrete element force log data.
+* Fixed issues with processing edges from feb4 input file.
+* Removed mentioning of model title since that parameter no longer exists.
+
+
+===========================================================================
+
+ R E L E A S E   4.6   3/29/2024
+
+===========================================================================
+
+New Features:
+* Two new rigid constraints were added to prescribe the rotation of a rigid body: rigid_rotation_vector prescribes the rotation via a rotation vector. The rigid_euler_angles prescribes the rotation via Euler angles.
+* Added "moving frame" body load, which can be used to emulate the effects of being embedded in an accelerating and rotating coordinate system.
+* Added new weak bond recruitment functions for reactive viscoelastictiy, including Weibull, log-normal, quintic, and gamma. Added new damage CDF function gamma.
+* Added filtering capabilities for RVE generations, RVE bonds, RVE recruitment and RVE strain, to plot these variables for specific solid mixture constituents
+* Added some initial support for body forces for beams. (Will only work with constant body forces.)
+* Added "field" plot variable, which can be used to output any field variable. Field variables are the internal solution variables that FEBio solves for. The available field variables depend on the physics module. 
+* Added "rotation" plot variable, which writes the nodal orientation of beam elements.
+* Added Lagrange multiplier method to linear constraints in FEAugLagLinearConstraint
+
+Improvements:
+* Array variables (e.g. solute concentrations) are now exported as FIELD variables in VTK export.
+* Added units to rigid force and mixture normal traction
+* Added option to use solute/sbm name in concentration dofs.
+* For dynamic analysis, the initial accelerations are now calculated based on the applied loads at time 0. This may improve the accuracy and convergence for dynamic problems. 
+* Added initial values for some of the discrete Hill material parameters.
+* Modified mixture stress plot variable so that you can specify the material as well as the solid component.
+* Added additional plot variables for discrete element length and direction.
+* Added option to turn off deprecation warnings. These are now turned off for older file formats.
+* Simplified implementation of (uncoupled) fiber-exp-linear a bit.
+* Costly evaluations of the zero stiffness matrix contributions of constant body forces are now avoided, which may significantly speed up models that use constant body forces.
+* Discrete domains are now processed after they have been read in, which is more efficient.
+* Improved memory management of the dump stream used during serialization.
+* Modified fiber-exp-linear models to optionally enforce continuity of the strain energy density and elasticity when the user sets c3=0.
+* Changed default value of tolerance parameter to 0.1 in FEThermoFluidPressureLoad
+* Added units to 'orthotropic elastic' and 'orthotropic CLE' materials
+* Modified 'recruitment user' to use 'function' instead of 'cdf' for the recruitment function.
+* Modified reactive viscoelastic and uncouple reactive viscoelastic materials to use 'bond recruitment' functions instead of 'damage CDF' functions. Modified the weak bond recruitment algorithm from published paper formula to accommodate strain reversal in cyclical loading.
+* Added support for writing FMT_MULT mesh data to plot file.
+* Added check to make sure that the value of int parameters is indeed a number. If not, an exception is thrown.
+* Changed type for FEThermoFluidPressureLoad from 'fluid pressure' to 'fluid pressure constraint'
+* Added additional scenarios for material test.
+* Improved calculation of incomplete Gamma function needed for the evaluation of the Malkin reduced relaxation function. Limited the range of the Malkin exponent to be >= 1
+* Plotfile is now created after model has been initialized. This allows some of values calculated during initialization to be stored in the plot file (e.g. initial discrete element force).
+* Now using full Newton in tangent diagnostic, which seems to work a bit better.
+* Updated FEThermoFluidPressureLoad to include penalty, augmented Lagrangian, Lagrange multipler methods.
+
+Bug fixes:
+* Fixed bug in contact potential initialization.
+* Fixes some issues to the velocity calculations in the biphasic and multiphasic solvers.
+* Fixed several issues with rigid body dynamics.
+* Fixed issue with surface data map that caused crash with cold restart.
+* Fixed problem with processing const surface data. Also provided more accurate error message when bc type is not recognized.
+* Fixed additional issue with reading old 2.5 files.
+* Fixed some issues with serialization of some material point data classes.
+* Fixed issue with merging maps for vec3d mesh data.
+* Fixed issue that was preventing old 2.5 files from running.
+* Fixed the reactive viscoelastic material response when weak bond recruitment is included, so that the response remains physical and meaningful during strain reversal, such as cyclical strain or cyclical stress
+* Fixed and updated several material parameter units.
+* Fixed strain energy density calculation for fiber-exp-linear when a non-zero c3 is specified by the user, to enforce continuity of the strain energy density.
+* Fixed bug that caused a crashed when plot file type was not initialized.
+* Fixed problem with restart when using VTK plot files.
+* Fixed some problems with serialization of model parameters.
+* Fixed cause of crash when using body forces with the rigid shell domain.
+* Fixed FEThermoFluidPressureLoad to make prescribed pressure spatially variable
+* Fixed implementation of nonlinear constraints in the fluid solver, thermofluid solver, and polar fluid solver.
+* Fixed issue with reading body loads that was always activating the loads, regardless of what step they are defined in.
+
+Documentation:
+* Added description of dump_stride command line option and made some minor formatting changes to the febio command line section.
+* Updated user manual entry for uncoupled fiber-exp-linear and corrected formula for C6 in user manual .
+* Modified User Manual to describe continuous strain energy density for fiber-exp-linear and uncoupled version.
+* Updated User Manual to describe optional enforcement of strain energy density and elasticity continuity in fiber-exp-linear materials.
+* Minor edits to nonlinear constraints section of Theory Manual, such as adding equations numbers.
+* Updated Theory Manual to display representative continuous relaxation spectra and corresponding reduced relaxation functions
+* Fixed typo in Holmes-Mow material.
+* Updated theoretical description of nonlinear constraint enforcement.
+
+
 ===========================================================================
 
  R E L E A S E   4.5   1/16/2024

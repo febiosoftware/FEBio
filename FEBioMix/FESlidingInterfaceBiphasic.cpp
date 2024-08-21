@@ -38,6 +38,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterfaceBiphasic, FEContactInterface)
+	ADD_PARAMETER(m_laugon   , "laugon"             )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol     , "tolerance"          );
     ADD_PARAMETER(m_gtol     , "gaptol"             )->setUnits(UNIT_LENGTH);;
 	ADD_PARAMETER(m_ptol     , "ptol"               );
@@ -79,6 +80,24 @@ FESlidingSurfaceBiphasic::Data::Data()
     m_nu    = m_s1 = m_dg = vec3d(0,0,0);
     m_rs    = m_rsp = vec2d(0,0);
     m_bstick = false;
+}
+
+void FESlidingSurfaceBiphasic::Data::Init()
+{
+	FEBiphasicContactPoint::Init();
+
+	m_Lmd = 0.0;
+	m_Lmt = m_tr = vec3d(0, 0, 0);
+	m_Lmp = 0.0;
+	m_epsn = 1.0;
+	m_epsp = 1.0;
+	m_pg = 0.0;
+	m_p1 = 0.0;
+	m_mueff = 0.0;
+	m_fls = 0.0;
+	m_nu = m_s1 = m_dg = vec3d(0, 0, 0);
+	m_rs = m_rsp = vec2d(0, 0);
+	m_bstick = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -134,7 +153,7 @@ bool FESlidingSurfaceBiphasic::Init()
         FESurfaceElement& se = Element(i);
         
         // get the element this surface element belongs to
-        FEElement* pe = se.m_elem[0];
+        FEElement* pe = se.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -740,7 +759,7 @@ double FESlidingInterfaceBiphasic::AutoPressurePenalty(FESurfaceElement& el, FES
     n.unit();
     
     // get the element this surface element belongs to
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == 0) return 0.0;
 
     // get the material
@@ -2358,7 +2377,7 @@ void FESlidingInterfaceBiphasic::UpdateContactPressures()
 bool FESlidingInterfaceBiphasic::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
     int i;
     double Ln, Lp;

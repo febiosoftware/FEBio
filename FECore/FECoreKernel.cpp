@@ -113,6 +113,7 @@ FECoreKernel::FECoreKernel()
 	ADD_SUPER_CLASS(FEDISCRETEDOMAIN_ID);
 	ADD_SUPER_CLASS(FEDOMAIN2D_ID);
 	ADD_SUPER_CLASS(FESURFACE_ID);
+	ADD_SUPER_CLASS(FEEDGE_ID);
 	ADD_SUPER_CLASS(FEIC_ID);
 	ADD_SUPER_CLASS(FEMESHDATAGENERATOR_ID);
 	ADD_SUPER_CLASS(FELOADCONTROLLER_ID);
@@ -401,11 +402,18 @@ FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 	FECoreBase* pc = fac->CreateInstance(fem);
 
 	int nspec = fac->GetSpecID();
-	if (m_bshowDeprecationWarning && (nspec != -1))
+	if (m_bshowDeprecationWarning && (nspec != -1) && fem)
 	{
-		int n1 = FECORE_SPEC_MAJOR(nspec);
-		int n2 = FECORE_SPEC_MINOR(nspec);
-		if (fem) feLogWarningEx(fem, "\"%s\" is deprecated in spec %d.%d!", fac->GetTypeStr(), n1, n2);
+		if (nspec == FECORE_EXPERIMENTAL)
+		{
+			feLogWarningEx(fem, "\"%s\" is considered experimental!", fac->GetTypeStr());
+		}
+		else
+		{
+			int n1 = FECORE_SPEC_MAJOR(nspec);
+			int n2 = FECORE_SPEC_MINOR(nspec);
+			feLogWarningEx(fem, "\"%s\" is deprecated in spec %d.%d!", fac->GetTypeStr(), n1, n2);
+		}
 	}
 
 	if ((m_blockEvents == false) && pc && (m_createHandlers.empty() == false))

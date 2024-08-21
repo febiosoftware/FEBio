@@ -74,6 +74,7 @@ FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : 
     
     m_pDmg = nullptr;
     m_pFtg = nullptr;
+    m_pRPD = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -99,6 +100,7 @@ bool FEReactiveViscoelasticMaterial::Init()
     
     m_pDmg = dynamic_cast<FEDamageMaterial*>(m_pBase);
     m_pFtg = dynamic_cast<FEReactiveFatigue*>(m_pBase);
+    m_pRPD = dynamic_cast<FEReactivePlasticDamage*>(m_pBase);
 
     return FEElasticMaterial::Init();
 }
@@ -672,7 +674,7 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
             pt.m_Jv.push_back(Jv);
             if (m_pWCDF) {
                 pt.m_Et = ScalarStrain(mp);
-                pt.m_wv.push_back(m_pWCDF->cdf(mp,pt.m_Et));
+                pt.m_wv.push_back(m_pWCDF->brf(mp,pt.m_Et));
             }
             else pt.m_wv.push_back(1);
             double f = (!pt.m_v.empty()) ? ReformingBondMassFraction(wb) : 1;
@@ -686,7 +688,7 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
         pt.m_Jv.back() = Jv;
         if (m_pWCDF) {
             pt.m_Et = ScalarStrain(mp);
-            pt.m_wv.back() = m_pWCDF->cdf(mp,pt.m_Et);
+            pt.m_wv.back() = m_pWCDF->brf(mp,pt.m_Et);
         }
         pt.m_f.back() = ReformingBondMassFraction(wb);
     }
@@ -753,5 +755,10 @@ double FEReactiveViscoelasticMaterial::Damage(FEMaterialPoint& mp)
     double D = 0;
     if (m_pDmg) D = m_pDmg->Damage(*GetBaseMaterialPoint(mp));
     else if (m_pFtg) D = m_pFtg->Damage(*GetBaseMaterialPoint(mp));
+    else if (m_pRPD) {
+        FEMaterialPoint& pt = *GetBaseMaterialPoint(mp);
+        const FEReactiveMaterialPoint* ppd = pt.ExtractData<FEReactiveMaterialPoint>();
+        D = ppd->BrokenBonds();
+    }
     return D;
 }

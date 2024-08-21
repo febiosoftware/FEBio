@@ -275,7 +275,7 @@ void XMLWriter::inc_level()
 	int l=0;
 	for (int i=0; i<m_level; ++i) 
 	{
-		sprintf(m_sztab+l, "\t");
+		snprintf(m_sztab+l, 256, "\t");
 		++l;
 	}
 	m_sztab[l] = 0;
@@ -291,7 +291,7 @@ void XMLWriter::dec_level()
 	int l=0;
 	for (int i=0; i<m_level; ++i) 
 	{
-		sprintf(m_sztab+l, "\t");
+		snprintf(m_sztab+l, 256, "\t");
 		++l;
 	}
 	m_sztab[l] = 0;
@@ -456,7 +456,7 @@ void XMLWriter::close_branch()
 		dec_level();
 
 		char szformat[256] = {0};
-		sprintf(szformat, "%s</%%s>\n", m_sztab);
+		snprintf(szformat, sizeof(szformat), "%s</%%s>\n", m_sztab);
 
         *m_stream << m_sztab << "</" << m_tag[m_level] << ">\n";
 	}

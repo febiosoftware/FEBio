@@ -33,7 +33,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEMixtureNormalTraction, FESurfaceLoad)
-	ADD_PARAMETER(m_traction  , "traction" )->setLongName("mixture normal traction");
+	ADD_PARAMETER(m_traction  , "traction" )->setLongName("mixture normal traction")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_blinear   , "linear"   );
     ADD_PARAMETER(m_bshellb   , "shell_bottom")->setLongName("apply on shell bottom");
 	ADD_PARAMETER(m_beffective, "effective");
@@ -60,6 +60,9 @@ void FEMixtureNormalTraction::SetSurface(FESurface* ps)
 //-----------------------------------------------------------------------------
 bool FEMixtureNormalTraction::Init()
 {
+	if (m_psurf == nullptr) return false;
+	m_psurf->SetShellBottom(m_bshellb);
+
 	FEModel* fem = GetFEModel();
 	m_dof.Clear();
 	if (m_bshellb == false)

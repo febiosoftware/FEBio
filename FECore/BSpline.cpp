@@ -43,6 +43,7 @@ BSpline::BSpline() : im(new BSpline::Impl)
 {
     im->korder = 0;
     im->ncoef = 0;
+    m_deriv = false;
 }
 
 //--------------------------------------------------------------------------------
@@ -156,10 +157,16 @@ double BSpline::eval(double x) const
 }
 
 //--------------------------------------------------------------------------------
-double BSpline::eval_deriv(double x) const { return eval_nderiv(x, 1); }
+double BSpline::eval_deriv(double x) const {
+    if (m_deriv) return eval(x);
+    else return eval_nderiv(x, 1);
+}
 
 //--------------------------------------------------------------------------------
-double BSpline::eval_deriv2(double x) const { return eval_nderiv(x, 2); }
+double BSpline::eval_deriv2(double x) const {
+    if (m_deriv) return eval_nderiv(x, 1);
+    else return eval_nderiv(x, 2);
+}
 
 //--------------------------------------------------------------------------------
 // evaluate B-spline n-th derivative at x using de Boor algorithm (de Boor 1986)

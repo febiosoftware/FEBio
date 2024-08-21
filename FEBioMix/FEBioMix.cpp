@@ -59,6 +59,7 @@ SOFTWARE.*/
 #include "FECarterHayes.h"
 #include "FEReactionRateConst.h"
 #include "FEReactionRateHuiskes.h"
+#include "FEReactionRateRuberti.h"
 #include "FEReactionRateNims.h"
 #include "FEReactionRateExpSED.h"
 #include "FEReactionRateSoluteAsSBM.h"
@@ -153,8 +154,10 @@ void FEBioMix::InitModule()
 
 	// extensions to "solid" module
 	febio.SetActiveModule("solid");
-	REGISTER_FECORE_CLASS(FECarterHayes     , "Carter-Hayes");
-	REGISTER_FECORE_CLASS(FEPorousNeoHookean, "porous neo-Hookean");
+	REGISTER_FECORE_CLASS(FECarterHayes      , "Carter-Hayes");
+	REGISTER_FECORE_CLASS(FEPorousNeoHookean , "porous neo-Hookean");
+    REGISTER_FECORE_CLASS(FEFiberExpPowSBM   , "fiber-exp-pow sbm" );
+    REGISTER_FECORE_CLASS(FEFiberPowLinearSBM, "fiber-pow-linear sbm");
 	REGISTER_FECORE_CLASS(FEMixtureNormalTraction, "normal_traction");
 
 //======================================================================
@@ -267,11 +270,16 @@ void FEBioMix::InitModule()
 	febio.OnCreateEvent(UpdateModelWhenCreating<FEBiphasicAnalysis>([](FEModelUpdate& fem) {
 		fem.AddPlotVariable("effective fluid pressure");
 		fem.AddPlotVariable("fluid flux");
+        fem.AddPlotVariable("fluid pressure");
 		})
 	);
 
     febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 25;
+        pc->m_maxups = 0;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 25;
     }));
     
     febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
@@ -405,7 +413,11 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogElemSoluteFluxZ_T, 7, "j8z");
 
     febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 25;
+        pc->m_maxups = 0;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 25;
     }));
     
     febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
@@ -448,10 +460,9 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEMultiphasicStandard               , "multiphasic"       );
 	REGISTER_FECORE_CLASS(FEMultiphasicMultigeneration        , "multiphasic-multigeneration");
 	REGISTER_FECORE_CLASS(FESFDSBM                            , "spherical fiber distribution sbm");
-	REGISTER_FECORE_CLASS(FEFiberExpPowSBM                    , "fiber-exp-pow sbm" );
-	REGISTER_FECORE_CLASS(FEFiberPowLinearSBM                 , "fiber-pow-linear sbm");
 	REGISTER_FECORE_CLASS(FEReactionRateConst		    	  , "constant reaction rate"    );
 	REGISTER_FECORE_CLASS(FEReactionRateHuiskes		    	  , "Huiskes reaction rate"     );
+    REGISTER_FECORE_CLASS(FEReactionRateRuberti               , "Ruberti reaction rate"     );
 	REGISTER_FECORE_CLASS(FEReactionRateNims		    	  , "Nims reaction rate"        );
 	REGISTER_FECORE_CLASS(FEReactionRateExpSED                , "exp-sed reaction rate"     );
     REGISTER_FECORE_CLASS(FEReactionRateSoluteAsSBM           , "solute-as-sbm reaction rate");
@@ -539,7 +550,11 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 7, "c8_integral");
 
     febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 25;
+        pc->m_maxups = 0;
+    }));
+    
+    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
+        pc->m_maxref = 25;
     }));
     
     febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {

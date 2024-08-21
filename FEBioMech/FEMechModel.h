@@ -30,8 +30,7 @@ SOFTWARE.*/
 //---------------------------------------------------------------------------------------
 class FERigidSystem;
 class FERigidBody;
-class FERigidPrescribedBC;
-class FERigidFixedBC;
+class FERigidBC;
 class FERigidIC;
 class FERigidNodeSet;
 
@@ -61,7 +60,7 @@ public:
 	bool InitMesh() override;
 
 	//! Initialize shells
-	void InitShells() override;
+	bool InitShells() override;
 
 	// find a parameter value
 	FEParamValue GetParameterValue(const ParamString& param) override;
@@ -91,17 +90,14 @@ public:
 	// find a rigid body from a material ID
 	int FindRigidbodyFromMaterialID(int matId);
 
-	// return number or rigid prescribed BCs
-	int RigidPrescribedBCs() const;
+	// return number or rigid BCs
+	int RigidBCs() const;
 
 	// return the rigid prescribed displacement
-	FERigidPrescribedBC* GetRigidPrescribedBC(int i);
+	FERigidBC* GetRigidBC(int i);
 
-	// add a rigid presribed BC
-	void AddRigidPrescribedBC(FERigidPrescribedBC* pDC);
-
-	// add a rigid fixed BC
-	void AddRigidFixedBC(FERigidFixedBC* pBC);
+	// add a rigid BC
+	void AddRigidBC(FERigidBC* pDC);
 
 	// add a rigid initial condition
 	void AddRigidInitialCondition(FERigidIC* pIC);

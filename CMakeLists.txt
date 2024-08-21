@@ -132,7 +132,7 @@ endif()
 if(WIN32)
     add_compile_options(/MP /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
-
+    set(CMAKE_BUILD_RPATH @executable_path/../lib/;@executable_path/../Frameworks)
 else()
 	add_compile_options(-fopenmp -w)
     
@@ -282,7 +282,7 @@ endif()
 if(USE_HYPRE)
     target_include_directories(numcore PRIVATE ${HYPRE_INC})
     target_compile_definitions(numcore PRIVATE HYPRE)
-	target_link_libraries(numcore PRIVATE ${HYPRE_LIB})
+    target_link_libraries(numcore PRIVATE ${HYPRE_LIB})
 endif()
 
 # Link SuperLU_MT

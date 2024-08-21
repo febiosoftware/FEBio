@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <FECore/FEModelParam.h>
 #include <FECore/FESurface.h>
+#include <FECore/FEEdge.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEPointFunction.h>
 #include <FECore/FEGlobalData.h>
@@ -154,7 +155,7 @@ FEFileException::FEFileException(const char* sz, ...)
 
 	// make the message
 	va_start(args, sz);
-	vsprintf(m_szerr, sz, args);
+	vsnprintf(m_szerr, sizeof(m_szerr), sz, args);
 	va_end(args);
 }
 
@@ -166,7 +167,7 @@ void FEFileException::SetErrorString(const char* sz, ...)
 
 	// make the message
 	va_start(args, sz);
-	vsprintf(m_szerr, sz, args);
+	vsnprintf(m_szerr, sizeof(m_szerr), sz, args);
 	va_end(args);
 }
 
@@ -206,6 +207,13 @@ void FEFileSection::value(XMLTag& tag, bool& b)
 }
 
 //-----------------------------------------------------------------------------
+void FEFileSection::value(XMLTag& tag, vec2d& v)
+{
+	const char* sz = tag.szvalue();
+	int n = sscanf(sz, "%lg,%lg", &v.r[0], &v.r[1]);
+	if (n != 3) throw XMLReader::XMLSyntaxError(tag.m_nstart_line);
+}
+
 void FEFileSection::value(XMLTag& tag, vec3d& v)
 {
 	const char* sz = tag.szvalue();
@@ -1184,6 +1192,16 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 
 					prop->SetProperty(surface);
 				}
+				else if (classID == FEEDGE_ID)
+				{
+					FEModelBuilder* builder = GetBuilder();
+					FESegmentSet* edgeList = mesh.FindSegmentSet(szref);
+					if (edgeList == nullptr) throw XMLReader::InvalidValue(tag);
+
+					FEEdge* edge = dynamic_cast<FEEdge*>(prop->get(0));
+					GetBuilder()->BuildEdge(*edge, *edgeList);
+//					mesh.AddEdge(edge); // I think that makes the mesh the owner, which is not the case!
+				}
 				else throw XMLReader::InvalidTag(tag);
 			}
 			else
@@ -1519,7 +1537,7 @@ bool FEFileImport::errf(const char* szerr, ...)
 
 	// copy to string
 	va_start(args, szerr);
-	vsprintf(m_szerr, szerr, args);
+	vsnprintf(m_szerr, sizeof(m_szerr), szerr, args);
 	va_end(args);
 
 	// close the file

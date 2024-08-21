@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FE3FieldElasticShellDomain.h"
 #include "FEUncoupledMaterial.h"
 #include <FECore/FEModel.h>
@@ -536,7 +537,7 @@ void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
 
             mat3ds D = pt.m_L.sym();
             double D2 = D.dotdot(D);
-            if (D2 > 0)
+            if (D2 > std::numeric_limits<double>::epsilon())
                 pt.m_s += D*(((pt.m_Wt-pt.m_Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
         }
     }

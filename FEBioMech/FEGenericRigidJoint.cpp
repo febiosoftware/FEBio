@@ -34,7 +34,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEGenericRigidJoint, FERigidConnector);
-	ADD_PARAMETER(m_laugon , "laugon" );
+	ADD_PARAMETER(m_laugon , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
 	ADD_PARAMETER(m_eps    , "penalty");
 	ADD_PARAMETER(m_tol    , "tolerance");
 	ADD_PARAMETER(m_q0     , "joint"  );
@@ -71,7 +71,7 @@ FEGenericRigidJoint::FEGenericRigidJoint(FEModel* pfem) : FERigidConnector(pfem)
 
 	m_bsymm = false;
 
-	m_laugon = 0;	// default to penalty method
+	m_laugon = FECore::PENALTY_METHOD;	// default to penalty method
 	m_eps = 1.0;
 	m_tol = 0.0;
 
@@ -129,7 +129,7 @@ vec3d FEGenericRigidJoint::Position() const
 // allocate equations
 int FEGenericRigidJoint::InitEquations(int neq)
 {
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		int n = neq;
 		for (int i = 0; i < 6; ++i)
@@ -171,7 +171,7 @@ void FEGenericRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	mat3da ya(-qa); mat3da yaT = -ya;
 	mat3da yb(-qb); mat3da ybT = -yb;
 
-	int ndof = (m_laugon == 2 ? 18 : 12);
+	int ndof = (m_laugon == FECore::LAGMULT_METHOD ? 18 : 12);
 
 	// add translational constraints
 	vector<double> fe(ndof, 0.0);
@@ -185,7 +185,7 @@ void FEGenericRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			double c = v*g + m_dc[i];
 
 			double L = m_Lm[i];
-			if (m_laugon != 2) L += m_eps*c;
+			if (m_laugon != FECore::LAGMULT_METHOD) L += m_eps*c;
 
 			vec3d F = v*L;
 
@@ -211,7 +211,7 @@ void FEGenericRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			fe[11] -= Mb.z;
 
 			// add constraint for Lagrange multiplier
-			if (m_laugon == 2)
+			if (m_laugon == FECore::LAGMULT_METHOD)
 			{
 				fe[12 + i] -= c;
 			}
@@ -232,7 +232,7 @@ void FEGenericRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			double c = va*vb - cos(0.5*PI + m_dc[i]);
 
 			double L = m_Lm[i];
-			if (m_laugon != 2) L += m_eps*c;
+			if (m_laugon != FECore::LAGMULT_METHOD) L += m_eps*c;
 
 			mat3da VaT(va);
 			mat3da VbT(vb);
@@ -251,7 +251,7 @@ void FEGenericRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			fe[11] -= Mb.z;
 
 			// add constraint for Lagrange multiplier
-			if (m_laugon == 2)
+			if (m_laugon == FECore::LAGMULT_METHOD)
 			{
 				fe[12 + i] -= c;
 			}
@@ -272,7 +272,7 @@ void FEGenericRigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FEGenericRigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-	if (m_laugon == 2) StiffnessMatrixLM(LS, tp);
+	if (m_laugon == FECore::LAGMULT_METHOD) StiffnessMatrixLM(LS, tp);
 	else StiffnessMatrixAL(LS, tp);
 }
 
@@ -544,14 +544,14 @@ bool FEGenericRigidJoint::Augment(int naug, const FETimeInfo& tp)
 	bool bconv = true;
 	double e[6] = { 0 };
 	double Lm[6] = { 0 };
-	if (m_laugon == 0)
+	if (m_laugon == FECore::PENALTY_METHOD)
 	{
 		for (int i = 0; i < 6; ++i)
 		{
 			Lm[i] = m_eps*c[i];
 		}
 	}
-	else if (m_laugon == 1)
+	else if (m_laugon == FECore::AUGLAG_METHOD)
 	{
 //		if (m_tol > 0.0)
 		{
@@ -587,7 +587,7 @@ bool FEGenericRigidJoint::Augment(int naug, const FETimeInfo& tp)
 	feLog("               %13.7lg,%13.7lg,%13.7lg\n", Lm[3], Lm[4], Lm[5]);
 	feLog(" constraint  : %13.7lg,%13.7lg,%13.7lg\n", c[0], c[1], c[2]);
 	feLog("               %13.7lg,%13.7lg,%13.7lg\n", c[3], c[4], c[5]);
-	if (m_laugon == 1)
+	if (m_laugon == FECore::AUGLAG_METHOD)
 	{
 		feLog(" error       : %13.7lg,%13.7lg,%13.7lg\n", e[0], e[1], e[2]);
 		feLog("               %13.7lg,%13.7lg,%13.7lg\n", e[3], e[4], e[5]);
@@ -620,7 +620,7 @@ void FEGenericRigidJoint::Reset()
 //-----------------------------------------------------------------------------
 void FEGenericRigidJoint::UnpackLM(vector<int>& lm)
 {
-	int ndof = (m_laugon == 2 ? 18 : 12);
+	int ndof = (m_laugon == FECore::LAGMULT_METHOD ? 18 : 12);
 
 	// add the dofs of rigid body A
 	lm.reserve(ndof);
@@ -640,7 +640,7 @@ void FEGenericRigidJoint::UnpackLM(vector<int>& lm)
 	lm.push_back(m_rbB->m_LM[5]);
 
 	// add the LM equations
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		for (int i = 0; i < 6; ++i) lm.push_back(m_EQ[i]);
 	}
@@ -649,7 +649,7 @@ void FEGenericRigidJoint::UnpackLM(vector<int>& lm)
 //-----------------------------------------------------------------------------
 void FEGenericRigidJoint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		for (int i = 0; i < 6; ++i)
 		{
@@ -660,7 +660,7 @@ void FEGenericRigidJoint::Update(const std::vector<double>& Ui, const std::vecto
 
 void FEGenericRigidJoint::PrepStep()
 {
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		for (int i = 0; i < 6; ++i)
 		{
@@ -671,7 +671,7 @@ void FEGenericRigidJoint::PrepStep()
 
 void FEGenericRigidJoint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
 {
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		for (int i = 0; i < 6; ++i)
 		{

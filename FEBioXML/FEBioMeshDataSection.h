@@ -51,11 +51,17 @@ public:
 protected:
 	void ParseShellThickness(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialFibers(XMLTag& tag, FEElementSet& set);
-	void ParseMaterialAxes  (XMLTag& tag, FEElementSet& set);
+	void ParseElementMaterialAxes(XMLTag& tag, FEElementSet& set);
+	void ParseMaterialAxesProperty(XMLTag& tag, FEElementSet& set);
 	void ParseMaterialData  (XMLTag& tag, FEElementSet& set, const string& name);
 	void ParseMaterialFiberProperty(XMLTag& tag, FEElementSet& set);
 
 private:
+	void ParseNodeData(XMLTag& tag);
+	void ParseEdgeData(XMLTag& tag);
+	void ParseSurfaceData(XMLTag& tag);
+	void ParseElementData(XMLTag& tag);
+
 	void ParseElementData(XMLTag& tag, FEElementSet& set, vector<ELEMENT_DATA>& values, int nvalues);
 	void ParseElementData(XMLTag& tag, FEDomainMap& map);
 	void ParseDataArray(XMLTag& tag, FEDataArray& map, const char* sztag);

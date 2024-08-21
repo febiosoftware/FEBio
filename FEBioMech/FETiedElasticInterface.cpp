@@ -37,6 +37,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedElasticInterface, FEContactInterface)
+	ADD_PARAMETER(m_laugon   , "laugon"             )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
 	ADD_PARAMETER(m_epsn     , "penalty"            );
@@ -422,6 +423,9 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
     np.SetTolerance(m_stol);
     np.SetSearchRadius(m_srad);
     np.Init();
+
+	// let's count the number of contact pairs we find.
+	int contacts = 0;
     
     // loop over all integration points
     int n = 0;
@@ -454,6 +458,8 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
                 
                 // calculate the gap function
                 pt.m_Gap = q - r;
+
+				contacts++;
             }
             else
             {
@@ -462,6 +468,13 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
             }
         }
     }
+
+	// if we found no contact pairs, let's report this since this is probably not the user's intention
+	if (contacts == 0)
+	{
+		std::string name = GetName();
+		feLogWarning("No contact pairs found for tied interface \"%s\".\nThis contact interface may not have any effect.", name.c_str());
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -963,7 +976,7 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
 bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
-    if (m_laugon != 1) return true;
+    if (m_laugon != FECore::AUGLAG_METHOD) return true;
     
     int i;
     vec3d Ln;

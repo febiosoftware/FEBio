@@ -59,6 +59,9 @@ public: // overridden from FEElasticDomain
 	//! Calculates inertial forces for dynamic problems | todo implement (removed assert DSR)
 	void InertialForces(FEGlobalVector& R, vector<double>& F) override { }
 
+	//! initialization
+	bool Init() override;
+
 	//! update domain data
 	void Update(const FETimeInfo& tp) override;
 

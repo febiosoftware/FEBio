@@ -70,14 +70,14 @@ public:
 	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 	// serialization
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	// initialize the linear constraint
-	bool Init();
+	bool Init() override;
 
 	// make the constraint active
-	void Activate();
-	void Deactivate();
+	void Activate() override;
+	void Deactivate() override;
 
 	// set the parent degree of freedom
 	void SetParentDof(int dof, int node);

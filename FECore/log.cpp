@@ -38,7 +38,7 @@ void write_log(FEModel* fem, int ntag, const char* szmsg, ...)
 	// make the message
 	char sztxt[2048] = { 0 };
 	va_start(args, szmsg);
-	vsprintf(sztxt, szmsg, args);
+	vsnprintf(sztxt, sizeof(sztxt), szmsg, args);
 	va_end(args);
 
 	fem->Log(ntag, sztxt);

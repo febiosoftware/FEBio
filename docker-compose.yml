@@ -1,0 +1,47 @@
+version: "3"
+services:
+  febiobase:
+    platform: "linux/amd64"
+    build:
+      context: ./infrastructure
+      dockerfile: DockerfileBase
+    image: febiosoftware/febiobase:ubuntu-22.04
+    working_dir: /FEBio
+    volumes:
+      - ./:/FEBio
+    command: bash
+
+  febio: &default
+    platform: "linux/amd64"
+    build:
+      context: ./infrastructure
+      dockerfile: Dockerfile
+    image: febiosoftware/febio:ubuntu-22.04
+    working_dir: /FEBio
+    volumes:
+      - ./:/FEBio
+    command: bash
+
+  febio-dev:
+    <<: *default
+    container_name: febio-dev
+    command: bash
+
+  febio-build:
+    <<: *default
+    container_name: febio-build
+    command: ci/linux/build.sh
+
+  febio-tests:
+    <<: *default
+    container_name: febio-tests
+    command: ci/linux/test.sh
+
+  febio-runtime:
+    build:
+      context: .
+      dockerfile: infrastructure/DockerfileRuntime
+    image: ${DOCKER_REPO}febio-runtime:ubuntu-22.04
+    working_dir: /FEBio
+    volumes:
+      - ./TestSuite/:/FEBio/TestSuite

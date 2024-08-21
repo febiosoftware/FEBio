@@ -32,9 +32,9 @@ char* febio::getVersionString()
     static char version[32];
 
 #ifndef DEVCOMMIT
-    sprintf(version, "%d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
+    snprintf(version, sizeof(version), "%d.%d.%d", VERSION, SUBVERSION, SUBSUBVERSION);
 #else
-    sprintf(version, "%d.%d.%d.%s", VERSION, SUBVERSION, SUBSUBVERSION, DEVCOMMIT);
+    snprintf(version, sizeof(version), "%d.%d.%d.%s", VERSION, SUBVERSION, SUBSUBVERSION, DEVCOMMIT);
 #endif
 
     return version;

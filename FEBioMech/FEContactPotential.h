@@ -51,6 +51,8 @@ public:
 	double GetContactArea() override;
 
 	FEMaterialPoint* CreateMaterialPoint() override;
+
+	vec3d GetContactForce() override;
 };
 
 typedef FEContactPotentialSurface::Data FECPContactPoint;
@@ -99,6 +101,8 @@ protected:
 	double PotentialDerive2(double r);
 
 	void BuildNeighborTable();
+
+	void UpdateSurface(FESurface& surface);
 
 protected:
 	FEContactPotentialSurface	m_surf1;

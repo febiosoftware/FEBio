@@ -1707,6 +1707,9 @@ public:
 
 	void init();
 
+	//! shape function at (r)
+	void shape(double* H, double r);
+
 public:
 	// gauss-point coordinates and weights
 	std::vector<double> gr;
@@ -2062,6 +2065,19 @@ public:
 public:
 	//! constructor
 	FELine2G1();
+
+	//! project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao) const override;
+};
+
+class FELine2NI : public FELine2_
+{
+public:
+	enum { NINT = 2 };
+
+public:
+	//! constructor
+	FELine2NI();
 
 	//! project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao) const override;

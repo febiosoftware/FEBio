@@ -49,12 +49,15 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FELinearConstraintManager.h>
+#include <FECore/LinearSolver.h>
 #include <FECore/vector.h>
 #include "FESolidLinearSystem.h"
 #include "FEBioMech.h"
 #include "FESolidAnalysis.h"
 #include "FETrussMaterial.h"
 #include "FELinearTrussDomain.h"
+#include "FEMechModel.h"
+#include "FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -70,6 +73,7 @@ BEGIN_FECORE_CLASS(FESolidSolver2, FENewtonSolver)
 		ADD_PARAMETER(m_logSolve  , "logSolve"    );
 		ADD_PARAMETER(m_arcLength , "arc_length"  );
 		ADD_PARAMETER(m_al_scale  , "arc_length_scale");
+		ADD_PARAMETER(m_init_accelerations, "init_accelerations")->SetFlags(FE_PARAM_HIDDEN);
 	END_PARAM_GROUP();
 END_FECORE_CLASS();
 
@@ -98,6 +102,8 @@ m_dofBW(pfem), m_dofBA(pfem)
     m_alpham = 1.0;
 	m_beta  = 0.25;
 	m_gamma = 0.5;
+
+	m_init_accelerations = true;
 
 	// arc-length parameters
 	m_arcLength = ARC_LENGTH_METHOD::NONE; // no arc-length
@@ -239,6 +245,114 @@ bool FESolidSolver2::Init()
         if (s) s->SetDynamicUpdateFlag(b);
         if (seas) seas->SetDynamicUpdateFlag(b);
         if (sans) sans->SetDynamicUpdateFlag(b);
+	}
+
+	// For dynamic problems we need to calculate the initial accelerations
+	// TODO: We currently only do this when time == 0. But what if the first step is static and the
+	// second is dynamic? 
+	if (m_init_accelerations)
+	{
+		FEAnalysis* pstep = fem.GetCurrentStep();
+		double currentTime = fem.GetTime().currentTime;
+		if ((pstep->m_nanalysis == FESolidAnalysis::DYNAMIC) && (currentTime == 0.0))
+		{
+			if (InitAccelerations() == false) return false;
+		}
+	}
+
+	return true;
+}
+
+bool FESolidSolver2::InitAccelerations()
+{
+	FEModel& fem = *GetFEModel();
+
+	// calculate applied force vector
+	// TODO: What if there is internal stress at time 0? 
+	vector<double> F(m_neq, 0.0), dummy(m_neq, 0.0);
+	FEResidualVector RHS(fem, F, dummy);
+	ExternalForces(RHS);
+
+	// Only calculate initial accelerations 
+	// if a nonzero inital force is applied.
+	double f_norm = sqrt(F * F);
+	if (f_norm > 0)
+	{
+		// We need to solve the linear system of equations F = M*a
+		// So, we build the mass matrix and then solve for a
+		const FETimeInfo& tp = fem.GetTime();
+
+		// Form the stiffness matrix
+		if (!CreateStiffness(true)) return false;
+
+		// setup the linear system
+		m_pK->Zero();
+		FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), 1.0, m_nreq);
+
+		// build the global mass matrix
+		FEMesh& mesh = fem.GetMesh();
+		for (int i = 0; i < mesh.Domains(); ++i)
+		{
+			FEElasticDomain* edom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
+			if (edom) edom->MassMatrix(LS, 1.0);
+		}
+		m_rigidSolver.RigidMassMatrix(LS, tp);
+
+		// Don't forget to factor the matrix first!
+		if (m_plinsolve == nullptr) return false;
+		if (m_plinsolve->Factor() == false)
+		{
+			throw FactorizationError();
+		}
+
+		// Solve for the initial accelerations
+		vector<double> a0(m_neq);
+		SolveEquations(a0, F);
+
+		// apply to nodes
+		for (int i = 0, n; i < mesh.Nodes(); ++i)
+		{
+			FENode& nodei = mesh.Node(i);
+			n = nodei.m_ID[m_dofU[0]]; if (n >= 0) nodei.m_at.x = a0[n];
+			n = nodei.m_ID[m_dofU[1]]; if (n >= 0) nodei.m_at.y = a0[n];
+			n = nodei.m_ID[m_dofU[2]]; if (n >= 0) nodei.m_at.z = a0[n];
+
+			vec3d aqt(0, 0, 0);
+			n = nodei.m_ID[m_dofSU[0]]; if (n >= 0) aqt.x = a0[n];
+			n = nodei.m_ID[m_dofSU[1]]; if (n >= 0) aqt.y = a0[n];
+			n = nodei.m_ID[m_dofSU[2]]; if (n >= 0) aqt.z = a0[n];
+			nodei.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
+		}
+
+		// apply to rigid bodies
+		FEMechModel& mech = dynamic_cast<FEMechModel&>(fem);
+		for (int i = 0, n; i < mech.RigidBodies(); ++i)
+		{
+			FERigidBody& rb = *mech.GetRigidBody(i);
+			n = rb.m_LM[0]; if (n >= 0) rb.m_at.x = rb.m_ap.x = a0[n];
+			n = rb.m_LM[1]; if (n >= 0) rb.m_at.y = rb.m_ap.y = a0[n];
+			n = rb.m_LM[2]; if (n >= 0) rb.m_at.z = rb.m_ap.z = a0[n];
+			n = rb.m_LM[3]; if (n >= 0) rb.m_alt.x = rb.m_alp.x = a0[n];
+			n = rb.m_LM[4]; if (n >= 0) rb.m_alt.y = rb.m_alp.y = a0[n];
+			n = rb.m_LM[5]; if (n >= 0) rb.m_alt.z = rb.m_alp.z = a0[n];
+		}
+
+		// since rigid nodes don't get equations assigned, we'll grab
+		// their initial accelerations from the rigid bodies
+		for (int i = 0; i < mesh.Nodes(); ++i)
+		{
+			FENode& nodei = mesh.Node(i);
+			if (nodei.m_rid >= 0)
+			{
+				FERigidBody& rb = *mech.GetRigidBody(nodei.m_rid);
+				// TODO: What if the rb has initial rotation or rotational acceleration?
+				nodei.m_at = rb.m_at;
+				nodei.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], rb.m_at);
+			}
+		}
+
+		// TODO: What if there are linear constraints present? We'll probably need to do
+		//       something similar for the constrained nodes since they also don't have equations assigned.
 	}
 
 	return true;
@@ -827,12 +941,18 @@ void FESolidSolver2::PrepStep()
 		if (plc && plc->IsActive()) plc->PrepStep();
 	}
 
+	for (int i = 0; i < fem.ModelLoads(); ++i)
+	{
+		FEModelLoad* pl = fem.ModelLoad(i);
+		if (pl->IsActive()) pl->PrepStep();
+	}
+
 	// see if we need to do contact augmentations
 	m_baugment = false;
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-		if (ci.IsActive() && (ci.m_laugon == 1)) m_baugment = true;
+		if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
 	}
 
 	// see if we need to do incompressible augmentations

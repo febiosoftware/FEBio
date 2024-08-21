@@ -31,20 +31,7 @@ SOFTWARE.*/
 #include <FECore/FEBox.h>
 #include <stdexcept>
 
-vec3d MaterialPointPosition(FESurfaceElement& el, int n)
-{
-	FESurface* surf = dynamic_cast<FESurface*>(el.GetMeshPartition());
-	vec3d r(0, 0, 0);
-	double* H = el.H(n);
-	for (int i = 0; i < el.Nodes(); ++i)
-	{
-		vec3d ri = surf->Node(el.m_lnode[i]).m_rt;
-		r += ri * H[i];
-	}
-	return r;
-}
-
-void UpdateSurface(FESurface& surface)
+void FEContactPotential::UpdateSurface(FESurface& surface)
 {
 // This assumes we are inside a omp parallel region!
 #pragma omp for
@@ -58,16 +45,13 @@ void UpdateSurface(FESurface& surface)
 		for (int n = 0; n < el.GaussPoints(); ++n)
 		{
 			FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
-			mp.m_rt = MaterialPointPosition(el, n);
+			mp.m_rt = surface.Position(el, n);
 			
 			// kinematics at integration points
 			mp.dxr = el.eval_deriv1(re, n);
 			mp.dxs = el.eval_deriv2(re, n);
 
 			mp.m_Jt = (mp.dxr ^ mp.dxs).norm();
-
-			mp.m_gap = 0.0;
-			mp.m_tc = vec3d(0, 0, 0);
 		}
 	}
 }
@@ -94,6 +78,24 @@ void FEContactPotentialSurface::GetContactTraction(int nelem, vec3d& tc)
 	tc /= (double)el.GaussPoints();
 }
 
+vec3d FEContactPotentialSurface::GetContactForce()
+{
+	vec3d F(0, 0, 0);
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		double* gw = el.GaussWeights();
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
+			vec3d dA = mp.dxr ^ mp.dxs;
+			double da = dA.norm();
+			F += mp.m_tc * (da * gw[n]);
+		}
+	}
+	return F;
+}
+
 double FEContactPotentialSurface::GetContactArea()
 {
 	double area = 0.0;
@@ -117,6 +119,9 @@ double FEContactPotentialSurface::GetContactArea()
 
 
 BEGIN_FECORE_CLASS(FEContactPotential, FEContactInterface)
+	// just adding this parameter for backward compatibility. 
+	ADD_PARAMETER(m_laugon, "laugon")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
+
 	ADD_PARAMETER(m_kc, "kc");
 	ADD_PARAMETER(m_p, "p");
 	ADD_PARAMETER(m_Rin, "R_in");
@@ -395,6 +400,7 @@ bool FEContactPotential::Init()
 {
 	if (FEContactInterface::Init() == false) return false;
 	BuildNeighborTable();
+	m_activeElements.resize(m_surf1.Elements());
 	return true;
 }
 
@@ -445,7 +451,6 @@ void FEContactPotential::Update()
 	}
 
 	// build the list of active elements
-	m_activeElements.resize(m_surf1.Elements());
 #pragma omp parallel for shared(g) schedule(dynamic)
 	for (int i = 0; i < m_surf1.Elements(); ++i)
 	{

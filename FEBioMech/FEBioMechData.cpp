@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include "FESolidSolver.h"
 #include "FESolidSolver2.h"
+#include "FEExplicitSolidSolver.h"
 #include "FERigidBody.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEAnalysis.h"
@@ -47,6 +48,8 @@ SOFTWARE.*/
 #include "FEContactSurface.h"
 #include "FEDiscreteElasticMaterial.h"
 #include "FESlidingInterface.h"
+#include "FEPreStrainElastic.h"
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(const FENode& node)
@@ -155,12 +158,20 @@ double FENodeForceY::value(const FENode& node)
 //-----------------------------------------------------------------------------
 double FENodeForceZ::value(const FENode& node)
 {
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
+	FESolver* solver = GetFEModel()->GetCurrentStep()->GetFESolver();
+	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(solver);
 	if (psolid_solver)
 	{
 		vector<double>& Fr = psolid_solver->m_Fr;
 		const vector<int>& id = node.m_ID;
 		return (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
+	}
+	FEExplicitSolidSolver* explicitSolver = dynamic_cast<FEExplicitSolidSolver*>(solver);
+	if (explicitSolver)
+	{
+		vector<double>& Fr = explicitSolver->m_Fr;
+		const vector<int>& id = node.m_ID;
+		return (-id[2] - 2 >= 0 ? Fr[-id[2] - 2] : 0);
 	}
 	return 0;
 }
@@ -1561,6 +1572,28 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 	return val / (double) nint;
 }
 
+double FELogTotalDeformationGradient::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		FEPrestrainMaterialPoint* pp = mp.ExtractData<FEPrestrainMaterialPoint>();
+
+		mat3d F = pt.m_F;
+		if (pp)
+		{
+			mat3d Fp = pp->prestrain();
+			F = F * Fp;
+		}
+
+		val += F(m_r, m_c);
+	}
+	return val / (double)nint;
+}
+
 //-----------------------------------------------------------------------------
 double FELogElemElasticity_::value(FEElement& el, int n)
 {
@@ -1967,24 +2000,25 @@ double FELogDiscreteElementForce::value(FEElement& el)
 	FEDiscreteElement& del = dynamic_cast<FEDiscreteElement&>(el);
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
-	// get the (one) material point data
-	FEDiscreteElasticMaterialPoint& mp = dynamic_cast<FEDiscreteElasticMaterialPoint&>(*el.GetMaterialPoint(0));
-
 	vec3d ra1 = mesh.Node(del.m_node[0]).m_rt;
 	vec3d rb1 = mesh.Node(del.m_node[1]).m_rt;
 	vec3d e = rb1 - ra1; e.unit();
 
-	vec3d F = mp.m_Ft;
-
-	double Fm = F * e;
-
-	return Fm;
+	FEDiscreteElasticMaterialPoint* mp = el.GetMaterialPoint(0)->ExtractData<FEDiscreteElasticMaterialPoint>();
+	assert(mp);
+	if (mp)
+	{
+		vec3d F = mp->m_Ft;
+		double Fm = F * e;
+		return Fm;
+	}
+	else return 0.0;
 }
 
 //-----------------------------------------------------------------------------
 double FELogDiscreteElementForceX::value(FEElement& el)
 {
-	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
+	FEDiscreteElasticMaterialPoint* mp = el.GetMaterialPoint(0)->ExtractData<FEDiscreteElasticMaterialPoint>();
 	if (mp) return mp->m_Ft.x;
 	else return 0.0;
 }
@@ -2211,4 +2245,51 @@ double FELogContactArea::value(FESurface& surface)
 		return area;
 	}
 	return 0.0;
+}
+
+//=============================================================================
+double FENormalizedInternalEnergy::value(FEDomain& dom)
+{
+	double sum = 0.0;
+	double vol = 0.0;
+	FESolidDomain* solidDomain = dynamic_cast<FESolidDomain*>(&dom);
+	if (solidDomain == nullptr) return 0.0;
+
+	FEModel* fem = GetFEModel();
+	const FETimeInfo& ti = fem->GetTime();
+	double dt = ti.timeIncrement;
+
+	double P0 = fem->GetGlobalConstant("P");
+	if (P0 == 0.0) P0 = 1.0;
+
+	int NE = solidDomain->Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& el = solidDomain->Element(i);
+		double Ve = solidDomain->Volume(el);
+		vol += Ve;
+
+		mat3ds s(0), D(0);
+		int nint = el.GaussPoints();
+		double* gw = el.GaussWeights();
+		double w = 0.0;
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
+			s += ep.m_s * gw[n];
+			D += ep.RateOfDeformation();
+			w += gw[n];
+		}
+		s /= w;
+		D /= w;
+
+		double We = s.dotdot(D);
+
+		sum += We * dt * Ve;
+	}
+	m_sum += sum;
+	double NTSIE = m_sum / (P0 * vol);
+	return NTSIE;
 }

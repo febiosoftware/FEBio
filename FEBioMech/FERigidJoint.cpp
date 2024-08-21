@@ -35,7 +35,7 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidJoint, FERigidConnector);
-	ADD_PARAMETER(m_laugon , "laugon"   );
+	ADD_PARAMETER(m_laugon , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
 	ADD_PARAMETER(m_atol   , "tolerance");
 	ADD_PARAMETER(m_eps    , "penalty"  );
 	ADD_PARAMETER(m_q0     , "joint"    );
@@ -47,7 +47,7 @@ FERigidJoint::FERigidJoint(FEModel* pfem) : FERigidConnector(pfem)
 	static int count = 1;
 	m_nID = count++;
 
-	m_laugon = 1;		// Augmented Lagrangian by default for backward compatibility
+	m_laugon = FECore::AUGLAG_METHOD;		// Augmented Lagrangian by default for backward compatibility
 	m_eps = 0.0;
 	m_atol = 0.01;
 
@@ -75,7 +75,7 @@ bool FERigidJoint::Init()
 	m_qb0 = m_q0 - m_rbB->m_r0;
 
 	// we make we have a non-zero penalty for penalty and auglag method
-	if ((m_laugon != 2) && (m_eps == 0.0)) return false;
+	if ((m_laugon != FECore::LAGMULT_METHOD) && (m_eps == 0.0)) return false;
 
 	return true;
 }
@@ -85,7 +85,7 @@ bool FERigidJoint::Init()
 int FERigidJoint::InitEquations(int neq)
 {
 	m_LM.resize(3, -1);
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		// we allocate three equations
 		m_LM[0] = neq;
@@ -175,7 +175,7 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 
 	FEElementMatrix ke;
 
-	if (m_laugon != 2)
+	if (m_laugon != FECore::LAGMULT_METHOD)
 	{
 		ke.resize(12, 12);
 		ke.zero();
@@ -291,7 +291,7 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon == 0) return true;
+	if (m_laugon == FECore::PENALTY_METHOD) return true;
 
     FERigidBody& RBa = *m_rbA;
     FERigidBody& RBb = *m_rbB;
@@ -309,7 +309,7 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 
 	// For Lagrange multipliers we just report the values
 	// of the LM and the constraint
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		feLog("\n=== rigid joint # %d:\n", m_nID);
 		feLog("\tLagrange m. : %15.7lg, %15.7lg, %15.7lg\n", m_F.x, m_F.y, m_F.z);
@@ -361,7 +361,7 @@ void FERigidJoint::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 void FERigidJoint::Update()
 {
-	if (m_laugon != 2)
+	if (m_laugon != FECore::LAGMULT_METHOD)
 	{
 		FERigidBody& RBa = *m_rbA;
 		FERigidBody& RBb = *m_rbB;
@@ -411,7 +411,7 @@ void FERigidJoint::UnpackLM(vector<int>& lm)
 	lm.push_back(m_rbB->m_LM[5]);
 
 	// add the LM equations
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		lm.push_back(m_LM[0]);
 		lm.push_back(m_LM[1]);
@@ -422,7 +422,7 @@ void FERigidJoint::UnpackLM(vector<int>& lm)
 //-----------------------------------------------------------------------------
 void FERigidJoint::Update(const std::vector<double>& ui)
 {
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		m_F.x += ui[m_LM[0]];
 		m_F.y += ui[m_LM[1]];

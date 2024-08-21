@@ -416,6 +416,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 				{
 					const char* szflt = PD.strFilter.c_str();
 					index = dofs.GetIndex(szfield, szflt);
+					if (index < 0) index = pfem->GetDOFIndex(szflt);
 				}
 				if ((index < 0) || (index >= ndofs)) return false;
 
@@ -611,6 +612,7 @@ FEBioPlotFile::FEBioPlotFile(FEModel* fem) : PlotFile(fem)
 	m_ncompress = 0;
 	m_meshesWritten = 0;
 	m_exportUnitsFlag = false;
+	m_exportErodedElements = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1024,8 +1026,17 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	assert(mid > 0);
 	int eshape = dom.GetElementShape();
 
-	int i, j;
 	int NE = dom.Elements();
+	int elementCount = NE;
+	if (m_exportErodedElements == false)
+	{
+		elementCount = 0;
+		for (int i = 0; i < NE; ++i)
+		{
+			FESolidElement& el = dom.Element(i);
+			if (el.isActive()) elementCount++;
+		}
+	}
 
 	// figure out element type
 	int ne = 0;
@@ -1053,7 +1064,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	{
 		m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
 		m_ar.WriteChunk(PLT_DOM_PART_ID  ,   mid);
-		m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+		m_ar.WriteChunk(PLT_DOM_ELEMS    , elementCount);
 		m_ar.WriteChunk(PLT_DOM_NAME     , dom.GetName());
 	}
 	m_ar.EndChunk();
@@ -1062,12 +1073,15 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	int n[FEElement::MAX_NODES + 1];
 	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
 	{
-		for (i=0; i<NE; ++i)
+		for (int i=0; i<NE; ++i)
 		{
 			FESolidElement& el = dom.Element(i);
-			n[0] = el.GetID();
-			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
-			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
+			if (m_exportErodedElements || el.isActive())
+			{
+				n[0] = el.GetID();
+				for (int j = 0; j < ne; ++j) n[j + 1] = el.m_node[j];
+				m_ar.WriteChunk(PLT_ELEMENT, n, ne + 1);
+			}
 		}
 	}
 	m_ar.EndChunk();
@@ -1080,8 +1094,17 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 	assert(mid > 0);
 	int etype = dom.GetElementType();
 
-	int i, j;
 	int NE = dom.Elements();
+	int elementCount = NE;
+	if (m_exportErodedElements == false)
+	{
+		elementCount = 0;
+		for (int i = 0; i < NE; ++i)
+		{
+			FEShellElement& el = dom.Element(i);
+			if (el.isActive()) elementCount++;
+		}
+	}
 
 	// figure out element type
 	int ne = 0;
@@ -1111,20 +1134,23 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 	{
 		m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
 		m_ar.WriteChunk(PLT_DOM_PART_ID  ,   mid);
-		m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+		m_ar.WriteChunk(PLT_DOM_ELEMS    , elementCount);
 	}
 	m_ar.EndChunk();
 
 	// write the element list
-	int n[9];
+	int n[FEElement::MAX_NODES + 1] = { 0 };
 	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
 	{
-		for (i=0; i<NE; ++i)
+		for (int i=0; i<NE; ++i)
 		{
 			FEShellElement& el = dom.Element(i);
-			n[0] = el.GetID();
-			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
-			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
+			if (m_exportErodedElements || el.isActive())
+			{
+				n[0] = el.GetID();
+				for (int j = 0; j < ne; ++j) n[j + 1] = el.m_node[j];
+				m_ar.WriteChunk(PLT_ELEMENT, n, ne + 1);
+			}
 		}
 	}
 	m_ar.EndChunk();
@@ -1137,11 +1163,21 @@ void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 	assert(mid > 0);
 
 	int NE = dom.Elements();
-	int etype = dom.GetElementType();
+	int elementCount = NE;
+	if (m_exportErodedElements == false)
+	{
+		elementCount = 0;
+		for (int i = 0; i < NE; ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			if (el.isActive()) elementCount++;
+		}
+	}
 
 	// figure out element type
 	int ne = 0;
 	int dtype = 0;
+	int etype = dom.GetElementType();
 	switch (etype)
 	{
 	case FE_TRUSS  : ne = 2; dtype = PLT_ELEM_LINE2; break;
@@ -1158,7 +1194,7 @@ void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 	{
 		m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
 		m_ar.WriteChunk(PLT_DOM_PART_ID  ,   mid);
-		m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+		m_ar.WriteChunk(PLT_DOM_ELEMS    , elementCount);
 	}
 	m_ar.EndChunk();
 
@@ -1169,9 +1205,12 @@ void FEBioPlotFile::WriteBeamDomain(FEBeamDomain& dom)
 		for (int i=0; i<NE; ++i)
 		{
 			FEElement& el = dom.ElementRef(i);
-			n[0] = el.GetID();
-			for (int j=0; j<ne; ++j) n[j+1] = el.m_node[j];
-			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
+			if (m_exportErodedElements || el.isActive())
+			{
+				n[0] = el.GetID();
+				for (int j = 0; j < ne; ++j) n[j + 1] = el.m_node[j];
+				m_ar.WriteChunk(PLT_ELEMENT, n, ne + 1);
+			}
 		}
 	}
 	m_ar.EndChunk();
@@ -1183,8 +1222,17 @@ void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
 	int mid = dom.GetMaterial()->GetID();
 	assert(mid > 0);
 
-	int i, j;
 	int NE = dom.Elements();
+	int elementCount = NE;
+	if (m_exportErodedElements == false)
+	{
+		elementCount = 0;
+		for (int i = 0; i < NE; ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			if (el.isActive()) elementCount++;
+		}
+	}
 
 	// figure out element type
 	int ne = 2;
@@ -1195,7 +1243,7 @@ void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
 	{
 		m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
 		m_ar.WriteChunk(PLT_DOM_PART_ID  ,   mid);
-		m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+		m_ar.WriteChunk(PLT_DOM_ELEMS    , elementCount);
 	}
 	m_ar.EndChunk();
 
@@ -1203,12 +1251,15 @@ void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
 	int n[5];
 	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
 	{
-		for (i=0; i<NE; ++i)
+		for (int i=0; i<NE; ++i)
 		{
 			FEElement& el = dom.ElementRef(i);
-			n[0] = el.GetID();
-			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
-			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
+			if (m_exportErodedElements || el.isActive())
+			{
+				n[0] = el.GetID();
+				for (int j = 0; j < ne; ++j) n[j + 1] = el.m_node[j];
+				m_ar.WriteChunk(PLT_ELEMENT, n, ne + 1);
+			}
 		}
 	}
 	m_ar.EndChunk();
@@ -1219,15 +1270,24 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
 {
     int mid = dom.GetMaterial()->GetID();
     assert(mid > 0);
-    int etype = dom.GetElementType();
     
-    int i, j;
-    int NE = dom.Elements();
-    
+	int NE = dom.Elements();
+	int elementCount = NE;
+	if (m_exportErodedElements == false)
+	{
+		elementCount = 0;
+		for (int i = 0; i < NE; ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			if (el.isActive()) elementCount++;
+		}
+	}
+
     // figure out element type
     int ne = 0;
     int dtype = 0;
-    switch (etype)
+	int etype = dom.GetElementType();
+	switch (etype)
     {
         case FE2D_TRI3G1 : ne = 3; dtype = PLT_ELEM_TRI; break;
         case FE2D_TRI6G3 : ne = 6; dtype = PLT_ELEM_TRI6; break;
@@ -1243,7 +1303,7 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
     {
         m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
         m_ar.WriteChunk(PLT_DOM_PART_ID  ,   mid);
-        m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+        m_ar.WriteChunk(PLT_DOM_ELEMS    , elementCount);
     }
     m_ar.EndChunk();
     
@@ -1251,12 +1311,15 @@ void FEBioPlotFile::WriteDomain2D(FEDomain2D& dom)
     int n[10];
     m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
     {
-        for (i=0; i<NE; ++i)
+        for (int i=0; i<NE; ++i)
         {
             FEElement2D& el = dom.Element(i);
-            n[0] = el.GetID();
-            for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
-            m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
+			if (m_exportErodedElements || el.isActive())
+			{
+				n[0] = el.GetID();
+				for (int j = 0; j < ne; ++j) n[j + 1] = el.m_node[j];
+				m_ar.WriteChunk(PLT_ELEMENT, n, ne + 1);
+			}
         }
     }
     m_ar.EndChunk();
@@ -1596,7 +1659,6 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 void FEBioPlotFile::WriteGlobalData(FEModel& fem)
 {
 	PlotFile::Dictionary& dic = GetDictionary();
-	dic.Clear();
 	auto& globData = dic.GlobalVariableList();
 	list<DICTIONARY_ITEM>::iterator it = globData.begin();
 	for (int i = 0; i < (int)globData.size(); ++i, ++it)
@@ -1988,8 +2050,11 @@ void FEBioPlotFile::WriteMeshState(FEMesh& mesh)
 		for (int j = 0; j < NE; ++j)
 		{
 			FEElement& el = dom.ElementRef(j);
-			unsigned int status = el.status();
-			flags.push_back(status);
+			if (m_exportErodedElements || el.isActive())
+			{
+				unsigned int status = el.status();
+				flags.push_back(status);
+			}
 		}
 	}
 

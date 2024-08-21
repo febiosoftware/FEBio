@@ -54,3 +54,75 @@ SOFTWARE.*/
 	cout << #a << endl << typeid(a).name() << endl; \
 	fecore_print_T(&a); \
 	cout << endl; }
+
+//-----------------------------------------------------------------------------
+class FECORE_API FECoreDebugStream
+{
+public:
+	enum STREAM_MODE
+	{
+		WRITING_MODE,
+		READING_MODE
+	};
+
+public:
+	FECoreDebugStream();
+	FECoreDebugStream(const char* szfilename, STREAM_MODE mode);
+	~FECoreDebugStream();
+
+	bool Open(const char* szfilename, STREAM_MODE mode);
+
+	bool is_writing() const { return m_mode == STREAM_MODE::WRITING_MODE; }
+	bool is_reading() const { return m_mode == STREAM_MODE::READING_MODE; }
+
+	bool ReopenForReading();
+
+	template <typename T> bool check(T& v)
+	{
+		if (is_writing())
+		{
+			write(&v, sizeof(T), 1);
+			return true;
+		}
+		else
+		{
+			T tmp;
+			read(&tmp, sizeof(T), 1);
+			assert(tmp == v);
+			return (tmp == v);
+		}
+	}
+
+	template <typename T> bool check(std::vector<T>& v)
+	{
+		size_t n = v.size();
+		if (is_writing())
+		{
+			write(v.data(), sizeof(T), n);
+			return true;
+		}
+		else
+		{
+
+			std::vector<T> tmp(n);
+			read(tmp.data(), sizeof(T), n);
+			for (size_t i = 0; i < n; ++i)
+			{
+				assert(tmp[i] == v[i]);
+				if (tmp[i] != v[i]) return false;
+			}
+			return true;
+		}
+	}
+
+
+private:
+	size_t write(const void* pd, size_t size, size_t count);
+	size_t read(void* pd, size_t size, size_t count);
+
+private:
+	STREAM_MODE	m_mode;
+	FILE* m_fp;
+	std::string	m_filename;
+	int	m_counter;
+};

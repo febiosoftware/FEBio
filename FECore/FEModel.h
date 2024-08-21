@@ -137,8 +137,11 @@ public:
 	//! Initialize the mesh
 	virtual bool InitMesh();
 
+	//! mesh validation
+	void ValidateMesh();
+
 	//! Initialize shells
-	virtual void InitShells();
+	virtual bool InitShells();
 
 	//! Build the matrix profile for this model
 	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
@@ -403,7 +406,7 @@ public: // Global data
 	void AddGlobalData(FEGlobalData* psd);
 	FEGlobalData* GetGlobalData(int i);
 	FEGlobalData* FindGlobalData(const char* szname);
-	int FindGlobalDataIndex(const char* szname);
+	int FindGlobalDataIndex(const char* szname) const;
 	int GlobalDataItems();
 
 	// get/set global data

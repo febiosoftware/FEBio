@@ -51,7 +51,7 @@ double FEMassDamping::divforce(FEMaterialPoint& mp)
 }
 
 //! calculate constribution to stiffness matrix
-mat3ds FEMassDamping::stiffness(FEMaterialPoint& pt)
+mat3d FEMassDamping::stiffness(FEMaterialPoint& pt)
 {
 	double dt = CurrentTimeIncrement();
 	return mat3dd(-m_C / dt);

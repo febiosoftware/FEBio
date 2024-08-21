@@ -136,10 +136,10 @@ public:
 	void add_leaf(const char* szn, const char* szv);
 	void add_leaf(const char* szn, const std::string& s);
 
-	void add_leaf(const char* szn, int    n){ char szv[256]; sprintf(szv, "%d" , n); write_leaf(szn, szv); }
-	void add_leaf(const char* szn, bool   b){ char szv[256]; sprintf(szv, "%d" , b); write_leaf(szn, szv); }
-	void add_leaf(const char* szn, double g){ char szv[256]; sprintf(szv, "%lg", g); write_leaf(szn, szv); }
-	void add_leaf(const char* szn, float  g){ char szv[256]; sprintf(szv, "%g" , g); write_leaf(szn, szv); }
+	void add_leaf(const char* szn, int    n){ char szv[256]; snprintf(szv, sizeof(szv), "%d" , n); write_leaf(szn, szv); }
+	void add_leaf(const char* szn, bool   b){ char szv[256]; snprintf(szv, sizeof(szv), "%d" , b); write_leaf(szn, szv); }
+	void add_leaf(const char* szn, double g){ char szv[256]; snprintf(szv, sizeof(szv), "%lg", g); write_leaf(szn, szv); }
+	void add_leaf(const char* szn, float  g){ char szv[256]; snprintf(szv, sizeof(szv), "%g" , g); write_leaf(szn, szv); }
 	void add_leaf(const char* szn, int *pi, int n);
 	void add_leaf(const char* szn, float* pg, int n);
 	void add_leaf(const char* szn, double* pg, int n);

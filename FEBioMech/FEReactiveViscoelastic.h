@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEReactiveVEMaterialPoint.h"
 #include "FEDamageMaterial.h"
 #include "FEReactiveFatigue.h"
+#include "FEReactivePlasticDamage.h"
 #include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
@@ -114,6 +115,7 @@ private:
 private:
     FEDamageMaterial*   m_pDmg;     //!< pointer to base material if it is a FEDamageMaterial
     FEReactiveFatigue*  m_pFtg;     //!< pointer to base material if it is a FEReactiveFatigue
+    FEReactivePlasticDamage*    m_pRPD;  //!< pointer to base material if it is a FEReactivePlasticDamage
     double Damage(FEMaterialPoint& mp); //!< return damage in this material
 
 public:

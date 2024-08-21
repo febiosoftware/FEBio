@@ -1,0 +1,37 @@
+#!/bin/zsh
+pushd $SOURCE_PATH
+
+git clone --depth 1 --branch "v6.2.2307" "https://github.com/NGSolve/netgen.git"
+pushd netgen
+ cmake .  -L -B cmbuild \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX="$INSTALLATION_PATH" \
+  -DUSE_CCACHE:BOOL=OFF \
+  -DUSE_CGNS:BOOL=OFF \
+  -DUSE_CSG:BOOL=ON \
+  -DUSE_GEOM2D:BOOL=ON \
+  -DUSE_GUI:BOOL=OFF \
+  -DUSE_INTERFACE:BOOL=ON \
+  -DUSE_INTERNAL_TCL:BOOL=OFF \
+  -DUSE_JPEG:BOOL=OFF \
+  -DUSE_MPEG:BOOL=OFF \
+  -DUSE_MPI:BOOL=OFF \
+  -DUSE_MPI4PY:BOOL=OFF \
+  -DUSE_NATIVE_ARCH:BOOL=OFF \
+  -DUSE_NUMA:BOOL=OFF \
+  -DUSE_OCC:BOOL=ON \
+  -DUSE_PYTHON:BOOL=OFF \
+  -DUSE_STLGEOM:BOOL=ON \
+  -DUSE_SUPERBUILD:BOOL=OFF \
+  -DENABLE_CPP_CORE_GUIDELINES_CHECK:BOOL=OFF \
+  -DENABLE_UNIT_TESTS:BOOL=OFF \
+  -DCMAKE_OSX_ARCHITECTURES="x86_64" \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+
+pushd cmbuild
+make -j $(sysctl -n hw.ncpu)
+make install
+popd
+popd
+rm -rf netgen
+popd

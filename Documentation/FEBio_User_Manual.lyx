@@ -162,13 +162,13 @@ status open
 
 \end_inset
 
-User's Manual Version 4.5
+User's Manual Version 4.7
 \end_layout
 
 \begin_layout Date
 
 \series bold
-Last Updated: January 16, 2024
+Last Updated: July 20, 2024
 \end_layout
 
 \begin_layout Standard
@@ -346,7 +346,7 @@ status open
 \end_layout
 
 \begin_layout Standard
-MRL: 
+Weiss Lab: 
 \begin_inset ERT
 status open
 
@@ -354,7 +354,7 @@ status open
 
 
 \backslash
-url{http://mrl.sci.utah.edu}
+url{https://weisslabutah.org}
 \end_layout
 
 \end_inset
@@ -4992,7 +4992,350 @@ At the end of the analysis a summary is printed with heuristics that inform
 \end_layout
 
 \begin_layout Standard
-By default, all screen output will also be printed to the log flie.
+By default, all screen output will also be printed to the log file.
+ 
+\end_layout
+
+\begin_layout Standard
+The summary printed at the end of a run also provides some useful timing
+ information.
+ Below follows an explanation of the different reported timings.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+timing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Input time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time it took to process the FEBio input file.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Initialization time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to initialize and check the model
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Solve time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The total time it took to solve the model.
+ This is the sum of the following timings:
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+IO-time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to write the output files (i.e.
+ the plot, dump, and data files)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+reforming stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to reform the stiffness matrix (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+evaluating stiffness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the stiffness matrix (2)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+evaluating residual
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the residual (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+model update
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to update the model (4)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QN updates
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time to evaluate the Quasi-Newton updates (5)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+time in linear solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The time spent in the linear solver (6)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Table listing descriptions of the different timings reported at the end
+ of an FEBio job.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+Internally, FEBio uses a sparse-matrix storage format to store the global
+ stiffness matrix efficiently.
+ A matrix reformation refers to the process of calculating the structure
+ of this sparse matrix.
+ The structure depends mostly on the nodal connectivity and for many problems
+ this only needs to be calculated once at the start of the run.
+ However, for some problems the connectivity may change during an analysis
+ and this may require a reformation of the global stiffness matrix.
+ (For instance, changes in contacting facets.) 
+\end_layout
+
+\begin_layout Enumerate
+The global stiffness matrix needs to be evaluated often as it is needed
+ by the Newton solver for finding the solution.
+ The total time to evaluate this stiffness matrix may often be a significant
+ portion of the total runtime, however, there are several parameters that
+ affect this.
+ For instance, the max_ups parameter sets the number of quasi-Newton updates.
+ During these updates, the full stiffness is not re-evaluated.
+ Instead, a rank-one update is performed, which often significantly reduces
+ the time to evaluate the stiffness matrices.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The residual, which is the difference between 
+\begin_inset Quotes eld
+\end_inset
+
+internal
+\begin_inset Quotes erd
+\end_inset
+
+ forces (i.e.
+ stresses) and external forces, is evaluated during each quasi-Newton iteration.
+ Although the residual is calculated many times during an analysis, its
+ evaluation rarely takes up a significant time of the total run time.
+ 
+\end_layout
+
+\begin_layout Enumerate
+During the model update, all quantities that depend on the solution variables
+ will be updated.
+ This includes nodal positions, element stress, etc.
+ This update is also called for each quasi-Newton iteration.
+ Although the update is usually fast, the fact that it is required for every
+ iteration may cause the total time spent in the model update to be significant.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The QN update refers to the process of calculating a rank-one update of
+ the stiffness matrix.
+ This is usually a fast process and does not take up a signifcant amount
+ of time.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The time in the linear solver usually takes up most of the total runtime.
+ Most of this time is spent calculating the factorization of the global
+ stiffness matrix.
  
 \end_layout
 
@@ -15278,7 +15621,7 @@ criterion
 \emph default
  property, which evaluates the variable or metric that is used by the adaptor,
  and optionally, can be used to filter the elements to which the adaptor
- will be applier.
+ will be applied.
  How the criterion is used, depends on the adaptor.
  For instance, the erosion adaptor uses it to identify the elements to deactivat
 e.
@@ -15540,8 +15883,8 @@ The erosion adaptor
 \end_layout
 
 \begin_layout Standard
-The erosion adaptor can be used to remove or deactivate elements in a mesh,
- based on a user-defined criterion.
+The erosion adaptor can be used to deactivate elements in a mesh, based
+ on a user-defined criterion.
  It defines the following properties: 
 \end_layout
 
@@ -15815,7 +16158,7 @@ Mesh Adaptor Criteria
 
 \begin_layout Standard
 The purpose of the mesh adaptor criteria is to assign values to elements.
- Some adaptors also act as filters, that limit the effect of the adaptor
+ Some adaptors also act as filters that limit the effect of the adaptor
  to certain elements.
  These values will then be used by the mesh adaptor to modify the mesh.
  How these values are used depends on the adaptor.
@@ -15840,7 +16183,7 @@ The following criteria are currently available.
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="2">
+<lyxtabular version="3" rows="11" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -16030,7 +16373,7 @@ Specify the element value based on a mathematical expression.
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -16039,11 +16382,32 @@ min-max filter
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Selects elements whose value falls within a min-max range.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+contact gap
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Select elements that are in contact.
+ 
 \end_layout
 
 \end_inset
@@ -16211,7 +16575,7 @@ min-max filter
 
 \begin_layout Standard
 This criterion evaluates a metric for each element, but then filters out
- the element that have a value within a min-max range.
+ the elements that have values within a min-max range.
  
 \end_layout
 
@@ -16248,6 +16612,23 @@ data
 : Specify the metric to evaluate the element values.
  Any of the other criteria defined above can be used.
  
+\end_layout
+
+\begin_layout Subsubsection
+contact gap
+\end_layout
+
+\begin_layout Standard
+This criterion evaluates the contact gap for all elements that are in contact.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+gap
+\series default
+: contact gap threshold value.
 \end_layout
 
 \begin_layout Subsection
@@ -21077,6 +21458,388 @@ The following example prescribes a rotation around the x-axis.
 
 \begin_layout LyX-Code
   <value lc="1">3.14</value>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_bc>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid_rotation_vector Constraint
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+rigid_rotation_vector 
+\emph default
+constraint allows the user to prescribe the rotation of a rigid body using
+ a rotation vector.
+ In essence, this combines the effect of using three separate rigid rotation
+ constraints, one for each component of the rotation vector, and thus might
+ be a more convenient choice if the rotation of the rigid body is fully
+ prescribed.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material name (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+vx
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x-component of the rotation vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+vy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+y-component of the rotation vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+vz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+z-component of the rotation vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the name attribute assigned to the corresponding rigid body material
+ as defined in the Material section.
+\end_layout
+
+\begin_layout Standard
+The following example prescribes a rotation around the z-axis using a load
+ controller.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_bc type="rigid_rotation_vector">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>rigid</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <vx>0</vx>
+\end_layout
+
+\begin_layout LyX-Code
+  <vy>0</vy>
+\end_layout
+
+\begin_layout LyX-Code
+  <vz lc="1">3.14</vz>
+\end_layout
+
+\begin_layout LyX-Code
+</rigid_bc>
+\end_layout
+
+\begin_layout Subsubsection
+Rigid_euler_angles Constraint
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+rigid_euler_angles 
+\emph default
+constraint allows the user to prescribe the rotation of a rigid body using
+ three Euler angles.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+rb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The rigid body's material name (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Ex
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+X Euler angle (degrees)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Ey
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Y Euler angle (degrees)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+Ez
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Z Euler angle (degrees)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+This is the name attribute assigned to the corresponding rigid body material
+ as defined in the Material section.
+\end_layout
+
+\begin_layout Standard
+The following example prescribes a rotation around the z-axis using a load
+ controller.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<rigid_bc type="rigid_euler_vector">
+\end_layout
+
+\begin_layout LyX-Code
+  <rb>rigid</rb>
+\end_layout
+
+\begin_layout LyX-Code
+  <vx>0</vx>
+\end_layout
+
+\begin_layout LyX-Code
+  <vy>0</vy>
+\end_layout
+
+\begin_layout LyX-Code
+  <vz lc="1">180.0</vz>
 \end_layout
 
 \begin_layout LyX-Code
@@ -27808,7 +28571,7 @@ status open
 
 
 \backslash
-href{http://help.mrl.sci.utah.edu/help/index.jsp}{
+href{https://help.febio.org/docs/FEBioTheory-4-5/TM45-Section-3.2.html}{
 \backslash
 emph{FEBio Theory 
 \end_layout
@@ -30126,6 +30889,411 @@ reference "subsec:Sliding-Interfaces"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsubsection
+Moving frame
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+moving frame 
+\emph default
+load can be used to model the effects of being embedded in an accelerating
+ and rotating coordinate system.
+ Whereas the 
+\emph on
+centrifual body force 
+\emph default
+only emulates the effect of a centrifugal force and assumes a static analysis,
+ the moving frame load includes Coriolos effect and the effects of an accelerati
+ng coordinate system and can be used in a dynamic analysis.
+ 
+\end_layout
+
+\begin_layout Standard
+The motion of the moving frame is decomposed into a translation and a rotation.
+ The position of a material point 
+\series bold
+r
+\series default
+ in the fixed inertial frame can then be related to the position in the
+ rotating frame 
+\series bold
+r'
+\series default
+ via, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbf{r}=\mathbf{Y}+\mathbf{R}\mathbf{r\mathit{'}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\series bold
+Y
+\series default
+ is the position of the origin of the moving frame and 
+\series bold
+R
+\series default
+ is the rotation matrix.
+ 
+\end_layout
+
+\begin_layout Standard
+Substituting this into the equations of motion (i.e.
+ the balance of linear momentum), results in a modified equation of motion
+ where the effects of the moving frame can be combined into a single body
+ load.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathbf{f}=\varrho\left(\mathbf{R}^{T}\mathbf{A}+\mathbf{\dot{W}}\times\mathbf{r}'+\mathbf{W}\times\left(\mathbf{W}\times\mathbf{r}'\right)+2\mathbf{W}\times\mathbf{v}'\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\series bold
+A
+\series default
+ is the linear acceleration of the moving frame, 
+\series bold
+W
+\series default
+ is the angular velocity of the moving frame, measured in the moving frame
+ (i.e.
+ 
+\begin_inset Formula $\mathbf{W}=\mathbf{R}^{T}\mathbf{w},$
+\end_inset
+
+where 
+\series bold
+w
+\series default
+ is the angular velocity in the fixed frame), and 
+\series bold
+v
+\series default
+' is the velocity of the material point, measured in the moving frame.
+ 
+\end_layout
+
+\begin_layout Standard
+The moving frame is defined via the two vectors, the angular velocity of
+ the rotating frame 
+\series bold
+w
+\series default
+, and the linear acceleration of the rotating frame's origin 
+\series bold
+A
+\series default
+.
+ The components of both vectors may be defined via load curves to make them
+ time-dependent.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+wx
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x-component of angular velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+wy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+y-component of angular velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+wz
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x-component of angular velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ax
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x-component of linear acceleration
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ay
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+y-component of linear acceleration
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+az
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+y-component of linear acceleration
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that if you wish to include the effect of gravity, do not add a separate
+ body force load.
+ Instead, modify the linear acceleration to include gravity: 
+\begin_inset Formula $\boldsymbol{a=}A-\boldsymbol{g}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<Loads>
+\end_layout
+
+\begin_layout LyX-Code
+  <body_load type="moving frame">
+\end_layout
+
+\begin_layout LyX-Code
+    <wx>0</wx>
+\end_layout
+
+\begin_layout LyX-Code
+    <wy>0</wy>
+\end_layout
+
+\begin_layout LyX-Code
+    <wz lc="1">1</wz>
+\end_layout
+
+\begin_layout LyX-Code
+    <ax>0</ax>
+\end_layout
+
+\begin_layout LyX-Code
+    <ay>0</ay>
+\end_layout
+
+\begin_layout LyX-Code
+    <az>0</az>
+\end_layout
+
+\begin_layout LyX-Code
+  </body_load>
+\end_layout
+
+\begin_layout LyX-Code
+</Loads> 
 \end_layout
 
 \begin_layout Standard
@@ -39765,10 +40933,6 @@ value is the name of the physical file.
 \end_layout
 
 \begin_layout LyX-Code
-*Title = <problem title>
-\end_layout
-
-\begin_layout LyX-Code
 *Step = <time step>
 \end_layout
 
@@ -39782,10 +40946,6 @@ value is the name of the physical file.
 
 \begin_layout LyX-Code
 <actual data goes here>
-\end_layout
-
-\begin_layout Standard
-The problem title is as defined in the input file.
 \end_layout
 
 \begin_layout Standard
@@ -45247,7 +46407,7 @@ An asterisk (*) in the Category column denotes that the attribute is required
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="137" columns="3">
+<lyxtabular version="3" rows="139" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -46425,6 +47585,35 @@ Volume enclosed by named surface
 \begin_inset Text
 
 \begin_layout Plain Layout
+enclosed volume change
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Change in volume enclosed by named surface
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Euler angle 
 \end_layout
 
@@ -46502,6 +47691,36 @@ Element
 
 \begin_layout Plain Layout
 Material fiber vector 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+field
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Node
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Output the nodal values of a field variable.
+ 
 \end_layout
 
 \end_inset
@@ -47183,7 +48402,10 @@ reference "eq:mp-effective-p-c"
 , and fluid materials, Eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:cfd-pressure"
+reference "eq:fluid-pressure-state"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -60706,6 +61928,76 @@ fiber growth
 \end_inset
 
 .
+ For 
+\emph on
+general growth
+\emph default
+ the user specifies the desired values of 
+\begin_inset Formula $\vartheta^{\text{iso}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\vartheta^{\text{ani}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Internally, the calculations within FEBio require the evaluation of the
+ inverse of 
+\begin_inset Formula $\mathbf{F}^{g}$
+\end_inset
+
+, which is generall given by
+\begin_inset Formula 
+\[
+\left(\mathbf{F}^{g}\right)^{-1}=\frac{1}{\vartheta^{\text{iso}}+\vartheta^{\text{ani}}-1}\left(\left(1+\frac{\vartheta^{\text{ani}}-1}{\vartheta^{\text{iso}}}\right)\mathbf{I}-\frac{\vartheta^{\text{ani}}-1}{\vartheta^{\text{iso}}}\mathbf{n}_{r}\otimes\mathbf{n}_{r}\right)
+\]
+
+\end_inset
+
+The mass density of a growing material is evaluated from 
+\begin_inset Formula $\rho=\rho_{r}/J$
+\end_inset
+
+ where 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ is the (invariant) referential mass density of the growing solid (when
+ there is neither growth nor deformation) and 
+\begin_inset Formula $J=\det\mathbf{F}=\det\mathbf{F}^{e}\det\mathbf{F}^{g}\equiv J^{e}J^{g}$
+\end_inset
+
+.
+ It follows that the mass density change produced only by the growth is
+ 
+\begin_inset Formula $\rho J^{e}\equiv\rho_{rg}=\rho_{r}/J^{g}$
+\end_inset
+
+, thus 
+\begin_inset Formula $J^{g}=\det\mathbf{F}^{g}$
+\end_inset
+
+ may be used to evaluate the evolving solid mass density 
+\begin_inset Formula $\rho_{rg}$
+\end_inset
+
+ due only to growth.
+ From the general expression for 
+\begin_inset Formula $\mathbf{F}^{g}$
+\end_inset
+
+ above it follows that
+\begin_inset Formula 
+\[
+J^{g}=\det\mathbf{F}^{g}=\left(\vartheta^{\text{iso}}\right)^{2}\left(\vartheta^{\text{iso}}+\vartheta^{\text{ani}}-1\right)
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -78271,7 +79563,11 @@ The material type for a compressive reactive viscoelastic solid is
 \begin_inset Quotes eld
 \end_inset
 
+
+\emph on
 reactive viscoelastic
+\emph default
+
 \begin_inset Quotes erd
 \end_inset
 
@@ -82368,6 +83664,16 @@ where
 \end_inset
 
  is the measure of strain that triggers a new reactive weak bond generation.
+ This function is unbounded with increasing 
+\begin_inset Formula $\Xi$
+\end_inset
+
+.
+ Users should typically employ 
+\begin_inset Formula $\mu_{0}=1$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -82597,6 +83903,16 @@ where
 \end_inset
 
  is the measure of strain that triggers a new reactive weak bond generation.
+ This function is unbounded with increasing 
+\begin_inset Formula $\Xi$
+\end_inset
+
+.
+ Users should typically employ 
+\begin_inset Formula $\mu_{0}=1$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -82793,6 +84109,16 @@ where
 \end_inset
 
  is the measure of strain that triggers a new reactive weak bond generation.
+ This function is unbounded with increasing 
+\begin_inset Formula $\Xi$
+\end_inset
+
+.
+ Users should typically employ 
+\begin_inset Formula $\mu_{0}=1$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -82957,6 +84283,884 @@ Example:
 
 \begin_layout LyX-Code
   </function>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+Log-Normal
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-log-normal"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a log-normal recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment log-normal
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<sigma>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ (
+\begin_inset Formula $\sigma>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum increase 
+\begin_inset Formula $r$
+\end_inset
+
+ in bond recruitment from 1 (default is 0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the recruitment function is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=1+\frac{r}{2}\text{erfc}\left[-\frac{\ln\left(\Xi/\mu\right)}{\sigma\sqrt{2}}\right]\,.
+\]
+
+\end_inset
+
+Its minimum value is 
+\begin_inset Formula $1$
+\end_inset
+
+ and its maximum value is 
+\begin_inset Formula $1+r$
+\end_inset
+
+ as 
+\begin_inset Formula $\Xi/\mu\to\infty$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment log-normal">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.3</mu>
+\end_layout
+
+\begin_layout LyX-Code
+  <sigma>0.25</sigma>
+\end_layout
+
+\begin_layout LyX-Code
+  <max>4</max>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+Weibull
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-Weibull"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a Weibull recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment Weibull
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum increase 
+\begin_inset Formula $r$
+\end_inset
+
+ in bond recruitment from 1 (default is 0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the recruitment functions is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=1+r\left(1-\exp\left[-\left(\Xi/\mu\right)^{\alpha}\right]\right)\,.
+\]
+
+\end_inset
+
+Its minimum value is 
+\begin_inset Formula $1$
+\end_inset
+
+ and its maximum value is 
+\begin_inset Formula $1+r$
+\end_inset
+
+ as 
+\begin_inset Formula $\Xi/\mu\to\infty$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.3</mu>
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>2.0</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <max>4</max>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+Quintic Polynomial
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-quintic"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a quintic polynomial bond recruitment function is
+ 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment quintic
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mumin>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{\min}$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu_{\min}>0)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mumax>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu_{\max}$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu_{\max}>\mu_{\min})$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum increase 
+\begin_inset Formula $r$
+\end_inset
+
+ in bond recruitment from 1 (default is 0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the bond recruitment function is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=\begin{cases}
+1 & \Xi\leqslant\mu_{\min}\\
+1+rx^{3}\left(10-15x+6x^{2}\right) & \mu_{\min}<\Xi\leqslant\mu_{\max}\\
+1+r & \mu_{\max}<\Xi
+\end{cases}\,,\quad x=\frac{\Xi-\mu_{\min}}{\mu_{\max}-\mu_{\min}}\,.
+\]
+
+\end_inset
+
+Its minimum value is 
+\begin_inset Formula $1$
+\end_inset
+
+ and its maximum value is 
+\begin_inset Formula $1+r$
+\end_inset
+
+ when 
+\begin_inset Formula $\Xi\ge\mu_{\text{max}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment quintic">
+\end_layout
+
+\begin_layout LyX-Code
+  <mumin>0.2</mumin>
+\end_layout
+
+\begin_layout LyX-Code
+  <mumax>0.4</mumax>
+\end_layout
+
+\begin_layout LyX-Code
+  <Dmax>4</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+</recruitment>
+\end_layout
+
+\begin_layout Subsubsection
+Gamma
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:recruitment-gamma"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a gamma recruitment function is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+recruitment gamma
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha>0$
+\end_inset
+
+) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<max>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum increase 
+\begin_inset Formula $r$
+\end_inset
+
+ in bond recruitment from 1 (default is 0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the bond recruitment functions is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=1+r\frac{\gamma\left(\alpha,\Xi/\mu\right)}{\Gamma\left(\alpha,0\right)}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\gamma\left(\alpha,z\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma\left(\alpha,z\right)$
+\end_inset
+
+ are the lower and upper incomplete gamma functions, respectively.
+ The normalization by 
+\begin_inset Formula $\Gamma\left(\alpha,0\right)$
+\end_inset
+
+ ensures that this function is bounded by 
+\begin_inset Formula $1\le F\left(\Xi\right)\le1+r$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<recruitment type="recruitment gamma">
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>3</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.4</mu>
+\end_layout
+
+\begin_layout LyX-Code
+  <max>4</max>
 \end_layout
 
 \begin_layout LyX-Code
@@ -84493,6 +86697,224 @@ Example:
 
 \begin_layout LyX-Code
   <Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+</damage>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Gamma
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:CDF-gamma"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a gamma c.d.f.
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+CDF gamma
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<alpha>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ (
+\begin_inset Formula $\alpha>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameter 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (same units as 
+\begin_inset Formula $\Xi$
+\end_inset
+
+, 
+\begin_inset Formula $\mu>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\begin_inset Formula $\Xi$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material the c.d.f.
+ is given by 
+\begin_inset Formula 
+\[
+F\left(\Xi\right)=\frac{\gamma\left(\alpha,\Xi/\mu\right)}{\Gamma\left(\alpha,0\right)}\,,
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\gamma\left(\alpha,z\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma\left(\alpha,z\right)$
+\end_inset
+
+ are the lower and upper incomplete gamma functions, respectively.
+ The normalization by 
+\begin_inset Formula $\Gamma\left(\alpha,0\right)$
+\end_inset
+
+ ensures that this function is bounded by 
+\begin_inset Formula $0\le F\left(\Xi\right)\le1$
+\end_inset
+
+.
+ The figure below uses 
+\begin_inset Formula $\mu=0.15$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Graphics
+	filename Figures/FigDamageCDFgamma.png
+	lyxscale 50
+	width 4in
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<damage type="CDF gamma">
+\end_layout
+
+\begin_layout LyX-Code
+  <alpha>3</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+  <mu>0.15</mu>
 \end_layout
 
 \begin_layout LyX-Code
@@ -88991,6 +91413,1265 @@ DC von Mises stress
 
 \begin_layout LyX-Code
   <plastic_damage_criterion type="DC octahedral shear strain"/>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Viscoplasticity
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Viscoplasticity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A reactive viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) consists of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the equilibrium elastic response, and a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the viscous response.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response may be attributed to strong molecular bonds (e.g., covalent bonds)
+ in a material region, that don't break in the absence of damage, whereas
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response is attributed to weak molecular bonds (e.g., hydrogen bonds) in
+ the material region, that break under loading, and reform in a stress-free
+ state.
+\end_layout
+
+\begin_layout Standard
+To model viscoplasticity in a reactive framework, one may use a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plasticity
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) as the type of 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ material appearing in a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive viscoelastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material may be modeled as recommended previously (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive visoelasticity with reactive plasticity
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" name="Material2" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="reactive plasticity">
+\end_layout
+
+\begin_layout LyX-Code
+		<isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+		<rtol>0.0001</rtol>
+\end_layout
+
+\begin_layout LyX-Code
+		<secant_tangent>1</secant_tangent>
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>73000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<yield_criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+		<flow_curve type="PFC paper">
+\end_layout
+
+\begin_layout LyX-Code
+			<Y0>330</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+			<Ymax>489</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+			<w0>0.967</w0>
+\end_layout
+
+\begin_layout LyX-Code
+			<we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+			<nf>15</nf>
+\end_layout
+
+\begin_layout LyX-Code
+			<r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+		</flow_curve>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+		<E>7300</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>1.5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Reactive Viscoelasticity and Viscoplasticity with Damage
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Viscoelasticity-Damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A reactive viscoelastic material may undergo damage as detailed in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+.
+ Reactive viscoelastic materials (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Viscoelastic-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) consist of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the equilibrium elastic response, and a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, which imparts the viscous response.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response may be attributed to strong molecular bonds (e.g., covalent bonds)
+ in a material region, that don't break in the absence of damage, whereas
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response is attributed to weak molecular bonds (e.g., hydrogen bonds) in
+ the material region, that break under loading, and reform in a stress-free
+ state.
+\end_layout
+
+\begin_layout Standard
+It follows from this definition that the 
+\begin_inset Quotes eld
+\end_inset
+
+elastic
+\begin_inset Quotes erd
+\end_inset
+
+ material of a 
+\begin_inset Quotes eld
+\end_inset
+
+reactive viscoelastic
+\begin_inset Quotes erd
+\end_inset
+
+ material may undergo damage, as described for example in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ This damage is cause by the breaking of strong molecular bonds in the material
+ region, and the associated damage variable 
+\begin_inset Formula $D$
+\end_inset
+
+ represents the mass fraction of the material region whose strong bonds
+ have broken.
+ However, when strong molecular bonds break, the gap between molecular constitue
+nts of that material region may increase, also preventing the formation
+ of weak moleculer bonds (e.g., since hydrogen bonds may only form when there
+ is sufficient proximity between moeities associated with these bonds).
+ Based on the work of Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+, we can adopt the constitutive assumption that the fraction of weak bonds
+ that fails is the same as the fraction 
+\begin_inset Formula $D$
+\end_inset
+
+ of strong bonds that fail 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+.
+ Therefore, the stress 
+\begin_inset Formula $\boldsymbol{\sigma}^{e}$
+\end_inset
+
+ produced by strong bonds in a material region may be attenuated as 
+\begin_inset Formula $\left(1-D\right)\boldsymbol{\sigma}^{e}$
+\end_inset
+
+, just like the stress 
+\begin_inset Formula $\boldsymbol{\sigma}^{b}$
+\end_inset
+
+ produced by weak bonds may be reduced to 
+\begin_inset Formula $\left(1-D\right)\boldsymbol{\sigma}^{b}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+reactive viscoelastic
+\begin_inset Quotes erd
+\end_inset
+
+ material in FEBio automatically recognizes if its 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ component happens to be a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material, or a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+reactive plastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material.
+ In either of these cases, it will prescribe the damage 
+\begin_inset Formula $D$
+\end_inset
+
+ calculated from the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response to the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+bond
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ response.
+ In other words, it is possible to model viscoelastic damage and viscoplastic
+ damage in FEBio.
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive viscoelasticity with elastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Material1" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0.0001</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="elastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>1000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>2.5</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>125</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<E>2000</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+Example: Reactive viscoelasticity with reactive plastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="2" name="Material2" type="reactive viscoelastic">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<wmin>0.001</wmin>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinetics>1</kinetics>
+\end_layout
+
+\begin_layout LyX-Code
+	<trigger>0</trigger>
+\end_layout
+
+\begin_layout LyX-Code
+	<emin>0</emin>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="reactive plastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<isochoric>1</isochoric>
+\end_layout
+
+\begin_layout LyX-Code
+		<rtol>0.0001</rtol>
+\end_layout
+
+\begin_layout LyX-Code
+		<secant_tangent>1</secant_tangent>
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>73000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<yield_criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+		<flow_curve type="PFC paper">
+\end_layout
+
+\begin_layout LyX-Code
+			<Y0>330</Y0>
+\end_layout
+
+\begin_layout LyX-Code
+			<Ymax>489</Ymax>
+\end_layout
+
+\begin_layout LyX-Code
+			<w0>0.967</w0>
+\end_layout
+
+\begin_layout LyX-Code
+			<we>0</we>
+\end_layout
+
+\begin_layout LyX-Code
+			<nf>15</nf>
+\end_layout
+
+\begin_layout LyX-Code
+			<r>1</r>
+\end_layout
+
+\begin_layout LyX-Code
+		</flow_curve>
+\end_layout
+
+\begin_layout LyX-Code
+		<plastic_damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>0.65</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>7.95</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</plastic_damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<plastic_damage_criterion type="DC octahedral shear strain"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+	<bond type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+		<E>7300</E>
+\end_layout
+
+\begin_layout LyX-Code
+		<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+	</bond>
+\end_layout
+
+\begin_layout LyX-Code
+	<relaxation type="relaxation-exponential">
+\end_layout
+
+\begin_layout LyX-Code
+		<tau>1.5</tau>
+\end_layout
+
+\begin_layout LyX-Code
+	</relaxation>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Viscoelastic Damage
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Viscoelastic-Damage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Viscoelastic-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is fundamentally a continuum representation of the Standard Solid in classical
+ viscoelasticity, valid under finite deformation in the context of quasilinear
+ viscoelasticity.
+ The standard solid consists of a spring 
+\begin_inset Formula $e$
+\end_inset
+
+ in parallel with a Maxwell element (a spring 
+\begin_inset Formula $s$
+\end_inset
+
+ and dashpot 
+\begin_inset Formula $d$
+\end_inset
+
+ in series).
+ The spring stiffness in the Maxwell element is assumed to be equal to 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ times the stiffness of the parallel spring.
+ The elastic spring response may be a nonlinear function of the strain but
+ the viscoelastic response must be linear (i.e., it must obey Boltzmann's
+ superposition principle, equivalent to stating that the Maxwell element
+ response is governed by a linear ordinary differential equation, or ODE).
+ In general, a viscoelastic material of this type may undergo damage, using
+ the framework provided by Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+.
+ In FEBio we model this framework by adopting additional constitutive assumption
+s not provided by Simo, but outlined in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Ateshian23b"
+literal "false"
+
+\end_inset
+
+ and in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+.
+ The FEBio formulation for viscoelastic damage relies on a proper formulation
+ of the strain energy density of the Standard Solid, which is then employed
+ in the analysis of viscoelastic damage.
+ The strain energy density 
+\begin_inset Formula $\Psi_{r}\left(\mathbf{F}\right)$
+\end_inset
+
+ of the viscoelastic solid is given by 
+\begin_inset Formula 
+\[
+\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\gamma\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ is the (observable) deformation gradient of the material (also of the elastic
+ spring 
+\begin_inset Formula $e$
+\end_inset
+
+), 
+\begin_inset Formula $\mathbf{F}_{s}$
+\end_inset
+
+ is the deformation gradient associated with the Maxwell spring 
+\begin_inset Formula $s$
+\end_inset
+
+ (an internal variable which evolves based on a first-order ODE), and 
+\begin_inset Formula $\Psi_{r}^{e}$
+\end_inset
+
+ is the strain energy density of the elastic spring.
+ Let 
+\begin_inset Formula $\mathbf{S}^{e}$
+\end_inset
+
+ denote the second Piola-Kirchhoff stress in the elastic spring, obtained
+ from the standard hyperelasticity relation 
+\begin_inset Formula $\mathbf{S}^{e}=\partial\Psi_{r}\left(\mathbf{F}\right)/\partial\mathbf{E}$
+\end_inset
+
+, where 
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+ is the Lagrange strain tensor evaluated from 
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+.
+ It follows from the above relation for the strain energy density that 
+\begin_inset Formula $\mathbf{S}\left(\mathbf{F}\right)=\mathbf{S}^{e}\left(\mathbf{F}\right)+\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Damage 
+\begin_inset Formula $D^{e}$
+\end_inset
+
+ is produced in the elastic spring 
+\begin_inset Formula $e$
+\end_inset
+
+ according to the framework described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, based on a user-defined damage criterion 
+\begin_inset Formula $\Xi^{e}\left(\mathbf{F}\right)$
+\end_inset
+
+ (such as von Mises stress or maximum principal normal stress), such that
+ 
+\begin_inset Formula $0\le D^{e}\le1$
+\end_inset
+
+ represents the range from zero to complete damage.
+ The resulting stress in the elastic spring is now given by the attenuated
+ value 
+\begin_inset Formula $\left(1-D^{e}\right)\mathbf{S}^{e}$
+\end_inset
+
+
+\begin_inset Formula $\left(\mathbf{F}\right)$
+\end_inset
+
+.
+ Based on Simo 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Simo87"
+literal "false"
+
+\end_inset
+
+, FEBio assumes that the damage in the Maxwell element is similarly given
+ by 
+\begin_inset Formula $\left(1-D^{e}\right)\gamma\mathbf{S}^{e}\left(\mathbf{F}_{s}\right)$
+\end_inset
+
+.
+ Thus, the stress in a damaged viscoelastic material in FEBio is evaluated
+ from 
+\begin_inset Formula $\left(1-D^{e}\right)\mathbf{S}\left(\mathbf{F}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The specification of a material with 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+viscoelastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ takes the same form as that of a viscoelastic material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Viscoelastic-Solids"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), except that the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ component should now consist of an 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+elastic damage
+\emph default
+
+\begin_inset Quotes erd
+\end_inset
+
+ material type, whose specification is outlined in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example: Viscoelastic damage
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" name="Material1" type="viscoelastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+	<density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+	<t1>5</t1>
+\end_layout
+
+\begin_layout LyX-Code
+	<t2>1</t2>
+\end_layout
+
+\begin_layout LyX-Code
+	<t3>1</t3>
+\end_layout
+
+\begin_layout LyX-Code
+	<t4>1</t4>
+\end_layout
+
+\begin_layout LyX-Code
+	<t5>1</t5>
+\end_layout
+
+\begin_layout LyX-Code
+	<t6>1</t6>
+\end_layout
+
+\begin_layout LyX-Code
+	<g0>1</g0>
+\end_layout
+
+\begin_layout LyX-Code
+	<g1>2</g1>
+\end_layout
+
+\begin_layout LyX-Code
+	<g2>0</g2>
+\end_layout
+
+\begin_layout LyX-Code
+	<g3>0</g3>
+\end_layout
+
+\begin_layout LyX-Code
+	<g4>0</g4>
+\end_layout
+
+\begin_layout LyX-Code
+	<g5>0</g5>
+\end_layout
+
+\begin_layout LyX-Code
+	<g6>0</g6>
+\end_layout
+
+\begin_layout LyX-Code
+	<elastic type="elastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+		<elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+			<E>1000</E>
+\end_layout
+
+\begin_layout LyX-Code
+			<v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+		</elastic>
+\end_layout
+
+\begin_layout LyX-Code
+		<damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+			<Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+			<alpha>2.5</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+			<mu>125</mu>
+\end_layout
+
+\begin_layout LyX-Code
+			<ploc>0</ploc>
+\end_layout
+
+\begin_layout LyX-Code
+		</damage>
+\end_layout
+
+\begin_layout LyX-Code
+		<criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+	</elastic>
 \end_layout
 
 \begin_layout LyX-Code
@@ -105624,6 +109305,323 @@ Example:
 
 \end_layout
 
+\begin_layout Subsubsection
+Quemada Model
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Quemada-Fluid"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for a Quemada model 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Quemada78"
+literal "true"
+
+\end_inset
+
+ is 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Quemada
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following material parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mu0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shear viscosity at zero shear rate suspension volume fraction, 
+\begin_inset Formula $\mu_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+t
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<H>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+suspension volume fraction, 
+\begin_inset Formula $H$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+intrinsic relative viscosity at zero shear rate, 
+\begin_inset Formula $k_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<kinf>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+intrinsic relative viscosity at infinite shear rate, 
+\begin_inset Formula $k_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<gc>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+critical shear rate, 
+\begin_inset Formula $\dot{\gamma}_{c}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+t
+\series default
+
+\begin_inset Formula $^{-1}$
+\end_inset
+
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The viscous shear stress for this material model is
+\begin_inset Formula 
+\[
+\boldsymbol{\tau}=2\mu\mathbf{D}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mu=\frac{\mu_{0}}{\left(1-k\frac{H}{2}\right)^{2}}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+k=\frac{k_{0}+k_{\infty}\sqrt{\dot{\gamma}_{r}}}{1+\sqrt{\dot{\gamma}_{r}}}\,,\quad\dot{\gamma}_{r}=\frac{\dot{\gamma}}{\dot{\gamma}_{c}}
+\]
+
+\end_inset
+
+Here, 
+\begin_inset Formula $\dot{\gamma}=\sqrt{2\mathbf{D}:\mathbf{D}}$
+\end_inset
+
+ is the engineering shear rate.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<viscous type="Quemada">
+\end_layout
+
+\begin_layout LyX-Code
+	<mu0>0.03</mu0>
+\end_layout
+
+\begin_layout LyX-Code
+	<H>0.5</H>
+\end_layout
+
+\begin_layout LyX-Code
+	<k0>3.691</k0>
+\end_layout
+
+\begin_layout LyX-Code
+	<kinf>1.778</kinf>
+\end_layout
+
+\begin_layout LyX-Code
+    <gc>2.30</gc>
+\end_layout
+
+\begin_layout LyX-Code
+</viscous>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 General Specification of Fluid-FSI Materials
 \begin_inset CommandInset label
@@ -112029,11 +116027,10 @@ The
 \emph on
 data-fit
 \emph default
- model tries to fit predicted FE data to a user-defined data curve of time-value
- pairs.
+ model tries to fit predicted FE data to a user-defined data curve.
  The data curve usually represents some experimentally obtained result,
  e.g.
- reaction force, as a function of time.
+ reaction force as a function of time.
  The data-fit model needs a data source, i.e.
  a function for extracting the model data, and the data curve.
  
@@ -112081,28 +116078,127 @@ data-fit
 
 \begin_layout Standard
 The data source is defined by the type attribute of the fnc tag.
- There are currently two supported values.
+ The following table shows the supported values.
  
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
 
-\emph on
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 parameter
-\emph default
-: The function will track the time evolution of a model parameter.
- 
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
+\begin_layout Plain Layout
+The function will track the evolution of a model parameter.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 filter_positive_only
-\emph default
-: Another data source is needed to extract model data (e.g.
- parameter), but only positive values are returned.
- If the model parameter's value was negative, zero will be returned by the
- function.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The function tracks the evoluation of a model parameter, but filters only
+ the positive values.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+filter_sum
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The function is defined by summing nodal values.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+parameter
 \end_layout
 
 \begin_layout Standard
@@ -112176,6 +116272,66 @@ sz
 
 \begin_layout LyX-Code
   <param name="fem.element_data('sz',1)"/>
+\end_layout
+
+\begin_layout LyX-Code
+</fnc>
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+filter_positive_only
+\end_layout
+
+\begin_layout Standard
+This option requires another data source that is needed to extract model
+ data (e.g.
+ parameter), but only positive values are returned.
+ If the model parameter's value is negative, zero will be returned by the
+ function.
+\end_layout
+
+\begin_layout LyX-Code
+<fnc type="filter_positive_only">
+\end_layout
+
+\begin_layout LyX-Code
+  <source type="parameter">
+\end_layout
+
+\begin_layout LyX-Code
+    <param name="fem.rigidbody('rigid').Fz"/>
+\end_layout
+
+\begin_layout LyX-Code
+  </source>
+\end_layout
+
+\begin_layout LyX-Code
+</fnc>
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+filter_sum
+\end_layout
+
+\begin_layout Standard
+This option will sum up nodal values and use that in the objective function.
+ The summed value is always assumed to be a function of time.
+ The following example illustrates how this option can be used to define
+ an objective function from the sum of nodal reaction forces.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<fnc type="filter_sum">
+\end_layout
+
+\begin_layout LyX-Code
+  <node_data data="Rx" node_set="top surface"/>
 \end_layout
 
 \begin_layout LyX-Code
@@ -113354,7 +117510,7 @@ negative jacobians
  You can request FEBio to print out a detailed list of the inverted elements,
  by setting the 
 \emph on
-output_negative_jacobian
+output_negative_jacobians
 \emph default
  configuration flag in the FEBio configuration file.
  (see 
@@ -113965,9 +118121,9 @@ name "subsec:Augmented-Lagrangian-Method"
 In theory, in the presence of constraints, the corresponding Lagrange multiplier
 s must be calculated which, in the case of contact, correspond to the contact
  forces that enforce the contact constraint exactly.
- Unfortunately, the exact evaluation of these Lagrange multiplies is numerically
- very challenging and therefore in FEBio it was decided to evaluate these
- Lagrange multipliers in an iterative method, named the 
+ Unfortunately, the exact evaluation of these Lagrange multipliers is numericall
+y very challenging and therefore in FEBio it was decided to evaluate these
+ Lagrange multipliers using an iterative method, named the 
 \shape italic
 Augmented Lagrangian 
 \shape default
@@ -114008,9 +118164,15 @@ In many cases, users are only interested in the final time step.
  Lagrange method only in the final time step.
  This can be done by defining a loadcurve for the 
 \shape italic
-laugon 
+tolerance
 \shape default
-contact parameter.
+ contact parameter, which sets the convergence tolerance for the augmentations.
+ (Note that you still need to set the enforcement method, i.e.
+ the 
+\emph on
+laugon
+\emph default
+ paramerter, to AUGLAG (=1)).
  Then, define the corresponding loadcurve as zero everywhere except for
  the final time step.
  FEBio will now only use the augmented Lagrangian method in the final time
@@ -117036,7 +121198,7 @@ Process child tags only for release versions of FEBio (4)
 \begin_inset Text
 
 \begin_layout Plain Layout
-output_negative_jacobian
+output_negative_jacobians
 \end_layout
 
 \end_inset
@@ -117195,7 +121357,7 @@ negative jacobians
  If you wish to see a detailed list of the inverted elements, you can set
  the 
 \emph on
-output_negative_jacobian
+output_negative_jacobians
 \emph default
  flag to 1.
 \end_layout
@@ -117302,7 +121464,7 @@ type
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="4">
+<lyxtabular version="3" rows="9" columns="4">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top">
@@ -117587,7 +121749,7 @@ S/U
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -117596,7 +121758,7 @@ schur
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -117605,7 +121767,7 @@ A block based iterative solver.
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -117614,11 +121776,49 @@ It
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 B
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+accelerate
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Apple-specific sparse solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D/It
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+S/U
 \end_layout
 
 \end_inset
@@ -119260,6 +123460,277 @@ The solver for the A block in the Schur complement
 \end_layout
 
 \begin_layout Subsection
+Accelerate
+\end_layout
+
+\begin_layout Standard
+The Accelerate sparse solver is only available on Apple computers (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://developer.apple.com/documentation/accelerate/sparse_solvers
+\end_layout
+
+\end_inset
+
+).
+ It uses the native Accelerate framework of Mac OS.
+ It may be used as a direct solver or an iterative solver.
+ Users should consult the Apple documentation to determine optimal settings
+ for this solver, based on their application.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+print_condition_number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Print the matrix condition number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (false)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iterative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Use iterative solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (false)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+factorization
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Factorization method (0 to 6)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+U:5=QR, S:4=DLTTPP
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+order_method
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ordering algorithm (0 to 2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+U:2=COLAMD, S:0=AMD
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iterative_method
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Iterative method (0 to 4)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4=LSMR
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The factorization methods include: 0=Cholesky, 1=LDLT, 2=LDLTUnpivoted,
+ 3=LDLTSBK, 4=LDLTTPP , 5=QR, 6=CholeskyAtA (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://developer.apple.com/documentation/accelerate/sparsefactorization_t
+\end_layout
+
+\end_inset
+
+).
+ The ordering algorithms include: 0=AMD, 1=Metis, 2=COLAMD (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://developer.apple.com/documentation/accelerate/sparseorder_t
+\end_layout
+
+\end_inset
+
+).
+ The iterative methods include: 0=ConjugateGradient, 1=GMRES, 2=DQGMRES,
+ 3=FGMRES, 4=LSMR (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://developer.apple.com/documentation/accelerate/sparse_solvers/sparse_iterati
+ve_methods
+\end_layout
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
 Examples
 \end_layout
 
@@ -120831,7 +125302,7 @@ Parsers should read this number and use it to identify whether the file
 \series bold
 \emph on
 NOTE: Note that the FEBio tag is not followed by a size tag.
- The reason is because when FEBio is writing the file it does not know the
+ The reason is that when FEBio is writing the file it does not know the
  length of the final file yet.
 \end_layout
 

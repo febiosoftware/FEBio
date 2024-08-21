@@ -74,7 +74,7 @@ END_FECORE_CLASS();
 //! FEFluidFSISolver Construction
 //
 FEFluidFSISolver::FEFluidFSISolver(FEModel* pfem) : FENewtonSolver(pfem), m_rigidSolver(pfem), \
-m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofR(pfem), m_dofVF(pfem),m_dofAF(pfem),m_dofW(pfem), m_dofAW(pfem), m_dofEF(pfem)
+m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofQ(pfem),m_dofRQ(pfem), m_dofVF(pfem),m_dofAF(pfem),m_dofW(pfem), m_dofAW(pfem), m_dofEF(pfem)
 {
     // default values
     m_Rtol = 0.001;
@@ -119,7 +119,8 @@ m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofR(p
         m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
         m_dofSV.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_VELOCITY));
         m_dofSA.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_ACCELERATION));
-        m_dofR.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RIGID_ROTATION));
+        m_dofQ.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::ROTATION));
+        m_dofRQ.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RIGID_ROTATION));
         m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
         m_dofAW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_ACCELERATION));
         m_dofVF.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::FLUID_VELOCITY));
@@ -859,7 +860,7 @@ void FEFluidFSISolver::PrepStep()
     for (int i = 0; i < nsl; ++i)
     {
         FEModelLoad& pml = *fem.ModelLoad(i);
-        if (pml.IsActive()) pml.Update();
+        if (pml.IsActive()) pml.PrepStep();
     }
     
     // do the linear constraints
@@ -893,7 +894,7 @@ void FEFluidFSISolver::PrepStep()
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-        if (ci.IsActive() && (ci.m_laugon != 1)) m_baugment = true;
+        if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
     }
     
 	// see if we need to do incompressible augmentations

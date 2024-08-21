@@ -72,6 +72,9 @@ void FESoluteFlux::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 bool FESoluteFlux::Init()
 {
+	if (m_psurf == nullptr) return false;
+	m_psurf->SetShellBottom(m_bshellb);
+
 	if (m_isol == -1) return false;
 
 	// set up the dof lists

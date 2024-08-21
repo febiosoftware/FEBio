@@ -213,7 +213,7 @@ FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FESurfaceConstraint(
 	static int count = 1;
 	SetID(count++);
 
-	m_laugon = 0;
+	m_laugon = FECore::PENALTY_METHOD;
 
 	m_a[0] = m_a[1] = m_a[2] = m_a[3] = 0.0;
 
@@ -562,7 +562,7 @@ void FERigidWallInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 bool FERigidWallInterface::Augment(int naug, const FETimeInfo& tp)
 {
 	// make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	int i;
 	double Lm;

@@ -44,6 +44,8 @@ public:
 
 		void Serialize(DumpStream& ar);
 
+		void Init() override;
+
 	public:
 		double	m_Lm;	//!< Lagrange multipliers
 		double	m_eps;	//!< penalty value at integration point

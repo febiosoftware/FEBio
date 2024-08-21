@@ -108,31 +108,24 @@ int FEMechModel::FindRigidbodyFromMaterialID(int matId)
 }
 
 //-----------------------------------------------------------------------------
-// return number or rigid prescribed BCs
-int FEMechModel::RigidPrescribedBCs() const
+// return number or rigid BCs
+int FEMechModel::RigidBCs() const
 {
-	return m_prs->PrescribedBCs();
+	return m_prs->RigidBCs();
 }
 
 //-----------------------------------------------------------------------------
-// return the rigid prescribed displacement
-FERigidPrescribedBC* FEMechModel::GetRigidPrescribedBC(int i)
+// return the rigid displacement
+FERigidBC* FEMechModel::GetRigidBC(int i)
 {
-	return m_prs->PrescribedBC(i);
+	return m_prs->RigidBC(i);
 }
 
 //-----------------------------------------------------------------------------
 // add a rigid presribed BC
-void FEMechModel::AddRigidPrescribedBC(FERigidPrescribedBC* pDC)
+void FEMechModel::AddRigidBC(FERigidBC* pDC)
 {
-	m_prs->AddPrescribedBC(pDC);
-}
-
-//-----------------------------------------------------------------------------
-// add a rigid fixed BC
-void FEMechModel::AddRigidFixedBC(FERigidFixedBC* pBC)
-{
-	m_prs->AddFixedBC(pBC);
+	m_prs->AddRigidBC(pDC);
 }
 
 //-----------------------------------------------------------------------------
@@ -175,10 +168,10 @@ bool FEMechModel::InitMesh()
 
 //-----------------------------------------------------------------------------
 //! Initialize shells
-void FEMechModel::InitShells()
+bool FEMechModel::InitShells()
 {
 	// Base class does most of the work
-	FEModel::InitShells();
+	if (!FEModel::InitShells()) return false;
 
 	// NOTE: This was moved here because I wanted to FEMaterial::IsRigid to FESolidMaterial::IsRigid
 	//       This was part of the move to rid the FECore library of rigid stuff
@@ -213,6 +206,8 @@ void FEMechModel::InitShells()
 			}
 		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include "log.h"
 
 BEGIN_FECORE_CLASS(FELoadCurve, FELoadController)
-	ADD_PARAMETER(m_int, "interpolate", 0, "LINEAR\0STEP\0SMOOTH\0CUBIC SPLINE\0CONTROL POINTS\0APPROXIMATION\0SMOOTH STEP\0");
+	ADD_PARAMETER(m_int, "interpolate", 0, "LINEAR\0STEP\0SMOOTH\0CUBIC SPLINE\0CONTROL POINTS\0APPROXIMATION\0SMOOTH STEP\0C2-SMOOTH\0");
 	ADD_PARAMETER(m_ext, "extend"     , 0, "CONSTANT\0EXTRAPOLATE\0REPEAT\0REPEAT OFFSET\0");
 	ADD_PARAMETER(m_points, "points");
 END_FECORE_CLASS();
@@ -48,11 +48,15 @@ FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem)
 FELoadCurve::FELoadCurve(const FELoadCurve& lc) : FELoadController(lc)
 {
 	m_fnc = lc.m_fnc;
+	m_int = lc.m_int;
+	m_ext = lc.m_ext;
 }
 
 void FELoadCurve::operator = (const FELoadCurve& lc)
 {
 	m_fnc = lc.m_fnc;
+	m_int = lc.m_int;
+	m_ext = lc.m_ext;
 }
 
 FELoadCurve::~FELoadCurve()

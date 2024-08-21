@@ -339,8 +339,9 @@ double FEDamageCDFGamma::cdf(FEMaterialPoint& mp, const double X)
     double mu = m_mu(mp);
     
     // this CDF only admits positive values
+    double scale = gamma_inc_Q(alpha,0);
     if (X > 0)
-        cdf = gamma_inc_P(alpha,X/mu);
+        cdf = gamma_inc_P(alpha,X/mu)/scale;
     
     return cdf;
 }

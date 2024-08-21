@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <limits>
 #include "FEElasticShellDomain.h"
 #include "FEElasticMaterial.h"
 #include "FEBodyForce.h"
@@ -386,7 +387,7 @@ void FEElasticShellDomain::ElementBodyForceStiffness(FEBodyForce& BF, FEShellEle
     double detJ;
     double *M;
     double* gw = el.GaussWeights();
-    mat3ds K;
+    mat3d K;
     
     double Mu[FEElement::MAX_NODES], Md[FEElement::MAX_NODES];
     
@@ -886,7 +887,7 @@ void FEElasticShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 
             mat3ds D = pt.m_L.sym();
             double D2 = D.dotdot(D);
-            if (D2 > 0)
+            if (D2 > std::numeric_limits<double>::epsilon())
                 pt.m_s += D*(((pt.m_Wt-pt.m_Wp)/(dt*pt.m_J) - pt.m_s.dotdot(D))/D2);
         }
     }

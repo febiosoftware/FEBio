@@ -105,7 +105,7 @@ bool AkimaSpline::init(const std::vector<vec2d>& p)
         s[ncoef-1] = m[ncoef-2];
         for (int i=2; i<ncoef-2; ++i) {
             double d = fabs(m[i+1]-m[i]) + fabs(m[i-1]-m[i-2]);
-            s[i] = (fabs(d) > eps) ? (fabs(m[i+1]-m[i])*m[i-1]+fabs(m[i-1]-m[i-2])*m[i])/d : (m[i-1]+m[2])/2;
+            s[i] = (fabs(d) > eps) ? (fabs(m[i+1]-m[i])*m[i-1]+fabs(m[i-1]-m[i-2])*m[i])/d : (m[i-1]+m[i])/2;
         }
     }
 

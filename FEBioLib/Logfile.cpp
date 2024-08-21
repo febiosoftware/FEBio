@@ -101,7 +101,7 @@ void Logfile::printf(const char* sz, ...)
 	// make the message
 	char sztxt[2048] = {0};
 	va_start(args, sz);
-	vsprintf(sztxt, sz, args);
+	vsnprintf(sztxt, sizeof(sztxt), sz, args);
 	va_end(args);
 	
 	// print to file
@@ -123,13 +123,13 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 	// make the message
 	char sztxt[1024] = {0};
 	va_start(args, sz);
-	vsprintf(sztxt, sz, args);
+	vsnprintf(sztxt, 1024, sz, args);
 	va_end(args);
 
 	// print the box
 	char szmsg[1024] = {0};
 	char* ch = szmsg;
-	sprintf(szmsg,"\n *************************************************************************\n"); ch += strlen(ch);
+	snprintf(szmsg,sizeof(szmsg), "\n *************************************************************************\n"); ch += strlen(ch);
 	// print the title
 	if (sztitle)
 	{
@@ -138,9 +138,9 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 		char right[60] = {0};
 		strncpy(left, sztitle, l/2);
 		strncpy(right, sztitle+l/2, l - l/2);
-		sprintf(ch," * %33s", left); ch += strlen(ch);
-		sprintf(ch,"%-36s *\n", right); ch += strlen(ch);
-//		sprintf(ch," *%71s*\n", ""); ch += strlen(ch);
+		snprintf(ch,1024, " * %33s", left); ch += strlen(ch);
+		snprintf(ch,1024, "%-36s *\n", right); ch += strlen(ch);
+//		snprintf(ch,1024, " *%71s*\n", ""); ch += strlen(ch);
 	}
 
 	// print the message
@@ -162,13 +162,13 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 			if (cn) *cn = '\n';
 			cn = ct + n; 
 		}
-		sprintf(ch," * %-69s *\n", ct); ch += strlen(ch);
+		snprintf(ch,1024," * %-69s *\n", ct); ch += strlen(ch);
 		if (wrap) { ct[n] = tmp; }
 		if (cn) ct = cn+1;
 	}
 	while (cn);
 //	sprintf(ch," *                                                                       *\n"); ch += strlen(ch);
-	sprintf(ch," *************************************************************************\n");
+	snprintf(ch,1024," *************************************************************************\n");
 
 	// print the message
 	printf(szmsg);

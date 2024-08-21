@@ -103,7 +103,7 @@ void FEBioGeometrySection3::ParsePartSection(XMLTag& tag)
 
 		// redirect input to another file
 		char xpath[256] = {0};
-		sprintf(xpath, "febio_spec/Geometry/Part[@name=%s]", szname);
+		snprintf(xpath, sizeof(xpath), "febio_spec/Geometry/Part[@name=%s]", szname);
 		XMLReader xml;
 		if (xml.Open(szfrom) == false) throw XMLReader::InvalidAttributeValue(tag, "from", szfrom);
 		XMLTag tag2;

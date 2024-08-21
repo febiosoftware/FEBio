@@ -45,19 +45,19 @@ public:
     virtual double Pressure(FEMaterialPoint& pt) = 0;
     
     //! tangent of pressure with respect to strain J
-    virtual double Tangent_Strain(FEMaterialPoint& mp) = 0;
+    virtual double Tangent_Strain(FEMaterialPoint& mp);
     
     //! 2nd tangent of pressure with respect to strain J
-    virtual double Tangent_Strain_Strain(FEMaterialPoint& mp) = 0;
+    virtual double Tangent_Strain_Strain(FEMaterialPoint& mp);
     
     //! tangent of pressure with respect to temperature T
-    virtual double Tangent_Temperature(FEMaterialPoint& mp) = 0;
+    virtual double Tangent_Temperature(FEMaterialPoint& mp);
     
     //! 2nd tangent of pressure with respect to temperature T
-    virtual double Tangent_Temperature_Temperature(FEMaterialPoint& mp) = 0;
+    virtual double Tangent_Temperature_Temperature(FEMaterialPoint& mp);
     
     //! tangent of pressure with respect to strain J and temperature T
-    virtual double Tangent_Strain_Temperature(FEMaterialPoint& mp) = 0;
+    virtual double Tangent_Strain_Temperature(FEMaterialPoint& mp);
     
     //! specific free energy
     virtual double SpecificFreeEnergy(FEMaterialPoint& mp) = 0;
@@ -72,10 +72,10 @@ public:
     virtual double IsochoricSpecificHeatCapacity(FEMaterialPoint& mp) = 0;
             
     //! tangent of isochoric specific heat capacity with respect to strain J
-    virtual double Tangent_cv_Strain(FEMaterialPoint& mp) = 0;
+    virtual double Tangent_cv_Strain(FEMaterialPoint& mp);
             
     //! tangent of isochoric specific heat capacity with respect to temperature T
-    virtual double Tangent_cv_Temperature(FEMaterialPoint& mp) = 0;
+    virtual double Tangent_cv_Temperature(FEMaterialPoint& mp);
 
     //! isobaric specific heat capacity
     virtual double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) = 0;

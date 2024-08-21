@@ -58,7 +58,7 @@ public:
 	virtual double CurrentVolume(FEShellElement& el) { return 0.0; }
 
 	// Initialize shell data (Called from FEMesh::InitShells)
-	virtual void InitShells();
+	virtual bool InitShells();
 
 	virtual void AssignDefaultShellThickness() {}
 
@@ -75,6 +75,8 @@ public:
     
 public:
 	void ForEachShellElement(std::function<void(FEShellElement& el)> f);
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -100,7 +102,7 @@ public:
 
 	double Volume(FEShellElement& el) override;
 
-	void InitShells() override;
+	bool InitShells() override;
 
 protected:
 	vector<FEShellElementOld>	m_Elem;	//!< array of elements

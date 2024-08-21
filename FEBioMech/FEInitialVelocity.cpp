@@ -52,7 +52,7 @@ bool FEInitialVelocity::Init()
 	FEDofList dofs(GetFEModel());
 	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY)) == false) return false;
 	SetDOFList(dofs);
-	return true;
+	return FENodalIC::Init();
 }
 
 // return the values for node i
@@ -96,7 +96,7 @@ bool FEInitialShellVelocity::Init()
 	FEDofList dofs(GetFEModel());
 	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::SHELL_VELOCITY)) == false) return false;
 	SetDOFList(dofs);
-	return true;
+	return FENodalIC::Init();
 }
 
 // return the values for node i

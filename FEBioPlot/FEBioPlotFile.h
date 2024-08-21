@@ -321,6 +321,7 @@ protected:
 	int			m_meshesWritten;	// nr of meshes written
 	string		m_softwareString;	// the software string
 	bool		m_exportUnitsFlag;	// flag that indicates whether to write units
+	bool		m_exportErodedElements; // export the eroded elements or not 
 
 	std::vector<Surface>	m_Surf;
 

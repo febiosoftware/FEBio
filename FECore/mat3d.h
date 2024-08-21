@@ -220,6 +220,9 @@ public:
 	mat3ds& operator += (const mat3dd& d);
 	mat3ds& operator -= (const mat3dd& d);
 
+	// comparison
+	bool operator == (const mat3ds& d);
+
 	// matrix-vector multiplication
 	vec3d operator * (const vec3d& r) const;
 
@@ -363,6 +366,13 @@ public:
 	mat3d(const mat2d& m);
 
 	mat3d(const vec3d& e1, const vec3d& e2, const vec3d& e3);
+
+	// construct a matrix from two vectors a and b. (a and b not colinear!)
+	// e1 = a.unit()
+	// e3 = (a ^ b).unit()
+	// e2 = e3 ^ e1
+	// Q = [e1 e2 e3]
+	mat3d(const vec3d& a, const vec3d& b);
 
 	// assignment operators
 	mat3d& operator = (const mat3dd& m);

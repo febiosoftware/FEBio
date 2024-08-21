@@ -150,10 +150,11 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 	for (int i = 0; i<NO; ++i) fem.GetRigidBody(i)->Init();
 
 	// calculate local rigid displacements
-	for (int i = 0; i<fem.RigidPrescribedBCs(); ++i)
+	int NRBC = fem.RigidBCs();
+	for (int i = 0; i < NRBC; ++i)
 	{
-		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
-		if (DC.IsActive()) DC.InitTimeStep();
+		FERigidBC& rbc = *fem.GetRigidBC(i);
+		if (rbc.IsActive()) rbc.InitTimeStep();
 	}
 
 	// calculate global rigid displacements
@@ -270,39 +271,47 @@ void FERigidSolver::PrepStep(const FETimeInfo& timeInfo, vector<double>& ui)
 		}
 	}
 
-	FEAnalysis* pstep = m_fem->GetCurrentStep();
-	if (pstep->m_nanalysis == FESolidAnalysis::DYNAMIC)
-	{
-		FEMesh& mesh = m_fem->GetMesh();
+    for (int i = 0; i<NO; ++i)
+    {
+        FERigidBody& RB = *fem.GetRigidBody(i);
 
-		// set the initial velocities of all rigid nodes
-		for (int i = 0; i<mesh.Nodes(); ++i)
-		{
-			FENode& n = mesh.Node(i);
-			if (n.m_rid >= 0)
-			{
-				FERigidBody& rb = *fem.GetRigidBody(n.m_rid);
-				vec3d V = rb.m_vt;
-				vec3d W = rb.m_wt;
-				vec3d r = n.m_rt - rb.m_rt;
+        quatd q = RB.GetRotation()*RB.m_qp.Inverse();
+        q.MakeUnit();
 
-				vec3d v = V + (W ^ r);
-				n.m_vp = v;
-				n.set_vec3d(m_dofVX, m_dofVY, m_dofVZ, v);
+        // update RB variables
+        // translation
+        RB.m_rp = RB.m_rt;
+        RB.m_vp = RB.m_vt;
+        RB.m_ap = RB.m_at;
+        // rotation
+        RB.m_qp = RB.GetRotation();
+        RB.m_wp = RB.m_wt;
+        RB.m_alp = RB.m_alt;
+        // angular momentum
+        RB.m_hp = RB.m_ht;
+        RB.m_dhp = RB.m_dht;
+        
+        // rigid body reaction force and moment
+        RB.m_Fp = RB.m_Fr;
+        RB.m_Mp = RB.m_Mr;
 
-				vec3d a = (W ^ V)*2.0 + (W ^ (W ^ r));
-				n.m_ap = n.m_at = a;
-			}
-		}
-	}
-
-	// store the current rigid body reaction forces
-	for (int i = 0; i<fem.RigidBodies(); ++i)
-	{
-		FERigidBody& RB = *fem.GetRigidBody(i);
-		RB.m_Fp = RB.m_Fr;
-		RB.m_Mp = RB.m_Mr;
-	}
+        // estimate RB kinematics at current time
+        double dt = timeInfo.timeIncrement;
+        double beta = timeInfo.beta;
+        double gamma = timeInfo.gamma;
+        double a = 1.0 / (beta*dt);
+        double b = a / dt;
+        double c = 1.0 - 0.5 / beta;
+        // acceleration and velocity of center of mass
+        RB.m_at = RB.m_ap*c - RB.m_vp*a;
+        RB.m_vt = RB.m_vp + (RB.m_at*gamma + RB.m_ap*(1-gamma))*dt;
+        // angular acceleration and velocity of rigid body
+        vec3d vq = q.GetVector()*(2 * tan(q.GetAngle() / 2));  // Cayley transform
+        RB.m_wt = vq*(a*gamma) - RB.m_wp + (RB.m_wp + RB.m_alp*dt / 2.)*(2 - gamma / beta);
+        q.RotateVector(RB.m_wt);
+        RB.m_alt = vq*b - RB.m_wp*a + RB.m_alp*c;
+        q.RotateVector(RB.m_alt);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -409,28 +418,28 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
 							mat3d M;
 
 							// Kuu transformation to Krr
-							M = Kuu * alpha;
+							M = Kuu;
 							KR[0][0] = M[0][0]; KR[0][1] = M[0][1]; KR[0][2] = M[0][2];
 							KR[1][0] = M[1][0]; KR[1][1] = M[1][1]; KR[1][2] = M[1][2];
 							KR[2][0] = M[2][0]; KR[2][1] = M[2][1]; KR[2][2] = M[2][2];
 
 
 							// Kuu transformation to Krq
-							M = Kuu * Zj*(-alpha);
+							M = Kuu * Zj*(-1);
 							KR[0][3] = M[0][0]; KR[0][4] = M[0][1]; KR[0][5] = M[0][2];
 							KR[1][3] = M[1][0]; KR[1][4] = M[1][1]; KR[1][5] = M[1][2];
 							KR[2][3] = M[2][0]; KR[2][4] = M[2][1]; KR[2][5] = M[2][2];
 
 
 							// Kuu transformation to Kqr
-							M = Zi * Kuu*alpha;
+							M = Zi * Kuu;
 							KR[3][0] = M[0][0]; KR[3][1] = M[0][1]; KR[3][2] = M[0][2];
 							KR[4][0] = M[1][0]; KR[4][1] = M[1][1]; KR[4][2] = M[1][2];
 							KR[5][0] = M[2][0]; KR[5][1] = M[2][1]; KR[5][2] = M[2][2];
 
 
 							// Kuu transformation to Kqq
-							M = Zi * Kuu*Zj*(-alpha);
+							M = Zi * Kuu*Zj*(-1);
 							KR[3][3] = M[0][0]; KR[3][4] = M[0][1]; KR[3][5] = M[0][2];
 							KR[4][3] = M[1][0]; KR[4][4] = M[1][1]; KR[4][5] = M[1][2];
 							KR[5][3] = M[2][0]; KR[5][4] = M[2][1]; KR[5][5] = M[2][2];
@@ -457,9 +466,9 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
 							// rigid dofs of node j
 							for (int k = 3; k < ndof; ++k) {
 								vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
-								vec3d m = kpu * alpha;
+								vec3d m = kpu;
 								KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-								m = Zj * kpu*alpha;
+								m = Zj * kpu;
 								KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
 							}
 
@@ -513,9 +522,9 @@ void FERigidSolver::RigidStiffnessSolid(SparseMatrix& K, vector<double>& ui, vec
 							// Kij
 							for (int k = 0; k < ndof; ++k) {
 								vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
-								vec3d m = kpu * alpha;
+								vec3d m = kpu;
 								KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-								m = Zj * kpu*alpha;
+								m = Zj * kpu;
 								KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
 							}
 
@@ -695,28 +704,28 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     mat3d M;
                     
                     // Kuu transformation
-                    M = (Kuu + Kwu + Kuw + Kww)*alpha;
+                    M = (Kuu + Kwu + Kuw + Kww);
                     KR[0][0] = M[0][0]; KR[0][1] = M[0][1]; KR[0][2] = M[0][2];
                     KR[1][0] = M[1][0]; KR[1][1] = M[1][1]; KR[1][2] = M[1][2];
                     KR[2][0] = M[2][0]; KR[2][1] = M[2][1]; KR[2][2] = M[2][2];
                     
                     
                     // Kuw transformation
-                    M = ((Kuu + Kwu)*Aj + (Kuw + Kww)*Bj)*(-alpha);
+                    M = ((Kuu + Kwu)*Aj + (Kuw + Kww)*Bj)*(-1);
                     KR[0][3] = M[0][0]; KR[0][4] = M[0][1]; KR[0][5] = M[0][2];
                     KR[1][3] = M[1][0]; KR[1][4] = M[1][1]; KR[1][5] = M[1][2];
                     KR[2][3] = M[2][0]; KR[2][4] = M[2][1]; KR[2][5] = M[2][2];
                     
                     
                     // Kwu transformation
-                    M = (Ai*(Kuu + Kuw) + Bi*(Kwu + Kww))*alpha;
+                    M = (Ai*(Kuu + Kuw) + Bi*(Kwu + Kww));
                     KR[3][0] = M[0][0]; KR[3][1] = M[0][1]; KR[3][2] = M[0][2];
                     KR[4][0] = M[1][0]; KR[4][1] = M[1][1]; KR[4][2] = M[1][2];
                     KR[5][0] = M[2][0]; KR[5][1] = M[2][1]; KR[5][2] = M[2][2];
                     
                     
                     // Kww transformation
-                    M = ((Ai*Kuu + Bi*Kwu)*Aj + (Ai*Kuw + Bi*Kww)*Bj)*(-alpha);
+                    M = ((Ai*Kuu + Bi*Kwu)*Aj + (Ai*Kuw + Bi*Kww)*Bj)*(-1);
                     KR[3][3] = M[0][0]; KR[3][4] = M[0][1]; KR[3][5] = M[0][2];
                     KR[4][3] = M[1][0]; KR[4][4] = M[1][1]; KR[4][5] = M[1][2];
                     KR[5][3] = M[2][0]; KR[5][4] = M[2][1]; KR[5][5] = M[2][2];
@@ -744,9 +753,9 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     for (k = 6; k<ndof; ++k) {
                         vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
                         vec3d kpw(kij[k][3], kij[k][4], kij[k][5]);
-                        vec3d m = (kpu + kpw)*alpha;
+                        vec3d m = (kpu + kpw);
                         KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-                        m = (Aj*kpu + Bj*kpw)*alpha;
+                        m = (Aj*kpu + Bj*kpw);
                         KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
                     }
                     
@@ -803,9 +812,9 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
                     for (k = 0; k<ndof; ++k) {
                         vec3d kpu(kij[k][0], kij[k][1], kij[k][2]);
                         vec3d kpw(kij[k][3], kij[k][4], kij[k][5]);
-                        vec3d m = (kpu + kpw)*alpha;
+                        vec3d m = (kpu + kpw);
                         KF[k][0] = m.x; KF[k][1] = m.y; KF[k][2] = m.z;
-                        m = (Aj*kpu + Bj*kpw)*alpha;
+                        m = (Aj*kpu + Bj*kpw);
                         KF[k][3] = m.x; KF[k][4] = m.y; KF[k][5] = m.z;
                     }
                     
@@ -1070,6 +1079,11 @@ void FERigidSolver::RigidMassMatrix(FELinearSystem& LS, const FETimeInfo& timeIn
 	double gamma = timeInfo.gamma;
 	double a = 1. / (beta*dt*dt);
 
+	if (timeInfo.currentTime == 0)
+	{
+		a = alpham = 1;
+	}
+
 	for (int i=0; i<fem.RigidBodies(); ++i)
 	{
 		FERigidBody& RB = *fem.GetRigidBody(i);
@@ -1101,10 +1115,14 @@ void FERigidSolver::RigidMassMatrix(FELinearSystem& LS, const FETimeInfo& timeIn
 
 		// skew-symmetric of angular momentum
 		mat3d hhat;
-		hhat.skew(Jt*RB.m_wt);
+		hhat.skew(RB.m_ht);
 
+        // skew-symmetric angular velocity
+        mat3d Omega; Omega.skew(RB.m_wt);
+        mat3d Dht; Dht.skew(RB.m_dht);
+        
 		// rotational inertia stiffness
-		mat3d K = ((Jt*T)/(beta*dt) - hhat/gamma)*(alpham/dt);
+		mat3d K = ((((Omega*gamma+mat3dd(1./dt))*Jt -  hhat*gamma)/(beta*dt))*T - Dht)*alpham;
 
 		ke[3][3] = K(0, 0); ke[3][4] = K(0, 1); ke[3][5] = K(0, 2);
 		ke[4][3] = K(1, 0); ke[4][4] = K(1, 1); ke[4][5] = K(1, 2);
@@ -1230,17 +1248,20 @@ void FERigidSolverOld::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui,
 
 	// for prescribed displacements, the displacement increments are evaluated differently
 	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
-	const int NRD = fem.RigidPrescribedBCs();
-	for (int i = 0; i<NRD; ++i)
+	for (int i = 0; i < NRB; ++i)
 	{
-		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
-		if (dc.IsActive())
+		// get the rigid body
+		FERigidBody& RB = *fem.GetRigidBody(i);
+		if (RB.m_prb == nullptr)
 		{
-			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
-			if (RB.m_prb == 0)
+			for (int j = 0; j < 6; ++j)
 			{
-				int I = dc.GetBC();
-				RB.m_du[I] = dc.Value() - RB.m_Up[I];
+				FERigidPrescribedBC* dc = RB.m_pDC[j];
+				if (dc && dc->IsActive())
+				{
+					int I = dc->GetBC();
+					RB.m_du[I] = dc->Value() - RB.m_Up[I];
+				}
 			}
 		}
 	}
@@ -1452,6 +1473,41 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 		}
 	}
 
+    // Newmark rule
+    FETimeInfo& timeInfo = GetFEModel()->GetTime();
+    double alpham = timeInfo.alpham;
+    double beta = timeInfo.beta;
+    double gamma = timeInfo.gamma;
+    double dt = timeInfo.timeIncrement;
+    double a = 1.0 / (beta*dt);
+    double b = a / dt;
+    double c = 1.0 - 0.5 / beta;
+    
+    for (int i = 0; i<nrb; ++i)
+    {
+        // get the rigid body
+        FERigidBody& RB = *fem.GetRigidBody(i);
+        
+        // acceleration and velocity of center of mass
+        RB.m_at = (RB.m_rt - RB.m_rp)*b - RB.m_vp*a + RB.m_ap*c;
+        RB.m_vt = RB.m_vp + (RB.m_ap*(1.0 - gamma) + RB.m_at*gamma)*dt;
+        // angular acceleration and velocity of rigid body
+        quatd q = RB.GetRotation()*RB.m_qp.Inverse();
+        q.MakeUnit();
+        vec3d vq = q.GetVector()*(2 * tan(q.GetAngle() / 2));  // Cayley transform
+        RB.m_wt = vq*(a*gamma) - RB.m_wp + (RB.m_wp + RB.m_alp*dt / 2.)*(2 - gamma / beta);
+        q.RotateVector(RB.m_wt);
+        RB.m_alt = vq*b - RB.m_wp*a + RB.m_alp*c;
+        q.RotateVector(RB.m_alt);
+        
+        // evaluate mass moment of inertia at t
+        mat3d Rt = RB.GetRotation().RotationMatrix();
+        mat3ds Jt = (Rt*RB.m_moi*Rt.transpose()).sym();
+        // evaluate angular momentum and its rate of change at current time
+        RB.m_ht = Jt*RB.m_wt;
+        RB.m_dht = (RB.m_ht - RB.m_hp)/(gamma*dt) + RB.m_dhp*(1-1./gamma);
+    }
+    
 	// update the mesh' nodes
 	fem.UpdateRigidMesh();
 
@@ -1484,35 +1540,11 @@ void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeI
 {
 	// Newmark rule
     double alpham = timeInfo.alpham;
-    double beta = timeInfo.beta;
-    double gamma = timeInfo.gamma;
-	double dt = timeInfo.timeIncrement;
-	double a = 1.0 / (beta*dt);
-	double b = a / dt;
-	double c = 1.0 - 0.5 / beta;
 
 	if (m_fem == nullptr) return;
 	FEMechModel& fem = *m_fem;
 
 	int nrb = fem.RigidBodies();
-	for (int i = 0; i<nrb; ++i)
-	{
-		// get the rigid body
-		FERigidBody& RB = *fem.GetRigidBody(i);
-
-		// acceleration and velocity of center of mass
-		RB.m_at = (RB.m_rt - RB.m_rp)*b - RB.m_vp*a + RB.m_ap*c;
-		RB.m_vt = RB.m_vp + (RB.m_ap*(1.0 - gamma) + RB.m_at*gamma)*dt;
-		// angular acceleration and velocity of rigid body
-		quatd q = RB.GetRotation()*RB.m_qp.Inverse();
-		q.MakeUnit();
-		vec3d vq = q.GetVector()*(2 * tan(q.GetAngle() / 2));  // Cayley transform
-		RB.m_wt = vq*(a*gamma) - RB.m_wp + (RB.m_wp + RB.m_alp*dt / 2.)*(2 - gamma / beta);
-		q.RotateVector(RB.m_wt);
-		RB.m_alt = vq*b - RB.m_wp*a + RB.m_alp*c;
-		q.RotateVector(RB.m_alt);
-	}
-
 	// calculate rigid body inertial forces
 	for (int i = 0; i<nrb; ++i)
 	{
@@ -1535,8 +1567,7 @@ void FERigidSolverNew::InertialForces(FEGlobalVector& R, const FETimeInfo& timeI
         RB.m_ht = Jt*RB.m_wt;
 
 		// evaluate rate of change of angular momentum
-		RB.m_dht = (RB.m_ht - RB.m_hp) / (gamma*dt) + RB.m_dhp*(1-1.0/gamma);
-//        RB.m_dht = (RB.m_wt ^ RB.m_ht) + Jt*RB.m_alt;
+        RB.m_dht = (RB.m_wt ^ RB.m_ht) + Jt*RB.m_alt;
 
         vec3d M = (RB.m_dht*alpham + RB.m_dhp*(1-alpham));
 

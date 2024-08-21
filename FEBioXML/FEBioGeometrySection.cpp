@@ -1043,7 +1043,7 @@ void FEBioGeometrySection25::ParsePartSection(XMLTag& tag)
 
 		// redirect input to another file
 		char xpath[256] = {0};
-		sprintf(xpath, "febio_spec/Geometry/Part[@name=%s]", szname);
+		snprintf(xpath, sizeof(xpath), "febio_spec/Geometry/Part[@name=%s]", szname);
 		XMLReader xml;
 		if (xml.Open(szfrom) == false) throw XMLReader::InvalidAttributeValue(tag, "from", szfrom);
 		XMLTag tag2;
@@ -1309,8 +1309,9 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	}
 
 	// get the name
+	string name;
 	const char* szname = tag.AttributeValue("name", true);
-	if (szname == 0) szname = "_unnamed";
+	if (szname) name = szname;
 
 	// get the element type
 	const char* sztype = tag.AttributeValue("type");
@@ -1321,7 +1322,7 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	FEDomain* pdom = GetBuilder()->CreateDomain(espec, pmat);
 	if (pdom == 0) throw FEBioImport::FailedCreatingDomain();
 	FEDomain& dom = *pdom;
-	dom.SetName(szname);
+	dom.SetName(name);
 
 	// active flag
 	const char* szactive = tag.AttributeValue("active", true);
@@ -1355,15 +1356,6 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 	pdom->SetMatID(pmat->GetID() - 1);
 	mesh.AddDomain(pdom);
 
-	// for named domains, we'll also create an element set
-	FEElementSet* pg = 0;
-	if (szname)
-	{
-		pg = new FEElementSet(&fem);
-		pg->SetName(szname);
-		mesh.AddElementSet(pg);
-	}
-
 	// read element data
 	for (int i = 0; i<elems; ++i)
 	{
@@ -1386,8 +1378,14 @@ void FEBioGeometrySection25::ParseElementSection(XMLTag& tag)
 		GetBuilder()->GlobalToLocalID(elem.node, el.Nodes(), el.m_node);
 	}
 
-	// create the element set
-	if (pg) pg->Create(pdom);
+	// for named domains, we'll also create an element set
+	if (!name.empty())
+	{
+		FEElementSet* pg = new FEElementSet(&fem);
+		pg->SetName(name);
+		mesh.AddElementSet(pg);
+		pg->Create(pdom);
+	}
 
 	// assign material point data
 	dom.CreateMaterialPointData();

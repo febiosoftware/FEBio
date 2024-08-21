@@ -171,6 +171,7 @@ enum FE_Element_Type {
 
 	// line elements
 	FE_LINE2G1,
+	FE_LINE2NI,
 
 	// beam elements
 	FE_BEAM2G1,
@@ -261,6 +262,7 @@ enum SUPER_CLASS_ID {
 	FEDISCRETEDOMAIN_ID,			// derived from FEDiscreteDomain
 	FEDOMAIN2D_ID,					// derived from FEDomain2D
 	FESURFACE_ID,					// derived from FESurface
+	FEEDGE_ID,						// derived from FEEdge
 	FEIC_ID,						// derived from FEInitialCondition
 	FEMESHDATAGENERATOR_ID,			// derived from FEMeshDataGenerator
 	FELOADCONTROLLER_ID,			// derived from FELoadContoller
@@ -368,3 +370,12 @@ enum Matrix_Type {
 	REAL_SYMMETRIC,				// symmetric (not necessarily positive definite)
 	REAL_SYMM_STRUCTURE			// structurally symmetric
 };
+
+//! Constraint enforcement method
+namespace FECore {
+	enum CONSTRAINT_ENFORCEMENT {
+		PENALTY_METHOD,
+		AUGLAG_METHOD,
+		LAGMULT_METHOD
+	};
+}

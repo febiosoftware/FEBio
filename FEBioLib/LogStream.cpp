@@ -39,7 +39,7 @@ void LogStream::printf(const char* sz, ...)
 	// make the message
 	char sztxt[1024] = { 0 };
 	va_start(args, sz);
-	vsprintf(sztxt, sz, args);
+	vsnprintf(sztxt, sizeof(sztxt), sz, args);
 	va_end(args);
 
 	print(sztxt);

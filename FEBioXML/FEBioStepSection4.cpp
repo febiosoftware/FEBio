@@ -63,6 +63,7 @@ void FEBioStepSection4::Parse(XMLTag& tag)
 			// parse the file sections
 			Map.Parse(tag);
 		}
+		else throw XMLReader::MissingTag(tag, "step");
 		++tag;
 	}
 	while (!tag.isend());

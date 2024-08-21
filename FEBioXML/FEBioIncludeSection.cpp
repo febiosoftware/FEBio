@@ -42,7 +42,7 @@ void FEBioIncludeSection::Parse(XMLTag& tag)
 	if (ch==0)
 	{
 		// pre-pend the name with the input path
-		sprintf(szin, "%s%s", GetFileReader()->GetFilePath(), tag.szvalue());
+		snprintf(szin, sizeof(szin), "%s%s", GetFileReader()->GetFilePath(), tag.szvalue());
 	}
 
 	// read the file

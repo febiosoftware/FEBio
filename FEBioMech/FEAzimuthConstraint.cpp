@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FEAzimuthConstraint, FENodeSetConstraint)
-	ADD_PARAMETER(m_laugon, "laugon");
+	ADD_PARAMETER(m_laugon, "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
 	ADD_PARAMETER(m_tol, "augtol");
 	ADD_PARAMETER(m_eps, "penalty");
 	ADD_PARAMETER(m_minaug, "minaug");
@@ -40,7 +40,7 @@ BEGIN_FECORE_CLASS(FEAzimuthConstraint, FENodeSetConstraint)
 
 FEAzimuthConstraint::FEAzimuthConstraint(FEModel* fem) : FENodeSetConstraint(fem), m_dofU(fem), m_nodeSet(fem)
 {
-	m_laugon = 0;
+	m_laugon = FECore::PENALTY_METHOD;
 	m_tol = 0.1;
 	m_eps = 0.0;
 
@@ -90,7 +90,7 @@ void FEAzimuthConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 		lm[0] = n0.m_ID[m_dofU[0]];
 		lm[1] = n0.m_ID[m_dofU[1]];
 
-		if (m_laugon == 2)
+		if (m_laugon == FECore::LAGMULT_METHOD)
 		{
 			lm.push_back(m_eq[2*i  ]);
 			lm.push_back(m_eq[2*i+1]);
@@ -108,7 +108,7 @@ int FEAzimuthConstraint::InitEquations(int neq)
 	m_Lm.assign(N, vec3d(0, 0, 0));
 
 	// make sure we want to use Lagrange Multiplier method
-	if (m_laugon != 2) return 0;
+	if (m_laugon != FECore::LAGMULT_METHOD) return 0;
 
 	// allocate two equations per node
 	m_eq.resize(2 * N);
@@ -141,7 +141,7 @@ void FEAzimuthConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		// calculate force
 		vector<double> F;
 		vector<int> lm;
-		if (m_laugon == 2)
+		if (m_laugon == FECore::LAGMULT_METHOD)
 		{
 			// Lagrange multiplier formulation
 			vec3d Pl = P * m_Lm[i];
@@ -198,7 +198,7 @@ void FEAzimuthConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 		mat3ds Q = (Ploe + P * (et*m_Lm[i])) / (-l);
 
 		// stiffness
-		if (m_laugon == 2)
+		if (m_laugon == FECore::LAGMULT_METHOD)
 		{
 			FEElementMatrix ke(4, 4); ke.zero();
 			ke[0][0] = Q(0, 0); ke[0][1] = Q(0, 1);
@@ -248,7 +248,7 @@ void FEAzimuthConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 
 void FEAzimuthConstraint::Update(const std::vector<double>& ui)
 {
-	if (m_laugon == 2)
+	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		int N = m_nodeSet.Size();
 		for (int i = 0; i < N; ++i)
@@ -284,12 +284,12 @@ bool FEAzimuthConstraint::Augment(int naug, const FETimeInfo& tp)
 		double L0 = m_Lm[i].norm();
 		double L1 = lam1.norm();
 
-		if (m_laugon == 0)
+		if (m_laugon == FECore::PENALTY_METHOD)
 		{
 			// penalty-formulation
 			feLog("\t%d: %lg, %lg\n", nodeId, g, L1);
 		}
-		else if (m_laugon == 2)
+		else if (m_laugon == FECore::LAGMULT_METHOD)
 		{
 			// Lagrange multiplier
 			feLog("\t%d: %lg, %lg\n", nodeId, g, L0);

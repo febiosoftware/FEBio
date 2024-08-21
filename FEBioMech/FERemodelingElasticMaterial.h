@@ -89,6 +89,10 @@ public:
 
 	//! calculate tangent of stress with solid density at material point
 	virtual mat3ds Tangent_Stress_Density(FEMaterialPoint& pt) = 0;
+    
+public:
+    int     m_comp;     // mixture component to which this material belongs (if applicable)
+    int     m_sbm;      // sbm ID associated with this material
 };
 
 //-----------------------------------------------------------------------------
@@ -107,6 +111,9 @@ public:
 	
 	//! tangent function of stress with strain
 	tens4ds Tangent(FEMaterialPoint& pt) override;
+    
+    //! evaluate referential mass density
+    double Density(FEMaterialPoint& pt) override;
 	
 	//! tangent function of strain energy density with solid mass density
 	double Tangent_SE_Density(FEMaterialPoint& pt);

@@ -36,8 +36,7 @@ SOFTWARE.*/
 class FEModel;
 class FERigidBody;
 class FEModelComponent;
-class FERigidFixedBC;
-class FERigidPrescribedBC;
+class FERigidBC;
 class FERigidIC;
 class FEGlobalMatrix;
 
@@ -94,13 +93,9 @@ public:
 	void BuildMatrixProfile(FEGlobalMatrix& G);
 
 public:
-	int FixedBCs() { return (int) m_RBC.size(); }
-	FERigidFixedBC* FixedBC(int i) { return m_RBC[i]; }
-	void AddFixedBC(FERigidFixedBC* pbc) { m_RBC.push_back(pbc); }
-
-	int PrescribedBCs() { return (int) m_RDC.size(); }
-	FERigidPrescribedBC* PrescribedBC(int i) { return m_RDC[i]; }
-	void AddPrescribedBC(FERigidPrescribedBC* pdc) { m_RDC.push_back(pdc); }
+	int RigidBCs() { return (int) m_RBC.size(); }
+	FERigidBC* RigidBC(int i) { return m_RBC[i]; }
+	void AddRigidBC(FERigidBC* pbc) { m_RBC.push_back(pbc); }
 
 	void AddInitialCondition(FERigidIC* ric) { m_RIC.push_back(ric); }
 
@@ -112,9 +107,8 @@ protected:
 protected:
 	// Boundary/Initial conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
-	vector<FERigidFixedBC*>			m_RBC;	//!< rigid body fixed
-	vector<FERigidPrescribedBC*>	m_RDC;	//!< rigid body displacements
-	vector<FERigidIC*>				m_RIC;	//!< rigid body initial conditions
+	vector<FERigidBC*>			m_RBC;	//!< rigid body fixed
+	vector<FERigidIC*>			m_RIC;	//!< rigid body initial conditions
 
 private:
 	FEModel&				m_fem;	//!< the FE model this system is attached to

@@ -93,7 +93,7 @@ void Console::SetTitle(const char* sz, ...)
 		// make the message
 		char sztitle[512];
 		va_start(args, sz);
-		vsprintf(sztitle, sz, args);
+		vsnprintf(sztitle, sizeof(sztitle), sz, args);
 		va_end(args);
 
 #ifdef WIN32

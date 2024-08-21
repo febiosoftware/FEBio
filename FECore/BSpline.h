@@ -71,6 +71,8 @@ public:
     // perform spline approximation over points p, using ncoef coefficients
     bool init_approximation(int korder, int ncoef, const std::vector<vec2d>& p);
 
+    bool    m_deriv;    //!< flag indicating derivative status
+
 private:
     Impl* im;
 };

@@ -515,7 +515,7 @@ string format_string(const char* sz, ...)
 	// make the message
 	char szbuf[512];
 	va_start(args, sz);
-	vsprintf(szbuf, sz, args);
+	vsnprintf(szbuf, sizeof(szbuf), sz, args);
 	va_end(args);
 
 	return szbuf;
@@ -901,53 +901,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 			}
 
 		ch = GetChar();
-		if (ch == '!')
-		{
-            m_comment.clear();
-
-			// parse the comment
-			ch = GetChar(); if (ch != '-') throw XMLSyntaxError(m_nline);
-			ch = GetChar(); if (ch != '-') throw XMLSyntaxError(m_nline);
-
-			// find the end of the comment
-			int n = 0;
-			do
-			{
-				ch = GetChar();
-				if (ch == '-') n++;
-				else if ((ch == '>') && (n >= 2)) break;
-				else
-				{
-					if (n > 0) m_comment += '-';
-					if (n > 1) m_comment += '-';
-					if (ch != '\r') m_comment += ch; // don't append \r
-					n = 0;
-				}
-			}
-			while (1);
-
-			// eat whitespace at the start and end of the comment
-			if (m_comment.empty() == false)
-			{
-				int n = m_comment.size();
-				char* tmp = new char[n + 1];
-				strncpy(tmp, m_comment.c_str(), n);
-				tmp[n] = 0;
-
-				char* cl = tmp;
-				while (*cl && isspace(*cl)) cl++;
-				n = strlen(cl);
-				if (n > 0)
-				{
-					char* cr = &cl[n - 1];
-					while ((cr > cl) && isspace(*cr)) *cr-- = 0;
-				}
-
-				m_comment = cl;
-				delete[] tmp;
-			}
-		}
-		else if (ch == '?')
+		if (ch == '?')
 		{
 			// parse the xml header tag
 			while ((ch = GetChar()) != '?');
@@ -1033,8 +987,14 @@ void XMLReader::ReadValue(XMLTag& tag)
 		tag.m_szval.clear();
 		tag.m_szval.reserve(256);
 		while ((ch=GetChar())!='<') 
-		{ 
-			tag.m_szval.push_back(ch);
+		{
+			if (ch != '\r')
+			{
+				if ((ch != '\n') && (ch != '\t'))
+					tag.m_szval.push_back(ch);
+				else
+					tag.m_szval.push_back(' ');
+			}
 		}
 	}
 	else while ((ch=GetChar())!='<');
@@ -1113,7 +1073,9 @@ char XMLReader::readNextChar()
         m_eof = (m_bufSize != BUF_SIZE);
 	}
 	m_currentPos++;
-	return m_buf[m_bufIndex++];
+	char ch = m_buf[m_bufIndex++];
+	if (ch == '\n') m_nline++;
+	return ch;
 }
 
 //-----------------------------------------------------------------------------
@@ -1126,23 +1088,82 @@ int64_t XMLReader::currentPos()
 //! move the file pointer
 void XMLReader::rewind(int64_t nstep)
 {
+	// NOTE: What if we rewind past a newline? Won't that mess up the line index?
 	m_bufIndex -= nstep;
 	m_currentPos -= nstep;
 
 	if (m_bufIndex < 0)
 	{
-        m_stream->seekg(m_bufIndex - m_bufSize, ios_base::cur);
+		m_stream->seekg(m_bufIndex - m_bufSize, ios_base::cur);
 		m_bufIndex = m_bufSize = 0;
 		m_eof = false;
 	}
 }
 
+// clean the string by removing whitespace at the front and back
+void clean_string(string& s)
+{
+	if (s.empty()) return;
+
+	size_t n = s.size();
+	char* tmp = new char[n + 1];
+	strncpy(tmp, s.c_str(), n);
+	tmp[n] = 0;
+
+	char* cl = tmp;
+	while (*cl && isspace(*cl)) cl++;
+	n = strlen(cl);
+	if (n > 0)
+	{
+		char* cr = &cl[n - 1];
+		while ((cr > cl) && isspace(*cr)) *cr-- = 0;
+	}
+
+	s = cl;
+	delete[] tmp;
+}
+
 //-----------------------------------------------------------------------------
-//! Read the next character in the file.
+//! Read the next character in the file (skipping over comments).
 char XMLReader::GetChar()
 {
-	char ch;
-    if ((ch=readNextChar())=='\n') ++m_nline;
+	char ch = readNextChar();
+
+	// check for comments
+	if (ch == '<')
+	{
+		char tmp = readNextChar();
+		if (tmp == '!')
+		{
+			m_comment.clear();
+
+			// parse the comment
+			ch = readNextChar(); if (ch != '-') throw XMLSyntaxError(m_nline);
+			ch = readNextChar(); if (ch != '-') throw XMLSyntaxError(m_nline);
+
+			// find the end of the comment
+			int n = 0;
+			do
+			{
+				ch = readNextChar();
+				if (ch == '-') n++;
+				else if ((ch == '>') && (n >= 2)) break;
+				else
+				{
+					if (n > 0) m_comment += '-';
+					if (n > 1) m_comment += '-';
+					if (ch != '\r') m_comment += ch; // don't append \r
+					n = 0;
+				}
+			} while (1);
+
+			// eat whitespace at the start and end of the comment
+			clean_string(m_comment);
+
+			ch = readNextChar();
+		}
+		else rewind(1);
+	}
 
 	// read entity references
 	if (ch=='&')

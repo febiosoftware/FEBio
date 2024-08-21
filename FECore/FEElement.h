@@ -184,9 +184,6 @@ public:
 	// see if this element has the node n
     bool HasNode(int n) const;
 
-    // see if this element has the list of nodes n
-    int HasNodes(int* n, const int ns) const;
-    
 	// find local element index of node n
     int FindNode(int n) const;
 
@@ -313,6 +310,28 @@ public:
 	FELineElement& operator = (const FELineElement& el);
 
 	void SetTraits(FEElementTraits* pt);
+
+	double* GaussWeights() { return &((FELineElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
+
+	double* Gr(int n) const { return ((FELineElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
+
+	vec3d eval(vec3d* d, int n)
+	{
+		int ne = Nodes();
+		double* N = H(n);
+		vec3d a(0, 0, 0);
+		for (int i = 0; i < ne; ++i) a += d[i] * N[i];
+		return a;
+	}
+
+	vec3d eval_deriv(vec3d* d, int j)
+	{
+		double* Hr = Gr(j);
+		int n = Nodes();
+		vec3d v(0, 0, 0);
+		for (int i = 0; i < n; ++i) v += d[i] * Hr[i];
+		return v;
+	}
 };
 
 //-----------------------------------------------------------------------------

@@ -95,12 +95,29 @@ void FESSIShellDomain::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 //! Calculate all shell normals (i.e. the shell directors).
 //! And find shell nodes
-void FESSIShellDomain::InitShells()
+bool FESSIShellDomain::InitShells()
 {
-    FEShellDomain::InitShells();
-    
+	if (!FEShellDomain::InitShells()) return false;
+
+	FEMesh& mesh = *GetMesh();
+
+	// check for zero shell thickness
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FEShellElementNew& el = ShellElement(i);
+		int nn = el.Nodes();
+		for (int j = 0; j < nn; ++j)
+		{
+			if (el.m_h0[j] <= 0.0)
+			{
+				string name = GetName();
+				feLogError("Zero shell thickness found in \"%s\"", name.c_str());
+				return false;
+			}
+		}
+	}
+
     if (!m_bnodalnormals) {
-        FEMesh& mesh = *GetMesh();
         for (int i = 0; i<Elements(); ++i)
         {
             FEShellElementNew& el = ShellElement(i);
@@ -122,7 +139,6 @@ void FESSIShellDomain::InitShells()
         }
     }
 
-	FEMesh& mesh = *GetMesh();
 	for (int i = 0; i < Elements(); ++i)
 	{
 		FEShellElementNew& el = ShellElement(i);
@@ -142,6 +158,8 @@ void FESSIShellDomain::InitShells()
 			el.m_G0[2][j] = el.m_Gt[2][j] = g0[2];
 		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

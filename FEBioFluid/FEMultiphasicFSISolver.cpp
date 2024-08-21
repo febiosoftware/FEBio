@@ -960,7 +960,7 @@ void FEMultiphasicFSISolver::PrepStep()
     for (int i = 0; i < nsl; ++i)
     {
         FEModelLoad& pml = *fem.ModelLoad(i);
-        if (pml.IsActive()) pml.Update();
+        if (pml.IsActive()) pml.PrepStep();
     }
 
     // do the linear constraints
@@ -988,7 +988,7 @@ void FEMultiphasicFSISolver::PrepStep()
     for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-        if (ci.IsActive() && (ci.m_laugon != 1)) m_baugment = true;
+        if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
     }
     
     // see if we need to do incompressible augmentations

@@ -59,7 +59,7 @@ void FEException::what(const char* msg, ...)
 	// make the message
 	char sztxt[1024] = { 0 };
 	va_start(args, msg);
-	vsprintf(sztxt, msg, args);
+	vsnprintf(sztxt, sizeof(sztxt), msg, args);
 	va_end(args);
 
 	m_what = sztxt;

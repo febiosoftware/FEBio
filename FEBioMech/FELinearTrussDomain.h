@@ -106,6 +106,7 @@ protected:
 
 	FEDofList	m_dofU;
 	FEDofList	m_dofV;
+	FEDofList	m_dofR;
 
 	DECLARE_FECORE_CLASS();
 };

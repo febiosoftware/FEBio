@@ -1,0 +1,14 @@
+FROM ubuntu:22.04
+SHELL ["/bin/bash", "-c"]
+RUN pwd
+
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install curl gpg sudo -y
+RUN curl -L https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+RUN echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+RUN apt-get update && apt-get install intel-oneapi-runtime-libs -y
+
+COPY cmbuild/bin/* /usr/local/bin/
+COPY cmbuild/lib/* /usr/local/lib/
+ENV PATH "$PATH:/usr/local/bin:/usr/local/lib"
+RUN chmod +x /usr/local/bin/febio4

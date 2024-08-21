@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 #include "FEPolarFluidMaterial.h"
 #include "FEFluid.h"
+#include "FEThermoFluid.h"
 #include "FEPolarFluid.h"
 #include "FEFluidDomain.h"
 #include "FEFluidFSIDomain.h"
@@ -199,7 +200,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -207,7 +208,7 @@ bool FEPlotFluidSurfaceForce::Save(FESurface &surf, FEDataStream &a)
             FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
 
             if (!pfluid) {
-                pe = el.m_elem[1];
+                pe = el.m_elem[1].pe;
                 if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
             }
 
@@ -267,7 +268,7 @@ bool FEPlotFluidSurfaceMoment::Save(FESurface &surf, FEDataStream &a)
         FESurfaceElement& el = pcs->Element(j);
         
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -275,7 +276,7 @@ bool FEPlotFluidSurfaceMoment::Save(FESurface &surf, FEDataStream &a)
             FEPolarFluidMaterial* pfluid = pm->ExtractProperty<FEPolarFluidMaterial>();
             
             if (!pfluid) {
-                pe = el.m_elem[1];
+                pe = el.m_elem[1].pe;
                 if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEPolarFluidMaterial>();
             }
             
@@ -320,13 +321,13 @@ bool FEPlotFluidSurfacePressure::Save(FESurface &surf, FEDataStream& a)
         FESurfaceElement& el = pcs->Element(nface);
         double ef = pcs->Evaluate(nface, dof_EF);
         double T = pcs->Evaluate(nface, dof_T);
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe) {
             // get the material
             FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
             FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
             if (!fluid) {
-                pe = el.m_elem[1];
+                pe = el.m_elem[1].pe;
                 if (pe) fluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
             }
             if (fluid) return fluid->Pressure(ef, T);
@@ -364,7 +365,7 @@ bool FEPlotFluidSurfaceTractionPower::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -422,7 +423,7 @@ bool FEPlotFluidSurfaceEnergyFlux::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -477,7 +478,7 @@ bool FEPlotFluidMassFlowRate::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -544,7 +545,7 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 		FESurfaceElement& el = pcs->Element(j);
 
 		// get the element this surface element belongs to
-		FEElement* pe = el.m_elem[0];
+		FEElement* pe = el.m_elem[0].pe;
 		if (pe)
 		{
 			// evaluate the average fluid flux in this element
@@ -762,6 +763,45 @@ bool FEPlotFluidDensityRate::Save(FEDomain &dom, FEDataStream& a)
     }
     
     return false;
+}
+
+//-----------------------------------------------------------------------------
+class FEFluidBodyForce
+{
+public:
+    FEFluidBodyForce(FEModel* fem, FESolidDomain& dom) : m_fem(fem), m_dom(dom) {}
+    
+    vec3d operator()(const FEMaterialPoint& mp)
+    {
+        int NBL = m_fem->ModelLoads();
+        vec3d bf(0,0,0);
+        for (int j = 0; j<NBL; ++j)
+        {
+            FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem->ModelLoad(j));
+            FEMaterialPoint pt(mp);
+            if (pbf && pbf->IsActive()) bf += pbf->force(pt);
+        }
+		// FEBio actually applies the negative of the body force
+        return -bf;
+    }
+
+private:
+    FESolidDomain&    m_dom;
+    FEModel*          m_fem;
+};
+
+bool FEPlotFluidBodyForce::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
+    if (pfluid == 0) return false;
+
+    if (dom.Class() == FE_DOMAIN_SOLID)
+    {
+        FESolidDomain& sd = static_cast<FESolidDomain&>(dom);
+        writeAverageElementValue<vec3d>(dom, a, FEFluidBodyForce(GetFEModel(), sd));
+        return true;
+    }
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1331,6 +1371,34 @@ bool FEPlotFluidIsobaricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& 
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotFluidPressureTangentTemperature::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->Tangent_Temperature(mp_noconst);
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidPressureTangentStrain::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->Tangent_Strain(mp_noconst);
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidThermalConductivity::Save(FEDomain &dom, FEDataStream& a)
 {
     FEFluidThermalConductivity* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidThermalConductivity>();
@@ -1436,6 +1504,27 @@ bool FEPlotFluidRelativeReynoldsNumber::Save(FEDomain &dom, FEDataStream& a)
     return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidRelativeThermalPecletNumber::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEThermoFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluid>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<double>(dom, a, [&pfluid](const FEMaterialPoint& mp) {
+        const FEFluidMaterialPoint* fpt = mp.ExtractData<FEFluidMaterialPoint>();
+//        const FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        double cp = pfluid->GetElastic()->IsobaricSpecificHeatCapacity(mp_noconst);
+        double K = pfluid->GetConduct()->ThermalConductivity(mp_noconst);
+        double rho = pfluid->Density(mp_noconst);
+        vec3d v(0,0,0);
+//        if (ept) v = ept->m_v;
+        return (fpt->m_vft - v).Length()*rho*cp/K;
+    });
+    
+    return true;
+}
+
 //=================================================================================================
 //-----------------------------------------------------------------------------
 FEPlotFluidRelativePecletNumber::FEPlotFluidRelativePecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
@@ -1512,4 +1601,3 @@ bool FEPlotFluidRelativePecletNumber::Save(FEDomain &dom, FEDataStream& a)
     }
     return true;
 }
-

@@ -1,0 +1,13 @@
+{
+  "dependencies": [
+    "eigen3",
+    "glew",
+    "libssh",
+    "mpi",
+    "opengl",
+    "openssl",
+    "pthread",
+    "qtbase",
+    "zlib"
+  ]
+}

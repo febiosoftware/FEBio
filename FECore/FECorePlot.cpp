@@ -552,6 +552,8 @@ bool FEPlotMeshData::SetFilter(const char* sz)
 		switch (dataType)
 		{
 		case FE_DOUBLE: SetVarType(PLT_FLOAT); break;
+		case FE_VEC3D : SetVarType(PLT_VEC3F); break;
+		case FE_MAT3D : SetVarType(PLT_MAT3F); break;
 		default:
 			assert(false);
 			return false;

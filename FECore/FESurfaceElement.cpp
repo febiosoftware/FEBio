@@ -35,7 +35,6 @@ SOFTWARE.*/
 FESurfaceElement::FESurfaceElement()
 {
 	m_lid = -1;
-	m_elem[0] = m_elem[1] = nullptr;
 }
 
 FESurfaceElement::FESurfaceElement(const FESurfaceElement& el) : FEElement(el)
@@ -137,6 +136,57 @@ void FESurfaceElement::facet_edge(int j, int* en) const
 		en[2] = m_lnode[(j + 1) % 4];
 		break;
 	}
+}
+
+//-----------------------------------------------------------------------------
+// see if this element has the list of nodes n. Return 0 if not or order is invalid, 1 if same order
+// and -1 if opposite order
+int FESurfaceElement::HasNodes(int* n, const int ns) const
+{
+	int l = Nodes();
+	if (l < ns) return 0;
+
+	// find start index
+	int m0 = -1;
+	for (int i = 0; i < ns; ++i)
+	{
+		if (m_node[0] == n[i])
+		{
+			m0 = i;
+			break;
+		}
+	}
+	if (m0 == -1) return 0;
+
+	// check positive order
+	int order = 1;
+	for (int i = 1; i < ns; ++i)
+	{
+		int m = (i + m0) % ns;
+		if (m_node[i] != n[m])
+		{
+			order = 0;
+			break;
+		}
+	}
+
+	if (order == 0)
+	{
+		// check negative order
+		order = -1;
+		for (int i = 1; i < ns; ++i)
+		{
+			int m = (m0 + ns - i) % ns;
+			assert((m >= 0) && (m < ns));
+			if (m_node[i] != n[m])
+			{
+				order = 0;
+				break;
+			}
+		}
+	}
+
+	return order;
 }
 
 double* FESurfaceElement::Gr(int order, int n) const { return (order >= 0 ? ((FESurfaceElementTraits*)(m_pT))->Gr_p[order][n] : ((FESurfaceElementTraits*)(m_pT))->Gr[n]); }	// shape function derivative to r

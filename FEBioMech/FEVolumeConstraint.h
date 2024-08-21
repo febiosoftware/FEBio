@@ -47,9 +47,6 @@ public:
 	void Serialize(DumpStream& ar);
 
 public:
-	double Volume();
-
-public:
 	double	m_Lp;	//!< Lagrange multipler pressure
 	double	m_p;	//!< applied pressure (= Lp + eps*DV)
 	double	m_V0;	//!< Initial volume

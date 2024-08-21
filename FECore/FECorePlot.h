@@ -44,9 +44,9 @@ class FECORE_API FEPlotParameter : public FEPlotData
 
 public:
 	FEPlotParameter(FEModel* pfem);
-	bool Save(FEDomain& dom, FEDataStream& a);
-	bool Save(FESurface& dom, FEDataStream& a);
-	bool Save(FEMesh& mesh, FEDataStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
+	bool Save(FESurface& dom, FEDataStream& a) override;
+	bool Save(FEMesh& mesh, FEDataStream& a) override;
 
 	bool SetFilter(const char* sz) override;
 
@@ -85,9 +85,9 @@ class FECORE_API FEPlotMeshData : public FEPlotData
 
 public:
 	FEPlotMeshData(FEModel* pfem);
-	bool Save(FEDomain& dom, FEDataStream& a);
-	bool Save(FESurface& dom, FEDataStream& a);
-	bool Save(FEMesh& mesh, FEDataStream& a);
+	bool Save(FEDomain& dom, FEDataStream& a) override;
+	bool Save(FESurface& dom, FEDataStream& a) override;
+	bool Save(FEMesh& mesh, FEDataStream& a) override;
 
 	bool SetFilter(const char* sz) override;
 
@@ -105,7 +105,7 @@ class FECORE_API FEPlotFieldVariable : public FEPlotNodeData
 {
 public:
 	FEPlotFieldVariable(FEModel* pfem);
-	bool Save(FEMesh& mesh, FEDataStream& a);
+	bool Save(FEMesh& mesh, FEDataStream& a) override;
 
 	bool SetFilter(const char* sz) override;
 

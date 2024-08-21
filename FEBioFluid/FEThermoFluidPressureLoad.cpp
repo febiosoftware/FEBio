@@ -52,7 +52,7 @@ FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceC
     m_pfluid = nullptr;
     m_p = 0;
     m_tol = 0.1;
-    m_laugon = 0;
+    m_laugon = FECore::PENALTY_METHOD;
     m_eps = 1.0;
     m_naugmin = 0;
     m_naugmax = 10;
@@ -71,7 +71,7 @@ bool FEThermoFluidPressureLoad::Init()
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_surf.Element(0);
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == nullptr) return false;
     
     // get the material
@@ -106,7 +106,7 @@ bool FEThermoFluidPressureLoad::Init()
 // allocate equations
 int FEThermoFluidPressureLoad::InitEquations(int neq)
 {
-    if (m_laugon < 2) return 0;
+    if (m_laugon < FECore::LAGMULT_METHOD) return 0;
     int n = neq;
     for (int i = 0; i < m_surf.Nodes(); ++i) m_EQ[i] = n++;
 
@@ -117,14 +117,14 @@ int FEThermoFluidPressureLoad::InitEquations(int neq)
 void FEThermoFluidPressureLoad::UnpackLM(vector<int>& lm, int n)
 {
     int ndof;
-    if (m_laugon < 2) ndof = 2;
+    if (m_laugon < FECore::LAGMULT_METHOD) ndof = 2;
     else ndof = 3;
     
     lm.reserve(ndof);
     FENode& node = m_surf.Node(n);
     lm.push_back(node.m_ID[m_dofEF]);
     lm.push_back(node.m_ID[m_dofT]);
-    if (m_laugon > 1) lm.push_back(m_EQ[n]);
+    if (m_laugon == FECore::LAGMULT_METHOD) lm.push_back(m_EQ[n]);
 }
 
 //-----------------------------------------------------------------------------
@@ -143,7 +143,7 @@ void FEThermoFluidPressureLoad::BuildMatrixProfile(FEGlobalMatrix& M)
 //-----------------------------------------------------------------------------
 void FEThermoFluidPressureLoad::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
-    if (m_laugon < 2) return;
+    if (m_laugon < FECore::LAGMULT_METHOD) return;
     for (int i = 0; i < m_surf.Nodes(); ++i)
     {
         if (m_EQ[i] != -1) m_Lm[i] = m_Lmp[i] + Ui[m_EQ[i]] + ui[m_EQ[i]];
@@ -154,7 +154,7 @@ void FEThermoFluidPressureLoad::Update(const std::vector<double>& Ui, const std:
 void FEThermoFluidPressureLoad::PrepStep()
 {
     m_surf.ProjectToNodes(m_p, m_pn);
-    if (m_laugon < 2) return;
+    if (m_laugon < FECore::LAGMULT_METHOD) return;
     for (int i = 0; i < m_surf.Nodes(); ++i)
     {
         m_Lmp[i] = m_Lm[i];
@@ -164,7 +164,7 @@ void FEThermoFluidPressureLoad::PrepStep()
 //-----------------------------------------------------------------------------
 void FEThermoFluidPressureLoad::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
 {
-    if (m_laugon < 2) return;
+    if (m_laugon < FECore::LAGMULT_METHOD) return;
     for (int i = 0; i < m_surf.Nodes(); ++i)
     {
         if (m_EQ[i] != -1) Ui[m_EQ[i]] += ui[m_EQ[i]];
@@ -179,8 +179,8 @@ void FEThermoFluidPressureLoad::Serialize(DumpStream& ar)
     if (ar.IsShallow()) return;
     ar & m_pfluid;
     ar & m_dofT & m_dofEF;
-    if (m_laugon == 1) ar & m_Lm;
-    else if (m_laugon > 1)
+    if (m_laugon == FECore::AUGLAG_METHOD) ar & m_Lm;
+    else if (m_laugon > FECore::AUGLAG_METHOD)
         ar & m_Lm & m_Lmp;
 }
 
@@ -190,7 +190,7 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R, const FETimeInfo& 
 {
     double alpha = tp.alphaf;
     
-    if (m_laugon == 2) {
+    if (m_laugon == FECore::LAGMULT_METHOD) {
         int ndof = 3;
         vector<double> fe(ndof, 0.0);
         
@@ -240,7 +240,7 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
 {
     double alpha = tp.alphaf;
     
-    if (m_laugon == 2) {
+    if (m_laugon == FECore::LAGMULT_METHOD) {
         int ndof = 3;
         FEElementMatrix ke;
         ke.resize(ndof, ndof);
@@ -309,7 +309,7 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS, const FETime
 //-----------------------------------------------------------------------------
 bool FEThermoFluidPressureLoad::Augment(int naug, const FETimeInfo& tp)
 {
-    if (m_laugon != 1) return true;
+    if (m_laugon != FECore::AUGLAG_METHOD) return true;
     
     double alpha = tp.alphaf;
     

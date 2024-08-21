@@ -450,10 +450,14 @@ void FECGSolidSolver::PrepStep()
 	for (int i = 0; i<NO; ++i) fem.GetRigidBody(i)->Init();
 
 	// calculate local rigid displacements
-	for (int i = 0; i<fem.RigidPrescribedBCs(); ++i)
+	for (int i = 0; i < NO; ++i)
 	{
-		FERigidPrescribedBC& DC = *fem.GetRigidPrescribedBC(i);
-		if (DC.IsActive()) DC.InitTimeStep();
+		FERigidBody& rb = *fem.GetRigidBody(i);
+		for (int j = 0; j < 6; ++j)
+		{
+			FERigidPrescribedBC* dc = rb.m_pDC[j];
+			if (dc) dc->InitTimeStep();
+		}
 	}
 
 	// calculate global rigid displacements
@@ -588,7 +592,7 @@ void FECGSolidSolver::PrepStep()
 	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
 	{
 		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-		if (ci.IsActive() && (ci.m_laugon == 1)) m_baugment = true;
+		if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
 	}
 
 	// see if we need to do incompressible augmentations
@@ -1455,17 +1459,19 @@ void FECGSolidSolver::UpdateRigidBodies(vector<double>& ui)
 
 	// for prescribed displacements, the displacement increments are evaluated differently
 	// TODO: Is this really necessary? Why can't the ui vector contain the correct values?
-	const int NRD = fem.RigidPrescribedBCs();
-	for (int i = 0; i<NRD; ++i)
+	for (int i = 0; i < NRB; ++i)
 	{
-		FERigidPrescribedBC& dc = *fem.GetRigidPrescribedBC(i);
-		if (dc.IsActive())
+		FERigidBody& RB = *fem.GetRigidBody(i);
+		if (RB.m_prb == nullptr)
 		{
-			FERigidBody& RB = *fem.GetRigidBody(dc.GetID());
-			if (RB.m_prb == 0)
+			for (int j = 0; j < 6; ++j)
 			{
-				int I = dc.GetBC();
-				RB.m_du[I] = dc.Value() - RB.m_Up[I];
+				FERigidPrescribedBC* dc = RB.m_pDC[j];
+				if (dc)
+				{
+					int I = dc->GetBC();
+					RB.m_du[I] = dc->Value() - RB.m_Up[I];
+				}
 			}
 		}
 	}

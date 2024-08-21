@@ -40,6 +40,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
+	ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
 	ADD_PARAMETER(m_ptol     , "ptol"               );
@@ -355,7 +356,7 @@ double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFlu
     n.unit();
     
     // get the element this surface element belongs to
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == 0) return 0.0;
     
     // get the material
@@ -715,7 +716,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
         {
             // get the next element
             FESurfaceElement& se = ss.Element(i);
-            FEElement* sse = se.m_elem[0];
+            FEElement* sse = se.m_elem[0].pe;
 
             // get nr of nodes and integration points
             int nseln = se.Nodes();
@@ -894,7 +895,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
-	if (m_laugon != 1) return true;
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
     int i;
     vec3d Ln;

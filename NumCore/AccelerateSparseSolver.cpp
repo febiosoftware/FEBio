@@ -227,8 +227,7 @@ bool AccelerateSparseSolver::PreProcess()
                         imp->SSFO.orderMethod = SparseOrderMetis;
                         break;
                     case OMSparseOrderCOLAMD:
-                        imp->SSFO.orderMethod = SparseOrderMetis;
-//                        imp->SSFO.orderMethod = SparseOrderCOLAMD;
+                        imp->SSFO.orderMethod = SparseOrderCOLAMD;
                         break;
                     default:
                         imp->SSFO.orderMethod = SparseOrderCOLAMD;
@@ -508,7 +507,7 @@ double AccelerateSparseSolver::condition_number()
 //-----------------------------------------------------------------------------
 void AccelerateSparseSolver::Destroy()
 {
-    if (imp->m_pA && imp->m_pA->Pointers() && imp->m_isFactored)
+    if (imp->m_pA && imp->m_isFactored)
     {
         SparseCleanup(imp->ASS);
         SparseCleanup(imp->ASF);

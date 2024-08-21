@@ -137,7 +137,7 @@ public:
 	const FEElement& ElementRef(int n) const override { return m_el[n]; }
 
 	//! find the solid or shell element of a surface element
-	FEElement* FindElement(FESurfaceElement& el);
+	FESurfaceElement::ELEMENT_REF FindElement(FESurfaceElement& el);
 
     //! for interface surfaces, find the index of both solid elements
     //! on either side of the interface
@@ -217,6 +217,9 @@ public:
     //! return the nodal normals
     vec3d NodeNormal(const int inode) { return m_nn[inode]; }
     
+    //! calculate the global position of an integration point
+    vec3d Local2Global0(FESurfaceElement& el, int n);
+    
 	//! calculate the global position of a point on the surface
 	vec3d Local2Global(FESurfaceElement& el, double r, double s);
 
@@ -235,6 +238,9 @@ public:
 	//! calculates the covariant base vectors of a surface
 	void CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
+    //! calculates the covariant base vectors of a surface at an integration point in the reference configuration
+    void CoBaseVectors0(const FESurfaceElement& el, int j, vec3d t[2]) const;
+    
 	//! calculates covariant base vectors of a surface
 	void CoBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
@@ -320,3 +326,6 @@ protected:
     double                      m_alpha;    //!< intermediate time fraction
 	bool						m_bshellb;	//!< true if this surface is the bottom of a shell domain
 };
+
+// Calculates the volume inside a (closed) surface. 
+FECORE_API double CalculateSurfaceVolume(FESurface& s);

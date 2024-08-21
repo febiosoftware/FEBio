@@ -54,7 +54,8 @@ FEAmbientConcentration::FEAmbientConcentration(FEModel* fem) : FECoreClass(fem)
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterfaceMP, FEContactInterface)
-    ADD_PARAMETER(m_atol     , "tolerance"            );
+	ADD_PARAMETER(m_laugon   , "laugon"               )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+	ADD_PARAMETER(m_atol     , "tolerance"            );
     ADD_PARAMETER(m_gtol     , "gaptol"               )->setUnits(UNIT_LENGTH);;
     ADD_PARAMETER(m_ptol     , "ptol"                 );
     ADD_PARAMETER(m_ctol     , "ctol"                 );
@@ -219,7 +220,7 @@ bool FESlidingSurfaceMP::Init()
 	if (Elements()) {
 		FESurfaceElement& se = Element(0);
 		// get the element this surface element belongs to
-		FEElement* pe = se.m_elem[0];
+		FEElement* pe = se.m_elem[0].pe;
 		if (pe)
 		{
 			// get the material
@@ -901,7 +902,7 @@ double FESlidingInterfaceMP::AutoPenalty(FESurfaceElement& el, FESurface &s)
     FEMesh& m = GetFEModel()->GetMesh();
     
     // get the element this surface element belongs to
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == 0) return 0.0;
 
 	tens4ds S;
@@ -969,7 +970,7 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
 	n.unit();
 	
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == 0) return 0.0;
 
 	// get the material
@@ -1045,7 +1046,7 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
 	n.unit();
 	
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == 0) return 0.0;
 
 	// get the material
@@ -2859,7 +2860,7 @@ void FESlidingInterfaceMP::UpdateContactPressures()
 bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
-    if (m_laugon != 1) return true;
+    if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
     double Ln, Lp;
     int nsol = (int)m_sid.size();

@@ -47,15 +47,6 @@ FEFluidSupplyStarling::FEFluidSupplyStarling(FEModel* pfem) : FEFluidSupply(pfem
 {
 	m_kp = 0;
 	m_pv = 0;
-/*
-    // get number of DOFS
-	DOFS& fedofs = pfem->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
-    if (MAX_CDOFS > 0) {
-        m_qc.assign(MAX_CDOFS,0);
-        m_cv.assign(MAX_CDOFS,0);
-    }*/
 }
 
 //-----------------------------------------------------------------------------

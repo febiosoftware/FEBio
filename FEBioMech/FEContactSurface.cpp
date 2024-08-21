@@ -35,14 +35,19 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEContactSurface::FEContactSurface(FEModel* pfem) : FESurface(pfem), m_pfem(pfem)
 {
-	m_pSibling = 0; 
+	m_pContactInterface = nullptr;
+	m_pSibling = nullptr; 
 	m_dofX = -1;
 	m_dofY = -1;
 	m_dofZ = -1;
 }
 
 //-----------------------------------------------------------------------------
-FEContactSurface::~FEContactSurface() { m_pSibling = 0; m_pContactInterface = 0; }
+FEContactSurface::~FEContactSurface()
+{
+	m_pSibling = nullptr; 
+	m_pContactInterface = nullptr; 
+}
 
 //-----------------------------------------------------------------------------
 bool FEContactSurface::Init()
@@ -53,7 +58,7 @@ bool FEContactSurface::Init()
 	m_dofY = dofs.GetDOF("y");
 	m_dofZ = dofs.GetDOF("z");
 
-    SetInterfaceStatus(true);
+	SetInterfaceStatus(true);
 	return FESurface::Init();
 }
 
@@ -100,7 +105,7 @@ double FEContactSurface::GetContactArea() { return 0; }
 void FEContactSurface::GetSurfaceTraction(int nface, vec3d& pt)
 {
     FESurfaceElement& el = Element(nface);
-    FEElement* e = el.m_elem[0];
+    FEElement* e = el.m_elem[0].pe;
     FESolidElement* se = dynamic_cast<FESolidElement*>(e);
     if (se) {
         mat3ds si[FEElement::MAX_INTPOINTS];
@@ -144,7 +149,7 @@ void FEContactSurface::GetSurfaceTraction(int nface, vec3d& pt)
 void FEContactSurface::GetNodalSurfaceTraction(int nface, vec3d* pt)
 {
     FESurfaceElement& el = Element(nface);
-	FEElement* e = el.m_elem[0];
+	FEElement* e = el.m_elem[0].pe;
 	FESolidElement* se = dynamic_cast<FESolidElement*>(e);
     if (se) {
         mat3ds si[FEElement::MAX_INTPOINTS];
@@ -185,7 +190,7 @@ void FEContactSurface::GetNodalSurfaceTraction(int nface, vec3d* pt)
 void FEContactSurface::GetGPSurfaceTraction(int nface, vec3d* pt)
 {
     FESurfaceElement& el = Element(nface);
-	FEElement* e = el.m_elem[0];
+	FEElement* e = el.m_elem[0].pe;
 	FESolidElement* se = dynamic_cast<FESolidElement*>(e);
     if (se) {
         mat3ds si[FEElement::MAX_INTPOINTS];

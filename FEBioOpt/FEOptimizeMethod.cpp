@@ -28,5 +28,6 @@ SOFTWARE.*/
 
 FEOptimizeMethod::FEOptimizeMethod(FEModel* fem) : FECoreClass(fem)
 { 
-	m_print_level = PRINT_ITERATIONS; 
+	m_loglevel = LogLevel::LOG_NEVER;
+	m_print_level = PRINT_ITERATIONS;
 }

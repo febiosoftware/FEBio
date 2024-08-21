@@ -153,6 +153,7 @@ public:
 	void value(XMLTag& tag, int&    n);
 	void value(XMLTag& tag, double& g);
 	void value(XMLTag& tag, bool&   b);
+	void value(XMLTag& tag, vec2d&  v);
 	void value(XMLTag& tag, vec3d&  v);
 	void value(XMLTag& tag, mat3d&  m);
 	void value(XMLTag& tag, mat3ds& m);

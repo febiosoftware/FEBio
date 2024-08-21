@@ -33,7 +33,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEDomain::FEDomain(int nclass, FEModel* fem) : FEMeshPartition(nclass, fem)
 {
-
+	m_matAxis = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -55,6 +55,10 @@ void FEDomain::SetMatID(int mid)
 // determines how many integration points an element gets). 
 void FEDomain::CreateMaterialPointData()
 {
+	// This function is called before Init is called, so we need to do the 
+	// initialization of the mat_axis here.
+	if (m_matAxis) m_matAxis->Init();
+
 	FEMaterial* pmat = GetMaterial();
 	FEMesh* mesh = GetMesh();
 	if (pmat) ForEachElement([=](FEElement& el) {
@@ -66,7 +70,9 @@ void FEDomain::CreateMaterialPointData()
 		for (int k = 0; k < el.GaussPoints(); ++k)
 		{
 			FEMaterialPoint* mp = new FEMaterialPoint(pmat->CreateMaterialPointData());
+			mp->m_Q = (m_matAxis ? m_matAxis->operator()(*mp) : mat3d::identity());
 			mp->m_r0 = el.Evaluate(r, k);
+			mp->m_rt = mp->m_r0;
 			mp->m_index = k;
 			el.SetMaterialPointData(mp, k);
 		}
