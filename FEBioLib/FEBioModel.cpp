@@ -762,7 +762,12 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 	if (m_createReport)
 	{
 		string msg = removeNewLines(szmsg);
-		msg.push_back('\n');
+
+		double t = GetCurrentTime();
+		stringstream ss;
+		ss << msg << " (t = " << t << ")\n";
+		msg = ss.str();
+
 		if (ntag == 1) m_report += "Warning: " + msg;
 		if (ntag == 2) m_report += "Error: " + msg;
 	}
