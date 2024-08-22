@@ -164,7 +164,17 @@ double MSimpleExpression::value(const MItem* pi) const
 	case MSFNC:
 		{
 			return value(msfncnd(pi)->Value());
-		};		
+		};
+		break;
+	case MFND:
+		{
+			const MFuncND* f = mfncnd(pi);
+			int n = f->Params();
+			vector<double> d(n, 0.0);
+			for (int i = 0; i < n; ++i) d[i] = value(f->Param(i));
+			return (f->funcptr())(d.data(), n);
+		}
+		break;
 	default:
 		assert(false);
 		return 0;
