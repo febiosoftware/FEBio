@@ -286,7 +286,6 @@ SOFTWARE.*/
 #include "FESolidModule.h"
 
 #include "FESolidAnalysis.h"
-#include <FECore/FEModelUpdate.h>
 
 #include "FEElasticBeamMaterial.h"
 
@@ -1155,16 +1154,6 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// Derived from FEElemDataGenerator
 	REGISTER_FECORE_CLASS(FEDeformationMapGenerator, "defgrad");
-
-	//-----------------------------------------------------------------------------
-	// Model update requests
-	febio.OnCreateEvent(UpdateModelWhenCreating<FESolidAnalysis>([](FEModelUpdate& fem) {
-			fem.AddPlotVariable("displacement");
-			fem.AddPlotVariable("stress");
-		}));
-
-	febio.OnCreateEvent(AddPlotVariableWhenCreating<FEContactInterface>("contact pressure"));
-	febio.OnCreateEvent(AddPlotVariableWhenCreating<FEContactInterface>("contact gap"));
 
 	febio.SetActiveModule(0);
 }

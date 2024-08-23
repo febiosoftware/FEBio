@@ -42,7 +42,6 @@ SOFTWARE.*/
 #include "FEFluidModule.h"
 #include "FEFluidFSIAnalysis.h"
 #include "FEFluidSupplyStarling.h"
-#include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
@@ -109,28 +108,6 @@ void FEBioFSI::InitModule()
     REGISTER_FECORE_CLASS(FEBiphasicFSIDomain3D, "biphasic-FSI-3D");
 
     REGISTER_FECORE_CLASS(FEFluidSupplyStarling, "Starling");
-    
-    //-----------------------------------------------------------------------------
-    // Reset solver parameters to preferred default settings
-    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 50;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
-        pc->m_iteopt = 50;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FEFluidFSIAnalysis>([](FEFluidFSIAnalysis* pc) {
-        pc->m_nanalysis = FEFluidFSIAnalysis::DYNAMIC;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
-        pc->m_maxref = 5;
-        pc->m_Rmax = 1.0e+20;
-        // turn off reform on each time step and diverge reform
-        pc->m_breformtimestep = false;
-        pc->m_bdivreform = false;
-    }));
-    
-    febio.SetActiveModule(0);
+
+	febio.SetActiveModule(0);
 }

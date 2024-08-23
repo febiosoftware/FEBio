@@ -42,7 +42,6 @@
 #include "FEPrescribedFluidAngularVelocity.h"
 #include "FEBioFluidPlot.h"
 #include "FEConstFluidBodyMoment.h"
-#include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
@@ -122,27 +121,5 @@ void FEBioPolarFluid::InitModule()
     REGISTER_FECORE_CLASS(FEPlotPolarFluidCoupleStress           , "polar fluid couple stress"            );
     REGISTER_FECORE_CLASS(FEPlotFluidSurfaceMoment               , "fluid surface moment"                 );
     
-    //-----------------------------------------------------------------------------
-    // Reset solver parameters to preferred default settings
-    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 50;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
-        pc->m_iteopt = 50;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FEPolarFluidAnalysis>([](FEPolarFluidAnalysis* pc) {
-        pc->m_nanalysis = FEPolarFluidAnalysis::DYNAMIC;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
-        pc->m_maxref = 5;
-        pc->m_Rmax = 1.0e+20;
-        // turn off reform on each time step and diverge reform
-        pc->m_breformtimestep = false;
-        pc->m_bdivreform = false;
-    }));
-    
-    febio.SetActiveModule(0);
+	febio.SetActiveModule(0);
 }

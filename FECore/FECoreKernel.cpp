@@ -80,7 +80,6 @@ FECoreKernel::FECoreKernel()
 	m_next_alloc_id = 1;
 	m_nspec = -1;
 	m_default_solver = nullptr;
-	m_blockEvents = true;
 	m_bshowDeprecationWarning = true;
 
 	// build the super class ID table
@@ -416,17 +415,6 @@ FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 		}
 	}
 
-	if ((m_blockEvents == false) && pc && (m_createHandlers.empty() == false))
-	{
-		for (int i = 0; i < m_createHandlers.size(); ++i)
-		{
-			FECreateHandler* ph = m_createHandlers[i];
-			if (ph && (IsModuleActive(ph->GetModuleID())))
-			{
-				ph->handle(pc);
-			}
-		}
-	}
 	return pc;
 }
 
@@ -802,18 +790,6 @@ FEDomain* FECoreKernel::CreateDomainExplicit(int superClass, const char* sztype,
 }
 
 //-----------------------------------------------------------------------------
-void FECoreKernel::OnCreateEvent(FECreateHandler* pf)
-{
-	pf->SetModuleID(GetActiveModuleID());
-	m_createHandlers.push_back(pf);
-}
-
-//-----------------------------------------------------------------------------
-void FECoreKernel::BlockEvents(bool b)
-{
-	m_blockEvents = b;
-}
-
 void FECoreKernel::ShowDeprecationWarnings(bool b)
 {
 	m_bshowDeprecationWarning = b;
