@@ -113,7 +113,7 @@ bool FELinearSolver::Init()
 	// we let the solver allocate the correct type of matrix format
 	Matrix_Type mtype = MatrixType();
 	SparseMatrix* pS = m_pls->CreateSparseMatrix(mtype);
-	if ((pS == 0) && (m_msymm == REAL_SYMMETRIC))
+	if ((pS == 0) && (mtype == REAL_SYMMETRIC))
 	{
 		// oh, oh, something went wrong. It's probably because the user requested a symmetric matrix for a 
 		// solver that wants a non-symmetric. If so, let's force a non-symmetric format.

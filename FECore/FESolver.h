@@ -161,9 +161,6 @@ public:
 	// get the linear solver
 	virtual LinearSolver* GetLinearSolver();
 
-	//! Matrix symmetry flag
-	int MatrixSymmetryFlag() const;
-
 	//! get matrix type
 	Matrix_Type MatrixType() const;
 
@@ -185,6 +182,9 @@ public:
 
 	// return the solution vector
 	virtual std::vector<double> GetSolutionVector() const;
+
+private:
+	Matrix_Type PreferredMatrixType() const;
 
 public: //TODO Move these parameters elsewhere
 	bool				m_bwopt;	    //!< bandwidth optimization flag
