@@ -38,9 +38,11 @@ BEGIN_FECORE_CLASS(FEDistanceConstraint, FENLConstraint);
 	ADD_PARAMETER(m_blaugon, "laugon" ); 
 	ADD_PARAMETER(m_atol   , "augtol" );
 	ADD_PARAMETER(m_eps    , "penalty");
-	ADD_PARAMETER(m_node   , 2, "node");
+	ADD_PARAMETER(m_nodeID , 2, "node");
 	ADD_PARAMETER(m_nminaug, "minaug");
 	ADD_PARAMETER(m_nmaxaug, "maxaug");
+	ADD_PARAMETER(m_target, "target");
+	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -52,10 +54,14 @@ FEDistanceConstraint::FEDistanceConstraint(FEModel* pfem) : FENLConstraint(pfem)
 	m_blaugon = false;
 	m_node[0] = -1;
 	m_node[1] = -1;
+	m_nodeID[0] = -1;
+	m_nodeID[1] = -1;
 	m_l0 = 0.0;
 	m_Lm = 0.0;
 	m_nminaug = 0;
 	m_nmaxaug = 10;
+	m_target = 0;
+	m_brelative = true;
 
 	// TODO: Can this be done in Init, since there is no error checking
 	if (pfem)
@@ -73,9 +79,10 @@ bool FEDistanceConstraint::Init()
 	int NN = mesh.Nodes();
 
 	// make sure the nodes are valid
-	// (remember, they are one-based since they are defined in the input file)
-	if ((m_node[0] <= 0)||(m_node[0] > NN)) return false;
-	if ((m_node[1] <= 0)||(m_node[1] > NN)) return false;
+	m_node[0] = mesh.FindNodeIndexFromID(m_nodeID[0]);
+	m_node[1] = mesh.FindNodeIndexFromID(m_nodeID[1]);
+	if ((m_node[0] < 0)||(m_node[0] >= NN)) return false;
+	if ((m_node[1] < 0)||(m_node[1] >= NN)) return false;
 
 	return true;
 }
@@ -91,8 +98,8 @@ void FEDistanceConstraint::Activate()
 	int NN = mesh.Nodes();
 
 	// get the initial position of the two nodes
-	vec3d ra = mesh.Node(m_node[0] - 1).m_rt;
-	vec3d rb = mesh.Node(m_node[1] - 1).m_rt;
+	vec3d ra = mesh.Node(m_node[0]).m_rt;
+	vec3d rb = mesh.Node(m_node[1]).m_rt;
 
 	// set the initial length
 	m_l0 = (ra - rb).norm();
@@ -105,8 +112,8 @@ void FEDistanceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	FEMesh& mesh = GetMesh();
 
 	// get the two nodes
-	FENode& nodea = mesh.Node(m_node[0] - 1);
-	FENode& nodeb = mesh.Node(m_node[1] - 1);
+	FENode& nodea = mesh.Node(m_node[0]);
+	FENode& nodeb = mesh.Node(m_node[1]);
 
 	// get the current position of the two nodes
 	vec3d ra = nodea.m_rt;
@@ -114,7 +121,11 @@ void FEDistanceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// calculate the force
 	double lt = (ra - rb).norm();
-	double Lm = m_Lm + m_eps*(lt - m_l0);
+
+	double l0 = (m_brelative ? m_l0 + m_target : m_target);
+	if (l0 < 0) l0 = 0;
+
+	double Lm = m_Lm + m_eps*(lt - l0);
 	vec3d Fc = (ra - rb)*(Lm/lt);
 
 	// setup the "element" force vector
@@ -137,8 +148,8 @@ void FEDistanceConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 
 	// setup element vector
 	vector<int> en(2);
-	en[0] = m_node[0] - 1;
-	en[1] = m_node[1] - 1;
+	en[0] = m_node[0];
+	en[1] = m_node[1];
 
 	// add element force vector to global force vector
 	R.Assemble(en, lm, fe);
@@ -151,8 +162,8 @@ void FEDistanceConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 	FEMesh& mesh = GetMesh();
 
 	// get the two nodes
-	FENode& nodea = mesh.Node(m_node[0] - 1);
-	FENode& nodeb = mesh.Node(m_node[1] - 1);
+	FENode& nodea = mesh.Node(m_node[0]);
+	FENode& nodeb = mesh.Node(m_node[1]);
 
 	// get the current position of the two nodes
 	vec3d ra = nodea.m_rt;
@@ -161,8 +172,11 @@ void FEDistanceConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 
 	// calculate the Lagrange mulitplier
 	double lt = rab.norm();
-	double l0 = m_l0;
 	double l3 = lt*lt*lt;
+
+	double l0 = (m_brelative ? m_l0 + m_target : m_target);
+	if (l0 < 0) l0 = 0;
+
 	double Lm = m_Lm + m_eps*(lt - l0);
 
 	// calculate the stiffness
@@ -197,8 +211,8 @@ void FEDistanceConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 
 	// setup element vector
 	vector<int> en(2);
-	en[0] = m_node[0] - 1;
-	en[1] = m_node[1] - 1;
+	en[0] = m_node[0];
+	en[1] = m_node[1];
 
 	// assemble element matrix in global stiffness matrix
 	ke.SetNodes(en);
@@ -216,8 +230,8 @@ bool FEDistanceConstraint::Augment(int naug, const FETimeInfo& tp)
 	FEMesh& mesh = GetMesh();
 
 	// get the two nodes
-	FENode& nodea = mesh.Node(m_node[0] - 1);
-	FENode& nodeb = mesh.Node(m_node[1] - 1);
+	FENode& nodea = mesh.Node(m_node[0]);
+	FENode& nodeb = mesh.Node(m_node[1]);
 
 	// get the current position of the two nodes
 	vec3d ra = nodea.m_rt;
@@ -225,7 +239,11 @@ bool FEDistanceConstraint::Augment(int naug, const FETimeInfo& tp)
 
 	// calculate the Lagrange multipler
 	double l = (ra - rb).norm();
-	double Lm = m_Lm + m_eps*(l - m_l0);
+
+	double l0 = (m_brelative ? m_l0 + m_target : m_target);
+	if (l0 < 0) l0 = 0;
+
+	double Lm = m_Lm + m_eps*(l - l0);
 
 	// calculate force
 	vec3d Fc = (ra - rb)*(Lm/l);
@@ -256,11 +274,11 @@ void FEDistanceConstraint::BuildMatrixProfile(FEGlobalMatrix& M)
 {
 	FEMesh& mesh = GetMesh();
 	vector<int> lm(6);
-	FENode& n0 = mesh.Node(m_node[0] - 1);
+	FENode& n0 = mesh.Node(m_node[0]);
 	lm[0] = n0.m_ID[m_dofU[0]];
 	lm[1] = n0.m_ID[m_dofU[1]];
 	lm[2] = n0.m_ID[m_dofU[2]];
-	FENode& n1 = mesh.Node(m_node[1] - 1);
+	FENode& n1 = mesh.Node(m_node[1]);
 	lm[3] = n1.m_ID[m_dofU[0]];
 	lm[4] = n1.m_ID[m_dofU[1]];
 	lm[5] = n1.m_ID[m_dofU[2]];

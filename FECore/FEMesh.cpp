@@ -67,7 +67,8 @@ FEDataMap* CreateDataMap(int mapType)
 //-----------------------------------------------------------------------------
 FEMesh::FEMesh(FEModel* fem) : m_fem(fem)
 {
-	m_LUT = 0;
+	m_ELT = nullptr;
+	m_NLT = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -248,6 +249,9 @@ void FEMesh::CreateNodes(int nodes)
 
 	m_NEL.Clear();
 	m_EEL.Clear();
+
+	delete m_ELT; m_ELT = nullptr;
+	delete m_NLT; m_NLT = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -265,6 +269,9 @@ void FEMesh::AddNodes(int nodes)
 
 	m_Node.resize(N0 + nodes);
 	for (int i=0; i<nodes; ++i) m_Node[i+N0].SetID(n0+i);
+
+	delete m_ELT; m_ELT = nullptr;
+	delete m_NLT; m_NLT = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -398,7 +405,8 @@ void FEMesh::Clear()
 
 	m_NEL.Clear();
 	m_EEL.Clear();
-	if (m_LUT) delete m_LUT; m_LUT = 0;
+	if (m_ELT) delete m_ELT; m_ELT = nullptr;
+	if (m_NLT) delete m_NLT; m_NLT = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -571,7 +579,7 @@ void FEMesh::AddDomain(FEDomain* pd)
 	int N = (int)m_Domain.size();
 	pd->SetID(N);
 	m_Domain.push_back(pd); 
-	if (m_LUT) delete m_LUT; m_LUT = 0;
+	if (m_ELT) delete m_ELT; m_ELT = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -615,12 +623,14 @@ FEElement* FEMesh::Element(int n)
 
 FENode* FEMesh::FindNodeFromID(int nid)
 {
-	for (int i = 0; i<Nodes(); ++i)
-	{
-		FENode& node = Node(i);
-		if (node.GetID() == nid) return &node;
-	}
-	return 0;
+	if (m_NLT == nullptr) m_NLT = new FENodeLUT(*this);
+	return m_NLT->Find(nid);
+}
+
+int FEMesh::FindNodeIndexFromID(int nid)
+{
+	if (m_NLT == nullptr) m_NLT = new FENodeLUT(*this);
+	return m_NLT->FindIndex(nid);
 }
 
 //-----------------------------------------------------------------------------
@@ -628,14 +638,14 @@ FENode* FEMesh::FindNodeFromID(int nid)
 
 FEElement* FEMesh::FindElementFromID(int elemID)
 {
-	if (m_LUT == 0) m_LUT = new FEElementLUT(*this);
-	return m_LUT->Find(elemID);
+	if (m_ELT == nullptr) m_ELT = new FEElementLUT(*this);
+	return m_ELT->Find(elemID);
 }
 
 int FEMesh::FindElementIndexFromID(int elemID)
 {
-	if (m_LUT == 0) m_LUT = new FEElementLUT(*this);
-	return m_LUT->FindIndex(elemID);
+	if (m_ELT == nullptr) m_ELT = new FEElementLUT(*this);
+	return m_ELT->FindIndex(elemID);
 }
 
 /*
@@ -703,15 +713,15 @@ void FEMesh::ClearDomains()
 	int N = Domains();
 	for (int i = 0; i < N; ++i) delete m_Domain[i];
 	m_Domain.clear();
-	if (m_LUT) delete m_LUT; m_LUT = 0;
+	if (m_ELT) delete m_ELT; m_ELT = 0;
 }
 
 //-----------------------------------------------------------------------------
 //! Rebuild the LUT
 void FEMesh::RebuildLUT()
 {
-	if (m_LUT) delete m_LUT;
-	m_LUT = new FEElementLUT(*this);
+	if (m_ELT) delete m_ELT;
+	m_ELT = new FEElementLUT(*this);
 }
 
 //-----------------------------------------------------------------------------
@@ -979,6 +989,48 @@ void FEMesh::GetNodalCoordinates(const FEElement& el, vec3d* node)
 {
 	const int neln = el.Nodes();
 	for (int i=0; i<neln; ++i) node[i] = Node(el.m_node[i]).m_rt;
+}
+
+//=============================================================================
+FENodeLUT::FENodeLUT(FEMesh& mesh)
+{
+	m_mesh = &mesh;
+
+	// get the ID ranges
+	m_minID = -1;
+	m_maxID = -1;
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		int nid = node.GetID();
+		if ((nid < m_minID) || (m_minID == -1)) m_minID = nid;
+		if ((nid > m_maxID) || (m_maxID == -1)) m_maxID = nid;
+	}
+
+	// allocate size
+	int nsize = m_maxID - m_minID + 1;
+	m_node.resize(nsize, -1);
+
+	// fill the table
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		int nid = node.GetID();
+		m_node[nid - m_minID] = i;
+	}
+}
+
+// Find an element from its ID
+FENode* FENodeLUT::Find(int nodeID) const
+{
+	if ((nodeID < m_minID) || (nodeID > m_maxID)) return nullptr;
+	return &m_mesh->Node(m_node[nodeID - m_minID]);
+}
+
+int FENodeLUT::FindIndex(int nodeID) const
+{
+	if ((nodeID < m_minID) || (nodeID > m_maxID)) return -1;
+	return m_node[nodeID - m_minID];
 }
 
 //=============================================================================

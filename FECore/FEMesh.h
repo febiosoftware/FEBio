@@ -50,6 +50,25 @@ class FEDataMap;
 class DumpStream;
 
 //---------------------------------------------------------------------------------------
+// Helper class for faster lookup of nodes based on their ID 
+class FECORE_API FENodeLUT
+{
+public:
+	FENodeLUT(FEMesh& mesh);
+
+	// Find an element from its ID
+	FENode* Find(int nodeID) const;
+
+	// return an element's zero-based index
+	int FindIndex(int nodeID) const;
+
+private:
+	vector<int>		m_node;
+	int				m_minID, m_maxID;
+	FEMesh*			m_mesh;
+};
+
+//---------------------------------------------------------------------------------------
 // Helper class for faster lookup of elements based on their ID 
 class FECORE_API FEElementLUT
 {
@@ -128,6 +147,9 @@ public:
 
 	//! Finds a node from a given ID
 	FENode* FindNodeFromID(int nid);
+
+	//! Finds node index from a given ID
+	int FindNodeIndexFromID(int nid);
 
 	//! return an element (expensive way!)
 	FEElement* Element(int i);
@@ -284,7 +306,8 @@ private:
 	FEBoundingBox		m_box;	//!< bounding box
 
 	FENodeElemList	m_NEL;
-	FEElementLUT*	m_LUT;
+	FEElementLUT*	m_ELT;
+	FENodeLUT*		m_NLT;
 
 	FEElemElemList	m_EEL;
 
