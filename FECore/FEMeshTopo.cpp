@@ -290,7 +290,7 @@ std::vector<FEElement*> FEMeshTopo::ElementNeighborList(int n)
 	int nbrs = 0;
 	switch (el->Shape())
 	{
-	case ET_HEX8: nbrs = 8; break;
+	case ET_HEX8: nbrs = 6; break;
 	case ET_TET4: nbrs = 4; break;
 	case ET_TET5: nbrs = 4; break;
 	default:
@@ -313,7 +313,7 @@ std::vector<int> FEMeshTopo::ElementNeighborIndexList(int n)
 	int nbrs = 0;
 	switch (el->Shape())
 	{
-	case ET_HEX8: nbrs = 8; break;
+	case ET_HEX8: nbrs = 6; break;
 	case ET_TET4: nbrs = 4; break;
 	case ET_TET5: nbrs = 4; break;
 	default:

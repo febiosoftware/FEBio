@@ -46,7 +46,7 @@ BEGIN_FECORE_CLASS(FEErosionAdaptor, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxelem, "max_elems");
 	ADD_PARAMETER(m_nsort, "sort");
 	ADD_PARAMETER(m_bremoveIslands, "remove_islands");
-	ADD_PARAMETER(m_erodeSurfaces, "erode_surfaces")->setEnums("No\0Yes\0Grow\0");
+	ADD_PARAMETER(m_erodeSurfaces, "erode_surfaces")->setEnums("no\0yes\0grow\0reconstruct\0");
 
 	ADD_PROPERTY(m_criterion, "criterion");
 END_FECORE_CLASS();
@@ -136,6 +136,7 @@ bool FEErosionAdaptor::Apply(int iteration)
 	case SurfaceErodeOption::DONT_ERODE: break;// don't do anything
 	case SurfaceErodeOption::ERODE: ErodeSurfaces(); break;
 	case SurfaceErodeOption::GROW : GrowErodedSurfaces(topo); break;
+	case SurfaceErodeOption::RECONSTRUCT: ReconstructSurfaces(topo); break;
 	}
 
 	// remove any linear constraints of excluded nodes
@@ -178,7 +179,7 @@ void FEErosionAdaptor::RemoveIslands(FEMeshTopo& topo)
 				island.push_back(id);
 
 				// loop over all the neighbors
-				vector<int> nbrList = topo.ElementNeighborIndexList(n);
+				vector<int> nbrList = topo.ElementNeighborIndexList(id);
 				for (int i = 0; i < nbrList.size(); ++i)
 				{
 					FEElement* eli = topo.Element(nbrList[i]);
@@ -433,5 +434,42 @@ void FEErosionAdaptor::UpdateLinearConstraints()
 			}
 		}
 		if (del) LCM.RemoveLinearConstraint(j); else ++j;
+	}
+}
+
+void FEErosionAdaptor::ReconstructSurfaces(FEMeshTopo& topo)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	// We assume that the surfaces are definded through part lists. 
+	// We don't actually store which surfaces are generated from part lists,
+	// but they should have the same name. 
+	for (int i = 0; i < mesh.Surfaces(); ++i)
+	{
+		FESurface& surf = mesh.Surface(i);
+
+		// see if a part list exists with this name
+		FEDomainList* domList = mesh.FindDomainList(surf.GetName());
+		if (domList)
+		{
+			// build the outer surface
+			FEFacetSet* facetSet = mesh.DomainBoundary(*domList);
+
+			FEFacetSet* oldFacetSet = surf.GetFacetSet();
+			if (oldFacetSet == nullptr)
+			{
+				surf.Create(*facetSet);
+			}
+			else
+			{
+				oldFacetSet->Clear();
+				oldFacetSet->Add(facetSet);
+				surf.Create(*oldFacetSet);
+			}
+
+			surf.CreateMaterialPointData();
+			surf.Init();
+		}
 	}
 }

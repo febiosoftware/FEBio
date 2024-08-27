@@ -393,6 +393,7 @@ void FEMesh::Clear()
 	for (size_t i=0; i<m_DiscSet.size (); ++i) delete m_DiscSet [i];
 	for (size_t i=0; i<m_FaceSet.size (); ++i) delete m_FaceSet [i];
 	for (size_t i=0; i<m_SurfPair.size(); ++i) delete m_SurfPair[i];
+	for (size_t i=0; i<m_DomList.size (); ++i) delete m_DomList [i];
 
 	m_Domain.clear();
 	m_Surf.clear();
@@ -402,6 +403,7 @@ void FEMesh::Clear()
 	m_DiscSet.clear();
 	m_FaceSet.clear();
 	m_SurfPair.clear();
+	m_DomList.clear();
 
 	m_NEL.Clear();
 	m_EEL.Clear();
@@ -560,11 +562,17 @@ FEFacetSet* FEMesh::FindFacetSet(const std::string& name)
 	return 0;
 }
 
-//-----------------------------------------------------------------------------
 FESurfacePair* FEMesh::FindSurfacePair(const std::string& name)
 {
-	for (size_t i = 0; i<m_SurfPair.size(); ++i) if (m_SurfPair[i]->GetName() == name) return m_SurfPair[i];
-	return 0;
+	for (FESurfacePair* sp : m_SurfPair) if (sp->GetName() == name) return sp;
+	return nullptr;
+}
+
+FEDomainList* FEMesh::FindDomainList(const std::string& name)
+{
+	for (FEDomainList* dom : m_DomList) 
+		if (dom->GetName() == name) return dom;
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -897,6 +905,12 @@ FESurface* FEMesh::ElementBoundarySurface(std::vector<FEDomain*> domains, bool b
 
 FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside, bool binside)
 {
+	FEDomainList tmp(domains);
+	return DomainBoundary(tmp, boutside, binside);
+}
+
+FEFacetSet* FEMesh::DomainBoundary(FEDomainList& domains, bool boutside, bool binside)
+{
 	if ((boutside == false) && (binside == false)) return nullptr;
 
 	// get the element neighbor list
@@ -913,14 +927,22 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
-			int index = FindElementIndexFromID(el.GetID());
-			int nf = el.Faces();
-			for (int k = 0; k < nf; ++k)
+			if (el.isActive())
 			{
-				FEElement* pen = EEL.Neighbor(index, k);
-				if ((pen == nullptr) && boutside) ++NF;
-				else if (pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ++NF;
-				if ((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())) ++NF;
+				int index = FindElementIndexFromID(el.GetID());
+				int nf = el.Faces();
+				for (int k = 0; k < nf; ++k)
+				{
+					FEElement* pen = EEL.Neighbor(index, k);
+					if ((pen == nullptr) && boutside) ++NF;
+					else if (pen && !pen->isActive() && boutside) ++NF;
+					else if (pen)
+					{
+						FEDomain* domk = dynamic_cast<FEDomain*>(pen->GetMeshPartition()); assert(domk);
+						if (boutside && !domains.IsMember(domk)) ++NF;
+						else if (binside && domains.IsMember(domk) && (el.GetID() < pen->GetID())) ++NF;
+					}
+				}
 			}
 		}
 	}
@@ -938,33 +960,45 @@ FEFacetSet* FEMesh::DomainBoundary(std::vector<FEDomain*> domains, bool boutside
 		for (int j = 0; j < domains[i]->Elements(); j++)
 		{
 			FEElement& el = domains[i]->ElementRef(j);
-			int index = FindElementIndexFromID(el.GetID());
-			int nf = el.Faces();
-			for (int k = 0; k < nf; ++k)
+			if (el.isActive())
 			{
-				FEElement* pen = EEL.Neighbor(index, k);
-				if (((pen == nullptr) && boutside) ||
-					(pen && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) == domains.end()) && boutside) ||
-					((pen != nullptr) && (el.GetID() < pen->GetID()) && binside && (std::find(domains.begin(), domains.end(), pen->GetMeshPartition()) != domains.end())))
+				int index = FindElementIndexFromID(el.GetID());
+				int nf = el.Faces();
+				for (int k = 0; k < nf; ++k)
 				{
-					FEFacetSet::FACET& f = ps->Face(NF++);
-					int fn = el.GetFace(k, faceNodes);
+					FEElement* pen = EEL.Neighbor(index, k);
+					bool addFace = false;
 
-					switch (fn)
+					if ((pen == nullptr) && boutside) addFace = true;
+					else if (pen && !pen->isActive() && boutside) addFace = true;
+					else if (pen)
 					{
-					case 4: f.ntype = FEFacetSet::FACET::QUAD4; break;
-					case 8: f.ntype = FEFacetSet::FACET::QUAD8; break;
-					case 9: f.ntype = FEFacetSet::FACET::QUAD9; break;
-					case 3: f.ntype = FEFacetSet::FACET::TRI3; break;
-					case 6: f.ntype = FEFacetSet::FACET::TRI6; break;
-					case 7: f.ntype = FEFacetSet::FACET::TRI7; break;
-					default:
-						assert(false);
+						FEDomain* domk = dynamic_cast<FEDomain*>(pen->GetMeshPartition()); assert(domk);
+						if (boutside && !domains.IsMember(domk)) addFace = true;
+						else if (binside && domains.IsMember(domk) && (el.GetID() < pen->GetID())) addFace = true;
 					}
 
-					for (int p = 0; p < fn; ++p)
+					if (addFace)
 					{
-						f.node[p] = faceNodes[p];
+						FEFacetSet::FACET& f = ps->Face(NF++);
+						int fn = el.GetFace(k, faceNodes);
+
+						switch (fn)
+						{
+						case 4: f.ntype = FEFacetSet::FACET::QUAD4; break;
+						case 8: f.ntype = FEFacetSet::FACET::QUAD8; break;
+						case 9: f.ntype = FEFacetSet::FACET::QUAD9; break;
+						case 3: f.ntype = FEFacetSet::FACET::TRI3; break;
+						case 6: f.ntype = FEFacetSet::FACET::TRI6; break;
+						case 7: f.ntype = FEFacetSet::FACET::TRI7; break;
+						default:
+							assert(false);
+						}
+
+						for (int p = 0; p < fn; ++p)
+						{
+							f.node[p] = faceNodes[p];
+						}
 					}
 				}
 			}
