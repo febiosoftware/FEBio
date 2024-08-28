@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEEdgeList.h"
 #include "FEFaceList.h"
+#include "vec3d.h"
 
 class FEMesh;
 class FEElement;
@@ -98,7 +99,21 @@ public:
 
 	// return the element neighbor index list
 	std::vector<int> ElementNeighborIndexList(int i);
+    
+    // evaluate centroid of element
+    vec3d ElementCentroid(int i);
+    
+    // evaluate proximity of element i to point x
+    double Proximity(vec3d x, int i);
+    
+    // find neighboring elements that fall within given proximity d
+    std::vector<int> ElementProximityList(int i, double d, bool bexcself = true);
+    
+    // recursively search all elements
+    bool RecursiveSearch(vec3d x, double d, std::vector<int>ENIL);
 
 private:
 	MeshTopoImp*	imp;
+    std::vector<int>    m_EPL;      // element proximity list
+    std::vector<bool>   m_vst;      // list of visited elements
 };
