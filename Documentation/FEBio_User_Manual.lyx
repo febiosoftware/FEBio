@@ -31523,10 +31523,90 @@ A potential based sliding contact interface
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\align center
 \begin_inset VSpace defskip
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+A note on auto-contact
+\end_layout
+
+\begin_layout Standard
+The two surfaces that participate in the contact are specified via a surface
+ pair.
+ These surface pairs are defined in the SurfacePair subsection of the Mesh
+ section of the input file.
+ Typically the surfaces are chosen based on the user's knowledge of where
+ the contact will occur.
+ However, for complex geometries it might not be clear where the contact
+ will occur, or identifying the surfaces may be cumbersome.
+ For this reason, FEBio supports an auto-contact option, where users only
+ need to specify the parts of the primary and secondary surfaces.
+ From these part lists, FEBio will extract the surfaces automatically.
+ To use the auto-contact, simply specify a part list instead of the surface
+ names when defining the surface pair.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<PartList name="SlidingElastic1Primary">Part1</PartList>
+\end_layout
+
+\begin_layout LyX-Code
+<PartList name="SlidingElastic1Secondary">Part2</PartList> 
+\end_layout
+
+\begin_layout LyX-Code
+<SurfacePair name="SlidingElastic1">
+\end_layout
+
+\begin_layout LyX-Code
+   <primary>
+\series bold
+@part_list:SlidingElastic1Primary
+\series default
+</primary>
+\end_layout
+
+\begin_layout LyX-Code
+   <secondary>
+\series bold
+@part_list:SlidingElastic1Secondary
+\series default
+</secondary>
+\end_layout
+
+\begin_layout LyX-Code
+</SurfacePair> 
+\end_layout
+
+\begin_layout Standard
+Note the 
+\series bold
+@part_list:
+\series default
+ prefix in front of the part list name.
+ 
+\end_layout
+
+\begin_layout Standard
+Although using the auto-contact can greatly simply defining contact between
+ parts, it is important to keep in mind that there are a few drawbacks.
+ First and foremost, the surfaces extracted from parts will likely be much
+ larger than the contact area and this will result in a performance cost.
+ Second, for complex geometries the extract surfaces may have a complex
+ topology that may confuse some of the contact detection algorithms.
+ In those situations it might be beneficial to decrease the search_radius
+ parameter (for contact algorihtms that define this parameter).
+ 
 \end_layout
 
 \begin_layout Subsection
