@@ -95,5 +95,6 @@ double FEMassActionForwardERD::Tangent_ReactionSupply_Concentration(FEMaterialPo
 //! tangent of molar supply with Cauchy stress (sigma) at material point
 mat3ds FEMassActionForwardERD::Tangent_ReactionSupply_Stress(FEMaterialPoint& pt)
 {
-    return mat3ds(0);
+    return m_pFwd->Tangent_ReactionRate_Stress(pt);
+    //return mat3ds(0);
 }

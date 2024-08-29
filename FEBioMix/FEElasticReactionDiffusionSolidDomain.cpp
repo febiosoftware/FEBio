@@ -535,7 +535,7 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
         FEMaterialPoint& mp = *el.GetMaterialPoint(i_k);
         FEElasticMaterialPoint&  ep = *(mp.ExtractData<FEElasticMaterialPoint >());
         FESolutesMaterialPoint&  sp = *(mp.ExtractData<FESolutesMaterialPoint >());
-        
+
         // calculate jacobian
         detJ = ShapeGradient(el, i_k, gradN);
         
@@ -546,6 +546,13 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
         
         // get elasticity tensor
         tens4ds C = m_pMat->Tangent(mp);
+        tens4ds Ce = C;
+
+        FEGrowthTensor* gmat = p_kg->GetGrowthMaterial();
+        int g_sol = gmat->m_sol_id - 1;
+        double phi_cdot = gmat->EnvironmentalFunction(mp);
+        double k_theta = gmat->ActivationFunction(mp);
+        double dkdtheta = gmat->dkdtheta(mp);
         
         // next we get the determinant
         double J = ep.m_J;
@@ -557,21 +564,16 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
         vector<mat3ds> ImD(n_sol);
         mat3dd I(1);
         
-        // evaluate the solvent supply and its derivatives
-        vector<double> dcdotdc(n_sol,0.0);
-
-        mat3ds dcdotdC = mat3ds(0.0);
         vector<mat3ds> dTdc(n_sol,mat3ds(0.0));
-        vector<mat3ds> dzetahatdsigma(n_r, mat3ds(0.0));
-        vector<mat3ds> dzhatde(n_r, mat3ds(0.0));
+        double dchatdzhat = 0.0;
+        mat3ds dzhatdsigma = mat3ds(0.0);
+        mat3ds dchatde = mat3ds(0.0);
         
         // chemical reactions
 		vector<double> reactionSupply(n_r, 0.0);
 
-        FEGrowthTensor* gmat = p_kg->GetGrowthMaterial();
-        int g_sol;
-        if(p_kg)
-            g_sol = gmat->m_sol_id - 1;
+        //get the growth elasticity tensor
+        //
 
         //fill in solute diffusivity
         for (int i_sol = 0; i_sol < n_sol; ++i_sol)
@@ -584,19 +586,26 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
 
             reactionSupply[i_r] = reacti->ReactionSupply(mp);
 
-            for (int i_sol = 0; i_sol < n_sol; ++i_sol)
-                dcdotdc[i_sol] += reacti->Tangent_ReactionSupply_Concentration(mp, i_sol);
-
             if (p_kg)
             {
-                dzetahatdsigma[i_r] = reacti->Tangent_ReactionSupply_Stress(mp);
-                dzhatde[i_r] = C.dot(dzetahatdsigma[i_r]);
+                dchatdzhat = reacti->m_v[g_sol];
+                double k_r = reacti->m_pFwd->ReactionRate(mp);
+                double zhat = reactionSupply[i_r];
+                double dzhatdkf = (k_r / zhat);
+                dzhatdsigma = dchatdzhat * dzhatdkf * reacti->Tangent_ReactionSupply_Stress(mp);
+                dchatde = C.dot(dzhatdsigma);
             }
         }
 
         if (p_kg)
         {
-            dTdc[g_sol] = p_kg->dTdc(mp, g_sol) * dcdotdc[g_sol];
+            dTdc[g_sol] = p_kg->dTdc(mp, g_sol);
+            mat3ds dcdotdC = 0.5 * J * (ep.m_F.inverse() * dchatde * ep.m_F.transinv()).sym();;
+            double K_res = 1.0 - dt * dkdtheta * phi_cdot;
+            mat3ds dthetadC = dcdotdC * (gmat->ActivationFunction(mp) * gmat->m_gm(mp) * dt / K_res);
+            mat3ds dSdtheta = p_kg->dSdtheta(mp);
+            tens4ds Cg = dyad1s(dSdtheta, dthetadC);
+            C += (1.0 / J) * Cg.pp(ep.m_F);
         }
         
         // Miscellaneous constants
@@ -623,7 +632,7 @@ bool FEElasticReactionDiffusionSolidDomain::ElementElasticReactionDiffusionStiff
                     if(i_sol == g_sol)
                     {
                         //kcu
-                        vec3d kcu_tmp = H[i_a] * dzhatde[i_sol] * gradN[i_b];
+                        vec3d kcu_tmp = H[i_a] * dchatde * gradN[i_b];
                         ke[n_dpn * i_a + 3 + i_sol][n_dpn * i_b] = kcu_tmp.x;
                         ke[n_dpn * i_a + 3 + i_sol][n_dpn * i_b + 1] = kcu_tmp.y;
                         ke[n_dpn * i_a + 3 + i_sol][n_dpn * i_b + 2] = kcu_tmp.z;

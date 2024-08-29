@@ -58,6 +58,9 @@ public:
     //! dkdtheta
     virtual double dkdtheta(FEMaterialPoint& pt) = 0;
 
+    //! dphidcdot
+    virtual double dphidcdot(FEMaterialPoint& pt, double& sol_id) = 0;
+
     double SoluteConcentration(FEMaterialPoint& pt);
 
     double SBMConcentration(FEMaterialPoint& pt);
@@ -118,6 +121,9 @@ public:
     //! dkdtheta
     virtual double dkdtheta(FEMaterialPoint& pt) override;
 
+    //! dphidcdot
+    virtual double dphidcdot(FEMaterialPoint& pt, double& sol_i) override;
+
 public:
 
     // declare the parameter list
@@ -149,6 +155,9 @@ public:
     //! dkdtheta
     virtual double dkdtheta(FEMaterialPoint& pt) override;
 
+    //! dphidcdot
+    virtual double dphidcdot(FEMaterialPoint& pt, double& sol_i) override;
+
 public:
     FEVec3dValuator* m_fiber_0;
     FEVec3dValuator* m_fiber_1;
@@ -179,6 +188,9 @@ public:
 
     //! dkdtheta
     virtual double dkdtheta(FEMaterialPoint& pt) override;
+
+    //! dphidcdot
+    virtual double dphidcdot(FEMaterialPoint& pt, double& sol_i) override;
 
 public:
 

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEUncoupledMaterial.h"
 #include "FEGrowthTensor.h"
 #include <FEBioMix/FEElasticReactionDiffusion.h>
+#include <FECore/tools.h>
 
 //============================================================================
 //FEKinematicMaterialPoint::FEKinematicMaterialPoint(FEMaterialPointData* ppt) : FEMaterialPointData(ppt) {}
@@ -238,6 +239,8 @@ tens4ds FEKinematicGrowth::dSdFg(FEMaterialPoint& mp)
     double theta = std::max(kp->m_theta, 1.0e-20);
 
     mat3d Fe = ep.m_F * Fgi;
+    mat3d Fei = Fe.inverse();
+    mat3d FeiT = Fei.transpose();
     double Je = Fe.det();
     mat3ds Ce = (Fe.transpose() * Fe).sym();
     double J = ep.m_J;
@@ -248,16 +251,16 @@ tens4ds FEKinematicGrowth::dSdFg(FEMaterialPoint& mp)
     double dt = this->CurrentTimeIncrement();
 
     // solve dS/dFg
-    tens4ds Le = Je * Tangent(mp).pp(Fgi);
-    tens4ds L0 = Jg * Le.pp(Fgi);
+    tens4ds Ce4d = Tangent(mp);
+    tens4ds Le = Je * Ce4d.pp(FeiT);
     tens4d SoFgiT = dyad1(S, Fgi.transpose());
-    tens4d FgixS = dyad4(Fgi, S);
-    tens4d SxFgi = dyad4(S, Fgi);
-    tens4d FgioFgi = dyad2(Fgi, Fgi);
-    tens4d CeoFgi = dyad2(Ce, Fgi);
-    tens4d FgioCe = dyad2(Fgi, Ce);
+    tens4d FgioslashS = dyad2(Fgi, S);
+    tens4d SobslashFgi = dyad3(S, Fgi);
+    tens4d FgioslashFgi = dyad2(Fgi, Fgi);
+    tens4d CeoslashFgiT = dyad2(Ce, Fgi.transpose());
+    tens4d FgiTobslashCe = dyad3(Fgi.transpose(), Ce);
 
-    tens4ds dSdFg = (SoFgiT -FgixS - SxFgi - 0.5 * ddot(FgioFgi, ddot(Le, (CeoFgi + FgioCe)))).supersymm();
+    tens4ds dSdFg = (SoFgiT -FgioslashS - SobslashFgi - 0.5 * Jg * ddot(FgioslashFgi, ddot(Le, (FgiTobslashCe + CeoslashFgiT)))).supersymm();
     return dSdFg;
 }
 
@@ -274,15 +277,14 @@ mat3ds FEKinematicGrowth::dTdc(FEMaterialPoint& mp, int sol)
         mat3d F = ep.m_F;
         double J = ep.m_J;
         double k = gmat->ActivationFunction(mp);
-
+        double g = gmat->m_gm(mp);
         mat3d Q = GetLocalCS(mp);
         // get the fiber vector in local coordinates
         vec3d fiber = gmat->m_fiber.unitVector(mp);
         // convert to global coordinates
         vec3d a0 = Q * fiber;
-        double dt = CurrentTimeIncrement();
 
-        dTdc = (F * dSdtheta(mp) * F.transpose()).sym() * (k * dt / J);
+        dTdc = (F * dSdtheta(mp) * F.transpose()).sym() * (k * g / J);
     }
     return dTdc;
 }

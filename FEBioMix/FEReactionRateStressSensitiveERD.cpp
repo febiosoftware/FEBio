@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include <iostream>
 #include <FEBioMix/FEElasticReactionDiffusionSolidDomain.h>
 #include <FEBioMix/FEElasticReactionDiffusionDomain.h>
+#include <FEBioMix/FEMassActionForwardERD.h>
 
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactionRateStressSensitiveERD, FEReactionRateERD)
@@ -56,8 +57,8 @@ double FEReactionRateStressSensitiveERD::ReactionRate(FEMaterialPoint& pt)
 	FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
 	double I1 = ep.m_s.tr();
 	double m_S = m_a0 + m_a / (1.0 + (exp(-(I1 - m_s0) / m_b)));
-	double zhat = m_k(pt) * m_S;
-	return zhat;
+	
+	return m_k(pt) * m_S;
 }
 
 //-----------------------------------------------------------------------------
@@ -69,16 +70,18 @@ mat3ds FEReactionRateStressSensitiveERD::Tangent_ReactionRate_Strain(FEMaterialP
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of reaction rate with Cauchy stress (sigma) at material point
+//! tangent of reaction rate k with Cauchy stress (sigma) at material point
 mat3ds FEReactionRateStressSensitiveERD::Tangent_ReactionRate_Stress(FEMaterialPoint& pt)
 {
 	FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
 	FEElement* el = pt.m_elem;
 
 	double trs = ep.m_s.tr();
-	double m_S = m_a0 + m_a / (1.0 + (exp(-(trs - m_s0) / m_b)));
+	double m_S = m_a0 + m_a / (1.0 + (exp(-(trs - m_s0) / m_b)));	
+	double dkfds = m_k(pt);
 	double temp_exp = exp(-(trs - m_s0) / m_b);
-	double zhat = ReactionRate(pt);
-	return ((zhat / m_b) * temp_exp / pow(m_b * (1.0 + temp_exp), 2.0)) * mat3dd(1.0);
+	double dsdtrs = (m_a / m_b) * ((temp_exp) / pow((1.0 + temp_exp),2.0));
+	mat3ds dtrsdsigma = mat3ds(1.0);
+	return dkfds * dsdtrs * dtrsdsigma;
 
 }

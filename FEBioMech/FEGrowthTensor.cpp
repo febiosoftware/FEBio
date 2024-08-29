@@ -16,6 +16,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -110,15 +111,21 @@ mat3ds FEVolumeGrowth::dFgdtheta(FEMaterialPoint& pt, const vec3d& n0)
 //! returns dkdtheta for volume-type growth
 double FEVolumeGrowth::dkdtheta(FEMaterialPoint& pt)
 {
-    //double theta = GrowthRate(pt);
-    //double lhnum = exp((-theta_a - theta) / theta_gamma);
-    //double rhnum = exp((theta_a - theta) / theta_gamma);
-    //double lhden = theta_gamma * pow((lhnum + 1.0), 2.0);
-    //double rhden = theta_gamma * pow((rhnum + 1.0), 2.0);
+    double theta = GrowthRate(pt);
+    double lhnum = exp((-theta_a - theta) / theta_gamma);
+    double rhnum = exp((theta_a - theta) / theta_gamma);
+    double lhden = pow((lhnum + 1.0), 2.0);
+    double rhden = pow((rhnum + 1.0), 2.0);
 
-    //double dkdtheta = k_max * ((lhnum / lhden) + (rhnum / rhden));
-    //return dkdtheta;
-    return 0.0;
+    double dkdtheta = (k_max / theta_gamma) * ((lhnum / lhden) + (rhnum / rhden));
+    return dkdtheta;
+}
+
+//-----------------------------------------------------------------------------
+//! returns dphidcdot for volume-type growth
+double FEVolumeGrowth::dphidcdot(FEMaterialPoint& pt, double& sol_id)
+{
+    return (sol_id == m_sol_id) ? m_gm(pt) : 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -168,15 +175,21 @@ mat3ds FEAreaGrowth::dFgdtheta(FEMaterialPoint& pt, const vec3d& n0)
 //! returns dkdtheta for area-type growth
 double FEAreaGrowth::dkdtheta(FEMaterialPoint& pt)
 {
-    //double theta = GrowthRate(pt);
-    //double lhnum = exp((-theta_a - theta) / theta_gamma);
-    //double rhnum = exp((theta_a - theta) / theta_gamma);
-    //double lhden = theta_gamma * pow((lhnum + 1.0), 2.0);
-    //double rhden = theta_gamma * pow((rhnum + 1.0), 2.0);
+    double theta = GrowthRate(pt);
+    double lhnum = exp((-theta_a - theta) / theta_gamma);
+    double rhnum = exp((theta_a - theta) / theta_gamma);
+    double lhden = pow((lhnum + 1.0), 2.0);
+    double rhden = pow((rhnum + 1.0), 2.0);
 
-    //double dkdtheta = k_max * ((lhnum / lhden) + (rhnum / rhden));
-    //return dkdtheta;+
-    return 0.0;
+    double dkdtheta = (k_max / theta_gamma) * ((lhnum / lhden) + (rhnum / rhden));
+    return dkdtheta;
+}
+
+//-----------------------------------------------------------------------------
+//! returns dphidcdot for area-type growth
+double FEAreaGrowth::dphidcdot(FEMaterialPoint& pt, double& sol_id)
+{
+    return (sol_id == m_sol_id) ? m_gm(pt) : 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -228,11 +241,18 @@ double FEFiberGrowth::dkdtheta(FEMaterialPoint& pt)
     double theta = GrowthRate(pt);
     double lhnum = exp((-theta_a - theta) / theta_gamma);
     double rhnum = exp((theta_a - theta) / theta_gamma);
-    double lhden = theta_gamma * pow((lhnum + 1.0), 2.0);
-    double rhden = theta_gamma * pow((rhnum + 1.0), 2.0);
+    double lhden = pow((lhnum + 1.0), 2.0);
+    double rhden = pow((rhnum + 1.0), 2.0);
 
-    double dkdtheta = k_max * ((lhnum / lhden) + (rhnum / rhden));
+    double dkdtheta = (k_max / theta_gamma) * ((lhnum / lhden) + (rhnum / rhden));
     return dkdtheta;
+}
+
+//-----------------------------------------------------------------------------
+//! returns dphidcdot for fiber-type growth
+double FEFiberGrowth::dphidcdot(FEMaterialPoint & pt, double& sol_id)
+{
+    return (sol_id == m_sol_id) ? m_gm(pt) : 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -338,7 +358,5 @@ double FEGrowthTensor::GrowthRate(FEMaterialPoint& pt)
     double k_theta = ActivationFunction(pt);
     double phi = EnvironmentalFunction(pt);
     double dtheta = m_gm(pt) * k_theta * phi;
-    double dt = this->CurrentTimeIncrement();    
-
     return dtheta;
 }
