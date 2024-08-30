@@ -35,7 +35,7 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FEHuiskesSupply, FESolidSupply)
 	ADD_PARAMETER(m_B, "B");
-	ADD_PARAMETER(m_k, "k");
+	ADD_PARAMETER(m_k, "k")->setUnits(UNIT_SPECIFIC_ENERGY);
     ADD_PARAMETER(m_D, FE_RANGE_GREATER_OR_EQUAL(0.0), "D")->setUnits(UNIT_LENGTH)->setLongName("sensor distance");
 END_FECORE_CLASS();
 
