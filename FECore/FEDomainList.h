@@ -23,11 +23,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include <vector>
+#include <string>
 #include "fecore_api.h"
 
 class FEDomain;
@@ -41,6 +39,7 @@ public:
 	//! constructor
 	FEDomainList();
 	FEDomainList(FEDomainList& domList);
+	FEDomainList(std::vector<FEDomain*> domList);
 
 	//! Clear the domain list
 	void Clear();
@@ -67,6 +66,14 @@ public:
 	//! serialization
 	void Serialize(DumpStream& ar);
 
+	size_t size() const { return m_dom.size(); }
+	FEDomain* operator [] (size_t n) { return m_dom[n]; }
+
+public:
+	void SetName(const std::string& name) { m_name = name; }
+	const std::string& GetName() const { return m_name; }
+
 private:
+	std::string m_name;
 	std::vector<FEDomain*>	m_dom;		// the actual list of domains
 };

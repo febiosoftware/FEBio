@@ -34,7 +34,8 @@ class FEErosionAdaptor : public FEMeshAdaptor
 	enum SurfaceErodeOption {
 		DONT_ERODE,		// don't erode surface elements (default)
 		ERODE,			// erode surface elements
-		GROW			// add newly exposed surface elements
+		GROW,			// add newly exposed surface elements
+		RECONSTRUCT		// reconstruct surfaces
 	};
 
 public:
@@ -47,6 +48,7 @@ private:
 	void DeactivateOrphanedNodes();
 	void ErodeSurfaces();
 	void GrowErodedSurfaces(FEMeshTopo& topo);
+	void ReconstructSurfaces(FEMeshTopo& topo);
 	void UpdateLinearConstraints();
 
 private:

@@ -293,7 +293,7 @@ std::vector<FEElement*> FEMeshTopo::ElementNeighborList(int n)
         case ET_HEX8:
         case ET_HEX20:
         case ET_HEX27:
-            nbrs = 8; break;
+            nbrs = 6; break;
         case ET_TET4:
         case ET_TET5:
         case ET_TET10:
@@ -328,7 +328,7 @@ std::vector<int> FEMeshTopo::ElementNeighborIndexList(int n)
         case ET_HEX8:
         case ET_HEX20:
         case ET_HEX27:
-            nbrs = 8; break;
+            nbrs = 6; break;
         case ET_TET4:
         case ET_TET5:
         case ET_TET10:

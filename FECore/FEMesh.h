@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FEBoundingBox.h"
 #include "FESolidElement.h"
 #include "FEShellElement.h"
+#include "FEDomainList.h"
 
 //-----------------------------------------------------------------------------
 class FEEdge;
@@ -48,6 +49,25 @@ class FEModel;
 class FETimeInfo;
 class FEDataMap;
 class DumpStream;
+
+//---------------------------------------------------------------------------------------
+// Helper class for faster lookup of nodes based on their ID 
+class FECORE_API FENodeLUT
+{
+public:
+	FENodeLUT(FEMesh& mesh);
+
+	// Find an element from its ID
+	FENode* Find(int nodeID) const;
+
+	// return an element's zero-based index
+	int FindIndex(int nodeID) const;
+
+private:
+	vector<int>		m_node;
+	int				m_minID, m_maxID;
+	FEMesh*			m_mesh;
+};
 
 //---------------------------------------------------------------------------------------
 // Helper class for faster lookup of elements based on their ID 
@@ -128,6 +148,9 @@ public:
 
 	//! Finds a node from a given ID
 	FENode* FindNodeFromID(int nid);
+
+	//! Finds node index from a given ID
+	int FindNodeIndexFromID(int nid);
 
 	//! return an element (expensive way!)
 	FEElement* Element(int i);
@@ -224,6 +247,12 @@ public:
 	FESurfacePair* FindSurfacePair(const std::string& name);
 
 public:
+	size_t DomainLists() const { return m_DomList.size(); }
+	FEDomainList* DomainList(size_t n) { return m_DomList[n]; }
+	void AddDomainList(FEDomainList* dl) { m_DomList.push_back(dl); }
+	FEDomainList* FindDomainList(const std::string& name);
+
+public:
 	//! stream mesh data
 	void Serialize(DumpStream& dmp);
 
@@ -245,6 +274,7 @@ public:
 	//! binside  : include all interior facets
 	FESurface* ElementBoundarySurface(std::vector<FEDomain*> domains, bool boutside = true, bool binside = false);
 	FEFacetSet* DomainBoundary(std::vector<FEDomain*> domains, bool boutside = true, bool binside = false);
+	FEFacetSet* DomainBoundary(FEDomainList& domainList, bool boutside = true, bool binside = false);
 
 	//! get the nodal coordinates in reference configuration
 	void GetInitialNodalCoordinates(const FEElement& el, vec3d* node);
@@ -278,13 +308,15 @@ private:
 	vector<FEDiscreteSet*>	m_DiscSet;	//!< discrete element sets
 	vector<FEFacetSet*>		m_FaceSet;	//!< facet sets
 	vector<FESurfacePair*>	m_SurfPair;	//!< facet set pairs
+	vector<FEDomainList*>	m_DomList;	//!< named domain lists
 
 	vector<FEDataMap*>		m_DataMap;	//!< all data maps
 
 	FEBoundingBox		m_box;	//!< bounding box
 
 	FENodeElemList	m_NEL;
-	FEElementLUT*	m_LUT;
+	FEElementLUT*	m_ELT;
+	FENodeLUT*		m_NLT;
 
 	FEElemElemList	m_EEL;
 

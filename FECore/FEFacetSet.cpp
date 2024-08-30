@@ -49,6 +49,11 @@ FEFacetSet::FEFacetSet(FEModel* fem) : FEItemList(fem, FEItemList::FE_ELEMENT_SE
 void FEFacetSet::SetSurface(FESurface* surf) { m_surface = surf; }
 FESurface* FEFacetSet::GetSurface() { return m_surface; }
 
+void FEFacetSet::Clear()
+{
+	m_Face.clear();
+}
+
 //-----------------------------------------------------------------------------
 int FEFacetSet::Faces() const { return (int)m_Face.size(); }
 

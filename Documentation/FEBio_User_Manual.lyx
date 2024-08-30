@@ -31953,10 +31953,90 @@ A potential based sliding contact interface
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\align center
 \begin_inset VSpace defskip
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+A note on auto-contact
+\end_layout
+
+\begin_layout Standard
+The two surfaces that participate in the contact are specified via a surface
+ pair.
+ These surface pairs are defined in the SurfacePair subsection of the Mesh
+ section of the input file.
+ Typically the surfaces are chosen based on the user's knowledge of where
+ the contact will occur.
+ However, for complex geometries it might not be clear where the contact
+ will occur, or identifying the surfaces may be cumbersome.
+ For this reason, FEBio supports an auto-contact option, where users only
+ need to specify the parts of the primary and secondary surfaces.
+ From these part lists, FEBio will extract the surfaces automatically.
+ To use the auto-contact, simply specify a part list instead of the surface
+ names when defining the surface pair.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<PartList name="SlidingElastic1Primary">Part1</PartList>
+\end_layout
+
+\begin_layout LyX-Code
+<PartList name="SlidingElastic1Secondary">Part2</PartList> 
+\end_layout
+
+\begin_layout LyX-Code
+<SurfacePair name="SlidingElastic1">
+\end_layout
+
+\begin_layout LyX-Code
+   <primary>
+\series bold
+@part_list:SlidingElastic1Primary
+\series default
+</primary>
+\end_layout
+
+\begin_layout LyX-Code
+   <secondary>
+\series bold
+@part_list:SlidingElastic1Secondary
+\series default
+</secondary>
+\end_layout
+
+\begin_layout LyX-Code
+</SurfacePair> 
+\end_layout
+
+\begin_layout Standard
+Note the 
+\series bold
+@part_list:
+\series default
+ prefix in front of the part list name.
+ 
+\end_layout
+
+\begin_layout Standard
+Although using the auto-contact can greatly simply defining contact between
+ parts, it is important to keep in mind that there are a few drawbacks.
+ First and foremost, the surfaces extracted from parts will likely be much
+ larger than the contact area and this will result in a performance cost.
+ Second, for complex geometries the extract surfaces may have a complex
+ topology that may confuse some of the contact detection algorithms.
+ In those situations it might be beneficial to decrease the search_radius
+ parameter (for contact algorihtms that define this parameter).
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -39444,6 +39524,395 @@ Example
 
 \begin_layout LyX-Code
 </constraint> 
+\end_layout
+
+\begin_layout Subsection
+Node Distance
+\end_layout
+
+\begin_layout Standard
+A 
+\begin_inset Quotes eld
+\end_inset
+
+node distance
+\begin_inset Quotes erd
+\end_inset
+
+ constraint can be used to enforce a user-defined distance between two nodes.
+ The target distance can be defined as a distance relative to the initial
+ seperation between the two nodes, or as an absolute distance.
+ This constraint takes the following parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+initial value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+laugon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Turn on augmented Lagrangian flag
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0(=false)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+augtol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Augmentation tolerance.
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.01
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+penalty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Penalty factor for constrtaint enforcement
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+node
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+IDs of the two nodes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[-1,-1] (invalid)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+minaug
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+minimum nr of augmentations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+maxaug
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+maximum nr of augmentations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+target
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Target distance between two nodes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+relative
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Use relative or absolute distance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 (=true)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default configuration of this constraint is such that the initial distance
+ between the two nodes is preserved.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout Standard
+This example illustrates how the 
+\emph on
+node distance
+\emph default
+ constraint can be used to reduce the distance between two nodes to zero:
+ the target is set to zero and the relative flag is off so that the target
+ is interpreted as an absolute distance.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<constraint name="NodeDistance3" type="node distance">
+\end_layout
+
+\begin_layout LyX-Code
+  <laugon>0</laugon>
+\end_layout
+
+\begin_layout LyX-Code
+  <augtol>0.01</augtol>
+\end_layout
+
+\begin_layout LyX-Code
+  <penalty lc="1">1</penalty>
+\end_layout
+
+\begin_layout LyX-Code
+  <node>17,158</node>
+\end_layout
+
+\begin_layout LyX-Code
+  <minaug>0</minaug>
+\end_layout
+
+\begin_layout LyX-Code
+  <maxaug>10</maxaug>
+\end_layout
+
+\begin_layout LyX-Code
+  <target>0</target>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative>0</relative>
+\end_layout
+
+\begin_layout LyX-Code
+</constraint>
 \end_layout
 
 \begin_layout Standard
@@ -116187,54 +116656,86 @@ The following example illustrates the use of the multi-step feature of FEBio.
 
 \begin_layout Verbatim
 
+<<<<<<< HEAD
 			<node id="1">-2.0,-0.5,
  0.0</node>
+=======
+			<node id="1">-2.0,-0.5, 0.0</node>
+>>>>>>> 1d8f8d60bc9d7683e8561212780f1d9b83622536
 \end_layout
 
 \begin_layout Verbatim
 
+<<<<<<< HEAD
 			<node id="2">-2.0,-0.5,
  1.0</node>
+=======
+			<node id="2">-2.0,-0.5, 1.0</node>
+>>>>>>> 1d8f8d60bc9d7683e8561212780f1d9b83622536
 \end_layout
 
 \begin_layout Verbatim
 
+<<<<<<< HEAD
 			<node id="3">-2.0,
  0.5,
  0.0</node>
+=======
+			<node id="3">-2.0, 0.5, 0.0</node>
+>>>>>>> 1d8f8d60bc9d7683e8561212780f1d9b83622536
 \end_layout
 
 \begin_layout Verbatim
 
+<<<<<<< HEAD
 			<node id="4">-2.0,
  0.5,
  1.0</node>
+=======
+			<node id="4">-2.0, 0.5, 1.0</node>
+>>>>>>> 1d8f8d60bc9d7683e8561212780f1d9b83622536
 \end_layout
 
 \begin_layout Verbatim
 
+<<<<<<< HEAD
 			<node id="5"> 2.0,-0.5,
  0.0</node>
+=======
+			<node id="5"> 2.0,-0.5, 0.0</node>
+>>>>>>> 1d8f8d60bc9d7683e8561212780f1d9b83622536
 \end_layout
 
 \begin_layout Verbatim
 
+<<<<<<< HEAD
 			<node id="6"> 2.0,-0.5,
  1.0</node>
+=======
+			<node id="6"> 2.0,-0.5, 1.0</node>
+>>>>>>> 1d8f8d60bc9d7683e8561212780f1d9b83622536
 \end_layout
 
 \begin_layout Verbatim
 
+<<<<<<< HEAD
 			<node id="7"> 2.0,
  0.5,
  0.0</node>
+=======
+			<node id="7"> 2.0, 0.5, 0.0</node>
+>>>>>>> 1d8f8d60bc9d7683e8561212780f1d9b83622536
 \end_layout
 
 \begin_layout Verbatim
 
+<<<<<<< HEAD
 			<node id="8"> 2.0,
  0.5,
  1.0</node>
+=======
+			<node id="8"> 2.0, 0.5, 1.0</node>
+>>>>>>> 1d8f8d60bc9d7683e8561212780f1d9b83622536
 \end_layout
 
 \begin_layout Verbatim
