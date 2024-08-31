@@ -89,7 +89,7 @@ FEMaterialPoint::FEMaterialPoint(FEMaterialPointData* data)
 
 FEMaterialPoint::~FEMaterialPoint()
 {
-
+	delete m_data;
 }
 
 void FEMaterialPoint::Init()

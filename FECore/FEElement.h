@@ -57,7 +57,7 @@ public:
 	void Clear() { for (size_t i=0; i<m_data.size(); ++i) delete m_data[i]; m_data.clear(); }
 
 	//! create 
-	void Create(int n) { m_data.assign(n, static_cast<FEMaterialPoint*>(0) ); }
+	void Create(int n) { Clear(); m_data.assign(n, static_cast<FEMaterialPoint*>(0)); }
 
 	//! operator for easy access to element data
 	FEMaterialPoint*& operator [] (int n) { return m_data[n]; }
@@ -160,6 +160,7 @@ public:
 	{ 
 		pmp->m_elem = this;
 		pmp->m_index = n;
+		if (m_State[n] != nullptr) delete m_State[n];
 		m_State[n] = pmp; 
 	}
 
