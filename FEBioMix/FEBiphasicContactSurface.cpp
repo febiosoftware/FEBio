@@ -34,6 +34,18 @@ SOFTWARE.*/
 void FEBiphasicContactPoint::Serialize(DumpStream& ar)
 {
     FEContactMaterialPoint::Serialize(ar);
+    ar & m_dg;
+    ar & m_Lmd;
+    ar & m_Lmt;
+    ar & m_epsn;
+    ar & m_epsp;
+    ar & m_p1;
+    ar & m_nu;
+    ar & m_s1;
+    ar & m_tr;
+    ar & m_rs;
+    ar & m_rsp;
+    ar & m_bstick;
     ar & m_Lmp & m_pg & m_mueff & m_fls;
 }
 

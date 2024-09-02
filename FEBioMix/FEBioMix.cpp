@@ -232,6 +232,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotActualFluidPressure              , "fluid pressure"                  );
 	REGISTER_FECORE_CLASS(FEPlotFluidFlux                        , "fluid flux"                      );
 	REGISTER_FECORE_CLASS(FEPlotNodalFluidFlux                   , "nodal fluid flux");
+    REGISTER_FECORE_CLASS(FEPlotContactGapMP                     , "contact gap"         );
 	REGISTER_FECORE_CLASS(FEPlotPressureGap					     , "pressure gap"        );
 	REGISTER_FECORE_CLASS(FEPlotFluidForce                       , "fluid force"         );
 	REGISTER_FECORE_CLASS(FEPlotFluidForce2                      , "fluid force2"        );
@@ -331,6 +332,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration     , "effective solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveShellSoluteConcentration, "effective shell solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration        , "solute concentration");
+    REGISTER_FECORE_CLASS(FEPlotConcentrationGap                 , "concentration gap"   );
     REGISTER_FECORE_CLASS(FEPlotPartitionCoefficient             , "partition coefficient");
 	REGISTER_FECORE_CLASS(FEPlotSoluteFlux		                 , "solute flux"                     );
     REGISTER_FECORE_CLASS(FEPlotSoluteVolumetricFlux             , "solute volumetric flux"          );
