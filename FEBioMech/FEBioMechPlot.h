@@ -686,7 +686,7 @@ public:
 class FEPlotElementElasticity : public FEPlotDomainData
 {
 public:
-	FEPlotElementElasticity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_TENS4FS, FMT_ITEM){}
+    FEPlotElementElasticity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_TENS4FS, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
