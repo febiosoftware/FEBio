@@ -1110,7 +1110,7 @@ public:
 	double operator()(const FEMaterialPoint& mp)
 	{
         if (dynamic_cast<FERemodelingInterface*>(m_mat) == 0) return 0;
-        FEMaterialPoint lmp(mp);
+		FEMaterialPoint& lmp = const_cast<FEMaterialPoint&>(mp);
 		FERemodelingMaterialPoint* rpt = lmp.ExtractData<FERemodelingMaterialPoint>();
         if (rpt == nullptr) {
             FEMaterialPoint* pt = lmp.ExtractData<FEElasticMixtureMaterialPoint>()->GetPointData(m_comp);
@@ -4732,29 +4732,6 @@ bool FEPlotIdealGasPressure::Save(FESurface& surf, FEDataStream& a)
 	else return false;
 }
 
-class FEFluidBodyForce
-{
-public:
-	FEFluidBodyForce(FEModel* fem, FESolidDomain& dom) : m_fem(fem), m_dom(dom) {}
-
-	vec3d operator()(const FEMaterialPoint& mp)
-	{
-		int NBL = m_fem->ModelLoads();
-		vec3d bf(0, 0, 0);
-		for (int j = 0; j < NBL; ++j)
-		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem->ModelLoad(j));
-			FEMaterialPoint pt(mp);
-			if (pbf && pbf->IsActive()) bf += pbf->force(pt);
-		}
-		return bf;
-	}
-
-private:
-	FESolidDomain& m_dom;
-	FEModel* m_fem;
-};
-
 bool FEPlotBodyForce::Save(FEDomain& dom, FEDataStream& a)
 {
 	if (dom.Class() == FE_DOMAIN_SOLID)
@@ -4767,7 +4744,7 @@ bool FEPlotBodyForce::Save(FEDomain& dom, FEDataStream& a)
 			for (int j = 0; j < NBL; ++j)
 			{
 				FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem->ModelLoad(j));
-				FEMaterialPoint pt(mp);
+				FEMaterialPoint& pt = const_cast<FEMaterialPoint&>(mp);
 				if (pbf && pbf->IsActive()) bf += pbf->force(pt);
 			}
 
