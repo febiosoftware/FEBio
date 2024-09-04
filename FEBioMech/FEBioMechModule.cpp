@@ -145,6 +145,7 @@ SOFTWARE.*/
 #include "FERVEFatigueMaterial.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
+#include "FERelativeVolumeCriterion.h"
 #include "FEPlasticFlowCurve.h"
 #include "FEFiberExpLinear.h"
 #include "FEUncoupledFiberExpLinear.h"
@@ -1147,6 +1148,7 @@ void FEBioMech::InitModule()
 	// Derived from FEMeshAdaptorCriterion
 	REGISTER_FECORE_CLASS(FEStressCriterion, "stress");
 	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");
+    REGISTER_FECORE_CLASS(FERelativeVolumeCriterion, "relative volume");
 	REGISTER_FECORE_CLASS(FESpringForceCriterion, "spring force");
 	REGISTER_FECORE_CLASS(FESpringStretchCriterion, "spring stretch");
 	REGISTER_FECORE_CLASS(FEContactGapCriterion, "contact gap");

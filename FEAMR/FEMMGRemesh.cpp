@@ -334,6 +334,7 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 	assert(criterion);
 	if (criterion == nullptr) return false;
 	FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
+    if(elemList.size() == 0) return false;
 
 	// see if want to normalize the data
 	if (m_mmgRemesh->m_normalizeData)
