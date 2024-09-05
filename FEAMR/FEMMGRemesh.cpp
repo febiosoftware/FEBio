@@ -467,6 +467,7 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		{
 			assert(false);
 			delete mapper;
+			throw std::runtime_error("Fatal error in MMG remesh during nodal mapping.");
 			return false;
 		}
 
