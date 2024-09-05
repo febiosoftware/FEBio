@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEBioMech/FEBioMechModule.h"
 #ifndef MECH_ONLY
 #include "FEBioMix/FEBioMix.h"
+#include <FEBioERD/FEBioERD.h>
 #include "FEBioOpt/FEBioOpt.h"
 #include "FEBioFluid/FEBioFluid.h"
 #include <FEBioFluid/FEBioFSI.h>
@@ -73,6 +74,7 @@ void InitLibrary()
 
 #ifndef MECH_ONLY
 	FEBioMix::InitModule();
+	FEBioERD::InitModule();
 	FEBioOpt::InitModule();
 	FEBioFluid::InitModule();
 	FEBioFSI::InitModule();

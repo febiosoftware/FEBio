@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,35 +23,38 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include <FECore/FEModule.h>
-#include <FEBioMech/FESolidModule.h>
-#include "febiomix_api.h"
+#include "FEChemicalReactionERD.h"
 
-class FEBIOMIX_API FEBiphasicModule : public FESolidModule
+//-----------------------------------------------------------------------------
+//! Law of mass action for reversible chemical reaction
+//! using  concentrations.
+class FEBIOERD_API FEMassActionReversibleERD : public FEChemicalReactionERD
 {
 public:
-	FEBiphasicModule();
-	void InitModel(FEModel* fem) override;
-};
+    //! constructor
+    FEMassActionReversibleERD(FEModel* pfem);
 
-class FEBIOMIX_API FEBiphasicSoluteModule : public FEBiphasicModule
-{
-public:
-	FEBiphasicSoluteModule();
-	void InitModel(FEModel* fem) override;
-};
+    //! molar supply at material point
+    double ReactionSupply(FEMaterialPoint& pt) override;
 
-class FEBIOMIX_API FEMultiphasicModule : public FEBiphasicSoluteModule
-{
-public:
-	FEMultiphasicModule();
-	void InitModel(FEModel* fem) override;
-};
+    //! tangent of molar supply with strain (J) at material point
+    mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) override;
 
-//class FEBIOMIX_API FEElasticReactionDiffusionModule : public FEBiphasicSoluteModule
-//{
-//public:
-//	FEElasticReactionDiffusionModule();
-//	void InitModel(FEModel* fem) override;
-//};
+    //! tangent of molar supply with  concentration at material point
+    double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) override;
+
+    //! tangent of molar supply with Cauchy stress (sigma) at material point
+    mat3ds Tangent_ReactionSupply_Stress(FEMaterialPoint& pt) override;
+
+    //! molar supply at material point
+    double FwdReactionSupply(FEMaterialPoint& pt);
+
+    //! molar supply at material point
+    double RevReactionSupply(FEMaterialPoint& pt);
+
+    DECLARE_FECORE_CLASS();
+};

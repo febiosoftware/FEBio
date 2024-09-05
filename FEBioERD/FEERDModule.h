@@ -26,32 +26,11 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEModule.h>
 #include <FEBioMech/FESolidModule.h>
-#include "febiomix_api.h"
+#include "febioerd_api.h"
 
-class FEBIOMIX_API FEBiphasicModule : public FESolidModule
+class FEBIOERD_API FEERDModule : public FESolidModule
 {
 public:
-	FEBiphasicModule();
+	FEERDModule();
 	void InitModel(FEModel* fem) override;
 };
-
-class FEBIOMIX_API FEBiphasicSoluteModule : public FEBiphasicModule
-{
-public:
-	FEBiphasicSoluteModule();
-	void InitModel(FEModel* fem) override;
-};
-
-class FEBIOMIX_API FEMultiphasicModule : public FEBiphasicSoluteModule
-{
-public:
-	FEMultiphasicModule();
-	void InitModel(FEModel* fem) override;
-};
-
-//class FEBIOMIX_API FEElasticReactionDiffusionModule : public FEBiphasicSoluteModule
-//{
-//public:
-//	FEElasticReactionDiffusionModule();
-//	void InitModel(FEModel* fem) override;
-//};

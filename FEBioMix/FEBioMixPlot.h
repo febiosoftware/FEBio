@@ -384,36 +384,36 @@ public:
     bool Save(FESurface& surf, FEDataStream& a);
 };
 
-//-----------------------------------------------------------------------------
-//! Actual solute concentration (for elastic-reaction-diffusion problems)
-class FEPlotActualSoluteConcentrationERD : public FEPlotDomainData
-{
-public:
-	FEPlotActualSoluteConcentrationERD(FEModel* pfem);
-	bool Save(FEDomain& dom, FEDataStream& a);
-protected:
-	vector<int>	m_sol;
-};
-
-//-----------------------------------------------------------------------------
-//! Nodal effective solute concentrations (for elastic-reaction-diffusion problems)
-class FEPlotEffectiveSoluteConcentrationERD : public FEPlotDomainData
-{
-public:
-	FEPlotEffectiveSoluteConcentrationERD(FEModel* pfem);
-	bool Save(FEDomain& m, FEDataStream& a);
-protected:
-	vector<int>	m_sol;
-};
-
-//-----------------------------------------------------------------------------
-//! Solute flux (for elastic-reaction-diffusion problems)
-class FEPlotSoluteFluxERD : public FEPlotDomainData
-{
-public:
-	FEPlotSoluteFluxERD(FEModel* pfem);
-	bool Save(FEDomain& dom, FEDataStream& a);
-
-protected:
-	vector<int>	m_sol;
-};
+////-----------------------------------------------------------------------------
+////! Actual solute concentration (for elastic-reaction-diffusion problems)
+//class FEPlotActualSoluteConcentrationERD : public FEPlotDomainData
+//{
+//public:
+//	FEPlotActualSoluteConcentrationERD(FEModel* pfem);
+//	bool Save(FEDomain& dom, FEDataStream& a);
+//protected:
+//	vector<int>	m_sol;
+//};
+//
+////-----------------------------------------------------------------------------
+////! Nodal effective solute concentrations (for elastic-reaction-diffusion problems)
+//class FEPlotEffectiveSoluteConcentrationERD : public FEPlotDomainData
+//{
+//public:
+//	FEPlotEffectiveSoluteConcentrationERD(FEModel* pfem);
+//	bool Save(FEDomain& m, FEDataStream& a);
+//protected:
+//	vector<int>	m_sol;
+//};
+//
+////-----------------------------------------------------------------------------
+////! Solute flux (for elastic-reaction-diffusion problems)
+//class FEPlotSoluteFluxERD : public FEPlotDomainData
+//{
+//public:
+//	FEPlotSoluteFluxERD(FEModel* pfem);
+//	bool Save(FEDomain& dom, FEDataStream& a);
+//
+//protected:
+//	vector<int>	m_sol;
+//};

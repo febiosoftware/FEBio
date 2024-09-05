@@ -28,8 +28,6 @@ SOFTWARE.*/
 #include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterial.h"
 #include "febiomech_api.h"
-#include <FEBioMix/FEChemicalReactionERD.h>
-#include <FEBioMix/FEReactionERD.h>
 
 //-----------------------------------------------------------------------------
 //! Base class for growth tensors.
@@ -52,48 +50,12 @@ public:
     //! referential solid density
     virtual double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) = 0;
 
-    //! dFgdtheta
-    virtual mat3ds dFgdtheta(FEMaterialPoint& pt, const vec3d& a0) = 0;
-
-    //! dkdtheta
-    virtual double dkdtheta(FEMaterialPoint& pt) = 0;
-
-    //! dphidcdot
-    virtual double dphidcdot(FEMaterialPoint& pt, double& sol_id) = 0;
-
-    double SoluteConcentration(FEMaterialPoint& pt);
-
-    double SBMConcentration(FEMaterialPoint& pt);
-
-    vec3d UpdateNormal(FEMaterialPoint& pt, const vec3d& a0);
-
-    double SpeciesGrowth(FEMaterialPoint& pt);
-
-    double ActivationFunction(FEMaterialPoint& pt);
-
-    double EnvironmentalFunction(FEMaterialPoint& pt);
-
-    double Sigmoid(double a, double x, double x0, double b);
-
-    double GrowthRate(FEMaterialPoint& pt);
-
     //! initialize
     bool Init() override;
 
 public:
-    FEParamVec3 m_fiber;
-    //FEVec3dValuator* m_fiber;
-    FEParamDouble   m_gm;       //! isotropic growth multiplier
-    //!SL: temporary place holder. Intent is to allow scaling by value of some state variable. In this case we are saying SBM id number to identify which SBM to base growth on. Will implement general solution later for more options.
-    int             m_sbm_id = -1;   //! Which sbm should be used? Optional for now...
-    int             m_sol_id = -1;
-    double          theta_gamma = 0.2;
-    double          theta_a = -2.0;
-    double          k_min = 0.0;
-    double          k_max = 1.0;
-    //!SL: Flag to choose whether growth is based on current or referential concentration.
-    bool m_referential_normal_flag = true;
-protected:
+    FEVec3dValuator* m_fiber;
+
     DECLARE_FECORE_CLASS();
 };
 
@@ -115,19 +77,11 @@ public:
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
 
-    //! dFgdtheta
-    mat3ds dFgdtheta(FEMaterialPoint& pt, const vec3d& a0) override;
-
-    //! dkdtheta
-    virtual double dkdtheta(FEMaterialPoint& pt) override;
-
-    //! dphidcdot
-    virtual double dphidcdot(FEMaterialPoint& pt, double& sol_i) override;
-
 public:
+    FEParamDouble   m_gm;       //! isotropic growth multiplier
 
     // declare the parameter list
-    //DECLARE_FECORE_CLASS();
+    DECLARE_FECORE_CLASS();
 
 };
 
@@ -148,21 +102,13 @@ public:
 
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
-    
-    //! dFgdtheta
-    mat3ds dFgdtheta(FEMaterialPoint& pt, const vec3d& a0) override;
-
-    //! dkdtheta
-    virtual double dkdtheta(FEMaterialPoint& pt) override;
-
-    //! dphidcdot
-    virtual double dphidcdot(FEMaterialPoint& pt, double& sol_i) override;
 
 public:
-    FEVec3dValuator* m_fiber_0;
-    FEVec3dValuator* m_fiber_1;
+    FEParamDouble   m_gm;       //! growth multiplier
+
     // declare the parameter list
-    //DECLARE_FECORE_CLASS();
+    DECLARE_FECORE_CLASS();
+
 };
 
 //-----------------------------------------------------------------------------
@@ -183,17 +129,37 @@ public:
     //! referential solid density
     double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
 
-    //! dFgdtheta
-    mat3ds dFgdtheta(FEMaterialPoint& pt, const vec3d& a0) override;
-
-    //! dkdtheta
-    virtual double dkdtheta(FEMaterialPoint& pt) override;
-
-    //! dphidcdot
-    virtual double dphidcdot(FEMaterialPoint& pt, double& sol_i) override;
-
 public:
+    FEParamDouble   m_gm;       //! growth multiplier
 
     // declare the parameter list
-    // DECLARE_FECORE_CLASS();
+    DECLARE_FECORE_CLASS();
+
+};
+
+//-----------------------------------------------------------------------------
+//! General growth
+//!
+class FEGeneralGrowth : public FEGrowthTensor
+{
+public:
+    FEGeneralGrowth(FEModel* pfem) : FEGrowthTensor(pfem) { m_gi = 1;  m_ga = 1; }
+    virtual ~FEGeneralGrowth() {}
+
+    //! growth tensor
+    mat3d GrowthTensor(FEMaterialPoint& pt, const vec3d& a0) override;
+
+    //! inverse of growth tensor
+    mat3d GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& a0) override;
+
+    //! referential solid density
+    double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
+
+public:
+    FEParamDouble   m_gi;       //! growth multiplier for isotropic growth
+    FEParamDouble   m_ga;       //! growth multiplier for anisotropic growth
+
+    // declare the parameter list
+    DECLARE_FECORE_CLASS();
+
 };

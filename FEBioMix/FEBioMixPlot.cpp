@@ -36,13 +36,13 @@ SOFTWARE.*/
 #include "FETriphasicDomain.h"
 #include "FEMultiphasicSolidDomain.h"
 #include "FEMultiphasicShellDomain.h"
-#include "FEElasticReactionDiffusionSolidDomain.h"
+//#include <FEBioERD/FEElasticReactionDiffusionSolidDomain.h>
 #include <FEBioMech/FEElasticSolidDomain.h>
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
-#include "FEElasticReactionDiffusion.h"
+//#include <FEBioERD/FEElasticReactionDiffusion.h>
 #include "FEBiphasicContactSurface.h"
 #include "FEBioMech/FEDonnanEquilibrium.h"
 #include "FEBioMech/FEElasticMixture.h"
@@ -1501,207 +1501,207 @@ bool FEPlotOsmoticCoefficient::Save(FEDomain &dom, FEDataStream& a)
 
     return true;
 }
-
-//=================================================================================================
-//-----------------------------------------------------------------------------
-FEPlotActualSoluteConcentrationERD::FEPlotActualSoluteConcentrationERD(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
-{
-	DOFS& dofs = pfem->GetDOFS();
-	int nsol = dofs.GetVariableSize("concentration");
-	SetArraySize(nsol);
-
-	// collect the names
-	int ndata = pfem->GlobalDataItems();
-	vector<string> s;
-	for (int i = 0; i < ndata; ++i)
-	{
-		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-		if (ps)
-		{
-			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID());
-		}
-	}
-	assert(nsol == (int)s.size());
-	SetArrayNames(s);
-	SetUnits(UNIT_CONCENTRATION);
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotActualSoluteConcentrationERD::Save(FEDomain& dom, FEDataStream& a)
-{
-	FEElasticReactionDiffusionInterface* pm = dynamic_cast<FEElasticReactionDiffusionInterface*>(dom.GetMaterial());
-	if (pm == 0) return false;
-
-	// figure out the local solute IDs. This depends on the material
-	int nsols = (int)m_sol.size();
-	vector<int> lid(nsols, -1);
-	int negs = 0;
-	for (int i = 0; i < (int)m_sol.size(); ++i)
-	{
-		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
-		if (lid[i] < 0) negs++;
-	}
-	if (negs == nsols) return false;
-
-	// loop over all elements
-	int N = dom.Elements();
-	for (int i = 0; i < N; ++i)
-	{
-		FEElement& el = dom.ElementRef(i);
-
-		for (int k = 0; k < nsols; ++k)
-		{
-			int nsid = lid[k];
-			if (nsid == -1) a << 0.f;
-			else
-			{
-				// calculate average concentration
-				double ew = 0;
-				for (int j = 0; j < el.GaussPoints(); ++j)
-				{
-					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-					ew += pm->GetActualSoluteConcentration(mp, nsid);
-				}
-				ew /= el.GaussPoints();
-				a << ew;
-			}
-		}
-
-	}
-	return true;
-}
-
-//=================================================================================================
-// FEPlotEffectiveSoluteConcentration
-//=================================================================================================
-
-FEPlotEffectiveSoluteConcentrationERD::FEPlotEffectiveSoluteConcentrationERD(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_NODE)
-{
-	DOFS& dofs = pfem->GetDOFS();
-	int nsol = dofs.GetVariableSize("concentration");
-	SetArraySize(nsol);
-
-	// collect the names
-	int ndata = pfem->GlobalDataItems();
-	vector<string> s;
-	for (int i = 0; i < ndata; ++i)
-	{
-		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-		if (ps)
-		{
-			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID());
-		}
-	}
-	assert(nsol == (int)s.size());
-	SetArrayNames(s);
-	SetUnits(UNIT_CONCENTRATION);
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotEffectiveSoluteConcentrationERD::Save(FEDomain& dom, FEDataStream& a)
-{
-	// get the dof
-	DOFS& dofs = GetFEModel()->GetDOFS();
-	int nsol = dofs.GetVariableSize("concentration");
-	if (nsol == -1) return false;
-
-	// get the start index
-	const int dof_C = GetFEModel()->GetDOFIndex("concentration", 0);
-
-	FEElasticReactionDiffusionInterface* pm = dynamic_cast<FEElasticReactionDiffusionInterface*>(dom.GetMaterial());
-	if (pm == 0) return false;
-
-	// figure out the local solute IDs. This depends on the material
-	int nsols = (int)m_sol.size();
-	vector<int> lid(nsols, -1);
-	int negs = 0;
-	for (int i = 0; i < (int)m_sol.size(); ++i)
-	{
-		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
-		if (lid[i] < 0) negs++;
-	}
-	if (negs == nsol) return false;
-
-	// save the concentrations
-	int N = dom.Nodes();
-	for (int i = 0; i < N; ++i)
-	{
-		FENode& node = dom.Node(i);
-		for (int j = 0; j < nsol; ++j)
-		{
-			double c = (lid[j] >= 0 ? node.get(dof_C + j) : 0.0);
-			a << c;
-		}
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-FEPlotSoluteFluxERD::FEPlotSoluteFluxERD(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY_VEC3F, FMT_ITEM)
-{
-	DOFS& dofs = pfem->GetDOFS();
-	int nsol = dofs.GetVariableSize("concentration");
-	SetArraySize(nsol);
-
-	// collect the names
-	int ndata = pfem->GlobalDataItems();
-	vector<string> s;
-	for (int i = 0; i < ndata; ++i)
-	{
-		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-		if (ps)
-		{
-			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID());
-		}
-	}
-	assert(nsol == (int)s.size());
-	SetArrayNames(s);
-	SetUnits(UNIT_MOLAR_FLUX);
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotSoluteFluxERD::Save(FEDomain& dom, FEDataStream& a)
-{
-	FEElasticReactionDiffusionInterface* pm = dynamic_cast<FEElasticReactionDiffusionInterface*>(dom.GetMaterial());
-	if ((pm == 0) || (pm->Solutes() == 0)) return false;
-
-	// figure out the local solute IDs. This depends on the material
-	int nsols = (int)m_sol.size();
-	vector<int> lid(nsols, -1);
-	int nsc = 0;
-	for (int i = 0; i < (int)m_sol.size(); ++i)
-	{
-		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
-		if (lid[i] != -1) nsc++;
-	}
-	if (nsc == 0) return false;
-
-	for (int i = 0; i < dom.Elements(); ++i)
-	{
-		FEElement& el = dom.ElementRef(i);
-
-		for (int k = 0; k < nsols; ++k)
-		{
-			int nsid = lid[k];
-			if (nsid == -1) a << vec3d(0, 0, 0);
-			else
-			{
-				// calculate average flux
-				vec3d ew = vec3d(0, 0, 0);
-				for (int j = 0; j < el.GaussPoints(); ++j)
-				{
-					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-					ew += pm->GetSoluteFlux(mp, nsid);
-				}
-
-				ew /= el.GaussPoints();
-
-				a << ew;
-			}
-		}
-	}
-	return true;
-}
+//
+////=================================================================================================
+////-----------------------------------------------------------------------------
+//FEPlotActualSoluteConcentrationERD::FEPlotActualSoluteConcentrationERD(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
+//{
+//	DOFS& dofs = pfem->GetDOFS();
+//	int nsol = dofs.GetVariableSize("concentration");
+//	SetArraySize(nsol);
+//
+//	// collect the names
+//	int ndata = pfem->GlobalDataItems();
+//	vector<string> s;
+//	for (int i = 0; i < ndata; ++i)
+//	{
+//		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+//		if (ps)
+//		{
+//			s.push_back(ps->GetName());
+//			m_sol.push_back(ps->GetID());
+//		}
+//	}
+//	assert(nsol == (int)s.size());
+//	SetArrayNames(s);
+//	SetUnits(UNIT_CONCENTRATION);
+//}
+//
+////-----------------------------------------------------------------------------
+//bool FEPlotActualSoluteConcentrationERD::Save(FEDomain& dom, FEDataStream& a)
+//{
+//	FEElasticReactionDiffusionInterface* pm = dynamic_cast<FEElasticReactionDiffusionInterface*>(dom.GetMaterial());
+//	if (pm == 0) return false;
+//
+//	// figure out the local solute IDs. This depends on the material
+//	int nsols = (int)m_sol.size();
+//	vector<int> lid(nsols, -1);
+//	int negs = 0;
+//	for (int i = 0; i < (int)m_sol.size(); ++i)
+//	{
+//		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+//		if (lid[i] < 0) negs++;
+//	}
+//	if (negs == nsols) return false;
+//
+//	// loop over all elements
+//	int N = dom.Elements();
+//	for (int i = 0; i < N; ++i)
+//	{
+//		FEElement& el = dom.ElementRef(i);
+//
+//		for (int k = 0; k < nsols; ++k)
+//		{
+//			int nsid = lid[k];
+//			if (nsid == -1) a << 0.f;
+//			else
+//			{
+//				// calculate average concentration
+//				double ew = 0;
+//				for (int j = 0; j < el.GaussPoints(); ++j)
+//				{
+//					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+//					ew += pm->GetActualSoluteConcentration(mp, nsid);
+//				}
+//				ew /= el.GaussPoints();
+//				a << ew;
+//			}
+//		}
+//
+//	}
+//	return true;
+//}
+//
+////=================================================================================================
+//// FEPlotEffectiveSoluteConcentration
+////=================================================================================================
+//
+//FEPlotEffectiveSoluteConcentrationERD::FEPlotEffectiveSoluteConcentrationERD(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_NODE)
+//{
+//	DOFS& dofs = pfem->GetDOFS();
+//	int nsol = dofs.GetVariableSize("concentration");
+//	SetArraySize(nsol);
+//
+//	// collect the names
+//	int ndata = pfem->GlobalDataItems();
+//	vector<string> s;
+//	for (int i = 0; i < ndata; ++i)
+//	{
+//		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+//		if (ps)
+//		{
+//			s.push_back(ps->GetName());
+//			m_sol.push_back(ps->GetID());
+//		}
+//	}
+//	assert(nsol == (int)s.size());
+//	SetArrayNames(s);
+//	SetUnits(UNIT_CONCENTRATION);
+//}
+//
+////-----------------------------------------------------------------------------
+//bool FEPlotEffectiveSoluteConcentrationERD::Save(FEDomain& dom, FEDataStream& a)
+//{
+//	// get the dof
+//	DOFS& dofs = GetFEModel()->GetDOFS();
+//	int nsol = dofs.GetVariableSize("concentration");
+//	if (nsol == -1) return false;
+//
+//	// get the start index
+//	const int dof_C = GetFEModel()->GetDOFIndex("concentration", 0);
+//
+//	FEElasticReactionDiffusionInterface* pm = dynamic_cast<FEElasticReactionDiffusionInterface*>(dom.GetMaterial());
+//	if (pm == 0) return false;
+//
+//	// figure out the local solute IDs. This depends on the material
+//	int nsols = (int)m_sol.size();
+//	vector<int> lid(nsols, -1);
+//	int negs = 0;
+//	for (int i = 0; i < (int)m_sol.size(); ++i)
+//	{
+//		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+//		if (lid[i] < 0) negs++;
+//	}
+//	if (negs == nsol) return false;
+//
+//	// save the concentrations
+//	int N = dom.Nodes();
+//	for (int i = 0; i < N; ++i)
+//	{
+//		FENode& node = dom.Node(i);
+//		for (int j = 0; j < nsol; ++j)
+//		{
+//			double c = (lid[j] >= 0 ? node.get(dof_C + j) : 0.0);
+//			a << c;
+//		}
+//	}
+//	return true;
+//}
+//
+////-----------------------------------------------------------------------------
+//FEPlotSoluteFluxERD::FEPlotSoluteFluxERD(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY_VEC3F, FMT_ITEM)
+//{
+//	DOFS& dofs = pfem->GetDOFS();
+//	int nsol = dofs.GetVariableSize("concentration");
+//	SetArraySize(nsol);
+//
+//	// collect the names
+//	int ndata = pfem->GlobalDataItems();
+//	vector<string> s;
+//	for (int i = 0; i < ndata; ++i)
+//	{
+//		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+//		if (ps)
+//		{
+//			s.push_back(ps->GetName());
+//			m_sol.push_back(ps->GetID());
+//		}
+//	}
+//	assert(nsol == (int)s.size());
+//	SetArrayNames(s);
+//	SetUnits(UNIT_MOLAR_FLUX);
+//}
+//
+////-----------------------------------------------------------------------------
+//bool FEPlotSoluteFluxERD::Save(FEDomain& dom, FEDataStream& a)
+//{
+//	FEElasticReactionDiffusionInterface* pm = dynamic_cast<FEElasticReactionDiffusionInterface*>(dom.GetMaterial());
+//	if ((pm == 0) || (pm->Solutes() == 0)) return false;
+//
+//	// figure out the local solute IDs. This depends on the material
+//	int nsols = (int)m_sol.size();
+//	vector<int> lid(nsols, -1);
+//	int nsc = 0;
+//	for (int i = 0; i < (int)m_sol.size(); ++i)
+//	{
+//		lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+//		if (lid[i] != -1) nsc++;
+//	}
+//	if (nsc == 0) return false;
+//
+//	for (int i = 0; i < dom.Elements(); ++i)
+//	{
+//		FEElement& el = dom.ElementRef(i);
+//
+//		for (int k = 0; k < nsols; ++k)
+//		{
+//			int nsid = lid[k];
+//			if (nsid == -1) a << vec3d(0, 0, 0);
+//			else
+//			{
+//				// calculate average flux
+//				vec3d ew = vec3d(0, 0, 0);
+//				for (int j = 0; j < el.GaussPoints(); ++j)
+//				{
+//					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+//					ew += pm->GetSoluteFlux(mp, nsid);
+//				}
+//
+//				ew /= el.GaussPoints();
+//
+//				a << ew;
+//			}
+//		}
+//	}
+//	return true;
+//}

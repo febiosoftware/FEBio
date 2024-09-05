@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include "FEGrowthTensor.h"
-#include "FEElasticMaterial.h"
+#include "FEGrowthTensorERD.h"
+#include <FEBioMech/FEElasticMaterial.h>
 #include <FECore/FEMaterialPoint.h>
 #include <FECore/FEModelComponent.h>
 
@@ -34,63 +34,73 @@ SOFTWARE.*/
 //! Define a material point that stores the multiplicative decomposition
 //! of the deformation gradient and the solid referential density
 //
-class FEKinematicMaterialPoint : public FEMaterialPointData
+class FEKinematicMaterialPointERD : public FEMaterialPointData
 {
 public:
-    FEKinematicMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt) {}
-
+    FEKinematicMaterialPointERD(FEMaterialPointData *pt) : FEMaterialPointData(pt) {}
+    
     FEMaterialPointData* Copy() override;
-
+    
     void Init() override;
+
     void Update(const FETimeInfo& timeInfo) override;
-
+    
     void Serialize(DumpStream& ar) override;
-
+    
 public:
-    mat3d   m_Fe;       //!< elastic deformation
-    double  m_Je;       //!< elastic relative volume
-    mat3d   m_Fg;       //!< growth deformation
-    double  m_rhor;     //!< solid referential density
+    mat3d    m_Fe;       //!< elastic deformation
+    mat3d    m_Fg;       //!< growth deformation
+    double   m_Je;
+    double   m_Jg;
+    double   m_theta;    //!< growth rate
+    double   m_theta_p;  //!< growth rate on previous step
+    FEParamDouble   m_rhor;     //!< solid referential density
 };
 
 //-----------------------------------------------------------------------------
 //! Material class that implements Kinematic growth model.
 //
-class FEKinematicGrowth : public FEElasticMaterial
+class FEBIOERD_API FEKinematicGrowthRateDependent : public FEElasticMaterial
 {
 public:
-    FEKinematicGrowth(FEModel* pfem);
-
+    FEKinematicGrowthRateDependent(FEModel* pfem);
+    
     //! Initialization routine
     bool Init() override;
-
+    
     //! get the elastic base material
     FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
-
-    //! get the elastic base material
-    FEGrowthTensor* GetGrowthMaterial() { return m_pGrowth; }
-
+    
+    //! get the growth tensor base material
+    FEGrowthTensorERD* GetGrowthMaterial() { return m_pGrowth; }
+    
     //! Returns the Cauchy stress
     mat3ds Stress(FEMaterialPoint& mp) override;
-
+    
     //! Returns the spatial tangent
     tens4ds Tangent(FEMaterialPoint& mp) override;
 
+    //! Returns the spatial tangent
+    mat3ds dSdtheta(FEMaterialPoint& mp);
+    
+    //! Returns dSdFg
+    tens4ds dSdFg(FEMaterialPoint& mp);
+
+    //! Returns dTdc
+    mat3ds dTdc(FEMaterialPoint& mp, int sol);
+
     //! Returns the strain energy density
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
-
+    
     // returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
 
     // update material point at each iteration
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
 
-    //! Get the elastic deformation
-    FEMaterialPoint GetElasticDeformationMaterialPoint(FEMaterialPoint& mp);
-
 private:
-    FEElasticMaterial* m_pBase;        //!< pointer to elastic solid material
-    FEGrowthTensor* m_pGrowth;      //!< pointer to growth tensor
+    FEElasticMaterial*  m_pBase;        //!< pointer to elastic solid material
+    FEGrowthTensorERD*     m_pGrowth;      //!< pointer to growth tensor
 
     DECLARE_FECORE_CLASS();
 };

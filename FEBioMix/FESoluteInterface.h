@@ -30,8 +30,8 @@ SOFTWARE.*/
 #include <FECore/fecore_api.h>
 #include "febiomix_api.h"
 #include <FECore/vec3d.h>
-#include <FEBioMech/FEKinematicGrowth.h>
-#include <FEBioMech/FEGrowthTensor.h>
+//#include "FEKinematicGrowthRateDependent.h"
+//#include "FEGrowthTensorERD.h"
 #include <FEBioMix/FEBiphasic.h>
 
 class FESolute;

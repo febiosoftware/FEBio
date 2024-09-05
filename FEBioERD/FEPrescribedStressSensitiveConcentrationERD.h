@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,35 +23,47 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include <FECore/FEModule.h>
-#include <FEBioMech/FESolidModule.h>
-#include "febiomix_api.h"
+#include <FECore/FEPrescribedDOF.h>
+#include <FECore/tens3d.h>
+#include <FEBioMech/FEBioMech.h>
+#include "febioerd_api.h"
+#include <FECore/FEElement.h>
 
-class FEBIOMIX_API FEBiphasicModule : public FESolidModule
+//-----------------------------------------------------------------------------
+class FEBIOERD_API FEPrescribedStressSensitiveConcentrationERD : public FEPrescribedDOF
 {
 public:
-	FEBiphasicModule();
-	void InitModel(FEModel* fem) override;
-};
+	//! constructor
+	FEPrescribedStressSensitiveConcentrationERD(FEModel* pfem);
 
-class FEBIOMIX_API FEBiphasicSoluteModule : public FEBiphasicModule
-{
+	//! initializer
+	bool Init() override;
+
+	//! get integration point stress
+	mat3ds GetStress(FEElement& m_elem, int nodelid);
+
+	//! get integration point concentration
+	double GetConcentration(FEElement& m_elem, int nodelid);
+
+	//! get stress projected at the nodes
+	mat3ds GetNodalStress(int nodelid);
+
+	//! get concentration projected at the nodes
+	double GetNodalConcentration(int nodelid);
+
 public:
-	FEBiphasicSoluteModule();
-	void InitModel(FEModel* fem) override;
-};
+	double m_s0		= 0.2;
+	double m_a0		= 1.0;
+	double m_a		= 1.0;
+	double m_b		= 0.05;
+	FEParamDouble m_value;
+	DECLARE_FECORE_CLASS();
+protected:
+	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
-class FEBIOMIX_API FEMultiphasicModule : public FEBiphasicSoluteModule
-{
-public:
-	FEMultiphasicModule();
-	void InitModel(FEModel* fem) override;
+protected:
 };
-
-//class FEBIOMIX_API FEElasticReactionDiffusionModule : public FEBiphasicSoluteModule
-//{
-//public:
-//	FEElasticReactionDiffusionModule();
-//	void InitModel(FEModel* fem) override;
-//};

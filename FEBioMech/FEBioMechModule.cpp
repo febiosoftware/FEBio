@@ -849,21 +849,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotBeamReferenceStress, "beam reference stress");
 	REGISTER_FECORE_CLASS(FEPlotBeamReferenceStressCouple, "beam reference stress couple");
 
-	// growth variables
-	REGISTER_FECORE_CLASS(FEPlotGrowthRatio, "growth ratio");
-	REGISTER_FECORE_CLASS(FEPlotGrowthTensor, "growth tensor");
-	REGISTER_FECORE_CLASS(FEPlotTraceStresses, "stress trace");
-	REGISTER_FECORE_CLASS(FEPlotGrowthElasticDeformationGradient, "growth elastic deformation gradient");
-	REGISTER_FECORE_CLASS(FEPlotGrowthDeformationGradient, "growth deformation gradient");
-	REGISTER_FECORE_CLASS(FEPlotJacobian, "Jacobian");
-	REGISTER_FECORE_CLASS(FEPlotGrowthElasticJacobian, "growth elastic Jacobian");
-	REGISTER_FECORE_CLASS(FEPlotGrowthJacobian, "growth Jacobian");
-	REGISTER_FECORE_CLASS(FEPlotGrowthK, "growth activation");
-	REGISTER_FECORE_CLASS(FEPlotGrowthPhi, "growth phi");
-
-
-	
-
 	// 2O continuum fields
 	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "s norm");
 

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,35 +23,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include <FECore/FEModule.h>
-#include <FEBioMech/FESolidModule.h>
-#include "febiomix_api.h"
+#include "FEChemicalReactionERD.h"
 
-class FEBIOMIX_API FEBiphasicModule : public FESolidModule
+class FEBIOERD_API FEReactionRateConstERD : public FEReactionRateERD
 {
 public:
-	FEBiphasicModule();
-	void InitModel(FEModel* fem) override;
-};
+	//! constructor
+	FEReactionRateConstERD(FEModel* pfem) : FEReactionRateERD(pfem) { m_k = 0; }
 
-class FEBIOMIX_API FEBiphasicSoluteModule : public FEBiphasicModule
-{
+	//! reaction rate at material point
+	double ReactionRate(FEMaterialPoint& pt) override { return m_k(pt); }
+
+	//! tangent of reaction rate with strain at material point
+	mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) override { return mat3ds(0); }
+
+	//! tangent of reaction rate with Cauchy stress (sigma) at material point
+	mat3ds Tangent_ReactionRate_Stress(FEMaterialPoint& pt) override { return mat3ds(0); }
+
 public:
-	FEBiphasicSoluteModule();
-	void InitModel(FEModel* fem) override;
-};
+	FEParamDouble   m_k;		//!< reaction rate
 
-class FEBIOMIX_API FEMultiphasicModule : public FEBiphasicSoluteModule
-{
-public:
-	FEMultiphasicModule();
-	void InitModel(FEModel* fem) override;
+	DECLARE_FECORE_CLASS();
 };
-
-//class FEBIOMIX_API FEElasticReactionDiffusionModule : public FEBiphasicSoluteModule
-//{
-//public:
-//	FEElasticReactionDiffusionModule();
-//	void InitModel(FEModel* fem) override;
-//};
