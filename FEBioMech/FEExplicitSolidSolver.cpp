@@ -944,20 +944,20 @@ bool FEExplicitSolidSolver::DoSolve()
     double dt = fem.GetTime().timeIncrement;
 
 	// collect accelerations, velocities, displacements
-	vector<double> an(m_neq, 0.0), vn(m_neq, 0.0), un(m_neq, 0.0);
-#pragma omp parallel for shared(an, vn, un, mesh)
+	vector<double> an(m_neq, 0.0), vn(m_neq, 0.0);
+#pragma omp parallel for shared(an, vn, mesh)
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		vec3d vt = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) { un[n] = node.m_rt.x - node.m_r0.x; vn[n] = vt.x; an[n] = node.m_at.x; }
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) { un[n] = node.m_rt.y - node.m_r0.y; vn[n] = vt.y; an[n] = node.m_at.y; }
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) { un[n] = node.m_rt.z - node.m_r0.z; vn[n] = vt.z; an[n] = node.m_at.z; }
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) { vn[n] = vt.x; an[n] = node.m_at.x; }
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) { vn[n] = vt.y; an[n] = node.m_at.y; }
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) { vn[n] = vt.z; an[n] = node.m_at.z; }
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { un[n] = node.get(m_dofSU[0]); vn[n] = node.get(m_dofSV[0]); an[n] = node.get(m_dofSA[0]); }
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { un[n] = node.get(m_dofSU[1]); vn[n] = node.get(m_dofSV[1]); an[n] = node.get(m_dofSA[1]); }
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { un[n] = node.get(m_dofSU[2]); vn[n] = node.get(m_dofSV[2]); an[n] = node.get(m_dofSA[2]); }
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { vn[n] = node.get(m_dofSV[0]); an[n] = node.get(m_dofSA[0]); }
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { vn[n] = node.get(m_dofSV[1]); an[n] = node.get(m_dofSA[1]); }
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { vn[n] = node.get(m_dofSV[2]); an[n] = node.get(m_dofSA[2]); }
 	}
 
 	// do rigid bodies
@@ -965,9 +965,9 @@ bool FEExplicitSolidSolver::DoSolve()
 	{
 		FERigidBody& rb = *fem.GetRigidBody(i);
 		int n;
-		if ((n = rb.m_LM[0]) >= 0) { un[n] = rb.m_rt.x - rb.m_r0.x; vn[n] = rb.m_vt.x; an[n] = rb.m_at.x; }
-		if ((n = rb.m_LM[1]) >= 0) { un[n] = rb.m_rt.y - rb.m_r0.y; vn[n] = rb.m_vt.y; an[n] = rb.m_at.y; }
-		if ((n = rb.m_LM[2]) >= 0) { un[n] = rb.m_rt.z - rb.m_r0.z; vn[n] = rb.m_vt.z; an[n] = rb.m_at.z; }
+		if ((n = rb.m_LM[0]) >= 0) { vn[n] = rb.m_vt.x; an[n] = rb.m_at.x; }
+		if ((n = rb.m_LM[1]) >= 0) { vn[n] = rb.m_vt.y; an[n] = rb.m_at.y; }
+		if ((n = rb.m_LM[2]) >= 0) { vn[n] = rb.m_vt.z; an[n] = rb.m_at.z; }
 		
 		// convert to rigid frame
 		quatd Q = rb.GetRotation();
@@ -1132,6 +1132,8 @@ bool FEExplicitSolidSolver::DoSolve()
 
 bool FEExplicitSolidSolver::Residual(vector<double>& R)
 {
+	TRACK_TIME(Timer_Residual);
+
 	// get the time information
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	const FETimeInfo& tp = fem.GetTime();
