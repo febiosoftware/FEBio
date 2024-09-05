@@ -151,6 +151,13 @@ bool FEMMGRemesh::RefineMesh()
 
 bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMeshTopo& topo)
 {
+	FEMeshAdaptorCriterion* criterion = m_mmgRemesh->GetCriterion();
+	assert(criterion);
+	if (criterion == nullptr) return false;
+	FEElementSet* elset = m_mmgRemesh->GetElementSet();
+	FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
+	if (elemList.size() == 0) return false;
+
 	FEMesh& mesh = *topo.GetMesh();
 	int NN = mesh.Nodes();
 	int NE = topo.Elements();
@@ -311,7 +318,6 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 		}
 	}
 
-	FEElementSet* elset = m_mmgRemesh->GetElementSet();
 	if (elset)
 	{
 		// elements that are not in the element set will be flagged as required.
@@ -329,12 +335,6 @@ bool FEMMGRemesh::MMG::build_mmg_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMe
 
 	// scale factors
 	vector<double> nodeScale(NN, 0.0);
-	FEMeshAdaptorCriterion* criterion = m_mmgRemesh->GetCriterion();
-
-	assert(criterion);
-	if (criterion == nullptr) return false;
-	FEMeshAdaptorSelection elemList = criterion->GetElementSelection(elset);
-    if(elemList.size() == 0) return false;
 
 	// see if want to normalize the data
 	if (m_mmgRemesh->m_normalizeData)
@@ -633,12 +633,9 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		else
 		{
 			// assume this node set is determined by the entire mesh
-			FESolidDomain& dom = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
-//			if (nset.Size() == dom.Nodes())
-			{
-				nset.Clear();
-				for (int i = 0; i < dom.Nodes(); ++i) nset.Add(dom.NodeIndex(i));
-			}
+			nset.Clear();
+			int N = mesh.Nodes();
+			for (int i = 0; i < N; ++i) nset.Add(i);
 		}
 	}
 
