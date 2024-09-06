@@ -736,3 +736,54 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 
 	return FEParamValue();
 }
+
+FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, int index)
+{
+	switch (paramVal.type())
+	{
+	case FE_PARAM_STD_VECTOR_INT:
+	{
+		std::vector<int>& d = paramVal.value<std::vector<int>>();
+		if ((index >= 0) && (index < d.size())) return FEParamValue(d[index]);
+	}
+	break;
+	case FE_PARAM_STD_VECTOR_DOUBLE:
+	{
+		std::vector<double>& d = paramVal.value<std::vector<double>>();
+		if ((index >= 0) && (index < d.size())) return FEParamValue(d[index]);
+	}
+	break;
+	case FE_PARAM_STD_VECTOR_VEC2D:
+	{
+		std::vector<vec2d>& d = paramVal.value<std::vector<vec2d>>();
+		if ((index >= 0) && (index < d.size())) return FEParamValue(d[index]);
+	}
+	break;
+	}
+	assert(false);
+	return FEParamValue();
+}
+
+FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, const char* szcomp)
+{
+	switch (paramVal.type())
+	{
+	case FE_PARAM_VEC2D:
+	{
+		vec3d& v = paramVal.value<vec3d>();
+		if      (strcmp(szcomp, "x") == 0) return FEParamValue(v.x);
+		else if (strcmp(szcomp, "y") == 0) return FEParamValue(v.y);
+	}
+	break;
+	case FE_PARAM_VEC3D:
+	{
+		vec3d& v = paramVal.value<vec3d>();
+		if      (strcmp(szcomp, "x") == 0) return FEParamValue(v.x);
+		else if (strcmp(szcomp, "y") == 0) return FEParamValue(v.y);
+		else if (strcmp(szcomp, "z") == 0) return FEParamValue(v.z);
+	}
+	break;
+	}
+	assert(false);
+	return FEParamValue();
+}

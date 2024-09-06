@@ -348,7 +348,7 @@ public: // --- parameter functions ---
 	FEParam* FindParameter(const ParamString& s) override;
 
 	//! return a reference to the named parameter
-	virtual FEParamValue GetParameterValue(const ParamString& param);
+	FEParamValue GetParameterValue(const ParamString& param) override;
 
 	//! return the parameter string for a parameter
 	std::string GetParamString(FEParam* p);
