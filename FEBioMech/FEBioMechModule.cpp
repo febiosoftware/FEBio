@@ -272,6 +272,7 @@ SOFTWARE.*/
 
 #include "FEInitialVelocity.h"
 #include "FENodalForce.h"
+#include "FENodalTargetForce.h"
 
 #include "FEPreStrainElastic.h"
 #include "FEPreStrainUncoupledElastic.h"
@@ -632,6 +633,7 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// classes derived from FENodalLoad
 	REGISTER_FECORE_CLASS(FENodalForce, "nodal_force");
+	REGISTER_FECORE_CLASS(FENodalTargetForce, "nodal_target_force");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FESurfaceLoad
