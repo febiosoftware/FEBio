@@ -715,7 +715,7 @@ void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 
 		if (ar.IsSaving())
 		{
-			int N = m_data.size();
+			int N = (int)m_data.size();
 			ar << N;
 			for (int i = 0; i < N; ++i)
 			{

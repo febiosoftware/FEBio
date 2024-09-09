@@ -799,37 +799,15 @@ public:
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 {
-	if (dynamic_cast<FELinearTrussDomain*>(&dom))
-	{
-		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
-			const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			return pt.m_s;
-		});
-		return true;
-	}
-
-	if (dynamic_cast<FEElasticBeamDomain*>(&dom))
-	{
-		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
-			const FEElasticBeamMaterialPoint& pt = *mp.ExtractData<FEElasticBeamMaterialPoint>();
-			mat3d Q = pt.m_Q;
-			vec3d E1 = Q.col(0);
-			vec3d E2 = Q.col(1);
-			vec3d E3 = Q.col(2);
-			quatd Rt = pt.m_Rt;
-			vec3d t1 = Rt * E1;
-			vec3d t2 = Rt * E2;
-			vec3d t3 = Rt * E3;
-			vec3d t = pt.m_t;
-			return (dyad(t1)*(t*t1) + dyad(t2)*(t*t2) + dyad(t3)*(t*t3));
-			});
-		return true;
-	}
-
+	FEDomainParameter* var = nullptr;
 	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
-	if ((pme == 0) || pme->IsRigid()) return false;
+	if (pme)
+	{
+		if (!pme->IsRigid())
+			var = pme->FindDomainParameter("stress");
+	}
+	else var = dom.GetMaterial()->FindDomainParameter("stress");
 
-	FEDomainParameter* var = pme->FindDomainParameter("stress");
 	if (var == nullptr) return false;
 
 	writeAverageElementValue<mat3ds>(dom, a, var);
@@ -2724,7 +2702,7 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
         {
             FEElement& el = dom.ElementRef(i);
 
-            float D = 0.0;
+            double D = 0.0;
             for (int n = 0; n < el.GaussPoints(); ++n)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
