@@ -49,5 +49,9 @@ private:
 	vec3d	m_alt, m_alp, m_al;
 	quatd	m_qt, m_qp, m_q;
 
+	// output parameters
+	vec3d m_Wt; // angular velocity in moving frame (output)
+	vec3d m_rt; // rotational vector in fixed frame (output)
+
 	DECLARE_FECORE_CLASS();
 };

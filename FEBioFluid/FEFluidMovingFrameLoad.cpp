@@ -35,6 +35,10 @@ BEGIN_FECORE_CLASS(FEFluidMovingFrameLoad, FEBodyForce)
 	ADD_PARAMETER(m_wt.x, "wx");
 	ADD_PARAMETER(m_wt.y, "wy");
 	ADD_PARAMETER(m_wt.z, "wz");
+
+	ADD_PARAMETER(m_wt, "wt")->setLongName("Angular velocity in fixed frame")->setUnits(UNIT_ANGULAR_VELOCITY)->SetFlags(FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_Wt, "Wt")->setLongName("Angular velocity in moving frame")->setUnits(UNIT_ANGULAR_VELOCITY)->SetFlags(FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_rt, "rt")->setLongName("Rotation vector in fixed frame")->setUnits(UNIT_RADIAN)->SetFlags(FE_PARAM_HIDDEN);
 END_FECORE_CLASS();
 
 FEFluidMovingFrameLoad::FEFluidMovingFrameLoad(FEModel* fem) : FEBodyForce(fem)
@@ -74,6 +78,11 @@ void FEFluidMovingFrameLoad::PrepStep()
 
 	m_qp = m_qt;
 	m_wp = m_wt;
+
+	// output quantities
+	quatd qi = m_qt.Inverse();
+	m_Wt = qi * m_wt;
+	m_rt = m_qt.GetRotationVector();
 
 	FEBodyForce::PrepStep();
 }

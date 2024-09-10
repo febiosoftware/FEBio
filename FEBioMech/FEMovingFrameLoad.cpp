@@ -35,6 +35,10 @@ BEGIN_FECORE_CLASS(FEMovingFrameLoad, FEBodyForce)
 	ADD_PARAMETER(m_at.x, "ax")->setLongName("x-linear acceleration")->setUnits(UNIT_ACCELERATION);
 	ADD_PARAMETER(m_at.y, "ay")->setLongName("y-linear acceleration")->setUnits(UNIT_ACCELERATION);
 	ADD_PARAMETER(m_at.z, "az")->setLongName("z-linear acceleration")->setUnits(UNIT_ACCELERATION);
+
+	ADD_PARAMETER(m_wt, "wt")->setLongName("Angular velocity in fixed frame")->setUnits(UNIT_ANGULAR_VELOCITY)->SetFlags(FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_Wt, "Wt")->setLongName("Angular velocity in moving frame")->setUnits(UNIT_ANGULAR_VELOCITY)->SetFlags(FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_rt, "rt")->setLongName("Rotation vector in fixed frame")->setUnits(UNIT_RADIAN)->SetFlags(FE_PARAM_HIDDEN);
 END_FECORE_CLASS();
 
 FEMovingFrameLoad::FEMovingFrameLoad(FEModel* fem) : FEBodyForce(fem)
@@ -74,6 +78,11 @@ void FEMovingFrameLoad::PrepStep()
 
 	m_qp = m_qt;
 	m_wp = m_wt;
+
+	// output quantities
+	quatd qi = m_qt.Inverse();
+	m_Wt = qi * m_wt;
+	m_rt = m_qt.GetRotationVector();
 
 	vec3d R = m_q.GetRotationVector();
 
