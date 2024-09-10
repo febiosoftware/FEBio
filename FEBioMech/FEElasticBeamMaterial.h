@@ -66,6 +66,9 @@ public:
 
 	vec3d	m_dpt;	// rate of linear momentum (current)
 	vec3d	m_dht;	// rate of angular momentum (current)
+
+	// for output
+	mat3ds m_s; // Cauchy stress tensor in global coordinates
 };
 
 class FEElasticBeamMaterial : public FEMaterial
