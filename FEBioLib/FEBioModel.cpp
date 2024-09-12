@@ -1691,11 +1691,31 @@ bool FEBioModel::Reset()
 	return true;
 }
 
+TimingInfo FEBioModel::GetTimingInfo()
+{
+	TimingInfo ti;
+	ti.total_time   = 0.0;
+	ti.input_time   = m_InputTime.GetTime(); ti.total_time += ti.input_time;
+	ti.init_time    = m_InitTime .GetTime(); ti.total_time += ti.init_time;
+	ti.solve_time   = GetTimer(TimerID::Timer_ModelSolve)->GetTime(); ti.total_time += ti.solve_time;
+
+	double sum = 0;
+	ti.io_time      = m_IOTimer.GetTime(); sum += ti.io_time;
+	ti.total_linsol = GetTimer(TimerID::Timer_LinSolve )->GetTime(); sum += ti.total_linsol;
+	ti.total_reform = GetTimer(TimerID::Timer_Reform   )->GetTime(); sum += ti.total_reform;
+	ti.total_stiff  = GetTimer(TimerID::Timer_Stiffness)->GetTime(); sum += ti.total_stiff;
+	ti.total_rhs    = GetTimer(TimerID::Timer_Residual )->GetTime(); sum += ti.total_rhs;
+	ti.total_update = GetTimer(TimerID::Timer_Update   )->GetTime(); sum += ti.total_update;
+	ti.total_qn     = GetTimer(TimerID::Timer_QNUpdate )->GetTime(); sum += ti.total_qn;
+	ti.total_other  = ti.solve_time - sum;
+	return ti;
+}
+
+
 //=============================================================================
 //                               S O L V E
 //=============================================================================
 
-//-----------------------------------------------------------------------------
 void FEBioModel::on_cb_solved()
 {
 	FEAnalysis* step = GetCurrentStep();
@@ -1741,30 +1761,20 @@ void FEBioModel::on_cb_solved()
 		Logfile::MODE old_mode = m_log.SetMode(Logfile::LOG_FILE);
 
 		// sum up all the times spend in the linear solvers
-		double total_time   = 0.0;
-		double input_time   = m_InputTime.GetTime(); total_time += input_time;
-		double init_time    = m_InitTime .GetTime(); total_time += init_time;
-		double solve_time   = GetTimer(TimerID::Timer_ModelSolve)->GetTime(); total_time += solve_time;
-		double io_time      = m_IOTimer.GetTime();
-		double total_linsol = GetTimer(TimerID::Timer_LinSolve )->GetTime();
-		double total_reform = GetTimer(TimerID::Timer_Reform   )->GetTime();
-		double total_stiff  = GetTimer(TimerID::Timer_Stiffness)->GetTime();
-		double total_rhs    = GetTimer(TimerID::Timer_Residual )->GetTime();
-		double total_update = GetTimer(TimerID::Timer_Update   )->GetTime();
-		double total_qn     = GetTimer(TimerID::Timer_QNUpdate )->GetTime();
+		TimingInfo ti = GetTimingInfo();
 
 		feLog(" T I M I N G   I N F O R M A T I O N\n\n");
-		Timer::time_str(input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time);
-		Timer::time_str(init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, init_time);
-		Timer::time_str(solve_time  , sztime); feLog("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, solve_time);
-		Timer::time_str(io_time     , sztime); feLog("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, io_time);
-		Timer::time_str(total_reform, sztime); feLog("\t   reforming stiffness .......... : %s (%lg sec)\n\n", sztime, total_reform);
-		Timer::time_str(total_stiff , sztime); feLog("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, total_stiff);
-		Timer::time_str(total_rhs   , sztime); feLog("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs);
-		Timer::time_str(total_update, sztime); feLog("\t   model update ................. : %s (%lg sec)\n\n", sztime, total_update);
-		Timer::time_str(total_qn    , sztime); feLog("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, total_qn);
-		Timer::time_str(total_linsol, sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, total_linsol);
-		Timer::time_str(total_time  , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, total_time);
+		Timer::time_str(ti.input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, ti.input_time);
+		Timer::time_str(ti.init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, ti.init_time);
+		Timer::time_str(ti.solve_time  , sztime); feLog("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, ti.solve_time);
+		Timer::time_str(ti.io_time     , sztime); feLog("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, ti.io_time);
+		Timer::time_str(ti.total_reform, sztime); feLog("\t   reforming stiffness .......... : %s (%lg sec)\n\n", sztime, ti.total_reform);
+		Timer::time_str(ti.total_stiff , sztime); feLog("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, ti.total_stiff);
+		Timer::time_str(ti.total_rhs   , sztime); feLog("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, ti.total_rhs);
+		Timer::time_str(ti.total_update, sztime); feLog("\t   model update ................. : %s (%lg sec)\n\n", sztime, ti.total_update);
+		Timer::time_str(ti.total_qn    , sztime); feLog("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, ti.total_qn);
+		Timer::time_str(ti.total_linsol, sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, ti.total_linsol);
+		Timer::time_str(ti.total_time  , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, ti.total_time);
 
 		m_log.SetMode(old_mode);
 
