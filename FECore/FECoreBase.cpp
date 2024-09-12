@@ -551,7 +551,7 @@ FEParamValue FECoreBase::GetParameterValue(const ParamString& s)
 		{
 			FEParamDouble& v = p->value<FEParamDouble>();
 			if (v.isConst()) paramVal = FEParamValue(p, &v.constValue(), FE_PARAM_DOUBLE);
-			else return FEParamValue();
+			else paramVal = FEParamValue(p, p->data_ptr(), p->type());
 		}
 		else paramVal = FEParamValue(p, p->data_ptr(), p->type());
 
