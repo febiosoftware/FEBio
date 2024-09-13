@@ -148,7 +148,9 @@ public:
 
 		// allocate timers
 		// Make sure enough timers are allocated for all the TimerIds!
-		m_timers.resize(7);
+		m_timers.resize(TIMER_COUNT);
+		// make the solve timer is an inclusive timer!
+		m_timers[Timer_ModelSolve].makeInclusive();
 	}
 
 	void Serialize(DumpStream& ar);

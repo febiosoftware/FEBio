@@ -45,13 +45,24 @@ public:
 	//! constructor
 	~Timer();
 
+	// inclusive timers will not be paused when nested timers start
+	void makeInclusive();
+
+	// excluse timers will be paused when nested timers start 
+	void makeExclusive();
+
 	//! Start the timer
 	void start();
 
 	//! Stop the timer
 	void stop();
 
-	//! Reset the timer
+	//! pause the timer
+	void pause();
+
+	//! continue
+	void unpause();
+
 	void reset();
 
 	//! Get the elapsed time
@@ -72,6 +83,7 @@ public:
 public:
 	static void time_str(double fsec, char* sz);
 	static void GetTime(double fsec, int& nhour, int& nmin, int& nsec);
+	static Timer* activeTimer();
 
 private:
 	Imp*	m;	//!< local timing data (using PIMPL ididom)
@@ -89,7 +101,8 @@ enum TimerID {
 	Timer_Residual,
 	Timer_Stiffness,
 	Timer_QNUpdate,
-	Timer_ModelSolve
+	Timer_ModelSolve,
+	TIMER_COUNT // leave this at the end so that it equals the nr. of timers we need
 };
 
 //-----------------------------------------------------------------------------
@@ -102,8 +115,12 @@ class FECORE_API TimerTracker
 {
 public:
 	TimerTracker(FEModel* fem, int timerId);
-	TimerTracker(Timer* timer);
-	~TimerTracker();
+	TimerTracker(Timer* timer)
+	{
+		if (timer && !timer->isRunning()) { m_timer = timer; timer->start(); }
+		else m_timer = nullptr;
+	}
+	~TimerTracker() { if (m_timer) m_timer->stop(); }
 
 private:
 	Timer*	m_timer;

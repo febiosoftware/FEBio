@@ -41,23 +41,46 @@ struct	Timer::Imp {
 	time_point<steady_clock>	start;	//!< time at start
 	time_point<steady_clock>	stop;		//!< time at last stop
 
-	bool	isRunning;	//!< flag indicating whether start was called
+	bool	isRunning = false;	//!< flag indicating whether start was called
 	dseconds total; //!< accumulated time so far in seconds
+
+	// exclusive timers will pause when a nested timer starts
+	bool isExclusive = true;
+
+	Timer* parent = nullptr; // the timer that was active when this timer starts
+
+	static Timer* activeTimer;
 };
+
+Timer* Timer::Imp::activeTimer = nullptr;
 
 Timer::Timer()
 {
 	m = new Imp;
-	reset(); 
+	reset();
 }
+
+// inclusive timers will not be paused when child timers start
+void Timer::makeInclusive() { m->isExclusive = false; }
+
+// excluse timers will be paused when child timers start 
+void Timer::makeExclusive() { m->isExclusive = true; }
 
 Timer::~Timer()
 {
 	delete m;
 }
 
+Timer* Timer::activeTimer()
+{
+	return Imp::activeTimer;
+}
+
 void Timer::start()
 {
+	m->parent = m->activeTimer;
+	if (m->parent && m->parent->m->isExclusive) m->parent->pause();
+	m->activeTimer = this;
 	m->start = steady_clock::now();
 	m->isRunning = true;
 }
@@ -66,14 +89,33 @@ void Timer::stop()
 {
 	m->stop = steady_clock::now();
 	m->isRunning = false;
-
 	m->total += m->stop - m->start;
+
+	assert(m->activeTimer == this);
+	m->activeTimer = m->parent;
+	if (m->parent && m->parent->m->isExclusive) m->parent->unpause();
+}
+
+void Timer::pause()
+{
+	m->stop = steady_clock::now();
+	m->isRunning = false;
+	m->total += m->stop - m->start;
+}
+
+void Timer::unpause()
+{
+	m->start = steady_clock::now();
+	m->isRunning = true;
 }
 
 void Timer::reset()
 {
 	m->total = dseconds(0);
 	m->isRunning = false;
+	m->parent = nullptr;
+	assert(m->activeTimer == nullptr);
+	m->activeTimer = nullptr;
 }
 
 bool Timer::isRunning() const { return m->isRunning; }
@@ -93,7 +135,7 @@ double Timer::peek()
 
 void Timer::GetTime(int& nhour, int& nmin, int& nsec)
 {
-	double sec = (m->isRunning? peek() : m->total.count());
+	double sec = peek();
 	GetTime(sec, nhour, nmin, nsec);
 }
 
@@ -125,14 +167,3 @@ void Timer::time_str(double fsec, char* sz)
 
 //============================================================================
 TimerTracker::TimerTracker(FEModel* fem, int timerId) : TimerTracker(fem->GetTimer(timerId)) {}
-
-TimerTracker::TimerTracker(Timer* timer) 
-{
-	if (timer && (timer->isRunning() == false)) { m_timer = timer; timer->start(); }
-	else m_timer = nullptr;
-};
-
-TimerTracker::~TimerTracker() 
-{ 
-	if (m_timer) m_timer->stop(); 
-}

@@ -134,6 +134,8 @@ FEBioModel::FEBioModel()
 
 	m_bshowErrors = true;
 
+	m_TotalTime.makeInclusive();
+
 	// Add the output callback
 	// We call this function always since we want to flush the logfile for each event.
 	AddCallback(handleCB, CB_ALWAYS, this);
@@ -336,6 +338,9 @@ bool FEBioModel::AppendOnRestart() const
 
 bool FEBioModel::Input(const char* szfile)
 {
+	// start the total timer (assumes that this is the first function we'll hit)
+	m_TotalTime.start();
+
 	// start the timer
 	TimerTracker t(&m_InputTime);
 
@@ -749,6 +754,8 @@ string removeNewLines(const char* sz)
 //-----------------------------------------------------------------------------
 void FEBioModel::Log(int ntag, const char* szmsg)
 {
+	TimerTracker t(&m_IOTimer);
+
 	if      (ntag == 0) m_log.printf(szmsg);
 	else if ((ntag == 1) && m_bshowErrors) m_log.printbox("WARNING", szmsg);
 	else if ((ntag == 2) && m_bshowErrors) m_log.printbox("ERROR", szmsg);
@@ -1635,14 +1642,20 @@ bool FEBioModel::InitLogFile()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
+bool FEBioModel::Solve()
+{
+	bool b = FEModel::Solve();
+	m_TotalTime.stop();
+	return b;
+}
+
 //! This function resets the FEM data so that a new run can be done.
 //! This routine is called from the optimization routine.
-
 bool FEBioModel::Reset()
 {
 	// Reset model data
 	FEMechModel::Reset();
+	m_TotalTime.reset();
 
 	// re-initialize the log file
 	if (m_logLevel != 0)
@@ -1693,11 +1706,16 @@ bool FEBioModel::Reset()
 
 TimingInfo FEBioModel::GetTimingInfo()
 {
+	double tot = m_TotalTime.peek();
+
 	TimingInfo ti;
-	ti.total_time   = 0.0;
-	ti.input_time   = m_InputTime.GetTime(); ti.total_time += ti.input_time;
-	ti.init_time    = m_InitTime .GetTime(); ti.total_time += ti.init_time;
-	ti.solve_time   = GetTimer(TimerID::Timer_ModelSolve)->GetTime(); ti.total_time += ti.solve_time;
+	ti.total_time   = m_TotalTime.GetTime();
+
+	double total = 0;
+	ti.input_time   = m_InputTime.GetTime(); total += ti.input_time;
+	ti.init_time    = m_InitTime .GetTime(); total += ti.init_time;
+	ti.solve_time   = GetSolveTimer().GetTime(); total += ti.solve_time;
+	assert(total < ti.total_time);
 
 	double sum = 0;
 	ti.io_time      = m_IOTimer.GetTime(); sum += ti.io_time;
@@ -1707,10 +1725,13 @@ TimingInfo FEBioModel::GetTimingInfo()
 	ti.total_rhs    = GetTimer(TimerID::Timer_Residual )->GetTime(); sum += ti.total_rhs;
 	ti.total_update = GetTimer(TimerID::Timer_Update   )->GetTime(); sum += ti.total_update;
 	ti.total_qn     = GetTimer(TimerID::Timer_QNUpdate )->GetTime(); sum += ti.total_qn;
-	ti.total_other  = ti.solve_time - sum;
+	assert(sum < ti.solve_time);
+
+	ti.total_other  = (ti.total_time - total) + (ti.solve_time - sum);
+	assert(ti.total_other >= 0);
+
 	return ti;
 }
-
 
 //=============================================================================
 //                               S O L V E

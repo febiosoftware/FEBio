@@ -66,6 +66,9 @@ public:
 	//! Resets data structures
 	bool Reset() override;
 
+	//! solve the model
+	bool Solve() override;
+
 	TimingInfo GetTimingInfo();
 
 public: // --- I/O functions ---
@@ -206,6 +209,7 @@ private:
 	void UpdatePlotObjects();
 
 private:
+	Timer		m_TotalTime;	//!< timer to track total time
 	Timer		m_InputTime;	//!< timer to track time to read model
 	Timer		m_InitTime;		//!< timer to track model initialization
 	Timer		m_IOTimer;		//!< timer to track output (include plot, dump, and data)
