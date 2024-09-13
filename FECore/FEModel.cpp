@@ -673,8 +673,6 @@ void FEModel::IncrementUpdateCounter()
 //-----------------------------------------------------------------------------
 void FEModel::Update()
 {
-	TRACK_TIME(TimerID::Timer_Update);
-
 	// update model counter
 	m_imp->m_nupdates++;
 	
@@ -682,6 +680,7 @@ void FEModel::Update()
 	FEMesh& mesh = GetMesh();
 	const FETimeInfo& tp = GetTime();
 	try {
+		TRACK_TIME(TimerID::Timer_Update);
 		mesh.Update(tp);
 	}
 	catch (NegativeJacobianDetected e)
@@ -691,44 +690,49 @@ void FEModel::Update()
 		throw;
 	}
 
-	// set the mesh update flag to false
-	// If any load sets this to true, the
-	// mesh will also be update after the loads are updated
-	m_imp->m_meshUpdate = false;
-
-	int nvel = BoundaryConditions();
-	for (int i = 0; i < nvel; ++i)
+	// update model components
 	{
-		FEBoundaryCondition& bc = *BoundaryCondition(i);
-		if (bc.IsActive()) bc.UpdateModel();
-	}
+		TRACK_TIME(TimerID::Timer_Update);
 
-	// update all model loads
-	for (int i = 0; i < ModelLoads(); ++i)
-	{
-		FEModelLoad* pml = ModelLoad(i);
-		if (pml && pml->IsActive()) pml->Update();
-	}
-
-	// update all paired-interfaces
-	for (int i = 0; i < SurfacePairConstraints(); ++i)
-	{
-		FESurfacePairConstraint* psc = SurfacePairConstraint(i);
-		if (psc && psc->IsActive()) psc->Update();
-	}
-
-	// update all constraints
-	for (int i = 0; i < NonlinearConstraints(); ++i)
-	{
-		FENLConstraint* pc = NonlinearConstraint(i);
-		if (pc && pc->IsActive()) pc->Update();
-	}
-
-    // some of the loads may alter the prescribed dofs, so we update the mesh again
-	if (m_imp->m_meshUpdate)
-	{
-		mesh.Update(tp);
+		// set the mesh update flag to false
+		// If any load sets this to true, the
+		// mesh will also be update after the loads are updated
 		m_imp->m_meshUpdate = false;
+
+		int nvel = BoundaryConditions();
+		for (int i = 0; i < nvel; ++i)
+		{
+			FEBoundaryCondition& bc = *BoundaryCondition(i);
+			if (bc.IsActive()) bc.UpdateModel();
+		}
+
+		// update all model loads
+		for (int i = 0; i < ModelLoads(); ++i)
+		{
+			FEModelLoad* pml = ModelLoad(i);
+			if (pml && pml->IsActive()) pml->Update();
+		}
+
+		// update all paired-interfaces
+		for (int i = 0; i < SurfacePairConstraints(); ++i)
+		{
+			FESurfacePairConstraint* psc = SurfacePairConstraint(i);
+			if (psc && psc->IsActive()) psc->Update();
+		}
+
+		// update all constraints
+		for (int i = 0; i < NonlinearConstraints(); ++i)
+		{
+			FENLConstraint* pc = NonlinearConstraint(i);
+			if (pc && pc->IsActive()) pc->Update();
+		}
+
+		// some of the loads may alter the prescribed dofs, so we update the mesh again
+		if (m_imp->m_meshUpdate)
+		{
+			mesh.Update(tp);
+			m_imp->m_meshUpdate = false;
+		}
 	}
     
 	// do the callback
@@ -2456,7 +2460,7 @@ void FEModel::SerializeGeometry(DumpStream& ar)
 // This is used for running and cold restarts.
 void FEModel::Serialize(DumpStream& ar)
 {
-	TRACK_TIME(TimerID::Timer_Update);
+//	TRACK_TIME(TimerID::Timer_Update);
 
 	m_imp->Serialize(ar);
 	DoCallback(ar.IsSaving() ? CB_SERIALIZE_SAVE : CB_SERIALIZE_LOAD);
