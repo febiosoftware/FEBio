@@ -38,12 +38,15 @@ struct TimingInfo {
 	double init_time;
 	double solve_time;
 	double io_time;
-	double total_linsol;
+	double total_ls_factor;
+	double total_ls_backsolve;
 	double total_reform;
 	double total_stiff;
 	double total_rhs;
 	double total_update;
 	double total_qn;
+	double total_serialize;
+	double total_callback;
 	double total_other;
 };
 

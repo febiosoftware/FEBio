@@ -45,12 +45,6 @@ public:
 	//! constructor
 	~Timer();
 
-	// inclusive timers will not be paused when nested timers start
-	void makeInclusive();
-
-	// excluse timers will be paused when nested timers start 
-	void makeExclusive();
-
 	//! Start the timer
 	void start();
 
@@ -70,6 +64,9 @@ public:
 
 	//! Get the time in seconds
 	double GetTime();
+
+	//! Get the exclusive time (i.e. time when not paused)
+	double GetExclusiveTime();
 
 	//! return the time as a text string
 	void time_str(char* sz);
@@ -95,13 +92,21 @@ class FEModel;
 //-----------------------------------------------------------------------------
 // Timer IDs
 enum TimerID {
+	Timer_Init,
 	Timer_Update,
-	Timer_LinSolve,
+	Timer_LinSol_Factor,
+	Timer_LinSol_Backsolve,
 	Timer_Reform,
 	Timer_Residual,
 	Timer_Stiffness,
 	Timer_QNUpdate,
+	Timer_Serialize,
 	Timer_ModelSolve,
+	Timer_Callback,
+	Timer_USER1,
+	Timer_USER2,
+	Timer_USER3,
+	Timer_USER4,
 	TIMER_COUNT // leave this at the end so that it equals the nr. of timers we need
 };
 

@@ -205,7 +205,7 @@ bool FELinearSolver::SolveStep()
 	// solve the equations
 	vector<double> u(m_neq);
 	{
-		TRACK_TIME(TimerID::Timer_LinSolve);
+		TRACK_TIME(TimerID::Timer_LinSol_Backsolve);
 		if (m_pls->BackSolve(u, m_R) == false)
 			throw LinearSolverFailed();
 	}
@@ -261,7 +261,7 @@ bool FELinearSolver::ReformStiffness()
 
 	// factorize the stiffness matrix
 	{
-		TRACK_TIME(TimerID::Timer_LinSolve);
+		TRACK_TIME(TimerID::Timer_LinSol_Factor);
 		m_pls->Factor();
 	}
 
@@ -299,7 +299,6 @@ bool FELinearSolver::CreateStiffness()
 
 	// Do the preprocessing of the solver
 	{
-		TRACK_TIME(TimerID::Timer_LinSolve);
 		if (!m_pls->PreProcess()) throw FatalError();
 	}
 
