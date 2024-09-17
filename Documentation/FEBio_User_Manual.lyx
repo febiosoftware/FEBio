@@ -10200,9 +10200,13 @@ flag is used to set the symmetry of the global stiffness matrix.
 \end_layout
 
 \begin_layout Enumerate
-For portability reasons,
- the preferred method of setting the linear solver is in the FEBio configuration file,
- but it can also be specified in the solver section.
+The default linear solver used by FEBio is usually configured in the FEBio configuration file.
+ However,
+ it can also be specified directly in the FEBio input file as part of the solver parameters using the 
+\emph on
+linear_solver
+\emph default
+ tag.
  See 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -116593,362 +116597,449 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0,
  0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0,
  0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0,
  0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0,
  0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
@@ -124309,6 +124400,16 @@ The Pardiso solver is an effecient sparse direct linear solver and is the defaul
  
 \end_layout
 
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<default_linear_solver type="pardiso"/>
+\end_layout
+
 \begin_layout Subsection
 Skyline
 \end_layout
@@ -124644,6 +124745,129 @@ When using FGMRES as a preconditioner it is recommended to set the fail_max_iter
  
 \end_layout
 
+\begin_layout Standard
+
+\series bold
+Example 1.
+ 
+\series default
+This example shows how to set up the FGMRES solver with an ILU0 preconditioner.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<default_linear_solver type="fgmres">
+\begin_inset Newline newline
+\end_inset
+
+  <max_iter>100</max_iter>
+\end_layout
+
+\begin_layout LyX-Code
+  <tol>1e-5</tol>
+\end_layout
+
+\begin_layout LyX-Code
+  <pc_left type="ilu0"/>
+\end_layout
+
+\begin_layout LyX-Code
+</default_linear_solver>
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Example 2.
+ 
+\series default
+This example sets up an FGMRES solver with a Schur preconditioner.
+ For the Schur system we use pardiso for solving the A-block outside of the Schur complement and approximate the A-block inside the Schur complement with its diagonal.
+ This solver requires a block-structured matrix.
+ In order to generate the block structure you need to set the 
+\family typewriter
+equation_scheme
+\family default
+ control parameter to 1 in the model input file.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<default_linear_solver type="fgmres">
+\begin_inset Newline newline
+\end_inset
+
+ <print_level>2</print_level>
+\begin_inset Newline newline
+\end_inset
+
+ <max_iter>100</max_iter>
+\begin_inset Newline newline
+\end_inset
+
+ <tol>1e-5</tol>
+\begin_inset Newline newline
+\end_inset
+
+ <abs_tol>1e-9</abs_tol>
+\begin_inset Newline newline
+\end_inset
+
+ <pc_left type="schur">
+\begin_inset Newline newline
+\end_inset
+
+   <print_level>0</print_level>
+\begin_inset Newline newline
+\end_inset
+
+   <do_jacobi>0</do_jacobi>
+\begin_inset Newline newline
+\end_inset
+
+   <A_solver type="pardiso"/>
+\begin_inset Newline newline
+\end_inset
+
+   <schur_pc>0</schur_pc>
+\begin_inset Newline newline
+\end_inset
+
+   <schur_A_solver type="diagonal"/>
+\begin_inset Newline newline
+\end_inset
+
+   <schur_solver type="fgmres">
+\begin_inset Newline newline
+\end_inset
+
+     <print_level>0</print_level>
+\begin_inset Newline newline
+\end_inset
+
+     <max_iter>100</max_iter>
+\begin_inset Newline newline
+\end_inset
+
+     <tol>0.05</tol>
+\begin_inset Newline newline
+\end_inset
+
+     <fail_max_iters>0</fail_max_iters>
+\begin_inset Newline newline
+\end_inset
+
+   </schur_solver>
+\begin_inset Newline newline
+\end_inset
+
+  </pc_left>
+\begin_inset Newline newline
+\end_inset
+
+ </default_linear_solver>
+\end_layout
+
 \begin_layout Subsection
 CG
 \end_layout
@@ -124851,7 +125075,18 @@ BoomerAMG
 
 \begin_layout Standard
 This solver,
- from the HYPRE library,
+ from the HYPRE library (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://hypre.readthedocs.io/en/latest/index.html
+\end_layout
+
+\end_inset
+
+),
  is an adaptive multigrid solver.
  It often works better as a preconditioner to an iterative solver than as a stand-alone solver.
  
@@ -124976,8 +125211,8 @@ print_level
 \begin_inset Text
 
 \begin_layout Plain Layout
-The amount of information printed (0,1,
- or 2)
+The amount of information printed [0,1,
+ or 2]
 \end_layout
 
 \end_inset
@@ -125035,7 +125270,7 @@ coarsen_type
 \begin_inset Text
 
 \begin_layout Plain Layout
-Method of grid coarsening
+Method of grid coarsening (1)
 \end_layout
 
 \end_inset
@@ -125093,7 +125328,7 @@ relax_type
 \begin_inset Text
 
 \begin_layout Plain Layout
-relaxation type
+relaxation type (2)
 \end_layout
 
 \end_inset
@@ -125122,7 +125357,7 @@ interp_type
 \begin_inset Text
 
 \begin_layout Plain Layout
-interpolation type
+interpolation type (3)
 \end_layout
 
 \end_inset
@@ -125325,7 +125560,7 @@ fail_max_iters
 \begin_inset Text
 
 \begin_layout Plain Layout
-Fail on max iterations (1)
+Fail on max iterations (4)
 \end_layout
 
 \end_inset
@@ -125363,9 +125598,1026 @@ Comments
 \end_layout
 
 \begin_layout Enumerate
+
+\emph on
+coarsen_type 
+\emph default
+selects the algorithm for the coarsening phase.
+ The following values can be used.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="12" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CLJP-coarsening (a parallel coarsening algorithm using independent sets)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+classical Ruge-Stueben coarsening,
+ no boundary treatment (not recommended!)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+classical Ruge-Stueben coarsening,
+ with boundary treatment
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Falgout coarsening
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CLJP-coarsening (using fix random vector,
+ for debugging purposes only)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PMIS-coarsening (might lead to slower convergence)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PMIS-coarsening (using a fixed random vector ,for debugging purposes only)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+HMIS-coarsening
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+one-pass Ruge-Stueben coarsening (not recommended!)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CGC coarsening
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CGC-E coarsening
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+
+\emph on
+relax_type 
+\emph default
+selects the algorithm for the relaxation phase.
+ The following values can be used.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="14" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Jacobi
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gauss-Seidel,
+ sequential (very slow!)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gauss-Seidel,
+ interior points in parallel,
+ boundary sequential (slow!)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hybrid Gauss-Seidel or SOR,
+ forward solve
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hybrid Gauss-Seidel or SOR,
+ backward solve
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hybrid chaotic Gauss-Seidel (works only with OpenMP)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hybrid symmetric Gauss-Seidel or SSOR
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+l1-scaled hybrid symmetric Gauss-Seidel
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gaussian elimination (only on coarsest level)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CG (warning - not a fixed smoother - may require RGMRES)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Chebyshev
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCF-Jacobi
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+l1-scaled Jacobi
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+
+\emph on
+interp_type 
+\emph default
+selects the algorithm for the interpolation phase.
+ The following values can be used.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="16" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+classicial modified interpolation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LS interpolation (for use with GSMG)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+classical modified interpolation for hyperbolic PDEs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+direct interpolation (with separation of weights)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multipass interpolation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multipass interpolation (with separation of weights)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family sans
+\series medium
+\shape up
+\size normal
+\emph off
+\nospellcheck off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+extended+i interpolation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+extended+i (if no common C neighbor) interpolation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard interpolation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard interpolation (with separation of weights)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+classical block interpolation (for use with nodal systems version only)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+like 10,
+ with diagonalized blocks
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FF interpolation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+13
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FF1 interpolation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+extended interpolation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
 When using this solver as a preconditioner,
  it is recommended to set the fail_max_iters flag to 0.
  
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<default_linear_solver type="boomeramg">
+\end_layout
+
+\begin_layout LyX-Code
+  <max_iter>100</max_iter>
+\end_layout
+
+\begin_layout LyX-Code
+  <print_level>3</print_level>
+\end_layout
+
+\begin_layout LyX-Code
+  <tol>1e-05</tol>
+\end_layout
+
+\begin_layout LyX-Code
+  <max_levels>25</max_levels>
+\end_layout
+
+\begin_layout LyX-Code
+  <coarsen_type>-1</coarsen_type>
+\end_layout
+
+\begin_layout LyX-Code
+  <use_num_funcs>1</use_num_funcs>
+\end_layout
+
+\begin_layout LyX-Code
+  <relax_type>5</relax_type>
+\end_layout
+
+\begin_layout LyX-Code
+  <interp_type>6</interp_type>
+\end_layout
+
+\begin_layout LyX-Code
+  <strong_threshold>0.9</strong_threshold>
+\end_layout
+
+\begin_layout LyX-Code
+  <p_max_elmts>4</p_max_elmts>
+\end_layout
+
+\begin_layout LyX-Code
+  <num_sweeps>1</num_sweeps>
+\end_layout
+
+\begin_layout LyX-Code
+  <agg_interp_type>0</agg_interp_type>
+\end_layout
+
+\begin_layout LyX-Code
+  <agg_num_levels>0</agg_num_levels>
+\end_layout
+
+\begin_layout LyX-Code
+  <nodal>0</nodal>
+\end_layout
+
+\begin_layout LyX-Code
+  <do_jacobi>0</do_jacobi>
+\end_layout
+
+\begin_layout LyX-Code
+  <fail_max_iters>0</fail_max_iters>
+\end_layout
+
+\begin_layout LyX-Code
+</default_linear_solver>
 \end_layout
 
 \begin_layout Subsection
@@ -126004,147 +127256,6 @@ https://developer.apple.com/documentation/accelerate/sparse_solvers/sparse_itera
 \end_inset
 
 ).
-\end_layout
-
-\begin_layout Subsection
-Examples
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-Example 1.
- 
-\series default
-The default pardiso solver is defined in the configuration file using the following syntax.
- It does not require any parameters.
-\end_layout
-
-\begin_layout LyX-Code
-<default_linear_solver type="pardiso"/>
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-Example 2.
- 
-\series default
-This example shows how to set up the FGMRES solver with an ILU0 preconditioner.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<default_linear_solver type="fgmres">
-\begin_inset Newline newline
-\end_inset
-
-  <max_iter>100</max_iter>
-\end_layout
-
-\begin_layout LyX-Code
-  <tol>1e-5</tol>
-\end_layout
-
-\begin_layout LyX-Code
-  <pc_left type="ilu0"/>
-\end_layout
-
-\begin_layout LyX-Code
-</default_linear_solver>
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-Example 3.
- 
-\series default
-This example sets up an FGMRES solver with a Schur preconditioner.
- For the Schur system we use pardiso for solving the A-block outside of the Schur complement and approximate the A-block inside the Schur complement with its diagonal.
- This solver requires a block-structured matrix.
- In order to generate the block structure you need to set the 
-\family typewriter
-equation_scheme
-\family default
- control parameter to 1 in the model input file.
- 
-\end_layout
-
-\begin_layout LyX-Code
-<default_linear_solver type="fgmres">
-\begin_inset Newline newline
-\end_inset
-
- <print_level>2</print_level>
-\begin_inset Newline newline
-\end_inset
-
- <max_iter>100</max_iter>
-\begin_inset Newline newline
-\end_inset
-
- <tol>1e-5</tol>
-\begin_inset Newline newline
-\end_inset
-
- <abs_tol>1e-9</abs_tol>
-\begin_inset Newline newline
-\end_inset
-
- <pc_left type="schur">
-\begin_inset Newline newline
-\end_inset
-
-   <print_level>0</print_level>
-\begin_inset Newline newline
-\end_inset
-
-   <do_jacobi>0</do_jacobi>
-\begin_inset Newline newline
-\end_inset
-
-   <A_solver type="pardiso"/>
-\begin_inset Newline newline
-\end_inset
-
-   <schur_pc>0</schur_pc>
-\begin_inset Newline newline
-\end_inset
-
-   <schur_A_solver type="diagonal"/>
-\begin_inset Newline newline
-\end_inset
-
-   <schur_solver type="fgmres">
-\begin_inset Newline newline
-\end_inset
-
-     <print_level>0</print_level>
-\begin_inset Newline newline
-\end_inset
-
-     <max_iter>100</max_iter>
-\begin_inset Newline newline
-\end_inset
-
-     <tol>0.05</tol>
-\begin_inset Newline newline
-\end_inset
-
-     <fail_max_iters>0</fail_max_iters>
-\begin_inset Newline newline
-\end_inset
-
-   </schur_solver>
-\begin_inset Newline newline
-\end_inset
-
-  </pc_left>
-\begin_inset Newline newline
-\end_inset
-
- </default_linear_solver>
 \end_layout
 
 \begin_layout Chapter
