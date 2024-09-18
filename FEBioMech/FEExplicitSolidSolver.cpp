@@ -125,8 +125,8 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	vector<double> dummy(m_Mi);
-	FEGlobalVector Mi(fem, m_Mi, dummy);
+	vector<double> massVector(m_neq), dummy(m_neq);
+	FEGlobalVector M(fem, massVector, dummy);
 	matrix me;
 	vector <int> lm;
 	vector <double> el_lumped_mass;
@@ -191,7 +191,7 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					}
 
 					// assemble element matrix into inv_mass vector 
-					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+					M.Assemble(el.m_node, lm, el_lumped_mass);
 				} // loop over elements
 			}
 			else if (dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd)))
@@ -225,7 +225,7 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 						}
 					}
 					// assemble element matrix into inv_mass vector 
-					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+					M.Assemble(el.m_node, lm, el_lumped_mass);
 				}
 			}
 			else if (dynamic_cast<FELinearTrussDomain*>(&mesh.Domain(nd)))
@@ -261,7 +261,7 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					}
 
 					// assemble element matrix into inv_mass vector 
-					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+					M.Assemble(el.m_node, lm, el_lumped_mass);
 				}
 			}
 			else if (dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd)))
@@ -297,7 +297,7 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					}
 
 					// assemble element matrix into inv_mass vector 
-					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+					M.Assemble(el.m_node, lm, el_lumped_mass);
 				}
 			}
 			else
@@ -362,7 +362,7 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					}
 
 					// assemble element matrix into inv_mass vector 
-					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+					M.Assemble(el.m_node, lm, el_lumped_mass);
 				} // loop over elements
 			}
 			else if(dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd)))
@@ -409,7 +409,7 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					}
 
 					// assemble element matrix into inv_mass vector 
-					Mi.Assemble(el.m_node, lm, el_lumped_mass);
+					M.Assemble(el.m_node, lm, el_lumped_mass);
 				}
 			}
 			else
@@ -427,10 +427,10 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 
 	// we need the inverse of the lumped masses later
 	// Also, make sure the lumped masses are positive.
-	for (int i = 0; i < m_Mi.size(); ++i)
+	for (int i = 0; i < massVector.size(); ++i)
 	{
-//		if (m_Mi[i] <= 0.0) return false;
-		if (m_Mi[i] != 0.0) m_Mi[i] = 1.0 / m_Mi[i];
+		m_data[i].mi = 0;
+		if (massVector[i] != 0.0) m_data[i].mi = 1.0 / massVector[i];
 	}
 
 	return true;
@@ -472,12 +472,11 @@ bool FEExplicitSolidSolver::Init()
 	int neq = m_neq;
 
 	// allocate vectors
-	m_R0.assign(neq, 0);
-	m_R1.assign(neq, 0);
+	m_data.resize(neq);
+	m_Rt.assign(neq, 0);
 	m_Fr.assign(neq, 0);
-	m_ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
-	m_Mi.assign(neq, 0.0);
+	m_ui.assign(neq, 0);
 
 	fem.Update();
 
@@ -504,19 +503,19 @@ bool FEExplicitSolidSolver::Init()
 	if (fem.GetCurrentStep()->m_ntotiter == 0)
 	{
 		// Calculate initial residual to be used on the first time step
-		if (Residual(m_R0) == false) return false;
+		if (Residual(m_Rt) == false) return false;
 
 		for (int i = 0; i < mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(i);
 			int n;
-			if ((n = node.m_ID[m_dofU[0]]) >= 0) node.m_at.x = m_R0[n] * m_Mi[n];
-			if ((n = node.m_ID[m_dofU[1]]) >= 0) node.m_at.y = m_R0[n] * m_Mi[n];
-			if ((n = node.m_ID[m_dofU[2]]) >= 0) node.m_at.z = m_R0[n] * m_Mi[n];
+			if ((n = node.m_ID[m_dofU[0]]) >= 0) { m_data[n].a = node.m_at.x = m_Rt[n] * m_data[n].mi; }
+			if ((n = node.m_ID[m_dofU[1]]) >= 0) { m_data[n].a = node.m_at.y = m_Rt[n] * m_data[n].mi; }
+			if ((n = node.m_ID[m_dofU[2]]) >= 0) { m_data[n].a = node.m_at.z = m_Rt[n] * m_data[n].mi; }
 
-			if ((n = node.m_ID[m_dofSU[0]]) >= 0) node.set(m_dofSA[0], m_R0[n] * m_Mi[n]);
-			if ((n = node.m_ID[m_dofSU[1]]) >= 0) node.set(m_dofSA[1], m_R0[n] * m_Mi[n]);
-			if ((n = node.m_ID[m_dofSU[2]]) >= 0) node.set(m_dofSA[2], m_R0[n] * m_Mi[n]);
+			if ((n = node.m_ID[m_dofSU[0]]) >= 0) { m_data[n].a = m_Rt[n] * m_data[n].mi; node.set(m_dofSA[0], m_data[n].a);}
+			if ((n = node.m_ID[m_dofSU[1]]) >= 0) { m_data[n].a = m_Rt[n] * m_data[n].mi; node.set(m_dofSA[1], m_data[n].a);}
+			if ((n = node.m_ID[m_dofSU[2]]) >= 0) { m_data[n].a = m_Rt[n] * m_data[n].mi; node.set(m_dofSA[2], m_data[n].a);}
 		}
 
 		// do rigid bodies
@@ -525,12 +524,12 @@ bool FEExplicitSolidSolver::Init()
 			FERigidBody& rb = *fem.GetRigidBody(i);
 			vec3d Fn, Mn;
 			int n;
-			if ((n = rb.m_LM[0]) >= 0) { Fn.x = m_R0[n]; }
-			if ((n = rb.m_LM[1]) >= 0) { Fn.y = m_R0[n]; }
-			if ((n = rb.m_LM[2]) >= 0) { Fn.z = m_R0[n]; }
-			if ((n = rb.m_LM[3]) >= 0) { Mn.x = m_R0[n]; }
-			if ((n = rb.m_LM[4]) >= 0) { Mn.y = m_R0[n]; }
-			if ((n = rb.m_LM[5]) >= 0) { Mn.z = m_R0[n]; }
+			if ((n = rb.m_LM[0]) >= 0) { Fn.x = m_Rt[n]; }
+			if ((n = rb.m_LM[1]) >= 0) { Fn.y = m_Rt[n]; }
+			if ((n = rb.m_LM[2]) >= 0) { Fn.z = m_Rt[n]; }
+			if ((n = rb.m_LM[3]) >= 0) { Mn.x = m_Rt[n]; }
+			if ((n = rb.m_LM[4]) >= 0) { Mn.y = m_Rt[n]; }
+			if ((n = rb.m_LM[5]) >= 0) { Mn.z = m_Rt[n]; }
 
 			rb.m_at = Fn / rb.m_mass;
 
@@ -712,7 +711,29 @@ void FEExplicitSolidSolver::Serialize(DumpStream& ar)
 	ar & m_nrhs & m_niter & m_nref & m_ntotref & m_naug & m_neq & m_nreq;
 	if (ar.IsShallow() == false)
 	{
-		ar & m_Mi & m_Ut & m_R0 & m_R1;
+		ar & m_Ut & m_Rt;
+
+		if (ar.IsSaving())
+		{
+			int N = (int)m_data.size();
+			ar << N;
+			for (int i = 0; i < N; ++i)
+			{
+				Data& d = m_data[i];
+				ar << d.v << d.a << d.mi;
+			}
+		}
+		else if (ar.IsLoading())
+		{
+			int N = 0;
+			ar >> N;
+			m_data.resize(N);
+			for (int i = 0; i < N; ++i)
+			{
+				Data& d = m_data[i];
+				ar >> d.v >> d.a >> d.mi;
+			}
+		}
 	}
 }
 
@@ -941,54 +962,55 @@ bool FEExplicitSolidSolver::DoSolve()
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();
 	int N = mesh.Nodes(); // this is the total number of nodes in the mesh
-    double dt = fem.GetTime().timeIncrement;
+	double dt = fem.GetTime().timeIncrement;
 
 	// collect accelerations, velocities, displacements
-	vector<double> an(m_neq, 0.0), vn(m_neq, 0.0), un(m_neq, 0.0);
-#pragma omp parallel for shared(an, vn, un, mesh)
+	// NOTE: I don't think this is necessary
+/*
+#pragma omp parallel for shared(mesh)
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		vec3d vt = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) { un[n] = node.m_rt.x - node.m_r0.x; vn[n] = vt.x; an[n] = node.m_at.x; }
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) { un[n] = node.m_rt.y - node.m_r0.y; vn[n] = vt.y; an[n] = node.m_at.y; }
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) { un[n] = node.m_rt.z - node.m_r0.z; vn[n] = vt.z; an[n] = node.m_at.z; }
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) { m_vn[n] = vt.x; m_an[n] = node.m_at.x; }
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) { m_vn[n] = vt.y; m_an[n] = node.m_at.y; }
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) { m_vn[n] = vt.z; m_an[n] = node.m_at.z; }
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { un[n] = node.get(m_dofSU[0]); vn[n] = node.get(m_dofSV[0]); an[n] = node.get(m_dofSA[0]); }
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { un[n] = node.get(m_dofSU[1]); vn[n] = node.get(m_dofSV[1]); an[n] = node.get(m_dofSA[1]); }
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { un[n] = node.get(m_dofSU[2]); vn[n] = node.get(m_dofSV[2]); an[n] = node.get(m_dofSA[2]); }
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { m_vn[n] = node.get(m_dofSV[0]); m_an[n] = node.get(m_dofSA[0]); }
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { m_vn[n] = node.get(m_dofSV[1]); m_an[n] = node.get(m_dofSA[1]); }
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { m_vn[n] = node.get(m_dofSV[2]); m_an[n] = node.get(m_dofSA[2]); }
 	}
+*/
 
 	// do rigid bodies
 	for (int i = 0; i < fem.RigidBodies(); ++i)
 	{
 		FERigidBody& rb = *fem.GetRigidBody(i);
 		int n;
-		if ((n = rb.m_LM[0]) >= 0) { un[n] = rb.m_rt.x - rb.m_r0.x; vn[n] = rb.m_vt.x; an[n] = rb.m_at.x; }
-		if ((n = rb.m_LM[1]) >= 0) { un[n] = rb.m_rt.y - rb.m_r0.y; vn[n] = rb.m_vt.y; an[n] = rb.m_at.y; }
-		if ((n = rb.m_LM[2]) >= 0) { un[n] = rb.m_rt.z - rb.m_r0.z; vn[n] = rb.m_vt.z; an[n] = rb.m_at.z; }
+		if ((n = rb.m_LM[0]) >= 0) { m_data[n].v = rb.m_vt.x; m_data[n].a = rb.m_at.x; }
+		if ((n = rb.m_LM[1]) >= 0) { m_data[n].v = rb.m_vt.y; m_data[n].a = rb.m_at.y; }
+		if ((n = rb.m_LM[2]) >= 0) { m_data[n].v = rb.m_vt.z; m_data[n].a = rb.m_at.z; }
 		
 		// convert to rigid frame
 		quatd Q = rb.GetRotation();
 		quatd Qi = Q.Inverse();
 		vec3d Wn = Qi * rb.m_wt;
 		vec3d An = Qi * rb.m_alt;
-		if ((n = rb.m_LM[3]) >= 0) { vn[n] = Wn.x; an[n] = An.x; }
-		if ((n = rb.m_LM[4]) >= 0) { vn[n] = Wn.y; an[n] = An.y; }
-		if ((n = rb.m_LM[5]) >= 0) { vn[n] = Wn.z; an[n] = An.z; }
+		if ((n = rb.m_LM[3]) >= 0) { m_data[n].v = Wn.x; m_data[n].a = An.x; }
+		if ((n = rb.m_LM[4]) >= 0) { m_data[n].v = Wn.y; m_data[n].a = An.y; }
+		if ((n = rb.m_LM[5]) >= 0) { m_data[n].v = Wn.z; m_data[n].a = An.z; }
 	}
 
-	vector<double> v_pred(m_neq, 0.0);
 	double Dnorm = 0.0;
-#pragma omp parallel for shared(v_pred, vn, an) reduction(+: Dnorm)
+#pragma omp parallel for reduction(+: Dnorm)
 	for (int i = 0; i < m_neq; ++i)
 	{
 		// velocity predictor
-		v_pred[i] = vn[i] + an[i] * dt*0.5;
+		m_data[i].v += m_data[i].a * dt*0.5;
 
 		// update displacements
-		m_ui[i] = dt * v_pred[i];
+		m_ui[i] = dt * m_data[i].v;
 
 		// update norm
 		Dnorm += m_ui[i] * m_ui[i];
@@ -1016,28 +1038,31 @@ bool FEExplicitSolidSolver::DoSolve()
 	Update(m_ui);
 
 	// evaluate acceleration
-	Residual(m_R1);
+	Residual(m_Rt);
 
 	double Rnorm = 0.0;
-#pragma omp parallel for reduction(+: Rnorm)
-	for (int i=0; i<m_neq; ++i)
+#pragma omp parallel shared(Rnorm)
 	{
-		Rnorm += m_R1[i] * m_R1[i];
-	}
-	Rnorm = sqrt(Rnorm);
-	feLog("\t force vector norm : %lg\n", Rnorm);
+#pragma omp for reduction(+: Rnorm) nowait
+		for (int i = 0; i < m_neq; ++i)
+		{
+			Rnorm += m_Rt[i] * m_Rt[i];
+		}
 
-	vector<double> vnp1(m_neq, 0.0);
-	vector<double> anp1(m_neq);
-#pragma omp parallel shared(vnp1, anp1, v_pred)
-	{
+#pragma omp for nowait
+		for (int i = 0; i < m_neq; ++i)
+		{
+			// update total displacement
+			m_Ut[i] += m_ui[i];
+		}
+
 #pragma omp for
 		for (int i = 0; i < m_neq; ++i)
 		{
-			anp1[i] = m_R1[i] * m_Mi[i];
+			m_data[i].a = m_Rt[i] * m_data[i].mi;
 
 			// update velocity
-			vnp1[i] = m_dyn_damping*(v_pred[i] + anp1[i] * dt * 0.5);
+			m_data[i].v = m_dyn_damping * (m_data[i].v + m_data[i].a * dt * 0.5);
 		}
 
 		// scatter velocity and accelerations
@@ -1046,23 +1071,18 @@ bool FEExplicitSolidSolver::DoSolve()
 		{
 			FENode& node = mesh.Node(i);
 			int n;
-			if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], vnp1[n]); node.m_at.x = anp1[n]; }
-			if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], vnp1[n]); node.m_at.y = anp1[n]; }
-			if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], vnp1[n]); node.m_at.z = anp1[n]; }
+			if ((n = node.m_ID[m_dofU[0]]) >= 0) { node.set(m_dofV[0], m_data[n].v); node.m_at.x = m_data[n].a; }
+			if ((n = node.m_ID[m_dofU[1]]) >= 0) { node.set(m_dofV[1], m_data[n].v); node.m_at.y = m_data[n].a; }
+			if ((n = node.m_ID[m_dofU[2]]) >= 0) { node.set(m_dofV[2], m_data[n].v); node.m_at.z = m_data[n].a; }
 
-			if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], vnp1[n]); node.set(m_dofSA[0], anp1[n]); }
-			if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], vnp1[n]); node.set(m_dofSA[1], anp1[n]); }
-			if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], vnp1[n]); node.set(m_dofSA[2], anp1[n]); }
-		}
-
-		// update the total displacements
-#pragma omp for nowait
-		for (int i = 0; i < m_neq; ++i)
-		{
-			m_Ut[i] += m_ui[i];
-			m_R0[i] = m_R1[i];
+			if ((n = node.m_ID[m_dofSU[0]]) >= 0) { node.set(m_dofSV[0], m_data[n].v); node.set(m_dofSA[0], m_data[n].a); }
+			if ((n = node.m_ID[m_dofSU[1]]) >= 0) { node.set(m_dofSV[1], m_data[n].v); node.set(m_dofSA[1], m_data[n].a); }
+			if ((n = node.m_ID[m_dofSU[2]]) >= 0) { node.set(m_dofSV[2], m_data[n].v); node.set(m_dofSA[2], m_data[n].a); }
 		}
 	}
+
+	Rnorm = sqrt(Rnorm);
+	feLog("\t force vector norm : %lg\n", Rnorm);
 
 	// do rigid bodies
 	for (int i = 0; i < fem.RigidBodies(); ++i)
@@ -1074,12 +1094,12 @@ bool FEExplicitSolidSolver::DoSolve()
 		// get the force and moment
 		vec3d Fn(0, 0, 0), Mn;
 		int n;
-		if ((n = rb.m_LM[0]) >= 0) Fn.x = m_R1[n];
-		if ((n = rb.m_LM[1]) >= 0) Fn.y = m_R1[n];
-		if ((n = rb.m_LM[2]) >= 0) Fn.z = m_R1[n];
-		if ((n = rb.m_LM[3]) >= 0) Mn.x = m_R1[n];
-		if ((n = rb.m_LM[4]) >= 0) Mn.y = m_R1[n];
-		if ((n = rb.m_LM[5]) >= 0) Mn.z = m_R1[n];
+		if ((n = rb.m_LM[0]) >= 0) Fn.x = m_Rt[n];
+		if ((n = rb.m_LM[1]) >= 0) Fn.y = m_Rt[n];
+		if ((n = rb.m_LM[2]) >= 0) Fn.z = m_Rt[n];
+		if ((n = rb.m_LM[3]) >= 0) Mn.x = m_Rt[n];
+		if ((n = rb.m_LM[4]) >= 0) Mn.y = m_Rt[n];
+		if ((n = rb.m_LM[5]) >= 0) Mn.z = m_Rt[n];
 
 		// convert to rigid frame
 		Mn = Qi * Mn;
@@ -1089,9 +1109,9 @@ bool FEExplicitSolidSolver::DoSolve()
 		rb.m_at = Q*An;
 
 		vec3d Vn(0,0,0);
-		if ((n = rb.m_LM[0]) >= 0) Vn.x = m_dyn_damping * (v_pred[n] + An.x * dt * 0.5);
-		if ((n = rb.m_LM[1]) >= 0) Vn.y = m_dyn_damping * (v_pred[n] + An.y * dt * 0.5);
-		if ((n = rb.m_LM[2]) >= 0) Vn.z = m_dyn_damping * (v_pred[n] + An.z * dt * 0.5);
+		if ((n = rb.m_LM[0]) >= 0) Vn.x = m_dyn_damping * (m_data[n].v + An.x * dt * 0.5);
+		if ((n = rb.m_LM[1]) >= 0) Vn.y = m_dyn_damping * (m_data[n].v + An.y * dt * 0.5);
+		if ((n = rb.m_LM[2]) >= 0) Vn.z = m_dyn_damping * (m_data[n].v + An.z * dt * 0.5);
 		rb.m_vt = Q * Vn;
 
 		// angular momentum update
@@ -1099,9 +1119,9 @@ bool FEExplicitSolidSolver::DoSolve()
 		//       to evaluate a_{n+1}, I need W_{n+1}. This looks like a nonlinear problem
 		//       so probably need to do something else here. 
 		vec3d Wn(0,0,0);
-		if ((n = rb.m_LM[3]) >= 0) Wn.x = m_dyn_damping * (v_pred[n] + an[n] * dt*0.5);
-		if ((n = rb.m_LM[4]) >= 0) Wn.y = m_dyn_damping * (v_pred[n] + an[n] * dt*0.5);
-		if ((n = rb.m_LM[5]) >= 0) Wn.z = m_dyn_damping * (v_pred[n] + an[n] * dt*0.5);
+		if ((n = rb.m_LM[3]) >= 0) Wn.x = m_dyn_damping * (m_data[n].v + m_data[n].a * dt*0.5);
+		if ((n = rb.m_LM[4]) >= 0) Wn.y = m_dyn_damping * (m_data[n].v + m_data[n].a * dt*0.5);
+		if ((n = rb.m_LM[5]) >= 0) Wn.z = m_dyn_damping * (m_data[n].v + m_data[n].a * dt*0.5);
 		rb.m_wt = Q * Wn;
 
 		mat3ds I0 = rb.m_moi;
@@ -1132,6 +1152,8 @@ bool FEExplicitSolidSolver::DoSolve()
 
 bool FEExplicitSolidSolver::Residual(vector<double>& R)
 {
+	TRACK_TIME(Timer_Residual);
+
 	// get the time information
 	FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
 	const FETimeInfo& tp = fem.GetTime();

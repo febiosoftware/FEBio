@@ -32,6 +32,20 @@ SOFTWARE.*/
 class FECORE_API FESurfaceElement : public FEElement
 {
 public:
+	struct ELEMENT_REF {
+		FEElement* pe = nullptr;	// solid element the surface is attached to (if any)
+		int face = -1;				// local face index
+		int orient = 0;				// orientation of surface element relative to solid element
+
+		void Reset()
+		{
+			pe = nullptr;
+			face = -1;
+			orient = 0;
+		}
+	};
+
+public:
 	FESurfaceElement();
 
 	FESurfaceElement(const FESurfaceElement& el);
@@ -223,6 +237,9 @@ public:
     //! return node list of edge
     void facet_edge(int j, int* en) const;
 
+	// see if this element has the list of nodes n
+	int HasNodes(int* n, const int ns) const;
+
 	//! serialize
 	void Serialize(DumpStream& ar) override;
 
@@ -237,6 +254,5 @@ public:
 	// For solids, a surface element can be connected to two elements 
 	// if the surface is an inside surface. For boundary surfaces
 	// the second element index is -1. 
-	FEElement*		m_elem[2];
+	ELEMENT_REF 	m_elem[2];
 };
-

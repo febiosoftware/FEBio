@@ -60,30 +60,6 @@ BEGIN_FECORE_CLASS(FESlidingInterface2, FEContactInterface)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESlidingSurface2::Data::Data()
-{
-	m_Lmd  = 0.0;
-	m_Lmp  = 0.0;
-	m_epsn = 1.0;
-	m_epsp = 1.0;
-	m_pg   = 0.0;
-    m_p1   = 0.0;
-	m_nu   = vec3d(0,0,0);
-	m_rs   = vec2d(0,0);
-}
-
-void FESlidingSurface2::Data::Serialize(DumpStream& ar)
-{
-	FEBiphasicContactPoint::Serialize(ar);
-	ar & m_Lmd;
-	ar & m_epsn;
-	ar & m_epsp;
-	ar & m_p1;
-	ar & m_nu;
-	ar & m_rs;
-}
-
-//-----------------------------------------------------------------------------
 // FESlidingSurface2
 //-----------------------------------------------------------------------------
 
@@ -110,7 +86,7 @@ bool FESlidingSurface2::Init()
 		FESurfaceElement& se = Element(i);
 		
 		// get the element this surface element belongs to
-		FEElement* pe = se.m_elem[0];
+		FEElement* pe = se.m_elem[0].pe;
 		if (pe)
 		{
 			// get the material
@@ -132,7 +108,7 @@ bool FESlidingSurface2::Init()
 //! create material point data
 FEMaterialPoint* FESlidingSurface2::CreateMaterialPoint()
 {
-	return new FESlidingSurface2::Data;
+	return new FEBiphasicContactPoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -232,7 +208,7 @@ vec3d FESlidingSurface2::GetContactForceFromElementStress()
     {
         FESurfaceElement& el = Element(n);
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         
         mat3ds s(0,0,0,0,0,0);
         for (int j=0; j<pe->GaussPoints(); ++j) {
@@ -250,7 +226,7 @@ vec3d FESlidingSurface2::GetContactForceFromElementStress()
         // evaluate the contact force for that element
         for (int i=0; i<nint; ++i)
         {
-			Data& data = static_cast<Data&>(*el.GetMaterialPoint(i));
+            FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(i));
             if (data.m_Ln > 0) {
                 // get the base vectors
                 vec3d g[2];
@@ -286,7 +262,7 @@ double FESlidingSurface2::GetContactArea()
 		for (int i=0; i<nint; ++i)
 		{
 			// get data for this integration point
-			Data& data = static_cast<Data&>(*el.GetMaterialPoint(i));
+            FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(i));
 			if (data.m_Ln > 0)
 			{
 				// get the base vectors
@@ -326,7 +302,7 @@ vec3d FESlidingSurface2::GetFluidForce()
         for (int i=0; i<nint; ++i)
         {
             // get data for this integration point
-			Data& data = static_cast<Data&>(*el.GetMaterialPoint(i));
+            FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(i));
 			if (data.m_Ln > 0) {
                 // get the base vectors
                 vec3d g[2];
@@ -361,7 +337,7 @@ vec3d FESlidingSurface2::GetFluidForceFromElementPressure()
     {
         FESurfaceElement& el = Element(n);
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         
         double p = 0;
         for (int j=0; j<pe->GaussPoints(); ++j) {
@@ -377,7 +353,7 @@ vec3d FESlidingSurface2::GetFluidForceFromElementPressure()
         // evaluate the fluid force for that element
         for (int i=0; i<nint; ++i)
         {
-			Data& data = static_cast<Data&>(*el.GetMaterialPoint(i));
+            FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(i));
             if (data.m_Ln > 0) {
                 // get the base vectors
                 vec3d g[2];
@@ -423,7 +399,7 @@ void FESlidingSurface2::GetContactPressure(int nface, double& pg)
     pg = 0;
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pg += data.m_Ln;
 	}
     pg /= ni;
@@ -437,7 +413,7 @@ void FESlidingSurface2::GetContactTraction(int nface, vec3d& pt)
     pt = vec3d(0,0,0);
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pt -= data.m_nu*data.m_Ln;
 	}
     pt /= ni;
@@ -545,7 +521,7 @@ void FESlidingInterface2::BuildMatrixProfile(FEGlobalMatrix& K)
 			int* sn = &se.m_node[0];
 			for (k=0; k<nint; ++k)
 			{
-				FESlidingSurface2::Data& pt = static_cast<FESlidingSurface2::Data&>(*se.GetMaterialPoint(k));
+                FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*se.GetMaterialPoint(k));
 				FESurfaceElement* pe = pt.m_pme;
 				if (pe != 0)
 				{
@@ -630,7 +606,7 @@ void FESlidingInterface2::CalcAutoPenalty(FESlidingSurface2& s)
 		int nint = el.GaussPoints();
 		for (int j=0; j<nint; ++j)
 		{
-			FESlidingSurface2::Data& pt = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsn = eps;
 		}
 	}
@@ -652,7 +628,7 @@ void FESlidingInterface2::CalcAutoPressurePenalty(FESlidingSurface2& s)
 		int nint = el.GaussPoints();
 		for (int j=0; j<nint; ++j)
 		{
-			FESlidingSurface2::Data& pt = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsp = eps;
 		}
 	}
@@ -671,7 +647,7 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 	n.unit();
 
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == 0) return 0.0;
 
 	// get the material
@@ -800,7 +776,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 		for (int j=0; j<nint; ++j)
 		{
 			// get the integration point data
-			FESlidingSurface2::Data& pt = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 
 			// calculate the global position of the integration point
 			r = ss.Local2Global(el, j);
@@ -1087,7 +1063,7 @@ void FESlidingInterface2::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			for (j=0; j<nint; ++j)
 			{
 				// get the integration point data
-				FESlidingSurface2::Data& pt = static_cast<FESlidingSurface2::Data&>(*se.GetMaterialPoint(j));
+                FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*se.GetMaterialPoint(j));
 
 				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
@@ -1308,7 +1284,7 @@ void FESlidingInterface2::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 			for (j=0; j<nint; ++j)
 			{
 				// get integration point data
-				FESlidingSurface2::Data& pt = static_cast<FESlidingSurface2::Data&>(*se.GetMaterialPoint(j));
+                FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*se.GetMaterialPoint(j));
 
 				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
@@ -1696,7 +1672,7 @@ void FESlidingInterface2::UpdateContactPressures()
 			for (int i=0; i<nint; ++i) 
 			{
 				// get integration point data
-				FESlidingSurface2::Data& pt = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(i));
+                FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(i));
 
 				gap = pt.m_gap;
 				eps = m_epsn*pt.m_epsn;
@@ -1707,7 +1683,7 @@ void FESlidingInterface2::UpdateContactPressures()
 					int mint = pme->GaussPoints();
 					double ti[FEElement::MAX_NODES];
 					for (int j=0; j<mint; ++j) {
-						FESlidingSurface2::Data& mp = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(j));
+                        FEBiphasicContactPoint& mp = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 						gap = mp.m_gap;
 						eps = m_epsn*mp.m_epsn;
 						ti[j] = MBRACKET(mp.m_Lmd + m_epsn*mp.m_epsn*mp.m_gap);
@@ -1746,7 +1722,7 @@ bool FESlidingInterface2::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ss.Element(i);
 		for (int j=0; j<el.GaussPoints(); ++j)
 		{
-			FESlidingSurface2::Data& ds = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& ds = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			normL0 += ds.m_Lmd*ds.m_Lmd;
 		}
 	}
@@ -1755,7 +1731,7 @@ bool FESlidingInterface2::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ms.Element(i);
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
-			FESlidingSurface2::Data& dm = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& dm = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			normL0 += dm.m_Lmd*dm.m_Lmd;
 		}
 	}
@@ -1772,7 +1748,7 @@ bool FESlidingInterface2::Augment(int naug, const FETimeInfo& tp)
         vec3d tn[FEElement::MAX_INTPOINTS];
         if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
-			FESlidingSurface2::Data& data = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			// update Lagrange multipliers on primary surface
             if (m_bsmaug) {
                 // replace this multiplier with a smoother version
@@ -1808,7 +1784,7 @@ bool FESlidingInterface2::Augment(int naug, const FETimeInfo& tp)
         vec3d tn[FEElement::MAX_INTPOINTS];
         if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
-			FESlidingSurface2::Data& data = static_cast<FESlidingSurface2::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			// update Lagrange multipliers on secondary surface
             if (m_bsmaug) {
                 // replace this multiplier with a smoother version

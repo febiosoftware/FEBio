@@ -137,8 +137,11 @@ public:
 	//! Initialize the mesh
 	virtual bool InitMesh();
 
+	//! mesh validation
+	void ValidateMesh();
+
 	//! Initialize shells
-	virtual void InitShells();
+	virtual bool InitShells();
 
 	//! Build the matrix profile for this model
 	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
@@ -345,7 +348,7 @@ public: // --- parameter functions ---
 	FEParam* FindParameter(const ParamString& s) override;
 
 	//! return a reference to the named parameter
-	virtual FEParamValue GetParameterValue(const ParamString& param);
+	FEParamValue GetParameterValue(const ParamString& param) override;
 
 	//! return the parameter string for a parameter
 	std::string GetParamString(FEParam* p);

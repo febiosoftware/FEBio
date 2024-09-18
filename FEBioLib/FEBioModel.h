@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FEBioLib/Logfile.h>
 #include "febiolib_api.h"
+#include "febiolib_types.h"
 
 //-----------------------------------------------------------------------------
 // Dump level determines the times the restart file is written
@@ -42,14 +43,6 @@ enum FE_Dump_Level {
 	FE_DUMP_MAJOR_ITRS,		// create a dump file at the end of each converged time step
 	FE_DUMP_STEP,			// create a dump file at the end of an analysis step
 	FE_DUMP_MUST_POINTS     // create a dump file only on must-points
-};
-
-//-----------------------------------------------------------------------------
-struct ModelStats {
-	int		ntimeSteps;		//!< total nr of time steps
-	int		ntotalIters;	//!< total nr of equilibrium iterations
-	int		ntotalRHS;		//!< total nr of right hand side evaluations
-	int		ntotalReforms;	//!< total nr of stiffness reformations
 };
 
 //-----------------------------------------------------------------------------
@@ -72,6 +65,11 @@ public:
 
 	//! Resets data structures
 	bool Reset() override;
+
+	//! solve the model
+	bool Solve() override;
+
+	TimingInfo GetTimingInfo();
 
 public: // --- I/O functions ---
 
@@ -169,9 +167,6 @@ public: // Timers
 	//! Return the total timer
 	Timer& GetSolveTimer();
 
-	//! return number of seconds of time spent in linear solver
-	int GetLinearSolverTime();
-
 public:
 	//! set the debug level
 	void SetDebugLevel(int debugLvl);
@@ -211,8 +206,8 @@ private:
 	void UpdatePlotObjects();
 
 private:
+	Timer		m_TotalTime;	//!< timer to track total time
 	Timer		m_InputTime;	//!< timer to track time to read model
-	Timer		m_InitTime;		//!< timer to track model initialization
 	Timer		m_IOTimer;		//!< timer to track output (include plot, dump, and data)
 
 	PlotFile*	m_plot;			//!< the plot file

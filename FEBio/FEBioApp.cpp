@@ -423,7 +423,6 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		{
 			brun = false;
 		}
-
 		else if (strcmp(sz, "-import") == 0)
 		{
 			if ((i < nargs - 1) && (argv[i+1][0] != '-'))
@@ -433,6 +432,16 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 				fprintf(stderr, "FATAL ERROR: insufficient number of arguments for -import.\n");
 				return false;
 			}
+		}
+		else if (strncmp(sz, "-output_negative_jacobians", 26) == 0)
+		{
+			int n = -1;
+			if (sz[26] == '=')
+			{
+				const char* szval = sz + 27;
+				n = atoi(szval);
+			}
+			NegativeJacobian::m_maxout = n;
 		}
 		else if (sz[0] == '-')
 		{

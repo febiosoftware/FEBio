@@ -129,12 +129,22 @@ int FEBioPlugin::Load(const char* szfile)
 
 	// get the GetSDKVersion function
 	PLUGIN_GETSDKVERSION pf_sdk = (PLUGIN_GETSDKVERSION) FindPluginFunc(ph, "GetSDKVersion");
-	if (pf_sdk == 0) return 5;
+	if (pf_sdk == 0)
+	{
+		UnloadPlugin(ph);
+		m_ph = 0;
+		return 5;
+	}
 
 	// get the SDK version of the plugin
 	unsigned int n = FE_SDK_VERSION;
 	unsigned int version = pf_sdk();
-	if (version != FE_SDK_VERSION) return 6;
+	if (version != FE_SDK_VERSION)
+	{
+		UnloadPlugin(ph);
+		m_ph = 0;
+		return 6;
+	}
 
 	// find the numclasses function
 	PLUGIN_NUMCLASSES_FNC pfnc_cnt = (PLUGIN_NUMCLASSES_FNC) FindPluginFunc(ph, "PluginNumClasses");

@@ -42,7 +42,7 @@ bool FEMultiphasicFSIPressure::Init()
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_psurf->Element(0);
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == nullptr) return false;
     
     // get the material
@@ -98,7 +98,7 @@ void FEMultiphasicFSIPressure::Update()
     for (int i=0; i<ps->Elements(); ++i)
     {
         FESurfaceElement& el = ps->Element(i);
-        FEElement* e = el.m_elem[0];
+        FEElement* e = el.m_elem[0].pe;
         FESolidElement* se = dynamic_cast<FESolidElement*>(e);
         if (se) {
             double osci[FEElement::MAX_INTPOINTS];

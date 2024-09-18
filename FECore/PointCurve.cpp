@@ -34,6 +34,23 @@ SOFTWARE.*/
 #define min(a,b) ((a)<(b)?(a):(b))
 #endif
 
+size_t binarySearch(const std::vector<vec2d>& points, double x)
+{
+	size_t N = points.size();
+	size_t low = 0;
+	size_t high = N - 1;
+	// Repeat until the pointers low and high meet each other
+	while (low <= high) {
+		size_t mid = low + (high - low) / 2;
+
+		if (points[mid].x() <= x)
+			low = mid + 1;
+		else
+			high = mid - 1;
+	}
+	return low;
+}
+
 class PointCurve::Imp
 {
 public:
@@ -816,21 +833,4 @@ bool PointCurve::Update()
         }
 	}
 	return bvalid;
-}
-
-size_t PointCurve::binarySearch(std::vector<vec2d> points, double x) const
-{
-    size_t N = points.size();
-    size_t low = 0;
-    size_t high = N-1;
-    // Repeat until the pointers low and high meet each other
-    while (low <= high) {
-        size_t mid = low + (high - low) / 2;
-        
-        if (points[mid].x() <= x)
-            low = mid + 1;
-        else
-            high = mid - 1;
-    }
-    return low;
 }

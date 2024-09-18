@@ -168,10 +168,10 @@ bool FEMechModel::InitMesh()
 
 //-----------------------------------------------------------------------------
 //! Initialize shells
-void FEMechModel::InitShells()
+bool FEMechModel::InitShells()
 {
 	// Base class does most of the work
-	FEModel::InitShells();
+	if (!FEModel::InitShells()) return false;
 
 	// NOTE: This was moved here because I wanted to FEMaterial::IsRigid to FESolidMaterial::IsRigid
 	//       This was part of the move to rid the FECore library of rigid stuff
@@ -206,6 +206,8 @@ void FEMechModel::InitShells()
 			}
 		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

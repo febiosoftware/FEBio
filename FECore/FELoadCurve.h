@@ -55,6 +55,8 @@ public:
     
     bool Init() override;
 
+	void Reset() override;
+
 	PointCurve& GetFunction() { return m_fnc; }
 
 	int GetInterpolation() const { return m_int; }

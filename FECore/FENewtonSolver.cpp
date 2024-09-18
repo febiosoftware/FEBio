@@ -47,6 +47,7 @@ BEGIN_FECORE_CLASS(FENewtonSolver, FESolver)
 		ADD_PARAMETER(m_lineSearch->m_LStol , FE_RANGE_GREATER_OR_EQUAL(0.0), "lstol"   );
 		ADD_PARAMETER(m_lineSearch->m_LSmin , FE_RANGE_GREATER_OR_EQUAL(0.0), "lsmin"   );
 		ADD_PARAMETER(m_lineSearch->m_LSiter, FE_RANGE_GREATER_OR_EQUAL(0), "lsiter"  );
+		ADD_PARAMETER(m_lineSearch->m_checkJacobians, "ls_check_jacobians");
 	END_PARAM_GROUP();
 
 	BEGIN_PARAM_GROUP("Nonlinear solver");
@@ -230,7 +231,7 @@ bool FENewtonSolver::ReformStiffness()
     if (bret)
     {
         {
-			TRACK_TIME(TimerID::Timer_LinSolve);
+			TRACK_TIME(TimerID::Timer_LinSol_Factor);
 			// factorize the stiffness matrix
 			if (m_plinsolve->Factor() == false)
 			{
@@ -312,7 +313,6 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 	// Do the preprocessing of the solver
 	{
-		TRACK_TIME(TimerID::Timer_LinSolve);
 		if (!m_plinsolve->PreProcess())
 		{
 			feLogError("An error occurred during preprocessing of linear solver");
@@ -818,10 +818,6 @@ bool FENewtonSolver::QNInit()
 //! solve the equations
 void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>& R)
 {
-	// call the strategy to solve the linear equations
-	TRACK_TIME(TimerID::Timer_LinSolve);
-
-	// for iterative solvers, we pass the last solution as the initial guess
 	if (m_plinsolve->IsIterative())
 	{
 		// for the first iteration, we pass the solution of the last time step
@@ -851,8 +847,11 @@ void FENewtonSolver::SolveEquations(std::vector<double>& u, std::vector<double>&
 		throw NANInResidualDetected(info);
 	}
 
-	// call the qn strategy to actuall solve the equations
-	m_qnstrategy->SolveEquations(u, R);
+	// call the qn strategy to actually solve the equations
+	{
+		TRACK_TIME(TimerID::Timer_LinSol_Backsolve);
+		m_qnstrategy->SolveEquations(u, R);
+	}
 
 	// check for nans
 	double u2 = u*u;
@@ -1003,51 +1002,53 @@ bool FENewtonSolver::DoAugmentations()
 //! Update the state of the model
 void FENewtonSolver::Update(std::vector<double>& ui)
 {
-	TRACK_TIME(TimerID::Timer_Update);
-
-	// get the mesh
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-
-	// update nodes
-	vector<double> U(m_Ut.size());
-	for (size_t i = 0; i<m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
-
-	// scatter solution to nodes
-	for (int i = 0; i < m_solutionNorm.size(); ++i)
 	{
-		ConvergenceInfo& ci = m_solutionNorm[i];
-		FESolutionVariable& var = m_Var[ci.nvar];
-		scatter(U, mesh, *var.m_dofs);
-	}
+		TRACK_TIME(TimerID::Timer_Update);
 
-	// enforce the linear constraints
-	// TODO: do we really have to do this? Shouldn't the algorithm
-	// already guarantee that the linear constraints are satisfied?
-	FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
-	if (LCM.LinearConstraints() > 0)
-	{
-		LCM.Update();
-	}
+		// get the mesh
+		FEModel& fem = *GetFEModel();
+		FEMesh& mesh = fem.GetMesh();
 
-	// make sure the prescribed velocities are fullfilled
-	int nbc = fem.BoundaryConditions();
-	for (int i = 0; i<nbc; ++i)
-	{
-		FEBoundaryCondition& dc = *fem.BoundaryCondition(i);
-		if (dc.IsActive()) dc.Update();
-	}
+		// update nodes
+		vector<double> U(m_Ut.size());
+		for (size_t i = 0; i < m_Ut.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
 
-	// update element degrees of freedom
-	int ndom = mesh.Domains();
-	for (int i = 0; i<ndom; ++i)
-	{
-		FEDomain& dom = mesh.Domain(i);
-		int NE = dom.Elements();
-		for (int j = 0; j < NE; ++j)
+		// scatter solution to nodes
+		for (int i = 0; i < m_solutionNorm.size(); ++i)
 		{
-			FEElement& el = dom.ElementRef(j);
-			if (el.m_lm >= 0) el.m_val = U[el.m_lm];
+			ConvergenceInfo& ci = m_solutionNorm[i];
+			FESolutionVariable& var = m_Var[ci.nvar];
+			scatter(U, mesh, *var.m_dofs);
+		}
+
+		// enforce the linear constraints
+		// TODO: do we really have to do this? Shouldn't the algorithm
+		// already guarantee that the linear constraints are satisfied?
+		FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
+		if (LCM.LinearConstraints() > 0)
+		{
+			LCM.Update();
+		}
+
+		// make sure the prescribed velocities are fullfilled
+		int nbc = fem.BoundaryConditions();
+		for (int i = 0; i < nbc; ++i)
+		{
+			FEBoundaryCondition& dc = *fem.BoundaryCondition(i);
+			if (dc.IsActive()) dc.Update();
+		}
+
+		// update element degrees of freedom
+		int ndom = mesh.Domains();
+		for (int i = 0; i < ndom; ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			int NE = dom.Elements();
+			for (int j = 0; j < NE; ++j)
+			{
+				FEElement& el = dom.ElementRef(j);
+				if (el.m_lm >= 0) el.m_val = U[el.m_lm];
+			}
 		}
 	}
 

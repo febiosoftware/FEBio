@@ -23,22 +23,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEModelUpdate.h"
+#pragma once
+#include <FECore/FENodalLoad.h>
+#include "febiomech_api.h"
 
-FEModelUpdate* FEModelUpdate::m_pThis = nullptr;
-
-FEModelUpdate::FEModelUpdate()
+class FEBIOMECH_API FENodalTargetForce : public FENodalLoad
 {
-	m_pThis = this;
-}
+public:
+	FENodalTargetForce(FEModel* fem);
 
-FEModelUpdate::~FEModelUpdate()
-{
-	m_pThis = nullptr;
-}
+	void Activate() override;
 
-FEModelUpdate* FEModelUpdate::Instance()
-{
-	return m_pThis;
-}
+protected: // required functions of FENodalLoad
+
+	// Set the dof list
+	bool SetDofList(FEDofList& dofList) override;
+
+	// get the nodal values
+	void GetNodalValues(int inode, std::vector<double>& val) override;
+
+private:
+	double			m_w;
+	FEParamVec3		m_f;
+	bool			m_shellBottom;
+
+	DECLARE_FECORE_CLASS();
+};
+

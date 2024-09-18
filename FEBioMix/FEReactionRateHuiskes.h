@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEChemicalReaction.h"
+#include <FECore/FEMeshTopo.h>
 
 class FEBIOMIX_API FEReactionRateHuiskes : public FEReactionRate
 {
@@ -50,9 +51,15 @@ public:
 public:
 	FEParamDouble   m_B;					//!< mass supply coefficient
     FEParamDouble   m_psi0;					//!< specific strain energy at homeostasis
+    double          m_D;                    //!< characteristic sensor distance
 
 private:
     int             m_comp;                 //!< component of solid mixture (if applicable)
+    std::vector<std::vector<int>>    m_EPL; //!< list of element proximity lists
+    FEMeshTopo      m_topo;                 //!< mesh topology;
+    bool            m_binit;                //!< initialization flag
+    double          m_M;                    //!< molar mass of sbm
+    int             m_lsbm;                 //!< local sbm value
 
 	DECLARE_FECORE_CLASS();	
 };

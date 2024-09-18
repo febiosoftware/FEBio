@@ -201,8 +201,8 @@ double FEFluidSolutes::ElectricPotential(const FEMaterialPoint& pt, const bool e
     const int nsol = (int)m_pSolute.size();
     double cF = 0.0;
     
-    FEMaterialPoint mp = pt;
-    vector<double> c(nsol);        // effective concentration
+	FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
+	vector<double> c(nsol);        // effective concentration
     vector<double> khat(nsol);    // solubility
     vector<int> z(nsol);        // charge number
     for (i=0; i<nsol; ++i) {
@@ -248,7 +248,7 @@ double FEFluidSolutes::ElectricPotential(const FEMaterialPoint& pt, const bool e
 //! partition coefficient
 double FEFluidSolutes::PartitionCoefficient(const FEMaterialPoint& pt, const int sol)
 {
-    FEMaterialPoint mp = pt;
+    FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
     // solubility
     double khat = m_pSolute[sol]->m_pSolub->Solubility(mp);
     // charge number
@@ -274,8 +274,8 @@ void FEFluidSolutes::PartitionCoefficientFunctions(const FEMaterialPoint& mp, ve
     
     const FEFluidMaterialPoint& fpt = *(mp.ExtractData<FEFluidMaterialPoint>());
     const FEFluidSolutesMaterialPoint& spt = *(mp.ExtractData<FEFluidSolutesMaterialPoint>());
-    FEMaterialPoint pt = mp;
-    
+	FEMaterialPoint& pt = const_cast<FEMaterialPoint&>(mp);
+
     const int nsol = (int)m_pSolute.size();
     
     vector<double> c(nsol);
@@ -435,7 +435,7 @@ double FEFluidSolutes::PressureActual(const FEMaterialPoint& pt)
         c[i] = ConcentrationActual(pt, i);
     
     // osmotic coefficient
-    FEMaterialPoint mp = pt;
+    FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
     double osmc = m_pOsmC->OsmoticCoefficient(mp);
     
     // actual pressure
@@ -458,7 +458,7 @@ vec3d FEFluidSolutes::SoluteFlux(const FEMaterialPoint& pt, const int sol)
     vec3d gradc = spt.m_gradc[sol];
     
     // solute free diffusivity
-    FEMaterialPoint mp = pt;
+    FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
     double D0 = m_pSolute[sol]->m_pDiff->Free_Diffusivity(mp);
     double kappa = PartitionCoefficient(pt, sol);
     
@@ -483,8 +483,8 @@ vec3d FEFluidSolutes::SoluteDiffusiveFlux(const FEMaterialPoint& pt, const int s
     vec3d gradc = spt.m_gradc[sol];
     
     // solute free diffusivity
-    FEMaterialPoint mp = pt;
-    double D0 = m_pSolute[sol]->m_pDiff->Free_Diffusivity(mp);
+	FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
+	double D0 = m_pSolute[sol]->m_pDiff->Free_Diffusivity(mp);
     double kappa = PartitionCoefficient(pt, sol);
     
     // diffusive solute flux j

@@ -686,7 +686,7 @@ public:
 class FEPlotElementElasticity : public FEPlotDomainData
 {
 public:
-	FEPlotElementElasticity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_TENS4FS, FMT_ITEM){}
+    FEPlotElementElasticity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_TENS4FS, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -969,6 +969,14 @@ class FEPlotSPRLagrangeStrain : public FEPlotDomainData
 {
 public:
 	FEPlotSPRLagrangeStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_NODE){}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//! SPR infinitesimal strains
+class FEPlotSPRInfStrain : public FEPlotDomainData
+{
+public:
+	FEPlotSPRInfStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_NODE) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 

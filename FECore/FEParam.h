@@ -105,6 +105,7 @@ public:
 		m_param = p;
 	}
 
+	FEParamValue(int&    v) : FEParamValue(0, &v, FE_PARAM_INT) {}
 	FEParamValue(double& v) : FEParamValue(0, &v, FE_PARAM_DOUBLE) {}
 	FEParamValue(vec2d&  v) : FEParamValue(0, &v, FE_PARAM_VEC2D) {}
 	FEParamValue(vec3d&  v) : FEParamValue(0, &v, FE_PARAM_VEC3D) {}
@@ -258,3 +259,5 @@ template<class T> inline T* FEParam::pvalue(int n)
 
 //-----------------------------------------------------------------------------
 FECORE_API FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param);
+FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, int index);
+FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, const char* szcomp);

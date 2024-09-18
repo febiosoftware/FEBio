@@ -94,7 +94,7 @@ void FEThermoFluidPressureBC::Update()
         }
         p /= el.GaussPoints();
         // get surface underlying material
-        FEElement* e = el.m_elem[0];
+        FEElement* e = el.m_elem[0].pe;
         FESolidElement* se = dynamic_cast<FESolidElement*>(e);
         if (se) {
             FEMaterial* pm = GetFEModel()->GetMaterial(e->GetMatID());

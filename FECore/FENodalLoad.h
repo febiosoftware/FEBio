@@ -80,7 +80,7 @@ public:
 	//! evaluate the contribution to the global stiffness matrix
 	virtual void StiffnessMatrix(FELinearSystem& LS) override;
 
-private:
+protected:
 	FEDofList	m_dofs;
 	FENodeSet*	m_nodeSet;
 	bool		m_brelative;

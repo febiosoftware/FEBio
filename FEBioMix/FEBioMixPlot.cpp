@@ -37,11 +37,15 @@ SOFTWARE.*/
 #include "FEMultiphasicSolidDomain.h"
 #include "FEMultiphasicShellDomain.h"
 #include <FEBioMech/FEElasticSolidDomain.h>
+#include <FEBioMech/FESlidingInterface.h>
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
 #include "FEBiphasicContactSurface.h"
+#include "FESlidingInterfaceMP.h"
+#include "FETiedBiphasicInterface.h"
+#include "FETiedMultiphasicInterface.h"
 #include "FEBioMech/FEDonnanEquilibrium.h"
 #include "FEBioMech/FEElasticMixture.h"
 #include <FECore/FEModel.h>
@@ -108,7 +112,7 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
         FESurfaceElement& el = pcs->Element(j);
         
         // get the element this surface element belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         if (pe)
         {
             // evaluate the average fluid flux in this element
@@ -135,13 +139,34 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 
 //-----------------------------------------------------------------------------
 // Plot contact gap
+bool FEPlotContactGapMP::Save(FESurface& surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+    
+    writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+        const FEContactMaterialPoint* pt = dynamic_cast<const FEContactMaterialPoint*>(&mp);
+        double d = (pt ? pt->m_gap : 0);
+        if (d == 0) {
+            const FETiedBiphasicContactPoint* pd = dynamic_cast<const FETiedBiphasicContactPoint*>(&mp);
+            vec3d vd = (pd ? pd->m_dg : vec3d(0,0,0));
+            d = (pd ? vd.unit() : 0);
+        }
+        return d;
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot pressure gap
 bool FEPlotPressureGap::Save(FESurface& surf, FEDataStream& a)
 {
 	FEBiphasicContactSurface* pcs = dynamic_cast<FEBiphasicContactSurface*>(&surf);
 	if (pcs == 0) return false;
     
-	writeNodalProjectedElementValues<double>(surf, a, [](const FEMaterialPoint& mp) {
-		const FEBiphasicContactPoint* pt = mp.ExtractData<FEBiphasicContactPoint>();
+    writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+		const FEBiphasicContactPoint* pt = dynamic_cast<const FEBiphasicContactPoint*>(&mp);
 		return (pt ? pt->m_pg : 0);
 	});
 
@@ -208,11 +233,11 @@ bool FEPlotFluidForce2::Save(FESurface &surf, FEDataStream &a)
 	// this assumes that the surface sits on top of a single domain
 	// so that we can figure out the domain from a single element
 	FESurfaceElement& ref = surf.Element(0);
-	if (ref.m_elem[0] == nullptr) return false;
+	if (ref.m_elem[0].pe == nullptr) return false;
 
 	// get the element
 	FEMesh& mesh = *surf.GetMesh();
-	FEElement* el = ref.m_elem[0];
+	FEElement* el = ref.m_elem[0].pe;
 	if (el == 0) return false;
 
 	// get the domain this element belongs to
@@ -243,6 +268,79 @@ bool FEPlotFluidLoadSupport::Save(FESurface &surf, FEDataStream &a)
     double fn = pcs->GetFluidLoadSupport();
     a << fn;
     
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot concentration gap
+FEPlotConcentrationGap::FEPlotConcentrationGap(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_ARRAY, FMT_ITEM)
+{
+    DOFS& dofs = pfem->GetDOFS();
+    int nsol = dofs.GetVariableSize("concentration");
+    SetArraySize(nsol);
+    
+    // collect the names
+    int ndata = pfem->GlobalDataItems();
+    vector<string> s;
+    for (int i = 0; i<ndata; ++i)
+    {
+        FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+        if (ps)
+        {
+            s.push_back(ps->GetName());
+            m_sol.push_back(ps->GetID());
+        }
+    }
+    assert(nsol == (int)s.size());
+    SetArrayNames(s);
+    SetUnits(UNIT_CONCENTRATION);
+}
+
+bool FEPlotConcentrationGap::Save(FESurface& surf, FEDataStream& a)
+{
+    FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+    if (pcs == 0) return false;
+
+    for (int i=0; i<surf.Elements(); ++i) {
+        FESurfaceElement& el = surf.Element(i);
+
+        FEElement* se = (el.m_elem[0]).pe;
+        FEMaterial* mat = GetFEModel()->GetMaterial(se->GetMatID());
+        FESoluteInterface* pm = dynamic_cast<FESoluteInterface*>(mat);
+        if ((pm == 0) || (pm->Solutes() == 0)) return false;
+        
+        // figure out the local solute IDs. This depends on the material
+        int nsols = (int)m_sol.size();
+        vector<int> lid(nsols, -1);
+        int nsc = 0;
+        for (int i = 0; i<(int)m_sol.size(); ++i)
+        {
+            lid[i] = pm->FindLocalSoluteID(m_sol[i]);
+            if (lid[i] != -1) nsc++;
+        }
+        if (nsc == 0) return false;
+        
+        for (int k=0; k<nsols; ++k)
+        {
+            int nsid = lid[k];
+            if (nsid == -1) a << 0.f;
+            else
+            {
+                // calculate average concentration gp
+                double ew = 0;
+                for (int j = 0; j<el.GaussPoints(); ++j)
+                {
+                    FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+                    const FEMultiphasicContactPoint* pt = dynamic_cast<const FEMultiphasicContactPoint*>(&mp);
+                    const FETiedMultiphasicContactPoint* tt = dynamic_cast<const FETiedMultiphasicContactPoint*>(&mp);
+                    if (pt) ew += pt->m_cg[nsid];
+                    else if (tt) ew += tt->m_cg[nsid];
+                }
+                ew /= el.GaussPoints();
+                a << ew;
+            }
+        }
+    }
     return true;
 }
 
@@ -1408,77 +1506,34 @@ bool FEPlotSBMRefAppDensity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEDataStream& a)
 {
-    tens4ds c;
-    
-	if ((dom.Class() != FE_DOMAIN_SOLID)
-        && (dom.Class() != FE_DOMAIN_SHELL)) return false;
-	FESolidDomain* pbd = static_cast<FESolidDomain*>(&dom);
-    FEShellDomain* psd = static_cast<FEShellDomain*>(&dom);
-    
-    FEBiphasic*       pb  = dynamic_cast<FEBiphasic      *> (dom.GetMaterial());
-    FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
-    FETriphasic*      ptp = dynamic_cast<FETriphasic     *> (dom.GetMaterial());
-    FEMultiphasic*    pmp = dynamic_cast<FEMultiphasic   *> (dom.GetMaterial());
-    if ((pb == 0) && (pbs == 0) && (ptp == 0) && (pmp == 0)) return false;
+	FEBiphasic*       pb  = dynamic_cast<FEBiphasic      *> (dom.GetMaterial());
+	FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+	FETriphasic*      ptp = dynamic_cast<FETriphasic     *> (dom.GetMaterial());
+	FEMultiphasic*    pmp = dynamic_cast<FEMultiphasic   *> (dom.GetMaterial());
+	if ((pb == 0) && (pbs == 0) && (ptp == 0) && (pmp == 0)) return false;
 
-    if (pbd) {
-        for (int i=0; i<pbd->Elements(); ++i)
-        {
-            FESolidElement& el = pbd->Element(i);
-            
-            int nint = el.GaussPoints();
-            double f = 1.0 / (double) nint;
-            
-            // since the PLOT file requires floats we need to convert
-            // the doubles to single precision
-            // we output the average stress values of the gauss points
-            tens4ds s(0.0);
-            for (int j=0; j<nint; ++j)
-            {
-                FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
-                if (pb) c = pb->Tangent(pt);
-                else if (pbs) c = pbs->Tangent(pt);
-                else if (ptp) c = ptp->Tangent(pt);
-                else if (pmp) c = pmp->Tangent(pt);
-                
-                s += c;
-            }
-            s *= f;
-            
-            // store average elasticity
-            a << s;
-        }
-    }
-    else if (psd) {
-        for (int i=0; i<psd->Elements(); ++i)
-        {
-            FEShellElement& el = psd->Element(i);
-            
-            int nint = el.GaussPoints();
-            double f = 1.0 / (double) nint;
-            
-            // since the PLOT file requires floats we need to convert
-            // the doubles to single precision
-            // we output the average stress values of the gauss points
-            tens4ds s(0.0);
-            for (int j=0; j<nint; ++j)
-            {
-                FEMaterialPoint& pt = (*el.GetMaterialPoint(j)->ExtractData<FEMaterialPoint>());
-                if (pb) c = pb->Tangent(pt);
-                else if (pbs) c = pbs->Tangent(pt);
-                else if (ptp) c = ptp->Tangent(pt);
-                else if (pmp) c = pmp->Tangent(pt);
-                
-                s += c;
-            }
-            s *= f;
-            
-            // store average elasticity
-            a << s;
-        }
-    }
-    
-    return true;
+	for (int i=0; i<dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+
+		tens4ds s(0.0);
+		for (int j=0; j<nint; ++j)
+		{
+			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+			if      (pb ) s += pb->Tangent(pt);
+			else if (pbs) s += pbs->Tangent(pt);
+			else if (ptp) s += ptp->Tangent(pt);
+			else if (pmp) s += pmp->Tangent(pt);
+		}
+		s *= f;
+
+		// store average elasticity
+		a << s;
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------

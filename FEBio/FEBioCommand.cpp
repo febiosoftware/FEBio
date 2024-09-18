@@ -741,7 +741,7 @@ int FEBioCmd_set::run(int nargs, char** argv)
 	FEBioModel* fem = GetFEM();
 	if (nargs == 1)
 	{
-		printf("output_negative_jacobians = %d\n", (NegativeJacobian::m_boutput ? 1 : 0));
+		printf("output_negative_jacobians = %d\n", NegativeJacobian::m_maxout);
 		if (fem)
 		{
 			printf("print_model_params        = %d\n", (fem->GetPrintParametersFlag() ? 1 : 0));
@@ -760,7 +760,7 @@ int FEBioCmd_set::run(int nargs, char** argv)
 
 	if (strcmp(argv[1], "output_negative_jacobians") == 0)
 	{
-		NegativeJacobian::m_boutput = (n != 0);
+		NegativeJacobian::m_maxout = n;
 		printf("output_negative_jacobians = %d", n);
 	}
 	else if (fem && strcmp(argv[1], "print_model_params") == 0)

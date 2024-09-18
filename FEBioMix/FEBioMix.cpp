@@ -127,7 +127,6 @@ SOFTWARE.*/
 #include "FEBiphasicAnalysis.h"
 #include "FEBiphasicSoluteAnalysis.h"
 #include "FEMultiphasicAnalysis.h"
-#include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
@@ -233,6 +232,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotActualFluidPressure              , "fluid pressure"                  );
 	REGISTER_FECORE_CLASS(FEPlotFluidFlux                        , "fluid flux"                      );
 	REGISTER_FECORE_CLASS(FEPlotNodalFluidFlux                   , "nodal fluid flux");
+    REGISTER_FECORE_CLASS(FEPlotContactGapMP                     , "contact gap"         );
 	REGISTER_FECORE_CLASS(FEPlotPressureGap					     , "pressure gap"        );
 	REGISTER_FECORE_CLASS(FEPlotFluidForce                       , "fluid force"         );
 	REGISTER_FECORE_CLASS(FEPlotFluidForce2                      , "fluid force2"        );
@@ -264,26 +264,6 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 3, "esxy");
 	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 4, "esyz");
 	REGISTER_FECORE_CLASS_T(FELogElemSolidStress_T, 5, "esxz");
-
-	//-----------------------------------------------------------------------------
-	// Model update requests (for biphasic module)
-	febio.OnCreateEvent(UpdateModelWhenCreating<FEBiphasicAnalysis>([](FEModelUpdate& fem) {
-		fem.AddPlotVariable("effective fluid pressure");
-		fem.AddPlotVariable("fluid flux");
-		})
-	);
-
-    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 25;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
-        pc->m_iteopt = 15;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FEBiphasicAnalysis>([](FEBiphasicAnalysis* pc) {
-        pc->m_nanalysis = FEBiphasicAnalysis::TRANSIENT;
-    }));
 
 //======================================================================
 // setup the "solute" module (i.e. biphasic-solute)
@@ -352,6 +332,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotEffectiveSoluteConcentration     , "effective solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveShellSoluteConcentration, "effective shell solute concentration");
 	REGISTER_FECORE_CLASS(FEPlotActualSoluteConcentration        , "solute concentration");
+    REGISTER_FECORE_CLASS(FEPlotConcentrationGap                 , "concentration gap"   );
     REGISTER_FECORE_CLASS(FEPlotPartitionCoefficient             , "partition coefficient");
 	REGISTER_FECORE_CLASS(FEPlotSoluteFlux		                 , "solute flux"                     );
     REGISTER_FECORE_CLASS(FEPlotSoluteVolumetricFlux             , "solute volumetric flux"          );
@@ -406,18 +387,6 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogElemSoluteFluxX_T, 7, "j8x");
 	REGISTER_FECORE_CLASS_T(FELogElemSoluteFluxY_T, 7, "j8y");
 	REGISTER_FECORE_CLASS_T(FELogElemSoluteFluxZ_T, 7, "j8z");
-
-    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 25;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
-        pc->m_iteopt = 15;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FEBiphasicSoluteAnalysis>([](FEBiphasicSoluteAnalysis* pc) {
-        pc->m_nanalysis = FEBiphasicSoluteAnalysis::TRANSIENT;
-    }));
 
 //======================================================================
 // setup the "multiphasic" module
@@ -539,18 +508,6 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 5, "c6_integral");
 	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 6, "c7_integral");
 	REGISTER_FECORE_CLASS_T(FELogDomainIntegralSoluteConcentration_T, 7, "c8_integral");
-
-    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 25;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
-        pc->m_iteopt = 15;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FEMultiphasicAnalysis>([](FEMultiphasicAnalysis* pc) {
-        pc->m_nanalysis = FEMultiphasicAnalysis::TRANSIENT;
-    }));
 
 	febio.SetActiveModule(0);
 }

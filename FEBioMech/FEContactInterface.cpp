@@ -67,14 +67,14 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 	FEMesh& m = GetFEModel()->GetMesh();
 
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == nullptr) return 0.0;
 
 	// make sure the parent domain is an elastic domain
 	FEElasticDomain* ped = dynamic_cast<FEElasticDomain*>(pe->GetMeshPartition());
 	if (ped == nullptr)
 	{
-		if ((pe = el.m_elem[1]) == nullptr) return 0.0;
+		if ((pe = el.m_elem[1].pe) == nullptr) return 0.0;
 		ped = dynamic_cast<FEElasticDomain*>(pe->GetMeshPartition());
 		if (ped == nullptr) return 0.0;
 	}

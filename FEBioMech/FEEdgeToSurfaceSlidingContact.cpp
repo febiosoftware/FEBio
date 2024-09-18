@@ -127,6 +127,17 @@ void FEEdgeToSurfaceSlidingContactEdge::Update()
 	}
 }
 
+void FEEdgeToSurfaceSlidingContactEdge::Serialize(DumpStream& ar)
+{
+	FEEdge::Serialize(ar);
+	ar.LockPointerTable();
+	for (int i = 0; i < m_points.size(); ++i)
+	{
+		ar & m_points[i];
+	}
+	ar.UnlockPointerTable();
+}
+
 //=================================================================================================
 BEGIN_FECORE_CLASS(FEEdgeToSurfaceSlidingContact, FESurfaceConstraint)
 	ADD_PARAMETER(m_atol         , "tolerance"    );

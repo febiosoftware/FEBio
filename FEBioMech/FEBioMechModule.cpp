@@ -148,6 +148,7 @@ SOFTWARE.*/
 #include "FERVEFatigueMaterial.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
+#include "FERelativeVolumeCriterion.h"
 #include "FEPlasticFlowCurve.h"
 #include "FEFiberExpLinear.h"
 #include "FEUncoupledFiberExpLinear.h"
@@ -272,9 +273,11 @@ SOFTWARE.*/
 #include "FEMaxStressCriterion.h"
 #include "FEMaxDamageCriterion.h"
 #include "FESpringRuptureCriterion.h"
+#include "FEContactGapCriterion.h"
 
 #include "FEInitialVelocity.h"
 #include "FENodalForce.h"
+#include "FENodalTargetForce.h"
 
 #include "FEPreStrainElastic.h"
 #include "FEPreStrainUncoupledElastic.h"
@@ -290,7 +293,6 @@ SOFTWARE.*/
 #include "FESolidModule.h"
 
 #include "FESolidAnalysis.h"
-#include <FECore/FEModelUpdate.h>
 
 #include "FEElasticBeamMaterial.h"
 
@@ -447,6 +449,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEVolumeGrowth     , "volume growth"       );
     REGISTER_FECORE_CLASS(FEAreaGrowth       , "area growth"         );
     REGISTER_FECORE_CLASS(FEFiberGrowth      , "fiber growth"        );
+    REGISTER_FECORE_CLASS(FEGeneralGrowth    , "general growth"      );
 
 	// Elastic Fiber materials (derived from FEElasticFiberMaterial)
     REGISTER_FECORE_CLASS(FEElasticFiberCDF         , "fiber-CDF"           );
@@ -643,6 +646,7 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// classes derived from FENodalLoad
 	REGISTER_FECORE_CLASS(FENodalForce, "nodal_force");
+	REGISTER_FECORE_CLASS(FENodalTargetForce, "nodal_target_force");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FESurfaceLoad
@@ -790,6 +794,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotLagrangeStrain, "Lagrange strain");
 	REGISTER_FECORE_CLASS(FEPlotInfStrain, "infinitesimal strain");
 	REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain, "SPR Lagrange strain");
+	REGISTER_FECORE_CLASS(FEPlotSPRInfStrain, "SPR infinitesimal strain");
     REGISTER_FECORE_CLASS(FEPlotRightStretch, "right stretch");
     REGISTER_FECORE_CLASS(FEPlotLeftStretch, "left stretch");
     REGISTER_FECORE_CLASS(FEPlotRightHencky, "right Hencky");
@@ -1073,6 +1078,18 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 3, "mixture_stress[2].xz");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 4, "mixture_stress[2].yz");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 5, "mixture_stress[2].zz");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 0, "Ft_xx");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 1, "Ft_xy");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 2, "Ft_xz");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 1, 0, "Ft_yx");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 1, 1, "Ft_yy");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 1, 2, "Ft_yz");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 0, "Ft_zx");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 1, "Ft_zy");
+	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 2, "Ft_zz");
+
+	// derived from FELogDomainData
+	REGISTER_FECORE_CLASS(FENormalizedInternalEnergy, "normalized internal energy");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData
@@ -1146,22 +1163,14 @@ void FEBioMech::InitModule()
 	// Derived from FEMeshAdaptorCriterion
 	REGISTER_FECORE_CLASS(FEStressCriterion, "stress");
 	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");
+    REGISTER_FECORE_CLASS(FERelativeVolumeCriterion, "relative volume");
 	REGISTER_FECORE_CLASS(FESpringForceCriterion, "spring force");
 	REGISTER_FECORE_CLASS(FESpringStretchCriterion, "spring stretch");
+	REGISTER_FECORE_CLASS(FEContactGapCriterion, "contact gap");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FEElemDataGenerator
 	REGISTER_FECORE_CLASS(FEDeformationMapGenerator, "defgrad");
-
-	//-----------------------------------------------------------------------------
-	// Model update requests
-	febio.OnCreateEvent(UpdateModelWhenCreating<FESolidAnalysis>([](FEModelUpdate& fem) {
-			fem.AddPlotVariable("displacement");
-			fem.AddPlotVariable("stress");
-		}));
-
-	febio.OnCreateEvent(AddPlotVariableWhenCreating<FEContactInterface>("contact pressure"));
-	febio.OnCreateEvent(AddPlotVariableWhenCreating<FEContactInterface>("contact gap"));
 
 	febio.SetActiveModule(0);
 }

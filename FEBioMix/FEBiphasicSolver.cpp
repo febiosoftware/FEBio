@@ -59,6 +59,7 @@ BEGIN_FECORE_CLASS(FEBiphasicSolver, FENewtonSolver)
 		ADD_PARAMETER(m_Etol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol");
 		ADD_PARAMETER(m_Rtol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 		ADD_PARAMETER(m_Ptol, "ptol"        );
+        ADD_PARAMETER(m_Ctol, "ctol"        );
 		ADD_PARAMETER(m_biphasicFormulation, "mixed_formulation");
 	END_PARAM_GROUP();
 
@@ -85,6 +86,7 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FENewtonSolver(pfem),
 	m_Dtol = 0.001;
 	m_Etol = 0.01;
 	m_Ptol = 0.01;
+    m_Ctol = 0; // only needed for biphasic-solute analyses
 	m_Rmin = 1.0e-20;
 	m_Rmax = 0;	// not used if zero
 
@@ -95,6 +97,9 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FENewtonSolver(pfem),
 
 	m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
 
+    // Preferred strategy is Broyden's method
+    SetDefaultStrategy(QN_BROYDEN);
+    
 	// set default formulation (full shape functions)
 	m_biphasicFormulation = 0;
 
@@ -443,7 +448,7 @@ bool FEBiphasicSolver::Quasin()
 		normE1 = s*fabs(m_ui*m_R1);
 
 		m_residuNorm.norm = normR1;
-		m_energyNorm.norm = normR1;
+		m_energyNorm.norm = normE1;
 		m_solutionNorm[0].norm = normd;
 
 		// check residual norm

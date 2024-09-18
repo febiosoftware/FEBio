@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FEBiphasicSoluteSolver.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicDomain.h"
-#include "FETriphasicDomain.h"
 #include <FEBioMech/FEElasticDomain.h>
 #include <FEBioMech/FEResidualVector.h>
 #include <FEBioMech/FESolidLinearSystem.h>
@@ -42,12 +41,6 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include "FECore/sys.h"
 #include "FEBiphasicSoluteAnalysis.h"
-
-//-----------------------------------------------------------------------------
-// define the parameter list
-BEGIN_FECORE_CLASS(FEBiphasicSoluteSolver, FEBiphasicSolver)
-	ADD_PARAMETER(m_Ctol, "ctol"        );
-END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver(pfem), m_dofC(pfem), m_dofD(pfem)
@@ -247,7 +240,7 @@ bool FEBiphasicSoluteSolver::Quasin()
 		normE1 = s*fabs(m_ui*m_R1);
 
 		m_residuNorm.norm = normR1;
-		m_energyNorm.norm = normR1;
+		m_energyNorm.norm = normE1;
 		m_solutionNorm[0].norm = normd;
 
 		// check residual norm
@@ -423,18 +416,11 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
         FEElasticDomain* ped = dynamic_cast<FEElasticDomain*>(&dom);
         FEBiphasicDomain*  pbd = dynamic_cast<FEBiphasicDomain* >(&dom);
         FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
-        FETriphasicDomain*      ptd = dynamic_cast<FETriphasicDomain*     >(&dom);
         if (psd) {
             if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicSoluteAnalysis::STEADY_STATE)
                 psd->InternalForcesSS(RHS);
             else
                 psd->InternalForces(RHS);
-        }
-        else if (ptd) {
-            if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicSoluteAnalysis::STEADY_STATE)
-                ptd->InternalForcesSS(RHS);
-            else
-                ptd->InternalForces(RHS);
         }
         else if (pbd) {
             if (fem.GetCurrentStep()->m_nanalysis == FEBiphasicSoluteAnalysis::STEADY_STATE)
@@ -511,12 +497,10 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 		for (int i=0; i<mesh.Domains(); ++i) 
 		{
             // Biphasic-solute analyses may also include biphasic and elastic domains
-			FETriphasicDomain*      ptdom = dynamic_cast<FETriphasicDomain*>(&mesh.Domain(i));
 			FEBiphasicSoluteDomain* psdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
 			FEBiphasicDomain*  pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
 			FEElasticDomain*   pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
 			if (psdom) psdom->StiffnessMatrixSS(LS, bsymm);
-			else if (ptdom) ptdom->StiffnessMatrixSS(LS, bsymm);
 			else if (pbdom) pbdom->StiffnessMatrixSS(LS, bsymm);
             else if (pedom) pedom->StiffnessMatrix(LS);
 		}
@@ -526,12 +510,10 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 		for (int i = 0; i<mesh.Domains(); ++i)
 		{
             // Biphasic-solute analyses may also include biphasic and elastic domains
-			FETriphasicDomain*      ptdom = dynamic_cast<FETriphasicDomain*>(&mesh.Domain(i));
 			FEBiphasicSoluteDomain* psdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
 			FEBiphasicDomain* pbdom = dynamic_cast<FEBiphasicDomain*>(&mesh.Domain(i));
 			FEElasticDomain* pedom = dynamic_cast<FEElasticDomain*>(&mesh.Domain(i));
 			if (psdom) psdom->StiffnessMatrix(LS, bsymm);
-			else if (ptdom) ptdom->StiffnessMatrix(LS, bsymm);
 			else if (pbdom) pbdom->StiffnessMatrix(LS, bsymm);
             else if (pedom) pedom->StiffnessMatrix(LS);
 		}

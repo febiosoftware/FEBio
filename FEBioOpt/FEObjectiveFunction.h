@@ -148,24 +148,58 @@ class FEMinimizeObjective : public FEObjectiveFunction
 	class Function
 	{
 	public:
-		string		name;
-		double*		var;
+		Function(FEModel* fem) : m_fem(fem) {}
+		virtual ~Function() {}
 
-		double	y0;		// target value (i.e. "measurment")
+		virtual bool Init() { return (m_fem != nullptr); }
+
+		virtual double Target() const = 0;
+		virtual double Value() const = 0;
+
+	protected:
+		FEModel* m_fem;
+	};
+
+public:
+	class ParamFunction : public Function
+	{
+	public:
+		string	m_name;
+		double* m_var = nullptr;
+
+		double	m_y0 = 0;		// target value (i.e. "measurment")
+
+		ParamFunction(FEModel* fem, const string& name, double trg) : Function(fem), m_name(name), m_y0(trg) {}
 
 	public:
-		Function() : var(0), y0(0.0) {}
-		Function(const Function& f) { name = f.name; var = f.var; y0 = f.y0; }
-		void operator = (const Function& f) { name = f.name; var = f.var; y0 = f.y0; }
+		bool Init() override;
+		double Target() const override { return m_y0; }
+		double Value() const override { return *m_var; }
+	};
+
+	class FilterAvgFunction : public Function
+	{
+	public:
+		FELogElemData* m_pd = nullptr;
+		FEElementSet* m_elemSet = nullptr;
+		double	m_y0 = 0;
+
+		FilterAvgFunction(FEModel* fem, FELogElemData* pd, FEElementSet* elemSet, double trg);
+
+	public:
+		bool Init() override;
+		double Target() const override { return m_y0; }
+		double Value() const override;
 	};
 
 public:
 	FEMinimizeObjective(FEModel* fem);
+	~FEMinimizeObjective();
 
 	// one-time initialization
 	bool Init() override;
 
-	bool AddFunction(const char* szname, double targetValue);
+	void AddFunction(Function* func);
 
 public:
 	// return number of measurements
@@ -178,7 +212,7 @@ public:
 	void GetMeasurements(std::vector<double>& y) override;
 
 private:
-	std::vector<Function>	m_Func;
+	std::vector<Function*>	m_Func;
 };
 
 //=============================================================================

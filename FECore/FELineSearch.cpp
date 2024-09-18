@@ -29,7 +29,9 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FELineSearch.h"
 #include "FENewtonSolver.h"
+#include "FEException.h"
 #include "DumpStream.h"
+#include "log.h"
 #include <vector>
 using namespace std;
 
@@ -38,13 +40,14 @@ FELineSearch::FELineSearch(FENewtonSolver* pns) : m_pns(pns)
 	m_LSmin = 0.01;
 	m_LStol = 0.9;
 	m_LSiter = 5;
+	m_checkJacobians = false;
 }
 
 // serialization
 void FELineSearch::Serialize(DumpStream& ar)
 {
 	if (ar.IsShallow()) return;
-	ar & m_LSmin & m_LStol & m_LSiter;
+	ar & m_LSmin & m_LStol & m_LSiter & m_checkJacobians;
 }
 
 //! Performs a linesearch on a NR iteration
@@ -84,14 +87,16 @@ double FELineSearch::DoLineSearch(double s)
 	do
 	{
 		// Update geometry
-		vcopys(ul, ui, s);
-		m_pns->Update(ul);
+		s = UpdateModel(ul, ui, s);
 
 		// calculate residual at this point
 		ns->Residual(R1, false);
 
 		// make sure we are still in a valid range
-		if (s < m_LSmin)
+		// (When the check-jacobian flag is on, it's very possible that 
+		//  the current line search scale factor drops below the minimum, 
+		//  so we don't check the min value when the flag is on.)
+		if ((s < m_LSmin) && !m_checkJacobians)
 		{
 			// it appears that we are not converging
 			// I found in the NIKE3D code that when this happens,
@@ -157,6 +162,37 @@ double FELineSearch::DoLineSearch(double s)
 		vcopys(ul, ui, s);
 		m_pns->Update(ul);
 		ns->Residual(R1, false);
+	}
+	return s;
+}
+
+double FELineSearch::UpdateModel(std::vector<double>& ul, std::vector<double>& ui, double s)
+{
+	if (m_checkJacobians)
+	{
+		int nmax = m_LSiter;
+		int n = 0;
+		bool negJacFree = true;
+		do {
+			negJacFree = true;
+			vcopys(ul, ui, s);
+			try {
+				m_pns->Update(ul);
+			}
+			catch (NegativeJacobianDetected e)
+			{
+				negJacFree = false;
+				s *= 0.5;
+				feLogDebugEx(m_pns->GetFEModel(), "line search cutback : %lg", s);
+				n++;
+				if (n > nmax) throw;
+			}
+		} while (!negJacFree);
+	}
+	else
+	{
+		vcopys(ul, ui, s);
+		m_pns->Update(ul);
 	}
 	return s;
 }
