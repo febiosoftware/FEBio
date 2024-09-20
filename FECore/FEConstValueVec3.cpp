@@ -60,14 +60,31 @@ FEMathValueVec3::FEMathValueVec3(FEModel* fem) : FEVec3dValuator(fem)
 //---------------------------------------------------------------------------------------
 bool FEMathValueVec3::Init()
 {
-	size_t c1 = m_expr.find(',', 0); if (c1 == string::npos) return false;
-	size_t c2 = m_expr.find(',', c1 + 1); if (c2 == string::npos) return false;
+	if (m_expr.empty()) return false;
+	string s[3];
 
-	string sx = m_expr.substr(0, c1);
-	string sy = m_expr.substr(c1 + 1, c2 - c1);
-	string sz = m_expr.substr(c2 + 1, string::npos);
+	const char* c = m_expr.c_str();
+	int n = 0;
+	int l = 0;
+	while (*c)
+	{
+		char ch = *c;
+		if ((ch == ',') && (l == 0))
+		{
+			n++;
+			if (n > 2) return false;
+		}
+		else
+		{
+			if ((ch == '(') || (ch == '[') || (ch == '{')) l++;
+			if ((ch == ')') || (ch == ']') || (ch == '}')) l--;
+			s[n].push_back(ch);
+		}
+		c++;
+	}
+	if (n != 2) return false;
 
-	return create(sx, sy, sz);
+	return create(s[0], s[1], s[2]);
 }
 
 //---------------------------------------------------------------------------------------
