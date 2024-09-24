@@ -26,10 +26,10 @@ SOFTWARE.*/
 #pragma once
 
 struct ModelStats {
-	int		ntimeSteps;		//!< total nr of time steps
-	int		ntotalIters;	//!< total nr of equilibrium iterations
-	int		ntotalRHS;		//!< total nr of right hand side evaluations
-	int		ntotalReforms;	//!< total nr of stiffness reformations
+	int		ntimeSteps = 0;		//!< total nr of time steps
+	int		ntotalIters = 0;	//!< total nr of equilibrium iterations
+	int		ntotalRHS = 0;		//!< total nr of right hand side evaluations
+	int		ntotalReforms = 0;	//!< total nr of stiffness reformations
 };
 
 struct TimingInfo {

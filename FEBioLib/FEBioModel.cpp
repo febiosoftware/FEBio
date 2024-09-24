@@ -123,11 +123,6 @@ FEBioModel::FEBioModel()
 	m_writeMesh = false;
 	m_createReport = false;
 
-	m_stats.ntimeSteps = 0;
-	m_stats.ntotalIters = 0;
-	m_stats.ntotalRHS = 0;
-	m_stats.ntotalReforms = 0;
-
 	m_pltAppendOnRestart = true;
 
 	m_lastUpdate = -1;
@@ -190,7 +185,18 @@ void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
 //! Get the stats 
 ModelStats FEBioModel::GetModelStats() const
 {
-	return m_stats;
+	return m_modelStats;
+}
+
+ModelStats FEBioModel::GetStepStats(size_t n) const
+{
+	assert((n >= 0) && (n < Steps()));
+	return m_stepStats[n];
+}
+
+std::vector<ModelStats> FEBioModel::GetStepStats() const
+{
+	return m_stepStats;
 }
 
 //-----------------------------------------------------------------------------
@@ -1541,6 +1547,7 @@ bool FEBioModel::Init()
 	}
 
 	m_report.clear();
+	m_stepStats.resize(Steps());
 
 	FEBioPlotFile* pplt = nullptr;
 	m_lastUpdate = -1;
@@ -1682,10 +1689,18 @@ bool FEBioModel::Reset()
 		}
 	}
 
-	m_stats.ntimeSteps = 0;
-	m_stats.ntotalIters = 0;
-	m_stats.ntotalRHS = 0;
-	m_stats.ntotalReforms = 0;
+	// reset stats
+	m_modelStats.ntimeSteps = 0;
+	m_modelStats.ntotalIters = 0;
+	m_modelStats.ntotalRHS = 0;
+	m_modelStats.ntotalReforms = 0;
+	for (auto& s : m_stepStats)
+	{
+		s.ntimeSteps = 0;
+		s.ntotalIters = 0;
+		s.ntotalRHS = 0;
+		s.ntotalReforms = 0;
+	}
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -1735,10 +1750,10 @@ void FEBioModel::on_cb_solved()
 	if (Steps() > 1)
 	{
 		feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
-		feLog("\tNumber of time steps completed .................... : %d\n\n", m_stats.ntimeSteps);
-		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_stats.ntotalIters);
-		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_stats.ntotalRHS);
-		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_stats.ntotalReforms);
+		feLog("\tNumber of time steps completed .................... : %d\n\n", m_modelStats.ntimeSteps);
+		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_modelStats.ntotalIters);
+		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_modelStats.ntotalRHS);
+		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_modelStats.ntotalReforms);
 	}
 
 	// get timing info
@@ -1841,10 +1856,16 @@ void FEBioModel::on_cb_stepSolved()
 	}
 
 	// add to stats
-	m_stats.ntimeSteps    += step->m_ntimesteps;
-	m_stats.ntotalIters   += step->m_ntotiter;
-	m_stats.ntotalRHS     += step->m_ntotrhs;
-	m_stats.ntotalReforms += step->m_ntotref;
+	ModelStats stats;
+	stats.ntimeSteps    = step->m_ntimesteps;
+	stats.ntotalIters   = step->m_ntotiter;
+	stats.ntotalRHS     = step->m_ntotrhs;
+	stats.ntotalReforms = step->m_ntotref;
+	m_stepStats[GetCurrentStepIndex()] = stats;
+	m_modelStats.ntimeSteps    += stats.ntimeSteps;
+	m_modelStats.ntotalIters   += stats.ntotalIters;
+	m_modelStats.ntotalRHS     += stats.ntotalRHS;
+	m_modelStats.ntotalReforms += stats.ntotalReforms;
 }
 
 bool FEBioModel::Restart(const char* szfile)

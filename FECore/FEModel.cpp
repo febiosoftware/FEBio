@@ -397,7 +397,7 @@ void FEModel::AddInitialCondition(FEInitialCondition* pbc) { m_imp->m_IC.push_ba
 
 //-----------------------------------------------------------------------------
 //! retrieve the number of steps
-int FEModel::Steps() { return (int)m_imp->m_Step.size(); }
+int FEModel::Steps() const { return (int)m_imp->m_Step.size(); }
 
 //-----------------------------------------------------------------------------
 //! clear the steps

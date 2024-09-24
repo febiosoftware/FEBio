@@ -191,6 +191,8 @@ public:
 
 	//! Get the stats 
 	ModelStats GetModelStats() const;
+	ModelStats GetStepStats(size_t n) const;
+	std::vector<ModelStats> GetStepStats() const;
 
 	// flag to show warnings and errors
 	void ShowWarningsAndErrors(bool b);
@@ -224,7 +226,8 @@ private:
 
 private:
 	// accumulative statistics
-	ModelStats	m_stats;
+	ModelStats	m_modelStats;
+	std::vector<ModelStats> m_stepStats;
 
 protected: // file names
 	std::string		m_sfile_title;		//!< input file title 
