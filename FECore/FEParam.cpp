@@ -107,11 +107,11 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname, b
 	m_szname = szname;
 	m_szlongname = szname;
 
-	m_szenum = 0;
+	m_szenum = nullptr;
 
-	m_pvalid = 0;	// no default validator
+	m_pvalid = nullptr;	// no default validator
 
-	m_parent = 0;
+	m_parent = nullptr;
 
 	m_szunit = nullptr;
 }
@@ -386,7 +386,11 @@ void FEParam::SetValidator(FEParamValidator* pvalid)
 	m_pvalid = pvalid;
 }
 
-//-----------------------------------------------------------------------------
+FEParamValidator* FEParam::GetValidator()
+{
+	return m_pvalid;
+}
+
 void FEParam::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
