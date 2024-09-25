@@ -1741,41 +1741,57 @@ double FELogElemFiberVectorZ::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-double FELogDamage::value(FEElement& el)
+double FELogDamage_::value(FEElement& el)
 {
     int nint = el.GaussPoints();
     double D = 0;
-    for (int j=0; j<nint; ++j)
-    {
-        FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-        FEReactiveMaterialPoint* ppd = pt.ExtractData<FEReactiveMaterialPoint>();
-        FEElasticMixtureMaterialPoint* pem = pt.ExtractData<FEElasticMixtureMaterialPoint>();
-        FEMultigenerationMaterialPoint* pmg = pt.ExtractData<FEMultigenerationMaterialPoint>();
-        if (ppd) D += (float) ppd->BrokenBonds();
-        else if (pem) {
-            for (int k=0; k<pem->Components(); ++k)
-            {
-                FEReactiveMaterialPoint* ppd = pem->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
-                if (ppd) D += (float) ppd->BrokenBonds();
-            }
-        }
-        else if (pmg) {
-            for (int k=0; k<pmg->Components(); ++k)
-            {
-                FEReactiveMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
-                if (ppd) D += (float) ppd->BrokenBonds();
-                else if (pem)
-                {
-                    for (int l=0; l<pem->Components(); ++l)
-                    {
-                        FEReactiveMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEReactiveMaterialPoint>();
-                        if (ppd) D += (float) ppd->BrokenBonds();
-                    }
-                }
-            }
-        }
-    }
+	if (m_comp == -1)
+	{
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+			FEReactiveMaterialPoint* ppd = pt.ExtractData<FEReactiveMaterialPoint>();
+			FEElasticMixtureMaterialPoint* pem = pt.ExtractData<FEElasticMixtureMaterialPoint>();
+			FEMultigenerationMaterialPoint* pmg = pt.ExtractData<FEMultigenerationMaterialPoint>();
+			if (ppd) D += (float)ppd->BrokenBonds();
+			else if (pem) {
+				for (int k = 0; k < pem->Components(); ++k)
+				{
+					FEReactiveMaterialPoint* ppd = pem->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
+					if (ppd) D += (float)ppd->BrokenBonds();
+				}
+			}
+			else if (pmg) {
+				for (int k = 0; k < pmg->Components(); ++k)
+				{
+					FEReactiveMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
+					FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+					if (ppd) D += (float)ppd->BrokenBonds();
+					else if (pem)
+					{
+						for (int l = 0; l < pem->Components(); ++l)
+						{
+							FEReactiveMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEReactiveMaterialPoint>();
+							if (ppd) D += (float)ppd->BrokenBonds();
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
+			if (mmp && (m_comp < mmp->Components()))
+			{
+				FEReactiveMaterialPoint* dp = mmp->GetPointData(m_comp)->ExtractData<FEReactiveMaterialPoint>();
+				if (dp) D += dp->BrokenBonds();
+			}
+		}
+	}
     D /= (double) nint;
     return D;
 }

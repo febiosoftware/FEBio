@@ -1036,6 +1036,10 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorY, "fiber_y");
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, "fiber_z");
 	REGISTER_FECORE_CLASS(FELogDamage, "D");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 0, "damage_1");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 1, "damage_2");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 2, "damage_3");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 3, "damage_4");
     REGISTER_FECORE_CLASS(FELogIntactBonds, "wi");
     REGISTER_FECORE_CLASS(FELogYieldedBonds, "wy");
     REGISTER_FECORE_CLASS(FELogFatigueBonds, "wf");
