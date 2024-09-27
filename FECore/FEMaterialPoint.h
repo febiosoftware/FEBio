@@ -149,6 +149,7 @@ public:
 	quatd		m_Q;		//!< local coordinates
 	FEElement* m_elem;		//!< Element where this material point is
 	int			m_index;	//!< local integration point index 
+    double      m_V0;       //!< referential element volume associated with this material point
 
 	// pointer to element's shape function values
 	double* m_shape;

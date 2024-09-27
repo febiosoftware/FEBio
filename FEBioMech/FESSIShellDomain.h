@@ -61,7 +61,7 @@ protected:
 
 public:
 	//! calculates covariant basis vectors at an integration point
-	void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]);
+	void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]) override;
 
     //! calculates covariant basis vectors at any point
     void CoBaseVectors0(FEShellElement& el, double r, double s, double t, vec3d g[3]);

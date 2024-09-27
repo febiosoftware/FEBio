@@ -37,7 +37,7 @@ SOFTWARE.*/
 class FEBIOMECH_API FEDamageCDF : public FEMaterialProperty
 {
 public:
-    FEDamageCDF(FEModel* pfem) : FEMaterialProperty(pfem) { m_Dmax = 1; }
+    FEDamageCDF(FEModel* pfem) : FEMaterialProperty(pfem) { m_Dmax = 1; m_ploc = 0; }
     
 	//! damage
 	double Damage(FEMaterialPoint& pt);
@@ -49,8 +49,9 @@ public:
     virtual double pdf(FEMaterialPoint& mp, const double X) = 0;
 
 public:
-    double  m_Dmax;              //!< maximum allowable damage
-    
+    double  m_Dmax;             //!< maximum allowable damage
+    FEParamDouble   m_ploc;     //!< location parameter
+
     // declare parameter list
     DECLARE_FECORE_CLASS();
     FECORE_BASE_CLASS(FEDamageCDF)
@@ -75,6 +76,7 @@ public:
 public:
     FEParamDouble	m_alpha;			//!< parameter alpha
     FEParamDouble	m_beta;             //!< parameter beta
+    FEParamDouble   m_n;                //!< exponent
     
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

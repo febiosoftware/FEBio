@@ -648,20 +648,20 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
 		pt.m_s = (m_secant_stress ? m_pMat->SecantStress(mp) : m_pMat->Stress(mp));
         
         // adjust stress for strain energy conservation
-		// (Apply only for mid-point rule)
-		if (m_alphaf == 0.5)
-		{
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
-
-			// evaluate strain energy at current time
-			mat3d Ftmp = pt.m_F;
-			double Jtmp = pt.m_J;
-			pt.m_F = Ft;
-			pt.m_J = Jt;
-			pt.m_Wt = pme->StrainEnergyDensity(mp);
-			pt.m_F = Ftmp;
-			pt.m_J = Jtmp;
-
+        // (Apply only for mid-point rule)
+        FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
+        
+        // evaluate strain energy at current time
+        mat3d Ftmp = pt.m_F;
+        double Jtmp = pt.m_J;
+        pt.m_F = Ft;
+        pt.m_J = Jt;
+        pt.m_Wt = pme->StrainEnergyDensity(mp);
+        pt.m_F = Ftmp;
+        pt.m_J = Jtmp;
+        
+        if (m_alphaf == 0.5)
+        {
             mat3ds D = pt.RateOfDeformation();
             double D2 = D.dotdot(D);
 			if (D2 > std::numeric_limits<double>::epsilon())

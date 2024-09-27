@@ -563,21 +563,21 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
 		// seperately. 
 		pt.m_s = mat.DevStress(mp);
         
+        // evaluate deviatoric strain energy at current and previous time
+        mat3d Ftmp = pt.m_F;
+        double Jtmp = pt.m_J;
+        pt.m_F = Ft;
+        pt.m_J = Jt;
+        double Wt = mat.DevStrainEnergyDensity(mp);
+        pt.m_F = Ftmp;
+        pt.m_J = Jtmp;
+        
+        // store total strain energy density at current time
+        pt.m_Wt = Wt + eUt;
+        
         // adjust stress for strain energy conservation
-        if (m_alphaf == 0.5) 
-		{
-			// evaluate deviatoric strain energy at current and previous time
-			mat3d Ftmp = pt.m_F;
-			double Jtmp = pt.m_J;
-			pt.m_F = Ft;
-			pt.m_J = Jt;
-			double Wt = mat.DevStrainEnergyDensity(mp);
-			pt.m_F = Ftmp;
-			pt.m_J = Jtmp;
-
-			// store total strain energy density at current time
-			pt.m_Wt = Wt + eUt;
-
+        if (m_alphaf == 0.5)
+        {
 			double Wp = pt.m_Wp;
             mat3ds D = pt.RateOfDeformation();
             double D2 = D.dotdot(D);

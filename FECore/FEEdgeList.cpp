@@ -107,13 +107,14 @@ bool FEEdgeList::Create(FEMesh* pmesh)
 	set<pair<int, int>, edge_less> edgeSet;
 
 	const int ETET[6][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 0, 3 },{ 1, 3 },{ 2, 3 } };
+    const int EPENTA[9][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 3, 4 },{ 4, 5 },{ 5, 3 },{ 3, 0},{ 1, 4},{ 2, 5 } };
 	const int EHEX[12][2] = { { 0, 1 },{ 1, 2 },{ 2, 3 },{ 3, 0 },{ 4, 5 },{ 5, 6 },{ 6, 7 },{ 7, 4 },{ 0, 4 },{ 1, 5 },{ 2, 6 },{ 3, 7 } };
 
 	for (FEElementList::iterator it = elemList.begin(); it != elemList.end(); ++it)
 	{
 		FEElement& el = *it;
 
-		if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5))
+		if ((el.Shape() == ET_TET4) || (el.Shape() == ET_TET5) || (el.Shape() == ET_TET10) || (el.Shape() == ET_TET15))
 		{
 			for (int i = 0; i < 6; ++i)
 			{
@@ -124,7 +125,18 @@ bool FEEdgeList::Create(FEMesh* pmesh)
 				edgeSet.insert(edge);
 			}
 		}
-		else if (el.Shape() == ET_HEX8)
+        else if ((el.Shape() == ET_PENTA6) || (el.Shape() == ET_PENTA15))
+        {
+            for (int i = 0; i < 9; ++i)
+            {
+                pair<int, int> edge;
+                edge.first = el.m_node[EPENTA[i][0]];
+                edge.second = el.m_node[EPENTA[i][1]];
+                
+                edgeSet.insert(edge);
+            }
+        }
+		else if ((el.Shape() == ET_HEX8) || (el.Shape() == ET_HEX20) || (el.Shape() == ET_HEX27))
 		{
 			for (int i = 0; i < 12; ++i)
 			{

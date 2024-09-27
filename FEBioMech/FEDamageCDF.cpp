@@ -42,6 +42,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDamageCDF, FEMaterialProperty)
+    ADD_PARAMETER(m_ploc, "ploc");
 	ADD_PARAMETER(m_Dmax , FE_RANGE_CLOSED(0.0, 1.0), "Dmax");
 END_FECORE_CLASS();
 
@@ -65,24 +66,31 @@ double FEDamageCDF::Damage(FEMaterialPoint& mp) {
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDamageCDFSimo, FEDamageCDF)
-    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0.0), "a");
-    ADD_PARAMETER(m_beta , FE_RANGE_CLOSED(0.0, 1.0), "b");
+    ADD_PARAMETER(m_alpha, FE_RANGE_GREATER(0.0), "a")->setLongName("alpha");
+    ADD_PARAMETER(m_beta , FE_RANGE_CLOSED(0.0, 1.0), "b")->setLongName("beta");
+    ADD_PARAMETER(m_n    , FE_RANGE_GREATER_OR_EQUAL(1.0), "n")->setLongName("exponent");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FEDamageCDFSimo::FEDamageCDFSimo(FEModel* pfem) : FEDamageCDF(pfem)
 {
+    m_alpha = 0;
+    m_beta = 0;
+    m_n = 1;
 }
 
 //-----------------------------------------------------------------------------
 // Simo damage cumulative distribution function
 // Simo, CMAME 60 (1987), 153-173
 // Simo damage cumulative distribution function
-double FEDamageCDFSimo::cdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFSimo::cdf(FEMaterialPoint& mp, const double x)
 {
     double alpha = m_alpha(mp);
     double beta = m_beta(mp);
+    double n = m_n(mp);
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
     if (alpha == 0) {
         return 0;
     }
@@ -90,19 +98,22 @@ double FEDamageCDFSimo::cdf(FEMaterialPoint& mp, const double X)
     double cdf = 0;
     
     // this CDF only admits positive values
-    if (X >= 0) {
-        if (X > 1e-12) cdf = 1 - beta - (1.0 - beta)*(1.0 - exp(-X/alpha))*alpha/X;
-        else cdf = 0.5*(1.0 - beta)/alpha*X;
+    if (X > 0) {
+        double Y = pow(X/alpha,n);
+        cdf = 1 - beta - (1.0 - beta)*(1.0 - exp(-Y))/Y;
     }
     
     return cdf;
 }
 
 // Simo damage probability density function
-double FEDamageCDFSimo::pdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFSimo::pdf(FEMaterialPoint& mp, const double x)
 {
     double alpha = m_alpha(mp);
     double beta = m_beta(mp);
+    double n = m_n(mp);
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
     if (alpha == 0) {
         return 0;
     }
@@ -110,9 +121,9 @@ double FEDamageCDFSimo::pdf(FEMaterialPoint& mp, const double X)
     double pdf = 0;
     
     // this CDF only admits positive values
-    if (X >= 0) {
-        if (X > 1e-12) pdf = (1.0 - beta)*(alpha - (alpha + X)*exp(-X/alpha))/(X*X);
-        else pdf = (1.0 - beta)/alpha*(0.5 - X/3/alpha);
+    if (X > 0) {
+        double Y = pow(X/alpha,n);
+        pdf = n*(beta-1)/Y/X*((1+Y)*exp(-Y)-1);
     }
     
     return pdf;
@@ -137,11 +148,13 @@ FEDamageCDFLogNormal::FEDamageCDFLogNormal(FEModel* pfem) : FEDamageCDF(pfem)
 
 //-----------------------------------------------------------------------------
 // Lognormal damage cumulative distribution function
-double FEDamageCDFLogNormal::cdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFLogNormal::cdf(FEMaterialPoint& mp, const double x)
 {
     double cdf = 0;
     double mu = m_mu(mp);
     double sigma = m_sigma(mp);
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
     // this CDF only admits positive values
     if (X >= 0)
         cdf = 0.5*erfc(-log(X/mu)/sigma/sqrt(2.));
@@ -150,11 +163,13 @@ double FEDamageCDFLogNormal::cdf(FEMaterialPoint& mp, const double X)
 }
 
 // Lognormal damage probability density function
-double FEDamageCDFLogNormal::pdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFLogNormal::pdf(FEMaterialPoint& mp, const double x)
 {
     double pdf = 0;
     double mu = m_mu(mp);
     double sigma = m_sigma(mp);
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
 
     // this CDF only admits positive values
     if (X > 1e-12) pdf = exp(-pow(log(X/mu)/sigma,2)/2)/(sqrt(2*M_PI)*X*sigma);
@@ -168,7 +183,6 @@ double FEDamageCDFLogNormal::pdf(FEMaterialPoint& mp, const double X)
 BEGIN_FECORE_CLASS(FEDamageCDFWeibull, FEDamageCDF)
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha");
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu");
-    ADD_PARAMETER(m_ploc, "ploc");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -177,38 +191,39 @@ FEDamageCDFWeibull::FEDamageCDFWeibull(FEModel* pfem) : FEDamageCDF(pfem)
 {
     m_alpha = 1;
     m_mu = 1;
-    m_ploc = 0;
 }
 
 //-----------------------------------------------------------------------------
 // Weibull damage cumulative distribution function
-double FEDamageCDFWeibull::cdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFWeibull::cdf(FEMaterialPoint& mp, const double x)
 {
     double cdf = 0;
     double alpha = m_alpha(mp);
     double mu = m_mu(mp);
     double ploc = m_ploc(mp);
-    
+    double X = x - ploc;
+
     // this CDF only admits positive values
-    if (X > ploc)
-        cdf = 1 - exp(-pow((X-ploc)/mu,alpha));
+    if (X > 0)
+        cdf = 1 - exp(-pow(X/mu,alpha));
     
     return cdf;
 }
 
 // Weibull damage probability density function
-double FEDamageCDFWeibull::pdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFWeibull::pdf(FEMaterialPoint& mp, const double x)
 {
     double pdf = 0;
     double alpha = m_alpha(mp);
     double mu = m_mu(mp);
     double ploc = m_ploc(mp);
+    double X = x - ploc;
 
     // this CDF only admits positive values
-    if ((alpha > 1) && (X > ploc))
-        pdf = exp(-pow((X-ploc)/mu,alpha))*alpha*pow(X-ploc, alpha-1)/pow(mu, alpha);
-    else if ((alpha == 1) && (X > ploc))
-        pdf = exp(-(X-ploc)/mu)/mu;
+    if ((alpha > 1) && (X > 0))
+        pdf = exp(-pow(X/mu,alpha))*alpha*pow(X, alpha-1)/pow(mu, alpha);
+    else if ((alpha == 1) && (X > 0))
+        pdf = exp(-X/mu)/mu;
     
     return pdf;
 }
@@ -230,11 +245,13 @@ FEDamageCDFStep::FEDamageCDFStep(FEModel* pfem) : FEDamageCDF(pfem)
 //-----------------------------------------------------------------------------
 // Step cumulative distribution function (sudden fracture)
 // Step damage cumulative distribution function
-double FEDamageCDFStep::cdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFStep::cdf(FEMaterialPoint& mp, const double x)
 {
     double cdf = 0;
     double mu = m_mu(mp);
-    
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
+
     // this CDF only admits positive values
     if (X > mu)
         cdf = 1.0;
@@ -243,10 +260,12 @@ double FEDamageCDFStep::cdf(FEMaterialPoint& mp, const double X)
 }
 
 // Step damage probability density function
-double FEDamageCDFStep::pdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFStep::pdf(FEMaterialPoint& mp, const double x)
 {
     double pdf = 0;
     double mu = m_mu(mp);
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
 
     // this PDF only admits positive values
     if (X == mu) pdf = 1.0;
@@ -279,11 +298,13 @@ bool FEDamageCDFPQP::Validate()
 
 //-----------------------------------------------------------------------------
 // Piecewise S-shaped quintic polynomial damage cumulative distribution function
-double FEDamageCDFPQP::cdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFPQP::cdf(FEMaterialPoint& mp, const double x)
 {
     double cdf = 0;
     double mumin = m_mumin(mp);
     double mumax = m_mumax(mp);
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
 
     if (X <= mumin) cdf = 0;
     else if (X >= mumax) cdf = 1;
@@ -297,11 +318,13 @@ double FEDamageCDFPQP::cdf(FEMaterialPoint& mp, const double X)
 }
 
 // Piecewise S-shaped quintic polynomial damage probability density function
-double FEDamageCDFPQP::pdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFPQP::pdf(FEMaterialPoint& mp, const double x)
 {
     double pdf = 0;
     double mumin = m_mumin(mp);
     double mumax = m_mumax(mp);
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
 
     if (X <= mumin) pdf = 0;
     else if (X >= mumax) pdf = 0;
@@ -332,12 +355,14 @@ FEDamageCDFGamma::FEDamageCDFGamma(FEModel* pfem) : FEDamageCDF(pfem)
 
 //-----------------------------------------------------------------------------
 // Gamma damage cumulative distribution function
-double FEDamageCDFGamma::cdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFGamma::cdf(FEMaterialPoint& mp, const double x)
 {
     double cdf = 0;
     double alpha = m_alpha(mp);
     double mu = m_mu(mp);
-    
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
+
     // this CDF only admits positive values
     double scale = gamma_inc_Q(alpha,0);
     if (X > 0)
@@ -347,11 +372,13 @@ double FEDamageCDFGamma::cdf(FEMaterialPoint& mp, const double X)
 }
 
 // Gamma damage probability density function
-double FEDamageCDFGamma::pdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFGamma::pdf(FEMaterialPoint& mp, const double x)
 {
     double pdf = 0;
     double alpha = m_alpha(mp);
     double mu = m_mu(mp);
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
 
     // this CDF only admits positive values
     if (X > 0)
@@ -376,13 +403,17 @@ FEDamageCDFUser::FEDamageCDFUser(FEModel* pfem) : FEDamageCDF(pfem)
 
 //-----------------------------------------------------------------------------
 // User-defined loadcurve for damage cumulative distribution function
-double FEDamageCDFUser::cdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFUser::cdf(FEMaterialPoint& mp, const double x)
 {
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
     return m_cdf->value(X);
 }
 
 // Derivative of user-defined loadcurve damage probability density function
-double FEDamageCDFUser::pdf(FEMaterialPoint& mp, const double X)
+double FEDamageCDFUser::pdf(FEMaterialPoint& mp, const double x)
 {
+    double ploc = m_ploc(mp);
+    double X = x - ploc;
     return m_cdf->derive(X);
 }

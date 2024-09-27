@@ -259,6 +259,16 @@ int FEElement::GetFace(int nface, int* nf) const
 		case 4: nn = 4; nf[0] = en[3]; nf[1] = en[2]; nf[2] = en[1]; nf[3] = en[0]; break;
 		}
 		break;
+    case ET_PYRA13:
+        switch (nface)
+        {
+            case 0: nn = 6; nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[4]; nf[3] = en[5]; nf[4] = en[10]; nf[5] = en[9]; break;
+            case 1: nn = 6; nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[4]; nf[3] = en[6]; nf[4] = en[11]; nf[5] = en[10]; break;
+            case 2: nn = 6; nf[0] = en[2]; nf[1] = en[3]; nf[2] = en[4]; nf[3] = en[11]; nf[4] = en[7]; nf[5] = en[12]; break;
+            case 3: nn = 6; nf[0] = en[3]; nf[1] = en[0]; nf[2] = en[4]; nf[3] = en[8]; nf[4] = en[9]; nf[5] = en[12]; break;
+            case 4: nn = 8; nf[0] = en[3]; nf[1] = en[2]; nf[2] = en[1]; nf[3] = en[0]; nf[0] = en[7]; nf[1] = en[6]; nf[2] = en[5]; nf[3] = en[8]; break;
+        }
+        break;
 	case ET_TET4:
 	case ET_TET5:
 		nn = 3;

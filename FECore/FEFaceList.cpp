@@ -186,12 +186,28 @@ bool FEFaceList::Create(FEMesh& mesh, FEElemElemList& EEL)
 					switch (el.Shape())
 					{
 					case ET_HEX8:
+                    case ET_HEX20:
+                    case ET_HEX27:
 						se.ntype = 4;
 						break;
 					case ET_TET4:
 					case ET_TET5:
+                    case ET_TET10:
+                    case ET_TET15:
+                    case ET_TET20:
 						se.ntype = 3;
 						break;
+                    case ET_PENTA6:
+                    case ET_PENTA15:
+                        {
+                            if (j<3) se.ntype = 4;
+                            else se.ntype = 3;
+                        }
+                        break;
+                    case ET_PYRA5:
+                    case ET_PYRA13:
+                        se.ntype = 4;
+                        break;
 					default:
 						assert(false);
 					}
@@ -307,7 +323,44 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 		{ 2, 1, 0}
 	};
 
-	const int FHEX[6][4] = { 
+    const int FTET10[4][6] = {
+        { 0, 1, 3, 4, 8, 7},
+        { 1, 2, 3, 5, 9, 8},
+        { 2, 0, 3, 6, 7, 9},
+        { 2, 1, 0, 5, 4, 6}
+    };
+    
+    const int FTET15[4][7] = {
+        { 0, 1, 3, 4, 8, 7, 11},
+        { 1, 2, 3, 5, 9, 8, 12},
+        { 2, 0, 3, 6, 7, 9, 13},
+        { 2, 1, 0, 5, 4, 6, 10}
+    };
+    
+    const int FTET20[4][10] = {
+        { 0, 1, 3, 4, 5, 12, 13, 10, 11, 16},
+        { 1, 2, 3, 6, 7, 14, 15, 13, 14, 17},
+        { 2, 0, 3, 9, 8, 10, 11, 14, 15, 18},
+        { 2, 1, 0, 7, 6, 5, 4, 10, 8, 19}
+    };
+    
+    const int FPENTA6[5][4] = {
+        { 0, 1, 4, 3},
+        { 1, 2, 5, 4},
+        { 0, 3, 5, 2},
+        { 0, 2, 1, 1},
+        { 3, 4, 5, 5}
+    };
+    
+    const int FPENTA15[5][8] = {
+        { 0, 1, 4, 3, 6, 13, 9, 12},
+        { 1, 2, 5, 4, 7, 14, 10, 13},
+        { 0, 3, 5, 2, 12, 11, 14, 8},
+        { 0, 2, 1, 1, 8, 7, 6, 6},
+        { 3, 4, 5, 5, 9, 10, 11, 11}
+    };
+    
+	const int FHEX[6][4] = {
 		{ 0, 1, 5, 4 },
 		{ 1, 2, 6, 5 },
 		{ 2, 3, 7, 6 },
@@ -315,6 +368,36 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 		{ 3, 2, 1, 0 },
 		{ 4, 5, 6, 7 }};
 
+    const int FHEX20[6][8] = {
+        { 0, 1, 5, 4, 8, 17, 12, 16 },
+        { 1, 2, 6, 5, 9, 18, 13, 17 },
+        { 2, 3, 7, 6, 10, 19, 14, 18 },
+        { 3, 0, 4, 7, 11, 16, 15, 19 },
+        { 3, 2, 1, 0, 11, 10, 9, 8 },
+        { 4, 5, 6, 7, 12, 13, 14, 15 }};
+    
+    const int FHEX27[6][9] = {
+        { 0, 1, 5, 4, 8, 17, 12, 16, 20 },
+        { 1, 2, 6, 5, 9, 18, 13, 17, 21 },
+        { 2, 3, 7, 6, 10, 19, 14, 18, 22 },
+        { 3, 0, 4, 7, 11, 16, 15, 19, 23 },
+        { 3, 2, 1, 0, 11, 10, 9, 8, 24},
+        { 4, 5, 6, 7, 12, 13, 14, 15, 25}};
+    
+    const int FPYRA5[5][4] = {
+        {0, 1, 4, 4},
+        {1, 2, 4, 4},
+        {2, 3, 4, 4},
+        {3, 0, 4, 4},
+        {3, 2, 1, 0}};
+    
+    const int FPYRA13[5][8] = {
+        {0, 1, 4, 4, 5, 10, 9, 9},
+        {1, 2, 4, 4, 6, 11, 10, 10},
+        {2, 3, 4, 4, 11, 7, 12, 12},
+        {3, 0, 4, 4, 8, 9, 12, 12},
+        {3, 2, 1, 0, 7, 6, 5, 8}};
+    
 	// build a node face table for FT to facilitate searching
 	int NN = mesh.Nodes();
 	vector<vector<int> > NFT; NFT.resize(NN);
@@ -353,6 +436,101 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 				}
 			}
 		}
+        else if (el.Shape() == ET_TET10)
+        {
+            EFLi.resize(4);
+            for (int j = 0; j < 4; ++j)
+            {
+                int fj[6] = { el.m_node[FTET10[j][0]], el.m_node[FTET10[j][1]], el.m_node[FTET10[j][2]], el.m_node[FTET10[j][3]], el.m_node[FTET10[j][4]], el.m_node[FTET10[j][5]] };
+                EFLi[j] = -1;
+                vector<int>& nfi = NFT[fj[0]];
+                for (int k = 0; k<(int)nfi.size(); ++k)
+                {
+                    const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
+                    if (fk.IsEqual(fj))
+                    {
+                        EFLi[j] = nfi[k];
+                        break;
+                    }
+                }
+            }
+        }
+        else if (el.Shape() == ET_TET15)
+        {
+            EFLi.resize(4);
+            for (int j = 0; j < 4; ++j)
+            {
+                int fj[7] = { el.m_node[FTET15[j][0]], el.m_node[FTET15[j][1]], el.m_node[FTET15[j][2]], el.m_node[FTET15[j][3]], el.m_node[FTET15[j][4]], el.m_node[FTET15[j][5]], el.m_node[FTET15[j][6]] };
+                EFLi[j] = -1;
+                vector<int>& nfi = NFT[fj[0]];
+                for (int k = 0; k<(int)nfi.size(); ++k)
+                {
+                    const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
+                    if (fk.IsEqual(fj))
+                    {
+                        EFLi[j] = nfi[k];
+                        break;
+                    }
+                }
+            }
+        }
+        else if (el.Shape() == ET_TET20)
+        {
+            EFLi.resize(4);
+            for (int j = 0; j < 4; ++j)
+            {
+                int fj[10] = { el.m_node[FTET20[j][0]], el.m_node[FTET20[j][1]], el.m_node[FTET20[j][2]], el.m_node[FTET20[j][3]], el.m_node[FTET20[j][4]], el.m_node[FTET20[j][5]], el.m_node[FTET20[j][6]], el.m_node[FTET20[j][7]], el.m_node[FTET20[j][8]], el.m_node[FTET20[j][9]] };
+                EFLi[j] = -1;
+                vector<int>& nfi = NFT[fj[0]];
+                for (int k = 0; k<(int)nfi.size(); ++k)
+                {
+                    const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
+                    if (fk.IsEqual(fj))
+                    {
+                        EFLi[j] = nfi[k];
+                        break;
+                    }
+                }
+            }
+        }
+        else if (el.Shape() == ET_PENTA6)
+        {
+            EFLi.resize(5);
+            for (int j = 0; j < 5; ++j)
+            {
+                int fj[4] = { el.m_node[FPENTA6[j][0]], el.m_node[FPENTA6[j][1]], el.m_node[FPENTA6[j][2]], el.m_node[FPENTA6[j][3]] };
+                EFLi[j] = -1;
+                vector<int>& nfi = NFT[fj[0]];
+                for (int k = 0; k<(int)nfi.size(); ++k)
+                {
+                    const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
+                    if (fk.IsEqual(fj))
+                    {
+                        EFLi[j] = nfi[k];
+                        break;
+                    }
+                }
+            }
+        }
+        else if (el.Shape() == ET_PENTA15)
+        {
+            EFLi.resize(5);
+            for (int j = 0; j < 5; ++j)
+            {
+                int fj[8] = { el.m_node[FPENTA15[j][0]], el.m_node[FPENTA15[j][1]], el.m_node[FPENTA15[j][2]], el.m_node[FPENTA15[j][3]], el.m_node[FPENTA15[j][4]], el.m_node[FPENTA15[j][5]], el.m_node[FPENTA15[j][6]], el.m_node[FPENTA15[j][7]] };
+                EFLi[j] = -1;
+                vector<int>& nfi = NFT[fj[0]];
+                for (int k = 0; k<(int)nfi.size(); ++k)
+                {
+                    const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
+                    if (fk.IsEqual(fj))
+                    {
+                        EFLi[j] = nfi[k];
+                        break;
+                    }
+                }
+            }
+        }
 		else if (el.Shape() == FE_Element_Shape::ET_HEX8)
 		{
 			EFLi.resize(6);
@@ -372,6 +550,44 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 				}
 			}
 		}
+        else if (el.Shape() == FE_Element_Shape::ET_HEX20)
+        {
+            EFLi.resize(6);
+            for (int j = 0; j < 6; ++j)
+            {
+                int fj[8] = { el.m_node[FHEX20[j][0]], el.m_node[FHEX20[j][1]], el.m_node[FHEX20[j][2]], el.m_node[FHEX20[j][3]], el.m_node[FHEX20[j][4]], el.m_node[FHEX20[j][5]], el.m_node[FHEX20[j][6]], el.m_node[FHEX20[j][7]] };
+                EFLi[j] = -1;
+                vector<int>& nfi = NFT[fj[0]];
+                for (int k = 0; k<(int)nfi.size(); ++k)
+                {
+                    const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
+                    if (fk.IsEqual(fj))
+                    {
+                        EFLi[j] = nfi[k];
+                        break;
+                    }
+                }
+            }
+        }
+        else if (el.Shape() == FE_Element_Shape::ET_HEX27)
+        {
+            EFLi.resize(6);
+            for (int j = 0; j < 6; ++j)
+            {
+                int fj[9] = { el.m_node[FHEX20[j][0]], el.m_node[FHEX20[j][1]], el.m_node[FHEX20[j][2]], el.m_node[FHEX20[j][3]], el.m_node[FHEX20[j][4]], el.m_node[FHEX20[j][5]], el.m_node[FHEX20[j][6]], el.m_node[FHEX20[j][7]], el.m_node[FHEX20[j][8]] };
+                EFLi[j] = -1;
+                vector<int>& nfi = NFT[fj[0]];
+                for (int k = 0; k<(int)nfi.size(); ++k)
+                {
+                    const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
+                    if (fk.IsEqual(fj))
+                    {
+                        EFLi[j] = nfi[k];
+                        break;
+                    }
+                }
+            }
+        }
 		else if (el.Shape() == FE_Element_Shape::ET_QUAD4)
 		{
 		}

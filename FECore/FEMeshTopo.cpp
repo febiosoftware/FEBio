@@ -146,6 +146,10 @@ bool FEMeshTopo::Create(FEMesh* mesh)
 
 	// create the face-edge list
 	if (imp->m_FEL.Create(imp->m_faceList, imp->m_edgeList) == false) return false;
+    
+    // create list of element centroids
+    m_ctr.assign(Elements(), vec3d(0,0,0));
+    for (int i=0; i<Elements(); ++i) m_ctr[i] = ElementCentroid(i);
 
 	return true;
 }
@@ -370,7 +374,7 @@ vec3d FEMeshTopo::ElementCentroid(int i)
 // evaluate proximity of element i to point x
 double FEMeshTopo::Proximity(vec3d x, int i)
 {
-    double d = (x - ElementCentroid(i)).unit();
+    double d = (x - m_ctr[i]).unit();
     return d;
 }
 

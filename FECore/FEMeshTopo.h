@@ -116,4 +116,5 @@ private:
 	MeshTopoImp*	imp;
     std::vector<int>    m_EPL;      // element proximity list
     std::vector<bool>   m_vst;      // list of visited elements
+    std::vector<vec3d>  m_ctr;      // element centroids
 };

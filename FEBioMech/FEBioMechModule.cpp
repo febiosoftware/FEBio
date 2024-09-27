@@ -88,6 +88,8 @@ SOFTWARE.*/
 #include "FENeoHookeanTransIso.h"
 #include "FENewtonianViscousSolid.h"
 #include "FENewtonianViscousSolidUC.h"
+#include "FENonLocalAveraging.h"
+#include "FENonLocalKernel.h"
 #include "FEOgdenMaterial.h"
 #include "FEOgdenUnconstrained.h"
 #include "FEOrthoElastic.h"
@@ -572,11 +574,22 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
 	REGISTER_FECORE_CLASS(FEDamageCriterionOSS, "DC octahedral shear strain");
     REGISTER_FECORE_CLASS(FEDamageCriterionONS, "DC octahedral natural strain");
+//    REGISTER_FECORE_CLASS(FEDamageCriterionVMSNL, "DC nonlocal von Mises stress");
 
     // plastic flow curve (used by plastic materials)
     REGISTER_FECORE_CLASS(FEPlasticFlowCurvePaper, "PFC paper");
     REGISTER_FECORE_CLASS(FEPlasticFlowCurveUser , "PFC user");
     REGISTER_FECORE_CLASS(FEPlasticFlowCurveMath , "PFC math");
+    
+    // non-local kernels (used by damage, plastic and plastic damage materials)
+    REGISTER_FECORE_CLASS(FEKernelBell , "kernel bell");
+    REGISTER_FECORE_CLASS(FEKernelCone , "kernel cone");
+    REGISTER_FECORE_CLASS(FEKernelGauss, "kernel Gauss");
+
+    // non-local averaging (used by damage, plastic and plastic damage materials)
+    REGISTER_FECORE_CLASS(FENLABazant , "NLA Bazant");
+    REGISTER_FECORE_CLASS(FENLABorino , "NLA Borino");
+    REGISTER_FECORE_CLASS(FENLAElement, "NLA element");
 
 	// prestrain materials
 	REGISTER_FECORE_CLASS(FEPrestrainElastic, "prestrain elastic");

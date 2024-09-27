@@ -39,10 +39,10 @@ public:
 	FEShellDomain(FEModel* fem);
 
 	//! Update element data prior to solving time step
-	void PreSolveUpdate(const FETimeInfo& timeInfo);
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
 
 	//! Reset element data
-	void Reset();
+	void Reset() override;
 
 	// get a shell element
 	virtual FEShellElement& Element(int i) = 0;
@@ -61,6 +61,8 @@ public:
 	virtual bool InitShells();
 
 	virtual void AssignDefaultShellThickness() {}
+    
+    virtual void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]) {}
 
 public:
     //! get the current nodal coordinates
@@ -104,6 +106,8 @@ public:
 
 	bool InitShells() override;
 
+    void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]) override { assert(false); }
+    
 protected:
 	vector<FEShellElementOld>	m_Elem;	//!< array of elements
 };
@@ -135,6 +139,8 @@ public:
 
 	void AssignDefaultShellThickness() override;
 
+    void CoBaseVectors0(FEShellElement& el, int n, vec3d g[3]) override { assert(false); }
+    
 protected:
 	double	m_h0;
 

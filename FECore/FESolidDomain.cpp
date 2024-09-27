@@ -174,6 +174,8 @@ void FESolidDomain::Reset()
 
 		// loop over the integration points
 		int nint = el.GaussPoints();
+        double* gw = el.GaussWeights();
+        vec3d G[3];
 		for (int n = 0; n < nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
@@ -184,6 +186,10 @@ void FESolidDomain::Reset()
 
 			// material point coordinates
 			mp.m_r0 = el.Evaluate(r0, n);
+            
+            // referential element volume at this integration point
+            CoBaseVectors0(el, n, G);
+            mp.m_V0 = ((G[0] ^ G[1])*G[2])*gw[n];
 		}
 	});
 

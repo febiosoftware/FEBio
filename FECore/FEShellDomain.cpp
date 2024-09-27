@@ -52,12 +52,25 @@ void FEShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 //-----------------------------------------------------------------------------
 void FEShellDomain::Reset()
 {
-	ForEachShellElement([](FEShellElement& el) {
+    ForEachShellElement([this](FEShellElement& el) {
 		int ni = el.GaussPoints();
 		for (int j = 0; j<ni; ++j) el.GetMaterialPoint(j)->Init();
 
 		int ne = el.Nodes();
 		for (int j = 0; j<ne; ++j) el.m_ht[j] = el.m_h0[j];
+        
+        // loop over the integration points
+        int nint = el.GaussPoints();
+        double* gw = el.GaussWeights();
+        vec3d G[3];
+        for (int n = 0; n < nint; ++n)
+        {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+            
+            // referential element volume at this integration point
+            CoBaseVectors0(el, n, G);
+            mp.m_V0 = ((G[0] ^ G[1])*G[2])*gw[n];
+        }
 	});
 }
 
