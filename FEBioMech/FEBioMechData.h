@@ -1580,6 +1580,13 @@ public:
 	double value(FESurface& surface) override;
 };
 
+class FELogMaxContactGap : public FELogSurfaceData
+{
+public:
+	FELogMaxContactGap(FEModel* fem) : FELogSurfaceData(fem) {}
+	double value(FESurface& surface) override;
+};
+
 //=============================================================================
 // D O M A I N   D A T A
 //=============================================================================

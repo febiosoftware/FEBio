@@ -2263,6 +2263,35 @@ double FELogContactArea::value(FESurface& surface)
 	return 0.0;
 }
 
+double FELogMaxContactGap::value(FESurface& surface)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surface);
+	if (pcs == 0) return 0.0;
+
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		double maxGap = 0;
+		for (int i = 0; i < pcs->Elements(); ++i)
+		{
+			FESurfaceElement& el = pcs->Element(i);
+			for (int n = 0; n < el.GaussPoints(); ++n)
+			{
+				FEContactMaterialPoint* pt = dynamic_cast<FEContactMaterialPoint*>(el.GetMaterialPoint(n));
+				if (pt)
+				{
+					if (pt->m_gap > maxGap) maxGap = pt->m_gap;
+				}
+			}
+		}
+		return maxGap;
+	}
+	return 0.0;
+}
+
+
 //=============================================================================
 double FENormalizedInternalEnergy::value(FEDomain& dom)
 {
