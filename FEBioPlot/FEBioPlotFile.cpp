@@ -1575,6 +1575,8 @@ void FEBioPlotFile::WriteObject(PlotObject* po)
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Write(float ftime, int flag)
 {
+	feLogDebug("writing to plot file; time = %lg; flag = %d", ftime, flag);
+
 	FEModel& fem = *GetFEModel();
 	PlotFile::Dictionary& dic = GetDictionary();
 

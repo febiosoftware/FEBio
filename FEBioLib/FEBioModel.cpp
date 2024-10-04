@@ -637,7 +637,6 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				double time = GetTime().currentTime;
 				if (m_plot)
 				{
-					feLogDebug("writing to plot file; time = %lg; flag = %d", time, statusFlag);
 					m_plot->Write((float)time, statusFlag);
 				}
 
