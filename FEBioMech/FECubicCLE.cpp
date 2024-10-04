@@ -181,7 +181,7 @@ tens4ds FECubicCLE::Tangent(FEMaterialPoint& mp)
     for (i=0; i<3; ++i) {
         c += dyad4s(A[i], B)*mu[i];
         for (j=0; j<3; ++j) {
-            c += dyad1s(A[i],A[j])*lam[i][j];
+            c += dyad1s(A[i],A[j])*lam[i][j]/2;
         }
     }
     c /= J;
