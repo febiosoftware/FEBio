@@ -63371,7 +63371,7 @@ where
 
 Here,
  
-\begin_inset Formula ${\mathbf{E}\ensuremath{}}$
+\begin_inset Formula $\mathbf{E}$
 \end_inset
 
  is the Lagrangian strain tensor and 
@@ -75751,7 +75751,7 @@ Number of Taylor series terms
 \begin_inset Text
 
 \begin_layout Plain Layout
-Shear modulus fir fiber-matrix interaction
+Shear modulus for fiber-matrix interaction
 \end_layout
 
 \end_inset
