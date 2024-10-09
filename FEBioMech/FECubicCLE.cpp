@@ -102,9 +102,9 @@ mat3ds FECubicCLE::Stress(FEMaterialPoint& mp)
     
     int i,j;
     vec3d a0;           // texture direction in reference configuration
-    mat3ds A[3];		// texture tensor in current configuration
-    double K[3];		// Ka
-    mat3ds BmI = pt.LeftCauchyGreen() - mat3dd(1);			// B - I
+    mat3ds A0[3];		// texture tensor in reference configuration
+    double AE[3];		// E:A
+    mat3ds E = pt.Strain();
     
     mat3d F = pt.m_F;
     double J = pt.m_J;
@@ -115,23 +115,23 @@ mat3ds FECubicCLE::Stress(FEMaterialPoint& mp)
     for (i=0; i<3; i++) {	// Perform sum over all three texture directions
         // Copy the texture direction in the reference configuration to a0
         a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
-        A[i] = dyad(F*a0);
-        K[i] = 0.5*(A[i].tr() - 1);
+        A0[i] = dyad(a0);
+        AE[i] = a0*(E*a0);
     }
     
-    lam[0][0] = (K[0] >= 0) ? m_lp1 : m_lm1;
-    lam[1][1] = (K[1] >= 0) ? m_lp1 : m_lm1;
-    lam[2][2] = (K[2] >= 0) ? m_lp1 : m_lm1;
+    lam[0][0] = (AE[0] >= 0) ? m_lp1 : m_lm1;
+    lam[1][1] = (AE[1] >= 0) ? m_lp1 : m_lm1;
+    lam[2][2] = (AE[2] >= 0) ? m_lp1 : m_lm1;
     
 	mat3ds s; s.zero();
     
     for (i=0; i<3; ++i) {
-        s += (A[i]*BmI).sym()*(mu[i]);
+        s += (A0[i]*E).sym()*(mu[i]);
         for (j=0; j<3; ++j) {
-            s += A[j]*(lam[i][j]*K[i]);
+            s += A0[j]*(lam[i][j]*AE[i]);
         }
     }
-    s /= J;
+    s = (F*s*F.transpose()).sym()/J;
     
     return s;
 }
@@ -154,10 +154,10 @@ tens4ds FECubicCLE::Tangent(FEMaterialPoint& mp)
     
     int i,j;
     vec3d a0;           // texture direction in reference configuration
-    mat3ds A[3];		// texture tensor in current configuration
-    double K[3];		// Ka
-    mat3ds B = pt.LeftCauchyGreen();
-    
+    mat3ds A[3];        // texture tensor in current configuration
+    double AE[3];       // E:A
+    mat3ds E = pt.Strain();
+
     mat3d F = pt.m_F;
     double J = pt.m_J;
     
@@ -168,16 +168,17 @@ tens4ds FECubicCLE::Tangent(FEMaterialPoint& mp)
         // Copy the texture direction in the reference configuration to a0
         a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
         A[i] = dyad(F*a0);
-        K[i] = 0.5*(A[i].tr() - 1);
+        AE[i] = a0*(E*a0);
     }
     
-    lam[0][0] = (K[0] >= 0) ? m_lp1 : m_lm1;
-    lam[1][1] = (K[1] >= 0) ? m_lp1 : m_lm1;
-    lam[2][2] = (K[2] >= 0) ? m_lp1 : m_lm1;
-    
+    lam[0][0] = (AE[0] >= 0) ? m_lp1 : m_lm1;
+    lam[1][1] = (AE[1] >= 0) ? m_lp1 : m_lm1;
+    lam[2][2] = (AE[2] >= 0) ? m_lp1 : m_lm1;
+
     tens4ds c;
     c.zero();
-    
+
+    mat3ds B = pt.LeftCauchyGreen();
     for (i=0; i<3; ++i) {
         c += dyad4s(A[i], B)*mu[i];
         for (j=0; j<3; ++j) {
@@ -207,9 +208,9 @@ double FECubicCLE::StrainEnergyDensity(FEMaterialPoint& mp)
     
     int i,j;
     vec3d a0;           // texture direction in reference configuration
-    mat3ds A0;          // texture tensor in current configuration
-    double K[3], L[3];	// Ka
-    mat3ds E = (pt.RightCauchyGreen() - mat3dd(1))/2;
+    mat3ds A0;          // texture tensor in reference configuration
+    double AE[3], AE2[3];	// Ka
+    mat3ds E = pt.Strain();
     
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
@@ -218,20 +219,20 @@ double FECubicCLE::StrainEnergyDensity(FEMaterialPoint& mp)
         // Copy the texture direction in the reference configuration to a0
         a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
         A0 = dyad(a0);
-        K[i] = (A0*E).trace();
-        L[i] = (A0*E*E).trace();
+        AE[i] = a0*(E*a0);
+        AE2[i] = a0*(E*E*a0);
     }
     
-    lam[0][0] = (K[0] >= 0) ? m_lp1 : m_lm1;
-    lam[1][1] = (K[1] >= 0) ? m_lp1 : m_lm1;
-    lam[2][2] = (K[2] >= 0) ? m_lp1 : m_lm1;
+    lam[0][0] = (AE[0] >= 0) ? m_lp1 : m_lm1;
+    lam[1][1] = (AE[1] >= 0) ? m_lp1 : m_lm1;
+    lam[2][2] = (AE[2] >= 0) ? m_lp1 : m_lm1;
     
     double W = 0;
     
     for (i=0; i<3; ++i) {
-        W += L[i]*mu[i];
+        W += AE2[i]*mu[i];
         for (j=0; j<3; ++j) {
-            W += K[i]*K[j]*lam[i][j]/2;
+            W += AE[i]*AE[j]*lam[i][j]/2;
         }
     }
     
