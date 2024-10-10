@@ -181,22 +181,8 @@ bool FEFaceList::Create(FEMesh& mesh, FEElemElemList& EEL)
 				if ((pen == 0) || ((pen != 0) && (el.GetID() < pen->GetID())))
 				{
 					FACE& se = m_faceList[NF++];
-					el.GetFace(j, face);
-
-					switch (el.Shape())
-					{
-					case ET_HEX8:
-						se.ntype = 4;
-						break;
-					case ET_TET4:
-					case ET_TET5:
-						se.ntype = 3;
-						break;
-					default:
-						assert(false);
-					}
-
-					int nn = se.ntype;
+					int nn = el.GetFace(j, face);
+					se.ntype = nn;
 					for (int k = 0; k < nn; ++k)
 					{
 						se.node[k] = face[k];
@@ -246,7 +232,6 @@ void FEFaceList::BuildNeighbors()
 						}
 					}
 				}
-				assert(f.nbr[j] != -1);
 			}
 		}
 	}
@@ -315,6 +300,13 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 		{ 3, 2, 1, 0 },
 		{ 4, 5, 6, 7 }};
 
+	const int FPENTA[5][4] = {
+		{ 0, 1, 4, 3 },
+		{ 1, 2, 5, 4 },
+		{ 0, 3, 5, 2 },
+		{ 0, 2, 1, 1 },
+		{ 3, 4, 5, 5 }};
+
 	// build a node face table for FT to facilitate searching
 	int NN = mesh.Nodes();
 	vector<vector<int> > NFT; NFT.resize(NN);
@@ -362,6 +354,25 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 				EFLi[j] = -1;
 				vector<int>& nfi = NFT[fj[0]];
 				for (int k = 0; k<(int)nfi.size(); ++k)
+				{
+					const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
+					if (fk.IsEqual(fj))
+					{
+						EFLi[j] = nfi[k];
+						break;
+					}
+				}
+			}
+		}
+		else if (el.Shape() == FE_Element_Shape::ET_PENTA6)
+		{
+			EFLi.resize(5);
+			for (int j = 0; j < 5; ++j)
+			{
+				int fj[4] = { el.m_node[FPENTA[j][0]], el.m_node[FPENTA[j][1]], el.m_node[FPENTA[j][2]], el.m_node[FPENTA[j][3]] };
+				EFLi[j] = -1;
+				vector<int>& nfi = NFT[fj[0]];
+				for (int k = 0; k < (int)nfi.size(); ++k)
 				{
 					const FEFaceList::FACE& fk = faceList.Face(nfi[k]);
 					if (fk.IsEqual(fj))

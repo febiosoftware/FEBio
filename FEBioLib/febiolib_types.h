@@ -24,37 +24,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <XML/XMLReader.h>
 
-//-----------------------------------------------------------------------------
-//! FEBio error terminated during the optimization
-class FEErrorTermination{};
-
-//-----------------------------------------------------------------------------
-class FEOptimizeData;
-
-//=============================================================================
-//! Class that reads the optimization input file
-class FEOptimizeInput
-{
-public:
-	bool Input(const char* szfile, FEOptimizeData* pOpt);
-
-private:
-	void ParseTask(XMLTag& tag);
-	void ParseOptions(XMLTag& tag);
-	void ParseParameters(XMLTag& tag);
-	void ParseConstraints(XMLTag& tag);
-	void ParseObjective(XMLTag& tag);
-
-	FEDataSource* ParseDataSource(XMLTag& tag);
-
-private:
-	void ParseObjectiveDataFit(XMLTag& tag);
-	void ParseObjectiveTarget(XMLTag& tag);
-	void ParseObjectiveElementData(XMLTag& tag);
-	void ParseObjectiveNodeData(XMLTag& tag);
-
-private:
-	FEOptimizeData*	m_opt;
+struct ModelStats {
+	int		ntimeSteps = 0;		//!< total nr of time steps
+	int		ntotalIters = 0;	//!< total nr of equilibrium iterations
+	int		ntotalRHS = 0;		//!< total nr of right hand side evaluations
+	int		ntotalReforms = 0;	//!< total nr of stiffness reformations
 };
+
+struct TimingInfo {
+	double total_time;
+	double input_time;
+	double init_time;
+	double solve_time;
+	double io_time;
+	double total_ls_factor;
+	double total_ls_backsolve;
+	double total_reform;
+	double total_stiff;
+	double total_rhs;
+	double total_update;
+	double total_qn;
+	double total_serialize;
+	double total_callback;
+	double total_other;
+};
+

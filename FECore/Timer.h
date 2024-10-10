@@ -51,7 +51,12 @@ public:
 	//! Stop the timer
 	void stop();
 
-	//! Reset the timer
+	//! pause the timer
+	void pause();
+
+	//! continue
+	void unpause();
+
 	void reset();
 
 	//! Get the elapsed time
@@ -59,6 +64,9 @@ public:
 
 	//! Get the time in seconds
 	double GetTime();
+
+	//! Get the exclusive time (i.e. time when not paused)
+	double GetExclusiveTime();
 
 	//! return the time as a text string
 	void time_str(char* sz);
@@ -72,6 +80,7 @@ public:
 public:
 	static void time_str(double fsec, char* sz);
 	static void GetTime(double fsec, int& nhour, int& nmin, int& nsec);
+	static Timer* activeTimer();
 
 private:
 	Imp*	m;	//!< local timing data (using PIMPL ididom)
@@ -83,13 +92,22 @@ class FEModel;
 //-----------------------------------------------------------------------------
 // Timer IDs
 enum TimerID {
+	Timer_Init,
 	Timer_Update,
-	Timer_LinSolve,
+	Timer_LinSol_Factor,
+	Timer_LinSol_Backsolve,
 	Timer_Reform,
 	Timer_Residual,
 	Timer_Stiffness,
 	Timer_QNUpdate,
-	Timer_ModelSolve
+	Timer_Serialize,
+	Timer_ModelSolve,
+	Timer_Callback,
+	Timer_USER1,
+	Timer_USER2,
+	Timer_USER3,
+	Timer_USER4,
+	TIMER_COUNT // leave this at the end so that it equals the nr. of timers we need
 };
 
 //-----------------------------------------------------------------------------
@@ -102,8 +120,12 @@ class FECORE_API TimerTracker
 {
 public:
 	TimerTracker(FEModel* fem, int timerId);
-	TimerTracker(Timer* timer);
-	~TimerTracker();
+	TimerTracker(Timer* timer)
+	{
+		if (timer && !timer->isRunning()) { m_timer = timer; timer->start(); }
+		else m_timer = nullptr;
+	}
+	~TimerTracker() { if (m_timer) m_timer->stop(); }
 
 private:
 	Timer*	m_timer;

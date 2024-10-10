@@ -996,11 +996,25 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Damage (fraction of broken bonds))
-class FELogDamage : public FELogElemData
+class FELogDamage_ : public FELogElemData
 {
 public:
-    FELogDamage(FEModel* pfem) : FELogElemData(pfem){}
-    double value(FEElement& el);
+	FELogDamage_(FEModel* pfem, int comp = -1) : FELogElemData(pfem), m_comp(comp) {}
+	double value(FEElement& el);
+private:
+	int m_comp;
+};
+
+class FELogDamage : public FELogDamage_
+{
+public:
+	FELogDamage(FEModel* pfem) : FELogDamage_(pfem, -1) {}
+};
+
+template <int n> class FELogDamage_n : public FELogDamage_
+{
+public:
+	FELogDamage_n(FEModel* fem) : FELogDamage_(fem, n) {}
 };
 
 //-----------------------------------------------------------------------------
@@ -1563,6 +1577,13 @@ class FELogContactArea : public FELogSurfaceData
 {
 public:
 	FELogContactArea(FEModel* fem) : FELogSurfaceData(fem) {}
+	double value(FESurface& surface) override;
+};
+
+class FELogMaxContactGap : public FELogSurfaceData
+{
+public:
+	FELogMaxContactGap(FEModel* fem) : FELogSurfaceData(fem) {}
 	double value(FESurface& surface) override;
 };
 

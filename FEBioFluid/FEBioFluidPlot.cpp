@@ -778,8 +778,8 @@ public:
         for (int j = 0; j<NBL; ++j)
         {
             FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem->ModelLoad(j));
-            FEMaterialPoint pt(mp);
-            if (pbf && pbf->IsActive()) bf += pbf->force(pt);
+			FEMaterialPoint& pt = const_cast<FEMaterialPoint&>(mp);
+			if (pbf && pbf->IsActive()) bf += pbf->force(pt);
         }
 		// FEBio actually applies the negative of the body force
         return -bf;

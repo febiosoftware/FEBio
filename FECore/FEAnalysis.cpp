@@ -357,6 +357,7 @@ void FEAnalysis::Deactivate()
 // initialize the solver
 bool FEAnalysis::InitSolver()
 {
+	TRACK_TIME(TimerID::Timer_Init);
 	FEModel& fem = *GetFEModel();
 
 	// initialize equations

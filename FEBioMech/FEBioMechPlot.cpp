@@ -799,37 +799,15 @@ public:
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 {
-	if (dynamic_cast<FELinearTrussDomain*>(&dom))
-	{
-		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
-			const FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			return pt.m_s;
-		});
-		return true;
-	}
-
-	if (dynamic_cast<FEElasticBeamDomain*>(&dom))
-	{
-		writeAverageElementValue<mat3ds>(dom, a, [](const FEMaterialPoint& mp) {
-			const FEElasticBeamMaterialPoint& pt = *mp.ExtractData<FEElasticBeamMaterialPoint>();
-			mat3d Q = pt.m_Q;
-			vec3d E1 = Q.col(0);
-			vec3d E2 = Q.col(1);
-			vec3d E3 = Q.col(2);
-			quatd Rt = pt.m_Rt;
-			vec3d t1 = Rt * E1;
-			vec3d t2 = Rt * E2;
-			vec3d t3 = Rt * E3;
-			vec3d t = pt.m_t;
-			return (dyad(t1)*(t*t1) + dyad(t2)*(t*t2) + dyad(t3)*(t*t3));
-			});
-		return true;
-	}
-
+	FEDomainParameter* var = nullptr;
 	FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
-	if ((pme == 0) || pme->IsRigid()) return false;
+	if (pme)
+	{
+		if (!pme->IsRigid())
+			var = pme->FindDomainParameter("stress");
+	}
+	else var = dom.GetMaterial()->FindDomainParameter("stress");
 
-	FEDomainParameter* var = pme->FindDomainParameter("stress");
 	if (var == nullptr) return false;
 
 	writeAverageElementValue<mat3ds>(dom, a, var);
@@ -1110,7 +1088,7 @@ public:
 	double operator()(const FEMaterialPoint& mp)
 	{
         if (dynamic_cast<FERemodelingInterface*>(m_mat) == 0) return 0;
-        FEMaterialPoint lmp(mp);
+		FEMaterialPoint& lmp = const_cast<FEMaterialPoint&>(mp);
 		FERemodelingMaterialPoint* rpt = lmp.ExtractData<FERemodelingMaterialPoint>();
         if (rpt == nullptr) {
             FEMaterialPoint* pt = lmp.ExtractData<FEElasticMixtureMaterialPoint>()->GetPointData(m_comp);
@@ -2724,7 +2702,7 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
         {
             FEElement& el = dom.ElementRef(i);
 
-            float D = 0.0;
+            double D = 0.0;
             for (int n = 0; n < el.GaussPoints(); ++n)
             {
                 FEMaterialPoint& mp = *el.GetMaterialPoint(n);
@@ -4732,29 +4710,6 @@ bool FEPlotIdealGasPressure::Save(FESurface& surf, FEDataStream& a)
 	else return false;
 }
 
-class FEFluidBodyForce
-{
-public:
-	FEFluidBodyForce(FEModel* fem, FESolidDomain& dom) : m_fem(fem), m_dom(dom) {}
-
-	vec3d operator()(const FEMaterialPoint& mp)
-	{
-		int NBL = m_fem->ModelLoads();
-		vec3d bf(0, 0, 0);
-		for (int j = 0; j < NBL; ++j)
-		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem->ModelLoad(j));
-			FEMaterialPoint pt(mp);
-			if (pbf && pbf->IsActive()) bf += pbf->force(pt);
-		}
-		return bf;
-	}
-
-private:
-	FESolidDomain& m_dom;
-	FEModel* m_fem;
-};
-
 bool FEPlotBodyForce::Save(FEDomain& dom, FEDataStream& a)
 {
 	if (dom.Class() == FE_DOMAIN_SOLID)
@@ -4767,7 +4722,7 @@ bool FEPlotBodyForce::Save(FEDomain& dom, FEDataStream& a)
 			for (int j = 0; j < NBL; ++j)
 			{
 				FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem->ModelLoad(j));
-				FEMaterialPoint pt(mp);
+				FEMaterialPoint& pt = const_cast<FEMaterialPoint&>(mp);
 				if (pbf && pbf->IsActive()) bf += pbf->force(pt);
 			}
 

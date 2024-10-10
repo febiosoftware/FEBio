@@ -85,6 +85,8 @@ public:
 	//! return a parameter
 	virtual FEParam* FindParameter(const ParamString& s) override;
 
+	virtual FEParamValue GetParameterValue(const ParamString& paramString);
+
 	//! return the property (or this) that owns a parameter
 	FECoreBase* FindParameterOwner(void* pd);
 

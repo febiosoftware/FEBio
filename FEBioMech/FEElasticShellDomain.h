@@ -30,10 +30,11 @@ SOFTWARE.*/
 #include "FESSIShellDomain.h"
 #include "FEElasticDomain.h"
 #include "FESolidMaterial.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements
-class FEElasticShellDomain : public FESSIShellDomain, public FEElasticDomain
+class FEBIOMECH_API FEElasticShellDomain : public FESSIShellDomain, public FEElasticDomain
 {
 public:
 	FEElasticShellDomain(FEModel* pfem);

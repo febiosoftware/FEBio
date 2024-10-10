@@ -24,37 +24,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <XML/XMLReader.h>
+#include <FECore/FENodalLoad.h>
+#include "febiomech_api.h"
 
-//-----------------------------------------------------------------------------
-//! FEBio error terminated during the optimization
-class FEErrorTermination{};
-
-//-----------------------------------------------------------------------------
-class FEOptimizeData;
-
-//=============================================================================
-//! Class that reads the optimization input file
-class FEOptimizeInput
+class FEBIOMECH_API FENodalTargetForce : public FENodalLoad
 {
 public:
-	bool Input(const char* szfile, FEOptimizeData* pOpt);
+	FENodalTargetForce(FEModel* fem);
+
+	void Activate() override;
+
+protected: // required functions of FENodalLoad
+
+	// Set the dof list
+	bool SetDofList(FEDofList& dofList) override;
+
+	// get the nodal values
+	void GetNodalValues(int inode, std::vector<double>& val) override;
 
 private:
-	void ParseTask(XMLTag& tag);
-	void ParseOptions(XMLTag& tag);
-	void ParseParameters(XMLTag& tag);
-	void ParseConstraints(XMLTag& tag);
-	void ParseObjective(XMLTag& tag);
+	double			m_w;
+	FEParamVec3		m_f;
+	bool			m_shellBottom;
 
-	FEDataSource* ParseDataSource(XMLTag& tag);
-
-private:
-	void ParseObjectiveDataFit(XMLTag& tag);
-	void ParseObjectiveTarget(XMLTag& tag);
-	void ParseObjectiveElementData(XMLTag& tag);
-	void ParseObjectiveNodeData(XMLTag& tag);
-
-private:
-	FEOptimizeData*	m_opt;
+	DECLARE_FECORE_CLASS();
 };
+

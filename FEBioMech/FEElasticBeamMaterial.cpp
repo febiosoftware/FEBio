@@ -65,6 +65,8 @@ FEElasticBeamMaterial::FEElasticBeamMaterial(FEModel* fem) : FEMaterial(fem)
 	m_A = m_A1 = m_A2 = 0.0;
 	m_G = m_E = 0.0;
 	m_I1 = m_I2 = 0;
+
+	AddDomainParameter(new FEBeamStress());
 }
 
 void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
@@ -84,6 +86,16 @@ void FEElasticBeamMaterial::Stress(FEElasticBeamMaterialPoint& mp)
 	quatd R = mp.m_Rt;
 	mp.m_t = R * N;
 	mp.m_m = R * M;
+
+	// Cauchy stress
+	vec3d E1 = Q.col(0);
+	vec3d E2 = Q.col(1);
+	vec3d E3 = Q.col(2);
+	vec3d t1 = R * E1;
+	vec3d t2 = R * E2;
+	vec3d t3 = R * E3;
+	vec3d t = mp.m_t;
+	mp.m_s = (dyad(t1) * (t * t1) + dyad(t2) * (t * t2) + dyad(t3) * (t * t3));
 }
 
 void FEElasticBeamMaterial::Tangent(FEElasticBeamMaterialPoint& mp, matrix& C)
@@ -115,4 +127,12 @@ void FEElasticBeamMaterial::Tangent(FEElasticBeamMaterialPoint& mp, matrix& C)
 FEMaterialPointData* FEElasticBeamMaterial::CreateMaterialPointData()
 {
 	return new FEElasticBeamMaterialPoint();
+}
+
+FEBeamStress::FEBeamStress() : FEDomainParameter("stress") {}
+
+FEParamValue FEBeamStress::value(FEMaterialPoint& mp)
+{
+	FEElasticBeamMaterialPoint& pt = *mp.ExtractData<FEElasticBeamMaterialPoint>();
+	return pt.m_s;
 }

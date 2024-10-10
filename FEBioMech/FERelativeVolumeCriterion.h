@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2024 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,38 +23,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include <XML/XMLReader.h>
+#include <FECore/FEMeshAdaptorCriterion.h>
+#include "FEDamageMaterial.h"
 
-//-----------------------------------------------------------------------------
-//! FEBio error terminated during the optimization
-class FEErrorTermination{};
-
-//-----------------------------------------------------------------------------
-class FEOptimizeData;
-
-//=============================================================================
-//! Class that reads the optimization input file
-class FEOptimizeInput
+class FERelativeVolumeCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	bool Input(const char* szfile, FEOptimizeData* pOpt);
+	FERelativeVolumeCriterion(FEModel* fem);
 
-private:
-	void ParseTask(XMLTag& tag);
-	void ParseOptions(XMLTag& tag);
-	void ParseParameters(XMLTag& tag);
-	void ParseConstraints(XMLTag& tag);
-	void ParseObjective(XMLTag& tag);
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
 
-	FEDataSource* ParseDataSource(XMLTag& tag);
-
-private:
-	void ParseObjectiveDataFit(XMLTag& tag);
-	void ParseObjectiveTarget(XMLTag& tag);
-	void ParseObjectiveElementData(XMLTag& tag);
-	void ParseObjectiveNodeData(XMLTag& tag);
-
-private:
-	FEOptimizeData*	m_opt;
+	DECLARE_FECORE_CLASS()
 };

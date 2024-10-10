@@ -23,38 +23,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <XML/XMLReader.h>
 
-//-----------------------------------------------------------------------------
-//! FEBio error terminated during the optimization
-class FEErrorTermination{};
 
-//-----------------------------------------------------------------------------
-class FEOptimizeData;
 
-//=============================================================================
-//! Class that reads the optimization input file
-class FEOptimizeInput
+#include "stdafx.h"
+#include "FERelativeVolumeCriterion.h"
+#include "FEElasticMaterial.h"
+
+BEGIN_FECORE_CLASS(FERelativeVolumeCriterion, FEMeshAdaptorCriterion)
+END_FECORE_CLASS();
+
+FERelativeVolumeCriterion::FERelativeVolumeCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-public:
-	bool Input(const char* szfile, FEOptimizeData* pOpt);
+}
 
-private:
-	void ParseTask(XMLTag& tag);
-	void ParseOptions(XMLTag& tag);
-	void ParseParameters(XMLTag& tag);
-	void ParseConstraints(XMLTag& tag);
-	void ParseObjective(XMLTag& tag);
+bool FERelativeVolumeCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
+{
+	FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
+	if (ep == nullptr) return false;
 
-	FEDataSource* ParseDataSource(XMLTag& tag);
-
-private:
-	void ParseObjectiveDataFit(XMLTag& tag);
-	void ParseObjectiveTarget(XMLTag& tag);
-	void ParseObjectiveElementData(XMLTag& tag);
-	void ParseObjectiveNodeData(XMLTag& tag);
-
-private:
-	FEOptimizeData*	m_opt;
-};
+	// evaluate the relative volume at this point
+	value = ep->m_J;
+	return true;
+}
