@@ -88,18 +88,20 @@ FEMeshAdaptorSelection FEMeshAdaptorCriterion::GetElementSelection(FEElementSet*
 
 bool FEMeshAdaptorCriterion::GetElementValue(FEElement& el, double& value)
 {
-	bool bvalid = true;
 	value = 0.0;
-	int ni = el.GaussPoints();
+	int ni = el.GaussPoints(), nv = 0;
 	for (int i = 0; i < ni; ++i)
 	{
 		double vali = 0.0;
 		bool b = GetMaterialPointValue(*el.GetMaterialPoint(i), vali);
-		if (b) value += vali;
-		bvalid = (bvalid && b);
+		if (b) { value += vali; nv++; }
 	}
-	value /= (double)ni;
-	return bvalid;
+	if (nv > 0)
+	{
+		value /= (double)nv;
+		return true;
+	}
+	else return false;
 }
 
 bool FEMeshAdaptorCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& elemVal)
