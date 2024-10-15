@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEInitialCondition.h"
 #include "FECorePlot.h"
 #include "FESurfaceToSurfaceMap.h"
+#include "FESurfaceToSurfaceVectorMap.h"
 #include "FEParabolicMap.h"
 #include "FEDataMathGenerator.h"
 #include "FEPointFunction.h"
@@ -134,6 +135,7 @@ REGISTER_FECORE_CLASS(FEMathFunction  , "math");
 // data generators
 REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
 REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
+REGISTER_FECORE_CLASS(FESurfaceToSurfaceVectorMap, "surface-to-surface vector");
 REGISTER_FECORE_CLASS(FEParabolicMap       , "parabolic map");
 
 // scalar valuators
