@@ -780,7 +780,7 @@ void FEFacet2FacetSliding::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 	FEMesh* pm = m_ss.GetMesh();
 
 	// see how many reformations we've had to do so far
-	int nref = LS.GetSolver()->m_nref;
+	int nref = GetSolver()->m_nref;
 
 	// get the "size" of the model
 	// We need this to scale the insertion distance

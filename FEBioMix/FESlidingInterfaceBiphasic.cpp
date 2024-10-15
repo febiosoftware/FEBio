@@ -1590,7 +1590,7 @@ void FESlidingInterfaceBiphasic::LoadVector(FEGlobalVector& R, const FETimeInfo&
 void FESlidingInterfaceBiphasic::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     // see how many reformations we've had to do so far
-    int nref = LS.GetSolver()->m_nref;
+    int nref = GetSolver()->m_nref;
     
     const int MN = FEElement::MAX_NODES;
     

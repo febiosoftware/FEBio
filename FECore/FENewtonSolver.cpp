@@ -1123,7 +1123,7 @@ void FENewtonSolver::UpdateModel()
 bool FENewtonSolver::StiffnessMatrix()
 {
 	// setup the linear system
-	FELinearSystem LS(this, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
+	FELinearSystem LS(GetFEModel(), *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
 
 	// build the stiffness matrix
 	return StiffnessMatrix(LS);
