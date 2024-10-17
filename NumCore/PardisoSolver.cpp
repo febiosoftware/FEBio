@@ -159,6 +159,11 @@ bool PardisoSolver::PreProcess()
 	assert(m_isFactored == false);
 	pardisoinit(m_pt, &m_mtype, m_iparm);
 
+	// Turn off reporting the number of non-zero elements in the factors.
+	// According to the documentation turning this on (set to -1) will 
+	// increase the reordering time.
+	m_iparm[18] = 0; 
+
 	m_n = m_pA->Rows();
 	m_nnz = m_pA->NonZeroes();
 	m_nrhs = 1;
