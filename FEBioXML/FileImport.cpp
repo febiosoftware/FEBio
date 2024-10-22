@@ -1481,6 +1481,14 @@ FEModel* FEFileImport::GetFEModel()
 }
 
 //-----------------------------------------------------------------------------
+//! set a custom model builder 
+void FEFileImport::SetModelBuilder(FEModelBuilder* modelBuilder)
+{
+	delete m_builder;
+	m_builder = modelBuilder;
+}
+
+//-----------------------------------------------------------------------------
 //! Get the model builder
 FEModelBuilder* FEFileImport::GetBuilder()
 {
