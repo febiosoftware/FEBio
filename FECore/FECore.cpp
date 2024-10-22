@@ -65,6 +65,7 @@ SOFTWARE.*/
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
 #include "FELogSolutionNorm.h"
+#include "FELogElemMath.h"
 #include "LUSolver.h"
 #include "FETimeStepController.h"
 #include "FEModifiedNewtonStrategy.h"
@@ -201,6 +202,7 @@ REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 REGISTER_FECORE_CLASS(FELogIntegralDomainData, "integrate");
 REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
 REGISTER_FECORE_CLASS(FELogFaceArea    , "facet area");
+REGISTER_FECORE_CLASS(FELogElemMath    , "_math", FECORE_EXPERIMENTAL);
 
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");

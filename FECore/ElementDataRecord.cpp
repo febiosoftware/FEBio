@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FEModel.h"
 #include "FEDomain.h"
+#include "FELogElemMath.h"
 
 //-----------------------------------------------------------------------------
 FELogElemData::FELogElemData(FEModel* fem) : FELogData(fem) {}
@@ -56,7 +57,21 @@ void ElementDataRecord::SetData(const char *szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FELogElemData* pdata = fecore_new<FELogElemData>(sz, GetFEModel());
+		FELogElemData* pdata = nullptr;
+		if (sz && sz[0] == '=')
+		{
+			FELogElemMath* logMath = fecore_alloc(FELogElemMath, GetFEModel());
+			if (logMath)
+			{
+				string smath(sz + 1);
+				if (logMath->SetExpression(smath))
+				{
+					pdata = logMath;
+				}
+			}
+		}
+		else
+			pdata = fecore_new<FELogElemData>(sz, GetFEModel());
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;
