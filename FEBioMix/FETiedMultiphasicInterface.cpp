@@ -1073,7 +1073,7 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
     FEModel& fem = *GetFEModel();
     
     // see how many reformations we've had to do so far
-    int nref = LS.GetSolver()->m_nref;
+    int nref = GetSolver()->m_nref;
     
     // set higher order stiffness mutliplier
     // NOTE: this algorithm doesn't really need this

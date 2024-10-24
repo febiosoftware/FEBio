@@ -35,6 +35,8 @@ SOFTWARE.*/
 #include "FEOptimizeInput.h"
 #include <FECore/log.h>
 #include <FEBioXML/xmltool.h>
+#include <FECore/FELogElemMath.h>
+#include <FECore/FECoreKernel.h>
 
 //=============================================================================
 // FEOptimizeInput
@@ -283,7 +285,22 @@ void FEOptimizeInput::ParseObjectiveTarget(XMLTag& tag)
 						elset = mesh.FindElementSet(szset);
 						if (elset == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set");
 
-						pdata = fecore_new<FELogElemData>(szdata, &fem);
+						// try to allocate the element data record
+						if (szdata && (szdata[0] == '='))
+						{
+							FELogElemMath* logMath = fecore_alloc(FELogElemMath, &fem);
+							if (logMath)
+							{
+								string smath(szdata + 1);
+								if (logMath->SetExpression(smath))
+								{
+									pdata = logMath;
+								}
+							}
+						}
+						else
+							pdata = fecore_new<FELogElemData>(szdata, &fem);
+
 						if (pdata == nullptr) throw XMLReader::InvalidAttributeValue(tag, "data");
 					}
 					else if (tag == "target") tag.value(target);
@@ -313,7 +330,22 @@ void FEOptimizeInput::ParseObjectiveElementData(XMLTag& tag)
 			const char* sztype = tag.AttributeValue("type");
 
 			// try to allocate the element data record
-			FELogElemData* var = fecore_new<FELogElemData>(sztype, &fem);
+			FELogElemData* var = nullptr;
+			if (sztype && (sztype[0]=='='))
+			{
+				FELogElemMath* logMath = fecore_alloc(FELogElemMath, &fem);
+				if (logMath)
+				{
+					string smath(sztype + 1);
+					if (logMath->SetExpression(smath))
+					{
+						var = logMath;
+					}
+				}
+			}
+			else
+				var = fecore_new<FELogElemData>(sztype, &fem);
+
 			if (var == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 			obj->SetVariable(var);
@@ -457,7 +489,7 @@ FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag)
 	}
 	else if (strcmp(sztype, "filter_sum") == 0)
 	{
-		FEDataFilterSum* flt = new FEDataFilterSum(&fem);
+		FEDataSource* flt = nullptr;
 
 		++tag;
 		do
@@ -473,7 +505,39 @@ FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag)
 				FELogNodeData* nodeData = fecore_new<FELogNodeData>(szdata, &fem);
 				if (nodeData == nullptr) throw XMLReader::InvalidAttributeValue(tag, "data", szdata);
 
-				flt->SetData(nodeData, nodeSet);
+				FENodeDataFilterSum* dataFlt = new FENodeDataFilterSum(&fem);
+				dataFlt->SetData(nodeData, nodeSet);
+				flt = dataFlt;
+			}
+			else if (tag == "element_data")
+			{
+				const char* szdata = tag.AttributeValue("data");
+				const char* szset = tag.AttributeValue("elem_set");
+
+				FEElementSet* elemSet = mesh.FindElementSet(szset);
+				if (elemSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szset);
+
+				FELogElemData* elemData = nullptr;
+				if (szdata && (szdata[0] == '='))
+				{
+					FELogElemMath* logMath = fecore_alloc(FELogElemMath, &fem);
+					if (logMath)
+					{
+						string smath(szdata + 1);
+						if (logMath->SetExpression(smath))
+						{
+							elemData = logMath;
+						}
+					}
+				}
+				else
+					elemData = fecore_new<FELogElemData>(szdata, &fem);
+
+				if (elemData == nullptr) throw XMLReader::InvalidAttributeValue(tag, "data", szdata);
+
+				FEElemDataFilterSum* dataFlt = new FEElemDataFilterSum(&fem);
+				dataFlt->SetData(elemData, elemSet);
+				flt = dataFlt;
 			}
 			++tag;
 		}

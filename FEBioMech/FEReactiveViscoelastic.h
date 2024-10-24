@@ -61,6 +61,8 @@ public:
     //! data initialization
     bool Init() override;
     
+	void Serialize(DumpStream& ar) override;
+
 	//! stress function
 	mat3ds Stress(FEMaterialPoint& pt) override;
     mat3ds StressStrongBonds(FEMaterialPoint& pt);
@@ -105,7 +107,7 @@ public:
     
     //! evaluate scalar strain measure (same type as trigger strain for bond breaking)
     double ScalarStrain(FEMaterialPoint& mp);
-    
+
 private:
 	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material for strong bonds
 	FEElasticMaterial*	m_pBond;	//!< pointer to elastic solid material for reactive bonds

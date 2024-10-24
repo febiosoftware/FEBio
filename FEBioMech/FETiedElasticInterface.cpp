@@ -693,7 +693,7 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
     FEElementMatrix ke;
     
     // see how many reformations we've had to do so far
-    int nref = LS.GetSolver()->m_nref;
+    int nref = GetSolver()->m_nref;
     
     // set higher order stiffness mutliplier
     // NOTE: this algrotihm doesn't really need this

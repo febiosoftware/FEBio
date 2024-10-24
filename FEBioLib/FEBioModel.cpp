@@ -190,7 +190,6 @@ ModelStats FEBioModel::GetModelStats() const
 
 ModelStats FEBioModel::GetStepStats(size_t n) const
 {
-	assert((n >= 0) && (n < Steps()));
 	return m_stepStats[n];
 }
 
@@ -1336,6 +1335,28 @@ void FEBioModel::Serialize(DumpStream& ar)
 
 		// --- Save IO Data
 		SerializeIOData(ar);
+
+		if (ar.IsSaving())
+		{
+			int n = (int)m_stepStats.size();
+			ar << n;
+			for (ModelStats& s : m_stepStats)
+			{
+				ar << s.ntimeSteps << s.ntotalIters << s.ntotalReforms << s.ntotalRHS;
+			}
+		}
+		else
+		{
+			m_stepStats.clear();
+			int n = 0;
+			ar >> n;
+			for (int i = 0; i < n; ++i)
+			{
+				ModelStats s;
+				ar >> s.ntimeSteps >> s.ntotalIters >> s.ntotalReforms >> s.ntotalRHS;
+				m_stepStats.push_back(s);
+			}
+		}
 	}
 }
 
@@ -1546,7 +1567,7 @@ bool FEBioModel::Init()
 	}
 
 	m_report.clear();
-	m_stepStats.resize(Steps());
+	m_stepStats.clear();
 
 	FEBioPlotFile* pplt = nullptr;
 	m_lastUpdate = -1;
@@ -1640,6 +1661,9 @@ bool FEBioModel::InitLogFile()
 
 bool FEBioModel::Solve()
 {
+	// The total time is usually started on calling Input,
+	// however, in a restart Input is not called, so we start it here.
+	if (!m_TotalTime.isRunning()) m_TotalTime.start();
 	bool b = FEModel::Solve();
 	m_TotalTime.stop();
 	return b;
@@ -1693,13 +1717,7 @@ bool FEBioModel::Reset()
 	m_modelStats.ntotalIters = 0;
 	m_modelStats.ntotalRHS = 0;
 	m_modelStats.ntotalReforms = 0;
-	for (auto& s : m_stepStats)
-	{
-		s.ntimeSteps = 0;
-		s.ntotalIters = 0;
-		s.ntotalRHS = 0;
-		s.ntotalReforms = 0;
-	}
+	m_stepStats.clear();
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -1860,7 +1878,7 @@ void FEBioModel::on_cb_stepSolved()
 	stats.ntotalIters   = step->m_ntotiter;
 	stats.ntotalRHS     = step->m_ntotrhs;
 	stats.ntotalReforms = step->m_ntotref;
-	m_stepStats[GetCurrentStepIndex()] = stats;
+	m_stepStats.push_back(stats);
 	m_modelStats.ntimeSteps    += stats.ntimeSteps;
 	m_modelStats.ntotalIters   += stats.ntotalIters;
 	m_modelStats.ntotalRHS     += stats.ntotalRHS;

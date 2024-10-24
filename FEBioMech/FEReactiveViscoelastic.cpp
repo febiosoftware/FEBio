@@ -762,3 +762,9 @@ double FEReactiveViscoelasticMaterial::Damage(FEMaterialPoint& mp)
     }
     return D;
 }
+
+void FEReactiveViscoelasticMaterial::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	ar & m_nmax;
+}

@@ -1226,14 +1226,14 @@ bool FEModel::Solve()
 			// solve the analaysis step
 			bok = m_imp->m_pStep->Solve();
 
+			// do callbacks
+			DoCallback(CB_STEP_SOLVED);
+
 			if (nstep + 1 == Steps())
 			{
 				// set the solved flag
 				m_imp->m_bsolved = bok;
 			}
-
-			// do callbacks
-			DoCallback(CB_STEP_SOLVED);
 
 			// wrap it up
 			m_imp->m_pStep->Deactivate();

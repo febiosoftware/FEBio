@@ -23,33 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
 #pragma once
+#include "ElementDataRecord.h"
+#include "MathObject.h"
+#include <string>
+#include "fecore_api.h"
 
-#include <FECore/FELinearSystem.h>
-#include "febiomech_api.h"
-
-class FERigidSolver;
-
-class FEBIOMECH_API FESolidLinearSystem : public FELinearSystem
+class FECORE_API FELogElemMath : public FELogElemData
 {
 public:
-	FESolidLinearSystem(FEModel* fem, FERigidSolver* rigidSolver, FEGlobalMatrix& K, std::vector<double>& F, std::vector<double>& u, bool bsymm, double alpha, int nreq);
+	FELogElemMath(FEModel* pfem);
+	~FELogElemMath();
 
-	// Assembly routine
-	// This assembles the element stiffness matrix ke into the global matrix.
-	// The contributions of prescribed degrees of freedom will be stored in m_F
-	void Assemble(const FEElementMatrix& ke) override;
+	double value(FEElement& el);
 
-	// scale factor for stiffness matrix
-	void StiffnessAssemblyScaleFactor(double a);
+	bool SetExpression(const std::string& smath);
 
 private:
-	FEModel* fem;
-	FERigidSolver*	m_rigidSolver;
-	double			m_alpha;
-	int				m_nreq;
+	void Clear();
 
-	double	m_stiffnessScale;
+private:
+	MSimpleExpression m;
+	std::vector<FELogElemData*> m_data;
 };
+

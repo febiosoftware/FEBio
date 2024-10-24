@@ -1688,7 +1688,7 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
 	int degree_p = dofs.GetVariableInterpolationOrder(ss.m_varP);
 
     // see how many reformations we've had to do so far
-    int nref = LS.GetSolver()->m_nref;
+    int nref = GetSolver()->m_nref;
     
     const int MN = FEElement::MAX_NODES;
     

@@ -251,7 +251,7 @@ bool FELinearSolver::ReformStiffness()
 	{
 		TRACK_TIME(TimerID::Timer_Stiffness);
 
-		FELinearSystem K(this, *m_pK, m_R, m_u, (m_msymm == REAL_SYMMETRIC));
+		FELinearSystem K(GetFEModel(), *m_pK, m_R, m_u, (m_msymm == REAL_SYMMETRIC));
 		if (!StiffnessMatrix(K)) return false;
 
 		// do call back

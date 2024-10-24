@@ -175,16 +175,14 @@ int FEBioApp::RunModel()
 	{
 		// read the input file
 		if (fem.Input(m_ops.szfile) == false) nret = 1;
-		else
-		{
-			// apply configuration overrides
-			ApplyConfig(fem);
-		}
 	}
 
 	// solve the model with the task and control file
 	if (nret == 0)
 	{
+		// apply configuration overrides
+		ApplyConfig(fem);
+
 		bool bret = febio::SolveModel(fem, m_ops.sztask, m_ops.szctrl);
 
 		nret = (bret ? 0 : 1);

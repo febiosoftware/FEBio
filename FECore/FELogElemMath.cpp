@@ -23,33 +23,48 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "FELogElemMath.h"
+#include "MObjBuilder.h"
 
-
-#pragma once
-
-#include <FECore/FELinearSystem.h>
-#include "febiomech_api.h"
-
-class FERigidSolver;
-
-class FEBIOMECH_API FESolidLinearSystem : public FELinearSystem
+FELogElemMath::FELogElemMath(FEModel* pfem) : FELogElemData(pfem) 
 {
-public:
-	FESolidLinearSystem(FEModel* fem, FERigidSolver* rigidSolver, FEGlobalMatrix& K, std::vector<double>& F, std::vector<double>& u, bool bsymm, double alpha, int nreq);
 
-	// Assembly routine
-	// This assembles the element stiffness matrix ke into the global matrix.
-	// The contributions of prescribed degrees of freedom will be stored in m_F
-	void Assemble(const FEElementMatrix& ke) override;
+}
 
-	// scale factor for stiffness matrix
-	void StiffnessAssemblyScaleFactor(double a);
+FELogElemMath::~FELogElemMath()
+{
+	Clear();
+}
 
-private:
-	FEModel* fem;
-	FERigidSolver*	m_rigidSolver;
-	double			m_alpha;
-	int				m_nreq;
+void FELogElemMath::Clear()
+{
+	for (FELogElemData* d : m_data) delete d;
+	m_data.clear();
+}
 
-	double	m_stiffnessScale;
-};
+double FELogElemMath::value(FEElement& el)
+{
+	std::vector<double> val(m_data.size());
+	for (size_t i = 0; i < m_data.size(); ++i) val[i] = m_data[i]->value(el);
+	return m.value_s(val);
+}
+
+bool FELogElemMath::SetExpression(const std::string& smath)
+{
+	Clear();
+
+	MObjBuilder o;
+	o.setAutoVars(true);
+	if (!o.Create(&m, smath, false)) return false;
+
+	int nvar = m.Variables();
+	for (int i = 0; i < nvar; ++i)
+	{
+		MVariable& var = *m.Variable(i);
+		string varName = var.Name();
+		FELogElemData* pd = fecore_new<FELogElemData>(varName.c_str(), GetFEModel());
+		if (pd == nullptr) return false;
+		m_data.push_back(pd);
+	}
+	return true;
+}

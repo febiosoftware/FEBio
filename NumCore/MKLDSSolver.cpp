@@ -37,9 +37,6 @@ SOFTWARE.*/
 #define PARDISO
 #endif
 
-BEGIN_FECORE_CLASS(MKLDSSolver, LinearSolver)
-END_FECORE_CLASS();
-
 #ifdef PARDISO
 class MKLDSSolver::Imp 
 {
@@ -48,7 +45,13 @@ public:
 	_MKL_DSS_HANDLE_t handle = nullptr;
 	MKL_INT opt = MKL_DSS_DEFAULTS;
 	MKL_INT sym = MKL_DSS_SYMMETRIC;
+
+	int msglvl = 0;
 };
+
+BEGIN_FECORE_CLASS(MKLDSSolver, LinearSolver)
+	ADD_PARAMETER(m->msglvl, "msglvl");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 MKLDSSolver::MKLDSSolver(FEModel* fem) : LinearSolver(fem), m(new MKLDSSolver::Imp)
@@ -96,6 +99,7 @@ bool MKLDSSolver::PreProcess()
 	// create handle
 	if (m->handle == nullptr)
 	{
+		m->opt = MKL_DSS_DEFAULTS;
 		MKL_INT error = dss_create(m->handle, m->opt);
 		if (error != MKL_DSS_SUCCESS) return false;
 	}
@@ -110,6 +114,19 @@ bool MKLDSSolver::PreProcess()
 	m->opt = MKL_DSS_METIS_OPENMP_ORDER;
 	error = dss_reorder(m->handle, m->opt, 0);
 	if (error != MKL_DSS_SUCCESS) return false;
+
+	if (m->msglvl != 0)
+	{
+		m->opt = MKL_DSS_DEFAULTS;
+		const char* szstat = "PeakMem,FactorMem";
+		double ret[2];
+		dss_statistics(m->handle, m->opt, szstat, ret);
+		fprintf(stdout, "\nMKLDSS Memory info:\n");
+		fprintf(stdout, "===================\n");
+		fprintf(stdout, "Peak memory of symbolic factorization phase ........... : %lg KB\n", ret[0]);
+		fprintf(stdout, "Permanent memory for the factorization and solve phases : %lg KB\n", ret[1]);
+		fprintf(stdout, "\n");
+	}
 
 	return LinearSolver::PreProcess();
 }

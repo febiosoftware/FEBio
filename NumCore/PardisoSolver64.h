@@ -23,33 +23,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
 #pragma once
+#include <FECore/LinearSolver.h>
 
-#include <FECore/FELinearSystem.h>
-#include "febiomech_api.h"
-
-class FERigidSolver;
-
-class FEBIOMECH_API FESolidLinearSystem : public FELinearSystem
+class PardisoSolver64 : public LinearSolver
 {
+	class Imp;
+
 public:
-	FESolidLinearSystem(FEModel* fem, FERigidSolver* rigidSolver, FEGlobalMatrix& K, std::vector<double>& F, std::vector<double>& u, bool bsymm, double alpha, int nreq);
+	PardisoSolver64(FEModel* fem);
+	~PardisoSolver64();
 
-	// Assembly routine
-	// This assembles the element stiffness matrix ke into the global matrix.
-	// The contributions of prescribed degrees of freedom will be stored in m_F
-	void Assemble(const FEElementMatrix& ke) override;
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+	void Destroy() override;
 
-	// scale factor for stiffness matrix
-	void StiffnessAssemblyScaleFactor(double a);
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
 
-private:
-	FEModel* fem;
-	FERigidSolver*	m_rigidSolver;
-	double			m_alpha;
-	int				m_nreq;
+	void UseIterativeFactorization(bool b);
 
-	double	m_stiffnessScale;
+protected:
+	Imp& m;
+	DECLARE_FECORE_CLASS();
 };
