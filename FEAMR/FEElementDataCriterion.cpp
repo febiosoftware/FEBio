@@ -23,38 +23,31 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEAMR.h"
-#include <FECore/FECoreKernel.h>
-#include "FEErosionAdaptor.h"
-#include "FEHexRefine.h"
-#include "FEHexRefine2D.h"
-#include "FETetRefine.h"
-#include "FEMMGRemesh.h"
-#include "FETestRefine.h"
-#include "FEVariableCriterion.h"
-#include "FEElementSelectionCriterion.h"
-#include "FEScaleAdaptorCriterion.h"
-#include "FEFilterAdaptorCriterion.h"
-#include "FEDomainErrorCriterion.h"
 #include "FEElementDataCriterion.h"
+#include <FECore/FECoreKernel.h>
 
-//-----------------------------------------------------------------------------
-void FEAMR::InitModule()
+BEGIN_FECORE_CLASS(FEElementDataCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_data, "element_data");
+END_FECORE_CLASS();
+
+FEElementDataCriterion::FEElementDataCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-// mesh adaptors
-REGISTER_FECORE_CLASS(FEErosionAdaptor, "erosion");
-REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
-REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
-REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
-REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
-REGISTER_FECORE_CLASS(FETestRefine    , "test_refine");
+	m_pd = nullptr;
+}
 
-// adaptor criteria
-REGISTER_FECORE_CLASS(FEVariableCriterion        , "max_variable");
-REGISTER_FECORE_CLASS(FEElementSelectionCriterion, "element_selection");
-REGISTER_FECORE_CLASS(FEScaleAdaptorCriterion    , "math");
-REGISTER_FECORE_CLASS(FEMinMaxFilterAdaptorCriterion, "min-max filter");
-REGISTER_FECORE_CLASS(FEDomainErrorCriterion, "relative error");
-REGISTER_FECORE_CLASS(FEElementDataCriterion, "element data");
+bool FEElementDataCriterion::Init()
+{
+	m_pd = fecore_new<FELogElemData>(m_data.c_str(), GetFEModel());
+	if (m_pd == nullptr) return false;
+	return FEMeshAdaptorCriterion::Init();
+}
+
+bool FEElementDataCriterion::GetElementValue(FEElement& el, double& val)
+{
+	if (m_pd)
+	{
+		val = m_pd->value(el);
+		return true;
+	}
+	else return false;
 }
