@@ -107,6 +107,10 @@ double FENLABazant::DamageCriterionAverage(FEMaterialPoint& pt)
             int je = m_EPL[ie][i];
             if (je > -1) {
                 FEElement* el = mesh.Element(je);
+
+                // skip inactive elements. Needed for this to work with erosion
+                if(!el->isActive()) continue;
+
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
                     double krnl = m_krnl->Kernel(pt, mp);
@@ -141,6 +145,10 @@ mat3ds FENLABazant::DamageCriterionTangentAverage(FEMaterialPoint& pt)
             int je = m_EPL[ie][i];
             if (je > -1) {
                 FEElement* el = mesh.Element(je);
+
+                // skip inactive elements. Needed for this to work with erosion
+                if(!el->isActive()) continue;
+
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
                     double krnl = m_krnl->Kernel(pt, mp);
@@ -179,6 +187,10 @@ double FENLABorino::DamageCriterionAverage(FEMaterialPoint& pt)
             int je = m_EPL[ie][i];
             if (je > -1) {
                 FEElement* el = mesh.Element(je);
+
+                // skip inactive elements. Needed for this to work with erosion
+                if(!el->isActive()) continue;
+
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
                     double krnl = m_krnl->Kernel(pt, mp);
@@ -216,6 +228,10 @@ mat3ds FENLABorino::DamageCriterionTangentAverage(FEMaterialPoint& pt)
             int je = m_EPL[ie][i];
             if (je > -1) {
                 FEElement* el = mesh.Element(je);
+
+                // skip inactive elements. Needed for this to work with erosion
+                if(!el->isActive()) continue;
+
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
                     double krnl = m_krnl->Kernel(pt, mp);
