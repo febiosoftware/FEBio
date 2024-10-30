@@ -106,9 +106,9 @@ bool FEEdgeList::Create(FEMesh* pmesh)
 
 	set<pair<int, int>, edge_less> edgeSet;
 
-	const int ETET[6][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 0, 3 },{ 1, 3 },{ 2, 3 } };
-    const int EPENTA[9][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 3, 4 },{ 4, 5 },{ 5, 3 },{ 3, 0},{ 1, 4},{ 2, 5 } };
+	const int ETET[ 6][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 0, 3 },{ 1, 3 },{ 2, 3 } };
 	const int EHEX[12][2] = { { 0, 1 },{ 1, 2 },{ 2, 3 },{ 3, 0 },{ 4, 5 },{ 5, 6 },{ 6, 7 },{ 7, 4 },{ 0, 4 },{ 1, 5 },{ 2, 6 },{ 3, 7 } };
+	const int EPEN[ 9][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 3, 4 },{ 4, 5 },{ 5, 3 },{ 0, 3 },{ 1, 4 },{ 2, 5 } };
 
 	for (FEElementList::iterator it = elemList.begin(); it != elemList.end(); ++it)
 	{
@@ -130,8 +130,8 @@ bool FEEdgeList::Create(FEMesh* pmesh)
             for (int i = 0; i < 9; ++i)
             {
                 pair<int, int> edge;
-                edge.first = el.m_node[EPENTA[i][0]];
-                edge.second = el.m_node[EPENTA[i][1]];
+                edge.first = el.m_node[EPEN[i][0]];
+                edge.second = el.m_node[EPEN[i][1]];
                 
                 edgeSet.insert(edge);
             }
@@ -143,6 +143,17 @@ bool FEEdgeList::Create(FEMesh* pmesh)
 				pair<int, int> edge;
 				edge.first = el.m_node[EHEX[i][0]];
 				edge.second = el.m_node[EHEX[i][1]];
+
+				edgeSet.insert(edge);
+			}
+		}
+		else if (el.Shape() == ET_PENTA6)
+		{
+			for (int i = 0; i < 9; ++i)
+			{
+				pair<int, int> edge;
+				edge.first  = el.m_node[EPEN[i][0]];
+				edge.second = el.m_node[EPEN[i][1]];
 
 				edgeSet.insert(edge);
 			}
@@ -180,6 +191,7 @@ bool FEEdgeList::Create(FEDomain* dom)
 	const int ETET10[6][3] = { { 0, 1, 4 },{ 1, 2, 5 },{ 2, 0, 6 },{ 0, 3, 7 },{ 1, 3, 8 },{ 2, 3, 9 } };
 	const int EHEX[12][2] = { { 0, 1 },{ 1, 2 },{ 2, 3 },{ 3, 0 },{ 4, 5 },{ 5, 6 },{ 6, 7 },{ 7, 4 },{ 0, 4 },{ 1, 5 },{ 2, 6 },{ 3, 7 } };
 	const int EHEX20[12][3] = { { 0, 1, 8 },{ 1, 2, 9 },{ 2, 3, 10 },{ 3, 0, 11 },{ 4, 5, 12 },{ 5, 6, 13 },{ 6, 7, 14 },{ 7, 4, 15 },{ 0, 4, 16 },{ 1, 5, 17 },{ 2, 6, 18 },{ 3, 7, 19 } };
+	const int EPEN[9][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 3, 4 },{ 4, 5 },{ 5, 3 },{ 0, 3 },{ 1, 4 },{ 2, 5 } };
 
 	for (int i = 0; i<dom->Elements(); ++i)
 	{
@@ -193,6 +205,19 @@ bool FEEdgeList::Create(FEDomain* dom)
 				edge.ntype = 2;
 				edge.node[0] = el.m_lnode[ETET[i][0]];
 				edge.node[1] = el.m_lnode[ETET[i][1]];
+				edge.node[2] = -1;
+
+				edgeSet.insert(edge);
+			}
+		}
+		else if (el.Shape() == ET_PENTA6)
+		{
+			for (int i = 0; i < 9; ++i)
+			{
+				EDGE edge;
+				edge.ntype = 2;
+				edge.node[0] = el.m_lnode[EPEN[i][0]];
+				edge.node[1] = el.m_lnode[EPEN[i][1]];
 				edge.node[2] = -1;
 
 				edgeSet.insert(edge);
@@ -286,6 +311,7 @@ bool FEElementEdgeList::Create(FEElementList& elemList, FEEdgeList& edgeList)
 
 	const int ETET[6][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 0, 3 },{ 1, 3 },{ 2, 3 } };
 	const int EHEX[12][2] = { { 0, 1 },{ 1, 2 },{ 2, 3 },{ 3, 0 },{ 4, 5 },{ 5, 6 },{ 6, 7 },{ 7, 4 },{ 0, 4 },{ 1, 5 },{ 2, 6 },{ 3, 7 } };
+	const int EPENTA[9][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 3, 4 },{ 4, 5 },{ 5, 3 },{ 0, 3 },{ 1, 4 },{ 2, 5 } };
 
 	int NN = mesh.Nodes();
 	vector<pair<int, int> > NI;
@@ -351,6 +377,29 @@ bool FEElementEdgeList::Create(FEElementList& elemList, FEEdgeList& edgeList)
 				}
 			}
 		}
+		else if (el.Shape() == FE_Element_Shape::ET_PENTA6)
+		{
+			EELi.resize(9);
+			for (int j = 0; j < 9; ++j)
+			{
+				int n0 = el.m_node[EPENTA[j][0]];
+				int n1 = el.m_node[EPENTA[j][1]];
+
+				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
+
+				int l0 = NI[n0].first;
+				int ln = NI[n0].second;
+				for (int l = 0; l < ln; ++l)
+				{
+					assert(edgeList[l0 + l].node[0] == n0);
+					if (edgeList[l0 + l].node[1] == n1)
+					{
+						EELi[j] = l0 + l;
+						break;
+					}
+				}
+			}
+		}
 	}
 	return true;
 }
@@ -362,6 +411,7 @@ bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
 
 	const int ETET[6][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 0, 3 },{ 1, 3 },{ 2, 3 } };
 	const int EHEX[12][2] = { { 0, 1 },{ 1, 2 },{ 2, 3 },{ 3, 0 },{ 4, 5 },{ 5, 6 },{ 6, 7 },{ 7, 4 },{ 0, 4 },{ 1, 5 },{ 2, 6 },{ 3, 7 } };
+	const int EPEN[9][2] = { { 0, 1 },{ 1, 2 },{ 2, 0 },{ 3, 4 },{ 4, 5 },{ 5, 3 },{ 0, 3 },{ 1, 4 },{ 2, 5 } };
 
 	int NN = mesh.Nodes();
 	vector<pair<int, int> > NI;
@@ -410,6 +460,29 @@ bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
 			{
 				int n0 = el.m_node[EHEX[j][0]];
 				int n1 = el.m_node[EHEX[j][1]];
+
+				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
+
+				int l0 = NI[n0].first;
+				int ln = NI[n0].second;
+				for (int l = 0; l < ln; ++l)
+				{
+					assert(edgeList[l0 + l].node[0] == n0);
+					if (edgeList[l0 + l].node[1] == n1)
+					{
+						EELi[j] = l0 + l;
+						break;
+					}
+				}
+			}
+		}
+		else if (el.Shape() == FE_Element_Shape::ET_PENTA6)
+		{
+			EELi.resize(9);
+			for (int j = 0; j < 9; ++j)
+			{
+				int n0 = el.m_node[EPEN[j][0]];
+				int n1 = el.m_node[EPEN[j][1]];
 
 				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
 

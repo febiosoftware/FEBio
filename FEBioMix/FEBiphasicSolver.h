@@ -103,6 +103,8 @@ protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
 
+	Matrix_Type PreferredMatrixType() const override { return REAL_UNSYMMETRIC; };
+
 public:
 	// additional convergence norms
 	double	m_Dtol;			//!< displacement tolerance

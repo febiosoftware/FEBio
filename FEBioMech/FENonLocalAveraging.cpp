@@ -37,6 +37,9 @@ SOFTWARE.*/
 #ifndef SQR
 #define SQR(x) ((x)*(x))
 #endif
+#ifdef max
+#undef max
+#endif
 
 //-----------------------------------------------------------------------------
 bool FENonLocalAveraging::Init()

@@ -24,24 +24,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-#include <FECore/FEMaterialPoint.h>
-#include "feamr_api.h"
+#include <FECore/LinearSolver.h>
 
-class FEAMR_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
+class PardisoSolver64 : public LinearSolver
 {
+	class Imp;
+
 public:
-	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
+	PardisoSolver64(FEModel* fem);
+	~PardisoSolver64();
 
-	bool GetMaterialPointValue(FEMaterialPoint& el, double& value) override;
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+	void Destroy() override;
 
-	bool GetElementValue(FEElement& el, double& value) override;
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
 
-private:
-	double	m_min;
-	double	m_max;
-	bool	m_clamp;
-	FEMeshAdaptorCriterion*	m_data;
+	void UseIterativeFactorization(bool b);
 
+protected:
+	Imp& m;
 	DECLARE_FECORE_CLASS();
 };

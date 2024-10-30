@@ -25,23 +25,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEMeshAdaptorCriterion.h>
-#include <FECore/FEMaterialPoint.h>
-#include "feamr_api.h"
+#include <FECore/ElementDataRecord.h>
 
-class FEAMR_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
+class FEElementDataCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
+	FEElementDataCriterion(FEModel* fem);
 
-	bool GetMaterialPointValue(FEMaterialPoint& el, double& value) override;
+	bool Init() override;
 
-	bool GetElementValue(FEElement& el, double& value) override;
+	bool GetElementValue(FEElement& el, double& val) override;
 
 private:
-	double	m_min;
-	double	m_max;
-	bool	m_clamp;
-	FEMeshAdaptorCriterion*	m_data;
+	std::string m_data;
+	FELogElemData* m_pd;
 
 	DECLARE_FECORE_CLASS();
 };

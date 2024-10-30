@@ -60,7 +60,7 @@ bool FEDiscreteDomain::Init()
 	if (FEDomain::Init() == false) return false;
 
 	FEMaterial* pmat = GetMaterial();
-	if (pmat) SetMatID(pmat->GetID());
+	if (pmat) SetMatID(pmat->GetID() - 1);
 
 	return true;
 }

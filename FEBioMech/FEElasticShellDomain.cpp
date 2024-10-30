@@ -141,15 +141,18 @@ void FEElasticShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
     for (size_t i=0; i<m_Elem.size(); ++i)
     {
         FEShellElement& el = m_Elem[i];
-        int n = el.GaussPoints();
-        for (int j=0; j<n; ++j)
-        {
-            FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-            FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-            pt.m_Wp = pt.m_Wt;
-            
-            mp.Update(timeInfo);
-        }
+		if (el.isActive())
+		{
+			int n = el.GaussPoints();
+			for (int j = 0; j < n; ++j)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+				pt.m_Wp = pt.m_Wt;
+
+				mp.Update(timeInfo);
+			}
+		}
     }
 }
 
@@ -167,19 +170,21 @@ void FEElasticShellDomain::InternalForces(FEGlobalVector& R)
         
         // get the element
         FEShellElement& el = m_Elem[i];
-        
-        // create the element force vector and initialize to zero
-        int ndof = 6*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // calculate element's internal force
-        ElementInternalForce(el, fe);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble the residual
-        R.Assemble(el.m_node, lm, fe, true);
+		if (el.isActive())
+		{
+			// create the element force vector and initialize to zero
+			int ndof = 6 * el.Nodes();
+			fe.assign(ndof, 0);
+
+			// calculate element's internal force
+			ElementInternalForce(el, fe);
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble the residual
+			R.Assemble(el.m_node, lm, fe, true);
+		}
     }
 }
 
@@ -253,19 +258,21 @@ void FEElasticShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
         
         // get the element
         FEShellElement& el = m_Elem[i];
-        
-        // create the element force vector and initialize to zero
-        int ndof = 6*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // apply body forces to shells
-        ElementBodyForce(BF, el, fe);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble the residual
-        R.Assemble(el.m_node, lm, fe, true);
+		if (el.isActive())
+		{
+			// create the element force vector and initialize to zero
+			int ndof = 6 * el.Nodes();
+			fe.assign(ndof, 0);
+
+			// apply body forces to shells
+			ElementBodyForce(BF, el, fe);
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble the residual
+			R.Assemble(el.m_node, lm, fe, true);
+		}
     }
 }
 
@@ -327,19 +334,22 @@ void FEElasticShellDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
         
         // get the element
         FEShellElement& el = m_Elem[i];
-        
-        // get the element force vector and initialize it to zero
-        int ndof = 6*el.Nodes();
-        fe.assign(ndof, 0);
-        
-        // calculate internal force vector
-        ElementInertialForce(el, fe);
-        
-        // get the element's LM vector
-        UnpackLM(el, lm);
-        
-        // assemble element 'fe'-vector into global R vector
-        R.Assemble(el.m_node, lm, fe, true);
+		if (el.isActive())
+		{
+
+			// get the element force vector and initialize it to zero
+			int ndof = 6 * el.Nodes();
+			fe.assign(ndof, 0);
+
+			// calculate internal force vector
+			ElementInertialForce(el, fe);
+
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
+			// assemble element 'fe'-vector into global R vector
+			R.Assemble(el.m_node, lm, fe, true);
+		}
     }
 }
 
@@ -450,22 +460,24 @@ void FEElasticShellDomain::StiffnessMatrix(FELinearSystem& LS)
     for (int iel=0; iel<NS; ++iel)
     {
 		FEShellElement& el = m_Elem[iel];
-        
-        // create the element's stiffness matrix
-		FEElementMatrix ke(el);
-		int ndof = 6*el.Nodes();
-        ke.resize(ndof, ndof);
-        
-        // calculate the element stiffness matrix
-        ElementStiffness(iel, ke);
-        
-        // get the element's LM vector
-		vector<int> lm;
-		UnpackLM(el, lm);
-		ke.SetIndices(lm);
-        
-        // assemble element matrix in global stiffness matrix
-		LS.Assemble(ke);
+		if (el.isActive())
+		{
+			// create the element's stiffness matrix
+			FEElementMatrix ke(el);
+			int ndof = 6 * el.Nodes();
+			ke.resize(ndof, ndof);
+
+			// calculate the element stiffness matrix
+			ElementStiffness(iel, ke);
+
+			// get the element's LM vector
+			vector<int> lm;
+			UnpackLM(el, lm);
+			ke.SetIndices(lm);
+
+			// assemble element matrix in global stiffness matrix
+			LS.Assemble(ke);
+		}
     }
 }
 
@@ -478,23 +490,25 @@ void FEElasticShellDomain::MassMatrix(FELinearSystem& LS, double scale)
     for (int iel=0; iel<NE; ++iel)
     {
 		FEShellElement& el = m_Elem[iel];
-        
-        // create the element's stiffness matrix
-		FEElementMatrix ke(el);
-		int ndof = 6*el.Nodes();
-        ke.resize(ndof, ndof);
-        ke.zero();
-        
-        // calculate inertial stiffness
-        ElementMassMatrix(el, ke, scale);
-        
-        // get the element's LM vector
-		vector<int> lm;
-		UnpackLM(el, lm);
-		ke.SetIndices(lm);
-        
-        // assemble element matrix in global stiffness matrix
-		LS.Assemble(ke);
+		if (el.isActive())
+		{
+			// create the element's stiffness matrix
+			FEElementMatrix ke(el);
+			int ndof = 6 * el.Nodes();
+			ke.resize(ndof, ndof);
+			ke.zero();
+
+			// calculate inertial stiffness
+			ElementMassMatrix(el, ke, scale);
+
+			// get the element's LM vector
+			vector<int> lm;
+			UnpackLM(el, lm);
+			ke.SetIndices(lm);
+
+			// assemble element matrix in global stiffness matrix
+			LS.Assemble(ke);
+		}
     }
 }
 
@@ -507,23 +521,25 @@ void FEElasticShellDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& b
     for (int iel=0; iel<NE; ++iel)
     {
 		FEShellElement& el = m_Elem[iel];
-        
-        // create the element's stiffness matrix
-		FEElementMatrix ke(el);
-		int ndof = 6*el.Nodes();
-        ke.resize(ndof, ndof);
-        ke.zero();
-        
-        // calculate inertial stiffness
-        ElementBodyForceStiffness(bf, el, ke);
-        
-        // get the element's LM vector
-		vector<int> lm;
-		UnpackLM(el, lm);
-		ke.SetIndices(lm);
-        
-        // assemble element matrix in global stiffness matrix
-		LS.Assemble(ke);
+		if (el.isActive())
+		{
+			// create the element's stiffness matrix
+			FEElementMatrix ke(el);
+			int ndof = 6 * el.Nodes();
+			ke.resize(ndof, ndof);
+			ke.zero();
+
+			// calculate inertial stiffness
+			ElementBodyForceStiffness(bf, el, ke);
+
+			// get the element's LM vector
+			vector<int> lm;
+			UnpackLM(el, lm);
+			ke.SetIndices(lm);
+
+			// assemble element matrix in global stiffness matrix
+			LS.Assemble(ke);
+		}
     }
 }
 

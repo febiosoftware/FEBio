@@ -23,25 +23,48 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-#include <FECore/FEMaterialPoint.h>
-#include "feamr_api.h"
+#include "FELogElemMath.h"
+#include "MObjBuilder.h"
 
-class FEAMR_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
+FELogElemMath::FELogElemMath(FEModel* pfem) : FELogElemData(pfem) 
 {
-public:
-	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
 
-	bool GetMaterialPointValue(FEMaterialPoint& el, double& value) override;
+}
 
-	bool GetElementValue(FEElement& el, double& value) override;
+FELogElemMath::~FELogElemMath()
+{
+	Clear();
+}
 
-private:
-	double	m_min;
-	double	m_max;
-	bool	m_clamp;
-	FEMeshAdaptorCriterion*	m_data;
+void FELogElemMath::Clear()
+{
+	for (FELogElemData* d : m_data) delete d;
+	m_data.clear();
+}
 
-	DECLARE_FECORE_CLASS();
-};
+double FELogElemMath::value(FEElement& el)
+{
+	std::vector<double> val(m_data.size());
+	for (size_t i = 0; i < m_data.size(); ++i) val[i] = m_data[i]->value(el);
+	return m.value_s(val);
+}
+
+bool FELogElemMath::SetExpression(const std::string& smath)
+{
+	Clear();
+
+	MObjBuilder o;
+	o.setAutoVars(true);
+	if (!o.Create(&m, smath, false)) return false;
+
+	int nvar = m.Variables();
+	for (int i = 0; i < nvar; ++i)
+	{
+		MVariable& var = *m.Variable(i);
+		string varName = var.Name();
+		FELogElemData* pd = fecore_new<FELogElemData>(varName.c_str(), GetFEModel());
+		if (pd == nullptr) return false;
+		m_data.push_back(pd);
+	}
+	return true;
+}

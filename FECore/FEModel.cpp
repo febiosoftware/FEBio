@@ -149,8 +149,6 @@ public:
 		// allocate timers
 		// Make sure enough timers are allocated for all the TimerIds!
 		m_timers.resize(TIMER_COUNT);
-		// make the solve timer is an inclusive timer!
-		m_timers[Timer_ModelSolve].makeInclusive();
 	}
 
 	void Serialize(DumpStream& ar);
@@ -399,7 +397,7 @@ void FEModel::AddInitialCondition(FEInitialCondition* pbc) { m_imp->m_IC.push_ba
 
 //-----------------------------------------------------------------------------
 //! retrieve the number of steps
-int FEModel::Steps() { return (int)m_imp->m_Step.size(); }
+int FEModel::Steps() const { return (int)m_imp->m_Step.size(); }
 
 //-----------------------------------------------------------------------------
 //! clear the steps
@@ -1194,56 +1192,59 @@ bool FEModel::InitConstraints()
 //! This function solves the FE problem by calling the solve method for each step.
 bool FEModel::Solve()
 {
-	TRACK_TIME(Timer_ModelSolve);
-
 	// error flag
 	bool bok = true;
 
-	// loop over all analysis steps
-	// Note that we don't necessarily from step 0.
-	// This is because the user could have restarted
-	// the analysis. 
-	for (size_t nstep = m_imp->m_nStep; nstep < Steps(); ++nstep)
 	{
-		// set the current analysis step
-		m_imp->m_nStep = (int)nstep;
-		m_imp->m_pStep = m_imp->m_Step[(int)nstep];
+		TRACK_TIME(Timer_ModelSolve);
 
-		// In the case we restarted, the current step can already be active
-		// so don't activate it again. 
-		if (m_imp->m_pStep->IsActive() == false)
+
+		// loop over all analysis steps
+		// Note that we don't necessarily from step 0.
+		// This is because the user could have restarted
+		// the analysis. 
+		for (size_t nstep = m_imp->m_nStep; nstep < Steps(); ++nstep)
 		{
-			if (m_imp->m_pStep->Activate() == false)
+			// set the current analysis step
+			m_imp->m_nStep = (int)nstep;
+			m_imp->m_pStep = m_imp->m_Step[(int)nstep];
+
+			// In the case we restarted, the current step can already be active
+			// so don't activate it again. 
+			if (m_imp->m_pStep->IsActive() == false)
 			{
-				bok = false;
-				break;
+				if (m_imp->m_pStep->Activate() == false)
+				{
+					bok = false;
+					break;
+				}
+
+				// do callback
+				DoCallback(CB_STEP_ACTIVE);
 			}
 
-			// do callback
-			DoCallback(CB_STEP_ACTIVE);
+			// solve the analaysis step
+			bok = m_imp->m_pStep->Solve();
+
+			// do callbacks
+			DoCallback(CB_STEP_SOLVED);
+
+			if (nstep + 1 == Steps())
+			{
+				// set the solved flag
+				m_imp->m_bsolved = bok;
+			}
+
+			// wrap it up
+			m_imp->m_pStep->Deactivate();
+
+			// break if the step has failed
+			if (bok == false) break;
 		}
 
-		// solve the analaysis step
-		bok = m_imp->m_pStep->Solve();
-
-		if (nstep + 1 == Steps())
-		{
-			// set the solved flag
-			m_imp->m_bsolved = bok;
-		}
-
-		// do callbacks
-		DoCallback(CB_STEP_SOLVED);
-
-		// wrap it up
-		m_imp->m_pStep->Deactivate();
-
-		// break if the step has failed
-		if (bok == false) break;
+		// do the callbacks
+		DoCallback(CB_SOLVED);
 	}
-
-	// do the callbacks
-	DoCallback(CB_SOLVED);
 
 	return bok;
 }
@@ -1946,6 +1947,8 @@ int FEModel::GetDOFIndex(const char* szvar, int n) const
 //
 bool FEModel::DoCallback(unsigned int nevent)
 {
+	TRACK_TIME(TimerID::Timer_Callback);
+
 	try
 	{
 		// do the callbacks
@@ -2460,7 +2463,7 @@ void FEModel::SerializeGeometry(DumpStream& ar)
 // This is used for running and cold restarts.
 void FEModel::Serialize(DumpStream& ar)
 {
-//	TRACK_TIME(TimerID::Timer_Update);
+	TRACK_TIME(TimerID::Timer_Serialize);
 
 	m_imp->Serialize(ar);
 	DoCallback(ar.IsSaving() ? CB_SERIALIZE_SAVE : CB_SERIALIZE_LOAD);

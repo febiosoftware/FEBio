@@ -240,7 +240,7 @@ bool FEBiphasicSoluteSolver::Quasin()
 		normE1 = s*fabs(m_ui*m_R1);
 
 		m_residuNorm.norm = normR1;
-		m_energyNorm.norm = normR1;
+		m_energyNorm.norm = normE1;
 		m_solutionNorm[0].norm = normd;
 
 		// check residual norm
@@ -487,7 +487,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 	FEMesh& mesh = fem.GetMesh();
 
 	// setup the linear system
-	FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
+	FESolidLinearSystem LS(&fem, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
 
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();

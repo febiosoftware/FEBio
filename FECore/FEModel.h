@@ -234,7 +234,7 @@ public:
 public: // --- Analysis steps functions ---
 
 	//! retrieve the number of steps
-	int Steps();
+	int Steps() const;
 
 	//! clear the steps
 	void ClearSteps();

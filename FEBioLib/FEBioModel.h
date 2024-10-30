@@ -167,9 +167,6 @@ public: // Timers
 	//! Return the total timer
 	Timer& GetSolveTimer();
 
-	//! return number of seconds of time spent in linear solver
-	int GetLinearSolverTime();
-
 public:
 	//! set the debug level
 	void SetDebugLevel(int debugLvl);
@@ -194,6 +191,8 @@ public:
 
 	//! Get the stats 
 	ModelStats GetModelStats() const;
+	ModelStats GetStepStats(size_t n) const;
+	std::vector<ModelStats> GetStepStats() const;
 
 	// flag to show warnings and errors
 	void ShowWarningsAndErrors(bool b);
@@ -211,7 +210,6 @@ private:
 private:
 	Timer		m_TotalTime;	//!< timer to track total time
 	Timer		m_InputTime;	//!< timer to track time to read model
-	Timer		m_InitTime;		//!< timer to track model initialization
 	Timer		m_IOTimer;		//!< timer to track output (include plot, dump, and data)
 
 	PlotFile*	m_plot;			//!< the plot file
@@ -228,7 +226,8 @@ private:
 
 private:
 	// accumulative statistics
-	ModelStats	m_stats;
+	ModelStats	m_modelStats;
+	std::vector<ModelStats> m_stepStats;
 
 protected: // file names
 	std::string		m_sfile_title;		//!< input file title 

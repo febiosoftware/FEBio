@@ -527,7 +527,7 @@ bool FESolidSolver::StiffnessMatrix()
 	const FETimeInfo& tp = fem.GetTime();
 
 	// setup the linear syster
-	FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), 1.0, m_nreq);
+	FESolidLinearSystem LS(&fem, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), 1.0, m_nreq);
 
 	// get the mesh
 	FEMesh& mesh = fem.GetMesh();

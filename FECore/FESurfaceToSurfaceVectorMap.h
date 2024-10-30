@@ -24,24 +24,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-#include <FECore/FEMaterialPoint.h>
-#include "feamr_api.h"
+#include "FEDataGenerator.h"
 
-class FEAMR_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
+class FESurface;
+
+class FESurfaceToSurfaceVectorMap : public FEElemDataGenerator
 {
 public:
-	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
+	FESurfaceToSurfaceVectorMap(FEModel* fem);
+	~FESurfaceToSurfaceVectorMap();
 
-	bool GetMaterialPointValue(FEMaterialPoint& el, double& value) override;
+	bool Init() override;
 
-	bool GetElementValue(FEElement& el, double& value) override;
+	FEDataMap* Generate() override;
 
 private:
-	double	m_min;
-	double	m_max;
-	bool	m_clamp;
-	FEMeshAdaptorCriterion*	m_data;
+	FESurface* m_surf[2];
+
+	vec3d	m_normal;
+	double	m_inAngle;
+	double	m_outAngle;
+	bool m_cross;
+
+	int m_smoothIters;
 
 	DECLARE_FECORE_CLASS();
 };

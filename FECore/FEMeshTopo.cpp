@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEMeshTopo.h"
 #include "FEElementList.h"
@@ -33,6 +30,7 @@ SOFTWARE.*/
 #include "FEDomain.h"
 #include "FEElemElemList.h"
 #include "FESurface.h"
+#include <stack>
 
 class FEMeshTopo::MeshTopoImp
 {
@@ -146,10 +144,6 @@ bool FEMeshTopo::Create(FEMesh* mesh)
 
 	// create the face-edge list
 	if (imp->m_FEL.Create(imp->m_faceList, imp->m_edgeList) == false) return false;
-    
-    // create list of element centroids
-    m_ctr.assign(Elements(), vec3d(0,0,0));
-    for (int i=0; i<Elements(); ++i) m_ctr[i] = ElementCentroid(i);
 
 	return true;
 }
@@ -358,61 +352,61 @@ std::vector<int> FEMeshTopo::ElementNeighborIndexList(int n)
 }
 
 // evaluate centroid of element as average position of integration points
-vec3d FEMeshTopo::ElementCentroid(int i)
+vec3d ElementCentroid(FEElement& el)
 {
-    FEElement* el = Element(i);
-    int nint = el->GaussPoints();
+    int nint = el.GaussPoints();
     vec3d c(0,0,0);
     for (int n=0; n<nint; ++n) {
-        FEMaterialPoint* pt = el->GetMaterialPoint(n);
+        FEMaterialPoint* pt = el.GetMaterialPoint(n);
         c += pt->m_rt;
     }
     c /= nint;
     return c;
 }
 
-// evaluate proximity of element i to point x
-double FEMeshTopo::Proximity(vec3d x, int i)
-{
-    double d = (x - m_ctr[i]).unit();
-    return d;
-}
-
 // find neighboring elements that fall within given proximity d
 std::vector<int> FEMeshTopo::ElementProximityList(int i, double d, bool bexcself)
 {
-    m_EPL.clear();
-    int NE = Elements();
-    m_vst.assign(NE, false);
-    // exclude element i itself from the list, if requested
-    m_vst[i] = bexcself;
-    // get centroid of element i
-    vec3d x = ElementCentroid(i);
-    // get index list of elements that are neighbors to element i
-    std::vector<int> ENIL = ElementNeighborIndexList(i);
-    // search each neighbor to see if it falls within given proximity d
-    RecursiveSearch(x, d, ENIL);
-    return m_EPL;
-}
+	std::vector<int>    EPL; // element proximity list
+	std::vector<bool>   vst; // list of visited elements
 
-// recursively search all elements that fall within proximity d of point x
-bool FEMeshTopo::RecursiveSearch(vec3d x, double d, std::vector<int>ENIL)
-{
-    size_t ni = m_EPL.size();
-    // search each neighbor to see if it falls within given proximity d
-    for (int j=0; j<ENIL.size(); ++j) {
-        int k = ENIL[j];
-        if (k == -1) continue;
-        if (!m_vst[k] && (Proximity(x,k) <= d)) m_EPL.push_back(k);
-        m_vst[k] = true;
-    }
-    size_t  nf = m_EPL.size();
-    if (nf > ni) {
-        for (int j=0; j<ENIL.size(); ++j) {
-            int k = ENIL[j];
-            if (k == -1) continue;
-            if (!RecursiveSearch(x,d,ElementNeighborIndexList(k))) continue;
-        }
-    }
-    return false;
+	int NE = Elements();
+	vst.assign(NE, false);
+
+	// exclude element i itself from the list, if requested
+	if (!bexcself)
+	{
+		EPL.push_back(i);
+	}
+
+	// get centroid of element i
+	vec3d x = ElementCentroid(*Element(i));
+
+	std::stack<int> stack;
+	stack.push(i);
+	vst[i] = true;
+	while (!stack.empty())
+	{
+		int n = stack.top(); stack.pop();
+		std::vector<int> ENIL = ElementNeighborIndexList(n);
+
+		// search each neighbor to see if it falls within given proximity d
+		for (int j = 0; j < ENIL.size(); ++j) 
+		{
+			int k = ENIL[j];
+			if ((k != -1) && !vst[k])
+			{
+				vec3d xk = ElementCentroid(*Element(k));
+				double dk = (x - xk).Length();
+				if (dk <= d)
+				{
+					EPL.push_back(k);
+					vst[k] = true;
+					stack.push(k);
+				}
+			}
+		}
+	}
+
+	return EPL;
 }

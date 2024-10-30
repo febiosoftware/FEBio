@@ -2661,61 +2661,63 @@ void FESolidDomain::LoadStiffness(FELinearSystem& LS, const FEDofList& dofList_a
 	{
 		// get the element
 		FESolidElement& el = Element(m);
-
-		// calculate nodal normal tractions
-		int neln = el.Nodes();
-
-		// get the element stiffness matrix
-		ke.SetNodes(el.m_node);
-		int ndof_a = dofPerNode_a * neln;
-		int ndof_b = dofPerNode_b * neln;
-		ke.resize(ndof_a, ndof_b);
-
-		// calculate element stiffness
-		int nint = el.GaussPoints();
-
-		// gauss weights
-		double* w = el.GaussWeights();
-
-		// repeat over integration points
-		ke.zero();
-		for (int n = 0; n < nint; ++n)
+		if (el.isActive())
 		{
-			FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+			// calculate nodal normal tractions
+			int neln = el.Nodes();
 
-			// set the shape function values
-			pt.m_shape = el.H(n);
+			// get the element stiffness matrix
+			ke.SetNodes(el.m_node);
+			int ndof_a = dofPerNode_a * neln;
+			int ndof_b = dofPerNode_b * neln;
+			ke.resize(ndof_a, ndof_b);
 
-			// calculate stiffness component
-			for (int i = 0; i < neln; ++i)
-				for (int j = 0; j < neln; ++j)
-				{
-					// evaluate integrand
-					kab.zero();
-					f(pt, i, j, kab);
-					ke.adds(dofPerNode_a * i, dofPerNode_b * j, kab, w[n]);
-				}
+			// calculate element stiffness
+			int nint = el.GaussPoints();
+
+			// gauss weights
+			double* w = el.GaussWeights();
+
+			// repeat over integration points
+			ke.zero();
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& pt = *el.GetMaterialPoint(n);
+
+				// set the shape function values
+				pt.m_shape = el.H(n);
+
+				// calculate stiffness component
+				for (int i = 0; i < neln; ++i)
+					for (int j = 0; j < neln; ++j)
+					{
+						// evaluate integrand
+						kab.zero();
+						f(pt, i, j, kab);
+						ke.adds(dofPerNode_a * i, dofPerNode_b * j, kab, w[n]);
+					}
+			}
+
+			// get the element's LM vector
+			std::vector<int>& lma = ke.RowIndices();
+			std::vector<int>& lmb = ke.ColumnsIndices();
+			lma.assign(ndof_a, -1);
+			lmb.assign(ndof_b, -1);
+			for (int j = 0; j < neln; ++j)
+			{
+				FENode& node = mesh.Node(el.m_node[j]);
+				std::vector<int>& ID = node.m_ID;
+
+				for (int k = 0; k < dofPerNode_a; ++k)
+					lma[dofPerNode_a * j + k] = ID[dofList_a[k]];
+
+				for (int k = 0; k < dofPerNode_b; ++k)
+					lmb[dofPerNode_b * j + k] = ID[dofList_b[k]];
+			}
+
+			// assemble element matrix in global stiffness matrix
+			LS.Assemble(ke);
 		}
-
-		// get the element's LM vector
-		std::vector<int>& lma = ke.RowIndices();
-		std::vector<int>& lmb = ke.ColumnsIndices();
-		lma.assign(ndof_a, -1);
-		lmb.assign(ndof_b, -1);
-		for (int j = 0; j < neln; ++j)
-		{
-			FENode& node = mesh.Node(el.m_node[j]);
-			std::vector<int>& ID = node.m_ID;
-
-			for (int k = 0; k < dofPerNode_a; ++k)
-				lma[dofPerNode_a * j + k] = ID[dofList_a[k]];
-
-			for (int k = 0; k < dofPerNode_b; ++k)
-				lmb[dofPerNode_b * j + k] = ID[dofList_b[k]];
-		}
-
-		// assemble element matrix in global stiffness matrix
-		LS.Assemble(ke);
 	}
 	} // omp parallel
 }

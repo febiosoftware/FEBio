@@ -183,8 +183,8 @@ public:
 	// return the solution vector
 	virtual std::vector<double> GetSolutionVector() const;
 
-private:
-	Matrix_Type PreferredMatrixType() const;
+protected:
+	virtual Matrix_Type PreferredMatrixType() const;
 
 public: //TODO Move these parameters elsewhere
 	bool				m_bwopt;	    //!< bandwidth optimization flag

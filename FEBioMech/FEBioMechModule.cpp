@@ -1049,6 +1049,14 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorY, "fiber_y");
 	REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, "fiber_z");
 	REGISTER_FECORE_CLASS(FELogDamage, "D");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 0, "damage_1");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 1, "damage_2");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 2, "damage_3");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 3, "damage_4");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 4, "damage_5");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 5, "damage_6");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 6, "damage_7");
+	REGISTER_FECORE_CLASS_T(FELogDamage_n, 7, "damage_8");
     REGISTER_FECORE_CLASS(FELogIntactBonds, "wi");
     REGISTER_FECORE_CLASS(FELogYieldedBonds, "wy");
     REGISTER_FECORE_CLASS(FELogFatigueBonds, "wf");
@@ -1060,6 +1068,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogDiscreteElementForceY    , "Fde.y");
     REGISTER_FECORE_CLASS(FELogDiscreteElementForceZ    , "Fde.z");
 	REGISTER_FECORE_CLASS(FELogContactArea, "contact area");
+	REGISTER_FECORE_CLASS(FELogMaxContactGap, "max contact gap");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 0, "mixture_stress[0].xx");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 1, "mixture_stress[0].xy");
 	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 2, "mixture_stress[0].yy");

@@ -24,24 +24,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-#include <FECore/FEMaterialPoint.h>
-#include "feamr_api.h"
+#include "ElementDataRecord.h"
+#include "MathObject.h"
+#include <string>
+#include "fecore_api.h"
 
-class FEAMR_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
+class FECORE_API FELogElemMath : public FELogElemData
 {
 public:
-	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
+	FELogElemMath(FEModel* pfem);
+	~FELogElemMath();
 
-	bool GetMaterialPointValue(FEMaterialPoint& el, double& value) override;
+	double value(FEElement& el);
 
-	bool GetElementValue(FEElement& el, double& value) override;
+	bool SetExpression(const std::string& smath);
 
 private:
-	double	m_min;
-	double	m_max;
-	bool	m_clamp;
-	FEMeshAdaptorCriterion*	m_data;
+	void Clear();
 
-	DECLARE_FECORE_CLASS();
+private:
+	MSimpleExpression m;
+	std::vector<FELogElemData*> m_data;
 };
+

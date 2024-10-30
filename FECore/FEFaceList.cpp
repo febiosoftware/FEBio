@@ -181,38 +181,8 @@ bool FEFaceList::Create(FEMesh& mesh, FEElemElemList& EEL)
 				if ((pen == 0) || ((pen != 0) && (el.GetID() < pen->GetID())))
 				{
 					FACE& se = m_faceList[NF++];
-					el.GetFace(j, face);
-
-					switch (el.Shape())
-					{
-					case ET_HEX8:
-                    case ET_HEX20:
-                    case ET_HEX27:
-						se.ntype = 4;
-						break;
-					case ET_TET4:
-					case ET_TET5:
-                    case ET_TET10:
-                    case ET_TET15:
-                    case ET_TET20:
-						se.ntype = 3;
-						break;
-                    case ET_PENTA6:
-                    case ET_PENTA15:
-                        {
-                            if (j<3) se.ntype = 4;
-                            else se.ntype = 3;
-                        }
-                        break;
-                    case ET_PYRA5:
-                    case ET_PYRA13:
-                        se.ntype = 4;
-                        break;
-					default:
-						assert(false);
-					}
-
-					int nn = se.ntype;
+					int nn = el.GetFace(j, face);
+					se.ntype = nn;
 					for (int k = 0; k < nn; ++k)
 					{
 						se.node[k] = face[k];
@@ -262,7 +232,6 @@ void FEFaceList::BuildNeighbors()
 						}
 					}
 				}
-				assert(f.nbr[j] != -1);
 			}
 		}
 	}

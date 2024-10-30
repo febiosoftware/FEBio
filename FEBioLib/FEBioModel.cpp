@@ -123,18 +123,11 @@ FEBioModel::FEBioModel()
 	m_writeMesh = false;
 	m_createReport = false;
 
-	m_stats.ntimeSteps = 0;
-	m_stats.ntotalIters = 0;
-	m_stats.ntotalRHS = 0;
-	m_stats.ntotalReforms = 0;
-
 	m_pltAppendOnRestart = true;
 
 	m_lastUpdate = -1;
 
 	m_bshowErrors = true;
-
-	m_TotalTime.makeInclusive();
 
 	// Add the output callback
 	// We call this function always since we want to flush the logfile for each event.
@@ -168,14 +161,6 @@ Timer& FEBioModel::GetSolveTimer()
 }
 
 //-----------------------------------------------------------------------------
-//! return number of seconds of time spent in linear solver
-int FEBioModel::GetLinearSolverTime()
-{
-	Timer* t = GetTimer(TimerID::Timer_LinSolve);
-	return (int)t->peek();
-}
-
-//-----------------------------------------------------------------------------
 //! set the debug level
 void FEBioModel::SetDebugLevel(int debugLvl) { m_ndebug = debugLvl; }
 
@@ -200,7 +185,17 @@ void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
 //! Get the stats 
 ModelStats FEBioModel::GetModelStats() const
 {
-	return m_stats;
+	return m_modelStats;
+}
+
+ModelStats FEBioModel::GetStepStats(size_t n) const
+{
+	return m_stepStats[n];
+}
+
+std::vector<ModelStats> FEBioModel::GetStepStats() const
+{
+	return m_stepStats;
 }
 
 //-----------------------------------------------------------------------------
@@ -641,7 +636,6 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				double time = GetTime().currentTime;
 				if (m_plot)
 				{
-					feLogDebug("writing to plot file; time = %lg; flag = %d", time, statusFlag);
 					m_plot->Write((float)time, statusFlag);
 				}
 
@@ -1341,6 +1335,28 @@ void FEBioModel::Serialize(DumpStream& ar)
 
 		// --- Save IO Data
 		SerializeIOData(ar);
+
+		if (ar.IsSaving())
+		{
+			int n = (int)m_stepStats.size();
+			ar << n;
+			for (ModelStats& s : m_stepStats)
+			{
+				ar << s.ntimeSteps << s.ntotalIters << s.ntotalReforms << s.ntotalRHS;
+			}
+		}
+		else
+		{
+			m_stepStats.clear();
+			int n = 0;
+			ar >> n;
+			for (int i = 0; i < n; ++i)
+			{
+				ModelStats s;
+				ar >> s.ntimeSteps >> s.ntotalIters >> s.ntotalReforms >> s.ntotalRHS;
+				m_stepStats.push_back(s);
+			}
+		}
 	}
 }
 
@@ -1542,7 +1558,7 @@ bool FEBioModel::InitPlotFile()
 
 bool FEBioModel::Init()
 {
-	TimerTracker t(&m_InitTime);
+	TRACK_TIME(TimerID::Timer_Init);
 
 	// Open the logfile
 	if (m_logLevel != 0)
@@ -1551,6 +1567,7 @@ bool FEBioModel::Init()
 	}
 
 	m_report.clear();
+	m_stepStats.clear();
 
 	FEBioPlotFile* pplt = nullptr;
 	m_lastUpdate = -1;
@@ -1644,6 +1661,9 @@ bool FEBioModel::InitLogFile()
 
 bool FEBioModel::Solve()
 {
+	// The total time is usually started on calling Input,
+	// however, in a restart Input is not called, so we start it here.
+	if (!m_TotalTime.isRunning()) m_TotalTime.start();
 	bool b = FEModel::Solve();
 	m_TotalTime.stop();
 	return b;
@@ -1692,10 +1712,12 @@ bool FEBioModel::Reset()
 		}
 	}
 
-	m_stats.ntimeSteps = 0;
-	m_stats.ntotalIters = 0;
-	m_stats.ntotalRHS = 0;
-	m_stats.ntotalReforms = 0;
+	// reset stats
+	m_modelStats.ntimeSteps = 0;
+	m_modelStats.ntotalIters = 0;
+	m_modelStats.ntotalRHS = 0;
+	m_modelStats.ntotalReforms = 0;
+	m_stepStats.clear();
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -1706,28 +1728,27 @@ bool FEBioModel::Reset()
 
 TimingInfo FEBioModel::GetTimingInfo()
 {
-	double tot = m_TotalTime.peek();
+	double tot = m_TotalTime.GetTime();
 
 	TimingInfo ti;
-	ti.total_time   = m_TotalTime.GetTime();
+	ti.total_time = m_TotalTime.GetTime();
+	ti.solve_time = GetSolveTimer().GetTime();
 
 	double total = 0;
-	ti.input_time   = m_InputTime.GetTime(); total += ti.input_time;
-	ti.init_time    = m_InitTime .GetTime(); total += ti.init_time;
-	ti.solve_time   = GetSolveTimer().GetTime(); total += ti.solve_time;
-	assert(total < ti.total_time);
+	ti.input_time         = m_InputTime.GetExclusiveTime(); total += ti.input_time;
+	ti.init_time          = GetTimer(TimerID::Timer_Init)->GetExclusiveTime(); total += ti.init_time;
+	ti.io_time            = m_IOTimer.GetExclusiveTime(); total += ti.io_time;
+	ti.total_ls_factor    = GetTimer(TimerID::Timer_LinSol_Factor   )->GetExclusiveTime(); total += ti.total_ls_factor;
+	ti.total_ls_backsolve = GetTimer(TimerID::Timer_LinSol_Backsolve)->GetExclusiveTime(); total += ti.total_ls_backsolve;
+	ti.total_reform       = GetTimer(TimerID::Timer_Reform          )->GetExclusiveTime(); total += ti.total_reform;
+	ti.total_stiff        = GetTimer(TimerID::Timer_Stiffness       )->GetExclusiveTime(); total += ti.total_stiff;
+	ti.total_rhs          = GetTimer(TimerID::Timer_Residual        )->GetExclusiveTime(); total += ti.total_rhs;
+	ti.total_update       = GetTimer(TimerID::Timer_Update          )->GetExclusiveTime(); total += ti.total_update;
+	ti.total_qn           = GetTimer(TimerID::Timer_QNUpdate        )->GetExclusiveTime(); total += ti.total_qn;
+	ti.total_serialize    = GetTimer(TimerID::Timer_Serialize       )->GetExclusiveTime(); total += ti.total_serialize;
+	ti.total_callback     = GetTimer(TimerID::Timer_Callback        )->GetExclusiveTime(); total += ti.total_callback;
 
-	double sum = 0;
-	ti.io_time      = m_IOTimer.GetTime(); sum += ti.io_time;
-	ti.total_linsol = GetTimer(TimerID::Timer_LinSolve )->GetTime(); sum += ti.total_linsol;
-	ti.total_reform = GetTimer(TimerID::Timer_Reform   )->GetTime(); sum += ti.total_reform;
-	ti.total_stiff  = GetTimer(TimerID::Timer_Stiffness)->GetTime(); sum += ti.total_stiff;
-	ti.total_rhs    = GetTimer(TimerID::Timer_Residual )->GetTime(); sum += ti.total_rhs;
-	ti.total_update = GetTimer(TimerID::Timer_Update   )->GetTime(); sum += ti.total_update;
-	ti.total_qn     = GetTimer(TimerID::Timer_QNUpdate )->GetTime(); sum += ti.total_qn;
-	assert(sum < ti.solve_time);
-
-	ti.total_other  = (ti.total_time - total) + (ti.solve_time - sum);
+	ti.total_other  = ti.total_time - total;
 	assert(ti.total_other >= 0);
 
 	return ti;
@@ -1746,16 +1767,19 @@ void FEBioModel::on_cb_solved()
 	if (Steps() > 1)
 	{
 		feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
-		feLog("\tNumber of time steps completed .................... : %d\n\n", m_stats.ntimeSteps);
-		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_stats.ntotalIters);
-		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_stats.ntotalRHS);
-		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_stats.ntotalReforms);
+		feLog("\tNumber of time steps completed .................... : %d\n\n", m_modelStats.ntimeSteps);
+		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_modelStats.ntotalIters);
+		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_modelStats.ntotalRHS);
+		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_modelStats.ntotalReforms);
 	}
 
+	// get timing info
+	TimingInfo ti = GetTimingInfo();
+
 	// get and print elapsed time
+	double linsol_time = ti.total_ls_factor + ti.total_ls_backsolve;
 	char sztime[64];
-	Timer* solveTimer = GetTimer(TimerID::Timer_LinSolve);
-	solveTimer->time_str(sztime);
+	Timer::time_str(linsol_time, sztime);
 	feLog("\tTime in linear solver: %s\n\n", sztime);
 
 	// always flush the log
@@ -1782,8 +1806,6 @@ void FEBioModel::on_cb_solved()
 		Logfile::MODE old_mode = m_log.SetMode(Logfile::LOG_FILE);
 
 		// sum up all the times spend in the linear solvers
-		TimingInfo ti = GetTimingInfo();
-
 		feLog(" T I M I N G   I N F O R M A T I O N\n\n");
 		Timer::time_str(ti.input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, ti.input_time);
 		Timer::time_str(ti.init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, ti.init_time);
@@ -1794,7 +1816,7 @@ void FEBioModel::on_cb_solved()
 		Timer::time_str(ti.total_rhs   , sztime); feLog("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, ti.total_rhs);
 		Timer::time_str(ti.total_update, sztime); feLog("\t   model update ................. : %s (%lg sec)\n\n", sztime, ti.total_update);
 		Timer::time_str(ti.total_qn    , sztime); feLog("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, ti.total_qn);
-		Timer::time_str(ti.total_linsol, sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, ti.total_linsol);
+		Timer::time_str(linsol_time    , sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, linsol_time);
 		Timer::time_str(ti.total_time  , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, ti.total_time);
 
 		m_log.SetMode(old_mode);
@@ -1851,10 +1873,16 @@ void FEBioModel::on_cb_stepSolved()
 	}
 
 	// add to stats
-	m_stats.ntimeSteps    += step->m_ntimesteps;
-	m_stats.ntotalIters   += step->m_ntotiter;
-	m_stats.ntotalRHS     += step->m_ntotrhs;
-	m_stats.ntotalReforms += step->m_ntotref;
+	ModelStats stats;
+	stats.ntimeSteps    = step->m_ntimesteps;
+	stats.ntotalIters   = step->m_ntotiter;
+	stats.ntotalRHS     = step->m_ntotrhs;
+	stats.ntotalReforms = step->m_ntotref;
+	m_stepStats.push_back(stats);
+	m_modelStats.ntimeSteps    += stats.ntimeSteps;
+	m_modelStats.ntotalIters   += stats.ntotalIters;
+	m_modelStats.ntotalRHS     += stats.ntotalRHS;
+	m_modelStats.ntotalReforms += stats.ntotalReforms;
 }
 
 bool FEBioModel::Restart(const char* szfile)

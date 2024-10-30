@@ -23,25 +23,31 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-#include <FECore/FEMaterialPoint.h>
-#include "feamr_api.h"
+#include "FEElementDataCriterion.h"
+#include <FECore/FECoreKernel.h>
 
-class FEAMR_API FEMinMaxFilterAdaptorCriterion : public FEMeshAdaptorCriterion
+BEGIN_FECORE_CLASS(FEElementDataCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_data, "element_data");
+END_FECORE_CLASS();
+
+FEElementDataCriterion::FEElementDataCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-public:
-	FEMinMaxFilterAdaptorCriterion(FEModel* fem);
+	m_pd = nullptr;
+}
 
-	bool GetMaterialPointValue(FEMaterialPoint& el, double& value) override;
+bool FEElementDataCriterion::Init()
+{
+	m_pd = fecore_new<FELogElemData>(m_data.c_str(), GetFEModel());
+	if (m_pd == nullptr) return false;
+	return FEMeshAdaptorCriterion::Init();
+}
 
-	bool GetElementValue(FEElement& el, double& value) override;
-
-private:
-	double	m_min;
-	double	m_max;
-	bool	m_clamp;
-	FEMeshAdaptorCriterion*	m_data;
-
-	DECLARE_FECORE_CLASS();
-};
+bool FEElementDataCriterion::GetElementValue(FEElement& el, double& val)
+{
+	if (m_pd)
+	{
+		val = m_pd->value(el);
+		return true;
+	}
+	else return false;
+}

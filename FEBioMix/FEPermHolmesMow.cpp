@@ -77,6 +77,9 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 	{
 		FEElement* pe = mp.m_elem;
 		int id = (pe ? pe->GetID() : -1);
+		// NOTE: This function can be called from a parallel (omp) section
+		//       however, logging should be done in serial. 
+#pragma omp critical
 		feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g. (element %d)", J, phi0, id);
 	}
 
@@ -103,6 +106,9 @@ tens4dmm FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	{
 		FEElement* pe = mp.m_elem;
 		int id = (pe ? pe->GetID() : -1);
+		// NOTE: This function can be called from a parallel (omp) section
+		//       however, logging should be done in serial. 
+#pragma omp critical
 		feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g. (element %d)", J, phi0, id);
 	}
 
