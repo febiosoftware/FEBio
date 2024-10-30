@@ -176,7 +176,18 @@ void MKLDSSolver::Destroy()
 }
 #else
 //-----------------------------------------------------------------------------
-class MKLDSSolver::Imp {};
+class MKLDSSolver::Imp
+{
+public:
+    CompactMatrix* A = nullptr;
+    
+    int msglvl = 0;
+};
+
+BEGIN_FECORE_CLASS(MKLDSSolver, LinearSolver)
+ADD_PARAMETER(m->msglvl, "msglvl");
+END_FECORE_CLASS();
+
 MKLDSSolver::MKLDSSolver(FEModel* fem) : LinearSolver(fem), m(nullptr) {}
 MKLDSSolver::~MKLDSSolver() {}
 SparseMatrix* MKLDSSolver::CreateSparseMatrix(Matrix_Type ntype) {	return nullptr; }
