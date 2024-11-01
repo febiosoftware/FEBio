@@ -6,7 +6,6 @@ if command -v sudo &> /dev/null
 then
 	SUDO=$(which sudo)
 fi
-$SUDO apt-get update
-$SUDO apt-get install -y \
-	qt6-base-dev \
-	libqt6widgets6
+
+$SUDO pip install aqtinstall -v
+$SUDO aqt install-qt --outputdir /opt/Qt linux desktop 6.7.3 -m all

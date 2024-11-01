@@ -30,3 +30,4 @@ jq
 yasm
 patchelf
 zip
+python3-pip
