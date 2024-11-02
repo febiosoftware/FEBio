@@ -101,7 +101,7 @@ public:
 	std::vector<int> ElementNeighborIndexList(int i);
     
     // find neighboring elements that fall within given proximity d
-    std::vector<int> ElementProximityList(int i, double d, bool bexcself = true);
+    std::vector<int> ElementProximityList(int i, double d, bool excludeSelf = true, bool matchMaterial = true);
 
 private:
 	MeshTopoImp*	imp;
