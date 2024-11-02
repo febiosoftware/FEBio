@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEReactiveViscoelastic.h"
 #include "FEElasticMixture.h"
+#include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterialPoint.h"
 #include "FEScaledElasticMaterial.h"
 #include <FECore/FECoreKernel.h>
@@ -654,6 +655,10 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
     // start by updating specialized material points of base and bond materials
     m_pBase->UpdateSpecializedMaterialPoints(sb, tp);
     m_pBond->UpdateSpecializedMaterialPoints(wb, tp);
+    
+    // if the this material is a fiber and if the fiber is in compression, skip this update
+    if ((dynamic_cast<FEElasticFiberMaterial*>(m_pBase)) && (dynamic_cast<FEElasticFiberMaterial*>(m_pBond)))
+        if ((m_pBase->Stress(mp)).norm() == 0) return;
     
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *wb.ExtractData<FEReactiveVEMaterialPoint>();
