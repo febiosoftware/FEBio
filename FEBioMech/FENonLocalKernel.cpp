@@ -46,8 +46,10 @@ double FEKernelBell::Kernel(FEMaterialPoint& p0, FEMaterialPoint& pt)
 {
     double r = (p0.m_r0 - pt.m_r0).unit();
     double k = 0;
-    if (r <= m_R*m_mult) {
-        k = pow(1-pow(r/m_R,2),2)*m_c;
+    if (r <= m_R*m_mult) 
+	{
+		double e = 1 - (r*r) / (m_R*m_R);
+        k = e*e*m_c;
     }
     
     return k;
@@ -56,7 +58,7 @@ double FEKernelBell::Kernel(FEMaterialPoint& p0, FEMaterialPoint& pt)
 //! kernel integral over infinite domain
 double FEKernelBell::KernelIntegralInfinity()
 {
-    return 105/(32*PI*pow(m_R,3));
+    return 105.0/(32.0*PI*m_R*m_R*m_R);
 }
 
 //-----------------------------------------------------------------------------
@@ -79,7 +81,7 @@ double FEKernelCone::Kernel(FEMaterialPoint& p0, FEMaterialPoint& pt)
 //! kernel integral over infinite domain
 double FEKernelCone::KernelIntegralInfinity()
 {
-    return 3/(PI*pow(m_R,3));
+    return 3/(PI*m_R*m_R*m_R);
 }
 
 //-----------------------------------------------------------------------------
@@ -93,7 +95,8 @@ double FEKernelGauss::Kernel(FEMaterialPoint& p0, FEMaterialPoint& pt)
     double r = (p0.m_r0 - pt.m_r0).unit();
     double k = 0;
     if (r <= m_R*m_mult) {
-        k = exp(-pow(r/m_R,2)/2)*m_c;
+		double e = r / m_R;
+        k = exp(-e*e*0.5)*m_c;
     }
     
     return k;
