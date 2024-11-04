@@ -51,35 +51,14 @@ bool FENonLocalAveraging::Init()
 
 		double mult = m_krnl->m_mult;
 		FEMesh& mesh = GetFEModel()->GetMesh();
-		FEMeshTopo topo;
-		feLogInfo("Evaluating mesh topology...");
-		if (topo.Create(&mesh) == false)
+		if (m_EPL.Create(mesh, R * mult) == false)
 		{
-			feLogError("Failed building mesh topo.");
+			feLogError("Failed building elemnet proximity lists.");
 			return false;
 		}
-		feLogInfo("Evaluating element proximity...");
-		m_EPL.resize(mesh.Elements());
-		double eplmin = 1e9;
-		double eplmax = 0;
-		double eplavg = 0;
-		int NE = topo.Elements();
-		for (int i = 0; i < NE; ++i) {
-			std::vector<FEElement*> epl = topo.ElementProximityList(i, R * mult, false);
-			m_EPL[i] = epl;
-			double epls = epl.size();
-			eplmin = std::min(eplmin, epls);
-			eplmax = std::max(eplmax, epls);
-			eplavg += epls;
-		}
-		eplavg /= NE;
-		feLogInfo("Done.");
-		feLog("Number of neighboring elements:\n");
-		feLog("-------------------------------\n");
-		feLog("Min. = %g, Max. = %g, Avg. = %g\n", eplmin, eplmax, eplavg);
 	}
 	m_binit = true;
-	return true;
+	return FEMaterialProperty::Init();
 }
 
 BEGIN_FECORE_CLASS(FENLABazant, FENonLocalAveraging)
@@ -93,10 +72,11 @@ double FENLABazant::CalculateAverage(FEMaterialPoint& pt, std::function<double(F
 	double R = m_krnl->m_R;
 	if (R > 0) {
 		int ie = pt.m_elem->GetLocalID();
-		int NEPL = (int)m_EPL[ie].size();
+		const std::vector<FEElement*>& epl = m_EPL[ie];
+		int NEPL = (int)epl.size();
 		double V = 0;
 		for (int i = 0; i < NEPL; ++i) {
-			FEElement* el = m_EPL[ie][i];
+			FEElement* el = epl[i];
 			if (el && el->isActive()) {
 				for (int k = 0; k < el->GaussPoints(); ++k) {
 					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
@@ -110,7 +90,6 @@ double FENLABazant::CalculateAverage(FEMaterialPoint& pt, std::function<double(F
 	}
 
 	return ca;
-
 }
 
 mat3ds FENLABazant::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f)
@@ -120,10 +99,11 @@ mat3ds FENLABazant::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(F
 	double R = m_krnl->m_R;
 	if (R > 0) {
 		int ie = pt.m_elem->GetLocalID();
-		int NEPL = (int)m_EPL[ie].size();
+		const std::vector<FEElement*>& epl = m_EPL[ie];
+		int NEPL = (int)epl.size();
 		double V = 0;
 		for (int i = 0; i < NEPL; ++i) {
-			FEElement* el = m_EPL[ie][i];
+			FEElement* el = epl[i];
 			if (el && el->isActive()) {
 				for (int k = 0; k < el->GaussPoints(); ++k) {
 					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
@@ -150,10 +130,11 @@ double FENLABorino::CalculateAverage(FEMaterialPoint& pt, std::function<double(F
 	double R = m_krnl->m_R;
 	if (R > 0) {
 		int ie = pt.m_elem->GetLocalID();
-		int NEPL = (int)m_EPL[ie].size();
+		const std::vector<FEElement*>& epl = m_EPL[ie];
+		int NEPL = (int)epl.size();
 		double V = 0;
 		for (int i = 0; i < NEPL; ++i) {
-			FEElement* el = m_EPL[ie][i];
+			FEElement* el = epl[i];
 			if (el && el->isActive()) {
 				for (int k = 0; k < el->GaussPoints(); ++k) {
 					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
@@ -179,10 +160,11 @@ mat3ds FENLABorino::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(F
 	double R = m_krnl->m_R;
 	if (R > 0) {
 		int ie = pt.m_elem->GetLocalID();
-		int NEPL = (int)m_EPL[ie].size();
+		const std::vector<FEElement*>& epl = m_EPL[ie];
+		int NEPL = (int)epl.size();
 		double V = 0;
 		for (int i = 0; i < NEPL; ++i) {
-			FEElement* el = m_EPL[ie][i];
+			FEElement* el = epl[i];
 			if (el && el->isActive()) {
 				for (int k = 0; k < el->GaussPoints(); ++k) {
 					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
@@ -203,25 +185,10 @@ mat3ds FENLABorino::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(F
 
 bool FENLAElement::Init()
 {
-	if (m_binit) return true;
-
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	feLogInfo("Evaluating mesh topology...");
-	FEMeshTopo topo;
-	if (topo.Create(&mesh) == false)
-	{
-		feLogError("Failed building mesh topo.");
-		return false;
-	}
-	int NE = topo.Elements();
-	m_EPL.resize(NE);
-	for (int i = 0; i < NE; ++i) {
-		std::vector<FEElement*> epl; epl.push_back(topo.Element(i));
-		m_EPL[i] = epl;
-		double epls = epl.size();
-	}
+	// bypass FENonLocalAveraging base class
+	// since we don't need the proximity list
 	m_binit = true;
-	return true;
+	return FEMaterialProperty::Init();
 }
 
 double FENLAElement::CalculateAverage(FEMaterialPoint& pt, std::function<double(FEMaterialPoint& mp)> f)

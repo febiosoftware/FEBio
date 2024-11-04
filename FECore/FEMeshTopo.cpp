@@ -366,7 +366,7 @@ vec3d ElementCentroid(FEElement& el)
 
 std::vector<FEElement*> FEMeshTopo::ElementProximityList(int i, double d, bool excludeSelf, bool matchMaterial)
 {
-	std::vector<FEElement*>    EPL; // element proximity list
+	std::vector<FEElement*> EPL; // element proximity list
 	std::vector<bool>   vst; // list of visited elements
 
 	int NE = Elements();

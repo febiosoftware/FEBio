@@ -23,42 +23,43 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEElementProximityList.h"
+#include "FEMeshTopo.h"
+#include "log.h"
+#include <iostream>
 
-
-
-#pragma once
-#include "FERemodelingElasticMaterial.h"
-#include <FECore/FEElementProximityList.h>
-
-//-----------------------------------------------------------------------------
-// This class implements a material that has a constant solute supply
-
-class FEHuiskesSupply :	public FESolidSupply
+FEElementProximityList::FEElementProximityList()
 {
-public:
-	//! constructor
-	FEHuiskesSupply(FEModel* pfem);
-	
-    //! initialization
-    bool Init() override;
-    
-	//! solid supply
-	double Supply(FEMaterialPoint& pt) override;
-	
-	//! tangent of solute supply with respect to strain
-	mat3ds Tangent_Supply_Strain(FEMaterialPoint& mp) override;
-	
-	//! tangent of solute supply with respect to referential density
-	double Tangent_Supply_Density(FEMaterialPoint& mp) override;
-	
-public:
-	double	m_B;			//!< mass supply coefficient
-	double	m_k;			//!< specific strain energy at homeostasis
-    double  m_D;            //!< characteristic sensor distance
 
-private:
-	FEElementProximityList    m_EPL; //!< list of element proximity lists
+}
 
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
-};
+bool FEElementProximityList::Create(FEMesh& mesh, double R)
+{
+	FEMeshTopo topo;
+	cout << "Evaluating mesh topology...";
+	if (topo.Create(&mesh) == false)
+	{
+		cout << "Failed building mesh topo.";
+		return false;
+	}
+	cout << "Evaluating element proximity...";
+	int NE = topo.Elements();
+	m_EPL.resize(NE);
+	double eplmin = 1e9;
+	double eplmax = 0;
+	double eplavg = 0;
+	for (int i = 0; i < NE; ++i) {
+		std::vector<FEElement*> epl = topo.ElementProximityList(i, R, false);
+		m_EPL[i] = epl;
+		double epls = epl.size();
+		eplmin = std::min(eplmin, epls);
+		eplmax = std::max(eplmax, epls);
+		eplavg += epls;
+	}
+	eplavg /= NE;
+	printf("Done.");
+	printf("Number of neighboring elements:\n");
+	printf("-------------------------------\n");
+	printf("Min. = %g, Max. = %g, Avg. = %g\n", eplmin, eplmax, eplavg);
+}

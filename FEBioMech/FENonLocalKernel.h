@@ -29,7 +29,6 @@ SOFTWARE.*/
 #pragma once
 #include "febiomech_api.h"
 #include <FECore/FEMaterial.h>
-#include <FECore/FEMeshTopo.h>
 
 //-----------------------------------------------------------------------------
 // Virtual base class for nonlocal kernels

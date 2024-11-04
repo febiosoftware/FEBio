@@ -34,9 +34,9 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEHuiskesSupply, FESolidSupply)
-	ADD_PARAMETER(m_B, "B");
-	ADD_PARAMETER(m_k, "k")->setUnits(UNIT_SPECIFIC_ENERGY);
-    ADD_PARAMETER(m_D, FE_RANGE_GREATER_OR_EQUAL(0.0), "D")->setUnits(UNIT_LENGTH)->setLongName("sensor distance");
+ADD_PARAMETER(m_B, "B");
+ADD_PARAMETER(m_k, "k")->setUnits(UNIT_SPECIFIC_ENERGY);
+ADD_PARAMETER(m_D, FE_RANGE_GREATER_OR_EQUAL(0.0), "D")->setUnits(UNIT_LENGTH)->setLongName("sensor distance");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -50,26 +50,18 @@ FEHuiskesSupply::FEHuiskesSupply(FEModel* pfem) : FESolidSupply(pfem)
 //! Initialization
 bool FEHuiskesSupply::Init()
 {
-    // get neighboring elements for given proximity
-    if (m_D > 0) {
-        double mult = 4;    //! multiplier of characteristic distance, such that exp(-mult) << 1
-        FEMesh& mesh = GetFEModel()->GetMesh();
-        if (m_topo.Create(&mesh) == false)
-        {
-            feLogError("Failed building mesh topo.");
-            return false;
-        }
-        feLogInfo("Evaluating element proximity...");
-		int NE = m_topo.Elements();
-        m_EPL.resize(NE);
-        for (int i=0; i< NE; ++i) {
-            std::vector<FEElement*> epl = m_topo.ElementProximityList(i, m_D*mult);
-            m_EPL[i] = epl;
-        }
-        feLogInfo("Done.");
-    }
-    
-    return true;
+	// get neighboring elements for given proximity
+	if (m_D > 0) {
+		double mult = 4;    //! multiplier of characteristic distance, such that exp(-mult) << 1
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		if (m_EPL.Create(mesh, m_D * mult) == false)
+		{
+			feLogError("Failed building proximity list.");
+			return false;
+		}
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -79,66 +71,68 @@ double FEHuiskesSupply::Supply(FEMaterialPoint& pt)
 	FERemodelingMaterialPoint* rpt = pt.ExtractData<FERemodelingMaterialPoint>();
 	double rhor = rpt->m_rhor;
 	double sed = rpt->m_sed;
-	double rhorhat = m_B*(sed/rhor - m_k);
-    
-    if (m_D > 0) {
-        FEMesh& mesh = GetFEModel()->GetMesh();
-        int ie = pt.m_elem->GetLocalID();
-        int NEPL = (int)m_EPL[ie].size();
-        for (int i=0; i<NEPL; ++i) {
-            FEElement* el = m_EPL[ie][i];
-            if (el && el->isActive()) {
-                for (int k=0; k<el->GaussPoints(); ++k) {
-                    FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-                    double d = (pt.m_rt - mp.m_rt).unit();
-                    rpt = mp.ExtractData<FERemodelingMaterialPoint>();
-                    FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-                    rhorhat += exp(-d/m_D)*m_B*(rpt->m_sed/rpt->m_rhor - m_k);
-                }
-            }
-        }
-    }
+	double rhorhat = m_B * (sed / rhor - m_k);
 
-    return rhorhat;
+	if (m_D > 0) {
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		int ie = pt.m_elem->GetLocalID();
+		const std::vector<FEElement*>& epl = m_EPL[ie];
+		int NEPL = (int)epl.size();
+		for (int i = 0; i < NEPL; ++i) {
+			FEElement* el = epl[i];
+			if (el && el->isActive()) {
+				for (int k = 0; k < el->GaussPoints(); ++k) {
+					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
+					double d = (pt.m_rt - mp.m_rt).unit();
+					rpt = mp.ExtractData<FERemodelingMaterialPoint>();
+					FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+					rhorhat += exp(-d / m_D) * m_B * (rpt->m_sed / rpt->m_rhor - m_k);
+				}
+			}
+		}
+	}
+
+	return rhorhat;
 }
 
 //-----------------------------------------------------------------------------
 //! Tangent of solid supply with respect to strain
-mat3ds FEHuiskesSupply::Tangent_Supply_Strain(FEMaterialPoint &pt)
+mat3ds FEHuiskesSupply::Tangent_Supply_Strain(FEMaterialPoint& pt)
 {
-    FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
 	FERemodelingMaterialPoint* rpt = pt.ExtractData<FERemodelingMaterialPoint>();
-    mat3ds ruhat = et.m_s*(m_B/rpt->m_rhor);
+	mat3ds ruhat = et.m_s * (m_B / rpt->m_rhor);
 
-    if (m_D > 0) {
-        FEMesh& mesh = GetFEModel()->GetMesh();
-        int ie = pt.m_elem->GetLocalID();
-        int NEPL = (int)m_EPL[ie].size();
-        for (int i=0; i<NEPL; ++i) {
-            FEElement* el = m_EPL[ie][i];
-            if (el && el->isActive()) {
-                for (int k=0; k<el->GaussPoints(); ++k) {
-                    FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-                    double d = (pt.m_rt - mp.m_rt).unit();
-                    rpt = mp.ExtractData<FERemodelingMaterialPoint>();
-                    FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-                    ruhat += et.m_s*(exp(-d/m_D)*m_B/rpt->m_rhor);
-                }
-            }
-        }
-    }
+	if (m_D > 0) {
+		FEMesh& mesh = GetFEModel()->GetMesh();
+		int ie = pt.m_elem->GetLocalID();
+		const std::vector<FEElement*>& epl = m_EPL[ie];
+		int NEPL = (int)epl.size();
+		for (int i = 0; i < NEPL; ++i) {
+			FEElement* el = epl[i];
+			if (el && el->isActive()) {
+				for (int k = 0; k < el->GaussPoints(); ++k) {
+					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
+					double d = (pt.m_rt - mp.m_rt).unit();
+					rpt = mp.ExtractData<FERemodelingMaterialPoint>();
+					FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+					ruhat += et.m_s * (exp(-d / m_D) * m_B / rpt->m_rhor);
+				}
+			}
+		}
+	}
 
-    return ruhat;
+	return ruhat;
 }
 
 //-----------------------------------------------------------------------------
 //! Tangent of solid supply with respect to referential density
-double FEHuiskesSupply::Tangent_Supply_Density(FEMaterialPoint &mp)
+double FEHuiskesSupply::Tangent_Supply_Density(FEMaterialPoint& mp)
 {
 	FERemodelingMaterialPoint& rpt = *mp.ExtractData<FERemodelingMaterialPoint>();
-    double rhor = rpt.m_rhor;
-    double sed = rpt.m_sed;
-    double dsed = rpt.m_dsed;
-	return (dsed - sed/rhor)*m_B/rhor;
+	double rhor = rpt.m_rhor;
+	double sed = rpt.m_sed;
+	double dsed = rpt.m_dsed;
+	return (dsed - sed / rhor) * m_B / rhor;
 }
 

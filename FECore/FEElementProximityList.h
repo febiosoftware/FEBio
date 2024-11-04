@@ -23,42 +23,21 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FERemodelingElasticMaterial.h"
-#include <FECore/FEElementProximityList.h>
+#include "fecore_api.h"
+#include "FEElement.h"
+#include "FEMesh.h"
+#include <vector>
 
-//-----------------------------------------------------------------------------
-// This class implements a material that has a constant solute supply
-
-class FEHuiskesSupply :	public FESolidSupply
+class FECORE_API FEElementProximityList
 {
 public:
-	//! constructor
-	FEHuiskesSupply(FEModel* pfem);
-	
-    //! initialization
-    bool Init() override;
-    
-	//! solid supply
-	double Supply(FEMaterialPoint& pt) override;
-	
-	//! tangent of solute supply with respect to strain
-	mat3ds Tangent_Supply_Strain(FEMaterialPoint& mp) override;
-	
-	//! tangent of solute supply with respect to referential density
-	double Tangent_Supply_Density(FEMaterialPoint& mp) override;
-	
-public:
-	double	m_B;			//!< mass supply coefficient
-	double	m_k;			//!< specific strain energy at homeostasis
-    double  m_D;            //!< characteristic sensor distance
+	FEElementProximityList();
+
+	bool Create(FEMesh& mesh, double R);
+
+	const std::vector<FEElement*>& operator [](size_t n) const { return m_EPL[n]; }
 
 private:
-	FEElementProximityList    m_EPL; //!< list of element proximity lists
-
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
+	std::vector<std::vector<FEElement*> > m_EPL;
 };

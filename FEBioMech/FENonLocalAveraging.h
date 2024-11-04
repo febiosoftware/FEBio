@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "febiomech_api.h"
 #include "FENonLocalKernel.h"
 #include <FECore/FEMaterial.h>
+#include <FECore/FEElementProximityList.h>
 #include <functional>
 
 //-----------------------------------------------------------------------------
@@ -43,12 +44,11 @@ public:
 
 	virtual mat3ds CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f) { return mat3ds(); };
 
-public:
+protected:
 	FENonLocalKernel* m_krnl;   //! kernel function
-	bool    m_binit;            //!< initialization flag
 
-public:
-	std::vector<std::vector<FEElement*>>    m_EPL; //!< list of element proximity lists
+	bool    m_binit;            //!< initialization flag
+	FEElementProximityList m_EPL; //!< list of element proximity lists
 
 	FECORE_BASE_CLASS(FENonLocalAveraging);
 };

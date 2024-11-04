@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEChemicalReaction.h"
-#include <FECore/FEMeshTopo.h>
+#include <FECore/FEElementProximityList.h>
 
 class FEBIOMIX_API FEReactionRateHuiskes : public FEReactionRate
 {
@@ -55,8 +55,7 @@ public:
 
 private:
     int             m_comp;                 //!< component of solid mixture (if applicable)
-    std::vector<std::vector<FEElement*>>    m_EPL; //!< list of element proximity lists
-    FEMeshTopo      m_topo;                 //!< mesh topology;
+    FEElementProximityList    m_EPL; //!< list of element proximity lists
     bool            m_binit;                //!< initialization flag
     double          m_M;                    //!< molar mass of sbm
     int             m_lsbm;                 //!< local sbm value

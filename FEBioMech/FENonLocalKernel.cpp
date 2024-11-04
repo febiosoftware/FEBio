@@ -23,14 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FENonLocalKernel.h"
-#include <FECore/FEModel.h>
-#include <FECore/log.h>
-#include <algorithm>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
