@@ -78,6 +78,8 @@ public:
     
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp) override;
     
+	void PlasticityCriterionAverage(FEMaterialPoint& pt, FEMaterialPoint& rp);
+
 public:
     FEElasticMaterial*  m_pBase;    // base elastic material
     FEDamageCriterion*  m_pCrit;    // damage criterion

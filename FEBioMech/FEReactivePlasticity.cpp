@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 #include <FECore/matrix.h>
 #include <FECore/FEModel.h>
+#include "FENLADamageCriterion.h"
 
 //////////////////////// PLASTICITY MATERIAL  /////////////////////////////////
 // define the material parameters
@@ -235,6 +236,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
 //! calculate stress at material point
 mat3ds FEReactivePlasticity::Stress(FEMaterialPoint& pt)
 {
+	// TODO: mp is not deleted! Memory leak!!
     FEMaterialPoint* mp = pt.Copy();
     mp->m_r0 = pt.m_r0;
     mp->m_rt = pt.m_rt;
@@ -245,14 +247,16 @@ mat3ds FEReactivePlasticity::Stress(FEMaterialPoint& pt)
     mp->m_J0 = pt.m_J0;
     mp->m_Jt = pt.m_Jt;
     mp->m_index = pt.m_index;
-//    if (m_pCrit->m_nla == nullptr) {
+	if (dynamic_cast<FENLADamageCriterion*>(m_pCrit) == nullptr)
+	{
         ElasticDeformationGradient(*mp);
-/* }
-    else {
-        m_pCrit->m_nla->PlasticityCriterionAverage(pt, *mp);
+	}
+    else 
+	{
+		PlasticityCriterionAverage(pt, *mp);
     }
-*/
-    int n = (int)m_pFlow->BondFamilies(*mp);
+
+	int n = (int)m_pFlow->BondFamilies(*mp);
 
     // extract elastic material point
     FEElasticMaterialPoint& pe = *mp->ExtractData<FEElasticMaterialPoint>();
@@ -282,12 +286,74 @@ mat3ds FEReactivePlasticity::Stress(FEMaterialPoint& pt)
     return s;
 }
 
+//! criterion average
+void FEReactivePlasticity::PlasticityCriterionAverage(FEMaterialPoint& pt, FEMaterialPoint& rp)
+{
+	FEReactivePlasticityMaterialPoint& ca = *rp.ExtractData<FEReactivePlasticityMaterialPoint>();
+	int n = (int)m_pFlow->BondFamilies(pt);
+	for (int l=0; l<n; ++l) {
+		ca.m_w[l] = 0;
+		ca.m_Fusi[l] = mat3d(0,0,0,0,0,0,0,0,0);
+		ca.m_Fvsi[l] = mat3d(0,0,0,0,0,0,0,0,0);
+		ca.m_Ku[l] = 0;
+		ca.m_Kv[l] = 0;
+		ca.m_gp[l] = 0;
+		ca.m_gpp[l] = 0;
+		ca.m_gc[l] = 0;
+		ca.m_byld[l] = false;
+	}
+	ca.m_Fp = mat3d(0,0,0,0,0,0,0,0,0);
+	ca.m_Rhat = 0;
+
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	int ie = pt.m_elem->GetLocalID();
+	FEElement* el = mesh.Element(ie);
+	if (el->GetMatID() != pt.m_elem->GetMatID()) return;
+	double V = 0;
+	for (int k=0; k<el->GaussPoints(); ++k) {
+		FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
+		ElasticDeformationGradient(mp);
+		// extract plastic material point
+		FEReactivePlasticityMaterialPoint& pp = *mp.ExtractData<FEReactivePlasticityMaterialPoint>();
+		for (int l=0; l<n; ++l) {
+			ca.m_w[l] += pp.m_w[l]*mp.m_V0;
+			ca.m_Fusi[l] += pp.m_Fusi[l]*mp.m_V0;
+			ca.m_Fvsi[l] += pp.m_Fvsi[l]*mp.m_V0;
+			ca.m_Ku[l] += pp.m_Ku[l]*mp.m_V0;
+			ca.m_Kv[l] += pp.m_Kv[l]*mp.m_V0;
+			ca.m_gp[l] += pp.m_gp[l]*mp.m_V0;
+			ca.m_gpp[l] += pp.m_gpp[l]*mp.m_V0;
+			ca.m_gc[l] += pp.m_gc[l]*mp.m_V0;
+			ca.m_byld[l] = ca.m_byld[l] & pp.m_byld[l];
+		}
+		ca.m_Fp += pp.m_Fp*mp.m_V0;
+		ca.m_Rhat += pp.m_Rhat*mp.m_V0;
+		V += mp.m_V0;
+	}
+	if (V > 0) {
+		for (int l=0; l<n; ++l) {
+			ca.m_w[l] /= V;
+			ca.m_Fusi[l] /= V;
+			ca.m_Fvsi[l] /= V;
+			ca.m_Ku[l] /= V;
+			ca.m_Kv[l] /= V;
+			ca.m_gp[l] /= V;
+			ca.m_gpp[l] /= V;
+			ca.m_gc[l] /= V;
+		}
+		ca.m_Fp /= V;
+		ca.m_Rhat /= V;
+		OctahedralPlasticStrain(rp);
+		ReactiveHeatSupplyDensity(rp);
+	}
+}
+
 //-----------------------------------------------------------------------------
 //! calculate tangent stiffness at material point
 tens4ds FEReactivePlasticity::Tangent(FEMaterialPoint& pt)
 {
     FETimeInfo ti = GetFEModel()->GetTime();
-    FEMaterialPoint* mp = pt.Copy();
+    FEMaterialPoint* mp = pt.Copy(); // TODO: mp is not deleted! Memory leak!!
     mp->m_r0 = pt.m_r0;
     mp->m_rt = pt.m_rt;
     mp->m_Q = pt.m_Q;
@@ -297,14 +363,16 @@ tens4ds FEReactivePlasticity::Tangent(FEMaterialPoint& pt)
     mp->m_J0 = pt.m_J0;
     mp->m_Jt = pt.m_Jt;
     mp->m_index = pt.m_index;
-//    if (m_pCrit->m_nla == nullptr || (ti.currentTime == 0)) {
+	if (dynamic_cast<FENLADamageCriterion*>(m_pCrit) == nullptr)
+	{
         ElasticDeformationGradient(*mp);
-    /* }
-    else {
-        m_pCrit->m_nla->PlasticityCriterionAverage(pt, *mp);
     }
-*/
-    int n = (int)m_pFlow->BondFamilies(*mp);
+    else 
+	{
+        PlasticityCriterionAverage(pt, *mp);
+    }
+
+	int n = (int)m_pFlow->BondFamilies(*mp);
 
     // extract elastic material point
     FEElasticMaterialPoint& pe = *mp->ExtractData<FEElasticMaterialPoint>();
@@ -338,7 +406,7 @@ tens4ds FEReactivePlasticity::Tangent(FEMaterialPoint& pt)
 //! calculate strain energy density at material point
 double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
 {
-    FEMaterialPoint* mp = pt.Copy();
+    FEMaterialPoint* mp = pt.Copy(); // TODO: mp is not deleted! Memory leak!!
     mp->m_r0 = pt.m_r0;
     mp->m_rt = pt.m_rt;
     mp->m_Q = pt.m_Q;
@@ -351,13 +419,15 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
     FEElasticMaterialPoint& pte = *pt.ExtractData<FEElasticMaterialPoint>();
     FEElasticMaterialPoint& mpe = *mp->ExtractData<FEElasticMaterialPoint>();
     mpe.m_F = pte.m_F; mpe.m_J = pte.m_J;
-//    if (m_pCrit->m_nla == nullptr) {
-        ElasticDeformationGradient(*mp);
-/* }
-    else {
-        m_pCrit->m_nla->PlasticityCriterionAverage(pt, *mp);
+	if (dynamic_cast<FENLADamageCriterion*>(m_pCrit) == nullptr)
+	{
+		ElasticDeformationGradient(*mp);
+	}
+    else
+	{
+		PlasticityCriterionAverage(pt, *mp);
     }
-*/
+
     int n = (int)m_pFlow->BondFamilies(*mp);
 
     // extract elastic material point
