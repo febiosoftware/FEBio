@@ -984,20 +984,20 @@ void FEElasticANSShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         // calculate the stress at this material point
         mat3ds S = m_secant_stress ? m_pMat->SecantStress(mp, true) : m_pMat->PK2Stress(mp, el.m_E[n]);
         pt.m_s = (pt.m_F*S*pt.m_F.transpose()).sym()/pt.m_J;
+
+		// adjust stress for strain energy conservation
+		if (tp.alphaf == 0.5)
+		{
+			// evaluate strain energy at current time
+			mat3d Ftmp = pt.m_F;
+			double Jtmp = pt.m_J;
+			pt.m_F = Ft;
+			pt.m_J = Jt;
+			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
+			pt.m_Wt = pme->StrainEnergyDensity(mp);
+			pt.m_F = Ftmp;
+			pt.m_J = Jtmp;
         
-        // evaluate strain energy at current time
-        mat3d Ftmp = pt.m_F;
-        double Jtmp = pt.m_J;
-        pt.m_F = Ft;
-        pt.m_J = Jt;
-        FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
-        pt.m_Wt = pme->StrainEnergyDensity(mp);
-        pt.m_F = Ftmp;
-        pt.m_J = Jtmp;
-        
-        // adjust stress for strain energy conservation
-        if (tp.alphaf == 0.5)
-        {
             mat3ds D = pt.m_L.sym();
             double D2 = D.dotdot(D);
             if (D2 > 0)

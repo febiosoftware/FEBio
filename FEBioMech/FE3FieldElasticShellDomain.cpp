@@ -521,20 +521,19 @@ void FE3FieldElasticShellDomain::UpdateElementStress(int iel)
         // seperately.
         pt.m_s = mat3dd(ed.ep) + mat.DevStress(mp);
         
-        
-        // evaluate strain energy at current time
-        mat3d Ftmp = pt.m_F;
-        double Jtmp = pt.m_J;
-        pt.m_F = Ft;
-        pt.m_J = Jt;
-        FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
-        pt.m_Wt = pme->StrainEnergyDensity(mp);
-        pt.m_F = Ftmp;
-        pt.m_J = Jtmp;
-        
-        // adjust stress for strain energy conservation
-        if (m_alphaf == 0.5)
-        {
+		// adjust stress for strain energy conservation
+		if (m_alphaf == 0.5)
+		{
+			// evaluate strain energy at current time
+			mat3d Ftmp = pt.m_F;
+			double Jtmp = pt.m_J;
+			pt.m_F = Ft;
+			pt.m_J = Jt;
+			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
+			pt.m_Wt = pme->StrainEnergyDensity(mp);
+			pt.m_F = Ftmp;
+			pt.m_J = Jtmp;
+
             mat3ds D = pt.m_L.sym();
             double D2 = D.dotdot(D);
             if (D2 > std::numeric_limits<double>::epsilon())
