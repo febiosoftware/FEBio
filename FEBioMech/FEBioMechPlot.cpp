@@ -885,6 +885,13 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotShellNodalStresses::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStress());
+    return true;
+}
+
 //=============================================================================
 FEPlotElementMixtureStress::FEPlotElementMixtureStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM) 
 {

@@ -929,6 +929,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Class that projects stresses from integration points to the shell nodes
+class FEPlotShellNodalStresses : public FEPlotDomainData
+{
+public:
+    FEPlotShellNodalStresses(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Deformation gradient
 class FEPlotDeformationGradient : public FEPlotDomainData
 {
