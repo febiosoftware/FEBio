@@ -48,10 +48,10 @@ bool FENLADamageCriterion::Init()
 
 double FENLADamageCriterion::DamageCriterion(FEMaterialPoint& pt)
 {
-	return m_nla->CalculateAverage(pt, m_dc);
+	return m_nla->CalculateAverage(pt, [=](FEMaterialPoint& mp) { return m_dc->DamageCriterion(mp); });
 }
 
 mat3ds FENLADamageCriterion::CriterionStressTangent(FEMaterialPoint& pt)
 { 
-	return m_nla->CalculateAverageTangent(pt, m_dc);
+	return m_nla->CalculateAverage(pt, [=](FEMaterialPoint& mp) { return m_dc->CriterionStressTangent(mp); });
 }

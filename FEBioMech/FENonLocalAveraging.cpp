@@ -23,16 +23,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FENonLocalAveraging.h"
-#include "FEDamageCriterion.h"
-#include "FEReactivePlasticityMaterialPoint.h"
 #include <FECore/FEModel.h>
+#include <FECore/FEMeshTopo.h>
+#include <FECore/FEMesh.h>
 #include <FECore/log.h>
-#include <algorithm>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -86,18 +82,16 @@ bool FENonLocalAveraging::Init()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENLABazant, FENonLocalAveraging)
 	ADD_PROPERTY(m_krnl, "kernel");
 END_FECORE_CLASS();
 
-double FENLABazant::CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc)
+double FENLABazant::CalculateAverage(FEMaterialPoint& pt, std::function<double(FEMaterialPoint& mp)> f)
 {
 	double ca = 0;
 
 	double R = m_krnl->m_R;
 	if (R > 0) {
-		FEMesh& mesh = GetFEModel()->GetMesh();
 		int ie = pt.m_elem->GetLocalID();
 		int NEPL = (int)m_EPL[ie].size();
 		double V = 0;
@@ -107,7 +101,7 @@ double FENLABazant::CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc)
 				for (int k = 0; k < el->GaussPoints(); ++k) {
 					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
 					double krnl = m_krnl->Kernel(pt, mp);
-					ca += dc->DamageCriterion(mp) * krnl * mp.m_V0;
+					ca += f(mp) * krnl * mp.m_V0;
 					V += krnl * mp.m_V0;
 				}
 			}
@@ -119,13 +113,12 @@ double FENLABazant::CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc)
 
 }
 
-mat3ds FENLABazant::CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriterion* dc)
+mat3ds FENLABazant::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f)
 {
 	mat3ds cst(0);
 
 	double R = m_krnl->m_R;
 	if (R > 0) {
-		FEMesh& mesh = GetFEModel()->GetMesh();
 		int ie = pt.m_elem->GetLocalID();
 		int NEPL = (int)m_EPL[ie].size();
 		double V = 0;
@@ -135,7 +128,7 @@ mat3ds FENLABazant::CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriteri
 				for (int k = 0; k < el->GaussPoints(); ++k) {
 					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
 					double krnl = m_krnl->Kernel(pt, mp);
-					cst += dc->CriterionStressTangent(mp) * krnl * mp.m_V0;
+					cst += f(mp) * krnl * mp.m_V0;
 					V += krnl * mp.m_V0;
 				}
 			}
@@ -150,13 +143,12 @@ BEGIN_FECORE_CLASS(FENLABorino, FENonLocalAveraging)
 	ADD_PROPERTY(m_krnl, "kernel");
 END_FECORE_CLASS();
 
-double FENLABorino::CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc)
+double FENLABorino::CalculateAverage(FEMaterialPoint& pt, std::function<double(FEMaterialPoint& mp)> f)
 {
 	double ca = 0;
 
 	double R = m_krnl->m_R;
 	if (R > 0) {
-		FEMesh& mesh = GetFEModel()->GetMesh();
 		int ie = pt.m_elem->GetLocalID();
 		int NEPL = (int)m_EPL[ie].size();
 		double V = 0;
@@ -166,27 +158,26 @@ double FENLABorino::CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc)
 				for (int k = 0; k < el->GaussPoints(); ++k) {
 					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
 					double krnl = m_krnl->Kernel(pt, mp);
-					ca += dc->DamageCriterion(mp) * krnl * mp.m_V0;
+					ca += f(mp) * krnl * mp.m_V0;
 					V += krnl * mp.m_V0;
 				}
 			}
 		}
 		if (V > 0) {
 			ca /= V;
-			if (V < 1) ca += (1 - V) * dc->DamageCriterion(pt);
+			if (V < 1) ca += (1 - V) * f(pt);
 		}
 	}
 
 	return ca;
 }
 
-mat3ds FENLABorino::CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriterion* dc)
+mat3ds FENLABorino::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f)
 {
 	mat3ds cst(0);
 
 	double R = m_krnl->m_R;
 	if (R > 0) {
-		FEMesh& mesh = GetFEModel()->GetMesh();
 		int ie = pt.m_elem->GetLocalID();
 		int NEPL = (int)m_EPL[ie].size();
 		double V = 0;
@@ -196,14 +187,14 @@ mat3ds FENLABorino::CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriteri
 				for (int k = 0; k < el->GaussPoints(); ++k) {
 					FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
 					double krnl = m_krnl->Kernel(pt, mp);
-					cst += dc->CriterionStressTangent(mp) * krnl * mp.m_V0;
+					cst += f(mp) * krnl * mp.m_V0;
 					V += krnl * mp.m_V0;
 				}
 			}
 		}
 		if (V > 0) {
 			cst /= V;
-			if (V < 1) cst += dc->CriterionStressTangent(pt) * (1 - V);
+			if (V < 1) cst += f(pt) * (1 - V);
 		}
 	}
 
@@ -233,16 +224,14 @@ bool FENLAElement::Init()
 	return true;
 }
 
-double FENLAElement::CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc)
+double FENLAElement::CalculateAverage(FEMaterialPoint& pt, std::function<double(FEMaterialPoint& mp)> f)
 {
 	double ca = 0;
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int ie = pt.m_elem->GetLocalID();
-	FEElement* el = mesh.Element(ie);
+	FEElement* el = pt.m_elem;
 	double V = 0;
 	for (int k = 0; k < el->GaussPoints(); ++k) {
 		FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-		ca += dc->DamageCriterion(mp) * mp.m_V0;
+		ca += f(mp) * mp.m_V0;
 		V += mp.m_V0;
 	}
 	if (V > 0) ca /= V;
@@ -250,17 +239,14 @@ double FENLAElement::CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc
 	return ca;
 }
 
-mat3ds FENLAElement::CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriterion* dc)
+mat3ds FENLAElement::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f)
 {
 	mat3ds cst(0);
-
-	FEMesh& mesh = GetFEModel()->GetMesh();
-	int ie = pt.m_elem->GetLocalID();
-	FEElement* el = mesh.Element(ie);
+	FEElement* el = pt.m_elem;
 	double V = 0;
 	for (int k = 0; k < el->GaussPoints(); ++k) {
 		FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-		cst += dc->CriterionStressTangent(mp) * mp.m_V0;
+		cst += f(mp) * mp.m_V0;
 		V += mp.m_V0;
 	}
 	if (V > 0) cst /= V;

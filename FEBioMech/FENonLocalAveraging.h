@@ -23,16 +23,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "febiomech_api.h"
 #include "FENonLocalKernel.h"
 #include <FECore/FEMaterial.h>
-#include <FECore/FEMeshTopo.h>
-
-class FEDamageCriterion;
+#include <functional>
 
 //-----------------------------------------------------------------------------
 // Virtual base class for nonlocal averaging method
@@ -44,9 +39,9 @@ public:
 
 	virtual bool Init() override;
 
-	virtual double CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc) { return 0; }
+	virtual double CalculateAverage(FEMaterialPoint& pt, std::function<double(FEMaterialPoint& mp)> f) { return 0; }
 
-	virtual mat3ds CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriterion* dc) { return mat3ds(); };
+	virtual mat3ds CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f) { return mat3ds(); };
 
 public:
 	FENonLocalKernel* m_krnl;   //! kernel function
@@ -65,9 +60,9 @@ class FEBIOMECH_API FENLABazant : public FENonLocalAveraging
 public:
 	FENLABazant(FEModel* pfem) : FENonLocalAveraging(pfem) {}
 
-	double CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc) override;
+	double CalculateAverage(FEMaterialPoint& pt, std::function<double(FEMaterialPoint& mp)> f) override;
 
-	mat3ds CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriterion* dc) override;
+	mat3ds CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f) override;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -79,9 +74,9 @@ class FEBIOMECH_API FENLABorino : public FENonLocalAveraging
 public:
 	FENLABorino(FEModel* pfem) : FENonLocalAveraging(pfem) {}
 
-	double CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc) override;
+	double CalculateAverage(FEMaterialPoint& pt, std::function<double(FEMaterialPoint& mp)> f) override;
 
-	mat3ds CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriterion* dc) override;
+	mat3ds CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f) override;
 
 	DECLARE_FECORE_CLASS();
 };
@@ -95,7 +90,7 @@ public:
 
 	bool Init() override;
 
-	double CalculateAverage(FEMaterialPoint& pt, FEDamageCriterion* dc) override;
+	double CalculateAverage(FEMaterialPoint& pt, std::function<double(FEMaterialPoint& mp)> f) override;
 
-	mat3ds CalculateAverageTangent(FEMaterialPoint& pt, FEDamageCriterion* dc) override;
+	mat3ds CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(FEMaterialPoint& mp)> f) override;
 };
