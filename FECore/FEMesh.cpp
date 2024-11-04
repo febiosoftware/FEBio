@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include "FENodeDataMap.h"
 #include "DumpStream.h"
 #include "FECoreKernel.h"
+#include "FEElementLUT.h"
 #include <algorithm>
 
 //-----------------------------------------------------------------------------
@@ -1065,60 +1066,6 @@ int FENodeLUT::FindIndex(int nodeID) const
 {
 	if ((nodeID < m_minID) || (nodeID > m_maxID)) return -1;
 	return m_node[nodeID - m_minID];
-}
-
-//=============================================================================
-FEElementLUT::FEElementLUT(FEMesh& mesh)
-{
-	// get the ID ranges
-	m_minID = -1;
-	m_maxID = -1;
-	int NDOM = mesh.Domains();
-	for (int i=0; i<NDOM; ++i)
-	{
-		FEDomain& dom = mesh.Domain(i);
-		int NE = dom.Elements();
-		for (int j=0; j<NE; ++j)
-		{
-			FEElement& el = dom.ElementRef(j);
-			int eid = el.GetID();
-			if ((eid < m_minID) || (m_minID == -1)) m_minID = eid;
-			if ((eid > m_maxID) || (m_maxID == -1)) m_maxID = eid;
-		}
-	}
-
-	// allocate size
-	int nsize = m_maxID - m_minID + 1;
-	m_elem.resize(nsize, (FEElement*) 0);
-	m_elid.resize(nsize, -1);
-
-	// fill the table
-	int index = 0;
-	for (int i = 0; i<NDOM; ++i)
-	{
-		FEDomain& dom = mesh.Domain(i);
-		int NE = dom.Elements();
-		for (int j = 0; j<NE; ++j, ++index)
-		{
-			FEElement& el = dom.ElementRef(j);
-			int eid = el.GetID();
-			m_elem[eid - m_minID] = &el;
-			m_elid[eid - m_minID] = index;
-		}
-	}
-}
-
-// Find an element from its ID
-FEElement* FEElementLUT::Find(int elemID) const
-{
-	if ((elemID < m_minID) || (elemID > m_maxID)) return nullptr;
-	return m_elem[elemID - m_minID];
-}
-
-int FEElementLUT::FindIndex(int elemID) const
-{
-	if ((elemID < m_minID) || (elemID > m_maxID)) return -1;
-	return m_elid[elemID - m_minID];
 }
 
 // update the domains of the mesh

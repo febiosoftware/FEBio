@@ -125,8 +125,7 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
 	double zhat = B * (sed / rhor - psi0) / (J - phir) / m_M;
 	if (m_D > 0) {
 		FEMesh& mesh = GetFEModel()->GetMesh();
-		int ie = pt.m_elem->GetLocalID();
-		const std::vector<FEElement*>& epl = m_EPL[ie];
+		const std::vector<FEElement*>& epl = m_EPL.GetElementList(pt.m_elem);
 		int NEPL = (int)epl.size();
 		for (int i = 0; i < NEPL; ++i) {
 			FEElement* el = epl[i];
@@ -187,8 +186,7 @@ mat3ds FEReactionRateHuiskes::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 	if (m_D > 0) {
 		mat3ds s(0);
 		FEMesh& mesh = GetFEModel()->GetMesh();
-		int ie = pt.m_elem->GetLocalID();
-		const std::vector<FEElement*>& epl = m_EPL[ie];
+		const std::vector<FEElement*>& epl = m_EPL.GetElementList(pt.m_elem);
 		int NEPL = (int)epl.size();
 		for (int i = 0; i < NEPL; ++i) {
 			FEElement* el = epl[i];

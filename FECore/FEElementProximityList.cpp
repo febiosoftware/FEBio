@@ -34,8 +34,15 @@ FEElementProximityList::FEElementProximityList()
 
 }
 
+FEElementProximityList::~FEElementProximityList()
+{
+	delete m_lut;
+}
+
 bool FEElementProximityList::Create(FEMesh& mesh, double R)
 {
+	m_lut = new FEElementLUT(mesh);
+
 	FEMeshTopo topo;
 	cout << "Evaluating mesh topology...";
 	if (topo.Create(&mesh) == false)

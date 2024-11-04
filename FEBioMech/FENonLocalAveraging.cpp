@@ -71,8 +71,7 @@ double FENLABazant::CalculateAverage(FEMaterialPoint& pt, std::function<double(F
 
 	double R = m_krnl->m_R;
 	if (R > 0) {
-		int ie = pt.m_elem->GetLocalID();
-		const std::vector<FEElement*>& epl = m_EPL[ie];
+		const std::vector<FEElement*>& epl = m_EPL.GetElementList(pt.m_elem);
 		int NEPL = (int)epl.size();
 		double V = 0;
 		for (int i = 0; i < NEPL; ++i) {
@@ -98,8 +97,7 @@ mat3ds FENLABazant::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(F
 
 	double R = m_krnl->m_R;
 	if (R > 0) {
-		int ie = pt.m_elem->GetLocalID();
-		const std::vector<FEElement*>& epl = m_EPL[ie];
+		const std::vector<FEElement*>& epl = m_EPL.GetElementList(pt.m_elem);
 		int NEPL = (int)epl.size();
 		double V = 0;
 		for (int i = 0; i < NEPL; ++i) {
@@ -129,8 +127,7 @@ double FENLABorino::CalculateAverage(FEMaterialPoint& pt, std::function<double(F
 
 	double R = m_krnl->m_R;
 	if (R > 0) {
-		int ie = pt.m_elem->GetLocalID();
-		const std::vector<FEElement*>& epl = m_EPL[ie];
+		const std::vector<FEElement*>& epl = m_EPL.GetElementList(pt.m_elem);
 		int NEPL = (int)epl.size();
 		double V = 0;
 		for (int i = 0; i < NEPL; ++i) {
@@ -159,8 +156,7 @@ mat3ds FENLABorino::CalculateAverage(FEMaterialPoint& pt, std::function<mat3ds(F
 
 	double R = m_krnl->m_R;
 	if (R > 0) {
-		int ie = pt.m_elem->GetLocalID();
-		const std::vector<FEElement*>& epl = m_EPL[ie];
+		const std::vector<FEElement*>& epl = m_EPL.GetElementList(pt.m_elem);
 		int NEPL = (int)epl.size();
 		double V = 0;
 		for (int i = 0; i < NEPL; ++i) {

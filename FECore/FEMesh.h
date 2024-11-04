@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include "FESolidElement.h"
 #include "FEShellElement.h"
 #include "FEDomainList.h"
+#include "FEElementLUT.h"
 
 //-----------------------------------------------------------------------------
 class FEEdge;
@@ -67,25 +68,6 @@ private:
 	vector<int>		m_node;
 	int				m_minID, m_maxID;
 	FEMesh*			m_mesh;
-};
-
-//---------------------------------------------------------------------------------------
-// Helper class for faster lookup of elements based on their ID 
-class FECORE_API FEElementLUT
-{
-public:
-	FEElementLUT(FEMesh& mesh);
-
-	// Find an element from its ID
-	FEElement* Find(int elemID) const;
-
-	// return an element's zero-based index
-	int FindIndex(int elemID) const;
-
-private:
-	vector<FEElement*>	m_elem;
-	vector<int>			m_elid;
-	int					m_minID, m_maxID;
 };
 
 //-----------------------------------------------------------------------------

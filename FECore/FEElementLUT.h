@@ -24,26 +24,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
+
 #include "fecore_api.h"
-#include "FEElement.h"
-#include "FEMesh.h"
 #include <vector>
 
-class FECORE_API FEElementProximityList
+class FEMesh;
+class FEElement;
+
+// Helper class for faster lookup of elements based on their ID 
+class FECORE_API FEElementLUT
 {
 public:
-	FEElementProximityList();
-	~FEElementProximityList();
+	FEElementLUT(FEMesh& mesh);
 
-	bool Create(FEMesh& mesh, double R);
+	// Find an element from its ID
+	FEElement* Find(int elemID) const;
 
-	const std::vector<FEElement*>& GetElementList(FEElement* el) const 
-	{ 
-		int n = m_lut->FindIndex(el->GetID());
-		return m_EPL[n]; 
-	}
+	// return an element's zero-based index
+	int FindIndex(int elemID) const;
 
 private:
-	FEElementLUT* m_lut = nullptr;
-	std::vector<std::vector<FEElement*> > m_EPL;
+	std::vector<FEElement*>		m_elem;
+	std::vector<int>			m_elid;
+	int					m_minID, m_maxID;
 };
+

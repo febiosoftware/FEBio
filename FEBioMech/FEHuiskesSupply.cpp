@@ -76,7 +76,7 @@ double FEHuiskesSupply::Supply(FEMaterialPoint& pt)
 	if (m_D > 0) {
 		FEMesh& mesh = GetFEModel()->GetMesh();
 		int ie = pt.m_elem->GetLocalID();
-		const std::vector<FEElement*>& epl = m_EPL[ie];
+		const std::vector<FEElement*>& epl = m_EPL.GetElementList(pt.m_elem);
 		int NEPL = (int)epl.size();
 		for (int i = 0; i < NEPL; ++i) {
 			FEElement* el = epl[i];
@@ -105,8 +105,7 @@ mat3ds FEHuiskesSupply::Tangent_Supply_Strain(FEMaterialPoint& pt)
 
 	if (m_D > 0) {
 		FEMesh& mesh = GetFEModel()->GetMesh();
-		int ie = pt.m_elem->GetLocalID();
-		const std::vector<FEElement*>& epl = m_EPL[ie];
+		const std::vector<FEElement*>& epl = m_EPL.GetElementList(pt.m_elem);
 		int NEPL = (int)epl.size();
 		for (int i = 0; i < NEPL; ++i) {
 			FEElement* el = epl[i];

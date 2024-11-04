@@ -90,7 +90,7 @@ public:
 	virtual ~FEElement() {}
 
 	//! get the element ID
-	int GetID() const;
+	int GetID() const { return m_nID; }
 
 	//! set the element ID
 	void SetID(int n);

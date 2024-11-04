@@ -160,10 +160,8 @@ FEElement::FEElement() : m_pT(0)
 	m_lid = -1;
 	m_part = nullptr;
 	m_status = ACTIVE;
+	m_mat = -1;
 }
-
-//! get the element ID
-int FEElement::GetID() const { return m_nID; }
 
 //! set the element ID
 void FEElement::SetID(int n) { m_nID = n; }
