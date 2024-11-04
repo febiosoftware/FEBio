@@ -43,6 +43,12 @@ bool FENonLocalAveraging::Init()
 
 	if (m_krnl == nullptr) return false;
 
+	FEMaterial* mat = dynamic_cast<FEMaterial*>(GetAncestor());
+	if (mat == nullptr) return false;
+
+	FEDomainList& dom = mat->GetDomainList();
+	if (dom.size() == 0) return false;
+
 	// get neighboring elements for given proximity
 	double R = m_krnl->m_R;
 	if (R > 0) {
@@ -51,7 +57,7 @@ bool FENonLocalAveraging::Init()
 
 		double mult = m_krnl->m_mult;
 		FEMesh& mesh = GetFEModel()->GetMesh();
-		if (m_EPL.Create(mesh, R * mult) == false)
+		if (m_EPL.Create(mesh, dom, R * mult) == false)
 		{
 			feLogError("Failed building elemnet proximity lists.");
 			return false;

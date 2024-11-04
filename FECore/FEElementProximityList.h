@@ -36,6 +36,7 @@ public:
 	~FEElementProximityList();
 
 	bool Create(FEMesh& mesh, double R);
+	bool Create(FEMesh& mesh, FEDomainList& domainList, double R);
 
 	const std::vector<FEElement*>& GetElementList(FEElement* el) const 
 	{ 

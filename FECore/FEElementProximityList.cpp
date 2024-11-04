@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElementProximityList.h"
 #include "FEMeshTopo.h"
+#include "FEDomain.h"
 #include "log.h"
 #include <iostream>
 
@@ -63,6 +64,46 @@ bool FEElementProximityList::Create(FEMesh& mesh, double R)
 		eplmin = std::min(eplmin, epls);
 		eplmax = std::max(eplmax, epls);
 		eplavg += epls;
+	}
+	eplavg /= NE;
+	printf("Done.");
+	printf("Number of neighboring elements:\n");
+	printf("-------------------------------\n");
+	printf("Min. = %g, Max. = %g, Avg. = %g\n", eplmin, eplmax, eplavg);
+}
+
+bool FEElementProximityList::Create(FEMesh& mesh, FEDomainList& domainList, double R)
+{
+	m_lut = new FEElementLUT(mesh, domainList);
+	int NE = (int)m_lut->Size();
+	if (NE == 0) return false;
+
+	FEMeshTopo topo;
+	cout << "Evaluating mesh topology...";
+	if (topo.Create(&mesh) == false)
+	{
+		cout << "Failed building mesh topo.";
+		return false;
+	}
+	cout << "Evaluating element proximity...";
+	m_EPL.resize(NE);
+	double eplmin = 1e9;
+	double eplmax = 0;
+	double eplavg = 0;
+	for (int n = 0; n < domainList.size(); ++n) {
+		FEDomain& dom = *domainList[n];
+		int ne = dom.Elements();
+		for (int i = 0; i < ne; ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			int m = m_lut->FindIndex(el.GetID());
+			std::vector<FEElement*> epl = topo.ElementProximityList(m, R, false);
+			m_EPL[m] = epl;
+			double epls = epl.size();
+			eplmin = std::min(eplmin, epls);
+			eplmax = std::max(eplmax, epls);
+			eplavg += epls;
+		}
 	}
 	eplavg /= NE;
 	printf("Done.");

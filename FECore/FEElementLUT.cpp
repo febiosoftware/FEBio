@@ -69,6 +69,46 @@ FEElementLUT::FEElementLUT(FEMesh& mesh)
 	}
 }
 
+FEElementLUT::FEElementLUT(FEMesh& mesh, FEDomainList& domainList)
+{
+	// get the ID ranges
+	m_minID = -1;
+	m_maxID = -1;
+	int NDOM = domainList.Domains();
+	for (int i = 0; i < NDOM; ++i)
+	{
+		FEDomain& dom = *domainList[i];
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			int eid = el.GetID();
+			if ((eid < m_minID) || (m_minID == -1)) m_minID = eid;
+			if ((eid > m_maxID) || (m_maxID == -1)) m_maxID = eid;
+		}
+	}
+
+	// allocate size
+	int nsize = m_maxID - m_minID + 1;
+	m_elem.resize(nsize, (FEElement*)0);
+	m_elid.resize(nsize, -1);
+
+	// fill the table
+	int index = 0;
+	for (int i = 0; i < NDOM; ++i)
+	{
+		FEDomain& dom = *domainList[i];
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j, ++index)
+		{
+			FEElement& el = dom.ElementRef(j);
+			int eid = el.GetID();
+			m_elem[eid - m_minID] = &el;
+			m_elid[eid - m_minID] = index;
+		}
+	}
+}
+
 // Find an element from its ID
 FEElement* FEElementLUT::Find(int elemID) const
 {

@@ -30,18 +30,22 @@ SOFTWARE.*/
 
 class FEMesh;
 class FEElement;
+class FEDomainList;
 
 // Helper class for faster lookup of elements based on their ID 
 class FECORE_API FEElementLUT
 {
 public:
 	FEElementLUT(FEMesh& mesh);
+	FEElementLUT(FEMesh& mesh, FEDomainList& domainList);
 
 	// Find an element from its ID
 	FEElement* Find(int elemID) const;
 
 	// return an element's zero-based index
 	int FindIndex(int elemID) const;
+
+	size_t Size() const { return m_elem.size(); }
 
 private:
 	std::vector<FEElement*>		m_elem;
