@@ -364,22 +364,21 @@ vec3d ElementCentroid(FEElement& el)
     return c;
 }
 
-// find neighboring elements that fall within given proximity d
-std::vector<int> FEMeshTopo::ElementProximityList(int i, double d, bool excludeSelf, bool matchMaterial)
+std::vector<FEElement*> FEMeshTopo::ElementProximityList(int i, double d, bool excludeSelf, bool matchMaterial)
 {
-	std::vector<int>    EPL; // element proximity list
+	std::vector<FEElement*>    EPL; // element proximity list
 	std::vector<bool>   vst; // list of visited elements
 
 	int NE = Elements();
 	vst.assign(NE, false);
 
+	FEElement& el_i = *Element(i);
+
 	// exclude element i itself from the list, if requested
 	if (!excludeSelf)
 	{
-		EPL.push_back(i);
+		EPL.push_back(&el_i);
 	}
-
-	FEElement& el_i = *Element(i);
 
 	// get centroid of element i
 	vec3d x = ElementCentroid(el_i);
@@ -393,7 +392,7 @@ std::vector<int> FEMeshTopo::ElementProximityList(int i, double d, bool excludeS
 		std::vector<int> ENIL = ElementNeighborIndexList(n);
 
 		// search each neighbor to see if it falls within given proximity d
-		for (int j = 0; j < ENIL.size(); ++j) 
+		for (int j = 0; j < ENIL.size(); ++j)
 		{
 			int k = ENIL[j];
 			if ((k != -1) && !vst[k])
@@ -405,7 +404,7 @@ std::vector<int> FEMeshTopo::ElementProximityList(int i, double d, bool excludeS
 				{
 					if (!matchMaterial || (el_k.GetMatID() == el_i.GetMatID()))
 					{
-						EPL.push_back(k);
+						EPL.push_back(&el_k);
 						stack.push(k);
 					}
 				}

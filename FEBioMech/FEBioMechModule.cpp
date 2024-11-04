@@ -147,6 +147,7 @@ SOFTWARE.*/
 #include "FERVEFatigueMaterial.h"
 #include "FEDamageCDF.h"
 #include "FEDamageCriterion.h"
+#include "FENLADamageCriterion.h"
 #include "FERelativeVolumeCriterion.h"
 #include "FEPlasticFlowCurve.h"
 #include "FEFiberExpLinear.h"
@@ -562,6 +563,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCDFPQP, "CDF quintic");
 	REGISTER_FECORE_CLASS(FEDamageCDFGamma, "CDF gamma");
 	REGISTER_FECORE_CLASS(FEDamageCDFUser, "CDF user");
+	REGISTER_FECORE_CLASS(FENLADamageCriterion, "NLA damage");
 
 	// damage criterion (used by damage and plastic materials)
 	REGISTER_FECORE_CLASS(FEDamageCriterionSimo, "DC Simo");

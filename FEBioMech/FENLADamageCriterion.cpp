@@ -23,43 +23,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "FENLADamageCriterion.h"
 
+BEGIN_FECORE_CLASS(FENLADamageCriterion, FEDamageCriterion)
+	ADD_PROPERTY(m_nla, "nla");
+	ADD_PROPERTY(m_dc, "criterion");
+END_FECORE_CLASS();
 
-
-#pragma once
-#include "FERemodelingElasticMaterial.h"
-#include <FECore/FEMeshTopo.h>
-
-//-----------------------------------------------------------------------------
-// This class implements a material that has a constant solute supply
-
-class FEHuiskesSupply :	public FESolidSupply
+FENLADamageCriterion::FENLADamageCriterion(FEModel* fem) : FEDamageCriterion(fem)
 {
-public:
-	//! constructor
-	FEHuiskesSupply(FEModel* pfem);
-	
-    //! initialization
-    bool Init() override;
-    
-	//! solid supply
-	double Supply(FEMaterialPoint& pt) override;
-	
-	//! tangent of solute supply with respect to strain
-	mat3ds Tangent_Supply_Strain(FEMaterialPoint& mp) override;
-	
-	//! tangent of solute supply with respect to referential density
-	double Tangent_Supply_Density(FEMaterialPoint& mp) override;
-	
-public:
-	double	m_B;			//!< mass supply coefficient
-	double	m_k;			//!< specific strain energy at homeostasis
-    double  m_D;            //!< characteristic sensor distance
+	m_nla = nullptr;
+	m_dc = nullptr;
+}
 
-private:
-    std::vector<std::vector<FEElement*>>    m_EPL; //!< list of element proximity lists
-    FEMeshTopo      m_topo;                 //!< mesh topology;
+bool FENLADamageCriterion::Init()
+{
+	if (m_dc == nullptr) return false;
+	if (m_nla == nullptr) return false;
+	// the dc needs to be able to access the parent material, but the parent is this,
+	// so we need to pass the parent
+	m_dc->SetParent(GetParent());
+	return FEDamageCriterion::Init();
+}
 
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
-};
+double FENLADamageCriterion::DamageCriterion(FEMaterialPoint& pt)
+{
+	return m_nla->CalculateAverage(pt, m_dc);
+}
+
+mat3ds FENLADamageCriterion::CriterionStressTangent(FEMaterialPoint& pt)
+{ 
+	return m_nla->CalculateAverageTangent(pt, m_dc);
+}

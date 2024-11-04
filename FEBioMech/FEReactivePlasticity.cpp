@@ -128,7 +128,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         mat3ds Ue = pe.RightStretch();
         
         // evaluate yield measure
-        pp.m_Kv[i] = m_pCrit->DCpt(pt);
+        pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
         
         // restore total deformation gradient
         pe = etmp;
@@ -166,7 +166,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         while (!conv) {
             ++iter;
             pe.m_F = Fv; pe.m_J = Fv.det();
-            pp.m_Kv[i] = m_pCrit->DCpt(pt);
+            pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
             if (iter == 1) {
                 phi0 = phi;
@@ -219,7 +219,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             if (fabs(lam) <= m_rtol*m_rtol) conv = true;
         }
         pe.m_F = Fv; pe.m_J = Fv.det();
-        pp.m_Kv[i] = m_pCrit->DCpt(pt);
+        pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
         pe = etmp;
         pp.m_Fvsi[i] = Fs.inverse()*Fv;
     }
@@ -245,12 +245,13 @@ mat3ds FEReactivePlasticity::Stress(FEMaterialPoint& pt)
     mp->m_J0 = pt.m_J0;
     mp->m_Jt = pt.m_Jt;
     mp->m_index = pt.m_index;
-    if (m_pCrit->m_nla == nullptr) {
+//    if (m_pCrit->m_nla == nullptr) {
         ElasticDeformationGradient(*mp);
-    }
+/* }
     else {
         m_pCrit->m_nla->PlasticityCriterionAverage(pt, *mp);
     }
+*/
     int n = (int)m_pFlow->BondFamilies(*mp);
 
     // extract elastic material point
@@ -296,12 +297,13 @@ tens4ds FEReactivePlasticity::Tangent(FEMaterialPoint& pt)
     mp->m_J0 = pt.m_J0;
     mp->m_Jt = pt.m_Jt;
     mp->m_index = pt.m_index;
-    if (m_pCrit->m_nla == nullptr || (ti.currentTime == 0)) {
+//    if (m_pCrit->m_nla == nullptr || (ti.currentTime == 0)) {
         ElasticDeformationGradient(*mp);
-    }
+    /* }
     else {
         m_pCrit->m_nla->PlasticityCriterionAverage(pt, *mp);
     }
+*/
     int n = (int)m_pFlow->BondFamilies(*mp);
 
     // extract elastic material point
@@ -349,12 +351,13 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
     FEElasticMaterialPoint& pte = *pt.ExtractData<FEElasticMaterialPoint>();
     FEElasticMaterialPoint& mpe = *mp->ExtractData<FEElasticMaterialPoint>();
     mpe.m_F = pte.m_F; mpe.m_J = pte.m_J;
-    if (m_pCrit->m_nla == nullptr) {
+//    if (m_pCrit->m_nla == nullptr) {
         ElasticDeformationGradient(*mp);
-    }
+/* }
     else {
         m_pCrit->m_nla->PlasticityCriterionAverage(pt, *mp);
     }
+*/
     int n = (int)m_pFlow->BondFamilies(*mp);
 
     // extract elastic material point
@@ -393,7 +396,7 @@ mat3ds FEReactivePlasticity::YieldSurfaceNormal(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
     mat3ds s = m_pBase->Stress(mp);
     tens4ds c = m_pBase->Tangent(mp);
-    mat3ds dPhi = m_pCrit->CSTpt(mp);
+    mat3ds dPhi = m_pCrit->CriterionStressTangent(mp);
     mat3d M = dPhi*s*2 - mat3dd((dPhi*s).trace()) + c.dot(dPhi);
     mat3ds Ui = pe.RightStretchInverse();
     mat3d R = pe.m_F*Ui;

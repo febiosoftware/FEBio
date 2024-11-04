@@ -37,14 +37,8 @@ SOFTWARE.*/
 #define SQR(x) ((x)*(x))
 #endif
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionSimo, FEDamageCriterion)
-    ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 // Simo's damage criterion uses sqrt(2*strain energy density)
-double FEDamageCriterionSimo::DCpt(FEMaterialPoint& pt)
+double FEDamageCriterionSimo::DamageCriterion(FEMaterialPoint& pt)
 {
     FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
 	FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -56,14 +50,8 @@ double FEDamageCriterionSimo::DCpt(FEMaterialPoint& pt)
     return sqrt(2*sed);
 }
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionSED, FEDamageCriterion)
-ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 // Strain energy density damage criterion
-double FEDamageCriterionSED::DCpt(FEMaterialPoint& pt)
+double FEDamageCriterionSED::DamageCriterion(FEMaterialPoint& pt)
 {
 	FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
 	FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -72,14 +60,8 @@ double FEDamageCriterionSED::DCpt(FEMaterialPoint& pt)
     return sed;
 }
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionSSE, FEDamageCriterion)
-ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 // Specific strain energy damage criterion
-double FEDamageCriterionSSE::DCpt(FEMaterialPoint& pt)
+double FEDamageCriterionSSE::DamageCriterion(FEMaterialPoint& pt)
 {
 	FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
 	FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -88,9 +70,8 @@ double FEDamageCriterionSSE::DCpt(FEMaterialPoint& pt)
     return sed/ m_pBase->Density(pt);
 }
 
-//-----------------------------------------------------------------------------
 // von Mises stress damage criterion
-double FEDamageCriterionVMS::DCpt(FEMaterialPoint& pt)
+double FEDamageCriterionVMS::DamageCriterion(FEMaterialPoint& pt)
 {
 	FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
 	FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -103,14 +84,8 @@ double FEDamageCriterionVMS::DCpt(FEMaterialPoint& pt)
 }
 
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionVMS, FEDamageCriterion)
-    ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 //! criterion tangent with respect to stress
-mat3ds FEDamageCriterionVMS::CSTpt(FEMaterialPoint& pt)
+mat3ds FEDamageCriterionVMS::CriterionStressTangent(FEMaterialPoint& pt)
 {
     FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
     FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -119,14 +94,12 @@ mat3ds FEDamageCriterionVMS::CSTpt(FEMaterialPoint& pt)
     return s.dev()*(1.5/vms);
 }
 
-//-----------------------------------------------------------------------------
 // Drucker yield criterion
 BEGIN_FECORE_CLASS(FEDamageCriterionDrucker, FEDamageCriterion)
     ADD_PARAMETER(m_c, FE_RANGE_CLOSED(-27.0/8.0,9.0/4.0), "c");
-    ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
 END_FECORE_CLASS();
 
-double FEDamageCriterionDrucker::DCpt(FEMaterialPoint& pt)
+double FEDamageCriterionDrucker::DamageCriterion(FEMaterialPoint& pt)
 {
     FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
     FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -140,9 +113,8 @@ double FEDamageCriterionDrucker::DCpt(FEMaterialPoint& pt)
     return tau;
 }
 
-//-----------------------------------------------------------------------------
 //! criterion tangent with respect to stress
-mat3ds FEDamageCriterionDrucker::CSTpt(FEMaterialPoint& pt)
+mat3ds FEDamageCriterionDrucker::CriterionStressTangent(FEMaterialPoint& pt)
 {
     FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
     FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -155,14 +127,8 @@ mat3ds FEDamageCriterionDrucker::CSTpt(FEMaterialPoint& pt)
     return (s.dev()*(pow(J2,2)/2) - (sdev.inverse()).dev()*(pow(J3, 2)*c/3))/pow(tau, 5);
 }
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionMSS, FEDamageCriterion)
-    ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 // max shear stress damage criterion
-double FEDamageCriterionMSS::DCpt(FEMaterialPoint& pt)
+double FEDamageCriterionMSS::DamageCriterion(FEMaterialPoint& pt)
 {
     // evaluate stress tensor
 	FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
@@ -179,9 +145,8 @@ double FEDamageCriterionMSS::DCpt(FEMaterialPoint& pt)
     return mss;
 }
 
-//-----------------------------------------------------------------------------
 //! criterion tangent with respect to stress
-mat3ds FEDamageCriterionMSS::CSTpt(FEMaterialPoint& pt)
+mat3ds FEDamageCriterionMSS::CriterionStressTangent(FEMaterialPoint& pt)
 {
     FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
     FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -210,14 +175,8 @@ mat3ds FEDamageCriterionMSS::CSTpt(FEMaterialPoint& pt)
     return N;
 }
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionMNS, FEDamageCriterion)
-    ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 // max normal stress damage criterion
-double FEDamageCriterionMNS::DCpt(FEMaterialPoint& pt)
+double FEDamageCriterionMNS::DamageCriterion(FEMaterialPoint& pt)
 {
     // evaluate stress tensor
 	FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
@@ -231,9 +190,8 @@ double FEDamageCriterionMNS::DCpt(FEMaterialPoint& pt)
     return ps[2];
 }
 
-//-----------------------------------------------------------------------------
 //! criterion tangent with respect to stress
-mat3ds FEDamageCriterionMNS::CSTpt(FEMaterialPoint& pt)
+mat3ds FEDamageCriterionMNS::CriterionStressTangent(FEMaterialPoint& pt)
 {
     FEElasticMaterial* m_pMat = dynamic_cast<FEElasticMaterial*>(GetParent());
     FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
@@ -257,14 +215,8 @@ mat3ds FEDamageCriterionMNS::CSTpt(FEMaterialPoint& pt)
     return N;
 }
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionMNLS, FEDamageCriterion)
-    ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 // max normal Lagrange strain damage criterion
-double FEDamageCriterionMNLS::DCpt(FEMaterialPoint& mp)
+double FEDamageCriterionMNLS::DamageCriterion(FEMaterialPoint& mp)
 {
     // evaluate strain tensor
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -280,14 +232,8 @@ double FEDamageCriterionMNLS::DCpt(FEMaterialPoint& mp)
     return mnls;
 }
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionOSS, FEDamageCriterion)
-    ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 // octahedral shear strain damage criterion
-double FEDamageCriterionOSS::DCpt(FEMaterialPoint& mp)
+double FEDamageCriterionOSS::DamageCriterion(FEMaterialPoint& mp)
 {
     // evaluate strain tensor
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -299,14 +245,8 @@ double FEDamageCriterionOSS::DCpt(FEMaterialPoint& mp)
     return oss;
 }
 
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEDamageCriterionONS, FEDamageCriterion)
-    ADD_PROPERTY(m_nla, "nonlocal_averaging",FEProperty::Optional)->SetLongName("nonlocal averaging");
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
 // octahedral natural shear strain damage criterion
-double FEDamageCriterionONS::DCpt(FEMaterialPoint& mp)
+double FEDamageCriterionONS::DamageCriterion(FEMaterialPoint& mp)
 {
     // evaluate strain tensor
     FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

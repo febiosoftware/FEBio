@@ -656,7 +656,7 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         double Jtmp = pt.m_J;
         pt.m_F = Ft;
         pt.m_J = Jt;
-        pt.m_Wt = pme->StrainEnergyDensity(mp);
+//        pt.m_Wt = pme->StrainEnergyDensity(mp);
         pt.m_F = Ftmp;
         pt.m_J = Jtmp;
         

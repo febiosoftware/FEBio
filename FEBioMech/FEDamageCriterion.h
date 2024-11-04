@@ -27,11 +27,8 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "febiomech_api.h"
-#include "FENonLocalKernel.h"
-#include "FENonLocalAveraging.h"
 #include <FECore/FEMaterial.h>
-#include <FECore/FEMeshTopo.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 // Virtual base class for damage criterion
@@ -39,25 +36,15 @@ SOFTWARE.*/
 class FEBIOMECH_API FEDamageCriterion : public FEMaterialProperty
 {
 public:
-    FEDamageCriterion(FEModel* pfem) : FEMaterialProperty(pfem) { m_nla = nullptr; }
-    virtual ~FEDamageCriterion() {}
-    
-	//! damage
-    virtual double DamageCriterion(FEMaterialPoint& pt) { if (m_nla) return m_nla->DamageCriterionAverage(pt); else return DCpt(pt); }
-    
-    //! criterion tangent with respect to stress
-    virtual mat3ds CriterionStressTangent(FEMaterialPoint& pt) { if (m_nla) return m_nla->DamageCriterionTangentAverage(pt); else return CSTpt(pt); }
-    
-    //! damage at single point
-    virtual double DCpt(FEMaterialPoint& pt) = 0;
+	FEDamageCriterion(FEModel* pfem) : FEMaterialProperty(pfem) {}
 
-    //! criterion tangent with respect to stress at single pont
-    virtual mat3ds CSTpt(FEMaterialPoint& pt) { return mat3ds(0); }
-    
-public:
-    FENonLocalAveraging*    m_nla;  //! optional nonlocal averaging scheme
-    
-    FECORE_BASE_CLASS(FEDamageCriterion);
+	//! damage
+	virtual double DamageCriterion(FEMaterialPoint& pt) = 0;
+
+	//! criterion tangent with respect to stress
+	virtual mat3ds CriterionStressTangent(FEMaterialPoint& pt) { return mat3ds(0); }
+
+	FECORE_BASE_CLASS(FEDamageCriterion);
 };
 
 //-----------------------------------------------------------------------------
@@ -66,12 +53,10 @@ public:
 class FEDamageCriterionSimo : public FEDamageCriterion
 {
 public:
-    FEDamageCriterionSimo(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
-    
-    DECLARE_FECORE_CLASS();
+	FEDamageCriterionSimo(FEModel* pfem) : FEDamageCriterion(pfem) {}
+
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -81,11 +66,9 @@ class FEDamageCriterionSED : public FEDamageCriterion
 {
 public:
 	FEDamageCriterionSED(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
 
-    DECLARE_FECORE_CLASS();
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -94,12 +77,10 @@ public:
 class FEDamageCriterionSSE : public FEDamageCriterion
 {
 public:
-    FEDamageCriterionSSE(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
+	FEDamageCriterionSSE(FEModel* pfem) : FEDamageCriterion(pfem) {}
 
-    DECLARE_FECORE_CLASS();
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -109,14 +90,12 @@ class FEDamageCriterionVMS : public FEDamageCriterion
 {
 public:
 	FEDamageCriterionVMS(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
 
-    //! criterion tangent with respect to stress at single pont
-    mat3ds CSTpt(FEMaterialPoint& pt) override;
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
 
-    DECLARE_FECORE_CLASS();
+	//! criterion tangent with respect to stress
+	mat3ds CriterionStressTangent(FEMaterialPoint& pt) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -125,18 +104,18 @@ public:
 class FEDamageCriterionDrucker : public FEDamageCriterion
 {
 public:
-    FEDamageCriterionDrucker(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
+	FEDamageCriterionDrucker(FEModel* pfem) : FEDamageCriterion(pfem) {}
 
-    //! criterion tangent with respect to stress at single pont
-    mat3ds CSTpt(FEMaterialPoint& pt) override;
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
+
+	//! criterion tangent with respect to stress
+	mat3ds CriterionStressTangent(FEMaterialPoint& pt) override;
 
 public:
-    FEParamDouble   m_c;    //!< Drucker material parameter
-    
-    DECLARE_FECORE_CLASS();
+	FEParamDouble   m_c;    //!< Drucker material parameter
+
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -146,14 +125,12 @@ class FEDamageCriterionMSS : public FEDamageCriterion
 {
 public:
 	FEDamageCriterionMSS(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
 
-    //! criterion tangent with respect to stress at single pont
-    mat3ds CSTpt(FEMaterialPoint& pt) override;
+	//! damage at single point
+	double DamageCriterion(FEMaterialPoint& pt) override;
 
-    DECLARE_FECORE_CLASS();
+	//! criterion tangent with respect to stress
+	mat3ds CriterionStressTangent(FEMaterialPoint& pt) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -163,14 +140,12 @@ class FEDamageCriterionMNS : public FEDamageCriterion
 {
 public:
 	FEDamageCriterionMNS(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
 
-    //! criterion tangent with respect to stress at single pont
-    mat3ds CSTpt(FEMaterialPoint& pt) override;
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
 
-    DECLARE_FECORE_CLASS();
+	//! criterion tangent with respect to stress
+	mat3ds CriterionStressTangent(FEMaterialPoint& pt) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -180,11 +155,9 @@ class FEDamageCriterionMNLS : public FEDamageCriterion
 {
 public:
 	FEDamageCriterionMNLS(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
 
-    DECLARE_FECORE_CLASS();
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -193,12 +166,10 @@ public:
 class FEDamageCriterionOSS : public FEDamageCriterion
 {
 public:
-    FEDamageCriterionOSS(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
+	FEDamageCriterionOSS(FEModel* pfem) : FEDamageCriterion(pfem) {}
 
-    DECLARE_FECORE_CLASS();
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -207,10 +178,8 @@ public:
 class FEDamageCriterionONS : public FEDamageCriterion
 {
 public:
-    FEDamageCriterionONS(FEModel* pfem) : FEDamageCriterion(pfem) {}
-    
-    //! damage at single point
-    double DCpt(FEMaterialPoint& pt) override;
+	FEDamageCriterionONS(FEModel* pfem) : FEDamageCriterion(pfem) {}
 
-    DECLARE_FECORE_CLASS();
+	//! damage
+	double DamageCriterion(FEMaterialPoint& pt) override;
 };

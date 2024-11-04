@@ -60,9 +60,10 @@ bool FEHuiskesSupply::Init()
             return false;
         }
         feLogInfo("Evaluating element proximity...");
-        m_EPL.assign(mesh.Elements(), std::vector<int>());
-        for (int i=0; i< mesh.Elements(); ++i) {
-            std::vector<int> epl = m_topo.ElementProximityList(i, m_D*mult);
+		int NE = m_topo.Elements();
+        m_EPL.resize(NE);
+        for (int i=0; i< NE; ++i) {
+            std::vector<FEElement*> epl = m_topo.ElementProximityList(i, m_D*mult);
             m_EPL[i] = epl;
         }
         feLogInfo("Done.");
@@ -84,11 +85,9 @@ double FEHuiskesSupply::Supply(FEMaterialPoint& pt)
         FEMesh& mesh = GetFEModel()->GetMesh();
         int ie = pt.m_elem->GetLocalID();
         int NEPL = (int)m_EPL[ie].size();
-#pragma omp parallel for shared (NEPL)
         for (int i=0; i<NEPL; ++i) {
-            int je = m_EPL[ie][i];
-            if (je > -1) {
-                FEElement* el = mesh.Element(je);
+            FEElement* el = m_EPL[ie][i];
+            if (el && el->isActive()) {
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
                     double d = (pt.m_rt - mp.m_rt).unit();
@@ -115,11 +114,9 @@ mat3ds FEHuiskesSupply::Tangent_Supply_Strain(FEMaterialPoint &pt)
         FEMesh& mesh = GetFEModel()->GetMesh();
         int ie = pt.m_elem->GetLocalID();
         int NEPL = (int)m_EPL[ie].size();
-#pragma omp parallel for shared (NEPL)
         for (int i=0; i<NEPL; ++i) {
-            int je = m_EPL[ie][i];
-            if (je > -1) {
-                FEElement* el = mesh.Element(je);
+            FEElement* el = m_EPL[ie][i];
+            if (el && el->isActive()) {
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
                     double d = (pt.m_rt - mp.m_rt).unit();
