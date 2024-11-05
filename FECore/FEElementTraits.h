@@ -73,6 +73,7 @@ public:
 public:
 	int m_nint;	//!< number of integration points
 	int	m_neln;	//!< number of element nodes
+    int m_nvln; //!< number of element nodes including virtual nodes (e.g., in shell elements)
 
 	matrix m_H;	//!< shape function values at gausspoints.
 				//!< The first index refers to the gauss-point,
@@ -372,6 +373,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1470,6 +1472,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1490,6 +1493,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1547,6 +1551,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1567,6 +1572,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
