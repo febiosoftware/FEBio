@@ -795,6 +795,19 @@ public:
 	}
 };
 
+class FEStrain
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        FEElement* el = mp.m_elem;
+        FEShellElementNew* se = dynamic_cast<FEShellElementNew*>(el);
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (se) return se->m_E[mp.m_index];
+        else return (pt ? pt->Strain() : mat3ds(0));
+    }
+};
+
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
@@ -883,6 +896,27 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 {
 	writeNodalProjectedElementValues<mat3ds>(dom, a, FEStress());
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellNodalStresses::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStress());
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotNodalStrains::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeNodalProjectedElementValues<mat3ds>(dom, a, FEStrain());
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellNodalStrains::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStrain());
+    return true;
 }
 
 //=============================================================================
