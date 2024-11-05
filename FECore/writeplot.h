@@ -205,43 +205,8 @@ template <class T> void writeNodalProjectedElementValues(FEMeshPartition& dom, F
 		e.project_to_nodes(si, sn);
 
 		// push data to archive
-        if ((e.Type() == FE_SHELL_QUAD4G8) || (e.Type() == FE_SHELL_QUAD4G12)
-            || (e.Type() == FE_SHELL_TRI3G6) || (e.Type() == FE_SHELL_TRI3G9))
-            for (int j = 0; j<ne; ++j) ar << sn[ne+j];
-        else
-            for (int j = 0; j<ne; ++j) ar << sn[j];
+		for (int j = 0; j<ne; ++j) ar << sn[j];
 	}
-}
-
-//=================================================================================================
-template <class T> void writeShellNodalProjectedElementValues(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint&)> var)
-{
-    // temp storage
-    T si[FEElement::MAX_INTPOINTS];
-    T sn[FEElement::MAX_NODES];
-    
-    // loop over all elements
-    int NE = dom.Elements();
-    for (int i = 0; i<NE; ++i)
-    {
-        FEElement& e = dom.ElementRef(i);
-        int ne = e.Nodes();
-        int ni = e.GaussPoints();
-        
-        // get the integration point values
-        for (int k = 0; k<ni; ++k)
-        {
-            FEMaterialPoint& mp = *e.GetMaterialPoint(k);
-            T s = var(mp);
-            si[k] = s;
-        }
-        
-        // project to nodes
-        e.project_to_nodes(si, sn);
-        
-        // push data to archive
-        for (int j = 0; j<ne; ++j) ar << sn[j];
-    }
 }
 
 //=================================================================================================

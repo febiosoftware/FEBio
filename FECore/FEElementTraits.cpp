@@ -40,7 +40,7 @@ using namespace std;
 
 FEElementTraits::FEElementTraits(int ni, int ne, FE_Element_Class c, FE_Element_Shape s, FE_Element_Type t)
 {
-	m_neln = m_nvln = ne;
+	m_neln = ne;
 	m_nint = ni;
 	m_faces = 0;
 	m_spec.eclass = c;
@@ -59,7 +59,7 @@ void FEElementTraits::project_to_nodes(mat3ds* si, mat3ds* so) const
 		for (int j = i; j<3; ++j) {
 			for (int n = 0; n<m_nint; ++n) ai[n] = si[n](i, j);
 			project_to_nodes(ai, ao);
-			for (int n = 0; n<m_nvln; ++n) so[n](i, j) = ao[n];
+			for (int n = 0; n<m_neln; ++n) so[n](i, j) = ao[n];
 		}
 	}
 }
@@ -638,33 +638,23 @@ FEPenta15G21::FEPenta15G21() : FEPenta15_(NINT, FE_PENTA15G21)
 
     init();
     
-    m_MT.resize(NELN, NINT);
-    for (int i=0; i<NINT; ++i)
+	m_Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
         for (int n=0; n<NELN; ++n)
-            m_MT(n,i) = m_H(i,n);
-    
-    m_Hi.resize(NELN, NELN);
-    m_Hi = m_MT*m_MT.transpose();
-    m_Hi = m_Hi.inverse();
+			m_Hi(i,n) = m_H(ni[i],n);
+	m_Hi = m_Hi.inverse();
 }
 
 //-----------------------------------------------------------------------------
 //! project to nodes
 void FEPenta15G21::project_to_nodes(double* ai, double* ao) const
 {
-    double v[NELN];
-    for (int n=0; n<NELN; ++n) {
-        v[n] = 0;
-        for (int i=0; i<NINT; ++i) {
-            v[n] += m_MT(n,i)*ai[i];
-        }
-    }
     for (int j=0; j<NELN; ++j)
     {
         ao[j] = 0;
         for (int k=0; k<NELN; ++k)
         {
-            ao[j] += m_Hi[j][k]*v[k];
+            ao[j] += m_Hi[j][k]*ai[ni[k]];
         }
     }
 }
@@ -2738,7 +2728,6 @@ int FEShellQuad4G8::ni[NELN] = { 4, 5, 6, 7 };
 
 FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
 {
-    m_nvln = 8;
     const double a = 1.0 / sqrt(3.0);
     const double w = 1.0;
     
@@ -2753,17 +2742,11 @@ FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
     gr[ 7] = -a; gs[ 7] =  a; gt[ 7] =  a; gw[ 7] = w;
     
     init();
-
-    m_MT.resize(2*NELN, NINT);
-    for (int i=0; i<NINT; ++i) {
-        for (int n=0; n<NELN; ++n)
-            m_MT(n,i) = m_H(i,n)*(1-gt[i])/2;
-        for (int n=NELN; n<2*NELN; ++n)
-            m_MT(n,i) = m_H(i,n-NELN)*(1+gt[i])/2;
-    }
     
-    m_Hi.resize(2*NELN, 2*NELN);
-    m_Hi = m_MT*m_MT.transpose();
+	m_Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
+        for (int n=0; n<NELN; ++n)
+			m_Hi(i,n) = m_H(ni[i],n);
     m_Hi = m_Hi.inverse();
 }
 
@@ -2771,19 +2754,12 @@ FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
 //! project to nodes
 void FEShellQuad4G8::project_to_nodes(double* ai, double* ao) const
 {
-    double v[2*NELN];
-    for (int n=0; n<2*NELN; ++n) {
-        v[n] = 0;
-        for (int i=0; i<NINT; ++i) {
-            v[n] += m_MT(n,i)*ai[i];
-        }
-    }
-    for (int j=0; j<2*NELN; ++j)
+    for (int j=0; j<NELN; ++j)
     {
         ao[j] = 0;
-        for (int k=0; k<2*NELN; ++k)
+        for (int k=0; k<NELN; ++k)
         {
-            ao[j] += m_Hi[j][k]*v[k];
+            ao[j] += m_Hi[j][k]*ai[ni[k]];
         }
     }
 }
@@ -2796,7 +2772,6 @@ int FEShellQuad4G12::ni[NELN] = { 8, 9, 10, 11 };
 
 FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
 {
-    m_nvln = 8;
     const double a = 1.0 / sqrt(3.0);
     const double b = sqrt(3.0/5.0);
     const double w = 5.0 / 9.0;
@@ -2818,36 +2793,23 @@ FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
     
     init();
     
-    m_MT.resize(2*NELN, NINT);
-    for (int i=0; i<NINT; ++i) {
+	m_Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
         for (int n=0; n<NELN; ++n)
-            m_MT(n,i) = m_H(i,n)*(1-gt[i])/2;
-        for (int n=NELN; n<2*NELN; ++n)
-            m_MT(n,i) = m_H(i,n-NELN)*(1+gt[i])/2;
-    }
-    
-    m_Hi.resize(2*NELN, 2*NELN);
-    m_Hi = m_MT*m_MT.transpose();
-    m_Hi = m_Hi.inverse();
+			m_Hi(i,n) = m_H(ni[i],n);
+	m_Hi = m_Hi.inverse();
 }
 
 //-----------------------------------------------------------------------------
 //! project to nodes
 void FEShellQuad4G12::project_to_nodes(double* ai, double* ao) const
 {
-    double v[2*NELN];
-    for (int n=0; n<2*NELN; ++n) {
-        v[n] = 0;
-        for (int i=0; i<NINT; ++i) {
-            v[n] += m_MT(n,i)*ai[i];
-        }
-    }
-    for (int j=0; j<2*NELN; ++j)
+    for (int j=0; j<NELN; ++j)
     {
         ao[j] = 0;
-        for (int k=0; k<2*NELN; ++k)
+        for (int k=0; k<NELN; ++k)
         {
-            ao[j] += m_Hi[j][k]*v[k];
+            ao[j] += m_Hi[j][k]*ai[ni[k]];
         }
     }
 }
@@ -2911,7 +2873,6 @@ int FEShellTri3G6::ni[NELN] = { 3, 4, 5 };
 
 FEShellTri3G6::FEShellTri3G6() : FEShellTri3_(NINT, FE_SHELL_TRI3G6)
 {
-    m_nvln = 6;
     //gauss intergration points
     const double a = 1.0/6.0;
     const double b = 2.0/3.0;
@@ -2926,36 +2887,23 @@ FEShellTri3G6::FEShellTri3G6() : FEShellTri3_(NINT, FE_SHELL_TRI3G6)
 
     init();
     
-    m_MT.resize(2*NELN, NINT);
-    for (int i=0; i<NINT; ++i) {
+	m_Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
         for (int n=0; n<NELN; ++n)
-            m_MT(n,i) = m_H(i,n)*(1-gt[i])/2;
-        for (int n=NELN; n<2*NELN; ++n)
-            m_MT(n,i) = m_H(i,n-NELN)*(1+gt[i])/2;
-    }
-    
-    m_Hi.resize(2*NELN, 2*NELN);
-    m_Hi = m_MT*m_MT.transpose();
-    m_Hi = m_Hi.inverse();
+			m_Hi(i,n) = m_H(ni[i],n);
+	m_Hi = m_Hi.inverse();
 }
 
 //-----------------------------------------------------------------------------
 //! project to nodes
 void FEShellTri3G6::project_to_nodes(double* ai, double* ao) const
 {
-    double v[2*NELN];
-    for (int n=0; n<2*NELN; ++n) {
-        v[n] = 0;
-        for (int i=0; i<NINT; ++i) {
-            v[n] += m_MT(n,i)*ai[i];
-        }
-    }
-    for (int j=0; j<2*NELN; ++j)
+    for (int j=0; j<NELN; ++j)
     {
         ao[j] = 0;
-        for (int k=0; k<2*NELN; ++k)
+        for (int k=0; k<NELN; ++k)
         {
-            ao[j] += m_Hi[j][k]*v[k];
+            ao[j] += m_Hi[j][k]*ai[ni[k]];
         }
     }
 }
@@ -2968,7 +2916,6 @@ int FEShellTri3G9::ni[NELN] = { 6, 7, 8 };
 
 FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
 {
-    m_nvln = 6;
     const double a = 1.0 / 6.0;
     const double b = 2.0 / 3.0;
     const double w1 = 5.0 / 9.0;
@@ -2988,36 +2935,23 @@ FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
     
     init();
     
-    m_MT.resize(2*NELN, NINT);
-    for (int i=0; i<NINT; ++i) {
+	m_Hi.resize(NELN, NELN);
+    for (int i=0; i<NELN; ++i)
         for (int n=0; n<NELN; ++n)
-            m_MT(n,i) = m_H(i,n)*(1-gt[i])/2;
-        for (int n=NELN; n<2*NELN; ++n)
-            m_MT(n,i) = m_H(i,n-NELN)*(1+gt[i])/2;
-    }
-    
-    m_Hi.resize(2*NELN, 2*NELN);
-    m_Hi = m_MT*m_MT.transpose();
-    m_Hi = m_Hi.inverse();
+			m_Hi(i,n) = m_H(ni[i],n);
+	m_Hi = m_Hi.inverse();
 }
 
 //-----------------------------------------------------------------------------
 //! project to nodes
 void FEShellTri3G9::project_to_nodes(double* ai, double* ao) const
 {
-    double v[2*NELN];
-    for (int n=0; n<2*NELN; ++n) {
-        v[n] = 0;
-        for (int i=0; i<NINT; ++i) {
-            v[n] += m_MT(n,i)*ai[i];
-        }
-    }
-    for (int j=0; j<2*NELN; ++j)
+    for (int j=0; j<NELN; ++j)
     {
         ao[j] = 0;
-        for (int k=0; k<2*NELN; ++k)
+        for (int k=0; k<NELN; ++k)
         {
-            ao[j] += m_Hi[j][k]*v[k];
+            ao[j] += m_Hi[j][k]*ai[ni[k]];
         }
     }
 }

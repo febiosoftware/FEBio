@@ -929,33 +929,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Class that projects stresses from integration points to the shell nodes
-class FEPlotShellNodalStresses : public FEPlotDomainData
-{
-public:
-    FEPlotShellNodalStresses(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_PRESSURE); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Class that projects Lagrange strains from integration points to the nodes
-class FEPlotNodalStrains : public FEPlotDomainData
-{
-public:
-    FEPlotNodalStrains(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_NONE); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Class that projects Lagrange strains from integration points to the shell nodes
-class FEPlotShellNodalStrains : public FEPlotDomainData
-{
-public:
-    FEPlotShellNodalStrains(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_NONE); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Deformation gradient
 class FEPlotDeformationGradient : public FEPlotDomainData
 {
