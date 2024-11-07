@@ -60,6 +60,9 @@ public:
 	//! Generate warnings if needed
 	void SolverWarnings();
 
+	//! preferred matrix type should be unsymmetric.
+	Matrix_Type PreferredMatrixType() const override { return REAL_UNSYMMETRIC; };
+
 public:
 	void Update(vector<double>& ui) override;
 
