@@ -620,7 +620,6 @@ void FEMultiphasicFSIDomain3D::ElementBodyForce(FEBodyForce& BF, FESolidElement&
     double Ji[3][3], detJ;
     double *H, *Gr, *Gs, *Gt;
     double* gw = el.GaussWeights();
-    double cf;
     vec3d ff, f;
     
     int neln = el.Nodes();

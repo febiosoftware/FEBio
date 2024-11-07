@@ -73,7 +73,7 @@ void FEFluidNaturalHeatFlux::LoadVector(FEGlobalVector& R)
         // get surface element
         FESurfaceElement& el = *mp.SurfaceElement();
         // get underlying solid element
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
         vec3d dxt = mp.dxr ^ mp.dxs;
 

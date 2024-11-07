@@ -70,9 +70,17 @@ public:
     //! dilatation from temperature and pressure
     bool Dilatation(const double T, const double p, double& e) override;
 
+    //! tangent of pressure with respect to strain J
+    double Tangent_Strain(FEMaterialPoint& mp) override;
+    
+    //! tangent of pressure with respect to temperature T
+    double Tangent_Temperature(FEMaterialPoint& mp) override;
+    
 public:
     double          m_Pr;           //!< referential absolute pressure
     double          m_Tr;           //!< referential absolute temperature
+    double          m_Tc;           //!< normalized critical temperature (Tc/Tr)
+    double          m_alpha;        //!< exponent alpha used for calculating temperature map
     double          m_rhor;         //!< referential mass density
     int             m_nvp;          //!< number of virial coefficients for pressure
     int             m_nvc;          //!< number of virial coefficients for isochoric specific heat capacity

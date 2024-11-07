@@ -107,11 +107,11 @@ FEParam::FEParam(void* pdata, FEParamType itype, int ndim, const char* szname, b
 	m_szname = szname;
 	m_szlongname = szname;
 
-	m_szenum = 0;
+	m_szenum = nullptr;
 
-	m_pvalid = 0;	// no default validator
+	m_pvalid = nullptr;	// no default validator
 
-	m_parent = 0;
+	m_parent = nullptr;
 
 	m_szunit = nullptr;
 }
@@ -386,7 +386,11 @@ void FEParam::SetValidator(FEParamValidator* pvalid)
 	m_pvalid = pvalid;
 }
 
-//-----------------------------------------------------------------------------
+FEParamValidator* FEParam::GetValidator()
+{
+	return m_pvalid;
+}
+
 void FEParam::Serialize(DumpStream& ar)
 {
 	if (ar.IsSaving())
@@ -734,5 +738,56 @@ FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param)
 		return param->paramValue(paramName.Index());
 	}
 
+	return FEParamValue();
+}
+
+FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, int index)
+{
+	switch (paramVal.type())
+	{
+	case FE_PARAM_STD_VECTOR_INT:
+	{
+		std::vector<int>& d = paramVal.value<std::vector<int>>();
+		if ((index >= 0) && (index < d.size())) return FEParamValue(d[index]);
+	}
+	break;
+	case FE_PARAM_STD_VECTOR_DOUBLE:
+	{
+		std::vector<double>& d = paramVal.value<std::vector<double>>();
+		if ((index >= 0) && (index < d.size())) return FEParamValue(d[index]);
+	}
+	break;
+	case FE_PARAM_STD_VECTOR_VEC2D:
+	{
+		std::vector<vec2d>& d = paramVal.value<std::vector<vec2d>>();
+		if ((index >= 0) && (index < d.size())) return FEParamValue(d[index]);
+	}
+	break;
+	}
+	assert(false);
+	return FEParamValue();
+}
+
+FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, const char* szcomp)
+{
+	switch (paramVal.type())
+	{
+	case FE_PARAM_VEC2D:
+	{
+		vec3d& v = paramVal.value<vec3d>();
+		if      (strcmp(szcomp, "x") == 0) return FEParamValue(v.x);
+		else if (strcmp(szcomp, "y") == 0) return FEParamValue(v.y);
+	}
+	break;
+	case FE_PARAM_VEC3D:
+	{
+		vec3d& v = paramVal.value<vec3d>();
+		if      (strcmp(szcomp, "x") == 0) return FEParamValue(v.x);
+		else if (strcmp(szcomp, "y") == 0) return FEParamValue(v.y);
+		else if (strcmp(szcomp, "z") == 0) return FEParamValue(v.z);
+	}
+	break;
+	}
+	assert(false);
 	return FEParamValue();
 }

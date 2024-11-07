@@ -34,6 +34,23 @@ SOFTWARE.*/
 #define min(a,b) ((a)<(b)?(a):(b))
 #endif
 
+size_t binarySearch(const std::vector<vec2d>& points, double x)
+{
+	size_t N = points.size();
+	size_t low = 0;
+	size_t high = N - 1;
+	// Repeat until the pointers low and high meet each other
+	while (low <= high) {
+		size_t mid = low + (high - low) / 2;
+
+		if (points[mid].x() <= x)
+			low = mid + 1;
+		else
+			high = mid - 1;
+	}
+	return low;
+}
+
 class PointCurve::Imp
 {
 public:
@@ -280,8 +297,7 @@ double PointCurve::value(double time) const
 
 	if (im->fnc == LINEAR)
 	{
-		int n = 0;
-		while (points[n].x() <= time) ++n;
+        size_t n = binarySearch(points, time);
 
 		double t0 = points[n - 1].x();
 		double t1 = points[n].x();
@@ -293,15 +309,13 @@ double PointCurve::value(double time) const
 	}
 	else if (im->fnc == STEP)
 	{
-		int n = 0;
-		while (points[n].x() <= time) ++n;
+        size_t n = binarySearch(points, time);
 
 		return points[n].y();
 	}
 	else if (im->fnc == SMOOTH_STEP)
 	{
-		int n = 0;
-		while (points[n].x() <= time) ++n;
+        size_t n = binarySearch(points, time);
 
 		double t0 = points[n - 1].x();
 		double t1 = points[n].x();
@@ -346,8 +360,7 @@ double PointCurve::value(double time) const
 		}
 		else
 		{
-			int n = 0;
-			while (points[n].x() <= time) ++n;
+            size_t n = binarySearch(points, time);
 
 			if (n == 1)
 			{
@@ -573,8 +586,7 @@ double PointCurve::derive(double time) const
         }
         else
         {
-            int n = 0;
-            while (im->dpts[n].x() <= time) ++n;
+            size_t n = binarySearch(im->dpts, time);
             
             if (n == 1)
             {

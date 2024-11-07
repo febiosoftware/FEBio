@@ -23,22 +23,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEModelUpdate.h"
+#pragma once
+#include <FECore/FEMeshAdaptorCriterion.h>
+#include <FECore/ElementDataRecord.h>
 
-FEModelUpdate* FEModelUpdate::m_pThis = nullptr;
-
-FEModelUpdate::FEModelUpdate()
+class FEElementDataCriterion : public FEMeshAdaptorCriterion
 {
-	m_pThis = this;
-}
+public:
+	FEElementDataCriterion(FEModel* fem);
 
-FEModelUpdate::~FEModelUpdate()
-{
-	m_pThis = nullptr;
-}
+	bool Init() override;
 
-FEModelUpdate* FEModelUpdate::Instance()
-{
-	return m_pThis;
-}
+	bool GetElementValue(FEElement& el, double& val) override;
+
+private:
+	std::string m_data;
+	FELogElemData* m_pd;
+
+	DECLARE_FECORE_CLASS();
+};

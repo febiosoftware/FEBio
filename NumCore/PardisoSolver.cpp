@@ -90,6 +90,7 @@ void print_err(int nerror)
 BEGIN_FECORE_CLASS(PardisoSolver, LinearSolver)
 	ADD_PARAMETER(m_print_cn, "print_condition_number");
 	ADD_PARAMETER(m_iparm3  , "precondition");
+	ADD_PARAMETER(m_msglvl  , "msglvl");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -99,6 +100,7 @@ PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 	m_mtype = -2;
 	m_iparm3 = false;
 	m_isFactored = false;
+	m_msglvl = 0; /* 0 Suppress printing, 1 Print statistical information */
 }
 
 //-----------------------------------------------------------------------------
@@ -157,6 +159,11 @@ bool PardisoSolver::PreProcess()
 	assert(m_isFactored == false);
 	pardisoinit(m_pt, &m_mtype, m_iparm);
 
+	// Turn off reporting the number of non-zero elements in the factors.
+	// According to the documentation turning this on (set to -1) will 
+	// increase the reordering time.
+	m_iparm[18] = 0; 
+
 	m_n = m_pA->Rows();
 	m_nnz = m_pA->NonZeroes();
 	m_nrhs = 1;
@@ -167,8 +174,6 @@ bool PardisoSolver::PreProcess()
 
 	m_maxfct = 1;	/* Maximum number of numerical factorizations */
 	m_mnum = 1;	/* Which factorization to use */
-
-	m_msglvl = 0;	/* 0 Suppress printing, 1 Print statistical information */
 
 	return LinearSolver::PreProcess();
 }
@@ -195,6 +200,17 @@ bool PardisoSolver::Factor()
 		fprintf(stderr, "\nERROR during symbolic factorization: ");
 		print_err(error);
 		exit(2);
+	}
+
+	if (m_msglvl == 1)
+	{
+		int* ip = m_iparm;
+		fprintf(stdout, "\nMemory info:\n");
+		fprintf(stdout, "============\n");
+		fprintf(stdout, "Peak memory on symbolic factorization ............. : %d KB\n", ip[14]);
+		fprintf(stdout, "Permanent memory on symbolic factorization ........ : %d KB\n", ip[15]);
+		fprintf(stdout, "Peak memory on numerical factorization and solution : %d KB\n", ip[16]);
+		fprintf(stdout, "Total peak memory ................................. : %d KB\n\n", max(ip[14], ip[15]+ip[16]));
 	}
 
 // ------------------------------------------------------------------------------
@@ -335,7 +351,7 @@ void PardisoSolver::Destroy()
 
 	int error = 0;
 
-	if (m_pA && m_pA->Pointers() && m_isFactored)
+	if (m_pA && m_isFactored)
 	{
 		pardiso(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, m_pA->Pointers(), m_pA->Indices(),
 			NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &error);

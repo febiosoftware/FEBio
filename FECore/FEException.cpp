@@ -59,7 +59,7 @@ void FEException::what(const char* msg, ...)
 	// make the message
 	char sztxt[1024] = { 0 };
 	va_start(args, msg);
-	vsnprintf(sztxt, sizeof(1024), msg, args);
+	vsnprintf(sztxt, sizeof(sztxt), msg, args);
 	va_end(args);
 
 	m_what = sztxt;
@@ -145,8 +145,9 @@ ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 }
 */
 //=============================================================================
-bool NegativeJacobian::m_boutput = false;
 bool NegativeJacobian::m_bthrown = false;
+int NegativeJacobian::m_maxout = 0; // output off by default
+int NegativeJacobian::m_count = 0;
 
 //-----------------------------------------------------------------------------
 NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
@@ -162,7 +163,9 @@ NegativeJacobian::NegativeJacobian(int iel, int ng, double vol, FEElement* pe)
 //-----------------------------------------------------------------------------
 bool NegativeJacobian::DoOutput()
 {
-	return m_boutput;
+	m_count++; // we do this here because this function is called from critical sections.
+	bool b = (m_maxout < 0) || (m_count <= m_maxout);
+	return b;
 }
 
 //-----------------------------------------------------------------------------
@@ -175,6 +178,16 @@ void NegativeJacobian::clearFlag()
 bool NegativeJacobian::IsThrown()
 {
 	return m_bthrown;
+}
+
+int NegativeJacobian::Count()
+{
+	return m_count;
+}
+
+void NegativeJacobian::ResetCount()
+{
+	m_count = 0;
 }
 
 //-----------------------------------------------------------------------------

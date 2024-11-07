@@ -123,7 +123,7 @@ void FETangentialFlowPFStabilization::LoadVector(FEGlobalVector& R)
         FESurfaceElement& el = *mp.SurfaceElement();
         
         // get the density
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
         FEPolarFluid* pfluid = pm->ExtractProperty<FEPolarFluid>();
         FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();
@@ -183,7 +183,7 @@ void FETangentialFlowPFStabilization::StiffnessMatrix(FELinearSystem& LS)
         vec3d g = FluidAngularVelocity(mp, tp.alphaf);
         
         // get the density
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
         FEPolarFluid* pfluid = pm->ExtractProperty<FEPolarFluid>();
         FEFluidMaterial* fluid = pm->ExtractProperty<FEFluidMaterial>();

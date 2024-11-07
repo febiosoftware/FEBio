@@ -175,16 +175,14 @@ int FEBioApp::RunModel()
 	{
 		// read the input file
 		if (fem.Input(m_ops.szfile) == false) nret = 1;
-		else
-		{
-			// apply configuration overrides
-			ApplyConfig(fem);
-		}
 	}
 
 	// solve the model with the task and control file
 	if (nret == 0)
 	{
+		// apply configuration overrides
+		ApplyConfig(fem);
+
 		bool bret = febio::SolveModel(fem, m_ops.sztask, m_ops.szctrl);
 
 		nret = (bret ? 0 : 1);
@@ -423,7 +421,6 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		{
 			brun = false;
 		}
-
 		else if (strcmp(sz, "-import") == 0)
 		{
 			if ((i < nargs - 1) && (argv[i+1][0] != '-'))
@@ -433,6 +430,16 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 				fprintf(stderr, "FATAL ERROR: insufficient number of arguments for -import.\n");
 				return false;
 			}
+		}
+		else if (strncmp(sz, "-output_negative_jacobians", 26) == 0)
+		{
+			int n = -1;
+			if (sz[26] == '=')
+			{
+				const char* szval = sz + 27;
+				n = atoi(szval);
+			}
+			NegativeJacobian::m_maxout = n;
 		}
 		else if (sz[0] == '-')
 		{

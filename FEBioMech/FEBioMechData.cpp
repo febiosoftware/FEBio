@@ -48,6 +48,8 @@ SOFTWARE.*/
 #include "FEContactSurface.h"
 #include "FEDiscreteElasticMaterial.h"
 #include "FESlidingInterface.h"
+#include "FEPreStrainElastic.h"
+#include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(const FENode& node)
@@ -1570,6 +1572,28 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 	return val / (double) nint;
 }
 
+double FELogTotalDeformationGradient::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		FEPrestrainMaterialPoint* pp = mp.ExtractData<FEPrestrainMaterialPoint>();
+
+		mat3d F = pt.m_F;
+		if (pp)
+		{
+			mat3d Fp = pp->prestrain();
+			F = F * Fp;
+		}
+
+		val += F(m_r, m_c);
+	}
+	return val / (double)nint;
+}
+
 //-----------------------------------------------------------------------------
 double FELogElemElasticity_::value(FEElement& el, int n)
 {
@@ -1717,41 +1741,57 @@ double FELogElemFiberVectorZ::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-double FELogDamage::value(FEElement& el)
+double FELogDamage_::value(FEElement& el)
 {
     int nint = el.GaussPoints();
     double D = 0;
-    for (int j=0; j<nint; ++j)
-    {
-        FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-        FEReactiveMaterialPoint* ppd = pt.ExtractData<FEReactiveMaterialPoint>();
-        FEElasticMixtureMaterialPoint* pem = pt.ExtractData<FEElasticMixtureMaterialPoint>();
-        FEMultigenerationMaterialPoint* pmg = pt.ExtractData<FEMultigenerationMaterialPoint>();
-        if (ppd) D += (float) ppd->BrokenBonds();
-        else if (pem) {
-            for (int k=0; k<pem->Components(); ++k)
-            {
-                FEReactiveMaterialPoint* ppd = pem->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
-                if (ppd) D += (float) ppd->BrokenBonds();
-            }
-        }
-        else if (pmg) {
-            for (int k=0; k<pmg->Components(); ++k)
-            {
-                FEReactiveMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
-                if (ppd) D += (float) ppd->BrokenBonds();
-                else if (pem)
-                {
-                    for (int l=0; l<pem->Components(); ++l)
-                    {
-                        FEReactiveMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEReactiveMaterialPoint>();
-                        if (ppd) D += (float) ppd->BrokenBonds();
-                    }
-                }
-            }
-        }
-    }
+	if (m_comp == -1)
+	{
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
+			FEReactiveMaterialPoint* ppd = pt.ExtractData<FEReactiveMaterialPoint>();
+			FEElasticMixtureMaterialPoint* pem = pt.ExtractData<FEElasticMixtureMaterialPoint>();
+			FEMultigenerationMaterialPoint* pmg = pt.ExtractData<FEMultigenerationMaterialPoint>();
+			if (ppd) D += (float)ppd->BrokenBonds();
+			else if (pem) {
+				for (int k = 0; k < pem->Components(); ++k)
+				{
+					FEReactiveMaterialPoint* ppd = pem->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
+					if (ppd) D += (float)ppd->BrokenBonds();
+				}
+			}
+			else if (pmg) {
+				for (int k = 0; k < pmg->Components(); ++k)
+				{
+					FEReactiveMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
+					FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+					if (ppd) D += (float)ppd->BrokenBonds();
+					else if (pem)
+					{
+						for (int l = 0; l < pem->Components(); ++l)
+						{
+							FEReactiveMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEReactiveMaterialPoint>();
+							if (ppd) D += (float)ppd->BrokenBonds();
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		for (int n = 0; n < el.GaussPoints(); ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
+			if (mmp && (m_comp < mmp->Components()))
+			{
+				FEReactiveMaterialPoint* dp = mmp->GetPointData(m_comp)->ExtractData<FEReactiveMaterialPoint>();
+				if (dp) D += dp->BrokenBonds();
+			}
+		}
+	}
     D /= (double) nint;
     return D;
 }
@@ -2221,4 +2261,80 @@ double FELogContactArea::value(FESurface& surface)
 		return area;
 	}
 	return 0.0;
+}
+
+double FELogMaxContactGap::value(FESurface& surface)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surface);
+	if (pcs == 0) return 0.0;
+
+	// make sure the corresponding contact interface is active
+	// (in case the parent was not set, we'll proceed regardless)
+	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
+	if ((pci == 0) || pci->IsActive())
+	{
+		double maxGap = 0;
+		for (int i = 0; i < pcs->Elements(); ++i)
+		{
+			FESurfaceElement& el = pcs->Element(i);
+			for (int n = 0; n < el.GaussPoints(); ++n)
+			{
+				FEContactMaterialPoint* pt = dynamic_cast<FEContactMaterialPoint*>(el.GetMaterialPoint(n));
+				if (pt)
+				{
+					if (pt->m_gap > maxGap) maxGap = pt->m_gap;
+				}
+			}
+		}
+		return maxGap;
+	}
+	return 0.0;
+}
+
+
+//=============================================================================
+double FENormalizedInternalEnergy::value(FEDomain& dom)
+{
+	double sum = 0.0;
+	double vol = 0.0;
+	FESolidDomain* solidDomain = dynamic_cast<FESolidDomain*>(&dom);
+	if (solidDomain == nullptr) return 0.0;
+
+	FEModel* fem = GetFEModel();
+	const FETimeInfo& ti = fem->GetTime();
+	double dt = ti.timeIncrement;
+
+	double P0 = fem->GetGlobalConstant("P");
+	if (P0 == 0.0) P0 = 1.0;
+
+	int NE = solidDomain->Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& el = solidDomain->Element(i);
+		double Ve = solidDomain->Volume(el);
+		vol += Ve;
+
+		mat3ds s(0), D(0);
+		int nint = el.GaussPoints();
+		double* gw = el.GaussWeights();
+		double w = 0.0;
+		for (int n = 0; n < nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
+			s += ep.m_s * gw[n];
+			D += ep.RateOfDeformation();
+			w += gw[n];
+		}
+		s /= w;
+		D /= w;
+
+		double We = s.dotdot(D);
+
+		sum += We * dt * Ve;
+	}
+	m_sum += sum;
+	double NTSIE = m_sum / (P0 * vol);
+	return NTSIE;
 }

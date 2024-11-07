@@ -45,6 +45,12 @@ class FEExplicitSolidSolver : public FESolver
 		HRZ_LUMPING			// use Hinton-Rock-Zienkiewicz lumping
 	};
 
+	struct Data {
+		double v = 0; // velocity
+		double a = 0; // acceleration
+		double mi = 0; // inverted mass
+	};
+
 public:
 	//! constructor
 	FEExplicitSolidSolver(FEModel* pfem);
@@ -100,14 +106,11 @@ public:
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
 
-	vector<double> m_Mi;	//!< inverse mass vector for explicit analysis
-	vector<double> m_Fr;	//!< nodal reaction forces
+	vector<Data> m_data;
+	vector<double> m_ui;	//!< residual loads
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
-
-	vector<double> m_ui;	//!< displacement increment vector
-
-	vector<double> m_R0;	//!< residual at iteration i-1
-	vector<double> m_R1;	//!< residual at iteration i
+	vector<double> m_Rt;	//!< residual loads
+	vector<double> m_Fr;	//!< nodal reaction forces
 
 protected:
 	FEDofList	m_dofU, m_dofV, m_dofQ, m_dofRQ;

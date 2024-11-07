@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidBody, FECoreBase)
@@ -190,6 +191,11 @@ void FERigidBody::UpdateMass()
 			FERigidShellDomain* psd = dynamic_cast<FERigidShellDomain*>(&dom);
 			if (psd) m_mass += psd->CalculateMass();
 		}
+	}
+
+	if (m_mass == 0)
+	{
+		feLogWarning("Zero mass for rigid body \"%s.\"", GetName().c_str());
 	}
 }
 

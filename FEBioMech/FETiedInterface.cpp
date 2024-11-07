@@ -262,6 +262,9 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 	cpp.HandleSpecialCases(m_bspecial);
 	cpp.Init();
 
+	// let's count contact pairs
+	int contacts = 0;
+
 	// loop over all primary nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
@@ -302,8 +305,17 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 
 				// calculate force
 				ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_vgap*m_eps;
+
+				contacts++;
 			}
 		}
+	}
+
+	// if we found no contact pairs, let's report this since this is probably not the user's intention
+	if (contacts == 0)
+	{
+		std::string name = GetName();
+		feLogWarning("No contact pairs found for tied interface \"%s\".\nThis contact interface may not have any effect.", name.c_str());
 	}
 }
 

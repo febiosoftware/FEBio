@@ -60,7 +60,7 @@ public:
 	bool InitMesh() override;
 
 	//! Initialize shells
-	void InitShells() override;
+	bool InitShells() override;
 
 	// find a parameter value
 	FEParamValue GetParameterValue(const ParamString& param) override;

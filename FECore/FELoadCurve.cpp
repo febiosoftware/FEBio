@@ -48,11 +48,15 @@ FELoadCurve::FELoadCurve(FEModel* fem) : FELoadController(fem)
 FELoadCurve::FELoadCurve(const FELoadCurve& lc) : FELoadController(lc)
 {
 	m_fnc = lc.m_fnc;
+	m_int = lc.m_int;
+	m_ext = lc.m_ext;
 }
 
 void FELoadCurve::operator = (const FELoadCurve& lc)
 {
 	m_fnc = lc.m_fnc;
+	m_int = lc.m_int;
+	m_ext = lc.m_ext;
 }
 
 FELoadCurve::~FELoadCurve()
@@ -79,6 +83,15 @@ bool FELoadCurve::Init()
 
 	if (m_fnc.Update() == false) return false;
 	return FELoadController::Init();
+}
+
+void FELoadCurve::Reset()
+{
+	FELoadController::Reset();
+	m_fnc.SetInterpolator(m_int);
+	m_fnc.SetExtendMode(m_ext);
+	m_fnc.SetPoints(m_points);
+	m_fnc.Update();
 }
 
 void FELoadCurve::Serialize(DumpStream& ar)

@@ -103,10 +103,13 @@ protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
 
+	Matrix_Type PreferredMatrixType() const override { return REAL_UNSYMMETRIC; };
+
 public:
 	// additional convergence norms
 	double	m_Dtol;			//!< displacement tolerance
 	double	m_Ptol;			//!< pressure tolerance
+    double  m_Ctol;         //!< needed only for biphasic-solute analyses
 
 	// biphasic formulation
 	int		m_biphasicFormulation;	// = 0: standard, =1: mixed (linear pressure)

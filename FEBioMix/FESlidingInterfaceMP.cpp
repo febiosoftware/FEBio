@@ -83,65 +83,13 @@ BEGIN_FECORE_CLASS(FESlidingInterfaceMP, FEContactInterface)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESlidingSurfaceMP::Data::Data()
-{
-    m_Lmd   = 0.0;
-    m_Lmt   = m_tr = vec3d(0,0,0);
-    m_Lmp   = 0.0;
-    m_epsn  = 1.0;
-    m_epsp  = 1.0;
-    m_pg    = 0.0;
-    m_p1    = 0.0;
-    m_mueff = 0.0;
-    m_fls   = 0.0;
-    m_nu    = m_s1 = m_dg = vec3d(0,0,0);
-    m_rs    = m_rsp = vec2d(0,0);
-    m_bstick = false;
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingSurfaceMP::Data::Init()
-{
-    m_Lmd   = 0.0;
-    m_Lmt   = m_tr = vec3d(0,0,0);
-    m_Lmp   = 0.0;
-    m_epsn  = 1.0;
-    m_epsp  = 1.0;
-    m_pg    = 0.0;
-    m_p1    = 0.0;
-    m_mueff = 0.0;
-    m_fls   = 0.0;
-    m_nu    = m_s1 = m_dg = vec3d(0,0,0);
-    m_rs    = m_rsp = vec2d(0,0);
-    m_bstick = false;
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingSurfaceMP::Data::Serialize(DumpStream& ar)
+void FEMultiphasicContactPoint::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactPoint::Serialize(ar);
-    ar & m_gap;
-    ar & m_dg;
-    ar & m_nu;
-    ar & m_s1;
-    ar & m_rs;
-    ar & m_rsp;
-    ar & m_Lmd;
-    ar & m_Lmt;
-    ar & m_Lmp;
     ar & m_Lmc;
-    ar & m_epsn;
-    ar & m_epsp;
     ar & m_epsc;
-    ar & m_pg;
     ar & m_cg;
-    ar & m_p1;
     ar & m_c1;
-    ar & m_Ln;
-    ar & m_bstick;
-    ar & m_tr;
-    ar & m_mueff;
-    ar & m_fls;
 }
 
 //-----------------------------------------------------------------------------
@@ -164,7 +112,7 @@ FESlidingSurfaceMP::~FESlidingSurfaceMP()
 //! create material point data
 FEMaterialPoint* FESlidingSurfaceMP::CreateMaterialPoint()
 {
-	return new FESlidingSurfaceMP::Data;
+	return new FEMultiphasicContactPoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +168,7 @@ bool FESlidingSurfaceMP::Init()
 	if (Elements()) {
 		FESurfaceElement& se = Element(0);
 		// get the element this surface element belongs to
-		FEElement* pe = se.m_elem[0];
+		FEElement* pe = se.m_elem[0].pe;
 		if (pe)
 		{
 			// get the material
@@ -267,7 +215,7 @@ bool FESlidingSurfaceMP::Init()
 		int nint = el.GaussPoints();
         if (nsol) {
             for (int j=0; j<nint; ++j) {
-				Data& data = static_cast<Data&>(*el.GetMaterialPoint(j));
+                FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
                 data.m_Lmc.resize(nsol);
                 data.m_epsc.resize(nsol);
                 data.m_cg.resize(nsol);
@@ -293,7 +241,7 @@ void FESlidingSurfaceMP::InitSlidingSurface()
         for (int j=0; j<nint; ++j)
         {
             // Store current surface projection values as previous
-            Data& data = static_cast<Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
             data.m_rsp = data.m_rs;
             data.m_pmep = data.m_pme;
         }
@@ -440,7 +388,7 @@ double FESlidingSurfaceMP::GetContactArea()
 		for (int i=0; i<nint; ++i)
 		{
 			// get data for this integration point
-			Data& data = static_cast<Data&>(*el.GetMaterialPoint(i));
+            FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(i));
 			double s = (data.m_Ln > 0) ? 1 : 0;
             
 			// get the base vectors
@@ -528,7 +476,7 @@ void FESlidingSurfaceMP::GetVectorGap(int nface, vec3d& pg)
     pg = vec3d(0,0,0);
     for (int k=0; k<ni; ++k)
     {
-        Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(k));
         pg += data.m_dg;
     }
     pg /= ni;
@@ -542,7 +490,7 @@ void FESlidingSurfaceMP::GetContactPressure(int nface, double& pg)
     pg = 0;
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pg += data.m_Ln;
 	}
     pg /= ni;
@@ -556,7 +504,7 @@ void FESlidingSurfaceMP::GetContactTraction(int nface, vec3d& pt)
     pt = vec3d(0,0,0);
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(k));
         pt += data.m_tr;
 	}
     pt /= ni;
@@ -570,7 +518,7 @@ void FESlidingSurfaceMP::GetSlipTangent(int nface, vec3d& pt)
     pt = vec3d(0,0,0);
     for (int k=0; k<ni; ++k)
     {
-        Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(k));
         if (!data.m_bstick) pt += data.m_s1;
     }
     pt /= ni;
@@ -584,7 +532,7 @@ void FESlidingSurfaceMP::GetMuEffective(int nface, double& pg)
     pg = 0;
     for (int k=0; k<ni; ++k)
     {
-        Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(k));
         pg += data.m_mueff;
     }
     pg /= ni;
@@ -598,7 +546,7 @@ void FESlidingSurfaceMP::GetLocalFLS(int nface, double& pg)
     pg = 0;
     for (int k = 0; k < ni; ++k)
     {
-        Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(k));
         pg += data.m_fls;
     }
     pg /= ni;
@@ -612,7 +560,7 @@ void FESlidingSurfaceMP::GetNodalVectorGap(int nface, vec3d* pg)
     vec3d gi[FEElement::MAX_INTPOINTS];
     for (int k=0; k<ni; ++k)
     {
-        Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(k));
         gi[k] = data.m_dg;
     }
     el.project_to_nodes(gi, pg);
@@ -634,7 +582,7 @@ void FESlidingSurfaceMP::GetStickStatus(int nface, double& pg)
     pg = 0;
     for (int k=0; k<ni; ++k)
     {
-        Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(k));
         if (data.m_bstick) pg += 1.0;
     }
     pg /= ni;
@@ -775,7 +723,7 @@ void FESlidingInterfaceMP::BuildMatrixProfile(FEGlobalMatrix& K)
 			int* sn = &se.m_node[0];
 			for (k=0; k<nint; ++k)
 			{
-				FESlidingSurfaceMP::Data& data = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(k));
+                FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*se.GetMaterialPoint(k));
 
 				FESurfaceElement* pe = data.m_pme;
 				if (pe != 0)
@@ -864,7 +812,7 @@ void FESlidingInterfaceMP::CalcAutoPenalty(FESlidingSurfaceMP& s)
 		int nint = el.GaussPoints();
 		for (int j=0; j<nint; ++j)
         {
-			FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& pt = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsn = eps;
         }
 	}
@@ -886,7 +834,7 @@ void FESlidingInterfaceMP::CalcAutoPressurePenalty(FESlidingSurfaceMP& s)
 		int nint = el.GaussPoints();
 		for (int j=0; j<nint; ++j)
         {
-			FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& pt = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsp = eps;
         }
 	}
@@ -902,7 +850,7 @@ double FESlidingInterfaceMP::AutoPenalty(FESurfaceElement& el, FESurface &s)
     FEMesh& m = GetFEModel()->GetMesh();
     
     // get the element this surface element belongs to
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == 0) return 0.0;
 
 	tens4ds S;
@@ -970,7 +918,7 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
 	n.unit();
 	
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == 0) return 0.0;
 
 	// get the material
@@ -1024,7 +972,7 @@ void FESlidingInterfaceMP::CalcAutoConcentrationPenalty(FESlidingSurfaceMP& s,
 		int nint = el.GaussPoints();
 		for (int j=0; j<nint; ++j, ++ni)
         {
-			FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& pt = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsc[isol] = eps;
         }
 	}
@@ -1046,7 +994,7 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
 	n.unit();
 	
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == 0) return 0.0;
 
 	// get the material
@@ -1190,7 +1138,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
         
         for (int j=0; j<nint; ++j)
         {
-            FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& pt = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
 
             // calculate the global position of the integration point
             r = ss.Local2Global(el, j);
@@ -1492,7 +1440,7 @@ vec3d FESlidingInterfaceMP::SlipTangent(FESlidingSurfaceMP& ss, const int nel, c
     FESurfaceElement& se = ss.Element(nel);
     
     // get integration point data
-    FESlidingSurfaceMP::Data& data = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(nint));
+    FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*se.GetMaterialPoint(nint));
     double g = data.m_gap;
     vec3d nu = data.m_nu;
     
@@ -1563,7 +1511,7 @@ vec3d FESlidingInterfaceMP::ContactTraction(FESlidingSurfaceMP& ss, const int ne
     FESurfaceElement& se = ss.Element(nel);
     
     // get the integration point data
-    FESlidingSurfaceMP::Data& data = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(n));
+    FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*se.GetMaterialPoint(n));
     
     // penalty
     double eps = m_epsn*data.m_epsn*psf;
@@ -1898,7 +1846,7 @@ void FESlidingInterfaceMP::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
             for (int j=0; j<nint; ++j)
             {
                 // get integration point data
-                FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(j));
+                FEMultiphasicContactPoint& pt = static_cast<FEMultiphasicContactPoint&>(*se.GetMaterialPoint(j));
                 
                 // calculate contact pressure and account for stick
                 double pn;
@@ -2063,7 +2011,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
     double psf = GetPenaltyScaleFactor();
     
     // see how many reformations we've had to do so far
-    int nref = LS.GetSolver()->m_nref;
+    int nref = GetSolver()->m_nref;
     
     // set higher order stiffness mutliplier
     // NOTE: this algorithm doesn't really need this
@@ -2136,7 +2084,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
             for (j=0; j<nint; ++j)
             {
                 // get integration point data
-                FESlidingSurfaceMP::Data& pt = static_cast<FESlidingSurfaceMP::Data&>(*se.GetMaterialPoint(j));
+                FEMultiphasicContactPoint& pt = static_cast<FEMultiphasicContactPoint&>(*se.GetMaterialPoint(j));
                 
                 // calculate contact traction and account for stick
                 double pn;
@@ -2794,7 +2742,7 @@ void FESlidingInterfaceMP::UpdateContactPressures()
             for (i=0; i<nint; ++i)
             {
                 // get integration point data
-                FESlidingSurfaceMP::Data& sd = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(i));
+                FEMultiphasicContactPoint& sd = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(i));
                 // evaluate traction on primary surface
                 double eps = m_epsn*sd.m_epsn*psf;
                 if (sd.m_bstick) {
@@ -2819,7 +2767,7 @@ void FESlidingInterfaceMP::UpdateContactPressures()
                     vec3d ti[MI];
                     double pi[MI];
                     for (j=0; j<mint; ++j) {
-                        FESlidingSurfaceMP::Data& md = static_cast<FESlidingSurfaceMP::Data&>(*pme->GetMaterialPoint(j));
+                        FEMultiphasicContactPoint& md = static_cast<FEMultiphasicContactPoint&>(*pme->GetMaterialPoint(j));
                         
                         // evaluate traction on secondary surface
                         double eps = m_epsn*md.m_epsn*psf;
@@ -2884,7 +2832,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
         FESurfaceElement& el = m_ss.Element(i);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-            FESlidingSurfaceMP::Data& ds = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& ds = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
             if (ds.m_bstick)
                 normL0 += ds.m_Lmt*ds.m_Lmt;
             else
@@ -2896,7 +2844,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
         FESurfaceElement& el = m_ms.Element(i);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-            FESlidingSurfaceMP::Data& dm = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& dm = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
             if (dm.m_bstick)
                 normL0 += dm.m_Lmt*dm.m_Lmt;
             else
@@ -2917,7 +2865,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
         if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-            FESlidingSurfaceMP::Data& ds = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& ds = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
             
             // update Lagrange multipliers on primary surface
             eps = m_epsn*ds.m_epsn*psf;
@@ -2986,7 +2934,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
         vec3d tn[FEElement::MAX_INTPOINTS];
         if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j) {
-            FESlidingSurfaceMP::Data& dm = static_cast<FESlidingSurfaceMP::Data&>(*el.GetMaterialPoint(j));
+            FEMultiphasicContactPoint& dm = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
             
             // update Lagrange multipliers on master surface
             double eps = m_epsn*dm.m_epsn*psf;

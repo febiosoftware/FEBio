@@ -46,13 +46,16 @@ public:
 	
 	//! Tangent of supply with respect to concentration
 	double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
+
+    //! Initialization
+    bool Init() override { return FESolventSupply::Init(); }
 	
    
 public:
-	double		m_kp;				//!< coefficient of pressure drop
-	double		m_pv;				//!< prescribed (e.g., vascular) pressure
-	vector<double>		m_qc;       //!< coefficients of concentration drops
-	vector<double>		m_cv;       //!< prescribed (e.g., vascular) concentrations
+	FEParamDouble		m_kp;       //!< coefficient of pressure drop
+    FEParamDouble		m_pv;       //!< prescribed (e.g., vascular) pressure
+	vector<FEParamDouble>		m_qc;       //!< coefficients of concentration drops
+	vector<FEParamDouble>		m_cv;       //!< prescribed (e.g., vascular) concentrations
 	
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

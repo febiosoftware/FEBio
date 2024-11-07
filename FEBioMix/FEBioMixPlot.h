@@ -363,6 +363,15 @@ public:
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Contact gap for multiphasic interfaces
+//!
+class FEPlotContactGapMP : public FEPlotSurfaceData
+{
+public:
+    FEPlotContactGapMP(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_LENGTH); }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
 
 //-----------------------------------------------------------------------------
 //! Fluid pressure gap
@@ -370,7 +379,7 @@ public:
 class FEPlotPressureGap : public FEPlotSurfaceData
 {
 public:
-	FEPlotPressureGap(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_MULT) { SetUnits(UNIT_PRESSURE); }
+	FEPlotPressureGap(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
@@ -383,3 +392,17 @@ public:
     FEPlotFluidLoadSupport(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION){}
     bool Save(FESurface& surf, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! concentration gap
+//!
+class FEPlotConcentrationGap : public FEPlotSurfaceData
+{
+public:
+    FEPlotConcentrationGap(FEModel* pfem);
+    bool Save(FESurface& surf, FEDataStream& a);
+
+protected:
+    vector<int>    m_sol;
+};
+

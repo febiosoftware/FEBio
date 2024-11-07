@@ -38,6 +38,12 @@ public:
 		m_right = nullptr;
 	}
 
+	~KDTree()
+	{
+		delete m_left;
+		delete m_right;
+	}
+
 	void build(vector<vec3d> pts, int depth = 0)
 	{
 		size_t n = pts.size();

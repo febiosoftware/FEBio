@@ -243,7 +243,7 @@ double FEBondRelaxationPark::Relaxation(FEMaterialPoint& mp, const double t, con
 BEGIN_FECORE_CLASS(FEBondRelaxationParkDistortion, FEBondRelaxation)
     ADD_PARAMETER(m_tau0 , FE_RANGE_GREATER         (0.0), "tau0" )->setLongName("constant coefficient tau0")->setUnits(UNIT_TIME);
     ADD_PARAMETER(m_tau1 , FE_RANGE_GREATER_OR_EQUAL(0.0), "tau1" )->setLongName("power coefficient tau1")->setUnits(UNIT_TIME);
-    ADD_PARAMETER(m_beta0, FE_RANGE_GREATER         (0.0), "beta0")->setLongName("constant coefficient");
+    ADD_PARAMETER(m_beta0, FE_RANGE_GREATER         (0.0), "beta0")->setLongName("constant coefficient beta0");
     ADD_PARAMETER(m_beta1, FE_RANGE_GREATER_OR_EQUAL(0.0), "beta1")->setLongName("power coefficient beta1");
     ADD_PARAMETER(m_alpha, FE_RANGE_GREATER_OR_EQUAL(0.0), "alpha")->setLongName("power exponent alpha");
 END_FECORE_CLASS();

@@ -61,6 +61,8 @@ public:
 public:
     double          m_Kr;   //!< thermal conductivity at reference temperature
     double          m_Tr;   //!< reference temperature
+    double          m_Tc;           //!< normalized critical temperature (Tc/Tr)
+    double          m_alpha;        //!< exponent alpha used for calculating temperature map
     int             m_nvc;          //!< number of virial coefficients for isochoric specific heat capacity
     FEFunction1D*   m_esat;         //!< dilatation on saturation curve
     FEFunction1D*   m_Ksat;        //!< normalized thermal conductivity vs normalized temperature on saturation curve

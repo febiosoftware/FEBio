@@ -110,7 +110,6 @@ public: // operations
     void Scale(double s);
     
 public:
-    
     //! returns the value of the load curve at time
     double value(double x) const;
     

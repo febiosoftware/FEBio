@@ -52,8 +52,10 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
     int MAX_CDOFS = fedofs.GetVariableSize("concentration");
     
     if (MAX_CDOFS > 0) {
-        m_qc.assign(MAX_CDOFS,0);
-        m_cv.assign(MAX_CDOFS,0);
+        FEParamDouble tmp;
+        tmp = 0;
+        m_qc.assign(MAX_CDOFS,tmp);
+        m_cv.assign(MAX_CDOFS,tmp);
     }
 }
 
@@ -65,13 +67,17 @@ double FESolventSupplyStarling::Supply(FEMaterialPoint& mp)
 	FESolutesMaterialPoint* mpt = mp.ExtractData<FESolutesMaterialPoint>();
 
 	// evaluate solvent supply from pressure drop
-	double phiwhat = m_kp*(m_pv - ppt.m_p);
+    double kp = m_kp(mp);
+    double pv = m_pv(mp);
+	double phiwhat = kp*(pv - ppt.m_p);
 	
 	// evaluate solvent supply from concentration drop
 	if (mpt) {
 		int nsol = mpt->m_nsol;
 		for (int isol=0; isol<nsol; ++isol) {
-			phiwhat += m_qc[isol]*(m_cv[isol] - mpt->m_c[isol]);
+            double qc = m_qc[isol](mp);
+            double cv = m_cv[isol](mp);
+			phiwhat += qc*(cv - mpt->m_c[isol]);
 		}
 	}
 	
@@ -91,7 +97,7 @@ mat3ds FESolventSupplyStarling::Tangent_Supply_Strain(FEMaterialPoint &mp)
 //! Tangent of solvent supply with respect to pressure
 double FESolventSupplyStarling::Tangent_Supply_Pressure(FEMaterialPoint &mp)
 {
-	return -m_kp;
+	return -m_kp(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -100,7 +106,7 @@ double FESolventSupplyStarling::Tangent_Supply_Concentration(FEMaterialPoint &mp
 {
 	FESolutesMaterialPoint& mpt = *mp.ExtractData<FESolutesMaterialPoint>();
 	if (isol < mpt.m_nsol) {
-		return -m_qc[isol];
+		return -m_qc[isol](mp);
 	}
 	
 	return 0;

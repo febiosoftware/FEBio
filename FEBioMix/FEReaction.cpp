@@ -50,8 +50,7 @@ bool FEReaction::Init()
         return false;
     }
     
-    // now call base class
-    return FEMaterialProperty::Init();
+    return true;
 }
 
 

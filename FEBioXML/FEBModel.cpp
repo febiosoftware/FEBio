@@ -679,6 +679,22 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		fesurfPair->SetSecondarySurface(surf2);
 	}
 
+	// create domain lists
+	for (int i = 0; i < part.PartLists(); ++i)
+	{
+		FEBModel::PartList* partList = part.GetPartList(i);
+
+		FEDomainList* domList = new FEDomainList();
+		domList->SetName(partList->Name());
+		for (int j = 0; j < partList->Parts(); ++j)
+		{
+			FEDomain* dom = mesh.FindDomain(partList->PartName(j)); assert(dom);
+			if (dom) domList->AddDomain(dom);
+		}
+
+		mesh.AddDomainList(domList);
+	}
+
 	// create discrete element sets
 	int DSets = part.DiscreteSets();
 	for (int i = 0; i < DSets; ++i)

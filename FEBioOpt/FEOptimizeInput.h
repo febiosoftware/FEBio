@@ -50,5 +50,11 @@ private:
 	FEDataSource* ParseDataSource(XMLTag& tag);
 
 private:
+	void ParseObjectiveDataFit(XMLTag& tag);
+	void ParseObjectiveTarget(XMLTag& tag);
+	void ParseObjectiveElementData(XMLTag& tag);
+	void ParseObjectiveNodeData(XMLTag& tag);
+
+private:
 	FEOptimizeData*	m_opt;
 };

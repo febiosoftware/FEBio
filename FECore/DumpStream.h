@@ -65,9 +65,7 @@ enum TypeID
 	TYPE_MATRIX
 };
 
-#ifndef uchar
-#define uchar unsigned char
-#endif
+typedef unsigned char uchar;
 
 //-----------------------------------------------------------------------------
 //! A dump stream is used to serialize data to and from a data stream.

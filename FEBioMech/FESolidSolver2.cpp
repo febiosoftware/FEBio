@@ -287,7 +287,7 @@ bool FESolidSolver2::InitAccelerations()
 
 		// setup the linear system
 		m_pK->Zero();
-		FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), 1.0, m_nreq);
+		FESolidLinearSystem LS(&fem, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), 1.0, m_nreq);
 
 		// build the global mass matrix
 		FEMesh& mesh = fem.GetMesh();
@@ -1060,7 +1060,7 @@ bool FESolidSolver2::Quasin()
 		normE1 = fabs(ui*m_R1);
 
 		m_residuNorm.norm = normR1;
-		m_energyNorm.norm = normR1;
+		m_energyNorm.norm = normE1;
 		m_solutionNorm[0].norm = normu;
 
 		// check for nans
@@ -1324,7 +1324,7 @@ bool FESolidSolver2::StiffnessMatrix()
 	FEMesh& mesh = fem.GetMesh();
 
 	// setup the linear system
-	FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
+	FESolidLinearSystem LS(&fem, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
 
 	// calculate the stiffness matrix for each domain
 	for (int i=0; i<mesh.Domains(); ++i) 

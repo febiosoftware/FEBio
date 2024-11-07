@@ -89,7 +89,28 @@ FEMaterialPoint::FEMaterialPoint(FEMaterialPointData* data)
 
 FEMaterialPoint::~FEMaterialPoint()
 {
+	delete m_data;
+}
 
+// NOTE: We need a copy constructor to create vectors of FEMaterialPoint,
+// but we should not actually need to copy anything
+FEMaterialPoint::FEMaterialPoint(const FEMaterialPoint&)
+{
+	m_elem = nullptr;
+	m_shape = nullptr;
+	m_data = nullptr;
+	m_J0 = m_Jt = 1;
+	m_index = -1;
+}
+
+FEMaterialPoint& FEMaterialPoint::operator = (const FEMaterialPoint&)
+{
+	m_elem = nullptr;
+	m_shape = nullptr;
+	m_data = nullptr;
+	m_J0 = m_Jt = 1;
+	m_index = -1;
+	return *this;
 }
 
 void FEMaterialPoint::Init()
