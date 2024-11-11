@@ -59,7 +59,7 @@ bool FENonLocalAveraging::Init()
 		FEMesh& mesh = GetFEModel()->GetMesh();
 		if (m_EPL.Create(mesh, dom, R * mult) == false)
 		{
-			feLogError("Failed building elemnet proximity lists.");
+			feLogError("Failed building element proximity lists.");
 			return false;
 		}
 	}

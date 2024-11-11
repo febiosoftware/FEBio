@@ -97,7 +97,7 @@ bool FEElementProximityList::Create(FEMesh& mesh, FEDomainList& domainList, doub
 		{
 			FEElement& el = dom.ElementRef(i);
 			int m = m_lut->FindIndex(el.GetID());
-			std::vector<FEElement*> epl = topo.ElementProximityList(m, R, false);
+			std::vector<FEElement*> epl = topo.ElementProximityList(m, R, false, false);
 			m_EPL[m] = epl;
 			double epls = epl.size();
 			eplmin = std::min(eplmin, epls);
@@ -110,4 +110,5 @@ bool FEElementProximityList::Create(FEMesh& mesh, FEDomainList& domainList, doub
 	printf("Number of neighboring elements:\n");
 	printf("-------------------------------\n");
 	printf("Min. = %g, Max. = %g, Avg. = %g\n", eplmin, eplmax, eplavg);
+	return true;
 }
