@@ -40,7 +40,7 @@ using namespace std;
 
 FEElementTraits::FEElementTraits(int ni, int ne, FE_Element_Class c, FE_Element_Shape s, FE_Element_Type t)
 {
-	m_neln = m_nvln = ne;
+	m_neln = ne;
 	m_nint = ni;
 	m_faces = 0;
 	m_spec.eclass = c;
@@ -59,7 +59,7 @@ void FEElementTraits::project_to_nodes(mat3ds* si, mat3ds* so) const
 		for (int j = i; j<3; ++j) {
 			for (int n = 0; n<m_nint; ++n) ai[n] = si[n](i, j);
 			project_to_nodes(ai, ao);
-			for (int n = 0; n<m_nvln; ++n) so[n](i, j) = ao[n];
+			for (int n = 0; n<m_neln; ++n) so[n](i, j) = ao[n];
 		}
 	}
 }
@@ -2635,6 +2635,8 @@ void FEQuad9NI::project_to_nodes(double* ai, double* ao) const
 
 FEShellElementTraits::FEShellElementTraits(int ni, int ne, FE_Element_Shape es, FE_Element_Type et) : FEElementTraits(ni, ne, FE_ELEM_SHELL, es, et)
 {
+	m_nvln = ne;
+
 	gr.resize(ni);
 	gs.resize(ni);
 	gt.resize(ni);
@@ -2673,6 +2675,20 @@ void FEShellElementTraits::init()
             Hs[n][i] = Ns[i];
         }
     }
+}
+
+//! project mat3ds integration point data to nodes
+void FEShellElementTraits::project_to_nodes(mat3ds* si, mat3ds* so) const
+{
+	double ai[FEElement::MAX_INTPOINTS];
+	double ao[FEElement::MAX_NODES];
+	for (int i = 0; i < 3; ++i) {
+		for (int j = i; j < 3; ++j) {
+			for (int n = 0; n < m_nint; ++n) ai[n] = si[n](i, j);
+			project_to_nodes(ai, ao);
+			for (int n = 0; n < m_nvln; ++n) so[n](i, j) = ao[n];
+		}
+	}
 }
 
 //=============================================================================
