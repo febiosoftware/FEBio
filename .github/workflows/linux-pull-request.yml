@@ -16,5 +16,5 @@ jobs:
       runTests: true
       package-name: febio4
       package-sdk: true
-      aws-ami-id: ami-0590ebdb5afffb782
+      aws-ami-id: ami-0e02b23806d44a8fc
     secrets: inherit
