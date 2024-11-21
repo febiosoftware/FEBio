@@ -30,7 +30,49 @@ SOFTWARE.*/
 #include "writeplot.h"
 #include "FESPRProjection.h"
 
-//-------------------------------------------------------------------------------------------------
+void writeSPRElementValue(FESolidDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint&)> fnc, int interpolOrder)
+{
+	int NN = dom.Nodes();
+	int NE = dom.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& e = dom.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map;
+	map.SetInterpolationOrder(interpolOrder);
+	vector<double> val;
+
+	// fill the ED array
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int nint = el.GaussPoints();
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			double v = fnc(mp);
+			ED[i][j] = v;
+		}
+	}
+
+	// project to nodes
+	map.Project(dom, ED, val);
+
+	// copy results to archive
+	for (int i = 0; i < NN; ++i)
+	{
+		ar.push_back((float)val[i]);
+	}
+}
+
 void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar, std::function<mat3dd(const FEMaterialPoint&)> fnc, int interpolOrder)
 {
 	int NN = dom.Nodes();

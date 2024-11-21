@@ -607,6 +607,13 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+class FEPlotSPRRelativeVolume : public FEPlotDomainData
+{
+public:
+	FEPlotSPRRelativeVolume(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_NODE) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 // NOTE: Deprecated, but maintained for backward compatibility
 class FEPlotShellRelativeVolume : public FEPlotDomainData
 {
