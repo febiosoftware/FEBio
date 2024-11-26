@@ -1668,7 +1668,7 @@ bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double ep
 //! This function calculates the intersection of a ray with a quad
 //! and returns true if the ray intersected.
 //!
-bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps, bool checkNormal = true)
 {
 	// first we're going to see if the ray intersects the two subtriangles
 	vec3d x1[3], x2[3];
@@ -1754,10 +1754,13 @@ bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 		rs[0] = l1;
 		rs[1] = l2;
 		g     = l3;
-        vec3d nu2 = F1 ^ F2;
-        nu2.unit();
-        double cosq = n*nu2;
-        if (cosq > 0) return false;
+		if (checkNormal)
+		{
+			vec3d nu2 = F1 ^ F2;
+			nu2.unit();
+			double cosq = n * nu2;
+			if (cosq > 0) return false;
+		}
 
 		// see if the point is inside the quad
 		if ((rs[0] >= -1-eps) && (rs[0] <= 1+eps) && 
@@ -2255,7 +2258,7 @@ void FESurface::Invert()
 //! It simply calls the correct intersection function based on the type
 //! of element.
 //!
-bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps, bool checkNormal)
 {
 	int N = el.Nodes();
 
@@ -2269,7 +2272,7 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 	switch (N)
 	{
 	case 3: return IntersectTri  (y, r, n, rs, g, eps); break;
-	case 4: return IntersectQuad (y, r, n, rs, g, eps); break;
+	case 4: return IntersectQuad (y, r, n, rs, g, eps, checkNormal); break;
 	case 6: return IntersectTri6 (y, r, n, rs, g, eps); break;
 	case 7: return IntersectTri7 (y, r, n, rs, g, eps); break;
 	case 8: return IntersectQuad8(y, r, n, rs, g, eps); break;

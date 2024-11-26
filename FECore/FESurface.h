@@ -162,7 +162,7 @@ public:
 	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
 
 	//! See if a ray intersects an element
-	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
+	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps, bool checkNormal = true);
 
 	//! Invert the surface
 	void Invert();
