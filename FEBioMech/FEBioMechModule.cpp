@@ -1033,9 +1033,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemStrainEnergyDensity, "sed");
 	REGISTER_FECORE_CLASS(FELogElemDevStrainEnergyDensity, "devsed");
 	REGISTER_FECORE_CLASS(FELogElemFiberStretch, "fiber_stretch");
-	REGISTER_FECORE_CLASS(FELogElemFiberVectorX, "fiber_x");
-	REGISTER_FECORE_CLASS(FELogElemFiberVectorY, "fiber_y");
-	REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, "fiber_z");
+	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 0, "fiber_x");
+	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 1, "fiber_y");
+	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 2, "fiber_z");
 	REGISTER_FECORE_CLASS(FELogDamage, "D");
 	REGISTER_FECORE_CLASS_T(FELogDamage_n, 0, "damage_1");
 	REGISTER_FECORE_CLASS_T(FELogDamage_n, 1, "damage_2");

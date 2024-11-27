@@ -1672,69 +1672,39 @@ double FELogElemFiberStretch::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-double FELogElemFiberVectorX::value(FEElement& el)
+double FELogElemFiberVector_::value(FEElement& el)
 {
 	int matID = el.GetMatID();
 	FEMaterial* mat = GetFEModel()->GetMaterial(matID);
+
+	FEElasticMaterial* pme = mat->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return 0.0;
+
+	FEVec3dValuator* vec = dynamic_cast<FEVec3dValuator*>(pme->GetProperty("fiber"));
+	if (vec == nullptr) return 0.0;
 
 	int n = el.GaussPoints();
 	double l = 0.0;
 	for (int j = 0; j<n; ++j)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		mat3d Q = mat->GetLocalCS(mp);
+	
+		const FEElasticMaterialPoint* pt = mp.ExtractData<const FEElasticMaterialPoint>();
+		if (pt)
+		{
+			mat3d Q = pme->GetLocalCS(mp);
+			mat3d F = pt->m_F;
+			vec3d a0 = vec->unitVector(mp);
+			vec3d ar = Q * a0;
+			vec3d a = F * ar; a.unit();
 
-		vec3d ri = Q.col(0);
-		vec3d r = pt.m_F*ri;
-
-		l += r.x;
-	}
-	l /= (double)n;
-	return l;
-}
-
-//-----------------------------------------------------------------------------
-double FELogElemFiberVectorY::value(FEElement& el)
-{
-	int matID = el.GetMatID();
-	FEMaterial* mat = GetFEModel()->GetMaterial(matID);
-
-	int n = el.GaussPoints();
-	double l = 0.0;
-	for (int j = 0; j<n; ++j)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		mat3d Q = mat->GetLocalCS(mp);
-
-		vec3d ri = Q.col(0);
-		vec3d r = pt.m_F*ri;
-
-		l += r.y;
-	}
-	l /= (double)n;
-	return l;
-}
-
-//-----------------------------------------------------------------------------
-double FELogElemFiberVectorZ::value(FEElement& el)
-{
-	int matID = el.GetMatID();
-	FEMaterial* mat = GetFEModel()->GetMaterial(matID);
-
-	int n = el.GaussPoints();
-	double l = 0.0;
-	for (int j = 0; j<n; ++j)
-	{
-		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		mat3d Q = mat->GetLocalCS(mp);
-
-		vec3d ri = Q.col(0);
-		vec3d r = pt.m_F*ri;
-
-		l += r.z;
+			switch (m_comp)
+			{
+			case 0: l += a.x; break;
+			case 1: l += a.y; break;
+			case 2: l += a.z; break;
+			}
+		}
 	}
 	l /= (double)n;
 	return l;

@@ -971,27 +971,20 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemFiberVectorX : public FELogElemData
+class FELogElemFiberVector_ : public FELogElemData
 {
 public:
-	FELogElemFiberVectorX(FEModel* pfem) : FELogElemData(pfem){}
+	FELogElemFiberVector_(FEModel* pfem, int comp) : FELogElemData(pfem), m_comp(comp) {}
 	double value(FEElement& el);
+
+private:
+	int m_comp;
 };
 
-//-----------------------------------------------------------------------------
-class FELogElemFiberVectorY : public FELogElemData
+template <int N> class FELogElemFiberVector_N : public FELogElemFiberVector_
 {
 public:
-	FELogElemFiberVectorY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemFiberVectorZ : public FELogElemData
-{
-public:
-	FELogElemFiberVectorZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogElemFiberVector_N(FEModel* fem) : FELogElemFiberVector_(fem, N) {}
 };
 
 //-----------------------------------------------------------------------------
