@@ -567,6 +567,13 @@ void FEContactPotential::Update()
 // Build the matrix profile
 void FEContactPotential::BuildMatrixProfile(FEGlobalMatrix& M)
 {
+	const int dof_X = GetDOFIndex("x");
+	const int dof_Y = GetDOFIndex("y");
+	const int dof_Z = GetDOFIndex("z");
+	const int dof_RU = GetDOFIndex("Ru");
+	const int dof_RV = GetDOFIndex("Rv");
+	const int dof_RW = GetDOFIndex("Rw");
+
 	// connect every element of surface 1 to surface 2
 	for (int i = 0; i < m_surf1.Elements(); ++i)
 	{
@@ -578,9 +585,12 @@ void FEContactPotential::BuildMatrixProfile(FEGlobalMatrix& M)
 			for (int j = 0; j < el1.Nodes(); ++j)
 			{
 				FENode& node = m_surf1.Node(el1.m_lnode[j]);
-				lm.push_back(node.m_ID[0]);
-				lm.push_back(node.m_ID[1]);
-				lm.push_back(node.m_ID[2]);
+				lm.push_back(node.m_ID[dof_X]);
+				lm.push_back(node.m_ID[dof_Y]);
+				lm.push_back(node.m_ID[dof_Z]);
+				lm.push_back(node.m_ID[dof_RU]);
+				lm.push_back(node.m_ID[dof_RV]);
+				lm.push_back(node.m_ID[dof_RW]);
 			}
 
 			// add all active dofs of surface 2
@@ -590,9 +600,12 @@ void FEContactPotential::BuildMatrixProfile(FEGlobalMatrix& M)
 				for (int j = 0; j < el2->Nodes(); ++j)
 				{
 					FENode& node = m_surf2.Node(el2->m_lnode[j]);
-					lm.push_back(node.m_ID[0]);
-					lm.push_back(node.m_ID[1]);
-					lm.push_back(node.m_ID[2]);
+					lm.push_back(node.m_ID[dof_X]);
+					lm.push_back(node.m_ID[dof_Y]);
+					lm.push_back(node.m_ID[dof_Z]);
+					lm.push_back(node.m_ID[dof_RU]);
+					lm.push_back(node.m_ID[dof_RV]);
+					lm.push_back(node.m_ID[dof_RW]);
 				}
 			}
 			M.build_add(lm);
