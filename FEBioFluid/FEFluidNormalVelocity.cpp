@@ -234,7 +234,7 @@ void FEFluidNormalVelocity::Activate()
     {
         if (SetParabolicVelocity() == false)
         {
-            feLogError("Unable to set parablic velocity\n");
+            feLogError("Unable to set parabolic velocity\n");
         }
     }
 
