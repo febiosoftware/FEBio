@@ -93,7 +93,6 @@ PardisoProjectSolver::PardisoProjectSolver(FEModel* fem) : LinearSolver(fem), m_
 //-----------------------------------------------------------------------------
 PardisoProjectSolver::~PardisoProjectSolver()
 {
-    Destroy();
 }
 
 //-----------------------------------------------------------------------------
