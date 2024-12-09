@@ -936,11 +936,38 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Class that projects stresses from integration points to the shell nodes
-class FEPlotShellNodalStresses : public FEPlotDomainData
+//! Class that projects stresses from integration points to the nodes
+class FEPlotShellTopStress : public FEPlotDomainData
 {
 public:
-    FEPlotShellNodalStresses(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_PRESSURE); }
+    FEPlotShellTopStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){ SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that projects stresses from integration points to the bottom shell nodes
+class FEPlotShellBottomStress : public FEPlotDomainData
+{
+public:
+    FEPlotShellBottomStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){ SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that projects stresses from integration points to the nodes
+class FEPlotShellTopNodalStresses : public FEPlotDomainData
+{
+public:
+    FEPlotShellTopNodalStresses(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that projects stresses from integration points to the bottom shell nodes
+class FEPlotShellBottomNodalStresses : public FEPlotDomainData
+{
+public:
+    FEPlotShellBottomNodalStresses(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_PRESSURE); }
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -954,11 +981,38 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Class that projects Lagrange strains from integration points to the shell nodes
-class FEPlotShellNodalStrains : public FEPlotDomainData
+//! Class that projects stresses from integration points to the nodes
+class FEPlotShellTopStrain : public FEPlotDomainData
 {
 public:
-    FEPlotShellNodalStrains(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_NONE); }
+    FEPlotShellTopStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){ SetUnits(UNIT_NONE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that projects stresses from integration points to the bottom shell nodes
+class FEPlotShellBottomStrain : public FEPlotDomainData
+{
+public:
+    FEPlotShellBottomStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){ SetUnits(UNIT_NONE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that projects Lagrange strains from integration points to the shell nodes
+class FEPlotShellTopNodalStrains : public FEPlotDomainData
+{
+public:
+    FEPlotShellTopNodalStrains(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_NONE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Class that projects Lagrange strains from integration points to the shell nodes
+class FEPlotShellBottomNodalStrains : public FEPlotDomainData
+{
+public:
+    FEPlotShellBottomNodalStrains(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_MULT){ SetUnits(UNIT_NONE); }
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

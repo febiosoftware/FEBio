@@ -803,7 +803,7 @@ public:
         FEElement* el = mp.m_elem;
         FEShellElementNew* se = dynamic_cast<FEShellElementNew*>(el);
         const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
-        if (se) return se->m_E[mp.m_index];
+        if (se) return (se->m_E[mp.m_index].norm() > 0) ? se->m_E[mp.m_index] : pt->Strain();
         else return (pt ? pt->Strain() : mat3ds(0));
     }
 };
@@ -899,9 +899,30 @@ bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotShellNodalStresses::Save(FEDomain& dom, FEDataStream& a)
+bool FEPlotShellTopStress::Save(FEDomain& dom, FEDataStream& a)
 {
-    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStress());
+    writeShellElementValues<mat3ds>(dom, a, FEStress(), false);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellBottomStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellElementValues<mat3ds>(dom, a, FEStress(), true);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellTopNodalStresses::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStress(), false);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellBottomNodalStresses::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStress(), true);
     return true;
 }
 
@@ -913,9 +934,30 @@ bool FEPlotNodalStrains::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotShellNodalStrains::Save(FEDomain& dom, FEDataStream& a)
+bool FEPlotShellTopStrain::Save(FEDomain& dom, FEDataStream& a)
 {
-    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStrain());
+    writeShellElementValues<mat3ds>(dom, a, FEStrain(), false);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellBottomStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellElementValues<mat3ds>(dom, a, FEStrain(), true);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellTopNodalStrains::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStrain(), false);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellBottomNodalStrains::Save(FEDomain& dom, FEDataStream& a)
+{
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStrain(), true);
     return true;
 }
 

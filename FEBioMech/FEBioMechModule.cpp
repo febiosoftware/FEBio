@@ -777,9 +777,15 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSPRLinearStresses, "SPR-P1 stress");
 	REGISTER_FECORE_CLASS(FEPlotSPRPrincStresses, "SPR principal stress");
 	REGISTER_FECORE_CLASS(FEPlotNodalStresses, "nodal stress");
-    REGISTER_FECORE_CLASS(FEPlotShellNodalStresses, "shell nodal stress");
+    REGISTER_FECORE_CLASS(FEPlotShellTopStress, "shell top stress");
+    REGISTER_FECORE_CLASS(FEPlotShellBottomStress, "shell bottom stress");
+    REGISTER_FECORE_CLASS(FEPlotShellTopNodalStresses, "shell top nodal stress");
+    REGISTER_FECORE_CLASS(FEPlotShellBottomNodalStresses, "shell bottom nodal stress");
     REGISTER_FECORE_CLASS(FEPlotNodalStrains, "nodal strain");
-    REGISTER_FECORE_CLASS(FEPlotShellNodalStrains, "shell nodal strain");
+    REGISTER_FECORE_CLASS(FEPlotShellTopNodalStrains, "shell top nodal strain");
+    REGISTER_FECORE_CLASS(FEPlotShellBottomNodalStrains, "shell bottom nodal strain");
+    REGISTER_FECORE_CLASS(FEPlotShellTopStrain, "shell top strain");
+    REGISTER_FECORE_CLASS(FEPlotShellBottomStrain, "shell bottom strain");
 	REGISTER_FECORE_CLASS(FEPlotShellStrain, "shell strain");
 	REGISTER_FECORE_CLASS(FEPlotDeformationGradient, "deformation gradient");
 	REGISTER_FECORE_CLASS(FEPlotLagrangeStrain, "Lagrange strain");

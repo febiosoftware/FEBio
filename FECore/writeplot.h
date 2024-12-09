@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FESurface.h"
 #include "FEDataStream.h"
 #include "FESolidDomain.h"
+#include <FEBioMech/FESSIShellDomain.h>
 #include "FEDomainParameter.h"
 #include "fecore_api.h"
 #include <functional>
@@ -205,16 +206,42 @@ template <class T> void writeNodalProjectedElementValues(FEMeshPartition& dom, F
 		e.project_to_nodes(si, sn);
 
 		// push data to archive
-        if ((e.Type() == FE_SHELL_QUAD4G8) || (e.Type() == FE_SHELL_QUAD4G12)
-            || (e.Type() == FE_SHELL_TRI3G6) || (e.Type() == FE_SHELL_TRI3G9))
-            for (int j = 0; j<ne; ++j) ar << sn[ne+j];
-        else
-            for (int j = 0; j<ne; ++j) ar << sn[j];
+        for (int j = 0; j<ne; ++j) ar << sn[j];
 	}
 }
 
 //=================================================================================================
-template <class T> void writeShellNodalProjectedElementValues(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint&)> var)
+template <class T> void writeShellElementValues(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint&)> var, bool bbot)
+{
+    // loop over all elements
+    int NE = dom.Elements();
+    for (int i = 0; i<NE; ++i)
+    {
+        FEElement& e = dom.ElementRef(i);
+        int ne = e.Nodes();
+        int ni = e.GaussPoints();
+        int NI = ni;
+        bool TB = false;
+        if (dynamic_cast<FESSIShellDomain*>(&dom)) { NI = ni/2; TB = true; }
+        
+        // get the integration point values
+        T d; d.zero();
+        
+        for (int k = 0; k<NI; ++k)
+        {
+            FEMaterialPoint& mp = (TB && !bbot) ? *e.GetMaterialPoint(k + NI) : *e.GetMaterialPoint(k);
+            T s = var(mp);
+            d += s;
+        }
+        d /= NI;
+        
+        // push data to archive
+        ar << d;
+    }
+}
+
+//=================================================================================================
+template <class T> void writeShellNodalProjectedElementValues(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint&)> var, bool bbot)
 {
     // temp storage
     T si[FEElement::MAX_INTPOINTS];
@@ -240,7 +267,7 @@ template <class T> void writeShellNodalProjectedElementValues(FEMeshPartition& d
         e.project_to_nodes(si, sn);
         
         // push data to archive
-        for (int j = 0; j<ne; ++j) ar << sn[j];
+        for (int j = 0; j<ne; ++j) (bbot) ? (ar << sn[j]) : (ar << sn[j+ne]);
     }
 }
 
