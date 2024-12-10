@@ -213,83 +213,79 @@ template <class T> void writeNodalProjectedElementValues(FEMeshPartition& dom, F
 //=================================================================================================
 template <class T> void writeShellElementValues(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint&)> var, bool bbot)
 {
-    // loop over all elements
-    int NE = dom.Elements();
-    for (int i = 0; i<NE; ++i)
-    {
-        FEElement& e = dom.ElementRef(i);
-        int ne = e.Nodes();
-        int ni = e.GaussPoints();
-        int NI = ni;
-        int NS = 1;
-        if (e.Type() == FE_SHELL_QUAD4G8) { NS = 2; }
-        else if (e.Type() == FE_SHELL_QUAD4G12) { NS = 3; }
-        else if (e.Type() == FE_SHELL_QUAD8G18) { NS = 2; }
-        else if (e.Type() == FE_SHELL_QUAD8G27) { NS = 3; }
-        else if (e.Type() == FE_SHELL_TRI6G14) { NS = 2; }
-        else if (e.Type() == FE_SHELL_TRI6G21) { NS = 3; }
-        bool TB = false;
-        NI = ni/NS;
-        if (dynamic_cast<FESSIShellDomain*>(&dom)) TB = true;
-        std::vector<double> gt = dynamic_cast<FEShellElementTraits*>(e.GetTraits())->gt;
-
-        // get the integration point values
-        T d; d.zero();
-
-        for (int k = 0; k<NI; ++k)
+    // accepts only shell elements
+    if (dynamic_cast<FESSIShellDomain*>(&dom)) {
+        // loop over all elements
+        int NE = dom.Elements();
+        for (int i = 0; i<NE; ++i)
         {
-            switch (NS) {
-                case 1:
-                {
-                    FEMaterialPoint& mp = *e.GetMaterialPoint(k);
-                    T s = var(mp);
-                    d += s;
+            FEElement& e = dom.ElementRef(i);
+            int ne = e.Nodes();
+            int ni = e.GaussPoints();
+            int NI = ni;
+            int NS = 1;
+            if (e.Type() == FE_SHELL_QUAD4G8) { NS = 2; }
+            else if (e.Type() == FE_SHELL_QUAD4G12) { NS = 3; }
+            else if (e.Type() == FE_SHELL_QUAD8G18) { NS = 2; }
+            else if (e.Type() == FE_SHELL_QUAD8G27) { NS = 3; }
+            else if (e.Type() == FE_SHELL_TRI3G6)  { NS = 2; }
+            else if (e.Type() == FE_SHELL_TRI6G14) { NS = 2; }
+            else if (e.Type() == FE_SHELL_TRI6G21) { NS = 3; }
+            if (NS == 1) return;    // no valid way to project to front or back
+            NI = ni/NS;
+            std::vector<double> gt = dynamic_cast<FEShellElementTraits*>(e.GetTraits())->gt;
+            
+            // get the integration point values
+            T d; d.zero();
+            
+            for (int k = 0; k<NI; ++k)
+            {
+                switch (NS) {
+                    case 2:
+                    {
+                        FEMaterialPoint& mpt = *e.GetMaterialPoint(k + NI);
+                        FEMaterialPoint& mpb = *e.GetMaterialPoint(k);
+                        T st = var(mpt);
+                        T sb = var(mpb);
+                        double tt = gt[k + NI];
+                        double tb = gt[k];
+                        T s;
+                        if (bbot)
+                            s = (st - sb)*((-1-tb)/(tt-tb)) + sb;
+                        else
+                            s = (st - sb)*((1-tb)/(tt-tb)) + sb;
+                        d += s;
+                    }
+                        break;
+                    case 3:
+                    {
+                        FEMaterialPoint& mpt = *e.GetMaterialPoint(k + 2*NI);
+                        FEMaterialPoint& mpm = *e.GetMaterialPoint(k + NI);
+                        FEMaterialPoint& mpb = *e.GetMaterialPoint(k);
+                        T st = var(mpt);
+                        T sm = var(mpm);
+                        T sb = var(mpb);
+                        double tt = gt[k + 2*NI];
+                        double tm = gt[k + NI];
+                        double tb = gt[k];
+                        T s;
+                        if (bbot)
+                            s = (-(sm*(1 + tb)*(tb - tt)*(1 + tt)) +
+                                 (1 + tm)*(st*(1 + tb)*(tb - tm) + sb*(tm - tt)*(1 + tt)))/
+                            ((tb - tm)*(tb - tt)*(tm - tt));
+                        else
+                            s = ((-1 + tm)*(st*(-1 + tb)*(tb - tm) + sb*(tm - tt)*(-1 + tt)) -
+                                 sm*(-1 + tb)*(tb - tt)*(-1 + tt))/((tb - tm)*(tb - tt)*(tm - tt));
+                        d += s;
+                    }
+                        break;
                 }
-                    break;
-                case 2:
-                {
-                    FEMaterialPoint& mpt = *e.GetMaterialPoint(k + NI);
-                    FEMaterialPoint& mpb = *e.GetMaterialPoint(k);
-                    T st = var(mpt);
-                    T sb = var(mpb);
-                    double tt = gt[k + NI];
-                    double tb = gt[k];
-                    T s;
-                    if (bbot)
-                        s = (st - sb)*((-1-tb)/(tt-tb)) + sb;
-                    else
-                        s = (st - sb)*((1-tb)/(tt-tb)) + sb;
-                    d += s;
-                }
-                    break;
-                case 3:
-                {
-                    FEMaterialPoint& mpt = *e.GetMaterialPoint(k + 2*NI);
-                    FEMaterialPoint& mpm = *e.GetMaterialPoint(k + NI);
-                    FEMaterialPoint& mpb = *e.GetMaterialPoint(k);
-                    T st = var(mpt);
-                    T sm = var(mpm);
-                    T sb = var(mpb);
-                    double tt = gt[k + 2*NI];
-                    double tm = gt[k + NI];
-                    double tb = gt[k];
-                    T s;
-                    if (bbot)
-                        s = (-(sm*(1 + tb)*(tb - tt)*(1 + tt)) +
-                             (1 + tm)*(st*(1 + tb)*(tb - tm) + sb*(tm - tt)*(1 + tt)))/
-                        ((tb - tm)*(tb - tt)*(tm - tt));
-                    else
-                        s = ((-1 + tm)*(st*(-1 + tb)*(tb - tm) + sb*(tm - tt)*(-1 + tt)) -
-                             sm*(-1 + tb)*(tb - tt)*(-1 + tt))/((tb - tm)*(tb - tt)*(tm - tt));
-                    d += s;
-                }
-                    break;
             }
+            d /= NI;
+            
+            // push data to archive
+            ar << d;
         }
-        d /= NI;
-
-        // push data to archive
-        ar << d;
     }
 }
 
@@ -305,8 +301,10 @@ template <class T> void writeShellNodalProjectedElementValues(FEMeshPartition& d
     for (int i = 0; i<NE; ++i)
     {
         FEElement& e = dom.ElementRef(i);
+        if ((e.Type() == FE_SHELL_QUAD4G4) || (e.Type() == FE_SHELL_TRI3G3)) return;    // no valid way to project to front or back
         int ne = e.Nodes();
         int ni = e.GaussPoints();
+        int nvln = dynamic_cast<FEShellElementTraits*>(e.GetTraits())->m_nvln;
         
         // get the integration point values
         for (int k = 0; k<ni; ++k)
@@ -320,7 +318,7 @@ template <class T> void writeShellNodalProjectedElementValues(FEMeshPartition& d
         e.project_to_nodes(si, sn);
         
         // push data to archive
-        for (int j = 0; j<ne; ++j) (bbot) ? (ar << sn[j]) : (ar << sn[j+ne]);
+        for (int j = 0; j<nvln/2; ++j) (bbot) ? (ar << sn[j]) : (ar << sn[j+nvln/2]);
     }
 }
 
