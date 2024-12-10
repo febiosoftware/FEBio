@@ -240,9 +240,9 @@ void altGradient(int order, std::vector<double>& ODF, std::vector<double>& gradi
     }
 }
 
+#ifdef HAS_MMG
 void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
 {
-#ifdef HAS_MMG
 	int NN = NPTS;
 	int NF = NCON;
     int NC;
@@ -288,8 +288,6 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 	if (MMGS_Set_meshSize(mmgMesh, newNodeID-1, newElemID-1, 0) != 1)
 	{
 		assert(false);
-		// SetError("Error in MMGS_Set_meshSize");
-		// return nullptr;
 	}
 
 	// build the MMG mesh
@@ -315,8 +313,6 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 	if (MMGS_Set_solSize(mmgMesh, mmgSol, MMG5_Vertex, newNodeID-1, MMG5_Scalar) != 1)
 	{
 		assert(false);
-		// SetError("Error in MMG3D_Set_solSize");
-		// return nullptr;
 	}
 
     int n0 = CONN1[0]-1;
@@ -352,31 +348,23 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 	// run the mesher
 	int ier = MMGS_mmgslib(mmgMesh, mmgSol);
 
-	if (ier == MMG5_STRONGFAILURE) {
-		// if (min == 0.0) SetError("Element size cannot be zero.");
-		// else SetError("MMG was not able to remesh the mesh.");
-		// return nullptr;
+	if (ier == MMG5_STRONGFAILURE)
+    {
+		assert(false);
 	}
 	else if (ier == MMG5_LOWFAILURE)
 	{
-		// SetError("MMG return low failure error");
+		assert(false);
 	}
-
-	// convert back to prv mesh
-	// FSMesh* newMesh = new FSMesh();
 
 	// get the new mesh sizes
 	MMGS_Get_meshSize(mmgMesh, &NN, &NF, &NC);
-	// newMesh->Create(NN, NF);
 
     nodePos.resize(NN);
 
 	// get the vertex coordinates
 	for (int i = 0; i < NN; ++i)
 	{
-		// FSNode& vi = newMesh->Node(i);
-		// vec3d& ri = vi.r;
-
         double x,y,z;
         int g;
 		int isCorner = 0;
@@ -404,20 +392,10 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 	MMGS_Free_all(MMG5_ARG_start,
 		MMG5_ARG_ppMesh, &mmgMesh, MMG5_ARG_ppMet, &mmgSol,
 		MMG5_ARG_end);
-
-    // newMesh->RebuildMesh();
-
-	// return newMesh;
-
-#else
-	SetError("This version does not have MMG support");
-	return nullptr;
-#endif
 }
 
 void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
 {
-#ifdef HAS_MMG
 	int NN = NPTS;
 	int NF = NCON;
     int NC;
@@ -436,8 +414,6 @@ void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd,
 	if (MMGS_Set_meshSize(mmgMesh, NN, NF, 0) != 1)
 	{
 		assert(false);
-		// SetError("Error in MMGS_Set_meshSize");
-		// return nullptr;
 	}
 
 	// build the MMG mesh
@@ -457,8 +433,6 @@ void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd,
 	if (MMGS_Set_solSize(mmgMesh, mmgSol, MMG5_Vertex, NN, MMG5_Scalar) != 1)
 	{
 		assert(false);
-		// SetError("Error in MMG3D_Set_solSize");
-		// return nullptr;
 	}
 
     int n0 = CONN1[0]-1;
@@ -492,31 +466,23 @@ void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd,
 	// run the mesher
 	int ier = MMGS_mmgslib(mmgMesh, mmgSol);
 
-	if (ier == MMG5_STRONGFAILURE) {
-		// if (min == 0.0) SetError("Element size cannot be zero.");
-		// else SetError("MMG was not able to remesh the mesh.");
-		// return nullptr;
+	if (ier == MMG5_STRONGFAILURE) 
+    {
+        assert(false);
 	}
 	else if (ier == MMG5_LOWFAILURE)
 	{
-		// SetError("MMG return low failure error");
+		assert(false);
 	}
-
-	// convert back to prv mesh
-	// FSMesh* newMesh = new FSMesh();
 
 	// get the new mesh sizes
 	MMGS_Get_meshSize(mmgMesh, &NN, &NF, &NC);
-	// newMesh->Create(NN, NF);
 
     nodePos.resize(NN);
 
 	// get the vertex coordinates
 	for (int i = 0; i < NN; ++i)
 	{
-		// FSNode& vi = newMesh->Node(i);
-		// vec3d& ri = vi.r;
-
         double x,y,z;
         int g;
 		int isCorner = 0;
@@ -544,16 +510,11 @@ void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd,
 	MMGS_Free_all(MMG5_ARG_start,
 		MMG5_ARG_ppMesh, &mmgMesh, MMG5_ARG_ppMet, &mmgSol,
 		MMG5_ARG_end);
-
-    // newMesh->RebuildMesh();
-
-	// return newMesh;
-
-#else
-	SetError("This version does not have MMG support");
-	return nullptr;
-#endif
 }
+#else
+void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems) {}
+void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems) {}
+#endif
 
 // Taken from std::assoc_legendre definition in GCC
 template<typename _Tp>
