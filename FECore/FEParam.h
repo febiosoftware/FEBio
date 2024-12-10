@@ -158,6 +158,8 @@ public:
 	// set the parameter's validator
 	void SetValidator(FEParamValidator* pvalid);
 
+	FEParamValidator* GetValidator();
+
 	// see if the parameter's value is valid
 	bool is_valid() const;
 

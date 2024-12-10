@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "NumCore.h"
 #include "PardisoSolver.h"
+#include "PardisoSolver64.h"
 #include "PardisoProjectSolver.h"
 #include "RCICGSolver.h"
 #include "FGMRESSolver.h"
@@ -56,6 +57,7 @@ NUMCORE_API void NumCore::InitModule()
 {
 	// register linear solvers
 	REGISTER_FECORE_CLASS(PardisoSolver  , "pardiso");
+	REGISTER_FECORE_CLASS(PardisoSolver64, "pardiso_64");
     REGISTER_FECORE_CLASS(PardisoProjectSolver, "pardiso-project");
 	REGISTER_FECORE_CLASS(FGMRESSolver        , "fgmres"   );
 	REGISTER_FECORE_CLASS(BoomerAMGSolver     , "boomeramg");

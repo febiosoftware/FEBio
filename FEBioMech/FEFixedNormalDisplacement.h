@@ -52,6 +52,9 @@ public:
 
     // allocate equations
     int InitEquations(int neq) override;
+
+	// we don't use nodal integration for this constraint
+	bool UseNodalIntegration() { return false; };
     
 protected:
     void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;

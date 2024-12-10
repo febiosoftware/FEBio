@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FEBioXML/FERestartImport.h>
 #include <FECore/DumpFile.h>
 #include <FECore/FEAnalysis.h>
+#include "FEBioModelBuilder.h"
 
 //-----------------------------------------------------------------------------
 FEBioRestart::FEBioRestart(FEModel* pfem) : FECoreTask(pfem) {}
@@ -75,6 +76,7 @@ bool FEBioRestart::Init(const char* szfile)
 
 		// the file is assumed to be a xml-text input file
 		FERestartImport file;
+		file.SetModelBuilder(new FEBioModelBuilder(fem));
 		if (file.Load(fem, szfile) == false)
 		{
 			char szerr[256];

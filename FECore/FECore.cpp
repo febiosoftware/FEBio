@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEInitialCondition.h"
 #include "FECorePlot.h"
 #include "FESurfaceToSurfaceMap.h"
+#include "FESurfaceToSurfaceVectorMap.h"
 #include "FEParabolicMap.h"
 #include "FEDataMathGenerator.h"
 #include "FEPointFunction.h"
@@ -64,6 +65,7 @@ SOFTWARE.*/
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
 #include "FELogSolutionNorm.h"
+#include "FELogElemMath.h"
 #include "LUSolver.h"
 #include "FETimeStepController.h"
 #include "FEModifiedNewtonStrategy.h"
@@ -134,6 +136,7 @@ REGISTER_FECORE_CLASS(FEMathFunction  , "math");
 // data generators
 REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
 REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
+REGISTER_FECORE_CLASS(FESurfaceToSurfaceVectorMap, "surface-to-surface vector");
 REGISTER_FECORE_CLASS(FEParabolicMap       , "parabolic map");
 
 // scalar valuators
@@ -199,6 +202,7 @@ REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 REGISTER_FECORE_CLASS(FELogIntegralDomainData, "integrate");
 REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
 REGISTER_FECORE_CLASS(FELogFaceArea    , "facet area");
+REGISTER_FECORE_CLASS(FELogElemMath    , "_math", FECORE_EXPERIMENTAL);
 
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");

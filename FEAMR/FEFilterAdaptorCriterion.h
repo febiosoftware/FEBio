@@ -35,6 +35,8 @@ public:
 
 	bool GetMaterialPointValue(FEMaterialPoint& el, double& value) override;
 
+	bool GetElementValue(FEElement& el, double& value) override;
+
 private:
 	double	m_min;
 	double	m_max;

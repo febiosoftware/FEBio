@@ -207,6 +207,9 @@ public:
 	//! Get the current FE model that is being processed
 	FEModel* GetFEModel();
 
+	//! set a custom model builder (takes ownership of modelBuilder)
+	void SetModelBuilder(FEModelBuilder* modelBuilder);
+
 	//! Get the model builder
 	FEModelBuilder* GetBuilder();
 

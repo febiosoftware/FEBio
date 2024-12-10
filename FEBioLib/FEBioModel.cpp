@@ -123,11 +123,6 @@ FEBioModel::FEBioModel()
 	m_writeMesh = false;
 	m_createReport = false;
 
-	m_stats.ntimeSteps = 0;
-	m_stats.ntotalIters = 0;
-	m_stats.ntotalRHS = 0;
-	m_stats.ntotalReforms = 0;
-
 	m_pltAppendOnRestart = true;
 
 	m_lastUpdate = -1;
@@ -190,7 +185,17 @@ void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
 //! Get the stats 
 ModelStats FEBioModel::GetModelStats() const
 {
-	return m_stats;
+	return m_modelStats;
+}
+
+ModelStats FEBioModel::GetStepStats(size_t n) const
+{
+	return m_stepStats[n];
+}
+
+std::vector<ModelStats> FEBioModel::GetStepStats() const
+{
+	return m_stepStats;
 }
 
 //-----------------------------------------------------------------------------
@@ -631,7 +636,6 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				double time = GetTime().currentTime;
 				if (m_plot)
 				{
-					feLogDebug("writing to plot file; time = %lg; flag = %d", time, statusFlag);
 					m_plot->Write((float)time, statusFlag);
 				}
 
@@ -1331,6 +1335,28 @@ void FEBioModel::Serialize(DumpStream& ar)
 
 		// --- Save IO Data
 		SerializeIOData(ar);
+
+		if (ar.IsSaving())
+		{
+			int n = (int)m_stepStats.size();
+			ar << n;
+			for (ModelStats& s : m_stepStats)
+			{
+				ar << s.ntimeSteps << s.ntotalIters << s.ntotalReforms << s.ntotalRHS;
+			}
+		}
+		else
+		{
+			m_stepStats.clear();
+			int n = 0;
+			ar >> n;
+			for (int i = 0; i < n; ++i)
+			{
+				ModelStats s;
+				ar >> s.ntimeSteps >> s.ntotalIters >> s.ntotalReforms >> s.ntotalRHS;
+				m_stepStats.push_back(s);
+			}
+		}
 	}
 }
 
@@ -1541,6 +1567,7 @@ bool FEBioModel::Init()
 	}
 
 	m_report.clear();
+	m_stepStats.clear();
 
 	FEBioPlotFile* pplt = nullptr;
 	m_lastUpdate = -1;
@@ -1634,6 +1661,9 @@ bool FEBioModel::InitLogFile()
 
 bool FEBioModel::Solve()
 {
+	// The total time is usually started on calling Input,
+	// however, in a restart Input is not called, so we start it here.
+	if (!m_TotalTime.isRunning()) m_TotalTime.start();
 	bool b = FEModel::Solve();
 	m_TotalTime.stop();
 	return b;
@@ -1682,10 +1712,12 @@ bool FEBioModel::Reset()
 		}
 	}
 
-	m_stats.ntimeSteps = 0;
-	m_stats.ntotalIters = 0;
-	m_stats.ntotalRHS = 0;
-	m_stats.ntotalReforms = 0;
+	// reset stats
+	m_modelStats.ntimeSteps = 0;
+	m_modelStats.ntotalIters = 0;
+	m_modelStats.ntotalRHS = 0;
+	m_modelStats.ntotalReforms = 0;
+	m_stepStats.clear();
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -1735,10 +1767,10 @@ void FEBioModel::on_cb_solved()
 	if (Steps() > 1)
 	{
 		feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
-		feLog("\tNumber of time steps completed .................... : %d\n\n", m_stats.ntimeSteps);
-		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_stats.ntotalIters);
-		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_stats.ntotalRHS);
-		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_stats.ntotalReforms);
+		feLog("\tNumber of time steps completed .................... : %d\n\n", m_modelStats.ntimeSteps);
+		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_modelStats.ntotalIters);
+		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_modelStats.ntotalRHS);
+		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_modelStats.ntotalReforms);
 	}
 
 	// get timing info
@@ -1841,10 +1873,16 @@ void FEBioModel::on_cb_stepSolved()
 	}
 
 	// add to stats
-	m_stats.ntimeSteps    += step->m_ntimesteps;
-	m_stats.ntotalIters   += step->m_ntotiter;
-	m_stats.ntotalRHS     += step->m_ntotrhs;
-	m_stats.ntotalReforms += step->m_ntotref;
+	ModelStats stats;
+	stats.ntimeSteps    = step->m_ntimesteps;
+	stats.ntotalIters   = step->m_ntotiter;
+	stats.ntotalRHS     = step->m_ntotrhs;
+	stats.ntotalReforms = step->m_ntotref;
+	m_stepStats.push_back(stats);
+	m_modelStats.ntimeSteps    += stats.ntimeSteps;
+	m_modelStats.ntotalIters   += stats.ntotalIters;
+	m_modelStats.ntotalRHS     += stats.ntotalRHS;
+	m_modelStats.ntotalReforms += stats.ntotalReforms;
 }
 
 bool FEBioModel::Restart(const char* szfile)

@@ -180,9 +180,6 @@ public:
 	//! read the contents of a file
 	bool ReadFile(const char* szfile, bool broot = true);
 
-	//! set a custom model builder (takes ownership of modelBuilder)
-	void SetModelBuilder(FEModelBuilder* modelBuilder);
-
 public:
 	void SetDumpfileName(const char* sz);
 	void SetLogfileName (const char* sz);

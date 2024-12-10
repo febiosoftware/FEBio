@@ -288,7 +288,7 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 					const char* szsurf = tag.AttributeValue("surface");
 					FEFacetSet* pface = mesh.FindFacetSet(szsurf);
 					if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
-					if (GetBuilder()->BuildSurface(*psurf, *pface, true) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
+					if (GetBuilder()->BuildSurface(*psurf, *pface, psc->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
 				}
 
                 // get the nodeset for other constraints
