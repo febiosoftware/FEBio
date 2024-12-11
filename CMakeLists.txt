@@ -75,7 +75,7 @@ if(USE_MKL)
     foreach(name IN LISTS MKL_LIB_NAMES)
         findLib(${name} MKL_LIB_DIR MKL_LIB)
         list(APPEND MKL_LIBS ${MKL_LIB})
-        unset(MMG_LIB)
+        unset(MKL_LIB)
     endforeach(name)
     
     if(NOT EXISTS ${MKL_OMP_LIB})
