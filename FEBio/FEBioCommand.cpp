@@ -27,6 +27,13 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <FEBioLib/plugin.h>
+
+// TODO: On Windows the GetCurrentTime macro gets in here via plugin.h. 
+// I need to look into how to prevent this
+#ifdef GetCurrentTime
+#undef GetCurrentTime
+#endif
 #include <cstdlib>
 #include <FEBioLib/FEBioModel.h>
 #include <FEBioLib/version.h>
@@ -39,18 +46,12 @@ SOFTWARE.*/
 #include "console.h"
 #include <FEBioLib/cmdoptions.h>
 #include <FEBioLib/febio.h>
-#include <FEBioLib/plugin.h>
 #include "FEBioApp.h"
 #include "breakpoint.h"
 #include <iostream>
 #include <fstream>
 
-//-----------------------------------------------------------------------------
-// TODO: On Windows the GetCurrentTime macro gets in here via plugin.h. 
-// I need to look into how to prevent this
-#ifdef GetCurrentTime
-#undef GetCurrentTime
-#endif
+
 
 //-----------------------------------------------------------------------------
 #ifdef WIN32
