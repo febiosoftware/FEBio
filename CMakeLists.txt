@@ -328,7 +328,6 @@ if(USE_PDL)
     target_compile_definitions(numcore PRIVATE PARDISODL)
     target_link_libraries(numcore PRIVATE ${PDL_LIB})
     set(ENV{PARDISOLICMESSAGE} "1")
-    set(ENV{DYLD_LIBRARY_PATH} "/Users/gerard/panua-pardiso-20240630-mac_arm64/lib")
 
     # We still need OpenMP from the system.
     if(${OpenMP_C_FOUND})
