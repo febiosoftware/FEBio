@@ -148,12 +148,12 @@ else()
         PATH_SUFFIXES "include" "include/mmg" "build" "build/include" "cbuild" "cbuild/include" "src" 
 		DOC "MMG include directory")
 	find_library(MMG_LIB mmg3d 
-        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
+        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/* $ENV{HOME}/local/x86_64/lib
         PATH_SUFFIXES "lib" "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
 		DOC "MMG library path")
     find_library(MMGS_LIB mmgs 
-        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
-        PATH_SUFFIXES "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
+        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/* $ENV{HOME}/local/x86_64/lib
+        PATH_SUFFIXES "lib" "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
 		DOC "MMGS library path")
 endif()	
 
