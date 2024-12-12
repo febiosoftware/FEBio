@@ -35,4 +35,10 @@ namespace FEBioOpt {
 
 	FEBIOOPT_API void InitModule();
 
+	// wrapper function for some levmar calls.
+	// This is only used in FEBio Studio, but don't want to link there with levmar.
+	FEBIOOPT_API int optimize(
+		void (*func)(double* p, double* hx, int m, int n, void* adata),
+		double* p, double* x, int m, int n, double* lb, double* ub, double* dscl,
+		int itmax, double* opts, double* info, double* work, double* covar, void* adata);
 }
