@@ -322,7 +322,7 @@ matrix matrix::svd_inverse()
 }
 
 //-----------------------------------------------------------------------------
-matrix matrix::transpose()
+matrix matrix::transpose() const
 {
 	int i, j;
 	matrix At(m_nc, m_nr);
@@ -489,30 +489,25 @@ void matrix::mult(vector<double>& x, vector<double>& y)
 void matrix::mult(const matrix& m, std::vector<double>& x, std::vector<double>& y)
 {
     assert(m_nc == m.m_nr);
-    assert(m_nr == x.size());
-    
-    #pragma omp parallel for
-	for (int i = 0; i < m_nr; ++i)
+    assert(m.m_nc == x.size());
+	y.assign(m_nr, 0.0);
+
+	int nx = (int)x.size();
+	vector<double> tmp(m_nc, 0.0);
+#pragma omp parallel shared(tmp)
 	{
-        vector<double> temp(m.m_nc, 0.0);
-		for (int k = 0; k < m_nc; ++k)
+		#pragma omp for
+		for (int i = 0; i < m_nc; ++i)
 		{
-			const double pik = m_pr[i][k];
-			const double* pm = m.m_pr[k];
-			for (int j = 0; j < m.m_nc; ++j)
-			{
-				temp[j] += pik * pm[j];
-			}
+			for (int k = 0; k < nx; ++k) tmp[i] += m.m_pr[i][k] * x[k];
 		}
 
-        y[i] = 0.0;
-        for(int j = 0; j < m_nr; j++)
-        {
-            y[i] += temp[j] * x[j];
-        }
-    
+		#pragma omp for
+		for (int i = 0; i < m_nr; ++i)
+		{
+			for (int k = 0; k < m_nc; ++k) y[i] += m_pr[i][k] * tmp[k];
+		}
 	}
-
 }
 
 //-----------------------------------------------------------------------------
@@ -656,4 +651,39 @@ bool matrix::eigen_vectors(matrix& Eigen, vector<double>& eigen_values)
 	// we sure we converged
 	assert(n < NMAX);
 	return true;
+}
+
+matrix covariance(const matrix& a)
+{
+	int n = a.rows();
+	int d = a.columns();
+
+	// calculate mean row vector
+	vector<double> mu(d, 0.0);
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < d; ++j) mu[j] += a[i][j];
+	}
+	for (int i = 0; i < d; ++i) mu[i] /= n;
+
+	// normalization factor
+	// NOTE: it is n - 1, to be consistent with MatLab!
+	double R = (n == 1 ? 1.0 : n - 1);
+
+	// calculate covariance matrix
+	matrix c(d, d); c.zero();
+	for (int i = 0; i < d; ++i)
+		for (int j = 0; j < d; ++j)
+		{
+			double cij = 0.0;
+			for (int k = 0; k < n; ++k)
+			{
+				cij += (a[k][i] - mu[i]) * (a[k][j] - mu[j]);
+			}
+			cij /= R;
+
+			c[i][j] = cij;
+		}
+
+	return c;
 }

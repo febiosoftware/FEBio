@@ -120,6 +120,7 @@ SOFTWARE.*/
 #include "FEFiberDensityDistribution.h"
 #include "FEContinuousFiberDistribution.h"
 #include "FEContinuousFiberDistributionUC.h"
+#include "FEODFFiberDistribution.h"
 #include "FEFiberIntegrationGauss.h"
 #include "FEFiberIntegrationTrapezoidal.h"
 #include "FEFiberIntegrationGeodesic.h"
@@ -172,6 +173,8 @@ SOFTWARE.*/
 #include "FEGrowthTensor.h"
 #include "FEKinematicGrowth.h"
 #include "FEYeoh.h"
+#include "FEScaledElasticMaterial.h"
+#include "FEScaledUncoupledMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -362,6 +365,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FERemodelingElasticMaterial, "remodeling solid");
 	REGISTER_FECORE_CLASS(FECarterHayesOld, "Carter-Hayes (old)");
 	REGISTER_FECORE_CLASS(FEContinuousFiberDistribution, "continuous fiber distribution");
+    REGISTER_FECORE_CLASS(FEODFFiberDistribution, "fiberODF");
 	REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann, "coupled trans-iso Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin, "coupled trans-iso Mooney-Rivlin");
 	REGISTER_FECORE_CLASS(FEGenericHyperelastic, "hyperelastic");
@@ -373,6 +377,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
     REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
+    REGISTER_FECORE_CLASS(FEScaledElasticMaterial, "scaled elastic");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
@@ -425,6 +430,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
 	REGISTER_FECORE_CLASS(FEShenoyMaterial, "Shenoy");
 	REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean, "fiber neo-Hookean");
+    REGISTER_FECORE_CLASS(FEScaledUncoupledMaterial, "scaled uncoupled");
     REGISTER_FECORE_CLASS(FEYeoh, "Yeoh");
 
 	// fiber materials (derived from FEFiberMaterial)
@@ -492,6 +498,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberIntegrationGaussKronrod, "fibers-3d-gkt");
 	REGISTER_FECORE_CLASS(FEFiberIntegrationTriangle, "fibers-3d-fei");
 	REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidal, "fibers-2d-trapezoidal");
+
+    // Fiber ODF classes
+    REGISTER_FECORE_CLASS(FEFiberODF, "fiber-odf");
 
 	// Other materials 
 	REGISTER_FECORE_CLASS(FELinearTrussMaterial, "linear truss");

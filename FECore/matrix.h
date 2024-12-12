@@ -80,7 +80,7 @@ public:
 	void zero() { memset(m_pd, 0, sizeof(double)*m_nsize); }
 
 	//! matrix transpose
-	matrix transpose();
+	matrix transpose() const;
 
 	//! matrix inversion
 	matrix inverse();
@@ -332,3 +332,8 @@ inline matrix& matrix::operator = (matrix&& m)
 
 	return *this;
 }
+
+// Calculate the covariance of a matrix. 
+// The rows represent the observations, and the columns represent random variables.
+// The returned covariance matrix is an ncol x ncol matrix.
+matrix FECORE_API covariance(const matrix& a);
