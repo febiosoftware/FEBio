@@ -188,7 +188,7 @@ BEGIN_FECORE_CLASS(MKLDSSolver, LinearSolver)
 ADD_PARAMETER(m->msglvl, "msglvl");
 END_FECORE_CLASS();
 
-MKLDSSolver::MKLDSSolver(FEModel* fem) : LinearSolver(fem), m(nullptr) {}
+MKLDSSolver::MKLDSSolver(FEModel* fem) : LinearSolver(fem), m(new MKLDSSolver::Imp) {}
 MKLDSSolver::~MKLDSSolver() {}
 SparseMatrix* MKLDSSolver::CreateSparseMatrix(Matrix_Type ntype) {	return nullptr; }
 bool MKLDSSolver::SetSparseMatrix(SparseMatrix* pA) { return false; }
