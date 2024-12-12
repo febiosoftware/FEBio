@@ -12952,16 +12952,16 @@ q4eas
 By default,
  the nodes of a shell element define its 
 \emph on
-front
+top
 \emph default
  face.
  The location of the shell element 
 \emph on
-back
+bottom
 \emph default
  face is calculated from the nodal values of the shell thickness,
  along the opposite direction of nodal normals.
- The nodal normal is evaluated by averaging the front face normal of all shell elements sharing that node.
+ The nodal normal is evaluated by averaging the top face normal of all shell elements sharing that node.
  When a shell element is attached to a solid element (e.g.,
  when the shell nodes also represent the nodes of one face of the solid element),
  FEBio automatically accounts for the shell thickness,
@@ -12977,7 +12977,7 @@ Prior to FEBio 2.6,
 \emph on
 middle
 \emph default
- face (halfway between front and back,
+ face (halfway between top and bottom,
  such that the shell element extends above and below the face defined by the shell nodes).
  This older formulation can be recovered by setting 
 \emph on
@@ -12992,6 +12992,15 @@ Control
 \end_layout
 
 \begin_layout Standard
+By default,
+ stresses and strains reported for a shell element are evaluated by averaging all the integration point values within the shell element,
+ thus producing values that reflect the response along the middle surface.
+ To display shell stresses or strains at the top or bottom faces,
+ use plot variables that start with 'shell top...' or 'shell bottom...',
+ such as 'shell top stress' or 'shell bottom nodal strain'.
+\end_layout
+
+\begin_layout Standard
 When shell domains intersect such that three or more shell elements share the same edge,
  as in a T-connection,
  users should set 
@@ -13003,7 +13012,7 @@ shell_normal_nodal
 ShellDomain
 \emph default
  section.
- This setting ensures that the back face of a shell element is calculated using the front face normal,
+ This setting ensures that the bottom face of a shell element is calculated using the top face normal,
  instead of nodal normals,
  since the latter would be ill-defined for nodes belonging to such an edge.
 \end_layout
@@ -17135,7 +17144,7 @@ shell velocity
 \begin_inset Text
 
 \begin_layout Plain Layout
-Set the initial value for the shell (back) nodal velocities.
+Set the initial value for the shell (bottom) nodal velocities.
  
 \end_layout
 
@@ -17641,7 +17650,7 @@ zero shell displacement
 \begin_layout Plain Layout
 Fix the x,
  y,
- or z shell (back) displacement dof
+ or z shell (bottom) displacement dof
 \end_layout
 
 \end_inset
@@ -17812,7 +17821,7 @@ prescribed shell displacement
 \begin_layout Plain Layout
 Prescribe the x,
  y,
- or z shell (back) displacement dof 
+ or z shell (bottom) displacement dof 
 \end_layout
 
 \end_inset
@@ -32167,7 +32176,7 @@ literal "true"
  and in 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Zimmerman21a"
+key "Zimmerman22"
 literal "true"
 
 \end_inset
@@ -34928,7 +34937,7 @@ shell_bottom_primary
 \begin_inset Text
 
 \begin_layout Plain Layout
-contact with back of shell on primary surface
+contact with bottom of shell on primary surface
 \end_layout
 
 \end_inset
@@ -35026,7 +35035,7 @@ shell_bottom_secondary
 \begin_inset Text
 
 \begin_layout Plain Layout
-contact with back of shell on secondary surface
+contact with bottom of shell on secondary surface
 \end_layout
 
 \end_inset
@@ -35816,7 +35825,7 @@ implementation for sliding interfaces can deal with biphasic contact surfaces (i
  biphasic-on-rigid) 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian10b,Zimmerman21a"
+key "Ateshian10b,Zimmerman22"
 literal "true"
 
 \end_inset
@@ -35885,7 +35894,7 @@ When either contact surface is biphasic,
 As detailed in 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Zimmerman21a"
+key "Zimmerman22"
 literal "true"
 
 \end_inset
@@ -47371,7 +47380,7 @@ An asterisk (*) in the Category column denotes that the attribute is required an
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="139" columns="3">
+<lyxtabular version="3" rows="147" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top">
@@ -50324,7 +50333,6 @@ Element
 \begin_layout Plain Layout
 The Cauchy stress,
  projected to the nodes.
- 
 \end_layout
 
 \end_inset
@@ -51289,6 +51297,122 @@ Average element solid-bound molecule referential apparent density
 \begin_inset Text
 
 \begin_layout Plain Layout
+shell bottom nodal strain
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Node
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shell Lagrange strain extrapolated to bottom nodes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell bottom nodal stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Node
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shell Cauchy stress extrapolated to bottom nodes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell bottom strain
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Average of shell Lagrange strain extrapolated to bottom surface
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell bottom stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Average of shell Cauchy stress extrapolated to bottom surface
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 shell director 
 \end_layout
 
@@ -51347,7 +51471,7 @@ Relative volume of shell element
 \begin_inset Text
 
 \begin_layout Plain Layout
-shell strain 
+shell strain
 \end_layout
 
 \end_inset
@@ -51395,6 +51519,122 @@ Node
 
 \begin_layout Plain Layout
 Shell thickness 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell top nodal strain
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Node
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shell Lagrange strain extrapolated to top nodes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell top nodal stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Node
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Shell Cauchy stress extrapolated to top nodes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell top strain
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Average of shell Lagrange strain extrapolated to top surface
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell top stress
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Element
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Average of shell Cauchy stress extrapolated to top surface
 \end_layout
 
 \end_inset
@@ -63464,7 +63704,7 @@ Donnan equilibrium
  and the external bathing environment consists of a salt solution of monovalent counter-ions 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "OVERBEEK56,Lai91"
+key "Overbeek56,Lai91"
 literal "true"
 
 \end_inset
@@ -77776,7 +78016,7 @@ where
  represents the unit sphere (for 3D fiber distributions) or unit circle (for 2D fiber distributions) over which the integration is performed 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Hou2016"
+key "Hou16"
 literal "true"
 
 \end_inset
