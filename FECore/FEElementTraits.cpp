@@ -2787,7 +2787,7 @@ FEShellQuad4G8::FEShellQuad4G8() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G8)
 //! project to nodes
 void FEShellQuad4G8::project_to_nodes(double* ai, double* ao) const
 {
-    double v[m_nvln];
+    std::vector<double> v(m_nvln);
     for (int n=0; n<m_nvln; ++n) {
         v[n] = 0;
         for (int i=0; i<NINT; ++i) {
@@ -2851,7 +2851,7 @@ FEShellQuad4G12::FEShellQuad4G12() : FEShellQuad4_(NINT, FE_SHELL_QUAD4G12)
 //! project to nodes
 void FEShellQuad4G12::project_to_nodes(double* ai, double* ao) const
 {
-    double v[m_nvln];
+	std::vector<double> v(m_nvln);
     for (int n=0; n<m_nvln; ++n) {
         v[n] = 0;
         for (int i=0; i<NINT; ++i) {
@@ -2960,7 +2960,7 @@ FEShellTri3G6::FEShellTri3G6() : FEShellTri3_(NINT, FE_SHELL_TRI3G6)
 //! project to nodes
 void FEShellTri3G6::project_to_nodes(double* ai, double* ao) const
 {
-    double v[m_nvln];
+	std::vector<double> v(m_nvln);
     for (int n=0; n<m_nvln; ++n) {
         v[n] = 0;
         for (int i=0; i<NINT; ++i) {
@@ -3022,7 +3022,7 @@ FEShellTri3G9::FEShellTri3G9() : FEShellTri3_(NINT, FE_SHELL_TRI3G9)
 //! project to nodes
 void FEShellTri3G9::project_to_nodes(double* ai, double* ao) const
 {
-    double v[m_nvln];
+	std::vector<double> v(m_nvln);
     for (int n=0; n<m_nvln; ++n) {
         v[n] = 0;
         for (int i=0; i<NINT; ++i) {
@@ -3135,7 +3135,7 @@ FEShellQuad8G18::FEShellQuad8G18() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G18)
 //! project to nodes
 void FEShellQuad8G18::project_to_nodes(double* ai, double* ao) const
 {
-    double v[m_nvln];
+	std::vector<double> v(m_nvln);
     for (int n=0; n<m_nvln; ++n) {
         v[n] = 0;
         for (int i=0; i<NINT; ++i) {
@@ -3213,7 +3213,7 @@ FEShellQuad8G27::FEShellQuad8G27() : FEShellQuad8_(NINT, FE_SHELL_QUAD8G27)
 //! project to nodes
 void FEShellQuad8G27::project_to_nodes(double* ai, double* ao) const
 {
-    double v[m_nvln];
+	std::vector<double> v(m_nvln);
     for (int n=0; n<m_nvln; ++n) {
         v[n] = 0;
         for (int i=0; i<NINT; ++i) {
@@ -3317,7 +3317,7 @@ FEShellTri6G14::FEShellTri6G14() : FEShellTri6_(NINT, FE_SHELL_TRI6G14)
 //! project to nodes
 void FEShellTri6G14::project_to_nodes(double* ai, double* ao) const
 {
-    double v[m_nvln];
+	std::vector<double> v(m_nvln);
     for (int n=0; n<m_nvln; ++n) {
         v[n] = 0;
         for (int i=0; i<NINT; ++i) {
@@ -3392,7 +3392,7 @@ FEShellTri6G21::FEShellTri6G21() : FEShellTri6_(NINT, FE_SHELL_TRI6G21)
 //! project to nodes
 void FEShellTri6G21::project_to_nodes(double* ai, double* ao) const
 {
-    double v[m_nvln];
+	std::vector<double> v(m_nvln);
     for (int n=0; n<m_nvln; ++n) {
         v[n] = 0;
         for (int i=0; i<NINT; ++i) {
