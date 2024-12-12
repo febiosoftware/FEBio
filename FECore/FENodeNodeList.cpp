@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FENodeElemList.h"
 #include "FEMesh.h"
 #include "FEDomain.h"
+#include "FESurface.h"
 #include <stdlib.h>
 
 //////////////////////////////////////////////////////////////////////
@@ -235,6 +236,93 @@ void FENodeNodeList::Create(FEDomain& dom)
 	}
 }
 
+//-----------------------------------------------------------------------------
+void FENodeNodeList::Create(FESurface& surf)
+{
+	// get the nr of nodes
+	int NN = surf.Nodes();
+
+	// create the node-element list
+	FENodeElemList EL;
+	EL.Create(surf);
+
+	// create the nodal tag array
+	vector<int> tag; tag.assign(NN, 0);
+
+	// calculate nodal valences
+	m_nval.assign(NN, 0);
+	m_pn.resize(NN);
+
+	int nsize = 0;
+	int* en;
+	vector<int> buf(NN);
+	int nb;
+	for (int i = 0; i < NN; ++i)
+	{
+		nb = 0;
+		int n = EL.Valence(i);
+		FEElement** pe = EL.ElementList(i);
+		for (int j = 0; j < n; ++j)
+		{
+			FEElement* pel = pe[j];
+			int m = pel->Nodes();
+			en = &pel->m_lnode[0];
+			for (int k = 0; k < m; ++k)
+				if ((en[k] != i) && (tag[en[k]] == 0))
+				{
+					++m_nval[i];
+					++tag[en[k]];
+					buf[nb++] = en[k];
+					++nsize;
+				}
+		}
+
+		// clear the tag array
+		for (int j = 0; j < nb; ++j) tag[buf[j]] = 0;
+		nb = 0;
+	}
+
+	// create the node reference array
+	m_nref.resize(nsize);
+
+	// set nref pointers
+	m_pn[0] = 0;
+	for (int i = 1; i < NN; ++i)
+	{
+		m_pn[i] = m_pn[i - 1] + m_nval[i - 1];
+	}
+
+	// reset valence pointers
+	for (int i = 0; i < NN; ++i) m_nval[i] = 0;
+
+	// fill the nref pointers
+	for (int i = 0; i < NN; ++i)
+	{
+		nb = 0;
+		int n = EL.Valence(i);
+		FEElement** pe = EL.ElementList(i);
+		for (int j = 0; j < n; ++j)
+		{
+			FEElement* pel = pe[j];
+			int m = pel->Nodes();
+			en = &pel->m_lnode[0];
+			for (int k = 0; k < m; ++k)
+				if ((en[k] != i) && (tag[en[k]] == 0))
+				{
+					m_nref[m_pn[i] + m_nval[i]] = en[k];
+
+					++tag[en[k]];
+					++m_nval[i];
+					buf[nb++] = en[k];
+					++nsize;
+				}
+		}
+
+		// clear the tag array
+		for (int j = 0; j < nb; ++j) tag[buf[j]] = 0;
+		nb = 0;
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -41,9 +41,7 @@ class FECORE_API Timer
 public:
 	//! constructor
 	Timer();
-
-	//! constructor
-	~Timer();
+    ~Timer();
 
 	//! Start the timer
 	void start();

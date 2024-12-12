@@ -63,6 +63,7 @@ Timer::Timer()
 
 Timer::~Timer()
 {
+	if (Imp::activeTimer == this) Imp::activeTimer = nullptr;
 	delete m;
 }
 

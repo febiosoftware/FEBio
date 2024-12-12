@@ -64,13 +64,8 @@ void FESPRProjection::Project(FESolidDomain& dom, const vector< vector<double> >
 	{
 	case ET_TET4   :
 	case ET_TET5   : { NDOF =  4; NCN = 4; } break;
-	case ET_TET10  : { NDOF =  4; NCN = 4; } break;
-	case ET_TET15  : 
-		{
-			NDOF = (m_p == 1 ? 4 : 10); 
-			NCN = 4; 
-		}
-		break;
+	case ET_TET10  : { NDOF = (m_p == 1 ? 4 : 10); NCN = 4;	} break;
+	case ET_TET15  : { NDOF = (m_p == 1 ? 4 : 10); NCN = 4; } break;
 	case ET_TET20 : { NDOF = 10; NCN = 4; } break;
 	case ET_HEX8  : { NDOF =  7; NCN = 8; } break;
 	case ET_HEX20 : { NDOF = (m_p == 1 ? 7 : 10); NCN = 8; } break;

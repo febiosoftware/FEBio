@@ -122,6 +122,7 @@ SOFTWARE.*/
 #include "FEFiberDensityDistribution.h"
 #include "FEContinuousFiberDistribution.h"
 #include "FEContinuousFiberDistributionUC.h"
+#include "FEODFFiberDistribution.h"
 #include "FEFiberIntegrationGauss.h"
 #include "FEFiberIntegrationTrapezoidal.h"
 #include "FEFiberIntegrationGeodesic.h"
@@ -175,6 +176,8 @@ SOFTWARE.*/
 #include "FEGrowthTensor.h"
 #include "FEKinematicGrowth.h"
 #include "FEYeoh.h"
+#include "FEScaledElasticMaterial.h"
+#include "FEScaledUncoupledMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -365,6 +368,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FERemodelingElasticMaterial, "remodeling solid");
 	REGISTER_FECORE_CLASS(FECarterHayesOld, "Carter-Hayes (old)");
 	REGISTER_FECORE_CLASS(FEContinuousFiberDistribution, "continuous fiber distribution");
+    REGISTER_FECORE_CLASS(FEODFFiberDistribution, "fiberODF");
 	REGISTER_FECORE_CLASS(FECoupledTransIsoVerondaWestmann, "coupled trans-iso Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FECoupledTransIsoMooneyRivlin, "coupled trans-iso Mooney-Rivlin");
 	REGISTER_FECORE_CLASS(FEGenericHyperelastic, "hyperelastic");
@@ -376,6 +380,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEHGOCoronary, "HGO-coronary");
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
     REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
+    REGISTER_FECORE_CLASS(FEScaledElasticMaterial, "scaled elastic");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
@@ -428,6 +433,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPolynomialHyperElastic, "polynomial");
 	REGISTER_FECORE_CLASS(FEShenoyMaterial, "Shenoy");
 	REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean, "fiber neo-Hookean");
+    REGISTER_FECORE_CLASS(FEScaledUncoupledMaterial, "scaled uncoupled");
     REGISTER_FECORE_CLASS(FEYeoh, "Yeoh");
 
 	// fiber materials (derived from FEFiberMaterial)
@@ -495,6 +501,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberIntegrationGaussKronrod, "fibers-3d-gkt");
 	REGISTER_FECORE_CLASS(FEFiberIntegrationTriangle, "fibers-3d-fei");
 	REGISTER_FECORE_CLASS(FEFiberIntegrationTrapezoidal, "fibers-2d-trapezoidal");
+
+    // Fiber ODF classes
+    REGISTER_FECORE_CLASS(FEFiberODF, "fiber-odf");
 
 	// Other materials 
 	REGISTER_FECORE_CLASS(FELinearTrussMaterial, "linear truss");
@@ -759,6 +768,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotElementElasticity, "elasticity");
     REGISTER_FECORE_CLASS(FEPlotElementDevElasticity, "deviatoric elasticity");
 	REGISTER_FECORE_CLASS(FEPlotRelativeVolume, "relative volume");
+	REGISTER_FECORE_CLASS(FEPlotSPRRelativeVolume, "SPR relative volume");
 	REGISTER_FECORE_CLASS(FEPlotShellRelativeVolume, "shell relative volume");// , FECORE_SPEC(3, 0)); // NOTE: deprecated
 	REGISTER_FECORE_CLASS(FEPlotFiberVector, "fiber vector");
 	REGISTER_FECORE_CLASS(FEPlotFiberStretch, "fiber stretch");
@@ -1047,9 +1057,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemStrainEnergyDensity, "sed");
 	REGISTER_FECORE_CLASS(FELogElemDevStrainEnergyDensity, "devsed");
 	REGISTER_FECORE_CLASS(FELogElemFiberStretch, "fiber_stretch");
-	REGISTER_FECORE_CLASS(FELogElemFiberVectorX, "fiber_x");
-	REGISTER_FECORE_CLASS(FELogElemFiberVectorY, "fiber_y");
-	REGISTER_FECORE_CLASS(FELogElemFiberVectorZ, "fiber_z");
+	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 0, "fiber_x");
+	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 1, "fiber_y");
+	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 2, "fiber_z");
 	REGISTER_FECORE_CLASS(FELogDamage, "D");
 	REGISTER_FECORE_CLASS_T(FELogDamage_n, 0, "damage_1");
 	REGISTER_FECORE_CLASS_T(FELogDamage_n, 1, "damage_2");

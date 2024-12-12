@@ -38,6 +38,11 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include "FEBioMech.h"
 
+BEGIN_FECORE_CLASS(FEElasticANSShellDomain, FESSIShellDomain)
+	ADD_PARAMETER(m_secant_stress, "secant_stress");
+	ADD_PARAMETER(m_secant_tangent, "secant_tangent");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FEElasticANSShellDomain::FEElasticANSShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEElasticDomain(pfem), m_dofV(pfem), m_dofSV(pfem), m_dofSA(pfem), m_dofR(pfem), m_dof(pfem)
 {

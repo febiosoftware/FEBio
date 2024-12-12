@@ -774,6 +774,8 @@ void FEElasticSolidDomain::ElementInertialForce(FESolidElement& el, vector<doubl
 
 BEGIN_FECORE_CLASS(FEStandardElasticSolidDomain, FEElasticSolidDomain)
 	ADD_PARAMETER(m_elemType, "elem_type", FE_PARAM_ATTRIBUTE, "$(solid_element)\0");
+	ADD_PARAMETER(m_secant_stress, "secant_stress");
+	ADD_PARAMETER(m_secant_tangent, "secant_tangent");
 END_FECORE_CLASS();
 
 FEStandardElasticSolidDomain::FEStandardElasticSolidDomain(FEModel* fem) : FEElasticSolidDomain(fem)

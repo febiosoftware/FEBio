@@ -24,53 +24,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+#include <memory>
+#include <FECore/matrix.h>
+#include "feamr_api.h"
 
+FEAMR_API void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, const double* zCoords, double* theta, double* phi);
 
-#pragma once
-#include <vector>
-#include "fecore_api.h"
+FEAMR_API std::unique_ptr<matrix> compSH(int order, int numPts, double* theta, double* phi);
 
-class FEMesh;
-class FEDomain;
-class FESurface;
+FEAMR_API double harmonicY(int degree, int order, double theta, double phi, int numType);
 
-//-----------------------------------------------------------------------------
-//! The FENodeNodeList class is a utility class that determines for each node 
-//! the adjacent nodes
+FEAMR_API void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int numPts, double* theta, double* phi);
 
-//! This class analyzes a mesh and finds for each node all nodes that are 
-//! adjacent to this node
+FEAMR_API void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient);
 
-class FECORE_API FENodeNodeList
-{
-public:
-	//! default constructor
-	FENodeNodeList();
+FEAMR_API void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);
+FEAMR_API void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems);
 
-	//! desctructor
-	virtual ~FENodeNodeList();
-
-	//! create the node-node list for a mesh
-	void Create(FEMesh& mesh);
-
-	//! create the node-node list for a domain
-	void Create(FEDomain& dom);
-
-	//! create the node-node list for a surface
-	void Create(FESurface& surf);
-
-	int Size() const { return (int) m_nval.size(); }
-
-	int Valence(int i) { return m_nval[i]; }
-	int* NodeList(int i) { return &m_nref[0] + m_pn[i]; }
-
-	void Sort();
-
-protected:
-	std::vector<int>	m_nval;	// nodal valences
-	std::vector<int>	m_nref;	// adjacent nodes indices
-	std::vector<int>	m_pn;	// start index into the nref array
-
-	static FENodeNodeList*	m_pthis;
-	static int compare(const void* e1, const void* e2);
-};
+// Taken from std::assoc_legendre definition in GCC
+template<typename _Tp>
+_Tp
+__assoc_legendre_p(unsigned int __l, unsigned int __m, _Tp __x,
+            _Tp __phase = _Tp(+1));

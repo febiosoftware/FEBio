@@ -138,4 +138,6 @@ protected:
 	FEDofList	m_dofSA;
 	FEDofList	m_dofR;
 	FEDofList	m_dof;
+
+	DECLARE_FECORE_CLASS();
 };

@@ -161,3 +161,15 @@ public:
 
 inline vec3d to_vec3d(const vec3f& r) { return vec3d((double)r.x, (double)r.y, (double)r.z); }
 inline vec3f to_vec3f(const vec3d& r) { return vec3f((float)r.x, (float)r.y, (float)r.z); }
+
+
+//-----------------------------------------------------------------------------
+class vec3i
+{
+public:
+	vec3i() { x = y = z = 0; }
+	vec3i(int X, int Y, int Z) { x = X; y = Y; z = Z;}
+
+public:
+	int		x, y, z;
+};

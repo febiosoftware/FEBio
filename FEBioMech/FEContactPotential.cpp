@@ -30,6 +30,9 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEBox.h>
 #include <stdexcept>
+#include <FECore/FENodeNodeList.h>
+#include <FECore/FEMesh.h>
+#include <FECore/log.h>
 
 void FEContactPotential::UpdateSurface(FESurface& surface)
 {
@@ -136,6 +139,7 @@ BEGIN_FECORE_CLASS(FEContactPotential, FEContactInterface)
 	ADD_PARAMETER(m_Rout, "R_out");
 	ADD_PARAMETER(m_Rmin, "R0_min");
 	ADD_PARAMETER(m_wtol, "w_tol");
+	ADD_PARAMETER(m_checkIntersections, "check_intersections");
 END_FECORE_CLASS();
 
 FEContactPotential::FEContactPotential(FEModel* fem) : FEContactInterface(fem), m_surf1(fem), m_surf2(fem)
@@ -149,6 +153,7 @@ FEContactPotential::FEContactPotential(FEModel* fem) : FEContactInterface(fem), 
 	m_Rout = 2.0;
 	m_Rmin = 0.0;
 	m_wtol = 0.0;
+	m_checkIntersections = false;
 }
 
 //! return the primary surface
@@ -233,7 +238,7 @@ public:
 	double depth () const { return r1.z - r0.z; }
 };
 
-class Grid
+class FEContactPotential::Grid
 {
 public:
 	class Cell
@@ -412,6 +417,7 @@ bool FEContactPotential::Init()
 	if (FEContactInterface::Init() == false) return false;
 	BuildNeighborTable();
 	m_activeElements.resize(m_surf1.Elements());
+	m_NNL.Create(m_surf1);
 	return true;
 }
 
@@ -462,6 +468,17 @@ void FEContactPotential::Update()
 	if (g.Build(m_surf2, ndivs, m_Rout) == false)
 	{
 		throw std::runtime_error("Failed to build grid in FEContactPotential::Update");
+	}
+
+	if (m_checkIntersections)
+	{
+		feLog("Checking intersections ...");
+		if (CheckIntersections(g))
+		{
+			feLog("FOUND!\n");
+			throw NegativeJacobianDetected();
+		}
+		else feLog("all good.\n");
 	}
 
 	// build the list of active elements
@@ -550,6 +567,13 @@ void FEContactPotential::Update()
 // Build the matrix profile
 void FEContactPotential::BuildMatrixProfile(FEGlobalMatrix& M)
 {
+	const int dof_X = GetDOFIndex("x");
+	const int dof_Y = GetDOFIndex("y");
+	const int dof_Z = GetDOFIndex("z");
+	const int dof_RU = GetDOFIndex("Ru");
+	const int dof_RV = GetDOFIndex("Rv");
+	const int dof_RW = GetDOFIndex("Rw");
+
 	// connect every element of surface 1 to surface 2
 	for (int i = 0; i < m_surf1.Elements(); ++i)
 	{
@@ -561,9 +585,12 @@ void FEContactPotential::BuildMatrixProfile(FEGlobalMatrix& M)
 			for (int j = 0; j < el1.Nodes(); ++j)
 			{
 				FENode& node = m_surf1.Node(el1.m_lnode[j]);
-				lm.push_back(node.m_ID[0]);
-				lm.push_back(node.m_ID[1]);
-				lm.push_back(node.m_ID[2]);
+				lm.push_back(node.m_ID[dof_X]);
+				lm.push_back(node.m_ID[dof_Y]);
+				lm.push_back(node.m_ID[dof_Z]);
+				lm.push_back(node.m_ID[dof_RU]);
+				lm.push_back(node.m_ID[dof_RV]);
+				lm.push_back(node.m_ID[dof_RW]);
 			}
 
 			// add all active dofs of surface 2
@@ -573,9 +600,12 @@ void FEContactPotential::BuildMatrixProfile(FEGlobalMatrix& M)
 				for (int j = 0; j < el2->Nodes(); ++j)
 				{
 					FENode& node = m_surf2.Node(el2->m_lnode[j]);
-					lm.push_back(node.m_ID[0]);
-					lm.push_back(node.m_ID[1]);
-					lm.push_back(node.m_ID[2]);
+					lm.push_back(node.m_ID[dof_X]);
+					lm.push_back(node.m_ID[dof_Y]);
+					lm.push_back(node.m_ID[dof_Z]);
+					lm.push_back(node.m_ID[dof_RU]);
+					lm.push_back(node.m_ID[dof_RV]);
+					lm.push_back(node.m_ID[dof_RW]);
 				}
 			}
 			M.build_add(lm);
@@ -927,5 +957,65 @@ void FEContactPotential::Serialize(DumpStream& ar)
 	m_surf1.Serialize(ar);
 	m_surf2.Serialize(ar);
 
-	BuildNeighborTable();
+	if (!ar.IsShallow() && ar.IsLoading())
+	{
+		BuildNeighborTable();
+		m_activeElements.resize(m_surf1.Elements());
+		m_NNL.Create(m_surf1);
+	}
+}
+
+bool FEContactPotential::CheckIntersections(FEContactPotential::Grid& g)
+{
+	int intersectionCount = 0;
+#pragma omp parallel for shared(g, intersectionCount) schedule(dynamic)
+	for (int i = 0; i < m_surf1.Nodes(); ++i)
+	{
+		int n0 = m_surf1.NodeIndex(i);
+		int nval = m_NNL.Valence(i);
+		int* nnl = m_NNL.NodeList(i);
+		vec3d r0 = m_surf1.Node(i).m_rt;
+
+		Grid::Cell* c[27] = { nullptr };
+		int nc = g.GetCellNeighborHood(r0, &c[0]);
+
+		for (int j = 0; j < nval; ++j)
+		{
+			if (nnl[j] > i)
+			{
+				int n1 = m_surf1.NodeIndex(nnl[j]);
+				vec3d r1 = m_surf1.Node(nnl[j]).m_rt;
+				vec3d e = r1 - r0; 
+				double l = e.unit();
+
+				for (int k = 0; k < nc; ++k)
+				{
+					Grid::Cell* cl = c[k];
+					for (FESurfaceElement* el2 : cl->m_elemList)
+					{
+						FESurfaceElement& el = *el2;
+						if (!el.HasNode(n0) && !el.HasNode(n1))
+						{
+							double rs[2] = { 0 }, g(0);
+							if (m_surf2.Intersect(el, r0, e, rs, g, 1e-7, false))
+							{
+								if ((g >= 0) && (g <= l))
+								{
+/*									int nid0 = m_surf1.Node(i).GetID();
+									int nid1 = m_surf1.Node(nnl[j]).GetID();
+									feLog("\nNode : %d, %d\n", nid0, nid1);
+									int eid = el.m_elem[0].pe->GetID();
+									feLog("\nElement : %d\n", eid);
+*/
+									# pragma omp atomic
+									intersectionCount++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return (intersectionCount != 0);
 }

@@ -2067,7 +2067,20 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, FEDataStream& a)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
+bool FEPlotSPRRelativeVolume::Save(FEDomain& dom, FEDataStream& a)
+{
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FESolidDomain& solidDomain = dynamic_cast<FESolidDomain&>(dom);
+		writeSPRElementValue(solidDomain, a, [](const FEMaterialPoint& mp) {
+				const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+				return (pt ? pt->m_J : 0.0);
+			});
+		return true;
+	}
+	return false;
+}
+
 bool FEPlotShellRelativeVolume::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom);
