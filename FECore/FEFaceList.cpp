@@ -36,13 +36,13 @@ SOFTWARE.*/
 
 bool FEFaceList::FACE::IsEqual(int* n) const
 {
-	if (ntype == 3)
+	if (Edges() == 3)
 	{
 		if ((node[0] != n[0]) && (node[0] != n[1]) && (node[0] != n[2])) return false;
 		if ((node[1] != n[0]) && (node[1] != n[1]) && (node[1] != n[2])) return false;
 		if ((node[2] != n[0]) && (node[2] != n[1]) && (node[2] != n[2])) return false;
 	}
-	else if (ntype == 4)
+	else if (Edges() == 4)
 	{
 		if ((node[0] != n[0]) && (node[0] != n[1]) && (node[0] != n[2]) && (node[0] != n[3])) return false;
 		if ((node[1] != n[0]) && (node[1] != n[1]) && (node[1] != n[2]) && (node[1] != n[3])) return false;
@@ -61,13 +61,13 @@ bool FEFaceList::FACE::IsEqual(int* n) const
 bool FEFaceList::FACE::HasEdge(int a, int b) const
 {
 	const int* n = node;
-	if (ntype == 3)
+	if (Edges()==3)
 	{
 		if (((n[0] == a) && (n[1] == b)) || ((n[0] == b) && (n[1] == a))) return true;
 		if (((n[1] == a) && (n[2] == b)) || ((n[1] == b) && (n[2] == a))) return true;
 		if (((n[2] == a) && (n[0] == b)) || ((n[2] == b) && (n[0] == a))) return true;
 	}
-	else if (ntype == 4)
+	else if (Edges()==4)
 	{
 		if (((n[0] == a) && (n[1] == b)) || ((n[0] == b) && (n[1] == a))) return true;
 		if (((n[1] == a) && (n[2] == b)) || ((n[1] == b) && (n[2] == a))) return true;
@@ -212,7 +212,7 @@ void FEFaceList::BuildNeighbors()
 
 		if (f.nsurf == 1)
 		{
-			int fn = f.ntype;
+			int fn = f.Edges();
 			for (int j = 0; j < fn; ++j)
 			{
 				int n0 = f.node[j];
@@ -376,7 +376,7 @@ bool FEElementFaceList::Create(FEElementList& elemList, FEFaceList& faceList)
 		NFT[f.node[0]].push_back(i);
 		NFT[f.node[1]].push_back(i);
 		NFT[f.node[2]].push_back(i);
-		if (f.ntype == 4) NFT[f.node[3]].push_back(i);
+		if (f.Edges() == 4) NFT[f.node[3]].push_back(i);
 	}
 
 	int NE = mesh.Elements();
@@ -589,7 +589,7 @@ bool FEFaceEdgeList::Create(FEFaceList& faceList, FEEdgeList& edgeList)
 		FEFaceList::FACE face = faceList.Face(i);
 
 		// find the corresponding edges
-		int n = face.ntype;
+		int n = face.Edges();
 		for (int j = 0; j < n; ++j)
 		{
 			int a = face.node[j];

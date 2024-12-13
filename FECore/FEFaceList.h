@@ -40,14 +40,20 @@ class FECORE_API FEFaceList
 public:
 	struct FECORE_API FACE
 	{
-		int		ntype;		// 3 = triangle, 4 = quad
-		int		node[4];
+		int		ntype;		// = nr. of nodes
+		int		node[10];
 		int		nsurf;		// 1 if facet is on surface 
 		int		nbr[4];		// neighbor list
 
 		bool IsEqual(int* n) const;
 
 		bool HasEdge(int a, int b) const;
+
+		int Edges() const
+		{
+			static const int el[] = { 0,0,0,3,4,0,3,3,4,4,3 };
+			return el[ntype];
+		}
 	};
 
 public:
