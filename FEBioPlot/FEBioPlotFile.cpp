@@ -664,7 +664,11 @@ FEBioPlotFile::LineObject* FEBioPlotFile::AddLineObject(const std::string& name)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::SetCompression(int n)
 {
+#ifdef HAVE_ZLIB
 	m_ncompress = n;
+#else
+	m_ncompress = 0;
+#endif
 }
 
 //-----------------------------------------------------------------------------
