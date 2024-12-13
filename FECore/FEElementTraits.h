@@ -372,6 +372,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1403,7 +1404,12 @@ public:
     //! values of shape function derivatives
     virtual void shape_deriv(double* Hr, double* Hs, double r, double s) = 0;
     
+	using FEElementTraits::project_to_nodes;
+	virtual void project_to_nodes(mat3ds* ai, mat3ds* ao) const;
+
 public:
+	int m_nvln; //!< number of element nodes including virtual nodes (e.g., in shell elements)
+
 	// gauss-point coordinates and weights
 	std::vector<double> gr;
 	std::vector<double> gs;
@@ -1470,6 +1476,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1490,6 +1497,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1547,6 +1555,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1567,6 +1576,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1607,6 +1617,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1627,6 +1638,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1667,6 +1679,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================
@@ -1687,6 +1700,7 @@ protected:
     static int ni[NELN];
 
     matrix m_Hi;	//!< inverse of H; useful for projection integr. point data to nodal data
+    matrix m_MT;
 };
 
 //=============================================================================

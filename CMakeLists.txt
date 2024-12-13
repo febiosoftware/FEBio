@@ -330,6 +330,7 @@ endif()
 if(USE_PDL)
     target_compile_definitions(numcore PRIVATE PARDISODL)
     target_link_libraries(numcore PRIVATE ${PDL_LIB})
+    set(ENV{PARDISOLICMESSAGE} "1")
 
     # We still need OpenMP from the system.
     if(${OpenMP_C_FOUND})

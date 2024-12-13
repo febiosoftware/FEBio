@@ -795,6 +795,19 @@ public:
 	}
 };
 
+class FEStrain
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        FEElement* el = mp.m_elem;
+        FEShellElementNew* se = dynamic_cast<FEShellElementNew*>(el);
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (se) return (se->m_E[mp.m_index].norm() > 0) ? se->m_E[mp.m_index] : pt->Strain();
+        else return (pt ? pt->Strain() : mat3ds(0));
+    }
+};
+
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
@@ -881,8 +894,81 @@ bool FEPlotSPRLinearStresses::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotNodalStresses::Save(FEDomain& dom, FEDataStream& a)
 {
+    if (dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // new shell elements should be excluded
 	writeNodalProjectedElementValues<mat3ds>(dom, a, FEStress());
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellTopStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (!dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // only use with new shell elements
+    writeShellElementValues<mat3ds>(dom, a, FEStress(), false);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellBottomStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (!dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // only use with new shell elements
+    writeShellElementValues<mat3ds>(dom, a, FEStress(), true);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellTopNodalStresses::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (!dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // only use with new shell elements
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStress(), false);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellBottomNodalStresses::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (!dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // only use with new shell elements
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStress(), true);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotNodalStrains::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // new shell elements should be excluded
+    writeNodalProjectedElementValues<mat3ds>(dom, a, FEStrain());
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellTopStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (!dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // only use with new shell elements
+    writeShellElementValues<mat3ds>(dom, a, FEStrain(), false);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellBottomStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (!dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // only use with new shell elements
+    writeShellElementValues<mat3ds>(dom, a, FEStrain(), true);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellTopNodalStrains::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (!dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // only use with new shell elements
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStrain(), false);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellBottomNodalStrains::Save(FEDomain& dom, FEDataStream& a)
+{
+    if (!dynamic_cast<FESSIShellDomain*>(&dom)) return false;  // only use with new shell elements
+    writeShellNodalProjectedElementValues<mat3ds>(dom, a, FEStrain(), true);
+    return true;
 }
 
 //=============================================================================

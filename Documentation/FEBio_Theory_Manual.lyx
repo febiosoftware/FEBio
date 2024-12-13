@@ -5617,7 +5617,7 @@ where
 \end_inset
 
 When eigenvalues coincide,
- L'Hospital's rule may be used to evalue the coefficient in the last term,
+ L'Hospital's rule may be used to evaluate the coefficient in the last term,
  
 \begin_inset Formula 
 \begin{equation}
@@ -6007,7 +6007,7 @@ nolink "false"
 
  can vary arbitrarily when enforcing the entropy inequality.
  Instead,
- we introduce the incompressbility constraint of eq.
+ we introduce the incompressibility constraint of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:incompressibility-redux"
@@ -8852,7 +8852,7 @@ apparent mass density
  Following 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Bowen69,Ateshian07"
+key "Bowen69,Ateshian07b"
 literal "false"
 
 \end_inset
@@ -13418,7 +13418,7 @@ nolink "false"
  The complete theoretical framework for such materials can be found in 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Shim21a"
+key "Shim22"
 literal "false"
 
 \end_inset
@@ -13733,7 +13733,7 @@ where
  as shown in our earlier formulation of computational fluid dynamics 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian2018"
+key "Ateshian18"
 literal "false"
 
 \end_inset
@@ -13900,7 +13900,7 @@ nolink "false"
 ) 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian2011,Ateshian2013,Shim2019"
+key "Ateshian12,Ateshian13,Shim19"
 literal "true"
 
 \end_inset
@@ -13974,7 +13974,7 @@ In this expression,
 Based on the constitutive assumptions of our hybrid biphasic formulation 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Shim21a"
+key "Shim22"
 literal "false"
 
 \end_inset
@@ -14196,7 +14196,7 @@ Jump conditions on the axioms of mass,
  The full set of jump conditions for a hybrid biphasic material were derived in our recent study for the constitutive assumptions adopted in this formulation 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Shim21a"
+key "Shim22"
 literal "false"
 
 \end_inset
@@ -14369,7 +14369,7 @@ nolink "false"
  
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Hou1989"
+key "Hou89"
 literal "false"
 
 \end_inset
@@ -14746,7 +14746,7 @@ We model the domain
  Unlike the standard (Darcy flow through a porous-deformable) multiphasic domain 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian2007,Ateshian13,Ateshian14"
+key "Ateshian07b,Ateshian13,Ateshian14"
 literal "false"
 
 \end_inset
@@ -14987,8 +14987,8 @@ where
 
  relative to an ideal solution 
 \begin_inset CommandInset citation
-LatexCommand cite
-key "Ogston1961,Laurent1964"
+LatexCommand citep
+key "Ogston61,Laurent63"
 literal "false"
 
 \end_inset
@@ -15583,7 +15583,7 @@ nolink "false"
  
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian2014"
+key "Ateshian14"
 literal "false"
 
 \end_inset
@@ -15704,7 +15704,7 @@ nolink "false"
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Salt-Dissociation-CFDSol"
+reference "sec:Chemical-Reactions"
 plural "false"
 caps "false"
 noprefix "false"
@@ -15720,7 +15720,7 @@ nolink "false"
  can be determined as described in the previous standard multiphasic solver 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian2013,Ateshian2014"
+key "Ateshian13,Ateshian14"
 literal "false"
 
 \end_inset
@@ -25904,7 +25904,7 @@ nolink "false"
 ) 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Ateshian2018"
+key "Ateshian18"
 literal "true"
 
 \end_inset
@@ -25967,8 +25967,8 @@ where
 
  in this case) is at the current time step 
 \begin_inset CommandInset citation
-LatexCommand cite
-key "Jansen2000a"
+LatexCommand citep
+key "Jansen00"
 literal "true"
 
 \end_inset
@@ -26828,7 +26828,7 @@ nolink "false"
  The virtual work statement for a Galerkin finite element formulation 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Bonet2008"
+key "Bonet97"
 literal "true"
 
 \end_inset
@@ -33315,9 +33315,9 @@ Starting with FEBio 2.6,
  two shell formulations have become available:
  The original formulation,
  where nodes are located at the mid-surface through the thickness of the shell,
- and a new formulation where nodes are located on the front face of the shell.
+ and a new formulation where nodes are located on the top face of the shell.
  The original formulation uses nodal displacements and directors as degrees of freedom;
- the new formulation uses front and back face nodal displacements.
+ the new formulation uses top and bottom face nodal displacements.
  The new formulation is designed to properly accommodate shells attached to the surface of a solid element,
  or shells sandwiched between two solid elements,
  with minimal alterations to the rest of the code.
@@ -33969,7 +33969,7 @@ Different shell elements available in FEBio.
 \end_layout
 
 \begin_layout Subsection
-Shells with front and back face nodal displacements
+Shells with top and bottom face nodal displacements
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Shells-front-back"
@@ -33985,7 +33985,7 @@ We create a shell formulation by reducing a 3D element interpolation which is li
 \end_inset
 
 .
- The nodal positions at the back of the shell (
+ The nodal positions at the bottom of the shell (
 \begin_inset Formula $\xi_{3}=-1$
 \end_inset
 
@@ -33993,7 +33993,7 @@ We create a shell formulation by reducing a 3D element interpolation which is li
 \begin_inset Formula $\mathbf{y}_{a}$
 \end_inset
 
- and those on the front of the shell (
+ and those on the top of the shell (
 \begin_inset Formula $\xi_{3}=+1$
 \end_inset
 
@@ -34231,22 +34231,22 @@ For this formulation,
 
 .
  Similarly,
- prescribed pressures and contact pressures act on the shell front face.
+ prescribed pressures and contact pressures act on the shell top face.
 \end_layout
 
 \begin_layout Standard
 When a shell element is sandwiched between two solid elements,
- the nodal displacements of the solid element facing the shell back face are set to coincide with the shell back-face nodal displacements 
+ the nodal displacements of the solid element facing the shell bottom face are set to coincide with the shell back-face nodal displacements 
 \begin_inset Formula $\mathbf{w}_{b}$
 \end_inset
 
 ,
- whereas the nodal displacements of the solid element facing the shell front face are set to coincide with the shell front-face nodal displacements 
+ whereas the nodal displacements of the solid element facing the shell top face are set to coincide with the shell front-face nodal displacements 
 \begin_inset Formula $\mathbf{u}_{a}$
 \end_inset
 
 .
- If the shell thickness exceeds the thickness of the solid element connected to its back face,
+ If the shell thickness exceeds the thickness of the solid element connected to its bottom face,
  results become unpredictable.
 \end_layout
 
@@ -34418,7 +34418,7 @@ External work of surface forces
 \end_layout
 
 \begin_layout Standard
-We assume that surface forces are applied on the shell front face (
+We assume that surface forces are applied on the shell top face (
 \begin_inset Formula $\xi_{3}=+1$
 \end_inset
 
@@ -34443,7 +34443,7 @@ Shell on top of solid element
 
 \begin_layout Standard
 When a shell is coincident with the face of a solid element,
- we assume that the face of the solid element coincides with the back face (
+ we assume that the face of the solid element coincides with the bottom face (
 \begin_inset Formula $\xi_{3}=-1$
 \end_inset
 
@@ -34480,7 +34480,7 @@ When a shell is sandwiched between two solid elements,
 \begin_inset Formula $\mathbf{u}_{b}$
 \end_inset
 
- displacements facing the back of the shell to those of the shell 
+ displacements facing the bottom of the shell to those of the shell 
 \begin_inset Formula $\mathbf{w}_{b}$
 \end_inset
 
@@ -34489,7 +34489,7 @@ When a shell is sandwiched between two solid elements,
 \begin_inset Formula $\mathbf{u}_{b}$
 \end_inset
 
- displacements facing the front of the shell remain unchanged;
+ displacements facing the top of the shell remain unchanged;
  they will coincide with those of the corresponding solid element nodes.
 \end_layout
 
@@ -34500,7 +34500,7 @@ Rigid-Shell Interface
 \begin_layout Standard
 When the node of a deformable shell belongs to a rigid body,
  we need to substitute the nodal degrees of freedom with the rigid body degrees of freedom.
- The positions of the shell front face and back face nodes are 
+ The positions of the shell top face and bottom face nodes are 
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{x}_{b} & =\mathbf{r}+\boldsymbol{\Lambda}\cdot\left(\mathbf{X}_{b}-\mathbf{R}\right)\equiv\mathbf{r}+\mathbf{a}_{b}\\
@@ -41369,7 +41369,7 @@ nolink "false"
  often called a Voigt model in linear viscoelasticity 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Bland60,Coleman61"
+key "Bland16,Coleman61"
 literal "false"
 
 \end_inset
@@ -50627,7 +50627,7 @@ nolink "false"
  For second-order systems these parameters may be evaluated from 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Bazilevs2008"
+key "Bazilevs08"
 literal "true"
 
 \end_inset
@@ -55975,7 +55975,7 @@ literal "true"
  and reference 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Zimmerman21a"
+key "Zimmerman22"
 literal "false"
 
 \end_inset
@@ -55984,7 +55984,7 @@ literal "false"
  The presentation here follows that of 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "Zimmerman21a"
+key "Zimmerman22"
 literal "false"
 
 \end_inset
@@ -65783,11 +65783,7 @@ The position of a node shared by any number of deformable finite elements is den
 \end_inset
 
  by 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq34"
-nolink "false"
-
+\begin_inset Formula $\mathbf{x}=\mathbf{X}+\mathbf{u}$
 \end_inset
 
 ;
