@@ -53,6 +53,15 @@ public:
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 
+
+//! Nodal shell displacements
+class FEPlotNodeShellDisplacement : public FEPlotNodeData
+{
+public:
+    FEPlotNodeShellDisplacement(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) { SetUnits(UNIT_LENGTH); }
+    bool Save(FEMesh& m, FEDataStream& a);
+};
+
 //-----------------------------------------------------------------------------
 //! Nodal velocities
 //!
