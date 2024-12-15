@@ -136,10 +136,17 @@ private:
 	void UpdateNodalPressures();
 
 protected:
+    bool    m_secant_stress;    //!< use secant approximation to stress
+    bool    m_secant_tangent;   //!< flag for using secant tangent
+    bool    m_secant_perm_tangent;   //!< flag for using secant tangent on permeability
+    
+protected:
 	int			m_varU, m_varP;	// displacement, pressure field indices
 
 	FEDofList	m_dofU;		// displacement dofs
 	FEDofList	m_dofSU;	// shell displacement dofs
 	FEDofList	m_dofR;		// rigid rotation
 	FEDofList	m_dof;
+
+    DECLARE_FECORE_CLASS();
 };

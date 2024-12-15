@@ -128,7 +128,7 @@ double FEPressureStabilization::TimeConstant(FESurfaceElement& el, FESurface& s)
             ept.m_s.zero();
             
             // get the tangent (stiffness) and it inverse (compliance) at this point
-            tens4ds C = biph->Tangent(mp);
+            tens4dmm C = biph->Tangent(mp);
             double Ha = n*(vdotTdotv(n, C, n)*n);
             
             // if this is a poroelastic element, then get the permeability tensor

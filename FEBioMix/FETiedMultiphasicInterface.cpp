@@ -506,7 +506,7 @@ double FETiedMultiphasicInterface::AutoPenalty(FESurfaceElement& el, FESurface &
 	}
 	else if (dynamic_cast<FEBiphasic*>(pme)) {
 		FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(pme);
-		S = pmb->Tangent(mp);
+        S = (pmb->Tangent(mp)).supersymm();
 	}
 	else if (dynamic_cast<FEElasticMaterial*>(pme)) {
 		FEElasticMaterial* pm = dynamic_cast<FEElasticMaterial*>(pme);
