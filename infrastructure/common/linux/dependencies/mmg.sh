@@ -5,13 +5,15 @@ set -o verbose
 # shellcheck disable=1091
 . ./common-functions.sh
 
-MMG_SOURCE=https://github.com/MmgTools/mmg/archive/master.zip
-MMG_ARCHIVE=$(basename $MMG_SOURCE)
-MMG_PATH="mmg-${MMG_ARCHIVE%.*}"
+MMG="https://github.com/MmgTools/mmg.git"
+BRANCH="v5.7.3"
 
 build_and_install() {
-	local source=$1
-	pushd "$source" || exit 1
+    local source=$1
+	local branch=$2
+
+	git clone --depth 1 --branch "$branch" "$source" "$branch"
+	pushd $branch || exit 1
 	cmake . -B cmbuild \
 		-DCMAKE_INSTALL_PREFIX="/usr/local" \
 		-DCMAKE_POSITION_INDEPENDENT_CODE=ON
@@ -24,9 +26,7 @@ build_and_install() {
 
 main() {
 	pushd "$BUILD_PATH" || exit 1
-	download_source "$MMG_SOURCE"
-	extract_source "$MMG_ARCHIVE"
-	build_and_install "$MMG_PATH"
+	build_and_install "$MMG" "$BRANCH"
 	popd || exit 1
 }
 
