@@ -1436,6 +1436,14 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 				throw "FATAL ERROR";
 			}
 		}
+		else
+		{
+			if (m_plot->Open(m_splot.c_str()) == false)
+			{
+				printf("FATAL ERROR: Failed creating plot database %s\n", m_splot.c_str());
+				throw "FATAL ERROR";
+			}
+		}
 
 		// data records
 		SerializeDataStore(ar);

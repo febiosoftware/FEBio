@@ -106,6 +106,10 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 			strcpy(ops.szctrl, args[++i].c_str());
 			ops.binteractive = false;
 		}
+		else if (strcmp(sz, "-noappend") == 0)
+		{
+			ops.bappendFiles = false;
+		}
 		else if (strcmp(sz, "-d") == 0)
 		{
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-d is incompatible with other command line option.\n"); return false; }

@@ -38,6 +38,7 @@ struct FEBIOLIB_API CMDOPTIONS
 	bool	bsplash;			//!< show splash screen or not
 	bool	bsilent;			//!< run FEBio in silent mode (no output to screen)
 	bool	binteractive;		//!< start FEBio interactively
+	bool	bappendFiles;		//!< append plot and log files on restart?
 
 	int		dumpLevel;		//!< requested restart level
 	int		dumpStride;		//!< (cold) restart file stride
@@ -64,6 +65,7 @@ struct FEBIOLIB_API CMDOPTIONS
 		binteractive = false;
 		dumpLevel = 0;
 		dumpStride = 1;
+		bappendFiles = true;
 
 		szfile[0] = 0;
 		szlog[0] = 0;

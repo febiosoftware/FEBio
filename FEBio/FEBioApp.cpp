@@ -169,6 +169,8 @@ int FEBioApp::RunModel()
 	fem.SetPlotFilename(m_ops.szplt);
 	fem.SetDumpFilename(m_ops.szdmp);
 
+	fem.SetAppendOnRestart(m_ops.bappendFiles);
+
 	// read the input file if specified
 	int nret = 0;
 	if (m_ops.szfile[0])
@@ -235,6 +237,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	ops.bsplash = true;
 	ops.bsilent = false;
 	ops.binteractive = true;
+	ops.bappendFiles = true;
 
 	// these flags indicate whether the corresponding file name
 	// was defined on the command line. Otherwise, a default name will be generated.
@@ -272,6 +275,10 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			strcpy(ops.sztask, "restart");
 			strcpy(ops.szctrl, argv[++i]);
 			ops.binteractive = false;
+		}
+		else if (strcmp(sz, "-noappend") == 0)
+		{
+			ops.bappendFiles = false;
 		}
 		else if (strcmp(sz, "-d") == 0)
 		{
