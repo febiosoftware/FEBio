@@ -21,7 +21,7 @@ jobs:
       runTests: ${{ (github.event_name == 'workflow_dispatch' && inputs.runTests) || (github.event_name == 'push' && contains(fromJSON('["develop"]'), github.ref_name)) }}
       package-name: febio4
       package-sdk: true
-      aws-ami-id: ami-0ecb160c4a6bfd01d
+      aws-ami-id: ami-083a9a9faa1d3dddc
       aws-sg-id: sg-0ca7912782cf1538b
       aws-instance-type: c5a.8xlarge
     secrets: inherit
