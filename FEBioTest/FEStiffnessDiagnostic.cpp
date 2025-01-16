@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/FENewtonSolver.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/log.h>
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 FEStiffnessDiagnostic::FEStiffnessDiagnostic(FEModel* fem) : FECoreTask(fem)
@@ -106,12 +107,14 @@ bool FEStiffnessDiagnostic::Diagnose()
 	SparseMatrix* pA = nlsolve->m_pK->GetSparseMatrixPtr();
 	if (pA == nullptr) return false;
 
-	const double eps = 1e-6;
+	const double eps = 1e-8;
 	int neq = pA->Rows();
 	std::vector<double> R0(neq, 0);
 	nlsolve->Residual(R0);
-	double max_err = 0.0;
+	double max_val = 0, max_err = 0.0;
 	int i_max = -1, j_max = -1;
+	std::cerr << "\nstarting diagnostic:\nprogress:";
+	int pct = 0;
 	for (int j = 0; j < neq; ++j)
 	{
 		std::vector<double> u(neq, 0);
@@ -120,12 +123,23 @@ bool FEStiffnessDiagnostic::Diagnose()
 		nlsolve->Update(u);
 		nlsolve->Residual(R);
 
+		int new_pct = (100 * j) / neq;
+		if (pct != new_pct) {
+			if ((new_pct % 10) == 0)
+				std::cerr << "+"; 
+			else
+				std::cerr << "-"; 
+			pct = new_pct;
+		}
+
 		for (int i = 0; i < neq; ++i)
 		{
 			// note that we flip the sign on ka.
 			// this is because febio actually calculates the negative of the residual
 			double ka_ij = -(R[i] - R0[i]) / eps;
 			double kt_ij = pA->get(i, j);
+
+			if (fabs(kt_ij) > max_val) max_val = fabs(kt_ij);
 
 			double err = fabs(kt_ij - ka_ij);
 			if (err > max_err)
@@ -141,9 +155,16 @@ bool FEStiffnessDiagnostic::Diagnose()
 			}
 		}
 	}
+	std::cerr << "\n";
+
+	printf("Max abs. value: %lg\n", max_val);
+	fprintf(m_fp, "Max abs. value: %lg\n", max_val);
+	if (max_val == 0) max_val = 1;
 
 	printf("Max error: %lg (%d, %d)\n", max_err, i_max, j_max);
+	printf("Max rel. error: %lg (%d, %d)\n", max_err / max_val, i_max, j_max);
 	fprintf(m_fp, "Max error: %lg (%d, %d)\n", max_err, i_max, j_max);
+	fprintf(m_fp, "Max rel. error: %lg (%d, %d)\n", max_err / max_val, i_max, j_max);
 
 	return true;
 }
