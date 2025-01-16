@@ -64,6 +64,7 @@ SOFTWARE.*/
 #include "FESlidingInterface.h"
 #include "FESlidingElasticInterface.h"
 #include "FETiedContactSurface.h"
+#include "FEStickyInterface.h"
 #include "FEReactiveVEMaterialPoint.h"
 #include "FELinearTrussDomain.h"
 #include <FECore/FESurface.h>
@@ -154,7 +155,12 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, FEDataStream& a)
 //                       S U R F A C E    D A T A
 //=============================================================================
 
-//-----------------------------------------------------------------------------
+bool FEPlotContactGap::SetFilter(const char* szfilter)
+{
+	if (szfilter) m_interfaceName = szfilter;
+	return (szfilter != nullptr);
+}
+
 // Plot contact gap
 bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 {
@@ -164,19 +170,26 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 	// make sure the corresponding contact interface is active
 	// (in case the parent was not set, we'll proceed regardless)
 	FEContactInterface* pci = pcs->GetContactInterface();
-	if ((pci == 0) || pci->IsActive())
+	bool write = false;
+	if (pci == nullptr) write = true;
+	else if (pci->IsActive())
+	{
+		if (m_interfaceName.empty() || (m_interfaceName == pci->GetName())) write = true;
+	}
+
+	if (write)
 	{
 		// NOTE: the sliding surface does not use material points, so we need this little hack. 
-		FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
-		if (ss)
+		FESlidingSurface* slidingSurface = dynamic_cast<FESlidingSurface*>(pcs);
+		if (slidingSurface)
 		{
-			for (int i = 0; i < ss->Elements(); ++i)
+			for (int i = 0; i < slidingSurface->Elements(); ++i)
 			{
-				FEElement& el = ss->Element(i);
+				FEElement& el = slidingSurface->Element(i);
 				double g = 0.0;
 				for (int j = 0; j < el.Nodes(); ++j)
 				{
-					double gj = ss->m_data[el.m_lnode[j]].m_gap;
+					double gj = slidingSurface->m_data[el.m_lnode[j]].m_gap;
 					g += gj;
 				}
 				g /= el.Nodes();
@@ -185,16 +198,34 @@ bool FEPlotContactGap::Save(FESurface& surf, FEDataStream& a)
 			return true;
 		}
 
-		FETiedContactSurface* ts = dynamic_cast<FETiedContactSurface*>(pcs);
-		if (ts)
+		FETiedContactSurface* tiedSurface = dynamic_cast<FETiedContactSurface*>(pcs);
+		if (tiedSurface)
 		{
-			for (int i = 0; i < ts->Elements(); ++i)
+			for (int i = 0; i < tiedSurface->Elements(); ++i)
 			{
-				FEElement& el = ts->Element(i);
+				FEElement& el = tiedSurface->Element(i);
 				double g = 0.0;
 				for (int j = 0; j < el.Nodes(); ++j)
 				{
-					double gj = ts->m_data[el.m_lnode[j]].m_gap;
+					double gj = tiedSurface->m_data[el.m_lnode[j]].m_gap;
+					g += gj;
+				}
+				g /= el.Nodes();
+				a << g;
+			}
+			return true;
+		}
+
+		FEStickySurface* stickySurface = dynamic_cast<FEStickySurface*>(pcs);
+		if (stickySurface)
+		{
+			for (int i = 0; i < stickySurface->Elements(); ++i)
+			{
+				FEElement& el = stickySurface->Element(i);
+				double g = 0.0;
+				for (int j = 0; j < el.Nodes(); ++j)
+				{
+					double gj = stickySurface->m_data[el.m_lnode[j]].scalar_gap;
 					g += gj;
 				}
 				g /= el.Nodes();
@@ -235,7 +266,12 @@ bool FEPlotVectorGap::Save(FESurface& surf, FEDataStream& a)
 	return false;
 }
 
-//-----------------------------------------------------------------------------
+bool FEPlotContactPressure::SetFilter(const char* szfilter)
+{
+	if (szfilter) m_interfaceName = szfilter;
+	return (szfilter != nullptr);
+}
+
 // Plot contact pressure
 bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
 {
@@ -245,19 +281,26 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
 	// make sure the corresponding contact interface is active
 	// (in case the parent was not set, we'll proceed regardless)
 	FEContactInterface* pci = pcs->GetContactInterface();
-	if ((pci == 0) || pci->IsActive())
+	bool write = false;
+	if (pci == nullptr) write = true;
+	else if (pci->IsActive())
+	{
+		if (m_interfaceName.empty() || (m_interfaceName == pci->GetName())) write = true;
+	}
+
+	if (write)
 	{
 		// NOTE: the sliding surface does not use material points, so we need this little hack. 
-		FESlidingSurface* ss = dynamic_cast<FESlidingSurface*>(pcs);
-		if (ss)
+		FESlidingSurface* slidingSurface = dynamic_cast<FESlidingSurface*>(pcs);
+		if (slidingSurface)
 		{
-			for (int i = 0; i < ss->Elements(); ++i)
+			for (int i = 0; i < slidingSurface->Elements(); ++i)
 			{
-				FEElement& el = ss->Element(i);
+				FEElement& el = slidingSurface->Element(i);
 				double Lm = 0.0;
 				for (int j = 0; j < el.Nodes(); ++j)
 				{
-					double Lmj = ss->m_data[el.m_lnode[j]].m_Ln;
+					double Lmj = slidingSurface->m_data[el.m_lnode[j]].m_Ln;
 					Lm += Lmj;
 				}
 				Lm /= el.Nodes();
@@ -275,7 +318,12 @@ bool FEPlotContactPressure::Save(FESurface &surf, FEDataStream& a)
 	return false;
 }
 
-//-----------------------------------------------------------------------------
+bool FEPlotContactTraction::SetFilter(const char* szfilter)
+{
+	if (szfilter) m_interfaceName = szfilter;
+	return (szfilter != nullptr);
+}
+
 // Plot contact traction
 bool FEPlotContactTraction::Save(FESurface &surf, FEDataStream& a)
 {
@@ -284,8 +332,15 @@ bool FEPlotContactTraction::Save(FESurface &surf, FEDataStream& a)
 
 	// make sure the corresponding contact interface is active
 	// (in case the parent was not set, we'll proceed regardless)
-	FEContactInterface* pci = pcs->GetContactInterface(); assert(pci);
-	if ((pci == 0) || pci->IsActive())
+	FEContactInterface* pci = pcs->GetContactInterface();
+	bool write = false;
+	if (pci == nullptr) write = true;
+	else if (pci->IsActive())
+	{
+		if (m_interfaceName.empty() || (m_interfaceName == pci->GetName())) write = true;
+	}
+
+	if (write)
 	{
 		writeElementValue<vec3d>(surf, a, [=](int nface) {
 			vec3d tn;

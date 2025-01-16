@@ -93,7 +93,10 @@ class FEPlotContactGap : public FEPlotSurfaceData
 {
 public:
 	FEPlotContactGap(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_LENGTH); }
-    bool Save(FESurface& surf, FEDataStream& a);
+	bool SetFilter(const char* sz) override;
+	bool Save(FESurface& surf, FEDataStream& a);
+private:
+	std::string m_interfaceName;
 };
 
 //-----------------------------------------------------------------------------
@@ -112,8 +115,11 @@ public:
 class FEPlotContactPressure : public FEPlotSurfaceData
 {
 public:
-    FEPlotContactPressure(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM){ SetUnits(UNIT_PRESSURE); }
-    bool Save(FESurface& surf, FEDataStream& a);
+	FEPlotContactPressure(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM){ SetUnits(UNIT_PRESSURE); }
+	bool SetFilter(const char* sz) override;
+	bool Save(FESurface& surf, FEDataStream& a);
+private:
+	std::string m_interfaceName;
 };
 
 //-----------------------------------------------------------------------------
@@ -123,7 +129,10 @@ class FEPlotContactTraction : public FEPlotSurfaceData
 {
 public:
     FEPlotContactTraction(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_ITEM){ SetUnits(UNIT_PRESSURE); }
-    bool Save(FESurface& surf, FEDataStream& a);
+	bool SetFilter(const char* sz) override;
+	bool Save(FESurface& surf, FEDataStream& a);
+private:
+	std::string m_interfaceName;
 };
 
 //-----------------------------------------------------------------------------
