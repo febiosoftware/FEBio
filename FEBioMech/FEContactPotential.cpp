@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FECore/FENodeNodeList.h>
 #include <FECore/FEMesh.h>
 #include <FECore/log.h>
+#include <omp.h>
 
 void FEContactPotential::UpdateSurface(FESurface& surface)
 {
@@ -263,6 +264,7 @@ public:
 		BOX m_box;
 		set<FESurfaceElement*>	m_elemList;
 		vector<Cell*>	m_nbr;
+		int id = -1;
 	};
 
 	Cell* FindCell(const vec3d& r)
@@ -297,7 +299,11 @@ public:
 	}
 
 public:
-	Grid() { m_nx = m_ny = m_nz = 0; m_cell = nullptr; }
+	enum { MAX_OMP_LOCKS = 256 };
+	Grid() { 
+		m_nx = m_ny = m_nz = 0; m_cell = nullptr; 
+		if (lock == nullptr) init_locks();
+	}
 
 	bool Build(FESurface& s, int boxDivs, double minBoxSize)
 	{
@@ -375,7 +381,11 @@ public:
 			}
 		}
 
+
+		for (int i = 0; i < ncells; ++i) m_cell[i].id = (i% MAX_OMP_LOCKS);
+
 		// assign elements to grid cells
+#pragma omp parallel for
 		for (int i = 0; i < s.Elements(); ++i)
 		{
 			FESurfaceElement& el = s.Element(i);
@@ -386,8 +396,10 @@ public:
 				{
 					FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
 					Cell* c = FindCell(mp.m_rt); assert(c);
-					if (c == nullptr) return false;
+//					if (c == nullptr) return false;
+					omp_set_lock(lock + c->id);
 					c->add(&el);
+					omp_unset_lock(lock + c->id);
 				}
 			}
 		}
@@ -409,7 +421,27 @@ protected:
 	BOX		box;
 	int		m_nx, m_ny, m_nz;
 	Cell*	m_cell;
+
+public:
+	static omp_lock_t* lock;
+	static void init_locks()
+	{
+		lock = new omp_lock_t[MAX_OMP_LOCKS];
+		for (int i = 0; i < MAX_OMP_LOCKS; ++i) omp_init_lock(lock + i);
+	}
+
+	static void delete_locks()
+	{
+		if (lock)
+		{
+			for (int i = 0; i < MAX_OMP_LOCKS; ++i) omp_destroy_lock(lock + i);
+			delete[] lock;
+			lock = nullptr;
+		}
+	}
 };
+
+omp_lock_t* FEContactPotential::Grid::lock = nullptr;
 
 // initialization
 bool FEContactPotential::Init()
@@ -419,6 +451,11 @@ bool FEContactPotential::Init()
 	m_activeElements.resize(m_surf1.Elements());
 	m_NNL.Create(m_surf1);
 	return true;
+}
+
+FEContactPotential::~FEContactPotential()
+{
+	Grid::delete_locks();
 }
 
 void FEContactPotential::BuildNeighborTable()
@@ -482,7 +519,7 @@ void FEContactPotential::Update()
 	}
 
 	// build the list of active elements
-#pragma omp parallel for shared(g) schedule(dynamic)
+#pragma omp parallel for shared(g) schedule(dynamic, 5)
 	for (int i = 0; i < m_surf1.Elements(); ++i)
 	{
 		FESurfaceElement& el1 = m_surf1.Element(i);
@@ -645,6 +682,9 @@ double FEContactPotential::PotentialDerive2(double r)
 void FEContactPotential::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	const int ndof = 3;
+
+	// don't bother if kc is zero
+	if (m_kc <= 0) return;
 
 	// clear all contact tractions
 #pragma omp parallel
@@ -819,6 +859,9 @@ void FEContactPotential::ElementForce(FESurfaceElement& el1, FESurfaceElement& e
 void FEContactPotential::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	const int ndof = 3;
+
+	// don't bother if kc is zero
+	if (m_kc <= 0) return;
 
 	// loop over all elements of surf 1
 #pragma omp parallel for shared(LS)

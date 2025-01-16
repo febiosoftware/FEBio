@@ -64,6 +64,7 @@ class FEContactPotential : public FEContactInterface
 
 public:
 	FEContactPotential(FEModel* fem);
+	~FEContactPotential();
 
 	// -- From FESurfacePairConstraint
 public:
