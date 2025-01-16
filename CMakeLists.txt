@@ -330,9 +330,8 @@ endif()
 
 # Manually pull in include dirs for OpenMP on macOS
 if(APPLE)
-{
     target_include_directories(febiomech PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
-}
+endif()
 
 # Link Pardiso-project
 if(USE_PDL)
