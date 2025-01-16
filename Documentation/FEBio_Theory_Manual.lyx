@@ -12764,6 +12764,306 @@ nolink "false"
 \end_layout
 
 \begin_layout Subsection
+Wall Shear Stress
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Wall-Shear-Stress"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider a no-slip impermeable wall (a wall on which the fluid velocity is equal to the wall velocity,
+ 
+\begin_inset Formula $\mathbf{v}=\mathbf{v}_{\Gamma}$
+\end_inset
+
+).
+ Let 
+\begin_inset Formula $\left\{ \mathbf{n},\mathbf{s},\mathbf{t}\right\} $
+\end_inset
+
+ be an orthonormal basis where 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is the outward normal to the fluid on the wall,
+ 
+\begin_inset Formula $\mathbf{s}$
+\end_inset
+
+ is a unit tangent to the wall along the local direction of the flow (in the immediate wall vicinity),
+ and 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ is a unit tangent to the wall in the direction orthogonal to 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{s}$
+\end_inset
+
+.
+ The components of the velocity gradient 
+\begin_inset Formula $\mathbf{L}=\grad\mathbf{v}$
+\end_inset
+
+ on the wall,
+ when expressed in matrix form in the basis 
+\begin_inset Formula $\left\{ \mathbf{n},\mathbf{s},\mathbf{t}\right\} $
+\end_inset
+
+,
+ are zero in the directions of the wall tangent (since there is no variation in any of the velocity components along those directions).
+ Moreover,
+ by construction,
+ the tangential velocity component 
+\begin_inset Formula $v_{t}$
+\end_inset
+
+ along 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ is zero,
+ not only on the wall but also in its vicinity (thus,
+ 
+\begin_inset Formula $\partial v_{t}/\partial x_{n}=0$
+\end_inset
+
+).
+ Combining these factors produces
+\begin_inset Formula 
+\begin{equation}
+\left[\mathbf{L}\right]=\left[\begin{array}{ccc}
+\frac{\partial v_{n}}{\partial x_{n}} & \frac{\partial v_{n}}{\partial x_{s}} & \frac{\partial v_{n}}{\partial x_{t}}\\
+\frac{\partial v_{s}}{\partial x_{n}} & \frac{\partial v_{s}}{\partial x_{s}} & \frac{\partial v_{s}}{\partial x_{t}}\\
+\frac{\partial v_{t}}{\partial x_{n}} & \frac{\partial v_{t}}{\partial x_{s}} & \frac{\partial v_{t}}{\partial x_{t}}
+\end{array}\right]=\left[\begin{array}{ccc}
+\frac{\partial v_{n}}{\partial x_{n}} & 0 & 0\\
+\frac{\partial v_{s}}{\partial x_{n}} & 0 & 0\\
+0 & 0 & 0
+\end{array}\right]\label{eq:wss-L}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $dx_{n}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $dx_{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $dx_{t}$
+\end_inset
+
+ represent line elements along each of the coordinate directions.
+ The resulting rate of deformation tensor is
+\begin_inset Formula 
+\begin{equation}
+\left[\mathbf{D}\right]=\frac{1}{2}\left(\left[\mathbf{L}\right]+\left[\mathbf{L}\right]^{T}\right)=\left[\begin{array}{ccc}
+\frac{\partial v_{n}}{\partial x_{n}} & \frac{1}{2}\frac{\partial v_{s}}{\partial x_{n}} & 0\\
+\frac{1}{2}\frac{\partial v_{s}}{\partial x_{n}} & 0 & 0\\
+0 & 0 & 0
+\end{array}\right]\label{eq:wss=D}
+\end{equation}
+
+\end_inset
+
+Therefore the fluid stress evaluated from Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:stress"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ will typically have the form
+\begin_inset Formula 
+\begin{equation}
+\left[\boldsymbol{\sigma}\right]=-p\left[\mathbf{I}\right]+\left(\kappa-\frac{2}{3}\mu\right)\left(\tr\mathbf{D}\right)\left[\mathbf{I}\right]+2\mu\left[\mathbf{D}\right]=\left[\begin{array}{ccc}
+-p+\left(\kappa+\frac{4}{3}\eta\right)\frac{\partial v_{n}}{\partial x_{n}} & \mu\frac{\partial v_{s}}{\partial x_{n}} & 0\\
+\mu\frac{\partial v_{s}}{\partial x_{n}} & -p & 0\\
+0 & 0 & -p
+\end{array}\right]\label{eq:wss-stress}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\kappa$
+\end_inset
+
+ is the bulk viscosity and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ is the shear viscosity (which may be a function of the rate of deformation in the case of a non-Newtonian fluid),
+ see Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:viscous-stress"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Viscous-Fluids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ From this result we conclude that the wall shear stress is
+\begin_inset Formula 
+\begin{equation}
+\sigma_{ns}=\sigma_{sn}=\mu\frac{\partial v_{s}}{\partial x_{n}}\label{eq:wss-shear-stress}
+\end{equation}
+
+\end_inset
+
+In practice it is inconvenient to evaluate this wall shear stress in a local coordinate system attached to the wall and directed along the flow in the wall vicinity.
+ As it turns out,
+ the principal normal stresses evaluated from 
+\begin_inset Formula $\left[\boldsymbol{\sigma}\right]$
+\end_inset
+
+ in Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:wss-stress"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ are
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\sigma_{1} & =-p & \sigma_{2} & =-p+\frac{1}{2}\left(\sigma_{nn}-\sqrt{\sigma_{nn}^{2}+4\sigma_{sn}^{2}}\right) & \sigma_{3} & =-p+\frac{1}{2}\left(\sigma_{nn}+\sqrt{\sigma_{nn}^{2}+4\sigma_{sn}^{2}}\right)\end{aligned}
+\label{eq:wss-principal-normal}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\sigma_{nn} & =-p+\left(\kappa+\frac{4}{3}\mu\right)\frac{\partial v_{n}}{\partial x_{n}} & \sigma_{sn} & =\mu\frac{\partial v_{s}}{\partial x_{n}}\end{aligned}
+\label{eq:wss-normal-shear-tractions}
+\end{equation}
+
+\end_inset
+
+Thus,
+ the maximum shear stress is
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\sigma_{s,\text{max}} & =\max\left(\frac{\left|\sigma_{1}-\sigma_{2}\right|}{2},\frac{\left|\sigma_{2}-\sigma_{3}\right|}{2},\frac{\left|\sigma_{3}-\sigma_{1}\right|}{2}\right)\\
+ & =\max\left(\frac{1}{4}\left|\sigma_{nn}-\sqrt{\sigma_{nn}^{2}+4\sigma_{sn}^{2}}\right|,\frac{1}{2}\left|\sqrt{\sigma_{nn}^{2}+4\sigma_{sn}^{2}}\right|,\frac{1}{4}\left|\sigma_{nn}+\sqrt{\sigma_{nn}^{2}+4\sigma_{sn}^{2}}\right|\right)
+\end{aligned}
+\label{eq:wss-max-shear-stress-general}
+\end{equation}
+
+\end_inset
+
+When the flow is incompressible it follows that 
+\begin_inset Formula $\tr\mathbf{D}=\frac{\partial v_{n}}{\partial x_{n}}=0$
+\end_inset
+
+,
+ in which case 
+\begin_inset Formula $\boldsymbol{\sigma}_{nn}=-p$
+\end_inset
+
+ according to Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:wss-normal-shear-tractions"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Thus,
+\begin_inset Formula 
+\begin{equation}
+\sigma_{s,\text{max}}=\max\left(\frac{\left|\sigma_{ns}\right|}{2},\left|\sigma_{ns}\right|,\frac{\left|\sigma_{ns}\right|}{2}\right)=\left|\sigma_{sn}\right|\label{eq:wss-max-shear-incompressible}
+\end{equation}
+
+\end_inset
+
+Therefore,
+ when the flow is incompressible the wall shear stress is equal to the maximum fluid shear stress.
+ This result makes it convenient to use the maximum fluid shear stress on the wall as the value of the wall shear stress.
+ Conversely,
+ if the flow is compressible (which is generally the case in FEBio) but as long as
+\begin_inset Formula 
+\begin{equation}
+\left|\sigma_{nn}\right|\ll2\left|\sigma_{sn}\right|\label{eq:wss-negligible-normal}
+\end{equation}
+
+\end_inset
+
+the conclusion remains the same.
+ Therefore,
+ in most applications one can use the maximum fluid shear stress as a method for estimating the wall shear stress.
+ This result remains valid for problems where the wall is not stationary,
+ such as fluid-structure interaction problems.
+ In practice one can always examine the principal normal stresses in the fluid,
+ along the wall,
+ from which one can deduce if Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:wss-negligible-normal"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ is satisfied satisfactorily.
+\end_layout
+
+\begin_layout Standard
+However,
+ if the wall is porous or if slippage is allowed,
+ then the wall velocity components are not necessarily zero or negligible.
+ Thus,
+ the maximum shear stress is not always equal to the wall shear stress.
+\end_layout
+
+\begin_layout Subsection
 Energy Balance
 \begin_inset CommandInset label
 LatexCommand label
@@ -47651,6 +47951,13 @@ Here,
 
 \begin_layout Section
 Viscous Fluids
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Viscous-Fluids"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

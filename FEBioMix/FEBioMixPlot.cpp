@@ -1523,7 +1523,7 @@ bool FEPlotEffectiveElasticity::Save(FEDomain &dom, FEDataStream& a)
 		for (int j=0; j<nint; ++j)
 		{
 			FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-			if      (pb ) s += pb->Tangent(pt);
+            if      (pb ) s += (pb->Tangent(pt)).supersymm();
 			else if (pbs) s += pbs->Tangent(pt);
 			else if (ptp) s += ptp->Tangent(pt);
 			else if (pmp) s += pmp->Tangent(pt);
