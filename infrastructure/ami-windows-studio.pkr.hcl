@@ -206,6 +206,12 @@ build {
     env    = local.environment
   }
 
+   # python
+  provisioner "windows-shell" {
+    script = "./common/windows/python.bat"
+    env    = local.environment
+  }
+
   # sysprep for next launch
   provisioner "powershell" {
     inline = [
