@@ -136,6 +136,8 @@ if(WIN32)
     add_compile_options(/MP /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
     set(CMAKE_BUILD_RPATH @executable_path/../lib/;@executable_path/../Frameworks)
+    set(OMP_INC "" CACHE PATH "Path to the OMP include directory")
+    mark_as_advanced(OMP_INC)
 else()
 	add_compile_options(-fopenmp -w)
     
@@ -324,6 +326,11 @@ else()
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
+endif()
+
+# Manually pull in include dirs for OpenMP on macOS
+if(APPLE)
+    target_include_directories(febiomech PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
 endif()
 
 # Link Pardiso-project
