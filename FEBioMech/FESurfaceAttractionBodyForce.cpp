@@ -34,10 +34,10 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 BEGIN_FECORE_CLASS(FESurfaceAttractionBodyForce, FEBodyForce);
-    ADD_PARAMETER(m_blt     , "blt"          );
+    ADD_PARAMETER(m_blt     , "blt"          )->setUnits(UNIT_LENGTH);
     ADD_PARAMETER(m_bsf     , "bsf"          );
     ADD_PARAMETER(m_stol    , "search_tol"   );
-    ADD_PARAMETER(m_sradius , "search_radius");
+    ADD_PARAMETER(m_sradius , "search_radius")->setUnits(UNIT_LENGTH);
 
 	ADD_PROPERTY(m_s, "surface", FEProperty::Reference);
 END_FECORE_CLASS();
