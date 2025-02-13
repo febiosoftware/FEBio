@@ -164,6 +164,10 @@ bool PardisoSolver::PreProcess()
 	// increase the reordering time.
 	m_iparm[18] = 0; 
 
+	// check the matrix offset
+	m_iparm[34] = 0;
+	if (m_pA->Offset() == 0) m_iparm[34] = 1;
+
 	m_n = m_pA->Rows();
 	m_nnz = m_pA->NonZeroes();
 	m_nrhs = 1;
