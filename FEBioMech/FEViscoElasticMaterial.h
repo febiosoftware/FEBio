@@ -105,7 +105,7 @@ public:
 
 public: 
 	// material parameters
-	double	m_g0;			//!< intitial visco-elastic coefficient
+	FEParamDouble m_g0;			//!< intitial visco-elastic coefficient
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
 	double	m_t[MAX_TERMS];	//!< relaxation times
 
