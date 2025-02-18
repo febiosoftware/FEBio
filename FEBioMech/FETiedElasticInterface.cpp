@@ -50,6 +50,8 @@ BEGIN_FECORE_CLASS(FETiedElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_srad     , "search_radius"      );
 	ADD_PARAMETER(m_naugmin  , "minaug"             );
 	ADD_PARAMETER(m_naugmax  , "maxaug"             );
+	ADD_PARAMETER(m_bflips   , "flip_primary"       );
+	ADD_PARAMETER(m_bflipm   , "flip_secondary"     );
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -267,7 +269,10 @@ FETiedElasticInterface::FETiedElasticInterface(FEModel* pfem) : FEContactInterfa
     
     m_naugmin = 0;
     m_naugmax = 10;
-    
+
+	m_bflips = false;
+	m_bflipm = false;
+
     // set parents
     m_ss.SetContactInterface(this);
     m_ms.SetContactInterface(this);
@@ -288,6 +293,13 @@ bool FETiedElasticInterface::Init()
     // initialize surface data
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
+
+	// Flip secondary and primary surfaces, if requested.
+	// Note that we turn off those flags because otherwise we keep flipping, each time we get here (e.g. in optimization)
+	// TODO: Of course, we shouldn't get here more than once. I think we also get through the FEModel::Reset, so I'll have
+	//       look into that. 
+	if (m_bflips) { m_ss.Invert(); m_bflips = false; }
+	if (m_bflipm) { m_ms.Invert(); m_bflipm = false; }
     
     return true;
 }
