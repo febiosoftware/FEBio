@@ -114,6 +114,8 @@ SOFTWARE.*/
 #include "FEVerondaWestmann.h"
 #include "FEViscoElasticDamage.h"
 #include "FEViscoElasticMaterial.h"
+#include "FESIVViscoelastic.h"
+#include "FESIVViscoelasticUC.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEElasticFiberMaterial.h"
 #include "FEElasticFiberMaterialUC.h"
@@ -361,6 +363,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEStVenantKirchhoff, "St.Venant-Kirchhoff");
     REGISTER_FECORE_CLASS(FEViscoElasticDamage, "viscoelastic damage");
 	REGISTER_FECORE_CLASS(FEViscoElasticMaterial, "viscoelastic");
+    REGISTER_FECORE_CLASS(FESIVViscoelastic, "SIV-viscoelastic");
 	REGISTER_FECORE_CLASS(FEElasticMultigeneration, "multigeneration");
 	REGISTER_FECORE_CLASS(FERemodelingElasticMaterial, "remodeling solid");
 	REGISTER_FECORE_CLASS(FECarterHayesOld, "Carter-Hayes (old)");
@@ -416,6 +419,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEVerondaWestmann, "Veronda-Westmann");
     REGISTER_FECORE_CLASS(FEUncoupledViscoElasticDamage, "uncoupled viscoelastic damage");
 	REGISTER_FECORE_CLASS(FEUncoupledViscoElasticMaterial, "uncoupled viscoelastic");
+    REGISTER_FECORE_CLASS(FESIVViscoelasticUC, "SIV-uncoupled viscoelastic");
 	REGISTER_FECORE_CLASS(FEMRVonMisesFibers, "Mooney-Rivlin von Mises Fibers");
 	REGISTER_FECORE_CLASS(FEUncoupledActiveContraction, "uncoupled active contraction");
 	REGISTER_FECORE_CLASS(FEContinuousFiberDistributionUC, "continuous fiber distribution uncoupled");
