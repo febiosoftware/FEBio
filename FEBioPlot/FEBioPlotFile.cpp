@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
 #include <FECore/FESurface.h>
+#include <FECore/FEEdge.h>
 #include <FECore/FEPlotDataStore.h>
 #include <FECore/log.h>
 #include <FECore/FEPIDController.h>
@@ -347,6 +348,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		case FE_REGION_NODE   : return AddNodalVariable(ps, sz, item);
 		case FE_REGION_DOMAIN : return AddDomainVariable(ps, sz, item);
 		case FE_REGION_SURFACE: return AddSurfaceVariable(ps, sz, item);
+		case FE_REGION_EDGE   : return AddEdgeVariable(ps, sz, item);
 		default:
 			assert(false);
 			return false;
@@ -526,6 +528,27 @@ bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* s
 	return false;
 }
 
+bool FEBioPlotFile::Dictionary::AddEdgeVariable(FEPlotData* ps, const char* szname, vector<int>& item)
+{
+	assert(ps->RegionType() == FE_REGION_EDGE);
+	if (ps->RegionType() == FE_REGION_EDGE)
+	{
+		DICTIONARY_ITEM it;
+		it.m_ntype = ps->DataType();
+		it.m_nfmt = ps->StorageFormat();
+		it.m_psave = ps;
+		it.m_arraySize = ps->GetArraysize();
+		it.m_arrayNames = ps->GetArrayNames();
+		strcpy(it.m_szname, szname);
+		if (ps->GetUnits())
+		{
+			strcpy(it.m_szunit, ps->GetUnits());
+		}
+		m_Edge.push_back(it);
+		return true;
+	}
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
@@ -838,6 +861,16 @@ bool FEBioPlotFile::WriteDictionary(FEModel& fem)
 		m_ar.EndChunk();
 	}
 
+	// store edge variables
+	if (dic.EdgeVariables())
+	{
+		m_ar.BeginChunk(PLT_DIC_EDGE);
+		{
+			WriteDicList(dic.EdgeVariableList());
+		}
+		m_ar.EndChunk();
+	}
+
 	return true;
 }
 
@@ -908,6 +941,16 @@ bool FEBioPlotFile::WriteMeshSection(FEModel& fem)
 			m_ar.BeginChunk(PLT_SURFACE_SECTION);
 			{
 				WriteSurfaceSection(m);
+			}
+			m_ar.EndChunk();
+		}
+
+		// edge section
+		if (m.Edges() > 0)
+		{
+			m_ar.BeginChunk(PLT_EDGE_SECTION);
+			{
+				WriteEdgeSection(m);
 			}
 			m_ar.EndChunk();
 		}
@@ -1397,7 +1440,45 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 	}
 }
 
-//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteEdgeSection(FEMesh& m)
+{
+	for (int i = 0; i < m.Edges(); ++i)
+	{
+		FEEdge& edge = m.Edge(i);
+		int NE = edge.Elements();
+		int maxNodes = 3;
+
+		m_ar.BeginChunk(PLT_EDGE);
+		{
+			m_ar.BeginChunk(PLT_EDGE_HDR);
+			{
+				int id = i + 1;
+				m_ar.WriteChunk(PLT_EDGE_ID, id);
+				m_ar.WriteChunk(PLT_EDGE_LINES, NE);
+				m_ar.WriteChunk(PLT_EDGE_NAME, edge.GetName());
+				m_ar.WriteChunk(PLT_EDGE_MAX_NODES, maxNodes);
+			}
+			m_ar.EndChunk();
+
+			m_ar.BeginChunk(PLT_EDGE_LIST);
+			{
+				int n[FEElement::MAX_NODES + 2];
+				for (int j = 0; j < NE; ++j)
+				{
+					FELineElement& el = edge.Element(j);
+					int ne = el.Nodes();
+					n[0] = i + 1;
+					n[1] = ne;
+					for (int i = 0; i < ne; ++i) n[i + 2] = el.m_node[i];
+					m_ar.WriteChunk(PLT_LINE, n, maxNodes + 2);
+				}
+			}
+			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
+	}
+}
+
 void FEBioPlotFile::WriteNodeSetSection(FEMesh& m)
 {
 	for (int ns = 0; ns < m.NodeSets(); ++ns)
@@ -1644,6 +1725,16 @@ bool FEBioPlotFile::Write(float ftime, int flag)
 				}
 				m_ar.EndChunk();
 			}
+
+			// edge data
+			if (dic.EdgeVariables() > 0)
+			{
+				m_ar.BeginChunk(PLT_EDGE_DATA);
+				{
+					WriteEdgeData(fem);
+				}
+				m_ar.EndChunk();
+			}
 		}
 		m_ar.EndChunk();
 
@@ -1742,6 +1833,27 @@ void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
 			{
 				if (it->m_psave) WriteSurfaceDataField(fem, it->m_psave);
+			}
+			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
+	}
+}
+
+void FEBioPlotFile::WriteEdgeData(FEModel& fem)
+{
+	PlotFile::Dictionary& dic = GetDictionary();
+	auto& edgeData = dic.EdgeVariableList();
+	list<DICTIONARY_ITEM>::iterator it = edgeData.begin();
+	for (int i = 0; i < (int)edgeData.size(); ++i, ++it)
+	{
+		m_ar.BeginChunk(PLT_STATE_VARIABLE);
+		{
+			unsigned int nid = i + 1;
+			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
+			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
+			{
+				if (it->m_psave) WriteEdgeDataField(fem, it->m_psave);
 			}
 			m_ar.EndChunk();
 		}
@@ -1859,6 +1971,78 @@ void FEBioPlotFile::WriteSurfaceDataField(FEModel& fem, FEPlotData* pd)
 						m_ar.WriteData(i + 1, b.data());
 					}
 				}
+			}
+		}
+	}
+}
+
+void FEBioPlotFile::WriteEdgeDataField(FEModel& fem, FEPlotData* pd)
+{
+	// get the edge name (if any)
+	string domName;
+	const char* szdom = pd->GetDomainName();
+	if (szdom) domName = szdom;
+
+	// loop over all edges
+	FEMesh& m = fem.GetMesh();
+	for (int i = 0; i < m.Edges(); ++i)
+	{
+		FEEdge& edge = m.Edge(i);
+		int maxNodes = 3;
+
+		// Determine data size.
+		// Note that for the FMT_MULT case we are 
+		// assuming 9 data entries per facet
+		// regardless of the nr of nodes a facet really has
+		// this is because for surfaces, all elements are not
+		// necessarily of the same type
+		// TODO: Fix the assumption of the FMT_MULT
+		int datasize = pd->VarSize(pd->DataType());
+		int nsize = datasize;
+		switch (pd->StorageFormat())
+		{
+		case FMT_NODE: nsize *= edge.Nodes(); break;
+		case FMT_ITEM: nsize *= edge.Elements(); break;
+		case FMT_MULT: nsize *= maxNodes * edge.Elements(); break;
+		case FMT_REGION:
+			// one value per edge so nsize remains unchanged
+			break;
+		default:
+			assert(false);
+		}
+
+		// save data
+		FEDataStream a; a.reserve(nsize);
+		if (pd->Save(edge, a))
+		{
+			// in FEBio 3.0, the data streams are assumed to have no padding, but for now we still need to pad 
+			// the data stream before we write it to the file
+			if (a.size() == nsize)
+			{
+				// assumed padding is already there, or not needed
+				m_ar.WriteData(i + 1, a.data());
+			}
+			else
+			{
+				// this is only needed for FMT_MULT storage
+				assert(pd->StorageFormat() == FMT_MULT);
+
+				// add padding
+				const int M = maxNodes;
+				int m = 0;
+				FEDataStream b; b.assign(nsize, 0.f);
+				for (int n = 0; n < edge.Elements(); ++n)
+				{
+					FELineElement& el = edge.Element(n);
+					int ne = el.Nodes();
+					for (int j = 0; j < ne; ++j)
+					{
+						for (int k = 0; k < datasize; ++k) b[n * M * datasize + j * datasize + k] = a[m++];
+					}
+				}
+
+				// write the padded data
+				m_ar.WriteData(i + 1, b.data());
 			}
 		}
 	}

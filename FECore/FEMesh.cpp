@@ -384,8 +384,9 @@ void FEMesh::Clear()
 	m_Node.clear();
 	for (size_t i=0; i<m_Domain.size (); ++i) delete m_Domain [i];
 
-	// TODO: Surfaces are currently managed by the classes that use them so don't delete them
-//	for (size_t i=0; i<m_Surf.size   (); ++i) delete m_Surf   [i];
+	// TODO: Surfaces and edges are currently managed by the classes that use them so don't delete them
+//	for (size_t i=0; i<m_Surf.size   (); ++i) delete m_Surf[i];
+//	for (size_t i=0; i<m_Edge.size   (); ++i) delete m_Edge[i];
 
 	for (size_t i=0; i<m_NodeSet.size (); ++i) delete m_NodeSet [i];
 	for (size_t i=0; i<m_LineSet.size (); ++i) delete m_LineSet [i];

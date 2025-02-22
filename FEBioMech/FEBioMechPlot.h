@@ -1566,3 +1566,14 @@ public:
 	FEPlotBodyForce(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_FORCE); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//=============================================================================
+//                            E D G E   D A T A
+//=============================================================================
+
+class FEPlotBeamContactGap : public FEPlotEdgeData
+{
+public:
+	FEPlotBeamContactGap(FEModel* fem) : FEPlotEdgeData(fem, PLT_FLOAT, FMT_NODE) { SetUnits(UNIT_LENGTH); }
+	bool Save(FEEdge& edge, FEDataStream& a);
+};

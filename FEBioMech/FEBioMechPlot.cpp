@@ -73,6 +73,7 @@ SOFTWARE.*/
 #include <FECore/FEElement.h>
 #include <FEBioMech/FEElasticBeamDomain.h>
 #include <FEBioMech/FEElasticBeamMaterial.h>
+#include <FEBioMech/FEEdgeToSurfaceSlidingContact.h>
 #include "FEIdealGasPressure.h"
 #include "FEBodyForce.h"
 
@@ -4900,4 +4901,18 @@ bool FEPlotBodyForce::Save(FEDomain& dom, FEDataStream& a)
 		return true;
 	}
 	return false;
+}
+
+bool FEPlotBeamContactGap::Save(FEEdge& edge, FEDataStream& a)
+{
+	FEEdgeToSurfaceSlidingContactEdge* pe = dynamic_cast<FEEdgeToSurfaceSlidingContactEdge*>(&edge);
+	if (pe == nullptr) return false;
+
+	for (int i = 0; i < pe->Nodes(); ++i)
+	{
+		FEE2SSlidingContactPoint& pt = pe->m_points[i];
+		a << pt.m_gap;
+	}
+
+	return true;
 }

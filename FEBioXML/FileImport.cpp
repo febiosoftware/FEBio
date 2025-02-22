@@ -1199,8 +1199,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					if (edgeList == nullptr) throw XMLReader::InvalidValue(tag);
 
 					FEEdge* edge = dynamic_cast<FEEdge*>(prop->get(0));
-					GetBuilder()->BuildEdge(*edge, *edgeList);
-//					mesh.AddEdge(edge); // I think that makes the mesh the owner, which is not the case!
+					if (edge == nullptr) throw XMLReader::InvalidValue(tag);
+
+					if (GetBuilder()->BuildEdge(*edge, *edgeList))
+						mesh.AddEdge(edge);
+					else
+						throw XMLReader::InvalidValue(tag);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
