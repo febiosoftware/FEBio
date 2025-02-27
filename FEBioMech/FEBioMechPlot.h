@@ -1571,9 +1571,9 @@ public:
 //                            E D G E   D A T A
 //=============================================================================
 
-class FEPlotBeamContactGap : public FEPlotEdgeData
+class FEPlotEdgeContactGap : public FEPlotEdgeData
 {
 public:
-	FEPlotBeamContactGap(FEModel* fem) : FEPlotEdgeData(fem, PLT_FLOAT, FMT_NODE) { SetUnits(UNIT_LENGTH); }
+	FEPlotEdgeContactGap(FEModel* fem) : FEPlotEdgeData(fem, PLT_FLOAT, FMT_NODE) { SetUnits(UNIT_LENGTH); }
 	bool Save(FEEdge& edge, FEDataStream& a);
 };

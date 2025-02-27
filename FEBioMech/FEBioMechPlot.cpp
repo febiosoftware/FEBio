@@ -4903,7 +4903,7 @@ bool FEPlotBodyForce::Save(FEDomain& dom, FEDataStream& a)
 	return false;
 }
 
-bool FEPlotBeamContactGap::Save(FEEdge& edge, FEDataStream& a)
+bool FEPlotEdgeContactGap::Save(FEEdge& edge, FEDataStream& a)
 {
 	FEEdgeToSurfaceSlidingContactEdge* pe = dynamic_cast<FEEdgeToSurfaceSlidingContactEdge*>(&edge);
 	if (pe == nullptr) return false;

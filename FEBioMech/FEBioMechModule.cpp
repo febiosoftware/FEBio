@@ -903,7 +903,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotBeamReferenceStress      , "beam reference stress");
 	REGISTER_FECORE_CLASS(FEPlotBeamReferenceStressCouple, "beam reference stress couple");
 
-	REGISTER_FECORE_CLASS(FEPlotBeamContactGap, "beam contact gap");
+	REGISTER_FECORE_CLASS(FEPlotEdgeContactGap, "edge contact gap");
 
 	// 2O continuum fields
 	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "s norm");
