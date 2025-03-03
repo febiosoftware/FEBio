@@ -29,19 +29,11 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEBioApp.h"
 
-#ifdef USE_MPI
-#include <mpi.h>
-#endif
-
 //-----------------------------------------------------------------------------
 // The starting point of the application
 //
 int main(int argc, char* argv[])
 {
-#ifdef USE_MPI
-	MPI_Init(&argc, &argv);
-#endif
-
 	// create the FEBio app
 	FEBioApp febio;
 
@@ -53,10 +45,6 @@ int main(int argc, char* argv[])
 
 	// Don't forget to cleanup
 	febio.Finish();
-
-#ifdef USE_MPI
-	MPI_Finalize();
-#endif
 
 	return nret;
 }
