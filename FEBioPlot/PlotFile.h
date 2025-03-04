@@ -128,6 +128,8 @@ public:
 public:
 	Dictionary& GetDictionary() { return m_dic; }
 
+	bool AddVariable(FEPlotData* ps, const char* szname);
+
 protected:
 	FEModel* GetFEModel() { return m_pfem; }
 
@@ -135,7 +137,6 @@ protected:
 	void BuildDictionary();
 
 	//! Add a variable to the dictionary
-	bool AddVariable(FEPlotData* ps, const char* szname);
 	bool AddVariable(const char* sz);
 	bool AddVariable(const char* sz, std::vector<int>& item, const char* szdom = "");
 
