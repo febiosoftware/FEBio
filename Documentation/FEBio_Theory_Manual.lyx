@@ -2880,24 +2880,7 @@ where
 \begin_inset Formula $\gamma=\frac{\pi}{2}-\theta$
 \end_inset
 
- is its complementary angle (
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-figurename
-\end_layout
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
+ is its complementary angle (Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig17"
@@ -39173,24 +39156,7 @@ literal "false"
  though we make minor modifications and extensions to his presentation here.
  Consider that the microstructural model of this viscoelastic material consists of a spring and dashpot in series (a Maxwell model),
  combined with a spring in parallel,
- which is equivalent to the Maxwell representation of a standard linear solid in linear viscoelasticity (
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-figurename
-\end_layout
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
+ which is equivalent to the Maxwell representation of a standard linear solid in linear viscoelasticity (Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:spring-dashpot-model"
@@ -41057,24 +41023,7 @@ literal "false"
 \begin_inset Formula $\tau_{1}\le\tau\le\tau_{2}$
 \end_inset
 
- it takes the form (
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-figurename
-\end_layout
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
+ it takes the form (Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Malkin-relaxation-spectrum"
@@ -41181,24 +41130,7 @@ nolink "false"
 
 \end_inset
 
- this continuous relaxation spectrum produces the reduced relaxation function (
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-figurename
-\end_layout
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
+ this continuous relaxation spectrum produces the reduced relaxation function (Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Malkin-reduced-relaxation"
@@ -41332,24 +41264,7 @@ nolink "false"
 \end_layout
 
 \begin_layout Standard
-Another example for a continuous relaxation spectrum is the exponential spectrum (
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-figurename
-\end_layout
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
+Another example for a continuous relaxation spectrum is the exponential spectrum (Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:exponential-relaxation-spectrum"
@@ -41442,24 +41357,7 @@ where
 \end_inset
 
  is the modified Bessel function of the second kind,
- of order 1 (
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-figurename
-\end_layout
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
+ of order 1 (Figure 
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "fig:relaxation-continuous-exponential"
@@ -52559,9 +52457,6 @@ literal "false"
 \size normal
 \emph off
 \bar no
-\strikeout off
-\uuline off
-\uwave off
 \noun off
 \color none
  
@@ -52575,9 +52470,6 @@ literal "false"
 \size default
 \emph default
 \bar default
-\strikeout default
-\uuline default
-\uwave default
 \noun default
 \color inherit
  and 
