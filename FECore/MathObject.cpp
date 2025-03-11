@@ -126,6 +126,11 @@ int MSimpleExpression::Items()
 	else return 1;
 }
 
+bool MSimpleExpression::IsValid() const
+{
+	return (m_item.ItemPtr() != nullptr);
+}
+
 //-----------------------------------------------------------------------------
 double MSimpleExpression::value(const std::string& s)
 {

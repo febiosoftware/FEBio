@@ -105,6 +105,8 @@ public:
 
 	int Items();
 
+	bool IsValid() const;
+
 protected:
 	double value(const MItem* pi) const;
 	double value(const MItem* pi, const std::vector<double>& var) const;

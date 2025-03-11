@@ -139,6 +139,18 @@ double FENodeForceX::value(const FENode& node)
 		const vector<int>& id = node.m_ID;
 		return (-id[0] - 2 >= 0 ? Fr[-id[0] - 2] : 0);
 	}
+
+	// This code is from the "reaction forces" plot variable
+	// TODO: Need to check if code above produces the same answer as below. If so, 
+	//       just use code below.
+	FEModel& fem = *GetFEModel();
+	int dofX = fem.GetDOFIndex("x");
+	if (dofX >= 0)
+	{
+		double Rx = node.get_load(dofX);
+		return Rx;
+	}
+
 	return 0;
 }
 
@@ -152,6 +164,18 @@ double FENodeForceY::value(const FENode& node)
 		const vector<int>& id = node.m_ID;
 		return (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);
 	}
+
+	// This code is from the "reaction forces" plot variable
+	// TODO: Need to check if code above produces the same answer as below. If so, 
+	//       just use code below.
+	FEModel& fem = *GetFEModel();
+	int dofY = fem.GetDOFIndex("y");
+	if (dofY >= 0)
+	{
+		double Ry = node.get_load(dofY);
+		return Ry;
+	}
+
 	return 0;
 }
 
@@ -173,6 +197,18 @@ double FENodeForceZ::value(const FENode& node)
 		const vector<int>& id = node.m_ID;
 		return (-id[2] - 2 >= 0 ? Fr[-id[2] - 2] : 0);
 	}
+
+	// This code is from the "reaction forces" plot variable
+	// TODO: Need to check if code above produces the same answer as below. If so, 
+	//       just use code below.
+	FEModel& fem = *GetFEModel();
+	int dofZ = fem.GetDOFIndex("z");
+	if (dofZ >= 0)
+	{
+		double Rz = node.get_load(dofZ);
+		return Rz;
+	}
+
 	return 0;
 }
 

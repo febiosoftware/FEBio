@@ -39,14 +39,16 @@ enum Region_Type {
 	FE_REGION_GLOBAL,
 	FE_REGION_NODE,
 	FE_REGION_DOMAIN,
-	FE_REGION_SURFACE
+	FE_REGION_SURFACE,
+	FE_REGION_EDGE
 };
 
 //-----------------------------------------------------------------------------
 // forward declarations
 class FEModel;
-class FENode;
 class FEMesh;
+class FENode;
+class FEEdge;
 class FESurface;
 class FEDomain;
 class FESolidDomain;
@@ -88,8 +90,8 @@ public:
 	void SetItemList(vector<int>& item) { m_item = item; }
 
 	vector<int> GetItemList() { return m_item; }
-    
-    void SetDomainName(const char* szdom);
+
+	void SetDomainName(const char* szdom);
 	const char* GetDomainName() { return m_szdom;  }
 
 protected:
@@ -102,6 +104,7 @@ public: // override one of these functions depending on the Region_Type
 	virtual bool Save(FEMesh&    m, FEDataStream& a) { return false; }		// for FE_REGION_NODE
 	virtual bool Save(FEDomain&  D, FEDataStream& a) { return false; }		// for FE_REGION_DOMAIN
 	virtual bool Save(FESurface& S, FEDataStream& a) { return false; }		// for FE_REGION_SURFACE
+	virtual bool Save(FEEdge&    E, FEDataStream& a) { return false; }		// for FE_REGION_EDGE
 
 public:
 	// will be called before Save
@@ -171,6 +174,16 @@ class FECORE_API FEPlotSurfaceData : public FEPlotData
 
 public:
 	FEPlotSurfaceData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_SURFACE, t, s) {}
+};
+
+//! This is the base class for edge data. Classes that wish to store data
+//! associated with each node or facet of a FEEdge, will use this base class.
+class FECORE_API FEPlotEdgeData : public FEPlotData
+{
+	FECORE_BASE_CLASS(FEPlotEdgeData)
+
+public:
+	FEPlotEdgeData(FEModel* fem, Var_Type t, Storage_Fmt s) : FEPlotData(fem, FE_REGION_EDGE, t, s) {}
 };
 
 // helper class for parsing the type string of plot fields
