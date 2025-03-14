@@ -79,6 +79,171 @@ figs-within-sections
 \shortcut idx
 \color #008000
 \end_index
+\spellchecker_ignore english feb
+\spellchecker_ignore english xplt
+\spellchecker_ignore english fluid-FSI
+\spellchecker_ignore english Broyden's
+\spellchecker_ignore english qnmethod
+\spellchecker_ignore english rtol
+\spellchecker_ignore english Globals
+\spellchecker_ignore english Fc
+\spellchecker_ignore english triphasic
+\spellchecker_ignore english Glc
+\spellchecker_ignore english SolidBoundMolecules
+\spellchecker_ignore english sbm
+\spellchecker_ignore english 'fem
+\spellchecker_ignore english '
+\spellchecker_ignore english mymat
+\spellchecker_ignore english neo-Hookean
+\spellchecker_ignore english NodeSet
+\spellchecker_ignore english DiscreteSet
+\spellchecker_ignore english ElementSet
+\spellchecker_ignore english SurfacePair
+\spellchecker_ignore english PartList
+\spellchecker_ignore english trilinear
+\spellchecker_ignore english pentahedral
+\spellchecker_ignore english pentrahedral
+\spellchecker_ignore english Bischoff
+\spellchecker_ignore english et
+\spellchecker_ignore english al
+\spellchecker_ignore english EAS
+\spellchecker_ignore english Vu-Quoc
+\spellchecker_ignore english Klinkel
+\spellchecker_ignore english normals
+\spellchecker_ignore english Jacobian
+\spellchecker_ignore english 'shell
+\spellchecker_ignore english stress'
+\spellchecker_ignore english strain'
+\spellchecker_ignore english ShellDomain
+\spellchecker_ignore english BeamDomain
+\spellchecker_ignore english nodesets
+\spellchecker_ignore english delem
+\spellchecker_ignore english allParts
+\spellchecker_ignore english bc
+\spellchecker_ignore english nodeset
+\spellchecker_ignore english MeshDomains
+\spellchecker_ignore english SolidDomain
+\spellchecker_ignore english udg-hex
+\spellchecker_ignore english sri-solid
+\spellchecker_ignore english Gauss-Lobatto
+\spellchecker_ignore english Lobatto
+\spellchecker_ignore english tet
+\spellchecker_ignore english nodally
+\spellchecker_ignore english iso
+\spellchecker_ignore english elastic-shell-eas
+\spellchecker_ignore english MeshData
+\spellchecker_ignore english NodeData
+\spellchecker_ignore english SurfaceData
+\spellchecker_ignore english ElementData
+\spellchecker_ignore english procedurally
+\spellchecker_ignore english Emap
+\spellchecker_ignore english const
+\spellchecker_ignore english EdgeData
+\spellchecker_ignore english Adaptor
+\spellchecker_ignore english FEAMR
+\spellchecker_ignore english adaptor
+\spellchecker_ignore english remeshing
+\spellchecker_ignore english Remeshing
+\spellchecker_ignore english visco-elastic
+\spellchecker_ignore english MeshAdaptor
+\spellchecker_ignore english adapators
+\spellchecker_ignore english iters
+\spellchecker_ignore english elems
+\spellchecker_ignore english mmg
+\spellchecker_ignore english remesh
+\spellchecker_ignore english hausdorff
+\spellchecker_ignore english XY
+\spellchecker_ignore english dof
+\spellchecker_ignore english ic
+\spellchecker_ignore english init
+\spellchecker_ignore english vx
+\spellchecker_ignore english Prestrain
+\spellchecker_ignore english prestrain
+\spellchecker_ignore english eq
+\spellchecker_ignore english Nodesets
+\spellchecker_ignore english sx
+\spellchecker_ignore english sy
+\spellchecker_ignore english sz
+\spellchecker_ignore english lc
+\spellchecker_ignore english pos
+\spellchecker_ignore english rb
+\spellchecker_ignore english RCR
+\spellchecker_ignore english Windkessel
+\spellchecker_ignore english loadcurve
+\spellchecker_ignore english Rz
+\spellchecker_ignore english Rv
+\spellchecker_ignore english Rw
+\spellchecker_ignore english vy
+\spellchecker_ignore english vz
+\spellchecker_ignore english euler
+\spellchecker_ignore english Ey
+\spellchecker_ignore english Ez
+\spellchecker_ignore english dofs
+\spellchecker_ignore english maxaug
+\spellchecker_ignore english minaug
+\spellchecker_ignore english gaptol
+\spellchecker_ignore english angtol
+\spellchecker_ignore english revolute
+\spellchecker_ignore english laugon
+\spellchecker_ignore english Revolute
+\spellchecker_ignore english xy-plane
+\spellchecker_ignore english LoadData
+\spellchecker_ignore english loadcontroller
+\spellchecker_ignore english loadpoint
+\spellchecker_ignore english fluidflux
+\spellchecker_ignore english soluteflux
+\spellchecker_ignore english heatflux
+\spellchecker_ignore english hc
+\spellchecker_ignore english Backflow
+\spellchecker_ignore english backflow
+\spellchecker_ignore english unitless
+\spellchecker_ignore english Poiseuille
+\spellchecker_ignore english wx
+\spellchecker_ignore english wy
+\spellchecker_ignore english wz
+\spellchecker_ignore english axisymmetric
+\spellchecker_ignore english Fluid-FSI
+\spellchecker_ignore english FSI
+\spellchecker_ignore english Biphasic-FSI
+\spellchecker_ignore english biphasic-FSI
+\spellchecker_ignore english inhomogeneous
+\spellchecker_ignore english inhomogeneity
+\spellchecker_ignore english non-const
+\spellchecker_ignore english blt
+\spellchecker_ignore english bsf
+\spellchecker_ignore english tol
+\spellchecker_ignore english centrifual
+\spellchecker_ignore english ay
+\spellchecker_ignore english az
+\spellchecker_ignore english --
+\spellchecker_ignore english FEBio's
+\spellchecker_ignore english Laursen's
+\spellchecker_ignore english symmetrized
+\spellchecker_ignore english SBP
+\spellchecker_ignore english SBS
+\spellchecker_ignore english SMP
+\spellchecker_ignore english CP
+\spellchecker_ignore english aug
+\spellchecker_ignore english fric
+\spellchecker_ignore english coeff
+\spellchecker_ignore english ktmult
+\spellchecker_ignore english seg
+\spellchecker_ignore english Macauley
+\spellchecker_ignore english Symmetrized
+\spellchecker_ignore english nonsymmetric
+\spellchecker_ignore english -
+\spellchecker_ignore english in-situ
+\spellchecker_ignore english augtol
+\spellchecker_ignore english Vmax
+\spellchecker_ignore english Fmax
+\spellchecker_ignore english Lmax
+\spellchecker_ignore english Sv
+\spellchecker_ignore english Ftl
+\spellchecker_ignore english Ftv
+\spellchecker_ignore english xml
+\spellchecker_ignore english dmp
+\spellchecker_ignore english levmar
+\spellchecker_ignore english DWORD
 \leftmargin 1in
 \topmargin 1in
 \rightmargin 1in
@@ -516,7 +681,8 @@ FEBio is a nonlinear finite element solver that is specifically designed for bio
  thus offering a powerful tool for solving 3D problems in computational biomechanics.
  The software is open-source and the source code,
  as well as pre-compiled executables for Windows,
- OS-X and Linux platforms are available for download at 
+ OS-X,
+ and Linux platforms are available for download at 
 \begin_inset ERT
 status open
 
@@ -614,6 +780,17 @@ FEBio has a large library of element formulations.
  hexahedral and pentahedral (wedge) elements.
  FEBio also supports triangular quadrilateral shell elements,
  with linear and quadratic interpolations.
+\end_layout
+
+\begin_layout Standard
+In order to facilitate the process of customizing FEBio,
+ a plugin framework is available.
+ Plugins allow researchers to add new materials,
+ boundary conditions,
+ loads,
+ and more,
+ without the need to edit and recompile the FEBio source code itself.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -812,6 +989,34 @@ nolink "false"
 \end_inset
 
  provides helpful information for troubleshooting an FEBio model and offers guidelines that help users avoid common problems.
+ Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Configuration-File"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ discusses the configuration file,
+ which allow users to customize how FEBio runs on their system.
+ For instance,
+ users can configure the default linear solver that will be used for solving models.
+ Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:FEBio-Plugins"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ explains how use plugins with FEBio.
+ 
 \end_layout
 
 \begin_layout Section
@@ -2225,7 +2430,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="18" columns="3">
+<lyxtabular version="3" rows="21" columns="3">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top">
@@ -2737,7 +2942,7 @@ task input file
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2746,7 +2951,7 @@ task input file
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2755,11 +2960,100 @@ Print febio version information to screen or file
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 (optional) output file name
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-noappend
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Do not append the log and plot files on restart.
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-norun
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Do not run FEBio.
+ (Only process command line.)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-output_negative_jacobians[=n]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specify the max nr of negative jacobians that will be printed.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
 \end_layout
 
 \end_inset
@@ -2854,7 +3148,11 @@ It is also allowed to omit the .feb extension for FEBio input files.
  If no extension is given,
  FEBio will assume that .feb is the file extension.
  Thus,
- the following command will run the file input.feb:
+ the following command will run the file 
+\emph on
+input.feb
+\emph default
+:
 \end_layout
 
 \begin_layout LyX-Code
@@ -3086,7 +3384,7 @@ Example:
 \series bold
 -break
 \series default
- With this option a break point can be set which sets a time point at which FEBio will interrupt the run and show the FEBio prompt.
+ With this option a break point can be set which sets a time point or an event at which FEBio will interrupt the run and show the FEBio prompt.
  The following example sets a break point at time 1.0.
  FEBio will interrupt the run after the time step at time 1.0 is reached (i.e.
  has converged).
@@ -3098,7 +3396,7 @@ nolink "false"
 
 \end_inset
 
- for more informations on setting break points.)
+ for more information on setting break points.)
 \end_layout
 
 \begin_layout Standard
@@ -3174,6 +3472,24 @@ Example:
 –dump out.dmp
 \end_layout
 
+\begin_layout Standard
+To control when FEBio will write the dumpfile,
+ the -dump command can be appended by a number that defines the dump level.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Restarting-a-Run"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ for more information.
+ 
+\end_layout
+
 \begin_layout Description
 -dump_stride Sets the interval between writing dump files.
  The default is 1 (although the dump level may affect this as well.) The following example will write a dump file after every 10 timesteps.
@@ -3207,7 +3523,11 @@ configuration file
  However,
  the user can specify a different location and filename using the –config command line option.
  If the user does not have a configuration file or does not wish to use one,
- this can be specified using the –noconfig option.
+ this can be specified using the 
+\emph on
+–noconfig
+\emph default
+ option.
  More details on the configuration file can be found in Section
 \begin_inset space ~
 \end_inset
@@ -3306,7 +3626,7 @@ Example:
 
 \begin_layout Description
 -import This command will load the plugin that is specified following this command line option.
- Although it is more convienient to list plugins in the FEBio configuration file,
+ Although it is more convenient to list plugins in the FEBio configuration file,
  this option allows users to load a plugin from the command line,
  if such a need would arise.
  
@@ -3381,6 +3701,54 @@ Example:
 –task=optimize control.opt
 \end_layout
 
+\begin_layout Description
+
+\series bold
+-info 
+\series default
+Prints version information to the screen.
+ 
+\end_layout
+
+\begin_layout Description
+-noappend Do not append the log and plot file on restart.
+ When restarting an analysis,
+ FEBio will append the log and plot files with new data.
+ However,
+ when using this flag,
+ new log and plot files will be generated for the run.
+ 
+\end_layout
+
+\begin_layout Description
+-norun Do not run FEBio.
+ Only command line is processed.
+ For instance,
+ to get the version info from FEBio without running it,
+ use the following command.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+> febio4 -info -norun
+\end_layout
+
+\begin_layout Description
+-output_negative_jacobians Sets whether FEBio will output any negative Jacobians.
+ A negative Jacobian is often an indication of a problem during the solution process and knowing where these negative Jacobians occurred may be helpful for debugging.
+ By default,
+ FEBio will only report that negative Jacobians happened,
+ but won't print any other information.
+ The command can also be appended by a number that indicates the max number of Jacobians will be printed.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+> febio4 -i input.feb 
+\series bold
+–output_negative_jacobians=100
+\end_layout
+
 \begin_layout Section
 The FEBio Prompt
 \begin_inset CommandInset label
@@ -3393,7 +3761,7 @@ name "sec:FEBio-prompt"
 \end_layout
 
 \begin_layout Standard
-The FEBio prompt is shown when you start FEBio without any command arguments (referred to 
+The FEBio prompt is shown when you start FEBio without any command arguments (referred to as 
 \emph on
 interactive mode
 \emph default
@@ -3467,7 +3835,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="23" columns="5">
+<lyxtabular version="3" rows="26" columns="5">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top">
@@ -3858,6 +4226,53 @@ Toggle debug mode (3)
 \begin_inset Text
 
 \begin_layout Plain Layout
+events
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Print a list of events
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+✓
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+✓
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 fail
 \end_layout
 
@@ -3915,7 +4330,7 @@ help
 \begin_inset Text
 
 \begin_layout Plain Layout
-Print a list of available commans
+Print a list of available commands
 \end_layout
 
 \end_inset
@@ -4520,7 +4935,7 @@ plugin name
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4529,7 +4944,7 @@ version
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4539,11 +4954,105 @@ Print version information.
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 -
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+✓
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+✓
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+where
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Prints the current callback event
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+✓
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+list
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lists all the factory classes (10)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(command line options)
 \end_layout
 
 \end_inset
@@ -4799,10 +5308,41 @@ If you enter the set command without any additional options,
 \end_layout
 
 \end_deeper
-\begin_layout LyX-Code
-
+\begin_layout Enumerate
+The 
+\emph on
+list 
+\emph default
+command prints a list of all available FEBio features.
+ Additional options can be specified to configure the output.
+ 
 \end_layout
 
+\begin_deeper
+\begin_layout Description
+-m Specify the module name.
+ (e.g.
+ list -m solid)
+\end_layout
+
+\begin_layout Description
+-c Specify the category.
+ (e.g.
+ list -m FEMATERIAL_ID)
+\end_layout
+
+\begin_layout Description
+-n Set the max nr of lines in the output (e.g.
+ list -n 100)
+\end_layout
+
+\begin_layout Description
+-s Specify a general pattern that should match.
+ (e.g.
+ list -s neo)
+\end_layout
+
+\end_deeper
 \begin_layout Section
 The Configuration File
 \begin_inset CommandInset label
@@ -4884,7 +5424,7 @@ name "sec:Using-Multiple-Processors"
 
 \begin_layout Standard
 As of version 2.0,
- FEBio uses OpenMP to parallellize several of the finite element calculations,
+ FEBio uses OpenMP to parallelize several of the finite element calculations,
  improving the performance considerably.
  Both the right-hand-side and the stiffness matrix evaluations for many types of problems have been parallelized.
  On a system with four processors,
@@ -5415,7 +5955,7 @@ During the model update,
 
 \begin_layout Enumerate
 The QN update refers to the process of calculating a rank-one update of the stiffness matrix.
- This is usually a fast process and does not take up a signifcant amount of time.
+ This is usually a fast process and does not take up a significant amount of time.
  
 \end_layout
 
@@ -5575,6 +6115,27 @@ nolink "false"
  for more information on running optimization problems with FEBio.
 \end_layout
 
+\begin_layout Standard
+
+\emph on
+Note 3
+\emph default
+.
+ FEBio may also generate additional 
+\emph on
+data files
+\emph default
+.
+ Although the log file is used as the default output file for data requested in the 
+\emph on
+logfile 
+\emph default
+section of the input file,
+ users can specify the location of the output file.
+ In that case,
+ the data will be written to the output file instead of the logfile.
+\end_layout
+
 \begin_layout Section
 Advanced Options
 \begin_inset CommandInset label
@@ -5643,7 +6204,7 @@ nolink "false"
 \end_inset
 
 ,
- FEBio can be run in debug-mode by specifying the –g option on the command line.
+ FEBio can be run in debug-mode by specifying one of the –g options on the command line.
  When running in debug mode,
  FEBio performs additional checks and prints out more information to the screen and to the plot file.
  It will also store all non-converged states to the plot file.
@@ -6073,18 +6634,30 @@ With the optional arguments,
 \end_layout
 
 \begin_layout Standard
-The dump level can be set to 1 (= write dump file after each converged time step),
- 2 (= write dump file after each completed analysis step),
-  or 3 (= write dump file after each converged
+The dump level can be set to the following values:
+\end_layout
+
+\begin_layout Enumerate
+write dump file after each converged time step
+\end_layout
+
+\begin_layout Enumerate
+write dump file after each completed analysis step
+\end_layout
+
+\begin_layout Enumerate
+write dump file after each converged
 \shape italic
- must-point 
-\shape default
- ).
+ must-point
 \end_layout
 
 \begin_layout Standard
 To restart an analysis,
- use the -r command line option.
+ use the 
+\series bold
+-r
+\series default
+ command line option.
  This option requires a filename as a parameter,
  and this name can be either the name of a dump file or the name of a restart input file.
  The latter case is a text file that allows the user to redefine some parameters when restarting the run.
@@ -6534,7 +7107,7 @@ Step
 
 \shape italic
 \emph on
-Ouput
+Output
 \shape default
 \emph default
  Defines additional data that needs to be stored to file.
@@ -6640,7 +7213,7 @@ Version 2.5
 \shape italic
 MeshData 
 \shape default
-section and reformats the 
+section and re-formats the 
 \shape italic
 Discrete 
 \shape default
@@ -7224,7 +7797,7 @@ type
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="2">
+<lyxtabular version="3" rows="9" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -7337,27 +7910,6 @@ Multiphasic analysis including solute transport and chemical reactions
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-heat
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Heat transfer analysis:
- steady-state or transient (1)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -7379,7 +7931,7 @@ Fluid mechanics analysis:
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7388,12 +7940,54 @@ fluid-FSI
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Fluid mechanics with fluid-structure interactions:
  steady-state or dynamic
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fluid-solutes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A fluid mechanics analysis with support for solute transport.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiphasic-FSI
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The FSI module with support for multiphasic materials.
+ 
 \end_layout
 
 \end_inset
@@ -7666,19 +8260,6 @@ The following example defines the model's units explicitly.
 \begin_layout Standard
 
 \emph on
-Comments
-\emph default
-:
-\end_layout
-
-\begin_layout Enumerate
-The heat module requires the FEBioHeat plugin.
- 
-\end_layout
-
-\begin_layout Standard
-
-\emph on
 Notes
 \emph default
 :
@@ -7760,6 +8341,26 @@ Module
 \end_layout
 
 \begin_layout Standard
+Note that for multistep analyses (see chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Multi-step-Analysis"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) the Control section is specified for each step separately and defined as a child element of each 
+\emph on
+step
+\emph default
+ section.
+ 
+\end_layout
+
+\begin_layout Standard
 
 \emph on
 Example:
@@ -7818,7 +8419,11 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-        <qn_method type="BFGS"/>
+        <rhoi>-2</rhoi>
+\end_layout
+
+\begin_layout LyX-Code
+        <qn_method type="BFGS">
 \end_layout
 
 \begin_layout LyX-Code
@@ -7826,7 +8431,7 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-        <rhoi>-2</rhoi>
+        </qn_method>
 \end_layout
 
 \begin_layout LyX-Code
@@ -7887,7 +8492,7 @@ The following parameters are common for all analysis types.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="3">
+<lyxtabular version="3" rows="11" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -8156,7 +8761,7 @@ zero
 \begin_inset Text
 
 \begin_layout Plain Layout
-print_level
+output_level
 \end_layout
 
 \end_inset
@@ -8165,7 +8770,7 @@ print_level
 \begin_inset Text
 
 \begin_layout Plain Layout
-Sets the amount of output that is generated on screen (5)
+Controls when to output data to file (5)
 \end_layout
 
 \end_inset
@@ -8174,36 +8779,65 @@ Sets the amount of output that is generated on screen (5)
 \begin_inset Text
 
 \begin_layout Plain Layout
-PRINT_MINOR_ITRS 
+OUTPUT_MAJOR_ITRS 
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-output_level
+output_stride
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Controls when to output data to file (6)
+Set the output stride for writing out
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-OUTPUT_MAJOR_ITRS 
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+adaptor_resolve
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+re-solve time step after mesh adaptations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 (yes)
 \end_layout
 
 \end_inset
@@ -8234,11 +8868,11 @@ The
 analysis 
 \shape default
 element sets the analysis type.
- The text value of this element is tdetermined by the module,
+ The text value of this element is determined by the module,
  but the numeric value should be 0 for (quasi-)static or steady-state analysis and 1 for dynamic or transient analysis.
  In a quasi-static analysis,
  inertial effects are ignored and an equilibrium solution is sought.
- Note that in this analysis mode it is still possible to simulate time dependant effects such as viscoelasticity.
+ Note that in this analysis mode it is still possible to simulate time-dependent effects such as viscoelasticity.
  In a dynamic analysis the inertial effects are included.
 \end_layout
 
@@ -8390,7 +9024,7 @@ allows the user to control exactly when the solution is to be saved to the plot 
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="2">
+<lyxtabular version="3" rows="8" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -8434,7 +9068,7 @@ PLOT_NEVER
 \begin_inset Text
 
 \begin_layout Plain Layout
-Don't save the solution 
+Don't save the solution to the plot file
 \end_layout
 
 \end_inset
@@ -8481,7 +9115,7 @@ Save the solution for every quasi-Newton iteration
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8490,11 +9124,73 @@ PLOT_MUST_POINTS
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Only save the solution at the must points 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PLOT_FINAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Only store the final converged state.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PLOT_STEP_FINAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Store only the final converged state of each analysis step.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PLOT_AUGMENTATIONS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Store states at the start of each augmentation.
+ 
 \end_layout
 
 \end_inset
@@ -8658,167 +9354,6 @@ plot_zero_state
  parameters are only used by the fixed time stepper.
  Currently,
  these parameters are not used with the auto time stepper.
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-The 
-\shape italic
-print_level 
-\shape default
-allows the user to control exactly how much output is written to the screen.
- The following values are allowed:
- 
-\end_layout
-
-\begin_deeper
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Value
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\series default
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-PRINT_NEVER
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Don't generate any output 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-PRINT_PROGRESS
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Only print a progress bar 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-PRINT_MAJOR_ITRS
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Only print the converged solution 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-PRINT_MINOR_ITRS
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Print convergence information during equilibrium iterations 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-PRINT_MINOR_ITRS_EXP
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Print additional convergence info during equilib.
- iterations 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
 \end_layout
 
 \end_deeper
@@ -9259,7 +9794,7 @@ defines the estimated optimal number of quasi-Newton iterations.
 
 \begin_layout Enumerate
 When a time step fails (e.g.
- due to a negative jacobian),
+ due to a negative Jacobian),
  FEBio will retry the time step with a smaller time step size.
  The 
 \shape italic
@@ -9281,6 +9816,44 @@ is set to 4,
  The first retry will have a step size of 0.08;
  the next will be 0.06,
  and so on.
+ 
+\begin_inset Newline newline
+\end_inset
+
+When the time step succeeds,
+ the time step size will be adjusted by comparing the 
+\emph on
+opt_iter 
+\emph default
+parameter to the actual number of iterations it took to converge.
+ If the actual number of iterations is larger than 
+\emph on
+opt_iter
+\emph default
+,
+ the time step size will be decreased.
+ On the other hand,
+ if the actual number of iterations is less than 
+\emph on
+opt_iter
+\emph default
+,
+ then the time step size will be increased.
+ After adjusting
+\emph on
+ 
+\emph default
+the time step size,
+ it will be ensured that the new timestep size falls within the range defined by 
+\emph on
+dtmin
+\emph default
+ and 
+\emph on
+dtmax 
+\emph default
+and that must-points are respected.
+ 
 \end_layout
 
 \begin_layout Enumerate
@@ -9397,6 +9970,12 @@ parameter is set to PLOT_MUST_POINTS,
  then only the three defined time points will be stored to the plotfile.
 \end_layout
 
+\begin_layout Standard
+Note that when specifying a loadcurve for the dtmax parameter,
+ the value of this parameter will be ignored.
+ 
+\end_layout
+
 \end_deeper
 \begin_layout Enumerate
 When FEBio fails to converge a time step,
@@ -9426,7 +10005,7 @@ aggressiveness = 0
 \begin_inset Formula $m_{r}$
 \end_inset
 
-is the max numer of retries (set by the 
+is the max number of retries (set by the 
 \emph on
 max_retries 
 \emph default
@@ -9475,7 +10054,7 @@ Many of the solvers define the same parameters.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="3">
+<lyxtabular version="3" rows="23" columns="3">
 <features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -9661,6 +10240,35 @@ Maximum number of line search iterations
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ls_check_jacobians
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Check for negative Jacobians during linesearch
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (disabled)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -9748,39 +10356,6 @@ Max number of BFGS/Broyden stiffness updates (3)
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-cmax
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the max condition number for the stiffness matrix (4)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1e
-\begin_inset Formula $+$
-\end_inset
-
-5
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -9823,7 +10398,7 @@ min_residual
 \begin_inset Text
 
 \begin_layout Plain Layout
-Sets minimal value for residual tolerance (6)
+Sets minimal value for residual norm (5)
 \end_layout
 
 \end_inset
@@ -9843,6 +10418,35 @@ Sets minimal value for residual tolerance (6)
 \begin_inset Text
 
 \begin_layout Plain Layout
+max_residual
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sets the max value for residual norm
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (disabled)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 symmetric_stiffness
 \end_layout
 
@@ -9852,7 +10456,7 @@ symmetric_stiffness
 \begin_inset Text
 
 \begin_layout Plain Layout
-Use symmetric stiffness matrix flag (7)
+Use symmetric stiffness matrix flag (6)
 \end_layout
 
 \end_inset
@@ -9939,7 +10543,7 @@ optimize_bw
 \begin_inset Text
 
 \begin_layout Plain Layout
-Optimize bandwidth of stiffness matrix (5)
+Optimize bandwidth of stiffness matrix (4)
 \end_layout
 
 \end_inset
@@ -9955,7 +10559,7 @@ Optimize bandwidth of stiffness matrix (5)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -9964,12 +10568,148 @@ linear_solver
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Set the preferred linear solver to use.
- (8)
+ (7)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(default)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+check_zero_diagonal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Check for zero diagonals in the stiffness matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (disabled)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+zero_diagonal_tol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Tolerance value for checking zero diagonals
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+force_partition
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+For a partition in the stiffness matrix
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (disabled)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+reform_each_time_step
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Reform the stiffness matrix at the start of each time step
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 (enabled)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+reform_augment
 \end_layout
 
 \end_inset
@@ -9978,7 +10718,16 @@ Set the preferred linear solver to use.
 \begin_inset Text
 
 \begin_layout Plain Layout
-(default)
+Reform stiffness matrix after each augmentation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (disabled)
 \end_layout
 
 \end_inset
@@ -10017,10 +10766,10 @@ FEBio determines convergence of a time step based on three convergence criteria:
  means that the ratio of the displacement increment (i.e.
  the solution of the linearized FE equations,
  
-\begin_inset Formula $\Delta\mathbf{U}=-\mathbf{K}_{k}^{-1}\mathbf{R}_{k})$
+\begin_inset Formula $\Delta\mathbf{U}=-\mathbf{K}_{k}^{-1}\mathbf{R}_{k}$
 \end_inset
 
- norm at the current iteration 
+) norm at the current iteration 
 \begin_inset Formula $k+$
 \end_inset
 
@@ -10029,10 +10778,10 @@ FEBio determines convergence of a time step based on three convergence criteria:
 1
 \shape default
  to the norm of the total displacement (
-\begin_inset Formula $\mathbf{U}_{k+1}=\mathbf{U}_{k}+\Delta\mathbf{U})$
+\begin_inset Formula $\mathbf{U}_{k+1}=\mathbf{U}_{k}+\Delta\mathbf{U}$
 \end_inset
 
- must be less than 
+) must be less than 
 \begin_inset Formula $\varepsilon$
 \end_inset
 
@@ -10067,7 +10816,7 @@ lstol
 \shape default
  parameter controls the scaling of the vector direction obtained from the line search.
  A line search method is used to improve the convergence of the nonlinear (quasi-) Newton solution algorithm.
- After each BFGS or Newton iteration,
+ After each quasi-Newton iteration,
  this algorithm searches in the direction of the displacement increment for a solution that has less energy (that is,
  residual multiplied with the displacement increment) than the previous iteration.
  In many problems this will automatically be the case.
@@ -10116,24 +10865,6 @@ nolink "false"
  for more details.
 \end_layout
 
-\begin_layout Enumerate
-When the condition number of the stiffness matrix becomes too large,
- inversions of the stiffness matrix become inaccurate.
- This will negatively affect the convergence of the quasi-Newton or Newton solution algorithm.
- FEBio monitors the condition number of the BFGS stiffness update and when it exceeds 
-\shape italic
-cmax 
-\shape default
-it reforms the stiffness matrix.
- 
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<cmax>1e5</cmax>
-\end_layout
-
-\end_deeper
 \begin_layout Enumerate
 The 
 \shape italic
@@ -10197,6 +10928,19 @@ flag is used to set the symmetry of the global stiffness matrix.
 \end_inset
 
 - 2 = structurally symmetric
+\begin_inset Newline newline
+\end_inset
+
+- 3 = preferred
+\begin_inset Newline newline
+\end_inset
+
+If the option is set to 3 (preferred),
+ then one of the other formats will be chosen depending on the model components in the model.
+ For instance,
+ if a non-symmetric contact formulation is used,
+ then a non-symmetric stiffness matrix will be used.
+ 
 \end_layout
 
 \begin_layout Enumerate
@@ -10327,7 +11071,7 @@ The BFGS and Broyden take the following parameters.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="3">
+<lyxtabular version="3" rows="5" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -10368,7 +11112,7 @@ Default
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10377,7 +11121,7 @@ max_ups
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10389,11 +11133,100 @@ This is the maximum number of updates between stiffness matrix reformations.
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cmax
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sets the max condition number.
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1e5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_buffer_size
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sets the max buffer size.
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (ignored)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cycle_buffer
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Recycle buffers when max_ups is larger than max_buffer_size
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
 \end_layout
 
 \end_inset
@@ -10418,7 +11251,7 @@ Note that when max_ups is set to 0,
 max_refs 
 \shape default
 (to e.g.
- 50),
+ 50) in the solver settings,
  since the default value might cause FEBio to terminate prematurely when convergence is slow.
 \end_layout
 
@@ -10449,7 +11282,7 @@ type in Module section.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="3">
+<lyxtabular version="3" rows="9" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -10492,7 +11325,7 @@ Default
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10501,7 +11334,7 @@ dtol
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10510,11 +11343,218 @@ convergence tolerance on displacement
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 0.001
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+rhoi
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Spectral radius parameter 
+\begin_inset Formula $\rho_{\infty}$
+\end_inset
+
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+alpha
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+generalized alpha method parameter alpha
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+beta
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+generalized alpha method beta
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.25
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+gamma
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+generalized alpha method gamma
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+logSolve
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Use an acceleration for Newton iterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+arc_length
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specifies arc-length method (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (off)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+arc_length_scale
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Set the arc-length scale factor
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
 \end_layout
 
 \end_inset
@@ -10529,6 +11569,35 @@ convergence tolerance on displacement
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+There are two time-integrators implemented in FEBio:
+ the classical Newmark integration and the generalized alpha method.
+ Setting rhoi to -2,
+ will use the former,
+ where as setting rhoi to the range [0,1] will use the latter.
+ In the latter case,
+ the values for gamma,
+ beta,
+ and gamma are determined from the spectral radius parameter,
+ rhoi.
+ 
+\end_layout
+
+\begin_layout Enumerate
+When using the arc-length method,
+ there are some important restrictions.
+ Only zero-prescribed boundary conditions are allowed.
+ The loads must be specified via nodal loads and cannot be time-dependent.
+ The time_steps and step_size control parameters are interpreted as arc-length steps and step_size respectively.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -10771,7 +11840,7 @@ type in Module section.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="3">
+<lyxtabular version="3" rows="3" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -10814,7 +11883,7 @@ Default
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10823,7 +11892,7 @@ ptol
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10832,11 +11901,40 @@ Specify the fluid pressure convergence tolerance
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 0.01 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mixed_formulation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Use a mixed formulation (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
 \end_layout
 
 \end_inset
@@ -10851,6 +11949,20 @@ Specify the fluid pressure convergence tolerance
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comment
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+The mixed formulation uses discontinuous shape functions for the pressure interpolation.
+ It still uses the full shape functions for displacement.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -10887,7 +11999,7 @@ multiphasic
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="3">
+<lyxtabular version="3" rows="3" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -10930,7 +12042,7 @@ Default
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10939,7 +12051,7 @@ ctol
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10948,11 +12060,40 @@ Specify the concentration convergence tolerance
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 0.01 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+force_positive_concentrations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Force the concentration values always to be positive.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 (enabled)
 \end_layout
 
 \end_inset
@@ -10967,37 +12108,6 @@ Specify the concentration convergence tolerance
 \end_inset
 
 
-\end_layout
-
-\begin_layout Subsection
-Solver Parameters for Heat Analysis
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Parameters-Heat-Analysis"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A heat analysis uses the parameters defined in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Control-Parameters"
-nolink "false"
-
-\end_inset
-
-.
- However,
- not all parameters have an effect.
- In particular,
- any parameter related to the auto-time stepping capability of FEBio or the nonlinear solution strategy is ignored.
 \end_layout
 
 \begin_layout Subsection
@@ -11033,7 +12143,7 @@ nolink "false"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="7" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -11167,7 +12277,7 @@ Spectral radius parameter
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11176,7 +12286,7 @@ reform_each_time_step
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11185,11 +12295,69 @@ Flag for reforming stiffness matrix at the start of each time step
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+predictor
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sets the predictor method
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+min_volume_ratio
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sets the minimum value for the volume ratio.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (disabled)
 \end_layout
 
 \end_inset
@@ -11312,7 +12480,7 @@ emph{FEBio Theory Manual}}
 ,
  no damping occurs,
  potentially leading to instability in the solution process.
- When solving transient flows that exhibit eddies or shed vorticies,
+ When solving transient flows that exhibit eddies or shed vortices,
  a value of 
 \begin_inset Formula $\rho_{\infty}=0.5$
 \end_inset
@@ -11856,7 +13024,7 @@ name
 \end_layout
 
 \begin_layout LyX-Code
-<material id="1" type="isotropic elastic">
+<material id="1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Standard
@@ -11874,7 +13042,7 @@ name
 
 \begin_layout Standard
 The material parameters that have to be entered depend on the material type.
- A complete list of available materials is provided in Chapter
+ A complete list of available materials and their parameters is provided in Chapter
 \begin_inset space ~
 \end_inset
 
@@ -11926,7 +13094,15 @@ Nodes defines the nodal coordinates of the mesh
 \series bold
 Elements 
 \series default
-defines the elements of the mesh
+defines the elements of the mesh.
+ If the name attribute is provided,
+ then this also defines an element set.
+ Element sets defined this way are also referred to as 
+\emph on
+parts
+\emph default
+.
+ 
 \end_layout
 
 \begin_layout Description
@@ -11997,12 +13173,17 @@ define a surface pair that can be used by a contact definition.
  
 \end_layout
 
+\begin_layout Description
+PartList define a named list of parts (i.e.
+ element sets defined via the Elements tag)
+\end_layout
+
 \begin_layout Standard
 At least one 
 \emph on
 Nodes 
 \emph default
-must be defined and one 
+section must be defined and one 
 \emph on
 Elements
 \emph default
@@ -12033,19 +13214,25 @@ DiscreteSet
 ElementSet
 \shape default
 ,
- and 
+ 
 \shape italic
-SurfacePair 
+SurfacePair
+\emph on
+,
+ and 
+\emph default
+PartList 
 \shape default
 sections define sets of nodes,
  edges,
  facets,
  discrete elements,
  elements,
- and surface pairs,
+ surface pairs,
+ and part lists,
  respectively,
  and can be referenced by other sections of the model file.
- For instsance,
+ For instance,
  boundary conditions can be defined by referencing the sets to which the boundary condition will be applied.
 \end_layout
 
@@ -12099,6 +13286,8 @@ The
 id
 \shape default
  attribute is the global identifier of the node and must be a unique number within the model definition.
+ Nodal ids must be defined in increasing order,
+ but do not have to be sequential.
  This 
 \shape italic
 id
@@ -12321,16 +13510,22 @@ Elements
 \end_layout
 
 \begin_layout Standard
-FEBio classifies elements in two categories,
+FEBio classifies elements in three categories,
  namely 
 \shape italic
-solids 
+solids,
+ shells
 \shape default
+\emph on
+,
+ 
+\emph default
 and 
-\shape italic
-shells
-\shape default
+\emph on
+beams
+\emph default
 .
+ 
 \end_layout
 
 \begin_layout Subsubsection
@@ -13022,6 +14217,90 @@ Finally,
  please note that shell elements cannot be stacked in FEBio.
 \end_layout
 
+\begin_layout Subsubsection
+Beam Elements
+\end_layout
+
+\begin_layout Standard
+FEBio supports some truss and beam element formulations.
+ Currently,
+ only linear trusses and linear and quadratic beam elements are supported.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+line2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2-node linear truss or beam element
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+line3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3-node quadratic beam element
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Whether a truss or beam formulation is used,
+ is determined in the corresponding BeamDomain section.
+ 
+\end_layout
+
 \begin_layout Subsection
 NodeSet Section
 \begin_inset CommandInset label
@@ -13039,7 +14318,7 @@ The
 NodeSet 
 \shape default
 section allows users to define node sets.
- These node sets can then later be used in the definition of the fixed and prescribed boundary conditions.
+ These node sets can then later be used in the definition of boundary conditions and loads.
  A node set is defined by the 
 \shape italic
 NodeSet 
@@ -13119,7 +14398,7 @@ The
 Edge 
 \shape default
 section allows users to define a set of edges.
- These edges can be used to define boundary conditions or load.s
+ These edges can be used to define boundary conditions or loads.
 \end_layout
 
 \begin_layout LyX-Code
@@ -13172,6 +14451,11 @@ line2
 line3
 \shape default
  3-node line element 
+\end_layout
+
+\begin_layout Standard
+Edges cannot overlap element boundaries and must be a valid edges of elements.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -13244,7 +14528,7 @@ quad4
 \shape italic
 quad8
 \shape default
- 8-node serendipity quadrilater element 
+ 8-node serendipity quadrilateral element 
 \end_layout
 
 \begin_layout Description
@@ -13429,11 +14713,11 @@ and
 \shape italic
 surface2
 \shape default
-) are surfaces defined in the 
+) are surfaces defined in 
 \shape italic
 Surface 
 \shape default
-section.
+sections.
  Because surfaces must already be defined before they can be referenced in the 
 \shape italic
 SurfacePair 
@@ -13443,11 +14727,301 @@ section,
 \shape italic
 Surface 
 \shape default
-must be defined before the 
+sections must be defined before the 
 \shape italic
 SurfacePair 
 \shape default
 section.
+\end_layout
+
+\begin_layout Subsection
+PartList
+\end_layout
+
+\begin_layout Standard
+A 
+\emph on
+part 
+\emph default
+is an element set that is defined via the 
+\emph on
+Elements
+\emph default
+ tag.
+ Parts can be grouped together in part lists.
+ A part list is defined via the 
+\emph on
+PartList 
+\emph default
+tag.
+ The value of this tag is a list of the names of the parts that belong to the list.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<PartList name="allParts">part1,part2</PartList>
+\end_layout
+
+\begin_layout Standard
+Here,
+ 
+\emph on
+part1 
+\emph default
+and 
+\emph on
+part2 
+\emph default
+are parts defined via Elements sections.
+ Because part lists depend on the Elements sections,
+ the PartList tag must be defined after all Elements sections have been defined.
+ 
+\end_layout
+
+\begin_layout Standard
+Part lists can be used,
+ for instance,
+ in body loads if the body load is to be applied to multiple parts.
+ 
+\end_layout
+
+\begin_layout Subsection
+Implicit Partitions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Implicit-Partitions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In addition to the explicit mesh partitions that can be defined in the Mesh section,
+ as detailed above,
+ FEBio also supports 
+\emph on
+implicit partitions
+\emph default
+.
+ This allows you to assign a different type of partition to a model component than the target partition.
+ For instance,
+ if a boundary condition requires a node set,
+ using implicit partitioning,
+ you can assign a surface or an element set.
+ 
+\end_layout
+
+\begin_layout Standard
+Consider the following example.
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="zero displacement" node_set="set1"/>
+\end_layout
+
+\begin_layout Standard
+FEBio expects a node set with the name set1 defined in the Mesh section.
+ However,
+ if set1 is a surface,
+ then this surface can be assigned to the boundary condition using the following syntax.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<bc type="zero displacement" node_set="@surface:set1"/>
+\end_layout
+
+\begin_layout Standard
+The presence of the specifier @surface informs FEBio that set1 is a surface and the node set needs to be extracted from the surface definition.
+ 
+\end_layout
+
+\begin_layout Standard
+Mesh partitions can only be assigned this way if the target partition is a subset of the source partition.
+ For instance,
+ it is not possible to assign a node set to a surface partition.
+ 
+\end_layout
+
+\begin_layout Standard
+The following specifiers are available.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+specifier
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Target partition
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+References a surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nodeset
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@edge
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+References an edge
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nodeset
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@elem_set
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+References an element set (either via Elements or ElementSet)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nodeset
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@part_list
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+References a part list
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nodeset,
+ surface
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the @part_list is the only specifier that can be used to assign a part list to a surface.
+ This can be useful for defining contact surfaces where the surface might have a complex shape and is difficult to extract manually.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -13478,14 +15052,22 @@ Mesh
 section,
  define a 
 \emph on
-SolidDomain 
+SolidDomain
 \emph default
-or a 
+,
+
 \emph on
-ShellDomain 
+ ShellDomain
+\emph default
+,
+ or 
+\emph on
+BeamDomain 
 \emph default
 section,
- depending on whether the elements are solid or shells.
+ depending on whether the elements are solid,
+ shells,
+ or beams (or trusses).
  Each domain also requires a material name that defines the material properties of the domain.
  
 \end_layout
@@ -13744,7 +15326,7 @@ Comments:
 \begin_layout Standard
 1.
  For the elastic-solid domain,
- the elem_type attribute can be specified to further specialize the integration rule.
+ the elem_type attribute can be specified to further specialize the quadrature rule.
  The values of the rule depend on the specific element type.
  The tables below show the available integration rules for the different element types.
  The values marked with an asterisk (*) are the default.
@@ -14381,7 +15963,11 @@ is specified,
 \end_layout
 
 \begin_layout Standard
-3.The ut4-solid is a special formulation for tetrahedral elements that uses a nodally averaged integration rule,
+3.The ut4-solid is a special formulation for tetrahedral elements that uses a 
+\nospellcheck on
+nodally-averaged
+\nospellcheck default
+ integration rule,
  as proposed by Gee et al 
 \begin_inset CommandInset citation
 LatexCommand citep
@@ -14410,7 +15996,15 @@ type="ut4-solid"
 \end_layout
 
 \begin_layout LyX-Code
-  <iso_stab>0</iso_stab>
+  <
+\nospellcheck on
+iso
+\nospellcheck default
+_stab>0</
+\nospellcheck on
+iso
+\nospellcheck default
+_stab>
 \end_layout
 
 \begin_layout LyX-Code
@@ -14431,7 +16025,15 @@ blending
 \begin_inset Quotes erd
 \end_inset
 
- between the regular tet-contribution and the nodally integrated contribution.
+ between the regular 
+\nospellcheck on
+tet-contribution
+\nospellcheck default
+ and the 
+\nospellcheck on
+nodally
+\nospellcheck default
+ integrated contribution.
  The value must be between 0 and 1,
  where 0 means no contribution from the regular tet and 1 means no contribution from the nodally averaged tet.
  The 
@@ -14714,6 +16316,152 @@ If the shell thickness parameter is not specified,
  
 \end_layout
 
+\begin_layout Subsection
+BeamDomain Section
+\end_layout
+
+\begin_layout Standard
+Beam and trusses can be defined with the 
+\emph on
+BeamDomain 
+\emph default
+section.
+ This tag takes the following attributes.
+ 
+\end_layout
+
+\begin_layout Description
+name This is the name of the part to which this domain will be assigned.
+ The part is defined via a named 
+\emph on
+Elements 
+\emph default
+section.
+ 
+\end_layout
+
+\begin_layout Description
+mat The name of the material that will be assigned to this domain.
+ 
+\end_layout
+
+\begin_layout Description
+type The specific formulation that will be used.
+ 
+\end_layout
+
+\begin_layout Standard
+The particular beam formulation that can be assigned is listed below.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+linear-truss
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A linear truss formulation.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+elastic-truss
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+An extension of the linear-truss formulation that allows the use of standard FEBio materials (EXPERIMENTAL!)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+linear-beam
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A linear beam formulation.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -14938,7 +16686,7 @@ mat3
 
 \begin_layout Plain Layout
 A 3x3 tensor,
- row major sorted
+ row-major sorted
 \end_layout
 
 \end_inset
@@ -15700,68 +17448,6 @@ mesh_adaptor
 \end_layout
 
 \begin_layout Standard
-• 
-\series bold
-type
-\series default
-:
- set the type of the mesh adaptor (1).
- [Required] 
-\end_layout
-
-\begin_layout Standard
-• 
-\series bold
-elem_set
-\series default
-:
- The element set to apply the adaptor to (2).
- [Optional] 
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Comments
-\emph default
-:
- 
-\end_layout
-
-\begin_layout Enumerate
-The 
-\series bold
-type 
-\series default
-attribute defines the mesh adaptor.
- It must be one of the mesh adaptors defined in Table 1,
- below.
- 
-\end_layout
-
-\begin_layout Enumerate
-The 
-\series bold
-elem_set 
-\series default
-attribute is optional,
- but can be used to apply the adaptor to only a part of the mesh.
- This is useful to limit the effect of an adaptor to a part of the mesh.
- The element set must reference a domain (i.e.
- defined via Elements) of a mesh,
- or a set of domains.
- It cannot be an element set defined through the ElementSet tag.
- (Note that not all mesh adaptors support this attribute.) If omitted,
- the adaptor is applied to the entire mesh.
- 
-\end_layout
-
-\begin_layout Standard
-The sections below list the properties of the available mesh adaptors and the adaptor criteria.
- 
-\end_layout
-
-\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
 
@@ -15771,7 +17457,7 @@ The sections below list the properties of the available mesh adaptors and the ad
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="3" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -15782,7 +17468,7 @@ The sections below list the properties of the available mesh adaptors and the ad
 \begin_layout Plain Layout
 
 \series bold
-type
+attribute
 \end_layout
 
 \end_inset
@@ -15804,7 +17490,9 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-erosion
+
+\emph on
+type
 \end_layout
 
 \end_inset
@@ -15813,87 +17501,30 @@ erosion
 \begin_inset Text
 
 \begin_layout Plain Layout
-The erosion adaptor removes elements from a mesh.
+set the type of the mesh adaptor.
+ 
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-mmg_remesh
+
+\emph on
+elem_set
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Adaptive mesh refinement of tetrahedral mesh using the MMG library.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-hex_refine2d
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a 2D hexahedral mesh.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-tet_refine
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a linear tetrahedral mesh (Whole mesh refinement only)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-hex_refine
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Refine a hexahedral mesh.
+The element set to apply the adaptor to (1) (Optional) 
 \end_layout
 
 \end_inset
@@ -15911,6 +17542,50 @@ Refine a hexahedral mesh.
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+ 
+\end_layout
+
+\begin_layout Enumerate
+The 
+\series bold
+elem_set 
+\series default
+attribute is optional,
+ but can be used to apply the adaptor to only a part of the mesh.
+ This is useful to limit the effect of an adaptor to a part of the mesh.
+ The element set must reference a domain (i.e.
+ defined via Elements) of a mesh,
+ or a set of domains.
+ It cannot be an element set defined through the ElementSet tag.
+ (Note that not all mesh adaptors support this attribute.) If omitted,
+ the adaptor is applied to the entire mesh.
+ 
+\end_layout
+
+\begin_layout Standard
+Many mesh adapators require a mesh adaptor criterion.
+ The criterion defines the metric that will assign a value to each element.
+ This value can then in turn be used by the adaptor to decide what to do with a particular element.
+ Adaptor criteria are defined in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Mesh-Adaptor-Criteria"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -15976,6 +17651,58 @@ criterion
  Set the criterion that determines the element metric to evaluate and which elements to erode.
 \end_layout
 
+\begin_layout Itemize
+
+\series bold
+erode_surfaces
+\series default
+:
+ Sets the policy of handling surface facets that attach to eroded elements.
+ The value can be set to one of the following values:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series bold
+no
+\series default
+:
+ don't erode surfaces (default)
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+yes
+\series default
+:
+ erode surfaces if the underlying element is eroded.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+grow
+\series default
+:
+ add the newly exposed facets of eroded elements to the surface.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+reconstruct
+\series default
+:
+ reconstruct surface.
+ This only works if the surface is defined via a part.
+ 
+\end_layout
+
+\end_deeper
 \begin_layout Standard
 
 \emph on
@@ -16134,7 +17861,18 @@ criterion
 \series default
 :
  The metric used to assign values to elements.
- (See section 4) 
+ (See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Mesh-Adaptor-Criteria"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) 
 \end_layout
 
 \begin_layout Itemize
@@ -16205,8 +17943,310 @@ Example
 </mesh_adaptor> 
 \end_layout
 
+\begin_layout Subsubsection
+hex_refined2d
+\end_layout
+
+\begin_layout Standard
+The hex_refined2d adaptor refines elements in the XY plane.
+ (It assumes that the mesh consists of a single layer of hex elements,
+ aligned in the XY coordinate plane.) Elements are split by splitting each edge into 2.
+ This may result in a non-conforming mesh,
+ where an element node in the refined mesh lies on an edge in the parent mesh.
+ Such 
+\emph on
+hanging nodes 
+\emph default
+are constrained using linear constraints and are forced to remain in the same relative position as the parent edge.
+ This ensures that the refined mesh remains 
+\begin_inset Quotes eld
+\end_inset
+
+watertight
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The following parameters are available.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_elem_refine
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The max number of elements to refine per refinement step.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+criterion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The adaption criterion to use
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Elements with criterion values above this threshold will be refined.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+tet_refine
+\end_layout
+
+\begin_layout Standard
+Applies a uniform refinement of a tetrahedral mesh.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+hex_refine
+\end_layout
+
+\begin_layout Standard
+The hex_refined adaptor refines elements by splitting each edge into 2.
+ This may result in a non-conforming mesh,
+ where an element node in the refined mesh lies on an edge in the parent mesh.
+ Such 
+\emph on
+hanging nodes 
+\emph default
+are constrained using linear constraints and are forced to remain in the same relative position as the parent edge.
+ This ensures that the refined mesh remains 
+\begin_inset Quotes eld
+\end_inset
+
+watertight
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The following parameters are available.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_elem_refine
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The max number of elements to refine per refinement step.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+criterion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The adaption criterion to use
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max_value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Elements with criterion values above this threshold will be refined.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Mesh Adaptor Criteria
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Mesh-Adaptor-Criteria"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -16718,7 +18758,13 @@ Although contact can be used with the FEAMR framework,
 
 \begin_layout Enumerate
 It is not advised to erode elements that are in contact,
- since this will not produce the correct result.
+ since this may not produce the correct result.
+ If you want to use erosion with contact,
+ make sure to set the 
+\emph on
+erode_surfaces 
+\emph default
+to an appropriate value.
  
 \end_layout
 
@@ -16760,8 +18806,14 @@ The
 \shape italic
 Initial
 \shape default
- section defines all initial conditions that may be applied to the analysis.
- An initial condition is defined via the 
+ section defines all the initial conditions that may be applied to the analysis.
+ An initial condition allows users to set the initial values of solution variables (e.g.
+ velocity) as well as initialize the values of some special components.
+ 
+\end_layout
+
+\begin_layout Standard
+An initial condition is defined via the 
 \shape italic
 ic 
 \shape default
@@ -16784,6 +18836,62 @@ type
 node_set 
 \shape default
 attribute defines the set of nodes that this initial condition affects.
+ This node set must be defined in the Mesh section of the input file.
+ Using implicit partitions (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Implicit-Partitions"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) surfaces,
+ element sets,
+ and part lists can also be assigned to the node_set attribute.
+\end_layout
+
+\begin_layout Standard
+An optional name attribute can be defined to assign a unique name to the initial condition.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<ic name="ic01" type="velocity" node_set="set1">
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<value>1,0,0</value>
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+</ic>
+\end_layout
+
+\begin_layout Subsection
+The init_dof Initial Condition
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+init_dof 
+\emph default
+initial condition can be used to initialize any degree of freedom of the model.
+ It supports the following parameters.
+ This feature is deprecated and it is better to use one of the specific initial conditions listed in the sections below.
  
 \end_layout
 
@@ -16793,134 +18901,104 @@ attribute defines the set of nodes that this initial condition affects.
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="3" columns="3">
 <features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \series bold
-type
+parameter
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \series bold
-Description
+description
 \end_layout
 
 \end_inset
 </cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-init_dof
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the initial value of a specific degree of freedom.
- (obsolete)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-velocity
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the initial value for the nodal velocities.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-shell velocity
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the initial value for the shell (bottom) nodal velocities.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-initial fluid velocity
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the initial values for the fluid velocity (in fluid analysis)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-prestrain
+
+\series bold
+initial value
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Used to initialize the prestrain analysis.
- 
+dof
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The degree of freedom identifier
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The value for the corresponding nodal degree of freedom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
 \end_layout
 
 \end_inset
@@ -16931,6 +19009,10 @@ Used to initialize the prestrain analysis.
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\align center
 \begin_inset VSpace defskip
 \end_inset
 
@@ -16944,15 +19026,371 @@ Example:
 \end_layout
 
 \begin_layout LyX-Code
-<ic type="init_dof" node_set="set1">
+<ic name="ic01" type="init_dof" node_set="set1">
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<dof>vx</dof>
 \end_layout
 
 \begin_layout LyX-Code
-  <dof>x</dof>
+<value>1</value>
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+</ic>
+\end_layout
+
+\begin_layout Subsection
+The velocity Initial Condition
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+velocity 
+\emph default
+initial condition can be used to set the initial velocity for a dynamic solid-mechanics analysis.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+initial value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The value for the initial velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0,0,0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
 \end_layout
 
 \begin_layout LyX-Code
-  <value>1.0</value>
+<ic type="velocity" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+  <value>1.0,0.0,0.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+</ic>
+\end_layout
+
+\begin_layout Subsection
+The shell velocity Initial Condition
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+shell velocity 
+\emph default
+initial condition can be used to set the initial velocity for the for the back-nodes of shells in a dynamic solid-mechanics analysis.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+initial value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The value for the initial velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0,0,0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<ic type="shell velocity" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+  <value>1.0,0.0,0.0</value>
+\end_layout
+
+\begin_layout LyX-Code
+</ic>
+\end_layout
+
+\begin_layout Subsection
+The Initial Fluid Velocity Initial Condition
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+initial fluid velocity 
+\emph default
+initial condition can be used to set the initial velocity for a fluid mechanics analysis.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+initial value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The value for the initial fluid velocity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0,0,0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<ic type="initial fluid velocity" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+  <value>1.0,0.0,0.0</value>
 \end_layout
 
 \begin_layout LyX-Code
@@ -17268,7 +19706,7 @@ The
 \shape italic
 Boundary
 \shape default
- section defines all fixed and prescribed boundary conditions that may be applied to the geometry.
+ section defines all fixed and prescribed boundary conditions that may be applied to the model.
  Individual boundary conditions are defined via the 
 \emph on
 bc 
@@ -17278,642 +19716,36 @@ tag and the particular boundary condition is defined via the
 type 
 \emph default
 attribute.
- The following boundary condition types are currently supported.
+ An optional 
+\emph on
+name 
+\emph default
+attribute can be added to uniquely name the boundary condition.
  
 \end_layout
 
 \begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
+For example:
 \end_layout
 
-\begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="18" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<column alignment="center" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-type
+\begin_layout LyX-Code
+<bc name="bc1" type="zero displacement" node_set="nodeset1">
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-description
+\begin_layout LyX-Code
+  <x_dof>1</x_dof>
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-module
+\begin_layout LyX-Code
+  <y_dof>1</y_dof>
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-zero displacement
+\begin_layout LyX-Code
+  <z_dof>1</z_dof>
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fix the x,
- y,
- or z displacement degree of freedom
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-zero shell displacement
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fix the x,
- y,
- or z shell (bottom) displacement dof
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-zero fluid pressure
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fix the biphasic or multiphasic effective fluid pressure 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-biphasic
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-zero concentration
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fix the effective solute concentration 
-\begin_inset Formula $\tilde{c}$
-\end_inset
-
- (multiphasic or fluid-solutes)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solute
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-zero fluid dilatation
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fix the fluid dilatation 
-\begin_inset Formula $e^{f}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-fluid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-prescribed displacement
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the x,
- y,
- or z displacement dof 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-prescribed shell displacement
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the x,
- y,
- or z shell (bottom) displacement dof 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-prescribed deformation
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the motion via a deformation gradient
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-prescribed fluid pressure
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the biphasic or multiphasic effective fluid pressure 
-\begin_inset Formula $\tilde{p}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-biphasic
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-prescribed concentration
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the effective solute concentration 
-\begin_inset Formula $\tilde{c}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solute
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-prescribed fluid dilatation
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the fluid dilatation 
-\begin_inset Formula $e^{f}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-fluid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-normal displacement
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the motion normal to a surface (in reference configuration)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-rigid deformation
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the motion via a rigid motion
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-rigid
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-The nodes are attached to a rigid body
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-solid
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-fluid pressure
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe the actual fluid pressure 
-\begin_inset Formula $p$
-\end_inset
-
- on a surface
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-multiple
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-fluid resistance
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribe a fluid resistance 
-\begin_inset Formula $R$
-\end_inset
-
- such that 
-\begin_inset Formula $p=Rq$
-\end_inset
-
-,
- 
-\begin_inset Formula $q=$
-\end_inset
-
-volumetric flux
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-multiple
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-linear constraint
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-The motion is constrained to satisfy a linear constraint
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-(all)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
+\begin_layout LyX-Code
+</bc>
 \end_layout
 
 \begin_layout Standard
@@ -17970,6 +19802,21 @@ Mesh
  defining a node set via an element set is done using 
 \emph on
 @elem_set:.
+
+\emph default
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Implicit-Partitions"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ for more information on how to implicit partitions.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -18002,7 +19849,7 @@ zero displacement
 \begin_inset Quotes erd
 \end_inset
 
- and the node set to which this boundary condition applies is defined vua 
+ and the node set to which this boundary condition applies is defined via 
 \shape italic
 node_set
 \shape default
@@ -18075,7 +19922,7 @@ zero shell displacement
 \begin_inset Quotes erd
 \end_inset
 
- and the node set to which this boundary condition applies is defined vua 
+ and the node set to which this boundary condition applies is defined via 
 \shape italic
 node_set
 \shape default
@@ -20332,6 +22179,15 @@ In a fluid,
 \end_layout
 
 \begin_layout Subsection
+Fluid RC
+\end_layout
+
+\begin_layout Standard
+This boundary condition models a fluid surface that has an RC-equivalent circuit for outflow conditions.
+ 
+\end_layout
+
+\begin_layout Subsection
 Fluid RCR
 \begin_inset CommandInset label
 LatexCommand label
@@ -20343,7 +22199,7 @@ name "subsec:Fluid-RCR"
 \end_layout
 
 \begin_layout Standard
-This surface load models a three-element Windkessel outflow condition on a surface in a fluid,
+This boundary condition models a three-element Windkessel outflow condition on a surface in a fluid,
  fluid-FSI or fluid-solutes analysis,
  as described in 
 \begin_inset CommandInset citation
@@ -20818,107 +22674,26 @@ name "subsec:Rigid-Constraints"
 
 \begin_layout Standard
 The rigid constraints section allows users to prescribe the kinematics applied to a single rigid body.
+ A rigid constraint is added using the 
+\emph on
+rigid_bc 
+\emph default
+tag in the 
+\emph on
+Rigid 
+\emph default
+parent tag.
  The particular constraint is defined via the 
 \emph on
 type 
 \emph default
 attribute.
- 
-\end_layout
-
-\begin_layout Standard
-The following rigid constraints can be defined.
- 
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
+ An optional 
 \emph on
-rigid_fixed
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Fix one or more rigid degrees of freedom.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\emph on
-rigid_prescribed
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Prescribed the value of a rigid degree of freedom
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
+name 
+\emph default
+attribute can be added to uniquely name the constraint.
+ 
 \end_layout
 
 \begin_layout Subsubsection
@@ -21142,7 +22917,16 @@ Comments:
 \end_layout
 
 \begin_layout Enumerate
-The name of the rigid material defined in the Material section.
+The name of the rigid material is defined in the Material section.
+ The referenced material must be a 
+\begin_inset Quotes eld
+\end_inset
+
+rigid body
+\begin_inset Quotes erd
+\end_inset
+
+ material.
  
 \end_layout
 
@@ -21156,7 +22940,7 @@ The following example fixes the displacement degrees of freedom.
 \end_layout
 
 \begin_layout LyX-Code
-  <rb>1</rb>
+  <rb>RigidMaterial1</rb>
 \end_layout
 
 \begin_layout LyX-Code
@@ -21965,98 +23749,13 @@ The
 rigid_ic 
 \emph default
 section defines the initial conditions on rigid bodies.
- The following rigid initial conditions can be applied.
+ Rigid initial conditions can be used to set the initial values for the rigid body's linear and angular velocity.
+ The particular initial condition is selected using the 
+\emph on
+type 
+\emph default
+attribute.
  
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\emph on
-initial_rigid_velocity
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the initial value for the rigid body velocity.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\emph on
-initial_rigid_angular_velocity
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Set the initial value for the rigid body angular velocity.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsubsection
@@ -22358,172 +24057,7 @@ The
 rigid_load 
 \emph default
 section can be used to applied loads to a rigid body.
- The following rigid loads can be defined.
  
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\emph on
-rigid_force
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Apply a force to the center of the rigid body
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\emph on
-rigid_axial_force
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-An axial force between two rigid bodies.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\emph on
-rigid_follower_force
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-A force that follows the motion of the rigid body.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\emph on
-rigid_follower_moment
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-A moment that follows the motion of the rigid body.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\emph on
-rigid_cable
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-A force applied through a 
-\begin_inset Quotes eld
-\end_inset
-
-cable
-\begin_inset Quotes erd
-\end_inset
-
- that connects multiple rigid bodies.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsubsection
@@ -22772,7 +24306,7 @@ The
 \emph on
 rigid_moment
 \emph default
- load applies a moment about a partical coordinate axis.
+ load applies a moment about a particular coordinate axis.
  It requires the following parameters.
  
 \end_layout
@@ -22981,7 +24515,7 @@ The
 \emph on
 rigid_follower_force
 \emph default
- load applies a force in the local rigid body coortinate system.
+ load applies a force in the local rigid body coordinate system.
  The direction of the force in global coordinates therefore depends on orientation of the rigid body.
  It requires the following parameters.
  
@@ -23183,7 +24717,7 @@ The
 \emph on
 rigid_follower_
 \emph default
-moment load applies a moment in the local rigid body coortinate system.
+moment load applies a moment in the local rigid body coordinate system.
  The direction of the moment in global coordinates therefore depends on orientation of the rigid body.
  It requires the following parameters.
  
@@ -23631,14 +25165,14 @@ attribute.
 
 \begin_layout Standard
 The rigid connectors fall into two categories.
- The first category define different joints that contstrain the relative motion of one rigid body with respect to the second one.
+ The first category define different joints that constrain the relative motion of one rigid body with respect to the second one.
  
 \end_layout
 
 \begin_layout Standard
 Rigid joints produce nonlinear constraints between rigid bodies,
  which prevent relative motion except along the degrees of freedom of the joint.
- The term `rigid' refers to the bodies,
+ The term 'rigid' refers to the bodies,
  not to the joints.
  Each rigid joint needs to define two rigid bodies (
 \begin_inset Formula $a$
@@ -23957,7 +25491,7 @@ Prevent any relative motion between rigid bodies.
 
 \begin_layout Standard
 The second category of connectors apply a force on the rigid bodies that is proportional to some relative motion.
- The term `rigid' refers to the bodies,
+ The term 'rigid' refers to the bodies,
  not to the connectors.
 \end_layout
 
@@ -24249,7 +25783,7 @@ The second rigid body in the connector
 
 \begin_layout Standard
 In addition,
- the joints definde above are all based on the Augmented Lagrangian method,
+ the joints defined above are all based on the Augmented Lagrangian method,
  and consequently,
  also share the following parameters.
  
@@ -26766,7 +28300,7 @@ A rigid lock connects rigid bodies
 
 ,
  preventing relative motion between them.
- It requires the specification of a joint origin and two orthgonal axes 
+ It requires the specification of a joint origin and two orthogonal axes 
 \begin_inset Formula $\mathbf{e}_{1}$
 \end_inset
 
@@ -27150,7 +28684,7 @@ insertion_b
 \begin_inset Text
 
 \begin_layout Plain Layout
-Insection point of the spring on body b
+Insertion point of the spring on body b
 \end_layout
 
 \end_inset
@@ -27362,7 +28896,7 @@ insertion_b
 \begin_inset Text
 
 \begin_layout Plain Layout
-Insection point of the spring on body b
+In section point of the spring on body b
 \end_layout
 
 \end_inset
@@ -27660,7 +29194,7 @@ insertion_b
 \begin_inset Text
 
 \begin_layout Plain Layout
-Insection point of the spring on body b
+In section point of the spring on body b
 \end_layout
 
 \end_inset
@@ -27782,7 +29316,7 @@ attribute.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
+<lyxtabular version="3" rows="4" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -27824,14 +29358,14 @@ nodal_load
 \begin_inset Text
 
 \begin_layout Plain Layout
-A load that is added to the corresponding's dofs in the global force vector.
+A load that is added to the corresponding dofs in the global force vector.
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -27840,11 +29374,32 @@ nodal_force
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 A force applied to each node of a node set
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nodal_target_force
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A force that ramps the current nodal load to a target value.
+ 
 \end_layout
 
 \end_inset
@@ -27894,7 +29449,7 @@ The
 \shape italic
 dof
 \shape default
- parameter defins the degree of freedom.
+ parameter defines the degree of freedom.
  The following values are allowed:
 \end_layout
 
@@ -28019,6 +29574,48 @@ parameter sets the force vector.
 
 \begin_layout LyX-Code
 </nodal_load>
+\end_layout
+
+\begin_layout Subsubsection
+nodal_target_force
+\end_layout
+
+\begin_layout Standard
+This nodal load defines a force that is applied to each node in the node set.
+ The force will ramp up from the value at the end of the last time step,
+ to the desired value defined in the 
+\emph on
+force 
+\emph default
+variable.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<nodal_load type="nodal_force_target" node_set="set1">
+\end_layout
+
+\begin_layout LyX-Code
+  <force>1,0,0</force>
+\end_layout
+
+\begin_layout LyX-Code
+  <scale lc="1">1</scale>
+\end_layout
+
+\begin_layout LyX-Code
+</nodal_load>
+\end_layout
+
+\begin_layout Standard
+Note that,
+ in order to reach the target load,
+ the loadcurve assigned to 
+\emph on
+scale
+\emph default
+ must start at 0 and end at 1.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -31067,10 +32664,10 @@ moving frame
 load can be used to model the effects of being embedded in an accelerating and rotating coordinate system.
  Whereas the 
 \emph on
-centrifual body force 
+centrifugal body force 
 \emph default
 only emulates the effect of a centrifugal force and assumes a static analysis,
- the moving frame load includes Coriolos effect and the effects of an accelerating coordinate system and can be used in a dynamic analysis.
+ the moving frame load includes Coriolis effect and the effects of an accelerating coordinate system and can be used in a dynamic analysis.
  
 \end_layout
 
@@ -31782,7 +33379,7 @@ Although using the auto-contact can greatly simply defining contact between part
  the surfaces extracted from parts will likely be much larger than the contact area and this will result in a performance cost.
  Second,
  for complex geometries the extract surfaces may have a complex topology that may confuse some of the contact detection algorithms.
- In those situations it might be beneficial to decrease the search_radius parameter (for contact algorihtms that define this parameter).
+ In those situations it might be beneficial to decrease the search_radius parameter (for contact algorithms that define this parameter).
  
 \end_layout
 
@@ -34989,7 +36586,7 @@ Choosing a good initial penalty parameter can often be a difficult task,
 \begin_inset Formula $\varepsilon_{i}$
 \end_inset
 
-for a particular node/integration piont 
+for a particular node/integration point 
 \begin_inset Formula $i$
 \end_inset
 
@@ -35068,7 +36665,7 @@ secondary
 \emph default
 surface.
  The primary surface is the surface over which the contact equations are integrated and on which the contact tractions are calculated.
- The secondar surface is used to measure the gap function and to define the necessary kinematic quantities such as surface normals and tangents.
+ The secondary surface is used to measure the gap function and to define the necessary kinematic quantities such as surface normals and tangents.
  This approach is usually referred to as the 
 \shape italic
 single-pass 
@@ -35256,7 +36853,7 @@ maxaug
  can be used to set a minimum and maximum number of augmentations.
  When the 
 \shape italic
-maxuag 
+maxaug 
 \shape default
 value is reached,
  FEBio will move on to the next timestep,
@@ -35461,7 +37058,7 @@ The
 \shape italic
 search_tol
 \shape default
- parameter defines the search tolerance of the algorithm that projects nodes of the primary surface onto facets of the secondary syrface.
+ parameter defines the search tolerance of the algorithm that projects nodes of the primary surface onto facets of the secondary surface.
  A node that falls outside an element,
  but whose distance to the closest element's edge is less than the search tolerance is still considered inside.
  This can alleviate convergence problems when nodes are projected onto edges of elements and due to numerical error may be projected outside the surface.
@@ -37778,7 +39375,7 @@ contact potential
 \begin_inset Quotes erd
 \end_inset
 
- amd the following parameters can be defined.
+ and the following parameters can be defined.
  
 \end_layout
 
@@ -38689,7 +40286,7 @@ When an inlet boundary is subjected to a prescribed fluid pressure,
  the profile of the inlet fluid velocity remains unconstrained,
  and this lack of constraint often leads to poor numerical performance due to the production of velocity spikes.
  To avoid this problem,
- use this uniform fluid velocity constraint to help stabilize inlet conditions along the direction normal to the bondary.
+ use this uniform fluid velocity constraint to help stabilize inlet conditions along the direction normal to the boundary.
  This constraint evaluates the average fluid velocity normal to the selected boundary,
  
 \begin_inset Formula $\bar{v}_{n}$
@@ -39091,7 +40688,7 @@ prestrain update rule
 \begin_layout Standard
 The idea behind this rule is to eliminate the distortion induced by the incompatibility of the initial prestrain gradient with the reference geometry.
  Thus,
- we retain the original reference geometry at the cost of an altered effective prestain field.
+ we retain the original reference geometry at the cost of an altered effective prestrain field.
  The update rule is given by the following equation.
 \end_layout
 
@@ -39287,7 +40884,7 @@ node distance
 \end_inset
 
  constraint can be used to enforce a user-defined distance between two nodes.
- The target distance can be defined as a distance relative to the initial seperation between the two nodes,
+ The target distance can be defined as a distance relative to the initial separation between the two nodes,
  or as an absolute distance.
  This constraint takes the following parameters.
  
@@ -39416,7 +41013,7 @@ penalty
 \begin_inset Text
 
 \begin_layout Plain Layout
-Penalty factor for constrtaint enforcement
+Penalty factor for constraint enforcement
 \end_layout
 
 \end_inset
@@ -39700,11 +41297,11 @@ element.
 \end_layout
 
 \begin_layout LyX-Code
-  <discrete_material id="1" type="nonlinear spring">
+  <discrete_material id="1" type="linear spring">
 \end_layout
 
 \begin_layout LyX-Code
-    <force lc="1">1.0</force>
+    <E>1.0</E>
 \end_layout
 
 \begin_layout LyX-Code
@@ -39744,7 +41341,7 @@ and the
 \shape italic
 discrete 
 \shape default
-elemens are defined in more detail below.
+elements are defined in more detail below.
 \end_layout
 
 \begin_layout Subsection
@@ -39773,7 +41370,41 @@ attribute defines the material ID and the
 type 
 \shape default
 attribute defines the material type.
- The following types are currently supported.
+\end_layout
+
+\begin_layout Subsubsection
+Linear Spring
+\end_layout
+
+\begin_layout Standard
+The linear spring has a linear force-displacement relation.
+ It requires the E parameter that defines the spring constant.
+\end_layout
+
+\begin_layout Standard
+For example,
+\end_layout
+
+\begin_layout LyX-Code
+<discrete_material id="1" type="linear spring">
+\end_layout
+
+\begin_layout LyX-Code
+    <E>3.0</E>
+\end_layout
+
+\begin_layout LyX-Code
+</discrete_material>
+\end_layout
+
+\begin_layout Subsubsection
+Nonlinear spring
+\end_layout
+
+\begin_layout Standard
+The nonlinear spring allows users to define a custom relation between a measure of stretch and the spring force.
+ The following parameters can be defined.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -39794,7 +41425,7 @@ attribute defines the material type.
 \begin_layout Plain Layout
 
 \series bold
-Type
+parameter
 \end_layout
 
 \end_inset
@@ -39806,8 +41437,6 @@ Type
 
 \series bold
 Description
-\series default
- 
 \end_layout
 
 \end_inset
@@ -39818,7 +41447,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-linear spring
+scale
 \end_layout
 
 \end_inset
@@ -39827,7 +41456,7 @@ linear spring
 \begin_inset Text
 
 \begin_layout Plain Layout
-spring that has a linear force-displacement relation 
+Force scale factor.
 \end_layout
 
 \end_inset
@@ -39838,7 +41467,7 @@ spring that has a linear force-displacement relation
 \begin_inset Text
 
 \begin_layout Plain Layout
-nonlinear spring
+measure
 \end_layout
 
 \end_inset
@@ -39847,7 +41476,8 @@ nonlinear spring
 \begin_inset Text
 
 \begin_layout Plain Layout
-user defines the force-displacement relation 
+Measure of stretch.
+ (1)
 \end_layout
 
 \end_inset
@@ -39858,7 +41488,7 @@ user defines the force-displacement relation
 \begin_inset Text
 
 \begin_layout Plain Layout
-Hill
+force
 \end_layout
 
 \end_inset
@@ -39867,7 +41497,7 @@ Hill
 \begin_inset Text
 
 \begin_layout Plain Layout
-discrete material that defines a Hill-type muscle model
+1D function that defines the stretch-force relationship
 \end_layout
 
 \end_inset
@@ -39884,25 +41514,89 @@ discrete material that defines a Hill-type muscle model
 
 \end_layout
 
-\begin_layout Subsubsection
-Linear Spring
-\end_layout
-
 \begin_layout Standard
-The linear spring requires the E parameter that defines the spring constant.
+
+\emph on
+Comments:
 \end_layout
 
-\begin_layout Subsubsection
-Nonlinear spring
+\begin_layout Enumerate
+The 
+\emph on
+measure 
+\emph default
+parameter can be set to one of the following values:
 \end_layout
 
+\begin_deeper
+\begin_layout Enumerate
+
+\series bold
+elongation
+\series default
+:
+ Use the spring elongation,
+ the difference between current and original length,
+ as the measure of stretch.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+strain
+\series default
+:
+ Use the strain,
+ i.e.
+ the ratio of elongation over original length,
+ as the measure of stretch
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+stretch
+\series default
+:
+ Use the ratio of current length over original length as measure of stretch.
+ 
+\end_layout
+
+\end_deeper
 \begin_layout Standard
-The nonlinear spring requires the 
-\shape italic
-force
-\shape default
- parameter,
- which defines the loadcurve that will be used for the force-displacement relation.
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<discrete_material id="1" name="set1" type="nonlinear spring">
+\end_layout
+
+\begin_layout LyX-Code
+	<scale>1</scale>
+\end_layout
+
+\begin_layout LyX-Code
+	<measure>elongation</measure>
+\end_layout
+
+\begin_layout LyX-Code
+	<force type="math">
+\end_layout
+
+\begin_layout LyX-Code
+		<math>x</math>
+\end_layout
+
+\begin_layout LyX-Code
+	</force>
+\end_layout
+
+\begin_layout LyX-Code
+</discrete_material>
 \end_layout
 
 \begin_layout Subsubsection
@@ -39914,87 +41608,211 @@ The Hill discrete material defines the following parameters.
  
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
 
-\emph on
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Vmax
-\emph default
-:
- maximum shortening velocity
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
+\begin_layout Plain Layout
+maximum shortening velocity
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 ac
-\emph default
-:
- activation level
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
+\begin_layout Plain Layout
+activation level
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Fmax
-\emph default
-:
- maximum force
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
-Ksh
-\emph default
-:
- shape parameter
+\begin_layout Plain Layout
+maximum force
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
+\begin_layout Plain Layout
 Lmax
-\emph default
-:
- strain (i.e.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+strain (i.e.
  stretch - 1) at which Fmax occurs.
- 
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
+\begin_layout Plain Layout
 L0
-\emph default
-:
- initial reference length
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
+\begin_layout Plain Layout
+initial reference length
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Sv
-\emph default
-:
- max velocity scale
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
+\begin_layout Plain Layout
+max velocity scale
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Ftl
-\emph default
-:
- normalized tension-length curve
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\emph on
+\begin_layout Plain Layout
+normalized tension-length curve
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Ftv
-\emph default
-:
- normalized tension-velocity curve
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+normalized tension-velocity curve
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -40103,7 +41921,7 @@ The properties Sv,
  and Ftv,
  are optional and will evaluate to 1 if omitted.
  They can be defined as load curves.
- See the exampe below.
+ See the example below.
  
 \end_layout
 
@@ -40274,24 +42092,106 @@ element.
  This element requires two attributes:
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 
 \series bold
-dmat
-\series default
- discrete material ID 
+attribute
 \end_layout
 
-\begin_layout Description
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 
 \series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+dmat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+discrete material ID
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 discrete_set
-\series default
- discrete element set defined in the 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+discrete element set defined in the 
 \emph on
-Mesh
+Mesh 
 \emph default
- section 
+section.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<discrete dmat="1" discrete_set="set1"/>
 \end_layout
 
 \begin_layout Subsection
@@ -40521,55 +42421,89 @@ LoadData
 \shape default
  section is used to define load controllers.
  A load controller allows users to manipulate the value of most model parameters as an explicit or implicit function of time.
- Use the 
+ A specific load controller is defined using the 
 \emph on
 type
 \emph default
- attribute to define a particular controller.
- Currently the following load controllers are available:
+ attribute.
 \end_layout
 
-\begin_layout Itemize
-
-\series bold
-loadcurve
-\series default
-:
- the controller is a load curve,
- which is a tabulated list of time-value pairs.
- The user can set how the points are interpolated and how to extend the curve outside of its specified interval.
+\begin_layout Standard
+In order to make a model parameter time-dependent,
+ first define a load controller in the LoadData section.
+ Then,
+ use the id attribute assigned to the load controller as the value of the 
+\emph on
+lc
+\emph default
+ attribute.
+ For example,
+ consider the following load controller was defined in the LoadData section.
 \end_layout
 
-\begin_layout Itemize
-
+\begin_layout LyX-Code
+<load_controller 
 \series bold
-math
+id="1"
 \series default
-:
- the math controller allows the user to specify a mathematical expression that defines a function of time.
- Other model parameters can be used in the mathematical expression.
+ type="math">
 \end_layout
 
-\begin_layout Itemize
+\begin_layout LyX-Code
+    <math>2.0*sin(pi*t)</math>
+\end_layout
 
-\series bold
-math-interval
-\series default
-:
- Similar to the math controller,
- but the math expression is defined only over a time interval.
- The behavior outside the interval can be specified separately.
+\begin_layout LyX-Code
+</load_controller>
+\end_layout
+
+\begin_layout Standard
+The id assigned to this load controller is 1.
+ Then,
+ this load controller can be used,
+ for instance,
+ in a boundary condition.
  
 \end_layout
 
-\begin_layout Itemize
+\begin_layout LyX-Code
+<bc type="prescribed displacement" node_set="
+\shape italic
+\emph on
+set1
+\shape default
+\emph default
+">
+\end_layout
 
+\begin_layout LyX-Code
+  <dof>x</dof>
+\end_layout
+
+\begin_layout LyX-Code
+  <value 
 \series bold
-PID
+lc="1"
 \series default
-:
- a PID controller,
- which allows the value of a model parameter to be dependent on the values and their time history of other model parameters.
+>3.14</value>
+\end_layout
+
+\begin_layout LyX-Code
+  <relative>0</relative>
+\end_layout
+
+\begin_layout LyX-Code
+<bc>
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+value 
+\emph default
+parameter of this boundary condition is now made time dependent.
+ Note that the actual value of this parameter will be the value of the load controller at a particular point in time,
+ multiplied with the value specified by the tag's value (3.14 in the example).
  
 \end_layout
 
@@ -41051,6 +42985,318 @@ type="math"
 \end_layout
 
 \begin_layout Subsection
+The math-interval controller
+\end_layout
+
+\begin_layout Standard
+The math-interval controller is similar to the math controller,
+ but the math expression is defined only over a time interval.
+ The behavior outside the interval can be specified separately.
+ The following parameters can be defined.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+interval
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+min and max value of the time interval.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+left_extend
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+How the function is extrapolated before the min value.(1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+right_extend
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+How the function is extrapolated after the max value.
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+math
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The mathematical expression.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+t
+\begin_inset Quotes erd
+\end_inset
+
+ to reference time.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comment
+\emph default
+:
+\end_layout
+
+\begin_layout Enumerate
+The values for 
+\emph on
+left_extend 
+\emph default
+and 
+\emph on
+right_extend
+\emph default
+ can be set to one of the following values.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Extend
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+zero
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The value is set to zero.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+constant
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The value is the constant value at the end point
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+repeat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The curve is repeated
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<load_controller id="1" name="LC1" type="math-interval">
+\end_layout
+
+\begin_layout LyX-Code
+	<interval>0,1</interval>
+\end_layout
+
+\begin_layout LyX-Code
+	<left_extend>constant</left_extend>
+\end_layout
+
+\begin_layout LyX-Code
+	<right_extend>constant</right_extend>
+\end_layout
+
+\begin_layout LyX-Code
+	<math>sin(t)</math>
+\end_layout
+
+\begin_layout LyX-Code
+</load_controller>
+\end_layout
+
+\begin_layout Subsection
 The PID controller
 \end_layout
 
@@ -41068,53 +43314,162 @@ The PID controller allows users to create simple control systems where the value
 This controller requires the following parameters:
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 
 \series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
 var
-\series default
-:
- specify the model parameter that is used as process variable,
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+specify the model parameter that is used as process variable,
  i.e.
  the measurement.
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\series bold
+\begin_layout Plain Layout
+
+\emph on
 target
-\series default
-:
- the target value for the process variable.
- 
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\series bold
+\begin_layout Plain Layout
+the target value for the process variable.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
 Kp
-\series default
-:
- weight factor for the proportional term.
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\series bold
+\begin_layout Plain Layout
+weight factor for the derivative term
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
 Kd
-\series default
-:
- weight factor for the derivative term
 \end_layout
 
-\begin_layout Itemize
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\series bold
+\begin_layout Plain Layout
+weight factor for the derivative term
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
 Ki
-\series default
-:
- weight factor for the integral term.
- 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+weight factor for the integral term.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -53431,7 +55786,7 @@ A value of
 
 \begin_layout Enumerate
 The augmentation tolerance determines the convergence condition that is used for the augmented Lagrangian method:
- convergence is reached when the relative ratio of the lagrange multiplier norm of the previous augmentation 
+ convergence is reached when the relative ratio of the Lagrange multiplier norm of the previous augmentation 
 \begin_inset Formula $\left\Vert \lambda_{k}\right\Vert $
 \end_inset
 
@@ -116593,7 +118948,7 @@ In the following example an additional step is defined,
 \end_layout
 
 \begin_layout LyX-Code
-    </loadcuve>
+    </loadcurve>
 \end_layout
 
 \begin_layout LyX-Code
@@ -117517,7 +119872,7 @@ solution
 
 \begin_layout Standard
 In any case,
- the opimization module tries to minimize an objective function of the form,
+ the optimization module tries to minimize an objective function of the form,
 \end_layout
 
 \begin_layout Standard
@@ -117578,7 +119933,7 @@ name "sec:Optimization-Input-File"
 
 \begin_layout Standard
 Like all FEBio input files,
- the parameter optimization input file is an xml-formatted text file.
+ the parameter optimization input file is an XML-formatted text file.
  The following sections are defined:
 \end_layout
 
@@ -118731,7 +121086,7 @@ The target data is defined as a tabulated list of nodal values.
 \end_layout
 
 \begin_layout Standard
-These options will be described separetely in the following sections.
+These options will be described separately in the following sections.
  
 \end_layout
 
@@ -118882,7 +121237,7 @@ filter_positive_only
 \begin_inset Text
 
 \begin_layout Plain Layout
-The function tracks the evoluation of a model parameter,
+The function tracks the evolution of a model parameter,
  but filters only the positive values.
 \end_layout
 
@@ -119509,7 +121864,7 @@ However,
  that the finite element method cannot solve all problems.
  It is a very powerful numerical method,
  but with limitations.
- Understanding these limitations and how they affect your modeling work is crucial in becoming a good analysist.
+ Understanding these limitations and how they affect your modeling work is crucial in becoming a good analyst.
 \end_layout
 
 \begin_layout Section
@@ -120044,7 +122399,7 @@ Some constitutive models are only valid for a limited amount of deformation.
  All materials in FEBio are designed for large deformation (in the sense that they are objective under arbitrary deformation),
  but that does not imply unlimited deformation.
  When the deformation becomes too large,
- the material response may become unphysical and although FEBio gives an answer,
+ the material response may become nonphysical and although FEBio gives an answer,
  the result may be meaningless (see Section
 \begin_inset space ~
 \end_inset
@@ -120085,7 +122440,7 @@ Boundary conditions are necessary to uniquely define the solution of the problem
 
 \begin_layout Standard
 If the problem is underconstrained the solution is not uniquely defined and FEBio will not be able to find a solution.
- The most common example of an undercontrained problem is one where the rigid body modes are not constrained.
+ The most common example of an underconstrained problem is one where the rigid body modes are not constrained.
  A rigid body mode is a mode of deformation that does alter the stress in the body.
  Affine translation and rotation of the entire mesh are two ways to introduce a rigid body mode.
  In a (quasi-)static finite element analysis all rigid body modes must be properly constrained in order to find a unique solution.
@@ -120217,7 +122572,7 @@ When an element inverts,
  Thus,
  when a negative Jacobian is found in an element,
  FEBio cannot continue.
- Fortunatly,
+ Fortunately,
  FEBio's automatic time-stepping algorithm can usually circumvent this problem by cutting the time step back and retrying the step using a smaller time step.
  In addition,
  FEBio will recalculate the global stiffness matrix.
@@ -120292,7 +122647,7 @@ name "subsec:Time-step-too-large"
 \end_layout
 
 \begin_layout Standard
-Altough the auto-time stepper will automatically adjust the time step in case of trouble,
+Although the auto-time stepper will automatically adjust the time step in case of trouble,
  it is designed to work within user defined limits and sometimes they are not set properly to solve the problem.
  The most common issue is that the minimum time step is set too large.
  Cutting back the minimum in addition to the initial time step can often help in preventing negative Jacobians.
@@ -120316,7 +122671,7 @@ name "para:elements"
 
 \end_inset
 
- When elemens get too distorted they might not be able to deform any further without inverting the element.
+ When elements get too distorted they might not be able to deform any further without inverting the element.
  In this case,
  it may be necessary to adjust the mesh in the area where the elements are inverting.
 \end_layout
@@ -120377,7 +122732,7 @@ name "subsec:Failure-to-converge"
 FEBio uses an iterative method to solve the nonlinear finite element equations.
  This means that for each time step the solution for that step is obtained by a succession of iterations,
  where each iteration brings the model (hopefully) closer to the solution for that step.
- An iterative method requires a convergence criterium to decide when to stop iterating and FEBio uses no less than three criteria.
+ An iterative method requires a convergence criterion to decide when to stop iterating and FEBio uses no less than three criteria.
  (In biphasic and multiphasic problems additional convergence criteria are used for the pressure and concentration degrees of freedom.) The convergence norm for each of these criteria is defined by the user in the control section of the input file.
 \end_layout
 
@@ -120674,7 +123029,7 @@ Quasi-static models may sometimes exhibit instabilities that may prevent the def
 \begin_layout Standard
 The generalized-alpha time integration scheme of the implicit solver uses several parameters that control the overall energy-conservation of the model.
  By choosing these parameters such that the system looses energy over time,
- artifical damping can be introduced.
+ artificial damping can be introduced.
  
 \end_layout
 
@@ -120790,7 +123145,7 @@ penalizing
  In other words,
  when the two contacting surfaces penetrate,
  a force is generated proportional to the distance of penetration,
- which has the effect that the surfaces will now repell each other.
+ which has the effect that the surfaces will now repel each other.
  The strength of this repelling force is controlled by the user through the 
 \shape italic
 penalty factor
@@ -120853,7 +123208,7 @@ method.
 augmentations
 \shape default
 ),
- where each time the approximate Lagrange mutlipliers are updated (or 
+ where each time the approximate Lagrange multipliers are updated (or 
 \shape italic
 augmented
 \shape default
@@ -120873,7 +123228,7 @@ The obvious drawback of this method is that now each time step has to be solved 
 So why not just use the augmented Lagrangian method?
  Well,
  often the penalty method will give good results and since the penalty method is much faster,
- it is often the preferred choice of many analysists.
+ it is often the preferred choice of many analysts.
 \end_layout
 
 \begin_layout Standard
@@ -120892,7 +123247,7 @@ tolerance
 \emph on
 laugon
 \emph default
- paramerter,
+ parameter,
  to AUGLAG (=1)).
  Then,
  define the corresponding loadcurve as zero everywhere except for the final time step.
@@ -123322,7 +125677,7 @@ name "subsec:Constraint-enforcement"
 
 \begin_layout Standard
 FEBio uses many iterative algorithms for enforcing constraints.
- For each of these contraints the user must verify that the solution indeed satisfies these constraints sufficiently.
+ For each of these constraints the user must verify that the solution indeed satisfies these constraints sufficiently.
  The two most common constraints used in FEBio are incompressibility and contact.
 \end_layout
 
@@ -123365,7 +125720,7 @@ lock
 When a contact constraint is not sufficiently enforced,
  the contacting surfaces will have penetrated.
  This problem is usually identified easily by looking at the deformed model in a post-processing software (e.g.
- PostView).
+ FEBioStudio).
  Increasing the penalty factor and/or decreasing the augmented Lagrangian tolerance should solve this problem.
 \end_layout
 
@@ -124819,7 +127174,7 @@ Pardiso
 \end_layout
 
 \begin_layout Standard
-The Pardiso solver is an effecient sparse direct linear solver and is the default linear solver.
+The Pardiso solver is an efficient sparse direct linear solver and is the default linear solver.
  FEBio uses the implementation from the MKL library.
  It does not require any configuration parameters.
  It can take symmetric,
@@ -127930,7 +130285,7 @@ Invalid number of classes returned by PluginNumClasses
 :
 
 \emph default
- There was a problem with the plugin's innitialization.
+ There was a problem with the plugin's initialization.
  Notify the developer of the plugin to fix this.
 \end_layout
 
@@ -128849,9 +131204,9 @@ Introduction
 \begin_layout Standard
 This appendix describes the structure of the FEBio binary database (more commonly referred to as the FEBio plot file),
  which stores the results of a FEBio analysis.
- The FEBio binary database format is both self-describing and extendible.
+ The FEBio binary database format is both self-describing and extendable.
  A user can understand the contents of the file by simply parsing the block structure of the file.
- The file format is made extendible by providing an abstract layer between the data and the file system.
+ The file format is made extensible by providing an abstract layer between the data and the file system.
  This layer defines the file structure as a hierarchy of data blocks.
  The result is that each file is now structured similarly as a file folder.
  Each block can be viewed as a file in the folder and each branch in the hierarchy as a sub-folder.
@@ -129323,7 +131678,7 @@ State block containing results of a single time step
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-The overall structure of the plot file consistes of a root section,
+The overall structure of the plot file consists of a root section,
  a mesh section,
  and multiple state sections.
  
