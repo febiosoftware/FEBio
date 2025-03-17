@@ -28,21 +28,36 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEAugLagLinearConstraint.h"
-#include "FECore/FEMesh.h"
-#include "FECore/log.h"
-#include <FECore/FELinearSystem.h>
+#include "FEModel.h"
+#include "FEMesh.h"
+#include "log.h"
+#include "FELinearSystem.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEAugLagLinearConstraintDOF, FECoreClass)
-	ADD_PARAMETER(m_node, "id", FE_PARAM_ATTRIBUTE, 0);
+	ADD_PARAMETER(m_nodeid, "id", FE_PARAM_ATTRIBUTE, 0);
 	ADD_PARAMETER(m_bc, "bc", FE_PARAM_ATTRIBUTE, "$(dof_list)");
 	ADD_PARAMETER(m_val, "node")->setLongName("Value");
 END_FECORE_CLASS();
 
 FEAugLagLinearConstraintDOF::FEAugLagLinearConstraintDOF(FEModel* fem) : FECoreClass(fem)
 {
-	m_node = m_bc = 0;
+	m_nodeid = m_bc = 0;
 	m_val = 0.0;
+}
+
+FENode& FEAugLagLinearConstraintDOF::Node()
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+	return *(mesh.FindNodeFromID(m_nodeid));
+}
+
+int FEAugLagLinearConstraintDOF::NodeIndex()
+{
+	FEModel* fem = GetFEModel();
+	FEMesh& mesh = fem->GetMesh();
+	return mesh.FindNodeIndexFromID(m_nodeid);
 }
 
 //-----------------------------------------------------------------------------
@@ -61,7 +76,7 @@ void FEAugLagLinearConstraint::ClearDOFs()
 void FEAugLagLinearConstraint::AddDOF(int node, int bc, double val)
 {
 	FEAugLagLinearConstraintDOF* dof = fecore_alloc(FEAugLagLinearConstraintDOF, GetFEModel());
-	dof->m_node = node;
+	dof->m_nodeid = node;
 	dof->m_bc = bc;
 	dof->m_val = val;
 	m_dof.push_back(dof);
@@ -114,7 +129,7 @@ void FELinearConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
             int n = (int)(*it)->m_dof.size();
             lm.resize(n+1);
             FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
-            for (int j = 0; j<n; ++j, ++is) lm[j] = mesh.Node((*is)->m_node - 1).m_ID[(*is)->m_bc];
+            for (int j = 0; j<n; ++j, ++is) lm[j] = (*is)->Node().m_ID[(*is)->m_bc];
             lm[n] = m_EQ[i];
             M.build_add(lm);
         }
@@ -125,7 +140,7 @@ void FELinearConstraintSet::BuildMatrixProfile(FEGlobalMatrix& M)
             int n = (int)(*it)->m_dof.size();
             lm.resize(n);
             FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
-            for (int j = 0; j<n; ++j, ++is) lm[j] = mesh.Node((*is)->m_node - 1).m_ID[(*is)->m_bc];
+            for (int j = 0; j<n; ++j, ++is) lm[j] = (*is)->Node().m_ID[(*is)->m_bc];
             M.build_add(lm);
         }
     }
@@ -143,7 +158,7 @@ double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 	FEMesh& mesh = GetMesh();
 	for (int i=0; i<n; ++i, ++it) 
 	{
-		FENode& node = mesh.Node((*it)->m_node - 1);
+		FENode& node = (*it)->Node();
 		switch ((*it)->m_bc)
 		{
 		case 0: u = node.m_rt.x - node.m_r0.x; break;
@@ -231,7 +246,7 @@ void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
             FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin();
             for (int i=0; i<n; ++i, ++it)
             {
-                int neq = mesh.Node((*it)->m_node - 1).m_ID[(*it)->m_bc];
+                int neq = (*it)->Node().m_ID[(*it)->m_bc];
                 if (neq >= 0)
                     R[neq] -= lam * (*it)->m_val;
             }
@@ -247,7 +262,7 @@ void FELinearConstraintSet::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
             FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin();
             for (int i=0; i<n; ++i, ++it)
             {
-                int neq = mesh.Node((*it)->m_node - 1).m_ID[(*it)->m_bc];
+                int neq = (*it)->Node().m_ID[(*it)->m_bc];
                 if (neq >= 0)
                 {
                     R[neq] -= (LC.m_lam+m_eps*c)* (*it)->m_val;
@@ -293,8 +308,8 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
             it = LC.m_dof.begin();
             for (int i=0; i<n; ++i, ++it)
             {
-                en[i] = (*it)->m_node - 1;
-                int neq = mesh.Node((*it)->m_node - 1).m_ID[(*it)->m_bc];
+                en[i] = (*it)->NodeIndex();
+                int neq = (*it)->Node().m_ID[(*it)->m_bc];
                 elm[i] = neq;
             }
             en[n] = -1;
@@ -325,8 +340,8 @@ void FELinearConstraintSet::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
             it = LC.m_dof.begin();
             for (int i=0; i<n; ++i, ++it)
             {
-                en[i] = (*it)->m_node - 1;
-                int neq = mesh.Node((*it)->m_node - 1).m_ID[(*it)->m_bc];
+                en[i] = (*it)->NodeIndex();
+                int neq = (*it)->Node().m_ID[(*it)->m_bc];
                 elm[i] = neq;
             }
             ke.SetNodes(en);
