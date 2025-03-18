@@ -868,7 +868,7 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 		if (fgen)
 		{
 			// see if this map is already defined
-			string mapName = ngen->GetName();
+			string mapName = fgen->GetName();
 			FESurfaceMap* oldMap = dynamic_cast<FESurfaceMap*>(mesh.FindDataMap(mapName));
 			if (oldMap) return false;
 
