@@ -1,0 +1,8 @@
+@echo off
+
+SET BUCKET=%BUCKET%
+SET PACKAGE_NAME=%PACKAGE_NAME%
+SET SDK_S3_URI="s3://%BUCKET%/%PACKAGE_NAME%/%FEBIO_SDK_BRANCH%/%OS%/%PACKAGE%"
+echo %SDK_S3_URI%
+aws "s3" "cp" "%SDK_S3_URI%" "."
+tar "xzf" "%PACKAGE%"
