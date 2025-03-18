@@ -95,17 +95,6 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
     int NF = pcs->Elements();
     double fn = 0;    // initialize
     
-    // initialize on the first pass to calculate the vectorial area of each surface element and to identify solid element associated with this surface element
-    if (m_binit) {
-        m_area.resize(NF);
-        for (int j = 0; j<NF; ++j)
-        {
-            FESurfaceElement& el = pcs->Element(j);
-            m_area[j] = pcs->SurfaceNormal(el, 0, 0)*pcs->FaceArea(el);
-        }
-        m_binit = false;
-    }
-    
     // calculate net flow rate normal to this surface
     for (int j = 0; j<NF; ++j)
     {
@@ -125,9 +114,12 @@ bool FEPlotMixtureFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
                 if (ptf) w += ptf->m_w;
             }
             w /= nint;
+
+			vec3d area = pcs->SurfaceNormal(el, 0, 0) * pcs->FaceArea(el);
+
             
             // Evaluate contribution to net flow rate across surface.
-            fn += w*m_area[j];
+            fn += w*area;
         }
     }
     

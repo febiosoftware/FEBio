@@ -60,13 +60,8 @@ public:
 //!
 class FEPlotMixtureFluidFlowRate : public FEPlotSurfaceData
 {
-private:
-    bool                m_binit;
-    vector<vec3d>       m_area;
-    
 public:
 	FEPlotMixtureFluidFlowRate(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_REGION) {
-        m_binit = true;
         SetUnits(UNIT_FLOW_RATE);
     }
     bool Save(FESurface& surf, FEDataStream& a);
