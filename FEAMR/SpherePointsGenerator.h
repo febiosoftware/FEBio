@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include <unordered_map>
 #include <array>
 #include <FECore/vec3d.h>
+#include "feamr_api.h"
 
 struct pair_hash {
     template <class T1, class T2>
@@ -40,7 +41,7 @@ struct pair_hash {
 
 enum meshSizes { SMALL = 4, FULL = 6};
 
-class SpherePointsGenerator
+class FEAMR_API SpherePointsGenerator
 {
 public:
     static size_t GetNumNodes(int n);
