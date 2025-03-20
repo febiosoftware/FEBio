@@ -34,10 +34,11 @@ SOFTWARE.*/
 #include <FECore/FEDomain.h>
 #include <FECore/FENode.h>
 #include <FEAMR/sphericalHarmonics.h>
-#include <FEAMR/spherePoints.h>
-
+#include <FEAMR/SpherePointsGenerator.h>
 #include <FECore/Timer.h>
 #include <iostream>
+
+using sphere = SpherePointsGenerator;
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEFiberODF, FECoreClass)
@@ -49,7 +50,9 @@ END_FECORE_CLASS();
 
 void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
 {
-    m_ODF.resize(NPTS);
+    size_t npts = sphere::GetNumNodes(FULL);
+
+    m_ODF.resize(npts);
 
     double maxWeight = std::distance(m_weights.begin(), std::max_element(m_weights.begin(), m_weights.end()));
     m_ODF = ODFs[maxWeight];
@@ -63,7 +66,7 @@ void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
     double prevPhi = 3;
     double nPhi = 2;
 
-    std::vector<std::vector<double>> logmaps(ODFs.size(), std::vector<double>(NPTS, 0));
+    std::vector<std::vector<double>> logmaps(ODFs.size(), std::vector<double>(npts, 0));
 
     while(nPhi < prevPhi)
     {
@@ -75,7 +78,7 @@ void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
             double currentWeight = m_weights[index];
 
             double dot = 0;
-            for(int index2 = 0; index2 < NPTS; index2++)
+            for(int index2 = 0; index2 < npts; index2++)
             {
                 dot += m_ODF[index2]*currentODF[index2];
             }
@@ -83,13 +86,13 @@ void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
             // if the two vectors are the same, tangent is the 0 vector
             if(abs(1-dot) < 10e-12)
             {
-                logmaps[index] = std::vector<double>(NPTS, 0);
+                logmaps[index] = std::vector<double>(npts, 0);
             }
             else
             {
                 double denom = sqrt(1-dot*dot)*acos(dot);
 
-                for(int index2 = 0; index2 < NPTS; index2++)
+                for(int index2 = 0; index2 < npts; index2++)
                 {
                     currentLogmap[index2] = (currentODF[index2] - dot*m_ODF[index2])/denom;
                 }
@@ -100,7 +103,7 @@ void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
         std::vector<double> phi(m_ODF.size(), 0);
         for(int index = 0; index < logmaps.size(); index++)
         {
-            for(int index2 = 0; index2 < NPTS; index2++)
+            for(int index2 = 0; index2 < npts; index2++)
             {
                 phi[index2] += logmaps[index][index2]*m_weights[index];
             }
@@ -126,7 +129,7 @@ void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
         }
 
         double normPhi = 0;
-        for(int index = 0; index < NPTS; index++)
+        for(int index = 0; index < npts; index++)
         {
             normPhi += phi[index]*phi[index];
         }
@@ -134,7 +137,7 @@ void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
 
         if(normPhi >= 10e-12)
         {
-            for(int index = 0; index < NPTS; index++)
+            for(int index = 0; index < npts; index++)
             {
                 m_ODF[index] = cos(normPhi)*m_ODF[index] + sin(normPhi)*phi[index]/normPhi;
             } 
@@ -142,7 +145,7 @@ void FEElementODF::calcODF(std::vector<std::vector<double>>& ODFs)
     }
 
     //  undo sqaure root transform to obtain mean ODF
-    for(int index = 0; index < NPTS; index++)
+    for(int index = 0; index < npts; index++)
     {
         m_ODF[index] = m_ODF[index]*m_ODF[index];
     }
@@ -153,7 +156,7 @@ BEGIN_FECORE_CLASS(FEODFFiberDistribution, FEElasticMaterial)
 
 	// material properties
 	ADD_PROPERTY(m_pFmat, "fibers");
-    ADD_PROPERTY(m_ODF, "fiber-odf");
+    ADD_PROPERTY(m_ODF, "fiber_odf");
 
 	ADD_PROPERTY(m_Q, "mat_axis")->SetFlags(FEProperty::Optional);
 
@@ -161,8 +164,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEODFFiberDistribution::FEODFFiberDistribution(FEModel* pfem) 
-    : FEElasticMaterial(pfem), m_lengthScale(10), m_hausd(0.05), m_grad(1.3), m_interpolate(false),
-        m_theta(nullptr), m_phi(nullptr)
+    : FEElasticMaterial(pfem), m_lengthScale(10), m_hausd(0.05), m_grad(1.3), m_interpolate(false)
 {
 	m_pFmat = 0;
 }
@@ -170,8 +172,6 @@ FEODFFiberDistribution::FEODFFiberDistribution(FEModel* pfem)
 //-----------------------------------------------------------------------------
 FEODFFiberDistribution::~FEODFFiberDistribution()
 {
-    if(m_theta) delete[] m_theta;
-    if(m_phi) delete[] m_phi;
 }
 
 //-----------------------------------------------------------------------------
@@ -201,10 +201,9 @@ bool FEODFFiberDistribution::Init()
     m_order = (sqrt(8*m_ODF[0]->m_shpHar.size() + 1) - 3)/2;
 
     // Initialize spherical coordinates and T matrix
-    m_theta = new double[NPTS];
-    m_phi = new double[NPTS];
-    getSphereCoords(NPTS, XCOORDS, YCOORDS, ZCOORDS, m_theta, m_phi);
-    m_T = compSH(m_order, NPTS, m_theta, m_phi);
+    auto& nodes = sphere::GetNodes(FULL);
+    getSphereCoords(nodes, m_theta, m_phi);
+    m_T = compSH(m_order, m_theta, m_phi);
     matrix transposeT = m_T->transpose();
     matrix B = (transposeT*(*m_T)).inverse()*transposeT;
 
@@ -213,7 +212,7 @@ bool FEODFFiberDistribution::Init()
     for(int index = 0; index < m_ODF.size(); index++)
     {
         FEFiberODF* ODF = m_ODF[index];
-        reconstructODF(ODF->m_shpHar, ODF->m_ODF, NPTS, m_theta, m_phi);
+        reconstructODF(ODF->m_shpHar, ODF->m_ODF, m_theta, m_phi);
     }
 
     initTime.stop();
@@ -230,9 +229,9 @@ bool FEODFFiberDistribution::Init()
             auto& currentODF = m_ODF[index]->m_ODF;
             auto& currentPODF = pODF[index];
 
-            currentPODF.resize(NPTS);
+            currentPODF.resize(currentODF.size());
 
-            for(int index2 = 0; index2 < NPTS; index2++)
+            for(int index2 = 0; index2 < currentODF.size(); index2++)
             {
                 currentPODF[index2] = sqrt(currentODF[index2]);
             }
@@ -281,18 +280,6 @@ bool FEODFFiberDistribution::Init()
                     odf->m_weights[index] /= sum;
                 }
 
-                // interpTime.start();
-                // odf->calcODF(pODF);
-                // interpTime.stop();
-
-                // Reduce the number of points in the ODF
-                // reduceTime.start();
-                // reduceODF(odf, B);
-                
-                
-
-                // reduceTime.stop();
-
                 // Add element odf object to map
                 #pragma omp critical
                 {
@@ -323,9 +310,6 @@ bool FEODFFiberDistribution::Init()
     {
         reduceODF(m_ODF[0], B, new double);
     }
-
-    delete[] m_theta; m_theta = nullptr;
-    delete[] m_phi; m_phi = nullptr;
 
     totalTime.stop();
 
@@ -372,26 +356,13 @@ void FEODFFiberDistribution::reduceODF(FEBaseODF* ODF, matrix& B, double* time)
     int NN = ODF->m_nodePos.size();
     int NE = elems.size();
 
-    // Store the new coordinates
-    double* xCoords = new double[NN] {};
-    double* yCoords = new double[NN] {};
-    double* zCoords = new double[NN] {};
-    for(int index = 0; index < NN; index++)
-    {
-        vec3d vec = ODF->m_nodePos[index];
-
-        xCoords[index] = vec.x;
-        yCoords[index] = vec.y;
-        zCoords[index] = vec.z;
-    }
-
     // Convert the new coordinates to spherical coordinates
-    double* theta = new double[NN] {};
-    double* phi = new double[NN] {};
-    getSphereCoords(NN, xCoords, yCoords, zCoords, theta, phi);
+    std::vector<double> theta;
+    std::vector<double> phi;
+    getSphereCoords(ODF->m_nodePos, theta, phi);
 
     // Compute the new ODF values
-    auto T = compSH(m_order, NN, theta, phi); 
+    auto T = compSH(m_order, theta, phi); 
     ODF->m_ODF.resize(NN);
     (*T).mult(*sphHar, ODF->m_ODF);
 
@@ -435,13 +406,6 @@ void FEODFFiberDistribution::reduceODF(FEBaseODF* ODF, matrix& B, double* time)
     {
         ODF->m_ODF[index] /= sum;
     }
-
-    // Cleanup
-    delete[] xCoords;
-    delete[] yCoords;
-    delete[] zCoords;
-    delete[] theta;
-    delete[] phi;
 
     if(dynamic_cast<FEElementODF*>(ODF))
     {

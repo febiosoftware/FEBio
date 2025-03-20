@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #include "sphericalHarmonics.h"
-#include "spherePoints.h"
+#include "SpherePointsGenerator.h"
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
@@ -40,6 +40,7 @@ SOFTWARE.*/
 
 using std::vector;
 using std::unordered_map;
+using sphere = SpherePointsGenerator;
 
 enum NUMTYPE { REALTYPE, IMAGTYPE, COMPLEXTYPE };
 
@@ -55,12 +56,15 @@ double fact(int val)
     return ans;
 }
 
-void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, const double* zCoords, double* theta, double* phi)
+void getSphereCoords(std::vector<vec3d>& coords, std::vector<double>& theta, std::vector<double>& phi)
 {
+    theta.resize(coords.size());
+    phi.resize(coords.size());
+
     // get spherical coordinates
-    for(int index = 0; index < numPts; index++)
+    for(int index = 0; index < coords.size(); index++)
     {
-        double val = zCoords[index];
+        double val = coords[index].z;
 
         if (val<=-1)
         {
@@ -72,14 +76,14 @@ void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, c
         } 
         else 
         {
-            theta[index] = acos(zCoords[index]);
+            theta[index] = acos(coords[index].z);
         }
     }
 
-    for(int index = 0; index < numPts; index++)
+    for(int index = 0; index < coords.size(); index++)
     {
-        double x = xCoords[index];
-        double y = yCoords[index];
+        double x = coords[index].x;
+        double y = coords[index].y;
 
         if(x > 0)
         {
@@ -105,8 +109,9 @@ void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, c
 
 }
 
-std::unique_ptr<matrix> compSH(int order, int numPts, double* theta, double* phi)
+std::unique_ptr<matrix> compSH(int order, std::vector<double>& theta, std::vector<double>& phi)
 {
+    int numPts = theta.size();
     int numCols = (order+1)*(order+2)/2;
     std::unique_ptr<matrix> out = std::make_unique<matrix>(numPts, numCols);
     out->fill(0,0,numPts, numCols, 0.0);
@@ -175,19 +180,19 @@ double harmonicY(int degree, int order, double theta, double phi, int numType)
     return normalization*__assoc_legendre_p(degree, order, cos(theta))*pow(-1, degree)*e*negate;
 }
 
-void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int numPts, double* theta, double* phi)
+void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, std::vector<double>& theta, std::vector<double>& phi)
 {
     int order = (sqrt(8*sphHarm.size() + 1) - 3)/2;
 
-    ODF.resize(numPts);  
-    auto T = compSH(order, numPts, theta, phi);
+    ODF.resize(theta.size());  
+    auto T = compSH(order, theta, phi);
     (*T).mult(sphHarm, ODF);
 
     // Normalize ODF
     double sum = 0;
     for(int index = 0; index < ODF.size(); index++)
     {
-        if((ODF)[index] < 0)
+        if(ODF[index] < 0)
         {
             ODF[index] = 0;
         }
@@ -195,7 +200,7 @@ void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int 
         sum += ODF[index];
     }
 
-    for(int index = 0; index < NPTS; index++)
+    for(int index = 0; index < ODF.size(); index++)
     {
         ODF[index] /= sum;
     }
@@ -203,19 +208,18 @@ void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int 
 
 void altGradient(int order, std::vector<double>& ODF, std::vector<double>& gradient)
 {
-    gradient.resize(NPTS);
-    for(int index = 0; index < NPTS; index++)
-    {
-        gradient[index] = 0;
-    }
+    auto& faces = sphere::GetFaces(FULL);
 
-    std::vector<int> count(NPTS, 0);
+    gradient.resize(ODF.size());
+    std::fill(gradient.begin(), gradient.end(), 0);
 
-    for(int index = 0; index < NCON; index++)
+    std::vector<int> count(ODF.size(), 0);
+
+    for(int index = 0; index < faces.size(); index++)
     {
-        int n0 = CONN1[index]-1;
-        int n1 = CONN2[index]-1;
-        int n2 = CONN3[index]-1;
+        int n0 = faces[index][0];
+        int n1 = faces[index][1];
+        int n2 = faces[index][2];
 
         double val0 = ODF[n0];
         double val1 = ODF[n1];
@@ -234,7 +238,7 @@ void altGradient(int order, std::vector<double>& ODF, std::vector<double>& gradi
         count[n2]++;
     }
 
-    for(int index = 0; index < NPTS; index++)
+    for(int index = 0; index < gradient.size(); index++)
     {
         gradient[index] /= count[index];
     }
@@ -243,8 +247,11 @@ void altGradient(int order, std::vector<double>& ODF, std::vector<double>& gradi
 #ifdef HAS_MMG
 void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
 {
-	int NN = NPTS;
-	int NF = NCON;
+    auto& nodes = sphere::GetNodes(FULL);
+    auto& faces = sphere::GetFaces(FULL);
+
+	int NN = nodes.size();
+	int NF = faces.size();;
     int NC;
 
     // we only want to remesh half of the sphere, so here we discard 
@@ -254,7 +261,7 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
     int newNodeID = 1;
     for(int index = 0; index < NN; index++)
     {
-        if(ZCOORDS[index] >= 0)
+        if(nodes[index].z >= 0)
         {
             newNodeIDs[index] = newNodeID;
             newNodeID++;
@@ -265,7 +272,7 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
     int newElemID = 1;
     for(int index = 0; index < NF; index++)
     {
-        if(newNodeIDs.count(CONN1[index]-1) == 0 || newNodeIDs.count(CONN2[index]-1) == 0 || newNodeIDs.count(CONN3[index]-1) == 0)
+        if(newNodeIDs.count(faces[index][0]) == 0 || newNodeIDs.count(faces[index][1]) == 0 || newNodeIDs.count(faces[index][2]) == 0)
         {
             continue;
         }
@@ -295,7 +302,7 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 	{
         if(newNodeIDs.count(i))
         {
-            MMGS_Set_vertex(mmgMesh, XCOORDS[i], YCOORDS[i], ZCOORDS[i], 0, newNodeIDs[i]);
+            MMGS_Set_vertex(mmgMesh, nodes[i].x, nodes[i].y, nodes[i].z, 0, newNodeIDs[i]);
         }
 	}
 
@@ -303,7 +310,7 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 	{
         if(newElemIDs.count(i))
         {
-            MMGS_Set_triangle(mmgMesh, newNodeIDs[CONN1[i]-1], newNodeIDs[CONN2[i]-1], newNodeIDs[CONN3[i]-1], 0, newElemIDs[i]);
+            MMGS_Set_triangle(mmgMesh, newNodeIDs[faces[i][0]], newNodeIDs[faces[i][1]], newNodeIDs[faces[i][2]], 0, newElemIDs[i]);
         }
 	}
 	
@@ -315,11 +322,11 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 		assert(false);
 	}
 
-    int n0 = CONN1[0]-1;
-    int n1 = CONN2[0]-1;
+    int n0 = faces[0][0];
+    int n1 = faces[0][1];
 
-    vec3d pos0(XCOORDS[n0], YCOORDS[n0], ZCOORDS[n0]);
-    vec3d pos1(XCOORDS[n1], YCOORDS[n1], ZCOORDS[n1]);
+    vec3d pos0 = nodes[n0];
+    vec3d pos1 = nodes[n1];
 
     double minLength = (pos0 - pos1).Length();
     double maxLength = minLength*lengthScale;
@@ -396,8 +403,11 @@ void remesh(std::vector<double>& gradient, double lengthScale, double hausd, dou
 
 void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
 {
-	int NN = NPTS;
-	int NF = NCON;
+	auto& nodes = sphere::GetNodes(FULL);
+    auto& faces = sphere::GetFaces(FULL);
+
+	int NN = nodes.size();
+	int NF = faces.size();
     int NC;
 
 	// build the MMG mesh
@@ -419,12 +429,12 @@ void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd,
 	// build the MMG mesh
 	for (int i = 0; i < NN; ++i)
 	{
-        MMGS_Set_vertex(mmgMesh, XCOORDS[i], YCOORDS[i], ZCOORDS[i], 0, i+1);
+        MMGS_Set_vertex(mmgMesh, nodes[i].x, nodes[i].y, nodes[i].z, 0, i+1);
 	}
 
 	for (int i = 0; i < NF; ++i)
 	{
-        MMGS_Set_triangle(mmgMesh, CONN1[i], CONN2[i], CONN3[i], 0, i+1);
+        MMGS_Set_triangle(mmgMesh, faces[i][0]+1, faces[i][1]+1, faces[i][2]+1, 0, i+1);
 	}
 	
     // Now, we build the "solution", i.e. the target element size.
@@ -435,11 +445,11 @@ void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd,
 		assert(false);
 	}
 
-    int n0 = CONN1[0]-1;
-    int n1 = CONN2[0]-1;
+    int n0 = faces[0][0];
+    int n1 = faces[0][1];
 
-    vec3d pos0(XCOORDS[n0], YCOORDS[n0], ZCOORDS[n0]);
-    vec3d pos1(XCOORDS[n1], YCOORDS[n1], ZCOORDS[n1]);
+    vec3d pos0 = nodes[n0];
+    vec3d pos1 = nodes[n1];
 
     double minLength = (pos0 - pos1).Length();
     double maxLength = minLength*lengthScale;

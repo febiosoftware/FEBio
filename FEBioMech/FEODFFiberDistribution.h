@@ -72,8 +72,6 @@ public:
     std::vector<double> m_weights; //!< weights for interpolation
 };
 
-//  This material is a container for a fiber material, a fiber density
-//  distribution, and an integration scheme.
 class FEODFFiberDistribution : public FEElasticMaterial
 {
 public:
@@ -115,8 +113,8 @@ private:
 
     std::unique_ptr<matrix> m_T;
 
-    double* m_theta;
-    double* m_phi;
+    std::vector<double> m_theta;
+    std::vector<double> m_phi;
 
     double m_lengthScale;
     double m_hausd;

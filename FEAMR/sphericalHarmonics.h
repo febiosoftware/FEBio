@@ -28,13 +28,13 @@ SOFTWARE.*/
 #include <FECore/matrix.h>
 #include "feamr_api.h"
 
-FEAMR_API void getSphereCoords(int numPts, const double* xCoords, const double* yCoords, const double* zCoords, double* theta, double* phi);
+FEAMR_API void getSphereCoords(std::vector<vec3d>& coords, std::vector<double>& theta, std::vector<double>& phi);
 
-FEAMR_API std::unique_ptr<matrix> compSH(int order, int numPts, double* theta, double* phi);
+FEAMR_API std::unique_ptr<matrix> compSH(int order, std::vector<double>& theta, std::vector<double>& phi);
 
 FEAMR_API double harmonicY(int degree, int order, double theta, double phi, int numType);
 
-FEAMR_API void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, int numPts, double* theta, double* phi);
+FEAMR_API void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, std::vector<double>& theta, std::vector<double>& phi);
 
 FEAMR_API void altGradient(int order, std::vector<double>& sphHarm, std::vector<double>& gradient);
 
