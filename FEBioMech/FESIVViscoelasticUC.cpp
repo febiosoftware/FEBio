@@ -99,7 +99,8 @@ bool FESIVViscoelasticUC::Init()
 //! Stress function
 mat3ds FESIVViscoelasticUC::DevStress(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    return mat3ds(0, 0, 0, 0, 0, 0);
+/*    double dt = GetFEModel()->GetTime().timeIncrement;
     if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
     
     // get the elastic part
@@ -168,7 +169,7 @@ mat3ds FESIVViscoelasticUC::DevStress(FEMaterialPoint& mp)
     ep.m_J = Jsafe;
 
     // return the total Cauchy stress,
-    return s;
+    return s;*/
 }
 
 //-----------------------------------------------------------------------------
@@ -177,7 +178,7 @@ tens4ds FESIVViscoelasticUC::DevTangent(FEMaterialPoint& mp)
 {
     double dt = GetFEModel()->GetTime().timeIncrement;
     tens4ds c; c.zero();
-    if (dt == 0) return c;
+/*    if (dt == 0) return c;
     
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -216,7 +217,7 @@ tens4ds FESIVViscoelasticUC::DevTangent(FEMaterialPoint& mp)
     }
     ep.m_F = Fsafe;
     ep.m_J = Jsafe;
-
+*/
     // return the total Cauchy stress,
     return c;
 }
@@ -225,7 +226,8 @@ tens4ds FESIVViscoelasticUC::DevTangent(FEMaterialPoint& mp)
 //! Strain energy density function
 double FESIVViscoelasticUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    return 0;
+/*    double dt = GetFEModel()->GetTime().timeIncrement;
     if (dt == 0) return 0;
     
     // get the elastic part
@@ -267,5 +269,5 @@ double FESIVViscoelasticUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
     ep.m_J = Jsafe;
 
     // return the total Cauchy stress,
-    return sed;
+    return sed;*/
 }
