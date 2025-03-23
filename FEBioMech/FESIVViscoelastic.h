@@ -53,18 +53,15 @@ public:
     void Serialize(DumpStream& ar);
 
 public:
-    mat3ds  m_H;                    //!< measure of Hencky strain
-    mat3ds  m_Hp;                   //!< measure of Hencky strain at previous time step
-    mat3ds  m_dHp;                  //!< measure of time derivative of Hencky strain at previous time step
     mat3d   m_R;                    //!< rotation matrix
+    mat3ds  m_U[3];                 //!< eigentensors at current time
+    vec3d   m_u[3];                 //!< eigenvectors at current time
+    vec3d   m_up[3];                //!< eigenvectors at previous time
+    double  m_lam[3];               //!< eigenvalues of stretch tensor at current time
 
-    double  m_alpha[MAX_TERMS];     //!< exponent of right-stretch tensor in series spring
-    double  m_alphap[MAX_TERMS];    //!< alpha at previoust time step
-    double  m_dalphap[MAX_TERMS];   //!< alpha dot at  previoust time step
+    double  m_lam3d[MAX_TERMS];     //!< dashpot stretch ratio at current time
+    double  m_lam3dp[MAX_TERMS];    //!< dashpot stretch ratio previous time
     double  m_mumr[MAX_TERMS];      //!< shear modulus calculated from reference state
-    mat3ds  m_Hs[MAX_TERMS];        //!< Hs = alpha*H at current time step
-    mat3ds  m_Hsp[MAX_TERMS];       //!< Hs at previous timestep
-    mat3ds  m_dHsp[MAX_TERMS];      //!< Hs dot at previous timestep
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
 };
@@ -111,12 +108,6 @@ public:
 
     //! update specialize material point data
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
-    
-    //! convert right Hencky strain H to right stretch tensor U
-    mat3ds H2U(mat3ds& H);
-    
-    //! solve a system of equations based on a tensorial nonlinear equation
-    bool SolvedY(tens4ds& dTdY, mat3ds& Y, mat3ds& dY);
     
 public:
     // material parameters
