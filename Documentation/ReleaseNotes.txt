@@ -41,6 +41,70 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   4.9   3/24/2025
+
+===========================================================================
+
+New Features:
+* The "fiber ODF" material was added, which is a new Continuous Fiber Distribution constitutive model. It uses a non-parametric orientation distribution function that is defined by a series of spherical harmonic coefficients. This allows for the definition of extremely detailed ODFs of any shape.
+* Added "edge contact gap" plot variable which plots gap data on the edge.
+* Added log output variables for fluid max shear stress and fluid principal stresses
+* Added secant stress, secant tangent, and secant permeability tangent calculations to biphasic solid and biphasic shell domains
+* Added plot variable for nodal shell displacements
+* Added flip_secondary and gap_offset parameters to sticky contact. Fixed some issues with contact initiation.
+* Added filter option to contact gap, contact pressure, and contact traction plot variables.
+* Added progress and relative error measure to stiffness diagnostic.
+* Added noappend command option to prevent appending of plot file when restarting.
+* Added "SPR relative volume" plot variable.
+
+
+Improvements:
+* Editing pass to FEBio user manual (fix typos, removed obsolete info, added missing info.)
+* Now exporting FEIncompNeoHookean from febiomech dll. (In case plugins need it.)
+* Added documentation for FiberODF material [skip ci]
+* Made PlotFile::AddVariable public to make it easier for third party code to create plotfiles.
+* Updated reaction force log variables to be more consistent with "reaction forces" plot variable.
+* Added flags to tied-elastic to flip primary and secondary surfaces.
+* Made g0 parameter of visco-elastic material mappable.
+* Added check for matrix offset in pardiso solver (in case the sparse matrix was allocated externally).
+* Made perm parameter of "perm-holmes-mow" mappable.
+* Added units of length for length parameters in Surface Attraction Body Force
+* Added some additional parallelization to contact potential.
+* Updated User Manual to includee fluid max shear stress and fluid principal stresses as log output variables
+* Added description of Wall Shear Stress for fluids, in Theory Manual
+* All OSes now use MMG 5.7.3
+* Added helper function to levmar in order to avoid the need to link levmar (and blas) into FEBio Studio.
+* Updated nodal stress and nodal strain plot variables to exclude new shells.  Updated top/bottom stress/strain and top/bottom nodal stress/nodal strain to only include new shell elements. Updated calculation of nodal projection for quad8 and tri6 shells.
+* Updated shell top stress and shell bottom stress plot variables to work with quadratic shell elements.
+* Modified shell top stress/strain and shell bottom stress/strain to display extrapolated integration point values instead of top or bottom integration point averages
+* Modified plot variables for shell nodal stresses to say shell top nodal stress and shell bottom nodal stress. Added plot variables for shell top stress and shell bottom stress.
+* Added secant_stress and secant_tangent parameters to solid-elastic domain.
+* Added support for tri7 surface elements to "normal displacement".
+* Implemented surface constraint member function to choose whether a nodal integration rule should be installed on the surface. The fixed normal displacement now sets a non-nodal integration rule.
+* Added option to check for edge-face intersections in contact potential.
+* Added function for SPR values of vector<double> types, updated tet10 projection order default value
+
+
+Bug Fixes:
+* Fixed issue with processing empty Module tag.
+* Linear constraints no longer assume node IDs start at 1.
+* Fixed small issue with resetting a timer.
+* Fixed issue with discrete element ID numbers.
+* Fixed bug caused when trying to compress plot files when compiling without zlib
+* Fixed bug in constructor of MKL solver if MKL was not used. Now not registering mkl solvers if mkl is not used.
+* Fixed destructor of PardisoProjectSolver to avoid error message at end of run
+* Fixed issue with parsing elem_type attribute of solid domain.
+* Fixed issue with contact potential when used with rigid bodies.
+* Fixed issue with the normal displacement constraint when node IDs don't start at 1.
+* Fixed problem with exporting fiber components to log file.
+* Fixed bug in FEPlotMixtureFluidFlowRate plot variable.
+* Fixed calculation of yielded bond fraction in reactive plasticity materials to account for rigid body rotations.
+* Updated damage criterion for von Mises stress to produce non-singular tangent at stress origin.
+
+
+
+===========================================================================
+
  R E L E A S E   4.8   11/7/2024
 
 ===========================================================================
