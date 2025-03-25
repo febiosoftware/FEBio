@@ -35,35 +35,38 @@ class FESIVViscoelasticMaterialPoint : public FEMaterialPointData
 {
 public:
     enum { MAX_TERMS = 6 };
-
+    
 public:
     //! constructor
     FESIVViscoelasticMaterialPoint(FEMaterialPointData* mp = nullptr);
-
+    
     //! copy material point data
     FEMaterialPointData* Copy();
-
+    
     //! Initialize material point data
     void Init();
-
+    
     //! Update material point data
     void Update(const FETimeInfo& timeInfo);
-
+    
     //! Serialize data to archive
     void Serialize(DumpStream& ar);
-
+    
 public:
     mat3d   m_R;                    //!< rotation matrix
     mat3ds  m_U[3];                 //!< eigentensors at current time
     vec3d   m_u[3];                 //!< eigenvectors at current time
     vec3d   m_up[3];                //!< eigenvectors at previous time
     double  m_lam[3];               //!< eigenvalues of stretch tensor at current time
-
+    
     double  m_lam3d[MAX_TERMS];     //!< dashpot stretch ratio at current time
     double  m_lam3dp[MAX_TERMS];    //!< dashpot stretch ratio previous time
     double  m_mumr[MAX_TERMS];      //!< shear modulus calculated from reference state
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
+
+    bool    m_binit;                //!< initialization flag
+
 };
 
 
