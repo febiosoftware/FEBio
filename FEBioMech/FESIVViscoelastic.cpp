@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEModel.h>
 #include <FECore/DumpStream.h>
+#include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <limits>
 #include <cmath>
@@ -83,6 +84,8 @@ FEMaterialPointData* FESIVViscoelasticMaterialPoint::Copy()
 //! Initializes material point data.
 void FESIVViscoelasticMaterialPoint::Init()
 {
+    m_binit = false;
+    
     // intialize data to zero
     m_sed = 0.0;
     m_sedp = 0.0;
@@ -91,7 +94,7 @@ void FESIVViscoelasticMaterialPoint::Init()
     m_up[1] = m_u[1] = vec3d(0,1,0);
     m_up[2] = m_u[2] = vec3d(0,0,1);
     for (int i=0; i<3; ++i) {
-        m_U[i] = mat3dd(1);
+        m_U[i] = dyad(m_u[i]);
         m_lam[i] = 1.0;
     }
     for (int i=0; i<MAX_TERMS; ++i) {
@@ -163,13 +166,11 @@ FEMaterialPointData* FESIVViscoelastic::CreateMaterialPointData()
 //! update specialize material point data
 void FESIVViscoelastic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp)
 {
-    double dt = GetFEModel()->GetTime().timeIncrement;
-    // evaluate viscosities in reference configuration
-    if ((tp.timeStep == 0) && (tp.currentIteration == 0)) {
+    // get the viscosities in the reference configuration
+    FESIVViscoelasticMaterialPoint& pt = *mp.ExtractData<FESIVViscoelasticMaterialPoint>();
+    if (!pt.m_binit) {
         mat3dd I(1.);
 
-        // get the viscosities in the reference configuration
-        FESIVViscoelasticMaterialPoint& pt = *mp.ExtractData<FESIVViscoelasticMaterialPoint>();
         for (int i=0; i<MAX_TERMS; ++i) {
             if (m_g[i] > 0) {
                 tens4ds Cr = m_Mxwl->Tangent(mp);
@@ -178,6 +179,7 @@ void FESIVViscoelastic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
                 pt.m_mumr[i] = mur;
             }
         }
+        pt.m_binit = true;
         return;
     }
 }
@@ -186,9 +188,15 @@ void FESIVViscoelastic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
 //! Stress function
 mat3ds FESIVViscoelastic::Stress(FEMaterialPoint& mp)
 {
+    const double eps = 10*std::numeric_limits<double>::epsilon();
+    
     FETimeInfo& tp = GetFEModel()->GetTime();
     double dt = tp.timeIncrement;
     if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+    
+
+    // Calculate the base Cauchy stress
+    mat3ds s = m_Base->Stress(mp)*m_g0;
     
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -211,27 +219,27 @@ mat3ds FESIVViscoelastic::Stress(FEMaterialPoint& mp)
     // identify direction of loading from largest magnitude strains
     double Ev[3];
     Ev[0] = (lam2[0]-1)/2; Ev[1] = (lam2[1]-1)/2; Ev[2] = (lam2[2]-1)/2;
-    // reorder principal stretches
-    // let dir[2] be the principal direction of largest strain magnitude
-    if ((fabs(Ev[1]) > fabs(Ev[0])) && (fabs(Ev[1]) > fabs(Ev[2]))){
-        pt.m_lam[2] = lam[1]; pt.m_lam[0] = lam[2]; pt.m_lam[1] = lam[0];
-        pt.m_U[2] = U[1]; pt.m_U[0] = U[2]; pt.m_U[1] = U[0];
-        pt.m_u[2] = u[1]; pt.m_u[0] = u[2]; pt.m_u[1] = u[0];
+    bool reorder = false;
+    if ((fabs(Ev[0]) > eps) || (fabs(Ev[1]) > eps) || (fabs(Ev[2]) > eps)) {
+        // reorder principal stretches
+        // let dir[2] be the principal direction of largest strain magnitude
+        if ((fabs(Ev[1]) > fabs(Ev[0])) && (fabs(Ev[1]) > fabs(Ev[2]))){
+            pt.m_lam[2] = lam[1]; pt.m_lam[0] = lam[2]; pt.m_lam[1] = lam[0];
+            pt.m_U[2] = U[1]; pt.m_U[0] = U[2]; pt.m_U[1] = U[0];
+            pt.m_u[2] = u[1]; pt.m_u[0] = u[2]; pt.m_u[1] = u[0];
+        }
+        else if ((fabs(Ev[2]) > fabs(Ev[0])) && (fabs(Ev[2]) > fabs(Ev[1]))) {
+            pt.m_lam[2] = lam[2]; pt.m_lam[0] = lam[0]; pt.m_lam[1] = lam[1];
+            pt.m_U[2] = U[2]; pt.m_U[0] = U[0]; pt.m_U[1] = U[1];
+            pt.m_u[2] = u[2]; pt.m_u[0] = u[0]; pt.m_u[1] = u[1];
+        }
+        else {
+            pt.m_lam[2] = lam[0]; pt.m_lam[0] = lam[1]; pt.m_lam[1] = lam[2];
+            pt.m_U[2] = U[0]; pt.m_U[0] = U[1]; pt.m_U[1] = U[2];
+            pt.m_u[2] = u[0]; pt.m_u[0] = u[1]; pt.m_u[1] = u[2];
+        }
+        reorder = true;
     }
-    else if ((fabs(Ev[2]) > fabs(Ev[0])) && (fabs(Ev[2]) > fabs(Ev[1]))) {
-        pt.m_lam[2] = lam[2]; pt.m_lam[0] = lam[0]; pt.m_lam[1] = lam[1];
-        pt.m_U[2] = U[2]; pt.m_U[0] = U[0]; pt.m_U[1] = U[1];
-        pt.m_u[2] = u[2]; pt.m_u[0] = u[0]; pt.m_u[1] = u[1];
-    }
-    else {
-        pt.m_lam[2] = lam[0]; pt.m_lam[0] = lam[1]; pt.m_lam[1] = lam[2];
-        pt.m_U[2] = U[0]; pt.m_U[0] = U[1]; pt.m_U[1] = U[2];
-        pt.m_u[2] = u[0]; pt.m_u[0] = u[1]; pt.m_u[1] = u[2];
-    }
-
-    // Calculate the base Cauchy stress
-    mat3ds s = m_Base->Stress(mp)*m_g0;
-
     // store safe copy of deformation gradient
     mat3d Fsafe = ep.m_F;
     double Jsafe = ep.m_J;
@@ -242,53 +250,56 @@ mat3ds FESIVViscoelastic::Stress(FEMaterialPoint& mp)
     double errabs = 1e-15;
     int maxit = 100;
     int iter = 0;
-    vec3d u3dot = (pt.m_u[2] - pt.m_up[2])/dt;
-    double u3dot2 = u3dot*u3dot;
-    if ((tp.timeStep == 0) && (tp.currentIteration == 0))
-        u3dot2 = 0;
-    mat3ds U3dot = dyads(u3dot, pt.m_u[2]);
-    for (int i=0; i<MAX_TERMS; ++i)
-    {
-        // only solve for dashpot stretch if there is a non-zero time constant and gamma associated with this term
-        if ((m_t[i] > 0) && (m_g[i] > 0)) {
-            double lams[3]; // Maxwell spring principal stretches
-            bool cnvgd = false;
-            bool error = false;
-            double f = 0;
-            double fp = 0;
-            do {
-                fp = f;
-                double x = pt.m_lam3d[i];
-                lams[0] = pt.m_lam[0]; lams[1] = pt.m_lam[1]; lams[2] = pt.m_lam[2]/x;
-                mat3ds Us = pt.m_U[0]*lams[0] + pt.m_U[1]*lams[1] + pt.m_U[2]*lams[2];
-                mat3ds Es = ((Us*Us).sym() - I)/2;
-                ep.m_F = pt.m_R*Us;
-                ep.m_J = Us.det();
-                mat3ds Smhat = m_Mxwl->PK2Stress(mp,Es)/(2*pt.m_mumr[i]);
-                double c1 = Smhat.dotdot(pt.m_U[2])/m_t[i];
-                double c2 = Smhat.dotdot(U3dot)/2/m_t[i];
-                double c3 = Smhat.dotdot((U3dot*C + C*U3dot).sym())/2/m_t[i];
-                double c4 = Smhat.dotdot((pt.m_U[2]*U3dot*C + C*U3dot*pt.m_U[2]).sym())/2/m_t[i];
-                double lam3 = pt.m_lam[2];
-                double lam3dp = pt.m_lam3dp[i];
-                double delta = pow(c1,2)*pow(lam3,4) -
-                4*c2*pow(lam3,2)*pow(-1 + x,2)*pow(x,6)*(1 + x) -
-                (-1 + x)*pow(x,7)*(4*c4*(-1 + x) - 4*c3*x + u3dot2*(-1 + x)*x*pow(1 + x,2));
-                if (delta < 0) {
-                    error = true;
-                    break;
-                }
-                else {
-                    delta = sgn(c1)*sqrt(delta);
-                }
-                f = (lam3*lam3*c1 + delta)/(2*pow(x,5));
-                x = lam3dp + dt*f;
-                double dx = dt*(f - fp);
-                pt.m_lam3d[i] = x;
-                if (fabs(dx) <= fabs(x)*errrel) cnvgd = true;
-                if (++iter == maxit) { error = true; }
-            } while (!cnvgd && !error);
-            if (error) feLogWarning("SIV dashpot stretch calculation did not converge!");
+    if (reorder) {
+        vec3d u3dot = (pt.m_u[2] - pt.m_up[2])/dt;
+        double u3dot2 = u3dot*u3dot;
+        //    if ((tp.timeStep == 0) && (tp.currentIteration == 0))
+        //        u3dot2 = 0;
+        mat3ds U3dot = dyads(u3dot, pt.m_u[2]);
+        for (int i=0; i<MAX_TERMS; ++i)
+        {
+            // only solve for dashpot stretch if there is a non-zero time constant and gamma associated with this term
+            if ((m_t[i] > 0) && (m_g[i] > 0)) {
+                double lams[3]; // Maxwell spring principal stretches
+                bool cnvgd = false;
+                bool error = false;
+                double f = 0;
+                double fp = 0;
+                do {
+                    fp = f;
+                    double x = pt.m_lam3d[i];
+                    lams[0] = pt.m_lam[0]; lams[1] = pt.m_lam[1]; lams[2] = pt.m_lam[2]/x;
+                    mat3ds Us = pt.m_U[0]*lams[0] + pt.m_U[1]*lams[1] + pt.m_U[2]*lams[2];
+                    mat3ds Es = ((Us*Us).sym() - I)/2;
+                    ep.m_F = pt.m_R*Us;
+                    ep.m_J = Us.det();
+                    mat3ds Smhat = m_Mxwl->PK2Stress(mp,Es)/(2*pt.m_mumr[i]);
+                    double c1 = Smhat.dotdot(pt.m_U[2])/m_t[i];
+                    double c2 = Smhat.dotdot(U3dot)/2/m_t[i];
+                    double c3 = Smhat.dotdot((U3dot*C + C*U3dot).sym())/2/m_t[i];
+                    double c4 = Smhat.dotdot((pt.m_U[2]*U3dot*C + C*U3dot*pt.m_U[2]).sym())/2/m_t[i];
+                    double lam3 = pt.m_lam[2];
+                    double lam3dp = pt.m_lam3dp[i];
+                    double delta = pow(c1,2)*pow(lam3,4) -
+                    4*c2*pow(lam3,2)*pow(-1 + x,2)*pow(x,6)*(1 + x) -
+                    (-1 + x)*pow(x,7)*(4*c4*(-1 + x) - 4*c3*x + u3dot2*(-1 + x)*x*pow(1 + x,2));
+                    if (delta < 0) {
+//                        delta = (sqrt(fabs(delta)) <= eps) ? 0 : sgn(c1)*sqrt(pow(c1,2)*pow(lam3,4));
+                        delta = 0;
+                    }
+                    else {
+                        delta = sgn(c1)*sqrt(delta);
+                    }
+                    f = (lam3*lam3*c1 + delta)/(2*pow(x,5));
+                    x = lam3dp + dt*f;
+                    double dx = dt*(f - fp);
+                    pt.m_lam3d[i] = x;
+                    if (fabs(dx) <= fabs(x)*errrel) cnvgd = true;
+                    if (++iter == maxit) { error = true; }
+                } while (!cnvgd && !error);
+                if (error)
+                    feLogWarning("SIV dashpot stretch calculation did not converge!");
+            }
         }
     }
     
@@ -316,8 +327,6 @@ mat3ds FESIVViscoelastic::Stress(FEMaterialPoint& mp)
 //! Material tangent
 tens4ds FESIVViscoelastic::Tangent(FEMaterialPoint& mp)
 {
-    tens4ds c = m_Base->Tangent(mp)*m_g0;
-
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -329,7 +338,7 @@ tens4ds FESIVViscoelastic::Tangent(FEMaterialPoint& mp)
     FESIVViscoelasticMaterialPoint& pt = *mp.ExtractData<FESIVViscoelasticMaterialPoint>();
 
     // Calculate the new elastic Cauchy stress
-    c = m_Base->Tangent(mp)*m_g0;
+    tens4ds c = m_Base->Tangent(mp)*m_g0;
 
     for (int i=0; i<MAX_TERMS; ++i)
     {
