@@ -132,6 +132,7 @@ tens4ds FEFiberExpPow::FiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 
 	// only take fibers in tension into consideration
 	const double eps = m_epsf*std::numeric_limits<double>::epsilon();
+    if (fabs(In_I0) <= eps) In_I0 = eps;
 	if (In_I0 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
