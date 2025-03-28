@@ -84,8 +84,6 @@ FEMaterialPointData* FESIVViscoelasticMaterialPoint::Copy()
 //! Initializes material point data.
 void FESIVViscoelasticMaterialPoint::Init()
 {
-    m_binit = false;
-    
     // intialize data to zero
     m_sed = 0.0;
     m_sedp = 0.0;
@@ -99,7 +97,7 @@ void FESIVViscoelasticMaterialPoint::Init()
     }
     for (int i=0; i<MAX_TERMS; ++i) {
         m_lam3d[i] = m_lam3dp[i] = 1.0;
-        m_mumr[i] = 0;
+        m_HAmr[i] = 0;
     }
 
     // don't forget to initialize the base class
@@ -136,7 +134,7 @@ void FESIVViscoelasticMaterialPoint::Serialize(DumpStream& ar)
     ar & m_u & m_up;
     ar & m_lam;
     ar & m_R;
-    ar & m_mumr;
+    ar & m_HAmr;
 }
 
 //-----------------------------------------------------------------------------
@@ -168,19 +166,28 @@ void FESIVViscoelastic::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
 {
     // get the viscosities in the reference configuration
     FESIVViscoelasticMaterialPoint& pt = *mp.ExtractData<FESIVViscoelasticMaterialPoint>();
-    if (!pt.m_binit) {
-        mat3dd I(1.);
+    mat3dd I(1.);
+    // get the elastic part
+    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+    mat3ds Ui = ep.RightStretchInverse();
+    mat3d R = ep.m_F*Ui;
+    mat3d Fsafe = ep.m_F;
+    double Jsafe = ep.m_J;
 
-        for (int i=0; i<MAX_TERMS; ++i) {
-            if (m_g[i] > 0) {
-                tens4ds Cr = m_Mxwl->Tangent(mp);
-                double Kr = (Cr.dot(I)).dotdot(I)/9.;
-                double mur = ((Cr.dot2(I)).dotdot(I)-(Cr.dot(I)).dotdot(I)/3.)/10.;
-                pt.m_mumr[i] = mur;
-            }
+    // set current deformation to pure rotation
+    ep.m_F = R;
+    ep.m_J = 1;
+    mat3ds U3 = pt.m_U[2];
+    tens4ds Cr = m_Mxwl->Tangent(mp);
+    double HA3 = (Cr.dot(U3)).dotdot(U3);
+    // restore current deformation
+    ep.m_F = Fsafe;
+    ep.m_J = Jsafe;
+    
+    for (int i=0; i<MAX_TERMS; ++i) {
+        if (m_g[i] > 0) {
+            pt.m_HAmr[i] = HA3;
         }
-        pt.m_binit = true;
-        return;
     }
 }
 
@@ -246,7 +253,7 @@ mat3ds FESIVViscoelastic::Stress(FEMaterialPoint& mp)
     
     // calculate principal dashpot stretch
     // terms are accumulated in s
-    double errrel = 1e-8;
+    double errrel = 1e-3;
     double errabs = 1e-15;
     int maxit = 100;
     int iter = 0;
@@ -273,7 +280,7 @@ mat3ds FESIVViscoelastic::Stress(FEMaterialPoint& mp)
                     mat3ds Es = ((Us*Us).sym() - I)/2;
                     ep.m_F = pt.m_R*Us;
                     ep.m_J = Us.det();
-                    mat3ds Smhat = m_Mxwl->PK2Stress(mp,Es)/(2*pt.m_mumr[i]);
+                    mat3ds Smhat = m_Mxwl->PK2Stress(mp,Es)/pt.m_HAmr[i];
                     double c1 = Smhat.dotdot(pt.m_U[2])/m_t[i];
                     double c2 = Smhat.dotdot(U3dot)/2/m_t[i];
                     double c3 = Smhat.dotdot((U3dot*C + C*U3dot).sym())/2/m_t[i];

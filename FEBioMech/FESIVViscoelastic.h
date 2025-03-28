@@ -61,11 +61,9 @@ public:
     
     double  m_lam3d[MAX_TERMS];     //!< dashpot stretch ratio at current time
     double  m_lam3dp[MAX_TERMS];    //!< dashpot stretch ratio previous time
-    double  m_mumr[MAX_TERMS];      //!< shear modulus calculated from reference state
+    double  m_HAmr[MAX_TERMS];      //!< aggregate modulus along loading, calculated from reference state
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
-
-    bool    m_binit;                //!< initialization flag
 
 };
 
