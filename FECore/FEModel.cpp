@@ -486,6 +486,7 @@ bool FEModel::Init()
 	// intitialize time
 	FETimeInfo& tp = GetTime();
 	tp.currentTime = 0;
+	tp.timeIncrement = m_imp->m_pStep->m_dt0;
 	m_imp->m_ftime0 = 0;
 
 	// initialize global data
