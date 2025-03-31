@@ -98,34 +98,6 @@ FEMaterialPointData* FEKinematicGrowth::CreateMaterialPointData()
 }
 
 //-----------------------------------------------------------------------------
-//! Get the elastic deformation
-FEMaterialPoint FEKinematicGrowth::GetElasticDeformationMaterialPoint(FEMaterialPoint& mp)
-{
-    // Get the growth tensor inverse
-    FEGrowthTensor* gmat = GetGrowthMaterial();
-    // material axes
-    mat3d Q = GetLocalCS(mp);
-    // get the fiber vector in local coordinates
-    vec3d fiber = gmat->m_fiber->unitVector(mp);
-    // convert to global coordinates
-    vec3d a0 = Q * fiber;
-    
-    mat3d Fgi = gmat->GrowthTensorInverse(mp, a0);
-    double Jgi = Fgi.det();
-    
-    // Get the deformation gradient and evaluate elastic deformation
-    FEMaterialPoint pt = mp;
-    FEElasticMaterialPoint& pe = *pt.ExtractData<FEElasticMaterialPoint>();
-    mat3d Fe = pe.m_F*Fgi;
-    double Je = pe.m_J*Jgi;
-    // substitute elastic deformation in material point
-    pe.m_F = Fe;
-    pe.m_J = Je;
-
-    return pt;
-}
-
-//-----------------------------------------------------------------------------
 //! data initialization
 bool FEKinematicGrowth::Init()
 {
@@ -142,9 +114,23 @@ bool FEKinematicGrowth::Init()
 //! Returns the Cauchy stress
 mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
 {
+	FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEKinematicMaterialPoint& pt = *mp.ExtractData<FEKinematicMaterialPoint>();
+
+	// overwrite the elastic material point deformation gradient information
+	// to match elastic deformation gradient of kinematic growth material
+	mat3d F = pe.m_F;
+	double J = pe.m_J;
+	pe.m_F = pt.m_Fe;
+	pe.m_J = pt.m_Je;
+
     // evaluate stress
     FEElasticMaterial* emat = GetBaseMaterial();
     mat3ds s = emat->Stress(mp);
+
+	// restore deformation gradient
+	pe.m_F = F;
+	pe.m_J = J;
 
     return s;
 }
@@ -153,9 +139,23 @@ mat3ds FEKinematicGrowth::Stress(FEMaterialPoint& mp)
 //! Returns the spatial tangent
 tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
 {
+	FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEKinematicMaterialPoint& pt = *mp.ExtractData<FEKinematicMaterialPoint>();
+
+	// overwrite the elastic material point deformation gradient information
+	// to match elastic deformation gradient of kinematic growth material
+	mat3d F = pe.m_F;
+	double J = pe.m_J;
+	pe.m_F = pt.m_Fe;
+	pe.m_J = pt.m_Je;
+
     // evaluate tangent
     FEElasticMaterial* emat = GetBaseMaterial();
     tens4ds c = emat->Tangent(mp);
+
+	// restore deformation gradient
+	pe.m_F = F;
+	pe.m_J = J;
 
     return c;
 }
@@ -164,9 +164,23 @@ tens4ds FEKinematicGrowth::Tangent(FEMaterialPoint& mp)
 //! Returns the strain energy density
 double FEKinematicGrowth::StrainEnergyDensity(FEMaterialPoint& mp)
 {
+	FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEKinematicMaterialPoint& pt = *mp.ExtractData<FEKinematicMaterialPoint>();
+
+	// overwrite the elastic material point deformation gradient information
+	// to match elastic deformation gradient of kinematic growth material
+	mat3d F = pe.m_F;
+	double J = pe.m_J;
+	pe.m_F = pt.m_Fe;
+	pe.m_J = pt.m_Je;
+
     // evaluate sed
     FEElasticMaterial* emat = GetBaseMaterial();
     double sed = emat->StrainEnergyDensity(mp);
+
+	// restore deformation gradient
+	pe.m_F = F;
+	pe.m_J = J;
 
     return sed;
 }
@@ -197,9 +211,4 @@ void FEKinematicGrowth::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, con
     pt.m_Fe = Fe;
     pt.m_Je = Fe.det();
     pt.m_rhor = GetBaseMaterial()->Density(mp)*GetGrowthMaterial()->GrowthDensity(mp, a0);
-    
-    // overwrite the elastic material point deformation gradient information
-    // to match elastic deformation gradient of kinematic growth material
-    pe.m_F = pt.m_Fe;
-    pe.m_J = pt.m_Je;
 }
