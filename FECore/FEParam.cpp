@@ -650,6 +650,11 @@ bool FEParam::IsHidden() const
 	return (m_flag & FEParamFlag::FE_PARAM_HIDDEN);
 }
 
+bool FEParam::IsObsolete() const
+{
+	return (m_flag & FEParamFlag::FE_PARAM_OBSOLETE);
+}
+
 //-----------------------------------------------------------------------------
 bool FEParam::IsVolatile() const
 {

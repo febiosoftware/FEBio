@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include <string.h>
 #include <stdarg.h>
 #include <sstream>
+#include <iostream>
 #include "FEBioImport.h"
 
 #ifndef WIN32
@@ -578,6 +579,7 @@ std::vector<std::string> split_string(const std::string& s, char delim)
 bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc, bool parseAttributes)
 {
 	FEParam* pp = nullptr;
+	const char* szparamName = (szparam == 0 ? tag.Name() : szparam);
 	if (tag == "add_param")
 	{
 		// get the name and value
@@ -595,9 +597,14 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 	else
 	{
 		// see if we can find this parameter
-		pp = pl.FindFromName((szparam == 0 ? tag.Name() : szparam));
+		pp = pl.FindFromName(szparamName);
 	}
 	if (pp == 0) return false;
+
+	if (pp->IsObsolete())
+	{
+		feLogWarning("parameter '%s' is obsolete.", szparamName);
+	}
 
 	if (pp->dim() == 1)
 	{
