@@ -46,10 +46,13 @@ FEResidualVector::~FEResidualVector()
 //-----------------------------------------------------------------------------
 void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe, bool bdom)
 {
+	FEMesh& mesh = m_fem.GetMesh();
+
 	vector<double>& R = m_R;
 
 	// assemble the element residual into the global residual
 	int ndof = (int)fe.size();
+	int ndn = ndof / (int)en.size();
 	for (int i = 0; i < ndof; ++i)
 	{
 		int I = elm[i];
@@ -59,9 +62,19 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 			R[I] += fe[i];
 		}
 		// TODO: Find another way to store reaction forces
-		else if (-I - 2 >= 0) {
-			#pragma omp atomic
-			m_Fr[-I - 2] -= fe[i];
+		else if (-I - 2 >= 0) 
+		{
+			// Don't add the reaction force to rigid nodes
+			int nid = en[i / ndn];
+			if (nid >= 0)
+			{
+				FENode& node = mesh.Node(nid);
+				if (node.m_rid < 0)
+				{
+#pragma omp atomic
+					m_Fr[-I - 2] -= fe[i];
+				}
+			}
 		}
 	}
 
@@ -74,11 +87,9 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 	}
 
 	// If there are rigid bodies we need to look for rigid dofs
-	FEMechModel* fem = dynamic_cast<FEMechModel*>(&m_fem);
+	FEMechModel* fem = dynamic_cast<FEMechModel*>(&m_fem); assert(fem);
 	if (fem && (fem->RigidBodies() > 0))
 	{
-		FEMesh& mesh = m_fem.GetMesh();
-		int ndn = ndof / (int)en.size();
 		for (int i = 0; i < ndof; i += ndn)
 		{
 			int nid = en[i / ndn];
