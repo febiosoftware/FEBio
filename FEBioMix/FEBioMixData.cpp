@@ -363,6 +363,39 @@ double FELogElemSolidStress::value(FEElement& el)
 	return val / (double)nint;
 }
 
+FELogSBMRefAppDensity::FELogSBMRefAppDensity(FEModel* fem, int n) : FELogElemData(fem), sbmid(n)
+{
+}
+
+double FELogSBMRefAppDensity::value(FEElement& el)
+{
+	FESolidDomain* dom = dynamic_cast<FESolidDomain*>(el.GetMeshPartition());
+	if (dom == nullptr) return 0;
+
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom->GetMaterial());
+	if (pm == nullptr) return 0;
+
+	// figure out the local SBM IDs. This depends on the material
+	int n = -1;
+	for (int i = 0; i < pm->SBMs(); ++i)
+		if (pm->GetSBM(i)->GetSBMID() == sbmid) { n = i; break; }
+
+	if (n == -1) return 0;
+
+	// calculate average concentration
+	double ew = 0;
+	for (int j = 0; j < el.GaussPoints(); ++j)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+		FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+
+		if (st && (n >= 0) && (n < st->m_sbmr.size())) ew += st->m_sbmr[n];
+	}
+	ew /= el.GaussPoints();
+
+	return ew;
+}
+
 //=============================================================================
 
 FELogDomainIntegralSBMConcentration::FELogDomainIntegralSBMConcentration(FEModel* fem, int sbm) : FELogDomainData(fem) 

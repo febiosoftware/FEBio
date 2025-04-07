@@ -285,6 +285,21 @@ class FELogElemSolidStress_T : public FELogElemSolidStress
 public: FELogElemSolidStress_T(FEModel* fem) : FELogElemSolidStress(fem, n) {}
 };
 
+class FELogSBMRefAppDensity : public FELogElemData
+{
+public:
+	FELogSBMRefAppDensity(FEModel* fem, int n);
+	double value(FEElement& el);
+private:
+	int sbmid = -1;
+};
+
+template <int n>
+class FELogSBMRefAppDensity_T : public FELogSBMRefAppDensity
+{
+public: FELogSBMRefAppDensity_T(FEModel* fem) : FELogSBMRefAppDensity(fem, n) {}
+};
+
 //=============================================================================
 // D O M A I N   D A T A
 //=============================================================================
