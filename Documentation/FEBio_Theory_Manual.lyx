@@ -505,6 +505,7 @@ Development of the FEBio project is supported in part by a grant from the U.S.
 \begin_inset Graphics
 	filename Figures/NIHlogo.png
 	lyxscale 25
+	width 2cm
 	special height=0.75in
 
 \end_inset

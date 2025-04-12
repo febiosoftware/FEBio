@@ -57,8 +57,8 @@ public:
 	bool Validate() override;
 	
 public:
-	double	m_free_diff;	//!< free diffusivity
-	double	m_diff;			//!< diffusivity
+	FEParamDouble	m_free_diff;	//!< free diffusivity
+    FEParamDouble	m_diff;			//!< diffusivity
 	
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

@@ -64,13 +64,13 @@ BEGIN_FECORE_CLASS(FEBiphasicSolver, FENewtonSolver)
 	END_PARAM_GROUP();
 
 	// obsolete parameters that used to be inherited from FESolidSolver2
-	ADD_PARAMETER(m_rhoi      , "rhoi"            )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_alpha     , "alpha"           )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_beta      , "beta"            )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_gamma     , "gamma"           )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_logSolve  , "logSolve"        )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_arcLength , "arc_length"      )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_al_scale  , "arc_length_scale")->SetFlags(FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_rhoi      , "rhoi"            )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_alpha     , "alpha"           )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_beta      , "beta"            )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_gamma     , "gamma"           )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_logSolve  , "logSolve"        )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_arcLength , "arc_length"      )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_al_scale  , "arc_length_scale")->SetFlags(FE_PARAM_OBSOLETE);
 
 END_FECORE_CLASS();
 

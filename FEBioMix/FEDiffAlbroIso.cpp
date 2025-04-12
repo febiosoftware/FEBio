@@ -43,7 +43,8 @@ END_FECORE_CLASS();
 FEDiffAlbroIso::FEDiffAlbroIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 {
 	m_diff0 = 1;
-	m_cdinv = m_alphad = 0;
+	m_cdinv = 0;
+    m_alphad = 0;
     m_lsol = -1;
 }
 
@@ -76,7 +77,7 @@ double FEDiffAlbroIso::Free_Diffusivity(FEMaterialPoint& mp)
     double ca = psm->GetActualSoluteConcentration(mp, m_lsol);
     
     // diffusivity coefficient
-    double d = m_diff0*exp(-m_cdinv*ca);
+    double d = m_diff0(mp)*exp(-m_cdinv(mp)*ca);
     
 	return d;
 }
@@ -94,9 +95,9 @@ double FEDiffAlbroIso::Tangent_Free_Diffusivity_Concentration(FEMaterialPoint& m
     double k = psm->GetPartitionCoefficient(mp, m_lsol);
     
     // diffusivity coefficient
-    double d = m_diff0*exp(-m_cdinv*ca);
+    double d = m_diff0(mp)*exp(-m_cdinv(mp)*ca);
     // derivative of d w.r.t. actual concentration
-    double dc = -m_cdinv*d;    
+    double dc = -m_cdinv(mp)*d;
     
     // tangent w.r.t. concentration
     if (isol == m_lsol)
@@ -126,7 +127,7 @@ mat3ds FEDiffAlbroIso::Diffusivity(FEMaterialPoint& mp)
     double ca = psm->GetActualSoluteConcentration(mp, m_lsol);
     
     // diffusivity coefficient
-    double d = m_diff0*exp(-m_alphad*(1-phiw)/phiw - m_cdinv*ca);
+    double d = m_diff0(mp)*exp(-m_alphad(mp)*(1-phiw)/phiw - m_cdinv(mp)*ca);
 	
 	// diffusivity tensor
     mat3dd dt(d);
@@ -160,10 +161,10 @@ tens4dmm FEDiffAlbroIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
     double dkdJ = psm->dkdJ(mp, m_lsol);
     
     // diffusivity coefficient
-    double d = m_diff0*exp(-m_alphad*(1-phiw)/phiw - m_cdinv*ca);
+    double d = m_diff0(mp)*exp(-m_alphad(mp)*(1-phiw)/phiw - m_cdinv(mp)*ca);
     
     // derivative of (J d) w.r.t. J
-    double dJ = d*(1+J*(m_alphad*phi0/(J-phi0)/(J-phi0) - m_cdinv*c*dkdJ));
+    double dJ = d*(1+J*(m_alphad(mp)*phi0/(J-phi0)/(J-phi0) - m_cdinv(mp)*c*dkdJ));
 		
 	tens4dmm D4 = dyad1s(I)*dJ-dyad4s(I)*(2*d);
 	
@@ -194,9 +195,9 @@ mat3ds FEDiffAlbroIso::Tangent_Diffusivity_Concentration(FEMaterialPoint &mp, co
     double k = psm->GetPartitionCoefficient(mp, m_lsol);
     
     // diffusivity coefficient
-    double d = m_diff0*exp(-m_alphad*(1-phiw)/phiw - m_cdinv*ca);
+    double d = m_diff0(mp)*exp(-m_alphad(mp)*(1-phiw)/phiw - m_cdinv(mp)*ca);
     // derivative of d w.r.t. actual concentration
-    double dc = -m_cdinv*d;
+    double dc = -m_cdinv(mp)*d;
     
     // tangent w.r.t. concentration
     if (isol == m_lsol) {

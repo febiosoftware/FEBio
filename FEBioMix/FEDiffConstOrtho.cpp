@@ -40,7 +40,10 @@ END_FECORE_CLASS();
 //! Constructor. 
 FEDiffConstOrtho::FEDiffConstOrtho(FEModel* pfem) : FESoluteDiffusivity(pfem)
 {
-	m_free_diff = m_diff[0] = m_diff[1] = m_diff[2] = 1;
+	m_free_diff = 1;
+    m_diff[0] = 1;
+    m_diff[1] = 1;
+    m_diff[2] = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -48,9 +51,16 @@ FEDiffConstOrtho::FEDiffConstOrtho(FEModel* pfem) : FESoluteDiffusivity(pfem)
 bool FEDiffConstOrtho::Validate()
 {
 	if (FESoluteDiffusivity::Validate() == false) return false;
-	if (m_free_diff < m_diff[0]) { feLogError("free_diff must be >= diff1"); return false; }
-	if (m_free_diff < m_diff[1]) { feLogError("free_diff must be >= diff2"); return false; }
-	if (m_free_diff < m_diff[2]) { feLogError("free_diff must be >= diff3"); return false; }
+    FEMesh& mesh = GetMesh();
+    for (int i=0; i<mesh.Elements(); ++i) {
+        FEElement& elem = *mesh.Element(i);
+        for (int n=0; n<elem.GaussPoints(); ++n) {
+            FEMaterialPoint& mp = *elem.GetMaterialPoint(n);
+            if (m_free_diff(mp) < m_diff[0](mp)) { feLogError("free_diff must be >= diff1 in element %i", elem.GetID()); return false; }
+            if (m_free_diff(mp) < m_diff[1](mp)) { feLogError("free_diff must be >= diff2 in element %i", elem.GetID()); return false; }
+            if (m_free_diff(mp) < m_diff[2](mp)) { feLogError("free_diff must be >= diff3 in element %i", elem.GetID()); return false; }
+        }
+    }
 	return true;
 }
 
@@ -58,7 +68,7 @@ bool FEDiffConstOrtho::Validate()
 //! Free diffusivity
 double FEDiffConstOrtho::Free_Diffusivity(FEMaterialPoint& mp)
 {
-	return m_free_diff;
+	return m_free_diff(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -87,7 +97,7 @@ mat3ds FEDiffConstOrtho::Diffusivity(FEMaterialPoint& mp)
 		a0.x = Q[0][i]; a0.y = Q[1][i]; a0.z = Q[2][i];
 		
 		// Evaluate the texture tensor in the current configuration
-		d += dyad(a0)*m_diff[i];
+		d += dyad(a0)*m_diff[i](mp);
 	}
 	
 	return d;

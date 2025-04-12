@@ -75,7 +75,8 @@ enum FEParamFlag {
 	FE_PARAM_ADDLC     = 0x08,		// parameter should get a default load curve in FEBio Studio
 	FE_PARAM_VOLATILE  = 0x10,		// parameter can change (e.g. via a load curve)
 	FE_PARAM_TOPLEVEL  = 0x20,		// parameter should only defined at top-level (materials only)
-	FE_PARAM_WATCH	   = 0x40		// This is a watch parameter 
+	FE_PARAM_WATCH	   = 0x40,		// This is a watch parameter 
+	FE_PARAM_OBSOLETE  = 0x80		// Parameter is obsolete
 };
 
 class FEParam;
@@ -212,6 +213,8 @@ public:
 	void SetWatchFlag(bool b);
 
 	bool IsHidden() const;
+
+	bool IsObsolete() const;
 
 	bool IsVolatile() const;
 
