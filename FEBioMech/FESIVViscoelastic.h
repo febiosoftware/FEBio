@@ -53,7 +53,8 @@ public:
     void Serialize(DumpStream& ar);
     
 public:
-    mat3d   m_R;                    //!< rotation matrix
+    mat3d   m_R;                    //!< rotation matrix at current time
+    mat3d   m_Rp;                   //!< rotation matrix at previous time
     mat3ds  m_U[3];                 //!< eigentensors at current time
     vec3d   m_u[3];                 //!< eigenvectors at current time
     vec3d   m_up[3];                //!< eigenvectors at previous time
@@ -61,7 +62,7 @@ public:
     
     double  m_lam3d[MAX_TERMS];     //!< dashpot stretch ratio at current time
     double  m_lam3dp[MAX_TERMS];    //!< dashpot stretch ratio previous time
-    double  m_HAmr[MAX_TERMS];      //!< aggregate modulus along loading, calculated from reference state
+    double  m_2zet[MAX_TERMS];      //!< twice the viscosity
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
 

@@ -737,6 +737,18 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Dashpot stretch ratio (SIV viscoelastic)
+class FEPlotDashpotStretch : public FEPlotDomainData
+{
+public:
+    FEPlotDashpotStretch(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
+};
+
+//-----------------------------------------------------------------------------
 //! Intact bond fraction (fatigue)
 class FEPlotIntactBondFraction : public FEPlotDomainData
 {
