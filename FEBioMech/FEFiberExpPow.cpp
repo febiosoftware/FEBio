@@ -52,7 +52,7 @@ FEFiberExpPow::FEFiberExpPow(FEModel* pfem) : FEFiberMaterial(pfem)
 	m_mu = 0;
     m_lam0 = 1;
 
-	m_epsf = 1.0;
+	m_epsf = 10.0;
 }
 
 //-----------------------------------------------------------------------------

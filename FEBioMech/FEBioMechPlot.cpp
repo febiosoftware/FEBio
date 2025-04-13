@@ -76,6 +76,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEEdgeToSurfaceSlidingContact.h>
 #include "FEIdealGasPressure.h"
 #include "FEBodyForce.h"
+#include "FESIVViscoelastic.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -2884,6 +2885,56 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
             D /= (float)el.GaussPoints();
 
             a << D;
+        }
+        return true;
+    }
+}
+
+//=============================================================================
+FEPlotDashpotStretch::FEPlotDashpotStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+{
+    m_comp = -1;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotDashpotStretch::SetFilter(const char* szfilter)
+{
+    sscanf(szfilter, "solid[%d]", &m_comp);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotDashpotStretch::Save(FEDomain &dom, FEDataStream& a)
+{
+    if (m_comp == -1) {
+        writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& pt) {
+            FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
+            double lam3d = 1.0;
+            FESIVViscoelasticMaterialPoint* pve = mp.ExtractData<FESIVViscoelasticMaterialPoint>();
+            if (pve) lam3d = (float) pve->m_lam3d[0];
+            return lam3d;
+        });
+        return true;
+    }
+    else {
+        for (int i = 0; i < dom.Elements(); ++i)
+        {
+            FEElement& el = dom.ElementRef(i);
+            
+            float lam3d = 1.0;
+            for (int n = 0; n < el.GaussPoints(); ++n)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+                FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
+                if (mmp && (m_comp < mmp->Components()))
+                {
+                    FESIVViscoelasticMaterialPoint* pve = mmp->GetPointData(m_comp)->ExtractData<FESIVViscoelasticMaterialPoint>();
+                    if (pve) lam3d += (float) pve->m_lam3d[0];
+                }
+            }
+            lam3d /= (float)el.GaussPoints();
+            
+            a << lam3d;
         }
         return true;
     }
