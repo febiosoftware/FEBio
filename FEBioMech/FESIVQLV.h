@@ -27,65 +27,92 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEUncoupledMaterial.h"
-#include "FESIVViscoelastic.h"
+#include "FEElasticMaterial.h"
+
+//-----------------------------------------------------------------------------
+//! Material point data for visco-elastic materials
+class FESIVQLVMaterialPoint : public FEMaterialPointData
+{
+public:
+    enum { MAX_TERMS = 6 };
+    
+public:
+    //! constructor
+    FESIVQLVMaterialPoint(FEMaterialPointData* mp = nullptr);
+    
+    //! copy material point data
+    FEMaterialPointData* Copy();
+    
+    //! Initialize material point data
+    void Init();
+    
+    //! Update material point data
+    void Update(const FETimeInfo& timeInfo);
+    
+    //! Serialize data to archive
+    void Serialize(DumpStream& ar);
+    
+public:
+    mat3d   m_R;                    //!< rotation matrix at current time
+    mat3d   m_Rp;                   //!< rotation matrix at previous time
+    mat3ds  m_U[3];                 //!< eigentensors at current time
+    vec3d   m_u[3];                 //!< eigenvectors at current time
+    vec3d   m_up[3];                //!< eigenvectors at previous time
+    double  m_lam[3];               //!< eigenvalues of stretch tensor at current time
+    
+    double  m_lam3d;                //!< dashpot stretch ratio at current time
+    double  m_lam3dp;               //!< dashpot stretch ratio previous time
+    double  m_sed;                  //!< elastic strain energy density
+    double  m_sedp;                 //!< sed at previous time step
+
+};
+
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation visco-elastic material
 //
-//-----------------------------------------------------------------------------
-//! This class implements a large deformation visco-elastic material
-//
-class FESIVViscoelasticUC : public FEElasticMaterial
+class FESIVQLV :    public FEElasticMaterial
 {
 public:
-    // NOTE: make sure that this parameter is the
-    //       same as the MAX_TERMS in the FESIVViscoelasticMaterialPoint class
-    enum { MAX_TERMS = FESIVViscoelasticMaterialPoint::MAX_TERMS };
-    
-public:
     //! default constructor
-    FESIVViscoelasticUC(FEModel* pfem);
-    
+    FESIVQLV(FEModel* pfem);
+
     //! get the elastic base material
-    FEUncoupledMaterial* GetBaseMaterial() { return m_Base; }
-    
+    FEElasticMaterial* GetBaseMaterial() { return m_Base; }
+
     //! get the elastic Maxwell material
     FEElasticMaterial* GetMxwlMaterial() { return m_Mxwl; }
-    
+
     //! Set the base material
-    void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_Base = pbase; }
-    
+    void SetBaseMaterial(FEElasticMaterial* pbase) { m_Base = pbase; }
+
     //! Set the Maxwell material
     void SetMxwlMaterial(FEElasticMaterial* pmxwl) { m_Mxwl = pmxwl; }
-    
+
 public:
     //! stress function
     mat3ds Stress(FEMaterialPoint& pt) override;
-    
+
     //! tangent function
     tens4ds Tangent(FEMaterialPoint& pt) override;
-    
+
     //! strain energy density
     double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
     // returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
-    
+
     //! update specialize material point data
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
 public:
     // material parameters
-    double  m_g0;               //!< intitial visco-elastic coefficient
-    double  m_g[MAX_TERMS];     //!< visco-elastic coefficients
-    double  m_t[MAX_TERMS];     //!< relaxation times in reference configuration
-    int     m_ttype;            //!< strain trigger type
-    
+    double  m_zet;                  //!< dashpot viscosity
+
 private:
-    FEUncoupledMaterial*    m_Base; //!< pointer to parallel elastic solid material
+    FEElasticMaterial*    m_Base;   //!< pointer to parallel elastic solid material
     FEElasticMaterial*    m_Mxwl;   //!< pointer to Maxwell elastic solid material
-    
+
 public:
     // declare parameter list
     DECLARE_FECORE_CLASS();

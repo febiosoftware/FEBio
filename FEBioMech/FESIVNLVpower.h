@@ -27,65 +27,57 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEUncoupledMaterial.h"
-#include "FESIVViscoelastic.h"
+#include "FEElasticMaterial.h"
+#include "FESIVQLV.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation visco-elastic material
 //
-//-----------------------------------------------------------------------------
-//! This class implements a large deformation visco-elastic material
-//
-class FESIVViscoelasticUC : public FEElasticMaterial
+class FESIVNLVpower :    public FEElasticMaterial
 {
 public:
-    // NOTE: make sure that this parameter is the
-    //       same as the MAX_TERMS in the FESIVViscoelasticMaterialPoint class
-    enum { MAX_TERMS = FESIVViscoelasticMaterialPoint::MAX_TERMS };
-    
-public:
     //! default constructor
-    FESIVViscoelasticUC(FEModel* pfem);
-    
+    FESIVNLVpower(FEModel* pfem);
+
     //! get the elastic base material
-    FEUncoupledMaterial* GetBaseMaterial() { return m_Base; }
-    
+    FEElasticMaterial* GetBaseMaterial() { return m_Base; }
+
     //! get the elastic Maxwell material
     FEElasticMaterial* GetMxwlMaterial() { return m_Mxwl; }
-    
+
     //! Set the base material
-    void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_Base = pbase; }
-    
+    void SetBaseMaterial(FEElasticMaterial* pbase) { m_Base = pbase; }
+
     //! Set the Maxwell material
     void SetMxwlMaterial(FEElasticMaterial* pmxwl) { m_Mxwl = pmxwl; }
-    
+
 public:
     //! stress function
     mat3ds Stress(FEMaterialPoint& pt) override;
-    
+
     //! tangent function
     tens4ds Tangent(FEMaterialPoint& pt) override;
-    
+
     //! strain energy density
     double StrainEnergyDensity(FEMaterialPoint& pt) override;
     
     // returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
-    
+
     //! update specialize material point data
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
 public:
     // material parameters
-    double  m_g0;               //!< intitial visco-elastic coefficient
-    double  m_g[MAX_TERMS];     //!< visco-elastic coefficients
-    double  m_t[MAX_TERMS];     //!< relaxation times in reference configuration
-    int     m_ttype;            //!< strain trigger type
-    
+    double  m_z0;           //!< dashpot viscosity at zero dashpot strain
+    double  m_z1;           //!< dashpot viscosity increment at dashpot strain = E0
+    double  m_E0;           //!< dashpot strain at which viscosity is m_z1+m_z2;
+    double  m_a;            //!< power exponent
+
 private:
-    FEUncoupledMaterial*    m_Base; //!< pointer to parallel elastic solid material
+    FEElasticMaterial*    m_Base;   //!< pointer to parallel elastic solid material
     FEElasticMaterial*    m_Mxwl;   //!< pointer to Maxwell elastic solid material
-    
+
 public:
     // declare parameter list
     DECLARE_FECORE_CLASS();

@@ -77,6 +77,7 @@ SOFTWARE.*/
 #include "FEIdealGasPressure.h"
 #include "FEBodyForce.h"
 #include "FESIVViscoelastic.h"
+#include "FESIVQLV.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -2911,7 +2912,9 @@ bool FEPlotDashpotStretch::Save(FEDomain &dom, FEDataStream& a)
             FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
             double lam3d = 1.0;
             FESIVViscoelasticMaterialPoint* pve = mp.ExtractData<FESIVViscoelasticMaterialPoint>();
+            FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
             if (pve) lam3d = (float) pve->m_lam3d[0];
+            else if (pvq) lam3d = (float) pvq->m_lam3d;
             return lam3d;
         });
         return true;
