@@ -293,6 +293,7 @@ SOFTWARE.*/
 #include "FESolidAnalysis.h"
 
 #include "FEElasticBeamMaterial.h"
+#include "FETiedLineConstraint.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -711,6 +712,8 @@ void FEBioMech::InitModule()
 	
 	REGISTER_FECORE_CLASS(FEEdgeToSurfaceContactPotential, "edge-to-surface contact potential");
 	REGISTER_FECORE_CLASS(FEEdgeToSurfaceSlidingContact, "edge-to-surface sliding contact");
+
+	REGISTER_FECORE_CLASS(FETiedLineConstraint, "tied-line");
 
 	//-----------------------------------------------------------------------------
 	// classes derived directly from FERigidBC
