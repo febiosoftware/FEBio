@@ -374,8 +374,7 @@ void FETiedLineConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				}
 
 				// setup lm vector
-				if (m_laugon != FECore::LAGMULT_METHOD) lm.resize(3 * (nmeln + 1));
-				else lm.resize(3 * (nmeln + 2));
+				lm.resize(3 * (nmeln + 1));
 
 				// fill the lm array
 				lm[0] = sLM[n * 3];
@@ -388,8 +387,7 @@ void FETiedLineConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 					lm[3 * (l + 1) + 2] = mLM[l * 3 + 2];
 				}
 
-				if (m_laugon != FECore::LAGMULT_METHOD) en.resize(nmeln + 1);
-				else en.resize(nmeln + 2);
+				en.resize(nmeln + 1);
 
 				// fill the en array
 				en[0] = sel.m_node[n];
@@ -554,7 +552,12 @@ bool FETiedLineConstraint::Augment(int naug, const FETimeInfo& tp)
 	normgc = sqrt(normgc / N);
 
 	// check convergence of constraints
-	feLog(" tied interface # %d\n", GetID());
+	const std::string& name = GetName();
+	if (name.empty())
+		feLog(" tied-line # %d\n", GetID());
+	else
+		feLog(" %s [tied-line]\n", name.c_str());
+
 	feLog("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
