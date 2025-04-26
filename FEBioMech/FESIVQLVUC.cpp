@@ -42,7 +42,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FESIVQLVUC, FEUncoupledMaterial)
 
     // material parameters
-    ADD_PARAMETER(m_zet, "eta")->setUnits(UNIT_VISCOSITY);
+    ADD_PARAMETER(m_eta, "eta")->setUnits(UNIT_VISCOSITY);
 
     // define the material properties
     ADD_PROPERTY(m_Base, "parallel");
@@ -54,7 +54,7 @@ END_FECORE_CLASS();
 //! constructor
 FESIVQLVUC::FESIVQLVUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
-    m_zet = 0;
+    m_eta = 0;
     m_Base = nullptr;
     m_Mxwl = nullptr;
 }
@@ -192,7 +192,7 @@ mat3ds FESIVQLVUC::DevStress(FEMaterialPoint& mp)
         mat3ds Es = ((Us*Us).sym() - I)/2;
         ep.m_F = pt.m_R*Us;
         ep.m_J = Us.det();
-        mat3ds Smhat = m_Mxwl->PK2Stress(mp,Es)/(2*m_zet);
+        mat3ds Smhat = m_Mxwl->PK2Stress(mp,Es)/(3*m_eta);
         double b = Smhat.dotdot((pt.m_U[2]-I)/(2*lams[2])+pt.m_U[2]*pow(lams[2],2))*x;
         double c = (x2*x)/3*pow(x-1./x2,2)*u3dot2
         - x2/2*(1/rx*(pow(pt.m_lam[2],2)-1/pt.m_lam[2]) - (pow(lams[2],2)-1/lams[2]))*Smhat.dotdot(U3dot);

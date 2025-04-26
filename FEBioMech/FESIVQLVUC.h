@@ -69,7 +69,7 @@ public:
     
 public:
     // material parameters
-    double  m_zet;                  //!< dashpot viscosity
+    double  m_eta;                  //!< dashpot viscosity
 
 private:
     FEUncoupledMaterial*    m_Base;   //!< pointer to parallel elastic solid material
