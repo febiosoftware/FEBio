@@ -47,6 +47,7 @@ BEGIN_FECORE_CLASS(FESIVNLVpower, FEElasticMaterial)
     ADD_PARAMETER(m_z1, "zeta1")->setUnits(UNIT_VISCOSITY);
     ADD_PARAMETER(m_E0, "E0")->setUnits(UNIT_NONE);
     ADD_PARAMETER(m_a , "alpha")->setUnits(UNIT_NONE);
+    ADD_PARAMETER(m_bdash, "dashpot");
 
     // define the material properties
     ADD_PROPERTY(m_Base, "parallel");
@@ -61,6 +62,7 @@ FESIVNLVpower::FESIVNLVpower(FEModel* pfem) : FEElasticMaterial(pfem)
     m_z0 = m_z1 = 0;
     m_E0 = 1;
     m_a = 1;
+    m_bdash = true;
     m_Base = nullptr;
     m_Mxwl = nullptr;
 }
@@ -206,9 +208,9 @@ mat3ds FESIVNLVpower::Stress(FEMaterialPoint& mp)
         mat3ds Es = ((Us*Us).sym() - I)/2;
         ep.m_F = pt.m_R*Us;
         ep.m_J = Us.det();
-        double Ed = fabs(0.5*(x*x-1));
-        // power-law relation for viscosity zeta as a function of dashpot strain Ed
-        double zeta = m_z0 + m_z1*pow(Ed/m_E0,m_a);
+        double Enorm = m_bdash ? fabs(0.5*(x*x-1)) : fabs(0.5*(lams[2]*lams[2]-1));
+        // power-law relation for viscosity zeta as a function of dashpot/spring strain Enorm
+        double zeta = m_z0 + m_z1*pow(Enorm/m_E0,m_a);
         mat3ds Smhat = m_Mxwl->PK2Stress(mp,Es)/(2*zeta);
         double c1 = Smhat.dotdot(pt.m_U[2]);
         double c2 = (btransiso) ? Smhat.dotdot(U3dot*(pow(pt.m_lam[0],2)+pow(pt.m_lam[2],2)))/2 :

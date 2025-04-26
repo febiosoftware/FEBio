@@ -135,6 +135,8 @@ mat3ds FESIVViscoelasticUC::Stress(FEMaterialPoint& mp)
     double dt = tp.timeIncrement;
     if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
     
+    if (tp.currentTime >= 0.2)
+        bool pause = true;
     
     // Calculate the base Cauchy stress
     mat3ds s = m_Base->Stress(mp)*m_g0;

@@ -749,6 +749,18 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Maxwell spring stretch ratio (SIV viscoelastic)
+class FEPlotMxwlSpringStretch : public FEPlotDomainData
+{
+public:
+    FEPlotMxwlSpringStretch(FEModel* pfem);
+    bool SetFilter(const char* szfilter) override;
+    bool Save(FEDomain& m, FEDataStream& a) override;
+protected:
+    int        m_comp;
+};
+
+//-----------------------------------------------------------------------------
 //! Intact bond fraction (fatigue)
 class FEPlotIntactBondFraction : public FEPlotDomainData
 {
