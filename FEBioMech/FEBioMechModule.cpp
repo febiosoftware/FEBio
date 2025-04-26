@@ -117,6 +117,7 @@ SOFTWARE.*/
 #include "FESIVViscoelastic.h"
 #include "FESIVViscoelasticUC.h"
 #include "FESIVQLV.h"
+#include "FESIVQLVUC.h"
 #include "FESIVNLVpower.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEElasticFiberMaterial.h"
@@ -440,6 +441,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberEFDNeoHookean, "fiber neo-Hookean");
     REGISTER_FECORE_CLASS(FEScaledUncoupledMaterial, "scaled uncoupled");
     REGISTER_FECORE_CLASS(FEYeoh, "Yeoh");
+    REGISTER_FECORE_CLASS(FESIVQLVUC, "SIV-QLV-UC");
 
 	// fiber materials (derived from FEFiberMaterial)
     REGISTER_FECORE_CLASS(FEFiberCDF         , "fiber-CDF"           );
