@@ -182,12 +182,14 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
         if ((fabs(Ev[0]) > eps) || (fabs(Ev[1]) > eps) || (fabs(Ev[2]) > eps)) {
             // reorder principal stretches
             // let dir[2] be the principal direction of largest strain magnitude
-            if ((fabs(Ev[1]) > fabs(Ev[0])) && (fabs(Ev[1]) > fabs(Ev[2]))){
+//            if ((fabs(Ev[1]) > fabs(Ev[0])) && (fabs(Ev[1]) > fabs(Ev[2]))){
+            if ((lam[1] > lam[0]) && (lam[1] > lam[2])){
                 pt.m_lam[2] = lam[1]; pt.m_lam[0] = lam[2]; pt.m_lam[1] = lam[0];
                 pt.m_U[2] = U[1]; pt.m_U[0] = U[2]; pt.m_U[1] = U[0];
                 pt.m_u[2] = u[1]; pt.m_u[0] = u[2]; pt.m_u[1] = u[0];
             }
-            else if ((fabs(Ev[2]) > fabs(Ev[0])) && (fabs(Ev[2]) > fabs(Ev[1]))) {
+//            else if ((fabs(Ev[2]) > fabs(Ev[0])) && (fabs(Ev[2]) > fabs(Ev[1]))) {
+            else if ((lam[2] > lam[0]) && (lam[2] > lam[1])) {
                 pt.m_lam[2] = lam[2]; pt.m_lam[0] = lam[0]; pt.m_lam[1] = lam[1];
                 pt.m_U[2] = U[2]; pt.m_U[0] = U[0]; pt.m_U[1] = U[1];
                 pt.m_u[2] = u[2]; pt.m_u[0] = u[0]; pt.m_u[1] = u[1];
@@ -240,7 +242,7 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
     
     // calculate principal dashpot stretch
     // terms are accumulated in s
-    double errrel = 1e-3;
+    double errrel = 1e-6;
     double errabs = 1e-15;
     int maxit = 100;
     int iter = 0;

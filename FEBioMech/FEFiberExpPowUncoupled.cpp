@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFiberExpPowUncoupled.h"
+#include <limits>
 #include <FECore/log.h>
 
 // define the material parameters
@@ -48,6 +49,8 @@ FEFiberExpPowUC::FEFiberExpPowUC(FEModel* pfem) : FEFiberMaterialUncoupled(pfem)
 	m_alpha = 0.0;
 	m_beta = 2.0;
     m_mu = 0;
+    
+    m_epsf = 10.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -60,16 +63,19 @@ mat3ds FEFiberExpPowUC::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
 	mat3d F = pt.m_F*pow(J,-1.0/3.0);
 	
 	// loop over all integration points
-	const double eps = 0;
 	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
 	
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
 
-	double ksi = m_ksi(mp);
-	
+    double ksi = m_ksi(mp);
+    double mu = m_mu(mp);
+    double alpha = m_alpha(mp);
+    double beta = m_beta(mp);
+
 	// only take fibers in tension into consideration
+    const double eps = m_epsf* std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
@@ -79,14 +85,14 @@ mat3ds FEFiberExpPowUC::DevFiberStress(FEMaterialPoint& mp, const vec3d& n0)
 		mat3ds N = dyad(nt);
 		
 		// calculate strain energy derivative
-		double Wl = ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
+		double Wl = ksi*pow(In_1, beta-1.0)*exp(alpha*pow(In_1, beta));
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
 
         // add the contribution from shear
         mat3ds BmI = pt.DevLeftCauchyGreen() - mat3dd(1);
-        s += (N*BmI).sym()*(m_mu / J);
+        s += (N*BmI).sym()*(mu / J);
 	}
 	else
 	{
@@ -106,7 +112,6 @@ tens4ds FEFiberExpPowUC::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 	mat3d F = pt.m_F*pow(J,-1.0/3.0);
 	
 	// loop over all integration points
-	const double eps = 0;
 	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds s;
 	tens4ds c;
@@ -114,9 +119,13 @@ tens4ds FEFiberExpPowUC::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
 	
-	double ksi = m_ksi(mp);
-
+    double ksi = m_ksi(mp);
+    double mu = m_mu(mp);
+    double alpha = m_alpha(mp);
+    double beta = m_beta(mp);
+    
 	// only take fibers in tension into consideration
+    const double eps = m_epsf*std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// get the global spatial fiber direction in current configuration
@@ -130,9 +139,9 @@ tens4ds FEFiberExpPowUC::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
         tens4ds I4  = dyad4s(I);
 
 		// calculate strain energy derivatives
-		double tmp = m_alpha*pow(In_1, m_beta);
-		double Wl = ksi*pow(In_1, m_beta-1.0)*exp(m_alpha*pow(In_1, m_beta));
-		double Wll = ksi*pow(In_1, m_beta-2.0)*((tmp+1)*m_beta-1.0)*exp(tmp);
+		double tmp = alpha*pow(In_1, beta);
+		double Wl = ksi*pow(In_1, beta-1.0)*exp(alpha*pow(In_1, beta));
+		double Wll = ksi*pow(In_1, beta-2.0)*((tmp+1)*beta-1.0)*exp(tmp);
 		
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
@@ -140,13 +149,13 @@ tens4ds FEFiberExpPowUC::DevFiberTangent(FEMaterialPoint& mp, const vec3d& n0)
         // add the contribution from shear
         mat3ds B = pt.DevLeftCauchyGreen();
         mat3ds BmI = B - I;
-        s += (N*BmI).sym()*(m_mu / J);
+        s += (N*BmI).sym()*(mu / J);
 
 		// calculate the fiber tangent
 		c = NxN*(4.0*Wll/J);
 
         // add the contribution from shear
-        c += dyad4s(N, B)*(m_mu / J);
+        c += dyad4s(N, B)*(mu / J);
 
 		// This is the final value of the elasticity tensor
 		c += ((I4+IxI/3.0)*s.tr() - dyad1s(I,s))*(2./3.)
@@ -174,21 +183,24 @@ double FEFiberExpPowUC::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, const v
 	// Calculate In = n0*C*n0
 	double In_1 = n0*(C*n0) - 1.0;
 	
-	double ksi = m_ksi(mp);
-
+    double ksi = m_ksi(mp);
+    double mu = m_mu(mp);
+    double alpha = m_alpha(mp);
+    double beta = m_beta(mp);
+    
 	// only take fibers in tension into consideration
-	const double eps = 0;
+    const double eps = m_epsf*std::numeric_limits<double>::epsilon();
 	if (In_1 >= eps)
 	{
 		// calculate strain energy derivative
-        if (m_alpha > 0) {
-            sed = ksi/(m_alpha*m_beta)*(exp(m_alpha*pow(In_1, m_beta))-1);
+        if (alpha > 0) {
+            sed = ksi/(alpha*beta)*(exp(alpha*pow(In_1, beta))-1);
         }
         else
-            sed = ksi/m_beta*pow(In_1, m_beta);
+            sed = ksi/beta*pow(In_1, beta);
 
         // add the contribution from shear
-        sed += m_mu*(n0*(C2*n0) - 2 * In_1 - 1) / 4.0;
+        sed += mu*(n0*(C2*n0) - 2 * In_1 - 1) / 4.0;
 	}
     
     return sed;

@@ -185,7 +185,7 @@ double FEFiberExpPow::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d&
     double beta = m_beta(mp);
 
 	// only take fibers in tension into consideration
-	const double eps = 0;
+    const double eps = m_epsf*std::numeric_limits<double>::epsilon();
 	if (In_I0 >= eps)
 	{
 		// calculate strain energy derivative
