@@ -1459,6 +1459,132 @@ double FELogElemPK2StressXZ::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemPK1StressXX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(0,0);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressYY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(1,1);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressZZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(2,2);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressXY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(0,1);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressYZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(1,2);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressXZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(0,2);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressYX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(1,0);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressZY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(2,1);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressZX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(2,0);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemStressEigenVector::value(FEElement& el)
 {
 	assert(m_eigenVector >= 0);

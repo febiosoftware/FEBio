@@ -817,6 +817,78 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogElemPK1StressXX : public FELogElemData
+{
+public:
+    FELogElemPK1StressXX(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressYY : public FELogElemData
+{
+public:
+    FELogElemPK1StressYY(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressZZ : public FELogElemData
+{
+public:
+    FELogElemPK1StressZZ(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressXY : public FELogElemData
+{
+public:
+    FELogElemPK1StressXY(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressYZ : public FELogElemData
+{
+public:
+    FELogElemPK1StressYZ(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressXZ : public FELogElemData
+{
+public:
+    FELogElemPK1StressXZ(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressYX : public FELogElemData
+{
+public:
+    FELogElemPK1StressYX(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressZY : public FELogElemData
+{
+public:
+    FELogElemPK1StressZY(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressZX : public FELogElemData
+{
+public:
+    FELogElemPK1StressZX(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemStressEigenVector : public FELogElemData
 {
 public:
