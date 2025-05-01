@@ -42,6 +42,21 @@ double FENodeConcentration::value(const FENode& node)
 }
 
 //-----------------------------------------------------------------------------
+double FENodeFluidPressure::value(const FENode& node)
+{
+    const int dof_P = GetFEModel()->GetDOFIndex("p");
+    return node.get(dof_P);
+}
+
+//-----------------------------------------------------------------------------
+double FENodeSoluteConcentration_::value(const FENode& node)
+{
+    double val = 0.0;
+    const int dof_C = GetFEModel()->GetDOFIndex("concentration", m_nsol);
+    return node.get(dof_C);
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemFluidPressure::value(FEElement& el)
 {
 	double val = 0.0;
