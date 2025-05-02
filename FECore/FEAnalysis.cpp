@@ -72,8 +72,15 @@ BEGIN_FECORE_CLASS(FEAnalysis, FECoreBase)
 
 	// the default type of the solver should match the active module's name
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
-	const char* szmod = fecore.GetActiveModule()->GetName();
-	solver->SetDefaultType(szmod);
+	FEModule* mod = fecore.GetActiveModule();
+	if (mod)
+	{
+		const char* szmod = mod->GetName();
+		if (szmod)
+		{
+			solver->SetDefaultType(szmod);
+		}
+	}
 
 END_FECORE_CLASS();
 
