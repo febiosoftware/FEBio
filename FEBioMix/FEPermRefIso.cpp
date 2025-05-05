@@ -83,9 +83,9 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 	// --- strain-dependent permeability ---
 	
 	double f = pow((J-phisr)/(1-pt.m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
-	double k0 = m_perm0*f;
-	double k1 = m_perm1/(J*J)*f;
-	double k2 = 0.5*m_perm2/pow(J,4)*f;
+	double k0 = m_perm0(mp)*f;
+	double k1 = m_perm1(mp) /(J*J)*f;
+	double k2 = 0.5*m_perm2(mp)/pow(J,4)*f;
 	mat3ds kt = k0*I+k1*b+2*k2*b.sqr();
 	
 	return kt;
@@ -114,9 +114,9 @@ tens4dmm FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
     if (J <= phisr) feLogError("The perm-ref-iso permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
     
 	double f = pow((J-phisr)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
-	double k0 = m_perm0*f;
-	double k1 = m_perm1/(J*J)*f;
-	double k2 = 0.5*m_perm2/pow(J,4)*f;
+	double k0 = m_perm0(mp) *f;
+	double k1 = m_perm1(mp) /(J*J)*f;
+	double k2 = 0.5*m_perm2(mp) /pow(J,4)*f;
     double K0prime = (1+J*(m_alpha/(J-phi0)+m_M*J))*k0;
 	double K1prime = (J*J*m_M+(J*(m_alpha-1)+phi0)/(J-phisr))*k1;
 	double K2prime = (J*J*m_M+(J*(m_alpha-3)+3*phi0)/(J-phisr))*k2;
