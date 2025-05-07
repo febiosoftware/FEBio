@@ -359,8 +359,7 @@ void FETiedLineConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 				mel.shape(N, r);
 
 				// allocate "element" force vector
-				if (m_laugon != FECore::LAGMULT_METHOD) fe.resize(3 * (nmeln + 1));
-				else fe.resize(3 * (nmeln + 2));
+				fe.resize(3 * (nmeln + 1));
 
 				// calculate contribution to force vector from nodes
 				fe[0] = -Jw * tc.x;
