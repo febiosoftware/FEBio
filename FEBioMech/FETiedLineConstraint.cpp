@@ -101,8 +101,6 @@ BEGIN_FECORE_CLASS(FETiedLineConstraint, FENLConstraint)
 	ADD_PARAMETER(m_stol    , "search_tolerance");
 	ADD_PARAMETER(m_boffset , "offset_shells"   );
 	ADD_PARAMETER(m_Dmax    , "max_distance"    );
-	ADD_PARAMETER(m_bspecial, "special"         );
-	ADD_PARAMETER(m_breloc  , "node_reloc"      );
 
 	ADD_PROPERTY(pl, "primary")->AddFlag(FEProperty::Reference);
 	ADD_PROPERTY(sl, "secondary")->AddFlag(FEProperty::Reference);
@@ -123,8 +121,6 @@ FETiedLineConstraint::FETiedLineConstraint(FEModel* pfem) : FENLConstraint(pfem)
 	m_naugmax = 10;
 	m_boffset = false;
 	m_Dmax = 0.0;
-	m_bspecial = true;
-	m_breloc = false;
 }
 
 bool FETiedLineConstraint::Init()

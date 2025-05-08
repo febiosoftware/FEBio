@@ -110,8 +110,6 @@ public:
 	int			m_naugmin;	//!< minimum nr of augmentations
 	bool		m_boffset;	//!< offset primary surface for shells
 	double		m_Dmax;		//!< max distance for contact
-	bool		m_bspecial;	//!< handle special cases in projection
-	bool		m_breloc;	//!< node relocation on initialization
 
 private:
 	FETiedLine pl; // primary line
