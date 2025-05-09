@@ -187,7 +187,7 @@ SOFTWARE.*/
 #include "FESurfaceAttractionBodyForce.h"
 #include "FEMassDamping.h"
 #include "FEMovingFrameLoad.h"
-
+#include "FERadialBodyForce.h"
 #include "FEFacet2FacetSliding.h"
 #include "FEPeriodicBoundary.h"
 #include "FERigidWallInterface.h"
@@ -665,6 +665,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FESurfaceAttractionBodyForce, "surface attraction");
 	REGISTER_FECORE_CLASS(FEMassDamping, "mass damping");
 	REGISTER_FECORE_CLASS(FEMovingFrameLoad, "moving frame");
+	REGISTER_FECORE_CLASS(FERadialBodyForce, "radial force");
 
 	//-----------------------------------------------------------------------------
 	// constraint classes
