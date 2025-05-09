@@ -316,6 +316,10 @@ void FESlideLineConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		FELineElement& sel = pl.Element(j);
 		int nseln = sel.Nodes();
 
+		vec3d a = pl.Node(sel.m_lnode[0]).m_r0;
+		vec3d b = pl.Node(sel.m_lnode[1]).m_r0;
+		double L = (b - a).norm();
+
 		// get the element's LM array
 		// TODO: This assumes dofs are indexed at (0,1,2)!
 		sLM.resize(3 * nseln);
@@ -332,7 +336,7 @@ void FESlideLineConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		for (int n=0; n<nseln; ++n)
 		{
 			// jacobians
-			detJ[n] = 2; // TODO: This assumes local jacobian is 2!
+			detJ[n] = L/2; // TODO: This assumes local jacobian is 2!
 
 			// integration weights
 			w[n] = 1;// sel.GaussWeights()[n];
@@ -467,6 +471,10 @@ void FESlideLineConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 		FELineElement& se = pl.Element(j);
 		int nseln = se.Nodes();
 
+		vec3d a = pl.Node(se.m_lnode[0]).m_r0;
+		vec3d b = pl.Node(se.m_lnode[1]).m_r0;
+		double L = (b - a).norm();
+
 		// get the element's LM array
 		// TODO: This assumes dofs are indexed at (0,1,2)!
 		sLM.resize(3 * nseln);
@@ -481,7 +489,7 @@ void FESlideLineConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
 		// get all the metrics we need 
 		for (int n=0; n<nseln; ++n)
 		{
-			detJ[n] = 2;
+			detJ[n] = L/2;
 			w[n] = 1;
 		}
 

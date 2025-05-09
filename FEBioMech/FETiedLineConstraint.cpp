@@ -312,6 +312,10 @@ void FETiedLineConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			sLM[3 * a + 2] = node.m_ID[2];
 		}
 
+		vec3d a = pl.Node(sel.m_lnode[0]).m_r0;
+		vec3d b = pl.Node(sel.m_lnode[1]).m_r0;
+		double L = (b - a).norm();
+
 		double* w = sel.GaussWeights();
 
 		// loop over primary element nodes (which are the integration points as well)
@@ -326,7 +330,7 @@ void FETiedLineConstraint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 			if (pl.m_data[m].me != 0)
 			{
 				// calculate jacobian and weight
-				double Jw = 2*w[n]; // TODO: This assumes local jacobian is 2!
+				double Jw = w[n] * (L / 2);
 
 				// get nodal contact force
 				vec3d tc = pl.m_data[m].Lm;
@@ -426,6 +430,10 @@ void FETiedLineConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 
 		double* w = se.GaussWeights();
 
+		vec3d a = pl.Node(se.m_lnode[0]).m_r0;
+		vec3d b = pl.Node(se.m_lnode[1]).m_r0;
+		double L = (b - a).norm();
+
 		// loop over all integration points (that is nodes)
 		for (int n = 0; n < nseln; ++n)
 		{
@@ -449,7 +457,7 @@ void FETiedLineConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 				}
 
 				// calculate jacobian
-				double Jw = 2*w[n]; // TODO: This assumes local jacobian is 2!
+				double Jw = w[n]*(L/2);
 
 				// primary node natural coordinates in secondary element
 				double r = pl.m_data[m].r;
