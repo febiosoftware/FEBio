@@ -69,8 +69,8 @@ public:
     
 protected:
     // material parameters
-    double  m_z0;           //!< dashpot viscosity at zero dashpot strain
-    double  m_z1;           //!< dashpot viscosity increment at dashpot strain = E0
+    double  m_e0;           //!< dashpot viscosity at zero dashpot strain
+    double  m_e1;           //!< dashpot viscosity increment at dashpot strain = E0
     double  m_E0;           //!< dashpot strain at which viscosity is m_z1+m_z2;
     double  m_a;            //!< power exponent
     bool    m_bdash;        //!< true = use dashpot strain, false = use spring strain

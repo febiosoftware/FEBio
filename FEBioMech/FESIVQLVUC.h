@@ -43,7 +43,7 @@ public:
     FEUncoupledMaterial* GetBaseMaterial() { return m_Base; }
 
     //! get the elastic Maxwell material
-    FEUncoupledMaterial* GetMxwlMaterial() { return m_Mxwl; }
+    FEElasticMaterial* GetMxwlMaterial() { return m_Mxwl; }
 
     //! Set the base material
     void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_Base = pbase; }
@@ -73,7 +73,7 @@ public:
 
 private:
     FEUncoupledMaterial*    m_Base;   //!< pointer to parallel elastic solid material
-    FEUncoupledMaterial*    m_Mxwl;   //!< pointer to Maxwell elastic solid material
+    FEElasticMaterial*      m_Mxwl;   //!< pointer to Maxwell elastic solid material
 
 public:
     // declare parameter list

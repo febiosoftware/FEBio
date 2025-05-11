@@ -2914,7 +2914,7 @@ bool FEPlotDashpotStretch::Save(FEDomain &dom, FEDataStream& a)
             FESIVViscoelasticMaterialPoint* pve = mp.ExtractData<FESIVViscoelasticMaterialPoint>();
             FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
             if (pve) lam3d = (float) pve->m_lam3d[0];
-            else if (pvq) lam3d = (float) pvq->m_lam3d;
+            else if (pvq) lam3d = (float) pvq->m_lamd;
             return lam3d;
         });
         return true;
@@ -2932,7 +2932,9 @@ bool FEPlotDashpotStretch::Save(FEDomain &dom, FEDataStream& a)
                 if (mmp && (m_comp < mmp->Components()))
                 {
                     FESIVViscoelasticMaterialPoint* pve = mmp->GetPointData(m_comp)->ExtractData<FESIVViscoelasticMaterialPoint>();
+                    FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
                     if (pve) lam3d += (float) pve->m_lam3d[0];
+                    else if (pvq) lam3d += (float) pvq->m_lamd;
                 }
             }
             lam3d /= (float)el.GaussPoints();
@@ -2966,7 +2968,7 @@ bool FEPlotMxwlSpringStretch::Save(FEDomain &dom, FEDataStream& a)
             FESIVViscoelasticMaterialPoint* pve = mp.ExtractData<FESIVViscoelasticMaterialPoint>();
             FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
             if (pve) lam3s = (float) pve->m_lam[2]/pve->m_lam3d[0];
-            else if (pvq) lam3s = (float) pvq->m_lam[2]/pvq->m_lam3d;
+//            else if (pvq) lam3s = (float) pvq->m_lam[2]/pvq->m_lam3d;
             return lam3s;
         });
         return true;
@@ -2986,12 +2988,62 @@ bool FEPlotMxwlSpringStretch::Save(FEDomain &dom, FEDataStream& a)
                     FESIVViscoelasticMaterialPoint* pve = mmp->GetPointData(m_comp)->ExtractData<FESIVViscoelasticMaterialPoint>();
                     FESIVQLVMaterialPoint* pvq = mmp->GetPointData(m_comp)->ExtractData<FESIVQLVMaterialPoint>();
                     if (pve) lam3s += (float) pve->m_lam[2]/pve->m_lam3d[0];
-                    else if (pvq) lam3s += (float) pvq->m_lam[2]/pvq->m_lam3d;
+//                    else if (pvq) lam3s += (float) pvq->m_lam[2]/pvq->m_lam3d;
                 }
             }
             lam3s /= (float)el.GaussPoints();
             
             a << lam3s;
+        }
+        return true;
+    }
+}
+
+//=============================================================================
+FEPlotMxwlAlpha::FEPlotMxwlAlpha(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+{
+    m_comp = -1;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotMxwlAlpha::SetFilter(const char* szfilter)
+{
+    sscanf(szfilter, "solid[%d]", &m_comp);
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotMxwlAlpha::Save(FEDomain &dom, FEDataStream& a)
+{
+    if (m_comp == -1) {
+        writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& pt) {
+            FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
+            double alpha = 0;
+            FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
+            if (pvq) alpha = (float) pvq->m_lamd;
+            return alpha;
+        });
+        return true;
+    }
+    else {
+        for (int i = 0; i < dom.Elements(); ++i)
+        {
+            FEElement& el = dom.ElementRef(i);
+            
+            float alpha = 0;
+            for (int n = 0; n < el.GaussPoints(); ++n)
+            {
+                FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+                FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
+                if (mmp && (m_comp < mmp->Components()))
+                {
+                    FESIVQLVMaterialPoint* pvq = mmp->GetPointData(m_comp)->ExtractData<FESIVQLVMaterialPoint>();
+                    if (pvq) alpha += (float) pvq->m_lamd;
+                }
+            }
+            alpha /= (float)el.GaussPoints();
+            
+            a << alpha;
         }
         return true;
     }
