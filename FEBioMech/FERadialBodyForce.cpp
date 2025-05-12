@@ -46,7 +46,7 @@ FERadialBodyForce::FERadialBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 
 vec3d FERadialBodyForce::force(FEMaterialPoint& mp)
 {
-	vec3d& x = mp.m_rt - c;
+	vec3d x = mp.m_rt - c;
 	if (p == 0)
 	{
 		vec3d f(s[0] * x.x, s[1] * x.y, s[2] * x.z);
@@ -72,7 +72,7 @@ mat3d FERadialBodyForce::stiffness(FEMaterialPoint& mp)
 	}
 	else
 	{
-		vec3d& x = mp.m_rt - c;
+		vec3d x = mp.m_rt - c;
 		mat3d XX = (x & x);
 
 		double R = x.norm();
