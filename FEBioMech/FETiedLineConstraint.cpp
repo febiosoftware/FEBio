@@ -98,8 +98,6 @@ BEGIN_FECORE_CLASS(FETiedLineConstraint, FENLConstraint)
 	ADD_PARAMETER(m_eps     , "penalty"         );
 	ADD_PARAMETER(m_naugmin , "minaug"          );
 	ADD_PARAMETER(m_naugmax , "maxaug"          );
-	ADD_PARAMETER(m_stol    , "search_tolerance");
-	ADD_PARAMETER(m_boffset , "offset_shells"   );
 	ADD_PARAMETER(m_Dmax    , "max_distance"    );
 
 	ADD_PROPERTY(pl, "primary")->AddFlag(FEProperty::Reference);
@@ -116,10 +114,8 @@ FETiedLineConstraint::FETiedLineConstraint(FEModel* pfem) : FENLConstraint(pfem)
 	m_laugon = FECore::PENALTY_METHOD;
 	m_atol = 0.01;
 	m_eps = 1.0;
-	m_stol = 0.0001;
 	m_naugmin = 0;
 	m_naugmax = 10;
-	m_boffset = false;
 	m_Dmax = 0.0;
 }
 

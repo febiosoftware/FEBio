@@ -105,10 +105,8 @@ public:
 	int			m_laugon;	//!< enforcement method (0=penalty, 1=aug. Lag.)
 	double		m_atol;		//!< augmentation tolerance
 	double		m_eps;		//!< penalty scale factor
-	double		m_stol;		//!< search tolerance
 	int			m_naugmax;	//!< maximum nr of augmentations
 	int			m_naugmin;	//!< minimum nr of augmentations
-	bool		m_boffset;	//!< offset primary surface for shells
 	double		m_Dmax;		//!< max distance for contact
 
 private:
