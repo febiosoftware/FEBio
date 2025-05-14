@@ -172,7 +172,7 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
     
     // calculate alpha at current time
     double errrel = 1e-6;
-    double errabs = eps;
+    double errabs = 1e-9;
     int maxit = 100;
     int iter = 0;
     double x = pt.m_alpha; // solve for x
@@ -192,9 +192,10 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
         mat3ds Cd = (Ud*Ud).sym();
         mat3ds Cdi = (Udi*Udi).sym();
         mat3ds Es = (Cs - I)/2;
-        mat3ds Udot = (U - pt.m_Up)/dt;
-        mat3ds Usdot = (Us - pt.m_Usp)/dt;
-        mat3ds Uddot = (Ud - pt.m_Udp)/dt;
+        // use Gram-Schmidt orthogonalization when evaluation U dot
+        mat3ds Udot = (U*(U.dotdot(pt.m_Up)/U.dotdot(U)) - pt.m_Up)/dt;
+        mat3ds Usdot = (Us*(Us.dotdot(pt.m_Usp)/Us.dotdot(Us)) - pt.m_Usp)/dt;
+        mat3ds Uddot = (Ud*(Ud.dotdot(pt.m_Udp)/Ud.dotdot(Ud)) - pt.m_Udp)/dt;
         mat3ds Edot = (Udot*U).sym();
         mat3ds Esdot = (Usdot*Us).sym();
         mat3ds Eddot = (Uddot*Ud).sym();
@@ -202,17 +203,18 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
         mat3ds Esdotc = Esdot - (Cs*H).sym()*alphadot;
         mat3ds Eddotc = Eddot + (Cd*H).sym()*alphadot;
         double Jd = Ud.det();
-        mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(2*eta);
-        double a = Jd*H.dotdot(H);
-        double b = Smhat.dotdot((Cs*H).sym()) - 2*Jd*Eddotc.dotdot((H*Cdi).sym());
-        double c = Smhat.dotdot((Udi*Edot*Udi).sym() - Esdotc) - Jd*(Cdi*Eddotc).dotdot(Eddotc*Cdi);
+        mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(2*eta*Jd);
+        double a = H.dotdot(H);
+        double b = Smhat.dotdot((Cs*H).sym()) - 2*Eddotc.dotdot((H*Cdi).sym());
+        double c = Smhat.dotdot((Udi*Edot*Udi).sym() - Esdotc) - (Cdi*Eddotc).dotdot(Eddotc*Cdi);
         double delta = b*b + 4*a*c;
         delta = (delta < 0) ? 0 : sqrt(delta);
         double adot = (fabs(a) <= eps) ? 0 : -(b+sgn(b)*delta)/(2*a);
         double dx = adot*dt + pt.m_alphap - x;
         x += dx;
         if (fabs(dx) <= fabs(x)*errrel) cnvgd = true;
-        if (++iter == maxit) { error = true; }
+        if (fabs(dx) <= errabs) cnvgd = true;
+        if (++iter == maxit) error = true;
     } while (!cnvgd && !error);
     if (error)
         feLogWarning("SIV dashpot stretch calculation did not converge!");

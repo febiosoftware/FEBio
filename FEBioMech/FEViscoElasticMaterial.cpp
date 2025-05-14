@@ -265,7 +265,8 @@ double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 bool FEViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
 {
     const double errrel = 1e-6;
-    const double almin = 0.001;
+    const double almax = 10;
+    const double almin = -10;
     const int maxiter = 50;
     // get the elastic point data and evaluate the right-stretch tensor
     FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -308,8 +309,8 @@ bool FEViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
                     alpha += dalpha;
                     if (fabs(f) < errrel*fmag) done = true;
                     else if (fabs(dalpha) < errrel*fabs(alpha)) done = true;
-                    else if (alpha > 1) { alpha = 1; done = true; }
-                    else if (alpha < almin) { alpha = 0; done = true; }
+                    else if (alpha > almax) { alpha = almax; done = true; }
+                    else if (alpha < almin) { alpha = almin; done = true; }
                     else if (++iter > maxiter) done = true;
                 }
                 else

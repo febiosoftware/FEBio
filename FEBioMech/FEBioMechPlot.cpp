@@ -76,6 +76,7 @@ SOFTWARE.*/
 #include <FEBioMech/FEEdgeToSurfaceSlidingContact.h>
 #include "FEIdealGasPressure.h"
 #include "FEBodyForce.h"
+#include "FEViscoElasticMaterial.h"
 #include "FESIVViscoelastic.h"
 #include "FESIVQLV.h"
 
@@ -3019,8 +3020,10 @@ bool FEPlotMxwlAlpha::Save(FEDomain &dom, FEDataStream& a)
         writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& pt) {
             FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
             double alpha = 0;
+            FEViscoElasticMaterialPoint* pv = mp.ExtractData<FEViscoElasticMaterialPoint>();
             FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
-            if (pvq) alpha = (float) pvq->m_alpha;
+            if (pv) alpha = (float) pv->m_alpha[0];
+            else if (pvq) alpha = (float) pvq->m_alpha;
             return alpha;
         });
         return true;
@@ -3037,8 +3040,10 @@ bool FEPlotMxwlAlpha::Save(FEDomain &dom, FEDataStream& a)
                 FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
                 if (mmp && (m_comp < mmp->Components()))
                 {
+                    FEViscoElasticMaterialPoint* pv = mp.ExtractData<FEViscoElasticMaterialPoint>();
                     FESIVQLVMaterialPoint* pvq = mmp->GetPointData(m_comp)->ExtractData<FESIVQLVMaterialPoint>();
-                    if (pvq) alpha += (float) pvq->m_alpha;
+                    if (pv) alpha += (float) pv->m_alpha[0];
+                    else if (pvq) alpha += (float) pvq->m_alpha;
                 }
             }
             alpha /= (float)el.GaussPoints();
