@@ -68,8 +68,7 @@ public:
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
 public:
-    // material parameters
-    double  m_eta;                  //!< dashpot viscosity
+    FEParamDouble   m_tau;          //!< referential time constant (at zero strain)
 
 private:
     FEUncoupledMaterial*    m_Base;   //!< pointer to parallel elastic solid material

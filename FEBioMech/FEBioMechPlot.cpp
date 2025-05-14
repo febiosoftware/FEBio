@@ -2914,7 +2914,7 @@ bool FEPlotDashpotStretch::Save(FEDomain &dom, FEDataStream& a)
             FESIVViscoelasticMaterialPoint* pve = mp.ExtractData<FESIVViscoelasticMaterialPoint>();
             FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
             if (pve) lam3d = (float) pve->m_lam3d[0];
-            else if (pvq) lam3d = (float) pvq->m_lamd;
+//            else if (pvq) lam3d = (float) pvq->m_lamd;
             return lam3d;
         });
         return true;
@@ -2934,7 +2934,7 @@ bool FEPlotDashpotStretch::Save(FEDomain &dom, FEDataStream& a)
                     FESIVViscoelasticMaterialPoint* pve = mmp->GetPointData(m_comp)->ExtractData<FESIVViscoelasticMaterialPoint>();
                     FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
                     if (pve) lam3d += (float) pve->m_lam3d[0];
-                    else if (pvq) lam3d += (float) pvq->m_lamd;
+//                    else if (pvq) lam3d += (float) pvq->m_lamd;
                 }
             }
             lam3d /= (float)el.GaussPoints();
@@ -3020,7 +3020,7 @@ bool FEPlotMxwlAlpha::Save(FEDomain &dom, FEDataStream& a)
             FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
             double alpha = 0;
             FESIVQLVMaterialPoint* pvq = mp.ExtractData<FESIVQLVMaterialPoint>();
-            if (pvq) alpha = (float) pvq->m_lamd;
+            if (pvq) alpha = (float) pvq->m_alpha;
             return alpha;
         });
         return true;
@@ -3038,7 +3038,7 @@ bool FEPlotMxwlAlpha::Save(FEDomain &dom, FEDataStream& a)
                 if (mmp && (m_comp < mmp->Components()))
                 {
                     FESIVQLVMaterialPoint* pvq = mmp->GetPointData(m_comp)->ExtractData<FESIVQLVMaterialPoint>();
-                    if (pvq) alpha += (float) pvq->m_lamd;
+                    if (pvq) alpha += (float) pvq->m_alpha;
                 }
             }
             alpha /= (float)el.GaussPoints();

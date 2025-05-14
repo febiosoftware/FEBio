@@ -53,11 +53,14 @@ public:
     void Serialize(DumpStream& ar);
     
 public:
-    double  m_lamd;                 //!< dashpot stretch at current time
-    double  m_lamdp;                //!< dashpot stretch at previous time
+    double  m_alpha;                //!< alpha exponent at current time
+    double  m_alphap;               //!< alpha exponent at previous time
     mat3ds  m_U;                    //!< parallel spring stretch tensor at current time
+    mat3ds  m_Up;                   //!< parallel spring stretch tensor at previous time
     mat3ds  m_Us;                   //!< Maxwell spring stretch tensor at current time
+    mat3ds  m_Usp;                  //!< Maxwell spring stretch tensor at previoust time
     mat3ds  m_Ud;                   //!< Maxwell dashpot stretch tensor at current time
+    mat3ds  m_Udp;                  //!< Maxwell dashpot stretch tensor at previous time
     mat3d   m_R;                    //!< rotation tensor at current time
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
@@ -104,7 +107,7 @@ public:
     
 public:
     // material parameters
-    double  m_eta;                  //!< dashpot viscosity
+    FEParamDouble   m_eta;          //!< dashpot shear viscosity
 
 private:
     FEElasticMaterial*    m_Base;   //!< pointer to parallel elastic solid material

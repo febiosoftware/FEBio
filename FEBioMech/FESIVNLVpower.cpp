@@ -82,8 +82,8 @@ void FESIVNLVpower::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const F
 
 //-----------------------------------------------------------------------------
 //! Stress function
-mat3ds FESIVNLVpower::Stress(FEMaterialPoint& mp)
-{
+mat3ds FESIVNLVpower::Stress(FEMaterialPoint& mp) { return mat3ds(0); }
+/*{
     const double eps = 10*std::numeric_limits<double>::epsilon();
     
     FETimeInfo& tp = GetFEModel()->GetTime();
@@ -153,12 +153,12 @@ mat3ds FESIVNLVpower::Stress(FEMaterialPoint& mp)
     // return the total Cauchy stress,
     return s;
 
-}
+}*/
 
 //-----------------------------------------------------------------------------
 //! Material tangent
-tens4ds FESIVNLVpower::Tangent(FEMaterialPoint& mp)
-{
+tens4ds FESIVNLVpower::Tangent(FEMaterialPoint& mp) { return tens4ds(0.); }
+/*{
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -182,12 +182,12 @@ tens4ds FESIVNLVpower::Tangent(FEMaterialPoint& mp)
     
     // return the total elastic tangent,
     return c;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 //! Strain energy density function
-double FESIVNLVpower::StrainEnergyDensity(FEMaterialPoint& mp)
-{
+double FESIVNLVpower::StrainEnergyDensity(FEMaterialPoint& mp) { return 0; }
+/*{
     double dt = GetFEModel()->GetTime().timeIncrement;
     if (dt == 0) return 0;
     
@@ -213,4 +213,4 @@ double FESIVNLVpower::StrainEnergyDensity(FEMaterialPoint& mp)
     
     // return the total Cauchy stress,
     return sed;
-}
+}*/

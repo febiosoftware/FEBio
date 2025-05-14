@@ -42,7 +42,7 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FESIVQLVUC, FEUncoupledMaterial)
 
     // material parameters
-    ADD_PARAMETER(m_eta, "eta")->setUnits(UNIT_VISCOSITY);
+    ADD_PARAMETER(m_tau, "tau")->setUnits(UNIT_TIME);
 
     // define the material properties
     ADD_PROPERTY(m_Base, "parallel");
@@ -54,7 +54,7 @@ END_FECORE_CLASS();
 //! constructor
 FESIVQLVUC::FESIVQLVUC(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
-    m_eta = 0;
+    m_tau = 0;
     m_Base = nullptr;
     m_Mxwl = nullptr;
 }
@@ -74,8 +74,8 @@ void FESIVQLVUC::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETi
 
 //-----------------------------------------------------------------------------
 //! Stress function
-mat3ds FESIVQLVUC::DevStress(FEMaterialPoint& mp)
-{
+mat3ds FESIVQLVUC::DevStress(FEMaterialPoint& mp) { return mat3ds(0); }
+/*{
     const double eps = 10*std::numeric_limits<double>::epsilon();
     
     FETimeInfo& tp = GetFEModel()->GetTime();
@@ -96,6 +96,17 @@ mat3ds FESIVQLVUC::DevStress(FEMaterialPoint& mp)
     mat3d Fsafe = ep.m_F;
     double Jsafe = ep.m_J;
     
+    // evaluate zero-strain bulk modulus
+    ep.m_F = mat3dd(1);
+    ep.m_J = 1;
+    mat3dd I(1);
+    // get bulk modulus
+    double Km = ((m_Mxwl->Tangent(mp)).dot(I)).dotdot(I)/9;
+    ep.m_F = Fsafe;
+    ep.m_J = Jsafe;
+    // evaluate equivalent viscosity
+    double eta = m_tau(mp)*Km*1.5;
+    
     // calculate principal dashpot stretch
     // terms are accumulated in s
     double errrel = 1e-6;
@@ -107,7 +118,6 @@ mat3ds FESIVQLVUC::DevStress(FEMaterialPoint& mp)
     bool error = false;
     mat3ds U = ep.RightStretch();
     mat3ds C = ep.RightCauchyGreen();
-    mat3dd I(1);
     if (tp.currentTime > 0.5)
         bool pause = true;
     do {
@@ -115,7 +125,7 @@ mat3ds FESIVQLVUC::DevStress(FEMaterialPoint& mp)
         mat3ds Us = U/x;
         mat3ds Es = (C/(x*x)-I)/2;
         double Jd = Ud.det();
-        mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(6*m_eta);
+        mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(6*eta);
         double c = Smhat.dotdot(C);
         double g = x - pt.m_lamdp - dt*pow(x,-4)*c;
         double dg = 1 + dt*pow(x,-5)*4*c;
@@ -142,12 +152,12 @@ mat3ds FESIVQLVUC::DevStress(FEMaterialPoint& mp)
     
     // return the total Cauchy stress,
     return s.dev();
-}
+}*/
 
 //-----------------------------------------------------------------------------
 //! Material tangent
-tens4ds FESIVQLVUC::DevTangent(FEMaterialPoint& mp)
-{
+tens4ds FESIVQLVUC::DevTangent(FEMaterialPoint& mp) { return tens4ds(0.); }
+/*{
     // get the elastic part
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
     
@@ -181,12 +191,12 @@ tens4ds FESIVQLVUC::DevTangent(FEMaterialPoint& mp)
     
     // return the total elastic tangent,
     return c;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 //! Strain energy density function
-double FESIVQLVUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
-{
+double FESIVQLVUC::DevStrainEnergyDensity(FEMaterialPoint& mp) { return 0; }
+/*{
     double dt = GetFEModel()->GetTime().timeIncrement;
     if (dt == 0) return 0;
     
@@ -212,4 +222,4 @@ double FESIVQLVUC::DevStrainEnergyDensity(FEMaterialPoint& mp)
     
     // return the total Cauchy stress,
     return sed;
-}
+}*/
