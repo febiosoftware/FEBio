@@ -3679,7 +3679,7 @@ bool FEPlotSPRPreStrainCorrection::Save(FEDomain& dom, FEDataStream& a)
 	}
 
 	// this array will store the results
-	FESPRProjection map;
+	FESPRProjection map(sd);
 	vector<double> val[9];
 
 	// loop over stress components
@@ -3700,7 +3700,7 @@ bool FEPlotSPRPreStrainCorrection::Save(FEDomain& dom, FEDataStream& a)
 		}
 
 		// project to nodes
-		map.Project(sd, ED, val[n]);
+		map.Project(ED, val[n]);
 	}
 
 	// copy results to archive
@@ -3749,7 +3749,7 @@ bool FEPlotPreStrainCompatibility::Save(FEDomain& dom, FEDataStream& a)
 	}
 
 	// this array will store the results
-	FESPRProjection map;
+	FESPRProjection map(sd);
 	vector<double> val[9];
 
 	// create a global-to-local node list
@@ -3784,7 +3784,7 @@ bool FEPlotPreStrainCompatibility::Save(FEDomain& dom, FEDataStream& a)
 		}
 
 		// project to nodes
-		map.Project(sd, ED, val[n]);
+		map.Project(ED, val[n]);
 	}
 
 	// STEP 2 - now we calculate the gradient of the nodal values at the integration points

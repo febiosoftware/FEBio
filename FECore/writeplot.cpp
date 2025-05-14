@@ -46,8 +46,8 @@ void writeSPRElementValue(FESolidDomain& dom, FEDataStream& ar, std::function<do
 	}
 
 	// this array will store the results
-	FESPRProjection map;
-	map.SetInterpolationOrder(interpolOrder);
+	FESPRProjection map(dom, interpolOrder);
+
 	vector<double> val;
 
 	// fill the ED array
@@ -64,7 +64,7 @@ void writeSPRElementValue(FESolidDomain& dom, FEDataStream& ar, std::function<do
 	}
 
 	// project to nodes
-	map.Project(dom, ED, val);
+	map.Project(ED, val);
 
 	// copy results to archive
 	for (int i = 0; i < NN; ++i)
@@ -98,8 +98,7 @@ void writeSPRElementValueVectorDouble(FESolidDomain& dom, FEDataStream& ar, std:
 	}
 
 	// this array will store the results
-	FESPRProjection map;
-	map.SetInterpolationOrder(interpolOrder);
+	FESPRProjection map(dom, interpolOrder);
 	vector<vector<double> >val(n_fields);
 
 	// fill the ED array
@@ -124,7 +123,7 @@ void writeSPRElementValueVectorDouble(FESolidDomain& dom, FEDataStream& ar, std:
 	// loop over stress components
 	for (int n = 0; n < n_fields; ++n)
 	{
-		map.Project(dom, ED[n], val[n]);
+		map.Project(ED[n], val[n]);
 	}
 
 	// copy results to archive
@@ -155,8 +154,7 @@ void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar, std::funct
 	}
 
 	// this array will store the results
-	FESPRProjection map;
-	map.SetInterpolationOrder(interpolOrder);
+	FESPRProjection map(dom, interpolOrder);
 	vector<double> val[3];
 
 	// fill the ED array
@@ -176,9 +174,9 @@ void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar, std::funct
 	}
 
 	// project to nodes
-	map.Project(dom, ED[0], val[0]);
-	map.Project(dom, ED[1], val[1]);
-	map.Project(dom, ED[2], val[2]);
+	map.Project(ED[0], val[0]);
+	map.Project(ED[1], val[1]);
+	map.Project(ED[2], val[2]);
 
 	// copy results to archive
 	for (int i = 0; i<NN; ++i)
@@ -211,8 +209,8 @@ void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::funct
 	}
 
 	// this array will store the results
-	FESPRProjection map;
-	map.SetInterpolationOrder(interpolOrder);
+	FESPRProjection map(dom, interpolOrder);
+
 	vector<double> val[6];
 
 	// fill the ED array
@@ -237,7 +235,7 @@ void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::funct
 	// loop over stress components
 	for (int n = 0; n<6; ++n)
 	{
-		map.Project(dom, ED[n], val[n]);
+		map.Project(ED[n], val[n]);
 	}
 
 	// copy results to archive
