@@ -563,8 +563,8 @@ void FESlideLineConstraint::ContactNodalStiffness(int m, FELineElement& mel, mat
 
 	double H[MAXMN], Hr[MAXMN];
 
-	double N[3*(MAXMN+1)], T1[3 * (MAXMN + 1)];
-	double N1[3*(MAXMN+1)], D1[3*(MAXMN+1)];
+	double N[3][3 * (MAXMN + 1)] = { 0 };
+	double AN[3][3 * (MAXMN + 1)] = { 0 };
 
 	// get the mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -600,15 +600,14 @@ void FESlideLineConstraint::ContactNodalStiffness(int m, FELineElement& mel, mat
 	mel.shape_deriv(Hr, r);
 
 	// set up the N vector
-	N[0] = nu.x;
-	N[1] = nu.y;
-	N[2] = nu.z;
-
+	N[0][0] = 1;
+	N[1][1] = 1;
+	N[2][2] = 1;
 	for (int k=0; k<nmeln; ++k)
 	{
-		N[(k+1)*3  ] = -H[k]*nu.x;
-		N[(k+1)*3+1] = -H[k]*nu.y;
-		N[(k+1)*3+2] = -H[k]*nu.z;
+		N[0][(k+1)*3  ] = -H[k];
+		N[1][(k+1)*3+1] = -H[k];
+		N[2][(k+1)*3+2] = -H[k];
 	}
 
 	// get the tangent vector
@@ -616,30 +615,6 @@ void FESlideLineConstraint::ContactNodalStiffness(int m, FELineElement& mel, mat
 	for (int i = 0; i < nmeln; ++i)
 	{
 		tau += mesh.Node(mel.m_node[i]).m_rt * Hr[i];
-	}
-
-	// set up the Ti vectors
-	T1[0] = tau.x;
-	T1[1] = tau.y;
-	T1[2] = tau.z;
-
-	for (int k = 0; k < nmeln; ++k)
-	{
-		T1[(k+1)*3  ] = -H[k] * tau.x;
-		T1[(k+1)*3+1] = -H[k] * tau.y;
-		T1[(k+1)*3+2] = -H[k] * tau.z;
-	}
-	
-	// set up the Ni vectors
-	N1[0] = 0;
-	N1[1] = 0;
-	N1[2] = 0;
-
-	for (int k=0; k<nmeln; ++k)
-	{
-		N1[(k+1)*3  ] = -Hr[k]*nu.x;
-		N1[(k+1)*3+1] = -Hr[k]*nu.y;
-		N1[(k+1)*3+2] = -Hr[k]*nu.z;
 	}
 
 	// calculate curvature tensor
@@ -652,31 +627,33 @@ void FESlideLineConstraint::ContactNodalStiffness(int m, FELineElement& mel, mat
 	}
 
 	// metric
-	double M = tau * tau;
+	double t = tau * tau;
 
 	// setup A matrix A = M + gK
-	double A = M + gap*K;
+	double A = t - gap*K;
 
-	// setup Di vectors
-	for (int k=0; k<ndof; ++k)
-	{
-		D1[k] = (1/A)*(T1[k]+gap*N1[k]);
-	}
+	mat3d TxT = (tau & tau);
 
-	// --- N O R M A L   S T I F F N E S S ---
-	double sum;
+	mat3d B = mat3dd(1.0) - TxT/A;
+
+	mat3d M = B.transpose() * B;
+
+	for (int i=0; i<3; ++i)
+		for (int j = 0; j < ndof; ++j)
+		{
+			AN[i][j] = 0;
+			for (int k=0; k<3; ++k)
+				AN[i][j] += M[i][k] * N[k][j];
+		}
+
 	for (int k=0; k<ndof; ++k)
 		for (int l=0; l<ndof; ++l)
 			{
-				sum = 0;
+				ke[k][l] = 0;
+				for (int i=0; i<3; ++i)
+					ke[k][l] += N[i][k] * AN[i][l];
 
-				sum = (1/M)*N1[k]*N1[l];
-				sum *= gap;
-				sum -= D1[k]*N1[l]+N1[k]*D1[l];
-				sum *= tn;
-				sum += eps*N[k]*N[l];
-
-				ke[k][l] = sum;
+				ke[l][k] *= eps;
 			}
 }
 
@@ -686,7 +663,6 @@ bool FESlideLineConstraint::Augment(int naug, const FETimeInfo& tp)
 	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	double Ln;
-	double Lt[2];
 	bool bconv = true;
 	mat2d Mi;
 
