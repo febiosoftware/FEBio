@@ -283,6 +283,7 @@ SOFTWARE.*/
 #include "FEInSituStretchGradient.h"
 #include "FEPreStrainConstraint.h"
 #include "FEInitialPreStrain.h"
+#include "FEInitialRigidKinematics.h"
 
 #include "FENodeToNodeConstraint.h"
 
@@ -640,6 +641,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEInitialVelocity, "velocity");
 	REGISTER_FECORE_CLASS(FEInitialShellVelocity, "shell velocity");
 	REGISTER_FECORE_CLASS(FEInitialPreStrain, "prestrain");
+	REGISTER_FECORE_CLASS(FEInitialRigidKinematics, "rigid kinematics");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FENodalLoad
