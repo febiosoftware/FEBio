@@ -36,7 +36,7 @@ SOFTWARE.*/
 #include <limits>
 #include <cmath>
 
-#define sgn(x) x==0 ? 0 : x/abs(x)
+//#define sgn(x) x==0 ? 0 : x/abs(x)
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FESIVQLV, FEElasticMaterial)
@@ -182,10 +182,11 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
     do {
         // evaluate Us and Ud
         Us = Ud = mat3ds(0);
-        mat3ds Udi(0);
+        mat3ds Usi(0), Udi(0);
         for (int i=0; i<3; ++i) {
             Us += Ue[i]*pow(lam[i],x);
             Ud += Ue[i]*pow(lam[i],1-x);
+            Usi += Ue[i]/pow(lam[i],x);
             Udi += Ue[i]/pow(lam[i],1-x);
         }
         mat3ds Cs = (Us*Us).sym();
@@ -199,9 +200,10 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
         mat3ds Edot = (Udot*U).sym();
         mat3ds Esdot = (Usdot*Us).sym();
         mat3ds Eddot = (Uddot*Ud).sym();
-        double alphadot = (x - pt.m_alphap)/dt;
-        mat3ds Esdotc = Esdot - (Cs*H).sym()*alphadot;
-        mat3ds Eddotc = Eddot + (Cd*H).sym()*alphadot;
+        mat3ds Usdotc = (Udi*Udot).sym()*x;
+        mat3ds Uddotc = (Usi*Udot).sym()*(1-x);
+        mat3ds Esdotc = (Usdotc*Us).sym();
+        mat3ds Eddotc = (Uddotc*Ud).sym();
         double Jd = Ud.det();
         mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(2*eta*Jd);
         double a = H.dotdot(H);
@@ -209,12 +211,14 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
         double c = Smhat.dotdot((Udi*Edot*Udi).sym() - Esdotc) - (Cdi*Eddotc).dotdot(Eddotc*Cdi);
         double delta = b*b + 4*a*c;
         delta = (delta < 0) ? 0 : sqrt(delta);
-        double adot = (fabs(a) <= eps) ? 0 : -(b+sgn(b)*delta)/(2*a);
+        if (b < 0) delta = -delta;
+        double adot = (fabs(a) <= eps) ? 0 : -(b+delta)/(2*a);
         double dx = adot*dt + pt.m_alphap - x;
         x += dx;
         if (fabs(dx) <= fabs(x)*errrel) cnvgd = true;
         if (fabs(dx) <= errabs) cnvgd = true;
         if (++iter == maxit) error = true;
+        if (tp.currentTime == dt) cnvgd = true;
     } while (!cnvgd && !error);
     if (error)
         feLogWarning("SIV dashpot stretch calculation did not converge!");
