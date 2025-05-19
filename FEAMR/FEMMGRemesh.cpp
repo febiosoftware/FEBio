@@ -39,6 +39,7 @@ SOFTWARE.*/
 #include "FEMeshShapeInterpolator.h"
 #include "FEDomainShapeInterpolator.h"
 #include <FECore/FECoreKernel.h>
+#include <FECore/FEMaterial.h>
 #ifdef HAS_MMG
 #include "mmg/mmg3d/libmmg3d.h"
 
@@ -534,6 +535,8 @@ bool FEMMGRemesh::MMG::build_new_mesh(MMG5_pMesh mmgMesh, MMG5_pSol mmgSol, FEMo
 		}
 
 		// re-init domain
+		FEMaterial* mat = dom.GetMaterial();
+		dom.SetMatID(mat->GetID() - 1);
 		dom.CreateMaterialPointData();
 		dom.Reset();	// NOTE: we need to call this to actually call the Init function on the material points.
 		dom.Init();
