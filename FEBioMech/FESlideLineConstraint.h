@@ -29,8 +29,9 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FENLConstraint.h>
 #include <FECore/FEEdge.h>
+#include "febiomech_api.h"
 
-class FESlideLine : public FEEdge
+class FEBIOMECH_API FESlideLine : public FEEdge
 {
 public:
 	class FESlidingPoint
@@ -77,7 +78,7 @@ public:
 	vector<FESlidingPoint>		m_data;	//!< sliding contact surface data
 };
 
-class FESlideLineConstraint : public FENLConstraint
+class FEBIOMECH_API FESlideLineConstraint : public FENLConstraint
 {
 public:
 	//! constructor

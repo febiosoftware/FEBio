@@ -626,11 +626,8 @@ void FESlideLineConstraint::ContactNodalStiffness(int m, FELineElement& mel, mat
 		K += (nu*rt[k])*Grr[k];
 	}
 
-	// metric
-	double t = tau * tau;
-
 	// setup A matrix A = M + gK
-	double A = t - gap*K;
+	double A = (tau * tau) - gap * K;
 
 	mat3d TxT = (tau & tau);
 
