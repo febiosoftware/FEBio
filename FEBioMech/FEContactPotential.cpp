@@ -67,6 +67,33 @@ FEContactPotentialSurface::FEContactPotentialSurface(FEModel* fem) : FEContactSu
 
 }
 
+void FEContactPotentialSurface::InitSurface()
+{
+	FEContactPotential* pci = dynamic_cast<FEContactPotential*>(GetContactInterface());
+
+	if (pci && (pci->IntegrationRule() == 1))
+	{
+		FEFacetSet& fs = *m_surf;
+		int elems = Elements();
+		for (int i = 0; i < elems; ++i)
+		{
+			FESurfaceElement& el = Element(i);
+			FEFacetSet::FACET& fi = fs.Face(i);
+
+			if      (fi.ntype == 4) el.SetType(FE_QUAD4G16);
+			else if (fi.ntype == 3) el.SetType(FE_TRI3G7);
+			else assert(false);
+
+			int N = el.Nodes(); assert(N == fi.ntype);
+			for (int j = 0; j < N; ++j) el.m_node[j] = fi.node[j];
+		}
+
+		CreateMaterialPointData();
+	}
+
+	FEContactSurface::InitSurface();
+}
+
 FEMaterialPoint* FEContactPotentialSurface::CreateMaterialPoint()
 {
 	return new FECPContactPoint;
@@ -141,6 +168,7 @@ BEGIN_FECORE_CLASS(FEContactPotential, FEContactInterface)
 	ADD_PARAMETER(m_Rmin, "R0_min");
 	ADD_PARAMETER(m_wtol, "w_tol");
 	ADD_PARAMETER(m_checkIntersections, "check_intersections");
+	ADD_PARAMETER(m_integrationRule, "integration_rule")->setEnums("default\0higher-order\0");
 END_FECORE_CLASS();
 
 FEContactPotential::FEContactPotential(FEModel* fem) : FEContactInterface(fem), m_surf1(fem), m_surf2(fem)
@@ -155,6 +183,7 @@ FEContactPotential::FEContactPotential(FEModel* fem) : FEContactInterface(fem), 
 	m_Rmin = 0.0;
 	m_wtol = 0.0;
 	m_checkIntersections = false;
+	m_integrationRule = 0;
 }
 
 //! return the primary surface

@@ -47,6 +47,8 @@ public:
 public:
 	FEContactPotentialSurface(FEModel* fem);
 
+	void InitSurface() override;
+
 	void GetContactTraction(int nelem, vec3d& tc) override;
 
 	double GetContactArea() override;
@@ -89,6 +91,8 @@ public:
 	// serialization
 	void Serialize(DumpStream& ar) override;
 
+	int IntegrationRule() const { return m_integrationRule; }
+
 	// -- from FEContactInterface
 public:
 	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
@@ -123,6 +127,8 @@ protected:
 	double	m_Rmin;
 	double	m_wtol;
 	bool	m_checkIntersections;	//!< check for edge/face intersections
+
+	int		m_integrationRule = 0;
 
 	double	m_c1, m_c2;
 
