@@ -30,6 +30,26 @@ SOFTWARE.*/
 #include "writeplot.h"
 #include "FESPRProjection.h"
 
+void writeMaxElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc)
+{
+	int NE = dom.Elements();
+	std::vector<double> v(NE);
+#pragma omp parallel for shared(v)
+	for (int i = 0; i < NE; ++i) {
+		FEElement& el = dom.ElementRef(i);
+		double s = 0.0;
+		for (int j = 0; j < el.GaussPoints(); ++j)
+		{
+			double sj = fnc(*el.GetMaterialPoint(j));
+			if ((sj > s) || (j == 0)) s = sj;
+		}
+		v[i] = s;
+	}
+
+	for (int i = 0; i < NE; ++i)
+		ar << v[i];
+}
+
 void writeSPRElementValue(FESolidDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint&)> fnc, int interpolOrder)
 {
 	int NN = dom.Nodes();

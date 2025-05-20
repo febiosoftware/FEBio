@@ -98,6 +98,9 @@ template <class T> void writeElementValue(FEMeshPartition& dom, FEDataStream& ar
 }
 
 //=================================================================================================
+void FECORE_API writeMaxElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc);
+
+//=================================================================================================
 template <class T> void writeAverageElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint& mp)> fnc)
 {
 	int NE = dom.Elements();
