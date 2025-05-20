@@ -68,7 +68,8 @@ bool FEStiffnessDiagnostic::Run()
 	// solve the problem
 	FEModel& fem = *GetFEModel();
 
-	fem.AddCallback(stiffness_diagnostic_cb, CB_MATRIX_REFORM, (void*)this);
+	fem.AddCallback(stiffness_diagnostic_cb, CB_TIMESTEP_SOLVED, (void*)this);
+//	fem.AddCallback(stiffness_diagnostic_cb, CB_MATRIX_REFORM, (void*)this);
 
 	// create a file name for the log file
 	string logfile("diagnostic.log");
@@ -109,6 +110,22 @@ bool FEStiffnessDiagnostic::Diagnose()
 
 	const double eps = 1e-8;
 	int neq = pA->Rows();
+
+	// need to know which dofs are prescribed
+	// TODO: This does not take rigid body dofs.
+	// 0 == fixed, 1 == free
+	vector<int> bc(neq, 0);
+	FEMesh& mesh = fem->GetMesh();
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int j = 0; j < node.m_ID.size(); ++j)
+		{
+			int n = node.m_ID[j];
+			if (n >= 0) bc[n] = 1;
+		}
+	}
+
 	std::vector<double> R0(neq, 0);
 	nlsolve->Residual(R0);
 	double max_val = 0, max_err = 0.0;
@@ -136,7 +153,14 @@ bool FEStiffnessDiagnostic::Diagnose()
 		{
 			// note that we flip the sign on ka.
 			// this is because febio actually calculates the negative of the residual
-			double ka_ij = -(R[i] - R0[i]) / eps;
+			double ka_ij = 0;
+			if ((bc[i] == 0) || (bc[j] == 0))
+			{
+				if (i == j) ka_ij = 1;
+				else ka_ij = 0;
+			}
+			else ka_ij = -(R[i] - R0[i]) / eps;
+
 			double kt_ij = pA->get(i, j);
 
 			if (fabs(kt_ij) > max_val) max_val = fabs(kt_ij);
