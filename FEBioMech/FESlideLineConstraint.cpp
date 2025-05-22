@@ -646,11 +646,11 @@ void FESlideLineConstraint::ContactNodalStiffness(int m, FELineElement& mel, mat
 	for (int k=0; k<ndof; ++k)
 		for (int l=0; l<ndof; ++l)
 			{
-				ke[k][l] = 0;
+				double sum = 0;
 				for (int i=0; i<3; ++i)
-					ke[k][l] += N[i][k] * AN[i][l];
+					sum += N[i][k] * AN[i][l];
 
-				ke[l][k] *= eps;
+				ke[k][l] = eps*sum;
 			}
 }
 
