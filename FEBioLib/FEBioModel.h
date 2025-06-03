@@ -45,6 +45,17 @@ enum FE_Dump_Level {
 	FE_DUMP_MUST_POINTS     // create a dump file only on must-points
 };
 
+enum PlotObjectType {
+	OBJ_UNKNOWN           = 0,
+	OBJ_RIGID_BODY        = 1,
+	OBJ_GENERIC_JOINT     = 2,
+	OBJ_SPHERICAL_JOINT   = 3,
+	OBJ_PRISMATIC_JOINT   = 4,
+	OBJ_REVOLUTE_JOINT    = 5,
+	OBJ_CYLINDRICAL_JOINT = 6,
+	OBJ_PLANAR_JOINT      = 7
+};
+
 //-----------------------------------------------------------------------------
 //! The FEBio model specializes the FEModel class to implement FEBio specific
 //! functionality.
