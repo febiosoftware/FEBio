@@ -143,5 +143,10 @@ public:
 	FERigidBody*	m_prb;	//!< parent rigid body
 
 public:
+    // return the helical axis relative to the ground
+    void InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& tdot);
+    void FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot);
+
+public:
 	DECLARE_FECORE_CLASS();
 };

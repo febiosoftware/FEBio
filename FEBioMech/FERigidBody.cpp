@@ -351,3 +351,49 @@ void FERigidBody::Serialize(DumpStream& ar)
 		// TODO: should I store parent rigid body (m_prb)
 	}
 }
+
+//-----------------------------------------------------------------------------
+// return the (instantaneous) helical axis relative to the ground
+void FERigidBody::InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& tdot)
+{
+    double dt = GetFEModel()->GetTime().timeIncrement;
+    // incremental rotation in spatial frame
+    vec3d omg = (m_wp + m_wt)/2;
+    omega = quatd(omg);
+    vec3d rdot = (m_vt + m_vp)/2;
+    double rdm = rdot.norm();
+    vec3d n = omega.GetVector();
+    vec3d w = omega.GetRotationVector();
+    tdot = rdot*n;
+    vec3d r = (m_rt + m_rp)/2;     // midpoint value of r
+    double w2 = w*w;
+    s = (w2 > 0) ? (w ^ (rdot - n*tdot + (r ^ w)))/(w*w) : vec3d(0,0,0);
+    if ((w2 == 0) && (rdm > 0)) {
+        tdot = rdm/dt;
+        n = rdot.Normalize();
+        omega = quatd(0, n);
+    }
+}
+
+//-----------------------------------------------------------------------------
+// return the (finite) helical axis relative to the ground
+void FERigidBody::FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot)
+{
+    // incremental rotation in spatial frame
+    omega = m_qt*m_qp.Inverse();
+    // clean-up roundoff errors
+    omega.MakeUnit();
+    vec3d rdot = m_rt - m_rp;
+    double rdm = rdot.norm();
+    vec3d n = omega.GetVector();
+    vec3d w = omega.GetRotationVector();
+    tdot = rdot*n;
+    vec3d r = (m_rt + m_rp)/2;     // midpoint value of r
+    double w2 = w*w;
+    s = (w2 > 0) ? (w ^ (rdot - n*tdot + (r ^ w)))/(w*w) : vec3d(0,0,0);
+    if ((w2 == 0) && (rdm > 0)) {
+        tdot = rdm;
+        n = rdot.Normalize();
+        omega = quatd(0, n);
+    }
+}

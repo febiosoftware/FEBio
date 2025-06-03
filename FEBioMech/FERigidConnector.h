@@ -79,6 +79,11 @@ protected:
 	FERigidBody*	m_rbB;
     
     static int	m_ncount;	//!< used to create unique ID's for the nonlinear constraints
-    
+
+public:
+    // return the helical axis of Body b relative to Body a
+    void InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& tdot);
+    void FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot);
+
     DECLARE_FECORE_CLASS();
 };

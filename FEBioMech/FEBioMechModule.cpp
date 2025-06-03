@@ -1171,6 +1171,38 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogRigidBodyTorqueY, "My");
 	REGISTER_FECORE_CLASS(FELogRigidBodyTorqueZ, "Mz");
 	REGISTER_FECORE_CLASS(FELogRigidBodyKineticEnergy, "KE");
+    REGISTER_FECORE_CLASS(FELogRigidBodyIHAwx, "IHAwx");
+    REGISTER_FECORE_CLASS(FELogRigidBodyIHAwy, "IHAwy");
+    REGISTER_FECORE_CLASS(FELogRigidBodyIHAwz, "IHAwz");
+    REGISTER_FECORE_CLASS(FELogRigidBodyIHAwm, "IHAwm");
+    REGISTER_FECORE_CLASS(FELogRigidBodyIHAsx, "IHAsx");
+    REGISTER_FECORE_CLASS(FELogRigidBodyIHAsy, "IHAsy");
+    REGISTER_FECORE_CLASS(FELogRigidBodyIHAsz, "IHAsz");
+    REGISTER_FECORE_CLASS(FELogRigidBodyIHAtd, "IHAtd");
+    REGISTER_FECORE_CLASS(FELogRigidBodyFHAwx, "FHAwx");
+    REGISTER_FECORE_CLASS(FELogRigidBodyFHAwy, "FHAwy");
+    REGISTER_FECORE_CLASS(FELogRigidBodyFHAwz, "FHAwz");
+    REGISTER_FECORE_CLASS(FELogRigidBodyFHAwm, "FHAwm");
+    REGISTER_FECORE_CLASS(FELogRigidBodyFHAsx, "FHAsx");
+    REGISTER_FECORE_CLASS(FELogRigidBodyFHAsy, "FHAsy");
+    REGISTER_FECORE_CLASS(FELogRigidBodyFHAsz, "FHAsz");
+    REGISTER_FECORE_CLASS(FELogRigidBodyFHAtd, "FHAtd");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorIHAwx, "rcIHAwx");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorIHAwy, "rcIHAwy");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorIHAwz, "rcIHAwz");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorIHAwm, "rcIHAwm");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorIHAsx, "rcIHAsx");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorIHAsy, "rcIHAsy");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorIHAsz, "rcIHAsz");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorIHAtd, "rcIHAtd");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorFHAwx, "rcFHAwx");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorFHAwy, "rcFHAwy");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorFHAwz, "rcFHAwz");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorFHAwm, "rcFHAwm");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorFHAsx, "rcFHAsx");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorFHAsy, "rcFHAsy");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorFHAsz, "rcFHAsz");
+    REGISTER_FECORE_CLASS(FELogRigidConnectorFHAtd, "rcFHAtd");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogConnectorData
