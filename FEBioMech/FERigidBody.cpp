@@ -354,39 +354,40 @@ void FERigidBody::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 // return the (instantaneous) helical axis relative to the ground
-void FERigidBody::InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& tdot)
+void FERigidBody::InstantaneousHelicalAxis(vec3d& omega, vec3d& s, double& tdot)
 {
     double dt = GetFEModel()->GetTime().timeIncrement;
+
     // incremental rotation in spatial frame
-    vec3d omg = (m_wp + m_wt)/2;
-    omega = quatd(omg);
+    omega = (m_wp + m_wt)/2;
     vec3d rdot = (m_vt + m_vp)/2;
     double rdm = rdot.norm();
-    vec3d n = omega.GetVector();
-    vec3d w = omega.GetRotationVector();
+	vec3d n(omega); n.unit();
     tdot = rdot*n;
     vec3d r = (m_rt + m_rp)/2;     // midpoint value of r
-    double w2 = w*w;
+	vec3d w(omega);
+    double w2 = w.norm2();
     s = (w2 > 0) ? (w ^ (rdot - n*tdot + (r ^ w)))/(w*w) : vec3d(0,0,0);
     if ((w2 == 0) && (rdm > 0)) {
         tdot = rdm/dt;
         n = rdot.Normalize();
-        omega = quatd(0, n);
+        omega = n;
     }
 }
 
 //-----------------------------------------------------------------------------
 // return the (finite) helical axis relative to the ground
-void FERigidBody::FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot)
+void FERigidBody::FiniteHelicalAxis(vec3d& omega, vec3d& s, double& tdot)
 {
     // incremental rotation in spatial frame
-    omega = m_qt*m_qp.Inverse();
+    quatd dQ = m_qt*m_qp.Inverse();
     // clean-up roundoff errors
-    omega.MakeUnit();
+    dQ.MakeUnit();
     vec3d rdot = m_rt - m_rp;
     double rdm = rdot.norm();
-    vec3d n = omega.GetVector();
-    vec3d w = omega.GetRotationVector();
+    vec3d w = dQ.GetRotationVector();
+	vec3d n(w); n.unit();
+	omega = w;
     tdot = rdot*n;
     vec3d r = (m_rt + m_rp)/2;     // midpoint value of r
     double w2 = w*w;
@@ -394,6 +395,6 @@ void FERigidBody::FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot)
     if ((w2 == 0) && (rdm > 0)) {
         tdot = rdm;
         n = rdot.Normalize();
-        omega = quatd(0, n);
+        omega = n;
     }
 }

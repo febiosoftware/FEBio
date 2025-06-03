@@ -113,7 +113,7 @@ void FERigidConnector::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 // return the instantaneous helical axis of Body b relative to Body a, in ground CS
-void FERigidConnector::InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& tdot)
+void FERigidConnector::InstantaneousHelicalAxis(vec3d& omega, vec3d& s, double& tdot)
 {
     double dt = GetFEModel()->GetTime().timeIncrement;
     // incremental rotation in spatial frame
@@ -122,11 +122,11 @@ void FERigidConnector::InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& 
     vec3d va = (m_rbA->m_vp + m_rbA->m_vt)/2;
     vec3d vb = (m_rbB->m_vp + m_rbB->m_vt)/2;
     // get the relative motion
-    omega = quatd(omb - oma);
+    omega = (omb - oma);
     vec3d rdot = vb - va;
     double rdm = rdot.norm();
-    vec3d n = omega.GetVector();
-    vec3d w = omega.GetRotationVector()/dt;
+	vec3d n(omega); n.unit();
+    vec3d w(omega);
     tdot = rdot*n;
     vec3d ra = (m_rbA->m_rt + m_rbA->m_rp)/2;
     vec3d rb = (m_rbB->m_rt + m_rbB->m_rp)/2;
@@ -136,7 +136,7 @@ void FERigidConnector::InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& 
     if ((w2 == 0) && (rdm > 0)) {
         tdot = rdm;
         n = rdot.Normalize();
-        omega = quatd(0, n);
+        omega = n;
     }
     // now transform the helical axis to be represented relative to the ground
     s -= m_rbB->m_rt;
@@ -145,7 +145,7 @@ void FERigidConnector::InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& 
 
 //-----------------------------------------------------------------------------
 // return the helical axis of Body b relative to Body a, in ground CS
-void FERigidConnector::FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot)
+void FERigidConnector::FiniteHelicalAxis(vec3d& omega, vec3d& s, double& tdot)
 {
     // incremental rotation in spatial frame
     quatd oma = m_rbA->GetRotation()*m_rbA->GetPreviousRotation().Inverse();
@@ -156,11 +156,12 @@ void FERigidConnector::FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot)
     vec3d rda = (m_rbA->m_rt - m_rbA->m_rp);
     vec3d rdb = (m_rbB->m_rt - m_rbB->m_rp);
     // get the relative motion
-    omega = omb - oma;
+    quatd dQ = omb - oma; // TODO: Is this valid for rotations?
+	omega = dQ.GetRotationVector();
     vec3d rdot = rdb - rda;
     double rdm = rdot.norm();
-    vec3d n = omega.GetVector();
-    vec3d w = omega.GetRotationVector();
+	vec3d n(omega); n.unit();
+    vec3d w(omega);
     tdot = rdot*n;
     vec3d ra = (m_rbA->m_rt + m_rbA->m_rp)/2;
     vec3d rb = (m_rbB->m_rt + m_rbB->m_rp)/2;
@@ -170,7 +171,7 @@ void FERigidConnector::FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot)
     if ((w2 == 0) && (rdm > 0)) {
         tdot = rdm;
         n = rdot.Normalize();
-        omega = quatd(0, n);
+        omega = n;
     }
     // now transform the helical axis to be represented relative to the ground
     s -= m_rbB->m_rt;

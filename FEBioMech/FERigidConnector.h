@@ -82,8 +82,8 @@ protected:
 
 public:
     // return the helical axis of Body b relative to Body a
-    void InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& tdot);
-    void FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot);
+    void InstantaneousHelicalAxis(vec3d& omega, vec3d& s, double& tdot);
+    void FiniteHelicalAxis(vec3d& omega, vec3d& s, double& tdot);
 
     DECLARE_FECORE_CLASS();
 };

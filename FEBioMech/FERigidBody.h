@@ -144,8 +144,8 @@ public:
 
 public:
     // return the helical axis relative to the ground
-    void InstantaneousHelicalAxis(quatd& omega, vec3d& s, double& tdot);
-    void FiniteHelicalAxis(quatd& omega, vec3d& s, double& tdot);
+    void InstantaneousHelicalAxis(vec3d& omega, vec3d& s, double& tdot);
+    void FiniteHelicalAxis(vec3d& omega, vec3d& s, double& tdot);
 
 public:
 	DECLARE_FECORE_CLASS();
