@@ -53,18 +53,16 @@ public:
     void Serialize(DumpStream& ar);
     
 public:
-    double  m_alpha;                //!< alpha exponent at current time
-    double  m_alphap;               //!< alpha exponent at previous time
+    double  m_alpha;                //!< calculated alpha (for display purposes only)
     mat3ds  m_U;                    //!< parallel spring stretch tensor at current time
     mat3ds  m_Up;                   //!< parallel spring stretch tensor at previous time
-    mat3ds  m_Us;                   //!< Maxwell spring stretch tensor at current time
-    mat3ds  m_Usp;                  //!< Maxwell spring stretch tensor at previoust time
-    mat3ds  m_Ud;                   //!< Maxwell dashpot stretch tensor at current time
-    mat3ds  m_Udp;                  //!< Maxwell dashpot stretch tensor at previous time
     mat3d   m_R;                    //!< rotation tensor at current time
+    mat3ds  m_Udot;                 //!< time derivative of parallel spring stretch tensor at current time
+    mat3ds  m_Udotp;                //!< time derivative of parallel spring stretch tensor at previous time
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
-
+    mat3ds  m_Ed, m_Edp;
+    mat3ds  m_Us, m_Usp;
 };
 
 

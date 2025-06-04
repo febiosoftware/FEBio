@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <FECore/matrix.h>
 #include <limits>
 #include <cmath>
 
@@ -72,11 +73,11 @@ void FESIVQLVMaterialPoint::Init()
 {
     // intialize data to zero
     m_sedp = m_sed = 0.0;
-    m_alphap = m_alpha = 1;
     m_Up = m_U = mat3dd(1);
-    m_Usp = m_Us = m_U;
-    m_Udp = m_Ud = m_U;
+    m_Usp = m_Us = mat3dd(1);
+    m_Ed = m_Edp = mat3ds(0);
     m_R = mat3dd(1);
+    m_Udotp = m_Udot = mat3ds(0);
 
     // don't forget to initialize the base class
     FEMaterialPointData::Init();
@@ -88,10 +89,10 @@ void FESIVQLVMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
     double dt = timeInfo.timeIncrement;
     m_sedp = m_sed;
-    m_alphap = m_alpha;
     m_Up = m_U;
     m_Usp = m_Us;
-    m_Udp = m_Ud;
+    m_Edp = m_Ed;
+    m_Udotp = m_Udot;
 
     // don't forget to call the base class
     FEMaterialPointData::Update(timeInfo);
@@ -103,11 +104,11 @@ void FESIVQLVMaterialPoint::Serialize(DumpStream& ar)
 {
     FEMaterialPointData::Serialize(ar);
     ar & m_sed & m_sedp;
-    ar & m_alpha & m_alphap;
     ar & m_U & m_Up;
     ar & m_Us & m_Usp;
-    ar & m_Ud & m_Udp;
+    ar & m_Ed & m_Edp;
     ar & m_R;
+    ar & m_Udot & m_Udotp;
 }
 
 //-----------------------------------------------------------------------------
@@ -137,7 +138,10 @@ void FESIVQLV::UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETime
 mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
 {
     const double eps = 10*std::numeric_limits<double>::epsilon();
-    
+    double errrel = 1e-3;
+    double errabs = 1e-9;
+    int maxit = 100;
+
     FETimeInfo& tp = GetFEModel()->GetTime();
     double dt = tp.timeIncrement;
     if (dt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
@@ -153,80 +157,83 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
     // get the viscoelastic point data
     FESIVQLVMaterialPoint& pt = *mp.ExtractData<FESIVQLVMaterialPoint>();
     
-    mat3dd I(1);
-    mat3ds U = ep.RightStretch();
-    if ((U-I).norm() <= eps)
-        return s;
-    mat3ds C = ep.RightCauchyGreen();
-    mat3ds H = ep.RightHencky();
-    mat3ds E = ep.Strain();
     double lam[3];
     vec3d u[3];
-    U.eigen2(lam, u);
+    mat3ds e(0), edot(0);
+    mat3dd I(1);
+    mat3ds U = ep.RightStretch();   // U at current time
+    mat3ds Udot = (U - pt.m_Up)/dt; // Udot over interval
+    U.eigen2(lam, u);               // eigenvalues & eigenvectors at current time
+
     mat3ds Ue[3];
-    for (int i=0; i<3; ++i) Ue[i] = dyad(u[i]);
+    double lamdot[3];
+    mat3da Omega(vec3d(0,0,0));
+    mat3ds Udot0(0);
+    for (int i=0; i<3; ++i) {
+        Ue[i] = dyad(u[i]);
+        lamdot[i] = Udot.dotdot(Ue[i]);
+        Udot0 += Ue[i]*lamdot[i];
+    }
+
+    mat3ds OUUO = Udot - Udot0;
+    double omg[3];
+    double dlam;
+    dlam = lam[0] - lam[1]; omg[2] = (dlam != 0) ? u[1]*(OUUO*u[0])/dlam : 0;
+    dlam = lam[1] - lam[2]; omg[0] = (dlam != 0) ? u[2]*(OUUO*u[1])/dlam : 0;
+    dlam = lam[2] - lam[0]; omg[1] = (dlam != 0) ? u[0]*(OUUO*u[2])/dlam : 0;
+    vec3d omega (omg[0], omg[1], omg[2]);
+    Omega = mat3da(omega);
     
     // store safe copy of deformation gradient
     mat3d Fsafe = ep.m_F;
     double Jsafe = ep.m_J;
     
-    // calculate alpha at current time
-    double errrel = 1e-6;
-    double errabs = 1e-9;
-    int maxit = 100;
+    // calculate Ed0-dot
+    // and use it to calculate Ed
+    mat3ds Ed = pt.m_Ed;
     int iter = 0;
-    double x = pt.m_alpha; // solve for x
     bool cnvgd = false;
     bool error = false;
-    mat3ds Us, Ud;
+    mat3ds Us;
+    double lamd[3], lams[3];
     do {
-        // evaluate Us and Ud
-        Us = Ud = mat3ds(0);
-        mat3ds Usi(0), Udi(0);
+        Us = mat3ds(0);
+        // evaluate the eigenvalues of Ud and Us
         for (int i=0; i<3; ++i) {
-            Us += Ue[i]*pow(lam[i],x);
-            Ud += Ue[i]*pow(lam[i],1-x);
-            Usi += Ue[i]/pow(lam[i],x);
-            Udi += Ue[i]/pow(lam[i],1-x);
+            lamd[i] = sqrt(1+2*Ed.dotdot(Ue[i]));
+            lams[i] = lam[i]/lamd[i];
+            Us += Ue[i]*lams[i];
         }
-        mat3ds Cs = (Us*Us).sym();
-        mat3ds Cd = (Ud*Ud).sym();
-        mat3ds Cdi = (Udi*Udi).sym();
-        mat3ds Es = (Cs - I)/2;
-        // use Gram-Schmidt orthogonalization when evaluation U dot
-        mat3ds Udot = (U*(U.dotdot(pt.m_Up)/U.dotdot(U)) - pt.m_Up)/dt;
-        mat3ds Usdot = (Us*(Us.dotdot(pt.m_Usp)/Us.dotdot(Us)) - pt.m_Usp)/dt;
-        mat3ds Uddot = (Ud*(Ud.dotdot(pt.m_Udp)/Ud.dotdot(Ud)) - pt.m_Udp)/dt;
-        mat3ds Edot = (Udot*U).sym();
-        mat3ds Esdot = (Usdot*Us).sym();
-        mat3ds Eddot = (Uddot*Ud).sym();
-        mat3ds Usdotc = (Udi*Udot).sym()*x;
-        mat3ds Uddotc = (Usi*Udot).sym()*(1-x);
-        mat3ds Esdotc = (Usdotc*Us).sym();
-        mat3ds Eddotc = (Uddotc*Ud).sym();
-        double Jd = Ud.det();
-        mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(2*eta*Jd);
-        double a = H.dotdot(H);
-        double b = Smhat.dotdot((Cs*H).sym()) - 2*Eddotc.dotdot((H*Cdi).sym());
-        double c = Smhat.dotdot((Udi*Edot*Udi).sym() - Esdotc) - (Cdi*Eddotc).dotdot(Eddotc*Cdi);
-        double delta = b*b + 4*a*c;
-        delta = (delta < 0) ? 0 : sqrt(delta);
-        if (b < 0) delta = -delta;
-        double adot = (fabs(a) <= eps) ? 0 : -(b+delta)/(2*a);
-        double dx = adot*dt + pt.m_alphap - x;
-        x += dx;
-        if (fabs(dx) <= fabs(x)*errrel) cnvgd = true;
-        if (fabs(dx) <= errabs) cnvgd = true;
+        double Jdm = lamd[0]*lamd[1]*lamd[2];
+        mat3ds Es = ((Us*Us).sym()-I)/2;
+        mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(2*eta*Jdm);
+        mat3ds Ed0dot(0), Edp(0);
+        for (int i=0; i<3; ++i) {
+            Ed0dot += Ue[i]*(Smhat.dotdot(Ue[i])*lam[i]);
+            Edp += Ue[i]*pt.m_Edp.dotdot(Ue[i]);
+        }
+        mat3ds dEd = Edp + Ed0dot*dt - Ed;
+        Ed += dEd;
+        double dEdn = dEd.norm();
+        if (dEdn <= Ed.norm()*errrel) cnvgd = true;
+        if (dEdn <= errabs) cnvgd = true;
         if (++iter == maxit) error = true;
-        if (tp.currentTime == dt) cnvgd = true;
     } while (!cnvgd && !error);
     if (error)
         feLogWarning("SIV dashpot stretch calculation did not converge!");
-    pt.m_alpha = x;
+    pt.m_Ed = Ed;
     pt.m_U = U;
-    pt.m_Us = Us;
-    pt.m_Ud = Ud;
+    pt.m_Udot = Udot;
     pt.m_R = Fsafe*U.inverse();
+    pt.m_Us = Us;
+    pt.m_alpha = 0;
+    int imax = 0;
+    double lmax = fabs(log(lam[imax]));
+    for (int i=0; i<3; ++i) {
+        double l = fabs(log(lam[i]));
+        if (l > lmax) { imax = i; lmax = l;}
+    }
+    if (lmax > 0) pt.m_alpha = log(lams[imax])/log(lam[imax]);
 
     // evaluate Fs and Js to calculate stress in Maxwell spring
     ep.m_F = pt.m_R*pt.m_Us;     // Fs
