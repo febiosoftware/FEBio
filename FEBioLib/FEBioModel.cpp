@@ -990,6 +990,31 @@ void FEBioModel::UpdatePlotObjects()
 			nid++;
 		}
 
+		// add the helical axes for all rigid bodies
+		for (int i = 0; i < nrb; ++i)
+		{
+			FERigidBody* rb = GetRigidBody(i);
+			string name = rb->GetName();
+			if (name.empty())
+			{
+				stringstream ss; ss << "rb" << i + 1;
+				name = ss.str();
+			}
+			name += ".helicalAxis";
+
+			vec3d w, s;
+			double tdot;
+			rb->InstantaneousHelicalAxis(w, s, tdot);
+
+			FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
+			po->m_tag = OBJ_HELICAL_AXIS;
+			po->m_pos = s;
+			if (w.norm2() == 0) w = vec3d(0, 0, 1);
+			else w.unit();
+			quatd Q = quatd(vec3d(0, 0, 1), w);
+			po->m_rot = Q;
+		}
+
 		// check rigid connectors
 		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 		{
@@ -1105,8 +1130,25 @@ void FEBioModel::UpdatePlotObjects()
 			po->m_rot = rb->GetRotation();
 		}
 
-		// check rigid connectors
+		// add the helical axes for all rigid bodies
 		int n = nrb;
+		for (int i = 0; i < nrb; ++i)
+		{
+			FERigidBody* rb = GetRigidBody(i);
+		
+			vec3d w, s;
+			double tdot;
+			rb->InstantaneousHelicalAxis(w, s, tdot);
+
+			FEBioPlotFile::PointObject* po = plt->GetPointObject(n++);
+			po->m_pos = s;
+			if (w.norm2() == 0) w = vec3d(0, 0, 1);
+			else w.unit();
+			quatd Q = quatd(vec3d(0, 0, 1), w);
+			po->m_rot = Q;
+		}
+
+		// check rigid connectors
 		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 		{
 			FENLConstraint* pc = fem.NonlinearConstraint(i);

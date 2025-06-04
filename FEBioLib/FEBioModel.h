@@ -53,7 +53,8 @@ enum PlotObjectType {
 	OBJ_PRISMATIC_JOINT   = 4,
 	OBJ_REVOLUTE_JOINT    = 5,
 	OBJ_CYLINDRICAL_JOINT = 6,
-	OBJ_PLANAR_JOINT      = 7
+	OBJ_PLANAR_JOINT      = 7,
+	OBJ_HELICAL_AXIS      = 8
 };
 
 //-----------------------------------------------------------------------------
