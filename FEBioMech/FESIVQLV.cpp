@@ -167,23 +167,14 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
 
     mat3ds Ue[3];
     double lamdot[3];
-    mat3da Omega(vec3d(0,0,0));
-    mat3ds Udot0(0);
+    mat3ds Udot0(0), Edp(0);
     for (int i=0; i<3; ++i) {
         Ue[i] = dyad(u[i]);
         lamdot[i] = Udot.dotdot(Ue[i]);
         Udot0 += Ue[i]*lamdot[i];
+        Edp += Ue[i]*pt.m_Edp.dotdot(Ue[i]);
     }
 
-    mat3ds OUUO = Udot - Udot0;
-    double omg[3];
-    double dlam;
-    dlam = lam[0] - lam[1]; omg[2] = (dlam != 0) ? u[1]*(OUUO*u[0])/dlam : 0;
-    dlam = lam[1] - lam[2]; omg[0] = (dlam != 0) ? u[2]*(OUUO*u[1])/dlam : 0;
-    dlam = lam[2] - lam[0]; omg[1] = (dlam != 0) ? u[0]*(OUUO*u[2])/dlam : 0;
-    vec3d omega (omg[0], omg[1], omg[2]);
-    Omega = mat3da(omega);
-    
     // store safe copy of deformation gradient
     mat3d Fsafe = ep.m_F;
     double Jsafe = ep.m_J;
@@ -207,10 +198,9 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
         double Jdm = lamd[0]*lamd[1]*lamd[2];
         mat3ds Es = ((Us*Us).sym()-I)/2;
         mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(2*eta*Jdm);
-        mat3ds Ed0dot(0), Edp(0);
+        mat3ds Ed0dot(0);
         for (int i=0; i<3; ++i) {
             Ed0dot += Ue[i]*(Smhat.dotdot(Ue[i])*lam[i]);
-            Edp += Ue[i]*pt.m_Edp.dotdot(Ue[i]);
         }
         mat3ds dEd = Edp + Ed0dot*dt - Ed;
         Ed += dEd;
