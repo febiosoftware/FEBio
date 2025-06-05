@@ -2288,9 +2288,9 @@ double FELogRigidBodyKineticEnergy::value(FERigidBody& rb) {
     return (rbl.m_mass*(rbl.m_vt*rbl.m_vt) + rbl.m_wt*(rbl.m_moi*rbl.m_wt))/2;
 }
 //-----------------------------------------------------------------------------
-double FELogRigidBodyIHAwx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return omega.x; }
-double FELogRigidBodyIHAwy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return omega.y; }
-double FELogRigidBodyIHAwz::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return omega.z; }
+double FELogRigidBodyIHAwx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); vec3d n = omega.Normalize(); return n.x; }
+double FELogRigidBodyIHAwy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); vec3d n = omega.Normalize(); return n.y; }
+double FELogRigidBodyIHAwz::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); vec3d n = omega.Normalize(); return n.z; }
 double FELogRigidBodyIHAwm::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return omega.norm() * 180 / PI; }
 double FELogRigidBodyIHAsx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return s.x; }
 double FELogRigidBodyIHAsy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return s.y; }
@@ -2298,9 +2298,9 @@ double FELogRigidBodyIHAsz::value(FERigidBody& rb) { vec3d omega; vec3d s; doubl
 double FELogRigidBodyIHAtd::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return tdot; }
 
 //-----------------------------------------------------------------------------
-double FELogRigidBodyFHAwx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return omega.x; }
-double FELogRigidBodyFHAwy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return omega.y; }
-double FELogRigidBodyFHAwz::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return omega.z; }
+double FELogRigidBodyFHAwx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); vec3d n = omega.Normalize(); return n.x; }
+double FELogRigidBodyFHAwy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); vec3d n = omega.Normalize(); return n.y; }
+double FELogRigidBodyFHAwz::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); vec3d n = omega.Normalize(); return n.z; }
 double FELogRigidBodyFHAwm::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return omega.norm()*180/PI; }
 double FELogRigidBodyFHAsx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return s.x; }
 double FELogRigidBodyFHAsy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return s.y; }
@@ -2314,7 +2314,8 @@ double FELogRigidConnectorIHAwx::value(FENLConstraint& rc) {
     double tdot;
     FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
     prc->InstantaneousHelicalAxis(omega, s, tdot);
-    return omega.x;
+    vec3d n = omega.Normalize();
+    return n.x;
 }
 double FELogRigidConnectorIHAwy::value(FENLConstraint& rc) {
     vec3d omega;
@@ -2322,7 +2323,8 @@ double FELogRigidConnectorIHAwy::value(FENLConstraint& rc) {
     double tdot;
     FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
     prc->InstantaneousHelicalAxis(omega, s, tdot);
-    return omega.y;
+    vec3d n = omega.Normalize();
+    return n.y;
 }
 double FELogRigidConnectorIHAwz::value(FENLConstraint& rc) {
     vec3d omega;
@@ -2330,7 +2332,8 @@ double FELogRigidConnectorIHAwz::value(FENLConstraint& rc) {
     double tdot;
     FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
     prc->InstantaneousHelicalAxis(omega, s, tdot);
-    return omega.z;
+    vec3d n = omega.Normalize();
+    return n.z;
 }
 double FELogRigidConnectorIHAwm::value(FENLConstraint& rc) {
     vec3d omega;
@@ -2380,7 +2383,8 @@ double FELogRigidConnectorFHAwx::value(FENLConstraint& rc) {
     double tdot;
     FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
     prc->FiniteHelicalAxis(omega, s, tdot);
-    return omega.x;
+    vec3d n = omega.Normalize();
+    return n.x;
 }
 double FELogRigidConnectorFHAwy::value(FENLConstraint& rc) {
 	vec3d omega;
@@ -2388,7 +2392,8 @@ double FELogRigidConnectorFHAwy::value(FENLConstraint& rc) {
     double tdot;
     FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
     prc->FiniteHelicalAxis(omega, s, tdot);
-    return omega.y;
+    vec3d n = omega.Normalize();
+    return n.y;
 }
 double FELogRigidConnectorFHAwz::value(FENLConstraint& rc) {
 	vec3d omega;
@@ -2396,7 +2401,8 @@ double FELogRigidConnectorFHAwz::value(FENLConstraint& rc) {
     double tdot;
     FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
     prc->FiniteHelicalAxis(omega, s, tdot);
-    return omega.z;
+    vec3d n = omega.Normalize();
+    return n.z;
 }
 double FELogRigidConnectorFHAwm::value(FENLConstraint& rc) {
 	vec3d omega;
