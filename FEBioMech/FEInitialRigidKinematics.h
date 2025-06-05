@@ -23,40 +23,25 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEBiphasic.h"
+#include <FECore/FEInitialCondition.h>
+#include "febiomech_api.h"
 
-//-----------------------------------------------------------------------------
-// This class implements a poroelastic material that has a strain-dependent
-// permeability which is isotropic in the reference state, but exhibits
-// strain-induced anisotropy, according to the constitutive relation
-// of Ateshian and Weiss (JBME 2010)
-
-class FEBIOMIX_API FEPermRefIso :	public FEHydraulicPermeability
+//! Component that assigns initial velocity based on rigid body kinematics
+class FEBIOMECH_API FEInitialRigidKinematics : public FENodalIC
 {
 public:
-	//! constructor
-	FEPermRefIso(FEModel* pfem);
-		
-	//! permeability
-	mat3ds Permeability(FEMaterialPoint& pt) override;
-		
-	//! Tangent of permeability
-	tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
-		
-	//! data initialization and checking
-	bool Validate() override;
-		
-public:
-	FEParamDouble m_perm0;		//!< permeability for I term
-	FEParamDouble m_perm1;		//!< permeability for b term
-	FEParamDouble m_perm2;		//!< permeability for b^2 term
-	double	m_M;			//!< nonlinear exponential coefficient
-	double	m_alpha;		//!< nonlinear power exponent
-		
-	// declare parameter list
+	FEInitialRigidKinematics(FEModel* fem);
+
+	bool Init() override;
+
+	// return the values for node i
+	void GetNodalValues(int inode, std::vector<double>& values) override;
+
+private:
+	vec3d	m_v;	// initial linear velocity
+	vec3d	m_w;	// initial angular velocity	
+	vec3d	m_c;	// center of rotation
+
 	DECLARE_FECORE_CLASS();
 };

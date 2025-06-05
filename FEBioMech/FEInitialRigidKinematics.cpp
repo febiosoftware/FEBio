@@ -23,40 +23,46 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+#include "stdafx.h"
+#include "FEInitialRigidKinematics.h"
+#include "FEBioMech.h"
+#include <FECore/FEMaterialPoint.h>
+#include <FECore/FENode.h>
 
+BEGIN_FECORE_CLASS(FEInitialRigidKinematics, FENodalIC)
+	ADD_PARAMETER(m_v, "velocity")->setUnits(UNIT_VELOCITY);
+	ADD_PARAMETER(m_w, "angular_velocity")->setUnits(UNIT_ANGULAR_VELOCITY);
+	ADD_PARAMETER(m_c, "center_of_rotation")->setUnits(UNIT_LENGTH);
+END_FECORE_CLASS();
 
-
-#pragma once
-#include "FEBiphasic.h"
-
-//-----------------------------------------------------------------------------
-// This class implements a poroelastic material that has a strain-dependent
-// permeability which is isotropic in the reference state, but exhibits
-// strain-induced anisotropy, according to the constitutive relation
-// of Ateshian and Weiss (JBME 2010)
-
-class FEBIOMIX_API FEPermRefIso :	public FEHydraulicPermeability
+FEInitialRigidKinematics::FEInitialRigidKinematics(FEModel* fem) : FENodalIC(fem)
 {
-public:
-	//! constructor
-	FEPermRefIso(FEModel* pfem);
-		
-	//! permeability
-	mat3ds Permeability(FEMaterialPoint& pt) override;
-		
-	//! Tangent of permeability
-	tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
-		
-	//! data initialization and checking
-	bool Validate() override;
-		
-public:
-	FEParamDouble m_perm0;		//!< permeability for I term
-	FEParamDouble m_perm1;		//!< permeability for b term
-	FEParamDouble m_perm2;		//!< permeability for b^2 term
-	double	m_M;			//!< nonlinear exponential coefficient
-	double	m_alpha;		//!< nonlinear power exponent
-		
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
-};
+	m_v = vec3d(0, 0, 0);
+	m_w = vec3d(0, 0, 0);
+	m_c = vec3d(0, 0, 0);
+}
+
+// initialization
+bool FEInitialRigidKinematics::Init()
+{
+	FEDofList dofs(GetFEModel());
+	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY)) == false) return false;
+	SetDOFList(dofs);
+	return FENodalIC::Init();
+}
+
+// return the values for node i
+void FEInitialRigidKinematics::GetNodalValues(int inode, std::vector<double>& values)
+{
+	assert(values.size() == 3);
+
+	const FENodeSet& nset = *GetNodeSet();
+	const FENode& node = *nset.Node(inode);
+
+	vec3d r = node.m_rt;
+	vec3d v = m_v + (m_w ^ (r - m_c));
+
+	values[0] = v.x;
+	values[1] = v.y;
+	values[2] = v.z;
+}

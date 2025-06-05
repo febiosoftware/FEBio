@@ -857,6 +857,23 @@ protected:
 };
 
 //=============================================================================
+// 16-node quadrilateral elements with 16-point gaussian quadrature 
+class FEQuad4G16 : public FEQuad4_
+{
+public:
+	enum { NINT = 16 };
+
+public:
+	FEQuad4G16();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao) const override;
+
+protected:
+	matrix m_Ai;	//!< inverse of H; useful for projection integr. point data to nodal data 
+};
+
+//=============================================================================
 // 4-node quadrilateral elements with nodal quadrature 
 class FEQuad4NI : public FEQuad4_
 {

@@ -23,40 +23,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEBiphasic.h"
+#include "FEBodyForce.h"
 
-//-----------------------------------------------------------------------------
-// This class implements a poroelastic material that has a strain-dependent
-// permeability which is isotropic in the reference state, but exhibits
-// strain-induced anisotropy, according to the constitutive relation
-// of Ateshian and Weiss (JBME 2010)
-
-class FEBIOMIX_API FEPermRefIso :	public FEHydraulicPermeability
+//! This class defines a radial body force.
+//! The body force depends on the current nodal coordinates
+class FEAxialBodyForce : public FEBodyForce
 {
 public:
-	//! constructor
-	FEPermRefIso(FEModel* pfem);
-		
-	//! permeability
-	mat3ds Permeability(FEMaterialPoint& pt) override;
-		
-	//! Tangent of permeability
-	tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
-		
-	//! data initialization and checking
-	bool Validate() override;
-		
+	FEAxialBodyForce(FEModel* pfem);
+
+	vec3d force(FEMaterialPoint& mp) override;
+
+	double divforce(FEMaterialPoint& mp) override;
+
+	mat3d stiffness(FEMaterialPoint& mp) override;
+
 public:
-	FEParamDouble m_perm0;		//!< permeability for I term
-	FEParamDouble m_perm1;		//!< permeability for b term
-	FEParamDouble m_perm2;		//!< permeability for b^2 term
-	double	m_M;			//!< nonlinear exponential coefficient
-	double	m_alpha;		//!< nonlinear power exponent
-		
-	// declare parameter list
+	vec3d	c; //!< force center
+	vec3d	n; //!< axis 
+	double	p; //!< power
+	double	s; //!< scale factor
+
 	DECLARE_FECORE_CLASS();
 };
+

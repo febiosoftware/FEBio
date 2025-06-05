@@ -482,7 +482,7 @@ void FEParam::Serialize(DumpStream& ar)
 				FEParamDouble* p = (FEParamDouble*)(m_pv);
 				for (int i = 0; i < m_dim; ++i)
 				{
-					p[i].Serialize(ar);
+					ar << p[i];
 				}
 			}
 			break;
@@ -588,7 +588,7 @@ void FEParam::Serialize(DumpStream& ar)
 				FEParamDouble* p = (FEParamDouble*)(m_pv);
 				for (int i = 0; i < m_dim; ++i)
 				{
-					p[i].Serialize(ar);
+					ar >> p[i];
 				}
 			}
 			break;

@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include <FECore/FECoreTask.h>
 #include <FECore/DumpMemStream.h>
 
-//-----------------------------------------------------------------------------
 // This diagnostics tests the running and cold restart features
 class FERestartDiagnostic : public FECoreTask
 {
@@ -49,4 +48,21 @@ public:
 	bool	m_bfile;		// file or memory stream?
 	char	m_szdmp[256];	// restart file name
 	DumpMemStream	m_dmp;
+};
+
+// This diagnostics tests simple calls serialize after init
+class FEQuickRestartDiagnostic : public FECoreTask
+{
+public:
+	// constructor
+	FEQuickRestartDiagnostic(FEModel* pfem);
+
+	// initialize the diagnostic
+	bool Init(const char* sz) override;
+
+	// run the diagnostic
+	bool Run() override;
+
+public:
+	char	m_szdmp[256];	// restart file name
 };

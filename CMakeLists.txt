@@ -159,11 +159,9 @@ endif()
 ##### Find Source Files #####
 
 macro(findHdrSrc name)
-	file(GLOB HDR_${name} "${name}/*.h")
+	file(GLOB HDR_${name} "${name}/*.h*")
 	file(GLOB SRC_${name} "${name}/*.cpp")
 endmacro()
-
-findHdrSrc(FEBioStudio)
 
 foreach(name IN LISTS FEBIO_LIBS)
 	findHdrSrc(${name})
@@ -197,8 +195,9 @@ foreach(name IN LISTS STATIC_FEBIO_LIBS)
 endforeach(name)
 
 ##### Set up executable compilation #####
+file(GLOB HEADERS "FEBio/*.h")
 file(GLOB SOURCES "FEBio/*.cpp")
-add_executable (febio4 ${SOURCES})
+add_executable (febio4 ${HEADERS} ${SOURCES})
 
 if(WIN32)
     target_compile_options(febio4 PRIVATE /openmp)

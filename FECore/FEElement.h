@@ -316,6 +316,12 @@ public:
 
 	double* Gr(int n) const { return ((FELineElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
 
+	void shape(double* H, double r) { return ((FELineElementTraits*)(m_pT))->shape(H, r); }
+
+	void shape_deriv(double* Hr, double r) { return ((FELineElementTraits*)(m_pT))->shape_deriv(Hr, r); }
+
+	void shape_deriv2(double* Hrr, double r) { return ((FELineElementTraits*)(m_pT))->shape_deriv2(Hrr, r); }
+
 	vec3d eval(vec3d* d, int n)
 	{
 		int ne = Nodes();

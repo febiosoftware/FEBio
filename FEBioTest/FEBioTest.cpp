@@ -44,6 +44,7 @@ void InitModule()
 {
 	REGISTER_FECORE_CLASS(FEBioDiagnostic, "diagnose");
 	REGISTER_FECORE_CLASS(FERestartDiagnostic, "restart_test");
+	REGISTER_FECORE_CLASS(FEQuickRestartDiagnostic, "quick_restart_test");
 	REGISTER_FECORE_CLASS(FEJFNKTangentDiagnostic, "jfnk tangent test");
 	REGISTER_FECORE_CLASS(FEResetTest, "reset_test");
 	REGISTER_FECORE_CLASS(FEMaterialTest, "material test");

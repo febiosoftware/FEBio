@@ -43,9 +43,6 @@ public:
 	//! Data initialization
 	bool Init() override;
 
-	//! serialization
-	void Serialize(DumpStream& ar) override;
-
 public:
 	//! Calculate the deviatoric stress
 	mat3ds DevStress(FEMaterialPoint& pt) override;

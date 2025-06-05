@@ -1738,6 +1738,63 @@ void FEQuad4G4::project_to_nodes(double* ai, double* ao) const
 }
 
 //=============================================================================
+//                          F E Q U A D G 16
+//=============================================================================
+
+FEQuad4G16::FEQuad4G16() : FEQuad4_(NINT, FE_QUAD4G16)
+{
+	const double a = 0.339981;
+	const double b = 0.861136;
+
+	const double wa = 0.652145;
+	const double wb = 0.347855;
+
+	gr[ 0] = -b; gs[ 0] = -b; gw[ 0] = wb * wb;
+	gr[ 1] = -a; gs[ 1] = -b; gw[ 1] = wa * wb;
+	gr[ 2] =  a; gs[ 2] = -b; gw[ 2] = wa * wb;
+	gr[ 3] =  b; gs[ 3] = -b; gw[ 3] = wb * wb;
+
+	gr[ 4] = -b; gs[ 4] = -a; gw[ 4] = wa * wb;
+	gr[ 5] = -a; gs[ 5] = -a; gw[ 5] = wa * wa;
+	gr[ 6] =  a; gs[ 6] = -a; gw[ 6] = wa * wa;
+	gr[ 7] =  b; gs[ 7] = -a; gw[ 7] = wa * wb;
+
+	gr[ 8] = -b; gs[ 8] =  a; gw[ 8] = wa * wb;
+	gr[ 9] = -a; gs[ 9] =  a; gw[ 9] = wa * wa;
+	gr[10] =  a; gs[10] =  a; gw[10] = wa * wa;
+	gr[11] =  b; gs[11] =  a; gw[11] = wa * wb;
+
+	gr[12] = -b; gs[12] =  b; gw[12] = wb * wb;
+	gr[13] = -a; gs[13] =  b; gw[13] = wa * wb;
+	gr[14] =  a; gs[14] =  b; gw[14] = wa * wb;
+	gr[15] =  b; gs[15] =  b; gw[15] = wb * wb;
+
+	init();
+	// we need Ai to project integration point data to the nodes
+	matrix A(NELN, NELN);
+	m_Ai.resize(NELN, NELN);
+	A = m_H.transpose() * m_H;
+	m_Ai = A.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FEQuad4G16::project_to_nodes(double* ai, double* ao) const
+{
+	vector<double> b(NELN);
+	for (int i = 0; i < NELN; ++i)
+	{
+		b[i] = 0;
+		for (int j = 0; j < NINT; ++j) b[i] += m_H[j][i] * ai[j];
+	}
+
+	for (int i = 0; i < NELN; ++i)
+	{
+		ao[i] = 0;
+		for (int j = 0; j < NELN; ++j) ao[i] += m_Ai[i][j] * b[j];
+	}
+}
+
+//=============================================================================
 //                          F E Q U A D N I
 //=============================================================================
 

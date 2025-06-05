@@ -1459,6 +1459,132 @@ double FELogElemPK2StressXZ::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemPK1StressXX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(0,0);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressYY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(1,1);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressZZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(2,2);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressXY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(0,1);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressYZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(1,2);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressXZ::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(0,2);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressYX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(1,0);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressZY::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(2,1);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPK1StressZX::value(FEElement& el)
+{
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i = 0; i < nint; ++i)
+    {
+        FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+        mat3d P = pt.m_J*pt.m_s*pt.m_F.transinv();
+        val += P(2,0);
+    }
+    return val / (double)nint;
+}
+
+//-----------------------------------------------------------------------------
 double FELogElemStressEigenVector::value(FEElement& el)
 {
 	assert(m_eigenVector >= 0);
@@ -2160,6 +2286,157 @@ double FELogRigidBodyTorqueZ::value(FERigidBody& rb) { return rb.m_Mr.z; }
 double FELogRigidBodyKineticEnergy::value(FERigidBody& rb) {
     FERigidBody&rbl = static_cast<FERigidBody&>(rb);
     return (rbl.m_mass*(rbl.m_vt*rbl.m_vt) + rbl.m_wt*(rbl.m_moi*rbl.m_wt))/2;
+}
+//-----------------------------------------------------------------------------
+double FELogRigidBodyIHAwx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return omega.x; }
+double FELogRigidBodyIHAwy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return omega.y; }
+double FELogRigidBodyIHAwz::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return omega.z; }
+double FELogRigidBodyIHAwm::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return omega.norm() * 180 / PI; }
+double FELogRigidBodyIHAsx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return s.x; }
+double FELogRigidBodyIHAsy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return s.y; }
+double FELogRigidBodyIHAsz::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return s.z; }
+double FELogRigidBodyIHAtd::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.InstantaneousHelicalAxis(omega, s, tdot); return tdot; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyFHAwx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return omega.x; }
+double FELogRigidBodyFHAwy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return omega.y; }
+double FELogRigidBodyFHAwz::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return omega.z; }
+double FELogRigidBodyFHAwm::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return omega.norm()*180/PI; }
+double FELogRigidBodyFHAsx::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return s.x; }
+double FELogRigidBodyFHAsy::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return s.y; }
+double FELogRigidBodyFHAsz::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return s.z; }
+double FELogRigidBodyFHAtd::value(FERigidBody& rb) { vec3d omega; vec3d s; double tdot; rb.FiniteHelicalAxis(omega, s, tdot); return tdot; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidConnectorIHAwx::value(FENLConstraint& rc) {
+    vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->InstantaneousHelicalAxis(omega, s, tdot);
+    return omega.x;
+}
+double FELogRigidConnectorIHAwy::value(FENLConstraint& rc) {
+    vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->InstantaneousHelicalAxis(omega, s, tdot);
+    return omega.y;
+}
+double FELogRigidConnectorIHAwz::value(FENLConstraint& rc) {
+    vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->InstantaneousHelicalAxis(omega, s, tdot);
+    return omega.z;
+}
+double FELogRigidConnectorIHAwm::value(FENLConstraint& rc) {
+    vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->InstantaneousHelicalAxis(omega, s, tdot);
+    return omega.norm()*180/PI;
+}
+double FELogRigidConnectorIHAsx::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->InstantaneousHelicalAxis(omega, s, tdot);
+    return s.x;
+}
+double FELogRigidConnectorIHAsy::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->InstantaneousHelicalAxis(omega, s, tdot);
+    return s.y;
+}
+double FELogRigidConnectorIHAsz::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->InstantaneousHelicalAxis(omega, s, tdot);
+    return s.z;
+}
+double FELogRigidConnectorIHAtd::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->InstantaneousHelicalAxis(omega, s, tdot);
+    return tdot;
+}
+
+//-----------------------------------------------------------------------------
+double FELogRigidConnectorFHAwx::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->FiniteHelicalAxis(omega, s, tdot);
+    return omega.x;
+}
+double FELogRigidConnectorFHAwy::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->FiniteHelicalAxis(omega, s, tdot);
+    return omega.y;
+}
+double FELogRigidConnectorFHAwz::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->FiniteHelicalAxis(omega, s, tdot);
+    return omega.z;
+}
+double FELogRigidConnectorFHAwm::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->FiniteHelicalAxis(omega, s, tdot);
+    return omega.norm()*180/PI;
+}
+double FELogRigidConnectorFHAsx::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->FiniteHelicalAxis(omega, s, tdot);
+    return s.x;
+}
+double FELogRigidConnectorFHAsy::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->FiniteHelicalAxis(omega, s, tdot);
+    return s.y;
+}
+double FELogRigidConnectorFHAsz::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->FiniteHelicalAxis(omega, s, tdot);
+    return s.z;
+}
+double FELogRigidConnectorFHAtd::value(FENLConstraint& rc) {
+	vec3d omega;
+    vec3d s;
+    double tdot;
+    FERigidConnector* prc = dynamic_cast<FERigidConnector*>(&rc);
+    prc->FiniteHelicalAxis(omega, s, tdot);
+    return tdot;
 }
 
 //-----------------------------------------------------------------------------

@@ -93,9 +93,6 @@ public:
 	//! calculate strain energy density at material point
 	double StrainEnergyDensity(FEMaterialPoint& pt) override;
 
-	//! the density is the sum of the constituent densities
-	double Density(FEMaterialPoint& mp) override;
-    
 public:
     double StrongBondSED(FEMaterialPoint& pt) override;
     double WeakBondSED(FEMaterialPoint& pt) override;

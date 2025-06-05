@@ -817,6 +817,78 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogElemPK1StressXX : public FELogElemData
+{
+public:
+    FELogElemPK1StressXX(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressYY : public FELogElemData
+{
+public:
+    FELogElemPK1StressYY(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressZZ : public FELogElemData
+{
+public:
+    FELogElemPK1StressZZ(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressXY : public FELogElemData
+{
+public:
+    FELogElemPK1StressXY(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressYZ : public FELogElemData
+{
+public:
+    FELogElemPK1StressYZ(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressXZ : public FELogElemData
+{
+public:
+    FELogElemPK1StressXZ(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressYX : public FELogElemData
+{
+public:
+    FELogElemPK1StressYX(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressZY : public FELogElemData
+{
+public:
+    FELogElemPK1StressZY(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogElemPK1StressZX : public FELogElemData
+{
+public:
+    FELogElemPK1StressZX(FEModel* pfem) : FELogElemData(pfem) {}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemStressEigenVector : public FELogElemData
 {
 public:
@@ -1559,6 +1631,258 @@ class FELogVolumePressure : public FELogNLConstraintData
 {
 public:
     FELogVolumePressure(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyIHAwx : public FELogObjectData
+{
+public:
+    FELogRigidBodyIHAwx(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyIHAwy : public FELogObjectData
+{
+public:
+    FELogRigidBodyIHAwy(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyIHAwz : public FELogObjectData
+{
+public:
+    FELogRigidBodyIHAwz(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyIHAwm : public FELogObjectData
+{
+public:
+    FELogRigidBodyIHAwm(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+//-----------------------------------------------------------------------------
+class FELogRigidBodyIHAsx : public FELogObjectData
+{
+public:
+    FELogRigidBodyIHAsx(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyIHAsy : public FELogObjectData
+{
+public:
+    FELogRigidBodyIHAsy(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyIHAsz : public FELogObjectData
+{
+public:
+    FELogRigidBodyIHAsz(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyIHAtd : public FELogObjectData
+{
+public:
+    FELogRigidBodyIHAtd(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyFHAwx : public FELogObjectData
+{
+public:
+    FELogRigidBodyFHAwx(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyFHAwy : public FELogObjectData
+{
+public:
+    FELogRigidBodyFHAwy(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyFHAwz : public FELogObjectData
+{
+public:
+    FELogRigidBodyFHAwz(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyFHAwm : public FELogObjectData
+{
+public:
+    FELogRigidBodyFHAwm(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+//-----------------------------------------------------------------------------
+class FELogRigidBodyFHAsx : public FELogObjectData
+{
+public:
+    FELogRigidBodyFHAsx(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyFHAsy : public FELogObjectData
+{
+public:
+    FELogRigidBodyFHAsy(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyFHAsz : public FELogObjectData
+{
+public:
+    FELogRigidBodyFHAsz(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidBodyFHAtd : public FELogObjectData
+{
+public:
+    FELogRigidBodyFHAtd(FEModel* pfem) : FELogObjectData(pfem){}
+    double value(FERigidBody& rb) override;
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorIHAwx : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorIHAwx(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorIHAwy : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorIHAwy(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorIHAwz : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorIHAwz(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorIHAwm : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorIHAwm(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorIHAsx : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorIHAsx(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorIHAsy : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorIHAsy(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorIHAsz : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorIHAsz(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorIHAtd : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorIHAtd(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorFHAwx : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorFHAwx(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorFHAwy : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorFHAwy(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorFHAwz : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorFHAwz(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorFHAwm : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorFHAwm(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorFHAsx : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorFHAsx(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorFHAsy : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorFHAsy(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorFHAsz : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorFHAsz(FEModel* pfem) : FELogNLConstraintData(pfem){}
+    double value(FENLConstraint& rc);
+};
+
+//-----------------------------------------------------------------------------
+class FELogRigidConnectorFHAtd : public FELogNLConstraintData
+{
+public:
+    FELogRigidConnectorFHAtd(FEModel* pfem) : FELogNLConstraintData(pfem){}
     double value(FENLConstraint& rc);
 };
 
