@@ -63,12 +63,12 @@ bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return (FreeLibrary(ph) == TRUE); }
 #ifdef LINUX
 FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
 void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
-bool UnloadPlugin(FEBIO_PLUGIN_HANDLE) { return true; }
+bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return dlclose(ph) == 0; }
 #endif
 #ifdef __APPLE__
 FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
 void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
-bool UnloadPlugin(FEBIO_PLUGIN_HANDLE) { return true; }
+bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return dlclose(ph) == 0; }
 #endif
 
 //=============================================================================
