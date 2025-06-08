@@ -74,11 +74,11 @@ void FESIVQLVMaterialPoint::Init()
     // intialize data to zero
     m_sedp = m_sed = 0.0;
     m_Up = m_U = mat3dd(1);
-    m_Csp = m_Cs = mat3dd(1);
-    m_Cdp = m_Cd = mat3dd(1);
-    m_Us = mat3dd(1);
+    m_Usp = m_Us = mat3dd(1);
+    m_Udp = m_Ud = mat3dd(1);
     m_R = mat3dd(1);
     m_Udotp = m_Udot = mat3ds(0);
+    m_Omegap = m_Omega = mat3da(vec3d(0,0,0));
 
     // don't forget to initialize the base class
     FEMaterialPointData::Init();
@@ -91,9 +91,10 @@ void FESIVQLVMaterialPoint::Update(const FETimeInfo& timeInfo)
     double dt = timeInfo.timeIncrement;
     m_sedp = m_sed;
     m_Up = m_U;
-    m_Csp = m_Cs;
-    m_Cdp = m_Cd;
+    m_Usp = m_Us;
+    m_Udp = m_Ud;
     m_Udotp = m_Udot;
+    m_Omegap = m_Omega;
 
     // don't forget to call the base class
     FEMaterialPointData::Update(timeInfo);
@@ -106,10 +107,11 @@ void FESIVQLVMaterialPoint::Serialize(DumpStream& ar)
     FEMaterialPointData::Serialize(ar);
     ar & m_sed & m_sedp;
     ar & m_U & m_Up;
-    ar & m_Cs & m_Csp;
-    ar & m_Cd & m_Cdp;
-    ar & m_R & m_Us;
+    ar & m_Us & m_Usp;
+    ar & m_Ud & m_Udp;
+    ar & m_R;
     ar & m_Udot & m_Udotp;
+    ar & m_Omega & m_Omegap;
 }
 
 //-----------------------------------------------------------------------------
@@ -166,18 +168,23 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
     mat3ds C = ep.RightCauchyGreen();   // C at current time
     mat3ds E = ep.Strain();         // E at current time
     mat3ds Udot = (U - pt.m_Up)/dt; // Udot over interval
-    U.eigen2(lam, u);               // eigenvalues & eigenvectors at current time
+    pt.m_Udp.eigen2(lam,u);
+    for (int i=0; i<3; ++i) {
+        u[i] = (I + pt.m_Omegap)*u[i];
+        u[i].Normalize();
+        lam[i] = 1;
+    }
 
-    if (tp.currentTime >= 0.5)
-        bool pause = true;
     mat3ds Ue[3];
-    double lamdot[3];
+    double lamdot[3], lamd[3], lamdp[3];
     mat3ds Udot0(0);
     for (int i=0; i<3; ++i) {
         u[i].Normalize();
         Ue[i] = dyad(u[i]);
         lamdot[i] = Udot.dotdot(Ue[i]);
         Udot0 += Ue[i]*lamdot[i];
+        lamd[i] = pt.m_Ud.dotdot(Ue[i]);
+        lamdp[i] = pt.m_Udp.dotdot(Ue[i]);
     }
     mat3ds OUUO = Udot - Udot0;
     vec3d omtmp(0,0,0);
@@ -196,56 +203,59 @@ mat3ds FESIVQLV::Stress(FEMaterialPoint& mp)
     mat3d Fsafe = ep.m_F;
     double Jsafe = ep.m_J;
     
-    // calculate Ed-dot
-    // and use it to calculate Cd
-    mat3ds Cd = pt.m_Cd;
-    mat3ds Cdp(0);
-    // project Cdp along Ue at current time
-    for (int i=0; i<3; ++i) Cdp += Ue[i]*pt.m_Cdp.dotdot(Ue[i]);
+    mat3ds Us;
+    mat3ds Ud = pt.m_Ud;
     int iter = 0;
     bool cnvgd = false;
     bool error = false;
-    mat3ds Cs;
     do {
-        Cs = (C*Cd.inverse()).sym();
-        double lamd2[3], lamd[3];
-        mat3ds Udi(0);
+        vector<double> f(3,0.);
+        matrix df(3,3);
+        double Jd = lamd[0]*lamd[1]*lamd[2];
+        double lams[3];
+        Us = mat3ds(0);
+        Ud = mat3ds(0);
+        mat3ds Cdi(0);
         for (int i=0; i<3; ++i) {
-            lamd2[i] = Cd.dotdot(Ue[i]);
-            lamd[i] = sqrt(lamd2[i]);
-            Udi += Ue[i]/lamd[i];
+            lams[i] = lam[i]/lamd[i];
+            Us += Ue[i]*lams[i];
+            Ud += Ue[i]*lamd[i];
+            Cdi += Ue[i]/pow(lamd[i],2);
         }
-        double Jdm = lamd[0]*lamd[1]*lamd[2];
-        mat3ds Es = (Cs-I)/2;
-        mat3ds Ewdot = 2*(Udi*(Omega*E)*Udi-Omega*Es).sym();
-        mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(2*eta*Jdm);
-        mat3ds Ed0dot(0);
-        for (int i=0; i<3; ++i) Ed0dot += (C*Ue[i]).sym()*(Smhat.dotdot(Ue[i]));
-        mat3ds Cdi = (Udi*Udi).sym();
-        double sc = (Ed0dot.norm() > 0) ? 1 - Ewdot.dotdot(Smhat)/Ed0dot.dotdot((Cdi*Cdi*Ed0dot).sym()) : 1;
-        Ed0dot /= sc;
-        mat3ds Cdtmp = Cdp + Ed0dot*(2*dt);
-        double dCdn = (Cdtmp - Cd).norm();
-        Cd = Cdtmp;
-        if (dCdn <= Cd.norm()*errrel) cnvgd = true;
-        if (dCdn <= errabs) cnvgd = true;
+        mat3ds Es = ((Us*Us).sym()-I)/2;
+        mat3ds Smhat = m_Mxwl->PK2Stress(mp, Es)/(2*eta*Jd);
+        vector<double> dx(3,0.);
+        double fn;
+        tens4dmm Cmhat = m_Mxwl->MaterialTangent(mp, Es)/(2*eta*Jd);
+        for (int i=0; i<3; ++i) {
+            f[i] = (pow(lamd[i],2)-pow(lamdp[i],2))/2 - dt*pow(lam[i],2)*Smhat.dotdot(Ue[i]);
+            for (int j=0; j<3; ++j) {
+                double dden = eta*Jd/lamd[j];
+                df(i,j) = dt*dden*pow(lam[i],2)*Smhat.dotdot(Ue[i])/(2*pow(eta*Jd,2))
+                + dt*(pow(lam[i]*lam[j],2)/pow(lamd[j],3)*(Ue[i].dotdot(Cmhat.dot(Ue[j]))));
+                if (j==i) df(i,j) += lamd[i];
+            }
+        }
+        df.solve(dx, f);
+        fn = sqrt(f[0]*f[0]+f[1]*f[1]+f[2]*f[2]);
+        for (int i=0; i<3; ++i) lamd[i] -= dx[i];
+        double dxn = sqrt(dx[0]*dx[0]+dx[1]*dx[1]+dx[2]*dx[2]);
+        double xn = sqrt(lamd[0]*lamd[0]+lamd[1]*lamd[1]+lamd[2]*lamd[2]);
+        if (dxn <= xn*errrel) cnvgd = true;
+        if (fn <= errabs) cnvgd = true;
         if (++iter == maxit) error = true;
     } while (!cnvgd && !error);
     if (error)
         feLogWarning("SIV dashpot stretch calculation did not converge!");
-    pt.m_Cd = Cd;
+    pt.m_Ud = Ue[0]*lamd[0] + Ue[1]*lamd[1] + Ue[2]*lamd[2];
     pt.m_U = U;
+    pt.m_Omega = Omega;
     pt.m_Udot = Udot;
     pt.m_R = Fsafe*U.inverse();
-    pt.m_Cs = (C*Cd.inverse()).sym();
+    pt.m_Us = (U*pt.m_Ud.inverse()).sym();
     pt.m_alpha = 0;
-    double lams2[3], lams[3];
-    pt.m_Us = mat3ds(0);
-    for (int i=0; i<3; ++i) {
-        lams2[i] = pt.m_Cs.dotdot(Ue[i]);
-        lams[i] = sqrt(lams2[i]);
-        pt.m_Us += Ue[i]*lams[i];
-    }
+    double lams[3];
+    for (int i=0; i<3; ++i) lams[i] = pt.m_Us.dotdot(Ue[i]);
     int imax = 0;
     double lmax = fabs(log(lam[imax]));
     for (int i=0; i<3; ++i) {

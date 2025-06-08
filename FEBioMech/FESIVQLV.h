@@ -61,9 +61,9 @@ public:
     mat3ds  m_Udotp;                //!< time derivative of parallel spring stretch tensor at previous time
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
-    mat3ds  m_Cd, m_Cdp;
-    mat3ds  m_Cs, m_Csp;
-    mat3ds  m_Us;
+    mat3ds  m_Ud, m_Udp;
+    mat3ds  m_Us, m_Usp;
+    mat3d   m_Omega, m_Omegap;
 };
 
 
