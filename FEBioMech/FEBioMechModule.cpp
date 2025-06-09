@@ -785,6 +785,8 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotDashpotStretch, "dashpot stretch");
     REGISTER_FECORE_CLASS(FEPlotMxwlSpringStretch, "Maxwell spring stretch");
     REGISTER_FECORE_CLASS(FEPlotMxwlAlpha, "Maxwell alpha");
+    REGISTER_FECORE_CLASS(FEPlotSIVSpringRightStretch, "SIV spring stretch");
+    REGISTER_FECORE_CLASS(FEPlotSIVDashpotRightStretch, "SIV dashpot stretch");
 	REGISTER_FECORE_CLASS(FEPlotIntactBondFraction, "intact bond fraction");
     REGISTER_FECORE_CLASS(FEPlotFatigueBondFraction, "fatigue bond fraction");
 	REGISTER_FECORE_CLASS(FEPlotYieldedBondFraction, "yielded bond fraction");

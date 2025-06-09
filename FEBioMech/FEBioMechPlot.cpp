@@ -5068,6 +5068,53 @@ bool FEPlotBodyForce::Save(FEDomain& dom, FEDataStream& a)
 	return false;
 }
 
+//=============================================================================
+//! Store the average right stretch of the SIV Maxwell spring
+class FESIVSpringRightStretch
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FESIVQLVMaterialPoint* pt = mp.ExtractData<FESIVQLVMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->m_Us;
+    }
+};
+
+//=============================================================================
+//! Store the average right stretch of the SIV Maxwell dashpot
+class FESIVDashpotRightStretch
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FESIVQLVMaterialPoint* pt = mp.ExtractData<FESIVQLVMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->m_Ud;
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotSIVSpringRightStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FESIVSpringRightStretch());
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSIVDashpotRightStretch::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FESIVDashpotRightStretch());
+    return true;
+}
+
+
 bool FEPlotEdgeContactGap::Save(FEEdge& edge, FEDataStream& a)
 {
 	FEEdgeToSurfaceSlidingContactEdge* pe = dynamic_cast<FEEdgeToSurfaceSlidingContactEdge*>(&edge);

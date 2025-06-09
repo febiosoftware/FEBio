@@ -1603,6 +1603,25 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Right stretch of Maxwell spring for SIV viscoelasticity
+class FEPlotSIVSpringRightStretch : public FEPlotDomainData
+{
+public:
+    FEPlotSIVSpringRightStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Right stretch of Maxwell dashpot for SIV viscoelasticity
+class FEPlotSIVDashpotRightStretch : public FEPlotDomainData
+{
+public:
+    FEPlotSIVDashpotRightStretch(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+
 //=============================================================================
 //                            E D G E   D A T A
 //=============================================================================
