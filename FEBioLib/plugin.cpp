@@ -242,6 +242,9 @@ void FEBioPlugin::UnLoad()
 		FECoreKernel& febio = FECoreKernel::GetInstance();
 		febio.UnregisterFactories(m_allocater_id);
 
+        // unregister the modules from the kernel that were added by the plugin
+        febio.UnregisterModules(m_allocater_id);
+
 		// unload the plugin from memory
 		bool b = UnloadPlugin(m_ph);
 		if (b == false) fprintf(stderr, "ERROR: Failed unloading plugin %s\n", m_szname);
