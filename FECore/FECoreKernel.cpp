@@ -254,6 +254,21 @@ void FECoreKernel::UnregisterFactories(int alloc_id)
 	}
 }
 
+//! unregister modules from allocator
+void FECoreKernel::UnregisterModules(int alloc_id)
+{
+    for (vector<FEModule*>::iterator it = m_modules.begin(); it != m_modules.end();)
+	{
+		FEModule* pfi = *it;
+        int alloc = pfi->GetAllocID();
+		if (pfi->GetAllocID() == alloc_id)
+		{
+			it = m_modules.erase(it);
+		}
+		else ++it;
+	}
+}
+
 //-----------------------------------------------------------------------------
 //! set the current allocator ID
 void FECoreKernel::SetAllocatorID(int alloc_id)
@@ -669,6 +684,7 @@ bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char
 		pmodule->SetName(szmod);
 		pmodule->SetID(newID);
 		pmodule->SetDescription(description);
+        pmodule->SetAllocID(m_alloc_id);
 		m_modules.push_back(pmodule);
 
 		// make this the active module

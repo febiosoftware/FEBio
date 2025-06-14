@@ -175,6 +175,8 @@ int FEBioApp::RunModel()
 
 	fem.SetAppendOnRestart(m_ops.bappendFiles);
 
+	if (!m_ops.boutputLog) fem.SetLogLevel(0);
+
 	// read the input file if specified
 	int nret = 0;
 	if (m_ops.szfile[0])
@@ -378,6 +380,10 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		else if (strcmp(sz, "-no_title") == 0)
 		{
 			ops.bupdateTitle = false;
+		}
+		else if (strcmp(sz, "-no_log") == 0)
+		{
+			ops.boutputLog = false;
 		}
 		else if (strcmp(sz, "-cnf") == 0)	// obsolete: use -config instead
 		{

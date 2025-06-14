@@ -40,6 +40,7 @@ struct FEBIOLIB_API CMDOPTIONS
 	bool	binteractive;		//!< start FEBio interactively
 	bool	bappendFiles;		//!< append plot and log files on restart?
 	bool	bupdateTitle;		//!< update the console title with progress info
+	bool	boutputLog;			//!< write a log file
 
 	int		dumpLevel;		//!< requested restart level
 	int		dumpStride;		//!< (cold) restart file stride
@@ -68,6 +69,7 @@ struct FEBIOLIB_API CMDOPTIONS
 		dumpStride = 1;
 		bappendFiles = true;
 		bupdateTitle = true;
+		boutputLog = true;
 
 		szfile[0] = 0;
 		szlog[0] = 0;

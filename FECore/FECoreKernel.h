@@ -104,6 +104,9 @@ public:
 	//! unregister factories from allocator
 	void UnregisterFactories(int alloc_id);
 
+    //! unregister modules from allocator
+	void UnregisterModules(int alloc_id);
+
 	//! set the current allocator ID
 	void SetAllocatorID(int alloc_id);
 

@@ -82,6 +82,16 @@ int FEModule::GetModuleID() const
 	return im->id;
 }
 
+void FEModule::SetAllocID(int id)
+{
+    im->alloc_id = id;
+}
+
+int FEModule::GetAllocID() const
+{
+    return im->alloc_id;
+}
+
 const char* FEModule::GetName() const
 {
 	return im->szname;
