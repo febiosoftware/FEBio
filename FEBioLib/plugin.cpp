@@ -63,12 +63,12 @@ bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return (FreeLibrary(ph) == TRUE); }
 #ifdef LINUX
 FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
 void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
-bool UnloadPlugin(FEBIO_PLUGIN_HANDLE) { return true; }
+bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return dlclose(ph) == 0; }
 #endif
 #ifdef __APPLE__
 FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
 void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
-bool UnloadPlugin(FEBIO_PLUGIN_HANDLE) { return true; }
+bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return dlclose(ph) == 0; }
 #endif
 
 //=============================================================================
@@ -241,6 +241,9 @@ void FEBioPlugin::UnLoad()
 		// remove all features from the kernel that were added by the plugin
 		FECoreKernel& febio = FECoreKernel::GetInstance();
 		febio.UnregisterFactories(m_allocater_id);
+
+        // unregister the modules from the kernel that were added by the plugin
+        febio.UnregisterModules(m_allocater_id);
 
 		// unload the plugin from memory
 		bool b = UnloadPlugin(m_ph);
