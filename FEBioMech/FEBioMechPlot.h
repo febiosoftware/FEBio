@@ -1621,6 +1621,15 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Rotational dissipative energy of Maxwell dashpot for SIV viscoelasticity
+class FEPlotSIVDashpotSEw : public FEPlotDomainData
+{
+public:
+    FEPlotSIVDashpotSEw(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 
 //=============================================================================
 //                            E D G E   D A T A

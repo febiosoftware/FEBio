@@ -54,6 +54,7 @@ public:
     
 public:
     double  m_alpha;                //!< calculated alpha (for display purposes only)
+    double  m_alphap;               //!< calculated alpha at previoust time point
     mat3ds  m_U;                    //!< parallel spring stretch tensor at current time
     mat3ds  m_Up;                   //!< parallel spring stretch tensor at previous time
     mat3d   m_R;                    //!< rotation tensor at current time
@@ -64,6 +65,7 @@ public:
     mat3ds  m_Ud, m_Udp;
     mat3ds  m_Us, m_Usp;
     mat3d   m_Omega, m_Omegap;
+    double  m_SEw;
 };
 
 

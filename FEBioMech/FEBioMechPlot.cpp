@@ -5114,6 +5114,27 @@ bool FEPlotSIVDashpotRightStretch::Save(FEDomain& dom, FEDataStream& a)
     return true;
 }
 
+class FESIVDashpotSEw
+{
+public:
+    float operator()(const FEMaterialPoint& mp)
+    {
+        const FESIVQLVMaterialPoint* pt = mp.ExtractData<FESIVQLVMaterialPoint>();
+        if (pt == 0) return 0;
+            
+        return pt->m_SEw;
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotSIVDashpotSEw::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<double>(dom, a, FESIVDashpotSEw());
+    return true;
+}
+
 
 bool FEPlotEdgeContactGap::Save(FEEdge& edge, FEDataStream& a)
 {
