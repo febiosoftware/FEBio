@@ -116,6 +116,7 @@ void FESIVQLVMaterialPoint::Serialize(DumpStream& ar)
     ar & m_Udot & m_Udotp;
     ar & m_Omega & m_Omegap;
     ar & m_SEw;
+    ar & m_alpha & m_alphap;
 }
 
 //-----------------------------------------------------------------------------
