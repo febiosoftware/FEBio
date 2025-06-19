@@ -78,6 +78,7 @@ SOFTWARE.*/
 #include "FEHuiskesSupply.h"
 #include "FEIncompNeoHookean.h"
 #include "FEIsotropicElastic.h"
+#include "FEIsoHencky.h"
 #include "FEMooneyRivlin.h"
 #include "FEMooneyRivlinAD.h"
 #include "FEMRVonMisesFibers.h"
@@ -348,6 +349,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEHolmesMowUC, "uncoupled Holmes-Mow");
     REGISTER_FECORE_CLASS(FEHolzapfelUnconstrained, "HGO unconstrained");
 	REGISTER_FECORE_CLASS(FEIsotropicElastic, "isotropic elastic");
+    REGISTER_FECORE_CLASS(FEIsoHencky, "isotropic Hencky");
 	REGISTER_FECORE_CLASS(FECoupledMooneyRivlin, "coupled Mooney-Rivlin");
 	REGISTER_FECORE_CLASS(FECoupledVerondaWestmann, "coupled Veronda-Westmann");
 	REGISTER_FECORE_CLASS(FENaturalNeoHookean, "natural neo-Hookean");
