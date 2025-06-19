@@ -1,7 +1,7 @@
 %% This BibTeX bibliography file was created using BibDesk.
-%% https://bibdesk.sourceforge.io/
+%% http://bibdesk.sourceforge.net/
 
-%% Created for Gerard Ateshian at 2024-12-12 16:41:35 -0500 
+%% Created for Gerard Ateshian at 2025-06-19 13:53:01 -0400 
 
 
 %% Saved with string encoding Unicode (UTF-8) 
@@ -10,6 +10,18 @@
 @comment{jabref-meta: databaseType:bibtex;}
 
 
+
+@article{Xiao02,
+	author = {Xiao, H and Chen, LS},
+	date-added = {2025-06-19 13:52:52 -0400},
+	date-modified = {2025-06-19 13:53:00 -0400},
+	journal = {Acta Mechanica},
+	number = {1},
+	pages = {51--60},
+	publisher = {Springer},
+	title = {Hencky's elasticity model and linear stress-strain relations in isotropic finite hyperelasticity},
+	volume = {157},
+	year = {2002}}
 
 @article{Coleman61,
 	author = {Coleman, Bernard D and Noll, Walter},
@@ -2551,37 +2563,39 @@
 	bdsk-url-2 = {https://doi.org/10.1016/j.jmbbm.2022.105342}}
 
 @article{rauff_nonparametric_2022,
-	title = {A {Nonparametric} {Approach} for {Estimating} {Three}-{Dimensional} {Fiber} {Orientation} {Distribution} {Functions} ({ODFs}) in {Fibrous} {Materials}},
-	volume = {41},
-	issn = {1558-254X},
-	url = {https://ieeexplore.ieee.org/document/9548066},
-	doi = {10.1109/TMI.2021.3115716},
 	abstract = {Many biological tissues contain an underlying fibrous microstructure that is optimized to suit a physiological function. The fiber architecture dictates physical characteristics such as stiffness, diffusivity, and electrical conduction. Abnormal deviations of fiber architecture are often associated with disease. Thus, it is useful to characterize fiber network organization from image data in order to better understand pathological mechanisms. We devised a method to quantify distributions of fiber orientations based on the Fourier transform and the Qball algorithm from diffusion MRI. The Fourier transform was used to decompose images into directional components, while the Qball algorithm efficiently converted the directional data from the frequency domain to the orientation domain. The representation in the orientation domain does not require any particular functional representation, and thus the method is nonparametric. The algorithm was verified to demonstrate its reliability and used on datasets from microscopy to show its applicability. This method increases the ability to extract information of microstructural fiber organization from experimental data that will enhance our understanding of structure-function relationships and enable accurate representation of material anisotropy in biological tissues.},
-	number = {2},
-	urldate = {2025-01-10},
-	journal = {IEEE Transactions on Medical Imaging},
 	author = {Rauff, Adam and Timmins, Lucas H. and Whitaker, Ross T. and Weiss, Jeffrey A.},
-	month = feb,
-	year = {2022},
-	note = {Conference Name: IEEE Transactions on Medical Imaging},
-	keywords = {Fibers, Fourier transform, Fourier transforms, Image resolution, Magnetic resonance imaging, nonparametric distributions, Optical fiber dispersion, Optical fiber networks, Optical fiber polarization, orientation distribution function (ODF), Three-dimensional displays},
-	pages = {446--455},
+	doi = {10.1109/TMI.2021.3115716},
 	file = {IEEE Xplore Abstract Record:/home/mherron/Zotero/storage/E338ZCUL/9548066.html:text/html;PubMed Central Full Text PDF:/home/mherron/Zotero/storage/JC837KWX/Rauff et al. - 2022 - A Nonparametric Approach for Estimating Three-Dimensional Fiber Orientation Distribution Functions (.pdf:application/pdf},
-}
+	issn = {1558-254X},
+	journal = {IEEE Transactions on Medical Imaging},
+	keywords = {Fibers, Fourier transform, Fourier transforms, Image resolution, Magnetic resonance imaging, nonparametric distributions, Optical fiber dispersion, Optical fiber networks, Optical fiber polarization, orientation distribution function (ODF), Three-dimensional displays},
+	month = feb,
+	note = {Conference Name: IEEE Transactions on Medical Imaging},
+	number = {2},
+	pages = {446--455},
+	title = {A {Nonparametric} {Approach} for {Estimating} {Three}-{Dimensional} {Fiber} {Orientation} {Distribution} {Functions} ({ODFs}) in {Fibrous} {Materials}},
+	url = {https://ieeexplore.ieee.org/document/9548066},
+	urldate = {2025-01-10},
+	volume = {41},
+	year = {2022},
+	bdsk-url-1 = {https://ieeexplore.ieee.org/document/9548066},
+	bdsk-url-2 = {https://doi.org/10.1109/TMI.2021.3115716}}
 
 @article{rauff_algorithmic_2024,
-	title = {An algorithmic and software framework to incorporate orientation distribution functions in finite element simulations for biomechanics and biophysics},
-	issn = {1742-7061},
-	url = {https://www.sciencedirect.com/science/article/pii/S1742706124007074},
-	doi = {10.1016/j.actbio.2024.11.043},
 	abstract = {Biological tissues and biomaterials routinely feature a fibrous microstructure that contributes to physical and mechanical properties while influencing cellular guidance, organization and extracellular matrix (ECM) production. Specialized three-dimensional (3D) imaging techniques can visualize fibrillar structure and orientation, and previously we developed a nonparametric approach to extract orientation distribution functions (ODFs) directly from 3D image data [1]. In this work, we expanded our previous approach to provide a complete algorithmic and software framework to characterize inhomogeneous ODFs in image data and use ODFs to model the physics of materials with the finite element method. We characterized inhomogeneity using image subdomains and specialized interpolation methods, and we developed methods to incorporate ODFs directly into constitutive models. To facilitate its adoption by the biomechanics and biophysics communities, we developed a unified software framework in FEBio Studio (www.febio.org). This included new interpolation methods to spatially map the ODFs onto finite element meshes and an approach to downsample ODFs for efficient numerical calculations. The software provides the option to fit ODFs to parametric distributions, and scalar metrics provide means to assess goodness of fit. We evaluated the utility and accuracy of the algorithms and implementation using representative 3D image datasets. Our results demonstrated that utilizing the true measured ODFs provide a more accurate and spatially resolved representation of fiber ODFs and the resulting predicted mechanical response when compared with parametric approaches to approximating the true ODFs. This research provides a powerful, interactive software framework to extract and represent the inhomogeneous anisotropic characteristics of fibrous tissues directly from image data, and to incorporate them into biomechanics and biophysics simulations using the finite element method.
 Statement of Significance
 Biological tissues and biomaterials routinely feature a fibrous microstructure that contributes to physical and mechanical properties while influencing cellular guidance, organization and extracellular matrix (ECM) production. In this study, we developed a complete algorithmic and software framework to characterize inhomogeneous orientation distribution functions (ODFs) directly from biomedical image data and apply the ODFs to model the physics of biological materials. We characterized inhomogeneity using image subdomains and specialized interpolation methods, and we developed methods to incorporate ODFs directly into constitutive models. We developed a unified software framework in FEBio Studio (www.febio.org) to accommodate its adoption by the biomechanics and biophysics communities. The result is a powerful, interactive software framework to extract and represent inhomogeneous, anisotropic characteristics directly from image data, and incorporate them into biomechanics and biophysics simulations.},
-	urldate = {2025-01-10},
-	journal = {Acta Biomaterialia},
 	author = {Rauff, Adam and Herron, Michael R. and Maas, Steve A. and Weiss, Jeffrey A.},
-	month = nov,
-	year = {2024},
-	keywords = {Anisotropy, FEBio, Finite element analysis, Image analysis, Multiscale modeling, Orientation distribution function},
+	doi = {10.1016/j.actbio.2024.11.043},
 	file = {ScienceDirect Snapshot:/home/mherron/Zotero/storage/Y72ZR633/S1742706124007074.html:text/html},
-}
+	issn = {1742-7061},
+	journal = {Acta Biomaterialia},
+	keywords = {Anisotropy, FEBio, Finite element analysis, Image analysis, Multiscale modeling, Orientation distribution function},
+	month = nov,
+	title = {An algorithmic and software framework to incorporate orientation distribution functions in finite element simulations for biomechanics and biophysics},
+	url = {https://www.sciencedirect.com/science/article/pii/S1742706124007074},
+	urldate = {2025-01-10},
+	year = {2024},
+	bdsk-url-1 = {https://www.sciencedirect.com/science/article/pii/S1742706124007074},
+	bdsk-url-2 = {https://doi.org/10.1016/j.actbio.2024.11.043}}
