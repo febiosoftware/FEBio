@@ -110,7 +110,7 @@ bool FEBiphasic::Init()
     if (!m_pPerm->Init()) return false;
     if (m_pSupp && !m_pSupp->Init()) return false;
     if (m_pAmom && !m_pAmom->Init()) return false;
-    return true;
+    return FEMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
