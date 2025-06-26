@@ -28,73 +28,73 @@ SOFTWARE.*/
 #include "quatd.h"
 
 //-----------------------------------------------------------------------------
-// Class that defines an affine transformation (scale, rotate, translate).
-// This currently applies the transformation as follows: 
-// 1. scale : the scale is applied in the local coordinate system
-// 2. rotate: rotation from local to global coordinates
-// 3. translate: translate to a global position
-// 
+//! Class that defines an affine transformation (scale, rotate, translate).
+//! This currently applies the transformation as follows: 
+//! 1. scale : the scale is applied in the local coordinate system
+//! 2. rotate: rotation from local to global coordinates
+//! 3. translate: translate to a global position
+//! 
 class Transform
 {
 public:
 	FECORE_API Transform();
 
-	// Reset the transform
+	//! Reset the transform
 	FECORE_API void Reset();
 
-	// set the scale factors
+	//! set the scale factors
 	FECORE_API void SetScale(double sx, double sy, double sz);
 
-	// set the scale of the object
+	//! set the scale of the object
 	void SetScale(const vec3d& s) { m_scl = s; }
 
 	//! get scale of the object
 	const vec3d& GetScale() const { return m_scl; }
 
-	// set the position (or translation)
+	//! set the position (or translation)
 	FECORE_API void SetPosition(const vec3d& t);
 
-	// get position of object
+	//! get position of object
 	const vec3d& GetPosition() const { return m_pos; }
 
-	// set the rotation quaternion
+	//! set the rotation quaternion
 	FECORE_API void SetRotation(const quatd& q);
 
-	// set the rotation vector (uses degrees)
+	//! set the rotation vector (uses degrees)
 	FECORE_API void SetRotation(const vec3d& r);
 
-	// set rotation via Euler angles Tait-Bryan (Z,Y,X) convention (in degrees)
+	//! set rotation via Euler angles Tait-Bryan (Z,Y,X) convention (in degrees)
 	FECORE_API void SetRotation(double X, double Y, double Z);
 
 	//! get orientation
 	const quatd& GetRotation() const { return m_rot; }
 
-	// get inverse of rotation
+	//! get inverse of rotation
 	quatd GetRotationInverse() const { return m_roti; }
 
-	// apply transformation
+	//! apply transformation
 	FECORE_API vec3d Apply(const vec3d& r) const;
 
-	// translate the transform
+	//! translate the transform
 	void Translate(const vec3d& dr);
 
-	// scale an object
+	//! scale an object
 	void Scale(double s, vec3d r, vec3d rc);
 
-	// rotate around the center rc
+	//! rotate around the center rc
 	void Rotate(quatd q, vec3d rc);
 
-	// Rotate angle w around an axis defined by the position vectors a, b.
+	//! Rotate angle w around an axis defined by the position vectors a, b.
 	void Rotate(const vec3d& a, const vec3d& b, double w);
 
-	// comparison
+	//! comparison
 	bool operator == (const Transform& T) const;
 
 public:
-	// convert from local to global coordinates
+	//! convert from local to global coordinates
 	vec3d LocalToGlobal(const vec3d& r) const;
 
-	// convert from global to local coordinates
+	//! convert from global to local coordinates
 	vec3d GlobalToLocal(const vec3d& r) const;
 
 	//! get a normal-like vector from global to local
@@ -104,10 +104,10 @@ public:
 	vec3d GlobalToLocalNormal(const vec3d& n) const;
 
 private:
-	vec3d	m_scl;		// scale factors
-	vec3d	m_pos;		// translation (global space)
-	quatd	m_rot;		// rotation
-	quatd	m_roti;		// inverse rotation
+	vec3d	m_scl;		//! scale factors
+	vec3d	m_pos;		//! translation (global space)
+	quatd	m_rot;		//! rotation
+	quatd	m_roti;		//! inverse rotation
 };
 
 inline bool Transform::operator == (const Transform& T) const
@@ -117,13 +117,13 @@ inline bool Transform::operator == (const Transform& T) const
 
 inline void Transform::Translate(const vec3d& dr) { m_pos += dr; }
 
-// convert from local to global coordinates
+//! convert from local to global coordinates
 inline vec3d Transform::LocalToGlobal(const vec3d& r) const
 {
 	return m_pos + m_rot * vec3d(r.x * m_scl.x, r.y * m_scl.y, r.z * m_scl.z);
 }
 
-// convert from global to local coordinates
+//! convert from global to local coordinates
 inline vec3d Transform::GlobalToLocal(const vec3d& r) const
 {
 	vec3d p = m_roti * (r - m_pos);
@@ -149,7 +149,7 @@ inline vec3d Transform::GlobalToLocalNormal(const vec3d& n) const
 	return m;
 }
 
-// scale 
+//! scale 
 inline void Transform::Scale(double s, vec3d r, vec3d rc)
 {
 	vec3d r0 = GlobalToLocal(rc);
@@ -169,7 +169,7 @@ inline void Transform::Scale(double s, vec3d r, vec3d rc)
 	m_pos -= LocalToGlobal(r0) - rc;
 }
 
-// rotate around the center rc
+//! rotate around the center rc
 inline void Transform::Rotate(quatd q, vec3d rc)
 {
 	m_rot = q * m_rot;
@@ -181,7 +181,7 @@ inline void Transform::Rotate(quatd q, vec3d rc)
 	m_pos = rc + q * (m_pos - rc);
 }
 
-// Rotate angle w around an axis defined by the position vectors a, b.
+//! Rotate angle w around an axis defined by the position vectors a, b.
 inline void Transform::Rotate(const vec3d& a, const vec3d& b, double w)
 {
 	double wr = PI * w / 180.0;

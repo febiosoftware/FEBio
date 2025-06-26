@@ -92341,6 +92341,641 @@ where
 \end_layout
 
 \begin_layout Section
+Reactive Fatigue
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reactive-Fatigue"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reactive fatigue is a framework that leverages the reactive damage framework described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ In reactive damage,
+ the intact bonds of an elastic material may break upon loading,
+ causing damage.
+ This single reactive process governs reactive damage.
+ In reactive fatigue we assume that three reactions may take place simultaneously:
+ (1) Intact bonds of an elastic material may break in response to loading (
+\emph on
+elastic damage
+\emph default
+),
+ (2) Intact bonds of an elastic material may fatigue in response to repetitive loading,
+ thereby reducing their damage threshold but maintaining their elasticity,
+ and (3) Fatigued bonds of elastic material may break in response to loading (
+\emph on
+fatigue damage
+\emph default
+).
+ The two damage reactions (1 and 3 in this list) behave identically with reactive damage materials described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Damage-Mechanics"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Thus,
+ each of these reactions requires a cumulative distribution function (CDF,
+ Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Cumulative-Distribution-Function"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) which provides the probability that bonds will break at a given threshold of the damage criterion 
+\begin_inset Formula $\Xi$
+\end_inset
+
+ (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Damage-Yield-Criterion"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ It is the user's responsibility to ensure that the CDF of fatigued bonds produces failure at a lesser threshold than the CDF of elastic bonds.
+\end_layout
+
+\begin_layout Standard
+The fatigue reaction (2 in the list given above) progresses with a reaction rate
+\begin_inset Formula 
+\[
+k^{if}=k_{0}^{if}\left(\left|\dot{\Xi}^{i}\right|w^{b}\right)^{\beta}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $k_{0}^{if}$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta$
+\end_inset
+
+ are user-specified parameters.
+ 
+\begin_inset Formula $\dot{\Xi}^{i}$
+\end_inset
+
+ is the time rate of change of the damage criterion 
+\begin_inset Formula $\Xi^{i}$
+\end_inset
+
+ of intact bonds of the elastic solid,
+ whereas 
+\begin_inset Formula $w^{b}$
+\end_inset
+
+ is the mass fraction of broken bonds in the elastic solid (also known as the 
+\emph on
+damage
+\emph default
+ 
+\begin_inset Formula $D$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Remarks:
+
+\emph default
+ The parameter 
+\begin_inset Formula $k_{0}^{if}$
+\end_inset
+
+ determines the rate at which the fatigue reaction proceeds,
+ for a given 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ Decreasing 
+\begin_inset Formula $k_{0}^{if}$
+\end_inset
+
+ shifts the 
+\begin_inset Formula $S-N$
+\end_inset
+
+ curve (failure stress versus number of cycles) to the right.
+ The parameter 
+\begin_inset Formula $\beta$
+\end_inset
+
+ affects the shape of the 
+\begin_inset Formula $S-N$
+\end_inset
+
+ curve,
+ for a given 
+\begin_inset Formula $k_{0}^{if}$
+\end_inset
+
+.
+ Increasing 
+\begin_inset Formula $\beta$
+\end_inset
+
+ causes the 
+\begin_inset Formula $S-N$
+\end_inset
+
+ curve to become more sigmoidal.
+ It is acceptable to use the same criterion for elastic and fatigue damage.
+ To model fatigue failure,
+ the CDF for fatigue damage should be to the left of the CDF for elastic damage on a CDF vs 
+\begin_inset Formula $\Xi$
+\end_inset
+
+ graph (i.e.,
+ amount of damage at a given 
+\begin_inset Formula $\Xi$
+\end_inset
+
+ should be lower for elastic damage than for fatigue damage,
+ 
+\begin_inset Formula $F^{i}\left(\Xi\right)<F^{f}\left(\Xi\right)$
+\end_inset
+
+).
+ The fatigue reaction may not be initiated unless some elastic damage has taken place,
+ since 
+\begin_inset Formula $k^{if}=0$
+\end_inset
+
+ when 
+\begin_inset Formula $w^{b}=0$
+\end_inset
+
+.
+ However,
+ the amount of elastic damage needed to initiate the fatigue reaction may be very small,
+ 
+\begin_inset Formula $w^{b}\ll1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+General Specification of Reactive Fatigue Material
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:General-Specification-Fatigue"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material types for reactive fatigue materials are 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+reactive fatigue
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+ and 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+uncoupled reactive fatigue
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k0>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the reaction rate constant 
+\begin_inset Formula $k_{0}^{if}$
+\end_inset
+
+ for the fatigue reaction (units vary)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<beta>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the power exponent 
+\begin_inset Formula $\beta$
+\end_inset
+
+ for the fatigue reaction (
+\begin_inset Formula $\beta>0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic material
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic_damage>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the cumulative distribution function 
+\begin_inset Formula $F^{i}\left(\Xi^{i}\right)$
+\end_inset
+
+ for damage of intact bonds
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<fatigue_damage>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the cumulative distribution function 
+\begin_inset Formula $F^{f}\left(\Xi^{f}\right)$
+\end_inset
+
+ for damage of fatigue bonds
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<elastic_criterion>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the elastic damage criterion 
+\begin_inset Formula $\Xi^{i}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<fatigue_criterion>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Specification of the fatigue damage criterion 
+\begin_inset Formula $\Xi^{f}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The <elastic> tag encloses a description of the constitutive relation of the intact elastic material and associated material properties,
+ as may be selected from the list provided in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Unconstrained-Materials"
+nolink "false"
+
+\end_inset
+
+ for unconstrained materials (used with 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+elastic damage
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+) and Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Uncoupled-Materials"
+nolink "false"
+
+\end_inset
+
+ for uncoupled materials (used with 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+uncoupled elastic damage
+\begin_inset Quotes erd
+\end_inset
+
+
+\shape default
+).
+ The <elastic_damage> or <fatigue_damage> tags enclose a description of the cumulative distribution function and associated material properties for elastic or fatigue damage,
+ as may be selected from the list presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Cumulative-Distribution-Function"
+nolink "false"
+
+\end_inset
+
+.
+ The <elastic_criterion> and <fatigue_criterion> tags enclose a description of the damage criterion for intact and fatigued bonds of the elastic solid,
+ as may be selected from the list presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Damage-Yield-Criterion"
+nolink "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<material id="1" type="elastic damage">
+\end_layout
+
+\begin_layout LyX-Code
+  <k0>0.001</k0>
+\end_layout
+
+\begin_layout LyX-Code
+  <beta>2</beta>
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic type="neo-Hookean">
+\end_layout
+
+\begin_layout LyX-Code
+    <density>1</density>
+\end_layout
+
+\begin_layout LyX-Code
+    <E>200000</E>
+\end_layout
+
+\begin_layout LyX-Code
+    <v>0.3</v>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic>
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic_damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>20</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <mu>200</mu>
+\end_layout
+
+\begin_layout LyX-Code
+    <Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+  </elastic_damage>
+\end_layout
+
+\begin_layout LyX-Code
+  <fatigue_damage type="CDF Weibull">
+\end_layout
+
+\begin_layout LyX-Code
+    <alpha>10</alpha>
+\end_layout
+
+\begin_layout LyX-Code
+    <mu>100</mu>
+\end_layout
+
+\begin_layout LyX-Code
+    <Dmax>1</Dmax>
+\end_layout
+
+\begin_layout LyX-Code
+  </fatigue_damage>
+\end_layout
+
+\begin_layout LyX-Code
+  <elastic_criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+  <fatigue_criterion type="DC von Mises stress"/>
+\end_layout
+
+\begin_layout LyX-Code
+</material>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 Reactive Plasticity
 \begin_inset CommandInset label
 LatexCommand label

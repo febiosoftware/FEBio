@@ -259,7 +259,11 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
             crossExecProcess(DEVCOMMIT)
             
             if(${SUCCESS} EQUAL 0)
-                target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
+                set_source_files_properties(
+                    FEBioLib/version.cpp
+                    PROPERTIES
+                    COMPILE_DEFINITIONS "DEVCOMMIT=\"${DEVCOMMIT}\""
+                )
             endif()
         endif()
     else()
