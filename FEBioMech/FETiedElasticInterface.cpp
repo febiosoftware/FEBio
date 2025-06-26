@@ -352,9 +352,9 @@ void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
                         lm[ndpn*l  ] = id[dof_X];
                         lm[ndpn*l+1] = id[dof_Y];
                         lm[ndpn*l+2] = id[dof_Z];
-                        lm[ndpn*l+4] = id[dof_RU];
-                        lm[ndpn*l+5] = id[dof_RV];
-                        lm[ndpn*l+6] = id[dof_RW];
+                        lm[ndpn*l+3] = id[dof_RU];
+                        lm[ndpn*l+4] = id[dof_RV];
+                        lm[ndpn*l+5] = id[dof_RW];
                     }
                     
                     for (l=0; l<nmeln; ++l)
@@ -363,9 +363,9 @@ void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
                         lm[ndpn*(l+nseln)  ] = id[dof_X];
                         lm[ndpn*(l+nseln)+1] = id[dof_Y];
                         lm[ndpn*(l+nseln)+2] = id[dof_Z];
-                        lm[ndpn*(l+nseln)+4] = id[dof_RU];
-                        lm[ndpn*(l+nseln)+5] = id[dof_RV];
-                        lm[ndpn*(l+nseln)+6] = id[dof_RW];
+                        lm[ndpn*(l+nseln)+3] = id[dof_RU];
+                        lm[ndpn*(l+nseln)+4] = id[dof_RV];
+                        lm[ndpn*(l+nseln)+5] = id[dof_RW];
                     }
                     
                     K.build_add(lm);
