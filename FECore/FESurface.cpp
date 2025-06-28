@@ -200,11 +200,14 @@ void FESurface::Update(const FETimeInfo& tp)
 
 			double* Gr = el.Gr(n);
 			double* Gs = el.Gs(n);
+            double* H = el.H(n);
 
+            mp.m_rt = vec3d(0,0,0);
 			mp.dxr = vec3d(0, 0, 0);
 			mp.dxs = vec3d(0, 0, 0);
 			for (int i = 0; i < neln; ++i)
 			{
+                mp.m_rt += rt[i] * H[i];
 				mp.dxr += rt[i] * Gr[i];
 				mp.dxs += rt[i] * Gs[i];
 			}
@@ -317,6 +320,7 @@ bool FESurface::Init()
 			}
 
 			pt->m_r0 = rn;
+            pt->m_rt = pt->m_rp = rn;
 
 			// calculate initial surface tangents
 			double* Gr = el.Gr(n);
@@ -762,6 +766,14 @@ void FESurface::NodalCoordinates(FESurfaceElement& el, vec3d* re)
 	int ne = el.Nodes();
 	if (!m_bshellb) for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).m_rt;
     else for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).st();
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::PreviousNodalCoordinates(FESurfaceElement& el, vec3d* re)
+{
+    int ne = el.Nodes();
+    if (!m_bshellb) for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).m_rp;
+    else for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).sp();
 }
 
 //-----------------------------------------------------------------------------

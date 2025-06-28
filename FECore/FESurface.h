@@ -47,10 +47,16 @@ class FECORE_API FESurfaceMaterialPoint : public FEMaterialPoint
 {
 public:
 	vec3d	dxr, dxs;		// tangent vectors at material point
+    vec3d   m_rp;
 
 	// return the surface element
 	FESurfaceElement* SurfaceElement() { return (FESurfaceElement*)m_elem; }
 
+    void Update(const FETimeInfo& tp) override
+    {
+        m_rp = m_rt;
+    }
+    
 	void Serialize(DumpStream& ar) override
 	{
 		FEMaterialPoint::Serialize(ar);
@@ -176,6 +182,9 @@ public:
     
 	//! Get the nodal coordinates of an element
 	void NodalCoordinates(FESurfaceElement& el, vec3d* re);
+    
+    //! Get the nodal coordinates of an element at previoust time
+    void PreviousNodalCoordinates(FESurfaceElement& el, vec3d* re);
     
     //! Determine if a face on this surface is pointing away or into a specified element
     double FacePointing(FESurfaceElement& se, FEElement& el);
