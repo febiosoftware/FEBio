@@ -180,6 +180,7 @@ SOFTWARE.*/
 #include "FEPressureLoad.h"
 #include "FEPressureRobinBC.h"
 #include "FETractionLoad.h"
+#include "FETractionRobinBC.h"
 #include "FESurfaceForceUniform.h"
 #include "FEBearingLoad.h"
 #include "FEIdealGasPressure.h"
@@ -660,6 +661,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
 	REGISTER_FECORE_CLASS(FEIdealGasPressure, "ideal gas pressure");
     REGISTER_FECORE_CLASS(FEPressureRobinBC, "pressure Robin BC");
+    REGISTER_FECORE_CLASS(FETractionRobinBC, "traction Robin BC");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
