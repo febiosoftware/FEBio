@@ -29972,6 +29972,321 @@ Example
 \end_layout
 
 \begin_layout Subsubsection
+Pressure Robin BC
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Pressure-Robin-BC"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ is prescribed normal to a surface (along 
+\begin_inset Formula $-\mathbf{n}$
+\end_inset
+
+),
+ which is proportional to the surface normal displacement 
+\begin_inset Formula $u_{n}=\mathbf{u}\cdot\mathbf{n}$
+\end_inset
+
+ and its normal velocity 
+\begin_inset Formula $v_{n}=\dot{\mathbf{u}}\cdot\mathbf{n}$
+\end_inset
+
+,
+ according to
+\begin_inset Formula 
+\[
+p=\begin{cases}
+\varepsilon_{k}u_{n}+\varepsilon_{c}v_{n} & u_{n}>0\\
+0 & u_{n}\le0
+\end{cases}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{k}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{c}$
+\end_inset
+
+ are user-specified measures of surface stiffness and damping,
+ respectively.
+ These pressure forces are also 
+\shape italic
+follower forces
+\shape default
+;
+ they change direction as the body is deformed and,
+ in this case,
+ are always oriented along the local surface normal.
+ The sign convention is so that a positive pressure will act opposite to the normal,
+ so it will compress the material.
+ The surface that the load is applied to is specified with the 
+\emph on
+surface 
+\emph default
+attribute.The surface must be defined in the 
+\emph on
+Mesh
+\shape italic
+\emph default
+ 
+\shape default
+section.
+ Note that this boundary condition is only meaningful to resist the expansion of a surface along its normal,
+ since the pressure 
+\begin_inset Formula $p$
+\end_inset
+
+ is set to zero when the surface motion is inward (
+\begin_inset Formula $u_{n}\le0$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+spring_eps
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The parameter 
+\begin_inset Formula $\varepsilon_{k}$
+\end_inset
+
+,
+ with units of pressure per length
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 [
+\series bold
+P
+\series default
+/
+\series bold
+L
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+dashpot_eps
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The parameter 
+\begin_inset Formula $\varepsilon_{c}$
+\end_inset
+
+,
+ with units of pressure per speed
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 [P•
+\series bold
+T
+\series default
+/
+\series bold
+L
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell_bottom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell bottom flag (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+When the 
+\emph on
+shell_bottom
+\emph default
+ flag is set to 1,
+ the surface is assumed to be a shell surface and the pressure is applied to the bottom part of the shell surface.
+\end_layout
+
+\begin_layout Enumerate
+The formulation of this pressure load requires a non-symmetric stiffness matrix.
+ It is the user's responsibility to set the solver stiffness matrix to non-symmetric.
+\end_layout
+
+\begin_layout Enumerate
+The user-specified values of 
+\begin_inset Formula $\varepsilon_{k}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{c}$
+\end_inset
+
+ are highly dependend on the model being examined,
+ thus users must carefully determine appropriate values for either parameter.
+\end_layout
+
+\begin_layout Enumerate
+This formulation may be employed in quasi-static and dynamic analyses.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="pressure Robin BC" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <spring_eps>50</spring_eps>
+\end_layout
+
+\begin_layout LyX-Code
+  <dashpot_eps>5</dashpot_eps>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
+\end_layout
+
+\begin_layout Subsubsection
 Traction Load
 \begin_inset CommandInset label
 LatexCommand label
@@ -30031,6 +30346,264 @@ attribute.
 lc 
 \shape default
 attribute is omitted a constant traction load is applied.
+\end_layout
+
+\begin_layout Subsubsection
+Traction Robin BC
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Traction-Robin-BC"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A traction 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
+
+ is applied to a surface,
+ which opposes the surface motion according to
+\begin_inset Formula 
+\[
+\mathbf{t}=-\varepsilon_{k}\mathbf{u}-\varepsilon_{c}\dot{\mathbf{u}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+spring_eps
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The parameter 
+\begin_inset Formula $\varepsilon_{k}$
+\end_inset
+
+,
+ with units of pressure per length
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 [
+\series bold
+P
+\series default
+/
+\series bold
+L
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+dashpot_eps
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The parameter 
+\begin_inset Formula $\varepsilon_{c}$
+\end_inset
+
+,
+ with units of pressure per speed
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 [P•
+\series bold
+T
+\series default
+/
+\series bold
+L
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell_bottom
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+shell bottom flag (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments:
+\end_layout
+
+\begin_layout Enumerate
+When the 
+\emph on
+shell_bottom
+\emph default
+ flag is set to 1,
+ the surface is assumed to be a shell surface and the pressure is applied to the bottom part of the shell surface.
+\end_layout
+
+\begin_layout Enumerate
+The formulation of this traction load requires a non-symmetric stiffness matrix.
+ It is the user's responsibility to set the solver stiffness matrix to non-symmetric.
+\end_layout
+
+\begin_layout Enumerate
+The user-specified values of 
+\begin_inset Formula $\varepsilon_{k}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{c}$
+\end_inset
+
+ are highly dependend on the model being examined,
+ thus users must carefully determine appropriate values for either parameter.
+\end_layout
+
+\begin_layout Enumerate
+This formulation may be employed in quasi-static and dynamic analyses.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example
+\emph default
+:
+\end_layout
+
+\begin_layout LyX-Code
+<surface_load type="traction Robin BC" surface="surface1">
+\end_layout
+
+\begin_layout LyX-Code
+  <spring_eps>50</spring_eps>
+\end_layout
+
+\begin_layout LyX-Code
+  <dashpot_eps>5</dashpot_eps>
+\end_layout
+
+\begin_layout LyX-Code
+</surface_load>
 \end_layout
 
 \begin_layout Subsubsection
