@@ -36,7 +36,7 @@ SOFTWARE.*/
 // Parameter block for pressure loads
 BEGIN_FECORE_CLASS(FEPressureRobinBC, FESurfaceLoad)
 	ADD_PARAMETER(m_epsk   , "spring_eps")->setUnits("P/L");
-	ADD_PARAMETER(m_epsc   , "dashpot_eps")->setUnits("P.T/L");
+	ADD_PARAMETER(m_epsc   , "dashpot_eps")->setUnits("P.t/L");
 	ADD_PARAMETER(m_bshellb , "shell_bottom");
 END_FECORE_CLASS()
 
