@@ -817,6 +817,9 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotInfStrain, "infinitesimal strain");
 	REGISTER_FECORE_CLASS(FEPlotSPRLagrangeStrain, "SPR Lagrange strain");
 	REGISTER_FECORE_CLASS(FEPlotSPRInfStrain, "SPR infinitesimal strain");
+    REGISTER_FECORE_CLASS(FEPlotAlmansiStrain, "Almansi strain");
+    REGISTER_FECORE_CLASS(FEPlotRightCauchyGreen, "right Cauchy-Green");
+    REGISTER_FECORE_CLASS(FEPlotLeftCauchyGreen, "left Cauchy-Green");
     REGISTER_FECORE_CLASS(FEPlotRightStretch, "right stretch");
     REGISTER_FECORE_CLASS(FEPlotLeftStretch, "left stretch");
     REGISTER_FECORE_CLASS(FEPlotRightHencky, "right Hencky");

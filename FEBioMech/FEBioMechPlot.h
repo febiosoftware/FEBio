@@ -1061,6 +1061,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Almansi strain
+class FEPlotAlmansiStrain : public FEPlotDomainData
+{
+public:
+    FEPlotAlmansiStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 // Infinitesimal strain
 class FEPlotInfStrain : public FEPlotDomainData
 {
@@ -1084,6 +1093,24 @@ class FEPlotSPRInfStrain : public FEPlotDomainData
 public:
 	FEPlotSPRInfStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_NODE) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Right Cauchy-Green tensor
+class FEPlotRightCauchyGreen : public FEPlotDomainData
+{
+public:
+    FEPlotRightCauchyGreen(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Left Cauchy-Green tensor
+class FEPlotLeftCauchyGreen : public FEPlotDomainData
+{
+public:
+    FEPlotLeftCauchyGreen(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------

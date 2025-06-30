@@ -52,6 +52,7 @@ public:
 public:
 	mat3ds Strain() const;
 	mat3ds SmallStrain() const;
+    mat3ds AlmansiStrain() const;
 
 	mat3ds RightCauchyGreen() const;
 	mat3ds LeftCauchyGreen () const;

@@ -2623,6 +2623,75 @@ bool FEPlotSPRInfStrain::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //=============================================================================
+//! Store the average Almansi tensor
+class FEAlmansiStrain
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+        
+        return pt->AlmansiStrain();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotAlmansiStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FEAlmansiStrain());
+    return true;
+}
+
+//=============================================================================
+//! Store the average right Cauchy Green tensor
+class FERightCauchyGreen
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+        
+        return pt->RightCauchyGreen();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotRightCauchyGreen::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FERightCauchyGreen());
+    return true;
+}
+
+//=============================================================================
+//! Store the average left Cauchy Green tensor
+class FELeftCauchyGreen
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+        
+        return pt->LeftCauchyGreen();
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotLeftCauchyGreen::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FELeftCauchyGreen());
+    return true;
+}
+
+//=============================================================================
 //! Store the average right stretch
 class FERightStretch
 {

@@ -288,6 +288,15 @@ mat3ds FEElasticMaterialPoint::SmallStrain() const
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the Almansi strain tensor
+mat3ds FEElasticMaterialPoint::AlmansiStrain() const
+{
+    // caculate small strain tensor
+    mat3ds B = LeftCauchyGreen();
+    return (mat3dd(1)-B.inverse())/2.;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the 2nd PK stress from the Cauchy stress stored in the point
 
 mat3ds FEElasticMaterialPoint::pull_back(const mat3ds& A) const
