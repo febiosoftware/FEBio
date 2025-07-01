@@ -17,7 +17,7 @@ jobs:
       runTests: true
       package-name: febio4
       package-sdk: true
-      aws-ami-id: ami-083a9a9faa1d3dddc
+      aws-ami-id: ${{ vars.WINDOWS_AMI }}
       aws-sg-id: sg-0ca7912782cf1538b
       aws-instance-type: c5a.8xlarge
     secrets: inherit
