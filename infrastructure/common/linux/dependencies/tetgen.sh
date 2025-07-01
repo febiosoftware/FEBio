@@ -15,7 +15,7 @@ build_and_install() {
 
 	git clone $git_remote $src_dir
 	pushd "${src_dir}" || exit 1
-	cmake .  -LA -B cmbuild -DCMAKE_INSTALL_PREFIX="/usr/local"
+	cmake .  -LA -B cmbuild -DCMAKE_INSTALL_PREFIX="/usr/local" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_CXX_FLAGS="-fPIC"
 	pushd cmbuild
 	make -j "$(nproc)"
 	sudo make install
