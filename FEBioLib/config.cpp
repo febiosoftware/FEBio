@@ -59,6 +59,7 @@ namespace febio {
 	bool parse_default_linear_solver(XMLTag& tag);
 	bool parse_import(XMLTag& tag);
 	bool parse_import_folder(XMLTag& tag);
+    bool parse_repo_plugins(XMLTag& tag);
 	bool parse_set(XMLTag& tag);
 	bool parse_output_negative_jacobians(XMLTag& tag);
 
@@ -182,6 +183,10 @@ namespace febio {
 		{
 			if (parse_import_folder(tag) == false) return false;
 		}
+        else if (tag == "repo_plugin_xml")
+        {
+            if (parse_repo_plugins(tag) == false) return false;
+        }
 		else if (tag == "output_negative_jacobians")
 		{
 			if (parse_output_negative_jacobians(tag) == false) return false;
@@ -307,6 +312,22 @@ namespace febio {
 		return bok;
 	}
 
+    //-----------------------------------------------------------------------------
+    bool parse_repo_plugins(XMLTag& tag)
+    {
+        // get the file name
+		const char* szfile = tag.szvalue();
+
+		// process any aliases
+		char szbuf[1024] = { 0 };
+		bool bok = process_aliases(szbuf, szfile);
+
+		// load the plugin
+		if (bok) febio::ImportRepoPlugins(szbuf);
+
+		return bok;
+    }
+
 	//-----------------------------------------------------------------------------
 	const char* GetFileTitle(const char* szfile)
 	{
@@ -391,6 +412,51 @@ void ImportPluginFolder(const char* szfolder)
 {
 }
 #endif
+
+void ImportRepoPlugins(const char* szxmlFile)
+{
+    XMLReader xml;
+    if (xml.Open(szxmlFile))
+    {
+        XMLTag tag;
+
+        if(!xml.FindTag("plugins", tag)) return;
+
+        if(!tag.isleaf())
+        {
+            ++tag;
+            do
+            {
+                if(tag == "plugin")
+                {
+                    int ID = tag.AttributeValue("ID", 0);
+
+                    if(!tag.isleaf())
+                    {
+                        ++tag;
+                        do
+                        {
+                            if (tag == "file")
+                            {
+                                int main = tag.AttributeValue("main", 1);
+
+                                std::string filePath;
+                                tag.value(filePath);
+
+                                if(main == 1)
+                                {
+                                    ImportPlugin(filePath.c_str());
+                                }
+                            }
+                            ++tag;
+                        } while(!tag.isend());
+                    }
+                }
+                ++tag;
+            } while(!tag.isend());
+        }
+    }
+}
 
 //-----------------------------------------------------------------------------
 FEBIOLIB_API const char* GetPluginName(int allocId)
