@@ -15034,6 +15034,13 @@ Note that the @part_list is the only specifier that can be used to assign a part
 
 \begin_layout Section
 MeshDomains Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MeshDomains-Section"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -15075,6 +15082,13 @@ section,
 
 \begin_layout Subsection
 SolidDomain Section
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:SolidDomain-Section"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -30266,6 +30280,18 @@ The user-specified values of
 This formulation may be employed in quasi-static and dynamic analyses.
 \end_layout
 
+\begin_layout Enumerate
+This formulation is 
+\emph on
+not frame-invariant!
+
+\emph default
+ Therefore,
+ caution must be used when employing this pressure load (e.g.,
+ do not prescribe this pressure load on a surface undergoing large translations or rotations,
+ or else results will not make sense).
+\end_layout
+
 \begin_layout Standard
 
 \emph on
@@ -30588,6 +30614,18 @@ The user-specified values of
 
 \begin_layout Enumerate
 This formulation may be employed in quasi-static and dynamic analyses.
+\end_layout
+
+\begin_layout Enumerate
+This formulation is 
+\emph on
+not frame-invariant!
+
+\emph default
+ Therefore,
+ caution must be used when employing this traction load (e.g.,
+ do not prescribe this traction load on a surface undergoing large translations or rotations,
+ or else results will not make sense).
 \end_layout
 
 \begin_layout Standard
@@ -56208,10 +56246,31 @@ For these materials,
 \end_inset
 
 0.
+ The computational literature has employed different functional forms for 
+\begin_inset Formula $U\left(J\right)$
+\end_inset
+
+.
+ To compare one's results to literature references that employ a 
+\begin_inset Formula $U\left(J\right)$
+\end_inset
+
+ that differs from the default FEBio formulation,
+ use one of the 
+\begin_inset Quotes eld
+\end_inset
+
+pressure_model
+\begin_inset Quotes erd
+\end_inset
+
+ options listed below.
 \end_layout
 
 \begin_layout Standard
-All of these materials make use of the three-field element described by Simo and Taylor 
+By default,
+ all of these materials make use of three-field elements (when available for a particular element type),
+ as described by Simo and Taylor 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Simo91"
@@ -56224,10 +56283,7 @@ literal "true"
 \end_layout
 
 \begin_layout Standard
-The uncoupled materials and the associated three-field element are very effective for representing nearly incompressible material behavior.
- Fully incompressible behavior can be obtained using an augmented Lagrangian method.
- To use the augmented Lagrangian method for enforcement of the incompressibility constraint to a user-defined tolerance,
- the user must define two additional material parameters:
+The properties that should be specified for all uncoupled materials are:
 \end_layout
 
 \begin_layout Standard
@@ -56280,6 +56336,217 @@ Default
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<k>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bulk modulus 
+\begin_inset Formula $k$
+\end_inset
+
+ appearing in 
+\begin_inset Formula $U\left(J\right)$
+\end_inset
+
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 [
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<pressure_model>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Choose from 0 to 3 for various models (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Comments
+\shape default
+:
+\end_layout
+
+\begin_layout Enumerate
+The pressure models are as follows:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+0:
+ 
+\begin_inset Formula $U\left(J\right)=\frac{k}{2}\left(\ln J\right)^{2}$
+\end_inset
+
+ (FEBio default)
+\end_layout
+
+\begin_layout Enumerate
+1:
+ 
+\begin_inset Formula $U\left(J\right)=\frac{k}{4}\left(J^{2}-2\ln J-1\right)$
+\end_inset
+
+ (Nike3D's Ogden material)
+\end_layout
+
+\begin_layout Enumerate
+2:
+ 
+\begin_inset Formula $U\left(J\right)=\frac{k}{2}\left(J-1\right)^{2}$
+\end_inset
+
+ (ABAQUS)
+\end_layout
+
+\begin_layout Enumerate
+3:
+ 
+\begin_inset Formula $U\left(J\right)=\frac{k}{2}\left(\frac{1}{2}\left(J^{2}-1\right)-\ln J\right)$
+\end_inset
+
+ (Gasser-Ogden-Holzapfel material implementation in ABAQUS)
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+The uncoupled materials and the associated three-field element are very effective for representing nearly incompressible material behavior.
+ Fully incompressible behavior can be obtained (for all uncoupled materials) using an augmented Lagrangian method.
+ To use the three-field element formulation and augmented Lagrangian method,
+ please see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SolidDomain-Section"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ 
+\begin_inset Quotes eld
+\end_inset
+
+three-field-solid
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For enforcement of the incompressibility constraint to a user-defined tolerance,
+ the user must define two material parameters for the three-field-solid:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
@@ -56302,7 +56569,7 @@ Turn augmented Lagrangian on for this material or off (1)
 \begin_inset Text
 
 \begin_layout Plain Layout
-0 (off) 
+0 (off)
 \end_layout
 
 \end_inset
@@ -56331,7 +56598,7 @@ Augmentation tolerance (2)
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.01 
+0.01
 \end_layout
 
 \end_inset
@@ -56346,14 +56613,6 @@ Augmentation tolerance (2)
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-Comments
-\shape default
-:
 \end_layout
 
 \begin_layout Enumerate
@@ -56378,22 +56637,15 @@ The augmentation tolerance determines the convergence condition that is used for
 
  is less than the specified value:
  
-\end_layout
-
-\begin_layout Standard
 \begin_inset Formula 
 \[
-\left|\frac{\left\Vert \lambda_{k+1}\right\Vert -\left\Vert \lambda_{k}\right\Vert }{\left\Vert \lambda_{k+1}\right\Vert }\right|<\varepsilon.
+\left|\frac{\left\Vert \lambda_{k+1}\right\Vert -\left\Vert \lambda_{k}\right\Vert }{\left\Vert \lambda_{k+1}\right\Vert }\right|<\varepsilon
 \]
 
 \end_inset
 
 Thus,
  a value of 0.01 implies that the change in norm between the previous augmentation loop and the current loop is less than 1%.
-\end_layout
-
-\begin_layout Standard
-The augmented Lagrangian method for incompressibility enforcement is available for all materials that are based on an uncoupled hyperelastic strain energy function.
 \end_layout
 
 \begin_layout Standard
@@ -56478,7 +56730,7 @@ literal "true"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="2" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -56517,7 +56769,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -56526,7 +56778,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -56535,44 +56787,11 @@ number of links in chain
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [ ] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
 \end_layout
 
 \end_inset
@@ -57691,7 +57910,7 @@ Fung orthotropic
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="11" columns="3">
+<lyxtabular version="3" rows="10" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -58007,7 +58226,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58016,7 +58235,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58028,7 +58247,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58037,39 +58256,6 @@ P
 P
 \series default
 ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
 \end_layout
 
 \end_inset
@@ -58302,7 +58488,7 @@ Gent
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="2" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -58341,7 +58527,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58350,7 +58536,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58371,40 +58557,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58705,7 +58858,7 @@ Holzapfel-Gasser-Ogden
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="5" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -58847,7 +59000,7 @@ deg
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58856,7 +59009,7 @@ deg
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -58865,44 +59018,11 @@ Fiber dispersion
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 []
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
 \end_layout
 
 \end_inset
@@ -59137,7 +59257,7 @@ Mooney-Rivlin
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="2" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -59176,7 +59296,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -59185,44 +59305,11 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Coefficient of second invariant term
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Bulk modulus
+Coefficient of second invariant term
 \end_layout
 
 \end_inset
@@ -59400,7 +59487,7 @@ muscle material
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="9" columns="3">
+<lyxtabular version="3" rows="8" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -59619,39 +59706,6 @@ fiber stretch for straightened fibers
 
 \begin_layout Plain Layout
 [ ] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
 \end_layout
 
 \end_inset
@@ -59904,7 +59958,7 @@ literal "true"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="2" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -59948,7 +60002,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -59957,7 +60011,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -59971,44 +60025,11 @@ Exponent of n
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [ ] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
 \end_layout
 
 \end_inset
@@ -60178,7 +60199,7 @@ The material parameters for this material are listed below.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="5" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -60312,7 +60333,7 @@ fiber uncrimping factor
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -60321,7 +60342,7 @@ fiber uncrimping factor
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -60330,44 +60351,11 @@ fiber stretch for straightened fibers
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [ ] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
 \end_layout
 
 \end_inset
@@ -60472,7 +60460,7 @@ TC nonlinear orthotropic
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="5" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -60525,39 +60513,6 @@ P
 
 \begin_layout Plain Layout
 Second Mooney-Rivlin material parameter
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-bulk modulus
 \end_layout
 
 \end_inset
@@ -60840,7 +60795,7 @@ trans iso Mooney-Rivlin
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="9" columns="3">
+<lyxtabular version="3" rows="8" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -60988,39 +60943,6 @@ Fiber uncrimping coefficient
 
 \begin_layout Plain Layout
 Modulus of straightened fibers
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Bulk modulus
 \end_layout
 
 \end_inset
@@ -61422,7 +61344,7 @@ literal "true"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="9" columns="3">
+<lyxtabular version="3" rows="8" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -61566,39 +61488,6 @@ Fiber uncrimping coefficient
 
 \begin_layout Plain Layout
 Modulus of straightened fibers
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Bulk modulus
 \end_layout
 
 \end_inset
@@ -62088,7 +61977,7 @@ literal "true"
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="3">
+<lyxtabular version="3" rows="2" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -62127,7 +62016,7 @@ P
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -62136,7 +62025,7 @@ P
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -62145,44 +62034,11 @@ Second VW coefficient
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [ ] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
 \end_layout
 
 \end_inset
@@ -62299,7 +62155,7 @@ Mooney-Rivlin von Mises Fibers
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="15" columns="3">
+<lyxtabular version="3" rows="14" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -62447,39 +62303,6 @@ Fiber uncrimping coefficient
 
 \begin_layout Plain Layout
 Modulus of straightened fibers
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-] 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Bulk modulus
 \end_layout
 
 \end_inset
@@ -63256,7 +63079,7 @@ isotropic Lee-Sacks
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="4" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
@@ -63357,7 +63180,7 @@ c2 parameter
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -63366,7 +63189,7 @@ c2 parameter
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -63375,44 +63198,11 @@ scale factor for c0 when used in tangent (default = 1)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 [ ]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
 \end_layout
 
 \end_inset
@@ -63531,13 +63321,13 @@ This material implements a Yeoh material,
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="3">
+<lyxtabular version="3" rows="1" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -63546,7 +63336,7 @@ This material implements a Yeoh material,
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -63555,40 +63345,7 @@ Elastic moduli of Yeoh material (up to 6)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-[
-\series bold
-P
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-<k>
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-bulk modulus
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -120832,362 +120589,449 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0,
  0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0,
  0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0,
  0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0,
  0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
