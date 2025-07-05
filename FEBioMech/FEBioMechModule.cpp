@@ -277,6 +277,7 @@ SOFTWARE.*/
 #include "FESpringRuptureCriterion.h"
 #include "FEContactGapCriterion.h"
 
+#include "FEInitialDisplacement.h"
 #include "FEInitialVelocity.h"
 #include "FENodalForce.h"
 #include "FENodalTargetForce.h"
@@ -643,6 +644,7 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEInitialCondition
+    REGISTER_FECORE_CLASS(FEInitialDisplacement, "displacement");
 	REGISTER_FECORE_CLASS(FEInitialVelocity, "velocity");
 	REGISTER_FECORE_CLASS(FEInitialShellVelocity, "shell velocity");
 	REGISTER_FECORE_CLASS(FEInitialPreStrain, "prestrain");
