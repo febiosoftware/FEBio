@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
-set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE FEImgLib)
+set(FEBIO_LIBS FEBioAPI FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE FEImgLib)
 set(STATIC_FEBIO_LIBS FEBioPlot FEBioTest FEBioXML XML)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -201,6 +201,7 @@ add_executable (febio4 ${HEADERS} ${SOURCES})
 
 if(WIN32)
     target_compile_options(febio4 PRIVATE /openmp)
+    target_compile_options(febioapi PRIVATE /openmp)
     target_compile_options(febiofluid PRIVATE /openmp)
     target_compile_options(febiolib PRIVATE /openmp)
     target_compile_options(febiomech PRIVATE /openmp)
@@ -373,6 +374,7 @@ target_include_directories(febioopt PRIVATE ${EXTRA_INC})
 target_include_directories(numcore PRIVATE ${EXTRA_INC})
 target_include_directories(feamr PRIVATE ${EXTRA_INC})
 target_include_directories(febiolib PRIVATE ${EXTRA_INC})
+target_include_directories(febioapi PRIVATE ${EXTRA_INC})
 
 # Extra Libs
 target_link_libraries(numcore PRIVATE ${EXTRA_LIB})
@@ -396,8 +398,9 @@ target_link_libraries(febiomech PRIVATE fecore feamr)
 target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
 target_link_libraries(feimglib PRIVATE fecore)
 target_link_libraries(feamr PRIVATE fecore)
+target_link_libraries(febioapi PRIVATE fecore febiofluid febiomech febioxml febioplot xml febiorve feamr)
 
-target_link_libraries(febiolib PRIVATE febioplot febiomech 
+target_link_libraries(febiolib PRIVATE febioapi febioplot febiomech
 		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve fecore feimglib)
 
 if (WIN32)
@@ -406,7 +409,7 @@ endif()
 
 # Link FEBio libraries
 if(WIN32 OR APPLE)
-	target_link_libraries(febio4 fecore febiolib)
+	target_link_libraries(febio4 fecore febiolib febioapi)
 else()
     if(USE_STATIC_STDLIBS)
         target_link_libraries(numcore PRIVATE -static-libstdc++ -static-libgcc)
@@ -422,6 +425,7 @@ else()
         target_link_libraries(feamr PRIVATE -static-libstdc++ -static-libgcc)
         target_link_libraries(febiolib PRIVATE -static-libstdc++ -static-libgcc)
         target_link_libraries(fecore PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febioapi PRIVATE -static-libstdc++ -static-libgcc)
         
         target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
     endif()

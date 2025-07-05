@@ -26,8 +26,8 @@ SOFTWARE.*/
 
 
 
-#include "stdafx.h"
-#include "FEBioApp.h"
+#include <FEBioAPI/stdafx.h>
+#include <FEBioAPI/FEBioApp.h>
 
 //-----------------------------------------------------------------------------
 // The starting point of the application
@@ -39,7 +39,13 @@ int main(int argc, char* argv[])
 
 	// initialize the app
 	if (febio.Init(argc, argv) == false) return 1;
-
+    
+    // add node sets to existing input file
+    int Nstart = 0;
+    int Nend = 0;
+    
+    bool good = febio.CreateNodeSetsForAllNodes(Nstart, Nend);
+    
 	// start the FEBio app
 	int nret = febio.Run();
 
