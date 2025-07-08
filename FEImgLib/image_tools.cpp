@@ -119,6 +119,7 @@ FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d)
 	float* y = trg.data();
 
 	// for zero blur radius, we just copy the image
+	// SL: Why not copy i.e. if (d <= 0) { trg = src; return; }?
 	if (d <= 0.f)
 	{
 		for (int i = 0; i < nx * ny; ++i) y[i] = x[i];
@@ -166,9 +167,10 @@ FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d)
 	float* y = trg.data();
 
 	// for zero blur radius, we just copy the image
+	// SL: Why not copy i.e. if (d <= 0) { trg = src; return; }?
 	if (d <= 0.f)
 	{
-		for (int i = 0; i < nx * ny*nz; ++i) y[i] = x[i];
+		for (int i = 0; i < nx * ny * nz; ++i) y[i] = x[i];
 		return;
 	}
 

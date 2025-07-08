@@ -1,6 +1,8 @@
 //#include "stdafx.h"
 #include "ImageMap.h"
 #include "math.h"
+#include "algorithm"
+#include "iostream"
 
 ImageMap::ImageMap(Image& img) : m_img(img)
 {
@@ -32,9 +34,9 @@ ImageMap::POINT ImageMap::map(const vec3d& p)
 	double dy = 1.0 / (double) (ny - 1);
 	double dz = (nz>1?1.0 / (double) (nz - 1):1.0);
 
-	int i = (int) floor(x*(nx - 1));
-	int j = (int) floor(y*(ny - 1));
-	int k = (int) floor(z*(nz - 1));
+	int i = (int) std::max(floor(x * (nx - 1)), 0.0);
+	int j = (int) std::max(floor(y * (ny - 1)), 0.0);
+	int k = (int) std::max(floor(z * (nz - 1)), 0.0);
 
 	if (i == nx-1) i--;
 	if (j == ny-1) j--;
