@@ -124,12 +124,12 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R)
         FEThermoFluid* fluid = pm->ExtractProperty<FEThermoFluid>();
         if (fluid == nullptr) return;
         double p, dpJ, dpT;
-        if (!FluidPressure(el,p,dpJ,dpT)) return;
+        if (!FluidPressure(*pe,p,dpJ,dpT)) return;
         double da = (pt.dxr ^ pt.dxs).norm();
         double Na  = dof_a.shape;
         
-        val[0] = Na*dpJ*(p - p0)*da;
-        val[1] = Na*dpT*(p - p0)*da;
+        val[0] = -Na*dpJ*(p - p0)*da;
+        val[1] = -Na*dpT*(p - p0)*da;
     });
 
 }
@@ -150,16 +150,17 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS)
         FEThermoFluid* fluid = pm->ExtractProperty<FEThermoFluid>();
         if (fluid == nullptr) return;
         double p, dpJ, dpT;
-        if (!FluidPressure(el,p,dpJ,dpT)) return;
+        if (!FluidPressure(*pe,p,dpJ,dpT)) return;
         double dpJJ, dpJT, dpTT;
-        if (!FluidPressure2ndDerivs(el,dpJJ,dpJT,dpTT)) return;
+        if (!FluidPressure2ndDerivs(*pe,dpJJ,dpJT,dpTT)) return;
 
+        double da = (mp.dxr ^ mp.dxs).norm();
         double Na  = dof_a.shape;
         double Nb  = dof_b.shape;
 
-        kab(0, 0) = Na*Nb*(dpJJ*(p-p0)+pow(dpJ,2));
-        kab(0, 1) = Na*Nb*(dpJT*(p-p0)+dpJ*dpT);
+        kab(0, 0) = Na*Nb*(dpJJ*(p-p0)+pow(dpJ,2))*da;
+        kab(0, 1) = Na*Nb*(dpJT*(p-p0)+dpJ*dpT)*da;
         kab(1, 0) = kab(0, 1);
-        kab(1, 1) = Na*Nb*(dpTT*(p-p0)+pow(dpT,2));
+        kab(1, 1) = Na*Nb*(dpTT*(p-p0)+pow(dpT,2))*da;
     });
 }
