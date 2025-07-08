@@ -202,7 +202,7 @@ void FEMultiphasicFSIModule::InitModel(FEModel* fem)
 }
 
 //=============================================================================
-FEThermoFluidModule::FEThermoFluidModule() { SetStatus(EXPERIMENTAL); }
+FEThermoFluidModule::FEThermoFluidModule() { SetStatus(RELEASED); }
 void FEThermoFluidModule::InitModel(FEModel* fem)
 {
     // Allocate degrees of freedom

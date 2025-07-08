@@ -105,7 +105,8 @@ bool FEThermoFluidDomain3D::Init()
     FEModel* pfem = GetFEModel();
     
     m_Tr = GetFEModel()->GetGlobalConstant("T");
-    
+    m_Pr = GetFEModel()->GetGlobalConstant("P");
+
     return true;
 }
 
@@ -117,7 +118,7 @@ void FEThermoFluidDomain3D::Serialize(DumpStream& ar)
     if (ar.IsShallow()) return;
     
     ar & m_pMat;
-    ar & m_Tr;
+    ar & m_Tr & m_Pr;
     ar & m_dof;
     ar & m_dofW & m_dofAW;
     ar & m_dofEF & m_dofAEF;

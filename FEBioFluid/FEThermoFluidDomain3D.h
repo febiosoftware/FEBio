@@ -129,6 +129,7 @@ public:
 protected:
     FEThermoFluid*  m_pMat;
     double          m_Tr;       // referential absolute temperature
+    double          m_Pr;       // referential absolute pressure
 
 protected:
     FEDofList   m_dofW;

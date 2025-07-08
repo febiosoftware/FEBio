@@ -143,7 +143,7 @@ void FEBioThermoFluid::InitModule()
     
     //-----------------------------------------------------------------------------
     // loads
-    REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure constraint");
+    REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure load");
 
     //-----------------------------------------------------------------------------
     // classes derived from FEPlotData
