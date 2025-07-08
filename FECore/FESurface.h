@@ -293,7 +293,8 @@ public:
 	void GetReferenceNodalCoordinates(FESurfaceElement& el, vec3d* r0);
 
 	// Get current coordinates
-	void GetNodalCoordinates(FESurfaceElement& el, vec3d* rt);
+	void GetNodalCoordinates(FESurfaceElement& el, vec3d* rt) const;
+    void GetNodalCoordinates(const FESurfaceElement& el, vec3d* rt) const;
 
 	// Get current coordinates at intermediate configuration
 	void GetNodalCoordinates(FESurfaceElement& el, double alpha, vec3d* rt);
@@ -304,6 +305,9 @@ public:
 	// Set the shell bottom flag
 	void SetShellBottom(bool b) { m_bshellb = b; }
 
+    // Get a specific node's coordinates at intermediate configuration
+    vec3d GetNodalCoordinate(FENode& node);
+    
 public:
 	// Evaluate field variables
 	double Evaluate(FESurfaceMaterialPoint& mp, int dof);

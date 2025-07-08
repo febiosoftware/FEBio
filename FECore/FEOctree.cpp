@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEOctree.h"
 #include "FESurface.h"
 #include "FEMesh.h"
+#include "FEModel.h"
 
 OTnode::OTnode()
 {
@@ -108,12 +109,12 @@ bool OTnode::ElementIntersectsNode(const int iel)
 	// and determine bounding box of surface element
 	FEMesh& mesh = *(m_ps->GetMesh());
 	FESurfaceElement& el = m_ps->Element(iel);
-	vec3d rn = mesh.Node(el.m_node[0]).m_rt;
+    vec3d rn = m_ps->GetNodalCoordinate(mesh.Node(el.m_node[0]));
 	vec3d fmin = rn;
 	vec3d fmax = rn;
 	int N = el.Nodes();
 	for (int i=1; i<N; ++i) {
-		rn = mesh.Node(el.m_node[i]).m_rt;
+        rn = m_ps->GetNodalCoordinate(mesh.Node(el.m_node[i]));
 		if (rn.x < fmin.x) fmin.x = rn.x;
 		if (rn.x > fmax.x) fmax.x = rn.x;
 		if (rn.y < fmin.y) fmin.y = rn.y;
@@ -288,11 +289,11 @@ void FEOctree::Init(const double stol)
 		root.selist[i] = i;
 	
 	// Find the bounding box of the surface
-	vec3d fenode = (m_ps->Node(0)).m_rt;
+    vec3d fenode = m_ps->GetNodalCoordinate(m_ps->Node(0));
 	root.cmin = fenode;
 	root.cmax = fenode;
 	for (int i=1; i<m_ps->Nodes(); ++i) {
-		fenode = (m_ps->Node(i)).m_rt;
+        fenode = m_ps->GetNodalCoordinate(m_ps->Node(i));
 		if (fenode.x < root.cmin.x) root.cmin.x = fenode.x;
 		if (fenode.x > root.cmax.x) root.cmax.x = fenode.x;
 		if (fenode.y < root.cmin.y) root.cmin.y = fenode.y;

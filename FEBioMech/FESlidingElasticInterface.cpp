@@ -509,16 +509,9 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
             for (int j=0; j<ne; ++j)
             {
                 vec3d r0, rp, rm;
-                if (!ss.IsShellBottom()) {
-                    r0 = ss.Node(el.m_lnode[ j         ]).m_rt;
-                    rp = ss.Node(el.m_lnode[(j+   1)%ne]).m_rt;
-                    rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).m_rt;
-                }
-                else {
-                    r0 = ss.Node(el.m_lnode[ j         ]).st();
-                    rp = ss.Node(el.m_lnode[(j+   1)%ne]).st();
-                    rm = ss.Node(el.m_lnode[(j+ne-1)%ne]).st();
-                }
+                r0 = ss.GetNodalCoordinate(ss.Node(el.m_lnode[ j         ]));
+                rp = ss.GetNodalCoordinate(ss.Node(el.m_lnode[(j+   1)%ne]));
+                rm = ss.GetNodalCoordinate(ss.Node(el.m_lnode[(j+ne-1)%ne]));
                 vec3d n = (rp - r0)^(rm - r0);
                 normal[el.m_lnode[j]] += n;
             }
@@ -532,7 +525,7 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
             FENode& node = ss.Node(i);
             
             // get the spatial nodal coordinates
-            vec3d rt = ss.IsShellBottom() ? node.st() : node.m_rt;
+            vec3d rt = ss.GetNodalCoordinate(node);
             vec3d nu = normal[i];
             
             // project onto the secondary surface
@@ -1247,7 +1240,7 @@ void FESlidingElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETime
 								for (int k = 0; k < nseln; ++k) N[k] = Hs[k];
 								for (int k = 0; k < nmeln; ++k) N[k + nseln] = -Hm[k];
 
-								double tmp = dtn * detJ[j] * w[j];
+								double tmp = dtn * detJ[j] * w[j] * tp.alphaf;
 								for (int l = 0; l < nseln + nmeln; ++l)
 								{
 									for (int k = 0; k < nseln + nmeln; ++k)
@@ -1269,7 +1262,7 @@ void FESlidingElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETime
 								// b. A-term
 								//-------------------------------------
 
-								tmp = detJ[j] * w[j];
+								tmp = detJ[j] * w[j] * tp.alphaf;
 								// non-symmetric
 								for (int l = 0; l < nseln; ++l)
 								{
@@ -1434,7 +1427,7 @@ void FESlidingElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETime
 								for (int k = 0; k < nseln; ++k) N[k] = Hs[k];
 								for (int k = 0; k < nmeln; ++k) N[k + nseln] = -Hm[k];
 
-								double tmp = detJ[j] * w[j];
+								double tmp = detJ[j] * w[j] * tp.alphaf;
 								for (int l = 0; l < nseln + nmeln; ++l)
 								{
 									for (int k = 0; k < nseln + nmeln; ++k)
@@ -1456,7 +1449,7 @@ void FESlidingElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETime
 								// b. Na,Nb-term
 								//-------------------------------------
 
-								tmp = tn * detJ[j] * w[j];
+								tmp = tn * detJ[j] * w[j] * tp.alphaf;
 								// non-symmetric
 								for (int l = 0; l < nseln; ++l)
 								{
@@ -1479,7 +1472,7 @@ void FESlidingElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETime
 								// c. Nc,Nd-term
 								//---------------------------------------
 
-								tmp = tn * detJ[j] * w[j];
+								tmp = tn * detJ[j] * w[j] * tp.alphaf;
 								// non-symmetric
 								for (int k = 0; k < nmeln; ++k)
 								{
@@ -1502,7 +1495,7 @@ void FESlidingElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETime
 								// c. Gbc-term
 								//---------------------------------------
 
-								tmp = tn * detJ[j] * w[j];
+								tmp = tn * detJ[j] * w[j] * tp.alphaf;
 								for (int k = 0; k < nmeln; ++k)
 								{
 									for (int l = 0; l < nseln; ++l)

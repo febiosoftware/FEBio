@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FENormalProjection.h"
 #include "FEMesh.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 FENormalProjection::FENormalProjection(FESurface& s) : m_surf(s)
@@ -192,7 +193,8 @@ vec3d FENormalProjection::Project(const vec3d& x, const vec3d& N)
 	{
 		FEMesh& mesh = *m_surf.GetMesh();
 		vec3d r[FEElement::MAX_NODES];
-		for (int i=0; i<pe->Nodes(); ++i) r[i] = mesh.Node(pe->m_node[i]).m_rt;
+        
+		for (int i=0; i<pe->Nodes(); ++i) r[i] = m_surf.GetNodalCoordinate(mesh.Node(pe->m_node[i]));
 		vec3d q = pe->eval(r, rs[0], rs[1]);
 		return q;
 	}
@@ -210,7 +212,7 @@ vec3d FENormalProjection::Project2(const vec3d& x, const vec3d& N)
 	{
 		FEMesh& mesh = *m_surf.GetMesh();
 		vec3d r[FEElement::MAX_NODES];
-		for (int i = 0; i<pe->Nodes(); ++i) r[i] = mesh.Node(pe->m_node[i]).m_rt;
+		for (int i = 0; i<pe->Nodes(); ++i) r[i] = m_surf.GetNodalCoordinate(mesh.Node(pe->m_node[i]));
 		vec3d q = pe->eval(r, rs[0], rs[1]);
 		return q;
 	}

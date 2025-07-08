@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "DumpStream.h"
 #include "matrix.h"
 #include <FECore/log.h>
+#include <FECore/FEModel.h>
 #include "FEModelParam.h"
 #include "FEMesh.h"
 
@@ -718,8 +719,7 @@ vec3d FESurface::Position(FESurfaceElement& el, double r, double s)
 
 	// get the elements nodal positions
 	vec3d y[FEElement::MAX_NODES];
-    if (!m_bshellb) for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
-    else for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).st();
+    GetNodalCoordinates(el, y);
 
 	double H[FEElement::MAX_NODES];
 	el.shape_fnc(H, r, s);
@@ -746,9 +746,8 @@ vec3d FESurface::Position(FESurfaceElement &el, int n)
     
     // get the elements nodal positions
     vec3d y[FEElement::MAX_NODES];
-    if (!m_bshellb) for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
-    else for (int i = 0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).st();
-    
+    GetNodalCoordinates(el, y);
+
     double* H = el.H(n);
     
     vec3d q(0,0,0);
@@ -763,9 +762,7 @@ vec3d FESurface::Position(FESurfaceElement &el, int n)
 //-----------------------------------------------------------------------------
 void FESurface::NodalCoordinates(FESurfaceElement& el, vec3d* re)
 {
-	int ne = el.Nodes();
-	if (!m_bshellb) for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).m_rt;
-    else for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).st();
+    GetNodalCoordinates(el, re);
 }
 
 //-----------------------------------------------------------------------------
@@ -781,9 +778,11 @@ void FESurface::PreviousNodalCoordinates(FESurfaceElement& el, vec3d* re)
 //! return +1 if face points away from element, -1 if face points into element, 0 if invalid solution found
 double FESurface::FacePointing(FESurfaceElement& se, FEElement& el)
 {
+    double alpha = GetFEModel()->GetTime().alphaf;
+    
     FEMesh& mesh = *GetMesh();
     // get point on surface element
-    vec3d sp = Position(se, 0,0);
+    vec3d sp = Position(se,0,0);
     
     // get surface normal at that point;
     vec3d sn = SurfaceNormal(se, 0,0);
@@ -797,15 +796,15 @@ double FESurface::FacePointing(FESurfaceElement& se, FEElement& el)
     if (sel) {
         for (int i=0; i<sel->Nodes(); ++i) {
             FENode& node = mesh.Node(sel->m_node[i]);
-            c += node.m_rt;
+            c += node.m_rt*alpha + node.m_rp*(1-alpha);
         }
         c /= sel->Nodes();
     }
     else if (shl) {
         for (int i=0; i<sel->Nodes(); ++i) {
             FENode& node = mesh.Node(sel->m_node[i]);
-            c += node.m_rt;
-            c += node.st();
+            c += node.m_rt*alpha + node.m_rp*(1-alpha);
+            c += node.st()*alpha + node.sp()*(1-alpha);
         }
         c /= (2*sel->Nodes());
     }
@@ -836,8 +835,7 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 
 	// get the elements nodal positions
 	vec3d y[FEElement::MAX_NODES];
-    if (!m_bshellb) for (int i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
-    else for (int i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).st();
+    GetNodalCoordinates(el, y);
 
 	// calculate normal projection of x onto element
 	vec3d q;
@@ -905,8 +903,7 @@ double FESurface::FaceArea(FESurfaceElement& el)
 
 	// get the initial nodes
 	vec3d r0[FEElement::MAX_NODES];
-	if (!m_bshellb) for (int i=0; i<neln; ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
-    else for (int i=0; i<neln; ++i) r0[i] = mesh.Node(el.m_node[i]).s0();
+    GetReferenceNodalCoordinates(el,r0);
 
 	// get the integration weights
 	double* w = el.GaussWeights();
@@ -959,8 +956,7 @@ double FESurface::CurrentFaceArea(FESurfaceElement& el)
 
 	// get the initial nodes
 	vec3d rt[FEElement::MAX_NODES];
-	if (!m_bshellb) for (int i = 0; i < neln; ++i) rt[i] = mesh.Node(el.m_node[i]).m_rt;
-	else for (int i = 0; i < neln; ++i) rt[i] = mesh.Node(el.m_node[i]).st();
+    GetNodalCoordinates(el, rt);
 
 	// get the integration weights
 	double* w = el.GaussWeights();
@@ -1067,8 +1063,7 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 	
 	// element nodes
 	vec3d rt[FEElement::MAX_NODES];
-    if (!m_bshellb) for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-    else for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).st();
+    GetNodalCoordinates(el, rt);
 	
 	// shape function derivatives
 	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
@@ -1100,9 +1095,8 @@ mat2d FESurface::Metric(const FESurfaceElement& el, int n) const
     
     // element nodes
     vec3d rt[FEElement::MAX_NODES];
-    if (!m_bshellb) for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-    else for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).st();
-    
+    GetNodalCoordinates(el, rt);
+
     // get the shape function derivatives at this integration point
     double* Hr = el.Gr(n);
     double* Hs = el.Gs(n);
@@ -1181,8 +1175,7 @@ vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
 	vec3d y[FEElement::MAX_NODES];
-    if (!m_bshellb) for (int l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
-    else for (int l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).st();
+    GetNodalCoordinates(el, y);
 
 	// calculate the element position
 	return el.eval(y, r, s);
@@ -1199,11 +1192,13 @@ vec3d FESurface::Local2Global(FESurfaceElement &el, int n)
 	// get the shape functions at this integration point
 	double* H = el.H(n);
 
+    vec3d y[FEElement::MAX_NODES];
+    GetNodalCoordinates(el, y);
+    
 	// calculate the location
 	vec3d r(0);
 	int ne = el.Nodes();
-    if (!m_bshellb) for (int i=0; i<ne; ++i) r += m.Node(el.m_node[i]).m_rt*H[i];
-    else for (int i=0; i<ne; ++i) r += m.Node(el.m_node[i]).st()*H[i];
+    for (int i=0; i<ne; ++i) r += y[i]*H[i];
 
 	return r;
 }
@@ -1259,8 +1254,7 @@ vec3d FESurface::SurfaceNormal(const FESurfaceElement &el, int n) const
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
 	vec3d y[FEElement::MAX_NODES];
-    if (!m_bshellb) for (int i=0; i<ne; ++i) y[i] = m.Node(el.m_node[i]).m_rt;
-    else for (int i=0; i<ne; ++i) y[i] = m.Node(el.m_node[i]).st();
+    GetNodalCoordinates(el, y);
 
 	// calculate the tangents
 	vec3d xr, xs;
@@ -1290,8 +1284,7 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s) const
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
 	vec3d y[FEElement::MAX_NODES];
-    if (!m_bshellb) for (l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
-    else for (l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).st();
+    GetNodalCoordinates(el, y);
 	
 	// set up shape functions and derivatives
 	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
@@ -1335,7 +1328,7 @@ void FESurface::UpdateNodeNormals()
         int ne = el.Nodes();
         
         // get the nodal coordinates
-        for (int j=0; j<ne; ++j) y[j] = Node(el.m_lnode[j]).m_rt;
+        GetNodalCoordinates(el, y);
         
         // calculate the normals
         for (int j=0; j<ne; ++j)
@@ -1398,21 +1391,15 @@ void FESurface::CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[
 	// get the shape function derivatives
 	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
 	el.shape_deriv(Hr, Hs, r, s);
+    
+    vec3d rt[FEElement::MAX_NODES];
+    GetNodalCoordinates(el, rt);
 
 	t[0] = t[1] = vec3d(0,0,0);
-    if (!m_bshellb) {
-        for (int i=0; i<n; ++i)
-        {
-            t[0] += m.Node(el.m_node[i]).m_rt*Hr[i];
-            t[1] += m.Node(el.m_node[i]).m_rt*Hs[i];
-        }
-    }
-    else {
-        for (int i=0; i<n; ++i)
-        {
-            t[0] -= m.Node(el.m_node[i]).st()*Hr[i];
-            t[1] -= m.Node(el.m_node[i]).st()*Hs[i];
-        }
+    for (int i=0; i<n; ++i)
+    {
+        t[0] += rt[i]*Hr[i];
+        t[1] += rt[i]*Hs[i];
     }
 }
 
@@ -1432,20 +1419,14 @@ void FESurface::CoBaseVectors(const FESurfaceElement& el, int j, vec3d t[2]) con
 	double* Hr = el.Gr(j);
 	double* Hs = el.Gs(j);
 
+    vec3d rt[FEElement::MAX_NODES];
+    GetNodalCoordinates(el, rt);
+    
 	t[0] = t[1] = vec3d(0,0,0);
-    if (!m_bshellb) {
-        for (int i=0; i<n; ++i)
-        {
-            t[0] += m.Node(el.m_node[i]).m_rt*Hr[i];
-            t[1] += m.Node(el.m_node[i]).m_rt*Hs[i];
-        }
-    }
-    else {
-        for (int i=0; i<n; ++i)
-        {
-            t[0] -= m.Node(el.m_node[i]).st()*Hr[i];
-            t[1] -= m.Node(el.m_node[i]).st()*Hs[i];
-        }
+    for (int i=0; i<n; ++i)
+    {
+        t[0] += rt[i]*Hr[i];
+        t[1] += rt[i]*Hs[i];
     }
 }
 
@@ -2272,13 +2253,13 @@ void FESurface::Invert()
 //!
 bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps, bool checkNormal)
 {
+    double alpha = GetFEModel()->GetTime().alphaf;
 	int N = el.Nodes();
 
 	// get the element nodes
 	FEMesh& mesh = *m_pMesh;
 	vec3d y[FEElement::MAX_NODES];
-    if (!m_bshellb) for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
-    else for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).st();
+    GetNodalCoordinates(el, alpha, y);
 
 	// call the correct intersection function
 	switch (N)
@@ -2357,12 +2338,25 @@ void FESurface::Serialize(DumpStream &ar)
 }
 
 //-----------------------------------------------------------------------------
-void FESurface::GetNodalCoordinates(FESurfaceElement& el, vec3d* rt)
+void FESurface::GetNodalCoordinates(FESurfaceElement& el, vec3d* rt) const
 {
-	FEMesh& mesh = *GetMesh();
-	int neln = el.Nodes();
-    if (!m_bshellb) for (int j = 0; j < neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
-    else for (int j = 0; j < neln; ++j) rt[j] = mesh.Node(el.m_node[j]).st();
+    double alpha = GetFEModel()->GetTime().alphaf;
+    int neln = el.Nodes();
+    for (int j = 0; j<neln; ++j) {
+        const FENode& node = Node(el.m_lnode[j]);
+        rt[j] = (m_bshellb) ? node.st()*alpha + node.sp()*(1.0 - alpha) : node.m_rt*alpha + node.m_rp*(1.0 - alpha);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::GetNodalCoordinates(const FESurfaceElement& el, vec3d* rt) const
+{
+    double alpha = GetFEModel()->GetTime().alphaf;
+    int neln = el.Nodes();
+    for (int j = 0; j<neln; ++j) {
+        const FENode& node = Node(el.m_lnode[j]);
+        rt[j] = (m_bshellb) ? node.st()*alpha + node.sp()*(1.0 - alpha) : node.m_rt*alpha + node.m_rp*(1.0 - alpha);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -2381,9 +2375,17 @@ void FESurface::GetNodalCoordinates(FESurfaceElement& el, double alpha, vec3d* r
 	int neln = el.Nodes();
 	for (int j = 0; j<neln; ++j) {
 		FENode& node = Node(el.m_lnode[j]);
-		rt[j] = node.m_rt*alpha + node.m_rp*(1.0 - alpha);
-        if (m_bshellb) rt[j] -= node.m_dt*alpha + node.m_dp*(1.0 - alpha);
+		rt[j] = (m_bshellb) ? node.st()*alpha + node.sp()*(1.0 - alpha) : node.m_rt*alpha + node.m_rp*(1.0 - alpha);
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Get current coordinates at intermediate configuration
+vec3d FESurface::GetNodalCoordinate(FENode& node)
+{
+    double alpha = GetFEModel()->GetTime().alphaf;
+    vec3d rt = (m_bshellb) ? node.st()*alpha + node.sp()*(1.0 - alpha) : node.m_rt*alpha + node.m_rp*(1.0 - alpha);
+    return rt;
 }
 
 //-----------------------------------------------------------------------------
