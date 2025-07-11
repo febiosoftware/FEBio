@@ -617,7 +617,12 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
 
 					double Ln = data.m_Lmd + eps * g;
 
-					data.m_gap = (g <= m_srad ? g : 0);
+                    // enforce contact persistency condition
+                    if (data.m_gap > 0) {
+                        data.m_gap = (g <= m_srad ? data.m_gap : 0);
+                    }
+					else
+                        data.m_gap = (g <= m_srad ? g : 0);
 
 					if ((g > m_srad) || ((!m_btension) && (Ln < 0))) {
 						data.m_Lmd = 0;
