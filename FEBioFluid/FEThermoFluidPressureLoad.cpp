@@ -52,6 +52,8 @@ bool FEThermoFluidPressureLoad::Init()
     m_dofEF = m_dof.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION));
     m_dofT = m_dof.AddVariable(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE));
 
+    m_Pr = GetGlobalConstant("P");
+    
     return FESurfaceLoad::Init();
 }
 
@@ -113,6 +115,7 @@ bool FEThermoFluidPressureLoad::FluidPressure2ndDerivs(FEElement& el, double& dp
 void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R)
 {
     double alpha = GetFEModel()->GetTime().alphaf;
+    double dt = GetFEModel()->GetTime().timeIncrement;
     FESurface& surf = GetSurface();
 
     surf.LoadVector(R, m_dof, false, [&](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
@@ -128,8 +131,8 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R)
         double da = (pt.dxr ^ pt.dxs).norm();
         double Na  = dof_a.shape;
         
-        val[0] = -Na*dpJ*(p - p0)*da;
-        val[1] = -Na*dpT*(p - p0)*da;
+        val[0] = Na*dpJ*(p - p0)*da;
+        val[1] = Na*dpT*(p - p0)*da;
     });
 
 }
@@ -139,6 +142,7 @@ void FEThermoFluidPressureLoad::LoadVector(FEGlobalVector& R)
 void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 {
     double alpha = GetFEModel()->GetTime().alphaf;
+    double dt = GetFEModel()->GetTime().timeIncrement;
     FESurface& surf = GetSurface();
     surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& kab) {
 
@@ -158,9 +162,9 @@ void FEThermoFluidPressureLoad::StiffnessMatrix(FELinearSystem& LS)
         double Na  = dof_a.shape;
         double Nb  = dof_b.shape;
 
-        kab(0, 0) = Na*Nb*(dpJJ*(p-p0)+pow(dpJ,2))*da;
-        kab(0, 1) = Na*Nb*(dpJT*(p-p0)+dpJ*dpT)*da;
+        kab(0, 0) = -(Na*Nb*(dpJJ*(p-p0)+pow(dpJ,2))*da);
+        kab(0, 1) = -(Na*Nb*(dpJT*(p-p0)+dpJ*dpT)*da);
         kab(1, 0) = kab(0, 1);
-        kab(1, 1) = Na*Nb*(dpTT*(p-p0)+pow(dpT,2))*da;
+        kab(1, 1) = -(Na*Nb*(dpTT*(p-p0)+pow(dpT,2))*da);
     });
 }

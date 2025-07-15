@@ -29,6 +29,11 @@ SOFTWARE.*/
 #include "FEThermoFluid.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/DumpStream.h>
+#include "FELinearElasticFluid.h"
+#include "FENonlinearElasticFluid.h"
+#include "FELogNonlinearElasticFluid.h"
+#include "FEIdealGasIsentropic.h"
+#include "FEIdealGasIsothermal.h"
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEThermoFluid, FEFluidMaterial)
@@ -50,6 +55,48 @@ FEThermoFluid::FEThermoFluid(FEModel* pfem) : FEFluidMaterial(pfem)
 {
     m_pElastic = 0;
     m_pConduct = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! FEFluid initialization
+bool FEThermoFluid::Init()
+{
+    m_Tr = GetGlobalConstant("T");
+    m_Pr = GetGlobalConstant("P");
+    if (m_pElastic == nullptr) {
+        m_pElastic = fecore_alloc(FELinearElasticFluid, GetFEModel());
+    }
+    FELinearElasticFluid* pLN = dynamic_cast<FELinearElasticFluid*>(m_pElastic);
+    FENonlinearElasticFluid* pNL = dynamic_cast<FENonlinearElasticFluid*>(m_pElastic);
+    FELogNonlinearElasticFluid* pLNL = dynamic_cast<FELogNonlinearElasticFluid*>(m_pElastic);
+    FEIdealGasIsentropic* pIGH = dynamic_cast<FEIdealGasIsentropic*>(m_pElastic);
+    FEIdealGasIsothermal* pIGT = dynamic_cast<FEIdealGasIsothermal*>(m_pElastic);
+    if (pLN) {
+        pLN->m_k = m_Pr;
+        pLN->m_rhor = m_rhor;
+        return pLN->Init();
+    }
+    else if (pNL) {
+        pNL->m_k = m_Pr;
+        pNL->m_rhor = m_rhor;
+        return pNL->Init();
+    }
+    else if (pLNL) {
+        pLNL->m_k = m_Pr;
+        pLNL->m_rhor = m_rhor;
+        return pLNL->Init();
+    }
+    else if (pIGH) {
+        pIGH->m_k = m_Pr;
+        pIGH->m_rhor = m_rhor;
+        return pIGH->Init();
+    }
+    else if (pIGT) {
+        pIGT->m_rhor = m_rhor;
+        return pIGT->Init();
+    }
+    else
+        return m_pElastic->Init();
 }
 
 //-----------------------------------------------------------------------------

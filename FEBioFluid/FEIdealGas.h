@@ -93,10 +93,10 @@ public:
     double      m_Pr;       //!< referential absolute pressure
     double      m_Tr;       //!< referential absolute temperature
     double      m_M;        //!< molar mass
-    double      m_ar;       //!< referential specific free energy
-    double      m_sr;       //!< referential specific entropy
-    FEFunction1D*   m_cp;   //!< isobaric specific heat capacity
-    FEFunction1D*   m_ao;   //!< specific free energy a-circle
+    double      m_arhat;    //!< normalized referential specific free energy (by R/M)
+    double      m_srhat;    //!< normalized referential specific entropy (by R Tr/M)
+    FEFunction1D*   m_cphat;   //!< normalized isobaric specific heat capacity (by R/M)
+    FEFunction1D*   m_aohat;   //!< normalized specific free energy a-circle (by R Tr/M)
     // declare parameter list
     DECLARE_FECORE_CLASS();
 

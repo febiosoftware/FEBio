@@ -63,6 +63,7 @@ protected:
 protected:
     int             m_dofT;
     int             m_dofEF;
+    double          m_Pr;
 
 public:
     FEParamDouble   m_p;        // prescribed pressure

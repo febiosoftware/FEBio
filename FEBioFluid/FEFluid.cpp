@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "FENonlinearElasticFluid.h"
 #include "FELogNonlinearElasticFluid.h"
 #include "FEIdealGasIsentropic.h"
+#include "FEIdealGasIsothermal.h"
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFluid, FEFluidMaterial)
@@ -69,6 +70,7 @@ bool FEFluid::Init()
     FENonlinearElasticFluid* pNL = dynamic_cast<FENonlinearElasticFluid*>(m_pElastic);
     FELogNonlinearElasticFluid* pLNL = dynamic_cast<FELogNonlinearElasticFluid*>(m_pElastic);
     FEIdealGasIsentropic* pIGH = dynamic_cast<FEIdealGasIsentropic*>(m_pElastic);
+    FEIdealGasIsothermal* pIGT = dynamic_cast<FEIdealGasIsothermal*>(m_pElastic);
     if (pLN) {
         pLN->m_k = m_k;
         pLN->m_rhor = m_rhor;
@@ -88,6 +90,10 @@ bool FEFluid::Init()
         pIGH->m_k = m_k;
         pIGH->m_rhor = m_rhor;
         return pIGH->Init();
+    }
+    else if (pIGT) {
+        pIGT->m_rhor = m_rhor;
+        return pIGT->Init();
     }
     return false;
 }

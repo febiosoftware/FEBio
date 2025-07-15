@@ -35,19 +35,19 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEIdealGas, FEElasticFluid)
 
     // material parameters
-    ADD_PARAMETER(m_M   , FE_RANGE_GREATER(0.0), "M")->setUnits(UNIT_MOLAR_MASS)->setLongName("molar mass");
-    ADD_PARAMETER(m_ar  , "ar")->setLongName("normalized referential specific free energy");    // ar normalized by R.Tr/M
-    ADD_PARAMETER(m_sr  , "sr")->setLongName("normalized referential specific entropy");        // sr normalized by R/M
-    ADD_PROPERTY (m_ao  , "ao")->SetLongName("normalized specific free energy circle");         // a-circle normalized by R.Tr/M
-    ADD_PROPERTY (m_cp  , "cp")->SetLongName("normalized isobaric specific heat capacity");     // cp normalized by R/M
+    ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M")->setUnits(UNIT_MOLAR_MASS)->setLongName("molar mass");
+    ADD_PARAMETER(m_arhat, "ar")->setLongName("normalized referential specific free energy");    // ar normalized by R.Tr/M
+    ADD_PARAMETER(m_srhat, "sr")->setLongName("normalized referential specific entropy");        // sr normalized by R/M
+    ADD_PROPERTY (m_aohat, "ao")->SetLongName("normalized specific free energy circle");         // a-circle normalized by R.Tr/M
+    ADD_PROPERTY (m_cphat, "cp")->SetLongName("normalized isobaric specific heat capacity");     // cp normalized by R/M
 
 END_FECORE_CLASS();
 
 FEIdealGas::FEIdealGas(FEModel* pfem) : FEElasticFluid(pfem)
 {
-    m_R = m_Pr = m_Tr = m_ar = m_sr = 0;
-    m_ao = nullptr;
-    m_cp = nullptr;
+    m_R = m_Pr = m_Tr = m_arhat = m_srhat = 0;
+    m_aohat = nullptr;
+    m_cphat = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,8 +67,8 @@ bool FEIdealGas::Init()
         feLogWarning("The referential absolute pressure P is calculated internally as %g\n",m_Pr);
     }
     
-    m_ao->Init();
-    m_cp->Init();
+    m_aohat->Init();
+    m_cphat->Init();
     
     return true;
 }
@@ -88,12 +88,12 @@ double FEIdealGas::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = m_Tr + tf.m_T;
-    double Jf = 1 + fp.m_ef;
+    double That = (m_Tr + tf.m_T)/m_Tr;
+    double J = 1 + fp.m_ef;
 
-    double p = m_Pr*(T/(Jf*m_Tr) - 1);
+    double phat = That/J-1;
 
-    return p;
+    return phat*m_Pr;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,12 +102,12 @@ double FEIdealGas::Tangent_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = m_Tr + tf.m_T;
-    double Jf = 1 + fp.m_ef;
+    double That = (m_Tr + tf.m_T)/m_Tr;
+    double J = 1 + fp.m_ef;
 
-    double dp = -m_Pr*T/(Jf*Jf*m_Tr);
+    double dphatJ = -That/pow(J,2);
 
-    return dp;
+    return dphatJ*m_Pr;
 }
 
 //-----------------------------------------------------------------------------
@@ -116,12 +116,12 @@ double FEIdealGas::Tangent_Strain_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = m_Tr + tf.m_T;
-    double Jf = 1 + fp.m_ef;
+    double That = (m_Tr + tf.m_T)/m_Tr;
+    double J = 1 + fp.m_ef;
 
-    double d2p = 2*m_Pr*T/(pow(Jf,3)*m_Tr);
+    double d2phatJ = 2*That/pow(J,3);
 
-    return d2p;
+    return d2phatJ*m_Pr;
 }
 
 //-----------------------------------------------------------------------------
@@ -129,11 +129,11 @@ double FEIdealGas::Tangent_Strain_Strain(FEMaterialPoint& mp)
 double FEIdealGas::Tangent_Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double Jf = 1 + fp.m_ef;
+    double J = 1 + fp.m_ef;
 
-    double dp = m_Pr/(Jf*m_Tr);
+    double dphatThat = 1/J;
 
-    return dp;
+    return dphatThat*m_Pr/m_Tr;
 }
 
 //-----------------------------------------------------------------------------
@@ -148,11 +148,11 @@ double FEIdealGas::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
 double FEIdealGas::Tangent_Strain_Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double Jf = 1 + fp.m_ef;
+    double J = 1 + fp.m_ef;
 
-    double d2p = -m_Pr/(Jf*Jf*m_Tr);
+    double d2phat = -1/pow(J,2);
 
-    return d2p;
+    return d2phat*m_Pr/m_Tr;
 }
 
 //-----------------------------------------------------------------------------
@@ -163,20 +163,15 @@ double FEIdealGas::SpecificFreeEnergy(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
     double J = 1 + fp.m_ef;
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double scl = m_R*m_Tr/m_M;
+    double That = (m_Tr + tf.m_T)/m_Tr;
     
     // referential free energy
-    double a = m_ar - m_sr*(That-1);
+    double ahat = J + That*(log(That/J)-1)+ m_arhat - m_srhat*(That-1);
     
     // add a_circle
-    a += m_ao->value(That);
+    ahat += m_aohat->value(That);
     
-    // add strain-dependent contribution
-    a += J+That*(log(That/J)-1);
-
-    return a*scl;
+    return ahat*m_R*m_Tr/m_M;
 }
 
 //-----------------------------------------------------------------------------
@@ -187,20 +182,14 @@ double FEIdealGas::SpecificEntropy(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
     double J = 1 + fp.m_ef;
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double scl = m_R/m_M;
+    double That = (tf.m_T + m_Tr)/m_Tr;
 
-    // referential entropy
-    double s = m_sr;
-    
-    // add s_circle
-    s -= m_ao->derive(That);
+    double shat = -log(That/J)+m_srhat;
     
     // add strain-dependent contribution
-    s += -log(That/J);
+    shat += -m_aohat->derive(That);
 
-    return s*scl;
+    return shat*m_R/m_M;
 }
 
 //-----------------------------------------------------------------------------
@@ -211,14 +200,11 @@ double FEIdealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
     double J = 1 + fp.m_ef;
-    double T = tf.m_T;
-    double That = T/m_Tr;
-    double scl = m_R*m_Tr/m_M;
-
-    // strain-dependent contribution
-    double a = J+That*(log(That/J)-1);
-
-    return a*scl;
+    double That = (m_Tr + tf.m_T)/m_Tr;
+    
+    double what = J + That*(log(That/J)-1);
+    
+    return what*m_R*m_Tr/m_M;
 }
 
 //-----------------------------------------------------------------------------
@@ -226,13 +212,11 @@ double FEIdealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
 double FEIdealGas::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double scl = m_R/m_M;
+    double That = (tf.m_T + m_Tr)/m_Tr;
 
-    double cp = m_cp->value(That);
+    double cphat = m_cphat->value(That);
     
-    return cp*scl;
+    return cphat*m_R/m_M;
 }
                 
 //-----------------------------------------------------------------------------
@@ -256,13 +240,11 @@ double FEIdealGas::Tangent_cv_Strain(FEMaterialPoint& mp)
 double FEIdealGas::Tangent_cv_Temperature(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
-    double scl = m_R/(m_M*m_Tr);
+    double That = (tf.m_T + m_Tr)/m_Tr;
 
-    double dcv = m_cp->derive(That);
+    double dcvhat = m_cphat->derive(That);
     
-    return dcv*scl;
+    return dcvhat*m_R*m_Tr/m_M;
 }
 
 //-----------------------------------------------------------------------------

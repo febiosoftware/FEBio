@@ -45,6 +45,9 @@ public:
     // returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
     
+    //! initialization
+    bool Init() override;
+    
     //! Serialization
     void Serialize(DumpStream& ar) override;
 
@@ -105,6 +108,10 @@ public:
 private: // material properties
     FEElasticFluid*             m_pElastic;     //!< pointer to elastic part of fluid material
     FEFluidThermalConductivity* m_pConduct;     //!< pointer to fluid thermal conductivity material
+    
+public:
+    double      m_Pr;       //!< referential pressure
+    double      m_Tr;       //!< referential temperature
     
     // declare parameter list
     DECLARE_FECORE_CLASS();
