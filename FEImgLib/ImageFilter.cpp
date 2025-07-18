@@ -13,7 +13,7 @@ ImageFilter::ImageFilter(FEModel* fem) : FECoreClass(fem)
 //=================================================================================================
 
 BEGIN_FECORE_CLASS(IterativeBlur1D, ImageFilter)
-	ADD_PARAMETER(m_blur, "blur radius");
+	ADD_PARAMETER(m_blur, "blur");
 	ADD_PARAMETER(m_norm_flag, "normalize values");
 END_FECORE_CLASS();
 
@@ -102,7 +102,7 @@ double IterativeBlur1D::Apply(Image& img, int m_pos[3], int m_range[3], int m_di
 }
 
 BEGIN_FECORE_CLASS(IterativeBlur3D, ImageFilter)
-ADD_PARAMETER(m_blur, "blur radius");
+ADD_PARAMETER(m_blur, "blur");
 ADD_PARAMETER(m_norm_flag, "normalize values");
 END_FECORE_CLASS();
 
@@ -183,7 +183,7 @@ double IterativeBlur3D::Apply(Image& img, int m_pos[3], int m_range[3], int m_di
 //=================================================================================================
 
 BEGIN_FECORE_CLASS(BoxBlur1D, ImageFilter)
-	ADD_PARAMETER(m_blur, "blur radius");
+	ADD_PARAMETER(m_blur, "blur");
 	ADD_PARAMETER(m_norm_flag, "normalize values");
 END_FECORE_CLASS();
 
@@ -289,8 +289,8 @@ double BoxBlur1D::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
 }
 
 BEGIN_FECORE_CLASS(BoxBlur3D, ImageFilter)
-ADD_PARAMETER(m_blur, "blur radius");
-ADD_PARAMETER(m_norm_flag, "normalize values");
+	ADD_PARAMETER(m_blur, "blur");
+	ADD_PARAMETER(m_norm_flag, "normalize values");
 END_FECORE_CLASS();
 
 BoxBlur3D::BoxBlur3D(FEModel* fem) : ImageFilter(fem)
