@@ -1,4 +1,5 @@
 #pragma once
+#include <FECore/FECoreClass.h>
 #include "feimglib_api.h"
 
 class Image;
