@@ -1594,6 +1594,27 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+class FEPlotTotalLinearMomentum : public FEPlotDomainData
+{
+public:
+	FEPlotTotalLinearMomentum(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_REGION) { SetUnits(UNIT_ENERGY); }
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotTotalAngularMomentum : public FEPlotDomainData
+{
+public:
+	FEPlotTotalAngularMomentum(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_REGION) { SetUnits(UNIT_ENERGY); }
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotTotalEnergy : public FEPlotDomainData
+{
+public:
+	FEPlotTotalEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_REGION) { SetUnits(UNIT_ENERGY); }
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //=============================================================================
 //                            E D G E   D A T A
 //=============================================================================

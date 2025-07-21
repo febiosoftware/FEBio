@@ -4985,3 +4985,113 @@ bool FEPlotEdgeContactGap::Save(FEEdge& edge, FEDataStream& a)
 
 	return true;
 }
+
+bool FEPlotTotalLinearMomentum::Save(FEDomain& dom, FEDataStream& a)
+{
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+		if (pme == 0) return false;
+
+		vec3d L(0,0,0);
+		FESolidDomain& solidDomain = dynamic_cast<FESolidDomain&>(dom);
+		for (int i = 0; i < solidDomain.Elements(); ++i)
+		{
+			FESolidElement& el = solidDomain.Element(i);
+			int nint = el.GaussPoints();
+			double* w = el.GaussWeights();
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+				vec3d& v = pt.m_v;
+
+				double J0 = solidDomain.detJ0(el, n);
+
+				L.x += v.x * J0 * w[n];
+				L.y += v.y * J0 * w[n];
+				L.z += v.z * J0 * w[n];
+			}
+		}
+		a << L;
+		return true;
+	}
+	return false;
+}
+
+bool FEPlotTotalAngularMomentum::Save(FEDomain& dom, FEDataStream& a)
+{
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+		if (pme == 0) return false;
+
+		vec3d J(0, 0, 0);
+		FESolidDomain& solidDomain = dynamic_cast<FESolidDomain&>(dom);
+		for (int i = 0; i < solidDomain.Elements(); ++i)
+		{
+			FESolidElement& el = solidDomain.Element(i);
+			int nint = el.GaussPoints();
+			double* w = el.GaussWeights();
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+				vec3d& r = mp.m_rt;
+				vec3d& v = pt.m_v;
+
+				vec3d j = r ^ v;
+
+				double J0 = solidDomain.detJ0(el, n);
+
+				J.x += j.x * J0 * w[n];
+				J.y += j.y * J0 * w[n];
+				J.z += j.z * J0 * w[n];
+			}
+		}
+		a << J;
+		return true;
+	}
+	return false;
+}
+
+
+bool FEPlotTotalEnergy::Save(FEDomain& dom, FEDataStream& a)
+{
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+		if (pme == 0) return false;
+
+		double E = 0.0;
+		FESolidDomain& solidDomain = dynamic_cast<FESolidDomain&>(dom);
+		for (int i = 0; i < solidDomain.Elements(); ++i)
+		{
+			FESolidElement& el = solidDomain.Element(i);
+			int nint = el.GaussPoints();
+			double* w = el.GaussWeights();
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+				// strain energy
+				double W = pme->StrainEnergyDensity(mp);
+
+				// kinetic energy
+				double D = pme->Density(mp);
+				vec3d& v = pt.m_v;
+				double K = 0.5 * (v * v) * D;
+
+				double J0 = solidDomain.detJ0(el, n);
+
+				E += (K + W) * J0 * w[n];
+			}
+		}
+		a << E;
+		return true;
+	}
+	return false;
+}

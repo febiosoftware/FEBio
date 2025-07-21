@@ -915,6 +915,10 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotIdealGasPressure, "ideal gas pressure");
 	REGISTER_FECORE_CLASS(FEPlotBodyForce, "body force");
 
+	REGISTER_FECORE_CLASS(FEPlotTotalLinearMomentum, "total linear momentum");
+	REGISTER_FECORE_CLASS(FEPlotTotalAngularMomentum, "total angular momentum");
+	REGISTER_FECORE_CLASS(FEPlotTotalEnergy, "total energy");
+
 	// beam variables
 	REGISTER_FECORE_CLASS(FEPlotBeamStress      , "beam stress");
 	REGISTER_FECORE_CLASS(FEPlotBeamStressCouple, "beam stress couple");
