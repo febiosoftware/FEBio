@@ -779,6 +779,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotMaterialAxes, "material axes");
 	REGISTER_FECORE_CLASS(FEPlotShellThickness, "shell thickness");
 	REGISTER_FECORE_CLASS(FEPlotShellDirector, "shell director");
+    REGISTER_FECORE_CLASS(FEPlotNodalShellDirector, "nodal shell director");
 	REGISTER_FECORE_CLASS(FEPlotDamage, "damage");
 	REGISTER_FECORE_CLASS(FEPlotIntactBondFraction, "intact bond fraction");
     REGISTER_FECORE_CLASS(FEPlotFatigueBondFraction, "fatigue bond fraction");
@@ -914,6 +915,10 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotGrowthRelativeVolume, "growth relative volume");
     REGISTER_FECORE_CLASS(FEPlotIdealGasPressure, "ideal gas pressure");
 	REGISTER_FECORE_CLASS(FEPlotBodyForce, "body force");
+
+	REGISTER_FECORE_CLASS(FEPlotTotalLinearMomentum, "total linear momentum");
+	REGISTER_FECORE_CLASS(FEPlotTotalAngularMomentum, "total angular momentum");
+	REGISTER_FECORE_CLASS(FEPlotTotalEnergy, "total energy");
 
 	// beam variables
 	REGISTER_FECORE_CLASS(FEPlotBeamStress      , "beam stress");

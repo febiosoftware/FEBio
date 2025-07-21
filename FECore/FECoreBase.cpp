@@ -248,10 +248,8 @@ FECoreBase* FECoreBase::LoadClass(DumpStream& ar, FECoreBase* a)
 	return a;
 }
 
-//-----------------------------------------------------------------------------
-bool FECoreBase::Validate()
+bool FECoreBase::ValidateParameters()
 {
-	// validate parameters
 	FEParameterList& pl = GetParameterList();
 	int N = pl.Parameters();
 	list<FEParam>::iterator pi = pl.first();
@@ -267,6 +265,12 @@ bool FECoreBase::Validate()
 			return false;
 		}
 	}
+}
+
+bool FECoreBase::Validate()
+{
+	// validate parameters
+	ValidateParameters();
 
 	// check properties
 	const int nprop = (int)m_Prop.size();
@@ -330,7 +334,7 @@ bool FECoreBase::Init()
 	}
 
 	// check the parameter ranges
-	if (Validate() == false) return false;
+	if (ValidateParameters() == false) return false;
 
 	// initialize properties
 	const int nprop = (int)m_Prop.size();
