@@ -121,6 +121,14 @@ bool FEPlotNodeShellDisplacement::Save(FEMesh& m, FEDataStream& a)
     return true;
 }
 
+bool FEPlotNodalShellDirector::Save(FEMesh& m, FEDataStream& a)
+{
+    writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
+        return (node.HasFlags(FENode::SHELL)) ? node.m_dt : vec3d(0,0,0);
+    });
+    return true;
+}
+
 //-----------------------------------------------------------------------------
 bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 {

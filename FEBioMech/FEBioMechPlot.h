@@ -63,6 +63,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Shell directors
+class FEPlotNodalShellDirector : public FEPlotNodeData
+{
+public:
+    FEPlotNodalShellDirector(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) { SetUnits(UNIT_LENGTH); }
+    bool Save(FEMesh& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Nodal velocities
 //!
 class FEPlotNodeVelocity : public FEPlotNodeData
