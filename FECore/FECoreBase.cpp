@@ -265,12 +265,13 @@ bool FECoreBase::ValidateParameters()
 			return false;
 		}
 	}
+	return true;
 }
 
 bool FECoreBase::Validate()
 {
 	// validate parameters
-	ValidateParameters();
+	if (!ValidateParameters()) return false;
 
 	// check properties
 	const int nprop = (int)m_Prop.size();

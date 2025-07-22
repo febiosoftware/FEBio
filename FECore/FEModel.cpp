@@ -517,6 +517,9 @@ bool FEModel::Init()
 	//       reference the rigid bodies
 	if (InitMaterials() == false) return false;
 
+	// Validate the materials
+	if (ValidateMaterials() == false) return false;
+
 	// initialize mesh data
 	// NOTE: this must be done AFTER the elements have been assigned material point data !
 	// this is because the mesh data is reset
