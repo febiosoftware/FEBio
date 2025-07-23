@@ -29,14 +29,15 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FETractionRobinBC.h"
 #include "FEBioMech.h"
+#include "FEMechModel.h"
 #include <FECore/FEFacetSet.h>
 #include <FECore/FEModel.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FETractionRobinBC, FESurfaceLoad)
     ADD_PARAMETER(m_epsk   , "spring_eps")->setUnits("P/L");
-    ADD_PARAMETER(m_epsc   , "dashpot_eps")->setUnits("P.t/L");
 	ADD_PARAMETER(m_bshellb , "shell_bottom");
+    ADD_PARAMETER(m_nRB, "body")->setEnums("$(rigid_materials)");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -44,8 +45,9 @@ END_FECORE_CLASS();
 FETractionRobinBC::FETractionRobinBC(FEModel* pfem) : FESurfaceLoad(pfem)
 {
     m_epsk = 0.0;
-    m_epsc = 0.0;
     m_bshellb = false;
+    m_nRB = -1;
+    m_rb = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -62,6 +64,9 @@ bool FETractionRobinBC::Init()
 	FESurface& surf = GetSurface();
 	surf.SetShellBottom(m_bshellb);
 
+    FEMechModel& fem = static_cast<FEMechModel&>(*GetFEModel());
+    if (m_nRB != -1) m_rb = fem.GetRigidBody(m_nRB);
+    
 	// get the degrees of freedom
 	m_dof.Clear();
 	if (m_bshellb == false)
@@ -98,22 +103,29 @@ void FETractionRobinBC::LoadVector(FEGlobalVector& R)
 {
     if (GetFEModel()->GetTime().currentTime == 0) return;
     
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    quatd q;
+    if (m_rb) q = m_rb->GetRotation();
     
 	// evaluate the integral
 	FESurface& surf = GetSurface();
 	surf.LoadVector(R, m_dof, false, [=](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
 
 		// evaluate traction at this material point
+        FESurfaceElement& el = *pt.SurfaceElement();
+        vec3d G[2];
+        surf.CoBaseVectors0(el, pt.m_index, G);
+        
+        // evaluate referential normal and area at this point
+        vec3d nr = G[0] ^ G[1];
+        double J = nr.unit();
+        mat3ds Nr = dyad(nr);
+        
         double epsk = m_epsk(pt);
-        double epsc = m_epsc(pt);
         vec3d u = pt.m_rt - pt.m_r0;
-        vec3d udot = (dt > 0) ? (pt.m_rt - pt.m_rp)/dt : vec3d(0,0,0);
+        q.RotateVector(u);
 
-        vec3d t = -u*epsk - udot*epsc;
+        vec3d t = -u*epsk;
 		if (m_bshellb) t = -t;
-
-		double J = (pt.dxr ^ pt.dxs).norm();
 
 		double Na = dof_a.shape;
 
@@ -127,36 +139,28 @@ void FETractionRobinBC::LoadVector(FEGlobalVector& R)
 void FETractionRobinBC::StiffnessMatrix(FELinearSystem& LS)
 {
     if (GetFEModel()->GetTime().currentTime == 0) return;
-    double dt = GetFEModel()->GetTime().timeIncrement;
+    quatd q;
+    if (m_rb) q = m_rb->GetRotation();
     
     // evaluate the integral
     FESurface& surf = GetSurface();
     surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& kab) {
         
-        // evaluate pressure at this material point
-        vec3d n = (pt.dxr ^ pt.dxs);
-        double J = n.unit();
+        FESurfaceElement& el = *pt.SurfaceElement();
+        vec3d G[2];
+        surf.CoBaseVectors0(el, pt.m_index, G);
         
-        mat3dd I(1);
+        // evaluate referential normal and area at this point
+        vec3d nr = G[0] ^ G[1];
+        
+        double J = nr.unit();
         
         double epsk = m_epsk(pt);
-        double epsc = m_epsc(pt);
-        vec3d u = pt.m_rt - pt.m_r0;
-        vec3d udot = (dt > 0) ? (pt.m_rt - pt.m_rp)/dt : vec3d(0,0,0);
-        
-        vec3d t = -u*epsk - udot*epsc;
-        if (m_bshellb) t = -t;
 
         double Na  = dof_a.shape;
-        double dNar = dof_a.shape_deriv_r;
-        double dNas = dof_a.shape_deriv_s;
-        
         double Nb  = dof_b.shape;
-        double dNbr = dof_b.shape_deriv_r;
-        double dNbs = dof_b.shape_deriv_s;
         
-        mat3d Kab = (J*Na*Nb)*(epsk+epsc/dt)*mat3dd(1)
-        +((t & n)*mat3da(pt.dxr*dNbs - pt.dxs*dNbr)*(Na*J));
+        mat3d Kab = q.RotationMatrix()*(epsk*Na*Nb*J);
         kab.set(0, 0, Kab);
     });
 }

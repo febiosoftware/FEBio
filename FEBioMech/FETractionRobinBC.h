@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelParam.h>
+#include <FEBioMech/FERigidBody.h>
 
 //-----------------------------------------------------------------------------
 //! FETractionRobinBC is a surface that has a traction proportional to the surface displacement and velocity
@@ -57,8 +58,9 @@ public:
 
 protected:
     FEParamDouble   m_epsk;     //!< displacement penalty
-    FEParamDouble   m_epsc;     //!< velocity penalty
 	bool			m_bshellb;
+    int             m_nRB;      //!< optional rigid body number for rotating frame
+    FERigidBody*    m_rb;       //!< optional rigid body for rotating frame
 
 	DECLARE_FECORE_CLASS();
 };

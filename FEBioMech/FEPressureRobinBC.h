@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEModelParam.h>
+#include <FEBioMech/FERigidBody.h>
 
 //-----------------------------------------------------------------------------
 //! The pressure surface is a surface domain that sustains pressure boundary
@@ -55,8 +56,9 @@ public:
 
 protected:
 	FEParamDouble   m_epsk;     //!< normal displacement penalty
-    FEParamDouble   m_epsc;     //!< normal velocity penalty
 	bool			m_bshellb;	//!< flag for prescribing pressure on shell bottom
+    int             m_nRB;      //!< optional rigid body number for rotating frame
+    FERigidBody*    m_rb;       //!< optional rigid body for rotating frame
 
 	DECLARE_FECORE_CLASS();
 };
