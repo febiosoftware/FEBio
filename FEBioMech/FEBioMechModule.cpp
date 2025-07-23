@@ -662,8 +662,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FESurfaceForceUniform, "force");
 	REGISTER_FECORE_CLASS(FEBearingLoad, "bearing load");
 	REGISTER_FECORE_CLASS(FEIdealGasPressure, "ideal gas pressure");
-    REGISTER_FECORE_CLASS(FEPressureRobinBC, "pressure Robin BC");
-    REGISTER_FECORE_CLASS(FETractionRobinBC, "traction Robin BC");
+    REGISTER_FECORE_CLASS(FEPressureRobinBC, "pressure Robin BC", FECORE_EXPERIMENTAL);
+    REGISTER_FECORE_CLASS(FETractionRobinBC, "traction Robin BC", FECORE_EXPERIMENTAL);
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
