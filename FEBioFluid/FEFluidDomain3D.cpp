@@ -169,12 +169,16 @@ void FEFluidDomain3D::InternalForces(FEGlobalVector& R)
 void FEFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
     int i, n;
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    double alpha = fem.GetTime().alphaf;
     
     // jacobian matrix, inverse jacobian matrix and determinants
     double Ji[3][3], detJ;
     
     mat3ds sv;
-    vec3d gradp;
+    vec3d gradp, gradJ;
+    double J;
     
     const double *H, *Gr, *Gs, *Gt;
     
@@ -185,6 +189,13 @@ void FEFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& f
     vector<vec3d> gradN(neln);
     
     double*	gw = el.GaussWeights();
+    
+    vec3d vf[FEElement::MAX_NODES];
+    for (int i=0; i<neln; ++i) {
+        FENode& node = mesh.Node(el.m_node[i]);
+        vf[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*alpha
+        + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-alpha);
+    }
 
     // repeat for all integration points
     for (n=0; n<nint; ++n)
@@ -203,6 +214,10 @@ void FEFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& f
         sv = m_pMat->GetViscous()->Stress(mp);
         // get the gradient of the elastic pressure
         gradp = pt.m_gradef*m_pMat->Tangent_Pressure_Strain(mp);
+        // get the gradient of the fluid dilatation
+        gradJ = pt.m_gradef;
+        // get J
+        J = pt.m_ef+1;
         
         H = el.H(n);
         Gr = el.Gr(n);
@@ -215,13 +230,16 @@ void FEFluidDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& f
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
         }
         
-        // Jdot/J
-        double dJoJ = pt.m_efdot/(pt.m_ef+1);
+        // dJdt
+        double dJdt = pt.m_efdot;
+        // divergence of velocity
+        double divv = 0;
+        for (i = 0; i<neln; ++i) divv += gradN[i]*vf[i];
         
         for (i=0; i<neln; ++i)
         {
             vec3d fs = sv*gradN[i] + gradp*H[i];
-            double fJ = dJoJ*H[i] + gradN[i]*pt.m_vft;
+            double fJ = (dJdt + gradJ*pt.m_vft - J*divv)*H[i];
             
             // calculate internal force
             // the '-' sign is so that the internal forces get subtracted
@@ -365,7 +383,9 @@ void FEFluidDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidElement 
 
 void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
 {
-    const FETimeInfo& tp = GetFEModel()->GetTime();
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    const FETimeInfo& tp = fem.GetTime();
     int i, i4, j, j4, n;
     
     // Get the current element's data
@@ -385,6 +405,14 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
     
     // weights at gauss points
     const double *gw = el.GaussWeights();
+    
+    
+    vec3d vf[FEElement::MAX_NODES];
+    for (int i=0; i<neln; ++i) {
+        FENode& node = mesh.Node(el.m_node[i]);
+        vf[i] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2])*tp.alphaf
+        + node.get_vec3d_prev(m_dofW[0], m_dofW[1], m_dofW[2])*(1-tp.alphaf);
+    }
     
     // calculate element stiffness matrix
     for (n=0; n<nint; ++n)
@@ -410,14 +438,17 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         // get the tangents
         mat3ds svJ = m_pMat->GetViscous()->Tangent_Strain(mp);
         tens4ds cv = m_pMat->Tangent_RateOfDeformation(mp);
-        double dp = m_pMat->Tangent_Pressure_Strain(mp);
-        double d2p = m_pMat->Tangent_Pressure_Strain_Strain(mp);
-        // Jdot/J
-        double dJoJ = pt.m_efdot/Jf;
+        double dpJ = m_pMat->Tangent_Pressure_Strain(mp);
+        double d2pJ = m_pMat->Tangent_Pressure_Strain_Strain(mp);
+        double dJdt = pt.m_efdot;
+        vec3d gradJ = pt.m_gradef;
         
         // evaluate spatial gradient of shape functions
         for (i=0; i<neln; ++i)
             gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+        
+        double divv = 0;
+        for (i=0; i<neln; ++i) divv += gradN[i]*vf[i];
         
         // evaluate stiffness matrix
         for (i=0, i4=0; i<neln; ++i, i4 += 4)
@@ -425,9 +456,9 @@ void FEFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
             for (j=0, j4 = 0; j<neln; ++j, j4 += 4)
             {
                 mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j]);
-                vec3d kJv = (pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j];
-                vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dp+pt.m_gradef*(H[j]*d2p))*H[i];
-                double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;
+                vec3d kJv = (gradJ*H[j] - gradN[j]*Jf)*H[i];
+                vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dpJ+pt.m_gradef*(H[j]*d2pJ))*H[i];
+                double kJJ = (H[j]*(ksi - divv) + gradN[j]*pt.m_vft)*H[i];
                 
                 ke[i4  ][j4  ] += Kvv(0,0)*detJ;
                 ke[i4  ][j4+1] += Kvv(0,1)*detJ;
