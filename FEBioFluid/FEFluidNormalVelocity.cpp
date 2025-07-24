@@ -82,7 +82,8 @@ double FEFluidNormalVelocity::NormalVelocity(FESurfaceMaterialPoint& mp)
 //! Calculate the residual for the prescribed normal velocity
 void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R)
 {
-    const FETimeInfo& tp = GetTimeInfo();
+    return;
+/*    const FETimeInfo& tp = GetTimeInfo();
 
 	m_psurf->LoadVector(R, m_dofEF, false, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, vector<double>& fa) {
 
@@ -102,7 +103,7 @@ void FEFluidNormalVelocity::LoadVector(FEGlobalVector& R)
 
 		double H = dof_a.shape;
 		fa[0] = H * vn * da;
-	});
+	});*/
 }
 
 //-----------------------------------------------------------------------------
