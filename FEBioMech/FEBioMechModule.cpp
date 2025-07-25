@@ -1143,6 +1143,7 @@ void FEBioMech::InitModule()
 
 	// derived from FELogDomainData
 	REGISTER_FECORE_CLASS(FENormalizedInternalEnergy, "normalized internal energy");
+	REGISTER_FECORE_CLASS(FELogTotalEnergy, "total energy");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogObjectData

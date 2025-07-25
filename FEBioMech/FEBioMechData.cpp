@@ -2574,8 +2574,6 @@ double FELogMaxContactGap::value(FESurface& surface)
 	return 0.0;
 }
 
-
-//=============================================================================
 double FENormalizedInternalEnergy::value(FEDomain& dom)
 {
 	double sum = 0.0;
@@ -2620,4 +2618,43 @@ double FENormalizedInternalEnergy::value(FEDomain& dom)
 	m_sum += sum;
 	double NTSIE = m_sum / (P0 * vol);
 	return NTSIE;
+}
+
+double FELogTotalEnergy::value(FEDomain& dom)
+{
+	m_sum = 0.0;
+	if (dom.Class() == FE_DOMAIN_SOLID)
+	{
+		FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+		if (pme == 0) return false;
+
+		double E = 0.0;
+		FESolidDomain& solidDomain = dynamic_cast<FESolidDomain&>(dom);
+		for (int i = 0; i < solidDomain.Elements(); ++i)
+		{
+			FESolidElement& el = solidDomain.Element(i);
+			int nint = el.GaussPoints();
+			double* w = el.GaussWeights();
+			for (int n = 0; n < nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+				// strain energy
+				double W = pme->StrainEnergyDensity(mp);
+
+				// kinetic energy
+				double D = pme->Density(mp);
+				vec3d& v = pt.m_v;
+				double K = 0.5 * (v * v) * D;
+
+				double J0 = solidDomain.detJ0(el, n);
+
+				E += (K + W) * J0 * w[n];
+			}
+		}
+		m_sum = E;
+	}
+
+	return m_sum;
 }
