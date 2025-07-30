@@ -236,7 +236,8 @@ macro(crossExecProcess OUT)
 endmacro()
 
 # Check for git and give warning if not available
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+option(SET_DEVCOMMIT "Set the DEVCOMMIT macro with git commit hash" ON)
+if(${SET_DEVCOMMIT} AND EXISTS ${CMAKE_SOURCE_DIR}/.git)
     if(WIN32)
         set(CMD where git)
     else()
@@ -259,11 +260,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
             crossExecProcess(DEVCOMMIT)
             
             if(${SUCCESS} EQUAL 0)
-                set_source_files_properties(
-                    FEBioLib/version.cpp
-                    PROPERTIES
-                    COMPILE_DEFINITIONS "DEVCOMMIT=\"${DEVCOMMIT}\""
-                )
+                target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
             endif()
         endif()
     else()
