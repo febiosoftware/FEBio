@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FE2DTransIsoVerondaWestmann.h"
 #include "FEABUnconstrained.h"
 #include "FEActiveFiberContraction.h"
+#include "FEUncoupledActiveFiberContraction.h"
 #include "FEArrudaBoyce.h"
 #include "FECarreauYasudaViscousSolid.h"
 #include "FECarterHayesOld.h"
@@ -514,6 +515,7 @@ void FEBioMech::InitModule()
 	// Other materials 
 	REGISTER_FECORE_CLASS(FELinearTrussMaterial, "linear truss");
 	REGISTER_FECORE_CLASS(FEHuiskesSupply, "Huiskes-supply");
+	REGISTER_FECORE_CLASS(FEUncoupledActiveFiberContraction, "uncoupled active_contraction");
 	REGISTER_FECORE_CLASS(FEActiveFiberContraction, "active_contraction");
     REGISTER_FECORE_CLASS(FEForceVelocityContraction, "force-velocity-Estrada");
 	REGISTER_FECORE_CLASS(FEWrinkleOgdenMaterial, "wrinkle Ogden");
