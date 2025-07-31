@@ -1918,3 +1918,13 @@ public:
 private:
 	double m_sum;
 };
+
+class FELogTotalEnergy : public FELogDomainData
+{
+public:
+	FELogTotalEnergy(FEModel* fem) : FELogDomainData(fem), m_sum(0) {}
+	double value(FEDomain& dom) override;
+
+private:
+	double m_sum;
+};

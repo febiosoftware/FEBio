@@ -24,35 +24,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
+#include "FEActiveContractionMaterial.h"
 
-struct ModelStats {
-	int		ntimeSteps = 0;		//!< total nr of time steps
-	int		ntotalIters = 0;	//!< total nr of equilibrium iterations
-	int		ntotalRHS = 0;		//!< total nr of right hand side evaluations
-	int		ntotalReforms = 0;	//!< total nr of stiffness reformations
-};
+//! A material class describing the active fiber contraction for use in uncoupled materials
+class FEUncoupledActiveFiberContraction : public FEActiveContractionMaterial
+{
+public:
+	FEUncoupledActiveFiberContraction(FEModel* pfem);
 
-struct TimingInfo {
-	double total_time = 0;
-	double input_time = 0;
-	double init_time = 0;
-	double solve_time = 0;
-	double io_time = 0;
-	double total_ls_factor = 0;
-	double total_ls_backsolve = 0;
-	double total_reform = 0;
-	double total_stiff = 0;
-	double total_rhs = 0;
-	double total_update = 0;
-	double total_qn = 0;
-	double total_serialize = 0;
-	double total_callback = 0;
-	double total_other = 0;
-};
+	//! initialization
+	bool Init() override;
 
-struct TimeStepStats {
-	int iters = 0;
-	int nrhs = 0;
-	int refs = 0;
-	int status = 0; // 0 = failed, 1 = converged
+	//! calculate the fiber stress
+	mat3ds ActiveStress(FEMaterialPoint& mp, const vec3d& a0) override;
+
+	//! active contraction stiffness contribution
+	tens4ds ActiveStiffness(FEMaterialPoint& mp, const vec3d& a0) override;
+
+protected:
+	double	m_ascl;		//!< activation scale factor
+	double	m_Tmax;		//!< activation scale factor
+	double	m_ca0;		//!< intracellular calcium concentration
+	double	m_camax;	//!< peak calcium concentration
+	double	m_beta;		//!< shape of peak isometric tension-sarcomere length relation
+	double	m_l0;		//!< unloaded length
+	double	m_refl;		//!< sarcomere length
+
+	DECLARE_FECORE_CLASS();
 };
