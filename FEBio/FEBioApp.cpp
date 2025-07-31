@@ -80,11 +80,21 @@ bool FEBioApp::Init(int argc, char* argv[])
 
 	// read the configration file if specified
 	if (m_ops.szcnf[0])
+    {
+        fprintf(stdout, "Reading configuration file: %s\n", m_ops.szcnf);
+
 		if (febio::Configure(m_ops.szcnf, m_config) == false)
 		{
 			fprintf(stderr, "FATAL ERROR: An error occurred reading the configuration file.\n");
 			return false;
 		}
+    }
+    else
+    {
+        fprintf(stdout, "Starting without configuration file\n");
+    }
+
+    if (m_config.m_noutput != 0) fprintf(stdout, "Default linear solver: %s\n", febio::GetFECoreKernel()->GetLinearSolverType());
 
 	// read command line plugin if specified
 	if (m_ops.szimp[0] != 0)
@@ -267,6 +277,18 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		char szpath[512] = { 0 };
 		febio::get_app_path(szpath, 511);
 		snprintf(ops.szcnf, sizeof(ops.szcnf), "%sfebio.xml", szpath);
+
+        // if there is an febio.xml file next to the binary, we use it, otherwise
+        // we set the contig name to an empty string
+        FILE* file = fopen(ops.szcnf, "r");
+        if (file) 
+        {
+            fclose(file);
+        }
+        else
+        {
+            ops.szcnf[0] = 0;
+        }
 	}
 
 	// loop over the arguments

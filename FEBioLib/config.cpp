@@ -233,7 +233,6 @@ namespace febio {
 			// set this as the default solver
 			FECoreKernel& fecore = FECoreKernel::GetInstance();
 			fecore.SetDefaultSolver(cd);
-			if (boutput) fprintf(stderr, "Default linear solver: %s\n", fecore.GetLinearSolverType());
 		}
 
 		return true;
