@@ -1,6 +1,6 @@
 # MKL - On Unix the compilervars.sh should be run to find the MKL libraries.
-if(DEFINED ENV{MKLROOT})
-    set(MKLROOT $ENV{MKLROOT} CACHE PATH "MKL root directory")
+if(DEFINED ENV{MKL_ROOT})
+    set(MKL_ROOT $ENV{MKL_ROOT} CACHE PATH "MKL root directory")
 else()
     if(WIN32)
         set(MKLPATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*)
@@ -13,33 +13,33 @@ else()
         set(MKLSUFFIXES "compilers_and_libraries/linux" "oneapi")
     endif()
     
-    find_file(MKLROOT mkl
+    find_file(MKL_ROOT mkl
 		PATHS ${MKLPATHS}
 		PATH_SUFFIXES ${MKLSUFFIXES}
 		DOC "MKL root directory")
 endif()
 
-if(MKLROOT)
-    if(${MKLROOT} MATCHES "oneapi")
+if(MKL_ROOT)
+    if(${MKL_ROOT} MATCHES "oneapi")
         find_path(MKL_INC mkl.h 
             PATHS
-              ${MKLROOT}/latest/include
-              ${MKLROOT}/include
+              ${MKL_ROOT}/latest/include
+              ${MKL_ROOT}/include
             DOC "MKL include directory")
             
         find_library(MKL_CORE mkl_core
             PATHS
-              ${MKLROOT}/latest/lib
-              ${MKLROOT}/lib
+              ${MKL_ROOT}/latest/lib
+              ${MKL_ROOT}/lib
             PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH)
             
         find_library(MKL_OMP_LIB 
             NAMES iomp5 iomp5md libiomp5md.lib
             PATHS
-              ${MKLROOT}/../compiler/latest/*/compiler/lib/
-              ${MKLROOT}/../../compiler/latest/*/compiler/lib/
-              ${MKLROOT}/../../compiler/latest/lib/
+              ${MKL_ROOT}/../compiler/latest/*/compiler/lib/
+              ${MKL_ROOT}/../../compiler/latest/*/compiler/lib/
+              ${MKL_ROOT}/../../compiler/latest/lib/
             PATH_SUFFIXES "intel64" "mac"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
@@ -47,25 +47,25 @@ if(MKLROOT)
     else()
         find_path(MKL_INC mkl.h 
             PATHS
-              ${MKLROOT}/latest/include
-              ${MKLROOT}/include
+              ${MKL_ROOT}/latest/include
+              ${MKL_ROOT}/include
             DOC "MKL include directory")
             
         find_library(MKL_CORE mkl_core
             PATHS
-              ${MKLROOT}/latest/lib
-              ${MKLROOT}/lib
+              ${MKL_ROOT}/latest/lib
+              ${MKL_ROOT}/lib
             PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH)
             
         find_library(MKL_OMP_LIB 
             NAMES iomp5 iomp5md libiomp5md.lib
 
-            PATHS ${MKLROOT}/lib
-                  ${MKLROOT}/../lib
-                  ${MKLROOT}/../compiler/lib
-                  ${MKLROOT}/../../windows/compiler/lib/
-                  ${MKLROOT}/../../compiler/latest/*/compiler/lib/
+            PATHS ${MKL_ROOT}/lib
+                  ${MKL_ROOT}/../lib
+                  ${MKL_ROOT}/../compiler/lib
+                  ${MKL_ROOT}/../../windows/compiler/lib/
+                  ${MKL_ROOT}/../../compiler/latest/*/compiler/lib/
             PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
