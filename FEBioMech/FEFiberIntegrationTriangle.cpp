@@ -102,7 +102,9 @@ bool FEFiberIntegrationTriangle::Init()
 {
     int list[21] = {NST20, NST34, NST60, NST74, NST196, NST210, NST396, NST410, NST596, NST610, NST796, NST810, NST996, NST1010, NST1196, NST1210, NST1396, NST1410, NST1596, NST1610, NST1796};
     
-    if (m_nre != -1) m_nres = list[m_nre];
+    // this is needed to maintain backward compatibility
+    if (m_nre > 21) m_nres = m_nre;
+    else m_nres = list[m_nre];
     
 	// initialize integration rule data
 	InitIntegrationRule();
