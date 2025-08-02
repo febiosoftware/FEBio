@@ -54,6 +54,7 @@ protected:
     
 public: // parameters
 	int             m_nres;	// resolution
+    int             m_nre;  // resolution entry
 
 protected:
     int             m_nint; // number of integration points

@@ -84,12 +84,13 @@ private:
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberIntegrationTriangle, FEFiberIntegrationScheme)
-	ADD_PARAMETER(m_nres, "resolution");
+	ADD_PARAMETER(m_nre, "resolution")->setEnums("  20\0  34\0  60\0  74\0 196\0 210\0 396\0 410\0 596\0 610\0 796\0 810\0 996\0 1010\0 1196\0 1210\0 1396\0 1410\0 1596\0 1610\0 1796\0");
 END_FECORE_CLASS();
 
 FEFiberIntegrationTriangle::FEFiberIntegrationTriangle(FEModel* pfem) : FEFiberIntegrationScheme(pfem)
 { 
-	m_nres = 0; 
+	m_nres = 0;
+    m_nre = -1;
 }
 
 FEFiberIntegrationTriangle::~FEFiberIntegrationTriangle()
@@ -99,6 +100,10 @@ FEFiberIntegrationTriangle::~FEFiberIntegrationTriangle()
 //-----------------------------------------------------------------------------
 bool FEFiberIntegrationTriangle::Init()
 {
+    int list[21] = {NST20, NST34, NST60, NST74, NST196, NST210, NST396, NST410, NST596, NST610, NST796, NST810, NST996, NST1010, NST1196, NST1210, NST1396, NST1410, NST1596, NST1610, NST1796};
+    
+    if (m_nre != -1) m_nres = list[m_nre];
+    
 	// initialize integration rule data
 	InitIntegrationRule();
     
