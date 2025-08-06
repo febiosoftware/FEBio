@@ -44,10 +44,10 @@ BEGIN_FECORE_CLASS(FEMuscleMaterial, FEUncoupledMaterial)
 	ADD_PARAMETER(m_G1, "g1")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_G2, "g2")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_G3, "g3")->setUnits(UNIT_PRESSURE);
-	ADD_PARAMETER(m_P1, "p1")->setUnits(UNIT_PRESSURE);
+	ADD_PARAMETER(m_P1, "p1");
 	ADD_PARAMETER(m_P2, "p2")->setUnits(UNIT_NONE);
 	ADD_PARAMETER(m_Lofl, "Lofl");
-	ADD_PARAMETER(m_smax, "smax");
+	ADD_PARAMETER(m_smax, "smax")->setUnits(UNIT_PRESSURE);
 	ADD_PARAMETER(m_lam1, "lam_max");
 	ADD_PARAMETER(m_alpha, "activation");
 
