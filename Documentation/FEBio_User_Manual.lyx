@@ -84158,9 +84158,9 @@ The <kinetics> parameter should be set to 1 for Type I bond kinetics or 2 for Ty
 \begin_inset Formula 
 \begin{equation}
 \text{trigger}=\begin{cases}
-1\text{ for any strain} & \left\Vert \Delta\mathbf{E}\right\Vert \\
-2\text{ for distortional strain} & \left\Vert \dev\Delta\boldsymbol{\eta}\right\Vert \\
-3\text{ for dilatational strain} & \left|\ln\left(\det\Delta\mathbf{F}\right)\right|
+0\text{ for any strain} & \left\Vert \Delta\mathbf{E}\right\Vert \\
+1\text{ for distortional strain} & \left\Vert \dev\Delta\boldsymbol{\eta}\right\Vert \\
+2\text{ for dilatational strain} & \left|\ln\left(\det\Delta\mathbf{F}\right)\right|
 \end{cases}\label{eq:rvs-trigger}
 \end{equation}
 
