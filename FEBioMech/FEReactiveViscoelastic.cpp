@@ -45,8 +45,8 @@ SOFTWARE.*/
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactiveViscoelasticMaterial, FEElasticMaterial)
     ADD_PARAMETER(m_wmin , FE_RANGE_CLOSED(0.0, 1.0), "wmin");
-    ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1,2), "kinetics");
-    ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0,2), "trigger");
+    ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1,2), "kinetics")->setEnums("(invalid)\0Type I\0Type II\0");
+    ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0,2), "trigger")->setEnums("any strain\0distortional\0dilatational\0");
     ADD_PARAMETER(m_emin , FE_RANGE_GREATER_OR_EQUAL(0.0), "emin");
 
 	// set material properties
@@ -62,7 +62,7 @@ END_FECORE_CLASS();
 FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
     m_wmin = 0;
-    m_btype = 0;
+    m_btype = 1;
     m_ttype = 0;
     m_emin = 0;
     
