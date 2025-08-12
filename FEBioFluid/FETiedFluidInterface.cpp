@@ -103,6 +103,11 @@ bool FETiedFluidSurface::Init()
     // initialize surface data first
     if (FEContactSurface::Init() == false) return false;
     
+    m_pme.assign(Nodes(), nullptr);
+    double rs[2] = {0,0};
+    m_rs.assign(Nodes(), std::vector<double>(2,0));
+    m_ef.assign(Nodes(), 0);
+    
 	// set the dof list
 	if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
     if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
@@ -317,7 +322,11 @@ void FETiedFluidInterface::Activate()
     // project the surfaces onto each other
     // this will evaluate the gap functions in the reference configuration
     InitialProjection(m_ss, m_ms);
-    if (m_btwo_pass) InitialProjection(m_ms, m_ss);
+    InitialNodalProjection(m_ss, m_ms);
+    if (m_btwo_pass) {
+        InitialProjection(m_ms, m_ss);
+        InitialNodalProjection(m_ms, m_ss);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -520,14 +529,104 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
 }
 
 //-----------------------------------------------------------------------------
+// Perform initial projection between tied surfaces in reference configuration
+void FETiedFluidInterface::InitialNodalProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms)
+{
+    FEMesh& mesh = GetMesh();
+    FESurfaceElement* pme;
+    vec3d r, nu;
+    double rs[2];
+    
+    // initialize projection data
+    FENormalProjection np(ms);
+    np.SetTolerance(m_stol);
+    np.SetSearchRadius(m_srad);
+    np.Init();
+    
+    // loop over all nodes of the primary surface
+    ss.UpdateNodeNormals();
+    int n = 0;
+    for (int i=0; i<ss.Nodes(); ++i)
+    {
+        FENode& node = ss.Node(i);
+        r = node.m_r0;
+        nu = ss.NodeNormal(i);
+        // find the intersection point with the secondary surface
+        pme = np.Project2(r, nu, rs);
+        ss.m_pme[i] = pme;
+        std::vector<double> lrs(2,0);
+        if (pme) { lrs[0] = rs[0]; lrs[1] = rs[1]; }
+        ss.m_rs[i] = lrs;
+        // allow prescribing nodal fluid dilatations on primary surface
+        if (pme) {
+            if (node.get_bc(m_dofWE[3]) != DOF_PRESCRIBED) node.set_bc(m_dofWE[3], DOF_PRESCRIBED);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+// Evaluate jump in fluid dilatation
+void FETiedFluidInterface::ProjectNodalSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms)
+{
+    FEMesh& mesh = GetMesh();
+    double ef[FEElement::MAX_NODES];
+    
+    // loop over all primary surface nodes
+    for (int i=0; i<ss.Nodes(); ++i)
+    {
+        if (ss.m_pme[i]) {
+            FENode& node = ss.Node(i);
+            // get the primary surface dilatation
+            double ef1 = node.get(m_dofWE[3]);
+            
+            // get the secondary surface face
+            FESurfaceElement& el = *ss.m_pme[i];
+
+            int ne = el.Nodes();
+            int nint = el.GaussPoints();
+            
+            // get the nodal dilatations
+            for (int j=0; j<ne; ++j) {
+                ef[j] = mesh.Node(el.m_node[j]).get(m_dofWE[3]);
+            }
+            
+            // evaluate the dilatation on the secondary surface at the projection point
+            double ef2 = el.eval(ef, ss.m_rs[i][0], ss.m_rs[i][1]);
+
+            // get average value of fluid dilatation across the contact interface
+            ss.m_ef[i] = (ef1+ef2)/2;
+        }
+    }
+}
+
+void FETiedFluidInterface::PrescribeNodalDilatation(FETiedFluidSurface& ss)
+{
+    for (int i=0; i<ss.Nodes(); ++i)
+    {
+        if (ss.Node(i).m_ID[m_dofWE[3]] < -1)
+        {
+            FENode& node = ss.Node(i);
+            // set node as having prescribed DOF
+            node.set(m_dofWE[3], ss.m_ef[i]);
+        }
+    }
+    
+    GetFEModel()->SetMeshUpdateFlag(true);
+}
+//-----------------------------------------------------------------------------
 
 void FETiedFluidInterface::Update()
 {
     // project the surfaces onto each other
     // this will update the gap functions as well
     ProjectSurface(m_ss, m_ms);
-    if (m_btwo_pass) ProjectSurface(m_ms, m_ss);
-    
+    ProjectNodalSurface(m_ss, m_ms);
+    PrescribeNodalDilatation(m_ss);
+    if (m_btwo_pass) {
+        ProjectSurface(m_ms, m_ss);
+        ProjectNodalSurface(m_ms, m_ss);
+        PrescribeNodalDilatation(m_ms);
+    }
 }
 
 //-----------------------------------------------------------------------------

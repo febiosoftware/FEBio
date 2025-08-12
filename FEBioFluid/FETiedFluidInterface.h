@@ -78,6 +78,11 @@ public:
    
 public:
 	FEDofList	m_dofWE;
+    
+public:
+    std::vector<FESurfaceElement*>  m_pme;
+    std::vector< std::vector<double>> m_rs;
+    std::vector<double> m_ef;
 };
 
 //-----------------------------------------------------------------------------
@@ -126,6 +131,10 @@ protected:
     void InitialProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
     void ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
     
+    void InitialNodalProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
+    void ProjectNodalSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
+    void PrescribeNodalDilatation(FETiedFluidSurface& ss);
+
     //! calculate penalty factor
     void CalcAutoPressurePenalty(FETiedFluidSurface& s);
     double AutoPressurePenalty(FESurfaceElement& el, FETiedFluidSurface& s);
