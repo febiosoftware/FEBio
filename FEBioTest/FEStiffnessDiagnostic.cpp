@@ -30,6 +30,9 @@ SOFTWARE.*/
 #include <FECore/FENewtonSolver.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/log.h>
+#include <FEBioMech/FEMechModel.h>
+#include <FEBioMech/FERigidBody.h>
+#include <FEBioMech/FESolidSolver2.h>
 #include <iostream>
 
 //-----------------------------------------------------------------------------
@@ -102,7 +105,8 @@ bool FEStiffnessDiagnostic::Diagnose()
 	FEAnalysis* step = fem->GetCurrentStep();
 	if (step == nullptr) return false;
 
-	FENewtonSolver* nlsolve = dynamic_cast<FENewtonSolver*>(step->GetFESolver());
+	FESolidSolver2* solver = dynamic_cast<FESolidSolver2*>(step->GetFESolver());
+	FENewtonSolver* nlsolve = dynamic_cast<FENewtonSolver*>(solver);
 	if (nlsolve == nullptr) return false;
 
 	SparseMatrix* pA = nlsolve->m_pK->GetSparseMatrixPtr();
@@ -112,18 +116,39 @@ bool FEStiffnessDiagnostic::Diagnose()
 	int neq = pA->Rows();
 
 	// need to know which dofs are prescribed
-	// TODO: This does not take rigid body dofs.
 	// 0 == fixed, 1 == free
 	vector<int> bc(neq, 0);
 	FEMesh& mesh = fem->GetMesh();
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j = 0; j < node.m_ID.size(); ++j)
+		if (node.m_rid < 0)
 		{
-			int n = node.m_ID[j];
-			if (n >= 0) bc[n] = 1;
+			for (int j = 0; j < node.m_ID.size(); ++j)
+			{
+				int n = node.m_ID[j];
+				if (n >= 0) bc[n] = 1;
+			}
 		}
+		else
+		{
+			for (int j = 0; j < node.m_ID.size(); ++j)
+			{
+				int n = -node.m_ID[j]-2;
+				if (n >= 0) bc[n] = 1;
+			}
+		}
+	}
+
+	// we need to commit the rigid body kinematics. 
+	// This usually doesn't happen until the init of the next time step,
+	// but that won't work for this diagnostic.
+	FEMechModel& mech = dynamic_cast<FEMechModel&>(*fem);
+	for (int i=0; i<mech.RigidBodies(); ++i)
+	{
+		FERigidBody& rb = *mech.GetRigidBody(i);
+		rb.m_rp = rb.m_rt;
+		rb.m_qp = rb.GetRotation();
 	}
 
 	std::vector<double> R0(neq, 0);
@@ -180,6 +205,12 @@ bool FEStiffnessDiagnostic::Diagnose()
 		}
 	}
 	std::cerr << "\n";
+
+	// let's make sure we leave the model in a consistent state
+	std::vector<double> u(neq, 0);
+	std::vector<double> R(neq, 0);
+	nlsolve->Update(u);
+	nlsolve->Residual(R);
 
 	printf("Max abs. value: %lg\n", max_val);
 	fprintf(m_fp, "Max abs. value: %lg\n", max_val);
