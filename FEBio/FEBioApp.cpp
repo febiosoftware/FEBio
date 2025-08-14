@@ -486,7 +486,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		}
 		else if (sz[0] == '-')
 		{
-			fprintf(stderr, "FATAL ERROR: Invalid command line option.\n");
+			fprintf(stderr, "FATAL ERROR: Invalid command line option '%s'.\n", sz);
 			return false;
 		}
 		else
@@ -508,7 +508,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			}
 			else
 			{
-				fprintf(stderr, "FATAL ERROR: Invalid command line option\n");
+				fprintf(stderr, "FATAL ERROR: Invalid command line option '%s'\n", sz);
 				return false;
 			}
 		}
