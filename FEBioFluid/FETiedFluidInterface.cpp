@@ -58,6 +58,9 @@ void FETiedFluidSurface::Activate()
 {
     if (m_binit == false)
     {
+        // don't forget to call base class
+        FESurfaceConstraint::Activate();
+        
         FEMesh& mesh = FEModel().GetMesh();
         FETiedFluidSurface* ts = GetSibling();
         FESurface* surf = ts->GetSurface();
@@ -263,11 +266,15 @@ void FETiedFluidInterface::Update()
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
+    m_ss.LoadVector(R, tp);
+    m_ms.LoadVector(R, tp);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
+    m_ss.StiffnessMatrix(LS, tp);
+    m_ms.StiffnessMatrix(LS, tp);
 }
 
 //-----------------------------------------------------------------------------
