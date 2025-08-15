@@ -27,62 +27,81 @@ SOFTWARE.*/
 
 
 #pragma once
+#include <FECore/FEAugLagLinearConstraint.h>
 #include <FEBioMech/FEContactInterface.h>
 #include <FEBioMech/FEContactSurface.h>
 #include "FEFluidMaterial.h"
 
+class FETiedFluidInterface;
+
 //-----------------------------------------------------------------------------
-class FEBIOFLUID_API FETiedFluidSurface : public FEContactSurface
+class FEBIOFLUID_API FETiedFluidSurface : public FESurfaceConstraint
 {
 public:
-    //! Integration point data
-    class Data : public FEContactMaterialPoint
-    {
-    public:
-        Data();
-
-		void Serialize(DumpStream& ar) override;
-        
-    public:
-        vec3d   m_Gap;      //!< initial gap in reference configuration
-        vec3d   m_vg;       //!< tangential velocity gap function at integration points
-        vec3d   m_nu;       //!< normal at integration points
-        vec2d   m_rs;       //!< natural coordinates of projection of integration point
-        vec3d   m_Lmd;      //!< lagrange multipliers for tangential velocity
-        vec3d   m_tv;       //!< viscous tangential traction
-        double  m_Lmp;      //!< lagrange multipliers for fluid pressures
-        double  m_epst;     //!< viscous traction penalty factor
-        double  m_epsn;     //!< normal velocity penalty factor
-        double  m_pg;       //!< pressure "gap"
-        double  m_vn;       //!< normal fluid velocity gap
-    };
-    
     //! constructor
     FETiedFluidSurface(FEModel* pfem);
     
+    //! destructor
+    ~FETiedFluidSurface() {}
+    
+    //! Activation
+    void Activate() override;
+    
+    // allocate equations
+    int InitEquations(int neq) override;
+
     //! initialization
     bool Init() override;
-    
-    //! Unpack surface element data
-    void UnpackLM(FEElement& el, vector<int>& lm) override;
-
-	//! create material point data
-	FEMaterialPoint* CreateMaterialPoint() override;
-    
-public:
-    void GetVelocityGap     (int nface, vec3d& vg);
-    void GetPressureGap     (int nface, double& pg);
-    void GetViscousTraction (int nface, vec3d& tv);
-    void GetNormalVelocity  (int nface, double& vn);
-
    
+    //! Get the surface
+    FESurface* GetSurface() override { return &m_surf; }
+    
 public:
 	FEDofList	m_dofWE;
     
 public:
     std::vector<FESurfaceElement*>  m_pme;
     std::vector< std::vector<double>> m_rs;
-    std::vector<double> m_ef;
+    
+    //! Set the sibling of this contact surface
+    void SetSibling(FETiedFluidSurface* ps) { m_pSibling = ps; }
+    FETiedFluidSurface* GetSibling() { return m_pSibling; }
+
+    //! Set the parent of this contact surface
+    void SetContactInterface(FETiedFluidInterface* ps) { m_pTiedFluidInterface = ps; }
+    
+    //! Get the parent of this contact surface
+    FETiedFluidInterface* GetContactInterface() { return m_pTiedFluidInterface; }
+    
+protected:
+    void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+    void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
+    
+    void PrepStep() override;
+    
+public:
+    //! serialize data to archive
+    void Serialize(DumpStream& ar) override;
+
+    //! add the linear constraint contributions to the residual
+    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+
+    //! add the linear constraint contributions to the stiffness matrix
+    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+
+    //! do the augmentation
+    bool Augment(int naug, const FETimeInfo& tp) override;
+
+    //! build connectivity for matrix profile
+    void BuildMatrixProfile(FEGlobalMatrix& M) override;
+
+protected:
+    FESurface               m_surf;
+    FELinearConstraintSet   m_lc;
+    FETiedFluidInterface*   m_pTiedFluidInterface;
+    FETiedFluidSurface*     m_pSibling;
+    bool                    m_binit;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -105,14 +124,14 @@ public:
     void Serialize(DumpStream& ar) override;
     
     //! return the primary and secondary surfaces
-	FESurface* GetPrimarySurface() override { return &m_ss; }
-	FESurface* GetSecondarySurface() override { return &m_ms; }
+    FESurface* GetPrimarySurface() override { return m_ss.GetSurface(); }
+	FESurface* GetSecondarySurface() override { return m_ms.GetSurface(); }
     
     //! return integration rule class
     bool UseNodalIntegration() override { return false; }
     
     //! build the matrix profile for use in the stiffness matrix
-    void BuildMatrixProfile(FEGlobalMatrix& K) override;
+    void BuildMatrixProfile(FEGlobalMatrix& K) override {}
     
 public:
     //! calculate contact forces
@@ -122,39 +141,25 @@ public:
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
     
     //! calculate Lagrangian augmentations
-    bool Augment(int naug, const FETimeInfo& tp) override;
+    bool Augment(int naug, const FETimeInfo& tp) override {}
     
     //! update
     void Update() override;
     
 protected:
-    void InitialProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
-    void ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
-    
     void InitialNodalProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
-    void ProjectNodalSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
-    void PrescribeNodalDilatation(FETiedFluidSurface& ss);
 
-    //! calculate penalty factor
-    void CalcAutoPressurePenalty(FETiedFluidSurface& s);
-    double AutoPressurePenalty(FESurfaceElement& el, FETiedFluidSurface& s);
-    
 public:
 	FETiedFluidSurface    m_ss;    //!< primary surface
 	FETiedFluidSurface    m_ms;    //!< secondary surface
     
-    bool            m_btwo_pass;    //!< two-pass flag
-    double          m_atol;         //!< augmentation tolerance
-    double          m_gtol;         //!< gap tolerance
-    double          m_ptol;         //!< pressure gap tolerance
+    double          m_tol;         //!< augmentation tolerance
     double          m_stol;         //!< search tolerance
     double          m_srad;         //!< contact search radius
     int             m_naugmax;      //!< maximum nr of augmentations
     int             m_naugmin;      //!< minimum nr of augmentations
     
-    double          m_epst;         //!< tangential viscous traction penalty factor
-    double          m_epsn;         //!< normal fluid velocity penalty factor
-    bool            m_bautopen;     //!< use autopenalty factor
+    double          m_eps;          //!< penalty factor
     
     bool            m_bfreedofs;    //!< flag to free constrained/fixed DOFS on secondary surface
     
