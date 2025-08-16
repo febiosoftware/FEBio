@@ -145,7 +145,7 @@ void FETiedFluidSurface::PrepStep() { m_lc.PrepStep(); }
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
+BEGIN_FECORE_CLASS(FETiedFluidInterface, FESurfacePairConstraintNL)
     ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
     ADD_PARAMETER(m_tol      , "tolerance"          );
     ADD_PARAMETER(m_eps      , "penalty"            );
@@ -156,7 +156,7 @@ BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
     ADD_PARAMETER(m_bfreedofs, "free_dofs"          );
 END_FECORE_CLASS();
 
-FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem)
+FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FESurfacePairConstraintNL(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem)
 {
     static int count = 1;
     SetID(count++);
@@ -203,7 +203,7 @@ bool FETiedFluidInterface::Init()
 void FETiedFluidInterface::Activate()
 {
     // don't forget to call the base class
-    FEContactInterface::Activate();
+    FESurfacePairConstraintNL::Activate();
     
     // project surfaces onto each other (node-to-surface projection)
     InitialNodalProjection(m_ss, m_ms);
@@ -258,9 +258,17 @@ void FETiedFluidInterface::InitialNodalProjection(FETiedFluidSurface& ss, FETied
 }
 
 //-----------------------------------------------------------------------------
-
-void FETiedFluidInterface::Update()
+void FETiedFluidInterface::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
+    m_ss.Update(Ui, ui);
+    m_ms.Update(Ui, ui);
+}
+
+//-----------------------------------------------------------------------------
+void FETiedFluidInterface::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+    m_ss.UpdateIncrements(Ui, ui);
+    m_ms.UpdateIncrements(Ui, ui);
 }
 
 //-----------------------------------------------------------------------------
@@ -278,10 +286,39 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 }
 
 //-----------------------------------------------------------------------------
+void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& G)
+{
+    m_ss.BuildMatrixProfile(G);
+    m_ms.BuildMatrixProfile(G);
+}
+
+//-----------------------------------------------------------------------------
+int FETiedFluidInterface::InitEquations(int neq)
+{
+    m_ss.InitEquations(neq);
+    m_ms.InitEquations(neq);
+}
+
+//-----------------------------------------------------------------------------
+bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
+{
+    if (!m_ss.Augment(naug, tp)) return false;
+    if (!m_ms.Augment(naug, tp)) return false;
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+void FETiedFluidInterface::PrepStep()
+{
+    m_ss.PrepStep();
+    m_ms.PrepStep();
+}
+
+//-----------------------------------------------------------------------------
 void FETiedFluidInterface::Serialize(DumpStream &ar)
 {
     // store contact data
-    FEContactInterface::Serialize(ar);
+    FESurfacePairConstraintNL::Serialize(ar);
     
     // store contact surface data
     m_ms.Serialize(ar);

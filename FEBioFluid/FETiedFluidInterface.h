@@ -28,8 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEAugLagLinearConstraint.h>
-#include <FEBioMech/FEContactInterface.h>
-#include <FEBioMech/FEContactSurface.h>
+#include <FECore/FESurfacePairConstraintNL.h>
 #include "FEFluidMaterial.h"
 
 class FETiedFluidInterface;
@@ -73,7 +72,7 @@ public:
     //! Get the parent of this contact surface
     FETiedFluidInterface* GetContactInterface() { return m_pTiedFluidInterface; }
     
-protected:
+public:
     void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
     void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
     
@@ -105,7 +104,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEBIOFLUID_API FETiedFluidInterface :    public FEContactInterface
+class FEBIOFLUID_API FETiedFluidInterface : public FESurfacePairConstraintNL
 {
 public:
     //! constructor
@@ -131,8 +130,10 @@ public:
     bool UseNodalIntegration() override { return false; }
     
     //! build the matrix profile for use in the stiffness matrix
-    void BuildMatrixProfile(FEGlobalMatrix& K) override {}
-    
+    void BuildMatrixProfile(FEGlobalMatrix& K) override;
+
+    int InitEquations(int neq) override;
+
 public:
     //! calculate contact forces
     void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
@@ -141,11 +142,15 @@ public:
     void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
     
     //! calculate Lagrangian augmentations
-    bool Augment(int naug, const FETimeInfo& tp) override {}
+    bool Augment(int naug, const FETimeInfo& tp) override;
+    
+    // called at start of time step
+    void PrepStep() override;
     
     //! update
-    void Update() override;
-    
+    void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+    void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
+
 protected:
     void InitialNodalProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
 
@@ -153,7 +158,8 @@ public:
 	FETiedFluidSurface    m_ss;    //!< primary surface
 	FETiedFluidSurface    m_ms;    //!< secondary surface
     
-    double          m_tol;         //!< augmentation tolerance
+    int             m_laugon;       //!< enforcement method
+    double          m_tol;          //!< augmentation tolerance
     double          m_stol;         //!< search tolerance
     double          m_srad;         //!< contact search radius
     int             m_naugmax;      //!< maximum nr of augmentations

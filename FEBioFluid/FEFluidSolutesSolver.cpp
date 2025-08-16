@@ -264,14 +264,14 @@ bool FEFluidSolutesSolver::InitEquations()
             m_neq += lmc->InitEquations(m_neq);
         }
     }
-    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+/*    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
     {
         FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
         if (spc->IsActive())
         {
             m_neq += spc->InitEquations(m_neq);
         }
-    }
+    }*/
 
 	if (m_eq_scheme == EQUATION_SCHEME::BLOCK)
 	{
@@ -691,11 +691,11 @@ void FEFluidSolutesSolver::PrepStep()
 
     // see if we need to do contact augmentations
     m_baugment = false;
-    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+/*    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
         if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
-    }
+    }*/
     
     // see if we have to do nonlinear constraint augmentations
     if (fem.NonlinearConstraints() != 0) m_baugment = true;
@@ -1068,11 +1068,11 @@ void FEFluidSolutesSolver::ContactStiffness(FELinearSystem& LS)
     FEModel& fem = *GetFEModel();
     
     const FETimeInfo& tp = fem.GetTime();
-    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+/*    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
         if (pci->IsActive()) pci->StiffnessMatrix(LS, tp);
-    }
+    }*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1082,11 +1082,11 @@ void FEFluidSolutesSolver::ContactForces(FEGlobalVector& R)
     FEModel& fem = *GetFEModel();
     
     const FETimeInfo& tp = fem.GetTime();
-    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+/*    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
         if (pci->IsActive()) pci->LoadVector(R, tp);
-    }
+    }*/
 }
 
 //-----------------------------------------------------------------------------
