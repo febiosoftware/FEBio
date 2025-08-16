@@ -61,7 +61,8 @@ void FETiedFluidSurface::Activate()
         // don't forget to call base class
         FESurfaceConstraint::Activate();
         
-        FEMesh& mesh = FEModel().GetMesh();
+        FEModel& fem = *GetFEModel();
+        FEMesh& mesh = fem.GetMesh();
         FETiedFluidSurface* ts = GetSibling();
         FESurface* surf = ts->GetSurface();
         FETiedFluidInterface* tfi = GetContactInterface();
@@ -83,6 +84,12 @@ void FETiedFluidSurface::Activate()
                 double Na[FEElement::MAX_NODES];
                 m_pme[i]->shape_fnc(Na, m_rs[i][0], m_rs[i][1]);
 
+                // extract the fluid bulk modulus for the solid element underneath this face
+                FEElement& el = *(m_pme[i]->m_elem[0].pe);
+                FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+                FEFluidMaterial* fm = dynamic_cast<FEFluidMaterial*>(pm);
+                double K = fm->BulkModulus(*el.GetMaterialPoint(0));
+
                 //  constrain components of velocities on primary and secondary surfaces
                 FEAugLagLinearConstraint *pLCvx = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
                 FEAugLagLinearConstraint *pLCvy = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
@@ -91,13 +98,13 @@ void FETiedFluidSurface::Activate()
                 pLCvx->AddDOF(node.GetID(), m_dofWE[0], 1);
                 pLCvy->AddDOF(node.GetID(), m_dofWE[1], 1);
                 pLCvz->AddDOF(node.GetID(), m_dofWE[2], 1);
-                pLCef->AddDOF(node.GetID(), m_dofWE[3], 1);
+                pLCef->AddDOF(node.GetID(), m_dofWE[3], 1*K);
                 for (int j=0; j<m_pme[i]->Nodes(); ++j) {
                     FENode& n2 = surf->Node(m_pme[i]->m_lnode[j]);
                     pLCvx->AddDOF(n2.GetID(), m_dofWE[0], -Na[j]);
                     pLCvy->AddDOF(n2.GetID(), m_dofWE[1], -Na[j]);
                     pLCvz->AddDOF(n2.GetID(), m_dofWE[2], -Na[j]);
-                    pLCef->AddDOF(n2.GetID(), m_dofWE[3], -Na[j]);
+                    pLCef->AddDOF(n2.GetID(), m_dofWE[3], -Na[j]*K);
                 }
                 m_lc.add(pLCvx);
                 m_lc.add(pLCvy);
