@@ -160,6 +160,7 @@ public:
     
     int             m_laugon;       //!< enforcement method
     double          m_tol;          //!< augmentation tolerance
+    bool            m_btwopass;     //!< flag for two pass analysis
     double          m_stol;         //!< search tolerance
     double          m_srad;         //!< contact search radius
     int             m_naugmax;      //!< maximum nr of augmentations

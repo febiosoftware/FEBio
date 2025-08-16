@@ -101,10 +101,13 @@ void FETiedFluidSurface::Activate()
                 pLCef->AddDOF(node.GetID(), m_dofWE[3], 1*K);
                 for (int j=0; j<m_pme[i]->Nodes(); ++j) {
                     FENode& n2 = surf->Node(m_pme[i]->m_lnode[j]);
-                    pLCvx->AddDOF(n2.GetID(), m_dofWE[0], -Na[j]);
-                    pLCvy->AddDOF(n2.GetID(), m_dofWE[1], -Na[j]);
-                    pLCvz->AddDOF(n2.GetID(), m_dofWE[2], -Na[j]);
-                    pLCef->AddDOF(n2.GetID(), m_dofWE[3], -Na[j]*K);
+                    // only include terms that are significant
+                    if (fabs(Na[j]) > 1e-3) {
+                        pLCvx->AddDOF(n2.GetID(), m_dofWE[0], -Na[j]);
+                        pLCvy->AddDOF(n2.GetID(), m_dofWE[1], -Na[j]);
+                        pLCvz->AddDOF(n2.GetID(), m_dofWE[2], -Na[j]);
+                        pLCef->AddDOF(n2.GetID(), m_dofWE[3], -Na[j]*K);
+                    }
                 }
                 m_lc.add(pLCvx);
                 m_lc.add(pLCvy);
@@ -156,11 +159,11 @@ BEGIN_FECORE_CLASS(FETiedFluidInterface, FESurfacePairConstraintNL)
     ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
     ADD_PARAMETER(m_tol      , "tolerance"          );
     ADD_PARAMETER(m_eps      , "penalty"            );
+    ADD_PARAMETER(m_btwopass , "two_pass"           );
     ADD_PARAMETER(m_stol     , "search_tol"         );
-    ADD_PARAMETER(m_srad     , "search_radius"      );
+    ADD_PARAMETER(m_srad     , "search_radius"      )->setUnits(UNIT_LENGTH);
     ADD_PARAMETER(m_naugmin  , "minaug"             );
     ADD_PARAMETER(m_naugmax  , "maxaug"             );
-    ADD_PARAMETER(m_bfreedofs, "free_dofs"          );
 END_FECORE_CLASS();
 
 FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FESurfacePairConstraintNL(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem)
@@ -173,6 +176,7 @@ FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FESurfacePairConstra
     m_eps = 1;
     m_stol = 0.01;
     m_srad = 1.0;
+    m_btwopass = true;
     m_bfreedofs = true;
     
     m_naugmin = 0;
@@ -217,7 +221,7 @@ void FETiedFluidInterface::Activate()
     InitialNodalProjection(m_ms, m_ss);
     
     m_ss.Activate();
-    m_ms.Activate();
+    if (m_btwopass) m_ms.Activate();
 
 }
 
@@ -268,49 +272,51 @@ void FETiedFluidInterface::InitialNodalProjection(FETiedFluidSurface& ss, FETied
 void FETiedFluidInterface::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
     m_ss.Update(Ui, ui);
-    m_ms.Update(Ui, ui);
+    if (m_btwopass) m_ms.Update(Ui, ui);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
 {
     m_ss.UpdateIncrements(Ui, ui);
-    m_ms.UpdateIncrements(Ui, ui);
+    if (m_btwopass) m_ms.UpdateIncrements(Ui, ui);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     m_ss.LoadVector(R, tp);
-    m_ms.LoadVector(R, tp);
+    if (m_btwopass) m_ms.LoadVector(R, tp);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     m_ss.StiffnessMatrix(LS, tp);
-    m_ms.StiffnessMatrix(LS, tp);
+    if (m_btwopass) m_ms.StiffnessMatrix(LS, tp);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& G)
 {
     m_ss.BuildMatrixProfile(G);
-    m_ms.BuildMatrixProfile(G);
+    if (m_btwopass) m_ms.BuildMatrixProfile(G);
 }
 
 //-----------------------------------------------------------------------------
 int FETiedFluidInterface::InitEquations(int neq)
 {
     m_ss.InitEquations(neq);
-    m_ms.InitEquations(neq);
+    if (m_btwopass) m_ms.InitEquations(neq);
 }
 
 //-----------------------------------------------------------------------------
 bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
 {
     if (!m_ss.Augment(naug, tp)) return false;
-    if (!m_ms.Augment(naug, tp)) return false;
+    if (m_btwopass) {
+        if (!m_ms.Augment(naug, tp)) return false;
+    }
     return true;
 }
 
@@ -318,7 +324,7 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
 void FETiedFluidInterface::PrepStep()
 {
     m_ss.PrepStep();
-    m_ms.PrepStep();
+    if (m_btwopass) m_ms.PrepStep();
 }
 
 //-----------------------------------------------------------------------------
@@ -328,8 +334,8 @@ void FETiedFluidInterface::Serialize(DumpStream &ar)
     FESurfacePairConstraintNL::Serialize(ar);
     
     // store contact surface data
-    m_ms.Serialize(ar);
     m_ss.Serialize(ar);
+    m_ms.Serialize(ar);
     
     if (ar.IsShallow()) return;
     ar & m_dofWE;
