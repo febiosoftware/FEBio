@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FEAugLagLinearConstraint.h>
-#include <FECore/FESurfacePairConstraintNL.h>
+#include <FEBioMech/FEContactInterface.h>
 #include "FEFluidMaterial.h"
 
 class FETiedFluidInterface;
@@ -104,7 +104,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-class FEBIOFLUID_API FETiedFluidInterface : public FESurfacePairConstraintNL
+class FEBIOFLUID_API FETiedFluidInterface : public FEContactInterface
 {
 public:
     //! constructor
@@ -158,7 +158,6 @@ public:
 	FETiedFluidSurface    m_ss;    //!< primary surface
 	FETiedFluidSurface    m_ms;    //!< secondary surface
     
-    int             m_laugon;       //!< enforcement method
     double          m_tol;          //!< augmentation tolerance
     bool            m_btwopass;     //!< flag for two pass analysis
     double          m_stol;         //!< search tolerance

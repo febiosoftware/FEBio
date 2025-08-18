@@ -637,11 +637,11 @@ void FEFluidSolver::PrepStep()
 
     // see if we need to do contact augmentations
     m_baugment = false;
-/*    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
         if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
-    }*/
+    }
     
     // see if we have to do nonlinear constraint augmentations
     if (fem.NonlinearConstraints() != 0) m_baugment = true;
@@ -901,11 +901,11 @@ void FEFluidSolver::ContactStiffness(FELinearSystem& LS)
 	FEModel& fem = *GetFEModel();
 
     const FETimeInfo& tp = fem.GetTime();
-/*    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
         if (pci->IsActive()) pci->StiffnessMatrix(LS, tp);
-    }*/
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -915,11 +915,11 @@ void FEFluidSolver::ContactForces(FEGlobalVector& R)
 	FEModel& fem = *GetFEModel();
 
     const FETimeInfo& tp = fem.GetTime();
-/*    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+    for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
     {
         FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
         if (pci->IsActive()) pci->LoadVector(R, tp);
-    }*/
+    }
 }
 
 //-----------------------------------------------------------------------------

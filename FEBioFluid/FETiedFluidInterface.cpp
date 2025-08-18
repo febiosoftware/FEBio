@@ -101,13 +101,10 @@ void FETiedFluidSurface::Activate()
                 pLCef->AddDOF(node.GetID(), m_dofWE[3], 1*K);
                 for (int j=0; j<m_pme[i]->Nodes(); ++j) {
                     FENode& n2 = surf->Node(m_pme[i]->m_lnode[j]);
-                    // only include terms that are significant
-                    if (fabs(Na[j]) > 1e-3) {
-                        pLCvx->AddDOF(n2.GetID(), m_dofWE[0], -Na[j]);
-                        pLCvy->AddDOF(n2.GetID(), m_dofWE[1], -Na[j]);
-                        pLCvz->AddDOF(n2.GetID(), m_dofWE[2], -Na[j]);
-                        pLCef->AddDOF(n2.GetID(), m_dofWE[3], -Na[j]*K);
-                    }
+                    pLCvx->AddDOF(n2.GetID(), m_dofWE[0], -Na[j]);
+                    pLCvy->AddDOF(n2.GetID(), m_dofWE[1], -Na[j]);
+                    pLCvz->AddDOF(n2.GetID(), m_dofWE[2], -Na[j]);
+                    pLCef->AddDOF(n2.GetID(), m_dofWE[3], -Na[j]*K);
                 }
                 m_lc.add(pLCvx);
                 m_lc.add(pLCvy);
@@ -155,7 +152,7 @@ void FETiedFluidSurface::PrepStep() { m_lc.PrepStep(); }
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_FECORE_CLASS(FETiedFluidInterface, FESurfacePairConstraintNL)
+BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
     ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
     ADD_PARAMETER(m_tol      , "tolerance"          );
     ADD_PARAMETER(m_eps      , "penalty"            );
@@ -166,7 +163,7 @@ BEGIN_FECORE_CLASS(FETiedFluidInterface, FESurfacePairConstraintNL)
     ADD_PARAMETER(m_naugmax  , "maxaug"             );
 END_FECORE_CLASS();
 
-FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FESurfacePairConstraintNL(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem)
+FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem)
 {
     static int count = 1;
     SetID(count++);
@@ -214,7 +211,7 @@ bool FETiedFluidInterface::Init()
 void FETiedFluidInterface::Activate()
 {
     // don't forget to call the base class
-    FESurfacePairConstraintNL::Activate();
+    FEContactInterface::Activate();
     
     // project surfaces onto each other (node-to-surface projection)
     InitialNodalProjection(m_ss, m_ms);
@@ -331,7 +328,7 @@ void FETiedFluidInterface::PrepStep()
 void FETiedFluidInterface::Serialize(DumpStream &ar)
 {
     // store contact data
-    FESurfacePairConstraintNL::Serialize(ar);
+    FEContactInterface::Serialize(ar);
     
     // store contact surface data
     m_ss.Serialize(ar);

@@ -79,6 +79,8 @@ public:
 
 	// update based on solution (use for updating Lagrange Multipliers)
 	virtual void Update(vector<double>& ui);
+    virtual void Update(std::vector<double>& Ui, std::vector<double>& ui) { Update(ui); }
+    virtual void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) {};
 
 	using FEModelComponent::Update;
 };

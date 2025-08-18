@@ -62,6 +62,10 @@ public:
 
 	// Evaluates the contriubtion to the stiffness matrix
 	virtual void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) = 0;
+    
+    virtual void PrepStep() {}
+    virtual void Update() override { FESurfacePairConstraint::Update(); }
+    virtual void Update(const std::vector<double>& Ui, const std::vector<double>& ui) {}
 
 protected:
 	//! don't call the default constructor
