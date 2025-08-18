@@ -96,7 +96,8 @@ public:
 
 protected:
     FESurface               m_surf;
-    FELinearConstraintSet   m_lc;
+    FELinearConstraintSet   m_lcv;
+    FELinearConstraintSet   m_lcp;
     FETiedFluidInterface*   m_pTiedFluidInterface;
     FETiedFluidSurface*     m_pSibling;
     bool                    m_binit;
@@ -165,8 +166,9 @@ public:
     int             m_naugmax;      //!< maximum nr of augmentations
     int             m_naugmin;      //!< minimum nr of augmentations
     
-    double          m_eps;          //!< penalty factor
-    
+    double          m_epsv;          //!< penalty factor for velocity
+    double          m_epsp;          //!< penalty factor for pressure
+
     bool            m_bfreedofs;    //!< flag to free constrained/fixed DOFS on secondary surface
     
     FEFluidMaterial* m_pfluid;       //!< fluid pointer
