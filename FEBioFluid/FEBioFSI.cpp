@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include "FEFluidModule.h"
 #include "FEFluidFSIAnalysis.h"
 #include "FEFluidSupplyStarling.h"
+#include "FETiedSolidInterface.h"
 #include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
@@ -108,6 +109,8 @@ void FEBioFSI::InitModule()
     REGISTER_FECORE_CLASS(FEBiphasicFSIDomain3D, "biphasic-FSI-3D");
 
     REGISTER_FECORE_CLASS(FEFluidSupplyStarling, "Starling");
+
+    REGISTER_FECORE_CLASS(FETiedSolidInterface, "tied-solid");
 
 	febio.SetActiveModule(0);
 }
