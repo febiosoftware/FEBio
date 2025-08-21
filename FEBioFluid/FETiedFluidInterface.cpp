@@ -136,6 +136,7 @@ bool FETiedFluidSurface::Init()
     m_pme.assign(surf->Nodes(), nullptr);
     double rs[2] = {0,0};
     m_rs.assign(surf->Nodes(), std::vector<double>(2,0));
+    m_gap.assign(surf->Nodes(), 0.0);
 
 	// set the dof list
 	if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
@@ -246,7 +247,7 @@ void FETiedFluidInterface::InitialNodalProjection(FETiedFluidSurface& ss, FETied
     FEMesh& mesh = GetMesh();
     FESurfaceElement* pme;
     vec3d r, nu;
-    double rs[2];
+    double rs[2] = {0};
     
     // initialize projection data
     FENormalProjection np(ssurf);
@@ -267,10 +268,17 @@ void FETiedFluidInterface::InitialNodalProjection(FETiedFluidSurface& ss, FETied
         
         // find the intersection point with the secondary surface
         pme = np.Project2(r, nu, rs);
-        
         ss.m_pme[i] = pme;
-        ss.m_rs[i][0] = rs[0];
-        ss.m_rs[i][1] = rs[1];
+        if (pme != nullptr) {
+            // evaluate the location of the intersection point in 3D
+            vec3d r2[FEElement::MAX_NODES];
+            for (int j=0; j<pme->Nodes(); ++j)
+                r2[j]= mesh.Node(pme->m_node[j]).m_rt;
+            vec3d q = pme->eval(r2,rs[0], rs[1]);
+            ss.m_rs[i][0] = rs[0];
+            ss.m_rs[i][1] = rs[1];
+            ss.m_gap[i] = (q - r).norm();
+        }
     }
 }
 
