@@ -13,3 +13,5 @@ cd "cmbuild"
 msbuild /p:configuration=%CONFIG_TYPE% /maxCpuCount:%NUMBER_OF_PROCESSORS% ALL_BUILD.vcxproj
 copy bin\febio.xml bin\%CONFIG_TYPE%\
 cd ..
+
+exit /b %errorlevel%
