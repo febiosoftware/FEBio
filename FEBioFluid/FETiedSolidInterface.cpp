@@ -290,8 +290,9 @@ void FETiedSolidInterface::BuildMatrixProfile(FEGlobalMatrix& G)
 //-----------------------------------------------------------------------------
 int FETiedSolidInterface::InitEquations(int neq)
 {
-    m_ss.InitEquations(neq);
-    if (m_btwopass) m_ms.InitEquations(neq);
+    int n = m_ss.InitEquations(neq);
+    if (m_btwopass) n += m_ms.InitEquations(neq);
+	return n;
 }
 
 //-----------------------------------------------------------------------------

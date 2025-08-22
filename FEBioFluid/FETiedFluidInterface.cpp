@@ -83,12 +83,14 @@ void FETiedFluidSurface::Activate()
         // create linear constraints
         for (int i=0; i<m_surf.Nodes(); ++i) {
             FENode& node = m_surf.Node(i);
-            if (m_pme[i] == nullptr) break;
+            if (m_pme[i] == nullptr) continue;
             if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
                 
                 // get shape functions on sibling surface at projection point
                 double Na[FEElement::MAX_NODES];
                 m_pme[i]->shape_fnc(Na, m_rs[i][0], m_rs[i][1]);
+
+				if (node.get_bc(m_dofWE[0])) node.set_bc(m_dofWE[0], DOF_OPEN);
 
                 // extract the fluid bulk modulus for the solid element underneath this face
                 FEElement& el = *(m_pme[i]->m_elem[0].pe);
@@ -320,8 +322,9 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& G)
 //-----------------------------------------------------------------------------
 int FETiedFluidInterface::InitEquations(int neq)
 {
-    m_ss.InitEquations(neq);
-    if (m_btwopass) m_ms.InitEquations(neq);
+    int n = m_ss.InitEquations(neq);
+    if (m_btwopass) n += m_ms.InitEquations(neq);
+	return n;
 }
 
 //-----------------------------------------------------------------------------
