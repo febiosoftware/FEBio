@@ -62,6 +62,8 @@ public:
     std::vector<FESurfaceElement*>  m_pme;
     std::vector< std::vector<double>> m_rs;
     
+    std::vector<int> m_tag;
+    
     //! Set the sibling of this contact surface
     void SetSibling(FETiedFluidFSISurface* ps) { m_pSibling = ps; }
     FETiedFluidFSISurface* GetSibling() { return m_pSibling; }

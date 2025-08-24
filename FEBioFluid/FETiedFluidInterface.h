@@ -63,6 +63,8 @@ public:
     std::vector< std::vector<double>> m_rs;
     std::vector<double> m_gap;
 
+    std::vector<int>m_tag;
+
     //! Set the sibling of this contact surface
     void SetSibling(FETiedFluidSurface* ps) { m_pSibling = ps; }
     FETiedFluidSurface* GetSibling() { return m_pSibling; }
