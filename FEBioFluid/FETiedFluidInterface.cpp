@@ -84,12 +84,31 @@ void FETiedFluidSurface::Activate()
         // create linear constraints
         for (int i=0; i<m_surf.Nodes(); ++i) {
             FENode& node = m_surf.Node(i);
-            if (m_pme[i] == nullptr) break;
+            if (m_pme[i] == nullptr) continue;
             if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
                 
                 // get shape functions on sibling surface at projection point
                 double Na[FEElement::MAX_NODES];
                 m_pme[i]->shape_fnc(Na, m_rs[i][0], m_rs[i][1]);
+                
+                for (int j=0; j<m_dofWE.Size(); ++j) {
+                    // check to see if the DOF is not open
+                    int dof = m_dofWE[j];
+                    if (node.get_bc(dof) != DOF_OPEN) {
+                        // if not open, check to see if one of the projected face nodal DOFs is not open
+                        bool reset = true;
+                        for (int k=0; k<m_pme[i]->Nodes(); ++k) {
+                            FENode& n2 = surf->Node(m_pme[i]->m_lnode[k]);
+                            int indx = m_pme[i]->m_lnode[k];
+                            if ((ts->m_tag[indx] == -1) && (n2.get_bc(dof) != DOF_OPEN) && (fabs(Na[k]) > tfi->m_stol)) {
+                                ts->m_tag[indx] = 1;
+                                reset = false;
+                            }
+                        }
+                        // only reset if there are no significant constraints on any node of the projected surface
+                        if (reset) node.set_bc(dof, DOF_OPEN);
+                    }
+                }
 
                 // extract the fluid bulk modulus for the solid element underneath this face
                 FEElement& el = *(m_pme[i]->m_elem[0].pe);
@@ -141,6 +160,7 @@ bool FETiedFluidSurface::Init()
     double rs[2] = {0,0};
     m_rs.assign(surf->Nodes(), std::vector<double>(2,0));
     m_gap.assign(surf->Nodes(), 0.0);
+    m_tag.assign(surf->Nodes(), -1);
 
 	// set the dof list
 	if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
@@ -324,8 +344,9 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& G)
 //-----------------------------------------------------------------------------
 int FETiedFluidInterface::InitEquations(int neq)
 {
-    m_ss.InitEquations(neq);
-    if (m_btwopass) m_ms.InitEquations(neq);
+    int n = m_ss.InitEquations(neq);
+    if (m_btwopass) n += m_ms.InitEquations(neq);
+	return n;
 }
 
 //-----------------------------------------------------------------------------
