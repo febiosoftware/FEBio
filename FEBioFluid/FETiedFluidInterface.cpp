@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEModel.h>
 #include "FEBioFluid.h"
+#include "FEFluidFSI.h"
 
 //-----------------------------------------------------------------------------
 // FETiedFluidSurface
@@ -93,8 +94,11 @@ void FETiedFluidSurface::Activate()
                 // extract the fluid bulk modulus for the solid element underneath this face
                 FEElement& el = *(m_pme[i]->m_elem[0].pe);
                 FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+                double K = 0;
                 FEFluidMaterial* fm = dynamic_cast<FEFluidMaterial*>(pm);
-                double K = fm->BulkModulus(*el.GetMaterialPoint(0));
+                FEFluidFSI* fsim = dynamic_cast<FEFluidFSI*>(pm);
+                if (fm) K = fm->BulkModulus(*el.GetMaterialPoint(0));
+                else if (fsim) K = fsim->Fluid()->BulkModulus(*el.GetMaterialPoint(0));
 
                 //  constrain components of velocities on primary and secondary surfaces
                 FEAugLagLinearConstraint *pLCvx = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
