@@ -16,18 +16,24 @@ Next, the steps for the basic procedure will be discussed in more detail.
 
 \section mat_sec1 Basic Procedure
 
-\subsection step1 Defining the material base class
+\subsection step1 Defining the material class
 
-FEBio is written in C++ and therefore the new material implementation must be coded in C++ as well. Each material requires a separate class and hence the first step is to define a new class. The class has to be derived from one of the available material base classes. In this section it is assumed that the new material is derived from FEElasticMaterial. Materials that are derived from this base class will be materials that are used to describe isotropic, compressible solid materials. An example of such a material is the neo-Hookean material, which will be used as a case study in this section. The implementation of more advanced models will be discussed later, but they too have to follow most of the same steps.
+FEBio is written in C++ and therefore the new material implementation must be coded in C++ as well. Each material requires a separate class and hence the first step is to define a new class. The class has to be derived from one of the available material base classes. In this section it is assumed that the new material is derived from <b>FEElasticMaterial</b>. Materials that are derived from this base class will be materials that are used to describe isotropic, compressible solid materials. An example of such a material is the neo-Hookean material, which will be used as a case study in this section. The implementation of more advanced models will be discussed later, but they too have to follow most of the same steps.
 
-The definition of the neo-Hookean material class looks as follows. Note that the actual implementation of this class might look a bit different in the code. Only the important aspects are touched upon here.
+At this point it is useful to discuss a common practice in adding new classes in C++. Usually the definition of the class is split over two separate files. One file, the so-called header file, declares the new class. The implementation of the function members are placed in a separate file, usually a .cpp file. FEBio follows this practice and it is recommended that the implementation of new plugin classes follows this practice as well. Thus, we'll have to add a MyNeoHookean.h header file that contains the class declaration. Then, we'll add a MyNeoHookean.cpp file that will contain the implementation of the class' methods. 
+
+The definition of the neo-Hookean material class looks as follows.
 
 \code
-class FENeoHookean : public FEElasticMaterial
+// MyNeoHookean.h
+#include <FEBioMech/FEElasticMaterial.h>
+#include <FECore/FEModelParam.h>
+
+class MyNeoHookean : public FEElasticMaterial
 {
 public:
 	// constructor
-	FENeoHookean(FEModel*);
+	MyNeoHookean(FEModel*);
 
 	// Cauchy-stress calculation
 	mat3ds Stress(FEMaterialPoint& pt) override;
@@ -53,26 +59,19 @@ private:
 
 The class derives, as expected, publicly from FEElasticMaterial. It then defines a constructor, which has to take the FEModel* parameter. Next, several functions are overridden in order to implement the specifics of the neo-Hookean material. Then, a list of material parameters is defined. Finally, at the end of the class definition, the required macro <b>DECLARE_FECORE_CLASS</b> is placed, which is needed as it is part of the process of integrating the plugin class with the framework. 
 
-At this point it is useful to discuss a common practice in adding new classes in C++. Usually the definition of the class is split over two separate files. One file, the so-called header file, declares the new class. The implementation of the function members are placed in a separate file, usually a .cpp file. FEBio follows this practice and therefore the neo-Hookean implementation is spread over two files: the FENeoHookean.h  contains the class definition and FENeoHookean.cpp contains the member function definitions. It is recommended that the implementation of new materials follows this practice. 
-
-\subsection step2 Registering the new material
-
-In order for FEBio to recognize the new material, the material needs to be registered with the framework. In a plugin, this is done in the PluginInitialize function, which must be provided by the user. (see \ref register)
+The MyNeoHookean.cpp file contain the implementation of the class member functions, and a few other required code (e.g. parameter definitions). The top of the file will need the necessary include statements. 
 
 \code
-FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)
-{
-	\\ Set the kernel to match FEBio's kernel
-	FECoreKernel::SetInstance(&fecore);
-	
-	\\ Register the classes in this plugin
-	REGISTER_FECORE_CLASS(FENeoHookean, "neo-Hookean");
-}
+// MyNeoHookean.cpp
+#include "MyNeoHookean.h"
+#include <FECore/FEModelParam.h>
+
+/* rest of code here */
 \endcode
 
 \subsection step3 Defining the material parameters
 
-Defining the material parameters of the class requires two steps. First, variables need to be defined that will store the values for these parameters. In our example, the FENeoHookean class defines two parameters: m_E stores the Young's modulus and m_v stores the Poisson's ratio. The second step is to register the material parameters with FEBio's framework. A set of macros exist that will facilitate this process. The first one is placed in the class definition.
+Defining the material parameters of the class requires two steps. First, variables need to be defined that will store the values for these parameters. In our example, the MyNeoHookean class defines two parameters: m_E stores the Young's modulus and m_v stores the Poisson's ratio. The second step is to register the material parameters with FEBio's framework. A set of macros exist that will facilitate this process. The first one is placed in the class definition.
 
 \code
 DECLARE_FECORE_CLASS();
@@ -80,10 +79,10 @@ DECLARE_FECORE_CLASS();
 
 This macro informs FEBio that this material class will be defining a set of material parameters. The actual
 definition of the material parameter list is placed in the compilation unit (i.e. the .cpp file). In our
-example, this list is found at the top of the FENeoHookean.cpp file.
+example, this list is found at the top of the MyNeoHookean.cpp file.
 
 \code
-BEGIN_FECORE_CLASS(FENeoHookean, FEElasticMaterial);
+BEGIN_FECORE_CLASS(MyNeoHookean, FEElasticMaterial);
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
 	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1, 0.5), "v");
 END_FECORE_CLASS();
@@ -120,7 +119,7 @@ Finally, the parameter list must end with the END_FECORE_CLASS macro. Note that 
 The constructor requires some special attention. It is always needed since it needs to pass the FEModel* parameter that it receives to the base class. 
 
 \code
-FENeoHookean::FENeoHookean(FEModel* fem) : FEElasticMaterial(fem) 
+MyNeoHookean::MyNeoHookean(FEModel* fem) : FEElasticMaterial(fem) 
 {
 	m_E = 0.0;
 	m_v = 0.0;
@@ -134,12 +133,12 @@ In addition, all member variables should be initialized in the constructor. Note
 When implementing a new material class the user has the option to override the base class implementation of the Init function. This function is called during model initialization and can be used to allocate any data the class may require. In our example, this function is not necessary but is provided simply as an example. It is important to always call the base class as well.
 
 \code
-bool FENeoHookean::Init()
+bool MyNeoHookean::Init()
 {
 	// call the base-class first!
 	if (FEElasticMaterial::Init() == false) return false;
 	
-	// Do additional initialization here
+	// TODO: Do additional initialization here
 	
 	return true;
 }
@@ -149,12 +148,12 @@ bool FENeoHookean::Init()
 The Validate function is called whenever the values of the material parameters have changed. By default, FEBio will use the ranges defined in the material parameter definitions to validate materials so for most material implementation this function doest not have to be defined. However, if the material requires additional validation then the user should override the <c>Validate</c> member. Again, make sure to always call the base class version. 
 
 \code
-bool FENeoHookean::Validate()
+bool MyNeoHookean::Validate()
 {
 	// call base class first!
 	if (FEElasticMaterial::Validate() == false) return false;
 	
-	// Do additional parameter validation here
+	// TODO: Do additional parameter validation here
 	
 	return true;
 }
@@ -169,20 +168,20 @@ Next follows the most important aspect of the implementation: the declaration of
 The stress function is defined as follows in the material class definition (i.e. the header file). 
 
 \code
-mat3ds stress(FEMaterialPoint& pt) override;
+mat3ds Stress(FEMaterialPoint& pt) override;
 \endcode
 
 This function takes one parameter of type FEMaterialPoint. This parameter stores all the important information about the point at which to calculate the stress value. For example, this variable stores the reference and current location of the point, the local deformation gradient, history variables (if defined) and much more. It also defines a bunch of useful functions that can facilitate the implementation of the stress function, such as a function that calculates the left and right Cauchy-Green tensors. There is a lot to say about this class, but in order not to digress, a detailed explanation of this class is postponed and only a few important aspects of it are mentioned here. 
 
-The actual definition of the stress function is, as usual, placed in the compilation unit. In our example, this is the FENeoHookean.cpp file.
+The actual definition of the stress function is, as usual, placed in the compilation unit. In our example, this is the MyNeoHookean.cpp file.
 
 \code
-mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)
+mat3ds MYNeoHookean::Stress(FEMaterialPoint& mp)
 {
  FEElasticMaterialPoint& pt =  mp.ExtractData<FEElasticMaterialPoint>();
 
- mat3d &F = pt.F;
- double detF = pt.J;
+ mat3d &F = pt.m_F;
+ double detF = pt.m_J;
  double detFi = 1.0/detF;
  double lndetF = log(detF);
 
@@ -212,7 +211,7 @@ Although the detailed implementation of this constitutive model will not be expl
 The FEMaterialPoint contains all the data that is defined at this particular material point. (The material points can be any point in the material, but typically are the element integration points when evaluating the FE integrals.) The first line, then extracts the component of the material point data that we need here: 
 
 \code
-FEElasticMaterialPoint& pt =  mp.ExtractData<FEElasticMaterialPoint>();
+FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 \endcode
 
 Materials can define their own material point data classes and extract them in a similar way from the FEMaterialPoint parameter. However, in this case, the FEElasticMaterialPoint, which is defined by the FEElasticMaterial base class provides all the data we need. 
@@ -220,8 +219,8 @@ Materials can define their own material point data classes and extract them in a
 Next, the local deformation gradient is accessed from the material point data, as well as the local Jacobian (which is the determinant of the deformation gradient ). These are data members that can be accessed directly. 
 
 \code
- mat3d &F = pt.F;
- double detF = pt.J;
+ mat3d &F = pt.m_F;
+ double detF = pt.m_J;
 \endcode
 
 The FEElasticMaterialPoint class has some useful member functions to calculate commonly needed tensors (e.g. left and right Cauchy-Green tensors.) Here, the left Cauchy-Green tensor is retrieved using the LeftCauchyGreen member function. A more detailed description of the available data and function members can be found in the advanced section. 
@@ -251,16 +250,16 @@ The tangent function is declared in the class definition as well.
 tens4ds Tangent(FEMaterialPoint& pt) override;
 \endcode
 
-This function too takes a single FEMaterialPoint variable as input. Note that in this case the return value is of type tens4ds which is a class that implements a fourth-order tensor with major and minor symmetries. The definition of the function can be found in the FENeoHookean.cpp file.
+This function too takes a single FEMaterialPoint variable as input. Note that in this case the return value is of type tens4ds which is a class that implements a fourth-order tensor with major and minor symmetries. The definition of the function can be found in the MyNeoHookean.cpp file.
 
 \code
-tens4ds FENeoHookean::Tangent(FEMaterialPoint& mp)
+tens4ds MyNeoHookean::Tangent(FEMaterialPoint& mp)
 {
    FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 
 	// evaluate material parameters at current material point
 	double E = m_E(mp);
@@ -291,7 +290,22 @@ Next, several tensor are evaluated that are need for the material tangent. Note 
 	tens4ds I4 = dyad4s(I);
 \endcode
 
-The next section takes a closer look at the FEMaterialPoint class. 
+\subsection step2 Registering the new material
+
+In order for FEBio to recognize the new material, the material needs to be registered with the framework. In a plugin, this is done in the PluginInitialize function, which must be provided by the user. (see \ref register for more details implementing the required functions.)
+
+\code
+FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)
+{
+	\\ Set the kernel to match FEBio's kernel
+	FECoreKernel::SetInstance(&fecore);
+	
+	\\ Register the classes in this plugin
+	REGISTER_FECORE_CLASS(MyNeoHookean, "neo-Hookean");
+}
+\endcode
+
+With the new feature class registered, FEBio will be able to allocate it when referenced in the febio input file, and call the appropriate member functions when needed.
 
 \section mat_sec2 The FEMaterialPoint class
 
@@ -661,5 +675,4 @@ To use a particular material property in an FEBio model, use the type attribute 
 	</permeability>
 </material>
 \endcode
-
 */

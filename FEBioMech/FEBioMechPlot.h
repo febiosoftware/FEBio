@@ -63,6 +63,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Shell directors
+class FEPlotNodalShellDirector : public FEPlotNodeData
+{
+public:
+    FEPlotNodalShellDirector(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) { SetUnits(UNIT_LENGTH); }
+    bool Save(FEMesh& m, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Nodal velocities
 //!
 class FEPlotNodeVelocity : public FEPlotNodeData
@@ -1591,6 +1600,27 @@ class FEPlotBodyForce : public FEPlotDomainData
 {
 public:
 	FEPlotBodyForce(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_FORCE); }
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotTotalLinearMomentum : public FEPlotDomainData
+{
+public:
+	FEPlotTotalLinearMomentum(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_REGION) { SetUnits(UNIT_ENERGY); }
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotTotalAngularMomentum : public FEPlotDomainData
+{
+public:
+	FEPlotTotalAngularMomentum(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_REGION) { SetUnits(UNIT_ENERGY); }
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+class FEPlotTotalEnergy : public FEPlotDomainData
+{
+public:
+	FEPlotTotalEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_REGION) { SetUnits(UNIT_ENERGY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 

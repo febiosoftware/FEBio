@@ -10,11 +10,3 @@ scp cmbuild/bin/Release/* repo:~/$REMOTE_PATH/bin
 if [ -f testLogs/Logs/* ]; then
     scp testLogs/Logs/* repo:~/TestSuite/Logs/windows.txt
 fi
-
-if [ -f ChemArtifacts/Release/* ]; then
-    scp ChemArtifacts/Release/* repo:~/$REMOTE_PATH/bin
-fi
-
-if [ -f HeatArtifacts/Release/* ]; then
-    scp HeatArtifacts/Release/* repo:~/$REMOTE_PATH/bin
-fi

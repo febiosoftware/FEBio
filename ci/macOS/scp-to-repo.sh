@@ -12,11 +12,3 @@ ssh repo "chmod +x $REMOTE_PATH/FEBioStudio.app/Contents/MacOS/febio4"
 if [ -f testLogs/Logs/* ]; then
     scp testLogs/Logs/* repo:~/TestSuite/Logs/macOS.txt
 fi
-
-if [ -f ChemArtifacts/lib/* ]; then
-    scp ChemArtifacts/lib/* repo:~/$REMOTE_PATH/FEBioStudio.app/Contents/Frameworks
-fi
-
-if [ -f HeatArtifacts/lib/* ]; then
-    scp HeatArtifacts/lib/* repo:~/$REMOTE_PATH/FEBioStudio.app/Contents/Frameworks
-fi

@@ -188,12 +188,12 @@ status open
 
 
 \series default
-Theory Manual Version 4.9 
+Theory Manual Version 4.10 
 \end_layout
 
 \begin_layout Date
 Last Updated:
- March 24,
+ July 22,
  2025
 \end_layout
 
@@ -63793,9 +63793,9 @@ it follows that
 \delta\mathbf{r}^{\left(1\right)} & \delta\boldsymbol{\theta}^{\left(1\right)} & \delta\mathbf{r}^{\left(2\right)} & \delta\boldsymbol{\theta}^{\left(2\right)}\end{array}\right]\times\\
  & \alpha\left[\begin{array}{cccc}
 \mathbf{K}_{fr}^{\left(1\right)} & \mathbf{K}_{f\theta}^{\left(1\right)} & \mathbf{K}_{fr}^{\left(2\right)} & \mathbf{K}_{f\theta}^{\left(2\right)}\\
-\hat{\mathbf{z}}_{n+1}^{\left(1\right)}\cdot\mathbf{K}_{fr}^{\left(1\right)}+\mathbf{K}_{mr}^{\left(1\right)} & \hat{\mathbf{z}}_{n+1}^{\left(1\right)}\cdot\mathbf{K}_{f\theta}^{\left(1\right)}+\mathbf{K}_{m\theta}^{\left(1\right)} & \hat{\mathbf{z}}_{n+1}^{\left(1\right)}\cdot\mathbf{K}_{fr}^{\left(2\right)}+\mathbf{K}_{mr}^{\left(2\right)} & \hat{\mathbf{z}}_{n+1}^{\left(1\right)}\cdot\mathbf{K}_{f\theta}^{\left(2\right)}+\mathbf{K}_{m\theta}^{\left(2\right)}\\
+\hat{\mathbf{z}}_{n+1}^{\left(1\right)}\cdot\mathbf{K}_{fr}^{\left(1\right)}+\mathbf{K}_{mr}^{\left(1\right)} & \hat{\mathbf{f}}_{n+\alpha}^{\left(1\right)}\hat{\mathbf{z}}_{n+1}^{\left(1\right)}+\hat{\mathbf{z}}_{n+1}^{\left(1\right)}\cdot\mathbf{K}_{f\theta}^{\left(1\right)}+\mathbf{K}_{m\theta}^{\left(1\right)} & \hat{\mathbf{z}}_{n+1}^{\left(1\right)}\cdot\mathbf{K}_{fr}^{\left(2\right)}+\mathbf{K}_{mr}^{\left(2\right)} & \hat{\mathbf{z}}_{n+1}^{\left(1\right)}\cdot\mathbf{K}_{f\theta}^{\left(2\right)}+\mathbf{K}_{m\theta}^{\left(2\right)}\\
 -\mathbf{K}_{fr}^{\left(1\right)} & -\mathbf{K}_{f\theta}^{\left(1\right)} & -\mathbf{K}_{fr}^{\left(2\right)} & -\mathbf{K}_{f\theta}^{\left(2\right)}\\
--\hat{\mathbf{z}}_{n+1}^{\left(2\right)}\cdot\mathbf{K}_{fr}^{\left(1\right)}-\mathbf{K}_{mr}^{\left(1\right)} & -\hat{\mathbf{z}}_{n+1}^{\left(2\right)}\cdot\mathbf{K}_{f\theta}^{\left(1\right)}-\mathbf{K}_{m\theta}^{\left(1\right)} & -\hat{\mathbf{z}}_{n+1}^{\left(2\right)}\cdot\mathbf{K}_{fr}^{\left(2\right)}-\mathbf{K}_{mr}^{\left(2\right)} & -\hat{\mathbf{z}}_{n+1}^{\left(2\right)}\cdot\mathbf{K}_{f\theta}^{\left(2\right)}-\mathbf{K}_{m\theta}^{\left(2\right)}
+-\hat{\mathbf{z}}_{n+1}^{\left(2\right)}\cdot\mathbf{K}_{fr}^{\left(1\right)}-\mathbf{K}_{mr}^{\left(1\right)} & -\hat{\mathbf{z}}_{n+1}^{\left(2\right)}\cdot\mathbf{K}_{f\theta}^{\left(1\right)}-\mathbf{K}_{m\theta}^{\left(1\right)} & -\hat{\mathbf{z}}_{n+1}^{\left(2\right)}\cdot\mathbf{K}_{fr}^{\left(2\right)}-\mathbf{K}_{mr}^{\left(2\right)} & \hat{\mathbf{-f}}_{n+\alpha}^{\left(1\right)}\hat{\mathbf{z}}_{n+1}^{\left(2\right)}-\hat{\mathbf{z}}_{n+1}^{\left(2\right)}\cdot\mathbf{K}_{f\theta}^{\left(2\right)}-\mathbf{K}_{m\theta}^{\left(2\right)}
 \end{array}\right]\\
  & \times\left[\begin{array}{c}
 \Delta\mathbf{r}^{\left(1\right)}\\

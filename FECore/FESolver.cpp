@@ -161,13 +161,9 @@ Matrix_Type FESolver::PreferredMatrixType() const
 	for (int i = 0; i < fem.ModelLoads(); ++i)
 	{
 		FEModelLoad* pl = fem.ModelLoad(i);
-		if (pl->IsActive())
+		if (pl->IsActive() && (pl->PreferredMatrixType() == REAL_UNSYMMETRIC))
 		{
-			FEParam* p = pl->GetParameter("symmetric_stiffness");
-			if (p && (p->type() == FE_PARAM_BOOL) && !p->value<bool>())
-			{
-				return REAL_UNSYMMETRIC; // no point in continuing
-			}
+			return REAL_UNSYMMETRIC; // no point in continuing
 		}
 	}
 	for (int i = 0; i < fem.NonlinearConstraints(); ++i)

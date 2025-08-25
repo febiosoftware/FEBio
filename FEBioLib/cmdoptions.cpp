@@ -217,7 +217,7 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 		}
 		else if (sz[0] == '-')
 		{
-			fprintf(stderr, "FATAL ERROR: Invalid command line option.\n");
+			fprintf(stderr, "FATAL ERROR: Invalid command line option '%s'.\n", sz);
 			return false;
 		}
 		else
@@ -239,7 +239,7 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 			}
 			else
 			{
-				fprintf(stderr, "FATAL ERROR: Invalid command line option\n");
+				fprintf(stderr, "FATAL ERROR: Invalid command line option '%s'\n", sz);
 				return false;
 			}
 		}

@@ -142,6 +142,7 @@ public: // Modules
 	const char* GetModuleNameFromId(int id) const;
 	const char* GetModuleDescription(int i) const;
 	int GetModuleStatus(int i) const;
+    int GetModuleAllocatorID(int i) const;
 
 	//! Get a module's dependencies
 	vector<int> GetModuleDependencies(int i) const;

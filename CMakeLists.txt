@@ -236,7 +236,8 @@ macro(crossExecProcess OUT)
 endmacro()
 
 # Check for git and give warning if not available
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+option(SET_DEVCOMMIT "Set the DEVCOMMIT macro with git commit hash" ON)
+if(${SET_DEVCOMMIT} AND EXISTS ${CMAKE_SOURCE_DIR}/.git)
     if(WIN32)
         set(CMD where git)
     else()
@@ -259,11 +260,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
             crossExecProcess(DEVCOMMIT)
             
             if(${SUCCESS} EQUAL 0)
-                set_source_files_properties(
-                    FEBioLib/version.cpp
-                    PROPERTIES
-                    COMPILE_DEFINITIONS "DEVCOMMIT=\"${DEVCOMMIT}\""
-                )
+                target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
             endif()
         endif()
     else()
@@ -311,30 +308,23 @@ if(USE_MKL)
     target_include_directories(febioopt PRIVATE ${MKL_INC})
 	target_compile_definitions(febioopt PRIVATE MKL_ISS PARDISO)
 
-	target_include_directories(feimglib PRIVATE ${MKL_INC})
-    target_compile_definitions(feimglib PRIVATE HAVE_MKL)
-
     if(WIN32 OR APPLE)
         target_link_libraries(numcore PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
         target_link_libraries(febioopt PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
-        target_link_libraries(feimglib PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
     else()
         target_link_libraries(numcore PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
         target_link_libraries(febioopt PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
-        target_link_libraries(feimglib PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
     endif()
     
     if(FORCE_SYSTEM_OMP)
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
-        target_link_libraries(feimglib PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
 else()
     # If not using MKL, we still need OpenMP from the system.
     if(${OpenMP_C_FOUND})
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
-        target_link_libraries(feimglib PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
 endif()
 

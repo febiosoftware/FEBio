@@ -33,20 +33,26 @@ struct ModelStats {
 };
 
 struct TimingInfo {
-	double total_time;
-	double input_time;
-	double init_time;
-	double solve_time;
-	double io_time;
-	double total_ls_factor;
-	double total_ls_backsolve;
-	double total_reform;
-	double total_stiff;
-	double total_rhs;
-	double total_update;
-	double total_qn;
-	double total_serialize;
-	double total_callback;
-	double total_other;
+	double total_time = 0;
+	double input_time = 0;
+	double init_time = 0;
+	double solve_time = 0;
+	double io_time = 0;
+	double total_ls_factor = 0;
+	double total_ls_backsolve = 0;
+	double total_reform = 0;
+	double total_stiff = 0;
+	double total_rhs = 0;
+	double total_update = 0;
+	double total_qn = 0;
+	double total_serialize = 0;
+	double total_callback = 0;
+	double total_other = 0;
 };
 
+struct TimeStepStats {
+	int iters = 0;
+	int nrhs = 0;
+	int refs = 0;
+	int status = 0; // 0 = failed, 1 = converged
+};

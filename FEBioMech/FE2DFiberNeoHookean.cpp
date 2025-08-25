@@ -32,7 +32,7 @@ SOFTWARE.*/
 // define the material parameters
 BEGIN_FECORE_CLASS(FE2DFiberNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, "E")->setUnits(UNIT_PRESSURE);
-	ADD_PARAMETER(m_v, "v");
+	ADD_PARAMETER(m_v, FE_RANGE_RIGHT_OPEN(-1.0, 0.5), "v");
 	ADD_PARAMETER(m_a, 2, "a");
 	ADD_PARAMETER(m_ac, "active_contraction")->setUnits(UNIT_PRESSURE);
 	
