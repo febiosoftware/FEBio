@@ -10,8 +10,7 @@
 #include <fftw3.h>
 #endif // HAVE_FFTW
 
-//-----------------------------------------------------------------------------
-void blur_image_2d(Image& trg, Image& src, float d)
+void blur_avg_2d(Image& trg, Image& src, float d)
 {
 	if (d <= 0) { trg = src; return; }
 
@@ -57,8 +56,7 @@ void blur_image_2d(Image& trg, Image& src, float d)
 	}
 }
 
-//-----------------------------------------------------------------------------
-void blur_image(Image& trg, Image& src, float d)
+void blur_avg_3d(Image& trg, Image& src, float d)
 {
 	if (d <= 0) { trg = src; return; }
 
@@ -114,7 +112,7 @@ void blur_image(Image& trg, Image& src, float d)
 bool mkl_dft2(int nx, int ny, float* x, MKL_Complex8* c);
 bool mkl_idft2(int nx, int ny, MKL_Complex8* c, float* y);
 
-FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d)
+FEIMGLIB_API void mkl_blur_2d(Image& trg, Image& src, float d)
 {
 	int nx = src.width();
 	int ny = src.height();
@@ -161,7 +159,7 @@ FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d)
 // in fft.cpp
 bool mkl_dft3(int nx, int ny, int nz, float* x, MKL_Complex8* c);
 bool mkl_idft3(int nx, int ny, int nz, MKL_Complex8* c, float* y);
-FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d)
+FEIMGLIB_API void mkl_blur_3d(Image& trg, Image& src, float d)
 {
 	int nx = src.width();
 	int ny = src.height();
@@ -209,8 +207,8 @@ FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d)
 	delete[] c;
 }
 #else // HAVE_MKL
-void fftblur_2d(Image& trg, Image& src, float d) {}
-void fftblur_3d(Image& trg, Image& src, float d) {}
+void mkl_blur_2d(Image& trg, Image& src, float d) {}
+void mkl_blur_3d(Image& trg, Image& src, float d) {}
 #endif // HAVE_MKL
 
 #ifdef HAVE_FFTW
@@ -382,3 +380,35 @@ void fftw_blur_3d(Image& trg, Image& src, float d)
 void fftw_blur_2d(Image& trg, Image& src, float d) {}
 void fftw_blur_3d(Image& trg, Image& src, float d) {}
 #endif // HAVE_FFTW
+
+void blur_image_2d(Image& trg, Image& src, float d, BlurMethod blurMethod)
+{
+	switch (blurMethod)
+	{
+	case BlurMethod::BLUR_AVERAGE: blur_avg_2d(trg, src, d); break;
+	case BlurMethod::BLUR_FFT: 
+#ifdef HAVE_FFTW
+		fftw_blur_2d(trg, src, d); break;
+#elif HAVE_MKL
+		mkl_blur_2d(trg, src, d); break;
+#endif
+	default:
+		break;
+	}
+}
+
+void blur_image_3d(Image& trg, Image& src, float d, BlurMethod blurMethod)
+{
+	switch (blurMethod)
+	{
+	case BlurMethod::BLUR_AVERAGE: blur_avg_3d(trg, src, d); break;
+	case BlurMethod::BLUR_FFT:
+#ifdef HAVE_FFTW
+		fftw_blur_3d(trg, src, d); break;
+#elif HAVE_MKL
+		mkl_blur_3d(trg, src, d); break;
+#endif
+	default:
+		break;
+	}
+}
