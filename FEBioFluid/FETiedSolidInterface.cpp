@@ -86,6 +86,7 @@ FETiedSolidInterface::FETiedSolidInterface(FEModel* pfem) : FEContactInterface(p
     SetID(count++);
     
     // initial values
+    m_lc.m_laugon = 0;
     m_lc.m_tol = 0.1;
     m_lc.m_eps = 1;
     m_lc.m_tol = 0.01;
@@ -112,7 +113,9 @@ bool FETiedSolidInterface::Init()
     // initialize surface data
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
-    
+
+    m_laugon = m_lc.m_laugon;
+
     // get the DOFS
     m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
     

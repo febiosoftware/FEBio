@@ -88,6 +88,7 @@ FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(p
     SetID(count++);
     
     // initial values
+    m_lcv.m_laugon = m_lcp.m_laugon = 0;
     m_lcv.m_tol = m_lcp.m_tol = 0.1;
     m_lcv.m_eps = m_lcp.m_eps = 1;
     m_lcv.m_tol = 0.01;
@@ -117,6 +118,8 @@ bool FETiedFluidInterface::Init()
     
     m_lcp = m_lcv;
     m_lcp.m_eps = m_epsp;
+    
+    m_laugon = m_lcv.m_laugon;
     
     // get the DOFS
     m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
@@ -216,13 +219,12 @@ void FETiedFluidInterface::Activate()
                     m_lcp.add(pLCef);
                 }
             }
-            m_lcv.Init();
-            m_lcv.Activate();
-            m_lcp.Init();
-            m_lcp.Activate();
-            m_binit = true;
         }
-        
+        m_lcv.Init();
+        m_lcv.Activate();
+        m_lcp.Init();
+        m_lcp.Activate();
+        m_binit = true;
     }
 }
 
