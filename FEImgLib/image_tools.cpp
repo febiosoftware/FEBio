@@ -215,15 +215,13 @@ void fftblur_3d(Image& trg, Image& src, float d) {}
 
 #ifdef HAVE_FFTW
 void create_gaussian_2d(double* kernel, int rows, int cols, double sigma) {
-	int cx = cols / 2;
-	int cy = rows / 2;
 	double sum = 0.0;
-
 	for (int y = 0; y < rows; ++y) {
-		double dy = (y - cy) * (y - cy);
+		int dy = (y <= rows / 2) ? y : (rows - y);  // wrap-around distance
 		for (int x = 0; x < cols; ++x) {
-			double dx = (x - cx) * (x - cx);
-			double val = exp(-(dx + dy) / (2.0 * sigma * sigma));
+			int dx = (x <= cols / 2) ? x : (cols - x);
+			double d2 = (double)(dx * dx + dy * dy);
+			double val = exp(-d2 / (2.0 * sigma * sigma));
 			kernel[y * cols + x] = val;
 			sum += val;
 		}
@@ -236,25 +234,21 @@ void create_gaussian_2d(double* kernel, int rows, int cols, double sigma) {
 
 // Create 3D Gaussian kernel (centered)
 void create_gaussian_3d(double* kernel, int nz, int ny, int nx, double sigma) {
-	int cz = nz / 2;
-	int cy = ny / 2;
-	int cx = nx / 2;
 	double sum = 0.0;
-
 	for (int z = 0; z < nz; ++z) {
-		double dz = (z - cz) * (z - cz);
+		int dz = (z <= nz / 2) ? z : (nz - z);  // wrap-around distance
 		for (int y = 0; y < ny; ++y) {
-			double dy = (y - cy) * (y - cy);
+			int dy = (y <= ny / 2) ? y : (ny - y);
 			for (int x = 0; x < nx; ++x) {
-				double dx = (x - cx) * (x - cx);
-				double val = exp(-(dx + dy + dz) / (2.0 * sigma * sigma));
+				int dx = (x <= nx / 2) ? x : (nx - x);
+				double d2 = (double)(dx * dx + dy * dy + dz * dz);
+				double val = exp(-d2 / (2.0 * sigma * sigma));
 				kernel[(z * ny + y) * nx + x] = val;
 				sum += val;
 			}
 		}
 	}
-
-	// Normalize so sum(kernel) = 1
+	// Normalize
 	for (int i = 0; i < nx * ny * nz; ++i) {
 		kernel[i] /= sum;
 	}
