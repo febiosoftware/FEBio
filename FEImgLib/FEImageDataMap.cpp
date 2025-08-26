@@ -93,7 +93,7 @@ void FEImageDataMap::Evaluate(double time)
 	if (m_blur > 0)
 	{
 		if (m_im0.depth() == 1) blur_image_2d(m_im, m_im0, (float)m_blur);
-		else blur_image(m_im, m_im0, (float)m_blur);
+		else blur_image_3d(m_im, m_im0, (float)m_blur);
 	}
 	else m_im = m_im0;
 
