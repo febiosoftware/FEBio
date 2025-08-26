@@ -3,6 +3,11 @@
 #include <FECore/FECoreClass.h>
 #include <FECore/mat3d.h>
 #include "feimglib_api.h"
+#include "image_tools.h"
+
+#ifdef HAVE_FFTW
+#include <fftw3.h>
+#endif // HAVE_FFTW
 
 class FEIMGLIB_API ImageFilter : public FECoreClass
 {
@@ -95,3 +100,22 @@ public:
 	double m_blur;
 	DECLARE_FECORE_CLASS();
 };
+
+#ifdef HAVE_FFTW
+class FEIMGLIB_API FFTWBlur3D : public ImageFilter
+{
+public:
+	FFTWBlur3D(FEModel* fem);
+
+	bool Init() override;
+
+	void Update(Image& trg, Image& src) override;
+
+	double Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
+
+public:
+	bool m_norm_flag = false;
+	double m_blur;
+	DECLARE_FECORE_CLASS();
+};
+#endif // HAVE_FFTW

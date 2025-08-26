@@ -2,6 +2,11 @@
 #include "ImageFilter.h"
 #include <FECore/log.h>
 #include <vector>
+#include "image_tools.h"
+
+#ifdef HAVE_FFTW
+#include <fftw3.h>
+#endif // HAVE_FFTW
 
 ImageFilter::ImageFilter(FEModel* fem) : FECoreClass(fem)
 {
@@ -392,3 +397,35 @@ double BoxBlur3D::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
 
 	return (f / n_count);
 }
+
+#ifdef HAVE_FFTW
+BEGIN_FECORE_CLASS(FFTWBlur3D, ImageFilter)
+ADD_PARAMETER(m_blur, "blur");
+ADD_PARAMETER(m_norm_flag, "normalize values");
+END_FECORE_CLASS();
+
+FFTWBlur3D::FFTWBlur3D(FEModel* fem) : ImageFilter(fem)
+{
+	m_blur = 0.0;
+	m_norm_flag = false;
+}
+
+bool FFTWBlur3D::Init() 
+{
+	return true;
+}
+
+void FFTWBlur3D::Update(Image& trg, Image& src)
+{
+	if (m_blur <= 0) { trg = src; return; }
+	feLog("Blurring images, blur factor %lg\n", m_blur);
+
+	fftw_blur_3d(trg, src, m_blur);
+}
+
+// SL: Does nothing for now.
+double FFTWBlur3D::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
+{
+	return 0;
+}
+#endif // HAVE_FFTW
