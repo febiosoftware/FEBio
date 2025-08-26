@@ -42,118 +42,15 @@ SOFTWARE.*/
 // FETiedFluidSurface
 //-----------------------------------------------------------------------------
 
-FETiedFluidSurface::FETiedFluidSurface(FEModel* pfem) : FESurfaceConstraint(pfem), m_dofWE(pfem), m_surf(pfem), m_lcv(pfem), m_lcp(pfem)
+FETiedFluidSurface::FETiedFluidSurface(FEModel* pfem) : FESurface(pfem)
 {
-    m_binit = false;
-}
-
-//-----------------------------------------------------------------------------
-void FETiedFluidSurface::Serialize(DumpStream& ar)
-{
-//    ar & m_pme;
-    ar & m_rs;
-}
-
-//-----------------------------------------------------------------------------
-void FETiedFluidSurface::Activate()
-{
-    if (m_binit == false)
-    {
-        // don't forget to call base class
-        FESurfaceConstraint::Activate();
-        
-        FEModel& fem = *GetFEModel();
-        FEMesh& mesh = fem.GetMesh();
-        FETiedFluidSurface* ts = GetSibling();
-        FESurface* surf = ts->GetSurface();
-        FETiedFluidInterface* tfi = GetContactInterface();
-        
-        // copy settings
-        m_lcv.m_laugon = tfi->m_laugon;
-        m_lcv.m_tol = tfi->m_tol;
-        m_lcv.m_eps = tfi->m_epsv;
-        m_lcv.m_naugmin = tfi->m_naugmin;
-        m_lcv.m_naugmax = tfi->m_naugmax;
-
-        m_lcp.m_laugon = tfi->m_laugon;
-        m_lcp.m_tol = tfi->m_tol;
-        m_lcp.m_eps = tfi->m_epsp;
-        m_lcp.m_naugmin = tfi->m_naugmin;
-        m_lcp.m_naugmax = tfi->m_naugmax;
-
-        // create linear constraints
-        for (int i=0; i<m_surf.Nodes(); ++i) {
-            FENode& node = m_surf.Node(i);
-            if (m_pme[i] == nullptr) continue;
-            if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
-                
-                // get shape functions on sibling surface at projection point
-                double Na[FEElement::MAX_NODES];
-                m_pme[i]->shape_fnc(Na, m_rs[i][0], m_rs[i][1]);
-                
-                for (int j=0; j<m_dofWE.Size(); ++j) {
-                    // check to see if the DOF is not open
-                    int dof = m_dofWE[j];
-                    if (node.get_bc(dof) != DOF_OPEN) {
-                        // if not open, check to see if one of the projected face nodal DOFs is not open
-                        bool reset = true;
-                        for (int k=0; k<m_pme[i]->Nodes(); ++k) {
-                            FENode& n2 = surf->Node(m_pme[i]->m_lnode[k]);
-                            int indx = m_pme[i]->m_lnode[k];
-                            if ((ts->m_tag[indx] == -1) && (n2.get_bc(dof) != DOF_OPEN) && (fabs(Na[k]) > tfi->m_stol)) {
-                                ts->m_tag[indx] = 1;
-                                reset = false;
-                            }
-                        }
-                        // only reset if there are no significant constraints on any node of the projected surface
-                        if (reset) node.set_bc(dof, DOF_OPEN);
-                    }
-                }
-
-                // extract the fluid bulk modulus for the solid element underneath this face
-                FEElement& el = *(m_pme[i]->m_elem[0].pe);
-                FEMaterial* pm = fem.GetMaterial(el.GetMatID());
-                double K = 0;
-                FEFluidMaterial* fm = dynamic_cast<FEFluidMaterial*>(pm);
-                FEFluidFSI* fsim = dynamic_cast<FEFluidFSI*>(pm);
-                if (fm) K = fm->BulkModulus(*el.GetMaterialPoint(0));
-                else if (fsim) K = fsim->Fluid()->BulkModulus(*el.GetMaterialPoint(0));
-
-                //  constrain components of velocities on primary and secondary surfaces
-                FEAugLagLinearConstraint *pLCvx = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-                FEAugLagLinearConstraint *pLCvy = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-                FEAugLagLinearConstraint *pLCvz = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-                FEAugLagLinearConstraint *pLCef = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-                pLCvx->AddDOF(node.GetID(), m_dofWE[0], 1);
-                pLCvy->AddDOF(node.GetID(), m_dofWE[1], 1);
-                pLCvz->AddDOF(node.GetID(), m_dofWE[2], 1);
-                pLCef->AddDOF(node.GetID(), m_dofWE[3], 1*K);
-                for (int j=0; j<m_pme[i]->Nodes(); ++j) {
-                    FENode& n2 = surf->Node(m_pme[i]->m_lnode[j]);
-                    pLCvx->AddDOF(n2.GetID(), m_dofWE[0], -Na[j]);
-                    pLCvy->AddDOF(n2.GetID(), m_dofWE[1], -Na[j]);
-                    pLCvz->AddDOF(n2.GetID(), m_dofWE[2], -Na[j]);
-                    pLCef->AddDOF(n2.GetID(), m_dofWE[3], -Na[j]*K);
-                }
-                m_lcv.add(pLCvx);
-                m_lcv.add(pLCvy);
-                m_lcv.add(pLCvz);
-                m_lcp.add(pLCef);
-            }
-        }
-        m_lcv.Init();
-        m_lcv.Activate();
-        m_lcp.Init();
-        m_lcp.Activate();
-        m_binit = true;
-    }
 }
 
 //-----------------------------------------------------------------------------
 bool FETiedFluidSurface::Init()
 {
     // initialize surface data first
-    if (FESurfaceConstraint::Init() == false) return false;
+    if (FESurface::Init() == false) return false;
     
     FESurface* surf = GetSurface();
     m_pme.assign(surf->Nodes(), nullptr);
@@ -162,22 +59,8 @@ bool FETiedFluidSurface::Init()
     m_gap.assign(surf->Nodes(), 0.0);
     m_tag.assign(surf->Nodes(), -1);
 
-	// set the dof list
-	if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
-    if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
-
     return true;
 }
-
-//-----------------------------------------------------------------------------
-void FETiedFluidSurface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lcv.LoadVector(R, tp); m_lcp.LoadVector(R, tp); }
-void FETiedFluidSurface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lcv.StiffnessMatrix(LS, tp); m_lcp.StiffnessMatrix(LS, tp); }
-bool FETiedFluidSurface::Augment(int naug, const FETimeInfo& tp) { return (m_lcv.Augment(naug, tp) && m_lcp.Augment(naug, tp)); }
-void FETiedFluidSurface::BuildMatrixProfile(FEGlobalMatrix& M) { m_lcv.BuildMatrixProfile(M); m_lcp.BuildMatrixProfile(M); }
-int FETiedFluidSurface::InitEquations(int neq) { m_lcv.InitEquations(neq); return m_lcp.InitEquations(neq); }
-void FETiedFluidSurface::Update(const std::vector<double>& Ui, const std::vector<double>& ui) { m_lcv.Update(Ui, ui); m_lcp.Update(Ui, ui); }
-void FETiedFluidSurface::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) { m_lcv.UpdateIncrements(Ui, ui); m_lcp.UpdateIncrements(Ui, ui); }
-void FETiedFluidSurface::PrepStep() { m_lcv.PrepStep(); m_lcp.PrepStep(); }
 
 //-----------------------------------------------------------------------------
 // FETiedFluidInterface
@@ -186,39 +69,34 @@ void FETiedFluidSurface::PrepStep() { m_lcv.PrepStep(); m_lcp.PrepStep(); }
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
-    ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
-    ADD_PARAMETER(m_tol      , "tolerance"          );
-    ADD_PARAMETER(m_epsv      ,"velocity_penalty"   );
+    ADD_PARAMETER(m_lcv.m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+    ADD_PARAMETER(m_lcv.m_tol      , "tolerance"          );
+    ADD_PARAMETER(m_lcv.m_eps      , "velocity_penalty"   );
     ADD_PARAMETER(m_epsp      ,"pressure_penalty"   );
     ADD_PARAMETER(m_btwopass , "two_pass"           );
     ADD_PARAMETER(m_stol     , "search_tol"         );
     ADD_PARAMETER(m_srad     , "search_radius"      )->setUnits(UNIT_LENGTH);
-    ADD_PARAMETER(m_naugmin  , "minaug"             );
-    ADD_PARAMETER(m_naugmax  , "maxaug"             );
+    ADD_PARAMETER(m_lcv.m_naugmin  , "minaug"       );
+    ADD_PARAMETER(m_lcv.m_naugmax  , "maxaug"       );
 END_FECORE_CLASS();
 
-FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem)
+FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem), m_lcv(pfem), m_lcp(pfem)
 {
     static int count = 1;
     SetID(count++);
     
     // initial values
-    m_tol = 0.1;
-    m_epsv = m_epsp = 1;
+    m_lcv.m_tol = m_lcp.m_tol = 0.1;
+    m_lcv.m_eps = m_lcp.m_eps = 1;
     m_stol = 0.01;
     m_srad = 1.0;
     m_btwopass = true;
     m_bfreedofs = true;
     
-    m_naugmin = 0;
-    m_naugmax = 10;
+    m_lcv.m_naugmin = m_lcp.m_naugmin = 0;
+    m_lcv.m_naugmax = m_lcp.m_naugmax = 10;
     
-    // set parents
-    m_ss.SetContactInterface(this);
-    m_ms.SetContactInterface(this);
-
-    m_ss.SetSibling(&m_ms);
-    m_ms.SetSibling(&m_ss);
+    m_binit = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -233,6 +111,9 @@ bool FETiedFluidInterface::Init()
     // initialize surface data
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
+    
+    m_lcp = m_lcv;
+    m_lcp.m_eps = m_epsp;
     
     // get the DOFS
     m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
@@ -251,9 +132,88 @@ void FETiedFluidInterface::Activate()
     InitialNodalProjection(m_ss, m_ms);
     InitialNodalProjection(m_ms, m_ss);
     
-    m_ss.Activate();
-    if (m_btwopass) m_ms.Activate();
+    if (m_binit == false)
+    {
+        int npass = (m_btwopass?2:1);
+        for (int np=0; np<npass; ++np)
+        {
+            FETiedFluidSurface& ps = (np == 0? m_ss : m_ms);
+            FETiedFluidSurface& ss = (np == 0? m_ms : m_ss);
 
+            // don't forget to call base class
+            
+            FEModel& fem = *GetFEModel();
+            FEMesh& mesh = fem.GetMesh();
+            FESurface* surf = ss.GetSurface();
+            
+            // create linear constraints
+            for (int i=0; i<ps.Nodes(); ++i) {
+                FENode& node = ps.Node(i);
+                if (ps.m_pme[i] == nullptr) continue;
+                if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
+                    
+                    // get shape functions on sibling surface at projection point
+                    double Na[FEElement::MAX_NODES];
+                    ps.m_pme[i]->shape_fnc(Na, ps.m_rs[i][0], ps.m_rs[i][1]);
+                    
+                    for (int j=0; j<m_dofWE.Size(); ++j) {
+                        // check to see if the DOF is not open
+                        int dof = m_dofWE[j];
+                        if (node.get_bc(dof) != DOF_OPEN) {
+                            // if not open, check to see if one of the projected face nodal DOFs is not open
+                            bool reset = true;
+                            for (int k=0; k<ps.m_pme[i]->Nodes(); ++k) {
+                                FENode& n2 = surf->Node(ps.m_pme[i]->m_lnode[k]);
+                                int indx = ps.m_pme[i]->m_lnode[k];
+                                if ((ss.m_tag[indx] == -1) && (n2.get_bc(dof) != DOF_OPEN) && (fabs(Na[k]) > m_stol)) {
+                                    ss.m_tag[indx] = 1;
+                                    reset = false;
+                                }
+                            }
+                            // only reset if there are no significant constraints on any node of the projected surface
+                            if (reset) node.set_bc(dof, DOF_OPEN);
+                        }
+                    }
+                    
+                    // extract the fluid bulk modulus for the solid element underneath this face
+                    FEElement& el = *(ps.m_pme[i]->m_elem[0].pe);
+                    FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+                    double K = 0;
+                    FEFluidMaterial* fm = dynamic_cast<FEFluidMaterial*>(pm);
+                    FEFluidFSI* fsim = dynamic_cast<FEFluidFSI*>(pm);
+                    if (fm) K = fm->BulkModulus(*el.GetMaterialPoint(0));
+                    else if (fsim) K = fsim->Fluid()->BulkModulus(*el.GetMaterialPoint(0));
+                    
+                    //  constrain components of velocities on primary and secondary surfaces
+                    FEAugLagLinearConstraint *pLCvx = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
+                    FEAugLagLinearConstraint *pLCvy = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
+                    FEAugLagLinearConstraint *pLCvz = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
+                    FEAugLagLinearConstraint *pLCef = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
+                    pLCvx->AddDOF(node.GetID(), m_dofWE[0], 1);
+                    pLCvy->AddDOF(node.GetID(), m_dofWE[1], 1);
+                    pLCvz->AddDOF(node.GetID(), m_dofWE[2], 1);
+                    pLCef->AddDOF(node.GetID(), m_dofWE[3], 1*K);
+                    for (int j=0; j<ps.m_pme[i]->Nodes(); ++j) {
+                        FENode& n2 = ss.Node(ps.m_pme[i]->m_lnode[j]);
+                        pLCvx->AddDOF(n2.GetID(), m_dofWE[0], -Na[j]);
+                        pLCvy->AddDOF(n2.GetID(), m_dofWE[1], -Na[j]);
+                        pLCvz->AddDOF(n2.GetID(), m_dofWE[2], -Na[j]);
+                        pLCef->AddDOF(n2.GetID(), m_dofWE[3], -Na[j]*K);
+                    }
+                    m_lcv.add(pLCvx);
+                    m_lcv.add(pLCvy);
+                    m_lcv.add(pLCvz);
+                    m_lcp.add(pLCef);
+                }
+            }
+            m_lcv.Init();
+            m_lcv.Activate();
+            m_lcp.Init();
+            m_lcp.Activate();
+            m_binit = true;
+        }
+        
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -309,61 +269,58 @@ void FETiedFluidInterface::InitialNodalProjection(FETiedFluidSurface& ss, FETied
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
-    m_ss.Update(Ui, ui);
-    if (m_btwopass) m_ms.Update(Ui, ui);
+    m_lcv.Update(Ui, ui);
+    m_lcp.Update(Ui, ui);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
 {
-    m_ss.UpdateIncrements(Ui, ui);
-    if (m_btwopass) m_ms.UpdateIncrements(Ui, ui);
+    m_lcv.UpdateIncrements(Ui, ui);
+    m_lcp.UpdateIncrements(Ui, ui);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    m_ss.LoadVector(R, tp);
-    if (m_btwopass) m_ms.LoadVector(R, tp);
+    m_lcv.LoadVector(R, tp);
+    m_lcp.LoadVector(R, tp);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-    m_ss.StiffnessMatrix(LS, tp);
-    if (m_btwopass) m_ms.StiffnessMatrix(LS, tp);
+    m_lcv.StiffnessMatrix(LS, tp);
+    m_lcp.StiffnessMatrix(LS, tp);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& G)
 {
-    m_ss.BuildMatrixProfile(G);
-    if (m_btwopass) m_ms.BuildMatrixProfile(G);
+    m_lcv.BuildMatrixProfile(G);
+    m_lcp.BuildMatrixProfile(G);
 }
 
 //-----------------------------------------------------------------------------
 int FETiedFluidInterface::InitEquations(int neq)
 {
-    int n = m_ss.InitEquations(neq);
-    if (m_btwopass) n += m_ms.InitEquations(neq);
+    int n = m_lcv.InitEquations(neq);
+    n += m_lcp.InitEquations(neq);
 	return n;
 }
 
 //-----------------------------------------------------------------------------
 bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
 {
-    if (!m_ss.Augment(naug, tp)) return false;
-    if (m_btwopass) {
-        if (!m_ms.Augment(naug, tp)) return false;
-    }
+    if (!m_lcv.Augment(naug, tp) || !m_lcp.Augment(naug, tp)) return false;
     return true;
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::PrepStep()
 {
-    m_ss.PrepStep();
-    if (m_btwopass) m_ms.PrepStep();
+    m_lcv.PrepStep();
+    m_lcp.PrepStep();
 }
 
 //-----------------------------------------------------------------------------
