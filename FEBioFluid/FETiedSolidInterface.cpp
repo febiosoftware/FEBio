@@ -36,102 +36,21 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include <FECore/FEModel.h>
 #include "FEBioFSI.h"
+#include "FEFluidFSI.h"
 
 //-----------------------------------------------------------------------------
 // FETiedFluidFSISurface
 //-----------------------------------------------------------------------------
 
-FETiedFluidFSISurface::FETiedFluidFSISurface(FEModel* pfem) : FESurfaceConstraint(pfem), m_dofU(pfem), m_surf(pfem), m_lcu(pfem)
+FETiedFluidFSISurface::FETiedFluidFSISurface(FEModel* pfem) : FESurface(pfem)
 {
-    m_binit = false;
-}
-
-//-----------------------------------------------------------------------------
-void FETiedFluidFSISurface::Serialize(DumpStream& ar)
-{
-//    ar & m_pme;
-    ar & m_rs;
-}
-
-//-----------------------------------------------------------------------------
-void FETiedFluidFSISurface::Activate()
-{
-    if (m_binit == false)
-    {
-        // don't forget to call base class
-        FESurfaceConstraint::Activate();
-        
-        FEModel& fem = *GetFEModel();
-        FEMesh& mesh = fem.GetMesh();
-        FETiedFluidFSISurface* ts = GetSibling();
-        FESurface* surf = ts->GetSurface();
-        FETiedSolidInterface* tfi = GetContactInterface();
-        
-        // copy settings
-        m_lcu.m_laugon = tfi->m_laugon;
-        m_lcu.m_tol = tfi->m_tol;
-        m_lcu.m_eps = tfi->m_epsu;
-        m_lcu.m_naugmin = tfi->m_naugmin;
-        m_lcu.m_naugmax = tfi->m_naugmax;
-
-        // create linear constraints
-        for (int i=0; i<m_surf.Nodes(); ++i) {
-            FENode& node = m_surf.Node(i);
-            if (m_pme[i] == nullptr) continue;
-            if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
-                
-                // get shape functions on sibling surface at projection point
-                double Na[FEElement::MAX_NODES];
-                m_pme[i]->shape_fnc(Na, m_rs[i][0], m_rs[i][1]);
-
-                for (int j=0; j<m_dofU.Size(); ++j) {
-                    // check to see if the DOF is not open
-                    int dof = m_dofU[j];
-                    if (node.get_bc(dof) != DOF_OPEN) {
-                        // if not open, check to see if one of the projected face nodal DOFs is not open
-                        bool reset = true;
-                        for (int k=0; k<m_pme[i]->Nodes(); ++k) {
-                            FENode& n2 = surf->Node(m_pme[i]->m_lnode[k]);
-                            int indx = m_pme[i]->m_lnode[k];
-                            if ((ts->m_tag[indx] == -1) && (n2.get_bc(dof) != DOF_OPEN) && (fabs(Na[k]) > tfi->m_stol)) {
-                                ts->m_tag[indx] = 1;
-                                reset = false;
-                            }
-                        }
-                        // only reset if there are no significant constraints on any node of the projected surface
-                        if (reset) node.set_bc(dof, DOF_OPEN);
-                    }
-                }
-
-                //  constrain components of velocities on primary and secondary surfaces
-                FEAugLagLinearConstraint *pLCux = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-                FEAugLagLinearConstraint *pLCuy = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-                FEAugLagLinearConstraint *pLCuz = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
-                pLCux->AddDOF(node.GetID(), m_dofU[0], 1);
-                pLCuy->AddDOF(node.GetID(), m_dofU[1], 1);
-                pLCuz->AddDOF(node.GetID(), m_dofU[2], 1);
-                for (int j=0; j<m_pme[i]->Nodes(); ++j) {
-                    FENode& n2 = surf->Node(m_pme[i]->m_lnode[j]);
-                    pLCux->AddDOF(n2.GetID(), m_dofU[0], -Na[j]);
-                    pLCuy->AddDOF(n2.GetID(), m_dofU[1], -Na[j]);
-                    pLCuz->AddDOF(n2.GetID(), m_dofU[2], -Na[j]);
-                }
-                m_lcu.add(pLCux);
-                m_lcu.add(pLCuy);
-                m_lcu.add(pLCuz);
-            }
-        }
-        m_lcu.Init();
-        m_lcu.Activate();
-        m_binit = true;
-    }
 }
 
 //-----------------------------------------------------------------------------
 bool FETiedFluidFSISurface::Init()
 {
     // initialize surface data first
-    if (FESurfaceConstraint::Init() == false) return false;
+    if (FESurface::Init() == false) return false;
     
     FESurface* surf = GetSurface();
     m_pme.assign(surf->Nodes(), nullptr);
@@ -140,22 +59,8 @@ bool FETiedFluidFSISurface::Init()
     
     m_tag.assign(surf->Nodes(),-1);
 
-	// set the dof list
-	if (m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT)) == false) return false;
-
     return true;
 }
-
-//-----------------------------------------------------------------------------
-void FETiedFluidFSISurface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp) { m_lcu.LoadVector(R, tp); }
-void FETiedFluidFSISurface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) { m_lcu.StiffnessMatrix(LS, tp); }
-bool FETiedFluidFSISurface::Augment(int naug, const FETimeInfo& tp) { return m_lcu.Augment(naug, tp); }
-void FETiedFluidFSISurface::BuildMatrixProfile(FEGlobalMatrix& M) { m_lcu.BuildMatrixProfile(M); }
-int FETiedFluidFSISurface::InitEquations(int neq) { return m_lcu.InitEquations(neq); }
-void FETiedFluidFSISurface::Update(const std::vector<double>& Ui, const std::vector<double>& ui) { m_lcu.Update(Ui, ui); }
-void FETiedFluidFSISurface::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) { m_lcu.UpdateIncrements(Ui, ui); }
-void FETiedFluidFSISurface::PrepStep() { m_lcu.PrepStep(); }
-
 //-----------------------------------------------------------------------------
 // FETiedSolidInterface
 //-----------------------------------------------------------------------------
@@ -163,37 +68,36 @@ void FETiedFluidFSISurface::PrepStep() { m_lcu.PrepStep(); }
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedSolidInterface, FEContactInterface)
-    ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
-    ADD_PARAMETER(m_tol      , "tolerance"          );
-    ADD_PARAMETER(m_epsu      ,"displacement_penalty");
+    ADD_PARAMETER(m_lc.m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+    ADD_PARAMETER(m_lc.m_tol      , "tolerance"          );
+    ADD_PARAMETER(m_lc.m_eps      ,"displacement_penalty");
+    ADD_PARAMETER(m_lc.m_naugmin  , "minaug"             );
+    ADD_PARAMETER(m_lc.m_naugmax  , "maxaug"             );
+
     ADD_PARAMETER(m_btwopass , "two_pass"           );
     ADD_PARAMETER(m_stol     , "search_tol"         );
     ADD_PARAMETER(m_srad     , "search_radius"      )->setUnits(UNIT_LENGTH);
-    ADD_PARAMETER(m_naugmin  , "minaug"             );
-    ADD_PARAMETER(m_naugmax  , "maxaug"             );
+    ADD_PARAMETER(m_bfreedofs, "free_DOFs")->setLongName("Free fixed interface DOFs");
 END_FECORE_CLASS();
 
-FETiedSolidInterface::FETiedSolidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofU(pfem)
+FETiedSolidInterface::FETiedSolidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofU(pfem), m_lc(pfem)
 {
     static int count = 1;
     SetID(count++);
     
     // initial values
-    m_tol = 0.1;
-    m_epsu = 1;
+    m_lc.m_tol = 0.1;
+    m_lc.m_eps = 1;
+    m_lc.m_tol = 0.01;
+    m_lc.m_naugmin = 0;
+    m_lc.m_naugmax = 10;
+    
     m_stol = 0.01;
     m_srad = 1.0;
     m_btwopass = true;
+    m_bfreedofs = false;
     
-    m_naugmin = 0;
-    m_naugmax = 10;
-    
-    // set parents
-    m_ss.SetContactInterface(this);
-    m_ms.SetContactInterface(this);
-
-    m_ss.SetSibling(&m_ms);
-    m_ms.SetSibling(&m_ss);
+    m_binit = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -225,9 +129,88 @@ void FETiedSolidInterface::Activate()
     InitialNodalProjection(m_ss, m_ms);
     InitialNodalProjection(m_ms, m_ss);
     
-    m_ss.Activate();
-    if (m_btwopass) m_ms.Activate();
+    if (m_binit == false)
+    {
+        int npass = (m_btwopass?2:1);
+        for (int np=0; np<npass; ++np)
+        {
+            FETiedFluidFSISurface& ps = (np == 0? m_ss : m_ms);
+            FETiedFluidFSISurface& ss = (np == 0? m_ms : m_ss);
 
+            // don't forget to call base class
+            
+            FEModel& fem = *GetFEModel();
+            FEMesh& mesh = fem.GetMesh();
+            FESurface* surf = ss.GetSurface();
+            
+            // create linear constraints
+            for (int i=0; i<ps.Nodes(); ++i) {
+                FENode& node = ps.Node(i);
+                if (ps.m_pme[i] == nullptr) continue;
+                if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
+                    
+                    // get shape functions on sibling surface at projection point
+                    double Na[FEElement::MAX_NODES];
+                    ps.m_pme[i]->shape_fnc(Na, ps.m_rs[i][0], ps.m_rs[i][1]);
+                    
+                    // free the fixed DOFs inside of the tied interface, if requested
+                    if (m_bfreedofs) {
+                        for (int j=0; j<m_dofU.Size(); ++j) {
+                            // check to see if the DOF is not open
+                            int dof = m_dofU[j];
+                            if (node.get_bc(dof) == DOF_FIXED) {
+                                // if not open, check to see if one of the projected face nodal DOFs is not open
+                                bool reset = true;
+                                for (int k=0; k<ps.m_pme[i]->Nodes(); ++k) {
+                                    FENode& n2 = surf->Node(ps.m_pme[i]->m_lnode[k]);
+                                    int indx = ps.m_pme[i]->m_lnode[k];
+                                    if ((ss.m_tag[indx] == -1) && (n2.get_bc(dof) == DOF_FIXED) && (fabs(Na[k]) > m_stol)) {
+                                        ss.m_tag[indx] = 1;
+                                        reset = false;
+                                    }
+                                }
+                                // only reset if there are no significant constraints on any node of the projected surface
+                                if (reset) node.set_bc(dof, DOF_OPEN);
+                            }
+                            else if (node.get_bc(dof) == DOF_PRESCRIBED) {
+                                feLogError("Prescribed degrees of freedom should not be assigned within tied-fluid interfaces!");
+                                exit(-1);
+                            }
+                        }
+                    }
+                    
+                    // extract the fluid bulk modulus for the solid element underneath this face
+                    FEElement& el = *(ps.m_pme[i]->m_elem[0].pe);
+                    FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+                    double K = 0;
+                    FEFluidMaterial* fm = dynamic_cast<FEFluidMaterial*>(pm);
+                    FEFluidFSI* fsim = dynamic_cast<FEFluidFSI*>(pm);
+                    if (fm) K = fm->BulkModulus(*el.GetMaterialPoint(0));
+                    else if (fsim) K = fsim->Fluid()->BulkModulus(*el.GetMaterialPoint(0));
+                    
+                    //  constrain components of velocities on primary and secondary surfaces
+                    FEAugLagLinearConstraint *pLCux = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
+                    FEAugLagLinearConstraint *pLCuy = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
+                    FEAugLagLinearConstraint *pLCuz = fecore_alloc(FEAugLagLinearConstraint, GetFEModel());
+                    pLCux->AddDOF(node.GetID(), m_dofU[0], 1);
+                    pLCuy->AddDOF(node.GetID(), m_dofU[1], 1);
+                    pLCuz->AddDOF(node.GetID(), m_dofU[2], 1);
+                    for (int j=0; j<ps.m_pme[i]->Nodes(); ++j) {
+                        FENode& n2 = ss.Node(ps.m_pme[i]->m_lnode[j]);
+                        pLCux->AddDOF(n2.GetID(), m_dofU[0], -Na[j]);
+                        pLCuy->AddDOF(n2.GetID(), m_dofU[1], -Na[j]);
+                        pLCuz->AddDOF(n2.GetID(), m_dofU[2], -Na[j]);
+                    }
+                    m_lc.add(pLCux);
+                    m_lc.add(pLCuy);
+                    m_lc.add(pLCuz);
+                }
+            }
+            m_lc.Init();
+            m_lc.Activate();
+            m_binit = true;
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -276,61 +259,50 @@ void FETiedSolidInterface::InitialNodalProjection(FETiedFluidFSISurface& ss, FET
 //-----------------------------------------------------------------------------
 void FETiedSolidInterface::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
-    m_ss.Update(Ui, ui);
-    if (m_btwopass) m_ms.Update(Ui, ui);
+    m_lc.Update(Ui, ui);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedSolidInterface::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
 {
-    m_ss.UpdateIncrements(Ui, ui);
-    if (m_btwopass) m_ms.UpdateIncrements(Ui, ui);
+    m_lc.UpdateIncrements(Ui, ui);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedSolidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    m_ss.LoadVector(R, tp);
-    if (m_btwopass) m_ms.LoadVector(R, tp);
+    m_lc.LoadVector(R, tp);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedSolidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-    m_ss.StiffnessMatrix(LS, tp);
-    if (m_btwopass) m_ms.StiffnessMatrix(LS, tp);
+    m_lc.StiffnessMatrix(LS, tp);
 }
 
 //-----------------------------------------------------------------------------
 void FETiedSolidInterface::BuildMatrixProfile(FEGlobalMatrix& G)
 {
-    m_ss.BuildMatrixProfile(G);
-    if (m_btwopass) m_ms.BuildMatrixProfile(G);
+    m_lc.BuildMatrixProfile(G);
 }
 
 //-----------------------------------------------------------------------------
 int FETiedSolidInterface::InitEquations(int neq)
 {
-    int n = m_ss.InitEquations(neq);
-    if (m_btwopass) n += m_ms.InitEquations(neq);
-	return n;
+	return m_lc.InitEquations(neq);
 }
 
 //-----------------------------------------------------------------------------
 bool FETiedSolidInterface::Augment(int naug, const FETimeInfo& tp)
 {
-    if (!m_ss.Augment(naug, tp)) return false;
-    if (m_btwopass) {
-        if (!m_ms.Augment(naug, tp)) return false;
-    }
+    if (!m_lc.Augment(naug, tp)) return false;
     return true;
 }
 
 //-----------------------------------------------------------------------------
 void FETiedSolidInterface::PrepStep()
 {
-    m_ss.PrepStep();
-    if (m_btwopass) m_ms.PrepStep();
+    m_lc.PrepStep();
 }
 
 //-----------------------------------------------------------------------------

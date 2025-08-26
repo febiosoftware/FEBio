@@ -34,7 +34,7 @@ SOFTWARE.*/
 class FETiedSolidInterface;
 
 //-----------------------------------------------------------------------------
-class FEBIOFLUID_API FETiedFluidFSISurface : public FESurfaceConstraint
+class FEBIOFLUID_API FETiedFluidFSISurface : public FESurface
 {
 public:
     //! constructor
@@ -43,66 +43,17 @@ public:
     //! destructor
     ~FETiedFluidFSISurface() {}
     
-    //! Activation
-    void Activate() override;
-    
-    // allocate equations
-    int InitEquations(int neq) override;
-
     //! initialization
     bool Init() override;
    
     //! Get the surface
-    FESurface* GetSurface() override { return &m_surf; }
-    
-public:
-	FEDofList	m_dofU;
+    FESurface* GetSurface() { return dynamic_cast<FESurface*>(this); }
     
 public:
     std::vector<FESurfaceElement*>  m_pme;
     std::vector< std::vector<double>> m_rs;
     
     std::vector<int> m_tag;
-    
-    //! Set the sibling of this contact surface
-    void SetSibling(FETiedFluidFSISurface* ps) { m_pSibling = ps; }
-    FETiedFluidFSISurface* GetSibling() { return m_pSibling; }
-
-    //! Set the parent of this contact surface
-    void SetContactInterface(FETiedSolidInterface* ps) { m_pTiedSolidInterface = ps; }
-    
-    //! Get the parent of this contact surface
-    FETiedSolidInterface* GetContactInterface() { return m_pTiedSolidInterface; }
-    
-public:
-    void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
-    void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
-    
-    void PrepStep() override;
-    
-public:
-    //! serialize data to archive
-    void Serialize(DumpStream& ar) override;
-
-    //! add the linear constraint contributions to the residual
-    void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-
-    //! add the linear constraint contributions to the stiffness matrix
-    void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
-
-    //! do the augmentation
-    bool Augment(int naug, const FETimeInfo& tp) override;
-
-    //! build connectivity for matrix profile
-    void BuildMatrixProfile(FEGlobalMatrix& M) override;
-
-protected:
-    FESurface               m_surf;
-    FELinearConstraintSet   m_lcu;
-    FETiedSolidInterface*   m_pTiedSolidInterface;
-    FETiedFluidFSISurface*  m_pSibling;
-    bool                    m_binit;
-
 };
 
 //-----------------------------------------------------------------------------
@@ -155,21 +106,17 @@ public:
 
 protected:
     void InitialNodalProjection(FETiedFluidFSISurface& ss, FETiedFluidFSISurface& ms);
+    bool    m_binit;
 
 public:
-	FETiedFluidFSISurface    m_ss;    //!< primary surface
-	FETiedFluidFSISurface    m_ms;    //!< secondary surface
+	FETiedFluidFSISurface    m_ss;  //!< primary surface
+	FETiedFluidFSISurface    m_ms;  //!< secondary surface
+    FELinearConstraintSet   m_lc;   //!< linear constraint enforcing tied displacement
     
-    double          m_tol;          //!< augmentation tolerance
     bool            m_btwopass;     //!< flag for two pass analysis
     double          m_stol;         //!< search tolerance
     double          m_srad;         //!< contact search radius
-    int             m_naugmax;      //!< maximum nr of augmentations
-    int             m_naugmin;      //!< minimum nr of augmentations
-    
-    double          m_epsu;          //!< penalty factor for velocity
-
-    FEFluidMaterial* m_pfluid;       //!< fluid pointer
+    bool            m_bfreedofs;    //!< flag to free DOFs inside tied interface
 
 	FEDofList		m_dofU;
    

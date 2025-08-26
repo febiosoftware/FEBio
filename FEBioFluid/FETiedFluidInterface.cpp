@@ -72,12 +72,14 @@ BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
     ADD_PARAMETER(m_lcv.m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
     ADD_PARAMETER(m_lcv.m_tol      , "tolerance"          );
     ADD_PARAMETER(m_lcv.m_eps      , "velocity_penalty"   );
+    ADD_PARAMETER(m_lcv.m_naugmin  , "minaug"       );
+    ADD_PARAMETER(m_lcv.m_naugmax  , "maxaug"       );
+
     ADD_PARAMETER(m_epsp      ,"pressure_penalty"   );
     ADD_PARAMETER(m_btwopass , "two_pass"           );
     ADD_PARAMETER(m_stol     , "search_tol"         );
     ADD_PARAMETER(m_srad     , "search_radius"      )->setUnits(UNIT_LENGTH);
-    ADD_PARAMETER(m_lcv.m_naugmin  , "minaug"       );
-    ADD_PARAMETER(m_lcv.m_naugmax  , "maxaug"       );
+    ADD_PARAMETER(m_bfreedofs, "free_DOFs")->setLongName("Free fixed interface DOFs");
 END_FECORE_CLASS();
 
 FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem), m_lcv(pfem), m_lcp(pfem)
@@ -88,13 +90,14 @@ FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(p
     // initial values
     m_lcv.m_tol = m_lcp.m_tol = 0.1;
     m_lcv.m_eps = m_lcp.m_eps = 1;
+    m_lcv.m_tol = 0.01;
+    m_lcv.m_naugmin = m_lcp.m_naugmin = 0;
+    m_lcv.m_naugmax = m_lcp.m_naugmax = 10;
+    
     m_stol = 0.01;
     m_srad = 1.0;
     m_btwopass = true;
     m_bfreedofs = true;
-    
-    m_lcv.m_naugmin = m_lcp.m_naugmin = 0;
-    m_lcv.m_naugmax = m_lcp.m_naugmax = 10;
     
     m_binit = false;
 }
@@ -156,26 +159,29 @@ void FETiedFluidInterface::Activate()
                     double Na[FEElement::MAX_NODES];
                     ps.m_pme[i]->shape_fnc(Na, ps.m_rs[i][0], ps.m_rs[i][1]);
                     
-                    for (int j=0; j<m_dofWE.Size(); ++j) {
-                        // check to see if the DOF is not open
-                        int dof = m_dofWE[j];
-                        if (node.get_bc(dof) == DOF_FIXED) {
-                            // if not open, check to see if one of the projected face nodal DOFs is not open
-                            bool reset = true;
-                            for (int k=0; k<ps.m_pme[i]->Nodes(); ++k) {
-                                FENode& n2 = surf->Node(ps.m_pme[i]->m_lnode[k]);
-                                int indx = ps.m_pme[i]->m_lnode[k];
-                                if ((ss.m_tag[indx] == -1) && (n2.get_bc(dof) == DOF_FIXED) && (fabs(Na[k]) > m_stol)) {
-                                    ss.m_tag[indx] = 1;
-                                    reset = false;
+                    // free the fixed DOFs inside of the tied interface, if requested
+                    if (m_bfreedofs) {
+                        for (int j=0; j<m_dofWE.Size(); ++j) {
+                            // check to see if the DOF is not open
+                            int dof = m_dofWE[j];
+                            if (node.get_bc(dof) == DOF_FIXED) {
+                                // if not open, check to see if one of the projected face nodal DOFs is not open
+                                bool reset = true;
+                                for (int k=0; k<ps.m_pme[i]->Nodes(); ++k) {
+                                    FENode& n2 = surf->Node(ps.m_pme[i]->m_lnode[k]);
+                                    int indx = ps.m_pme[i]->m_lnode[k];
+                                    if ((ss.m_tag[indx] == -1) && (n2.get_bc(dof) == DOF_FIXED) && (fabs(Na[k]) > m_stol)) {
+                                        ss.m_tag[indx] = 1;
+                                        reset = false;
+                                    }
                                 }
+                                // only reset if there are no significant constraints on any node of the projected surface
+                                if (reset) node.set_bc(dof, DOF_OPEN);
                             }
-                            // only reset if there are no significant constraints on any node of the projected surface
-                            if (reset) node.set_bc(dof, DOF_OPEN);
-                        }
-                        else if (node.get_bc(dof) == DOF_PRESCRIBED) {
-                            feLogError("Prescribed degrees of freedom should not be assigned within tied-fluid interfaces!");
-                            exit(-1);
+                            else if (node.get_bc(dof) == DOF_PRESCRIBED) {
+                                feLogError("Prescribed degrees of freedom should not be assigned within tied-fluid interfaces!");
+                                exit(-1);
+                            }
                         }
                     }
                     

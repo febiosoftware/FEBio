@@ -115,19 +115,13 @@ public:
     FELinearConstraintSet   m_lcv;
     FELinearConstraintSet   m_lcp;
 
-    double          m_tol;          //!< augmentation tolerance
     bool            m_btwopass;     //!< flag for two pass analysis
     double          m_stol;         //!< search tolerance
     double          m_srad;         //!< contact search radius
-    int             m_naugmax;      //!< maximum nr of augmentations
-    int             m_naugmin;      //!< minimum nr of augmentations
-    
+    bool            m_bfreedofs;    //!< flag to free DOFs inside tied interface
+
     double          m_epsv;          //!< penalty factor for velocity
     double          m_epsp;          //!< penalty factor for pressure
-
-    bool            m_bfreedofs;    //!< flag to free constrained/fixed DOFS on secondary surface
-    
-    FEFluidMaterial* m_pfluid;       //!< fluid pointer
 
 	FEDofList		m_dofWE;
    
