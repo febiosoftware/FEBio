@@ -159,19 +159,23 @@ void FETiedFluidInterface::Activate()
                     for (int j=0; j<m_dofWE.Size(); ++j) {
                         // check to see if the DOF is not open
                         int dof = m_dofWE[j];
-                        if (node.get_bc(dof) != DOF_OPEN) {
+                        if (node.get_bc(dof) == DOF_FIXED) {
                             // if not open, check to see if one of the projected face nodal DOFs is not open
                             bool reset = true;
                             for (int k=0; k<ps.m_pme[i]->Nodes(); ++k) {
                                 FENode& n2 = surf->Node(ps.m_pme[i]->m_lnode[k]);
                                 int indx = ps.m_pme[i]->m_lnode[k];
-                                if ((ss.m_tag[indx] == -1) && (n2.get_bc(dof) != DOF_OPEN) && (fabs(Na[k]) > m_stol)) {
+                                if ((ss.m_tag[indx] == -1) && (n2.get_bc(dof) == DOF_FIXED) && (fabs(Na[k]) > m_stol)) {
                                     ss.m_tag[indx] = 1;
                                     reset = false;
                                 }
                             }
                             // only reset if there are no significant constraints on any node of the projected surface
                             if (reset) node.set_bc(dof, DOF_OPEN);
+                        }
+                        else if (node.get_bc(dof) == DOF_PRESCRIBED) {
+                            feLogError("Prescribed degrees of freedom should not be assigned within tied-fluid interfaces!");
+                            exit(-1);
                         }
                     }
                     
