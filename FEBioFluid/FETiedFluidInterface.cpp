@@ -69,13 +69,18 @@ bool FETiedFluidSurface::Init()
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
-    ADD_PARAMETER(m_lcv.m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
-    ADD_PARAMETER(m_lcv.m_tol      , "tolerance"          );
+    ADD_PARAMETER(m_lcv.m_laugon   , "velocity_laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+    ADD_PARAMETER(m_lcv.m_tol      , "velocity_tol"       );
     ADD_PARAMETER(m_lcv.m_eps      , "velocity_penalty"   );
-    ADD_PARAMETER(m_lcv.m_naugmin  , "minaug"       );
-    ADD_PARAMETER(m_lcv.m_naugmax  , "maxaug"       );
+    ADD_PARAMETER(m_lcv.m_naugmin  , "velocity_minaug"    );
+    ADD_PARAMETER(m_lcv.m_naugmax  , "velocity_maxaug"    );
 
-    ADD_PARAMETER(m_epsp      ,"pressure_penalty"   );
+    ADD_PARAMETER(m_lcp.m_laugon   , "pressure_laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+    ADD_PARAMETER(m_lcp.m_tol      , "pressure_tol"       );
+    ADD_PARAMETER(m_lcp.m_eps      , "pressurepenalty"   );
+    ADD_PARAMETER(m_lcp.m_naugmin  , "pressure_minaug"    );
+    ADD_PARAMETER(m_lcp.m_naugmax  , "pressure_maxaug"    );
+
     ADD_PARAMETER(m_btwopass , "two_pass"           );
     ADD_PARAMETER(m_stol     , "search_tol"         );
     ADD_PARAMETER(m_srad     , "search_radius"      )->setUnits(UNIT_LENGTH);
@@ -116,10 +121,7 @@ bool FETiedFluidInterface::Init()
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
     
-    m_lcp = m_lcv;
-    m_lcp.m_eps = m_epsp;
-    
-    m_laugon = m_lcv.m_laugon;
+    m_laugon = max(m_lcv.m_laugon, m_lcp.m_laugon);
     
     // get the DOFS
     m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
