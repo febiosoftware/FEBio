@@ -74,7 +74,7 @@ bool FERigidJoint::Init()
 	m_qa0 = m_q0 - m_rbA->m_r0;
 	m_qb0 = m_q0 - m_rbB->m_r0;
 
-	// we make we have a non-zero penalty for penalty and auglag method
+	// we make sure we have a non-zero penalty for penalty and auglag method
 	if ((m_laugon != FECore::LAGMULT_METHOD) && (m_eps == 0.0)) return false;
 
 	return true;
@@ -110,26 +110,40 @@ void FERigidJoint::BuildMatrixProfile(FEGlobalMatrix& M)
 //-----------------------------------------------------------------------------
 void FERigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
+	double alpha = tp.alpha;
+
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	quatd Qa = RBa.GetRotation();
-	vec3d qa = Qa*m_qa0;
+	// body A
+	vec3d rat = RBa.m_rt;
+	vec3d rap = RBa.m_rp;
+	vec3d ra = rat * alpha + rap*(1 - alpha);
 
-	quatd Qb = RBb.GetRotation();
-	vec3d qb = Qb*m_qb0;
+	vec3d zat = RBa.GetRotation() * m_qa0;
+	vec3d zap = RBa.m_qp * m_qa0;
+	vec3d za = zat * alpha + zap * (1 - alpha);
 
-	vec3d ra = RBa.m_rt;
-	vec3d rb = RBb.m_rt;
-	vec3d c = ra + qa - rb - qb;
+	// body b
+	vec3d rbt = RBb.m_rt;
+	vec3d rbp = RBb.m_rp;
+	vec3d rb = rbt*alpha + rbp*(1 - alpha);
 
-	mat3da yaT(qa);
-	mat3da ybT(qb);
+	vec3d zbt = RBb.GetRotation() * m_qb0;
+	vec3d zbp = RBb.m_qp * m_qb0;
+	vec3d zb = zbt * alpha + zbp * (1 - alpha);
 
-	vec3d Fa =  m_F;
-	vec3d Fb = -m_F;
-	vec3d Ma =  yaT*m_F;
-	vec3d Mb = -ybT*m_F;
+	// constraint
+	vec3d c = ra + za - rb - zb;
+
+	// forces
+	vec3d F = m_L + c * m_eps;
+	if (m_laugon == FECore::LAGMULT_METHOD) F = m_F;
+
+	vec3d Fa =  F;
+	vec3d Fb = -F;
+	vec3d Ma =  (za ^ F);
+	vec3d Mb = -(zb ^ F);
 
 	vector<double> fe(15, 0.0);
 	fe[ 0] = -Fa.x;
@@ -165,13 +179,25 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
-	vec3d a = m_qa0;
-	quatd Qa = RBa.GetRotation();
-	Qa.RotateVector(a);
+	double alpha = tp.alpha;
 
-	vec3d b = m_qb0;
-	quatd Qb = m_rbB->GetRotation();
-	Qb.RotateVector(b);
+	// body A
+	vec3d rat = RBa.m_rt;
+	vec3d rap = RBa.m_rp;
+	vec3d ra = rat * alpha + rap * (1 - alpha);
+
+	vec3d zat = RBa.GetRotation() * m_qa0;
+	vec3d zap = RBa.m_qp * m_qa0;
+	vec3d za = zat * alpha + zap * (1 - alpha);
+
+	// body b
+	vec3d rbt = RBb.m_rt;
+	vec3d rbp = RBb.m_rp;
+	vec3d rb = rbt * alpha + rbp * (1 - alpha);
+
+	vec3d zbt = RBb.GetRotation() * m_qb0;
+	vec3d zbp = RBb.m_qp * m_qb0;
+	vec3d zb = zbt * alpha + zbp * (1 - alpha);
 
 	FEElementMatrix ke;
 
@@ -180,88 +206,33 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke.resize(12, 12);
 		ke.zero();
 
-		mat3d y1;
-		y1[0][0] = 0; y1[0][1] = a.z; y1[0][2] = -a.y;
-		y1[1][0] = -a.z; y1[1][1] = 0; y1[1][2] = a.x;
-		y1[2][0] = a.y; y1[2][1] = -a.x; y1[2][2] = 0;
+		// constraint
+		vec3d c = ra + za - rb - zb;
 
-		mat3d y2;
-		y2[0][0] = 0; y2[0][1] = b.z; y2[0][2] = -b.y;
-		y2[1][0] = -b.z; y2[1][1] = 0; y2[1][2] = b.x;
-		y2[2][0] = b.y; y2[2][1] = -b.x; y2[2][2] = 0;
+		// forces
+		vec3d F = m_L + c * m_eps;
+		mat3da Fhat(F);
 
-		mat3d y11, y12, y22;
+		mat3da zahat(za);
+		mat3da zathat(zat);
 
-		for (int j = 0; j < 3; ++j)
-		{
-			y11[j][0] = y1[0][j] * y1[0][0] + y1[1][j] * y1[1][0] + y1[2][j] * y1[2][0];
-			y11[j][1] = y1[0][j] * y1[0][1] + y1[1][j] * y1[1][1] + y1[2][j] * y1[2][1];
-			y11[j][2] = y1[0][j] * y1[0][2] + y1[1][j] * y1[1][2] + y1[2][j] * y1[2][2];
+		mat3da zbhat(zb);
+		mat3da zbthat(zbt);
 
-			y12[j][0] = y1[0][j] * y2[0][0] + y1[1][j] * y2[1][0] + y1[2][j] * y2[2][0];
-			y12[j][1] = y1[0][j] * y2[0][1] + y1[1][j] * y2[1][1] + y1[2][j] * y2[2][1];
-			y12[j][2] = y1[0][j] * y2[0][2] + y1[1][j] * y2[1][2] + y1[2][j] * y2[2][2];
+		mat3dd I(1.0);
 
-			y22[j][0] = y2[0][j] * y2[0][0] + y2[1][j] * y2[1][0] + y2[2][j] * y2[2][0];
-			y22[j][1] = y2[0][j] * y2[0][1] + y2[1][j] * y2[1][1] + y2[2][j] * y2[2][1];
-			y22[j][2] = y2[0][j] * y2[0][2] + y2[1][j] * y2[1][2] + y2[2][j] * y2[2][2];
-		}
-
-		ke[0][0] = ke[1][1] = ke[2][2] =  1;
-		ke[0][6] = ke[1][7] = ke[2][8] = -1;
-		ke[6][0] = ke[7][1] = ke[8][2] = -1;
-		ke[6][6] = ke[7][7] = ke[8][8] =  1;
-
-		ke[0][3] = y1[0][0]; ke[0][4] = y1[0][1]; ke[0][5] = y1[0][2];
-		ke[1][3] = y1[1][0]; ke[1][4] = y1[1][1]; ke[1][5] = y1[1][2];
-		ke[2][3] = y1[2][0]; ke[2][4] = y1[2][1]; ke[2][5] = y1[2][2];
-
-		ke[0][9] = -y2[0][0]; ke[0][10] = -y2[0][1]; ke[0][11] = -y2[0][2];
-		ke[1][9] = -y2[1][0]; ke[1][10] = -y2[1][1]; ke[1][11] = -y2[1][2];
-		ke[2][9] = -y2[2][0]; ke[2][10] = -y2[2][1]; ke[2][11] = -y2[2][2];
-
-		ke[3][0] = y1[0][0]; ke[3][1] = y1[1][0]; ke[3][2] = y1[2][0];
-		ke[4][0] = y1[0][1]; ke[4][1] = y1[1][1]; ke[4][2] = y1[2][1];
-		ke[5][0] = y1[0][2]; ke[5][1] = y1[1][2]; ke[5][2] = y1[2][2];
-
-		ke[3][3] = y11[0][0]; ke[3][4] = y11[0][1]; ke[3][5] = y11[0][2];
-		ke[4][3] = y11[1][0]; ke[4][4] = y11[1][1]; ke[4][5] = y11[1][2];
-		ke[5][3] = y11[2][0]; ke[5][4] = y11[2][1]; ke[5][5] = y11[2][2];
-
-		ke[3][6] = -y1[0][0]; ke[3][7] = -y1[1][0]; ke[3][8] = -y1[2][0];
-		ke[4][6] = -y1[0][1]; ke[4][7] = -y1[1][1]; ke[4][8] = -y1[2][1];
-		ke[5][6] = -y1[0][2]; ke[5][7] = -y1[1][2]; ke[5][8] = -y1[2][2];
-
-		ke[3][9] = -y12[0][0]; ke[3][10] = -y12[0][1]; ke[3][11] = -y12[0][2];
-		ke[4][9] = -y12[1][0]; ke[4][10] = -y12[1][1]; ke[4][11] = -y12[1][2];
-		ke[5][9] = -y12[2][0]; ke[5][10] = -y12[2][1]; ke[5][11] = -y12[2][2];
-
-		ke[6][3] = -y1[0][0]; ke[6][4] = -y1[0][1]; ke[6][5] = -y1[0][2];
-		ke[7][3] = -y1[1][0]; ke[7][4] = -y1[1][1]; ke[7][5] = -y1[1][2];
-		ke[8][3] = -y1[2][0]; ke[8][4] = -y1[2][1]; ke[8][5] = -y1[2][2];
-
-		ke[6][9] = y2[0][0]; ke[6][10] = y2[0][1]; ke[6][11] = y2[0][2];
-		ke[7][9] = y2[1][0]; ke[7][10] = y2[1][1]; ke[7][11] = y2[1][2];
-		ke[8][9] = y2[2][0]; ke[8][10] = y2[2][1]; ke[8][11] = y2[2][2];
-
-		ke[ 9][0] = -y2[0][0]; ke[ 9][1] = -y2[1][0]; ke[ 9][2] = -y2[2][0];
-		ke[10][0] = -y2[0][1]; ke[10][1] = -y2[1][1]; ke[10][2] = -y2[2][1];
-		ke[11][0] = -y2[0][2]; ke[11][1] = -y2[1][2]; ke[11][2] = -y2[2][2];
-
-		ke[ 9][3] = -y12[0][0]; ke[ 9][4] = -y12[1][0]; ke[ 9][5] = -y12[2][0];
-		ke[10][3] = -y12[0][1]; ke[10][4] = -y12[1][1]; ke[10][5] = -y12[2][1];
-		ke[11][3] = -y12[0][2]; ke[11][4] = -y12[1][2]; ke[11][5] = -y12[2][2];
-
-		ke[ 9][6] = y2[0][0]; ke[ 9][7] = y2[1][0]; ke [9][8] = y2[2][0];
-		ke[10][6] = y2[0][1]; ke[10][7] = y2[1][1]; ke[10][8] = y2[2][1];
-		ke[11][6] = y2[0][2]; ke[11][7] = y2[1][2]; ke[11][8] = y2[2][2];
-
-		ke[ 9][9] = y22[0][0]; ke[ 9][10] = y22[0][1]; ke[ 9][11] = y22[0][2];
-		ke[10][9] = y22[1][0]; ke[10][10] = y22[1][1]; ke[10][11] = y22[1][2];
-		ke[11][9] = y22[2][0]; ke[11][10] = y22[2][1]; ke[11][11] = y22[2][2];
+		ke.set(0, 0,      I); ke.set(0, 3,       -zathat); ke.set(0, 6,     -I); ke.set(0, 9,        zbthat);
+		ke.set(3, 0,  zahat); ke.set(3, 3, -zahat*zathat); ke.set(3, 6, -zahat); ke.set(3, 9,  zahat*zbthat);
+		ke.set(6, 0,     -I); ke.set(6, 3,        zathat); ke.set(6, 6,      I); ke.set(6, 9,       -zbthat);
+		ke.set(9, 0, -zbhat); ke.set(9, 3,  zbhat*zathat); ke.set(9, 6,  zbhat); ke.set(9, 9, -zbhat*zbthat);
 
 		// scale by penalty factor
 		ke *= m_eps;
+
+		ke.add(3, 3,  Fhat*zathat);
+		ke.add(9, 9, -Fhat*zbthat);
+
+		ke *= alpha;
 	}
 	else
 	{
@@ -269,13 +240,18 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke.zero();
 
 		mat3dd I(1.0);
-		mat3da yaT(a);
-		mat3da ybT(b);
+		mat3da yaT(za);
+		mat3da ybT(zb);
+
+		mat3da Fhat(m_F);
 
 		ke.add_symm(0, 12,   I);
 		ke.add_symm(3, 12,  yaT);
 		ke.add_symm(6, 12,  -I);
 		ke.add_symm(9, 12, -ybT);
+
+		ke.add(3, 3,  Fhat*yaT);
+		ke.add(9, 9, -Fhat*ybT);
 	}
 
 	// unpack LM
