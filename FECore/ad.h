@@ -38,6 +38,12 @@ namespace ad {
 		void operator = (const double& a) { r = a; dr = 0.0; }
 	};
 
+	// negation
+	inline number operator - (const number& a)
+	{
+		return number(-a.r, -a.dr);
+	}
+
 	// addition
 	inline number operator + (const number& a, const number& b)
 	{
@@ -145,6 +151,159 @@ namespace ad {
 	inline number sinh(const number& a)
 	{
 		return number(::sinh(a.r), ::cosh(a.r) * a.dr);
+	}
+
+	struct vec3d
+	{
+		number x, y, z;
+		vec3d() {}
+		vec3d(const ::vec3d& a) : x(a.x), y(a.y), z(a.z) {}
+		vec3d(double a, double b, double c) : x(a), y(b), z(c) {}
+		vec3d(const number& a, const number& b, const number& c) : x(a), y(b), z(c) {}
+
+		::vec3d values() const { return ::vec3d(x.r, y.r, z.r); }
+		::vec3d partials() const { return ::vec3d(x.dr, y.dr, z.dr); }
+
+		number& operator [] (size_t n) { return (&x)[n]; }
+
+		number length() const { return sqrt(x * x + y * y + z * z); }
+	};
+
+	inline number operator * (const vec3d& a, const vec3d& b)
+	{
+		return a.x * b.x + a.y * b.y + a.z * b.z;
+	}
+
+	inline vec3d operator * (double a, const vec3d& b)
+	{
+		return vec3d(a * b.x, a * b.y, a * b.z);
+	}
+
+	inline vec3d operator * (const number& a, const vec3d& b)
+	{
+		return vec3d(a * b.x, a * b.y, a * b.z);
+	}
+	
+	inline vec3d operator * (const vec3d& a, double b)
+	{
+		return vec3d(a.x * b, a.y * b, a.z * b);
+	}
+
+	inline vec3d operator * (const vec3d& a, const number& b)
+	{
+		return vec3d(a.x * b, a.y * b, a.z * b);
+	}
+
+	inline vec3d operator + (const vec3d& a, const vec3d& b)
+	{
+		return vec3d(a.x + b.x, a.y + b.y, a.z + b.z);
+	}
+
+	inline vec3d operator - (const vec3d& a, const vec3d& b)
+	{
+		return vec3d(a.x - b.x, a.y - b.y, a.z - b.z);
+	}
+
+	inline vec3d operator - (const vec3d& a)
+	{
+		return vec3d(-a.x, -a.y, -a.z);
+	}
+
+	inline vec3d cross(const vec3d& a, const vec3d& b)
+	{
+		return vec3d(a.y * b.z - a.z * b.y,
+					 a.z * b.x - a.x * b.z,
+					 a.x * b.y - a.y * b.x);
+	}
+
+	// alternative cross product operator. 
+	// Make sure to include parentheses when using this operator since ^ has a lower precedence than some other operators.
+	// e.g. use (a ^ b) * c instead of a ^ b * c
+	inline vec3d operator ^ (const vec3d& a, const vec3d& b)
+	{
+		return cross(a, b);
+	}
+
+	FECORE_API double Evaluate(std::function<number(ad::vec3d&)> W, const ::vec3d& a);
+	FECORE_API ::vec3d Grad(std::function<number(ad::vec3d&)> W, const ::vec3d& a);
+	FECORE_API ::mat3d Grad(std::function<ad::vec3d(ad::vec3d&)> F, const ::vec3d& a);
+
+	struct mat3d
+	{
+		number m[3][3];
+		number* operator [] (size_t n) { return m[n]; }
+		const number* operator [] (size_t n) const { return m[n]; }
+
+		mat3d() {}
+		mat3d(const ::mat3d& A)
+		{
+			for (int i = 0; i < 3; ++i)
+				for (int j = 0; j < 3; ++j) m[i][j] = A[i][j];
+		}
+		mat3d(const number& a11, const number& a12, const number& a13,
+			  const number& a21, const number& a22, const number& a23,
+			  const number& a31, const number& a32, const number& a33)
+		{
+			m[0][0] = a11; m[0][1] = a12; m[0][2] = a13;
+			m[1][0] = a21; m[1][1] = a22; m[1][2] = a23;
+			m[2][0] = a31; m[2][1] = a32; m[2][2] = a33;
+		}
+
+		mat3d(double d)
+		{
+			m[0][0].r = d; m[0][1].r = 0.0; m[0][2].r = 0.0;
+			m[1][0].r = 0.0; m[1][1].r = d; m[1][2].r = 0.0;
+			m[2][0].r = 0.0; m[2][1].r = 0.0; m[2][2].r = d;
+		}
+		::mat3d values() const
+		{
+			return ::mat3d(m[0][0].r, m[0][1].r, m[0][2].r,
+				m[1][0].r, m[1][1].r, m[1][2].r,
+				m[2][0].r, m[2][1].r, m[2][2].r);
+		}
+		::mat3d partials() const
+		{
+			return ::mat3d(m[0][0].dr, m[0][1].dr, m[0][2].dr,
+				m[1][0].dr, m[1][1].dr, m[1][2].dr,
+				m[2][0].dr, m[2][1].dr, m[2][2].dr);
+		}
+	};
+
+	inline mat3d operator * (const mat3d& A, const mat3d& B)
+	{
+		mat3d C(0.0);
+		for (int i = 0; i < 3; ++i)
+			for (int j = 0; j < 3; ++j)
+				for (int k = 0; k < 3; ++k)
+					C[i][j] = C[i][j] + A[i][k] * B[k][j];
+		return C;
+	}
+
+	inline vec3d operator * (const mat3d& A, const vec3d& v)
+	{
+		return vec3d(
+			A[0][0] * v.x + A[0][1] * v.y + A[0][2] * v.z,
+			A[1][0] * v.x + A[1][1] * v.y + A[1][2] * v.z,
+			A[2][0] * v.x + A[2][1] * v.y + A[2][2] * v.z
+		);
+	}
+
+	inline mat3d dyad(const vec3d& a)
+	{
+		return mat3d(
+			a.x * a.x, a.x * a.y, a.x * a.z,
+			a.y * a.x, a.y * a.y, a.y * a.z,
+			a.z * a.x, a.z * a.y, a.z * a.z
+		);
+	}
+
+	inline mat3d dyad(const vec3d& a, const vec3d& b)
+	{
+		return mat3d(
+			a.x * b.x, a.x * b.y, a.x * b.z,
+			a.y * b.x, a.y * b.y, a.y * b.z,
+			a.z * b.x, a.z * b.y, a.z * b.z
+		);
 	}
 
 	struct mat3ds
@@ -327,4 +486,41 @@ namespace ad {
 	FECORE_API double Evaluate(std::function<number(mat3ds& C)> W, const ::mat3ds& C);
 	FECORE_API ::mat3ds Derive(std::function<number(mat3ds& C)> W, const ::mat3ds& C);
 	FECORE_API ::tens4ds Derive(std::function<mat3ds(mat3ds& C)> S, const ::mat3ds& C);
+}
+
+namespace dd {
+	struct vec3d {
+		::vec3d v = ::vec3d(0, 0, 0);
+		::mat3d dv = ::mat3d(0.0);
+
+		vec3d(::vec3d a) : v(a), dv(::mat3d(0.0)) {}
+		vec3d(::vec3d a, ::mat3d da) : v(a), dv(da) {}
+	};
+}
+
+inline dd::vec3d operator - (const dd::vec3d& a)
+{
+	return { -a.v, -a.dv };
+}
+
+inline dd::vec3d operator + (const dd::vec3d& a, const dd::vec3d& b)
+{
+	return { a.v + b.v, a.dv + b.dv };
+}
+
+inline dd::vec3d operator - (const dd::vec3d& a, const dd::vec3d& b)
+{
+	return { a.v - b.v, a.dv - b.dv };
+}
+
+inline dd::vec3d operator ^ (const dd::vec3d& a, const dd::vec3d& b)
+{
+	::mat3da ahat(a.v);
+	::mat3da bhat(b.v);
+	return { (a.v ^ b.v), ahat * b.dv - bhat * a.dv };
+}
+
+inline dd::vec3d operator * (const dd::vec3d& a, double s)
+{
+	return { a.v * s, a.dv * s };
 }
