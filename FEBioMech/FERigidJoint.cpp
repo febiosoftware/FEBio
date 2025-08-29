@@ -134,11 +134,11 @@ void FERigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	vec3d zb = zbt * alpha + zbp * (1 - alpha);
 
 	// constraint
-	vec3d c = ra + za - rb - zb;
+	vec3d c = rb + zb - ra - za;
 
 	// forces
 	vec3d F = m_L + c * m_eps;
-	if (m_laugon == FECore::LAGMULT_METHOD) F = m_F;
+	if (m_laugon == FECore::LAGMULT_METHOD) F = -m_F;
 
 	vec3d Fa =  F;
 	vec3d Fb = -F;
@@ -146,21 +146,21 @@ void FERigidJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	vec3d Mb = -(zb ^ F);
 
 	vector<double> fe(15, 0.0);
-	fe[ 0] = -Fa.x;
-	fe[ 1] = -Fa.y;
-	fe[ 2] = -Fa.z;
-	fe[ 3] = -Ma.x;
-	fe[ 4] = -Ma.y;
-	fe[ 5] = -Ma.z;
-	fe[ 6] = -Fb.x;
-	fe[ 7] = -Fb.y;
-	fe[ 8] = -Fb.z;
-	fe[ 9] = -Mb.x;
-	fe[10] = -Mb.y;
-	fe[11] = -Mb.z;
-	fe[12] = -c.x;
-	fe[13] = -c.y;
-	fe[14] = -c.z;
+	fe[ 0] = Fa.x;
+	fe[ 1] = Fa.y;
+	fe[ 2] = Fa.z;
+	fe[ 3] = Ma.x;
+	fe[ 4] = Ma.y;
+	fe[ 5] = Ma.z;
+	fe[ 6] = Fb.x;
+	fe[ 7] = Fb.y;
+	fe[ 8] = Fb.z;
+	fe[ 9] = Mb.x;
+	fe[10] = Mb.y;
+	fe[11] = Mb.z;
+	fe[12] = c.x;
+	fe[13] = c.y;
+	fe[14] = c.z;
 
 	vector<int> lm;
 	UnpackLM(lm);
@@ -207,7 +207,7 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		ke.zero();
 
 		// constraint
-		vec3d c = ra + za - rb - zb;
+		vec3d c = rb + zb - ra - za;
 
 		// forces
 		vec3d F = m_L + c * m_eps;
@@ -229,8 +229,8 @@ void FERigidJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 		// scale by penalty factor
 		ke *= m_eps;
 
-		ke.add(3, 3,  Fhat*zathat);
-		ke.add(9, 9, -Fhat*zbthat);
+		ke.add(3, 3, -Fhat*zathat);
+		ke.add(9, 9,  Fhat*zbthat);
 
 		ke *= alpha;
 	}
@@ -281,7 +281,7 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 	vec3d qa = Qa*m_qa0;
 	vec3d qb = Qb*m_qb0;
 
-	vec3d c = ra + qa - rb - qb;
+	vec3d c = rb + qb - ra - qa;
 
 	// For Lagrange multipliers we just report the values
 	// of the LM and the constraint
