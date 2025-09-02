@@ -1,7 +1,7 @@
 #!/bin/zsh
 pushd $SOURCE_PATH
 
-git clone --depth 1 --branch "v6.2.2307" "https://github.com/NGSolve/netgen.git"
+git clone --depth 1 --branch "v6.2.2406" "https://github.com/NGSolve/netgen.git"
 pushd netgen
  cmake .  -L -B cmbuild \
   -DCMAKE_BUILD_TYPE=Release \

@@ -81,8 +81,8 @@ bool FEFluidFSITraction::Init()
         bool bself = false;
 		FESurfaceElement& el = surf.Element(j);
 		// extract the first of two elements on this interface
-		m_elem[j] = el.m_elem[0];
-		if (el.m_elem[1] == nullptr) bself = true;
+		m_elem[j] = el.m_elem[0].pe;
+		if (el.m_elem[1].pe == nullptr) bself = true;
 		// get its material and check if FluidFSI
 		FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
 		FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
@@ -93,7 +93,7 @@ bool FEFluidFSITraction::Init()
 		}
 		else if (!bself) {
 			// extract the second of two elements on this interface
-			m_elem[j] = el.m_elem[1];
+			m_elem[j] = el.m_elem[1].pe;
 			pm = fem->GetMaterial(m_elem[j]->GetMatID());
 			pfsi = dynamic_cast<FEFluidFSI*>(pm);
 			if (pfsi == nullptr) return false;

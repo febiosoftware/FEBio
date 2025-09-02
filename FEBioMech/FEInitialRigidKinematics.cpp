@@ -24,21 +24,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FEModelUpdate.h"
+#include "FEInitialRigidKinematics.h"
+#include "FEBioMech.h"
+#include <FECore/FEMaterialPoint.h>
+#include <FECore/FENode.h>
 
-FEModelUpdate* FEModelUpdate::m_pThis = nullptr;
+BEGIN_FECORE_CLASS(FEInitialRigidKinematics, FENodalIC)
+	ADD_PARAMETER(m_v, "velocity")->setUnits(UNIT_VELOCITY);
+	ADD_PARAMETER(m_w, "angular_velocity")->setUnits(UNIT_ANGULAR_VELOCITY);
+	ADD_PARAMETER(m_c, "center_of_rotation")->setUnits(UNIT_LENGTH);
+END_FECORE_CLASS();
 
-FEModelUpdate::FEModelUpdate()
+FEInitialRigidKinematics::FEInitialRigidKinematics(FEModel* fem) : FENodalIC(fem)
 {
-	m_pThis = this;
+	m_v = vec3d(0, 0, 0);
+	m_w = vec3d(0, 0, 0);
+	m_c = vec3d(0, 0, 0);
 }
 
-FEModelUpdate::~FEModelUpdate()
+// initialization
+bool FEInitialRigidKinematics::Init()
 {
-	m_pThis = nullptr;
+	FEDofList dofs(GetFEModel());
+	if (dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY)) == false) return false;
+	SetDOFList(dofs);
+	return FENodalIC::Init();
 }
 
-FEModelUpdate* FEModelUpdate::Instance()
+// return the values for node i
+void FEInitialRigidKinematics::GetNodalValues(int inode, std::vector<double>& values)
 {
-	return m_pThis;
+	assert(values.size() == 3);
+
+	const FENodeSet& nset = *GetNodeSet();
+	const FENode& node = *nset.Node(inode);
+
+	vec3d r = node.m_rt;
+	vec3d v = m_v + (m_w ^ (r - m_c));
+
+	values[0] = v.x;
+	values[1] = v.y;
+	values[2] = v.z;
 }

@@ -46,6 +46,9 @@ public:
 		
 	//! Tangent of permeability
 	tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp) override;
+
+private:
+	void reportError(double J, double phisr);
 		
 public:
 	FEParamDouble	m_perm0;		//!< permeability for I term

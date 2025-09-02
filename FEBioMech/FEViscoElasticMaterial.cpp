@@ -181,7 +181,7 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 
 	// calculate new history variables
 	// terms are accumulated in S, the total PK2-stress
-	mat3ds S = Se*m_g0;
+	mat3ds S = Se* m_g0(mp);
 	double g, h;
 	for (int i=0; i<MAX_TERMS; ++i)
 	{
@@ -208,7 +208,7 @@ tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 	if (dt == 0.0) return C;
 
 	// calculate the visco scale factor
-	double f = m_g0, g, h;
+	double f = m_g0(pt), g, h;
 	for (int i=0; i<MAX_TERMS; ++i)
 	{
 		g = exp(-dt/m_t[i]);
@@ -233,7 +233,7 @@ double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 	pt.m_sed = m_Base->StrainEnergyDensity(mp);
     double sed = pt.m_sed;
     
-	double sedt = sed*m_g0;
+	double sedt = sed*m_g0(mp);
     if (SeriesStretchExponent(mp)) {
         // get the elastic point data and evaluate the right-stretch tensor
         for (int i=0; i<MAX_TERMS; ++i)

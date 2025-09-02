@@ -181,6 +181,7 @@ FECORE_API void AssembleSolidDomain(FESolidDomain& dom, FELinearSystem& ls, std:
 FECORE_API void AssembleSolidDomain(FESolidDomain& dom, FEGlobalVector& R, std::function<void(FESolidElement& el, vector<double>& fe)> elementIntegrand)
 {
 	int NE = dom.Elements();
+#pragma omp parallel for
 	for (int i = 0; i < NE; ++i)
 	{
 		FESolidElement& el = dom.Element(i);

@@ -63,12 +63,12 @@ bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return (FreeLibrary(ph) == TRUE); }
 #ifdef LINUX
 FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
 void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
-bool UnloadPlugin(FEBIO_PLUGIN_HANDLE) { return true; }
+bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return dlclose(ph) == 0; }
 #endif
 #ifdef __APPLE__
 FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
 void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
-bool UnloadPlugin(FEBIO_PLUGIN_HANDLE) { return true; }
+bool UnloadPlugin(FEBIO_PLUGIN_HANDLE ph) { return dlclose(ph) == 0; }
 #endif
 
 //=============================================================================
@@ -129,12 +129,22 @@ int FEBioPlugin::Load(const char* szfile)
 
 	// get the GetSDKVersion function
 	PLUGIN_GETSDKVERSION pf_sdk = (PLUGIN_GETSDKVERSION) FindPluginFunc(ph, "GetSDKVersion");
-	if (pf_sdk == 0) return 5;
+	if (pf_sdk == 0)
+	{
+		UnloadPlugin(ph);
+		m_ph = 0;
+		return 5;
+	}
 
 	// get the SDK version of the plugin
 	unsigned int n = FE_SDK_VERSION;
 	unsigned int version = pf_sdk();
-	if (version != FE_SDK_VERSION) return 6;
+	if (version != FE_SDK_VERSION)
+	{
+		UnloadPlugin(ph);
+		m_ph = 0;
+		return 6;
+	}
 
 	// find the numclasses function
 	PLUGIN_NUMCLASSES_FNC pfnc_cnt = (PLUGIN_NUMCLASSES_FNC) FindPluginFunc(ph, "PluginNumClasses");
@@ -231,6 +241,9 @@ void FEBioPlugin::UnLoad()
 		// remove all features from the kernel that were added by the plugin
 		FECoreKernel& febio = FECoreKernel::GetInstance();
 		febio.UnregisterFactories(m_allocater_id);
+
+        // unregister the modules from the kernel that were added by the plugin
+        febio.UnregisterModules(m_allocater_id);
 
 		// unload the plugin from memory
 		bool b = UnloadPlugin(m_ph);

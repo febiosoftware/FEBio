@@ -85,7 +85,7 @@ void FEMultiphasicFluidPressureLoad::Update()
     vector<int> nosm(N,0);
     for (int i=0; i<ps->Elements(); ++i) {
         FESurfaceElement& el = m_psurf->Element(i);
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
         FESoluteInterface* psi = pm->ExtractProperty<FESoluteInterface>();
         if (psi) {

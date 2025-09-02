@@ -47,10 +47,16 @@ class FECORE_API FESurfaceMaterialPoint : public FEMaterialPoint
 {
 public:
 	vec3d	dxr, dxs;		// tangent vectors at material point
+    vec3d   m_rp;
 
 	// return the surface element
 	FESurfaceElement* SurfaceElement() { return (FESurfaceElement*)m_elem; }
 
+    void Update(const FETimeInfo& tp) override
+    {
+        m_rp = m_rt;
+    }
+    
 	void Serialize(DumpStream& ar) override
 	{
 		FEMaterialPoint::Serialize(ar);
@@ -97,7 +103,8 @@ public:
 
 	//! initialize surface data structure
 	bool Init() override;
-	void InitSurface();
+	
+	virtual void InitSurface();
     
 	//! creates surface
 	void Create(int nsize, int elemType = -1);
@@ -137,7 +144,7 @@ public:
 	const FEElement& ElementRef(int n) const override { return m_el[n]; }
 
 	//! find the solid or shell element of a surface element
-	FEElement* FindElement(FESurfaceElement& el);
+	FESurfaceElement::ELEMENT_REF FindElement(FESurfaceElement& el);
 
     //! for interface surfaces, find the index of both solid elements
     //! on either side of the interface
@@ -162,7 +169,7 @@ public:
 	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
 
 	//! See if a ray intersects an element
-	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
+	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps, bool checkNormal = true);
 
 	//! Invert the surface
 	void Invert();
@@ -175,6 +182,9 @@ public:
     
 	//! Get the nodal coordinates of an element
 	void NodalCoordinates(FESurfaceElement& el, vec3d* re);
+    
+    //! Get the nodal coordinates of an element at previoust time
+    void PreviousNodalCoordinates(FESurfaceElement& el, vec3d* re);
     
     //! Determine if a face on this surface is pointing away or into a specified element
     double FacePointing(FESurfaceElement& se, FEElement& el);

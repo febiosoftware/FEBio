@@ -59,17 +59,18 @@ BEGIN_FECORE_CLASS(FEBiphasicSolver, FENewtonSolver)
 		ADD_PARAMETER(m_Etol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "etol");
 		ADD_PARAMETER(m_Rtol      , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 		ADD_PARAMETER(m_Ptol, "ptol"        );
+        ADD_PARAMETER(m_Ctol, "ctol"        );
 		ADD_PARAMETER(m_biphasicFormulation, "mixed_formulation");
 	END_PARAM_GROUP();
 
 	// obsolete parameters that used to be inherited from FESolidSolver2
-	ADD_PARAMETER(m_rhoi      , "rhoi"            )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_alpha     , "alpha"           )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_beta      , "beta"            )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_gamma     , "gamma"           )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_logSolve  , "logSolve"        )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_arcLength , "arc_length"      )->SetFlags(FE_PARAM_HIDDEN);
-	ADD_PARAMETER(m_al_scale  , "arc_length_scale")->SetFlags(FE_PARAM_HIDDEN);
+	ADD_PARAMETER(m_rhoi      , "rhoi"            )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_alpha     , "alpha"           )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_beta      , "beta"            )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_gamma     , "gamma"           )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_logSolve  , "logSolve"        )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_arcLength , "arc_length"      )->SetFlags(FE_PARAM_OBSOLETE);
+	ADD_PARAMETER(m_al_scale  , "arc_length_scale")->SetFlags(FE_PARAM_OBSOLETE);
 
 END_FECORE_CLASS();
 
@@ -85,6 +86,7 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FENewtonSolver(pfem),
 	m_Dtol = 0.001;
 	m_Etol = 0.01;
 	m_Ptol = 0.01;
+    m_Ctol = 0; // only needed for biphasic-solute analyses
 	m_Rmin = 1.0e-20;
 	m_Rmax = 0;	// not used if zero
 
@@ -95,6 +97,9 @@ FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FENewtonSolver(pfem),
 
 	m_msymm = REAL_UNSYMMETRIC; // assume non-symmetric stiffness matrix by default
 
+    // Preferred strategy is Broyden's method
+    SetDefaultStrategy(QN_BROYDEN);
+    
 	// set default formulation (full shape functions)
 	m_biphasicFormulation = 0;
 
@@ -443,7 +448,7 @@ bool FEBiphasicSolver::Quasin()
 		normE1 = s*fabs(m_ui*m_R1);
 
 		m_residuNorm.norm = normR1;
-		m_energyNorm.norm = normR1;
+		m_energyNorm.norm = normE1;
 		m_solutionNorm[0].norm = normd;
 
 		// check residual norm
@@ -603,7 +608,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	FEMesh& mesh = fem.GetMesh();
 
 	// setup the linear system of equations
-	FESolidLinearSystem LS(this, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
+	FESolidLinearSystem LS(&fem, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alpha, m_nreq);
 
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = fem.GetCurrentStep();

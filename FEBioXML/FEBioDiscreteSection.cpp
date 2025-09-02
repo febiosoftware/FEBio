@@ -151,8 +151,19 @@ void FEBioDiscreteSection25::Parse(XMLTag& tag)
 	FEMesh& mesh = fem.GetMesh();
 	vector<FEDiscreteMaterial*> dmat;
 
-	int elems = fem.GetMesh().Elements();
-	int maxid = elems + 1;
+	// figure out the max element ID
+	// todo: probably should store that when reading elements
+	int maxid = 0;
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j)
+		{
+			int eid = dom.ElementRef(j).GetID();
+			if (eid > maxid) maxid = eid;
+		}
+	}
 
 	vector<FEDomain*> discreteDomains;
 	++tag;

@@ -7,7 +7,8 @@
     "opengl",
     "openssl",
     "pthread",
-    "qtbase",
-    "zlib"
+    "zstd",
+    "zlib",
+    "sqlite3"
   ]
 }

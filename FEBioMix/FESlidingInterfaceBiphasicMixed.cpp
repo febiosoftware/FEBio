@@ -68,40 +68,6 @@ BEGIN_FECORE_CLASS(FESlidingInterfaceBiphasicMixed, FEContactInterface)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESlidingSurfaceBiphasicMixed::Data::Data()
-{
-    m_Lmd   = 0.0;
-    m_Lmt   = m_tr = vec3d(0,0,0);
-    m_Lmp   = 0.0;
-    m_epsn  = 1.0;
-    m_epsp  = 1.0;
-    m_pg    = 0.0;
-    m_p1    = 0.0;
-    m_mueff = 0.0;
-    m_nu    = m_s1 = m_dg = vec3d(0,0,0);
-    m_rs    = m_rsp = vec2d(0,0);
-    m_bstick = false;
-}
-
-//-----------------------------------------------------------------------------
-void FESlidingSurfaceBiphasicMixed::Data::Serialize(DumpStream& ar)
-{
-	FEBiphasicContactPoint::Serialize(ar);
-	ar & m_dg;
-    ar & m_Lmd;
-    ar & m_Lmt;
-    ar & m_epsn;
-    ar & m_epsp;
-    ar & m_p1;
-    ar & m_nu;
-	ar & m_s1;
-    ar & m_tr;
-	ar & m_rs;
-	ar & m_rsp;
-    ar & m_bstick;
-}
-
-//-----------------------------------------------------------------------------
 // FESlidingSurfaceBiphasic
 //-----------------------------------------------------------------------------
 
@@ -114,7 +80,7 @@ FESlidingSurfaceBiphasicMixed::FESlidingSurfaceBiphasicMixed(FEModel* pfem) : FE
 //! create material point data
 FEMaterialPoint* FESlidingSurfaceBiphasicMixed::CreateMaterialPoint()
 {
-	return new FESlidingSurfaceBiphasicMixed::Data;
+	return new FEBiphasicContactPoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -141,7 +107,7 @@ bool FESlidingSurfaceBiphasicMixed::Init()
         FESurfaceElement& se = Element(i);
         
         // get the element this surface element belongs to
-        FEElement* pe = se.m_elem[0];
+        FEElement* pe = se.m_elem[0].pe;
         if (pe)
         {
             // get the material
@@ -168,7 +134,7 @@ void FESlidingSurfaceBiphasicMixed::InitSlidingSurface()
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-			Data& data = static_cast<Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
             // Store current surface projection values as previous
             data.m_rsp  = data.m_rs;
 			data.m_pmep = data.m_pme;
@@ -316,7 +282,7 @@ double FESlidingSurfaceBiphasicMixed::GetContactArea()
         for (int i=0; i<nint; ++i)
         {
             // get data for this integration point
-            Data& data = static_cast<Data&>(*el.GetMaterialPoint(i));
+            FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(i));
             if (data.m_Ln > 0)
             {
                 // get the base vectors
@@ -403,7 +369,7 @@ void FESlidingSurfaceBiphasicMixed::GetVectorGap(int nface, vec3d& pg)
     pg = vec3d(0,0,0);
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pg += data.m_dg;
 	}
     pg /= ni;
@@ -417,7 +383,7 @@ void FESlidingSurfaceBiphasicMixed::GetContactPressure(int nface, double& pg)
     pg = 0;
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pg += data.m_Ln;
 	}
     pg /= ni;
@@ -431,7 +397,7 @@ void FESlidingSurfaceBiphasicMixed::GetContactTraction(int nface, vec3d& pt)
     pt = vec3d(0,0,0);
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pt += data.m_tr;
 	}
     pt /= ni;
@@ -445,7 +411,7 @@ void FESlidingSurfaceBiphasicMixed::GetSlipTangent(int nface, vec3d& pt)
     pt = vec3d(0,0,0);
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		if (!data.m_bstick) pt += data.m_s1;
 	}
     pt /= ni;
@@ -459,7 +425,7 @@ void FESlidingSurfaceBiphasicMixed::GetMuEffective(int nface, double& pg)
     pg = 0;
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pg += data.m_mueff;
 	}
     pg /= ni;
@@ -473,7 +439,7 @@ void FESlidingSurfaceBiphasicMixed::GetLocalFLS(int nface, double& pg)
     pg = 0;
     for (int k = 0; k < ni; ++k)
     {
-        Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
         pg += data.m_fls;
     }
     pg /= ni;
@@ -487,7 +453,7 @@ void FESlidingSurfaceBiphasicMixed::GetNodalVectorGap(int nface, vec3d* pg)
     vec3d gi[FEElement::MAX_INTPOINTS];
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		gi[k] = data.m_dg;
 	}
     el.project_to_nodes(gi, pg);
@@ -513,7 +479,7 @@ void FESlidingSurfaceBiphasicMixed::GetStickStatus(int nface, double& pg)
     pg = 0;
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		if (data.m_bstick) pg += 1.0;
 	}
     pg /= ni;
@@ -660,7 +626,7 @@ void FESlidingInterfaceBiphasicMixed::BuildMatrixProfile(FEGlobalMatrix& K)
             int* sn = &se.m_node[0];
             for (k=0; k<nint; ++k)
             {
-				FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(k));
+                FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*se.GetMaterialPoint(k));
                 FESurfaceElement* pe = pt.m_pme;
                 if (pe != 0)
                 {
@@ -745,7 +711,7 @@ void FESlidingInterfaceBiphasicMixed::CalcAutoPenalty(FESlidingSurfaceBiphasicMi
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-			FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsn = eps;
         }
     }
@@ -767,7 +733,7 @@ void FESlidingInterfaceBiphasicMixed::CalcAutoPressurePenalty(FESlidingSurfaceBi
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-			FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsp = eps;
         }
     }
@@ -787,7 +753,7 @@ double FESlidingInterfaceBiphasicMixed::AutoPressurePenalty(FESurfaceElement& el
     n.unit();
     
     // get the element this surface element belongs to
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == 0) return 0.0;
 
     // get the material
@@ -915,7 +881,7 @@ void FESlidingInterfaceBiphasicMixed::ProjectSurface(FESlidingSurfaceBiphasicMix
         for (int j=0; j<nint; ++j)
         {
             // get the integration point data
-			FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 
             // calculate the global position of the integration point
             vec3d r = ss.Local2Global(el, j);
@@ -1177,7 +1143,7 @@ vec3d FESlidingInterfaceBiphasicMixed::SlipTangent(FESlidingSurfaceBiphasicMixed
     FESurfaceElement& se = ss.Element(nel);
     
     // get integration point data
-	FESlidingSurfaceBiphasicMixed::Data& data = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(nint));
+    FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*se.GetMaterialPoint(nint));
 	double g = data.m_gap;
     vec3d nu = data.m_nu;
     
@@ -1248,7 +1214,7 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
 	FESurfaceElement& se = ss.Element(nel);
 
     // get the integration point data
-	FESlidingSurfaceBiphasicMixed::Data& data = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(n));
+    FEBiphasicContactPoint& data = static_cast<FEBiphasicContactPoint&>(*se.GetMaterialPoint(n));
 
     // penalty
     double eps = m_epsn*data.m_epsn*psf;
@@ -1566,7 +1532,7 @@ void FESlidingInterfaceBiphasicMixed::LoadVector(FESlidingSurfaceBiphasicMixed& 
         for (int j=0; j<nint; ++j)
         {
             // get the integration point data
-			FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(j));
+            FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*se.GetMaterialPoint(j));
 
             // calculate contact pressure and account for stick
             double pn;
@@ -1722,7 +1688,7 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
 	int degree_p = dofs.GetVariableInterpolationOrder(ss.m_varP);
 
     // see how many reformations we've had to do so far
-    int nref = LS.GetSolver()->m_nref;
+    int nref = GetSolver()->m_nref;
     
     const int MN = FEElement::MAX_NODES;
     
@@ -1779,7 +1745,7 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
         for (int j=0; j<nint; ++j)
         {
             // get integration point data
-			FESlidingSurfaceBiphasicMixed::Data& pt = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*se.GetMaterialPoint(j));
+            FEBiphasicContactPoint& pt = static_cast<FEBiphasicContactPoint&>(*se.GetMaterialPoint(j));
 
             // calculate contact pressure and account for stick
             double pn;
@@ -2402,7 +2368,7 @@ void FESlidingInterfaceBiphasicMixed::UpdateContactPressures()
             for (int i=0; i<nint; ++i)
             {
                 // get integration point data
-				FESlidingSurfaceBiphasicMixed::Data& sd = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(i));
+                FEBiphasicContactPoint& sd = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(i));
 				// evaluate traction on primary surface
                 double eps = m_epsn*sd.m_epsn*psf;
                 if (sd.m_bstick) {
@@ -2430,7 +2396,7 @@ void FESlidingInterfaceBiphasicMixed::UpdateContactPressures()
                     vec3d ti[MI];
                     for (int j=0; j<mint; ++j)
                     {
-						FESlidingSurfaceBiphasicMixed::Data& md = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*pme->GetMaterialPoint(j));
+                        FEBiphasicContactPoint& md = static_cast<FEBiphasicContactPoint&>(*pme->GetMaterialPoint(j));
 
                         // evaluate traction on secondary surface
                         double eps = m_epsn*md.m_epsn*psf;
@@ -2491,7 +2457,7 @@ bool FESlidingInterfaceBiphasicMixed::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ss.Element(i);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-			FESlidingSurfaceBiphasicMixed::Data& ds = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& ds = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			if (ds.m_bstick)
                 normL0 += ds.m_Lmt*ds.m_Lmt;
             else
@@ -2503,7 +2469,7 @@ bool FESlidingInterfaceBiphasicMixed::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ms.Element(i);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-			FESlidingSurfaceBiphasicMixed::Data& dm = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& dm = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			if (dm.m_bstick)
                 normL0 += dm.m_Lmt*dm.m_Lmt;
             else
@@ -2525,7 +2491,7 @@ bool FESlidingInterfaceBiphasicMixed::Augment(int naug, const FETimeInfo& tp)
         if (m_bsmaug) m_ss.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-			FESlidingSurfaceBiphasicMixed::Data& ds = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& ds = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on primary surface
             double eps = m_epsn*ds.m_epsn*psf;
@@ -2587,7 +2553,7 @@ bool FESlidingInterfaceBiphasicMixed::Augment(int naug, const FETimeInfo& tp)
         if (m_bsmaug) m_ms.GetGPSurfaceTraction(i, tn);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-			FESlidingSurfaceBiphasicMixed::Data& dm = static_cast<FESlidingSurfaceBiphasicMixed::Data&>(*el.GetMaterialPoint(j));
+            FEBiphasicContactPoint& dm = static_cast<FEBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on secondary surface
             double eps = m_epsn*dm.m_epsn*psf;

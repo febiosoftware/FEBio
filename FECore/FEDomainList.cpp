@@ -44,6 +44,11 @@ FEDomainList::FEDomainList(FEDomainList& domList)
 	m_dom = domList.m_dom;
 }
 
+FEDomainList::FEDomainList(std::vector<FEDomain*> domList)
+{
+	m_dom = domList;
+}
+
 //! Clear the domain list
 void FEDomainList::Clear()
 {

@@ -27,32 +27,38 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEBioMech/FEContactInterface.h"
+#include <FEBioMech/FEContactInterface.h>
 #include "FEBiphasicContactSurface.h"
+
+//-----------------------------------------------------------------------------
+class FEBIOMIX_API FETiedBiphasicContactPoint: public FEBiphasicContactPoint
+{
+public:
+    vec3d   m_Gap;  //!< initial gap in reference configuration
+    vec3d   m_dg;   //!< gap function at integration points
+    vec3d   m_nu;   //!< normal at integration points
+    vec2d   m_rs;   //!< natural coordinates of projection of integration point
+    vec3d   m_Lmd;  //!< lagrange multipliers for displacements
+    vec3d   m_tr;   //!< contact traction
+    double  m_epsn; //!< penalty factors
+    double  m_epsp; //!< pressure penalty factors
+
+    void Init() override
+    {
+        FEBiphasicContactPoint::Init();
+        m_Gap = m_dg = m_nu = m_Lmd = m_tr = vec3d(0,0,0);
+        m_rs = vec2d(0,0);
+        m_epsn = 1.0;
+        m_epsp = 1.0;
+    }
+    
+    void Serialize(DumpStream& ar) override;
+};
 
 //-----------------------------------------------------------------------------
 class FEBIOMIX_API FETiedBiphasicSurface : public FEBiphasicContactSurface
 {
 public:
-    //! Integration point data
-    class Data : public FEBiphasicContactPoint
-    {
-    public:
-        Data();
-
-		void Serialize(DumpStream& ar) override;
-        
-    public:
-        vec3d	m_Gap;	//!< initial gap in reference configuration
-        vec3d	m_dg;	//!< gap function at integration points
-        vec3d	m_nu;	//!< normal at integration points
-        vec2d	m_rs;	//!< natural coordinates of projection of integration point
-        vec3d	m_Lmd;	//!< lagrange multipliers for displacements
-        vec3d   m_tr;   //!< contact traction
-        double	m_epsn;	//!< penalty factors
-        double	m_epsp;	//!< pressure penalty factors
-    };
-    
 	//! constructor
 	FETiedBiphasicSurface(FEModel* pfem);
 	

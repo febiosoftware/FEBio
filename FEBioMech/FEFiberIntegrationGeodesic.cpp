@@ -89,7 +89,7 @@ public:
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEFiberIntegrationGeodesic, FEFiberIntegrationScheme)
-	ADD_PARAMETER(m_nres, "resolution");
+	ADD_PARAMETER(m_nres, "resolution")->setEnums("low\0high\0");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------

@@ -41,6 +41,7 @@ SOFTWARE.*/
 #include <string.h>
 #include <stdarg.h>
 #include <sstream>
+#include <iostream>
 #include "FEBioImport.h"
 
 #ifndef WIN32
@@ -573,11 +574,19 @@ std::vector<std::string> split_string(const std::string& s, char delim)
 	return vs;
 }
 
+std::string trim_string(const std::string& s) {
+	auto start = std::find_if_not(s.begin(), s.end(), ::isspace);
+	auto end = std::find_if_not(s.rbegin(), s.rend(), ::isspace).base();
+	if (start >= end) return "";  // All spaces or empty string
+	return std::string(start, end);
+}
+
 //-----------------------------------------------------------------------------
 //! This function parses a parameter list
 bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc, bool parseAttributes)
 {
 	FEParam* pp = nullptr;
+	const char* szparamName = (szparam == 0 ? tag.Name() : szparam);
 	if (tag == "add_param")
 	{
 		// get the name and value
@@ -595,9 +604,14 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 	else
 	{
 		// see if we can find this parameter
-		pp = pl.FindFromName((szparam == 0 ? tag.Name() : szparam));
+		pp = pl.FindFromName(szparamName);
 	}
 	if (pp == 0) return false;
+
+	if (pp->IsObsolete())
+	{
+		feLogWarning("parameter '%s' is obsolete.", szparamName);
+	}
 
 	if (pp->dim() == 1)
 	{
@@ -804,7 +818,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -842,7 +859,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -876,7 +896,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -907,7 +930,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -990,12 +1016,15 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 						}
 						pi.SetItemList(itemList);
 
+						// trim the string
+						std::string trimmedName = trim_string(s[i]);
+
 						// mapped values require special treatment
 						// The value is just the name of the map, but the problem is that 
 						// these maps may not be defined yet.
 						// So, we add them to the FEBioModel, which will process mapped 
 						// parameters after the rest of the file is processed
-						GetBuilder()->AddMappedParameter(pp, pc, s[i].c_str(), i);
+						GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str(), i);
 
 						// assign the valuator to the parameter
 						pi.setValuator(val);
@@ -1199,8 +1228,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					if (edgeList == nullptr) throw XMLReader::InvalidValue(tag);
 
 					FEEdge* edge = dynamic_cast<FEEdge*>(prop->get(0));
-					GetBuilder()->BuildEdge(*edge, *edgeList);
-//					mesh.AddEdge(edge); // I think that makes the mesh the owner, which is not the case!
+					if (edge == nullptr) throw XMLReader::InvalidValue(tag);
+
+					if (GetBuilder()->BuildEdge(*edge, *edgeList))
+						mesh.AddEdge(edge);
+					else
+						throw XMLReader::InvalidValue(tag);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1478,6 +1511,14 @@ bool FEFileImport::ParseFile(XMLTag& tag)
 FEModel* FEFileImport::GetFEModel()
 {
 	return &m_builder->GetFEModel();
+}
+
+//-----------------------------------------------------------------------------
+//! set a custom model builder 
+void FEFileImport::SetModelBuilder(FEModelBuilder* modelBuilder)
+{
+	delete m_builder;
+	m_builder = modelBuilder;
 }
 
 //-----------------------------------------------------------------------------

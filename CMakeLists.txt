@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
@@ -75,7 +75,7 @@ if(USE_MKL)
     foreach(name IN LISTS MKL_LIB_NAMES)
         findLib(${name} MKL_LIB_DIR MKL_LIB)
         list(APPEND MKL_LIBS ${MKL_LIB})
-        unset(MMG_LIB)
+        unset(MKL_LIB)
     endforeach(name)
     
     if(NOT EXISTS ${MKL_OMP_LIB})
@@ -105,6 +105,9 @@ if(USE_MMG)
 	if(NOT EXISTS ${MMG_LIB})
 		message(SEND_ERROR "Could not find MMG library. Check MMG_LIB.")
 	endif()
+    if(NOT EXISTS ${MMGS_LIB})
+		message(SEND_ERROR "Could not find MMGS library. Check MMGS_LIB.")
+	endif()
 	if(NOT EXISTS ${MMG_INC}/mmg/libmmg.h)
 		message(SEND_ERROR "Could not find libmmg.h. Check MMG_INC.")
 	endif()
@@ -133,6 +136,8 @@ if(WIN32)
     add_compile_options(/MP /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
     set(CMAKE_BUILD_RPATH @executable_path/../lib/;@executable_path/../Frameworks)
+    set(OMP_INC "" CACHE PATH "Path to the OMP include directory")
+    mark_as_advanced(OMP_INC)
 else()
 	add_compile_options(-fopenmp -w)
     
@@ -154,11 +159,9 @@ endif()
 ##### Find Source Files #####
 
 macro(findHdrSrc name)
-	file(GLOB HDR_${name} "${name}/*.h")
+	file(GLOB HDR_${name} "${name}/*.h*")
 	file(GLOB SRC_${name} "${name}/*.cpp")
 endmacro()
-
-findHdrSrc(FEBioStudio)
 
 foreach(name IN LISTS FEBIO_LIBS)
 	findHdrSrc(${name})
@@ -192,8 +195,9 @@ foreach(name IN LISTS STATIC_FEBIO_LIBS)
 endforeach(name)
 
 ##### Set up executable compilation #####
+file(GLOB HEADERS "FEBio/*.h")
 file(GLOB SOURCES "FEBio/*.cpp")
-add_executable (febio4 ${SOURCES})
+add_executable (febio4 ${HEADERS} ${SOURCES})
 
 if(WIN32)
     target_compile_options(febio4 PRIVATE /openmp)
@@ -232,7 +236,8 @@ macro(crossExecProcess OUT)
 endmacro()
 
 # Check for git and give warning if not available
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+option(SET_DEVCOMMIT "Set the DEVCOMMIT macro with git commit hash" ON)
+if(${SET_DEVCOMMIT} AND EXISTS ${CMAKE_SOURCE_DIR}/.git)
     if(WIN32)
         set(CMD where git)
     else()
@@ -323,10 +328,16 @@ else()
     endif()
 endif()
 
+# Manually pull in include dirs for OpenMP on macOS
+if(APPLE)
+    target_include_directories(febiomech PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
+endif()
+
 # Link Pardiso-project
 if(USE_PDL)
     target_compile_definitions(numcore PRIVATE PARDISODL)
     target_link_libraries(numcore PRIVATE ${PDL_LIB})
+    set(ENV{PARDISOLICMESSAGE} "1")
 
     # We still need OpenMP from the system.
     if(${OpenMP_C_FOUND})
@@ -344,7 +355,7 @@ endif()
 if(USE_MMG)
 	target_include_directories(feamr PRIVATE ${MMG_INC})
     target_compile_definitions(feamr PRIVATE HAS_MMG)
-    target_link_libraries(feamr PRIVATE ${MMG_LIB})
+    target_link_libraries(feamr PRIVATE ${MMG_LIB} ${MMGS_LIB})
 endif()
 
 # Link ZLIB
@@ -378,7 +389,7 @@ target_link_libraries(febiorve PRIVATE fecore febiomech febioxml febioplot xml)
 target_link_libraries(febioplot PRIVATE fecore)
 target_link_libraries(febioopt PRIVATE fecore febioxml xml)
 target_link_libraries(febiomix PRIVATE febiomech fecore)
-target_link_libraries(febiomech PRIVATE fecore)
+target_link_libraries(febiomech PRIVATE fecore feamr)
 target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
 target_link_libraries(feimglib PRIVATE fecore)
 target_link_libraries(feamr PRIVATE fecore)

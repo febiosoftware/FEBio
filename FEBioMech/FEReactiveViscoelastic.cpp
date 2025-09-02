@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEReactiveViscoelastic.h"
 #include "FEElasticMixture.h"
+#include "FEElasticFiberMaterial.h"
 #include "FEFiberMaterialPoint.h"
 #include "FEScaledElasticMaterial.h"
 #include <FECore/FECoreKernel.h>
@@ -44,8 +45,8 @@ SOFTWARE.*/
 // Material parameters for the FEMultiphasic material
 BEGIN_FECORE_CLASS(FEReactiveViscoelasticMaterial, FEElasticMaterial)
     ADD_PARAMETER(m_wmin , FE_RANGE_CLOSED(0.0, 1.0), "wmin");
-    ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1,2), "kinetics");
-    ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0,2), "trigger");
+    ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1,2), "kinetics")->setEnums("(invalid)\0Type I\0Type II\0");
+    ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0,2), "trigger")->setEnums("any strain\0distortional\0dilatational\0");
     ADD_PARAMETER(m_emin , FE_RANGE_GREATER_OR_EQUAL(0.0), "emin");
 
 	// set material properties
@@ -61,7 +62,7 @@ END_FECORE_CLASS();
 FEReactiveViscoelasticMaterial::FEReactiveViscoelasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
     m_wmin = 0;
-    m_btype = 0;
+    m_btype = 1;
     m_ttype = 0;
     m_emin = 0;
     
@@ -655,6 +656,10 @@ void FEReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FEMaterialP
     m_pBase->UpdateSpecializedMaterialPoints(sb, tp);
     m_pBond->UpdateSpecializedMaterialPoints(wb, tp);
     
+    // if the this material is a fiber and if the fiber is in compression, skip this update
+    if ((dynamic_cast<FEElasticFiberMaterial*>(m_pBase)) && (dynamic_cast<FEElasticFiberMaterial*>(m_pBond)))
+        if ((m_pBase->Stress(mp)).norm() == 0) return;
+    
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *wb.ExtractData<FEReactiveVEMaterialPoint>();
     
@@ -761,4 +766,10 @@ double FEReactiveViscoelasticMaterial::Damage(FEMaterialPoint& mp)
         D = ppd->BrokenBonds();
     }
     return D;
+}
+
+void FEReactiveViscoelasticMaterial::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	ar & m_nmax;
 }

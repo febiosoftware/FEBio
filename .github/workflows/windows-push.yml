@@ -16,12 +16,10 @@ permissions:
   contents: read  # This is required for actions/checkout
 jobs:
   call_workflow:
-    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable-push.yml@develop
+    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable.yml@develop
     with:
       runTests: ${{ (github.event_name == 'workflow_dispatch' && inputs.runTests) || (github.event_name == 'push' && contains(fromJSON('["develop"]'), github.ref_name)) }}
       package-name: febio4
       package-sdk: true
-      aws-ami-id: ami-0b18c665dbe9efa75
-      aws-sg-id: sg-0ca7912782cf1538b
-      aws-instance-type: c5a.8xlarge
+      publish: true
     secrets: inherit

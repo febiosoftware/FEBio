@@ -80,7 +80,6 @@ FECoreKernel::FECoreKernel()
 	m_next_alloc_id = 1;
 	m_nspec = -1;
 	m_default_solver = nullptr;
-	m_blockEvents = true;
 	m_bshowDeprecationWarning = true;
 
 	// build the super class ID table
@@ -255,6 +254,21 @@ void FECoreKernel::UnregisterFactories(int alloc_id)
 	}
 }
 
+//! unregister modules from allocator
+void FECoreKernel::UnregisterModules(int alloc_id)
+{
+    for (vector<FEModule*>::iterator it = m_modules.begin(); it != m_modules.end();)
+	{
+		FEModule* pfi = *it;
+        int alloc = pfi->GetAllocID();
+		if (pfi->GetAllocID() == alloc_id)
+		{
+			it = m_modules.erase(it);
+		}
+		else ++it;
+	}
+}
+
 //-----------------------------------------------------------------------------
 //! set the current allocator ID
 void FECoreKernel::SetAllocatorID(int alloc_id)
@@ -402,24 +416,20 @@ FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 	FECoreBase* pc = fac->CreateInstance(fem);
 
 	int nspec = fac->GetSpecID();
-	if (m_bshowDeprecationWarning && (nspec != -1))
+	if (m_bshowDeprecationWarning && (nspec != -1) && fem)
 	{
-		int n1 = FECORE_SPEC_MAJOR(nspec);
-		int n2 = FECORE_SPEC_MINOR(nspec);
-		if (fem) feLogWarningEx(fem, "\"%s\" is deprecated in spec %d.%d!", fac->GetTypeStr(), n1, n2);
-	}
-
-	if ((m_blockEvents == false) && pc && (m_createHandlers.empty() == false))
-	{
-		for (int i = 0; i < m_createHandlers.size(); ++i)
+		if (nspec == FECORE_EXPERIMENTAL)
 		{
-			FECreateHandler* ph = m_createHandlers[i];
-			if (ph && (IsModuleActive(ph->GetModuleID())))
-			{
-				ph->handle(pc);
-			}
+			feLogWarningEx(fem, "\"%s\" is considered experimental!", fac->GetTypeStr());
+		}
+		else
+		{
+			int n1 = FECORE_SPEC_MAJOR(nspec);
+			int n2 = FECORE_SPEC_MINOR(nspec);
+			feLogWarningEx(fem, "\"%s\" is deprecated in spec %d.%d!", fac->GetTypeStr(), n1, n2);
 		}
 	}
+
 	return pc;
 }
 
@@ -674,6 +684,7 @@ bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char
 		pmodule->SetName(szmod);
 		pmodule->SetID(newID);
 		pmodule->SetDescription(description);
+        pmodule->SetAllocID(m_alloc_id);
 		m_modules.push_back(pmodule);
 
 		// make this the active module
@@ -702,6 +713,12 @@ int FECoreKernel::GetModuleStatus(int i) const
 {
 	if ((i < 0) || (i >= m_modules.size())) return -1;
 	return m_modules[i]->GetStatus();
+}
+
+int FECoreKernel::GetModuleAllocatorID(int i) const
+{
+    if ((i < 0) || (i >= m_modules.size())) return -1;
+    return m_modules[i]->GetAllocID();
 }
 
 //! Get a module
@@ -795,18 +812,6 @@ FEDomain* FECoreKernel::CreateDomainExplicit(int superClass, const char* sztype,
 }
 
 //-----------------------------------------------------------------------------
-void FECoreKernel::OnCreateEvent(FECreateHandler* pf)
-{
-	pf->SetModuleID(GetActiveModuleID());
-	m_createHandlers.push_back(pf);
-}
-
-//-----------------------------------------------------------------------------
-void FECoreKernel::BlockEvents(bool b)
-{
-	m_blockEvents = b;
-}
-
 void FECoreKernel::ShowDeprecationWarnings(bool b)
 {
 	m_bshowDeprecationWarning = b;

@@ -80,7 +80,7 @@ public:
 	void zero() { memset(m_pd, 0, sizeof(double)*m_nsize); }
 
 	//! matrix transpose
-	matrix transpose();
+	matrix transpose() const;
 
 	//! matrix inversion
 	matrix inverse();
@@ -151,6 +151,7 @@ public:
 	void sub(int i, int j, const mat3da& a);
 	void sub(int i, int j, const mat3dd& a);
 	void sub(int i, int j, const mat3d&  a);
+	void sub(int i, int j, const matrix& a);
 
 	void get(int i, int j, mat3d& a) const;
 
@@ -294,6 +295,15 @@ inline void matrix::sub(int i, int j, const mat3d& a)
 	m_pr[i][j] -= a(2,0); m_pr[i][j+1] -= a(2,1); m_pr[i][j+2] -= a(2,2);
 }
 
+inline void matrix::sub(int i, int j, const matrix& m)
+{
+	int mr = m.rows();
+	int mc = m.columns();
+	for (int r = 0; r < mr; ++r)
+		for (int c = 0; c < mc; ++c)
+			m_pr[i + r][j + c] -= m[r][c];
+}
+
 inline void matrix::get(int i, int j, mat3d& a) const
 {
 	a[0][0] = m_pr[i  ][j]; a[0][1] = m_pr[i  ][j+1]; a[0][2] = m_pr[i  ][j+2];
@@ -332,3 +342,8 @@ inline matrix& matrix::operator = (matrix&& m)
 
 	return *this;
 }
+
+// Calculate the covariance of a matrix. 
+// The rows represent the observations, and the columns represent random variables.
+// The returned covariance matrix is an ncol x ncol matrix.
+matrix FECORE_API covariance(const matrix& a);

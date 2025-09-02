@@ -257,7 +257,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
         {
             FEDomainDataRecord* prec = new FEDomainDataRecord(&fem);
 			pdr = prec;
-			const char* sz = tag.AttributeValue("domain");
+			const char* sz = tag.AttributeValue("domain", true);
 			if (sz)
 			{
 				int domainIndex = mesh.FindDomainIndex(sz);

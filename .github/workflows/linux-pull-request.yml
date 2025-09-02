@@ -11,10 +11,10 @@ permissions:
   contents: read  # This is required for actions/checkout
 jobs:
   call_workflow:
-    uses: febiosoftware/febio-workflows/.github/workflows/linux-reusable-pull-request.yml@develop
+    uses: febiosoftware/febio-workflows/.github/workflows/linux--reusable.yml@develop
     with:
       runTests: true
       package-name: febio4
       package-sdk: true
-      aws-ami-id: ami-0590ebdb5afffb782
+      publish: false
     secrets: inherit

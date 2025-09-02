@@ -35,10 +35,12 @@ To create a nodal plot data field, derive a new class from <b>FEPlotNodeData</b>
 requires the data format and storage format. For nodal data the storage format is irrelevant since for nodal data one value per node is expected.
 
 \code
+#include <FECore/FEPlotData.h>
+
 class MyNodeData : public FEPlotNodeData
 {
 public:
-	MyNodeData(FEModel* pfem) : FEPlotNodeData(PLT_FLOAT, FMT_NODE){}
+	MyNodeData(FEModel* fem) : FEPlotNodeData(fem, PLT_FLOAT, FMT_NODE){}
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 \endcode
@@ -63,10 +65,12 @@ bool MyNodeData::Save(FEMesh& m, FEDataStream& a)
 To create a plot field for element data, create a new class from FEPlotDomainData.
 
 \code
+#include <FECore/FEPlotData.h>
+
 class MyElementData : public FEPlotDomainData
 {
 public:
-	MyElementData(FEModel* pfem) : FEPlotDomainData(PLT_FLOAT, FMT_ITEM){}
+	MyElementData(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 \endcode
@@ -151,10 +155,12 @@ bool FEPlotElementStress::Save(FEDomain& dom, FEDataStream& a)
 To create a surface facet plot field, create a new class from FEPlotSurfaceData.
 
 \code
+#include <FECore/FEPlotData.h>
+
 class MySurfaceData : public FEPlotSurfaceData
 {
 public:
-	MySurfaceData(FEModel* pfem) : FEPlotSurfaceData(PLT_FLOAT, FMT_ITEM){}
+	MySurfaceData(FEModel* fem) : FEPlotSurfaceData(fem, PLT_FLOAT, FMT_ITEM){}
 	bool Save(FESurface& s, FEDataStream& a);
 };
 \endcode

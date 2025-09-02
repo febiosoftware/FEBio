@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "NumCore.h"
 #include "PardisoSolver.h"
+#include "PardisoSolver64.h"
 #include "PardisoProjectSolver.h"
 #include "RCICGSolver.h"
 #include "FGMRESSolver.h"
@@ -55,7 +56,12 @@ SOFTWARE.*/
 NUMCORE_API void NumCore::InitModule()
 {
 	// register linear solvers
+#ifdef PARDISO
 	REGISTER_FECORE_CLASS(PardisoSolver  , "pardiso");
+	REGISTER_FECORE_CLASS(PardisoSolver64, "pardiso_64");
+	REGISTER_FECORE_CLASS(MKLDSSolver, "mkl_dss");
+#endif
+
     REGISTER_FECORE_CLASS(PardisoProjectSolver, "pardiso-project");
 	REGISTER_FECORE_CLASS(FGMRESSolver        , "fgmres"   );
 	REGISTER_FECORE_CLASS(BoomerAMGSolver     , "boomeramg");
@@ -70,7 +76,6 @@ NUMCORE_API void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(TestSolver          , "test");
     REGISTER_FECORE_CLASS(AccelerateSparseSolver, "accelerate");
     REGISTER_FECORE_CLASS(SuperLU_MT_Solver     , "superlu_mt");
-    REGISTER_FECORE_CLASS(MKLDSSolver           , "mkl_dss");
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");

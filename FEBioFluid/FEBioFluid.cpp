@@ -89,7 +89,6 @@ SOFTWARE.*/
 #include "FEFluidModule.h"
 
 #include "FEFluidAnalysis.h"
-#include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
@@ -291,6 +290,10 @@ REGISTER_FECORE_CLASS(FELogFluidStressZZ       , "fszz");
 REGISTER_FECORE_CLASS(FELogFluidStressXY       , "fsxy");
 REGISTER_FECORE_CLASS(FELogFluidStressYZ       , "fsyz");
 REGISTER_FECORE_CLASS(FELogFluidStressXZ       , "fsxz");
+REGISTER_FECORE_CLASS(FELogFluidStress1        , "fs1" );
+REGISTER_FECORE_CLASS(FELogFluidStress2        , "fs2" );
+REGISTER_FECORE_CLASS(FELogFluidStress3        , "fs3" );
+REGISTER_FECORE_CLASS(FELogFluidMaxShearStress , "fmxs");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefXX    , "fdxx");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefYY    , "fdyy");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefZZ    , "fdzz");
@@ -306,28 +309,5 @@ REGISTER_FECORE_CLASS(FEFSIErosionVolumeRatio, "fsi-volume-erosion");
 // Derived from FEMeshAdaptorCriterion
 REGISTER_FECORE_CLASS(FEFluidStressCriterion     , "fluid shear stress");
 
-//-----------------------------------------------------------------------------
-// Reset solver parameters to preferred default settings
-    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 50;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
-        pc->m_iteopt = 50;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FEFluidAnalysis>([](FEFluidAnalysis* pc) {
-        pc->m_nanalysis = FEFluidAnalysis::DYNAMIC;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
-        pc->m_maxref = 5;
-        pc->m_Rmax = 1.0e+20;
-        // turn off reform on each time step and diverge reform
-        pc->m_breformtimestep = false;
-        pc->m_bdivreform = false;
-    }));
-    
 febio.SetActiveModule(0);
-
 }

@@ -39,18 +39,13 @@ SOFTWARE.*/
 #include "plugin.h"
 #include <map>
 #include <iostream>
-
-#ifdef WIN32
-// TODO: This is deprecated and <filesystem> should be used instead when switching to C++17. At that point, also remove this define.
-// #include <filesystem>
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-#endif
+#include <filesystem>
 
 #ifndef WIN32
 #include <dlfcn.h>
 #endif
 
+namespace fs = std::filesystem;
 
 namespace febio {
 
@@ -59,6 +54,7 @@ namespace febio {
 	bool parse_default_linear_solver(XMLTag& tag);
 	bool parse_import(XMLTag& tag);
 	bool parse_import_folder(XMLTag& tag);
+    bool parse_repo_plugins(XMLTag& tag);
 	bool parse_set(XMLTag& tag);
 	bool parse_output_negative_jacobians(XMLTag& tag);
 
@@ -182,6 +178,10 @@ namespace febio {
 		{
 			if (parse_import_folder(tag) == false) return false;
 		}
+        else if (tag == "repo_plugin_xml")
+        {
+            if (parse_repo_plugins(tag) == false) return false;
+        }
 		else if (tag == "output_negative_jacobians")
 		{
 			if (parse_output_negative_jacobians(tag) == false) return false;
@@ -207,7 +207,7 @@ namespace febio {
 	{
 		int n;
 		tag.value(n);
-		NegativeJacobian::m_boutput = (n != 0);
+		NegativeJacobian::m_maxout = n;
 		return true;
 	}
 
@@ -228,7 +228,6 @@ namespace febio {
 			// set this as the default solver
 			FECoreKernel& fecore = FECoreKernel::GetInstance();
 			fecore.SetDefaultSolver(cd);
-			if (boutput) fprintf(stderr, "Default linear solver: %s\n", fecore.GetLinearSolverType());
 		}
 
 		return true;
@@ -307,6 +306,22 @@ namespace febio {
 		return bok;
 	}
 
+    //-----------------------------------------------------------------------------
+    bool parse_repo_plugins(XMLTag& tag)
+    {
+        // get the file name
+		const char* szfile = tag.szvalue();
+
+		// process any aliases
+		char szbuf[1024] = { 0 };
+		bool bok = process_aliases(szbuf, szfile);
+
+		// load the plugin
+		if (bok) febio::ImportRepoPlugins(szbuf);
+
+		return bok;
+    }
+
 	//-----------------------------------------------------------------------------
 	const char* GetFileTitle(const char* szfile)
 	{
@@ -348,49 +363,73 @@ namespace febio {
 		return false;
 	}
 
-	//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
-#ifdef WIN32
-	namespace fs = std::experimental::filesystem;
-
-	void ImportPluginFolder(const char* szfolder)
-	{
-		std::string path = szfolder;
-
-		// get the default (system-dependant) extension
-		std::wstring defExt = L".dll";
-		//	std::wstring defExt = L".dylib";
-		//	std::wstring defExt = L".so";
-
-		size_t extLength = defExt.length();
-
-		// loop over all the items in a directory
-		for (auto & p : fs::directory_iterator(path))
-		{
-			// only get regular files with the default extension 
-			if (p.status().type() == fs::file_type::regular)
-			{
-				std::wstring fileName = p.path();
-				size_t l = fileName.length();
-				if (l > extLength) {
-					std::wstring ext = fileName.substr(l - extLength, extLength);
-					if (ext == defExt)
-					{
-						// we can only deal with strings for now, so convert
-						std::string s = p.path().string<char>();
-
-						// try to load the plugin
-						ImportPlugin(s.c_str());
-					}
-				}
-			}
-		}
-	}
-#else
 void ImportPluginFolder(const char* szfolder)
 {
+    // get the default (system-dependant) extension
+    #ifdef WIN32
+        std::string extension = ".dll";
+    #elif __APPLE__
+        std::string extension = ".dylib";
+    #else
+        std::string extension = ".so";
+    #endif
+    
+    for (const auto& entry : fs::directory_iterator(szfolder)) 
+    {
+        if (entry.is_regular_file() && entry.path().extension() == extension)
+        {
+            // try to load the plugin
+            ImportPlugin(entry.path().string().c_str());
+        }
+    }
 }
-#endif
+
+void ImportRepoPlugins(const char* szxmlFile)
+{
+    XMLReader xml;
+    if (xml.Open(szxmlFile))
+    {
+        XMLTag tag;
+
+        if(!xml.FindTag("plugins", tag)) return;
+
+        if(!tag.isleaf())
+        {
+            ++tag;
+            do
+            {
+                if(tag == "plugin")
+                {
+                    int ID = tag.AttributeValue("ID", 0);
+
+                    if(!tag.isleaf())
+                    {
+                        ++tag;
+                        do
+                        {
+                            if (tag == "file")
+                            {
+                                int main = tag.AttributeValue("main", 1);
+
+                                std::string filePath;
+                                tag.value(filePath);
+
+                                if(main == 1)
+                                {
+                                    ImportPlugin(filePath.c_str());
+                                }
+                            }
+                            ++tag;
+                        } while(!tag.isend());
+                    }
+                }
+                ++tag;
+            } while(!tag.isend());
+        }
+    }
+}
 
 //-----------------------------------------------------------------------------
 FEBIOLIB_API const char* GetPluginName(int allocId)

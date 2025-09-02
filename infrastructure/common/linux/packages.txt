@@ -22,6 +22,7 @@ libsqlite3-dev
 tcl-dev
 tk-dev
 libx11-dev
+libxcb-cursor0
 libxmu-dev
 libinsighttoolkit5-dev
 swig
@@ -30,3 +31,4 @@ jq
 yasm
 patchelf
 zip
+python3-pip

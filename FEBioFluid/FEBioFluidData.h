@@ -239,6 +239,38 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogFluidStress1 : public FELogElemData
+{
+public:
+    FELogFluidStress1(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidStress2 : public FELogElemData
+{
+public:
+    FELogFluidStress2(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidStress3 : public FELogElemData
+{
+public:
+    FELogFluidStress3(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidMaxShearStress : public FELogElemData
+{
+public:
+    FELogFluidMaxShearStress(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogFluidRateOfDefXX : public FELogElemData
 {
 public:

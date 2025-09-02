@@ -150,7 +150,10 @@ public:
     
     double      m_epsn;         //!< normal penalty factor
     bool        m_bautopen;     //!< use autopenalty factor
-    bool            m_bupdtpen;     //!< update penalty at each time step
+    bool        m_bupdtpen;     //!< update penalty at each time step
+
+	bool            m_bflips;       //!< flip primary surface normal
+	bool            m_bflipm;       //!< flip secondary surface normal
 
     DECLARE_FECORE_CLASS();
 };

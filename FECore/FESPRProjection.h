@@ -29,6 +29,8 @@ SOFTWARE.*/
 #pragma once
 #include <vector>
 #include "fecore_api.h"
+#include <FECore/matrix.h>
+#include <FECore/FENodeElemList.h>
 
 class FESolidDomain;
 
@@ -38,12 +40,17 @@ class FESolidDomain;
 class FECORE_API FESPRProjection
 {
 public:
-	FESPRProjection();
+	FESPRProjection(FESolidDomain& dom, int interpolationOrder = -1);
 
-	void Project(FESolidDomain& dom, const std::vector< std::vector<double> >& d, std::vector<double>& o);
+	void Project(const std::vector< std::vector<double> >& d, std::vector<double>& o);
 
-	void SetInterpolationOrder(int p);
+private:
+	void Init();
 
 protected:
+	FESolidDomain& m_dom;	//!< reference to the solid domain	
+	FENodeElemList NEL;
+	std::vector<matrix> m_Ai;
+	std::vector<int> m_valence;
 	int		m_p;	//!< interpolation order (set to -1 for default rules)
 };

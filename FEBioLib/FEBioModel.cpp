@@ -102,6 +102,15 @@ bool FEBioModel::processEvent(int nevent)
 	{
 	case CB_STEP_SOLVED: on_cb_stepSolved(); break;
 	case CB_SOLVED     : on_cb_solved(); break;
+	case CB_MAJOR_ITERS:
+	case CB_TIMESTEP_FAILED:
+	{
+		FEAnalysis* step = GetCurrentStep();
+		FESolver* solver = step->GetFESolver();
+		TimeStepStats stats = {solver->m_niter, solver->m_nrhs, solver->m_nref, (nevent== CB_MAJOR_ITERS?1:0)};
+		m_timestepStats.push_back(stats);
+	}
+	break;
 	}
 
 	return true;
@@ -122,11 +131,6 @@ FEBioModel::FEBioModel()
 	m_plot = nullptr;
 	m_writeMesh = false;
 	m_createReport = false;
-
-	m_stats.ntimeSteps = 0;
-	m_stats.ntotalIters = 0;
-	m_stats.ntotalRHS = 0;
-	m_stats.ntotalReforms = 0;
 
 	m_pltAppendOnRestart = true;
 
@@ -166,14 +170,6 @@ Timer& FEBioModel::GetSolveTimer()
 }
 
 //-----------------------------------------------------------------------------
-//! return number of seconds of time spent in linear solver
-int FEBioModel::GetLinearSolverTime()
-{
-	Timer* t = GetTimer(TimerID::Timer_LinSolve);
-	return (int)t->peek();
-}
-
-//-----------------------------------------------------------------------------
 //! set the debug level
 void FEBioModel::SetDebugLevel(int debugLvl) { m_ndebug = debugLvl; }
 
@@ -198,7 +194,22 @@ void FEBioModel::SetLogLevel(int logLevel) { m_logLevel = logLevel; }
 //! Get the stats 
 ModelStats FEBioModel::GetModelStats() const
 {
-	return m_stats;
+	return m_modelStats;
+}
+
+ModelStats FEBioModel::GetStepStats(size_t n) const
+{
+	return m_stepStats[n];
+}
+
+std::vector<ModelStats> FEBioModel::GetStepStats() const
+{
+	return m_stepStats;
+}
+
+std::vector<TimeStepStats> FEBioModel::GetTimeStepStats() const
+{
+	return m_timestepStats;
 }
 
 //-----------------------------------------------------------------------------
@@ -336,6 +347,9 @@ bool FEBioModel::AppendOnRestart() const
 
 bool FEBioModel::Input(const char* szfile)
 {
+	// start the total timer (assumes that this is the first function we'll hit)
+	m_TotalTime.start();
+
 	// start the timer
 	TimerTracker t(&m_InputTime);
 
@@ -565,6 +579,8 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				}
 				isStride = ((pstep->m_ntimesteps - nmin) % pstep->m_nplot_stride) == 0;
 
+				bool isMustPoint = (pstep->m_timeController && (pstep->m_timeController->m_nmust >= 0));
+
 				switch (nevent)
 				{
 				case CB_MINOR_ITERS:
@@ -578,8 +594,8 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				}
 				break;
 				case CB_MAJOR_ITERS:
-					if ((nplt == FE_PLOT_MAJOR_ITRS) && inRange && isStride) bout = true;
-					if ((nplt == FE_PLOT_MUST_POINTS) && (pstep->m_timeController) && (pstep->m_timeController->m_nmust >= 0)) bout = true;
+					if ((nplt == FE_PLOT_MAJOR_ITRS) && inRange && (isStride || isMustPoint)) bout = true;
+					if ((nplt == FE_PLOT_MUST_POINTS) && isMustPoint) bout = true;
 					if (nplt == FE_PLOT_AUGMENTATIONS) bout = true;
 					break;
 				case CB_AUGMENT:
@@ -634,7 +650,6 @@ void FEBioModel::WritePlot(unsigned int nevent)
 				double time = GetTime().currentTime;
 				if (m_plot)
 				{
-					feLogDebug("writing to plot file; time = %lg; flag = %d", time, statusFlag);
 					m_plot->Write((float)time, statusFlag);
 				}
 
@@ -747,6 +762,8 @@ string removeNewLines(const char* sz)
 //-----------------------------------------------------------------------------
 void FEBioModel::Log(int ntag, const char* szmsg)
 {
+	TimerTracker t(&m_IOTimer);
+
 	if      (ntag == 0) m_log.printf(szmsg);
 	else if ((ntag == 1) && m_bshowErrors) m_log.printbox("WARNING", szmsg);
 	else if ((ntag == 2) && m_bshowErrors) m_log.printbox("ERROR", szmsg);
@@ -760,7 +777,12 @@ void FEBioModel::Log(int ntag, const char* szmsg)
 	if (m_createReport)
 	{
 		string msg = removeNewLines(szmsg);
-		msg.push_back('\n');
+
+		double t = GetCurrentTime();
+		stringstream ss;
+		ss << msg << " (t = " << t << ")\n";
+		msg = ss.str();
+
 		if (ntag == 1) m_report += "Warning: " + msg;
 		if (ntag == 2) m_report += "Error: " + msg;
 	}
@@ -966,7 +988,7 @@ void FEBioModel::UpdatePlotObjects()
 			}
 
 			FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-			po->m_tag = 1;
+			po->m_tag = OBJ_RIGID_BODY;
 			po->m_pos = rb->m_r0;
 			po->m_rot = quatd(0, vec3d(1,0,0));
 
@@ -999,7 +1021,7 @@ void FEBioModel::UpdatePlotObjects()
 			if (rj)
 			{
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-				po->m_tag = 2;
+				po->m_tag = OBJ_GENERIC_JOINT;
 				po->m_pos = rj->InitialPosition();
 				po->m_rot = quatd(0, vec3d(1, 0, 0));
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rj));
@@ -1014,7 +1036,7 @@ void FEBioModel::UpdatePlotObjects()
             if (rsj)
             {
                 FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-                po->m_tag = 3;
+                po->m_tag = OBJ_SPHERICAL_JOINT;
                 po->m_pos = rsj->InitialPosition();
                 po->m_rot = quatd(0, vec3d(1, 0, 0));
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rsj));
@@ -1029,7 +1051,7 @@ void FEBioModel::UpdatePlotObjects()
 			if (rpj)
 			{
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-				po->m_tag = 4;
+				po->m_tag = OBJ_PRISMATIC_JOINT;
 				po->m_pos = rpj->InitialPosition();
 				po->m_rot = rpj->Orientation();
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rpj));
@@ -1044,7 +1066,7 @@ void FEBioModel::UpdatePlotObjects()
 			if (rrj)
 			{
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-				po->m_tag = 5;
+				po->m_tag = OBJ_REVOLUTE_JOINT;
 				po->m_pos = rrj->InitialPosition();
 				po->m_rot = rrj->Orientation();
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rrj));
@@ -1059,7 +1081,7 @@ void FEBioModel::UpdatePlotObjects()
 			if (rcj)
 			{
 				FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-				po->m_tag = 6;
+				po->m_tag = OBJ_CYLINDRICAL_JOINT;
 				po->m_pos = rcj->InitialPosition();
 				po->m_rot = rcj->Orientation();
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rcj));
@@ -1074,7 +1096,7 @@ void FEBioModel::UpdatePlotObjects()
             if (rlj)
             {
                 FEBioPlotFile::PointObject* po = plt->AddPointObject(name);
-                po->m_tag = 7;
+                po->m_tag = OBJ_PLANAR_JOINT;
                 po->m_pos = rlj->InitialPosition();
                 po->m_rot = rlj->Orientation();
                 po->AddData("Relative translation (LCS)" , PLT_VEC3F, new FEPlotRigidConnectorTranslationLCS(this, rlj));
@@ -1327,6 +1349,45 @@ void FEBioModel::Serialize(DumpStream& ar)
 
 		// --- Save IO Data
 		SerializeIOData(ar);
+
+		if (ar.IsSaving())
+		{
+			int n = (int)m_stepStats.size();
+			ar << n;
+			for (ModelStats& s : m_stepStats)
+			{
+				ar << s.ntimeSteps << s.ntotalIters << s.ntotalReforms << s.ntotalRHS;
+			}
+
+			n = (int)m_timestepStats.size();
+			ar << n;
+			for (TimeStepStats& s : m_timestepStats)
+			{
+				ar << s.iters << s.nrhs << s.refs << s.status;
+			}
+		}
+		else
+		{
+			m_stepStats.clear();
+			int n = 0;
+			ar >> n;
+			for (int i = 0; i < n; ++i)
+			{
+				ModelStats s;
+				ar >> s.ntimeSteps >> s.ntotalIters >> s.ntotalReforms >> s.ntotalRHS;
+				m_stepStats.push_back(s);
+			}
+
+			m_timestepStats.clear();
+			n = 0;
+			ar >> n;
+			for (int i = 0; i < n; ++i)
+			{
+				TimeStepStats s;
+				ar >> s.iters >> s.nrhs >> s.refs >> s.status;
+				m_timestepStats.push_back(s);
+			}
+		}
 	}
 }
 
@@ -1403,6 +1464,14 @@ void FEBioModel::SerializeIOData(DumpStream &ar)
 			if (m_plot->Append(m_splot.c_str()) == false)
 			{
 				printf("FATAL ERROR: Failed reopening plot database %s\n", m_splot.c_str());
+				throw "FATAL ERROR";
+			}
+		}
+		else
+		{
+			if (m_plot->Open(m_splot.c_str()) == false)
+			{
+				printf("FATAL ERROR: Failed creating plot database %s\n", m_splot.c_str());
 				throw "FATAL ERROR";
 			}
 		}
@@ -1528,7 +1597,7 @@ bool FEBioModel::InitPlotFile()
 
 bool FEBioModel::Init()
 {
-	TimerTracker t(&m_InitTime);
+	TRACK_TIME(TimerID::Timer_Init);
 
 	// Open the logfile
 	if (m_logLevel != 0)
@@ -1537,6 +1606,8 @@ bool FEBioModel::Init()
 	}
 
 	m_report.clear();
+	m_stepStats.clear();
+	m_timestepStats.clear();
 
 	FEBioPlotFile* pplt = nullptr;
 	m_lastUpdate = -1;
@@ -1628,14 +1699,23 @@ bool FEBioModel::InitLogFile()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
+bool FEBioModel::Solve()
+{
+	// The total time is usually started on calling Input,
+	// however, in a restart Input is not called, so we start it here.
+	if (!m_TotalTime.isRunning()) m_TotalTime.start();
+	bool b = FEModel::Solve();
+	m_TotalTime.stop();
+	return b;
+}
+
 //! This function resets the FEM data so that a new run can be done.
 //! This routine is called from the optimization routine.
-
 bool FEBioModel::Reset()
 {
 	// Reset model data
 	FEMechModel::Reset();
+	m_TotalTime.reset();
 
 	// re-initialize the log file
 	if (m_logLevel != 0)
@@ -1672,10 +1752,13 @@ bool FEBioModel::Reset()
 		}
 	}
 
-	m_stats.ntimeSteps = 0;
-	m_stats.ntotalIters = 0;
-	m_stats.ntotalRHS = 0;
-	m_stats.ntotalReforms = 0;
+	// reset stats
+	m_modelStats.ntimeSteps = 0;
+	m_modelStats.ntotalIters = 0;
+	m_modelStats.ntotalRHS = 0;
+	m_modelStats.ntotalReforms = 0;
+	m_stepStats.clear();
+	m_timestepStats.clear();
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -1684,11 +1767,38 @@ bool FEBioModel::Reset()
 	return true;
 }
 
+TimingInfo FEBioModel::GetTimingInfo()
+{
+	double tot = m_TotalTime.GetTime();
+
+	TimingInfo ti;
+	ti.total_time = m_TotalTime.GetTime();
+	ti.solve_time = GetSolveTimer().GetTime();
+
+	double total = 0;
+	ti.input_time         = m_InputTime.GetExclusiveTime(); total += ti.input_time;
+	ti.init_time          = GetTimer(TimerID::Timer_Init)->GetExclusiveTime(); total += ti.init_time;
+	ti.io_time            = m_IOTimer.GetExclusiveTime(); total += ti.io_time;
+	ti.total_ls_factor    = GetTimer(TimerID::Timer_LinSol_Factor   )->GetExclusiveTime(); total += ti.total_ls_factor;
+	ti.total_ls_backsolve = GetTimer(TimerID::Timer_LinSol_Backsolve)->GetExclusiveTime(); total += ti.total_ls_backsolve;
+	ti.total_reform       = GetTimer(TimerID::Timer_Reform          )->GetExclusiveTime(); total += ti.total_reform;
+	ti.total_stiff        = GetTimer(TimerID::Timer_Stiffness       )->GetExclusiveTime(); total += ti.total_stiff;
+	ti.total_rhs          = GetTimer(TimerID::Timer_Residual        )->GetExclusiveTime(); total += ti.total_rhs;
+	ti.total_update       = GetTimer(TimerID::Timer_Update          )->GetExclusiveTime(); total += ti.total_update;
+	ti.total_qn           = GetTimer(TimerID::Timer_QNUpdate        )->GetExclusiveTime(); total += ti.total_qn;
+	ti.total_serialize    = GetTimer(TimerID::Timer_Serialize       )->GetExclusiveTime(); total += ti.total_serialize;
+	ti.total_callback     = GetTimer(TimerID::Timer_Callback        )->GetExclusiveTime(); total += ti.total_callback;
+
+	ti.total_other  = ti.total_time - total;
+	assert(ti.total_other >= 0);
+
+	return ti;
+}
+
 //=============================================================================
 //                               S O L V E
 //=============================================================================
 
-//-----------------------------------------------------------------------------
 void FEBioModel::on_cb_solved()
 {
 	FEAnalysis* step = GetCurrentStep();
@@ -1698,16 +1808,19 @@ void FEBioModel::on_cb_solved()
 	if (Steps() > 1)
 	{
 		feLog("\n\n N O N L I N E A R   I T E R A T I O N   S U M M A R Y\n\n");
-		feLog("\tNumber of time steps completed .................... : %d\n\n", m_stats.ntimeSteps);
-		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_stats.ntotalIters);
-		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_stats.ntotalRHS);
-		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_stats.ntotalReforms);
+		feLog("\tNumber of time steps completed .................... : %d\n\n", m_modelStats.ntimeSteps);
+		feLog("\tTotal number of equilibrium iterations ............ : %d\n\n", m_modelStats.ntotalIters);
+		feLog("\tTotal number of right hand evaluations ............ : %d\n\n", m_modelStats.ntotalRHS);
+		feLog("\tTotal number of stiffness reformations ............ : %d\n\n", m_modelStats.ntotalReforms);
 	}
 
+	// get timing info
+	TimingInfo ti = GetTimingInfo();
+
 	// get and print elapsed time
+	double linsol_time = ti.total_ls_factor + ti.total_ls_backsolve;
 	char sztime[64];
-	Timer* solveTimer = GetTimer(TimerID::Timer_LinSolve);
-	solveTimer->time_str(sztime);
+	Timer::time_str(linsol_time, sztime);
 	feLog("\tTime in linear solver: %s\n\n", sztime);
 
 	// always flush the log
@@ -1734,30 +1847,18 @@ void FEBioModel::on_cb_solved()
 		Logfile::MODE old_mode = m_log.SetMode(Logfile::LOG_FILE);
 
 		// sum up all the times spend in the linear solvers
-		double total_time   = 0.0;
-		double input_time   = m_InputTime.GetTime(); total_time += input_time;
-		double init_time    = m_InitTime .GetTime(); total_time += init_time;
-		double solve_time   = GetTimer(TimerID::Timer_ModelSolve)->GetTime(); total_time += solve_time;
-		double io_time      = m_IOTimer.GetTime();
-		double total_linsol = GetTimer(TimerID::Timer_LinSolve )->GetTime();
-		double total_reform = GetTimer(TimerID::Timer_Reform   )->GetTime();
-		double total_stiff  = GetTimer(TimerID::Timer_Stiffness)->GetTime();
-		double total_rhs    = GetTimer(TimerID::Timer_Residual )->GetTime();
-		double total_update = GetTimer(TimerID::Timer_Update   )->GetTime();
-		double total_qn     = GetTimer(TimerID::Timer_QNUpdate )->GetTime();
-
 		feLog(" T I M I N G   I N F O R M A T I O N\n\n");
-		Timer::time_str(input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, input_time);
-		Timer::time_str(init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, init_time);
-		Timer::time_str(solve_time  , sztime); feLog("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, solve_time);
-		Timer::time_str(io_time     , sztime); feLog("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, io_time);
-		Timer::time_str(total_reform, sztime); feLog("\t   reforming stiffness .......... : %s (%lg sec)\n\n", sztime, total_reform);
-		Timer::time_str(total_stiff , sztime); feLog("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, total_stiff);
-		Timer::time_str(total_rhs   , sztime); feLog("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, total_rhs);
-		Timer::time_str(total_update, sztime); feLog("\t   model update ................. : %s (%lg sec)\n\n", sztime, total_update);
-		Timer::time_str(total_qn    , sztime); feLog("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, total_qn);
-		Timer::time_str(total_linsol, sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, total_linsol);
-		Timer::time_str(total_time  , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, total_time);
+		Timer::time_str(ti.input_time  , sztime); feLog("\tInput time ...................... : %s (%lg sec)\n\n", sztime, ti.input_time);
+		Timer::time_str(ti.init_time   , sztime); feLog("\tInitialization time ............. : %s (%lg sec)\n\n", sztime, ti.init_time);
+		Timer::time_str(ti.solve_time  , sztime); feLog("\tSolve time ...................... : %s (%lg sec)\n\n", sztime, ti.solve_time);
+		Timer::time_str(ti.io_time     , sztime); feLog("\t   IO-time (plot, dmp, data) .... : %s (%lg sec)\n\n", sztime, ti.io_time);
+		Timer::time_str(ti.total_reform, sztime); feLog("\t   reforming stiffness .......... : %s (%lg sec)\n\n", sztime, ti.total_reform);
+		Timer::time_str(ti.total_stiff , sztime); feLog("\t   evaluating stiffness ......... : %s (%lg sec)\n\n", sztime, ti.total_stiff);
+		Timer::time_str(ti.total_rhs   , sztime); feLog("\t   evaluating residual .......... : %s (%lg sec)\n\n", sztime, ti.total_rhs);
+		Timer::time_str(ti.total_update, sztime); feLog("\t   model update ................. : %s (%lg sec)\n\n", sztime, ti.total_update);
+		Timer::time_str(ti.total_qn    , sztime); feLog("\t   QN updates ................... : %s (%lg sec)\n\n", sztime, ti.total_qn);
+		Timer::time_str(linsol_time    , sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, linsol_time);
+		Timer::time_str(ti.total_time  , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, ti.total_time);
 
 		m_log.SetMode(old_mode);
 
@@ -1813,10 +1914,16 @@ void FEBioModel::on_cb_stepSolved()
 	}
 
 	// add to stats
-	m_stats.ntimeSteps    += step->m_ntimesteps;
-	m_stats.ntotalIters   += step->m_ntotiter;
-	m_stats.ntotalRHS     += step->m_ntotrhs;
-	m_stats.ntotalReforms += step->m_ntotref;
+	ModelStats stats;
+	stats.ntimeSteps    = step->m_ntimesteps;
+	stats.ntotalIters   = step->m_ntotiter;
+	stats.ntotalRHS     = step->m_ntotrhs;
+	stats.ntotalReforms = step->m_ntotref;
+	m_stepStats.push_back(stats);
+	m_modelStats.ntimeSteps    += stats.ntimeSteps;
+	m_modelStats.ntotalIters   += stats.ntotalIters;
+	m_modelStats.ntotalRHS     += stats.ntotalRHS;
+	m_modelStats.ntotalReforms += stats.ntotalReforms;
 }
 
 bool FEBioModel::Restart(const char* szfile)

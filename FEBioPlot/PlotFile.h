@@ -68,6 +68,7 @@ public:
 		int NodalVariables() { return (int)m_Node.size(); }
 		int DomainVariables() { return (int)m_Elem.size(); }
 		int SurfaceVariables() { return (int)m_Face.size(); }
+		int EdgeVariables() { return (int)m_Edge.size(); }
 
 		void Defaults(FEModel& fem);
 
@@ -79,6 +80,7 @@ public:
 		list<DICTIONARY_ITEM>& NodalVariableList() { return m_Node; }
 		list<DICTIONARY_ITEM>& DomainVariableList() { return m_Elem; }
 		list<DICTIONARY_ITEM>& SurfaceVariableList() { return m_Face; }
+		list<DICTIONARY_ITEM>& EdgeVariableList() { return m_Edge; }
 
 	protected:
 		bool AddGlobalVariable(FEPlotData* ps, const char* szname);
@@ -86,6 +88,7 @@ public:
 		bool AddNodalVariable(FEPlotData* ps, const char* szname, std::vector<int>& item);
 		bool AddDomainVariable(FEPlotData* ps, const char* szname, std::vector<int>& item);
 		bool AddSurfaceVariable(FEPlotData* ps, const char* szname, std::vector<int>& item);
+		bool AddEdgeVariable(FEPlotData* ps, const char* szname, std::vector<int>& item);
 
 	protected:
 		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
@@ -93,6 +96,7 @@ public:
 		list<DICTIONARY_ITEM>	m_Node;		// Node variables
 		list<DICTIONARY_ITEM>	m_Elem;		// Domain variables
 		list<DICTIONARY_ITEM>	m_Face;		// Surface variables
+		list<DICTIONARY_ITEM>	m_Edge;		// Edge variables
 
 		friend class PlotFile;
 	};
@@ -124,6 +128,8 @@ public:
 public:
 	Dictionary& GetDictionary() { return m_dic; }
 
+	bool AddVariable(FEPlotData* ps, const char* szname);
+
 protected:
 	FEModel* GetFEModel() { return m_pfem; }
 
@@ -131,7 +137,6 @@ protected:
 	void BuildDictionary();
 
 	//! Add a variable to the dictionary
-	bool AddVariable(FEPlotData* ps, const char* szname);
 	bool AddVariable(const char* sz);
 	bool AddVariable(const char* sz, std::vector<int>& item, const char* szdom = "");
 

@@ -70,13 +70,14 @@ void FEFixedNormalDisplacement::Activate()
         // nx*ux + ny*uy + nz*uz = 0
         if (m_bshellb == false) {
             for (int i = 0; i < m_surf.Nodes(); ++i) {
-                FENode node = m_surf.Node(i);
+                FENode& node = m_surf.Node(i);
                 if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
+					int nid = m_surf.NodeIndex(i) + 1; // NOTE: the linear constraint set still assumes 1-based indexing!
                     vec3d nn = m_surf.NodeNormal(i);
                     FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, &fem);
-                    pLC->AddDOF(node.GetID(), dofs.GetDOF("x"), nn.x);
-                    pLC->AddDOF(node.GetID(), dofs.GetDOF("y"), nn.y);
-                    pLC->AddDOF(node.GetID(), dofs.GetDOF("z"), nn.z);
+                    pLC->AddDOF(nid, dofs.GetDOF("x"), nn.x);
+                    pLC->AddDOF(nid, dofs.GetDOF("y"), nn.y);
+                    pLC->AddDOF(nid, dofs.GetDOF("z"), nn.z);
                     // add the linear constraint to the system
                     m_lc.add(pLC);
                 }
@@ -84,13 +85,14 @@ void FEFixedNormalDisplacement::Activate()
         }
         else {
             for (int i = 0; i < m_surf.Nodes(); ++i) {
-                FENode node = m_surf.Node(i);
+                FENode& node = m_surf.Node(i);
                 if ((node.HasFlags(FENode::EXCLUDE) == false) && (node.m_rid == -1)) {
                     vec3d nn = m_surf.NodeNormal(i);
-                    FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, &fem);
-                    pLC->AddDOF(node.GetID(), dofs.GetDOF("sx"), nn.x);
-                    pLC->AddDOF(node.GetID(), dofs.GetDOF("sy"), nn.y);
-                    pLC->AddDOF(node.GetID(), dofs.GetDOF("sz"), nn.z);
+					int nid = m_surf.NodeIndex(i) + 1; // NOTE: the linear constraint set still assumes 1-based indexing!
+					FEAugLagLinearConstraint* pLC = fecore_alloc(FEAugLagLinearConstraint, &fem);
+                    pLC->AddDOF(nid, dofs.GetDOF("sx"), nn.x);
+                    pLC->AddDOF(nid, dofs.GetDOF("sy"), nn.y);
+                    pLC->AddDOF(nid, dofs.GetDOF("sz"), nn.z);
                     // add the linear constraint to the system
                     m_lc.add(pLC);
                 }

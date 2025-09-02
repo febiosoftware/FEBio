@@ -138,23 +138,31 @@ if(WIN32)
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* $ENV{HOMEPATH}/source/repos/*
         PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib" "cmbuild/lib/Release"
 		DOC "MMG library path")
+    find_library(MMGS_LIB mmgs 
+        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* $ENV{HOMEPATH}/source/repos/*
+        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib" "cmbuild/lib/Release"
+		DOC "MMGS library path")
 else()
 	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
         PATHS /opt/hypre* $ENV{HOME}/* $ENV{HOME}/*/*
         PATH_SUFFIXES "include" "include/mmg" "build" "build/include" "cbuild" "cbuild/include" "src" 
 		DOC "MMG include directory")
 	find_library(MMG_LIB mmg3d 
-        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
+        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/* $ENV{HOME}/local/x86_64/lib
         PATH_SUFFIXES "lib" "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
 		DOC "MMG library path")
+    find_library(MMGS_LIB mmgs 
+        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/* $ENV{HOME}/local/x86_64/lib
+        PATH_SUFFIXES "lib" "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
+		DOC "MMGS library path")
 endif()	
 
-if(MMG_INC AND MMG_LIB)		
+if(MMG_INC AND MMG_LIB AND MMGS_LIB)		
 	option(USE_MMG "Required for MMG use" ON)
-    mark_as_advanced(MMG_INC MMG_LIB)
+    mark_as_advanced(MMG_INC MMG_LIB MMGS_LIB)
 else()
 	option(USE_MMG "Required for MMG use" OFF)
-    mark_as_advanced(CLEAR MMG_INC MMG_LIB)
+    mark_as_advanced(CLEAR MMG_INC MMG_LIB MMGS_LIB)
 endif()
 
 # LEVMAR

@@ -36,11 +36,25 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEElemElemList::FEElemElemList(void)
 {
+	m_pmesh = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 FEElemElemList::~FEElemElemList(void)
 {
+}
+
+bool FEElemElemList::IsValid() const
+{
+	return (m_pmesh != nullptr);
+}
+
+void FEElemElemList::Clear()
+{
+	m_pmesh = nullptr;
+	m_ref.clear();
+	m_pel.clear();
+	m_peli.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -83,8 +97,7 @@ bool FEElemElemList::Create(FEMesh* pmesh)
 	Init();
 
 	// create the node element list
-	FENodeElemList NEL;
-	NEL.Create(m);
+	FENodeElemList& NEL = pmesh->NodeElementList();
 
 	// loop over all solid elements first
 	int en0[FEElement::MAX_NODES], en1[FEElement::MAX_NODES], n0, n1, M = 0;

@@ -80,11 +80,21 @@ bool FEBioApp::Init(int argc, char* argv[])
 
 	// read the configration file if specified
 	if (m_ops.szcnf[0])
+    {
+        fprintf(stdout, "Reading configuration file: %s\n", m_ops.szcnf);
+
 		if (febio::Configure(m_ops.szcnf, m_config) == false)
 		{
 			fprintf(stderr, "FATAL ERROR: An error occurred reading the configuration file.\n");
 			return false;
 		}
+    }
+    else
+    {
+        fprintf(stdout, "Starting without configuration file\n");
+    }
+
+    if (m_config.m_noutput != 0) fprintf(stdout, "Default linear solver: %s\n", febio::GetFECoreKernel()->GetLinearSolverType());
 
 	// read command line plugin if specified
 	if (m_ops.szimp[0] != 0)
@@ -150,7 +160,11 @@ int FEBioApp::RunModel()
 
 	// add console stream to log file
 	if (m_ops.bsilent == false)
+	{
 		fem.GetLogFile().SetLogStream(new ConsoleStream);
+		if (m_ops.bupdateTitle == false)
+			Console::GetHandle()->Deactivate(); // This doesn't really deactive the console, it just prevents the title from getting updated.
+	}
 	else
 		Console::GetHandle()->Deactivate();
 
@@ -169,22 +183,24 @@ int FEBioApp::RunModel()
 	fem.SetPlotFilename(m_ops.szplt);
 	fem.SetDumpFilename(m_ops.szdmp);
 
+	fem.SetAppendOnRestart(m_ops.bappendFiles);
+
+	if (!m_ops.boutputLog) fem.SetLogLevel(0);
+
 	// read the input file if specified
 	int nret = 0;
 	if (m_ops.szfile[0])
 	{
 		// read the input file
 		if (fem.Input(m_ops.szfile) == false) nret = 1;
-		else
-		{
-			// apply configuration overrides
-			ApplyConfig(fem);
-		}
 	}
 
 	// solve the model with the task and control file
 	if (nret == 0)
 	{
+		// apply configuration overrides
+		ApplyConfig(fem);
+
 		bool bret = febio::SolveModel(fem, m_ops.sztask, m_ops.szctrl);
 
 		nret = (bret ? 0 : 1);
@@ -237,6 +253,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	ops.bsplash = true;
 	ops.bsilent = false;
 	ops.binteractive = true;
+	ops.bappendFiles = true;
 
 	// these flags indicate whether the corresponding file name
 	// was defined on the command line. Otherwise, a default name will be generated.
@@ -260,6 +277,18 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		char szpath[512] = { 0 };
 		febio::get_app_path(szpath, 511);
 		snprintf(ops.szcnf, sizeof(ops.szcnf), "%sfebio.xml", szpath);
+
+        // if there is an febio.xml file next to the binary, we use it, otherwise
+        // we set the contig name to an empty string
+        FILE* file = fopen(ops.szcnf, "r");
+        if (file) 
+        {
+            fclose(file);
+        }
+        else
+        {
+            ops.szcnf[0] = 0;
+        }
 	}
 
 	// loop over the arguments
@@ -274,6 +303,10 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			strcpy(ops.sztask, "restart");
 			strcpy(ops.szctrl, argv[++i]);
 			ops.binteractive = false;
+		}
+		else if (strcmp(sz, "-noappend") == 0)
+		{
+			ops.bappendFiles = false;
 		}
 		else if (strcmp(sz, "-d") == 0)
 		{
@@ -366,6 +399,14 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			// no output to screen
 			ops.bsilent = true;
 		}
+		else if (strcmp(sz, "-no_title") == 0)
+		{
+			ops.bupdateTitle = false;
+		}
+		else if (strcmp(sz, "-no_log") == 0)
+		{
+			ops.boutputLog = false;
+		}
 		else if (strcmp(sz, "-cnf") == 0)	// obsolete: use -config instead
 		{
 			strcpy(ops.szcnf, argv[++i]);
@@ -423,7 +464,6 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 		{
 			brun = false;
 		}
-
 		else if (strcmp(sz, "-import") == 0)
 		{
 			if ((i < nargs - 1) && (argv[i+1][0] != '-'))
@@ -434,9 +474,19 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 				return false;
 			}
 		}
+		else if (strncmp(sz, "-output_negative_jacobians", 26) == 0)
+		{
+			int n = -1;
+			if (sz[26] == '=')
+			{
+				const char* szval = sz + 27;
+				n = atoi(szval);
+			}
+			NegativeJacobian::m_maxout = n;
+		}
 		else if (sz[0] == '-')
 		{
-			fprintf(stderr, "FATAL ERROR: Invalid command line option.\n");
+			fprintf(stderr, "FATAL ERROR: Invalid command line option '%s'.\n", sz);
 			return false;
 		}
 		else
@@ -458,7 +508,7 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 			}
 			else
 			{
-				fprintf(stderr, "FATAL ERROR: Invalid command line option\n");
+				fprintf(stderr, "FATAL ERROR: Invalid command line option '%s'\n", sz);
 				return false;
 			}
 		}

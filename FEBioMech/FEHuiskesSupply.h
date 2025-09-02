@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FERemodelingElasticMaterial.h"
+#include <FECore/FEMeshTopo.h>
 
 //-----------------------------------------------------------------------------
 // This class implements a material that has a constant solute supply
@@ -38,6 +39,9 @@ public:
 	//! constructor
 	FEHuiskesSupply(FEModel* pfem);
 	
+    //! initialization
+    bool Init() override;
+    
 	//! solid supply
 	double Supply(FEMaterialPoint& pt) override;
 	
@@ -50,7 +54,12 @@ public:
 public:
 	double	m_B;			//!< mass supply coefficient
 	double	m_k;			//!< specific strain energy at homeostasis
-	
+    double  m_D;            //!< characteristic sensor distance
+
+private:
+    std::vector<std::vector<int>>    m_EPL; //!< list of element proximity lists
+    FEMeshTopo      m_topo;                 //!< mesh topology;
+
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
 };

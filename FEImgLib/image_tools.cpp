@@ -6,8 +6,11 @@
 #include <mkl.h>
 #endif
 
-//-----------------------------------------------------------------------------
-void blur_image_2d(Image& trg, Image& src, float d)
+#ifdef HAVE_FFTW
+#include <fftw3.h>
+#endif // HAVE_FFTW
+
+void blur_avg_2d(Image& trg, Image& src, float d)
 {
 	if (d <= 0) { trg = src; return; }
 
@@ -53,8 +56,7 @@ void blur_image_2d(Image& trg, Image& src, float d)
 	}
 }
 
-//-----------------------------------------------------------------------------
-void blur_image(Image& trg, Image& src, float d)
+void blur_avg_3d(Image& trg, Image& src, float d)
 {
 	if (d <= 0) { trg = src; return; }
 
@@ -110,7 +112,7 @@ void blur_image(Image& trg, Image& src, float d)
 bool mkl_dft2(int nx, int ny, float* x, MKL_Complex8* c);
 bool mkl_idft2(int nx, int ny, MKL_Complex8* c, float* y);
 
-FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d)
+FEIMGLIB_API void mkl_blur_2d(Image& trg, Image& src, float d)
 {
 	int nx = src.width();
 	int ny = src.height();
@@ -119,6 +121,7 @@ FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d)
 	float* y = trg.data();
 
 	// for zero blur radius, we just copy the image
+	// SL: Why not copy i.e. if (d <= 0) { trg = src; return; }?
 	if (d <= 0.f)
 	{
 		for (int i = 0; i < nx * ny; ++i) y[i] = x[i];
@@ -156,7 +159,7 @@ FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d)
 // in fft.cpp
 bool mkl_dft3(int nx, int ny, int nz, float* x, MKL_Complex8* c);
 bool mkl_idft3(int nx, int ny, int nz, MKL_Complex8* c, float* y);
-FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d)
+FEIMGLIB_API void mkl_blur_3d(Image& trg, Image& src, float d)
 {
 	int nx = src.width();
 	int ny = src.height();
@@ -166,9 +169,10 @@ FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d)
 	float* y = trg.data();
 
 	// for zero blur radius, we just copy the image
+	// SL: Why not copy i.e. if (d <= 0) { trg = src; return; }?
 	if (d <= 0.f)
 	{
-		for (int i = 0; i < nx * ny*nz; ++i) y[i] = x[i];
+		for (int i = 0; i < nx * ny * nz; ++i) y[i] = x[i];
 		return;
 	}
 
@@ -203,6 +207,208 @@ FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d)
 	delete[] c;
 }
 #else // HAVE_MKL
-FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d) {}
-FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d) {}
+void mkl_blur_2d(Image& trg, Image& src, float d) {}
+void mkl_blur_3d(Image& trg, Image& src, float d) {}
 #endif // HAVE_MKL
+
+#ifdef HAVE_FFTW
+void create_gaussian_2d(double* kernel, int rows, int cols, double sigma) {
+	double sum = 0.0;
+	for (int y = 0; y < rows; ++y) {
+		int dy = (y <= rows / 2) ? y : (rows - y);  // wrap-around distance
+		for (int x = 0; x < cols; ++x) {
+			int dx = (x <= cols / 2) ? x : (cols - x);
+			double d2 = (double)(dx * dx + dy * dy);
+			double val = exp(-d2 / (2.0 * sigma * sigma));
+			kernel[y * cols + x] = val;
+			sum += val;
+		}
+	}
+	// Normalize
+	for (int i = 0; i < rows * cols; ++i) {
+		kernel[i] /= sum;
+	}
+}
+
+// Create 3D Gaussian kernel (centered)
+void create_gaussian_3d(double* kernel, int nz, int ny, int nx, double sigma) {
+	double sum = 0.0;
+	for (int z = 0; z < nz; ++z) {
+		int dz = (z <= nz / 2) ? z : (nz - z);  // wrap-around distance
+		for (int y = 0; y < ny; ++y) {
+			int dy = (y <= ny / 2) ? y : (ny - y);
+			for (int x = 0; x < nx; ++x) {
+				int dx = (x <= nx / 2) ? x : (nx - x);
+				double d2 = (double)(dx * dx + dy * dy + dz * dz);
+				double val = exp(-d2 / (2.0 * sigma * sigma));
+				kernel[(z * ny + y) * nx + x] = val;
+				sum += val;
+			}
+		}
+	}
+	// Normalize
+	for (int i = 0; i < nx * ny * nz; ++i) {
+		kernel[i] /= sum;
+	}
+}
+
+void fftw_blur_2d(Image& trg, Image& src, float d)
+{
+	int width = src.width();
+	int height = src.height();
+
+	float* img_data = src.data();
+	double sigma = d;
+
+	// Allocate FFTW arrays
+	double* img_spatial = (double*) fftw_malloc(sizeof(double) * width * height);
+	double* kernel_spatial = (double*) fftw_malloc(sizeof(double) * width * height);
+	fftw_complex* img_freq = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * height * (width / 2 + 1));
+	fftw_complex* kernel_freq = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * height * (width / 2 + 1));
+
+	// Copy image to double buffer
+	for (int i = 0; i < width * height; ++i) {
+		img_spatial[i] = (double)img_data[i];
+	}
+
+	// Create Gaussian kernel
+	create_gaussian_2d(kernel_spatial, height, width, sigma);
+
+	// Create FFT plans
+	fftw_plan plan_fwd_img = fftw_plan_dft_r2c_2d(height, width, img_spatial, img_freq, FFTW_ESTIMATE);
+	fftw_plan plan_fwd_kernel = fftw_plan_dft_r2c_2d(height, width, kernel_spatial, kernel_freq, FFTW_ESTIMATE);
+	fftw_plan plan_inv = fftw_plan_dft_c2r_2d(height, width, img_freq, img_spatial, FFTW_ESTIMATE);
+
+	// Forward FFTs
+	fftw_execute(plan_fwd_img);
+	fftw_execute(plan_fwd_kernel);
+
+	// Multiply in frequency domain
+	int nfreq = height * (width / 2 + 1);
+	for (int i = 0; i < nfreq; ++i) {
+		double a = img_freq[i][0], b = img_freq[i][1];
+		double c = kernel_freq[i][0], d = kernel_freq[i][1];
+		img_freq[i][0] = a * c - b * d;
+		img_freq[i][1] = a * d + b * c;
+	}
+
+	// Inverse FFT
+	fftw_execute(plan_inv);
+
+	// Normalize and convert back to float
+	float* out_data = trg.data();
+	for (int i = 0; i < width * height; ++i) {
+		double val = img_spatial[i] / (width * height);
+		out_data[i] = (float)(val);
+	}
+
+	// Cleanup
+	fftw_destroy_plan(plan_fwd_img);
+	fftw_destroy_plan(plan_fwd_kernel);
+	fftw_destroy_plan(plan_inv);
+	fftw_free(img_spatial);
+	fftw_free(kernel_spatial);
+	fftw_free(img_freq);
+	fftw_free(kernel_freq);
+}
+
+void fftw_blur_3d(Image& trg, Image& src, float d) 
+{
+	int nx = src.width();
+	int ny = src.height();
+	int nz = src.depth();
+
+	double sigma = d;
+	float* img_data = src.data();
+
+	// Allocate FFTW buffers
+	double* img_spatial = (double*)fftw_malloc(sizeof(double) * nx* ny*nz);
+	double* kernel_spatial = (double*)fftw_malloc(sizeof(double) * nx * ny * nz);
+	fftw_complex* img_freq = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * nz * ny * (nx / 2 + 1));
+	fftw_complex* kernel_freq = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * nz * ny * (nx / 2 + 1));
+
+	// Copy image to double buffer
+	for (int i = 0; i < nx*ny*nz; ++i) {
+		img_spatial[i] = (double)img_data[i];
+	}
+
+	// Create Gaussian kernel
+	create_gaussian_3d(kernel_spatial, nz, ny, nx, sigma);
+
+	// Plans
+	fftw_plan plan_fwd_img = fftw_plan_dft_r2c_3d(nz, ny, nx, img_spatial, img_freq, FFTW_ESTIMATE);
+	fftw_plan plan_fwd_kernel = fftw_plan_dft_r2c_3d(nz, ny, nx, kernel_spatial, kernel_freq, FFTW_ESTIMATE);
+	fftw_plan plan_inv = fftw_plan_dft_c2r_3d(nz, ny, nx, img_freq, img_spatial, FFTW_ESTIMATE);
+
+	// Forward FFTs
+	fftw_execute(plan_fwd_img);
+	fftw_execute(plan_fwd_kernel);
+
+	// Multiply in frequency domain
+	int nfreq = nz * ny * (nx / 2 + 1);
+	for (int i = 0; i < nfreq; ++i) {
+		double a = img_freq[i][0];
+		double b = img_freq[i][1];
+		double c = kernel_freq[i][0];
+		double d = kernel_freq[i][1];
+		img_freq[i][0] = a * c - b * d;
+		img_freq[i][1] = a * d + b * c;
+	}
+
+	// Inverse FFT
+	fftw_execute(plan_inv);
+
+	// Normalize and convert back to float
+	float* out_data = trg.data();
+	double norm_factor = (double)(nx * ny * nz);
+	for (int i = 0; i < nx * ny * nz; ++i) {
+		double val = img_spatial[i] / norm_factor;
+		out_data[i] = (float)(val);
+	}
+
+	// Cleanup
+	fftw_destroy_plan(plan_fwd_img);
+	fftw_destroy_plan(plan_fwd_kernel);
+	fftw_destroy_plan(plan_inv);
+	fftw_free(img_spatial);
+	fftw_free(kernel_spatial);
+	fftw_free(img_freq);
+	fftw_free(kernel_freq);
+}
+
+#else
+void fftw_blur_2d(Image& trg, Image& src, float d) {}
+void fftw_blur_3d(Image& trg, Image& src, float d) {}
+#endif // HAVE_FFTW
+
+void blur_image_2d(Image& trg, Image& src, float d, BlurMethod blurMethod)
+{
+	switch (blurMethod)
+	{
+	case BlurMethod::BLUR_AVERAGE: blur_avg_2d(trg, src, d); break;
+	case BlurMethod::BLUR_FFT: 
+#ifdef HAVE_FFTW
+		fftw_blur_2d(trg, src, d); break;
+#elif HAVE_MKL
+		mkl_blur_2d(trg, src, d); break;
+#endif
+	default:
+		break;
+	}
+}
+
+void blur_image_3d(Image& trg, Image& src, float d, BlurMethod blurMethod)
+{
+	switch (blurMethod)
+	{
+	case BlurMethod::BLUR_AVERAGE: blur_avg_3d(trg, src, d); break;
+	case BlurMethod::BLUR_FFT:
+#ifdef HAVE_FFTW
+		fftw_blur_3d(trg, src, d); break;
+#elif HAVE_MKL
+		mkl_blur_3d(trg, src, d); break;
+#endif
+	default:
+		break;
+	}
+}

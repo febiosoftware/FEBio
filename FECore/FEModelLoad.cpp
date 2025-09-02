@@ -53,6 +53,16 @@ void FEModelLoad::PrepStep()
 
 }
 
+Matrix_Type FEModelLoad::PreferredMatrixType()
+{
+	FEParam* p = GetParameter("symmetric_stiffness");
+	if (p && (p->type() == FE_PARAM_BOOL) && !p->value<bool>())
+	{
+		return REAL_UNSYMMETRIC;
+	}
+	return REAL_SYMMETRIC;
+}
+
 //-----------------------------------------------------------------------------
 void FEModelLoad::LoadVector(FEGlobalVector& R)
 {

@@ -74,7 +74,7 @@ void FEPressureStabilization::Activate()
         FESurfaceElement& el = ps.Element(i);
         
         // find the element this face belongs to
-        FEElement* pe = el.m_elem[0];
+        FEElement* pe = el.m_elem[0].pe;
         assert(pe);
         
         // calculate time constant
@@ -93,7 +93,7 @@ double FEPressureStabilization::TimeConstant(FESurfaceElement& el, FESurface& s)
     double tau = 0;
     
     // get the element this surface element belongs to
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe)
     {
         // evaluate element surface normal at parametric center
@@ -128,7 +128,7 @@ double FEPressureStabilization::TimeConstant(FESurfaceElement& el, FESurface& s)
             ept.m_s.zero();
             
             // get the tangent (stiffness) and it inverse (compliance) at this point
-            tens4ds C = biph->Tangent(mp);
+            tens4dmm C = biph->Tangent(mp);
             double Ha = n*(vdotTdotv(n, C, n)*n);
             
             // if this is a poroelastic element, then get the permeability tensor

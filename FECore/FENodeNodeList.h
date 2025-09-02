@@ -32,6 +32,7 @@ SOFTWARE.*/
 
 class FEMesh;
 class FEDomain;
+class FESurface;
 
 //-----------------------------------------------------------------------------
 //! The FENodeNodeList class is a utility class that determines for each node 
@@ -54,6 +55,9 @@ public:
 
 	//! create the node-node list for a domain
 	void Create(FEDomain& dom);
+
+	//! create the node-node list for a surface
+	void Create(FESurface& surf);
 
 	int Size() const { return (int) m_nval.size(); }
 

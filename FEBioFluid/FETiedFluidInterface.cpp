@@ -356,7 +356,7 @@ double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFlu
     n.unit();
     
     // get the element this surface element belongs to
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == 0) return 0.0;
     
     // get the material
@@ -716,7 +716,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
         {
             // get the next element
             FESurfaceElement& se = ss.Element(i);
-            FEElement* sse = se.m_elem[0];
+            FEElement* sse = se.m_elem[0].pe;
 
             // get nr of nodes and integration points
             int nseln = se.Nodes();

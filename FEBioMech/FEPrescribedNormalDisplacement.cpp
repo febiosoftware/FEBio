@@ -89,9 +89,9 @@ void FEPrescribedNormalDisplacement::Activate()
 					m_normals[i0] += nu;
 				}
 			}
-			else if (nn == 6)
+			else if ((nn == 6) || (nn == 7))
 			{
-				vec3d normals[6];
+				vec3d normals[7];
 
 				// corner nodes
 				for (int n = 0; n<3; ++n)
@@ -119,8 +119,14 @@ void FEPrescribedNormalDisplacement::Activate()
 					normals[n0] = (normals[n1] + normals[n2]) * 0.5;
 				}
 
-				for (int n=0; n<6; ++n) m_normals[el.m_lnode[n]] += normals[n];
+				if (nn == 7)
+				{
+					normals[6] = (normals[0] + normals[1] + normals[2]) / 3.0;
+				}
+
+				for (int n=0; n<nn; ++n) m_normals[el.m_lnode[n]] += normals[n];
 			}
+			else { assert(false); }
 		}
 
 		for (int i = 0; i<N; ++i)

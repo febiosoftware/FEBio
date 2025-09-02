@@ -42,6 +42,260 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   4.10   7/23/2025
+
+===========================================================================
+
+New Features:
+* Added plot variables that calculate total linear momentum, angular momentum, and energy for a solid domain.
+* Added plot variable for nodal shell director
+* Added range check for E parameter of FE2DFiberNeoHookean.
+* Added calculation of Almansi strain for elastic material points. Added plot variables for Almansi strain, left Cauchy-Green and right Cauchy-Green tensors
+* Added isotropic Hencky elastic model
+* Added tension_only flag to fiber-pow-linear
+* Added command line option to suppress log file output.
+* Added calculation of helical axis (instantaneous and finite) for rigid bodies and rigid connectors, and created log variables for output to file.
+* Added command line option to prevent shell title updates.
+* Added axial body force.
+* Implemented radial body load.
+* Added option to contact potential to use a higher-order quadrature rule. This will use a new QUAD4G16 for quadrilateral elements. 
+* Added "rigid kinematics" initial condition that sets initial velocity based on rigid body kinematics.
+* Added quick restart diagnostic.
+* Implementation of the slide-line and tied-line constraint.
+* Added PK1 stress components to logfile output, as Pxx, Pxy, etc.
+* Added log file nodal data variables for effective fluid pressure pe and effective solute concentrations ce1 to ce8
+* Added mapping to FEDiffAlbroIso, DiffConstOrtho and DiffRefIso diffusivity types
+* Added mapping capability for FEDiffConstIso diffusivity type
+* Added "sbm_referential_apparent_density" log variable.
+
+
+Improvements:
+* Fixed some formatting issues in the FEBio EULA.
+* Added documentation for initial displacement condition
+* Added option to specify initial displacements
+* Added description of pressure_model in Uncoupled elastic solids. Improved description of enforcement of three-field-solid formulation.
+* Updated User Manual to include reactive fatigue materials
+* Added Doxygen comments to some core classes
+* Modules registered by plugins are now unregistered when the plugins are unloaded.
+* Improved performance of SPR projection by storing reusable data.
+* For mixtures, the density is now defined by the top-level parameter.
+* Changed type of perm parameters from double to FEParamDouble.
+* Added option to tag a parameter as obsolete. Now using this for unused biphasic and multiphasic solver parameters.
+* Made sure time increment is initialized before model initialization to avoid division by zero.
+* Modified kinematic growth formulation so that it does not need to permanently overwrite elastic material point data.
+* Fixed some logo issues in the documentation
+
+
+Buf fixes:
+* Fixed issue with validation when not all properties are initialized yet. 
+* Fixed issue with reading load curves from restart input.
+* Fixed bug in building matrix profile for tied-elastic interface.
+* Fixed problem with initialization of biphasic materials.
+* Unloading plugins on Linux and macOS now actually unloads the library (rather than doing nothing).
+* Fixed bug in evaluation of stiffness matrix for slide-line.
+* Changes to stiffness matrix diagnostic to better handle prescribed dofs.
+* Fixed issue with reassigning material IDs after mmg remeshing.
+* Fixed issue with serialization of array of FEParamDouble. Removed unnecessary Serialize of EFDMoonyRivlin.
+* Fixed potential crash in FBS when an analysis is allocated without an active module.
+* Reaction forces are not accumulated anymore in residual vector for rigid nodes. (Otherwise they are double-counted.)
+
+
+
+===========================================================================
+
+ R E L E A S E   4.9   3/24/2025
+
+===========================================================================
+
+New Features:
+* The "fiber ODF" material was added, which is a new Continuous Fiber Distribution constitutive model. It uses a non-parametric orientation distribution function that is defined by a series of spherical harmonic coefficients. This allows for the definition of extremely detailed ODFs of any shape.
+* Added "edge contact gap" plot variable which plots gap data on the edge.
+* Added log output variables for fluid max shear stress and fluid principal stresses
+* Added secant stress, secant tangent, and secant permeability tangent calculations to biphasic solid and biphasic shell domains
+* Added plot variable for nodal shell displacements
+* Added flip_secondary and gap_offset parameters to sticky contact. Fixed some issues with contact initiation.
+* Added filter option to contact gap, contact pressure, and contact traction plot variables.
+* Added progress and relative error measure to stiffness diagnostic.
+* Added noappend command option to prevent appending of plot file when restarting.
+* Added "SPR relative volume" plot variable.
+
+
+Improvements:
+* Editing pass to FEBio user manual (fix typos, removed obsolete info, added missing info.)
+* Now exporting FEIncompNeoHookean from febiomech dll. (In case plugins need it.)
+* Added documentation for FiberODF material [skip ci]
+* Made PlotFile::AddVariable public to make it easier for third party code to create plotfiles.
+* Updated reaction force log variables to be more consistent with "reaction forces" plot variable.
+* Added flags to tied-elastic to flip primary and secondary surfaces.
+* Made g0 parameter of visco-elastic material mappable.
+* Added check for matrix offset in pardiso solver (in case the sparse matrix was allocated externally).
+* Made perm parameter of "perm-holmes-mow" mappable.
+* Added units of length for length parameters in Surface Attraction Body Force
+* Added some additional parallelization to contact potential.
+* Updated User Manual to includee fluid max shear stress and fluid principal stresses as log output variables
+* Added description of Wall Shear Stress for fluids, in Theory Manual
+* All OSes now use MMG 5.7.3
+* Added helper function to levmar in order to avoid the need to link levmar (and blas) into FEBio Studio.
+* Updated nodal stress and nodal strain plot variables to exclude new shells.  Updated top/bottom stress/strain and top/bottom nodal stress/nodal strain to only include new shell elements. Updated calculation of nodal projection for quad8 and tri6 shells.
+* Updated shell top stress and shell bottom stress plot variables to work with quadratic shell elements.
+* Modified shell top stress/strain and shell bottom stress/strain to display extrapolated integration point values instead of top or bottom integration point averages
+* Modified plot variables for shell nodal stresses to say shell top nodal stress and shell bottom nodal stress. Added plot variables for shell top stress and shell bottom stress.
+* Added secant_stress and secant_tangent parameters to solid-elastic domain.
+* Added support for tri7 surface elements to "normal displacement".
+* Implemented surface constraint member function to choose whether a nodal integration rule should be installed on the surface. The fixed normal displacement now sets a non-nodal integration rule.
+* Added option to check for edge-face intersections in contact potential.
+* Added function for SPR values of vector<double> types, updated tet10 projection order default value
+
+
+Bug Fixes:
+* Fixed issue with processing empty Module tag.
+* Linear constraints no longer assume node IDs start at 1.
+* Fixed small issue with resetting a timer.
+* Fixed issue with discrete element ID numbers.
+* Fixed bug caused when trying to compress plot files when compiling without zlib
+* Fixed bug in constructor of MKL solver if MKL was not used. Now not registering mkl solvers if mkl is not used.
+* Fixed destructor of PardisoProjectSolver to avoid error message at end of run
+* Fixed issue with parsing elem_type attribute of solid domain.
+* Fixed issue with contact potential when used with rigid bodies.
+* Fixed issue with the normal displacement constraint when node IDs don't start at 1.
+* Fixed problem with exporting fiber components to log file.
+* Fixed bug in FEPlotMixtureFluidFlowRate plot variable.
+* Fixed calculation of yielded bond fraction in reactive plasticity materials to account for rigid body rotations.
+* Updated damage criterion for von Mises stress to produce non-singular tangent at stress origin.
+
+
+
+===========================================================================
+
+ R E L E A S E   4.8   11/7/2024
+
+===========================================================================
+
+New Features:
+* Added new "preferred" option for matrix format. With this option, FEBio will select the matrix format depending on the analysis type and model components. 
+* Added an "element data" criterion for mesh adaptors. This allows users to use any of the element log data fields in mesh adaptors. 
+* Added new feature to use math expressions in element log data.
+* Implemented support "pardiso_64" linear solver that can be used with really large problems ( > 2e9 non-zero elements in stiffness matrix).
+* Added "msglvl" option  to produce additional output from pardiso and mkl_dss linear solvers.
+* Implemented "surface-to-surface vector" element data map generator.
+* Modified implementation of cubic-CLE and ortho-CLE materials to hew more closely to theoretical formulation
+* Added "max contact gap" log variable.
+* Added additional damage log output variables.
+* Added log variables for exporting damage components of nested materials.
+* Added option to "moving frame" load to specify the angular velocity in the moving frame instead of the fixed frame.
+* Added nodal_target_force load, which can be used to ramp down reaction forces produced by prescribed displacements.
+* Added "relative volume" mesh adaptor criterion
+* Added option to specify a filter function for the target objective.
+* Added ls_check_jacobians control parameter for toggling modified line search that catches negative jacobians.
+* Added a "contact gap" mesh adaptor criterion.
+* Added "SPR infinitesimal strain" plot variable.
+* Added "normalized internal energy" domain log variable.
+* Added log output variable for total deformation gradient (includes effect of prestrain if present.)
+
+Improvements:
+* Changed how element value is calculated from material point values in FEMeshAdaptorCriterion.
+* FEBioModel now also tracks stats per step.
+* Now printing warning if mass of rigid body is zero.
+* Modified timers so that they can record both inclusive (i.e. total) time and exclusive time. Added some additional timers.
+* Some changes to the update and linsolve timers to get more accurate timings.
+* Added additional output parameters for "moving frame" loads.
+* Made some minor performance enhancements for the explicit solver.
+* Implemented better way for getting parameter values from the model.
+* Modified MMG remesh so it can remesh internal surfaces.
+* Adaptor criterion work on elements instead of on integration points.
+* Modified definition of contact material point in several sliding and tied interfaced to facilitate plotting of contact gap and pressure gap in tied-biphasic and tied-multiphasic interfaces
+* Now storing parts lists defined in input file as domain lists on the mesh. Added new surface reconstruction algorithm for surfaces defined via part lists. 
+* Updated the node-distance constraint so it can be used to enforce an absolute distance.
+* Added units to some parameters in FEHuiskeSupply and FERemodelingMaterial
+* Removed create handler mechanism (This has been moved to FEBio Studio since that's where it's actually used.)
+* Users can now set the max nr. of negative jacobians reported using the output_negative_jacobians flag.
+* Added missing description in long name of FEBondRelaxationParkDistortion
+* Modified FEHuiskesSupply to include characteristic distance from sensor cells, for consistency with FEHuiskesReactionRate.
+* Modified initialization of FEChemicalReaction to initialize FEReactionSpeciesRef objects, and to initialize forward and reverse reactions.  Modified FEReaction initialization to remove initialization of base class. These changes fix out-of-order initializations that became problematic in FEReactionRateHuiskes and similar classes
+* Updated Huiskes reaction rate to include characteristic distance from sensor cells
+* Modified error reporting for the perm-ref-ortho permeability calculation so it only reports the error a limited number of times.
+* Added command line option to set the output_negative_jacobian flag.
+* Added plot file option to choose whether to export eroded elements or not.
+* Implemented algorithm for growing surfaces when underlying elements are eroded.
+* Added explicit check for zero shell thicknesses.
+* Updated biphasic, biphasic-solute and triphasic materials to include local material axes, just like multiphasic materials
+* Fixed issue when Surface section is empty. Added some additional mesh validation. Warnings are now produced if nodesets, surfaces, etc. are empty.
+* Improperly formatted step section will now throw exception.
+* Added warning to tied interfaces when no contact pairs were found.
+* Updated default solver strategy for biphasic, biphasic-solute and multiphasic modules to Broyden
+* Changed default settings for biphasic, biphasic-solute and multiphasic analyses to use max_ups=0 (full Newton) and max_refs=25
+* Updated FESolventSupplyStarling to use FEParamDouble instead of double material parameters
+* Added general growth option for kinematic growth and updated documentation.
+* Made domain attribute optional for domain_data.
+* Modified warning message for experimental features.
+* Load controllers are now given a default name if no name is provided.
+* Made sure that must points are written to plotfile even when plot stride is not one.
+* Addressed some performance issues in FEOctree.
+* Element neighbor list is now stored on the mesh so it does not need to be recalculated repeatedly.
+* Minor fixes to Accelerate solver for Apple computers. Documented Accelerate solver in User Manual
+* Made sure plugin is unloaded when its interface is not compatible.
+* Refactored binarySearch function out of PointCurve class.
+* Modified calculation of second derivatives of elastic fluid pressure with respect to temperature and volume to use first derivative calculation, since first derivative may employ smoothed functions
+* Modified real vapor models to use stretched temperature scale for more efficient point interpolation
+* Added descriptions of timings reported at the end of a job.
+* Addressed some problems reading old 2.5 files.
+
+Bug Fixes:
+* Fixed bug in reactive viscoelastic materials (unconstrained and uncoupled) to correctly accommodate viscoelastic fibrous materials that don't sustain stress in compression.  This affects reactive viscoelastic fibrous materials subjected to tension and compression.
+* Fixed bug in MKLDSSolver which prevented compilation of FEBio without MKL library
+* Fixed issue with merging vector data maps.
+* Fixed several issues related to restarts when using rigid components or when using dump=2 option.
+* Fixed some issues related to erosion in shells and contact.
+* Added omp critical section around logging in FEPermHolmesMow to avoid potential crash when run with multiple threads.
+* Fixed small bug in evaluation of elastic tangent in cubic-CLE and ortho-CLE materials
+* Fixed issue with gap tolerance in sliding-node-on-facet.
+* Fixed bug in processing expression string for FEMathValueVec3.
+* Fixed potential crash when using uninitialized FEMappedValueMat3d.
+* Fixed bug that incorrectly set the initial energy norm.
+* Fixed bug in discrete domain initialization.
+* Fixed issue that stress was not reported for von-Mises plasticity material.
+* Fixed bug in FECoreBase::GetParameterValue.
+* Fixed issue with reconstructing global nodeset.
+* Fixed issue with including materials from multiple include files.
+* Fixed issues with incorrect use of material point classes.
+* Fixed some memory leaks.
+* Fixed problem with evaluating multi-variable functions.
+* Fixed duplicated surface facet issue with surface erosion.
+* Moved ctol from biphasic-solute solver to biphasic solver (but set it to 0 in biphasic solver). This is needed to correctly pass ctol as a parameter in biphasic-solute analyses).
+* Fixed segfault caused by missing return values
+* Updated initialization of FEFluidSupplyStarling and FESolventSupplyStarling and their parent classes. Added FERemodelingSolid class to model reactive solid mixtures (initial implementation).
+* Fixed bug in initialization of FEGrowthTensor
+* Fixed issue with creating rigid bodies with shells on solids.
+* Added missing support for evaluating functions with variable number of parameters.
+* Fixed bug in FEElasticMixture::UpdateSpecializedMaterialPoints.
+* Added serialization for edge-to-surface sliding contact.
+* Fixed bug in evaluation of total deformation gradient log variable.
+* Fixed bug in export of global variables.
+* Fixed crash with FEPlotEffectiveElasticity.
+* Added function to FEMesh to extract element's zero-based index and used that to fix issue with domain boundary calculation.
+* Fixed problem with extracting boundary from mesh when element IDs don't start from 1.
+* Fixed bug in real vapor calculation of q.
+* Fixed bug in composing FEException message.
+* Added missing cases for FE_VEC3D and FE_MAT3D in FEPlotMeshData::SetFilter.
+
+Documentation:
+* Fixed comments in code snippet of plugin registration documentation.
+* Fixed typo in uncoupled material section.
+* Updated some documentation of linear solvers
+* Fixed explanation that shell_normal_nodal is defined in the ShellDomain section, not the Control section.
+* Added note on auto-contact to user manual.
+* Updated documentation on this node-distance constraint.
+* Updated Theory and User manuals to reflect updated features of the Huiskes reaction rate and clarify material specifications and potential pitfalls
+* Minor updates to mesh adaptor documentation.
+* Updated documentation on plot data plugins.
+* Updated documentation on optimization
+* Replaced mrl.sci.utah.edu links with weisslabutah.org links in manuals.
+* Replaced pdf figures with pngs. Updated theory manual accordingly.
+* Documented Holmes-Mow elastic solid in the limit as beta goes to zero
+
+
+===========================================================================
+
  R E L E A S E   4.7   6/6/2024
 
 ===========================================================================

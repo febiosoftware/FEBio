@@ -50,6 +50,20 @@ enum FEParamRange {
 };
 
 //-----------------------------------------------------------------------------
+// helper class for defining ranges
+struct RANGE
+{
+public:
+	FEParamRange	m_rt;
+	double			m_fmin;
+	double			m_fmax;
+public:
+	RANGE(FEParamRange rt) { m_rt = rt; m_fmin = m_fmax = 0.0; }
+	RANGE(FEParamRange rt, double fval) { m_rt = rt; m_fmin = fval; m_fmax = 0.0; }
+	RANGE(FEParamRange rt, double fmin, double fmax) { m_rt = rt; m_fmin = fmin; m_fmax = fmax; }
+};
+
+//-----------------------------------------------------------------------------
 //! Abstract base class for parameter validators. 
 class FECORE_API FEParamValidator
 {
@@ -90,6 +104,8 @@ public:
 
 	void Serialize(DumpStream& ar);
 
+	RANGE GetRange() { return { (FEParamRange)m_rng, (double)m_nmin, (double)m_nmax }; }
+
 private:
 	int		m_rng;
 	int		m_nmin;
@@ -107,6 +123,8 @@ public:
 	bool is_valid(const FEParam& p) const;
 
 	void Serialize(DumpStream& ar);
+
+	RANGE GetRange() { return { (FEParamRange)m_rng, m_fmin, m_fmax }; }
 
 private:
 	int			m_rng;
@@ -126,26 +144,14 @@ public:
 
 	void Serialize(DumpStream& ar);
 
+	RANGE GetRange() { return { (FEParamRange)m_rng, m_fmin, m_fmax }; }
+
 private:
 	int			m_rng;
 	double		m_fmin;
 	double		m_fmax;
 };
 
-
-//-----------------------------------------------------------------------------
-// helper class for defining ranges
-class RANGE
-{
-public:
-	FEParamRange	m_rt;
-	double			m_fmin;
-	double			m_fmax;
-public:
-	RANGE(FEParamRange rt) { m_rt = rt; m_fmin = m_fmax = 0.0; }
-	RANGE(FEParamRange rt, double fval) { m_rt = rt; m_fmin = fval; m_fmax = 0.0; }
-	RANGE(FEParamRange rt, double fmin, double fmax) { m_rt = rt; m_fmin = fmin; m_fmax = fmax; }
-};
 
 inline RANGE FE_RANGE_DONT_CARE() { return RANGE(FE_DONT_CARE); }
 inline RANGE FE_RANGE_GREATER         (double f) { return RANGE(FE_GREATER         , f); }

@@ -56,22 +56,7 @@ BEGIN_FECORE_CLASS(FETiedBiphasicInterface, FEContactInterface)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FETiedBiphasicSurface::Data::Data()
-{
-    m_Gap = vec3d(0,0,0);
-    m_dg = vec3d(0,0,0);
-    m_nu = vec3d(0,0,0);
-    m_rs = vec2d(0,0);
-    m_Lmd = vec3d(0,0,0);
-    m_tr = vec3d(0,0,0);
-    m_Lmp  = 0.0;
-    m_epsn = 1.0;
-    m_epsp = 1.0;
-    m_pg   = 0.0;
-}
-
-//-----------------------------------------------------------------------------
-void FETiedBiphasicSurface::Data::Serialize(DumpStream& ar)
+void FETiedBiphasicContactPoint::Serialize(DumpStream& ar)
 {
 	FEBiphasicContactPoint::Serialize(ar);
 	ar & m_Gap;
@@ -97,7 +82,7 @@ FETiedBiphasicSurface::FETiedBiphasicSurface(FEModel* pfem) : FEBiphasicContactS
 //! create material point data
 FEMaterialPoint* FETiedBiphasicSurface::CreateMaterialPoint()
 {
-	return new FETiedBiphasicSurface::Data;
+	return new FETiedBiphasicContactPoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -117,7 +102,7 @@ bool FETiedBiphasicSurface::Init()
 		FESurfaceElement& se = Element(i);
 		
 		// get the element this surface element belongs to
-		FEElement* pe = se.m_elem[0];
+		FEElement* pe = se.m_elem[0].pe;
 		if (pe)
 		{
 			// get the material
@@ -189,7 +174,7 @@ void FETiedBiphasicSurface::GetVectorGap(int nface, vec3d& pg)
     pg = vec3d(0,0,0);
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FETiedBiphasicContactPoint& data = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pg += data.m_dg;
 	}
     pg /= ni;
@@ -203,7 +188,7 @@ void FETiedBiphasicSurface::GetContactTraction(int nface, vec3d& pt)
     pt = vec3d(0,0,0);
 	for (int k = 0; k < ni; ++k)
 	{
-		Data& data = static_cast<Data&>(*el.GetMaterialPoint(k));
+        FETiedBiphasicContactPoint& data = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(k));
 		pt += data.m_tr;
 	}
     pt /= ni;
@@ -293,7 +278,7 @@ void FETiedBiphasicInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 			int* sn = &se.m_node[0];
 			for (k=0; k<nint; ++k, ++ni)
 			{
-				FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*se.GetMaterialPoint(k));
+                FETiedBiphasicContactPoint& pt = static_cast<FETiedBiphasicContactPoint&>(*se.GetMaterialPoint(k));
 				FESurfaceElement* pe = pt.m_pme;
 				if (pe != 0)
 				{
@@ -381,7 +366,7 @@ void FETiedBiphasicInterface::CalcAutoPenalty(FETiedBiphasicSurface& s)
 		int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-			FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedBiphasicContactPoint& pt = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsn = eps;
         }
 	}
@@ -403,7 +388,7 @@ void FETiedBiphasicInterface::CalcAutoPressurePenalty(FETiedBiphasicSurface& s)
 		int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-			FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedBiphasicContactPoint& pt = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsp = eps;
         }
 	}
@@ -422,7 +407,7 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 	n.unit();
 	
 	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0];
+	FEElement* pe = el.m_elem[0].pe;
 	if (pe == 0) return 0.0;
 
 	// get the material
@@ -498,7 +483,7 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 			// find the intersection point with the secondary surface
 			pme = np.Project2(r, nu, rs);
 			
-			FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedBiphasicContactPoint& pt = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_pme = pme;
 			pt.m_rs[0] = rs[0];
 			pt.m_rs[1] = rs[1];
@@ -547,7 +532,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 		
 		for (int j=0; j<nint; ++j)
 		{
-			FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedBiphasicContactPoint& pt = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 
 			// calculate the global position of the integration point
 			r = ss.Local2Global(el, j);
@@ -568,6 +553,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 				// calculate the gap function
 				vec3d g = q - r;
 				pt.m_dg = g - pt.m_Gap;
+//                pt.m_gap = pt.m_dg.unit();
 				
 				// calculate the pressure gap function
 				bool mporo = ms.m_poro[pme->m_lid];
@@ -582,6 +568,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 			{
 				// the node is not tied
 				pt.m_dg = vec3d(0,0,0);
+//                pt.m_gap = 0;
 				if (sporo) pt.m_pg = 0;
 			}
 		}
@@ -659,7 +646,7 @@ void FETiedBiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 			// note that we are integrating over the current surface
 			for (j=0; j<nint; ++j)
 			{
-				FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*se.GetMaterialPoint(j));
+                FETiedBiphasicContactPoint& pt = static_cast<FETiedBiphasicContactPoint&>(*se.GetMaterialPoint(j));
 
 				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
@@ -797,7 +784,7 @@ void FETiedBiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 	FEMesh* pm = m_ss.GetMesh();
 	
 	// see how many reformations we've had to do so far
-	int nref = LS.GetSolver()->m_nref;
+	int nref = GetSolver()->m_nref;
 	
 	// set higher order stiffness mutliplier
 	// NOTE: this algrotihm doesn't really need this
@@ -868,7 +855,7 @@ void FETiedBiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 			// loop over all integration points
 			for (j=0; j<nint; ++j)
 			{
-				FETiedBiphasicSurface::Data& pt = static_cast<FETiedBiphasicSurface::Data&>(*se.GetMaterialPoint(j));
+                FETiedBiphasicContactPoint& pt = static_cast<FETiedBiphasicContactPoint&>(*se.GetMaterialPoint(j));
 
 				// get the secondary surface element
 				FESurfaceElement* pme = pt.m_pme;
@@ -1226,7 +1213,7 @@ bool FETiedBiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ss.Element(i);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-			FETiedBiphasicSurface::Data& ds = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedBiphasicContactPoint& ds = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			normL0 += ds.m_Lmd*ds.m_Lmd;
         }
     }
@@ -1235,7 +1222,7 @@ bool FETiedBiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ms.Element(i);
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
-			FETiedBiphasicSurface::Data& dm = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedBiphasicContactPoint& dm = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			normL0 += dm.m_Lmd*dm.m_Lmd;
         }
     }
@@ -1252,7 +1239,7 @@ bool FETiedBiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ss.Element(i);
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
-			FETiedBiphasicSurface::Data& ds = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedBiphasicContactPoint& ds = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on primary surface
             eps = m_epsn*ds.m_epsn;
@@ -1280,7 +1267,7 @@ bool FETiedBiphasicInterface::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ms.Element(i);
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
-			FETiedBiphasicSurface::Data& dm = static_cast<FETiedBiphasicSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedBiphasicContactPoint& dm = static_cast<FETiedBiphasicContactPoint&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on secondary surface
             eps = m_epsn*dm.m_epsn;

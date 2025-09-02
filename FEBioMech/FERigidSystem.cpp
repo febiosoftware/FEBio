@@ -244,20 +244,50 @@ bool FERigidSystem::CreateObjects()
 
 	// Next, we assign to all nodes a rigid node number
 	// This number is preliminary since rigid materials can be merged
+	// Note that we do solid domains first. This is to avoid a complication
+	// with shells on solids.
+
+	// solid domains first
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
 		FEDomain& dom = mesh.Domain(nd);
-		FERigidMaterial* pmat = dynamic_cast<FERigidMaterial*>(dom.GetMaterial());
-		if (pmat)
+		if (dom.Class() == FE_DOMAIN_SOLID)
 		{
-			for (int i=0; i<dom.Elements(); ++i)
+			FERigidMaterial* pmat = dynamic_cast<FERigidMaterial*>(dom.GetMaterial());
+			if (pmat)
 			{
-				FEElement& el = dom.ElementRef(i);
-				for (int j=0; j<el.Nodes(); ++j)
+				for (int i = 0; i < dom.Elements(); ++i)
 				{
-					int n = el.m_node[j];
-					FENode& node = mesh.Node(n);
-					node.m_rid = pmat->GetID() - 1;
+					FEElement& el = dom.ElementRef(i);
+					for (int j = 0; j < el.Nodes(); ++j)
+					{
+						int n = el.m_node[j];
+						FENode& node = mesh.Node(n);
+						node.m_rid = pmat->GetID() - 1;
+					}
+				}
+			}
+		}
+	}
+
+	// non-solid domains
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		if (dom.Class() != FE_DOMAIN_SOLID)
+		{
+			FERigidMaterial* pmat = dynamic_cast<FERigidMaterial*>(dom.GetMaterial());
+			if (pmat)
+			{
+				for (int i = 0; i < dom.Elements(); ++i)
+				{
+					FEElement& el = dom.ElementRef(i);
+					for (int j = 0; j < el.Nodes(); ++j)
+					{
+						int n = el.m_node[j];
+						FENode& node = mesh.Node(n);
+						node.m_rid = pmat->GetID() - 1;
+					}
 				}
 			}
 		}

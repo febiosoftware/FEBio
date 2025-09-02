@@ -37,6 +37,7 @@ SOFTWARE.*/
 #include "FEScaleAdaptorCriterion.h"
 #include "FEFilterAdaptorCriterion.h"
 #include "FEDomainErrorCriterion.h"
+#include "FEElementDataCriterion.h"
 
 //-----------------------------------------------------------------------------
 void FEAMR::InitModule()
@@ -55,4 +56,5 @@ REGISTER_FECORE_CLASS(FEElementSelectionCriterion, "element_selection");
 REGISTER_FECORE_CLASS(FEScaleAdaptorCriterion    , "math");
 REGISTER_FECORE_CLASS(FEMinMaxFilterAdaptorCriterion, "min-max filter");
 REGISTER_FECORE_CLASS(FEDomainErrorCriterion, "relative error");
+REGISTER_FECORE_CLASS(FEElementDataCriterion, "element data");
 }

@@ -289,12 +289,3 @@ void FEUncoupledElasticMixture::UpdateSpecializedMaterialPoints(FEMaterialPoint&
         pmj->UpdateSpecializedMaterialPoints(mpi, tp);
     }
 }
-
-//-----------------------------------------------------------------------------
-//! the density is the sum of the component densities
-double FEUncoupledElasticMixture::Density(FEMaterialPoint& mp)
-{
-	double d = 0.0;
-	for (FEElasticMaterial* pe : m_pMat) d += pe->Density(mp);
-	return d;
-}

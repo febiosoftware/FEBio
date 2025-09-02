@@ -28,11 +28,12 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEUncoupledMaterial.h"
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! Incompressible Neo-Hookean material
 
-class FEIncompNeoHookean : public FEUncoupledMaterial
+class FEBIOMECH_API FEIncompNeoHookean : public FEUncoupledMaterial
 {
 public:
 	FEIncompNeoHookean(FEModel* pfem);

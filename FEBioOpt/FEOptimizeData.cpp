@@ -57,43 +57,25 @@ bool FEModelParameter::Init()
 		return false;
 	}
 
-    switch (val.type()) {
-        case FE_PARAM_DOUBLE:
-        {
-            // make sure we have a valid data pointer
-            double* pd = (double*) val.data_ptr();
-            if (pd == 0)
-            {
-                feLogError("Invalid data pointer for parameter %s", name.c_str());
-                return false;
-            }
-            
-            // store the pointer to the parameter
-            m_pd = pd;
-        }
-            break;
-            
-        case FE_PARAM_VEC2D:
-        {
-            // make sure we have a valid data pointer
-            vec2d* vd = (vec2d*) val.data_ptr();
-            if (vd == 0)
-            {
-                feLogError("Invalid data pointer for parameter %s", name.c_str());
-                return false;
-            }
-            // store the pointer to the parameter
-            m_pd = &vd->y();
-        }
-            break;
-            
-       default:
-        {
-            feLogError("Invalid parameter type for parameter %s", name.c_str());
-            return false;
-        }
-            break;
-    }
+	// Make sure it's a double
+	if (val.type() == FE_PARAM_DOUBLE)
+	{
+		// make sure we have a valid data pointer
+		double* pd = (double*)val.data_ptr();
+		if (pd == 0)
+		{
+			feLogError("Invalid data pointer for parameter %s", name.c_str());
+			return false;
+		}
+
+		// store the pointer to the parameter
+		m_pd = pd;
+	}
+	else
+	{
+		feLogError("Invalid parameter type for parameter %s", name.c_str());
+		return false;
+	}
 
 	return true;
 }

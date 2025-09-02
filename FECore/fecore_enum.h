@@ -122,6 +122,7 @@ enum FE_Element_Type {
 
 	// 2.5D surface elements
 	FE_QUAD4G4,
+	FE_QUAD4G16,
 	FE_QUAD4NI,
 	FE_TRI3G1,
 	FE_TRI3G3,

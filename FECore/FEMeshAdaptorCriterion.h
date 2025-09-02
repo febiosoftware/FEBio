@@ -84,6 +84,10 @@ public:
 	// for the element set, the entire mesh will be processed
 	virtual FEMeshAdaptorSelection GetElementSelection(FEElementSet* elset);
 
+	// evaluate an element. This can be overriden by derived classes. By default,
+	// it will evaluate the integration point average by calling GetMaterialPointValue
+	virtual bool GetElementValue(FEElement& el, double& value);
+
 	// This function needs to be overridden in order to set the element's value.  
 	// Return false if the element cannot be evaluated. Otherwise return true.
 	virtual bool GetMaterialPointValue(FEMaterialPoint& mp, double& value);

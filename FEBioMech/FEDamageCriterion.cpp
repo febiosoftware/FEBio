@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEDamageCriterion.h"
 #include "FEDamageMaterial.h"
 #include <algorithm>
+#include <limits>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -94,7 +95,8 @@ mat3ds FEDamageCriterionVMS::CriterionStressTangent(FEMaterialPoint& pt)
     FEElasticMaterial* m_pBase = m_pMat->GetElasticMaterial();
     mat3ds s = m_pBase->Stress(pt);
     double vms = DamageCriterion(pt);
-    return s.dev()*(1.5/vms);
+    mat3ds dPhi = (vms > std::numeric_limits<double>::epsilon()) ? s.dev()*(1.5/vms) : mat3dd(1);
+    return dPhi;
 }
 
 //-----------------------------------------------------------------------------

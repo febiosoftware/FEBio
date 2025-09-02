@@ -23,14 +23,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
+#include <vector>
 
 class FENewtonSolver;
 class DumpStream;
-
 
 class FELineSearch
 {
@@ -43,10 +40,14 @@ public:
 	// serialization
 	void Serialize(DumpStream& ar);
 
+private:
+	double UpdateModel(std::vector<double>& ul, std::vector<double>& ui, double s);
+
 public:
 	double	m_LSmin;		//!< minimum line search step
 	double	m_LStol;		//!< line search tolerance
 	int		m_LSiter;		//!< max nr of line search iterations
+	bool	m_checkJacobians;//!< check for negative jacobians
 
 private:
 	FENewtonSolver*	m_pns;

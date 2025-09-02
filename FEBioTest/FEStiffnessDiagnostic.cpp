@@ -30,6 +30,10 @@ SOFTWARE.*/
 #include <FECore/FENewtonSolver.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/log.h>
+#include <FEBioMech/FEMechModel.h>
+#include <FEBioMech/FERigidBody.h>
+#include <FEBioMech/FESolidSolver2.h>
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 FEStiffnessDiagnostic::FEStiffnessDiagnostic(FEModel* fem) : FECoreTask(fem)
@@ -67,7 +71,8 @@ bool FEStiffnessDiagnostic::Run()
 	// solve the problem
 	FEModel& fem = *GetFEModel();
 
-	fem.AddCallback(stiffness_diagnostic_cb, CB_MATRIX_REFORM, (void*)this);
+	fem.AddCallback(stiffness_diagnostic_cb, CB_TIMESTEP_SOLVED, (void*)this);
+//	fem.AddCallback(stiffness_diagnostic_cb, CB_MATRIX_REFORM, (void*)this);
 
 	// create a file name for the log file
 	string logfile("diagnostic.log");
@@ -100,18 +105,58 @@ bool FEStiffnessDiagnostic::Diagnose()
 	FEAnalysis* step = fem->GetCurrentStep();
 	if (step == nullptr) return false;
 
-	FENewtonSolver* nlsolve = dynamic_cast<FENewtonSolver*>(step->GetFESolver());
+	FESolidSolver2* solver = dynamic_cast<FESolidSolver2*>(step->GetFESolver());
+	FENewtonSolver* nlsolve = dynamic_cast<FENewtonSolver*>(solver);
 	if (nlsolve == nullptr) return false;
 
 	SparseMatrix* pA = nlsolve->m_pK->GetSparseMatrixPtr();
 	if (pA == nullptr) return false;
 
-	const double eps = 1e-6;
+	const double eps = 1e-8;
 	int neq = pA->Rows();
+
+	// need to know which dofs are prescribed
+	// 0 == fixed, 1 == free
+	vector<int> bc(neq, 0);
+	FEMesh& mesh = fem->GetMesh();
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid < 0)
+		{
+			for (int j = 0; j < node.m_ID.size(); ++j)
+			{
+				int n = node.m_ID[j];
+				if (n >= 0) bc[n] = 1;
+			}
+		}
+		else
+		{
+			for (int j = 0; j < node.m_ID.size(); ++j)
+			{
+				int n = -node.m_ID[j]-2;
+				if (n >= 0) bc[n] = 1;
+			}
+		}
+	}
+
+	// we need to commit the rigid body kinematics. 
+	// This usually doesn't happen until the init of the next time step,
+	// but that won't work for this diagnostic.
+	FEMechModel& mech = dynamic_cast<FEMechModel&>(*fem);
+	for (int i=0; i<mech.RigidBodies(); ++i)
+	{
+		FERigidBody& rb = *mech.GetRigidBody(i);
+		rb.m_rp = rb.m_rt;
+		rb.m_qp = rb.GetRotation();
+	}
+
 	std::vector<double> R0(neq, 0);
 	nlsolve->Residual(R0);
-	double max_err = 0.0;
+	double max_val = 0, max_err = 0.0;
 	int i_max = -1, j_max = -1;
+	std::cerr << "\nstarting diagnostic:\nprogress:";
+	int pct = 0;
 	for (int j = 0; j < neq; ++j)
 	{
 		std::vector<double> u(neq, 0);
@@ -120,12 +165,30 @@ bool FEStiffnessDiagnostic::Diagnose()
 		nlsolve->Update(u);
 		nlsolve->Residual(R);
 
+		int new_pct = (100 * j) / neq;
+		if (pct != new_pct) {
+			if ((new_pct % 10) == 0)
+				std::cerr << "+"; 
+			else
+				std::cerr << "-"; 
+			pct = new_pct;
+		}
+
 		for (int i = 0; i < neq; ++i)
 		{
 			// note that we flip the sign on ka.
 			// this is because febio actually calculates the negative of the residual
-			double ka_ij = -(R[i] - R0[i]) / eps;
+			double ka_ij = 0;
+			if ((bc[i] == 0) || (bc[j] == 0))
+			{
+				if (i == j) ka_ij = 1;
+				else ka_ij = 0;
+			}
+			else ka_ij = -(R[i] - R0[i]) / eps;
+
 			double kt_ij = pA->get(i, j);
+
+			if (fabs(kt_ij) > max_val) max_val = fabs(kt_ij);
 
 			double err = fabs(kt_ij - ka_ij);
 			if (err > max_err)
@@ -141,9 +204,22 @@ bool FEStiffnessDiagnostic::Diagnose()
 			}
 		}
 	}
+	std::cerr << "\n";
+
+	// let's make sure we leave the model in a consistent state
+	std::vector<double> u(neq, 0);
+	std::vector<double> R(neq, 0);
+	nlsolve->Update(u);
+	nlsolve->Residual(R);
+
+	printf("Max abs. value: %lg\n", max_val);
+	fprintf(m_fp, "Max abs. value: %lg\n", max_val);
+	if (max_val == 0) max_val = 1;
 
 	printf("Max error: %lg (%d, %d)\n", max_err, i_max, j_max);
+	printf("Max rel. error: %lg (%d, %d)\n", max_err / max_val, i_max, j_max);
 	fprintf(m_fp, "Max error: %lg (%d, %d)\n", max_err, i_max, j_max);
+	fprintf(m_fp, "Max rel. error: %lg (%d, %d)\n", max_err / max_val, i_max, j_max);
 
 	return true;
 }

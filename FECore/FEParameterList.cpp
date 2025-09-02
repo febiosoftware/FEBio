@@ -200,6 +200,7 @@ FEParam* FEParameterList::FindFromData(void* pv)
 					switch (it->type())
 					{
 					case FE_PARAM_DOUBLE_MAPPED: pd = &(it->value<FEParamDouble>(i)); break;
+					case FE_PARAM_INT: pd = &(it->value<int>(i)); break;
 					default:
 						assert(false);
 					}

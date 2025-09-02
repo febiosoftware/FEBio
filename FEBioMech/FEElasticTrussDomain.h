@@ -31,10 +31,11 @@ SOFTWARE.*/
 #include "FEElasticDomain.h"
 #include "FESolidMaterial.h"
 #include <FECore/FEDofList.h>
+#include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D truss elements
-class FEElasticTrussDomain : public FETrussDomain, public FEElasticDomain
+class FEBIOMECH_API FEElasticTrussDomain : public FETrussDomain, public FEElasticDomain
 {
 public:
 	//! Constructor

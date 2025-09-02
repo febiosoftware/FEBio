@@ -30,7 +30,130 @@ SOFTWARE.*/
 #include "writeplot.h"
 #include "FESPRProjection.h"
 
+void writeMaxElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint& mp)> fnc)
+{
+	int NE = dom.Elements();
+	std::vector<double> v(NE);
+#pragma omp parallel for shared(v)
+	for (int i = 0; i < NE; ++i) {
+		FEElement& el = dom.ElementRef(i);
+		double s = 0.0;
+		for (int j = 0; j < el.GaussPoints(); ++j)
+		{
+			double sj = fnc(*el.GetMaterialPoint(j));
+			if ((sj > s) || (j == 0)) s = sj;
+		}
+		v[i] = s;
+	}
+
+	for (int i = 0; i < NE; ++i)
+		ar << v[i];
+}
+
+void writeSPRElementValue(FESolidDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint&)> fnc, int interpolOrder)
+{
+	int NN = dom.Nodes();
+	int NE = dom.Elements();
+
+	// build the element data array
+	vector< vector<double> > ED;
+	ED.resize(NE);
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& e = dom.Element(i);
+		int nint = e.GaussPoints();
+		ED[i].assign(nint, 0.0);
+	}
+
+	// this array will store the results
+	FESPRProjection map(dom, interpolOrder);
+
+	vector<double> val;
+
+	// fill the ED array
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int nint = el.GaussPoints();
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			double v = fnc(mp);
+			ED[i][j] = v;
+		}
+	}
+
+	// project to nodes
+	map.Project(ED, val);
+
+	// copy results to archive
+	for (int i = 0; i < NN; ++i)
+	{
+		ar.push_back((float)val[i]);
+	}
+}
+
 //-------------------------------------------------------------------------------------------------
+void writeSPRElementValueVectorDouble(FESolidDomain& dom, FEDataStream& ar, std::function<std::vector<double>(const FEMaterialPoint&)> fnc, int interpolOrder, int n_fields)
+{
+
+	// get all nodes and elements
+	int NN = dom.Nodes();
+	int NE = dom.Elements();
+
+	// build the element data array
+	vector<vector< vector<double> > > ED(n_fields);
+	// for each component
+	for (int n = 0; n < n_fields; ++n)
+	{
+		// fill element data. for each element add the number of gauss points in the element.
+		ED[n].resize(NE);
+		for (int i = 0; i < NE; ++i)
+		{
+			FESolidElement& e = dom.Element(i);
+			int nint = e.GaussPoints();
+
+			ED[n][i].assign(nint, 0.0);
+		}
+	}
+
+	// this array will store the results
+	FESPRProjection map(dom, interpolOrder);
+	vector<vector<double> >val(n_fields);
+
+	// fill the ED array
+	for (int i = 0; i < NE; ++i)
+	{
+		FESolidElement& el = dom.Element(i);
+		int nint = el.GaussPoints();
+		for (int j = 0; j < nint; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			vector<double> v = fnc(mp);
+
+			// loop over all solutes components
+			for (int n = 0; n < n_fields; ++n)
+			{
+				ED[n][i][j] = v[n];
+			}
+		}
+	}
+
+	// project to nodes
+	// loop over stress components
+	for (int n = 0; n < n_fields; ++n)
+	{
+		map.Project(ED[n], val[n]);
+	}
+
+	// copy results to archive
+	for (int i_node = 0; i_node < NN; ++i_node)
+	{
+		for (int i_field = 0; i_field < n_fields; ++i_field)
+			ar.push_back((float)val[i_field][i_node]);
+	}
+}
+
 void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar, std::function<mat3dd(const FEMaterialPoint&)> fnc, int interpolOrder)
 {
 	int NN = dom.Nodes();
@@ -51,8 +174,7 @@ void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar, std::funct
 	}
 
 	// this array will store the results
-	FESPRProjection map;
-	map.SetInterpolationOrder(interpolOrder);
+	FESPRProjection map(dom, interpolOrder);
 	vector<double> val[3];
 
 	// fill the ED array
@@ -72,9 +194,9 @@ void writeSPRElementValueMat3dd(FESolidDomain& dom, FEDataStream& ar, std::funct
 	}
 
 	// project to nodes
-	map.Project(dom, ED[0], val[0]);
-	map.Project(dom, ED[1], val[1]);
-	map.Project(dom, ED[2], val[2]);
+	map.Project(ED[0], val[0]);
+	map.Project(ED[1], val[1]);
+	map.Project(ED[2], val[2]);
 
 	// copy results to archive
 	for (int i = 0; i<NN; ++i)
@@ -107,8 +229,8 @@ void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::funct
 	}
 
 	// this array will store the results
-	FESPRProjection map;
-	map.SetInterpolationOrder(interpolOrder);
+	FESPRProjection map(dom, interpolOrder);
+
 	vector<double> val[6];
 
 	// fill the ED array
@@ -133,7 +255,7 @@ void writeSPRElementValueMat3ds(FESolidDomain& dom, FEDataStream& ar, std::funct
 	// loop over stress components
 	for (int n = 0; n<6; ++n)
 	{
-		map.Project(dom, ED[n], val[n]);
+		map.Project(ED[n], val[n]);
 	}
 
 	// copy results to archive

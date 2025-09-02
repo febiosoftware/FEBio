@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "FERigidMaterial.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidBody, FECoreBase)
@@ -191,6 +192,11 @@ void FERigidBody::UpdateMass()
 			if (psd) m_mass += psd->CalculateMass();
 		}
 	}
+
+	if (m_mass == 0)
+	{
+		feLogWarning("Zero mass for rigid body \"%s.\"", GetName().c_str());
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -344,4 +350,51 @@ void FERigidBody::Serialize(DumpStream& ar)
 
 		// TODO: should I store parent rigid body (m_prb)
 	}
+}
+
+//-----------------------------------------------------------------------------
+// return the (instantaneous) helical axis relative to the ground
+void FERigidBody::InstantaneousHelicalAxis(vec3d& omega, vec3d& s, double& tdot)
+{
+    double dt = GetFEModel()->GetTime().timeIncrement;
+
+    // incremental rotation in spatial frame
+    omega = (m_wp + m_wt)/2;
+    vec3d rdot = (m_vt + m_vp)/2;
+    double rdm = rdot.norm();
+	vec3d n(omega); n.unit();
+    tdot = rdot*n;
+    vec3d r = (m_rt + m_rp)/2;     // midpoint value of r
+	vec3d w(omega);
+    double w2 = w.norm2();
+    s = (w2 > 0) ? (w ^ (rdot - n*tdot + (r ^ w)))/(w*w) : vec3d(0,0,0);
+    if ((w2 == 0) && (rdm > 0)) {
+        tdot = rdm/dt;
+        n = rdot.Normalize();
+        omega = n;
+    }
+}
+
+//-----------------------------------------------------------------------------
+// return the (finite) helical axis relative to the ground
+void FERigidBody::FiniteHelicalAxis(vec3d& omega, vec3d& s, double& tdot)
+{
+    // incremental rotation in spatial frame
+    quatd dQ = m_qt*m_qp.Inverse();
+    // clean-up roundoff errors
+    dQ.MakeUnit();
+    vec3d rdot = m_rt - m_rp;
+    double rdm = rdot.norm();
+    vec3d w = dQ.GetRotationVector();
+	vec3d n(w); n.unit();
+	omega = w;
+    tdot = rdot*n;
+    vec3d r = (m_rt + m_rp)/2;     // midpoint value of r
+    double w2 = w*w;
+    s = (w2 > 0) ? (w ^ (rdot - n*tdot + (r ^ w)))/(w*w) : vec3d(0,0,0);
+    if ((w2 == 0) && (rdm > 0)) {
+        tdot = rdm;
+        n = rdot.Normalize();
+        omega = n;
+    }
 }

@@ -142,11 +142,6 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         // check if i-th bond family is yielding
         if ((pp.m_Kv[i] > pp.m_Ku[i]) && (pp.m_Ku[i] < fp.m_Ky[i]*(1+m_rtol)))
             pp.m_w[i] = fp.m_w[i];
-        // if not, and if this bond family has not yielded at previous times,
-        // reset the mass fraction of yielded bonds to zero (in case m_w[i] was
-        // set to w[i] during a prior iteration at current time)
-        else if (pp.m_byld[i] == false)
-            pp.m_w[i] = 0;
         
         // find Fv
         bool conv = false;
@@ -224,6 +219,16 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         pp.m_Fvsi[i] = Fs.inverse()*Fv;
     }
 
+    // if bond family has not yielded at this instant, and had not yielded at previous times,
+    // reset the mass fraction of yielded bonds to zero (in case m_w[i] was
+    // set to w[i] during a prior iteration at current time)
+    for (int i=0; i<n; ++i) {
+        if ((pp.m_w[i] > 0) && !pp.m_byld[i]) {
+            if (pp.m_Kv[i] < fp.m_Ky[i]/(1+m_rtol))
+                pp.m_w[i] = 0;
+        }
+    }
+    
     // evaluate octahedral plastic strain
     OctahedralPlasticStrain(pt);
     ReactiveHeatSupplyDensity(pt);

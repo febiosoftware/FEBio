@@ -47,7 +47,8 @@ public:
 	// 3.2: added PLT_ELEMENTSET_SECTION
 	// 3.3: node IDs are now stored in Node Section
 	// 3.4: added PLT_ELEM_LINE3
-	enum { PLT_VERSION = 0x0034 };
+	// 3.5: added PLT_EDGE_DATA
+	enum { PLT_VERSION = 0x0035 };
 
 	// file tags
 	enum { 
@@ -73,6 +74,7 @@ public:
 			PLT_DIC_NODAL				= 0x01023000,
 			PLT_DIC_DOMAIN				= 0x01024000,
 			PLT_DIC_SURFACE				= 0x01025000,
+			PLT_DIC_EDGE				= 0x01026000,
 //		PLT_MATERIALS					= 0x01030000,		// This was removed
 //			PLT_MATERIAL				= 0x01030001,
 //			PLT_MAT_ID					= 0x01030002,
@@ -134,6 +136,16 @@ public:
 				PLT_FACETSET_LIST			= 0x01047200,
 					PLT_FACET				= 0x01047201,
 
+			PLT_EDGE_SECTION			= 0x01048000,
+				PLT_EDGE				= 0x01048100,
+					PLT_EDGE_HDR		= 0x01048101,
+					PLT_EDGE_ID			= 0x01048102,
+					PLT_EDGE_LINES		= 0x01048103,
+					PLT_EDGE_NAME		= 0x01048104,
+					PLT_EDGE_MAX_NODES	= 0x01048105,
+				PLT_EDGE_LIST			= 0x01048200,
+					PLT_LINE			= 0x01048201,
+
 			// plot objects were added in 3.0
 			PLT_OBJECTS_SECTION			= 0x01050000,
 					PLT_OBJECT_ID		= 0x01050001,
@@ -161,6 +173,7 @@ public:
 				PLT_NODE_DATA			= 0x02020300,
 				PLT_ELEMENT_DATA		= 0x02020400,
 				PLT_FACE_DATA			= 0x02020500,
+				PLT_EDGE_DATA			= 0x02020600,
 			PLT_MESH_STATE				= 0x02030000,
 				PLT_ELEMENT_STATE		= 0x02030001,
 			PLT_OBJECTS_STATE			= 0x02040000
@@ -282,6 +295,7 @@ protected:
 	void WriteNodeSection   (FEMesh& m);
 	void WriteDomainSection (FEMesh& m);
 	void WriteSurfaceSection(FEMesh& m);
+	void WriteEdgeSection(FEMesh& m);
 	void WriteNodeSetSection(FEMesh& m);
 	void WriteElementSetSection(FEMesh& m);
 	void WriteFacetSetSection(FEMesh& m);
@@ -299,6 +313,7 @@ protected:
 	void WriteNodeData    (FEModel& fem);
 	void WriteDomainData  (FEModel& fem);
 	void WriteSurfaceData (FEModel& fem);
+	void WriteEdgeData    (FEModel& fem);
 	void WriteObjectsState();
 	void WriteObjectData(PlotObject* po);
 
@@ -306,6 +321,7 @@ protected:
 	void WriteNodeDataField(FEModel& fem, FEPlotData* pd);
 	void WriteDomainDataField(FEModel& fem, FEPlotData* pd);
 	void WriteSurfaceDataField(FEModel& fem, FEPlotData* pd);
+	void WriteEdgeDataField(FEModel& fem, FEPlotData* pd);
 
 	void WriteMeshState(FEMesh& mesh);
 
@@ -321,6 +337,7 @@ protected:
 	int			m_meshesWritten;	// nr of meshes written
 	string		m_softwareString;	// the software string
 	bool		m_exportUnitsFlag;	// flag that indicates whether to write units
+	bool		m_exportErodedElements; // export the eroded elements or not 
 
 	std::vector<Surface>	m_Surf;
 

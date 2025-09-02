@@ -41,22 +41,6 @@ class FEModel;
 class LinearSolver;
 class FEModule;
 
-
-//-----------------------------------------------------------------------------
-// base class for handling create events.
-class FECreateHandler{
-public:
-	FECreateHandler() { m_moduleId = -1; }
-	virtual ~FECreateHandler() {}
-	virtual void handle(FECoreBase*) = 0;
-
-	int GetModuleID() const { return m_moduleId; }
-	void SetModuleID(int n) { m_moduleId = n; }
-
-private:
-	int	m_moduleId;
-};
-
 //-----------------------------------------------------------------------------
 //! This is the FECore kernel class that manages the interactions between the 
 //! different modules. In particular, it manages the factory classes
@@ -120,6 +104,9 @@ public:
 	//! unregister factories from allocator
 	void UnregisterFactories(int alloc_id);
 
+    //! unregister modules from allocator
+	void UnregisterModules(int alloc_id);
+
 	//! set the current allocator ID
 	void SetAllocatorID(int alloc_id);
 
@@ -155,6 +142,7 @@ public: // Modules
 	const char* GetModuleNameFromId(int id) const;
 	const char* GetModuleDescription(int i) const;
 	int GetModuleStatus(int i) const;
+    int GetModuleAllocatorID(int i) const;
 
 	//! Get a module's dependencies
 	vector<int> GetModuleDependencies(int i) const;
@@ -186,18 +174,11 @@ public:
 	LinearSolver* CreateDefaultLinearSolver(FEModel* fem);
 
 public:
-	void OnCreateEvent(FECreateHandler* pf);
-
-	void BlockEvents(bool b);
-
 	void ShowDeprecationWarnings(bool b);
 
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
-
-	std::vector<FECreateHandler*>		m_createHandlers;
-	bool								m_blockEvents;
 
 	bool	m_bshowDeprecationWarning;
 

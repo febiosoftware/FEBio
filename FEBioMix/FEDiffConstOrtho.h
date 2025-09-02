@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEBiphasicSolute.h"
+#include <FECore/FEMesh.h>
 
 //-----------------------------------------------------------------------------
 // This class implements a material that has a constant orthotropic diffusivity
@@ -57,8 +58,8 @@ public:
 	bool Validate() override;
 	
 public:
-	double	m_free_diff;	//!< free diffusivity
-	double	m_diff[3];		//!< principal diffusivities
+	FEParamDouble	m_free_diff;	//!< free diffusivity
+    FEParamDouble	m_diff[3];		//!< principal diffusivities
 	
 	// declare parameter list
 	DECLARE_FECORE_CLASS();
