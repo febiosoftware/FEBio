@@ -26,6 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include "mat3d.h"
 #include "tens4d.h"
+#include "quatd.h"
 #include "fecore_api.h"
 #include <functional>
 
@@ -79,7 +80,7 @@ namespace ad {
 	// multiplication
 	inline number operator * (const number& a, const number& b)
 	{
-		return number(a.r * b.r , a.dr * b.r + a.r * b.dr);
+		return number(a.r * b.r, a.dr * b.r + a.r * b.dr);
 	}
 
 	inline number operator * (double a, const number& b)
@@ -95,12 +96,12 @@ namespace ad {
 	// division
 	inline number operator / (const number& a, const number& b)
 	{
-		return number(a.r / b.r, (a.dr - a.r* b.dr/ b.r) / b.r);
+		return number(a.r / b.r, (a.dr - a.r * b.dr / b.r) / b.r);
 	}
 
 	inline number operator / (double a, const number& b)
 	{
-		return number(a / b.r,  - a * b.dr / (b.r* b.r));
+		return number(a / b.r, -a * b.dr / (b.r * b.r));
 	}
 
 	inline number operator / (const number& a, double b)
@@ -183,7 +184,7 @@ namespace ad {
 	{
 		return vec3d(a * b.x, a * b.y, a * b.z);
 	}
-	
+
 	inline vec3d operator * (const vec3d& a, double b)
 	{
 		return vec3d(a.x * b, a.y * b, a.z * b);
@@ -212,8 +213,8 @@ namespace ad {
 	inline vec3d cross(const vec3d& a, const vec3d& b)
 	{
 		return vec3d(a.y * b.z - a.z * b.y,
-					 a.z * b.x - a.x * b.z,
-					 a.x * b.y - a.y * b.x);
+			a.z * b.x - a.x * b.z,
+			a.x * b.y - a.y * b.x);
 	}
 
 	// alternative cross product operator. 
@@ -225,8 +226,8 @@ namespace ad {
 	}
 
 	FECORE_API double Evaluate(std::function<number(ad::vec3d&)> W, const ::vec3d& a);
-	FECORE_API ::vec3d Grad(std::function<number(ad::vec3d&)> W, const ::vec3d& a);
-	FECORE_API ::mat3d Grad(std::function<ad::vec3d(ad::vec3d&)> F, const ::vec3d& a);
+	FECORE_API::vec3d Grad(std::function<number(ad::vec3d&)> W, const ::vec3d& a);
+	FECORE_API::mat3d Grad(std::function<ad::vec3d(ad::vec3d&)> F, const ::vec3d& a);
 
 	struct mat3d
 	{
@@ -241,8 +242,8 @@ namespace ad {
 				for (int j = 0; j < 3; ++j) m[i][j] = A[i][j];
 		}
 		mat3d(const number& a11, const number& a12, const number& a13,
-			  const number& a21, const number& a22, const number& a23,
-			  const number& a31, const number& a32, const number& a33)
+			const number& a21, const number& a22, const number& a23,
+			const number& a31, const number& a32, const number& a33)
 		{
 			m[0][0] = a11; m[0][1] = a12; m[0][2] = a13;
 			m[1][0] = a21; m[1][1] = a22; m[1][2] = a23;
@@ -323,9 +324,9 @@ namespace ad {
 		number& operator [] (size_t n) { return m[n]; }
 		mat3ds() {}
 		mat3ds(
-			const number& xx, 
-			const number& yy, 
-			const number& zz, 
+			const number& xx,
+			const number& yy,
+			const number& zz,
 			const number& xy,
 			const number& yz,
 			const number& xz)
@@ -432,7 +433,7 @@ namespace ad {
 			A.xy() + B.xy(),
 			A.yz() + B.yz(),
 			A.xz() + B.xz()
-			);
+		);
 	}
 
 	inline mat3ds operator - (const mat3ds& A, const mat3ds& B)
@@ -450,12 +451,12 @@ namespace ad {
 	inline mat3ds operator * (const mat3ds& A, double b)
 	{
 		return mat3ds(
-			A.xx()*b,
-			A.yy()*b,
-			A.zz()*b,
-			A.xy()*b,
-			A.yz()*b,
-			A.xz()*b
+			A.xx() * b,
+			A.yy() * b,
+			A.zz() * b,
+			A.xy() * b,
+			A.yz() * b,
+			A.xz() * b
 		);
 	}
 
@@ -484,43 +485,143 @@ namespace ad {
 	}
 
 	FECORE_API double Evaluate(std::function<number(mat3ds& C)> W, const ::mat3ds& C);
-	FECORE_API ::mat3ds Derive(std::function<number(mat3ds& C)> W, const ::mat3ds& C);
-	FECORE_API ::tens4ds Derive(std::function<mat3ds(mat3ds& C)> S, const ::mat3ds& C);
+	FECORE_API::mat3ds Derive(std::function<number(mat3ds& C)> W, const ::mat3ds& C);
+	FECORE_API::tens4ds Derive(std::function<mat3ds(mat3ds& C)> S, const ::mat3ds& C);
 }
 
+// This namespace contains classes and functions that can be used to evaluate directional 
+// derivatives for vec3d and quatd variables automatically. 
+// To use this, first create some variables, either dd::vec3d or dd::quat3d.
+// For example,
+// 
+//  dd::vec3d r(1,0,0);
+//  dd::quatd q(1,0,0);
+//
+// then, create functions using these variables. For example,
+//
+//  auto F = [&]() { 
+//    ::vec3d z0(0, 1, 0);
+//    return r + q*z0;
+// };
+//
+// Make sure to capture by reference!
+// Finally, to evaluate the directional derivatives: 
+//
+//  mat3d dFr = dd::D(F, r);
+//  mat3d dFq = dd::D(F, q);
+//
 namespace dd {
+
+	// this class defines a number that can be used in calculations.
+	// Never initialize directly. Instead, use vec3d operators to construct numbers.
+	// For example.
+	// dd::vec3d r(1,0,0);
+	// dd::number l = dd::sqrt(r*r);
+	struct number {
+		double v = 0;
+		::vec3d dv = ::vec3d(0.0, 0.0, 0.0);
+	};
+
+	inline dd::number operator - (double a, const dd::number& n)
+	{
+		return { a - n.v, -n.dv };
+	}
+
+	inline dd::number operator * (double a, const dd::number& n)
+	{
+		return { a * n.v, n.dv * a };
+	}
+
+	inline dd::number operator * (const dd::number& n, double a)
+	{
+		return { a * n.v, n.dv * a };
+	}
+
+	inline dd::number operator / (double a, const dd::number& n)
+	{
+		return { a / n.v, n.dv * (-a / (n.v * n.v)) };
+	}
+
+	inline dd::number sqrt(const dd::number& a)
+	{
+		return { ::sqrt(a.v), a.dv * (0.5 / ::sqrt(a.v)) };
+	};
+
+	// represents vector variables.
 	struct vec3d {
 		::vec3d v = ::vec3d(0, 0, 0);
 		::mat3d dv = ::mat3d(0.0);
 
+		void activate(bool b) { dv = (b ? ::mat3d::identity() : ::mat3d(0.0)); }
+
 		vec3d(::vec3d a) : v(a), dv(::mat3d(0.0)) {}
 		vec3d(::vec3d a, ::mat3d da) : v(a), dv(da) {}
+		vec3d(double x, double y, double z) : v(::vec3d(x, y, z)), dv(::mat3d(0.0)) {}
 	};
-}
 
-inline dd::vec3d operator - (const dd::vec3d& a)
-{
-	return { -a.v, -a.dv };
-}
+	inline dd::number operator * (const dd::vec3d& a, const dd::vec3d& b)
+	{
+		return dd::number{ a.v * b.v, b.dv.transpose() * a.v + a.dv.transpose() * b.v };
+	}
 
-inline dd::vec3d operator + (const dd::vec3d& a, const dd::vec3d& b)
-{
-	return { a.v + b.v, a.dv + b.dv };
-}
+	inline dd::vec3d operator * (const dd::vec3d& r, const dd::number& a)
+	{
+		return { r.v * a.v, (r.v & a.dv) + r.dv*a.v };
+	}
 
-inline dd::vec3d operator - (const dd::vec3d& a, const dd::vec3d& b)
-{
-	return { a.v - b.v, a.dv - b.dv };
-}
+	inline dd::vec3d operator - (const dd::vec3d& a)
+	{
+		return { -a.v, -a.dv };
+	}
 
-inline dd::vec3d operator ^ (const dd::vec3d& a, const dd::vec3d& b)
-{
-	::mat3da ahat(a.v);
-	::mat3da bhat(b.v);
-	return { (a.v ^ b.v), ahat * b.dv - bhat * a.dv };
-}
+	inline dd::vec3d operator + (const dd::vec3d& a, const dd::vec3d& b)
+	{
+		return { a.v + b.v, a.dv + b.dv };
+	}
 
-inline dd::vec3d operator * (const dd::vec3d& a, double s)
-{
-	return { a.v * s, a.dv * s };
+	inline dd::vec3d operator - (const dd::vec3d& a, const dd::vec3d& b)
+	{
+		return { a.v - b.v, a.dv - b.dv };
+	}
+
+	inline dd::vec3d operator ^ (const dd::vec3d& a, const dd::vec3d& b)
+	{
+		::mat3da ahat(a.v);
+		::mat3da bhat(b.v);
+		return { (a.v ^ b.v), ahat * b.dv - bhat * a.dv };
+	}
+
+	inline dd::vec3d operator * (const dd::vec3d& a, double s)
+	{
+		return { a.v * s, a.dv * s };
+	}
+
+	// represents rotational variables
+	struct quatd {
+		::quatd q;
+		::mat3d dq;
+
+		quatd(::quatd r) { q = r; dq = ::mat3d(0.0); }
+		quatd(::vec3d r) { q = ::quatd(r); dq = ::mat3d(0.0); }
+		quatd(double x, double y, double z) { q = ::quatd(::vec3d(x,y,z)); dq = ::mat3d(0.0); }
+		quatd(double x, double y, double z, double w) { q = ::quatd(x,y,z,w); dq = ::mat3d(0.0); }
+
+		void activate(bool b) { dq = (b ? ::mat3d::identity() : ::mat3d(0.0)); }
+
+		dd::vec3d operator * (const ::vec3d& a)
+		{
+			::vec3d qa = q * a;
+			return { qa, ::mat3da(-qa) * dq };
+		}
+	};
+
+	// Use this function to return the directional derivative of "F" w.r.t. "r".
+	template <typename T>
+	::mat3d D(std::function<dd::vec3d()> F, T& r)
+	{
+		r.activate(true);
+		::mat3d dF = F().dv;
+		r.activate(false);
+		return dF;
+	}
 }
