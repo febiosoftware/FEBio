@@ -82535,7 +82535,6 @@ The parameter <resolution> must be one of the values 20,
  1596,
  1610,
  and 1796.
- A recommended combination is nph=7 and nth=31.
  A conservative choice for producing accurate results under general loading conditions is 
 \begin_inset Formula $N=$
 \end_inset
