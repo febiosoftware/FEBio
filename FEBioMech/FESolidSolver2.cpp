@@ -188,24 +188,31 @@ bool FESolidSolver2::Init()
 
 	FEModel& fem = *GetFEModel();
 
-    if (m_rhoi == -1) {
-        // Euler integration
-        m_alpha = m_alphaf = m_alpham = 1.0;
-        m_beta = pow(1 + m_alpham - m_alphaf,2)/4;
-        m_gamma = 0.5 + m_alpham - m_alphaf;
-    }
-    else if ((m_rhoi >= 0) && (m_rhoi <= 1)) {
-        // Generalized-alpha integration (2nd order system)
-        m_alpha = m_alphaf = 1.0/(1+m_rhoi);
-        m_alpham = (2-m_rhoi)/(1+m_rhoi);
-        m_beta = pow(1 + m_alpham - m_alphaf,2)/4;
-        m_gamma = 0.5 + m_alpham - m_alphaf;
-    }
-    else {
-        // for any other value of rhoi, use the user-defined alpha, beta, gamma parameters
-        m_alphaf = m_alpham = m_alpha;
-    }
-    
+	if (fem.GetCurrentStep()->m_nanalysis == FESolidAnalysis::DYNAMIC)
+	{
+		if (m_rhoi == -1) {
+			// Euler integration
+			m_alpha = m_alphaf = m_alpham = 1.0;
+			m_beta = pow(1 + m_alpham - m_alphaf, 2) / 4;
+			m_gamma = 0.5 + m_alpham - m_alphaf;
+		}
+		else if ((m_rhoi >= 0) && (m_rhoi <= 1)) {
+			// Generalized-alpha integration (2nd order system)
+			m_alpha = m_alphaf = 1.0 / (1 + m_rhoi);
+			m_alpham = (2 - m_rhoi) / (1 + m_rhoi);
+			m_beta = pow(1 + m_alpham - m_alphaf, 2) / 4;
+			m_gamma = 0.5 + m_alpham - m_alphaf;
+		}
+		else {
+			// for any other value of rhoi, use the user-defined alpha, beta, gamma parameters
+			m_alphaf = m_alpham = m_alpha;
+		}
+	}
+	else
+	{
+		m_alpha = m_alphaf = m_alpham = 1.0;
+	}
+
 	// allocate vectors
 //	m_Fn.assign(m_neq, 0);
 	m_Fr.assign(m_neq, 0);
