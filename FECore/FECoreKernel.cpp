@@ -289,6 +289,16 @@ FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* 
 //-----------------------------------------------------------------------------
 //! Create an object. An object is created by specifying the super-class id
 //! and the type-string. 
+FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, const char* szmod, FEModel* pfem)
+{
+	FECoreFactory* fac = FindFactoryClass(superClassID, sztype, szmod);
+	if (fac == nullptr) return nullptr;
+	return CreateInstance(fac, pfem);
+}
+
+//-----------------------------------------------------------------------------
+//! Create an object. An object is created by specifying the super-class id
+//! and the type-string. 
 FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel* pfem)
 {
 	if (szbase == nullptr) return nullptr;
@@ -587,6 +597,41 @@ FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype)
 }
 
 //-----------------------------------------------------------------------------
+FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype, const char* szmod)
+{
+	if (sztype == nullptr) return nullptr;
+
+	int modId = FindModuleID(szmod);
+	if (modId == -1) return nullptr;	
+
+	std::vector<FECoreFactory*>::iterator pf;
+	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+	{
+		FECoreFactory* pfac = *pf;
+		if (pfac->GetSuperClassID() == superID) {
+
+			// see if we can match module first
+			unsigned int mid = pfac->GetModuleID();
+			if (mid == modId)
+			{
+				// see if the type name matches
+				if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+				{
+					// check the spec (TODO: What is this for?)
+					int nspec = pfac->GetSpecID();
+					if ((nspec == -1) || (m_nspec <= nspec))
+					{
+						return pfac;
+					}
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 //! set the active module
 bool FECoreKernel::SetActiveModule(const char* szmod)
 {
@@ -719,6 +764,17 @@ int FECoreKernel::GetModuleAllocatorID(int i) const
 {
     if ((i < 0) || (i >= m_modules.size())) return -1;
     return m_modules[i]->GetAllocID();
+}
+
+int FECoreKernel::FindModuleID(const char* szmodule) const
+{
+	if (szmodule == 0) return -1;
+	for (size_t i = 0; i<m_modules.size(); ++i)
+	{
+		FEModule& mi = *m_modules[i];
+		if (strcmp(mi.GetName(), szmodule) == 0) return mi.GetModuleID();
+	}
+	return -1;
 }
 
 //! Get a module
