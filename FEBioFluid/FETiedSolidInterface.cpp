@@ -68,7 +68,7 @@ bool FETiedFluidFSISurface::Init()
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FETiedSolidInterface, FEContactInterface)
-    ADD_PARAMETER(m_lc.m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+    ADD_PARAMETER(m_lc.m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
     ADD_PARAMETER(m_lc.m_tol      , "tolerance"          );
     ADD_PARAMETER(m_lc.m_eps      ,"displacement_penalty");
     ADD_PARAMETER(m_lc.m_naugmin  , "minaug"             );

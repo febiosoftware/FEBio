@@ -203,14 +203,14 @@ bool FEFluidSolver::InitEquations()
             m_neq += lmc->InitEquations(m_neq);
         }
     }
-/*    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
     {
         FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
         if (spc->IsActive())
         {
             m_neq += spc->InitEquations(m_neq);
         }
-    }*/
+    }
 
     return true;
 }
