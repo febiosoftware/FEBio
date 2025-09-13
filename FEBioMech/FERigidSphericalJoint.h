@@ -78,7 +78,14 @@ public:
     //! current position
     vec3d Position() const;
 
+private: // lag. mult. methods
+	int InitEquations(int neq) override;
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
+	void UnpackLM(vector<int>& lm);
+	void Update(const std::vector<double>& ui) override;
+
 public: // parameters
+	int		m_laugon;	//!< enforcement method
     double	m_atol;     //! augmented Lagrangian tolerance
     double  m_gtol;     //! augmented Lagrangian gap tolerance
     double  m_qtol;     //! augmented Lagrangian angular gap tolerance
@@ -106,6 +113,8 @@ protected:
     
     vec3d	m_L;        //! Lagrange multiplier for constraining force
     vec3d	m_U;        //! Lagrange multiplier for constraining moment
-    
+
+	vector<int>		m_LM;	// Lagrange multiplier equation numbers
+
     DECLARE_FECORE_CLASS();
 };

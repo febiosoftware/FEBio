@@ -52,4 +52,5 @@ public:
 public:
     mat3ds  m_Us;   //!< pre-stretch tensor for fiber
     bool    m_bUs;  //!< flag for pre-stretch
+	int		m_index = -1;	//!< used as index in CDF material
 };

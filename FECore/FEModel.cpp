@@ -215,6 +215,8 @@ public:
 	std::vector<FEMeshDataGenerator*>		m_MD;		//!< mesh data generators
 
 	std::vector<LoadParam>		m_Param;	//!< list of parameters controller by load controllers
+	
+	bool m_dotiming = true; // flag to enable/disable timings
 	std::vector<Timer>			m_timers;	// list of timers
 
 public:
@@ -486,7 +488,7 @@ bool FEModel::Init()
 	// intitialize time
 	FETimeInfo& tp = GetTime();
 	tp.currentTime = 0;
-	tp.timeIncrement = m_imp->m_pStep->m_dt0;
+	tp.timeIncrement = m_imp->m_Step[0]->m_dt0;
 	m_imp->m_ftime0 = 0;
 
 	// initialize global data
@@ -1271,7 +1273,7 @@ bool FEModel::RCI_ClearRewindStack()
 bool FEModel::RCI_Init()
 {
 	// start the timer
-	GetTimer(Timer_ModelSolve)->start();
+	TRACK_TIME(Timer_ModelSolve);
 
 	// reset solver status flag
 	m_imp->m_bsolved = false;
@@ -2505,6 +2507,16 @@ bool FEModel::GetNodeData(int ndof, vector<double>& data)
 	}
 	
 	return true;
+}
+
+void FEModel::CollectTimings(bool b)
+{
+	m_imp->m_dotiming = b;
+}
+
+bool FEModel::CollectTimings() const
+{
+	return m_imp->m_dotiming;
 }
 
 //-----------------------------------------------------------------------------

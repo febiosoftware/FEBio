@@ -41,7 +41,7 @@ END_FECORE_CLASS();
 
 FEEllipsoidalFiberDensityDistribution::FEEllipsoidalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem)
 { 
-    m_spa = vec3d(0);
+    m_spa = vec3d(1,1,1);
 }
 
 double FEEllipsoidalFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)

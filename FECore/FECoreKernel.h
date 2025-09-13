@@ -68,6 +68,9 @@ public:
 	//! Create a specific using a superclass ID and an alias
 	FECoreBase* Create(int superClassID, const char* szalias, FEModel* pfem);
 
+	//! Creat a specific class using a superclass ID, an alias and a module name
+	FECoreBase* Create(int superClassID, const char* szalias, const char* szmod, FEModel* pfem);
+
 	//! Create a class from its base class name and type string
 	FECoreBase* Create(const char* baseClassName, const char* typeStr, FEModel* pfem);
 
@@ -97,6 +100,9 @@ public:
 
 	//! find a factory class
 	FECoreFactory* FindFactoryClass(int classID, const char* sztype);
+
+	//! find a factory class (also match module name)
+	FECoreFactory* FindFactoryClass(int classID, const char* sztype, const char* szmod);
 
 	//! remove a factory class
 	bool UnregisterFactory(FECoreFactory* ptf);
@@ -143,6 +149,8 @@ public: // Modules
 	const char* GetModuleDescription(int i) const;
 	int GetModuleStatus(int i) const;
     int GetModuleAllocatorID(int i) const;
+
+	int FindModuleID(const char* szmodule) const;
 
 	//! Get a module's dependencies
 	vector<int> GetModuleDependencies(int i) const;
@@ -251,6 +259,15 @@ template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* 
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, pfem));
 //	return static_cast<TBase*>(fecore.Create(TBase::BaseClassName(), sztype, pfem));
+}
+
+//-----------------------------------------------------------------------------
+// Create an instance of a class in a particulare module.
+// This assumes that TBase is derived from FECoreBase and defines a class ID. 
+template <typename TBase> inline TBase* fecore_new_ex(const char* sztype, const char* szmod, FEModel* pfem)
+{
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, szmod, pfem));
 }
 
 //-----------------------------------------------------------------------------

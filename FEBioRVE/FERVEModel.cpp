@@ -46,6 +46,9 @@ SOFTWARE.*/
 FERVEModel::FERVEModel()
 {
 	m_bctype = DISPLACEMENT;
+
+	// Don't collect function timings for RVE models.
+	CollectTimings(false);
 }
 
 //-----------------------------------------------------------------------------

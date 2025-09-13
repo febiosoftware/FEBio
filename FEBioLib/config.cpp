@@ -39,18 +39,13 @@ SOFTWARE.*/
 #include "plugin.h"
 #include <map>
 #include <iostream>
-
-#ifdef WIN32
-// TODO: This is deprecated and <filesystem> should be used instead when switching to C++17. At that point, also remove this define.
-// #include <filesystem>
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-#endif
+#include <filesystem>
 
 #ifndef WIN32
 #include <dlfcn.h>
 #endif
 
+namespace fs = std::filesystem;
 
 namespace febio {
 
@@ -368,49 +363,28 @@ namespace febio {
 		return false;
 	}
 
-	//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
-#ifdef WIN32
-	namespace fs = std::experimental::filesystem;
-
-	void ImportPluginFolder(const char* szfolder)
-	{
-		std::string path = szfolder;
-
-		// get the default (system-dependant) extension
-		std::wstring defExt = L".dll";
-		//	std::wstring defExt = L".dylib";
-		//	std::wstring defExt = L".so";
-
-		size_t extLength = defExt.length();
-
-		// loop over all the items in a directory
-		for (auto & p : fs::directory_iterator(path))
-		{
-			// only get regular files with the default extension 
-			if (p.status().type() == fs::file_type::regular)
-			{
-				std::wstring fileName = p.path();
-				size_t l = fileName.length();
-				if (l > extLength) {
-					std::wstring ext = fileName.substr(l - extLength, extLength);
-					if (ext == defExt)
-					{
-						// we can only deal with strings for now, so convert
-						std::string s = p.path().string<char>();
-
-						// try to load the plugin
-						ImportPlugin(s.c_str());
-					}
-				}
-			}
-		}
-	}
-#else
 void ImportPluginFolder(const char* szfolder)
 {
+    // get the default (system-dependant) extension
+    #ifdef WIN32
+        std::string extension = ".dll";
+    #elif __APPLE__
+        std::string extension = ".dylib";
+    #else
+        std::string extension = ".so";
+    #endif
+    
+    for (const auto& entry : fs::directory_iterator(szfolder)) 
+    {
+        if (entry.is_regular_file() && entry.path().extension() == extension)
+        {
+            // try to load the plugin
+            ImportPlugin(entry.path().string().c_str());
+        }
+    }
 }
-#endif
 
 void ImportRepoPlugins(const char* szxmlFile)
 {
