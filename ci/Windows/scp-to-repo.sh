@@ -7,6 +7,12 @@ fi
 
 scp cmbuild/bin/Release/* repo:~/$REMOTE_PATH/bin
 
+# package and upload sdk
+zip -r sdk.zip sdk/include
+zip -r sdk.zip sdk/lib
+zip -r sdk.zip sdk/bin
+scp sdk.zip repo:~/$REMOTE_PATH/
+
 if [ -f testLogs/Logs/* ]; then
     scp testLogs/Logs/* repo:~/TestSuite/Logs/windows.txt
 fi
