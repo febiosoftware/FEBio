@@ -32,7 +32,7 @@ SOFTWARE.*/
 //#include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FESymmetryPlane, FESurfaceConstraint)
-    ADD_PARAMETER(m_lc.m_laugon, "laugon");
+    ADD_PARAMETER(m_lc.m_laugon, "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
     ADD_PARAMETER(m_lc.m_tol, "tol");
     ADD_PARAMETER(m_lc.m_eps, "penalty");
     ADD_PARAMETER(m_lc.m_rhs, "rhs");
