@@ -101,7 +101,7 @@ public:
     void PrepStep() override;
     
     //! update
-    void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+    void Update(std::vector<double>& Ui, std::vector<double>& ui) override;
     void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
 protected:

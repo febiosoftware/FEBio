@@ -65,7 +65,7 @@ public:
     
     virtual void PrepStep() {}
     virtual void Update() override { FESurfacePairConstraint::Update(); }
-    virtual void Update(const std::vector<double>& Ui, const std::vector<double>& ui) {}
+    virtual void Update(std::vector<double>& Ui, std::vector<double>& ui) override {}
 
 protected:
 	//! don't call the default constructor

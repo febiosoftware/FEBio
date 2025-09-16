@@ -281,7 +281,7 @@ void FETiedFluidInterface::InitialNodalProjection(FETiedFluidSurface& ss, FETied
 }
 
 //-----------------------------------------------------------------------------
-void FETiedFluidInterface::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
+void FETiedFluidInterface::Update(std::vector<double>& Ui, std::vector<double>& ui)
 {
     m_lcv.Update(Ui, ui);
     m_lcp.Update(Ui, ui);

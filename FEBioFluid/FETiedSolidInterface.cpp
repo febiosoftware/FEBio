@@ -260,7 +260,7 @@ void FETiedSolidInterface::InitialNodalProjection(FETiedFluidFSISurface& ss, FET
 }
 
 //-----------------------------------------------------------------------------
-void FETiedSolidInterface::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
+void FETiedSolidInterface::Update(std::vector<double>& Ui, std::vector<double>& ui)
 {
     m_lc.Update(Ui, ui);
 }
