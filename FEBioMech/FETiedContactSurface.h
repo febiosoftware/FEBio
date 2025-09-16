@@ -50,7 +50,7 @@ public:
 	public:
 		vec3d				m_vgap;	//!< gap function at nodes
 		vec2d				m_rs;	//!< natural coordinates of projection on secondary surface element
-		vec3d				m_Lm;	//!< Lagrange multipliers
+		vec3d				m_Lm, m_Lp;	//!< Lagrange multipliers (current, previous time step)
 		vec3d				m_Tc;	//!< contact forces
 		double				m_off;	//!< offset values (used for shells)
 	};

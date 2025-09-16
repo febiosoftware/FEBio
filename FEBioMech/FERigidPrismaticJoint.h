@@ -85,7 +85,9 @@ private: // lag. mult. methods
 	int InitEquations(int neq) override;
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 	void UnpackLM(vector<int>& lm);
-	void Update(const std::vector<double>& ui) override;
+	void PrepStep();
+	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
 public: // parameters
 	int     m_laugon; //!< enforcement method
@@ -114,6 +116,8 @@ protected:
     
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
+
+	vec3d m_Lp, m_U1p, m_U2p;
 
 	vec3d m_U1, m_U2;
 	vector<int>		m_LM;	// Lagrange multiplier equation numbers

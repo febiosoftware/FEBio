@@ -73,14 +73,16 @@ protected:
 	// Build the matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
-	void Update(const std::vector<double>& ui) override;
+	void PrepStep();
+	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
 public:
 	vec3d	m_q0;		//! initial position of joint
 	vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
 	vec3d	m_qb0;	//! initial relative position vector of joint w.r.t. B
 
-	vec3d	m_F;		//!< constraining force
+	vec3d	m_F, m_Fp;	//!< constraining force
 	vec3d	m_L;		//!< Lagrange multiplier
 	double	m_eps;		//!< penalty factor
 	double	m_atol;		//!< augmented Lagrangian tolerance

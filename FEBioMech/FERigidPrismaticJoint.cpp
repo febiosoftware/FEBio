@@ -96,6 +96,9 @@ bool FERigidPrismaticJoint::Init()
     m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
     m_M = vec3d(0,0,0); m_U = vec3d(0,0,0);
 	m_U1 = m_U2 = vec3d(0, 0, 0);
+
+	m_Lp = vec3d(0, 0, 0);
+	m_U1p = m_U2p = vec3d(0, 0, 0);
     
 	// base class first
 	if (FERigidConnector::Init() == false) return false;
@@ -119,6 +122,7 @@ void FERigidPrismaticJoint::Serialize(DumpStream& ar)
     ar & m_ea0;
     ar & m_eb0;
 	ar & m_U1 & m_U2 & m_LM;
+	ar & m_Fp & m_U1p & m_U2p;
 }
 
 //-----------------------------------------------------------------------------
@@ -919,22 +923,37 @@ void FERigidPrismaticJoint::UnpackLM(vector<int>& lm)
 	}
 }
 
-void FERigidPrismaticJoint::Update(const std::vector<double>& ui)
+void FERigidPrismaticJoint::PrepStep()
+{
+	m_Lp  = m_F;
+	m_U1p = m_U1;
+	m_U2p = m_U2;
+}
+
+void FERigidPrismaticJoint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
-		m_F.x += ui[m_LM[0]];
-		m_F.y += ui[m_LM[1]];
-		m_F.z += ui[m_LM[2]];
+		m_F.x = m_Lp.x + Ui[m_LM[0]] + ui[m_LM[0]];
+		m_F.y = m_Lp.y + Ui[m_LM[1]] + ui[m_LM[1]];
+		m_F.z = m_Lp.z + Ui[m_LM[2]] + ui[m_LM[2]];
 
-		m_U1.x += ui[m_LM[3]];
-		m_U1.y += ui[m_LM[4]];
-		m_U1.z += ui[m_LM[5]];
+		m_U1.x = m_U1p.x + Ui[m_LM[3]] + ui[m_LM[3]];
+		m_U1.y = m_U1p.y + Ui[m_LM[4]] + ui[m_LM[4]];
+		m_U1.z = m_U1p.z + Ui[m_LM[5]] + ui[m_LM[5]];
 
-		m_U2.x += ui[m_LM[6]];
-		m_U2.y += ui[m_LM[7]];
-		m_U2.z += ui[m_LM[8]];
+		m_U2.x = m_U2p.x + Ui[m_LM[6]] + ui[m_LM[6]];
+		m_U2.y = m_U2p.y + Ui[m_LM[7]] + ui[m_LM[7]];
+		m_U2.z = m_U2p.z + Ui[m_LM[8]] + ui[m_LM[8]];
 
 		m_M = m_U1 + m_U2;
+	}
+}
+
+void FERigidPrismaticJoint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		for (int n : m_LM) Ui[n] += ui[n];
 	}
 }

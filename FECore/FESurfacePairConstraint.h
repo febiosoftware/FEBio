@@ -75,10 +75,18 @@ public:
 
 	// allocate equations for lagrange multipliers
 	// (should return the number of equations to be allocated)
-	virtual int InitEquations(int neq);
+	virtual int InitEquations(int neq) { return 0; }
+
+	// prepare for next time step
+	virtual void PrepStep() {}
 
 	// update based on solution (use for updating Lagrange Multipliers)
-	virtual void Update(vector<double>& ui);
+	// Ui is the total update for the current time step
+	// ui is the trial incremental update (e.g. from line search)
+	virtual void Update(const std::vector<double>& Ui, const std::vector<double>& ui) {}
+
+	// This is called after each iteration and asks to Update Ui using ui (this is used by Lagrange Multiplier implementations)
+	virtual void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) {}
 
 	using FEModelComponent::Update;
 };

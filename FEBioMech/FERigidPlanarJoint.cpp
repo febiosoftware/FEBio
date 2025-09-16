@@ -112,6 +112,7 @@ bool FERigidPlanarJoint::Init()
     // reset force
     m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
     m_M = vec3d(0,0,0); m_U = vec3d(0,0,0);
+	m_Fp = m_Mp = vec3d(0, 0, 0);
     
 	// base class first
 	if (FERigidConnector::Init() == false) return false;
@@ -968,16 +969,35 @@ void FERigidPlanarJoint::UnpackLM(vector<int>& lm)
 	}
 }
 
-void FERigidPlanarJoint::Update(const std::vector<double>& ui)
+void FERigidPlanarJoint::PrepStep()
+{
+	m_Fp = m_F;
+	m_Mp = m_M;
+}
+
+void FERigidPlanarJoint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
-		m_F.x += ui[m_LM[0]];
-		m_F.y += ui[m_LM[1]];
-		m_F.z += ui[m_LM[2]];
+		m_F.x = m_Fp.x + Ui[m_LM[0]] + ui[m_LM[0]];
+		m_F.y = m_Fp.y + Ui[m_LM[1]] + ui[m_LM[1]];
+		m_F.z = m_Fp.z + Ui[m_LM[2]] + ui[m_LM[2]];
 
-		m_M.x += ui[m_LM[3]];
-		m_M.y += ui[m_LM[4]];
-		m_M.z += ui[m_LM[5]];
+		m_M.x = m_Mp.x + Ui[m_LM[3]] + ui[m_LM[3]];
+		m_M.y = m_Mp.y + Ui[m_LM[4]] + ui[m_LM[4]];
+		m_M.z = m_Mp.z + Ui[m_LM[5]] + ui[m_LM[5]];
+	}
+}
+
+void FERigidPlanarJoint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		Ui[m_LM[0]] += ui[m_LM[0]];
+		Ui[m_LM[1]] += ui[m_LM[1]];
+		Ui[m_LM[2]] += ui[m_LM[2]];
+		Ui[m_LM[3]] += ui[m_LM[3]];
+		Ui[m_LM[4]] += ui[m_LM[4]];
+		Ui[m_LM[5]] += ui[m_LM[5]];
 	}
 }

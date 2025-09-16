@@ -65,7 +65,7 @@ FERigidJoint::~FERigidJoint()
 bool FERigidJoint::Init()
 {
 	// reset force
-	m_F = vec3d(0,0,0);
+	m_F = m_Fp = vec3d(0,0,0);
 
 	// base class first
 	if (FERigidConnector::Init() == false) return false;
@@ -331,7 +331,7 @@ void FERigidJoint::Serialize(DumpStream& ar)
 	FERigidConnector::Serialize(ar);
 	ar & m_nID;
 	ar & m_q0 & m_qa0 & m_qb0;
-	ar & m_F & m_L & m_eps & m_atol & m_laugon;
+	ar & m_F & m_Fp & m_L & m_eps & m_atol & m_laugon;
 }
 
 //-----------------------------------------------------------------------------
@@ -360,6 +360,7 @@ void FERigidJoint::Update()
 void FERigidJoint::Reset()
 {
 	m_F = vec3d(0,0,0);
+	m_Fp = vec3d(0,0,0);
 	m_L = vec3d(0,0,0);
 
 	m_qa0 = m_q0 - m_rbA->m_r0;
@@ -395,13 +396,28 @@ void FERigidJoint::UnpackLM(vector<int>& lm)
 	}
 }
 
-//-----------------------------------------------------------------------------
-void FERigidJoint::Update(const std::vector<double>& ui)
+void FERigidJoint::PrepStep()
+{
+	m_Fp = m_F;
+}
+
+void FERigidJoint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
-		m_F.x += ui[m_LM[0]];
-		m_F.y += ui[m_LM[1]];
-		m_F.z += ui[m_LM[2]];
+		m_F.x = m_Fp.x + Ui[m_LM[0]] + ui[m_LM[0]];
+		m_F.y = m_Fp.y + Ui[m_LM[1]] + ui[m_LM[1]];
+		m_F.z = m_Fp.z + Ui[m_LM[2]] + ui[m_LM[2]];
+	}
+}
+
+
+void FERigidJoint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		Ui[m_LM[0]] += ui[m_LM[0]];
+		Ui[m_LM[1]] += ui[m_LM[1]];
+		Ui[m_LM[2]] += ui[m_LM[2]];
 	}
 }
