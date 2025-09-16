@@ -10,8 +10,8 @@ cmake . -LA -B cmbuild ^
   -DUSE_HYPER=ON
 
 cd "cmbuild"
-msbuild /p:configuration=%CONFIG_TYPE% /maxCpuCount:%NUMBER_OF_PROCESSORS% ALL_BUILD.vcxproj
-copy bin\febio.xml bin\%CONFIG_TYPE%\
+msbuild /p:configuration=Release /maxCpuCount:%NUMBER_OF_PROCESSORS% ALL_BUILD.vcxproj
+msbuild /p:configuration=Debug /maxCpuCount:%NUMBER_OF_PROCESSORS% ALL_BUILD.vcxproj
 cd ..
 
 exit /b %errorlevel%

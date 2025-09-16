@@ -11,6 +11,12 @@ scp cmbuild/bin/* repo:~/$REMOTE_PATH/bin
 scp cmbuild/lib/* repo:~/$REMOTE_PATH/lib
 ssh repo "chmod +x $REMOTE_PATH/bin/febio4"
 
+# package and upload sdk
+pushd sdk
+zip -r sdk.zip include
+zip -r sdk.zip lib
+scp sdk.zip repo:~/$REMOTE_PATH/
+popd
 
 if [ -f testLogs/Logs/* ]; then
     scp testLogs/Logs/* repo:~/TestSuite/Logs/linux.txt
