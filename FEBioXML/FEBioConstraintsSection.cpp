@@ -29,7 +29,6 @@ SOFTWARE.*/
 #include "FECore/FECoreKernel.h"
 #include <FECore/FESurfaceConstraint.h>
 #include <FECore/FENodeSetConstraint.h>
-#include <FECore/FESurfacePairConstraintNL.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEMesh.h>
 #include <FECore/FESurface.h>
@@ -303,26 +302,6 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
                     pnset->Add(pset->GetNodeList());
                 }
 
-                // get the surface pair
-                FESurfacePairConstraintNL* pspc = dynamic_cast<FESurfacePairConstraintNL*>(plc);
-                if (pspc && pspc->GetPrimarySurface() && pspc->GetSecondarySurface())
-                {
-                    // get the surface pair
-                    const char* szpair = tag.AttributeValue("surface_pair");
-                    FESurfacePair* surfacePair =mesh.FindSurfacePair(szpair);
-                    if (surfacePair == 0) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
-                    
-                    // build the surfaces
-                    if (GetBuilder()->BuildSurface(*pspc->GetSecondarySurface(), *surfacePair->GetSecondarySurface(), pspc->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
-                    if (GetBuilder()->BuildSurface(*pspc->GetPrimarySurface(), *surfacePair->GetPrimarySurface(), pspc->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface_pair", szpair);
-
-                    // Make sure we have both surfaces
-                    FESurface* pss = pspc->GetPrimarySurface (); if ((pss == 0) || (pss->Elements()==0)) throw XMLReader::MissingAttribute(tag,"Missing constraint primary surface");
-                    mesh.AddSurface(pss);
-                    FESurface* pms = pspc->GetSecondarySurface(); if ((pms == 0) || (pms->Elements()==0)) throw XMLReader::MissingAttribute(tag,"Missing constraint secondary surface");
-                    mesh.AddSurface(pms);
-                }
-                
 				// read the parameter list
 				ReadParameterList(tag, plc);
 
