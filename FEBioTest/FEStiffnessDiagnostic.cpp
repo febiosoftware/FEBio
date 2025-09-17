@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FENewtonSolver.h>
 #include <FECore/FEGlobalMatrix.h>
+#include <FECore/FENLConstraint.h>
 #include <FECore/log.h>
 #include <FEBioMech/FEMechModel.h>
 #include <FEBioMech/FERigidBody.h>
@@ -71,8 +72,8 @@ bool FEStiffnessDiagnostic::Run()
 	// solve the problem
 	FEModel& fem = *GetFEModel();
 
-	fem.AddCallback(stiffness_diagnostic_cb, CB_TIMESTEP_SOLVED, (void*)this);
 //	fem.AddCallback(stiffness_diagnostic_cb, CB_MATRIX_REFORM, (void*)this);
+	fem.AddCallback(stiffness_diagnostic_cb, CB_QUASIN_CONVERGED, (void*)this);
 
 	// create a file name for the log file
 	string logfile("diagnostic.log");
@@ -101,6 +102,7 @@ bool FEStiffnessDiagnostic::Run()
 bool FEStiffnessDiagnostic::Diagnose()
 {
 	FEModel* fem = GetFEModel();
+	FEMechModel* mech = dynamic_cast<FEMechModel*>(fem);
 
 	FEAnalysis* step = fem->GetCurrentStep();
 	if (step == nullptr) return false;
@@ -118,6 +120,7 @@ bool FEStiffnessDiagnostic::Diagnose()
 	// need to know which dofs are prescribed
 	// 0 == fixed, 1 == free
 	vector<int> bc(neq, 0);
+	int nmax = -1;
 	FEMesh& mesh = fem->GetMesh();
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
@@ -128,6 +131,7 @@ bool FEStiffnessDiagnostic::Diagnose()
 			{
 				int n = node.m_ID[j];
 				if (n >= 0) bc[n] = 1;
+				if (n > nmax) nmax = n;
 			}
 		}
 		else
@@ -136,19 +140,29 @@ bool FEStiffnessDiagnostic::Diagnose()
 			{
 				int n = -node.m_ID[j]-2;
 				if (n >= 0) bc[n] = 1;
+				if (n > nmax) nmax = n;
 			}
 		}
 	}
 
-	// we need to commit the rigid body kinematics. 
-	// This usually doesn't happen until the init of the next time step,
-	// but that won't work for this diagnostic.
-	FEMechModel& mech = dynamic_cast<FEMechModel&>(*fem);
-	for (int i=0; i<mech.RigidBodies(); ++i)
+	if (mech)
 	{
-		FERigidBody& rb = *mech.GetRigidBody(i);
-		rb.m_rp = rb.m_rt;
-		rb.m_qp = rb.GetRotation();
+		for (int i = 0; i < mech->RigidBodies(); ++i)
+		{
+			FERigidBody& rb = *mech->GetRigidBody(i);
+			for (int j = 0; j < 6; ++j)
+			{
+				int n = rb.m_LM[j];
+				if (n >= 0) bc[n] = 1;
+				if (n > nmax) nmax = n;
+			}
+		}
+	}
+
+	if (nmax < neq)
+	{
+		// these are probably lagrange multiplier dofs
+		for (int i = nmax + 1; i < neq; ++i) bc[i] = 1;
 	}
 
 	std::vector<double> R0(neq, 0);

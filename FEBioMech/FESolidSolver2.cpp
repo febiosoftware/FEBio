@@ -1172,6 +1172,8 @@ bool FESolidSolver2::Quasin()
 	}
 	while (bconv == false);
 
+	fem.DoCallback(CB_QUASIN_CONVERGED);
+
 	// if converged we update the total displacements
 	if (bconv)
 	{
