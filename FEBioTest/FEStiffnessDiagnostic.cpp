@@ -41,6 +41,7 @@ FEStiffnessDiagnostic::FEStiffnessDiagnostic(FEModel* fem) : FECoreTask(fem)
 {
 	m_fp = nullptr;
 	m_writeMatrix = false;
+	m_nmax = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -51,7 +52,7 @@ bool FEStiffnessDiagnostic::Init(const char* szarg)
 	if (szarg && szarg[0])
 	{
 		if (strcmp(szarg, "v") == 0) m_writeMatrix = true;
-		else return false;
+		else { m_nmax = atoi(szarg); m_writeMatrix = true; }
 	}
 	return GetFEModel()->Init();
 }
@@ -171,7 +172,11 @@ bool FEStiffnessDiagnostic::Diagnose()
 	int i_max = -1, j_max = -1;
 	std::cerr << "\nstarting diagnostic:\nprogress:";
 	int pct = 0;
-	for (int j = 0; j < neq; ++j)
+
+	int nreq = (m_nmax <= 0 ? neq : m_nmax);
+	if (nreq > neq) nreq = neq;
+
+	for (int j = 0; j < nreq; ++j)
 	{
 		std::vector<double> u(neq, 0);
 		std::vector<double> R(neq, 0);
@@ -188,7 +193,7 @@ bool FEStiffnessDiagnostic::Diagnose()
 			pct = new_pct;
 		}
 
-		for (int i = 0; i < neq; ++i)
+		for (int i = 0; i < nreq; ++i)
 		{
 			// note that we flip the sign on ka.
 			// this is because febio actually calculates the negative of the residual
