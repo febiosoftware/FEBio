@@ -63,6 +63,7 @@ SOFTWARE.*/
 #include "FEFiberExpPowUncoupled.h"
 #include "FEFiberNaturalNeoHookean.h"
 #include "FEFiberNeoHookean.h"
+#include "FEFiberPow.h"
 #include "FEFiberPowLinear.h"
 #include "FEFiberPowLinearUncoupled.h"
 #include "FEFiberEFDNeoHookean.h"
@@ -448,6 +449,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberNH          , "fiber-NH"            );
 	REGISTER_FECORE_CLASS(FEFiberExpPow      , "fiber-exp-pow"       );
 	REGISTER_FECORE_CLASS(FEFiberExpLinear   , "fiber-exp-linear"    );
+	REGISTER_FECORE_CLASS(FEFiberPow         , "fiber-pow"           );
 	REGISTER_FECORE_CLASS(FEFiberPowLinear   , "fiber-pow-linear"    );
 	REGISTER_FECORE_CLASS(FEFiberExpPowLinear, "fiber-exp-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberNaturalNH   , "fiber-natural-NH"    );
@@ -462,6 +464,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEElasticFiberNH          , "fiber-NH"            );
 	REGISTER_FECORE_CLASS(FEElasticFiberExpPow      , "fiber-exp-pow"       );
 	REGISTER_FECORE_CLASS(FEElasticFiberExpLinear   , "fiber-exp-linear"    );
+	REGISTER_FECORE_CLASS(FEElasticFiberPow         , "fiber-pow"           );
 	REGISTER_FECORE_CLASS(FEElasticFiberPowLinear   , "fiber-pow-linear"    );
 	REGISTER_FECORE_CLASS(FEElasticFiberExpPowLinear, "fiber-exp-pow-linear");
 	REGISTER_FECORE_CLASS(FEElasticFiberNaturalNH   , "fiber-natural-NH"    );
