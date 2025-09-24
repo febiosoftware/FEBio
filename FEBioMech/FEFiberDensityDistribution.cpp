@@ -36,20 +36,21 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // define the ellipsoidal fiber density distributionmaterial parameters
 BEGIN_FECORE_CLASS(FEEllipsoidalFiberDensityDistribution, FEFiberDensityDistribution)
-	ADD_PARAMETER(m_spa, "spa" );
+	ADD_PARAMETER(m_spa, 3, FE_RANGE_GREATER_OR_EQUAL(0.0), "spa");
 END_FECORE_CLASS();
 
 FEEllipsoidalFiberDensityDistribution::FEEllipsoidalFiberDensityDistribution(FEModel* pfem) : FEFiberDensityDistribution(pfem)
 { 
-    m_spa = vec3d(1,1,1);
+	m_spa[0] = 1;
+	m_spa[1] = 1;
+	m_spa[2] = 1;
 }
 
 double FEEllipsoidalFiberDensityDistribution::FiberDensity(FEMaterialPoint& mp, const vec3d& n0)
 {
-    vec3d spa = m_spa(mp);
-	double a0 = spa.x;
-	double a1 = spa.y;
-	double a2 = spa.z;
+	double a0 = m_spa[0](mp);
+	double a1 = m_spa[1](mp);
+	double a2 = m_spa[2](mp);
 
     double R = 1.0/sqrt(SQR(n0.x/a0)+SQR(n0.y/a1)+SQR(n0.z/a2));
     return R;

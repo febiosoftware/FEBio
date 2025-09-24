@@ -67,8 +67,8 @@ public:
     double FiberDensity(FEMaterialPoint& mp, const vec3d& n0) override;
     
 public:
-    FEParamVec3 m_spa;      // semi-principal axes of ellipsoid
-    
+	FEParamDouble m_spa[3]; // semi-principal axes of ellipsoid
+
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
