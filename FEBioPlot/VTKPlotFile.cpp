@@ -301,7 +301,9 @@ void VTKPlotFile::WritePointData()
 		if (it->m_psave)
 		{
 			FEPlotData* pd = it->m_psave;
-			if (pd->StorageFormat() == Storage_Fmt::FMT_NODE) domainVars++;
+			int format = pd->StorageFormat();
+			if ((format == Storage_Fmt::FMT_NODE) ||
+				(format == Storage_Fmt::FMT_MULT)) domainVars++;
 		}
 	}
 	if ((nodalVars + domainVars) == 0) return;
@@ -352,19 +354,21 @@ void VTKPlotFile::WritePointData()
 		if (it->m_psave)
 		{
 			FEPlotData* pd = it->m_psave;
-			if (pd->StorageFormat() == Storage_Fmt::FMT_NODE)
+			int format = pd->StorageFormat();
+
+			// must remove all whitespace
+			string dataName = it->m_szname;
+			Space2_(dataName);
+			const char* szname = dataName.c_str();
+
+			int ndata = pd->VarSize(pd->DataType());
+
+			// For now, we store all data in a global array
+			int N = fem.GetMesh().Nodes();
+			std::vector<float> val(ndata * N, 0.f);
+
+			if (format == Storage_Fmt::FMT_NODE)
 			{
-				// must remove all whitespace
-				string dataName = it->m_szname;
-				Space2_(dataName);
-				const char* szname = dataName.c_str();
-
-				int ndata = pd->VarSize(pd->DataType());
-
-				// For now, we store all data in a global array
-				int N = fem.GetMesh().Nodes();
-				std::vector<float> val(ndata * N, 0.f);
-
 				// loop over all domains and fill global val array
 				for (int i = 0; i < mesh.Domains(); ++i)
 				{
@@ -383,19 +387,67 @@ void VTKPlotFile::WritePointData()
 						for (int k = 0; k < ndata; ++k) val[nj * ndata + k] = a[ndata * j + k];
 					}
 				}
+			}
+			else if (format == Storage_Fmt::FMT_MULT)
+			{
+				vector<int> tag(N, 0);
 
-				// write the value array
-				switch (pd->DataType())
+				// loop over all domains and fill global val array
+				for (int i = 0; i < mesh.Domains(); ++i)
 				{
-				case PLT_FLOAT : WriteScalarData(val, szname); break;
-				case PLT_VEC3F : WriteVectorData(val, szname); break;
-				case PLT_MAT3FS: WriteMat3FSData(val, szname); break;
-				case PLT_MAT3FD: WriteMat3FDData(val, szname); break;
-				case PLT_ARRAY : WriteArrayData (val, szname, pd); break;
-				case PLT_ARRAY_VEC3F: WriteArrayVec3fData(val, szname, pd); break;
-				default:
-					assert(false);
+					FEDomain& dom = mesh.Domain(i);
+
+					int NN = 0;
+					for (int j = 0; j < dom.Elements(); ++j) NN += dom.ElementRef(j).Nodes();
+
+					FEDataStream a; a.reserve(ndata * NN);
+					pd->Save(dom, a);
+
+					// pad mismatches
+					if (a.size() != NN * ndata) a.resize(NN * ndata, 0.f);
+
+					// copy to global array
+					NN = 0;
+					for (int j = 0; j < dom.Elements(); ++j)
+					{
+						FEElement& el = dom.ElementRef(j);
+						int ne = el.Nodes();
+						for (int k = 0; k < ne; ++k, ++NN)
+						{
+							int nk = el.m_node[k];
+
+							tag[nk]++;
+
+							for (int l = 0; l < ndata; ++l)
+							{
+								val[nk * ndata + l] += a[NN*ndata + l];
+							}
+						}
+					}
 				}
+
+				for (int i = 0; i < N; ++i)
+				{
+					if (tag[i] != 0)
+					{
+						float d = 1.f / (float)tag[i];
+						for (int j = 0; j < ndata; ++j) val[i * ndata + j] *= d;
+					}
+				}
+			}
+			else continue;
+
+			// write the value array
+			switch (pd->DataType())
+			{
+			case PLT_FLOAT : WriteScalarData(val, szname); break;
+			case PLT_VEC3F : WriteVectorData(val, szname); break;
+			case PLT_MAT3FS: WriteMat3FSData(val, szname); break;
+			case PLT_MAT3FD: WriteMat3FDData(val, szname); break;
+			case PLT_ARRAY : WriteArrayData (val, szname, pd); break;
+			case PLT_ARRAY_VEC3F: WriteArrayVec3fData(val, szname, pd); break;
+			default:
+				assert(false);
 			}
 		}
 	}
