@@ -856,6 +856,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotCurrentElementLinearMomentum, "current element linear momentum");
 	REGISTER_FECORE_CLASS(FEPlotCurrentElementAngularMomentum, "current element angular momentum");
 	REGISTER_FECORE_CLASS(FEPlotNodeDisplacement, "displacement");
+	REGISTER_FECORE_CLASS(FEPlotNodeIncrementalDisplacement, "incremental displacement");
 	REGISTER_FECORE_CLASS(FEPlotNodeRotation, "rotation");
     REGISTER_FECORE_CLASS(FEPlotNodeShellDisplacement, "shell displacement");
 	REGISTER_FECORE_CLASS(FEPlotNodeVelocity, "nodal velocity");

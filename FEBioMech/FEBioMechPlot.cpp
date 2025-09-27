@@ -129,6 +129,26 @@ bool FEPlotNodalShellDirector::Save(FEMesh& m, FEDataStream& a)
     return true;
 }
 
+//! Store the nodal incremental displacements
+bool FEPlotNodeIncrementalDisplacement::Save(FEMesh& m, FEDataStream& a)
+{
+	int N = m.Nodes();
+	if (m_rp.size() != N)
+	{
+		m_rp.resize(N);
+		for (int i = 0; i < N; ++i) m_rp[i] = m.Node(i).m_rt;
+	}
+
+	// loop over all nodes
+	for (int i = 0; i < N; ++i)
+	{
+		vec3d& rt = m.Node(i).m_rt;
+		a << rt - m_rp[i];
+		m_rp[i] = rt;
+	}
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 bool FEPlotNodeVelocity::Save(FEMesh& m, FEDataStream& a)
 {

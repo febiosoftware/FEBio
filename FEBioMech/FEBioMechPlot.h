@@ -62,6 +62,17 @@ public:
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
+//! Nodal incremental displacement
+class FEPlotNodeIncrementalDisplacement : public FEPlotNodeData
+{
+public:
+	FEPlotNodeIncrementalDisplacement(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) { SetUnits(UNIT_LENGTH); }
+	bool Save(FEMesh& m, FEDataStream& a);
+
+private:
+	std::vector<vec3d> m_rp;
+};
+
 //-----------------------------------------------------------------------------
 //! Shell directors
 class FEPlotNodalShellDirector : public FEPlotNodeData
