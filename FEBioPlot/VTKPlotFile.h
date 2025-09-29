@@ -56,6 +56,7 @@ private:
 
 	void WriteScalarData(std::vector<float>& val, const std::string& szname);
 	void WriteVectorData(std::vector<float>& val, const std::string& szname);
+	void WriteMat3FData (std::vector<float>& val, const std::string& szname);
 	void WriteMat3FSData(std::vector<float>& val, const std::string& szname);
 	void WriteMat3FDData(std::vector<float>& val, const std::string& szname);
 	void WriteArrayData (std::vector<float>& val, const std::string& name, FEPlotData* pd);

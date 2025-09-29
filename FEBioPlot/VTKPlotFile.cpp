@@ -216,6 +216,16 @@ void VTKPlotFile::WriteVectorData(std::vector<float>& val, const std::string& na
 	for (int i = 0; i < val.size(); i += 3) fprintf(m_fp, "%g %g %g\n", val[i], val[i + 1], val[i + 2]);
 }
 
+void VTKPlotFile::WriteMat3FData(std::vector<float>& val, const std::string& name)
+{
+	fprintf(m_fp, "%s %s %s\n", "TENSORS", name.c_str(), "float");
+	for (int i = 0; i < val.size(); i += 6)
+		fprintf(m_fp, "%g %g %g\n%g %g %g\n%g %g %g\n\n",
+			val[i    ], val[i + 1], val[i + 2],
+			val[i + 3], val[i + 4], val[i + 5],
+			val[i + 6], val[i + 7], val[i + 8]);
+}
+
 void VTKPlotFile::WriteMat3FSData(std::vector<float>& val, const std::string& name)
 {
 	fprintf(m_fp, "%s %s %s\n", "TENSORS", name.c_str(), "float");
@@ -528,6 +538,7 @@ void VTKPlotFile::WriteCellData()
 				{
 				case PLT_FLOAT : WriteScalarData(val, szname); break;
 				case PLT_VEC3F : WriteVectorData(val, szname); break;
+				case PLT_MAT3F : WriteMat3FData (val, szname); break;
 				case PLT_MAT3FS: WriteMat3FSData(val, szname); break;
 				case PLT_MAT3FD: WriteMat3FDData(val, szname); break;
 				case PLT_ARRAY : WriteArrayData (val, szname, pd); break;
