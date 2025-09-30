@@ -9790,7 +9790,8 @@ opt_iter
 \shape default
 defines the estimated optimal number of quasi-Newton iterations.
  If the actual number of iterations is less than or equal to this value the time step size is increased,
- otherwise it is decreased.
+ otherwise it is decreased,
+ as detailed further below.
 \end_layout
 
 \begin_layout Enumerate
@@ -9802,13 +9803,13 @@ When a time step fails (e.g.
 max_retries 
 \shape default
 parameter determines the maximum number of times a timestep may be retried before FEBio error terminates.
- The new time step size is determined by the ratio of the previous time step size and 
+ The new time step size is determined by the ratio of the time step size before restarts started and 
 \shape italic
 max_retries+1
 \shape default
 .
  For example,
- if the last time step size is 0.1 and 
+ if the time step size is 0.1 and 
 \shape italic
 max_retries 
 \shape default
@@ -9817,7 +9818,50 @@ is set to 4,
  The first retry will have a step size of 0.08;
  the next will be 0.06,
  and so on.
+ Specifically,
+ the new time step size is determined as follows.
+ (This is only for the case when the 
+\emph on
+aggressiveness 
+\emph default
+parameter is set to zero.) 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Delta t^{k+1}=\Delta t^{k}-\Delta t^{0}/\left(m_{\mathrm{max}}+1\right)
+\]
+
+\end_inset
+
+Here,
  
+\begin_inset Formula $\Delta t^{k}$
+\end_inset
+
+is the current time step size,
+ 
+\begin_inset Formula $\Delta t^{k+1}$
+\end_inset
+
+ is the new time step size,
+ 
+\begin_inset Formula $\Delta t^{0}$
+\end_inset
+
+ is the time step size before retries started,
+ and 
+\begin_inset Formula $m_{\mathrm{max}}$
+\end_inset
+
+is the max number of retries (i.e.
+ 
+\emph on
+max_
+\emph default
+retries).
 \begin_inset Newline newline
 \end_inset
 
@@ -9833,18 +9877,83 @@ opt_iter
 \emph default
 ,
  the time step size will be decreased.
- On the other hand,
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Delta t^{k+1}=\Delta t^{k}-\left(\Delta t^{k}-\Delta t_{\mathrm{min}}\right)\left(1-r\right)
+\]
+
+\end_inset
+
+Here,
+ 
+\begin_inset Formula $\Delta t^{k}$
+\end_inset
+
+is the current time step size,
+ 
+\begin_inset Formula $\Delta t^{k+1}$
+\end_inset
+
+ is the new time step size,
+ 
+\begin_inset Formula $\Delta t_{\mathrm{min}}$
+\end_inset
+
+is the minimum time step size and 
+\begin_inset Formula $r=\sqrt{n_{\mathrm{opt}}/n}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $n$
+\end_inset
+
+ is the number of iterations and 
+\begin_inset Formula $n_{\mathrm{opt}}$
+\end_inset
+
+is the optimal number of iterations as specified by the user (i.e.
+ 
+\emph on
+opt_iter
+\emph default
+).
+\begin_inset Newline newline
+\end_inset
+
+On the other hand,
  if the actual number of iterations is less than 
 \emph on
 opt_iter
 \emph default
 ,
  then the time step size will be increased.
- After adjusting
-\emph on
+ The exact equation follows.
  
-\emph default
-the time step size,
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Delta t^{k+1}=\Delta t^{k}+\left(\Delta t_{\mathrm{max}}-\Delta t^{k}\right)\mathrm{min}\left(0.2,r-1\right)
+\]
+
+\end_inset
+
+In addition,
+ the new time step size is enforced to be less than 5 times the old time step size,
+ to prevent the time step size from growing too fast.
+ 
+\begin_inset Newline newline
+\end_inset
+
+After calculating the new time step size,
  it will be ensured that the new timestep size falls within the range defined by 
 \emph on
 dtmin
@@ -9998,19 +10107,11 @@ aggressiveness = 0
 \emph default
  (default):
  
-\begin_inset Formula $\Delta t_{k+1}=\Delta t_{k}-(\Delta t_{k}/m_{r})$
+\begin_inset Formula $\Delta t^{k+1}=\Delta t^{k}-\Delta t^{0}/\left(m_{\mathrm{max}}+1\right)$
 \end_inset
 
 ,
- where 
-\begin_inset Formula $m_{r}$
-\end_inset
-
-is the max number of retries (set by the 
-\emph on
-max_retries 
-\emph default
-parameter).
+ (see comment 2 for more details).
 \end_layout
 
 \begin_layout Enumerate
@@ -10020,7 +10121,7 @@ aggressiveness = 1:
  
 \emph default
 
-\begin_inset Formula $\Delta t_{k+1}=\gamma\Delta t_{k}$
+\begin_inset Formula $\Delta t^{k+1}=\gamma\Delta t^{k}$
 \end_inset
 
 ,
@@ -120113,362 +120214,449 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout Verbatim
+
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
+
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
+
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
+
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
+
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
+
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
+
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
+
 		</material>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1">-2.0,-0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2">-2.0,-0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3">-2.0,
  0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4">-2.0,
  0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"> 2.0,-0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"> 2.0,-0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"> 2.0,
  0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"> 2.0,
  0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
+
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
+
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
+
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
+
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
+
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
+
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
+
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
+
 			<points>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
+
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
+
 			</points>
 \end_layout
 
 \begin_layout Verbatim
+
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
+
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
+
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
+
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
+
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
+
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
+
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
+
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
+
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
+
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
+
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
+
 		</step>
 \end_layout
 
 \begin_layout Verbatim
+
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
+
 </febio_spec>
 \end_layout
 
