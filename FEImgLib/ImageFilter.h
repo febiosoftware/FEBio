@@ -24,41 +24,26 @@ public:
 	virtual void Update(Image& trg, Image& src) = 0;
 
 	//! evaluate the filter at the current position
-	virtual double Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) = 0;
+	virtual float Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) = 0;
+
+	//! return blur value
+	virtual double GetBlur() = 0;
 
 protected:
-	//Image& m_img;
-	//ImageFilter& m_filt;
 };
 
-class FEIMGLIB_API IterativeBlur1D : public ImageFilter
+class FEIMGLIB_API IterativeBlur : public ImageFilter
 {
 public:
-	IterativeBlur1D(FEModel* fem);
+	IterativeBlur(FEModel* fem);
 
 	bool Init() override;
 
 	void Update(Image& trg, Image& src) override;
 
-	double Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
+	float Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
 
-protected:
-	//! flag to normalize data so that blur units coincide with physical dimensions rather than img dimensions
-	bool m_norm_flag;
-	double m_blur;
-	DECLARE_FECORE_CLASS();
-};
-
-class FEIMGLIB_API IterativeBlur3D : public ImageFilter
-{
-public:
-	IterativeBlur3D(FEModel* fem);
-
-	bool Init() override;
-
-	void Update(Image& trg, Image& src) override;
-
-	double Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
+	double GetBlur() override { return m_blur; };
 
 protected:
 	//! flag to normalize data so that blur units coincide with physical dimensions rather than img dimensions
@@ -67,55 +52,50 @@ protected:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEIMGLIB_API BoxBlur1D : public ImageFilter
+class FEIMGLIB_API BoxBlur : public ImageFilter
 {
 public:
-	BoxBlur1D(FEModel* fem);
+	BoxBlur(FEModel* fem);
 
 	bool Init() override;
 
 	void Update(Image& trg, Image& src) override;
 
-	double Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
+	float Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
+
+	//! return the current blur value
+	double GetBlur() override { return m_blur; };
 
 public:
 	bool m_norm_flag = false;
-	double m_blur;
-	DECLARE_FECORE_CLASS();
-};
-
-class FEIMGLIB_API BoxBlur3D : public ImageFilter
-{
-public:
-	BoxBlur3D(FEModel* fem);
-
-	bool Init() override;
-
-	void Update(Image& trg, Image& src) override;
-
-	double Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
-
-public:
-	bool m_norm_flag = false;
-	double m_blur;
+	double m_blur; // sigma (units of length)
+	double m_rp; // previous modulus
+	double m_tp; // previous time
+	int m_K; // iterations of box blur to apply
+	double m_res[3]; // voxel resolution (L / px)
+	int m_ri[3]; // effective radii along each direction
 	DECLARE_FECORE_CLASS();
 };
 
 #ifdef HAVE_FFTW
-class FEIMGLIB_API FFTWBlur3D : public ImageFilter
+class FEIMGLIB_API FFTWBlur : public ImageFilter
 {
 public:
-	FFTWBlur3D(FEModel* fem);
+	FFTWBlur(FEModel* fem);
 
 	bool Init() override;
 
 	void Update(Image& trg, Image& src) override;
 
-	double Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
+	float Apply(Image& img, int m_pos[3], int m_range[3], int m_dir) override;
+
+	double GetBlur() override { return m_blur; };
 
 public:
 	bool m_norm_flag = false;
-	double m_blur;
+	double m_blur; // sigma (units of length)
+	double m_res[3]; // voxel resolution (L / px)
+	double m_sigma[3];
 	DECLARE_FECORE_CLASS();
 };
 #endif // HAVE_FFTW

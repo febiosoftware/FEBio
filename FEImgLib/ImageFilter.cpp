@@ -17,30 +17,30 @@ ImageFilter::ImageFilter(FEModel* fem) : FECoreClass(fem)
 // IterativeBlur
 //=================================================================================================
 
-BEGIN_FECORE_CLASS(IterativeBlur1D, ImageFilter)
+BEGIN_FECORE_CLASS(IterativeBlur, ImageFilter)
 	ADD_PARAMETER(m_blur, "blur");
 	ADD_PARAMETER(m_norm_flag, "normalize values");
 END_FECORE_CLASS();
 
-IterativeBlur1D::IterativeBlur1D(FEModel* fem) : ImageFilter(fem)
+IterativeBlur::IterativeBlur(FEModel* fem) : ImageFilter(fem)
 {
 	m_blur = 0.0;
 	m_norm_flag = false;
 }
 
-bool IterativeBlur1D::Init()
+bool IterativeBlur::Init()
 {
 	return true;
 }
 
 //sequential 1D approach
-void IterativeBlur1D::Update(Image& trg, Image& src)
+void IterativeBlur::Update(Image& trg, Image& src)
 {
 	if (m_blur <= 0) { trg = src; return; }
 	feLog("Blurring images, blur factor %lg\n", m_blur);
 
-	int n = (int)m_blur;
-	float w = m_blur - (float)n;
+	int K = (int)m_blur;
+	float w = float(m_blur) - (float)K;
 
 	int nx = src.width();
 	int ny = src.height();
@@ -49,167 +49,101 @@ void IterativeBlur1D::Update(Image& trg, Image& src)
 	trg = src;
 	Image tmp(src);
 	
-	for (int l = 0; l < n; ++l)
+	for (int k = 0; k < K; ++k)
 	{
-		for (int m = 0; m < 2; ++m)
+		for (int m = 0; m < 3; ++m)
 		{
-			for (int k = 0; k < nz; ++k)
-				for (int j = 0; j < ny; ++j)
-					for (int i = 0; i < nx; ++i) {
-						int m_pos[] = { i, j, k };
+#ifdef NDEBUG
+			#pragma omp parallel for
+#endif
+			for (int z = 0; z < nz; ++z)
+				for (int y = 0; y < ny; ++y)
+					for (int x = 0; x < nx; ++x) {
+						int m_pos[] = { x, y, z };
 						int m_range[] = { nx, ny, nz };
-						trg.value(i, j, k) = Apply(tmp, m_pos, m_range, m);
+						trg.value(x, y, z) = Apply(tmp, m_pos, m_range, m);
 					}
-
 			tmp = trg;
 		}
 	}
 
 	if (w > 0.0)
 	{
-		for (int m = 0; m < 2; ++m)
+		for (int m = 0; m < 3; ++m)
 		{
-			for (int k = 0; k < nz; ++k)
-				for (int j = 0; j < ny; ++j)
-					for (int i = 0; i < nx; ++i) {
-						int m_pos[] = { i, j, k };
+#ifdef NDEBUG
+			#pragma omp parallel for
+#endif
+			for (int z = 0; z < nz; ++z)
+				for (int y = 0; y < ny; ++y)
+					for (int x = 0; x < nx; ++x) {
+						int m_pos[] = { x, y, z };
 						int m_range[] = { nx, ny, nz };
-						trg.value(i, j, k) = Apply(tmp, m_pos, m_range, m);
+						float f1 = Apply(tmp, m_pos, m_range, m);
+						float f2 = trg.value(x, y, z);
+						trg.value(x, y, z) = Apply(tmp, m_pos, m_range, m);
+						trg.value(x, y, z) = f1 * w + f2 * (1.f - w);
 					}
-
 			tmp = trg;
 		}
 	}
 }
 
-double IterativeBlur1D::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
+float IterativeBlur::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
 {
-	// sequential 1D implementation
-	int i = m_pos[0]; int j = m_pos[1]; int k = m_pos[2];
+	int x = m_pos[0]; int y = m_pos[1]; int z = m_pos[2];
 	int nx = m_range[0]; int ny = m_range[1]; int nz = m_range[2];
-	float f[2] = { 0.0f, 0.0f };
-	switch (m_dir)
-	{
-	case 0:
-		if (i > 0) f[0] = img.value(i - 1, j, k); else f[0] = img.value(i, j, k);
-		if (i < nx - 1) f[1] = img.value(i + 1, j, k); else f[1] = img.value(i, j, k);
-		break;
-	case 1:
-		if (j > 0) f[0] = img.value(i, j - 1, k); else f[0] = img.value(i, j, k);
-		if (j < ny - 1) f[1] = img.value(i, j + 1, k); else f[1] = img.value(i, j, k);
-		break;
-	case 2:
-		if (k > 0) f[0] = img.value(i, j, k - 1); else f[0] = img.value(i, j, k);
-		if (k < nz - 1) f[1] = img.value(i, j, k + 1); else f[1] = img.value(i, j, k);
-		break;
-	}
-	return 0.5f * (f[0] + f[1]);
-}
-
-BEGIN_FECORE_CLASS(IterativeBlur3D, ImageFilter)
-ADD_PARAMETER(m_blur, "blur");
-ADD_PARAMETER(m_norm_flag, "normalize values");
-END_FECORE_CLASS();
-
-IterativeBlur3D::IterativeBlur3D(FEModel* fem) : ImageFilter(fem)
-{
-	m_blur = 0.0;
-	m_norm_flag = false;
-}
-
-bool IterativeBlur3D::Init()
-{
-	return true;
-}
-
-//naive approach
-void IterativeBlur3D::Update(Image& trg, Image& src)
-{
-	if (m_blur <= 0) { trg = src; return; }
-	feLog("Blurring images, blur factor %lg\n", m_blur);
-
-	int n = (int)m_blur;
-	float w = m_blur - (float)n;
-
-	int nx = src.width();
-	int ny = src.height();
-	int nz = src.depth();
-
-	trg = src;
-	Image tmp(src);
-
-	//IterativeBlur* m_filt = new IterativeBlur();
-	for (int l = 0; l < n; ++l)
-	{
-#pragma omp parallel for collapse(3)
-		for (int k = 0; k < nz; ++k)
-			for (int j = 0; j < ny; ++j)
-				for (int i = 0; i < nx; ++i) {
-					int m_pos[] = { i, j, k };
-					int m_range[] = { nx, ny, nz };
-					trg.value(i, j, k) = Apply(tmp, m_pos, m_range, 0);
-				}
-		tmp = trg;
-	}
-
-	if (w > 0.0)
-	{
-#pragma omp parallel for collapse(3)
-		for (int k = 0; k < nz; ++k)
-			for (int j = 0; j < ny; ++j)
-				for (int i = 0; i < nx; ++i)
-				{
-					int m_pos[] = { i, j, k };
-					int m_range[] = { nx, ny, nz };
-					float f1 = Apply(tmp, m_pos, m_range, 0);
-					float f2 = trg.value(i, j, k);
-					trg.value(i, j, k) = f1 * w + f2 * (1.f - w);
-				}
-	}
-}
-
-double IterativeBlur3D::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
-{
-	//naive implementation
-	int i = m_pos[0]; int j = m_pos[1]; int k = m_pos[2];
-	int nx = m_range[0]; int ny = m_range[1]; int nz = m_range[2];
-	float f[6];
-	if (i > 0) f[0] = img.value(i - 1, j, k); else f[0] = img.value(i, j, k);
-	if (i < nx - 1) f[1] = img.value(i + 1, j, k); else f[1] = img.value(i, j, k);
-	if (j > 0) f[2] = img.value(i, j - 1, k); else f[2] = img.value(i, j, k);
-	if (j < ny - 1) f[3] = img.value(i, j + 1, k); else f[3] = img.value(i, j, k);
-	if (k > 0) f[4] = img.value(i, j, k - 1); else f[4] = img.value(i, j, k);
-	if (k < nz - 1) f[5] = img.value(i, j, k + 1); else f[5] = img.value(i, j, k);
-	return 0.1666667f * (f[0] + f[1] + f[2] + f[3] + f[4] + f[5]);
+	float f = 0.0;
+	if (x > 0) f += img.value(x - 1, y, z); else f += img.value(x, y, z);
+	if (x < nx - 1) f += img.value(x + 1, y, z); else f += img.value(x, y, z);
+	if (y > 0) f += img.value(x, y - 1, z); else f += img.value(x, y, z);
+	if (y < ny - 1) f += img.value(x, y + 1, z); else f += img.value(x, y, z);
+	if (z > 0) f += img.value(x, y, z - 1); else f += img.value(x, y, z);
+	if (z < nz - 1) f += img.value(x, y, z + 1); else f += img.value(x, y, z);
+	return float(0.1666667f) * f;
 }
 
 //=================================================================================================
 // BoxBlur
 //=================================================================================================
 
-BEGIN_FECORE_CLASS(BoxBlur1D, ImageFilter)
-	ADD_PARAMETER(m_blur, "blur");
+BEGIN_FECORE_CLASS(BoxBlur, ImageFilter)
+	ADD_PARAMETER(m_blur, "blur"); // blur radius
+	ADD_PARAMETER(m_K, "iterations");
 	ADD_PARAMETER(m_norm_flag, "normalize values");
+	ADD_PARAMETER(m_res, 3, "voxel_resolution");
 END_FECORE_CLASS();
 
-BoxBlur1D::BoxBlur1D(FEModel* fem) : ImageFilter(fem)
+BoxBlur::BoxBlur(FEModel* fem) : ImageFilter(fem)
 {
 	m_blur = 0.0;
+	m_K = 0;
 	m_norm_flag = false;
+	m_res[0] = 1.0; m_res[1] = 1.0; m_res[2] = 1.0;
+	m_ri[0] = 1; m_ri[1] = 1; m_ri[2] = 1;
+	m_rp = 0.0;
+	m_tp = -1.0;
 }
 
-bool BoxBlur1D::Init()
+bool BoxBlur::Init()
 {
 	return true;
 }
 
-void BoxBlur1D::Update(Image& trg, Image& src)
+void BoxBlur::Update(Image& trg, Image& src)
 {
-	if (m_blur <= 0) { trg = src; return; }
-	feLog("Blurring images, blur factor %lg\n", m_blur);
-
-	int n = (int)m_blur;
-	float w = m_blur - (float)n;
+	if (m_blur < 1) { trg = src; return; }
+	// approximate gaussian blur from https://www.ipol.im/pub/art/2013/87/?utm_source=doi
+	double r_eff = (int)floor(0.5 * sqrt(((12.0 * m_blur * m_blur / m_K) + 1.0)));
+	double sigma_i[3] = { 0.0, 0.0, 0.0 };
+	for (int i = 0; i < 3; ++i)
+	{
+		sigma_i[i] = m_blur / m_res[i]; // (units of px)
+		m_ri[i] = (int)floor(0.5 * sqrt(((12.0 * sigma_i[i] * sigma_i[i] / m_K) + 1.0)));
+	}
+	feLog("Blurring images\n");
+	feLog("blur radius = %lg px, rx = %d px, ry = %d px, rz = %d px,\n", r_eff, m_ri[0], m_ri[1], m_ri[2]);
+	feLog("blur std = %lg, stdx = %lg, stdy = %lg, stdz = %lg\n", m_blur, sigma_i[0], sigma_i[1], sigma_i[2]);
 
 	int nx = src.width();
 	int ny = src.height();
@@ -218,214 +152,109 @@ void BoxBlur1D::Update(Image& trg, Image& src)
 	trg = src;
 	Image tmp(src);
 
-	//IterativeBlur* m_filt = new IterativeBlur();
-	for (int l = 0; l < n; ++l)
+	// for each iteration
+	for (int k = 0; k < m_K; ++k)
 	{
-#pragma omp parallel for collapse(3)
-		for (int k = 0; k < nz; ++k)
-			for (int j = 0; j < ny; ++j)
-				for (int i = 0; i < nx; ++i) {
-					int m_pos[] = { i, j, k };
-					int m_range[] = { nx, ny, nz };
-					trg.value(i, j, k) = Apply(tmp, m_pos, m_range, 0);
-				}
-		tmp = trg;
-	}
-
-	if (w > 0.0)
-	{
-#pragma omp parallel for collapse(3)
-		for (int k = 0; k < nz; ++k)
-			for (int j = 0; j < ny; ++j)
-				for (int i = 0; i < nx; ++i)
-				{
-					int m_pos[] = { i, j, k };
-					int m_range[] = { nx, ny, nz };
-					float f1 = Apply(tmp, m_pos, m_range, 0);
-					float f2 = trg.value(i, j, k);
-					trg.value(i, j, k) = f1 * w + f2 * (1.f - w);
-				}
+		// perform 1D blur along each dimension
+		for (int m = 0; m < 3; ++m)
+		{
+#ifdef NDEBUG
+			#pragma omp parallel for
+#endif
+			for (int z = 0; z < nz; ++z)
+				for (int y = 0; y < ny; ++y)
+					for (int x = 0; x < nx; ++x)
+					{
+						int m_pos[] = { x, y, z };
+						int m_range[] = { nx, ny, nz };
+						
+						trg.value(x, y, z) = Apply(tmp, m_pos, m_range, m);
+					}
+			tmp = trg;
+		}
 	}
 }
 
-double BoxBlur1D::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
+float BoxBlur::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
 {
 	//naive implementation
-	int i = m_pos[0]; int j = m_pos[1]; int k = m_pos[2];
+	int x = m_pos[0]; int y = m_pos[1]; int z = m_pos[2];
 	int nx = m_range[0]; int ny = m_range[1]; int nz = m_range[2];
 	float f = 0.0;
-	
-	//set flags based on position
-	bool flag_i0, flag_in, flag_j0, flag_jn, flag_k0, flag_kn = false;
-	int n_flag = 0;
-	int n_count = 0;
-	int i_0, j_0, k_0 = -1;
-	int i_f, j_f, k_f = 1;
-	if (i == 0) { flag_i0 = true; n_flag++; i_0 = 0; }
-	if (i == nx) { flag_in = true; n_flag++; i_f = 0; }
-	if (j == 0) { flag_j0 = true; n_flag++; j_0 = 0; }
-	if (j == ny) { flag_jn = true; n_flag++; j_f = 0; }
-	if (k == 0) { flag_k0 = true; n_flag++; k_0 = 0; }
-	if (k == nz) { flag_kn = true; n_flag++; k_f = 0; }
-
-	switch (n_flag) {
-	case 0:
-		n_count = 27;
-		break;
-	case 1:
-		n_count = 18;
-		break;
-	case 2:
-		n_count = 12;
-		break;
-	case 3:
-		n_count = 8;
-		break;	
-	}
-
-	for (int a = i_0; a < i_f; ++a)
-		for (int b = j_0; b < j_f; ++b)
-			for (int c = k_0; c < k_f; ++c)
+	switch (m_dir)
+	{
+		case 0:
+		{
+			for (int i_r = -m_ri[0]; i_r <= m_ri[0]; ++i_r)
 			{
-				f += img.value(i + a, j + b, c + k);
-			}	
-	
-	return (f / n_count);
-}
-
-BEGIN_FECORE_CLASS(BoxBlur3D, ImageFilter)
-	ADD_PARAMETER(m_blur, "blur");
-	ADD_PARAMETER(m_norm_flag, "normalize values");
-END_FECORE_CLASS();
-
-BoxBlur3D::BoxBlur3D(FEModel* fem) : ImageFilter(fem)
-{
-	m_blur = 0.0;
-	m_norm_flag = false;
-}
-
-bool BoxBlur3D::Init()
-{
-	return true;
-}
-
-void BoxBlur3D::Update(Image& trg, Image& src)
-{
-	if (m_blur <= 0) { trg = src; return; }
-	feLog("Blurring images, blur factor %lg\n", m_blur);
-
-	int n = (int)m_blur;
-	float w = m_blur - (float)n;
-
-	int nx = src.width();
-	int ny = src.height();
-	int nz = src.depth();
-
-	trg = src;
-	Image tmp(src);
-
-	//IterativeBlur* m_filt = new IterativeBlur();
-	for (int l = 0; l < n; ++l)
-	{
-#pragma omp parallel for collapse(3)
-		for (int k = 0; k < nz; ++k)
-			for (int j = 0; j < ny; ++j)
-				for (int i = 0; i < nx; ++i) {
-					int m_pos[] = { i, j, k };
-					int m_range[] = { nx, ny, nz };
-					trg.value(i, j, k) = Apply(tmp, m_pos, m_range, 0);
-				}
-		tmp = trg;
+				int xr = symmetric_extension(x + i_r, nx);
+				f += img.value(xr, y, z);
+			}
+			f /= (2.f * m_ri[0] + 1.f);
+			break;
+		}
+		case 1:
+		{
+			for (int i_r = -m_ri[1]; i_r <= m_ri[1]; ++i_r)
+			{
+				int yr = symmetric_extension(y + i_r, ny);
+				f += img.value(x, yr, z);
+			}
+			f /= (2.f * m_ri[1] + 1.f);
+			break;
+		}
+		case 2:
+		{
+			for (int i_r = -m_ri[2]; i_r <= m_ri[2]; ++i_r)
+			{
+				int zr = symmetric_extension(z + i_r, nz);
+				f += img.value(x, y, zr);
+			}
+			f /= (2.f * m_ri[2] + 1.f);
+			break;
+		}
 	}
-
-	if (w > 0.0)
-	{
-#pragma omp parallel for collapse(3)
-		for (int k = 0; k < nz; ++k)
-			for (int j = 0; j < ny; ++j)
-				for (int i = 0; i < nx; ++i)
-				{
-					int m_pos[] = { i, j, k };
-					int m_range[] = { nx, ny, nz };
-					float f1 = Apply(tmp, m_pos, m_range, 0);
-					float f2 = trg.value(i, j, k);
-					trg.value(i, j, k) = f1 * w + f2 * (1.f - w);
-				}
-	}
+	return f;
 }
 
-double BoxBlur3D::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
-{
-	// naive implementation
-	int i = m_pos[0]; int j = m_pos[1]; int k = m_pos[2];
-	int nx = m_range[0]; int ny = m_range[1]; int nz = m_range[2];
-	float f = 0.0;
-
-	// set flags based on position
-	bool flag_i0, flag_in, flag_j0, flag_jn, flag_k0, flag_kn = false;
-	int n_flag = 0;	int n_count = 0;
-	int i_0 = -1; int j_0 = -1; int k_0 = -1;
-	int i_f = 1; int j_f = 1; int k_f = 1;
-	if (i == 0) { flag_i0 = true; n_flag++; i_0 = 0; }
-	if (i == nx - 1) { flag_in = true; n_flag++; i_f = 0; }
-	if (j == 0) { flag_j0 = true; n_flag++; j_0 = 0; }
-	if (j == ny - 1) { flag_jn = true; n_flag++; j_f = 0; }
-	if (k == 0) { flag_k0 = true; n_flag++; k_0 = 0; }
-	if (k == nz - 1) { flag_kn = true; n_flag++; k_f = 0; }
-
-	// determine # of neighbors
-	switch (n_flag) {
-	case 0:
-		n_count = 27;
-		break;
-	case 1:
-		n_count = 18;
-		break;
-	case 2:
-		n_count = 12;
-		break;
-	case 3:
-		n_count = 8;
-		break;
-	}
-
-	// get unweighted average value from neighbors
-	for (int a = i_0; a <= i_f; ++a)
-		for (int b = j_0; b <= j_f; ++b)
-			for (int c = k_0; c <= k_f; ++c)
-				f += img.value(i + a, j + b, c + k);
-
-	return (f / n_count);
-}
+//=================================================================================================
+// Fastest Fourier Transform in the West (FFTW) Blur
+//=================================================================================================
 
 #ifdef HAVE_FFTW
-BEGIN_FECORE_CLASS(FFTWBlur3D, ImageFilter)
+BEGIN_FECORE_CLASS(FFTWBlur, ImageFilter)
 ADD_PARAMETER(m_blur, "blur");
 ADD_PARAMETER(m_norm_flag, "normalize values");
+ADD_PARAMETER(m_res, 3, "voxel_resolution");
 END_FECORE_CLASS();
 
-FFTWBlur3D::FFTWBlur3D(FEModel* fem) : ImageFilter(fem)
+FFTWBlur::FFTWBlur(FEModel* fem) : ImageFilter(fem)
 {
 	m_blur = 0.0;
 	m_norm_flag = false;
+	m_res[0] = 1.0; m_res[1] = 1.0; m_res[2] = 1.0;
+	m_sigma[0] = 1.0; m_sigma[1] = 1.0; m_sigma[2] = 1.0;
 }
 
-bool FFTWBlur3D::Init() 
+bool FFTWBlur::Init() 
 {
 	return true;
 }
 
-void FFTWBlur3D::Update(Image& trg, Image& src)
+void FFTWBlur::Update(Image& trg, Image& src)
 {
-	if (m_blur <= 0) { trg = src; return; }
-	feLog("Blurring images, blur factor %lg\n", m_blur);
-
-	fftw_blur_3d(trg, src, m_blur);
+	if (m_blur < 1) { trg = src; return; }
+	// scale blur in each direction for voxel resolution
+	for (int i = 0; i < 3; ++i)
+		m_sigma[i] = m_blur / m_res[i]; // (units of px)
+	feLog("Blurring images\n");
+	feLog("blur std = %lg, stdx = %lg, stdy = %lg, stdz = %lg\n", m_blur, m_sigma[0], m_sigma[1], m_sigma[2]);
+	fftw_blur_3d(trg, src, m_sigma);
 }
 
 // SL: Does nothing for now.
-double FFTWBlur3D::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
+float FFTWBlur::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
 {
-	return 0;
+	return 0.f;
 }
 #endif // HAVE_FFTW

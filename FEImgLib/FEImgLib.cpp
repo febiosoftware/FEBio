@@ -18,11 +18,9 @@ void FEImgLib::InitModule()
 	REGISTER_FECORE_CLASS(FEImageValuator, "image map");
 
 	// filter classes
-	REGISTER_FECORE_CLASS(IterativeBlur1D, "iterative blur 1D");
-	REGISTER_FECORE_CLASS(IterativeBlur3D, "iterative blur 3D");
-	REGISTER_FECORE_CLASS(BoxBlur1D, "box blur 1D");
-	REGISTER_FECORE_CLASS(BoxBlur3D, "box blur 3D");
+	REGISTER_FECORE_CLASS(IterativeBlur, "iterative blur");
+	REGISTER_FECORE_CLASS(BoxBlur, "box blur");
 #ifdef HAVE_FFTW
-	REGISTER_FECORE_CLASS(FFTWBlur3D, "FFTW blur 3D");
+	REGISTER_FECORE_CLASS(FFTWBlur, "FFTW blur");
 #endif // HAVE_FFTW
 }
