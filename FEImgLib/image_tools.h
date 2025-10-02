@@ -20,8 +20,8 @@ FEIMGLIB_API void fftblur_2d(Image& trg, Image& src, float d);
 FEIMGLIB_API void fftblur_3d(Image& trg, Image& src, float d);
 
 // FFT-based blurs (rely on FFTW library)
-FEIMGLIB_API void fftw_blur_2d(Image& trg, Image& src, float d[2]);
-FEIMGLIB_API void fftw_blur_3d(Image& trg, Image& src, float d[3]);
+FEIMGLIB_API void fftw_blur_2d(Image& trg, Image& src, float sigma[2]);
+FEIMGLIB_API void fftw_blur_3d(Image& trg, Image& src, float sigma[3]);
 
 // Extension functions for image filter edges
 FEIMGLIB_API int constant_extension(int N, int n);

@@ -271,7 +271,7 @@ void create_gaussian_3d(double* kernel, int nz, int ny, int nx, float sigma[3]) 
 	}
 }
 
-void fftw_blur_2d(Image& trg, Image& src, float d[2])
+void fftw_blur_2d(Image& trg, Image& src, float sigma[2])
 {
 	int width = src.width();
 	int height = src.height();
@@ -290,7 +290,7 @@ void fftw_blur_2d(Image& trg, Image& src, float d[2])
 	}
 
 	// Create Gaussian kernel
-	create_gaussian_2d(kernel_spatial, height, width, d);
+	create_gaussian_2d(kernel_spatial, height, width, sigma);
 
 	// Create FFT plans
 	fftw_plan plan_fwd_img = fftw_plan_dft_r2c_2d(height, width, img_spatial, img_freq, FFTW_ESTIMATE);
@@ -330,7 +330,7 @@ void fftw_blur_2d(Image& trg, Image& src, float d[2])
 	fftw_free(kernel_freq);
 }
 
-void fftw_blur_3d(Image& trg, Image& src, float d[3])
+void fftw_blur_3d(Image& trg, Image& src, float sigma[3])
 {
 	int nx = src.width();
 	int ny = src.height();
@@ -350,7 +350,7 @@ void fftw_blur_3d(Image& trg, Image& src, float d[3])
 	}
 
 	// Create Gaussian kernel
-	create_gaussian_3d(kernel_spatial, nz, ny, nx, d);
+	create_gaussian_3d(kernel_spatial, nz, ny, nx, sigma);
 
 	// Plans
 	fftw_plan plan_fwd_img = fftw_plan_dft_r2c_3d(nz, ny, nx, img_spatial, img_freq, FFTW_ESTIMATE);
@@ -395,8 +395,8 @@ void fftw_blur_3d(Image& trg, Image& src, float d[3])
 }
 
 #else
-void fftw_blur_2d(Image& trg, Image& src, float d) {}
-void fftw_blur_3d(Image& trg, Image& src, float d) {}
+void fftw_blur_2d(Image& trg, Image& src, float sigma[2]) {}
+void fftw_blur_3d(Image& trg, Image& src, float sigma[3]) {}
 #endif // HAVE_FFTW
 
 void blur_image_2d(Image& trg, Image& src, float d, BlurMethod blurMethod)
@@ -404,12 +404,16 @@ void blur_image_2d(Image& trg, Image& src, float d, BlurMethod blurMethod)
 	switch (blurMethod)
 	{
 	case BlurMethod::BLUR_AVERAGE: blur_avg_2d(trg, src, d); break;
-	case BlurMethod::BLUR_FFT: 
+	case BlurMethod::BLUR_FFT:
+	{
 #ifdef HAVE_FFTW
-		fftw_blur_2d(trg, src, d); break;
+		// currently this function will assume the voxels are isotropic
+		float d2[2] = { d, d };
+		fftw_blur_2d(trg, src, d2); break;
 #elif HAVE_MKL
 		mkl_blur_2d(trg, src, d); break;
 #endif
+	}
 	default:
 		break;
 	}
@@ -421,11 +425,15 @@ void blur_image_3d(Image& trg, Image& src, float d, BlurMethod blurMethod)
 	{
 	case BlurMethod::BLUR_AVERAGE: blur_avg_3d(trg, src, d); break;
 	case BlurMethod::BLUR_FFT:
+	{
 #ifdef HAVE_FFTW
-		fftw_blur_3d(trg, src, d); break;
+		// currently this function will assume the voxels are isotropic
+		float d3[3] = { d, d, d };
+		fftw_blur_3d(trg, src, d3); break;
 #elif HAVE_MKL
 		mkl_blur_3d(trg, src, d); break;
 #endif
+	}
 	default:
 		break;
 	}
