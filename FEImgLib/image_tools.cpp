@@ -1,6 +1,7 @@
 #include "image_tools.h"
 #include "Image.h"
 #include <math.h>
+#include <iostream>
 
 #ifdef HAVE_MKL
 #include <mkl.h>
@@ -26,6 +27,9 @@ void blur_avg_2d(Image& trg, Image& src, float d)
 	float f[4];
 	for (int l = 0; l < n; ++l)
 	{
+#ifdef NDEBUG
+		#pragma omp parallel for
+#endif
 		for (int k = 0; k < nz; ++k)
 			for (int j = 0; j < ny; ++j)
 				for (int i = 0; i < nx; ++i)
@@ -41,6 +45,9 @@ void blur_avg_2d(Image& trg, Image& src, float d)
 
 	if (w > 0.0)
 	{
+#ifdef NDEBUG
+		#pragma omp parallel for
+#endif
 		for (int k = 0; k < nz; ++k)
 			for (int j = 0; j < ny; ++j)
 				for (int i = 0; i < nx; ++i)
@@ -72,6 +79,9 @@ void blur_avg_3d(Image& trg, Image& src, float d)
 	float f[6];
 	for (int l = 0; l < n; ++l)
 	{
+#ifdef NDEBUG
+		#pragma omp parallel for
+#endif
 		for (int k = 0; k < nz; ++k)
 			for (int j = 0; j < ny; ++j)
 				for (int i = 0; i < nx; ++i)
@@ -89,6 +99,9 @@ void blur_avg_3d(Image& trg, Image& src, float d)
 
 	if (w > 0.0)
 	{
+#ifdef NDEBUG
+		#pragma omp parallel for
+#endif
 		for (int k = 0; k < nz; ++k)
 			for (int j = 0; j < ny; ++j)
 				for (int i = 0; i < nx; ++i)
@@ -106,6 +119,8 @@ void blur_avg_3d(Image& trg, Image& src, float d)
 	}
 }
 
+//-----------------------------------------------------------------------------
+// FFT-based blurs (rely on MKL library. Incompatible with pardiso/dss)
 #ifdef HAVE_MKL
 
 // in fft.cpp
@@ -121,7 +136,6 @@ FEIMGLIB_API void mkl_blur_2d(Image& trg, Image& src, float d)
 	float* y = trg.data();
 
 	// for zero blur radius, we just copy the image
-	// SL: Why not copy i.e. if (d <= 0) { trg = src; return; }?
 	if (d <= 0.f)
 	{
 		for (int i = 0; i < nx * ny; ++i) y[i] = x[i];
@@ -138,12 +152,12 @@ FEIMGLIB_API void mkl_blur_2d(Image& trg, Image& src, float d)
 	mkl_dft2(nx, ny, x, c);
 
 	// multiply the DFT with blur mask
-	for (int j = 0; j <= ny/2; ++j)
+	for (int j = 0; j <= ny / 2; ++j)
 		for (int i = 0; i < nx; ++i)
 		{
 			double wx = (i < nx / 2 ? i : i - nx) / sigmax;
 			double wy = j / sigmay;
-			float v = (float) exp(-(wx * wx + wy * wy));
+			float v = (float)exp(-(wx * wx + wy * wy));
 
 			c[j * nx + i].real *= v;
 			c[j * nx + i].imag *= v;
@@ -196,8 +210,8 @@ FEIMGLIB_API void mkl_blur_3d(Image& trg, Image& src, float d)
 				double wz = k / sigmaz;
 				float v = (float)exp(-(wx * wx + wy * wy + wz * wz));
 
-				c[k*nx*ny + j * nx + i].real *= v;
-				c[k*nx*ny + j * nx + i].imag *= v;
+				c[k * nx * ny + j * nx + i].real *= v;
+				c[k * nx * ny + j * nx + i].imag *= v;
 			}
 
 	// calculate the inverse DFT
@@ -211,17 +225,20 @@ void mkl_blur_2d(Image& trg, Image& src, float d) {}
 void mkl_blur_3d(Image& trg, Image& src, float d) {}
 #endif // HAVE_MKL
 
+//-----------------------------------------------------------------------------
+// FFT-based blurs (rely on FFTW library)
 #ifdef HAVE_FFTW
-void create_gaussian_2d(double* kernel, int rows, int cols, double sigma) {
+void create_gaussian_2d(double* kernel, int rows, int cols, float sigma[2]) {
 	double sum = 0.0;
 	for (int y = 0; y < rows; ++y) {
 		int dy = (y <= rows / 2) ? y : (rows - y);  // wrap-around distance
 		for (int x = 0; x < cols; ++x) {
 			int dx = (x <= cols / 2) ? x : (cols - x);
-			double d2 = (double)(dx * dx + dy * dy);
-			double val = exp(-d2 / (2.0 * sigma * sigma));
-			kernel[y * cols + x] = val;
-			sum += val;
+			double gx = (double)(dx * dx / (sigma[0] * sigma[0]));
+			double gy = (double)(dy * dy / (sigma[1] * sigma[1]));
+			double g = exp(-0.5 * (gx + gy));
+			kernel[y * cols + x] = g;
+			sum += g;
 		}
 	}
 	// Normalize
@@ -231,7 +248,7 @@ void create_gaussian_2d(double* kernel, int rows, int cols, double sigma) {
 }
 
 // Create 3D Gaussian kernel (centered)
-void create_gaussian_3d(double* kernel, int nz, int ny, int nx, double sigma) {
+void create_gaussian_3d(double* kernel, int nz, int ny, int nx, float sigma[3]) {
 	double sum = 0.0;
 	for (int z = 0; z < nz; ++z) {
 		int dz = (z <= nz / 2) ? z : (nz - z);  // wrap-around distance
@@ -239,10 +256,12 @@ void create_gaussian_3d(double* kernel, int nz, int ny, int nx, double sigma) {
 			int dy = (y <= ny / 2) ? y : (ny - y);
 			for (int x = 0; x < nx; ++x) {
 				int dx = (x <= nx / 2) ? x : (nx - x);
-				double d2 = (double)(dx * dx + dy * dy + dz * dz);
-				double val = exp(-d2 / (2.0 * sigma * sigma));
-				kernel[(z * ny + y) * nx + x] = val;
-				sum += val;
+				double gx = double(dx * dx / (sigma[0] * sigma[0]));
+				double gy = double(dy * dy / (sigma[1] * sigma[1]));
+				double gz = double(dz * dz / (sigma[2] * sigma[2]));
+				double g = exp(-0.5 * (gx + gy + gz));
+				kernel[(z * ny + y) * nx + x] = g;
+				sum += g;
 			}
 		}
 	}
@@ -252,13 +271,12 @@ void create_gaussian_3d(double* kernel, int nz, int ny, int nx, double sigma) {
 	}
 }
 
-void fftw_blur_2d(Image& trg, Image& src, float d)
+void fftw_blur_2d(Image& trg, Image& src, float d[2])
 {
 	int width = src.width();
 	int height = src.height();
 
 	float* img_data = src.data();
-	double sigma = d;
 
 	// Allocate FFTW arrays
 	double* img_spatial = (double*) fftw_malloc(sizeof(double) * width * height);
@@ -272,7 +290,7 @@ void fftw_blur_2d(Image& trg, Image& src, float d)
 	}
 
 	// Create Gaussian kernel
-	create_gaussian_2d(kernel_spatial, height, width, sigma);
+	create_gaussian_2d(kernel_spatial, height, width, d);
 
 	// Create FFT plans
 	fftw_plan plan_fwd_img = fftw_plan_dft_r2c_2d(height, width, img_spatial, img_freq, FFTW_ESTIMATE);
@@ -312,20 +330,19 @@ void fftw_blur_2d(Image& trg, Image& src, float d)
 	fftw_free(kernel_freq);
 }
 
-void fftw_blur_3d(Image& trg, Image& src, float d) 
+void fftw_blur_3d(Image& trg, Image& src, float d[3])
 {
 	int nx = src.width();
 	int ny = src.height();
 	int nz = src.depth();
 
-	double sigma = d;
 	float* img_data = src.data();
 
 	// Allocate FFTW buffers
-	double* img_spatial = (double*)fftw_malloc(sizeof(double) * nx* ny*nz);
+	double* img_spatial = (double*)fftw_malloc(sizeof(double) * nx * ny * nz);
 	double* kernel_spatial = (double*)fftw_malloc(sizeof(double) * nx * ny * nz);
-	fftw_complex* img_freq = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * nz * ny * (nx / 2 + 1));
-	fftw_complex* kernel_freq = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * nz * ny * (nx / 2 + 1));
+	fftw_complex* img_freq = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * nz * ny * (nx / 2 + 1));
+	fftw_complex* kernel_freq = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * nz * ny * (nx / 2 + 1));
 
 	// Copy image to double buffer
 	for (int i = 0; i < nx*ny*nz; ++i) {
@@ -333,7 +350,7 @@ void fftw_blur_3d(Image& trg, Image& src, float d)
 	}
 
 	// Create Gaussian kernel
-	create_gaussian_3d(kernel_spatial, nz, ny, nx, sigma);
+	create_gaussian_3d(kernel_spatial, nz, ny, nx, d);
 
 	// Plans
 	fftw_plan plan_fwd_img = fftw_plan_dft_r2c_3d(nz, ny, nx, img_spatial, img_freq, FFTW_ESTIMATE);
@@ -346,13 +363,14 @@ void fftw_blur_3d(Image& trg, Image& src, float d)
 
 	// Multiply in frequency domain
 	int nfreq = nz * ny * (nx / 2 + 1);
-	for (int i = 0; i < nfreq; ++i) {
-		double a = img_freq[i][0];
-		double b = img_freq[i][1];
-		double c = kernel_freq[i][0];
-		double d = kernel_freq[i][1];
-		img_freq[i][0] = a * c - b * d;
-		img_freq[i][1] = a * d + b * c;
+	for (int i = 0; i < nfreq; ++i) 
+	{
+		double a = img_freq[i][0]; // real part
+		double b = img_freq[i][1]; // complex part
+		double c = kernel_freq[i][0]; // real part
+		double d = kernel_freq[i][1]; // complex part
+		img_freq[i][0] = a * c - b * d; // real part
+		img_freq[i][1] = a * d + b * c; // complex part
 	}
 
 	// Inverse FFT
@@ -411,4 +429,31 @@ void blur_image_3d(Image& trg, Image& src, float d, BlurMethod blurMethod)
 	default:
 		break;
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Extension functions for image filter edges
+// return integer for constant border extension
+int constant_extension(int n, int N)
+{
+	if (n < 0)
+		n = 0;
+	else if (n >= N)
+		n = N - 1;
+	return n;
+}
+
+// return integer for symmetric border extension
+int symmetric_extension(int n, int N)
+{
+	while (1)
+	{
+		if (n < 0)
+			n = -1 - n;
+		else if (n >= N)
+			n = (2 * N) - 1 - n;
+		else
+			break;
+	}
+	return n;
 }
