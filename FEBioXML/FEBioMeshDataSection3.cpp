@@ -143,6 +143,8 @@ void FEBioMeshDataSection3::ParseNodalData(XMLTag& tag)
 			gen = fecore_new<FENodeDataGenerator>(szgen, &fem);
 			if (gen == 0) throw XMLReader::InvalidAttributeValue(tag, "generator", szgen);
 
+			gen->SetNodeSet(nset);
+
 			// read the parameters
 			ReadParameterList(tag, gen);
 
