@@ -82,6 +82,16 @@ if(USE_MKL)
     endif()
 endif()
 
+if(USE_FFTW)
+	if(NOT EXISTS ${FFTW_LIB})
+		message(SEND_ERROR "Could not find FFTW library libfftw3-3. Check FFTW_LIB.")
+        message(SEND_ERROR "The library is " ${FFTW_LIB})
+	endif()
+	if(NOT EXISTS ${FFTW_INC}/fftw3.h)
+		message(SEND_ERROR "Could not find fftw3.h. Check FFTW_INC.")
+	endif()
+endif()
+
 if(USE_HYPRE)
 	if(NOT EXISTS ${HYPRE_LIB})
 		message(SEND_ERROR "Could not find HYPRE library. Check HYPRE_LIB.")
@@ -280,6 +290,13 @@ if(USE_LEVMAR)
 	target_include_directories(febioopt PRIVATE ${LEVMAR_INC})
     target_compile_definitions(febioopt PRIVATE HAVE_LEVMAR)
     target_link_libraries(febioopt PRIVATE ${LEVMAR_LIB})
+endif()
+
+# Link FFTW
+if(USE_FFTW)
+    target_include_directories(feimglib PRIVATE ${FFTW_INC})
+    target_compile_definitions(feimglib PRIVATE HAVE_FFTW)
+    target_link_libraries(feimglib PRIVATE ${FFTW_LIB})
 endif()
 
 # Link HYPRE

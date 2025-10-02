@@ -97,6 +97,35 @@ else()
 	option(USE_MKL "Required for pardiso and iterative solvers" OFF)
 endif()
 
+# FFTW
+if(WIN32)
+	find_path(FFTW_INC fftw3.h
+      PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+      PATH_SUFFIXES "include" "fftw*" "include/fftw*"
+      DOC "FFTW include directory")
+	find_library(FFTW_LIB libfftw3-3
+      PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+      PATH_SUFFIXES "vs2017/Release"
+      DOC "FFTW library path")
+else()
+	find_path(FFTW_INC fftw3.h
+      PATHS /usr/local/ /opt/fftw* $ENV{HOME}/* $ENV{HOME}/*/*
+      PATH_SUFFIXES "include" "fftw*" "include/fftw*"
+	  DOC "FFTW include directory")
+	find_library(FFTW_LIB libfftw3-3
+      PATHS /usr/local/ /opt/fftw* $ENV{HOME}/* $ENV{HOME}/*/*
+      PATH_SUFFIXES "lib" "build" "cbuild" "cmbuild"
+	  DOC "FFTW library path")
+endif()	
+
+if(FFTW_INC AND FFTW_LIB)		
+	option(USE_FFTW "Required for FFTW functions" ON)
+    mark_as_advanced(FFTW_INC FFTW_LIB)
+else()
+	option(USE_FFTW "Required for FFTW functions" OFF)
+    mark_as_advanced(CLEAR FFTW_INC FFTW_LIB)
+endif()
+
 # HYPRE
 if(WIN32)
 	find_path(HYPRE_INC HYPRE_IJ_mv.h

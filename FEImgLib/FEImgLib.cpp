@@ -3,6 +3,7 @@
 #include "FEImageSource.h"
 #include "FEImageDataMap.h"
 #include "FEImageValuator.h"
+#include "ImageFilter.h"
 
 void FEImgLib::InitModule()
 {
@@ -15,4 +16,11 @@ void FEImgLib::InitModule()
 
 	// valuator
 	REGISTER_FECORE_CLASS(FEImageValuator, "image map");
+
+	// filter classes
+	REGISTER_FECORE_CLASS(IterativeBlur, "iterative blur");
+	REGISTER_FECORE_CLASS(BoxBlur, "box blur");
+#ifdef HAVE_FFTW
+	REGISTER_FECORE_CLASS(FFTWBlur, "FFTW blur");
+#endif // HAVE_FFTW
 }

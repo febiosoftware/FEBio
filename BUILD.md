@@ -30,6 +30,8 @@ FEBio makes use of the following third party packages to add additional function
 
 * zlib is an open-source, lossless data-compression library that is used by FEBio to optionally compress plot files to save disc space. This library is generally pre-installed on macOS, and most Linux distributions. For Windows, you will need to download the latest source from zlib's website, and compile the library yourself.
 
+* FFTW: Fastest Fourier Transform in the West. Alternate library to perform FFTs since certain solvers use conflicting versions of MKL. The library can be found at [FFTW's wegpage](https://fftw.org/)
+
 ## Running CMake <a name="runCMake"></a>
 
 CMake is used to configure the build environment for FEBio on your machine. It can be used to generate a Microsoft Visual Studio Solution on Windows, an XCode Project on macOS, and a set of makefiles to be used with the GNU Make tool on Linux. 
