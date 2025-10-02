@@ -249,7 +249,8 @@ void FFTWBlur::Update(Image& trg, Image& src)
 		m_sigma[i] = m_blur / m_res[i]; // (units of px)
 	feLog("Blurring images\n");
 	feLog("blur std = %lg, stdx = %lg, stdy = %lg, stdz = %lg\n", m_blur, m_sigma[0], m_sigma[1], m_sigma[2]);
-	fftw_blur_3d(trg, src, m_sigma);
+	float d[3] = { float(m_sigma[0]), float(m_sigma[1]), float(m_sigma[2]) };
+	fftw_blur_3d(trg, src, d);
 }
 
 // SL: Does nothing for now.

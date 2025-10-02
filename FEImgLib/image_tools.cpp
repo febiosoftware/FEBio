@@ -12,33 +12,6 @@
 #endif // HAVE_FFTW
 
 //-----------------------------------------------------------------------------
-// Extension functions for image filter edges
-// return integer for constant border extension
-int constant_extension(int n, int N)
-{
-	if (n < 0)
-		n = 0;
-	else if (n >= N)
-		n = N - 1;
-	return n;
-}
-
-// return integer for symmetric border extension
-int symmetric_extension(int n, int N)
-{
-	while (1)
-	{
-		if (n < 0)
-			n = -1 - n;
-		else if (n >= N)
-			n = (2 * N) - 1 - n;
-		else
-			break;
-	}
-	return n;
-}
-
-//-----------------------------------------------------------------------------
 // 2D iterative stencil-based blur
 void blur_image_2d(Image& trg, Image& src, float d)
 {
@@ -259,7 +232,7 @@ void fftblur_3d(Image& trg, Image& src, float d) {}
 //-----------------------------------------------------------------------------
 // FFT-based blurs (rely on FFTW library)
 #ifdef HAVE_FFTW
-void create_gaussian_2d(double* kernel, int rows, int cols, double sigma[2]) {
+void create_gaussian_2d(double* kernel, int rows, int cols, float sigma[2]) {
 	double sum = 0.0;
 	for (int y = 0; y < rows; ++y) {
 		int dy = (y <= rows / 2) ? y : (rows - y);  // wrap-around distance
@@ -279,7 +252,7 @@ void create_gaussian_2d(double* kernel, int rows, int cols, double sigma[2]) {
 }
 
 // Create 3D Gaussian kernel (centered)
-void create_gaussian_3d(double* kernel, int nz, int ny, int nx, double sigma[3]) {
+void create_gaussian_3d(double* kernel, int nz, int ny, int nx, float sigma[3]) {
 	double sum = 0.0;
 	for (int z = 0; z < nz; ++z) {
 		int dz = (z <= nz / 2) ? z : (nz - z);  // wrap-around distance
@@ -302,7 +275,7 @@ void create_gaussian_3d(double* kernel, int nz, int ny, int nx, double sigma[3])
 	}
 }
 
-void fftw_blur_2d(Image& trg, Image& src, double d[2])
+void fftw_blur_2d(Image& trg, Image& src, float d[2])
 {
 	int width = src.width();
 	int height = src.height();
@@ -361,7 +334,7 @@ void fftw_blur_2d(Image& trg, Image& src, double d[2])
 	fftw_free(kernel_freq);
 }
 
-void fftw_blur_3d(Image& trg, Image& src, double d[3])
+void fftw_blur_3d(Image& trg, Image& src, float d[3])
 {
 	int nx = src.width();
 	int ny = src.height();
@@ -429,3 +402,30 @@ void fftw_blur_3d(Image& trg, Image& src, double d[3])
 void fftw_blur_2d(Image& trg, Image& src, float d) {}
 void fftw_blur_3d(Image& trg, Image& src, float d) {}
 #endif // HAVE_FFTW
+
+//-----------------------------------------------------------------------------
+// Extension functions for image filter edges
+// return integer for constant border extension
+int constant_extension(int n, int N)
+{
+	if (n < 0)
+		n = 0;
+	else if (n >= N)
+		n = N - 1;
+	return n;
+}
+
+// return integer for symmetric border extension
+int symmetric_extension(int n, int N)
+{
+	while (1)
+	{
+		if (n < 0)
+			n = -1 - n;
+		else if (n >= N)
+			n = (2 * N) - 1 - n;
+		else
+			break;
+	}
+	return n;
+}
