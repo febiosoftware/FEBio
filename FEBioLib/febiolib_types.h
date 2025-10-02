@@ -30,6 +30,7 @@ struct ModelStats {
 	int		ntotalIters = 0;	//!< total nr of equilibrium iterations
 	int		ntotalRHS = 0;		//!< total nr of right hand side evaluations
 	int		ntotalReforms = 0;	//!< total nr of stiffness reformations
+	double  solutionNorm = 0.0; //!< norm of solution
 };
 
 struct TimingInfo {
