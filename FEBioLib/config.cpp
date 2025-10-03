@@ -39,13 +39,15 @@ SOFTWARE.*/
 #include "plugin.h"
 #include <map>
 #include <iostream>
-#include <filesystem>
 
 #ifndef WIN32
 #include <dlfcn.h>
 #endif
 
-namespace fs = std::filesystem;
+#ifdef HAS_STD_FILESYSTEM
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#endif
 
 namespace febio {
 
@@ -301,7 +303,7 @@ namespace febio {
 		bool bok = process_aliases(szbuf, szfolder);
 
 		// load the plugin
-		if (bok) febio::ImportPluginFolder(szbuf);
+		if (bok) bok = febio::ImportPluginFolder(szbuf);
 
 		return bok;
 	}
@@ -365,8 +367,9 @@ namespace febio {
 
 //-----------------------------------------------------------------------------
 
-void ImportPluginFolder(const char* szfolder)
+bool ImportPluginFolder(const char* szfolder)
 {
+#ifdef HAS_STD_FILESYSTEM
     // get the default (system-dependant) extension
     #ifdef WIN32
         std::string extension = ".dll";
@@ -381,9 +384,17 @@ void ImportPluginFolder(const char* szfolder)
         if (entry.is_regular_file() && entry.path().extension() == extension)
         {
             // try to load the plugin
-            ImportPlugin(entry.path().string().c_str());
+            bool ok = ImportPlugin(entry.path().string().c_str());
+
+            if(!ok) return false;
         }
     }
+
+    return true;
+#else
+    fprintf(stderr, "This version of FEBio does not support the import_folder tag.\n");
+    return false;
+#endif
 }
 
 void ImportRepoPlugins(const char* szxmlFile)

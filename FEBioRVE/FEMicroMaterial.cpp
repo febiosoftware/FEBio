@@ -35,9 +35,6 @@ SOFTWARE.*/
 #include "FEBioMech/FEBCPrescribedDeformation.h"
 #include "FERVEProbe.h"
 #include <sstream>
-#include <filesystem>
-
-namespace fs = std::filesystem;
 
 //=============================================================================
 FEMicroMaterialPoint::FEMicroMaterialPoint()

@@ -42,6 +42,17 @@ endif()
 
 include(FindDependencies.cmake)
 
+##### Check compiler for std::filesystem support #####
+include(CheckCXXSourceCompiles)
+
+check_cxx_source_compiles("
+  #include <filesystem>
+  int main() {
+    std::filesystem::path p{\"test\"};
+    return 0;
+  }
+" HAS_STD_FILESYSTEM)
+
 #### Check if paths are valid and find libs ####
 
 function(findLib libName libDir libOut)
@@ -284,6 +295,10 @@ mark_as_advanced(EXTRA_INC)
 
 ##### Setup includes, defnitions, and linking options #####
 include_directories(${PROJECT_SOURCE_DIR})
+
+if(HAS_STD_FILESYSTEM)
+    target_compile_definitions(febiolib PRIVATE HAS_STD_FILESYSTEM)
+endif()
 
 # Link LEVMAR
 if(USE_LEVMAR)
