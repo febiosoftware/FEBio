@@ -113,6 +113,16 @@ double ImageMap::value(const POINT& p)
 	}
 }
 
+bool ImageMap::valid(const vec3d& p)
+{
+	int nz = m_img.depth();
+	bool r_valid = true;
+	r_valid &= (p.x >= m_r0.x && p.x <= m_r1.x);
+	r_valid &= (p.y >= m_r0.y && p.y <= m_r1.y);
+	r_valid &= (nz == 1) ? true : (p.z >= m_r0.z && p.z <= m_r1.z);
+	return r_valid;
+}
+
 vec3d ImageMap::gradient(const vec3d& r)
 {
 	POINT p = map(r);

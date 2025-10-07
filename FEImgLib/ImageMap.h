@@ -25,6 +25,9 @@ public:
 	// evaluate image
 	double value(const POINT& p);
 	double value(const vec3d& r) { return value(map(r)); }
+	
+	// determine if a point is in bounds
+	bool valid(const vec3d& p);
 
 	// image gradient
 	vec3d gradient(const vec3d& r);
