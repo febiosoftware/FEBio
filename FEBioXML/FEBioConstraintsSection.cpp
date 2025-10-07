@@ -28,6 +28,7 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include <FECore/FESurfaceConstraint.h>
+#include <FECore/FEBodyConstraint.h>
 #include <FECore/FENodeSetConstraint.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEMesh.h>
@@ -288,6 +289,21 @@ void FEBioConstraintsSection25::Parse(XMLTag &tag)
 					FEFacetSet* pface = mesh.FindFacetSet(szsurf);
 					if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
 					if (GetBuilder()->BuildSurface(*psurf, *pface, psc->UseNodalIntegration()) == false) throw XMLReader::InvalidAttributeValue(tag, "surface", szsurf);
+				}
+
+				// get the element set
+				FEBodyConstraint* pbc = dynamic_cast<FEBodyConstraint*>(plc);
+				if (pbc)
+				{
+					// see if a specific domain was referenced
+					const char* szpart = tag.AttributeValue("elem_set", true);
+					if (szpart)
+					{
+						FEMesh& mesh = fem.GetMesh();
+						FEElementSet* elset = mesh.FindElementSet(szpart);
+						if (elset == 0) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szpart);
+						pbc->SetDomainList(elset);
+					}
 				}
 
                 // get the nodeset for other constraints

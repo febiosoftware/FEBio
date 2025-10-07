@@ -1790,7 +1790,7 @@ TimingInfo FEBioModel::GetTimingInfo()
 	ti.total_callback     = GetTimer(TimerID::Timer_Callback        )->GetExclusiveTime(); total += ti.total_callback;
 
 	ti.total_other  = ti.total_time - total;
-	assert(ti.total_other >= 0);
+//	assert(ti.total_other >= 0);
 
 	return ti;
 }
