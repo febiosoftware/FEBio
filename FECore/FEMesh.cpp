@@ -99,9 +99,6 @@ void FEMesh::Serialize(DumpStream& ar)
 	}
 	ar.UnlockPointerTable();
 
-	// stream domain data
-	ar & m_Domain;
-
 	// if this is a shallow archive, we're done
 	if (ar.IsShallow()) return;
 
@@ -208,7 +205,6 @@ void FEMesh::Serialize(DumpStream& ar)
 		// write data maps
 		ClearDataMaps();
 		int maps = 0;
-		string mapName;
 		ar >> maps;
 		for (int i = 0; i < maps; ++i)
 		{
@@ -219,6 +215,12 @@ void FEMesh::Serialize(DumpStream& ar)
 
 		UpdateBox();
 	}
+}
+
+void FEMesh::SerializeDomains(DumpStream& ar)
+{
+	// stream domain data
+	ar & m_Domain;
 }
 
 //-----------------------------------------------------------------------------

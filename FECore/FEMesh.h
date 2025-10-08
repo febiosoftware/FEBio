@@ -256,6 +256,8 @@ public:
 	//! stream mesh data
 	void Serialize(DumpStream& dmp);
 
+	void SerializeDomains(DumpStream& ar);
+
 	static void SaveClass(DumpStream& ar, FEMesh* p);
 	static FEMesh* LoadClass(DumpStream& ar, FEMesh* p);
 

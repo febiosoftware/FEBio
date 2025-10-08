@@ -2386,6 +2386,9 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		ar & m_timeInfo;
 
 		// stream mesh
+		ar & m_mesh;
+
+		// stream domains
 		m_fem->SerializeGeometry(ar);
 
 		// serialize contact
@@ -2415,10 +2418,13 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		ar & m_ftime0;
 		ar & m_bsolved;
 
-		// we have to stream materials before the mesh
+		// serialize the mesh first
+		ar & m_mesh;
+
+		// we have to stream materials before we serialize the domains
 		ar & m_MAT;
 
-		// we have to stream the mesh before any boundary conditions
+		// stream geometry (domains)
 		m_fem->SerializeGeometry(ar);
 
 		// stream all boundary conditions
@@ -2461,7 +2467,7 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 //! Derived classes can override this
 void FEModel::SerializeGeometry(DumpStream& ar)
 {
-	ar & m_imp->m_mesh;
+	m_imp->m_mesh.SerializeDomains(ar);
 }
 
 //-----------------------------------------------------------------------------
