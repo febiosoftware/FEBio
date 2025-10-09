@@ -112,7 +112,7 @@ else()
       PATHS /usr/local/ /opt/fftw* $ENV{HOME}/* $ENV{HOME}/*/*
       PATH_SUFFIXES "include" "fftw*" "include/fftw*"
 	  DOC "FFTW include directory")
-	find_library(FFTW_LIB libfftw3-3
+	find_library(FFTW_LIB fftw3
       PATHS /usr/local/ /opt/fftw* $ENV{HOME}/* $ENV{HOME}/*/*
       PATH_SUFFIXES "lib" "build" "cbuild" "cmbuild"
 	  DOC "FFTW library path")
