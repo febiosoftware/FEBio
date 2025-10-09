@@ -9,6 +9,7 @@
     "pthread",
     "zstd",
     "zlib",
-    "sqlite3"
+    "sqlite3",
+    "fftw3"
   ]
 }
