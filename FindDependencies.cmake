@@ -103,7 +103,7 @@ if(WIN32)
       PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
       PATH_SUFFIXES "include" "fftw*" "include/fftw*"
       DOC "FFTW include directory")
-	find_library(FFTW_LIB libfftw3-3
+	find_library(FFTW_LIB fftw3 libfftw3-3
       PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
       PATH_SUFFIXES "vs2017/Release"
       DOC "FFTW library path")
