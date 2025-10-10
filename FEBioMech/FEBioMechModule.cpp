@@ -213,6 +213,7 @@ SOFTWARE.*/
 #include "FEContactPotential.h"
 #include "FEEdgeToSurfaceContactPotential.h"
 #include "FEEdgeToSurfaceSlidingContact.h"
+#include "FEPipetteAspiration.h"
 
 #include "FESymmetryPlane.h"
 #include "FERigidJoint.h"
@@ -669,6 +670,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEIdealGasPressure, "ideal gas pressure");
     REGISTER_FECORE_CLASS(FEPressureRobinBC, "pressure Robin BC", FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FETractionRobinBC, "traction Robin BC", FECORE_EXPERIMENTAL);
+    REGISTER_FECORE_CLASS(FEPipetteAspiration, "pipette aspiration");
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
