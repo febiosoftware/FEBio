@@ -32,3 +32,4 @@ yasm
 patchelf
 zip
 python3-pip
+libfftw3-dev

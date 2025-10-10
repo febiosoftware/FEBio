@@ -19,7 +19,7 @@ ImageFilter::ImageFilter(FEModel* fem) : FECoreClass(fem)
 
 BEGIN_FECORE_CLASS(IterativeBlur, ImageFilter)
 	ADD_PARAMETER(m_blur, "blur");
-	ADD_PARAMETER(m_norm_flag, "normalize values");
+	ADD_PARAMETER(m_norm_flag, "normalize_values");
 END_FECORE_CLASS();
 
 IterativeBlur::IterativeBlur(FEModel* fem) : ImageFilter(fem)
@@ -110,7 +110,7 @@ float IterativeBlur::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
 BEGIN_FECORE_CLASS(BoxBlur, ImageFilter)
 	ADD_PARAMETER(m_blur, "blur"); // blur radius
 	ADD_PARAMETER(m_K, "iterations");
-	ADD_PARAMETER(m_norm_flag, "normalize values");
+	ADD_PARAMETER(m_norm_flag, "normalize_values");
 	ADD_PARAMETER(m_res, 3, "voxel_resolution");
 END_FECORE_CLASS();
 
@@ -224,7 +224,7 @@ float BoxBlur::Apply(Image& img, int m_pos[3], int m_range[3], int m_dir)
 #ifdef HAVE_FFTW
 BEGIN_FECORE_CLASS(FFTWBlur, ImageFilter)
 ADD_PARAMETER(m_blur, "blur");
-ADD_PARAMETER(m_norm_flag, "normalize values");
+ADD_PARAMETER(m_norm_flag, "normalize_values");
 ADD_PARAMETER(m_res, 3, "voxel_resolution");
 END_FECORE_CLASS();
 
