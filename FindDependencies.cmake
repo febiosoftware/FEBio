@@ -38,6 +38,7 @@ if(MKLROOT)
             NAMES iomp5 iomp5md libiomp5md.lib
             PATHS
               ${MKLROOT}/../compiler/latest/*/compiler/lib/
+              ${MKLROOT}/../compiler/latest/lib/
               ${MKLROOT}/../../compiler/latest/*/compiler/lib/
               ${MKLROOT}/../../compiler/latest/lib/
             PATH_SUFFIXES "intel64" "mac"
