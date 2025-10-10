@@ -112,9 +112,24 @@ bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* p
 	{
 		switch (pp->type())
 		{
-		case FE_PARAM_INT   : { vector<int> d(pp->dim()); tag.value(&d[0], pp->dim()); } break;
-		case FE_PARAM_DOUBLE: { vector<double> d(pp->dim()); tag.value(&d[0], pp->dim()); } break;
-        default: break;
+		case FE_PARAM_INT   : { 
+			vector<int> d(pp->dim()); 
+			tag.value(&d[0], pp->dim()); 
+			for (int i=0; i<pp->dim(); ++i) 
+				*(pp->pvalue<int>()+i) = d[i]; 
+		} 
+		break;
+		case FE_PARAM_DOUBLE: 
+		{ 
+			vector<double> d(pp->dim()); 
+			tag.value(&d[0], pp->dim()); 
+			for (int i = 0; i < pp->dim(); ++i) 
+				*(pp->pvalue<double>() + i) = d[i];
+		}
+		break;
+		default:
+			assert(false);
+			break;
 		}
 	}
 
@@ -160,6 +175,9 @@ bool fexml::readParameterList(XMLTag& tag, FECoreBase* pc)
 	// make sure this tag has children
 	if (tag.isleaf()) return true;
 
+	// read attribute parameters
+	if (!readAttributeParams(tag, pc)) return false;
+
 	// process the parameter lists
 	++tag;
 	do
@@ -168,6 +186,53 @@ bool fexml::readParameterList(XMLTag& tag, FECoreBase* pc)
 		++tag;
 	} 
 	while (!tag.isend());
+
+	return true;
+}
+
+bool fexml::readAttributeParams(XMLTag& tag, FECoreBase* pc)
+{
+	FEParameterList& pl = pc->GetParameterList();
+
+	// process all the other attributes
+	for (XMLAtt& att : tag.m_att)
+	{
+		const char* szatt = att.name();
+		const char* szval = att.cvalue();
+		if ((att.m_bvisited == false) && szatt && szval)
+		{
+			FEParam* param = pl.FindFromName(szatt);
+			if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
+			{
+				switch (param->type())
+				{
+				case FE_PARAM_INT:
+				{
+					if (param->enums() == nullptr)
+						param->value<int>() = atoi(szval);
+					else
+					{
+						if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+					}
+					break;
+				}
+				case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
+				case FE_PARAM_STD_STRING: param->value<std::string>() = szval; break;
+				default:
+					throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+				}
+			}
+			else if (strcmp("name", szatt) == 0) pc->SetName(szval);
+			else if (strcmp("id", szatt) == 0) pc->SetID(atoi(szval));
+			else if (strcmp("type", szatt) == 0) { /* don't do anything here */ }
+			else if (strcmp("lc", szatt) == 0) { /* don't do anything. Loadcurves are processed elsewhere. */ }
+			else
+			{
+				assert(false);
+				return false;
+			}
+		}
+	}
 
 	return true;
 }

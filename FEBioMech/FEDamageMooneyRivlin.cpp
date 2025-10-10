@@ -134,8 +134,9 @@ tens4ds FEDamageMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	// calculate C:d2WdCdC:C
 	double CWWC = 2*I2*W2;
 
-	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.m_s.dev();
+	// deviatoric cauchy-stress
+	mat3ds T = B * (W1 + W2 * I1) - B2 * W2;
+	mat3ds devs = T.dev() * (2.0 / J);
 
 	// Identity tensor
 	mat3ds I(1,1,1,0,0,0);

@@ -215,6 +215,8 @@ public:
 	std::vector<FEMeshDataGenerator*>		m_MD;		//!< mesh data generators
 
 	std::vector<LoadParam>		m_Param;	//!< list of parameters controller by load controllers
+	
+	bool m_dotiming = true; // flag to enable/disable timings
 	std::vector<Timer>			m_timers;	// list of timers
 
 public:
@@ -486,7 +488,7 @@ bool FEModel::Init()
 	// intitialize time
 	FETimeInfo& tp = GetTime();
 	tp.currentTime = 0;
-	tp.timeIncrement = m_imp->m_pStep->m_dt0;
+	tp.timeIncrement = m_imp->m_Step[0]->m_dt0;
 	m_imp->m_ftime0 = 0;
 
 	// initialize global data
@@ -516,6 +518,9 @@ bool FEModel::Init()
 	// NOTE: This must be called after the rigid system is initialiazed since the rigid materials will
 	//       reference the rigid bodies
 	if (InitMaterials() == false) return false;
+
+	// Validate the materials
+	if (ValidateMaterials() == false) return false;
 
 	// initialize mesh data
 	// NOTE: this must be done AFTER the elements have been assigned material point data !
@@ -1268,7 +1273,7 @@ bool FEModel::RCI_ClearRewindStack()
 bool FEModel::RCI_Init()
 {
 	// start the timer
-	GetTimer(Timer_ModelSolve)->start();
+	TRACK_TIME(Timer_ModelSolve);
 
 	// reset solver status flag
 	m_imp->m_bsolved = false;
@@ -2381,6 +2386,9 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		ar & m_timeInfo;
 
 		// stream mesh
+		ar & m_mesh;
+
+		// stream domains
 		m_fem->SerializeGeometry(ar);
 
 		// serialize contact
@@ -2410,10 +2418,13 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		ar & m_ftime0;
 		ar & m_bsolved;
 
-		// we have to stream materials before the mesh
+		// serialize the mesh first
+		ar & m_mesh;
+
+		// we have to stream materials before we serialize the domains
 		ar & m_MAT;
 
-		// we have to stream the mesh before any boundary conditions
+		// stream geometry (domains)
 		m_fem->SerializeGeometry(ar);
 
 		// stream all boundary conditions
@@ -2456,7 +2467,7 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 //! Derived classes can override this
 void FEModel::SerializeGeometry(DumpStream& ar)
 {
-	ar & m_imp->m_mesh;
+	m_imp->m_mesh.SerializeDomains(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -2502,6 +2513,16 @@ bool FEModel::GetNodeData(int ndof, vector<double>& data)
 	}
 	
 	return true;
+}
+
+void FEModel::CollectTimings(bool b)
+{
+	m_imp->m_dotiming = b;
+}
+
+bool FEModel::CollectTimings() const
+{
+	return m_imp->m_dotiming;
 }
 
 //-----------------------------------------------------------------------------

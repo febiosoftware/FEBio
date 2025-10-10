@@ -23,19 +23,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERigidPrismaticJoint.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
+#include <FECore/ad.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERigidPrismaticJoint, FERigidConnector);
-    ADD_PARAMETER(m_atol, "tolerance"     );
+	ADD_PARAMETER(m_laugon, "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0LAGMULT\0");
+	ADD_PARAMETER(m_atol, "tolerance"     );
     ADD_PARAMETER(m_gtol, "gaptol"        );
     ADD_PARAMETER(m_qtol, "angtol"        );
     ADD_PARAMETER(m_eps , "force_penalty" );
@@ -57,6 +55,8 @@ END_FECORE_CLASS();
 FERigidPrismaticJoint::FERigidPrismaticJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
     m_nID = m_ncount++;
+
+	m_laugon = FECore::AUGLAG_METHOD; // for backward compatibility
     m_atol = 0;
     m_gtol = 0;
     m_qtol = 0;
@@ -95,6 +95,10 @@ bool FERigidPrismaticJoint::Init()
     // reset force
     m_F = vec3d(0,0,0); m_L = vec3d(0,0,0);
     m_M = vec3d(0,0,0); m_U = vec3d(0,0,0);
+	m_U1 = m_U2 = vec3d(0, 0, 0);
+
+	m_Lp = vec3d(0, 0, 0);
+	m_U1p = m_U2p = vec3d(0, 0, 0);
     
 	// base class first
 	if (FERigidConnector::Init() == false) return false;
@@ -117,6 +121,8 @@ void FERigidPrismaticJoint::Serialize(DumpStream& ar)
     ar & m_e0;
     ar & m_ea0;
     ar & m_eb0;
+	ar & m_U1 & m_U2 & m_LM;
+	ar & m_Fp & m_U1p & m_U2p;
 }
 
 //-----------------------------------------------------------------------------
@@ -189,60 +195,113 @@ void FERigidPrismaticJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
     eb[0] = ebt[0]*alpha + ebp[0]*(1-alpha);
     eb[1] = ebt[1]*alpha + ebp[1]*(1-alpha);
     eb[2] = ebt[2]*alpha + ebp[2]*(1-alpha);
-    
-    // incremental compound rotation of B w.r.t. A
-    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
-    
-    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
-    vec3d c = P*(rb + zb - ra - za) - p;
-    m_F = m_L + c*m_eps + ea[0]*m_Fp;
-    
-    vec3d ksi = vth;
-    m_M = m_U + ksi*m_ups;
-    
-    // add damping
-    if (m_cps > 0) {
-        // body A
-        vec3d vat = RBa.m_vt + (RBa.m_wt ^ zat);
-        vec3d vap = RBa.m_vp + (RBa.m_wp ^ zap);
-        vec3d va = vat*alpha + vap*(1-alpha);
-        
-        // body b
-        vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
-        vec3d vbp = RBb.m_vp + (RBb.m_wp ^ zbp);
-        vec3d vb = vbt*alpha + vbp*(1-alpha);
-        
-        m_F += P*(vb - va)*m_cps;
-    }
-    if (m_rps > 0) {
-        // body A
-        vec3d wa = RBa.m_wt*alpha + RBa.m_wp*(1-alpha);
-        
-        // body b
-        vec3d wb = RBb.m_wt*alpha + RBb.m_wp*(1-alpha);
-        
-        m_M += (wb - wa)*m_rps;
-    }
-    
-    fa[0] = m_F.x;
-    fa[1] = m_F.y;
-    fa[2] = m_F.z;
-    
-    fa[3] = za.y*m_F.z-za.z*m_F.y + m_M.x;
-    fa[4] = za.z*m_F.x-za.x*m_F.z + m_M.y;
-    fa[5] = za.x*m_F.y-za.y*m_F.x + m_M.z;
-    
-    fb[0] = -m_F.x;
-    fb[1] = -m_F.y;
-    fb[2] = -m_F.z;
-    
-    fb[3] = -zb.y*m_F.z+zb.z*m_F.y - m_M.x;
-    fb[4] = -zb.z*m_F.x+zb.x*m_F.z - m_M.y;
-    fb[5] = -zb.x*m_F.y+zb.y*m_F.x - m_M.z;
-    
-    for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
-    for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
+
+	if (m_laugon != FECore::LAGMULT_METHOD)
+	{
+		// incremental compound rotation of B w.r.t. A
+		vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2])) / 2;
+
+		mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+		vec3d p = m_bd ? ea[0] * m_dp : vec3d(0, 0, 0);
+		vec3d c = P * (rb + zb - ra - za) - p;
+		m_F = m_L + c * m_eps + ea[0] * m_Fp;
+
+		vec3d ksi = vth;
+		m_M = m_U + ksi * m_ups;
+
+		// add damping
+		if (m_cps > 0) {
+			// body A
+			vec3d vat = RBa.m_vt + (RBa.m_wt ^ zat);
+			vec3d vap = RBa.m_vp + (RBa.m_wp ^ zap);
+			vec3d va = vat * alpha + vap * (1 - alpha);
+
+			// body b
+			vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
+			vec3d vbp = RBb.m_vp + (RBb.m_wp ^ zbp);
+			vec3d vb = vbt * alpha + vbp * (1 - alpha);
+
+			m_F += P * (vb - va) * m_cps;
+		}
+		if (m_rps > 0) {
+			// body A
+			vec3d wa = RBa.m_wt * alpha + RBa.m_wp * (1 - alpha);
+
+			// body b
+			vec3d wb = RBb.m_wt * alpha + RBb.m_wp * (1 - alpha);
+
+			m_M += (wb - wa) * m_rps;
+		}
+
+		fa[0] = m_F.x;
+		fa[1] = m_F.y;
+		fa[2] = m_F.z;
+
+		fa[3] = za.y * m_F.z - za.z * m_F.y + m_M.x;
+		fa[4] = za.z * m_F.x - za.x * m_F.z + m_M.y;
+		fa[5] = za.x * m_F.y - za.y * m_F.x + m_M.z;
+
+		fb[0] = -m_F.x;
+		fb[1] = -m_F.y;
+		fb[2] = -m_F.z;
+
+		fb[3] = -zb.y * m_F.z + zb.z * m_F.y - m_M.x;
+		fb[4] = -zb.z * m_F.x + zb.x * m_F.z - m_M.y;
+		fb[5] = -zb.x * m_F.y + zb.y * m_F.x - m_M.z;
+
+		for (int i = 0; i < 6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
+		for (int i = 0; i < 6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
+	}
+	else
+	{
+		mat3dd I(1.0);
+		mat3d P = I - dyad(ea[0]);
+
+		vec3d d = rb + zb - ra - za;
+		double ad = m_ea0[0] * d;
+		mat3d D = I * (ad) + (ea[0] & d);
+		mat3d DT = D.transpose();
+		mat3da eahat(ea[0]);
+
+		vec3d F = P * m_F;
+		vec3d Ma = (za ^ F) + eahat*(DT*m_F);
+		vec3d Mb = (zb ^ F);
+
+		fa[0] = -F.x;
+		fa[1] = -F.y;
+		fa[2] = -F.z;
+
+		fa[3] = -Ma.x;
+		fa[4] = -Ma.y;
+		fa[5] = -Ma.z;
+
+		fb[0] = F.x;
+		fb[1] = F.y;
+		fb[2] = F.z;
+
+		fb[3] = Mb.x;
+		fb[4] = Mb.y;
+		fb[5] = Mb.z;
+
+		for (int i = 0; i < 6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
+		for (int i = 0; i < 6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
+
+		// translational constraint
+		vec3d c = P*d;
+		R[m_LM[0]] += c.x;
+		R[m_LM[1]] += c.y;
+		R[m_LM[2]] += c.z;
+
+		// rotational constraint
+		vec3d ksi1 = eb[0] - ea[0];
+		vec3d ksi2 = eb[1] - ea[1];
+		R[m_LM[3]] += ksi1.x;
+		R[m_LM[4]] += ksi1.y;
+		R[m_LM[5]] += ksi1.z;
+		R[m_LM[6]] += ksi2.x;
+		R[m_LM[7]] += ksi2.y;
+		R[m_LM[8]] += ksi2.z;
+	}
     
     RBa.m_Fr -= vec3d(fa[0],fa[1],fa[2]);
     RBa.m_Mr -= vec3d(fa[3],fa[4],fa[5]);
@@ -265,18 +324,18 @@ void FERigidPrismaticJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
     vec3d eat[3], eap[3], ea[3];
     vec3d ebt[3], ebp[3], eb[3];
     
-    vector<int> LM(12);
-	FEElementMatrix ke(12, 12);
-    ke.zero();
-    
 	FERigidBody& RBa = *m_rbA;
 	FERigidBody& RBb = *m_rbB;
 
     // body A
-    vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
-	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
-    vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
-    vec3d za = zat*alpha + zap*(1-alpha);
+	quatd Qat = RBa.GetRotation();
+	quatd Qap = RBa.m_qp;
+	vec3d rat = RBa.m_rt;
+	vec3d rap = RBa.m_rp;
+	vec3d ra = rat * alpha + rap * (1 - alpha);
+	vec3d zat = Qat * m_qa0;
+	vec3d zap = Qap * m_qa0;
+	vec3d za = zat * alpha + zap * (1 - alpha);
 	eat[0] = m_ea0[0]; RBa.GetRotation().RotateVector(eat[0]);
 	eat[1] = m_ea0[1]; RBa.GetRotation().RotateVector(eat[1]);
 	eat[2] = m_ea0[2]; RBa.GetRotation().RotateVector(eat[2]);
@@ -290,10 +349,14 @@ void FERigidPrismaticJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
     mat3d zathat; zathat.skew(zat);
     
     // body b
-    vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
-	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
-    vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
-    vec3d zb = zbt*alpha + zbp*(1-alpha);
+	quatd Qbt = RBb.GetRotation();
+	quatd Qbp = RBb.m_qp;
+	vec3d rbt = RBb.m_rt;
+	vec3d rbp = RBb.m_rp;
+	vec3d rb = rbt * alpha + rbp * (1 - alpha);
+	vec3d zbt = Qbt * m_qb0;
+	vec3d zbp = Qbp * m_qb0;
+	vec3d zb = zbt * alpha + zbp * (1 - alpha);
 	ebt[0] = m_eb0[0]; RBb.GetRotation().RotateVector(ebt[0]);
 	ebt[1] = m_eb0[1]; RBb.GetRotation().RotateVector(ebt[1]);
 	ebt[2] = m_eb0[2]; RBb.GetRotation().RotateVector(ebt[2]);
@@ -305,186 +368,242 @@ void FERigidPrismaticJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo
     eb[2] = ebt[2]*alpha + ebp[2]*(1-alpha);
     mat3d zbhat; zbhat.skew(zb);
     mat3d zbthat; zbthat.skew(zbt);
-    
-    // incremental compound rotation of B w.r.t. A
-    vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2]))/2;
-    
-    mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
-    vec3d p = m_bd ? ea[0]*m_dp : vec3d(0,0,0);
-    vec3d d = rb + zb - ra - za;
-    vec3d c = P*d - p;
-    m_F = m_L + c*m_eps + ea[0]*m_Fp;
-    
-    vec3d ksi = vth;
-    m_M = m_U + ksi*m_ups;
-    
-    mat3d eahat[3], ebhat[3], eathat[3], ebthat[3];
-    for (int j=0; j<3; ++j) {
-        eahat[j] = skew(ea[j]);
-        ebhat[j] = skew(eb[j]);
-        eathat[j] = skew(eat[j]);
-        ebthat[j] = skew(ebt[j]);
-    }
-    mat3d Q = m_bd ? eathat[0]*m_dp : ((ea[0] & d) + mat3dd(1)*(ea[0]*d))*eathat[0];
-    mat3d Wba = (ebhat[0]*eathat[0]+ebhat[1]*eathat[1]+ebhat[1]*eathat[1])/2;
-    mat3d Wab = (eahat[0]*ebthat[0]+eahat[1]*ebthat[1]+eahat[1]*ebthat[1])/2;
-    mat3d K;
-    
-    // add damping
-    mat3ds A;
-    mat3d Ba, Bb, Ca, Cb;
-    A.zero(); Ba.zero(); Bb.zero(); Ca.zero(); Cb.zero();
-    if ((m_cps > 0) || (m_rps > 0)) {
-        mat3dd I(1);
-        
-        // body A
-        vec3d vat = RBa.m_vt + (RBa.m_wt ^ zat);
-        vec3d vap = RBa.m_vp + (RBa.m_wp ^ zap);
-        vec3d va = vat*alpha + vap*(1-alpha);
-		quatd qai = RBa.GetRotation()*RBa.m_qp.Inverse(); qai.MakeUnit();
-        vec3d cai = qai.GetVector()*(2*tan(qai.GetAngle()/2));
-        mat3d Ta = I + skew(cai)/2 + dyad(cai)/4;
-        vec3d wa = RBa.m_wt*alpha + RBa.m_wp*(1-alpha);
-        
-        // body b
-        vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
-        vec3d vbp = RBb.m_vp + (RBb.m_wp ^ zbp);
-        vec3d vb = vbt*alpha + vbp*(1-alpha);
-		quatd qbi = RBb.GetRotation()*RBb.m_qp.Inverse(); qbi.MakeUnit();
-        vec3d cbi = qbi.GetVector()*(2*tan(qbi.GetAngle()/2));
-        mat3d Tb = I + skew(cbi)/2 + dyad(cbi)/4;
-        vec3d wb = RBb.m_wt*alpha + RBb.m_wp*(1-alpha);
-        
-        m_F += (vb - va)*m_cps;
-        
-        vec3d w = wb - wa;
-        
-        m_M += P*w*m_rps;
-        
-        A = P*(gamma/beta/dt);
-        Ba = P*(zathat*Ta.transpose()*(gamma/beta/dt) + skew(RBa.m_wt)*zathat);
-        Bb = P*(zbthat*Tb.transpose()*(gamma/beta/dt) + skew(RBb.m_wt)*zbthat);
-        Ca = Ta.transpose()*(gamma/beta/dt);
-        Cb = Tb.transpose()*(gamma/beta/dt);
-    }
-    
-    // (1,1)
-    K = P*(alpha*m_eps) + A*(alpha*m_cps);
-    ke[0][0] = K[0][0]; ke[0][1] = K[0][1]; ke[0][2] = K[0][2];
-    ke[1][0] = K[1][0]; ke[1][1] = K[1][1]; ke[1][2] = K[1][2];
-    ke[2][0] = K[2][0]; ke[2][1] = K[2][1]; ke[2][2] = K[2][2];
-    
-    // (1,2)
-    K = (P*zathat+Q)*(-m_eps*alpha)
-    + eathat[0]*(m_Fp*alpha) + Ba*(-alpha*m_cps);
-    ke[0][3] = K[0][0]; ke[0][4] = K[0][1]; ke[0][5] = K[0][2];
-    ke[1][3] = K[1][0]; ke[1][4] = K[1][1]; ke[1][5] = K[1][2];
-    ke[2][3] = K[2][0]; ke[2][4] = K[2][1]; ke[2][5] = K[2][2];
-    
-    // (1,3)
-    K = P*(-alpha*m_eps) + A*(-alpha*m_cps);
-    ke[0][6] = K[0][0]; ke[0][7] = K[0][1]; ke[0][8] = K[0][2];
-    ke[1][6] = K[1][0]; ke[1][7] = K[1][1]; ke[1][8] = K[1][2];
-    ke[2][6] = K[2][0]; ke[2][7] = K[2][1]; ke[2][8] = K[2][2];
-    
-    // (1,4)
-    K = P*zbthat*(alpha*m_eps) + Bb*(alpha*m_cps);
-    ke[0][9] = K[0][0]; ke[0][10] = K[0][1]; ke[0][11] = K[0][2];
-    ke[1][9] = K[1][0]; ke[1][10] = K[1][1]; ke[1][11] = K[1][2];
-    ke[2][9] = K[2][0]; ke[2][10] = K[2][1]; ke[2][11] = K[2][2];
-    
-    // (2,1)
-    K = zahat*P*(alpha*m_eps) + zahat*A*(alpha*m_cps);
-    ke[3][0] = K[0][0]; ke[3][1] = K[0][1]; ke[3][2] = K[0][2];
-    ke[4][0] = K[1][0]; ke[4][1] = K[1][1]; ke[4][2] = K[1][2];
-    ke[5][0] = K[2][0]; ke[5][1] = K[2][1]; ke[5][2] = K[2][2];
-    
-    // (2,2)
-    K = (zahat*(P*zathat+Q)*m_eps + Wba*m_ups)*(-alpha)
-    + (zahat*Ba)*(-alpha*m_cps) - Ca*(alpha*m_rps);
-    ke[3][3] = K[0][0]; ke[3][4] = K[0][1]; ke[3][5] = K[0][2];
-    ke[4][3] = K[1][0]; ke[4][4] = K[1][1]; ke[4][5] = K[1][2];
-    ke[5][3] = K[2][0]; ke[5][4] = K[2][1]; ke[5][5] = K[2][2];
-    
-    // (2,3)
-    K = zahat*P*(-alpha*m_eps) + zahat*A*(-alpha*m_cps);
-    ke[3][6] = K[0][0]; ke[3][7] = K[0][1]; ke[3][8] = K[0][2];
-    ke[4][6] = K[1][0]; ke[4][7] = K[1][1]; ke[4][8] = K[1][2];
-    ke[5][6] = K[2][0]; ke[5][7] = K[2][1]; ke[5][8] = K[2][2];
-    
-    // (2,4)
-    K = (zahat*P*zbthat*m_eps + Wab*m_ups)*alpha
-    + (zahat*Bb)*(alpha*m_cps) + Cb*(alpha*m_rps);
-    ke[3][9] = K[0][0]; ke[3][10] = K[0][1]; ke[3][11] = K[0][2];
-    ke[4][9] = K[1][0]; ke[4][10] = K[1][1]; ke[4][11] = K[1][2];
-    ke[5][9] = K[2][0]; ke[5][10] = K[2][1]; ke[5][11] = K[2][2];
-    
-    
-    // (3,1)
-    K = P*(-alpha*m_eps) + A*(-alpha*m_cps);
-    ke[6][0] = K[0][0]; ke[6][1] = K[0][1]; ke[6][2] = K[0][2];
-    ke[7][0] = K[1][0]; ke[7][1] = K[1][1]; ke[7][2] = K[1][2];
-    ke[8][0] = K[2][0]; ke[8][1] = K[2][1]; ke[8][2] = K[2][2];
-    
-    // (3,2)
-    K = (P*zathat+Q)*(m_eps*alpha)
-    - eathat[0]*(m_Fp*alpha) + Ba*(alpha*m_cps);
-    ke[6][3] = K[0][0]; ke[6][4] = K[0][1]; ke[6][5] = K[0][2];
-    ke[7][3] = K[1][0]; ke[7][4] = K[1][1]; ke[7][5] = K[1][2];
-    ke[8][3] = K[2][0]; ke[8][4] = K[2][1]; ke[8][5] = K[2][2];
-    
-    // (3,3)
-    K = P*(alpha*m_eps) + A*(alpha*m_cps);
-    ke[6][6] = K[0][0]; ke[6][7] = K[0][1]; ke[6][8] = K[0][2];
-    ke[7][6] = K[1][0]; ke[7][7] = K[1][1]; ke[7][8] = K[1][2];
-    ke[8][6] = K[2][0]; ke[8][7] = K[2][1]; ke[8][8] = K[2][2];
-    
-    // (3,4)
-    K = P*zbthat*(-alpha*m_eps) + Bb*(-alpha*m_cps);
-    ke[6][9] = K[0][0]; ke[6][10] = K[0][1]; ke[6][11] = K[0][2];
-    ke[7][9] = K[1][0]; ke[7][10] = K[1][1]; ke[7][11] = K[1][2];
-    ke[8][9] = K[2][0]; ke[8][10] = K[2][1]; ke[8][11] = K[2][2];
-    
-    
-    // (4,1)
-    K = zbhat*P*(-alpha*m_eps) + zbhat*A*(-alpha*m_cps);
-    ke[9 ][0] = K[0][0]; ke[ 9][1] = K[0][1]; ke[ 9][2] = K[0][2];
-    ke[10][0] = K[1][0]; ke[10][1] = K[1][1]; ke[10][2] = K[1][2];
-    ke[11][0] = K[2][0]; ke[11][1] = K[2][1]; ke[11][2] = K[2][2];
-    
-    // (4,2)
-    K = (zbhat*(P*zathat+Q)*m_eps + Wba*m_ups)*alpha
-    + (zbhat*Ba)*(alpha*m_cps) + Ca*(alpha*m_rps);
-    ke[9 ][3] = K[0][0]; ke[ 9][4] = K[0][1]; ke[ 9][5] = K[0][2];
-    ke[10][3] = K[1][0]; ke[10][4] = K[1][1]; ke[10][5] = K[1][2];
-    ke[11][3] = K[2][0]; ke[11][4] = K[2][1]; ke[11][5] = K[2][2];
-    
-    // (4,3)
-    K = zbhat*P*(alpha*m_eps) + zbhat*A*(alpha*m_cps);
-    ke[9 ][6] = K[0][0]; ke[ 9][7] = K[0][1]; ke[ 9][8] = K[0][2];
-    ke[10][6] = K[1][0]; ke[10][7] = K[1][1]; ke[10][8] = K[1][2];
-    ke[11][6] = K[2][0]; ke[11][7] = K[2][1]; ke[11][8] = K[2][2];
-    
-    // (4,4)
-    K = (zbhat*P*zbthat*m_eps + Wab*m_ups)*(-alpha)
-    + (zbhat*Bb)*(-alpha*m_cps) - Cb*(alpha*m_rps);
-    ke[9 ][9] = K[0][0]; ke[ 9][10] = K[0][1]; ke[ 9][11] = K[0][2];
-    ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
-    ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];
-    
-    for (int j=0; j<6; ++j)
-    {
-        LM[j  ] = RBa.m_LM[j];
-        LM[j+6] = RBb.m_LM[j];
-    }
-    
-	ke.SetIndices(LM);
-	LS.Assemble(ke);
+
+	if (m_laugon != FECore::LAGMULT_METHOD)
+	{
+		// incremental compound rotation of B w.r.t. A
+		vec3d vth = ((ea[0] ^ eb[0]) + (ea[1] ^ eb[1]) + (ea[2] ^ eb[2])) / 2;
+
+		mat3ds P = m_bd ? mat3dd(1) : mat3dd(1) - dyad(ea[0]);
+		vec3d p = m_bd ? ea[0] * m_dp : vec3d(0, 0, 0);
+		vec3d d = rb + zb - ra - za;
+		vec3d c = P * d - p;
+		m_F = m_L + c * m_eps + ea[0] * m_Fp;
+
+		vec3d ksi = vth;
+		m_M = m_U + ksi * m_ups;
+
+		mat3d eahat[3], ebhat[3], eathat[3], ebthat[3];
+		for (int j = 0; j < 3; ++j) {
+			eahat[j] = skew(ea[j]);
+			ebhat[j] = skew(eb[j]);
+			eathat[j] = skew(eat[j]);
+			ebthat[j] = skew(ebt[j]);
+		}
+		mat3d Q = m_bd ? eathat[0] * m_dp : ((ea[0] & d) + mat3dd(1) * (ea[0] * d)) * eathat[0];
+		mat3d Wba = (ebhat[0] * eathat[0] + ebhat[1] * eathat[1] + ebhat[2] * eathat[2]) / 2;
+		mat3d Wab = (eahat[0] * ebthat[0] + eahat[1] * ebthat[1] + eahat[2] * ebthat[2]) / 2;
+		mat3d K;
+
+		// add damping
+		mat3ds A;
+		mat3d Ba, Bb, Ca, Cb;
+		A.zero(); Ba.zero(); Bb.zero(); Ca.zero(); Cb.zero();
+		if ((m_cps > 0) || (m_rps > 0)) {
+			mat3dd I(1);
+
+			// body A
+			vec3d vat = RBa.m_vt + (RBa.m_wt ^ zat);
+			vec3d vap = RBa.m_vp + (RBa.m_wp ^ zap);
+			vec3d va = vat * alpha + vap * (1 - alpha);
+			quatd qai = RBa.GetRotation() * RBa.m_qp.Inverse(); qai.MakeUnit();
+			vec3d cai = qai.GetVector() * (2 * tan(qai.GetAngle() / 2));
+			mat3d Ta = I + skew(cai) / 2 + dyad(cai) / 4;
+			vec3d wa = RBa.m_wt * alpha + RBa.m_wp * (1 - alpha);
+
+			// body b
+			vec3d vbt = RBb.m_vt + (RBb.m_wt ^ zbt);
+			vec3d vbp = RBb.m_vp + (RBb.m_wp ^ zbp);
+			vec3d vb = vbt * alpha + vbp * (1 - alpha);
+			quatd qbi = RBb.GetRotation() * RBb.m_qp.Inverse(); qbi.MakeUnit();
+			vec3d cbi = qbi.GetVector() * (2 * tan(qbi.GetAngle() / 2));
+			mat3d Tb = I + skew(cbi) / 2 + dyad(cbi) / 4;
+			vec3d wb = RBb.m_wt * alpha + RBb.m_wp * (1 - alpha);
+
+			m_F += (vb - va) * m_cps;
+
+			vec3d w = wb - wa;
+
+			m_M += P * w * m_rps;
+
+			A = P * (gamma / beta / dt);
+			Ba = P * (zathat * Ta.transpose() * (gamma / beta / dt) + skew(RBa.m_wt) * zathat);
+			Bb = P * (zbthat * Tb.transpose() * (gamma / beta / dt) + skew(RBb.m_wt) * zbthat);
+			Ca = Ta.transpose() * (gamma / beta / dt);
+			Cb = Tb.transpose() * (gamma / beta / dt);
+		}
+
+		mat3da Fhat(m_F);
+
+		FEElementMatrix ke(12, 12);
+		ke.zero();
+
+		// row 1
+		ke.set(0, 0, P * (m_eps)+A * (m_cps));
+		ke.set(0, 3, (P * zathat + Q) * (-m_eps) + eathat[0]*m_Fp + Ba*(-m_cps));
+		ke.set(0, 6, P * (-m_eps) + A * (-m_cps));
+		ke.set(0, 9, P * zbthat * (m_eps)+Bb * (m_cps));
+
+		// row 2
+		ke.set(3, 0, zahat*P*m_eps + zahat*A*m_cps);
+		ke.set(3, 3, zahat*(P * zathat + Q) * (-m_eps) - Fhat * zathat - Wba * m_ups - (zahat * Ba) * m_cps - Ca * m_rps);
+		ke.set(3, 6, zahat*P * (-m_eps) + zahat * A * (-m_cps));
+		ke.set(3, 9, zahat*P * zbthat * m_eps + Wab * m_ups + zahat * Bb * m_cps + Cb * m_rps);
+
+		// row 3
+		ke.set(6, 0, P * (-m_eps) + A * (-m_cps));
+		ke.set(6, 3, (P * zathat + Q)*m_eps - eathat[0]*m_Fp + Ba*m_cps);
+		ke.set(6, 6, P*m_eps + A*m_cps);
+		ke.set(6, 9, P*zbthat*(-m_eps) - Bb*m_cps);
+
+		// row 4
+		ke.set(9, 0, zbhat*P*(-m_eps) - zbhat*A*m_cps);
+		ke.set(9, 3, zbhat * (P * zathat + Q) * m_eps + Wba * m_ups + (zbhat * Ba) * m_cps + Ca * m_rps);
+		ke.set(9, 6, zbhat * P * (m_eps)+zbhat * A * (m_cps));
+		ke.set(9, 9, zbhat * P * zbthat * (-m_eps) + Fhat * zbthat - Wab * m_ups - (zbhat * Bb) * m_cps - Cb * m_rps);
+
+		ke *= alpha;
+
+		vector<int> LM(12);
+		for (int j = 0; j < 6; ++j)
+		{
+			LM[j    ] = RBa.m_LM[j];
+			LM[j + 6] = RBb.m_LM[j];
+		}
+
+		ke.SetIndices(LM);
+		LS.Assemble(ke);
+	}
+	else
+	{
+		dd::vec3d pa(ra);
+		dd::quatd qa(Qat);
+		dd::vec3d pb(rb);
+		dd::quatd qb(Qbt);
+		dd::vec3d lam(m_F);
+		dd::vec3d mu1(m_U1);
+		dd::vec3d mu2(m_U2);
+
+		auto F = [&]() {
+			dd::vec3d a = qa * m_ea0[0];
+			return lam - a*(lam*a);
+			};
+
+		auto c = [&]() {
+			dd::vec3d za = qa * m_qa0;
+			dd::vec3d zb = qb * m_qb0;
+			dd::vec3d d = pb + zb - pa - za;
+			dd::vec3d a = qa * m_ea0[0];
+			return d - a*(d*a);
+			};
+
+		auto m1 = [&]() {
+			dd::vec3d a1 = qa * m_ea0[0];
+			dd::vec3d b1 = qb * m_eb0[0];
+			return b1 - a1;
+			};
+
+		auto m2 = [&]() {
+			dd::vec3d a2 = qa * m_ea0[1];
+			dd::vec3d b2 = qb * m_eb0[1];
+			return b2 - a2;
+			};
+
+		auto Ma = [&] {
+			dd::vec3d za = qa * m_qa0;
+			dd::vec3d ea0 = qa * m_ea0[0];
+			dd::vec3d ea1 = qa * m_ea0[1];
+			dd::vec3d d = pb + zb - pa - za;
+			dd::vec3d t = lam * (ea0 * d) + d * (ea0 * lam);
+			return (za ^ lam) + (ea0 ^ t) + (ea0 ^ mu1) + (ea1 ^ mu2);
+			};
+
+		auto Mb = [&] {
+			dd::vec3d zb  = qb * m_qb0;
+			dd::vec3d eb0 = qb * m_eb0[0];
+			dd::vec3d eb1 = qb * m_eb0[1];
+			return (zb ^ lam) + (eb0 ^ mu1) + (eb1 ^ mu2);
+			};
+
+		mat3d K00 = -dd::D( F, pa);
+		mat3d K10 = -dd::D(Ma, pa);
+		mat3d K20 =  dd::D( F, pa);
+		mat3d K30 =  dd::D(Mb, pa);
+		mat3d K40 =  dd::D( c, pa);
+		mat3d K50 =  dd::D(m1, pa);
+		mat3d K60 =  dd::D(m2, pa);
+
+		mat3d K01 = -dd::D( F, qa);
+		mat3d K11 = -dd::D(Ma, qa);
+		mat3d K21 =  dd::D( F, qa);
+		mat3d K31 =  dd::D(Mb, qa);
+		mat3d K41 =  dd::D( c, qa);
+		mat3d K51 =  dd::D(m1, qa);
+		mat3d K61 =  dd::D(m2, qa);
+
+		mat3d K02 = -dd::D( F, pb);
+		mat3d K12 = -dd::D(Ma, pb);
+		mat3d K22 =  dd::D( F, pb);
+		mat3d K32 =  dd::D(Mb, pb);
+		mat3d K42 =  dd::D( c, pb);
+		mat3d K52 =  dd::D(m1, pb);
+		mat3d K62 =  dd::D(m2, pb);
+
+		mat3d K03 = -dd::D( F, qb);
+		mat3d K13 = -dd::D(Ma, qb);
+		mat3d K23 =  dd::D( F, qb);
+		mat3d K33 =  dd::D(Mb, qb);
+		mat3d K43 =  dd::D( c, qb);
+		mat3d K53 =  dd::D(m1, qb);
+		mat3d K63 =  dd::D(m2, qb);
+
+		mat3d K04 = -dd::D( F, lam);
+		mat3d K14 = -dd::D(Ma, lam);
+		mat3d K24 =  dd::D( F, lam);
+		mat3d K34 =  dd::D(Mb, lam);
+		mat3d K44 =  dd::D( c, lam);
+		mat3d K54 =  dd::D(m1, lam);
+		mat3d K64 =  dd::D(m2, lam);
+
+		mat3d K05 = -dd::D( F, mu1);
+		mat3d K15 = -dd::D(Ma, mu1);
+		mat3d K25 =  dd::D( F, mu1);
+		mat3d K35 =  dd::D(Mb, mu1);
+		mat3d K45 =  dd::D( c, mu1);
+		mat3d K55 =  dd::D(m1, mu1);
+		mat3d K65 =  dd::D(m2, mu1);
+
+		mat3d K06 = -dd::D( F, mu2);
+		mat3d K16 = -dd::D(Ma, mu2);
+		mat3d K26 =  dd::D( F, mu2);
+		mat3d K36 =  dd::D(Mb, mu2);
+		mat3d K46 =  dd::D( c, mu2);
+		mat3d K56 =  dd::D(m1, mu2);
+		mat3d K66 =  dd::D(m2, mu2);
+
+		matrix kd(21, 21); kd.zero();
+		kd.sub( 0, 0, K00); kd.sub( 0, 3, K01); kd.sub( 0, 6, K02); kd.sub( 0, 9, K03); kd.sub( 0, 12, K04); kd.sub( 0, 15, K05); kd.sub( 0, 18, K06);
+		kd.sub( 3, 0, K10); kd.sub( 3, 3, K11); kd.sub( 3, 6, K12); kd.sub( 3, 9, K13); kd.sub( 3, 12, K14); kd.sub( 3, 15, K15); kd.sub( 3, 18, K16);
+		kd.sub( 6, 0, K20); kd.sub( 6, 3, K21); kd.sub( 6, 6, K22); kd.sub( 6, 9, K23); kd.sub( 6, 12, K24); kd.sub( 6, 15, K25); kd.sub( 6, 18, K26);
+		kd.sub( 9, 0, K30); kd.sub( 9, 3, K31); kd.sub( 9, 6, K32); kd.sub( 9, 9, K33); kd.sub( 9, 12, K34); kd.sub( 9, 15, K35); kd.sub( 9, 18, K36);
+		kd.sub(12, 0, K40); kd.sub(12, 3, K41); kd.sub(12, 6, K42); kd.sub(12, 9, K43); kd.sub(12, 12, K44); kd.sub(12, 15, K45); kd.sub(12, 18, K46);
+		kd.sub(15, 0, K50); kd.sub(15, 3, K51); kd.sub(15, 6, K52); kd.sub(15, 9, K53); kd.sub(15, 12, K54); kd.sub(15, 15, K55); kd.sub(15, 18, K56);
+		kd.sub(18, 0, K60); kd.sub(18, 3, K61); kd.sub(18, 6, K62); kd.sub(18, 9, K63); kd.sub(18, 12, K64); kd.sub(18, 15, K65); kd.sub(18, 18, K66);
+
+		FEElementMatrix ke(21, 21);
+		ke = kd;
+		vector<int> LM(21);
+		UnpackLM(LM);
+		ke.SetIndices(LM);
+		LS.Assemble(ke);
+	}
 }
 
 //-----------------------------------------------------------------------------
 bool FERigidPrismaticJoint::Augment(int naug, const FETimeInfo& tp)
 {
+	if (m_laugon != FECore::AUGLAG_METHOD) return true;
+
     vec3d ra, rb, qa, qb, c, ksi, Lm;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
@@ -601,6 +720,8 @@ bool FERigidPrismaticJoint::Augment(int naug, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FERigidPrismaticJoint::Update()
 {
+	if (m_laugon == FECore::LAGMULT_METHOD) return;
+
     vec3d ra, rb;
     vec3d za, zb;
     vec3d eat[3], eap[3], ea[3];
@@ -751,4 +872,88 @@ vec3d FERigidPrismaticJoint::RelativeRotation(const bool global)
     vec3d y(q*ea[0], q*ea[1], q*ea[2]);
     
     return y;
+}
+
+// allocate equations
+int FERigidPrismaticJoint::InitEquations(int neq)
+{
+	const int LMeq = 9;
+	m_LM.resize(LMeq, -1);
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		for (int i = 0; i < LMeq; ++i) m_LM[i] = neq + i;
+		return LMeq;
+	}
+	else return 0;
+}
+
+// Build the matrix profile
+void FERigidPrismaticJoint::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	vector<int> lm;
+	UnpackLM(lm);
+
+	// add it to the pile
+	M.build_add(lm);
+}
+
+void FERigidPrismaticJoint::UnpackLM(vector<int>& lm)
+{
+	// add the dofs of rigid body A
+	lm.resize(21);
+	lm[0] = m_rbA->m_LM[0];
+	lm[1] = m_rbA->m_LM[1];
+	lm[2] = m_rbA->m_LM[2];
+	lm[3] = m_rbA->m_LM[3];
+	lm[4] = m_rbA->m_LM[4];
+	lm[5] = m_rbA->m_LM[5];
+
+	// add the dofs of rigid body B
+	lm[6] = m_rbB->m_LM[0];
+	lm[7] = m_rbB->m_LM[1];
+	lm[8] = m_rbB->m_LM[2];
+	lm[9] = m_rbB->m_LM[3];
+	lm[10] = m_rbB->m_LM[4];
+	lm[11] = m_rbB->m_LM[5];
+
+	// add the LM equations
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		for (int i = 0; i < m_LM.size(); ++i) lm[12 + i] = m_LM[i];
+	}
+}
+
+void FERigidPrismaticJoint::PrepStep()
+{
+	m_Lp  = m_F;
+	m_U1p = m_U1;
+	m_U2p = m_U2;
+}
+
+void FERigidPrismaticJoint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		m_F.x = m_Lp.x + Ui[m_LM[0]] + ui[m_LM[0]];
+		m_F.y = m_Lp.y + Ui[m_LM[1]] + ui[m_LM[1]];
+		m_F.z = m_Lp.z + Ui[m_LM[2]] + ui[m_LM[2]];
+
+		m_U1.x = m_U1p.x + Ui[m_LM[3]] + ui[m_LM[3]];
+		m_U1.y = m_U1p.y + Ui[m_LM[4]] + ui[m_LM[4]];
+		m_U1.z = m_U1p.z + Ui[m_LM[5]] + ui[m_LM[5]];
+
+		m_U2.x = m_U2p.x + Ui[m_LM[6]] + ui[m_LM[6]];
+		m_U2.y = m_U2p.y + Ui[m_LM[7]] + ui[m_LM[7]];
+		m_U2.z = m_U2p.z + Ui[m_LM[8]] + ui[m_LM[8]];
+
+		m_M = m_U1 + m_U2;
+	}
+}
+
+void FERigidPrismaticJoint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		for (int n : m_LM) Ui[n] += ui[n];
+	}
 }

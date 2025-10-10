@@ -174,4 +174,4 @@ void Timer::time_str(double fsec, char* sz)
 }
 
 //============================================================================
-TimerTracker::TimerTracker(FEModel* fem, int timerId) : TimerTracker(fem->GetTimer(timerId)) {}
+TimerTracker::TimerTracker(FEModel* fem, int timerId) : TimerTracker(fem->CollectTimings() ? fem->GetTimer(timerId) : nullptr) {}

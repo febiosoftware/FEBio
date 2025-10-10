@@ -167,8 +167,9 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	tens4ds BxB = dyad1s(B);
 	tens4ds B4  = dyad4s(B);
 
-	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.m_s.dev();
+	// deviatoric cauchy-stress
+	mat3ds T = B * (W1 + W2 * I1) - B2 * W2;
+	mat3ds devs = T.dev() * (2.0 / J);
 
 	// d2W/dCdC:C
 	mat3ds WCCxC = B*(W2*I1) - B2*W2;

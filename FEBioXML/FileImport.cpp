@@ -574,6 +574,13 @@ std::vector<std::string> split_string(const std::string& s, char delim)
 	return vs;
 }
 
+std::string trim_string(const std::string& s) {
+	auto start = std::find_if_not(s.begin(), s.end(), ::isspace);
+	auto end = std::find_if_not(s.rbegin(), s.rend(), ::isspace).base();
+	if (start >= end) return "";  // All spaces or empty string
+	return std::string(start, end);
+}
+
 //-----------------------------------------------------------------------------
 //! This function parses a parameter list
 bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc, bool parseAttributes)
@@ -615,8 +622,9 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				// make sure the type attribute is not defined 
 				// This most likely means a user thinks this parameter can be mapped
 				// but the corresponding parameter is not a FEModelParam
-				const char* sztype = tag.AttributeValue("type", true);
-				if (sztype) throw XMLReader::InvalidAttribute(tag, "type");
+				XMLAtt* att = tag.Attribute("type", true);
+				if (att && !att->m_bvisited)
+					throw XMLReader::InvalidAttribute(tag, "type");
 
 				value(tag, pp->value<double  >());
 			}
@@ -811,7 +819,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -849,7 +860,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -883,7 +897,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -914,7 +931,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -997,12 +1017,15 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 						}
 						pi.SetItemList(itemList);
 
+						// trim the string
+						std::string trimmedName = trim_string(s[i]);
+
 						// mapped values require special treatment
 						// The value is just the name of the map, but the problem is that 
 						// these maps may not be defined yet.
 						// So, we add them to the FEBioModel, which will process mapped 
 						// parameters after the rest of the file is processed
-						GetBuilder()->AddMappedParameter(pp, pc, s[i].c_str(), i);
+						GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str(), i);
 
 						// assign the valuator to the parameter
 						pi.setValuator(val);

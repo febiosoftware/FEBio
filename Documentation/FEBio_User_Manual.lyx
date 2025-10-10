@@ -336,14 +336,14 @@ status open
 
 \end_inset
 
-User's Manual Version 4.9
+User's Manual Version 4.10
 \end_layout
 
 \begin_layout Date
 
 \series bold
 Last Updated:
- March 24,
+ July 22,
  2025
 \end_layout
 
@@ -9790,7 +9790,8 @@ opt_iter
 \shape default
 defines the estimated optimal number of quasi-Newton iterations.
  If the actual number of iterations is less than or equal to this value the time step size is increased,
- otherwise it is decreased.
+ otherwise it is decreased,
+ as detailed further below.
 \end_layout
 
 \begin_layout Enumerate
@@ -9802,13 +9803,13 @@ When a time step fails (e.g.
 max_retries 
 \shape default
 parameter determines the maximum number of times a timestep may be retried before FEBio error terminates.
- The new time step size is determined by the ratio of the previous time step size and 
+ The new time step size is determined by the ratio of the time step size before restarts started and 
 \shape italic
 max_retries+1
 \shape default
 .
  For example,
- if the last time step size is 0.1 and 
+ if the time step size is 0.1 and 
 \shape italic
 max_retries 
 \shape default
@@ -9817,7 +9818,50 @@ is set to 4,
  The first retry will have a step size of 0.08;
  the next will be 0.06,
  and so on.
+ Specifically,
+ the new time step size is determined as follows.
+ (This is only for the case when the 
+\emph on
+aggressiveness 
+\emph default
+parameter is set to zero.) 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Delta t^{k+1}=\Delta t^{k}-\Delta t^{0}/\left(m_{\mathrm{max}}+1\right)
+\]
+
+\end_inset
+
+Here,
  
+\begin_inset Formula $\Delta t^{k}$
+\end_inset
+
+is the current time step size,
+ 
+\begin_inset Formula $\Delta t^{k+1}$
+\end_inset
+
+ is the new time step size,
+ 
+\begin_inset Formula $\Delta t^{0}$
+\end_inset
+
+ is the time step size before retries started,
+ and 
+\begin_inset Formula $m_{\mathrm{max}}$
+\end_inset
+
+is the max number of retries (i.e.
+ 
+\emph on
+max_
+\emph default
+retries).
 \begin_inset Newline newline
 \end_inset
 
@@ -9833,18 +9877,83 @@ opt_iter
 \emph default
 ,
  the time step size will be decreased.
- On the other hand,
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Delta t^{k+1}=\Delta t^{k}-\left(\Delta t^{k}-\Delta t_{\mathrm{min}}\right)\left(1-r\right)
+\]
+
+\end_inset
+
+Here,
+ 
+\begin_inset Formula $\Delta t^{k}$
+\end_inset
+
+is the current time step size,
+ 
+\begin_inset Formula $\Delta t^{k+1}$
+\end_inset
+
+ is the new time step size,
+ 
+\begin_inset Formula $\Delta t_{\mathrm{min}}$
+\end_inset
+
+is the minimum time step size and 
+\begin_inset Formula $r=\sqrt{n_{\mathrm{opt}}/n}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $n$
+\end_inset
+
+ is the number of iterations and 
+\begin_inset Formula $n_{\mathrm{opt}}$
+\end_inset
+
+is the optimal number of iterations as specified by the user (i.e.
+ 
+\emph on
+opt_iter
+\emph default
+).
+\begin_inset Newline newline
+\end_inset
+
+On the other hand,
  if the actual number of iterations is less than 
 \emph on
 opt_iter
 \emph default
 ,
  then the time step size will be increased.
- After adjusting
-\emph on
+ The exact equation follows.
  
-\emph default
-the time step size,
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Delta t^{k+1}=\Delta t^{k}+\left(\Delta t_{\mathrm{max}}-\Delta t^{k}\right)\mathrm{min}\left(0.2,r-1\right)
+\]
+
+\end_inset
+
+In addition,
+ the new time step size is enforced to be less than 5 times the old time step size,
+ to prevent the time step size from growing too fast.
+ 
+\begin_inset Newline newline
+\end_inset
+
+After calculating the new time step size,
  it will be ensured that the new timestep size falls within the range defined by 
 \emph on
 dtmin
@@ -9998,19 +10107,11 @@ aggressiveness = 0
 \emph default
  (default):
  
-\begin_inset Formula $\Delta t_{k+1}=\Delta t_{k}-(\Delta t_{k}/m_{r})$
+\begin_inset Formula $\Delta t^{k+1}=\Delta t^{k}-\Delta t^{0}/\left(m_{\mathrm{max}}+1\right)$
 \end_inset
 
 ,
- where 
-\begin_inset Formula $m_{r}$
-\end_inset
-
-is the max number of retries (set by the 
-\emph on
-max_retries 
-\emph default
-parameter).
+ (see comment 2 for more details).
 \end_layout
 
 \begin_layout Enumerate
@@ -10020,7 +10121,7 @@ aggressiveness = 1:
  
 \emph default
 
-\begin_inset Formula $\Delta t_{k+1}=\gamma\Delta t_{k}$
+\begin_inset Formula $\Delta t^{k+1}=\gamma\Delta t^{k}$
 \end_inset
 
 ,
@@ -30116,337 +30217,6 @@ Example
 \end_layout
 
 \begin_layout Subsubsection
-Pressure Robin BC
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Pressure-Robin-BC"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A pressure 
-\begin_inset Formula $p$
-\end_inset
-
- is prescribed normal to a surface (along 
-\begin_inset Formula $-\mathbf{n}$
-\end_inset
-
-),
- which is proportional to the surface normal displacement 
-\begin_inset Formula $u_{n}=\mathbf{u}\cdot\mathbf{n}$
-\end_inset
-
- and its normal velocity 
-\begin_inset Formula $v_{n}=\dot{\mathbf{u}}\cdot\mathbf{n}$
-\end_inset
-
-,
- according to
-\begin_inset Formula 
-\[
-p=\begin{cases}
-\varepsilon_{k}u_{n}+\varepsilon_{c}v_{n} & u_{n}>0\\
-0 & u_{n}\le0
-\end{cases}
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\varepsilon_{k}$
-\end_inset
-
- and 
-\begin_inset Formula $\varepsilon_{c}$
-\end_inset
-
- are user-specified measures of surface stiffness and damping,
- respectively.
- These pressure forces are also 
-\shape italic
-follower forces
-\shape default
-;
- they change direction as the body is deformed and,
- in this case,
- are always oriented along the local surface normal.
- The sign convention is so that a positive pressure will act opposite to the normal,
- so it will compress the material.
- The surface that the load is applied to is specified with the 
-\emph on
-surface 
-\emph default
-attribute.The surface must be defined in the 
-\emph on
-Mesh
-\shape italic
-\emph default
- 
-\shape default
-section.
- Note that this boundary condition is only meaningful to resist the expansion of a surface along its normal,
- since the pressure 
-\begin_inset Formula $p$
-\end_inset
-
- is set to zero when the surface motion is inward (
-\begin_inset Formula $u_{n}\le0$
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-parameter
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-default
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-spring_eps
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-The parameter 
-\begin_inset Formula $\varepsilon_{k}$
-\end_inset
-
-,
- with units of pressure per length
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0 [
-\series bold
-P
-\series default
-/
-\series bold
-L
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dashpot_eps
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-The parameter 
-\begin_inset Formula $\varepsilon_{c}$
-\end_inset
-
-,
- with units of pressure per speed
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0 [
-\series bold
-P
-\series default
-•
-\series bold
-t
-\series default
-/
-\series bold
-L
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-shell_bottom
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-shell bottom flag (1)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Comments:
-\end_layout
-
-\begin_layout Enumerate
-When the 
-\emph on
-shell_bottom
-\emph default
- flag is set to 1,
- the surface is assumed to be a shell surface and the pressure is applied to the bottom part of the shell surface.
-\end_layout
-
-\begin_layout Enumerate
-The formulation of this pressure load requires a non-symmetric stiffness matrix.
- It is the user's responsibility to set the solver stiffness matrix to non-symmetric.
-\end_layout
-
-\begin_layout Enumerate
-The user-specified values of 
-\begin_inset Formula $\varepsilon_{k}$
-\end_inset
-
- and 
-\begin_inset Formula $\varepsilon_{c}$
-\end_inset
-
- are highly dependend on the model being examined,
- thus users must carefully determine appropriate values for either parameter.
-\end_layout
-
-\begin_layout Enumerate
-This formulation may be employed in quasi-static and dynamic analyses.
-\end_layout
-
-\begin_layout Enumerate
-This formulation is 
-\emph on
-not frame-invariant!
-
-\emph default
- Therefore,
- caution must be used when employing this pressure load (e.g.,
- do not prescribe this pressure load on a surface undergoing large translations or rotations,
- or else results will not make sense).
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Example
-\emph default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load type="pressure Robin BC" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <spring_eps>50</spring_eps>
-\end_layout
-
-\begin_layout LyX-Code
-  <dashpot_eps>5</dashpot_eps>
-\end_layout
-
-\begin_layout LyX-Code
-</surface_load>
-\end_layout
-
-\begin_layout Subsubsection
 Traction Load
 \begin_inset CommandInset label
 LatexCommand label
@@ -30506,280 +30276,6 @@ attribute.
 lc 
 \shape default
 attribute is omitted a constant traction load is applied.
-\end_layout
-
-\begin_layout Subsubsection
-Traction Robin BC
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:Traction-Robin-BC"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A traction 
-\begin_inset Formula $\mathbf{t}$
-\end_inset
-
- is applied to a surface,
- which opposes the surface motion according to
-\begin_inset Formula 
-\[
-\mathbf{t}=-\varepsilon_{k}\mathbf{u}-\varepsilon_{c}\dot{\mathbf{u}}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="3">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-parameter
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-default
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-spring_eps
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-The parameter 
-\begin_inset Formula $\varepsilon_{k}$
-\end_inset
-
-,
- with units of pressure per length
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0 [
-\series bold
-P
-\series default
-/
-\series bold
-L
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-dashpot_eps
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-The parameter 
-\begin_inset Formula $\varepsilon_{c}$
-\end_inset
-
-,
- with units of pressure per speed
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0 [
-\series bold
-P
-\series default
-•
-\series bold
-t
-\series default
-/
-\series bold
-L
-\series default
-]
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-shell_bottom
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-shell bottom flag (1)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Comments:
-\end_layout
-
-\begin_layout Enumerate
-When the 
-\emph on
-shell_bottom
-\emph default
- flag is set to 1,
- the surface is assumed to be a shell surface and the pressure is applied to the bottom part of the shell surface.
-\end_layout
-
-\begin_layout Enumerate
-The formulation of this traction load requires a non-symmetric stiffness matrix.
- It is the user's responsibility to set the solver stiffness matrix to non-symmetric.
-\end_layout
-
-\begin_layout Enumerate
-The user-specified values of 
-\begin_inset Formula $\varepsilon_{k}$
-\end_inset
-
- and 
-\begin_inset Formula $\varepsilon_{c}$
-\end_inset
-
- are highly dependend on the model being examined,
- thus users must carefully determine appropriate values for either parameter.
-\end_layout
-
-\begin_layout Enumerate
-This formulation may be employed in quasi-static and dynamic analyses.
-\end_layout
-
-\begin_layout Enumerate
-This formulation is 
-\emph on
-not frame-invariant!
-
-\emph default
- Therefore,
- caution must be used when employing this traction load (e.g.,
- do not prescribe this traction load on a surface undergoing large translations or rotations,
- or else results will not make sense).
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Example
-\emph default
-:
-\end_layout
-
-\begin_layout LyX-Code
-<surface_load type="traction Robin BC" surface="surface1">
-\end_layout
-
-\begin_layout LyX-Code
-  <spring_eps>50</spring_eps>
-\end_layout
-
-\begin_layout LyX-Code
-  <dashpot_eps>5</dashpot_eps>
-\end_layout
-
-\begin_layout LyX-Code
-</surface_load>
 \end_layout
 
 \begin_layout Subsubsection
@@ -83440,7 +82936,6 @@ The parameter <resolution> must be one of the values 20,
  1596,
  1610,
  and 1796.
- A recommended combination is nph=7 and nth=31.
  A conservative choice for producing accurate results under general loading conditions is 
 \begin_inset Formula $N=$
 \end_inset
@@ -85063,9 +84558,9 @@ The <kinetics> parameter should be set to 1 for Type I bond kinetics or 2 for Ty
 \begin_inset Formula 
 \begin{equation}
 \text{trigger}=\begin{cases}
-1\text{ for any strain} & \left\Vert \Delta\mathbf{E}\right\Vert \\
-2\text{ for distortional strain} & \left\Vert \dev\Delta\boldsymbol{\eta}\right\Vert \\
-3\text{ for dilatational strain} & \left|\ln\left(\det\Delta\mathbf{F}\right)\right|
+0\text{ for any strain} & \left\Vert \Delta\mathbf{E}\right\Vert \\
+1\text{ for distortional strain} & \left\Vert \dev\Delta\boldsymbol{\eta}\right\Vert \\
+2\text{ for dilatational strain} & \left|\ln\left(\det\Delta\mathbf{F}\right)\right|
 \end{cases}\label{eq:rvs-trigger}
 \end{equation}
 

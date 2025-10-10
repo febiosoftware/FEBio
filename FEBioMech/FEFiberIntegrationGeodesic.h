@@ -50,6 +50,9 @@ public:
 	// get iterator
 	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
 
+	// get number of integration points
+	int IntegrationPoints() const override { return m_nint; };
+
 protected:
 	void InitIntegrationRule();  
 

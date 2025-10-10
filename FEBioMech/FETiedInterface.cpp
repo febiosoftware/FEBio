@@ -691,17 +691,39 @@ void FETiedInterface::Serialize(DumpStream &ar)
 	}
 }
 
-//-----------------------------------------------------------------------------
-//! Update Lagrange multipliers
-void FETiedInterface::Update(vector<double>& ui)
+void FETiedInterface::PrepStep()
 {
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		for (int i = 0; i < ss.Nodes(); ++i)
 		{
-			ss.m_data[i].m_Lm.x += ui[m_LM[3 * i    ]];
-			ss.m_data[i].m_Lm.y += ui[m_LM[3 * i + 1]];
-			ss.m_data[i].m_Lm.z += ui[m_LM[3 * i + 2]];
+			ss.m_data[i].m_Lp = ss.m_data[i].m_Lm;
 		}
+	}
+}
+
+//! Update Lagrange multipliers
+void FETiedInterface::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		for (int i = 0; i < ss.Nodes(); ++i)
+		{
+			ss.m_data[i].m_Lm.x = ss.m_data[i].m_Lp.x + Ui[m_LM[3 * i    ]] + ui[m_LM[3 * i    ]];
+			ss.m_data[i].m_Lm.y = ss.m_data[i].m_Lp.y + Ui[m_LM[3 * i + 1]] + ui[m_LM[3 * i + 1]];
+			ss.m_data[i].m_Lm.z = ss.m_data[i].m_Lp.z + Ui[m_LM[3 * i + 2]] + ui[m_LM[3 * i + 2]];
+		}
+	}
+}
+
+void FETiedInterface::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon != FECore::LAGMULT_METHOD) return;
+
+	for (int i = 0; i < ss.Nodes(); ++i)
+	{
+		Ui[m_LM[3 * i    ]] += ui[m_LM[3 * i    ]];
+		Ui[m_LM[3 * i + 1]] += ui[m_LM[3 * i + 1]];
+		Ui[m_LM[3 * i + 2]] += ui[m_LM[3 * i + 2]];
 	}
 }

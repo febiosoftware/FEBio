@@ -102,6 +102,15 @@ bool FEBioModel::processEvent(int nevent)
 	{
 	case CB_STEP_SOLVED: on_cb_stepSolved(); break;
 	case CB_SOLVED     : on_cb_solved(); break;
+	case CB_MAJOR_ITERS:
+	case CB_TIMESTEP_FAILED:
+	{
+		FEAnalysis* step = GetCurrentStep();
+		FESolver* solver = step->GetFESolver();
+		TimeStepStats stats = {solver->m_niter, solver->m_nrhs, solver->m_nref, (nevent== CB_MAJOR_ITERS?1:0)};
+		m_timestepStats.push_back(stats);
+	}
+	break;
 	}
 
 	return true;
@@ -196,6 +205,11 @@ ModelStats FEBioModel::GetStepStats(size_t n) const
 std::vector<ModelStats> FEBioModel::GetStepStats() const
 {
 	return m_stepStats;
+}
+
+std::vector<TimeStepStats> FEBioModel::GetTimeStepStats() const
+{
+	return m_timestepStats;
 }
 
 //-----------------------------------------------------------------------------
@@ -1344,6 +1358,13 @@ void FEBioModel::Serialize(DumpStream& ar)
 			{
 				ar << s.ntimeSteps << s.ntotalIters << s.ntotalReforms << s.ntotalRHS;
 			}
+
+			n = (int)m_timestepStats.size();
+			ar << n;
+			for (TimeStepStats& s : m_timestepStats)
+			{
+				ar << s.iters << s.nrhs << s.refs << s.status;
+			}
 		}
 		else
 		{
@@ -1355,6 +1376,16 @@ void FEBioModel::Serialize(DumpStream& ar)
 				ModelStats s;
 				ar >> s.ntimeSteps >> s.ntotalIters >> s.ntotalReforms >> s.ntotalRHS;
 				m_stepStats.push_back(s);
+			}
+
+			m_timestepStats.clear();
+			n = 0;
+			ar >> n;
+			for (int i = 0; i < n; ++i)
+			{
+				TimeStepStats s;
+				ar >> s.iters >> s.nrhs >> s.refs >> s.status;
+				m_timestepStats.push_back(s);
 			}
 		}
 	}
@@ -1576,6 +1607,7 @@ bool FEBioModel::Init()
 
 	m_report.clear();
 	m_stepStats.clear();
+	m_timestepStats.clear();
 
 	FEBioPlotFile* pplt = nullptr;
 	m_lastUpdate = -1;
@@ -1726,6 +1758,7 @@ bool FEBioModel::Reset()
 	m_modelStats.ntotalRHS = 0;
 	m_modelStats.ntotalReforms = 0;
 	m_stepStats.clear();
+	m_timestepStats.clear();
 
 	// do the callback
 	DoCallback(CB_INIT);
@@ -1757,7 +1790,7 @@ TimingInfo FEBioModel::GetTimingInfo()
 	ti.total_callback     = GetTimer(TimerID::Timer_Callback        )->GetExclusiveTime(); total += ti.total_callback;
 
 	ti.total_other  = ti.total_time - total;
-	assert(ti.total_other >= 0);
+//	assert(ti.total_other >= 0);
 
 	return ti;
 }

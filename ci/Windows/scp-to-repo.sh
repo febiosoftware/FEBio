@@ -7,14 +7,14 @@ fi
 
 scp cmbuild/bin/Release/* repo:~/$REMOTE_PATH/bin
 
+# package and upload sdk
+pushd sdk
+zip -r sdk.zip include
+zip -r sdk.zip lib
+zip -r sdk.zip bin
+scp sdk.zip repo:~/$REMOTE_PATH/
+popd
+
 if [ -f testLogs/Logs/* ]; then
     scp testLogs/Logs/* repo:~/TestSuite/Logs/windows.txt
-fi
-
-if [ -f ChemArtifacts/Release/* ]; then
-    scp ChemArtifacts/Release/* repo:~/$REMOTE_PATH/bin
-fi
-
-if [ -f HeatArtifacts/Release/* ]; then
-    scp HeatArtifacts/Release/* repo:~/$REMOTE_PATH/bin
 fi

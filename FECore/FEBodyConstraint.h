@@ -25,6 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "FENLConstraint.h"
+#include "FEDomain.h"
+#include "FEDomainList.h"
 
 // Base class for nonlinear constraints that are defined using a surface.
 class FECORE_API FEBodyConstraint : public FENLConstraint
@@ -33,4 +35,24 @@ class FECORE_API FEBodyConstraint : public FENLConstraint
 
 public:
 	FEBodyConstraint(FEModel* fem);
+
+	bool Init() override;
+
+	void Serialize(DumpStream& ar) override;
+
+public:
+	//! return number of domains this load is applied to
+	int Domains() const;
+
+	//! return a domain 
+	FEDomain* Domain(int i);
+
+	//! add a domain to which to apply this load
+	void SetDomainList(FEElementSet* elset);
+
+	//! get the domain list
+	FEDomainList& GetDomainList();
+
+private:
+	FEDomainList	m_dom;	//!< list of domains to which to apply the body load
 };

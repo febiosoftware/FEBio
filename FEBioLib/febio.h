@@ -54,7 +54,7 @@ namespace febio
 	FEBIOLIB_API bool ImportPlugin(const char* szfile);
 
 	// load all the plugins in a folder
-	FEBIOLIB_API void ImportPluginFolder(const char* szfolder);
+	FEBIOLIB_API bool ImportPluginFolder(const char* szfolder);
 
     // load the plugins as defined in the repo's XML file
 	FEBIOLIB_API void ImportRepoPlugins(const char* szxmlFile);

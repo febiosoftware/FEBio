@@ -103,8 +103,9 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	// calculate C:d2WdCdC:C
 	double CWWC = W11*I1*I1;
 
-	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.m_s.dev();
+	// deviatoric cauchy-stress
+	mat3ds T = B * W1;
+	mat3ds devs = T.dev() * (2.0 / J);
 
 	// Identity tensor
 	mat3ds I(1,1,1,0,0,0);

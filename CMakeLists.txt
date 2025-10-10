@@ -10,7 +10,6 @@ set(STATIC_FEBIO_LIBS FEBioPlot FEBioTest FEBioXML XML)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_FILES_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER Autogen)
@@ -42,6 +41,17 @@ endif()
 ##### Search for library and include directories #####
 
 include(FindDependencies.cmake)
+
+##### Check compiler for std::filesystem support #####
+include(CheckCXXSourceCompiles)
+
+check_cxx_source_compiles("
+  #include <filesystem>
+  int main() {
+    std::filesystem::path p{\"test\"};
+    return 0;
+  }
+" HAS_STD_FILESYSTEM)
 
 #### Check if paths are valid and find libs ####
 
@@ -81,6 +91,16 @@ if(USE_MKL)
     if(NOT EXISTS ${MKL_OMP_LIB})
         message(SEND_ERROR "Could not find MKL OMP library. Check MKL_OMP_LIB.")
     endif()
+endif()
+
+if(USE_FFTW)
+	if(NOT EXISTS ${FFTW_LIB})
+		message(SEND_ERROR "Could not find FFTW library libfftw3-3. Check FFTW_LIB.")
+        message(SEND_ERROR "The library is " ${FFTW_LIB})
+	endif()
+	if(NOT EXISTS ${FFTW_INC}/fftw3.h)
+		message(SEND_ERROR "Could not find fftw3.h. Check FFTW_INC.")
+	endif()
 endif()
 
 if(USE_HYPRE)
@@ -236,7 +256,8 @@ macro(crossExecProcess OUT)
 endmacro()
 
 # Check for git and give warning if not available
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+option(SET_DEVCOMMIT "Set the DEVCOMMIT macro with git commit hash" ON)
+if(${SET_DEVCOMMIT} AND EXISTS ${CMAKE_SOURCE_DIR}/.git)
     if(WIN32)
         set(CMD where git)
     else()
@@ -259,11 +280,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
             crossExecProcess(DEVCOMMIT)
             
             if(${SUCCESS} EQUAL 0)
-                set_source_files_properties(
-                    FEBioLib/version.cpp
-                    PROPERTIES
-                    COMPILE_DEFINITIONS "DEVCOMMIT=\"${DEVCOMMIT}\""
-                )
+                target_compile_definitions(febiolib PUBLIC "DEVCOMMIT=\"${DEVCOMMIT}\"")
             endif()
         endif()
     else()
@@ -279,11 +296,22 @@ mark_as_advanced(EXTRA_INC)
 ##### Setup includes, defnitions, and linking options #####
 include_directories(${PROJECT_SOURCE_DIR})
 
+if(HAS_STD_FILESYSTEM)
+    target_compile_definitions(febiolib PRIVATE HAS_STD_FILESYSTEM)
+endif()
+
 # Link LEVMAR
 if(USE_LEVMAR)
 	target_include_directories(febioopt PRIVATE ${LEVMAR_INC})
     target_compile_definitions(febioopt PRIVATE HAVE_LEVMAR)
     target_link_libraries(febioopt PRIVATE ${LEVMAR_LIB})
+endif()
+
+# Link FFTW
+if(USE_FFTW)
+    target_include_directories(feimglib PRIVATE ${FFTW_INC})
+    target_compile_definitions(feimglib PRIVATE HAVE_FFTW)
+    target_link_libraries(feimglib PRIVATE ${FFTW_LIB})
 endif()
 
 # Link HYPRE
@@ -311,30 +339,23 @@ if(USE_MKL)
     target_include_directories(febioopt PRIVATE ${MKL_INC})
 	target_compile_definitions(febioopt PRIVATE MKL_ISS PARDISO)
 
-	target_include_directories(feimglib PRIVATE ${MKL_INC})
-    target_compile_definitions(feimglib PRIVATE HAVE_MKL)
-
     if(WIN32 OR APPLE)
         target_link_libraries(numcore PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
         target_link_libraries(febioopt PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
-        target_link_libraries(feimglib PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
     else()
         target_link_libraries(numcore PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
         target_link_libraries(febioopt PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
-        target_link_libraries(feimglib PRIVATE -Wl,--start-group ${MKL_OMP_LIB} ${MKL_LIBS} -Wl,--end-group)
     endif()
     
     if(FORCE_SYSTEM_OMP)
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
-        target_link_libraries(feimglib PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
 else()
     # If not using MKL, we still need OpenMP from the system.
     if(${OpenMP_C_FOUND})
         target_link_libraries(numcore PRIVATE ${OpenMP_C_LIBRARIES})
         target_link_libraries(febioopt PRIVATE ${OpenMP_C_LIBRARIES})
-        target_link_libraries(feimglib PRIVATE ${OpenMP_C_LIBRARIES})
     endif()
 endif()
 

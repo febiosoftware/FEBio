@@ -768,6 +768,16 @@ FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, int index)
 		if ((index >= 0) && (index < d.size())) return FEParamValue(d[index]);
 	}
 	break;
+	case FE_PARAM_DOUBLE_MAPPED:
+	{
+		FEParam* p = paramVal.param(); assert(p);
+		if (p->dim() > 0)
+		{
+			FEParamDouble* d = p->pvalue<FEParamDouble>(index);
+			return FEParamValue(p, d, p->type());
+		}
+	}
+	break;
 	}
 	assert(false);
 	return FEParamValue();

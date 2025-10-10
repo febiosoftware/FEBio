@@ -39,6 +39,68 @@ the FEBio User's Manual for a more detailed description of the new features.
 To report any bugs or request new features, please visit the FEBio forum 
 at https://forums.febio.org/.
 
+
+===========================================================================
+
+ R E L E A S E   4.10   7/23/2025
+
+===========================================================================
+
+New Features:
+* Added plot variables that calculate total linear momentum, angular momentum, and energy for a solid domain.
+* Added plot variable for nodal shell director
+* Added range check for E parameter of FE2DFiberNeoHookean.
+* Added calculation of Almansi strain for elastic material points. Added plot variables for Almansi strain, left Cauchy-Green and right Cauchy-Green tensors
+* Added isotropic Hencky elastic model
+* Added tension_only flag to fiber-pow-linear
+* Added command line option to suppress log file output.
+* Added calculation of helical axis (instantaneous and finite) for rigid bodies and rigid connectors, and created log variables for output to file.
+* Added command line option to prevent shell title updates.
+* Added axial body force.
+* Implemented radial body load.
+* Added option to contact potential to use a higher-order quadrature rule. This will use a new QUAD4G16 for quadrilateral elements. 
+* Added "rigid kinematics" initial condition that sets initial velocity based on rigid body kinematics.
+* Added quick restart diagnostic.
+* Implementation of the slide-line and tied-line constraint.
+* Added PK1 stress components to logfile output, as Pxx, Pxy, etc.
+* Added log file nodal data variables for effective fluid pressure pe and effective solute concentrations ce1 to ce8
+* Added mapping to FEDiffAlbroIso, DiffConstOrtho and DiffRefIso diffusivity types
+* Added mapping capability for FEDiffConstIso diffusivity type
+* Added "sbm_referential_apparent_density" log variable.
+
+
+Improvements:
+* Fixed some formatting issues in the FEBio EULA.
+* Added documentation for initial displacement condition
+* Added option to specify initial displacements
+* Added description of pressure_model in Uncoupled elastic solids. Improved description of enforcement of three-field-solid formulation.
+* Updated User Manual to include reactive fatigue materials
+* Added Doxygen comments to some core classes
+* Modules registered by plugins are now unregistered when the plugins are unloaded.
+* Improved performance of SPR projection by storing reusable data.
+* For mixtures, the density is now defined by the top-level parameter.
+* Changed type of perm parameters from double to FEParamDouble.
+* Added option to tag a parameter as obsolete. Now using this for unused biphasic and multiphasic solver parameters.
+* Made sure time increment is initialized before model initialization to avoid division by zero.
+* Modified kinematic growth formulation so that it does not need to permanently overwrite elastic material point data.
+* Fixed some logo issues in the documentation
+
+
+Buf fixes:
+* Fixed issue with validation when not all properties are initialized yet. 
+* Fixed issue with reading load curves from restart input.
+* Fixed bug in building matrix profile for tied-elastic interface.
+* Fixed problem with initialization of biphasic materials.
+* Unloading plugins on Linux and macOS now actually unloads the library (rather than doing nothing).
+* Fixed bug in evaluation of stiffness matrix for slide-line.
+* Changes to stiffness matrix diagnostic to better handle prescribed dofs.
+* Fixed issue with reassigning material IDs after mmg remeshing.
+* Fixed issue with serialization of array of FEParamDouble. Removed unnecessary Serialize of EFDMoonyRivlin.
+* Fixed potential crash in FBS when an analysis is allocated without an active module.
+* Reaction forces are not accumulated anymore in residual vector for rigid nodes. (Otherwise they are double-counted.)
+
+
+
 ===========================================================================
 
  R E L E A S E   4.9   3/24/2025

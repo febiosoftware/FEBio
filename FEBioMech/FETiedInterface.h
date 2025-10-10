@@ -80,8 +80,13 @@ public:
 	//! update
 	void Update() override;
 
+	//! prepare for next time step
+	void PrepStep() override;
+
 	//! Update Lagrange multipliers
-	void Update(vector<double>& ui) override;
+	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+
+	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
 public:
 	FETiedContactSurface	ss;	//!< primary surface

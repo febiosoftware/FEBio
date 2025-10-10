@@ -47,6 +47,9 @@ bool FEBIOXML_API readParameter(XMLTag& tag, FECoreBase* pc);
 // reads the parameters and properties of a FECore class
 bool FEBIOXML_API readParameterList(XMLTag& tag, FECoreBase* pc);
 
+// read parameters listed as attributes in the tag
+bool FEBIOXML_API readAttributeParams(XMLTag& tag, FECoreBase* pc);
+
 //---------------------------------------------------------------------------------------
 // read a list of integers
 void FEBIOXML_API readList(XMLTag& tag, vector<int>& l);

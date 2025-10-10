@@ -61,8 +61,11 @@ public:
 	//! Initialization
 	virtual bool Init();
 
-	//! validates all properties and parameters
+	//! validates all properties and parameters recursively
 	bool Validate() override;
+
+	//! validate parameters only
+	bool ValidateParameters();
 
 	//! call this after the parameters are changed
 	virtual bool UpdateParams();

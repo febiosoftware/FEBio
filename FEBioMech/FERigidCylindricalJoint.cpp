@@ -30,7 +30,6 @@ SOFTWARE.*/
 #include "FERigidCylindricalJoint.h"
 #include "FERigidBody.h"
 #include "FECore/log.h"
-#include "FECore/FEMaterial.h"
 #include <FECore/FELinearSystem.h>
 
 //-----------------------------------------------------------------------------
@@ -76,7 +75,8 @@ FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnect
 	m_eps = m_ups = 1.0;
 
 	m_F = vec3d(0, 0, 0);
-	m_u = 0;
+	m_Lp = vec3d(0, 0, 0);
+	m_u = m_up = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,15 +174,31 @@ void FERigidCylindricalJoint::BuildMatrixProfile(FEGlobalMatrix& M)
 	M.build_add(lm);
 }
 
-//-----------------------------------------------------------------------------
-void FERigidCylindricalJoint::Update(const std::vector<double>& ui)
+void FERigidCylindricalJoint::PrepStep()
+{
+	m_Lp = m_F;
+	m_up = m_u;
+}
+
+void FERigidCylindricalJoint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
-		m_F.x += ui[m_EQ[0]];
-		m_F.y += ui[m_EQ[1]];
-		m_F.z += ui[m_EQ[2]];
-		m_u   += ui[m_EQ[3]];
+		m_F.x = m_Lp.x + Ui[m_EQ[0]] + ui[m_EQ[0]];
+		m_F.y = m_Lp.y + Ui[m_EQ[1]] + ui[m_EQ[1]];
+		m_F.z = m_Lp.z + Ui[m_EQ[2]] + ui[m_EQ[2]];
+		m_u   = m_up   + Ui[m_EQ[3]] + ui[m_EQ[3]];
+	}
+}
+
+void FERigidCylindricalJoint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		Ui[m_EQ[0]] += ui[m_EQ[0]];
+		Ui[m_EQ[1]] += ui[m_EQ[1]];
+		Ui[m_EQ[2]] += ui[m_EQ[2]];
+		Ui[m_EQ[3]] += ui[m_EQ[3]];
 	}
 }
 
@@ -226,6 +242,7 @@ void FERigidCylindricalJoint::Serialize(DumpStream& ar)
     ar & m_ea0;
     ar & m_eb0;
 	ar & m_F & m_u;
+	ar & m_Lp & m_up;
 }
 
 //-----------------------------------------------------------------------------
@@ -505,6 +522,8 @@ void FERigidCylindricalJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 			Wab = R*(I*Qb.trace() - Qb) / 2;
 		}
 
+		mat3da Fhat(m_F);
+
 		// (1,1)
 		K = P*(alpha*m_eps);
 		ke[0][0] = K[0][0]; ke[0][1] = K[0][1]; ke[0][2] = K[0][2];
@@ -537,7 +556,7 @@ void FERigidCylindricalJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 		ke[5][0] = K[2][0]; ke[5][1] = K[2][1]; ke[5][2] = K[2][2];
 
 		// (2,2)
-		K = (zahat*(P*zathat + Q)*m_eps + Wba*m_ups)*(-alpha)
+		K = (zahat*(P*zathat + Q)*m_eps + Fhat * zathat + Wba*m_ups)*(-alpha)
 			+ eathat[0] * (m_Mp*alpha);
 		ke[3][3] = K[0][0]; ke[3][4] = K[0][1]; ke[3][5] = K[0][2];
 		ke[4][3] = K[1][0]; ke[4][4] = K[1][1]; ke[4][5] = K[1][2];
@@ -602,7 +621,7 @@ void FERigidCylindricalJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 		ke[11][6] = K[2][0]; ke[11][7] = K[2][1]; ke[11][8] = K[2][2];
 
 		// (4,4)
-		K = (zbhat*P*zbthat*m_eps + Wab*m_ups)*(-alpha);
+		K = (zbhat*P*zbthat*m_eps - Fhat * zbthat + Wab*m_ups)*(-alpha);
 		ke[9][9] = K[0][0]; ke[9][10] = K[0][1]; ke[9][11] = K[0][2];
 		ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
 		ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];

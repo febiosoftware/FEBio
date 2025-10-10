@@ -430,6 +430,12 @@ public: // Data retrieval
 	const FEPlotDataStore& GetPlotDataStore() const;
 
 public:
+	// decide whether to collect timings
+	void CollectTimings(bool b);
+
+	// return if this model has timing collection on
+	bool CollectTimings() const;
+
 	// reset all the timers
 	void ResetAllTimers();
 

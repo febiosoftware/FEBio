@@ -69,7 +69,7 @@ bool FEAzimuthConstraint::Init()
 void FEAzimuthConstraint::Serialize(DumpStream& ar)
 {
 	FENLConstraint::Serialize(ar);
-	ar & m_Lm;
+	ar & m_Lm & m_Lp;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,6 +106,7 @@ int FEAzimuthConstraint::InitEquations(int neq)
 {
 	int N = m_nodeSet.Size();
 	m_Lm.assign(N, vec3d(0, 0, 0));
+	m_Lp = m_Lm;
 
 	// make sure we want to use Lagrange Multiplier method
 	if (m_laugon != FECore::LAGMULT_METHOD) return 0;
@@ -246,18 +247,37 @@ void FEAzimuthConstraint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& 
 	}
 }
 
-void FEAzimuthConstraint::Update(const std::vector<double>& ui)
+void FEAzimuthConstraint::PrepStep()
+{
+	m_Lp = m_Lm;
+}
+
+void FEAzimuthConstraint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
 {
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		int N = m_nodeSet.Size();
 		for (int i = 0; i < N; ++i)
 		{
-			m_Lm[i].x += ui[m_eq[2*i  ]];
-			m_Lm[i].y += ui[m_eq[2*i+1]];
+			m_Lm[i].x = m_Lp[i].x + Ui[m_eq[2*i  ]] + ui[m_eq[2*i  ]];
+			m_Lm[i].y = m_Lp[i].y + Ui[m_eq[2*i+1]] + ui[m_eq[2*i+1]];
 		}
 	}
 }
+
+void FEAzimuthConstraint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		int N = m_nodeSet.Size();
+		for (int i = 0; i < N; ++i)
+		{
+			Ui[m_eq[2*i  ]] += ui[m_eq[2*i  ]];
+			Ui[m_eq[2*i+1]] += ui[m_eq[2*i+1]];
+		}
+	}
+}
+
 
 //! augmentations
 bool FEAzimuthConstraint::Augment(int naug, const FETimeInfo& tp)

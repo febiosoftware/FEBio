@@ -405,6 +405,12 @@ void FEMultiphasicSolver::PrepStep()
 		if (plc && plc->IsActive()) plc->PrepStep();
 	}
 
+	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint* psc = fem.SurfacePairConstraint(i);
+		if (psc && psc->IsActive()) psc->PrepStep();
+	}
+
 	// see if we need to do contact augmentations
 	m_baugment = false;
 	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
@@ -1021,7 +1027,7 @@ void FEMultiphasicSolver::UpdateKinematics(vector<double>& ui)
 	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
 	{
 		FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
-		if (spc->IsActive()) spc->Update(ui);
+		if (spc->IsActive()) spc->Update(m_Ui, ui);
 	}
 
 	// update poroelastic data

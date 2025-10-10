@@ -42,6 +42,9 @@ public:
 
 	// get iterator	
 	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
+
+	// get number of integration points
+	int IntegrationPoints() const override { return -1; };
     
 private:
     int             m_nth;  // number of trapezoidal integration points along theta
