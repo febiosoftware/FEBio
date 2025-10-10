@@ -361,8 +361,26 @@ void XMLWriter::add_leaf(XMLElement& el, bool bclear)
 void XMLWriter::write_leaf(const char* sztag, const char* szval)
 {
     *m_stream << m_sztab << "<" << sztag;
+	*m_stream << ">";
 
-    *m_stream << ">" << szval << "</" << sztag << ">\n";
+	if (m_encodeControlChars)
+	{
+		const char* ch = szval;
+		while (ch && *ch)
+		{
+			if      (*ch == '\t') *m_stream << "&#x9;";
+			else if (*ch == '\n') *m_stream << "&#xA;";
+			else if (*ch == '\r') *m_stream << "&#xD;";
+			else *m_stream << *ch;
+			++ch;
+		}
+	}
+	else
+	{
+		*m_stream << szval;
+	}
+
+	*m_stream << "</" << sztag << ">\n";
 }
 
 void XMLWriter::add_leaf(const char* szn, const char* szv)

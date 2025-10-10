@@ -155,6 +155,9 @@ public:
 	static void SetFloatFormat(XMLFloatFormat fmt);
 	static XMLFloatFormat GetFloatFormat();
 
+	void SetEncodeControlChars(bool b) { m_encodeControlChars = b; }
+	bool EncodeControlChars() const { return m_encodeControlChars; }
+
 protected:
 	void inc_level();
 	void dec_level();
@@ -167,6 +170,8 @@ protected:
 
 	char	m_tag[MAX_TAGS][256];
 	char	m_sztab[256];
+
+	bool	m_encodeControlChars = false;
 
 	static XMLFloatFormat	m_floatFormat;
 };
