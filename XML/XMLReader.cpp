@@ -988,13 +988,7 @@ void XMLReader::ReadValue(XMLTag& tag)
 		tag.m_szval.reserve(256);
 		while ((ch=GetChar())!='<') 
 		{
-			if (ch != '\r')
-			{
-				if ((ch != '\n') && (ch != '\t'))
-					tag.m_szval.push_back(ch);
-				else
-					tag.m_szval.push_back(' ');
-			}
+			tag.m_szval.push_back(ch);
 		}
 	}
 	else while ((ch=GetChar())!='<');
@@ -1128,6 +1122,8 @@ void clean_string(string& s)
 char XMLReader::GetChar()
 {
 	char ch = readNextChar();
+	while (ch == '\r') ch = readNextChar();
+	if ((ch == '\t') || (ch == '\n')) ch = ' ';
 
 	// check for comments
 	if (ch == '<')
@@ -1184,6 +1180,9 @@ char XMLReader::GetChar()
 		else if (strcmp(szbuf, "&amp;" )==0) ch = '&';
 		else if (strcmp(szbuf, "&apos;")==0) ch = '\'';
 		else if (strcmp(szbuf, "&quot;")==0) ch = '"';
+		else if ((strcmp(szbuf, "&#9;" ) == 0) || (strcmp(szbuf, "&#x9;") == 0)) ch = '\t';
+		else if ((strcmp(szbuf, "&#10;") == 0) || (strcmp(szbuf, "&#xA;") == 0)) ch = '\n';
+		else if ((strcmp(szbuf, "&#13;") == 0) || (strcmp(szbuf, "&#xD;") == 0)) ch = '\r';
 		else throw XMLSyntaxError(m_nline);
 	}
 	return ch;
