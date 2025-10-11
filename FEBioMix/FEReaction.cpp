@@ -50,7 +50,8 @@ bool FEReaction::Init()
         return false;
     }
     
-    return FEMaterialProperty::Init();
+	// TODO: Why does calling the base class cause a crash in cr02???
+	return true;// FEMaterialProperty::Init();
 }
 
 void FEReaction::Serialize(DumpStream& dmp)
