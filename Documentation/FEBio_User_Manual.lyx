@@ -30497,6 +30497,306 @@ force
 \end_layout
 
 \begin_layout Subsubsection
+Pipette Aspiration
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Pipette-Aspiration"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Pipette aspiration is a common tool in biomechanics:
+ A pipette is pressed against a tissue surface (contact problem) and a known negative pressure is typically applied through the pipette to aspirate the tissue.
+ Then,
+ some relevant material property may be extracted from the observed aspirated height of the tissue under the prescribed pressure.
+ This pressure load is similar to the pressure load described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Pressure-Load"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ however 
+\emph on
+it must be used on a surface which is also the primary surface
+\emph default
+ in a 
+\emph on
+sliding-elastic
+\emph default
+ contact interface (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Sliding-Interfaces"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ The contact interface must be between a 
+\emph on
+circular
+\emph default
+ pipette with inner radius 
+\emph on
+
+\begin_inset Formula $R$
+\end_inset
+
+
+\emph default
+ and the tissue.
+ (In other words,
+ the pipette has to be modeled explicitly in this contact analysis).
+ The purpose of this 
+\emph on
+pipette aspiration
+\emph default
+ load is to prescribe the pressure only on the faces of the selected contact surface which happen to be inside the pipette footprint.
+ Therefore,
+ the pressure is not applied on the portion of the contact surface which has a non-zero contact pressure,
+ or on the faces that fall outside of the pipette footprint.
+ The parameters that need to be defined for this pressure load are:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+default
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+pressure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The applied pressure values (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 [
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+radius
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The inner radius 
+\begin_inset Formula $R$
+\end_inset
+
+ of the pipette
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 [
+\series bold
+L
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+center
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A vector representing the position of the center of the circular pipette footprint
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0,0,0 [
+\series bold
+L
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+normal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A vector represent the normal direction representing the pipette axis
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0,0,1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This pressure load only works with circular pipettes.
+ However,
+ the pipette wall thickness is only modeled via the explicit representation of the pipette,
+ and the pipette tip need not be flat (e.g.,
+ it could be semi-circular or beveled,
+ etc.).
+ The radius 
+\begin_inset Formula $R$
+\end_inset
+
+ represents the circular edge of the contact region in the absence of deformation (in the reference condition).
+ The model may employ planes of symmetry,
+ since those do not affect the specification of 
+\emph on
+radius
+\emph default
+,
+ 
+\emph on
+center
+\emph default
+,
+ or 
+\emph on
+normal
+\emph default
+.
+\end_layout
+
+\begin_layout Subsubsection
 Mixture Normal Traction
 \begin_inset CommandInset label
 LatexCommand label
