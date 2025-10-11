@@ -48,6 +48,9 @@ public:
     
     //! initialization
     bool Init() override;
+
+	//! serialization
+	void Serialize(DumpStream& dmp);
     
 public:
     //! set stoichiometric coefficient

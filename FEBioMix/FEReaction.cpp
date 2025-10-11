@@ -50,9 +50,21 @@ bool FEReaction::Init()
         return false;
     }
     
-    return true;
+    return FEMaterialProperty::Init();
 }
 
+void FEReaction::Serialize(DumpStream& dmp)
+{
+	FEMaterialProperty::Serialize(dmp);
+	if (!dmp.IsShallow())
+	{
+		if (dmp.IsLoading())
+		{
+			m_psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+			assert(m_psm);
+		}
+	}
+}
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEReactionSpeciesRef, FEMaterialProperty)
