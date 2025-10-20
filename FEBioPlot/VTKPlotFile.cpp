@@ -219,7 +219,7 @@ void VTKPlotFile::WriteVectorData(std::vector<float>& val, const std::string& na
 void VTKPlotFile::WriteMat3FData(std::vector<float>& val, const std::string& name)
 {
 	fprintf(m_fp, "%s %s %s\n", "TENSORS", name.c_str(), "float");
-	for (int i = 0; i < val.size(); i += 6)
+	for (int i = 0; i < val.size(); i += 9)
 		fprintf(m_fp, "%g %g %g\n%g %g %g\n%g %g %g\n\n",
 			val[i    ], val[i + 1], val[i + 2],
 			val[i + 3], val[i + 4], val[i + 5],
