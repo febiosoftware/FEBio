@@ -1638,7 +1638,7 @@ bool FESlidingElasticInterface::Augment(int naug, const FETimeInfo& tp)
     if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
 	// don't augment if tolerance is zero (or negative)
-	if (m_atol <= 0.0)
+	if ((m_atol <= 0.0) && (m_gtol <= 0.0))
 	{
 		feLogInfo("Augmentation skipped since tolerance is zero.");
 		return true;
