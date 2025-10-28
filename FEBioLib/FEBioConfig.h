@@ -35,7 +35,10 @@ public:
 
 	void SetOutputLevel(int n);
 
-public:
+public: // input parameters
+	bool readPlugins;
+
+public: // output parameters (set by reading the config file)
 	int		m_printParams;
 	int		m_noutput;
 	bool	m_bshowErrors;

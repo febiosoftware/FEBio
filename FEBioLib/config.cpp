@@ -52,7 +52,7 @@ SOFTWARE.*/
 namespace febio {
 
 	//-----------------------------------------------------------------------------
-	bool parse_tags(XMLTag& tag);
+	bool parse_tags(XMLTag& tag, bool readPlugins);
 	bool parse_default_linear_solver(XMLTag& tag);
 	bool parse_import(XMLTag& tag);
 	bool parse_import_folder(XMLTag& tag);
@@ -70,7 +70,6 @@ namespace febio {
 	{
 		vars.clear();
 
-		config.Defaults();
 		boutput = (config.m_noutput != 0);
 
 		// open the configuration file
@@ -81,9 +80,14 @@ namespace febio {
 			return false;
 		}
 
-		// unload all plugins	
-		FEBioPluginManager& pm = *FEBioPluginManager::GetInstance();
-		pm.UnloadAllPlugins();
+		bool readPlugins = config.readPlugins;
+
+		if (readPlugins)
+		{
+			// unload all plugins before reading new ones
+			FEBioPluginManager& pm = *FEBioPluginManager::GetInstance();
+			pm.UnloadAllPlugins();
+		}
 
 		// loop over all child tags
 		try
@@ -105,7 +109,7 @@ namespace febio {
 						{
 #ifndef NDEBUG
 							++tag;
-							if (parse_tags(tag) == false) return false;
+							if (parse_tags(tag, readPlugins) == false) return false;
 							++tag;
 #else
 							tag.skip();
@@ -115,7 +119,7 @@ namespace febio {
 						{
 #ifdef NDEBUG
 							++tag;
-							if (parse_tags(tag) == false) return false;
+							if (parse_tags(tag, readPlugins) == false) return false;
 							++tag;
 #else
 							tag.skip();
@@ -131,7 +135,7 @@ namespace febio {
 						}
 						else
 						{
-							if (parse_tags(tag) == false) return false;
+							if (parse_tags(tag, readPlugins) == false) return false;
 						}
 
 						++tag;
@@ -162,7 +166,7 @@ namespace febio {
 	}
 
 	//-----------------------------------------------------------------------------
-	bool parse_tags(XMLTag& tag)
+	bool parse_tags(XMLTag& tag, bool readPlugins)
 	{
 		if (tag == "set")
 		{
@@ -174,15 +178,29 @@ namespace febio {
 		}
 		else if (tag == "import")
 		{
-			if (parse_import(tag) == false) return false;
+			if (readPlugins)
+			{
+				if (parse_import(tag) == false) return false;
+			}
+			else
+				tag.skip();
 		}
 		else if (tag == "import_folder")
 		{
-			if (parse_import_folder(tag) == false) return false;
+			if (readPlugins)
+			{
+				if (parse_import_folder(tag) == false) return false;
+			}
+			else tag.skip();
 		}
         else if (tag == "repo_plugin_xml")
         {
-            if (parse_repo_plugins(tag) == false) return false;
+			if (readPlugins)
+			{
+				if (parse_repo_plugins(tag) == false) return false;
+			}
+			else
+				tag.skip();
         }
 		else if (tag == "output_negative_jacobians")
 		{
