@@ -3,7 +3,7 @@ if(DEFINED ENV{MKLROOT})
     set(MKLROOT $ENV{MKLROOT} CACHE PATH "MKL root directory")
 else()
     if(WIN32)
-        set(MKLPATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*)
+        set(MKLPATHS $ENV{ProgramFiles\(x86\)}\\IntelSWTools $ENV{PROGRAMFILES}\\Intel* $ENV{ProgramFiles\(x86\)}\\Intel $ENV{SystemDrive} $ENV{SystemDrive}\\Intel*)
         set(MKLSUFFIXES "compilers_and_libraries/windows" "oneapi")
     elseif(APPLE)
         set(MKLPATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel)
@@ -20,27 +20,32 @@ else()
 endif()
 
 if(MKLROOT)
-    if(${MKLROOT} MATCHES "oneapi")
-        find_path(MKL_INC mkl.h 
+    if(${MKLROOT} MATCHES "oneapi" OR ${MKLROOT} MATCHES "oneAPI")
+        find_path(MKL_INC mkl.h
             PATHS
               ${MKLROOT}/latest/include
               ${MKLROOT}/include
+              ${MKLROOT}/mkl/latest/include
             DOC "MKL include directory")
-            
-        find_library(MKL_CORE mkl_core
+        
+        find_library(MKL_CORE
+            NAMES mkl_core mkl_core.lib
             PATHS
               ${MKLROOT}/latest/lib
               ${MKLROOT}/lib
+              ${MKLROOT}/mkl/latest/lib
             PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH)
             
         find_library(MKL_OMP_LIB 
+        find_library(MKL_OMP_LIB
             NAMES iomp5 iomp5md libiomp5md.lib
             PATHS
               ${MKLROOT}/../compiler/latest/*/compiler/lib/
               ${MKLROOT}/../compiler/latest/lib/
               ${MKLROOT}/../../compiler/latest/*/compiler/lib/
               ${MKLROOT}/../../compiler/latest/lib/
+              ${MKLROOT}/compiler/latest/lib/
             PATH_SUFFIXES "intel64" "mac"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
