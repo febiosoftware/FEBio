@@ -37,7 +37,6 @@ if(MKLROOT)
             PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH)
             
-        find_library(MKL_OMP_LIB 
         find_library(MKL_OMP_LIB
             NAMES iomp5 iomp5md libiomp5md.lib
             PATHS
