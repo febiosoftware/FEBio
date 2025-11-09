@@ -372,6 +372,38 @@ inline tens4dmm tens4dmm::operator - () const
 }
 
 //-----------------------------------------------------------------------------
+// operator * mat3ds
+inline tens4dmm tens4dmm::operator * (const mat3ds& m) const
+{
+    tens4dmm t = *this;
+    tens4dmm s;
+    for (int i=0; i<3; ++i)
+        for (int j=0; j<3; ++j)
+            for (int k=0; k<3; ++k)
+                for (int n=0; n<3; ++n) {
+                    s(i,j,k,n) = t(i,j,k,0)*m(0,n) + t(i,j,k,1)*m(1,n) + t(i,j,k,2)*m(2,n);
+            }
+    
+    return s;
+}
+
+//-----------------------------------------------------------------------------
+// operator * mat3d
+inline tens4dmm tens4dmm::operator * (const mat3d& m) const
+{
+    tens4dmm t = *this;
+    tens4dmm s;
+    for (int i=0; i<3; ++i)
+        for (int j=0; j<3; ++j)
+            for (int k=0; k<3; ++k)
+                for (int n=0; n<3; ++n) {
+                    s(i,j,k,n) = t(i,j,k,0)*m(0,n) + t(i,j,k,1)*m(1,n) + t(i,j,k,2)*m(2,n);
+                }
+    
+    return s;
+}
+
+//-----------------------------------------------------------------------------
 // vdotTdotv_jk = a_i T_ijkl b_l
 inline mat3d vdotTdotv(const vec3d& a, const tens4dmm& T, const vec3d& b)
 {
@@ -408,6 +440,56 @@ inline mat3ds tens4dmm::dot(const mat3ds &m) const
     a.xy() = d[3]*m.xx() + d[21]*m.xy() + d[33]*m.xz() + d[9]*m.yy() + d[27]*m.yz() + d[15]*m.zz();
     a.yz() = d[4]*m.xx() + d[22]*m.xy() + d[34]*m.xz() + d[10]*m.yy() + d[28]*m.yz() + d[16]*m.zz();
     a.xz() = d[5]*m.xx() + d[23]*m.xy() + d[35]*m.xz() + d[11]*m.yy() + d[29]*m.yz() + d[17]*m.zz();
+    
+    return a;
+}
+
+//-----------------------------------------------------------------------------
+// double contraction of mm 4th-order tensor with a symmetric 4th-order tensor
+// Aijmn = Bijkl Tklmn
+inline tens4dmm tens4dmm::ddot(const tens4ds& t) const
+{
+    tens4dmm b = *this;
+    tens4dmm a;
+    for (int i=0; i<3; ++i) {
+        for (int j=0; j<3; ++j) {
+            for (int m=0; m<3; ++m) {
+                for (int n=0; n<3; ++n) {
+                    a(i,j,m,n) = 0;
+                    for (int k=0; k<3; ++k) {
+                        for (int l=0; l<3; ++l) {
+                            a(i,j,m,n) += b(i,j,k,l)*t(k,l,m,n);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return a;
+}
+
+//-----------------------------------------------------------------------------
+// double contraction of mm 4th-order tensor with a mm 4th-order tensor
+// Aijmn = Bijkl Tklmn
+inline tens4dmm tens4dmm::ddot(const tens4dmm& t) const
+{
+    tens4dmm b = *this;
+    tens4dmm a;
+    for (int i=0; i<3; ++i) {
+        for (int j=0; j<3; ++j) {
+            for (int m=0; m<3; ++m) {
+                for (int n=0; n<3; ++n) {
+                    a(i,j,m,n) = 0;
+                    for (int k=0; k<3; ++k) {
+                        for (int l=0; l<3; ++l) {
+                            a(i,j,m,n) += b(i,j,k,l)*t(k,l,m,n);
+                        }
+                    }
+                }
+            }
+        }
+    }
     
     return a;
 }
@@ -568,6 +650,56 @@ inline tens4dmm dyad3mm(const mat3ds& a, const mat3ds& b)
 inline tens4dmm dyad4mm(const mat3ds& a, const mat3ds& b)
 {
     return (dyad2mm(a,b) + dyad3mm(a,b))/2;
+}
+
+//-----------------------------------------------------------------------------
+// (a dyad4 b)_ijkl = 0.5(a_ik b_jl + a_il b_jk)
+inline tens4dmm dyad4mm(const mat3d& a, const mat3d& b)
+{
+    tens4dmm c;
+    c.d[ 0] = 2*a(0,0)*b(0,0);
+    c.d[ 1] = 2*a(1,0)*b(1,0);
+    c.d[ 2] = 2*a(2,0)*b(2,0);
+    c.d[ 3] = a(1,0)*b(0,0) + a(0,0)*b(1,0);
+    c.d[ 4] = a(2,0)*b(1,0) + a(1,0)*b(2,0);
+    c.d[ 5] = a(2,0)*b(0,0) + a(0,0)*b(2,0);
+
+    c.d[ 6] = 2*a(0,1)*b(0,1);
+    c.d[ 7] = 2*a(1,1)*b(1,1);
+    c.d[ 8] = 2*a(2,1)*b(2,1);
+    c.d[ 9] = a(1,1)*b(0,1) + a(0,1)*b(1,1);
+    c.d[10] = a(2,1)*b(1,1) + a(1,1)*b(2,1);
+    c.d[11] = a(2,1)*b(0,1) + a(0,1)*b(2,1);
+
+    c.d[12] = 2*a(0,2)*b(0,2);
+    c.d[13] = 2*a(1,2)*b(1,2);
+    c.d[14] = 2*a(2,2)*b(2,2);
+    c.d[15] = a(1,2)*b(0,2) + a(0,2)*b(1,2);
+    c.d[16] = a(2,2)*b(1,2) + a(1,2)*b(2,2);
+    c.d[17] = a(2,2)*b(0,2) + a(0,2)*b(2,2);
+
+    c.d[18] = a(0,1)*b(0,0) + a(0,0)*b(0,1);
+    c.d[19] = a(1,1)*b(1,0) + a(1,0)*b(1,1);
+    c.d[20] = a(2,1)*b(2,0) + a(2,0)*b(2,1);
+    c.d[21] = (a(1,1)*b(0,0) + a(1,0)*b(0,1) + a(0,1)*b(1,0) + a(0,0)*b(1,1))/2.;
+    c.d[22] = (a(2,1)*b(1,0) + a(2,0)*b(1,1) + a(1,1)*b(2,0) + a(1,0)*b(2,1))/2.;
+    c.d[23] = (a(2,1)*b(0,0) + a(2,0)*b(0,1) + a(0,1)*b(2,0) + a(0,0)*b(2,1))/2.;
+
+    c.d[24] = a(0,2)*b(0,1) + a(0,1)*b(0,2);
+    c.d[25] = a(1,2)*b(1,1) + a(1,1)*b(1,2);
+    c.d[26] = a(2,2)*b(2,1) + a(2,1)*b(2,2);
+    c.d[27] = (a(1,2)*b(0,1) + a(1,1)*b(0,2) + a(0,2)*b(1,1) + a(0,1)*b(1,2))/2.;
+    c.d[28] = (a(2,2)*b(1,1) + a(2,1)*b(1,2) + a(1,2)*b(2,1) + a(1,1)*b(2,2))/2.;
+    c.d[29] = (a(2,2)*b(0,1) + a(2,1)*b(0,2) + a(0,2)*b(2,1) + a(0,1)*b(2,2))/2.;
+
+    c.d[30] = a(0,2)*b(0,0) + a(0,0)*b(0,2);
+    c.d[31] = a(1,2)*b(1,0) + a(1,0)*b(1,2);
+    c.d[32] = a(2,2)*b(2,0) + a(2,0)*b(2,2);
+    c.d[33] = (a(1,2)*b(0,0) + a(1,0)*b(0,2) + a(0,2)*b(1,0) + a(0,0)*b(1,2))/2.;
+    c.d[34] = (a(2,2)*b(1,0) + a(2,0)*b(1,2) + a(1,2)*b(2,0) + a(1,0)*b(2,2))/2.;
+    c.d[35] = (a(2,2)*b(0,0) + a(2,0)*b(0,2) + a(0,2)*b(2,0) + a(0,0)*b(2,2))/2.;
+    
+    return c;
 }
 
 //-----------------------------------------------------------------------------

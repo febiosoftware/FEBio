@@ -273,6 +273,14 @@ public:
     // double dot product with 2nd order tensor
     mat3ds dot(const mat3ds& m) const;
     mat3ds dot(const mat3dd& m) const { return dot(mat3ds(m)); }
+    
+    // double dot product with 4th order tensor
+    tens4dmm ddot(const tens4ds& t) const;
+    tens4dmm ddot(const tens4dmm& t) const;
+    
+    // single dot product with 2nd order tensor
+    tens4dmm operator * (const mat3ds& m) const;
+    tens4dmm operator * (const mat3d& m) const;
 
     // trace
     double tr() const;
@@ -299,10 +307,15 @@ public:
 
 // dyadic products of second-order tensors
 tens4dmm dyad1mm(const mat3ds& a, const mat3ds& b);
+tens4dmm dyad4mm(const mat3d& a, const mat3d& b);
 
 inline tens4dmm dyad1mm(const mat3dd& as, const mat3ds& b) { mat3ds a(as); return dyad1mm(a,b); }
 inline tens4dmm dyad1mm(const mat3ds& a, const mat3dd& bs) { mat3ds b(bs); return dyad1mm(a,b); }
 inline tens4dmm dyad1mm(const mat3dd& as, const mat3dd& bs) { mat3ds a(as); mat3ds b(bs); return dyad1mm(a,b); }
+
+inline tens4dmm dyad4mm(const mat3dd& as, const mat3ds& b) { mat3ds a(as); return dyad4mm(a,b); }
+inline tens4dmm dyad4mm(const mat3ds& a, const mat3dd& bs) { mat3ds b(bs); return dyad4mm(a,b); }
+inline tens4dmm dyad4mm(const mat3dd& as, const mat3dd& bs) { mat3ds a(as); mat3ds b(bs); return dyad4mm(a,b); }
 
 // other common operations
 tens4dmm ddot(const tens4dmm& a, const tens4dmm& b);
