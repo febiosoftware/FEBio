@@ -48,6 +48,7 @@ BEGIN_FECORE_CLASS(FERigidRevoluteJoint, FERigidConnector);
     ADD_PARAMETER(m_qp  , "rotation"      );
     ADD_PARAMETER(m_Mp  , "moment"        );
 	ADD_PARAMETER(m_bautopen, "auto_penalty");
+	ADD_PARAMETER(m_torsion_stiffness, "torsion_stiffness");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -286,6 +287,25 @@ void FERigidRevoluteJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		R[m_LM[3]] += ksi1.x;
 		R[m_LM[4]] += ksi1.y;
 		R[m_LM[5]] += ksi1.z;
+	}
+
+	if (m_torsion_stiffness != 0)
+	{
+		vec3d zbat = m_qb0; RBa.GetRotation().RotateVector(zbat);
+		vec3d zbap = m_qb0; RBa.m_qp.RotateVector(zbap);
+		vec3d zba = zbat * alpha + zbap * (1 - alpha);
+
+		vec3d nb(zb); nb.unit();
+		vec3d nba(zba); nba.unit();
+
+		vec3d t = (nb ^ nba)*m_torsion_stiffness;
+		double ma[3] = { -t.x, -t.y, -t.z };
+		double mb[3] = {  t.x,  t.y,  t.z };
+		for (int i=0;i <3; ++i)
+		{
+			if (RBa.m_LM[3 + i] >= 0) R[RBa.m_LM[3 + i]] += ma[i];
+			if (RBb.m_LM[3 + i] >= 0) R[RBb.m_LM[3 + i]] += mb[i];
+		}
 	}
     
     RBa.m_Fr -= vec3d(fa[0],fa[1],fa[2]);
@@ -532,6 +552,39 @@ void FERigidRevoluteJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 
 		vector<int> LM;
 		UnpackLM(LM);
+		ke.SetIndices(LM);
+		LS.Assemble(ke);
+	}
+
+	if (m_torsion_stiffness != 0)
+	{
+		vec3d zbat = m_qb0; RBa.GetRotation().RotateVector(zbat);
+		vec3d zbap = m_qb0; RBa.m_qp.RotateVector(zbap);
+		vec3d zba = zbat * alpha + zbap * (1 - alpha);
+
+		vec3d nb(zb); nb.unit();
+		vec3d nba(zba); nba.unit();
+
+		mat3d nbhat = skew(nb);
+		mat3d nbahat = skew(nba);
+
+		mat3d Kbba = nbhat * nbahat * m_torsion_stiffness;
+		mat3d Kbab = nbahat * nbhat * m_torsion_stiffness;
+
+		FEElementMatrix ke(12, 12);
+		ke.zero();
+		ke.sub(3, 3,  Kbba); ke.sub(3, 9, -Kbab);
+		ke.sub(9, 3, -Kbba); ke.sub(9, 9,  Kbab);
+
+		ke *= alpha;
+
+		vector<int> LM(12);
+		for (int j = 0; j < 6; ++j)
+		{
+			LM[j    ] = RBa.m_LM[j];
+			LM[j + 6] = RBb.m_LM[j];
+		}
+
 		ke.SetIndices(LM);
 		LS.Assemble(ke);
 	}

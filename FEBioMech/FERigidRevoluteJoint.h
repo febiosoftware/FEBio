@@ -106,6 +106,8 @@ public: // parameters
     double  m_Mp;   //! prescribed moment
 	bool	m_bautopen;	//!< auto-penalty for gap and ang tolerance
 
+	double m_torsion_stiffness = 0.0; //!< torsional stiffness about the joint axis
+
 protected:
     vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
     vec3d	m_qb0;	//! initial relative position vector of joint w.r.t. B
