@@ -4,7 +4,7 @@
 #include <FECore/mat3d.h>
 #include "feimglib_api.h"
 
-class FEIMGLIB_API ImageMap
+class FEIMGLIB_API ImageDMap
 {
 public:
 	struct POINT
@@ -14,8 +14,8 @@ public:
 	};
 
 public:
-	ImageMap(Image& img);
-	~ImageMap(void);
+	ImageDMap(Image& img);
+	~ImageDMap(void);
 
 	void SetRange(vec3d r0, vec3d r1);
 
@@ -36,11 +36,16 @@ public:
 	mat3ds hessian(const vec3d& r);
 
 	// pixel dimensions
-	double dx() { return (m_r1.x - m_r0.x)/(double) (m_img.width () - 1); }
-	double dy() { return (m_r1.y - m_r0.y)/(double) (m_img.height() - 1); }
+	double dx() { return (m_r1.x - m_r0.x)/(double) (m_img.width ()); }
+	double dy() { return (m_r1.y - m_r0.y)/(double) (m_img.height()); }
 	double dz() { int nz = m_img.depth(); if (nz == 1) return 1.0; else return (m_r1.z - m_r0.z)/(double)(m_img.depth()); }
 
 protected:
+	double Q0(int i, int j);
+	double Q1(int i, int j);
+	double Q2(int i, int j);
+	double Q3(int i, int j);
+
 	double grad_x(int i, int j, int k);
 	double grad_y(int i, int j, int k);
 	double grad_z(int i, int j, int k);

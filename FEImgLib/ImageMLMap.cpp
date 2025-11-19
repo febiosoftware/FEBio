@@ -1,50 +1,46 @@
 //#include "stdafx.h"
-#include "ImageMap.h"
+#include "ImageMLMap.h"
 #include "math.h"
 #include "algorithm"
 #include "iostream"
 
-ImageMap::ImageMap(Image& img) : m_img(img)
+ImageMLMap::ImageMLMap(Image& img) : m_img(img)
 {
 	m_r0 = vec3d(0,0,0);
 	m_r1 = vec3d(0,0,0);
 }
 
-ImageMap::~ImageMap(void)
+ImageMLMap::~ImageMLMap(void)
 {
 }
 
-void ImageMap::SetRange(vec3d r0, vec3d r1)
+void ImageMLMap::SetRange(vec3d r0, vec3d r1)
 {
 	m_r0 = r0;
 	m_r1 = r1;
 }
 
-ImageMap::POINT ImageMap::map(const vec3d& p)
+ImageMLMap::POINT ImageMLMap::map(const vec3d& p)
 {
 	int nx = m_img.width ();
 	int ny = m_img.height();
 	int nz = m_img.depth ();
 
-	double x = (p.x - m_r0.x)/(m_r1.x - m_r0.x);
-	double y = (p.y - m_r0.y)/(m_r1.y - m_r0.y);
-	double z = (p.z - m_r0.z) / (m_r1.z - m_r0.z);// nz == 1 ? 0 : (p.z - m_r0.z) / (m_r1.z - m_r0.z));
+	double xd = (p.x - m_r0.x)/(m_r1.x - m_r0.x);
+	double yd = (p.y - m_r0.y)/(m_r1.y - m_r0.y);
+	double zd = (nz==1?0:(p.z - m_r0.z)/(m_r1.z - m_r0.z));
 
-	double dx = 1.0 / (double) (nx - 1);
-	double dy = 1.0 / (double) (ny - 1);
-	double dz = (nz>1?1.0 / (double) (nz - 1):1.0);
+	double dx = 1.0 / (m_r1.x - m_r0.x);
+	double dy = 1.0 / (m_r1.y - m_r0.y);
+	double dz = nz == 1 ? 1.0 : 1.0 / (m_r1.z - m_r0.z);
 
-	int i = (int) std::max(floor(x * (nx - 1)), 0.0);
-	int j = (int) std::max(floor(y * (ny - 1)), 0.0);
-	int k = (int) std::max(floor(z * (nz - 1)), 0.0);
+	int i = (int)std::max(floor(xd * nx - 0.5), 0.0);
+	int j = (int)std::max(floor(yd * ny - 0.5), 0.0);
+	int k = (int)std::max(floor(zd * nz - 0.5), 0.0);
 
-	if (i == nx-1) i--;	
-	if (j == ny-1) j--;
-	if ((k == nz-1)&&(nz>1)) k--;
-
-	double r = (x - i*dx)/dx;
-	double s = (y - j*dy)/dy;
-	double t = (z - k*dz)/dz;
+	double r = (p.x - i * dx) / (2.0 * dx);
+	double s = (p.y - j * dy) / (2.0 * dy);
+	double t = (p.z - k * dz) / (2.0 * dz);
 
 	POINT pt;
 	pt.i = i;
@@ -54,44 +50,48 @@ ImageMap::POINT ImageMap::map(const vec3d& p)
 	if (nz == 1)
 	{
 		pt.h[0] = (1-r)*(1-s);
-		pt.h[1] = r*(1-s);
-		pt.h[2] = r*s;
-		pt.h[3] = s*(1-r);
+		pt.h[1] = (r)*(1-s);
+		pt.h[2] = (r)*(s);
+		pt.h[3] = (1-r)*(s);
 		pt.h[4] = pt.h[5] = pt.h[6] = pt.h[7] = 0.0;
 	}
 	else
 	{
 		pt.h[0] = (1-r)*(1-s)*(1-t);
-		pt.h[1] = r*(1-s)*(1-t);
-		pt.h[2] = r*s*(1-t);
-		pt.h[3] = s*(1-r)*(1-t);
-		pt.h[4] = (1-r)*(1-s)*t;
-		pt.h[5] = r*(1-s)*t;
-		pt.h[6] = r*s*t;
-		pt.h[7] = s*(1-r)*t;
+		pt.h[1] = (1+r)*(1-s)*(1-t);
+		pt.h[2] = (1+r)*(1+s)*(1-t);
+		pt.h[3] = (1-r)*(1+s)*(1-t);
+		pt.h[4] = (1-r)*(1-s)*(1+t);
+		pt.h[5] = (1+r)*(1-s)*(1+t);
+		pt.h[6] = (1+r)*(1+s)*(1+t);
+		pt.h[7] = (1-r)*(1+s)*(1+t);
 	}
 
 	return pt;
 }
 
-double ImageMap::value(const POINT& p)
+double ImageMLMap::value(const POINT& p)
 {
-	int nx = m_img.width ();
+	int nx = m_img.width();
 	int ny = m_img.height();
-	int nz = m_img.depth ();
+	int nz = m_img.depth();
 
 	if (nz == 1)
 	{
-		if ((p.i<0) || (p.i >= nx-1)) return 0.0;
-		if ((p.j<0) || (p.j >= ny-1)) return 0.0;
+		if ((p.i < 0) || (p.i >= nx - 1)) return 0.0;
+		if ((p.j < 0) || (p.j >= ny - 1)) return 0.0;
 
 		double v[4];
-		v[0] = m_img.value(p.i  , p.j  , 0);
-		v[1] = m_img.value(p.i+1, p.j  , 0);
-		v[2] = m_img.value(p.i+1, p.j+1, 0);
-		v[3] = m_img.value(p.i  , p.j+1, 0);
-
-		return (p.h[0]*v[0] + p.h[1]*v[1] + p.h[2]*v[2] + p.h[3]*v[3]);
+		// for each corner pixel get the avg value from its neighbors
+		// i-1:i, j-1:j
+		v[0] = 0.25 * (m_img.value(p.i-1, p.j-1, p.k) + m_img.value(p.i, p.j-1, p.k) + m_img.value(p.i, p.j, p.k) + m_img.value(p.i-1, p.j, p.k));
+		// i+1:i+2, j-1:j
+		v[1] = 0.25 * (m_img.value(p.i, p.j-1, p.k) + m_img.value(p.i+1, p.j-1, p.k) + m_img.value(p.i+1, p.j, p.k) + m_img.value(p.i, p.j, p.k));
+		// i+1:i+2, j+1:j+2
+		v[2] = 0.25 * (m_img.value(p.i, p.j, p.k) + m_img.value(p.i+1, p.j, p.k) + m_img.value(p.i+1, p.j+1, p.k) + m_img.value(p.i+1, p.j+2, p.k));
+		// i-1:i, j+1:j+2
+		v[3] = 0.25 * (m_img.value(p.i-1, p.j+1, p.k) + m_img.value(p.i, p.j+1, p.k) + m_img.value(p.i, p.j+2, p.k) + m_img.value(p.i-1, p.j+2, p.k));
+		return (p.h[0] * v[0] + p.h[1] * v[1] + p.h[2] * v[2] + p.h[3] * v[3]);
 	}
 	else
 	{
@@ -113,19 +113,18 @@ double ImageMap::value(const POINT& p)
 	}
 }
 
-bool ImageMap::valid(const vec3d& p)
+bool ImageMLMap::valid(const vec3d& p)
 {
 	int nz = m_img.depth();
-	double dz = (m_r1.z - m_r0.z) / nz;
 	bool r_valid = true;
 	r_valid &= (p.x >= m_r0.x && p.x <= m_r1.x);
 	r_valid &= (p.y >= m_r0.y && p.y <= m_r1.y);
 	//r_valid &= (nz == 1) ? true : (p.z >= m_r0.z && p.z <= m_r1.z);
-	r_valid &= (p.z >= (m_r0.z - dz) && p.z <= (m_r1.z + dz));
+	r_valid &= (p.z >= m_r0.z && p.z <= m_r1.z);
 	return r_valid;
 }
 
-vec3d ImageMap::gradient(const vec3d& r)
+vec3d ImageMLMap::gradient(const vec3d& r)
 {
 	POINT p = map(r);
 
@@ -210,7 +209,7 @@ vec3d ImageMap::gradient(const vec3d& r)
 	}
 }
 
-double ImageMap::grad_x(int i, int j, int k)
+double ImageMLMap::grad_x(int i, int j, int k)
 {
 	int nx = m_img.width();
 	if (i == 0   ) return m_img.value(i+1, j, k) - m_img.value(i  , j, k);
@@ -218,7 +217,7 @@ double ImageMap::grad_x(int i, int j, int k)
 	return 0.5*(m_img.value(i+1, j, k) - m_img.value(i-1, j, k));
 }
 
-double ImageMap::grad_y(int i, int j, int k)
+double ImageMLMap::grad_y(int i, int j, int k)
 {
 	int ny = m_img.height();
 	if (j == 0   ) return m_img.value(i, j+1, k) - m_img.value(i, j  , k);
@@ -226,7 +225,7 @@ double ImageMap::grad_y(int i, int j, int k)
 	return 0.5*(m_img.value(i, j+1, k) - m_img.value(i, j-1, k));
 }
 
-double ImageMap::grad_z(int i, int j, int k)
+double ImageMLMap::grad_z(int i, int j, int k)
 {
 	int nz = m_img.depth();
 	if (nz == 1) return 0.0;
@@ -235,7 +234,7 @@ double ImageMap::grad_z(int i, int j, int k)
 	return 0.5*(m_img.value(i, j, k+1) - m_img.value(i, j, k-1));
 }
 
-mat3ds ImageMap::hessian(const vec3d& r)
+mat3ds ImageMLMap::hessian(const vec3d& r)
 {
 	POINT p = map(r);
 
@@ -360,34 +359,34 @@ mat3ds ImageMap::hessian(const vec3d& r)
 	}
 }
 
-double ImageMap::hessian_xx(int i, int j, int k)
+double ImageMLMap::hessian_xx(int i, int j, int k)
 {
 	int nx = m_img.width();
 	if (nx <= 2) return 0.0;
 	if (i==0   ) return (grad_x(i+1,j,k) - grad_x(i  ,j,k));
 	if (i==nx-1) return (grad_x(i  ,j,k) - grad_x(i-1,j,k));
-	return 0.5 *(grad_x(i+1,j,k) - grad_x(i-1,j,k));
+	return 0.5*(grad_x(i+1,j,k) - grad_x(i-1,j,k));
 }
 
-double ImageMap::hessian_yy(int i, int j, int k)
+double ImageMLMap::hessian_yy(int i, int j, int k)
 {
 	int ny = m_img.height();
 	if (ny <= 2) return 0.0;
 	if (j==0   ) return (grad_y(i,j+1,k) - grad_y(i  ,j,k));
 	if (j==ny-1) return (grad_y(i  ,j,k) - grad_y(i,j-1,k));
-	return 0.5 * (grad_y(i,j+1,k) - grad_y(i,j-1,k));
+	return 0.5*(grad_y(i,j+1,k) - grad_y(i,j-1,k));
 }
 
-double ImageMap::hessian_zz(int i, int j, int k)
+double ImageMLMap::hessian_zz(int i, int j, int k)
 {
 	int nz = m_img.depth();
 	if (nz <= 2) return 0.0;
 	if (k==0   ) return (grad_z(i,j,k+1) - grad_z(i  ,j,k));
 	if (k==nz-1) return (grad_z(i  ,j,k) - grad_z(i,j,k-1));
-	return 0.5 * (grad_z(i,j,k+1) - grad_z(i,j,k-1));
+	return 0.5*(grad_z(i,j,k+1) - grad_z(i,j,k-1));
 }
 
-double ImageMap::hessian_xy(int i, int j, int k)
+double ImageMLMap::hessian_xy(int i, int j, int k)
 {
 	int nx = m_img.width();
 	if (nx <= 2) return 0.0;
@@ -396,7 +395,7 @@ double ImageMap::hessian_xy(int i, int j, int k)
 	return 0.5*(grad_y(i+1,j,k) - grad_y(i-1,j,k));
 }
 
-double ImageMap::hessian_yz(int i, int j, int k)
+double ImageMLMap::hessian_yz(int i, int j, int k)
 {
 	int ny = m_img.height();
 	if (ny <= 2) return 0.0;
@@ -405,7 +404,7 @@ double ImageMap::hessian_yz(int i, int j, int k)
 	return 0.5*(grad_z(i,j+1,k) - grad_z(i,j-1,k));
 }
 
-double ImageMap::hessian_xz(int i, int j, int k)
+double ImageMLMap::hessian_xz(int i, int j, int k)
 {
 	int nx = m_img.width();
 	if (nx <= 2) return 0.0;

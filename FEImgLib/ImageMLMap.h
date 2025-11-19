@@ -4,7 +4,7 @@
 #include <FECore/mat3d.h>
 #include "feimglib_api.h"
 
-class FEIMGLIB_API ImageMap
+class FEIMGLIB_API ImageMLMap
 {
 public:
 	struct POINT
@@ -14,8 +14,8 @@ public:
 	};
 
 public:
-	ImageMap(Image& img);
-	~ImageMap(void);
+	ImageMLMap(Image& img);
+	~ImageMLMap(void);
 
 	void SetRange(vec3d r0, vec3d r1);
 
