@@ -6712,6 +6712,627 @@ rst FEBio restart input file.
  
 \end_layout
 
+\begin_layout Section
+FEBio Tasks
+\end_layout
+
+\begin_layout Standard
+At its core,
+ FEBio always executes a 
+\emph on
+task
+\emph default
+.
+ You can think of a task as the outer loop that instructs FEBio what to do.
+ The default task will run the FEBio input file provided on the command line and calculate the solution.
+ Other tasks perform a restart,
+ solve an optimization problem,
+ or run a diagnostic.
+ Users can also create custom tasks via plugins and direct FEBio what exactly it should do.
+ Many of these tasks perform tests on specific FEBio features and thus can be helpful for plugin developers to ensure that their plugin works correctly with these specific FEBio features.
+ 
+\end_layout
+
+\begin_layout Standard
+The task to execute can be specified on the command line using the 
+\series bold
+-task
+\series default
+ command line option.
+ The name of the task is specified as follows.
+\end_layout
+
+\begin_layout LyX-Code
+>febio4 -i input.feb 
+\series bold
+-task=task_name [task_input_file]
+\end_layout
+
+\begin_layout Standard
+The name of the task follows after an equal sign ('=') (Notice that there are no spaces before or after the equal sign).
+ Some tasks require an additional input file,
+ which can be specified directly following the -task command line option.
+ (There should be a space between the -task command line option and the optional task input file.)
+\end_layout
+
+\begin_layout Standard
+In this section we'll document the tasks that are currently supported by FEBio.
+ The following table lists the available tasks.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="14" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+task
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+diagnose
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Run a diagnostic.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+jfnk tangent test
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs a tangent test on the JFNK solver
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+optimize
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs an optimization problem.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+param_run
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs a parameter study
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+parameter_sweep
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs a parameter study
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+quick_restart_test
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs a restart test
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+rci_solve
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs a model using the RCI solver
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+reset_test
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs a test on the FEBio reset functionality
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+restart
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs a cold restart problem.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+restart_test
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs a test on the restart feature.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+solve
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs the forward model (default task)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+stiffness_test
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Allows users to export the stiffness matrix from FEBio.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+test
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Runs the model as a test suite problem.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Table of available FEBio tasks.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Some more details about these tasks follow.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+diagnose:
+ 
+\series default
+The 
+\emph on
+diagnose 
+\emph default
+task runs a diagnostic.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+jfnk_tangent_test:
+ 
+\series default
+The 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+jfnk tangent test
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ runs a test on the tangent produced by the JFNK linear solver.
+ The JFNK linear solver is an iterative solver that aims to solve the nonlinear Newton problem without ever evaluating the stiffness matrix explicitly.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+optimize:
+
+\series default
+ Runs an optimization problem.
+ (See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Parameter-Optimization"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ or more details on how to run optimization problems in FEBio.)
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+param_run:
+
+\series default
+ The 
+\emph on
+param_run
+\emph default
+ task runs a parameter study on the input model.
+ In other words,
+ it runs the input file multiple times,
+ each time using a different value for certain parameters.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+parameter_sweep
+\series default
+:
+ This tasks runs a parameter study on the input file.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+quick_restart_test:
+ 
+\series default
+The 
+\emph on
+quick_restart_test 
+\emph default
+runs a test on the restart feature after model initialization.
+ This task initializes the model and then writes a dump file.
+ After that,
+ the model is cleared and the dump file is read to re-initialize the model.
+ Any issues that occur during re-initialization will be reported.
+ If no problems are encountered,
+ the task finishes.
+ (Note that the model is not solved.) 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+rci_solve:
+
+\series default
+ The 
+\emph on
+rci_solve 
+\emph default
+task solves a model using the RCI solver.
+ The RCI (Reverse Communication Interface) solver is a feature that allows users more control over how FEBio solves the model.
+ This feature was added to give plugins that interface with third party solvers the ability to transfer some of the solution progress decisions (e.g.
+ when to advance the time step) to the third party library.
+ This tasks tests that interface and ensures that it produces the same result as the standard solver.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+reset_test:
+ 
+\series default
+FEBio's reset feature restores the original state of the model.
+ This feature is used in several other tasks that need to solve the forward model repeatedly (e.g.
+ optimization,
+ parameter study).
+ This task can be used to test the reset feature and ensure that it indeed properly resets the model.
+ The test will run the forward model twice.
+ After the first run,
+ some stats are collected.
+ The model is then reset and run again.
+ The same stats are collected after the second run and compared with those from the first run.
+ If the model reset was successful,
+ the stats should be identical.
+ If not,
+ there is a problem with model reset.
+ This task also produces a separate log file for each run that can be compared.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+restart:
+ 
+\series default
+Runs a cold restart of a previously run model.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Restart-Input-file"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ for more details on how to run restart problems.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+restart_test:
+ 
+\series default
+This task tests the restart feature to ensure that it indeed correctly restarts a model.
+ After each converged time step,
+ the model's state is serialized (in memory) to a dump stream and then immediately read back from the dump stream.
+ If the restart feature is working properly,
+ the model should produce the exact same output to both log and plot file as the forward model (i.e.
+ the model run with that default task).
+ Users can compare outputs to see if there might be any problem with the restart feature.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+solve:
+ 
+\series default
+This solves the forward model provided by the FEBio input file.
+ This is the default task when the -task command line option is not provided.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+stiffness_test:
+ 
+\series default
+The 
+\emph on
+stiffness_test 
+\emph default
+task allows users to export the stiffness matrix and right-hand-side vector out of FEBio.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+test:
+ 
+\series default
+This task is used by the FEBio test suite and adds the solution norm as a log variable that can be queried once the model completes.
+ (This is used in the test suite to see if the solution norm has changed compared to a golden standard.)
+\end_layout
+
 \begin_layout Chapter
 Free Format Input
 \begin_inset CommandInset label
@@ -12590,6 +13211,282 @@ emph{FEBio Theory Manual}}
  represents a good balance between too much and too little numerical damping.
 \end_layout
 
+\begin_layout Subsection
+Explicit-Solid Solver
+\end_layout
+
+\begin_layout Standard
+FEBio supports an explicit-solid solver,
+ which solves dynamic structural mechanics problems using an explicit time-integration scheme.
+ This means that the solution at a given timestep is calculated using only the solution from the previous timestep.
+ The advantage of this approach is that no stiffness matrix needs to be calculated and no linear system of equations needs to be solved (at least,
+ with mass-lumping enabled).
+ As a result,
+ this solver can solve dynamic problems very fast.
+ However,
+ the downside of this approach is that it is only conditionally stable and imposes an upper limit on the time step size.
+ This limit is often much smaller than the time step sizes that can be taken by implicit time-integration schemes (as used by the default Newton-based solvers in FEBio) and thus often will require many more time steps to solve the model.
+ Thus,
+ the explicit solver is most useful in dynamic problems that already require relatively small time step sizes,
+ such as impact-contact models,
+ or models that use non-elastic material behavior that may undergo rapid changes in their constitutive behavior (e.g.
+ damage).
+ 
+\end_layout
+
+\begin_layout Standard
+The explicit solver in FEBio uses the midpoint time integration rule and uses mass lumping.
+ Mass lumping is a technique that replaces the consistent mass matrix with a diagonal approximation.
+ In fact,
+ it's this diagonalization of the mass matrix that really prevents the need to solve a linear system of equations.
+ (Since solving a diagonal linear system of equations is trivial.) 
+\end_layout
+
+\begin_layout Standard
+The explicit solver can be selected by setting the 
+\series bold
+type 
+\series default
+attribute of the 
+\series bold
+solver 
+\series default
+element to 
+\emph on
+explicit-solid
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+<solver 
+\series bold
+type="explicit-solid"
+\series default
+>
+\end_layout
+
+\begin_layout LyX-Code
+...
+\end_layout
+
+\begin_layout LyX-Code
+</solver>
+\end_layout
+
+\begin_layout Standard
+The following parameters can be specified for the explicit-solid solver.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+default value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mass_lumping
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Chooses the mass lumping strategy.
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+dyn_damping
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The damping factor for dynamic damping.
+ (2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+The parameters of the explicit-solid solver
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Comments
+\emph default
+:
+ 
+\end_layout
+
+\begin_layout Enumerate
+As mentioned,
+ mass lumping is a technique to approximate the mass matrix with a diagonal matrix.
+ Several approaches are supported in FEBio.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+mass_lumping = 0:
+ no mass-lumping (This is currently not implemented,
+ but the value is reserved in case support will be added in the future.) 
+\end_layout
+
+\begin_layout Enumerate
+mass_lumping = 1 :
+ use row summation approach.
+ Useful for linear elements,
+ but may produce negative nodal masses for quadratic elements and thus should not be used for models containing higher-order elements.
+ 
+\end_layout
+
+\begin_layout Enumerate
+mass_lumping = 2:
+ HRZ lumping technique.
+ Better suited for higher-order elements,
+ but should not be used for shells.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Dynamic damping is a technique to dampen the solution in order to obtain an equilibrium solution (e.g.
+ for false-transient analyses).
+ In FEBio,
+ dynamic damping is applied to the velocity updates and the
+\emph on
+ dyn_damping 
+\emph default
+parameter specifies the damping factor.
+ The default value is 1 so no damping is applied.
+ Note that the lower the damping factor,
+ the more damping,
+ but also the longer it may take to find the equilibrium solution.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Important!
+ 
+\series default
+As a final note,
+ the explicit-solver is still considered an experimental feature in FEBio and may not work correctly with all of the features of FEBio yet.
+ Use at your own risk and please report any problems you may encounter to the FEBio developers.
+ 
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -15236,11 +16133,10 @@ attribute can be added to specify a specific solid formulation.
  However,
  users can explicitly set the type attribute.
  The following solid domain types are defined.
- 
-\end_layout
-
-\begin_layout Standard
-
+ If the domain type is specified explicitly,
+ the user must make sure that the assigned material is compatible with the domain type.
+ (For instance,
+ you cannot assign a biphasic material to an elastic-solid.) 
 \end_layout
 
 \begin_layout Standard
@@ -15250,7 +16146,7 @@ attribute can be added to specify a specific solid formulation.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="2">
+<lyxtabular version="3" rows="15" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -15402,7 +16298,36 @@ Formulation used for elastic remodeling problems.
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+elastic-mm-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Formulation used for multi-scale domains.
+ (requires the 
+\begin_inset Quotes eld
+\end_inset
+
+micro-material
+\begin_inset Quotes erd
+\end_inset
+
+) 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -15411,12 +16336,138 @@ ut4-solid
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Uniform nodal strain tetrahedron.
  (3)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+biphasic-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for biphasic domains.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+biphasic-solute-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for biphasic-solute domains.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiphasic-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for multiphasic domains.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+triphasic-solid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for triphasic domains (deprecated,
+ use multiphasic-solid instead).
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fluid-3D
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for fluid domains.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fluid-FSI-3D
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for fluid-FSI domains.
+ 
 \end_layout
 
 \end_inset
@@ -16223,6 +17274,8 @@ type
  attribute.
  If omitted,
  FEBio will determine the formulation from the material and shell element types.
+ If specified explicitly,
+ the user must ensure that the correct material is assigned to the domain.
  The following shell domain types are available.
  
 \end_layout
@@ -16234,7 +17287,7 @@ type
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
+<lyxtabular version="3" rows="10" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -16376,7 +17429,7 @@ Enhanced-Assumed-Strain shell;
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -16385,13 +17438,73 @@ elastic-shell-ans
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Assumed-Natural-Strain shell;
  an alternative shell formulation for incompressible shells.
  
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+biphasic-shell
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for biphasic shell domains.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+biphasic-solute-shell
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for biphasic-solute shell domains.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiphasic-shell
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The standard formulation for multiphasic shell domains.
 \end_layout
 
 \end_inset
@@ -33798,8 +34911,12 @@ A joint between two rigid bodies
 \begin_inset Text
 
 \begin_layout Plain Layout
-tied,sticky,
- tied-biphasic
+tied-elastic,
+ tied-node-on-facet,
+ tied-facet-on-facet,
+ sticky,
+ tied-biphasic,
+ tied-multiphasic
 \end_layout
 
 \end_inset
@@ -124102,42 +125219,6 @@ Any other value for
 \end_layout
 
 \begin_layout Subsection
-Explicit Dynamics Solver
-\end_layout
-
-\begin_layout Standard
-The explicit solver uses a midpoint time integration rule.
- 
-\end_layout
-
-\begin_layout Standard
-An important aspect of the explicit solver is that is uses a 
-\begin_inset Quotes eld
-\end_inset
-
-lumped
-\begin_inset Quotes erd
-\end_inset
-
- mass matrix,
- which reduces the mass matrix to a diagonal form.
- There are currently two lumping algorithms implemented:
- 
-\end_layout
-
-\begin_layout Description
-row-sum The matrix elements of each row are summed together and the sum is assigned to the diagonal.
- 
-\end_layout
-
-\begin_layout Description
-HRZ-lumping This is the preferred method of lumping for higher-order elements.
- However,
- it should not be used for shells.
- 
-\end_layout
-
-\begin_layout Subsection
 False Transient Analysis
 \begin_inset CommandInset label
 LatexCommand label
@@ -131168,6 +132249,27 @@ https://developer.apple.com/documentation/accelerate/sparse_solvers/sparse_itera
 \end_inset
 
 ).
+\end_layout
+
+\begin_layout Subsection
+Pardiso_64
+\end_layout
+
+\begin_layout Standard
+The pardiso_64 solver is variant of the pardiso solver that can be used for very large problems since it uses 64 bit integers.
+ Other than that,
+ it is identical to the standard pardiso solver.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<default_linear_solver type="pardiso_64"/>
 \end_layout
 
 \begin_layout Chapter
