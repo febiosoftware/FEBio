@@ -103,6 +103,7 @@ bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* p
 		}
 		break;
 		case FE_PARAM_BOOL    : { bool b; tag.value(b); pp->value<bool>() = b; } break;
+		case FE_PARAM_STD_STRING: { std::string s; tag.value(s); pp->value<std::string>() = s; } break;
 		default:
 			assert(false);
 			return false;
