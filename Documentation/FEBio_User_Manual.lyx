@@ -84351,6 +84351,218 @@ Example:
 \end_layout
 
 \begin_layout Subsubsection
+Drucker-Prager Criterion
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Drucker-Shear-Stress-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for the Drucker-Prager criterion is 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+DC Drucker-Prager
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+.
+ It is based on the yield criterion for plasticity introduced in 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Drucker52"
+literal "true"
+
+\end_inset
+
+.
+ For this criterion,
+\begin_inset Formula 
+\[
+\Xi\left(\mathbf{F}\right)=\sigma_{e}-b\sigma_{m}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\sigma_{e}$
+\end_inset
+
+ is the von Mises stress,
+ 
+\begin_inset Formula $\sigma_{m}=\tr\boldsymbol{\sigma}_{0}$
+\end_inset
+
+ is the first invariant of the Cauchy stress,
+ 
+\begin_inset Formula $b$
+\end_inset
+
+ is a parameter that depends on the yield (or failure) stress 
+\begin_inset Formula $\sigma_{t}$
+\end_inset
+
+ in tension,
+ and 
+\begin_inset Formula $\sigma_{c}$
+\end_inset
+
+ in compression (
+\begin_inset Formula $\sigma_{c}\ge0$
+\end_inset
+
+),
+ 
+\begin_inset Formula 
+\[
+b=3\frac{\sigma_{t}-\sigma_{c}}{\sigma_{c}+\sigma_{t}}
+\]
+
+\end_inset
+
+This parameter 
+\begin_inset Formula $b$
+\end_inset
+
+ is negative when 
+\begin_inset Formula $\sigma_{c}>\sigma_{t}$
+\end_inset
+
+.
+ In the special case when 
+\begin_inset Formula $b=0$
+\end_inset
+
+ the Drucker-Prager criterion reduces to the von Mises criterion.
+ When used as a plastic yield criterion (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Reactive-Plasticity"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ the yield stress 
+\begin_inset Formula $\sigma_{y}$
+\end_inset
+
+ for this type of material is given by
+\begin_inset Formula 
+\[
+\sigma_{y}=2\frac{\sigma_{c}\sigma_{t}}{\sigma_{c}+\sigma_{t}}
+\]
+
+\end_inset
+
+which reduces to 
+\begin_inset Formula $\sigma_{y}=\sigma_{t}$
+\end_inset
+
+ for uniaxial tension,
+ 
+\begin_inset Formula $\sigma_{y}=-\sigma_{c}$
+\end_inset
+
+ in uniaxial compression,
+ and more generally,
+ 
+\begin_inset Formula $\sigma_{y}=\sigma_{c}=\sigma_{t}$
+\end_inset
+
+ when 
+\begin_inset Formula $\sigma_{t}=\sigma_{c}$
+\end_inset
+
+.
+ The parameter 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ are related to the parameters 
+\begin_inset Formula $A$
+\end_inset
+
+ and 
+\begin_inset Formula $B$
+\end_inset
+
+ appearing on Wikipedia's description of the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Drucker-Prager yield criterion"
+target "https://en.wikipedia.org/wiki/Drucker–Prager_yield_criterion"
+literal "false"
+
+\end_inset
+
+ via
+\begin_inset Formula 
+\[
+\begin{aligned}a & =\sqrt{3}A & b & =3\sqrt{3}B\end{aligned}
+\]
+
+\end_inset
+
+Given these relationships,
+ users may consult that web page for finding the relation between these parameters and cohesion 
+\begin_inset Formula $c$
+\end_inset
+
+ and angle of internal friction 
+\begin_inset Formula $\phi$
+\end_inset
+
+ (as well as the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Mohr-Coulomb yield surface"
+target "https://en.wikipedia.org/wiki/Mohr–Coulomb_theory#Typical_values_of_cohesion_and_angle_of_internal_friction"
+literal "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout LyX-Code
+<criterion type="DC Drucker-Prager">
+\end_layout
+
+\begin_layout LyX-Code
+  <b>-1</b>
+\end_layout
+
+\begin_layout LyX-Code
+</criterion>
+\end_layout
+
+\begin_layout Subsubsection
 Maximum Normal Lagrange Strain
 \begin_inset CommandInset label
 LatexCommand label
@@ -112363,449 +112575,362 @@ The following example illustrates the use of the multi-step feature of FEBio.
 \end_layout
 
 \begin_layout Verbatim
-
 <?xml version="1.0" encoding="ISO-8859-1"?>
 \end_layout
 
 \begin_layout Verbatim
-
 <febio_spec version="4.0">
 \end_layout
 
 \begin_layout Verbatim
-
 	<Module type="solid"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Material>
 \end_layout
 
 \begin_layout Verbatim
-
 		<material id="1" name="Material 1" type="neo-Hookean">
 \end_layout
 
 \begin_layout Verbatim
-
 			<density>1.0</density>
 \end_layout
 
 \begin_layout Verbatim
-
 			<E>1</E>
 \end_layout
 
 \begin_layout Verbatim
-
 			<v>0.45</v>
 \end_layout
 
 \begin_layout Verbatim
-
 		</material>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Material>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1">-2.0,-0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2">-2.0,-0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3">-2.0,
  0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4">-2.0,
  0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"> 2.0,-0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"> 2.0,-0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"> 2.0,
  0.5,
  0.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"> 2.0,
  0.5,
  1.0</node>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Nodes>
 \end_layout
 
 \begin_layout Verbatim
-
 		<Elements type="hex8" name="Part1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<elem id="1">1,5,7,3,2,6,8,4</elem>
 \end_layout
 
 \begin_layout Verbatim
-
 		</Elements>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="4"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="2"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set3">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="3"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 		<NodeSet name="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="5"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="6"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="7"/>
 \end_layout
 
 \begin_layout Verbatim
-
 			<node id="8"/>
 \end_layout
 
 \begin_layout Verbatim
-
 		</NodeSet>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Mesh>
 \end_layout
 
 \begin_layout Verbatim
-
 	<MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 		<SolidDomain name="Part1" mat="Material 1"/>
 \end_layout
 
 \begin_layout Verbatim
-
 	</MeshDomains>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		<bc type="zero displacement" node_set="set1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<dofs>x,y,z</dofs>
 \end_layout
 
 \begin_layout Verbatim
-
 		</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 	<LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 		<load_controller id="1" type="loadcurve">
 \end_layout
 
 \begin_layout Verbatim
-
 			<points>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>0,0</point>
 \end_layout
 
 \begin_layout Verbatim
-
 				<point>1,0.1</point>
 \end_layout
 
 \begin_layout Verbatim
-
 			</points>
 \end_layout
 
 \begin_layout Verbatim
-
 		</load_controller>
 \end_layout
 
 \begin_layout Verbatim
-
 	</LoadData>
 \end_layout
 
 \begin_layout Verbatim
-
 	<Step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="1">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>10</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.1</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 			<Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 				<bc type="prescribed displacement" node_set="set4">
 \end_layout
 
 \begin_layout Verbatim
-
 					<dof>x</dof>
 \end_layout
 
 \begin_layout Verbatim
-
 					<scale lc="1">1.0</scale>
 \end_layout
 
 \begin_layout Verbatim
-
 				</bc>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Boundary>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 		<step id="2">
 \end_layout
 
 \begin_layout Verbatim
-
 			<Control>
 \end_layout
 
 \begin_layout Verbatim
-
 				<time_steps>50</time_steps>
 \end_layout
 
 \begin_layout Verbatim
-
 				<step_size>0.5</step_size>
 \end_layout
 
 \begin_layout Verbatim
-
 				<analysis>DYNAMIC</analysis>
 \end_layout
 
 \begin_layout Verbatim
-
 			</Control>
 \end_layout
 
 \begin_layout Verbatim
-
 		</step>
 \end_layout
 
 \begin_layout Verbatim
-
 	</Step>
 \end_layout
 
 \begin_layout Verbatim
-
 </febio_spec>
 \end_layout
 

@@ -178,6 +178,7 @@ SOFTWARE.*/
 #include "FEYeoh.h"
 #include "FEScaledElasticMaterial.h"
 #include "FEScaledUncoupledMaterial.h"
+#include "FESSVQLV.h"
 
 #include "FEPressureLoad.h"
 #include "FEPressureRobinBC.h"
@@ -390,6 +391,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
     REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
     REGISTER_FECORE_CLASS(FEScaledElasticMaterial, "scaled elastic");
+    REGISTER_FECORE_CLASS(FESSVQLV, "SSV-QLV");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
@@ -596,6 +598,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCriterionMNLS, "DC max normal Lagrange strain");
 	REGISTER_FECORE_CLASS(FEDamageCriterionOSS, "DC octahedral shear strain");
     REGISTER_FECORE_CLASS(FEDamageCriterionONS, "DC octahedral natural strain");
+    REGISTER_FECORE_CLASS(FEDamageCriterionDruckerPrager, "DC Drucker-Prager");
 
     // plastic flow curve (used by plastic materials)
     REGISTER_FECORE_CLASS(FEPlasticFlowCurvePaper, "PFC paper");
