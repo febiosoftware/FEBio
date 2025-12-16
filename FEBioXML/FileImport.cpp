@@ -623,7 +623,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				// This most likely means a user thinks this parameter can be mapped
 				// but the corresponding parameter is not a FEModelParam
 				XMLAtt* att = tag.Attribute("type", true);
-				if (att && !att->m_bvisited)
+				if (att)
 					throw XMLReader::InvalidAttribute(tag, "type");
 
 				value(tag, pp->value<double  >());

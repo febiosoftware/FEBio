@@ -295,6 +295,41 @@ void FEBioMeshDataSection4::ParseElementData(XMLTag& tag)
 		else if (strcmp(sztype, "mat_axis"       ) == 0) ParseMaterialAxes  (tag, *elset);
 		else if (strcmp(sztype, "fiber"          ) == 0) ParseMaterialFibers(tag, *elset);
 		else if (strstr(sztype, ".fiber"         )) ParseMaterialFibers(tag, *elset);
+		else if (strcmp(sztype, "const") == 0)
+		{
+			// get the data type
+			const char* szdataType = tag.AttributeValue("data_type", true);
+			if (szdataType == nullptr) szdataType = "scalar";
+			FEDataType dataType = str2datatype(szdataType);
+			if (dataType == FEDataType::FE_INVALID_TYPE) throw XMLReader::InvalidAttributeValue(tag, "datatype", szdataType);
+
+			// create the data map
+			FEDomainMap* map = new FEDomainMap(dataType, Storage_Fmt::FMT_ITEM);
+			map->Create(elset);
+			map->SetName(szname);
+			mesh.AddDataMap(map);
+
+			++tag;
+			do
+			{
+				if (tag == "value")
+				{
+					switch (dataType)
+					{
+					case FE_DOUBLE: { double v; tag.value(v); map->fillValue(v); } break;
+					case FE_VEC2D: { vec2d  v; value(tag, v); map->fillValue(v); } break;
+					case FE_VEC3D: { vec3d  v; value(tag, v); map->fillValue(v); } break;
+					case FE_MAT3D: { mat3d  v; value(tag, v); map->fillValue(v); } break;
+					case FE_MAT3DS: { mat3ds v; value(tag, v); map->fillValue(v); } break;
+					default:
+						throw XMLReader::InvalidAttributeValue(tag, "type");
+						break;
+					}
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			} while (!tag.isend());
+		}
 		else
 		{
 			// allocate generator
