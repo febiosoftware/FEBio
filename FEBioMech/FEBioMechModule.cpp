@@ -597,6 +597,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEDamageCriterionOSS, "DC octahedral shear strain");
     REGISTER_FECORE_CLASS(FEDamageCriterionONS, "DC octahedral natural strain");
     REGISTER_FECORE_CLASS(FEDamageCriterionDruckerPrager, "DC Drucker-Prager");
+    REGISTER_FECORE_CLASS(FEDamageCriterionDeshpandeFleck, "DC Deshpande-Fleck");
 
     // plastic flow curve (used by plastic materials)
     REGISTER_FECORE_CLASS(FEPlasticFlowCurvePaper, "PFC paper");
