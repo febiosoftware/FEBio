@@ -178,7 +178,6 @@ SOFTWARE.*/
 #include "FEYeoh.h"
 #include "FEScaledElasticMaterial.h"
 #include "FEScaledUncoupledMaterial.h"
-#include "FESSVQLV.h"
 
 #include "FEPressureLoad.h"
 #include "FEPressureRobinBC.h"
@@ -391,7 +390,6 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
     REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
     REGISTER_FECORE_CLASS(FEScaledElasticMaterial, "scaled elastic");
-    REGISTER_FECORE_CLASS(FESSVQLV, "SSV-QLV");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");
