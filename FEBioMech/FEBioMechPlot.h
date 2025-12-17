@@ -123,7 +123,7 @@ class FEPlotContactGap : public FEPlotSurfaceData
 public:
 	FEPlotContactGap(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_LENGTH); }
 	bool SetFilter(const char* sz) override;
-	bool Save(FESurface& surf, FEDataStream& a);
+	bool Save(FESurface& surf, FEDataStream& a) override;
 private:
 	std::string m_interfaceName;
 };
@@ -146,7 +146,7 @@ class FEPlotContactPressure : public FEPlotSurfaceData
 public:
 	FEPlotContactPressure(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM){ SetUnits(UNIT_PRESSURE); }
 	bool SetFilter(const char* sz) override;
-	bool Save(FESurface& surf, FEDataStream& a);
+	bool Save(FESurface& surf, FEDataStream& a) override;
 private:
 	std::string m_interfaceName;
 };
@@ -159,7 +159,7 @@ class FEPlotContactTraction : public FEPlotSurfaceData
 public:
     FEPlotContactTraction(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_VEC3F, FMT_ITEM){ SetUnits(UNIT_PRESSURE); }
 	bool SetFilter(const char* sz) override;
-	bool Save(FESurface& surf, FEDataStream& a);
+	bool Save(FESurface& surf, FEDataStream& a) override;
 private:
 	std::string m_interfaceName;
 };
@@ -433,6 +433,33 @@ public:
 protected:
 	int		m_comp;
 	int		m_mat;
+};
+
+//-----------------------------------------------------------------------------
+//! Element yield stress based on Drucker shear stress criterion
+class FEPlotElementDruckerShear : public FEPlotDomainData
+{
+public:
+    FEPlotElementDruckerShear(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element yield stress based on Prager-Drucker criterion
+class FEPlotElementPragerDruckerStress : public FEPlotDomainData
+{
+public:
+    FEPlotElementPragerDruckerStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element yield stress based on Deshpande-Fleck criterion
+class FEPlotElementDeshpandeFleckStress : public FEPlotDomainData
+{
+public:
+    FEPlotElementDeshpandeFleckStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------

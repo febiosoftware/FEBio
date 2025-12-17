@@ -963,6 +963,75 @@ bool FEPlotElementPK1Stress::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+//! Store the average element yield stress based on Drucker shear stress criterion
+bool FEPlotElementDruckerShear::Save(FEDomain& dom, FEDataStream& a)
+{
+    FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
+    if ((pme == 0) || pme->IsRigid()) return false;
+    FEDamageCriterionDrucker* pmd = pme->ExtractProperty<FEDamageCriterionDrucker>();
+    if (pmd == nullptr) return false;
+
+    writeAverageElementValue<double>(dom, a, [&pmd](const FEMaterialPoint& mp) {
+        double c = pmd->m_c(mp);
+        const FEElasticMaterialPoint& ep = *mp.ExtractData< FEElasticMaterialPoint>();
+        mat3ds s = ep.m_s;    // Cauchy stress
+        mat3ds sdev = s.dev();
+        double J2 = 0.5*(sdev*sdev).trace();
+        double J3 = sdev.det();
+        double k = pow(pow(J2,3) - c*pow(J3,2),1./6.);
+        return k;
+        });
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the average element yield stress based on Prager-Drucker criterion
+bool FEPlotElementPragerDruckerStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
+    if ((pme == 0) || pme->IsRigid()) return false;
+    FEDamageCriterionDruckerPrager* pmd = pme->ExtractProperty<FEDamageCriterionDruckerPrager>();
+    if (pmd == nullptr) return false;
+
+    writeAverageElementValue<double>(dom, a, [&pmd](const FEMaterialPoint& mp) {
+        double b = pmd->m_b(mp);
+        const FEElasticMaterialPoint& ep = *mp.ExtractData< FEElasticMaterialPoint>();
+        mat3ds s = ep.m_s;    // Cauchy stress
+        double se = sqrt((pow(s.xx()-s.yy(),2) + pow(s.yy()-s.zz(),2) + pow(s.zz()-s.xx(),2)
+                           + 6*(pow(s.xy(),2) + pow(s.yz(),2) + pow(s.xz(),2)))/2);
+        double sm = s.tr()/3;
+        double Phi = se - b*sm;
+        return Phi;
+        });
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the average element yield stress based on Deshpande-Fleck criterion
+bool FEPlotElementDeshpandeFleckStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
+    if ((pme == 0) || pme->IsRigid()) return false;
+    FEDamageCriterionDeshpandeFleck* pmd = pme->ExtractProperty<FEDamageCriterionDeshpandeFleck>();
+    if (pmd == nullptr) return false;
+
+    writeAverageElementValue<double>(dom, a, [&pmd](const FEMaterialPoint& mp) {
+        double beta = pmd->m_beta(mp);
+        const FEElasticMaterialPoint& ep = *mp.ExtractData< FEElasticMaterialPoint>();
+        mat3ds s = ep.m_s;  // Cauchy stress
+        double se = sqrt((pow(s.xx()-s.yy(),2) + pow(s.yy()-s.zz(),2) + pow(s.zz()-s.xx(),2)
+                           + 6*(pow(s.xy(),2) + pow(s.yz(),2) + pow(s.xz(),2)))/2);
+        double sm = s.tr()/3;
+        double Phi = sqrt((se*se+3*pow(beta*sm,2))/(1+beta*beta));
+        return Phi;
+        });
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotSPRStresses::Save(FEDomain& dom, FEDataStream& a)
 {
 	// For now, this is only available for solid domains
