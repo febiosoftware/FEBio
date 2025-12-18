@@ -322,8 +322,8 @@ double FEDamageCriterionDeshpandeFleck::DamageCriterion(FEMaterialPoint& pt)
                       + 6*(SQR(s.xy()) + SQR(s.yz()) + SQR(s.xz())))/2);
     double sm = s.tr()/3;
     double beta = m_beta(pt);
-    double Phi = sqrt((se*se+3*pow(beta*sm,2))/(1+beta*beta));
-    
+    double Phi = sqrt((se*se+pow(3*beta*sm,2))/(1+beta*beta));
+
     return Phi;
 }
 
@@ -339,5 +339,5 @@ mat3ds FEDamageCriterionDeshpandeFleck::CriterionStressTangent(FEMaterialPoint& 
     double sm = s.tr()/3;
     double beta = m_beta(pt);
     mat3dd I(1);
-    return s.dev()*3 + I*(2*beta*beta);
+    return (s.dev()/2+I*(beta*beta*sm))*(3/(sqrt(se*se+pow(3*beta*sm,2))*sqrt(1+beta*beta)));
 }

@@ -1024,7 +1024,7 @@ bool FEPlotElementDeshpandeFleckStress::Save(FEDomain& dom, FEDataStream& a)
         double se = sqrt((pow(s.xx()-s.yy(),2) + pow(s.yy()-s.zz(),2) + pow(s.zz()-s.xx(),2)
                            + 6*(pow(s.xy(),2) + pow(s.yz(),2) + pow(s.xz(),2)))/2);
         double sm = s.tr()/3;
-        double Phi = sqrt((se*se+3*pow(beta*sm,2))/(1+beta*beta));
+        double Phi = sqrt((se*se+pow(3*beta*sm,2))/(1+beta*beta));
         return Phi;
         });
 
