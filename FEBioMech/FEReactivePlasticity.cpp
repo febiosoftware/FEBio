@@ -145,21 +145,26 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         
         // find Fv
         bool conv = false;
+        bool done = false;
+        int maxit = 20;
         int iter = 0;
-        double lam = 0;
-        mat3d Fv = Fe;
+        double lam = pp.m_lamp[i];
+        mat3d Fu = Fe;
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
-        pe.m_F = Fv; pe.m_J = Fv.det();
-        mat3ds Uv = pe.RightStretch();
+        pe.m_F = Fu; pe.m_J = Fu.det();
+        mat3ds Uu = pe.RightStretch();
         mat3ds Nv = YieldSurfaceNormal(pt);
         double Nvmag = Nv.norm();
         mat3dd I(1);
+        mat3ds Uv = (Uu*(I-Nv*(lam/Nvmag))).sym();
+        mat3d Fv;
         double beta = 1;
         mat3ds ImN = I;
-        double phi0=0, phi1=0, phi2=0, lam1=0, lam2=0, a, b, c=0, d;
-        while (!conv) {
+        double phi0=0, phi1=0, phi2=0, lam1=lam, lam2=lam, a, b, c=0, d;
+        while (!done) {
             ++iter;
+            Fv = R*Uv;
             pe.m_F = Fv; pe.m_J = Fv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
@@ -204,19 +209,30 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                     else
                         lam = 0;
                 }
-                conv = true;
+                if (fabs(phi) < m_rtol) { conv = true; done = true; }
             }
             ImN = I - Nv*(lam/Nvmag);
             if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
             Uv = (Ue*ImN).sym()*beta;
+            if (fabs(phi) < m_rtol) { conv = true; done = true; }
+            if (iter > maxit) done = true;
+        }
+        if (conv) {
+            pp.m_lamt[i] = lam;
+        }
+        else {
+//            feLogWarning("Reactive plasticity iterations did not converge for bond family %d\n",i);
+            pp.m_lamt[i] = pp.m_lamp[i];
+            pe.m_F = Fu; pe.m_J = Fu.det();
+            mat3ds Nv = YieldSurfaceNormal(pt);
+            Nvmag = Nv.norm();
+            Uv = (Uu*(I-Nv*(pp.m_lamt[i]/Nvmag))).sym();
             Fv = R*Uv;
-            if (fabs(dlam) <= m_rtol*fabs(lam)) conv = true;
-            if (fabs(lam) <= m_rtol*m_rtol) conv = true;
         }
         pe.m_F = Fv; pe.m_J = Fv.det();
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-        pe.m_F = Ftmp; pe.m_J = Jtmp;
         pp.m_Fvsi[i] = Fs.inverse()*Fv;
+        pe.m_F = Ftmp; pe.m_J = Jtmp;
     }
 
     // if bond family has not yielded at this instant, and had not yielded at previous times,
@@ -432,9 +448,11 @@ void FEReactivePlasticity::ReactiveHeatSupplyDensity(FEMaterialPoint& pt)
 // update plasticity material point at each iteration
 void FEReactivePlasticity::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp)
 {
+    int n = (int)m_pFlow->BondFamilies(pt);
+    FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
+    for (int i=0; i<n; ++i) pp.m_lamp[i] = pp.m_lamt[i];
     // initialize flow curve (if not done yet)
     if (m_pFlow->InitFlowCurve(pt)) {
-        FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
         pp.Init();
     }
 }

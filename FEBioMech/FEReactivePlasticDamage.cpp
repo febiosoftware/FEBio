@@ -170,6 +170,8 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
         // find Fv
         bool conv = false;
         int iter = 0;
+        bool done = false;
+        int maxit = 100;
         double lam = 0;
         mat3d Fv = Fe;
         Ftmp = pe.m_F;  // store safe copy
@@ -182,8 +184,9 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
         double beta = 1;
         mat3ds ImN = I;
         double phi0=0, phi1=0, phi2=0, lam1=0, lam2=0, a, b, c=0, d;
-        while (!conv) {
+        while (!done) {
             ++iter;
+            Fv = R*Uv;
             pe.m_F = Fv; pe.m_J = Fv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
@@ -228,19 +231,21 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
                     else
                         lam = 0;
                 }
-                conv = true;
+                if (fabs(phi) < m_rtol) { conv = true; done = true; }
             }
             ImN = I - Nv*(lam/Nvmag);
             if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
             Uv = (Ue*ImN).sym()*beta;
-            Fv = R*Uv;
-            if (fabs(dlam) <= m_rtol*fabs(lam)) conv = true;
-            if (fabs(lam) <= m_rtol*m_rtol) conv = true;
+            if (fabs(phi) < m_rtol) { conv = true; done = true; }
+            if (iter > maxit) done = true;
         }
-        pe.m_F = Fv; pe.m_J = Fv.det();
-        pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
+        if (conv) {
+            pp.m_Kv[i] = phi +fp.m_Ky[i];
+            pp.m_Fvsi[i] = Fs.inverse()*Fv;
+        }
+        else
+            feLogWarning("Reactive plastic damage iterations did not converge for bond family %d\n",i);
         pe.m_F = Ftmp; pe.m_J = Jtmp;
-        pp.m_Fvsi[i] = Fs.inverse()*Fv;
     }
     
     // evaluate octahedral plastic strain

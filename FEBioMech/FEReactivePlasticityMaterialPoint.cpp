@@ -44,6 +44,8 @@ FEMaterialPointData* FEReactivePlasticityMaterialPoint::Copy()
 	pt->m_gp = m_gp;
 	pt->m_gpp = m_gpp;
 	pt->m_gc = m_gc;
+    pt->m_lamt = m_lamt;
+    pt->m_lamp = m_lamp;
     pt->m_byld = m_byld;
 
     return pt;
@@ -70,6 +72,8 @@ void FEReactivePlasticityMaterialPoint::Init()
         m_gp.assign(n, 0);
         m_gpp.assign(n, 0);
         m_gc.assign(n, 0);
+        m_lamt.assign(n,0);
+        m_lamp.assign(n,0);
         m_byld.assign(n,false);
         m_Rhat = 0;
 
@@ -103,13 +107,13 @@ void FEReactivePlasticityMaterialPoint::Serialize(DumpStream& ar)
     if (ar.IsSaving())
     {
         ar << m_Rhat << m_Fp;
-        ar << m_w << m_Fusi << m_Fvsi << m_Ku << m_Kv << m_gp << m_gpp << m_gc;
+        ar << m_w << m_Fusi << m_Fvsi << m_Ku << m_Kv << m_gp << m_gpp << m_gc << m_lamt << m_lamp;
         ar << m_byld;
     }
     else
     {
         ar >> m_Rhat >> m_Fp;
-        ar >> m_w >> m_Fusi >> m_Fvsi >> m_Ku >> m_Kv >> m_gp >> m_gpp >> m_gc;
+        ar >> m_w >> m_Fusi >> m_Fvsi >> m_Ku >> m_Kv >> m_gp >> m_gpp >> m_gc >> m_lamt >> m_lamp;
         ar >> m_byld;
     }
 }

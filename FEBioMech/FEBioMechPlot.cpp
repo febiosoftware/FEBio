@@ -66,6 +66,7 @@ SOFTWARE.*/
 #include "FETiedContactSurface.h"
 #include "FEStickyInterface.h"
 #include "FEReactiveVEMaterialPoint.h"
+#include "FEReactivePlasticityMaterialPoint.h"
 #include "FELinearTrussDomain.h"
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
@@ -960,6 +961,23 @@ bool FEPlotElementPK1Stress::Save(FEDomain& dom, FEDataStream& a)
 		});
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the average element yield stress
+bool FEPlotElementPlasticYieldStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
+    if ((pme == 0) || pme->IsRigid()) return false;
+    FEReactivePlasticity* pmp = pme->ExtractProperty<FEReactivePlasticity>();
+    if (pmp == nullptr) return false;
+
+    writeAverageElementValue<double>(dom, a, [&pmp](const FEMaterialPoint& mp) {
+        const FEReactivePlasticityMaterialPoint& pp = *mp.ExtractData< FEReactivePlasticityMaterialPoint>();
+        if (pp.m_Kv.size() > 0) return pp.m_Kv[0];
+    });
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------

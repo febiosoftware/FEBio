@@ -437,6 +437,15 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Element yield stress based on Drucker shear stress criterion
+class FEPlotElementPlasticYieldStress : public FEPlotDomainData
+{
+public:
+    FEPlotElementPlasticYieldStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Element yield stress based on Drucker shear stress criterion
 class FEPlotElementDruckerShear : public FEPlotDomainData
 {
 public:
