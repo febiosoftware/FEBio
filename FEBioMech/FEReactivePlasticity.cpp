@@ -161,7 +161,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         mat3d Fv;
         double beta = 1;
         mat3ds ImN = I;
-        double phi0=0, phi1=0, phi2=0, lam1=lam, lam2=lam, a, b, c=0, d;
+        double phi0=0, phi1=0, phi2=0, lam0=0, lam1=0, lam2=0, a, b, c=0, d;
         while (!done) {
             ++iter;
             Fv = R*Uv;
@@ -170,7 +170,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
             if (iter == 1) {
                 phi0 = phi;
-                c = phi0;
+                lam0 = lam;
             }
             else if (iter == 2) {
                 phi1 = phi;
@@ -186,13 +186,16 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             double dlam = -phi/(Nv*dUvdlam.transpose()).trace();
             lam += dlam;
             if (iter == 3) {
-                d = lam1*lam2*(lam1-lam2);
+                d = (lam0-lam1)*(lam0-lam2)*(lam1-lam2);
                 if (d == 0) {
-                    lam = (lam1*lam2 == 0) ? 0 : lam2;
+                    if (lam0 == lam1) lam = lam1;
+                    if (lam1 == lam2) lam = lam2;
+                    if (lam0 == lam2) lam = lam2;
                 }
                 else {
-                    a = (lam2*(phi1-phi0)-lam1*(phi2-phi0))/d;
-                    b = ((phi2-phi0)*lam1*lam1-(phi1-phi0)*lam2*lam2)/d;
+                    a = (lam2*(phi1-phi0)+lam1*(phi0-phi2)+lam0*(phi2-phi1))/d;
+                    b = (pow(lam2,2)*(phi0-phi1)+pow(lam0,2)*(phi1-phi2)+pow(lam1,2)*(phi2-phi0))/d;
+                    c = (lam0*lam2*(lam2-lam0)*phi1+pow(lam1,2)*(lam2*phi0-lam0*phi2)+lam1*(pow(lam0,2)*phi2-pow(lam2,2)*phi0))/d;
                     d = b*b - 4*a*c;
                     if (d >= 0) {
                         if (a != 0) {
@@ -201,19 +204,23 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                             lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
                         }
                         else if (b != 0) lam = -c/b;
-                        else lam = 0;
+                        else lam = lam0;
                     }
                     else if (a != 0) {
                         lam = -b/(2*a);
                     }
                     else
-                        lam = 0;
+                        lam = lam0;
                 }
+                phi = a*pow(lam,2) + b*lam + c;
                 if (fabs(phi) < m_rtol) { conv = true; done = true; }
+//                conv = true; done = true;
             }
             ImN = I - Nv*(lam/Nvmag);
             if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
             Uv = (Ue*ImN).sym()*beta;
+            if (fabs(dlam) <= m_rtol*fabs(lam)) { conv = true; done = true; }
+            if (fabs(lam) <= m_rtol*m_rtol) { conv = true; done = true; }
             if (fabs(phi) < m_rtol) { conv = true; done = true; }
             if (iter > maxit) done = true;
         }
