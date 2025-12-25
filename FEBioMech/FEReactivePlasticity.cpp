@@ -158,13 +158,13 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         double Nvmag = Nv.norm();
         mat3dd I(1);
         mat3ds Uv = (Uu*(I-Nv*(lam/Nvmag))).sym();
-        mat3d Fv;
+        mat3d Fv = R*Uv;
         double beta = 1;
         mat3ds ImN = I;
         double phi0=0, phi1=0, phi2=0, lam0=0, lam1=0, lam2=0, a, b, c=0, d;
+        // fit phi = a*lam^2 + b*lam + c and solve for its roots, to get phi = 0;
         while (!done) {
             ++iter;
-            Fv = R*Uv;
             pe.m_F = Fv; pe.m_J = Fv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
@@ -188,9 +188,9 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             if (iter == 3) {
                 d = (lam0-lam1)*(lam0-lam2)*(lam1-lam2);
                 if (d == 0) {
-                    if (lam0 == lam1) lam = lam1;
-                    if (lam1 == lam2) lam = lam2;
-                    if (lam0 == lam2) lam = lam2;
+                    if (lam0 == lam1) { lam = lam1; phi = phi1; }
+                    if (lam1 == lam2) { lam = lam2; phi = phi2; }
+                    if (lam0 == lam2) { lam = lam2; phi = phi2; }
                 }
                 else {
                     a = (lam2*(phi1-phi0)+lam1*(phi0-phi2)+lam0*(phi2-phi1))/d;
@@ -200,8 +200,10 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                     if (d >= 0) {
                         if (a != 0) {
                             lam1 = (-b+sqrt(d))/(2*a);
+                            phi1 = a*pow(lam1,2) + b*lam1 + c;
                             lam2 = (-b-sqrt(d))/(2*a);
-                            lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
+                            phi2 = a*pow(lam2,2) + b*lam2 + c;
+                            lam = (fabs(phi1) < fabs(phi2)) ? lam1 : lam2;
                         }
                         else if (b != 0) lam = -c/b;
                         else lam = lam0;
@@ -211,16 +213,15 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                     }
                     else
                         lam = lam0;
+                    phi = a*pow(lam,2) + b*lam + c;
+                    if (fabs(phi) < m_rtol) { conv = true; done = true; }
                 }
-                phi = a*pow(lam,2) + b*lam + c;
-                if (fabs(phi) < m_rtol) { conv = true; done = true; }
-//                conv = true; done = true;
             }
             ImN = I - Nv*(lam/Nvmag);
             if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
             Uv = (Ue*ImN).sym()*beta;
+            Fv = R*Uv;
             if (fabs(dlam) <= m_rtol*fabs(lam)) { conv = true; done = true; }
-            if (fabs(lam) <= m_rtol*m_rtol) { conv = true; done = true; }
             if (fabs(phi) < m_rtol) { conv = true; done = true; }
             if (iter > maxit) done = true;
         }
