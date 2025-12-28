@@ -1,31 +1,32 @@
 /*This file is part of the FEBio source code and is licensed under the MIT license
-listed below.
-
-See Copyright-FEBio.txt for details.
-
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
-the City of New York, and others.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.*/
+ listed below.
+ 
+ See Copyright-FEBio.txt for details.
+ 
+ Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+ the City of New York, and others.
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <cmath>
 #include "FEReactivePlasticity.h"
 #include "FEDamageCriterion.h"
 #include "FEElasticMaterial.h"
@@ -38,14 +39,14 @@ SOFTWARE.*/
 //////////////////////// PLASTICITY MATERIAL  /////////////////////////////////
 // define the material parameters
 BEGIN_FECORE_CLASS(FEReactivePlasticity, FEElasticMaterial)
-    // set material properties
-    ADD_PROPERTY(m_pBase, "elastic");
-    ADD_PROPERTY(m_pCrit, "yield_criterion");
-    ADD_PROPERTY(m_pFlow, "flow_curve");
+// set material properties
+ADD_PROPERTY(m_pBase, "elastic");
+ADD_PROPERTY(m_pCrit, "yield_criterion");
+ADD_PROPERTY(m_pFlow, "flow_curve");
 
-    ADD_PARAMETER(m_isochrc, "isochoric");
-    ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
-    ADD_PARAMETER(m_secant_tangent, "secant_tangent");
+ADD_PARAMETER(m_isochrc, "isochoric");
+ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
+ADD_PARAMETER(m_secant_tangent, "secant_tangent");
 
 END_FECORE_CLASS();
 
@@ -58,7 +59,7 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
     m_pBase = nullptr;
     m_pCrit = nullptr;
     m_pFlow = nullptr;
-	m_secant_tangent = true;
+    m_secant_tangent = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +67,7 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
 bool FEReactivePlasticity::Init()
 {
     if (m_pFlow->Init() == false) return false;
-
+    
     return FEElasticMaterial::Init();
 }
 
@@ -105,7 +106,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
     FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
     FEPlasticFlowCurveMaterialPoint& fp = *pt.ExtractData<FEPlasticFlowCurveMaterialPoint>();
     FEShellElementNew* sel = dynamic_cast<FEShellElementNew*>(pt.m_elem);
-
+    
     for (int i=0; i<n; ++i) {
         mat3d Fs = pe.m_F;
         mat3d R = pe.m_F*pe.RightStretchInverse();
@@ -119,7 +120,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             Fs = R*Us;
         }
         mat3d Fe = Fs*pp.m_Fusi[i];
-
+        
         // store safe copy of total deformation gradient
         mat3d Ftmp = pe.m_F;
         double Jtmp = pe.m_J;
@@ -148,35 +149,32 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         bool done = false;
         int maxit = 20;
         int iter = 0;
-        double lam = pp.m_lamp[i];
-        mat3d Fu = Fe;
+        double lam = 0;
+        mat3d Fv = Fe;
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
-        pe.m_F = Fu; pe.m_J = Fu.det();
-        mat3ds Uu = pe.RightStretch();
+        pe.m_F = Fv; pe.m_J = Fv.det();
+        mat3ds Uv = pe.RightStretch();
         mat3ds Nv = YieldSurfaceNormal(pt);
         double Nvmag = Nv.norm();
         mat3dd I(1);
-        mat3ds Uv = (Uu*(I-Nv*(lam/Nvmag))).sym();
-        mat3d Fv = R*Uv;
         double beta = 1;
         mat3ds ImN = I;
-        double phi0=0, phi1=0, phi2=0, lam0=0, lam1=0, lam2=0, a, b, c=0, d;
-        // fit phi = a*lam^2 + b*lam + c and solve for its roots, to get phi = 0;
+        double phi0=0, phi1=0, phi2=0, lam0 = 0, lam1=0, lam2=0, a, b, c=0, d;
         while (!done) {
-            ++iter;
             pe.m_F = Fv; pe.m_J = Fv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
-            if (iter == 1) {
+            int it = iter % 3;
+            if (it == 0) {
                 phi0 = phi;
                 lam0 = lam;
             }
-            else if (iter == 2) {
+            else if (it == 1) {
                 phi1 = phi;
                 lam1 = lam;
             }
-            else if (iter == 3) {
+            else if (it == 2) {
                 phi2 = phi;
                 lam2 = lam;
             }
@@ -185,64 +183,52 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                 dUvdlam += Ue*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
             double dlam = -phi/(Nv*dUvdlam.transpose()).trace();
             lam += dlam;
-            if (iter == 3) {
+            if (it == 2) {
                 d = (lam0-lam1)*(lam0-lam2)*(lam1-lam2);
                 if (d == 0) {
-                    if (lam0 == lam1) { lam = lam1; phi = phi1; }
-                    if (lam1 == lam2) { lam = lam2; phi = phi2; }
-                    if (lam0 == lam2) { lam = lam2; phi = phi2; }
+                    if (lam0 == lam1) lam = lam1;
+                    else if (lam1 == lam2) lam = lam2;
+                    else lam = 2;
                 }
                 else {
                     a = (lam2*(phi1-phi0)+lam1*(phi0-phi2)+lam0*(phi2-phi1))/d;
                     b = (pow(lam2,2)*(phi0-phi1)+pow(lam0,2)*(phi1-phi2)+pow(lam1,2)*(phi2-phi0))/d;
-                    c = (lam0*lam2*(lam2-lam0)*phi1+pow(lam1,2)*(lam2*phi0-lam0*phi2)+lam1*(pow(lam0,2)*phi2-pow(lam2,2)*phi0))/d;
+                    c = (lam0*lam2*(lam2-lam0)*phi1+pow(lam1,2)*(lam2*phi0-lam0*phi2)+lam1*(phi2*pow(lam0,2)-phi0*pow(lam2,2)))/d;
                     d = b*b - 4*a*c;
                     if (d >= 0) {
                         if (a != 0) {
                             lam1 = (-b+sqrt(d))/(2*a);
-                            phi1 = a*pow(lam1,2) + b*lam1 + c;
                             lam2 = (-b-sqrt(d))/(2*a);
-                            phi2 = a*pow(lam2,2) + b*lam2 + c;
-                            lam = (fabs(phi1) < fabs(phi2)) ? lam1 : lam2;
+                            lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
                         }
                         else if (b != 0) lam = -c/b;
-                        else lam = lam0;
+                        else lam = 0;
                     }
                     else if (a != 0) {
                         lam = -b/(2*a);
                     }
                     else
-                        lam = lam0;
-                    phi = a*pow(lam,2) + b*lam + c;
-                    if (fabs(phi) < m_rtol) { conv = true; done = true; }
+                        lam = (fabs(b) > 0) ? -c/b : 0;
                 }
+                phi = a*pow(lam,2) + b*lam +  c;
+                if (fabs(phi) < m_rtol) { conv = true; done = true; }
             }
             ImN = I - Nv*(lam/Nvmag);
             if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
             Uv = (Ue*ImN).sym()*beta;
             Fv = R*Uv;
-            if (fabs(dlam) <= m_rtol*fabs(lam)) { conv = true; done = true; }
-            if (fabs(phi) < m_rtol) { conv = true; done = true; }
-            if (iter > maxit) done = true;
+//            if (fabs(dlam) <= m_rtol*fabs(lam)) { conv = true; done = true;}
+            if (fabs(phi) <= m_rtol) { conv = true; done = true;}
+            if (++iter > maxit) done = true;
         }
-        if (conv) {
-            pp.m_lamt[i] = lam;
-        }
-        else {
-//            feLogWarning("Reactive plasticity iterations did not converge for bond family %d\n",i);
-            pp.m_lamt[i] = pp.m_lamp[i];
-            pe.m_F = Fu; pe.m_J = Fu.det();
-            mat3ds Nv = YieldSurfaceNormal(pt);
-            Nvmag = Nv.norm();
-            Uv = (Uu*(I-Nv*(pp.m_lamt[i]/Nvmag))).sym();
-            Fv = R*Uv;
-        }
+        if (!conv) feLogWarning("Plasticity iterations did not converge!\n");
         pe.m_F = Fv; pe.m_J = Fv.det();
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-        pp.m_Fvsi[i] = Fs.inverse()*Fv;
+        pp.m_Kv[i]  = phi + fp.m_Ky[i];
         pe.m_F = Ftmp; pe.m_J = Jtmp;
+        pp.m_Fvsi[i] = Fs.inverse()*Fv;
     }
-
+    
     // if bond family has not yielded at this instant, and had not yielded at previous times,
     // reset the mass fraction of yielded bonds to zero (in case m_w[i] was
     // set to w[i] during a prior iteration at current time)
@@ -256,7 +242,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
     // evaluate octahedral plastic strain
     OctahedralPlasticStrain(pt);
     ReactiveHeatSupplyDensity(pt);
-
+    
     return;
 }
 
@@ -266,7 +252,7 @@ mat3ds FEReactivePlasticity::Stress(FEMaterialPoint& pt)
 {
     ElasticDeformationGradient(pt);
     int n = (int)m_pFlow->BondFamilies(pt);
-
+    
     // extract elastic material point
     FEElasticMaterialPoint& pe = *pt.ExtractData<FEElasticMaterialPoint>();
     // extract plastic material point
@@ -301,7 +287,7 @@ tens4ds FEReactivePlasticity::Tangent(FEMaterialPoint& pt)
 {
     ElasticDeformationGradient(pt);
     int n = (int)m_pFlow->BondFamilies(pt);
-
+    
     // extract elastic material point
     FEElasticMaterialPoint& pe = *pt.ExtractData<FEElasticMaterialPoint>();
     // extract plastic material point
@@ -336,7 +322,7 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
 {
     ElasticDeformationGradient(pt);
     int n = (int)m_pFlow->BondFamilies(pt);
-
+    
     // extract elastic material point
     FEElasticMaterialPoint& pe = *pt.ExtractData<FEElasticMaterialPoint>();
     // extract plastic material point
@@ -353,7 +339,7 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
             // store safe copy of total deformation gradient
             mat3d Fs = pe.m_F; double Js = pe.m_J;
             pe.m_F = Fv; pe.m_J = Fv.det();
-
+            
             // evaluate the tangent using the elastic deformation gradient
             sed += m_pBase->StrainEnergyDensity(pt)*pp.m_w[i]/Jvsi;
             
@@ -370,7 +356,7 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
 // get the yield surface normal
 mat3ds FEReactivePlasticity::YieldSurfaceNormal(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
+    FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
     mat3ds s = m_pBase->Stress(mp);
     tens4ds c = m_pBase->Tangent(mp);
     mat3ds dPhi = m_pCrit->CriterionStressTangent(mp);
@@ -420,7 +406,7 @@ void FEReactivePlasticity::ReactiveHeatSupplyDensity(FEMaterialPoint& pt)
     mat3d Fs = pe.m_F; double Js = pe.m_J;
     
     int n = (int)m_pFlow->BondFamilies(pt);
-
+    
     for (int i=0; i<n; ++i) {
         if (pp.m_w[i] > 0) {
             // get the elastic deformation gradients
@@ -428,7 +414,7 @@ void FEReactivePlasticity::ReactiveHeatSupplyDensity(FEMaterialPoint& pt)
             
             // evaluate strain energy density in the absence of yielding
             pe.m_F = Fu; pe.m_J = Fu.det();
-
+            
             // evaluate the tangent using the elastic deformation gradient
             Rhat += m_pBase->StrainEnergyDensity(pt)*pp.m_w[i];
             
@@ -436,7 +422,7 @@ void FEReactivePlasticity::ReactiveHeatSupplyDensity(FEMaterialPoint& pt)
             
             // evaluate strain energy density in the absence of yielding
             pe.m_F = Fv; pe.m_J = Fv.det();
-
+            
             // evaluate the tangent using the elastic deformation gradient
             Rhat -= m_pBase->StrainEnergyDensity(pt)*pp.m_w[i];
         }
@@ -447,7 +433,7 @@ void FEReactivePlasticity::ReactiveHeatSupplyDensity(FEMaterialPoint& pt)
     
     // restore the original deformation gradient
     pe.m_F = Fs; pe.m_J = Js;
-
+    
     // return the reactive heat supply
     pp.m_Rhat = Rhat;
 }
@@ -456,11 +442,9 @@ void FEReactivePlasticity::ReactiveHeatSupplyDensity(FEMaterialPoint& pt)
 // update plasticity material point at each iteration
 void FEReactivePlasticity::UpdateSpecializedMaterialPoints(FEMaterialPoint& pt, const FETimeInfo& tp)
 {
-    int n = (int)m_pFlow->BondFamilies(pt);
-    FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
-    for (int i=0; i<n; ++i) pp.m_lamp[i] = pp.m_lamt[i];
     // initialize flow curve (if not done yet)
     if (m_pFlow->InitFlowCurve(pt)) {
+        FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
         pp.Init();
     }
 }
