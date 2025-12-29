@@ -161,6 +161,8 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         double beta = 1;
         mat3ds ImN = I;
         double phi0=0, phi1=0, phi2=0, lam0 = 0, lam1=0, lam2=0, a, b, c=0, d;
+        bool mroot = false;
+        double lroot = 0;
         while (!done) {
             pe.m_F = Fv; pe.m_J = Fv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
@@ -199,13 +201,27 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                         if (a != 0) {
                             lam1 = (-b+sqrt(d))/(2*a);
                             lam2 = (-b-sqrt(d))/(2*a);
-                            lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
+                            if (lam1*lam2 < 0) lam = max(lam1,lam2);
+                            else {
+                                mroot = true;
+                                lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
+                                lroot = (fabs(lam1) >= fabs(lam2)) ? lam1 : lam2;
+                            }
                         }
                         else if (b != 0) lam = -c/b;
                         else lam = 0;
                     }
                     else if (a != 0) {
-                        lam = -b/(2*a);
+                        // first try a least squares linear fit
+                        double sx = lam0 + lam1 + lam2;
+                        double sy = phi0 + phi1 + phi2;
+                        double sx2 = pow(lam0,2) + pow(lam1,2) + pow(lam2,2);
+                        double sxy = lam0*phi0 + lam1*phi1 + lam2*phi2;
+                        double slope = (3*sxy - sx*sy)/(3*sx2 - pow(sx,2));
+                        double intercept = (sy - slope*sx)/3;
+                        lam = -intercept/slope;
+                        // if that produces a negative root, use the minimum of the parabola
+                        if (lam < 0) lam = -b/(2*a);
                     }
                     else
                         lam = (fabs(b) > 0) ? -c/b : 0;
@@ -217,11 +233,19 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
             Uv = (Ue*ImN).sym()*beta;
             Fv = R*Uv;
-//            if (fabs(dlam) <= m_rtol*fabs(lam)) { conv = true; done = true;}
             if (fabs(phi) <= m_rtol) { conv = true; done = true;}
             if (++iter > maxit) done = true;
+            if (done && !conv && mroot) {
+                done = mroot = false;
+                lam = lroot;
+                ImN = I - Nv*(lam/Nvmag);
+                if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
+                Uv = (Ue*ImN).sym()*beta;
+                Fv = R*Uv;
+            }
         }
-        if (!conv) feLogWarning("Plasticity iterations did not converge!\n");
+        if (!conv)
+            feLogWarning("Plasticity iterations did not converge for bond family %d!\n",i);
         pe.m_F = Fv; pe.m_J = Fv.det();
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
         pp.m_Kv[i]  = phi + fp.m_Ky[i];
