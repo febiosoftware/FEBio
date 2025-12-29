@@ -190,7 +190,7 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                 if (d == 0) {
                     if (lam0 == lam1) lam = lam1;
                     else if (lam1 == lam2) lam = lam2;
-                    else lam = 2;
+                    else lam = lam2;
                 }
                 else {
                     a = (lam2*(phi1-phi0)+lam1*(phi0-phi2)+lam0*(phi2-phi1))/d;
