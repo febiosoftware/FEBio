@@ -40,6 +40,8 @@ public:
 	double dy() { return (m_r1.y - m_r0.y)/(double) (m_img.height() - 1); }
 	double dz() { int nz = m_img.depth(); if (nz == 1) return 1.0; else return (m_r1.z - m_r0.z)/(double) (m_img.depth () - 1); }
 
+    Image& GetImage() { return m_img; }
+
 protected:
 	double grad_x(int i, int j, int k);
 	double grad_y(int i, int j, int k);

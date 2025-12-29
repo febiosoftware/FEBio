@@ -8,4 +8,4 @@ then
 fi
 
 $SUDO pip install aqtinstall -v
-$SUDO aqt install-qt --outputdir /opt/Qt linux desktop 6.7.3 -m all
+$SUDO aqt install-qt --outputdir /opt/Qt linux desktop 6.9.3 -m all
