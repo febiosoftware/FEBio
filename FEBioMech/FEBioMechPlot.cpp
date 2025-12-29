@@ -963,6 +963,24 @@ bool FEPlotElementPK1Stress::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
+//! Store the average element plastic yield stress
+bool FEPlotElementPlasticYieldStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    FESolidMaterial* pme = dom.GetMaterial()->ExtractProperty<FESolidMaterial>();
+    if ((pme == 0) || pme->IsRigid()) return false;
+    FEReactivePlasticity* pmp = pme->ExtractProperty<FEReactivePlasticity>();
+    if (pmp == nullptr) return false;
+
+    writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEReactivePlasticityMaterialPoint& pp = *mp.ExtractData<FEReactivePlasticityMaterialPoint>();
+        if (pp.m_Kv.size() > 0) return pp.m_Kv[0];
+        return 0.0;
+    });
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 //! Store the average element yield stress based on Drucker shear stress criterion
 bool FEPlotElementDruckerShear::Save(FEDomain& dom, FEDataStream& a)
 {
