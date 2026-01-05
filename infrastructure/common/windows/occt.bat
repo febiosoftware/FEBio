@@ -36,7 +36,8 @@ cmake . -B cmbuild ^
   -DUSE_TBB:BOOL=OFF ^
   -DUSE_TK:BOOL=OFF ^
   -DUSE_VTK:BOOL=OFF ^
-  -DUSE_XLIB:BOOL=OFF
+  -DUSE_XLIB:BOOL=OFF ^
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 pushd cmbuild
 msbuild /P:Configuration=Release /m:%NUMBER_OF_PROCESSORS% INSTALL.vcxproj

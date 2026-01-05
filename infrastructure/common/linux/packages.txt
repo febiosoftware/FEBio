@@ -33,3 +33,13 @@ patchelf
 zip
 python3-pip
 libfftw3-dev
+libvulkan-dev
+vulkan-tools
+build-essential
+libssl-dev
+zlib1g-dev
+libbz2-dev
+libreadline-dev
+libffi-dev
+liblzma-dev
+uuid-dev

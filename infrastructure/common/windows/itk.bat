@@ -12,7 +12,8 @@ cmake .  -LA -B cmbuild ^
   -DITK_USE_SYSTEM_EIGEN:BOOL=ON ^
   -DITK_WRAP_PYTHON:BOOL=OFF ^
   -DITK_DOXYGEN_HTML:BOOL=OFF ^
-  -DCMAKE_BUILD_TYPE=Release
+  -DCMAKE_BUILD_TYPE=Release ^
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 pushd cmbuild
 msbuild /P:Configuration=Release /m:%NUMBER_OF_PROCESSORS% INSTALL.vcxproj
 popd
