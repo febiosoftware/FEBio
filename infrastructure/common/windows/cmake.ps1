@@ -1,0 +1,1 @@
+choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' --apply-install-arguments-to-dependencies -y

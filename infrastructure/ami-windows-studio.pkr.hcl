@@ -27,7 +27,7 @@ variable "installation_path" {
 
 data "amazon-ami" "windows" {
   filters = {
-    name             = "packer-provisioned-windows-2019-intel-oneapi-*"
+    name             = "packer-provisioned-windows-2022-intel-oneapi-*"
     root-device-type = "ebs"
   }
 
@@ -52,7 +52,7 @@ variable "skip_create_ami" {
 }
 
 source "amazon-ebs" "windows" {
-  ami_name      = "packer-provisioned-windows-2019-febio-studio-${local.buildtime}"
+  ami_name      = "packer-provisioned-windows-2022-febio-studio-${local.buildtime}"
   instance_type = "c5a.8xlarge"
   source_ami    = data.amazon-ami.windows.id
 
@@ -100,6 +100,12 @@ build {
 
   provisioner "powershell" {
     script = "./common/windows/jq.ps1"
+    env    = local.environment
+  }
+
+  # cmake
+  provisioner "powershell" {
+    script = "./common/windows/cmake.ps1"
     env    = local.environment
   }
 
@@ -215,7 +221,7 @@ build {
   # sysprep for next launch
   provisioner "powershell" {
     inline = [
-      "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
+      "& 'C:\\Program Files\\Amazon\\EC2Launch\\EC2Launch.exe' sysprep"
     ]
   }
 }
