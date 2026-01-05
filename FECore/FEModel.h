@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "Callback.h"
 #include "FECoreKernel.h"
 #include "DataStore.h"
+#include "FEDataValue.h"
 #include <string>
 
 //-----------------------------------------------------------------------------
@@ -362,6 +363,9 @@ public: // --- parameter functions ---
 
 	//! Get the print parameter flag
 	bool GetPrintParametersFlag() const;
+
+	//! return a data value object
+	FEDataValue GetDataValue(const ParamString& s);
 
 public:	// --- Miscellaneous routines ---
 

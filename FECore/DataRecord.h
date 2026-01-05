@@ -23,15 +23,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include <stdio.h>
 #include <string>
 #include <vector>
 #include <stdexcept>
 #include "FECoreBase.h"
+#include "FELogData.h"
 #include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
@@ -112,12 +110,4 @@ protected:
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record
 	FILE*		m_fp;
-};
-
-//=========================================================================
-// Super class for log data classes. 
-class FECORE_API FELogData : public FECoreBase
-{
-public:
-	FELogData(FEModel* fem);
 };

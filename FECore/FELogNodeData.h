@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2025 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,38 +24,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FECoreBase.h"
-#include "DataRecord.h"
-#include "FELogElemData.h"
+#include "FELogData.h"
 
-class FEElement;
-class FEElementSet;
+class FENode;
 
-class FECORE_API ElementDataRecord : public DataRecord
+//! This is the base class for a node data value.
+class FECORE_API FELogNodeData : public FELogData
 {
-	struct ELEMREF
-	{
-		int	ndom;
-		int	nid;
-	};
+	FECORE_SUPER_CLASS(FELOGNODEDATA_ID)
+	FECORE_BASE_CLASS(FELogNodeData)
 
 public:
-	ElementDataRecord(FEModel* pfem);
-	double Evaluate(int item, int ndata) override;
-	void SetData(const char* sz) override;
-	void SelectAllItems() override;
-	int Size() const override;
-	void SetElementSet(FEElementSet* pg);
-
-	void SetItemList(FEItemList* itemList, const vector<int>& selection) override;
-
-	using DataRecord::SetItemList;
-
-protected:
-	void BuildELT();
-
-protected:
-	vector<ELEMREF>	m_ELT;
-	int				m_offset;
-	vector<FELogElemData*>	m_Data;
+	FELogNodeData(FEModel* fem);
+	virtual ~FELogNodeData();
+	virtual double value(const FENode& node) = 0;
 };

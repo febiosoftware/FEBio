@@ -23,39 +23,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include "FECoreBase.h"
-#include "DataRecord.h"
-#include "FELogElemData.h"
+#include "FELogData.h"
 
-class FEElement;
-class FEElementSet;
-
-class FECORE_API ElementDataRecord : public DataRecord
+FELogData::FELogData(FEModel* fem) : FECoreBase(fem)
 {
-	struct ELEMREF
-	{
-		int	ndom;
-		int	nid;
-	};
 
-public:
-	ElementDataRecord(FEModel* pfem);
-	double Evaluate(int item, int ndata) override;
-	void SetData(const char* sz) override;
-	void SelectAllItems() override;
-	int Size() const override;
-	void SetElementSet(FEElementSet* pg);
-
-	void SetItemList(FEItemList* itemList, const vector<int>& selection) override;
-
-	using DataRecord::SetItemList;
-
-protected:
-	void BuildELT();
-
-protected:
-	vector<ELEMREF>	m_ELT;
-	int				m_offset;
-	vector<FELogElemData*>	m_Data;
-};
+}

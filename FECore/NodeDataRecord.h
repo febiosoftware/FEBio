@@ -23,28 +23,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "FECoreBase.h"
 #include "DataRecord.h"
+#include "FELogNodeData.h"
 
 class FENodeSet;
 class FENode;
-
-//-----------------------------------------------------------------------------
-//! This is the base class for a node data value.
-class FECORE_API FELogNodeData : public FELogData
-{ 
-	FECORE_SUPER_CLASS(FELOGNODEDATA_ID)
-	FECORE_BASE_CLASS(FELogNodeData)
-
-public:
-	FELogNodeData(FEModel* fem);
-	virtual ~FELogNodeData();
-	virtual double value(const FENode& node) = 0; 
-};
 
 //-----------------------------------------------------------------------------
 //! This class records nodal data

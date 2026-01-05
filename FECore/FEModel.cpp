@@ -64,6 +64,9 @@ SOFTWARE.*/
 #include "FEDiscreteDomain.h"
 #include "FEDataGenerator.h"
 #include "FEModule.h"
+#include "FELogNodeData.h"
+#include "FELogElemData.h"
+#include "log.h"
 #include <stdarg.h>
 #include <sstream>
 using namespace std;
@@ -149,6 +152,12 @@ public:
 		// allocate timers
 		// Make sure enough timers are allocated for all the TimerIds!
 		m_timers.resize(TIMER_COUNT);
+	}
+
+	~Implementation()
+	{
+		for (auto p : m_logData) delete p;
+		m_logData.clear();
 	}
 
 	void Serialize(DumpStream& ar);
@@ -251,6 +260,9 @@ public:
 
 	DumpMemStream	m_dmp;	// only used by incremental solver
 
+	// user-requested log data (via GetDataValue)
+	vector<FELogData*> m_logData;
+
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
@@ -294,6 +306,7 @@ FEModel::FEModel(void) : FECoreBase(this), m_imp(new FEModel::Implementation(thi
 FEModel::~FEModel(void)
 {
 	Clear();
+	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------
@@ -1796,6 +1809,38 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 	{
 		if (next == "mesh") return GetMeshParameter(next);
 	}
+	return val;
+}
+
+FEDataValue FEModel::GetDataValue(const ParamString& s)
+{
+	FEDataValue val;
+	if (s != GetName()) return val;
+	ParamString data = s.next();
+
+	if (data == "node_data")
+	{
+		string params = data.IDString();
+
+		FELogNodeData* pd = fecore_new<FELogNodeData>(params.c_str(), this);
+		if (pd == nullptr) { feLogError("Invalid data variable %s", params.c_str()); return val; }
+
+		m_imp->m_logData.push_back(pd);
+
+		val.SetLogData(pd);
+	}
+	else if (data == "elem_data")
+	{
+		string params = data.IDString();
+
+		FELogElemData* pd = fecore_new<FELogElemData>(params.c_str(), this);
+		if (pd == nullptr) { feLogError("Invalid data variable %s", params.c_str()); return val; }
+
+		m_imp->m_logData.push_back(pd);
+
+		val.SetLogData(pd);
+	}
+
 	return val;
 }
 

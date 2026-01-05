@@ -434,7 +434,7 @@ bool FEAnalysis::Solve()
 
 		// Inform that the time is about to change. (Plugins can use 
 		// this callback to modify time step)
-		fem.DoCallback(CB_UPDATE_TIME);
+		if (fem.DoCallback(CB_UPDATE_TIME) == false) return false;
 
 		// update time
 		FETimeInfo& tp = fem.GetTime();
