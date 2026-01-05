@@ -709,8 +709,62 @@ void FEElasticBeamDomain::ElementBodyForce(FEBeamElement& el, std::vector<double
 	}
 }
 
-//! TODO: Calculate stiffness contribution of body forces
 void FEElasticBeamDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf) 
 {
+	for (int iel = 0; iel < Elements(); ++iel)
+	{
+		FEBeamElement& el = Element(iel);
 
+		int ne = el.Nodes();
+		int ndof = ne * 6;
+
+		FEElementMatrix ke(ndof, ndof);
+		ke.zero();
+		ElementBodyForceStiffness(el, ke, bf);
+
+		vector<int> lm(ndof);
+		UnpackLM(el, lm);
+		ke.SetIndices(lm);
+		LS.Assemble(ke);
+	}
+}
+
+void FEElasticBeamDomain::ElementBodyForceStiffness(FEBeamElement& el, FEElementMatrix& ke, FEBodyForce& bf)
+{
+	// reference length of beam
+	double L0 = el.m_L0;
+
+	FEElasticBeamMaterial& mat = *m_mat;
+	double rho = mat.m_density;
+	double A_rho = mat.m_A * rho;
+
+	// loop over integration points
+	int nint = el.GaussPoints();
+	int ne = el.Nodes();
+	double* w = el.GaussWeights();
+	for (int n = 0; n < nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticBeamMaterialPoint& ebm = *(mp.ExtractData<FEElasticBeamMaterialPoint>());
+
+		// shape functions
+		double* H = el.H(n);
+
+		// J = dS / dr
+		double J = L0 / 2.0;
+
+		double wJA = w[n] * J * A_rho;
+
+		mat3d k = bf.stiffness(mp);
+
+		for (int a = 0; a < ne; ++a)
+			for (int b = 0; b < ne; ++b)
+			{
+				for (int i=0; i<3; ++i)
+					for (int j = 0; j < 3; ++j)
+					{
+						ke(a * 6 + i, b * 6 + j) -= H[a] * k[i][j] * H[b] * wJA;
+					}
+			}
+	}
 }

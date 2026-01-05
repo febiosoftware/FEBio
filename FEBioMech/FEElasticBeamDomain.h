@@ -101,6 +101,8 @@ private:
 
 	void ElementBodyForce(FEBeamElement& el, std::vector<double>& fe, FEBodyForce& f);
 
+	void ElementBodyForceStiffness(FEBeamElement& el, FEElementMatrix& ke, FEBodyForce& f);
+
 	void ElementMassMatrix(FEBeamElement& el, FEElementMatrix& ke);
 
 	void UpdateElement(FEBeamElement& el);
