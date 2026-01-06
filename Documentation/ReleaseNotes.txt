@@ -155,7 +155,7 @@ Improvements:
 * Fixed some logo issues in the documentation
 
 
-Buf fixes:
+Bug fixes:
 * Fixed issue with validation when not all properties are initialized yet. 
 * Fixed issue with reading load curves from restart input.
 * Fixed bug in building matrix profile for tied-elastic interface.
