@@ -4,7 +4,8 @@ git clone https://github.com/MmgTools/mmg.git
 pushd mmg
 git checkout v5.7.3
 cmake . -LA -B cmbuild ^
-  -DCMAKE_INSTALL_PREFIX=%INSTALLATION_PATH%
+  -DCMAKE_INSTALL_PREFIX=%INSTALLATION_PATH% ^
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 pushd cmbuild
 msbuild /P:Configuration=Release /m:%NUMBER_OF_PROCESSORS% INSTALL.vcxproj
 popd

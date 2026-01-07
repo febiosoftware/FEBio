@@ -10,6 +10,7 @@
     "zstd",
     "zlib",
     "sqlite3",
-    "fftw3"
+    "fftw3",
+    "vulkan"
   ]
 }

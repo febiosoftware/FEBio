@@ -39,6 +39,75 @@ the FEBio User's Manual for a more detailed description of the new features.
 To report any bugs or request new features, please visit the FEBio forum 
 at https://forums.febio.org/.
 
+===========================================================================
+
+ R E L E A S E   4.11  1/5/2026
+
+===========================================================================
+
+New Features:
+* Added plot variable for plastic yield stress, updated nonlinear iterative solution method for reactive plasticity to produce better results for yield criterion Deshpande-Fleck
+* Added plot variables for the Drucker shear stress, the Drucker-Prager stress criterion, and the Deshpande-Fleck stress criterion
+* Added Deshpande-Fleck yield/damage criterion
+* Added Drucker-Prager failure or yield criterion. Fixed factor of 2 error in tens4dmm::dyad4 calculation
+* Added support for "const" ElementData section.
+* Added pipette aspiration pressure load
+* Added support for reading and writing xml encode control characters.
+* Added support for MAT3F element data in VTK export.
+* Added support for FMT_MULT domain variables to VTK export. These fields are stored as nodal data.
+* Added "incremental displacement" plot variable that calculates the change in displacement from the previously stored state.
+* Implemented fiber-pow fiber material model.
+* Implemented fftw-based image blurring algorithm.
+* FEBio no longer requires a config file to run. Config files must now be explicitly added to the command line (use -config). 
+* Implemented active contraction model valid for uncoupled materials.
+
+Improvements:
+* Added body force stiffness calculation for beam domains.
+* Updated Deshpande-Fleck yield criterion to be more consistent with the paper.
+* Modified parameterization of FEEllipsoidalFiberDensityDistribution to simplify assigning maps.
+* Added option to stiffness diagnostic to only test a limited number of equations.
+* Initialized "spa" member of the "ellipsoidal" density distribution to a valid value.
+* Some minor changes to continuous fiber framework to simplify some plugin development.
+* Added error message when rve fails to load.
+* Modified sign convention in "rigid joint" to be consistent with other rigid connectors.
+* The invalid command line option is now reported to the user.
+* Allowed some whitespace in the tag's value when defining maps.
+
+Bug Fixes:
+* Fixed bug in FEBioMech/FEBioMechModule.cpp
+* Fixed method for evaluating isobaric specific heat capacity in real liquids, gases and vapors
+* Fixed minor bug to allow gap tolerance to be specified for AUGLAG in sliding-elastic, even when tol=0
+* Fixed crash in export of "PK1 norm" plot variable. (#111)
+* Fixed bug in writing mat3 data to vtk file.
+* Fixed bug in serialization of FEReaction.
+* Fixed issue with order of serializing data.
+* Fixed bug where nodeset was not set for nodedata generators.
+* Fixed issue in elasticity calculation in several materials.
+* Fixed several issues with stiffness matrices of rigid connectors. Also implemented Lagrange Multiplier method for all rigid connectors.
+* Alpha parameters are now only set in dynamic analyses. This fixes a bug where alpha parameters affected static analyses too. 
+* Fixed problems when running micro-materials.
+* Fixed issues with stiffness matrix of "rigid joint".
+* Fixed issue with Gaussian filter in fftw blur.
+* The "import" plugin folder in config file is now supported on all OSes.
+* Fixed stiffness matrix for rigid connectors. [skip ci]
+* Stiffness matrix now handles rigid nodes correctly.
+* Fixed unit assignments in muscle material parameter list.
+
+Documentation:
+* Description of FEBio tasks was added (section 2.10).
+* The tables of plot and log variables were expanded and are now available in Appendix E.
+* Many missing boundary conditions, initial conditions, and loads were added to the documentation.
+* Descriptions of several domain types were updated.
+* Documentation on FEBio's explicit solver was added to section 3.3.9.
+* Added documentation for Deshpande-Fleck damage/yield criterion
+* Added description of pipette aspiration pressure load.
+* Fixed reference in active contraction material in theory manual.
+* Updated description of time stepper in user manual.
+* Fixed documentation of fibers-3d-fei integration rule.
+* Updated developer's manual. Fixed some typos in the material plugin section and added a new section on creating plugins with fbs3.
+* Updated user manual to correct numbering error for reactive viscoelastic trigger (should be 0, 1, 2 not 1, 2, 3)
+
+
 
 ===========================================================================
 
@@ -86,7 +155,7 @@ Improvements:
 * Fixed some logo issues in the documentation
 
 
-Buf fixes:
+Bug fixes:
 * Fixed issue with validation when not all properties are initialized yet. 
 * Fixed issue with reading load curves from restart input.
 * Fixed bug in building matrix profile for tied-elastic interface.

@@ -11,7 +11,14 @@ cmake . -LA -B cmbuild ^
   -DUSE_LEVMAR=ON ^
   -DUSE_MKL=ON ^
   -DUSE_MMG=ON ^
-  -DUSE_ZLIB=ON
+  -DUSE_ZLIB=ON ^
+  -DFFTW_LIB="C:\usr\local\febio\vcpkg_installed\x64-windows\lib\fftw3.lib" ^
+  -DHYPRE_LIB="C:\usr\local\lib\HYPRE.lib" ^
+  -DMMG_LIB="C:\usr\local\lib\mmg3d.lib" ^
+  -DMMGS_LIB="C:\usr\local\lib\mmgs.lib" ^
+  -DLEVMAR_INC="C:\usr\local\include\levmar" ^
+  -DLEVMAR_LIB="C:\usr\local\lib\levmar.lib"
+  
 
 cd "cmbuild"
 msbuild /p:configuration=Release /maxCpuCount:%NUMBER_OF_PROCESSORS% ALL_BUILD.vcxproj

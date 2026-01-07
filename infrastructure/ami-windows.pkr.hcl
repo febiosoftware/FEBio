@@ -12,13 +12,13 @@ locals {
   intel_basekit          = "w_BaseKit_p_2022.2.0.252_offline.exe"
   intel_basekit_uri      = "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/18674/${local.intel_basekit}"
   intel_install_windows  = "https://raw.githubusercontent.com/oneapi-src/oneapi-ci/master/scripts/install_windows.bat"
-  vs_2019_buildtools_bin = "vs_buildtools.exe"
-  vs_2019_buildtools_uri = "https://aka.ms/vs/16/release/${local.vs_2019_buildtools_bin}"
+  vs_2022_buildtools_bin = "vs_buildtools.exe"
+  vs_2022_buildtools_uri = "https://aka.ms/vs/17/release/${local.vs_2022_buildtools_bin}"
   installation_path      = var.installation_path
 }
 
 variable "installation_path" {
-  default = "c:\\usr\local"
+  default = "c:\\usr\\local"
 }
 
 data "amazon-parameterstore" "winrm_password" {
@@ -34,7 +34,7 @@ data "amazon-parameterstore" "winrm_username" {
 
 data "amazon-ami" "windows" {
   filters = {
-    name             = "Windows_Server-2019-English-Full-Base-*"
+    name             = "Windows_Server-2022-English-Full-Base-*"
     root-device-type = "ebs"
   }
 
@@ -49,7 +49,7 @@ variable "skip_create_ami" {
 }
 
 source "amazon-ebs" "windows" {
-  ami_name      = "packer-provisioned-windows-2019-intel-oneapi-${local.buildtime}"
+  ami_name      = "packer-provisioned-windows-2022-intel-oneapi-${local.buildtime}"
   instance_type = "c4.2xlarge"
   source_ami    = data.amazon-ami.windows.id
   communicator  = "winrm"
@@ -87,9 +87,9 @@ build {
   # VS Build tools
   provisioner "windows-shell" {
     inline = [
-      "curl -L -O ${local.vs_2019_buildtools_uri}",
-      "start /wait ${local.vs_2019_buildtools_bin} --add Microsoft.VisualStudio.Workload.VCTools --includeOptional --includeRecommended --quiet --nocache --wait",
-      "del ${local.vs_2019_buildtools_bin}",
+      "curl -L -O ${local.vs_2022_buildtools_uri}",
+      "start /wait ${local.vs_2022_buildtools_bin} --add Microsoft.VisualStudio.Workload.VCTools --includeOptional --includeRecommended --quiet --nocache --wait",
+      "del ${local.vs_2022_buildtools_bin}",
     ]
   }
 
@@ -104,9 +104,9 @@ build {
   # paths
   #provisioner "powershell" {
   #  inline = [<<EOF
-$u#serpath=[Environment]::GetEnvironmentVariable("Path", "User")
-se#tx PATH "$userpath;${local.installation_path}"
-EO#F
+# $userpath=[Environment]::GetEnvironmentVariable("Path", "User")
+# setx PATH "$userpath;${local.installation_path}"
+# EOF
   #  ]
   #}
 
@@ -147,7 +147,8 @@ EO#F
   # # sysprep for next launch
   provisioner "powershell" {
     inline = [
-      "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
+        "& 'C:\\Program Files\\Amazon\\EC2Launch\\EC2Launch.exe' sysprep"
     ]
   }
+
 }
