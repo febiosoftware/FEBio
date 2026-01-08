@@ -126,9 +126,10 @@ REGISTER_FECORE_CLASS(FEPlotPIDController, "pid controller");
 REGISTER_FECORE_CLASS(FEPlotMeshData, "mesh_data");
 REGISTER_FECORE_CLASS(FEPlotFieldVariable, "field");
 
-// load curves
+// 1D functions
 REGISTER_FECORE_CLASS(FEPointFunction , "point");
 REGISTER_FECORE_CLASS(FEConstFunction, "const");
+REGISTER_FECORE_CLASS(FEScaleFunction, "scale");
 REGISTER_FECORE_CLASS(FELinearFunction, "linear ramp");
 REGISTER_FECORE_CLASS(FEStepFunction  , "step");
 REGISTER_FECORE_CLASS(FEMathFunction  , "math");
