@@ -208,6 +208,7 @@ public: // TODO: Find a better place for these parameters
 	double		m_ftime0;			//!< start time of current step
 
 	bool	m_block_log;
+	bool	m_log_verbose = false;
 
 	int		m_nupdates;	//!< number of calls to FEModel::Update
 
@@ -307,6 +308,11 @@ FEModel::~FEModel(void)
 {
 	Clear();
 	delete m_imp;
+}
+
+void FEModel::SetVerboseMode(bool b)
+{
+	m_imp->m_log_verbose = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -1993,6 +1999,34 @@ int FEModel::GetDOFIndex(const char* szvar, int n) const
 	return m_imp->m_dofs.GetDOF(szvar, n);
 }
 
+std::string CallbackId2String(unsigned int nevent)
+{
+	switch (nevent)
+	{
+	case CB_INIT            : return "CB_INIT"            ; break;
+	case CB_STEP_ACTIVE     : return "CB_STEP_ACTIVE"     ; break;
+	case CB_MAJOR_ITERS     : return "CB_MAJOR_ITERS"     ; break;
+	case CB_MINOR_ITERS     : return "CB_MINOR_ITERS"     ; break;
+	case CB_SOLVED          : return "CB_SOLVED"          ; break;
+	case CB_UPDATE_TIME     : return "CB_UPDATE_TIME"     ; break;
+	case CB_AUGMENT         : return "CB_AUGMENT"         ; break;
+	case CB_STEP_SOLVED     : return "CB_STEP_SOLVED"     ; break;
+	case CB_MATRIX_REFORM   : return "CB_MATRIX_REFORM"   ; break;
+	case CB_REMESH          : return "CB_REMESH"          ; break;
+	case CB_PRE_MATRIX_SOLVE: return "CB_PRE_MATRIX_SOLVE"; break;
+	case CB_RESET           : return "CB_RESET"           ; break;
+	case CB_MODEL_UPDATE    : return "CB_MODEL_UPDATE"    ; break;
+	case CB_TIMESTEP_SOLVED : return "CB_TIMESTEP_SOLVED" ; break;
+	case CB_SERIALIZE_SAVE  : return "CB_SERIALIZE_SAVE"  ; break;
+	case CB_SERIALIZE_LOAD  : return "CB_SERIALIZE_LOAD"  ; break;
+	case CB_TIMESTEP_FAILED : return "CB_TIMESTEP_FAILED" ; break;
+	case CB_QUASIN_CONVERGED: return "CB_QUASIN_CONVERGED"; break;
+	case CB_USER1           : return "CB_USER1"           ; break;
+	default:
+		return "<unknown>";
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Call the callback function if there is one defined
 //
@@ -2000,10 +2034,25 @@ bool FEModel::DoCallback(unsigned int nevent)
 {
 	TRACK_TIME(TimerID::Timer_Callback);
 
+	if (m_imp->m_log_verbose)
+	{
+		string name = GetName();
+		string cbname = CallbackId2String(nevent);
+		feLog("[%s.%s]===>\n", name.c_str(), cbname.c_str());
+	}
+
 	try
 	{
 		// do the callbacks
 		bool bret = CallbackHandler::DoCallback(this, nevent);
+
+		if (m_imp->m_log_verbose)
+		{
+			string name = GetName();
+			string cbname = CallbackId2String(nevent);
+			feLog("<===[%s.%s]\n", name.c_str(), cbname.c_str());
+		}
+
 		return bret;
 	}
 	catch (ForceConversion)

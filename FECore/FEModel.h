@@ -402,6 +402,8 @@ public:
 	void UnBlockLog();
 	bool LogBlocked() const;
 
+	void SetVerboseMode(bool b);
+
 public:
 	// Derived classes can use this to implement the actual logging mechanism
 	virtual void Log(int ntag, const char* msg);
