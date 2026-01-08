@@ -199,6 +199,14 @@ template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, T* pp, const cha
 	return prop;
 }
 
+template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, std::vector<T>* pp, const char* sz)
+{
+	FEFixedVecPropertyT<T>* prop = new FEFixedVecPropertyT<T>(pp);
+	prop->SetDefaultType(sz);
+	pc->AddProperty(prop, sz, FEProperty::Fixed);
+	return prop;
+}
+
 template <class T> FEProperty* AddClassProperty(FECoreBase* pc, T** pp, const char* sz, unsigned int flags = FEProperty::Required)
 {
 	FEPropertyT<T>* prop = new FEPropertyT<T>(pp);
