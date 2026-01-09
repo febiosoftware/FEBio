@@ -27,8 +27,11 @@ IOMP_LIB="${ONEAPI}compiler/latest/windows/redist/intel64_win/compiler/libiomp5m
 cp -a "$IOMP_LIB" "$FEBIO_LIB"
 
 # Copy fftw lib into febio dir
-FFTW_LIB="/c/vcpkg/packages/fftw3_x64-windows/bin/fftw3.dll"
+FFTW_LIB="/c/usr/local/febio/vcpkg_installed/x64-windows/bin/fftw3.dll"
 cp -a "$FFTW_LIB" "$FEBIO_LIB"
+
+ZLIB="/c/usr/local/febio/vcpkg_installed/x64-windows/bin/zlib1.dll"
+cp -a "$ZLIB" "$FEBIO_LIB"
 
 # Run the test suite
 PYTHON="${ONEAPI}intelpython/latest/python"
