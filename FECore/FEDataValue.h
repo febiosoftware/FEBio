@@ -24,38 +24,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FECoreBase.h"
-#include "DataRecord.h"
-#include "FELogElemData.h"
+#include "FELogData.h"
+#include "FEItemList.h"
+#include <memory>
 
-class FEElement;
-class FEElementSet;
-
-class FECORE_API ElementDataRecord : public DataRecord
+class FECORE_API FEDataValue
 {
-	struct ELEMREF
-	{
-		int	ndom;
-		int	nid;
-	};
-
 public:
-	ElementDataRecord(FEModel* pfem);
-	double Evaluate(int item, int ndata) override;
-	void SetData(const char* sz) override;
-	void SelectAllItems() override;
-	int Size() const override;
-	void SetElementSet(FEElementSet* pg);
+	FEDataValue();
 
-	void SetItemList(FEItemList* itemList, const vector<int>& selection) override;
+	bool IsValid() const;
 
-	using DataRecord::SetItemList;
+	void SetLogData(FELogData* logData);
 
-protected:
-	void BuildELT();
+	bool GetValues(const FEItemList* itemList, std::vector<double>& val);
 
-protected:
-	vector<ELEMREF>	m_ELT;
-	int				m_offset;
-	vector<FELogElemData*>	m_Data;
+private:
+	FELogData* m_logData = nullptr;
 };

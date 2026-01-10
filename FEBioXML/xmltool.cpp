@@ -173,11 +173,11 @@ void fexml::readList(XMLTag& tag, vector<int>& l)
 
 bool fexml::readParameterList(XMLTag& tag, FECoreBase* pc)
 {
-	// make sure this tag has children
-	if (tag.isleaf()) return true;
-
 	// read attribute parameters
 	if (!readAttributeParams(tag, pc)) return false;
+
+	// make sure this tag has children
+	if (tag.isleaf()) return true;
 
 	// process the parameter lists
 	++tag;
@@ -250,16 +250,36 @@ bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
 		if (n >= 0)
 		{
 			FEProperty* prop = pc->PropertyClass(n);
-			const char* sztype = tag.AttributeValue("type");
+			const char* sztype = tag.AttributeValue("type", true);
 
-			// try to allocate the class
-			FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, pc->GetFEModel());
-			if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			if (sztype)
+			{
+				// try to allocate the class
+				FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, pc->GetFEModel());
+				if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-			prop->SetProperty(pp);
+				prop->SetProperty(pp);
 
-			// read the property data
-			readParameterList(tag, pp);
+				// read the property data
+				readParameterList(tag, pp);
+			}
+			else if (prop->Flags() & FEProperty::Fixed)
+			{
+				if (prop->IsArray())
+				{
+					FECoreBase* pc = prop->get(prop->size());
+					readParameterList(tag, pc);
+				}
+				else
+				{
+					FECoreBase* pc = prop->get(0);
+					readParameterList(tag, pc);
+				}
+			}
+			else
+			{
+				throw XMLReader::MissingAttribute(tag, "type");
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 	}

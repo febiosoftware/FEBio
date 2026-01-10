@@ -64,6 +64,9 @@ SOFTWARE.*/
 #include "FEDiscreteDomain.h"
 #include "FEDataGenerator.h"
 #include "FEModule.h"
+#include "FELogNodeData.h"
+#include "FELogElemData.h"
+#include "log.h"
 #include <stdarg.h>
 #include <sstream>
 using namespace std;
@@ -151,6 +154,12 @@ public:
 		m_timers.resize(TIMER_COUNT);
 	}
 
+	~Implementation()
+	{
+		for (auto p : m_logData) delete p;
+		m_logData.clear();
+	}
+
 	void Serialize(DumpStream& ar);
 
 	void PushState()
@@ -199,6 +208,7 @@ public: // TODO: Find a better place for these parameters
 	double		m_ftime0;			//!< start time of current step
 
 	bool	m_block_log;
+	bool	m_log_verbose = false;
 
 	int		m_nupdates;	//!< number of calls to FEModel::Update
 
@@ -251,6 +261,9 @@ public:
 
 	DumpMemStream	m_dmp;	// only used by incremental solver
 
+	// user-requested log data (via GetDataValue)
+	vector<FELogData*> m_logData;
+
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FEGlobalData*>	m_GD;		//!< global data structures
@@ -294,6 +307,12 @@ FEModel::FEModel(void) : FECoreBase(this), m_imp(new FEModel::Implementation(thi
 FEModel::~FEModel(void)
 {
 	Clear();
+	delete m_imp;
+}
+
+void FEModel::SetVerboseMode(bool b)
+{
+	m_imp->m_log_verbose = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -1799,6 +1818,38 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 	return val;
 }
 
+FEDataValue FEModel::GetDataValue(const ParamString& s)
+{
+	FEDataValue val;
+	if (s != GetName()) return val;
+	ParamString data = s.next();
+
+	if (data == "node_data")
+	{
+		string params = data.IDString();
+
+		FELogNodeData* pd = fecore_new<FELogNodeData>(params.c_str(), this);
+		if (pd == nullptr) { feLogError("Invalid data variable %s", params.c_str()); return val; }
+
+		m_imp->m_logData.push_back(pd);
+
+		val.SetLogData(pd);
+	}
+	else if (data == "elem_data")
+	{
+		string params = data.IDString();
+
+		FELogElemData* pd = fecore_new<FELogElemData>(params.c_str(), this);
+		if (pd == nullptr) { feLogError("Invalid data variable %s", params.c_str()); return val; }
+
+		m_imp->m_logData.push_back(pd);
+
+		val.SetLogData(pd);
+	}
+
+	return val;
+}
+
 //-----------------------------------------------------------------------------
 FECoreBase* FEModel::FindComponent(const ParamString& prop)
 {
@@ -1948,6 +1999,34 @@ int FEModel::GetDOFIndex(const char* szvar, int n) const
 	return m_imp->m_dofs.GetDOF(szvar, n);
 }
 
+std::string CallbackId2String(unsigned int nevent)
+{
+	switch (nevent)
+	{
+	case CB_INIT            : return "CB_INIT"            ; break;
+	case CB_STEP_ACTIVE     : return "CB_STEP_ACTIVE"     ; break;
+	case CB_MAJOR_ITERS     : return "CB_MAJOR_ITERS"     ; break;
+	case CB_MINOR_ITERS     : return "CB_MINOR_ITERS"     ; break;
+	case CB_SOLVED          : return "CB_SOLVED"          ; break;
+	case CB_UPDATE_TIME     : return "CB_UPDATE_TIME"     ; break;
+	case CB_AUGMENT         : return "CB_AUGMENT"         ; break;
+	case CB_STEP_SOLVED     : return "CB_STEP_SOLVED"     ; break;
+	case CB_MATRIX_REFORM   : return "CB_MATRIX_REFORM"   ; break;
+	case CB_REMESH          : return "CB_REMESH"          ; break;
+	case CB_PRE_MATRIX_SOLVE: return "CB_PRE_MATRIX_SOLVE"; break;
+	case CB_RESET           : return "CB_RESET"           ; break;
+	case CB_MODEL_UPDATE    : return "CB_MODEL_UPDATE"    ; break;
+	case CB_TIMESTEP_SOLVED : return "CB_TIMESTEP_SOLVED" ; break;
+	case CB_SERIALIZE_SAVE  : return "CB_SERIALIZE_SAVE"  ; break;
+	case CB_SERIALIZE_LOAD  : return "CB_SERIALIZE_LOAD"  ; break;
+	case CB_TIMESTEP_FAILED : return "CB_TIMESTEP_FAILED" ; break;
+	case CB_QUASIN_CONVERGED: return "CB_QUASIN_CONVERGED"; break;
+	case CB_USER1           : return "CB_USER1"           ; break;
+	default:
+		return "<unknown>";
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Call the callback function if there is one defined
 //
@@ -1955,10 +2034,25 @@ bool FEModel::DoCallback(unsigned int nevent)
 {
 	TRACK_TIME(TimerID::Timer_Callback);
 
+	if (m_imp->m_log_verbose)
+	{
+		string name = GetName();
+		string cbname = CallbackId2String(nevent);
+		feLog("[%s.%s]===>\n", name.c_str(), cbname.c_str());
+	}
+
 	try
 	{
 		// do the callbacks
 		bool bret = CallbackHandler::DoCallback(this, nevent);
+
+		if (m_imp->m_log_verbose)
+		{
+			string name = GetName();
+			string cbname = CallbackId2String(nevent);
+			feLog("<===[%s.%s]\n", name.c_str(), cbname.c_str());
+		}
+
 		return bret;
 	}
 	catch (ForceConversion)

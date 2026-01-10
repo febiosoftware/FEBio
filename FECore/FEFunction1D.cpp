@@ -112,6 +112,11 @@ BEGIN_FECORE_CLASS(FEConstFunction, FEFunction1D)
 END_FECORE_CLASS();
 
 //=============================================================================
+BEGIN_FECORE_CLASS(FEScaleFunction, FEFunction1D)
+	ADD_PARAMETER(m_scale, "scale");
+END_FECORE_CLASS();
+
+//=============================================================================
 BEGIN_FECORE_CLASS(FELinearFunction, FEFunction1D)
 	ADD_PARAMETER(m_slope, "slope");
 	ADD_PARAMETER(m_intercept, "intercept");

@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "Callback.h"
 #include "FECoreKernel.h"
 #include "DataStore.h"
+#include "FEDataValue.h"
 #include <string>
 
 //-----------------------------------------------------------------------------
@@ -363,6 +364,9 @@ public: // --- parameter functions ---
 	//! Get the print parameter flag
 	bool GetPrintParametersFlag() const;
 
+	//! return a data value object
+	FEDataValue GetDataValue(const ParamString& s);
+
 public:	// --- Miscellaneous routines ---
 
 	//! call the callback function
@@ -397,6 +401,8 @@ public:
 	void BlockLog();
 	void UnBlockLog();
 	bool LogBlocked() const;
+
+	void SetVerboseMode(bool b);
 
 public:
 	// Derived classes can use this to implement the actual logging mechanism

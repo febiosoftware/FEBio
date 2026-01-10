@@ -141,6 +141,70 @@ public:
 	}
 };
 
+template <class T>
+class FEFixedVecPropertyT : public FEProperty
+{
+private:
+	std::vector<T>* m_pc;	//!< pointer to property list
+
+public:
+	FEFixedVecPropertyT(std::vector<T>* ppc) : FEProperty(T::superClassID())
+	{
+		m_pc = ppc;
+		m_className = T::BaseClassName();
+	}
+
+	bool IsArray() const override { return true; }
+	bool IsType(FECoreBase* pc) const override { return (dynamic_cast<T*>(pc) != nullptr); }
+	void SetProperty(FECoreBase* pc) override
+	{
+		T* p = dynamic_cast<T*>(pc); assert(p);
+		if (p == nullptr) return;
+		m_pc->push_back(*p);
+	}
+	int size() const override { return (int)(m_pc == 0 ? 0 : m_pc->size()); }
+
+	FECoreBase* get(int i) override 
+	{ 
+		if ((i >= 0) && (i < (int)m_pc->size())) return &(*m_pc)[i];
+		if (i == m_pc->size())
+		{
+			m_pc->emplace_back(T());
+			return &m_pc->back();
+		}
+		return nullptr;
+	}
+	FECoreBase* get(const char* szname) override
+	{
+		// This requires that T has a GetName() member function, which may not be the case.
+		return nullptr;
+	}
+
+	FECoreBase* getFromID(int nid) override
+	{
+		// This assumes that T has a GetID() member, which may not be the case.
+		// I don't think I can implement this.
+		return nullptr;
+	}
+
+	void Serialize(DumpStream& ar) override
+	{
+		// TODO: implement serialization
+	}
+
+	bool Init() override
+	{
+		// TODO: implement initialization
+		return true;
+	}
+
+	bool Validate() override
+	{
+		// TODO: implement validation
+		return true;
+	}
+};
+
 //-----------------------------------------------------------------------------
 //! Use this class to define array material properties
 template<class T> class FEVecPropertyT : public FEProperty

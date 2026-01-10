@@ -34,12 +34,6 @@ SOFTWARE.*/
 #include "FELogElemMath.h"
 
 //-----------------------------------------------------------------------------
-FELogElemData::FELogElemData(FEModel* fem) : FELogData(fem) {}
-
-//-----------------------------------------------------------------------------
-FELogElemData::~FELogElemData() {}
-
-//-----------------------------------------------------------------------------
 ElementDataRecord::ElementDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_ELEM)
 {
 	m_offset = 0;
