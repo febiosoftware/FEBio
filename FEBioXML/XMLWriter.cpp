@@ -34,13 +34,6 @@ SOFTWARE.*/
 #include <iomanip>
 using namespace std;
 
-const char* XMLElement::intFormat = "%6d";
-
-void XMLElement::setDefaultFormats()
-{
-	intFormat = "%6d";
-}
-
 void XMLElement::value(int    n) { stringstream ss; ss << n; m_val = ss.str(); }
 void XMLElement::value(bool   b) { int n = (b ? 1 : 0); stringstream ss; ss << n; m_val = ss.str(); }
 void XMLElement::value(double g) { stringstream ss; ss << std::setprecision(7) << g; m_val = ss.str(); }
@@ -211,8 +204,6 @@ XMLWriter::XMLWriter()
 	m_level = 0;
 
 	m_sztab[0] = 0;
-
-	XMLElement::setDefaultFormats();
 }
 
 XMLWriter::~XMLWriter()

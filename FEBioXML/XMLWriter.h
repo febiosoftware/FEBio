@@ -30,9 +30,10 @@ SOFTWARE.*/
 #include <vector>
 #include <string>
 #include <assert.h>
+#include "febioxml_api.h"
 class XMLWriter;
 
-class XMLElement
+class FEBIOXML_API XMLElement
 {
 public:
 	class XMLAtt
@@ -100,13 +101,10 @@ protected:
 	std::vector<XMLAtt> m_att; // attributes
 
 public:
-	static void setDefaultFormats();
-	static const char* intFormat;
-
 	friend class XMLWriter;
 };
 
-class XMLWriter  
+class FEBIOXML_API XMLWriter
 {
 	enum {MAX_TAGS = 32};
 
