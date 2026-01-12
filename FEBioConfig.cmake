@@ -102,7 +102,7 @@ function(_febio_find_library out_release out_debug out_fallback libname is_stati
     find_library(_TEMP
         NAMES ${_lib_lc}
         PATHS ${_FEBIO_LIB_DIR}
-        PATH_SUFFIXES lib lib/Release Release/lib
+        PATH_SUFFIXES lib lib/Release Release/lib Release
         NO_DEFAULT_PATH)
 
     string(REGEX MATCH "Release" _is_release ${_TEMP})
@@ -115,7 +115,7 @@ function(_febio_find_library out_release out_debug out_fallback libname is_stati
     find_library(_TEMP 
         NAMES ${_lib_lc}
         PATHS ${_FEBIO_LIB_DIR}
-        PATH_SUFFIXES lib lib/Debug Debug/lib
+        PATH_SUFFIXES lib lib/Debug Debug/lib Debug
         NO_DEFAULT_PATH)
 
     string(REGEX MATCH "Debug" _is_debug ${_TEMP})
@@ -165,17 +165,35 @@ foreach(lib IN LISTS _FEBIO_SHARED_LIBS _FEBIO_STATIC_LIBS)
         set_target_properties("FEBio::${lib}" PROPERTIES
             IMPORTED_LOCATION_RELEASE "${_rel}"
         )
-    endif()
 
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_IMPLIB_RELEASE "${_rel}"
+        )
+
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_LOCATION "${_rel}"
+        )
+
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_IMPLIB "${_rel}"
+        )        
+    endif()
+   
     if(_dbg)
         set_target_properties("FEBio::${lib}" PROPERTIES
             IMPORTED_LOCATION_DEBUG "${_dbg}"
+        )
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_IMPLIB_DEBUG "${_dbg}"
         )
     endif()
 
     if(_fallback)
         set_target_properties("FEBio::${lib}" PROPERTIES
             IMPORTED_LOCATION "${_fallback}"
+        )
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_IMPLIB "${_fallback}"
         )
     endif()
 
