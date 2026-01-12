@@ -26,9 +26,10 @@ SOFTWARE.*/
 #pragma once
 #include "PlotFile.h"
 #include <stdio.h>
+#include "febioplot_api.h"
 
 //! This class stores the FEBio results to a family of VTK files. 
-class VTKPlotFile : public PlotFile
+class FEBIOPLOT_API VTKPlotFile : public PlotFile
 {
 public:
 	VTKPlotFile(FEModel* fem);

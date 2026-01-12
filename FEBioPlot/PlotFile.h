@@ -29,14 +29,14 @@ SOFTWARE.*/
 #pragma once
 #include "FECore/FEMesh.h"
 #include "FECore/FEPlotData.h"
-
+#include "febioplot_api.h"
 //-----------------------------------------------------------------------------
 class FEModel;
 
 //-----------------------------------------------------------------------------
 //! This class implements the facilities to write to a plot database. 
 //!
-class PlotFile
+class FEBIOPLOT_API PlotFile
 {
 public:
 	// size of name variables

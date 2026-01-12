@@ -35,12 +35,13 @@ SOFTWARE.*/
 #include "FECore/FEDiscreteDomain.h"
 #include "FECore/FEDomain2D.h"
 #include <list>
+#include "febioplot_api.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements the facilities to export FE data in the FEBio
 //! plot file format (version 3).
 //!
-class FEBioPlotFile : public PlotFile
+class FEBIOPLOT_API FEBioPlotFile : public PlotFile
 {
 public:
 	// file version
@@ -208,7 +209,7 @@ public:
 		FEFacetSet*	surf;
 	};
 
-	class PlotObject
+	class FEBIOPLOT_API PlotObject
 	{
 	public:
 		PlotObject() {}
