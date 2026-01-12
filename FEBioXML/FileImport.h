@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <stdio.h>
-#include <XML/XMLReader.h>
+#include <FEBioXML/XMLReader.h>
 #include <FECore/vec3d.h>
 #include <FECore/mat3d.h>
 #include <FECore/tens3d.h>

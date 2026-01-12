@@ -23,13 +23,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <XML/XMLReader.h>
 #include <FECore/FECoreBase.h>
 #include <FECore/ClassDescriptor.h>
+#include "XMLReader.h"
 #include "febioxml_api.h"
 
 //This namespace defines some helper functions that facilitate processing the FEBio xml formatted files.

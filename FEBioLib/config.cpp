@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "febio.h"
-#include <XML/XMLReader.h>
+#include <FEBioXML/XMLReader.h>
 #include <FEBioXML/xmltool.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>

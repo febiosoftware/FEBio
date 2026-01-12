@@ -5,7 +5,7 @@ mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
 set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE FEImgLib FEBioPlot)
-set(STATIC_FEBIO_LIBS FEBioTest FEBioXML XML)
+set(STATIC_FEBIO_LIBS FEBioTest FEBioXML)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -233,7 +233,6 @@ if(WIN32)
     target_compile_options(febioplot PRIVATE /openmp)
     target_compile_options(febiotest PRIVATE /openmp)
     target_compile_options(febioxml PRIVATE /openmp)
-    target_compile_options(xml PRIVATE /openmp)
 endif()
 
 ##### Set dev commit information #####
@@ -419,14 +418,14 @@ target_link_libraries(febiotest PRIVATE fecore)
 target_link_libraries(febioplot PRIVATE fecore)
 target_link_libraries(feimglib PRIVATE fecore)
 target_link_libraries(feamr PRIVATE fecore)
-target_link_libraries(febiorve PRIVATE fecore febiomech febioxml febioplot xml)
-target_link_libraries(febioopt PRIVATE fecore febioxml xml)
+target_link_libraries(febiorve PRIVATE fecore febiomech febioxml febioplot)
+target_link_libraries(febioopt PRIVATE fecore febioxml)
 target_link_libraries(febiomix PRIVATE febiomech fecore)
 target_link_libraries(febiomech PRIVATE fecore feamr)
 target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
 
 target_link_libraries(febiolib PRIVATE febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve fecore feimglib)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr febiorve fecore feimglib)
 
 if (WIN32)
     target_link_libraries(febiolib PRIVATE psapi.lib)
