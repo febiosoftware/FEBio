@@ -24,8 +24,8 @@ sdkLibs=(
     libfebiomix.dylib
     libfebiofluid.dylib
     libfebiorve.dylib
-    libfebioplot.a
-    libfebioxml.a
+    libfebioplot.dylib
+    libfebioxml.dylib
     libfebiolib.dylib
     libfeamr.dylib
     libfebioopt.dylib

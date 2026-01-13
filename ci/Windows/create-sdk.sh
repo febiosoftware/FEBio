@@ -14,7 +14,6 @@ sdkDirs=(
     FEBioRVE
     FEBioPlot
     FEBioXML
-    XML
     FEBioLib
     FEAMR
     FEBioOpt

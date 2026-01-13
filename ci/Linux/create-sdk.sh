@@ -24,8 +24,8 @@ sdkLibs=(
     libfebiomix.so
     libfebiofluid.so
     libfebiorve.so
-    libfebioplot.a
-    libfebioxml.a
+    libfebioplot.so
+    libfebioxml.so
     libfebiolib.so
     libfeamr.so
     libfebioopt.so
