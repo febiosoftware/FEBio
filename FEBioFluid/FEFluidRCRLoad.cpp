@@ -52,8 +52,8 @@ FEFluidRCRLoad::FEFluidRCRLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem
     m_pd = 0.0;
     m_C = 0.0;
 
-    m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    if (pfem) m_dofW.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = (pfem ? pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0) : -1);
 }
 
 //-----------------------------------------------------------------------------

@@ -444,8 +444,8 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_naugmin = 0;
 	m_naugmax = 10;
 
-	m_dofP = pfem->GetDOFIndex("p");
-	m_dofC = pfem->GetDOFIndex("concentration", 0);
+	m_dofP = (pfem ? pfem->GetDOFIndex("p") : -1);
+	m_dofC = (pfem ? pfem->GetDOFIndex("concentration", 0) : -1);
 	
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);

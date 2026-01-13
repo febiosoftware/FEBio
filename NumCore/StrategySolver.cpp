@@ -110,8 +110,8 @@ bool StrategySolver::BackSolve(double* x, double* b)
 //! Clean up
 void StrategySolver::Destroy()
 {
-	m_solver1->Destroy();
-	m_solver2->Destroy();
+	if (m_solver1) m_solver1->Destroy();
+	if (m_solver2) m_solver2->Destroy();
 	if (m_strategy != PERSIST_FOREVER) m_activeSolver = nullptr;
 }
 

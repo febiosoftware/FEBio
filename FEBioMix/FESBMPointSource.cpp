@@ -47,7 +47,7 @@ BEGIN_FECORE_CLASS(FESBMPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_weighVolume, "weigh_volume");
 END_FECORE_CLASS();
 
-FESBMPointSource::FESBMPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
+FESBMPointSource::FESBMPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(fem ? &fem->GetMesh() : nullptr)
 {
 	//static bool bfirst = true;
 	m_sbmId = -1;

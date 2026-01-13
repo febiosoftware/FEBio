@@ -107,9 +107,12 @@ FEBCPrescribedDeformation2O::FEBCPrescribedDeformation2O(FEModel* pfem) : FEPres
 	m_G.zero();
 	m_refNode = -1;
 
-	FEDofList dofs(pfem);
-	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	SetDOFList(dofs);
+	if (pfem)
+	{
+		FEDofList dofs(pfem);
+		dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		SetDOFList(dofs);
+	}
 }
 
 //-----------------------------------------------------------------------------

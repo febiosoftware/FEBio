@@ -42,8 +42,8 @@ FESolutesDomain::FESolutesDomain(FEModel* pfem) : FESolidDomain(pfem), m_dof(pfe
 	m_pMat = 0;
 	m_btrans = true;
 
-	m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
-	m_dofAC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), 0);
+	m_dofC  = (pfem ? pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0) : -1);
+	m_dofAC = (pfem ? pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION_TDERIV), 0) : -1);
 
 	// list the degrees of freedom
 	// (This allows the FEDomain base class to handle several tasks such as UnpackLM)

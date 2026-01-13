@@ -514,7 +514,7 @@ FESlidingInterfaceBiphasic::FESlidingInterfaceBiphasic(FEModel* pfem) : FEContac
     m_bflipm = m_bflips = false;
     m_bshellbm = m_bshellbs = false;
 
-    m_dofP = pfem->GetDOFIndex("p");
+    m_dofP = (pfem ? pfem->GetDOFIndex("p") : -1);
     
     // set parents
     m_ss.SetContactInterface(this);

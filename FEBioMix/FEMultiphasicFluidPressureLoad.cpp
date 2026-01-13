@@ -44,7 +44,7 @@ FEMultiphasicFluidPressureLoad::FEMultiphasicFluidPressureLoad(FEModel* pfem) : 
 {
     m_p0 = 0;
     
-    m_dofP = pfem->GetDOFIndex("p");
+    m_dofP = (pfem ? pfem->GetDOFIndex("p") : -1);
     
     m_dof.Clear();
     m_dof.AddDof(m_dofP);

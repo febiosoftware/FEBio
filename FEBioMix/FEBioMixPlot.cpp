@@ -267,25 +267,28 @@ bool FEPlotFluidLoadSupport::Save(FESurface &surf, FEDataStream &a)
 // Plot concentration gap
 FEPlotConcentrationGap::FEPlotConcentrationGap(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-    DOFS& dofs = pfem->GetDOFS();
-    int nsol = dofs.GetVariableSize("concentration");
-    SetArraySize(nsol);
-    
-    // collect the names
-    int ndata = pfem->GlobalDataItems();
-    vector<string> s;
-    for (int i = 0; i<ndata; ++i)
-    {
-        FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-        if (ps)
-        {
-            s.push_back(ps->GetName());
-            m_sol.push_back(ps->GetID());
-        }
-    }
-    assert(nsol == (int)s.size());
-    SetArrayNames(s);
-    SetUnits(UNIT_CONCENTRATION);
+	if (pfem)
+	{
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
+
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
+		{
+			FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+				m_sol.push_back(ps->GetID());
+			}
+		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
+	}
+	SetUnits(UNIT_CONCENTRATION);
 }
 
 bool FEPlotConcentrationGap::Save(FESurface& surf, FEDataStream& a)
@@ -587,24 +590,27 @@ int GetLocalSBMID(FEMultiphasic* pmm, int nsbm)
 //-----------------------------------------------------------------------------
 FEPlotActualSoluteConcentration::FEPlotActualSoluteConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-	DOFS& dofs = pfem->GetDOFS();
-	int nsol = dofs.GetVariableSize("concentration");
-	SetArraySize(nsol);
-
-	// collect the names
-	int ndata = pfem->GlobalDataItems();
-	vector<string> s;
-	for (int i = 0; i<ndata; ++i)
+	if (pfem)
 	{
-		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-		if (ps)
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
+
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
 		{
-			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID());
+			FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+				m_sol.push_back(ps->GetID());
+			}
 		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
 	}
-	assert(nsol == (int)s.size());
-	SetArrayNames(s);
     SetUnits(UNIT_CONCENTRATION);
 }
 
@@ -657,24 +663,27 @@ bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 FEPlotPartitionCoefficient::FEPlotPartitionCoefficient(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-    DOFS& dofs = pfem->GetDOFS();
-    int nsol = dofs.GetVariableSize("concentration");
-    SetArraySize(nsol);
-    
-    // collect the names
-    int ndata = pfem->GlobalDataItems();
-    vector<string> s;
-    for (int i = 0; i<ndata; ++i)
-    {
-        FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-        if (ps)
-        {
-            s.push_back(ps->GetName());
-            m_sol.push_back(ps->GetID());
-        }
-    }
-    assert(nsol == (int)s.size());
-    SetArrayNames(s);
+	if (pfem)
+	{
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
+
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
+		{
+			FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+				m_sol.push_back(ps->GetID());
+			}
+		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -725,24 +734,27 @@ bool FEPlotPartitionCoefficient::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 FEPlotSoluteFlux::FEPlotSoluteFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY_VEC3F, FMT_ITEM)
 {
-	DOFS& dofs = pfem->GetDOFS();
-	int nsol = dofs.GetVariableSize("concentration");
-	SetArraySize(nsol);
-
-	// collect the names
-	int ndata = pfem->GlobalDataItems();
-	vector<string> s;
-	for (int i = 0; i<ndata; ++i)
+	if (pfem)
 	{
-		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-		if (ps)
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
+
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
 		{
-			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID());
+			FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+				m_sol.push_back(ps->GetID());
+			}
 		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
 	}
-	assert(nsol == (int)s.size());
-	SetArrayNames(s);
     SetUnits(UNIT_MOLAR_FLUX);
 }
 
@@ -793,24 +805,27 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 FEPlotSoluteVolumetricFlux::FEPlotSoluteVolumetricFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY_VEC3F, FMT_ITEM)
 {
-    DOFS& dofs = pfem->GetDOFS();
-    int nsol = dofs.GetVariableSize("concentration");
-    SetArraySize(nsol);
-    
-    // collect the names
-    int ndata = pfem->GlobalDataItems();
-    vector<string> s;
-    for (int i = 0; i<ndata; ++i)
-    {
-        FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-        if (ps)
-        {
-            s.push_back(ps->GetName());
-            m_sol.push_back(ps->GetID());
-        }
-    }
-    assert(nsol == (int)s.size());
-    SetArrayNames(s);
+	if (pfem)
+	{
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
+
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
+		{
+			FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+				m_sol.push_back(ps->GetID());
+			}
+		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
+	}
     SetUnits(UNIT_VELOCITY);
 }
 
@@ -924,23 +939,26 @@ bool FEPlotOsmolarity::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 FEPlotSBMConcentration::FEPlotSBMConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-	// count SBMs
-	int sbms = 0;
-	int ndata = pfem->GlobalDataItems();
-	vector<string> names;
-	for (int i=0; i<ndata; ++i)
+	if (pfem)
 	{
-		FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
-		if (sbm) 
+		// count SBMs
+		int sbms = 0;
+		int ndata = pfem->GlobalDataItems();
+		vector<string> names;
+		for (int i = 0; i < ndata; ++i)
 		{
-			names.push_back(sbm->GetName());
-			m_sbm.push_back(sbm->GetID());
-			sbms++;
+			FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
+			if (sbm)
+			{
+				names.push_back(sbm->GetName());
+				m_sbm.push_back(sbm->GetID());
+				sbms++;
+			}
 		}
-	}
 
-	SetArraySize(sbms);
-	SetArrayNames(names);
+		SetArraySize(sbms);
+		SetArrayNames(names);
+	}
     SetUnits(UNIT_CONCENTRATION);
 }
 
@@ -995,22 +1013,25 @@ bool FEPlotSBMConcentration::Save(FEDomain &dom, FEDataStream& a)
 FEPlotSBMArealConcentration::FEPlotSBMArealConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
     // count SBMs
-    int sbms = 0;
-    int ndata = pfem->GlobalDataItems();
-    vector<string> names;
-    for (int i=0; i<ndata; ++i)
-    {
-        FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
-        if (sbm)
-        {
-            names.push_back(sbm->GetName());
-            m_sbm.push_back(sbm->GetID());
-            sbms++;
-        }
-    }
-    
-    SetArraySize(sbms);
-    SetArrayNames(names);
+	if (pfem)
+	{
+		int sbms = 0;
+		int ndata = pfem->GlobalDataItems();
+		vector<string> names;
+		for (int i = 0; i < ndata; ++i)
+		{
+			FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
+			if (sbm)
+			{
+				names.push_back(sbm->GetName());
+				m_sbm.push_back(sbm->GetID());
+				sbms++;
+			}
+		}
+
+		SetArraySize(sbms);
+		SetArrayNames(names);
+	}
     SetUnits(UNIT_MOLAR_AREAL_CONCENTRATION);
 }
 
@@ -1305,24 +1326,27 @@ bool FEPlotEffectiveShellFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 
 FEPlotEffectiveSoluteConcentration::FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_NODE)
 {
-	DOFS& dofs = pfem->GetDOFS();
-	int nsol = dofs.GetVariableSize("concentration");
-	SetArraySize(nsol);
-
-	// collect the names
-	int ndata = pfem->GlobalDataItems();
-	vector<string> s;
-	for (int i=0; i<ndata; ++i)
+	if (pfem)
 	{
-		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-		if (ps)
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
+
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
 		{
-			s.push_back(ps->GetName());
-			m_sol.push_back(ps->GetID());
+			FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+				m_sol.push_back(ps->GetID());
+			}
 		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
 	}
-	assert(nsol == (int)s.size());
-	SetArrayNames(s);
     SetUnits(UNIT_CONCENTRATION);
 }
 
@@ -1431,23 +1455,26 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, FEDataStream& a)
 //=================================================================================================
 FEPlotSBMRefAppDensity::FEPlotSBMRefAppDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-	// count SBMs
-	int sbms = 0;
-	int ndata = pfem->GlobalDataItems();
-	vector<string> names;
-	for (int i = 0; i<ndata; ++i)
+	if (pfem)
 	{
-		FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
-		if (sbm)
+		// count SBMs
+		int sbms = 0;
+		int ndata = pfem->GlobalDataItems();
+		vector<string> names;
+		for (int i = 0; i < ndata; ++i)
 		{
-			names.push_back(sbm->GetName());
-			m_sbm.push_back(sbm->GetID());
-			sbms++;
+			FESBMData* sbm = dynamic_cast<FESBMData*>(pfem->GetGlobalData(i));
+			if (sbm)
+			{
+				names.push_back(sbm->GetName());
+				m_sbm.push_back(sbm->GetID());
+				sbms++;
+			}
 		}
-	}
 
-	SetArraySize(sbms);
-	SetArrayNames(names);
+		SetArraySize(sbms);
+		SetArrayNames(names);
+	}
     SetUnits(UNIT_DENSITY);
 }
 

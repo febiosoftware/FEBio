@@ -1529,24 +1529,27 @@ bool FEPlotFluidRelativeThermalPecletNumber::Save(FEDomain &dom, FEDataStream& a
 //-----------------------------------------------------------------------------
 FEPlotFluidRelativePecletNumber::FEPlotFluidRelativePecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-    DOFS& dofs = pfem->GetDOFS();
-    int nsol = dofs.GetVariableSize("concentration");
-    SetArraySize(nsol);
-    
-    // collect the names
-    int ndata = pfem->GlobalDataItems();
-    vector<string> s;
-    for (int i = 0; i<ndata; ++i)
-    {
-        FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
-        if (ps)
-        {
-            s.push_back(ps->GetName());
-            m_sol.push_back(ps->GetID());
-        }
-    }
-    assert(nsol == (int)s.size());
-    SetArrayNames(s);
+	if (pfem)
+	{
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
+
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
+		{
+			FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+				m_sol.push_back(ps->GetID());
+			}
+		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
+	}
     SetUnits(UNIT_RECIPROCAL_LENGTH);
 }
 

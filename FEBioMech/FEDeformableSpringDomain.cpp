@@ -519,10 +519,13 @@ void FEDeformableSpringDomain::StiffnessMatrix(FELinearSystem& LS)
 //-----------------------------------------------------------------------------
 FEDeformableSpringDomain2::FEDeformableSpringDomain2(FEModel* pfem) : FEDiscreteDomain(pfem), FEElasticDomain(pfem), m_dofU(pfem), m_dofR(pfem), m_dof(pfem)
 {
-	m_pMat = 0;
+	m_pMat = nullptr;
 
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+	}
 }
 
 //-----------------------------------------------------------------------------

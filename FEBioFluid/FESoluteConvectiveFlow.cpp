@@ -46,9 +46,9 @@ FESoluteConvectiveFlow::FESoluteConvectiveFlow(FEModel* pfem) : FESurfaceLoad(pf
 {
     m_sol = -1;
     
-    m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
-    m_dofEF = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0);
-    m_dofC = GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
+    if (pfem) m_dofW.AddVariable(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = (pfem ? GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_DILATATION), 0) : -1);
+    m_dofC  = (pfem ? GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0) : -1);
 }
 
 //-----------------------------------------------------------------------------

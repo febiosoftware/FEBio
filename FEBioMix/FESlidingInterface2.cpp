@@ -465,7 +465,7 @@ FESlidingInterface2::FESlidingInterface2(FEModel* pfem) : FEContactInterface(pfe
 	m_naugmin = 0;
 	m_naugmax = 10;
 
-	m_dofP = pfem->GetDOFIndex("p");
+	m_dofP = (pfem ? pfem->GetDOFIndex("p") : -1);
 
 	// set parents
 	m_ss.SetContactInterface(this);

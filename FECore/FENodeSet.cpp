@@ -35,9 +35,9 @@ SOFTWARE.*/
 //=============================================================================
 // FENodeSet
 //-----------------------------------------------------------------------------
-FENodeSet::FENodeSet(FEModel* fem) : FEItemList(fem, FEItemList::FE_ELEMENT_SET), m_Node(&fem->GetMesh())
+FENodeSet::FENodeSet(FEModel* fem) : FEItemList(fem, FEItemList::FE_ELEMENT_SET), m_Node(fem ? &fem->GetMesh() : nullptr)
 {
-	SetMesh(&fem->GetMesh());
+	if (fem) SetMesh(&fem->GetMesh());
 }
 
 //-----------------------------------------------------------------------------

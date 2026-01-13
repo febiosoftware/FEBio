@@ -297,8 +297,8 @@ FETiedMultiphasicInterface::FETiedMultiphasicInterface(FEModel* pfem) : FEContac
     m_naugmin = 0;
     m_naugmax = 10;
     
-    m_dofP = pfem->GetDOFIndex("p");
-    m_dofC = pfem->GetDOFIndex("concentration", 0);
+    m_dofP = (pfem ? pfem->GetDOFIndex("p") : -1);
+    m_dofC = (pfem ? pfem->GetDOFIndex("concentration", 0) : -1);
     
     // set parents
     m_ss.SetContactInterface(this);

@@ -25,8 +25,8 @@ FEMultiphasicFSIPressure::FEMultiphasicFSIPressure(FEModel* pfem) : FESurfaceLoa
     m_p = 0;
     
     
-    m_dofEF = pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_DILATATION), 0);
-    m_dofC = pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), 0);
+    m_dofEF = (pfem ? pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_DILATATION   ), 0) : -1);
+    m_dofC  = (pfem ? pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), 0) : -1);
     
     m_dof.Clear();
     m_dof.AddDof(m_dofEF);

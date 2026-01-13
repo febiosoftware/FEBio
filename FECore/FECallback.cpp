@@ -38,5 +38,5 @@ bool do_FECallBack_cb(FEModel* pfem, unsigned int nwhen, void* pd)
 
 FECallBack::FECallBack(FEModel* fem, int when) : FEModelComponent(fem)
 {
-	fem->AddCallback(do_FECallBack_cb, when, this);
+	if (fem) fem->AddCallback(do_FECallBack_cb, when, this);
 }

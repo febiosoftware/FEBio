@@ -102,9 +102,9 @@ FEVolumeConstraint::FEVolumeConstraint(FEModel* pfem) : FESurfaceConstraint(pfem
 	m_binit = false;	// will be set to true during activation
 
 	// get the degrees of freedom
-	m_dofX = pfem->GetDOFIndex("x");
-	m_dofY = pfem->GetDOFIndex("y");
-	m_dofZ = pfem->GetDOFIndex("z");
+	m_dofX = (pfem ? pfem->GetDOFIndex("x") : -1);
+	m_dofY = (pfem ? pfem->GetDOFIndex("y") : -1);
+	m_dofZ = (pfem ? pfem->GetDOFIndex("z") : -1);
 }
 
 //-----------------------------------------------------------------------------

@@ -42,8 +42,8 @@ FEMatchingOsmoticCoefficientLoad::FEMatchingOsmoticCoefficientLoad(FEModel* pfem
     m_ambp = m_ambc = 0.0;
     m_bshellb = false;
 
-    m_dofP = pfem->GetDOFIndex("p");
-    m_dofQ = pfem->GetDOFIndex("q");
+    m_dofP = (pfem ? pfem->GetDOFIndex("p") : -1);
+    m_dofQ = (pfem ? pfem->GetDOFIndex("q") : -1);
 }
 
 //-----------------------------------------------------------------------------

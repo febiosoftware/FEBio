@@ -43,7 +43,7 @@ END_FECORE_CLASS();
 FEMultiphasicFSISoluteBackflowStabilization::FEMultiphasicFSISoluteBackflowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_sol = -1;
-    m_dofC = pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), 0);
+    m_dofC = (pfem ? pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), 0) : -1);
     m_nnlist = FENodeNodeList();
 }
 

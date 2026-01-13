@@ -71,9 +71,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEMortarTiedContact::FEMortarTiedContact(FEModel* pfem) : FEMortarInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
-	m_dofX = GetDOFIndex("x");
-	m_dofY = GetDOFIndex("y");
-	m_dofZ = GetDOFIndex("z");
+	m_dofX = (pfem ? GetDOFIndex("x") : -1);
+	m_dofY = (pfem ? GetDOFIndex("y") : -1);
+	m_dofZ = (pfem ? GetDOFIndex("z") : -1);
 }
 
 //-----------------------------------------------------------------------------

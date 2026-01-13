@@ -43,9 +43,12 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEBiphasicShellDomain::FEBiphasicShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEBiphasicDomain(pfem), m_dof(pfem)
 {
-    m_dofSX = pfem->GetDOFIndex("sx");
-    m_dofSY = pfem->GetDOFIndex("sy");
-    m_dofSZ = pfem->GetDOFIndex("sz");
+	if (pfem)
+	{
+		m_dofSX = pfem->GetDOFIndex("sx");
+		m_dofSY = pfem->GetDOFIndex("sy");
+		m_dofSZ = pfem->GetDOFIndex("sz");
+	}
     m_secant_stress = false;
     m_secant_tangent = false;
     m_secant_perm_tangent = false;

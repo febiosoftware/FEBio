@@ -42,9 +42,12 @@ FELinearTrussDomain::FELinearTrussDomain(FEModel* pfem) : FETrussDomain(pfem), F
 {
 	m_pMat = nullptr;
 	m_a0 = 0.0;
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
-	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
+	}
 }
 
 const FEDofList& FELinearTrussDomain::GetDOFList() const
