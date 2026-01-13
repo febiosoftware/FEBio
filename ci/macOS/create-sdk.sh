@@ -12,7 +12,6 @@ sdkDirs=(
     FEBioRVE
     FEBioPlot
     FEBioXML
-    XML
     FEBioLib
     FEAMR
     FEBioOpt
@@ -27,7 +26,6 @@ sdkLibs=(
     libfebiorve.dylib
     libfebioplot.a
     libfebioxml.a
-    libxml.a
     libfebiolib.dylib
     libfeamr.dylib
     libfebioopt.dylib
