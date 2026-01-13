@@ -13,34 +13,27 @@ cmake_minimum_required(VERSION 3.15)
 #     FEBio::FEBioRVE
 #     FEBio::FECore
 #     FEBio::FEImgLib
-#     FEBio::NumCore
-#
-#     FEBio::FEBioPlot     (static)
-#     FEBio::FEBioTest     (static)
-#     FEBio::FEBioXML        (static)
-#     FEBio::XML                 (static)
+#     FEBio::FEBioPlot
+#     FEBio::FEBioTest
+#     FEBio::FEBioXML
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Libraries
 # ------------------------------------------------------------------------------
 
-set(_FEBIO_SHARED_LIBS
-    FEAMR
-    FEBioLib
-    FEBioMech
-    FEBioOpt
-    FEBioRVE
+set(_FEBIO_LIBS
     FECore
-    FEImgLib
-    NumCore
-)
-
-set(_FEBIO_STATIC_LIBS
+    FEBioMech
+    FEBioMix
+    FEBioFluid
+    FEBioRVE
     FEBioPlot
-    FEBioTest
     FEBioXML
-    XML
+    FEBioLib
+    FEAMR
+    FEBioOpt
+    FEImgLib
 )
 
 # ------------------------------------------------------------------------------
@@ -64,16 +57,27 @@ if(_FEBIO_IS_SOURCE_TREE)
     # This is the default build output directory
     set(_FEBIO_LIB_DIR "${_FEBIO_PREFIX}/build")
 
-    # Try to find the build directory by searching for febioxml
+    # Try to find the build directory by searching for fecore
     file(GLOB _MATCHED_DIRS LIST_DIRECTORIES true "${_FEBIO_PREFIX}/*build*")
 
     if(_MATCHED_DIRS)
+
+        if(WIN32)
+            set(_LIB_NAME "fecore.lib")
+        elseif(APPLE)
+            set(_LIB_NAME "libfecore.dylib")
+        else()
+            set(_LIB_NAME "libfecore.so")
+        endif()
+
+
         foreach(dir IN LISTS _MATCHED_DIRS)
-            find_library(_test 
-                NAMES febioxml
+            find_file(_test
+                NAMES ${_LIB_NAME}
                 PATHS ${dir}
                 PATH_SUFFIXES lib lib/Release Release/lib Debug/lib lib/Debug
-                NO_DEFAULT_PATH)
+                NO_DEFAULT_PATH            
+            )
 
             if(_test)
                 set(_FEBIO_LIB_DIR "${dir}")
@@ -96,9 +100,10 @@ endif()
 # Helper to locate libraries
 # ------------------------------------------------------------------------------
 
-function(_febio_find_library out_release out_debug out_fallback libname is_static)
+function(_febio_find_library out_release out_debug out_min_size out_rel_deb out_fallback libname)
     string(TOLOWER ${libname} _lib_lc)
 
+    # Find release version
     find_library(_TEMP
         NAMES ${_lib_lc}
         PATHS ${_FEBIO_LIB_DIR}
@@ -112,6 +117,7 @@ function(_febio_find_library out_release out_debug out_fallback libname is_stati
     endif()
     unset(_TEMP CACHE)
 
+    # Find debug version
     find_library(_TEMP 
         NAMES ${_lib_lc}
         PATHS ${_FEBIO_LIB_DIR}
@@ -125,6 +131,35 @@ function(_febio_find_library out_release out_debug out_fallback libname is_stati
     endif()
     unset(_TEMP CACHE)
 
+    # Find min size version
+    find_library(_TEMP 
+        NAMES ${_lib_lc}
+        PATHS ${_FEBIO_LIB_DIR}
+        PATH_SUFFIXES lib lib/MinSizeRel MinSizeRel/lib MinSizeRel
+        NO_DEFAULT_PATH)
+
+    string(REGEX MATCH "MinSizeRel" _is_min_size ${_TEMP})
+
+    if(_is_min_size)
+        set(${out_min_size} "${_TEMP}" PARENT_SCOPE)
+    endif()
+    unset(_TEMP CACHE)
+
+    # Find rel with deb info version
+    find_library(_TEMP 
+        NAMES ${_lib_lc}
+        PATHS ${_FEBIO_LIB_DIR}
+        PATH_SUFFIXES lib lib/RelWithDebInfo RelWithDebInfo/lib RelWithDebInfo
+        NO_DEFAULT_PATH)
+
+    string(REGEX MATCH "RelWithDebInfo" _is_rel_deb ${_TEMP})
+
+    if(_is_rel_deb)
+        set(${out_rel_deb} "${_TEMP}" PARENT_SCOPE)
+    endif()
+    unset(_TEMP CACHE)
+
+    # Fallback: find any version
     find_library(_TEMP 
         NAMES ${_lib_lc}
         PATHS ${_FEBIO_LIB_DIR}
@@ -139,27 +174,18 @@ endfunction()
 # Create imported targets
 # ------------------------------------------------------------------------------
 
-foreach(lib IN LISTS _FEBIO_SHARED_LIBS _FEBIO_STATIC_LIBS)
+foreach(lib IN LISTS _FEBIO_LIBS)
     if(TARGET "FEBio::${lib}")
         continue()
     endif()
 
-    list(FIND _FEBIO_STATIC_LIBS "${lib}" _static_index)
-    if(_static_index GREATER -1)
-        set(_lib_type STATIC)
-        set(_is_static TRUE)
-    else()
-        set(_lib_type SHARED)
-        set(_is_static FALSE)
-    endif()
-
-    add_library("FEBio::${lib}" ${_lib_type} IMPORTED)
+    add_library("FEBio::${lib}" SHARED IMPORTED)
 
     set_target_properties("FEBio::${lib}" PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${_FEBIO_INCLUDE_DIR}"
     )
 
-    _febio_find_library(_rel _dbg _fallback "${lib}" "${_is_static}")
+    _febio_find_library(_rel _dbg _min_size _rel_deb _fallback "${lib}")
 
     if(_rel)
         set_target_properties("FEBio::${lib}" PROPERTIES
@@ -170,6 +196,7 @@ foreach(lib IN LISTS _FEBIO_SHARED_LIBS _FEBIO_STATIC_LIBS)
             IMPORTED_IMPLIB_RELEASE "${_rel}"
         )
 
+        # Use release configuration as default in case not all are found
         set_target_properties("FEBio::${lib}" PROPERTIES
             IMPORTED_LOCATION "${_rel}"
         )
@@ -185,6 +212,34 @@ foreach(lib IN LISTS _FEBIO_SHARED_LIBS _FEBIO_STATIC_LIBS)
         )
         set_target_properties("FEBio::${lib}" PROPERTIES
             IMPORTED_IMPLIB_DEBUG "${_dbg}"
+        )
+
+        # Use debug configuration as default if release not found
+        if(NOT _rel)
+            set_target_properties("FEBio::${lib}" PROPERTIES
+                IMPORTED_LOCATION "${_dbg}"
+            )
+            set_target_properties("FEBio::${lib}" PROPERTIES
+                IMPORTED_IMPLIB "${_dbg}"
+            )
+        endif()
+    endif()
+
+    if(_min_size)
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_LOCATION_MINSIZEREL "${_min_size}"
+        )
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_IMPLIB_MINSIZEREL "${_min_size}"
+        )
+    endif()
+
+    if(_rel_deb)
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_LOCATION_RELWITHDEBINFO "${_rel_deb}"
+        )
+        set_target_properties("FEBio::${lib}" PROPERTIES
+            IMPORTED_IMPLIB_RELWITHDEBINFO "${_rel_deb}"
         )
     endif()
 
@@ -213,9 +268,9 @@ foreach(lib IN LISTS _FEBIO_SHARED_LIBS _FEBIO_STATIC_LIBS)
 
 endforeach()
 
-unset(_FEBIO_SHARED_LIBS)
-unset(_FEBIO_STATIC_LIBS)
+unset(_FEBIO_LIBS)
 unset(_FEBIO_PREFIX)
 unset(_FEBIO_INCLUDE_DIR)
+unset(_FEBIO_LIB_DIR)
 
 set(FEBio_FOUND TRUE)

@@ -6,6 +6,10 @@ mkdir -p ${TARGET_DIR}/{include,lib,bin}
 mkdir ${TARGET_DIR}/lib/{Release,Debug}
 mkdir ${TARGET_DIR}/bin/Debug
 
+# Copy in FEBioConfig.cmake
+mkdir -p ${TARGET_DIR}/lib/cmake/FEBio
+cp $FEBIO_REPO/FEBioConfig.cmake ${TARGET_DIR}/lib/cmake/FEBio
+
 sdkDirs=(
     FECore
     FEBioMech
