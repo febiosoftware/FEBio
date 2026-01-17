@@ -193,7 +193,7 @@ public:
 		n = findComponentInVector<FEBoundaryCondition    >(m_BC  , pc); if (n >= 0) return { FEBC_ID, n };
 		n = findComponentInVector<FEModelLoad            >(m_ML  , pc); if (n >= 0) return { FELOAD_ID, n };
 		n = findComponentInVector<FEInitialCondition     >(m_IC  , pc); if (n >= 0) return { FEIC_ID, n };
-		n = findComponentInVector<FESurfacePairConstraint>(m_CI  , pc); if (n >= 0) return { FESURFACEINTERFACE_ID, n };
+		n = findComponentInVector<FESurfacePairConstraint>(m_CI  , pc); if (n >= 0) return { FESURFACEINTERACTION_ID, n };
 		n = findComponentInVector<FENLConstraint         >(m_NLC , pc); if (n >= 0) return { FENLCONSTRAINT_ID, n };
 		n = findComponentInVector<FELoadController       >(m_LC  , pc); if (n >= 0) return { FELOADCONTROLLER_ID, n };
 		n = findComponentInVector<FEAnalysis             >(m_Step, pc); if (n >= 0) return { FEANALYSIS_ID, n };
@@ -1668,16 +1668,16 @@ std::string FEModel::GetParamString(FEParam* p)
 	string typeStr;
 	switch (typeId)
 	{
-	case FEMATERIAL_ID         : typeStr = "material"; break;
-	case FEBC_ID               : typeStr = "bc"; break;
-	case FELOAD_ID             : typeStr = "load"; break;
-	case FEIC_ID               : typeStr = "initial"; break;
-	case FESURFACEINTERFACE_ID : typeStr = "contact"; break;
-	case FENLCONSTRAINT_ID     : typeStr = "constraint"; break;
-	case FEMESHADAPTOR_ID      : typeStr = "mesh_adaptor"; break;
-	case FELOADCONTROLLER_ID   : typeStr = "load_controller"; break;
-	case FEMESHDATAGENERATOR_ID: typeStr = "mesh_data"; break;
-	case FEANALYSIS_ID         : typeStr = "step"; break;
+	case FEMATERIAL_ID          : typeStr = "material"; break;
+	case FEBC_ID                : typeStr = "bc"; break;
+	case FELOAD_ID              : typeStr = "load"; break;
+	case FEIC_ID                : typeStr = "initial"; break;
+	case FESURFACEINTERACTION_ID: typeStr = "contact"; break;
+	case FENLCONSTRAINT_ID      : typeStr = "constraint"; break;
+	case FEMESHADAPTOR_ID       : typeStr = "mesh_adaptor"; break;
+	case FELOADCONTROLLER_ID    : typeStr = "load_controller"; break;
+	case FEMESHDATAGENERATOR_ID : typeStr = "mesh_data"; break;
+	case FEANALYSIS_ID          : typeStr = "step"; break;
 	default:
 		return string();
 	}
