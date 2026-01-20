@@ -455,6 +455,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEFiberExpPowLinear, "fiber-exp-pow-linear");
 	REGISTER_FECORE_CLASS(FEFiberNaturalNH   , "fiber-natural-NH"    );
     REGISTER_FECORE_CLASS(FEFiberEntropyChain, "fiber-entropy-chain" );
+
+	// growth materials (derived from FEGrowthTensor) 
     REGISTER_FECORE_CLASS(FEVolumeGrowth     , "volume growth"       );
     REGISTER_FECORE_CLASS(FEAreaGrowth       , "area growth"         );
     REGISTER_FECORE_CLASS(FEFiberGrowth      , "fiber growth"        );

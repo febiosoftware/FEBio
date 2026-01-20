@@ -147,7 +147,13 @@ void FEBioThermoFluid::InitModule()
 
     //-----------------------------------------------------------------------------
     // classes derived from FEPlotData
-    REGISTER_FECORE_CLASS(FEPlotFluidRelativeThermalPecletNumber, "fluid relative thermal Peclet number");
+	REGISTER_FECORE_CLASS(FEPlotFluidTemperature, "fluid temperature");
+	REGISTER_FECORE_CLASS(FEPlotNodalFluidTemperature, "nodal fluid temperature");
+	REGISTER_FECORE_CLASS(FEPlotFluidPressureTangentTemperature, "fluid pressure tangent temperature");
+	REGISTER_FECORE_CLASS(FEPlotFluidRelativeThermalPecletNumber, "fluid relative thermal Peclet number");
+	REGISTER_FECORE_CLASS(FEPlotFluidIsochoricSpecificHeatCapacity, "fluid isochoric specific heat capacity");
+	REGISTER_FECORE_CLASS(FEPlotFluidIsobaricSpecificHeatCapacity, "fluid isobaric specific heat capacity");
+	REGISTER_FECORE_CLASS(FEPlotFluidThermalConductivity, "fluid thermal conductivity");
 
 	febio.SetActiveModule(0);
 }
