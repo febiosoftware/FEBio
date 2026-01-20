@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include "FEFluidMaterial.h"
 #include "FEPolarFluidMaterial.h"
 #include "FEFluid.h"
-#include "FEThermoFluid.h"
 #include "FEPolarFluid.h"
 #include "FEFluidDomain.h"
 #include "FEFluidFSIDomain.h"
@@ -41,7 +40,6 @@ SOFTWARE.*/
 #include "FEBiphasicFSI.h"
 #include "FEMultiphasicFSIDomain.h"
 #include "FEMultiphasicFSI.h"
-#include "FEThermoFluid.h"
 #include <FECore/FEModel.h>
 #include <FECore/FESurface.h>
 #include <FECore/writeplot.h>
@@ -154,21 +152,6 @@ bool FEPlotNodalPolarFluidAngularVelocity::Save(FEMesh& m, FEDataStream& a)
     
     writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
         return node.get_vec3d(dofGX, dofGY, dofGZ);
-    });
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Store the nodal temperatures
-bool FEPlotNodalFluidTemperature::Save(FEMesh& m, FEDataStream& a)
-{
-    // get the dilatation dof index
-    int dof_T = GetFEModel()->GetDOFIndex("T");
-    if (dof_T < 0) return false;
-
-    // loop over all nodes
-    writeNodalValues<double>(m, a, [=](const FENode& node) {
-        return node.get(dof_T);
     });
     return true;
 }
@@ -602,18 +585,6 @@ bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidTemperature::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
-	if (pfluid == 0) return false;
-
-	writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-		return pfluid->Temperature(const_cast<FEMaterialPoint&>(mp));
-	});
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 class FEFluidVolumeRatio
 {
 public:
@@ -997,21 +968,6 @@ bool FEPlotPolarFluidRegionalAngularVelocity::Save(FEDomain &dom, FEDataStream& 
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidHeatFlux::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
-    if (pfluid == 0) return false;
-
-    // write solid element data
-    writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
-        const FEThermoFluidMaterialPoint* ppt = mp.ExtractData<FEThermoFluidMaterialPoint>();
-        return (ppt ? ppt->m_q : vec3d(0.));
-    });
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
 //! Store the average stresses for each element.
 bool FEPlotFluidStress::Save(FEDomain& dom, FEDataStream& a)
 {
@@ -1343,48 +1299,6 @@ bool FEPlotFluidSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidIsochoricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
-    if (pfluid == 0) return false;
-
-    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->IsochoricSpecificHeatCapacity(mp_noconst);
-    });
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotFluidIsobaricSpecificHeatCapacity::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
-    if (pfluid == 0) return false;
-
-    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->IsobaricSpecificHeatCapacity(mp_noconst);
-    });
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotFluidPressureTangentTemperature::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
-    if (pfluid == 0) return false;
-    
-    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->Tangent_Temperature(mp_noconst);
-    });
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
 bool FEPlotFluidPressureTangentStrain::Save(FEDomain &dom, FEDataStream& a)
 {
     FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
@@ -1395,20 +1309,6 @@ bool FEPlotFluidPressureTangentStrain::Save(FEDomain &dom, FEDataStream& a)
         return pfluid->Tangent_Strain(mp_noconst);
     });
     
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotFluidThermalConductivity::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEFluidThermalConductivity* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidThermalConductivity>();
-    if (pfluid == 0) return false;
-    
-    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->ThermalConductivity(mp_noconst);
-    });
-
     return true;
 }
 
@@ -1499,27 +1399,6 @@ bool FEPlotFluidRelativeReynoldsNumber::Save(FEDomain &dom, FEDataStream& a)
         vec3d v(0,0,0);
         if (ept) v = ept->m_v;
         return (fpt->m_vft - v).Length()/nu;
-    });
-    
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotFluidRelativeThermalPecletNumber::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEThermoFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluid>();
-    if (pfluid == 0) return false;
-    
-    writeAverageElementValue<double>(dom, a, [&pfluid](const FEMaterialPoint& mp) {
-        const FEFluidMaterialPoint* fpt = mp.ExtractData<FEFluidMaterialPoint>();
-//        const FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        double cp = pfluid->GetElastic()->IsobaricSpecificHeatCapacity(mp_noconst);
-        double K = pfluid->GetConduct()->ThermalConductivity(mp_noconst);
-        double rho = pfluid->Density(mp_noconst);
-        vec3d v(0,0,0);
-//        if (ept) v = ept->m_v;
-        return (fpt->m_vft - v).Length()*rho*cp/K;
     });
     
     return true;

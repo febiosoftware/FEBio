@@ -55,10 +55,8 @@ SOFTWARE.*/
 #include "FEThermoFluidTemperatureBC.h"
 #include "FEFluidModule.h"
 #include "FEThermoFluidAnalysis.h"
-#include "FEBioFluidPlot.h"
-#include <FECore/FETimeStepController.h>
+#include "FEBioThermoFluidPlot.h"
 
-//-----------------------------------------------------------------------------
 const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARIABLE var)
 {
     switch (var)
@@ -154,6 +152,7 @@ void FEBioThermoFluid::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotFluidIsochoricSpecificHeatCapacity, "fluid isochoric specific heat capacity");
 	REGISTER_FECORE_CLASS(FEPlotFluidIsobaricSpecificHeatCapacity, "fluid isobaric specific heat capacity");
 	REGISTER_FECORE_CLASS(FEPlotFluidThermalConductivity, "fluid thermal conductivity");
+	REGISTER_FECORE_CLASS(FEPlotFluidHeatFlux, "fluid heat flux");
 
 	febio.SetActiveModule(0);
 }
