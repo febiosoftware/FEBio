@@ -84,10 +84,19 @@ int FESolidDomain::Elements() const { return (int)m_Elem.size(); }
 
 //-----------------------------------------------------------------------------
 //! loop over elements
-void FESolidDomain::ForEachSolidElement(std::function<void(FESolidElement& el)> f)
+void FESolidDomain::ForEachSolidElement(std::function<void(FESolidElement& el)> f, bool runInParallel)
 {
 	int NE = Elements();
-	for (int i = 0; i < NE; ++i) f(m_Elem[i]);
+	if (runInParallel)
+	{
+#pragma omp parallel for
+		for (int i = 0; i < NE; ++i) 
+			f(m_Elem[i]);
+	}
+	else
+	{
+		for (int i = 0; i < NE; ++i) f(m_Elem[i]);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -141,7 +150,7 @@ bool FESolidDomain::Init()
 				// material point coordinates
 				mp.m_r0 = el.Evaluate(r0, n);
 			}
-		});
+		}, false);
 	}
 	catch (NegativeJacobian e)
 	{

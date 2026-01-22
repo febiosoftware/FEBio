@@ -263,7 +263,7 @@ public:
 
 public:
 	//! loop over elements
-	void ForEachSolidElement(std::function<void(FESolidElement& el)> f);
+	void ForEachSolidElement(std::function<void(FESolidElement& el)> f, bool runInParallel = true);
 
 	//! return the degrees of freedom of an element for this domain
 	virtual int GetElementDofs(FESolidElement& el);
