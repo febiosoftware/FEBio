@@ -36,7 +36,7 @@ SOFTWARE.*/
 #include "FECore/FEAnalysis.h"
 #include "FEBioMech/FESolidSolver2.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
-#include "FEBioMech/FEBCPrescribedDeformation.h"
+#include "FEBCPrescribedDeformation2O.h"
 #include "FEPeriodicLinearConstraint2O.h"
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FECube.h>

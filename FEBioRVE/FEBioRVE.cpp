@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "FEMicroMaterial2O.h"
 #include "FEMindlinElastic2O.h"
 #include "FEPeriodicBoundary2O.h"
+#include "FEBCPrescribedDeformation2O.h"
 #include "FE2OMicroConstraint.h"
 #include "FEElasticMultiscaleDomain1O.h"
 #include "FEElasticMultiscaleDomain2O.h"
@@ -47,22 +48,24 @@ void FEBioRVE::InitModule()
 	febio.SetActiveModule("solid");
 
 	REGISTER_FECORE_CLASS(FEMicroMaterial, "micro-material");
-	REGISTER_FECORE_CLASS(FEMicroMaterial2O, "micro-material2O");
-	REGISTER_FECORE_CLASS(FEMindlinElastic2O, "mindlin elastic");
+	REGISTER_FECORE_CLASS(FEMicroMaterial2O, "micro-material2O", FECORE_EXPERIMENTAL);
+	REGISTER_FECORE_CLASS(FEMindlinElastic2O, "mindlin elastic", FECORE_EXPERIMENTAL);
 
 	REGISTER_FECORE_CLASS(FEMicroProbe, "probe");
 
 	REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain1O, "elastic-mm-solid");
-	REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain2O, "elastic-mm-solid2O");
-	REGISTER_FECORE_CLASS(FEElasticSolidDomain2O, "elastic-solid2O");
+	REGISTER_FECORE_CLASS(FEElasticMultiscaleDomain2O, "elastic-mm-solid2O", FECORE_EXPERIMENTAL);
+	REGISTER_FECORE_CLASS(FEElasticSolidDomain2O, "elastic-solid2O", FECORE_EXPERIMENTAL);
 
-	REGISTER_FECORE_CLASS(FE2OMicroConstraint, "2O microfluc");
+	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation2O, "prescribed deformation 2O", FECORE_EXPERIMENTAL);
 
-	REGISTER_FECORE_CLASS(FEPeriodicBoundary1O, "periodic boundary1O");
-	REGISTER_FECORE_CLASS(FEPeriodicBoundary2O, "periodic boundary2O");
+	REGISTER_FECORE_CLASS(FE2OMicroConstraint, "2O microfluc", FECORE_EXPERIMENTAL);
 
-	REGISTER_FECORE_CLASS(FEPlotElementGnorm, "G norm");
+	REGISTER_FECORE_CLASS(FEPeriodicBoundary1O, "periodic boundary1O", FECORE_EXPERIMENTAL);
+	REGISTER_FECORE_CLASS(FEPeriodicBoundary2O, "periodic boundary2O", FECORE_EXPERIMENTAL);
+
+	REGISTER_FECORE_CLASS(FEPlotElementGnorm, "G norm", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEPlotElementPK1norm, "PK1 norm");
-	REGISTER_FECORE_CLASS(FEPlotElementQK1norm, "QK1 norm");
+	REGISTER_FECORE_CLASS(FEPlotElementQK1norm, "QK1 norm", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEPlotElementMicroEnergy, "micro energy");
 }

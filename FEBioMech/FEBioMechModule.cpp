@@ -649,7 +649,6 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation     , "prescribed deformation");
 	REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement");
 	REGISTER_FECORE_CLASS(FEBCRigidDeformation          , "rigid deformation");
-	REGISTER_FECORE_CLASS(FEBCPrescribedDeformation2O   , "prescribed deformation 2O");
 	REGISTER_FECORE_CLASS(FERigidNodeSet                , "rigid");
 
 	//-----------------------------------------------------------------------------
@@ -843,7 +842,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotRightHencky, "right Hencky");
     REGISTER_FECORE_CLASS(FEPlotLeftHencky, "left Hencky");
     REGISTER_FECORE_CLASS(FEPlotRateOfDeformation, "rate of deformation");
-	REGISTER_FECORE_CLASS(FEPlotMortarContactGap, "mortar-gap");
+	REGISTER_FECORE_CLASS(FEPlotMortarContactGap, "mortar-gap", FECORE_EXPERIMENTAL);
 	REGISTER_FECORE_CLASS(FEPlotSurfaceTraction, "surface traction");
 	REGISTER_FECORE_CLASS(FEPlotNodalSurfaceTraction, "nodal surface traction");
 	REGISTER_FECORE_CLASS(FEPlotEnclosedVolume, "enclosed volume");
