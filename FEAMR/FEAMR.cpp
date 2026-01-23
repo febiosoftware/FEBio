@@ -48,7 +48,7 @@ REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
 REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
 REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
 REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
-REGISTER_FECORE_CLASS(FETestRefine    , "test_refine");
+REGISTER_FECORE_CLASS(FETestRefine    , "test_refine", FECORE_EXPERIMENTAL);
 
 // adaptor criteria
 REGISTER_FECORE_CLASS(FEVariableCriterion        , "max_variable");

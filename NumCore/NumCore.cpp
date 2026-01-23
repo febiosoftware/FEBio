@@ -83,7 +83,7 @@ NUMCORE_API void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(IncompleteCholesky , "ichol");
 
 	// register eigen solvers
-	REGISTER_FECORE_CLASS(FEASTEigenSolver, "feast");
+	REGISTER_FECORE_CLASS(FEASTEigenSolver, "feast", FECORE_EXPERIMENTAL);
 
 	// set default linear solver
 	// (Set this before the configuration is read in because
