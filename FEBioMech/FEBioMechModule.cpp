@@ -330,7 +330,7 @@ void FEBioMech::InitModule()
 	// Solver classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FESolidSolver2, "solid");
 	REGISTER_FECORE_CLASS(FEExplicitSolidSolver, "explicit-solid");
-	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old");
+	REGISTER_FECORE_CLASS(FESolidSolver, "solid_old", FECORE_DEPRECATED);
 	REGISTER_FECORE_CLASS(FECGSolidSolver, "CG-solid");
 
 	//-----------------------------------------------------------------------------
@@ -748,8 +748,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FERigidRotationVector , "rigid_rotation_vector" );
 	REGISTER_FECORE_CLASS(FERigidEulerAngles    , "rigid_euler_angles"    );
 
-	REGISTER_FECORE_CLASS(FERigidFixedBCOld     , "rigid_fixed_old"     , 0x300);	// obsolete in 4.0
-	REGISTER_FECORE_CLASS(FERigidPrescribedOld  , "rigid_prescribed_old", 0x300);	// obsolete in 4.0
+	REGISTER_FECORE_CLASS(FERigidFixedBCOld     , "rigid_fixed_old"     , FECORE_DEPRECATED);	// obsolete in 4.0
+	REGISTER_FECORE_CLASS(FERigidPrescribedOld  , "rigid_prescribed_old", FECORE_DEPRECATED);	// obsolete in 4.0
 	
 	// classes derived directly from FERigidIC
 	REGISTER_FECORE_CLASS(FERigidBodyVelocity       , "initial_rigid_velocity"        );

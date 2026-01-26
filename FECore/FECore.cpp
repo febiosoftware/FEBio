@@ -104,8 +104,8 @@ void FECore::InitModule()
 REGISTER_FECORE_CLASS(FETimeStepController, "default");
 
 // boundary conditions
-REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      , 0x300);	// obsolete in 4.0
-REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe", 0x300);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      , FECORE_DEPRECATED);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe", FECORE_DEPRECATED);	// obsolete in 4.0
 REGISTER_FECORE_CLASS(FELinearConstraint, "linear constraint");
 REGISTER_FECORE_CLASS(FELinearConstraintDOF, "child_dof");
 
@@ -113,7 +113,7 @@ REGISTER_FECORE_CLASS(FELinearConstraintDOF, "child_dof");
 REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");
 
 // initial conditions
-REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     , 0x300);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     , FECORE_DEPRECATED);	// obsolete in 4.0
 
 // (augmented lagrangian) linear constraints
 REGISTER_FECORE_CLASS(FELinearConstraintSet, "linear constraint");

@@ -117,3 +117,4 @@ public:
 
 // macro for tagging a feature as experimental (i.e. in development)
 #define FECORE_EXPERIMENTAL	int(0xFFFF)
+#define FECORE_DEPRECATED int(0x300)
