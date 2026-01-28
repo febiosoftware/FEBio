@@ -35,7 +35,7 @@ namespace fexml
 //---------------------------------------------------------------------------------------
 // Reads the value of a parameter.
 // if paramName is zero, the tag's name will be used as the parameter name.
-bool FEBIOXML_API readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName = 0);
+bool FEBIOXML_API readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName = 0, FECoreBase* parent = nullptr);
 
 //---------------------------------------------------------------------------------------
 bool FEBIOXML_API readParameter(XMLTag& tag, FECoreBase* pc);
