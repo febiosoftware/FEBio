@@ -298,9 +298,19 @@ void FERigidRevoluteJoint::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 		vec3d nb(zb); nb.unit();
 		vec3d nba(zba); nba.unit();
 
-		vec3d t = (nb ^ nba)*m_torsion_stiffness;
-		double ma[3] = { -t.x, -t.y, -t.z };
-		double mb[3] = {  t.x,  t.y,  t.z };
+		vec3d t = nb ^ nba;
+
+		// Approach A
+//		vec3d T = t*m_torsion_stiffness;
+
+		// Approach B
+		t.unit();
+		double angle = acos(nb * nba);
+		vec3d T = t * (angle * m_torsion_stiffness);
+
+		// add it all up
+		double ma[3] = { -T.x, -T.y, -T.z };
+		double mb[3] = {  T.x,  T.y,  T.z };
 		for (int i=0;i <3; ++i)
 		{
 			if (RBa.m_LM[3 + i] >= 0) R[RBa.m_LM[3 + i]] += ma[i];
@@ -568,14 +578,27 @@ void FERigidRevoluteJoint::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
 		mat3d nbhat = skew(nb);
 		mat3d nbahat = skew(nba);
 
-		mat3d Kbba = nbhat * nbahat * m_torsion_stiffness;
-		mat3d Kbab = nbahat * nbhat * m_torsion_stiffness;
-
 		FEElementMatrix ke(12, 12);
 		ke.zero();
+
+		// Approach A
+/*		mat3d Kbba = nbhat * nbahat * m_torsion_stiffness;
+		mat3d Kbab = nbahat * nbhat * m_torsion_stiffness;
 		ke.sub(3, 3,  Kbba); ke.sub(3, 9, -Kbab);
 		ke.sub(9, 3, -Kbba); ke.sub(9, 9,  Kbab);
+*/
 
+		// Approach B
+		vec3d t = nb ^ nba; t.unit();
+		double angle = acos(nb * nba);
+		if (fabs(angle) < 1e-12) t = ea[0];
+		mat3d NT = (ea[0] & t) * m_torsion_stiffness;
+		mat3d Ea = eahat[0]*(angle*m_torsion_stiffness);
+
+		ke.sub(3, 3, -(NT + Ea)); ke.sub(3, 9,  NT);
+		ke.sub(9, 3,  (NT + Ea)); ke.sub(9, 9, -NT);
+
+		// don't forget to multiply with alpha
 		ke *= alpha;
 
 		vector<int> LM(12);
