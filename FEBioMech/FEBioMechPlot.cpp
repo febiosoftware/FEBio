@@ -639,9 +639,12 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 		FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
 		if (ps)
 		{
-			writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+			FEFacet2FacetSliding* pf2f = dynamic_cast<FEFacet2FacetSliding*>(pci);
+			double eps = (pf2f ? pf2f->m_epsn : 1);
+
+			writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
 				const FEFacetSlidingSurface::Data* pt = dynamic_cast<const FEFacetSlidingSurface::Data*>(&mp);
-				return (pt ? pt->m_eps : 0);
+				return (pt ? eps*pt->m_eps : 0);
 				});
 			return true;
 		}
@@ -649,9 +652,11 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 		FESlidingElasticSurface* pse = dynamic_cast<FESlidingElasticSurface*>(&surf);
 		if (pse)
 		{
-			writeAverageElementValue<double>(surf, a, [](const FEMaterialPoint& mp) {
+			FESlidingElasticInterface* psei = dynamic_cast<FESlidingElasticInterface*>(pci);
+			double epsn = (psei ? psei->m_epsn : 1);
+			writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
 				const FESlidingElasticSurface::Data* pt = dynamic_cast<const FESlidingElasticSurface::Data*>(&mp);
-				return (pt ? pt->m_epsn : 0);
+				return (pt ? epsn*pt->m_epsn : 0);
 				});
 			return true;
 		}
@@ -663,7 +668,7 @@ bool FEPlotContactPenalty::Save(FESurface& surf, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotContactStatus::Save(FESurface& surf, FEDataStream& a)
 {
-	FEFacetSlidingSurface* ps = dynamic_cast<FEFacetSlidingSurface*>(&surf);
+	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(&surf);
 	if (ps == nullptr) return false;
 
 	// make sure the corresponding contact interface is active
