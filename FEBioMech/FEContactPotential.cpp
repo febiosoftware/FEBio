@@ -425,7 +425,7 @@ public:
 				{
 					FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
 					Cell* c = FindCell(mp.m_rt); assert(c);
-//					if (c == nullptr) return false;
+					if (c == nullptr) continue;
 					omp_set_lock(lock + c->id);
 					c->add(&el);
 					omp_unset_lock(lock + c->id);
@@ -575,6 +575,7 @@ void FEContactPotential::Update()
 				for (int l = 0; l < nc; ++l)
 				{
 					Grid::Cell* cl = c[l];
+					if (cl == nullptr) continue;
 					for (FESurfaceElement* el2 : cl->m_elemList)
 					{
 						// make sure we did not process this element yet
@@ -1062,7 +1063,8 @@ bool FEContactPotential::CheckIntersections(FEContactPotential::Grid& g)
 
 				for (int k = 0; k < nc; ++k)
 				{
-					Grid::Cell* cl = c[k];
+					Grid::Cell* cl = c[k]; assert(cl);
+					if (cl == nullptr) continue;
 					for (FESurfaceElement* el2 : cl->m_elemList)
 					{
 						FESurfaceElement& el = *el2;
