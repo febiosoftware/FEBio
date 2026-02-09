@@ -988,6 +988,30 @@ void XMLReader::ReadValue(XMLTag& tag)
 		tag.m_szval.reserve(256);
 		while ((ch=GetChar())!='<') 
 		{
+			// read entity references
+			if (ch == '&')
+			{
+				char szbuf[16] = { 0 };
+				szbuf[0] = '&';
+				int i = 1;
+				do
+				{
+					ch = readNextChar();
+					szbuf[i++] = ch;
+				} while ((i < 16) && (ch != ';'));
+				if (ch != ';') throw XMLSyntaxError(m_nline);
+
+				if (strcmp(szbuf, "&lt;") == 0) ch = '<';
+				else if (strcmp(szbuf, "&gt;") == 0) ch = '>';
+				else if (strcmp(szbuf, "&amp;") == 0) ch = '&';
+				else if (strcmp(szbuf, "&apos;") == 0) ch = '\'';
+				else if (strcmp(szbuf, "&quot;") == 0) ch = '"';
+				else if ((strcmp(szbuf, "&#9;") == 0) || (strcmp(szbuf, "&#x9;") == 0)) ch = '\t';
+				else if ((strcmp(szbuf, "&#10;") == 0) || (strcmp(szbuf, "&#xA;") == 0)) ch = '\n';
+				else if ((strcmp(szbuf, "&#13;") == 0) || (strcmp(szbuf, "&#xD;") == 0)) ch = '\r';
+				else throw XMLSyntaxError(m_nline);
+			}
+
 			tag.m_szval.push_back(ch);
 		}
 	}
@@ -1159,31 +1183,6 @@ char XMLReader::GetChar()
 			ch = readNextChar();
 		}
 		else rewind(1);
-	}
-
-	// read entity references
-	if (ch=='&')
-	{
-		char szbuf[16]={0};
-		szbuf[0] = '&';
-		int i = 1;
-		do
-		{
-			ch = readNextChar();
-			szbuf[i++]=ch;
-		}
-		while ((i<16)&&(ch!=';'));
-		if (ch!=';') throw XMLSyntaxError(m_nline);
-
-		if      (strcmp(szbuf, "&lt;"  )==0) ch = '<';
-		else if (strcmp(szbuf, "&gt;"  )==0) ch = '>';
-		else if (strcmp(szbuf, "&amp;" )==0) ch = '&';
-		else if (strcmp(szbuf, "&apos;")==0) ch = '\'';
-		else if (strcmp(szbuf, "&quot;")==0) ch = '"';
-		else if ((strcmp(szbuf, "&#9;" ) == 0) || (strcmp(szbuf, "&#x9;") == 0)) ch = '\t';
-		else if ((strcmp(szbuf, "&#10;") == 0) || (strcmp(szbuf, "&#xA;") == 0)) ch = '\n';
-		else if ((strcmp(szbuf, "&#13;") == 0) || (strcmp(szbuf, "&#xD;") == 0)) ch = '\r';
-		else throw XMLSyntaxError(m_nline);
 	}
 	return ch;
 }
