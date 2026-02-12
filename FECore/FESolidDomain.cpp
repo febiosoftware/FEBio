@@ -194,7 +194,7 @@ void FESolidDomain::Reset()
 			// material point coordinates
 			mp.m_r0 = el.Evaluate(r0, n);
 		}
-	});
+	}, false); // don't run in parallel since this may throw exceptions!
 
 	ForEachMaterialPoint([](FEMaterialPoint& mp) {
 		mp.Init();
