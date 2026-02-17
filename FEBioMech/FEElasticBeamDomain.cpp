@@ -158,7 +158,7 @@ void FEElasticBeamDomain::InternalForces(FEGlobalVector& R)
 
 		vector<int> lm(6*ne);
 		UnpackLM(el, lm);
-		R.Assemble(lm, fe);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 
@@ -520,7 +520,7 @@ void FEElasticBeamDomain::InertialForces(FEGlobalVector& R, std::vector<double>&
 		ElementInertialForce(el, fe);
 		vector<int> lm(6 * neln);
 		UnpackLM(el, lm);
-		R.Assemble(lm, fe);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 
@@ -668,7 +668,7 @@ void FEElasticBeamDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
 
 		vector<int> lm(6 * ne);
 		UnpackLM(el, lm);
-		R.Assemble(lm, fe);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 
