@@ -327,9 +327,14 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 					assert(StorageFormat() == FMT_ITEM);
 					// loop over all elements
 					int NE = dom.Elements();
+					const FEElementSet* elset = map->GetElementSet();
 					for (int i = 0; i < NE; ++i)
 					{
-						a << map->get<double>(i);
+						FEElement& el = dom.ElementRef(i);
+						int n = elset->GetLocalIndex(el);
+						if (n < 0) a << 0.0;
+						else
+							a << map->get<double>(n);
 					}
 
 					return true;
