@@ -310,10 +310,15 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 						FEElement& e = dom.ElementRef(i);
 						int ne = e.Nodes();
 
-						vector<double> sn(ne);
-						for (int j = 0; j < ne; ++j)
+						const FEElementSet* elset = map->GetElementSet();
+						int n = elset->GetLocalIndex(e);
+						vector<double> sn(ne, 0.0);
+						if (n >= 0)
 						{
-							sn[j] = map->value<double>(i, j);
+							for (int j = 0; j < ne; ++j)
+							{
+								sn[j] = map->value<double>(n, j);
+							}
 						}
 
 						// push data to archive
