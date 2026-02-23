@@ -3,7 +3,7 @@ set -o errexit
 set -o verbose
 
 NETGEN="https://github.com/NGSolve/netgen.git"
-BRANCH="v6.2.2406"
+BRANCH="v6.2.2501"
 
 build_and_install() {
 	local source=$1
