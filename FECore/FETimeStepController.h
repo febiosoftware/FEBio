@@ -84,7 +84,7 @@ public:
 	bool				m_mp_repeat;	//!< repeat must-points
 	double				m_mp_toff;		//!< offset for repeat must-points
 
-private:
+public:
 	double	m_ddt;			//!< used by auto-time stepper
 	double	m_dtp;			//!< previous time step size
 
