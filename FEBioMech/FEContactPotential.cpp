@@ -217,6 +217,18 @@ static bool is_neighbor(FESurfaceElement& e1, FESurfaceElement& e2)
 	return false;
 }
 
+static bool is_same(FESurfaceElement& e1, FESurfaceElement& e2)
+{
+	int n1 = e1.Nodes();
+	int n2 = e2.Nodes();
+	for (int i = 0; i < n1; ++i)
+	{
+		if (e1.m_node[i] != e2.m_node[i]) return false;
+	}
+	return true;
+}
+
+
 struct BOX
 {
 public:
@@ -525,7 +537,15 @@ void FEContactPotential::BuildNeighborTable()
 			{
 				set<FESurfaceElement*>& nbrList = m_elemNeighbors[i];
 				nbrList.clear();
-				nbrList.insert(&el1);
+
+				for (int j = 0; j < m_surf2.Elements(); ++j)
+				{
+					FESurfaceElement& el2 = m_surf2.Element(j);
+					if (el2.isActive() && ::is_same(el1, el2))
+					{
+						nbrList.insert(&el2);
+					}
+				}
 			}
 		}
 	}
