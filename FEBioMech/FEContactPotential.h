@@ -129,6 +129,7 @@ protected:
 	bool	m_checkIntersections;	//!< check for edge/face intersections
 
 	int		m_integrationRule = 0;
+	bool	m_excludeNeighbors = true;
 
 	double	m_c1, m_c2;
 
