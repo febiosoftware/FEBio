@@ -1,7 +1,7 @@
 call "%ONEAPI_ROOT%setvars.bat" --force
 pushd %SOURCE_PATH%
 set SOURCE="https://github.com/NGSolve/netgen.git"
-set BRANCH="v6.2.2406"
+set BRANCH="v6.2.2501"
 
 git clone --depth 1 --branch "%BRANCH%" "%SOURCE%" "%BRANCH%"
 pushd %BRANCH%

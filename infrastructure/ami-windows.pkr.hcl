@@ -34,7 +34,7 @@ data "amazon-parameterstore" "winrm_username" {
 
 data "amazon-ami" "windows" {
   filters = {
-    name             = "Windows_Server-2022-English-Full-Base-*"
+    name             = "Windows_Server-2019-English-Full-Base-*"
     root-device-type = "ebs"
   }
 
@@ -49,7 +49,7 @@ variable "skip_create_ami" {
 }
 
 source "amazon-ebs" "windows" {
-  ami_name      = "packer-provisioned-windows-2022-intel-oneapi-${local.buildtime}"
+  ami_name      = "packer-provisioned-windows-2019-intel-oneapi-${local.buildtime}"
   instance_type = "c4.2xlarge"
   source_ami    = data.amazon-ami.windows.id
   communicator  = "winrm"
@@ -68,7 +68,7 @@ source "amazon-ebs" "windows" {
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
     volume_size           = 100
-    volume_type           = "gp2"
+    volume_type           = "gp3"
     delete_on_termination = true
   }
 }
@@ -147,7 +147,7 @@ build {
   # # sysprep for next launch
   provisioner "powershell" {
     inline = [
-        "& 'C:\\Program Files\\Amazon\\EC2Launch\\EC2Launch.exe' sysprep"
+        "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
     ]
   }
 

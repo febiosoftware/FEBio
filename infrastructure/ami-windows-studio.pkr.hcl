@@ -27,7 +27,7 @@ variable "installation_path" {
 
 data "amazon-ami" "windows" {
   filters = {
-    name             = "packer-provisioned-windows-2022-intel-oneapi-*"
+    name             = "packer-provisioned-windows-2019-intel-oneapi-*"
     root-device-type = "ebs"
   }
 
@@ -52,7 +52,7 @@ variable "skip_create_ami" {
 }
 
 source "amazon-ebs" "windows" {
-  ami_name      = "packer-provisioned-windows-2022-febio-studio-${local.buildtime}"
+  ami_name      = "packer-provisioned-windows-2019-febio-studio-${local.buildtime}"
   instance_type = "c5a.8xlarge"
   source_ami    = data.amazon-ami.windows.id
 
@@ -75,7 +75,7 @@ source "amazon-ebs" "windows" {
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
     volume_size           = 150
-    volume_type           = "gp2"
+    volume_type           = "gp3"
     delete_on_termination = true
   }
 }
@@ -109,35 +109,13 @@ build {
     env    = local.environment
   }
 
-  provisioner "powershell" {
-    script = "./common/windows/msmpi.ps1"
-    env    = local.environment
-  }
+#   provisioner "powershell" {
+#     script = "./common/windows/msmpi.ps1"
+#     env    = local.environment
+#   }
 
   provisioner "powershell" {
     script = "./common/windows/aws.ps1"
-    env    = local.environment
-  }
-
-  # qt
-  provisioner "windows-shell" {
-    script = "./common/windows/qt.bat"
-    env    = local.environment
-  }
-
-  provisioner "powershell" {
-    script = "./common/windows/install-builder.ps1"
-    env    = local.environment
-  }
-
-  # Lua 5.3
-  provisioner "powershell" {
-    script = "./common/windows/lua.ps1"
-    env    = local.environment
-  }
-
-  provisioner "powershell" {
-    script = "./common/windows/ffmpeg.ps1"
     env    = local.environment
   }
 
@@ -155,6 +133,40 @@ build {
 
   provisioner "powershell" {
     script = "./common/windows/vcpkg-package-install.ps1"
+    env    = local.environment
+  }
+
+  # Lua 5.3
+  provisioner "powershell" {
+    script = "./common/windows/lua.ps1"
+    env    = local.environment
+  }
+
+  # itk
+  provisioner "windows-shell" {
+    script = "./common/windows/itk.bat"
+    env    = local.environment
+  }
+
+  # sitk
+  provisioner "windows-shell" {
+    script = "./common/windows/sitk.bat"
+    env    = local.environment
+  }
+
+  # qt
+  provisioner "windows-shell" {
+    script = "./common/windows/qt.bat"
+    env    = local.environment
+  }
+
+  provisioner "powershell" {
+    script = "./common/windows/install-builder.ps1"
+    env    = local.environment
+  }
+
+  provisioner "powershell" {
+    script = "./common/windows/ffmpeg.ps1"
     env    = local.environment
   }
 
@@ -179,18 +191,6 @@ build {
   # tetgen
   provisioner "windows-shell" {
     script = "./common/windows/tetgen.bat"
-    env    = local.environment
-  }
-
-  # itk
-  provisioner "windows-shell" {
-    script = "./common/windows/itk.bat"
-    env    = local.environment
-  }
-
-  # sitk
-  provisioner "windows-shell" {
-    script = "./common/windows/sitk.bat"
     env    = local.environment
   }
 
@@ -221,7 +221,7 @@ build {
   # sysprep for next launch
   provisioner "powershell" {
     inline = [
-      "& 'C:\\Program Files\\Amazon\\EC2Launch\\EC2Launch.exe' sysprep"
+      "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
     ]
   }
 }
