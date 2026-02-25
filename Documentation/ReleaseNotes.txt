@@ -41,6 +41,39 @@ at https://forums.febio.org/.
 
 ===========================================================================
 
+ R E L E A S E   4.12  2/25/2026
+
+===========================================================================
+
+New Features:
+* Added option to "contact potential" to exclude neighbors from contact search.
+* Added support for including CDATA sections in xml file.
+* Added "scale" 1d-function, which simply scales the input value by a user-defined constant.
+
+Improvements:
+* Added additional checks around potential dereferencing null pointers in contact potential.
+* Reimplemented torsion spring on revolute joint so applied moment remains linear w.r.t. the rotation angle.
+* Mapped values are now stored with FMT_ITEM if applicable.
+* Updated FEBioConfig.cmake. SDKs now include FEBioConfig.cmake
+* Added FEBioConfig.cmake, a CMake build script that can be used in plugins to find and configure the FEBio paths. 
+* Made some changes to FEBioConfig.cmake [skip ci]
+* Added option to set verbose mode, which will print info on when callbacks are entered and exited.
+
+Bug Fixes:
+* Using different assembly method for forces of beam domain so that reaction forces are processed correctly.
+* Fixed bug in "parameter" plot variable when field was evaluated over multiple domains.
+* Fixed crash when elements are initially inverted.
+* Moved where entity references in xml reader are processed.
+* Fixed issues with output of "contact penalty" and "contact status". (#116)
+* Fixed initial value of E parameter in tension-only linear spring.
+* Added checks on FEModel* constructor argument for feature classes to avoid crashing when FEModel* is null in FEBio Studio.
+
+Documentation:
+* A new Feature Manual is available here: https://febiosoftware.github.io/febio-feature-manual/
+
+
+===========================================================================
+
  R E L E A S E   4.11  1/5/2026
 
 ===========================================================================
