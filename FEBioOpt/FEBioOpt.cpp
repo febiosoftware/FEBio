@@ -36,7 +36,7 @@ SOFTWARE.*/
 #include "FEConstrainedLMOptimizeMethod.h"
 #include "FEPowellOptimizeMethod.h"
 #include "FEScanOptimizeMethod.h"
-
+#include "NLOptOptimizeMethod.h"
 #ifdef HAVE_LEVMAR
 #include "levmar.h"
 #endif
@@ -58,6 +58,12 @@ void FEBioOpt::InitModule()
 #endif
 	REGISTER_FECORE_CLASS(FEPowellOptimizeMethod, "powell");
 	REGISTER_FECORE_CLASS(FEScanOptimizeMethod, "scan");
+
+#ifdef HAVE_NLOPT
+	REGISTER_FECORE_CLASS(FEMMAOptimizeMethod    , "mma");
+	REGISTER_FECORE_CLASS(FENelderMeadOptMethod  , "nelder-mead");
+	REGISTER_FECORE_CLASS(FESubplexOptimizeMethod, "sbplx");
+#endif
 }
 
 int FEBioOpt::optimize(
