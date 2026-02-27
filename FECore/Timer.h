@@ -40,7 +40,7 @@ class FECORE_API Timer
 
 public:
 	//! constructor
-	Timer();
+	Timer(bool isTracked = true);
     ~Timer();
 
 	//! Start the timer

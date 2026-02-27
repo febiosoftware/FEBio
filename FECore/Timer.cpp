@@ -50,14 +50,17 @@ struct	Timer::Imp {
 
 	Timer* parent = nullptr; // the timer that was active when this timer starts
 
+	bool track = true;
+
 	static Timer* activeTimer;
 };
 
 Timer* Timer::Imp::activeTimer = nullptr;
 
-Timer::Timer()
+Timer::Timer(bool isTracked)
 {
 	m = new Imp;
+	m->track = isTracked;
 	reset();
 }
 
@@ -74,9 +77,9 @@ Timer* Timer::activeTimer()
 
 void Timer::start()
 {
-	m->parent = m->activeTimer;
+	m->parent = (m->track ? m->activeTimer : nullptr);
 	if (m->parent) m->parent->pause();
-	m->activeTimer = this;
+	if (m->track) m->activeTimer = this;
 	m->start = steady_clock::now();
 	assert(m->isRunning == false);
 	m->isRunning = true;
@@ -89,9 +92,12 @@ void Timer::stop()
 	m->isRunning = false;
 	m->total += m->stop - m->start;
 
-	assert(m->activeTimer == this);
-	m->activeTimer = m->parent;
-	if (m->parent) m->parent->unpause();
+	if (m->track)
+	{
+		assert(m->activeTimer == this);
+		m->activeTimer = m->parent;
+		if (m->parent) m->parent->unpause();
+	}
 }
 
 void Timer::pause()
