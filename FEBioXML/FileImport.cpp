@@ -802,6 +802,8 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			FEScalarValuator* val = fecore_new<FEScalarValuator>(sztype, GetFEModel());
 			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
+			val->SetParent(pc);
+
 			// Figure out the item list
 			FEItemList* itemList = nullptr;
 			if (dynamic_cast<FESurfaceLoad*>(pc))
