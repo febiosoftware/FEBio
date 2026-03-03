@@ -233,10 +233,10 @@ if(WIN32)
       PATH_SUFFIXES "vs2017/Release"
       DOC "NLOPT library path")
 else()
-	find_path(NLOPT_INC nlopt.h PATHS /usr/local/ /opt/nlopt* $ENV{HOME}/* $ENV{HOME}/*/* $ENV{HOME}/local/x86_64/*
+	find_path(NLOPT_INC nlopt.h PATHS /usr/local/ /opt/nlopt* $ENV{HOME}/* $ENV{HOME}/*/*
       PATH_SUFFIXES "include" "nlopt" "include/nlopt"
 		DOC "NLOPT include directory")
-	find_library(NLOPT_LIB nlopt PATHS /usr/local/ /opt/nlopt* $ENV{HOME}/* $ENV{HOME}/*/* $ENV{HOME}/local/x86_64/*
+	find_library(NLOPT_LIB nlopt PATHS /usr/local/ /opt/nlopt* $ENV{HOME}/* $ENV{HOME}/*/*
         PATH_SUFFIXES "lib" "build" "cbuild" "cmbuild"
 		DOC "NLOPT library path")
 endif()

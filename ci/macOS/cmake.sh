@@ -8,4 +8,5 @@ cmake . -B cmbuild -L \
 	-DUSE_MKL=ON \
 	-DUSE_MMG=ON \
 	-DUSE_ZLIB=ON \
+	-DUSE_NLOPT=ON \
     -DOMP_INC=/Users/gitRunner/local/x86_64/homebrew/opt/libomp/include
