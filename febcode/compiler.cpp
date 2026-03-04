@@ -1,0 +1,799 @@
+#include "compiler.h"
+#include "scanner.h"
+#include "parser.h"
+
+using namespace febcode;
+
+void febcode::CompileSource(Program& prg, const std::string& source)
+{
+	// 1. Tokenize
+	Scanner scanner(source);
+	std::vector<Token> tokens = scanner.scanTokens();
+
+	// 2. Parse -> AST
+	Parser parser(prg);
+	parser.parse(tokens);
+
+	// Optional safety check
+	if (prg.ast.empty())
+		throw std::runtime_error("Parser produced no statements.");
+
+	// 3. Compile -> bytecode
+	Compiler compiler(prg);
+	compiler.compile();
+}
+
+//
+// ================= IMPLEMENTATION =================
+//
+
+Compiler::Compiler(Program& prg) : prg(prg)
+{
+}
+
+//
+// ===== Scope =====
+//
+
+void Compiler::beginScope()
+{
+	m_scopeDepth++;
+}
+
+void Compiler::endScope()
+{
+	while (!m_locals.empty() && m_locals.back().depth == m_scopeDepth)
+	{
+		emit(OpCode::POP);
+		m_locals.pop_back();
+	}
+	m_scopeDepth--;
+}
+
+int Compiler::resolveLocal(const std::string& name)
+{
+	for (int i = (int)m_locals.size() - 1; i >= 0; --i)
+		if (m_locals[i].name == name)
+			return m_locals[i].slot;
+	return -1;
+}
+
+int Compiler::resolveGlobal(const std::string& name)
+{
+	auto it = prg.globals.find(name);
+	if (it != prg.globals.end())
+		return it->second.slot;
+
+	throw std::runtime_error("Undefined global variable: " + name);
+}
+
+//
+// ===== Bytecode Helpers =====
+//
+
+void Compiler::emit(OpCode op)
+{
+	prg.code.push_back((uint8_t)op);
+}
+
+void Compiler::emitUint16(uint16_t v)
+{
+	prg.code.push_back((v >> 8) & 0xff);
+	prg.code.push_back(v & 0xff);
+}
+
+uint16_t Compiler::addConstant(const Value& v)
+{
+	prg.constants.push_back(v);
+	return (uint16_t)(prg.constants.size() - 1);
+}
+
+int Compiler::emitJump(OpCode op)
+{
+	emit(op);
+	emitUint16(0xffff);
+	return (int)prg.code.size() - 2;
+}
+
+void Compiler::patchJump(int offset)
+{
+	int jump = (int)prg.code.size() - offset - 2;
+	prg.code[offset] = (jump >> 8) & 0xff;
+	prg.code[offset + 1] = jump & 0xff;
+}
+
+void Compiler::emitLoop(int loopStart)
+{
+	emit(OpCode::LOOP);
+	int offset = (int)prg.code.size() - loopStart + 2;
+	emitUint16(offset);
+}
+
+//
+// ===== Program =====
+//
+
+void Compiler::compile()
+{
+	prg.functions[0].entry = 0;
+
+	for (auto& stmt : prg.ast.statements)
+		compileStatement(stmt.get());
+
+	// only add return if the last instruction isn't already a return (e.g. from a function)
+	if (prg.code.empty() || prg.code.back() != (uint8_t)OpCode::RETURN)
+		emit(OpCode::RETURN);
+}
+
+//
+// ===== Statements =====
+//
+
+void Compiler::compileStatement(Statement* stmt)
+{
+	if      (auto b = dynamic_cast<ExpressionStmt*>(stmt)) compileExprStmt(b);
+	else if (auto b = dynamic_cast<BlockStmt*     >(stmt)) compileBlock(b);
+	else if (auto v = dynamic_cast<VarDeclStmt*   >(stmt)) compileVarDecl(v);
+	else if (auto f = dynamic_cast<FunctionStmt*  >(stmt)) compileFunction(f);
+	else if (auto i = dynamic_cast<IfStmt*        >(stmt)) compileIf(i);
+	else if (auto w = dynamic_cast<WhileStmt*     >(stmt)) compileWhile(w);
+	else if (auto r = dynamic_cast<ReturnStmt*    >(stmt)) compileReturn(r);
+	else if (auto s = dynamic_cast<StructStmt*    >(stmt)) compileStruct(s);
+	else
+		throw std::runtime_error("Unsupported statement type");
+}
+
+void Compiler::compileExprStmt(ExpressionStmt* stmt)
+{
+	compileExpression(stmt->expr.get());
+	emit(OpCode::POP);
+}
+
+void Compiler::compileBlock(BlockStmt* stmt)
+{
+	beginScope();
+	for (auto& s : stmt->statements)
+		compileStatement(s.get());
+	endScope();
+}
+
+void Compiler::compileInitializer(Expression* expr, Type expectedType)
+{
+	if (expectedType->kind == TypeKind::Struct)
+	{
+		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
+		if (init)
+		{
+			if (init->elements.size() != expectedType->fields.size())
+				throw std::runtime_error("Struct initializer has incorrect number of fields.");
+
+			for (size_t i = 0; i < init->elements.size(); ++i)
+			{
+				Type fieldType = expectedType->fields[i].first;
+				compileInitializer(init->elements[i].get(), fieldType);
+			}
+
+			emit(OpCode::CREATE_STRUCT);
+			emitUint16(static_cast<uint16_t>(expectedType->typeIndex));
+		}
+		else
+		{
+			Type returnType = compileExpression(expr);
+			if (returnType != expectedType)
+				throw std::runtime_error("Invalid initializer type for struct.");
+
+			emit(OpCode::COPY_STRUCT);
+		}
+	}
+	else if (expectedType->kind == TypeKind::Array)
+	{
+		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
+		if (init)
+		{
+			if (init->elements.size() != expectedType->arraySize)
+				throw std::runtime_error("Array initializer has incorrect number of elements.");
+
+			Type arrayType = expectedType->elementType;
+			for (size_t i = 0; i < init->elements.size(); ++i)
+			{
+				compileInitializer(init->elements[i].get(), arrayType);
+			}
+
+			emit(OpCode::CREATE_ARRAY);
+			emitUint16(static_cast<uint16_t>(expectedType->arraySize));
+		}
+		else
+		{
+			Type returnType = compileExpression(expr);
+			if (returnType != expectedType)
+				throw std::runtime_error("Invalid initializer type for array.");
+
+			emit(OpCode::COPY_ARRAY);
+		}
+	}
+	else
+	{
+		Type returnType = compileExpression(expr);
+		if (returnType != expectedType)
+			throw std::runtime_error("Invalid initializer type");
+	}
+}
+
+void Compiler::compileVarDecl(VarDeclStmt* decl)
+{
+	for (auto& var : decl->vars)
+	{
+		if (var.initializer)
+		{
+			compileInitializer(var.initializer.get(), var.type);
+		}
+
+		// make sure the name doesn't start with an underscore, which is reserved for internal use
+		if (!var.name.empty() && var.name[0] == '_')
+			throw std::runtime_error("Variable names cannot start with an underscore.");
+
+		if (m_scopeDepth == 0)
+		{
+			int slot = prg.addGlobal(var.name, var.type);
+
+			if (var.initializer)
+			{
+				prg.globals[var.name].isInitialized = true;
+				emit(OpCode::SET_GLOBAL);
+				emitUint16(slot);
+				emit(OpCode::POP);
+			}
+		}
+		else
+		{
+			int slot = (int)m_locals.size();
+
+			// make sure the variable isn't already declared in this scope
+			for (int i = (int)m_locals.size() - 1; i >= 0; --i)
+			{
+				if (m_locals[i].depth < m_scopeDepth)
+					break;
+				if (m_locals[i].name == var.name)
+					throw std::runtime_error("Variable '" + var.name + "' is already declared in this scope.");
+			}
+
+			m_locals.push_back({ var.name, var.type, m_scopeDepth, slot });
+
+			if (var.initializer)
+			{
+				m_locals.back().isInitialized = true;
+			}
+		}
+	}
+}
+
+//
+// ===== If / While =====
+//
+
+void Compiler::compileIf(IfStmt* stmt)
+{
+	compileExpression(stmt->condition.get());
+
+	int thenJump = emitJump(OpCode::JUMP_IF_FALSE);
+	emit(OpCode::POP);
+
+	compileStatement(stmt->thenBranch.get());
+
+	int elseJump = emitJump(OpCode::JUMP);
+
+	patchJump(thenJump);
+	emit(OpCode::POP);
+
+	if (stmt->elseBranch)
+		compileStatement(stmt->elseBranch.get());
+
+	patchJump(elseJump);
+}
+
+void Compiler::compileWhile(WhileStmt* stmt)
+{
+	int loopStart = (int)prg.code.size();
+
+	compileExpression(stmt->condition.get());
+
+	int exitJump = emitJump(OpCode::JUMP_IF_FALSE);
+	emit(OpCode::POP);
+
+	compileStatement(stmt->body.get());
+
+	emitLoop(loopStart);
+
+	patchJump(exitJump);
+	emit(OpCode::POP);
+}
+
+void Compiler::compileReturn(ReturnStmt* stmt)
+{
+	if (stmt->value)
+	{
+		auto init = dynamic_cast<InitializerExpr*>(stmt->value.get());
+		if (init && expectedReturnType != nullptr)
+		{
+			compileInitializer(init, expectedReturnType);
+		}
+		else
+		{
+			Type type = compileExpression(stmt->value.get());
+
+			if (expectedReturnType != nullptr && type != expectedReturnType)
+				throw std::runtime_error("Return type mismatch: expected " + TypeToString(expectedReturnType) + ", got " + TypeToString(type));
+		}
+	}
+	else
+	{
+		if (expectedReturnType != nullptr && expectedReturnType != prg.types.getVoidType())
+			throw std::runtime_error("Missing return value in function with non-void return type.");
+
+		// return without value -> push monostate
+		uint16_t idx = addConstant(std::monostate{});
+		emit(OpCode::PUSH_CONST);
+		emitUint16(idx);
+	}
+
+	emit(OpCode::RETURN);
+}
+
+void Compiler::compileStruct(StructStmt* stmt)
+{
+	// nothing to do here since struct definitions are handled during parsing and type registration.
+}
+
+//
+// ===== Functions =====
+//
+
+void Compiler::compileFunction(FunctionStmt* fn)
+{
+	// Emit jump over function body
+	int jumpOver = emitJump(OpCode::JUMP);
+
+	FunctionInfo info;
+	info.name = fn->name;
+	info.entry = prg.code.size();
+	info.returnType = fn->returnType;
+
+	for (auto& p : fn->params)
+		info.args.push_back(p.first);
+
+	int fnIndex = (int)prg.functions.size();
+	prg.functions.push_back(info);
+
+	Type currentReturnType = expectedReturnType;
+	expectedReturnType = fn->returnType;
+
+	beginScope();
+
+	for (auto& p : fn->params)
+		m_locals.push_back({ p.second, p.first, m_scopeDepth, (int)m_locals.size(), true });
+
+	BlockStmt* body = dynamic_cast<BlockStmt*>(fn->body.get());
+	for (auto& stmt : body->statements)
+		compileStatement(stmt.get());
+
+	// We don't call endScope() here since the function body must end with a return, this will never pop the function's locals. 
+	// Instead, just clear locals and reset the scope depth.
+	while (!m_locals.empty() && m_locals.back().depth == m_scopeDepth)
+	{
+		m_locals.pop_back();
+	}
+	m_scopeDepth--;
+
+	if (prg.code.empty() || prg.code.back() != (uint8_t)OpCode::RETURN)
+	{
+		if (fn->returnType != nullptr && fn->returnType != prg.types.getVoidType())
+			throw std::runtime_error("Missing return statement in function with non-void return type.");
+
+		emit(OpCode::RETURN);
+	}
+
+	expectedReturnType = currentReturnType;
+
+	// Patch jump so execution skips function body
+	patchJump(jumpOver);
+}
+
+//
+// ===== Expressions =====
+//
+
+Type Compiler::compileExpression(Expression* expr)
+{
+	Type type;
+	if      (auto b = dynamic_cast<BinaryExpr*       >(expr)) type = compileBinary(b);
+	else if (auto u = dynamic_cast<UnaryExpr*        >(expr)) type = compileUnary(u);
+	else if (auto l = dynamic_cast<LiteralExpr*      >(expr)) type = compileLiteral(l);
+	else if (auto v = dynamic_cast<VariableExpr*     >(expr)) type = compileVariable(v);
+	else if (auto a = dynamic_cast<AssignExpr*       >(expr)) type = compileAssign(a);
+	else if (auto c = dynamic_cast<CallExpr*         >(expr)) type = compileCall(c);
+	else if (auto m = dynamic_cast<MemberExpr*       >(expr)) type = compileMember(m);
+	else if (auto s = dynamic_cast<SetMemberExpr*    >(expr)) type = compileSetMember(s);
+	else if (auto s = dynamic_cast<IndexExpr*        >(expr)) type = compileIndex(s);
+	else if (auto s = dynamic_cast<SetIndexExpr*     >(expr)) type = compileSetIndex(s);
+	else
+		throw std::runtime_error("Unsupported expression type");
+
+	return type;
+}
+
+Type Compiler::compileLiteral(LiteralExpr* expr)
+{
+	uint16_t idx = addConstant(expr->value);
+	emit(OpCode::PUSH_CONST);
+	emitUint16(idx);
+	return prg.types.getBuiltinType(expr->value);
+}
+
+Type Compiler::compileVariable(VariableExpr* expr)
+{
+	int local = resolveLocal(expr->name);
+	if (local != -1)
+	{
+		emit(OpCode::GET_LOCAL);
+		emitUint16(local);
+
+		if (!m_locals[local].isInitialized)
+			throw std::runtime_error("Cannot read uninitialized local variable: " + expr->name);
+
+		return m_locals[local].type;
+	}
+
+	int global = resolveGlobal(expr->name);
+
+	Program::Global& glob = prg.globals[expr->name];
+
+	if (!glob.isInitialized)
+		throw std::runtime_error("Cannot read uninitialized global variable: " + expr->name);
+
+	glob.refcount++;
+
+	emit(OpCode::GET_GLOBAL);
+	emitUint16(global);
+	return glob.type;
+}
+
+Type Compiler::compileAssign(AssignExpr* expr)
+{
+	Type type = compileExpression(expr->value.get());
+
+	int local = resolveLocal(expr->name);
+	if (local != -1)
+	{
+		if (m_locals[local].type != type)
+			throw std::runtime_error("Type mismatch in assignment to local variable: " + expr->name);
+
+		m_locals[local].isInitialized = true;
+
+		emit(OpCode::SET_LOCAL);
+		emitUint16(local);
+		return type;
+	}
+
+	int global = resolveGlobal(expr->name);
+	if (prg.globals[expr->name].type != type)
+		throw std::runtime_error("Type mismatch in assignment to global variable: " + expr->name);
+
+	if (prg.globals[expr->name].immutable)
+		throw std::runtime_error("Cannot assign to immutable global variable: " + expr->name);
+
+	prg.globals[expr->name].isInitialized = true;
+
+	emit(OpCode::SET_GLOBAL);
+	emitUint16(global);
+	return type;
+}
+
+//
+// ===== Binary (includes &&, ||) =====
+//
+
+Type Compiler::compileBinary(BinaryExpr* expr)
+{
+	BinaryOp op = expr->op;
+
+	// Short-circuit AND
+	if (op == BinaryOp::AndAnd)
+	{
+		Type type = compileExpression(expr->left.get());
+
+		if (!isNumericType(type) && !isBoolType(type))
+			throw std::runtime_error("Cannot convert left operand of '&&' to boolean.");
+
+		int endJump = emitJump(OpCode::JUMP_IF_FALSE);
+		emit(OpCode::POP);
+		type = compileExpression(expr->right.get());
+		if (!isNumericType(type) && !isBoolType(type))
+			throw std::runtime_error("Cannot convert right operand of '&&' to boolean.");
+
+		patchJump(endJump);
+		return prg.types.getBoolType();
+	}
+
+	// Short-circuit OR
+	if (op == BinaryOp::OrOr)
+	{
+		Type type = compileExpression(expr->left.get());
+
+		if (!isNumericType(type) && !isBoolType(type))
+			throw std::runtime_error("Cannot convert left operand of '||' to boolean.");
+
+		int endJump = emitJump(OpCode::JUMP_IF_TRUE);
+		emit(OpCode::POP);
+
+		type = compileExpression(expr->right.get());
+		if (!isNumericType(type) && !isBoolType(type))
+			throw std::runtime_error("Cannot convert right operand of '||' to boolean.");
+
+		patchJump(endJump);
+		return prg.types.getBoolType();
+	}
+
+	Type type_l = compileExpression(expr->left.get());
+	Type type_r = compileExpression(expr->right.get());
+
+	if (isStringType(type_l) && isStringType(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Plus      : emit(OpCode::ADD_STRING); break;
+		case BinaryOp::EqualEqual: emit(OpCode::EQUAL     ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::NotEqual  : emit(OpCode::NOT_EQUAL ); type_l = prg.types.getBoolType(); break;
+		default:
+			throw std::runtime_error("Unsupported binary op for string type.");
+		}
+		return type_l;
+	}
+
+	if (isIntType(type_l) && isIntType(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Plus    : emit(OpCode::ADD_INT); break;
+		case BinaryOp::Minus   : emit(OpCode::SUB_INT); break;
+		case BinaryOp::Multiply: emit(OpCode::MUL_INT); break;
+		case BinaryOp::Divide  : emit(OpCode::DIV_INT); break;
+		case BinaryOp::Exponent: emit(OpCode::EXP_INT); break;
+		case BinaryOp::Greater     : emit(OpCode::GT_INT   ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::Less        : emit(OpCode::LT_INT   ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::GreaterEqual: emit(OpCode::GE_INT   ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::LessEqual   : emit(OpCode::LE_INT   ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL    ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::NotEqual    : emit(OpCode::NOT_EQUAL); type_l = prg.types.getBoolType(); break;
+		default: throw std::runtime_error("Unsupported binary op for int type.");
+		}
+		return type_l;
+	}
+
+	if (isDoubleType(type_l) && isDoubleType(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Plus    : emit(OpCode::ADD_DOUBLE); break;
+		case BinaryOp::Minus   : emit(OpCode::SUB_DOUBLE); break;
+		case BinaryOp::Multiply: emit(OpCode::MUL_DOUBLE); break;
+		case BinaryOp::Divide  : emit(OpCode::DIV_DOUBLE); break;
+		case BinaryOp::Exponent: emit(OpCode::EXP_DOUBLE); break;
+		case BinaryOp::Greater     : emit(OpCode::GT_DOUBLE); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::Less        : emit(OpCode::LT_DOUBLE); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::GreaterEqual: emit(OpCode::GE_DOUBLE); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::LessEqual   : emit(OpCode::LE_DOUBLE); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL    ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::NotEqual    : emit(OpCode::NOT_EQUAL); type_l = prg.types.getBoolType(); break;
+		default: throw std::runtime_error("Unsupported binary op for double type.");
+		}
+		return type_l;
+	}
+
+	// see if we have a binary operator overload for these operand types
+	if (auto overload = prg.findBinaryOperatorOverload(op, type_l, type_r))
+	{
+		emit(OpCode::CALL_BINARY);
+		emitUint16(static_cast<uint16_t>(overload->index));
+		return overload->returnType;
+	}
+
+	throw std::runtime_error("Unsupported binary op for given operand types.");
+
+	return type_l;
+}
+
+Type Compiler::compileUnary(UnaryExpr* expr)
+{
+	Type type = compileExpression(expr->right.get());
+	switch (expr->op)
+	{
+	case UnaryOp::Negate:
+	{
+		if      (isIntType   (type)) emit(OpCode::NEG_INT);
+		else if (isDoubleType(type)) emit(OpCode::NEG_DOUBLE);
+		else
+			throw std::runtime_error("Invalid operand type for unary '-'.");
+		break;
+	}
+	case UnaryOp::Not   : emit(OpCode::NOT); type = prg.types.getBoolType(); break;
+	default: throw std::runtime_error("Unsupported unary op");
+	}
+	return type;
+}
+
+int Compiler::resolveFunction(const std::string& name, std::vector<Type> args)
+{
+	for (int i = 0; i < (int)prg.functions.size(); ++i)
+	{
+		if ((prg.functions[i].name == name) && (prg.functions[i].args == args))
+		{
+			return i ;
+		}
+	}
+	return -1;
+}
+
+bool Compiler::isNativeFunction(const std::string& name)
+{
+	for (int i = 0; i < (int)prg.functions.size(); ++i)
+	{
+		if (prg.functions[i].name == name)
+		{
+			return prg.functions[i].isNative;
+		}
+	}
+	return false;
+}
+
+std::vector<Type> Compiler::compileFncArgs(std::vector<std::unique_ptr<Expression>>& args, bool copyArgs)
+{
+	std::vector<Type> argTypes;
+	for (auto& arg : args)
+	{
+		Type type = compileExpression(arg.get());
+
+		if (copyArgs)
+		{
+			if (type->kind == TypeKind::Struct) emit(OpCode::COPY_STRUCT);
+			if (type->kind == TypeKind::Array ) emit(OpCode::COPY_ARRAY);
+		}
+
+		argTypes.push_back(type);
+	}
+	return argTypes;
+}
+
+Type Compiler::compileCall(CallExpr* call)
+{
+	// Callee must be a variable (function name)
+	if (auto calleeVar = dynamic_cast<VariableExpr*>(call->callee.get()))
+	{
+		// handle special functions first
+		if (calleeVar->name == "print")
+		{
+			compileFncArgs(call->arguments, false);
+			emit(OpCode::PRINT);
+			emitUint16(static_cast<uint16_t>(call->arguments.size())); // number of arguments
+			return prg.types.getVoidType();
+		}
+
+		// don't copy args for native functions
+		std::vector<Type> argTypes = compileFncArgs(call->arguments, !isNativeFunction(calleeVar->name));
+		int fnIndex = resolveFunction(calleeVar->name, argTypes);
+		if (fnIndex == -1)
+			throw std::runtime_error("Undefined function: " + calleeVar->name);
+
+		// check arg count
+		if (prg.functions[fnIndex].args.size() != (int)call->arguments.size())
+			throw std::runtime_error("Argument count mismatch in call to function: " + calleeVar->name);
+
+		// check arg types
+		for (int i = 0; i < argTypes.size(); ++i)
+		{
+			if (argTypes[i] != prg.functions[fnIndex].args[i])
+				throw std::runtime_error("Argument type mismatch in call to function: " + calleeVar->name);
+		}
+
+		emit(OpCode::CALL);
+		emitUint16(fnIndex);
+		emitUint16((uint16_t)call->arguments.size());
+
+		return prg.functions[fnIndex].returnType;
+	}
+	else if (auto calleeMem = dynamic_cast<MemberExpr*>(call->callee.get()))
+	{
+		auto obj = dynamic_cast<VariableExpr*>(calleeMem->object.get());
+		if (obj == nullptr)
+			throw std::runtime_error("Unknown object name when compiling function call.");
+
+		std::string fncName = obj->name + "." + calleeMem->property;
+
+		std::vector<Type> argTypes = compileFncArgs(call->arguments);
+		int fnIndex = resolveFunction(fncName, argTypes);
+		if (fnIndex == -1)
+			throw std::runtime_error("Undefined function: " + fncName);
+
+		emit(OpCode::CALL);
+		emitUint16(fnIndex);
+		emitUint16((uint16_t)call->arguments.size());
+
+		return prg.functions[fnIndex].returnType;
+	}
+	else
+	{
+		throw std::runtime_error("Invalid function call.");
+	}
+}
+
+Type Compiler::compileMember(MemberExpr* expr)
+{
+	Type type = compileExpression(expr->object.get());
+
+	auto it = std::find_if(type->fields.begin(), type->fields.end(),
+		[&](const auto& field) { return field.second == expr->property; });
+	if (it == type->fields.end())
+		throw std::runtime_error("Unknown property: " + expr->property);
+
+	std::size_t index = it - type->fields.begin();
+
+	emit(OpCode::GET_PROPERTY);
+	emitUint16((uint16_t)index);
+
+	return it->first;
+}
+
+Type Compiler::compileSetMember(SetMemberExpr* expr)
+{
+	Type objType = compileExpression(expr->object.get());
+	Type valType = compileExpression(expr->value.get());
+
+	auto it = std::find_if(objType->fields.begin(), objType->fields.end(),
+		[&](const auto& field) { return field.second == expr->property; });
+
+	if (it == objType->fields.end())
+		throw std::runtime_error("Unknown property: " + expr->property);
+
+	if (it->first != valType)
+		throw std::runtime_error("Type mismatch in assignment to property: " + expr->property);
+
+	std::size_t index = it - objType->fields.begin();
+
+	emit(OpCode::SET_PROPERTY);
+	emitUint16((uint16_t)index);
+
+	return it->first;
+}
+
+Type Compiler::compileIndex(IndexExpr* expr)
+{
+	Type exprType = compileExpression(expr->object.get());
+	Type indxType = compileExpression(expr->index.get());
+	if (exprType->kind != TypeKind::Array)
+		throw std::runtime_error("Cannot index non-array type.");
+	if (indxType->kind != TypeKind::Int)
+		throw std::runtime_error("Array index must be a number.");
+
+	emit(OpCode::GET_INDEX);
+
+	return exprType->elementType;
+}
+
+Type Compiler::compileSetIndex(SetIndexExpr* expr)
+{
+	Type objType = compileExpression(expr->object.get());   // push array
+	Type expType = compileExpression(expr->index.get());    // push index
+	Type valType = compileExpression(expr->value.get());    // push value
+
+	if (objType->kind != TypeKind::Array)
+		throw std::runtime_error("Cannot index non-array type.");
+
+	if (expType->kind != TypeKind::Int)
+		throw std::runtime_error("Array index must be a number.");
+
+	if (valType != objType->elementType)
+		throw std::runtime_error("Type mismatch in array assignment.");
+
+	emit(OpCode::SET_INDEX);
+
+	return objType->elementType;
+}
