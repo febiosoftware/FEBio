@@ -56,12 +56,12 @@ public:
     mat3ds Tangent_Temperature(FEMaterialPoint& mp) override;
     
     //! dynamic viscosity
-    double ShearViscosity(FEMaterialPoint& mp) override;
-    double TangentShearViscosityTemperature(FEMaterialPoint& mp);
+	double ShearViscosity(FEMaterialPoint& mp) override { return 0.0; }
+    double TangentShearViscosityTemperature(FEMaterialPoint& mp) { return 0.0; }
 
     //! bulk viscosity
-    double BulkViscosity(FEMaterialPoint& mp) override;
-    double TangentBulkViscosityTemperature(FEMaterialPoint& mp);
+    double BulkViscosity(FEMaterialPoint& mp) override { return 0.0; }
+    double TangentBulkViscosityTemperature(FEMaterialPoint& mp) { return 0.0; }
 
 public:
     FENewtonianFluid*   m_NF;
