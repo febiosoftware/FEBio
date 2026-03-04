@@ -176,6 +176,12 @@ build {
     env    = local.environment
   }
 
+  # NLOPT
+   provisioner "windows-shell" {
+    script = "./common/windows/nlopt.bat"
+    env    = local.environment
+  }
+
   # HYPRE
   provisioner "windows-shell" {
     script = "./common/windows/hypre.bat"

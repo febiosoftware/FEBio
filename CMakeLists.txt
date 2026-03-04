@@ -142,6 +142,15 @@ if(USE_LEVMAR)
 	endif()
 endif()
 
+if(USE_NLOPT)
+	if(NOT EXISTS ${NLOPT_INC}/nlopt.h)
+		message(SEND_ERROR "Could not find nlopt.h. Check NLOPT_INC.")
+	endif()
+	if(NOT EXISTS ${NLOPT_LIB})
+		message(SEND_ERROR "Could not find NLOPT library. Check NLOPT_LIB.")
+	endif()
+endif()
+
 if(USE_ZLIB)
 	if(NOT EXISTS ${ZLIB_LIBRARY_RELEASE})
 		message(SEND_ERROR "Could not find ZLIB. Check ZLIB_LIBRARY_RELEASE.")
@@ -304,6 +313,13 @@ if(USE_LEVMAR)
 	target_include_directories(febioopt PRIVATE ${LEVMAR_INC})
     target_compile_definitions(febioopt PRIVATE HAVE_LEVMAR)
     target_link_libraries(febioopt PRIVATE ${LEVMAR_LIB})
+endif()
+
+# Link NLOPT
+if(USE_NLOPT)
+	target_include_directories(febioopt PRIVATE ${NLOPT_INC})
+    target_compile_definitions(febioopt PRIVATE HAVE_NLOPT)
+    target_link_libraries(febioopt PRIVATE ${NLOPT_LIB})
 endif()
 
 # Link FFTW

@@ -214,7 +214,42 @@ else()
 	find_library(LEVMAR_LIB levmar PATHS /usr/local/ /opt/levmar* $ENV{HOME}/* $ENV{HOME}/*/*
         PATH_SUFFIXES "lib" "build" "cbuild" "cmbuild"
 		DOC "Levmar library path")
-endif()	
+endif()
+
+if(LEVMAR_INC AND LEVMAR_LIB)		
+	option(USE_LEVMAR "Required for optimization in FEBio" ON)
+    mark_as_advanced(LEVMAR_INC LEVMAR_LIB)
+else()
+	option(USE_LEVMAR "Required for optimization in FEBio" OFF)
+    mark_as_advanced(CLEAR LEVMAR_INC LEVMAR_LIB)
+endif()
+
+# NLOPT
+if(WIN32)
+	find_path(NLOPT_INC nlopt.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* 
+      PATH_SUFFIXES "nlopt"
+      DOC "NLOPT include directory")
+	find_library(NLOPT_LIB nlopt PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+      PATH_SUFFIXES "vs2017/Release"
+      DOC "NLOPT library path")
+else()
+	find_path(NLOPT_INC nlopt.h PATHS /usr/local/ /opt/nlopt* $ENV{HOME}/* $ENV{HOME}/*/*
+      PATH_SUFFIXES "include" "nlopt" "include/nlopt"
+		DOC "NLOPT include directory")
+	find_library(NLOPT_LIB nlopt PATHS /usr/local/ /opt/nlopt* $ENV{HOME}/* $ENV{HOME}/*/*
+        PATH_SUFFIXES "lib" "build" "cbuild" "cmbuild"
+		DOC "NLOPT library path")
+endif()
+
+if(NLOPT_INC AND NLOPT_LIB)		
+	option(USE_NLOPT "Required for optimization in FEBio" ON)
+    mark_as_advanced(NLOPT_INC NLOPT_LIB)
+else()
+	option(USE_NLOPT "Required for optimization in FEBio" OFF)
+    mark_as_advanced(CLEAR NLOPT_INC NLOPT_LIB)
+endif()
+
+
 
 # SuperLU_MT
 if (WIN32)
@@ -235,15 +270,6 @@ if(SUPERLU_MT_INC AND SUPERLU_MT_LIB)
 else()
 	option(USE_SUPERLU_MT "Option for using SuperLU_MT" OFF)
     mark_as_advanced(CLEAR SUPERLU_MT_INC SUPERLU_MT_LIB)
-endif()
-
-
-if(LEVMAR_INC AND LEVMAR_LIB)		
-	option(USE_LEVMAR "Required for optimization in FEBio" ON)
-    mark_as_advanced(LEVMAR_INC LEVMAR_LIB)
-else()
-	option(USE_LEVMAR "Required for optimization in FEBio" OFF)
-    mark_as_advanced(CLEAR LEVMAR_INC LEVMAR_LIB)
 endif()
 
 # PDL

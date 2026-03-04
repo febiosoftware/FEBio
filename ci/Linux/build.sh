@@ -11,7 +11,8 @@ cmake . -B cmbuild -LA \
 	-DUSE_MKL=ON \
 	-DUSE_MMG=ON \
 	-DUSE_STATIC_STDLIBS=ON \
-	-DUSE_ZLIB=ON
+	-DUSE_ZLIB=ON \
+	-DUSE_NLOPT=ON 
 pushd cmbuild
 make -j $(nproc)
 popd
