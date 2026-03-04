@@ -25,7 +25,7 @@ cmake . -LA -B cmbuild ^
 
 cd "cmbuild"
 msbuild /p:configuration=Release /maxCpuCount:%NUMBER_OF_PROCESSORS% ALL_BUILD.vcxproj
-msbuild /p:configuration=Debug /maxCpuCount:%NUMBER_OF_PROCESSORS% ALL_BUILD.vcxproj
+@REM msbuild /p:configuration=Debug /maxCpuCount:%NUMBER_OF_PROCESSORS% ALL_BUILD.vcxproj
 cd ..
 
 exit /b %errorlevel%

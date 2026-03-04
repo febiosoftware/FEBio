@@ -34,9 +34,9 @@ for item in ${sdkDirs[@]}; do
     fi 
 
     cp $FEBIO_REPO/cmbuild/lib/Release/$item.lib ${TARGET_DIR}/lib/Release
-    cp $FEBIO_REPO/cmbuild/lib/Debug/$item.lib ${TARGET_DIR}/lib/Debug
+    # cp $FEBIO_REPO/cmbuild/lib/Debug/$item.lib ${TARGET_DIR}/lib/Debug
 done
 
-cp $FEBIO_REPO/cmbuild/bin/Debug/febio4.exe ${TARGET_DIR}/bin/Debug
-cp $FEBIO_REPO/cmbuild/bin/Debug/*.dll ${TARGET_DIR}/bin/Debug
+# cp $FEBIO_REPO/cmbuild/bin/Debug/febio4.exe ${TARGET_DIR}/bin/Debug
+# cp $FEBIO_REPO/cmbuild/bin/Debug/*.dll ${TARGET_DIR}/bin/Debug
 
