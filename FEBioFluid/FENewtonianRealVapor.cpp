@@ -35,7 +35,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FENewtonianRealVapor, FEViscousFluid)
+BEGIN_FECORE_CLASS(FENewtonianRealVapor, FEThermoViscousFluid)
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("referential shear viscosity");
 // properties
     ADD_PROPERTY(m_esat , "esat",FEProperty::Optional)->SetLongName("saturation dilatation");
@@ -48,7 +48,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FENewtonianRealVapor::FENewtonianRealVapor(FEModel* pfem) : FEViscousFluid(pfem)
+FENewtonianRealVapor::FENewtonianRealVapor(FEModel* pfem) : FEThermoViscousFluid(pfem)
 {
     m_kappa = 0;
     m_mu = 0;
