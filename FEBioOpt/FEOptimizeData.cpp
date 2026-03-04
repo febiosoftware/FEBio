@@ -37,9 +37,10 @@ SOFTWARE.*/
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEModelParameter::FEModelParameter(FEModel* fem) : FEInputParameter(fem)
+FEModelParameter::FEModelParameter(FEModel* fem) : FEInputParameter()
 {
-	m_pd = 0;
+	m_fem = fem;
+	m_pd = nullptr;
 }
 
 //-----------------------------------------------------------------------------
