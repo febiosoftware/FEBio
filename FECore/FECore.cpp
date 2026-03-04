@@ -55,6 +55,7 @@ SOFTWARE.*/
 #include "FEFacetSet.h"
 #include "FEElementSet.h"
 #include "FEConstValueVec3.h"
+#include "FECodeValuator.h"
 #include "NodeDataRecord.h"
 #include "FaceDataRecord.h"
 #include "ElementDataRecord.h"
@@ -141,9 +142,10 @@ REGISTER_FECORE_CLASS(FESurfaceToSurfaceVectorMap, "surface-to-surface vector");
 REGISTER_FECORE_CLASS(FEParabolicMap       , "parabolic map");
 
 // scalar valuators
-REGISTER_FECORE_CLASS(FEConstValue , "const");
-REGISTER_FECORE_CLASS(FEMathValue  , "math" );
-REGISTER_FECORE_CLASS(FEMappedValue, "map"  );
+REGISTER_FECORE_CLASS(FEConstValue  , "const");
+REGISTER_FECORE_CLASS(FEMathValue   , "math" );
+REGISTER_FECORE_CLASS(FEMappedValue , "map"  );
+REGISTER_FECORE_CLASS(FECodeValuator, "code" );
 
 //  vector generators
 REGISTER_FECORE_CLASS(FELocalVectorGenerator          , "local");
