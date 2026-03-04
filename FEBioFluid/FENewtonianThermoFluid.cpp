@@ -35,84 +35,67 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianThermoFluid, FEThermoViscousFluid)
-    ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits(UNIT_VISCOSITY)->setLongName("bulk viscosity");
-    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("shear viscosity");
 // properties
-    ADD_PROPERTY(m_kappahat, "khat" ,FEProperty::Optional)->SetLongName("normalized bulk viscosity");
-    ADD_PROPERTY(m_muhat   , "muhat",FEProperty::Optional)->SetLongName("normalized shear viscosity");
+    ADD_PROPERTY(m_prop[0], "khat" ,FEProperty::Optional)->SetLongName("normalized bulk viscosity");
+    ADD_PROPERTY(m_prop[1], "muhat",FEProperty::Optional)->SetLongName("normalized shear viscosity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FENewtonianThermoFluid::FENewtonianThermoFluid(FEModel* pfem) : FEThermoViscousFluid(pfem)
 {
-    m_kappa = 0;
-    m_mu = 0;
-    m_Tr = 0;
-    m_kappahat = nullptr;
-    m_muhat = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! initialization
 bool FENewtonianThermoFluid::Init()
 {
-    if (m_kappahat || m_muhat) {
-        m_Tr = GetGlobalConstant("T");
-        
-        if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
-    }
+    if (m_prop[0]) m_prop[0]->Init();
+    if (m_prop[1]) m_prop[1]->Init();
     
-    if (m_kappahat) m_kappahat->Init();
-    if (m_muhat) m_muhat->Init();
+    // store an invariant copy of the Newtonian fluid viscosities
+    m_kappa = m_NF->m_kappa;
+    m_mu = m_NF->m_mu;
     
     return FEViscousFluid::Init();
-}
-
-//-----------------------------------------------------------------------------
-void FENewtonianThermoFluid::Serialize(DumpStream& ar)
-{
-    FEViscousFluid::Serialize(ar);
-    
-    if (ar.IsShallow()) return;
-    
-    ar & m_Tr;
 }
 
 //-----------------------------------------------------------------------------
 //! viscous stress
 mat3ds FENewtonianThermoFluid::Stress(FEMaterialPoint& pt)
 {
-    FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
+    // evaluate thermal dependence of viscosities
+    double kappa = m_kappa*ThermoProp(pt,0);
+    double mu = m_mu*ThermoProp(pt,1);
     
-    mat3ds D = vt.RateOfDeformation();
+    // set these viscosities in the Newtonian fluid object
+    m_NF->m_kappa = kappa;
+    m_NF->m_mu = mu;
     
-    double mu = ShearViscosity(pt);
-    double kappa = BulkViscosity(pt);
-    
-    mat3ds s = mat3dd(1.0)*(D.tr()*(kappa - 2.*mu/3.)) + D*(2*mu);
-        
-    return s;
+    // evaluate the stress in the Newtonian fluid using these viscosities
+    return m_NF->Stress(pt);
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of stress with respect to strain J
 mat3ds FENewtonianThermoFluid::Tangent_Strain(FEMaterialPoint& mp)
 {
-    return mat3ds(0,0,0,0,0,0);
+    return m_NF->Tangent_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of stress with respect to rate of deformation tensor D
 tens4ds FENewtonianThermoFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
 {
-    mat3dd I(1.0);
-    double mu = ShearViscosity(mp);
-    double kappa = BulkViscosity(mp);
+    // evaluate thermal dependence of viscosities
+    double kappa = m_kappa*ThermoProp(mp,0);
+    double mu = m_mu*ThermoProp(mp,1);
     
-    tens4ds c = dyad1s(I)*(kappa - 2.*mu/3.) + dyad4s(I)*(2*mu);
+    // set these viscosities in the Newtonian fluid object
+    m_NF->m_kappa = kappa;
+    m_NF->m_mu = mu;
     
-    return c;
+    return m_NF->Tangent_RateOfDeformation(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -123,70 +106,10 @@ mat3ds FENewtonianThermoFluid::Tangent_Temperature(FEMaterialPoint& mp)
     
     mat3ds D = vt.RateOfDeformation();
     
-    double dmu = TangentShearViscosityTemperature(mp);
-    double dkappa = TangentBulkViscosityTemperature(mp);
+    double dkappa = m_kappa*TangentThermoProp(mp,0);
+    double dmu = m_mu*TangentThermoProp(mp,1);
     
     mat3ds ds = mat3dd(1.0)*(D.tr()*(dkappa - 2.*dmu/3.)) + D*(2*dmu);
         
     return ds;
-}
-
-//-----------------------------------------------------------------------------
-//! dynamic shear viscosity
-double FENewtonianThermoFluid::ShearViscosity(FEMaterialPoint& mp)
-{
-    double mu = m_mu;
-    if (m_muhat) {
-        FEThermoFluidMaterialPoint* tf = mp.ExtractData<FEThermoFluidMaterialPoint>();
-        if (tf) {
-            double That = (tf->m_T+m_Tr)/m_Tr;
-            mu *= m_muhat->value(That);
-        }
-    }
-    return mu;
-}
-
-//-----------------------------------------------------------------------------
-//! dynamic shear viscosity tangent w.r.t. temperature
-double FENewtonianThermoFluid::TangentShearViscosityTemperature(FEMaterialPoint& mp)
-{
-    double dmu = 0;
-    if (m_muhat) {
-        FEThermoFluidMaterialPoint* tf = mp.ExtractData<FEThermoFluidMaterialPoint>();
-        if (tf) {
-            double That = (tf->m_T+m_Tr)/m_Tr;
-            dmu = m_muhat->derive(That)*m_mu/m_Tr;
-        }
-    }
-    return dmu;
-}
-
-//-----------------------------------------------------------------------------
-//! bulk viscosity
-double FENewtonianThermoFluid::BulkViscosity(FEMaterialPoint& mp)
-{
-    double kappa = m_kappa;
-    if (m_kappa) {
-        FEThermoFluidMaterialPoint* tf = mp.ExtractData<FEThermoFluidMaterialPoint>();
-        if (tf) {
-            double That = (tf->m_T+m_Tr)/m_Tr;
-            kappa *= m_kappahat->value(That);
-        }
-    }
-    return kappa;
-}
-
-//-----------------------------------------------------------------------------
-//! bulk viscosity tangent w.r.t. temperature
-double FENewtonianThermoFluid::TangentBulkViscosityTemperature(FEMaterialPoint& mp)
-{
-    double dkappa = 0;
-    if (m_kappa) {
-        FEThermoFluidMaterialPoint* tf = mp.ExtractData<FEThermoFluidMaterialPoint>();
-        if (tf) {
-            double That = (tf->m_T+m_Tr)/m_Tr;
-            dkappa = m_kappahat->derive(That)*m_kappa/m_Tr;
-        }
-    }
-    return dkappa;
 }
