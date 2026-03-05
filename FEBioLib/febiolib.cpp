@@ -38,7 +38,7 @@ SOFTWARE.*/
 #include <FEBioFluid/FEBioFSI.h>
 #include <FEBioFluid/FEBioMultiphasicFSI.h>
 #include <FEBioFluid/FEBioFluidSolutes.h>
-#include <FEBioFluid/FEBioThermoFluid.h>
+#include <FEBioThermoFluid/FEBioThermoFluid.h>
 #include <FEBioFluid/FEBioPolarFluid.h>
 #include <FEBioTest/FEBioTest.h>
 #include <FEBioRVE/FEBioRVE.h>

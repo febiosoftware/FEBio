@@ -29,12 +29,11 @@
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include "FEFluidMaterialPoint.h"
+#include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 FELinearElasticFluid::FELinearElasticFluid(FEModel* pfem) : FEElasticFluid(pfem)
 {
-    m_k = 0;
-    m_rhor = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -45,19 +44,12 @@ bool FELinearElasticFluid::Init()
 }
 
 //-----------------------------------------------------------------------------
-// serialization
-void FELinearElasticFluid::Serialize(DumpStream& ar)
-{
-    if (ar.IsShallow()) return;
-    ar & m_k & m_rhor;
-}
-
-//-----------------------------------------------------------------------------
 //! gauge pressure
 double FELinearElasticFluid::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double p = -m_k*fp.m_ef;
+	double k = m_pFluid->m_k;
+    double p = -k*fp.m_ef;
     
     return p;
 }
@@ -66,7 +58,7 @@ double FELinearElasticFluid::Pressure(FEMaterialPoint& mp)
 //! tangent of pressure with respect to strain J
 double FELinearElasticFluid::Tangent_Strain(FEMaterialPoint& mp)
 {
-    return -m_k;
+    return -m_pFluid->m_k;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,81 +69,21 @@ double FELinearElasticFluid::Tangent_Strain_Strain(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of pressure with respect to temperature T
-double FELinearElasticFluid::Tangent_Temperature(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! 2nd tangent of pressure with respect to temperature T
-double FELinearElasticFluid::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of pressure with respect to strain J and temperature T
-double FELinearElasticFluid::Tangent_Strain_Temperature(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
 //! specific free energy
 double FELinearElasticFluid::SpecificFreeEnergy(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double a = m_k/(2*m_rhor)*pow(fp.m_ef,2);
+	double k = m_pFluid->m_k;
+	double rhor = m_pFluid->m_rhor;
+
+    double a = k/(2*rhor)*pow(fp.m_ef,2);
     return a;
-}
-
-//-----------------------------------------------------------------------------
-//! specific entropy
-double FELinearElasticFluid::SpecificEntropy(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! specific strain energy
-double FELinearElasticFluid::SpecificStrainEnergy(FEMaterialPoint& mp)
-{
-    return SpecificFreeEnergy(mp);
-}
-
-//-----------------------------------------------------------------------------
-//! isobaric specific heat capacity
-double FELinearElasticFluid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! isochoric specific heat capacity
-double FELinearElasticFluid::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of isochoric specific heat capacity with respect to strain J
-double FELinearElasticFluid::Tangent_cv_Strain(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of isochoric specific heat capacity with respect to temperature T
-double FELinearElasticFluid::Tangent_cv_Temperature(FEMaterialPoint& mp)
-{
-    return 0;
 }
 
 //-----------------------------------------------------------------------------
 //! dilatation from temperature and pressure
 bool FELinearElasticFluid::Dilatation(const double T, const double p, double& e)
 {
-    e = -p/m_k;
+    e = -p/m_pFluid->m_k;
     return true;
 }

@@ -1229,62 +1229,6 @@ bool FEPlotFluidSpecificFreeEnergy::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidSpecificEntropy::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
-    if (pfluid == 0) return false;
-
-    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->SpecificEntropy(mp_noconst);
-    });
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotFluidSpecificInternalEnergy::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
-    if (pfluid == 0) return false;
-
-    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->SpecificInternalEnergy(mp_noconst);
-    });
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotFluidSpecificGaugeEnthalpy::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
-    if (pfluid == 0) return false;
-
-    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->SpecificGaugeEnthalpy(mp_noconst);
-    });
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotFluidSpecificFreeEnthalpy::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
-    if (pfluid == 0) return false;
-
-    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
-        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->SpecificFreeEnthalpy(mp_noconst);
-    });
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
 bool FEPlotFluidSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 {
     FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
@@ -1292,7 +1236,7 @@ bool FEPlotFluidSpecificStrainEnergy::Save(FEDomain &dom, FEDataStream& a)
 
     writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
         FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-        return pfluid->SpecificStrainEnergy(mp_noconst);
+        return pfluid->SpecificFreeEnergy(mp_noconst);
     });
 
     return true;

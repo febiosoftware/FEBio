@@ -101,7 +101,8 @@ private: // material properties
     FEViscousFluid*         m_pViscous; //!< pointer to viscous part of fluid material
 
 public:
-    double      m_rhor;     //!< referential fluid density
+	double      m_k;        //!< bulk modulus at J=1
+	double      m_rhor;     //!< referential fluid density
     
     // declare parameter list
     DECLARE_FECORE_CLASS();

@@ -72,22 +72,11 @@ bool FEPolarFluid::Init()
     if (m_pElastic == nullptr) {
         m_pElastic = fecore_alloc(FELinearElasticFluid, GetFEModel());
     }
-    FELinearElasticFluid* pLN = dynamic_cast<FELinearElasticFluid*>(m_pElastic);
-    FENonlinearElasticFluid* pNL = dynamic_cast<FENonlinearElasticFluid*>(m_pElastic);
-    FELogNonlinearElasticFluid* pLNL = dynamic_cast<FELogNonlinearElasticFluid*>(m_pElastic);
-    if (pLN) {
-        pLN->m_k = m_k;
-        pLN->m_rhor = m_rhor;
-    }
-    else if (pNL) {
-        pNL->m_k = m_k;
-        pNL->m_rhor = m_rhor;
-    }
-    else if (pLNL) {
-        pLNL->m_k = m_k;
-        pLNL->m_rhor = m_rhor;
-    }
-    return true;
+
+
+	m_pElastic->SetParentFluid(this);
+
+    return FEPolarFluidMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------

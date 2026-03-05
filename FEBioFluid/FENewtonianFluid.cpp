@@ -29,9 +29,6 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FENewtonianFluid.h"
 #include "FEFluid.h"
-#include "FEBiphasicFSI.h"
-#include "FEThermoFluid.h"
-#include <FECore/log.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianFluid, FEViscousFluid)

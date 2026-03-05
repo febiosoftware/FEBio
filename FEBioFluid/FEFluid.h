@@ -98,7 +98,6 @@ public: // from FEBiphasicInterface
     }
     
 public:
-    double      m_k;        //!< bulk modulus at J=1
     double      m_Tr;       //!< ambient temperature
     
     // declare parameter list

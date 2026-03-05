@@ -38,8 +38,6 @@ SOFTWARE.*/
 #include "FEQuemadaFluid.h"
 #include "FEFluidFSI.h"
 #include "FEBiphasicFSI.h"
-#include "FEIdealGasIsentropic.h"
-#include "FEIdealGasIsothermal.h"
 #include "FELinearElasticFluid.h"
 #include "FENonlinearElasticFluid.h"
 #include "FELogNonlinearElasticFluid.h"
@@ -144,8 +142,6 @@ REGISTER_FECORE_CLASS(FECrossFluid        , "Cross"         );
 REGISTER_FECORE_CLASS(FEQuemadaFluid      , "Quemada"       );
 
 // elastic fluids
-REGISTER_FECORE_CLASS(FEIdealGasIsentropic, "ideal gas isentropic");
-//REGISTER_FECORE_CLASS(FEIdealGasIsothermal, "ideal gas isothermal");
 REGISTER_FECORE_CLASS(FELinearElasticFluid, "linear"        );
 REGISTER_FECORE_CLASS(FENonlinearElasticFluid, "nonlinear"  );
 REGISTER_FECORE_CLASS(FELogNonlinearElasticFluid, "log-nonlinear");
@@ -248,10 +244,6 @@ REGISTER_FECORE_CLASS(FEPlotFluidPressure              , "fluid pressure"       
 REGISTER_FECORE_CLASS(FEPlotFluidPressureTangentStrain , "fluid pressure tangent strain" );
 REGISTER_FECORE_CLASS(FEPlotFluidRelativeReynoldsNumber, "fluid relative Reynolds number");
 REGISTER_FECORE_CLASS(FEPlotFluidSpecificFreeEnergy    , "fluid specific free energy"    );
-REGISTER_FECORE_CLASS(FEPlotFluidSpecificEntropy       , "fluid specific entropy"        );
-REGISTER_FECORE_CLASS(FEPlotFluidSpecificInternalEnergy, "fluid specific internal energy");
-REGISTER_FECORE_CLASS(FEPlotFluidSpecificGaugeEnthalpy , "fluid specific gauge enthalpy" );
-REGISTER_FECORE_CLASS(FEPlotFluidSpecificFreeEnthalpy  , "fluid specific free enthalpy"  );
 REGISTER_FECORE_CLASS(FEPlotFluidSpecificStrainEnergy  , "fluid specific strain energy"  );
 REGISTER_FECORE_CLASS(FEPlotBFSIPorosity               , "porosity"                 );
 REGISTER_FECORE_CLASS(FEPlotFSISolidStress             , "solid stress"             );

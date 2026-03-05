@@ -23,16 +23,13 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.*/
-
-
 #include "FELogNonlinearElasticFluid.h"
 #include "FEFluidMaterialPoint.h"
+#include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
 FELogNonlinearElasticFluid::FELogNonlinearElasticFluid(FEModel* pfem) : FEElasticFluid(pfem)
 {
-    m_k = 0;
-    m_rhor = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -43,20 +40,12 @@ bool FELogNonlinearElasticFluid::Init()
 }
 
 //-----------------------------------------------------------------------------
-// serialization
-void FELogNonlinearElasticFluid::Serialize(DumpStream& ar)
-{
-    if (ar.IsLoading()) return;
-    ar & m_k & m_rhor;
-}
-
-//-----------------------------------------------------------------------------
 //! gauge pressure
 double FELogNonlinearElasticFluid::Pressure(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = 1+fp.m_ef;
-    return -m_k*log(J)/J;
+    return -m_pFluid->m_k*log(J)/J;
 }
 
 //-----------------------------------------------------------------------------
@@ -65,7 +54,7 @@ double FELogNonlinearElasticFluid::Tangent_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = 1+fp.m_ef;
-    return m_k*(log(J)-1)/pow(J,2);
+    return m_pFluid->m_k*(log(J)-1)/pow(J,2);
 }
 
 //-----------------------------------------------------------------------------
@@ -74,28 +63,7 @@ double FELogNonlinearElasticFluid::Tangent_Strain_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = 1+fp.m_ef;
-    return m_k*(3-2*log(J))/pow(J,3);
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of pressure with respect to temperature T
-double FELogNonlinearElasticFluid::Tangent_Temperature(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! 2nd tangent of pressure with respect to temperature T
-double FELogNonlinearElasticFluid::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of pressure with respect to strain J and temperature T
-double FELogNonlinearElasticFluid::Tangent_Strain_Temperature(FEMaterialPoint& mp)
-{
-    return 0;
+    return m_pFluid->m_k*(3-2*log(J))/pow(J,3);
 }
 
 //-----------------------------------------------------------------------------
@@ -104,49 +72,8 @@ double FELogNonlinearElasticFluid::SpecificFreeEnergy(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = 1+fp.m_ef;
-    return m_k/2*pow(log(J),2)/m_rhor;
-}
 
-//-----------------------------------------------------------------------------
-//! specific entropy
-double FELogNonlinearElasticFluid::SpecificEntropy(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! specific strain energy
-double FELogNonlinearElasticFluid::SpecificStrainEnergy(FEMaterialPoint& mp)
-{
-    return SpecificFreeEnergy(mp);
-}
-
-//-----------------------------------------------------------------------------
-//! isobaric specific heat capacity
-double FELogNonlinearElasticFluid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! isochoric specific heat capacity
-double FELogNonlinearElasticFluid::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of isochoric specific heat capacity with respect to strain J
-double FELogNonlinearElasticFluid::Tangent_cv_Strain(FEMaterialPoint& mp)
-{
-    return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! tangent of isochoric specific heat capacity with respect to temperature T
-double FELogNonlinearElasticFluid::Tangent_cv_Temperature(FEMaterialPoint& mp)
-{
-    return 0;
+    return m_pFluid->m_k/2*pow(log(J),2)/ m_pFluid->m_rhor;
 }
 
 //-----------------------------------------------------------------------------
@@ -158,15 +85,16 @@ bool FELogNonlinearElasticFluid::Dilatation(const double T, const double p, doub
     int maxiter = 50;
     bool cnvgd = false;
     // initializations
-    e = -p/(m_k+p);                     // initial guess
-    double f = log(1+e)+p*(1+e)/m_k;    // function
+	double k = m_pFluid->m_k;
+    e = -p/(k+p);                     // initial guess
+    double f = log(1+e)+p*(1+e)/k;    // function
     double de = 0;
     int iter = 0;
     while (!cnvgd) {
-        double df = p/m_k+1.0/(1+e);    // derivative
+        double df = p/k+1.0/(1+e);    // derivative
         double de = -f/df;              // solution increment
         e += de;                        // update solution
-        f = log(1+e)+p*(1+e)/m_k;       // function
+        f = log(1+e)+p*(1+e)/k;       // function
         // check convergence
         if ((fabs(f) < errabs) || (fabs(de) < errrel*fabs(e))) cnvgd = true;
         else if (++iter > maxiter) return false;

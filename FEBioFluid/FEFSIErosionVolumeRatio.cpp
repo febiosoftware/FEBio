@@ -174,7 +174,7 @@ bool FEFSIErosionVolumeRatio::Apply(int iteration)
         return false;
     }
     
-    int melems = melem.size();
+    int melems = (int)melem.size();
     if (melems > m_maxElems) melems = m_maxElems;
     int nel = 0;
     for (std::map<int,bool>::iterator it=melem.begin(); it!=melem.end(); ++it)
@@ -237,7 +237,7 @@ bool FEFSIErosionVolumeRatio::Apply(int iteration)
         FELinearConstraint& lc = LCM.LinearConstraint(j);
         
         bool del = false;
-        int n = lc.Size();
+        int n = (int)lc.Size();
         for (int k = 0; k < n; ++k)
         {
             if (mesh.Node(lc.GetChildDof(k).node).HasFlags(FENode::EXCLUDE))

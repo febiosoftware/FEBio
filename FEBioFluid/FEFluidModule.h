@@ -48,13 +48,6 @@ public:
 	void InitModel(FEModel* fem) override;
 };
 
-class FEBIOFLUID_API FEThermoFluidModule : public FEModule
-{
-public:
-	FEThermoFluidModule();
-	void InitModel(FEModel* fem) override;
-};
-
 class FEBIOFLUID_API FEPolarFluidModule : public FEModule
 {
 public:

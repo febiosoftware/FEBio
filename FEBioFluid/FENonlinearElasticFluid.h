@@ -42,9 +42,6 @@ public:
     //! initialization
     bool Init() override;
     
-    // serialization
-    void Serialize(DumpStream& ar) override;
-
     //! gauge pressure
     double Pressure(FEMaterialPoint& pt) override;
     
@@ -54,40 +51,9 @@ public:
     //! 2nd tangent of pressure with respect to strain J
     double Tangent_Strain_Strain(FEMaterialPoint& mp) override;
     
-    //! tangent of pressure with respect to temperature T
-    double Tangent_Temperature(FEMaterialPoint& mp) override;
-    
-    //! 2nd tangent of pressure with respect to temperature T
-    double Tangent_Temperature_Temperature(FEMaterialPoint& mp) override;
-    
-    //! tangent of pressure with respect to strain J and temperature T
-    double Tangent_Strain_Temperature(FEMaterialPoint& mp) override;
-    
     //! specific free energy
     double SpecificFreeEnergy(FEMaterialPoint& mp) override;
     
-    //! specific entropy
-    double SpecificEntropy(FEMaterialPoint& mp) override;
-    
-    //! specific strain energy
-    double SpecificStrainEnergy(FEMaterialPoint& mp) override;
-    
-    //! isochoric specific heat capacity
-    double IsochoricSpecificHeatCapacity(FEMaterialPoint& mp) override;
-    
-    //! tangent of isochoric specific heat capacity with respect to strain J
-    double Tangent_cv_Strain(FEMaterialPoint& mp) override;
-    
-    //! tangent of isochoric specific heat capacity with respect to temperature T
-    double Tangent_cv_Temperature(FEMaterialPoint& mp) override;
-    
-    //! isobaric specific heat capacity
-    double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
-    
     //! dilatation from temperature and pressure
     bool Dilatation(const double T, const double p, double& e) override;
-    
-public:
-    double      m_k;        //!< bulk modulus
-    double      m_rhor;     //!< true density
 };
