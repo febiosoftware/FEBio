@@ -47,6 +47,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEFiberEntropyChain::FEFiberEntropyChain(FEModel* pfem) : FEFiberMaterial(pfem)
 {
+	m_N = 2;
 	m_mu = 0;
 	m_term = 30;
 
