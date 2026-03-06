@@ -106,7 +106,9 @@ double FECrossFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
 
 	double dmu = -2 * (m_mu0 - m_mui) * m_m * pow(m_lam, m_m) * pow(gdot, m_m - 2) / pow(1 + pow(lamg, m_m), 2);
 
-	return dmu;
+	double dmu_dgdot = 0.5 * gdot * dmu;
+
+   return dmu_dgdot;
 }
 
 //-----------------------------------------------------------------------------

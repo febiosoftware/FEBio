@@ -105,7 +105,9 @@ double FECarreauFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
 
 	double dmu = 2 * (m_mu0 - m_mui) * (m_n - 1) * m_lam * m_lam * pow(1 + lamg2, (m_n - 3) * 0.5);
 
-	return dmu;
+   double dmu_dgdot = 0.5 * gdot * dmu;
+
+   return dmu_dgdot;
 }
 
 //-----------------------------------------------------------------------------
