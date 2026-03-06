@@ -107,7 +107,10 @@ double FEQuemadaFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
 	double gdot = sqrt(2 * (D.sqr()).tr());
 	double grsqrt = sqrt(gdot / m_gc);
 	double dmu = (gdot > 0) ? 4 * m_mu0 * m_H / m_gc * (m_k0 - m_ki) * (1 + grsqrt) / grsqrt / pow(-2 * (1 + grsqrt) + m_H * (m_k0 + m_ki * grsqrt), 3) : 0.0;
-	return dmu;
+	
+   double dmu_dgdot = 0.5 * gdot * dmu;
+
+   return dmu_dgdot;
 }
 
 //-----------------------------------------------------------------------------

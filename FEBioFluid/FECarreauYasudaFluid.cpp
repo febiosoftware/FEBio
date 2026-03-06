@@ -110,7 +110,9 @@ double FECarreauYasudaFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& 
 	double dmu = (m_a >= 2) ? 2 * (m_mu0 - m_mui) * (m_n - 1) * pow(m_lam, m_a) * pow(gdot, m_a - 2)
 		* pow(1 + lamga, (m_n - m_a - 1) / m_a) : 0;
 
-	return dmu;
+	double dmu_dgdot = 0.5 * gdot * dmu;
+
+   return dmu_dgdot;
 }
 
 //-----------------------------------------------------------------------------
