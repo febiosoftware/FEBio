@@ -288,6 +288,6 @@ BEGIN_FECORE_CLASS(FEElasticFiberEntropyChain, FEElasticFiberMaterial)
     ADD_PARAMETER(m_fib.m_N   , FE_RANGE_GREATER_OR_EQUAL(0.0), "N");
     ADD_PARAMETER(m_fib.m_ksi, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi")->setUnits(UNIT_PRESSURE);
     ADD_PARAMETER(m_fib.m_mu , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu" )->setUnits(UNIT_PRESSURE);
-    ADD_PARAMETER(m_fib.m_term, FE_RANGE_GREATER_OR_EQUAL(3), "n_term");
+    ADD_PARAMETER(m_fib.m_term, FE_RANGE_CLOSED(3, 30), "n_term");
 END_FECORE_CLASS();
 
