@@ -103,6 +103,12 @@ double FENewtonianFluid::ShearViscosity(FEMaterialPoint& mp)
     return m_mu;
 }
 
+//! derivative of shear viscosity w.r.t. strain rate
+double FENewtonianFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
+{
+	return 0.0;
+}
+
 //-----------------------------------------------------------------------------
 //! bulk viscosity
 double FENewtonianFluid::BulkViscosity(FEMaterialPoint& mp)

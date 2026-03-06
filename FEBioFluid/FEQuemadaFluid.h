@@ -51,6 +51,9 @@ public:
     //! dynamic viscosity
     double ShearViscosity(FEMaterialPoint& mp) override;
     
+	//! derivative of shear viscosity w.r.t. strain rate
+	double Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp) override;
+
     //! bulk viscosity
     double BulkViscosity(FEMaterialPoint& mp) override;
     

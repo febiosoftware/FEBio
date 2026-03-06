@@ -95,6 +95,19 @@ double FECarreauFluid::ShearViscosity(FEMaterialPoint& pt)
     return mu;
 }
 
+//! derivative of shear viscosity w.r.t. strain rate
+double FECarreauFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
+{
+	FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+	mat3ds D = vt.RateOfDeformation();
+	double gdot = sqrt(2 * (D.sqr()).tr());
+	double lamg2 = m_lam * m_lam * gdot * gdot;
+
+	double dmu = 2 * (m_mu0 - m_mui) * (m_n - 1) * m_lam * m_lam * pow(1 + lamg2, (m_n - 3) * 0.5);
+
+	return dmu;
+}
+
 //-----------------------------------------------------------------------------
 //! bulk viscosity
 double FECarreauFluid::BulkViscosity(FEMaterialPoint& pt)
