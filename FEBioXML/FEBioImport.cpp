@@ -57,6 +57,7 @@ SOFTWARE.*/
 #include "FEBioMeshSection4.h"
 #include "FEBioMeshDomainsSection4.h"
 #include "FEBioStepSection3.h"
+#include "FEBioScriptsSection.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
 #include <string.h>
@@ -290,6 +291,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["MeshData"   ] = new FEBioMeshDataSection4    (this);	// added in febio4
 		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
 		m_map["Rigid"      ] = new FEBioRigidSection4       (this); // added in FEBio 4.0
+		m_map["Scripts"    ] = new FEBioScriptsSection      (this);
 		m_map["Step"       ] = new FEBioStepSection4        (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}

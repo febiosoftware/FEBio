@@ -23,42 +23,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEScalarValuator.h>
-#include <febcode/compiler.h>
-#include "fecore_api.h"
+#include "stdafx.h"
+#include "FEBioScriptsSection.h"
 
-class FESurface;
-
-class FECORE_API FECodeValuator : public FEScalarValuator
+void FEBioScriptsSection::Parse(XMLTag& tag)
 {
-public:
-	FECodeValuator(FEModel* fem);
-	~FECodeValuator();
-	
-	bool Init() override;
+	++tag;
+	do
+	{
+		if (tag == "script")
+		{
+			const char* szname = tag.AttributeValue("name");
+			const char* szcode = tag.szvalue();
 
-public:
-	double operator()(const FEMaterialPoint& pt) override;
-	FEScalarValuator* copy() override;
-	bool isConst() override { return false; }
-	double* constValue() override { return nullptr; }
-	void Serialize(DumpStream& ar) override;
-
-private:
-	bool CompileScript();
-
-private:
-	std::string m_scriptName; // user specifies the script name
-
-private:
-	std::string m_scriptCode;
-
-	febcode::Program m_program;
-	int globals[3]; // for _pos0, _time, _norm0
-
-	FESurface* m_surf = nullptr; // for surface valuators
-
-	DECLARE_FECORE_CLASS()
-};
-
+			if (GetFEModel()->AddScript(szname, szcode) == false)
+				throw XMLReader::InvalidValue(tag);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	} while (!tag.isend());
+}

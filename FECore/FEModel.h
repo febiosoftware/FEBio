@@ -457,6 +457,10 @@ public:
 	// this can be used to change the update counter
 	void IncrementUpdateCounter();
 
+	bool AddScript(const std::string& name, const std::string& script);
+
+	std::string GetScript(const std::string& name) const;
+
 public:
 	void SetUnits(const char* szunits);
 	const char* GetUnits() const;

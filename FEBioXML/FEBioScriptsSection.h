@@ -24,41 +24,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEScalarValuator.h>
-#include <febcode/compiler.h>
-#include "fecore_api.h"
+#include "FEBioImport.h"
 
-class FESurface;
-
-class FECORE_API FECodeValuator : public FEScalarValuator
+class FEBioScriptsSection : public FEFileSection
 {
 public:
-	FECodeValuator(FEModel* fem);
-	~FECodeValuator();
-	
-	bool Init() override;
-
-public:
-	double operator()(const FEMaterialPoint& pt) override;
-	FEScalarValuator* copy() override;
-	bool isConst() override { return false; }
-	double* constValue() override { return nullptr; }
-	void Serialize(DumpStream& ar) override;
-
-private:
-	bool CompileScript();
-
-private:
-	std::string m_scriptName; // user specifies the script name
-
-private:
-	std::string m_scriptCode;
-
-	febcode::Program m_program;
-	int globals[3]; // for _pos0, _time, _norm0
-
-	FESurface* m_surf = nullptr; // for surface valuators
-
-	DECLARE_FECORE_CLASS()
+	FEBioScriptsSection(FEFileImport* pim) : FEFileSection(pim) {}
+	void Parse(XMLTag& tag);
 };
-

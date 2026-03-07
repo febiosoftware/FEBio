@@ -37,7 +37,7 @@ SOFTWARE.*/
 #include <febcode/types.h>
 
 BEGIN_FECORE_CLASS(FECodeValuator, FEScalarValuator)
-	ADD_PARAMETER(m_script, "code");
+	ADD_PARAMETER(m_scriptName, "code");
 END_FECORE_CLASS()
 
 FECodeValuator::FECodeValuator(FEModel* fem) : FEScalarValuator(fem)
@@ -51,6 +51,8 @@ FECodeValuator::~FECodeValuator()
 
 bool FECodeValuator::CompileScript()
 {
+	if (m_scriptCode.empty()) return false;
+
 	FECoreBase* parent = GetParent();
 	try {
 
@@ -67,7 +69,7 @@ bool FECodeValuator::CompileScript()
 			return false;
 		}
 
-		febcode::ParseSource(m_program, m_script);
+		febcode::ParseSource(m_program, m_scriptCode);
 
 		febcode::Compiler compiler(m_program);
 
@@ -108,6 +110,15 @@ bool FECodeValuator::Init()
 {
 	if (FEScalarValuator::Init() == false) return false;
 
+	// get the script
+	m_scriptCode = GetFEModel()->GetScript(m_scriptName);
+	if (m_scriptCode.empty())
+	{
+		feLogError("Script \"%s\" not found or is empty.", m_scriptName.c_str());
+		return false;
+	}
+
+	// compile the script
 	if (CompileScript() == false) return false;
 
 	return true;
@@ -134,15 +145,19 @@ double FECodeValuator::operator()(const FEMaterialPoint& pt)
 FEScalarValuator* FECodeValuator::copy()
 {
 	FECodeValuator* p = new FECodeValuator(GetFEModel());
-	p->m_script = m_script;
+	p->m_scriptName = m_scriptName;
+	p->m_scriptCode = m_scriptCode;
 	return p;
 }
 
 void FECodeValuator::Serialize(DumpStream& ar)
 {
-	if (!ar.IsShallow() && !ar.IsSaving())
+	FEScalarValuator::Serialize(ar);
+	if (!ar.IsShallow())
 	{
-		FEScalarValuator::Serialize(ar);
-		CompileScript();
+		ar& m_scriptCode;
+
+		if (!ar.IsSaving())
+			CompileScript();
 	}
 }
