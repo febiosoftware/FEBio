@@ -25,13 +25,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEScalarValuator.h>
-#include <febcode/compiler.h>
 #include "fecore_api.h"
 
 class FESurface;
 
 class FECORE_API FECodeValuator : public FEScalarValuator
 {
+	class Imp;
+
 public:
 	FECodeValuator(FEModel* fem);
 	~FECodeValuator();
@@ -52,13 +53,9 @@ private:
 	std::string m_scriptName; // user specifies the script name
 
 private:
-	std::string m_scriptCode;
-
-	febcode::Program m_program;
-	int globals[3]; // for _pos0, _time, _norm0
-
-	FESurface* m_surf = nullptr; // for surface valuators
-
+	Imp& m;
 	DECLARE_FECORE_CLASS()
 };
 
+// helper function to see if a script compiles. This is used in FEBio studio.
+FECORE_API bool ValidateScript(const std::string& script, std::string& err);
