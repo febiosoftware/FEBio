@@ -1,11 +1,10 @@
 #pragma once
 #include <memory>
-#include <variant>
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include <stdexcept>
 #include <functional>
+#include <assert.h>
 
 namespace febcode
 {
@@ -100,18 +99,114 @@ namespace febcode
 		STRUCT
 	};
 
-	// variant for storing either a number or a boolean
-	using Value = std::variant <
-		std::monostate,
-		bool,
-		int,
-		double,
-		vec2,
-		vec3,
-		std::string,
-		ArrayValuePtr,
-		StructValuePtr
-	>;
+	struct Void {};
+
+	struct Value
+	{
+		ValueIndex index = ValueIndex::VOID;
+
+		Value() {}
+		Value(bool   a) : index(ValueIndex::BOOL), b(a) {}
+		Value(int    a) : index(ValueIndex::INT), i(a) {}
+		Value(double a) : index(ValueIndex::DOUBLE), d(a) {}
+		Value(const vec2& a) : index(ValueIndex::VEC2), vec2Value(a) {}
+		Value(const vec3& a) : index(ValueIndex::VEC3), vec3Value(a) {}
+		Value(const std::string& a) : index(ValueIndex::STRING), stringValue(a) {}
+		Value(const ArrayValuePtr& a) : index(ValueIndex::ARRAY), arrayValue(a) {}
+		Value(const StructValuePtr& a) : index(ValueIndex::STRUCT), structValue(a) {}
+
+		Value(const Value& v)
+		{
+			copyFrom(v);
+		}
+
+		Value& operator = (const Value& other)
+		{
+			if (this != &other) {
+				destroy();
+				copyFrom(other);
+			}
+			return *this;
+		}
+
+		~Value()
+		{
+			destroy();
+		}
+
+		bool operator == (const Value& other)
+		{
+			if (index != other.index)
+				return false;
+			switch (index)
+			{
+			case ValueIndex::VOID  : return true; // all void values are equal
+			case ValueIndex::BOOL  : return b == other.b;
+			case ValueIndex::INT   : return i == other.i;
+			case ValueIndex::DOUBLE: return d == other.d;
+			case ValueIndex::VEC2  : return vec2Value == other.vec2Value;
+			case ValueIndex::VEC3  : return vec3Value == other.vec3Value;
+			case ValueIndex::STRING: return stringValue == other.stringValue;
+			case ValueIndex::ARRAY : return arrayValue == other.arrayValue;
+			case ValueIndex::STRUCT: return structValue == other.structValue;
+			}
+			return false;
+		}
+
+		bool operator != (const Value& other)
+		{
+			return !(*this == other);
+		}
+
+		union {
+			Void v;
+			bool b;
+			int i;
+			double d;
+			vec2 vec2Value;
+			vec3 vec3Value;
+			std::string stringValue;
+			ArrayValuePtr arrayValue;
+			StructValuePtr structValue;
+		};
+
+	private:
+		void copyFrom(const Value& v) 
+		{
+			index = v.index;
+			switch (index)
+			{
+			case ValueIndex::VOID: break;	// no data to copy
+			case ValueIndex::BOOL: b = v.b; break;
+			case ValueIndex::INT: i = v.i; break;
+			case ValueIndex::DOUBLE: d = v.d; break;
+			case ValueIndex::VEC2: vec2Value = v.vec2Value; break;
+			case ValueIndex::VEC3: vec3Value = v.vec3Value; break;
+			case ValueIndex::STRING: new (&stringValue) std::string(v.stringValue); break;
+			case ValueIndex::ARRAY: new (&arrayValue) ArrayValuePtr(v.arrayValue); break;
+			case ValueIndex::STRUCT: new (&structValue) StructValuePtr(v.structValue); break;
+			}
+		}
+
+		void destroy()
+		{
+			switch (index)
+			{
+				case ValueIndex::STRING:
+					stringValue.~basic_string();
+					break;
+				case ValueIndex::ARRAY:
+					arrayValue.~shared_ptr();
+					break;
+				case ValueIndex::STRUCT:
+					structValue.~shared_ptr();
+					break;
+				default:
+					break; // no special handling needed for other types
+			}
+			index = ValueIndex::VOID; // reset to void after destruction
+		}
+	};
 
 	struct ArrayValue {
 		Type type;
@@ -144,15 +239,15 @@ namespace febcode
 
 	StructValuePtr copyStruct(const StructValue& src);
 
-	inline bool isVoid  (const Value& v) { return v.index() == ValueIndex::VOID;}
-	inline bool isBool  (const Value& v) { return v.index() == ValueIndex::BOOL;}
-	inline bool isInt   (const Value& v) { return v.index() == ValueIndex::INT; }
-	inline bool isDouble(const Value& v) { return v.index() == ValueIndex::DOUBLE; }
-	inline bool isVec2  (const Value& v) { return v.index() == ValueIndex::VEC2; }
-	inline bool isVec3  (const Value& v) { return v.index() == ValueIndex::VEC3; }
-	inline bool isString(const Value& v) { return v.index() == ValueIndex::STRING; }
-	inline bool isArray (const Value& v) { return v.index() == ValueIndex::ARRAY; }
-	inline bool isStruct(const Value& v) { return v.index() == ValueIndex::STRUCT; }
+	inline bool isVoid  (const Value& v) { return v.index == ValueIndex::VOID;}
+	inline bool isBool  (const Value& v) { return v.index == ValueIndex::BOOL;}
+	inline bool isInt   (const Value& v) { return v.index == ValueIndex::INT; }
+	inline bool isDouble(const Value& v) { return v.index == ValueIndex::DOUBLE; }
+	inline bool isVec2  (const Value& v) { return v.index == ValueIndex::VEC2; }
+	inline bool isVec3  (const Value& v) { return v.index == ValueIndex::VEC3; }
+	inline bool isString(const Value& v) { return v.index == ValueIndex::STRING; }
+	inline bool isArray (const Value& v) { return v.index == ValueIndex::ARRAY; }
+	inline bool isStruct(const Value& v) { return v.index == ValueIndex::STRUCT; }
 
 	inline bool isVoidType  (Type type) { return type->kind == TypeKind::Void; }
 	inline bool isBoolType  (Type type) { return type->kind == TypeKind::Bool; }
@@ -166,23 +261,23 @@ namespace febcode
 
 	inline bool isNumericType(Type type) { return isIntType(type) || isDoubleType(type); }
 
-	inline bool   getBool  (const Value& v) { return std::get<bool  >(v); }
-	inline int    getInt   (const Value& v) { return std::get<int   >(v); }
-	inline double getDouble(const Value& v) { return std::get<double>(v); }
-	inline const vec2& getVec2(const Value& v) { return std::get<vec2>(v); }
-	inline vec2& getVec2(Value& v) { return std::get<vec2>(v); }
-	inline const vec3& getVec3(const Value& v) { return std::get<vec3>(v); }
-	inline vec3& getVec3(Value& v) { return std::get<vec3>(v); }
-	inline const std::string& getString(const Value& v) { return std::get<std::string>(v); }
-	inline const ArrayValue&  getArray (const Value& v) { return *std::get<std::shared_ptr<ArrayValue>>(v); }
-	inline const StructValue& getStruct(const Value& v) { return *std::get<std::shared_ptr<StructValue>>(v); }
+	inline bool   getBool(const Value& v) { assert(v.index == ValueIndex::BOOL); return v.b; }
+	inline int    getInt   (const Value& v) { assert(v.index == ValueIndex::INT); return v.i; }
+	inline double getDouble(const Value& v) { assert(v.index == ValueIndex::DOUBLE); return v.d; }
+	inline const vec2& getVec2(const Value& v) { assert(v.index == ValueIndex::VEC2); return v.vec2Value; }
+	inline vec2& getVec2(Value& v) { assert(v.index == ValueIndex::VEC2); return v.vec2Value; }
+	inline const vec3& getVec3(const Value& v) { assert(v.index == ValueIndex::VEC3); return v.vec3Value; }
+	inline vec3& getVec3(Value& v) { assert(v.index == ValueIndex::VEC3); return v.vec3Value; }
+	inline const std::string& getString(const Value& v) { assert(v.index == ValueIndex::STRING); return v.stringValue; }
+	inline const ArrayValue&  getArray (const Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
+	inline const StructValue& getStruct(const Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
 
-	inline const ArrayValuePtr& getArrayPtr(const Value& v) { return std::get<std::shared_ptr<ArrayValue>>(v); }
-	inline const StructValuePtr& getStructPtr(const Value& v) { return std::get<std::shared_ptr<StructValue>>(v); }
+	inline const ArrayValuePtr& getArrayPtr(const Value& v) { assert(v.index == ValueIndex::ARRAY); return v.arrayValue; }
+	inline const StructValuePtr& getStructPtr(const Value& v) { assert(v.index == ValueIndex::STRUCT); return v.structValue; }
 
-	inline std::string& getString(Value& v) { return std::get<std::string>(v); }
-	inline ArrayValue&  getArray (Value& v) { return *std::get<std::shared_ptr<ArrayValue>>(v); }
-	inline StructValue& getStruct(Value& v) { return *std::get<std::shared_ptr<StructValue>>(v); }
+	inline std::string& getString(Value& v) { assert(v.index == ValueIndex::STRING); return v.stringValue; }
+	inline ArrayValue&  getArray (Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
+	inline StructValue& getStruct(Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
 
 	using NativeFnc = std::function<Value(const std::vector<Value>&)>;
 
@@ -233,7 +328,7 @@ namespace febcode
 
 	inline TypeKind ValueType(const Value& v)
 	{
-		return (TypeKind)v.index();
+		return (TypeKind)v.index;
 	}
 
 	std::string TypeToString(Type type);
@@ -244,10 +339,10 @@ namespace febcode
 inline febcode::Value operator + (const febcode::Value& a, const febcode::Value& b)
 {
 	if (isInt(a) && isInt(b))
-		return std::get<int>(a) + std::get<int>(b);
+		return getInt(a) + getInt(b);
 	if (isDouble(a) && isDouble(b))
-		return std::get<double>(a) + std::get<double>(b);
+		return getDouble(a) + getDouble(b);
 	if (isString(a) && isString(b))
-		return std::get<std::string>(a) + std::get<std::string>(b);
+		return getString(a) + getString(b);
 	throw std::runtime_error("Unsupported operand types for +");
 }

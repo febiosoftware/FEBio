@@ -180,7 +180,7 @@ Value VM::execute()
 		case OpCode::NEG_INT:
 		{
 			Value a = pop();
-			m_stack.push_back(-std::get<int>(a));
+			m_stack.push_back(-getInt(a));
 			break;
 		}
 		case OpCode::ADD_INT:
@@ -259,7 +259,7 @@ Value VM::execute()
 		case OpCode::NEG_DOUBLE:
 		{
 			Value a = pop();
-			m_stack.push_back(-std::get<double>(a));
+			m_stack.push_back(-getDouble(a));
 			break;
 		}
 
@@ -676,7 +676,7 @@ Value VM::execute()
 
 			auto& arr = getArray(arrayVal);
 
-			int idxNum = std::get<int>(indexVal);
+			int idxNum = getInt(indexVal);
 
 			size_t index = static_cast<size_t>(idxNum);
 			if (index >= arr.size())
@@ -692,7 +692,7 @@ Value VM::execute()
 
 			auto& arr = getArray(arrayVal);
 
-			int idxNum = std::get<int>(indexVal);
+			int idxNum = getInt(indexVal);
 
 			size_t index = static_cast<size_t>(idxNum);
 
@@ -765,7 +765,7 @@ Value VM::execute()
 			}
 
 			// leave empty value on stack after print (for chaining)
-			m_stack.push_back(std::monostate{});
+			m_stack.push_back(Value());
 
 			break;
 		}

@@ -4,10 +4,10 @@
 std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 {
 	if      (isVoid  (v)) return o << "null";
-	else if (isInt   (v)) return o << std::get<int>(v);
-	else if (isDouble(v)) return o << std::get<double>(v);
-	else if (isBool  (v)) return o << (std::get<bool>(v) ? "true" : "false");
-	else if (isString(v)) return o << std::get<std::string>(v);
+	else if (isInt   (v)) return o << getInt(v);
+	else if (isDouble(v)) return o << getDouble(v);
+	else if (isBool  (v)) return o << (getBool(v) ? "true" : "false");
+	else if (isString(v)) return o << getString(v);
 	else if (isArray(v))
 	{
 		const febcode::ArrayValue& arr = getArray(v);
@@ -32,12 +32,12 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 	}
 	else if (isVec2(v))
 	{
-		const febcode::vec2& vec = std::get<febcode::vec2>(v);
+		const febcode::vec2& vec = getVec2(v);
 		return o << "vec2(" << vec.x << ", " << vec.y << ")";
 	}
 	else if (isVec3(v))
 	{
-		const febcode::vec3& vec = std::get<febcode::vec3>(v);
+		const febcode::vec3& vec = getVec3(v);
 		return o << "vec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 	}
 	else

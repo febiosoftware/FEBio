@@ -379,7 +379,7 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 			throw std::runtime_error("Missing return value in function with non-void return type.");
 
 		// return without value -> push monostate
-		uint16_t idx = addConstant(std::monostate{});
+		uint16_t idx = addConstant(Value());
 		emit(OpCode::PUSH_CONST);
 		emitUint16(idx);
 	}

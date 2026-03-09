@@ -155,7 +155,7 @@ namespace febcode
 
 		bool isTruthy(const Value& v)
 		{
-			switch (v.index())
+			switch (v.index)
 			{
 				case ValueIndex::VOID  : return false;
 				case ValueIndex::BOOL  : return getBool(v);
@@ -171,7 +171,7 @@ namespace febcode
 
 		std::string toString(const Value& v)
 		{
-			switch (v.index())
+			switch (v.index)
 			{
 			case ValueIndex::VOID  : return "void";
 			case ValueIndex::BOOL  : return getBool(v) ? "true" : "false";

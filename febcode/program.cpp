@@ -97,7 +97,7 @@ void Program::registerNative(const std::string& name, double (*f)(double))
 		types.getDoubleType(),
 		{ types.getDoubleType() },
 		[f](const std::vector<Value>& args) -> Value {
-			double arg = std::get<double>(args[0]);
+			double arg = getDouble(args[0]);
 			return f(arg);
 		});
 }
