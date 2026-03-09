@@ -15,11 +15,14 @@ namespace febcode
 	public:
 		enum { MAX_CALL_DEPTH = 128 };
 
+		enum {STACK_SIZE = 16};
+
 	public:
 		VM(const Program& program) : m_program(program)
 		{
 			globalCount = (int)m_program.globals.size();
 			assert(m_program.globalInitializers.size() == globalCount);
+			m_stack.reserve(globalCount + STACK_SIZE);
 			m_stack.resize(globalCount);   // allocate global region
 
 			// initialize globals

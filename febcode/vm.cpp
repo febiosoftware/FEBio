@@ -70,6 +70,7 @@ const char* IPToString(uint8_t ip)
 	case OpCode::GET_VEC3_X    : return "GV3X";
 	case OpCode::GET_VEC3_Y    : return "GV3Y";
 	case OpCode::GET_VEC3_Z    : return "GV3Z";
+	case OpCode::GET_VEC3_SWIZZLE: return "G3SW";
 	case OpCode::SET_VEC3_X    : return "SV3X";
 	case OpCode::SET_VEC3_Y    : return "SV3Y";
 	case OpCode::SET_VEC3_Z    : return "SV3Z";
@@ -488,6 +489,31 @@ Value VM::execute()
 			push(getVec3(vec).z);
 			break;
 		}
+		case OpCode::GET_VEC3_SWIZZLE:
+		{
+			uint16_t mask = readUint16();
+			uint16_t size = readUint16();
+			Value vec = pop();
+			vec3& v = getVec3(vec);
+			double c[4] = { v.x, v.y, v.z, 0.0 };
+
+			if (size == 2)
+			{
+				vec2 result;
+				result.y = c[mask & 0b11];
+				result.x = c[(mask >> 2) & 0b11];
+				push(result);
+			}
+			else if (size == 3)
+			{
+				vec3 result;
+				result.z = c[mask & 0b11];
+				result.y = c[(mask >> 2) & 0b11];
+				result.x = c[(mask >> 4) & 0b11];
+				push(result);
+			}
+			break;
+		}
 		case OpCode::SET_VEC3_X:
 		{
 			uint16_t slot = readUint16();
@@ -761,7 +787,7 @@ Value VM::execute()
 			auto it = m_program.m_specialFns.find("print");
 			if (it != m_program.m_specialFns.end())
 			{
-				it->second(args);
+				it->second(args.data(), argCount);
 			}
 
 			// leave empty value on stack after print (for chaining)
@@ -819,13 +845,8 @@ void VM::callFunction(int fnIndex, int argCount)
 
 	if (fn.isNative)
 	{
-		std::vector<Value> args;
-		for (int i = 0; i < argCount; ++i)
-			args.push_back(m_stack[m_stack.size() - argCount + i]);
-
+		Value result = fn.fnc(&m_stack[m_stack.size() - argCount], argCount);
 		m_stack.resize(m_stack.size() - argCount);
-
-		Value result = fn.fnc(args);
 		push(result);
 		return;
 	}

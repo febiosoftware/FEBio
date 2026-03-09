@@ -4,10 +4,10 @@
 namespace febcode
 {
 	// double = dot(vec2)
-	Value DotVec2(const std::vector<Value>& args);
+	Value DotVec2(const Value* args, int argc);
 
 	// normalized = Normalize(vec2)
-	Value NormalizeVec2(const std::vector<Value>& args);
+	Value NormalizeVec2(const Value* args, int argc);
 
 	class Vec2Module : public Module
 	{

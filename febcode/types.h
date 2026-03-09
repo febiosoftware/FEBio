@@ -279,7 +279,7 @@ namespace febcode
 	inline ArrayValue&  getArray (Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
 	inline StructValue& getStruct(Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
 
-	using NativeFnc = std::function<Value(const std::vector<Value>&)>;
+	using NativeFnc = std::function<Value(const Value* arg, int argc)>;
 
 	using BinaryFnc = std::function<Value(const Value&, const Value&)>;
 

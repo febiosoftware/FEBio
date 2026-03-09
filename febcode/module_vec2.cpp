@@ -1,16 +1,19 @@
 #include "module_vec2.h"
+#include <assert.h>
 
 using namespace febcode;
 
-Value febcode::DotVec2(const std::vector<Value>& args)
+Value febcode::DotVec2(const Value* args, int argc)
 {
+	assert(argc == 2);
 	const vec2& a = getVec2(args[0]);
 	const vec2& b = getVec2(args[1]);
 	return a*b;
 }
 
-Value febcode::NormalizeVec2(const std::vector<Value>& args)
+Value febcode::NormalizeVec2(const Value* args, int argc)
 {
+	assert(argc == 1);
 	const vec2& a = getVec2(args[0]);
 
 	double x = a.x;

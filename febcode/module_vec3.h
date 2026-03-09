@@ -4,13 +4,13 @@
 namespace febcode
 {
 	// vec3 = dot(vec3, vec3)
-	Value DotVec3(const std::vector<Value>& args);
+	Value DotVec3(const Value* args, int argc);
 
 	// vec3 = cross(vec3, vec3)
-	Value CrossVec3(const std::vector<Value>& args);
+	Value CrossVec3(const Value* args, int argc);
 
 	// normalized = Normalize(vec3)
-	Value NormalizeVec3(const std::vector<Value>& args);
+	Value NormalizeVec3(const Value* args, int argc);
 
 	class Vec3Module : public Module
 	{
