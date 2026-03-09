@@ -46,6 +46,7 @@ namespace febcode
 		GET_VEC3_X,
 		GET_VEC3_Y,
 		GET_VEC3_Z,
+		GET_VEC3_SWIZZLE,
 		SET_VEC3_X,
 		SET_VEC3_Y,
 		SET_VEC3_Z,
