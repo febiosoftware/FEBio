@@ -142,14 +142,14 @@ Value VM::execute()
 		case OpCode::PUSH_CONST:
 		{
 			uint16_t idx = readUint16();
-			m_stack.push_back(m_program.constants[idx]);
+			push(m_program.constants[idx]);
 			break;
 		}
 
 		case OpCode::GET_GLOBAL:
 		{
 			uint16_t slot = readUint16();
-			m_stack.push_back(m_stack[slot]);
+			push(m_stack[slot]);
 			break;
 		}
 
@@ -164,7 +164,7 @@ Value VM::execute()
 		{
 			uint16_t slot = readUint16();
 			CallFrame& frame = currentFrame();
-			m_stack.push_back(m_stack[frame.base + slot]);
+			push(m_stack[frame.base + slot]);
 			break;
 		}
 
@@ -180,28 +180,28 @@ Value VM::execute()
 		case OpCode::NEG_INT:
 		{
 			Value a = pop();
-			m_stack.push_back(-getInt(a));
+			push(-getInt(a));
 			break;
 		}
 		case OpCode::ADD_INT:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getInt(a) + getInt(b));
+			push(getInt(a) + getInt(b));
 			break;
 		}
 		case OpCode::SUB_INT:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getInt(a) - getInt(b));
+			push(getInt(a) - getInt(b));
 			break;
 		}
 		case OpCode::MUL_INT:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getInt(a) * getInt(b));
+			push(getInt(a) * getInt(b));
 			break;
 		}
 		case OpCode::DIV_INT:
@@ -211,7 +211,7 @@ Value VM::execute()
 			int divisor = getInt(b);
 			if (divisor == 0)
 				throw std::runtime_error("division by zero.");
-			m_stack.push_back(getInt(a) / divisor);
+			push(getInt(a) / divisor);
 			break;
 		}
 		case OpCode::EXP_INT:
@@ -223,35 +223,35 @@ Value VM::execute()
 			if (e < 0)
 				throw std::runtime_error("Negative exponent not supported for integers.");
 
-			m_stack.push_back(ipow(getInt(a), e));
+			push(ipow(getInt(a), e));
 			break;
 		}
 		case OpCode::GT_INT:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getInt(a) > getInt(b));
+			push(getInt(a) > getInt(b));
 			break;
 		}
 		case OpCode::LT_INT:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getInt(a) < getInt(b));
+			push(getInt(a) < getInt(b));
 			break;
 		}
 		case OpCode::GE_INT:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getInt(a) >= getInt(b));
+			push(getInt(a) >= getInt(b));
 			break;
 		}
 		case OpCode::LE_INT:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getInt(a) <= getInt(b));
+			push(getInt(a) <= getInt(b));
 			break;
 		}
 
@@ -259,7 +259,7 @@ Value VM::execute()
 		case OpCode::NEG_DOUBLE:
 		{
 			Value a = pop();
-			m_stack.push_back(-getDouble(a));
+			push(-getDouble(a));
 			break;
 		}
 
@@ -267,21 +267,21 @@ Value VM::execute()
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getDouble(a) + getDouble(b));
+			push(getDouble(a) + getDouble(b));
 			break;
 		}
 		case OpCode::SUB_DOUBLE:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getDouble(a) - getDouble(b));
+			push(getDouble(a) - getDouble(b));
 			break;
 		}
 		case OpCode::MUL_DOUBLE:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getDouble(a) * getDouble(b));
+			push(getDouble(a) * getDouble(b));
 			break;
 		}
 		case OpCode::DIV_DOUBLE:
@@ -291,42 +291,42 @@ Value VM::execute()
 			double divisor = getDouble(b);
 			if (divisor == 0.0)
 				throw std::runtime_error("division by zero.");
-			m_stack.push_back(getDouble(a) / divisor);
+			push(getDouble(a) / divisor);
 			break;
 		}
 		case OpCode::EXP_DOUBLE:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(std::pow(getDouble(a), getDouble(b)));
+			push(std::pow(getDouble(a), getDouble(b)));
 			break;
 		}
 		case OpCode::GT_DOUBLE:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getDouble(a) > getDouble(b));
+			push(getDouble(a) > getDouble(b));
 			break;
 		}
 		case OpCode::LT_DOUBLE:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getDouble(a) < getDouble(b));
+			push(getDouble(a) < getDouble(b));
 			break;
 		}
 		case OpCode::GE_DOUBLE:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getDouble(a) >= getDouble(b));
+			push(getDouble(a) >= getDouble(b));
 			break;
 		}
 		case OpCode::LE_DOUBLE:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getDouble(a) <= getDouble(b));
+			push(getDouble(a) <= getDouble(b));
 			break;
 		}
 
@@ -334,61 +334,61 @@ Value VM::execute()
 		{
 			Value y = pop();
 			Value x = pop();
-			m_stack.push_back(vec2(getDouble(x), getDouble(y)));
+			push(vec2(getDouble(x), getDouble(y)));
 			break;
 		}
 		case OpCode::COPY_VEC2:
 		{
 			Value src = pop();
 			const vec2& v = getVec2(src);
-			m_stack.push_back(vec2(v.x, v.y));
+			push(vec2(v.x, v.y));
 			break;
 		}
 		case OpCode::ADD_VEC2:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getVec2(a) + getVec2(b));
+			push(getVec2(a) + getVec2(b));
 			break;
 		}
 		case OpCode::SUB_VEC2:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getVec2(a) - getVec2(b));
+			push(getVec2(a) - getVec2(b));
 			break;
 		}
 		case OpCode::DOT_VEC2:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getVec2(a) * getVec2(b));
+			push(getVec2(a) * getVec2(b));
 			break;
 		}
 		case OpCode::MUL_VEC2_DOUBLE:
 		{
 			Value scalar = pop();
 			Value vec = pop();
-			m_stack.push_back(getVec2(vec) * getDouble(scalar));
+			push(getVec2(vec) * getDouble(scalar));
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC2:
 		{
 			Value vec = pop();
 			Value scalar = pop();
-			m_stack.push_back(getVec2(vec) * getDouble(scalar));
+			push(getVec2(vec) * getDouble(scalar));
 			break;
 		}
 		case OpCode::GET_VEC2_X:
 		{
 			Value vec = pop();
-			m_stack.push_back(getVec2(vec).x);
+			push(getVec2(vec).x);
 			break;
 		}
 		case OpCode::GET_VEC2_Y:
 		{
 			Value vec = pop();
-			m_stack.push_back(getVec2(vec).y);
+			push(getVec2(vec).y);
 			break;
 		}
 		case OpCode::SET_VEC2_X:
@@ -399,7 +399,7 @@ Value VM::execute()
 			vec2& v = getVec2(vec);
 			v.x = getDouble(x);
 			m_stack[slot] = v;
-			m_stack.push_back(v.x);
+			push(v.x);
 			break;
 		}
 		case OpCode::SET_VEC2_Y:
@@ -410,14 +410,14 @@ Value VM::execute()
 			vec2& v = getVec2(vec);
 			v.y = getDouble(y);
 			m_stack[slot] = v;
-			m_stack.push_back(v.y);
+			push(v.y);
 			break;
 		}
 		case OpCode::NEG_VEC2:
 		{
 			Value vec = pop();
 			vec2& v = getVec2(vec);
-			m_stack.push_back(vec2(-v.x, -v.y));
+			push(vec2(-v.x, -v.y));
 			break;
 		}
 		case OpCode::CREATE_VEC3:
@@ -425,67 +425,67 @@ Value VM::execute()
 			Value z = pop();
 			Value y = pop();
 			Value x = pop();
-			m_stack.push_back(vec3(getDouble(x), getDouble(y), getDouble(z)));
+			push(vec3(getDouble(x), getDouble(y), getDouble(z)));
 			break;
 		}
 		case OpCode::COPY_VEC3:
 		{
 			Value src = pop();
 			const vec3& v = getVec3(src);
-			m_stack.push_back(vec3(v.x, v.y, v.z));
+			push(vec3(v.x, v.y, v.z));
 			break;
 		}
 		case OpCode::ADD_VEC3:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getVec3(a) + getVec3(b));
+			push(getVec3(a) + getVec3(b));
 			break;
 		}
 		case OpCode::SUB_VEC3:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getVec3(a) - getVec3(b));
+			push(getVec3(a) - getVec3(b));
 			break;
 		}
 		case OpCode::DOT_VEC3:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(getVec3(a) * getVec3(b));
+			push(getVec3(a) * getVec3(b));
 			break;
 		}
 		case OpCode::MUL_VEC3_DOUBLE:
 		{
 			Value scalar = pop();
 			Value vec = pop();
-			m_stack.push_back(getVec3(vec) * getDouble(scalar));
+			push(getVec3(vec) * getDouble(scalar));
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC3:
 		{
 			Value vec = pop();
 			Value scalar = pop();
-			m_stack.push_back(getVec3(vec) * getDouble(scalar));
+			push(getVec3(vec) * getDouble(scalar));
 			break;
 		}
 		case OpCode::GET_VEC3_X:
 		{
 			Value vec = pop();
-			m_stack.push_back(getVec3(vec).x);
+			push(getVec3(vec).x);
 			break;
 		}
 		case OpCode::GET_VEC3_Y:
 		{
 			Value vec = pop();
-			m_stack.push_back(getVec3(vec).y);
+			push(getVec3(vec).y);
 			break;
 		}
 		case OpCode::GET_VEC3_Z:
 		{
 			Value vec = pop();
-			m_stack.push_back(getVec3(vec).z);
+			push(getVec3(vec).z);
 			break;
 		}
 		case OpCode::SET_VEC3_X:
@@ -496,7 +496,7 @@ Value VM::execute()
 			vec3& v = getVec3(vec);
 			v.x = getDouble(x);
 			m_stack[slot] = v;
-			m_stack.push_back(v.x);
+			push(v.x);
 			break;
 		}
 		case OpCode::SET_VEC3_Y:
@@ -507,7 +507,7 @@ Value VM::execute()
 			vec3& v = getVec3(vec);
 			v.y = getDouble(y);
 			m_stack[slot] = v;
-			m_stack.push_back(v.y);
+			push(v.y);
 			break;
 		}
 		case OpCode::SET_VEC3_Z:
@@ -518,14 +518,14 @@ Value VM::execute()
 			vec3& v = getVec3(vec);
 			v.z = getDouble(z);
 			m_stack[slot] = v;
-			m_stack.push_back(v.z);
+			push(v.z);
 			break;
 		}
 		case OpCode::NEG_VEC3:
 		{
 			Value vec = pop();
 			vec3& v = getVec3(vec);
-			m_stack.push_back(vec2(-v.x, -v.y));
+			push(vec2(-v.x, -v.y));
 			break;
 		}
 
@@ -534,7 +534,7 @@ Value VM::execute()
 		{
 			Value a = pop();
 			Value b = pop();
-			m_stack.push_back(getString(a) + getString(b));
+			push(getString(a) + getString(b));
 			break;
 		}
 
@@ -543,21 +543,21 @@ Value VM::execute()
 		{
 			Value a = pop();
 			bool b = isTruthy(a);
-			m_stack.push_back(!b);
+			push(!b);
 			break;
 		}
 		case OpCode::EQUAL:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(a == b);
+			push(a == b);
 			break;
 		}
 		case OpCode::NOT_EQUAL:
 		{
 			Value b = pop();
 			Value a = pop();
-			m_stack.push_back(a != b);
+			push(a != b);
 			break;
 		}
 
@@ -573,7 +573,7 @@ Value VM::execute()
 				obj->fields[i] = pop();
 			}
 
-			m_stack.push_back(obj);
+			push(obj);
 			break;
 		}
 		case OpCode::COPY_STRUCT:
@@ -586,7 +586,7 @@ Value VM::execute()
 			const StructValue& srcObj = getStruct(src);
 			auto obj = copyStruct(srcObj);
 
-			m_stack.push_back(obj);
+			push(obj);
 			break;
 		}
 		case OpCode::GET_PROPERTY:
@@ -604,7 +604,7 @@ Value VM::execute()
 				if (slot >= structVal.fields.size())
 					throw std::runtime_error("Invalid property slot");
 
-				m_stack.push_back(structVal.fields[slot]);
+				push(structVal.fields[slot]);
 				break;
 			}
 			default:
@@ -633,7 +633,7 @@ Value VM::execute()
 				structVal.fields[slot] = value;
 
 				// Push assigned value (JS-style assignment semantics)
-				m_stack.push_back(value);
+				push(value);
 				break;
 			}
 			default:
@@ -655,7 +655,7 @@ Value VM::execute()
 			Type elemType = m_program.types.getBuiltinType(arr->elements[0]);
 			arr->type = m_program.types.getArrayType(elemType, count);
 
-			m_stack.push_back(arr);
+			push(arr);
 			break;
 		}
 		case OpCode::COPY_ARRAY: {
@@ -667,7 +667,7 @@ Value VM::execute()
 			const ArrayValue& srcObj = getArray(src);
 			auto obj = copyArray(srcObj);
 
-			m_stack.push_back(obj);
+			push(obj);
 			break;
 		}
 		case OpCode::GET_INDEX: {
@@ -682,7 +682,7 @@ Value VM::execute()
 			if (index >= arr.size())
 				throw std::runtime_error("Array index out of bounds.");
 
-			m_stack.push_back(arr.elements[index]);
+			push(arr.elements[index]);
 			break;
 		}
 		case OpCode::SET_INDEX: {
@@ -701,7 +701,7 @@ Value VM::execute()
 
 			arr.elements[index] = value;
 
-			m_stack.push_back(value);
+			push(value);
 			break;
 		}
 		case OpCode::JUMP:
@@ -765,7 +765,7 @@ Value VM::execute()
 			}
 
 			// leave empty value on stack after print (for chaining)
-			m_stack.push_back(Value());
+			push(Value());
 
 			break;
 		}
@@ -781,7 +781,7 @@ Value VM::execute()
 			m_frames.pop_back();
 
 			m_stack.resize(frame.base);
-			m_stack.push_back(result);
+			push(result);
 
 			if (m_debug)
 			{
@@ -826,7 +826,7 @@ void VM::callFunction(int fnIndex, int argCount)
 		m_stack.resize(m_stack.size() - argCount);
 
 		Value result = fn.fnc(args);
-		m_stack.push_back(result);
+		push(result);
 		return;
 	}
 
@@ -853,7 +853,7 @@ void VM::callBinaryOperator(int opIndex)
 	m_stack.resize(m_stack.size() - 2);
 
 	Value result = fn.fnc(lv, rv);
-	m_stack.push_back(result);
+	push(result);
 }
 
 Value febcode::runScript(const std::string& script, bool initModules)

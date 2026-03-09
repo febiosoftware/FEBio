@@ -148,6 +148,11 @@ namespace febcode
 			return v;
 		}
 
+		void push(const Value& v)
+		{
+			m_stack.push_back(v);
+		}
+
 		Value& peek()
 		{
 			return m_stack.back();
