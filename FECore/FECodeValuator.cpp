@@ -184,7 +184,7 @@ bool ValidateScript(const std::string& script, std::string& err)
 		febcode::MathModule mathModule;
 		mathModule.Register(program);
 
-		febcode::Type vec3 = program.types.getStructType("vec3");
+		febcode::Type vec3 = program.types.getVec3Type();
 		if (!vec3) {
 			err = "Error compiling code: 'vec3' type not defined";
 			return false;
@@ -195,9 +195,9 @@ bool ValidateScript(const std::string& script, std::string& err)
 		febcode::Compiler compiler(program);
 
 		int globals[3] = { -1, -1, -1 };
-		globals[0] = program.addGlobal("_pos0", vec3, { 0., 0., 0. });
+		globals[0] = program.addGlobal("_pos0", vec3, febcode::vec3( 0., 0., 0. ));
 		globals[1] = program.addGlobal("_time", 0.0);
-		globals[2] = program.addGlobal("_norm0", vec3, { 0., 0., 0. });
+		globals[2] = program.addGlobal("_norm0", vec3, febcode::vec3(0., 0., 0.));
 
 		compiler.compile();
 	}
