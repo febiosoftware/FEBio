@@ -73,8 +73,8 @@ bool FECodeValuator::CompileScript()
 		febcode::MathModule mathModule;
 		mathModule.Register(m.program);
 
-		febcode::Type vec3 = m.program.types.getStructType("vec3");
-		if (!vec3) {
+		febcode::Type vec3_t = m.program.types.getVec3Type();
+		if (!vec3_t) {
 			feLogError("Error compiling code: 'vec3' type not defined");
 			return false;
 		}
@@ -84,13 +84,13 @@ bool FECodeValuator::CompileScript()
 		febcode::Compiler compiler(m.program);
 
 
-		m.globals[0] = m.program.addGlobal("_pos0", vec3, { 0., 0., 0. });
+		m.globals[0] = m.program.addGlobal("_pos0", vec3_t, febcode::vec3(0., 0., 0.), true);
 		m.globals[1] = m.program.addGlobal("_time", 0.0);
 		m.globals[2] = -1;
 
 		if (auto s = dynamic_cast<FESurfaceLoad*>(parent))
 		{
-			m.globals[2] = m.program.addGlobal("_norm0", vec3, { 0., 0., 0. });
+			m.globals[2] = m.program.addGlobal("_norm0", vec3_t, febcode::vec3(0., 0., 0.), true);
 			m.surf = &s->GetSurface();
 		}
 
@@ -137,7 +137,7 @@ bool FECodeValuator::Init()
 double FECodeValuator::operator()(const FEMaterialPoint& pt)
 {
 	febcode::VM vm(m.program);
-	if (m.globals[0] >= 0) vm.setGlobal(m.globals[0], { pt.m_r0.x, pt.m_r0.y, pt.m_r0.z });
+	if (m.globals[0] >= 0) vm.setGlobal(m.globals[0], febcode::vec3(pt.m_r0.x, pt.m_r0.y, pt.m_r0.z));
 	if (m.globals[1] >= 0) vm.setGlobal(m.globals[1], GetFEModel()->GetTime().currentTime);
 	if (m.surf && (m.globals[2] >= 0))
 	{
@@ -145,7 +145,7 @@ double FECodeValuator::operator()(const FEMaterialPoint& pt)
 		if (el)
 		{
 			vec3d n = m.surf->SurfaceNormal(*el, pt.m_index);
-			vm.setGlobal(m.globals[2], { n.x, n.y, n.z });
+			vm.setGlobal(m.globals[2], febcode::vec3(n.x, n.y, n.z));
 		}
 	}
 	febcode::Value v = vm.run();

@@ -255,6 +255,10 @@ namespace febcode {
 				return makeToken(TokenType::Type);
 			if (length == 6 && std::memcmp(start, "string", 6) == 0)
 				return makeToken(TokenType::Type);
+			if (length == 4 && std::memcmp(start, "vec2", 4) == 0)
+				return makeToken(TokenType::Type);
+			if (length == 4 && std::memcmp(start, "vec3", 4) == 0)
+				return makeToken(TokenType::Type);
 
 			// Fallback: regular identifier
 			return makeToken(TokenType::Identifier);

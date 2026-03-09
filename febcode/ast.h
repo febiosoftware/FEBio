@@ -223,12 +223,7 @@ namespace febcode {
 	struct AST {
 		std::vector<std::unique_ptr<Statement>> statements;
 
-		AST() = default;
-		AST(AST&&) = default;
-		AST& operator=(AST&&) = default;
-
-		AST(const AST&) = delete;
-		AST& operator=(const AST&) = delete;
+		AST() {}
 
 		void clear() { statements.clear(); }
 

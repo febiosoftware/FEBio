@@ -30,6 +30,16 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 		}
 		return o << "}";
 	}
+	else if (isVec2(v))
+	{
+		const febcode::vec2& vec = std::get<febcode::vec2>(v);
+		return o << "vec2(" << vec.x << ", " << vec.y << ")";
+	}
+	else if (isVec3(v))
+	{
+		const febcode::vec3& vec = std::get<febcode::vec3>(v);
+		return o << "vec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+	}
 	else
 		return o << "<unknown value>";
 }
@@ -41,6 +51,8 @@ std::string ValueToString(const febcode::Value& v)
 	else if (isBool  (v)) s = getBool(v) ? "true" : "false";
 	else if (isInt   (v)) s = std::to_string(getInt (v));
 	else if (isDouble(v)) s = std::to_string(getDouble(v));
+	else if (isVec2  (v)) s = "vec2";
+	else if (isVec3  (v)) s = "vec3";
 	else if (isString(v)) s = "\"" + getString(v) + "\"";
 	else if (isArray (v)) { auto& p = getArrayPtr (v); s = "[array:"  + std::to_string(p.use_count()) + "]"; }
 	else if (isStruct(v)) { 
@@ -62,5 +74,7 @@ std::string ValueTypeToString(const febcode::Value& v)
 	else if (isString(v)) return "string";
 	else if (isArray (v)) return "array";
 	else if (isStruct(v)) return "struct";
-	else return "unknown type";
+	else if (isVec2  (v)) return "vec2";
+	else if (isVec3  (v)) return "vec3";
+	else return "<unknown type>";
 }

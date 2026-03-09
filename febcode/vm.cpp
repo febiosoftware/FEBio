@@ -53,6 +53,32 @@ const char* IPToString(uint8_t ip)
 	case OpCode::LE_DOUBLE     : return "LEF ";
 	case OpCode::NEG_INT       : return "NEGI";
 	case OpCode::NEG_DOUBLE    : return "NEGF";
+	case OpCode::CREATE_VEC2   : return "VEC2";
+	case OpCode::COPY_VEC2     : return "CPV2";
+	case OpCode::GET_VEC2_X    : return "GV2X";
+	case OpCode::GET_VEC2_Y    : return "GV2Y";
+	case OpCode::SET_VEC2_X    : return "SV2X";
+	case OpCode::SET_VEC2_Y    : return "SV2Y";
+	case OpCode::ADD_VEC2      : return "ADD2";
+	case OpCode::SUB_VEC2      : return "SUB2";
+	case OpCode::DOT_VEC2      : return "DOT2";
+	case OpCode::MUL_VEC2_DOUBLE: return "ML2F";
+	case OpCode::MUL_DOUBLE_VEC2: return "MLF2";
+	case OpCode::NEG_VEC2      : return "NEG2";
+	case OpCode::CREATE_VEC3   : return "VEC3";
+	case OpCode::COPY_VEC3     : return "CPV3";
+	case OpCode::GET_VEC3_X    : return "GV3X";
+	case OpCode::GET_VEC3_Y    : return "GV3Y";
+	case OpCode::GET_VEC3_Z    : return "GV3Z";
+	case OpCode::SET_VEC3_X    : return "SV3X";
+	case OpCode::SET_VEC3_Y    : return "SV3Y";
+	case OpCode::SET_VEC3_Z    : return "SV3Z";
+	case OpCode::ADD_VEC3      : return "ADD3";
+	case OpCode::SUB_VEC3      : return "SUB3";
+	case OpCode::DOT_VEC3      : return "DOT3";
+	case OpCode::MUL_VEC3_DOUBLE: return "ML3F";
+	case OpCode::MUL_DOUBLE_VEC3: return "MLF3";
+	case OpCode::NEG_VEC3      : return "NEG3";
 	case OpCode::NOT           : return "NOT ";
 	case OpCode::CREATE_STRUCT : return "STRC";
 	case OpCode::COPY_STRUCT   : return "CPYS";
@@ -301,6 +327,205 @@ Value VM::execute()
 			Value b = pop();
 			Value a = pop();
 			m_stack.push_back(getDouble(a) <= getDouble(b));
+			break;
+		}
+
+		case OpCode::CREATE_VEC2:
+		{
+			Value y = pop();
+			Value x = pop();
+			m_stack.push_back(vec2(getDouble(x), getDouble(y)));
+			break;
+		}
+		case OpCode::COPY_VEC2:
+		{
+			Value src = pop();
+			const vec2& v = getVec2(src);
+			m_stack.push_back(vec2(v.x, v.y));
+			break;
+		}
+		case OpCode::ADD_VEC2:
+		{
+			Value b = pop();
+			Value a = pop();
+			m_stack.push_back(getVec2(a) + getVec2(b));
+			break;
+		}
+		case OpCode::SUB_VEC2:
+		{
+			Value b = pop();
+			Value a = pop();
+			m_stack.push_back(getVec2(a) - getVec2(b));
+			break;
+		}
+		case OpCode::DOT_VEC2:
+		{
+			Value b = pop();
+			Value a = pop();
+			m_stack.push_back(getVec2(a) * getVec2(b));
+			break;
+		}
+		case OpCode::MUL_VEC2_DOUBLE:
+		{
+			Value scalar = pop();
+			Value vec = pop();
+			m_stack.push_back(getVec2(vec) * getDouble(scalar));
+			break;
+		}
+		case OpCode::MUL_DOUBLE_VEC2:
+		{
+			Value vec = pop();
+			Value scalar = pop();
+			m_stack.push_back(getVec2(vec) * getDouble(scalar));
+			break;
+		}
+		case OpCode::GET_VEC2_X:
+		{
+			Value vec = pop();
+			m_stack.push_back(getVec2(vec).x);
+			break;
+		}
+		case OpCode::GET_VEC2_Y:
+		{
+			Value vec = pop();
+			m_stack.push_back(getVec2(vec).y);
+			break;
+		}
+		case OpCode::SET_VEC2_X:
+		{
+			uint16_t slot = readUint16();
+			Value x = pop();
+			Value vec = pop();
+			vec2& v = getVec2(vec);
+			v.x = getDouble(x);
+			m_stack[slot] = v;
+			m_stack.push_back(v.x);
+			break;
+		}
+		case OpCode::SET_VEC2_Y:
+		{
+			uint16_t slot = readUint16();
+			Value y = pop();
+			Value vec = pop();
+			vec2& v = getVec2(vec);
+			v.y = getDouble(y);
+			m_stack[slot] = v;
+			m_stack.push_back(v.y);
+			break;
+		}
+		case OpCode::NEG_VEC2:
+		{
+			Value vec = pop();
+			vec2& v = getVec2(vec);
+			m_stack.push_back(vec2(-v.x, -v.y));
+			break;
+		}
+		case OpCode::CREATE_VEC3:
+		{
+			Value z = pop();
+			Value y = pop();
+			Value x = pop();
+			m_stack.push_back(vec3(getDouble(x), getDouble(y), getDouble(z)));
+			break;
+		}
+		case OpCode::COPY_VEC3:
+		{
+			Value src = pop();
+			const vec3& v = getVec3(src);
+			m_stack.push_back(vec3(v.x, v.y, v.z));
+			break;
+		}
+		case OpCode::ADD_VEC3:
+		{
+			Value b = pop();
+			Value a = pop();
+			m_stack.push_back(getVec3(a) + getVec3(b));
+			break;
+		}
+		case OpCode::SUB_VEC3:
+		{
+			Value b = pop();
+			Value a = pop();
+			m_stack.push_back(getVec3(a) - getVec3(b));
+			break;
+		}
+		case OpCode::DOT_VEC3:
+		{
+			Value b = pop();
+			Value a = pop();
+			m_stack.push_back(getVec3(a) * getVec3(b));
+			break;
+		}
+		case OpCode::MUL_VEC3_DOUBLE:
+		{
+			Value scalar = pop();
+			Value vec = pop();
+			m_stack.push_back(getVec3(vec) * getDouble(scalar));
+			break;
+		}
+		case OpCode::MUL_DOUBLE_VEC3:
+		{
+			Value vec = pop();
+			Value scalar = pop();
+			m_stack.push_back(getVec3(vec) * getDouble(scalar));
+			break;
+		}
+		case OpCode::GET_VEC3_X:
+		{
+			Value vec = pop();
+			m_stack.push_back(getVec3(vec).x);
+			break;
+		}
+		case OpCode::GET_VEC3_Y:
+		{
+			Value vec = pop();
+			m_stack.push_back(getVec3(vec).y);
+			break;
+		}
+		case OpCode::GET_VEC3_Z:
+		{
+			Value vec = pop();
+			m_stack.push_back(getVec3(vec).z);
+			break;
+		}
+		case OpCode::SET_VEC3_X:
+		{
+			uint16_t slot = readUint16();
+			Value x = pop();
+			Value vec = pop();
+			vec3& v = getVec3(vec);
+			v.x = getDouble(x);
+			m_stack[slot] = v;
+			m_stack.push_back(v.x);
+			break;
+		}
+		case OpCode::SET_VEC3_Y:
+		{
+			uint16_t slot = readUint16();
+			Value y = pop();
+			Value vec = pop();
+			vec3& v = getVec3(vec);
+			v.y = getDouble(y);
+			m_stack[slot] = v;
+			m_stack.push_back(v.y);
+			break;
+		}
+		case OpCode::SET_VEC3_Z:
+		{
+			uint16_t slot = readUint16();
+			Value z = pop();
+			Value vec = pop();
+			vec3& v = getVec3(vec);
+			v.z = getDouble(z);
+			m_stack[slot] = v;
+			m_stack.push_back(v.z);
+			break;
+		}
+		case OpCode::NEG_VEC3:
+		{
+			Value vec = pop();
+			vec3& v = getVec3(vec);
+			m_stack.push_back(vec2(-v.x, -v.y));
 			break;
 		}
 

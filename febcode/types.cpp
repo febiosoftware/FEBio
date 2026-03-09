@@ -49,6 +49,8 @@ TypeRegistry::TypeRegistry()
 	m_bool   = { TypeKind::Bool  };
 	m_int    = { TypeKind::Int   };
 	m_double = { TypeKind::Double};
+	m_vec2   = { TypeKind::Vec2  };
+	m_vec3   = { TypeKind::Vec3  };
 	m_string = { TypeKind::String};
 }
 
@@ -61,6 +63,8 @@ Type TypeRegistry::getVoidType() const { return &m_void; }
 Type TypeRegistry::getBoolType() const { return &m_bool; }
 Type TypeRegistry::getIntType() const { return &m_int; }
 Type TypeRegistry::getDoubleType() const { return &m_double; }
+Type TypeRegistry::getVec2Type() const { return &m_vec2; }
+Type TypeRegistry::getVec3Type() const { return &m_vec3; }
 Type TypeRegistry::getStringType() const { return &m_string; }
 
 Type TypeRegistry::getArrayType(Type element, size_t size)
@@ -105,6 +109,8 @@ Type TypeRegistry::getBuiltinType(const Value& v) const
 	if (isBool  (v)) return getBoolType();
 	if (isInt   (v)) return getIntType();
 	if (isDouble(v)) return getDoubleType();
+	if (isVec2  (v)) return getVec2Type();
+	if (isVec3  (v)) return getVec3Type();
 	if (isString(v)) return getStringType();
 	if (isArray (v)) { const ArrayValue&  a = getArray (v); return a.type; }
 	if (isStruct(v)) { const StructValue& s = getStruct(v); return s.type; }
@@ -119,6 +125,8 @@ Type TypeRegistry::getType(const std::string& name) const
 	if (name == "bool"  ) return getBoolType();
 	if (name == "int"   ) return getIntType();
 	if (name == "double") return getDoubleType();
+	if (name == "vec2"  ) return getVec2Type();
+	if (name == "vec3"  ) return getVec3Type();
 	if (name == "string") return getStringType();
 
 	Type s = getStructType(name);
@@ -181,6 +189,8 @@ Type TypeRegistry::defineStructType(const std::string& name, const std::vector<s
 		case TypeKind::Bool  : t = getBoolType(); break;
 		case TypeKind::Int   : t = getIntType(); break;
 		case TypeKind::Double: t = getDoubleType(); break;
+		case TypeKind::Vec2  : t = getVec2Type(); break;
+		case TypeKind::Vec3  : t = getVec3Type(); break;
 		case TypeKind::String: t = getStringType(); break;
 		default:
 			throw std::runtime_error("Unsupported field type in RegisterStruct: " + std::to_string((int)f.first));
@@ -196,10 +206,12 @@ std::string febcode::TypeToString(Type type)
 
 	switch (type->kind)
 	{
-	case TypeKind::Void: return "void";
-	case TypeKind::Int: return "int";
+	case TypeKind::Void  : return "void";
+	case TypeKind::Bool  : return "bool";
+	case TypeKind::Int   : return "int";
 	case TypeKind::Double: return "double";
-	case TypeKind::Bool: return "bool";
+	case TypeKind::Vec2  : return "vec2";
+	case TypeKind::Vec3  : return "vec3";
 	case TypeKind::String: return "string";
 	case TypeKind::Struct: return type->name;
 	case TypeKind::Array:

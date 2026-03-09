@@ -211,6 +211,54 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 			emit(OpCode::COPY_ARRAY);
 		}
 	}
+	else if (expectedType->kind == TypeKind::Vec2)
+	{
+		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
+		if (init)
+		{
+			if (init->elements.size() != 2)
+				throw std::runtime_error("Vec2 initializer must have exactly 2 elements.");
+			for (size_t i = 0; i < 2; ++i)
+			{
+				Type elemType = compileExpression(init->elements[i].get());
+				if (elemType != prg.types.getDoubleType())
+					throw std::runtime_error("Vec2 initializer elements must be of type double.");
+			}
+			emit(OpCode::CREATE_VEC2);
+		}
+		else
+		{
+			Type returnType = compileExpression(expr);
+			if (returnType != expectedType)
+				throw std::runtime_error("Invalid initializer type for vec2.");
+
+			emit(OpCode::COPY_VEC2);
+		}
+	}
+	else if (expectedType->kind == TypeKind::Vec3)
+	{
+		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
+		if (init)
+		{
+			if (init->elements.size() != 3)
+				throw std::runtime_error("Vec3 initializer must have exactly 3 elements.");
+			for (size_t i = 0; i < 3; ++i)
+			{
+				Type elemType = compileExpression(init->elements[i].get());
+				if (elemType != prg.types.getDoubleType())
+					throw std::runtime_error("Vec3 initializer elements must be of type double.");
+			}
+			emit(OpCode::CREATE_VEC3);
+		}
+		else
+		{
+			Type returnType = compileExpression(expr);
+			if (returnType != expectedType)
+				throw std::runtime_error("Invalid initializer type for vec3.");
+
+			emit(OpCode::COPY_VEC3);
+		}
+	}
 	else
 	{
 		Type returnType = compileExpression(expr);
@@ -589,6 +637,78 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		return type_l;
 	}
 
+	// vec2 operations
+	if (isVec2Type(type_l) && isVec2Type(type_r))
+	{
+		Type returnType = type_l; // default return type is vec2, but some ops like dot product will return double
+		switch (op)
+		{
+		case BinaryOp::Plus    : emit(OpCode::ADD_VEC2); break;
+		case BinaryOp::Minus   : emit(OpCode::SUB_VEC2); break;
+		case BinaryOp::Multiply: emit(OpCode::DOT_VEC2); returnType = prg.types.getDoubleType(); break;
+		default: throw std::runtime_error("Unsupported binary op for vec2 type.");
+		}
+		return returnType;
+	}
+
+	// vec2 * scalar
+	if (isVec2Type(type_l) && isDoubleType(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_VEC2_DOUBLE); break;
+		default: throw std::runtime_error("Unsupported binary op for vec2 and double types.");
+		}
+		return type_l;
+	}
+
+	// scalar * vec2
+	if (isDoubleType(type_l) && isVec2Type(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_DOUBLE_VEC2); break;
+		default: throw std::runtime_error("Unsupported binary op for double and vec2 types.");
+		}
+		return type_r;
+	}
+
+	// vec3 operations
+	if (isVec3Type(type_l) && isVec3Type(type_r))
+	{
+		Type returnType = type_l; // default return type is vec3, but some ops like dot product will return double
+		switch (op)
+		{
+		case BinaryOp::Plus : emit(OpCode::ADD_VEC3); break;
+		case BinaryOp::Minus: emit(OpCode::SUB_VEC3); break;
+		case BinaryOp::Multiply: emit(OpCode::DOT_VEC3); returnType = prg.types.getDoubleType(); break;
+		default: throw std::runtime_error("Unsupported binary op for vec3 type.");
+		}
+		return returnType;
+	}
+
+	// vec3 * scalar
+	if (isVec3Type(type_l) && isDoubleType(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_VEC3_DOUBLE); break;
+		default: throw std::runtime_error("Unsupported binary op for vec3 and double types.");
+		}
+		return type_l;
+	}
+
+	// scalar * vec3
+	if (isDoubleType(type_l) && isVec3Type(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_DOUBLE_VEC3); break;
+		default: throw std::runtime_error("Unsupported binary op for double and vec3 types.");
+		}
+		return type_r;
+	}
+
 	// see if we have a binary operator overload for these operand types
 	if (auto overload = prg.findBinaryOperatorOverload(op, type_l, type_r))
 	{
@@ -611,6 +731,8 @@ Type Compiler::compileUnary(UnaryExpr* expr)
 	{
 		if      (isIntType   (type)) emit(OpCode::NEG_INT);
 		else if (isDoubleType(type)) emit(OpCode::NEG_DOUBLE);
+		else if (isVec2Type  (type)) emit(OpCode::NEG_VEC2);
+		else if (isVec3Type  (type)) emit(OpCode::NEG_VEC3);
 		else
 			throw std::runtime_error("Invalid operand type for unary '-'.");
 		break;
@@ -729,17 +851,59 @@ Type Compiler::compileMember(MemberExpr* expr)
 {
 	Type type = compileExpression(expr->object.get());
 
-	auto it = std::find_if(type->fields.begin(), type->fields.end(),
-		[&](const auto& field) { return field.second == expr->property; });
-	if (it == type->fields.end())
-		throw std::runtime_error("Unknown property: " + expr->property);
+	if (isStructType(type))
+	{
+		auto it = std::find_if(type->fields.begin(), type->fields.end(),
+			[&](const auto& field) { return field.second == expr->property; });
+		if (it == type->fields.end())
+			throw std::runtime_error("Unknown property: " + expr->property);
 
-	std::size_t index = it - type->fields.begin();
+		std::size_t index = it - type->fields.begin();
 
-	emit(OpCode::GET_PROPERTY);
-	emitUint16((uint16_t)index);
+		emit(OpCode::GET_PROPERTY);
+		emitUint16((uint16_t)index);
 
-	return it->first;
+		return it->first;
+	}
+	else if (isVec2Type(type))
+	{
+		if (expr->property == "x")
+		{
+			emit(OpCode::GET_VEC2_X);
+			return prg.types.getDoubleType();
+		}
+		else if (expr->property == "y")
+		{
+			emit(OpCode::GET_VEC2_Y);
+			return prg.types.getDoubleType();
+		}
+		else
+			throw std::runtime_error("Unknown property: " + expr->property);
+	}
+	else if (isVec3Type(type))
+	{
+		if (expr->property == "x")
+		{
+			emit(OpCode::GET_VEC3_X);
+			return prg.types.getDoubleType();
+		}
+		else if (expr->property == "y")
+		{
+			emit(OpCode::GET_VEC3_Y);
+			return prg.types.getDoubleType();
+		}
+		else if (expr->property == "z")
+		{
+			emit(OpCode::GET_VEC3_Z);
+			return prg.types.getDoubleType();
+		}
+		else
+			throw std::runtime_error("Unknown property: " + expr->property);
+	}
+	else
+	{
+		throw std::runtime_error("Cannot access property of non-struct type.");
+	}
 }
 
 Type Compiler::compileSetMember(SetMemberExpr* expr)
@@ -747,21 +911,98 @@ Type Compiler::compileSetMember(SetMemberExpr* expr)
 	Type objType = compileExpression(expr->object.get());
 	Type valType = compileExpression(expr->value.get());
 
-	auto it = std::find_if(objType->fields.begin(), objType->fields.end(),
-		[&](const auto& field) { return field.second == expr->property; });
+	if (isStructType(objType))
+	{
+		auto it = std::find_if(objType->fields.begin(), objType->fields.end(),
+			[&](const auto& field) { return field.second == expr->property; });
 
-	if (it == objType->fields.end())
-		throw std::runtime_error("Unknown property: " + expr->property);
+		if (it == objType->fields.end())
+			throw std::runtime_error("Unknown property: " + expr->property);
 
-	if (it->first != valType)
-		throw std::runtime_error("Type mismatch in assignment to property: " + expr->property);
+		if (it->first != valType)
+			throw std::runtime_error("Type mismatch in assignment to property: " + expr->property);
 
-	std::size_t index = it - objType->fields.begin();
+		std::size_t index = it - objType->fields.begin();
 
-	emit(OpCode::SET_PROPERTY);
-	emitUint16((uint16_t)index);
+		emit(OpCode::SET_PROPERTY);
+		emitUint16((uint16_t)index);
+		return it->first;
+	}
+	else if (isVec2Type(objType))
+	{
+		if (auto v = dynamic_cast<VariableExpr*>(expr->object.get()))
+		{
+			// find the stack index of the variable
+			int slot = resolveLocal(v->name);
+			if (slot == -1)
+				slot = resolveGlobal(v->name);
+			if (slot == -1)
+				throw std::runtime_error("Unknown variable: " + v->name);
 
-	return it->first;
+			if (expr->property == "x" || expr->property == "y")
+			{
+				if (valType != prg.types.getDoubleType())
+					throw std::runtime_error("Type mismatch in assignment to vec2 property: " + expr->property);
+
+				switch (expr->property[0])
+				{
+				case 'x': emit(OpCode::SET_VEC2_X); break;
+				case 'y': emit(OpCode::SET_VEC2_Y); break;
+				default:
+					throw std::runtime_error("Unknown property: " + expr->property);
+				}
+				emitUint16((uint16_t)slot);
+
+				return prg.types.getDoubleType();
+			}
+			else
+				throw std::runtime_error("Unknown property: " + expr->property);
+		}
+		else
+		{
+			throw std::runtime_error("Unknown left-hand side in vec2 component assignment.");
+		}
+	}
+	else if (isVec3Type(objType))
+	{
+		if (auto v = dynamic_cast<VariableExpr*>(expr->object.get()))
+		{
+			// find the stack index of the variable
+			int slot = resolveLocal(v->name);
+			if (slot == -1)
+				slot = resolveGlobal(v->name);
+			if (slot == -1)
+				throw std::runtime_error("Unknown variable: " + v->name);
+
+			if (expr->property == "x" || expr->property == "y" || expr->property == "z")
+			{
+				if (valType != prg.types.getDoubleType())
+					throw std::runtime_error("Type mismatch in assignment to vec3 property: " + expr->property);
+
+				switch (expr->property[0])
+				{
+				case 'x': emit(OpCode::SET_VEC3_X); break;
+				case 'y': emit(OpCode::SET_VEC3_Y); break;
+				case 'z': emit(OpCode::SET_VEC3_Z); break;
+				default:
+					throw std::runtime_error("Unknown property: " + expr->property);
+				}
+				emitUint16((uint16_t)slot);
+
+				return prg.types.getDoubleType();
+			}
+			else
+				throw std::runtime_error("Unknown property: " + expr->property);
+		}
+		else
+		{
+			throw std::runtime_error("Unknown left-hand side in vec3 component assignment.");
+		}
+	}
+	else
+	{
+		throw std::runtime_error("Cannot set property of non-struct type.");
+	}
 }
 
 Type Compiler::compileIndex(IndexExpr* expr)

@@ -20,15 +20,35 @@ namespace febcode
 		GET_LOCAL,
 		SET_LOCAL,
 
+		// struct codes
 		CREATE_STRUCT,
 		COPY_STRUCT,
 		GET_PROPERTY,
 		SET_PROPERTY,
 
+		// array codes
 		CREATE_ARRAY,
 		COPY_ARRAY,
 		GET_INDEX,
 		SET_INDEX,
+
+		// vec2 codes
+		CREATE_VEC2,
+		COPY_VEC2,
+		GET_VEC2_X,
+		GET_VEC2_Y,
+		SET_VEC2_X,
+		SET_VEC2_Y,
+
+		// vec3 codes
+		CREATE_VEC3,
+		COPY_VEC3,
+		GET_VEC3_X,
+		GET_VEC3_Y,
+		GET_VEC3_Z,
+		SET_VEC3_X,
+		SET_VEC3_Y,
+		SET_VEC3_Z,
 
 		// int operators
 		NEG_INT,
@@ -53,6 +73,22 @@ namespace febcode
 		LT_DOUBLE,
 		GE_DOUBLE,
 		LE_DOUBLE,
+
+		// vec2 operators
+		NEG_VEC2,
+		ADD_VEC2,
+		SUB_VEC2,
+		DOT_VEC2,
+		MUL_VEC2_DOUBLE,
+		MUL_DOUBLE_VEC2,
+
+		// vec3 operators
+		NEG_VEC3,
+		ADD_VEC3,
+		SUB_VEC3,
+		DOT_VEC3,
+		MUL_VEC3_DOUBLE,
+		MUL_DOUBLE_VEC3,
 
 		// logical operators
 		NOT,
