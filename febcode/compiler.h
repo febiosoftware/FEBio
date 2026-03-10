@@ -39,6 +39,7 @@ namespace febcode
 		GET_VEC2_Y,
 		SET_VEC2_X,
 		SET_VEC2_Y,
+		GET_VEC2_SWIZZLE,
 
 		// vec3 codes
 		CREATE_VEC3,
@@ -46,10 +47,10 @@ namespace febcode
 		GET_VEC3_X,
 		GET_VEC3_Y,
 		GET_VEC3_Z,
-		GET_VEC3_SWIZZLE,
 		SET_VEC3_X,
 		SET_VEC3_Y,
 		SET_VEC3_Z,
+		GET_VEC3_SWIZZLE,
 
 		// int operators
 		NEG_INT,

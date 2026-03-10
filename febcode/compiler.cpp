@@ -878,7 +878,32 @@ Type Compiler::compileMember(MemberExpr* expr)
 			return prg.types.getDoubleType();
 		}
 		else
-			throw std::runtime_error("Unknown property: " + expr->property);
+		{
+			std::string swizzle = expr->property;
+			if (((swizzle.size() == 2) || (swizzle.size() == 3)) &&
+				swizzle.find_first_not_of("xy") == std::string::npos)
+			{
+				uint16_t size = (uint16_t)swizzle.size();
+				uint16_t mask = 0;
+				for (char c : swizzle)
+				{
+					switch (c)
+					{
+					case 'x': mask = (mask << 2) | 0b00; break;
+					case 'y': mask = (mask << 2) | 0b01; break;
+					default:
+						break;
+					}
+
+				}
+				emit(OpCode::GET_VEC2_SWIZZLE);
+				emitUint16(mask);
+				emitUint16(size);
+				return (size == 2 ? prg.types.getVec2Type() : prg.types.getVec3Type());
+			}
+			else
+				throw std::runtime_error("Unknown property: " + expr->property);
+		}
 	}
 	else if (isVec3Type(type))
 	{

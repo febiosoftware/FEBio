@@ -59,6 +59,7 @@ const char* IPToString(uint8_t ip)
 	case OpCode::GET_VEC2_Y    : return "GV2Y";
 	case OpCode::SET_VEC2_X    : return "SV2X";
 	case OpCode::SET_VEC2_Y    : return "SV2Y";
+	case OpCode::GET_VEC2_SWIZZLE: return "G2SW";
 	case OpCode::ADD_VEC2      : return "ADD2";
 	case OpCode::SUB_VEC2      : return "SUB2";
 	case OpCode::DOT_VEC2      : return "DOT2";
@@ -419,6 +420,31 @@ Value VM::execute()
 			Value vec = pop();
 			vec2& v = getVec2(vec);
 			push(vec2(-v.x, -v.y));
+			break;
+		}
+		case OpCode::GET_VEC2_SWIZZLE:
+		{
+			uint16_t mask = readUint16();
+			uint16_t size = readUint16();
+			Value vec = pop();
+			vec2& v = getVec2(vec);
+			double c[4] = { v.x, v.y, 0.0, 0.0 };
+
+			if (size == 2)
+			{
+				vec2 result;
+				result.y = c[mask & 0b11];
+				result.x = c[(mask >> 2) & 0b11];
+				push(result);
+			}
+			else if (size == 3)
+			{
+				vec3 result;
+				result.z = c[mask & 0b11];
+				result.y = c[(mask >> 2) & 0b11];
+				result.x = c[(mask >> 4) & 0b11];
+				push(result);
+			}
 			break;
 		}
 		case OpCode::CREATE_VEC3:
