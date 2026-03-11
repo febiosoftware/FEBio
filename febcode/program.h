@@ -69,5 +69,6 @@ namespace febcode {
 		std::unordered_map<int, Value> globalInitializers;
 		std::unordered_map<std::string, NativeFnc> m_specialFns;
 
+		size_t maxStackSize = 0;
 	};
 }

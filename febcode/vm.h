@@ -15,15 +15,13 @@ namespace febcode
 	public:
 		enum { MAX_CALL_DEPTH = 128 };
 
-		enum {STACK_SIZE = 16};
-
 	public:
 		VM(const Program& program) : m_program(program)
 		{
 			globalCount = (int)m_program.globals.size();
 			assert(m_program.globalInitializers.size() == globalCount);
-			m_stack.reserve(globalCount + STACK_SIZE);
-			m_stack.resize(globalCount);   // allocate global region
+			m_stack.resize(globalCount + program.maxStackSize);
+			stackTop = globalCount; // stack starts after global region
 
 			// initialize globals
 			for (auto& it : m_program.globalInitializers)
@@ -44,8 +42,8 @@ namespace febcode
 
 		void setDebugMode(bool b) { m_debug = b; }
 
-		bool stackEmpty() const { return m_stack.size() == globalCount; }
-		size_t stackSize() const { return m_stack.size() - globalCount; }
+		bool stackEmpty() const { return stackTop == globalCount; }
+		size_t stackSize() const { return stackTop - globalCount; }
 
 		Value getGlobal(size_t n)
 		{
@@ -146,19 +144,23 @@ namespace febcode
 
 		Value pop()
 		{
-			Value v = m_stack.back();
-			m_stack.pop_back();
-			return v;
+			if (stackTop <= globalCount)
+				throw std::runtime_error("Stack underflow.");
+			return m_stack[--stackTop];
 		}
 
 		void push(const Value& v)
 		{
-			m_stack.push_back(v);
+			if (stackTop >= m_stack.size())
+				throw std::runtime_error("Stack overflow.");
+			m_stack[stackTop++] = v;
 		}
 
 		Value& peek()
 		{
-			return m_stack.back();
+			if (stackTop <= globalCount)
+				throw std::runtime_error("Stack underflow.");
+			return m_stack[stackTop-1];
 		}
 
 		bool isTruthy(const Value& v)
@@ -195,6 +197,8 @@ namespace febcode
 		int globalCount = 0;
 
 		std::vector<Value> m_stack;
+		size_t stackTop = 0;
+
 		std::vector<CallFrame> m_frames;
 
 		bool m_debug = false;

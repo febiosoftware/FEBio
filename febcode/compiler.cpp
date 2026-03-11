@@ -71,15 +71,106 @@ int Compiler::resolveGlobal(const std::string& name)
 // ===== Bytecode Helpers =====
 //
 
-void Compiler::emit(OpCode op)
+void Compiler::emit(OpCode op, int arg)
 {
 	prg.code.push_back((uint8_t)op);
+
+	stackDepth += stackEffect(op, arg); assert(stackDepth >= 0);
+	if (stackDepth > maxStackDepth)
+		maxStackDepth = stackDepth;
 }
 
 void Compiler::emitUint16(uint16_t v)
 {
 	prg.code.push_back((v >> 8) & 0xff);
 	prg.code.push_back(v & 0xff);
+}
+
+int Compiler::stackEffect(OpCode op, int arg)
+{
+	switch (op)
+	{
+	case OpCode::PUSH_CONST: return +1;
+	case OpCode::GET_GLOBAL: return +1;
+	case OpCode::SET_GLOBAL: return 0;
+	case OpCode::GET_GLOBAL_REF: return +1;
+	case OpCode::GET_LOCAL: return +1;
+	case OpCode::SET_LOCAL: return 0;
+	case OpCode::GET_LOCAL_REF: return +1;
+	case OpCode::CREATE_STRUCT: return -arg + 1;
+	case OpCode::COPY_STRUCT: return 0;
+	case OpCode::GET_PROPERTY: return +1;
+	case OpCode::GET_MEMBER_REF: return 0;
+	case OpCode::CREATE_ARRAY: return -arg + 1;
+	case OpCode::COPY_ARRAY: return +1;
+	case OpCode::GET_INDEX: return +1;
+	case OpCode::GET_INDEX_REF: return 0;
+	case OpCode::CREATE_VEC2: return -1;
+	case OpCode::COPY_VEC2: return +1;
+	case OpCode::GET_VEC2_X: return 0;
+	case OpCode::GET_VEC2_Y: return 0;
+	case OpCode::GET_VEC2_X_REF: return 0;
+	case OpCode::GET_VEC2_Y_REF: return 0;
+	case OpCode::GET_VEC2_SWIZZLE: return 0;
+	case OpCode::CREATE_VEC3: return -2;
+	case OpCode::COPY_VEC3: return +1;
+	case OpCode::GET_VEC3_X: return 0;
+	case OpCode::GET_VEC3_Y: return 0;
+	case OpCode::GET_VEC3_Z: return 0;
+	case OpCode::GET_VEC3_X_REF: return 0;
+	case OpCode::GET_VEC3_Y_REF: return 0;
+	case OpCode::GET_VEC3_Z_REF: return 0;
+	case OpCode::GET_VEC3_SWIZZLE: return +1;
+	case OpCode::NEG_INT: return 0;
+	case OpCode::ADD_INT: return -1;
+	case OpCode::SUB_INT: return -1;
+	case OpCode::MUL_INT: return -1;
+	case OpCode::DIV_INT: return -1;
+	case OpCode::EXP_INT: return -1;
+	case OpCode::GT_INT: return -1;
+	case OpCode::LT_INT: return -1;
+	case OpCode::GE_INT: return -1;
+	case OpCode::LE_INT: return -1;
+	case OpCode::NEG_DOUBLE: return 0;
+	case OpCode::ADD_DOUBLE: return -1;
+	case OpCode::SUB_DOUBLE: return -1;
+	case OpCode::MUL_DOUBLE: return -1;
+	case OpCode::DIV_DOUBLE: return -1;
+	case OpCode::EXP_DOUBLE: return -1;
+	case OpCode::GT_DOUBLE: return -1;
+	case OpCode::LT_DOUBLE: return -1;
+	case OpCode::GE_DOUBLE: return -1;
+	case OpCode::LE_DOUBLE: return -1;
+	case OpCode::NEG_VEC2: return 0;
+	case OpCode::ADD_VEC2: return -1;
+	case OpCode::SUB_VEC2: return -1;
+	case OpCode::DOT_VEC2: return -1;
+	case OpCode::MUL_VEC2_DOUBLE: return -1;
+	case OpCode::MUL_DOUBLE_VEC2: return -1;
+	case OpCode::NEG_VEC3: return 0;
+	case OpCode::ADD_VEC3: return -1;
+	case OpCode::SUB_VEC3: return -1;
+	case OpCode::DOT_VEC3: return -1;
+	case OpCode::MUL_VEC3_DOUBLE: return -1;
+	case OpCode::MUL_DOUBLE_VEC3: return -1;
+	case OpCode::NOT: return 0;
+	case OpCode::ADD_STRING: return -1;
+	case OpCode::EQUAL: return -1;
+	case OpCode::NOT_EQUAL: return -1;
+	case OpCode::JUMP: return 0;
+	case OpCode::JUMP_IF_FALSE: return +1; // technically +0, but each jump adds two pops (one for each branch)
+	case OpCode::JUMP_IF_TRUE: return +1; // technically +0, but each jump adds two pops (one for each branch)
+	case OpCode::LOOP: return 0;
+	case OpCode::STORE: return -1;
+	case OpCode::CALL: return -arg + 1;
+	case OpCode::CALL_BINARY: return -1;
+	case OpCode::RETURN: return 0;
+	case OpCode::PRINT: return -arg + 1;
+	case OpCode::POP: return -1;
+	default:
+		assert(false);
+		return 0;
+	}
 }
 
 uint16_t Compiler::addConstant(const Value& v)
@@ -123,6 +214,8 @@ void Compiler::compile()
 	// only add return if the last instruction isn't already a return (e.g. from a function)
 	if (prg.code.empty() || prg.code.back() != (uint8_t)OpCode::RETURN)
 		emit(OpCode::RETURN);
+
+	prg.maxStackSize = maxStackDepth;
 }
 
 //
@@ -173,7 +266,7 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 				compileInitializer(init->elements[i].get(), fieldType);
 			}
 
-			emit(OpCode::CREATE_STRUCT);
+			emit(OpCode::CREATE_STRUCT, (int)expectedType->fields.size());
 			emitUint16(static_cast<uint16_t>(expectedType->typeIndex));
 		}
 		else
@@ -199,7 +292,7 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 				compileInitializer(init->elements[i].get(), arrayType);
 			}
 
-			emit(OpCode::CREATE_ARRAY);
+			emit(OpCode::CREATE_ARRAY, (int)expectedType->arraySize);
 			emitUint16(static_cast<uint16_t>(expectedType->arraySize));
 		}
 		else
@@ -460,9 +553,7 @@ Type Compiler::compileExpression(Expression* expr)
 	else if (auto a = dynamic_cast<AssignExpr*       >(expr)) type = compileAssign(a);
 	else if (auto c = dynamic_cast<CallExpr*         >(expr)) type = compileCall(c);
 	else if (auto m = dynamic_cast<MemberExpr*       >(expr)) type = compileMember(m);
-	else if (auto s = dynamic_cast<SetMemberExpr*    >(expr)) type = compileSetMember(s);
 	else if (auto s = dynamic_cast<IndexExpr*        >(expr)) type = compileIndex(s);
-	else if (auto s = dynamic_cast<SetIndexExpr*     >(expr)) type = compileSetIndex(s);
 	else
 		throw std::runtime_error("Unsupported expression type");
 
@@ -507,33 +598,143 @@ Type Compiler::compileVariable(VariableExpr* expr)
 
 Type Compiler::compileAssign(AssignExpr* expr)
 {
-	Type type = compileExpression(expr->value.get());
+	Type l_type = compileLValue(expr->target.get());
+	Type r_type = compileExpression(expr->value.get());
 
-	int local = resolveLocal(expr->name);
-	if (local != -1)
+	if (l_type != r_type)
+		throw std::runtime_error("Type mismatch in assignment: cannot assign " + TypeToString(r_type) + " to " + TypeToString(l_type));
+
+	emit(OpCode::STORE);
+
+	return l_type;
+}
+
+Type Compiler::compileLValue(Expression* expr)
+{
+	if (auto var = dynamic_cast<VariableExpr*>(expr))
 	{
-		if (m_locals[local].type != type)
-			throw std::runtime_error("Type mismatch in assignment to local variable: " + expr->name);
-
-		m_locals[local].isInitialized = true;
-
-		emit(OpCode::SET_LOCAL);
-		emitUint16(local);
-		return type;
+		return compileVariableRef(var);
 	}
 
-	int global = resolveGlobal(expr->name);
-	if (prg.globals[expr->name].type != type)
-		throw std::runtime_error("Type mismatch in assignment to global variable: " + expr->name);
+	if (auto member = dynamic_cast<MemberExpr*>(expr))
+	{
+		return compileMemberRef(member);
+	}
 
-	if (prg.globals[expr->name].immutable)
-		throw std::runtime_error("Cannot assign to immutable global variable: " + expr->name);
+	if (auto index = dynamic_cast<IndexExpr*>(expr))
+	{
+		return compileIndexRef(index);
+	}
 
-	prg.globals[expr->name].isInitialized = true;
+	throw std::runtime_error("Invalid assignment target.");
+}
 
-	emit(OpCode::SET_GLOBAL);
-	emitUint16(global);
-	return type;
+Type Compiler::compileVariableRef(VariableExpr* expr)
+{
+	Type returnType = nullptr;
+
+	int slot = resolveLocal(expr->name);
+	if (slot != -1)
+	{
+		emit(OpCode::GET_LOCAL_REF);
+		emitUint16((uint16_t)slot);
+		returnType = m_locals[slot].type;
+	}
+	else
+	{
+		slot = resolveGlobal(expr->name);
+		emit(OpCode::GET_GLOBAL_REF);
+		emitUint16((uint16_t)slot);
+		returnType = prg.globals[expr->name].type;
+	}
+
+	return returnType;
+}
+
+Type Compiler::compileMemberRef(MemberExpr* expr)
+{
+	Type objectType = compileLValue(expr->object.get());
+	if (isStructType(objectType))
+	{
+		int memberIndex = resolveMember(objectType, expr->property);
+
+		emit(OpCode::GET_MEMBER_REF);
+		emitUint16((uint16_t)memberIndex);
+
+		return memberType(objectType, memberIndex);
+	}
+	else if (isVec2Type(objectType))
+	{
+		if (expr->property == "x")
+		{
+			emit(OpCode::GET_VEC2_X_REF);
+			return prg.types.getDoubleType();
+		}
+		else if (expr->property == "y")
+		{
+			emit(OpCode::GET_VEC2_Y_REF);
+			return prg.types.getDoubleType();
+		}
+		else
+			throw std::runtime_error("Vec2 has no member named '" + expr->property + "'.");
+	}
+	else if (isVec3Type(objectType))
+	{
+		if (expr->property == "x")
+		{
+			emit(OpCode::GET_VEC3_X_REF);
+			return prg.types.getDoubleType();
+		}
+		else if (expr->property == "y")
+		{
+			emit(OpCode::GET_VEC3_Y_REF);
+			return prg.types.getDoubleType();
+		}
+		else if (expr->property == "z")
+		{
+			emit(OpCode::GET_VEC3_Z_REF);
+			return prg.types.getDoubleType();
+		}
+		else
+			throw std::runtime_error("Vec3 has no member named '" + expr->property + "'.");
+	}
+	else
+	{
+		throw std::runtime_error("Left-hand side of member access must be a struct or vector.");
+	}
+}
+
+int Compiler::resolveMember(Type type, const std::string& member)
+{
+	assert(type->kind == TypeKind::Struct);
+	for (size_t i = 0; i < type->fields.size(); ++i)
+	{
+		if (type->fields[i].second == member)
+			return (int)i;
+	}
+	throw std::runtime_error("Struct '" + TypeToString(type) + "' has no member named '" + member + "'.");
+}
+
+Type Compiler::memberType(Type type, int memberIndex)
+{
+	assert(type->kind == TypeKind::Struct);
+	if (memberIndex < 0 || memberIndex >= (int)type->fields.size())
+		throw std::runtime_error("Invalid member index for struct '" + TypeToString(type) + "'.");
+	return type->fields[memberIndex].first;
+}
+
+Type Compiler::compileIndexRef(IndexExpr* expr)
+{
+	Type objectType = compileLValue(expr->object.get());
+
+	if (objectType->kind != TypeKind::Array)
+		throw std::runtime_error("Left-hand side of index access must be an array.");
+
+	compileExpression(expr->index.get());
+
+	emit(OpCode::GET_INDEX_REF);
+
+	return objectType->elementType;
 }
 
 //
@@ -957,104 +1158,7 @@ Type Compiler::compileMember(MemberExpr* expr)
 	}
 }
 
-Type Compiler::compileSetMember(SetMemberExpr* expr)
-{
-	Type objType = compileExpression(expr->object.get());
-	Type valType = compileExpression(expr->value.get());
 
-	if (isStructType(objType))
-	{
-		auto it = std::find_if(objType->fields.begin(), objType->fields.end(),
-			[&](const auto& field) { return field.second == expr->property; });
-
-		if (it == objType->fields.end())
-			throw std::runtime_error("Unknown property: " + expr->property);
-
-		if (it->first != valType)
-			throw std::runtime_error("Type mismatch in assignment to property: " + expr->property);
-
-		std::size_t index = it - objType->fields.begin();
-
-		emit(OpCode::SET_PROPERTY);
-		emitUint16((uint16_t)index);
-		return it->first;
-	}
-	else if (isVec2Type(objType))
-	{
-		if (auto v = dynamic_cast<VariableExpr*>(expr->object.get()))
-		{
-			// find the stack index of the variable
-			int slot = resolveLocal(v->name);
-			if (slot == -1)
-				slot = resolveGlobal(v->name);
-			if (slot == -1)
-				throw std::runtime_error("Unknown variable: " + v->name);
-
-			if (expr->property == "x" || expr->property == "y")
-			{
-				if (valType != prg.types.getDoubleType())
-					throw std::runtime_error("Type mismatch in assignment to vec2 property: " + expr->property);
-
-				switch (expr->property[0])
-				{
-				case 'x': emit(OpCode::SET_VEC2_X); break;
-				case 'y': emit(OpCode::SET_VEC2_Y); break;
-				default:
-					throw std::runtime_error("Unknown property: " + expr->property);
-				}
-				emitUint16((uint16_t)slot);
-
-				return prg.types.getDoubleType();
-			}
-			else
-				throw std::runtime_error("Unknown property: " + expr->property);
-		}
-		else
-		{
-			throw std::runtime_error("Unknown left-hand side in vec2 component assignment.");
-		}
-	}
-	else if (isVec3Type(objType))
-	{
-		if (auto v = dynamic_cast<VariableExpr*>(expr->object.get()))
-		{
-			// find the stack index of the variable
-			int slot = resolveLocal(v->name);
-			if (slot == -1)
-				slot = resolveGlobal(v->name);
-			if (slot == -1)
-				throw std::runtime_error("Unknown variable: " + v->name);
-
-			if (expr->property == "x" || expr->property == "y" || expr->property == "z")
-			{
-				if (valType != prg.types.getDoubleType())
-					throw std::runtime_error("Type mismatch in assignment to vec3 property: " + expr->property);
-
-				switch (expr->property[0])
-				{
-				case 'x': emit(OpCode::SET_VEC3_X); break;
-				case 'y': emit(OpCode::SET_VEC3_Y); break;
-				case 'z': emit(OpCode::SET_VEC3_Z); break;
-				default:
-					throw std::runtime_error("Unknown property: " + expr->property);
-				}
-				emitUint16((uint16_t)slot);
-
-				return prg.types.getDoubleType();
-			}
-			else
-				throw std::runtime_error("Unknown property: " + expr->property);
-		}
-		else
-		{
-			throw std::runtime_error("Unknown left-hand side in vec3 component assignment.");
-		}
-	}
-	else
-	{
-		throw std::runtime_error("Cannot set property of non-struct type.");
-	}
-}
 
 Type Compiler::compileIndex(IndexExpr* expr)
 {
@@ -1068,24 +1172,4 @@ Type Compiler::compileIndex(IndexExpr* expr)
 	emit(OpCode::GET_INDEX);
 
 	return exprType->elementType;
-}
-
-Type Compiler::compileSetIndex(SetIndexExpr* expr)
-{
-	Type objType = compileExpression(expr->object.get());   // push array
-	Type expType = compileExpression(expr->index.get());    // push index
-	Type valType = compileExpression(expr->value.get());    // push value
-
-	if (objType->kind != TypeKind::Array)
-		throw std::runtime_error("Cannot index non-array type.");
-
-	if (expType->kind != TypeKind::Int)
-		throw std::runtime_error("Array index must be a number.");
-
-	if (valType != objType->elementType)
-		throw std::runtime_error("Type mismatch in array assignment.");
-
-	emit(OpCode::SET_INDEX);
-
-	return objType->elementType;
 }

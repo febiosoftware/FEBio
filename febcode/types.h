@@ -17,7 +17,14 @@ namespace febcode
 		Vec3,
 		String,
 		Array,
-		Struct
+		Struct,
+		Value
+	};
+
+	struct Ref {
+		void* ptr;
+		TypeKind type;
+		Ref() : ptr(nullptr), type(TypeKind::Void) {}
 	};
 
 	struct vec2
@@ -96,7 +103,8 @@ namespace febcode
 		VEC3,
 		STRING,
 		ARRAY,
-		STRUCT
+		STRUCT,
+		REF
 	};
 
 	struct Void {};
@@ -168,6 +176,7 @@ namespace febcode
 			std::string stringValue;
 			ArrayValuePtr arrayValue;
 			StructValuePtr structValue;
+			Ref ref;
 		};
 
 	private:
@@ -185,6 +194,7 @@ namespace febcode
 			case ValueIndex::STRING: new (&stringValue) std::string(v.stringValue); break;
 			case ValueIndex::ARRAY: new (&arrayValue) ArrayValuePtr(v.arrayValue); break;
 			case ValueIndex::STRUCT: new (&structValue) StructValuePtr(v.structValue); break;
+			case ValueIndex::REF   : ref = v.ref; break;
 			}
 		}
 
@@ -248,6 +258,7 @@ namespace febcode
 	inline bool isString(const Value& v) { return v.index == ValueIndex::STRING; }
 	inline bool isArray (const Value& v) { return v.index == ValueIndex::ARRAY; }
 	inline bool isStruct(const Value& v) { return v.index == ValueIndex::STRUCT; }
+	inline bool isRef   (const Value& v) { return v.index == ValueIndex::REF; }
 
 	inline bool isVoidType  (Type type) { return type->kind == TypeKind::Void; }
 	inline bool isBoolType  (Type type) { return type->kind == TypeKind::Bool; }
@@ -271,6 +282,7 @@ namespace febcode
 	inline const std::string& getString(const Value& v) { assert(v.index == ValueIndex::STRING); return v.stringValue; }
 	inline const ArrayValue&  getArray (const Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
 	inline const StructValue& getStruct(const Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
+	inline const Ref& getRef(const Value& v) { assert(v.index == ValueIndex::REF); return v.ref; }
 
 	inline const ArrayValuePtr& getArrayPtr(const Value& v) { assert(v.index == ValueIndex::ARRAY); return v.arrayValue; }
 	inline const StructValuePtr& getStructPtr(const Value& v) { assert(v.index == ValueIndex::STRUCT); return v.structValue; }

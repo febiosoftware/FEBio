@@ -40,6 +40,11 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 		const febcode::vec3& vec = getVec3(v);
 		return o << "vec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 	}
+	else if (isRef(v))
+	{
+		const febcode::Ref& ref = v.ref;
+		return o << "ref";
+	}
 	else
 		return o << "<unknown value>";
 }
@@ -59,7 +64,35 @@ std::string ValueToString(const febcode::Value& v)
 		const febcode::StructValue& o = febcode::getStruct(v);
 		const std::string& name = o.type->name;
 		auto& p = getStructPtr(v);
-		s = "[" + name + ":" + std::to_string(p.use_count()) + "]";
+		s = "[" + name;
+		s = "{";
+		for (size_t i = 0; i < o.fields.size(); ++i)
+		{
+			s += ValueToString(o.fields[i]);
+			if (i != o.fields.size() - 1) s += ", ";
+		}
+		s += "}";
+		s += ":" + std::to_string(p.use_count()) + "]";
+	}
+	else if (isRef(v))
+	{
+		const febcode::Ref& ref = getRef(v);
+		s = "ref->";
+		switch (ref.type)
+		{
+		case febcode::TypeKind::Value:
+		{
+			febcode::Value* v = static_cast<febcode::Value*>(ref.ptr);
+			if (v)
+			{
+				s += ValueTypeToString(*v);
+			}
+			else s += "null"; 
+			break;
+		}
+		case febcode::TypeKind::Double: s += "double"; break;
+		}
+		
 	}
 	else s = "unknown";
 	return s;
@@ -76,5 +109,6 @@ std::string ValueTypeToString(const febcode::Value& v)
 	else if (isStruct(v)) return "struct";
 	else if (isVec2  (v)) return "vec2";
 	else if (isVec3  (v)) return "vec3";
+	else if (isRef    (v)) return "ref";
 	else return "<unknown type>";
 }

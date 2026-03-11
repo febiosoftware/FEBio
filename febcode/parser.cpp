@@ -311,36 +311,10 @@ std::unique_ptr<Expression> Parser::parseAssignment() {
 
 		auto value = parseAssignment();
 
-		// Variable assignment
-		if (auto var = dynamic_cast<VariableExpr*>(expr.get()))
-		{
-			return std::make_unique<AssignExpr>(
-				var->name,
-				std::move(value));
-		}
-
-		// Member assignment
-		if (auto member = dynamic_cast<MemberExpr*>(expr.get()))
-		{
-			return std::make_unique<SetMemberExpr>(
-				std::move(member->object),
-				member->property,
-				std::move(value)
-			);
-		}
-
-		// index assignment
-		if (auto index = dynamic_cast<IndexExpr*>(expr.get()))
-		{
-			return std::make_unique<SetIndexExpr>(
-				std::move(index->object),
-				std::move(index->index),
-				std::move(value)
-			);
-		}
-
-		// Error: invalid assignment target
-		throw std::runtime_error("Invalid assignment target.");
+		return std::make_unique<AssignExpr>(
+			std::move(expr),
+			std::move(value)
+		);
 	}
 
 	return expr; // just an equality/expression if no '='
@@ -624,16 +598,6 @@ static void printMemberExpr(const Program& prg, const MemberExpr* e)
 	l--; printTabs(); std::cout << "}";
 }
 
-static void printSetMemberExpr(const Program& prg, const SetMemberExpr* e)
-{
-	std::cout << "SetMemberExpr {\n"; l++;
-	printTabs(); std::cout << "object: "; printExpr(prg, e->object.get()); std::cout << ",\n";
-	printTabs(); std::cout << "property: " << e->property << "\n";
-	printTabs(); std::cout << "value: "; printExpr(prg, e->value.get()); std::cout << "\n";
-	l--; printTabs(); std::cout << "}";
-}
-
-
 static void printVariableExpr(const Program& prg, const VariableExpr* e)
 {
 	std::cout << e->name;
@@ -641,8 +605,11 @@ static void printVariableExpr(const Program& prg, const VariableExpr* e)
 
 static void printAssignmentExpr(const Program& prg, const AssignExpr* e)
 {
-	std::cout << "{ name: " << e->name << ", value: "; 
-	printExpr(prg, e->value.get()); std::cout << " }";
+	std::cout << "AssignExpr {\n"; l++;
+	printTabs(); std::cout << "target: "; printExpr(prg, e->target.get()); std::cout << ",\n";
+	printTabs(); std::cout << "value: "; printExpr(prg, e->value.get()); std::cout << "\n";
+	l--;
+	printTabs(); std::cout << "}";
 }
 
 static void printUnaryExpr(const Program& prg, const UnaryExpr* e)
@@ -693,16 +660,6 @@ static void printInitializerExpr(const Program& prg, const InitializerExpr* e)
 	printTabs(); std::cout << "}";
 }
 
-static void printSetIndexExpr(const Program& prg, const SetIndexExpr* e)
-{
-	std::cout << "SetIndexExpr {\n"; l++;
-	printTabs(); std::cout << "object: "; printExpr(prg, e->object.get()); std::cout << ",\n";
-	printTabs(); std::cout << "index: "; printExpr(prg, e->index.get()); std::cout << ",\n";
-	printTabs(); std::cout << "value: "; printExpr(prg, e->value.get()); std::cout << "\n";
-	l--;
-	printTabs(); std::cout << "}";
-}
-
 static void printIndexExpr(const Program& prg, const IndexExpr* e)
 {
 	std::cout << "IndexExpr {\n"; l++;
@@ -716,14 +673,12 @@ static void printExpr(const Program& prg, const Expression* e)
 {
 	if      (auto l = dynamic_cast<const LiteralExpr*      >(e)) printLiteralExpr      (prg, l);
 	else if (auto m = dynamic_cast<const MemberExpr*       >(e)) printMemberExpr       (prg, m);
-	else if (auto s = dynamic_cast<const SetMemberExpr*    >(e)) printSetMemberExpr    (prg, s);
 	else if (auto v = dynamic_cast<const VariableExpr*     >(e)) printVariableExpr     (prg, v);
 	else if (auto a = dynamic_cast<const AssignExpr*       >(e)) printAssignmentExpr   (prg, a);
 	else if (auto u = dynamic_cast<const UnaryExpr*        >(e)) printUnaryExpr        (prg, u);
 	else if (auto b = dynamic_cast<const BinaryExpr*       >(e)) printBinaryExpr       (prg, b);
 	else if (auto c = dynamic_cast<const CallExpr*         >(e)) printCallExpr         (prg, c);
 	else if (auto c = dynamic_cast<const InitializerExpr*  >(e)) printInitializerExpr  (prg, c);
-	else if (auto c = dynamic_cast<const SetIndexExpr*     >(e)) printSetIndexExpr     (prg, c);
 	else if (auto c = dynamic_cast<const IndexExpr*        >(e)) printIndexExpr        (prg, c);
 	else if (e == nullptr)
 		std::cout << "null";

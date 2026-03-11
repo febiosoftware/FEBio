@@ -1,11 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <unordered_map>
-#include <variant>
 #include <cstdint>
-#include <stdexcept>
-#include <functional>
 #include "program.h"
 
 namespace febcode
@@ -16,29 +12,31 @@ namespace febcode
 
 		GET_GLOBAL,
 		SET_GLOBAL,
+		GET_GLOBAL_REF,
 
 		GET_LOCAL,
 		SET_LOCAL,
+		GET_LOCAL_REF,
 
 		// struct codes
 		CREATE_STRUCT,
 		COPY_STRUCT,
 		GET_PROPERTY,
-		SET_PROPERTY,
+		GET_MEMBER_REF,
 
 		// array codes
 		CREATE_ARRAY,
 		COPY_ARRAY,
 		GET_INDEX,
-		SET_INDEX,
+		GET_INDEX_REF,
 
 		// vec2 codes
 		CREATE_VEC2,
 		COPY_VEC2,
 		GET_VEC2_X,
 		GET_VEC2_Y,
-		SET_VEC2_X,
-		SET_VEC2_Y,
+		GET_VEC2_X_REF,
+		GET_VEC2_Y_REF,
 		GET_VEC2_SWIZZLE,
 
 		// vec3 codes
@@ -47,9 +45,9 @@ namespace febcode
 		GET_VEC3_X,
 		GET_VEC3_Y,
 		GET_VEC3_Z,
-		SET_VEC3_X,
-		SET_VEC3_Y,
-		SET_VEC3_Z,
+		GET_VEC3_X_REF,
+		GET_VEC3_Y_REF,
+		GET_VEC3_Z_REF,
 		GET_VEC3_SWIZZLE,
 
 		// int operators
@@ -108,6 +106,7 @@ namespace febcode
 		JUMP_IF_TRUE,
 		LOOP,
 
+		STORE,		// store value in variable (local or global)
 		CALL,		// call function
 		CALL_BINARY, // call binary operator
 		RETURN,
@@ -167,9 +166,15 @@ namespace febcode
 		Type compileAssign       (AssignExpr* expr);
 		Type compileCall         (CallExpr* expr);
 		Type compileMember       (MemberExpr* expr);
-		Type compileSetMember    (SetMemberExpr* expr);
 		Type compileIndex        (IndexExpr* expr);
-		Type compileSetIndex     (SetIndexExpr* expr);
+
+		Type compileLValue(Expression* expr);
+		Type compileVariableRef(VariableExpr* expr);
+		Type compileMemberRef(MemberExpr* expr);
+		Type compileIndexRef(IndexExpr* expr);
+
+		int resolveMember(Type type, const std::string& member);
+		Type memberType(Type type, int memberIndex);
 
 		void compileInitializer(Expression* expr, Type expectedType);
 
@@ -177,8 +182,10 @@ namespace febcode
 
 		// ===== Bytecode =====
 
-		void emit(OpCode op);
+		void emit(OpCode op, int arg = 0);
 		void emitUint16(uint16_t v);
+
+		int stackEffect(OpCode op, int arg);
 
 		uint16_t addConstant(const Value& v);
 
@@ -193,6 +200,9 @@ namespace febcode
 
 		std::vector<Local> m_locals;
 		int m_scopeDepth = 0;
+
+		int stackDepth = 0;
+		int maxStackDepth = 0;
 	};
 
 	void CompileSource(Program& prg, const std::string& source);

@@ -43,11 +43,16 @@ namespace febcode {
 		VariableExpr(const std::string& n) : name(n) {}
 	};
 
-	struct AssignExpr : Expression {
-		std::string name;
+	class AssignExpr : public Expression
+	{
+	public:
+		std::unique_ptr<Expression> target;
 		std::unique_ptr<Expression> value;
-		AssignExpr(const std::string& n, std::unique_ptr<Expression> v)
-			: name(n), value(std::move(v)) {
+
+	public:
+		AssignExpr(std::unique_ptr<Expression> target,
+			std::unique_ptr<Expression> value)
+			: target(std::move(target)), value(std::move(value)) {
 		}
 	};
 
@@ -93,21 +98,6 @@ namespace febcode {
 		}
 	};
 
-	struct SetMemberExpr : Expression
-	{
-		std::unique_ptr<Expression> object;
-		std::string property;
-		std::unique_ptr<Expression> value;
-
-		SetMemberExpr(std::unique_ptr<Expression> object,
-			std::string property,
-			std::unique_ptr<Expression> value)
-			: object(std::move(object)),
-			property(std::move(property)),
-			value(std::move(value)) {
-		}
-	};
-
 	struct InitializerExpr : Expression {
 		std::vector<std::unique_ptr<Expression>> elements;
 		InitializerExpr(std::vector<std::unique_ptr<Expression>> elements)
@@ -122,19 +112,6 @@ namespace febcode {
 			std::unique_ptr<Expression> index)
 			: object(std::move(object)),
 			index(std::move(index)) {
-		}
-	};
-
-	struct SetIndexExpr : Expression {
-		std::unique_ptr<Expression> object;
-		std::unique_ptr<Expression> index;
-		std::unique_ptr<Expression> value;
-		SetIndexExpr(std::unique_ptr<Expression> object,
-			std::unique_ptr<Expression> index,
-			std::unique_ptr<Expression> value)
-			: object(std::move(object)),
-			index(std::move(index)),
-			value(std::move(value)) {
 		}
 	};
 
