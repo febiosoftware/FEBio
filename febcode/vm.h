@@ -1,10 +1,8 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <variant>
 #include <functional>
 #include <stdexcept>
-#include <iostream>
 #include "compiler.h"
 #include <assert.h>
 
@@ -13,7 +11,7 @@ namespace febcode
 	class VM
 	{
 	public:
-		enum { MAX_CALL_DEPTH = 128 };
+		enum { MAX_CALL_DEPTH = 8 };
 
 	public:
 		VM(const Program& program) : m_program(program)
@@ -127,7 +125,7 @@ namespace febcode
 
 		CallFrame& currentFrame()
 		{
-			return m_frames.back();
+			return m_frames[frameCount - 1];
 		}
 
 		uint8_t readByte()
@@ -199,7 +197,8 @@ namespace febcode
 		std::vector<Value> m_stack;
 		size_t stackTop = 0;
 
-		std::vector<CallFrame> m_frames;
+		CallFrame m_frames[MAX_CALL_DEPTH];
+		size_t frameCount = 0;
 
 		bool m_debug = false;
 	};

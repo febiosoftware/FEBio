@@ -133,7 +133,7 @@ void printStack(const std::vector<Value>& stack, int numGlobals, int stackSize)
 
 Value VM::execute()
 {
-	if (m_frames.empty())
+	if (frameCount == 0)
 		throw std::runtime_error("No function to execute");
 
 	const size_t instructions = m_program.code.size();
@@ -906,9 +906,7 @@ Value VM::execute()
 			if (stackTop > globalCount)
 				result = pop();
 
-			CallFrame frame = m_frames.back();
-			m_frames.pop_back();
-
+			CallFrame frame = m_frames[--frameCount];
 			stackTop = frame.base;
 			push(result);
 
@@ -917,7 +915,7 @@ Value VM::execute()
 				printStack(m_stack, globalCount, (int)stackTop);
 			}
 
-			if (m_frames.empty())
+			if (frameCount == 0)
 				return result;
 
 			break;
@@ -957,7 +955,7 @@ void VM::callFunction(int fnIndex, int argCount)
 	if (argCount != fn.args.size())
 		throw std::runtime_error("Arity mismatch in call to " + fn.name);
 
-	if (m_frames.size() > MAX_CALL_DEPTH)
+	if (frameCount >= MAX_CALL_DEPTH)
 		throw std::runtime_error("Stack overflow: too many nested function calls.");
 
 	CallFrame frame;
@@ -965,7 +963,7 @@ void VM::callFunction(int fnIndex, int argCount)
 	frame.ip = fn.entry;
 	frame.base = stackTop - argCount;
 
-	m_frames.push_back(frame);
+	m_frames[frameCount++] = frame;
 }
 
 void VM::callBinaryOperator(int opIndex)
