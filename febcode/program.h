@@ -7,20 +7,22 @@ namespace febcode {
 	struct FunctionInfo
 	{
 		std::string name;
-		Type returnType;
+		Type returnType = nullptr;
 		std::vector<Type> args;
 		size_t entry = 0;
 		int localCount = 0;
 		bool isNative = false;
 		NativeFnc fnc;
+
+		size_t maxStackSize = 0;
 	};
 
 	struct BinaryOperatorInfo
 	{
 		BinaryOp op;
-		Type returnType;
-		Type leftType;
-		Type rightType;
+		Type returnType = nullptr;
+		Type leftType = nullptr;
+		Type rightType = nullptr;
 		size_t index = 0;
 		BinaryFnc fnc;
 	};

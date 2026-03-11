@@ -196,7 +196,7 @@ Value VM::execute()
 		{
 			uint16_t memberIndex = readUint16();
 
-			Value objRef = pop();
+			const Value& objRef = pop();
 			Value* slot = (Value*)objRef.ref.ptr;
 
 			StructValue* s = slot->structValue.get();
@@ -212,10 +212,10 @@ Value VM::execute()
 
 		case OpCode::GET_INDEX_REF:
 		{
-			Value indexVal = pop();
+			const Value& indexVal = pop();
 			int index = getInt(indexVal);
 
-			Value objRef = pop();
+			const Value& objRef = pop();
 			Value* slot = (Value*)objRef.ref.ptr;
 
 			ArrayValue* s = slot->arrayValue.get();
@@ -231,7 +231,7 @@ Value VM::execute()
 
 		case OpCode::GET_VEC2_X_REF:
 		{
-			Value objRef = pop();
+			const Value& objRef = pop();
 			Value* slot = (Value*)objRef.ref.ptr;
 
 			vec2* v = &slot->vec2Value;
@@ -246,7 +246,7 @@ Value VM::execute()
 		}
 		case OpCode::GET_VEC2_Y_REF:
 		{
-			Value objRef = pop();
+			const Value& objRef = pop();
 			Value* slot = (Value*)objRef.ref.ptr;
 
 			vec2* v = &slot->vec2Value;
@@ -262,7 +262,7 @@ Value VM::execute()
 
 		case OpCode::GET_VEC3_X_REF:
 		{
-			Value objRef = pop();
+			const Value& objRef = pop();
 			Value* slot = (Value*)objRef.ref.ptr;
 
 			vec3* v = &slot->vec3Value;
@@ -278,7 +278,7 @@ Value VM::execute()
 
 		case OpCode::GET_VEC3_Y_REF:
 		{
-			Value objRef = pop();
+			const Value& objRef = pop();
 			Value* slot = (Value*)objRef.ref.ptr;
 
 			vec3* v = &slot->vec3Value;
@@ -294,7 +294,7 @@ Value VM::execute()
 
 		case OpCode::GET_VEC3_Z_REF:
 		{
-			Value objRef = pop();
+			const Value& objRef = pop();
 			Value* slot = (Value*)objRef.ref.ptr;
 
 			vec3* v = &slot->vec3Value;
@@ -310,10 +310,10 @@ Value VM::execute()
 
 		case OpCode::STORE:
 		{
-			Value value = pop();
-			Value ref = pop();
+			const Value& value = pop();
+			const Value& ref = pop();
 
-			Ref& r = ref.ref;
+			const Ref& r = ref.ref;
 
 			switch (r.type)
 			{
@@ -359,35 +359,35 @@ Value VM::execute()
 		// Integer operators
 		case OpCode::NEG_INT:
 		{
-			Value a = pop();
+			const Value& a = pop();
 			push(-getInt(a));
 			break;
 		}
 		case OpCode::ADD_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getInt(a) + getInt(b));
 			break;
 		}
 		case OpCode::SUB_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getInt(a) - getInt(b));
 			break;
 		}
 		case OpCode::MUL_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getInt(a) * getInt(b));
 			break;
 		}
 		case OpCode::DIV_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			int divisor = getInt(b);
 			if (divisor == 0)
 				throw std::runtime_error("division by zero.");
@@ -396,8 +396,8 @@ Value VM::execute()
 		}
 		case OpCode::EXP_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 
 			int e = getInt(b);
 			if (e < 0)
@@ -408,29 +408,29 @@ Value VM::execute()
 		}
 		case OpCode::GT_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getInt(a) > getInt(b));
 			break;
 		}
 		case OpCode::LT_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getInt(a) < getInt(b));
 			break;
 		}
 		case OpCode::GE_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getInt(a) >= getInt(b));
 			break;
 		}
 		case OpCode::LE_INT:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getInt(a) <= getInt(b));
 			break;
 		}
@@ -438,36 +438,36 @@ Value VM::execute()
 		// Double operators
 		case OpCode::NEG_DOUBLE:
 		{
-			Value a = pop();
+			const Value& a = pop();
 			push(-getDouble(a));
 			break;
 		}
 
 		case OpCode::ADD_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getDouble(a) + getDouble(b));
 			break;
 		}
 		case OpCode::SUB_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getDouble(a) - getDouble(b));
 			break;
 		}
 		case OpCode::MUL_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getDouble(a) * getDouble(b));
 			break;
 		}
 		case OpCode::DIV_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			double divisor = getDouble(b);
 			if (divisor == 0.0)
 				throw std::runtime_error("division by zero.");
@@ -476,105 +476,105 @@ Value VM::execute()
 		}
 		case OpCode::EXP_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(std::pow(getDouble(a), getDouble(b)));
 			break;
 		}
 		case OpCode::GT_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getDouble(a) > getDouble(b));
 			break;
 		}
 		case OpCode::LT_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getDouble(a) < getDouble(b));
 			break;
 		}
 		case OpCode::GE_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getDouble(a) >= getDouble(b));
 			break;
 		}
 		case OpCode::LE_DOUBLE:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getDouble(a) <= getDouble(b));
 			break;
 		}
 
 		case OpCode::CREATE_VEC2:
 		{
-			Value y = pop();
-			Value x = pop();
+			const Value& y = pop();
+			const Value& x = pop();
 			push(vec2(getDouble(x), getDouble(y)));
 			break;
 		}
 		case OpCode::COPY_VEC2:
 		{
-			Value src = pop();
+			const Value& src = pop();
 			const vec2& v = getVec2(src);
 			push(vec2(v.x, v.y));
 			break;
 		}
 		case OpCode::ADD_VEC2:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getVec2(a) + getVec2(b));
 			break;
 		}
 		case OpCode::SUB_VEC2:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getVec2(a) - getVec2(b));
 			break;
 		}
 		case OpCode::DOT_VEC2:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getVec2(a) * getVec2(b));
 			break;
 		}
 		case OpCode::MUL_VEC2_DOUBLE:
 		{
-			Value scalar = pop();
-			Value vec = pop();
+			const Value& scalar = pop();
+			const Value& vec = pop();
 			push(getVec2(vec) * getDouble(scalar));
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC2:
 		{
-			Value vec = pop();
-			Value scalar = pop();
+			const Value& vec = pop();
+			const Value& scalar = pop();
 			push(getVec2(vec) * getDouble(scalar));
 			break;
 		}
 		case OpCode::GET_VEC2_X:
 		{
-			Value vec = pop();
+			const Value& vec = pop();
 			push(getVec2(vec).x);
 			break;
 		}
 		case OpCode::GET_VEC2_Y:
 		{
-			Value vec = pop();
+			const Value& vec = pop();
 			push(getVec2(vec).y);
 			break;
 		}
 		case OpCode::NEG_VEC2:
 		{
-			Value vec = pop();
-			vec2& v = getVec2(vec);
+			const Value& vec = pop();
+			const vec2& v = getVec2(vec);
 			push(vec2(-v.x, -v.y));
 			break;
 		}
@@ -582,8 +582,8 @@ Value VM::execute()
 		{
 			uint16_t mask = readUint16();
 			uint16_t size = readUint16();
-			Value vec = pop();
-			vec2& v = getVec2(vec);
+			const Value& vec = pop();
+			const vec2& v = getVec2(vec);
 			double c[4] = { v.x, v.y, 0.0, 0.0 };
 
 			if (size == 2)
@@ -605,69 +605,69 @@ Value VM::execute()
 		}
 		case OpCode::CREATE_VEC3:
 		{
-			Value z = pop();
-			Value y = pop();
-			Value x = pop();
+			const Value& z = pop();
+			const Value& y = pop();
+			const Value& x = pop();
 			push(vec3(getDouble(x), getDouble(y), getDouble(z)));
 			break;
 		}
 		case OpCode::COPY_VEC3:
 		{
-			Value src = pop();
+			const Value& src = pop();
 			const vec3& v = getVec3(src);
 			push(vec3(v.x, v.y, v.z));
 			break;
 		}
 		case OpCode::ADD_VEC3:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getVec3(a) + getVec3(b));
 			break;
 		}
 		case OpCode::SUB_VEC3:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getVec3(a) - getVec3(b));
 			break;
 		}
 		case OpCode::DOT_VEC3:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(getVec3(a) * getVec3(b));
 			break;
 		}
 		case OpCode::MUL_VEC3_DOUBLE:
 		{
-			Value scalar = pop();
-			Value vec = pop();
+			const Value& scalar = pop();
+			const Value& vec = pop();
 			push(getVec3(vec) * getDouble(scalar));
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC3:
 		{
-			Value vec = pop();
-			Value scalar = pop();
+			const Value& vec = pop();
+			const Value& scalar = pop();
 			push(getVec3(vec) * getDouble(scalar));
 			break;
 		}
 		case OpCode::GET_VEC3_X:
 		{
-			Value vec = pop();
+			const Value& vec = pop();
 			push(getVec3(vec).x);
 			break;
 		}
 		case OpCode::GET_VEC3_Y:
 		{
-			Value vec = pop();
+			const Value& vec = pop();
 			push(getVec3(vec).y);
 			break;
 		}
 		case OpCode::GET_VEC3_Z:
 		{
-			Value vec = pop();
+			const Value& vec = pop();
 			push(getVec3(vec).z);
 			break;
 		}
@@ -675,8 +675,8 @@ Value VM::execute()
 		{
 			uint16_t mask = readUint16();
 			uint16_t size = readUint16();
-			Value vec = pop();
-			vec3& v = getVec3(vec);
+			const Value& vec = pop();
+			const vec3& v = getVec3(vec);
 			double c[4] = { v.x, v.y, v.z, 0.0 };
 
 			if (size == 2)
@@ -699,8 +699,8 @@ Value VM::execute()
 
 		case OpCode::NEG_VEC3:
 		{
-			Value vec = pop();
-			vec3& v = getVec3(vec);
+			const Value& vec = pop();
+			const vec3& v = getVec3(vec);
 			push(vec2(-v.x, -v.y));
 			break;
 		}
@@ -708,8 +708,8 @@ Value VM::execute()
 		// string operators
 		case OpCode::ADD_STRING:
 		{
-			Value a = pop();
-			Value b = pop();
+			const Value& a = pop();
+			const Value& b = pop();
 			push(getString(a) + getString(b));
 			break;
 		}
@@ -717,22 +717,22 @@ Value VM::execute()
 		// Logical operators
 		case OpCode::NOT:
 		{
-			Value a = pop();
+			const Value& a = pop();
 			bool b = isTruthy(a);
 			push(!b);
 			break;
 		}
 		case OpCode::EQUAL:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(a == b);
 			break;
 		}
 		case OpCode::NOT_EQUAL:
 		{
-			Value b = pop();
-			Value a = pop();
+			const Value& b = pop();
+			const Value& a = pop();
 			push(a != b);
 			break;
 		}
@@ -769,7 +769,7 @@ Value VM::execute()
 		{
 			uint16_t slot = readUint16();
 
-			Value objVal = pop();
+			const Value& objVal = pop();
 
 			switch (ValueType(objVal))
 			{
@@ -819,8 +819,8 @@ Value VM::execute()
 			break;
 		}
 		case OpCode::GET_INDEX: {
-			Value indexVal = pop();
-			Value arrayVal = pop();
+			const Value& indexVal = pop();
+			const Value& arrayVal = pop();
 
 			auto& arr = getArray(arrayVal);
 

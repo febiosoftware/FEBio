@@ -203,6 +203,8 @@ namespace febcode
 
 		int stackDepth = 0;
 		int maxStackDepth = 0;
+
+		int currentFunction = -1;
 	};
 
 	void CompileSource(Program& prg, const std::string& source);

@@ -142,7 +142,7 @@ namespace febcode
 			destroy();
 		}
 
-		bool operator == (const Value& other)
+		bool operator == (const Value& other) const
 		{
 			if (index != other.index)
 				return false;
@@ -161,7 +161,7 @@ namespace febcode
 			return false;
 		}
 
-		bool operator != (const Value& other)
+		bool operator != (const Value& other) const
 		{
 			return !(*this == other);
 		}

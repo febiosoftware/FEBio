@@ -505,6 +505,8 @@ void Compiler::compileFunction(FunctionStmt* fn)
 	int fnIndex = (int)prg.functions.size();
 	prg.functions.push_back(info);
 
+	currentFunction = fnIndex;
+
 	Type currentReturnType = expectedReturnType;
 	expectedReturnType = fn->returnType;
 
@@ -512,6 +514,8 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	for (auto& p : fn->params)
 		m_locals.push_back({ p.second, p.first, m_scopeDepth, (int)m_locals.size(), true });
+
+	size_t currentStackSize = stackDepth;
 
 	BlockStmt* body = dynamic_cast<BlockStmt*>(fn->body.get());
 	for (auto& stmt : body->statements)
@@ -537,6 +541,10 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	// Patch jump so execution skips function body
 	patchJump(jumpOver);
+
+	prg.functions[fnIndex].maxStackSize = maxStackDepth - currentStackSize;
+
+	currentFunction = -1;
 }
 
 //
@@ -995,7 +1003,7 @@ Type Compiler::compileCall(CallExpr* call)
 		if (calleeVar->name == "print")
 		{
 			compileFncArgs(call->arguments, false);
-			emit(OpCode::PRINT);
+			emit(OpCode::PRINT, (int)call->arguments.size());
 			emitUint16(static_cast<uint16_t>(call->arguments.size())); // number of arguments
 			return prg.types.getVoidType();
 		}
@@ -1005,6 +1013,10 @@ Type Compiler::compileCall(CallExpr* call)
 		int fnIndex = resolveFunction(calleeVar->name, argTypes);
 		if (fnIndex == -1)
 			throw std::runtime_error("Undefined function: " + calleeVar->name);
+
+		// We don't allow recursive calls.
+		if (currentFunction == fnIndex)
+			throw std::runtime_error("Recursive calls are not allowed: " + calleeVar->name);
 
 		// check arg count
 		if (prg.functions[fnIndex].args.size() != (int)call->arguments.size())
@@ -1017,26 +1029,9 @@ Type Compiler::compileCall(CallExpr* call)
 				throw std::runtime_error("Argument type mismatch in call to function: " + calleeVar->name);
 		}
 
-		emit(OpCode::CALL);
-		emitUint16(fnIndex);
-		emitUint16((uint16_t)call->arguments.size());
+		stackDepth += (int)prg.functions[fnIndex].maxStackSize;
 
-		return prg.functions[fnIndex].returnType;
-	}
-	else if (auto calleeMem = dynamic_cast<MemberExpr*>(call->callee.get()))
-	{
-		auto obj = dynamic_cast<VariableExpr*>(calleeMem->object.get());
-		if (obj == nullptr)
-			throw std::runtime_error("Unknown object name when compiling function call.");
-
-		std::string fncName = obj->name + "." + calleeMem->property;
-
-		std::vector<Type> argTypes = compileFncArgs(call->arguments);
-		int fnIndex = resolveFunction(fncName, argTypes);
-		if (fnIndex == -1)
-			throw std::runtime_error("Undefined function: " + fncName);
-
-		emit(OpCode::CALL);
+		emit(OpCode::CALL, (int)prg.functions[fnIndex].args.size());
 		emitUint16(fnIndex);
 		emitUint16((uint16_t)call->arguments.size());
 

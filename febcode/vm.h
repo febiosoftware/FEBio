@@ -142,7 +142,7 @@ namespace febcode
 			return (high << 8) | low;
 		}
 
-		Value pop()
+		const Value& pop()
 		{
 			if (stackTop <= globalCount)
 				throw std::runtime_error("Stack underflow.");
