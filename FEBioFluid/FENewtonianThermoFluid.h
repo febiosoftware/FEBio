@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEThermoViscousFluid.h"
-#include "FENewtonianFluid.h"
 #include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
@@ -43,6 +42,9 @@ public:
     //! initialization
     bool Init() override;
     
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
+
     //! viscous stress
     mat3ds Stress(FEMaterialPoint& pt) override;
     
@@ -64,9 +66,11 @@ public:
     double TangentBulkViscosityTemperature(FEMaterialPoint& mp) { return 0.0; }
 
 public:
-    FENewtonianFluid*   m_NF;
-    double              m_kappa;
-    double              m_mu;
+    double	m_kappa;	//!< bulk viscosity
+    double	m_mu;		//!< shear viscosity
+    double  m_Tr;       //!< referential temperature
+    FEFunction1D*   m_kappahat; //!< normalized bulk viscosity vs normalized temperature
+    FEFunction1D*   m_muhat;    //!< normalized shear viscosity vs normalized temperature
 
     // declare parameter list
     DECLARE_FECORE_CLASS();
