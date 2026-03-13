@@ -27,6 +27,7 @@ set(_FEBIO_LIBS
     FEBioMech
     FEBioMix
     FEBioFluid
+    FEBioThermoFluid
     FEBioRVE
     FEBioPlot
     FEBioXML
