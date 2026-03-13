@@ -1706,7 +1706,7 @@ FEParamValue FEModel::GetMeshParameter(const ParamString& paramString)
 			ParamString fnc = next.next();
 			if (fnc == "fromId")
 			{
-				nid = fnc.Index();
+				nid = fnc.ID();
 				node = mesh.FindNodeFromID(nid);
 				next = next.next();
 			}

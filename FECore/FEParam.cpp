@@ -239,7 +239,22 @@ FEParam* FEParam::setUnits(const char* szunit) { m_szunit = szunit; return this;
 
 //-----------------------------------------------------------------------------
 // set the enum values (\0 separated. Make sure the end of the string has two \0's)
-FEParam* FEParam::setEnums(const char* sz) { m_szenum = sz; return this; }
+FEParam* FEParam::setEnums(const char* sz)
+{ 
+	// count the enums
+	if (sz && (sz[0] != '$') && (type() == FE_PARAM_INT))
+	{
+		int n = 0;
+		const char* s = sz;
+		while ((s != nullptr) && (*s != 0))
+		{
+			s += strlen(s) + 1;
+			n++;
+		}
+		SetValidator(new FEIntValidator(FEParamRange::FE_CLOSED, 0, n - 1));
+	}
+	m_szenum = sz; return this; 
+}
 
 //-----------------------------------------------------------------------------
 FEParam* FEParam::setLongName(const char* sz)

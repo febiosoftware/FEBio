@@ -96,6 +96,22 @@ double FEPowellEyringFluid::ShearViscosity(FEMaterialPoint& pt)
     return mu;
 }
 
+//! derivative of shear viscosity w.r.t. strain rate
+double FEPowellEyringFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
+{
+	FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+	mat3ds D = vt.RateOfDeformation();
+	double gdot = sqrt(2 * (D.sqr()).tr());
+	double lamg = m_lam * gdot;
+
+	double dmu = (lamg < 1e-3) ? -2 * (m_mu0 - m_mui) * m_lam * m_lam / 3. :
+		(2 * (m_mu0 - m_mui) * (gdot / sqrt(1 + pow(lamg, 2)) - asinh(lamg) / m_lam)) / pow(gdot, 3);
+
+	double dmu_dgdot = 0.5 * gdot * dmu;
+
+   return dmu_dgdot;
+}
+
 //-----------------------------------------------------------------------------
 //! bulk viscosity
 double FEPowellEyringFluid::BulkViscosity(FEMaterialPoint& pt)
