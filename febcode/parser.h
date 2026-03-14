@@ -126,7 +126,7 @@ namespace febcode {
 		}
 	};
 
-	void printAST(const Program& prg);
+	void printAST(const AST& ast);
 
 	void ParseSource(Program& prg, const std::string& source);
 

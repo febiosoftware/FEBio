@@ -583,119 +583,119 @@ std::ostream& operator << (std::ostream& o, const BinaryOp& op)
 	}
 }
 
-static void printExpr(const Program& prg, const Expression* e);
+static void printExpr(const Expression* e);
 
-static void printLiteralExpr(const Program& prg, const LiteralExpr* e)
+static void printLiteralExpr(const LiteralExpr* e)
 {
 	std::cout << ValueToString(e->value);
 }
 
-static void printMemberExpr(const Program& prg, const MemberExpr* e)
-{
-	std::cout << "MemberExpr {\n"; l++;
-	printTabs(); std::cout << "object: "; printExpr(prg, e->object.get()); std::cout << ",\n";
-	printTabs(); std::cout << "property: " << e->property << "\n";
-	l--; printTabs(); std::cout << "}";
-}
-
-static void printVariableExpr(const Program& prg, const VariableExpr* e)
+static void printVariableExpr(const VariableExpr* e)
 {
 	std::cout << e->name;
 }
 
-static void printAssignmentExpr(const Program& prg, const AssignExpr* e)
+static void printMemberExpr(const MemberExpr* e)
+{
+	std::cout << "MemberExpr {\n"; l++;
+	printTabs(); std::cout << "object: "; printExpr(e->object.get()); std::cout << ",\n";
+	printTabs(); std::cout << "property: " << e->property << "\n";
+	l--; printTabs(); std::cout << "}";
+}
+
+static void printAssignmentExpr(const AssignExpr* e)
 {
 	std::cout << "AssignExpr {\n"; l++;
-	printTabs(); std::cout << "target: "; printExpr(prg, e->target.get()); std::cout << ",\n";
-	printTabs(); std::cout << "value: "; printExpr(prg, e->value.get()); std::cout << "\n";
+	printTabs(); std::cout << "target: "; printExpr(e->target.get()); std::cout << ",\n";
+	printTabs(); std::cout << "value: "; printExpr(e->value.get()); std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printUnaryExpr(const Program& prg, const UnaryExpr* e)
+static void printUnaryExpr(const UnaryExpr* e)
 {
 	std::cout << "UnaryExpr {\n"; l++;
 	printTabs(); std::cout << "op: " << e->op << ",\n";
-	printTabs(); std::cout << "right: "; printExpr(prg, e->right.get()); std::cout << "\n";
+	printTabs(); std::cout << "right: "; printExpr(e->right.get()); std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printBinaryExpr(const Program& prg, const BinaryExpr* e)
+static void printBinaryExpr(const BinaryExpr* e)
 {
 	std::cout << "BinaryExpr {\n"; l++;
 	printTabs(); std::cout << "op: " << e->op << ",\n";
-	printTabs(); std::cout << "left: "; printExpr(prg, e->left.get()); std::cout << ",\n";
-	printTabs(); std::cout << "right: "; printExpr(prg, e->right.get()); std::cout << "\n";
+	printTabs(); std::cout << "left: "; printExpr(e->left.get()); std::cout << ",\n";
+	printTabs(); std::cout << "right: "; printExpr(e->right.get()); std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printExprList(const Program& prg, const std::vector<std::unique_ptr<Expression>>& a)
+static void printExprList(const std::vector<std::unique_ptr<Expression>>& a)
 {
 	std::cout << "[\n"; l++;
 	for (size_t i = 0; i < a.size(); ++i)
 	{
-		printTabs(); printExpr(prg, a[i].get());
+		printTabs(); printExpr(a[i].get());
 		if (i != a.size() - 1) std::cout << ",\n";
 		else std::cout << "\n";
 	}
 	l--; printTabs(); std::cout << "]";
 }
 
-static void printCallExpr(const Program& prg, const CallExpr* e)
+static void printCallExpr(const CallExpr* e)
 {
 	std::cout << "CallExpr {\n"; l++;
-	printTabs(); std::cout << "callee: "; printExpr(prg, e->callee.get()); std::cout << ",\n";
-	printTabs(); std::cout << "args: "; printExprList(prg, e->arguments); std::cout << "\n";
+	printTabs(); std::cout << "callee: "; printExpr(e->callee.get()); std::cout << ",\n";
+	printTabs(); std::cout << "args: "; printExprList(e->arguments); std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printInitializerExpr(const Program& prg, const InitializerExpr* e)
+static void printInitializerExpr(const InitializerExpr* e)
 {
 	std::cout << "InitializerExpr {\n"; l++;
-	printTabs(); std::cout << "elements: "; printExprList(prg, e->elements); std::cout << "\n";
+	printTabs(); std::cout << "elements: "; printExprList(e->elements); std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printIndexExpr(const Program& prg, const IndexExpr* e)
+static void printIndexExpr(const IndexExpr* e)
 {
 	std::cout << "IndexExpr {\n"; l++;
-	printTabs(); std::cout << "object: "; printExpr(prg, e->object.get()); std::cout << ",\n";
-	printTabs(); std::cout << "index: "; printExpr(prg, e->index.get()); std::cout << "\n";
+	printTabs(); std::cout << "object: "; printExpr(e->object.get()); std::cout << ",\n";
+	printTabs(); std::cout << "index: "; printExpr(e->index.get()); std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printExpr(const Program& prg, const Expression* e)
+static void printExpr(const Expression* e)
 {
-	if      (auto l = dynamic_cast<const LiteralExpr*      >(e)) printLiteralExpr      (prg, l);
-	else if (auto m = dynamic_cast<const MemberExpr*       >(e)) printMemberExpr       (prg, m);
-	else if (auto v = dynamic_cast<const VariableExpr*     >(e)) printVariableExpr     (prg, v);
-	else if (auto a = dynamic_cast<const AssignExpr*       >(e)) printAssignmentExpr   (prg, a);
-	else if (auto u = dynamic_cast<const UnaryExpr*        >(e)) printUnaryExpr        (prg, u);
-	else if (auto b = dynamic_cast<const BinaryExpr*       >(e)) printBinaryExpr       (prg, b);
-	else if (auto c = dynamic_cast<const CallExpr*         >(e)) printCallExpr         (prg, c);
-	else if (auto c = dynamic_cast<const InitializerExpr*  >(e)) printInitializerExpr  (prg, c);
-	else if (auto c = dynamic_cast<const IndexExpr*        >(e)) printIndexExpr        (prg, c);
+	if      (auto l = dynamic_cast<const LiteralExpr*      >(e)) printLiteralExpr      (l);
+	else if (auto v = dynamic_cast<const VariableExpr*     >(e)) printVariableExpr     (v);
+	else if (auto m = dynamic_cast<const MemberExpr*       >(e)) printMemberExpr       (m);
+	else if (auto a = dynamic_cast<const AssignExpr*       >(e)) printAssignmentExpr   (a);
+	else if (auto u = dynamic_cast<const UnaryExpr*        >(e)) printUnaryExpr        (u);
+	else if (auto b = dynamic_cast<const BinaryExpr*       >(e)) printBinaryExpr       (b);
+	else if (auto c = dynamic_cast<const CallExpr*         >(e)) printCallExpr         (c);
+	else if (auto c = dynamic_cast<const InitializerExpr*  >(e)) printInitializerExpr  (c);
+	else if (auto c = dynamic_cast<const IndexExpr*        >(e)) printIndexExpr        (c);
 	else if (e == nullptr)
 		std::cout << "null";
 	else
 		std::cout << "(Unknown Expression)";
 }
 
-static void printExpressionStmt(const Program& prg, const ExpressionStmt* s)
+static void printExpressionStmt(const ExpressionStmt* s)
 {
 	std::cout << "ExpressionStmt: {\n"; l++;
-	printTabs(); std::cout << "expr: "; printExpr(prg, s->expr.get());
+	printTabs(); std::cout << "expr: "; printExpr(s->expr.get());
 	std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printStatement(const Program& prg, const Statement* stmt);
+static void printStatement(const Statement* stmt);
 
 static std::ostream& operator << (std::ostream& o, TypeKind type)
 {
@@ -713,13 +713,13 @@ static std::ostream& operator << (std::ostream& o, TypeKind type)
 	}
 }
 
-static void printVarDeclStmt(const Program& prg, const VarDeclStmt* s)
+static void printVarDeclStmt(const VarDeclStmt* s)
 {
 	std::cout << "VarDeclStmt: {\n"; l++;
 	printTabs(); std::cout << "vars: [\n"; l++;
 	for (const auto& var : s->vars) {
 		printTabs(); std::cout << "{ type: " << TypeToString(var.type) << ", name: " << var.name << ", initializer: ";
-		printExpr(prg, var.initializer.get());
+		printExpr(var.initializer.get());
 		std::cout << " },\n";
 	}
 	l--; printTabs(); std::cout << "],\n";
@@ -727,40 +727,40 @@ static void printVarDeclStmt(const Program& prg, const VarDeclStmt* s)
 	printTabs(); std::cout << "}";
 }
 
-static void printReturnStmt(const Program& prg, const ReturnStmt* s)
+static void printReturnStmt(const ReturnStmt* s)
 {
 	std::cout << "ReturnStmt: {\n"; l++;
-	printTabs(); std::cout << "value: "; printExpr(prg, s->value.get());
+	printTabs(); std::cout << "value: "; printExpr(s->value.get());
 	std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printBlockStmt(const Program& prg, const BlockStmt* s)
+static void printBlockStmt(const BlockStmt* s)
 {
 	std::cout << "BlockStmt: [\n"; l++;
 	size_t n = s->statements.size();
 	for (size_t i = 0; i < n; ++i)
 	{
 		auto& stmt = s->statements[i];
-		printStatement(prg, stmt.get());
+		printStatement(stmt.get());
 		if (i != n - 1) std::cout << ",\n";
 	}	std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "]";
 }
 
-static void printIfStmt(const Program& prg, const IfStmt* s)
+static void printIfStmt(const IfStmt* s)
 {
 	std::cout << "IfStmt: {\n"; l++;
-	printTabs(); std::cout << "condition: "; printExpr(prg, s->condition.get()); std::cout << ",\n";
-	printTabs(); std::cout << "thenBranch: {\n"; l++; printStatement(prg, s->thenBranch.get());
+	printTabs(); std::cout << "condition: "; printExpr(s->condition.get()); std::cout << ",\n";
+	printTabs(); std::cout << "thenBranch: {\n"; l++; printStatement(s->thenBranch.get());
 	std::cout << "\n";
 	l--; printTabs(); std::cout << "}\n";
 	if (s->elseBranch)
 	{
 		printTabs(); std::cout << "elseBranch: {\n"; l++;
-		printStatement(prg, s->elseBranch.get());
+		printStatement(s->elseBranch.get());
 		std::cout << "\n";
 		l--; printTabs(); std::cout << "}\n";
 	}
@@ -768,16 +768,16 @@ static void printIfStmt(const Program& prg, const IfStmt* s)
 	printTabs(); std::cout << "}";
 }
 
-static void printWhileStmt(const Program& prg, const WhileStmt* s)
+static void printWhileStmt(const WhileStmt* s)
 {
 	std::cout << "WhileStmt: {\n"; l++;
-	printTabs(); std::cout << "condition: "; printExpr(prg, s->condition.get()); std::cout << ",\n";
-	printTabs(); std::cout << "body: {\n"; l++; printStatement(prg, s->body.get());
+	printTabs(); std::cout << "condition: "; printExpr(s->condition.get()); std::cout << ",\n";
+	printTabs(); std::cout << "body: {\n"; l++; printStatement(s->body.get());
 	std::cout << "\n";
 	l--; printTabs(); std::cout << "}\n";
 }
 
-static void printFunctionStmt(const Program& prg, const FunctionStmt* s)
+static void printFunctionStmt(const FunctionStmt* s)
 {
 	std::cout << "FunctionStmt: {\n"; l++;
 	printTabs(); std::cout << "type: " << TypeToString(s->returnType) << ",\n";
@@ -788,13 +788,13 @@ static void printFunctionStmt(const Program& prg, const FunctionStmt* s)
 		printTabs(); std::cout << "{ type: " << TypeToString(param.first) << ", name: " << param.second << " },\n";
 	}
 	l--; printTabs(); std::cout << "],\n";
-	printTabs(); std::cout << "body: {\n"; l++; printStatement(prg, s->body.get());
+	printTabs(); std::cout << "body: {\n"; l++; printStatement(s->body.get());
 	std::cout << "\n";
 	l--; printTabs(); std::cout << "}\n";
 	l--; printTabs(); std::cout << "}";
 }
 
-static void printStructStmt(const Program& prg, const StructStmt* s)
+static void printStructStmt(const StructStmt* s)
 {
 	std::cout << "StructStmt: {\n"; l++;
 	printTabs(); std::cout << "name: " << s->name << ",\n";
@@ -807,29 +807,29 @@ static void printStructStmt(const Program& prg, const StructStmt* s)
 	l--; printTabs(); std::cout << "}";
 }
 
-static void printStatement(const Program& prg, const Statement* stmt)
+static void printStatement(const Statement* stmt)
 {
 	printTabs();
-	if      (auto e = dynamic_cast<const ExpressionStmt*>(stmt)) printExpressionStmt(prg, e);
-	else if (auto v = dynamic_cast<const VarDeclStmt*   >(stmt)) printVarDeclStmt   (prg, v);
-	else if (auto r = dynamic_cast<const ReturnStmt*    >(stmt)) printReturnStmt    (prg, r);
-	else if (auto b = dynamic_cast<const BlockStmt*     >(stmt)) printBlockStmt     (prg, b);
-	else if (auto i = dynamic_cast<const IfStmt*        >(stmt)) printIfStmt        (prg, i);
-	else if (auto w = dynamic_cast<const WhileStmt*     >(stmt)) printWhileStmt     (prg, w);
-	else if (auto f = dynamic_cast<const FunctionStmt*  >(stmt)) printFunctionStmt  (prg, f);
-	else if (auto s = dynamic_cast<const StructStmt*    >(stmt)) printStructStmt    (prg, s);
+	if      (auto e = dynamic_cast<const ExpressionStmt*>(stmt)) printExpressionStmt(e);
+	else if (auto v = dynamic_cast<const VarDeclStmt*   >(stmt)) printVarDeclStmt   (v);
+	else if (auto r = dynamic_cast<const ReturnStmt*    >(stmt)) printReturnStmt    (r);
+	else if (auto b = dynamic_cast<const BlockStmt*     >(stmt)) printBlockStmt     (b);
+	else if (auto i = dynamic_cast<const IfStmt*        >(stmt)) printIfStmt        (i);
+	else if (auto w = dynamic_cast<const WhileStmt*     >(stmt)) printWhileStmt     (w);
+	else if (auto f = dynamic_cast<const FunctionStmt*  >(stmt)) printFunctionStmt  (f);
+	else if (auto s = dynamic_cast<const StructStmt*    >(stmt)) printStructStmt    (s);
 	else
 		std::cout << "(Unknown Statement)";
 }
 
-void febcode::printAST(const Program& prg)
+void febcode::printAST(const AST& ast)
 {
 	l = 0;
-	size_t n = prg.ast.statements.size();
+	size_t n = ast.statements.size();
 	for (size_t i = 0; i < n; ++i)
 	{
-		auto& stmt = prg.ast.statements[i];
-		printStatement(prg, stmt.get());
+		auto& stmt = ast.statements[i];
+		printStatement(stmt.get());
 		if (i != n - 1) std::cout << ",\n";
 	}
 
