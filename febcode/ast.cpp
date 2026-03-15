@@ -1,6 +1,111 @@
 #include "ast.h"
 #include <iostream>
 
+using namespace febcode;
+
+ExprPtr febcode::Initializer(const std::vector<StructField>& fields)
+{
+	std::vector<ExprPtr> init;
+	for (const auto& field : fields)
+	{
+		switch (field.first->kind)
+		{
+		case TypeKind::Bool  : init.push_back(Literal(Value(false))); break;
+		case TypeKind::Int   : init.push_back(Literal(Value(0))); break;
+		case TypeKind::Double: init.push_back(Literal(Value(0.0))); break;
+		case TypeKind::Vec2  : init.push_back(Literal(Value(vec2(0., 0.)))); break;
+		case TypeKind::Vec3  : init.push_back(Literal(Value(vec3(0., 0., 0.)))); break;
+		case TypeKind::String: init.push_back(Literal(Value(std::string("")))); break;
+		case TypeKind::Array:
+		{
+			Value v;
+			switch (field.first->elementType->kind)
+			{
+			case TypeKind::Bool: v = Value(false); break;
+			case TypeKind::Int: v = Value(0); break;
+			case TypeKind::Double: v = Value(0.0); break;
+			case TypeKind::Vec2: v = Value(vec2(0., 0.)); break;
+			case TypeKind::Vec3: v = Value(vec3(0., 0., 0.)); break;
+			case TypeKind::String: v = Value(std::string("")); break;
+			default:
+				throw std::runtime_error("Unsupported array element type for initializer");
+			};
+			init.push_back(Initializer(field.first->arraySize, v));
+			break;
+		}
+		case TypeKind::Struct:
+		{
+			std::vector<ExprPtr> structFields;
+			for (const auto& subfield : field.first->fields)
+			{
+				Value v;
+				switch (subfield.first->elementType->kind)
+				{
+				case TypeKind::Bool  : v = Value(false); break;
+				case TypeKind::Int   : v = Value(0); break;
+				case TypeKind::Double: v = Value(0.0); break;
+				case TypeKind::Vec2  : v = Value(vec2(0., 0.)); break;
+				case TypeKind::Vec3  : v = Value(vec3(0., 0., 0.)); break;
+				case TypeKind::String: v = Value(std::string("")); break;
+				default:
+					throw std::runtime_error("Unsupported struct field type for initializer");
+				};
+
+				structFields.push_back(Literal(v));
+			}
+			init.push_back(std::make_unique<InitializerExpr>(std::move(structFields)));
+		}
+		break;
+		default:
+			throw std::runtime_error("Unsupported struct field type for initializer");
+		}
+	}
+	return std::make_unique<InitializerExpr>(std::move(init));
+}
+
+ExprPtr febcode::copy_expression(const Expression* expr)
+{
+	if (expr == nullptr)  return nullptr;
+	else if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+		return Literal(literal->value);
+	}
+	else if (auto variable = dynamic_cast<const VariableExpr*>(expr)) {
+		return Variable(variable->name);
+	}
+	else if (auto unary = dynamic_cast<const UnaryExpr*>(expr)) {
+		return Unary(unary->op, unary->right);
+	}
+	else if (auto binary = dynamic_cast<const BinaryExpr*>(expr)) {
+		return Binary(binary->left, binary->op, binary->right);
+	}
+	else if (auto call = dynamic_cast<const CallExpr*>(expr))
+	{
+		return Call(call->callee, call->arguments);
+	}
+	else if (auto call = dynamic_cast<const InitializerExpr*>(expr))
+	{
+		std::vector<ExprPtr> copyArgs;
+		for (auto& arg : call->elements)
+		{
+			copyArgs.emplace_back(copy_expression(arg.get()));
+		}
+		return std::make_unique<InitializerExpr>(std::move(copyArgs));
+	}
+	else if (auto assign = dynamic_cast<const AssignExpr*>(expr))
+	{
+		return Assign(assign->target, assign->value);
+	}
+	else if (auto member = dynamic_cast<const MemberExpr*>(expr))
+	{
+		return Member(member->object, member->property);
+	}
+	else
+	{
+		throw std::runtime_error("Unsupported expression type for copying");
+	}
+}
+
+
 std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 {
 	if      (isVoid  (v)) return o << "null";

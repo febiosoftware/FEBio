@@ -74,6 +74,8 @@ namespace febcode
 	struct TypeStruct;
 	using Type = const TypeStruct*;
 
+	using StructField = std::pair<Type, std::string>; // type and name of a struct field
+
 	struct TypeStruct {
 		TypeKind kind = TypeKind::Void;
 
@@ -84,7 +86,7 @@ namespace febcode
 		// For struct types
 		int typeIndex = -1;
 		std::string name;
-		std::vector<std::pair<Type, std::string>> fields;
+		std::vector<StructField> fields;
 	};
 
 	struct ArrayValue;
@@ -291,6 +293,39 @@ namespace febcode
 	inline ArrayValue&  getArray (Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
 	inline StructValue& getStruct(Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
 
+	inline bool isZero(const Value& v)
+	{
+		if (isInt(v) && (getInt(v) == 0)) return true;
+		if (isDouble(v) && (getDouble(v) == 0.0)) return true;
+		return false;
+	}
+
+	inline bool isOne(const Value& v)
+	{
+		if (isInt(v) && (getInt(v) == 1)) return true;
+		if (isDouble(v) && (getDouble(v) == 1.0)) return true;
+		return false;
+	}
+
+	inline bool isIntNumber(const Value& v)
+	{
+		if (isInt(v)) return true;
+		if (isDouble(v))
+		{
+			double d = getDouble(v);
+			return (d == std::floor(d));
+		}
+		return false;
+	}
+
+	inline int toIntNumber(const Value& v)
+	{
+		assert(isIntNumber(v));
+		if (isInt(v)) return getInt(v);
+		if (isDouble(v)) return (int)getDouble(v);
+		return 0;
+	}
+
 	using NativeFnc = std::function<Value(const Value* arg, int argc)>;
 
 	using BinaryFnc = std::function<Value(const Value&, const Value&)>;
@@ -347,7 +382,6 @@ namespace febcode
 
 }
 
-// TODO: Can I remove this?
 inline febcode::Value operator + (const febcode::Value& a, const febcode::Value& b)
 {
 	if (isInt(a) && isInt(b))
@@ -356,5 +390,30 @@ inline febcode::Value operator + (const febcode::Value& a, const febcode::Value&
 		return getDouble(a) + getDouble(b);
 	if (isString(a) && isString(b))
 		return getString(a) + getString(b);
+	throw std::runtime_error("Unsupported operand types for +");
+}
+
+inline febcode::Value operator - (const febcode::Value& a, const febcode::Value& b)
+{
+	if (isInt(a) && isInt(b))
+		return getInt(a) - getInt(b);
+	if (isDouble(a) && isDouble(b))
+		return getDouble(a) - getDouble(b);
+	throw std::runtime_error("Unsupported operand types for +");
+}
+
+inline febcode::Value operator * (const febcode::Value& a, const febcode::Value& b)
+{
+	if (isInt(a) && isInt(b))
+		return getInt(a) * getInt(b);
+	if (isDouble(a) && isDouble(b))
+		return getDouble(a) * getDouble(b);
+	throw std::runtime_error("Unsupported operand types for +");
+}
+
+inline febcode::Value operator / (const febcode::Value& a, const febcode::Value& b)
+{
+	if (isDouble(a) && isDouble(b))
+		return getDouble(a) / getDouble(b);
 	throw std::runtime_error("Unsupported operand types for +");
 }

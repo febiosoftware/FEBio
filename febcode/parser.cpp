@@ -540,6 +540,11 @@ static void printTabs()
 	for (int i = 0; i < l; ++i) std::cout << "    ";
 }
 
+static void printTabs(std::ostream& os)
+{
+	for (int i = 0; i < l; ++i) os << "    ";
+}
+
 std::ostream& operator << (std::ostream& o, const UnaryOp& op)
 {
 	switch (op)
@@ -843,4 +848,231 @@ void febcode::ParseSource(Program& prg, const std::string& source)
 
 	Parser parser(prg);
 	parser.parse(tokens);
+}
+
+//---------------------------------------------------------------------
+// pretty print functions for debugging purposes
+
+static void prettyPrintExpression(std::ostream& os, const Expression& expr);
+
+static void prettyPrintLiteralExpr(std::ostream& os, const LiteralExpr& expr)
+{
+	os << ValueToString(expr.value);
+}
+
+static void prettyPrintVariableExpr(std::ostream& os, const VariableExpr& expr)
+{
+	os << expr.name;
+}
+
+static void prettyPrintMemberExpr(std::ostream& os, const MemberExpr& expr)
+{
+	prettyPrintExpression(os, *expr.object);
+	os << "." << expr.property;
+}
+
+static void prettyPrintAssignmentExpr(std::ostream& os, const AssignExpr& expr)
+{
+	prettyPrintExpression(os, *expr.target);
+	os << " = ";
+	prettyPrintExpression(os, *expr.value);
+}
+
+static void prettyPrintUnaryExpr(std::ostream& os, const UnaryExpr& expr)
+{
+	os << expr.op;
+
+	bool isBinary = dynamic_cast<const BinaryExpr*>(expr.right.get()) != nullptr;
+
+	if (isBinary) os << "(";
+	prettyPrintExpression(os, *expr.right);
+	if (isBinary) os << ")";
+}
+
+static void prettyPrintBinaryExpr(std::ostream& os, const BinaryExpr& expr)
+{
+	bool leftBinary  = dynamic_cast<const BinaryExpr*>(expr.left.get()) != nullptr;
+	bool rightBinary = dynamic_cast<const BinaryExpr*>(expr.right.get()) != nullptr;
+
+	if (leftBinary) os << "(";
+	prettyPrintExpression(os, *expr.left);
+	if (leftBinary) os << ")";
+	os << expr.op;
+	if (rightBinary) os << "(";
+	prettyPrintExpression(os, *expr.right);
+	if (rightBinary) os << ")";
+}
+
+static void prettyPrintCallExpr(std::ostream& os, const CallExpr& expr)
+{
+	prettyPrintExpression(os, *expr.callee);
+	os << "(";
+	size_t n = expr.arguments.size();
+	for (size_t i = 0; i < n; ++i)
+	{
+		prettyPrintExpression(os, *expr.arguments[i]);
+		if (i != n - 1) os << ", ";
+	}
+	os << ")";
+}
+
+static void prettyPrintInitializerExpr(std::ostream& os, const InitializerExpr& expr)
+{
+	os << "{ ";
+	size_t n = expr.elements.size();
+	for (size_t i = 0; i < n; ++i)
+	{
+		prettyPrintExpression(os, *expr.elements[i]);
+		if (i != n - 1) os << ", ";
+	}
+	os << " }";
+}
+
+static void prettyPrintIndexExpr(std::ostream& os, const IndexExpr& expr)
+{
+	prettyPrintExpression(os, *expr.object);
+	os << "[";
+	prettyPrintExpression(os, *expr.index);
+	os << "]";
+}
+
+static void prettyPrintExpression(std::ostream& os, const Expression& expr)
+{
+	if      (auto l = dynamic_cast<const LiteralExpr*      >(&expr)) prettyPrintLiteralExpr      (os, *l);
+	else if (auto v = dynamic_cast<const VariableExpr*     >(&expr)) prettyPrintVariableExpr     (os, *v);
+	else if (auto m = dynamic_cast<const MemberExpr*       >(&expr)) prettyPrintMemberExpr       (os, *m);
+	else if (auto a = dynamic_cast<const AssignExpr*       >(&expr)) prettyPrintAssignmentExpr   (os, *a);
+	else if (auto u = dynamic_cast<const UnaryExpr*        >(&expr)) prettyPrintUnaryExpr        (os, *u);
+	else if (auto b = dynamic_cast<const BinaryExpr*       >(&expr)) prettyPrintBinaryExpr       (os, *b);
+	else if (auto c = dynamic_cast<const CallExpr*         >(&expr)) prettyPrintCallExpr         (os, *c);
+	else if (auto c = dynamic_cast<const InitializerExpr*  >(&expr)) prettyPrintInitializerExpr  (os, *c);
+	else if (auto c = dynamic_cast<const IndexExpr*        >(&expr)) prettyPrintIndexExpr        (os, *c);
+	else
+		os << "(Unknown Expression)";
+}
+
+static void prettyPrintStatement(std::ostream& os, const Statement& stmt);
+
+static void prettyPrintExpressionStmt(std::ostream& os, const ExpressionStmt& stmt)
+{
+	prettyPrintExpression(os, *stmt.expr);
+}
+
+static void prettyPrintVarDeclStmt(std::ostream& os, const VarDeclStmt& stmt)
+{
+	size_t n = stmt.vars.size();
+	for (size_t i = 0; i < n; ++i)
+	{
+		const auto& var = stmt.vars[i];
+		os << TypeToString(var.type) << " " << var.name;
+		if (var.initializer)
+		{
+			os << " = ";
+			prettyPrintExpression(os, *var.initializer);
+		}
+		if (i != n - 1) os << ", ";
+	}
+}
+
+static void prettyPrintReturnStmt(std::ostream& os, const ReturnStmt& stmt)
+{
+	os << "return";
+	if (stmt.value)
+	{
+		os << " ";
+		prettyPrintExpression(os, *stmt.value);
+	}
+	os << ";";
+}
+
+static void prettyPrintBlockStmt(std::ostream& os, const BlockStmt& stmt)
+{
+	os << "{\n"; l++;
+	size_t n = stmt.statements.size();
+	for (size_t i = 0; i < n; ++i)
+	{
+		auto& s = stmt.statements[i];
+		prettyPrintStatement(os, *s);
+		if (i != n - 1) os << "\n";
+	}
+	os << "\n"; l--;
+	printTabs(os); os << "}";
+}
+
+static void prettyPrintIfStmt(std::ostream& os, const IfStmt& stmt)
+{
+	os << "if (";
+	prettyPrintExpression(os, *stmt.condition);
+	os << ")\n";
+	printTabs(os); prettyPrintStatement(os, *stmt.thenBranch);
+	if (stmt.elseBranch)
+	{
+		os << "\n";
+		printTabs(os); os << "else\n";
+		printTabs(os); prettyPrintStatement(os, *stmt.elseBranch);
+	}
+}
+
+static void prettyPrintWhileStmt(std::ostream& os, const WhileStmt& stmt)
+{
+	os << "while (";
+	prettyPrintExpression(os, *stmt.condition);
+	os << ")\n";
+	printTabs(os); prettyPrintStatement(os, *stmt.body);
+}
+
+static void prettyPrintFunctionStmt(std::ostream& os, const FunctionStmt& stmt)
+{
+	os << TypeToString(stmt.returnType) << " " << stmt.name << "(";
+	size_t n = stmt.params.size();
+	for (size_t i = 0; i < n; ++i)
+	{
+		const auto& param = stmt.params[i];
+		os << TypeToString(param.first) << " " << param.second;
+		if (i != n - 1) std::cout << ", ";
+	}
+	os << ")\n";
+	printTabs(os); prettyPrintStatement(os, *stmt.body);
+}
+
+static void prettyPrintStructStmt(std::ostream& os, const StructStmt& stmt)
+{
+	os << "struct " << stmt.name << " {\n";
+	for (auto& field : stmt.fields)
+	{
+		os << "    " << TypeToString(field.first) << " " << field.second << ";\n";
+	}
+	os << "};\n\n";
+}
+
+static void prettyPrintStatement(std::ostream& os, const febcode::Statement& stmt)
+{
+	printTabs(os);
+	if      (auto e = dynamic_cast<const ExpressionStmt*>(&stmt)) prettyPrintExpressionStmt(os, *e);
+	else if (auto v = dynamic_cast<const VarDeclStmt*   >(&stmt)) prettyPrintVarDeclStmt   (os, *v);
+	else if (auto r = dynamic_cast<const ReturnStmt*    >(&stmt)) prettyPrintReturnStmt    (os, *r);
+	else if (auto b = dynamic_cast<const BlockStmt*     >(&stmt)) prettyPrintBlockStmt     (os, *b);
+	else if (auto i = dynamic_cast<const IfStmt*        >(&stmt)) prettyPrintIfStmt        (os, *i);
+	else if (auto w = dynamic_cast<const WhileStmt*     >(&stmt)) prettyPrintWhileStmt     (os, *w);
+	else if (auto f = dynamic_cast<const FunctionStmt*  >(&stmt)) prettyPrintFunctionStmt  (os, *f);
+	else if (auto s = dynamic_cast<const StructStmt*    >(&stmt)) prettyPrintStructStmt    (os, *s);
+	else
+		std::cout << "(Unknown Statement)";
+}
+
+void febcode::prettyPrintAST(std::ostream& os, const AST& ast)
+{
+	l = 0;
+	size_t n = ast.statements.size();
+	for (size_t i = 0; i < n; ++i)
+	{
+		auto& stmt = ast.statements[i];
+		prettyPrintStatement(os, *stmt);
+		if (i != n - 1) os << ",\n";
+	}
+}
+
+void febcode::prettyPrintAST(const AST& ast)
+{
+	prettyPrintAST(std::cout, ast);
 }

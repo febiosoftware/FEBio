@@ -3,6 +3,7 @@
 #include "ast.h"
 #include "program.h"
 #include <stdexcept>
+#include <ostream>
 
 namespace febcode {
 
@@ -127,6 +128,9 @@ namespace febcode {
 	};
 
 	void printAST(const AST& ast);
+
+	void prettyPrintAST(const AST& ast);
+	void prettyPrintAST(std::ostream& os, const AST& ast);
 
 	void ParseSource(Program& prg, const std::string& source);
 

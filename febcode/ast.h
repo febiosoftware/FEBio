@@ -31,6 +31,8 @@ namespace febcode {
 		virtual ~Statement() = default;
 	};
 
+	using ExprPtr = std::unique_ptr<Expression>;
+
 	// --- Expressions ---
 
 	struct LiteralExpr : Expression {
@@ -46,98 +48,91 @@ namespace febcode {
 	class AssignExpr : public Expression
 	{
 	public:
-		std::unique_ptr<Expression> target;
-		std::unique_ptr<Expression> value;
+		ExprPtr target;
+		ExprPtr value;
 
 	public:
-		AssignExpr(std::unique_ptr<Expression> target,
-			std::unique_ptr<Expression> value)
+		AssignExpr(ExprPtr target, ExprPtr value)
 			: target(std::move(target)), value(std::move(value)) {
 		}
 	};
 
 	struct BinaryExpr : Expression {
 		BinaryOp op;
-		std::unique_ptr<Expression> left;
-		std::unique_ptr<Expression> right;
+		ExprPtr left;
+		ExprPtr right;
 
-		BinaryExpr(std::unique_ptr<Expression> l, BinaryOp o, std::unique_ptr<Expression> r)
+		BinaryExpr(ExprPtr l, BinaryOp o, ExprPtr r)
 			: left(std::move(l)), op(o), right(std::move(r)) {
 		}
 	};
 
 	struct UnaryExpr : Expression {
 		UnaryOp op;
-		std::unique_ptr<Expression> right;
+		ExprPtr right;
 
-		UnaryExpr(UnaryOp o, std::unique_ptr<Expression> r)
-			: op(o), right(std::move(r)) {
-		}
+		UnaryExpr(UnaryOp o, ExprPtr r)
+			: op(o), right(std::move(r)) {}
 	};
 
 	struct CallExpr : Expression {
-		std::unique_ptr<Expression> callee;
-		std::vector<std::unique_ptr<Expression>> arguments;
+		ExprPtr callee;
+		std::vector<ExprPtr> arguments;
 
-		CallExpr(std::unique_ptr<Expression> callee,
-			std::vector<std::unique_ptr<Expression>> arguments)
+		CallExpr(ExprPtr callee, std::vector<ExprPtr> arguments)
 			: callee(std::move(callee)),
-			arguments(std::move(arguments)) {
-		}
+			arguments(std::move(arguments)) {}
 	};
 
 	struct MemberExpr : Expression
 	{
-		std::unique_ptr<Expression> object;
+		ExprPtr object;
 		std::string property;
 
-		MemberExpr(std::unique_ptr<Expression> object,
-			std::string property)
-			: object(std::move(object)),
-			property(std::move(property)) {
-		}
+		MemberExpr(ExprPtr object, std::string property)
+			: object(std::move(object)), property(std::move(property)) {}
 	};
 
 	struct InitializerExpr : Expression {
-		std::vector<std::unique_ptr<Expression>> elements;
-		InitializerExpr(std::vector<std::unique_ptr<Expression>> elements)
-			: elements(std::move(elements)) {
-		}
+		std::vector<ExprPtr> elements;
+		InitializerExpr(std::vector<ExprPtr> elements)
+			: elements(std::move(elements)) {}
 	};
 
 	struct IndexExpr : Expression {
-		std::unique_ptr<Expression> object;
-		std::unique_ptr<Expression> index;
-		IndexExpr(std::unique_ptr<Expression> object,
-			std::unique_ptr<Expression> index)
-			: object(std::move(object)),
-			index(std::move(index)) {
-		}
+		ExprPtr object;
+		ExprPtr index;
+		IndexExpr(ExprPtr object, ExprPtr index)
+			: object(std::move(object)), index(std::move(index)) {}
 	};
 
 	// --- Statements ---
 
 	struct ExpressionStmt : Statement {
-		std::unique_ptr<Expression> expr;
-		ExpressionStmt(std::unique_ptr<Expression> e) : expr(std::move(e)) {}
+		ExprPtr expr;
+		ExpressionStmt(ExprPtr e) : expr(std::move(e)) {}
 	};
 
 	struct Var {
 		Type type = nullptr;
 		std::string name;
-		std::unique_ptr<Expression> initializer; // can be null
+		ExprPtr initializer; // can be null
 	};
 
 	struct VarDeclStmt : Statement {
 		std::vector<Var> vars;
+		VarDeclStmt(Type type, const std::string& name, ExprPtr initializer)
+		{
+			vars.push_back({ type, name, std::move(initializer) });
+		}
 		VarDeclStmt(std::vector<Var>& vars)
 			: vars(std::move(vars)) {
 		}
 	};
 
 	struct ReturnStmt : Statement {
-		std::unique_ptr<Expression> value; // can be null
-		ReturnStmt(std::unique_ptr<Expression> v) : value(std::move(v)) {}
+		ExprPtr value; // can be null
+		ReturnStmt(ExprPtr v) : value(std::move(v)) {}
 	};
 
 	struct BlockStmt : Statement {
@@ -145,11 +140,11 @@ namespace febcode {
 	};
 
 	struct IfStmt : Statement {
-		std::unique_ptr<Expression> condition;
+		ExprPtr condition;
 		std::unique_ptr<Statement> thenBranch;
 		std::unique_ptr<Statement> elseBranch; // optional
 
-		IfStmt(std::unique_ptr<Expression> cond,
+		IfStmt(ExprPtr cond,
 			std::unique_ptr<Statement> thenStmt,
 			std::unique_ptr<Statement> elseStmt = nullptr)
 			: condition(std::move(cond)),
@@ -159,10 +154,10 @@ namespace febcode {
 	};
 
 	struct WhileStmt : Statement {
-		std::unique_ptr<Expression> condition;
+		ExprPtr condition;
 		std::unique_ptr<Statement> body;
 
-		WhileStmt(std::unique_ptr<Expression> cond,
+		WhileStmt(ExprPtr cond,
 			std::unique_ptr<Statement> bodyStmt)
 			: condition(std::move(cond)),
 			body(std::move(bodyStmt)) {
@@ -215,6 +210,45 @@ namespace febcode {
 			return statements[index].get();
 		}
 	};
+
+	// use this to make a deep copy of an expression when constructing new expressions from existing ones
+	ExprPtr copy_expression(const Expression* expr);
+
+	// helper functions to create expressions more easily
+	inline ExprPtr Literal(const Value& v) { return std::make_unique<LiteralExpr>(v); }
+	inline ExprPtr Variable(const std::string& name) { return std::make_unique<VariableExpr>(name); }
+	inline ExprPtr Unary(UnaryOp op, const ExprPtr& arg) { return std::make_unique<UnaryExpr>(op, std::move(copy_expression(arg.get()))); }
+	inline ExprPtr Negate(const ExprPtr& arg) { return std::make_unique<UnaryExpr>(UnaryOp::Negate, std::move(copy_expression(arg.get()))); }
+	inline ExprPtr Binary(const ExprPtr& left, BinaryOp op, const ExprPtr& right) { return std::make_unique<BinaryExpr>(std::move(copy_expression(left.get())), op, std::move(copy_expression(right.get()))); }
+	inline ExprPtr Assign(const ExprPtr& target, const ExprPtr& value) { return std::make_unique<AssignExpr>(std::move(copy_expression(target.get())), std::move(copy_expression(value.get()))); }
+	inline ExprPtr Call(const ExprPtr& callee, const std::vector<ExprPtr>& args)
+	{
+		std::vector<ExprPtr> copyArgs;
+		for (auto& arg : args)
+		{
+			copyArgs.emplace_back(copy_expression(arg.get()));
+		}
+		return std::make_unique<CallExpr>(std::move(copy_expression(callee.get())), std::move(copyArgs));
+	}
+
+	inline ExprPtr Call(const std::string& fnc, const std::vector<ExprPtr>& args)
+	{
+		return Call(Variable(fnc), args);
+	}
+
+	inline ExprPtr Member(const ExprPtr& object, const std::string& property)
+	{ 
+		return std::make_unique<MemberExpr>(std::move(copy_expression(object.get())), property); 
+	}
+
+	inline ExprPtr Initializer(size_t n, Value v)
+	{
+		std::vector<ExprPtr> init(n);
+		for (int i = 0; i < n; ++i) init[i] = Literal(v);
+		return std::make_unique<InitializerExpr>(std::move(init));
+	}
+
+	ExprPtr Initializer(const std::vector<StructField>& fields);
 } // namespace febcode
 
 std::ostream& operator << (std::ostream& o, const febcode::Value& v);
@@ -223,3 +257,10 @@ std::string ValueToString(const febcode::Value& v);
 
 std::string ValueTypeToString(const febcode::Value& v);
 
+// Expression "algebra" for easier construction of new expressions from existing ones
+inline febcode::ExprPtr operator - (const febcode::ExprPtr& expr) { return Negate(expr); }
+inline febcode::ExprPtr operator + (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Plus, right); }
+inline febcode::ExprPtr operator - (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Minus, right); }
+inline febcode::ExprPtr operator * (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Multiply, right); }
+inline febcode::ExprPtr operator / (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Divide, right); }
+inline febcode::ExprPtr Pow(const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Exponent, right); }
