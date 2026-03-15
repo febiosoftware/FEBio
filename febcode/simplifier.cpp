@@ -89,6 +89,14 @@ ExprPtr febcode::simplify(const Expression* expr)
 			}
 		}
 
+		// if left and right are the same, we can simplify
+		if (febcode::isEqual(l, r))
+		{
+			if (binary->op == BinaryOp::Plus    ) return Binary(Literal(2.0), BinaryOp::Multiply, l);
+			if (binary->op == BinaryOp::Minus   ) return Literal(0.0);
+			if (binary->op == BinaryOp::Multiply) return Binary(l, BinaryOp::Exponent, Literal(2.0));
+		}
+
 		return Binary(l, binary->op, r);
 	}
 	if (auto unary = dynamic_cast<const UnaryExpr*>(expr))

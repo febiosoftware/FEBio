@@ -105,6 +105,61 @@ ExprPtr febcode::copy_expression(const Expression* expr)
 	}
 }
 
+bool febcode::isEqual(const ExprPtr& l, const ExprPtr& r)
+{
+	if (!l && !r) return true;
+	if (!l || !r) return false;
+
+	if (auto litL = dynamic_cast<LiteralExpr*>(l.get()))
+	{
+		if (auto litR = dynamic_cast<LiteralExpr*>(r.get()))
+		{
+			return litL->value == litR->value;
+		}
+	}
+	else if (auto varL = dynamic_cast<VariableExpr*>(l.get()))
+	{
+		if (auto varR = dynamic_cast<VariableExpr*>(r.get()))
+		{
+			return varL->name == varR->name;
+		}
+	}
+	else if (auto binL = dynamic_cast<BinaryExpr*>(l.get()))
+	{
+		if (auto binR = dynamic_cast<BinaryExpr*>(r.get()))
+		{
+			return binL->op == binR->op &&
+				isEqual(binL->left, binR->left) &&
+				isEqual(binL->right, binR->right);
+		}
+	}
+	else if (auto unL = dynamic_cast<UnaryExpr*>(l.get()))
+	{
+		if (auto unR = dynamic_cast<UnaryExpr*>(r.get()))
+		{
+			return unL->op == unR->op &&
+				isEqual(unL->right, unR->right);
+		}
+	}
+	else if (auto memberL = dynamic_cast<MemberExpr*>(l.get()))
+	{
+		if (auto memberR = dynamic_cast<MemberExpr*>(r.get()))
+		{
+			return isEqual(memberL->object, memberR->object) &&
+				memberL->property == memberR->property;
+		}
+	}
+	else if (auto indexL = dynamic_cast<IndexExpr*>(l.get()))
+	{
+		if (auto indexR = dynamic_cast<IndexExpr*>(r.get()))
+		{
+			return isEqual(indexL->object, indexR->object) &&
+				isEqual(indexL->index, indexR->index);
+		}
+	}
+
+	return false;
+}
 
 std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 {

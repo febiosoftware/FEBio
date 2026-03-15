@@ -253,6 +253,9 @@ namespace febcode {
 	}
 
 	ExprPtr Initializer(const std::vector<StructField>& fields);
+
+	bool isEqual(const ExprPtr& l, const ExprPtr& r);
+
 } // namespace febcode
 
 std::ostream& operator << (std::ostream& o, const febcode::Value& v);
@@ -268,3 +271,4 @@ inline febcode::ExprPtr operator - (const febcode::ExprPtr& left, const febcode:
 inline febcode::ExprPtr operator * (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Multiply, right); }
 inline febcode::ExprPtr operator / (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Divide, right); }
 inline febcode::ExprPtr Pow(const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Exponent, right); }
+
