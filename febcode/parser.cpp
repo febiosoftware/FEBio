@@ -125,6 +125,10 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 			initializer = parseExpression();
 		}
 
+		// make sure the name doesn't start with an underscore, which is reserved for internal use
+		if (!varName.empty() && varName[0] == '_')
+			throw std::runtime_error("Variable names cannot start with an underscore.");
+
 		vars.push_back({varName, arraySizes, std::move(initializer)});
 
 		if (!match(TokenType::Comma)) break;

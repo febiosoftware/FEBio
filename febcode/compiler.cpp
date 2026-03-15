@@ -15,7 +15,7 @@ void febcode::CompileSource(Program& prg, const std::string& source)
 	parser.parse(tokens);
 
 	// Optional safety check
-	if (prg.ast.empty())
+	if (prg.ast->empty())
 		throw std::runtime_error("Parser produced no statements.");
 
 	// 3. Compile -> bytecode
@@ -208,7 +208,7 @@ void Compiler::compile()
 {
 	prg.functions[0].entry = 0;
 
-	for (auto& stmt : prg.ast.statements)
+	for (auto& stmt : prg.ast->statements)
 		compileStatement(stmt.get());
 
 	// only add return if the last instruction isn't already a return (e.g. from a function)
@@ -375,10 +375,6 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 		{
 			compileInitializer(var.initializer.get(), type);
 		}
-
-		// make sure the name doesn't start with an underscore, which is reserved for internal use
-		if (!var.name.empty() && var.name[0] == '_')
-			throw std::runtime_error("Variable names cannot start with an underscore.");
 
 		if (m_scopeDepth == 0)
 		{

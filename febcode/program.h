@@ -59,7 +59,7 @@ namespace febcode {
 		BinaryOperatorInfo* findBinaryOperatorOverload(BinaryOp op, Type type_l, Type type_r);
 
 	public:
-		AST ast;
+		std::unique_ptr<AST> ast;
 		TypeRegistry types;
 
 		std::vector<uint8_t> code;

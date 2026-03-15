@@ -12,7 +12,7 @@ namespace febcode {
 		Parser(Program& program) : prg(program), current(0), m_ast(nullptr) {}
 
 		void parse(const std::vector<Token>& tokens) {
-			m_ast = &prg.ast;
+			m_ast = prg.ast.get();
 			this->tokens = tokens;
 			current = 0;
 			while (!isAtEnd()) {

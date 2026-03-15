@@ -3,6 +3,8 @@ using namespace febcode;
 
 Program::Program()
 {
+	ast = std::make_unique<AST>();
+
 	// Add "main" function (must be the first function, so it gets index 0)
 	functions.push_back(FunctionInfo{
 		"main",
