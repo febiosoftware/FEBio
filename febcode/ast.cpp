@@ -157,8 +157,25 @@ bool febcode::isEqual(const ExprPtr& l, const ExprPtr& r)
 				isEqual(indexL->index, indexR->index);
 		}
 	}
+	else if (auto callL = dynamic_cast<CallExpr*>(l.get()))
+	{
+		if (auto callR = dynamic_cast<CallExpr*>(r.get()))
+		{
+			return isEqual(callL->callee, callR->callee) && isEqual(callL->arguments, callR->arguments);
+		}
+	}
 
 	return false;
+}
+
+bool febcode::isEqual(const std::vector<ExprPtr>& l, const std::vector<ExprPtr>& r)
+{
+	if (l.size() != r.size()) return false;
+	for (int i = 0; i < l.size(); ++i)
+	{
+		if (!isEqual(l[i], r[i])) return false;
+	}
+	return true;
 }
 
 std::ostream& operator << (std::ostream& o, const febcode::Value& v)

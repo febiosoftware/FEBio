@@ -865,8 +865,6 @@ void febcode::ParseSource(Program& prg, const std::string& source)
 //---------------------------------------------------------------------
 // pretty print functions for debugging purposes
 
-static void prettyPrintExpression(std::ostream& os, const Expression& expr);
-
 static void prettyPrintLiteralExpr(std::ostream& os, const LiteralExpr& expr)
 {
 	os << ValueToString(expr.value);
@@ -893,12 +891,9 @@ static void prettyPrintAssignmentExpr(std::ostream& os, const AssignExpr& expr)
 static void prettyPrintUnaryExpr(std::ostream& os, const UnaryExpr& expr)
 {
 	os << expr.op;
-
-	bool isBinary = dynamic_cast<const BinaryExpr*>(expr.right.get()) != nullptr;
-
-	if (isBinary) os << "(";
+	os << "(";
 	prettyPrintExpression(os, *expr.right);
-	if (isBinary) os << ")";
+	os << ")";
 }
 
 static void prettyPrintBinaryExpr(std::ostream& os, const BinaryExpr& expr)
@@ -948,7 +943,7 @@ static void prettyPrintIndexExpr(std::ostream& os, const IndexExpr& expr)
 	os << "]";
 }
 
-static void prettyPrintExpression(std::ostream& os, const Expression& expr)
+void febcode::prettyPrintExpression(std::ostream& os, const Expression& expr)
 {
 	if      (auto l = dynamic_cast<const LiteralExpr*      >(&expr)) prettyPrintLiteralExpr      (os, *l);
 	else if (auto v = dynamic_cast<const VariableExpr*     >(&expr)) prettyPrintVariableExpr     (os, *v);

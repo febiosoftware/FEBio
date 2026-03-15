@@ -22,9 +22,23 @@ namespace febcode {
 	struct Expression;
 	struct Statement;
 
+	enum class ExpressionType {
+		Literal,
+		Variable,
+		Binary,
+		Unary,
+		Call,
+		Member,
+		Initializer,
+		Index,
+		Assignment
+	};
+
 	// Base classes
 	struct Expression {
+		Expression(ExpressionType type) : exprType(type) {}
 		virtual ~Expression() = default;
+		ExpressionType exprType;
 	};
 
 	struct Statement {
@@ -37,12 +51,12 @@ namespace febcode {
 
 	struct LiteralExpr : Expression {
 		Value value;
-		LiteralExpr(const Value& v) : value(v) {}
+		LiteralExpr(const Value& v) : Expression(ExpressionType::Literal), value(v) {}
 	};
 
 	struct VariableExpr : Expression {
 		std::string name;
-		VariableExpr(const std::string& n) : name(n) {}
+		VariableExpr(const std::string& n) : Expression(ExpressionType::Variable), name(n) {}
 	};
 
 	class AssignExpr : public Expression
@@ -53,7 +67,7 @@ namespace febcode {
 
 	public:
 		AssignExpr(ExprPtr target, ExprPtr value)
-			: target(std::move(target)), value(std::move(value)) {
+			: Expression(ExpressionType::Assignment), target(std::move(target)), value(std::move(value)) {
 		}
 	};
 
@@ -63,7 +77,7 @@ namespace febcode {
 		ExprPtr right;
 
 		BinaryExpr(ExprPtr l, BinaryOp o, ExprPtr r)
-			: left(std::move(l)), op(o), right(std::move(r)) {
+			: Expression(ExpressionType::Binary), left(std::move(l)), op(o), right(std::move(r)) {
 		}
 	};
 
@@ -72,7 +86,7 @@ namespace febcode {
 		ExprPtr right;
 
 		UnaryExpr(UnaryOp o, ExprPtr r)
-			: op(o), right(std::move(r)) {}
+			: Expression(ExpressionType::Unary), op(o), right(std::move(r)) {}
 	};
 
 	struct CallExpr : Expression {
@@ -80,7 +94,7 @@ namespace febcode {
 		std::vector<ExprPtr> arguments;
 
 		CallExpr(ExprPtr callee, std::vector<ExprPtr> arguments)
-			: callee(std::move(callee)),
+			: Expression(ExpressionType::Call), callee(std::move(callee)),
 			arguments(std::move(arguments)) {}
 	};
 
@@ -90,20 +104,20 @@ namespace febcode {
 		std::string property;
 
 		MemberExpr(ExprPtr object, std::string property)
-			: object(std::move(object)), property(std::move(property)) {}
+			: Expression(ExpressionType::Member), object(std::move(object)), property(std::move(property)) {}
 	};
 
 	struct InitializerExpr : Expression {
 		std::vector<ExprPtr> elements;
 		InitializerExpr(std::vector<ExprPtr> elements)
-			: elements(std::move(elements)) {}
+			: Expression(ExpressionType::Initializer), elements(std::move(elements)) {}
 	};
 
 	struct IndexExpr : Expression {
 		ExprPtr object;
 		ExprPtr index;
 		IndexExpr(ExprPtr object, ExprPtr index)
-			: object(std::move(object)), index(std::move(index)) {}
+			: Expression(ExpressionType::Index), object(std::move(object)), index(std::move(index)) {}
 	};
 
 	// --- Statements ---
@@ -218,6 +232,22 @@ namespace febcode {
 	// use this to make a deep copy of an expression when constructing new expressions from existing ones
 	ExprPtr copy_expression(const Expression* expr);
 
+	// expression checks
+	inline bool isLiteral    (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Literal    ); }
+	inline bool isVariable   (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Variable   ); }
+	inline bool isBinary     (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Binary     ); }
+	inline bool isUnary      (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Unary      ); }
+	inline bool isCall       (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Call       ); }
+	inline bool isMember     (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Member     ); }
+	inline bool isInitializer(const ExprPtr& expr) { return (expr->exprType == ExpressionType::Initializer); }
+	inline bool isIndex      (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Index      ); }
+
+	inline bool isNegation   (const ExprPtr& expr) {
+		if (expr->exprType != ExpressionType::Unary) return false;
+		auto unary = dynamic_cast<UnaryExpr*>(expr.get());
+		return (unary->op == UnaryOp::Negate);
+	}
+
 	// helper functions to create expressions more easily
 	inline ExprPtr Literal(const Value& v) { return std::make_unique<LiteralExpr>(v); }
 	inline ExprPtr Variable(const std::string& name) { return std::make_unique<VariableExpr>(name); }
@@ -255,6 +285,7 @@ namespace febcode {
 	ExprPtr Initializer(const std::vector<StructField>& fields);
 
 	bool isEqual(const ExprPtr& l, const ExprPtr& r);
+	bool isEqual(const std::vector<ExprPtr>& l, const std::vector<ExprPtr>& r);
 
 } // namespace febcode
 

@@ -131,6 +131,7 @@ namespace febcode {
 
 	void prettyPrintAST(const AST& ast);
 	void prettyPrintAST(std::ostream& os, const AST& ast);
+	void prettyPrintExpression(std::ostream& os, const Expression& expr);
 
 	void ParseSource(Program& prg, const std::string& source);
 
