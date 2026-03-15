@@ -125,7 +125,7 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 			initializer = parseExpression();
 		}
 
-		vars.push_back({varType, varName, std::move(initializer)});
+		vars.push_back({varName, arraySizes, std::move(initializer)});
 
 		if (!match(TokenType::Comma)) break;
 
@@ -139,7 +139,7 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 		throw std::runtime_error("Expected ';' after variable declaration.");
 	}
 
-	return std::make_unique<VarDeclStmt>(vars);
+	return std::make_unique<VarDeclStmt>(type, vars);
 }
 
 std::unique_ptr<Statement> Parser::parseStructDeclaration() {
@@ -721,9 +721,21 @@ static std::ostream& operator << (std::ostream& o, TypeKind type)
 static void printVarDeclStmt(const VarDeclStmt* s)
 {
 	std::cout << "VarDeclStmt: {\n"; l++;
+	printTabs(); std::cout << "type: " << TypeToString(s->type) << ",\n";
 	printTabs(); std::cout << "vars: [\n"; l++;
 	for (const auto& var : s->vars) {
-		printTabs(); std::cout << "{ type: " << TypeToString(var.type) << ", name: " << var.name << ", initializer: ";
+		printTabs(); std::cout << "{ name: " << var.name;
+		if (!var.arraySizes.empty())
+		{
+			std::cout << ", size: [";
+			for (size_t i = 0; i < var.arraySizes.size(); ++i)
+			{
+				std::cout << var.arraySizes[i];
+				if (i != var.arraySizes.size() - 1) std::cout << "][";
+			}
+			std::cout << "]";
+		}
+		std::cout << ", initializer: ";
 		printExpr(var.initializer.get());
 		std::cout << " },\n";
 	}
@@ -956,15 +968,26 @@ static void prettyPrintStatement(std::ostream& os, const Statement& stmt);
 static void prettyPrintExpressionStmt(std::ostream& os, const ExpressionStmt& stmt)
 {
 	prettyPrintExpression(os, *stmt.expr);
+	os << ";";
 }
 
 static void prettyPrintVarDeclStmt(std::ostream& os, const VarDeclStmt& stmt)
 {
 	size_t n = stmt.vars.size();
+	os << TypeToString(stmt.type) << " ";
 	for (size_t i = 0; i < n; ++i)
 	{
 		const auto& var = stmt.vars[i];
-		os << TypeToString(var.type) << " " << var.name;
+		os << var.name;
+		if (!var.arraySizes.empty())
+		{
+			for (size_t j = 0; j < var.arraySizes.size(); ++j)
+			{
+				os << "[";
+				os << var.arraySizes[j];
+				os << "]";
+			}
+		}
 		if (var.initializer)
 		{
 			os << " = ";
@@ -972,6 +995,7 @@ static void prettyPrintVarDeclStmt(std::ostream& os, const VarDeclStmt& stmt)
 		}
 		if (i != n - 1) os << ", ";
 	}
+	os << ";";
 }
 
 static void prettyPrintReturnStmt(std::ostream& os, const ReturnStmt& stmt)
@@ -1042,7 +1066,7 @@ static void prettyPrintStructStmt(std::ostream& os, const StructStmt& stmt)
 	{
 		os << "    " << TypeToString(field.first) << " " << field.second << ";\n";
 	}
-	os << "};\n\n";
+	os << "};";
 }
 
 static void prettyPrintStatement(std::ostream& os, const febcode::Statement& stmt)
@@ -1068,7 +1092,7 @@ void febcode::prettyPrintAST(std::ostream& os, const AST& ast)
 	{
 		auto& stmt = ast.statements[i];
 		prettyPrintStatement(os, *stmt);
-		if (i != n - 1) os << ",\n";
+		if (i != n - 1) os << "\n";
 	}
 }
 

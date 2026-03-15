@@ -344,6 +344,7 @@ namespace febcode
 		Type getStringType() const;
 		Type getArrayType(Type element, size_t size);
 		Type getArrayType(Type element, size_t size) const;
+		Type getArrayType(Type element, const std::vector<size_t>& size) const;
 
 		Type getBuiltinType(const Value& v) const;
 

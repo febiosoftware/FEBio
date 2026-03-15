@@ -362,11 +362,18 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 
 void Compiler::compileVarDecl(VarDeclStmt* decl)
 {
+	Type baseType = decl->type;
 	for (auto& var : decl->vars)
 	{
+		Type type = baseType;
+		if (var.arraySizes.size() > 0)
+		{
+			type = prg.types.getArrayType(baseType, var.arraySizes);
+		}
+
 		if (var.initializer)
 		{
-			compileInitializer(var.initializer.get(), var.type);
+			compileInitializer(var.initializer.get(), type);
 		}
 
 		// make sure the name doesn't start with an underscore, which is reserved for internal use
@@ -375,7 +382,7 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 
 		if (m_scopeDepth == 0)
 		{
-			int slot = prg.addGlobal(var.name, var.type);
+			int slot = prg.addGlobal(var.name, type);
 
 			if (var.initializer)
 			{
@@ -398,7 +405,7 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					throw std::runtime_error("Variable '" + var.name + "' is already declared in this scope.");
 			}
 
-			m_locals.push_back({ var.name, var.type, m_scopeDepth, slot });
+			m_locals.push_back({ var.name, type, m_scopeDepth, slot });
 
 			if (var.initializer)
 			{

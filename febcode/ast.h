@@ -114,20 +114,20 @@ namespace febcode {
 	};
 
 	struct Var {
-		Type type = nullptr;
 		std::string name;
+		std::vector<size_t> arraySizes; // empty if not an array
 		ExprPtr initializer; // can be null
 	};
 
 	struct VarDeclStmt : Statement {
+		Type type = nullptr;
 		std::vector<Var> vars;
-		VarDeclStmt(Type type, const std::string& name, ExprPtr initializer)
+		VarDeclStmt(Type type, const std::string& name, ExprPtr initializer) : type(type)
 		{
-			vars.push_back({ type, name, std::move(initializer) });
+			vars.push_back({ name, std::vector<size_t>(), std::move(initializer)});
 		}
-		VarDeclStmt(std::vector<Var>& vars)
-			: vars(std::move(vars)) {
-		}
+		VarDeclStmt(Type type, std::vector<Var>& vars)
+			: type(type), vars(std::move(vars)) {}
 	};
 
 	struct ReturnStmt : Statement {
@@ -208,6 +208,10 @@ namespace febcode {
 				return nullptr;
 			}
 			return statements[index].get();
+		}
+
+		void addStatement(std::unique_ptr<Statement> stmt) {
+			statements.push_back(std::move(stmt));
 		}
 	};
 

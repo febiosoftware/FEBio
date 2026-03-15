@@ -89,6 +89,16 @@ Type TypeRegistry::getArrayType(Type element, size_t size)
 	return m_arrayTypes.back().get();
 }
 
+Type TypeRegistry::getArrayType(Type element, const std::vector<size_t>& sizes) const
+{
+	Type type = element;
+	for (auto it = sizes.rbegin(); it != sizes.rend(); ++it)
+	{
+		type = getArrayType(type, *it);
+	}
+	return type;
+}
+
 Type TypeRegistry::getArrayType(Type element, size_t size) const
 {
 	if (size == 0)

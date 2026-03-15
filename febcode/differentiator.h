@@ -3,12 +3,23 @@
 #include <unordered_map>
 #include <string>
 #include "ast.h"
+#include "program.h"
 
 namespace febcode {
 	class Differentiator {
 	public:
+		Differentiator(Program& prg) : prg(prg) {}
+
 		// differentiate an AST to produce a new AST representing the derivative
 		std::unique_ptr<AST> differentiate(const AST& ast, const std::string& var);
+
+	private:
+		void differentiateStmt(AST& ast, Statement* stmt, const std::string& var);
+
+		void diffExpressionStmt(AST& ast, ExpressionStmt* stmt, const std::string& var);
+		void diffReturnStmt    (AST& ast, ReturnStmt*     stmt, const std::string& var);
+		void diffStructStmt    (AST& ast, StructStmt*     stmt, const std::string& var);
+		void diffVarDeclStmt   (AST& ast, VarDeclStmt*    stmt, const std::string& var);
 
 	private:
 		// Differentiate an expression with respect to a variable
@@ -25,5 +36,6 @@ namespace febcode {
 
 	private:
 		std::unordered_map<std::string, std::string> deriveVars; // map of derivative variables
+		Program& prg;
 	};
 } // namespace febcode
