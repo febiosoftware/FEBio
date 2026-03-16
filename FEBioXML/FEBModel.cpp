@@ -543,7 +543,16 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 
 			seg.ntype = edge.ntype;
 			int nn = edge.ntype;	// we assume that the type also identifies the number of nodes
-			for (int n = 0; n < nn; ++n) seg.node[n] = NLT[edge.node[n] - noff];
+			for (int n = 0; n < nn; ++n)
+			{
+				int nid = edge.node[n] - noff;
+				if (nid < 0 || nid >= NLT.size() || NLT[nid] < 0)
+				{
+					feLogErrorEx(&fem, "Invalid node index %d in edge set %s", edge.node[n], edgeSet->Name().c_str());
+					return false;
+				}
+				seg.node[n] = NLT[nid];
+			}
 		}
 
 		// add it to the mesh
