@@ -39,6 +39,15 @@ public:
 	
 	bool Init() override;
 
+	int AddGlobal(const std::string& name);
+
+	void SetGlobal(int slot, double val);
+
+	std::string GetScriptName() const { return m_scriptName; }
+	void SetScriptName(const std::string& name) { m_scriptName = name; }
+
+	void CompileDerivative(const std::string& varName);
+
 public:
 	double operator()(const FEMaterialPoint& pt) override;
 	FEScalarValuator* copy() override;

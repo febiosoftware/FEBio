@@ -67,6 +67,22 @@ Type TypeRegistry::getVec2Type() const { return &m_vec2; }
 Type TypeRegistry::getVec3Type() const { return &m_vec3; }
 Type TypeRegistry::getStringType() const { return &m_string; }
 
+Type TypeRegistry::getTypeFromKind(TypeKind kind) const
+{
+	switch (kind)
+	{
+	case TypeKind::Void: return getVoidType();
+	case TypeKind::Bool: return getBoolType();
+	case TypeKind::Int: return getIntType();
+	case TypeKind::Double: return getDoubleType();
+	case TypeKind::Vec2: return getVec2Type();
+	case TypeKind::Vec3: return getVec3Type();
+	case TypeKind::String: return getStringType();
+	default:
+		return nullptr;
+	}
+}
+
 Type TypeRegistry::getArrayType(Type element, size_t size)
 {
 	if (size == 0)

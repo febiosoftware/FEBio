@@ -30,20 +30,69 @@ SOFTWARE.*/
 #include <febcode/module_vec2.h>
 #include <febcode/module_math.h>
 #include <febcode/compiler.h>
+#include <febcode/differentiator.h>
 #include <FECore/FEMaterialPoint.h>
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
 #include <FECore/FESurfaceLoad.h>
 #include <febcode/types.h>
+#include <iostream>
+#include <sstream>
 
 class FECodeValuator::Imp {
 public:
+	struct Global {
+		int slot = -1;
+		std::string name;
+		febcode::Value val;
+	};
+
 	std::string scriptCode;
 
 	febcode::Program program;
-	int globals[3]; // for _pos0, _time, _norm0
+	std::vector<Global> globals;
+
+	bool compileDeriv = false;
+	std::string derivVarName;
 
 	FESurface* surf = nullptr; // for surface valuators
+
+	int AddGlobal(const std::string& name, febcode::TypeKind typeKind)
+	{
+		// make sure the name is not defined yet
+		for (auto& g : globals)
+		{
+			if (g.name == name)
+			{
+				return -1;
+			}
+		}
+
+		// figure out the initializer value based on the type
+		febcode::Value initVal;
+		switch (typeKind)
+		{
+		case febcode::TypeKind::Bool  : initVal = (bool)false; break;
+		case febcode::TypeKind::Int   : initVal = (int)0; break;
+		case febcode::TypeKind::Double: initVal = 0.0; break;
+		case febcode::TypeKind::Vec2  : initVal = febcode::vec2(0., 0.); break;
+		case febcode::TypeKind::Vec3  : initVal = febcode::vec3(0., 0., 0.); break;
+		default:
+			return -1;
+		};
+
+		febcode::Type type = program.types.getTypeFromKind(typeKind);
+		if (type == nullptr)
+		{
+			return -1;
+		}
+
+		// add the new global
+		Global g({ -1, name, initVal });
+		g.slot = program.addGlobal(g.name, type, initVal, true);
+		globals.push_back(g);
+		return (int)globals.size() - 1;
+	}
 };
 
 BEGIN_FECORE_CLASS(FECodeValuator, FEScalarValuator)
@@ -52,11 +101,27 @@ END_FECORE_CLASS()
 
 FECodeValuator::FECodeValuator(FEModel* fem) : FEScalarValuator(fem), m(*new Imp())
 {
+	febcode::Vec2Module vec2Module;
+	vec2Module.Register(m.program);
+	febcode::Vec3Module vec3Module;
+	vec3Module.Register(m.program);
+	febcode::MathModule mathModule;
+	mathModule.Register(m.program);
+
+	m.AddGlobal("_pos0", febcode::TypeKind::Vec3);
+	m.AddGlobal("_time", febcode::TypeKind::Double);
+	m.AddGlobal("_norm0", febcode::TypeKind::Vec3);
 }
 
 FECodeValuator::~FECodeValuator()
 {
 
+}
+
+void FECodeValuator::CompileDerivative(const std::string& varName)
+{
+	m.compileDeriv = true;
+	m.derivVarName = varName;
 }
 
 bool FECodeValuator::CompileScript()
@@ -65,14 +130,6 @@ bool FECodeValuator::CompileScript()
 
 	FECoreBase* parent = GetParent();
 	try {
-
-		febcode::Vec2Module vec2Module;
-		vec2Module.Register(m.program);
-		febcode::Vec3Module vec3Module;
-		vec3Module.Register(m.program);
-		febcode::MathModule mathModule;
-		mathModule.Register(m.program);
-
 		febcode::Type vec3_t = m.program.types.getVec3Type();
 		if (!vec3_t) {
 			feLogError("Error compiling code: 'vec3' type not defined");
@@ -81,25 +138,32 @@ bool FECodeValuator::CompileScript()
 
 		febcode::ParseSource(m.program, m.scriptCode);
 
-		febcode::Compiler compiler(m.program);
-
-
-		m.globals[0] = m.program.addGlobal("_pos0", vec3_t, febcode::vec3(0., 0., 0.), true);
-		m.globals[1] = m.program.addGlobal("_time", 0.0);
-		m.globals[2] = -1;
-
-		if (auto s = dynamic_cast<FESurfaceLoad*>(parent))
+		if (m.compileDeriv)
 		{
-			m.globals[2] = m.program.addGlobal("_norm0", vec3_t, febcode::vec3(0., 0., 0.), true);
-			m.surf = &s->GetSurface();
+			febcode::Differentiator diff(m.program);
+			auto diffAST = diff.differentiate(*m.program.ast, m.derivVarName);
+			m.program.ast = std::move(diffAST);
+
+#ifndef NDEBUG
+			feLog("Derivative AST w.r.t %s :\n>>>\n", m.derivVarName.c_str());
+			std::stringstream ss;
+			febcode::prettyPrintAST(ss, *m.program.ast);
+			feLog("%s\n<<<\n\n", ss.str().c_str());
+#endif
 		}
+
+		febcode::Compiler compiler(m.program);
 
 		compiler.compile();
 
 		// see if the globals were actually used
-		if (m.program.globals["_pos0"].refcount == 0) m.globals[0] = -1;
-		if (m.program.globals["_time"].refcount == 0) m.globals[1] = -1;
-		if ((m.globals[2] >= 0) && (m.program.globals["_norm0"].refcount == 0)) m.globals[2] = -1;
+		for (auto& g : m.globals)
+		{
+			if (m.program.globals[g.name].refcount == 0)
+			{
+				g.slot = -1; // mark as unused
+			}
+		}
 	}
 	catch (const std::exception& e)
 	{
@@ -115,6 +179,19 @@ bool FECodeValuator::CompileScript()
 	return true;
 }
 
+int FECodeValuator::AddGlobal(const std::string& name)
+{
+	return m.AddGlobal(name, febcode::TypeKind::Double);
+}
+
+void FECodeValuator::SetGlobal(int slot, double val)
+{
+	assert(m.globals[slot].val.index == febcode::ValueIndex::DOUBLE);
+	if ((slot >= 0) && (slot < m.globals.size()))
+		m.globals[slot].val = val;
+	else
+		assert(false);
+}
 
 bool FECodeValuator::Init()
 {
@@ -137,16 +214,21 @@ bool FECodeValuator::Init()
 double FECodeValuator::operator()(const FEMaterialPoint& pt)
 {
 	febcode::VM vm(m.program);
-	if (m.globals[0] >= 0) vm.setGlobal(m.globals[0], febcode::vec3(pt.m_r0.x, pt.m_r0.y, pt.m_r0.z));
-	if (m.globals[1] >= 0) vm.setGlobal(m.globals[1], GetFEModel()->GetTime().currentTime);
-	if (m.surf && (m.globals[2] >= 0))
+	if (m.globals[0].slot >= 0) m.globals[0].val = febcode::vec3(pt.m_r0.x, pt.m_r0.y, pt.m_r0.z);
+	if (m.globals[1].slot >= 0) m.globals[1].val = GetFEModel()->GetTime().currentTime;
+	if (m.surf && (m.globals[2].slot >= 0))
 	{
 		FESurfaceElement* el = dynamic_cast<FESurfaceElement*>(pt.m_elem);
 		if (el)
 		{
 			vec3d n = m.surf->SurfaceNormal(*el, pt.m_index);
-			vm.setGlobal(m.globals[2], febcode::vec3(n.x, n.y, n.z));
+			m.globals[2].val = febcode::vec3(n.x, n.y, n.z);
 		}
+	}
+	for (int i = 0; i < m.globals.size(); ++i)
+	{
+		if (m.globals[i].slot >= 0)
+			vm.setGlobal(m.globals[i].slot, m.globals[i].val);
 	}
 	febcode::Value v = vm.run();
 	return febcode::getDouble(v);
@@ -195,8 +277,8 @@ bool ValidateScript(const std::string& script, std::string& err)
 		febcode::Compiler compiler(program);
 
 		int globals[3] = { -1, -1, -1 };
-		globals[0] = program.addGlobal("_pos0", vec3, febcode::vec3( 0., 0., 0. ));
-		globals[1] = program.addGlobal("_time", 0.0);
+		globals[0] = program.addGlobal("_pos0" , vec3, febcode::vec3( 0., 0., 0. ));
+		globals[1] = program.addGlobal("_time" , 0.0);
 		globals[2] = program.addGlobal("_norm0", vec3, febcode::vec3(0., 0., 0.));
 
 		compiler.compile();
