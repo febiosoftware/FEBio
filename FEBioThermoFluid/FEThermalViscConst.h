@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,34 +23,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
-#include "FEThermoFluid.h"
-#include <FECore/log.h>
+
+
+
+#pragma once
+#include "FEThermalViscosity.h"
 
 //-----------------------------------------------------------------------------
-//! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
-{
-    m_Tr = 0;
-}
+// This class implements a poroelastic material that has a constant permeability
 
-//-----------------------------------------------------------------------------
-//! initialization
-bool FEThermoViscousFluid::Init()
+class FEBIOTHERMOFLUID_API FEThermalViscConst :	public FEThermalViscosity
 {
-    m_Tr = GetGlobalConstant("T");
+public:
+	//! constructor
+    FEThermalViscConst(FEModel* pfem);
+		
+    //! viscosity
+    double NormalizedViscosity(FEMaterialPoint& pt) { return 1.; };
     
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
-    
-    return FEViscousFluid::Init();
-}
+    //! tangent of normalized viscosity with respect to temperature
+    double Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp) { return 0; }
 
-//-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
-{
-    FEViscousFluid::Serialize(ar);
-    
-    if (ar.IsShallow()) return;
-    
-    ar & m_Tr;
-}
+    //! tangent of normalized viscosity with respect to volumetric strain (or J)
+    double Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp) { return 0; }
+};

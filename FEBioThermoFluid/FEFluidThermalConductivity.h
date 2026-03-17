@@ -39,13 +39,13 @@ public:
     
 public:
     //! calculate thermal conductivity at material point
-    virtual double ThermalConductivity(FEMaterialPoint& pt) = 0;
+    virtual double NormalizedConductivity(FEMaterialPoint& pt) = 0;
     
-    //! tangent of thermal conductivity with respect to strain J
-    virtual double Tangent_Strain(FEMaterialPoint& mp) = 0;
+    //! tangent of normalized thermal conductivity with respect to strain J
+    virtual double Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp) = 0;
     
     //! tangent of thermal conductivity with respect to temperature T
-    virtual double Tangent_Temperature(FEMaterialPoint& mp) = 0;
+    virtual double Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp) = 0;
 
     FECORE_BASE_CLASS(FEFluidThermalConductivity)
 };

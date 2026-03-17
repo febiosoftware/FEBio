@@ -27,13 +27,12 @@
 #include "FEThermoFluid.h"
 #include "FERealVapor.h"
 #include "FEThermoFluidMaterialPoint.h"
+#include <FEBioFluid/FEFluidMaterialPoint.h>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEConductivityRealVapor, FEFluidThermalConductivity)
 
-    // parameters
-    ADD_PARAMETER(m_Kr, "Kr")->setLongName("referential thermal conductivity")->setUnits(UNIT_THERMAL_CONDUCTIVITY);
     // properties
     ADD_PROPERTY(m_esat , "esat", FEProperty::Optional)->SetLongName("saturation dilatation");
     ADD_PROPERTY(m_Ksat , "Ksat", FEProperty::Optional)->SetLongName("normalized saturation thermal conductivity");
@@ -50,7 +49,6 @@ FEConductivityRealVapor::FEConductivityRealVapor(FEModel* pfem) : FEFluidThermal
     m_Ksat = nullptr;
     m_esat = nullptr;
     for (int k=0; k<MAX_NVC; ++k) m_C[k] = nullptr;
-    m_Kr = 0;
     m_Tr = 0;
 }
 
@@ -97,7 +95,7 @@ void FEConductivityRealVapor::Serialize(DumpStream& ar)
     
     if (ar.IsShallow()) return;
     
-    ar & m_Kr & m_Tr & m_nvc;
+    ar & m_Tr & m_nvc;
     ar & m_Ksat;
     for (int i=0; i<MAX_NVC; ++i)
         ar & m_C[i];
@@ -111,9 +109,9 @@ void FEConductivityRealVapor::Serialize(DumpStream& ar)
 
 //-----------------------------------------------------------------------------
 //! calculate thermal conductivity at material point
-double FEConductivityRealVapor::ThermalConductivity(FEMaterialPoint& mp)
+double FEConductivityRealVapor::NormalizedConductivity(FEMaterialPoint& mp)
 {
-    double K = 1.0;
+    double Khat = 1.0;
     if (m_Ksat) {
         FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
         FEFluidMaterialPoint& pf = *mp.ExtractData<FEFluidMaterialPoint>();
@@ -122,17 +120,17 @@ double FEConductivityRealVapor::ThermalConductivity(FEMaterialPoint& mp)
         double J = 1 + pf.m_ef;
         double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
         double q = log(1+pow(y,m_alpha));
-        K = m_Ksat->value(q);
+        Khat = m_Ksat->value(q);
         double Jsat = exp(m_esat->value(q));
         double x = 1 - Jsat/J;
-        for (int k=0; k<m_nvc; ++k) K += m_C[k]->value(q)*pow(x,k+1);
+        for (int k=0; k<m_nvc; ++k) Khat += m_C[k]->value(q)*pow(x,k+1);
     }
-    return K*m_Kr;
+    return Khat;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of thermal conductivity with respect to strain J
-double FEConductivityRealVapor::Tangent_Strain(FEMaterialPoint& mp)
+double FEConductivityRealVapor::Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp)
 {
     double d = 1e-6;
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
@@ -143,17 +141,17 @@ double FEConductivityRealVapor::Tangent_Strain(FEMaterialPoint& mp)
     fp->m_ef = pf.m_ef+d;
     ft->m_T = tf.m_T;
     FEMaterialPoint tmp(ft);
-    double Kp = ThermalConductivity(tmp);
+    double Kphat = NormalizedConductivity(tmp);
     fp->m_ef = pf.m_ef-d;
-    double Km = ThermalConductivity(tmp);
+    double Kmhat = NormalizedConductivity(tmp);
     delete ft;
-    double dKJ = (Kp - Km)/(2*d);
-    return dKJ;
+    double dKhatJ = (Kphat - Kmhat)/(2*d);
+    return dKhatJ;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of thermal conductivity with respect to temperature T
-double FEConductivityRealVapor::Tangent_Temperature(FEMaterialPoint& mp)
+double FEConductivityRealVapor::Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp)
 {
     double Tr = GetGlobalConstant("T");
     double d = 1e-6*Tr;
@@ -165,11 +163,11 @@ double FEConductivityRealVapor::Tangent_Temperature(FEMaterialPoint& mp)
     fp->m_ef = pf.m_ef;
     ft->m_T = tf.m_T+d;
     FEMaterialPoint tmp(ft);
-    double Kp = ThermalConductivity(tmp);
+    double Kphat = NormalizedConductivity(tmp);
     ft->m_T = tf.m_T-d;
-    double Km = ThermalConductivity(tmp);
+    double Kmhat = NormalizedConductivity(tmp);
     delete ft;
-    double dKT = (Kp - Km)/(2*d);
-    return dKT;
+    double dKhatT = (Kphat - Kmhat)/(2*d);
+    return dKhatT;
 }
 

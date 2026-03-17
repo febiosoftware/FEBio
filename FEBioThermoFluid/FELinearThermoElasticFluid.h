@@ -3,7 +3,7 @@
  
  See Copyright-FEBio.txt for details.
  
- Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+ Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
  the City of New York, and others.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,41 +27,33 @@
 
 
 #pragma once
-#include "FEFluidThermalConductivity.h"
+#include "FEThermoElasticFluid.h"
 #include <FECore/FEFunction1D.h>
-#include "febiothermofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! Base class for fluid thermal conductivity materials.
-
-class FEBIOTHERMOFLUID_API FETempDependentConductivity : public FEFluidThermalConductivity
+//! Linear elastic fluid
+//!
+class FEBIOTHERMOFLUID_API FELinearThermoElasticFluid : public FEThermoElasticFluid
 {
 public:
-    FETempDependentConductivity(FEModel* pfem);
-    virtual ~FETempDependentConductivity() {}
+    FELinearThermoElasticFluid(FEModel* pfem);
+    ~FELinearThermoElasticFluid() {}
     
-public:
     //! initialization
     bool Init() override;
-    
-    //! serialization
-    void Serialize(DumpStream& ar) override;
-    
-public:
-    //! calculate thermal conductivity at material point
-    double NormalizedConductivity(FEMaterialPoint& pt) override;
-    
-    //! tangent of thermal conductivity with respect to temperature T
-    double Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp) override;
 
-    //! tangent of normalized thermal conductivity with respect to strain J
-    double Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp) override;
+    //! gauge pressure
+    double Pressure(FEMaterialPoint& pt) override;
     
-public:
-    FEFunction1D*   m_Khat; //!< normalized thermal conductivity
-    double          m_Tr;   //!< reference temperature
-
-    // declare parameter list
-    DECLARE_FECORE_CLASS();
+    //! tangent of pressure with respect to strain J
+    double Tangent_Strain(FEMaterialPoint& mp) override;
     
+    //! 2nd tangent of pressure with respect to strain J
+    double Tangent_Strain_Strain(FEMaterialPoint& mp) override;
+    
+    //! specific free energy
+    double SpecificFreeEnergy(FEMaterialPoint& mp) override;
+    
+    //! dilatation from temperature and pressure
+    bool Dilatation(const double T, const double p, double& e) override;
 };

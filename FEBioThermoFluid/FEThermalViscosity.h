@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,34 +23,31 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
-#include "FEThermoFluid.h"
-#include <FECore/log.h>
+
+
+
+#pragma once
+#include <FECore/FEMaterial.h>
+#include "febiothermofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
+//! Base class for thermofluid viscosity
+//! These materials need to define the normalized viscosity and its tangent functions (w.r.t. T and J).
+//!
+class FEBIOTHERMOFLUID_API FEThermalViscosity : public FEMaterialProperty
 {
-    m_Tr = 0;
-}
+public:
+    FEThermalViscosity(FEModel* pfem) : FEMaterialProperty(pfem) {}
+	virtual ~FEThermalViscosity(){}
+    
+	//! viscosity
+	virtual double NormalizedViscosity(FEMaterialPoint& pt) = 0;
+    
+	//! tangent of normalized viscosity with respect to temperature
+	virtual double Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp) = 0;
 
-//-----------------------------------------------------------------------------
-//! initialization
-bool FEThermoViscousFluid::Init()
-{
-    m_Tr = GetGlobalConstant("T");
+    //! tangent of normalized viscosity with respect to volumetric strain (or J)
+    virtual double Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp) = 0;
     
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
-    
-    return FEViscousFluid::Init();
-}
-
-//-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
-{
-    FEViscousFluid::Serialize(ar);
-    
-    if (ar.IsShallow()) return;
-    
-    ar & m_Tr;
-}
+	FECORE_BASE_CLASS(FEThermalViscosity);
+};

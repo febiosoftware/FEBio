@@ -24,35 +24,47 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FENewtonianThermoFluid.h"
+#include "FEThermoFluid.h"
+#include "FEThermalViscConst.h"
 #include <FEBioFluid/FEFluid.h>
 #include <FEBioFluid/FEBiphasicFSI.h>
-#include "FEThermoFluid.h"
 #include <FECore/log.h>
+#include <FECore/FEModel.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianThermoFluid, FEThermoViscousFluid)
-// properties
-    ADD_PROPERTY(m_prop[0], "khat" ,FEProperty::Optional)->SetLongName("normalized bulk viscosity");
-    ADD_PROPERTY(m_prop[1], "muhat",FEProperty::Optional)->SetLongName("normalized shear viscosity");
+    ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits(UNIT_VISCOSITY)->setLongName("referential bulk viscosity");
+    ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("referential shear viscosity");
+
+// Optionally add strain-dependent normalized viscosity relations
+    ADD_PROPERTY(m_kappahat, "kappahat", FEProperty::Optional)->SetLongName("normal. bulk viscosity");
+    ADD_PROPERTY(m_muhat, "muhat", FEProperty::Optional)->SetLongName("normal. bulk viscosity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
 FENewtonianThermoFluid::FENewtonianThermoFluid(FEModel* pfem) : FEThermoViscousFluid(pfem)
 {
+    m_kappahat = nullptr;
+    m_muhat = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! initialization
 bool FENewtonianThermoFluid::Init()
 {
-    if (m_prop[0]) m_prop[0]->Init();
-    if (m_prop[1]) m_prop[1]->Init();
-    
-    // store an invariant copy of the Newtonian fluid viscosities
-    m_kappa = m_NF->m_kappa;
-    m_mu = m_NF->m_mu;
-    
+    FEModel* pfem = GetFEModel();
+    if (m_kappahat == nullptr) {
+        m_kappahat = new FEThermalViscConst(pfem);
+    }
+    m_kappahat->Init();
+    if (m_muhat == nullptr) {
+        m_muhat = new FEThermalViscConst(pfem);
+    }
+    m_muhat->Init();
+    m_Tr = GetFEModel()->GetGlobalConstant("T");
+    if (m_Tr <= 0) { feLogError("A positive absolute temperature T must be defined in Globals section");     return false; }
+
     return FEViscousFluid::Init();
 }
 
@@ -60,38 +72,45 @@ bool FENewtonianThermoFluid::Init()
 //! viscous stress
 mat3ds FENewtonianThermoFluid::Stress(FEMaterialPoint& pt)
 {
-    // evaluate thermal dependence of viscosities
-    double kappa = m_kappa*ThermoProp(pt,0);
-    double mu = m_mu*ThermoProp(pt,1);
+    FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
     
-    // set these viscosities in the Newtonian fluid object
-    m_NF->m_kappa = kappa;
-    m_NF->m_mu = mu;
+    mat3ds D = vt.RateOfDeformation();
     
-    // evaluate the stress in the Newtonian fluid using these viscosities
-    return m_NF->Stress(pt);
+    double mu = ShearViscosity(pt);
+    double kappa = BulkViscosity(pt);
+    
+    mat3ds s = mat3dd(1.0)*(D.tr()*(kappa - 2.*mu/3.)) + D*(2*mu);
+        
+    return s;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of stress with respect to strain J
 mat3ds FENewtonianThermoFluid::Tangent_Strain(FEMaterialPoint& mp)
 {
-    return m_NF->Tangent_Strain(mp);
+    FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+    
+    mat3ds D = vt.RateOfDeformation();
+    
+    double dmudJ = m_mu*m_muhat->Tangent_NormalizedViscosity_Strain(mp);
+    double dkappadJ = m_kappa*m_kappahat->Tangent_NormalizedViscosity_Strain(mp);
+    
+    mat3ds dsdJ = mat3dd(1.0)*(D.tr()*(dkappadJ - 2.*dmudJ/3.)) + D*(2*dmudJ);
+        
+    return dsdJ;
 }
 
 //-----------------------------------------------------------------------------
 //! tangent of stress with respect to rate of deformation tensor D
 tens4ds FENewtonianThermoFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
 {
-    // evaluate thermal dependence of viscosities
-    double kappa = m_kappa*ThermoProp(mp,0);
-    double mu = m_mu*ThermoProp(mp,1);
+    mat3dd I(1.0);
+    double mu = ShearViscosity(mp);
+    double kappa = BulkViscosity(mp);
     
-    // set these viscosities in the Newtonian fluid object
-    m_NF->m_kappa = kappa;
-    m_NF->m_mu = mu;
+    tens4ds c = dyad1s(I)*(kappa - 2.*mu/3.) + dyad4s(I)*(2*mu);
     
-    return m_NF->Tangent_RateOfDeformation(mp);
+    return c;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,10 +121,36 @@ mat3ds FENewtonianThermoFluid::Tangent_Temperature(FEMaterialPoint& mp)
     
     mat3ds D = vt.RateOfDeformation();
     
-    double dkappa = m_kappa*TangentThermoProp(mp,0);
-    double dmu = m_mu*TangentThermoProp(mp,1);
+    double dkappa = 0;
+    double dmu = 0;
     
     mat3ds ds = mat3dd(1.0)*(D.tr()*(dkappa - 2.*dmu/3.)) + D*(2*dmu);
         
     return ds;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate viscosities
+double FENewtonianThermoFluid::ShearViscosity(FEMaterialPoint& mp) {
+    return m_mu*m_muhat->NormalizedViscosity(mp);
+}
+
+double FENewtonianThermoFluid::TangentShearViscosityTemperature(FEMaterialPoint& mp) {
+    return m_mu*m_muhat->Tangent_NormalizedViscosity_Temperature(mp);
+}
+
+double FENewtonianThermoFluid::TangentShearViscosityStrain(FEMaterialPoint& mp) {
+    return m_mu*m_muhat->Tangent_NormalizedViscosity_Strain(mp);
+}
+
+double FENewtonianThermoFluid::BulkViscosity(FEMaterialPoint& mp) {
+    return m_kappa*m_muhat->NormalizedViscosity(mp);
+}
+
+double FENewtonianThermoFluid::TangentBulkViscosityTemperature(FEMaterialPoint& mp) {
+    return m_kappa*m_muhat->Tangent_NormalizedViscosity_Temperature(mp);
+}
+
+double FENewtonianThermoFluid::TangentBulkViscosityStrain(FEMaterialPoint& mp) {
+    return m_kappa*m_muhat->Tangent_NormalizedViscosity_Strain(mp);
 }

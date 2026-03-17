@@ -51,6 +51,7 @@ ADD_PROPERTY(m_C[0], "C0")->SetLongName("1st cv virial coeff");
 ADD_PROPERTY(m_C[1], "C1", FEProperty::Optional)->SetLongName("2nd cv virial coeff");
 ADD_PROPERTY(m_C[2], "C2", FEProperty::Optional)->SetLongName("3rd cv virial coeff");
 ADD_PROPERTY(m_C[3], "C3", FEProperty::Optional)->SetLongName("4th cv virial coeff");
+ADD_PROPERTY(m_C[4], "C4", FEProperty::Optional)->SetLongName("5th cv virial coeff");
 
 END_FECORE_CLASS();
 
@@ -61,7 +62,7 @@ FERealGas::FERealGas(FEModel* pfem) : FEThermoElasticFluid(pfem)
     m_R = m_Pr = m_Tr = 0;
     m_a0 = nullptr;
     m_A[0] = m_A[1] = m_A[2] = m_A[3] = m_A[4] = m_A[5] = m_A[6] = nullptr;
-    m_C[0] = m_C[1] = m_C[2] = m_C[3] = nullptr;
+    m_C[0] = m_C[1] = m_C[2] = m_C[3] = m_C[4] = nullptr;
 }
 
 //-----------------------------------------------------------------------------

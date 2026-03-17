@@ -67,6 +67,10 @@ public:
     double	m_kappa;	//!< bulk viscosity
     double	m_mu;		//!< shear viscosity
 
+public:
+    FEViscosity*    m_kappahat; //!< normalized bulk viscosity
+    FEViscosity*    m_muhat;    //!< normalized shear vicosity
+
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };

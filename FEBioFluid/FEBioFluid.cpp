@@ -41,6 +41,11 @@ SOFTWARE.*/
 #include "FELinearElasticFluid.h"
 #include "FENonlinearElasticFluid.h"
 #include "FELogNonlinearElasticFluid.h"
+#include "FEIdealGasIsentropic.h"
+#include "FEIdealGasIsothermal.h"
+#include "FEViscConst.h"
+#include "FEViscBarus.h"
+#include "FEVisclnJ.h"
 
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
@@ -142,9 +147,16 @@ REGISTER_FECORE_CLASS(FECrossFluid        , "Cross"         );
 REGISTER_FECORE_CLASS(FEQuemadaFluid      , "Quemada"       );
 
 // elastic fluids
-REGISTER_FECORE_CLASS(FELinearElasticFluid, "linear"        );
-REGISTER_FECORE_CLASS(FENonlinearElasticFluid, "nonlinear"  );
+REGISTER_FECORE_CLASS(FELinearElasticFluid      , "linear"       );
+REGISTER_FECORE_CLASS(FENonlinearElasticFluid   , "nonlinear"    );
 REGISTER_FECORE_CLASS(FELogNonlinearElasticFluid, "log-nonlinear");
+REGISTER_FECORE_CLASS(FEIdealGasIsentropic      , "IG-isentropic");
+REGISTER_FECORE_CLASS(FEIdealGasIsothermal      , "IG-isothermal");
+
+// viscosity matrials
+REGISTER_FECORE_CLASS(FEViscConst, "constant viscosity");
+REGISTER_FECORE_CLASS(FEViscBarus, "Barus viscosity");
+REGISTER_FECORE_CLASS(FEVisclnJ  , "lnJ viscosity");
 
 //-----------------------------------------------------------------------------
 // Domain classes

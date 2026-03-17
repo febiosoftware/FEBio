@@ -23,45 +23,50 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
 #include <FEBioMech/FEBodyForce.h>
-#include <FEBioFluid/FEFluidMaterial.h>
+#include "FEThermoFluidMaterial.h"
+#include "FEThermoFluidMaterialPoint.h"
+#include "FEThermoViscousFluid.h"
+#include <FEBioFluid/FEFluidMaterialPoint.h>
 #include "FEThermoElasticFluid.h"
-#include "FEFluidThermalConductivity.h"
-#include "febiothermofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! Base class for fluid materials.
+//! Base class for thermo-fluid materials.
 
-class FEBIOTHERMOFLUID_API FEThermoFluid : public FEFluidMaterial
+class FEBIOTHERMOFLUID_API FEThermoFluid : public FEThermoFluidMaterial
 {
 public:
     FEThermoFluid(FEModel* pfem);
-    
-    // returns a pointer to a new material point object
+	
+	// returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
+
+public:
+    //! initialization
+    bool Init() override;
     
     //! Serialization
     void Serialize(DumpStream& ar) override;
 
-public:
-    //! calculate stress at material point
-    mat3ds Stress(FEMaterialPoint& pt) override;
-    
+	//! calculate stress at material point
+	mat3ds Stress(FEMaterialPoint& pt) override;
+	
     //! tangent of stress with respect to strain J
     mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
     
-    //! tangent of stress with respect to temperature T
-    mat3ds Tangent_Temperature(FEMaterialPoint& mp);
-    
-    //! Elastic pressure
-    double Pressure(FEMaterialPoint& mp) override { return m_pElastic->Pressure(mp); }
+    //! elastic pressure
+    double Pressure(FEMaterialPoint& mp) override;
+    double Pressure(const double e, const double T = 0) override;
 
     //! tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain(FEMaterialPoint& mp) override { return m_pElastic->Tangent_Strain(mp); }
+    double Tangent_Pressure_Strain(FEMaterialPoint& mp) override;
     
     //! 2nd tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) override { return m_pElastic->Tangent_Strain_Strain(mp); }
+    double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) override;
     
     //! tangent of elastic pressure with respect to temperature T
     double Tangent_Pressure_Temperature(FEMaterialPoint& mp) { return m_pElastic->Tangent_Temperature(mp); }
@@ -75,32 +80,21 @@ public:
 public:
     //! bulk modulus
     double BulkModulus(FEMaterialPoint& mp) override;
-
-    //! heat flux
-    vec3d HeatFlux(FEMaterialPoint& mp);
     
     //! strain energy density
     double StrainEnergyDensity(FEMaterialPoint& mp) override;
     
-    //! invert pressure-dilatation relation
-    bool Dilatation(const double T, const double p, double& e) override { return GetElastic()->Dilatation(T,p,e); }
+    //! evaluate dilatation from effective pressure
+    bool Dilatation(const double T, const double p, double& e) override;
     
-    //! fluid pressure from state variables
-    double Pressure(const double ef, const double T) override { return GetElastic()->Pressure(ef, T); };
-
-    //! evaluate temperature
-    double Temperature(FEMaterialPoint& mp) override;
-
-public:
-    //! return elastic part
-	FEThermoElasticFluid* GetElastic() { return m_pElastic; }
-    
-    //! return thermal conductivity part
-    FEFluidThermalConductivity* GetConduct() { return m_pConduct; }
+    //! return elastic fluid
+    FEThermoElasticFluid* GetElastic() { return m_pElastic; }
     
 private: // material properties
-    FEThermoElasticFluid*       m_pElastic;     //!< pointer to elastic part of fluid material
-    FEFluidThermalConductivity* m_pConduct;     //!< pointer to fluid thermal conductivity material
+    FEThermoElasticFluid*           m_pElastic;     //!< pointer to elastic part of fluid material
+
+public:
+    double      m_Tr;       //!< ambient temperature
     
     // declare parameter list
     DECLARE_FECORE_CLASS();

@@ -23,34 +23,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
+#include "FEFluidHeatFlux.h"
 #include "FEThermoFluid.h"
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
+FEFluidHeatFlux::FEFluidHeatFlux(FEModel* pfem) : FEMaterial(pfem)
 {
-    m_Tr = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! initialization
-bool FEThermoViscousFluid::Init()
-{
-    m_Tr = GetGlobalConstant("T");
-    
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
-    
-    return FEViscousFluid::Init();
-}
-
-//-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
-{
-    FEViscousFluid::Serialize(ar);
-    
-    if (ar.IsShallow()) return;
-    
-    ar & m_Tr;
 }

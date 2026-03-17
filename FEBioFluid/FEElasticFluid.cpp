@@ -28,6 +28,13 @@ SOFTWARE.*/
 #include "FEFluidMaterialPoint.h"
 
 //-----------------------------------------------------------------------------
+// By default, the absolute temperature is the ambient temperature for isothermal fluids
+double FEElasticFluid::Temperature(FEMaterialPoint& mp)
+{
+    return GetGlobalConstant("T");
+}
+
+//-----------------------------------------------------------------------------
 //! tangent of pressure with respect to strain J
 double FEElasticFluid::Tangent_Strain(FEMaterialPoint& mp)
 {

@@ -27,11 +27,11 @@ SOFTWARE.*/
 
 
 #include "FEIdealGasIsentropic.h"
-#include <FEBioFluid/FEFluidMaterialPoint.h>
+#include "FEFluidMaterialPoint.h"
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEIdealGasIsentropic, FEThermoElasticFluid)
+BEGIN_FECORE_CLASS(FEIdealGasIsentropic, FEElasticFluid)
 	ADD_PARAMETER(m_gamma, FE_RANGE_GREATER(0.0), "gamma")->setLongName("specific heat capacity ratio");
 	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    )->setLongName("molar mass")->setUnits(UNIT_MOLAR_MASS);
     ADD_PARAMETER(m_cv0  , FE_RANGE_GREATER(0.0), "cv0"  )->setLongName("isochoric specific heat capacity")->setUnits(UNIT_SPECIFIC_ENTROPY);
@@ -44,7 +44,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FEIdealGasIsentropic constructor
 
-FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEThermoElasticFluid(pfem)
+FEIdealGasIsentropic::FEIdealGasIsentropic(FEModel* pfem) : FEElasticFluid(pfem)
 {
     m_rhor = 0;
     m_k = 0;
@@ -74,7 +74,7 @@ bool FEIdealGasIsentropic::Init()
 //-----------------------------------------------------------------------------
 void FEIdealGasIsentropic::Serialize(DumpStream& ar)
 {
-    FEThermoElasticFluid::Serialize(ar);
+    FEElasticFluid::Serialize(ar);
     if (ar.IsShallow()) return;
     
     ar & m_R & m_Pr & m_Tr & m_rhor;
@@ -87,6 +87,16 @@ double FEIdealGasIsentropic::Pressure(FEMaterialPoint& mp)
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double p =m_k*(pow(1+fp.m_ef,-m_gamma)-1);
     return p;
+}
+
+//-----------------------------------------------------------------------------
+//! temperature
+double FEIdealGasIsentropic::Temperature(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    double J = 1 + fp.m_ef;
+    double T = m_Tr*pow(J,1-m_gamma);
+    return T;
 }
 
 //-----------------------------------------------------------------------------

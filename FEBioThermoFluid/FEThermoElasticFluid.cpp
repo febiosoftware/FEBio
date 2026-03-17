@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "FEThermoElasticFluid.h"
 #include "FEThermoFluidMaterialPoint.h"
 #include "FEThermoFluid.h"
+#include <FEBioFluid/FEFluidMaterialPoint.h>
 
 //-----------------------------------------------------------------------------
 //! tangent of pressure with respect to strain J

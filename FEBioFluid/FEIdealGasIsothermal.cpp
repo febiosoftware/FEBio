@@ -24,10 +24,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FEIdealGasIsothermal.h"
+#include "FEFluidMaterialPoint.h"
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEIdealGasIsothermal, FEFluid)
+BEGIN_FECORE_CLASS(FEIdealGasIsothermal, FEElasticFluid)
 	ADD_PARAMETER(m_M    , FE_RANGE_GREATER(0.0), "M"    )->setUnits(UNIT_MOLAR_MASS)->setLongName("molar mass");
 END_FECORE_CLASS();
 
@@ -38,10 +39,8 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FEIdealGasIsothermal constructor
 
-FEIdealGasIsothermal::FEIdealGasIsothermal(FEModel* pfem) : FEFluid(pfem)
+FEIdealGasIsothermal::FEIdealGasIsothermal(FEModel* pfem) : FEElasticFluid(pfem)
 {
-    m_rhor = 0;
-    m_k = 0;
     m_M = 0;
 }
 
@@ -64,7 +63,7 @@ bool FEIdealGasIsothermal::Init()
 //-----------------------------------------------------------------------------
 void FEIdealGasIsothermal::Serialize(DumpStream& ar)
 {
-    FEFluid::Serialize(ar);
+    FEElasticFluid::Serialize(ar);
     if (ar.IsShallow()) return;
     
     ar & m_R & m_Pr & m_Tr & m_rhor;
@@ -88,7 +87,7 @@ double FEIdealGasIsothermal::Pressure(const double e, const double T)
 
 //-----------------------------------------------------------------------------
 //! tangent of elastic pressure with respect to strain J
-double FEIdealGasIsothermal::Tangent_Pressure_Strain(FEMaterialPoint& mp)
+double FEIdealGasIsothermal::Tangent_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = 1 + fp.m_ef;
@@ -98,7 +97,7 @@ double FEIdealGasIsothermal::Tangent_Pressure_Strain(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! 2nd tangent of elastic pressure with respect to strain J
-double FEIdealGasIsothermal::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
+double FEIdealGasIsothermal::Tangent_Strain_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = 1 + fp.m_ef;
@@ -115,7 +114,7 @@ double FEIdealGasIsothermal::Temperature(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 //! calculate free energy density (per reference volume)
-double FEIdealGasIsothermal::StrainEnergyDensity(FEMaterialPoint& mp)
+double FEIdealGasIsothermal::SpecificFreeEnergy(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = 1 + fp.m_ef;
@@ -131,4 +130,3 @@ bool FEIdealGasIsothermal::Dilatation(const double T, const double p, double& e)
     e = J - 1;
     return true;
 }
-

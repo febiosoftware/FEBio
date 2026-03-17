@@ -23,34 +23,49 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
-#include "FEThermoFluid.h"
+#include "FEFluidFourierLaw.h"
+#include "FEThermalCondConst.h"
+#include "FEThermoFluidMaterialPoint.h"
 #include <FECore/log.h>
+#include <FECore/FEModel.h>
+
+// define the material parameters
+BEGIN_FECORE_CLASS(FEFluidFourierLaw, FEFluidHeatFlux)
+    ADD_PARAMETER(m_Kr, FE_RANGE_GREATER_OR_EQUAL(0.0), "Kr")->setUnits(UNIT_THERMAL_CONDUCTIVITY)->setLongName("referential thermal conductivity");
+
+// Optionally add strain-dependent normalized viscosity relations
+    ADD_PROPERTY(m_Khat, "Khat", FEProperty::Optional)->SetLongName("normalized thermal conductivity");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
+FEFluidFourierLaw::FEFluidFourierLaw(FEModel* pfem) : FEFluidHeatFlux(pfem)
 {
-    m_Tr = 0;
+    m_Khat = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! initialization
-bool FEThermoViscousFluid::Init()
+bool FEFluidFourierLaw::Init()
 {
-    m_Tr = GetGlobalConstant("T");
-    
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
-    
-    return FEViscousFluid::Init();
+    FEModel* pfem = GetFEModel();
+    if (m_Khat == nullptr) {
+        m_Khat = new FEThermalCondConst(pfem);
+    }
+    m_Khat->Init();
+
+    return FEFluidHeatFlux::Init();
 }
 
 //-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
+//! viscous stress
+vec3d FEFluidFourierLaw::HeatFlux(FEMaterialPoint& pt)
 {
-    FEViscousFluid::Serialize(ar);
+    FEThermoFluidMaterialPoint& tf = *pt.ExtractData<FEThermoFluidMaterialPoint>();
     
-    if (ar.IsShallow()) return;
+    double K = Conductivity(pt);
     
-    ar & m_Tr;
+    vec3d q = -tf.m_gradT*K;
+        
+    return q;
 }

@@ -48,16 +48,15 @@ public:
     void Serialize(DumpStream& ar) override;
     
     //! calculate thermal conductivity at material point
-    double ThermalConductivity(FEMaterialPoint& pt) override;
+    double NormalizedConductivity(FEMaterialPoint& pt) override;
     
     //! tangent of thermal conductivity with respect to strain J
-    double Tangent_Strain(FEMaterialPoint& mp) override;
+    double Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp) override;
     
     //! tangent of thermal conductivity with respect to temperature T
-    double Tangent_Temperature(FEMaterialPoint& mp) override;
-    
+    double Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp) override;
+
 public:
-    double          m_Kr;   //!< thermal conductivity at reference temperature
     double          m_Tr;   //!< reference temperature
     double          m_Tc;           //!< normalized critical temperature (Tc/Tr)
     double          m_alpha;        //!< exponent alpha used for calculating temperature map

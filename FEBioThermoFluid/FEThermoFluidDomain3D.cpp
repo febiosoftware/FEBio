@@ -27,7 +27,8 @@ SOFTWARE.*/
 #include "FEThermoFluidDomain3D.h"
 #include "FEFluidHeatSupply.h"
 #include "FEThermoViscousFluid.h"
-#include "FECore/log.h"
+#include <FEBioFluid/FEFluidMaterialPoint.h>
+#include <FECore/log.h>
 #include <FECore/FEModel.h>
 #include <FECore/FELinearSystem.h>
 
@@ -576,9 +577,9 @@ void FEThermoFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         double cv   = m_pMat->GetElastic()->IsochoricSpecificHeatCapacity(mp);
         double dcvT = m_pMat->GetElastic()->Tangent_cv_Temperature(mp);
         double dcvJ = m_pMat->GetElastic()->Tangent_cv_Strain(mp);
-        double k    = m_pMat->GetConduct()->ThermalConductivity(mp);
-        double dkJ  = m_pMat->GetConduct()->Tangent_Strain(mp);
-        double dkT  = m_pMat->GetConduct()->Tangent_Temperature(mp);
+        double k    = m_pMat->GetHeatFlux()->Conductivity(mp);
+        double dkJ  = m_pMat->GetHeatFlux()->Tangent_Conductivity_Strain(mp);
+        double dkT  = m_pMat->GetHeatFlux()->Tangent_Conductivity_Temperature(mp);
         double T = m_Tr + tf.m_T;
 
         // evaluate spatial gradient of shape functions
@@ -941,9 +942,9 @@ void FEThermoFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         // calculate remaining entries of thermofluid material point
         // TODO: Not sure that we need any of these (consider taking them out)
         tf.m_k = m_pMat->BulkModulus(mp);
-        tf.m_K = m_pMat->GetConduct()->ThermalConductivity(mp);
-        tf.m_dKJ = m_pMat->GetConduct()->Tangent_Strain(mp);
-        tf.m_dKT = m_pMat->GetConduct()->Tangent_Temperature(mp);
+        tf.m_K = m_pMat->GetHeatFlux()->Conductivity(mp);
+        tf.m_dKJ = m_pMat->GetHeatFlux()->Tangent_Conductivity_Strain(mp);
+        tf.m_dKT = m_pMat->GetHeatFlux()->Tangent_Conductivity_Temperature(mp);
         tf.m_cv = m_pMat->GetElastic()->IsochoricSpecificHeatCapacity(mp);
         tf.m_dcvJ = m_pMat->GetElastic()->Tangent_cv_Strain(mp);
         tf.m_dcvT = m_pMat->GetElastic()->Tangent_cv_Temperature(mp);

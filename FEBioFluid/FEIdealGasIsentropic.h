@@ -27,13 +27,13 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEThermoElasticFluid.h"
-#include "febiothermofluid_api.h"
+#include "FEElasticFluid.h"
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
 //! Ideal gas under isentropic conditions.
 
-class FEBIOTHERMOFLUID_API FEIdealGasIsentropic : public FEThermoElasticFluid
+class FEBIOFLUID_API FEIdealGasIsentropic : public FEElasticFluid
 {
 public:
     FEIdealGasIsentropic(FEModel* pfem);
@@ -47,6 +47,9 @@ public:
 
     //! elastic pressure
     double Pressure(FEMaterialPoint& mp) override;
+    
+    //! temperature in isentropic process
+    double Temperature(FEMaterialPoint& mp) override;
 
     //! tangent of pressure with respect to strain J
     double Tangent_Strain(FEMaterialPoint& mp) override;

@@ -24,52 +24,52 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FEThermoViscousFluid.h"
-#include "febiothermofluid_api.h"
-#include "FEThermalViscosity.h"
-#include <FEBioFluid/FENewtonianFluid.h>
-#include <FECore/FEFunction1D.h>
+#include "FEElasticFluid.h"
+#include "febiofluid_api.h"
 
 //-----------------------------------------------------------------------------
-// This class evaluates the viscous stress in a Newtonian fluid
+//! Ideal gas under isothermal conditions.
 
-class FEBIOTHERMOFLUID_API FENewtonianThermoFluid :	public FEThermoViscousFluid
+class FEBIOFLUID_API FEIdealGasIsothermal : public FEElasticFluid
 {
 public:
-    //! constructor
-    FENewtonianThermoFluid(FEModel* pfem);
+    FEIdealGasIsothermal(FEModel* pfem);
     
+public:
     //! initialization
     bool Init() override;
     
-    //! viscous stress
-    mat3ds Stress(FEMaterialPoint& pt) override;
-    
-    //! tangent of stress with respect to strain J
-    mat3ds Tangent_Strain(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to rate of deformation tensor D
-    tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
-    
-    //! tangent of stress with respect to temperature
-    mat3ds Tangent_Temperature(FEMaterialPoint& mp) override;
-    
-    //! dynamic shear viscosity
-    double ShearViscosity(FEMaterialPoint& mp) override;
-    double TangentShearViscosityTemperature(FEMaterialPoint& mp);
-    double TangentShearViscosityStrain(FEMaterialPoint& mp);
+    //! Serialization
+    void Serialize(DumpStream& ar) override;
 
-    //! bulk viscosity
-    double BulkViscosity(FEMaterialPoint& mp) override;
-    double TangentBulkViscosityTemperature(FEMaterialPoint& mp);
-    double TangentBulkViscosityStrain(FEMaterialPoint& mp);
-
+    //! elastic pressure
+    double Pressure(FEMaterialPoint& mp) override;
+    double Pressure(const double e, const double T = 0);
+    
+    //! tangent of elastic pressure with respect to strain J
+    double Tangent_Strain(FEMaterialPoint& mp) override;
+    
+    //! 2nd tangent of elastic pressure with respect to strain J
+    double Tangent_Strain_Strain(FEMaterialPoint& mp) override;
+    
+    //! specific free energy
+    double SpecificFreeEnergy(FEMaterialPoint& mp) override;
+    
+    //! invert effective pressure-dilatation relation
+    bool Dilatation(const double T, const double p, double& e) override;
+    
+    //! evaluate temperature
+    double Temperature(FEMaterialPoint& mp) override;
+    
 public:
-    double              m_kappa;    // referential bulk viscosity
-    double              m_mu;       // referential shear viscosity
-    FEThermalViscosity* m_kappahat; // normalized bulk viscosity
-    FEThermalViscosity* m_muhat;    // normalized shear viscosity
+    double      m_M;        //!< moral mass
+    double      m_Pr;       //!< ambient pressure
+    double      m_Tr;       //!< ambient temperature
+    double      m_R;        //!< universal gas constant
 
+private:
+    double  m_rhor;         //!< calculated referential mass density
+    
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };

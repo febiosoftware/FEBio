@@ -44,18 +44,48 @@ public:
     virtual ~FEElasticFluid() {}
 
 	void SetParentFluid(FEFluidMaterial* pf) { m_pFluid = pf; }
-    
+ 
     //! gauge pressure
     virtual double Pressure(FEMaterialPoint& pt) = 0;
     
+    //! absolute temperature
+    virtual double Temperature(FEMaterialPoint& mp);
+
     //! tangent of pressure with respect to strain J
     virtual double Tangent_Strain(FEMaterialPoint& mp);
     
     //! 2nd tangent of pressure with respect to strain J
     virtual double Tangent_Strain_Strain(FEMaterialPoint& mp);
     
-    //! specific free energy
+    //! tangent of pressure with respect to temperature (non-zero for isentropic processes)
+    virtual double Tangent_Temperature(FEMaterialPoint& mp) { return 0; }
+    
+    //! 2nd tangent of pressure with respect to temperature T
+    virtual double Tangent_Temperature_Temperature(FEMaterialPoint& mp) { return 0; }
+    
+    //! tangent of pressure with respect to strain J and temperature T
+    virtual double Tangent_Strain_Temperature(FEMaterialPoint& mp) { return 0; }
+    
+   //! specific free energy
     virtual double SpecificFreeEnergy(FEMaterialPoint& mp) = 0;
+    
+    //! specific entropy (zero by default for isothermal fluids)
+    virtual double SpecificEntropy(FEMaterialPoint& mp) { return 0; }
+    
+    //! specific strain energy
+    virtual double SpecificStrainEnergy(FEMaterialPoint& mp) { return SpecificFreeEnergy(mp); }
+    
+    //! isochoric specific heat capacity (not specified explicitly in isothermal fluids)
+    virtual double IsochoricSpecificHeatCapacity(FEMaterialPoint& mp) { return 0; }
+    
+    //! tangent of isochoric specific heat capacity with respect to strain J (zero for ideal gases)
+    virtual double Tangent_cv_Strain(FEMaterialPoint& mp) { return 0; }
+    
+    //! tangent of isochoric specific heat capacity with respect to temperature T (zero by default for isothermal fluids)
+    virtual double Tangent_cv_Temperature(FEMaterialPoint& mp) { return 0; }
+    
+    //! isobaric specific heat capacity (not specified explicitly in isothermal fluids)
+    virtual double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) { return 0; }
     
     //! calculate dilatation for given (effective) pressure and temperature
     virtual bool Dilatation(const double T, const double p, double& e) = 0;

@@ -93,7 +93,7 @@ bool FEPlotFluidRelativeThermalPecletNumber::Save(FEDomain& dom, FEDataStream& a
 		//        const FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
 		double cp = pfluid->GetElastic()->IsobaricSpecificHeatCapacity(mp_noconst);
-		double K = pfluid->GetConduct()->ThermalConductivity(mp_noconst);
+		double K = pfluid->GetHeatFlux()->Conductivity(mp_noconst);
 		double rho = pfluid->Density(mp_noconst);
 		vec3d v(0, 0, 0);
 		//        if (ept) v = ept->m_v;
@@ -105,12 +105,12 @@ bool FEPlotFluidRelativeThermalPecletNumber::Save(FEDomain& dom, FEDataStream& a
 
 bool FEPlotFluidThermalConductivity::Save(FEDomain& dom, FEDataStream& a)
 {
-	FEFluidThermalConductivity* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidThermalConductivity>();
-	if (pfluid == 0) return false;
+    FEThermoFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluid>();
+    if (pfluid == 0) return false;
 
 	writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
 		FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
-		return pfluid->ThermalConductivity(mp_noconst);
+        return pfluid->GetHeatFlux()->Conductivity(mp_noconst);
 		});
 
 	return true;

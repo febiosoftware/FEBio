@@ -23,50 +23,44 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include <FEBioFluid/FEFluid.h>
-#include "febiothermofluid_api.h"
+#include "FEFluidThermalConductivity.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
-//! Ideal gas under isothermal conditions.
+// This class implements a thermofluid conductivity which is a virial expansion in lnJ
 
-class FEBIOTHERMOFLUID_API FEIdealGasIsothermal : public FEFluid
+class FEBIOTHERMOFLUID_API FEThermalCondLnJvirial :	public FEFluidThermalConductivity
 {
 public:
-    FEIdealGasIsothermal(FEModel* pfem);
+    enum { MAX_COEF = 7 };
     
 public:
-    //! initialization
+	//! constructor
+    FEThermalCondLnJvirial(FEModel* pfem);
+    
+    //! initialize
     bool Init() override;
+		
+    //! viscosity
+    double NormalizedConductivity(FEMaterialPoint& pt) override;
     
-    //! Serialization
-    void Serialize(DumpStream& ar) override;
+    //! tangent of normalized viscosity with respect to temperature
+    double Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp) override;
 
-    //! elastic pressure
-    double Pressure(FEMaterialPoint& mp) override;
-    double Pressure(const double e, const double T = 0) override;
+    //! tangent of normalized viscosity with respect to volumetric strain (or J)
+    double Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp) override;
     
-    //! tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain(FEMaterialPoint& mp) override;
-    
-    //! 2nd tangent of elastic pressure with respect to strain J
-    double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) override;
-    
-    //! strain energy density
-    double StrainEnergyDensity(FEMaterialPoint& mp) override;
-    
-    //! invert effective pressure-dilatation relation
-    bool Dilatation(const double T, const double p, double& e) override;
-    
-    //! evaluate temperature
-    double Temperature(FEMaterialPoint& mp) override;
-    
-public:
-    double      m_M;        //!< moral mass
-    double      m_Pr;       //!< ambient pressure
-    double      m_Tr;       //!< ambient temperature
-    double      m_R;        //!< universal gas constant
-    
-    // declare parameter list
-    DECLARE_FECORE_CLASS();
+ public:
+	FEFunction1D*	m_coef[MAX_COEF];			//!< virial coefficients
+    double          m_Tr;           //!< referential absolute temperature
+
+private:
+    int             m_ncoef;                    //!< number of coefficients in the virial expansion
+		
+	// declare parameter list
+	DECLARE_FECORE_CLASS();
 };

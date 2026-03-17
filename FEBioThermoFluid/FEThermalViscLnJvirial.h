@@ -23,34 +23,45 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
-#include "FEThermoFluid.h"
-#include <FECore/log.h>
+
+
+
+#pragma once
+#include "FEThermalViscosity.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
-//! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
-{
-    m_Tr = 0;
-}
+// This class implements a thermofluid viscosity which is a virial expansion in lnJ
 
-//-----------------------------------------------------------------------------
-//! initialization
-bool FEThermoViscousFluid::Init()
+class FEBIOTHERMOFLUID_API FEThermalViscLnJvirial :	public FEThermalViscosity
 {
-    m_Tr = GetGlobalConstant("T");
+public:
+    enum { MAX_COEF = 7 };
     
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
+public:
+	//! constructor
+    FEThermalViscLnJvirial(FEModel* pfem);
     
-    return FEViscousFluid::Init();
-}
+    //! initialize
+    bool Init() override;
+		
+    //! viscosity
+    double NormalizedViscosity(FEMaterialPoint& pt) override;
+    
+    //! tangent of normalized viscosity with respect to temperature
+    double Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp) override;
 
-//-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
-{
-    FEViscousFluid::Serialize(ar);
+    //! tangent of normalized viscosity with respect to volumetric strain (or J)
+    double Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp) override;
     
-    if (ar.IsShallow()) return;
-    
-    ar & m_Tr;
-}
+public:
+	FEFunction1D*	m_coef[MAX_COEF];			//!< virial coefficients
+    double          m_Pr;           //!< referential absolute pressure
+    double          m_Tr;           //!< referential absolute temperature
+
+private:
+    int             m_ncoef;                    //!< number of coefficients in the virial expansion
+		
+	// declare parameter list
+	DECLARE_FECORE_CLASS();
+};

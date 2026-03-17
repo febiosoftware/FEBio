@@ -23,34 +23,41 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
-#include "FEThermoFluid.h"
-#include <FECore/log.h>
+
+
+
+#pragma once
+#include "FEViscosity.h"
+#include "FEFluidMaterial.h"
+#include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
-//! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
-{
-    m_Tr = 0;
-}
+// This class implements a fluid viscosity which follows the Barus equation
 
-//-----------------------------------------------------------------------------
-//! initialization
-bool FEThermoViscousFluid::Init()
+class FEBIOFLUID_API FEViscBarus :	public FEViscosity
 {
-    m_Tr = GetGlobalConstant("T");
+public:
+	//! constructor
+    FEViscBarus(FEModel* pfem);
     
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
+    //! initialize
+    bool Init() override;
+		
+    //! viscosity
+    double NormalizedViscosity(FEMaterialPoint& pt) override;
     
-    return FEViscousFluid::Init();
-}
+    //! tangent of normalized viscosity with respect to temperature
+    double Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp) override;
 
-//-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
-{
-    FEViscousFluid::Serialize(ar);
+    //! tangent of normalized viscosity with respect to volumetric strain (or J)
+    double Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp) override;
     
-    if (ar.IsShallow()) return;
+public:
+    double  m_alpha;    //!< alpha coefficient in Barus equation
+
+private:
+    FEFluidMaterial*    m_pFluid;
     
-    ar & m_Tr;
-}
+	// declare parameter list
+	DECLARE_FECORE_CLASS();
+};

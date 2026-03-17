@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include "FEBioThermoFluid.h"
 #include <FECore/FEModel.h>
 
-FEThermoFluidModule::FEThermoFluidModule() { SetStatus(EXPERIMENTAL); }
+FEThermoFluidModule::FEThermoFluidModule() { SetStatus(RELEASED); }
 void FEThermoFluidModule::InitModel(FEModel* fem)
 {
 	// Allocate degrees of freedom

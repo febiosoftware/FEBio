@@ -23,15 +23,21 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #include "FEThermoFluid.h"
+#include "FEThermoFluidMaterialPoint.h"
+#include <FEBioFluid/FEFluidMaterialPoint.h>
+#include <FECore/FECoreKernel.h>
 #include <FECore/DumpStream.h>
-
+#include "FELinearThermoElasticFluid.h"
 // define the material parameters
-BEGIN_FECORE_CLASS(FEThermoFluid, FEFluidMaterial)
+BEGIN_FECORE_CLASS(FEThermoFluid, FEThermoFluidMaterial)
 
-    // material properties
-    ADD_PROPERTY(m_pElastic, "elastic");
-    ADD_PROPERTY(m_pConduct, "conduct");
+	// material parameters
+    ADD_PARAMETER(m_k      , FE_RANGE_GREATER_OR_EQUAL(0.0), "k")->setUnits(UNIT_PRESSURE);
+    ADD_PROPERTY(m_pElastic, "elastic", FEProperty::Optional)->SetLongName("Elastic response");
 
 END_FECORE_CLASS();
 
@@ -40,35 +46,44 @@ END_FECORE_CLASS();
 //============================================================================
 
 //-----------------------------------------------------------------------------
-//! FEThermoFluid constructor
+//! FEFluid constructor
 
-FEThermoFluid::FEThermoFluid(FEModel* pfem) : FEFluidMaterial(pfem)
+FEThermoFluid::FEThermoFluid(FEModel* pfem) : FEThermoFluidMaterial(pfem)
 {
-    m_pElastic = 0;
-    m_pConduct = 0;
+    m_k = 0;
+    m_pElastic = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+//! FEFluid initialization
+bool FEThermoFluid::Init()
+{
+    m_Tr = GetGlobalConstant("T");
+    if (m_pElastic == nullptr) {
+        m_pElastic = fecore_alloc(FELinearThermoElasticFluid, GetFEModel());
+    }
+
+	// We set the parent of the elastic material to this fluid,
+	// so that it can access the fluid parameters if needed.
+//	m_pElastic->SetParentFluid(this);
+
+    return FEThermoFluidMaterial::Init();
 }
 
 //-----------------------------------------------------------------------------
 void FEThermoFluid::Serialize(DumpStream& ar)
 {
-    FEFluidMaterial::Serialize(ar);
+    FEThermoFluidMaterial::Serialize(ar);
     if (ar.IsShallow()) return;
+    
+    ar & m_Tr;
 }
 
 //-----------------------------------------------------------------------------
 //! returns a pointer to a new material point object
 FEMaterialPointData* FEThermoFluid::CreateMaterialPointData()
 {
-    FEFluidMaterialPoint* fp = new FEFluidMaterialPoint();
-    return new FEThermoFluidMaterialPoint(fp);
-}
-
-//-----------------------------------------------------------------------------
-//! evaluate temperature
-double FEThermoFluid::Temperature(FEMaterialPoint& mp)
-{
-    FEThermoFluidMaterialPoint& tp = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    return tp.m_T;
+	return new FEFluidMaterialPoint();
 }
 
 //-----------------------------------------------------------------------------
@@ -80,13 +95,29 @@ double FEThermoFluid::BulkModulus(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! heat flux
-vec3d FEThermoFluid::HeatFlux(FEMaterialPoint& mp)
+//! elastic pressure
+double FEThermoFluid::Pressure(FEMaterialPoint& mp)
 {
-    FEThermoFluidMaterialPoint& tp = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double k = m_pConduct->ThermalConductivity(mp);
-    vec3d q = -tp.m_gradT*k;
-    return q;
+    return m_pElastic->Pressure(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! elastic pressure from dilatation
+double FEThermoFluid::Pressure(const double e, const double T)
+{
+    return m_pElastic->Pressure(e, T);
+}
+
+//-----------------------------------------------------------------------------
+double FEThermoFluid::Tangent_Pressure_Strain(FEMaterialPoint& mp)
+{
+    return m_pElastic->Tangent_Strain(mp);
+}
+
+//-----------------------------------------------------------------------------
+double FEThermoFluid::Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp)
+{
+    return m_pElastic->Tangent_Strain_Strain(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -95,17 +126,17 @@ vec3d FEThermoFluid::HeatFlux(FEMaterialPoint& mp)
 
 mat3ds FEThermoFluid::Stress(FEMaterialPoint& mp)
 {
-    // calculate solid material stress
-    mat3ds s = GetViscous()->Stress(mp);
+	// calculate solid material stress
+	mat3ds s = GetViscous()->Stress(mp);
     
-    double p = m_pElastic->Pressure(mp);
-    
-    // add fluid pressure
-    s.xx() -= p;
-    s.yy() -= p;
-    s.zz() -= p;
-    
-    return s;
+    double p = Pressure(mp);
+	
+	// add fluid pressure
+	s.xx() -= p;
+	s.yy() -= p;
+	s.zz() -= p;
+	
+	return s;
 }
 
 //-----------------------------------------------------------------------------
@@ -118,7 +149,7 @@ mat3ds FEThermoFluid::Tangent_Strain(FEMaterialPoint& mp)
     mat3ds sJ = GetViscous()->Tangent_Strain(mp);
     
     // add tangent of fluid pressure
-    double dp = m_pElastic->Tangent_Strain(mp);
+    double dp = Tangent_Pressure_Strain(mp);
     sJ.xx() -= dp;
     sJ.yy() -= dp;
     sJ.zz() -= dp;
@@ -130,6 +161,15 @@ mat3ds FEThermoFluid::Tangent_Strain(FEMaterialPoint& mp)
 //! calculate strain energy density (per reference volume)
 double FEThermoFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 {
-    double sed = m_rhor*m_pElastic->SpecificStrainEnergy(mp);
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    double sed = m_k*(fp.m_ef-log(fp.m_ef+1));
     return sed;
+}
+
+//-----------------------------------------------------------------------------
+//! invert pressure-dilatation relation
+bool FEThermoFluid::Dilatation(const double T, const double p, double& e)
+{
+    e = -p/m_k;
+    return true;
 }

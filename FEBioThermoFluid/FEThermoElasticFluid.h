@@ -26,6 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMaterial.h>
 #include <FECore/tens4d.h>
+#include "FEThermoFluidMaterial.h"
 #include "febiothermofluid_api.h"
 
 //-----------------------------------------------------------------------------
@@ -37,7 +38,9 @@ class FEBIOTHERMOFLUID_API FEThermoElasticFluid : public FEMaterialProperty
 public:
     FEThermoElasticFluid(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEThermoElasticFluid() {}
-    
+
+    void SetParentFluid(FEThermoFluidMaterial* pf) { m_pFluid = pf; }
+
     //! gauge pressure
     virtual double Pressure(FEMaterialPoint& pt) = 0;
     
@@ -97,6 +100,9 @@ public:
     
     //! specific free enthalpy
     double SpecificFreeEnthalpy(FEMaterialPoint& mp);
+
+protected:
+    FEThermoFluidMaterial* m_pFluid = nullptr;    //!< pointer to parent fluid material
 
     FECORE_BASE_CLASS(FEThermoElasticFluid)
 };

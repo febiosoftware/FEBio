@@ -23,34 +23,51 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
-#include "FEThermoFluid.h"
+
+
+
+#include "FEVisclnJ.h"
+#include "FEFluidMaterialPoint.h"
+#include "FEElasticFluid.h"
+#include "FEFluid.h"
 #include <FECore/log.h>
 
+// define the material parameters
+BEGIN_FECORE_CLASS(FEVisclnJ, FEViscosity)
+    ADD_PROPERTY(m_nvisc, "etahat")->SetLongName("normalized viscosity vs lnJ");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
-//! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
+//! Constructor. 
+FEVisclnJ::FEVisclnJ(FEModel* pfem) : FEViscosity(pfem)
 {
-    m_Tr = 0;
+    m_nvisc = nullptr;
+}
+
+bool FEVisclnJ::Init()
+{
+    if (!m_nvisc->Init()) return false;
+    
+    return FEViscosity::Init();
 }
 
 //-----------------------------------------------------------------------------
-//! initialization
-bool FEThermoViscousFluid::Init()
+//! normalize viscosity
+double FEVisclnJ::NormalizedViscosity(FEMaterialPoint& mp)
 {
-    m_Tr = GetGlobalConstant("T");
-    
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
-    
-    return FEViscousFluid::Init();
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    double lnJ = log(1 + fp.m_ef);
+    double etahat = m_nvisc->value(lnJ);
+    return etahat;
 }
 
 //-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
+//! tangent of normalized viscosity with respect to volumetric strain (or J)
+double FEVisclnJ::Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp)
 {
-    FEViscousFluid::Serialize(ar);
-    
-    if (ar.IsShallow()) return;
-    
-    ar & m_Tr;
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    double J = 1 + fp.m_ef;
+    double lnJ = log(J);
+    double detahatdJ = m_nvisc->derive(lnJ)/J;
+    return detahatdJ;
 }

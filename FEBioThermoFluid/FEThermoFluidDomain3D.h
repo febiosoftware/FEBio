@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
+#include <FECore/FEMaterial.h>
 #include <FECore/FESolidDomain.h>
 #include "FEBioFluid/FEFluidDomain.h"
 #include "FEThermoFluid.h"

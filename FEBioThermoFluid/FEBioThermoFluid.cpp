@@ -42,7 +42,6 @@ SOFTWARE.*/
 #include "FERealGas.h"
 #include "FERealVapor.h"
 #include "FERealLiquid.h"
-#include "FEFluidConstantConductivity.h"
 #include "FETempDependentConductivity.h"
 #include "FEConductivityRealVapor.h"
 #include "FEThermoFluidPressureLoad.h"
@@ -52,6 +51,11 @@ SOFTWARE.*/
 #include "FEThermoFluidModule.h"
 #include "FEThermoFluidAnalysis.h"
 #include "FEBioThermoFluidPlot.h"
+#include "FEThermalViscConst.h"
+#include "FEThermalViscLnJvirial.h"
+#include "FEThermalCondConst.h"
+#include "FEThermalCondLnJvirial.h"
+#include "FEFluidFourierLaw.h"
 
 const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARIABLE var)
 {
@@ -121,7 +125,7 @@ void FEBioThermoFluid::InitModule()
     // Materials
     
     // viscous thermofluids
-    REGISTER_FECORE_CLASS(FENewtonianThermoFluid, "Newtonian fluid");
+    REGISTER_FECORE_CLASS(FENewtonianThermoFluid, "Newtonian thermofluid");
     REGISTER_FECORE_CLASS(FENewtonianRealVapor, "Newtonian real vapor");
 
     // elastic fluids
@@ -129,12 +133,20 @@ void FEBioThermoFluid::InitModule()
     REGISTER_FECORE_CLASS(FERealGas    , "real gas"    );
     REGISTER_FECORE_CLASS(FERealVapor  , "real vapor"  );
     REGISTER_FECORE_CLASS(FERealLiquid , "real liquid" );
-    
+
+    // heat flux
+    REGISTER_FECORE_CLASS(FEFluidFourierLaw, "Fourier's law");
+
     // thermal conductivity
-    REGISTER_FECORE_CLASS(FEFluidConstantConductivity, "constant thermal conductivity");
+    REGISTER_FECORE_CLASS(FEThermalCondConst, "constant thermal conductivity");
     REGISTER_FECORE_CLASS(FETempDependentConductivity, "temp-dependent thermal conductivity");
     REGISTER_FECORE_CLASS(FEConductivityRealVapor    , "real vapor thermal conductivity");
-    
+    REGISTER_FECORE_CLASS(FEThermalCondLnJvirial     , "virial T-lnJ conductivity");
+
+    // thermofluid viscosity
+    REGISTER_FECORE_CLASS(FEThermalViscConst, "constant viscosity");
+    REGISTER_FECORE_CLASS(FEThermalViscLnJvirial, "virial T-lnJ viscosity");
+
     //-----------------------------------------------------------------------------
     // loads
     REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure constraint");

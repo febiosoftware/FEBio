@@ -23,34 +23,53 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
-#include "FEThermoFluid.h"
+
+
+
+#include "FEViscBarus.h"
+#include "FEFluidMaterialPoint.h"
 #include <FECore/log.h>
 
+// define the material parameters
+BEGIN_FECORE_CLASS(FEViscBarus, FEViscosity)
+    ADD_PARAMETER(m_alpha, "alpha")->setUnits("1/P");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
-//! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
+//! Constructor. 
+FEViscBarus::FEViscBarus(FEModel* pfem) : FEViscosity(pfem)
 {
-    m_Tr = 0;
+    m_pFluid = nullptr;
+    m_alpha = 0;
+}
+
+bool FEViscBarus::Init()
+{
+    m_pFluid = dynamic_cast<FEFluidMaterial*>(GetAncestor());
+    if (m_pFluid == nullptr) return false;
+    return true;
 }
 
 //-----------------------------------------------------------------------------
-//! initialization
-bool FEThermoViscousFluid::Init()
+//! normalize viscosity
+double FEViscBarus::NormalizedViscosity(FEMaterialPoint& mp)
 {
-    m_Tr = GetGlobalConstant("T");
-    
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
-    
-    return FEViscousFluid::Init();
+    double p = m_pFluid->Pressure(mp);
+    return exp(m_alpha*p);
 }
 
 //-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
+//! tangent of normalized viscosity with respect to temperature
+double FEViscBarus::Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp)
 {
-    FEViscousFluid::Serialize(ar);
-    
-    if (ar.IsShallow()) return;
-    
-    ar & m_Tr;
+    return 0.;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of normalized viscosity with respect to volumetric strain (or J)
+double FEViscBarus::Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp)
+{
+    double p = m_pFluid->Pressure(mp);
+    double dpdJ = m_pFluid->Tangent_Pressure_Strain(mp);
+    return m_alpha*dpdJ*exp(m_alpha*p);
 }

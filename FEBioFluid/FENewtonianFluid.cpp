@@ -29,11 +29,17 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FENewtonianFluid.h"
 #include "FEFluid.h"
+#include "FEViscConst.h"
+#include <FECore/FEModel.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FENewtonianFluid, FEViscousFluid)
     ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits(UNIT_VISCOSITY)->setLongName("bulk viscosity");
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("shear viscosity");
+
+// Optionally add strain-dependent normalized viscosity relations
+    ADD_PROPERTY(m_kappahat, "kappahat", FEProperty::Optional)->SetLongName("normal. bulk viscosity vs strain");
+    ADD_PROPERTY(m_muhat, "muhat", FEProperty::Optional)->SetLongName("normal. bulk viscosity vs strain");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -42,12 +48,23 @@ FENewtonianFluid::FENewtonianFluid(FEModel* pfem) : FEViscousFluid(pfem)
 {
     m_kappa = 0;
     m_mu = 0;
+    m_kappahat = nullptr;
+    m_muhat = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 //! initialization
 bool FENewtonianFluid::Init()
 {
+    FEModel* pfem = GetFEModel();
+    if (m_kappahat == nullptr) {
+        m_kappahat = new FEViscConst(pfem);
+    }
+    m_kappahat->Init();
+    if (m_muhat == nullptr) {
+        m_muhat = new FEViscConst(pfem);
+    }
+    m_muhat->Init();
     return FEViscousFluid::Init();
 }
 
@@ -80,7 +97,16 @@ mat3ds FENewtonianFluid::Stress(FEMaterialPoint& pt)
 //! tangent of stress with respect to strain J
 mat3ds FENewtonianFluid::Tangent_Strain(FEMaterialPoint& mp)
 {
-    return mat3ds(0,0,0,0,0,0);
+    FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+    
+    mat3ds D = vt.RateOfDeformation();
+    
+    double dmudJ = m_mu*m_muhat->Tangent_NormalizedViscosity_Strain(mp);
+    double dkappadJ = m_kappa*m_kappahat->Tangent_NormalizedViscosity_Strain(mp);
+    
+    mat3ds dsdJ = mat3dd(1.0)*(D.tr()*(dkappadJ - 2.*dmudJ/3.)) + D*(2*dmudJ);
+        
+    return dsdJ;
 }
 
 //-----------------------------------------------------------------------------
@@ -100,7 +126,7 @@ tens4ds FENewtonianFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
 //! dynamic shear viscosity
 double FENewtonianFluid::ShearViscosity(FEMaterialPoint& mp)
 {
-    return m_mu;
+    return m_mu*m_muhat->NormalizedViscosity(mp);
 }
 
 //! derivative of shear viscosity w.r.t. strain rate
@@ -113,5 +139,5 @@ double FENewtonianFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
 //! bulk viscosity
 double FENewtonianFluid::BulkViscosity(FEMaterialPoint& mp)
 {
-    return m_kappa;
+    return m_kappa*m_kappahat->NormalizedViscosity(mp);
 }

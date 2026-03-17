@@ -23,76 +23,67 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.*/
-#include "FETempDependentConductivity.h"
-#include "FEThermoFluidMaterialPoint.h"
+
+
+#include "FELinearThermoElasticFluid.h"
+#include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <FEBioFluid/FEFluidMaterialPoint.h>
+#include "FEThermoFluid.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FETempDependentConductivity, FEFluidThermalConductivity)
-
-// parameters
-    // properties
-    ADD_PROPERTY(m_Khat, "Khat")->SetLongName("normalized thermal conductivity");
-
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
-FETempDependentConductivity::FETempDependentConductivity(FEModel* pfem) : FEFluidThermalConductivity(pfem)
+FELinearThermoElasticFluid::FELinearThermoElasticFluid(FEModel* pfem) : FEThermoElasticFluid(pfem)
 {
-    m_Khat = nullptr;
-    m_Tr = 0;
 }
 
 //-----------------------------------------------------------------------------
 //! initialization
-bool FETempDependentConductivity::Init()
+bool FELinearThermoElasticFluid::Init()
 {
-    m_Tr = GetGlobalConstant("T");
-    
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
-    
-    m_Khat->Init();
-    
-    return FEFluidThermalConductivity::Init();
+    return true;
 }
 
 //-----------------------------------------------------------------------------
-void FETempDependentConductivity::Serialize(DumpStream& ar)
+//! gauge pressure
+double FELinearThermoElasticFluid::Pressure(FEMaterialPoint& mp)
 {
-    FEFluidThermalConductivity::Serialize(ar);
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+	double k = m_pFluid->m_k;
+    double p = -k*fp.m_ef;
     
-    if (ar.IsShallow()) return;
-    
-    ar & m_Tr;
-    ar & m_Khat;
-    
-    if (ar.IsLoading()) {
-        m_Khat->Init();
-    }
+    return p;
 }
 
 //-----------------------------------------------------------------------------
-//! calculate thermal conductivity at material point
-double FETempDependentConductivity::NormalizedConductivity(FEMaterialPoint& mp)
+//! tangent of pressure with respect to strain J
+double FELinearThermoElasticFluid::Tangent_Strain(FEMaterialPoint& mp)
 {
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double That = (tf.m_T+m_Tr)/m_Tr;
-    return m_Khat->value(That);
+    return -m_pFluid->m_k;
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of thermal conductivity with respect to strain J
-double FETempDependentConductivity::Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp)
+//! 2nd tangent of pressure with respect to strain J
+double FELinearThermoElasticFluid::Tangent_Strain_Strain(FEMaterialPoint& mp)
 {
     return 0;
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of thermal conductivity with respect to temperature T
-double FETempDependentConductivity::Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp)
+//! specific free energy
+double FELinearThermoElasticFluid::SpecificFreeEnergy(FEMaterialPoint& mp)
 {
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double That = (tf.m_T+m_Tr)/m_Tr;
-    return m_Khat->derive(That)/m_Tr;
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+	double k = m_pFluid->m_k;
+	double rhor = m_pFluid->m_rhor;
+
+    double a = k/(2*rhor)*pow(fp.m_ef,2);
+    return a;
 }
 
+//-----------------------------------------------------------------------------
+//! dilatation from temperature and pressure
+bool FELinearThermoElasticFluid::Dilatation(const double T, const double p, double& e)
+{
+    e = -p/m_pFluid->m_k;
+    return true;
+}

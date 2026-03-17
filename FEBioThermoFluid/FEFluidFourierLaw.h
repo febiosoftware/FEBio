@@ -23,34 +23,36 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEThermoViscousFluid.h"
-#include "FEThermoFluid.h"
-#include <FECore/log.h>
+#pragma once
+#include "FEFluidHeatFlux.h"
+#include "febiothermofluid_api.h"
+#include "FEFluidThermalConductivity.h"
 
 //-----------------------------------------------------------------------------
-//! Constructor.
-FEThermoViscousFluid::FEThermoViscousFluid(FEModel* pfem) : FEViscousFluid(pfem)
-{
-    m_Tr = 0;
-}
+// This class evaluates the heat flux from Fourier's law for a fluid
 
-//-----------------------------------------------------------------------------
-//! initialization
-bool FEThermoViscousFluid::Init()
+class FEBIOTHERMOFLUID_API FEFluidFourierLaw : public FEFluidHeatFlux
 {
-    m_Tr = GetGlobalConstant("T");
+public:
+    //! constructor
+    FEFluidFourierLaw(FEModel* pfem);
     
-    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined for thermo-viscous fluids in Globals section"); return false; }
+    //! initialize
+    bool Init() override;
     
-    return FEViscousFluid::Init();
-}
+    //! heat flux
+    vec3d HeatFlux(FEMaterialPoint& pt) override;
 
-//-----------------------------------------------------------------------------
-void FEThermoViscousFluid::Serialize(DumpStream& ar)
-{
-    FEViscousFluid::Serialize(ar);
+    double Conductivity(FEMaterialPoint& mp) override { return m_Kr*m_Khat->NormalizedConductivity(mp); }
     
-    if (ar.IsShallow()) return;
+    double Tangent_Conductivity_Temperature(FEMaterialPoint& mp) override { return m_Kr*m_Khat->Tangent_NormalizedConductivity_Temperature(mp); }
     
-    ar & m_Tr;
-}
+    double Tangent_Conductivity_Strain(FEMaterialPoint& mp) override { return m_Kr*m_Khat->Tangent_NormalizedConductivity_Strain(mp); }
+
+public:
+    double                      m_Kr;   // referential thermal conductivity
+    FEFluidThermalConductivity* m_Khat; // normalized thermal conductivity
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+};
