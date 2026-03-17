@@ -91,7 +91,7 @@ public:
 		Global g({ -1, name, initVal });
 		g.slot = program.addGlobal(g.name, type, initVal, true);
 		globals.push_back(g);
-		return (int)globals.size() - 1;
+		return g.slot;
 	}
 };
 
@@ -179,18 +179,9 @@ bool FECodeValuator::CompileScript()
 	return true;
 }
 
-int FECodeValuator::AddGlobal(const std::string& name)
+int FECodeValuator::AddGlobalDouble(const std::string& name)
 {
 	return m.AddGlobal(name, febcode::TypeKind::Double);
-}
-
-void FECodeValuator::SetGlobal(int slot, double val)
-{
-	assert(m.globals[slot].val.index == febcode::ValueIndex::DOUBLE);
-	if ((slot >= 0) && (slot < m.globals.size()))
-		m.globals[slot].val = val;
-	else
-		assert(false);
 }
 
 bool FECodeValuator::Init()
@@ -214,21 +205,39 @@ bool FECodeValuator::Init()
 double FECodeValuator::operator()(const FEMaterialPoint& pt)
 {
 	febcode::VM vm(m.program);
-	if (m.globals[0].slot >= 0) m.globals[0].val = febcode::vec3(pt.m_r0.x, pt.m_r0.y, pt.m_r0.z);
-	if (m.globals[1].slot >= 0) m.globals[1].val = GetFEModel()->GetTime().currentTime;
+	if (m.globals[0].slot >= 0) vm.setGlobal(m.globals[0].slot, febcode::vec3(pt.m_r0.x, pt.m_r0.y, pt.m_r0.z));
+	if (m.globals[1].slot >= 0) vm.setGlobal(m.globals[1].slot, GetFEModel()->GetTime().currentTime);
 	if (m.surf && (m.globals[2].slot >= 0))
 	{
 		FESurfaceElement* el = dynamic_cast<FESurfaceElement*>(pt.m_elem);
 		if (el)
 		{
 			vec3d n = m.surf->SurfaceNormal(*el, pt.m_index);
-			m.globals[2].val = febcode::vec3(n.x, n.y, n.z);
+			vm.setGlobal(m.globals[2].slot, febcode::vec3(n.x, n.y, n.z));
 		}
 	}
-	for (int i = 0; i < m.globals.size(); ++i)
+	febcode::Value v = vm.run();
+	return febcode::getDouble(v);
+}
+
+double FECodeValuator::run(const FEMaterialPoint& pt, std::vector < std::pair<int, double>>& globals) const
+{
+	febcode::VM vm(m.program);
+	if (m.globals[0].slot >= 0) vm.setGlobal(m.globals[0].slot, febcode::vec3(pt.m_r0.x, pt.m_r0.y, pt.m_r0.z));
+	if (m.globals[1].slot >= 0) vm.setGlobal(m.globals[1].slot, GetFEModel()->GetTime().currentTime);
+	if (m.surf && (m.globals[2].slot >= 0))
 	{
-		if (m.globals[i].slot >= 0)
-			vm.setGlobal(m.globals[i].slot, m.globals[i].val);
+		FESurfaceElement* el = dynamic_cast<FESurfaceElement*>(pt.m_elem);
+		if (el)
+		{
+			vec3d n = m.surf->SurfaceNormal(*el, pt.m_index);
+			vm.setGlobal(m.globals[2].slot, febcode::vec3(n.x, n.y, n.z));
+		}
+	}
+	for (int i = 0; i < globals.size(); ++i)
+	{
+		if (globals[i].first >= 0)
+			vm.setGlobal(globals[i].first, globals[i].second);
 	}
 	febcode::Value v = vm.run();
 	return febcode::getDouble(v);

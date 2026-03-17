@@ -39,9 +39,7 @@ public:
 	
 	bool Init() override;
 
-	int AddGlobal(const std::string& name);
-
-	void SetGlobal(int slot, double val);
+	int AddGlobalDouble(const std::string& name);
 
 	std::string GetScriptName() const { return m_scriptName; }
 	void SetScriptName(const std::string& name) { m_scriptName = name; }
@@ -54,6 +52,8 @@ public:
 	bool isConst() override { return false; }
 	double* constValue() override { return nullptr; }
 	void Serialize(DumpStream& ar) override;
+
+	double run(const FEMaterialPoint& pt, std::vector < std::pair<int, double>>& globals) const;
 
 private:
 	bool CompileScript();
