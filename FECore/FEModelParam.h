@@ -41,6 +41,9 @@ public:
 	FEModelParam();
 	virtual ~FEModelParam();
 
+	// initialization
+	virtual bool Init() { return true; }
+
 	// set the domain
 	void SetItemList(FEItemList* itemList) { m_dom = itemList; }
 
@@ -97,7 +100,7 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
-	bool Init();
+	bool Init() override;
 
 private:
 	FEScalarValuator*	m_val;
@@ -114,7 +117,7 @@ public:
 
 	FEParamVec3(const FEParamVec3& p);
 
-	bool Init();
+	bool Init() override;
 
 	// set the value
 	void operator = (const vec3d& v);
@@ -157,7 +160,7 @@ public:
 	void operator = (const mat3d& v);
 	void operator = (const FEParamMat3d& v);
 
-	bool Init();
+	bool Init() override;
 
 	// set the valuator
 	void setValuator(FEMat3dValuator* val);
@@ -193,6 +196,8 @@ public:
 	// set the value
 	void operator = (const mat3ds& v);
 	void operator = (const FEParamMat3ds& v);
+
+	bool Init() override;
 
 	// set the valuator
 	void setValuator(FEMat3dsValuator* val);

@@ -247,6 +247,11 @@ FEParamMat3ds::~FEParamMat3ds()
 	delete m_val;
 }
 
+bool FEParamMat3ds::Init()
+{
+	return (m_val ? m_val->Init() : true);
+}
+
 FEParamMat3ds::FEParamMat3ds(const FEParamMat3ds& p)
 {
 	m_val = p.m_val->copy();
