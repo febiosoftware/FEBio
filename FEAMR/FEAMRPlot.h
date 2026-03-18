@@ -24,22 +24,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-#include "feamr_api.h"
+#include <FECore/FEPlotData.h>
+#include <FECore/FEElement.h>
 
-class FEAMR_API FETetQualityCriterion : public FEMeshAdaptorCriterion
+class FEPlotTetQuality : public FEPlotDomainData
 {
 public:
-	FETetQualityCriterion(FEModel* fem);
-
-	bool GetElementValue(FEElement& el, double& value) override;
-
-public:
-	static double TetQuality(FEElement& el);
-
-private:
-	double minQuality = 0.0;
-
-	DECLARE_FECORE_CLASS()
+	FEPlotTetQuality(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+class FEPlotMeanRatio : public FEPlotDomainData
+{
+public:
+	FEPlotMeanRatio(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};
