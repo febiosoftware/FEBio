@@ -23,23 +23,38 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEMeshAdaptorCriterion.h>
-#include "feamr_api.h"
+#include "FEAMRPlot.h"
+#include <FECore/FEDomain.h>
+#include <FECore/FEMesh.h>
+#include "FETetQualityCriterion.h"
+#include "FEElementQualityCriterion.h"
 
-class FEAMR_API FETetQualityCriterion : public FEMeshAdaptorCriterion
+bool FEPlotTetQuality::Save(FEDomain& dom, FEDataStream& a)
 {
-public:
-	FETetQualityCriterion(FEModel* fem);
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		if (el.Shape() == ET_TET4)
+		{
+			double q = FETetQualityCriterion::TetQuality(el);
+			a << q;
+		}
+		else a << 0.0;
+	}
+	return true;
+}
 
-	bool GetElementValue(FEElement& el, double& value) override;
-
-public:
-	static double TetQuality(FEElement& el);
-
-private:
-	double minQuality = 0.0;
-
-	DECLARE_FECORE_CLASS()
-};
-
+bool FEPlotMeanRatio::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double q = FEElementQualityCriterion::ElementQuality(el);
+		a << q;
+	}
+	return true;
+}

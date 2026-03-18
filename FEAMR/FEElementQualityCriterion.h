@@ -27,15 +27,16 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptorCriterion.h>
 #include "feamr_api.h"
 
-class FEAMR_API FETetQualityCriterion : public FEMeshAdaptorCriterion
+
+class FEAMR_API FEElementQualityCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FETetQualityCriterion(FEModel* fem);
+	FEElementQualityCriterion(FEModel* fem);
 
 	bool GetElementValue(FEElement& el, double& value) override;
 
 public:
-	static double TetQuality(FEElement& el);
+	static double ElementQuality(FEElement& el);
 
 private:
 	double minQuality = 0.0;

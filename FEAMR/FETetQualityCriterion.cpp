@@ -25,7 +25,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FETetQualityCriterion.h"
 #include <FECore/FEElement.h>
-#include <FECore/FEModel.h>
+#include <FECore/FEMeshPartition.h>
+#include <FECore/FEMesh.h>
+
 
 BEGIN_FECORE_CLASS(FETetQualityCriterion, FEMeshAdaptorCriterion)
 	ADD_PARAMETER(minQuality, "min_quality")->setLongName("Minimum tet quality");
@@ -45,8 +47,10 @@ bool FETetQualityCriterion::GetElementValue(FEElement& el, double& value)
 
 double FETetQualityCriterion::TetQuality(FEElement& el)
 {
-	FEModel* fem = GetFEModel();
-	FEMesh& mesh = fem->GetMesh();
+	FEMeshPartition* partition = el.GetMeshPartition();
+	if (partition == nullptr) return 0.0;
+
+	FEMesh& mesh = *partition->GetMesh();
 
 	// get the tet's nodal coordinates
 	vec3d p[4];
