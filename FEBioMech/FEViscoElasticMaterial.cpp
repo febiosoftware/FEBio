@@ -222,6 +222,7 @@ tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density function
+/*
 double FEViscoElasticMaterial::StrainEnergyDensity(FEMaterialPoint& mp)
 {
 	// get the viscoelastic point data
@@ -325,4 +326,4 @@ bool FEViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
     et.m_F = Fsafe; et.m_J = Jsafe;
     return true;
 }
-
+*/
