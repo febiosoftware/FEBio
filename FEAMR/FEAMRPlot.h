@@ -40,3 +40,10 @@ public:
 	FEPlotMeanRatio(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+class FEPlotScaledJacobian : public FEPlotDomainData
+{
+public:
+	FEPlotScaledJacobian(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, FEDataStream& a);
+};

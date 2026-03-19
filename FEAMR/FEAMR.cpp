@@ -61,9 +61,11 @@ REGISTER_FECORE_CLASS(FEMinMaxFilterAdaptorCriterion, "min-max filter");
 REGISTER_FECORE_CLASS(FEDomainErrorCriterion, "relative error");
 REGISTER_FECORE_CLASS(FEElementDataCriterion, "element data");
 REGISTER_FECORE_CLASS(FETetQualityCriterion, "tet-quality");
-REGISTER_FECORE_CLASS(FEElementQualityCriterion, "mean-ratio");
+REGISTER_FECORE_CLASS(FEMeanRatioQualityCriterion, "mean-ratio");
+REGISTER_FECORE_CLASS(FEScaledJacobianQualityCriterion, "scaled Jacobian");
 
 // plot variables
 REGISTER_FECORE_CLASS(FEPlotTetQuality, "tet-quality");
 REGISTER_FECORE_CLASS(FEPlotMeanRatio, "mean-ratio");
+REGISTER_FECORE_CLASS(FEPlotScaledJacobian, "scaled-Jacobian");
 }

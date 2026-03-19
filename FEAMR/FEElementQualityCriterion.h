@@ -28,10 +28,10 @@ SOFTWARE.*/
 #include "feamr_api.h"
 
 
-class FEAMR_API FEElementQualityCriterion : public FEMeshAdaptorCriterion
+class FEAMR_API FEMeanRatioQualityCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEElementQualityCriterion(FEModel* fem);
+	FEMeanRatioQualityCriterion(FEModel* fem);
 
 	bool GetElementValue(FEElement& el, double& value) override;
 
@@ -44,3 +44,18 @@ private:
 	DECLARE_FECORE_CLASS()
 };
 
+class FEAMR_API FEScaledJacobianQualityCriterion : public FEMeshAdaptorCriterion
+{
+public:
+	FEScaledJacobianQualityCriterion(FEModel* fem);
+
+	bool GetElementValue(FEElement& el, double& value) override;
+
+public:
+	static double ElementQuality(FEElement& el);
+
+private:
+	double minQuality = 0.0;
+
+	DECLARE_FECORE_CLASS()
+};
