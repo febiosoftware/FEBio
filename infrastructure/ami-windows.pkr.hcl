@@ -50,7 +50,7 @@ variable "skip_create_ami" {
 
 source "amazon-ebs" "windows" {
   ami_name      = "packer-provisioned-windows-2019-intel-oneapi-${local.buildtime}"
-  instance_type = "c4.2xlarge"
+  instance_type = "c7i.8xlarge"
   source_ami    = data.amazon-ami.windows.id
   communicator  = "winrm"
 
@@ -100,55 +100,4 @@ build {
       "install_windows.bat ${local.intel_basekit_uri}"
     ]
   }
-
-  # paths
-  #provisioner "powershell" {
-  #  inline = [<<EOF
-# $userpath=[Environment]::GetEnvironmentVariable("Path", "User")
-# setx PATH "$userpath;${local.installation_path}"
-# EOF
-  #  ]
-  #}
-
-  #vcpkg
-  #provisioner "powershell" {
-  #  script = "./common/windows/vcpkg.ps1"
-  #}
-
-  # ZLIB
-  # provisioner "windows-shell" {
-  #   script = "./common/windows/zlib.bat"
-  # }
-
-  # # HYPRE
-  # provisioner "windows-shell" {
-  #   script = "./common/windows/hypre.bat"
-  # }
-
-  # # levmar
-  # provisioner "windows-shell" {
-  #   script = "./common/windows/levmar.bat"
-  # }
-
-  # # levmar header path
-  # provisioner "powershell" {
-  #   inline = [<<EOF
-#$userpath=[Environment]::GetEnvironmentVariable("Path", "User")
-#setx PATH "$userpath;${local.installation_path}\include\levmar"
-#EOF
-  #   ]
-  # }
-
-  # # mmg
-  # provisioner "windows-shell" {
-  #   script = "./common/windows/mmg.bat"
-  # }
-
-  # # sysprep for next launch
-  provisioner "powershell" {
-    inline = [
-        "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
-    ]
-  }
-
 }

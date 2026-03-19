@@ -9,6 +9,7 @@ cmake . -LA -B cmbuild ^
   -DCMAKE_BUILD_TYPE=Release ^
   -DCMAKE_INSTALL_PREFIX="c:/usr/local" ^
   -DBUILD_SHARED_LIBS=OFF ^	
+  -DNLOPT_CXX=OFF ^
 	-DNLOPT_GUILE=OFF ^
 	-DNLOPT_JAVA=OFF ^
 	-DNLOPT_MATLAB=OFF ^
