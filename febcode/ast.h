@@ -242,6 +242,12 @@ namespace febcode {
 	inline bool isInitializer(const ExprPtr& expr) { return (expr->exprType == ExpressionType::Initializer); }
 	inline bool isIndex      (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Index      ); }
 
+	inline bool isZero(const ExprPtr& expr) {
+		if (!isLiteral(expr)) return false;
+		auto literal = dynamic_cast<LiteralExpr*>(expr.get());
+		return isZero(literal->value);
+	}
+
 	inline bool isNegation   (const ExprPtr& expr) {
 		if (expr->exprType != ExpressionType::Unary) return false;
 		auto unary = dynamic_cast<UnaryExpr*>(expr.get());

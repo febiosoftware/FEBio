@@ -62,52 +62,53 @@ void Differentiator::diffVarDeclStmt(AST& ast, VarDeclStmt* stmt, const std::str
 		// copy the original variable declaration to the derivative AST
 		copyVars.push_back({ var_i.name, var_i.arraySizes, copy_expression(var_i.initializer.get()) });
 
+		// No need to differentiate non-numeric types, since they don't contribute to the derivative. 
+		// We can just copy them to the derivative AST without creating a derivative variable for them.
+		if (type->kind == TypeKind::Bool || type->kind == TypeKind::Int || type->kind == TypeKind::String) continue;
+
 		// create a new variable for the derivative of this variable
 		std::string derivName = "__d" + var_i.name + "_d" + var;
 
-		// only differentiate numeric types
-		if (type->kind == TypeKind::Double)
+		ExprPtr init = nullptr;
+		if (var_i.initializer)
 		{
-			deriveVars[var_i.name] = derivName;
-			ExprPtr init = (var_i.initializer ? simplify(differentiate(var_i.initializer.get(), var).get()) : Literal(Value(0.0)));
-			newVars.push_back({ derivName, std::vector<size_t>(), std::move(init) });
-		}
-		else if (type->kind == TypeKind::Vec2)
-		{
-			deriveVars[var_i.name] = derivName;
-			ExprPtr init = (var_i.initializer ? simplify(differentiate(var_i.initializer.get(), var).get()) : Literal(Value(vec2(0., 0.))));
-			newVars.push_back({ derivName, std::vector<size_t>(), std::move(init) });
-		}
-		else if (type->kind == TypeKind::Vec3)
-		{
-			deriveVars[var_i.name] = derivName;
-			ExprPtr init = (var_i.initializer ? simplify(differentiate(var_i.initializer.get(), var).get()) : Literal(Value(vec3(0., 0., 0.))));
-			newVars.push_back({ derivName, std::vector<size_t>(), std::move(init) });
-		}
-		else if (type->kind == TypeKind::Bool || type->kind == TypeKind::Int || type->kind == TypeKind::String)
-		{
-			// don't need to derive these types
-		}
-		else if (type->kind == TypeKind::Array)
-		{
-			deriveVars[var_i.name] = derivName;
+			// lets differentiate the initializer.
+			init = simplify(differentiate(var_i.initializer.get(), var));
 
-			ExprPtr init = (var_i.initializer ? simplify(differentiate(var_i.initializer.get(), var).get()) : Initializer(type->arraySize, 0.0));
-			newVars.push_back({ derivName, {type->arraySize}, std::move(init)});
-		}
-		else if (type->kind == TypeKind::Struct)
-		{
-			deriveVars[var_i.name] = derivName;
-			ExprPtr init = (var_i.initializer ? simplify(differentiate(var_i.initializer.get(), var).get()) : Initializer(type->fields));
-			newVars.push_back({ derivName, std::vector<size_t>(), std::move(init)});
+			// if it's zero, then this variable didn't contribute to the derivative, so we can skip creating a derivative variable for it.
+			if (isZero(init))
+				continue;
 		}
 		else
-			throw std::runtime_error("Don't know how to differentiate variable.");
+		{
+			// If the variable was not initializer, it could be assigned later. 
+			// To be safe, we should create a derivative variable for it and initialize it to zero.
+			switch (type->kind)
+			{
+			case TypeKind::Double: init = Literal(Value(0.0)); break;
+			case TypeKind::Vec2  : init = Literal(Value(vec2(0., 0.))); break;
+			case TypeKind::Vec3  : init = Literal(Value(vec3(0., 0., 0.))); break;
+			case TypeKind::Array : init = Initializer(type->arraySize, 0.0); break;
+			case TypeKind::Struct: init = Initializer(type->fields); break;
+			default:
+				throw std::runtime_error("Don't know how to differentiate variable.");
+			}
+		}
+
+		// add the new derivative variable to the map and the list of new variables for the derivative AST
+		std::vector<size_t> arraySizes;
+		if (type->kind == TypeKind::Array)
+		{
+			arraySizes.push_back(type->arraySize);
+		}
+		deriveVars[var_i.name] = derivName;
+		newVars.push_back({ derivName, arraySizes, std::move(init)});
+
 	}
 
 	// create new variable declaration statements for the derivatives and add it to the derivative AST
 	ast.addStatement(std::make_unique<VarDeclStmt>(stmt->type, copyVars));
-	ast.addStatement(std::make_unique<VarDeclStmt>(stmt->type, newVars ));
+	if (!newVars.empty()) ast.addStatement(std::make_unique<VarDeclStmt>(stmt->type, newVars ));
 }
 
 ExprPtr Differentiator::differentiate(const Expression* expr, const std::string& var) 
@@ -144,7 +145,12 @@ ExprPtr Differentiator::diffVariable(const VariableExpr* variable, const std::st
 		return Variable(it->second);
 	}
 	else
+	{
+		// we may get here if a derivative was not created for this variable 
+		// (e.g. if it's a non-numeric type or has a literal initializer),
+		// in which case we treat it as a constant and return zero
 		return Literal(Value(0.0));
+	}
 }
 
 ExprPtr Differentiator::diffUnary(const UnaryExpr* unary, const std::string& var)

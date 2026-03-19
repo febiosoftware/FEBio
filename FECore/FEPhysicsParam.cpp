@@ -37,6 +37,10 @@ bool FEPhysicsParam::Init()
 	{
 		std::string scriptName = m.code->GetScriptName();
 
+#ifndef NDEBUG
+		feLogEx(m.fem, "compiling script \"%s\":\n", scriptName.c_str());
+#endif
+
 		// get the number of variables
 		int nvars = (int)m.varNames.size();
 

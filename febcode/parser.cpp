@@ -2,56 +2,26 @@
 #include <iostream>
 using namespace febcode;
 
-void Parser::synchronize() {
-	advance(); // skip the erroneous token
-
-	while (!isAtEnd()) {
-		// Stop if the previous token was a semicolon (likely end of statement)
-		if (previous().type == TokenType::Semicolon) return;
-
-		// Check if the current token could be the start of a new statement/declaration
-		switch (peek().type) {
-		case TokenType::Type:
-		case TokenType::Return:
-		case TokenType::If:
-		case TokenType::While:
-		case TokenType::Struct:
-			return;
-		default:
-			break;
-		}
-
-		advance(); // keep skipping
-	}
-}
-
 std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
-	try {
-		if (isType())
-		{
-			Type type = prg.types.getType(lexeme(previous()));
+	if (isType())
+	{
+		Type type = prg.types.getType(lexeme(previous()));
 
-			if (match(TokenType::Identifier)) {
-				std::string name = lexeme(previous());
+		if (match(TokenType::Identifier)) {
+			std::string name = lexeme(previous());
 
-				if (match(TokenType::LeftParen)) {
-					// function declaration
-					return parseFunctionDeclaration(type, name);
-				}
-
-				return parseVarDeclaration(type, name);
+			if (match(TokenType::LeftParen)) {
+				// function declaration
+				return parseFunctionDeclaration(type, name);
 			}
-			else
-				throw std::runtime_error("Expected identifier after type.");
+
+			return parseVarDeclaration(type, name);
 		}
-		if (match(TokenType::Struct)) return parseStructDeclaration();
-		return parseStatement();
+		else
+			throw std::runtime_error("Expected identifier after type.");
 	}
-	catch (const std::runtime_error& e) {
-		std::cerr << "ERROR: Parse error in parseDeclaration: " << e.what() << "\n";
-		synchronize();  // skip tokens until a safe point
-		return nullptr; // skip malformed declaration
-	}
+	if (match(TokenType::Struct)) return parseStructDeclaration();
+	return parseStatement();
 }
 
 std::unique_ptr<febcode::Statement> Parser::parseBlockStatement() {

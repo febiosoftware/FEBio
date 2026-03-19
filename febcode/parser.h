@@ -96,8 +96,6 @@ namespace febcode {
 
 		std::unique_ptr<Expression> finishCall(std::unique_ptr<Expression> callee);
 
-		void synchronize(); // for error recovery
-
 		// --- Helper functions to map tokens to enums ---
 		BinaryOp tokenToBinaryOp(const Token& t) {
 			switch (t.type) {
