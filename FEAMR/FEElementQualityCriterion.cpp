@@ -158,7 +158,7 @@ double FEScaledJacobianQualityCriterion::ElementQuality(FEElement& el)
 	// for each node, find 3 edges that meet at the node
 	int n = el.Nodes();
 	const int(*edgeData)[3][2] = nullptr;
-	switch (el.Type())
+	switch (el.Shape())
 	{
 	case ET_HEX8  : edgeData = hexCornerEdges; break;
 	case ET_PENTA6: edgeData = wedgeCornerEdges; break;
