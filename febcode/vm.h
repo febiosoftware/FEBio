@@ -20,19 +20,8 @@ namespace febcode
 		{
 			m_program = &program;
 			globalCount = (int)m_program->globals.size();
-			assert(m_program->globalInitializers.size() == globalCount);
 			m_stack.resize(globalCount + program.maxStackSize);
 			stackTop = globalCount; // stack starts after global region
-
-			// initialize globals
-			for (auto& it : m_program->globalInitializers)
-			{
-				const Value& v = it.second;
-				Value& d = m_stack[it.first];
-				if (isStruct(v)) d = copyStruct(getStruct(v));
-				else if (isArray(v)) d = copyArray(getArray(v));
-				else d = v;
-			}
 		}
 
 		VM(const Program& program)
@@ -62,15 +51,19 @@ namespace febcode
 		Value getGlobal(const std::string& name)
 		{
 			auto it = m_program->globals.find(name);
+#ifndef NDEBUG
 			if (it == m_program->globals.end())
 				throw std::runtime_error("Undefined global variable: " + name);
+#endif
 			return m_stack[it->second.slot];
 		}
 
 		void setGlobal(int i, const Value& v)
 		{
+#ifndef NDEBUG
 			if ((i<0) || (i >= globalCount))
 				throw std::runtime_error("Invalid global index: " + std::to_string(i));
+#endif
 
 			if (isStruct(v)) m_stack[i] = copyStruct(getStruct(v));
 			else if (isArray(v)) m_stack[i] = copyArray(getArray(v));
@@ -79,8 +72,10 @@ namespace febcode
 
 		void setGlobal(int i, std::initializer_list<Value> values)
 		{
+#ifndef NDEBUG
 			if ((i<0) || (i >= globalCount))
 				throw std::runtime_error("Invalid global index: " + std::to_string(i));
+#endif
 
 			Value& v = m_stack[i];
 			if (isArray(v))

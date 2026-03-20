@@ -16,55 +16,26 @@ Program::Program()
 		});
 }
 
-int Program::addGlobal(const std::string& name, Type type, const Value& initializer, bool immutable)
+int Program::addGlobal(const std::string& name, Type type)
 {
 	if (globals.find(name) != globals.end())
 		throw std::runtime_error("Global variable '" + name + "' is already defined.");
 
 	int slot = (int)globals.size();
-	globals[name] = { type, slot, !isVoid(initializer), immutable };
-	globalInitializers[slot] = initializer;
+	globals[name] = { type, slot, false, false };
+
 	return slot;
 }
 
-int Program::addGlobal(const std::string& name, Type type, std::initializer_list<Value> values, bool immutable)
+int Program::injectGlobal(const std::string& name, Type type)
 {
 	if (globals.find(name) != globals.end())
 		throw std::runtime_error("Global variable '" + name + "' is already defined.");
 
 	int slot = (int)globals.size();
-	globals[name] = { type, slot, true, immutable };
-
-	if (type->kind == TypeKind::Struct)
-	{
-		if (values.size() != type->fields.size())
-			throw std::runtime_error("Struct initializer has incorrect number of fields.");
-
-		auto obj = createStruct(type);
-		std::copy(values.begin(), values.end(), obj->fields.begin());
-
-		globalInitializers[slot] = obj;
-	}
-	else if (type->kind == TypeKind::Array)
-	{
-		if (values.size() != type->arraySize)
-			throw std::runtime_error("Array initializer has incorrect number of elements.");
-
-		auto arr = createArray(type->elementType, type->arraySize);
-		std::copy(values.begin(), values.end(), arr->elements.begin());
-		globalInitializers[slot] = arr;
-	}
-	else
-	{
-		throw std::runtime_error("Initializer list can only be used for struct or array types.");
-	}
+	globals[name] = { type, slot, true, true};
 
 	return slot;
-}
-
-int Program::addGlobal(const std::string& name, double v, bool immutable)
-{
-	return addGlobal(name, types.getDoubleType(), v, immutable);
 }
 
 Type Program::RegisterStruct(const std::string& name, const std::vector<std::pair<Type, std::string>>& fields)

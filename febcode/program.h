@@ -42,10 +42,11 @@ namespace febcode {
 	public:
 		Program();
 
-		int addGlobal(const std::string& name, Type type, const Value& initializer = Value{}, bool immutable = false);
-		int addGlobal(const std::string& name, Type type, std::initializer_list<Value> values, bool immutable = false);
-		int addGlobal(const std::string& name, double v, bool immutable = false);
+		// adds a global variable (from compiled code)
+		int addGlobal(const std::string& name, Type type);
 
+		// adds a global variable (from native code)
+		int injectGlobal(const std::string& name, Type type);
 
 		Type RegisterStruct(const std::string& name, const std::vector<std::pair<Type, std::string>>& fields);
 		Type RegisterStruct(const std::string& name, const std::vector<std::pair<TypeKind, std::string>>& fields);
@@ -68,7 +69,6 @@ namespace febcode {
 		std::vector<BinaryOperatorInfo> operators;
 
 		std::unordered_map<std::string, Global> globals;
-		std::unordered_map<int, Value> globalInitializers;
 		std::unordered_map<std::string, NativeFnc> m_specialFns;
 
 		size_t maxStackSize = 0;

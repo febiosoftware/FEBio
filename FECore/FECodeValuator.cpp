@@ -44,7 +44,6 @@ public:
 	struct Global {
 		int slot = -1;
 		std::string name;
-		febcode::Value val;
 	};
 
 	std::string scriptCode;
@@ -70,19 +69,6 @@ public:
 			}
 		}
 
-		// figure out the initializer value based on the type
-		febcode::Value initVal;
-		switch (typeKind)
-		{
-		case febcode::TypeKind::Bool  : initVal = (bool)false; break;
-		case febcode::TypeKind::Int   : initVal = (int)0; break;
-		case febcode::TypeKind::Double: initVal = 0.0; break;
-		case febcode::TypeKind::Vec2  : initVal = febcode::vec2(0., 0.); break;
-		case febcode::TypeKind::Vec3  : initVal = febcode::vec3(0., 0., 0.); break;
-		default:
-			return -1;
-		};
-
 		febcode::Type type = program.types.getTypeFromKind(typeKind);
 		if (type == nullptr)
 		{
@@ -90,8 +76,8 @@ public:
 		}
 
 		// add the new global
-		Global g({ -1, name, initVal });
-		g.slot = program.addGlobal(g.name, type, initVal, true);
+		Global g({ -1, name });
+		g.slot = program.injectGlobal(g.name, type);
 		globals.push_back(g);
 		return g.slot;
 	}
@@ -302,9 +288,9 @@ bool ValidateScript(const std::string& script, std::string& err)
 		febcode::Compiler compiler(program);
 
 		int globals[3] = { -1, -1, -1 };
-		globals[0] = program.addGlobal("_pos0" , vec3, febcode::vec3( 0., 0., 0. ));
-		globals[1] = program.addGlobal("_time" , 0.0);
-		globals[2] = program.addGlobal("_norm0", vec3, febcode::vec3(0., 0., 0.));
+		globals[0] = program.injectGlobal("_pos0" , vec3);
+		globals[1] = program.injectGlobal("_time" , program.types.getDoubleType());
+		globals[2] = program.injectGlobal("_norm0", vec3);
 
 		compiler.compile();
 	}

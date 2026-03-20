@@ -71,7 +71,7 @@ bool FECodeController::CompileScript()
 
 		febcode::Compiler compiler(program);
 
-		globals[0] = program.addGlobal("_time", 0.0);
+		globals[0] = program.injectGlobal("_time", program.types.getDoubleType());
 
 		compiler.compile();
 

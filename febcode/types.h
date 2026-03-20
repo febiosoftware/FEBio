@@ -132,16 +132,29 @@ namespace febcode
 
 		void operator = (const Value& other)
 		{
-			if (this != &other)
+			if (this == &other) return;
+
+			// for simple types we use the fast path
+			if ((index < ValueIndex::STRING) && (other.index < ValueIndex::STRING))
 			{
-				if ((index == ValueIndex::DOUBLE) && (other.index == ValueIndex::DOUBLE))
+				index = other.index;
+				switch (index)
 				{
-					d = other.d;
+				case ValueIndex::VOID  : break;	// no data to copy
+				case ValueIndex::BOOL  : b = other.b; break;
+				case ValueIndex::INT   : i = other.i; break;
+				case ValueIndex::DOUBLE: d = other.d; break;
+				case ValueIndex::VEC2  : vec2Value = other.vec2Value; break;
+				case ValueIndex::VEC3  : vec3Value = other.vec3Value; break;
+				default: 
+					assert(false);
+					break; // should not happen
 				}
-				else if (this != &other) {
-					destroy();
-					copyFrom(other);
-				}
+			}
+			else
+			{
+				destroy();
+				copyFrom(other);
 			}
 		}
 
