@@ -80,6 +80,11 @@ void Compiler::emit(OpCode op, int arg)
 		maxStackDepth = stackDepth;
 }
 
+void Compiler::emitUint8(uint8_t v)
+{
+	prg.code.push_back(v);
+}
+
 void Compiler::emitUint16(uint16_t v)
 {
 	prg.code.push_back((v >> 8) & 0xff);
@@ -173,10 +178,10 @@ int Compiler::stackEffect(OpCode op, int arg)
 	}
 }
 
-uint16_t Compiler::addConstant(const Value& v)
+uint8_t Compiler::addConstant(const Value& v)
 {
 	prg.constants.push_back(v);
-	return (uint16_t)(prg.constants.size() - 1);
+	return (uint8_t)(prg.constants.size() - 1);
 }
 
 int Compiler::emitJump(OpCode op)
@@ -267,7 +272,7 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 			}
 
 			emit(OpCode::CREATE_STRUCT, (int)expectedType->fields.size());
-			emitUint16(static_cast<uint16_t>(expectedType->typeIndex));
+			emitUint8(static_cast<uint8_t>(expectedType->typeIndex));
 		}
 		else
 		{
@@ -293,7 +298,7 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 			}
 
 			emit(OpCode::CREATE_ARRAY, (int)expectedType->arraySize);
-			emitUint16(static_cast<uint16_t>(expectedType->arraySize));
+			emitUint8(static_cast<uint8_t>(expectedType->arraySize));
 		}
 		else
 		{
@@ -384,7 +389,7 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 			{
 				prg.globals[var.name].isInitialized = true;
 				emit(OpCode::SET_GLOBAL);
-				emitUint16(slot);
+				emitUint8((uint8_t)slot);
 				emit(OpCode::POP);
 			}
 		}
@@ -475,9 +480,9 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 			throw std::runtime_error("Missing return value in function with non-void return type.");
 
 		// return without value -> push monostate
-		uint16_t idx = addConstant(Value());
+		uint8_t idx = addConstant(Value());
 		emit(OpCode::PUSH_CONST);
-		emitUint16(idx);
+		emitUint8(idx);
 	}
 
 	emit(OpCode::RETURN);
@@ -573,9 +578,9 @@ Type Compiler::compileExpression(Expression* expr)
 
 Type Compiler::compileLiteral(LiteralExpr* expr)
 {
-	uint16_t idx = addConstant(expr->value);
+	uint8_t idx = addConstant(expr->value);
 	emit(OpCode::PUSH_CONST);
-	emitUint16(idx);
+	emitUint8(idx);
 	return prg.types.getBuiltinType(expr->value);
 }
 
@@ -585,7 +590,7 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	if (local != -1)
 	{
 		emit(OpCode::GET_LOCAL);
-		emitUint16(local);
+		emitUint8(local);
 
 		if (!m_locals[local].isInitialized)
 			throw std::runtime_error("Cannot read uninitialized local variable: " + expr->name);
@@ -603,7 +608,7 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	glob.refcount++;
 
 	emit(OpCode::GET_GLOBAL);
-	emitUint16(global);
+	emitUint8(global);
 	return glob.type;
 }
 
@@ -648,14 +653,14 @@ Type Compiler::compileVariableRef(VariableExpr* expr)
 	if (slot != -1)
 	{
 		emit(OpCode::GET_LOCAL_REF);
-		emitUint16((uint16_t)slot);
+		emitUint8((uint8_t)slot);
 		returnType = m_locals[slot].type;
 	}
 	else
 	{
 		slot = resolveGlobal(expr->name);
 		emit(OpCode::GET_GLOBAL_REF);
-		emitUint16((uint16_t)slot);
+		emitUint8((uint8_t)slot);
 		returnType = prg.globals[expr->name].type;
 	}
 
@@ -670,7 +675,7 @@ Type Compiler::compileMemberRef(MemberExpr* expr)
 		int memberIndex = resolveMember(objectType, expr->property);
 
 		emit(OpCode::GET_MEMBER_REF);
-		emitUint16((uint16_t)memberIndex);
+		emitUint8((uint8_t)memberIndex);
 
 		return memberType(objectType, memberIndex);
 	}
@@ -925,7 +930,7 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 	if (auto overload = prg.findBinaryOperatorOverload(op, type_l, type_r))
 	{
 		emit(OpCode::CALL_BINARY);
-		emitUint16(static_cast<uint16_t>(overload->index));
+		emitUint8(static_cast<uint8_t>(overload->index));
 		return overload->returnType;
 	}
 
@@ -1007,7 +1012,7 @@ Type Compiler::compileCall(CallExpr* call)
 		{
 			compileFncArgs(call->arguments, false);
 			emit(OpCode::PRINT, (int)call->arguments.size());
-			emitUint16(static_cast<uint16_t>(call->arguments.size())); // number of arguments
+			emitUint8(static_cast<uint8_t>(call->arguments.size())); // number of arguments
 			return prg.types.getVoidType();
 		}
 
@@ -1035,8 +1040,8 @@ Type Compiler::compileCall(CallExpr* call)
 		stackDepth += (int)prg.functions[fnIndex].maxStackSize;
 
 		emit(OpCode::CALL, (int)prg.functions[fnIndex].args.size());
-		emitUint16(fnIndex);
-		emitUint16((uint16_t)call->arguments.size());
+		emitUint8(fnIndex);
+		emitUint8((uint8_t)call->arguments.size());
 
 		return prg.functions[fnIndex].returnType;
 	}
@@ -1060,7 +1065,7 @@ Type Compiler::compileMember(MemberExpr* expr)
 		std::size_t index = it - type->fields.begin();
 
 		emit(OpCode::GET_PROPERTY);
-		emitUint16((uint16_t)index);
+		emitUint8((uint8_t)index);
 
 		return it->first;
 	}
@@ -1082,8 +1087,8 @@ Type Compiler::compileMember(MemberExpr* expr)
 			if (((swizzle.size() == 2) || (swizzle.size() == 3)) &&
 				swizzle.find_first_not_of("xy") == std::string::npos)
 			{
-				uint16_t size = (uint16_t)swizzle.size();
-				uint16_t mask = 0;
+				uint8_t size = (uint8_t)swizzle.size();
+				uint8_t mask = 0;
 				for (char c : swizzle)
 				{
 					switch (c)
@@ -1096,8 +1101,8 @@ Type Compiler::compileMember(MemberExpr* expr)
 
 				}
 				emit(OpCode::GET_VEC2_SWIZZLE);
-				emitUint16(mask);
-				emitUint16(size);
+				emitUint8(mask);
+				emitUint8(size);
 				return (size == 2 ? prg.types.getVec2Type() : prg.types.getVec3Type());
 			}
 			else
@@ -1127,8 +1132,8 @@ Type Compiler::compileMember(MemberExpr* expr)
 			if (((swizzle.size() == 2) || (swizzle.size() == 3)) &&
 				swizzle.find_first_not_of("xyz") == std::string::npos)
 			{
-				uint16_t size = (uint16_t)swizzle.size();
-				uint16_t mask = 0;
+				uint8_t size = (uint8_t)swizzle.size();
+				uint8_t mask = 0;
 				for (char c : swizzle)
 				{
 					switch (c)
@@ -1142,8 +1147,8 @@ Type Compiler::compileMember(MemberExpr* expr)
 
 				}
 				emit(OpCode::GET_VEC3_SWIZZLE);
-				emitUint16(mask);
-				emitUint16(size);
+				emitUint8(mask);
+				emitUint8(size);
 				return (size == 2 ? prg.types.getVec2Type() : prg.types.getVec3Type());
 			}
 			else

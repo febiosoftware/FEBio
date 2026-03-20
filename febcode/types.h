@@ -132,8 +132,6 @@ namespace febcode
 
 		void operator = (const Value& other)
 		{
-			if (this == &other) return;
-
 			// for simple types we use the fast path
 			if ((index < ValueIndex::STRING) && (other.index < ValueIndex::STRING))
 			{
@@ -151,7 +149,7 @@ namespace febcode
 					break; // should not happen
 				}
 			}
-			else
+			else if (this != &other)
 			{
 				destroy();
 				copyFrom(other);

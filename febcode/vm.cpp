@@ -26,8 +26,8 @@ const char* IPToString(uint8_t ip)
 	switch ((OpCode)ip)
 	{
 	case OpCode::PUSH_CONST    : return "MOV ";
-	case OpCode::GET_GLOBAL    : return "GETG";
-	case OpCode::SET_GLOBAL    : return "SETG";
+	case OpCode::GET_GLOBAL    : return "GTG ";
+	case OpCode::SET_GLOBAL    : return "STG ";
 	case OpCode::STORE         : return "STRE";
 	case OpCode::GET_GLOBAL_REF: return "GREF";
 	case OpCode::GET_LOCAL_REF : return "LREF";
@@ -152,21 +152,21 @@ Value VM::execute()
 		{
 		case OpCode::PUSH_CONST:
 		{
-			uint16_t idx = readUint16();
+			uint8_t idx = readByte();
 			push(m_program->constants[idx]);
 			break;
 		}
 
 		case OpCode::GET_GLOBAL:
 		{
-			uint16_t slot = readUint16();
+			uint8_t slot = readByte();
 			push(m_stack[slot]);
 			break;
 		}
 
 		case OpCode::GET_GLOBAL_REF:
 		{
-			uint16_t slot = readUint16();
+			uint8_t slot = readByte();
 
 			Value ref;
 			ref.index = ValueIndex::REF;
@@ -179,7 +179,7 @@ Value VM::execute()
 
 		case OpCode::GET_LOCAL_REF:
 		{
-			uint16_t slot = readUint16();
+			uint8_t slot = readByte();
 
 			CallFrame& frame = currentFrame();
 
@@ -194,7 +194,7 @@ Value VM::execute()
 
 		case OpCode::GET_MEMBER_REF:
 		{
-			uint16_t memberIndex = readUint16();
+			uint8_t memberIndex = readByte();
 
 			const Value& objRef = pop();
 			Value* slot = (Value*)objRef.ref.ptr;
@@ -335,14 +335,14 @@ Value VM::execute()
 
 		case OpCode::SET_GLOBAL:
 		{
-			uint16_t slot = readUint16();
+			uint8_t slot = readByte();
 			m_stack[slot] = peek();
 			break;
 		}
 
 		case OpCode::GET_LOCAL:
 		{
-			uint16_t slot = readUint16();
+			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
 			push(m_stack[frame.base + slot]);
 			break;
@@ -350,7 +350,7 @@ Value VM::execute()
 
 		case OpCode::SET_LOCAL:
 		{
-			uint16_t slot = readUint16();
+			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
 			m_stack[frame.base + slot] = peek();
 			break;
@@ -580,8 +580,8 @@ Value VM::execute()
 		}
 		case OpCode::GET_VEC2_SWIZZLE:
 		{
-			uint16_t mask = readUint16();
-			uint16_t size = readUint16();
+			uint8_t mask = readByte();
+			uint8_t size = readByte();
 			const Value& vec = pop();
 			const vec2& v = getVec2(vec);
 			double c[4] = { v.x, v.y, 0.0, 0.0 };
@@ -673,8 +673,8 @@ Value VM::execute()
 		}
 		case OpCode::GET_VEC3_SWIZZLE:
 		{
-			uint16_t mask = readUint16();
-			uint16_t size = readUint16();
+			uint8_t mask = readByte();
+			uint8_t size = readByte();
 			const Value& vec = pop();
 			const vec3& v = getVec3(vec);
 			double c[4] = { v.x, v.y, v.z, 0.0 };
@@ -739,7 +739,7 @@ Value VM::execute()
 
 		case OpCode::CREATE_STRUCT:
 		{
-			uint16_t typeIndex = readUint16();
+			uint8_t typeIndex = readByte();
 			Type type = m_program->types.getStructType(typeIndex);
 			int fieldCount = (int)type->fields.size();
 
@@ -767,7 +767,7 @@ Value VM::execute()
 		}
 		case OpCode::GET_PROPERTY:
 		{
-			uint16_t slot = readUint16();
+			uint8_t slot = readByte();
 
 			const Value& objVal = pop();
 
@@ -791,7 +791,7 @@ Value VM::execute()
 		}
 
 		case OpCode::CREATE_ARRAY: {
-			uint16_t count = readUint16();
+			uint8_t count = readByte();
 			auto arr = std::make_shared<ArrayValue>();
 
 			arr->elements.resize(count);
@@ -865,22 +865,22 @@ Value VM::execute()
 
 		case OpCode::CALL:
 		{
-			uint16_t fnIndex = readUint16();
-			uint16_t args = readUint16();
+			uint8_t fnIndex = readByte();
+			uint8_t args = readByte();
 			callFunction(fnIndex, args);
 			break;
 		}
 
 		case OpCode::CALL_BINARY:
 		{
-			uint16_t opIndex = readUint16();
+			uint8_t opIndex = readByte();
 			callBinaryOperator(opIndex);
 			break;
 		}
 		
 		case OpCode::PRINT:
 		{
-			uint16_t argCount = readUint16();
+			uint8_t argCount = readByte();
 			std::vector<Value> args;
 			for (int i = 0; i < argCount; ++i)
 			{

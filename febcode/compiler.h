@@ -183,11 +183,12 @@ namespace febcode
 		// ===== Bytecode =====
 
 		void emit(OpCode op, int arg = 0);
+		void emitUint8(uint8_t v);
 		void emitUint16(uint16_t v);
 
 		int stackEffect(OpCode op, int arg);
 
-		uint16_t addConstant(const Value& v);
+		uint8_t addConstant(const Value& v);
 
 		int emitJump(OpCode op);
 		void patchJump(int offset);
