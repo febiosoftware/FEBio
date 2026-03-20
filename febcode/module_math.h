@@ -26,9 +26,6 @@ namespace febcode {
 			prg.registerNative("sqrt" , std::sqrt);
 			prg.registerNative("tan"  , std::tan);
 			prg.registerNative("tanh" , std::tanh);
-
-			// math constants
-			prg.addGlobal("PI", 3.14159265358979323846, true);
 		}
 	};
 }

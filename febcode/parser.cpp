@@ -472,6 +472,14 @@ std::unique_ptr<Expression> Parser::parsePrimary()
 		return std::make_unique<LiteralExpr>(false);
 
 	if (match(TokenType::Identifier)) {
+		std::string name(previous().start, previous().length);
+
+		// check some special built-in constants like "PI"
+		if (name == "PI") {
+			return std::make_unique<LiteralExpr>(3.14159265358979323846);
+		}
+
+		// otherwise, it's a variable
 		return std::make_unique<VariableExpr>(
 			std::string(previous().start, previous().length));
 	}
