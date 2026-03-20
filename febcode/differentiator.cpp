@@ -7,44 +7,65 @@ using namespace febcode;
 std::unique_ptr<AST> Differentiator::differentiate(const AST& ast, const std::string& var)
 {
 	auto derivativeAst = std::make_unique<AST>();
-	for (const auto& stmt : ast.statements)
+
+	// first, see if the source AST actually depends on the variable we're differentiating with respect to. 
+	// If not, we can just return an empty AST
+	dependencyFound = false;
+	for (const auto& stmt : ast.root.statements)
 	{
-		differentiateStmt(*derivativeAst, stmt.get(), var);
+		if (febcode::dependsOn(stmt.get(), var))
+		{
+			dependencyFound = true;
+			break;
+		}
+	}
+
+	if (!dependencyFound)
+	{
+		// the derivative of a constant is zero, so we can just return an AST with a single statement that returns zero.
+		derivativeAst->addStatement(std::make_unique<ReturnStmt>(Literal(Value(0.0))));
+		return derivativeAst;
+	}
+
+	for (const auto& stmt : ast.root.statements)
+	{
+		differentiateStmt(derivativeAst->root, stmt.get(), var);
 	}
 	return derivativeAst;
 }
 
-void Differentiator::differentiateStmt(AST& ast, Statement* stmt, const std::string& var)
+void Differentiator::differentiateStmt(BlockStmt& ast, Statement* stmt, const std::string& var)
 {
 	if      (auto exprStmt   = dynamic_cast<ExpressionStmt*>(stmt)) diffExpressionStmt(ast, exprStmt  , var);
 	else if (auto returnStmt = dynamic_cast<ReturnStmt*    >(stmt)) diffReturnStmt    (ast, returnStmt, var); 
 	else if (auto structStmt = dynamic_cast<StructStmt*    >(stmt)) diffStructStmt    (ast, structStmt, var);
 	else if (auto varStmt    = dynamic_cast<VarDeclStmt*   >(stmt)) diffVarDeclStmt   (ast, varStmt   , var);
+	else if (auto ifStmt     = dynamic_cast<IfStmt*        >(stmt)) diffIfStmt        (ast, ifStmt    , var);
 	else
 	{
 		throw std::runtime_error("Unsupported statement type for differentiation");
 	}
 }
 
-void Differentiator::diffExpressionStmt(AST& ast, ExpressionStmt* stmt, const std::string& var)
+void Differentiator::diffExpressionStmt(BlockStmt& ast, ExpressionStmt* stmt, const std::string& var)
 {
 	auto derivativeExpr = simplify(differentiate(stmt->expr.get(), var).get());
 	ast.addStatement(std::make_unique<ExpressionStmt>(std::move(derivativeExpr)));
 }
 
-void Differentiator::diffReturnStmt(AST& ast, ReturnStmt* stmt, const std::string& var)
+void Differentiator::diffReturnStmt(BlockStmt& ast, ReturnStmt* stmt, const std::string& var)
 {
 	auto derivativeExpr = simplify(differentiate(stmt->value.get(), var).get());
 	ast.addStatement(std::make_unique<ReturnStmt>(std::move(derivativeExpr)));
 }
 
-void Differentiator::diffStructStmt(AST& ast, StructStmt* stmt, const std::string& var)
+void Differentiator::diffStructStmt(BlockStmt& ast, StructStmt* stmt, const std::string& var)
 {
 	// copy the original struct declaration to the derivative AST
 	ast.addStatement(std::make_unique<StructStmt>(stmt->name, stmt->type, stmt->fields));
 }
 
-void Differentiator::diffVarDeclStmt(AST& ast, VarDeclStmt* stmt, const std::string& var)
+void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const std::string& var)
 {
 	std::vector<Var> copyVars; // copy of the original variables for the derivative AST
 	std::vector<Var> newVars; // new variables for the derivatives in the derivative AST
@@ -109,6 +130,29 @@ void Differentiator::diffVarDeclStmt(AST& ast, VarDeclStmt* stmt, const std::str
 	// create new variable declaration statements for the derivatives and add it to the derivative AST
 	ast.addStatement(std::make_unique<VarDeclStmt>(stmt->type, copyVars));
 	if (!newVars.empty()) ast.addStatement(std::make_unique<VarDeclStmt>(stmt->type, newVars ));
+}
+
+void Differentiator::diffIfStmt(BlockStmt& ast, IfStmt* stmt, const std::string& var)
+{
+	// copy the condition
+	auto newIf = std::make_unique<IfStmt>();
+	newIf->condition = std::move(copy_expression(stmt->condition.get()));
+
+	// differentiate the then branch
+	std::unique_ptr<BlockStmt> thenStmt = std::make_unique<BlockStmt>();
+	differentiateStmt(*thenStmt, stmt->thenBranch.get(), var);
+	newIf->thenBranch = std::move(thenStmt);
+
+	// differentiate the else branch if it exists
+	if (stmt->elseBranch)
+	{
+		std::unique_ptr<BlockStmt> elseStmt = std::make_unique<BlockStmt>();
+		differentiateStmt(*elseStmt, stmt->elseBranch.get(), var);
+		newIf->elseBranch = std::move(elseStmt);
+	}
+
+	// create the new if statement with the differentiated branches
+	ast.addStatement(std::move(newIf));
 }
 
 ExprPtr Differentiator::differentiate(const Expression* expr, const std::string& var) 
@@ -215,8 +259,9 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
 			ExprPtr dfnc;
 			if      (fnc == "sin") dfnc =  Call("cos", args);
 			else if (fnc == "cos") dfnc = -Call("sin", args);
+			else if (fnc == "sqrt") dfnc = Literal(1.0) / (Literal(2.0) * Call("sqrt", args));
 			else
-				throw std::runtime_error("Don't know how to differentiate function.");
+				throw std::runtime_error("Don't know how to differentiate function " + fnc + ".");
 
 			// differentiate argument
 			auto diffArg = differentiate(args[0].get(), var);
@@ -251,4 +296,82 @@ std::unique_ptr<Expression> Differentiator::diffMember(const MemberExpr* member,
 	// For a member access expression, we can use the rule: d( obj.field ) --> dobj.field
 	auto dobj = differentiate(member->object.get(), var);
 	return Member(dobj, member->property);
+}
+
+static bool dependsOn(const Expression* expr, const std::string& var)
+{
+	if (auto variable = dynamic_cast<const VariableExpr*>(expr))
+	{
+		return variable->name == var;
+	}
+	else if (auto binary = dynamic_cast<const BinaryExpr*>(expr))
+	{
+		return dependsOn(binary->left.get(), var) || dependsOn(binary->right.get(), var);
+	}
+	else if (auto unary = dynamic_cast<const UnaryExpr*>(expr))
+	{
+		return dependsOn(unary->right.get(), var);
+	}
+	else if (auto call = dynamic_cast<const CallExpr*>(expr))
+	{
+		for (const auto& arg : call->arguments)
+		{
+			if (dependsOn(arg.get(), var))
+				return true;
+		}
+		return false;
+	}
+	else if (auto member = dynamic_cast<const MemberExpr*>(expr))
+	{
+		return dependsOn(member->object.get(), var);
+	}
+	else if (auto init = dynamic_cast<const InitializerExpr*>(expr))
+	{
+		for (const auto& elem : init->elements)
+		{
+			if (dependsOn(elem.get(), var))
+				return true;
+		}
+		return false;
+	}
+	else if (auto assign = dynamic_cast<const AssignExpr*>(expr))
+	{
+		return dependsOn(assign->target.get(), var) || dependsOn(assign->value.get(), var);
+	}
+	else
+		return false; // for literals and other expression types that don't involve variables
+}
+
+bool febcode::dependsOn(const Statement* stmt, const std::string& varName)
+{
+	if (auto exprStmt = dynamic_cast<const ExpressionStmt*>(stmt))
+	{
+		return ::dependsOn(exprStmt->expr.get(), varName);
+	}
+	else if (auto returnStmt = dynamic_cast<const ReturnStmt*>(stmt))
+	{
+		return ::dependsOn(returnStmt->value.get(), varName);
+	}
+	else if (auto structStmt = dynamic_cast<const StructStmt*>(stmt))
+	{
+		return false;
+	}
+	else if (auto varDeclStmt = dynamic_cast<const VarDeclStmt*>(stmt))
+	{
+		for (const auto& var : varDeclStmt->vars)
+		{
+			if (::dependsOn(var.initializer.get(), varName))
+				return true;
+		}
+		return false;
+	}
+	else if (auto ifStmt = dynamic_cast<const IfStmt*>(stmt))
+	{
+		if (::dependsOn(ifStmt->condition.get(), varName)) return true;
+		if (dependsOn(ifStmt->thenBranch.get(), varName)) return true;
+		if (ifStmt->elseBranch && dependsOn(ifStmt->elseBranch.get(), varName)) return true;
+		return false;
+	}
+	else
+		throw std::runtime_error("Unsupported statement type for dependency analysis");
 }

@@ -208,7 +208,7 @@ void Compiler::compile()
 {
 	prg.functions[0].entry = 0;
 
-	for (auto& stmt : prg.ast->statements)
+	for (auto& stmt : prg.ast->root.statements)
 		compileStatement(stmt.get());
 
 	// only add return if the last instruction isn't already a return (e.g. from a function)

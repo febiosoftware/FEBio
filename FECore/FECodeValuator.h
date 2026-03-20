@@ -46,6 +46,9 @@ public:
 
 	void CompileDerivative(const std::string& varName);
 
+	// the program compiled to "return 0;";
+	bool IsNullProgram() const;
+
 public:
 	double operator()(const FEMaterialPoint& pt) override;
 	FEScalarValuator* copy() override;

@@ -13,13 +13,16 @@ namespace febcode {
 		// differentiate an AST to produce a new AST representing the derivative
 		std::unique_ptr<AST> differentiate(const AST& ast, const std::string& var);
 
-	private:
-		void differentiateStmt(AST& ast, Statement* stmt, const std::string& var);
+		bool DependencyFound() const { return dependencyFound; }
 
-		void diffExpressionStmt(AST& ast, ExpressionStmt* stmt, const std::string& var);
-		void diffReturnStmt    (AST& ast, ReturnStmt*     stmt, const std::string& var);
-		void diffStructStmt    (AST& ast, StructStmt*     stmt, const std::string& var);
-		void diffVarDeclStmt   (AST& ast, VarDeclStmt*    stmt, const std::string& var);
+	private:
+		void differentiateStmt(BlockStmt& ast, Statement* stmt, const std::string& var);
+
+		void diffExpressionStmt(BlockStmt& ast, ExpressionStmt* stmt, const std::string& var);
+		void diffReturnStmt    (BlockStmt& ast, ReturnStmt*     stmt, const std::string& var);
+		void diffStructStmt    (BlockStmt& ast, StructStmt*     stmt, const std::string& var);
+		void diffVarDeclStmt   (BlockStmt& ast, VarDeclStmt*    stmt, const std::string& var);
+		void diffIfStmt        (BlockStmt& ast, IfStmt*         stmt, const std::string& var);
 
 	private:
 		// Differentiate an expression with respect to a variable
@@ -35,7 +38,10 @@ namespace febcode {
 		std::unique_ptr<Expression> diffMember  (const MemberExpr*      member  , const std::string& var);
 
 	private:
+		bool dependencyFound = false; // flag to indicate if we found a dependency on the variable we're differentiating with respect to
 		std::unordered_map<std::string, std::string> deriveVars; // map of derivative variables
 		Program& prg;
 	};
+
+	bool dependsOn(const Statement* stmt, const std::string& varName);
 } // namespace febcode

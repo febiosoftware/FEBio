@@ -151,12 +151,18 @@ namespace febcode {
 
 	struct BlockStmt : Statement {
 		std::vector<std::unique_ptr<Statement>> statements;
+
+		void addStatement(std::unique_ptr<Statement> stmt) {
+			statements.push_back(std::move(stmt));
+		}
 	};
 
 	struct IfStmt : Statement {
 		ExprPtr condition;
 		std::unique_ptr<Statement> thenBranch;
 		std::unique_ptr<Statement> elseBranch; // optional
+
+		IfStmt() {}
 
 		IfStmt(ExprPtr cond,
 			std::unique_ptr<Statement> thenStmt,
@@ -207,25 +213,25 @@ namespace febcode {
 	};
 
 	struct AST {
-		std::vector<std::unique_ptr<Statement>> statements;
+		BlockStmt root;
 
 		AST() {}
 
-		void clear() { statements.clear(); }
+		void clear() { root.statements.clear(); }
 
-		bool empty() const { return statements.empty(); }
+		bool empty() const { return root.statements.empty(); }
 
-		size_t size() const { return statements.size(); }
+		size_t size() const { return root.statements.size(); }
 
 		Statement* operator[](size_t index) const {
-			if (index >= statements.size()) {
+			if (index >= root.statements.size()) {
 				return nullptr;
 			}
-			return statements[index].get();
+			return root.statements[index].get();
 		}
 
 		void addStatement(std::unique_ptr<Statement> stmt) {
-			statements.push_back(std::move(stmt));
+			root.statements.push_back(std::move(stmt));
 		}
 	};
 

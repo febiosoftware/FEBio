@@ -16,7 +16,7 @@ namespace febcode {
 			this->tokens = tokens;
 			current = 0;
 			while (!isAtEnd()) {
-				m_ast->statements.push_back(parseDeclaration());
+				m_ast->root.statements.push_back(parseDeclaration());
 			}
 			m_ast = nullptr;
 		}

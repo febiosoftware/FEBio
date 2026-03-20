@@ -816,11 +816,11 @@ static void printStatement(const Statement* stmt)
 void febcode::printAST(const AST& ast)
 {
 	l = 0;
-	size_t n = ast.statements.size();
+	size_t n = ast.size();
 	for (size_t i = 0; i < n; ++i)
 	{
-		auto& stmt = ast.statements[i];
-		printStatement(stmt.get());
+		auto stmt = ast[i];
+		printStatement(stmt);
 		if (i != n - 1) std::cout << ",\n";
 	}
 
@@ -1056,11 +1056,11 @@ static void prettyPrintStatement(std::ostream& os, const febcode::Statement& stm
 void febcode::prettyPrintAST(std::ostream& os, const AST& ast)
 {
 	l = 0;
-	size_t n = ast.statements.size();
+	size_t n = ast.size();
 	for (size_t i = 0; i < n; ++i)
 	{
-		auto& stmt = ast.statements[i];
-		prettyPrintStatement(os, *stmt);
+		auto& stmt = *ast[i];
+		prettyPrintStatement(os, stmt);
 		if (i != n - 1) os << "\n";
 	}
 }

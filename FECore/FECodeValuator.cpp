@@ -55,6 +55,8 @@ public:
 	bool compileDeriv = false;
 	std::string derivVarName;
 
+	bool isNullProgram = false;
+
 	FESurface* surf = nullptr; // for surface valuators
 
 	int AddGlobal(const std::string& name, febcode::TypeKind typeKind)
@@ -118,6 +120,11 @@ FECodeValuator::~FECodeValuator()
 
 }
 
+bool FECodeValuator::IsNullProgram() const
+{
+	return m.isNullProgram;
+}
+
 void FECodeValuator::CompileDerivative(const std::string& varName)
 {
 	m.compileDeriv = true;
@@ -142,6 +149,13 @@ bool FECodeValuator::CompileScript()
 		{
 			febcode::Differentiator diff(m.program);
 			auto diffAST = diff.differentiate(*m.program.ast, m.derivVarName);
+
+			if (!diff.DependencyFound())
+			{
+				// no dependency was found on the variable we are differentiating with respect to
+				m.isNullProgram = true;
+			}
+
 			m.program.ast = std::move(diffAST);
 
 #ifndef NDEBUG

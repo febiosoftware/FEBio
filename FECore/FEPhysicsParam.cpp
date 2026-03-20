@@ -82,6 +82,11 @@ bool FEPhysicsParam::Init()
 				feLogErrorEx(m.fem, "Failed to initialize derivative valuator for variable %d", i);
 				return false;
 			}
+
+			if (m.valDeriv[i].derivVal->IsNullProgram())
+			{
+				m.valDeriv[i].derivVal.reset(); // no need to keep the valuator if the program is null
+			}
 		}
 	}
 	return FEParamDouble::Init();
@@ -110,6 +115,11 @@ double FEPhysicsParam::DerivValue(const FEMaterialPoint& pt, const std::vector<d
 	if ((varIndex >= 0) && (varIndex < m.valDeriv.size()))
 	{
 		Imp::Deriv& deriv_i = m.valDeriv[varIndex];
+		if (deriv_i.derivVal == nullptr)
+		{
+			// this derivative was optimized out, so we return zero
+			return 0.0;
+		}
 
 		std::vector<std::pair<int, double>> globals(deriv_i.slots.size());
 		for (int i = 0; i < deriv_i.slots.size(); ++i)
