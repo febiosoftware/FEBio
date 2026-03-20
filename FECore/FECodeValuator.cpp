@@ -218,7 +218,8 @@ bool FECodeValuator::Init()
 
 double FECodeValuator::operator()(const FEMaterialPoint& pt)
 {
-	febcode::VM vm(m.program);
+	thread_local febcode::VM vm;
+	vm.setProgram(m.program);
 	if (m.globals[0].slot >= 0) vm.setGlobal(m.globals[0].slot, febcode::vec3(pt.m_r0.x, pt.m_r0.y, pt.m_r0.z));
 	if (m.globals[1].slot >= 0) vm.setGlobal(m.globals[1].slot, GetFEModel()->GetTime().currentTime);
 	if (m.surf && (m.globals[2].slot >= 0))
@@ -236,7 +237,8 @@ double FECodeValuator::operator()(const FEMaterialPoint& pt)
 
 double FECodeValuator::run(const FEMaterialPoint& pt, std::vector < std::pair<int, double>>& globals) const
 {
-	febcode::VM vm(m.program);
+	thread_local febcode::VM vm;
+	vm.setProgram(m.program);
 	if (m.globals[0].slot >= 0) vm.setGlobal(m.globals[0].slot, febcode::vec3(pt.m_r0.x, pt.m_r0.y, pt.m_r0.z));
 	if (m.globals[1].slot >= 0) vm.setGlobal(m.globals[1].slot, GetFEModel()->GetTime().currentTime);
 	if (m.surf && (m.globals[2].slot >= 0))

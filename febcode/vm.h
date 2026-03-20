@@ -14,15 +14,18 @@ namespace febcode
 		enum { MAX_CALL_DEPTH = 8 };
 
 	public:
-		VM(const Program& program) : m_program(program)
+		VM() : m_program(nullptr) {}
+
+		void setProgram(const Program& program)
 		{
-			globalCount = (int)m_program.globals.size();
-			assert(m_program.globalInitializers.size() == globalCount);
+			m_program = &program;
+			globalCount = (int)m_program->globals.size();
+			assert(m_program->globalInitializers.size() == globalCount);
 			m_stack.resize(globalCount + program.maxStackSize);
 			stackTop = globalCount; // stack starts after global region
 
 			// initialize globals
-			for (auto& it : m_program.globalInitializers)
+			for (auto& it : m_program->globalInitializers)
 			{
 				const Value& v = it.second;
 				Value& d = m_stack[it.first];
@@ -32,8 +35,14 @@ namespace febcode
 			}
 		}
 
+		VM(const Program& program)
+		{
+			setProgram(program);
+		}
+
 		Value run()
 		{
+			if (m_program == nullptr) return Value();
 			callFunction(0, 0);              // call "main"
 			return execute();
 		}
@@ -52,8 +61,8 @@ namespace febcode
 
 		Value getGlobal(const std::string& name)
 		{
-			auto it = m_program.globals.find(name);
-			if (it == m_program.globals.end())
+			auto it = m_program->globals.find(name);
+			if (it == m_program->globals.end())
 				throw std::runtime_error("Undefined global variable: " + name);
 			return m_stack[it->second.slot];
 		}
@@ -81,7 +90,7 @@ namespace febcode
 				if (arr.size() != values.size())
 					throw std::runtime_error("Array initializer has incorrect number of elements.");
 
-				Type elemType = m_program.types.getBuiltinType(*values.begin());
+				Type elemType = m_program->types.getBuiltinType(*values.begin());
 				std::copy(values.begin(), values.end(), arr.elements.begin());
 			}
 			else if (isStruct(v))
@@ -93,7 +102,7 @@ namespace febcode
 				for (size_t i = 0; i < values.size(); ++i)
 				{
 					Type fieldType = obj.type->fields[i].first;
-					Type valType = m_program.types.getBuiltinType(values.begin()[i]);
+					Type valType = m_program->types.getBuiltinType(values.begin()[i]);
 					if (fieldType != valType)
 						throw std::runtime_error("Type mismatch in struct initializer for field: " + obj.type->fields[i].second);
 					obj.fields[i] = values.begin()[i];
@@ -130,7 +139,7 @@ namespace febcode
 
 		uint8_t readByte()
 		{
-			return m_program.code[currentFrame().ip++];
+			return m_program->code[currentFrame().ip++];
 		}
 
 		uint16_t readUint16()
@@ -142,22 +151,28 @@ namespace febcode
 
 		const Value& pop()
 		{
+#ifndef NDEBUG
 			if (stackTop <= globalCount)
 				throw std::runtime_error("Stack underflow.");
+#endif
 			return m_stack[--stackTop];
 		}
 
 		void push(const Value& v)
 		{
+#ifndef NDEBUG
 			if (stackTop >= m_stack.size())
 				throw std::runtime_error("Stack overflow.");
+#endif
 			m_stack[stackTop++] = v;
 		}
 
 		Value& peek()
 		{
+#ifndef NDEBUG
 			if (stackTop <= globalCount)
 				throw std::runtime_error("Stack underflow.");
+#endif
 			return m_stack[stackTop-1];
 		}
 
@@ -191,7 +206,7 @@ namespace febcode
 		}
 
 	private:
-		const Program& m_program;
+		const Program* m_program;
 		int globalCount = 0;
 
 		std::vector<Value> m_stack;

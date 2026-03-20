@@ -136,7 +136,7 @@ Value VM::execute()
 	if (frameCount == 0)
 		throw std::runtime_error("No function to execute");
 
-	const size_t instructions = m_program.code.size();
+	const size_t instructions = m_program->code.size();
 
 	while (currentFrame().ip < instructions)
 	{
@@ -153,7 +153,7 @@ Value VM::execute()
 		case OpCode::PUSH_CONST:
 		{
 			uint16_t idx = readUint16();
-			push(m_program.constants[idx]);
+			push(m_program->constants[idx]);
 			break;
 		}
 
@@ -740,7 +740,7 @@ Value VM::execute()
 		case OpCode::CREATE_STRUCT:
 		{
 			uint16_t typeIndex = readUint16();
-			Type type = m_program.types.getStructType(typeIndex);
+			Type type = m_program->types.getStructType(typeIndex);
 			int fieldCount = (int)type->fields.size();
 
 			auto obj = createStruct(type);
@@ -800,8 +800,8 @@ Value VM::execute()
 				arr->elements[i] = pop();
 			}
 
-			Type elemType = m_program.types.getBuiltinType(arr->elements[0]);
-			arr->type = m_program.types.getArrayType(elemType, count);
+			Type elemType = m_program->types.getBuiltinType(arr->elements[0]);
+			arr->type = m_program->types.getArrayType(elemType, count);
 
 			push(arr);
 			break;
@@ -887,8 +887,8 @@ Value VM::execute()
 				args.push_back(pop());
 			}
 
-			auto it = m_program.m_specialFns.find("print");
-			if (it != m_program.m_specialFns.end())
+			auto it = m_program->m_specialFns.find("print");
+			if (it != m_program->m_specialFns.end())
 			{
 				it->second(args.data(), argCount);
 			}
@@ -942,7 +942,7 @@ Value VM::execute()
 
 void VM::callFunction(int fnIndex, int argCount)
 {
-	const FunctionInfo& fn = m_program.functions[fnIndex];
+	const FunctionInfo& fn = m_program->functions[fnIndex];
 
 	if (fn.isNative)
 	{
@@ -968,7 +968,7 @@ void VM::callFunction(int fnIndex, int argCount)
 
 void VM::callBinaryOperator(int opIndex)
 {
-	const BinaryOperatorInfo& fn = m_program.operators[opIndex];
+	const BinaryOperatorInfo& fn = m_program->operators[opIndex];
 
 	Value lv = m_stack[stackTop - 2];
 	Value rv = m_stack[stackTop - 1];

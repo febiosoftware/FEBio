@@ -130,13 +130,19 @@ namespace febcode
 			copyFrom(v);
 		}
 
-		Value& operator = (const Value& other)
+		void operator = (const Value& other)
 		{
-			if (this != &other) {
-				destroy();
-				copyFrom(other);
+			if (this != &other)
+			{
+				if ((index == ValueIndex::DOUBLE) && (other.index == ValueIndex::DOUBLE))
+				{
+					d = other.d;
+				}
+				else if (this != &other) {
+					destroy();
+					copyFrom(other);
+				}
 			}
-			return *this;
 		}
 
 		~Value()
