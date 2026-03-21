@@ -187,6 +187,16 @@ namespace febcode
 			push(v);
 		}
 
+		bool popBool()
+		{
+			return pop().b;
+		}
+
+		int popInt()
+		{
+			return pop().i;
+		}
+
 		double popDouble()
 		{
 			return pop().d;
@@ -209,6 +219,56 @@ namespace febcode
 				throw std::runtime_error("Stack underflow.");
 #endif
 			return m_stack[stackTop-1];
+		}
+
+		bool peekBool()
+		{
+			return peek().b;
+		}
+
+		int peekInt()
+		{
+			return peek().i;
+		}
+
+		double peekDouble()
+		{
+			return peek().d;
+		}
+
+		vec2 peekVec2()
+		{
+			return peek().vec2Value;
+		}
+
+		vec3 peekVec3()
+		{
+			return peek().vec3Value;
+		}
+
+		void setBool(int slot, bool b)
+		{
+			m_stack[slot] = b;
+		}
+
+		void setInt(int slot, int n)
+		{
+			m_stack[slot] = n;
+		}
+
+		void setDouble(int slot, double d)
+		{
+			m_stack[slot] = d;
+		}
+
+		void setVec2(int slot, const vec2& v)
+		{
+			m_stack[slot] = v;
+		}
+
+		void setVec3(int slot, const vec3& v)
+		{
+			m_stack[slot] = v;
 		}
 
 		bool isTruthy(const Value& v)

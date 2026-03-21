@@ -95,7 +95,13 @@ int Compiler::stackEffect(OpCode op, int arg)
 {
 	switch (op)
 	{
-	case OpCode::PUSH_CONST: return +1;
+	case OpCode::PUSH_CONST: 
+	case OpCode::PUSH_BOOL: 
+	case OpCode::PUSH_INT: 
+	case OpCode::PUSH_DOUBLE: 
+	case OpCode::PUSH_VEC2: 
+	case OpCode::PUSH_VEC3: 
+		return +1;
 	case OpCode::GET_GLOBAL:
 	case OpCode::GET_GLOBAL_BOOL:
 	case OpCode::GET_GLOBAL_INT:
@@ -103,10 +109,21 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_GLOBAL_VEC2:
 	case OpCode::GET_GLOBAL_VEC3:
 		return +1;
-	case OpCode::SET_GLOBAL: return 0;
+	case OpCode::SET_GLOBAL: 
+	case OpCode::SET_GLOBAL_BOOL: 
+	case OpCode::SET_GLOBAL_INT: 
+	case OpCode::SET_GLOBAL_DOUBLE: 
+	case OpCode::SET_GLOBAL_VEC2: 
+	case OpCode::SET_GLOBAL_VEC3: 
+		return 0;
 	case OpCode::GET_GLOBAL_REF: return +1;
-	case OpCode::GET_LOCAL: return +1;
-	case OpCode::SET_LOCAL: return 0;
+	case OpCode::GET_LOCAL: 
+	case OpCode::GET_LOCAL_BOOL:
+	case OpCode::GET_LOCAL_INT:
+	case OpCode::GET_LOCAL_DOUBLE:
+	case OpCode::GET_LOCAL_VEC2:
+	case OpCode::GET_LOCAL_VEC3:
+		return +1;
 	case OpCode::GET_LOCAL_REF: return +1;
 	case OpCode::CREATE_STRUCT: return -arg + 1;
 	case OpCode::COPY_STRUCT: return 0;
@@ -165,8 +182,17 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_VEC3_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC3: return -1;
 	case OpCode::NOT: return 0;
-	case OpCode::EQUAL: return -1;
-	case OpCode::NOT_EQUAL: return -1;
+
+	case OpCode::EQUAL_BOOL: 
+	case OpCode::EQUAL_INT: 
+	case OpCode::EQUAL_DOUBLE: 
+		return -1;
+
+	case OpCode::NEQ_BOOL: 
+	case OpCode::NEQ_INT: 
+	case OpCode::NEQ_DOUBLE: 
+		return -1;
+
 	case OpCode::JUMP: return 0;
 	case OpCode::JUMP_IF_FALSE: return +1; // technically +0, but each jump adds two pops (one for each branch)
 	case OpCode::JUMP_IF_TRUE: return +1; // technically +0, but each jump adds two pops (one for each branch)
@@ -393,7 +419,18 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 			if (var.initializer)
 			{
 				prg.globals[var.name].isInitialized = true;
-				emit(OpCode::SET_GLOBAL);
+
+				switch (type->kind)
+				{
+				case TypeKind::Bool  : emit(OpCode::SET_GLOBAL_BOOL  ); break;
+				case TypeKind::Int   : emit(OpCode::SET_GLOBAL_INT   ); break;
+				case TypeKind::Double: emit(OpCode::SET_GLOBAL_DOUBLE); break;
+				case TypeKind::Vec2  : emit(OpCode::SET_GLOBAL_VEC2  ); break;
+				case TypeKind::Vec3  : emit(OpCode::SET_GLOBAL_VEC3  ); break;
+				default:
+					emit(OpCode::SET_GLOBAL);
+				}
+
 				emitUint8((uint8_t)slot);
 				emit(OpCode::POP);
 			}
@@ -583,10 +620,21 @@ Type Compiler::compileExpression(Expression* expr)
 
 Type Compiler::compileLiteral(LiteralExpr* expr)
 {
+	Type type = prg.types.getBuiltinType(expr->value);
+	switch (type->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::PUSH_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::PUSH_INT   ); break;
+	case TypeKind::Double: emit(OpCode::PUSH_DOUBLE); break;
+	case TypeKind::Vec2  : emit(OpCode::PUSH_VEC2  ); break;
+	case TypeKind::Vec3  : emit(OpCode::PUSH_VEC3  ); break;
+	default:
+		emit(OpCode::PUSH_CONST);
+	}
+
 	uint8_t idx = addConstant(expr->value);
-	emit(OpCode::PUSH_CONST);
 	emitUint8(idx);
-	return prg.types.getBuiltinType(expr->value);
+	return type;
 }
 
 Type Compiler::compileVariable(VariableExpr* expr)
@@ -594,13 +642,25 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	int local = resolveLocal(expr->name);
 	if (local != -1)
 	{
-		emit(OpCode::GET_LOCAL);
+		Type type = m_locals[local].type;
+
+		switch (type->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::GET_LOCAL_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::GET_LOCAL_INT   ); break;
+		case TypeKind::Double: emit(OpCode::GET_LOCAL_DOUBLE); break;
+		case TypeKind::Vec2  : emit(OpCode::GET_LOCAL_VEC2  ); break;
+		case TypeKind::Vec3  : emit(OpCode::GET_LOCAL_VEC3  ); break;
+		default:
+			emit(OpCode::GET_LOCAL);
+		}
+
 		emitUint8(local);
 
 		if (!m_locals[local].isInitialized)
 			throw std::runtime_error("Cannot read uninitialized local variable: " + expr->name);
 
-		return m_locals[local].type;
+		return type;
 	}
 
 	int global = resolveGlobal(expr->name);
@@ -816,6 +876,17 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 	Type type_l = compileExpression(expr->left.get());
 	Type type_r = compileExpression(expr->right.get());
 
+	if (isBoolType(type_l) && isBoolType(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::EqualEqual: emit(OpCode::EQUAL_BOOL); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::NotEqual  : emit(OpCode::NEQ_BOOL  ); type_l = prg.types.getBoolType(); break;
+		default: throw std::runtime_error("Unsupported binary op for bool type.");
+		}
+		return type_l;
+	}
+
 	if (isIntType(type_l) && isIntType(type_r))
 	{
 		switch (op)
@@ -829,8 +900,8 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		case BinaryOp::Less        : emit(OpCode::LT_INT   ); type_l = prg.types.getBoolType(); break;
 		case BinaryOp::GreaterEqual: emit(OpCode::GE_INT   ); type_l = prg.types.getBoolType(); break;
 		case BinaryOp::LessEqual   : emit(OpCode::LE_INT   ); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL    ); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::NotEqual    : emit(OpCode::NOT_EQUAL); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL_INT); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::NotEqual    : emit(OpCode::NEQ_INT  ); type_l = prg.types.getBoolType(); break;
 		default: throw std::runtime_error("Unsupported binary op for int type.");
 		}
 		return type_l;
@@ -849,8 +920,8 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		case BinaryOp::Less        : emit(OpCode::LT_DOUBLE); type_l = prg.types.getBoolType(); break;
 		case BinaryOp::GreaterEqual: emit(OpCode::GE_DOUBLE); type_l = prg.types.getBoolType(); break;
 		case BinaryOp::LessEqual   : emit(OpCode::LE_DOUBLE); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL    ); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::NotEqual    : emit(OpCode::NOT_EQUAL); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL_DOUBLE); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::NotEqual    : emit(OpCode::NEQ_DOUBLE  ); type_l = prg.types.getBoolType(); break;
 		default: throw std::runtime_error("Unsupported binary op for double type.");
 		}
 		return type_l;
@@ -956,7 +1027,17 @@ Type Compiler::compileUnary(UnaryExpr* expr)
 			throw std::runtime_error("Invalid operand type for unary '-'.");
 		break;
 	}
-	case UnaryOp::Not   : emit(OpCode::NOT); type = prg.types.getBoolType(); break;
+	case UnaryOp::Not:
+	{
+		if (isBoolType(type))
+		{
+			emit(OpCode::NOT);
+			type = prg.types.getBoolType();
+		}
+		else
+			throw std::runtime_error("Invalid operand type for unary '!'.");
+		break;
+	}
 	default: throw std::runtime_error("Unsupported unary op");
 	}
 	return type;

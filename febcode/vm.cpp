@@ -25,16 +25,40 @@ const char* IPToString(uint8_t ip)
 {
 	switch ((OpCode)ip)
 	{
-	case OpCode::PUSH_CONST    : return "MOV ";
-	case OpCode::GET_GLOBAL    : return "GTG ";
-	case OpCode::SET_GLOBAL    : return "STG ";
+	case OpCode::PUSH_CONST    : 
+	case OpCode::PUSH_BOOL     :
+	case OpCode::PUSH_INT      :
+	case OpCode::PUSH_DOUBLE   :
+	case OpCode::PUSH_VEC2     :
+	case OpCode::PUSH_VEC3     : return "MOV ";
+
+	case OpCode::GET_GLOBAL       :
+	case OpCode::GET_GLOBAL_BOOL  :
+	case OpCode::GET_GLOBAL_INT   :
+	case OpCode::GET_GLOBAL_DOUBLE:
+	case OpCode::GET_GLOBAL_VEC2  :
+	case OpCode::GET_GLOBAL_VEC3  : return "GTG ";
+
+	case OpCode::SET_GLOBAL       :
+	case OpCode::SET_GLOBAL_BOOL  :
+	case OpCode::SET_GLOBAL_INT   :
+	case OpCode::SET_GLOBAL_DOUBLE:
+	case OpCode::SET_GLOBAL_VEC2  :
+	case OpCode::SET_GLOBAL_VEC3  : return "STG ";
+
 	case OpCode::STORE         : return "STRE";
 	case OpCode::GET_GLOBAL_REF: return "GREF";
 	case OpCode::GET_LOCAL_REF : return "LREF";
 	case OpCode::GET_INDEX_REF : return "IREF";
 	case OpCode::GET_MEMBER_REF: return "MREF";
-	case OpCode::GET_LOCAL     : return "GETL";
-	case OpCode::SET_LOCAL     : return "SETL";
+
+	case OpCode::GET_LOCAL       :
+	case OpCode::GET_LOCAL_BOOL  :
+	case OpCode::GET_LOCAL_INT   :
+	case OpCode::GET_LOCAL_DOUBLE:
+	case OpCode::GET_LOCAL_VEC2  :
+	case OpCode::GET_LOCAL_VEC3  : return "GETL";
+
 	case OpCode::ADD_INT       : return "ADDI";
 	case OpCode::ADD_DOUBLE    : return "ADDF";
 	case OpCode::SUB_INT       : return "SUBI";
@@ -45,8 +69,15 @@ const char* IPToString(uint8_t ip)
 	case OpCode::DIV_DOUBLE    : return "DIVF";
 	case OpCode::EXP_INT       : return "EXPI";
 	case OpCode::EXP_DOUBLE    : return "EXPF";
-	case OpCode::EQUAL         : return "EQ  ";
-	case OpCode::NOT_EQUAL     : return "NEQ ";
+
+	case OpCode::EQUAL_BOOL  :
+	case OpCode::EQUAL_INT   :
+	case OpCode::EQUAL_DOUBLE: return "EQ  ";
+
+	case OpCode::NEQ_BOOL  :
+	case OpCode::NEQ_INT   :
+	case OpCode::NEQ_DOUBLE: return "NEQ ";
+
 	case OpCode::GT_INT        : return "GTI ";
 	case OpCode::GT_DOUBLE     : return "GTF ";
 	case OpCode::LT_INT        : return "LTI ";
@@ -153,6 +184,41 @@ Value VM::execute()
 		{
 			uint8_t idx = readByte();
 			push(m_program->constants[idx]);
+			break;
+		}
+
+		case OpCode::PUSH_BOOL:
+		{
+			uint8_t idx = readByte();
+			pushBool(m_program->constants[idx].b);
+			break;
+		}
+
+		case OpCode::PUSH_INT:
+		{
+			uint8_t idx = readByte();
+			pushInt(m_program->constants[idx].i);
+			break;
+		}
+
+		case OpCode::PUSH_DOUBLE:
+		{
+			uint8_t idx = readByte();
+			pushDouble(m_program->constants[idx].d);
+			break;
+		}
+
+		case OpCode::PUSH_VEC2:
+		{
+			uint8_t idx = readByte();
+			pushVec2(m_program->constants[idx].vec2Value);
+			break;
+		}
+
+		case OpCode::PUSH_VEC3:
+		{
+			uint8_t idx = readByte();
+			pushVec3(m_program->constants[idx].vec3Value);
 			break;
 		}
 
@@ -374,6 +440,41 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::SET_GLOBAL_BOOL:
+		{
+			uint8_t slot = readByte();
+			setBool(slot, peekBool());
+			break;
+		}
+
+		case OpCode::SET_GLOBAL_INT:
+		{
+			uint8_t slot = readByte();
+			setInt(slot, peekInt());
+			break;
+		}
+
+		case OpCode::SET_GLOBAL_DOUBLE:
+		{
+			uint8_t slot = readByte();
+			setDouble(slot, peekDouble());
+			break;
+		}
+
+		case OpCode::SET_GLOBAL_VEC2:
+		{
+			uint8_t slot = readByte();
+			setVec2(slot, peekVec2());
+			break;
+		}
+
+		case OpCode::SET_GLOBAL_VEC3:
+		{
+			uint8_t slot = readByte();
+			setVec3(slot, peekVec3());
+			break;
+		}
+
 		case OpCode::GET_LOCAL:
 		{
 			uint8_t slot = readByte();
@@ -382,90 +483,120 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::SET_LOCAL:
+		case OpCode::GET_LOCAL_BOOL:
 		{
 			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
-			m_stack[frame.base + slot] = peek();
+			pushBool(m_stack[frame.base + slot].b);
+			break;
+		}
+
+		case OpCode::GET_LOCAL_INT:
+		{
+			uint8_t slot = readByte();
+			CallFrame& frame = currentFrame();
+			pushInt(m_stack[frame.base + slot].i);
+			break;
+		}
+
+		case OpCode::GET_LOCAL_DOUBLE:
+		{
+			uint8_t slot = readByte();
+			CallFrame& frame = currentFrame();
+			pushDouble(m_stack[frame.base + slot].d);
+			break;
+		}
+
+		case OpCode::GET_LOCAL_VEC2:
+		{
+			uint8_t slot = readByte();
+			CallFrame& frame = currentFrame();
+			pushVec2(m_stack[frame.base + slot].vec2Value);
+			break;
+		}
+
+		case OpCode::GET_LOCAL_VEC3:
+		{
+			uint8_t slot = readByte();
+			CallFrame& frame = currentFrame();
+			pushVec3(m_stack[frame.base + slot].vec3Value);
 			break;
 		}
 
 		// Integer operators
 		case OpCode::NEG_INT:
 		{
-			const Value& a = pop();
-			push(-getInt(a));
+			int a = popInt();
+			pushInt(-a);
 			break;
 		}
 		case OpCode::ADD_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getInt(a) + getInt(b));
+			int b = popInt();
+			int a = popInt();
+			pushInt(a + b);
 			break;
 		}
 		case OpCode::SUB_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getInt(a) - getInt(b));
+			int b = popInt();
+			int a = popInt();
+			pushInt(a - b);
 			break;
 		}
 		case OpCode::MUL_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getInt(a) * getInt(b));
+			int b = popInt();
+			int a = popInt();
+			pushInt(a * b);
 			break;
 		}
 		case OpCode::DIV_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			int divisor = getInt(b);
-			if (divisor == 0)
+			int b = popInt();
+			int a = popInt();
+			if (b == 0)
 				throw std::runtime_error("division by zero.");
-			push(getInt(a) / divisor);
+			pushInt(a / b);
 			break;
 		}
 		case OpCode::EXP_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
+			int b = popInt();
+			int a = popInt();
 
-			int e = getInt(b);
-			if (e < 0)
+			if (b < 0)
 				throw std::runtime_error("Negative exponent not supported for integers.");
 
-			push(ipow(getInt(a), e));
+			push(ipow(a, b));
 			break;
 		}
 		case OpCode::GT_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getInt(a) > getInt(b));
+			int b = popInt();
+			int a = popInt();
+			pushBool(a > b);
 			break;
 		}
 		case OpCode::LT_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getInt(a) < getInt(b));
+			int b = popInt();
+			int a = popInt();
+			pushBool(a < b);
 			break;
 		}
 		case OpCode::GE_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getInt(a) >= getInt(b));
+			int b = popInt();
+			int a = popInt();
+			pushBool(a >= b);
 			break;
 		}
 		case OpCode::LE_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getInt(a) <= getInt(b));
+			int b = popInt();
+			int a = popInt();
+			pushBool(a <= b);
 			break;
 		}
 
@@ -504,42 +635,42 @@ Value VM::execute()
 			double a = popDouble();
 			if (b == 0.0)
 				throw std::runtime_error("division by zero.");
-			push(a / b);
+			pushDouble(a / b);
 			break;
 		}
 		case OpCode::EXP_DOUBLE:
 		{
 			double b = popDouble();
 			double a = popDouble();
-			push(std::pow(a, b));
+			pushDouble(std::pow(a, b));
 			break;
 		}
 		case OpCode::GT_DOUBLE:
 		{
 			double b = popDouble();
 			double a = popDouble();
-			push(a > b);
+			pushBool(a > b);
 			break;
 		}
 		case OpCode::LT_DOUBLE:
 		{
 			double b = popDouble();
 			double a = popDouble();
-			push(a < b);
+			pushBool(a < b);
 			break;
 		}
 		case OpCode::GE_DOUBLE:
 		{
 			double b = popDouble();
 			double a = popDouble();
-			push(a >= b);
+			pushBool(a >= b);
 			break;
 		}
 		case OpCode::LE_DOUBLE:
 		{
 			double b = popDouble();
 			double a = popDouble();
-			push(a <= b);
+			pushBool(a <= b);
 			break;
 		}
 
@@ -547,14 +678,13 @@ Value VM::execute()
 		{
 			double y = popDouble();
 			double x = popDouble();
-			push(vec2(x, y));
+			pushVec2(vec2(x, y));
 			break;
 		}
-		case OpCode::COPY_VEC2:
+		case OpCode::COPY_VEC2: // What is the point of this?
 		{
-			const Value& src = pop();
-			const vec2& v = getVec2(src);
-			push(vec2(v.x, v.y));
+			vec2 v = popVec2();
+			pushVec2(v);
 			break;
 		}
 		case OpCode::ADD_VEC2:
@@ -737,23 +867,54 @@ Value VM::execute()
 		// Logical operators
 		case OpCode::NOT:
 		{
-			const Value& a = pop();
-			bool b = isTruthy(a);
-			push(!b);
+			bool b = popBool();
+			pushBool(!b);
 			break;
 		}
-		case OpCode::EQUAL:
+
+		case OpCode::EQUAL_BOOL:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(a == b);
+			bool b = popBool();
+			bool a = popBool();
+			pushBool(a == b);
 			break;
 		}
-		case OpCode::NOT_EQUAL:
+		case OpCode::EQUAL_INT:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(a != b);
+			int b = popInt();
+			int a = popInt();
+			pushBool(a == b);
+			break;
+		}
+		case OpCode::EQUAL_DOUBLE:
+		{
+			double b = popDouble();
+			double a = popDouble();
+			pushBool(a == b);
+			break;
+		}
+
+		case OpCode::NEQ_BOOL:
+		{
+			bool b = popBool();
+			bool a = popBool();
+			pushBool(a != b);
+			break;
+		}
+
+		case OpCode::NEQ_INT:
+		{
+			int b = popInt();
+			int a = popInt();
+			pushBool(a != b);
+			break;
+		}
+
+		case OpCode::NEQ_DOUBLE:
+		{
+			double b = popDouble();
+			double a = popDouble();
+			pushBool(a != b);
 			break;
 		}
 

@@ -9,9 +9,13 @@ namespace febcode
 	enum class OpCode : uint8_t
 	{
 		PUSH_CONST,
+		PUSH_BOOL,
+		PUSH_INT,
+		PUSH_DOUBLE,
+		PUSH_VEC2,
+		PUSH_VEC3,
 
 		GET_GLOBAL,
-
 		GET_GLOBAL_BOOL,
 		GET_GLOBAL_INT,
 		GET_GLOBAL_DOUBLE,
@@ -19,10 +23,20 @@ namespace febcode
 		GET_GLOBAL_VEC3,
 
 		SET_GLOBAL,
-		GET_GLOBAL_REF,
+		SET_GLOBAL_BOOL,
+		SET_GLOBAL_INT,
+		SET_GLOBAL_DOUBLE,
+		SET_GLOBAL_VEC2,
+		SET_GLOBAL_VEC3,
 
 		GET_LOCAL,
-		SET_LOCAL,
+		GET_LOCAL_BOOL,
+		GET_LOCAL_INT,
+		GET_LOCAL_DOUBLE,
+		GET_LOCAL_VEC2,
+		GET_LOCAL_VEC3,
+
+		GET_GLOBAL_REF,
 		GET_LOCAL_REF,
 
 		// struct codes
@@ -101,8 +115,13 @@ namespace febcode
 		NOT,
 
 		// comparison operators
-		EQUAL,
-		NOT_EQUAL,
+		EQUAL_BOOL,
+		EQUAL_INT,
+		EQUAL_DOUBLE,
+
+		NEQ_BOOL,
+		NEQ_INT,
+		NEQ_DOUBLE,
 
 		// control flow
 		JUMP,
