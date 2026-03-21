@@ -8,33 +8,34 @@ namespace febcode
 {
 	enum class OpCode : uint8_t
 	{
-		PUSH_CONST,
+		PUSH_VOID, // just push a dummy value, used for return without value
 		PUSH_BOOL,
 		PUSH_INT,
 		PUSH_DOUBLE,
-		PUSH_VEC2,
-		PUSH_VEC3,
 
-		GET_GLOBAL,
 		GET_GLOBAL_BOOL,
 		GET_GLOBAL_INT,
 		GET_GLOBAL_DOUBLE,
 		GET_GLOBAL_VEC2,
 		GET_GLOBAL_VEC3,
+		GET_GLOBAL_ARRAY,
+		GET_GLOBAL_STRUCT,
 
-		SET_GLOBAL,
 		SET_GLOBAL_BOOL,
 		SET_GLOBAL_INT,
 		SET_GLOBAL_DOUBLE,
 		SET_GLOBAL_VEC2,
 		SET_GLOBAL_VEC3,
+		SET_GLOBAL_ARRAY,
+		SET_GLOBAL_STRUCT,
 
-		GET_LOCAL,
 		GET_LOCAL_BOOL,
 		GET_LOCAL_INT,
 		GET_LOCAL_DOUBLE,
 		GET_LOCAL_VEC2,
 		GET_LOCAL_VEC3,
+		GET_LOCAL_ARRAY,
+		GET_LOCAL_STRUCT,
 
 		GET_GLOBAL_REF,
 		GET_LOCAL_REF,
@@ -42,18 +43,33 @@ namespace febcode
 		// struct codes
 		CREATE_STRUCT,
 		COPY_STRUCT,
-		GET_PROPERTY,
+
+		GET_PROPERTY_BOOL,
+		GET_PROPERTY_INT,
+		GET_PROPERTY_DOUBLE,
+		GET_PROPERTY_VEC2,
+		GET_PROPERTY_VEC3,
+		GET_PROPERTY_ARRAY,
+		GET_PROPERTY_STRUCT,
+
 		GET_MEMBER_REF,
 
 		// array codes
 		CREATE_ARRAY,
 		COPY_ARRAY,
-		GET_INDEX,
+		
+		GET_INDEX_BOOL,
+		GET_INDEX_INT,
+		GET_INDEX_DOUBLE,
+		GET_INDEX_VEC2,
+		GET_INDEX_VEC3,
+		GET_INDEX_ARRAY,
+		GET_INDEX_STRUCT,
+
 		GET_INDEX_REF,
 
 		// vec2 codes
 		CREATE_VEC2,
-		COPY_VEC2,
 		GET_VEC2_X,
 		GET_VEC2_Y,
 		GET_VEC2_X_REF,
@@ -62,7 +78,6 @@ namespace febcode
 
 		// vec3 codes
 		CREATE_VEC3,
-		COPY_VEC3,
 		GET_VEC3_X,
 		GET_VEC3_Y,
 		GET_VEC3_Z,
@@ -129,13 +144,30 @@ namespace febcode
 		JUMP_IF_TRUE,
 		LOOP,
 
-		STORE,		// store value in variable (local or global)
+		// store value in variable (local or global)
+		STORE_BOOL,
+		STORE_INT,
+		STORE_DOUBLE,
+		STORE_VEC2,
+		STORE_VEC3,
+		STORE_ARRAY,
+		STORE_STRUCT,
+
+		POP,
 		CALL,		// call function
 		CALL_BINARY, // call binary operator
-		RETURN,
-		PRINT,
 
-		POP
+		// returns (make sure these are the last opcodes, since they have special handling in the VM)
+		RETURN_VOID,
+		RETURN_BOOL,
+		RETURN_INT,
+		RETURN_DOUBLE,
+		RETURN_VEC2,
+		RETURN_VEC3,
+		RETURN_ARRAY,
+		RETURN_STRUCT,
+
+		LAST_OPCODE, // not really an opcode, just a marker for the end of the enum. Also, make sure this is less than 255!
 	};
 
 	//

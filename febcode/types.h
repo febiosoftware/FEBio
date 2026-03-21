@@ -17,13 +17,18 @@ namespace febcode
 		Vec3,
 		Array,
 		Struct,
+	};
+
+	enum class RefType : uint8_t {
+		Invalid,
+		Double,
 		Value
 	};
 
 	struct Ref {
 		void* ptr;
-		TypeKind type;
-		Ref() : ptr(nullptr), type(TypeKind::Void) {}
+		RefType type;
+		Ref() : ptr(nullptr), type(RefType::Invalid) {}
 	};
 
 	struct vec2

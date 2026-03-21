@@ -252,7 +252,7 @@ std::string ValueToString(const febcode::Value& v)
 		s = "ref->";
 		switch (ref.type)
 		{
-		case febcode::TypeKind::Value:
+		case febcode::RefType::Value:
 		{
 			febcode::Value* v = static_cast<febcode::Value*>(ref.ptr);
 			if (v)
@@ -262,7 +262,7 @@ std::string ValueToString(const febcode::Value& v)
 			else s += "null"; 
 			break;
 		}
-		case febcode::TypeKind::Double: s += "double"; break;
+		case febcode::RefType::Double: s += "double"; break;
 		}
 		
 	}

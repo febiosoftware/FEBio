@@ -95,53 +95,75 @@ int Compiler::stackEffect(OpCode op, int arg)
 {
 	switch (op)
 	{
-	case OpCode::PUSH_CONST: 
+	case OpCode::PUSH_VOID: 
 	case OpCode::PUSH_BOOL: 
 	case OpCode::PUSH_INT: 
 	case OpCode::PUSH_DOUBLE: 
-	case OpCode::PUSH_VEC2: 
-	case OpCode::PUSH_VEC3: 
 		return +1;
-	case OpCode::GET_GLOBAL:
+
 	case OpCode::GET_GLOBAL_BOOL:
 	case OpCode::GET_GLOBAL_INT:
 	case OpCode::GET_GLOBAL_DOUBLE:
 	case OpCode::GET_GLOBAL_VEC2:
 	case OpCode::GET_GLOBAL_VEC3:
+	case OpCode::GET_GLOBAL_ARRAY:
+	case OpCode::GET_GLOBAL_STRUCT:
 		return +1;
-	case OpCode::SET_GLOBAL: 
+
 	case OpCode::SET_GLOBAL_BOOL: 
 	case OpCode::SET_GLOBAL_INT: 
 	case OpCode::SET_GLOBAL_DOUBLE: 
 	case OpCode::SET_GLOBAL_VEC2: 
 	case OpCode::SET_GLOBAL_VEC3: 
+	case OpCode::SET_GLOBAL_ARRAY: 
+	case OpCode::SET_GLOBAL_STRUCT: 
 		return 0;
+
 	case OpCode::GET_GLOBAL_REF: return +1;
-	case OpCode::GET_LOCAL: 
+
 	case OpCode::GET_LOCAL_BOOL:
 	case OpCode::GET_LOCAL_INT:
 	case OpCode::GET_LOCAL_DOUBLE:
 	case OpCode::GET_LOCAL_VEC2:
 	case OpCode::GET_LOCAL_VEC3:
+	case OpCode::GET_LOCAL_ARRAY:
+	case OpCode::GET_LOCAL_STRUCT:
 		return +1;
+
 	case OpCode::GET_LOCAL_REF: return +1;
 	case OpCode::CREATE_STRUCT: return -arg + 1;
 	case OpCode::COPY_STRUCT: return 0;
-	case OpCode::GET_PROPERTY: return +1;
+
+	case OpCode::GET_PROPERTY_BOOL: 
+	case OpCode::GET_PROPERTY_INT: 
+	case OpCode::GET_PROPERTY_DOUBLE: 
+	case OpCode::GET_PROPERTY_VEC2: 
+	case OpCode::GET_PROPERTY_VEC3: 
+	case OpCode::GET_PROPERTY_ARRAY: 
+	case OpCode::GET_PROPERTY_STRUCT: 
+		return +1;
+
 	case OpCode::GET_MEMBER_REF: return 0;
 	case OpCode::CREATE_ARRAY: return -arg + 1;
 	case OpCode::COPY_ARRAY: return +1;
-	case OpCode::GET_INDEX: return +1;
+
+	case OpCode::GET_INDEX_BOOL:
+	case OpCode::GET_INDEX_INT:
+	case OpCode::GET_INDEX_DOUBLE:
+	case OpCode::GET_INDEX_VEC2:
+	case OpCode::GET_INDEX_VEC3:
+	case OpCode::GET_INDEX_ARRAY:
+	case OpCode::GET_INDEX_STRUCT:
+		return +1;
+
 	case OpCode::GET_INDEX_REF: return 0;
 	case OpCode::CREATE_VEC2: return -1;
-	case OpCode::COPY_VEC2: return +1;
 	case OpCode::GET_VEC2_X: return 0;
 	case OpCode::GET_VEC2_Y: return 0;
 	case OpCode::GET_VEC2_X_REF: return 0;
 	case OpCode::GET_VEC2_Y_REF: return 0;
 	case OpCode::GET_VEC2_SWIZZLE: return 0;
 	case OpCode::CREATE_VEC3: return -2;
-	case OpCode::COPY_VEC3: return +1;
 	case OpCode::GET_VEC3_X: return 0;
 	case OpCode::GET_VEC3_Y: return 0;
 	case OpCode::GET_VEC3_Z: return 0;
@@ -197,12 +219,29 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::JUMP_IF_FALSE: return +1; // technically +0, but each jump adds two pops (one for each branch)
 	case OpCode::JUMP_IF_TRUE: return +1; // technically +0, but each jump adds two pops (one for each branch)
 	case OpCode::LOOP: return 0;
-	case OpCode::STORE: return -1;
+
+	case OpCode::STORE_BOOL:
+	case OpCode::STORE_INT:
+	case OpCode::STORE_DOUBLE:
+	case OpCode::STORE_VEC2:
+	case OpCode::STORE_VEC3:
+	case OpCode::STORE_ARRAY:
+	case OpCode::STORE_STRUCT:
+		return -1;
+
+	case OpCode::POP: return -1;
 	case OpCode::CALL: return -arg + 1;
 	case OpCode::CALL_BINARY: return -1;
-	case OpCode::RETURN: return 0;
-	case OpCode::PRINT: return -arg + 1;
-	case OpCode::POP: return -1;
+
+	case OpCode::RETURN_VOID:
+	case OpCode::RETURN_BOOL: 
+	case OpCode::RETURN_INT: 
+	case OpCode::RETURN_DOUBLE: 
+	case OpCode::RETURN_VEC2: 
+	case OpCode::RETURN_VEC3: 
+	case OpCode::RETURN_ARRAY: 
+	case OpCode::RETURN_STRUCT: 
+		return 0;
 	default:
 		assert(false);
 		return 0;
@@ -248,8 +287,8 @@ void Compiler::compile()
 		compileStatement(stmt.get());
 
 	// only add return if the last instruction isn't already a return (e.g. from a function)
-	if (prg.code.empty() || prg.code.back() != (uint8_t)OpCode::RETURN)
-		emit(OpCode::RETURN);
+	if (prg.code.empty() || (prg.code.back() < (uint8_t)OpCode::RETURN_VOID))
+		emit(OpCode::RETURN_VOID);
 
 	prg.maxStackSize = maxStackDepth;
 }
@@ -360,8 +399,6 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 			Type returnType = compileExpression(expr);
 			if (returnType != expectedType)
 				throw std::runtime_error("Invalid initializer type for vec2.");
-
-			emit(OpCode::COPY_VEC2);
 		}
 	}
 	else if (expectedType->kind == TypeKind::Vec3)
@@ -384,8 +421,6 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 			Type returnType = compileExpression(expr);
 			if (returnType != expectedType)
 				throw std::runtime_error("Invalid initializer type for vec3.");
-
-			emit(OpCode::COPY_VEC3);
 		}
 	}
 	else
@@ -427,8 +462,10 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 				case TypeKind::Double: emit(OpCode::SET_GLOBAL_DOUBLE); break;
 				case TypeKind::Vec2  : emit(OpCode::SET_GLOBAL_VEC2  ); break;
 				case TypeKind::Vec3  : emit(OpCode::SET_GLOBAL_VEC3  ); break;
+				case TypeKind::Array : emit(OpCode::SET_GLOBAL_ARRAY ); break;
+				case TypeKind::Struct: emit(OpCode::SET_GLOBAL_STRUCT); break;
 				default:
-					emit(OpCode::SET_GLOBAL);
+					throw std::runtime_error("Unsupported global variable type");
 				}
 
 				emitUint8((uint8_t)slot);
@@ -503,6 +540,7 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 {
 	if (stmt->value)
 	{
+		Type returnType = expectedReturnType;
 		auto init = dynamic_cast<InitializerExpr*>(stmt->value.get());
 		if (init && expectedReturnType != nullptr)
 		{
@@ -510,11 +548,24 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 		}
 		else
 		{
-			Type type = compileExpression(stmt->value.get());
+			returnType = compileExpression(stmt->value.get());
 
-			if (expectedReturnType != nullptr && type != expectedReturnType)
-				throw std::runtime_error("Return type mismatch: expected " + TypeToString(expectedReturnType) + ", got " + TypeToString(type));
+			if (expectedReturnType != nullptr && returnType != expectedReturnType)
+				throw std::runtime_error("Return type mismatch: expected " + TypeToString(expectedReturnType) + ", got " + TypeToString(returnType));
 		}
+
+		switch (returnType->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::RETURN_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::RETURN_INT   ); break;
+		case TypeKind::Double: emit(OpCode::RETURN_DOUBLE); break;
+		case TypeKind::Vec2  : emit(OpCode::RETURN_VEC2  ); break;
+		case TypeKind::Vec3  : emit(OpCode::RETURN_VEC3  ); break;
+		case TypeKind::Array : emit(OpCode::RETURN_ARRAY ); break;
+		case TypeKind::Struct: emit(OpCode::RETURN_STRUCT); break;
+		default:
+			throw std::runtime_error("Unsupported return type");
+		};
 	}
 	else
 	{
@@ -522,12 +573,10 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 			throw std::runtime_error("Missing return value in function with non-void return type.");
 
 		// return without value -> push monostate
-		uint8_t idx = addConstant(Value());
-		emit(OpCode::PUSH_CONST);
-		emitUint8(idx);
+		emit(OpCode::PUSH_VOID);
+		emit(OpCode::RETURN_VOID);
 	}
 
-	emit(OpCode::RETURN);
 }
 
 void Compiler::compileStruct(StructStmt* stmt)
@@ -579,18 +628,18 @@ void Compiler::compileFunction(FunctionStmt* fn)
 	}
 	m_scopeDepth--;
 
-	if (prg.code.empty() || prg.code.back() != (uint8_t)OpCode::RETURN)
+	if (prg.code.empty() || (prg.code.back() < (uint8_t)OpCode::RETURN_VOID) || (prg.code.back() >= (uint8_t)OpCode::LAST_OPCODE))
 	{
 		if (fn->returnType != nullptr && fn->returnType != prg.types.getVoidType())
 			throw std::runtime_error("Missing return statement in function with non-void return type.");
 
-		emit(OpCode::RETURN);
+		emit(OpCode::RETURN_VOID);
 	}
-
-	expectedReturnType = currentReturnType;
 
 	// Patch jump so execution skips function body
 	patchJump(jumpOver);
+
+	expectedReturnType = currentReturnType;
 
 	prg.functions[fnIndex].maxStackSize = maxStackDepth - currentStackSize;
 
@@ -626,10 +675,8 @@ Type Compiler::compileLiteral(LiteralExpr* expr)
 	case TypeKind::Bool  : emit(OpCode::PUSH_BOOL  ); break;
 	case TypeKind::Int   : emit(OpCode::PUSH_INT   ); break;
 	case TypeKind::Double: emit(OpCode::PUSH_DOUBLE); break;
-	case TypeKind::Vec2  : emit(OpCode::PUSH_VEC2  ); break;
-	case TypeKind::Vec3  : emit(OpCode::PUSH_VEC3  ); break;
 	default:
-		emit(OpCode::PUSH_CONST);
+		throw std::runtime_error("Unsupported literal type");
 	}
 
 	uint8_t idx = addConstant(expr->value);
@@ -651,8 +698,10 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		case TypeKind::Double: emit(OpCode::GET_LOCAL_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::GET_LOCAL_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::GET_LOCAL_VEC3  ); break;
+		case TypeKind::Array : emit(OpCode::GET_LOCAL_ARRAY ); break;
+		case TypeKind::Struct: emit(OpCode::GET_LOCAL_STRUCT); break;
 		default:
-			emit(OpCode::GET_LOCAL);
+			throw std::runtime_error("Unsupported local variable type");
 		}
 
 		emitUint8(local);
@@ -679,8 +728,10 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	case TypeKind::Double: emit(OpCode::GET_GLOBAL_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::GET_GLOBAL_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::GET_GLOBAL_VEC3  ); break;
+	case TypeKind::Array : emit(OpCode::GET_GLOBAL_ARRAY ); break;
+	case TypeKind::Struct: emit(OpCode::GET_GLOBAL_STRUCT); break;
 	default:
-		emit(OpCode::GET_GLOBAL);
+		throw std::runtime_error("Unsupported global variable type");
 	}
 
 	emitUint8(global);
@@ -695,7 +746,19 @@ Type Compiler::compileAssign(AssignExpr* expr)
 	if (l_type != r_type)
 		throw std::runtime_error("Type mismatch in assignment: cannot assign " + TypeToString(r_type) + " to " + TypeToString(l_type));
 
-	emit(OpCode::STORE);
+	switch (l_type->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::STORE_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::STORE_INT   ); break;
+	case TypeKind::Double: emit(OpCode::STORE_DOUBLE); break;
+	case TypeKind::Vec2  : emit(OpCode::STORE_VEC2  ); break;
+	case TypeKind::Vec3  : emit(OpCode::STORE_VEC3  ); break;
+	case TypeKind::Array : emit(OpCode::STORE_ARRAY ); break;
+	case TypeKind::Struct: emit(OpCode::STORE_STRUCT); break;
+	default:
+		throw std::runtime_error("Unsupported type in assignment");
+		break;
+	}
 
 	return l_type;
 }
@@ -1090,15 +1153,6 @@ Type Compiler::compileCall(CallExpr* call)
 	// Callee must be a variable (function name)
 	if (auto calleeVar = dynamic_cast<VariableExpr*>(call->callee.get()))
 	{
-		// handle special functions first
-		if (calleeVar->name == "print")
-		{
-			compileFncArgs(call->arguments, false);
-			emit(OpCode::PRINT, (int)call->arguments.size());
-			emitUint8(static_cast<uint8_t>(call->arguments.size())); // number of arguments
-			return prg.types.getVoidType();
-		}
-
 		// don't copy args for native functions
 		std::vector<Type> argTypes = compileFncArgs(call->arguments, !isNativeFunction(calleeVar->name));
 		int fnIndex = resolveFunction(calleeVar->name, argTypes);
@@ -1147,7 +1201,19 @@ Type Compiler::compileMember(MemberExpr* expr)
 
 		std::size_t index = it - type->fields.begin();
 
-		emit(OpCode::GET_PROPERTY);
+		switch (it->first->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::GET_PROPERTY_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::GET_PROPERTY_INT   ); break;
+		case TypeKind::Double: emit(OpCode::GET_PROPERTY_DOUBLE); break;
+		case TypeKind::Vec2  : emit(OpCode::GET_PROPERTY_VEC2  ); break;
+		case TypeKind::Vec3  : emit(OpCode::GET_PROPERTY_VEC3  ); break;
+		case TypeKind::Array : emit(OpCode::GET_PROPERTY_ARRAY ); break;
+		case TypeKind::Struct: emit(OpCode::GET_PROPERTY_STRUCT); break;
+		default:
+			throw std::runtime_error("Unsupported struct member type");
+		}
+
 		emitUint8((uint8_t)index);
 
 		return it->first;
@@ -1244,8 +1310,6 @@ Type Compiler::compileMember(MemberExpr* expr)
 	}
 }
 
-
-
 Type Compiler::compileIndex(IndexExpr* expr)
 {
 	Type exprType = compileExpression(expr->object.get());
@@ -1255,7 +1319,18 @@ Type Compiler::compileIndex(IndexExpr* expr)
 	if (indxType->kind != TypeKind::Int)
 		throw std::runtime_error("Array index must be a number.");
 
-	emit(OpCode::GET_INDEX);
+	switch (exprType->elementType->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::GET_INDEX_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::GET_INDEX_INT   ); break;
+	case TypeKind::Double: emit(OpCode::GET_INDEX_DOUBLE); break;
+	case TypeKind::Vec2  : emit(OpCode::GET_INDEX_VEC2  ); break;
+	case TypeKind::Vec3  : emit(OpCode::GET_INDEX_VEC3  ); break;
+	case TypeKind::Array : emit(OpCode::GET_INDEX_ARRAY ); break;
+	case TypeKind::Struct: emit(OpCode::GET_INDEX_STRUCT); break;
+		default:
+		throw std::runtime_error("Unsupported array element type");
+	}
 
 	return exprType->elementType;
 }

@@ -25,39 +25,48 @@ const char* IPToString(uint8_t ip)
 {
 	switch ((OpCode)ip)
 	{
-	case OpCode::PUSH_CONST    : 
+	case OpCode::PUSH_VOID     : 
 	case OpCode::PUSH_BOOL     :
 	case OpCode::PUSH_INT      :
-	case OpCode::PUSH_DOUBLE   :
-	case OpCode::PUSH_VEC2     :
-	case OpCode::PUSH_VEC3     : return "MOV ";
+	case OpCode::PUSH_DOUBLE   : return "MOV ";
 
-	case OpCode::GET_GLOBAL       :
 	case OpCode::GET_GLOBAL_BOOL  :
 	case OpCode::GET_GLOBAL_INT   :
 	case OpCode::GET_GLOBAL_DOUBLE:
 	case OpCode::GET_GLOBAL_VEC2  :
-	case OpCode::GET_GLOBAL_VEC3  : return "GTG ";
+	case OpCode::GET_GLOBAL_VEC3  : 
+	case OpCode::GET_GLOBAL_ARRAY : 
+	case OpCode::GET_GLOBAL_STRUCT: return "GTG ";
 
-	case OpCode::SET_GLOBAL       :
 	case OpCode::SET_GLOBAL_BOOL  :
 	case OpCode::SET_GLOBAL_INT   :
 	case OpCode::SET_GLOBAL_DOUBLE:
 	case OpCode::SET_GLOBAL_VEC2  :
-	case OpCode::SET_GLOBAL_VEC3  : return "STG ";
+	case OpCode::SET_GLOBAL_VEC3  :
+	case OpCode::SET_GLOBAL_ARRAY :
+	case OpCode::SET_GLOBAL_STRUCT: return "STG ";
 
-	case OpCode::STORE         : return "STRE";
+	case OpCode::STORE_BOOL  :
+	case OpCode::STORE_INT   :
+	case OpCode::STORE_DOUBLE:
+	case OpCode::STORE_VEC2  :
+	case OpCode::STORE_VEC3  :
+	case OpCode::STORE_ARRAY :
+	case OpCode::STORE_STRUCT:
+		return "STRE";
+
 	case OpCode::GET_GLOBAL_REF: return "GREF";
 	case OpCode::GET_LOCAL_REF : return "LREF";
 	case OpCode::GET_INDEX_REF : return "IREF";
 	case OpCode::GET_MEMBER_REF: return "MREF";
 
-	case OpCode::GET_LOCAL       :
 	case OpCode::GET_LOCAL_BOOL  :
 	case OpCode::GET_LOCAL_INT   :
 	case OpCode::GET_LOCAL_DOUBLE:
 	case OpCode::GET_LOCAL_VEC2  :
-	case OpCode::GET_LOCAL_VEC3  : return "GETL";
+	case OpCode::GET_LOCAL_VEC3  :
+	case OpCode::GET_LOCAL_ARRAY :
+	case OpCode::GET_LOCAL_STRUCT: return "GETL";
 
 	case OpCode::ADD_INT       : return "ADDI";
 	case OpCode::ADD_DOUBLE    : return "ADDF";
@@ -89,7 +98,6 @@ const char* IPToString(uint8_t ip)
 	case OpCode::NEG_INT       : return "NEGI";
 	case OpCode::NEG_DOUBLE    : return "NEGF";
 	case OpCode::CREATE_VEC2   : return "VEC2";
-	case OpCode::COPY_VEC2     : return "CPV2";
 	case OpCode::GET_VEC2_X    : return "GV2X";
 	case OpCode::GET_VEC2_Y    : return "GV2Y";
 	case OpCode::GET_VEC2_SWIZZLE: return "G2SW";
@@ -100,7 +108,6 @@ const char* IPToString(uint8_t ip)
 	case OpCode::MUL_DOUBLE_VEC2: return "MLF2";
 	case OpCode::NEG_VEC2      : return "NEG2";
 	case OpCode::CREATE_VEC3   : return "VEC3";
-	case OpCode::COPY_VEC3     : return "CPV3";
 	case OpCode::GET_VEC3_X    : return "GV3X";
 	case OpCode::GET_VEC3_Y    : return "GV3Y";
 	case OpCode::GET_VEC3_Z    : return "GV3Z";
@@ -114,24 +121,50 @@ const char* IPToString(uint8_t ip)
 	case OpCode::NOT           : return "NOT ";
 	case OpCode::CREATE_STRUCT : return "STRC";
 	case OpCode::COPY_STRUCT   : return "CPYS";
-	case OpCode::GET_PROPERTY  : return "GETP";
+
+	case OpCode::GET_PROPERTY_BOOL:
+	case OpCode::GET_PROPERTY_INT:
+	case OpCode::GET_PROPERTY_DOUBLE:
+	case OpCode::GET_PROPERTY_VEC2:
+	case OpCode::GET_PROPERTY_VEC3:
+	case OpCode::GET_PROPERTY_ARRAY:
+	case OpCode::GET_PROPERTY_STRUCT:
+		return "GETP";
+
 	case OpCode::CREATE_ARRAY  : return "ARR ";
 	case OpCode::COPY_ARRAY    : return "CPYA";
-	case OpCode::GET_INDEX     : return "GETI";
+
+	case OpCode::GET_INDEX_BOOL  :
+	case OpCode::GET_INDEX_INT   :
+	case OpCode::GET_INDEX_DOUBLE:
+	case OpCode::GET_INDEX_VEC2  :
+	case OpCode::GET_INDEX_VEC3  :
+	case OpCode::GET_INDEX_ARRAY :
+	case OpCode::GET_INDEX_STRUCT:
+		return "GETI";
+
 	case OpCode::JUMP          : return "JMP ";
 	case OpCode::JUMP_IF_FALSE : return "JMPF";
 	case OpCode::JUMP_IF_TRUE  : return "JMPT";
 	case OpCode::LOOP          : return "LOOP";
 	case OpCode::CALL          : return "CALL";
 	case OpCode::CALL_BINARY   : return "BINO";
-	case OpCode::PRINT         : return "PRNT";
-	case OpCode::RETURN        : return "RET ";
 	case OpCode::POP           : return "POP ";
 	case OpCode::GET_VEC2_X_REF: return "RV2X";
 	case OpCode::GET_VEC2_Y_REF: return "RV2Y";
 	case OpCode::GET_VEC3_X_REF: return "RV3X";
 	case OpCode::GET_VEC3_Y_REF: return "RV3Y";
 	case OpCode::GET_VEC3_Z_REF: return "RV3Z";
+
+	case OpCode::RETURN_VOID: 
+	case OpCode::RETURN_BOOL: 
+	case OpCode::RETURN_INT: 
+	case OpCode::RETURN_DOUBLE: 
+	case OpCode::RETURN_VEC2: 
+	case OpCode::RETURN_VEC3: 
+	case OpCode::RETURN_ARRAY: 
+	case OpCode::RETURN_STRUCT: 
+		return "RET ";
 	}
 	return "(UNKNOWN)";
 }
@@ -180,10 +213,9 @@ Value VM::execute()
 
 		switch ((OpCode)instruction)
 		{
-		case OpCode::PUSH_CONST:
+		case OpCode::PUSH_VOID:
 		{
-			uint8_t idx = readByte();
-			push(m_program->constants[idx]);
+			pushVoid();
 			break;
 		}
 
@@ -208,59 +240,54 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::PUSH_VEC2:
-		{
-			uint8_t idx = readByte();
-			pushVec2(m_program->constants[idx].vec2Value);
-			break;
-		}
-
-		case OpCode::PUSH_VEC3:
-		{
-			uint8_t idx = readByte();
-			pushVec3(m_program->constants[idx].vec3Value);
-			break;
-		}
-
-		case OpCode::GET_GLOBAL:
-		{
-			uint8_t slot = readByte();
-			push(m_stack[slot]);
-			break;
-		}
-
 		case OpCode::GET_GLOBAL_BOOL:
 		{
 			uint8_t slot = readByte();
-			pushBool(m_stack[slot].b);
+			pushBool(getBoolAt(slot));
 			break;
 		}
 
 		case OpCode::GET_GLOBAL_INT:
 		{
 			uint8_t slot = readByte();
-			pushInt(m_stack[slot].i);
+			pushInt(getIntAt(slot));
 			break;
 		}
 
 		case OpCode::GET_GLOBAL_DOUBLE:
 		{
 			uint8_t slot = readByte();
-			pushDouble(m_stack[slot].d);
+			pushDouble(getDoubleAt(slot));
 			break;
 		}
 
 		case OpCode::GET_GLOBAL_VEC2:
 		{
 			uint8_t slot = readByte();
-			pushVec2(m_stack[slot].vec2Value);
+			pushVec2(getVec2At(slot));
 			break;
 		}
 
 		case OpCode::GET_GLOBAL_VEC3:
 		{
 			uint8_t slot = readByte();
-			pushVec3(m_stack[slot].vec3Value);
+			pushVec3(getVec3At(slot));
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_ARRAY:
+		{
+			uint8_t slot = readByte();
+			const ArrayValuePtr& arr = m_stack[slot].arrayValue;
+			pushArray(arr);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_STRUCT:
+		{
+			uint8_t slot = readByte();
+			const StructValuePtr& obj = m_stack[slot].structValue;
+			pushStruct(obj);
 			break;
 		}
 
@@ -271,7 +298,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &m_stack[slot];
-			ref.ref.type = TypeKind::Value;
+			ref.ref.type = RefType::Value;
 
 			push(ref);
 			break;
@@ -286,7 +313,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &m_stack[frame.base + slot];
-			ref.ref.type = TypeKind::Value;
+			ref.ref.type = RefType::Value;
 
 			push(ref);
 			break;
@@ -304,7 +331,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &s->fields[memberIndex];
-			ref.ref.type = TypeKind::Value;
+			ref.ref.type = RefType::Value;
 
 			push(ref);
 			break;
@@ -323,7 +350,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &s->elements[index];
-			ref.ref.type = TypeKind::Value;
+			ref.ref.type = RefType::Value;
 
 			push(ref);
 			break;
@@ -339,7 +366,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &v->x;
-			ref.ref.type = TypeKind::Double;
+			ref.ref.type = RefType::Double;
 
 			push(ref);
 			break;
@@ -354,7 +381,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &v->y;
-			ref.ref.type = TypeKind::Double;
+			ref.ref.type = RefType::Double;
 
 			push(ref);
 			break;
@@ -370,7 +397,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &v->x;
-			ref.ref.type = TypeKind::Double;
+			ref.ref.type = RefType::Double;
 
 			push(ref);
 			break;
@@ -386,7 +413,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &v->y;
-			ref.ref.type = TypeKind::Double;
+			ref.ref.type = RefType::Double;
 
 			push(ref);
 			break;
@@ -402,84 +429,117 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &v->z;
-			ref.ref.type = TypeKind::Double;
+			ref.ref.type = RefType::Double;
 
 			push(ref);
 			break;
 		}
 
-		case OpCode::STORE:
+		case OpCode::STORE_BOOL:
 		{
-			const Value& value = pop();
-			const Value& ref = pop();
-
-			const Ref& r = ref.ref;
-
-			switch (r.type)
-			{
-			case TypeKind::Value:
-				*(Value*)r.ptr = value;
-				break;
-
-			case TypeKind::Double:
-				*(double*)r.ptr = value.d;
-				break;
-
-			default:
-				throw std::runtime_error("Invalid store target");
-			}
-
-			push(value);
+			bool b = popBool();
+			const Ref& r = popRef();
+			*(Value*)r.ptr = b;
+			pushBool(b);
 			break;
 		}
 
-		case OpCode::SET_GLOBAL:
+		case OpCode::STORE_INT :
 		{
-			uint8_t slot = readByte();
-			m_stack[slot] = peek();
+			int n = popInt();
+			const Ref& r = popRef();
+			*(Value*)r.ptr = n;
+			pushInt(n);
+			break;
+		}
+
+		case OpCode::STORE_DOUBLE:
+		{
+			double d = popDouble();
+			const Ref& r = popRef();
+			if (r.type == RefType::Double)
+				*(double*)r.ptr = d;
+			else
+				*(Value*)r.ptr = d;
+			pushDouble(d);
+			break;
+		}
+
+		case OpCode::STORE_VEC2:
+		{
+			vec2 v = popVec2();
+			const Ref& r = popRef();
+			*(Value*)r.ptr = v;
+			pushVec2(v);
+			break;
+		}
+
+		case OpCode::STORE_VEC3:
+		{
+			vec3 v = popVec3();
+			const Ref& r = popRef();
+			*(Value*)r.ptr = v;
+			pushVec3(v);
+			break;
+		}
+
+		case OpCode::STORE_ARRAY:
+		case OpCode::STORE_STRUCT:
+		{
+			const Value& value = pop();
+			const Value& ref = pop();
+			const Ref& r = ref.ref;
+			*(Value*)r.ptr = value;
+			push(value);
 			break;
 		}
 
 		case OpCode::SET_GLOBAL_BOOL:
 		{
 			uint8_t slot = readByte();
-			setBool(slot, peekBool());
+			setBoolAt(slot, peekBool());
 			break;
 		}
 
 		case OpCode::SET_GLOBAL_INT:
 		{
 			uint8_t slot = readByte();
-			setInt(slot, peekInt());
+			setIntAt(slot, peekInt());
 			break;
 		}
 
 		case OpCode::SET_GLOBAL_DOUBLE:
 		{
 			uint8_t slot = readByte();
-			setDouble(slot, peekDouble());
+			setDoubleAt(slot, peekDouble());
 			break;
 		}
 
 		case OpCode::SET_GLOBAL_VEC2:
 		{
 			uint8_t slot = readByte();
-			setVec2(slot, peekVec2());
+			setVec2At(slot, peekVec2());
 			break;
 		}
 
 		case OpCode::SET_GLOBAL_VEC3:
 		{
 			uint8_t slot = readByte();
-			setVec3(slot, peekVec3());
+			setVec3At(slot, peekVec3());
 			break;
 		}
 
-		case OpCode::GET_LOCAL:
+		case OpCode::SET_GLOBAL_ARRAY:
 		{
 			uint8_t slot = readByte();
-			CallFrame& frame = currentFrame();
-			push(m_stack[frame.base + slot]);
+			m_stack[slot] = peek();
+			break;
+		}
+
+		case OpCode::SET_GLOBAL_STRUCT:
+		{
+			uint8_t slot = readByte();
+			m_stack[slot] = peek();
 			break;
 		}
 
@@ -520,6 +580,22 @@ Value VM::execute()
 			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
 			pushVec3(m_stack[frame.base + slot].vec3Value);
+			break;
+		}
+
+		case OpCode::GET_LOCAL_ARRAY:
+		{
+			uint8_t slot = readByte();
+			CallFrame& frame = currentFrame();
+			push(m_stack[frame.base + slot]);
+			break;
+		}
+
+		case OpCode::GET_LOCAL_STRUCT:
+		{
+			uint8_t slot = readByte();
+			CallFrame& frame = currentFrame();
+			push(m_stack[frame.base + slot]);
 			break;
 		}
 
@@ -568,7 +644,7 @@ Value VM::execute()
 			if (b < 0)
 				throw std::runtime_error("Negative exponent not supported for integers.");
 
-			push(ipow(a, b));
+			pushInt(ipow(a, b));
 			break;
 		}
 		case OpCode::GT_INT:
@@ -681,12 +757,6 @@ Value VM::execute()
 			pushVec2(vec2(x, y));
 			break;
 		}
-		case OpCode::COPY_VEC2: // What is the point of this?
-		{
-			vec2 v = popVec2();
-			pushVec2(v);
-			break;
-		}
 		case OpCode::ADD_VEC2:
 		{
 			vec2 b = popVec2();
@@ -770,13 +840,6 @@ Value VM::execute()
 			double y = popDouble();
 			double x = popDouble();
 			pushVec3(vec3(x, y, z));
-			break;
-		}
-		case OpCode::COPY_VEC3:
-		{
-			// TODO: This seems pointless
-			vec3 v = popVec3();
-			pushVec3(v);
 			break;
 		}
 		case OpCode::ADD_VEC3:
@@ -946,28 +1009,52 @@ Value VM::execute()
 			push(obj);
 			break;
 		}
-		case OpCode::GET_PROPERTY:
+		case OpCode::GET_PROPERTY_BOOL:
 		{
+			const StructValue& obj = popStruct();
 			uint8_t slot = readByte();
+			pushBool(obj.fields[slot].b);
+			break;
+		}
 
-			const Value& objVal = pop();
+		case OpCode::GET_PROPERTY_INT:
+		{
+			const StructValue& obj = popStruct();
+			uint8_t slot = readByte();
+			pushInt(obj.fields[slot].i);
+			break;
+		}
 
-			switch (ValueType(objVal))
-			{
-			case TypeKind::Struct:
-			{
-				const auto& structVal = getStruct(objVal);
+		case OpCode::GET_PROPERTY_DOUBLE:
+		{
+			const StructValue& obj = popStruct();
+			uint8_t slot = readByte();
+			pushDouble(obj.fields[slot].d);
+			break;
+		}
 
-				if (slot >= structVal.fields.size())
-					throw std::runtime_error("Invalid property slot");
+		case OpCode::GET_PROPERTY_VEC2:
+		{
+			const StructValue& obj = popStruct();
+			uint8_t slot = readByte();
+			pushVec2(obj.fields[slot].vec2Value);
+			break;
+		}
 
-				push(structVal.fields[slot]);
-				break;
-			}
-			default:
-				throw std::runtime_error("GET_PROPERTY on non-struct");
-			}
+		case OpCode::GET_PROPERTY_VEC3:
+		{
+			const StructValue& obj = popStruct();
+			uint8_t slot = readByte();
+			pushVec3(obj.fields[slot].vec3Value);
+			break;
+		}
 
+		case OpCode::GET_PROPERTY_ARRAY:
+		case OpCode::GET_PROPERTY_STRUCT:
+		{
+			const StructValue& obj = popStruct();
+			uint8_t slot = readByte();
+			push(obj.fields[slot]);
 			break;
 		}
 
@@ -988,32 +1075,96 @@ Value VM::execute()
 			break;
 		}
 		case OpCode::COPY_ARRAY: {
-			auto src = pop();
-
-			if (!isArray(src))
-				throw std::runtime_error("COPY_ARRAY operand must be an array");
-
-			const ArrayValue& srcObj = getArray(src);
-			auto obj = copyArray(srcObj);
-
+			const ArrayValue& arr = popArray();
+			auto obj = copyArray(arr);
 			push(obj);
 			break;
 		}
-		case OpCode::GET_INDEX: {
-			const Value& indexVal = pop();
-			const Value& arrayVal = pop();
+		case OpCode::GET_INDEX_BOOL:
+		{
+			int index = popInt();
+			const ArrayValue& arr = popArray();
 
-			auto& arr = getArray(arrayVal);
-
-			int idxNum = getInt(indexVal);
-
-			size_t index = static_cast<size_t>(idxNum);
+#ifndef  NDEBUG
 			if (index >= arr.size())
 				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
+
+			pushBool(arr.elements[index].b);
+			break;
+		}
+
+		case OpCode::GET_INDEX_INT:
+		{
+			int index = popInt();
+			const ArrayValue& arr = popArray();
+
+#ifndef  NDEBUG
+			if (index >= arr.size())
+				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
+
+			pushInt(arr.elements[index].i);
+			break;
+		}
+
+		case OpCode::GET_INDEX_DOUBLE:
+		{
+			int index = popInt();
+			const ArrayValue& arr = popArray();
+
+#ifndef  NDEBUG
+			if (index >= arr.size())
+				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
+
+			pushDouble(arr.elements[index].d);
+			break;
+		}
+
+		case OpCode::GET_INDEX_VEC2:
+		{
+			int index = popInt();
+			const ArrayValue& arr = popArray();
+
+#ifndef  NDEBUG
+			if (index >= arr.size())
+				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
+
+			pushVec2(arr.elements[index].vec2Value);
+			break;
+		}
+
+		case OpCode::GET_INDEX_VEC3:
+		{
+			int index = popInt();
+			const ArrayValue& arr = popArray();
+
+#ifndef  NDEBUG
+			if (index >= arr.size())
+				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
+
+			pushVec3(arr.elements[index].vec3Value);
+			break;
+		}
+
+		case OpCode::GET_INDEX_ARRAY:
+		case OpCode::GET_INDEX_STRUCT:
+		{
+			int index = popInt();
+			const ArrayValue& arr = popArray();
+
+#ifndef  NDEBUG
+			if (index >= arr.size())
+				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
 
 			push(arr.elements[index]);
 			break;
 		}
+
 		case OpCode::JUMP:
 		{
 			uint16_t offset = readUint16();
@@ -1044,6 +1195,12 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::POP:
+		{
+			pop();
+			break;
+		}
+
 		case OpCode::CALL:
 		{
 			uint8_t fnIndex = readByte();
@@ -1059,37 +1216,47 @@ Value VM::execute()
 			break;
 		}
 		
-		case OpCode::PRINT:
+		case OpCode::RETURN_VOID:
+		case OpCode::RETURN_BOOL:
+		case OpCode::RETURN_INT:
+		case OpCode::RETURN_DOUBLE:
+		case OpCode::RETURN_VEC2:
+		case OpCode::RETURN_VEC3:
+		case OpCode::RETURN_ARRAY:
+		case OpCode::RETURN_STRUCT:
 		{
-			uint8_t argCount = readByte();
-			std::vector<Value> args;
-			for (int i = 0; i < argCount; ++i)
-			{
-				args.push_back(pop());
-			}
+			TypeKind returnType = (TypeKind)(instruction - (uint8_t)OpCode::RETURN_VOID);
 
-			auto it = m_program->m_specialFns.find("print");
-			if (it != m_program->m_specialFns.end())
-			{
-				it->second(args.data(), argCount);
-			}
-
-			// leave empty value on stack after print (for chaining)
-			push(Value());
-
-			break;
-		}
-
-		case OpCode::RETURN:
-		{
 			Value result;
-
 			if (stackTop > globalCount)
-				result = pop();
+			{
+				switch (returnType)
+				{
+				case TypeKind::Void  : pop(); break;
+				case TypeKind::Bool  : result = popBool  (); break;
+				case TypeKind::Int   : result = popInt   (); break;
+				case TypeKind::Double: result = popDouble(); break;
+				case TypeKind::Vec2  : result = popVec2  (); break;
+				case TypeKind::Vec3  : result = popVec3  (); break;
+				default:
+					result = pop();
+				}
+			}
 
 			CallFrame frame = m_frames[--frameCount];
 			stackTop = frame.base;
-			push(result);
+
+			switch (returnType)
+			{
+			case TypeKind::Void  : push      (result); break;
+			case TypeKind::Bool  : pushBool  (result.b); break;
+			case TypeKind::Int   : pushInt   (result.i); break;
+			case TypeKind::Double: pushDouble(result.d); break;
+			case TypeKind::Vec2  : pushVec2  (result.vec2Value); break;
+			case TypeKind::Vec3  : pushVec3  (result.vec3Value); break;
+			default:
+				push(result);
+			}
 
 			if (m_debug)
 			{
@@ -1102,17 +1269,11 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::POP:
-		{
-			pop();
-			break;
-		}
-
 		default:
 			throw std::runtime_error("Unknown opcode");
 		}
 
-		if (m_debug && (instruction != (uint8_t)OpCode::RETURN))
+		if (m_debug && (instruction < (uint8_t)OpCode::RETURN_VOID))
 		{
 			printStack(m_stack, globalCount, (int)stackTop);
 		}

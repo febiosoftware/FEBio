@@ -144,15 +144,6 @@ namespace febcode
 			return (high << 8) | low;
 		}
 
-		const Value& pop()
-		{
-#ifndef NDEBUG
-			if (stackTop <= globalCount)
-				throw std::runtime_error("Stack underflow.");
-#endif
-			return m_stack[--stackTop];
-		}
-
 		void push(const Value& v)
 		{
 #ifndef NDEBUG
@@ -160,6 +151,11 @@ namespace febcode
 				throw std::runtime_error("Stack overflow.");
 #endif
 			m_stack[stackTop++] = v;
+		}
+
+		void pushVoid()
+		{
+			push(Value());
 		}
 
 		void pushBool(bool b)
@@ -187,6 +183,25 @@ namespace febcode
 			push(v);
 		}
 
+		void pushArray(const ArrayValuePtr& arr)
+		{
+			push(arr);
+		}
+
+		void pushStruct(const StructValuePtr& arr)
+		{
+			push(arr);
+		}
+
+		const Value& pop()
+		{
+#ifndef NDEBUG
+			if (stackTop <= globalCount)
+				throw std::runtime_error("Stack underflow.");
+#endif
+			return m_stack[--stackTop];
+		}
+
 		bool popBool()
 		{
 			return pop().b;
@@ -210,6 +225,21 @@ namespace febcode
 		vec3 popVec3()
 		{
 			return pop().vec3Value;
+		}
+
+		const ArrayValue& popArray()
+		{
+			return getArray(pop());
+		}
+
+		const StructValue& popStruct()
+		{
+			return getStruct(pop());
+		}
+
+		const Ref& popRef()
+		{
+			return pop().ref;
 		}
 
 		Value& peek()
@@ -246,29 +276,54 @@ namespace febcode
 			return peek().vec3Value;
 		}
 
-		void setBool(int slot, bool b)
+		void setBoolAt(int slot, bool b)
 		{
 			m_stack[slot] = b;
 		}
 
-		void setInt(int slot, int n)
+		void setIntAt(int slot, int n)
 		{
 			m_stack[slot] = n;
 		}
 
-		void setDouble(int slot, double d)
+		void setDoubleAt(int slot, double d)
 		{
 			m_stack[slot] = d;
 		}
 
-		void setVec2(int slot, const vec2& v)
+		void setVec2At(int slot, const vec2& v)
 		{
 			m_stack[slot] = v;
 		}
 
-		void setVec3(int slot, const vec3& v)
+		void setVec3At(int slot, const vec3& v)
 		{
 			m_stack[slot] = v;
+		}
+
+		bool getBoolAt(int slot)
+		{
+			return m_stack[slot].b;
+		}
+
+		int getIntAt(int slot)
+		{
+			return m_stack[slot].i;
+		}
+
+		double getDoubleAt(int slot)
+		{
+			return m_stack[slot].d;
+		}
+
+		vec2 getVec2At(int slot)
+		{
+			return m_stack[slot].vec2Value;
+		}
+
+		vec3 getVec3At(int slot)
+		{
+			return m_stack[slot].vec3Value;
 		}
 
 		bool isTruthy(const Value& v)
