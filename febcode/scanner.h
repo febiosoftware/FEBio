@@ -27,7 +27,6 @@ namespace febcode {
 		Double,
 		True,
 		False,
-		String,
 
 		// Keywords
 		Return,
@@ -153,8 +152,6 @@ namespace febcode {
 			case '<': return makeToken(TokenType::Less);
 			case '>': return makeToken(TokenType::Greater);
 			case '!': return makeToken(TokenType::Not);
-			case '\'': return string('\'');
-			case '\"': return string('\"');
 			}
 
 			if (std::isdigit(c)) return number();
@@ -262,19 +259,6 @@ namespace febcode {
 
 			// Fallback: regular identifier
 			return makeToken(TokenType::Identifier);
-		}
-
-		Token string(char quote)
-		{
-			while (peek() != quote && !isAtEnd()) {
-				if (peek() == '\n') line++;
-				advance();
-			}
-			if (isAtEnd()) return errorToken("Unterminated string.");
-			advance(); // consume closing '
-
-			// don't include quotes characters
-			return Token{ TokenType::String, start + 1, int(current - start) - 2, line };
 		}
 
 		char peek() const {

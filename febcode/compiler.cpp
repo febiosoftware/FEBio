@@ -96,7 +96,13 @@ int Compiler::stackEffect(OpCode op, int arg)
 	switch (op)
 	{
 	case OpCode::PUSH_CONST: return +1;
-	case OpCode::GET_GLOBAL: return +1;
+	case OpCode::GET_GLOBAL:
+	case OpCode::GET_GLOBAL_BOOL:
+	case OpCode::GET_GLOBAL_INT:
+	case OpCode::GET_GLOBAL_DOUBLE:
+	case OpCode::GET_GLOBAL_VEC2:
+	case OpCode::GET_GLOBAL_VEC3:
+		return +1;
 	case OpCode::SET_GLOBAL: return 0;
 	case OpCode::GET_GLOBAL_REF: return +1;
 	case OpCode::GET_LOCAL: return +1;
@@ -159,7 +165,6 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_VEC3_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC3: return -1;
 	case OpCode::NOT: return 0;
-	case OpCode::ADD_STRING: return -1;
 	case OpCode::EQUAL: return -1;
 	case OpCode::NOT_EQUAL: return -1;
 	case OpCode::JUMP: return 0;
@@ -607,7 +612,17 @@ Type Compiler::compileVariable(VariableExpr* expr)
 
 	glob.refcount++;
 
-	emit(OpCode::GET_GLOBAL);
+	switch (glob.type->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::GET_GLOBAL_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::GET_GLOBAL_INT   ); break;
+	case TypeKind::Double: emit(OpCode::GET_GLOBAL_DOUBLE); break;
+	case TypeKind::Vec2  : emit(OpCode::GET_GLOBAL_VEC2  ); break;
+	case TypeKind::Vec3  : emit(OpCode::GET_GLOBAL_VEC3  ); break;
+	default:
+		emit(OpCode::GET_GLOBAL);
+	}
+
 	emitUint8(global);
 	return glob.type;
 }
@@ -800,19 +815,6 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 
 	Type type_l = compileExpression(expr->left.get());
 	Type type_r = compileExpression(expr->right.get());
-
-	if (isStringType(type_l) && isStringType(type_r))
-	{
-		switch (op)
-		{
-		case BinaryOp::Plus      : emit(OpCode::ADD_STRING); break;
-		case BinaryOp::EqualEqual: emit(OpCode::EQUAL     ); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::NotEqual  : emit(OpCode::NOT_EQUAL ); type_l = prg.types.getBoolType(); break;
-		default:
-			throw std::runtime_error("Unsupported binary op for string type.");
-		}
-		return type_l;
-	}
 
 	if (isIntType(type_l) && isIntType(type_r))
 	{

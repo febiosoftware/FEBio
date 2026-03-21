@@ -51,7 +51,6 @@ TypeRegistry::TypeRegistry()
 	m_double = { TypeKind::Double};
 	m_vec2   = { TypeKind::Vec2  };
 	m_vec3   = { TypeKind::Vec3  };
-	m_string = { TypeKind::String};
 }
 
 void TypeRegistry::clear()
@@ -65,7 +64,6 @@ Type TypeRegistry::getIntType() const { return &m_int; }
 Type TypeRegistry::getDoubleType() const { return &m_double; }
 Type TypeRegistry::getVec2Type() const { return &m_vec2; }
 Type TypeRegistry::getVec3Type() const { return &m_vec3; }
-Type TypeRegistry::getStringType() const { return &m_string; }
 
 Type TypeRegistry::getTypeFromKind(TypeKind kind) const
 {
@@ -77,7 +75,6 @@ Type TypeRegistry::getTypeFromKind(TypeKind kind) const
 	case TypeKind::Double: return getDoubleType();
 	case TypeKind::Vec2: return getVec2Type();
 	case TypeKind::Vec3: return getVec3Type();
-	case TypeKind::String: return getStringType();
 	default:
 		return nullptr;
 	}
@@ -137,7 +134,6 @@ Type TypeRegistry::getBuiltinType(const Value& v) const
 	if (isDouble(v)) return getDoubleType();
 	if (isVec2  (v)) return getVec2Type();
 	if (isVec3  (v)) return getVec3Type();
-	if (isString(v)) return getStringType();
 	if (isArray (v)) { const ArrayValue&  a = getArray (v); return a.type; }
 	if (isStruct(v)) { const StructValue& s = getStruct(v); return s.type; }
 
@@ -153,7 +149,6 @@ Type TypeRegistry::getType(const std::string& name) const
 	if (name == "double") return getDoubleType();
 	if (name == "vec2"  ) return getVec2Type();
 	if (name == "vec3"  ) return getVec3Type();
-	if (name == "string") return getStringType();
 
 	Type s = getStructType(name);
 	if (s) return s;
@@ -217,7 +212,6 @@ Type TypeRegistry::defineStructType(const std::string& name, const std::vector<s
 		case TypeKind::Double: t = getDoubleType(); break;
 		case TypeKind::Vec2  : t = getVec2Type(); break;
 		case TypeKind::Vec3  : t = getVec3Type(); break;
-		case TypeKind::String: t = getStringType(); break;
 		default:
 			throw std::runtime_error("Unsupported field type in RegisterStruct: " + std::to_string((int)f.first));
 		}
@@ -238,7 +232,6 @@ std::string febcode::TypeToString(Type type)
 	case TypeKind::Double: return "double";
 	case TypeKind::Vec2  : return "vec2";
 	case TypeKind::Vec3  : return "vec3";
-	case TypeKind::String: return "string";
 	case TypeKind::Struct: return type->name;
 	case TypeKind::Array:
 	{

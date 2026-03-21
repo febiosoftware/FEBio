@@ -11,6 +11,13 @@ namespace febcode
 		PUSH_CONST,
 
 		GET_GLOBAL,
+
+		GET_GLOBAL_BOOL,
+		GET_GLOBAL_INT,
+		GET_GLOBAL_DOUBLE,
+		GET_GLOBAL_VEC2,
+		GET_GLOBAL_VEC3,
+
 		SET_GLOBAL,
 		GET_GLOBAL_REF,
 
@@ -92,9 +99,6 @@ namespace febcode
 
 		// logical operators
 		NOT,
-
-		// string operators
-		ADD_STRING,
 
 		// comparison operators
 		EQUAL,

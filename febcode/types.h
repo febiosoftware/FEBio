@@ -15,7 +15,6 @@ namespace febcode
 		Double,
 		Vec2,
 		Vec3,
-		String,
 		Array,
 		Struct,
 		Value
@@ -103,7 +102,6 @@ namespace febcode
 		DOUBLE,
 		VEC2,
 		VEC3,
-		STRING,
 		ARRAY,
 		STRUCT,
 		REF
@@ -121,7 +119,6 @@ namespace febcode
 		Value(double a) : index(ValueIndex::DOUBLE), d(a) {}
 		Value(const vec2& a) : index(ValueIndex::VEC2), vec2Value(a) {}
 		Value(const vec3& a) : index(ValueIndex::VEC3), vec3Value(a) {}
-		Value(const std::string& a) : index(ValueIndex::STRING), stringValue(a) {}
 		Value(const ArrayValuePtr& a) : index(ValueIndex::ARRAY), arrayValue(a) {}
 		Value(const StructValuePtr& a) : index(ValueIndex::STRUCT), structValue(a) {}
 
@@ -133,7 +130,7 @@ namespace febcode
 		void operator = (const Value& other)
 		{
 			// for simple types we use the fast path
-			if ((index < ValueIndex::STRING) && (other.index < ValueIndex::STRING))
+			if ((index < ValueIndex::ARRAY) && (other.index < ValueIndex::ARRAY))
 			{
 				index = other.index;
 				switch (index)
@@ -158,7 +155,8 @@ namespace febcode
 
 		~Value()
 		{
-			destroy();
+			if (index >= ValueIndex::ARRAY)
+				destroy();
 		}
 
 		bool operator == (const Value& other) const
@@ -173,7 +171,6 @@ namespace febcode
 			case ValueIndex::DOUBLE: return d == other.d;
 			case ValueIndex::VEC2  : return vec2Value == other.vec2Value;
 			case ValueIndex::VEC3  : return vec3Value == other.vec3Value;
-			case ValueIndex::STRING: return stringValue == other.stringValue;
 			case ValueIndex::ARRAY : return arrayValue == other.arrayValue;
 			case ValueIndex::STRUCT: return structValue == other.structValue;
 			}
@@ -192,7 +189,6 @@ namespace febcode
 			double d;
 			vec2 vec2Value;
 			vec3 vec3Value;
-			std::string stringValue;
 			ArrayValuePtr arrayValue;
 			StructValuePtr structValue;
 			Ref ref;
@@ -210,7 +206,6 @@ namespace febcode
 			case ValueIndex::DOUBLE: d = v.d; break;
 			case ValueIndex::VEC2: vec2Value = v.vec2Value; break;
 			case ValueIndex::VEC3: vec3Value = v.vec3Value; break;
-			case ValueIndex::STRING: new (&stringValue) std::string(v.stringValue); break;
 			case ValueIndex::ARRAY: new (&arrayValue) ArrayValuePtr(v.arrayValue); break;
 			case ValueIndex::STRUCT: new (&structValue) StructValuePtr(v.structValue); break;
 			case ValueIndex::REF   : ref = v.ref; break;
@@ -221,9 +216,6 @@ namespace febcode
 		{
 			switch (index)
 			{
-				case ValueIndex::STRING:
-					stringValue.~basic_string();
-					break;
 				case ValueIndex::ARRAY:
 					arrayValue.~shared_ptr();
 					break;
@@ -274,7 +266,6 @@ namespace febcode
 	inline bool isDouble(const Value& v) { return v.index == ValueIndex::DOUBLE; }
 	inline bool isVec2  (const Value& v) { return v.index == ValueIndex::VEC2; }
 	inline bool isVec3  (const Value& v) { return v.index == ValueIndex::VEC3; }
-	inline bool isString(const Value& v) { return v.index == ValueIndex::STRING; }
 	inline bool isArray (const Value& v) { return v.index == ValueIndex::ARRAY; }
 	inline bool isStruct(const Value& v) { return v.index == ValueIndex::STRUCT; }
 	inline bool isRef   (const Value& v) { return v.index == ValueIndex::REF; }
@@ -285,7 +276,6 @@ namespace febcode
 	inline bool isDoubleType(Type type) { return type->kind == TypeKind::Double; }
 	inline bool isVec2Type  (Type type) { return type->kind == TypeKind::Vec2; }
 	inline bool isVec3Type  (Type type) { return type->kind == TypeKind::Vec3; }
-	inline bool isStringType(Type type) { return type->kind == TypeKind::String; }
 	inline bool isArrayType (Type type) { return type->kind == TypeKind::Array; }
 	inline bool isStructType(Type type) { return type->kind == TypeKind::Struct; }
 
@@ -298,7 +288,6 @@ namespace febcode
 	inline vec2& getVec2(Value& v) { assert(v.index == ValueIndex::VEC2); return v.vec2Value; }
 	inline const vec3& getVec3(const Value& v) { assert(v.index == ValueIndex::VEC3); return v.vec3Value; }
 	inline vec3& getVec3(Value& v) { assert(v.index == ValueIndex::VEC3); return v.vec3Value; }
-	inline const std::string& getString(const Value& v) { assert(v.index == ValueIndex::STRING); return v.stringValue; }
 	inline const ArrayValue&  getArray (const Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
 	inline const StructValue& getStruct(const Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
 	inline const Ref& getRef(const Value& v) { assert(v.index == ValueIndex::REF); return v.ref; }
@@ -306,7 +295,6 @@ namespace febcode
 	inline const ArrayValuePtr& getArrayPtr(const Value& v) { assert(v.index == ValueIndex::ARRAY); return v.arrayValue; }
 	inline const StructValuePtr& getStructPtr(const Value& v) { assert(v.index == ValueIndex::STRUCT); return v.structValue; }
 
-	inline std::string& getString(Value& v) { assert(v.index == ValueIndex::STRING); return v.stringValue; }
 	inline ArrayValue&  getArray (Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
 	inline StructValue& getStruct(Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
 
@@ -358,7 +346,6 @@ namespace febcode
 		Type getDoubleType() const;
 		Type getVec2Type() const;
 		Type getVec3Type() const;
-		Type getStringType() const;
 		Type getArrayType(Type element, size_t size);
 		Type getArrayType(Type element, size_t size) const;
 		Type getArrayType(Type element, const std::vector<size_t>& size) const;
@@ -384,7 +371,6 @@ namespace febcode
 		TypeStruct m_double;
 		TypeStruct m_vec2;
 		TypeStruct m_vec3;
-		TypeStruct m_string;
 
 		// Interned array types
 		std::vector<std::unique_ptr<TypeStruct>> m_arrayTypes;
@@ -408,8 +394,6 @@ inline febcode::Value operator + (const febcode::Value& a, const febcode::Value&
 		return getInt(a) + getInt(b);
 	if (isDouble(a) && isDouble(b))
 		return getDouble(a) + getDouble(b);
-	if (isString(a) && isString(b))
-		return getString(a) + getString(b);
 	throw std::runtime_error("Unsupported operand types for +");
 }
 

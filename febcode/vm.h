@@ -162,6 +162,46 @@ namespace febcode
 			m_stack[stackTop++] = v;
 		}
 
+		void pushBool(bool b)
+		{
+			push(b);
+		}
+
+		void pushInt(int n)
+		{
+			push(n);
+		}
+
+		void pushDouble(double d)
+		{
+			push(d);
+		}
+
+		void pushVec2(const vec2& v)
+		{
+			push(v);
+		}
+
+		void pushVec3(const vec3& v)
+		{
+			push(v);
+		}
+
+		double popDouble()
+		{
+			return pop().d;
+		}
+
+		vec2 popVec2()
+		{
+			return pop().vec2Value;
+		}
+
+		vec3 popVec3()
+		{
+			return pop().vec3Value;
+		}
+
 		Value& peek()
 		{
 #ifndef NDEBUG
@@ -179,7 +219,6 @@ namespace febcode
 				case ValueIndex::BOOL  : return getBool(v);
 				case ValueIndex::INT   : return getInt(v) != 0;
 				case ValueIndex::DOUBLE: return getDouble(v) != 0.0;
-				case ValueIndex::STRING: return !getString(v).empty();
 				case ValueIndex::ARRAY : return true;
 				case ValueIndex::STRUCT: return true;
 			}
@@ -195,7 +234,6 @@ namespace febcode
 			case ValueIndex::BOOL  : return getBool(v) ? "true" : "false";
 			case ValueIndex::INT   : return std::to_string(getInt(v));
 			case ValueIndex::DOUBLE: return std::to_string(getDouble(v));
-			case ValueIndex::STRING: return getString(v);
 			}
 			return "";
 		}

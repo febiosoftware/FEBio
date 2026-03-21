@@ -85,7 +85,7 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const st
 
 		// No need to differentiate non-numeric types, since they don't contribute to the derivative. 
 		// We can just copy them to the derivative AST without creating a derivative variable for them.
-		if (type->kind == TypeKind::Bool || type->kind == TypeKind::Int || type->kind == TypeKind::String) continue;
+		if (type->kind == TypeKind::Bool || type->kind == TypeKind::Int) continue;
 
 		// create a new variable for the derivative of this variable
 		std::string derivName = "__d" + var_i.name + "_d" + var;

@@ -37,7 +37,6 @@ const char* IPToString(uint8_t ip)
 	case OpCode::SET_LOCAL     : return "SETL";
 	case OpCode::ADD_INT       : return "ADDI";
 	case OpCode::ADD_DOUBLE    : return "ADDF";
-	case OpCode::ADD_STRING    : return "ADDS";
 	case OpCode::SUB_INT       : return "SUBI";
 	case OpCode::SUB_DOUBLE    : return "SUBF";
 	case OpCode::MUL_INT       : return "MULI";
@@ -161,6 +160,41 @@ Value VM::execute()
 		{
 			uint8_t slot = readByte();
 			push(m_stack[slot]);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_BOOL:
+		{
+			uint8_t slot = readByte();
+			pushBool(m_stack[slot].b);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_INT:
+		{
+			uint8_t slot = readByte();
+			pushInt(m_stack[slot].i);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_DOUBLE:
+		{
+			uint8_t slot = readByte();
+			pushDouble(m_stack[slot].d);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_VEC2:
+		{
+			uint8_t slot = readByte();
+			pushVec2(m_stack[slot].vec2Value);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_VEC3:
+		{
+			uint8_t slot = readByte();
+			pushVec3(m_stack[slot].vec3Value);
 			break;
 		}
 
@@ -438,83 +472,82 @@ Value VM::execute()
 		// Double operators
 		case OpCode::NEG_DOUBLE:
 		{
-			const Value& a = pop();
-			push(-getDouble(a));
+			double a = popDouble();
+			pushDouble(-a);
 			break;
 		}
 
 		case OpCode::ADD_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getDouble(a) + getDouble(b));
+			double b = popDouble();
+			double a = popDouble();
+			pushDouble(a + b);
 			break;
 		}
 		case OpCode::SUB_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getDouble(a) - getDouble(b));
+			double b = popDouble();
+			double a = popDouble();
+			pushDouble(a - b);
 			break;
 		}
 		case OpCode::MUL_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getDouble(a) * getDouble(b));
+			double b = popDouble();
+			double a = popDouble();
+			pushDouble(a * b);
 			break;
 		}
 		case OpCode::DIV_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			double divisor = getDouble(b);
-			if (divisor == 0.0)
+			double b = popDouble();
+			double a = popDouble();
+			if (b == 0.0)
 				throw std::runtime_error("division by zero.");
-			push(getDouble(a) / divisor);
+			push(a / b);
 			break;
 		}
 		case OpCode::EXP_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(std::pow(getDouble(a), getDouble(b)));
+			double b = popDouble();
+			double a = popDouble();
+			push(std::pow(a, b));
 			break;
 		}
 		case OpCode::GT_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getDouble(a) > getDouble(b));
+			double b = popDouble();
+			double a = popDouble();
+			push(a > b);
 			break;
 		}
 		case OpCode::LT_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getDouble(a) < getDouble(b));
+			double b = popDouble();
+			double a = popDouble();
+			push(a < b);
 			break;
 		}
 		case OpCode::GE_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getDouble(a) >= getDouble(b));
+			double b = popDouble();
+			double a = popDouble();
+			push(a >= b);
 			break;
 		}
 		case OpCode::LE_DOUBLE:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getDouble(a) <= getDouble(b));
+			double b = popDouble();
+			double a = popDouble();
+			push(a <= b);
 			break;
 		}
 
 		case OpCode::CREATE_VEC2:
 		{
-			const Value& y = pop();
-			const Value& x = pop();
-			push(vec2(getDouble(x), getDouble(y)));
+			double y = popDouble();
+			double x = popDouble();
+			push(vec2(x, y));
 			break;
 		}
 		case OpCode::COPY_VEC2:
@@ -526,64 +559,62 @@ Value VM::execute()
 		}
 		case OpCode::ADD_VEC2:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getVec2(a) + getVec2(b));
+			vec2 b = popVec2();
+			vec2 a = popVec2();
+			pushVec2(a + b);
 			break;
 		}
 		case OpCode::SUB_VEC2:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getVec2(a) - getVec2(b));
+			vec2 b = popVec2();
+			vec2 a = popVec2();
+			pushVec2(a - b);
 			break;
 		}
 		case OpCode::DOT_VEC2:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getVec2(a) * getVec2(b));
+			vec2 b = popVec2();
+			vec2 a = popVec2();
+			pushDouble(a * b);
 			break;
 		}
 		case OpCode::MUL_VEC2_DOUBLE:
 		{
-			const Value& scalar = pop();
-			const Value& vec = pop();
-			push(getVec2(vec) * getDouble(scalar));
+			double scalar = popDouble();
+			vec2 vec = popVec2();
+			pushVec2(vec * scalar);
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC2:
 		{
-			const Value& vec = pop();
-			const Value& scalar = pop();
-			push(getVec2(vec) * getDouble(scalar));
+			vec2 vec = popVec2();
+			double scalar = popDouble();
+			pushVec2(vec * scalar);
 			break;
 		}
 		case OpCode::GET_VEC2_X:
 		{
-			const Value& vec = pop();
-			push(getVec2(vec).x);
+			vec2 vec = popVec2();
+			pushDouble(vec.x);
 			break;
 		}
 		case OpCode::GET_VEC2_Y:
 		{
-			const Value& vec = pop();
-			push(getVec2(vec).y);
+			vec2 vec = popVec2();
+			pushDouble(vec.y);
 			break;
 		}
 		case OpCode::NEG_VEC2:
 		{
-			const Value& vec = pop();
-			const vec2& v = getVec2(vec);
-			push(vec2(-v.x, -v.y));
+			vec2 v = popVec2();
+			pushVec2(vec2(-v.x, -v.y));
 			break;
 		}
 		case OpCode::GET_VEC2_SWIZZLE:
 		{
 			uint8_t mask = readByte();
 			uint8_t size = readByte();
-			const Value& vec = pop();
-			const vec2& v = getVec2(vec);
+			vec2 v = popVec2();
 			double c[4] = { v.x, v.y, 0.0, 0.0 };
 
 			if (size == 2)
@@ -591,7 +622,7 @@ Value VM::execute()
 				vec2 result;
 				result.y = c[mask & 0b11];
 				result.x = c[(mask >> 2) & 0b11];
-				push(result);
+				pushVec2(result);
 			}
 			else if (size == 3)
 			{
@@ -599,84 +630,83 @@ Value VM::execute()
 				result.z = c[mask & 0b11];
 				result.y = c[(mask >> 2) & 0b11];
 				result.x = c[(mask >> 4) & 0b11];
-				push(result);
+				pushVec3(result);
 			}
 			break;
 		}
 		case OpCode::CREATE_VEC3:
 		{
-			const Value& z = pop();
-			const Value& y = pop();
-			const Value& x = pop();
-			push(vec3(getDouble(x), getDouble(y), getDouble(z)));
+			double z = popDouble();
+			double y = popDouble();
+			double x = popDouble();
+			pushVec3(vec3(x, y, z));
 			break;
 		}
 		case OpCode::COPY_VEC3:
 		{
-			const Value& src = pop();
-			const vec3& v = getVec3(src);
-			push(vec3(v.x, v.y, v.z));
+			// TODO: This seems pointless
+			vec3 v = popVec3();
+			pushVec3(v);
 			break;
 		}
 		case OpCode::ADD_VEC3:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getVec3(a) + getVec3(b));
+			vec3 b = popVec3();
+			vec3 a = popVec3();
+			pushVec3(a + b);
 			break;
 		}
 		case OpCode::SUB_VEC3:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getVec3(a) - getVec3(b));
+			vec3 b = popVec3();
+			vec3 a = popVec3();
+			pushVec3(a - b);
 			break;
 		}
 		case OpCode::DOT_VEC3:
 		{
-			const Value& b = pop();
-			const Value& a = pop();
-			push(getVec3(a) * getVec3(b));
+			vec3 b = popVec3();
+			vec3 a = popVec3();
+			pushDouble(a * b);
 			break;
 		}
 		case OpCode::MUL_VEC3_DOUBLE:
 		{
-			const Value& scalar = pop();
-			const Value& vec = pop();
-			push(getVec3(vec) * getDouble(scalar));
+			double scalar = popDouble();
+			vec3 vec = popVec3();
+			pushVec3(vec * scalar);
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC3:
 		{
-			const Value& vec = pop();
-			const Value& scalar = pop();
-			push(getVec3(vec) * getDouble(scalar));
+			vec3 vec = popVec3();
+			double scalar = popDouble();
+			pushVec3(vec * scalar);
 			break;
 		}
 		case OpCode::GET_VEC3_X:
 		{
-			const Value& vec = pop();
-			push(getVec3(vec).x);
+			vec3 vec = popVec3();
+			pushDouble(vec.x);
 			break;
 		}
 		case OpCode::GET_VEC3_Y:
 		{
-			const Value& vec = pop();
-			push(getVec3(vec).y);
+			vec3 vec = popVec3();
+			pushDouble(vec.y);
 			break;
 		}
 		case OpCode::GET_VEC3_Z:
 		{
-			const Value& vec = pop();
-			push(getVec3(vec).z);
+			vec3 vec = popVec3();
+			pushDouble(vec.z);
 			break;
 		}
 		case OpCode::GET_VEC3_SWIZZLE:
 		{
 			uint8_t mask = readByte();
 			uint8_t size = readByte();
-			const Value& vec = pop();
-			const vec3& v = getVec3(vec);
+			vec3 v = popVec3();
 			double c[4] = { v.x, v.y, v.z, 0.0 };
 
 			if (size == 2)
@@ -684,7 +714,7 @@ Value VM::execute()
 				vec2 result;
 				result.y = c[mask & 0b11];
 				result.x = c[(mask >> 2) & 0b11];
-				push(result);
+				pushVec2(result);
 			}
 			else if (size == 3)
 			{
@@ -692,25 +722,15 @@ Value VM::execute()
 				result.z = c[mask & 0b11];
 				result.y = c[(mask >> 2) & 0b11];
 				result.x = c[(mask >> 4) & 0b11];
-				push(result);
+				pushVec3(result);
 			}
 			break;
 		}
 
 		case OpCode::NEG_VEC3:
 		{
-			const Value& vec = pop();
-			const vec3& v = getVec3(vec);
-			push(vec2(-v.x, -v.y));
-			break;
-		}
-
-		// string operators
-		case OpCode::ADD_STRING:
-		{
-			const Value& a = pop();
-			const Value& b = pop();
-			push(getString(a) + getString(b));
+			vec3 v = popVec3();
+			pushVec3(vec3(-v.x, -v.y, -v.z));
 			break;
 		}
 

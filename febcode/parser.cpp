@@ -484,10 +484,6 @@ std::unique_ptr<Expression> Parser::parsePrimary()
 			std::string(previous().start, previous().length));
 	}
 
-	if (match(TokenType::String)) {
-		return std::make_unique<LiteralExpr>(std::string(previous().start, previous().length));
-	}
-
 	if (match(TokenType::LeftParen)) {
 		auto expr = parseExpression();
 		if (!match(TokenType::RightParen)) {
@@ -694,7 +690,6 @@ static std::ostream& operator << (std::ostream& o, TypeKind type)
 	case TypeKind::Double: return o << "double";
 	case TypeKind::Vec2  : return o << "vec2";
 	case TypeKind::Vec3  : return o << "vec3";
-	case TypeKind::String: return o << "string";
 	default:
 		return o << "<unknown type>";
 	}

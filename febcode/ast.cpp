@@ -15,7 +15,6 @@ ExprPtr febcode::Initializer(const std::vector<StructField>& fields)
 		case TypeKind::Double: init.push_back(Literal(Value(0.0))); break;
 		case TypeKind::Vec2  : init.push_back(Literal(Value(vec2(0., 0.)))); break;
 		case TypeKind::Vec3  : init.push_back(Literal(Value(vec3(0., 0., 0.)))); break;
-		case TypeKind::String: init.push_back(Literal(Value(std::string("")))); break;
 		case TypeKind::Array:
 		{
 			Value v;
@@ -26,7 +25,6 @@ ExprPtr febcode::Initializer(const std::vector<StructField>& fields)
 			case TypeKind::Double: v = Value(0.0); break;
 			case TypeKind::Vec2: v = Value(vec2(0., 0.)); break;
 			case TypeKind::Vec3: v = Value(vec3(0., 0., 0.)); break;
-			case TypeKind::String: v = Value(std::string("")); break;
 			default:
 				throw std::runtime_error("Unsupported array element type for initializer");
 			};
@@ -46,7 +44,6 @@ ExprPtr febcode::Initializer(const std::vector<StructField>& fields)
 				case TypeKind::Double: v = Value(0.0); break;
 				case TypeKind::Vec2  : v = Value(vec2(0., 0.)); break;
 				case TypeKind::Vec3  : v = Value(vec3(0., 0., 0.)); break;
-				case TypeKind::String: v = Value(std::string("")); break;
 				default:
 					throw std::runtime_error("Unsupported struct field type for initializer");
 				};
@@ -184,7 +181,6 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 	else if (isInt   (v)) return o << getInt(v);
 	else if (isDouble(v)) return o << getDouble(v);
 	else if (isBool  (v)) return o << (getBool(v) ? "true" : "false");
-	else if (isString(v)) return o << getString(v);
 	else if (isArray(v))
 	{
 		const febcode::ArrayValue& arr = getArray(v);
@@ -235,7 +231,6 @@ std::string ValueToString(const febcode::Value& v)
 	else if (isDouble(v)) s = std::to_string(getDouble(v));
 	else if (isVec2  (v)) s = "vec2";
 	else if (isVec3  (v)) s = "vec3";
-	else if (isString(v)) s = "\"" + getString(v) + "\"";
 	else if (isArray (v)) { auto& p = getArrayPtr (v); s = "[array:"  + std::to_string(p.use_count()) + "]"; }
 	else if (isStruct(v)) { 
 		const febcode::StructValue& o = febcode::getStruct(v);
@@ -281,7 +276,6 @@ std::string ValueTypeToString(const febcode::Value& v)
 	else if (isBool  (v)) return "bool";
 	else if (isInt   (v)) return "int";
 	else if (isDouble(v)) return "double";
-	else if (isString(v)) return "string";
 	else if (isArray (v)) return "array";
 	else if (isStruct(v)) return "struct";
 	else if (isVec2  (v)) return "vec2";
