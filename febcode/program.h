@@ -10,7 +10,7 @@ namespace febcode {
 		Type returnType = nullptr;
 		std::vector<Type> args;
 		size_t entry = 0;
-		int localCount = 0;
+		int argSize = 0; // stack size needed for arguments.
 		bool isNative = false;
 		NativeFnc fnc;
 
@@ -55,10 +55,6 @@ namespace febcode {
 
 		void registerNative(const std::string& name, double (*f)(double));
 
-		void RegisterBinaryOperator(BinaryOp op, Type retType, Type type_l, Type type_r, BinaryFnc f);
-
-		BinaryOperatorInfo* findBinaryOperatorOverload(BinaryOp op, Type type_l, Type type_r);
-
 	public:
 		std::unique_ptr<AST> ast;
 		TypeRegistry types;
@@ -66,13 +62,10 @@ namespace febcode {
 		std::vector<uint8_t> code;
 		std::vector<Value> constants;
 		std::vector<FunctionInfo> functions;
-		std::vector<BinaryOperatorInfo> operators;
 
 		size_t globalStackSize = 0; // next available slot index for global variables
 		std::vector<Global> globals;
 		std::unordered_map<std::string, size_t> globalIndices; // maps global variable names to their slot index
-
-		std::unordered_map<std::string, NativeFnc> m_specialFns;
 
 		size_t maxStackSize = 0;
 	};

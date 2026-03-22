@@ -38,7 +38,18 @@ namespace febcode
 		GET_LOCAL_STRUCT,
 
 		GET_GLOBAL_REF,
+		GET_GLOBAL_REF_BOOL,
+		GET_GLOBAL_REF_INT,
+		GET_GLOBAL_REF_DOUBLE,
+		GET_GLOBAL_REF_VEC2,
+		GET_GLOBAL_REF_VEC3,
+
 		GET_LOCAL_REF,
+		GET_LOCAL_REF_BOOL,
+		GET_LOCAL_REF_INT,
+		GET_LOCAL_REF_DOUBLE,
+		GET_LOCAL_REF_VEC2,
+		GET_LOCAL_REF_VEC3,
 
 		// struct codes
 		CREATE_STRUCT,
@@ -154,8 +165,13 @@ namespace febcode
 		STORE_STRUCT,
 
 		POP,
+		POP_BOOL,
+		POP_INT,
+		POP_DOUBLE,
+		POP_VEC2,
+		POP_VEC3,
+
 		CALL,		// call function
-		CALL_BINARY, // call binary operator
 
 		// returns (make sure these are the last opcodes, since they have special handling in the VM)
 		RETURN_VOID,
@@ -256,6 +272,7 @@ namespace febcode
 
 		std::vector<Local> m_locals;
 		int m_scopeDepth = 0;
+		int localStackSize = 0;
 
 		int stackDepth = 0;
 		int maxStackDepth = 0;

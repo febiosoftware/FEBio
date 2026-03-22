@@ -95,6 +95,7 @@ Type TypeRegistry::getArrayType(Type element, size_t size)
 	// Create new one
 	auto newType = std::make_unique<TypeStruct>();
 	newType->kind = TypeKind::Array;
+	newType->typeIndex = (int)m_arrayTypes.size();
 	newType->elementType = element;
 	newType->arraySize = size;
 
@@ -110,6 +111,13 @@ Type TypeRegistry::getArrayType(Type element, const std::vector<size_t>& sizes) 
 		type = getArrayType(type, *it);
 	}
 	return type;
+}
+
+Type TypeRegistry::getArrayType(int index) const
+{
+	if (index < 0 || index >= (int)m_arrayTypes.size())
+		throw std::runtime_error("Invalid array type index: " + std::to_string(index));
+	return m_arrayTypes[index].get();
 }
 
 Type TypeRegistry::getArrayType(Type element, size_t size) const

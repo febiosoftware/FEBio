@@ -61,13 +61,20 @@ Type Program::RegisterStruct(const std::string& name, const std::vector<std::pai
 
 void Program::registerNative(const std::string& name, Type returnType, std::vector<Type> argTypes, NativeFnc fn)
 {
+	// calculate required stack size for arguments
+	int argSize = 0;
+	for (const auto& argType : argTypes)
+	{
+		argSize += (int)argType->size();
+	}
+
 	size_t slot = functions.size();
 	functions.push_back(FunctionInfo{
 		name,
 		returnType,
 		argTypes,
 		slot,
-		0,
+		argSize,
 		true,
 		fn
 		});
@@ -79,34 +86,8 @@ void Program::registerNative(const std::string& name, double (*f)(double))
 		name,
 		types.getDoubleType(),
 		{ types.getDoubleType() },
-		[f](const Value* args, int argc) -> Value {
-			double arg = getDouble(args[0]);
+		[f](FuncArgs args) -> Value {
+			double arg = args.getDouble();
 			return f(arg);
 		});
-}
-
-void Program::RegisterBinaryOperator(BinaryOp op, Type retType, Type type_l, Type type_r, BinaryFnc f)
-{
-	size_t index = operators.size();
-	operators.push_back(BinaryOperatorInfo{
-		op,
-		retType,
-		type_l, type_r,
-		index,
-		f
-		});
-}
-
-BinaryOperatorInfo* Program::findBinaryOperatorOverload(BinaryOp op, Type type_l, Type type_r)
-{
-	for (auto& overload : operators)
-	{
-		if (overload.op == op &&
-			overload.leftType == type_l &&
-			overload.rightType == type_r)
-		{
-			return &overload;
-		}
-	}
-	return nullptr;
 }

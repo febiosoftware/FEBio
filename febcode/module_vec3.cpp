@@ -2,27 +2,26 @@
 
 using namespace febcode;
 
-Value febcode::DotVec3(const Value* args, int argc)
+Value febcode::DotVec3(FuncArgs args)
 {
-	assert(argc == 2);
-	const vec3& a = getVec3(args[0]);
-	const vec3& b = getVec3(args[1]);
+	assert(args.count == 2);
+	const vec3& a = args.getVec3();
+	const vec3& b = args.getVec3();
 	return a*b;
 }
 
-Value febcode::CrossVec3(const Value* args, int argc)
+Value febcode::CrossVec3(FuncArgs args)
 {
-	assert(argc == 2);
-	const vec3& a = getVec3(args[0]);
-	const vec3& b = getVec3(args[1]);
+	assert(args.count == 2);
+	const vec3& a = args.getVec3();
+	const vec3& b = args.getVec3();
 	return a.cross(b);
 }
 
-Value febcode::NormalizeVec3(const Value* args, int argc)
+Value febcode::NormalizeVec3(FuncArgs args)
 {
-	assert(argc == 1);
-	const vec3& a = getVec3(args[0]);
-
+	assert(args.count == 1);
+	const vec3& a = args.getVec3();
 	double x = a.x;
 	double y = a.y;
 	double z = a.z;

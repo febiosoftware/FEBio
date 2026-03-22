@@ -4,10 +4,10 @@
 namespace febcode
 {
 	// double = dot(vec2)
-	Value DotVec2(const Value* args, int argc);
+	Value DotVec2(FuncArgs args);
 
 	// normalized = Normalize(vec2)
-	Value NormalizeVec2(const Value* args, int argc);
+	Value NormalizeVec2(FuncArgs);
 
 	class Vec2Module : public Module
 	{

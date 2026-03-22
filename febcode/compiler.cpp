@@ -44,7 +44,20 @@ void Compiler::endScope()
 {
 	while (!m_locals.empty() && m_locals.back().depth == m_scopeDepth)
 	{
-		emit(OpCode::POP);
+		Local& local = m_locals.back();
+
+		switch (local.type->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+		case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+		case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
+		case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+		default:
+			emit(OpCode::POP);
+			break;
+		}
+
 		m_locals.pop_back();
 	}
 	m_scopeDepth--;
@@ -54,7 +67,7 @@ int Compiler::resolveLocal(const std::string& name)
 {
 	for (int i = (int)m_locals.size() - 1; i >= 0; --i)
 		if (m_locals[i].name == name)
-			return m_locals[i].slot;
+			return i;
 	return -1;
 }
 
@@ -62,7 +75,7 @@ int Compiler::resolveGlobal(const std::string& name)
 {
 	auto it = prg.globalIndices.find(name);
 	if (it != prg.globalIndices.end())
-		return prg.globals[it->second].slot;
+		return (int)it->second;
 
 	throw std::runtime_error("Undefined global variable: " + name);
 }
@@ -101,14 +114,13 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::PUSH_DOUBLE: 
 		return +1;
 
-	case OpCode::GET_GLOBAL_BOOL:
-	case OpCode::GET_GLOBAL_INT:
-	case OpCode::GET_GLOBAL_DOUBLE:
-	case OpCode::GET_GLOBAL_VEC2:
-	case OpCode::GET_GLOBAL_VEC3:
-	case OpCode::GET_GLOBAL_ARRAY:
-	case OpCode::GET_GLOBAL_STRUCT:
-		return +1;
+	case OpCode::GET_GLOBAL_BOOL  : return +1;
+	case OpCode::GET_GLOBAL_INT   : return +1;
+	case OpCode::GET_GLOBAL_DOUBLE: return +1;
+	case OpCode::GET_GLOBAL_VEC2  : return +2;
+	case OpCode::GET_GLOBAL_VEC3  : return +1;
+	case OpCode::GET_GLOBAL_ARRAY : return +1;
+	case OpCode::GET_GLOBAL_STRUCT: return +1;
 
 	case OpCode::SET_GLOBAL_BOOL: 
 	case OpCode::SET_GLOBAL_INT: 
@@ -119,45 +131,53 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::SET_GLOBAL_STRUCT: 
 		return 0;
 
-	case OpCode::GET_GLOBAL_REF: return +1;
+	case OpCode::GET_GLOBAL_REF       : return +1;
+	case OpCode::GET_GLOBAL_REF_BOOL  : return +1;
+	case OpCode::GET_GLOBAL_REF_INT   : return +1;
+	case OpCode::GET_GLOBAL_REF_DOUBLE: return +1;
+	case OpCode::GET_GLOBAL_REF_VEC2  : return +1;
+	case OpCode::GET_GLOBAL_REF_VEC3  : return +1;
 
-	case OpCode::GET_LOCAL_BOOL:
-	case OpCode::GET_LOCAL_INT:
-	case OpCode::GET_LOCAL_DOUBLE:
-	case OpCode::GET_LOCAL_VEC2:
-	case OpCode::GET_LOCAL_VEC3:
-	case OpCode::GET_LOCAL_ARRAY:
-	case OpCode::GET_LOCAL_STRUCT:
-		return +1;
+	case OpCode::GET_LOCAL_BOOL  : return +1;
+	case OpCode::GET_LOCAL_INT   : return +1;
+	case OpCode::GET_LOCAL_DOUBLE: return +1;
+	case OpCode::GET_LOCAL_VEC2  : return +2;
+	case OpCode::GET_LOCAL_VEC3  : return +1;
+	case OpCode::GET_LOCAL_ARRAY : return +1;
+	case OpCode::GET_LOCAL_STRUCT: return +1;
 
-	case OpCode::GET_LOCAL_REF: return +1;
+	case OpCode::GET_LOCAL_REF       : return +1;
+	case OpCode::GET_LOCAL_REF_BOOL  : return +1;
+	case OpCode::GET_LOCAL_REF_INT   : return +1;
+	case OpCode::GET_LOCAL_REF_DOUBLE: return +1;
+	case OpCode::GET_LOCAL_REF_VEC2  : return +1;
+	case OpCode::GET_LOCAL_REF_VEC3  : return +1;
+
 	case OpCode::CREATE_STRUCT: return -arg + 1;
 	case OpCode::COPY_STRUCT: return 0;
 
-	case OpCode::GET_PROPERTY_BOOL: 
-	case OpCode::GET_PROPERTY_INT: 
-	case OpCode::GET_PROPERTY_DOUBLE: 
-	case OpCode::GET_PROPERTY_VEC2: 
-	case OpCode::GET_PROPERTY_VEC3: 
-	case OpCode::GET_PROPERTY_ARRAY: 
-	case OpCode::GET_PROPERTY_STRUCT: 
-		return +1;
+	case OpCode::GET_PROPERTY_BOOL  : return +1;
+	case OpCode::GET_PROPERTY_INT   : return +1;
+	case OpCode::GET_PROPERTY_DOUBLE: return +1;
+	case OpCode::GET_PROPERTY_VEC2  : return +2;
+	case OpCode::GET_PROPERTY_VEC3  : return +1;
+	case OpCode::GET_PROPERTY_ARRAY : return +1;
+	case OpCode::GET_PROPERTY_STRUCT: return +1;
 
 	case OpCode::GET_MEMBER_REF: return 0;
 	case OpCode::CREATE_ARRAY: return -arg + 1;
 	case OpCode::COPY_ARRAY: return +1;
 
-	case OpCode::GET_INDEX_BOOL:
-	case OpCode::GET_INDEX_INT:
-	case OpCode::GET_INDEX_DOUBLE:
-	case OpCode::GET_INDEX_VEC2:
-	case OpCode::GET_INDEX_VEC3:
-	case OpCode::GET_INDEX_ARRAY:
-	case OpCode::GET_INDEX_STRUCT:
-		return +1;
+	case OpCode::GET_INDEX_BOOL  : return +1;
+	case OpCode::GET_INDEX_INT   : return +1;
+	case OpCode::GET_INDEX_DOUBLE: return +1;
+	case OpCode::GET_INDEX_VEC2  : return +2;
+	case OpCode::GET_INDEX_VEC3  : return +1;
+	case OpCode::GET_INDEX_ARRAY : return +1;
+	case OpCode::GET_INDEX_STRUCT: return +1;
 
 	case OpCode::GET_INDEX_REF: return 0;
-	case OpCode::CREATE_VEC2: return -1;
+	case OpCode::CREATE_VEC2: return 0;
 	case OpCode::GET_VEC2_X: return 0;
 	case OpCode::GET_VEC2_Y: return 0;
 	case OpCode::GET_VEC2_X_REF: return 0;
@@ -192,9 +212,9 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GE_DOUBLE: return -1;
 	case OpCode::LE_DOUBLE: return -1;
 	case OpCode::NEG_VEC2: return 0;
-	case OpCode::ADD_VEC2: return -1;
-	case OpCode::SUB_VEC2: return -1;
-	case OpCode::DOT_VEC2: return -1;
+	case OpCode::ADD_VEC2: return -2;
+	case OpCode::SUB_VEC2: return -2;
+	case OpCode::DOT_VEC2: return -3;
 	case OpCode::MUL_VEC2_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC2: return -1;
 	case OpCode::NEG_VEC3: return 0;
@@ -229,9 +249,14 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::STORE_STRUCT:
 		return -1;
 
-	case OpCode::POP: return -1;
-	case OpCode::CALL: return -arg + 1;
-	case OpCode::CALL_BINARY: return -1;
+	case OpCode::POP       : return -1;
+	case OpCode::POP_BOOL  : return -1;
+	case OpCode::POP_INT   : return -1;
+	case OpCode::POP_DOUBLE: return -1;
+	case OpCode::POP_VEC2  : return -2;
+	case OpCode::POP_VEC3  : return -1;
+
+	case OpCode::CALL: return -arg + 1; // TODO: This is not correct anymore!
 
 	case OpCode::RETURN_VOID:
 	case OpCode::RETURN_BOOL: 
@@ -313,8 +338,18 @@ void Compiler::compileStatement(Statement* stmt)
 
 void Compiler::compileExprStmt(ExpressionStmt* stmt)
 {
-	compileExpression(stmt->expr.get());
-	emit(OpCode::POP);
+	Type type = compileExpression(stmt->expr.get());
+
+	switch (type->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+	case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
+	case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+	default:
+		emit(OpCode::POP);
+	}
 }
 
 void Compiler::compileBlock(BlockStmt* stmt)
@@ -368,7 +403,7 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 			}
 
 			emit(OpCode::CREATE_ARRAY, (int)expectedType->arraySize);
-			emitUint8(static_cast<uint8_t>(expectedType->arraySize));
+			emitUint8(static_cast<uint8_t>(expectedType->typeIndex));
 		}
 		else
 		{
@@ -472,13 +507,21 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 				}
 
 				emitUint8((uint8_t)global.slot);
-				emit(OpCode::POP);
+
+				switch (type->kind)
+				{
+				case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+				case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+				case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+				case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
+				case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+				default:
+					emit(OpCode::POP);
+				}
 			}
 		}
 		else
 		{
-			int slot = (int)m_locals.size();
-
 			// make sure the variable isn't already declared in this scope
 			for (int i = (int)m_locals.size() - 1; i >= 0; --i)
 			{
@@ -488,12 +531,14 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					throw std::runtime_error("Variable '" + var.name + "' is already declared in this scope.");
 			}
 
-			m_locals.push_back({ var.name, type, m_scopeDepth, slot });
+			m_locals.push_back({ var.name, type, m_scopeDepth, localStackSize });
 
 			if (var.initializer)
 			{
 				m_locals.back().isInitialized = true;
 			}
+
+			localStackSize += (int)type->size();
 		}
 	}
 }
@@ -605,7 +650,6 @@ void Compiler::compileFunction(FunctionStmt* fn)
 		info.args.push_back(p.first);
 
 	int fnIndex = (int)prg.functions.size();
-	prg.functions.push_back(info);
 
 	currentFunction = fnIndex;
 
@@ -615,21 +659,19 @@ void Compiler::compileFunction(FunctionStmt* fn)
 	beginScope();
 
 	for (auto& p : fn->params)
-		m_locals.push_back({ p.second, p.first, m_scopeDepth, (int)m_locals.size(), true });
+	{
+		m_locals.push_back({ p.second, p.first, m_scopeDepth, localStackSize, true });
+		localStackSize += (int)p.first->size();
+		info.argSize += (int)p.first->size();
+		stackDepth += (int)p.first->size();
+	}
+	prg.functions.push_back(info);
 
 	size_t currentStackSize = stackDepth;
 
 	BlockStmt* body = dynamic_cast<BlockStmt*>(fn->body.get());
 	for (auto& stmt : body->statements)
 		compileStatement(stmt.get());
-
-	// We don't call endScope() here since the function body must end with a return, this will never pop the function's locals. 
-	// Instead, just clear locals and reset the scope depth.
-	while (!m_locals.empty() && m_locals.back().depth == m_scopeDepth)
-	{
-		m_locals.pop_back();
-	}
-	m_scopeDepth--;
 
 	if (prg.code.empty() || (prg.code.back() < (uint8_t)OpCode::RETURN_VOID) || (prg.code.back() >= (uint8_t)OpCode::LAST_OPCODE))
 	{
@@ -638,6 +680,27 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 		emit(OpCode::RETURN_VOID);
 	}
+
+	// We don't call endScope() here since the function body must end with a return, this will never pop the function's locals. 
+	// Instead, just clear locals and reset the scope depth.
+	while (!m_locals.empty() && m_locals.back().depth == m_scopeDepth)
+	{
+		Local& local = m_locals.back();
+		switch (local.type->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+		case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+		case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
+		case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+		default:
+			emit(OpCode::POP);
+			break;
+		}
+		m_locals.pop_back();
+		localStackSize -= (int)local.type->size();
+	}
+	m_scopeDepth--;
 
 	// Patch jump so execution skips function body
 	patchJump(jumpOver);
@@ -692,7 +755,8 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	int local = resolveLocal(expr->name);
 	if (local != -1)
 	{
-		Type type = m_locals[local].type;
+		Local& localInfo = m_locals[local];
+		Type type = localInfo.type;
 
 		switch (type->kind)
 		{
@@ -707,7 +771,7 @@ Type Compiler::compileVariable(VariableExpr* expr)
 			throw std::runtime_error("Unsupported local variable type");
 		}
 
-		emitUint8(local);
+		emitUint8(localInfo.slot);
 
 		if (!m_locals[local].isInitialized)
 			throw std::runtime_error("Cannot read uninitialized local variable: " + expr->name);
@@ -715,10 +779,8 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		return type;
 	}
 
-	int slot = resolveGlobal(expr->name);
-
-	auto it = prg.globalIndices.find(expr->name);
-	Program::Global& glob = prg.globals[it->second];
+	int globalIndex = resolveGlobal(expr->name);
+	Program::Global& glob = prg.globals[globalIndex];
 
 	if (!glob.isInitialized)
 		throw std::runtime_error("Cannot read uninitialized global variable: " + expr->name);
@@ -738,7 +800,7 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		throw std::runtime_error("Unsupported global variable type");
 	}
 
-	emitUint8(slot);
+	emitUint8(glob.slot);
 	return glob.type;
 }
 
@@ -791,22 +853,41 @@ Type Compiler::compileVariableRef(VariableExpr* expr)
 {
 	Type returnType = nullptr;
 
-	int slot = resolveLocal(expr->name);
-	if (slot != -1)
+	int index = resolveLocal(expr->name);
+	if (index != -1)
 	{
-		emit(OpCode::GET_LOCAL_REF);
-		emitUint8((uint8_t)slot);
-		returnType = m_locals[slot].type;
+		returnType = m_locals[index].type;
+
+		switch (returnType->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::GET_LOCAL_REF_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::GET_LOCAL_REF_INT   ); break;
+		case TypeKind::Double: emit(OpCode::GET_LOCAL_REF_DOUBLE); break;
+		case TypeKind::Vec2  : emit(OpCode::GET_LOCAL_REF_VEC2  ); break;
+		case TypeKind::Vec3  : emit(OpCode::GET_LOCAL_REF_VEC3  ); break;
+		default:
+			emit(OpCode::GET_LOCAL_REF);
+		}
+		emitUint8((uint8_t)m_locals[index].slot);
 	}
 	else
 	{
-		slot = resolveGlobal(expr->name);
-		emit(OpCode::GET_GLOBAL_REF);
-		emitUint8((uint8_t)slot);
+		index = resolveGlobal(expr->name);
+		returnType = prg.globals[index].type;
 
-		auto it = prg.globalIndices.find(expr->name);
+		switch (returnType->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::GET_GLOBAL_REF_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::GET_GLOBAL_REF_INT   ); break;
+		case TypeKind::Double: emit(OpCode::GET_GLOBAL_REF_DOUBLE); break;
+		case TypeKind::Vec2  : emit(OpCode::GET_GLOBAL_REF_VEC2  ); break;
+		case TypeKind::Vec3  : emit(OpCode::GET_GLOBAL_REF_VEC3  ); break;
+		default:
+			emit(OpCode::GET_GLOBAL_REF);
+			break;
+		}
 
-		returnType = prg.globals[it->second].type;
+		emitUint8((uint8_t)prg.globals[index].slot);
 	}
 
 	return returnType;
@@ -1067,14 +1148,6 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		default: throw std::runtime_error("Unsupported binary op for double and vec3 types.");
 		}
 		return type_r;
-	}
-
-	// see if we have a binary operator overload for these operand types
-	if (auto overload = prg.findBinaryOperatorOverload(op, type_l, type_r))
-	{
-		emit(OpCode::CALL_BINARY);
-		emitUint8(static_cast<uint8_t>(overload->index));
-		return overload->returnType;
 	}
 
 	throw std::runtime_error("Unsupported binary op for given operand types.");

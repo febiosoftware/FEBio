@@ -140,7 +140,6 @@ namespace febcode
 		// ===== Call Handling =====
 
 		void callFunction(int fnIndex, int argCount);
-		void callBinaryOperator(int opIndex);
 
 		// ===== Helpers =====
 
@@ -192,7 +191,8 @@ namespace febcode
 
 		void pushVec2(const vec2& v)
 		{
-			push(v);
+			push(v.x);
+			push(v.y);
 		}
 
 		void pushVec3(const vec3& v)
@@ -236,7 +236,9 @@ namespace febcode
 
 		vec2 popVec2()
 		{
-			return pop().vec2Value;
+			double y = pop().d;
+			double x = pop().d;
+			return vec2(x, y);
 		}
 
 		vec3 popVec3()
@@ -285,7 +287,7 @@ namespace febcode
 
 		vec2 peekVec2()
 		{
-			return peek().vec2Value;
+			return vec2(m_stack[stackTop - 2].d, m_stack[stackTop - 1].d);
 		}
 
 		vec3 peekVec3()
@@ -310,7 +312,8 @@ namespace febcode
 
 		void setVec2At(int slot, const vec2& v)
 		{
-			m_stack[slot] = v;
+			m_stack[slot  ] = v.x;
+			m_stack[slot+1] = v.y;
 		}
 
 		void setVec3At(int slot, const vec3& v)
@@ -335,7 +338,7 @@ namespace febcode
 
 		vec2 getVec2At(int slot)
 		{
-			return m_stack[slot].vec2Value;
+			return vec2(m_stack[slot].d, m_stack[slot + 1].d);
 		}
 
 		vec3 getVec3At(int slot)

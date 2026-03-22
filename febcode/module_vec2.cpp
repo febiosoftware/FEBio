@@ -3,18 +3,18 @@
 
 using namespace febcode;
 
-Value febcode::DotVec2(const Value* args, int argc)
+Value febcode::DotVec2(FuncArgs args)
 {
-	assert(argc == 2);
-	const vec2& a = getVec2(args[0]);
-	const vec2& b = getVec2(args[1]);
+	assert(args.count == 2);
+	vec2 a = args.getVec2();
+	vec2 b = args.getVec2();
 	return a*b;
 }
 
-Value febcode::NormalizeVec2(const Value* args, int argc)
+Value febcode::NormalizeVec2(FuncArgs args)
 {
-	assert(argc == 1);
-	const vec2& a = getVec2(args[0]);
+	assert(args.count == 1);
+	const vec2& a = getVec2(args.getDouble());
 
 	double x = a.x;
 	double y = a.y;

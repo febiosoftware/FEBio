@@ -22,6 +22,7 @@ namespace febcode
 	enum class RefType : uint8_t {
 		Invalid,
 		Double,
+		Vec2,
 		Value
 	};
 
@@ -83,12 +84,14 @@ namespace febcode
 	struct TypeStruct {
 		TypeKind kind = TypeKind::Void;
 
+		// index in type registry (for arrays and structs)
+		int typeIndex = -1;
+
 		// for arrays
 		Type elementType = nullptr;
 		size_t arraySize = 0;
 
 		// For struct types
-		int typeIndex = -1;
 		std::string name;
 		std::vector<StructField> fields;
 
@@ -99,7 +102,7 @@ namespace febcode
 			case TypeKind::Bool:   return 1;
 			case TypeKind::Int:    return 1;
 			case TypeKind::Double: return 1;
-			case TypeKind::Vec2:   return 1;// 2;
+			case TypeKind::Vec2:   return 2;
 			case TypeKind::Vec3:   return 1;// 3;
 			case TypeKind::Array:  return 1;// elementType->size()* arraySize;
 			case TypeKind::Struct:
@@ -358,8 +361,6 @@ namespace febcode
 		return 0;
 	}
 
-	using NativeFnc = std::function<Value(const Value* arg, int argc)>;
-
 	using BinaryFnc = std::function<Value(const Value&, const Value&)>;
 
 	class TypeRegistry {
@@ -376,6 +377,7 @@ namespace febcode
 		Type getArrayType(Type element, size_t size);
 		Type getArrayType(Type element, size_t size) const;
 		Type getArrayType(Type element, const std::vector<size_t>& size) const;
+		Type getArrayType(int index) const;
 
 		Type getTypeFromKind(TypeKind kind) const;
 
@@ -447,4 +449,25 @@ inline febcode::Value operator / (const febcode::Value& a, const febcode::Value&
 	if (isDouble(a) && isDouble(b))
 		return getDouble(a) / getDouble(b);
 	throw std::runtime_error("Unsupported operand types for +");
+}
+
+namespace febcode
+{
+	struct FuncArgs {
+		Value* stack = nullptr;
+		size_t count = 0; // number of arguments passed to the function
+		size_t index = 0;
+
+		bool getBool  () { return febcode::getBool  (stack[index++]); }
+		int getInt    () { return febcode::getInt   (stack[index++]); }
+		double getDouble() { return febcode::getDouble(stack[index++]); }
+		vec2 getVec2  () { 
+			double x = febcode::getDouble(stack[index++]);
+			double y = febcode::getDouble(stack[index++]);
+			return vec2(x, y); 
+		}
+		vec3 getVec3() { return febcode::getVec3(stack[index++]); }
+	};
+
+	using NativeFnc = std::function<Value(FuncArgs args)>;
 }
