@@ -33,7 +33,7 @@ namespace febcode {
 		struct Global
 		{
 			Type type = nullptr;
-			int slot = -1;
+			int slot = -1;	// start index in stack
 			bool isInitialized = false;
 			bool immutable = false;
 			int refcount = 0;
@@ -68,7 +68,10 @@ namespace febcode {
 		std::vector<FunctionInfo> functions;
 		std::vector<BinaryOperatorInfo> operators;
 
-		std::unordered_map<std::string, Global> globals;
+		size_t globalStackSize = 0; // next available slot index for global variables
+		std::vector<Global> globals;
+		std::unordered_map<std::string, size_t> globalIndices; // maps global variable names to their slot index
+
 		std::unordered_map<std::string, NativeFnc> m_specialFns;
 
 		size_t maxStackSize = 0;

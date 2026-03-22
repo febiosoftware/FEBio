@@ -18,22 +18,32 @@ Program::Program()
 
 int Program::addGlobal(const std::string& name, Type type)
 {
-	if (globals.find(name) != globals.end())
+	// make sure the global variable name is unique
+	auto it = globalIndices.find(name);
+	if (it != globalIndices.end())
 		throw std::runtime_error("Global variable '" + name + "' is already defined.");
 
 	int slot = (int)globals.size();
-	globals[name] = { type, slot, false, false };
+	globals.push_back({ type, (int)globalStackSize, false, false });
+	globalIndices[name] = slot;
+
+	globalStackSize += type->size(); // reserve stack slots for this global variable
 
 	return slot;
 }
 
 int Program::injectGlobal(const std::string& name, Type type)
 {
-	if (globals.find(name) != globals.end())
+	// make sure the global variable name is unique
+	auto it = globalIndices.find(name);
+	if (it != globalIndices.end())
 		throw std::runtime_error("Global variable '" + name + "' is already defined.");
 
 	int slot = (int)globals.size();
-	globals[name] = { type, slot, true, true};
+	globals.push_back({ type, (int)globalStackSize, true, true });
+	globalIndices[name] = slot;
+
+	globalStackSize += type->size(); // reserve stack slots for this global variable
 
 	return slot;
 }

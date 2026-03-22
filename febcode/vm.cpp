@@ -1228,7 +1228,7 @@ Value VM::execute()
 			TypeKind returnType = (TypeKind)(instruction - (uint8_t)OpCode::RETURN_VOID);
 
 			Value result;
-			if (stackTop > globalCount)
+			if (stackTop > globalStackSize)
 			{
 				switch (returnType)
 				{
@@ -1260,7 +1260,7 @@ Value VM::execute()
 
 			if (m_debug)
 			{
-				printStack(m_stack, globalCount, (int)stackTop);
+				printStack(m_stack, (int)globalStackSize, (int)stackTop);
 			}
 
 			if (frameCount == 0)
@@ -1275,7 +1275,7 @@ Value VM::execute()
 
 		if (m_debug && (instruction < (uint8_t)OpCode::RETURN_VOID))
 		{
-			printStack(m_stack, globalCount, (int)stackTop);
+			printStack(m_stack, (int)globalStackSize, (int)stackTop);
 		}
 	}
 

@@ -60,9 +60,9 @@ int Compiler::resolveLocal(const std::string& name)
 
 int Compiler::resolveGlobal(const std::string& name)
 {
-	auto it = prg.globals.find(name);
-	if (it != prg.globals.end())
-		return it->second.slot;
+	auto it = prg.globalIndices.find(name);
+	if (it != prg.globalIndices.end())
+		return prg.globals[it->second].slot;
 
 	throw std::runtime_error("Undefined global variable: " + name);
 }
@@ -449,11 +449,14 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 
 		if (m_scopeDepth == 0)
 		{
-			int slot = prg.addGlobal(var.name, type);
+			prg.addGlobal(var.name, type);
 
 			if (var.initializer)
 			{
-				prg.globals[var.name].isInitialized = true;
+				auto it = prg.globalIndices.find(var.name);
+
+				Program::Global& global = prg.globals[it->second];
+				global.isInitialized = true;
 
 				switch (type->kind)
 				{
@@ -468,7 +471,7 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					throw std::runtime_error("Unsupported global variable type");
 				}
 
-				emitUint8((uint8_t)slot);
+				emitUint8((uint8_t)global.slot);
 				emit(OpCode::POP);
 			}
 		}
@@ -712,9 +715,10 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		return type;
 	}
 
-	int global = resolveGlobal(expr->name);
+	int slot = resolveGlobal(expr->name);
 
-	Program::Global& glob = prg.globals[expr->name];
+	auto it = prg.globalIndices.find(expr->name);
+	Program::Global& glob = prg.globals[it->second];
 
 	if (!glob.isInitialized)
 		throw std::runtime_error("Cannot read uninitialized global variable: " + expr->name);
@@ -734,7 +738,7 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		throw std::runtime_error("Unsupported global variable type");
 	}
 
-	emitUint8(global);
+	emitUint8(slot);
 	return glob.type;
 }
 
@@ -799,7 +803,10 @@ Type Compiler::compileVariableRef(VariableExpr* expr)
 		slot = resolveGlobal(expr->name);
 		emit(OpCode::GET_GLOBAL_REF);
 		emitUint8((uint8_t)slot);
-		returnType = prg.globals[expr->name].type;
+
+		auto it = prg.globalIndices.find(expr->name);
+
+		returnType = prg.globals[it->second].type;
 	}
 
 	return returnType;

@@ -76,7 +76,7 @@ bool FECodeController::CompileScript()
 		compiler.compile();
 
 		// see if the globals were actually used
-		if (program.globals["_time"].refcount == 0) globals[1] = -1;
+		if (program.globals[ globals[0] ].refcount == 0) globals[1] = -1;
 	}
 	catch (const std::exception& e)
 	{

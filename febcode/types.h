@@ -91,6 +91,28 @@ namespace febcode
 		int typeIndex = -1;
 		std::string name;
 		std::vector<StructField> fields;
+
+		size_t size() const {
+			switch (kind)
+			{
+			case TypeKind::Void:   return 1;
+			case TypeKind::Bool:   return 1;
+			case TypeKind::Int:    return 1;
+			case TypeKind::Double: return 1;
+			case TypeKind::Vec2:   return 1;// 2;
+			case TypeKind::Vec3:   return 1;// 3;
+			case TypeKind::Array:  return 1;// elementType->size()* arraySize;
+			case TypeKind::Struct:
+				{
+					size_t totalSize = 0;
+					for (const auto& field : fields)
+						totalSize += field.first->size();
+					return 1;// totalSize;
+				}
+			default:
+				throw std::runtime_error("Unknown type kind.");
+			}
+		}
 	};
 
 	struct ArrayValue;

@@ -159,7 +159,7 @@ bool FECodeValuator::CompileScript()
 		// see if the globals were actually used
 		for (auto& g : m.globals)
 		{
-			if (m.program.globals[g.name].refcount == 0)
+			if (m.program.globals[g.slot].refcount == 0)
 			{
 				g.slot = -1; // mark as unused
 			}

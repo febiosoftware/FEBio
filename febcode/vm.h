@@ -19,9 +19,9 @@ namespace febcode
 		void setProgram(const Program& program)
 		{
 			m_program = &program;
-			globalCount = (int)m_program->globals.size();
-			m_stack.resize(globalCount + program.maxStackSize);
-			stackTop = globalCount; // stack starts after global region
+			globalStackSize = m_program->globalStackSize;
+			m_stack.resize(globalStackSize + program.maxStackSize);
+			stackTop = globalStackSize; // stack starts after global region
 		}
 
 		VM(const Program& program)
@@ -38,46 +38,63 @@ namespace febcode
 
 		void setDebugMode(bool b) { m_debug = b; }
 
-		bool stackEmpty() const { return stackTop == globalCount; }
-		size_t stackSize() const { return stackTop - globalCount; }
+		bool stackEmpty() const { return stackTop == globalStackSize; }
+		size_t stackSize() const { return stackTop - globalStackSize; }
 
 		Value getGlobal(size_t n)
 		{
-			if (n >= globalCount)
+			if (n >= globalStackSize)
 				throw std::runtime_error("Invalid global index: " + std::to_string(n));
-			return m_stack[n];
+
+			const Program::Global& glob = m_program->globals[n];
+			int slot = glob.slot;
+			switch (glob.type->kind)
+			{
+			case TypeKind::Bool  : return getBoolAt  (slot);
+			case TypeKind::Int   : return getIntAt   (slot);
+			case TypeKind::Double: return getDoubleAt(slot);
+			case TypeKind::Vec2  : return getVec2At  (slot);
+			case TypeKind::Vec3  : return getVec3At  (slot);
+			default:
+				return m_stack[slot];
+			};
 		}
 
 		Value getGlobal(const std::string& name)
 		{
-			auto it = m_program->globals.find(name);
+			auto it = m_program->globalIndices.find(name);
 #ifndef NDEBUG
-			if (it == m_program->globals.end())
+			if (it == m_program->globalIndices.end())
 				throw std::runtime_error("Undefined global variable: " + name);
 #endif
-			return m_stack[it->second.slot];
+			return getGlobal(it->second);
 		}
 
 		void setGlobal(int i, const Value& v)
 		{
 #ifndef NDEBUG
-			if ((i<0) || (i >= globalCount))
+			if ((i<0) || (i >= globalStackSize))
 				throw std::runtime_error("Invalid global index: " + std::to_string(i));
 #endif
+			const Program::Global& glob = m_program->globals[i];
+			int slot = glob.slot;
 
-			if (isStruct(v)) m_stack[i] = copyStruct(getStruct(v));
-			else if (isArray(v)) m_stack[i] = copyArray(getArray(v));
-			else m_stack[i] = v;
+			if      (isStruct(v)) m_stack[slot] = copyStruct(getStruct(v));
+			else if (isArray (v)) m_stack[slot] = copyArray(getArray(v));
+			else m_stack[slot] = v;
 		}
 
-		void setGlobal(int i, std::initializer_list<Value> values)
+		void setGlobal(int n, std::initializer_list<Value> values)
 		{
 #ifndef NDEBUG
-			if ((i<0) || (i >= globalCount))
-				throw std::runtime_error("Invalid global index: " + std::to_string(i));
+			if ((n<0) || (n >= globalStackSize))
+				throw std::runtime_error("Invalid global index: " + std::to_string(n));
 #endif
 
-			Value& v = m_stack[i];
+			const Program::Global& glob = m_program->globals[n];
+			int slot = (int)glob.slot;
+
+			Value& v = m_stack[slot];
 			if (isArray(v))
 			{
 				ArrayValue& arr = getArray(v);
@@ -196,7 +213,7 @@ namespace febcode
 		const Value& pop()
 		{
 #ifndef NDEBUG
-			if (stackTop <= globalCount)
+			if (stackTop <= globalStackSize)
 				throw std::runtime_error("Stack underflow.");
 #endif
 			return m_stack[--stackTop];
@@ -245,7 +262,7 @@ namespace febcode
 		Value& peek()
 		{
 #ifndef NDEBUG
-			if (stackTop <= globalCount)
+			if (stackTop <= globalStackSize)
 				throw std::runtime_error("Stack underflow.");
 #endif
 			return m_stack[stackTop-1];
@@ -355,7 +372,7 @@ namespace febcode
 
 	private:
 		const Program* m_program;
-		int globalCount = 0;
+		size_t globalStackSize = 0;
 
 		std::vector<Value> m_stack;
 		size_t stackTop = 0;
