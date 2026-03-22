@@ -23,6 +23,7 @@ namespace febcode
 		Invalid,
 		Double,
 		Vec2,
+		Vec3,
 		Value
 	};
 
@@ -103,7 +104,7 @@ namespace febcode
 			case TypeKind::Int:    return 1;
 			case TypeKind::Double: return 1;
 			case TypeKind::Vec2:   return 2;
-			case TypeKind::Vec3:   return 1;// 3;
+			case TypeKind::Vec3:   return 3;
 			case TypeKind::Array:  return 1;// elementType->size()* arraySize;
 			case TypeKind::Struct:
 				{
@@ -458,15 +459,20 @@ namespace febcode
 		size_t count = 0; // number of arguments passed to the function
 		size_t index = 0;
 
-		bool getBool  () { return febcode::getBool  (stack[index++]); }
-		int getInt    () { return febcode::getInt   (stack[index++]); }
+		bool   getBool  () { return febcode::getBool  (stack[index++]); }
+		int    getInt   () { return febcode::getInt   (stack[index++]); }
 		double getDouble() { return febcode::getDouble(stack[index++]); }
 		vec2 getVec2  () { 
 			double x = febcode::getDouble(stack[index++]);
 			double y = febcode::getDouble(stack[index++]);
 			return vec2(x, y); 
 		}
-		vec3 getVec3() { return febcode::getVec3(stack[index++]); }
+		vec3 getVec3() { 
+			double x = febcode::getDouble(stack[index++]);
+			double y = febcode::getDouble(stack[index++]);
+			double z = febcode::getDouble(stack[index++]);
+			return vec3(x,y,z);
+		}
 	};
 
 	using NativeFnc = std::function<Value(FuncArgs args)>;

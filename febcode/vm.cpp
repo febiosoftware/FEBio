@@ -384,7 +384,7 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &m_stack[slot];
-			ref.ref.type = RefType::Value;
+			ref.ref.type = RefType::Vec3;
 
 			push(ref);
 			break;
@@ -394,7 +394,6 @@ Value VM::execute()
 		case OpCode::GET_LOCAL_REF_BOOL:
 		case OpCode::GET_LOCAL_REF_INT:
 		case OpCode::GET_LOCAL_REF_DOUBLE:
-		case OpCode::GET_LOCAL_REF_VEC3:
 		{
 			uint8_t slot = readByte();
 
@@ -419,6 +418,21 @@ Value VM::execute()
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &m_stack[frame.base + slot];
 			ref.ref.type = RefType::Vec2;
+
+			push(ref);
+			break;
+		}
+
+		case OpCode::GET_LOCAL_REF_VEC3:
+		{
+			uint8_t slot = readByte();
+
+			CallFrame& frame = currentFrame();
+
+			Value ref;
+			ref.index = ValueIndex::REF;
+			ref.ref.ptr = &m_stack[frame.base + slot];
+			ref.ref.type = RefType::Vec3;
 
 			push(ref);
 			break;
@@ -494,13 +508,12 @@ Value VM::execute()
 		case OpCode::GET_VEC3_X_REF:
 		{
 			const Value& objRef = pop();
-			Value* slot = (Value*)objRef.ref.ptr;
-
-			vec3* v = &slot->vec3Value;
+			assert(objRef.ref.type == RefType::Vec3);
+			Value* v = (Value*)objRef.ref.ptr;
 
 			Value ref;
 			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &v->x;
+			ref.ref.ptr = &v->d;
 			ref.ref.type = RefType::Double;
 
 			push(ref);
@@ -510,13 +523,12 @@ Value VM::execute()
 		case OpCode::GET_VEC3_Y_REF:
 		{
 			const Value& objRef = pop();
-			Value* slot = (Value*)objRef.ref.ptr;
-
-			vec3* v = &slot->vec3Value;
+			assert(objRef.ref.type == RefType::Vec3);
+			Value* v = (Value*)objRef.ref.ptr;
 
 			Value ref;
 			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &v->y;
+			ref.ref.ptr = &(v+1)->d;
 			ref.ref.type = RefType::Double;
 
 			push(ref);
@@ -526,13 +538,12 @@ Value VM::execute()
 		case OpCode::GET_VEC3_Z_REF:
 		{
 			const Value& objRef = pop();
-			Value* slot = (Value*)objRef.ref.ptr;
-
-			vec3* v = &slot->vec3Value;
+			assert(objRef.ref.type == RefType::Vec3);
+			Value* v = (Value*)objRef.ref.ptr;
 
 			Value ref;
 			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &v->z;
+			ref.ref.ptr = &(v+2)->d;
 			ref.ref.type = RefType::Double;
 
 			push(ref);
@@ -588,7 +599,14 @@ Value VM::execute()
 		{
 			vec3 v = popVec3();
 			const Ref& r = popRef();
-			*(Value*)r.ptr = v;
+			if (r.type == RefType::Vec3) {
+				double* xPtr = (double*)r.ptr;
+				xPtr[0] = v.x;
+				xPtr[1] = v.y;
+				xPtr[2] = v.z;
+			}
+			else
+				*(Value*)r.ptr = v;
 			pushVec3(v);
 			break;
 		}
@@ -689,7 +707,7 @@ Value VM::execute()
 		{
 			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
-			pushVec3(m_stack[frame.base + slot].vec3Value);
+			pushVec3(getVec3At((int)frame.base + (int)slot));
 			break;
 		}
 
@@ -1103,6 +1121,7 @@ Value VM::execute()
 				switch (type->fields[i].first->kind)
 				{
 				case TypeKind::Vec2: obj->fields[i] = popVec2(); break;
+				case TypeKind::Vec3: obj->fields[i] = popVec3(); break;
 				default:
 					obj->fields[i] = pop();
 					break;
@@ -1189,6 +1208,7 @@ Value VM::execute()
 				switch (type->elementType->kind)
 				{
 				case TypeKind::Vec2: arr->elements[i] = popVec2(); break;
+				case TypeKind::Vec3: arr->elements[i] = popVec3(); break;
 				default:
 					arr->elements[i] = pop();
 				}
@@ -1443,7 +1463,18 @@ void VM::callFunction(int fnIndex, int argCount)
 
 		Value result = fn.fnc(args);
 		stackTop -= fn.argSize;
-		push(result);
+
+		switch (fn.returnType->kind)
+		{
+		case TypeKind::Void  : pushVoid  (); break;
+		case TypeKind::Bool  : pushBool  (result.b); break;
+		case TypeKind::Int   : pushInt   (result.i); break;
+		case TypeKind::Double: pushDouble(result.d); break;
+		case TypeKind::Vec2  : pushVec2  (result.vec2Value); break;
+		case TypeKind::Vec3  : pushVec3  (result.vec3Value); break;
+		default:
+			push(result);
+		}
 		return;
 	}
 

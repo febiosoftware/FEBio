@@ -118,7 +118,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_GLOBAL_INT   : return +1;
 	case OpCode::GET_GLOBAL_DOUBLE: return +1;
 	case OpCode::GET_GLOBAL_VEC2  : return +2;
-	case OpCode::GET_GLOBAL_VEC3  : return +1;
+	case OpCode::GET_GLOBAL_VEC3  : return +3;
 	case OpCode::GET_GLOBAL_ARRAY : return +1;
 	case OpCode::GET_GLOBAL_STRUCT: return +1;
 
@@ -142,7 +142,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_LOCAL_INT   : return +1;
 	case OpCode::GET_LOCAL_DOUBLE: return +1;
 	case OpCode::GET_LOCAL_VEC2  : return +2;
-	case OpCode::GET_LOCAL_VEC3  : return +1;
+	case OpCode::GET_LOCAL_VEC3  : return +3;
 	case OpCode::GET_LOCAL_ARRAY : return +1;
 	case OpCode::GET_LOCAL_STRUCT: return +1;
 
@@ -160,7 +160,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_PROPERTY_INT   : return +1;
 	case OpCode::GET_PROPERTY_DOUBLE: return +1;
 	case OpCode::GET_PROPERTY_VEC2  : return +2;
-	case OpCode::GET_PROPERTY_VEC3  : return +1;
+	case OpCode::GET_PROPERTY_VEC3  : return +3;
 	case OpCode::GET_PROPERTY_ARRAY : return +1;
 	case OpCode::GET_PROPERTY_STRUCT: return +1;
 
@@ -172,7 +172,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_INDEX_INT   : return +1;
 	case OpCode::GET_INDEX_DOUBLE: return +1;
 	case OpCode::GET_INDEX_VEC2  : return +2;
-	case OpCode::GET_INDEX_VEC3  : return +1;
+	case OpCode::GET_INDEX_VEC3  : return +3;
 	case OpCode::GET_INDEX_ARRAY : return +1;
 	case OpCode::GET_INDEX_STRUCT: return +1;
 
@@ -183,7 +183,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_VEC2_X_REF: return 0;
 	case OpCode::GET_VEC2_Y_REF: return 0;
 	case OpCode::GET_VEC2_SWIZZLE: return 0;
-	case OpCode::CREATE_VEC3: return -2;
+	case OpCode::CREATE_VEC3: return 0;
 	case OpCode::GET_VEC3_X: return 0;
 	case OpCode::GET_VEC3_Y: return 0;
 	case OpCode::GET_VEC3_Z: return 0;
@@ -218,9 +218,9 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_VEC2_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC2: return -1;
 	case OpCode::NEG_VEC3: return 0;
-	case OpCode::ADD_VEC3: return -1;
-	case OpCode::SUB_VEC3: return -1;
-	case OpCode::DOT_VEC3: return -1;
+	case OpCode::ADD_VEC3: return -3;
+	case OpCode::SUB_VEC3: return -3;
+	case OpCode::DOT_VEC3: return -5;
 	case OpCode::MUL_VEC3_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC3: return -1;
 	case OpCode::NOT: return 0;

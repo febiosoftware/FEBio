@@ -264,6 +264,7 @@ std::string ValueToString(const febcode::Value& v)
 		}
 		case febcode::RefType::Double: s += "double"; break;
 		case febcode::RefType::Vec2  : s += "vec2"  ; break;
+		case febcode::RefType::Vec3  : s += "vec3"  ; break;
 		}
 		
 	}

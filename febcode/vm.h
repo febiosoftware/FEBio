@@ -81,7 +81,19 @@ namespace febcode
 
 			if      (isStruct(v)) m_stack[slot] = copyStruct(getStruct(v));
 			else if (isArray (v)) m_stack[slot] = copyArray(getArray(v));
-			else m_stack[slot] = v;
+			else
+			{
+				switch (glob.type->kind)
+				{
+				case TypeKind::Bool  : setBoolAt  (slot, getBool  (v)); break;
+				case TypeKind::Int   : setIntAt   (slot, getInt   (v)); break;
+				case TypeKind::Double: setDoubleAt(slot, getDouble(v)); break;
+				case TypeKind::Vec2  : setVec2At  (slot, getVec2  (v)); break;
+				case TypeKind::Vec3  : setVec3At  (slot, getVec3  (v)); break;
+					default:
+					throw std::runtime_error("Unsupported global variable type for assignment.");
+				}
+			}
 		}
 
 		void setGlobal(int n, std::initializer_list<Value> values)
@@ -197,7 +209,9 @@ namespace febcode
 
 		void pushVec3(const vec3& v)
 		{
-			push(v);
+			push(v.x);
+			push(v.y);
+			push(v.z);
 		}
 
 		void pushArray(const ArrayValuePtr& arr)
@@ -243,7 +257,10 @@ namespace febcode
 
 		vec3 popVec3()
 		{
-			return pop().vec3Value;
+			double z = pop().d;
+			double y = pop().d;
+			double x = pop().d;
+			return vec3(x, y, z);
 		}
 
 		const ArrayValue& popArray()
@@ -292,7 +309,7 @@ namespace febcode
 
 		vec3 peekVec3()
 		{
-			return peek().vec3Value;
+			return vec3(m_stack[stackTop - 3].d, m_stack[stackTop - 2].d, m_stack[stackTop - 1].d);
 		}
 
 		void setBoolAt(int slot, bool b)
@@ -318,7 +335,9 @@ namespace febcode
 
 		void setVec3At(int slot, const vec3& v)
 		{
-			m_stack[slot] = v;
+			m_stack[slot    ] = v.x;
+			m_stack[slot + 1] = v.y;
+			m_stack[slot + 2] = v.z;
 		}
 
 		bool getBoolAt(int slot)
@@ -343,7 +362,7 @@ namespace febcode
 
 		vec3 getVec3At(int slot)
 		{
-			return m_stack[slot].vec3Value;
+			return vec3(m_stack[slot].d, m_stack[slot + 1].d, m_stack[slot + 2].d);
 		}
 
 		bool isTruthy(const Value& v)
