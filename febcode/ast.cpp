@@ -213,11 +213,6 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 		const febcode::vec3& vec = getVec3(v);
 		return o << "vec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 	}
-	else if (isRef(v))
-	{
-		const febcode::Ref& ref = v.ref;
-		return o << "ref";
-	}
 	else
 		return o << "<unknown value>";
 }
@@ -245,11 +240,6 @@ std::string ValueToString(const febcode::Value& v)
 		}
 		s += "}";
 		s += ":" + std::to_string(p.use_count()) + "]";
-	}
-	else if (isRef(v))
-	{
-		const febcode::Ref& ref = getRef(v);
-		s = "ref";
 	}
 	else s = "unknown";
 	return s;

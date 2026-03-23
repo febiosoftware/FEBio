@@ -17,16 +17,6 @@ namespace febcode {
 		size_t maxStackSize = 0;
 	};
 
-	struct BinaryOperatorInfo
-	{
-		BinaryOp op;
-		Type returnType = nullptr;
-		Type leftType = nullptr;
-		Type rightType = nullptr;
-		size_t index = 0;
-		BinaryFnc fnc;
-	};
-
 	class Program
 	{
 	public:

@@ -21,11 +21,6 @@ namespace febcode
 
 	struct Value;
 
-	struct Ref {
-		Value* ptr;
-		Ref() : ptr(nullptr) {}
-	};
-
 	struct vec2
 	{
 		double x, y;
@@ -215,7 +210,6 @@ namespace febcode
 			vec3 vec3Value;
 			ArrayValuePtr arrayValue;
 			StructValuePtr structValue;
-			Ref ref;
 		};
 
 	private:
@@ -232,7 +226,6 @@ namespace febcode
 			case ValueIndex::VEC3: vec3Value = v.vec3Value; break;
 			case ValueIndex::ARRAY: new (&arrayValue) ArrayValuePtr(v.arrayValue); break;
 			case ValueIndex::STRUCT: new (&structValue) StructValuePtr(v.structValue); break;
-			case ValueIndex::REF   : ref = v.ref; break;
 			}
 		}
 
@@ -314,7 +307,6 @@ namespace febcode
 	inline vec3& getVec3(Value& v) { assert(v.index == ValueIndex::VEC3); return v.vec3Value; }
 	inline const ArrayValue&  getArray (const Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
 	inline const StructValue& getStruct(const Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
-	inline const Ref& getRef(const Value& v) { assert(v.index == ValueIndex::REF); return v.ref; }
 
 	inline const ArrayValuePtr& getArrayPtr(const Value& v) { assert(v.index == ValueIndex::ARRAY); return v.arrayValue; }
 	inline const StructValuePtr& getStructPtr(const Value& v) { assert(v.index == ValueIndex::STRUCT); return v.structValue; }
@@ -354,8 +346,6 @@ namespace febcode
 		if (isDouble(v)) return (int)getDouble(v);
 		return 0;
 	}
-
-	using BinaryFnc = std::function<Value(const Value&, const Value&)>;
 
 	class TypeRegistry {
 	public:
@@ -448,23 +438,23 @@ inline febcode::Value operator / (const febcode::Value& a, const febcode::Value&
 namespace febcode
 {
 	struct FuncArgs {
-		Value* stack = nullptr;
+		double* stack = nullptr;
 		size_t count = 0; // number of arguments passed to the function
 		size_t index = 0;
 
-		bool   getBool  () { return febcode::getBool  (stack[index++]); }
-		int    getInt   () { return febcode::getInt   (stack[index++]); }
-		double getDouble() { return febcode::getDouble(stack[index++]); }
-		vec2 getVec2  () { 
-			double x = febcode::getDouble(stack[index++]);
-			double y = febcode::getDouble(stack[index++]);
-			return vec2(x, y); 
+		bool   getBool()   { return (bool  )(stack[index++]); }
+		int    getInt()    { return (int   )(stack[index++]); }
+		double getDouble() { return stack[index++]; }
+		vec2 getVec2() {
+			double x = stack[index++];
+			double y = stack[index++];
+			return vec2(x, y);
 		}
-		vec3 getVec3() { 
-			double x = febcode::getDouble(stack[index++]);
-			double y = febcode::getDouble(stack[index++]);
-			double z = febcode::getDouble(stack[index++]);
-			return vec3(x,y,z);
+		vec3 getVec3() {
+			double x = stack[index++];
+			double y = stack[index++];
+			double z = stack[index++];
+			return vec3(x, y, z);
 		}
 	};
 

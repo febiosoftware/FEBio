@@ -55,10 +55,6 @@ namespace febcode
 
 		GET_MEMBER_REF,
 
-		// array codes
-		CREATE_ARRAY,
-		COPY_ARRAY,
-		
 		GET_INDEX_BOOL,
 		GET_INDEX_INT,
 		GET_INDEX_DOUBLE,
@@ -75,7 +71,6 @@ namespace febcode
 		GET_INDEX_REF_VEC3,
 
 		// vec2 codes
-		CREATE_VEC2,
 		GET_VEC2_X,
 		GET_VEC2_Y,
 		GET_VEC2_X_REF,
@@ -83,7 +78,6 @@ namespace febcode
 		GET_VEC2_SWIZZLE,
 
 		// vec3 codes
-		CREATE_VEC3,
 		GET_VEC3_X,
 		GET_VEC3_Y,
 		GET_VEC3_Z,
@@ -247,7 +241,7 @@ namespace febcode
 
 		void compileInitializer(Expression* expr, Type expectedType);
 
-		std::vector<Type> compileFncArgs(std::vector<std::unique_ptr<Expression>>& args, bool copyArgs = true);
+		std::vector<Type> compileFncArgs(std::vector<std::unique_ptr<Expression>>& args);
 
 		// ===== Bytecode =====
 

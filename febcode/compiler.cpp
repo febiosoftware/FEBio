@@ -163,8 +163,6 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_PROPERTY_STRUCT: return +1;
 
 	case OpCode::GET_MEMBER_REF: return 0;
-	case OpCode::CREATE_ARRAY: return 0;
-	case OpCode::COPY_ARRAY: return +1;
 
 	case OpCode::GET_INDEX_BOOL  : return +arg;
 	case OpCode::GET_INDEX_INT   : return +arg;
@@ -182,13 +180,11 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_INDEX_REF_VEC3:
 		return 0;
 
-	case OpCode::CREATE_VEC2: return 0;
 	case OpCode::GET_VEC2_X: return 0;
 	case OpCode::GET_VEC2_Y: return 0;
 	case OpCode::GET_VEC2_X_REF: return 0;
 	case OpCode::GET_VEC2_Y_REF: return 0;
 	case OpCode::GET_VEC2_SWIZZLE: return +1; // in case the swizzle returns a vec3
-	case OpCode::CREATE_VEC3: return 0;
 	case OpCode::GET_VEC3_X: return 0;
 	case OpCode::GET_VEC3_Y: return 0;
 	case OpCode::GET_VEC3_Z: return 0;
@@ -417,16 +413,12 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 			{
 				compileInitializer(init->elements[i].get(), arrayType);
 			}
-
-			emit(OpCode::CREATE_ARRAY);
 		}
 		else
 		{
 			Type returnType = compileExpression(expr);
 			if (returnType != expectedType)
 				throw std::runtime_error("Invalid initializer type for array.");
-
-			emit(OpCode::COPY_ARRAY);
 		}
 	}
 	else if (expectedType->kind == TypeKind::Vec2)
@@ -442,7 +434,6 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 				if (elemType != prg.types.getDoubleType())
 					throw std::runtime_error("Vec2 initializer elements must be of type double.");
 			}
-			emit(OpCode::CREATE_VEC2);
 		}
 		else
 		{
@@ -464,7 +455,6 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 				if (elemType != prg.types.getDoubleType())
 					throw std::runtime_error("Vec3 initializer elements must be of type double.");
 			}
-			emit(OpCode::CREATE_VEC3);
 		}
 		else
 		{
@@ -1341,19 +1331,12 @@ bool Compiler::isNativeFunction(const std::string& name)
 	return false;
 }
 
-std::vector<Type> Compiler::compileFncArgs(std::vector<std::unique_ptr<Expression>>& args, bool copyArgs)
+std::vector<Type> Compiler::compileFncArgs(std::vector<std::unique_ptr<Expression>>& args)
 {
 	std::vector<Type> argTypes;
 	for (auto& arg : args)
 	{
 		Type type = compileExpression(arg.get());
-
-		if (copyArgs)
-		{
-			if (type->kind == TypeKind::Struct) emit(OpCode::COPY_STRUCT);
-			if (type->kind == TypeKind::Array ) emit(OpCode::COPY_ARRAY);
-		}
-
 		argTypes.push_back(type);
 	}
 	return argTypes;
@@ -1365,7 +1348,7 @@ Type Compiler::compileCall(CallExpr* call)
 	if (auto calleeVar = dynamic_cast<VariableExpr*>(call->callee.get()))
 	{
 		// don't copy args for native functions
-		std::vector<Type> argTypes = compileFncArgs(call->arguments, !isNativeFunction(calleeVar->name));
+		std::vector<Type> argTypes = compileFncArgs(call->arguments);
 		int fnIndex = resolveFunction(calleeVar->name, argTypes);
 		if (fnIndex == -1)
 			throw std::runtime_error("Undefined function: " + calleeVar->name);

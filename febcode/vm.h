@@ -10,6 +10,11 @@ namespace febcode
 {
 	class VM
 	{
+		struct Ref {
+			double* ptr;
+			Ref() : ptr(nullptr) {}
+		};
+
 	public:
 		enum { MAX_CALL_DEPTH = 8 };
 
@@ -79,65 +84,21 @@ namespace febcode
 			const Program::Global& glob = m_program->globals[i];
 			int slot = glob.slot;
 
-			if      (isStruct(v)) m_stack[slot] = copyStruct(getStruct(v));
-			else if (isArray (v)) m_stack[slot] = copyArray(getArray(v));
-			else
+			switch (glob.type->kind)
 			{
-				switch (glob.type->kind)
-				{
-				case TypeKind::Bool  : setBoolAt  (slot, getBool  (v)); break;
-				case TypeKind::Int   : setIntAt   (slot, getInt   (v)); break;
-				case TypeKind::Double: setDoubleAt(slot, getDouble(v)); break;
-				case TypeKind::Vec2  : setVec2At  (slot, getVec2  (v)); break;
-				case TypeKind::Vec3  : setVec3At  (slot, getVec3  (v)); break;
-					default:
-					throw std::runtime_error("Unsupported global variable type for assignment.");
-				}
+			case TypeKind::Bool  : setBoolAt  (slot, getBool  (v)); break;
+			case TypeKind::Int   : setIntAt   (slot, getInt   (v)); break;
+			case TypeKind::Double: setDoubleAt(slot, getDouble(v)); break;
+			case TypeKind::Vec2  : setVec2At  (slot, getVec2  (v)); break;
+			case TypeKind::Vec3  : setVec3At  (slot, getVec3  (v)); break;
+			case TypeKind::Array : setArrayAt (slot, getArray (v)); break;
+			case TypeKind::Struct: setStructAt(slot, getStruct(v)); break;
+				default:
+				throw std::runtime_error("Unsupported global variable type for assignment.");
 			}
-		}
-
-		void setGlobal(int n, std::initializer_list<Value> values)
-		{
-#ifndef NDEBUG
-			if ((n<0) || (n >= globalStackSize))
-				throw std::runtime_error("Invalid global index: " + std::to_string(n));
-#endif
-
-			const Program::Global& glob = m_program->globals[n];
-			int slot = (int)glob.slot;
-
-			Value& v = m_stack[slot];
-			if (isArray(v))
-			{
-				ArrayValue& arr = getArray(v);
-
-				if (arr.size() != values.size())
-					throw std::runtime_error("Array initializer has incorrect number of elements.");
-
-				Type elemType = m_program->types.getBuiltinType(*values.begin());
-				std::copy(values.begin(), values.end(), arr.elements.begin());
-			}
-			else if (isStruct(v))
-			{
-				StructValue& obj = getStruct(v);
-				if (obj.fields.size() != values.size())
-					throw std::runtime_error("Array initializer has incorrect number of elements.");
-
-				for (size_t i = 0; i < values.size(); ++i)
-				{
-					Type fieldType = obj.type->fields[i].first;
-					Type valType = m_program->types.getBuiltinType(values.begin()[i]);
-					if (fieldType != valType)
-						throw std::runtime_error("Type mismatch in struct initializer for field: " + obj.type->fields[i].second);
-					obj.fields[i] = values.begin()[i];
-				}
-			}
-			else
-				throw std::runtime_error("Initializer lists can only be assigned to arrays and structs.");
 		}
 
 	private:
-
 		struct CallFrame
 		{
 			int functionIndex;
@@ -162,7 +123,7 @@ namespace febcode
 
 		uint8_t readByte()
 		{
-			return m_program->code[currentFrame().ip++];
+			return m_program->code[ip++];
 		}
 
 		uint16_t readUint16()
@@ -172,7 +133,7 @@ namespace febcode
 			return (high << 8) | low;
 		}
 
-		void push(const Value& v)
+		void push(const double& v)
 		{
 #ifndef NDEBUG
 			if (stackTop >= m_stack.size())
@@ -183,7 +144,7 @@ namespace febcode
 
 		void pushVoid()
 		{
-			push(Value());
+			push(0.0);
 		}
 
 		void pushBool(bool b)
@@ -254,15 +215,7 @@ namespace febcode
 			}
 		}
 
-		void pushRef(const Ref& ref)
-		{
-			Value v;
-			v.index = ValueIndex::REF;
-			v.ref = ref;
-			push(v);
-		}
-
-		const Value& pop()
+		const double& pop()
 		{
 #ifndef NDEBUG
 			if (stackTop <= globalStackSize)
@@ -278,32 +231,58 @@ namespace febcode
 
 		bool popBool()
 		{
-			return pop().b;
+			return (pop() != 0.0);
 		}
 
 		int popInt()
 		{
-			return pop().i;
+			return (int)pop();
 		}
 
 		double popDouble()
 		{
-			return pop().d;
+			return pop();
 		}
 
 		vec2 popVec2()
 		{
-			double y = pop().d;
-			double x = pop().d;
+			double y = pop();
+			double x = pop();
 			return vec2(x, y);
+		}
+
+		void popVec2_0()
+		{
+			vec2_0.y = pop();
+			vec2_0.x = pop();
+		}
+
+		void popVec2_1()
+		{
+			vec2_1.y = pop();
+			vec2_1.x = pop();
 		}
 
 		vec3 popVec3()
 		{
-			double z = pop().d;
-			double y = pop().d;
-			double x = pop().d;
+			double z = pop();
+			double y = pop();
+			double x = pop();
 			return vec3(x, y, z);
+		}
+
+		void popVec3_0()
+		{
+			vec3_0.z = pop();
+			vec3_0.y = pop();
+			vec3_0.x = pop();
+		}
+
+		void popVec3_1()
+		{
+			vec3_1.z = pop();
+			vec3_1.y = pop();
+			vec3_1.x = pop();
 		}
 
 		void popValues(size_t count)
@@ -362,12 +341,7 @@ namespace febcode
 			return obj;
 		}
 
-		const Ref& popRef()
-		{
-			return pop().ref;
-		}
-
-		Value& peek()
+		double& peek()
 		{
 #ifndef NDEBUG
 			if (stackTop <= globalStackSize)
@@ -378,27 +352,27 @@ namespace febcode
 
 		bool peekBool()
 		{
-			return peek().b;
+			return (peek() != 0.0);
 		}
 
 		int peekInt()
 		{
-			return peek().i;
+			return (int)peek();
 		}
 
 		double peekDouble()
 		{
-			return peek().d;
+			return peek();
 		}
 
 		vec2 peekVec2()
 		{
-			return vec2(m_stack[stackTop - 2].d, m_stack[stackTop - 1].d);
+			return vec2(m_stack[stackTop - 2], m_stack[stackTop - 1]);
 		}
 
 		vec3 peekVec3()
 		{
-			return vec3(m_stack[stackTop - 3].d, m_stack[stackTop - 2].d, m_stack[stackTop - 1].d);
+			return vec3(m_stack[stackTop - 3], m_stack[stackTop - 2], m_stack[stackTop - 1]);
 		}
 
 		ArrayValue peekArray(Type type)
@@ -464,29 +438,48 @@ namespace febcode
 			}
 		}
 
+		void setStructAt(int slot, const StructValue& obj)
+		{
+			for (int i = 0; i < obj.fields.size(); ++i)
+			{
+				const Value& v = obj.fields[i];
+				switch (obj.type->fields[i].first->kind)
+				{
+				case TypeKind::Bool  : setBoolAt  (slot, v.b); break;
+				case TypeKind::Int   : setIntAt   (slot, v.i); break;
+				case TypeKind::Double: setDoubleAt(slot, v.d); break;
+				case TypeKind::Vec2  : setVec2At  (slot, v.vec2Value); break;
+				case TypeKind::Vec3  : setVec3At  (slot, v.vec3Value); break;
+				default:
+					throw std::runtime_error("Unsupported array element type for setArrayAt.");
+				};
+				slot += (int)obj.type->fields[i].first->size();
+			}
+		}
+
 		bool getBoolAt(int slot)
 		{
-			return m_stack[slot].b;
+			return (m_stack[slot] != 0.0);
 		}
 
 		int getIntAt(int slot)
 		{
-			return m_stack[slot].i;
+			return (int)m_stack[slot];
 		}
 
 		double getDoubleAt(int slot)
 		{
-			return m_stack[slot].d;
+			return m_stack[slot];
 		}
 
 		vec2 getVec2At(int slot)
 		{
-			return vec2(m_stack[slot].d, m_stack[slot + 1].d);
+			return vec2(m_stack[slot], m_stack[slot + 1]);
 		}
 
 		vec3 getVec3At(int slot)
 		{
-			return vec3(m_stack[slot].d, m_stack[slot + 1].d, m_stack[slot + 2].d);
+			return vec3(m_stack[slot], m_stack[slot + 1], m_stack[slot + 2]);
 		}
 
 		ArrayValue getArrayAt(int slot, Type type)
@@ -551,21 +544,6 @@ namespace febcode
 				stackTop = dest + size;
 		}
 
-		bool isTruthy(const Value& v)
-		{
-			switch (v.index)
-			{
-				case ValueIndex::VOID  : return false;
-				case ValueIndex::BOOL  : return getBool(v);
-				case ValueIndex::INT   : return getInt(v) != 0;
-				case ValueIndex::DOUBLE: return getDouble(v) != 0.0;
-				case ValueIndex::ARRAY : return true;
-				case ValueIndex::STRUCT: return true;
-			}
-
-			return false;
-		}
-
 		std::string toString(const Value& v)
 		{
 			switch (v.index)
@@ -582,12 +560,17 @@ namespace febcode
 		const Program* m_program;
 		size_t globalStackSize = 0;
 
-		std::vector<Value> m_stack;
+		std::vector<double> m_stack;
 		size_t stackTop = 0;
 		Ref ref;
 
+		// small "registers" for binary ops
+		vec2 vec2_0, vec2_1;
+		vec3 vec3_0, vec3_1;
+
 		CallFrame m_frames[MAX_CALL_DEPTH];
 		size_t frameCount = 0;
+		size_t ip = 0; // current instruction pointer
 
 		bool m_debug = false;
 	};

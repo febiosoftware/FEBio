@@ -108,7 +108,6 @@ const char* IPToString(uint8_t ip)
 	case OpCode::LE_DOUBLE     : return "LEF ";
 	case OpCode::NEG_INT       : return "NEGI";
 	case OpCode::NEG_DOUBLE    : return "NEGF";
-	case OpCode::CREATE_VEC2   : return "VEC2";
 	case OpCode::GET_VEC2_X    : return "GV2X";
 	case OpCode::GET_VEC2_Y    : return "GV2Y";
 	case OpCode::GET_VEC2_SWIZZLE: return "G2SW";
@@ -118,7 +117,6 @@ const char* IPToString(uint8_t ip)
 	case OpCode::MUL_VEC2_DOUBLE: return "ML2F";
 	case OpCode::MUL_DOUBLE_VEC2: return "MLF2";
 	case OpCode::NEG_VEC2      : return "NEG2";
-	case OpCode::CREATE_VEC3   : return "VEC3";
 	case OpCode::GET_VEC3_X    : return "GV3X";
 	case OpCode::GET_VEC3_Y    : return "GV3Y";
 	case OpCode::GET_VEC3_Z    : return "GV3Z";
@@ -141,9 +139,6 @@ const char* IPToString(uint8_t ip)
 	case OpCode::GET_PROPERTY_ARRAY:
 	case OpCode::GET_PROPERTY_STRUCT:
 		return "GETP";
-
-	case OpCode::CREATE_ARRAY  : return "ARR ";
-	case OpCode::COPY_ARRAY    : return "CPYA";
 
 	case OpCode::GET_INDEX_BOOL  :
 	case OpCode::GET_INDEX_INT   :
@@ -188,7 +183,7 @@ const char* IPToString(uint8_t ip)
 	return "(UNKNOWN)";
 }
 
-void printStack(const std::vector<Value>& stack, int numGlobals, int stackSize, Value* ref)
+void printStack(const std::vector<double>& stack, int numGlobals, int stackSize, double* ref)
 {
 	std::cout << "Stack: [";
 	for (size_t i = 0; i < numGlobals; i++)
@@ -224,15 +219,17 @@ Value VM::execute()
 	const size_t instructions = m_program->code.size();
 	ref.ptr = nullptr;
 
-	while (currentFrame().ip < instructions)
+	while (ip < instructions)
 	{
 		uint8_t instruction = readByte();
 
+#ifndef NDEBUG
 		if (m_debug)
 		{
-			std::cout << "IP: " << std::setw(4) << currentFrame().ip - 1;
+			std::cout << "IP: " << std::setw(4) << ip - 1;
 			std::cout << " | Executing: " << IPToString(instruction) << " | ";
 		}
+#endif
 
 		switch ((OpCode)instruction)
 		{
@@ -334,7 +331,7 @@ Value VM::execute()
 		case OpCode::GET_MEMBER_REF:
 		{
 			uint8_t offset = readByte();
-			Value* slot = ref.ptr;
+			double* slot = ref.ptr;
 			ref.ptr = slot + offset;
 			break;
 		}
@@ -344,7 +341,7 @@ Value VM::execute()
 			uint8_t elemSize = readByte();
 			int index = popInt();
 
-			Value* slot = ref.ptr;
+			double* slot = ref.ptr;
 			ref.ptr = slot + elemSize*index;
 			break;
 		}
@@ -353,64 +350,61 @@ Value VM::execute()
 		case OpCode::GET_INDEX_REF_INT:
 		case OpCode::GET_INDEX_REF_DOUBLE:
 		{
-			const Value& indexVal = pop();
-			int index = getInt(indexVal);
+			int index = popInt();
 
-			Value* slot = ref.ptr;
+			double* slot = ref.ptr;
 			ref.ptr = slot + index;
 			break;
 		}
 
 		case OpCode::GET_INDEX_REF_VEC2:
 		{
-			const Value& indexVal = pop();
-			int index = getInt(indexVal);
+			int index = popInt();
 
-			Value* slot = ref.ptr;
+			double* slot = ref.ptr;
 			ref.ptr = slot + index * 2;
 			break;
 		}
 
 		case OpCode::GET_INDEX_REF_VEC3:
 		{
-			const Value& indexVal = pop();
-			int index = getInt(indexVal);
+			int index = popInt();
 
-			Value* slot = ref.ptr;
+			double* slot = ref.ptr;
 			ref.ptr = slot + index * 3;
 			break;
 		}
 
 		case OpCode::GET_VEC2_X_REF:
 		{
-			Value* v = ref.ptr;
+			double* v = ref.ptr;
 			ref.ptr = v;
 			break;
 		}
 		case OpCode::GET_VEC2_Y_REF:
 		{
-			Value* v = ref.ptr;
+			double* v = ref.ptr;
 			ref.ptr = v + 1;
 			break;
 		}
 
 		case OpCode::GET_VEC3_X_REF:
 		{
-			Value* v = ref.ptr;
+			double* v = ref.ptr;
 			ref.ptr = v;
 			break;
 		}
 
 		case OpCode::GET_VEC3_Y_REF:
 		{
-			Value* v = ref.ptr;
+			double* v = ref.ptr;
 			ref.ptr = v + 1;
 			break;
 		}
 
 		case OpCode::GET_VEC3_Z_REF:
 		{
-			Value* v = ref.ptr;
+			double* v = ref.ptr;
 			ref.ptr = v + 2;
 			break;
 		}
@@ -442,7 +436,7 @@ Value VM::execute()
 		case OpCode::STORE_VEC2:
 		{
 			vec2 v = peekVec2();
-			Value* xPtr = ref.ptr;
+			double* xPtr = ref.ptr;
 			xPtr[0] = v.x;
 			xPtr[1] = v.y;
 			ref.ptr = nullptr;
@@ -452,7 +446,7 @@ Value VM::execute()
 		case OpCode::STORE_VEC3:
 		{
 			vec3 v = peekVec3();
-			Value* xPtr = ref.ptr;
+			double* xPtr = ref.ptr;
 			xPtr[0] = v.x;
 			xPtr[1] = v.y;
 			xPtr[2] = v.z;
@@ -463,7 +457,7 @@ Value VM::execute()
 		case OpCode::STORE_ARRAY:
 		{
 			uint8_t size = readByte();
-			memcpy(ref.ptr, m_stack.data() + (stackTop - size), size*sizeof(Value));
+			memcpy(ref.ptr, m_stack.data() + (stackTop - size), size*sizeof(double));
 			ref.ptr = nullptr;
 			break;
 		}
@@ -471,7 +465,7 @@ Value VM::execute()
 		case OpCode::STORE_STRUCT:
 		{
 			uint8_t size = readByte();
-			memcpy(ref.ptr, m_stack.data() + (stackTop - size), size * sizeof(Value));
+			memcpy(ref.ptr, m_stack.data() + (stackTop - size), size * sizeof(double));
 			ref.ptr = nullptr;
 			break;
 		}
@@ -532,7 +526,7 @@ Value VM::execute()
 		{
 			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
-			pushBool(m_stack[frame.base + slot].b);
+			pushBool((bool)m_stack[frame.base + slot]);
 			break;
 		}
 
@@ -540,7 +534,7 @@ Value VM::execute()
 		{
 			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
-			pushInt(m_stack[frame.base + slot].i);
+			pushInt((int)m_stack[frame.base + slot]);
 			break;
 		}
 
@@ -548,7 +542,7 @@ Value VM::execute()
 		{
 			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
-			pushDouble(m_stack[frame.base + slot].d);
+			pushDouble(m_stack[frame.base + slot]);
 			break;
 		}
 
@@ -737,70 +731,65 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::CREATE_VEC2:
-		{
-			// Nothing to do here
-			break;
-		}
 		case OpCode::ADD_VEC2:
 		{
-			vec2 b = popVec2();
-			vec2 a = popVec2();
-			pushVec2(a + b);
+			popVec2_1();
+			popVec2_0();
+			pushVec2(vec2_0 + vec2_1);
 			break;
 		}
 		case OpCode::SUB_VEC2:
 		{
-			vec2 b = popVec2();
-			vec2 a = popVec2();
-			pushVec2(a - b);
+			popVec2_1();
+			popVec2_0();
+			pushVec2(vec2_0 - vec2_1);
 			break;
 		}
 		case OpCode::DOT_VEC2:
 		{
-			vec2 b = popVec2();
-			vec2 a = popVec2();
-			pushDouble(a * b);
+			popVec2_1();
+			popVec2_0();
+			pushDouble(vec2_0 * vec2_1);
 			break;
 		}
 		case OpCode::MUL_VEC2_DOUBLE:
 		{
 			double scalar = popDouble();
-			vec2 vec = popVec2();
-			pushVec2(vec * scalar);
+			popVec2_0();
+			pushVec2(vec2_0 * scalar);
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC2:
 		{
-			vec2 vec = popVec2();
+			popVec2_0();
 			double scalar = popDouble();
-			pushVec2(vec * scalar);
+			pushVec2(vec2_0 * scalar);
 			break;
 		}
 		case OpCode::GET_VEC2_X:
 		{
-			vec2 vec = popVec2();
-			pushDouble(vec.x);
+			popVec2_0();
+			pushDouble(vec2_0.x);
 			break;
 		}
 		case OpCode::GET_VEC2_Y:
 		{
-			vec2 vec = popVec2();
-			pushDouble(vec.y);
+			popVec2_0();
+			pushDouble(vec2_0.y);
 			break;
 		}
 		case OpCode::NEG_VEC2:
 		{
-			vec2 v = popVec2();
-			pushVec2(vec2(-v.x, -v.y));
+			popVec2_0();
+			pushVec2(vec2(-vec2_0.x, -vec2_0.y));
 			break;
 		}
 		case OpCode::GET_VEC2_SWIZZLE:
 		{
 			uint8_t mask = readByte();
 			uint8_t size = readByte();
-			vec2 v = popVec2();
-			double c[4] = { v.x, v.y, 0.0, 0.0 };
+			popVec2_0();
+			double c[4] = { vec2_0.x, vec2_0.y, 0.0, 0.0 };
 
 			if (size == 2)
 			{
@@ -819,70 +808,65 @@ Value VM::execute()
 			}
 			break;
 		}
-		case OpCode::CREATE_VEC3:
-		{
-			// Nothing to do here
-			break;
-		}
 		case OpCode::ADD_VEC3:
 		{
-			vec3 b = popVec3();
-			vec3 a = popVec3();
-			pushVec3(a + b);
+			popVec3_1();
+			popVec3_0();
+			pushVec3(vec3_0 + vec3_1);
 			break;
 		}
 		case OpCode::SUB_VEC3:
 		{
-			vec3 b = popVec3();
-			vec3 a = popVec3();
-			pushVec3(a - b);
+			popVec3_1();
+			popVec3_0();
+			pushVec3(vec3_0 - vec3_1);
 			break;
 		}
 		case OpCode::DOT_VEC3:
 		{
-			vec3 b = popVec3();
-			vec3 a = popVec3();
-			pushDouble(a * b);
+			popVec3_1();
+			popVec3_0();
+			pushDouble(vec3_0 * vec3_1);
 			break;
 		}
 		case OpCode::MUL_VEC3_DOUBLE:
 		{
 			double scalar = popDouble();
-			vec3 vec = popVec3();
-			pushVec3(vec * scalar);
+			popVec3_0();
+			pushVec3(vec3_0 * scalar);
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC3:
 		{
-			vec3 vec = popVec3();
+			popVec3_0();
 			double scalar = popDouble();
-			pushVec3(vec * scalar);
+			pushVec3(vec3_0 * scalar);
 			break;
 		}
 		case OpCode::GET_VEC3_X:
 		{
-			vec3 vec = popVec3();
-			pushDouble(vec.x);
+			popVec3_0();
+			pushDouble(vec3_0.x);
 			break;
 		}
 		case OpCode::GET_VEC3_Y:
 		{
-			vec3 vec = popVec3();
-			pushDouble(vec.y);
+			popVec3_0();
+			pushDouble(vec3_0.y);
 			break;
 		}
 		case OpCode::GET_VEC3_Z:
 		{
-			vec3 vec = popVec3();
-			pushDouble(vec.z);
+			popVec3_0();
+			pushDouble(vec3_0.z);
 			break;
 		}
 		case OpCode::GET_VEC3_SWIZZLE:
 		{
 			uint8_t mask = readByte();
 			uint8_t size = readByte();
-			vec3 v = popVec3();
-			double c[4] = { v.x, v.y, v.z, 0.0 };
+			popVec3_0();
+			double c[4] = { vec3_0.x, vec3_0.y, vec3_0.z, 0.0 };
 
 			if (size == 2)
 			{
@@ -904,8 +888,8 @@ Value VM::execute()
 
 		case OpCode::NEG_VEC3:
 		{
-			vec3 v = popVec3();
-			pushVec3(vec3(-v.x, -v.y, -v.z));
+			popVec3_0();
+			pushVec3(vec3(-vec3_0.x, -vec3_0.y, -vec3_0.z));
 			break;
 		}
 
@@ -1036,14 +1020,6 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::CREATE_ARRAY: {
-			// Nothing to do here since arrays are created on the stack.
-			break;
-		}
-		case OpCode::COPY_ARRAY: {
-			// Nothing to do here.
-			break;
-		}
 		case OpCode::GET_INDEX_BOOL:
 		{
 			int index = popInt();
@@ -1154,30 +1130,30 @@ Value VM::execute()
 		case OpCode::JUMP:
 		{
 			uint16_t offset = readUint16();
-			currentFrame().ip += offset;
+			ip += offset;
 			break;
 		}
 
 		case OpCode::JUMP_IF_FALSE:
 		{
 			uint16_t offset = readUint16();
-			if (!isTruthy(peek()))
-				currentFrame().ip += offset;
+			if (peek() == 0.0)
+				ip += offset;
 			break;
 		}
 
 		case OpCode::JUMP_IF_TRUE:
 		{
 			uint16_t offset = readUint16();
-			if (isTruthy(peek()))
-				currentFrame().ip += offset;
+			if (peek() != 0.0)
+				ip += offset;
 			break;
 		}
 
 		case OpCode::LOOP:
 		{
 			uint16_t offset = readUint16();
-			currentFrame().ip -= offset;
+			ip -= offset;
 			break;
 		}
 
@@ -1280,12 +1256,16 @@ Value VM::execute()
 				}
 			}
 
-			CallFrame frame = m_frames[--frameCount];
+			CallFrame& frame = m_frames[--frameCount];
 			stackTop = frame.base;
+			ip = frame.ip;
+
+			if (frameCount == 0)
+				return result;
 
 			switch (returnType)
 			{
-			case TypeKind::Void  : push      (result); break;
+			case TypeKind::Void  : pushVoid  (); break;
 			case TypeKind::Bool  : pushBool  (result.b); break;
 			case TypeKind::Int   : pushInt   (result.i); break;
 			case TypeKind::Double: pushDouble(result.d); break;
@@ -1294,16 +1274,15 @@ Value VM::execute()
 			case TypeKind::Array : pushArray (*result.arrayValue); break;
 			case TypeKind::Struct: pushStruct(*result.structValue); break;
 			default:
-				push(result);
+				throw std::runtime_error("Unsupported return type");
 			}
 
+#ifndef NDEBUG
 			if (m_debug)
 			{
 				printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 			}
-
-			if (frameCount == 0)
-				return result;
+#endif
 
 			break;
 		}
@@ -1312,10 +1291,12 @@ Value VM::execute()
 			throw std::runtime_error("Unknown opcode");
 		}
 
+#ifndef NDEBUG
 		if (m_debug && (instruction < (uint8_t)OpCode::RETURN_VOID))
 		{
 			printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 		}
+#endif
 	}
 
 	throw std::runtime_error("Unexpected end of code.");
@@ -1346,7 +1327,7 @@ void VM::callFunction(int fnIndex, int argCount)
 		case TypeKind::Vec2  : pushVec2  (result.vec2Value); break;
 		case TypeKind::Vec3  : pushVec3  (result.vec3Value); break;
 		default:
-			push(result);
+			throw std::runtime_error("Unsupported return type from native function: " + std::to_string((int)fn.returnType->kind));
 		}
 		return;
 	}
@@ -1354,12 +1335,11 @@ void VM::callFunction(int fnIndex, int argCount)
 	if (frameCount >= MAX_CALL_DEPTH)
 		throw std::runtime_error("Stack overflow: too many nested function calls.");
 
-	CallFrame frame;
+	CallFrame& frame = m_frames[frameCount++];
 	frame.functionIndex = fnIndex;
-	frame.ip = fn.entry;
 	frame.base = stackTop - fn.argSize;
-
-	m_frames[frameCount++] = frame;
+	frame.ip = ip;
+	ip = fn.entry;
 }
 
 Value febcode::runScript(const std::string& script, bool initModules)
