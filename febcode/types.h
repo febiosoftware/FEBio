@@ -19,18 +19,9 @@ namespace febcode
 		Struct,
 	};
 
-	enum class RefType : uint8_t {
-		Invalid,
-		Double,
-		Vec2,
-		Vec3,
-		Value
-	};
-
 	struct Ref {
 		void* ptr;
-		RefType type;
-		Ref() : ptr(nullptr), type(RefType::Invalid) {}
+		Ref() : ptr(nullptr) {}
 	};
 
 	struct vec2
@@ -105,7 +96,7 @@ namespace febcode
 			case TypeKind::Double: return 1;
 			case TypeKind::Vec2:   return 2;
 			case TypeKind::Vec3:   return 3;
-			case TypeKind::Array:  return 1;// elementType->size()* arraySize;
+			case TypeKind::Array:  return elementType->size()* arraySize;
 			case TypeKind::Struct:
 				{
 					size_t totalSize = 0;

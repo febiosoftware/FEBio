@@ -249,24 +249,7 @@ std::string ValueToString(const febcode::Value& v)
 	else if (isRef(v))
 	{
 		const febcode::Ref& ref = getRef(v);
-		s = "ref->";
-		switch (ref.type)
-		{
-		case febcode::RefType::Value:
-		{
-			febcode::Value* v = static_cast<febcode::Value*>(ref.ptr);
-			if (v)
-			{
-				s += ValueTypeToString(*v);
-			}
-			else s += "null"; 
-			break;
-		}
-		case febcode::RefType::Double: s += "double"; break;
-		case febcode::RefType::Vec2  : s += "vec2"  ; break;
-		case febcode::RefType::Vec3  : s += "vec3"  ; break;
-		}
-		
+		s = "ref";
 	}
 	else s = "unknown";
 	return s;

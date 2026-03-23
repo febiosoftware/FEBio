@@ -214,9 +214,22 @@ namespace febcode
 			push(v.z);
 		}
 
-		void pushArray(const ArrayValuePtr& arr)
+		void pushArray(const ArrayValue& arr)
 		{
-			push(arr);
+			for (int i = 0; i < arr.size(); ++i)
+			{
+				const Value& v = arr.elements[i];
+				switch (arr.type->elementType->kind)
+				{
+				case TypeKind::Bool  : pushBool  (v.b); break;
+				case TypeKind::Int   : pushInt   (v.i); break;
+				case TypeKind::Double: pushDouble(v.d); break;
+				case TypeKind::Vec2  : pushVec2  (v.vec2Value); break;
+				case TypeKind::Vec3  : pushVec3  (v.vec3Value); break;
+				default:
+					throw std::runtime_error("Unsupported array element type for push.");
+				};
+			}
 		}
 
 		void pushStruct(const StructValuePtr& arr)
@@ -263,9 +276,35 @@ namespace febcode
 			return vec3(x, y, z);
 		}
 
-		const ArrayValue& popArray()
+		void popValues(size_t count)
 		{
-			return getArray(pop());
+			if (stackTop < globalStackSize + count)
+				throw std::runtime_error("Stack underflow.");
+			stackTop -= count;
+		}
+
+		ArrayValue popArray(Type type)
+		{
+			assert(type->kind == TypeKind::Array);
+			ArrayValue arr;
+			arr.type = type;
+			arr.elements.resize(type->arraySize);
+			for (int i = (int)arr.size() - 1; i >= 0; --i)
+			{
+				switch (type->elementType->kind)
+				{
+				case TypeKind::Bool  : arr.elements[i] = popBool(); break;
+				case TypeKind::Int   : arr.elements[i] = popInt(); break;
+				case TypeKind::Double: arr.elements[i] = popDouble(); break;
+				case TypeKind::Vec2  : arr.elements[i] = popVec2(); break;
+				case TypeKind::Vec3  : arr.elements[i] = popVec3(); break;
+				case TypeKind::Array : arr.elements[i] = std::make_shared<ArrayValue>(popArray(type->elementType)); break;
+				case TypeKind::Struct: arr.elements[i] = std::make_shared<StructValue>(popStruct()); break;
+				default:
+					throw std::runtime_error("Unsupported array element type for pop.");
+				};
+			}
+			return arr;
 		}
 
 		const StructValue& popStruct()
@@ -312,6 +351,30 @@ namespace febcode
 			return vec3(m_stack[stackTop - 3].d, m_stack[stackTop - 2].d, m_stack[stackTop - 1].d);
 		}
 
+		ArrayValue peekArray(Type type)
+		{
+			assert(type->kind == TypeKind::Array);
+			ArrayValue arr;
+			arr.type = type;
+			arr.elements.resize(type->size());
+			int c = (int)(stackTop - type->size());
+			for (int i = 0; i < arr.size(); ++i)
+			{
+				switch (type->elementType->kind)
+				{
+				case TypeKind::Bool  : arr.elements[i] = m_stack[c].b; break;
+				case TypeKind::Int   : arr.elements[i] = m_stack[c].i; break;
+				case TypeKind::Double: arr.elements[i] = m_stack[c].d; break;
+				case TypeKind::Vec2  : arr.elements[i] = vec2(m_stack[c].d, m_stack[c + 1].d); break;
+				case TypeKind::Vec3  : arr.elements[i] = vec3(m_stack[c].d, m_stack[c + 1].d, m_stack[c + 2].d); break;
+				default:
+					throw std::runtime_error("Unsupported array element type for peek.");
+				};
+				c += (int)type->elementType->size();
+			}
+			return arr;
+		}
+
 		void setBoolAt(int slot, bool b)
 		{
 			m_stack[slot] = b;
@@ -340,6 +403,25 @@ namespace febcode
 			m_stack[slot + 2] = v.z;
 		}
 
+		void setArrayAt(int slot, const ArrayValue& arr)
+		{
+			for (int i = 0; i < arr.size(); ++i)
+			{
+				const Value& v = arr.elements[i];
+				switch (arr.type->elementType->kind)
+				{
+				case TypeKind::Bool  : setBoolAt  (slot, v.b); break;
+				case TypeKind::Int   : setIntAt   (slot, v.i); break;
+				case TypeKind::Double: setDoubleAt(slot, v.d); break;
+				case TypeKind::Vec2  : setVec2At  (slot, v.vec2Value); break;
+				case TypeKind::Vec3  : setVec3At  (slot, v.vec3Value); break;
+				default:
+					throw std::runtime_error("Unsupported array element type for setArrayAt.");
+				};
+				slot += (int)arr.type->elementType->size();
+			}
+		}
+
 		bool getBoolAt(int slot)
 		{
 			return m_stack[slot].b;
@@ -363,6 +445,41 @@ namespace febcode
 		vec3 getVec3At(int slot)
 		{
 			return vec3(m_stack[slot].d, m_stack[slot + 1].d, m_stack[slot + 2].d);
+		}
+
+		ArrayValue getArrayAt(int slot, Type type)
+		{
+			assert(type->kind == TypeKind::Array);
+			ArrayValue arr;
+			arr.type = type;
+			arr.elements.resize(type->arraySize);
+
+			int c = slot;
+			for (int i = 0; i < arr.size(); ++i)
+			{
+				Value& elem = arr.elements[i];
+				switch (type->elementType->kind)
+				{
+				case TypeKind::Bool  : elem = getBoolAt  (c); break;
+				case TypeKind::Int   : elem = getIntAt   (c); break;
+				case TypeKind::Double: elem = getDoubleAt(c); break;
+				case TypeKind::Vec2  : elem = getVec2At  (c); break;
+				case TypeKind::Vec3  : elem = getVec3At  (c); break;
+				default:
+					throw std::runtime_error("Unsupported type in getArrayAt");
+				}
+				c += (int)type->elementType->size();
+			}
+			return arr;
+		}
+
+		void copy(int dest, int src, int size)
+		{
+			for (int i = 0; i < size; ++i)
+				m_stack[dest + i] = m_stack[src + i];
+
+			if (dest + size > stackTop)
+				stackTop = dest + size;
 		}
 
 		bool isTruthy(const Value& v)

@@ -53,6 +53,10 @@ void Compiler::endScope()
 		case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+		case TypeKind::Array : 
+			emit(OpCode::POP_ARRAY, local.type->size());
+			emitUint8(local.type->typeIndex);
+			break;
 		default:
 			emit(OpCode::POP);
 			break;
@@ -119,7 +123,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_GLOBAL_DOUBLE: return +1;
 	case OpCode::GET_GLOBAL_VEC2  : return +2;
 	case OpCode::GET_GLOBAL_VEC3  : return +3;
-	case OpCode::GET_GLOBAL_ARRAY : return +1;
+	case OpCode::GET_GLOBAL_ARRAY : return +arg;
 	case OpCode::GET_GLOBAL_STRUCT: return +1;
 
 	case OpCode::SET_GLOBAL_BOOL: 
@@ -132,26 +136,16 @@ int Compiler::stackEffect(OpCode op, int arg)
 		return 0;
 
 	case OpCode::GET_GLOBAL_REF       : return +1;
-	case OpCode::GET_GLOBAL_REF_BOOL  : return +1;
-	case OpCode::GET_GLOBAL_REF_INT   : return +1;
-	case OpCode::GET_GLOBAL_REF_DOUBLE: return +1;
-	case OpCode::GET_GLOBAL_REF_VEC2  : return +1;
-	case OpCode::GET_GLOBAL_REF_VEC3  : return +1;
 
 	case OpCode::GET_LOCAL_BOOL  : return +1;
 	case OpCode::GET_LOCAL_INT   : return +1;
 	case OpCode::GET_LOCAL_DOUBLE: return +1;
 	case OpCode::GET_LOCAL_VEC2  : return +2;
 	case OpCode::GET_LOCAL_VEC3  : return +3;
-	case OpCode::GET_LOCAL_ARRAY : return +1;
+	case OpCode::GET_LOCAL_ARRAY : return +arg;
 	case OpCode::GET_LOCAL_STRUCT: return +1;
 
 	case OpCode::GET_LOCAL_REF       : return +1;
-	case OpCode::GET_LOCAL_REF_BOOL  : return +1;
-	case OpCode::GET_LOCAL_REF_INT   : return +1;
-	case OpCode::GET_LOCAL_REF_DOUBLE: return +1;
-	case OpCode::GET_LOCAL_REF_VEC2  : return +1;
-	case OpCode::GET_LOCAL_REF_VEC3  : return +1;
 
 	case OpCode::CREATE_STRUCT: return -arg + 1;
 	case OpCode::COPY_STRUCT: return 0;
@@ -165,24 +159,31 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_PROPERTY_STRUCT: return +1;
 
 	case OpCode::GET_MEMBER_REF: return 0;
-	case OpCode::CREATE_ARRAY: return -arg + 1;
+	case OpCode::CREATE_ARRAY: return 0;
 	case OpCode::COPY_ARRAY: return +1;
 
-	case OpCode::GET_INDEX_BOOL  : return +1;
-	case OpCode::GET_INDEX_INT   : return +1;
-	case OpCode::GET_INDEX_DOUBLE: return +1;
-	case OpCode::GET_INDEX_VEC2  : return +2;
-	case OpCode::GET_INDEX_VEC3  : return +3;
-	case OpCode::GET_INDEX_ARRAY : return +1;
-	case OpCode::GET_INDEX_STRUCT: return +1;
+	case OpCode::GET_INDEX_BOOL  : return +arg;
+	case OpCode::GET_INDEX_INT   : return +arg;
+	case OpCode::GET_INDEX_DOUBLE: return +arg;
+	case OpCode::GET_INDEX_VEC2  : return +arg;
+	case OpCode::GET_INDEX_VEC3  : return +arg;
+	case OpCode::GET_INDEX_ARRAY : return +arg;
+	case OpCode::GET_INDEX_STRUCT: return +arg;
 
-	case OpCode::GET_INDEX_REF: return 0;
+	case OpCode::GET_INDEX_REF:
+	case OpCode::GET_INDEX_REF_BOOL:
+	case OpCode::GET_INDEX_REF_INT:
+	case OpCode::GET_INDEX_REF_DOUBLE:
+	case OpCode::GET_INDEX_REF_VEC2:
+	case OpCode::GET_INDEX_REF_VEC3:
+		return 0;
+
 	case OpCode::CREATE_VEC2: return 0;
 	case OpCode::GET_VEC2_X: return 0;
 	case OpCode::GET_VEC2_Y: return 0;
 	case OpCode::GET_VEC2_X_REF: return 0;
 	case OpCode::GET_VEC2_Y_REF: return 0;
-	case OpCode::GET_VEC2_SWIZZLE: return 0;
+	case OpCode::GET_VEC2_SWIZZLE: return +1; // in case the swizzle returns a vec3
 	case OpCode::CREATE_VEC3: return 0;
 	case OpCode::GET_VEC3_X: return 0;
 	case OpCode::GET_VEC3_Y: return 0;
@@ -254,7 +255,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::POP_INT   : return -1;
 	case OpCode::POP_DOUBLE: return -1;
 	case OpCode::POP_VEC2  : return -2;
-	case OpCode::POP_VEC3  : return -1;
+	case OpCode::POP_VEC3  : return -3;
+	case OpCode::POP_ARRAY : return -arg;
 
 	case OpCode::CALL: return -arg + 1; // TODO: This is not correct anymore!
 
@@ -312,7 +314,9 @@ void Compiler::compile()
 		compileStatement(stmt.get());
 
 	// only add return if the last instruction isn't already a return (e.g. from a function)
-	if (prg.code.empty() || (prg.code.back() < (uint8_t)OpCode::RETURN_VOID))
+	// TODO: I need to revist this logic. The problem is when an array is returned, the last 
+	// instruction is the array size. This will add another return.
+	if (prg.code.empty() || (prg.code.back() < (uint8_t)OpCode::RETURN_VOID) || (prg.code.back() >= (uint8_t)OpCode::LAST_OPCODE))
 		emit(OpCode::RETURN_VOID);
 
 	prg.maxStackSize = maxStackDepth;
@@ -347,6 +351,10 @@ void Compiler::compileExprStmt(ExpressionStmt* stmt)
 	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+	case TypeKind::Array : 
+		emit(OpCode::POP_ARRAY, type->size());
+		emitUint8(type->typeIndex);
+		break;
 	default:
 		emit(OpCode::POP);
 	}
@@ -500,7 +508,10 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 				case TypeKind::Double: emit(OpCode::SET_GLOBAL_DOUBLE); break;
 				case TypeKind::Vec2  : emit(OpCode::SET_GLOBAL_VEC2  ); break;
 				case TypeKind::Vec3  : emit(OpCode::SET_GLOBAL_VEC3  ); break;
-				case TypeKind::Array : emit(OpCode::SET_GLOBAL_ARRAY ); break;
+				case TypeKind::Array : 
+					emit(OpCode::SET_GLOBAL_ARRAY ); 
+					emitUint8(type->typeIndex);
+					break;
 				case TypeKind::Struct: emit(OpCode::SET_GLOBAL_STRUCT); break;
 				default:
 					throw std::runtime_error("Unsupported global variable type");
@@ -515,6 +526,10 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 				case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
 				case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
 				case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+				case TypeKind::Array : 
+					emit(OpCode::POP_ARRAY, type->size());
+					emitUint8(type->typeIndex);
+					break;
 				default:
 					emit(OpCode::POP);
 				}
@@ -609,7 +624,10 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 		case TypeKind::Double: emit(OpCode::RETURN_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::RETURN_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::RETURN_VEC3  ); break;
-		case TypeKind::Array : emit(OpCode::RETURN_ARRAY ); break;
+		case TypeKind::Array : 
+			emit(OpCode::RETURN_ARRAY ); 
+			emitUint8(returnType->typeIndex);
+			break;
 		case TypeKind::Struct: emit(OpCode::RETURN_STRUCT); break;
 		default:
 			throw std::runtime_error("Unsupported return type");
@@ -693,6 +711,10 @@ void Compiler::compileFunction(FunctionStmt* fn)
 		case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+		case TypeKind::Array : 
+			emit(OpCode::POP_ARRAY, local.type->size()); 
+			emitUint8(local.type->typeIndex);
+			break;
 		default:
 			emit(OpCode::POP);
 			break;
@@ -765,7 +787,12 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		case TypeKind::Double: emit(OpCode::GET_LOCAL_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::GET_LOCAL_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::GET_LOCAL_VEC3  ); break;
-		case TypeKind::Array : emit(OpCode::GET_LOCAL_ARRAY ); break;
+		case TypeKind::Array:
+		{
+			emit(OpCode::GET_LOCAL_ARRAY, type->size()); 
+			emitUint8(type->typeIndex);
+			break;
+		}
 		case TypeKind::Struct: emit(OpCode::GET_LOCAL_STRUCT); break;
 		default:
 			throw std::runtime_error("Unsupported local variable type");
@@ -794,7 +821,12 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	case TypeKind::Double: emit(OpCode::GET_GLOBAL_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::GET_GLOBAL_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::GET_GLOBAL_VEC3  ); break;
-	case TypeKind::Array : emit(OpCode::GET_GLOBAL_ARRAY ); break;
+	case TypeKind::Array:
+	{
+		emit(OpCode::GET_GLOBAL_ARRAY, glob.type->size()); 
+		emitUint8(glob.type->typeIndex);
+		break;
+	}
 	case TypeKind::Struct: emit(OpCode::GET_GLOBAL_STRUCT); break;
 	default:
 		throw std::runtime_error("Unsupported global variable type");
@@ -858,16 +890,7 @@ Type Compiler::compileVariableRef(VariableExpr* expr)
 	{
 		returnType = m_locals[index].type;
 
-		switch (returnType->kind)
-		{
-		case TypeKind::Bool  : emit(OpCode::GET_LOCAL_REF_BOOL  ); break;
-		case TypeKind::Int   : emit(OpCode::GET_LOCAL_REF_INT   ); break;
-		case TypeKind::Double: emit(OpCode::GET_LOCAL_REF_DOUBLE); break;
-		case TypeKind::Vec2  : emit(OpCode::GET_LOCAL_REF_VEC2  ); break;
-		case TypeKind::Vec3  : emit(OpCode::GET_LOCAL_REF_VEC3  ); break;
-		default:
-			emit(OpCode::GET_LOCAL_REF);
-		}
+		emit(OpCode::GET_LOCAL_REF);
 		emitUint8((uint8_t)m_locals[index].slot);
 	}
 	else
@@ -875,18 +898,7 @@ Type Compiler::compileVariableRef(VariableExpr* expr)
 		index = resolveGlobal(expr->name);
 		returnType = prg.globals[index].type;
 
-		switch (returnType->kind)
-		{
-		case TypeKind::Bool  : emit(OpCode::GET_GLOBAL_REF_BOOL  ); break;
-		case TypeKind::Int   : emit(OpCode::GET_GLOBAL_REF_INT   ); break;
-		case TypeKind::Double: emit(OpCode::GET_GLOBAL_REF_DOUBLE); break;
-		case TypeKind::Vec2  : emit(OpCode::GET_GLOBAL_REF_VEC2  ); break;
-		case TypeKind::Vec3  : emit(OpCode::GET_GLOBAL_REF_VEC3  ); break;
-		default:
-			emit(OpCode::GET_GLOBAL_REF);
-			break;
-		}
-
+		emit(OpCode::GET_GLOBAL_REF);
 		emitUint8((uint8_t)prg.globals[index].slot);
 	}
 
@@ -974,7 +986,16 @@ Type Compiler::compileIndexRef(IndexExpr* expr)
 
 	compileExpression(expr->index.get());
 
-	emit(OpCode::GET_INDEX_REF);
+	switch (objectType->elementType->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::GET_INDEX_REF_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::GET_INDEX_REF_INT   ); break;
+	case TypeKind::Double: emit(OpCode::GET_INDEX_REF_DOUBLE); break;
+	case TypeKind::Vec2  : emit(OpCode::GET_INDEX_REF_VEC2  ); break;
+	case TypeKind::Vec3  : emit(OpCode::GET_INDEX_REF_VEC3  ); break;
+	default:
+		emit(OpCode::GET_INDEX_REF);
+	}
 
 	return objectType->elementType;
 }
@@ -1220,7 +1241,11 @@ std::vector<Type> Compiler::compileFncArgs(std::vector<std::unique_ptr<Expressio
 		if (copyArgs)
 		{
 			if (type->kind == TypeKind::Struct) emit(OpCode::COPY_STRUCT);
-			if (type->kind == TypeKind::Array ) emit(OpCode::COPY_ARRAY);
+			if (type->kind == TypeKind::Array)
+			{
+				emit(OpCode::COPY_ARRAY);
+				emitUint8(type->typeIndex);
+			}
 		}
 
 		argTypes.push_back(type);
@@ -1399,18 +1424,22 @@ Type Compiler::compileIndex(IndexExpr* expr)
 	if (indxType->kind != TypeKind::Int)
 		throw std::runtime_error("Array index must be a number.");
 
+	int stackEffect = -(int)exprType->size() + exprType->elementType->size();
+
 	switch (exprType->elementType->kind)
 	{
-	case TypeKind::Bool  : emit(OpCode::GET_INDEX_BOOL  ); break;
-	case TypeKind::Int   : emit(OpCode::GET_INDEX_INT   ); break;
-	case TypeKind::Double: emit(OpCode::GET_INDEX_DOUBLE); break;
-	case TypeKind::Vec2  : emit(OpCode::GET_INDEX_VEC2  ); break;
-	case TypeKind::Vec3  : emit(OpCode::GET_INDEX_VEC3  ); break;
-	case TypeKind::Array : emit(OpCode::GET_INDEX_ARRAY ); break;
-	case TypeKind::Struct: emit(OpCode::GET_INDEX_STRUCT); break;
+	case TypeKind::Bool  : emit(OpCode::GET_INDEX_BOOL  , stackEffect); break;
+	case TypeKind::Int   : emit(OpCode::GET_INDEX_INT   , stackEffect); break;
+	case TypeKind::Double: emit(OpCode::GET_INDEX_DOUBLE, stackEffect); break;
+	case TypeKind::Vec2  : emit(OpCode::GET_INDEX_VEC2  , stackEffect); break;
+	case TypeKind::Vec3  : emit(OpCode::GET_INDEX_VEC3  , stackEffect); break;
+	case TypeKind::Array : emit(OpCode::GET_INDEX_ARRAY , stackEffect); break;
+	case TypeKind::Struct: emit(OpCode::GET_INDEX_STRUCT, stackEffect); break;
 		default:
 		throw std::runtime_error("Unsupported array element type");
 	}
+
+	emitUint8(exprType->typeIndex);
 
 	return exprType->elementType;
 }

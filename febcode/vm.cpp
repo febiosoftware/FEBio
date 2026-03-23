@@ -56,22 +56,19 @@ const char* IPToString(uint8_t ip)
 		return "STRE";
 
 	case OpCode::GET_GLOBAL_REF: 
-	case OpCode::GET_GLOBAL_REF_BOOL: 
-	case OpCode::GET_GLOBAL_REF_INT: 
-	case OpCode::GET_GLOBAL_REF_DOUBLE: 
-	case OpCode::GET_GLOBAL_REF_VEC2: 
-	case OpCode::GET_GLOBAL_REF_VEC3: 
 		return "GREF";
 
 	case OpCode::GET_LOCAL_REF       :
-	case OpCode::GET_LOCAL_REF_BOOL  :
-	case OpCode::GET_LOCAL_REF_INT   :
-	case OpCode::GET_LOCAL_REF_DOUBLE:
-	case OpCode::GET_LOCAL_REF_VEC2  :
-	case OpCode::GET_LOCAL_REF_VEC3  :
 		return "LREF";
 
-	case OpCode::GET_INDEX_REF : return "IREF";
+	case OpCode::GET_INDEX_REF       : 
+	case OpCode::GET_INDEX_REF_BOOL  : 
+	case OpCode::GET_INDEX_REF_INT   : 
+	case OpCode::GET_INDEX_REF_DOUBLE: 
+	case OpCode::GET_INDEX_REF_VEC2  : 
+	case OpCode::GET_INDEX_REF_VEC3  : 
+		return "IREF";
+
 	case OpCode::GET_MEMBER_REF: return "MREF";
 
 	case OpCode::GET_LOCAL_BOOL  :
@@ -169,6 +166,7 @@ const char* IPToString(uint8_t ip)
 	case OpCode::POP_DOUBLE: 
 	case OpCode::POP_VEC2  : 
 	case OpCode::POP_VEC3  : 
+	case OpCode::POP_ARRAY : 
 		return "POP ";
 
 	case OpCode::GET_VEC2_X_REF: return "RV2X";
@@ -298,9 +296,10 @@ Value VM::execute()
 
 		case OpCode::GET_GLOBAL_ARRAY:
 		{
+			uint8_t typeIndex = readByte();
 			uint8_t slot = readByte();
-			const ArrayValuePtr& arr = m_stack[slot].arrayValue;
-			pushArray(arr);
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			copy(stackTop, slot, type->size());
 			break;
 		}
 
@@ -319,81 +318,13 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &m_stack[slot];
-			ref.ref.type = RefType::Value;
 
 			push(ref);
 			break;
 		}
 
-		case OpCode::GET_GLOBAL_REF_BOOL:
-		{
-			uint8_t slot = readByte();
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &m_stack[slot];
-			ref.ref.type = RefType::Value;
-
-			push(ref);
-			break;
-		}
-
-		case OpCode::GET_GLOBAL_REF_INT:
-		{
-			uint8_t slot = readByte();
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &m_stack[slot];
-			ref.ref.type = RefType::Value;
-
-			push(ref);
-			break;
-		}
-
-		case OpCode::GET_GLOBAL_REF_DOUBLE:
-		{
-			uint8_t slot = readByte();
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &m_stack[slot];
-			ref.ref.type = RefType::Value;
-
-			push(ref);
-			break;
-		}
-
-		case OpCode::GET_GLOBAL_REF_VEC2:
-		{
-			uint8_t slot = readByte();
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &m_stack[slot];
-			ref.ref.type = RefType::Vec2;
-
-			push(ref);
-			break;
-		}
-
-		case OpCode::GET_GLOBAL_REF_VEC3:
-		{
-			uint8_t slot = readByte();
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &m_stack[slot];
-			ref.ref.type = RefType::Vec3;
-
-			push(ref);
-			break;
-		}
 
 		case OpCode::GET_LOCAL_REF:
-		case OpCode::GET_LOCAL_REF_BOOL:
-		case OpCode::GET_LOCAL_REF_INT:
-		case OpCode::GET_LOCAL_REF_DOUBLE:
 		{
 			uint8_t slot = readByte();
 
@@ -402,37 +333,6 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &m_stack[frame.base + slot];
-			ref.ref.type = RefType::Value;
-
-			push(ref);
-			break;
-		}
-
-		case OpCode::GET_LOCAL_REF_VEC2:
-		{
-			uint8_t slot = readByte();
-
-			CallFrame& frame = currentFrame();
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &m_stack[frame.base + slot];
-			ref.ref.type = RefType::Vec2;
-
-			push(ref);
-			break;
-		}
-
-		case OpCode::GET_LOCAL_REF_VEC3:
-		{
-			uint8_t slot = readByte();
-
-			CallFrame& frame = currentFrame();
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &m_stack[frame.base + slot];
-			ref.ref.type = RefType::Vec3;
 
 			push(ref);
 			break;
@@ -450,7 +350,6 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &s->fields[memberIndex];
-			ref.ref.type = RefType::Value;
 
 			push(ref);
 			break;
@@ -469,7 +368,56 @@ Value VM::execute()
 			Value ref;
 			ref.index = ValueIndex::REF;
 			ref.ref.ptr = &s->elements[index];
-			ref.ref.type = RefType::Value;
+
+			push(ref);
+			break;
+		}
+
+		case OpCode::GET_INDEX_REF_BOOL:
+		case OpCode::GET_INDEX_REF_INT:
+		case OpCode::GET_INDEX_REF_DOUBLE:
+		{
+			const Value& indexVal = pop();
+			int index = getInt(indexVal);
+
+			const Value& objRef = pop();
+			Value* slot = (Value*)objRef.ref.ptr;
+
+			Value ref;
+			ref.index = ValueIndex::REF;
+			ref.ref.ptr = slot + index;
+
+			push(ref);
+			break;
+		}
+
+		case OpCode::GET_INDEX_REF_VEC2:
+		{
+			const Value& indexVal = pop();
+			int index = getInt(indexVal);
+
+			const Value& objRef = pop();
+			Value* slot = (Value*)objRef.ref.ptr;
+
+			Value ref;
+			ref.index = ValueIndex::REF;
+			ref.ref.ptr = slot + index * 2;
+
+			push(ref);
+			break;
+		}
+
+		case OpCode::GET_INDEX_REF_VEC3:
+		{
+			const Value& indexVal = pop();
+			int index = getInt(indexVal);
+
+			const Value& objRef = pop();
+			Value* slot = (Value*)objRef.ref.ptr;
+
+			Value ref;
+			ref.index = ValueIndex::REF;
+			ref.ref.ptr = slot + index * 3;
 
 			push(ref);
 			break;
@@ -478,14 +426,11 @@ Value VM::execute()
 		case OpCode::GET_VEC2_X_REF:
 		{
 			const Value& objRef = pop();
-			assert(objRef.ref.type == RefType::Vec2);
-
 			Value* v = (Value*)objRef.ref.ptr;
 
 			Value ref;
 			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &v->d;
-			ref.ref.type = RefType::Double;
+			ref.ref.ptr = v;
 
 			push(ref);
 			break;
@@ -493,13 +438,11 @@ Value VM::execute()
 		case OpCode::GET_VEC2_Y_REF:
 		{
 			const Value& objRef = pop();
-			assert(objRef.ref.type == RefType::Vec2);
 			Value* v = (Value*)objRef.ref.ptr;
 
 			Value ref;
 			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &(v+1)->d;
-			ref.ref.type = RefType::Double;
+			ref.ref.ptr = v+1;
 
 			push(ref);
 			break;
@@ -508,13 +451,11 @@ Value VM::execute()
 		case OpCode::GET_VEC3_X_REF:
 		{
 			const Value& objRef = pop();
-			assert(objRef.ref.type == RefType::Vec3);
 			Value* v = (Value*)objRef.ref.ptr;
 
 			Value ref;
 			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &v->d;
-			ref.ref.type = RefType::Double;
+			ref.ref.ptr = v;
 
 			push(ref);
 			break;
@@ -523,13 +464,11 @@ Value VM::execute()
 		case OpCode::GET_VEC3_Y_REF:
 		{
 			const Value& objRef = pop();
-			assert(objRef.ref.type == RefType::Vec3);
 			Value* v = (Value*)objRef.ref.ptr;
 
 			Value ref;
 			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &(v+1)->d;
-			ref.ref.type = RefType::Double;
+			ref.ref.ptr = v+1;
 
 			push(ref);
 			break;
@@ -538,13 +477,11 @@ Value VM::execute()
 		case OpCode::GET_VEC3_Z_REF:
 		{
 			const Value& objRef = pop();
-			assert(objRef.ref.type == RefType::Vec3);
 			Value* v = (Value*)objRef.ref.ptr;
 
 			Value ref;
 			ref.index = ValueIndex::REF;
-			ref.ref.ptr = &(v+2)->d;
-			ref.ref.type = RefType::Double;
+			ref.ref.ptr = v+2;
 
 			push(ref);
 			break;
@@ -572,10 +509,7 @@ Value VM::execute()
 		{
 			double d = popDouble();
 			const Ref& r = popRef();
-			if (r.type == RefType::Double)
-				*(double*)r.ptr = d;
-			else
-				*(Value*)r.ptr = d;
+			*(Value*)r.ptr = d;
 			pushDouble(d);
 			break;
 		}
@@ -584,13 +518,9 @@ Value VM::execute()
 		{
 			vec2 v = popVec2();
 			const Ref& r = popRef();
-			if (r.type == RefType::Vec2) {
-				double* xPtr = (double*)r.ptr;
-				xPtr[0] = v.x;
-				xPtr[1] = v.y;
-			}
-			else
-				*(Value*)r.ptr = v;
+			Value* xPtr = (Value*)r.ptr;
+			xPtr[0] = v.x;
+			xPtr[1] = v.y;
 			pushVec2(v);
 			break;
 		}
@@ -599,14 +529,10 @@ Value VM::execute()
 		{
 			vec3 v = popVec3();
 			const Ref& r = popRef();
-			if (r.type == RefType::Vec3) {
-				double* xPtr = (double*)r.ptr;
-				xPtr[0] = v.x;
-				xPtr[1] = v.y;
-				xPtr[2] = v.z;
-			}
-			else
-				*(Value*)r.ptr = v;
+			Value* xPtr = (Value*)r.ptr;
+			xPtr[0] = v.x;
+			xPtr[1] = v.y;
+			xPtr[2] = v.z;
 			pushVec3(v);
 			break;
 		}
@@ -659,8 +585,13 @@ Value VM::execute()
 
 		case OpCode::SET_GLOBAL_ARRAY:
 		{
+			uint8_t typeIndex = readByte();
 			uint8_t slot = readByte();
-			m_stack[slot] = peek();
+
+			Type type = m_program->types.getArrayType(typeIndex);
+			size_t arraySize = type->size();
+
+			copy(slot, (int)(stackTop - arraySize), (int)arraySize);
 			break;
 		}
 
@@ -713,9 +644,11 @@ Value VM::execute()
 
 		case OpCode::GET_LOCAL_ARRAY:
 		{
+			uint8_t typeIndex = readByte();
+			Type type = m_program->types.getArrayType(typeIndex);
 			uint8_t slot = readByte();
 			CallFrame& frame = currentFrame();
-			push(m_stack[frame.base + slot]);
+			copy(stackTop, frame.base + slot, type->size());
 			break;
 		}
 
@@ -880,9 +813,7 @@ Value VM::execute()
 
 		case OpCode::CREATE_VEC2:
 		{
-			double y = popDouble();
-			double x = popDouble();
-			pushVec2(vec2(x, y));
+			// Nothing to do here
 			break;
 		}
 		case OpCode::ADD_VEC2:
@@ -964,10 +895,7 @@ Value VM::execute()
 		}
 		case OpCode::CREATE_VEC3:
 		{
-			double z = popDouble();
-			double y = popDouble();
-			double x = popDouble();
-			pushVec3(vec3(x, y, z));
+			// Nothing to do here
 			break;
 		}
 		case OpCode::ADD_VEC3:
@@ -1194,31 +1122,13 @@ Value VM::execute()
 		}
 
 		case OpCode::CREATE_ARRAY: {
-			
-			uint8_t typeIndex = readByte();
-			auto arr = std::make_shared<ArrayValue>();
-
-			Type type = m_program->types.getArrayType(typeIndex);
-			int count = (int)type->arraySize;
-			arr->type = type;
-			arr->elements.resize(count);
-
-			for (int i = count - 1; i >= 0; --i) 
-			{
-				switch (type->elementType->kind)
-				{
-				case TypeKind::Vec2: arr->elements[i] = popVec2(); break;
-				case TypeKind::Vec3: arr->elements[i] = popVec3(); break;
-				default:
-					arr->elements[i] = pop();
-				}
-			}
-
-			push(arr);
+			// Nothing to do here since arrays are created on the stack.
+			readByte(); // type index
 			break;
 		}
 		case OpCode::COPY_ARRAY: {
-			const ArrayValue& arr = popArray();
+			uint8_t typeIndex = readByte();
+			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
 			auto obj = copyArray(arr);
 			push(obj);
 			break;
@@ -1226,7 +1136,8 @@ Value VM::execute()
 		case OpCode::GET_INDEX_BOOL:
 		{
 			int index = popInt();
-			const ArrayValue& arr = popArray();
+			uint8_t typeIndex = readByte();
+			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
 
 #ifndef  NDEBUG
 			if (index >= arr.size())
@@ -1240,7 +1151,8 @@ Value VM::execute()
 		case OpCode::GET_INDEX_INT:
 		{
 			int index = popInt();
-			const ArrayValue& arr = popArray();
+			uint8_t typeIndex = readByte();
+			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
 
 #ifndef  NDEBUG
 			if (index >= arr.size())
@@ -1254,7 +1166,8 @@ Value VM::execute()
 		case OpCode::GET_INDEX_DOUBLE:
 		{
 			int index = popInt();
-			const ArrayValue& arr = popArray();
+			uint8_t typeIndex = readByte();
+			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
 
 #ifndef  NDEBUG
 			if (index >= arr.size())
@@ -1268,7 +1181,8 @@ Value VM::execute()
 		case OpCode::GET_INDEX_VEC2:
 		{
 			int index = popInt();
-			const ArrayValue& arr = popArray();
+			uint8_t typeIndex = readByte();
+			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
 
 #ifndef  NDEBUG
 			if (index >= arr.size())
@@ -1282,7 +1196,8 @@ Value VM::execute()
 		case OpCode::GET_INDEX_VEC3:
 		{
 			int index = popInt();
-			const ArrayValue& arr = popArray();
+			uint8_t typeIndex = readByte();
+			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
 
 #ifndef  NDEBUG
 			if (index >= arr.size())
@@ -1294,17 +1209,34 @@ Value VM::execute()
 		}
 
 		case OpCode::GET_INDEX_ARRAY:
-		case OpCode::GET_INDEX_STRUCT:
 		{
 			int index = popInt();
-			const ArrayValue& arr = popArray();
+			uint8_t typeIndex = readByte();
+			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
 
 #ifndef  NDEBUG
 			if (index >= arr.size())
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			push(arr.elements[index]);
+			Value& element = arr.elements[index];
+			pushArray(*element.arrayValue); break;
+			break;
+		}
+
+		case OpCode::GET_INDEX_STRUCT:
+		{
+			int index = popInt();
+			uint8_t typeIndex = readByte();
+			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
+
+#ifndef  NDEBUG
+			if (index >= arr.size())
+				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
+
+			Value& element = arr.elements[index];
+			pushStruct(element.structValue); break;
 			break;
 		}
 
@@ -1374,6 +1306,14 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::POP_ARRAY:
+		{
+			uint8_t typeIndex = readByte();
+			Type type = m_program->types.getArrayType(typeIndex);
+			popValues(type->size());
+			break;
+		}
+
 		case OpCode::CALL:
 		{
 			uint8_t fnIndex = readByte();
@@ -1404,6 +1344,12 @@ Value VM::execute()
 				case TypeKind::Double: result = popDouble(); break;
 				case TypeKind::Vec2  : result = popVec2  (); break;
 				case TypeKind::Vec3  : result = popVec3  (); break;
+				case TypeKind::Array:
+				{
+					uint8_t typeIndex = readByte();
+					result = std::make_shared<ArrayValue>(popArray(m_program->types.getArrayType(typeIndex)));
+					break;
+				}
 				default:
 					result = pop();
 				}
@@ -1420,6 +1366,7 @@ Value VM::execute()
 			case TypeKind::Double: pushDouble(result.d); break;
 			case TypeKind::Vec2  : pushVec2  (result.vec2Value); break;
 			case TypeKind::Vec3  : pushVec3  (result.vec3Value); break;
+			case TypeKind::Array : pushArray (*result.arrayValue); break;
 			default:
 				push(result);
 			}
