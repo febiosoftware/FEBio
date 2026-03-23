@@ -254,7 +254,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::STORE_STRUCT:
 		return -1;
 
-	case OpCode::POP       : return -1;
+	case OpCode::POP_VOID  : return -1;
 	case OpCode::POP_BOOL  : return -1;
 	case OpCode::POP_INT   : return -1;
 	case OpCode::POP_DOUBLE: return -1;
@@ -350,7 +350,7 @@ void Compiler::compileExprStmt(ExpressionStmt* stmt)
 
 	switch (type->kind)
 	{
-	case TypeKind::Void  : emit(OpCode::POP       ); break;
+	case TypeKind::Void  : emit(OpCode::POP_VOID  ); break;
 	case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
 	case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
 	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
@@ -578,17 +578,35 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 
 void Compiler::compileIf(IfStmt* stmt)
 {
-	compileExpression(stmt->condition.get());
+	Type type = compileExpression(stmt->condition.get());
+	if (!isNumericType(type) && !isBoolType(type))
+		throw std::runtime_error("Condition expression must be of type bool.");
 
 	int thenJump = emitJump(OpCode::JUMP_IF_FALSE);
-	emit(OpCode::POP);
+
+	switch (type->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+	default:
+		throw std::runtime_error("Unsupported condition type in while statement");
+	}
 
 	compileStatement(stmt->thenBranch.get());
 
 	int elseJump = emitJump(OpCode::JUMP);
 
 	patchJump(thenJump);
-	emit(OpCode::POP);
+
+	switch (type->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+	default:
+		throw std::runtime_error("Unsupported condition type in while statement");
+	}
 
 	if (stmt->elseBranch)
 		compileStatement(stmt->elseBranch.get());
@@ -600,17 +618,27 @@ void Compiler::compileWhile(WhileStmt* stmt)
 {
 	int loopStart = (int)prg.code.size();
 
-	compileExpression(stmt->condition.get());
+	Type type = compileExpression(stmt->condition.get());
+	if (!isNumericType(type) && type != prg.types.getBoolType())
+		throw std::runtime_error("Condition expression must be of a numeric type or bool.");
 
 	int exitJump = emitJump(OpCode::JUMP_IF_FALSE);
-	emit(OpCode::POP);
+
+	switch (type->kind)
+	{
+	case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+	case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+	default:
+		throw std::runtime_error("Unsupported condition type in while statement");
+	}
 
 	compileStatement(stmt->body.get());
 
 	emitLoop(loopStart);
 
 	patchJump(exitJump);
-	emit(OpCode::POP);
+	emit(OpCode::POP_BOOL);
 }
 
 void Compiler::compileReturn(ReturnStmt* stmt)
@@ -888,8 +916,18 @@ Type Compiler::compileAssign(AssignExpr* expr)
 	case TypeKind::Double: emit(OpCode::STORE_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::STORE_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::STORE_VEC3  ); break;
-	case TypeKind::Array : emit(OpCode::STORE_ARRAY ); break;
-	case TypeKind::Struct: emit(OpCode::STORE_STRUCT); break;
+	case TypeKind::Array:
+	{
+		emit(OpCode::STORE_ARRAY);
+		emitUint8(l_type->size());
+		break;
+	}
+	case TypeKind::Struct:
+	{
+		emit(OpCode::STORE_STRUCT);
+		emitUint8(l_type->size());
+		break;
+	}
 	default:
 		throw std::runtime_error("Unsupported type in assignment");
 		break;
@@ -1073,7 +1111,16 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 			throw std::runtime_error("Cannot convert left operand of '&&' to boolean.");
 
 		int endJump = emitJump(OpCode::JUMP_IF_FALSE);
-		emit(OpCode::POP);
+
+		switch (type->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+		case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+		default:
+			throw std::runtime_error("Unsupported condition type in '&&' operator");
+		}
+
 		type = compileExpression(expr->right.get());
 		if (!isNumericType(type) && !isBoolType(type))
 			throw std::runtime_error("Cannot convert right operand of '&&' to boolean.");
@@ -1091,7 +1138,14 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 			throw std::runtime_error("Cannot convert left operand of '||' to boolean.");
 
 		int endJump = emitJump(OpCode::JUMP_IF_TRUE);
-		emit(OpCode::POP);
+		switch (type->kind)
+		{
+		case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+		case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+		case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+		default:
+			throw std::runtime_error("Unsupported condition type in || operator");
+		}
 
 		type = compileExpression(expr->right.get());
 		if (!isNumericType(type) && !isBoolType(type))

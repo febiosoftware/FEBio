@@ -159,7 +159,7 @@ namespace febcode
 		STORE_ARRAY,
 		STORE_STRUCT,
 
-		POP,
+		POP_VOID,
 		POP_BOOL,
 		POP_INT,
 		POP_DOUBLE,

@@ -271,6 +271,11 @@ namespace febcode
 			return m_stack[--stackTop];
 		}
 
+		void popVoid()
+		{
+			pop();
+		}
+
 		bool popBool()
 		{
 			return pop().b;
@@ -579,6 +584,7 @@ namespace febcode
 
 		std::vector<Value> m_stack;
 		size_t stackTop = 0;
+		Ref ref;
 
 		CallFrame m_frames[MAX_CALL_DEPTH];
 		size_t frameCount = 0;

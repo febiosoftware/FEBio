@@ -53,7 +53,7 @@ const char* IPToString(uint8_t ip)
 	case OpCode::STORE_VEC3  :
 	case OpCode::STORE_ARRAY :
 	case OpCode::STORE_STRUCT:
-		return "STRE";
+		return "STOR";
 
 	case OpCode::GET_GLOBAL_REF: 
 		return "GREF";
@@ -160,15 +160,14 @@ const char* IPToString(uint8_t ip)
 	case OpCode::LOOP          : return "LOOP";
 	case OpCode::CALL          : return "CALL";
 
-	case OpCode::POP       : 
-	case OpCode::POP_BOOL  : 
-	case OpCode::POP_INT   : 
-	case OpCode::POP_DOUBLE: 
-	case OpCode::POP_VEC2  : 
-	case OpCode::POP_VEC3  : 
-	case OpCode::POP_ARRAY : 
-	case OpCode::POP_STRUCT: 
-		return "POP ";
+	case OpCode::POP_VOID  : return "POPV";
+	case OpCode::POP_BOOL  : return "POPB";
+	case OpCode::POP_INT   : return "POPI";
+	case OpCode::POP_DOUBLE: return "POPD";
+	case OpCode::POP_VEC2  : return "POP2";
+	case OpCode::POP_VEC3  : return "POP3";
+	case OpCode::POP_ARRAY : return "POPA";
+	case OpCode::POP_STRUCT: return "POPS";	
 
 	case OpCode::GET_VEC2_X_REF: return "RV2X";
 	case OpCode::GET_VEC2_Y_REF: return "RV2Y";
@@ -189,11 +188,14 @@ const char* IPToString(uint8_t ip)
 	return "(UNKNOWN)";
 }
 
-void printStack(const std::vector<Value>& stack, int numGlobals, int stackSize)
+void printStack(const std::vector<Value>& stack, int numGlobals, int stackSize, Value* ref)
 {
 	std::cout << "Stack: [";
 	for (size_t i = 0; i < numGlobals; i++)
 	{
+		if (ref == &stack[i])
+			std::cout << "*";
+
 		std::cout << ValueToString(stack[i]);
 		if (i < numGlobals - 1)
 			std::cout << ",";
@@ -220,6 +222,7 @@ Value VM::execute()
 		throw std::runtime_error("No function to execute");
 
 	const size_t instructions = m_program->code.size();
+	ref.ptr = nullptr;
 
 	while (currentFrame().ip < instructions)
 	{
@@ -313,40 +316,26 @@ Value VM::execute()
 
 		case OpCode::GET_GLOBAL_REF:
 		{
+			assert(ref.ptr == nullptr); // make sure we don't overwrite an existing reference
 			uint8_t slot = readByte();
-
-			Ref ref;
 			ref.ptr = &m_stack[slot];
-
-			pushRef(ref);
 			break;
 		}
 
 		case OpCode::GET_LOCAL_REF:
 		{
+			assert(ref.ptr == nullptr); // make sure we don't overwrite an existing reference
 			uint8_t slot = readByte();
-
 			CallFrame& frame = currentFrame();
-
-			Ref ref;
 			ref.ptr = &m_stack[frame.base + slot];
-
-			pushRef(ref);
 			break;
 		}
 
 		case OpCode::GET_MEMBER_REF:
 		{
 			uint8_t offset = readByte();
-
-			const Value& objRef = pop();
-			Value* slot = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = slot + offset;
-
-			push(ref);
+			Value* slot = ref.ptr;
+			ref.ptr = slot + offset;
 			break;
 		}
 
@@ -355,14 +344,8 @@ Value VM::execute()
 			uint8_t elemSize = readByte();
 			int index = popInt();
 
-			const Value& objRef = pop();
-			Value* slot = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = slot + elemSize*index;
-
-			push(ref);
+			Value* slot = ref.ptr;
+			ref.ptr = slot + elemSize*index;
 			break;
 		}
 
@@ -373,14 +356,8 @@ Value VM::execute()
 			const Value& indexVal = pop();
 			int index = getInt(indexVal);
 
-			const Value& objRef = pop();
-			Value* slot = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = slot + index;
-
-			push(ref);
+			Value* slot = ref.ptr;
+			ref.ptr = slot + index;
 			break;
 		}
 
@@ -389,14 +366,8 @@ Value VM::execute()
 			const Value& indexVal = pop();
 			int index = getInt(indexVal);
 
-			const Value& objRef = pop();
-			Value* slot = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = slot + index * 2;
-
-			push(ref);
+			Value* slot = ref.ptr;
+			ref.ptr = slot + index * 2;
 			break;
 		}
 
@@ -405,139 +376,103 @@ Value VM::execute()
 			const Value& indexVal = pop();
 			int index = getInt(indexVal);
 
-			const Value& objRef = pop();
-			Value* slot = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = slot + index * 3;
-
-			push(ref);
+			Value* slot = ref.ptr;
+			ref.ptr = slot + index * 3;
 			break;
 		}
 
 		case OpCode::GET_VEC2_X_REF:
 		{
-			const Value& objRef = pop();
-			Value* v = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = v;
-
-			push(ref);
+			Value* v = ref.ptr;
+			ref.ptr = v;
 			break;
 		}
 		case OpCode::GET_VEC2_Y_REF:
 		{
-			const Value& objRef = pop();
-			Value* v = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = v+1;
-
-			push(ref);
+			Value* v = ref.ptr;
+			ref.ptr = v + 1;
 			break;
 		}
 
 		case OpCode::GET_VEC3_X_REF:
 		{
-			const Value& objRef = pop();
-			Value* v = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = v;
-
-			push(ref);
+			Value* v = ref.ptr;
+			ref.ptr = v;
 			break;
 		}
 
 		case OpCode::GET_VEC3_Y_REF:
 		{
-			const Value& objRef = pop();
-			Value* v = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = v+1;
-
-			push(ref);
+			Value* v = ref.ptr;
+			ref.ptr = v + 1;
 			break;
 		}
 
 		case OpCode::GET_VEC3_Z_REF:
 		{
-			const Value& objRef = pop();
-			Value* v = objRef.ref.ptr;
-
-			Value ref;
-			ref.index = ValueIndex::REF;
-			ref.ref.ptr = v+2;
-
-			push(ref);
+			Value* v = ref.ptr;
+			ref.ptr = v + 2;
 			break;
 		}
 
 		case OpCode::STORE_BOOL:
 		{
-			bool b = popBool();
-			const Ref& r = popRef();
-			*r.ptr = b;
-			pushBool(b);
+			bool b = peekBool();
+			*ref.ptr = b;
+			ref.ptr = nullptr;
 			break;
 		}
 
 		case OpCode::STORE_INT :
 		{
-			int n = popInt();
-			const Ref& r = popRef();
-			*r.ptr = n;
-			pushInt(n);
+			int n = peekInt();
+			*ref.ptr = n;
+			ref.ptr = nullptr;
 			break;
 		}
 
 		case OpCode::STORE_DOUBLE:
 		{
-			double d = popDouble();
-			const Ref& r = popRef();
-			*r.ptr = d;
-			pushDouble(d);
+			double d = peekDouble();
+			*ref.ptr = d;
+			ref.ptr = nullptr;
 			break;
 		}
 
 		case OpCode::STORE_VEC2:
 		{
-			vec2 v = popVec2();
-			const Ref& r = popRef();
-			Value* xPtr = r.ptr;
+			vec2 v = peekVec2();
+			Value* xPtr = ref.ptr;
 			xPtr[0] = v.x;
 			xPtr[1] = v.y;
-			pushVec2(v);
+			ref.ptr = nullptr;
 			break;
 		}
 
 		case OpCode::STORE_VEC3:
 		{
-			vec3 v = popVec3();
-			const Ref& r = popRef();
-			Value* xPtr = r.ptr;
+			vec3 v = peekVec3();
+			Value* xPtr = ref.ptr;
 			xPtr[0] = v.x;
 			xPtr[1] = v.y;
 			xPtr[2] = v.z;
-			pushVec3(v);
+			ref.ptr = nullptr;
 			break;
 		}
 
 		case OpCode::STORE_ARRAY:
+		{
+			uint8_t size = readByte();
+			memcpy(ref.ptr, m_stack.data() + (stackTop - size), size*sizeof(Value));
+			ref.ptr = nullptr;
+			break;
+		}
+
 		case OpCode::STORE_STRUCT:
 		{
-			const Value& value = pop();
-			const Value& ref = pop();
-			const Ref& r = ref.ref;
-			*r.ptr = value;
-			push(value);
+			uint8_t size = readByte();
+			memcpy(ref.ptr, m_stack.data() + (stackTop - size), size * sizeof(Value));
+			ref.ptr = nullptr;
 			break;
 		}
 
@@ -1246,9 +1181,9 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::POP:
+		case OpCode::POP_VOID:
 		{
-			pop();
+			popVoid();
 			break;
 		}
 
@@ -1364,7 +1299,7 @@ Value VM::execute()
 
 			if (m_debug)
 			{
-				printStack(m_stack, (int)globalStackSize, (int)stackTop);
+				printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 			}
 
 			if (frameCount == 0)
@@ -1379,7 +1314,7 @@ Value VM::execute()
 
 		if (m_debug && (instruction < (uint8_t)OpCode::RETURN_VOID))
 		{
-			printStack(m_stack, (int)globalStackSize, (int)stackTop);
+			printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 		}
 	}
 
