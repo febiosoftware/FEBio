@@ -226,15 +226,40 @@ namespace febcode
 				case TypeKind::Double: pushDouble(v.d); break;
 				case TypeKind::Vec2  : pushVec2  (v.vec2Value); break;
 				case TypeKind::Vec3  : pushVec3  (v.vec3Value); break;
+				case TypeKind::Array : pushArray (*v.arrayValue); break;
+				case TypeKind::Struct: pushStruct(*v.structValue); break;
 				default:
 					throw std::runtime_error("Unsupported array element type for push.");
 				};
 			}
 		}
 
-		void pushStruct(const StructValuePtr& arr)
+		void pushStruct(const StructValue& obj)
 		{
-			push(arr);
+			for (int i=0; i<obj.fields.size(); ++i)
+			{
+				const Value& field = obj.fields[i];
+				switch (obj.type->fields[i].first->kind)
+				{
+				case TypeKind::Bool  : pushBool  (field.b); break;
+				case TypeKind::Int   : pushInt   (field.i); break;
+				case TypeKind::Double: pushDouble(field.d); break;
+				case TypeKind::Vec2  : pushVec2  (field.vec2Value); break;
+				case TypeKind::Vec3  : pushVec3  (field.vec3Value); break;
+				case TypeKind::Array : pushArray (*field.arrayValue); break;
+				case TypeKind::Struct: pushStruct(*field.structValue); break;
+				default:
+					throw std::runtime_error("Unsupported field type in pushStruct.");
+				}
+			}
+		}
+
+		void pushRef(const Ref& ref)
+		{
+			Value v;
+			v.index = ValueIndex::REF;
+			v.ref = ref;
+			push(v);
 		}
 
 		const Value& pop()
@@ -298,8 +323,8 @@ namespace febcode
 				case TypeKind::Double: arr.elements[i] = popDouble(); break;
 				case TypeKind::Vec2  : arr.elements[i] = popVec2(); break;
 				case TypeKind::Vec3  : arr.elements[i] = popVec3(); break;
-				case TypeKind::Array : arr.elements[i] = std::make_shared<ArrayValue>(popArray(type->elementType)); break;
-				case TypeKind::Struct: arr.elements[i] = std::make_shared<StructValue>(popStruct()); break;
+				case TypeKind::Array : arr.elements[i] = std::make_shared<ArrayValue >(popArray(type->elementType)); break;
+				case TypeKind::Struct: arr.elements[i] = std::make_shared<StructValue>(popStruct(type->elementType)); break;
 				default:
 					throw std::runtime_error("Unsupported array element type for pop.");
 				};
@@ -307,9 +332,29 @@ namespace febcode
 			return arr;
 		}
 
-		const StructValue& popStruct()
+		StructValue popStruct(Type type)
 		{
-			return getStruct(pop());
+			assert(type->kind == TypeKind::Struct);
+			StructValue obj;
+			obj.type = type;
+			obj.fields.resize(type->fields.size());
+			for (int i = (int)type->fields.size() - 1; i >= 0; --i)
+			{
+				Value& field = obj.fields[i];
+				switch (type->fields[i].first->kind)
+				{
+				case TypeKind::Bool  : field = popBool(); break;
+				case TypeKind::Int   : field = popInt(); break;
+				case TypeKind::Double: field = popDouble(); break;
+				case TypeKind::Vec2  : field = popVec2(); break;
+				case TypeKind::Vec3  : field = popVec3(); break;
+				case TypeKind::Array : field = std::make_shared<ArrayValue >(popArray (type->fields[i].first)); break;
+				case TypeKind::Struct: field = std::make_shared<StructValue>(popStruct(type->fields[i].first)); break;
+				default:
+					throw std::runtime_error("Unsupported array element type for pop.");
+				};
+			}
+			return obj;
 		}
 
 		const Ref& popRef()
@@ -354,25 +399,17 @@ namespace febcode
 		ArrayValue peekArray(Type type)
 		{
 			assert(type->kind == TypeKind::Array);
-			ArrayValue arr;
-			arr.type = type;
-			arr.elements.resize(type->size());
 			int c = (int)(stackTop - type->size());
-			for (int i = 0; i < arr.size(); ++i)
-			{
-				switch (type->elementType->kind)
-				{
-				case TypeKind::Bool  : arr.elements[i] = m_stack[c].b; break;
-				case TypeKind::Int   : arr.elements[i] = m_stack[c].i; break;
-				case TypeKind::Double: arr.elements[i] = m_stack[c].d; break;
-				case TypeKind::Vec2  : arr.elements[i] = vec2(m_stack[c].d, m_stack[c + 1].d); break;
-				case TypeKind::Vec3  : arr.elements[i] = vec3(m_stack[c].d, m_stack[c + 1].d, m_stack[c + 2].d); break;
-				default:
-					throw std::runtime_error("Unsupported array element type for peek.");
-				};
-				c += (int)type->elementType->size();
-			}
+			ArrayValue arr = getArrayAt(c, type);
 			return arr;
+		}
+
+		StructValue peekStruct(Type type)
+		{
+			assert(type->kind == TypeKind::Struct);
+			int c = (int)(stackTop - type->size());
+			StructValue obj = getStructAt(c, type);
+			return obj;
 		}
 
 		void setBoolAt(int slot, bool b)
@@ -471,6 +508,33 @@ namespace febcode
 				c += (int)type->elementType->size();
 			}
 			return arr;
+		}
+
+		StructValue getStructAt(int slot, Type type)
+		{
+			assert(type->kind == TypeKind::Struct);
+			StructValue obj;
+			obj.type = type;
+			obj.fields.resize(type->fields.size());
+			int c = slot;
+			for (int i = 0; i < type->fields.size(); ++i)
+			{
+				Value& field = obj.fields[i];
+				switch (type->fields[i].first->kind)
+				{
+				case TypeKind::Bool  : field = getBoolAt  (c); break;
+				case TypeKind::Int   : field = getIntAt   (c); break;
+				case TypeKind::Double: field = getDoubleAt(c); break;
+				case TypeKind::Vec2  : field = getVec2At  (c); break;
+				case TypeKind::Vec3  : field = getVec3At  (c); break;
+				case TypeKind::Array : field = std::make_shared<ArrayValue >(getArrayAt (c, type->fields[i].first)); break;
+				case TypeKind::Struct: field = std::make_shared<StructValue>(getStructAt(c, type->fields[i].first)); break;
+				default:
+					throw std::runtime_error("Unsupported type in getStrucAt");
+				}
+				c += (int)type->elementType->size();
+			}
+			return obj;
 		}
 
 		void copy(int dest, int src, int size)

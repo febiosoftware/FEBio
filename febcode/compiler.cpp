@@ -57,8 +57,12 @@ void Compiler::endScope()
 			emit(OpCode::POP_ARRAY, local.type->size());
 			emitUint8(local.type->typeIndex);
 			break;
+		case TypeKind::Struct:
+			emit(OpCode::POP_STRUCT, local.type->size());
+			emitUint8(local.type->typeIndex);
+		break;		
 		default:
-			emit(OpCode::POP);
+			throw std::runtime_error("Unknown type kind in endScope.");
 			break;
 		}
 
@@ -124,7 +128,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_GLOBAL_VEC2  : return +2;
 	case OpCode::GET_GLOBAL_VEC3  : return +3;
 	case OpCode::GET_GLOBAL_ARRAY : return +arg;
-	case OpCode::GET_GLOBAL_STRUCT: return +1;
+	case OpCode::GET_GLOBAL_STRUCT: return +arg;
 
 	case OpCode::SET_GLOBAL_BOOL: 
 	case OpCode::SET_GLOBAL_INT: 
@@ -143,11 +147,11 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_LOCAL_VEC2  : return +2;
 	case OpCode::GET_LOCAL_VEC3  : return +3;
 	case OpCode::GET_LOCAL_ARRAY : return +arg;
-	case OpCode::GET_LOCAL_STRUCT: return +1;
+	case OpCode::GET_LOCAL_STRUCT: return +arg;
 
 	case OpCode::GET_LOCAL_REF       : return +1;
 
-	case OpCode::CREATE_STRUCT: return -arg + 1;
+	case OpCode::CREATE_STRUCT: return 0;
 	case OpCode::COPY_STRUCT: return 0;
 
 	case OpCode::GET_PROPERTY_BOOL  : return +1;
@@ -257,6 +261,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::POP_VEC2  : return -2;
 	case OpCode::POP_VEC3  : return -3;
 	case OpCode::POP_ARRAY : return -arg;
+	case OpCode::POP_STRUCT: return -arg;
 
 	case OpCode::CALL: return -arg + 1; // TODO: This is not correct anymore!
 
@@ -309,14 +314,13 @@ void Compiler::emitLoop(int loopStart)
 void Compiler::compile()
 {
 	prg.functions[0].entry = 0;
+	hasReturn = false;
 
 	for (auto& stmt : prg.ast->root.statements)
 		compileStatement(stmt.get());
 
-	// only add return if the last instruction isn't already a return (e.g. from a function)
-	// TODO: I need to revist this logic. The problem is when an array is returned, the last 
-	// instruction is the array size. This will add another return.
-	if (prg.code.empty() || (prg.code.back() < (uint8_t)OpCode::RETURN_VOID) || (prg.code.back() >= (uint8_t)OpCode::LAST_OPCODE))
+	// only add return if no return was encountered.
+	if (!hasReturn)
 		emit(OpCode::RETURN_VOID);
 
 	prg.maxStackSize = maxStackDepth;
@@ -346,6 +350,7 @@ void Compiler::compileExprStmt(ExpressionStmt* stmt)
 
 	switch (type->kind)
 	{
+	case TypeKind::Void  : emit(OpCode::POP       ); break;
 	case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
 	case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
 	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
@@ -355,8 +360,12 @@ void Compiler::compileExprStmt(ExpressionStmt* stmt)
 		emit(OpCode::POP_ARRAY, type->size());
 		emitUint8(type->typeIndex);
 		break;
+	case TypeKind::Struct: 
+		emit(OpCode::POP_STRUCT, type->size());
+		emitUint8(type->typeIndex);
+		break;
 	default:
-		emit(OpCode::POP);
+		throw std::runtime_error("Unsupported expression type in expression statement");
 	}
 }
 
@@ -384,8 +393,7 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 				compileInitializer(init->elements[i].get(), fieldType);
 			}
 
-			emit(OpCode::CREATE_STRUCT, (int)expectedType->fields.size());
-			emitUint8(static_cast<uint8_t>(expectedType->typeIndex));
+			emit(OpCode::CREATE_STRUCT);
 		}
 		else
 		{
@@ -410,8 +418,7 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 				compileInitializer(init->elements[i].get(), arrayType);
 			}
 
-			emit(OpCode::CREATE_ARRAY, (int)expectedType->arraySize);
-			emitUint8(static_cast<uint8_t>(expectedType->typeIndex));
+			emit(OpCode::CREATE_ARRAY);
 		}
 		else
 		{
@@ -509,10 +516,13 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 				case TypeKind::Vec2  : emit(OpCode::SET_GLOBAL_VEC2  ); break;
 				case TypeKind::Vec3  : emit(OpCode::SET_GLOBAL_VEC3  ); break;
 				case TypeKind::Array : 
-					emit(OpCode::SET_GLOBAL_ARRAY ); 
-					emitUint8(type->typeIndex);
+					emit(OpCode::SET_GLOBAL_ARRAY);
+					emitUint8(type->size());
 					break;
-				case TypeKind::Struct: emit(OpCode::SET_GLOBAL_STRUCT); break;
+				case TypeKind::Struct:
+					emit(OpCode::SET_GLOBAL_STRUCT);
+					emitUint8(type->size());
+					break;
 				default:
 					throw std::runtime_error("Unsupported global variable type");
 				}
@@ -530,8 +540,12 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					emit(OpCode::POP_ARRAY, type->size());
 					emitUint8(type->typeIndex);
 					break;
+				case TypeKind::Struct:
+					emit(OpCode::POP_STRUCT, type->size());
+					emitUint8(type->typeIndex);
+					break;
 				default:
-					emit(OpCode::POP);
+					throw std::runtime_error("Unsupported global variable type");
 				}
 			}
 		}
@@ -628,7 +642,10 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 			emit(OpCode::RETURN_ARRAY ); 
 			emitUint8(returnType->typeIndex);
 			break;
-		case TypeKind::Struct: emit(OpCode::RETURN_STRUCT); break;
+		case TypeKind::Struct: 
+			emit(OpCode::RETURN_STRUCT); 
+			emitUint8(returnType->typeIndex);
+			break;
 		default:
 			throw std::runtime_error("Unsupported return type");
 		};
@@ -643,6 +660,9 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 		emit(OpCode::RETURN_VOID);
 	}
 
+	// Mark that a return statement was encountered. 
+	// This is used to determine whether we need to emit an implicit return at the end of a function/program.
+	hasReturn = true;
 }
 
 void Compiler::compileStruct(StructStmt* stmt)
@@ -673,6 +693,8 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	Type currentReturnType = expectedReturnType;
 	expectedReturnType = fn->returnType;
+	bool hasReturnBefore = hasReturn;
+	hasReturn = false;
 
 	beginScope();
 
@@ -691,7 +713,7 @@ void Compiler::compileFunction(FunctionStmt* fn)
 	for (auto& stmt : body->statements)
 		compileStatement(stmt.get());
 
-	if (prg.code.empty() || (prg.code.back() < (uint8_t)OpCode::RETURN_VOID) || (prg.code.back() >= (uint8_t)OpCode::LAST_OPCODE))
+	if (!hasReturn)
 	{
 		if (fn->returnType != nullptr && fn->returnType != prg.types.getVoidType())
 			throw std::runtime_error("Missing return statement in function with non-void return type.");
@@ -715,8 +737,12 @@ void Compiler::compileFunction(FunctionStmt* fn)
 			emit(OpCode::POP_ARRAY, local.type->size()); 
 			emitUint8(local.type->typeIndex);
 			break;
+		case TypeKind::Struct:
+			emit(OpCode::POP_STRUCT, local.type->size());
+			emitUint8(local.type->typeIndex);
+			break;
 		default:
-			emit(OpCode::POP);
+			throw std::runtime_error("Unsupported local variable type");
 			break;
 		}
 		m_locals.pop_back();
@@ -728,6 +754,7 @@ void Compiler::compileFunction(FunctionStmt* fn)
 	patchJump(jumpOver);
 
 	expectedReturnType = currentReturnType;
+	hasReturn = hasReturnBefore;
 
 	prg.functions[fnIndex].maxStackSize = maxStackDepth - currentStackSize;
 
@@ -790,10 +817,15 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		case TypeKind::Array:
 		{
 			emit(OpCode::GET_LOCAL_ARRAY, type->size()); 
-			emitUint8(type->typeIndex);
+			emitUint8(type->size());
 			break;
 		}
-		case TypeKind::Struct: emit(OpCode::GET_LOCAL_STRUCT); break;
+		case TypeKind::Struct:
+		{
+			emit(OpCode::GET_LOCAL_STRUCT, type->size());
+			emitUint8(type->size());
+			break;
+		}
 		default:
 			throw std::runtime_error("Unsupported local variable type");
 		}
@@ -824,10 +856,15 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	case TypeKind::Array:
 	{
 		emit(OpCode::GET_GLOBAL_ARRAY, glob.type->size()); 
-		emitUint8(glob.type->typeIndex);
+		emitUint8(glob.type->size());
 		break;
 	}
-	case TypeKind::Struct: emit(OpCode::GET_GLOBAL_STRUCT); break;
+	case TypeKind::Struct:
+	{
+		emit(OpCode::GET_GLOBAL_STRUCT, glob.type->size());
+		emitUint8(glob.type->size());
+		break;
+	}
 	default:
 		throw std::runtime_error("Unsupported global variable type");
 	}
@@ -910,10 +947,11 @@ Type Compiler::compileMemberRef(MemberExpr* expr)
 	Type objectType = compileLValue(expr->object.get());
 	if (isStructType(objectType))
 	{
-		int memberIndex = resolveMember(objectType, expr->property);
+		int memberIndex  = resolveMember(objectType, expr->property);
+		int memberOffset = resolveMemberOffset(objectType, expr->property);
 
 		emit(OpCode::GET_MEMBER_REF);
-		emitUint8((uint8_t)memberIndex);
+		emitUint8((uint8_t)memberOffset);
 
 		return memberType(objectType, memberIndex);
 	}
@@ -969,6 +1007,19 @@ int Compiler::resolveMember(Type type, const std::string& member)
 	throw std::runtime_error("Struct '" + TypeToString(type) + "' has no member named '" + member + "'.");
 }
 
+int Compiler::resolveMemberOffset(Type type, const std::string& member)
+{
+	assert(type->kind == TypeKind::Struct);
+	int offset = 0;
+	for (size_t i = 0; i < type->fields.size(); ++i)
+	{
+		if (type->fields[i].second == member)
+			return offset;
+		offset += (int)type->fields[i].first->size();
+	}
+	throw std::runtime_error("Struct '" + TypeToString(type) + "' has no member named '" + member + "'.");
+}
+
 Type Compiler::memberType(Type type, int memberIndex)
 {
 	assert(type->kind == TypeKind::Struct);
@@ -993,8 +1044,13 @@ Type Compiler::compileIndexRef(IndexExpr* expr)
 	case TypeKind::Double: emit(OpCode::GET_INDEX_REF_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::GET_INDEX_REF_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::GET_INDEX_REF_VEC3  ); break;
-	default:
+	case TypeKind::Array : 
+	case TypeKind::Struct: 
 		emit(OpCode::GET_INDEX_REF);
+		emitUint8(objectType->elementType->size());
+		break;
+	default:
+		throw std::runtime_error("Unsupported array element type in index access");
 	}
 
 	return objectType->elementType;
@@ -1241,11 +1297,7 @@ std::vector<Type> Compiler::compileFncArgs(std::vector<std::unique_ptr<Expressio
 		if (copyArgs)
 		{
 			if (type->kind == TypeKind::Struct) emit(OpCode::COPY_STRUCT);
-			if (type->kind == TypeKind::Array)
-			{
-				emit(OpCode::COPY_ARRAY);
-				emitUint8(type->typeIndex);
-			}
+			if (type->kind == TypeKind::Array ) emit(OpCode::COPY_ARRAY);
 		}
 
 		argTypes.push_back(type);
@@ -1319,6 +1371,7 @@ Type Compiler::compileMember(MemberExpr* expr)
 			throw std::runtime_error("Unsupported struct member type");
 		}
 
+		emitUint8((uint8_t)type->typeIndex);
 		emitUint8((uint8_t)index);
 
 		return it->first;

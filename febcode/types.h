@@ -19,8 +19,10 @@ namespace febcode
 		Struct,
 	};
 
+	struct Value;
+
 	struct Ref {
-		void* ptr;
+		Value* ptr;
 		Ref() : ptr(nullptr) {}
 	};
 
@@ -102,7 +104,7 @@ namespace febcode
 					size_t totalSize = 0;
 					for (const auto& field : fields)
 						totalSize += field.first->size();
-					return 1;// totalSize;
+					return totalSize;
 				}
 			default:
 				throw std::runtime_error("Unknown type kind.");

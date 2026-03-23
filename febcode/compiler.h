@@ -166,6 +166,7 @@ namespace febcode
 		POP_VEC2,
 		POP_VEC3,
 		POP_ARRAY,
+		POP_STRUCT,
 
 		CALL,		// call function
 
@@ -241,6 +242,7 @@ namespace febcode
 		Type compileIndexRef(IndexExpr* expr);
 
 		int resolveMember(Type type, const std::string& member);
+		int resolveMemberOffset(Type type, const std::string& member);
 		Type memberType(Type type, int memberIndex);
 
 		void compileInitializer(Expression* expr, Type expectedType);
@@ -264,6 +266,7 @@ namespace febcode
 	private:
 		Program& prg;
 
+		bool hasReturn = false; // see if the program or function has an explicit return statement. If not, we will add a default return at the end.
 		Type expectedReturnType = nullptr;
 
 		std::vector<Local> m_locals;
