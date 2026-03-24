@@ -221,7 +221,7 @@ double FECodeValuator::operator()(const FEMaterialPoint& pt)
 	return febcode::getDouble(v);
 }
 
-double FECodeValuator::run(const FEMaterialPoint& pt, std::vector < std::pair<int, double>>& globals) const
+double FECodeValuator::run(const FEMaterialPoint& pt, const std::vector<int>& slots, const std::vector<double>& values) const
 {
 	thread_local febcode::VM vm;
 	vm.setProgram(m.program);
@@ -236,10 +236,10 @@ double FECodeValuator::run(const FEMaterialPoint& pt, std::vector < std::pair<in
 			vm.setGlobal(m.globals[2].slot, febcode::vec3(n.x, n.y, n.z));
 		}
 	}
-	for (int i = 0; i < globals.size(); ++i)
+	for (int i = 0; i < slots.size(); ++i)
 	{
-		if (globals[i].first >= 0)
-			vm.setGlobal(globals[i].first, globals[i].second);
+		if (slots[i] >= 0)
+			vm.setGlobal(slots[i], values[i]);
 	}
 	febcode::Value v = vm.run();
 	return febcode::getDouble(v);

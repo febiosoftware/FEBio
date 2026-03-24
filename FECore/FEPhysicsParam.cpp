@@ -96,15 +96,7 @@ double FEPhysicsParam::Value(const FEMaterialPoint& pt, const std::vector<double
 {
 	if (m.code)
 	{
-		thread_local std::vector<std::pair<int, double>> globals;
-		globals.resize(vars.size());
-		for (int i = 0; i < m.slots.size(); ++i)
-		{
-			globals[i].first = m.slots[i];
-			globals[i].second = vars[i];
-		}
-
-		double r = m.code->run(pt, globals);
+		double r = m.code->run(pt, m.slots, vars);
 		return m_scl*r;
 	}
 	else
@@ -122,15 +114,7 @@ double FEPhysicsParam::DerivValue(const FEMaterialPoint& pt, const std::vector<d
 			return 0.0;
 		}
 
-		thread_local std::vector<std::pair<int, double>> globals;
-		globals.resize(deriv_i.slots.size());
-		for (int i = 0; i < deriv_i.slots.size(); ++i)
-		{
-			globals[i].first = deriv_i.slots[i];
-			globals[i].second = vars[i];
-		}
-
-		double dr = deriv_i.derivVal->run(pt, globals);
+		double dr = deriv_i.derivVal->run(pt, deriv_i.slots, vars);
 		return m_scl*dr;
 	}
 	return 0.0;

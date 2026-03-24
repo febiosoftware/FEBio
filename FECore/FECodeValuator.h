@@ -56,7 +56,7 @@ public:
 	double* constValue() override { return nullptr; }
 	void Serialize(DumpStream& ar) override;
 
-	double run(const FEMaterialPoint& pt, std::vector < std::pair<int, double>>& globals) const;
+	double run(const FEMaterialPoint& pt, const std::vector<int>& slots, const std::vector<double>& values) const;
 
 private:
 	bool CompileScript();

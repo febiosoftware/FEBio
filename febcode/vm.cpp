@@ -218,20 +218,21 @@ Value VM::execute()
 
 	const size_t instructions = m_program->code.size();
 	ref.ptr = nullptr;
+	const uint8_t* lastIP = m_program->code.data() + instructions;
 
-	while (ip < instructions)
+	while (ip < lastIP)
 	{
-		uint8_t instruction = readByte();
+		OpCode instruction = (OpCode)readByte();
 
 #ifndef NDEBUG
 		if (m_debug)
 		{
 			std::cout << "IP: " << std::setw(4) << ip - 1;
-			std::cout << " | Executing: " << IPToString(instruction) << " | ";
+			std::cout << " | Executing: " << IPToString((uint8_t)instruction) << " | ";
 		}
 #endif
 
-		switch ((OpCode)instruction)
+		switch (instruction)
 		{
 		case OpCode::PUSH_VOID:
 		{
@@ -284,14 +285,17 @@ Value VM::execute()
 		case OpCode::GET_GLOBAL_VEC2:
 		{
 			uint8_t slot = readByte();
-			pushVec2(getVec2At(slot));
+			pushDouble(m_stack[slot]);
+			pushDouble(m_stack[slot + 1]);
 			break;
 		}
 
 		case OpCode::GET_GLOBAL_VEC3:
 		{
 			uint8_t slot = readByte();
-			pushVec3(getVec3At(slot));
+			pushDouble(m_stack[slot  ]);
+			pushDouble(m_stack[slot+1]);
+			pushDouble(m_stack[slot+2]);
 			break;
 		}
 
@@ -427,8 +431,7 @@ Value VM::execute()
 
 		case OpCode::STORE_DOUBLE:
 		{
-			double d = peekDouble();
-			*ref.ptr = d;
+			*ref.ptr = peek();
 			ref.ptr = nullptr;
 			break;
 		}
@@ -487,7 +490,7 @@ Value VM::execute()
 		case OpCode::SET_GLOBAL_DOUBLE:
 		{
 			uint8_t slot = readByte();
-			setDoubleAt(slot, peekDouble());
+			m_stack[slot] = peek();
 			break;
 		}
 
@@ -587,77 +590,46 @@ Value VM::execute()
 			pushInt(-a);
 			break;
 		}
+
 		case OpCode::ADD_INT:
-		{
-			int b = popInt();
-			int a = popInt();
-			pushInt(a + b);
-			break;
-		}
 		case OpCode::SUB_INT:
-		{
-			int b = popInt();
-			int a = popInt();
-			pushInt(a - b);
-			break;
-		}
 		case OpCode::MUL_INT:
-		{
-			int b = popInt();
-			int a = popInt();
-			pushInt(a * b);
-			break;
-		}
 		case OpCode::DIV_INT:
-		{
-			int b = popInt();
-			int a = popInt();
-			if (b == 0)
-				throw std::runtime_error("division by zero.");
-			pushInt(a / b);
-			break;
-		}
 		case OpCode::EXP_INT:
-		{
-			int b = popInt();
-			int a = popInt();
-
-			if (b < 0)
-				throw std::runtime_error("Negative exponent not supported for integers.");
-
-			pushInt(ipow(a, b));
-			break;
-		}
 		case OpCode::GT_INT:
-		{
-			int b = popInt();
-			int a = popInt();
-			pushBool(a > b);
-			break;
-		}
 		case OpCode::LT_INT:
-		{
-			int b = popInt();
-			int a = popInt();
-			pushBool(a < b);
-			break;
-		}
 		case OpCode::GE_INT:
-		{
-			int b = popInt();
-			int a = popInt();
-			pushBool(a >= b);
-			break;
-		}
 		case OpCode::LE_INT:
 		{
 			int b = popInt();
 			int a = popInt();
-			pushBool(a <= b);
+
+			switch (instruction)
+			{
+			case OpCode::ADD_INT: pushInt(a + b); break;
+			case OpCode::SUB_INT: pushInt(a - b); break;
+			case OpCode::MUL_INT: pushInt(a * b); break;
+			case OpCode::DIV_INT:
+				if (b == 0)
+					throw std::runtime_error("division by zero.");
+				pushInt(a / b);
+				break;
+			case OpCode::EXP_INT:
+				if (b < 0)
+					throw std::runtime_error("Negative exponent not supported for integers.");
+
+				pushInt(ipow(a, b));
+				break;
+			case OpCode::GT_INT: pushBool(a > b); break;
+			case OpCode::LT_INT: pushBool(a < b); break;
+			case OpCode::GE_INT: pushBool(a >= b); break;
+			case OpCode::LE_INT: pushBool(a <= b); break;
+			}
+
 			break;
 		}
 
-		// Double operators
+		// Double unary operators
 		case OpCode::NEG_DOUBLE:
 		{
 			double a = popDouble();
@@ -665,91 +637,52 @@ Value VM::execute()
 			break;
 		}
 
+		// double binary operators
 		case OpCode::ADD_DOUBLE:
-		{
-			double b = popDouble();
-			double a = popDouble();
-			pushDouble(a + b);
-			break;
-		}
 		case OpCode::SUB_DOUBLE:
-		{
-			double b = popDouble();
-			double a = popDouble();
-			pushDouble(a - b);
-			break;
-		}
 		case OpCode::MUL_DOUBLE:
-		{
-			double b = popDouble();
-			double a = popDouble();
-			pushDouble(a * b);
-			break;
-		}
 		case OpCode::DIV_DOUBLE:
-		{
-			double b = popDouble();
-			double a = popDouble();
-			if (b == 0.0)
-				throw std::runtime_error("division by zero.");
-			pushDouble(a / b);
-			break;
-		}
 		case OpCode::EXP_DOUBLE:
-		{
-			double b = popDouble();
-			double a = popDouble();
-			pushDouble(std::pow(a, b));
-			break;
-		}
 		case OpCode::GT_DOUBLE:
-		{
-			double b = popDouble();
-			double a = popDouble();
-			pushBool(a > b);
-			break;
-		}
 		case OpCode::LT_DOUBLE:
-		{
-			double b = popDouble();
-			double a = popDouble();
-			pushBool(a < b);
-			break;
-		}
 		case OpCode::GE_DOUBLE:
-		{
-			double b = popDouble();
-			double a = popDouble();
-			pushBool(a >= b);
-			break;
-		}
 		case OpCode::LE_DOUBLE:
 		{
 			double b = popDouble();
 			double a = popDouble();
-			pushBool(a <= b);
+
+			switch (instruction)
+			{
+			case OpCode::ADD_DOUBLE: pushDouble(a + b); break;
+			case OpCode::SUB_DOUBLE: pushDouble(a - b); break;
+			case OpCode::MUL_DOUBLE: pushDouble(a * b); break;
+			case OpCode::EXP_DOUBLE: pushDouble(std::pow(a, b)); break;
+			case OpCode::DIV_DOUBLE: 
+				if (b == 0.0)
+					throw std::runtime_error("division by zero.");
+				pushDouble(a / b); 
+				break;
+			case OpCode::GT_DOUBLE: pushBool(a > b); break;
+			case OpCode::LT_DOUBLE: pushBool(a < b); break;
+			case OpCode::GE_DOUBLE: pushBool(a >= b); break;
+			case OpCode::LE_DOUBLE: pushBool(a <= b); break;
+			}
 			break;
 		}
 
 		case OpCode::ADD_VEC2:
-		{
-			popVec2_1();
-			popVec2_0();
-			pushVec2(vec2_0 + vec2_1);
-			break;
-		}
 		case OpCode::SUB_VEC2:
-		{
-			popVec2_1();
-			popVec2_0();
-			pushVec2(vec2_0 - vec2_1);
-			break;
-		}
 		case OpCode::DOT_VEC2:
 		{
 			popVec2_1();
 			popVec2_0();
-			pushDouble(vec2_0 * vec2_1);
+
+			switch (instruction)
+			{
+			case OpCode::ADD_VEC2: pushVec2(vec2_0 + vec2_1); break;
+			case OpCode::SUB_VEC2: pushVec2(vec2_0 - vec2_1); break;
+			case OpCode::DOT_VEC2: pushDouble(vec2_0 * vec2_1); break;
+			}
 			break;
 		}
 		case OpCode::MUL_VEC2_DOUBLE:
@@ -766,16 +699,16 @@ Value VM::execute()
 			pushVec2(vec2_0 * scalar);
 			break;
 		}
+
 		case OpCode::GET_VEC2_X:
-		{
-			popVec2_0();
-			pushDouble(vec2_0.x);
-			break;
-		}
 		case OpCode::GET_VEC2_Y:
 		{
 			popVec2_0();
-			pushDouble(vec2_0.y);
+			switch (instruction)
+			{
+			case OpCode::GET_VEC2_X: pushDouble(vec2_0.x); break;
+			case OpCode::GET_VEC2_Y: pushDouble(vec2_0.y); break;
+			}
 			break;
 		}
 		case OpCode::NEG_VEC2:
@@ -784,6 +717,7 @@ Value VM::execute()
 			pushVec2(vec2(-vec2_0.x, -vec2_0.y));
 			break;
 		}
+
 		case OpCode::GET_VEC2_SWIZZLE:
 		{
 			uint8_t mask = readByte();
@@ -809,24 +743,18 @@ Value VM::execute()
 			break;
 		}
 		case OpCode::ADD_VEC3:
-		{
-			popVec3_1();
-			popVec3_0();
-			pushVec3(vec3_0 + vec3_1);
-			break;
-		}
 		case OpCode::SUB_VEC3:
-		{
-			popVec3_1();
-			popVec3_0();
-			pushVec3(vec3_0 - vec3_1);
-			break;
-		}
 		case OpCode::DOT_VEC3:
 		{
 			popVec3_1();
 			popVec3_0();
-			pushDouble(vec3_0 * vec3_1);
+
+			switch (instruction)
+			{
+			case OpCode::ADD_VEC3: pushVec3(vec3_0 + vec3_1); break;
+			case OpCode::SUB_VEC3: pushVec3(vec3_0 - vec3_1); break;
+			case OpCode::DOT_VEC3: pushDouble(vec3_0 * vec3_1); break;
+			}
 			break;
 		}
 		case OpCode::MUL_VEC3_DOUBLE:
@@ -1226,7 +1154,7 @@ Value VM::execute()
 		case OpCode::RETURN_ARRAY:
 		case OpCode::RETURN_STRUCT:
 		{
-			TypeKind returnType = (TypeKind)(instruction - (uint8_t)OpCode::RETURN_VOID);
+			TypeKind returnType = (TypeKind)((uint8_t)instruction - (uint8_t)OpCode::RETURN_VOID);
 
 			Value result;
 			if (stackTop > globalStackSize)
@@ -1292,7 +1220,7 @@ Value VM::execute()
 		}
 
 #ifndef NDEBUG
-		if (m_debug && (instruction < (uint8_t)OpCode::RETURN_VOID))
+		if (m_debug && (instruction < OpCode::RETURN_VOID))
 		{
 			printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 		}
@@ -1339,7 +1267,7 @@ void VM::callFunction(int fnIndex, int argCount)
 	frame.functionIndex = fnIndex;
 	frame.base = stackTop - fn.argSize;
 	frame.ip = ip;
-	ip = fn.entry;
+	ip = &(m_program->code[fn.entry]);
 }
 
 Value febcode::runScript(const std::string& script, bool initModules)

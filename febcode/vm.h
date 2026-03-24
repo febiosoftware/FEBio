@@ -75,7 +75,7 @@ namespace febcode
 			return getGlobal(it->second);
 		}
 
-		void setGlobal(int i, const Value& v)
+		void setGlobal(int i, double v)
 		{
 #ifndef NDEBUG
 			if ((i<0) || (i >= globalStackSize))
@@ -83,26 +83,36 @@ namespace febcode
 #endif
 			const Program::Global& glob = m_program->globals[i];
 			int slot = glob.slot;
+			setDoubleAt(slot, v);
+		}
 
-			switch (glob.type->kind)
-			{
-			case TypeKind::Bool  : setBoolAt  (slot, getBool  (v)); break;
-			case TypeKind::Int   : setIntAt   (slot, getInt   (v)); break;
-			case TypeKind::Double: setDoubleAt(slot, getDouble(v)); break;
-			case TypeKind::Vec2  : setVec2At  (slot, getVec2  (v)); break;
-			case TypeKind::Vec3  : setVec3At  (slot, getVec3  (v)); break;
-			case TypeKind::Array : setArrayAt (slot, getArray (v)); break;
-			case TypeKind::Struct: setStructAt(slot, getStruct(v)); break;
-				default:
-				throw std::runtime_error("Unsupported global variable type for assignment.");
-			}
+		void setGlobal(int i, vec2 v)
+		{
+#ifndef NDEBUG
+			if ((i < 0) || (i >= globalStackSize))
+				throw std::runtime_error("Invalid global index: " + std::to_string(i));
+#endif
+			const Program::Global& glob = m_program->globals[i];
+			int slot = glob.slot;
+			setVec2At(slot, v);
+		}
+
+		void setGlobal(int i, vec3 v)
+		{
+#ifndef NDEBUG
+			if ((i<0) || (i >= globalStackSize))
+				throw std::runtime_error("Invalid global index: " + std::to_string(i));
+#endif
+			const Program::Global& glob = m_program->globals[i];
+			int slot = glob.slot;
+			setVec3At(slot, v);
 		}
 
 	private:
 		struct CallFrame
 		{
 			int functionIndex;
-			size_t ip;
+			const uint8_t* ip;
 			size_t base;
 		};
 
@@ -123,7 +133,7 @@ namespace febcode
 
 		uint8_t readByte()
 		{
-			return m_program->code[ip++];
+			return *ip++;
 		}
 
 		uint16_t readUint16()
@@ -341,7 +351,7 @@ namespace febcode
 			return obj;
 		}
 
-		double& peek()
+		const double& peek()
 		{
 #ifndef NDEBUG
 			if (stackTop <= globalStackSize)
@@ -358,11 +368,6 @@ namespace febcode
 		int peekInt()
 		{
 			return (int)peek();
-		}
-
-		double peekDouble()
-		{
-			return peek();
 		}
 
 		vec2 peekVec2()
@@ -570,7 +575,7 @@ namespace febcode
 
 		CallFrame m_frames[MAX_CALL_DEPTH];
 		size_t frameCount = 0;
-		size_t ip = 0; // current instruction pointer
+		const uint8_t*  ip = nullptr; // current instruction pointer
 
 		bool m_debug = false;
 	};
