@@ -482,60 +482,65 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 			type = prg.types.getArrayType(baseType, var.arraySizes);
 		}
 
-		if (var.initializer)
+		if (!var.input && var.initializer)
 		{
 			compileInitializer(var.initializer.get(), type);
 		}
 
 		if (m_scopeDepth == 0)
 		{
-			prg.addGlobal(var.name, type);
-
-			if (var.initializer)
+			if (var.input)
+				prg.addInput(var.name, type);
+			else
 			{
-				auto it = prg.globalIndices.find(var.name);
+				prg.addGlobal(var.name, type);
 
-				Program::Global& global = prg.globals[it->second];
-				global.isInitialized = true;
-
-				switch (type->kind)
+				if (var.initializer)
 				{
-				case TypeKind::Bool  : emit(OpCode::SET_GLOBAL_BOOL  ); break;
-				case TypeKind::Int   : emit(OpCode::SET_GLOBAL_INT   ); break;
-				case TypeKind::Double: emit(OpCode::SET_GLOBAL_DOUBLE); break;
-				case TypeKind::Vec2  : emit(OpCode::SET_GLOBAL_VEC2  ); break;
-				case TypeKind::Vec3  : emit(OpCode::SET_GLOBAL_VEC3  ); break;
-				case TypeKind::Array : 
-					emit(OpCode::SET_GLOBAL_ARRAY);
-					emitUint8(type->size());
-					break;
-				case TypeKind::Struct:
-					emit(OpCode::SET_GLOBAL_STRUCT);
-					emitUint8(type->size());
-					break;
-				default:
-					throw std::runtime_error("Unsupported global variable type");
-				}
+					auto it = prg.globalIndices.find(var.name);
 
-				emitUint8((uint8_t)global.slot);
+					Program::Global& global = prg.globals[it->second];
+					global.isInitialized = true;
 
-				switch (type->kind)
-				{
-				case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
-				case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
-				case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
-				case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
-				case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
-				case TypeKind::Array : 
-					emit(OpCode::POP_ARRAY, type->size());
-					emitUint8(type->typeIndex);
-					break;
-				case TypeKind::Struct:
-					emit(OpCode::POP_STRUCT, type->size());
-					emitUint8(type->typeIndex);
-					break;
-				default:
-					throw std::runtime_error("Unsupported global variable type");
+					switch (type->kind)
+					{
+					case TypeKind::Bool  : emit(OpCode::SET_GLOBAL_BOOL  ); break;
+					case TypeKind::Int   : emit(OpCode::SET_GLOBAL_INT   ); break;
+					case TypeKind::Double: emit(OpCode::SET_GLOBAL_DOUBLE); break;
+					case TypeKind::Vec2  : emit(OpCode::SET_GLOBAL_VEC2  ); break;
+					case TypeKind::Vec3  : emit(OpCode::SET_GLOBAL_VEC3  ); break;
+					case TypeKind::Array :
+						emit(OpCode::SET_GLOBAL_ARRAY);
+						emitUint8(type->size());
+						break;
+					case TypeKind::Struct:
+						emit(OpCode::SET_GLOBAL_STRUCT);
+						emitUint8(type->size());
+						break;
+					default:
+						throw std::runtime_error("Unsupported global variable type");
+					}
+
+					emitUint8((uint8_t)global.slot);
+
+					switch (type->kind)
+					{
+					case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
+					case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
+					case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
+					case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
+					case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+					case TypeKind::Array :
+						emit(OpCode::POP_ARRAY, type->size());
+						emitUint8(type->typeIndex);
+						break;
+					case TypeKind::Struct:
+						emit(OpCode::POP_STRUCT, type->size());
+						emitUint8(type->typeIndex);
+						break;
+					default:
+						throw std::runtime_error("Unsupported global variable type");
+					}
 				}
 			}
 		}
@@ -961,6 +966,10 @@ Type Compiler::compileVariableRef(VariableExpr* expr)
 	else
 	{
 		index = resolveGlobal(expr->name);
+
+		if (prg.globals[index].immutable)
+			throw std::runtime_error("Cannot assign to immutable global variable: " + expr->name);
+
 		returnType = prg.globals[index].type;
 
 		emit(OpCode::GET_GLOBAL_REF);

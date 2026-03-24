@@ -3,7 +3,51 @@
 using namespace febcode;
 
 std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
-	if (isType())
+	if (match(TokenType::Input)) 
+	{
+		if (!isType()) {
+			throw std::runtime_error("Expected type after 'in'.");
+		}
+
+		Type type = prg.types.getType(lexeme(previous()));
+
+		if (!match(TokenType::Identifier)) {
+			throw std::runtime_error("Expected identifier after type.");
+		}
+
+		std::string name = lexeme(previous());
+
+		Type varType = type;
+
+		std::vector<size_t> arraySizes;
+		while (match(TokenType::LeftBrack))
+		{
+			if (!match(TokenType::Integer))
+				throw std::runtime_error("Expected array size after '['.");
+
+			int size = std::stoul(lexeme(previous()));
+			if (size == 0)
+				throw std::runtime_error("Array size must be greater than zero.");
+
+			if (!match(TokenType::RightBrack))
+				throw std::runtime_error("Expected ']' after array size.");
+
+			arraySizes.push_back(size);
+		}
+
+		for (int i = (int)arraySizes.size() - 1; i >= 0; --i)
+		{
+			varType = prg.types.getArrayType(varType, arraySizes[i]);
+		}
+
+		if (!match(TokenType::Semicolon)) {
+			throw std::runtime_error("Expected ';' after input declaration.");
+		}
+
+		Var var{ name, {}, nullptr, true };
+		return std::make_unique<VarDeclStmt>(varType, var);
+	}
+	else if (isType())
 	{
 		Type type = prg.types.getType(lexeme(previous()));
 

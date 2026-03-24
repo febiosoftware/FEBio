@@ -48,6 +48,14 @@ int Program::injectGlobal(const std::string& name, Type type)
 	return slot;
 }
 
+int Program::addInput(const std::string& name, Type type)
+{
+	int slot = injectGlobal(name, type);
+	inputIndices[name] = inputs.size();
+	inputs.push_back({ type, name, slot });
+	return slot;
+}
+
 Type Program::RegisterStruct(const std::string& name, const std::vector<std::pair<Type, std::string>>& fields)
 {
 	return types.defineStructType(name, fields);

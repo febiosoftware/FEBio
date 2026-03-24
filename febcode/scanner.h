@@ -34,6 +34,7 @@ namespace febcode {
 		Else,
 		While,
 		Struct,
+		Input,
 
 		// for type definitions
 		Type,
@@ -240,6 +241,9 @@ namespace febcode {
 
 			if (length == 5 && std::memcmp(start, "false", 5) == 0)
 				return makeToken(TokenType::False);
+
+			if (length == 2 && std::memcmp(start, "in", 2) == 0)
+				return makeToken(TokenType::Input);
 
 			// type checks
 			if (length == 4 && std::memcmp(start, "void", 4) == 0)

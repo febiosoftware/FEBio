@@ -108,6 +108,48 @@ namespace febcode
 			setVec3At(slot, v);
 		}
 
+		void setGlobal(int i, const Value& value)
+		{
+#ifndef NDEBUG
+			if ((i < 0) || (i >= globalStackSize))
+				throw std::runtime_error("Invalid global index: " + std::to_string(i));
+#endif
+			const Program::Global& glob = m_program->globals[i];
+			int slot = glob.slot;
+
+			switch (glob.type->kind)
+			{
+			case TypeKind::Bool: setBoolAt(slot, value.b); break;
+			case TypeKind::Int: setIntAt(slot, value.i); break;
+			case TypeKind::Double: setDoubleAt(slot, value.d); break;
+			case TypeKind::Vec2: setVec2At(slot, value.vec2Value); break;
+			case TypeKind::Vec3: setVec3At(slot, value.vec3Value); break;
+			default:
+				throw std::runtime_error("Unsupported global variable type for setGlobal.");
+				break;
+			}
+		}
+
+		void setInput(const std::string& name, const Value& value)
+		{
+			const auto it = m_program->inputIndices.find(name);
+
+#ifndef NDEBUG
+			if (it == m_program->inputIndices.end())
+				throw std::runtime_error("Input variable '" + name + "' is not defined.");
+#endif
+
+			size_t index = it->second;
+
+#ifndef NDEBUG
+			if (m_program->inputs[index].type != m_program->types.getBuiltinType(value))
+				throw std::runtime_error("Type mismatch when setting input variable '" + name + "'.");
+#endif
+
+			int globalSlot = m_program->inputs[index].slot;
+			setGlobal(globalSlot, value);
+		}
+
 	private:
 		struct CallFrame
 		{

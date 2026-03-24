@@ -29,6 +29,13 @@ namespace febcode {
 			int refcount = 0;
 		};
 
+		struct Input
+		{
+			Type type = nullptr;
+			std::string name;
+			int slot = -1;	// index in global's list
+		};
+
 	public:
 		Program();
 
@@ -37,6 +44,8 @@ namespace febcode {
 
 		// adds a global variable (from native code)
 		int injectGlobal(const std::string& name, Type type);
+
+		int addInput(const std::string& name, Type type);
 
 		Type RegisterStruct(const std::string& name, const std::vector<std::pair<Type, std::string>>& fields);
 		Type RegisterStruct(const std::string& name, const std::vector<std::pair<TypeKind, std::string>>& fields);
@@ -56,6 +65,9 @@ namespace febcode {
 		size_t globalStackSize = 0; // next available slot index for global variables
 		std::vector<Global> globals;
 		std::unordered_map<std::string, size_t> globalIndices; // maps global variable names to their slot index
+
+		std::vector<Input> inputs;
+		std::unordered_map<std::string, size_t> inputIndices; // maps global variable names to their slot index
 
 		size_t maxStackSize = 0;
 	};
