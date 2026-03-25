@@ -80,7 +80,7 @@ private:
     double              m_pn;   //!< fluid pressure at current time point
     double              m_pp;   //!< fluid pressure at previous time point
     double              m_ppp;  //!< fluid pressure at 2nd-previous time point
-    double              m_qn;   //!< flow rate at current time point
+    double              m_q;    //!< flow rate at current time point
     double              m_qp;   //!< flow rate at previous time point
     double              m_qpp;  //!< flow rate at 2nd-previous time point
     double              m_pdn;  //!< downstream fluid pressure at current time point
