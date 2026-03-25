@@ -68,7 +68,7 @@ private:
     double          m_Ra;       //!< arterial resistance
     double          m_Ca;       //!< arterial compliance
     double          m_Ram;      //!< microvascular arterial resistance
-    double          m_Cmi;      //!< myocardial compliance
+    double          m_Cim;      //!< myocardial compliance
     double          m_Rv;       //!< ventricular resistance
     double          m_Rvm;      //!< microvascular ventricular resistance
     double          m_p0;       //!< initial fluid pressure

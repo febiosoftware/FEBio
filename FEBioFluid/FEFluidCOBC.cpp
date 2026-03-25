@@ -37,7 +37,7 @@ BEGIN_FECORE_CLASS(FEFluidCOBC, FEPrescribedSurface)
     ADD_PARAMETER(m_Ra, "Ra")->setLongName("arterial resistance")->setUnits("F.t/L^5");
     ADD_PARAMETER(m_Ca, "Ca")->setLongName("arterial compliance")->setUnits("L^5/F");
     ADD_PARAMETER(m_Ram,"Ra-micro")->setLongName("microvascular arterial resistance")->setUnits("F.t/L^5");
-    ADD_PARAMETER(m_Cmi,"Cmi")->setLongName("myocardial compliance")->setUnits("L^5/F");
+    ADD_PARAMETER(m_Cim,"Cim")->setLongName("myocardial compliance")->setUnits("L^5/F");
     ADD_PARAMETER(m_Rv, "Rv")->setLongName("ventricular resistance")->setUnits("F.t/L^5");
     ADD_PARAMETER(m_Rvm,"Rv-micro")->setLongName("microvascular ventricular resistance")->setUnits("F.t/L^5");
     ADD_PARAMETER(m_p0, "initial_pressure")->setUnits(UNIT_PRESSURE);
@@ -52,7 +52,7 @@ END_FECORE_CLASS();
 FEFluidCOBC::FEFluidCOBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
 {
     m_Ra = m_Ram = m_Rv = m_Rvm = 0.0;
-    m_Ca = m_Cmi = 0.0;
+    m_Ca = m_Cim = 0.0;
     m_pfluid = nullptr;
     m_psurf = nullptr;
     m_p0 = 0;
@@ -123,7 +123,7 @@ void FEFluidCOBC::UpdateDilatation()
     double Rve   = m_Rv + m_Rvm;
     double Rae   = m_Ram + Rve;
     double Rt    = m_Ra + Rae;
-    double tauvi = Rve*m_Cmi;
+    double tauvi = Rve*m_Cim;
     double taua  = m_Ram*m_Ca;
     double tauae = Rae*m_Ca;
     
