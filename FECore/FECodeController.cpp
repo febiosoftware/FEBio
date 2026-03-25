@@ -61,12 +61,6 @@ bool FECodeController::CompileScript()
 		febcode::MathModule mathModule;
 		mathModule.Register(program);
 
-		febcode::Type vec3 = program.types.getStructType("vec3");
-		if (!vec3) {
-			feLogError("Error compiling code: 'vec3' type not defined");
-			return false;
-		}
-
 		febcode::ParseSource(program, script);
 
 		febcode::Compiler compiler(program);

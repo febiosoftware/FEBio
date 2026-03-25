@@ -188,6 +188,12 @@ bool FECodeValuator::Init()
 {
 	if (FEScalarValuator::Init() == false) return false;
 
+	FECoreBase* parent = GetParent();
+	if (auto s = dynamic_cast<FESurfaceLoad*>(parent))
+	{
+		m.surf = &s->GetSurface();
+	}
+
 	// get the script
 	m.scriptCode = GetFEModel()->GetScript(m_scriptName);
 	if (m.scriptCode.empty())
