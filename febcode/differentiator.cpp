@@ -81,11 +81,14 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const st
 		}
 
 		// copy the original variable declaration to the derivative AST
-		copyVars.push_back({ var_i.name, var_i.arraySizes, copy_expression(var_i.initializer.get()) });
+		copyVars.push_back({ var_i.name, var_i.arraySizes, copy_expression(var_i.initializer.get()), var_i.input });
 
 		// No need to differentiate non-numeric types, since they don't contribute to the derivative. 
 		// We can just copy them to the derivative AST without creating a derivative variable for them.
 		if (type->kind == TypeKind::Bool || type->kind == TypeKind::Int) continue;
+
+		// also, no need to differentiate input variables, since they are treated as constants with respect to differentiation.
+		if (var_i.input) continue;
 
 		// create a new variable for the derivative of this variable
 		std::string derivName = "__d" + var_i.name + "_d" + var;

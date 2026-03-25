@@ -593,6 +593,8 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		double v = 0.0; tag.value(v);
 		const char* szname = tag.AttributeValue("name");
 
+		const char* sztype = tag.AttributeValue("data_type", true);
+
 		// make sure this parameter does not exist yet
 		pp = pl.FindFromName(szname);
 		if (pp) throw XMLReader::InvalidTag(tag);
@@ -1303,6 +1305,9 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 						}
 						else
 						{
+							// parse attributes first
+							ReadAttributes(tag, pp);
+
 							// we get here if the property was defined with an empty tag.
 							// We should still validate it.
 							int NP = pp->PropertyClasses();
