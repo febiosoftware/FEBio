@@ -726,6 +726,14 @@ bool FEHexRefine2D::UpdateSurface(FESurface& surf)
 	FEMeshTopo& topo = *m_topo;
 	int NF0 = surf.Elements();
 
+	// set all element pointers to zero
+	for (int i = 0; i < NF0; ++i)
+	{
+		FESurfaceElement& el = surf.Element(i);
+		el.m_elem[0].Reset();
+		el.m_elem[1].Reset();
+	}
+
 	// figure out which facets to split
 	vector<int> faceList = topo.FaceIndexList(surf);
 	assert((int)faceList.size() == NF0);
