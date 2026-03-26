@@ -89,6 +89,8 @@ const char* IPToString(uint8_t ip)
 	case OpCode::DIV_DOUBLE    : return "DIVF";
 	case OpCode::EXP_INT       : return "EXPI";
 	case OpCode::EXP_DOUBLE    : return "EXPF";
+	case OpCode::SQR_DOUBLE    : return "SQR ";
+	case OpCode::SQRT_DOUBLE   : return "SQRT";
 
 	case OpCode::EQUAL_BOOL  :
 	case OpCode::EQUAL_INT   :
@@ -631,9 +633,17 @@ Value VM::execute()
 
 		// Double unary operators
 		case OpCode::NEG_DOUBLE:
+		case OpCode::SQR_DOUBLE:
+		case OpCode::SQRT_DOUBLE:
 		{
 			double a = popDouble();
-			pushDouble(-a);
+
+			switch (instruction)
+			{
+			case OpCode::NEG_DOUBLE: pushDouble(-a); break;
+			case OpCode::SQR_DOUBLE: pushDouble(a * a); break;
+			case OpCode::SQRT_DOUBLE: pushDouble(std::sqrt(a)); break;
+			}
 			break;
 		}
 

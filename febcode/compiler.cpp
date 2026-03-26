@@ -203,6 +203,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GE_INT: return -1;
 	case OpCode::LE_INT: return -1;
 	case OpCode::NEG_DOUBLE: return 0;
+	case OpCode::SQR_DOUBLE: return 0;
+	case OpCode::SQRT_DOUBLE: return 0;
 	case OpCode::ADD_DOUBLE: return -1;
 	case OpCode::SUB_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE: return -1;
@@ -1155,6 +1157,27 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 	}
 
 	Type type_l = compileExpression(expr->left.get());
+
+	if (isDoubleType(type_l) && isLiteral(expr->right) && (expr->op == BinaryOp::Exponent))
+	{
+		Value e = dynamic_cast<LiteralExpr*>(expr->right.get())->value;
+		if (isDouble(e))
+		{
+			// If the exponent is a literal, we can optimize by using a fast exponentiation algorithm.
+			double exponentValue = e.d;
+			if (exponentValue == 0.5)
+			{
+				emit(OpCode::SQRT_DOUBLE);
+				return type_l;
+			}
+			else if (exponentValue == 2.0)
+			{
+				emit(OpCode::SQR_DOUBLE);
+				return type_l;
+			}
+		}
+	}
+
 	Type type_r = compileExpression(expr->right.get());
 
 	if (isBoolType(type_l) && isBoolType(type_r))

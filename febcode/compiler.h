@@ -105,6 +105,8 @@ namespace febcode
 		MUL_DOUBLE,
 		DIV_DOUBLE,
 		EXP_DOUBLE,
+		SQR_DOUBLE,
+		SQRT_DOUBLE,
 		GT_DOUBLE,
 		LT_DOUBLE,
 		GE_DOUBLE,

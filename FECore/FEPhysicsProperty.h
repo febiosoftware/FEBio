@@ -70,6 +70,8 @@ public:
 
 	bool Init();
 
+	bool HasDerivative(int id) const;
+
 public:
 	double Value(const std::vector<FEValue>& vars);
 	double Value(const std::vector<double>& vars);

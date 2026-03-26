@@ -207,6 +207,12 @@ void FEPhysicsProperty::AddVariable(const std::string& varName, FEValueType type
 	m.code.vars.push_back({ varName, type });
 }
 
+bool FEPhysicsProperty::HasDerivative(int id) const
+{
+	if ((id < 0) || (id >= m.valDeriv.size())) return false;
+	return !m.valDeriv[id].isNullProgram;
+}
+
 bool FEPhysicsProperty::Init()
 {
 #ifndef NDEBUG
