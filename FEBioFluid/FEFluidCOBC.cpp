@@ -37,7 +37,7 @@ BEGIN_FECORE_CLASS(FEFluidCOBC, FEPrescribedSurface)
     ADD_PARAMETER(m_Ra, "Ra")->setLongName("arterial resistance")->setUnits("F.t/L^5");
     ADD_PARAMETER(m_Ca, "Ca")->setLongName("arterial compliance")->setUnits("L^5/F");
     ADD_PARAMETER(m_Ram,"Ra-micro")->setLongName("microvascular arterial resistance")->setUnits("F.t/L^5");
-    ADD_PARAMETER(m_Cmi,"Cmi")->setLongName("myocardial compliance")->setUnits("L^5/F");
+    ADD_PARAMETER(m_Cim,"Cim")->setLongName("myocardial compliance")->setUnits("L^5/F");
     ADD_PARAMETER(m_Rv, "Rv")->setLongName("ventricular resistance")->setUnits("F.t/L^5");
     ADD_PARAMETER(m_Rvm,"Rv-micro")->setLongName("microvascular ventricular resistance")->setUnits("F.t/L^5");
     ADD_PARAMETER(m_p0, "initial_pressure")->setUnits(UNIT_PRESSURE);
@@ -52,13 +52,14 @@ END_FECORE_CLASS();
 FEFluidCOBC::FEFluidCOBC(FEModel* pfem) : FEPrescribedSurface(pfem), m_dofW(pfem)
 {
     m_Ra = m_Ram = m_Rv = m_Rvm = 0.0;
-    m_Ca = m_Cmi = 0.0;
+    m_Ca = m_Cim = 0.0;
     m_pfluid = nullptr;
     m_psurf = nullptr;
     m_p0 = 0;
     m_pd = 0.0;
     m_e = 0.0;
-    
+    m_Pmi = nullptr;
+    m_PRA = nullptr;
  }
 
 //-----------------------------------------------------------------------------
@@ -86,8 +87,7 @@ bool FEFluidCOBC::Init()
     if (m_pfluid == nullptr) return false;
     
     m_pn = m_pp = m_ppp = m_p0;
-//    m_pdn = m_pdp = m_pd;
-    m_qn = m_qp = m_qpp = 0;
+    m_q = m_qp = m_qpp = 0;
     m_tp = m_tpp = 0;
 
     if (m_Pmi) { if (!m_Pmi->Init()) return false; }
@@ -105,41 +105,48 @@ void FEFluidCOBC::UpdateDilatation()
 	double time = timeInfo.currentTime;
 	int iter = timeInfo.currentIteration;
 	double dt = timeInfo.timeIncrement;
+    if (dt == 0) return;
 	if ((time > m_tp) && (iter == 0)) {
         m_ppp = m_pp;
 		m_pp = m_pn;
         m_qpp = m_qp;
-		m_qp = m_qn;
+		m_qp = m_q;
 		m_pdp = m_pdn;
         m_tpp = m_tp;
 		m_tp = time;
 	}
 
 	// evaluate the flow rate at the current time
-	m_qn = FlowRate();
+	m_q = FlowRate();
 	m_pdn = m_pd;
     
     double Rve   = m_Rv + m_Rvm;
     double Rae   = m_Ram + Rve;
     double Rt    = m_Ra + Rae;
-    double tauvi = Rve*m_Cmi;
+    double tauvi = Rve*m_Cim;
     double taua  = m_Ram*m_Ca;
     double tauae = Rae*m_Ca;
     
     double dtp = m_tp - m_tpp;
     
     double c0 = tauvi*taua/(dt*dt);
+    double d0 = (dtp > 0) ? tauvi*taua/(dt*dtp) : 0;
     double c1 = m_Ra*c0;
-    double c2 = (m_Ra*(tauae + tauvi)+m_Ram*tauvi)/dt;
+    double d1 = m_Ra*d0;
+    double d2 = (tauvi+tauae)/dt;
+    double c3 = tauvi/dt;
+    double c2 = m_Ra*d2 + m_Ram*c3;
     double a = c1 + c2 + Rt;
-    double b = (c1+c2)*m_qp + m_Ra*tauvi*taua/dt/dtp*(m_qp-m_qpp);
-    double c = c0 + (tauvi+tauae)/dt + 1;
-    double d = c0*m_pp + tauvi*taua/dt/dtp*(m_pp - m_ppp) + (tauvi+tauae)/dt*m_pp;
-    if (m_PRA) d += m_PRA->value(time);
+    double b = (c1+c2+d1)*m_qp;
+    b -= (dtp > 0) ?  d1*m_qpp : 0;
+    double c = c0 + d2 + 1;
+    double d = (c0 + d0 + d2)*m_pp;
+    d -= (dtp > 0) ?  d0*m_ppp : 0;
+    if (m_PRA) d += (m_PRA) ? m_PRA->value(time) : 0;
     if (m_Pmi) d += tauvi*m_Pmi->derive(time);
 
 	// calculate the RCR pressure
-    m_pn = (a*m_qn + d - b)/c;
+    m_pn = (a*m_q + d - b)/c;
 
 	// calculate the dilatation
 	m_e = 0.0;
@@ -247,7 +254,7 @@ void FEFluidCOBC::CopyFrom(FEBoundaryCondition* pbc)
 void FEFluidCOBC::Serialize(DumpStream& ar)
 {
     FEPrescribedSurface::Serialize(ar);
-    ar & m_pn & m_pp & m_pp & m_qn & m_qp & m_qpp & m_tp & m_tpp & m_e;
+    ar & m_pn & m_pp & m_pp & m_q & m_qp & m_qpp & m_tp & m_tpp & m_e;
     if (ar.IsShallow()) return;
     ar & m_pfluid;
     ar & m_dofW & m_dofEF;
