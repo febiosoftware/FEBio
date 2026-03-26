@@ -95,10 +95,10 @@ public:
 	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+    double StrainEnergyDensity(FEMaterialPoint& pt) override { return 0; }
     
     //! calculate exponent of right-stretch tensor in series spring
-    bool SeriesStretchExponent(FEMaterialPoint& pt);
+//    bool SeriesStretchExponent(FEMaterialPoint& pt);
     
     // returns a pointer to a new material point object
 	FEMaterialPointData* CreateMaterialPointData() override;

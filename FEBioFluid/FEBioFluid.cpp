@@ -58,6 +58,7 @@ SOFTWARE.*/
 #include "FEFluidResistanceLoad.h"
 #include "FEFluidRCRBC.h"
 #include "FEFluidRCRLoad.h"
+#include "FEFluidCOBC.h"
 #include "FETangentialDamping.h"
 #include "FETangentialFlowStabilization.h"
 #include "FEBackFlowStabilization.h"
@@ -186,6 +187,7 @@ REGISTER_FECORE_CLASS(FEPrescribedFluidPressure  , "fluid pressure");
 REGISTER_FECORE_CLASS(FEFluidRCBC                , "fluid RC");
 REGISTER_FECORE_CLASS(FEFluidRCRBC               , "fluid RCR");
 REGISTER_FECORE_CLASS(FEFluidResistanceBC        , "fluid resistance");
+REGISTER_FECORE_CLASS(FEFluidCOBC                , "fluid coronary outflow");
 
 //-----------------------------------------------------------------------------
 // initial conditions

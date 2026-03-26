@@ -53,7 +53,7 @@ variable "skip_create_ami" {
 
 source "amazon-ebs" "windows" {
   ami_name      = "packer-provisioned-windows-2019-febio-studio-${local.buildtime}"
-  instance_type = "c5a.8xlarge"
+  instance_type = "c7i.8xlarge"
   source_ami    = data.amazon-ami.windows.id
 
   communicator = "winrm"

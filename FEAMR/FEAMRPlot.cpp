@@ -53,7 +53,20 @@ bool FEPlotMeanRatio::Save(FEDomain& dom, FEDataStream& a)
 	for (int i = 0; i < NE; ++i)
 	{
 		FEElement& el = dom.ElementRef(i);
-		double q = FEElementQualityCriterion::ElementQuality(el);
+		double q = FEMeanRatioQualityCriterion::ElementQuality(el);
+		a << q;
+	}
+	return true;
+}
+
+bool FEPlotScaledJacobian::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEMesh& mesh = *dom.GetMesh();
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double q = FEScaledJacobianQualityCriterion::ElementQuality(el);
 		a << q;
 	}
 	return true;

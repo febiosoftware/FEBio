@@ -28,16 +28,16 @@ SOFTWARE.*/
 #include <FECore/FEMeshPartition.h>
 #include <FECore/FEMesh.h>
 
-BEGIN_FECORE_CLASS(FEElementQualityCriterion, FEMeshAdaptorCriterion)
+BEGIN_FECORE_CLASS(FEMeanRatioQualityCriterion, FEMeshAdaptorCriterion)
 	ADD_PARAMETER(minQuality, "min_quality")->setLongName("Minimum element quality");
 END_FECORE_CLASS();
 
-FEElementQualityCriterion::FEElementQualityCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+FEMeanRatioQualityCriterion::FEMeanRatioQualityCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
 	minQuality = 1.0;
 }
 
-bool FEElementQualityCriterion::GetElementValue(FEElement& el, double& value)
+bool FEMeanRatioQualityCriterion::GetElementValue(FEElement& el, double& value)
 {
 	if ((el.Shape() != ET_TET4) && (el.Shape() != ET_HEX8) && (el.Shape() != ET_PENTA6)) return false;
 	value = ElementQuality(el);
@@ -75,14 +75,14 @@ static const int tetCornerEdges[4][3][2] =
 	{ {3,0}, {3,2}, {3,1} }
 };
 
-double FEElementQualityCriterion::ElementQuality(FEElement& el)
+double FEMeanRatioQualityCriterion::ElementQuality(FEElement& el)
 {
 	FEMeshPartition* partition = el.GetMeshPartition();
 	if (partition == nullptr) return 0.0;
 
 	FEMesh& mesh = *partition->GetMesh();
 
-	// get the tet's nodal coordinates
+	// get the nodal coordinates
 	vec3d r[FEElement::MAX_NODES];
 	for (int i = 0; i < el.Nodes(); ++i) r[i] = mesh.Node(el.m_node[i]).m_rt;
 
@@ -124,4 +124,72 @@ double FEElementQualityCriterion::ElementQuality(FEElement& el)
 	}
 
 	return minMR;
+}
+
+//==================================================================
+
+BEGIN_FECORE_CLASS(FEScaledJacobianQualityCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(minQuality, "min_quality")->setLongName("Minimum element quality");
+END_FECORE_CLASS();
+
+FEScaledJacobianQualityCriterion::FEScaledJacobianQualityCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
+{
+	minQuality = 1.0;
+}
+
+bool FEScaledJacobianQualityCriterion::GetElementValue(FEElement& el, double& value)
+{
+	if ((el.Shape() != ET_TET4) && (el.Shape() != ET_HEX8) && (el.Shape() != ET_PENTA6)) return false;
+	value = ElementQuality(el);
+	return (value < minQuality);
+}
+
+double FEScaledJacobianQualityCriterion::ElementQuality(FEElement& el)
+{
+	FEMeshPartition* partition = el.GetMeshPartition();
+	if (partition == nullptr) return 0.0;
+
+	FEMesh& mesh = *partition->GetMesh();
+
+	// get the nodal coordinates
+	vec3d r[FEElement::MAX_NODES];
+	for (int i = 0; i < el.Nodes(); ++i) r[i] = mesh.Node(el.m_node[i]).m_rt;
+
+	// for each node, find 3 edges that meet at the node
+	int n = el.Nodes();
+	const int(*edgeData)[3][2] = nullptr;
+	switch (el.Shape())
+	{
+	case ET_HEX8  : edgeData = hexCornerEdges; break;
+	case ET_PENTA6: edgeData = wedgeCornerEdges; break;
+	case ET_TET4  : edgeData = tetCornerEdges; break;
+	default: return 0.0;
+	}
+
+	// calculate scaled jacobian at each node and store minimum value
+	double minSJ = 1e99;
+	vec3d e[3];
+	double L[3];
+	for (int i = 0; i < n; ++i)
+	{
+		// get the 3 edges that meet at this node
+		for (int k = 0; k < 3; ++k)
+		{
+			int a = edgeData[i][k][0];
+			int b = edgeData[i][k][1];
+			vec3d va = r[a];
+			vec3d vb = r[b];
+			e[k] = vb - va;
+			L[k] = e[k].Length();
+		}
+
+		// get the jacobian determinant at this node
+		double detJ = e[0] * (e[1] ^ e[2]);
+
+		// calculate the scaled jacobian
+		double SJ = detJ / (L[0] * L[1] * L[2]);
+		if (SJ < minSJ) minSJ = SJ;
+	}
+
+	return minSJ;
 }
