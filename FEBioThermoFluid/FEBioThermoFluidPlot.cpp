@@ -71,6 +71,19 @@ bool FEPlotNodalFluidTemperature::Save(FEMesh& m, FEDataStream& a)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidPressure::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEThermoFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluidMaterial>();
+    if (pfluid == 0) return false;
+
+    writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
+        return (pt ? pt->m_pf : 0.0);
+    });
+    return true;
+}
+
 bool FEPlotFluidPressureTangentTemperature::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEThermoElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoElasticFluid>();

@@ -43,6 +43,15 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Actual fluid pressure
+class FEPlotFluidPressure : public FEPlotDomainData
+{
+public:
+    FEPlotFluidPressure(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //! Nodal fluid temperature
 class FEPlotNodalFluidTemperature : public FEPlotNodeData
 {

@@ -153,6 +153,7 @@ void FEBioThermoFluid::InitModule()
     //-----------------------------------------------------------------------------
     // classes derived from FEPlotData
     REGISTER_FECORE_CLASS(FEPlotFluidVelocity, "fluid velocity");
+    REGISTER_FECORE_CLASS(FEPlotFluidPressure, "fluid pressure");
 	REGISTER_FECORE_CLASS(FEPlotFluidTemperature, "fluid temperature");
 	REGISTER_FECORE_CLASS(FEPlotNodalFluidTemperature, "nodal fluid temperature");
 	REGISTER_FECORE_CLASS(FEPlotFluidPressureTangentTemperature, "fluid pressure tangent temperature");
