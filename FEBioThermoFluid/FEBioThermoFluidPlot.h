@@ -26,6 +26,15 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEPlotData.h>
 
+//-----------------------------------------------------------------------------
+//! Element fluid velocity
+class FEPlotFluidVelocity : public FEPlotDomainData
+{
+public:
+    FEPlotFluidVelocity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_VELOCITY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //! Element fluid temperature
 class FEPlotFluidTemperature : public FEPlotDomainData
 {
@@ -121,3 +130,13 @@ public:
 	FEPlotFluidSpecificEntropy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Element fluid heat supply density
+class FEPlotFluidHeatSupplyDensity : public FEPlotDomainData
+{
+public:
+    FEPlotFluidHeatSupplyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_POWER_DENSITY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+

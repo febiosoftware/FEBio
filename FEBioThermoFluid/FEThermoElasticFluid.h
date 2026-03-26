@@ -58,28 +58,28 @@ public:
     
     //! tangent of pressure with respect to strain J and temperature T
     virtual double Tangent_Strain_Temperature(FEMaterialPoint& mp);
-    
+
     //! specific free energy
     virtual double SpecificFreeEnergy(FEMaterialPoint& mp) = 0;
-    
+
     //! specific entropy
     virtual double SpecificEntropy(FEMaterialPoint& mp) = 0;
-    
+
     //! specific strain energy
     virtual double SpecificStrainEnergy(FEMaterialPoint& mp) = 0;
-    
+
     //! isochoric specific heat capacity
     virtual double IsochoricSpecificHeatCapacity(FEMaterialPoint& mp) = 0;
-            
+
     //! tangent of isochoric specific heat capacity with respect to strain J
     virtual double Tangent_cv_Strain(FEMaterialPoint& mp);
-            
+
     //! tangent of isochoric specific heat capacity with respect to temperature T
     virtual double Tangent_cv_Temperature(FEMaterialPoint& mp);
 
     //! isobaric specific heat capacity
     virtual double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) = 0;
-            
+
     //! calculate dilatation for given (effective) pressure and temperature
     virtual bool Dilatation(const double T, const double p, double& e) = 0;
     

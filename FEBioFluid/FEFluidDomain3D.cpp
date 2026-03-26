@@ -709,8 +709,9 @@ void FEFluidDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         // calculate the stress at this material point
         pt.m_sf = m_pMat->Stress(mp);
         
-        // calculate the fluid pressure
+        // calculate the fluid pressure and temperature
         pt.m_pf = m_pMat->Pressure(mp);
+        pt.m_Tf = m_pMat->GetElastic()->Temperature(mp);
     }
 }
 

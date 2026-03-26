@@ -219,6 +219,7 @@ REGISTER_FECORE_CLASS(FEPlotNodalRelativeFluidVelocity , "nodal fluid flux"     
 REGISTER_FECORE_CLASS(FEPlotFluidDilatation            , "fluid dilatation"         );
 REGISTER_FECORE_CLASS(FEPlotFluidEffectivePressure     , "effective fluid pressure" );
 REGISTER_FECORE_CLASS(FEPlotElasticFluidPressure	   , "elastic fluid pressure"   );
+REGISTER_FECORE_CLASS(FEPlotElasticFluidTemperature    , "elastic fluid temperature");
 REGISTER_FECORE_CLASS(FEPlotFluidBodyForce             , "fluid body force"         );
 REGISTER_FECORE_CLASS(FEPlotFluidVolumeRatio		   , "fluid volume ratio"       );
 REGISTER_FECORE_CLASS(FEPlotFluidDensity               , "fluid density"            );

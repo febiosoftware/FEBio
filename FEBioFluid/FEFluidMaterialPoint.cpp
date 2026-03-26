@@ -32,7 +32,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEFluidMaterialPoint::FEFluidMaterialPoint(FEMaterialPointData* pt) : FEMaterialPointData(pt)
 {
-    m_pf = 0;
+    m_pf = m_Tf = 0;
     m_Lf.zero();
     m_ef = 0;
     m_efdot = 0;
@@ -52,13 +52,13 @@ FEMaterialPointData* FEFluidMaterialPoint::Copy()
 void FEFluidMaterialPoint::Serialize(DumpStream& ar)
 {
 	FEMaterialPointData::Serialize(ar);
-    ar & m_pf & m_Lf & m_ef & m_efdot & m_gradef & m_vft & m_aft & m_sf;
+    ar & m_pf & m_Tf & m_Lf & m_ef & m_efdot & m_gradef & m_vft & m_aft & m_sf;
 }
 
 //-----------------------------------------------------------------------------
 void FEFluidMaterialPoint::Init()
 {
-    m_pf = 0;
+    m_pf = m_Tf = 0;
     m_Lf.zero();
     m_ef = 0;
     m_efdot = 0;

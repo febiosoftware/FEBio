@@ -23,49 +23,65 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEFluidFourierLaw.h"
-#include "FEThermalPropConst.h"
+
+
+
+#include "FEThermalPropTempDpndnt.h"
 #include "FEThermoFluidMaterialPoint.h"
+#include <FEBioFluid/FEFluidMaterialPoint.h>
 #include <FECore/log.h>
-#include <FECore/FEModel.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEFluidFourierLaw, FEFluidHeatFlux)
-    ADD_PARAMETER(m_Kr, FE_RANGE_GREATER_OR_EQUAL(0.0), "Kr")->setUnits(UNIT_THERMAL_CONDUCTIVITY)->setLongName("referential thermal conductivity");
-
-// Optionally add non-dimensional thermal conductivity function
-    ADD_PROPERTY(m_Khat, "Khat", FEProperty::Optional)->SetLongName("normalized thermal conductivity");
+BEGIN_FECORE_CLASS(FEThermalPropTempDpndnt, FEThermoFluidProperty)
+    ADD_PROPERTY(m_prop , "prophat"   )->SetLongName("normalized property");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-//! Constructor.
-FEFluidFourierLaw::FEFluidFourierLaw(FEModel* pfem) : FEFluidHeatFlux(pfem)
+//! Constructor. 
+FEThermalPropTempDpndnt::FEThermalPropTempDpndnt(FEModel* pfem) : FEThermoFluidProperty(pfem)
 {
-    m_Khat = nullptr;
+    m_prop = nullptr;
+}
+
+bool FEThermalPropTempDpndnt::Init()
+{
+    m_Tr = GetGlobalConstant("T");
+    if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
+
+    if (m_prop) return m_prop->Init();
+    
+    return false;
 }
 
 //-----------------------------------------------------------------------------
-//! initialization
-bool FEFluidFourierLaw::Init()
+//! normalize viscosity
+double FEThermalPropTempDpndnt::NormalizedProperty(FEMaterialPoint& mp)
 {
-    FEModel* pfem = GetFEModel();
-    if (m_Khat == nullptr) {
-        m_Khat = new FEThermalPropConst(pfem);
-    }
-    m_Khat->Init();
-
-    return FEFluidHeatFlux::Init();
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    
+    double T = tf.m_T/m_Tr+1;
+    double prop = m_prop->value(T);
+    
+    return prop;
 }
 
 //-----------------------------------------------------------------------------
-//! viscous stress
-vec3d FEFluidFourierLaw::HeatFlux(FEMaterialPoint& pt)
+//! tangent of normalized property with respect to temperature
+double FEThermalPropTempDpndnt::Tangent_NormalizedProperty_Temperature(FEMaterialPoint& mp)
 {
-    FEThermoFluidMaterialPoint& tf = *pt.ExtractData<FEThermoFluidMaterialPoint>();
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
-    double K = Conductivity(pt);
+    double T = tf.m_T/m_Tr+1;
+    double dpropdT = m_prop->derive(T);
     
-    vec3d q = -tf.m_gradT*K;
-        
-    return q;
+    return dpropdT;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of normalized property with respect to volumetric strain (or J)
+double FEThermalPropTempDpndnt::Tangent_NormalizedProperty_Strain(FEMaterialPoint& mp)
+{
+    return 0.0;
 }

@@ -33,17 +33,15 @@
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FERealLiquid, FEThermoElasticFluid)
 
-// material parameters
-ADD_PARAMETER(m_nvc  , FE_RANGE_GREATER(0), "nvc");
-
-ADD_PROPERTY(m_psat, "psat")->SetLongName("saturation gauge pressure normalized");
-ADD_PROPERTY(m_asat, "asat")->SetLongName("saturation free energy normalized");
-ADD_PROPERTY(m_ssat, "ssat")->SetLongName("saturation entropy normalized");
+// all properties should be entered in non-dimensional form as functions of T/Tr
+ADD_PROPERTY(m_psat, "psat")->SetLongName("saturation gauge pressure normalized");  // normalized (divide) by Pr
+ADD_PROPERTY(m_asat, "asat")->SetLongName("saturation free energy normalized"); // normalized by Pr/rhor
+ADD_PROPERTY(m_ssat, "ssat")->SetLongName("saturation entropy normalized"); // normalized by Pr / (rhor Tr)
 ADD_PROPERTY(m_esat, "esat")->SetLongName("saturation dilatation");
 ADD_PROPERTY(m_B[0], "B1"  )->SetLongName("1st pressure virial coefficient");
 ADD_PROPERTY(m_B[1], "B2", FEProperty::Optional)->SetLongName("2nd pressure virial coefficient");
 ADD_PROPERTY(m_B[2], "B3", FEProperty::Optional)->SetLongName("3rd pressure virial coefficient");
-ADD_PROPERTY(m_cvsat, "cvsat")->SetLongName("saturation isochoric heat capacity normalized");
+ADD_PROPERTY(m_cvsat, "cvsat")->SetLongName("saturation isochoric heat capacity normalized");   // normalized by Pr / (rhor Tr)
 ADD_PROPERTY(m_C[0], "C1"  )->SetLongName("1st cv virial coefficient");
 ADD_PROPERTY(m_C[1], "C2", FEProperty::Optional)->SetLongName("2nd cv virial coefficient");
 ADD_PROPERTY(m_C[2], "C3", FEProperty::Optional)->SetLongName("3rd cv virial coefficient");
@@ -52,7 +50,7 @@ END_FECORE_CLASS();
 
 FERealLiquid::FERealLiquid(FEModel* pfem) : FEThermoElasticFluid(pfem)
 {
-    m_nvc = 0;
+    m_nvb = m_nvc = 0;
     m_R = m_Pr = m_Tr = 0;
     m_psat = m_asat = m_ssat = m_esat = m_cvsat = nullptr;
     m_B[0] = m_B[1] = m_B[2] = nullptr;
@@ -70,7 +68,6 @@ bool FERealLiquid::Init()
     if (m_R  <= 0) { feLogError("A positive universal gas constant R must be defined in Globals section");    return false; }
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
     if (m_Pr <= 0) { feLogError("A positive referential absolute pressure P must be defined in Globals section"); return false; }
-    if (m_nvc == 0){ feLogError("At least one virial coefficient must be specified in this real liquid"); return false; }
 
     m_pMat = dynamic_cast<FEThermoFluid*>(GetParent());
     m_rhor = m_pMat->ReferentialDensity();
@@ -80,11 +77,19 @@ bool FERealLiquid::Init()
     m_ssat->Init();
     m_esat->Init();
     m_cvsat->Init();
-    for (int k=0; k<m_nvc; ++k) {
-        if (m_B[k]) m_B[k]->Init();
-        if (m_C[k]) m_C[k]->Init();
+    for (int k=0; k<MAX_NVC; ++k) {
+        if (m_B[k]) {
+            ++m_nvb;
+            m_B[k]->Init();
+        }
+        if (m_C[k]) {
+            ++m_nvc;
+            m_C[k]->Init();
+        }
     }
-    
+    if (m_nvb == 0) { feLogError("At least one virial coefficient must be specified for the pressure"); return false; }
+    if (m_nvc == 0) { feLogError("At least one virial coefficient must be specified for cv"); return false; }
+
     return true;
 }
 
@@ -108,7 +113,7 @@ double FERealLiquid::Pressure(FEMaterialPoint& mp)
     double That = (m_Tr+tf.m_T)/m_Tr;
     double p = m_psat->value(That);
     double x = fp.m_ef - m_esat->value(That);
-    for (int k=1; k<=m_nvc; ++k)
+    for (int k=1; k<=m_nvb; ++k)
         p += m_B[k-1]->value(That)*pow(x,k);
     
     return p*m_Pr;
@@ -124,7 +129,7 @@ double FERealLiquid::Tangent_Strain(FEMaterialPoint& mp)
     double That = (m_Tr+tf.m_T)/m_Tr;
     double dpJ = m_B[0]->value(That);
     double x = fp.m_ef - m_esat->value(That);
-    for (int k=2; k<=m_nvc; ++k)
+    for (int k=2; k<=m_nvb; ++k)
         dpJ += k*m_B[k-1]->value(That)*pow(x,k-1);
     
     return dpJ*m_Pr;
@@ -138,9 +143,9 @@ double FERealLiquid::Tangent_Strain_Strain(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
     double That = (m_Tr+tf.m_T)/m_Tr;
-    double dpJ2 = (m_nvc > 1) ? 2*m_B[1]->value(That) : 0;
+    double dpJ2 = (m_nvb > 1) ? 2*m_B[1]->value(That) : 0;
     double x = fp.m_ef - m_esat->value(That);
-    for (int k=3; k<=m_nvc; ++k)
+    for (int k=3; k<=m_nvb; ++k)
         dpJ2 += k*(k-1)*m_B[k-1]->value(That)*pow(x,k-2);
     
     return dpJ2*m_Pr;
@@ -157,7 +162,7 @@ double FERealLiquid::Tangent_Temperature(FEMaterialPoint& mp)
     double dpT = m_psat->derive(That);
     double dJsat = m_esat->derive(That);
     double x = fp.m_ef - m_esat->value(That);
-    for (int k=1; k<=m_nvc; ++k)
+    for (int k=1; k<=m_nvb; ++k)
         dpT += m_B[k-1]->derive(That)*pow(x,k)
         - k*dJsat*m_B[k-1]->value(That)*pow(x,k-1);
     
@@ -176,12 +181,12 @@ double FERealLiquid::Tangent_Temperature_Temperature(FEMaterialPoint& mp)
     double dJsat = m_esat->derive(That);
     double dJsa2 = m_esat->deriv2(That);
     double x = fp.m_ef - m_esat->value(That);
-    vector<double> B(m_nvc,0);
-    for (int k=0; k<m_nvc; ++k) B[k] = m_B[k]->value(That);
-    for (int k=1; k<=m_nvc; ++k)
+    vector<double> B(m_nvb,0);
+    for (int k=0; k<m_nvb; ++k) B[k] = m_B[k]->value(That);
+    for (int k=1; k<=m_nvb; ++k)
         dpT2 += m_B[k-1]->deriv2(That)*pow(x,k)
         - (2*dJsat*m_B[k-1]->derive(That) + dJsa2*B[k-1])*k*pow(x,k-1);
-    for (int k=2; k<=m_nvc; ++k)
+    for (int k=2; k<=m_nvb; ++k)
         dpT2 += k*(k-1)*pow(dJsat,2)*B[k-1]*pow(x,k-2);
 
     return dpT2*m_Pr/pow(m_Tr,2);
@@ -198,7 +203,7 @@ double FERealLiquid::Tangent_Strain_Temperature(FEMaterialPoint& mp)
     double dpJT = m_B[0]->derive(That);
     double dJsat = m_esat->derive(That);
     double x = fp.m_ef - m_esat->value(That);
-    for (int k=2; k<=m_nvc; ++k)
+    for (int k=2; k<=m_nvb; ++k)
         dpJT += k*m_B[k-1]->derive(That)*pow(x,k-1)
         - k*(k-1)*dJsat*m_B[k-1]->value(That)*pow(x,k-2);
     
@@ -215,7 +220,7 @@ double FERealLiquid::SpecificFreeEnergy(FEMaterialPoint& mp)
     double That = (m_Tr+tf.m_T)/m_Tr;
     double x = fp.m_ef - m_esat->value(That);
     double a = m_asat->value(That) - x*m_psat->value(That);
-    for (int k=1; k<=m_nvc; ++k)
+    for (int k=1; k<=m_nvb; ++k)
         a -= m_B[k-1]->value(That)/(k+1)*pow(x,k+1);
     
     return a*m_Pr/m_rhor;
@@ -233,7 +238,7 @@ double FERealLiquid::SpecificEntropy(FEMaterialPoint& mp)
     double dJsat = m_esat->derive(That);
     double ssat = m_ssat->value(That);
     double s = ssat + x*m_psat->derive(That);
-    for (int k=1; k<=m_nvc; ++k)
+    for (int k=1; k<=m_nvb; ++k)
         s += (m_B[k-1]->derive(That)*x/(k+1) - dJsat*m_B[k-1]->value(That))*pow(x,k);
 
     return s*m_Pr/(m_rhor*m_Tr);
@@ -343,7 +348,7 @@ bool FERealLiquid::Dilatation(const double T, const double p, double& e)
     double esat = m_esat->value(That);
     double phat = p/m_Pr;
     if (phat == psat) { e = esat; return true; }
-    switch (m_nvc) {
+    switch (m_nvb) {
         case 0:
             delete ft;
             return false;

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <FEBioFluid/FEFluidMaterialPoint.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/DumpStream.h>
+#include <FECore/FEModel.h>
 #include "FELinearThermoElasticFluid.h"
 // define the material parameters
 BEGIN_FECORE_CLASS(FEThermoFluid, FEThermoFluidMaterial)
@@ -60,12 +61,13 @@ bool FEThermoFluid::Init()
 {
     m_Tr = GetGlobalConstant("T");
     if (m_pElastic == nullptr) {
-        m_pElastic = fecore_alloc(FELinearThermoElasticFluid, GetFEModel());
+//        m_pElastic = fecore_alloc(FELinearThermoElasticFluid, GetFEModel());
+        m_pElastic =  new FELinearThermoElasticFluid(GetFEModel());
     }
 
 	// We set the parent of the elastic material to this fluid,
 	// so that it can access the fluid parameters if needed.
-//	m_pElastic->SetParentFluid(this);
+	m_pElastic->SetParentFluid(this);
 
     return FEThermoFluidMaterial::Init();
 }
@@ -83,7 +85,9 @@ void FEThermoFluid::Serialize(DumpStream& ar)
 //! returns a pointer to a new material point object
 FEMaterialPointData* FEThermoFluid::CreateMaterialPointData()
 {
-	return new FEFluidMaterialPoint();
+    FEFluidMaterialPoint* fpt = new FEFluidMaterialPoint();
+    FEThermoFluidMaterialPoint* tfp = new FEThermoFluidMaterialPoint(fpt);
+	return tfp;
 }
 
 //-----------------------------------------------------------------------------

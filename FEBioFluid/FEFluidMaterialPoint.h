@@ -61,5 +61,6 @@ public:
     double      m_efdot;    //!< material time derivative of ef
     vec3d       m_gradef;   //!< gradient of ef
     double      m_pf;       //!< elastic fluid pressure
+    double      m_Tf;       //!< elastic fluid temperature
     mat3ds      m_sf;       //!< fluid stress
 };

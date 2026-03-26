@@ -29,17 +29,40 @@
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FEBioFluid/FEFluidMaterialPoint.h>
+#include "FEThermalPropConst.h"
 #include "FEThermoFluid.h"
+
+// define the material parameters
+BEGIN_FECORE_CLASS(FELinearThermoElasticFluid, FEThermoElasticFluid)
+    ADD_PARAMETER(m_cvr, FE_RANGE_GREATER_OR_EQUAL(0.0), "cvr")->setUnits(UNIT_SPECIFIC_ENTROPY)->setLongName("referential isochoric specific heat capacity");
+    ADD_PROPERTY(m_cvhat, "cvhat", FEProperty::Optional)->SetLongName("normalized isochoric specific heat capacity");
+END_FECORE_CLASS();
+
 
 //-----------------------------------------------------------------------------
 FELinearThermoElasticFluid::FELinearThermoElasticFluid(FEModel* pfem) : FEThermoElasticFluid(pfem)
 {
+    m_cvhat = nullptr;
+    m_Tr = 0;
 }
 
 //-----------------------------------------------------------------------------
 //! initialization
 bool FELinearThermoElasticFluid::Init()
 {
+    FEModel* pfem = GetFEModel();
+    
+    m_Tr = GetGlobalConstant("T");
+    if (m_Tr <= 0){
+        feLogError("A positive absolute temperature T must be defined in Globals section");
+        return false;
+    }
+    
+    if (m_cvhat == nullptr) {
+        m_cvhat = new FEThermalPropConst(pfem);
+    }
+    m_cvhat->Init();
+    
     return true;
 }
 
@@ -86,4 +109,54 @@ bool FELinearThermoElasticFluid::Dilatation(const double T, const double p, doub
 {
     e = -p/m_pFluid->m_k;
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! isochoric specific heat capacity
+double FELinearThermoElasticFluid::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
+{
+    double cv = m_cvr;
+    if (m_cvhat) cv *= m_cvhat->NormalizedProperty(mp);
+    return cv;
+}
+        
+//-----------------------------------------------------------------------------
+//! isobaric specific heat capacity
+double FELinearThermoElasticFluid::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    double cv = IsochoricSpecificHeatCapacity(mp);
+    double p = Pressure(mp);    // current gauge pressure
+    double dpT = Tangent_Temperature(mp);
+    // evaluate dpT/dpJ in the reference configuration
+    double efsafe = fp.m_ef;
+    double Tsafe = tf.m_T;
+    fp.m_ef = 0;
+    tf.m_T = 0;
+    double r = Tangent_Temperature(mp)/Tangent_Strain(mp);
+    // restore values before continuing
+    fp.m_ef = efsafe;
+    tf.m_T = Tsafe;
+    // evaluate isobaric specific heat capacity
+    double cp = cv + r/m_pFluid->m_rhor*(p - (m_Tr + tf.m_T)*dpT);
+    return cp;
+}
+        
+//-----------------------------------------------------------------------------
+//! tangent of isochoric specific heat capacity with respect to strain J
+double FELinearThermoElasticFluid::Tangent_cv_Strain(FEMaterialPoint& mp)
+{
+    double dcvdJ = 0;
+    if (m_cvhat) dcvdJ = m_cvr*m_cvhat->Tangent_NormalizedProperty_Strain(mp);
+    return dcvdJ;
+}
+
+//-----------------------------------------------------------------------------
+//! tangent of isochoric specific heat capacity with respect to temperature T
+double FELinearThermoElasticFluid::Tangent_cv_Temperature(FEMaterialPoint& mp)
+{
+    double dcvdT = 0;
+    if (m_cvhat) dcvdT = m_cvr*m_cvhat->Tangent_NormalizedProperty_Temperature(mp);
+    return dcvdT;
 }

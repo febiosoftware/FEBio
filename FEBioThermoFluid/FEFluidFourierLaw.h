@@ -26,7 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEFluidHeatFlux.h"
 #include "febiothermofluid_api.h"
-#include "FEFluidThermalConductivity.h"
+#include "FEThermoFluidProperty.h"
 
 //-----------------------------------------------------------------------------
 // This class evaluates the heat flux from Fourier's law for a fluid
@@ -43,15 +43,15 @@ public:
     //! heat flux
     vec3d HeatFlux(FEMaterialPoint& pt) override;
 
-    double Conductivity(FEMaterialPoint& mp) override { return m_Kr*m_Khat->NormalizedConductivity(mp); }
+    double Conductivity(FEMaterialPoint& mp) override { return m_Kr*m_Khat->NormalizedProperty(mp); }
     
-    double Tangent_Conductivity_Temperature(FEMaterialPoint& mp) override { return m_Kr*m_Khat->Tangent_NormalizedConductivity_Temperature(mp); }
+    double Tangent_Conductivity_Temperature(FEMaterialPoint& mp) override { return m_Kr*m_Khat->Tangent_NormalizedProperty_Temperature(mp); }
     
-    double Tangent_Conductivity_Strain(FEMaterialPoint& mp) override { return m_Kr*m_Khat->Tangent_NormalizedConductivity_Strain(mp); }
+    double Tangent_Conductivity_Strain(FEMaterialPoint& mp) override { return m_Kr*m_Khat->Tangent_NormalizedProperty_Strain(mp); }
 
 public:
-    double                      m_Kr;   // referential thermal conductivity
-    FEFluidThermalConductivity* m_Khat; // normalized thermal conductivity
+    double              m_Kr;   // referential thermal conductivity
+    FEThermoFluidProperty*  m_Khat; // normalized thermal conductivity
 
     // declare parameter list
     DECLARE_FECORE_CLASS();

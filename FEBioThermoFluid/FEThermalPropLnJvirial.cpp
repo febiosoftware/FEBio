@@ -26,30 +26,30 @@ SOFTWARE.*/
 
 
 
-#include "FEThermalViscLnJvirial.h"
+#include "FEThermalPropLnJvirial.h"
 #include "FEThermoFluidMaterialPoint.h"
 #include <FEBioFluid/FEFluidMaterialPoint.h>
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEThermalViscLnJvirial, FEThermalViscosity)
+BEGIN_FECORE_CLASS(FEThermalPropLnJvirial, FEThermoFluidProperty)
     ADD_PROPERTY(m_coef[0] , "c0"   )->SetLongName("0th normalized viscosity coefficient");
-    ADD_PROPERTY(m_coef[1] , "c1" , FEProperty::Optional)->SetLongName("1st normalized viscosity coefficient");
-    ADD_PROPERTY(m_coef[2] , "c2" , FEProperty::Optional)->SetLongName("2nd normalized viscosity coefficient");
-    ADD_PROPERTY(m_coef[3] , "c3" , FEProperty::Optional)->SetLongName("3rd normalized viscosity coefficient");
-    ADD_PROPERTY(m_coef[4] , "c4" , FEProperty::Optional)->SetLongName("4th normalized viscosity coefficient");
-    ADD_PROPERTY(m_coef[5] , "c5" , FEProperty::Optional)->SetLongName("5th normalized viscosity coefficient");
-    ADD_PROPERTY(m_coef[6] , "c6" , FEProperty::Optional)->SetLongName("6th normalized viscosity coefficient");
+    ADD_PROPERTY(m_coef[1] , "c1" , FEProperty::Optional)->SetLongName("1st normalized coefficient");
+    ADD_PROPERTY(m_coef[2] , "c2" , FEProperty::Optional)->SetLongName("2nd normalized coefficient");
+    ADD_PROPERTY(m_coef[3] , "c3" , FEProperty::Optional)->SetLongName("3rd normalized coefficient");
+    ADD_PROPERTY(m_coef[4] , "c4" , FEProperty::Optional)->SetLongName("4th normalized coefficient");
+    ADD_PROPERTY(m_coef[5] , "c5" , FEProperty::Optional)->SetLongName("5th normalized coefficient");
+    ADD_PROPERTY(m_coef[6] , "c6" , FEProperty::Optional)->SetLongName("6th normalized coefficient");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FEThermalViscLnJvirial::FEThermalViscLnJvirial(FEModel* pfem) : FEThermalViscosity(pfem)
+FEThermalPropLnJvirial::FEThermalPropLnJvirial(FEModel* pfem) : FEThermoFluidProperty(pfem)
 {
     for (int k=0; k<MAX_COEF; ++k) m_coef[k] = nullptr;
 }
 
-bool FEThermalViscLnJvirial::Init()
+bool FEThermalPropLnJvirial::Init()
 {
     m_Tr = GetGlobalConstant("T");
     if (m_Tr <= 0) { feLogError("A positive referential absolute temperature T must be defined in Globals section"); return false; }
@@ -68,7 +68,7 @@ bool FEThermalViscLnJvirial::Init()
 
 //-----------------------------------------------------------------------------
 //! normalize viscosity
-double FEThermalViscLnJvirial::NormalizedViscosity(FEMaterialPoint& mp)
+double FEThermalPropLnJvirial::NormalizedProperty(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
@@ -85,8 +85,8 @@ double FEThermalViscLnJvirial::NormalizedViscosity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of normalized viscosity with respect to temperature
-double FEThermalViscLnJvirial::Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp)
+//! tangent of normalized property with respect to temperature
+double FEThermalPropLnJvirial::Tangent_NormalizedProperty_Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
@@ -103,8 +103,8 @@ double FEThermalViscLnJvirial::Tangent_NormalizedViscosity_Temperature(FEMateria
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of normalized viscosity with respect to volumetric strain (or J)
-double FEThermalViscLnJvirial::Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp)
+//! tangent of normalized property with respect to volumetric strain (or J)
+double FEThermalPropLnJvirial::Tangent_NormalizedProperty_Strain(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();

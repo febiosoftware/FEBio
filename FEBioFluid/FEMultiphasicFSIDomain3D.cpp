@@ -1641,9 +1641,9 @@ void FEMultiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp
             spt.m_ca[isol] = m_pMat->ConcentrationActual(mp, isol);
         }
         
-        // calculate the fluid pressure
+        // calculate the actual fluid pressure and the temperature
         pt.m_pf = m_pMat->PressureActual(mp);
-        
+        pt.m_Tf = m_pMat->Fluid()->GetElastic()->Temperature(mp);
         spt.m_psi = m_pMat->ElectricPotential(mp);
         spt.m_Ie = m_pMat->CurrentDensity(mp);
         spt.m_cF = m_pMat->FixedChargeDensity(mp);

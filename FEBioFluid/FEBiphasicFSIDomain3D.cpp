@@ -1022,8 +1022,9 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         // calculate the mixture stress at this material point
         ept.m_s = ft.m_ss + pt.m_sf;
 
-        // calculate the fluid pressure
+        // calculate the fluid pressure and temperature
         pt.m_pf = m_pMat->Fluid()->Pressure(mp);
+        pt.m_Tf = m_pMat->Fluid()->GetElastic()->Temperature(mp);
     }
 }
 

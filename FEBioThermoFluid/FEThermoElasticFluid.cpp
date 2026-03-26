@@ -44,7 +44,6 @@ double FEThermoElasticFluid::Tangent_Strain(FEMaterialPoint& mp)
     double pp = Pressure(tmp);
     fp->m_ef = pf.m_ef-d;
     double pm = Pressure(tmp);
-    delete ft;
     double dpJ = (pp - pm)/(2*d);
     return dpJ;
 }
@@ -65,7 +64,6 @@ double FEThermoElasticFluid::Tangent_Strain_Strain(FEMaterialPoint& mp)
     double dpp = Tangent_Strain(tmp);
     fp->m_ef = pf.m_ef-d;
     double dpm = Tangent_Strain(tmp);
-    delete ft;
     double dpJ2 = (dpp - dpm)/(2*d);
     return dpJ2;
 }
@@ -87,7 +85,6 @@ double FEThermoElasticFluid::Tangent_Temperature(FEMaterialPoint& mp)
     double pp = Pressure(tmp);
     ft->m_T = tf.m_T-d;
     double pm = Pressure(tmp);
-    delete ft;
     double dpT = (pp - pm)/(2*d);
     return dpT;
 }
@@ -109,7 +106,6 @@ double FEThermoElasticFluid::Tangent_Temperature_Temperature(FEMaterialPoint& mp
     double dpp = Tangent_Temperature(tmp);
     ft->m_T = tf.m_T-d;
     double dpm = Tangent_Temperature(tmp);
-    delete ft;
     double dpT2 = (dpp - dpm)/(2*d);
     return dpT2;
 }
@@ -132,7 +128,6 @@ double FEThermoElasticFluid::Tangent_Strain_Temperature(FEMaterialPoint& mp)
     double dpp = Tangent_Temperature(tmp);
     fp->m_ef = pf.m_ef-dJ;
     double dpm = Tangent_Temperature(tmp);
-    delete ft;
     double dpTJ = (dpp - dpm)/(2*dJ);
     return dpTJ;
 }
@@ -153,7 +148,6 @@ double FEThermoElasticFluid::Tangent_cv_Strain(FEMaterialPoint& mp)
     double cvp = IsochoricSpecificHeatCapacity(tmp);
     fp->m_ef = pf.m_ef-d;
     double cvm = IsochoricSpecificHeatCapacity(tmp);
-    delete ft;
     double dcvJ = (cvp - cvm)/(2*d);
     return dcvJ;
 }
@@ -175,7 +169,6 @@ double FEThermoElasticFluid::Tangent_cv_Temperature(FEMaterialPoint& mp)
     double cvp = IsochoricSpecificHeatCapacity(tmp);
     ft->m_T = tf.m_T-d;
     double cvm = IsochoricSpecificHeatCapacity(tmp);
-    delete ft;
     double dcvT = (cvp - cvm)/(2*d);
     return dcvT;
 }

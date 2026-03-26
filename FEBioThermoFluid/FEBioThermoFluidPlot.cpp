@@ -31,6 +31,21 @@ SOFTWARE.*/
 #include <FECore/writeplot.h>
 #include <FECore/FEModel.h>
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEThermoFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluidMaterial>();
+    if (pfluid == 0) return false;
+
+    // write solid element data
+    writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
+        return (ppt ? ppt->m_vft : vec3d(0.));
+    });
+
+    return true;
+}
+
 bool FEPlotFluidTemperature::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEThermoFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluid>();
@@ -193,3 +208,27 @@ bool FEPlotFluidSpecificEntropy::Save(FEDomain& dom, FEDataStream& a)
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidHeatSupplyDensity::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEThermoFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluidMaterial>();
+    if (pfluid == 0) return false;
+    FEThermoFluid* ptf = dom.GetMaterial()->ExtractProperty<FEThermoFluid>();
+
+    // write solid element data
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        FEFluidMaterialPoint* ppt = (mp_noconst.ExtractData<FEFluidMaterialPoint>());
+        FEThermoFluidMaterialPoint* tfp = (mp_noconst.ExtractData<FEThermoFluidMaterialPoint>());
+        double T = tfp->m_T + pfluid->GetViscous()->m_Tr;
+        double dpdT = ptf->GetElastic()->Tangent_Temperature(mp_noconst);
+        double r = (pfluid->GetViscous()->Stress(mp_noconst)*ppt->m_Lf).trace()
+        -T*dpdT*ppt->m_Lf.trace();
+        double rho = pfluid->Density(mp_noconst);
+        return (tfp ? rho*r : 0.0);
+    });
+    
+    return true;
+}
+

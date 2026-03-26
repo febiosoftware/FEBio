@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,4 +26,35 @@ SOFTWARE.*/
 
 
 
-#include "FEThermalViscosity.h"
+#pragma once
+#include "FEThermoFluidProperty.h"
+#include <FECore/FEFunction1D.h>
+
+//-----------------------------------------------------------------------------
+// This class implements a thermofluid property which is temperature dependent
+
+class FEBIOTHERMOFLUID_API FEThermalPropTempDpndnt :	public FEThermoFluidProperty
+{
+public:
+	//! constructor
+    FEThermalPropTempDpndnt(FEModel* pfem);
+    
+    //! initialize
+    bool Init() override;
+		
+    //! viscosity
+    double NormalizedProperty(FEMaterialPoint& pt) override;
+    
+    //! tangent of normalized viscosity with respect to temperature
+    double Tangent_NormalizedProperty_Temperature(FEMaterialPoint& mp) override;
+
+    //! tangent of normalized viscosity with respect to volumetric strain (or J)
+    double Tangent_NormalizedProperty_Strain(FEMaterialPoint& mp) override;
+    
+public:
+	FEFunction1D*	m_prop;			//!< temperature-dependent property
+    double          m_Tr;           //!< referential absolute temperature
+
+	// declare parameter list
+	DECLARE_FECORE_CLASS();
+};

@@ -90,13 +90,13 @@ double FEIdealGasIsentropic::Pressure(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! temperature
+//! return gauge temperature
 double FEIdealGasIsentropic::Temperature(FEMaterialPoint& mp)
 {
     FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     double J = 1 + fp.m_ef;
     double T = m_Tr*pow(J,1-m_gamma);
-    return T;
+    return T - m_Tr;
 }
 
 //-----------------------------------------------------------------------------

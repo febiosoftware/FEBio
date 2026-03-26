@@ -26,7 +26,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEThermoViscousFluid.h"
 #include "febiothermofluid_api.h"
-#include "FEThermalViscosity.h"
+#include "FEThermoFluidProperty.h"
 #include <FEBioFluid/FENewtonianFluid.h>
 #include <FECore/FEFunction1D.h>
 
@@ -65,10 +65,11 @@ public:
     double TangentBulkViscosityStrain(FEMaterialPoint& mp);
 
 public:
-    double              m_kappa;    // referential bulk viscosity
-    double              m_mu;       // referential shear viscosity
-    FEThermalViscosity* m_kappahat; // normalized bulk viscosity
-    FEThermalViscosity* m_muhat;    // normalized shear viscosity
+    // viscosities
+    double              m_kappa;    //!< referential bulk viscosity
+    double              m_mu;       //!< referential shear viscosity
+    FEThermoFluidProperty*  m_kappahat; //!< normalized bulk viscosity
+    FEThermoFluidProperty*  m_muhat;    //!< normalized shear viscosity
 
     // declare parameter list
     DECLARE_FECORE_CLASS();

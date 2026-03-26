@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FENewtonianThermoFluid.h"
 #include "FEThermoFluid.h"
-#include "FEThermalViscConst.h"
+#include "FEThermalPropConst.h"
 #include <FEBioFluid/FEFluid.h>
 #include <FEBioFluid/FEBiphasicFSI.h>
 #include <FECore/log.h>
@@ -35,10 +35,9 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FENewtonianThermoFluid, FEThermoViscousFluid)
     ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits(UNIT_VISCOSITY)->setLongName("referential bulk viscosity");
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("referential shear viscosity");
-
 // Optionally add strain-dependent normalized viscosity relations
-    ADD_PROPERTY(m_kappahat, "kappahat", FEProperty::Optional)->SetLongName("normal. bulk viscosity");
-    ADD_PROPERTY(m_muhat, "muhat", FEProperty::Optional)->SetLongName("normal. bulk viscosity");
+    ADD_PROPERTY(m_kappahat, "kappahat", FEProperty::Optional)->SetLongName("normalized bulk viscosity");
+    ADD_PROPERTY(m_muhat, "muhat", FEProperty::Optional)->SetLongName("normalized bulk viscosity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -55,11 +54,11 @@ bool FENewtonianThermoFluid::Init()
 {
     FEModel* pfem = GetFEModel();
     if (m_kappahat == nullptr) {
-        m_kappahat = new FEThermalViscConst(pfem);
+        m_kappahat = new FEThermalPropConst(pfem);
     }
     m_kappahat->Init();
     if (m_muhat == nullptr) {
-        m_muhat = new FEThermalViscConst(pfem);
+        m_muhat = new FEThermalPropConst(pfem);
     }
     m_muhat->Init();
     m_Tr = GetFEModel()->GetGlobalConstant("T");
@@ -92,8 +91,8 @@ mat3ds FENewtonianThermoFluid::Tangent_Strain(FEMaterialPoint& mp)
     
     mat3ds D = vt.RateOfDeformation();
     
-    double dmudJ = m_mu*m_muhat->Tangent_NormalizedViscosity_Strain(mp);
-    double dkappadJ = m_kappa*m_kappahat->Tangent_NormalizedViscosity_Strain(mp);
+    double dmudJ = m_mu*m_muhat->Tangent_NormalizedProperty_Strain(mp);
+    double dkappadJ = m_kappa*m_kappahat->Tangent_NormalizedProperty_Strain(mp);
     
     mat3ds dsdJ = mat3dd(1.0)*(D.tr()*(dkappadJ - 2.*dmudJ/3.)) + D*(2*dmudJ);
         
@@ -132,25 +131,25 @@ mat3ds FENewtonianThermoFluid::Tangent_Temperature(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 //! calculate viscosities
 double FENewtonianThermoFluid::ShearViscosity(FEMaterialPoint& mp) {
-    return m_mu*m_muhat->NormalizedViscosity(mp);
+    return m_mu*m_muhat->NormalizedProperty(mp);
 }
 
 double FENewtonianThermoFluid::TangentShearViscosityTemperature(FEMaterialPoint& mp) {
-    return m_mu*m_muhat->Tangent_NormalizedViscosity_Temperature(mp);
+    return m_mu*m_muhat->Tangent_NormalizedProperty_Temperature(mp);
 }
 
 double FENewtonianThermoFluid::TangentShearViscosityStrain(FEMaterialPoint& mp) {
-    return m_mu*m_muhat->Tangent_NormalizedViscosity_Strain(mp);
+    return m_mu*m_muhat->Tangent_NormalizedProperty_Strain(mp);
 }
 
 double FENewtonianThermoFluid::BulkViscosity(FEMaterialPoint& mp) {
-    return m_kappa*m_muhat->NormalizedViscosity(mp);
+    return m_kappa*m_muhat->NormalizedProperty(mp);
 }
 
 double FENewtonianThermoFluid::TangentBulkViscosityTemperature(FEMaterialPoint& mp) {
-    return m_kappa*m_muhat->Tangent_NormalizedViscosity_Temperature(mp);
+    return m_kappa*m_muhat->Tangent_NormalizedProperty_Temperature(mp);
 }
 
 double FENewtonianThermoFluid::TangentBulkViscosityStrain(FEMaterialPoint& mp) {
-    return m_kappa*m_muhat->Tangent_NormalizedViscosity_Strain(mp);
+    return m_kappa*m_muhat->Tangent_NormalizedProperty_Strain(mp);
 }

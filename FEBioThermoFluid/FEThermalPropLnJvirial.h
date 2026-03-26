@@ -26,4 +26,42 @@ SOFTWARE.*/
 
 
 
-#include "FEFluidThermalConductivity.h"
+#pragma once
+#include "FEThermoFluidProperty.h"
+#include <FECore/FEFunction1D.h>
+
+//-----------------------------------------------------------------------------
+// This class implements a thermofluid property which is a virial expansion in lnJ
+
+class FEBIOTHERMOFLUID_API FEThermalPropLnJvirial :	public FEThermoFluidProperty
+{
+public:
+    enum { MAX_COEF = 7 };
+    
+public:
+	//! constructor
+    FEThermalPropLnJvirial(FEModel* pfem);
+    
+    //! initialize
+    bool Init() override;
+		
+    //! viscosity
+    double NormalizedProperty(FEMaterialPoint& pt) override;
+    
+    //! tangent of normalized viscosity with respect to temperature
+    double Tangent_NormalizedProperty_Temperature(FEMaterialPoint& mp) override;
+
+    //! tangent of normalized viscosity with respect to volumetric strain (or J)
+    double Tangent_NormalizedProperty_Strain(FEMaterialPoint& mp) override;
+    
+public:
+	FEFunction1D*	m_coef[MAX_COEF];			//!< virial coefficients
+    double          m_Pr;           //!< referential absolute pressure
+    double          m_Tr;           //!< referential absolute temperature
+
+private:
+    int             m_ncoef;                    //!< number of coefficients in the virial expansion
+		
+	// declare parameter list
+	DECLARE_FECORE_CLASS();
+};

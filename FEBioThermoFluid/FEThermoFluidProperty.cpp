@@ -26,28 +26,4 @@ SOFTWARE.*/
 
 
 
-#pragma once
-#include <FECore/FEMaterial.h>
-#include "febiothermofluid_api.h"
-
-//-----------------------------------------------------------------------------
-//! Base class for thermofluid viscosity
-//! These materials need to define the normalized viscosity and its tangent functions (w.r.t. T and J).
-//!
-class FEBIOTHERMOFLUID_API FEThermalViscosity : public FEMaterialProperty
-{
-public:
-    FEThermalViscosity(FEModel* pfem) : FEMaterialProperty(pfem) {}
-	virtual ~FEThermalViscosity(){}
-    
-	//! viscosity
-	virtual double NormalizedViscosity(FEMaterialPoint& pt) = 0;
-    
-	//! tangent of normalized viscosity with respect to temperature
-	virtual double Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp) = 0;
-
-    //! tangent of normalized viscosity with respect to volumetric strain (or J)
-    virtual double Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp) = 0;
-    
-	FECORE_BASE_CLASS(FEThermalViscosity);
-};
+#include "FEThermoFluidProperty.h"

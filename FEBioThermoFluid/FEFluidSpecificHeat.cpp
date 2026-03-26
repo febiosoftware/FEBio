@@ -26,24 +26,4 @@ SOFTWARE.*/
 
 
 
-#pragma once
-#include "FEThermalViscosity.h"
-
-//-----------------------------------------------------------------------------
-// This class implements a poroelastic material that has a constant permeability
-
-class FEBIOTHERMOFLUID_API FEThermalViscConst :	public FEThermalViscosity
-{
-public:
-	//! constructor
-    FEThermalViscConst(FEModel* pfem);
-		
-    //! viscosity
-    double NormalizedViscosity(FEMaterialPoint& pt) { return 1.; };
-    
-    //! tangent of normalized viscosity with respect to temperature
-    double Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp) { return 0; }
-
-    //! tangent of normalized viscosity with respect to volumetric strain (or J)
-    double Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp) { return 0; }
-};
+#include "FEFluidSpecificHeat.h"

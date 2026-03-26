@@ -26,9 +26,9 @@ SOFTWARE.*/
 
 
 
-#include "FEThermalViscConst.h"
+#include "FEThermalPropConst.h"
 
-FEThermalViscConst::FEThermalViscConst(FEModel* pfem) : FEThermalViscosity(pfem)
+FEThermalPropConst::FEThermalPropConst(FEModel* pfem) : FEThermoFluidProperty(pfem)
 {
     
 }

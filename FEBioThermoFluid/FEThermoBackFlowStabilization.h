@@ -23,29 +23,42 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
+
+
+
 #pragma once
-#include <FECore/FEMaterial.h>
-#include "FEThermoFluidMaterialPoint.h"
+#include <FECore/FESurfaceLoad.h>
 #include "febiothermofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! Base class for fluid thermal conductivity materials.
-
-class FEBIOTHERMOFLUID_API FEFluidThermalConductivity : public FEMaterialProperty
+//! Backflow stabilization prescribes a normal traction that opposes
+//! backflow on a boundary surface.
+class FEBIOTHERMOFLUID_API FEThermoBackFlowStabilization : public FESurfaceLoad
 {
 public:
-    FEFluidThermalConductivity(FEModel* pfem) : FEMaterialProperty(pfem) {}
-    virtual ~FEFluidThermalConductivity() {}
+    //! constructor
+    FEThermoBackFlowStabilization(FEModel* pfem);
     
-public:
-    //! calculate thermal conductivity at material point
-    virtual double NormalizedConductivity(FEMaterialPoint& pt) = 0;
+    //! calculate pressure stiffness
+    void StiffnessMatrix(FELinearSystem& LS) override;
     
-    //! tangent of normalized thermal conductivity with respect to strain J
-    virtual double Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp) = 0;
+    //! calculate residual
+    void LoadVector(FEGlobalVector& R) override;
     
-    //! tangent of thermal conductivity with respect to temperature T
-    virtual double Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp) = 0;
-
-    FECORE_BASE_CLASS(FEFluidThermalConductivity)
+    //! serialize data
+    void Serialize(DumpStream& ar) override;
+    
+    //! initialization
+    bool Init() override;
+    
+protected:
+	vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
+    
+protected:
+    double			m_beta;     //!< backflow stabilization coefficient
+    
+    // degrees of freedom
+	FEDofList	m_dofW;
+    
+    DECLARE_FECORE_CLASS();
 };

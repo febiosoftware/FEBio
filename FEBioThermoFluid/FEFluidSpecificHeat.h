@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,41 +27,27 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEThermalViscosity.h"
-#include <FECore/FEFunction1D.h>
+#include <FECore/FEMaterial.h>
+#include "febiothermofluid_api.h"
 
 //-----------------------------------------------------------------------------
-// This class implements a thermofluid viscosity which is a virial expansion in lnJ
-
-class FEBIOTHERMOFLUID_API FEThermalViscLnJvirial :	public FEThermalViscosity
+//! Base class for fluid specific heat capacity materials.
+//! These materials need to define the normalized viscosity and its tangent functions (w.r.t. T and J).
+//!
+class FEBIOTHERMOFLUID_API FEFluidSpecificHeat : public FEMaterialProperty
 {
 public:
-    enum { MAX_COEF = 7 };
+    FEFluidSpecificHeat(FEModel* pfem) : FEMaterialProperty(pfem) {}
+	virtual ~FEFluidSpecificHeat() {}
     
-public:
-	//! constructor
-    FEThermalViscLnJvirial(FEModel* pfem);
+	//! viscosity
+	virtual double NormalizedSpecificHeat(FEMaterialPoint& pt) = 0;
     
-    //! initialize
-    bool Init() override;
-		
-    //! viscosity
-    double NormalizedViscosity(FEMaterialPoint& pt) override;
-    
-    //! tangent of normalized viscosity with respect to temperature
-    double Tangent_NormalizedViscosity_Temperature(FEMaterialPoint& mp) override;
+	//! tangent of normalized fluid specific heat capacity with respect to temperature
+	virtual double Tangent_NormalizedSpecificHeat_Temperature(FEMaterialPoint& mp) = 0;
 
-    //! tangent of normalized viscosity with respect to volumetric strain (or J)
-    double Tangent_NormalizedViscosity_Strain(FEMaterialPoint& mp) override;
+    //! tangent of normalized fluid specific heat capacity with respect to volumetric strain (or J)
+    virtual double Tangent_NormalizedSpecificHeat_Strain(FEMaterialPoint& mp) = 0;
     
-public:
-	FEFunction1D*	m_coef[MAX_COEF];			//!< virial coefficients
-    double          m_Pr;           //!< referential absolute pressure
-    double          m_Tr;           //!< referential absolute temperature
-
-private:
-    int             m_ncoef;                    //!< number of coefficients in the virial expansion
-		
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FEFluidSpecificHeat);
 };

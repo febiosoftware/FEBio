@@ -26,9 +26,28 @@ SOFTWARE.*/
 
 
 
-#include "FEThermalCondConst.h"
+#pragma once
+#include <FECore/FEMaterial.h>
+#include "febiothermofluid_api.h"
 
-FEThermalCondConst::FEThermalCondConst(FEModel* pfem) : FEFluidThermalConductivity(pfem)
+//-----------------------------------------------------------------------------
+//! Base class for thermofluid property
+//! These materials need to define the normalized property and its tangent functions (w.r.t. T and J).
+//!
+class FEBIOTHERMOFLUID_API FEThermoFluidProperty : public FEMaterialProperty
 {
+public:
+    FEThermoFluidProperty(FEModel* pfem) : FEMaterialProperty(pfem) {}
+	virtual ~FEThermoFluidProperty(){}
     
-}
+	//! viscosity
+	virtual double NormalizedProperty(FEMaterialPoint& pt) = 0;
+    
+	//! tangent of normalized viscosity with respect to temperature
+	virtual double Tangent_NormalizedProperty_Temperature(FEMaterialPoint& mp) = 0;
+
+    //! tangent of normalized viscosity with respect to volumetric strain (or J)
+    virtual double Tangent_NormalizedProperty_Strain(FEMaterialPoint& mp) = 0;
+    
+	FECORE_BASE_CLASS(FEThermoFluidProperty);
+};

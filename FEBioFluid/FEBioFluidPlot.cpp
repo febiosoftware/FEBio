@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include <FECore/FESurface.h>
 #include <FECore/writeplot.h>
 #include <FECore/FEDomainParameter.h>
+#include <FEBioThermoFluid/FEThermoFluidMaterial.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -581,6 +582,19 @@ bool FEPlotElasticFluidPressure::Save(FEDomain &dom, FEDataStream& a)
 		const FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
 		return (pt ? pt->m_pf : 0.0);
 	});
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotElasticFluidTemperature::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEFluidMaterial>();
+    if (pfluid == 0) return false;
+    
+    writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
+        const FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
+        return (pt ? pt->m_Tf : 0.0);
+    });
     return true;
 }
 

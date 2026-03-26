@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,25 +27,42 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEFluidThermalConductivity.h"
-#include <FECore/FEModel.h>
+#include <FECore/FESurfaceLoad.h>
 #include "febiothermofluid_api.h"
 
 //-----------------------------------------------------------------------------
-// This class implements a thermal conductivity which is constant
-
-class FEBIOTHERMOFLUID_API FEThermalCondConst :	public FEFluidThermalConductivity
+//! Tangential flow stabilization prescribes a shear traction that opposes
+//! tangential fluid velocity on a boundary surface, in the presence of normal
+//! flow.  This can help stabilize inflow/outflow conditions.
+class FEBIOTHERMOFLUID_API FEThermoTangentialFlowStabilization : public FESurfaceLoad
 {
 public:
-	//! constructor
-    FEThermalCondConst(FEModel* pfem);
-		
-    //! viscosity
-    double NormalizedConductivity(FEMaterialPoint& pt) override { return 1.; };
-    
-    //! tangent of normalized viscosity with respect to temperature
-    double Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp) override { return 0; }
+    //! constructor
+    FEThermoTangentialFlowStabilization(FEModel* pfem);
 
-    //! tangent of normalized viscosity with respect to volumetric strain (or J)
-    double Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp) override { return 0; }
+	//! Initialization
+	bool Init() override;
+    
+    //! Set the surface to apply the load to
+    void SetSurface(FESurface* ps) override;
+    
+    //! calculate pressure stiffness
+    void StiffnessMatrix(FELinearSystem& LS) override;
+    
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R) override;
+    
+    //! serialize data
+    void Serialize(DumpStream& ar) override;
+    
+protected:
+	vec3d FluidVelocity(FESurfaceMaterialPoint& mp, double alpha);
+    
+protected:
+    double			m_beta;     //!< damping coefficient
+    
+    // degrees of freedom
+	FEDofList	m_dofW;
+    
+    DECLARE_FECORE_CLASS();
 };

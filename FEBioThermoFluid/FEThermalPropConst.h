@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,40 +27,23 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEFluidThermalConductivity.h"
-#include <FECore/FEFunction1D.h>
+#include "FEThermoFluidProperty.h"
 
 //-----------------------------------------------------------------------------
-// This class implements a thermofluid conductivity which is a virial expansion in lnJ
+// This class implements a thermal property that has a constant value
 
-class FEBIOTHERMOFLUID_API FEThermalCondLnJvirial :	public FEFluidThermalConductivity
+class FEBIOTHERMOFLUID_API FEThermalPropConst :	public FEThermoFluidProperty
 {
 public:
-    enum { MAX_COEF = 7 };
-    
-public:
 	//! constructor
-    FEThermalCondLnJvirial(FEModel* pfem);
-    
-    //! initialize
-    bool Init() override;
+    FEThermalPropConst(FEModel* pfem);
 		
     //! viscosity
-    double NormalizedConductivity(FEMaterialPoint& pt) override;
+    double NormalizedProperty(FEMaterialPoint& pt) { return 1.; };
     
     //! tangent of normalized viscosity with respect to temperature
-    double Tangent_NormalizedConductivity_Temperature(FEMaterialPoint& mp) override;
+    double Tangent_NormalizedProperty_Temperature(FEMaterialPoint& mp) { return 0; }
 
     //! tangent of normalized viscosity with respect to volumetric strain (or J)
-    double Tangent_NormalizedConductivity_Strain(FEMaterialPoint& mp) override;
-    
- public:
-	FEFunction1D*	m_coef[MAX_COEF];			//!< virial coefficients
-    double          m_Tr;           //!< referential absolute temperature
-
-private:
-    int             m_ncoef;                    //!< number of coefficients in the virial expansion
-		
-	// declare parameter list
-	DECLARE_FECORE_CLASS();
+    double Tangent_NormalizedProperty_Strain(FEMaterialPoint& mp) { return 0; }
 };

@@ -205,6 +205,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Element elastic fluid temperature
+class FEPlotElasticFluidTemperature : public FEPlotDomainData
+{
+public:
+    FEPlotElasticFluidTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_TEMPERATURE); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Element fluid volume ratio
 class FEPlotFluidVolumeRatio : public FEPlotDomainData
 {

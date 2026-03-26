@@ -28,7 +28,7 @@
 
 #pragma once
 #include "FEThermoElasticFluid.h"
-#include <FECore/FEFunction1D.h>
+#include "FEThermoFluidProperty.h"
 
 //-----------------------------------------------------------------------------
 //! Linear elastic fluid
@@ -54,6 +54,35 @@ public:
     //! specific free energy
     double SpecificFreeEnergy(FEMaterialPoint& mp) override;
     
+    //! specific entropy
+    double SpecificEntropy(FEMaterialPoint& mp) override { return 0; }
+    
+    //! specific strain energy
+    double SpecificStrainEnergy(FEMaterialPoint& mp) override { return SpecificFreeEnergy(mp); }
+    
+    //! isochoric specific heat capacity
+    double IsochoricSpecificHeatCapacity(FEMaterialPoint& mp) override;
+            
+    //! isobaric specific heat capacity
+    double IsobaricSpecificHeatCapacity(FEMaterialPoint& mp) override;
+            
+    //! tangent of isochoric specific heat capacity with respect to strain J
+    double Tangent_cv_Strain(FEMaterialPoint& mp) override;
+    
+    //! tangent of isochoric specific heat capacity with respect to temperature T
+    double Tangent_cv_Temperature(FEMaterialPoint& mp) override;
+    
     //! dilatation from temperature and pressure
     bool Dilatation(const double T, const double p, double& e) override;
+    
+public:
+    // specific heat capacity
+    double              m_cvr;      //!< referential isochoric specific heat capacity
+    FEThermoFluidProperty*  m_cvhat;    //!< normalized isochoric specific heat capacity
+    //!
+    double              m_Tr;
+
+    // declare parameter list
+    DECLARE_FECORE_CLASS();
+
 };
