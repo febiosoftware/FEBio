@@ -380,8 +380,9 @@ double FELogElemJacobian::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-		FEElasticMaterialPoint& pt = *el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-		val += pt.m_J;
+		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
+		if (pt)
+			val += pt->m_J;
 	}
 	return val / (double) nint;
 }
@@ -2472,16 +2473,18 @@ double FELogElementMixtureStress::value(FEElement& el)
 		{
 			if (m_comp < mmp->Components())
 			{
-				FEElasticMaterialPoint& ep = *mmp->GetPointData(m_comp)->ExtractData<FEElasticMaterialPoint>();
-
-				switch (m_metric)
+				FEElasticMaterialPoint* ep = mmp->GetPointData(m_comp)->ExtractData<FEElasticMaterialPoint>();
+				if (ep)
 				{
-				case 0: s += ep.m_s.xx(); break;
-				case 1: s += ep.m_s.xy(); break;
-				case 2: s += ep.m_s.yy(); break;
-				case 3: s += ep.m_s.xz(); break;
-				case 4: s += ep.m_s.yz(); break;
-				case 5: s += ep.m_s.zz(); break;
+					switch (m_metric)
+					{
+					case 0: s += ep->m_s.xx(); break;
+					case 1: s += ep->m_s.xy(); break;
+					case 2: s += ep->m_s.yy(); break;
+					case 3: s += ep->m_s.xz(); break;
+					case 4: s += ep->m_s.yz(); break;
+					case 5: s += ep->m_s.zz(); break;
+					}
 				}
 			}
 		}
@@ -2873,11 +2876,14 @@ double FENormalizedInternalEnergy::value(FEDomain& dom)
 		for (int n = 0; n < nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-			FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
-
-			s += ep.m_s * gw[n];
-			D += ep.RateOfDeformation();
+			FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
+			if (ep)
+			{
+				s += ep->m_s * gw[n];
+				D += ep->RateOfDeformation();
+			}
 			w += gw[n];
+
 		}
 		s /= w;
 		D /= w;
@@ -2909,19 +2915,22 @@ double FELogTotalEnergy::value(FEDomain& dom)
 			for (int n = 0; n < nint; ++n)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
 
-				// strain energy
-				double W = pme->StrainEnergyDensity(mp);
+				if (pt)
+				{
+					// strain energy
+					double W = pme->StrainEnergyDensity(mp);
 
-				// kinetic energy
-				double D = pme->Density(mp);
-				vec3d& v = pt.m_v;
-				double K = 0.5 * (v * v) * D;
+					// kinetic energy
+					double D = pme->Density(mp);
+					vec3d& v = pt->m_v;
+					double K = 0.5 * (v * v) * D;
 
-				double J0 = solidDomain.detJ0(el, n);
+					double J0 = solidDomain.detJ0(el, n);
 
-				E += (K + W) * J0 * w[n];
+					E += (K + W) * J0 * w[n];
+				}
 			}
 		}
 		m_sum = E;
