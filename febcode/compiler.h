@@ -18,6 +18,8 @@ namespace febcode
 		GET_GLOBAL_DOUBLE,
 		GET_GLOBAL_VEC2,
 		GET_GLOBAL_VEC3,
+		GET_GLOBAL_MAT2,
+		GET_GLOBAL_MAT3,
 		GET_GLOBAL_ARRAY,
 		GET_GLOBAL_STRUCT,
 
@@ -26,6 +28,8 @@ namespace febcode
 		SET_GLOBAL_DOUBLE,
 		SET_GLOBAL_VEC2,
 		SET_GLOBAL_VEC3,
+		SET_GLOBAL_MAT2,
+		SET_GLOBAL_MAT3,
 		SET_GLOBAL_ARRAY,
 		SET_GLOBAL_STRUCT,
 
@@ -34,6 +38,8 @@ namespace febcode
 		GET_LOCAL_DOUBLE,
 		GET_LOCAL_VEC2,
 		GET_LOCAL_VEC3,
+		GET_LOCAL_MAT2,
+		GET_LOCAL_MAT3,
 		GET_LOCAL_ARRAY,
 		GET_LOCAL_STRUCT,
 
@@ -50,6 +56,8 @@ namespace febcode
 		GET_PROPERTY_DOUBLE,
 		GET_PROPERTY_VEC2,
 		GET_PROPERTY_VEC3,
+		GET_PROPERTY_MAT2,
+		GET_PROPERTY_MAT3,
 		GET_PROPERTY_ARRAY,
 		GET_PROPERTY_STRUCT,
 
@@ -60,6 +68,8 @@ namespace febcode
 		GET_INDEX_DOUBLE,
 		GET_INDEX_VEC2,
 		GET_INDEX_VEC3,
+		GET_INDEX_MAT2,
+		GET_INDEX_MAT3,
 		GET_INDEX_ARRAY,
 		GET_INDEX_STRUCT,
 
@@ -69,6 +79,8 @@ namespace febcode
 		GET_INDEX_REF_DOUBLE,
 		GET_INDEX_REF_VEC2,
 		GET_INDEX_REF_VEC3,
+		GET_INDEX_REF_MAT2,
+		GET_INDEX_REF_MAT3,
 
 		// vec2 codes
 		GET_VEC2_X,
@@ -76,6 +88,7 @@ namespace febcode
 		GET_VEC2_X_REF,
 		GET_VEC2_Y_REF,
 		GET_VEC2_SWIZZLE,
+		GET_VEC2_INDEX,
 
 		// vec3 codes
 		GET_VEC3_X,
@@ -85,6 +98,7 @@ namespace febcode
 		GET_VEC3_Y_REF,
 		GET_VEC3_Z_REF,
 		GET_VEC3_SWIZZLE,
+		GET_VEC3_INDEX,
 
 		// int operators
 		NEG_INT,
@@ -128,6 +142,26 @@ namespace febcode
 		MUL_VEC3_DOUBLE,
 		MUL_DOUBLE_VEC3,
 
+		// mat2 operators
+		NEG_MAT2,
+		ADD_MAT2,
+		SUB_MAT2,
+		MUL_MAT2,
+		MUL_MAT2_DOUBLE,
+		MUL_DOUBLE_MAT2,
+		MUL_MAT2_VEC2,
+		GET_MAT2_INDEX,
+
+		// mat3 operators
+		NEG_MAT3,
+		ADD_MAT3,
+		SUB_MAT3,
+		MUL_MAT3,
+		MUL_MAT3_DOUBLE,
+		MUL_DOUBLE_MAT3,
+		MUL_MAT3_VEC3,
+		GET_MAT3_INDEX,
+
 		// logical operators
 		NOT,
 
@@ -152,6 +186,8 @@ namespace febcode
 		STORE_DOUBLE,
 		STORE_VEC2,
 		STORE_VEC3,
+		STORE_MAT2,
+		STORE_MAT3,
 		STORE_ARRAY,
 		STORE_STRUCT,
 
@@ -161,6 +197,8 @@ namespace febcode
 		POP_DOUBLE,
 		POP_VEC2,
 		POP_VEC3,
+		POP_MAT2,
+		POP_MAT3,
 		POP_ARRAY,
 		POP_STRUCT,
 
@@ -173,6 +211,8 @@ namespace febcode
 		RETURN_DOUBLE,
 		RETURN_VEC2,
 		RETURN_VEC3,
+		RETURN_MAT2,
+		RETURN_MAT3,
 		RETURN_ARRAY,
 		RETURN_STRUCT,
 
@@ -276,4 +316,6 @@ namespace febcode
 	};
 
 	void CompileSource(Program& prg, const std::string& source);
+
+	const char* OpCodeToString(febcode::OpCode ip);
 } // namespace febcode

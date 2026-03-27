@@ -35,6 +35,7 @@ namespace febcode {
 		std::unique_ptr<Expression> diffCall    (const CallExpr*        call    , const std::string& var);
 		std::unique_ptr<Expression> diffInit    (const InitializerExpr* init    , const std::string& var);
 		std::unique_ptr<Expression> diffAssign  (const AssignExpr*      assign  , const std::string& var);
+		std::unique_ptr<Expression> diffIndex   (const IndexExpr*       index   , const std::string& var);
 		std::unique_ptr<Expression> diffMember  (const MemberExpr*      member  , const std::string& var);
 
 	private:

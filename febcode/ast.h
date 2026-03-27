@@ -292,6 +292,11 @@ namespace febcode {
 		return std::make_unique<MemberExpr>(std::move(copy_expression(object.get())), property); 
 	}
 
+	inline ExprPtr Index(const ExprPtr& object, const ExprPtr& index)
+	{ 
+		return std::make_unique<IndexExpr>(std::move(copy_expression(object.get())), std::move(copy_expression(index.get()))); 
+	}
+
 	inline ExprPtr Initializer(size_t n, Value v)
 	{
 		std::vector<ExprPtr> init(n);

@@ -53,6 +53,8 @@ void Compiler::endScope()
 		case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+		case TypeKind::Mat2  : emit(OpCode::POP_MAT2  ); break;
+		case TypeKind::Mat3  : emit(OpCode::POP_MAT3  ); break;
 		case TypeKind::Array : 
 			emit(OpCode::POP_ARRAY, local.type->size());
 			emitUint8(local.type->typeIndex);
@@ -127,6 +129,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_GLOBAL_DOUBLE: return +1;
 	case OpCode::GET_GLOBAL_VEC2  : return +2;
 	case OpCode::GET_GLOBAL_VEC3  : return +3;
+	case OpCode::GET_GLOBAL_MAT2  : return +4;
+	case OpCode::GET_GLOBAL_MAT3  : return +9;
 	case OpCode::GET_GLOBAL_ARRAY : return +arg;
 	case OpCode::GET_GLOBAL_STRUCT: return +arg;
 
@@ -135,6 +139,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::SET_GLOBAL_DOUBLE: 
 	case OpCode::SET_GLOBAL_VEC2: 
 	case OpCode::SET_GLOBAL_VEC3: 
+	case OpCode::SET_GLOBAL_MAT2: 
+	case OpCode::SET_GLOBAL_MAT3: 
 	case OpCode::SET_GLOBAL_ARRAY: 
 	case OpCode::SET_GLOBAL_STRUCT: 
 		return 0;
@@ -146,6 +152,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_LOCAL_DOUBLE: return +1;
 	case OpCode::GET_LOCAL_VEC2  : return +2;
 	case OpCode::GET_LOCAL_VEC3  : return +3;
+	case OpCode::GET_LOCAL_MAT2  : return +4;
+	case OpCode::GET_LOCAL_MAT3  : return +9;
 	case OpCode::GET_LOCAL_ARRAY : return +arg;
 	case OpCode::GET_LOCAL_STRUCT: return +arg;
 
@@ -159,6 +167,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_PROPERTY_DOUBLE: return +1;
 	case OpCode::GET_PROPERTY_VEC2  : return +2;
 	case OpCode::GET_PROPERTY_VEC3  : return +3;
+	case OpCode::GET_PROPERTY_MAT2  : return +4;
+	case OpCode::GET_PROPERTY_MAT3  : return +9;
 	case OpCode::GET_PROPERTY_ARRAY : return +1;
 	case OpCode::GET_PROPERTY_STRUCT: return +1;
 
@@ -169,6 +179,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_INDEX_DOUBLE: return +arg;
 	case OpCode::GET_INDEX_VEC2  : return +arg;
 	case OpCode::GET_INDEX_VEC3  : return +arg;
+	case OpCode::GET_INDEX_MAT2  : return +arg;
+	case OpCode::GET_INDEX_MAT3  : return +arg;
 	case OpCode::GET_INDEX_ARRAY : return +arg;
 	case OpCode::GET_INDEX_STRUCT: return +arg;
 
@@ -178,13 +190,17 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_INDEX_REF_DOUBLE:
 	case OpCode::GET_INDEX_REF_VEC2:
 	case OpCode::GET_INDEX_REF_VEC3:
+	case OpCode::GET_INDEX_REF_MAT2:
+	case OpCode::GET_INDEX_REF_MAT3:
 		return 0;
 
-	case OpCode::GET_VEC2_X: return 0;
-	case OpCode::GET_VEC2_Y: return 0;
+	case OpCode::GET_VEC2_X: return -1;
+	case OpCode::GET_VEC2_Y: return -1;
 	case OpCode::GET_VEC2_X_REF: return 0;
 	case OpCode::GET_VEC2_Y_REF: return 0;
 	case OpCode::GET_VEC2_SWIZZLE: return +1; // in case the swizzle returns a vec3
+	case OpCode::GET_VEC2_INDEX: return -2; // pops the index and vec2, and pushes the component
+
 	case OpCode::GET_VEC3_X: return 0;
 	case OpCode::GET_VEC3_Y: return 0;
 	case OpCode::GET_VEC3_Z: return 0;
@@ -192,6 +208,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_VEC3_Y_REF: return 0;
 	case OpCode::GET_VEC3_Z_REF: return 0;
 	case OpCode::GET_VEC3_SWIZZLE: return +1;
+	case OpCode::GET_VEC3_INDEX: return -3; // pops the index and vec3, and pushes the component
+
 	case OpCode::NEG_INT: return 0;
 	case OpCode::ADD_INT: return -1;
 	case OpCode::SUB_INT: return -1;
@@ -214,18 +232,39 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::LT_DOUBLE: return -1;
 	case OpCode::GE_DOUBLE: return -1;
 	case OpCode::LE_DOUBLE: return -1;
+
 	case OpCode::NEG_VEC2: return 0;
 	case OpCode::ADD_VEC2: return -2;
 	case OpCode::SUB_VEC2: return -2;
 	case OpCode::DOT_VEC2: return -3;
 	case OpCode::MUL_VEC2_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC2: return -1;
+
 	case OpCode::NEG_VEC3: return 0;
 	case OpCode::ADD_VEC3: return -3;
 	case OpCode::SUB_VEC3: return -3;
 	case OpCode::DOT_VEC3: return -5;
 	case OpCode::MUL_VEC3_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC3: return -1;
+
+	case OpCode::NEG_MAT2: return 0;
+	case OpCode::ADD_MAT2: return -4;
+	case OpCode::SUB_MAT2: return -4;
+	case OpCode::MUL_MAT2: return -4;
+	case OpCode::MUL_MAT2_DOUBLE: return -1;
+	case OpCode::MUL_DOUBLE_MAT2: return -1;
+	case OpCode::MUL_MAT2_VEC2 : return -4;
+	case OpCode::GET_MAT2_INDEX: return -3;
+
+	case OpCode::NEG_MAT3: return 0;
+	case OpCode::ADD_MAT3: return -9;
+	case OpCode::SUB_MAT3: return -9;
+	case OpCode::MUL_MAT3: return -9;
+	case OpCode::MUL_MAT3_DOUBLE: return -1;
+	case OpCode::MUL_DOUBLE_MAT3: return -1;
+	case OpCode::MUL_MAT3_VEC3  : return -9;
+	case OpCode::GET_MAT3_INDEX : return -7;
+
 	case OpCode::NOT: return 0;
 
 	case OpCode::EQUAL_BOOL: 
@@ -248,6 +287,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::STORE_DOUBLE:
 	case OpCode::STORE_VEC2:
 	case OpCode::STORE_VEC3:
+	case OpCode::STORE_MAT2:
+	case OpCode::STORE_MAT3:
 	case OpCode::STORE_ARRAY:
 	case OpCode::STORE_STRUCT:
 		return -1;
@@ -258,6 +299,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::POP_DOUBLE: return -1;
 	case OpCode::POP_VEC2  : return -2;
 	case OpCode::POP_VEC3  : return -3;
+	case OpCode::POP_MAT2  : return -4;
+	case OpCode::POP_MAT3  : return -9;
 	case OpCode::POP_ARRAY : return -arg;
 	case OpCode::POP_STRUCT: return -arg;
 
@@ -269,6 +312,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::RETURN_DOUBLE: 
 	case OpCode::RETURN_VEC2: 
 	case OpCode::RETURN_VEC3: 
+	case OpCode::RETURN_MAT2: 
+	case OpCode::RETURN_MAT3: 
 	case OpCode::RETURN_ARRAY: 
 	case OpCode::RETURN_STRUCT: 
 		return 0;
@@ -354,6 +399,8 @@ void Compiler::compileExprStmt(ExpressionStmt* stmt)
 	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+	case TypeKind::Mat2  : emit(OpCode::POP_MAT2  ); break;
+	case TypeKind::Mat3  : emit(OpCode::POP_MAT3  ); break;
 	case TypeKind::Array : 
 		emit(OpCode::POP_ARRAY, type->size());
 		emitUint8(type->typeIndex);
@@ -465,6 +512,61 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 				throw std::runtime_error("Invalid initializer type for vec3.");
 		}
 	}
+	else if (expectedType->kind == TypeKind::Mat2)
+	{
+		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
+		if (init)
+		{
+			if (init->elements.size() != 2)
+				throw std::runtime_error("Invalid initializer for mat2 type.");
+
+			for (size_t i = 0; i < 2; ++i)
+			{
+				ExprPtr& init_i = init->elements[i];
+
+				InitializerExpr* rowInit = dynamic_cast<InitializerExpr*>(init_i.get());
+				if (!rowInit || rowInit->elements.size() != 2)
+					throw std::runtime_error("Invalid initializer for mat2 type.");
+
+				compileExpression(rowInit->elements[0].get());
+				compileExpression(rowInit->elements[1].get());
+			}
+		}
+		else
+		{
+			Type returnType = compileExpression(expr);
+			if (returnType != expectedType)
+				throw std::runtime_error("Invalid initializer type for vec3.");
+		}
+	}
+	else if (expectedType->kind == TypeKind::Mat3)
+	{
+		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
+		if (init)
+		{
+			if (init->elements.size() != 3)
+				throw std::runtime_error("Invalid initializer for mat3 type.");
+
+			for (size_t i = 0; i < 3; ++i)
+			{
+				ExprPtr& init_i = init->elements[i];
+
+				InitializerExpr* rowInit = dynamic_cast<InitializerExpr*>(init_i.get());
+				if (!rowInit || rowInit->elements.size() != 3)
+					throw std::runtime_error("Invalid initializer for mat3 type.");
+
+				compileExpression(rowInit->elements[0].get());
+				compileExpression(rowInit->elements[1].get());
+				compileExpression(rowInit->elements[2].get());
+			}
+		}
+		else
+		{
+			Type returnType = compileExpression(expr);
+			if (returnType != expectedType)
+				throw std::runtime_error("Invalid initializer type for vec3.");
+		}
+	}
 	else
 	{
 		Type returnType = compileExpression(expr);
@@ -511,6 +613,8 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					case TypeKind::Double: emit(OpCode::SET_GLOBAL_DOUBLE); break;
 					case TypeKind::Vec2  : emit(OpCode::SET_GLOBAL_VEC2  ); break;
 					case TypeKind::Vec3  : emit(OpCode::SET_GLOBAL_VEC3  ); break;
+					case TypeKind::Mat2  : emit(OpCode::SET_GLOBAL_MAT2  ); break;
+					case TypeKind::Mat3  : emit(OpCode::SET_GLOBAL_MAT3  ); break;
 					case TypeKind::Array :
 						emit(OpCode::SET_GLOBAL_ARRAY);
 						emitUint8(type->size());
@@ -532,6 +636,8 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
 					case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
 					case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+					case TypeKind::Mat2  : emit(OpCode::POP_MAT2  ); break;
+					case TypeKind::Mat3  : emit(OpCode::POP_MAT3  ); break;
 					case TypeKind::Array :
 						emit(OpCode::POP_ARRAY, type->size());
 						emitUint8(type->typeIndex);
@@ -663,6 +769,8 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 		case TypeKind::Double: emit(OpCode::RETURN_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::RETURN_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::RETURN_VEC3  ); break;
+		case TypeKind::Mat2  : emit(OpCode::RETURN_MAT2  ); break;
+		case TypeKind::Mat3  : emit(OpCode::RETURN_MAT3  ); break;
 		case TypeKind::Array : 
 			emit(OpCode::RETURN_ARRAY ); 
 			emitUint8(returnType->typeIndex);
@@ -758,6 +866,8 @@ void Compiler::compileFunction(FunctionStmt* fn)
 		case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::POP_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::POP_VEC3  ); break;
+		case TypeKind::Mat2  : emit(OpCode::POP_MAT2  ); break;
+		case TypeKind::Mat3  : emit(OpCode::POP_MAT3  ); break;
 		case TypeKind::Array : 
 			emit(OpCode::POP_ARRAY, local.type->size()); 
 			emitUint8(local.type->typeIndex);
@@ -839,6 +949,8 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		case TypeKind::Double: emit(OpCode::GET_LOCAL_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::GET_LOCAL_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::GET_LOCAL_VEC3  ); break;
+		case TypeKind::Mat2  : emit(OpCode::GET_LOCAL_MAT2  ); break;
+		case TypeKind::Mat3  : emit(OpCode::GET_LOCAL_MAT3  ); break;
 		case TypeKind::Array:
 		{
 			emit(OpCode::GET_LOCAL_ARRAY, type->size()); 
@@ -878,6 +990,8 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	case TypeKind::Double: emit(OpCode::GET_GLOBAL_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::GET_GLOBAL_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::GET_GLOBAL_VEC3  ); break;
+	case TypeKind::Mat2  : emit(OpCode::GET_GLOBAL_MAT2  ); break;
+	case TypeKind::Mat3  : emit(OpCode::GET_GLOBAL_MAT3  ); break;
 	case TypeKind::Array:
 	{
 		emit(OpCode::GET_GLOBAL_ARRAY, glob.type->size()); 
@@ -913,6 +1027,8 @@ Type Compiler::compileAssign(AssignExpr* expr)
 	case TypeKind::Double: emit(OpCode::STORE_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::STORE_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::STORE_VEC3  ); break;
+	case TypeKind::Mat2  : emit(OpCode::STORE_MAT2  ); break;
+	case TypeKind::Mat3  : emit(OpCode::STORE_MAT3  ); break;
 	case TypeKind::Array:
 	{
 		emit(OpCode::STORE_ARRAY);
@@ -1083,6 +1199,8 @@ Type Compiler::compileIndexRef(IndexExpr* expr)
 	case TypeKind::Double: emit(OpCode::GET_INDEX_REF_DOUBLE); break;
 	case TypeKind::Vec2  : emit(OpCode::GET_INDEX_REF_VEC2  ); break;
 	case TypeKind::Vec3  : emit(OpCode::GET_INDEX_REF_VEC3  ); break;
+	case TypeKind::Mat2  : emit(OpCode::GET_INDEX_REF_MAT2  ); break;
+	case TypeKind::Mat3  : emit(OpCode::GET_INDEX_REF_MAT3  ); break;
 	case TypeKind::Array : 
 	case TypeKind::Struct: 
 		emit(OpCode::GET_INDEX_REF);
@@ -1303,6 +1421,100 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		return type_r;
 	}
 
+	// mat2 operations
+	if (isMat2Type(type_l) && isMat2Type(type_r))
+	{
+		Type returnType = type_l;
+		switch (op)
+		{
+		case BinaryOp::Plus    : emit(OpCode::ADD_MAT2); break;
+		case BinaryOp::Minus   : emit(OpCode::SUB_MAT2); break;
+		case BinaryOp::Multiply: emit(OpCode::MUL_MAT2); break;
+		default: throw std::runtime_error("Unsupported binary op for mat2 type.");
+		}
+		return returnType;
+	}
+
+	// mat2 * vec2
+	if (isMat2Type(type_l) && isVec2Type(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_MAT2_VEC2); break;
+		default: throw std::runtime_error("Unsupported binary op for mat2 and vec2 types.");
+		}
+		return type_r;
+	}
+
+	// mat2 * scalar
+	if (isMat2Type(type_l) && isDoubleType(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_MAT2_DOUBLE); break;
+		default: throw std::runtime_error("Unsupported binary op for mat2 and double types.");
+		}
+		return type_l;
+	}
+
+	// scalar * mat2
+	if (isDoubleType(type_l) && isMat2Type(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_DOUBLE_MAT2); break;
+		default: throw std::runtime_error("Unsupported binary op for double and mat2 types.");
+		}
+		return type_r;
+	}
+
+	// mat3 operations
+	if (isMat3Type(type_l) && isMat3Type(type_r))
+	{
+		Type returnType = type_l;
+		switch (op)
+		{
+		case BinaryOp::Plus    : emit(OpCode::ADD_MAT3); break;
+		case BinaryOp::Minus   : emit(OpCode::SUB_MAT3); break;
+		case BinaryOp::Multiply: emit(OpCode::MUL_MAT3); break;
+		default: throw std::runtime_error("Unsupported binary op for mat3 type.");
+		}
+		return returnType;
+	}
+
+	// mat3 * scalar
+	if (isMat3Type(type_l) && isDoubleType(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_MAT3_DOUBLE); break;
+		default: throw std::runtime_error("Unsupported binary op for mat3 and double types.");
+		}
+		return type_l;
+	}
+
+	// scalar * mat3
+	if (isDoubleType(type_l) && isMat3Type(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_DOUBLE_MAT3); break;
+		default: throw std::runtime_error("Unsupported binary op for double and mat2 types.");
+		}
+		return type_r;
+	}
+
+	// mat3 * vec3
+	if (isMat3Type(type_l) && isVec3Type(type_r))
+	{
+		switch (op)
+		{
+		case BinaryOp::Multiply: emit(OpCode::MUL_MAT3_VEC3); break;
+		default: throw std::runtime_error("Unsupported binary op for mat3 and vec3 types.");
+		}
+		return type_r;
+	}
+
 	throw std::runtime_error("Unsupported binary op for given operand types.");
 
 	return type_l;
@@ -1319,6 +1531,8 @@ Type Compiler::compileUnary(UnaryExpr* expr)
 		else if (isDoubleType(type)) emit(OpCode::NEG_DOUBLE);
 		else if (isVec2Type  (type)) emit(OpCode::NEG_VEC2);
 		else if (isVec3Type  (type)) emit(OpCode::NEG_VEC3);
+		else if (isMat2Type  (type)) emit(OpCode::NEG_MAT2);
+		else if (isMat3Type  (type)) emit(OpCode::NEG_MAT3);
 		else
 			throw std::runtime_error("Invalid operand type for unary '-'.");
 		break;
@@ -1434,6 +1648,8 @@ Type Compiler::compileMember(MemberExpr* expr)
 		case TypeKind::Double: emit(OpCode::GET_PROPERTY_DOUBLE); break;
 		case TypeKind::Vec2  : emit(OpCode::GET_PROPERTY_VEC2  ); break;
 		case TypeKind::Vec3  : emit(OpCode::GET_PROPERTY_VEC3  ); break;
+		case TypeKind::Mat2  : emit(OpCode::GET_PROPERTY_MAT2  ); break;
+		case TypeKind::Mat3  : emit(OpCode::GET_PROPERTY_MAT3  ); break;
 		case TypeKind::Array : emit(OpCode::GET_PROPERTY_ARRAY ); break;
 		case TypeKind::Struct: emit(OpCode::GET_PROPERTY_STRUCT); break;
 		default:
@@ -1541,6 +1757,47 @@ Type Compiler::compileIndex(IndexExpr* expr)
 {
 	Type exprType = compileExpression(expr->object.get());
 	Type indxType = compileExpression(expr->index.get());
+
+	// vec2 indexing
+	if (exprType->kind == TypeKind::Vec2)
+	{
+		if (indxType->kind != TypeKind::Int)
+			throw std::runtime_error("vec2 index must be an integer.");
+
+		emit(OpCode::GET_VEC2_INDEX);
+		return prg.types.getDoubleType();
+	}
+
+	// vec3 indexing
+	if (exprType->kind == TypeKind::Vec3)
+	{
+		if (indxType->kind != TypeKind::Int)
+			throw std::runtime_error("vec3 index must be an integer.");
+
+		emit(OpCode::GET_VEC3_INDEX);
+		return prg.types.getDoubleType();
+	}
+
+	// mat2 indexing
+	if (exprType->kind == TypeKind::Mat2)
+	{
+		if (indxType->kind != TypeKind::Int)
+			throw std::runtime_error("mat2 index must be an integer.");
+
+		emit(OpCode::GET_MAT2_INDEX);
+		return prg.types.getVec2Type();
+	}
+
+	// mat3 indexing
+	if (exprType->kind == TypeKind::Mat3)
+	{
+		if (indxType->kind != TypeKind::Int)
+			throw std::runtime_error("mat3 index must be an integer.");
+
+		emit(OpCode::GET_MAT3_INDEX);
+		return prg.types.getVec3Type();
+	}
+
 	if (exprType->kind != TypeKind::Array)
 		throw std::runtime_error("Cannot index non-array type.");
 	if (indxType->kind != TypeKind::Int)
@@ -1555,6 +1812,8 @@ Type Compiler::compileIndex(IndexExpr* expr)
 	case TypeKind::Double: emit(OpCode::GET_INDEX_DOUBLE, stackEffect); break;
 	case TypeKind::Vec2  : emit(OpCode::GET_INDEX_VEC2  , stackEffect); break;
 	case TypeKind::Vec3  : emit(OpCode::GET_INDEX_VEC3  , stackEffect); break;
+	case TypeKind::Mat2  : emit(OpCode::GET_INDEX_MAT2  , stackEffect); break;
+	case TypeKind::Mat3  : emit(OpCode::GET_INDEX_MAT3  , stackEffect); break;
 	case TypeKind::Array : emit(OpCode::GET_INDEX_ARRAY , stackEffect); break;
 	case TypeKind::Struct: emit(OpCode::GET_INDEX_STRUCT, stackEffect); break;
 		default:
@@ -1564,4 +1823,208 @@ Type Compiler::compileIndex(IndexExpr* expr)
 	emitUint8(exprType->typeIndex);
 
 	return exprType->elementType;
+}
+
+
+const char* febcode::OpCodeToString(febcode::OpCode op)
+{
+	switch (op)
+	{
+	case OpCode::PUSH_VOID     : 
+	case OpCode::PUSH_BOOL     :
+	case OpCode::PUSH_INT      :
+	case OpCode::PUSH_DOUBLE   : return "MOV ";
+
+	case OpCode::GET_GLOBAL_BOOL  :
+	case OpCode::GET_GLOBAL_INT   :
+	case OpCode::GET_GLOBAL_DOUBLE:
+	case OpCode::GET_GLOBAL_VEC2  :
+	case OpCode::GET_GLOBAL_VEC3  : 
+	case OpCode::GET_GLOBAL_MAT2  : 
+	case OpCode::GET_GLOBAL_MAT3  : 
+	case OpCode::GET_GLOBAL_ARRAY : 
+	case OpCode::GET_GLOBAL_STRUCT: return "GTG ";
+
+	case OpCode::SET_GLOBAL_BOOL  :
+	case OpCode::SET_GLOBAL_INT   :
+	case OpCode::SET_GLOBAL_DOUBLE:
+	case OpCode::SET_GLOBAL_VEC2  :
+	case OpCode::SET_GLOBAL_VEC3  :
+	case OpCode::SET_GLOBAL_MAT2  :
+	case OpCode::SET_GLOBAL_MAT3  :
+	case OpCode::SET_GLOBAL_ARRAY :
+	case OpCode::SET_GLOBAL_STRUCT: return "STG ";
+
+	case OpCode::STORE_BOOL  :
+	case OpCode::STORE_INT   :
+	case OpCode::STORE_DOUBLE:
+	case OpCode::STORE_VEC2  :
+	case OpCode::STORE_VEC3  :
+	case OpCode::STORE_MAT2:
+	case OpCode::STORE_MAT3:
+	case OpCode::STORE_ARRAY :
+	case OpCode::STORE_STRUCT:
+		return "STOR";
+
+	case OpCode::GET_GLOBAL_REF: 
+		return "GREF";
+
+	case OpCode::GET_LOCAL_REF       :
+		return "LREF";
+
+	case OpCode::GET_INDEX_REF       : 
+	case OpCode::GET_INDEX_REF_BOOL  : 
+	case OpCode::GET_INDEX_REF_INT   : 
+	case OpCode::GET_INDEX_REF_DOUBLE: 
+	case OpCode::GET_INDEX_REF_VEC2  : 
+	case OpCode::GET_INDEX_REF_VEC3  : 
+	case OpCode::GET_INDEX_REF_MAT2  :
+	case OpCode::GET_INDEX_REF_MAT3  :
+		return "IREF";
+
+	case OpCode::GET_MEMBER_REF: return "MREF";
+
+	case OpCode::GET_LOCAL_BOOL  :
+	case OpCode::GET_LOCAL_INT   :
+	case OpCode::GET_LOCAL_DOUBLE:
+	case OpCode::GET_LOCAL_VEC2  :
+	case OpCode::GET_LOCAL_VEC3  :
+	case OpCode::GET_LOCAL_MAT2  :
+	case OpCode::GET_LOCAL_MAT3  :
+	case OpCode::GET_LOCAL_ARRAY :
+	case OpCode::GET_LOCAL_STRUCT: return "GETL";
+
+	case OpCode::ADD_INT       : return "ADDI";
+	case OpCode::ADD_DOUBLE    : return "ADDF";
+	case OpCode::SUB_INT       : return "SUBI";
+	case OpCode::SUB_DOUBLE    : return "SUBF";
+	case OpCode::MUL_INT       : return "MULI";
+	case OpCode::MUL_DOUBLE    : return "MULF";
+	case OpCode::DIV_INT       : return "DIVI";
+	case OpCode::DIV_DOUBLE    : return "DIVF";
+	case OpCode::EXP_INT       : return "EXPI";
+	case OpCode::EXP_DOUBLE    : return "EXPF";
+	case OpCode::SQR_DOUBLE    : return "SQR ";
+	case OpCode::SQRT_DOUBLE   : return "SQRT";
+
+	case OpCode::EQUAL_BOOL  :
+	case OpCode::EQUAL_INT   :
+	case OpCode::EQUAL_DOUBLE: return "EQ  ";
+
+	case OpCode::NEQ_BOOL  :
+	case OpCode::NEQ_INT   :
+	case OpCode::NEQ_DOUBLE: return "NEQ ";
+
+	case OpCode::GT_INT        : return "GTI ";
+	case OpCode::GT_DOUBLE     : return "GTF ";
+	case OpCode::LT_INT        : return "LTI ";
+	case OpCode::LT_DOUBLE     : return "LTF ";
+	case OpCode::GE_INT        : return "GEI ";
+	case OpCode::GE_DOUBLE     : return "GEF ";
+	case OpCode::LE_INT        : return "LEI ";
+	case OpCode::LE_DOUBLE     : return "LEF ";
+	case OpCode::NEG_INT       : return "NEGI";
+	case OpCode::NEG_DOUBLE    : return "NEGF";
+
+	case OpCode::GET_VEC2_X    : return "GV2X";
+	case OpCode::GET_VEC2_Y    : return "GV2Y";
+	case OpCode::GET_VEC2_SWIZZLE: return "G2SW";
+	case OpCode::GET_VEC2_INDEX: return "G2I ";
+	case OpCode::ADD_VEC2      : return "ADD2";
+	case OpCode::SUB_VEC2      : return "SUB2";
+	case OpCode::DOT_VEC2      : return "DOT2";
+	case OpCode::MUL_VEC2_DOUBLE: return "ML2F";
+	case OpCode::MUL_DOUBLE_VEC2: return "MLF2";
+	case OpCode::NEG_VEC2      : return "NEG2";
+
+	case OpCode::GET_VEC3_X    : return "GV3X";
+	case OpCode::GET_VEC3_Y    : return "GV3Y";
+	case OpCode::GET_VEC3_Z    : return "GV3Z";
+	case OpCode::GET_VEC3_SWIZZLE: return "G3SW";
+	case OpCode::GET_VEC3_INDEX: return "G3I ";
+	case OpCode::ADD_VEC3      : return "ADD3";
+	case OpCode::SUB_VEC3      : return "SUB3";
+	case OpCode::DOT_VEC3      : return "DOT3";
+	case OpCode::MUL_VEC3_DOUBLE: return "ML3F";
+	case OpCode::MUL_DOUBLE_VEC3: return "MLF3";
+	case OpCode::NEG_VEC3      : return "NEG3";
+
+	case OpCode::ADD_MAT2       : return "ADM2";
+	case OpCode::SUB_MAT2       : return "SBM2";
+	case OpCode::MUL_MAT2       : return "MLM2";
+	case OpCode::MUL_MAT2_DOUBLE: return "M2F ";
+	case OpCode::MUL_DOUBLE_MAT2: return "FM2 ";
+	case OpCode::MUL_MAT2_VEC2  : return "M2V2";
+	case OpCode::NEG_MAT2       : return "NGM2";
+	case OpCode::GET_MAT2_INDEX : return "GM2I";
+
+	case OpCode::ADD_MAT3       : return "ADM3";
+	case OpCode::SUB_MAT3       : return "SBM3";
+	case OpCode::MUL_MAT3       : return "MLM3";
+	case OpCode::MUL_MAT3_DOUBLE: return "M3F ";
+	case OpCode::MUL_DOUBLE_MAT3: return "FM3 ";
+	case OpCode::MUL_MAT3_VEC3  : return "M3V3";
+	case OpCode::NEG_MAT3       : return "NGM3";
+	case OpCode::GET_MAT3_INDEX : return "GM3I";
+
+	case OpCode::NOT           : return "NOT ";
+	case OpCode::CREATE_STRUCT : return "STRC";
+	case OpCode::COPY_STRUCT   : return "CPYS";
+
+	case OpCode::GET_PROPERTY_BOOL:
+	case OpCode::GET_PROPERTY_INT:
+	case OpCode::GET_PROPERTY_DOUBLE:
+	case OpCode::GET_PROPERTY_VEC2:
+	case OpCode::GET_PROPERTY_VEC3:
+	case OpCode::GET_PROPERTY_MAT2:
+	case OpCode::GET_PROPERTY_MAT3:
+	case OpCode::GET_PROPERTY_ARRAY:
+	case OpCode::GET_PROPERTY_STRUCT:
+		return "GETP";
+
+	case OpCode::GET_INDEX_BOOL  :
+	case OpCode::GET_INDEX_INT   :
+	case OpCode::GET_INDEX_DOUBLE:
+	case OpCode::GET_INDEX_VEC2  :
+	case OpCode::GET_INDEX_VEC3  :
+	case OpCode::GET_INDEX_ARRAY :
+	case OpCode::GET_INDEX_STRUCT:
+		return "GETI";
+
+	case OpCode::JUMP          : return "JMP ";
+	case OpCode::JUMP_IF_FALSE : return "JMPF";
+	case OpCode::JUMP_IF_TRUE  : return "JMPT";
+	case OpCode::LOOP          : return "LOOP";
+	case OpCode::CALL          : return "CALL";
+
+	case OpCode::POP_VOID  : return "POPV";
+	case OpCode::POP_BOOL  : return "POPB";
+	case OpCode::POP_INT   : return "POPI";
+	case OpCode::POP_DOUBLE: return "POPD";
+	case OpCode::POP_VEC2  : return "POP2";
+	case OpCode::POP_VEC3  : return "POP3";
+	case OpCode::POP_MAT2  : return "PPM2";
+	case OpCode::POP_MAT3  : return "PPM3";
+	case OpCode::POP_ARRAY : return "POPA";
+	case OpCode::POP_STRUCT: return "POPS";	
+
+	case OpCode::GET_VEC2_X_REF: return "RV2X";
+	case OpCode::GET_VEC2_Y_REF: return "RV2Y";
+	case OpCode::GET_VEC3_X_REF: return "RV3X";
+	case OpCode::GET_VEC3_Y_REF: return "RV3Y";
+	case OpCode::GET_VEC3_Z_REF: return "RV3Z";
+
+	case OpCode::RETURN_VOID: 
+	case OpCode::RETURN_BOOL: 
+	case OpCode::RETURN_INT: 
+	case OpCode::RETURN_DOUBLE: 
+	case OpCode::RETURN_VEC2: 
+	case OpCode::RETURN_VEC3: 
+	case OpCode::RETURN_MAT2:
+	case OpCode::RETURN_MAT3:
+	case OpCode::RETURN_ARRAY: 
+	case OpCode::RETURN_STRUCT: 
+		return "RET ";
+	}
+	return "(UNKNOWN)";
 }

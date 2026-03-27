@@ -15,6 +15,8 @@ namespace febcode
 		Double,
 		Vec2,
 		Vec3,
+		Mat2,
+		Mat3,
 		Array,
 		Struct,
 	};
@@ -65,6 +67,129 @@ namespace febcode
 		}
 	};
 
+	struct mat2 {
+		double m[2][2];
+		mat2() {
+			m[0][0] = m[0][1] = m[1][0] = m[1][1] = 0.0;
+		}
+		mat2(double a00, double a01, double a10, double a11) {
+			m[0][0] = a00; m[0][1] = a01;
+			m[1][0] = a10; m[1][1] = a11;
+		}
+		mat2 operator + (const mat2& other) const {
+			return mat2(
+				m[0][0] + other.m[0][0], m[0][1] + other.m[0][1],
+				m[1][0] + other.m[1][0], m[1][1] + other.m[1][1]
+			);
+		}
+		mat2 operator-(const mat2& other) const {
+			return mat2(
+				m[0][0] - other.m[0][0], m[0][1] - other.m[0][1],
+				m[1][0] - other.m[1][0], m[1][1] - other.m[1][1]
+			);
+		}
+		mat2 operator*(double scalar) const {
+			return mat2(
+				m[0][0] * scalar, m[0][1] * scalar,
+				m[1][0] * scalar, m[1][1] * scalar
+			);
+		}
+		vec2 operator*(const vec2& other) const {
+			return vec2(
+				m[0][0] * other.x + m[0][1] * other.y,
+				m[1][0] * other.x + m[1][1] * other.y
+			);
+		}
+		mat2 operator*(const mat2& other) const {
+			return mat2(
+				m[0][0] * other.m[0][0] + m[0][1] * other.m[1][0],
+				m[0][0] * other.m[0][1] + m[0][1] * other.m[1][1],
+				m[1][0] * other.m[0][0] + m[1][1] * other.m[1][0],
+				m[1][0] * other.m[0][1] + m[1][1] * other.m[1][1]
+			);
+		}
+		bool operator==(const mat2& other) const {
+			return (m[0][0] == other.m[0][0]) && (m[0][1] == other.m[0][1]) &&
+				   (m[1][0] == other.m[1][0]) && (m[1][1] == other.m[1][1]);
+		}
+		bool operator!=(const mat2& other) const {
+			return !(*this == other);
+		}
+	};
+
+	struct mat3 {
+		double m[3][3];
+		mat3() {
+			m[0][0] = m[0][1] = m[0][2] = 0.0;
+			m[1][0] = m[1][1] = m[1][2] = 0.0;
+			m[2][0] = m[2][1] = m[2][2] = 0.0;
+		}
+		mat3(double a00, double a01, double a02,
+			 double a10, double a11, double a12,
+			 double a20, double a21, double a22) {
+			m[0][0] = a00; m[0][1] = a01; m[0][2] = a02;
+			m[1][0] = a10; m[1][1] = a11; m[1][2] = a12;
+			m[2][0] = a20; m[2][1] = a21; m[2][2] = a22;
+		}
+
+		mat3 operator + (const mat3& other) const {
+			return mat3(
+				m[0][0] + other.m[0][0], m[0][1] + other.m[0][1], m[0][2] + other.m[0][2],
+				m[1][0] + other.m[1][0], m[1][1] + other.m[1][1], m[1][2] + other.m[1][2],
+				m[2][0] + other.m[2][0], m[2][1] + other.m[2][1], m[2][2] + other.m[2][2]
+			);
+		}
+
+		mat3 operator - (const mat3& other) const {
+			return mat3(
+				m[0][0] - other.m[0][0], m[0][1] - other.m[0][1], m[0][2] - other.m[0][2],
+				m[1][0] - other.m[1][0], m[1][1] - other.m[1][1], m[1][2] - other.m[1][2],
+				m[2][0] - other.m[2][0], m[2][1] - other.m[2][1], m[2][2] - other.m[2][2]
+			);
+		}
+
+		mat3 operator*(double scalar) const {
+			return mat3(
+				m[0][0] * scalar, m[0][1] * scalar, m[0][2] * scalar,
+				m[1][0] * scalar, m[1][1] * scalar, m[1][2] * scalar,
+				m[2][0] * scalar, m[2][1] * scalar, m[2][2] * scalar
+			);
+		}
+
+		vec3 operator*(const vec3& other) const {
+			return vec3(
+				m[0][0] * other.x + m[0][1] * other.y + m[0][2] * other.z,
+				m[1][0] * other.x + m[1][1] * other.y + m[1][2] * other.z,
+				m[2][0] * other.x + m[2][1] * other.y + m[2][2] * other.z
+			);
+		}
+
+		mat3 operator*(const mat3& other) const {
+			return mat3(
+				m[0][0] * other.m[0][0] + m[0][1] * other.m[1][0] + m[0][2] * other.m[2][0],
+				m[0][0] * other.m[0][1] + m[0][1] * other.m[1][1] + m[0][2] * other.m[2][1],
+				m[0][0] * other.m[0][2] + m[0][1] * other.m[1][2] + m[0][2] * other.m[2][2],
+
+				m[1][0] * other.m[0][0] + m[1][1] * other.m[1][0] + m[1][2] * other.m[2][0],
+				m[1][0] * other.m[0][1] + m[1][1] * other.m[1][1] + m[1][2] * other.m[2][1],
+				m[1][0] * other.m[0][2] + m[1][1] * other.m[1][2] + m[1][2] * other.m[2][2],
+
+				m[2][0] * other.m[0][0] + m[2][1] * other.m[1][0] + m[2][2] * other.m[2][0],
+				m[2][0] * other.m[0][1] + m[2][1] * other.m[1][1] + m[2][2] * other.m[2][1],
+				m[2][0] * other.m[0][2] + m[2][1] * other.m[1][2] + m[2][2] * other.m[2][2]
+			);
+		}
+
+		bool operator==(const mat3& other) const {
+			return (m[0][0] == other.m[0][0]) && (m[0][1] == other.m[0][1]) && (m[0][2] == other.m[0][2]) &&
+				   (m[1][0] == other.m[1][0]) && (m[1][1] == other.m[1][1]) && (m[1][2] == other.m[1][2]) &&
+				   (m[2][0] == other.m[2][0]) && (m[2][1] == other.m[2][1]) && (m[2][2] == other.m[2][2]);
+		}
+		bool operator!=(const mat3& other) const {
+			return !(*this == other);
+		}
+	};
+
 	struct TypeStruct;
 	using Type = const TypeStruct*;
 
@@ -93,6 +218,8 @@ namespace febcode
 			case TypeKind::Double: return 1;
 			case TypeKind::Vec2:   return 2;
 			case TypeKind::Vec3:   return 3;
+			case TypeKind::Mat2:   return 4;
+			case TypeKind::Mat3:   return 9;
 			case TypeKind::Array:  return elementType->size()* arraySize;
 			case TypeKind::Struct:
 				{
@@ -121,6 +248,8 @@ namespace febcode
 		DOUBLE,
 		VEC2,
 		VEC3,
+		MAT2,
+		MAT3,
 		ARRAY,
 		STRUCT,
 		REF
@@ -138,6 +267,8 @@ namespace febcode
 		Value(double a) : index(ValueIndex::DOUBLE), d(a) {}
 		Value(const vec2& a) : index(ValueIndex::VEC2), vec2Value(a) {}
 		Value(const vec3& a) : index(ValueIndex::VEC3), vec3Value(a) {}
+		Value(const mat2& a) : index(ValueIndex::MAT2), mat2Value(a) {}
+		Value(const mat3& a) : index(ValueIndex::MAT3), mat3Value(a) {}
 		Value(const ArrayValuePtr& a) : index(ValueIndex::ARRAY), arrayValue(a) {}
 		Value(const StructValuePtr& a) : index(ValueIndex::STRUCT), structValue(a) {}
 
@@ -160,6 +291,8 @@ namespace febcode
 				case ValueIndex::DOUBLE: d = other.d; break;
 				case ValueIndex::VEC2  : vec2Value = other.vec2Value; break;
 				case ValueIndex::VEC3  : vec3Value = other.vec3Value; break;
+				case ValueIndex::MAT2  : mat2Value = other.mat2Value; break;
+				case ValueIndex::MAT3  : mat3Value = other.mat3Value; break;
 				default: 
 					assert(false);
 					break; // should not happen
@@ -190,6 +323,8 @@ namespace febcode
 			case ValueIndex::DOUBLE: return d == other.d;
 			case ValueIndex::VEC2  : return vec2Value == other.vec2Value;
 			case ValueIndex::VEC3  : return vec3Value == other.vec3Value;
+			case ValueIndex::MAT2  : return mat2Value == other.mat2Value;
+			case ValueIndex::MAT3  : return mat3Value == other.mat3Value;
 			case ValueIndex::ARRAY : return arrayValue == other.arrayValue;
 			case ValueIndex::STRUCT: return structValue == other.structValue;
 			}
@@ -208,6 +343,8 @@ namespace febcode
 			double d;
 			vec2 vec2Value;
 			vec3 vec3Value;
+			mat2 mat2Value;
+			mat3 mat3Value;
 			ArrayValuePtr arrayValue;
 			StructValuePtr structValue;
 		};
@@ -224,6 +361,8 @@ namespace febcode
 			case ValueIndex::DOUBLE: d = v.d; break;
 			case ValueIndex::VEC2: vec2Value = v.vec2Value; break;
 			case ValueIndex::VEC3: vec3Value = v.vec3Value; break;
+			case ValueIndex::MAT2: mat2Value = v.mat2Value; break;
+			case ValueIndex::MAT3: mat3Value = v.mat3Value; break;
 			case ValueIndex::ARRAY: new (&arrayValue) ArrayValuePtr(v.arrayValue); break;
 			case ValueIndex::STRUCT: new (&structValue) StructValuePtr(v.structValue); break;
 			}
@@ -283,6 +422,8 @@ namespace febcode
 	inline bool isDouble(const Value& v) { return v.index == ValueIndex::DOUBLE; }
 	inline bool isVec2  (const Value& v) { return v.index == ValueIndex::VEC2; }
 	inline bool isVec3  (const Value& v) { return v.index == ValueIndex::VEC3; }
+	inline bool isMat2  (const Value& v) { return v.index == ValueIndex::MAT2; }
+	inline bool isMat3  (const Value& v) { return v.index == ValueIndex::MAT3; }
 	inline bool isArray (const Value& v) { return v.index == ValueIndex::ARRAY; }
 	inline bool isStruct(const Value& v) { return v.index == ValueIndex::STRUCT; }
 	inline bool isRef   (const Value& v) { return v.index == ValueIndex::REF; }
@@ -293,6 +434,8 @@ namespace febcode
 	inline bool isDoubleType(Type type) { return type->kind == TypeKind::Double; }
 	inline bool isVec2Type  (Type type) { return type->kind == TypeKind::Vec2; }
 	inline bool isVec3Type  (Type type) { return type->kind == TypeKind::Vec3; }
+	inline bool isMat2Type  (Type type) { return type->kind == TypeKind::Mat2; }
+	inline bool isMat3Type  (Type type) { return type->kind == TypeKind::Mat3; }
 	inline bool isArrayType (Type type) { return type->kind == TypeKind::Array; }
 	inline bool isStructType(Type type) { return type->kind == TypeKind::Struct; }
 
@@ -305,6 +448,10 @@ namespace febcode
 	inline vec2& getVec2(Value& v) { assert(v.index == ValueIndex::VEC2); return v.vec2Value; }
 	inline const vec3& getVec3(const Value& v) { assert(v.index == ValueIndex::VEC3); return v.vec3Value; }
 	inline vec3& getVec3(Value& v) { assert(v.index == ValueIndex::VEC3); return v.vec3Value; }
+	inline const mat2& getMat2(const Value& v) { assert(v.index == ValueIndex::MAT2); return v.mat2Value; }
+	inline mat2& getMat2(Value& v) { assert(v.index == ValueIndex::MAT2); return v.mat2Value; }
+	inline const mat3& getMat3(const Value& v) { assert(v.index == ValueIndex::MAT3); return v.mat3Value; }
+	inline mat3& getMat3(Value& v) { assert(v.index == ValueIndex::MAT3); return v.mat3Value; }
 	inline const ArrayValue&  getArray (const Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
 	inline const StructValue& getStruct(const Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
 
@@ -358,6 +505,8 @@ namespace febcode
 		Type getDoubleType() const;
 		Type getVec2Type() const;
 		Type getVec3Type() const;
+		Type getMat2Type() const;
+		Type getMat3Type() const;
 		Type getArrayType(Type element, size_t size);
 		Type getArrayType(Type element, size_t size) const;
 		Type getArrayType(Type element, const std::vector<size_t>& size) const;
@@ -384,6 +533,8 @@ namespace febcode
 		TypeStruct m_double;
 		TypeStruct m_vec2;
 		TypeStruct m_vec3;
+		TypeStruct m_mat2;
+		TypeStruct m_mat3;
 
 		// Interned array types
 		std::vector<std::unique_ptr<TypeStruct>> m_arrayTypes;
@@ -455,6 +606,21 @@ namespace febcode
 			double y = stack[index++];
 			double z = stack[index++];
 			return vec3(x, y, z);
+		}
+		mat2 getMat2() {
+			double a00 = stack[index++];
+			double a01 = stack[index++];
+			double a10 = stack[index++];
+			double a11 = stack[index++];
+			return mat2(a00, a01, a10, a11);
+		}
+		mat3 getMat3() {
+			double a00 = stack[index++]; double a01 = stack[index++]; double a02 = stack[index++];
+			double a10 = stack[index++]; double a11 = stack[index++]; double a12 = stack[index++];
+			double a20 = stack[index++]; double a21 = stack[index++]; double a22 = stack[index++];
+			return mat3(a00, a01, a02,
+						a10, a11, a12,
+						a20, a21, a22);
 		}
 	};
 

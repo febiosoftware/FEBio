@@ -227,6 +227,21 @@ namespace febcode
 			push(v.z);
 		}
 
+		void pushMat2(const mat2& m)
+		{
+			push(m.m[0][0]);
+			push(m.m[0][1]);
+			push(m.m[1][0]);
+			push(m.m[1][1]);
+		}
+
+		void pushMat3(const mat3& m)
+		{
+			push(m.m[0][0]); push(m.m[0][1]); push(m.m[0][2]);
+			push(m.m[1][0]); push(m.m[1][1]); push(m.m[1][2]);
+			push(m.m[2][0]); push(m.m[2][1]); push(m.m[2][2]);
+		}
+
 		void pushArray(const ArrayValue& arr)
 		{
 			for (int i = 0; i < arr.size(); ++i)
@@ -276,6 +291,11 @@ namespace febcode
 			return m_stack[--stackTop];
 		}
 
+		void pop(size_t n)
+		{
+			stackTop -= n;
+		}
+
 		void popVoid()
 		{
 			pop();
@@ -323,6 +343,23 @@ namespace febcode
 			return vec3(x, y, z);
 		}
 
+		mat2 popMat2()
+		{
+			double a11 = pop();
+			double a10 = pop();
+			double a01 = pop();
+			double a00 = pop();
+			return mat2(a00, a01, a10, a11);
+		}
+
+		mat3 popMat3()
+		{
+			double a22 = pop(); double a21 = pop(); double a20 = pop();
+			double a12 = pop(); double a11 = pop(); double a10 = pop();
+			double a02 = pop(); double a01 = pop(); double a00 = pop();
+			return mat3(a00, a01, a02, a10, a11, a12, a20, a21, a22);
+		}
+
 		void popVec3_0()
 		{
 			vec3_0.z = pop();
@@ -335,6 +372,48 @@ namespace febcode
 			vec3_1.z = pop();
 			vec3_1.y = pop();
 			vec3_1.x = pop();
+		}
+
+		void popMat2_0()
+		{
+			mat2_0.m[1][1] = pop();
+			mat2_0.m[1][0] = pop();
+			mat2_0.m[0][1] = pop();
+			mat2_0.m[0][0] = pop();
+		}
+
+		void popMat2_1()
+		{
+			mat2_1.m[1][1] = pop();
+			mat2_1.m[1][0] = pop();
+			mat2_1.m[0][1] = pop();
+			mat2_1.m[0][0] = pop();
+		}
+
+		void popMat3_0()
+		{
+			mat3_0.m[2][2] = pop();
+			mat3_0.m[2][1] = pop();
+			mat3_0.m[2][0] = pop();
+			mat3_0.m[1][2] = pop();
+			mat3_0.m[1][1] = pop();
+			mat3_0.m[1][0] = pop();
+			mat3_0.m[0][2] = pop();
+			mat3_0.m[0][1] = pop();
+			mat3_0.m[0][0] = pop();
+		}
+
+		void popMat3_1()
+		{
+			mat3_1.m[2][2] = pop();
+			mat3_1.m[2][1] = pop();
+			mat3_1.m[2][0] = pop();
+			mat3_1.m[1][2] = pop();
+			mat3_1.m[1][1] = pop();
+			mat3_1.m[1][0] = pop();
+			mat3_1.m[0][2] = pop();
+			mat3_1.m[0][1] = pop();
+			mat3_1.m[0][0] = pop();
 		}
 
 		void popValues(size_t count)
@@ -464,6 +543,29 @@ namespace febcode
 			m_stack[slot    ] = v.x;
 			m_stack[slot + 1] = v.y;
 			m_stack[slot + 2] = v.z;
+		}
+
+		void setMat2At(int slot)
+		{
+			double* s = &m_stack[stackTop - 4]; // last 4 slots
+			m_stack[slot  ] = s[0];
+			m_stack[slot+1] = s[1];
+			m_stack[slot+2] = s[2];
+			m_stack[slot+3] = s[3];
+		}
+
+		void setMat3At(int slot)
+		{
+			double* s = &m_stack[stackTop - 9]; // last 9 slots
+			m_stack[slot  ] = s[0];
+			m_stack[slot+1] = s[1];
+			m_stack[slot+2] = s[2];
+			m_stack[slot+3] = s[3];
+			m_stack[slot+4] = s[4];
+			m_stack[slot+5] = s[5];
+			m_stack[slot+6] = s[6];
+			m_stack[slot+7] = s[7];
+			m_stack[slot+8] = s[8];
 		}
 
 		void setArrayAt(int slot, const ArrayValue& arr)
@@ -614,6 +716,8 @@ namespace febcode
 		// small "registers" for binary ops
 		vec2 vec2_0, vec2_1;
 		vec3 vec3_0, vec3_1;
+		mat2 mat2_0, mat2_1;
+		mat3 mat3_0, mat3_1;
 
 		CallFrame m_frames[MAX_CALL_DEPTH];
 		size_t frameCount = 0;

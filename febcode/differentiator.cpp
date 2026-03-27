@@ -167,6 +167,7 @@ ExprPtr Differentiator::differentiate(const Expression* expr, const std::string&
 	else if (auto call     = dynamic_cast<const CallExpr*       >(expr)) return diffCall    (call    , var);
 	else if (auto init     = dynamic_cast<const InitializerExpr*>(expr)) return diffInit    (init    , var);
 	else if (auto assign   = dynamic_cast<const AssignExpr*     >(expr)) return diffAssign  (assign  , var);
+	else if (auto index    = dynamic_cast<const IndexExpr*      >(expr)) return diffIndex   (index   , var);
 	else if (auto member   = dynamic_cast<const MemberExpr*     >(expr)) return diffMember  (member  , var);
 	else
 		throw std::runtime_error("Unsupported expression type for differentiation");
@@ -299,6 +300,13 @@ std::unique_ptr<Expression> Differentiator::diffMember(const MemberExpr* member,
 	// For a member access expression, we can use the rule: d( obj.field ) --> dobj.field
 	auto dobj = differentiate(member->object.get(), var);
 	return Member(dobj, member->property);
+}
+
+std::unique_ptr<Expression> Differentiator::diffIndex(const IndexExpr* index, const std::string& var)
+{
+	// For an index access expression, we can use the rule: d( obj.[i] ) --> dobj[i]
+	auto dobj = differentiate(index->object.get(), var);
+	return Index(dobj, index->index);
 }
 
 static bool dependsOn(const Expression* expr, const std::string& var)

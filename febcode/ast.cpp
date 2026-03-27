@@ -213,6 +213,16 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 		const febcode::vec3& vec = getVec3(v);
 		return o << "vec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 	}
+	else if (isMat2(v))
+	{
+		const febcode::mat2& mat = getMat2(v);
+		return o << "mat2(" << mat.m[0][0] << ", " << mat.m[0][1] << ", " << mat.m[1][0] << ", " << mat.m[1][1] << ")";
+	}
+	else if (isMat3(v))
+	{
+		const febcode::mat3& mat = getMat3(v);
+		return o << "mat3(" << mat.m[0][0] << ", " << mat.m[0][1] << ", " << mat.m[0][2] << ", " << mat.m[1][0] << ", " << mat.m[1][1] << ", " << mat.m[1][2] << ", " << mat.m[2][0] << ", " << mat.m[2][1] << ", " << mat.m[2][2] << ")";
+	}
 	else
 		return o << "<unknown value>";
 }

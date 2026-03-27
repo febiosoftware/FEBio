@@ -21,170 +21,6 @@ static int ipow(int base, int exp)
 	return result;
 }
 
-const char* IPToString(uint8_t ip)
-{
-	switch ((OpCode)ip)
-	{
-	case OpCode::PUSH_VOID     : 
-	case OpCode::PUSH_BOOL     :
-	case OpCode::PUSH_INT      :
-	case OpCode::PUSH_DOUBLE   : return "MOV ";
-
-	case OpCode::GET_GLOBAL_BOOL  :
-	case OpCode::GET_GLOBAL_INT   :
-	case OpCode::GET_GLOBAL_DOUBLE:
-	case OpCode::GET_GLOBAL_VEC2  :
-	case OpCode::GET_GLOBAL_VEC3  : 
-	case OpCode::GET_GLOBAL_ARRAY : 
-	case OpCode::GET_GLOBAL_STRUCT: return "GTG ";
-
-	case OpCode::SET_GLOBAL_BOOL  :
-	case OpCode::SET_GLOBAL_INT   :
-	case OpCode::SET_GLOBAL_DOUBLE:
-	case OpCode::SET_GLOBAL_VEC2  :
-	case OpCode::SET_GLOBAL_VEC3  :
-	case OpCode::SET_GLOBAL_ARRAY :
-	case OpCode::SET_GLOBAL_STRUCT: return "STG ";
-
-	case OpCode::STORE_BOOL  :
-	case OpCode::STORE_INT   :
-	case OpCode::STORE_DOUBLE:
-	case OpCode::STORE_VEC2  :
-	case OpCode::STORE_VEC3  :
-	case OpCode::STORE_ARRAY :
-	case OpCode::STORE_STRUCT:
-		return "STOR";
-
-	case OpCode::GET_GLOBAL_REF: 
-		return "GREF";
-
-	case OpCode::GET_LOCAL_REF       :
-		return "LREF";
-
-	case OpCode::GET_INDEX_REF       : 
-	case OpCode::GET_INDEX_REF_BOOL  : 
-	case OpCode::GET_INDEX_REF_INT   : 
-	case OpCode::GET_INDEX_REF_DOUBLE: 
-	case OpCode::GET_INDEX_REF_VEC2  : 
-	case OpCode::GET_INDEX_REF_VEC3  : 
-		return "IREF";
-
-	case OpCode::GET_MEMBER_REF: return "MREF";
-
-	case OpCode::GET_LOCAL_BOOL  :
-	case OpCode::GET_LOCAL_INT   :
-	case OpCode::GET_LOCAL_DOUBLE:
-	case OpCode::GET_LOCAL_VEC2  :
-	case OpCode::GET_LOCAL_VEC3  :
-	case OpCode::GET_LOCAL_ARRAY :
-	case OpCode::GET_LOCAL_STRUCT: return "GETL";
-
-	case OpCode::ADD_INT       : return "ADDI";
-	case OpCode::ADD_DOUBLE    : return "ADDF";
-	case OpCode::SUB_INT       : return "SUBI";
-	case OpCode::SUB_DOUBLE    : return "SUBF";
-	case OpCode::MUL_INT       : return "MULI";
-	case OpCode::MUL_DOUBLE    : return "MULF";
-	case OpCode::DIV_INT       : return "DIVI";
-	case OpCode::DIV_DOUBLE    : return "DIVF";
-	case OpCode::EXP_INT       : return "EXPI";
-	case OpCode::EXP_DOUBLE    : return "EXPF";
-	case OpCode::SQR_DOUBLE    : return "SQR ";
-	case OpCode::SQRT_DOUBLE   : return "SQRT";
-
-	case OpCode::EQUAL_BOOL  :
-	case OpCode::EQUAL_INT   :
-	case OpCode::EQUAL_DOUBLE: return "EQ  ";
-
-	case OpCode::NEQ_BOOL  :
-	case OpCode::NEQ_INT   :
-	case OpCode::NEQ_DOUBLE: return "NEQ ";
-
-	case OpCode::GT_INT        : return "GTI ";
-	case OpCode::GT_DOUBLE     : return "GTF ";
-	case OpCode::LT_INT        : return "LTI ";
-	case OpCode::LT_DOUBLE     : return "LTF ";
-	case OpCode::GE_INT        : return "GEI ";
-	case OpCode::GE_DOUBLE     : return "GEF ";
-	case OpCode::LE_INT        : return "LEI ";
-	case OpCode::LE_DOUBLE     : return "LEF ";
-	case OpCode::NEG_INT       : return "NEGI";
-	case OpCode::NEG_DOUBLE    : return "NEGF";
-	case OpCode::GET_VEC2_X    : return "GV2X";
-	case OpCode::GET_VEC2_Y    : return "GV2Y";
-	case OpCode::GET_VEC2_SWIZZLE: return "G2SW";
-	case OpCode::ADD_VEC2      : return "ADD2";
-	case OpCode::SUB_VEC2      : return "SUB2";
-	case OpCode::DOT_VEC2      : return "DOT2";
-	case OpCode::MUL_VEC2_DOUBLE: return "ML2F";
-	case OpCode::MUL_DOUBLE_VEC2: return "MLF2";
-	case OpCode::NEG_VEC2      : return "NEG2";
-	case OpCode::GET_VEC3_X    : return "GV3X";
-	case OpCode::GET_VEC3_Y    : return "GV3Y";
-	case OpCode::GET_VEC3_Z    : return "GV3Z";
-	case OpCode::GET_VEC3_SWIZZLE: return "G3SW";
-	case OpCode::ADD_VEC3      : return "ADD3";
-	case OpCode::SUB_VEC3      : return "SUB3";
-	case OpCode::DOT_VEC3      : return "DOT3";
-	case OpCode::MUL_VEC3_DOUBLE: return "ML3F";
-	case OpCode::MUL_DOUBLE_VEC3: return "MLF3";
-	case OpCode::NEG_VEC3      : return "NEG3";
-	case OpCode::NOT           : return "NOT ";
-	case OpCode::CREATE_STRUCT : return "STRC";
-	case OpCode::COPY_STRUCT   : return "CPYS";
-
-	case OpCode::GET_PROPERTY_BOOL:
-	case OpCode::GET_PROPERTY_INT:
-	case OpCode::GET_PROPERTY_DOUBLE:
-	case OpCode::GET_PROPERTY_VEC2:
-	case OpCode::GET_PROPERTY_VEC3:
-	case OpCode::GET_PROPERTY_ARRAY:
-	case OpCode::GET_PROPERTY_STRUCT:
-		return "GETP";
-
-	case OpCode::GET_INDEX_BOOL  :
-	case OpCode::GET_INDEX_INT   :
-	case OpCode::GET_INDEX_DOUBLE:
-	case OpCode::GET_INDEX_VEC2  :
-	case OpCode::GET_INDEX_VEC3  :
-	case OpCode::GET_INDEX_ARRAY :
-	case OpCode::GET_INDEX_STRUCT:
-		return "GETI";
-
-	case OpCode::JUMP          : return "JMP ";
-	case OpCode::JUMP_IF_FALSE : return "JMPF";
-	case OpCode::JUMP_IF_TRUE  : return "JMPT";
-	case OpCode::LOOP          : return "LOOP";
-	case OpCode::CALL          : return "CALL";
-
-	case OpCode::POP_VOID  : return "POPV";
-	case OpCode::POP_BOOL  : return "POPB";
-	case OpCode::POP_INT   : return "POPI";
-	case OpCode::POP_DOUBLE: return "POPD";
-	case OpCode::POP_VEC2  : return "POP2";
-	case OpCode::POP_VEC3  : return "POP3";
-	case OpCode::POP_ARRAY : return "POPA";
-	case OpCode::POP_STRUCT: return "POPS";	
-
-	case OpCode::GET_VEC2_X_REF: return "RV2X";
-	case OpCode::GET_VEC2_Y_REF: return "RV2Y";
-	case OpCode::GET_VEC3_X_REF: return "RV3X";
-	case OpCode::GET_VEC3_Y_REF: return "RV3Y";
-	case OpCode::GET_VEC3_Z_REF: return "RV3Z";
-
-	case OpCode::RETURN_VOID: 
-	case OpCode::RETURN_BOOL: 
-	case OpCode::RETURN_INT: 
-	case OpCode::RETURN_DOUBLE: 
-	case OpCode::RETURN_VEC2: 
-	case OpCode::RETURN_VEC3: 
-	case OpCode::RETURN_ARRAY: 
-	case OpCode::RETURN_STRUCT: 
-		return "RET ";
-	}
-	return "(UNKNOWN)";
-}
-
 void printStack(const std::vector<double>& stack, int numGlobals, int stackSize, double* ref)
 {
 	std::cout << "Stack: [";
@@ -229,8 +65,8 @@ Value VM::execute()
 #ifndef NDEBUG
 		if (m_debug)
 		{
-			std::cout << "IP: " << std::setw(4) << ip - 1;
-			std::cout << " | Executing: " << IPToString((uint8_t)instruction) << " | ";
+			std::cout << "IP: " << std::setw(4) << (ip - &m_program->code[0]) - 1;
+			std::cout << " | Executing: " << OpCodeToString(instruction) << " | ";
 		}
 #endif
 
@@ -298,6 +134,31 @@ Value VM::execute()
 			pushDouble(m_stack[slot  ]);
 			pushDouble(m_stack[slot+1]);
 			pushDouble(m_stack[slot+2]);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_MAT2:
+		{
+			uint8_t slot = readByte();
+			pushDouble(m_stack[slot    ]);
+			pushDouble(m_stack[slot + 1]);
+			pushDouble(m_stack[slot + 2]);
+			pushDouble(m_stack[slot + 3]);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_MAT3:
+		{
+			uint8_t slot = readByte();
+			pushDouble(m_stack[slot    ]);
+			pushDouble(m_stack[slot + 1]);
+			pushDouble(m_stack[slot + 2]);
+			pushDouble(m_stack[slot + 3]);
+			pushDouble(m_stack[slot + 4]);
+			pushDouble(m_stack[slot + 5]);
+			pushDouble(m_stack[slot + 6]);
+			pushDouble(m_stack[slot + 7]);
+			pushDouble(m_stack[slot + 8]);
 			break;
 		}
 
@@ -507,6 +368,20 @@ Value VM::execute()
 		{
 			uint8_t slot = readByte();
 			setVec3At(slot, peekVec3());
+			break;
+		}
+
+		case OpCode::SET_GLOBAL_MAT2:
+		{
+			uint8_t slot = readByte();
+			setMat2At(slot);
+			break;
+		}
+
+		case OpCode::SET_GLOBAL_MAT3:
+		{
+			uint8_t slot = readByte();
+			setMat3At(slot);
 			break;
 		}
 
@@ -752,6 +627,19 @@ Value VM::execute()
 			}
 			break;
 		}
+
+		case OpCode::GET_VEC2_INDEX:
+		{
+			int index = popInt();
+			popVec2_0();
+#ifndef NDEBUG
+			if (index < 0 || index > 1)
+				throw std::runtime_error("vec2 index out of bounds.");
+#endif
+			pushDouble((&vec2_0.x)[index]);
+			break;
+		}
+
 		case OpCode::ADD_VEC3:
 		case OpCode::SUB_VEC3:
 		case OpCode::DOT_VEC3:
@@ -831,7 +719,121 @@ Value VM::execute()
 			break;
 		}
 
-		// Logical operators
+		case OpCode::GET_VEC3_INDEX:
+		{
+			int index = popInt();
+			popVec3_0();
+#ifndef NDEBUG
+			if (index < 0 || index > 2)
+				throw std::runtime_error("vec3 index out of bounds.");
+#endif
+			pushDouble((&vec3_0.x)[index]);
+			break;
+		}
+
+		// ----- Mat2 operators ------
+		case OpCode::ADD_MAT2:
+		case OpCode::SUB_MAT2:
+		case OpCode::MUL_MAT2:
+		{
+			popMat2_1();
+			popMat2_0();
+			switch (instruction)
+			{
+			case OpCode::ADD_MAT2: pushMat2(mat2_0 + mat2_1); break;
+			case OpCode::SUB_MAT2: pushMat2(mat2_0 - mat2_1); break;
+			case OpCode::MUL_MAT2: pushMat2(mat2_0 * mat2_1); break;
+			}
+			break;
+		}
+
+		case OpCode::MUL_DOUBLE_MAT2:
+		{
+			popMat2_0();
+			double scalar = popDouble();
+			pushMat2(mat2_0 * scalar);
+			break;
+		}
+		case OpCode::MUL_MAT2_DOUBLE:
+		{
+			double scalar = popDouble();
+			popMat2_0();
+			pushMat2(mat2_0 * scalar);
+			break;
+		}
+
+		case OpCode::MUL_MAT2_VEC2:
+		{
+			popVec2_0();
+			popMat2_0();
+			pushVec2(mat2_0 * vec2_0);
+			break;
+		}
+
+		case OpCode::GET_MAT2_INDEX:
+		{
+			int index = popInt();
+			popMat2_0();
+#ifndef NDEBUG
+			if (index < 0 || index > 1)
+				throw std::runtime_error("mat2 index out of bounds.");
+#endif
+			pushVec2(*((vec2*)(&mat2_0.m[index][0])));
+			break;
+		}
+
+		// ----- Mat3 operators ------
+		case OpCode::ADD_MAT3:
+		case OpCode::SUB_MAT3:
+		case OpCode::MUL_MAT3:
+		{
+			popMat3_1();
+			popMat3_0();
+			switch (instruction)
+			{
+			case OpCode::ADD_MAT3: pushMat3(mat3_0 + mat3_1); break;
+			case OpCode::SUB_MAT3: pushMat3(mat3_0 - mat3_1); break;
+			case OpCode::MUL_MAT3: pushMat3(mat3_0 * mat3_1); break;
+			}
+			break;
+		}
+
+		case OpCode::MUL_DOUBLE_MAT3:
+		{
+			popMat3_0();
+			double scalar = popDouble();
+			pushMat3(mat3_0 * scalar);
+			break;
+		}
+		case OpCode::MUL_MAT3_DOUBLE:
+		{
+			double scalar = popDouble();
+			popMat3_0();
+			pushMat3(mat3_0 * scalar);
+			break;
+		}
+
+		case OpCode::MUL_MAT3_VEC3:
+		{
+			popVec3_0();
+			popMat3_0();
+			pushVec3(mat3_0 * vec3_0);
+			break;
+		}
+
+		case OpCode::GET_MAT3_INDEX:
+		{
+			int index = popInt();
+			popMat3_0();
+#ifndef NDEBUG
+			if (index < 0 || index > 2)
+				throw std::runtime_error("mat3 index out of bounds.");
+#endif
+			pushVec3(*((vec3*)(&mat3_0.m[index][0])));
+			break;
+		}
+
+		// ----- Logical operators -----
 		case OpCode::NOT:
 		{
 			bool b = popBool();
@@ -1121,13 +1123,25 @@ Value VM::execute()
 
 		case OpCode::POP_VEC2:
 		{
-			popVec2();
+			pop(2);
 			break;
 		}
 
 		case OpCode::POP_VEC3:
 		{
-			popVec3();
+			pop(3);
+			break;
+		}
+
+		case OpCode::POP_MAT2:
+		{
+			pop(4);
+			break;
+		}
+
+		case OpCode::POP_MAT3:
+		{
+			pop(9);
 			break;
 		}
 
@@ -1161,6 +1175,8 @@ Value VM::execute()
 		case OpCode::RETURN_DOUBLE:
 		case OpCode::RETURN_VEC2:
 		case OpCode::RETURN_VEC3:
+		case OpCode::RETURN_MAT2:
+		case OpCode::RETURN_MAT3:
 		case OpCode::RETURN_ARRAY:
 		case OpCode::RETURN_STRUCT:
 		{
@@ -1177,6 +1193,8 @@ Value VM::execute()
 				case TypeKind::Double: result = popDouble(); break;
 				case TypeKind::Vec2  : result = popVec2  (); break;
 				case TypeKind::Vec3  : result = popVec3  (); break;
+				case TypeKind::Mat2  : result = popMat2  (); break;
+				case TypeKind::Mat3  : result = popMat3  (); break;
 				case TypeKind::Array:
 				{
 					uint8_t typeIndex = readByte();
