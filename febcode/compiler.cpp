@@ -87,7 +87,7 @@ int Compiler::resolveGlobal(const std::string& name)
 	if (it != prg.globalIndices.end())
 		return (int)it->second;
 
-	throw std::runtime_error("Undefined global variable: " + name);
+	return -1;
 }
 
 //
@@ -264,6 +264,9 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_DOUBLE_MAT3: return -1;
 	case OpCode::MUL_MAT3_VEC3  : return -9;
 	case OpCode::GET_MAT3_INDEX : return -7;
+	case OpCode::ADD_GLOBAL_MAT3: return +9;
+	case OpCode::SUB_GLOBAL_MAT3: return +9;
+	case OpCode::MUL_GLOBAL_MAT3: return +9;
 
 	case OpCode::NOT: return 0;
 
@@ -976,6 +979,9 @@ Type Compiler::compileVariable(VariableExpr* expr)
 	}
 
 	int globalIndex = resolveGlobal(expr->name);
+	if (globalIndex < 0)
+		throw std::runtime_error("Undefined variable: " + expr->name);
+
 	Program::Global& glob = prg.globals[globalIndex];
 
 	if (!glob.isInitialized)
@@ -1084,6 +1090,8 @@ Type Compiler::compileVariableRef(VariableExpr* expr)
 	else
 	{
 		index = resolveGlobal(expr->name);
+		if (index < 0)
+			throw std::runtime_error("Undefined variable: " + expr->name);
 
 		if (prg.globals[index].immutable)
 			throw std::runtime_error("Cannot assign to immutable global variable: " + expr->name);
@@ -1273,6 +1281,37 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		patchJump(endJump);
 		return prg.types.getBoolType();
 	}
+
+	// Handle special cases first
+	// see if both expressions are global variables
+	if (isVariable(expr->left) && isVariable(expr->right))
+	{
+		int globA = resolveGlobal(dynamic_cast<VariableExpr*>(expr->left.get())->name);
+		int globB = resolveGlobal(dynamic_cast<VariableExpr*>(expr->right.get())->name);
+
+		if ((globA >= 0) && (globB >= 0))
+		{
+			Program::Global& a = prg.globals[globA];
+			Program::Global& b = prg.globals[globB];
+
+			if (isMat3Type(a.type) && isMat3Type(b.type))
+			{
+				switch (op)
+				{
+				case BinaryOp::Plus    : emit(OpCode::ADD_GLOBAL_MAT3); break;
+				case BinaryOp::Minus   : emit(OpCode::SUB_GLOBAL_MAT3); break;
+				case BinaryOp::Multiply: emit(OpCode::MUL_GLOBAL_MAT3); break;
+				default:
+					throw std::runtime_error("Unsupported binary op for mat3 type.");
+				}
+
+				emitUint8((uint8_t)a.slot);
+				emitUint8((uint8_t)b.slot);
+				return a.type;
+			}
+		}
+	}
+
 
 	Type type_l = compileExpression(expr->left.get());
 
@@ -1966,6 +2005,9 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::MUL_MAT3_VEC3  : return "M3V3";
 	case OpCode::NEG_MAT3       : return "NGM3";
 	case OpCode::GET_MAT3_INDEX : return "GM3I";
+	case OpCode::ADD_GLOBAL_MAT3: return "ADM3";
+	case OpCode::SUB_GLOBAL_MAT3: return "SBM3";
+	case OpCode::MUL_GLOBAL_MAT3: return "MLM3";
 
 	case OpCode::NOT           : return "NOT ";
 	case OpCode::CREATE_STRUCT : return "STRC";

@@ -237,9 +237,14 @@ namespace febcode
 
 		void pushMat3(const mat3& m)
 		{
-			push(m.m[0][0]); push(m.m[0][1]); push(m.m[0][2]);
-			push(m.m[1][0]); push(m.m[1][1]); push(m.m[1][2]);
-			push(m.m[2][0]); push(m.m[2][1]); push(m.m[2][2]);
+			memcpy(&m_stack[stackTop], &(m.m[0][0]), 9 * sizeof(double));
+			stackTop += 9;
+		}
+
+		void pushFrom(int slot, size_t size)
+		{
+			memcpy(&m_stack[stackTop], &m_stack[slot], size * sizeof(double));
+			stackTop += size;
 		}
 
 		void pushArray(const ArrayValue& arr)
@@ -416,6 +421,18 @@ namespace febcode
 			mat3_1.m[0][0] = pop();
 		}
 
+		mat3* popMat3Ptr()
+		{
+			mat3* m = (mat3*)(&m_stack[stackTop - 9]);
+			stackTop -= 9;
+			return m;
+		}
+
+		mat3* getMat3PtrAt(int slot)
+		{
+			return (mat3*)(&m_stack[slot]);
+		}
+
 		void popValues(size_t count)
 		{
 			if (stackTop < globalStackSize + count)
@@ -499,6 +516,21 @@ namespace febcode
 		vec3 peekVec3()
 		{
 			return vec3(m_stack[stackTop - 3], m_stack[stackTop - 2], m_stack[stackTop - 1]);
+		}
+
+		mat2 peekMat2()
+		{
+			return mat2(m_stack[stackTop - 4], m_stack[stackTop - 3], m_stack[stackTop - 2], m_stack[stackTop - 1]);
+		}
+
+		mat3 peekMat3()
+		{
+			return mat3(m_stack[stackTop - 9], m_stack[stackTop - 8], m_stack[stackTop - 7], m_stack[stackTop - 6], m_stack[stackTop - 5], m_stack[stackTop - 4], m_stack[stackTop - 3], m_stack[stackTop - 2], m_stack[stackTop - 1]);
+		}
+
+		mat3* peekMat3Ptr()
+		{
+			return (mat3*)(&m_stack[stackTop - 9]);
 		}
 
 		ArrayValue peekArray(Type type)

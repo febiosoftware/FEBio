@@ -6,7 +6,7 @@
 
 namespace febcode
 {
-	enum class OpCode : uint8_t
+	enum OpCode : uint8_t
 	{
 		PUSH_VOID, // just push a dummy value, used for return without value
 		PUSH_BOOL,
@@ -161,6 +161,10 @@ namespace febcode
 		MUL_DOUBLE_MAT3,
 		MUL_MAT3_VEC3,
 		GET_MAT3_INDEX,
+
+		ADD_GLOBAL_MAT3,
+		SUB_GLOBAL_MAT3,
+		MUL_GLOBAL_MAT3,
 
 		// logical operators
 		NOT,

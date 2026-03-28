@@ -150,15 +150,7 @@ Value VM::execute()
 		case OpCode::GET_GLOBAL_MAT3:
 		{
 			uint8_t slot = readByte();
-			pushDouble(m_stack[slot    ]);
-			pushDouble(m_stack[slot + 1]);
-			pushDouble(m_stack[slot + 2]);
-			pushDouble(m_stack[slot + 3]);
-			pushDouble(m_stack[slot + 4]);
-			pushDouble(m_stack[slot + 5]);
-			pushDouble(m_stack[slot + 6]);
-			pushDouble(m_stack[slot + 7]);
-			pushDouble(m_stack[slot + 8]);
+			pushFrom(slot, 9);
 			break;
 		}
 
@@ -320,10 +312,30 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::STORE_MAT2:
+		{
+			mat2 v = peekMat2();
+			double* xPtr = ref.ptr;
+			xPtr[0] = v.m[0][0];
+			xPtr[1] = v.m[0][1];
+			xPtr[2] = v.m[1][0];
+			xPtr[3] = v.m[1][1];
+			ref.ptr = nullptr;
+			break;
+		}
+
+		case OpCode::STORE_MAT3:
+		{
+			double* xPtr = ref.ptr;
+			memcpy(xPtr, &m_stack[stackTop - 9], 9 * sizeof(double)); // copy all 9 elements at once
+			ref.ptr = nullptr;
+			break;
+		}
+
 		case OpCode::STORE_ARRAY:
 		{
 			uint8_t size = readByte();
-			memcpy(ref.ptr, m_stack.data() + (stackTop - size), size*sizeof(double));
+			memcpy(ref.ptr, &m_stack[stackTop - size], size * sizeof(double));
 			ref.ptr = nullptr;
 			break;
 		}
@@ -331,7 +343,7 @@ Value VM::execute()
 		case OpCode::STORE_STRUCT:
 		{
 			uint8_t size = readByte();
-			memcpy(ref.ptr, m_stack.data() + (stackTop - size), size * sizeof(double));
+			memcpy(ref.ptr, &m_stack[stackTop - size], size * sizeof(double));
 			ref.ptr = nullptr;
 			break;
 		}
@@ -784,40 +796,46 @@ Value VM::execute()
 
 		// ----- Mat3 operators ------
 		case OpCode::ADD_MAT3:
-		case OpCode::SUB_MAT3:
-		case OpCode::MUL_MAT3:
 		{
-			popMat3_1();
-			popMat3_0();
-			switch (instruction)
-			{
-			case OpCode::ADD_MAT3: pushMat3(mat3_0 + mat3_1); break;
-			case OpCode::SUB_MAT3: pushMat3(mat3_0 - mat3_1); break;
-			case OpCode::MUL_MAT3: pushMat3(mat3_0 * mat3_1); break;
-			}
+			mat3& B = *popMat3Ptr();
+			mat3& A = *popMat3Ptr();
+			pushMat3(A + B);
 			break;
 		}
-
+		case OpCode::SUB_MAT3:
+		{
+			mat3& B = *popMat3Ptr();
+			mat3& A = *popMat3Ptr();
+			pushMat3(A - B);
+			break;
+		}
+		case OpCode::MUL_MAT3:
+		{
+			mat3& B = *popMat3Ptr();
+			mat3& A = *popMat3Ptr();
+			pushMat3(A * B);
+			break;
+		}
 		case OpCode::MUL_DOUBLE_MAT3:
 		{
-			popMat3_0();
+			mat3& A = *popMat3Ptr();
 			double scalar = popDouble();
-			pushMat3(mat3_0 * scalar);
+			pushMat3(A * scalar);
 			break;
 		}
 		case OpCode::MUL_MAT3_DOUBLE:
 		{
 			double scalar = popDouble();
-			popMat3_0();
-			pushMat3(mat3_0 * scalar);
+			mat3& A = *popMat3Ptr();
+			pushMat3(A * scalar);
 			break;
 		}
 
 		case OpCode::MUL_MAT3_VEC3:
 		{
 			popVec3_0();
-			popMat3_0();
-			pushVec3(mat3_0 * vec3_0);
+			mat3& A = *popMat3Ptr();
+			pushVec3(A * vec3_0);
 			break;
 		}
 
@@ -832,6 +850,37 @@ Value VM::execute()
 			pushVec3(*((vec3*)(&mat3_0.m[index][0])));
 			break;
 		}
+
+		case OpCode::ADD_GLOBAL_MAT3:
+		{
+			uint8_t slotA = readByte();
+			uint8_t slotB = readByte();
+			mat3& A = *getMat3PtrAt(slotA);
+			mat3& B = *getMat3PtrAt(slotB);
+			pushMat3(A + B);
+			break;
+		}
+
+		case OpCode::SUB_GLOBAL_MAT3:
+		{
+			uint8_t slotA = readByte();
+			uint8_t slotB = readByte();
+			mat3& A = *getMat3PtrAt(slotA);
+			mat3& B = *getMat3PtrAt(slotB);
+			pushMat3(A - B);
+			break;
+		}
+
+		case OpCode::MUL_GLOBAL_MAT3:
+		{
+			uint8_t slotA = readByte();
+			uint8_t slotB = readByte();
+			mat3& A = *getMat3PtrAt(slotA);
+			mat3& B = *getMat3PtrAt(slotB);
+			pushMat3(A * B);
+			break;
+		}
+
 
 		// ----- Logical operators -----
 		case OpCode::NOT:
