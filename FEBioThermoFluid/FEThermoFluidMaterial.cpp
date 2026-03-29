@@ -29,14 +29,9 @@ SOFTWARE.*/
 #include <FECore/DumpStream.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FEThermoFluidMaterial, FEMaterial)
-
-// material parameters
-    ADD_PARAMETER(m_rhor, FE_RANGE_GREATER_OR_EQUAL(0.0), "density")->setUnits(UNIT_DENSITY);
-
+BEGIN_FECORE_CLASS(FEThermoFluidMaterial, FEFluidMaterial)
 
 // material properties
-    ADD_PROPERTY(m_pViscous, "viscous");
     ADD_PROPERTY(m_pHeatFlux, "heat_flux");
 
 END_FECORE_CLASS();
@@ -48,11 +43,9 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 //! FEThermoFluidMaterial constructor
 
-FEThermoFluidMaterial::FEThermoFluidMaterial(FEModel* pfem) : FEMaterial(pfem)
+FEThermoFluidMaterial::FEThermoFluidMaterial(FEModel* pfem) : FEFluidMaterial(pfem)
 {
-    m_rhor = 0;
     m_pHeatFlux = nullptr;
-    m_pViscous = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -64,57 +57,8 @@ double FEThermoFluidMaterial::Temperature(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! bulk modulus
-double FEThermoFluidMaterial::BulkModulus(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
-    return -(vt.m_ef+1)*Tangent_Pressure_Strain(mp);
-}
-
-//-----------------------------------------------------------------------------
 //! heat flux
 vec3d FEThermoFluidMaterial::HeatFlux(FEMaterialPoint& mp)
 {
     return m_pHeatFlux->HeatFlux(mp);;
 }
-
-//-----------------------------------------------------------------------------
-//! calculate current fluid density
-double FEThermoFluidMaterial::Density(FEMaterialPoint& pt)
-{
-    FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
-    return m_rhor/(vt.m_ef+1);
-}
-
-//-----------------------------------------------------------------------------
-//! calculate current fluid kinematic viscosity
-double FEThermoFluidMaterial::KinematicViscosity(FEMaterialPoint& mp)
-{
-    return m_pViscous->ShearViscosity(mp)/Density(mp);
-}
-
-//-----------------------------------------------------------------------------
-//! calculate current acoustic speed
-double FEThermoFluidMaterial::AcousticSpeed(FEMaterialPoint& mp)
-{
-    double c = sqrt(BulkModulus(mp)/Density(mp));
-    
-    return c;
-}
-
-//-----------------------------------------------------------------------------
-//! calculate kinetic energy density (per reference volume)
-double FEThermoFluidMaterial::KineticEnergyDensity(FEMaterialPoint& mp)
-{
-    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
-    double ked = m_rhor*(fp.m_vft*fp.m_vft)/2;
-    return ked;
-}
-
-//-----------------------------------------------------------------------------
-//! calculate strain + kinetic energy density (per reference volume)
-double FEThermoFluidMaterial::EnergyDensity(FEMaterialPoint& mp)
-{
-    return StrainEnergyDensity(mp) + KineticEnergyDensity(mp);
-}
-

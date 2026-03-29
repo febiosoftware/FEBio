@@ -45,8 +45,6 @@ SOFTWARE.*/
 #include "FELinearThermoElasticFluid.h"
 #include "FEThermoFluidPressureLoad.h"
 #include "FETemperatureBackFlowStabilization.h"
-#include "FEThermoBackFlowStabilization.h"
-#include "FEThermoTangentialFlowStabilization.h"
 #include "FEThermoFluidPressureBC.h"
 #include "FEThermoFluidTemperatureBC.h"
 #include "FEThermoFluidModule.h"
@@ -117,8 +115,6 @@ void FEBioThermoFluid::InitModule()
     REGISTER_FECORE_CLASS(FEFluidNormalHeatFlux, "fluid heat flux");
     REGISTER_FECORE_CLASS(FEFluidNaturalHeatFlux, "fluid natural heat flux");
     REGISTER_FECORE_CLASS(FETemperatureBackFlowStabilization, "temperature backflow stabilization");
-    REGISTER_FECORE_CLASS(FEThermoBackFlowStabilization, "fluid backflow stabilization");
-    REGISTER_FECORE_CLASS(FEThermoTangentialFlowStabilization, "fluid tangential stabilization");
 
     //-----------------------------------------------------------------------------
     // Body loads
@@ -152,8 +148,6 @@ void FEBioThermoFluid::InitModule()
 
     //-----------------------------------------------------------------------------
     // classes derived from FEPlotData
-    REGISTER_FECORE_CLASS(FEPlotFluidVelocity, "fluid velocity");
-    REGISTER_FECORE_CLASS(FEPlotFluidPressure, "fluid pressure");
 	REGISTER_FECORE_CLASS(FEPlotFluidTemperature, "fluid temperature");
 	REGISTER_FECORE_CLASS(FEPlotNodalFluidTemperature, "nodal fluid temperature");
 	REGISTER_FECORE_CLASS(FEPlotFluidPressureTangentTemperature, "fluid pressure tangent temperature");

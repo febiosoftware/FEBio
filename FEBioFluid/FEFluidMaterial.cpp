@@ -71,6 +71,14 @@ double FEFluidMaterial::KinematicViscosity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+//! bulk modulus
+double FEFluidMaterial::BulkModulus(FEMaterialPoint& mp)
+{
+    FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+    return -(vt.m_ef+1)*Tangent_Pressure_Strain(mp);
+}
+
+//-----------------------------------------------------------------------------
 //! calculate current acoustic speed
 double FEFluidMaterial::AcousticSpeed(FEMaterialPoint& mp)
 {

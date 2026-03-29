@@ -26,15 +26,6 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEPlotData.h>
 
-//-----------------------------------------------------------------------------
-//! Element fluid velocity
-class FEPlotFluidVelocity : public FEPlotDomainData
-{
-public:
-    FEPlotFluidVelocity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_VELOCITY); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
 //! Element fluid temperature
 class FEPlotFluidTemperature : public FEPlotDomainData
 {
@@ -44,14 +35,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Actual fluid pressure
-class FEPlotFluidPressure : public FEPlotDomainData
-{
-public:
-    FEPlotFluidPressure(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
 //! Nodal fluid temperature
 class FEPlotNodalFluidTemperature : public FEPlotNodeData
 {

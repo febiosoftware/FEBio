@@ -31,21 +31,6 @@ SOFTWARE.*/
 #include <FECore/writeplot.h>
 #include <FECore/FEModel.h>
 
-//-----------------------------------------------------------------------------
-bool FEPlotFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEThermoFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluidMaterial>();
-    if (pfluid == 0) return false;
-
-    // write solid element data
-    writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
-        const FEFluidMaterialPoint* ppt = mp.ExtractData<FEFluidMaterialPoint>();
-        return (ppt ? ppt->m_vft : vec3d(0.));
-    });
-
-    return true;
-}
-
 bool FEPlotFluidTemperature::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEThermoFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluid>();
@@ -72,18 +57,6 @@ bool FEPlotNodalFluidTemperature::Save(FEMesh& m, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotFluidPressure::Save(FEDomain &dom, FEDataStream& a)
-{
-    FEThermoFluidMaterial* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoFluidMaterial>();
-    if (pfluid == 0) return false;
-
-    writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& mp) {
-        const FEFluidMaterialPoint* pt = (mp.ExtractData<FEFluidMaterialPoint>());
-        return (pt ? pt->m_pf : 0.0);
-    });
-    return true;
-}
-
 bool FEPlotFluidPressureTangentTemperature::Save(FEDomain& dom, FEDataStream& a)
 {
 	FEThermoElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEThermoElasticFluid>();

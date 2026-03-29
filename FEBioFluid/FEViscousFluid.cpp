@@ -28,3 +28,11 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEViscousFluid.h"
+#include <FECore/log.h>
+
+bool FEViscousFluid::Init()
+{
+    m_Tr = GetGlobalConstant("T");
+    if (m_Tr <= 0) { feLogError("A positive ambient absolute temperature T must be defined in Globals section"); return false; }
+    return true;
+}

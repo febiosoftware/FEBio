@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FEMaterial.h>
+#include <FEBioFluid/FEFluidMaterial.h>
 #include "FEThermoViscousFluid.h"
 #include "FEFluidHeatFlux.h"
 #include "febiothermofluid_api.h"
@@ -32,81 +32,28 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 //! Base class for fluid materials.
 
-class FEBIOTHERMOFLUID_API FEThermoFluidMaterial : public FEMaterial
+class FEBIOTHERMOFLUID_API FEThermoFluidMaterial : public FEFluidMaterial
 {
 public:
     FEThermoFluidMaterial(FEModel* pfem);
     virtual ~FEThermoFluidMaterial() {}
 
 public:
-    //! calculate stress at material point
-    virtual mat3ds Stress(FEMaterialPoint& pt) = 0;
-    
-    //! tangent of stress with respect to strain J
-    virtual mat3ds Tangent_Strain(FEMaterialPoint& mp) = 0;
-    
-    //! elastic fluid pressure
-    virtual double Pressure(FEMaterialPoint& mp) = 0;
-
-    //! tangent of elastic pressure with respect to strain J
-    virtual double Tangent_Pressure_Strain(FEMaterialPoint& mp) = 0;
-    
-    //! 2nd tangent of elastic pressure with respect to strain J
-    virtual double Tangent_Pressure_Strain_Strain(FEMaterialPoint& mp) = 0;
-    
-    //! bulk modulus
-    virtual double BulkModulus(FEMaterialPoint& mp) = 0;
-    
-    //! strain energy density
-    virtual double StrainEnergyDensity(FEMaterialPoint& mp) = 0;
-    
-    //! invert effective pressure-dilatation relation
-    virtual bool Dilatation(const double T, const double p, double& e) = 0;
-    
-    //! fluid pressure from state variables
-    virtual double Pressure(const double ef, const double T) = 0;
-    
-public:
     //! evaluate temperature
-    double Temperature(FEMaterialPoint& mp);
+    double Temperature(FEMaterialPoint& mp) override;
     
-    //! return viscous part
-    FEThermoViscousFluid* GetViscous() { return m_pViscous; }
-
     //! return thermal conductivity
     FEFluidHeatFlux* GetHeatFlux() { return m_pHeatFlux; }
 
     //! tangent of stress with respect to rate of deformation tensor D
     tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp)  { return m_pViscous->Tangent_RateOfDeformation(mp); }
     
-    //! referential fluid density
-    double ReferentialDensity() { return m_rhor; }
-
-    //! calculate current fluid density
-    double Density(FEMaterialPoint& pt);
-    
     //! heat flux
     vec3d HeatFlux(FEMaterialPoint& mp);
-    
-    //! kinematic viscosity
-    double KinematicViscosity(FEMaterialPoint& mp);
-    
-    //! acoustic speed
-    double AcousticSpeed(FEMaterialPoint& mp);
-    
-    //! kinetic energy density
-    double KineticEnergyDensity(FEMaterialPoint& mp);
-    
-    //! strain + kinetic energy density
-    double EnergyDensity(FEMaterialPoint& mp);
     
 private: // material properties
     FEThermoViscousFluid*   m_pViscous; //!< pointer to thermo viscous part of fluid material
     FEFluidHeatFlux*        m_pHeatFlux; //!< pointer to thermal conductivity material
-
-public:
-    double      m_k;        //!< bulk modulus at J=1
-    double      m_rhor;     //!< referential fluid density
     
     // declare parameter list
     DECLARE_FECORE_CLASS();

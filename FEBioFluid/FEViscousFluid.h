@@ -42,6 +42,8 @@ public:
     FEViscousFluid(FEModel* pfem) : FEMaterialProperty(pfem) {}
     virtual ~FEViscousFluid() {}
     
+    virtual bool Init() override;
+    
     //! viscous stress
     virtual mat3ds Stress(FEMaterialPoint& pt) = 0;
     
@@ -60,5 +62,7 @@ public:
     //! bulk viscosity
     virtual double BulkViscosity(FEMaterialPoint& mp) = 0;
 
+    double  m_Tr;
+    
     FECORE_BASE_CLASS(FEViscousFluid)
 };
