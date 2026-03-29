@@ -39,7 +39,7 @@ BEGIN_FECORE_CLASS(FEIdealGas, FEThermoElasticFluid)
     ADD_PARAMETER(m_ar  , "ar")->setLongName("normalized referential specific free energy");    // ar normalized by R.Tr/M
     ADD_PARAMETER(m_sr  , "sr")->setLongName("normalized referential specific entropy");        // sr normalized by R/M
     ADD_PROPERTY (m_ao  , "ao")->SetLongName("normalized specific free energy circle");         // a-circle normalized by R.Tr/M
-    ADD_PROPERTY (m_cp  , "cp")->SetLongName("normalized isobaric specific heat capacity");     // cp normalized by R/M
+    ADD_PROPERTY (m_cp  , "cp", FEProperty::Optional)->SetLongName("normalized isobaric specific heat capacity");     // cp normalized by R/M
 
 END_FECORE_CLASS();
 
@@ -171,7 +171,7 @@ double FEIdealGas::SpecificFreeEnergy(FEMaterialPoint& mp)
     double a = m_ar - m_sr*(That-1);
     
     // add a_circle
-    a += m_ao->value(That);
+    a += m_ao->NormalizedProperty(mp);
     
     // add strain-dependent contribution
     a += J+That*(log(That/J)-1);
@@ -195,7 +195,7 @@ double FEIdealGas::SpecificEntropy(FEMaterialPoint& mp)
     double s = m_sr;
     
     // add s_circle
-    s -= m_ao->derive(That);
+    s -= m_ao->Tangent_NormalizedProperty_Temperature(mp);
     
     // add strain-dependent contribution
     s += -log(That/J);
@@ -225,12 +225,9 @@ double FEIdealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
 //! isobaric specific heat capacity
 double FEIdealGas::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
-    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
     double scl = m_R/m_M;
 
-    double cp = m_cp->value(That);
+    double cp = m_cp->NormalizedProperty(mp);
     
     return cp*scl;
 }
@@ -256,11 +253,9 @@ double FEIdealGas::Tangent_cv_Strain(FEMaterialPoint& mp)
 double FEIdealGas::Tangent_cv_Temperature(FEMaterialPoint& mp)
 {
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
-    double T = tf.m_T + m_Tr;
-    double That = T/m_Tr;
     double scl = m_R/(m_M*m_Tr);
 
-    double dcv = m_cp->derive(That);
+    double dcv = m_cp->Tangent_NormalizedProperty_Temperature(mp);
     
     return dcv*scl;
 }

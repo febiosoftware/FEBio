@@ -28,8 +28,9 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEThermoElasticFluid.h"
-#include <FECore/FEFunction1D.h>
+#include "FEThermalPropTempDpndnt.h"
 #include "febiothermofluid_api.h"
+
 //-----------------------------------------------------------------------------
 //! Base class for the viscous part of the fluid response.
 //! These materials provide the viscous stress and its tangents.
@@ -95,8 +96,8 @@ public:
     double      m_M;        //!< molar mass
     double      m_ar;       //!< referential specific free energy
     double      m_sr;       //!< referential specific entropy
-    FEFunction1D*   m_cp;   //!< isobaric specific heat capacity
-    FEFunction1D*   m_ao;   //!< specific free energy a-circle
+    FEThermalPropTempDpndnt*   m_cp;   //!< isobaric specific heat capacity
+    FEThermalPropTempDpndnt*   m_ao;   //!< specific free energy a-circle
     // declare parameter list
     DECLARE_FECORE_CLASS();
 
