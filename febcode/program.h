@@ -24,7 +24,6 @@ namespace febcode {
 		{
 			Type type = nullptr;
 			int slot = -1;	// start index in stack
-			bool isInitialized = false;
 			bool immutable = false;
 			int refcount = 0;
 		};

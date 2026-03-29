@@ -73,6 +73,8 @@ namespace febcode
 		GET_INDEX_ARRAY,
 		GET_INDEX_STRUCT,
 
+		GET_GLOBAL_INDEX_DOUBLE,
+
 		GET_INDEX_REF,
 		GET_INDEX_REF_BOOL,
 		GET_INDEX_REF_INT,
@@ -244,7 +246,6 @@ namespace febcode
 			Type type;
 			int depth;
 			int slot;
-			bool isInitialized = false;
 		};
 
 		void beginScope();

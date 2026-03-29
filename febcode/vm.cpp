@@ -571,8 +571,8 @@ Value VM::execute()
 		case OpCode::SUB_VEC2:
 		case OpCode::DOT_VEC2:
 		{
-			popVec2_1();
-			popVec2_0();
+			vec2& vec2_1 = popVec2();
+			vec2& vec2_0 = popVec2();
 
 			switch (instruction)
 			{
@@ -585,33 +585,37 @@ Value VM::execute()
 		case OpCode::MUL_VEC2_DOUBLE:
 		{
 			double scalar = popDouble();
-			popVec2_0();
-			pushVec2(vec2_0 * scalar);
+			double* v = peekPtr(2);
+			v[0] *= scalar;
+			v[1] *= scalar;
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC2:
 		{
-			popVec2_0();
+			double* v = popPtr(2);
 			double scalar = popDouble();
-			pushVec2(vec2_0 * scalar);
+			pushDouble(v[0] * scalar);
+			pushDouble(v[1] * scalar);
 			break;
 		}
 
 		case OpCode::GET_VEC2_X:
+		{
+			double* v = popPtr(2);
+			pushDouble(v[0]);
+			break;
+		}
 		case OpCode::GET_VEC2_Y:
 		{
-			popVec2_0();
-			switch (instruction)
-			{
-			case OpCode::GET_VEC2_X: pushDouble(vec2_0.x); break;
-			case OpCode::GET_VEC2_Y: pushDouble(vec2_0.y); break;
-			}
+			double* v = popPtr(2);
+			pushDouble(v[1]);
 			break;
 		}
 		case OpCode::NEG_VEC2:
 		{
-			popVec2_0();
-			pushVec2(vec2(-vec2_0.x, -vec2_0.y));
+			double* v = peekPtr(2);
+			v[0] = -v[0];
+			v[1] = -v[1];
 			break;
 		}
 
@@ -619,8 +623,8 @@ Value VM::execute()
 		{
 			uint8_t mask = readByte();
 			uint8_t size = readByte();
-			popVec2_0();
-			double c[4] = { vec2_0.x, vec2_0.y, 0.0, 0.0 };
+			double* v = popPtr(2);
+			double c[4] = { v[0], v[1], 0.0, 0.0};
 
 			if (size == 2)
 			{
@@ -643,68 +647,82 @@ Value VM::execute()
 		case OpCode::GET_VEC2_INDEX:
 		{
 			int index = popInt();
-			popVec2_0();
+			double* v = popPtr(2);
 #ifndef NDEBUG
 			if (index < 0 || index > 1)
 				throw std::runtime_error("vec2 index out of bounds.");
 #endif
-			pushDouble((&vec2_0.x)[index]);
+			pushDouble(v[index]);
 			break;
 		}
 
 		case OpCode::ADD_VEC3:
+		{
+			double* b = popPtr(3);
+			double* a = peekPtr(3);
+			a[0] += b[0];
+			a[1] += b[1];
+			a[2] += b[2];
+			break;
+		}
 		case OpCode::SUB_VEC3:
+		{
+			double* b = popPtr(3);
+			double* a = peekPtr(3);
+			a[0] -= b[0];
+			a[1] -= b[1];
+			a[2] -= b[2];
+			break;
+		}
 		case OpCode::DOT_VEC3:
 		{
-			popVec3_1();
-			popVec3_0();
-
-			switch (instruction)
-			{
-			case OpCode::ADD_VEC3: pushVec3(vec3_0 + vec3_1); break;
-			case OpCode::SUB_VEC3: pushVec3(vec3_0 - vec3_1); break;
-			case OpCode::DOT_VEC3: pushDouble(vec3_0 * vec3_1); break;
-			}
+			double* b = popPtr(3);
+			double* a = popPtr(3);
+			pushDouble(a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
 			break;
 		}
 		case OpCode::MUL_VEC3_DOUBLE:
 		{
 			double scalar = popDouble();
-			popVec3_0();
-			pushVec3(vec3_0 * scalar);
+			double* a = peekPtr(3);
+			a[0] *= scalar;
+			a[1] *= scalar;
+			a[2] *= scalar;
 			break;
 		}
 		case OpCode::MUL_DOUBLE_VEC3:
 		{
-			popVec3_0();
+			double* a = popPtr(3);
 			double scalar = popDouble();
-			pushVec3(vec3_0 * scalar);
+			pushDouble(a[0] * scalar);
+			pushDouble(a[1] * scalar);
+			pushDouble(a[2] * scalar);
 			break;
 		}
 		case OpCode::GET_VEC3_X:
 		{
-			popVec3_0();
-			pushDouble(vec3_0.x);
+			double* a = popPtr(3);
+			pushDouble(a[0]);
 			break;
 		}
 		case OpCode::GET_VEC3_Y:
 		{
-			popVec3_0();
-			pushDouble(vec3_0.y);
+			double* a = popPtr(3);
+			pushDouble(a[1]);
 			break;
 		}
 		case OpCode::GET_VEC3_Z:
 		{
-			popVec3_0();
-			pushDouble(vec3_0.z);
+			double* a = popPtr(3);
+			pushDouble(a[2]);
 			break;
 		}
 		case OpCode::GET_VEC3_SWIZZLE:
 		{
 			uint8_t mask = readByte();
 			uint8_t size = readByte();
-			popVec3_0();
-			double c[4] = { vec3_0.x, vec3_0.y, vec3_0.z, 0.0 };
+			double* a = popPtr(3);
+			double c[4] = { a[0], a[1], a[2], 0.0 };
 
 			if (size == 2)
 			{
@@ -726,99 +744,108 @@ Value VM::execute()
 
 		case OpCode::NEG_VEC3:
 		{
-			popVec3_0();
-			pushVec3(vec3(-vec3_0.x, -vec3_0.y, -vec3_0.z));
+			double* a = popPtr(3);
+			a[0] = -a[0];
+			a[1] = -a[1];
+			a[2] = -a[2];
 			break;
 		}
 
 		case OpCode::GET_VEC3_INDEX:
 		{
 			int index = popInt();
-			popVec3_0();
+			double* a = popPtr(3);
 #ifndef NDEBUG
 			if (index < 0 || index > 2)
 				throw std::runtime_error("vec3 index out of bounds.");
 #endif
-			pushDouble((&vec3_0.x)[index]);
+			pushDouble(a[index]);
 			break;
 		}
 
 		// ----- Mat2 operators ------
 		case OpCode::ADD_MAT2:
+		{
+			mat2& b = popMat2();
+			mat2& a = popMat2();
+			pushMat2(a + b);
+			break;
+		}
 		case OpCode::SUB_MAT2:
+		{
+			mat2& b = popMat2();
+			mat2& a = popMat2();
+			pushMat2(a - b);
+			break;
+		}
 		case OpCode::MUL_MAT2:
 		{
-			popMat2_1();
-			popMat2_0();
-			switch (instruction)
-			{
-			case OpCode::ADD_MAT2: pushMat2(mat2_0 + mat2_1); break;
-			case OpCode::SUB_MAT2: pushMat2(mat2_0 - mat2_1); break;
-			case OpCode::MUL_MAT2: pushMat2(mat2_0 * mat2_1); break;
-			}
+			mat2& b = popMat2();
+			mat2& a = popMat2();
+			pushMat2(a * b);
 			break;
 		}
 
 		case OpCode::MUL_DOUBLE_MAT2:
 		{
-			popMat2_0();
+			mat2& a = popMat2();
 			double scalar = popDouble();
-			pushMat2(mat2_0 * scalar);
+			pushMat2(a * scalar);
 			break;
 		}
 		case OpCode::MUL_MAT2_DOUBLE:
 		{
 			double scalar = popDouble();
-			popMat2_0();
-			pushMat2(mat2_0 * scalar);
+			mat2& a = popMat2();
+			pushMat2(a * scalar);
 			break;
 		}
 
 		case OpCode::MUL_MAT2_VEC2:
 		{
-			popVec2_0();
-			popMat2_0();
-			pushVec2(mat2_0 * vec2_0);
+			vec2& v = popVec2();
+			mat2& A = popMat2();
+			pushVec2(A * v);
 			break;
 		}
 
 		case OpCode::GET_MAT2_INDEX:
 		{
 			int index = popInt();
-			popMat2_0();
+			mat2& A = popMat2();
 #ifndef NDEBUG
 			if (index < 0 || index > 1)
 				throw std::runtime_error("mat2 index out of bounds.");
 #endif
-			pushVec2(*((vec2*)(&mat2_0.m[index][0])));
+			pushVec2(*((vec2*)(&A.m[index][0])));
 			break;
 		}
 
 		// ----- Mat3 operators ------
 		case OpCode::ADD_MAT3:
 		{
-			mat3& B = *popMat3Ptr();
-			mat3& A = *popMat3Ptr();
+			mat3& B = popMat3();
+			mat3& A = popMat3();
 			pushMat3(A + B);
 			break;
 		}
 		case OpCode::SUB_MAT3:
 		{
-			mat3& B = *popMat3Ptr();
-			mat3& A = *popMat3Ptr();
+			mat3& B = popMat3();
+			mat3& A = popMat3();
 			pushMat3(A - B);
 			break;
 		}
 		case OpCode::MUL_MAT3:
 		{
-			mat3& B = *popMat3Ptr();
-			mat3& A = *popMat3Ptr();
+			mat3& B = popMat3();
+			mat3& A = popMat3();
 			pushMat3(A * B);
 			break;
 		}
 		case OpCode::MUL_DOUBLE_MAT3:
 		{
-			mat3& A = *popMat3Ptr();
+			mat3& A = popMat3();
 			double scalar = popDouble();
 			pushMat3(A * scalar);
 			break;
@@ -826,28 +853,28 @@ Value VM::execute()
 		case OpCode::MUL_MAT3_DOUBLE:
 		{
 			double scalar = popDouble();
-			mat3& A = *popMat3Ptr();
+			mat3& A = popMat3();
 			pushMat3(A * scalar);
 			break;
 		}
 
 		case OpCode::MUL_MAT3_VEC3:
 		{
-			popVec3_0();
-			mat3& A = *popMat3Ptr();
-			pushVec3(A * vec3_0);
+			vec3& v = popVec3();
+			mat3& A = popMat3();
+			pushVec3(A * v);
 			break;
 		}
 
 		case OpCode::GET_MAT3_INDEX:
 		{
 			int index = popInt();
-			popMat3_0();
+			mat3& A = popMat3();
 #ifndef NDEBUG
 			if (index < 0 || index > 2)
 				throw std::runtime_error("mat3 index out of bounds.");
 #endif
-			pushVec3(*((vec3*)(&mat3_0.m[index][0])));
+			pushVec3(*((vec3*)(&A.m[index][0])));
 			break;
 		}
 
@@ -855,8 +882,8 @@ Value VM::execute()
 		{
 			uint8_t slotA = readByte();
 			uint8_t slotB = readByte();
-			mat3& A = *getMat3PtrAt(slotA);
-			mat3& B = *getMat3PtrAt(slotB);
+			mat3& A = getMat3At(slotA);
+			mat3& B = getMat3At(slotB);
 			pushMat3(A + B);
 			break;
 		}
@@ -865,8 +892,8 @@ Value VM::execute()
 		{
 			uint8_t slotA = readByte();
 			uint8_t slotB = readByte();
-			mat3& A = *getMat3PtrAt(slotA);
-			mat3& B = *getMat3PtrAt(slotB);
+			mat3& A = getMat3At(slotA);
+			mat3& B = getMat3At(slotB);
 			pushMat3(A - B);
 			break;
 		}
@@ -875,12 +902,11 @@ Value VM::execute()
 		{
 			uint8_t slotA = readByte();
 			uint8_t slotB = readByte();
-			mat3& A = *getMat3PtrAt(slotA);
-			mat3& B = *getMat3PtrAt(slotB);
+			mat3& A = getMat3At(slotA);
+			mat3& B = getMat3At(slotB);
 			pushMat3(A * B);
 			break;
 		}
-
 
 		// ----- Logical operators -----
 		case OpCode::NOT:
@@ -1013,14 +1039,19 @@ Value VM::execute()
 		{
 			int index = popInt();
 			uint8_t typeIndex = readByte();
-			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Bool);
+
+			double* arr = popPtr(type->size());
 
 #ifndef  NDEBUG
-			if (index >= arr.size())
+			if (index >= type->arraySize)
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			pushBool(arr.elements[index].b);
+			pushBool(arr[index]);
 			break;
 		}
 
@@ -1028,14 +1059,19 @@ Value VM::execute()
 		{
 			int index = popInt();
 			uint8_t typeIndex = readByte();
-			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Int);
+
+			double* arr = popPtr(type->size());
 
 #ifndef  NDEBUG
-			if (index >= arr.size())
+			if (index >= type->arraySize)
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			pushInt(arr.elements[index].i);
+			pushInt(arr[index]);
 			break;
 		}
 
@@ -1043,14 +1079,19 @@ Value VM::execute()
 		{
 			int index = popInt();
 			uint8_t typeIndex = readByte();
-			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Double);
+
+			double* arr = popPtr(type->size());
 
 #ifndef  NDEBUG
-			if (index >= arr.size())
+			if (index >= type->arraySize)
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			pushDouble(arr.elements[index].d);
+			pushDouble(arr[index]);
 			break;
 		}
 
@@ -1058,14 +1099,19 @@ Value VM::execute()
 		{
 			int index = popInt();
 			uint8_t typeIndex = readByte();
-			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Vec2);
+
+			vec2* arr = (vec2*) popPtr(type->size());
 
 #ifndef  NDEBUG
-			if (index >= arr.size())
+			if (index >= type->arraySize)
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			pushVec2(arr.elements[index].vec2Value);
+			pushVec2(arr[index]);
 			break;
 		}
 
@@ -1073,30 +1119,80 @@ Value VM::execute()
 		{
 			int index = popInt();
 			uint8_t typeIndex = readByte();
-			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Vec3);
+
+			vec3* arr = (vec3*)popPtr(type->size());
 
 #ifndef  NDEBUG
-			if (index >= arr.size())
+			if (index >= type->size())
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			pushVec3(arr.elements[index].vec3Value);
+			pushVec3(arr[index]);
 			break;
 		}
 
+		case OpCode::GET_INDEX_MAT2:
+		{
+			int index = popInt();
+			uint8_t typeIndex = readByte();
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Mat2);
+
+			mat2* arr = (mat2*)popPtr(type->size());
+
+#ifndef  NDEBUG
+			if (index >= type->size())
+				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
+
+			pushMat2(arr[index]);
+			break;
+		}
+
+		case OpCode::GET_INDEX_MAT3:
+		{
+			int index = popInt();
+			uint8_t typeIndex = readByte();
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Mat3);
+
+			mat3* arr = (mat3*)popPtr(type->size());
+
+#ifndef  NDEBUG
+			if (index >= type->size())
+				throw std::runtime_error("Array index out of bounds.");
+#endif // ! NDEBUG
+
+			pushMat3(arr[index]);
+			break;
+		}
 		case OpCode::GET_INDEX_ARRAY:
 		{
 			int index = popInt();
 			uint8_t typeIndex = readByte();
-			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Array);
+
+			double* arr = popPtr(type->size());
+
+			size_t elemSize = type->elementType->size();
 
 #ifndef  NDEBUG
-			if (index >= arr.size())
+			if (index >= type->arraySize)
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			Value& element = arr.elements[index];
-			pushArray(*element.arrayValue); break;
+			push(arr + index * elemSize, elemSize); break;
 			break;
 		}
 
@@ -1104,15 +1200,30 @@ Value VM::execute()
 		{
 			int index = popInt();
 			uint8_t typeIndex = readByte();
-			ArrayValue arr = popArray(m_program->types.getArrayType((int)typeIndex));
+
+			Type type = m_program->types.getArrayType((int)typeIndex);
+			assert(type->kind == TypeKind::Array);
+			assert(type->elementType->kind == TypeKind::Struct);
+
+			double* arr = popPtr(type->size());
 
 #ifndef  NDEBUG
-			if (index >= arr.size())
+			if (index >= type->arraySize)
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			Value& element = arr.elements[index];
-			pushStruct(*element.structValue); break;
+			size_t structSize = type->elementType->size();
+
+			push(arr + index * structSize, structSize);
+			break;
+		}
+
+		case OpCode::GET_GLOBAL_INDEX_DOUBLE:
+		{
+			int index = popInt();
+			uint8_t slot = readByte();
+			double* arr = getPtrAt(slot);
+			pushDouble(arr[index]);
 			break;
 		}
 
@@ -1196,9 +1307,8 @@ Value VM::execute()
 
 		case OpCode::POP_ARRAY:
 		{
-			uint8_t typeIndex = readByte();
-			Type type = m_program->types.getArrayType(typeIndex);
-			popValues(type->size());
+			uint8_t size = readByte();
+			pop(size);
 			break;
 		}
 
@@ -1206,7 +1316,7 @@ Value VM::execute()
 		{
 			uint8_t typeIndex = readByte();
 			Type type = m_program->types.getStructType(typeIndex);
-			popValues(type->size());
+			pop(type->size());
 			break;
 		}
 

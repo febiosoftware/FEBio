@@ -56,12 +56,14 @@ void Compiler::endScope()
 		case TypeKind::Mat2  : emit(OpCode::POP_MAT2  ); break;
 		case TypeKind::Mat3  : emit(OpCode::POP_MAT3  ); break;
 		case TypeKind::Array : 
-			emit(OpCode::POP_ARRAY, local.type->size());
-			emitUint8(local.type->typeIndex);
+			if (local.type->size() > 255)
+				throw std::runtime_error("Array size exceeds maximum of 255.");
+			emit(OpCode::POP_ARRAY, (int)local.type->size());
+			emitUint8((uint8_t)local.type->size());
 			break;
 		case TypeKind::Struct:
-			emit(OpCode::POP_STRUCT, local.type->size());
-			emitUint8(local.type->typeIndex);
+			emit(OpCode::POP_STRUCT, (int)local.type->size());
+			emitUint8((uint8_t)local.type->typeIndex);
 		break;		
 		default:
 			throw std::runtime_error("Unknown type kind in endScope.");
@@ -183,6 +185,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GET_INDEX_MAT3  : return +arg;
 	case OpCode::GET_INDEX_ARRAY : return +arg;
 	case OpCode::GET_INDEX_STRUCT: return +arg;
+
+	case OpCode::GET_GLOBAL_INDEX_DOUBLE: return +1;
 
 	case OpCode::GET_INDEX_REF:
 	case OpCode::GET_INDEX_REF_BOOL:
@@ -405,12 +409,14 @@ void Compiler::compileExprStmt(ExpressionStmt* stmt)
 	case TypeKind::Mat2  : emit(OpCode::POP_MAT2  ); break;
 	case TypeKind::Mat3  : emit(OpCode::POP_MAT3  ); break;
 	case TypeKind::Array : 
-		emit(OpCode::POP_ARRAY, type->size());
-		emitUint8(type->typeIndex);
+		if (type->size() > 255)
+			throw std::runtime_error("Array size exceeds maximum of 255.");
+		emit(OpCode::POP_ARRAY, (int)type->size());
+		emitUint8((uint8_t)type->size());
 		break;
 	case TypeKind::Struct: 
-		emit(OpCode::POP_STRUCT, type->size());
-		emitUint8(type->typeIndex);
+		emit(OpCode::POP_STRUCT, (int)type->size());
+		emitUint8((uint8_t)type->typeIndex);
 		break;
 	default:
 		throw std::runtime_error("Unsupported expression type in expression statement");
@@ -607,7 +613,6 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					auto it = prg.globalIndices.find(var.name);
 
 					Program::Global& global = prg.globals[it->second];
-					global.isInitialized = true;
 
 					switch (type->kind)
 					{
@@ -620,11 +625,11 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					case TypeKind::Mat3  : emit(OpCode::SET_GLOBAL_MAT3  ); break;
 					case TypeKind::Array :
 						emit(OpCode::SET_GLOBAL_ARRAY);
-						emitUint8(type->size());
+						emitUint8((uint8_t)type->size());
 						break;
 					case TypeKind::Struct:
 						emit(OpCode::SET_GLOBAL_STRUCT);
-						emitUint8(type->size());
+						emitUint8((uint8_t)type->size());
 						break;
 					default:
 						throw std::runtime_error("Unsupported global variable type");
@@ -642,12 +647,14 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 					case TypeKind::Mat2  : emit(OpCode::POP_MAT2  ); break;
 					case TypeKind::Mat3  : emit(OpCode::POP_MAT3  ); break;
 					case TypeKind::Array :
+						if (type->size() > 255)
+							throw std::runtime_error("Array size exceeds maximum of 255.");
 						emit(OpCode::POP_ARRAY, type->size());
-						emitUint8(type->typeIndex);
+						emitUint8((uint8_t)type->size());
 						break;
 					case TypeKind::Struct:
 						emit(OpCode::POP_STRUCT, type->size());
-						emitUint8(type->typeIndex);
+						emitUint8((uint8_t)type->typeIndex);
 						break;
 					default:
 						throw std::runtime_error("Unsupported global variable type");
@@ -667,11 +674,6 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 			}
 
 			m_locals.push_back({ var.name, type, m_scopeDepth, localStackSize });
-
-			if (var.initializer)
-			{
-				m_locals.back().isInitialized = true;
-			}
 
 			localStackSize += (int)type->size();
 		}
@@ -836,7 +838,7 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	for (auto& p : fn->params)
 	{
-		m_locals.push_back({ p.second, p.first, m_scopeDepth, localStackSize, true });
+		m_locals.push_back({ p.second, p.first, m_scopeDepth, localStackSize });
 		localStackSize += (int)p.first->size();
 		info.argSize += (int)p.first->size();
 		stackDepth += (int)p.first->size();
@@ -872,8 +874,10 @@ void Compiler::compileFunction(FunctionStmt* fn)
 		case TypeKind::Mat2  : emit(OpCode::POP_MAT2  ); break;
 		case TypeKind::Mat3  : emit(OpCode::POP_MAT3  ); break;
 		case TypeKind::Array : 
+			if (local.type->size() > 255)
+				throw std::runtime_error("Array size exceeds maximum of 255.");
 			emit(OpCode::POP_ARRAY, local.type->size()); 
-			emitUint8(local.type->typeIndex);
+			emitUint8(local.type->size());
 			break;
 		case TypeKind::Struct:
 			emit(OpCode::POP_STRUCT, local.type->size());
@@ -972,9 +976,6 @@ Type Compiler::compileVariable(VariableExpr* expr)
 
 		emitUint8(localInfo.slot);
 
-		if (!m_locals[local].isInitialized)
-			throw std::runtime_error("Cannot read uninitialized local variable: " + expr->name);
-
 		return type;
 	}
 
@@ -983,9 +984,6 @@ Type Compiler::compileVariable(VariableExpr* expr)
 		throw std::runtime_error("Undefined variable: " + expr->name);
 
 	Program::Global& glob = prg.globals[globalIndex];
-
-	if (!glob.isInitialized)
-		throw std::runtime_error("Cannot read uninitialized global variable: " + expr->name);
 
 	glob.refcount++;
 
@@ -1794,6 +1792,25 @@ Type Compiler::compileMember(MemberExpr* expr)
 
 Type Compiler::compileIndex(IndexExpr* expr)
 {
+	// handle special cases first
+	if (isVariable(expr->object))
+	{
+		int globIndex = resolveGlobal(dynamic_cast<VariableExpr*>(expr->object.get())->name);
+		if (globIndex >= 0)
+		{
+			Type globType = prg.globals[globIndex].type;
+			if (isArrayType(globType) && isDoubleType(globType->elementType))
+			{
+				Type indxType = compileExpression(expr->index.get());
+				if (indxType->kind != TypeKind::Int)
+					throw std::runtime_error("array index must be an integer.");
+				emit(OpCode::GET_GLOBAL_INDEX_DOUBLE);
+				emitUint8((uint8_t)prg.globals[globIndex].slot);
+				return prg.types.getDoubleType();
+			}
+		}
+	}
+
 	Type exprType = compileExpression(expr->object.get());
 	Type indxType = compileExpression(expr->index.get());
 
@@ -2031,6 +2048,9 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::GET_INDEX_VEC3  :
 	case OpCode::GET_INDEX_ARRAY :
 	case OpCode::GET_INDEX_STRUCT:
+		return "GETI";
+
+	case OpCode::GET_GLOBAL_INDEX_DOUBLE:
 		return "GETI";
 
 	case OpCode::JUMP          : return "JMP ";

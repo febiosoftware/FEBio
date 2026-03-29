@@ -194,6 +194,16 @@ namespace febcode
 			m_stack[stackTop++] = v;
 		}
 
+		void push(double* d, size_t n)
+		{
+#ifndef NDEBUG
+			if (stackTop + n > m_stack.size())
+				throw std::runtime_error("Stack overflow.");
+#endif
+			memcpy(&m_stack[stackTop], d, n * sizeof(double));
+			stackTop += n;
+		}
+
 		void pushVoid()
 		{
 			push(0.0);
@@ -201,12 +211,12 @@ namespace febcode
 
 		void pushBool(bool b)
 		{
-			push(b);
+			push((double)b);
 		}
 
 		void pushInt(int n)
 		{
-			push(n);
+			push((double)n);
 		}
 
 		void pushDouble(double d)
@@ -298,6 +308,10 @@ namespace febcode
 
 		void pop(size_t n)
 		{
+#ifndef NDEBUG
+			if (stackTop < globalStackSize + n)
+				throw std::runtime_error("Stack underflow.");
+#endif
 			stackTop -= n;
 		}
 
@@ -321,123 +335,43 @@ namespace febcode
 			return pop();
 		}
 
-		vec2 popVec2()
+		vec2& popVec2()
 		{
-			double y = pop();
-			double x = pop();
-			return vec2(x, y);
+			stackTop -= 2;
+			return *(vec2*)(&m_stack[stackTop]);
 		}
 
-		void popVec2_0()
+		vec3& popVec3()
 		{
-			vec2_0.y = pop();
-			vec2_0.x = pop();
+			stackTop -= 3;
+			return *(vec3*)(&m_stack[stackTop]);
 		}
 
-		void popVec2_1()
+		mat2& popMat2()
 		{
-			vec2_1.y = pop();
-			vec2_1.x = pop();
+			stackTop -= 4;
+			return *(mat2*)(&m_stack[stackTop]);
 		}
 
-		vec3 popVec3()
+		mat3& popMat3()
 		{
-			double z = pop();
-			double y = pop();
-			double x = pop();
-			return vec3(x, y, z);
-		}
-
-		mat2 popMat2()
-		{
-			double a11 = pop();
-			double a10 = pop();
-			double a01 = pop();
-			double a00 = pop();
-			return mat2(a00, a01, a10, a11);
-		}
-
-		mat3 popMat3()
-		{
-			double a22 = pop(); double a21 = pop(); double a20 = pop();
-			double a12 = pop(); double a11 = pop(); double a10 = pop();
-			double a02 = pop(); double a01 = pop(); double a00 = pop();
-			return mat3(a00, a01, a02, a10, a11, a12, a20, a21, a22);
-		}
-
-		void popVec3_0()
-		{
-			vec3_0.z = pop();
-			vec3_0.y = pop();
-			vec3_0.x = pop();
-		}
-
-		void popVec3_1()
-		{
-			vec3_1.z = pop();
-			vec3_1.y = pop();
-			vec3_1.x = pop();
-		}
-
-		void popMat2_0()
-		{
-			mat2_0.m[1][1] = pop();
-			mat2_0.m[1][0] = pop();
-			mat2_0.m[0][1] = pop();
-			mat2_0.m[0][0] = pop();
-		}
-
-		void popMat2_1()
-		{
-			mat2_1.m[1][1] = pop();
-			mat2_1.m[1][0] = pop();
-			mat2_1.m[0][1] = pop();
-			mat2_1.m[0][0] = pop();
-		}
-
-		void popMat3_0()
-		{
-			mat3_0.m[2][2] = pop();
-			mat3_0.m[2][1] = pop();
-			mat3_0.m[2][0] = pop();
-			mat3_0.m[1][2] = pop();
-			mat3_0.m[1][1] = pop();
-			mat3_0.m[1][0] = pop();
-			mat3_0.m[0][2] = pop();
-			mat3_0.m[0][1] = pop();
-			mat3_0.m[0][0] = pop();
-		}
-
-		void popMat3_1()
-		{
-			mat3_1.m[2][2] = pop();
-			mat3_1.m[2][1] = pop();
-			mat3_1.m[2][0] = pop();
-			mat3_1.m[1][2] = pop();
-			mat3_1.m[1][1] = pop();
-			mat3_1.m[1][0] = pop();
-			mat3_1.m[0][2] = pop();
-			mat3_1.m[0][1] = pop();
-			mat3_1.m[0][0] = pop();
-		}
-
-		mat3* popMat3Ptr()
-		{
-			mat3* m = (mat3*)(&m_stack[stackTop - 9]);
 			stackTop -= 9;
-			return m;
+			return *(mat3*)(&m_stack[stackTop]);
 		}
 
-		mat3* getMat3PtrAt(int slot)
+		double* popPtr(size_t n)
 		{
-			return (mat3*)(&m_stack[slot]);
-		}
-
-		void popValues(size_t count)
-		{
-			if (stackTop < globalStackSize + count)
+#ifndef NDEBUG
+			if (stackTop < globalStackSize + n)
 				throw std::runtime_error("Stack underflow.");
-			stackTop -= count;
+#endif
+			stackTop -= n;
+			return &m_stack[stackTop];
+		}
+
+		mat3& getMat3At(int slot)
+		{
+			return *(mat3*)(&m_stack[slot]);
 		}
 
 		ArrayValue popArray(Type type)
@@ -498,6 +432,15 @@ namespace febcode
 			return m_stack[stackTop-1];
 		}
 
+		double* peekPtr(size_t n)
+		{
+#ifndef NDEBUG
+			if (stackTop < globalStackSize + n)
+				throw std::runtime_error("Stack underflow.");
+#endif
+			return &m_stack[stackTop - n];
+		}
+
 		bool peekBool()
 		{
 			return (peek() != 0.0);
@@ -508,29 +451,24 @@ namespace febcode
 			return (int)peek();
 		}
 
-		vec2 peekVec2()
+		vec2& peekVec2()
 		{
-			return vec2(m_stack[stackTop - 2], m_stack[stackTop - 1]);
+			return *(vec2*)&m_stack[stackTop - 2];
 		}
 
-		vec3 peekVec3()
+		vec3& peekVec3()
 		{
-			return vec3(m_stack[stackTop - 3], m_stack[stackTop - 2], m_stack[stackTop - 1]);
+			return *(vec3*)&m_stack[stackTop - 3];
 		}
 
-		mat2 peekMat2()
+		mat2& peekMat2()
 		{
-			return mat2(m_stack[stackTop - 4], m_stack[stackTop - 3], m_stack[stackTop - 2], m_stack[stackTop - 1]);
+			return *(mat2*)&m_stack[stackTop - 4];
 		}
 
-		mat3 peekMat3()
+		mat3& peekMat3()
 		{
-			return mat3(m_stack[stackTop - 9], m_stack[stackTop - 8], m_stack[stackTop - 7], m_stack[stackTop - 6], m_stack[stackTop - 5], m_stack[stackTop - 4], m_stack[stackTop - 3], m_stack[stackTop - 2], m_stack[stackTop - 1]);
-		}
-
-		mat3* peekMat3Ptr()
-		{
-			return (mat3*)(&m_stack[stackTop - 9]);
+			return *(mat3*)&m_stack[stackTop - 9];
 		}
 
 		ArrayValue peekArray(Type type)
@@ -589,15 +527,7 @@ namespace febcode
 		void setMat3At(int slot)
 		{
 			double* s = &m_stack[stackTop - 9]; // last 9 slots
-			m_stack[slot  ] = s[0];
-			m_stack[slot+1] = s[1];
-			m_stack[slot+2] = s[2];
-			m_stack[slot+3] = s[3];
-			m_stack[slot+4] = s[4];
-			m_stack[slot+5] = s[5];
-			m_stack[slot+6] = s[6];
-			m_stack[slot+7] = s[7];
-			m_stack[slot+8] = s[8];
+			memcpy(&m_stack[slot], s, 9 * sizeof(double));
 		}
 
 		void setArrayAt(int slot, const ArrayValue& arr)
@@ -636,6 +566,11 @@ namespace febcode
 				};
 				slot += (int)obj.type->fields[i].first->size();
 			}
+		}
+
+		double* getPtrAt(int slot)
+		{
+			return &m_stack[slot];
 		}
 
 		bool getBoolAt(int slot)
@@ -716,9 +651,9 @@ namespace febcode
 			return obj;
 		}
 
-		void copy(int dest, int src, int size)
+		void copy(size_t dest, size_t src, size_t size)
 		{
-			for (int i = 0; i < size; ++i)
+			for (size_t i = 0; i < size; ++i)
 				m_stack[dest + i] = m_stack[src + i];
 
 			if (dest + size > stackTop)
@@ -744,12 +679,6 @@ namespace febcode
 		std::vector<double> m_stack;
 		size_t stackTop = 0;
 		Ref ref;
-
-		// small "registers" for binary ops
-		vec2 vec2_0, vec2_1;
-		vec3 vec3_0, vec3_1;
-		mat2 mat2_0, mat2_1;
-		mat3 mat3_0, mat3_1;
 
 		CallFrame m_frames[MAX_CALL_DEPTH];
 		size_t frameCount = 0;
