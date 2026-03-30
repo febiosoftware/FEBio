@@ -464,7 +464,7 @@ std::unique_ptr<Expression> Parser::parseExponent() {
 
 std::unique_ptr<Expression> Parser::parseCall() {
 
-	if (match(TokenType::Type))
+	if (isType())
 	{
 		std::string typeName = lexeme(previous());
 		Type type = prg.types.getType(typeName);
@@ -523,10 +523,7 @@ std::unique_ptr<Expression> Parser::parseConstructor(Type type)
 	if (!match(TokenType::RightParen))
 		throw std::runtime_error("Expected ')' after arguments.");
 
-	// NOTE: For now, we assume the argument type is double
-	Type argType = prg.types.getDoubleType();
-
-	return std::make_unique<ConstructorExpr>(type, argType, std::move(arguments));
+	return std::make_unique<ConstructorExpr>(type, std::move(arguments));
 }
 
 std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> callee) 
@@ -747,6 +744,15 @@ static void printIndexExpr(const IndexExpr* e)
 	printTabs(); std::cout << "}";
 }
 
+static void printConstructorExpr(const ConstructorExpr* e)
+{
+	std::cout << "ConstructorExpr {\n"; l++;
+	printTabs(); std::cout << "type: " << TypeToString(e->type) << ",\n";
+	printTabs(); std::cout << "args: "; printExprList(e->args); std::cout << "\n";
+	l--;
+	printTabs(); std::cout << "}";
+}
+
 static void printExpr(const Expression* e)
 {
 	if      (auto l = dynamic_cast<const LiteralExpr*      >(e)) printLiteralExpr      (l);
@@ -758,6 +764,7 @@ static void printExpr(const Expression* e)
 	else if (auto c = dynamic_cast<const CallExpr*         >(e)) printCallExpr         (c);
 	else if (auto c = dynamic_cast<const InitializerExpr*  >(e)) printInitializerExpr  (c);
 	else if (auto c = dynamic_cast<const IndexExpr*        >(e)) printIndexExpr        (c);
+	else if (auto c = dynamic_cast<const ConstructorExpr*  >(e)) printConstructorExpr  (c);
 	else if (e == nullptr)
 		std::cout << "null";
 	else
@@ -1017,6 +1024,19 @@ static void prettyPrintIndexExpr(std::ostream& os, const IndexExpr& expr)
 	os << "]";
 }
 
+static void prettyPrintConstructorExpr(std::ostream& os, const ConstructorExpr& expr)
+{
+	os << TypeToString(expr.type);
+	os << "(";
+	size_t n = expr.args.size();
+	for (size_t i = 0; i < n; ++i)
+	{
+		prettyPrintExpression(os, *expr.args[i]);
+		if (i != n - 1) os << ", ";
+	}
+	os << ")";
+}
+
 void febcode::prettyPrintExpression(std::ostream& os, const Expression& expr)
 {
 	if      (auto l = dynamic_cast<const LiteralExpr*      >(&expr)) prettyPrintLiteralExpr      (os, *l);
@@ -1028,6 +1048,7 @@ void febcode::prettyPrintExpression(std::ostream& os, const Expression& expr)
 	else if (auto c = dynamic_cast<const CallExpr*         >(&expr)) prettyPrintCallExpr         (os, *c);
 	else if (auto c = dynamic_cast<const InitializerExpr*  >(&expr)) prettyPrintInitializerExpr  (os, *c);
 	else if (auto c = dynamic_cast<const IndexExpr*        >(&expr)) prettyPrintIndexExpr        (os, *c);
+	else if (auto c = dynamic_cast<const ConstructorExpr*  >(&expr)) prettyPrintConstructorExpr  (os, *c);
 	else
 		os << "(Unknown Expression)";
 }

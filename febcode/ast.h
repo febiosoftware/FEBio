@@ -123,10 +123,9 @@ namespace febcode {
 
 	struct ConstructorExpr : Expression {
 		Type type;
-		Type argType;
 		std::vector<ExprPtr> args;
-		ConstructorExpr(Type type, Type argType, std::vector<ExprPtr> arguments) :
-			Expression(ExpressionType::Constructor), type(type), argType(argType), args(std::move(arguments)) {}
+		ConstructorExpr(Type type, std::vector<ExprPtr> arguments) :
+			Expression(ExpressionType::Constructor), type(type), args(std::move(arguments)) {}
 	};
 
 	// --- Statements ---

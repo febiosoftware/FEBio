@@ -989,16 +989,6 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::CREATE_STRUCT:
-		{
-			// Nothing to do here since structs are created on the stack.
-			break;
-		}
-		case OpCode::COPY_STRUCT:
-		{
-			// Nothing to do here. 
-			break;
-		}
 		case OpCode::GET_PROPERTY_BOOL:
 		{
 			uint8_t typeIndex = readByte();

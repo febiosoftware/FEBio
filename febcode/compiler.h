@@ -48,9 +48,6 @@ namespace febcode
 		GET_LOCAL_REF,
 
 		// struct codes
-		CREATE_STRUCT,
-		COPY_STRUCT,
-
 		GET_PROPERTY_BOOL,
 		GET_PROPERTY_INT,
 		GET_PROPERTY_DOUBLE,
@@ -278,6 +275,7 @@ namespace febcode
 		Type compileCall         (CallExpr* expr);
 		Type compileMember       (MemberExpr* expr);
 		Type compileIndex        (IndexExpr* expr);
+		Type compileInitializer  (InitializerExpr* expr);
 		Type compileConstructor  (ConstructorExpr* expr);
 
 		Type compileLValue(Expression* expr);
@@ -288,8 +286,6 @@ namespace febcode
 		int resolveMember(Type type, const std::string& member);
 		int resolveMemberOffset(Type type, const std::string& member);
 		Type memberType(Type type, int memberIndex);
-
-		void compileInitializer(Expression* expr, Type expectedType);
 
 		std::vector<Type> compileFncArgs(std::vector<std::unique_ptr<Expression>>& args);
 
