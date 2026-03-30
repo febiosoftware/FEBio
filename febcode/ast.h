@@ -35,20 +35,15 @@ namespace febcode {
 		Constructor
 	};
 
+	// --- Expressions ---
+
 	// Base classes
 	struct Expression {
 		Expression(ExpressionType type) : exprType(type) {}
 		virtual ~Expression() = default;
 		ExpressionType exprType;
 	};
-
-	struct Statement {
-		virtual ~Statement() = default;
-	};
-
 	using ExprPtr = std::unique_ptr<Expression>;
-
-	// --- Expressions ---
 
 	struct LiteralExpr : Expression {
 		Value value;
@@ -130,6 +125,11 @@ namespace febcode {
 
 	// --- Statements ---
 
+	struct Statement {
+		virtual ~Statement() = default;
+	};
+	using StmtPtr = std::unique_ptr<Statement>;
+
 	struct ExpressionStmt : Statement {
 		ExprPtr expr;
 		ExpressionStmt(ExprPtr e) : expr(std::move(e)) {}
@@ -163,23 +163,23 @@ namespace febcode {
 	};
 
 	struct BlockStmt : Statement {
-		std::vector<std::unique_ptr<Statement>> statements;
+		std::vector<StmtPtr> statements;
 
-		void addStatement(std::unique_ptr<Statement> stmt) {
+		void addStatement(StmtPtr stmt) {
 			statements.push_back(std::move(stmt));
 		}
 	};
 
 	struct IfStmt : Statement {
 		ExprPtr condition;
-		std::unique_ptr<Statement> thenBranch;
-		std::unique_ptr<Statement> elseBranch; // optional
+		StmtPtr thenBranch;
+		StmtPtr elseBranch; // optional
 
 		IfStmt() {}
 
 		IfStmt(ExprPtr cond,
-			std::unique_ptr<Statement> thenStmt,
-			std::unique_ptr<Statement> elseStmt = nullptr)
+			StmtPtr thenStmt,
+			StmtPtr elseStmt = nullptr)
 			: condition(std::move(cond)),
 			thenBranch(std::move(thenStmt)),
 			elseBranch(std::move(elseStmt)) {
@@ -188,7 +188,7 @@ namespace febcode {
 
 	struct WhileStmt : Statement {
 		ExprPtr condition;
-		std::unique_ptr<Statement> body;
+		StmtPtr body;
 
 		WhileStmt(ExprPtr cond,
 			std::unique_ptr<Statement> bodyStmt)
@@ -197,11 +197,28 @@ namespace febcode {
 		}
 	};
 
+	struct ForStmt : Statement {
+		StmtPtr initializer; // can be null
+		ExprPtr condition;
+		ExprPtr increment;
+		StmtPtr body;
+
+		ForStmt(std::unique_ptr<Statement> init,
+			ExprPtr cond,
+			ExprPtr incr,
+			std::unique_ptr<Statement> bodyStmt)
+			: initializer(std::move(init)),
+			condition(std::move(cond)),
+			increment(std::move(incr)),
+			body(std::move(bodyStmt)) {
+		}
+	};
+
 	struct FunctionStmt : Statement {
 		std::string name;
 		Type returnType = nullptr;
 		std::vector<std::pair<Type,std::string>> params;
-		std::unique_ptr<Statement> body;
+		StmtPtr body;
 
 		FunctionStmt(std::string name, Type returnType,
 			std::vector<std::pair<Type,std::string>> parameters,
@@ -247,6 +264,11 @@ namespace febcode {
 			root.statements.push_back(std::move(stmt));
 		}
 	};
+
+	// some helper variables for statements
+	inline bool isVarDecl (const StmtPtr& stmt) { return dynamic_cast<const VarDeclStmt*   >(stmt.get()) != nullptr; }
+	inline bool isExprStmt(const StmtPtr& stmt) { return dynamic_cast<const ExpressionStmt*>(stmt.get()) != nullptr; }
+	inline bool isReturn  (const StmtPtr& stmt) { return dynamic_cast<const ReturnStmt*    >(stmt.get()) != nullptr; }
 
 	// use this to make a deep copy of an expression when constructing new expressions from existing ones
 	ExprPtr copy_expression(const Expression* expr);

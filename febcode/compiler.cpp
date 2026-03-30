@@ -387,6 +387,7 @@ void Compiler::compileStatement(Statement* stmt)
 	else if (auto f = dynamic_cast<FunctionStmt*  >(stmt)) compileFunction(f);
 	else if (auto i = dynamic_cast<IfStmt*        >(stmt)) compileIf(i);
 	else if (auto w = dynamic_cast<WhileStmt*     >(stmt)) compileWhile(w);
+	else if (auto l = dynamic_cast<ForStmt*       >(stmt)) compileFor(l);
 	else if (auto r = dynamic_cast<ReturnStmt*    >(stmt)) compileReturn(r);
 	else if (auto s = dynamic_cast<StructStmt*    >(stmt)) compileStruct(s);
 	else
@@ -396,7 +397,11 @@ void Compiler::compileStatement(Statement* stmt)
 void Compiler::compileExprStmt(ExpressionStmt* stmt)
 {
 	Type type = compileExpression(stmt->expr.get());
+	pop(type);
+}
 
+void Compiler::pop(Type type)
+{
 	switch (type->kind)
 	{
 	case TypeKind::Void  : emit(OpCode::POP_VOID  ); break;
@@ -665,17 +670,30 @@ void Compiler::compileWhile(WhileStmt* stmt)
 		throw std::runtime_error("Condition expression must be of a numeric type or bool.");
 
 	int exitJump = emitJump(OpCode::JUMP_IF_FALSE);
+	emit(OpCode::POP_BOOL);
+	compileStatement(stmt->body.get());
 
-	switch (type->kind)
-	{
-	case TypeKind::Bool  : emit(OpCode::POP_BOOL  ); break;
-	case TypeKind::Int   : emit(OpCode::POP_INT   ); break;
-	case TypeKind::Double: emit(OpCode::POP_DOUBLE); break;
-	default:
-		throw std::runtime_error("Unsupported condition type in while statement");
-	}
+	emitLoop(loopStart);
+
+	patchJump(exitJump);
+	emit(OpCode::POP_BOOL);
+}
+
+void Compiler::compileFor(ForStmt* stmt)
+{
+	if (stmt->initializer) compileStatement(stmt->initializer.get());
+
+	int loopStart = (int)prg.code.size();
+	Type type = compileExpression(stmt->condition.get());
+	if (!isNumericType(type) && type != prg.types.getBoolType())
+		throw std::runtime_error("Condition expression must be of a numeric type or bool.");
+
+	int exitJump = emitJump(OpCode::JUMP_IF_FALSE);
+	emit(OpCode::POP_BOOL);
 
 	compileStatement(stmt->body.get());
+	Type incrType = compileExpression(stmt->increment.get());
+	pop(incrType);
 
 	emitLoop(loopStart);
 

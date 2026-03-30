@@ -263,6 +263,7 @@ namespace febcode
 		void compileFunction (FunctionStmt* fn);
 		void compileIf       (IfStmt* stmt);
 		void compileWhile    (WhileStmt* stmt);
+		void compileFor      (ForStmt* stmt);
 		void compileReturn   (ReturnStmt* stmt);
 		void compileStruct   (StructStmt* stmt);
 
@@ -288,6 +289,8 @@ namespace febcode
 		Type memberType(Type type, int memberIndex);
 
 		std::vector<Type> compileFncArgs(std::vector<std::unique_ptr<Expression>>& args);
+
+		void pop(Type type);
 
 		// ===== Bytecode =====
 

@@ -96,10 +96,11 @@ std::unique_ptr<febcode::Statement> Parser::parseBlockStatement() {
 }
 
 std::unique_ptr<Statement> Parser::parseStatement() {
-	if (match(TokenType::Return)) return parseReturnStatement();
+	if (match(TokenType::Return   )) return parseReturnStatement();
 	if (match(TokenType::LeftBrace)) return parseBlockStatement();
-	if (match(TokenType::If)) return parseIfStatement();
-	if (match(TokenType::While)) return parseWhileStatement();
+	if (match(TokenType::If       )) return parseIfStatement();
+	if (match(TokenType::While    )) return parseWhileStatement();
+	if (match(TokenType::For      )) return parseForStatement();
 
 	return parseExpressionStatement();
 }
@@ -335,6 +336,37 @@ std::unique_ptr<febcode::Statement> Parser::parseWhileStatement() {
 
 	return std::make_unique<WhileStmt>(
 		std::move(condition),
+		std::move(body));
+}
+
+std::unique_ptr<febcode::Statement> Parser::parseForStatement() {
+	if (!match(TokenType::LeftParen)) {
+		throw std::runtime_error("Expected '(' after 'for'.");
+	}
+
+	auto init = parseDeclaration(); // initializer (can be var decl, expression stmt, or empty)
+	if (!init && !isVarDecl(init) && !isExprStmt(init)) {
+		throw std::runtime_error("Expected variable declaration, expression statement, or ';' in for loop initializer.");
+	}
+
+	auto condition = parseExpression();
+
+	if (!match(TokenType::Semicolon)) {
+		throw std::runtime_error("Expected ';' after for initializer.");
+	}
+
+	auto increment = parseExpression();
+
+	if (!match(TokenType::RightParen)) {
+		throw std::runtime_error("Expected ')' after for increment.");
+	}
+
+	auto body = parseStatement(); // can be block or single statement
+
+	return std::make_unique<ForStmt>(
+		std::move(init),
+		std::move(condition),
+		std::move(increment),
 		std::move(body));
 }
 
@@ -875,6 +907,18 @@ static void printWhileStmt(const WhileStmt* s)
 	l--; printTabs(); std::cout << "}\n";
 }
 
+static void printForStmt(const ForStmt* s)
+{
+	std::cout << "ForStmt: {\n"; l++;
+	printTabs(); std::cout << "initializer: "; printStatement(s->initializer.get()); std::cout << ",\n";
+	printTabs(); std::cout << "condition: "; printExpr(s->condition.get()); std::cout << ",\n";
+	printTabs(); std::cout << "increment: "; printExpr(s->increment.get()); std::cout << ",\n";
+	printTabs(); std::cout << "body: {\n"; l++; printStatement(s->body.get());
+	std::cout << "\n";
+	l--; printTabs(); std::cout << "}\n";
+	l--; printTabs(); std::cout << "}";
+}
+
 static void printFunctionStmt(const FunctionStmt* s)
 {
 	std::cout << "FunctionStmt: {\n"; l++;
@@ -914,6 +958,7 @@ static void printStatement(const Statement* stmt)
 	else if (auto b = dynamic_cast<const BlockStmt*     >(stmt)) printBlockStmt     (b);
 	else if (auto i = dynamic_cast<const IfStmt*        >(stmt)) printIfStmt        (i);
 	else if (auto w = dynamic_cast<const WhileStmt*     >(stmt)) printWhileStmt     (w);
+	else if (auto l = dynamic_cast<const ForStmt*       >(stmt)) printForStmt       (l);
 	else if (auto f = dynamic_cast<const FunctionStmt*  >(stmt)) printFunctionStmt  (f);
 	else if (auto s = dynamic_cast<const StructStmt*    >(stmt)) printStructStmt    (s);
 	else

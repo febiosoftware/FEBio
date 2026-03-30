@@ -33,6 +33,7 @@ namespace febcode {
 		If,
 		Else,
 		While,
+		For,
 		Struct,
 		Input,
 
@@ -232,6 +233,9 @@ namespace febcode {
 
 			if (length == 5 && std::memcmp(start, "while", 5) == 0)
 				return makeToken(TokenType::While);
+
+			if (length == 3 && std::memcmp(start, "for", 3) == 0)
+				return makeToken(TokenType::For);
 
 			if (length == 6 && std::memcmp(start, "struct", 6) == 0)
 				return makeToken(TokenType::Struct);
