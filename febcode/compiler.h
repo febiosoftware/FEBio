@@ -153,6 +153,7 @@ namespace febcode
 		MUL_DOUBLE_MAT2,
 		MUL_MAT2_VEC2,
 		GET_MAT2_INDEX,
+		CREATE_MAT2_DIAG,
 
 		// mat3 operators
 		NEG_MAT3,
@@ -163,6 +164,7 @@ namespace febcode
 		MUL_DOUBLE_MAT3,
 		MUL_MAT3_VEC3,
 		GET_MAT3_INDEX,
+		CREATE_MAT3_DIAG,
 
 		ADD_GLOBAL_MAT3,
 		SUB_GLOBAL_MAT3,
@@ -276,6 +278,7 @@ namespace febcode
 		Type compileCall         (CallExpr* expr);
 		Type compileMember       (MemberExpr* expr);
 		Type compileIndex        (IndexExpr* expr);
+		Type compileConstructor  (ConstructorExpr* expr);
 
 		Type compileLValue(Expression* expr);
 		Type compileVariableRef(VariableExpr* expr);

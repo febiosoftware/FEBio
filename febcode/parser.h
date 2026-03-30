@@ -41,6 +41,10 @@ namespace febcode {
 			return previous();
 		}
 
+		void rewind() {
+			if (current > 0) current--;
+		}
+
 		bool check(TokenType type) const {
 			if (isAtEnd()) return false;
 			return peek().type == type;
@@ -63,6 +67,20 @@ namespace febcode {
 				Type type = prg.types.getStructType(name);
 				if (type != nullptr) {
 					advance(); // consume the identifier
+					return true;
+				}
+			}
+			return false;
+		}
+
+		bool checkType()
+		{
+			if (check(TokenType::Type)) return true;
+			if (check(TokenType::Identifier)) {
+				// Check if it's a user-defined struct type
+				std::string name = lexeme(peek());
+				Type type = prg.types.getStructType(name);
+				if (type != nullptr) {
 					return true;
 				}
 			}
@@ -92,6 +110,7 @@ namespace febcode {
 		std::unique_ptr<Expression> parseExponent();
 		std::unique_ptr<Expression> parseUnary();
 		std::unique_ptr<Expression> parseCall();
+		std::unique_ptr<Expression> parseConstructor(Type type);
 		std::unique_ptr<Expression> parsePrimary();
 
 		std::unique_ptr<Expression> finishCall(std::unique_ptr<Expression> callee);

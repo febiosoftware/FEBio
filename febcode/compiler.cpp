@@ -259,6 +259,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_DOUBLE_MAT2: return -1;
 	case OpCode::MUL_MAT2_VEC2 : return -4;
 	case OpCode::GET_MAT2_INDEX: return -3;
+	case OpCode::CREATE_MAT2_DIAG: return +3;
 
 	case OpCode::NEG_MAT3: return 0;
 	case OpCode::ADD_MAT3: return -9;
@@ -271,6 +272,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::ADD_GLOBAL_MAT3: return +9;
 	case OpCode::SUB_GLOBAL_MAT3: return +9;
 	case OpCode::MUL_GLOBAL_MAT3: return +9;
+	case OpCode::CREATE_MAT3_DIAG: return +8;
 
 	case OpCode::NOT: return 0;
 
@@ -481,16 +483,15 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 	}
 	else if (expectedType->kind == TypeKind::Vec2)
 	{
-		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
-		if (init)
+		if (auto construct = dynamic_cast<ConstructorExpr*>(expr))
 		{
-			if (init->elements.size() != 2)
-				throw std::runtime_error("Vec2 initializer must have exactly 2 elements.");
+			if (construct->args.size() != 2)
+				throw std::runtime_error("Vec2 constructor must have exactly 2 elements.");
 			for (size_t i = 0; i < 2; ++i)
 			{
-				Type elemType = compileExpression(init->elements[i].get());
+				Type elemType = compileExpression(construct->args[i].get());
 				if (elemType != prg.types.getDoubleType())
-					throw std::runtime_error("Vec2 initializer elements must be of type double.");
+					throw std::runtime_error("Vec2 constructor must be of type double.");
 			}
 		}
 		else
@@ -502,16 +503,15 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 	}
 	else if (expectedType->kind == TypeKind::Vec3)
 	{
-		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
-		if (init)
+		if (auto construct = dynamic_cast<ConstructorExpr*>(expr))
 		{
-			if (init->elements.size() != 3)
-				throw std::runtime_error("Vec3 initializer must have exactly 3 elements.");
+			if (construct->args.size() != 3)
+				throw std::runtime_error("Vec3 constructor must have exactly 3 elements.");
 			for (size_t i = 0; i < 3; ++i)
 			{
-				Type elemType = compileExpression(init->elements[i].get());
+				Type elemType = compileExpression(construct->args[i].get());
 				if (elemType != prg.types.getDoubleType())
-					throw std::runtime_error("Vec3 initializer elements must be of type double.");
+					throw std::runtime_error("Vec3 constructor must be of type double.");
 			}
 		}
 		else
@@ -523,57 +523,71 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 	}
 	else if (expectedType->kind == TypeKind::Mat2)
 	{
-		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
-		if (init)
+		if (auto construct = dynamic_cast<ConstructorExpr*>(expr))
 		{
-			if (init->elements.size() != 2)
-				throw std::runtime_error("Invalid initializer for mat2 type.");
+			if (construct->type->kind != TypeKind::Mat2)
+				throw std::runtime_error("Invalid type in mat2 constructor.");
 
-			for (size_t i = 0; i < 2; ++i)
+			if (construct->args.size() == 1)
 			{
-				ExprPtr& init_i = init->elements[i];
+				Type elemType = compileExpression(construct->args[0].get());
+				if (elemType != prg.types.getDoubleType())
+					throw std::runtime_error("Mat2 constructor must be of type double.");
 
-				InitializerExpr* rowInit = dynamic_cast<InitializerExpr*>(init_i.get());
-				if (!rowInit || rowInit->elements.size() != 2)
-					throw std::runtime_error("Invalid initializer for mat2 type.");
+				emit(CREATE_MAT2_DIAG);
+			}
+			else
+			{
+				if (construct->args.size() != 4)
+					throw std::runtime_error("Mat2 constructor must have exactly 4 elements.");
 
-				compileExpression(rowInit->elements[0].get());
-				compileExpression(rowInit->elements[1].get());
+				for (size_t i = 0; i < 4; ++i)
+				{
+					Type elemType = compileExpression(construct->args[i].get());
+					if (elemType != prg.types.getDoubleType())
+						throw std::runtime_error("Mat2 constructor must be of type double.");
+				}
 			}
 		}
 		else
 		{
 			Type returnType = compileExpression(expr);
 			if (returnType != expectedType)
-				throw std::runtime_error("Invalid initializer type for vec3.");
+				throw std::runtime_error("Invalid initializer type for mat2.");
 		}
 	}
 	else if (expectedType->kind == TypeKind::Mat3)
 	{
-		InitializerExpr* init = dynamic_cast<InitializerExpr*>(expr);
-		if (init)
+		if (auto construct = dynamic_cast<ConstructorExpr*>(expr))
 		{
-			if (init->elements.size() != 3)
-				throw std::runtime_error("Invalid initializer for mat3 type.");
+			if (construct->type->kind != TypeKind::Mat3)
+				throw std::runtime_error("Invalid type in mat3 constructor.");
 
-			for (size_t i = 0; i < 3; ++i)
+			if (construct->args.size() == 1)
 			{
-				ExprPtr& init_i = init->elements[i];
+				Type elemType = compileExpression(construct->args[0].get());
+				if (elemType != prg.types.getDoubleType())
+					throw std::runtime_error("Mat3 constructor must be of type double.");
 
-				InitializerExpr* rowInit = dynamic_cast<InitializerExpr*>(init_i.get());
-				if (!rowInit || rowInit->elements.size() != 3)
-					throw std::runtime_error("Invalid initializer for mat3 type.");
-
-				compileExpression(rowInit->elements[0].get());
-				compileExpression(rowInit->elements[1].get());
-				compileExpression(rowInit->elements[2].get());
+				emit(CREATE_MAT3_DIAG);
+			}
+			else
+			{
+				if (construct->args.size() != 9)
+					throw std::runtime_error("Mat3 constructor must have exactly 9 elements.");
+				for (size_t i = 0; i < 9; ++i)
+				{
+					Type elemType = compileExpression(construct->args[i].get());
+					if (elemType != prg.types.getDoubleType())
+						throw std::runtime_error("Mat3 constructor must be of type double.");
+				}
 			}
 		}
 		else
 		{
 			Type returnType = compileExpression(expr);
 			if (returnType != expectedType)
-				throw std::runtime_error("Invalid initializer type for vec3.");
+				throw std::runtime_error("Invalid initializer type for mat3.");
 		}
 	}
 	else
@@ -582,6 +596,17 @@ void Compiler::compileInitializer(Expression* expr, Type expectedType)
 		if (returnType != expectedType)
 			throw std::runtime_error("Invalid initializer type");
 	}
+}
+
+Type Compiler::compileConstructor(ConstructorExpr* construct)
+{
+	for (int i = 0; i < construct->args.size(); ++i)
+	{
+		Type argType = compileExpression(construct->args[i].get());
+		if (argType != construct->argType)
+			throw std::runtime_error("Invalid type in constructor argument.");
+	}
+	return construct->type;
 }
 
 void Compiler::compileVarDecl(VarDeclStmt* decl)
@@ -918,6 +943,7 @@ Type Compiler::compileExpression(Expression* expr)
 	else if (auto c = dynamic_cast<CallExpr*         >(expr)) type = compileCall(c);
 	else if (auto m = dynamic_cast<MemberExpr*       >(expr)) type = compileMember(m);
 	else if (auto s = dynamic_cast<IndexExpr*        >(expr)) type = compileIndex(s);
+	else if (auto s = dynamic_cast<ConstructorExpr*  >(expr)) type = compileConstructor(s);
 	else
 		throw std::runtime_error("Unsupported expression type");
 
@@ -2013,6 +2039,7 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::MUL_MAT2_VEC2  : return "M2V2";
 	case OpCode::NEG_MAT2       : return "NGM2";
 	case OpCode::GET_MAT2_INDEX : return "GM2I";
+	case OpCode::CREATE_MAT2_DIAG: return "MAT2";
 
 	case OpCode::ADD_MAT3       : return "ADM3";
 	case OpCode::SUB_MAT3       : return "SBM3";
@@ -2025,6 +2052,7 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::ADD_GLOBAL_MAT3: return "ADM3";
 	case OpCode::SUB_GLOBAL_MAT3: return "SBM3";
 	case OpCode::MUL_GLOBAL_MAT3: return "MLM3";
+	case OpCode::CREATE_MAT3_DIAG: return "MAT3";
 
 	case OpCode::NOT           : return "NOT ";
 	case OpCode::CREATE_STRUCT : return "STRC";

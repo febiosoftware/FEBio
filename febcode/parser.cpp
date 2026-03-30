@@ -10,6 +10,8 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 		}
 
 		Type type = prg.types.getType(lexeme(previous()));
+		if (type == nullptr)
+			throw std::runtime_error("Unknown type name");
 
 		if (!match(TokenType::Identifier)) {
 			throw std::runtime_error("Expected identifier after type.");
@@ -50,13 +52,21 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 	else if (isType())
 	{
 		Type type = prg.types.getType(lexeme(previous()));
+		if (type == nullptr)
+			throw std::runtime_error("Unknown type name");
 
 		if (match(TokenType::Identifier)) {
 			std::string name = lexeme(previous());
 
 			if (match(TokenType::LeftParen)) {
-				// function declaration
-				return parseFunctionDeclaration(type, name);
+
+				if (checkType() || check(TokenType::RightParen))
+				{
+					// function declaration
+					return parseFunctionDeclaration(type, name);
+				}
+
+				rewind();
 			}
 
 			return parseVarDeclaration(type, name);
@@ -138,6 +148,10 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 		if (match(TokenType::Equal)) {
 			initializer = parseExpression();
 		}
+		else if (check(TokenType::LeftParen))
+		{
+			initializer = parseConstructor(type);
+		}
 
 		// make sure the name doesn't start with an underscore, which is reserved for internal use
 		if (!varName.empty() && varName[0] == '_')
@@ -176,6 +190,8 @@ std::unique_ptr<Statement> Parser::parseStructDeclaration() {
 		}
 
 		Type type = prg.types.getType(lexeme(previous()));
+		if (type == nullptr)
+			throw std::runtime_error("Unknown type name");
 
 		if (!match(TokenType::Identifier)) {
 			throw std::runtime_error("Expected field name in struct.");
@@ -225,6 +241,8 @@ std::unique_ptr<Statement> Parser::parseFunctionDeclaration(Type type, const std
 			}
 
 			Type paramType = prg.types.getType(lexeme(previous()));
+			if (paramType == nullptr)
+				throw std::runtime_error("Unknown type name");
 
 			if (!match(TokenType::Identifier)) {
 				throw std::runtime_error("Expected parameter name.");
@@ -445,6 +463,17 @@ std::unique_ptr<Expression> Parser::parseExponent() {
 }
 
 std::unique_ptr<Expression> Parser::parseCall() {
+
+	if (match(TokenType::Type))
+	{
+		std::string typeName = lexeme(previous());
+		Type type = prg.types.getType(typeName);
+		if (type == nullptr)
+			throw std::runtime_error("Unknown type name in constructor expression.");
+
+		return parseConstructor(type);
+	}
+
 	auto expr = parsePrimary();
 
 	while (true) {
@@ -475,11 +504,33 @@ std::unique_ptr<Expression> Parser::parseCall() {
 			break;
 		}
 	}
-
 	return expr;
 }
 
-std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> callee) {
+std::unique_ptr<Expression> Parser::parseConstructor(Type type)
+{
+	std::vector<std::unique_ptr<Expression>> arguments;
+
+	if (!match(TokenType::LeftParen))
+		throw std::runtime_error("Expected '(' after type name in constructor expression.");
+
+	if (!check(TokenType::RightParen)) {
+		do {
+			arguments.push_back(parseExpression());
+		} while (match(TokenType::Comma));
+	}
+
+	if (!match(TokenType::RightParen))
+		throw std::runtime_error("Expected ')' after arguments.");
+
+	// NOTE: For now, we assume the argument type is double
+	Type argType = prg.types.getDoubleType();
+
+	return std::make_unique<ConstructorExpr>(type, argType, std::move(arguments));
+}
+
+std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> callee) 
+{
 	std::vector<std::unique_ptr<Expression>> arguments;
 
 	if (!check(TokenType::RightParen)) {

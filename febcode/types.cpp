@@ -171,7 +171,7 @@ Type TypeRegistry::getType(const std::string& name) const
 	Type s = getStructType(name);
 	if (s) return s;
 
-	throw std::runtime_error("Unknown type name: " + name);
+	return nullptr;
 }
 
 Type TypeRegistry::getStructType(const std::string& name) const

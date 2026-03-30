@@ -31,7 +31,8 @@ namespace febcode {
 		Member,
 		Initializer,
 		Index,
-		Assignment
+		Assignment,
+		Constructor
 	};
 
 	// Base classes
@@ -118,6 +119,14 @@ namespace febcode {
 		ExprPtr index;
 		IndexExpr(ExprPtr object, ExprPtr index)
 			: Expression(ExpressionType::Index), object(std::move(object)), index(std::move(index)) {}
+	};
+
+	struct ConstructorExpr : Expression {
+		Type type;
+		Type argType;
+		std::vector<ExprPtr> args;
+		ConstructorExpr(Type type, Type argType, std::vector<ExprPtr> arguments) :
+			Expression(ExpressionType::Constructor), type(type), argType(argType), args(std::move(arguments)) {}
 	};
 
 	// --- Statements ---

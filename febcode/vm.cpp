@@ -821,6 +821,16 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::CREATE_MAT2_DIAG:
+		{
+			double a = popDouble();
+			pushDouble(a);
+			pushDouble(0.0);
+			pushDouble(0.0);
+			pushDouble(a);
+			break;
+		}
+
 		// ----- Mat3 operators ------
 		case OpCode::ADD_MAT3:
 		{
@@ -875,6 +885,23 @@ Value VM::execute()
 				throw std::runtime_error("mat3 index out of bounds.");
 #endif
 			pushVec3(*((vec3*)(&A.m[index][0])));
+			break;
+		}
+
+		case OpCode::CREATE_MAT3_DIAG:
+		{
+			double a = popDouble();
+			pushDouble(a);
+			pushDouble(0.0);
+			pushDouble(0.0);
+
+			pushDouble(0.0);
+			pushDouble(a);
+			pushDouble(0.0);
+
+			pushDouble(0.0);
+			pushDouble(0.0);
+			pushDouble(a);
 			break;
 		}
 
