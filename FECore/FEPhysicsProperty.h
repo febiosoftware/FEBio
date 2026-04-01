@@ -13,7 +13,8 @@ enum class FEValueType
 	Bool,
 	Int,
 	Double,
-	Vec3d
+	Vec3d,
+	Mat3d
 };
 
 struct FEValue
@@ -24,6 +25,7 @@ struct FEValue
 		int i;
 		double d;
 		vec3d v3;
+		mat3d m3;
 	};
 
 	FEValue() {}
@@ -37,6 +39,7 @@ struct FEValue
 		case FEValueType::Int   : i = other.i; break;
 		case FEValueType::Double: d = other.d; break;
 		case FEValueType::Vec3d : v3 = other.v3; break;
+		case FEValueType::Mat3d : m3 = other.m3; break;
 		}
 	}
 
@@ -49,6 +52,7 @@ struct FEValue
 		case FEValueType::Int: i = other.i; break;
 		case FEValueType::Double: d = other.d; break;
 		case FEValueType::Vec3d: v3 = other.v3; break;
+		case FEValueType::Mat3d: m3 = other.m3; break;
 		}
 		return *this;
 	}
@@ -66,17 +70,19 @@ public:
 
 	void SetScriptName(const std::string& scriptName);
 
-	void AddVariable(const std::string& varName, FEValueType type);
+	void SetProgramReturnType(FEValueType type);
+
+	void AddVariable(const std::string& varName, FEValueType type, bool differentiable = true);
 
 	bool Init();
 
 	bool HasDerivative(int id) const;
 
 public:
-	double Value(const std::vector<FEValue>& vars);
+	FEValue Value(const std::vector<FEValue>& vars);
 	double Value(const std::vector<double>& vars);
 
-	double DerivValue(const std::vector<FEValue>& vars, int varIndex);
+	FEValue DerivValue(const std::vector<FEValue>& vars, int varIndex);
 	double DerivValue(const std::vector<double>& vars, int varIndex);
 
 protected:

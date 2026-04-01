@@ -1,14 +1,11 @@
 #include "FEPhysicsProperty.h"
 #include <febcode/vm.h>
 #include <febcode/parser.h>
-#include <febcode/module_vec3.h>
-#include <febcode/module_vec2.h>
-#include <febcode/module_math.h>
 #include <febcode/compiler.h>
+#include <febcode/module_math.h>
 #include <febcode/differentiator.h>
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
-#include <FECore/FECoreClass.h>
 #include <sstream>
 
 class FEPhysicsProperty::Imp
@@ -19,8 +16,14 @@ public:
 		std::string name;
 	};
 
+	struct Variable {
+		std::string name;
+		FEValueType type;
+		bool differentiable = true;
+	};
+
 	struct Script {
-		std::vector<std::pair<std::string, FEValueType>> vars;
+		std::vector<Variable> vars;
 		std::vector<Global> globals;
 		std::string script;
 		febcode::Program program;
@@ -44,8 +47,25 @@ public:
 			return g.slot;
 		}
 
+		void SetReturnType(FEValueType type)
+		{
+			switch (type)
+			{
+			case FEValueType::Bool  : program.returnType = program.types.getBoolType(); break;
+			case FEValueType::Int   : program.returnType = program.types.getIntType(); break;
+			case FEValueType::Double: program.returnType = program.types.getDoubleType(); break;
+			case FEValueType::Vec3d : program.returnType = program.types.getVec3Type(); break;
+			case FEValueType::Mat3d : program.returnType = program.types.getMat3Type(); break;
+			default:
+				assert(false);
+			}
+		}
+
 		bool Init()
 		{
+			febcode::MathModule math;
+			math.Register(program);
+
 			febcode::ParseSource(program, script);
 
 			febcode::Compiler compiler(program);
@@ -95,7 +115,7 @@ public:
 			return febcode::getDouble(v);
 		}
 
-		double Run(const std::vector<FEValue>& vars)
+		FEValue Run(const std::vector<FEValue>& vars)
 		{
 			thread_local febcode::VM vm;
 			vm.setProgram(program);
@@ -118,6 +138,13 @@ public:
 							vm.setGlobal(g.slot, v3_febcode);
 							break;
 						}
+					case FEValueType::Mat3d:
+						{
+							const mat3d& m3 = vars[i].m3;
+							febcode::mat3 m3_febcode(m3(0,0), m3(0, 1), m3(0, 2), m3(1, 0), m3(1, 1), m3(1, 2), m3(2, 0), m3(2, 1), m3(2, 2));
+							vm.setGlobal(g.slot, m3_febcode);
+							break;
+						}
 					}
 				}
 			}
@@ -137,7 +164,33 @@ public:
 			}
 
 			febcode::Value v = vm.run();
-			return febcode::getDouble(v);
+
+			FEValue result;
+			switch (v.index)
+			{
+			case febcode::ValueIndex::BOOL:
+				result.type = FEValueType::Bool;
+				result.b = v.b;
+				break;
+			case febcode::ValueIndex::INT:
+				result.type = FEValueType::Int;
+				result.i = v.i;
+				break;
+			case febcode::ValueIndex::DOUBLE:
+				result.type = FEValueType::Double;
+				result.d = v.d;
+				break;
+			case febcode::ValueIndex::VEC3:
+				result.type = FEValueType::Vec3d;
+				result.v3 = vec3d(v.vec3Value.x, v.vec3Value.y, v.vec3Value.z);
+				break;
+			case febcode::ValueIndex::MAT3:
+				result.type = FEValueType::Mat3d;
+				febcode::mat3& m = v.mat3Value;
+				result.m3 = mat3d(m.m[0][0], m.m[0][1], m.m[0][2], m.m[1][0], m.m[1][1], m.m[1][2], m.m[2][0], m.m[2][1], m.m[2][2]);
+				break;
+			}
+			return result;
 		}
 	};
 
@@ -148,10 +201,23 @@ public:
 
 		bool Init()
 		{
+			febcode::MathModule math;
+			math.Register(code.program);
+
 			febcode::ParseSource(code.program, code.script);
 
+			// get the type of the variable
+			if (code.program.globalIndices.count(varName) == 0)
+			{
+				feLogErrorEx(code.pc->GetFEModel(), "Internal error: variable \"%s\" not found in global indices after differentiation", varName.c_str());
+				return false;
+			}
+			size_t index = code.program.globalIndices[varName];
+			febcode::Type varType = code.program.globals[index].type;
+			if (varType == nullptr) return false;
+
 			febcode::Differentiator diff(code.program);
-			auto diffAST = diff.differentiate(*code.program.ast, varName);
+			auto diffAST = diff.differentiate(*code.program.ast, { varType->kind, varName });
 
 			if (!diff.DependencyFound())
 			{
@@ -162,6 +228,47 @@ public:
 			else
 			{
 				code.program.ast = std::move(diffAST);
+
+				// figure out the return type of the derivative program based on the type of the variable
+				// we're differentiating with respect to and the return type of the original program.
+				if (code.program.returnType == nullptr) return false;
+
+				febcode::TypeKind returnTypeKind = code.program.returnType->kind;
+				if (returnTypeKind == febcode::TypeKind::Double)
+				{
+					switch (varType->kind)
+					{
+					case febcode::TypeKind::Double:
+						code.program.returnType = code.program.types.getDoubleType();
+						break;
+					case febcode::TypeKind::Vec3:
+						code.program.returnType = code.program.types.getVec3Type();
+						break;
+					default:
+						feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
+						return false;
+					}
+				}
+				else if (returnTypeKind == febcode::TypeKind::Vec3)
+				{
+					switch (varType->kind)
+					{
+					case febcode::TypeKind::Double:
+						code.program.returnType = code.program.types.getVec3Type();
+						break;
+					case febcode::TypeKind::Vec3:
+						code.program.returnType = code.program.types.getMat3Type();
+						break;
+					default:
+						feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
+						return false;
+					}
+				}
+				else
+				{
+					feLogErrorEx(code.pc->GetFEModel(), "Unsupported return type for differentiation: only double and vec3 return types are supported");
+					return false;
+				}
 
 				febcode::Compiler compiler(code.program);
 				compiler.compile();
@@ -183,6 +290,8 @@ public:
 	FEModel* fem = nullptr;
 	FECoreBase* pc = nullptr;
 
+	FEValueType returnType = FEValueType::Double;
+
 	Script code;
 	std::vector<Derive> valDeriv; //!< programs for derivatives
 };
@@ -197,14 +306,19 @@ void FEPhysicsProperty::SetSibling(FECoreBase* pc)
 	m.pc = pc;
 }
 
+void FEPhysicsProperty::SetProgramReturnType(FEValueType type)
+{
+	m.returnType = type;
+}
+
 void FEPhysicsProperty::SetScriptName(const std::string& scriptName)
 {
 	m_scriptName = scriptName;
 }
 
-void FEPhysicsProperty::AddVariable(const std::string& varName, FEValueType type)
+void FEPhysicsProperty::AddVariable(const std::string& varName, FEValueType type, bool differentiable)
 {
-	m.code.vars.push_back({ varName, type });
+	m.code.vars.push_back({ varName, type, differentiable });
 }
 
 bool FEPhysicsProperty::HasDerivative(int id) const
@@ -235,18 +349,18 @@ bool FEPhysicsProperty::Init()
 	std::vector<std::string> varNamesPrefixed(nvars);
 	for (int i = 0; i < nvars; ++i)
 	{
-		varNamesPrefixed[i] = "_" + m.code.vars[i].first;
+		varNamesPrefixed[i] = "_" + m.code.vars[i].name;
 	}
 
 	// add the variables to the globals list
 	for (int i = 0; i < nvars; ++i)
 	{
-		switch (m.code.vars[i].second)
+		switch (m.code.vars[i].type)
 		{
 		case FEValueType::Double: m.code.AddGlobalDouble(varNamesPrefixed[i]); break;
 		case FEValueType::Vec3d : m.code.AddGlobalVec3  (varNamesPrefixed[i]); break;
 		default:
-			feLogErrorEx(m.fem, "Unsupported variable type for variable \"%s\"", m.code.vars[i].first.c_str());
+			feLogErrorEx(m.fem, "Unsupported variable type for variable \"%s\"", m.code.vars[i].name.c_str());
 			return false;
 		}
 	}
@@ -262,30 +376,47 @@ bool FEPhysicsProperty::Init()
 		// add the variables to the derivative code's global list
 		for (int j = 0; j < nvars; ++j)
 		{
-			switch (m.code.vars[j].second)
+			switch (m.code.vars[j].type)
 			{
 			case FEValueType::Double: m.valDeriv[i].code.AddGlobalDouble(varNamesPrefixed[j]); break;
 			case FEValueType::Vec3d: m.valDeriv[i].code.AddGlobalVec3(varNamesPrefixed[j]); break;
 			}
 		}
-
-		if (m.code.vars[i].second != FEValueType::Double)
-		{
-			m.valDeriv[i].isNullProgram = true; // we only support derivatives with respect to double variables for now
-		}
 	}
 
 	// compile the main program
+	m.code.SetReturnType(m.returnType);
 	if (m.code.Init() == false) return false;
 
 	// initialize the derivates
 	for (int i = 0; i < m.valDeriv.size(); ++i)
 	{
 		Imp::Derive& deriv_i = m.valDeriv[i];
-		if (!deriv_i.isNullProgram && deriv_i.Init() == false)
+
+		// Set the return type of the original code. 
+		// The derivative code's return type will be set during differentiation based on the type of the variable 
+		// we're differentiating with respect to.
+		deriv_i.code.SetReturnType(m.returnType); 
+
+		// if the corresponding variable is not differentiable, we mark the derivative program as null and skip initialization
+		if (!m.code.vars[i].differentiable)
 		{
-			feLogErrorEx(m.fem, "Failed to initialize derivative valuator for variable %d", i);
-			return false;
+			deriv_i.isNullProgram = true;
+			continue;
+		}
+
+		bool success = true;
+		try {
+
+			if (!deriv_i.isNullProgram && deriv_i.Init() == false)
+			{
+				feLogErrorEx(m.fem, "Failed to initialize derivative valuator for variable %d", i);
+				success = false;
+			}
+		}
+		catch (...)
+		{
+			success = false;
 		}
 
 #ifndef NDEBUG
@@ -301,11 +432,12 @@ bool FEPhysicsProperty::Init()
 			feLogEx(m.fem, "%s\n<<<\n\n", ss.str().c_str());
 		}
 #endif
+		if (!success) return false;
 	}
 	return true;
 }
 
-double FEPhysicsProperty::Value(const std::vector<FEValue>& vars)
+FEValue FEPhysicsProperty::Value(const std::vector<FEValue>& vars)
 {
 	return m.code.Run(vars);
 }
@@ -315,7 +447,7 @@ double FEPhysicsProperty::Value(const std::vector<double>& vars)
 	return m.code.Run(vars);
 }
 
-double FEPhysicsProperty::DerivValue(const std::vector<FEValue>& vars, int varIndex)
+FEValue FEPhysicsProperty::DerivValue(const std::vector<FEValue>& vars, int varIndex)
 {
 	if ((varIndex >= 0) && (varIndex < m.valDeriv.size()))
 	{
@@ -323,13 +455,36 @@ double FEPhysicsProperty::DerivValue(const std::vector<FEValue>& vars, int varIn
 		if (deriv_i.isNullProgram)
 		{
 			// this derivative was optimized out, so we return zero
-			return 0.0;
+			switch (deriv_i.code.program.returnType->kind)
+			{
+			case febcode::TypeKind::Double:
+			{
+				FEValue result;
+				result.type = FEValueType::Double;
+				result.d = 0.0;
+				return result;
+			}
+			case febcode::TypeKind::Vec3:
+			{
+				FEValue result;
+				result.type = FEValueType::Vec3d;
+				result.v3 = vec3d(0.0, 0.0, 0.0);
+				return result;
+			}
+			case febcode::TypeKind::Mat3:
+			{
+				FEValue result;
+				result.type = FEValueType::Vec3d;
+				result.m3 = mat3dd(0.0);
+				return result;
+			}
+			}
 		}
 
-		double dr = deriv_i.code.Run(vars);
+		FEValue dr = deriv_i.code.Run(vars);
 		return dr;
 	}
-	return 0.0;
+	return FEValue();
 }
 
 double FEPhysicsProperty::DerivValue(const std::vector<double>& vars, int varIndex)

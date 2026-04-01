@@ -365,6 +365,8 @@ void Compiler::compile()
 	prg.functions[0].entry = 0;
 	hasReturn = false;
 
+	expectedReturnType = prg.returnType;
+
 	for (auto& stmt : prg.ast->root.statements)
 		compileStatement(stmt.get());
 

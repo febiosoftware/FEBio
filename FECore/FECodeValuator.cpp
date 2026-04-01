@@ -134,7 +134,7 @@ bool FECodeValuator::CompileScript()
 		if (m.compileDeriv)
 		{
 			febcode::Differentiator diff(m.program);
-			auto diffAST = diff.differentiate(*m.program.ast, m.derivVarName);
+			auto diffAST = diff.differentiate(*m.program.ast, { febcode::TypeKind::Double, m.derivVarName });
 
 			if (!diff.DependencyFound())
 			{

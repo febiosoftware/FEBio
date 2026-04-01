@@ -72,6 +72,11 @@ namespace febcode
 		mat2() {
 			m[0][0] = m[0][1] = m[1][0] = m[1][1] = 0.0;
 		}
+		mat2(double d)
+		{
+			m[0][0] = m[1][1] = d;
+			m[0][1] = m[1][0] = 0.0;
+		}
 		mat2(double a00, double a01, double a10, double a11) {
 			m[0][0] = a00; m[0][1] = a01;
 			m[1][0] = a10; m[1][1] = a11;
@@ -123,6 +128,13 @@ namespace febcode
 			m[0][0] = m[0][1] = m[0][2] = 0.0;
 			m[1][0] = m[1][1] = m[1][2] = 0.0;
 			m[2][0] = m[2][1] = m[2][2] = 0.0;
+		}
+		mat3(double d) {
+			m[0][0] = m[1][1] = m[2][2] = d;
+
+			m[0][1] = m[1][0] = 0.0;
+			m[0][2] = m[2][0] = 0.0;
+			m[1][2] = m[2][1] = 0.0;
 		}
 		mat3(double a00, double a01, double a02,
 			 double a10, double a11, double a12,
@@ -465,6 +477,10 @@ namespace febcode
 	{
 		if (isInt(v) && (getInt(v) == 0)) return true;
 		if (isDouble(v) && (getDouble(v) == 0.0)) return true;
+		if (isVec2(v) && (getVec2(v) == vec2(0, 0))) return true;
+		if (isVec3(v) && (getVec3(v) == vec3(0, 0, 0))) return true;
+		if (isMat2(v) && (getMat2(v) == mat2(0.0))) return true;
+		if (isMat3(v) && (getMat3(v) == mat3(0.0))) return true;
 		return false;
 	}
 
@@ -473,6 +489,11 @@ namespace febcode
 		if (isInt(v) && (getInt(v) == 1)) return true;
 		if (isDouble(v) && (getDouble(v) == 1.0)) return true;
 		return false;
+	}
+
+	inline bool isIdentity(const mat3& m)
+	{
+		return (m == mat3(1.0));
 	}
 
 	inline bool isIntNumber(const Value& v)

@@ -1,5 +1,7 @@
 #include "ast.h"
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 using namespace febcode;
 
@@ -88,6 +90,15 @@ ExprPtr febcode::copy_expression(const Expression* expr)
 		}
 		return std::make_unique<InitializerExpr>(std::move(copyArgs));
 	}
+	else if (auto constructor = dynamic_cast<const ConstructorExpr*>(expr))
+	{
+		std::vector<ExprPtr> copyArgs;
+		for (auto& arg : constructor->args)
+		{
+			copyArgs.emplace_back(copy_expression(arg.get()));
+		}
+		return std::make_unique<ConstructorExpr>(constructor->type, std::move(copyArgs));
+	}
 	else if (auto assign = dynamic_cast<const AssignExpr*>(expr))
 	{
 		return Assign(assign->target, assign->value);
@@ -161,6 +172,21 @@ bool febcode::isEqual(const ExprPtr& l, const ExprPtr& r)
 			return isEqual(callL->callee, callR->callee) && isEqual(callL->arguments, callR->arguments);
 		}
 	}
+	else if (auto ctorL = dynamic_cast<ConstructorExpr*>(l.get()))
+	{
+		if (auto ctorR = dynamic_cast<ConstructorExpr*>(r.get()))
+		{
+			if (ctorL->type != ctorR->type) return false;
+			assert(ctorL->args.size() == ctorR->args.size());
+			if (ctorL->args.size() != ctorR->args.size()) return false;
+			for (int i = 0; i < ctorL->args.size(); ++i)
+			{
+				if (!isEqual(ctorL->args[i], ctorR->args[i]))
+					return false;
+			}
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -227,15 +253,51 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 		return o << "<unknown value>";
 }
 
+std::string to_nice_string(double d)
+{
+	std::ostringstream ss;
+	ss << std::setprecision(6) << std::defaultfloat << std::showpoint << d;
+	return ss.str();
+}
+
 std::string ValueToString(const febcode::Value& v)
 {
 	std::string s;
 	if      (isVoid  (v)) s = "null";
 	else if (isBool  (v)) s = getBool(v) ? "true" : "false";
 	else if (isInt   (v)) s = std::to_string(getInt (v));
-	else if (isDouble(v)) s = std::to_string(getDouble(v));
+	else if (isDouble(v)) s = to_nice_string(getDouble(v));
 	else if (isVec2  (v)) s = "vec2";
-	else if (isVec3  (v)) s = "vec3";
+	else if (isVec3(v))
+	{
+		s = "vec3(";
+		s += to_nice_string(getVec3(v).x) + ", " + to_nice_string(getVec3(v).y) + ", " + to_nice_string(getVec3(v).z);
+		s += ")";
+	}
+	else if (isMat3(v))
+	{
+		s = "mat3(";
+
+		const mat3& m = v.mat3Value;
+		if (isZero(m))
+		{
+			s += "0.0";
+		}
+		else if (isIdentity(m))
+		{
+			s += "1.0";
+		}
+		else
+		{
+			for (int i = 0; i < 3; ++i)
+				for (int j = 0; j < 3; ++j)
+				{
+					s += to_nice_string(m.m[i][j]);
+					if ((i != 2) || (j != 2)) s += ",";
+				}
+		}
+		s += ")";
+	}
 	else if (isArray (v)) { auto& p = getArrayPtr (v); s = "[array:"  + std::to_string(p.use_count()) + "]"; }
 	else if (isStruct(v)) { 
 		const febcode::StructValue& o = febcode::getStruct(v);

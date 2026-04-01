@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "types.h"
 
 namespace febcode {
@@ -284,9 +285,13 @@ namespace febcode {
 	inline bool isIndex      (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Index      ); }
 
 	inline bool isZero(const ExprPtr& expr) {
-		if (!isLiteral(expr)) return false;
-		auto literal = dynamic_cast<LiteralExpr*>(expr.get());
-		return isZero(literal->value);
+		if (auto literal = dynamic_cast<LiteralExpr*>(expr.get()))
+			return isZero(literal->value);
+		if (auto init = dynamic_cast<InitializerExpr*>(expr.get()))
+			return std::all_of(init->elements.begin(), init->elements.end(), [](const ExprPtr& arg) { return isZero(arg); });
+		if (auto ctor = dynamic_cast<ConstructorExpr*>(expr.get()))
+			return std::all_of(ctor->args.begin(), ctor->args.end(), [](const ExprPtr& arg) { return isZero(arg); });
+		return false;
 	}
 
 	inline bool isNegation   (const ExprPtr& expr) {
@@ -335,6 +340,59 @@ namespace febcode {
 	}
 
 	ExprPtr Initializer(const std::vector<StructField>& fields);
+
+	inline ExprPtr Constructor(Type type, const vec2& v) 
+	{ 
+		assert(type->kind == TypeKind::Vec2);
+		std::vector<ExprPtr> args(2);
+		args[0] = Literal(v.x);
+		args[1] = Literal(v.y);
+		return std::make_unique<ConstructorExpr>(type, std::move(args));
+	}
+
+	inline ExprPtr Constructor(Type type, const vec3& v)
+	{
+		assert(type->kind == TypeKind::Vec3);
+		std::vector<ExprPtr> args(3);
+		args[0] = Literal(v.x);
+		args[1] = Literal(v.y);
+		args[2] = Literal(v.z);
+		return std::make_unique<ConstructorExpr>(type, std::move(args)); 
+	}
+
+	inline ExprPtr Constructor(Type type, double v)
+	{
+		std::vector<ExprPtr> args(1);
+		args[0] = Literal(v);
+		return std::make_unique<ConstructorExpr>(type, std::move(args));
+	}
+
+	inline ExprPtr Constructor(Type type, const mat2& v) 
+	{ 
+		assert(type->kind == TypeKind::Mat2);
+		std::vector<ExprPtr> args(4);
+		args[0] = Literal(v.m[0][0]);
+		args[1] = Literal(v.m[0][1]);
+		args[2] = Literal(v.m[1][0]);
+		args[3] = Literal(v.m[1][1]);
+		return std::make_unique<ConstructorExpr>(type, std::move(args)); 
+	}
+
+	inline ExprPtr Constructor(Type type, const mat3& v) 
+	{ 
+		assert(type->kind == TypeKind::Mat3);
+		std::vector<ExprPtr> args(9);
+		args[0] = Literal(v.m[0][0]);
+		args[1] = Literal(v.m[0][1]);
+		args[2] = Literal(v.m[0][2]);
+		args[3] = Literal(v.m[1][0]);
+		args[4] = Literal(v.m[1][1]);
+		args[5] = Literal(v.m[1][2]);
+		args[6] = Literal(v.m[2][0]);
+		args[7] = Literal(v.m[2][1]);
+		args[8] = Literal(v.m[2][2]);
+		return std::make_unique<ConstructorExpr>(type, std::move(args)); 
+	}
 
 	bool isEqual(const ExprPtr& l, const ExprPtr& r);
 	bool isEqual(const std::vector<ExprPtr>& l, const std::vector<ExprPtr>& r);

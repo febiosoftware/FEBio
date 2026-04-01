@@ -57,6 +57,8 @@ namespace febcode {
 		std::unique_ptr<AST> ast;
 		TypeRegistry types;
 
+		Type returnType = nullptr; // expected return type of the program
+
 		std::vector<uint8_t> code;
 		std::vector<Value> constants;
 		std::vector<FunctionInfo> functions;
