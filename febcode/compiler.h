@@ -292,6 +292,9 @@ namespace febcode
 
 		void pop(Type type);
 
+		Type coerce(Type from, Type to);
+		Type commonType(Type l, Type r);
+
 		// ===== Bytecode =====
 
 		void emit(OpCode op, int arg = 0);

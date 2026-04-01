@@ -429,6 +429,24 @@ void Compiler::pop(Type type)
 	}
 }
 
+Type Compiler::coerce(Type from, Type to)
+{
+	if (from == to)
+		return from;
+	// allow coercion from numeric types to double, but not the other way around
+	if (isNumericType(from) && to->kind == TypeKind::Double)
+		return to;
+	throw std::runtime_error("Type coercion failed: cannot convert from " + TypeToString(from) + " to " + TypeToString(to));
+}
+
+Type Compiler::commonType(Type l, Type r)
+{
+	if (l == r) return l;
+	if (isDoubleType(l) && isNumericType(r)) return l;
+	if (isDoubleType(r) && isNumericType(l)) return r;
+	return nullptr;
+}
+
 void Compiler::compileBlock(BlockStmt* stmt)
 {
 	beginScope();
@@ -449,7 +467,7 @@ Type Compiler::compileInitializer(InitializerExpr* init)
 	// compile the rest of the elements and check that they match the deduced type
 	for (size_t i = 1; i < init->elements.size(); ++i)
 	{
-		Type type = compileExpression(init->elements[i].get());
+		Type type = coerce(compileExpression(init->elements[i].get()), elemType);
 		if (type != elemType)
 			throw std::runtime_error("Initializer element type mismatch.");
 	}
@@ -499,10 +517,12 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 		case TypeKind::Vec3:
 		case TypeKind::Mat2:
 		case TypeKind::Mat3:
+			argType = coerce(argType, prg.types.getDoubleType());
 			if (argType != prg.types.getDoubleType())
 				throw std::runtime_error("Vec2 constructor arguments must be of type double.");
 			break;
 		case TypeKind::Struct:
+			argType = coerce(argType, construct->type->fields[i].first);
 			if (argType != construct->type->fields[i].first)
 				throw std::runtime_error("Struct constructor argument type mismatch.");
 			break;
@@ -536,9 +556,7 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 
 		if (!var.input && var.initializer)
 		{
-			Type initType = compileExpression(var.initializer.get());
-			if (initType != type)
-				throw std::runtime_error("Variable initializer type does not match variable type.");
+			Type initType = coerce(compileExpression(var.initializer.get()), type);
 		}
 
 		if (m_scopeDepth == 0)
@@ -710,8 +728,8 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 		Type returnType = expectedReturnType;
 		returnType = compileExpression(stmt->value.get());
 
-		if (expectedReturnType != nullptr && returnType != expectedReturnType)
-			throw std::runtime_error("Return type mismatch: expected " + TypeToString(expectedReturnType) + ", got " + TypeToString(returnType));
+		if (expectedReturnType)
+			returnType = coerce(returnType, expectedReturnType);
 
 		switch (returnType->kind)
 		{
@@ -967,10 +985,7 @@ Type Compiler::compileVariable(VariableExpr* expr)
 Type Compiler::compileAssign(AssignExpr* expr)
 {
 	Type l_type = compileLValue(expr->target.get());
-	Type r_type = compileExpression(expr->value.get());
-
-	if (l_type != r_type)
-		throw std::runtime_error("Type mismatch in assignment: cannot assign " + TypeToString(r_type) + " to " + TypeToString(l_type));
+	Type r_type = coerce(compileExpression(expr->value.get()), l_type);
 
 	switch (l_type->kind)
 	{
@@ -1279,9 +1294,24 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 				return type_l;
 			}
 		}
+		else if (isInt(e))
+		{
+			int exponentValue = e.i;
+			if (exponentValue == 2)
+			{
+				emit(OpCode::SQR_DOUBLE);
+				return type_l;
+			}
+		}
 	}
 
 	Type type_r = compileExpression(expr->right.get());
+	Type t = commonType(type_l, type_r);
+	if (t)
+	{
+		type_l = t;
+		type_r = t;
+	}
 
 	if (isBoolType(type_l) && isBoolType(type_r))
 	{

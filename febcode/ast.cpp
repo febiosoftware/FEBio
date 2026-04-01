@@ -256,7 +256,7 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 std::string to_nice_string(double d)
 {
 	std::ostringstream ss;
-	ss << std::setprecision(6) << std::defaultfloat << std::showpoint << d;
+	ss << d;
 	return ss.str();
 }
 
