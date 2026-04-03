@@ -347,7 +347,7 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 
 			}
 
-			writeNodalProjectedElementValues<double>(sd, a, mapDouble);
+			writeNodalProjectedElementValues(sd, a, mapDouble);
 		}
 		else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
 		{
@@ -753,7 +753,7 @@ bool FEPlotFieldVariable::SetFilter(const char* sz)
 	case VAR_ARRAY :
 	{
 		SetVarType(Var_Type::PLT_ARRAY);
-		SetArraySize(m_dofs.size());
+		SetArraySize((int)m_dofs.size());
 		vector<string> dofNames;
 		for (int i = 0; i < m_dofs.size(); ++i) dofNames.push_back(dofs.GetDOFName(nvar, i));
 		SetArrayNames(dofNames);

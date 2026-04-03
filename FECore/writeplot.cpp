@@ -50,6 +50,68 @@ void writeMaxElementValue(FEMeshPartition& dom, FEDataStream& ar, std::function<
 		ar << v[i];
 }
 
+void writeNodalProjectedElementValues(FEMeshPartition& dom, FEDataStream& ar, FEParamDouble& var)
+{
+	// temp storage 
+	double si[FEElement::MAX_INTPOINTS];
+	double sn[FEElement::MAX_NODES];
+
+	// loop over all elements
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		FEElement& e = dom.ElementRef(i);
+		int ne = e.Nodes();
+		int ni = e.GaussPoints();
+
+		// get the integration point values
+		for (int k = 0; k < ni; ++k)
+		{
+			FEMaterialPoint& mp = *e.GetMaterialPoint(k);
+			double s = var(mp);
+			si[k] = s;
+		}
+
+		// project to nodes
+		e.project_to_nodes(si, sn);
+
+		// push data to archive
+		for (int j = 0; j < ne; ++j) ar << sn[j];
+	}
+}
+
+void writeNodalProjectedElementValues(FESurface& dom, FEDataStream& ar, FEParamDouble& var)
+{
+	double gi[FEElement::MAX_INTPOINTS];
+	double gn[FEElement::MAX_NODES];
+
+	// loop over all the elements in the domain
+	int NE = dom.Elements();
+	for (int i = 0; i < NE; ++i)
+	{
+		// get the element and loop over its integration points
+		// we only calculate the element's average
+		// but since most material parameters can only defined 
+		// at the element level, this should get the same answer
+		FESurfaceElement& e = dom.Element(i);
+		int nint = e.GaussPoints();
+		int neln = e.Nodes();
+
+		for (int j = 0; j < nint; ++j)
+		{
+			// get the material point data for this integration point
+			FEMaterialPoint& mp = *e.GetMaterialPoint(j);
+			gi[j] = var(mp);
+		}
+
+		e.FEElement::project_to_nodes(gi, gn);
+
+		// store the result
+		for (int j = 0; j < neln; ++j) ar << gn[j];
+	}
+}
+
+
 void writeSPRElementValue(FESolidDomain& dom, FEDataStream& ar, std::function<double(const FEMaterialPoint&)> fnc, int interpolOrder)
 {
 	int NN = dom.Nodes();
