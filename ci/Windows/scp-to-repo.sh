@@ -9,9 +9,7 @@ scp cmbuild/bin/Release/* repo:~/$REMOTE_PATH/bin
 
 # package and upload sdk
 pushd sdk
-zip -r sdk.zip include
-zip -r sdk.zip lib
-zip -r sdk.zip bin
+/c/WINDOWS/system32/tar -acf sdk.zip include lib bin
 scp sdk.zip repo:~/$REMOTE_PATH/
 popd
 

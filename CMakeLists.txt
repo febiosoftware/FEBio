@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
 set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE FEImgLib FEBioPlot FEBioXML)
@@ -477,21 +476,21 @@ else()
     endif()
 endif()
 
-##### Create febio.xml #####
-if(NOT EXISTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml)
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
-<febio_config version=\"3.0\">
-    <default_linear_solver type=\"pardiso\"></default_linear_solver>
-</febio_config>")
-endif()
+#### Set up installation #####
+install(TARGETS febio4 numcore febioxml febiotest febiorve febioplot febioopt
+    febiomix febiomech febiofluid feamr feimglib fecore febiolib
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
 
-if(USE_MKL)
-    file(READ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml filedata)
-    string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"pardiso\"" filedata ${filedata})
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml ${filedata})
-else()
-    file(READ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml filedata)
-    string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"skyline\"" filedata "${filedata}")
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "${filedata}")
-endif()
+install(DIRECTORY 
+    FEBio NumCore FECore FEAMR FEImgLib FEBioFluid FEBioLib FEBioMech FEBioMix
+    FEBioOpt FEBioRVE FEBioPlot FEBioTest FEBioXML
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h*"
+    )
 
+install(FILES FEBioConfig.cmake 
+    DESTINATION lib/cmake/FEBio
+)
