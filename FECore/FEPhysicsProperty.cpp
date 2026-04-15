@@ -212,12 +212,51 @@ public:
 				feLogErrorEx(code.pc->GetFEModel(), "Internal error: variable \"%s\" not found in global indices after differentiation", varName.c_str());
 				return false;
 			}
-			size_t index = code.program.globalIndices[varName];
-			febcode::Type varType = code.program.globals[index].type;
+			febcode::Type varType = code.program.globalType(varName);
 			if (varType == nullptr) return false;
 
 			febcode::Differentiator diff(code.program);
-			auto diffAST = diff.differentiate(*code.program.ast, { varType->kind, varName });
+			auto diffAST = diff.differentiate(*code.program.ast, varName);
+
+			// figure out the return type of the derivative program based on the type of the variable
+			// we're differentiating with respect to and the return type of the original program.
+			if (code.program.returnType == nullptr) return false;
+			febcode::TypeKind returnTypeKind = code.program.returnType->kind;
+			if (returnTypeKind == febcode::TypeKind::Double)
+			{
+				switch (varType->kind)
+				{
+				case febcode::TypeKind::Double:
+					code.program.returnType = code.program.types.getDoubleType();
+					break;
+				case febcode::TypeKind::Vec3:
+					code.program.returnType = code.program.types.getVec3Type();
+					break;
+				default:
+					feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
+					return false;
+				}
+			}
+			else if (returnTypeKind == febcode::TypeKind::Vec3)
+			{
+				switch (varType->kind)
+				{
+				case febcode::TypeKind::Double:
+					code.program.returnType = code.program.types.getVec3Type();
+					break;
+				case febcode::TypeKind::Vec3:
+					code.program.returnType = code.program.types.getMat3Type();
+					break;
+				default:
+					feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
+					return false;
+				}
+			}
+			else
+			{
+				feLogErrorEx(code.pc->GetFEModel(), "Unsupported return type for differentiation: only double and vec3 return types are supported");
+				return false;
+			}
 
 			if (!diff.DependencyFound())
 			{
@@ -229,46 +268,6 @@ public:
 			{
 				code.program.ast = std::move(diffAST);
 
-				// figure out the return type of the derivative program based on the type of the variable
-				// we're differentiating with respect to and the return type of the original program.
-				if (code.program.returnType == nullptr) return false;
-
-				febcode::TypeKind returnTypeKind = code.program.returnType->kind;
-				if (returnTypeKind == febcode::TypeKind::Double)
-				{
-					switch (varType->kind)
-					{
-					case febcode::TypeKind::Double:
-						code.program.returnType = code.program.types.getDoubleType();
-						break;
-					case febcode::TypeKind::Vec3:
-						code.program.returnType = code.program.types.getVec3Type();
-						break;
-					default:
-						feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
-						return false;
-					}
-				}
-				else if (returnTypeKind == febcode::TypeKind::Vec3)
-				{
-					switch (varType->kind)
-					{
-					case febcode::TypeKind::Double:
-						code.program.returnType = code.program.types.getVec3Type();
-						break;
-					case febcode::TypeKind::Vec3:
-						code.program.returnType = code.program.types.getMat3Type();
-						break;
-					default:
-						feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
-						return false;
-					}
-				}
-				else
-				{
-					feLogErrorEx(code.pc->GetFEModel(), "Unsupported return type for differentiation: only double and vec3 return types are supported");
-					return false;
-				}
 
 				febcode::Compiler compiler(code.program);
 				compiler.compile();
@@ -414,8 +413,14 @@ bool FEPhysicsProperty::Init()
 				success = false;
 			}
 		}
+		catch (std::runtime_error e)
+		{
+			feLogErrorEx(m.fem, "Runtime error while initializing derivative valuator for variable %d: %s", i, e.what());
+			success = false;
+		}
 		catch (...)
 		{
+			feLogErrorEx(m.fem, "Unknown error while initializing derivative valuator for variable %d", i);
 			success = false;
 		}
 

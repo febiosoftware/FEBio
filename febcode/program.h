@@ -53,6 +53,8 @@ namespace febcode {
 
 		void registerNative(const std::string& name, double (*f)(double));
 
+		Type globalType(const std::string& name) const;
+
 	public:
 		std::unique_ptr<AST> ast;
 		TypeRegistry types;

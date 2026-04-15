@@ -99,3 +99,12 @@ void Program::registerNative(const std::string& name, double (*f)(double))
 			return f(arg);
 		});
 }
+
+Type Program::globalType(const std::string& name) const
+{
+	auto it = globalIndices.find(name);
+	if (it == globalIndices.end())
+		throw std::runtime_error("Global variable '" + name + "' is not defined.");
+	size_t slot = it->second;
+	return globals[slot].type;
+}

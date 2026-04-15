@@ -56,6 +56,12 @@ struct FEValue
 		}
 		return *this;
 	}
+
+	void operator = (bool v) { type = FEValueType::Bool; b = v; }
+	void operator = (int v) { type = FEValueType::Int; i = v; }
+	void operator = (double v) { type = FEValueType::Double; d = v; }
+	void operator = (const vec3d& v) { type = FEValueType::Vec3d; v3 = v; }
+	void operator = (const mat3d& v) { type = FEValueType::Mat3d; m3 = v; }
 };
 
 class FECORE_API FEPhysicsProperty
