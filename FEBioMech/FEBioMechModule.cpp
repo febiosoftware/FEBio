@@ -178,8 +178,8 @@ SOFTWARE.*/
 #include "FEYeoh.h"
 #include "FEScaledElasticMaterial.h"
 #include "FEScaledUncoupledMaterial.h"
-
 #include "FEPressureLoad.h"
+#include "FEScriptedPressureLoad.h"
 #include "FEPressureRobinBC.h"
 #include "FETractionLoad.h"
 #include "FETractionRobinBC.h"
@@ -674,6 +674,8 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPressureRobinBC, "pressure Robin BC", FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FETractionRobinBC, "traction Robin BC", FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FEPipetteAspiration, "pipette aspiration");
+
+	REGISTER_FECORE_CLASS(FEScriptedPressureLoad, "pressure script", FECORE_EXPERIMENTAL);
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
