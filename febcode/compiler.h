@@ -136,6 +136,7 @@ namespace febcode
 		DOT_VEC2,
 		MUL_VEC2_DOUBLE,
 		MUL_DOUBLE_VEC2,
+		DIV_VEC2_DOUBLE,
 
 		// vec3 operators
 		NEG_VEC3,
@@ -144,6 +145,7 @@ namespace febcode
 		DOT_VEC3,
 		MUL_VEC3_DOUBLE,
 		MUL_DOUBLE_VEC3,
+		DIV_VEC3_DOUBLE,
 
 		// mat2 operators
 		NEG_MAT2,
@@ -153,6 +155,7 @@ namespace febcode
 		MUL_MAT2_DOUBLE,
 		MUL_DOUBLE_MAT2,
 		MUL_MAT2_VEC2,
+		DIV_MAT2_DOUBLE,
 		GET_MAT2_INDEX,
 		CREATE_MAT2_DIAG,
 
@@ -164,6 +167,7 @@ namespace febcode
 		MUL_MAT3_DOUBLE,
 		MUL_DOUBLE_MAT3,
 		MUL_MAT3_VEC3,
+		DIV_MAT3_DOUBLE,
 		GET_MAT3_INDEX,
 		CREATE_MAT3_DIAG,
 

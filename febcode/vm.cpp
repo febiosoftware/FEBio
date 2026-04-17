@@ -623,6 +623,14 @@ Value VM::execute()
 			pushDouble(v[1] * scalar);
 			break;
 		}
+		case OpCode::DIV_VEC2_DOUBLE:
+		{
+			double scalar = popDouble();
+			double* a = peekPtr(2);
+			a[0] /= scalar;
+			a[1] /= scalar;
+			break;
+		}
 
 		case OpCode::GET_VEC2_X:
 		{
@@ -724,6 +732,15 @@ Value VM::execute()
 			pushDouble(a[2] * scalar);
 			break;
 		}
+		case OpCode::DIV_VEC3_DOUBLE:
+		{
+			double scalar = popDouble();
+			double* a = peekPtr(3);
+			a[0] /= scalar;
+			a[1] /= scalar;
+			a[2] /= scalar;
+			break;
+		}
 		case OpCode::GET_VEC3_X:
 		{
 			double* a = popPtr(3);
@@ -769,7 +786,7 @@ Value VM::execute()
 
 		case OpCode::NEG_VEC3:
 		{
-			double* a = popPtr(3);
+			double* a = peekPtr(3);
 			a[0] = -a[0];
 			a[1] = -a[1];
 			a[2] = -a[2];
@@ -823,6 +840,14 @@ Value VM::execute()
 			double scalar = popDouble();
 			mat2& a = popMat2();
 			pushMat2(a * scalar);
+			break;
+		}
+
+		case OpCode::DIV_MAT2_DOUBLE:
+		{
+			double scalar = popDouble();
+			mat2& a = popMat2();
+			pushMat2(a / scalar);
 			break;
 		}
 
@@ -890,6 +915,13 @@ Value VM::execute()
 			double scalar = popDouble();
 			mat3& A = popMat3();
 			pushMat3(A * scalar);
+			break;
+		}
+		case OpCode::DIV_MAT3_DOUBLE:
+		{
+			double scalar = popDouble();
+			mat3& A = popMat3();
+			pushMat3(A / scalar);
 			break;
 		}
 

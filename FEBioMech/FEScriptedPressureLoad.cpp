@@ -80,34 +80,32 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 
 	// evaluate the integral
 	FESurface& surf = GetSurface();
-	surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& kab) {
+	surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
 		std::vector<FEValue> vars(2);
 		vars[0] = mp.m_rt;
 		vars[1] = t;
 
 		// evaluate pressure at this material point
-		double P = -Value(vars).d;
+		double P = Value(vars).d;
 
 		// evaluate pressure gradient at this material point
-		vec3d dP = -DerivValue(vars, 0).v3;
+		vec3d dP = DerivValue(vars, 0).v3;
 
 		double H_i = dof_a.shape;
-		double Gr_i = dof_a.shape_deriv_r;
-		double Gs_i = dof_a.shape_deriv_s;
-
 		double H_j = dof_b.shape;
+
 		double Gr_j = dof_b.shape_deriv_r;
 		double Gs_j = dof_b.shape_deriv_s;
 
 		vec3d vab(0, 0, 0);
-		vab = (mp.dxs * Gr_j - mp.dxr * Gs_j) * (P * H_i);
-
+		vab = (mp.dxr * Gs_j - mp.dxs * Gr_j) * (P * H_i);
 		mat3da K(vab);
-		kab.set(0, 0, K);
+
+		Kab.set(0, 0, K);
 
 		vec3d N = (mp.dxr ^ mp.dxs);
-		mat3d Kp = (N & dP);
-		kab.add(0, 0, Kp);
+		mat3d Kp = (N & dP)*(H_i * H_j);
+		Kab.add(0, 0, Kp);
 	});
 }

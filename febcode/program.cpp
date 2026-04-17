@@ -258,5 +258,5 @@ BinaryOpSignature Program::resolveBinaryOp(BinaryOp op, Type left, Type right)
 			}
 		}
 	}
-	throw std::runtime_error("No matching binary operator found for operator '" + std::to_string((int)op) + "' with operand types '" + std::to_string((int)left->kind) + "' and '" + std::to_string((int)right->kind) + "'.");
+	throw std::runtime_error("No matching binary operator found for operator '" + opToString(op) + "' with operand types '" + TypeToString(left) + "' and '" + TypeToString(right) + "'.");
 }

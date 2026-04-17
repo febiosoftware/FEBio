@@ -238,17 +238,50 @@ ExprPtr Differentiator::differentiate(const Expression* expr, const std::string&
 
 ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const std::string& var)
 {
-	// The derivative of a constant is zero
-	switch (literal->value.index)
+	Type varType = prg.globalType(var);
+
+	// scalar derivation
+	if (varType->kind == TypeKind::Double)
 	{
-	case ValueIndex::INT   : return Literal(0);
-	case ValueIndex::DOUBLE: return Literal(0.0);
-	case ValueIndex::VEC2  : return Literal(vec2());
-	case ValueIndex::VEC3  : return Literal(vec3());
-	case ValueIndex::MAT2  : return Literal(mat2());
-	case ValueIndex::MAT3  : return Literal(mat3());
-	default:
-		throw std::runtime_error("Don't know how to differentiate this literal type.");
+		// The derivative of a constant is zero
+		switch (literal->value.index)
+		{
+		case ValueIndex::INT: return Literal(0);
+		case ValueIndex::DOUBLE: return Literal(0.0);
+		case ValueIndex::VEC2: return Literal(vec2());
+		case ValueIndex::VEC3: return Literal(vec3());
+		case ValueIndex::MAT2: return Literal(mat2());
+		case ValueIndex::MAT3: return Literal(mat3());
+		default:
+			throw std::runtime_error("Don't know how to differentiate this literal type.");
+		}
+	}
+
+	// 2d gradient
+	if (varType->kind == TypeKind::Vec2)
+	{
+		switch (literal->value.index)
+		{
+		case ValueIndex::INT:
+		case ValueIndex::DOUBLE: return Literal(vec2());
+		case ValueIndex::VEC2  : return Literal(mat2());
+		default:
+			throw std::runtime_error("Don't know how to differentiate this literal type.");
+		}
+	}
+
+	// 3d gradient
+	if (varType->kind == TypeKind::Vec3)
+	{
+		switch (literal->value.index)
+		{
+		case ValueIndex::INT:
+		case ValueIndex::DOUBLE: return Literal(vec3());
+		case ValueIndex::VEC3  : return Literal(mat3());
+		default:
+			throw std::runtime_error("Don't know how to differentiate this literal type.");
+
+		}
 	}
 }
 
@@ -404,10 +437,24 @@ std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary,
 				return Add(Mul(Transpose(dleft), right), Mul(Transpose(dright), left));
 			}
 		}
-
+		if (binary->op == BinaryOp::Divide)
+		{
+			if (isScalarType(ltype) && isScalarType(rtype))
+			{
+				// the derivatives of scalars with respect to a vec3 variable should be vec3s)
+				assert(isVec3Type(dltype) && isVec3Type(drtype));
+				// grad( f / g ) = (grad(f) * g - f * grad(g)) / (g * g), where f and g are scalars
+				return Div(Sub(Mul(dleft, right), Mul(left, dright)), Mul(right, right));
+			}
+			else if ((ltype->kind == TypeKind::Vec3) && isScalarType(rtype))
+			{
+				// grad( v / f ) = (grad(v) * f - v & grad(f)) / (f * f), where v is a vector and f is a scalar
+				return Div(Sub(Mul(dleft, right), OuterProduct(left, dright)), Mul(right, right));
+			}
+		}
 	}
 
-	throw std::runtime_error("Unsupported binary operator for differentiation");
+	throw std::runtime_error("AD error: Unsupported binary operator '" + opToString(binary->op) + "' with operand types '" + TypeToString(ltype) + "' and '" + TypeToString(rtype) + "'.");
 }
 
 ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
@@ -419,6 +466,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
 		ExprPtr dfnc;
 		if      (fnc == "sin") dfnc =  Call("cos", args);
 		else if (fnc == "cos") dfnc = Negate(Call("sin", args));
+		else if (fnc == "exp") dfnc = Call("exp", args);
 		else if (fnc == "sqrt") dfnc = Div(Literal(0.5), Call("sqrt", args));
 		else
 			throw std::runtime_error("Don't know how to differentiate function " + fnc + ".");

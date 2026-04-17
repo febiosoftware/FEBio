@@ -27,6 +27,7 @@ namespace febcode
 			prg.binaryOps[BinaryOp::Multiply].push_back({ mat3_t, vec3_t, vec3_t });
 			prg.binaryOps[BinaryOp::Multiply].push_back({ mat3_t, double_t, mat3_t });
 			prg.binaryOps[BinaryOp::Multiply].push_back({ double_t, mat3_t, mat3_t });
+			prg.binaryOps[BinaryOp::Divide  ].push_back({ mat3_t, double_t, mat3_t });
 
 			prg.binaryOps[BinaryOp::EqualEqual].push_back({ mat3_t, mat3_t, bool_t });
 			prg.binaryOps[BinaryOp::NotEqual  ].push_back({ mat3_t, mat3_t, bool_t });

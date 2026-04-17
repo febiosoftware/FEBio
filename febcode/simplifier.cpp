@@ -382,6 +382,22 @@ ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
 			}
 		}
 
+		if (isVec3(rv))
+		{
+			vec3 v = getVec3(rv);
+			if (isZero(v))
+			{
+				switch (binary->op)
+				{
+				case BinaryOp::Multiply:
+					if (isScalarType(l->valType))
+						return Literal(vec3(0.0, 0.0, 0.0)); // scalar * vec3(0) = vec3(0)
+					if (l->valType->kind == TypeKind::Vec3)
+						return Literal(0.0); // vec3 * vec3(0) = 0
+				}
+			}
+		}
+
 		if (isMat2(rv))
 		{
 			mat2 m = getMat2(rv);
@@ -431,7 +447,7 @@ ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
 	{
 		if (binary->op == BinaryOp::Plus    ) return simplify(Binary(BinaryOp::Multiply, Literal(2.0), l));
 		if (binary->op == BinaryOp::Minus   ) return Zero(l->valType);
-		if (binary->op == BinaryOp::Multiply) return Binary(BinaryOp::Exponent, l, Literal(2.0));
+		if ((binary->op == BinaryOp::Multiply) && isScalarType(l->valType)) return Binary(BinaryOp::Exponent, l, Literal(2.0));
 	}
 
 	if (isNegation(r))

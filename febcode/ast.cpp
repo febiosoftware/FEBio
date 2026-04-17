@@ -288,3 +288,25 @@ std::string ValueTypeToString(const febcode::Value& v)
 	else if (isRef    (v)) return "ref";
 	else return "<unknown type>";
 }
+
+std::string opToString(BinaryOp op)
+{
+	switch (op)
+	{
+	case BinaryOp::Plus:         return "+";
+	case BinaryOp::Minus:        return "-";
+	case BinaryOp::Multiply:     return "*";
+	case BinaryOp::Divide:       return "/";
+	case BinaryOp::Exponent:     return "**";
+	case BinaryOp::Greater:      return ">";
+	case BinaryOp::GreaterEqual: return ">=";
+	case BinaryOp::Less:         return "<";
+	case BinaryOp::LessEqual:    return "<=";
+	case BinaryOp::EqualEqual:   return "==";
+	case BinaryOp::NotEqual:     return "!=";
+	case BinaryOp::AndAnd:       return "&&";
+	case BinaryOp::OrOr:         return "||";
+	default:
+		return "unknown_op";
+	}
+}

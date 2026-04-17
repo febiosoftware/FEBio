@@ -99,6 +99,12 @@ namespace febcode
 				m[1][0] * scalar, m[1][1] * scalar
 			);
 		}
+		mat2 operator/(double scalar) const {
+			return mat2(
+				m[0][0] / scalar, m[0][1] / scalar,
+				m[1][0] / scalar, m[1][1] / scalar
+			);
+		}
 		vec2 operator*(const vec2& other) const {
 			return vec2(
 				m[0][0] * other.x + m[0][1] * other.y,
@@ -165,6 +171,14 @@ namespace febcode
 				m[0][0] * scalar, m[0][1] * scalar, m[0][2] * scalar,
 				m[1][0] * scalar, m[1][1] * scalar, m[1][2] * scalar,
 				m[2][0] * scalar, m[2][1] * scalar, m[2][2] * scalar
+			);
+		}
+
+		mat3 operator/(double scalar) const {
+			return mat3(
+				m[0][0] / scalar, m[0][1] / scalar, m[0][2] / scalar,
+				m[1][0] / scalar, m[1][1] / scalar, m[1][2] / scalar,
+				m[2][0] / scalar, m[2][1] / scalar, m[2][2] / scalar
 			);
 		}
 

@@ -28,6 +28,7 @@ namespace febcode
 			prg.binaryOps[BinaryOp::Multiply].push_back({ vec2Type, doubleType, vec2Type });
 			prg.binaryOps[BinaryOp::Multiply].push_back({ doubleType, vec2Type, vec2Type });
 			prg.binaryOps[BinaryOp::Multiply].push_back({ vec2Type, vec2Type, doubleType }); // dot product
+			prg.binaryOps[BinaryOp::Divide  ].push_back({ vec2Type, doubleType, vec2Type });
 
 			prg.binaryOps[BinaryOp::EqualEqual].push_back({ vec2Type, vec2Type, bool_t });
 			prg.binaryOps[BinaryOp::NotEqual  ].push_back({ vec2Type, vec2Type, bool_t });

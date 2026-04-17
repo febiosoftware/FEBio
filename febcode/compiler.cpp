@@ -261,6 +261,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::DOT_VEC2: return -3;
 	case OpCode::MUL_VEC2_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC2: return -1;
+	case OpCode::DIV_VEC2_DOUBLE: return -1;
 
 	case OpCode::NEG_VEC3: return 0;
 	case OpCode::ADD_VEC3: return -3;
@@ -268,6 +269,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::DOT_VEC3: return -5;
 	case OpCode::MUL_VEC3_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_VEC3: return -1;
+	case OpCode::DIV_VEC3_DOUBLE: return -1;
 
 	case OpCode::NEG_MAT2: return 0;
 	case OpCode::ADD_MAT2: return -4;
@@ -275,6 +277,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_MAT2: return -4;
 	case OpCode::MUL_MAT2_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_MAT2: return -1;
+	case OpCode::DIV_MAT2_DOUBLE: return -1;
 	case OpCode::MUL_MAT2_VEC2 : return -4;
 	case OpCode::GET_MAT2_INDEX: return -3;
 	case OpCode::CREATE_MAT2_DIAG: return +3;
@@ -284,6 +287,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::SUB_MAT3: return -9;
 	case OpCode::MUL_MAT3: return -9;
 	case OpCode::MUL_MAT3_DOUBLE: return -1;
+	case OpCode::DIV_MAT3_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_MAT3: return -1;
 	case OpCode::MUL_MAT3_VEC3  : return -9;
 	case OpCode::GET_MAT3_INDEX : return -7;
@@ -1473,19 +1477,20 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		return returnType;
 	}
 
-	// vec2 * scalar
-	if (isVec2Type(type_l) && isDoubleType(type_r))
+	// vec2 op scalar
+	if (isVec2Type(type_l) && isScalarType(type_r))
 	{
 		switch (op)
 		{
 		case BinaryOp::Multiply: emit(OpCode::MUL_VEC2_DOUBLE); break;
+		case BinaryOp::Divide : emit(OpCode::DIV_VEC2_DOUBLE); break;
 		default: throw std::runtime_error("Unsupported binary op for vec2 and double types.");
 		}
 		return type_l;
 	}
 
 	// scalar * vec2
-	if (isDoubleType(type_l) && isVec2Type(type_r))
+	if (isScalarType(type_l) && isVec2Type(type_r))
 	{
 		switch (op)
 		{
@@ -1509,19 +1514,20 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		return returnType;
 	}
 
-	// vec3 * scalar
-	if (isVec3Type(type_l) && isDoubleType(type_r))
+	// vec3 op scalar
+	if (isVec3Type(type_l) && isScalarType(type_r))
 	{
 		switch (op)
 		{
 		case BinaryOp::Multiply: emit(OpCode::MUL_VEC3_DOUBLE); break;
+		case BinaryOp::Divide  : emit(OpCode::DIV_VEC3_DOUBLE); break;
 		default: throw std::runtime_error("Unsupported binary op for vec3 and double types.");
 		}
 		return type_l;
 	}
 
 	// scalar * vec3
-	if (isDoubleType(type_l) && isVec3Type(type_r))
+	if (isScalarType(type_l) && isVec3Type(type_r))
 	{
 		switch (op)
 		{
@@ -1556,19 +1562,20 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		return type_r;
 	}
 
-	// mat2 * scalar
-	if (isMat2Type(type_l) && isDoubleType(type_r))
+	// mat2 op scalar
+	if (isMat2Type(type_l) && isScalarType(type_r))
 	{
 		switch (op)
 		{
 		case BinaryOp::Multiply: emit(OpCode::MUL_MAT2_DOUBLE); break;
+		case BinaryOp::Divide  : emit(OpCode::DIV_MAT2_DOUBLE); break;
 		default: throw std::runtime_error("Unsupported binary op for mat2 and double types.");
 		}
 		return type_l;
 	}
 
 	// scalar * mat2
-	if (isDoubleType(type_l) && isMat2Type(type_r))
+	if (isScalarType(type_l) && isMat2Type(type_r))
 	{
 		switch (op)
 		{
@@ -1593,23 +1600,24 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 	}
 
 	// mat3 * scalar
-	if (isMat3Type(type_l) && isDoubleType(type_r))
+	if (isMat3Type(type_l) && isScalarType(type_r))
 	{
 		switch (op)
 		{
 		case BinaryOp::Multiply: emit(OpCode::MUL_MAT3_DOUBLE); break;
+		case BinaryOp::Divide  : emit(OpCode::DIV_MAT3_DOUBLE); break;
 		default: throw std::runtime_error("Unsupported binary op for mat3 and double types.");
 		}
 		return type_l;
 	}
 
 	// scalar * mat3
-	if (isDoubleType(type_l) && isMat3Type(type_r))
+	if (isScalarType(type_l) && isMat3Type(type_r))
 	{
 		switch (op)
 		{
 		case BinaryOp::Multiply: emit(OpCode::MUL_DOUBLE_MAT3); break;
-		default: throw std::runtime_error("Unsupported binary op for double and mat2 types.");
+		default: throw std::runtime_error("Unsupported binary op for double and mat3 types.");
 		}
 		return type_r;
 	}
@@ -1625,7 +1633,7 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		return type_r;
 	}
 
-	throw std::runtime_error("Unsupported binary op for given operand types.");
+	throw std::runtime_error("Compiler error: Unsupported binary operator '" + opToString(op) + "' with operand types '" + TypeToString(type_l) + "' and '" + TypeToString(type_r) + "'.");
 
 	return type_l;
 }
@@ -2061,6 +2069,7 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::DOT_VEC2      : return "DOT2";
 	case OpCode::MUL_VEC2_DOUBLE: return "ML2F";
 	case OpCode::MUL_DOUBLE_VEC2: return "MLF2";
+	case OpCode::DIV_VEC2_DOUBLE: return "DV2F";
 	case OpCode::NEG_VEC2      : return "NEG2";
 
 	case OpCode::GET_VEC3_X    : return "GV3X";
@@ -2073,14 +2082,16 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::DOT_VEC3      : return "DOT3";
 	case OpCode::MUL_VEC3_DOUBLE: return "ML3F";
 	case OpCode::MUL_DOUBLE_VEC3: return "MLF3";
+	case OpCode::DIV_VEC3_DOUBLE: return "DV3F";
 	case OpCode::NEG_VEC3      : return "NEG3";
 
 	case OpCode::ADD_MAT2       : return "ADM2";
 	case OpCode::SUB_MAT2       : return "SBM2";
 	case OpCode::MUL_MAT2       : return "MLM2";
-	case OpCode::MUL_MAT2_DOUBLE: return "M2F ";
+	case OpCode::MUL_MAT2_DOUBLE: return "MM2F";
 	case OpCode::MUL_DOUBLE_MAT2: return "FM2 ";
 	case OpCode::MUL_MAT2_VEC2  : return "M2V2";
+	case OpCode::DIV_MAT2_DOUBLE: return "DM2F";
 	case OpCode::NEG_MAT2       : return "NGM2";
 	case OpCode::GET_MAT2_INDEX : return "GM2I";
 	case OpCode::CREATE_MAT2_DIAG: return "MAT2";
@@ -2088,7 +2099,8 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::ADD_MAT3       : return "ADM3";
 	case OpCode::SUB_MAT3       : return "SBM3";
 	case OpCode::MUL_MAT3       : return "MLM3";
-	case OpCode::MUL_MAT3_DOUBLE: return "M3F ";
+	case OpCode::MUL_MAT3_DOUBLE: return "MM3F";
+	case OpCode::DIV_MAT3_DOUBLE: return "DM3F";
 	case OpCode::MUL_DOUBLE_MAT3: return "FM3 ";
 	case OpCode::MUL_MAT3_VEC3  : return "M3V3";
 	case OpCode::NEG_MAT3       : return "NGM3";
