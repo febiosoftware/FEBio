@@ -1,23 +1,23 @@
 #! /bin/bash
 
-REMOTE_PATH="update2/FEBioStudio2Dev/Linux/stage"
+REMOTE_PATH="/serverRoot/update2/FEBioStudio2Dev/Linux/stage"
 if [ $# == 1 ] && [ "$1" != "develop" ]; then
-    REMOTE_PATH="update2/FEBioStudio2Dev/branches/$1/Linux/stage"
+    REMOTE_PATH="/serverRoot/update2/FEBioStudio2Dev/branches/$1/Linux/stage"
 fi
 
 
 set -e
-scp cmbuild/bin/* repo:~/$REMOTE_PATH/bin
-scp cmbuild/lib/* repo:~/$REMOTE_PATH/lib
-ssh repo "chmod +x $REMOTE_PATH/bin/febio4"
+scp cmbuild/bin/* febio-web:$REMOTE_PATH/bin
+scp cmbuild/lib/* febio-web:$REMOTE_PATH/lib
+ssh febio-web "chmod +x $REMOTE_PATH/bin/febio4"
 
 # package and upload sdk
 pushd sdk
 zip -r sdk.zip include
 zip -r sdk.zip lib
-scp sdk.zip repo:~/$REMOTE_PATH/
+scp sdk.zip febio-web:$REMOTE_PATH/
 popd
 
 if [ -f testLogs/Logs/* ]; then
-    scp testLogs/Logs/* repo:~/TestSuite/Logs/linux.txt
+    scp testLogs/Logs/* febio-web:/serverRoot/TestSuite/Logs/linux.txt
 fi
