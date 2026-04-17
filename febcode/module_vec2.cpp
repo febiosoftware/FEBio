@@ -27,3 +27,14 @@ Value febcode::NormalizeVec2(FuncArgs args)
 
 	return vec2(x, y);
 }
+
+Value febcode::OuterVec2(FuncArgs args)
+{
+	assert(args.count == 2);
+	const vec2& a = args.getVec2();
+	const vec2& b = args.getVec2();
+	return mat2(
+		a.x * b.x, a.x * b.y,
+		a.y * b.x, a.y * b.y
+	);
+}

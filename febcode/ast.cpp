@@ -5,90 +5,39 @@
 
 using namespace febcode;
 
-ExprPtr febcode::Initializer(const std::vector<StructField>& fields)
-{
-	std::vector<ExprPtr> init;
-	for (const auto& field : fields)
-	{
-		switch (field.first->kind)
-		{
-		case TypeKind::Bool  : init.push_back(Literal(Value(false))); break;
-		case TypeKind::Int   : init.push_back(Literal(Value(0))); break;
-		case TypeKind::Double: init.push_back(Literal(Value(0.0))); break;
-		case TypeKind::Vec2  : init.push_back(Literal(Value(vec2(0., 0.)))); break;
-		case TypeKind::Vec3  : init.push_back(Literal(Value(vec3(0., 0., 0.)))); break;
-		case TypeKind::Array:
-		{
-			Value v;
-			switch (field.first->elementType->kind)
-			{
-			case TypeKind::Bool: v = Value(false); break;
-			case TypeKind::Int: v = Value(0); break;
-			case TypeKind::Double: v = Value(0.0); break;
-			case TypeKind::Vec2: v = Value(vec2(0., 0.)); break;
-			case TypeKind::Vec3: v = Value(vec3(0., 0., 0.)); break;
-			default:
-				throw std::runtime_error("Unsupported array element type for initializer");
-			};
-			init.push_back(Initializer(field.first->arraySize, v));
-			break;
-		}
-		case TypeKind::Struct:
-		{
-			std::vector<ExprPtr> structFields;
-			for (const auto& subfield : field.first->fields)
-			{
-				Value v;
-				switch (subfield.first->elementType->kind)
-				{
-				case TypeKind::Bool  : v = Value(false); break;
-				case TypeKind::Int   : v = Value(0); break;
-				case TypeKind::Double: v = Value(0.0); break;
-				case TypeKind::Vec2  : v = Value(vec2(0., 0.)); break;
-				case TypeKind::Vec3  : v = Value(vec3(0., 0., 0.)); break;
-				default:
-					throw std::runtime_error("Unsupported struct field type for initializer");
-				};
-
-				structFields.push_back(Literal(v));
-			}
-			init.push_back(std::make_unique<InitializerExpr>(std::move(structFields)));
-		}
-		break;
-		default:
-			throw std::runtime_error("Unsupported struct field type for initializer");
-		}
-	}
-	return std::make_unique<InitializerExpr>(std::move(init));
-}
-
 ExprPtr febcode::copy_expression(const Expression* expr)
 {
-	if (expr == nullptr)  return nullptr;
-	else if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
-		return Literal(literal->value);
+	ExprPtr cpy;
+
+	if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+		cpy = std::make_unique<LiteralExpr>(literal->value);
 	}
 	else if (auto variable = dynamic_cast<const VariableExpr*>(expr)) {
-		return Variable(variable->name);
+		cpy = std::make_unique<VariableExpr>(variable->name);
 	}
 	else if (auto unary = dynamic_cast<const UnaryExpr*>(expr)) {
-		return Unary(unary->op, unary->right);
+		cpy = std::make_unique<UnaryExpr>(unary->op, copy_expression(unary->right.get()));
 	}
 	else if (auto binary = dynamic_cast<const BinaryExpr*>(expr)) {
-		return Binary(binary->left, binary->op, binary->right);
+		cpy = std::make_unique<BinaryExpr>(copy_expression(binary->left.get()), binary->op, copy_expression(binary->right.get()));
 	}
 	else if (auto call = dynamic_cast<const CallExpr*>(expr))
 	{
-		return Call(call->callee, call->arguments);
+		std::vector<ExprPtr> copyArgs;
+		for (auto& arg : call->arguments)
+		{
+			copyArgs.emplace_back(copy_expression(arg.get()));
+		}
+		cpy = std::make_unique<CallExpr>(call->name, std::move(copyArgs));
 	}
-	else if (auto call = dynamic_cast<const InitializerExpr*>(expr))
+	else if (auto call = dynamic_cast<const InitExpr*>(expr))
 	{
 		std::vector<ExprPtr> copyArgs;
 		for (auto& arg : call->elements)
 		{
 			copyArgs.emplace_back(copy_expression(arg.get()));
 		}
-		return std::make_unique<InitializerExpr>(std::move(copyArgs));
+		cpy = std::make_unique<InitExpr>(std::move(copyArgs));
 	}
 	else if (auto constructor = dynamic_cast<const ConstructorExpr*>(expr))
 	{
@@ -97,20 +46,29 @@ ExprPtr febcode::copy_expression(const Expression* expr)
 		{
 			copyArgs.emplace_back(copy_expression(arg.get()));
 		}
-		return std::make_unique<ConstructorExpr>(constructor->type, std::move(copyArgs));
+		cpy = std::make_unique<ConstructorExpr>(constructor->valType, std::move(copyArgs));
 	}
 	else if (auto assign = dynamic_cast<const AssignExpr*>(expr))
 	{
-		return Assign(assign->target, assign->value);
+		cpy = std::make_unique<AssignExpr>(copy_expression(assign->target.get()), copy_expression(assign->value.get()));
 	}
 	else if (auto member = dynamic_cast<const MemberExpr*>(expr))
 	{
-		return Member(member->object, member->property);
+		cpy = std::make_unique<MemberExpr>(copy_expression(member->object.get()), member->property);
+	}
+	else if (auto index = dynamic_cast<const IndexExpr*>(expr))
+	{
+		cpy = std::make_unique<IndexExpr>(copy_expression(index->object.get()), copy_expression(index->index.get()));
 	}
 	else
 	{
 		throw std::runtime_error("Unsupported expression type for copying");
 	}
+
+	if (cpy)
+		cpy->valType = expr->valType; // Copy the value type as well
+
+	return cpy;
 }
 
 bool febcode::isEqual(const ExprPtr& l, const ExprPtr& r)
@@ -169,14 +127,14 @@ bool febcode::isEqual(const ExprPtr& l, const ExprPtr& r)
 	{
 		if (auto callR = dynamic_cast<CallExpr*>(r.get()))
 		{
-			return isEqual(callL->callee, callR->callee) && isEqual(callL->arguments, callR->arguments);
+			return (callL->name == callR->name) && isEqual(callL->arguments, callR->arguments);
 		}
 	}
 	else if (auto ctorL = dynamic_cast<ConstructorExpr*>(l.get()))
 	{
 		if (auto ctorR = dynamic_cast<ConstructorExpr*>(r.get()))
 		{
-			if (ctorL->type != ctorR->type) return false;
+			if (ctorL->valType != ctorR->valType) return false;
 			assert(ctorL->args.size() == ctorR->args.size());
 			if (ctorL->args.size() != ctorR->args.size()) return false;
 			for (int i = 0; i < ctorL->args.size(); ++i)
@@ -281,11 +239,11 @@ std::string ValueToString(const febcode::Value& v)
 		const mat3& m = v.mat3Value;
 		if (isZero(m))
 		{
-			s += "0.0";
+			s += to_nice_string(0.0);
 		}
 		else if (isIdentity(m))
 		{
-			s += "1.0";
+			s += to_nice_string(1.0);
 		}
 		else
 		{

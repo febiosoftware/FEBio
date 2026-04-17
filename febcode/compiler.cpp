@@ -1,6 +1,7 @@
 #include "compiler.h"
 #include "scanner.h"
 #include "parser.h"
+#include "resolver.h"
 
 using namespace febcode;
 
@@ -18,7 +19,11 @@ void febcode::CompileSource(Program& prg, const std::string& source)
 	if (prg.ast->empty())
 		throw std::runtime_error("Parser produced no statements.");
 
-	// 3. Compile -> bytecode
+	// 3. semantic analysis
+	Resolver resolve(prg);
+	resolve.resolve();
+
+	// 4. Compile -> bytecode
 	Compiler compiler(prg);
 	compiler.compile();
 }
@@ -92,6 +97,17 @@ int Compiler::resolveGlobal(const std::string& name)
 	return -1;
 }
 
+Type Compiler::resolveVariableType(const std::string& name)
+{
+	int localIndex = resolveLocal(name);
+	if (localIndex != -1)
+		return m_locals[localIndex].type;
+	int globalIndex = resolveGlobal(name);
+	if (globalIndex != -1)
+		return prg.globals[globalIndex].type;
+	throw std::runtime_error("Undefined variable: " + name);
+}
+
 //
 // ===== Bytecode Helpers =====
 //
@@ -125,6 +141,11 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::PUSH_INT: 
 	case OpCode::PUSH_DOUBLE: 
 		return +1;
+
+	case OpCode::PUSH_VEC2: return +2;
+	case OpCode::PUSH_VEC3: return +3;
+	case OpCode::PUSH_MAT2: return +4;
+	case OpCode::PUSH_MAT3: return +9;
 
 	case OpCode::GET_GLOBAL_BOOL  : return +1;
 	case OpCode::GET_GLOBAL_INT   : return +1;
@@ -310,7 +331,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::POP_ARRAY : return -arg;
 	case OpCode::POP_STRUCT: return -arg;
 
-	case OpCode::CALL: return -arg + 1; // TODO: This is not correct anymore!
+	case OpCode::CALL: return arg; // this is the net stack effect calculated when compiling.
 
 	case OpCode::RETURN_VOID:
 	case OpCode::RETURN_BOOL: 
@@ -429,24 +450,6 @@ void Compiler::pop(Type type)
 	}
 }
 
-Type Compiler::coerce(Type from, Type to)
-{
-	if (from == to)
-		return from;
-	// allow coercion from numeric types to double, but not the other way around
-	if (isNumericType(from) && to->kind == TypeKind::Double)
-		return to;
-	throw std::runtime_error("Type coercion failed: cannot convert from " + TypeToString(from) + " to " + TypeToString(to));
-}
-
-Type Compiler::commonType(Type l, Type r)
-{
-	if (l == r) return l;
-	if (isDoubleType(l) && isNumericType(r)) return l;
-	if (isDoubleType(r) && isNumericType(l)) return r;
-	return nullptr;
-}
-
 void Compiler::compileBlock(BlockStmt* stmt)
 {
 	beginScope();
@@ -455,7 +458,7 @@ void Compiler::compileBlock(BlockStmt* stmt)
 	endScope();
 }
 
-Type Compiler::compileInitializer(InitializerExpr* init)
+Type Compiler::compileInitializer(InitExpr* init)
 {
 	if (init->elements.empty())
 		throw std::runtime_error("Initializer cannot be empty.");
@@ -479,7 +482,7 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 {
 	// check the number of arguments for the constructor
 	int nargs = (int)construct->args.size();
-	switch (construct->type->kind)
+	switch (construct->valType->kind)
 	{
 	case TypeKind::Vec2:
 		if (nargs != 2)
@@ -498,8 +501,8 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 			throw std::runtime_error("Mat3 constructor must have either 1 or 9 arguments.");
 		break;
 	case TypeKind::Struct:
-		if (nargs != construct->type->fields.size())
-			throw std::runtime_error("Struct constructor must have exactly " + std::to_string(construct->type->fields.size()) + " arguments.");
+		if (nargs != construct->valType->fields.size())
+			throw std::runtime_error("Struct constructor must have exactly " + std::to_string(construct->valType->fields.size()) + " arguments.");
 		break;
 	default:
 		break;
@@ -511,19 +514,19 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 		Type argType = compileExpression(construct->args[i].get());
 
 		// check the argument type against the expected type for the constructor
-		switch (construct->type->kind)
+		switch (construct->valType->kind)
 		{
 		case TypeKind::Vec2:
 		case TypeKind::Vec3:
 		case TypeKind::Mat2:
 		case TypeKind::Mat3:
-			argType = coerce(argType, prg.types.getDoubleType());
-			if (argType != prg.types.getDoubleType())
+			argType = coerce(argType, prg.types.Double());
+			if (argType != prg.types.Double())
 				throw std::runtime_error("Vec2 constructor arguments must be of type double.");
 			break;
 		case TypeKind::Struct:
-			argType = coerce(argType, construct->type->fields[i].first);
-			if (argType != construct->type->fields[i].first)
+			argType = coerce(argType, construct->valType->fields[i].first);
+			if (argType != construct->valType->fields[i].first)
 				throw std::runtime_error("Struct constructor argument type mismatch.");
 			break;
 		default:
@@ -534,13 +537,98 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 	// emit special codes for matrix constructors
 	if (nargs == 1)
 	{
-		if (construct->type->kind == TypeKind::Mat2)
+		if (construct->valType->kind == TypeKind::Mat2)
 			emit(CREATE_MAT2_DIAG);
-		else if (construct->type->kind == TypeKind::Mat3)
+		else if (construct->valType->kind == TypeKind::Mat3)
 			emit(CREATE_MAT3_DIAG);
 	}
 
-	return construct->type;
+	return construct->valType;
+}
+
+Type Compiler::expressionType(Expression* expr)
+{
+	if (auto l = dynamic_cast<LiteralExpr*>(expr))
+	{
+		return prg.types.getBuiltinType(l->value);
+	}
+	if (auto v = dynamic_cast<VariableExpr*>(expr))
+	{
+		return resolveVariableType(v->name);
+	}
+	if (auto u = dynamic_cast<UnaryExpr*>(expr))
+	{
+		return expressionType(u->right.get());
+	}
+	if (auto b = dynamic_cast<BinaryExpr*>(expr))
+	{
+		Type leftType = expressionType(b->left.get());
+		Type rightType = expressionType(b->right.get());
+
+		// this is only supported for multiplications!
+		if (b->op == BinaryOp::Multiply)
+		{
+			// scalar * scalar --> scalar
+			if (isScalarType(leftType) && isScalarType(rightType))
+				return commonType(leftType, rightType);
+
+			// scalar * type --> type
+			if (isScalarType(leftType) && isVec2Type(rightType))
+				return rightType;
+			if (isScalarType(leftType) && isVec3Type(rightType))
+				return rightType;
+			if (isScalarType(leftType) && isMat2Type(rightType))
+				return rightType;
+			if (isScalarType(leftType) && isMat3Type(rightType))
+				return rightType;
+
+			// vec2 * type
+			if (isVec2Type(leftType) && isScalarType(rightType))
+				return leftType;
+			if (isVec2Type(leftType) && isVec2Type(rightType)) // dot product
+				return prg.types.Double();
+
+			// vec3 * type
+			if (isVec3Type(leftType) && isScalarType(rightType))
+				return leftType;
+			if (isVec3Type(leftType) && isVec3Type(rightType)) // dot product
+				return prg.types.Double();
+
+			// mat2 * type
+			if (isMat2Type(leftType) && isScalarType(rightType))
+				return leftType;
+			if (isMat2Type(leftType) && isVec2Type(rightType))
+				return rightType;
+			if (isMat2Type(leftType) && isMat2Type(rightType))
+				return leftType;
+
+			// mat3 * type
+			if (isMat3Type(leftType) && isScalarType(rightType))
+				return leftType;
+			if (isMat3Type(leftType) && isVec3Type(rightType))
+				return rightType;
+			if (isMat3Type(leftType) && isMat3Type(rightType))
+				return leftType;
+		}
+	}
+	if (auto c = dynamic_cast<CallExpr*>(expr))
+	{
+		std::vector<Type> args;
+		for (auto& arg : c->arguments)
+			args.push_back(expressionType(arg.get()));
+
+		int index = prg.resolveFunction(c->name, args);
+		if (index >=0 )
+		{
+			FunctionInfo& func = prg.functions[index];
+			return func.returnType;
+		}
+	}
+	if (auto i = dynamic_cast<ConstructorExpr*>(expr))
+	{
+		return i->valType;
+	}
+	throw std::runtime_error("Unsupported expression type in expressionType");
 }
 
 void Compiler::compileVarDecl(VarDeclStmt* decl)
@@ -646,7 +734,7 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 void Compiler::compileIf(IfStmt* stmt)
 {
 	Type type = compileExpression(stmt->condition.get());
-	if (!isNumericType(type) && !isBoolType(type))
+	if (!isScalarType(type) && !isBoolType(type))
 		throw std::runtime_error("Condition expression must be of type bool.");
 
 	int thenJump = emitJump(OpCode::JUMP_IF_FALSE);
@@ -686,7 +774,7 @@ void Compiler::compileWhile(WhileStmt* stmt)
 	int loopStart = (int)prg.code.size();
 
 	Type type = compileExpression(stmt->condition.get());
-	if (!isNumericType(type) && type != prg.types.getBoolType())
+	if (!isLogicalType(type))
 		throw std::runtime_error("Condition expression must be of a numeric type or bool.");
 
 	int exitJump = emitJump(OpCode::JUMP_IF_FALSE);
@@ -705,7 +793,7 @@ void Compiler::compileFor(ForStmt* stmt)
 
 	int loopStart = (int)prg.code.size();
 	Type type = compileExpression(stmt->condition.get());
-	if (!isNumericType(type) && type != prg.types.getBoolType())
+	if (!isScalarType(type) && type != prg.types.Bool())
 		throw std::runtime_error("Condition expression must be of a numeric type or bool.");
 
 	int exitJump = emitJump(OpCode::JUMP_IF_FALSE);
@@ -729,7 +817,11 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 		returnType = compileExpression(stmt->value.get());
 
 		if (expectedReturnType)
+		{
 			returnType = coerce(returnType, expectedReturnType);
+			if (returnType != expectedReturnType)
+				throw std::runtime_error("Return type mismatch. Expected " + TypeToString(expectedReturnType) + " but got " + TypeToString(returnType));
+		}
 
 		switch (returnType->kind)
 		{
@@ -754,7 +846,7 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 	}
 	else
 	{
-		if (expectedReturnType != nullptr && expectedReturnType != prg.types.getVoidType())
+		if (expectedReturnType != nullptr && expectedReturnType != prg.types.Void())
 			throw std::runtime_error("Missing return value in function with non-void return type.");
 
 		// return without value -> push monostate
@@ -781,16 +873,16 @@ void Compiler::compileFunction(FunctionStmt* fn)
 	// Emit jump over function body
 	int jumpOver = emitJump(OpCode::JUMP);
 
-	FunctionInfo info;
-	info.name = fn->name;
-	info.entry = prg.code.size();
-	info.returnType = fn->returnType;
-
+	std::vector<Type> argTypes;
 	for (auto& p : fn->params)
-		info.args.push_back(p.first);
+		argTypes.push_back(p.first);
 
-	int fnIndex = (int)prg.functions.size();
+	int fnIndex = prg.resolveFunction(fn->name, argTypes);
+	if (fnIndex < 0)
+		throw std::runtime_error("Compiler error: function not found after resolution.");
 
+	FunctionInfo& info = prg.functions[fnIndex];
+	info.entry = prg.code.size();
 	currentFunction = fnIndex;
 
 	Type currentReturnType = expectedReturnType;
@@ -807,7 +899,6 @@ void Compiler::compileFunction(FunctionStmt* fn)
 		info.argSize += (int)p.first->size();
 		stackDepth += (int)p.first->size();
 	}
-	prg.functions.push_back(info);
 
 	size_t currentStackSize = stackDepth;
 
@@ -817,7 +908,7 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	if (!hasReturn)
 	{
-		if (fn->returnType != nullptr && fn->returnType != prg.types.getVoidType())
+		if (fn->returnType != nullptr && fn->returnType != prg.types.Void())
 			throw std::runtime_error("Missing return statement in function with non-void return type.");
 
 		emit(OpCode::RETURN_VOID);
@@ -862,7 +953,7 @@ void Compiler::compileFunction(FunctionStmt* fn)
 	expectedReturnType = currentReturnType;
 	hasReturn = hasReturnBefore;
 
-	prg.functions[fnIndex].maxStackSize = maxStackDepth - currentStackSize;
+	info.maxStackSize = maxStackDepth - currentStackSize;
 
 	currentFunction = -1;
 }
@@ -874,16 +965,16 @@ void Compiler::compileFunction(FunctionStmt* fn)
 Type Compiler::compileExpression(Expression* expr)
 {
 	Type type;
-	if      (auto b = dynamic_cast<BinaryExpr*       >(expr)) type = compileBinary(b);
-	else if (auto u = dynamic_cast<UnaryExpr*        >(expr)) type = compileUnary(u);
-	else if (auto l = dynamic_cast<LiteralExpr*      >(expr)) type = compileLiteral(l);
-	else if (auto v = dynamic_cast<VariableExpr*     >(expr)) type = compileVariable(v);
-	else if (auto a = dynamic_cast<AssignExpr*       >(expr)) type = compileAssign(a);
-	else if (auto c = dynamic_cast<CallExpr*         >(expr)) type = compileCall(c);
-	else if (auto m = dynamic_cast<MemberExpr*       >(expr)) type = compileMember(m);
-	else if (auto s = dynamic_cast<IndexExpr*        >(expr)) type = compileIndex(s);
-	else if (auto i = dynamic_cast<InitializerExpr*  >(expr)) type = compileInitializer(i);
-	else if (auto c = dynamic_cast<ConstructorExpr*  >(expr)) type = compileConstructor(c);
+	if      (auto b = dynamic_cast<BinaryExpr*     >(expr)) type = compileBinary(b);
+	else if (auto u = dynamic_cast<UnaryExpr*      >(expr)) type = compileUnary(u);
+	else if (auto l = dynamic_cast<LiteralExpr*    >(expr)) type = compileLiteral(l);
+	else if (auto v = dynamic_cast<VariableExpr*   >(expr)) type = compileVariable(v);
+	else if (auto a = dynamic_cast<AssignExpr*     >(expr)) type = compileAssign(a);
+	else if (auto c = dynamic_cast<CallExpr*       >(expr)) type = compileCall(c);
+	else if (auto m = dynamic_cast<MemberExpr*     >(expr)) type = compileMember(m);
+	else if (auto s = dynamic_cast<IndexExpr*      >(expr)) type = compileIndex(s);
+	else if (auto i = dynamic_cast<InitExpr*       >(expr)) type = compileInitializer(i);
+	else if (auto c = dynamic_cast<ConstructorExpr*>(expr)) type = compileConstructor(c);
 	else
 		throw std::runtime_error("Unsupported expression type");
 
@@ -898,6 +989,10 @@ Type Compiler::compileLiteral(LiteralExpr* expr)
 	case TypeKind::Bool  : emit(OpCode::PUSH_BOOL  ); break;
 	case TypeKind::Int   : emit(OpCode::PUSH_INT   ); break;
 	case TypeKind::Double: emit(OpCode::PUSH_DOUBLE); break;
+	case TypeKind::Vec2  : emit(OpCode::PUSH_VEC2  ); break;
+	case TypeKind::Vec3  : emit(OpCode::PUSH_VEC3  ); break;
+	case TypeKind::Mat2  : emit(OpCode::PUSH_MAT2  ); break;
+	case TypeKind::Mat3  : emit(OpCode::PUSH_MAT3  ); break;
 	default:
 		throw std::runtime_error("Unsupported literal type");
 	}
@@ -1084,12 +1179,12 @@ Type Compiler::compileMemberRef(MemberExpr* expr)
 		if (expr->property == "x")
 		{
 			emit(OpCode::GET_VEC2_X_REF);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else if (expr->property == "y")
 		{
 			emit(OpCode::GET_VEC2_Y_REF);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else
 			throw std::runtime_error("Vec2 has no member named '" + expr->property + "'.");
@@ -1099,17 +1194,17 @@ Type Compiler::compileMemberRef(MemberExpr* expr)
 		if (expr->property == "x")
 		{
 			emit(OpCode::GET_VEC3_X_REF);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else if (expr->property == "y")
 		{
 			emit(OpCode::GET_VEC3_Y_REF);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else if (expr->property == "z")
 		{
 			emit(OpCode::GET_VEC3_Z_REF);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else
 			throw std::runtime_error("Vec3 has no member named '" + expr->property + "'.");
@@ -1195,7 +1290,7 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 	{
 		Type type = compileExpression(expr->left.get());
 
-		if (!isNumericType(type) && !isBoolType(type))
+		if (!isScalarType(type) && !isBoolType(type))
 			throw std::runtime_error("Cannot convert left operand of '&&' to boolean.");
 
 		int endJump = emitJump(OpCode::JUMP_IF_FALSE);
@@ -1210,11 +1305,11 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		}
 
 		type = compileExpression(expr->right.get());
-		if (!isNumericType(type) && !isBoolType(type))
+		if (!isScalarType(type) && !isBoolType(type))
 			throw std::runtime_error("Cannot convert right operand of '&&' to boolean.");
 
 		patchJump(endJump);
-		return prg.types.getBoolType();
+		return prg.types.Bool();
 	}
 
 	// Short-circuit OR
@@ -1222,7 +1317,7 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 	{
 		Type type = compileExpression(expr->left.get());
 
-		if (!isNumericType(type) && !isBoolType(type))
+		if (!isScalarType(type) && !isBoolType(type))
 			throw std::runtime_error("Cannot convert left operand of '||' to boolean.");
 
 		int endJump = emitJump(OpCode::JUMP_IF_TRUE);
@@ -1236,11 +1331,11 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		}
 
 		type = compileExpression(expr->right.get());
-		if (!isNumericType(type) && !isBoolType(type))
+		if (!isScalarType(type) && !isBoolType(type))
 			throw std::runtime_error("Cannot convert right operand of '||' to boolean.");
 
 		patchJump(endJump);
-		return prg.types.getBoolType();
+		return prg.types.Bool();
 	}
 
 	// Handle special cases first
@@ -1317,8 +1412,8 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 	{
 		switch (op)
 		{
-		case BinaryOp::EqualEqual: emit(OpCode::EQUAL_BOOL); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::NotEqual  : emit(OpCode::NEQ_BOOL  ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::EqualEqual: emit(OpCode::EQUAL_BOOL); type_l = prg.types.Bool(); break;
+		case BinaryOp::NotEqual  : emit(OpCode::NEQ_BOOL  ); type_l = prg.types.Bool(); break;
 		default: throw std::runtime_error("Unsupported binary op for bool type.");
 		}
 		return type_l;
@@ -1333,12 +1428,12 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		case BinaryOp::Multiply: emit(OpCode::MUL_INT); break;
 		case BinaryOp::Divide  : emit(OpCode::DIV_INT); break;
 		case BinaryOp::Exponent: emit(OpCode::EXP_INT); break;
-		case BinaryOp::Greater     : emit(OpCode::GT_INT   ); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::Less        : emit(OpCode::LT_INT   ); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::GreaterEqual: emit(OpCode::GE_INT   ); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::LessEqual   : emit(OpCode::LE_INT   ); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL_INT); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::NotEqual    : emit(OpCode::NEQ_INT  ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::Greater     : emit(OpCode::GT_INT   ); type_l = prg.types.Bool(); break;
+		case BinaryOp::Less        : emit(OpCode::LT_INT   ); type_l = prg.types.Bool(); break;
+		case BinaryOp::GreaterEqual: emit(OpCode::GE_INT   ); type_l = prg.types.Bool(); break;
+		case BinaryOp::LessEqual   : emit(OpCode::LE_INT   ); type_l = prg.types.Bool(); break;
+		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL_INT); type_l = prg.types.Bool(); break;
+		case BinaryOp::NotEqual    : emit(OpCode::NEQ_INT  ); type_l = prg.types.Bool(); break;
 		default: throw std::runtime_error("Unsupported binary op for int type.");
 		}
 		return type_l;
@@ -1353,12 +1448,12 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		case BinaryOp::Multiply: emit(OpCode::MUL_DOUBLE); break;
 		case BinaryOp::Divide  : emit(OpCode::DIV_DOUBLE); break;
 		case BinaryOp::Exponent: emit(OpCode::EXP_DOUBLE); break;
-		case BinaryOp::Greater     : emit(OpCode::GT_DOUBLE); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::Less        : emit(OpCode::LT_DOUBLE); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::GreaterEqual: emit(OpCode::GE_DOUBLE); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::LessEqual   : emit(OpCode::LE_DOUBLE); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL_DOUBLE); type_l = prg.types.getBoolType(); break;
-		case BinaryOp::NotEqual    : emit(OpCode::NEQ_DOUBLE  ); type_l = prg.types.getBoolType(); break;
+		case BinaryOp::Greater     : emit(OpCode::GT_DOUBLE   ); type_l = prg.types.Bool(); break;
+		case BinaryOp::Less        : emit(OpCode::LT_DOUBLE   ); type_l = prg.types.Bool(); break;
+		case BinaryOp::GreaterEqual: emit(OpCode::GE_DOUBLE   ); type_l = prg.types.Bool(); break;
+		case BinaryOp::LessEqual   : emit(OpCode::LE_DOUBLE   ); type_l = prg.types.Bool(); break;
+		case BinaryOp::EqualEqual  : emit(OpCode::EQUAL_DOUBLE); type_l = prg.types.Bool(); break;
+		case BinaryOp::NotEqual    : emit(OpCode::NEQ_DOUBLE  ); type_l = prg.types.Bool(); break;
 		default: throw std::runtime_error("Unsupported binary op for double type.");
 		}
 		return type_l;
@@ -1372,7 +1467,7 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		{
 		case BinaryOp::Plus    : emit(OpCode::ADD_VEC2); break;
 		case BinaryOp::Minus   : emit(OpCode::SUB_VEC2); break;
-		case BinaryOp::Multiply: emit(OpCode::DOT_VEC2); returnType = prg.types.getDoubleType(); break;
+		case BinaryOp::Multiply: emit(OpCode::DOT_VEC2); returnType = prg.types.Double(); break;
 		default: throw std::runtime_error("Unsupported binary op for vec2 type.");
 		}
 		return returnType;
@@ -1408,7 +1503,7 @@ Type Compiler::compileBinary(BinaryExpr* expr)
 		{
 		case BinaryOp::Plus : emit(OpCode::ADD_VEC3); break;
 		case BinaryOp::Minus: emit(OpCode::SUB_VEC3); break;
-		case BinaryOp::Multiply: emit(OpCode::DOT_VEC3); returnType = prg.types.getDoubleType(); break;
+		case BinaryOp::Multiply: emit(OpCode::DOT_VEC3); returnType = prg.types.Double(); break;
 		default: throw std::runtime_error("Unsupported binary op for vec3 type.");
 		}
 		return returnType;
@@ -1557,7 +1652,7 @@ Type Compiler::compileUnary(UnaryExpr* expr)
 		if (isBoolType(type))
 		{
 			emit(OpCode::NOT);
-			type = prg.types.getBoolType();
+			type = prg.types.Bool();
 		}
 		else
 			throw std::runtime_error("Invalid operand type for unary '!'.");
@@ -1566,18 +1661,6 @@ Type Compiler::compileUnary(UnaryExpr* expr)
 	default: throw std::runtime_error("Unsupported unary op");
 	}
 	return type;
-}
-
-int Compiler::resolveFunction(const std::string& name, std::vector<Type> args)
-{
-	for (int i = 0; i < (int)prg.functions.size(); ++i)
-	{
-		if ((prg.functions[i].name == name) && (prg.functions[i].args == args))
-		{
-			return i ;
-		}
-	}
-	return -1;
 }
 
 bool Compiler::isNativeFunction(const std::string& name)
@@ -1605,42 +1688,46 @@ std::vector<Type> Compiler::compileFncArgs(std::vector<std::unique_ptr<Expressio
 
 Type Compiler::compileCall(CallExpr* call)
 {
-	// Callee must be a variable (function name)
-	if (auto calleeVar = dynamic_cast<VariableExpr*>(call->callee.get()))
+	// don't copy args for native functions
+	std::vector<Type> argTypes = compileFncArgs(call->arguments);
+	int fnIndex = prg.resolveFunction(call->name, argTypes);
+	if (fnIndex == -1)
+		throw std::runtime_error("Undefined function: " + call->name);
+
+	// We don't allow recursive calls.
+	if (currentFunction == fnIndex)
+		throw std::runtime_error("Recursive calls are not allowed: " + call->name);
+
+	const FunctionInfo& fi = prg.functions[fnIndex];
+
+	// check arg count
+	if (fi.args.size() != (int)call->arguments.size())
+		throw std::runtime_error("Argument count mismatch in call to function: " + call->name);
+
+	// check arg types
+	for (int i = 0; i < argTypes.size(); ++i)
 	{
-		// don't copy args for native functions
-		std::vector<Type> argTypes = compileFncArgs(call->arguments);
-		int fnIndex = resolveFunction(calleeVar->name, argTypes);
-		if (fnIndex == -1)
-			throw std::runtime_error("Undefined function: " + calleeVar->name);
-
-		// We don't allow recursive calls.
-		if (currentFunction == fnIndex)
-			throw std::runtime_error("Recursive calls are not allowed: " + calleeVar->name);
-
-		// check arg count
-		if (prg.functions[fnIndex].args.size() != (int)call->arguments.size())
-			throw std::runtime_error("Argument count mismatch in call to function: " + calleeVar->name);
-
-		// check arg types
-		for (int i = 0; i < argTypes.size(); ++i)
-		{
-			if (argTypes[i] != prg.functions[fnIndex].args[i])
-				throw std::runtime_error("Argument type mismatch in call to function: " + calleeVar->name);
-		}
-
-		stackDepth += (int)prg.functions[fnIndex].maxStackSize;
-
-		emit(OpCode::CALL, (int)prg.functions[fnIndex].args.size());
-		emitUint8(fnIndex);
-		emitUint8((uint8_t)call->arguments.size());
-
-		return prg.functions[fnIndex].returnType;
+		if (argTypes[i] != fi.args[i])
+			throw std::runtime_error("Argument type mismatch in call to function: " + call->name);
 	}
-	else
+
+	stackDepth += (int)fi.maxStackSize;
+
+	// calculate stack size needed for arguments
+	int argStackSize = 0;
+	for (Type argType : argTypes)
 	{
-		throw std::runtime_error("Invalid function call.");
+		argStackSize += (int)argType->size();
 	}
+
+	// stack size needed for return value
+	int returnStackSize = (int)prg.functions[fnIndex].returnType->size();
+
+	emit(OpCode::CALL, returnStackSize - argStackSize);
+	emitUint8(fnIndex);
+	emitUint8((uint8_t)call->arguments.size());
+
+	return fi.returnType;
 }
 
 Type Compiler::compileMember(MemberExpr* expr)
@@ -1681,12 +1768,12 @@ Type Compiler::compileMember(MemberExpr* expr)
 		if (expr->property == "x")
 		{
 			emit(OpCode::GET_VEC2_X);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else if (expr->property == "y")
 		{
 			emit(OpCode::GET_VEC2_Y);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else
 		{
@@ -1710,7 +1797,7 @@ Type Compiler::compileMember(MemberExpr* expr)
 				emit(OpCode::GET_VEC2_SWIZZLE);
 				emitUint8(mask);
 				emitUint8(size);
-				return (size == 2 ? prg.types.getVec2Type() : prg.types.getVec3Type());
+				return (size == 2 ? prg.types.Vec2() : prg.types.Vec3());
 			}
 			else
 				throw std::runtime_error("Unknown property: " + expr->property);
@@ -1721,17 +1808,17 @@ Type Compiler::compileMember(MemberExpr* expr)
 		if (expr->property == "x")
 		{
 			emit(OpCode::GET_VEC3_X);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else if (expr->property == "y")
 		{
 			emit(OpCode::GET_VEC3_Y);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else if (expr->property == "z")
 		{
 			emit(OpCode::GET_VEC3_Z);
-			return prg.types.getDoubleType();
+			return prg.types.Double();
 		}
 		else
 		{
@@ -1756,7 +1843,7 @@ Type Compiler::compileMember(MemberExpr* expr)
 				emit(OpCode::GET_VEC3_SWIZZLE);
 				emitUint8(mask);
 				emitUint8(size);
-				return (size == 2 ? prg.types.getVec2Type() : prg.types.getVec3Type());
+				return (size == 2 ? prg.types.Vec2() : prg.types.Vec3());
 			}
 			else
 				throw std::runtime_error("Unknown property: " + expr->property);
@@ -1784,7 +1871,7 @@ Type Compiler::compileIndex(IndexExpr* expr)
 					throw std::runtime_error("array index must be an integer.");
 				emit(OpCode::GET_GLOBAL_INDEX_DOUBLE);
 				emitUint8((uint8_t)prg.globals[globIndex].slot);
-				return prg.types.getDoubleType();
+				return prg.types.Double();
 			}
 		}
 	}
@@ -1799,7 +1886,7 @@ Type Compiler::compileIndex(IndexExpr* expr)
 			throw std::runtime_error("vec2 index must be an integer.");
 
 		emit(OpCode::GET_VEC2_INDEX);
-		return prg.types.getDoubleType();
+		return prg.types.Double();
 	}
 
 	// vec3 indexing
@@ -1809,7 +1896,7 @@ Type Compiler::compileIndex(IndexExpr* expr)
 			throw std::runtime_error("vec3 index must be an integer.");
 
 		emit(OpCode::GET_VEC3_INDEX);
-		return prg.types.getDoubleType();
+		return prg.types.Double();
 	}
 
 	// mat2 indexing
@@ -1819,7 +1906,7 @@ Type Compiler::compileIndex(IndexExpr* expr)
 			throw std::runtime_error("mat2 index must be an integer.");
 
 		emit(OpCode::GET_MAT2_INDEX);
-		return prg.types.getVec2Type();
+		return prg.types.Vec2();
 	}
 
 	// mat3 indexing
@@ -1829,7 +1916,7 @@ Type Compiler::compileIndex(IndexExpr* expr)
 			throw std::runtime_error("mat3 index must be an integer.");
 
 		emit(OpCode::GET_MAT3_INDEX);
-		return prg.types.getVec3Type();
+		return prg.types.Vec3();
 	}
 
 	if (exprType->kind != TypeKind::Array)
@@ -1864,10 +1951,15 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 {
 	switch (op)
 	{
-	case OpCode::PUSH_VOID     : 
-	case OpCode::PUSH_BOOL     :
-	case OpCode::PUSH_INT      :
-	case OpCode::PUSH_DOUBLE   : return "MOV ";
+	case OpCode::PUSH_VOID  : 
+	case OpCode::PUSH_BOOL  :
+	case OpCode::PUSH_INT   :
+	case OpCode::PUSH_DOUBLE:
+	case OpCode::PUSH_VEC2  :
+	case OpCode::PUSH_VEC3  :
+	case OpCode::PUSH_MAT2  :
+	case OpCode::PUSH_MAT3  :
+		return "MOV ";
 
 	case OpCode::GET_GLOBAL_BOOL  :
 	case OpCode::GET_GLOBAL_INT   :

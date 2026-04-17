@@ -1,7 +1,7 @@
 #include "optimizer.h"
 using namespace febcode;
 
-Optimizer::Optimizer(Program& program) : prg(program) {}
+Optimizer::Optimizer(Program& program) : Modifier(program) {}
 
 void Optimizer::optimize()
 {
@@ -212,7 +212,7 @@ void Optimizer::updateLiveness(Expression* expr)
 	}
 	case ExpressionType::Initializer:
 	{
-		const auto* initExpr = static_cast<const InitializerExpr*>(expr);
+		const auto* initExpr = static_cast<const InitExpr*>(expr);
 		for (const auto& element : initExpr->elements)
 			updateLiveness(element.get());
 		break;
@@ -250,7 +250,7 @@ bool Optimizer::hasSideEffects(Expression* expr)
 	}
 	case ExpressionType::Initializer:
 	{
-		const auto* initExpr = static_cast<const InitializerExpr*>(expr);
+		const auto* initExpr = static_cast<const InitExpr*>(expr);
 		for (const auto& element : initExpr->elements)
 		{
 			if (hasSideEffects(element.get()))

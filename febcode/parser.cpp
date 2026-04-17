@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "resolver.h"
 #include <iostream>
 using namespace febcode;
 
@@ -115,7 +116,7 @@ std::unique_ptr<Statement> Parser::parseExpressionStatement() {
 
 std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::string& name) 
 {
-	if (type == prg.types.getVoidType())
+	if (type == prg.types.Void())
 		throw std::runtime_error("Variables cannot be of type void.");
 
 	std::vector<Var> vars;
@@ -560,6 +561,11 @@ std::unique_ptr<Expression> Parser::parseConstructor(Type type)
 
 std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> callee) 
 {
+	auto* varExpr = dynamic_cast<VariableExpr*>(callee.get());
+	if (!varExpr) {
+		throw std::runtime_error("Can only call functions by name.");
+	}
+
 	std::vector<std::unique_ptr<Expression>> arguments;
 
 	if (!check(TokenType::RightParen)) {
@@ -572,7 +578,7 @@ std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> calle
 		throw std::runtime_error("Expected ')' after arguments.");
 
 	return std::make_unique<CallExpr>(
-		std::move(callee),
+		varExpr->name,
 		std::move(arguments)
 	);
 }
@@ -629,7 +635,7 @@ std::unique_ptr<Expression> Parser::parsePrimary()
 		if (!match(TokenType::RightBrace))
 			throw std::runtime_error("Expected '}' after initializer list.");
 
-		return std::make_unique<InitializerExpr>(std::move(elements));
+		return std::make_unique<InitExpr>(std::move(elements));
 	}
 
 	throw std::runtime_error("Expected expression.");
@@ -753,13 +759,13 @@ static void printExprList(const std::vector<std::unique_ptr<Expression>>& a)
 static void printCallExpr(const CallExpr* e)
 {
 	std::cout << "CallExpr {\n"; l++;
-	printTabs(); std::cout << "callee: "; printExpr(e->callee.get()); std::cout << ",\n";
+	printTabs(); std::cout << "callee: " << e->name << ",\n";
 	printTabs(); std::cout << "args: "; printExprList(e->arguments); std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
 }
 
-static void printInitializerExpr(const InitializerExpr* e)
+static void printInitializerExpr(const InitExpr* e)
 {
 	std::cout << "InitializerExpr {\n"; l++;
 	printTabs(); std::cout << "elements: "; printExprList(e->elements); std::cout << "\n";
@@ -779,7 +785,7 @@ static void printIndexExpr(const IndexExpr* e)
 static void printConstructorExpr(const ConstructorExpr* e)
 {
 	std::cout << "ConstructorExpr {\n"; l++;
-	printTabs(); std::cout << "type: " << TypeToString(e->type) << ",\n";
+	printTabs(); std::cout << "type: " << TypeToString(e->valType) << ",\n";
 	printTabs(); std::cout << "args: "; printExprList(e->args); std::cout << "\n";
 	l--;
 	printTabs(); std::cout << "}";
@@ -794,7 +800,7 @@ static void printExpr(const Expression* e)
 	else if (auto u = dynamic_cast<const UnaryExpr*        >(e)) printUnaryExpr        (u);
 	else if (auto b = dynamic_cast<const BinaryExpr*       >(e)) printBinaryExpr       (b);
 	else if (auto c = dynamic_cast<const CallExpr*         >(e)) printCallExpr         (c);
-	else if (auto c = dynamic_cast<const InitializerExpr*  >(e)) printInitializerExpr  (c);
+	else if (auto c = dynamic_cast<const InitExpr*         >(e)) printInitializerExpr  (c);
 	else if (auto c = dynamic_cast<const IndexExpr*        >(e)) printIndexExpr        (c);
 	else if (auto c = dynamic_cast<const ConstructorExpr*  >(e)) printConstructorExpr  (c);
 	else if (e == nullptr)
@@ -986,6 +992,9 @@ void febcode::ParseSource(Program& prg, const std::string& source)
 
 	Parser parser(prg);
 	parser.parse(tokens);
+
+	Resolver resolver(prg);
+	resolver.resolve();
 }
 
 //---------------------------------------------------------------------
@@ -1038,7 +1047,7 @@ static void prettyPrintBinaryExpr(std::ostream& os, const BinaryExpr& expr)
 
 static void prettyPrintCallExpr(std::ostream& os, const CallExpr& expr)
 {
-	prettyPrintExpression(os, *expr.callee);
+	os << expr.name;
 	os << "(";
 	size_t n = expr.arguments.size();
 	for (size_t i = 0; i < n; ++i)
@@ -1049,7 +1058,7 @@ static void prettyPrintCallExpr(std::ostream& os, const CallExpr& expr)
 	os << ")";
 }
 
-static void prettyPrintInitializerExpr(std::ostream& os, const InitializerExpr& expr)
+static void prettyPrintInitializerExpr(std::ostream& os, const InitExpr& expr)
 {
 	os << "{ ";
 	size_t n = expr.elements.size();
@@ -1071,7 +1080,7 @@ static void prettyPrintIndexExpr(std::ostream& os, const IndexExpr& expr)
 
 static void prettyPrintConstructorExpr(std::ostream& os, const ConstructorExpr& expr)
 {
-	os << TypeToString(expr.type);
+	os << TypeToString(expr.valType);
 	os << "(";
 	size_t n = expr.args.size();
 	for (size_t i = 0; i < n; ++i)
@@ -1091,7 +1100,7 @@ void febcode::prettyPrintExpression(std::ostream& os, const Expression& expr)
 	else if (auto u = dynamic_cast<const UnaryExpr*        >(&expr)) prettyPrintUnaryExpr        (os, *u);
 	else if (auto b = dynamic_cast<const BinaryExpr*       >(&expr)) prettyPrintBinaryExpr       (os, *b);
 	else if (auto c = dynamic_cast<const CallExpr*         >(&expr)) prettyPrintCallExpr         (os, *c);
-	else if (auto c = dynamic_cast<const InitializerExpr*  >(&expr)) prettyPrintInitializerExpr  (os, *c);
+	else if (auto c = dynamic_cast<const InitExpr*         >(&expr)) prettyPrintInitializerExpr  (os, *c);
 	else if (auto c = dynamic_cast<const IndexExpr*        >(&expr)) prettyPrintIndexExpr        (os, *c);
 	else if (auto c = dynamic_cast<const ConstructorExpr*  >(&expr)) prettyPrintConstructorExpr  (os, *c);
 	else

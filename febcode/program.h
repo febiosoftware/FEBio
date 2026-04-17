@@ -56,6 +56,11 @@ namespace febcode {
 		Type globalType(const std::string& name) const;
 
 	public:
+		int resolveFunction(const std::string& name, std::vector<Type> args);
+
+		BinaryOpSignature resolveBinaryOp(BinaryOp op, Type left, Type right);
+
+	public:
 		std::unique_ptr<AST> ast;
 		TypeRegistry types;
 
@@ -73,5 +78,8 @@ namespace febcode {
 		std::unordered_map<std::string, size_t> inputIndices; // maps global variable names to their slot index
 
 		size_t maxStackSize = 0;
+
+		// binary operator signatures for operator overloading
+		std::unordered_map<BinaryOp, std::vector<BinaryOpSignature>> binaryOps;
 	};
 }

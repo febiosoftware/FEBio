@@ -1,10 +1,10 @@
 #pragma once
 #include <unordered_set>
 #include "ast.h"
-#include "program.h"
+#include "Modifier.h"
 
 namespace febcode {
-	class Optimizer {
+	class Optimizer : public Modifier {
 	public:
 		Optimizer(Program& program);
 
@@ -23,7 +23,6 @@ namespace febcode {
 		bool shouldRemoveIfStmt   (IfStmt*         stmt);
 
 	private:
-		Program& prg;
 		std::unordered_set<std::string> live; // variables that are currently live (used in the future)
 		std::unordered_set<std::string> assignedLater; // variables that are re-assigned later
 	};

@@ -12,6 +12,10 @@ namespace febcode
 		PUSH_BOOL,
 		PUSH_INT,
 		PUSH_DOUBLE,
+		PUSH_VEC2,
+		PUSH_VEC3,
+		PUSH_MAT2,
+		PUSH_MAT3,
 
 		GET_GLOBAL_BOOL,
 		GET_GLOBAL_INT,
@@ -251,8 +255,9 @@ namespace febcode
 		void endScope();
 		int resolveLocal(const std::string& name);
 		int resolveGlobal(const std::string& name);
-		int resolveFunction(const std::string& name, std::vector<Type> args);
+
 		bool isNativeFunction(const std::string& name);
+		Type resolveVariableType(const std::string& name);
 
 		// ===== Compile =====
 
@@ -276,8 +281,10 @@ namespace febcode
 		Type compileCall         (CallExpr* expr);
 		Type compileMember       (MemberExpr* expr);
 		Type compileIndex        (IndexExpr* expr);
-		Type compileInitializer  (InitializerExpr* expr);
+		Type compileInitializer  (InitExpr* expr);
 		Type compileConstructor  (ConstructorExpr* expr);
+
+		Type expressionType(Expression* expr);
 
 		Type compileLValue(Expression* expr);
 		Type compileVariableRef(VariableExpr* expr);
@@ -291,9 +298,6 @@ namespace febcode
 		std::vector<Type> compileFncArgs(std::vector<std::unique_ptr<Expression>>& args);
 
 		void pop(Type type);
-
-		Type coerce(Type from, Type to);
-		Type commonType(Type l, Type r);
 
 		// ===== Bytecode =====
 

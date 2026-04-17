@@ -17,7 +17,20 @@ namespace febcode
 	public:
 		void Register(Program& prg) override
 		{
-			Type vec3Type = prg.types.getVec3Type();
+			Type bool_t = prg.types.Bool();
+			Type doubleType = prg.types.Double();
+			Type vec3Type = prg.types.Vec3();
+			Type mat3Type = prg.types.Mat3();
+
+			// binary operators                            LHS       RHS       Result
+			prg.binaryOps[BinaryOp::Plus    ].push_back({ vec3Type, vec3Type, vec3Type });
+			prg.binaryOps[BinaryOp::Minus   ].push_back({ vec3Type, vec3Type, vec3Type });
+			prg.binaryOps[BinaryOp::Multiply].push_back({ vec3Type, doubleType, vec3Type });
+			prg.binaryOps[BinaryOp::Multiply].push_back({ doubleType, vec3Type, vec3Type });
+			prg.binaryOps[BinaryOp::Multiply].push_back({ vec3Type, vec3Type, doubleType }); // dot product
+
+			prg.binaryOps[BinaryOp::EqualEqual].push_back({ vec3Type, vec3Type, bool_t });
+			prg.binaryOps[BinaryOp::NotEqual  ].push_back({ vec3Type, vec3Type, bool_t });
 
 			// Register native functions
 			prg.registerNative("dot"      , vec3Type, { vec3Type, vec3Type }, DotVec3);

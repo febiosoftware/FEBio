@@ -24,9 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FECodeController.h"
-#include <febcode/module_math.h>
-#include <febcode/module_vec2.h>
-#include <febcode/module_vec3.h>
 #include <febcode/parser.h>
 #include <febcode/vm.h>
 #include <FECore/log.h>
@@ -53,19 +50,11 @@ bool FECodeController::CompileScript()
 	}
 
 	try {
-
-		febcode::Vec2Module vec2Module;
-		vec2Module.Register(program);
-		febcode::Vec3Module vec3Module;
-		vec3Module.Register(program);
-		febcode::MathModule mathModule;
-		mathModule.Register(program);
-
 		febcode::ParseSource(program, script);
 
 		febcode::Compiler compiler(program);
 
-		globals[0] = program.injectGlobal("_time", program.types.getDoubleType());
+		globals[0] = program.injectGlobal("_time", program.types.Double());
 
 		compiler.compile();
 

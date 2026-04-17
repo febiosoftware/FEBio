@@ -1,7 +1,4 @@
 #include "vm.h"
-#include "../febcode/module_vec3.h"
-#include "../febcode/module_vec2.h"
-#include "../febcode/module_math.h"
 #include <iostream>
 #include <iomanip>
 
@@ -96,6 +93,34 @@ Value VM::execute()
 		{
 			uint8_t idx = readByte();
 			pushDouble(m_program->constants[idx].d);
+			break;
+		}
+
+		case OpCode::PUSH_VEC2:
+		{
+			uint8_t idx = readByte();
+			pushVec2(m_program->constants[idx].vec2Value);
+			break;
+		}
+
+		case OpCode::PUSH_VEC3:
+		{
+			uint8_t idx = readByte();
+			pushVec3(m_program->constants[idx].vec3Value);
+			break;
+		}
+
+		case OpCode::PUSH_MAT2:
+		{
+			uint8_t idx = readByte();
+			pushMat2(m_program->constants[idx].mat2Value);
+			break;
+		}
+
+		case OpCode::PUSH_MAT3:
+		{
+			uint8_t idx = readByte();
+			pushMat3(m_program->constants[idx].mat3Value);
 			break;
 		}
 
@@ -1088,7 +1113,7 @@ Value VM::execute()
 				throw std::runtime_error("Array index out of bounds.");
 #endif // ! NDEBUG
 
-			pushInt(arr[index]);
+			pushInt((int)arr[index]);
 			break;
 		}
 
@@ -1458,6 +1483,8 @@ void VM::callFunction(int fnIndex, int argCount)
 		case TypeKind::Double: pushDouble(result.d); break;
 		case TypeKind::Vec2  : pushVec2  (result.vec2Value); break;
 		case TypeKind::Vec3  : pushVec3  (result.vec3Value); break;
+		case TypeKind::Mat2  : pushMat2  (result.mat2Value); break;
+		case TypeKind::Mat3  : pushMat3  (result.mat3Value); break;
 		default:
 			throw std::runtime_error("Unsupported return type from native function: " + std::to_string((int)fn.returnType->kind));
 		}
@@ -1474,21 +1501,9 @@ void VM::callFunction(int fnIndex, int argCount)
 	ip = &(m_program->code[fn.entry]);
 }
 
-Value febcode::runScript(const std::string& script, bool initModules)
+Value febcode::runScript(const std::string& script)
 {
 	Program prg;
-
-	if (initModules)
-	{
-		MathModule mathModule;
-		mathModule.Register(prg);
-
-		Vec2Module vec2Module;
-		vec2Module.Register(prg);
-
-		Vec3Module vec3Module;
-		vec3Module.Register(prg);
-	}
 
 	CompileSource(prg, script);
 	VM vm(prg);

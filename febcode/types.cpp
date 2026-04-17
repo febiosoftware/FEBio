@@ -60,30 +60,38 @@ void TypeRegistry::clear()
 //	m_arrayTypes.clear();
 }
 
-Type TypeRegistry::getVoidType() const { return &m_void; }
-Type TypeRegistry::getBoolType() const { return &m_bool; }
-Type TypeRegistry::getIntType() const { return &m_int; }
-Type TypeRegistry::getDoubleType() const { return &m_double; }
-Type TypeRegistry::getVec2Type() const { return &m_vec2; }
-Type TypeRegistry::getVec3Type() const { return &m_vec3; }
-Type TypeRegistry::getMat2Type() const { return &m_mat2; }
-Type TypeRegistry::getMat3Type() const { return &m_mat3; }
+Type TypeRegistry::Void() const { return &m_void; }
+Type TypeRegistry::Bool() const { return &m_bool; }
+Type TypeRegistry::Int() const { return &m_int; }
+Type TypeRegistry::Double() const { return &m_double; }
+Type TypeRegistry::Vec2() const { return &m_vec2; }
+Type TypeRegistry::Vec3() const { return &m_vec3; }
+Type TypeRegistry::Mat2() const { return &m_mat2; }
+Type TypeRegistry::Mat3() const { return &m_mat3; }
 
 Type TypeRegistry::getTypeFromKind(TypeKind kind) const
 {
 	switch (kind)
 	{
-	case TypeKind::Void  : return getVoidType();
-	case TypeKind::Bool  : return getBoolType();
-	case TypeKind::Int   : return getIntType();
-	case TypeKind::Double: return getDoubleType();
-	case TypeKind::Vec2  : return getVec2Type();
-	case TypeKind::Vec3  : return getVec3Type();
-	case TypeKind::Mat2  : return getMat2Type();
-	case TypeKind::Mat3  : return getMat3Type();
+	case TypeKind::Void  : return Void();
+	case TypeKind::Bool  : return Bool();
+	case TypeKind::Int   : return Int();
+	case TypeKind::Double: return Double();
+	case TypeKind::Vec2  : return Vec2();
+	case TypeKind::Vec3  : return Vec3();
+	case TypeKind::Mat2  : return Mat2();
+	case TypeKind::Mat3  : return Mat3();
 	default:
 		return nullptr;
 	}
+}
+
+Type TypeRegistry::getArrayType(TypeKind type, size_t size)
+{
+	Type elementType = getTypeFromKind(type);
+	if (!elementType)
+		throw std::runtime_error("Invalid array element type.");
+	return getArrayType(elementType, size);
 }
 
 Type TypeRegistry::getArrayType(Type element, size_t size)
@@ -142,31 +150,30 @@ Type TypeRegistry::getArrayType(Type element, size_t size) const
 
 Type TypeRegistry::getBuiltinType(const Value& v) const
 {
-	if (isVoid  (v)) return getVoidType();
-	if (isBool  (v)) return getBoolType();
-	if (isInt   (v)) return getIntType();
-	if (isDouble(v)) return getDoubleType();
-	if (isVec2  (v)) return getVec2Type();
-	if (isVec3  (v)) return getVec3Type();
-	if (isMat2  (v)) return getMat2Type();
-	if (isMat3  (v)) return getMat3Type();
+	if (isVoid  (v)) return Void();
+	if (isBool  (v)) return Bool();
+	if (isInt   (v)) return Int();
+	if (isDouble(v)) return Double();
+	if (isVec2  (v)) return Vec2();
+	if (isVec3  (v)) return Vec3();
+	if (isMat2  (v)) return Mat2();
+	if (isMat3  (v)) return Mat3();
 	if (isArray (v)) { const ArrayValue&  a = getArray (v); return a.type; }
 	if (isStruct(v)) { const StructValue& s = getStruct(v); return s.type; }
 
 	throw std::runtime_error("Unknown value type");
-	return getVoidType();
 }
 
 Type TypeRegistry::getType(const std::string& name) const
 {
-	if (name == "void"  ) return getVoidType();
-	if (name == "bool"  ) return getBoolType();
-	if (name == "int"   ) return getIntType();
-	if (name == "double") return getDoubleType();
-	if (name == "vec2"  ) return getVec2Type();
-	if (name == "vec3"  ) return getVec3Type();
-	if (name == "mat2"  ) return getMat2Type();
-	if (name == "mat3"  ) return getMat3Type();
+	if (name == "void"  ) return Void();
+	if (name == "bool"  ) return Bool();
+	if (name == "int"   ) return Int();
+	if (name == "double") return Double();
+	if (name == "vec2"  ) return Vec2();
+	if (name == "vec3"  ) return Vec3();
+	if (name == "mat2"  ) return Mat2();
+	if (name == "mat3"  ) return Mat3();
 
 	Type s = getStructType(name);
 	if (s) return s;
@@ -225,13 +232,13 @@ Type TypeRegistry::defineStructType(const std::string& name, const std::vector<s
 		Type t = nullptr;
 		switch (f.first)
 		{
-		case TypeKind::Bool  : t = getBoolType(); break;
-		case TypeKind::Int   : t = getIntType(); break;
-		case TypeKind::Double: t = getDoubleType(); break;
-		case TypeKind::Vec2  : t = getVec2Type(); break;
-		case TypeKind::Vec3  : t = getVec3Type(); break;
-		case TypeKind::Mat2  : t = getMat2Type(); break;
-		case TypeKind::Mat3  : t = getMat3Type(); break;
+		case TypeKind::Bool  : t = Bool(); break;
+		case TypeKind::Int   : t = Int(); break;
+		case TypeKind::Double: t = Double(); break;
+		case TypeKind::Vec2  : t = Vec2(); break;
+		case TypeKind::Vec3  : t = Vec3(); break;
+		case TypeKind::Mat2  : t = Mat2(); break;
+		case TypeKind::Mat3  : t = Mat3(); break;
 		default:
 			throw std::runtime_error("Unsupported field type in RegisterStruct: " + std::to_string((int)f.first));
 		}
@@ -263,4 +270,17 @@ std::string febcode::TypeToString(Type type)
 	default:
 		return "<unknown type>";
 	}
+}
+
+Type febcode::coerce(Type from, Type to)
+{
+	if (from == to)
+		return from;
+	// allow coercion from numeric types to double, but not the other way around
+	if (isScalarType(from) && to->kind == TypeKind::Double)
+		return to;
+	if (isLogicalType(from) && to->kind == TypeKind::Bool)
+		return to;
+	
+	return nullptr;
 }

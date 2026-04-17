@@ -26,9 +26,6 @@ SOFTWARE.*/
 #include "FECodeValuator.h"
 #include <febcode/vm.h>
 #include <febcode/parser.h>
-#include <febcode/module_vec3.h>
-#include <febcode/module_vec2.h>
-#include <febcode/module_math.h>
 #include <febcode/compiler.h>
 #include <febcode/differentiator.h>
 #include <FECore/FEMaterialPoint.h>
@@ -89,13 +86,6 @@ END_FECORE_CLASS()
 
 FECodeValuator::FECodeValuator(FEModel* fem) : FEScalarValuator(fem), m(*new Imp())
 {
-	febcode::Vec2Module vec2Module;
-	vec2Module.Register(m.program);
-	febcode::Vec3Module vec3Module;
-	vec3Module.Register(m.program);
-	febcode::MathModule mathModule;
-	mathModule.Register(m.program);
-
 	m.AddGlobal("_pos0", febcode::TypeKind::Vec3);
 	m.AddGlobal("_time", febcode::TypeKind::Double);
 	m.AddGlobal("_norm0", febcode::TypeKind::Vec3);
@@ -123,7 +113,7 @@ bool FECodeValuator::CompileScript()
 
 	FECoreBase* parent = GetParent();
 	try {
-		febcode::Type vec3_t = m.program.types.getVec3Type();
+		febcode::Type vec3_t = m.program.types.Vec3();
 		if (!vec3_t) {
 			feLogError("Error compiling code: 'vec3' type not defined");
 			return false;
@@ -276,14 +266,8 @@ bool ValidateScript(const std::string& script, std::string& err)
 	err.clear();
 	febcode::Program program;
 	try {
-		febcode::Vec2Module vec2Module;
-		vec2Module.Register(program);
-		febcode::Vec3Module vec3Module;
-		vec3Module.Register(program);
-		febcode::MathModule mathModule;
-		mathModule.Register(program);
 
-		febcode::Type vec3 = program.types.getVec3Type();
+		febcode::Type vec3 = program.types.Vec3();
 		if (!vec3) {
 			err = "Error compiling code: 'vec3' type not defined";
 			return false;
@@ -295,7 +279,7 @@ bool ValidateScript(const std::string& script, std::string& err)
 
 		int globals[3] = { -1, -1, -1 };
 		globals[0] = program.injectGlobal("_pos0" , vec3);
-		globals[1] = program.injectGlobal("_time" , program.types.getDoubleType());
+		globals[1] = program.injectGlobal("_time" , program.types.Double());
 		globals[2] = program.injectGlobal("_norm0", vec3);
 
 		compiler.compile();

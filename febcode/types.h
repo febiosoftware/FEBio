@@ -451,7 +451,11 @@ namespace febcode
 	inline bool isArrayType (Type type) { return type->kind == TypeKind::Array; }
 	inline bool isStructType(Type type) { return type->kind == TypeKind::Struct; }
 
-	inline bool isNumericType(Type type) { return isIntType(type) || isDoubleType(type); }
+	inline bool isLogicalType(Type type) { return isBoolType(type) || isIntType(type) || isDoubleType(type); }
+
+	inline bool isScalarType(Type type) { return isIntType(type) || isDoubleType(type); }
+
+	inline bool isNumericType(Type type) { return isIntType(type) || isDoubleType(type) || isVec2Type(type) || isVec3Type(type) || isMat2Type(type) || isMat3Type(type); }
 
 	inline bool   getBool(const Value& v) { assert(v.index == ValueIndex::BOOL); return v.b; }
 	inline int    getInt   (const Value& v) { assert(v.index == ValueIndex::INT); return v.i; }
@@ -473,6 +477,16 @@ namespace febcode
 	inline ArrayValue&  getArray (Value& v) { assert(v.index == ValueIndex::ARRAY); return *v.arrayValue; }
 	inline StructValue& getStruct(Value& v) { assert(v.index == ValueIndex::STRUCT); return *v.structValue; }
 
+	Type coerce(Type from, Type to);
+
+	inline Type commonType(Type l, Type r)
+	{
+		if (l == r) return l;
+		if (isDoubleType(l) && isScalarType(r)) return l;
+		if (isDoubleType(r) && isScalarType(l)) return r;
+		return nullptr;
+	}
+
 	inline bool isZero(const Value& v)
 	{
 		if (isInt(v) && (getInt(v) == 0)) return true;
@@ -491,9 +505,24 @@ namespace febcode
 		return false;
 	}
 
+	inline bool isIdentity(const mat2& m)
+	{
+		return (m == mat2(1.0));
+	}
+
 	inline bool isIdentity(const mat3& m)
 	{
 		return (m == mat3(1.0));
+	}
+
+	inline bool isSymmetric(const mat2& m)
+	{
+		return (m.m[0][1] == m.m[1][0]);
+	}
+
+	inline bool isSymmetric(const mat3& m)
+	{
+		return (m.m[0][1] == m.m[1][0]) && (m.m[0][2] == m.m[2][0]) && (m.m[1][2] == m.m[2][1]);
 	}
 
 	inline bool isIntNumber(const Value& v)
@@ -520,14 +549,15 @@ namespace febcode
 		TypeRegistry();
 		void clear();
 
-		Type getVoidType() const;
-		Type getIntType() const;
-		Type getBoolType() const;
-		Type getDoubleType() const;
-		Type getVec2Type() const;
-		Type getVec3Type() const;
-		Type getMat2Type() const;
-		Type getMat3Type() const;
+		Type Void() const;
+		Type Int() const;
+		Type Bool() const;
+		Type Double() const;
+		Type Vec2() const;
+		Type Vec3() const;
+		Type Mat2() const;
+		Type Mat3() const;
+		Type getArrayType(TypeKind type, size_t size);
 		Type getArrayType(Type element, size_t size);
 		Type getArrayType(Type element, size_t size) const;
 		Type getArrayType(Type element, const std::vector<size_t>& size) const;
@@ -571,6 +601,13 @@ namespace febcode
 
 	std::string TypeToString(Type type);
 
+	struct BinaryOpSignature
+	{
+		Type leftType;
+		Type rightType;
+
+		Type resultType;
+	};
 }
 
 inline febcode::Value operator + (const febcode::Value& a, const febcode::Value& b)
@@ -588,7 +625,7 @@ inline febcode::Value operator - (const febcode::Value& a, const febcode::Value&
 		return getInt(a) - getInt(b);
 	if (isDouble(a) && isDouble(b))
 		return getDouble(a) - getDouble(b);
-	throw std::runtime_error("Unsupported operand types for +");
+	throw std::runtime_error("Unsupported operand types for -");
 }
 
 inline febcode::Value operator * (const febcode::Value& a, const febcode::Value& b)
@@ -597,14 +634,14 @@ inline febcode::Value operator * (const febcode::Value& a, const febcode::Value&
 		return getInt(a) * getInt(b);
 	if (isDouble(a) && isDouble(b))
 		return getDouble(a) * getDouble(b);
-	throw std::runtime_error("Unsupported operand types for +");
+	throw std::runtime_error("Unsupported operand types for *");
 }
 
 inline febcode::Value operator / (const febcode::Value& a, const febcode::Value& b)
 {
 	if (isDouble(a) && isDouble(b))
 		return getDouble(a) / getDouble(b);
-	throw std::runtime_error("Unsupported operand types for +");
+	throw std::runtime_error("Unsupported operand types for /");
 }
 
 namespace febcode

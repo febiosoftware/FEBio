@@ -43,7 +43,9 @@ namespace febcode {
 		Expression(ExpressionType type) : exprType(type) {}
 		virtual ~Expression() = default;
 		ExpressionType exprType;
+		Type valType = nullptr; // Value type of expression. Determined during resolution
 	};
+
 	using ExprPtr = std::unique_ptr<Expression>;
 
 	struct LiteralExpr : Expression {
@@ -87,11 +89,11 @@ namespace febcode {
 	};
 
 	struct CallExpr : Expression {
-		ExprPtr callee;
+		std::string name;
 		std::vector<ExprPtr> arguments;
 
-		CallExpr(ExprPtr callee, std::vector<ExprPtr> arguments)
-			: Expression(ExpressionType::Call), callee(std::move(callee)),
+		CallExpr(const std::string& name, std::vector<ExprPtr> arguments)
+			: Expression(ExpressionType::Call), name(name),
 			arguments(std::move(arguments)) {}
 	};
 
@@ -104,9 +106,9 @@ namespace febcode {
 			: Expression(ExpressionType::Member), object(std::move(object)), property(std::move(property)) {}
 	};
 
-	struct InitializerExpr : Expression {
+	struct InitExpr : Expression {
 		std::vector<ExprPtr> elements;
-		InitializerExpr(std::vector<ExprPtr> elements)
+		InitExpr(std::vector<ExprPtr> elements)
 			: Expression(ExpressionType::Initializer), elements(std::move(elements)) {}
 	};
 
@@ -118,10 +120,11 @@ namespace febcode {
 	};
 
 	struct ConstructorExpr : Expression {
-		Type type;
 		std::vector<ExprPtr> args;
 		ConstructorExpr(Type type, std::vector<ExprPtr> arguments) :
-			Expression(ExpressionType::Constructor), type(type), args(std::move(arguments)) {}
+			Expression(ExpressionType::Constructor), args(std::move(arguments)) {
+			valType = type;
+		}
 	};
 
 	// --- Statements ---
@@ -284,114 +287,30 @@ namespace febcode {
 	inline bool isInitializer(const ExprPtr& expr) { return (expr->exprType == ExpressionType::Initializer); }
 	inline bool isIndex      (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Index      ); }
 
-	inline bool isZero(const ExprPtr& expr) {
-		if (auto literal = dynamic_cast<LiteralExpr*>(expr.get()))
-			return isZero(literal->value);
-		if (auto init = dynamic_cast<InitializerExpr*>(expr.get()))
-			return std::all_of(init->elements.begin(), init->elements.end(), [](const ExprPtr& arg) { return isZero(arg); });
-		if (auto ctor = dynamic_cast<ConstructorExpr*>(expr.get()))
-			return std::all_of(ctor->args.begin(), ctor->args.end(), [](const ExprPtr& arg) { return isZero(arg); });
+	inline bool isScalar(const ExprPtr& expr) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr.get()))
+			return isInt(literal->value) || isDouble(literal->value);
 		return false;
+	}
+
+	inline bool isZero(const Expression* expr) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr))
+			return isZero(literal->value);
+		if (auto init = dynamic_cast<const InitExpr*>(expr))
+			return std::all_of(init->elements.begin(), init->elements.end(), [](const ExprPtr& arg) { return isZero(arg.get()); });
+		if (auto ctor = dynamic_cast<const ConstructorExpr*>(expr))
+			return std::all_of(ctor->args.begin(), ctor->args.end(), [](const ExprPtr& arg) { return isZero(arg.get()); });
+		return false;
+	}
+
+	inline bool isZero(const ExprPtr& expr) {
+		return isZero(expr.get());
 	}
 
 	inline bool isNegation   (const ExprPtr& expr) {
 		if (expr->exprType != ExpressionType::Unary) return false;
 		auto unary = dynamic_cast<UnaryExpr*>(expr.get());
 		return (unary->op == UnaryOp::Negate);
-	}
-
-	// helper functions to create expressions more easily
-	inline ExprPtr Literal(const Value& v) { return std::make_unique<LiteralExpr>(v); }
-	inline ExprPtr Variable(const std::string& name) { return std::make_unique<VariableExpr>(name); }
-	inline ExprPtr Unary(UnaryOp op, const ExprPtr& arg) { return std::make_unique<UnaryExpr>(op, std::move(copy_expression(arg.get()))); }
-	inline ExprPtr Negate(const ExprPtr& arg) { return std::make_unique<UnaryExpr>(UnaryOp::Negate, std::move(copy_expression(arg.get()))); }
-	inline ExprPtr Binary(const ExprPtr& left, BinaryOp op, const ExprPtr& right) { return std::make_unique<BinaryExpr>(std::move(copy_expression(left.get())), op, std::move(copy_expression(right.get()))); }
-	inline ExprPtr Assign(const ExprPtr& target, const ExprPtr& value) { return std::make_unique<AssignExpr>(std::move(copy_expression(target.get())), std::move(copy_expression(value.get()))); }
-	inline ExprPtr Call(const ExprPtr& callee, const std::vector<ExprPtr>& args)
-	{
-		std::vector<ExprPtr> copyArgs;
-		for (auto& arg : args)
-		{
-			copyArgs.emplace_back(copy_expression(arg.get()));
-		}
-		return std::make_unique<CallExpr>(std::move(copy_expression(callee.get())), std::move(copyArgs));
-	}
-
-	inline ExprPtr Call(const std::string& fnc, const std::vector<ExprPtr>& args)
-	{
-		return Call(Variable(fnc), args);
-	}
-
-	inline ExprPtr Member(const ExprPtr& object, const std::string& property)
-	{ 
-		return std::make_unique<MemberExpr>(std::move(copy_expression(object.get())), property); 
-	}
-
-	inline ExprPtr Index(const ExprPtr& object, const ExprPtr& index)
-	{ 
-		return std::make_unique<IndexExpr>(std::move(copy_expression(object.get())), std::move(copy_expression(index.get()))); 
-	}
-
-	inline ExprPtr Initializer(size_t n, Value v)
-	{
-		std::vector<ExprPtr> init(n);
-		for (int i = 0; i < n; ++i) init[i] = Literal(v);
-		return std::make_unique<InitializerExpr>(std::move(init));
-	}
-
-	ExprPtr Initializer(const std::vector<StructField>& fields);
-
-	inline ExprPtr Constructor(Type type, const vec2& v) 
-	{ 
-		assert(type->kind == TypeKind::Vec2);
-		std::vector<ExprPtr> args(2);
-		args[0] = Literal(v.x);
-		args[1] = Literal(v.y);
-		return std::make_unique<ConstructorExpr>(type, std::move(args));
-	}
-
-	inline ExprPtr Constructor(Type type, const vec3& v)
-	{
-		assert(type->kind == TypeKind::Vec3);
-		std::vector<ExprPtr> args(3);
-		args[0] = Literal(v.x);
-		args[1] = Literal(v.y);
-		args[2] = Literal(v.z);
-		return std::make_unique<ConstructorExpr>(type, std::move(args)); 
-	}
-
-	inline ExprPtr Constructor(Type type, double v)
-	{
-		std::vector<ExprPtr> args(1);
-		args[0] = Literal(v);
-		return std::make_unique<ConstructorExpr>(type, std::move(args));
-	}
-
-	inline ExprPtr Constructor(Type type, const mat2& v) 
-	{ 
-		assert(type->kind == TypeKind::Mat2);
-		std::vector<ExprPtr> args(4);
-		args[0] = Literal(v.m[0][0]);
-		args[1] = Literal(v.m[0][1]);
-		args[2] = Literal(v.m[1][0]);
-		args[3] = Literal(v.m[1][1]);
-		return std::make_unique<ConstructorExpr>(type, std::move(args)); 
-	}
-
-	inline ExprPtr Constructor(Type type, const mat3& v) 
-	{ 
-		assert(type->kind == TypeKind::Mat3);
-		std::vector<ExprPtr> args(9);
-		args[0] = Literal(v.m[0][0]);
-		args[1] = Literal(v.m[0][1]);
-		args[2] = Literal(v.m[0][2]);
-		args[3] = Literal(v.m[1][0]);
-		args[4] = Literal(v.m[1][1]);
-		args[5] = Literal(v.m[1][2]);
-		args[6] = Literal(v.m[2][0]);
-		args[7] = Literal(v.m[2][1]);
-		args[8] = Literal(v.m[2][2]);
-		return std::make_unique<ConstructorExpr>(type, std::move(args)); 
 	}
 
 	bool isEqual(const ExprPtr& l, const ExprPtr& r);
@@ -404,12 +323,3 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v);
 std::string ValueToString(const febcode::Value& v);
 
 std::string ValueTypeToString(const febcode::Value& v);
-
-// Expression "algebra" for easier construction of new expressions from existing ones
-inline febcode::ExprPtr operator - (const febcode::ExprPtr& expr) { return Negate(expr); }
-inline febcode::ExprPtr operator + (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Plus, right); }
-inline febcode::ExprPtr operator - (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Minus, right); }
-inline febcode::ExprPtr operator * (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Multiply, right); }
-inline febcode::ExprPtr operator / (const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Divide, right); }
-inline febcode::ExprPtr Pow(const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(left, febcode::BinaryOp::Exponent, right); }
-

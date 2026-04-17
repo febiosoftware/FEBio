@@ -3,13 +3,14 @@
 #include <unordered_map>
 #include <string>
 #include "ast.h"
-#include "program.h"
+#include "modifier.h"
+#include "simplifier.h"
 
 namespace febcode {
-	class Differentiator {
+	class Differentiator : public Modifier {
 
 	public:
-		Differentiator(Program& prg) : prg(prg) {}
+		Differentiator(Program& prg) : Modifier(prg), simplifier(prg) {}
 
 		// differentiate an AST to produce a new AST representing the derivative
 		std::unique_ptr<AST> differentiate(const AST& ast, const std::string& var);
@@ -35,7 +36,7 @@ namespace febcode {
 		std::unique_ptr<Expression> diffUnary      (const UnaryExpr*       unary   , const std::string& var);
 		std::unique_ptr<Expression> diffBinary     (const BinaryExpr*      binary  , const std::string& var);
 		std::unique_ptr<Expression> diffCall       (const CallExpr*        call    , const std::string& var);
-		std::unique_ptr<Expression> diffInit       (const InitializerExpr* init    , const std::string& var);
+		std::unique_ptr<Expression> diffInit       (const InitExpr*        init    , const std::string& var);
 		std::unique_ptr<Expression> diffConstructor(const ConstructorExpr* ctor    , const std::string& var);
 		std::unique_ptr<Expression> diffAssign     (const AssignExpr*      assign  , const std::string& var);
 		std::unique_ptr<Expression> diffIndex      (const IndexExpr*       index   , const std::string& var);
@@ -43,13 +44,15 @@ namespace febcode {
 
 		Type getDerivativeType(Type varType, TypeKind derivType);
 
-		Type ExpressionValueType(const Expression* expr);
+		ExprPtr simplify(const ExprPtr& expr) { return simplifier.simplify(expr.get()); }
+		ExprPtr simplify(const Expression* expr) { return simplifier.simplify(expr); }
 
 	private:
 		bool dependencyFound = false; // flag to indicate if we found a dependency on the variable we're differentiating with respect to
 		std::unordered_map<std::string, std::string> deriveVars; // map of derivative variables
 		std::unordered_map<std::string, Type> varTypes; // map of variable types for variables in the original program, used to determine the type of the derivative variables.
-		Program& prg;
+
+		Simplifier simplifier;
 	};
 
 	bool dependsOn(const Statement* stmt, const std::string& varName);

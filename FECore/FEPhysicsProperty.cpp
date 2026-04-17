@@ -2,7 +2,6 @@
 #include <febcode/vm.h>
 #include <febcode/parser.h>
 #include <febcode/compiler.h>
-#include <febcode/module_math.h>
 #include <febcode/differentiator.h>
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
@@ -33,7 +32,7 @@ public:
 		{
 			Global g;
 			g.name = name;
-			g.slot = program.injectGlobal(name, program.types.getDoubleType());
+			g.slot = program.injectGlobal(name, program.types.Double());
 			globals.push_back(g);
 			return g.slot;
 		}
@@ -42,7 +41,7 @@ public:
 		{
 			Global g;
 			g.name = name;
-			g.slot = program.injectGlobal(name, program.types.getVec3Type());
+			g.slot = program.injectGlobal(name, program.types.Vec3());
 			globals.push_back(g);
 			return g.slot;
 		}
@@ -51,11 +50,11 @@ public:
 		{
 			switch (type)
 			{
-			case FEValueType::Bool  : program.returnType = program.types.getBoolType(); break;
-			case FEValueType::Int   : program.returnType = program.types.getIntType(); break;
-			case FEValueType::Double: program.returnType = program.types.getDoubleType(); break;
-			case FEValueType::Vec3d : program.returnType = program.types.getVec3Type(); break;
-			case FEValueType::Mat3d : program.returnType = program.types.getMat3Type(); break;
+			case FEValueType::Bool  : program.returnType = program.types.Bool(); break;
+			case FEValueType::Int   : program.returnType = program.types.Int(); break;
+			case FEValueType::Double: program.returnType = program.types.Double(); break;
+			case FEValueType::Vec3d : program.returnType = program.types.Vec3(); break;
+			case FEValueType::Mat3d : program.returnType = program.types.Mat3(); break;
 			default:
 				assert(false);
 			}
@@ -63,9 +62,6 @@ public:
 
 		bool Init()
 		{
-			febcode::MathModule math;
-			math.Register(program);
-
 			febcode::ParseSource(program, script);
 
 			febcode::Compiler compiler(program);
@@ -201,9 +197,6 @@ public:
 
 		bool Init()
 		{
-			febcode::MathModule math;
-			math.Register(code.program);
-
 			febcode::ParseSource(code.program, code.script);
 
 			// get the type of the variable
@@ -227,10 +220,10 @@ public:
 				switch (varType->kind)
 				{
 				case febcode::TypeKind::Double:
-					code.program.returnType = code.program.types.getDoubleType();
+					code.program.returnType = code.program.types.Double();
 					break;
 				case febcode::TypeKind::Vec3:
-					code.program.returnType = code.program.types.getVec3Type();
+					code.program.returnType = code.program.types.Vec3();
 					break;
 				default:
 					feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
@@ -242,10 +235,10 @@ public:
 				switch (varType->kind)
 				{
 				case febcode::TypeKind::Double:
-					code.program.returnType = code.program.types.getVec3Type();
+					code.program.returnType = code.program.types.Vec3();
 					break;
 				case febcode::TypeKind::Vec3:
-					code.program.returnType = code.program.types.getMat3Type();
+					code.program.returnType = code.program.types.Mat3();
 					break;
 				default:
 					feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");

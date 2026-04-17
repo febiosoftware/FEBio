@@ -687,5 +687,5 @@ namespace febcode
 		bool m_debug = false;
 	};
 
-	Value runScript(const std::string& script, bool initModules = false);
+	Value runScript(const std::string& script);
 }
