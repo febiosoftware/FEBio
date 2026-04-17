@@ -312,7 +312,7 @@ ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
 		if (isMat3(lv))
 		{
 			mat3 m = getMat3(lv);
-			if (isIdentity(m))
+			if (isIdentity(m) && (r->valType->kind == TypeKind::Mat3))
 			{
 				switch (binary->op)
 				{
@@ -432,7 +432,7 @@ ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
 				case BinaryOp::Multiply: return Zero(r->valType); // l * mat3(0) = mat3(0)
 				}
 			}
-			if (isIdentity(m))
+			if (isIdentity(m) && (l->valType->kind == TypeKind::Mat3))
 			{
 				switch (binary->op)
 				{

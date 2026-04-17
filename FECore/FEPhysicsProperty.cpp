@@ -472,7 +472,7 @@ FEValue FEPhysicsProperty::DerivValue(const std::vector<FEValue>& vars, int varI
 			case febcode::TypeKind::Mat3:
 			{
 				FEValue result;
-				result.type = FEValueType::Vec3d;
+				result.type = FEValueType::Mat3d;
 				result.m3 = mat3dd(0.0);
 				return result;
 			}

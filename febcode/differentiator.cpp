@@ -252,8 +252,6 @@ ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const std::strin
 		case ValueIndex::VEC3: return Literal(vec3());
 		case ValueIndex::MAT2: return Literal(mat2());
 		case ValueIndex::MAT3: return Literal(mat3());
-		default:
-			throw std::runtime_error("Don't know how to differentiate this literal type.");
 		}
 	}
 
@@ -265,8 +263,6 @@ ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const std::strin
 		case ValueIndex::INT:
 		case ValueIndex::DOUBLE: return Literal(vec2());
 		case ValueIndex::VEC2  : return Literal(mat2());
-		default:
-			throw std::runtime_error("Don't know how to differentiate this literal type.");
 		}
 	}
 
@@ -278,11 +274,10 @@ ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const std::strin
 		case ValueIndex::INT:
 		case ValueIndex::DOUBLE: return Literal(vec3());
 		case ValueIndex::VEC3  : return Literal(mat3());
-		default:
-			throw std::runtime_error("Don't know how to differentiate this literal type.");
-
 		}
 	}
+
+	throw std::runtime_error("Don't know how to differentiate this literal type.");
 }
 
 ExprPtr Differentiator::diffVariable(const VariableExpr* variable, const std::string& var)
@@ -469,7 +464,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
 		else if (fnc == "exp") dfnc = Call("exp", args);
 		else if (fnc == "sqrt") dfnc = Div(Literal(0.5), Call("sqrt", args));
 		else
-			throw std::runtime_error("Don't know how to differentiate function " + fnc + ".");
+			throw std::runtime_error("Don't know how to differentiate function \"" + fnc + "\".");
 
 		// differentiate argument
 		auto diffArg = differentiate(args[0].get(), var);
@@ -477,7 +472,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
 		return Mul(dfnc, diffArg);
 	}
 
-	throw std::runtime_error("Don't know how to differentiate function " + fnc + ".");
+	throw std::runtime_error("Don't know how to differentiate function \"" + fnc + "\".");
 }
 
 ExprPtr Differentiator::diffInit(const InitExpr* init, const std::string& var)

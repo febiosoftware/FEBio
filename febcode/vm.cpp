@@ -882,6 +882,14 @@ Value VM::execute()
 		}
 
 		// ----- Mat3 operators ------
+		case OpCode::NEG_MAT3:
+		{
+			mat3& A = peekMat3();
+			A.m[0][0] = -A.m[0][0]; A.m[0][1] = -A.m[0][1]; A.m[0][2] = -A.m[0][2];
+			A.m[1][0] = -A.m[1][0]; A.m[1][1] = -A.m[1][1]; A.m[1][2] = -A.m[1][2];
+			A.m[2][0] = -A.m[2][0]; A.m[2][1] = -A.m[2][1]; A.m[2][2] = -A.m[2][2];
+			break;
+		}
 		case OpCode::ADD_MAT3:
 		{
 			mat3& B = popMat3();
@@ -1477,7 +1485,7 @@ Value VM::execute()
 		}
 
 		default:
-			throw std::runtime_error("Unknown opcode");
+			throw std::runtime_error("Unknown opcode: " + std::to_string((int)instruction));
 		}
 
 #ifndef NDEBUG

@@ -17,6 +17,8 @@ namespace febcode {
 
 		bool DependencyFound() const { return dependencyFound; }
 
+		void SetSimplify(bool value) { doSimplify = value; }
+
 	private:
 		void differentiateStmt(BlockStmt& ast, Statement* stmt, const std::string& var);
 
@@ -44,14 +46,21 @@ namespace febcode {
 
 		Type getDerivativeType(Type varType, TypeKind derivType);
 
-		ExprPtr simplify(const ExprPtr& expr) { return simplifier.simplify(expr.get()); }
-		ExprPtr simplify(const Expression* expr) { return simplifier.simplify(expr); }
+		ExprPtr simplify(const Expression* expr) 
+		{ 
+			if (doSimplify)
+				return simplifier.simplify(expr); 
+			else
+				return copy_expression(expr);
+		}
+		ExprPtr simplify(const ExprPtr& expr) { return simplify(expr.get()); }
 
 	private:
 		bool dependencyFound = false; // flag to indicate if we found a dependency on the variable we're differentiating with respect to
 		std::unordered_map<std::string, std::string> deriveVars; // map of derivative variables
 		std::unordered_map<std::string, Type> varTypes; // map of variable types for variables in the original program, used to determine the type of the derivative variables.
 
+		bool doSimplify = true;
 		Simplifier simplifier;
 	};
 

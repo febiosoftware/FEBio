@@ -822,7 +822,10 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 
 		if (expectedReturnType)
 		{
-			returnType = coerce(returnType, expectedReturnType);
+			Type coerceType = coerce(returnType, expectedReturnType);
+			if (coerceType)
+				returnType = coerceType;
+
 			if (returnType != expectedReturnType)
 				throw std::runtime_error("Return type mismatch. Expected " + TypeToString(expectedReturnType) + " but got " + TypeToString(returnType));
 		}
