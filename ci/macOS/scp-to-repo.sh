@@ -15,7 +15,3 @@ zip -r sdk.zip include
 zip -r sdk.zip lib
 scp sdk.zip repo:$REMOTE_PATH/
 popd
-
-if [ -f testLogs/Logs/* ]; then
-    scp testLogs/Logs/* repo:/serverRoot/TestSuite/Logs/macOS.txt
-fi

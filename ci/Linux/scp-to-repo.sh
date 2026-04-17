@@ -17,7 +17,3 @@ zip -r sdk.zip include
 zip -r sdk.zip lib
 scp sdk.zip febio-web:$REMOTE_PATH/
 popd
-
-if [ -f testLogs/Logs/* ]; then
-    scp testLogs/Logs/* febio-web:/serverRoot/TestSuite/Logs/linux.txt
-fi

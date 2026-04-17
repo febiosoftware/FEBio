@@ -12,7 +12,3 @@ pushd sdk
 /c/WINDOWS/system32/tar -acf sdk.zip include lib bin
 scp sdk.zip repo:$REMOTE_PATH/
 popd
-
-if [ -f testLogs/Logs/* ]; then
-    scp testLogs/Logs/* repo:/serverRoot/TestSuite/Logs/windows.txt
-fi
