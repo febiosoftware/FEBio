@@ -624,40 +624,6 @@ namespace febcode
 	};
 }
 
-inline febcode::Value operator + (const febcode::Value& a, const febcode::Value& b)
-{
-	if (isInt(a) && isInt(b))
-		return getInt(a) + getInt(b);
-	if (isDouble(a) && isDouble(b))
-		return getDouble(a) + getDouble(b);
-	throw std::runtime_error("Unsupported operand types for +");
-}
-
-inline febcode::Value operator - (const febcode::Value& a, const febcode::Value& b)
-{
-	if (isInt(a) && isInt(b))
-		return getInt(a) - getInt(b);
-	if (isDouble(a) && isDouble(b))
-		return getDouble(a) - getDouble(b);
-	throw std::runtime_error("Unsupported operand types for -");
-}
-
-inline febcode::Value operator * (const febcode::Value& a, const febcode::Value& b)
-{
-	if (isInt(a) && isInt(b))
-		return getInt(a) * getInt(b);
-	if (isDouble(a) && isDouble(b))
-		return getDouble(a) * getDouble(b);
-	throw std::runtime_error("Unsupported operand types for *");
-}
-
-inline febcode::Value operator / (const febcode::Value& a, const febcode::Value& b)
-{
-	if (isDouble(a) && isDouble(b))
-		return getDouble(a) / getDouble(b);
-	throw std::runtime_error("Unsupported operand types for /");
-}
-
 namespace febcode
 {
 	struct FuncArgs {
