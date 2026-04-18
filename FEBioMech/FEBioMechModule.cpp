@@ -181,6 +181,7 @@ SOFTWARE.*/
 #include "FEPressureLoad.h"
 #include "FEScriptedPressureLoad.h"
 #include "FEScriptedTractionLoad.h"
+#include "FEScriptedBodyForce.h"
 #include "FEPressureRobinBC.h"
 #include "FETractionLoad.h"
 #include "FETractionRobinBC.h"
@@ -692,6 +693,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMovingFrameLoad, "moving frame");
 	REGISTER_FECORE_CLASS(FERadialBodyForce, "radial force");
 	REGISTER_FECORE_CLASS(FEAxialBodyForce, "axial force");
+
+	REGISTER_FECORE_CLASS(FEScriptedBodyForce, "body force script", FECORE_EXPERIMENTAL);
 
 	//-----------------------------------------------------------------------------
 	// constraint classes

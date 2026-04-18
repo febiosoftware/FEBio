@@ -65,4 +65,5 @@ namespace febcode {
 	};
 
 	bool dependsOn(const Statement* stmt, const std::string& varName);
+	bool dependsOn(const Expression* expr, const std::string& varName);
 } // namespace febcode

@@ -518,12 +518,28 @@ ExprPtr Differentiator::diffInit(const InitExpr* init, const std::string& var)
 
 ExprPtr Differentiator::diffConstructor(const ConstructorExpr* ctor, const std::string& var)
 {
-	std::vector<ExprPtr> diffArgs;
-	for (const auto& arg : ctor->args)
+	// determine the type of the derivative variable based on the type of the original variable and the derivative variable.
+	Type varType = prg.globalType(var);
+	Type derivType = getDerivativeType(ctor->valType, varType->kind);
+
+	if (varType->kind == TypeKind::Double)
 	{
-		diffArgs.push_back(simplify(differentiate(arg.get(), var)));
+		std::vector<ExprPtr> diffArgs;
+		for (const auto& arg : ctor->args)
+		{
+			diffArgs.push_back(simplify(differentiate(arg.get(), var)));
+		}
+		return std::make_unique<ConstructorExpr>(ctor->valType, std::move(diffArgs));
 	}
-	return std::make_unique<ConstructorExpr>(ctor->valType, std::move(diffArgs));
+	else if (varType->kind == TypeKind::Vec3)
+	{
+		if (!dependsOn(ctor, var))
+		{
+			return Literal(mat3(0));
+		}
+		else
+			throw std::runtime_error("Don't know how to differentiate this constructor for vec3 variable.");
+	}
 }
 
 std::unique_ptr<Expression> Differentiator::diffAssign(const AssignExpr* assign, const std::string& var)
@@ -554,7 +570,7 @@ std::unique_ptr<Expression> Differentiator::diffIndex(const IndexExpr* index, co
 	return Index(dobj, index->index);
 }
 
-static bool dependsOn(const Expression* expr, const std::string& var)
+bool febcode::dependsOn(const Expression* expr, const std::string& var)
 {
 	if (auto literal = dynamic_cast<const LiteralExpr*>(expr))
 	{
