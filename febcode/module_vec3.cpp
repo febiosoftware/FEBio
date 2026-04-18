@@ -35,3 +35,10 @@ Value febcode::NormalizeVec3(FuncArgs args)
 
 	return vec3(x,y,z);
 }
+
+Value febcode::LengthVec3(FuncArgs args)
+{
+	assert(args.count == 1);
+	const vec3& a = args.getVec3();
+	return std::sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
+}

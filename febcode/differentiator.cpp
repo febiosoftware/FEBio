@@ -454,22 +454,53 @@ std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary,
 
 ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
 {
+	Type returnType = call->valType;
+	std::vector<Type> argTypes;
+	for (const auto& arg : call->arguments)
+	{
+		argTypes.push_back(arg->valType);
+	}
+
+	// find the function with the matching name and argument types in the program's function definitions
+	int fnIndex = prg.resolveFunction(call->name, argTypes);
+	if (fnIndex == -1)
+		throw std::runtime_error("Function \"" + call->name + "\" not found for differentiation.");
+
+	Type varType = prg.globalType(var);
+	Type derivType = getDerivativeType(returnType, varType->kind);
+
 	const std::string& fnc = call->name;
 	auto& args = call->arguments;
 	if (args.size() == 1)
 	{
-		ExprPtr dfnc;
-		if      (fnc == "sin") dfnc =  Call("cos", args);
-		else if (fnc == "cos") dfnc = Negate(Call("sin", args));
-		else if (fnc == "exp") dfnc = Call("exp", args);
-		else if (fnc == "sqrt") dfnc = Div(Literal(0.5), Call("sqrt", args));
-		else
-			throw std::runtime_error("Don't know how to differentiate function \"" + fnc + "\".");
-
 		// differentiate argument
 		auto diffArg = differentiate(args[0].get(), var);
 
-		return Mul(dfnc, diffArg);
+		if      (fnc == "sin") return Mul(Call("cos", args), diffArg);
+		else if (fnc == "cos") return Negate(Mul(Call("sin", args), diffArg));
+		else if (fnc == "exp") return Mul(Call("exp", args), diffArg);
+		else if (fnc == "sqrt") return Mul(Div(Literal(0.5), Call("sqrt", args)), diffArg);
+		else if (fnc == "length" && isVec3Type(args[0]->valType))
+		{
+			if (derivType->kind == TypeKind::Double)
+			{
+				assert(diffArg->valType->kind == TypeKind::Vec3);
+				// d(length(v)) = (v . d(v)) / length(v)
+				return Div(Mul(args[0], diffArg), Call("length", args));
+			}
+			else if (derivType->kind == TypeKind::Vec3)
+			{
+				assert(diffArg->valType->kind == TypeKind::Mat3);
+				// grad(length(v)) = (transpose(grad(v)) . v) / length(v)
+				return Div(Mul(Transpose(diffArg), args[0]), Call("length", args));
+			}
+		}
+		else if (fnc == "normalize" && isVec3Type(args[0]->valType))
+		{
+			// rewrite normalize(v) as v / length(v), then derivate that
+			ExprPtr normalize = Div(args[0], Call("length", args));
+			return differentiate(normalize.get(), var);
+		}
 	}
 
 	throw std::runtime_error("Don't know how to differentiate function \"" + fnc + "\".");

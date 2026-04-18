@@ -12,6 +12,9 @@ namespace febcode
 	// normalized = Normalize(vec3)
 	Value NormalizeVec3(FuncArgs args);
 
+	// double length (vec3)
+	Value LengthVec3(FuncArgs args);
+
 	class Vec3Module : public Module
 	{
 	public:
@@ -37,6 +40,7 @@ namespace febcode
 			prg.registerNative("dot"      , vec3Type, { vec3Type, vec3Type }, DotVec3);
 			prg.registerNative("cross"    , vec3Type, { vec3Type, vec3Type }, CrossVec3);
 			prg.registerNative("normalize", vec3Type, { vec3Type }, NormalizeVec3);
+			prg.registerNative("length"   , doubleType, { vec3Type }, LengthVec3);
 		}
 	};
 }
