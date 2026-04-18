@@ -30,7 +30,7 @@ BEGIN_FECORE_CLASS(FEScriptedPressureLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_scriptName, "script");
 END_FECORE_CLASS()
 
-FEScriptedPressureLoad::FEScriptedPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), FEPhysicsProperty(pfem)
+FEScriptedPressureLoad::FEScriptedPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), FEScriptedBehavior(pfem)
 {
 }
 
@@ -43,7 +43,7 @@ bool FEScriptedPressureLoad::Init()
 	AddVariable("time", FEValueType::Double, false);
 
 	if (FESurfaceLoad::Init() == false) return false;
-	if (FEPhysicsProperty::Init() == false) return false;
+	if (FEScriptedBehavior::Init() == false) return false;
 	return true;
 }
 

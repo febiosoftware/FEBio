@@ -64,13 +64,13 @@ struct FEValue
 	void operator = (const mat3d& v) { type = FEValueType::Mat3d; m3 = v; }
 };
 
-class FECORE_API FEPhysicsProperty
+class FECORE_API FEScriptedBehavior
 {
 	class Imp; // PIMPL for hiding implementation details
 
 public:
-	FEPhysicsProperty(FEModel* fem);
-	virtual ~FEPhysicsProperty() {}
+	FEScriptedBehavior(FEModel* fem);
+	virtual ~FEScriptedBehavior() {}
 
 	void SetSibling(FECoreBase* pc);
 

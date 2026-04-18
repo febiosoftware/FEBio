@@ -26,14 +26,14 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEMaterialPoint.h>
 #include "FEBodyForce.h"
-#include <FECore/FEPhysicsProperty.h>
+#include <FECore/FEScriptedBehavior.h>
 #include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for body forces
 //! Derived classes need to implement the force and stiffness functions.
 //
-class FEBIOMECH_API FEScriptedBodyForce : public FEBodyForce, public FEPhysicsProperty
+class FEBIOMECH_API FEScriptedBodyForce : public FEBodyForce, public FEScriptedBehavior
 {
 public:
 	//! constructor

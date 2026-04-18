@@ -30,7 +30,7 @@ BEGIN_FECORE_CLASS(FEScriptedBodyForce, FEBodyForce);
 	ADD_PARAMETER(m_scriptName, "script");
 END_FECORE_CLASS();
 
-FEScriptedBodyForce::FEScriptedBodyForce(FEModel* pfem) : FEBodyForce(pfem), FEPhysicsProperty(pfem)
+FEScriptedBodyForce::FEScriptedBodyForce(FEModel* pfem) : FEBodyForce(pfem), FEScriptedBehavior(pfem)
 {
 }
 
@@ -41,7 +41,7 @@ bool FEScriptedBodyForce::Init()
 	AddVariable("time", FEValueType::Double, false);
 
 	if (FEBodyForce::Init() == false) return false;
-	if (FEPhysicsProperty::Init() == false) return false;
+	if (FEScriptedBehavior::Init() == false) return false;
 	return true;
 }
 

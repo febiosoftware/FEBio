@@ -1,4 +1,4 @@
-#include "FEPhysicsProperty.h"
+#include "FEScriptedBehavior.h"
 #include <febcode/vm.h>
 #include <febcode/parser.h>
 #include <febcode/compiler.h>
@@ -7,7 +7,7 @@
 #include <FECore/FEModel.h>
 #include <sstream>
 
-class FEPhysicsProperty::Imp
+class FEScriptedBehavior::Imp
 {
 public:
 	struct Global {
@@ -288,38 +288,38 @@ public:
 	std::vector<Derive> valDeriv; //!< programs for derivatives
 };
 
-FEPhysicsProperty::FEPhysicsProperty(FEModel* fem) : m(*new Imp())
+FEScriptedBehavior::FEScriptedBehavior(FEModel* fem) : m(*new Imp())
 {
 	m.fem = fem;
 }
 
-void FEPhysicsProperty::SetSibling(FECoreBase* pc)
+void FEScriptedBehavior::SetSibling(FECoreBase* pc)
 {
 	m.pc = pc;
 }
 
-void FEPhysicsProperty::SetProgramReturnType(FEValueType type)
+void FEScriptedBehavior::SetProgramReturnType(FEValueType type)
 {
 	m.returnType = type;
 }
 
-void FEPhysicsProperty::SetScriptName(const std::string& scriptName)
+void FEScriptedBehavior::SetScriptName(const std::string& scriptName)
 {
 	m_scriptName = scriptName;
 }
 
-void FEPhysicsProperty::AddVariable(const std::string& varName, FEValueType type, bool differentiable)
+void FEScriptedBehavior::AddVariable(const std::string& varName, FEValueType type, bool differentiable)
 {
 	m.code.vars.push_back({ varName, type, differentiable });
 }
 
-bool FEPhysicsProperty::HasDerivative(int id) const
+bool FEScriptedBehavior::HasDerivative(int id) const
 {
 	if ((id < 0) || (id >= m.valDeriv.size())) return false;
 	return !m.valDeriv[id].isNullProgram;
 }
 
-bool FEPhysicsProperty::Init()
+bool FEScriptedBehavior::Init()
 {
 #ifndef NDEBUG
 	feLogEx(m.fem, "compiling script \"%s\":\n", m_scriptName.c_str());
@@ -435,17 +435,17 @@ bool FEPhysicsProperty::Init()
 	return true;
 }
 
-FEValue FEPhysicsProperty::Value(const std::vector<FEValue>& vars)
+FEValue FEScriptedBehavior::Value(const std::vector<FEValue>& vars)
 {
 	return m.code.Run(vars);
 }
 
-double FEPhysicsProperty::Value(const std::vector<double>& vars)
+double FEScriptedBehavior::Value(const std::vector<double>& vars)
 {
 	return m.code.Run(vars);
 }
 
-FEValue FEPhysicsProperty::DerivValue(const std::vector<FEValue>& vars, int varIndex)
+FEValue FEScriptedBehavior::DerivValue(const std::vector<FEValue>& vars, int varIndex)
 {
 	if ((varIndex >= 0) && (varIndex < m.valDeriv.size()))
 	{
@@ -485,7 +485,7 @@ FEValue FEPhysicsProperty::DerivValue(const std::vector<FEValue>& vars, int varI
 	return FEValue();
 }
 
-double FEPhysicsProperty::DerivValue(const std::vector<double>& vars, int varIndex)
+double FEScriptedBehavior::DerivValue(const std::vector<double>& vars, int varIndex)
 {
 	if ((varIndex >= 0) && (varIndex < m.valDeriv.size()))
 	{

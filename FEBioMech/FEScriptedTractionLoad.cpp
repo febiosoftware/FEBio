@@ -30,7 +30,7 @@ BEGIN_FECORE_CLASS(FEScriptedTractionLoad, FESurfaceLoad)
 	ADD_PARAMETER(m_scriptName, "script");
 END_FECORE_CLASS()
 
-FEScriptedTractionLoad::FEScriptedTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), FEPhysicsProperty(pfem)
+FEScriptedTractionLoad::FEScriptedTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), FEScriptedBehavior(pfem)
 {
 }
 
@@ -46,7 +46,7 @@ bool FEScriptedTractionLoad::Init()
 	SetProgramReturnType(FEValueType::Vec3d);
 
 	if (FESurfaceLoad::Init() == false) return false;
-	if (FEPhysicsProperty::Init() == false) return false;
+	if (FEScriptedBehavior::Init() == false) return false;
 	return true;
 }
 

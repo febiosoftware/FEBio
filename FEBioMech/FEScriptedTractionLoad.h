@@ -26,9 +26,9 @@ SOFTWARE.*/
 #pragma once
 
 #include <FECore/FESurfaceLoad.h>
-#include <FECore/FEPhysicsProperty.h>
+#include <FECore/FEScriptedBehavior.h>
 
-class FEScriptedTractionLoad : public FESurfaceLoad, public FEPhysicsProperty
+class FEScriptedTractionLoad : public FESurfaceLoad, public FEScriptedBehavior
 {
 public:
 	FEScriptedTractionLoad(FEModel* pfem);
