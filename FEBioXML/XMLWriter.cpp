@@ -266,7 +266,7 @@ void XMLWriter::inc_level()
 	int l=0;
 	for (int i=0; i<m_level; ++i) 
 	{
-		snprintf(m_sztab+l, 256, "\t");
+		snprintf(m_sztab+l, 1, "\t");
 		++l;
 	}
 	m_sztab[l] = 0;
@@ -282,7 +282,7 @@ void XMLWriter::dec_level()
 	int l=0;
 	for (int i=0; i<m_level; ++i) 
 	{
-		snprintf(m_sztab+l, 256, "\t");
+		snprintf(m_sztab+l, 1, "\t");
 		++l;
 	}
 	m_sztab[l] = 0;

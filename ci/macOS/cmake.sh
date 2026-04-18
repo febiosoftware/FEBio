@@ -1,4 +1,7 @@
+set -e
+
 cmake . -B cmbuild -L \
+	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_OSX_ARCHITECTURES="x86_64" \
 	-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
 	-DSET_DEVCOMMIT=ON \

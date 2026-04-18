@@ -144,7 +144,7 @@ double FEContactPotentialSurface::GetContactArea()
 			for (int n = 0; n < el.GaussPoints(); ++n)
 			{
 				FECPContactPoint& mp = static_cast<FECPContactPoint&>(*el.GetMaterialPoint(n));
-				if (mp.m_tc.norm2() != 0.0)
+				if (mp.m_tc.norm() != 0.0)
 				{
 					vec3d dA = mp.dxr ^ mp.dxs;
 					double da = dA.norm();
@@ -640,7 +640,7 @@ void FEContactPotential::Update()
 									(r12.z < m_Rout) && (r12.z > -m_Rout) &&
 									(r12.norm2() < m_Rout * m_Rout))
 								{
-									double L12 = (R2 - R1).norm2();
+									double L12 = (R2 - R1).norm();
 									double l12 = r12.unit();
 									if ((fabs(r12 * n1) >= m_wtol) && (L12 >= m_Rmin))
 									{
