@@ -209,47 +209,7 @@ public:
 			if (varType == nullptr) return false;
 
 			febcode::Differentiator diff(code.program);
-			auto diffAST = diff.differentiate(*code.program.ast, varName);
-
-			// figure out the return type of the derivative program based on the type of the variable
-			// we're differentiating with respect to and the return type of the original program.
-			if (code.program.returnType == nullptr) return false;
-			febcode::TypeKind returnTypeKind = code.program.returnType->kind;
-			if (returnTypeKind == febcode::TypeKind::Double)
-			{
-				switch (varType->kind)
-				{
-				case febcode::TypeKind::Double:
-					code.program.returnType = code.program.types.Double();
-					break;
-				case febcode::TypeKind::Vec3:
-					code.program.returnType = code.program.types.Vec3();
-					break;
-				default:
-					feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
-					return false;
-				}
-			}
-			else if (returnTypeKind == febcode::TypeKind::Vec3)
-			{
-				switch (varType->kind)
-				{
-				case febcode::TypeKind::Double:
-					code.program.returnType = code.program.types.Vec3();
-					break;
-				case febcode::TypeKind::Vec3:
-					code.program.returnType = code.program.types.Mat3();
-					break;
-				default:
-					feLogErrorEx(code.pc->GetFEModel(), "Unsupported variable type for differentiation: only double variables are supported for differentiation when the return type is double");
-					return false;
-				}
-			}
-			else
-			{
-				feLogErrorEx(code.pc->GetFEModel(), "Unsupported return type for differentiation: only double and vec3 return types are supported");
-				return false;
-			}
+			diff.differentiate(varName);
 
 			if (!diff.DependencyFound())
 			{
@@ -259,9 +219,6 @@ public:
 			}
 			else
 			{
-				code.program.ast = std::move(diffAST);
-
-
 				febcode::Compiler compiler(code.program);
 				compiler.compile();
 

@@ -124,15 +124,13 @@ bool FECodeValuator::CompileScript()
 		if (m.compileDeriv)
 		{
 			febcode::Differentiator diff(m.program);
-			auto diffAST = diff.differentiate(*m.program.ast, m.derivVarName);
+			diff.differentiate(m.derivVarName);
 
 			if (!diff.DependencyFound())
 			{
 				// no dependency was found on the variable we are differentiating with respect to
 				m.isNullProgram = true;
 			}
-
-			m.program.ast = std::move(diffAST);
 
 #ifndef NDEBUG
 			feLog("Derivative AST w.r.t %s :\n>>>\n", m.derivVarName.c_str());

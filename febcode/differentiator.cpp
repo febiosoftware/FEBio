@@ -19,7 +19,28 @@ Type Differentiator::getDerivativeType(Type varType, TypeKind derivType)
 	throw std::runtime_error("Can't determine type of derivative.");
 }
 
-std::unique_ptr<AST> Differentiator::differentiate(const AST& ast, const std::string& var)
+void Differentiator::differentiate(const std::string& var)
+{
+	// get the variable's type
+	Type varType = prg.globalType(var);
+	if (varType == nullptr)
+		throw std::runtime_error("Variable not found in program: " + var);
+
+	// update the program's return type
+	if (prg.returnType)
+	{
+		Type derivType = getDerivativeType(prg.returnType, varType->kind);
+		prg.returnType = derivType;
+	}
+
+	DerivVar dvar{ var, varType };
+
+	// differentiate the program's AST
+	auto diffAST = differentiate(*prg.ast, dvar);
+	prg.ast.reset(diffAST.release()); // replace original AST with derivative AST
+}
+
+std::unique_ptr<AST> Differentiator::differentiate(const AST& ast, const DerivVar& var)
 {
 	auto derivativeAst = std::make_unique<AST>();
 
@@ -28,7 +49,7 @@ std::unique_ptr<AST> Differentiator::differentiate(const AST& ast, const std::st
 	dependencyFound = false;
 	for (const auto& stmt : ast.root.statements)
 	{
-		if (febcode::dependsOn(stmt.get(), var))
+		if (febcode::dependsOn(stmt.get(), var.name))
 		{
 			dependencyFound = true;
 			break;
@@ -38,26 +59,13 @@ std::unique_ptr<AST> Differentiator::differentiate(const AST& ast, const std::st
 	if (!dependencyFound)
 	{
 		// the derivative of a constant is zero, so we can just return an AST with a single statement that returns zero.
-		switch (prg.returnType->kind)
+		ExprPtr returnValue;
+		if (prg.returnType)
 		{
-		case TypeKind::Double:
-			derivativeAst->addStatement(std::make_unique<ReturnStmt>(Literal(0.0)));
-			return derivativeAst;
-		case TypeKind::Vec2:
-			derivativeAst->addStatement(std::make_unique<ReturnStmt>(Literal(vec2())));
-			return derivativeAst;
-		case TypeKind::Vec3:
-			derivativeAst->addStatement(std::make_unique<ReturnStmt>(Literal(vec3())));
-			return derivativeAst;
-		case TypeKind::Mat2:
-			derivativeAst->addStatement(std::make_unique<ReturnStmt>(Literal(mat2())));
-			return derivativeAst;
-		case TypeKind::Mat3:
-			derivativeAst->addStatement(std::make_unique<ReturnStmt>(Literal(mat3())));
-			return derivativeAst;
-		default:
-			throw std::runtime_error("Don't know how to return zero for this type.");
+			returnValue = Zero(prg.returnType);
 		}
+		derivativeAst->addStatement(std::make_unique<ReturnStmt>(std::move(returnValue)));
+		return derivativeAst;
 	}
 
 	// add all injected globals to vartypes
@@ -75,7 +83,7 @@ std::unique_ptr<AST> Differentiator::differentiate(const AST& ast, const std::st
 	return derivativeAst;
 }
 
-void Differentiator::differentiateStmt(BlockStmt& ast, Statement* stmt, const std::string& var)
+void Differentiator::differentiateStmt(BlockStmt& ast, Statement* stmt, const DerivVar& var)
 {
 	if      (auto exprStmt   = dynamic_cast<ExpressionStmt*>(stmt)) diffExpressionStmt(ast, exprStmt  , var);
 	else if (auto returnStmt = dynamic_cast<ReturnStmt*    >(stmt)) diffReturnStmt    (ast, returnStmt, var); 
@@ -89,25 +97,25 @@ void Differentiator::differentiateStmt(BlockStmt& ast, Statement* stmt, const st
 	}
 }
 
-void Differentiator::diffExpressionStmt(BlockStmt& ast, ExpressionStmt* stmt, const std::string& var)
+void Differentiator::diffExpressionStmt(BlockStmt& ast, ExpressionStmt* stmt, const DerivVar& var)
 {
-	auto derivativeExpr = simplify(differentiate(stmt->expr.get(), var).get());
+	auto derivativeExpr = differentiate(stmt->expr.get(), var);
 	ast.addStatement(std::make_unique<ExpressionStmt>(std::move(derivativeExpr)));
 }
 
-void Differentiator::diffReturnStmt(BlockStmt& ast, ReturnStmt* stmt, const std::string& var)
+void Differentiator::diffReturnStmt(BlockStmt& ast, ReturnStmt* stmt, const DerivVar& var)
 {
-	auto derivativeExpr = simplify(differentiate(stmt->value.get(), var).get());
+	auto derivativeExpr = differentiate(stmt->value.get(), var);
 	ast.addStatement(std::make_unique<ReturnStmt>(std::move(derivativeExpr)));
 }
 
-void Differentiator::diffStructStmt(BlockStmt& ast, StructStmt* stmt, const std::string& var)
+void Differentiator::diffStructStmt(BlockStmt& ast, StructStmt* stmt, const DerivVar& var)
 {
 	// copy the original struct declaration to the derivative AST
 	ast.addStatement(std::make_unique<StructStmt>(stmt->name, stmt->type, stmt->fields));
 }
 
-void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const std::string& var)
+void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const DerivVar& var)
 {
 	std::vector<Var> copyVars; // copy of the original variables for the derivative AST
 	std::vector<Var> newVars; // new variables for the derivatives in the derivative AST
@@ -115,8 +123,7 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const st
 	Type baseType = stmt->type;
 
 	// determine the type of the derivative variable based on the type of the original variable and the derivative variable.
-	Type varType = prg.globalType(var);
-	Type derivType = getDerivativeType(baseType, varType->kind);
+	Type derivType = getDerivativeType(baseType, var.type->kind);
 
 	for (auto& var_i : stmt->vars)
 	{
@@ -141,13 +148,13 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const st
 		if (var_i.input) continue;
 
 		// create a new variable for the derivative of this variable
-		std::string derivName = "__d" + var_i.name + "_d" + var;
+		std::string derivName = "__d" + var_i.name + "_d" + var.name;
 
 		ExprPtr init = nullptr;
 		if (var_i.initializer)
 		{
 			// lets differentiate the initializer.
-			init = simplify(differentiate(var_i.initializer.get(), var));
+			init = differentiate(var_i.initializer.get(), var);
 
 			// if it's zero, then this variable didn't contribute to the derivative, so we can skip creating a derivative variable for it.
 			if (isZero(init))
@@ -187,7 +194,7 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const st
 	if (!newVars.empty()) ast.addStatement(std::make_unique<VarDeclStmt>(derivType, newVars));
 }
 
-void Differentiator::diffIfStmt(BlockStmt& ast, IfStmt* stmt, const std::string& var)
+void Differentiator::diffIfStmt(BlockStmt& ast, IfStmt* stmt, const DerivVar& var)
 {
 	// copy the condition
 	auto newIf = std::make_unique<IfStmt>();
@@ -210,7 +217,7 @@ void Differentiator::diffIfStmt(BlockStmt& ast, IfStmt* stmt, const std::string&
 	ast.addStatement(std::move(newIf));
 }
 
-void Differentiator::diffBlockStmt(BlockStmt& ast, BlockStmt* stmt, const std::string& var)
+void Differentiator::diffBlockStmt(BlockStmt& ast, BlockStmt* stmt, const DerivVar& var)
 {
 	for (const auto& s : stmt->statements)
 	{
@@ -218,30 +225,28 @@ void Differentiator::diffBlockStmt(BlockStmt& ast, BlockStmt* stmt, const std::s
 	}
 }
 
-ExprPtr Differentiator::differentiate(const Expression* expr, const std::string& var)
+ExprPtr Differentiator::differentiate(const Expression* expr, const DerivVar& var)
 {
-	if      (auto literal  = dynamic_cast<const LiteralExpr*    >(expr)) return diffLiteral    (literal , var);
-	else if (auto variable = dynamic_cast<const VariableExpr*   >(expr)) return diffVariable   (variable, var);
-	else if (auto unary    = dynamic_cast<const UnaryExpr*      >(expr)) return diffUnary      (unary   , var);
-	else if (auto binary   = dynamic_cast<const BinaryExpr*     >(expr)) return diffBinary     (binary  , var);
-	else if (auto call     = dynamic_cast<const CallExpr*       >(expr)) return diffCall       (call    , var);
-	else if (auto init     = dynamic_cast<const InitExpr*       >(expr)) return diffInit       (init    , var);
-	else if (auto ctor     = dynamic_cast<const ConstructorExpr*>(expr)) return diffConstructor(ctor, var);
-	else if (auto assign   = dynamic_cast<const AssignExpr*     >(expr)) return diffAssign     (assign  , var);
-	else if (auto index    = dynamic_cast<const IndexExpr*      >(expr)) return diffIndex      (index   , var);
-	else if (auto member   = dynamic_cast<const MemberExpr*     >(expr)) return diffMember     (member  , var);
+	if      (auto literal  = dynamic_cast<const LiteralExpr*    >(expr)) return simplify(diffLiteral    (literal , var));
+	else if (auto variable = dynamic_cast<const VariableExpr*   >(expr)) return simplify(diffVariable   (variable, var));
+	else if (auto unary    = dynamic_cast<const UnaryExpr*      >(expr)) return simplify(diffUnary      (unary   , var));
+	else if (auto binary   = dynamic_cast<const BinaryExpr*     >(expr)) return simplify(diffBinary     (binary  , var));
+	else if (auto call     = dynamic_cast<const CallExpr*       >(expr)) return simplify(diffCall       (call    , var));
+	else if (auto init     = dynamic_cast<const InitExpr*       >(expr)) return simplify(diffInit       (init    , var));
+	else if (auto ctor     = dynamic_cast<const ConstructorExpr*>(expr)) return simplify(diffConstructor(ctor    , var));
+	else if (auto assign   = dynamic_cast<const AssignExpr*     >(expr)) return simplify(diffAssign     (assign  , var));
+	else if (auto index    = dynamic_cast<const IndexExpr*      >(expr)) return simplify(diffIndex      (index   , var));
+	else if (auto member   = dynamic_cast<const MemberExpr*     >(expr)) return simplify(diffMember     (member  , var));
 	else
 		throw std::runtime_error("Unsupported expression type for differentiation");
 
 	return nullptr;
 }
 
-ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const std::string& var)
+ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const DerivVar& var)
 {
-	Type varType = prg.globalType(var);
-
 	// scalar derivation
-	if (varType->kind == TypeKind::Double)
+	if (var.type->kind == TypeKind::Double)
 	{
 		// The derivative of a constant is zero
 		switch (literal->value.index)
@@ -256,7 +261,7 @@ ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const std::strin
 	}
 
 	// 2d gradient
-	if (varType->kind == TypeKind::Vec2)
+	if (var.type->kind == TypeKind::Vec2)
 	{
 		switch (literal->value.index)
 		{
@@ -267,7 +272,7 @@ ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const std::strin
 	}
 
 	// 3d gradient
-	if (varType->kind == TypeKind::Vec3)
+	if (var.type->kind == TypeKind::Vec3)
 	{
 		switch (literal->value.index)
 		{
@@ -280,14 +285,12 @@ ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const std::strin
 	throw std::runtime_error("Don't know how to differentiate this literal type.");
 }
 
-ExprPtr Differentiator::diffVariable(const VariableExpr* variable, const std::string& var)
+ExprPtr Differentiator::diffVariable(const VariableExpr* variable, const DerivVar& var)
 {
-	Type varType = varTypes[variable->name];
-	Type derivVarType = prg.globalType(var);
-	Type derivType = getDerivativeType(varType, derivVarType->kind);
+	Type derivType = getDerivativeType(variable->valType, var.type->kind);
 
 	// The derivative of a variable with respect to itself is 1
-	if (variable->name == var)
+	if (variable->name == var.name)
 	{
 		switch (derivType->kind)
 		{
@@ -323,26 +326,24 @@ ExprPtr Differentiator::diffVariable(const VariableExpr* variable, const std::st
 	}
 }
 
-ExprPtr Differentiator::diffUnary(const UnaryExpr* unary, const std::string& var)
+ExprPtr Differentiator::diffUnary(const UnaryExpr* unary, const DerivVar& var)
 {
+	auto right = simplify(unary->right);
+
 	// For unary negation, the derivative is the negation of the derivative of the operand
 	// d(-f) = -df
 	if (unary->op == UnaryOp::Negate) {
-		auto operandDerivative = differentiate(unary->right.get(), var);
+		auto operandDerivative = differentiate(right.get(), var);
 		return Negate(operandDerivative);
 	}
-	// For logical NOT, the derivative is zero (since it's not a mathematical operation)
-	else if (unary->op == UnaryOp::Not) {
-		return Literal(0.0);
-	}
-	else
-		throw std::runtime_error("Unsupported unary operator for differentiation");
+
+	throw std::runtime_error("Unsupported unary operator for differentiation");
 }
 
-std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary, const std::string& var)
+std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary, const DerivVar& var)
 {
-	const auto& left  = binary->left;
-	const auto& right = simplify(binary->right);
+	auto left  = simplify(binary->left);
+	auto right = simplify(binary->right);
 
 	auto dleft = differentiate(left.get(), var);
 	auto dright = differentiate(right.get(), var);
@@ -360,11 +361,8 @@ std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary,
 	Type dltype = dleft->valType;
 	Type drtype = dright->valType;
 
-	// get the type of the variable we are differentiating with respect to, so we can determine the type of the derivative variables and the result of this differentiation.
-	Type varType = prg.globalType(var);
-
 	// scalar differentation
-	if (varType->kind == TypeKind::Double)
+	if (var.type->kind == TypeKind::Double)
 	{
 		if (isScalarType(ltype) && isScalarType(rtype))
 		{
@@ -401,11 +399,11 @@ std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary,
 			};
 		}
 	}
-	else if (varType->kind == TypeKind::Vec2) // gradient w.r.t. a vec2 variable
+	else if (var.type->kind == TypeKind::Vec2) // gradient w.r.t. a vec2 variable
 	{
 
 	}
-	else if (varType->kind == TypeKind::Vec3) // gradient w.r.t. a vec3 variable
+	else if (var.type->kind == TypeKind::Vec3) // gradient w.r.t. a vec3 variable
 	{
 		if (binary->op == BinaryOp::Multiply)
 		{
@@ -452,9 +450,8 @@ std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary,
 	throw std::runtime_error("AD error: Unsupported binary operator '" + opToString(binary->op) + "' with operand types '" + TypeToString(ltype) + "' and '" + TypeToString(rtype) + "'.");
 }
 
-ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
+ExprPtr Differentiator::diffCall(const CallExpr* call, const DerivVar& var)
 {
-	Type returnType = call->valType;
 	std::vector<Type> argTypes;
 	for (const auto& arg : call->arguments)
 	{
@@ -466,8 +463,8 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
 	if (fnIndex == -1)
 		throw std::runtime_error("Function \"" + call->name + "\" not found for differentiation.");
 
-	Type varType = prg.globalType(var);
-	Type derivType = getDerivativeType(returnType, varType->kind);
+	Type returnType = call->valType;
+	Type derivType = getDerivativeType(returnType, var.type->kind);
 
 	const std::string& fnc = call->name;
 	auto& args = call->arguments;
@@ -506,7 +503,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const std::string& var)
 	throw std::runtime_error("Don't know how to differentiate function \"" + fnc + "\".");
 }
 
-ExprPtr Differentiator::diffInit(const InitExpr* init, const std::string& var)
+ExprPtr Differentiator::diffInit(const InitExpr* init, const DerivVar& var)
 {
 	std::vector<ExprPtr> diffElements;
 	for (const auto& elem : init->elements)
@@ -516,33 +513,34 @@ ExprPtr Differentiator::diffInit(const InitExpr* init, const std::string& var)
 	return std::make_unique<InitExpr>(std::move(diffElements));
 }
 
-ExprPtr Differentiator::diffConstructor(const ConstructorExpr* ctor, const std::string& var)
+ExprPtr Differentiator::diffConstructor(const ConstructorExpr* ctor, const DerivVar& var)
 {
 	// determine the type of the derivative variable based on the type of the original variable and the derivative variable.
-	Type varType = prg.globalType(var);
-	Type derivType = getDerivativeType(ctor->valType, varType->kind);
+	Type derivType = getDerivativeType(ctor->valType, var.type->kind);
 
-	if (varType->kind == TypeKind::Double)
+	if (var.type->kind == TypeKind::Double)
 	{
 		std::vector<ExprPtr> diffArgs;
 		for (const auto& arg : ctor->args)
 		{
-			diffArgs.push_back(simplify(differentiate(arg.get(), var)));
+			diffArgs.push_back(differentiate(arg.get(), var));
 		}
 		return std::make_unique<ConstructorExpr>(ctor->valType, std::move(diffArgs));
 	}
-	else if (varType->kind == TypeKind::Vec3)
+	else if (var.type->kind == TypeKind::Vec3)
 	{
-		if (!dependsOn(ctor, var))
+		if (!dependsOn(ctor, var.name))
 		{
 			return Literal(mat3(0));
 		}
 		else
 			throw std::runtime_error("Don't know how to differentiate this constructor for vec3 variable.");
 	}
+
+	throw std::runtime_error("Don't know how to differentiate constructor.");
 }
 
-std::unique_ptr<Expression> Differentiator::diffAssign(const AssignExpr* assign, const std::string& var)
+std::unique_ptr<Expression> Differentiator::diffAssign(const AssignExpr* assign, const DerivVar& var)
 {
 	// For an assignment expression, we can use the rule: d( y = expr ) --> dy = d(expr)
 	auto du = differentiate(assign->target.get(), var);
@@ -556,18 +554,28 @@ std::unique_ptr<Expression> Differentiator::diffAssign(const AssignExpr* assign,
 	return Assign(du, dv);
 }
 
-std::unique_ptr<Expression> Differentiator::diffMember(const MemberExpr* member, const std::string& var)
+std::unique_ptr<Expression> Differentiator::diffMember(const MemberExpr* member, const DerivVar& var)
 {
-	// For a member access expression, we can use the rule: d( obj.field ) --> dobj.field
-	auto dobj = differentiate(member->object.get(), var);
-	return Member(dobj, member->property);
+	if (var.type->kind == TypeKind::Double)
+	{
+		// For a member access expression, we can use the rule: d( obj.field ) --> dobj.field
+		auto dobj = differentiate(member->object.get(), var);
+		return Member(dobj, member->property);
+	}
+
+	throw std::runtime_error("Don't know how to differentiate member access for this variable type.");
 }
 
-std::unique_ptr<Expression> Differentiator::diffIndex(const IndexExpr* index, const std::string& var)
+std::unique_ptr<Expression> Differentiator::diffIndex(const IndexExpr* index, const DerivVar& var)
 {
-	// For an index access expression, we can use the rule: d( obj[i] ) --> d(obj)[i]
-	auto dobj = differentiate(index->object.get(), var);
-	return Index(dobj, index->index);
+	if (var.type->kind == TypeKind::Double)
+	{
+		// For an index access expression, we can use the rule: d( obj[i] ) --> d(obj)[i]
+		auto dobj = differentiate(index->object.get(), var);
+		return Index(dobj, index->index);
+	}
+
+	throw std::runtime_error("Don't know how to differentiate index access for this variable type.");
 }
 
 bool febcode::dependsOn(const Expression* expr, const std::string& var)
@@ -601,6 +609,14 @@ bool febcode::dependsOn(const Expression* expr, const std::string& var)
 	{
 		return dependsOn(member->object.get(), var);
 	}
+	else if (auto index = dynamic_cast<const IndexExpr*>(expr))
+	{
+		return dependsOn(index->object.get(), var) || dependsOn(index->index.get(), var);
+	}
+	else if (auto assign = dynamic_cast<const AssignExpr*>(expr))
+	{
+		return dependsOn(assign->target.get(), var) || dependsOn(assign->value.get(), var);
+	}
 	else if (auto init = dynamic_cast<const InitExpr*>(expr))
 	{
 		for (const auto& elem : init->elements)
@@ -609,10 +625,6 @@ bool febcode::dependsOn(const Expression* expr, const std::string& var)
 				return true;
 		}
 		return false;
-	}
-	else if (auto assign = dynamic_cast<const AssignExpr*>(expr))
-	{
-		return dependsOn(assign->target.get(), var) || dependsOn(assign->value.get(), var);
 	}
 	else if (auto constructor = dynamic_cast<const ConstructorExpr*>(expr))
 	{

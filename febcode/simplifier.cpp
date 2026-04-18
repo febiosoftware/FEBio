@@ -111,14 +111,14 @@ ExprPtr Simplifier::simplifyCall(const CallExpr* call)
 		if (isLiteral(le) && isZero(le))
 		{
 			Value lv = dynamic_cast<LiteralExpr*>(le.get())->value;
-			if (isVec2(lv)) return Literal(mat2(0.0));
+			if      (isVec2(lv)) return Literal(mat2(0.0));
 			else if (isVec3(lv)) return Literal(mat3(0.0));
 		}
 
 		if (isLiteral(re) && isZero(re))
 		{
 			Value rv = dynamic_cast<LiteralExpr*>(re.get())->value;
-			if (isVec2(rv)) return Literal(mat2(0.0));
+			if      (isVec2(rv)) return Literal(mat2(0.0));
 			else if (isVec3(rv)) return Literal(mat3(0.0));
 		}
 	}
@@ -217,7 +217,7 @@ ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
 
 	if (binary->op == BinaryOp::Minus)
 	{
-		if (isZero(l)) return Negate(r); // 0 - r = -r
+		if (isZero(l)) return simplify(Negate(r)); // 0 - r = -r
 		if (isZero(r)) return  l; // l - 0 = l
 	}
 
@@ -290,9 +290,14 @@ ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
 				{
 				case BinaryOp::Multiply:
 					if (isScalarType(r->valType))
-						return Literal(vec3(0.0, 0.0, 0.0)); // vec3(0) * scalar = vec3(0)
+						return Literal(vec3()); // vec3(0) * scalar = vec3(0)
 					if (r->valType->kind == TypeKind::Vec3)
 						return Literal(0.0); // vec3(0) * vec3 = 0
+					break;
+				case BinaryOp::Divide:
+					if (isScalarType(r->valType))
+						return Literal(vec3()); // vec3(0) / scalar = vec3(0)
+					break;
 				}
 			}
 		}
@@ -319,6 +324,16 @@ ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
 				{
 				case BinaryOp::Multiply: return r; // I * r = r
 				}
+			}
+			if (isZero(m) && (binary->op == BinaryOp::Multiply))
+			{
+				if      (isScalarType(r->valType)) return Literal(mat3()); // mat3(0) * scalar = mat3(0)
+				else if (isVec3Type  (r->valType)) return Literal(vec3()); // mat3(0) * vec3 = vec3(0)
+				else if (isMat3Type  (r->valType)) return Literal(mat3()); // mat3(0) * mat3 = mat3(0)
+			}
+			if (isZero(m) && (binary->op == BinaryOp::Divide))
+			{
+				if (isScalarType(r->valType) && !isZero(r)) return Literal(mat3()); // mat3(0) / scalar = mat3(0)
 			}
 		}
 	}
