@@ -260,6 +260,14 @@ void FEBioLoadsSection2::ParseNodalLoad(XMLTag &tag)
 		FENodalDOFLoad* pfc = fecore_alloc(FENodalDOFLoad, &fem);
 		pfc->SetDOF(bc);
 		pfc->SetLoad(scale);
+		pfc->SetNodeSet(pns);
+
+		if (lc >= 0)
+		{
+			FEParam* p = pfc->GetParameter("scale");
+			if (p == nullptr) throw XMLReader::InvalidTag(tag);
+			fem.AttachLoadController(p, lc);
+		}
 
 		// add it to the model
 		GetBuilder()->AddNodalLoad(pfc);
