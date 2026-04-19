@@ -476,6 +476,16 @@ std::unique_ptr<Expression> Parser::parseUnary() {
 	if (match(TokenType::Minus) || match(TokenType::Not)) {
 		UnaryOp op = tokenToUnaryOp(previous());
 		auto right = parseUnary();
+
+		// absorbe negative sign for scalars.
+		if (op == UnaryOp::Negate) {
+
+			int n;
+			if (isInt(right.get(), n)) return std::make_unique<LiteralExpr>(-n);
+			double d;
+			if (isDouble(right.get(), d)) return std::make_unique<LiteralExpr>(-d);
+		}
+
 		return std::make_unique<UnaryExpr>(op, std::move(right));
 	}
 
