@@ -50,7 +50,7 @@ vec3d FEScriptedBodyForce::force(FEMaterialPoint& mp)
 	std::vector<FEValue> var(2);
 	var[0] = mp.m_rt;
 	var[1] = GetTimeInfo().currentTime;
-	return Value(var).v3;
+	return Value(mp, var).v3;
 }
 
 mat3d FEScriptedBodyForce::stiffness(FEMaterialPoint& pt)
@@ -58,5 +58,5 @@ mat3d FEScriptedBodyForce::stiffness(FEMaterialPoint& pt)
 	std::vector<FEValue> var(2);
 	var[0] = pt.m_rt;
 	var[1] = GetTimeInfo().currentTime;
-	return DerivValue(var, 0).m3;
+	return DerivValue(pt, var, 0).m3;
 }

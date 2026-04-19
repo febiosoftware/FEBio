@@ -5,6 +5,7 @@
 #include "vec3d.h"
 #include "FECoreBase.h"
 
+class FEMaterialPoint;
 class FEModel;
 
 enum class FEValueType
@@ -85,11 +86,11 @@ public:
 	bool HasDerivative(int id) const;
 
 public:
-	FEValue Value(const std::vector<FEValue>& vars);
-	double Value(const std::vector<double>& vars);
+	FEValue Value(const FEMaterialPoint& mp, const std::vector<FEValue>& vars);
+	double Value(const FEMaterialPoint& mp, const std::vector<double>& vars);
 
-	FEValue DerivValue(const std::vector<FEValue>& vars, int varIndex);
-	double DerivValue(const std::vector<double>& vars, int varIndex);
+	FEValue DerivValue(const FEMaterialPoint& mp, const std::vector<FEValue>& vars, int varIndex);
+	double DerivValue(const FEMaterialPoint& mp, const std::vector<double>& vars, int varIndex);
 
 protected:
 	std::string m_scriptName;

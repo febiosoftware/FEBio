@@ -60,7 +60,7 @@ void FEScriptedPressureLoad::LoadVector(FEGlobalVector& R)
 		vars[1] = t;
 
 		// evaluate pressure at this material point
-		double P = -Value(vars).d;
+		double P = -Value(pt, vars).d;
 
 		// force vector
 		vec3d N = (pt.dxr ^ pt.dxs);
@@ -87,10 +87,10 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 		vars[1] = t;
 
 		// evaluate pressure at this material point
-		double P = Value(vars).d;
+		double P = Value(mp, vars).d;
 
 		// evaluate pressure gradient at this material point
-		vec3d dP = DerivValue(vars, 0).v3;
+		vec3d dP = DerivValue(mp, vars, 0).v3;
 
 		double H_i = dof_a.shape;
 		double H_j = dof_b.shape;

@@ -161,6 +161,9 @@ FEParam::~FEParam()
 		case FE_PARAM_BOOL  : delete (bool*  )m_pv; break;
 		case FE_PARAM_INT   : delete (int*   )m_pv; break;
 		case FE_PARAM_DOUBLE: delete (double*)m_pv; break;
+		case FE_PARAM_DOUBLE_MAPPED: delete (FEParamDouble*)m_pv; break;
+		case FE_PARAM_VEC3D_MAPPED : delete (FEParamVec3*  )m_pv; break;
+		case FE_PARAM_MAT3D_MAPPED : delete (FEParamMat3d* )m_pv; break;
 		default:
 			assert(false);
 		}

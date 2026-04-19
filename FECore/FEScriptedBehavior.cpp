@@ -5,6 +5,7 @@
 #include <febcode/differentiator.h>
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
+#include <FECore/FEModelParam.h>
 #include <sstream>
 
 class FEScriptedBehavior::Imp
@@ -78,7 +79,7 @@ public:
 			return true;
 		}
 
-		double Run(const std::vector<double>& vars)
+		double Run(const FEMaterialPoint& mp, const std::vector<double>& vars)
 		{
 			thread_local febcode::VM vm;
 			vm.setProgram(program);
@@ -100,9 +101,19 @@ public:
 				for (int i=0; i < pl.Parameters(); ++i, it++)
 				{
 					FEParam& pi = *it;
-					if (pi.GetFlags() & FEParamFlag::FE_PARAM_USER)
+					switch (pi.type())
 					{
-						vm.setInput(pi.name(), pi.value<double>());
+					case FEParamType::FE_PARAM_BOOL: vm.setInput(pi.name(), pi.value<bool  >()); break;
+					case FEParamType::FE_PARAM_INT: vm.setInput(pi.name(), pi.value<int   >()); break;
+					case FEParamType::FE_PARAM_DOUBLE: vm.setInput(pi.name(), pi.value<double>()); break;
+					case FEParamType::FE_PARAM_DOUBLE_MAPPED:
+					{
+						FEParamDouble& p = pi.value<FEParamDouble>();
+						vm.setInput(pi.name(), p(mp));
+						break;
+					}
+					default:
+						assert(false);
 					}
 				}
 			}
@@ -111,7 +122,7 @@ public:
 			return febcode::getDouble(v);
 		}
 
-		FEValue Run(const std::vector<FEValue>& vars)
+		FEValue Run(const FEMaterialPoint& mp, const std::vector<FEValue>& vars)
 		{
 			thread_local febcode::VM vm;
 			vm.setProgram(program);
@@ -159,6 +170,12 @@ public:
 						case FEParamType::FE_PARAM_BOOL  : vm.setInput(pi.name(), pi.value<bool  >()); break;
 						case FEParamType::FE_PARAM_INT   : vm.setInput(pi.name(), pi.value<int   >()); break;
 						case FEParamType::FE_PARAM_DOUBLE: vm.setInput(pi.name(), pi.value<double>()); break;
+						case FEParamType::FE_PARAM_DOUBLE_MAPPED:
+						{
+							FEParamDouble& p = pi.value<FEParamDouble>();
+							vm.setInput(pi.name(), p(mp));
+							break;
+						}
 						default:
 							assert(false);
 						}
@@ -399,17 +416,17 @@ bool FEScriptedBehavior::Init()
 	return true;
 }
 
-FEValue FEScriptedBehavior::Value(const std::vector<FEValue>& vars)
+FEValue FEScriptedBehavior::Value(const FEMaterialPoint& mp, const std::vector<FEValue>& vars)
 {
-	return m.code.Run(vars);
+	return m.code.Run(mp, vars);
 }
 
-double FEScriptedBehavior::Value(const std::vector<double>& vars)
+double FEScriptedBehavior::Value(const FEMaterialPoint& mp, const std::vector<double>& vars)
 {
-	return m.code.Run(vars);
+	return m.code.Run(mp, vars);
 }
 
-FEValue FEScriptedBehavior::DerivValue(const std::vector<FEValue>& vars, int varIndex)
+FEValue FEScriptedBehavior::DerivValue(const FEMaterialPoint& mp, const std::vector<FEValue>& vars, int varIndex)
 {
 	if ((varIndex >= 0) && (varIndex < m.valDeriv.size()))
 	{
@@ -443,13 +460,13 @@ FEValue FEScriptedBehavior::DerivValue(const std::vector<FEValue>& vars, int var
 			}
 		}
 
-		FEValue dr = deriv_i.code.Run(vars);
+		FEValue dr = deriv_i.code.Run(mp, vars);
 		return dr;
 	}
 	return FEValue();
 }
 
-double FEScriptedBehavior::DerivValue(const std::vector<double>& vars, int varIndex)
+double FEScriptedBehavior::DerivValue(const FEMaterialPoint& mp, const std::vector<double>& vars, int varIndex)
 {
 	if ((varIndex >= 0) && (varIndex < m.valDeriv.size()))
 	{
@@ -460,7 +477,7 @@ double FEScriptedBehavior::DerivValue(const std::vector<double>& vars, int varIn
 			return 0.0;
 		}
 
-		double dr = deriv_i.code.Run(vars);
+		double dr = deriv_i.code.Run(mp, vars);
 		return dr;
 	}
 	return 0.0;

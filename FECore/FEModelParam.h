@@ -76,6 +76,8 @@ public:
 	FEParamDouble();
 	~FEParamDouble();
 
+	FEParamDouble(double v);
+
 	FEParamDouble(const FEParamDouble& p);
 
 	// set the value
@@ -113,6 +115,7 @@ class FECORE_API FEParamVec3 : public FEModelParam
 {
 public:
 	FEParamVec3();
+	FEParamVec3(vec3d v);
 	~FEParamVec3();
 
 	FEParamVec3(const FEParamVec3& p);
@@ -152,6 +155,7 @@ class FECORE_API FEParamMat3d : public FEModelParam
 {
 public:
 	FEParamMat3d();
+	FEParamMat3d(const mat3d& m);
 	~FEParamMat3d();
 
 	FEParamMat3d(const FEParamMat3d& p);

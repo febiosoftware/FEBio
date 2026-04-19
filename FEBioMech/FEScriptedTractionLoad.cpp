@@ -67,7 +67,7 @@ void FEScriptedTractionLoad::LoadVector(FEGlobalVector& R)
 		vars[2] = t;
 
 		// evaluate traction at this material point
-		vec3d t = Value(vars).v3;
+		vec3d t = Value(pt, vars).v3;
 
 		double H_u = dof_a.shape;
 
@@ -94,13 +94,13 @@ void FEScriptedTractionLoad::StiffnessMatrix(FELinearSystem& LS)
 		vars[2] = t;
 
 		// evaluate traction at this material point
-		vec3d t = -Value(vars).v3;
+		vec3d t = -Value(mp, vars).v3;
 
 		// evaluate traction gradient w.r.t. position
-		mat3d dtdx = -DerivValue(vars, 0).m3;
+		mat3d dtdx = -DerivValue(mp, vars, 0).m3;
 
 		// evaluate traction gradient w.r.t. normal
-		mat3d dtdn = -DerivValue(vars, 1).m3;
+		mat3d dtdn = -DerivValue(mp, vars, 1).m3;
 
 		double H_i = dof_a.shape;
 		double H_j = dof_b.shape;

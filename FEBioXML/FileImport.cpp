@@ -587,7 +587,11 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 {
 	FEParam* pp = nullptr;
 	const char* szparamName = (szparam == 0 ? tag.Name() : szparam);
-	if (tag == "add_param")
+
+	// Read a user-parameter. 
+	// Note that we don't process this tag when parseAttributes is false. This is a bit of a hack to get around
+	// an issue with reading valuators. 
+	if ((tag == "add_param") && parseAttributes)
 	{
 		// get the name and value
 		const char* szname = tag.AttributeValue("name");
@@ -602,7 +606,17 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		if ((sztype == nullptr) || strcmp(sztype, "double") == 0)
 		{
 			double v = 0.0; tag.value(v);
-			pp = pl.AddParameter(new double(v), FE_PARAM_DOUBLE, 1, strdup(szname));
+			pp = pl.AddParameter(new FEParamDouble(v), FE_PARAM_DOUBLE_MAPPED, 1, strdup(szname));
+		}
+		else if (strcmp(sztype, "vec3") == 0)
+		{
+			vec3d v(0, 0, 0); tag.value(v);
+			pp = pl.AddParameter(new FEParamVec3(v), FE_PARAM_VEC3D_MAPPED, 1, strdup(szname));
+		}
+		else if (strcmp(sztype, "mat3") == 0)
+		{
+			mat3d m; tag.value(m);
+			pp = pl.AddParameter(new FEParamMat3d(m), FE_PARAM_MAT3D_MAPPED, 1, strdup(szname));
 		}
 		else if (strcmp(sztype, "int") == 0)
 		{
