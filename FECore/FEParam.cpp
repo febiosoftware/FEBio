@@ -156,8 +156,14 @@ FEParam::~FEParam()
 	if (m_flag & FEParamFlag::FE_PARAM_USER)
 	{
 		free((void*)m_szname);
-		assert(m_type == FE_PARAM_DOUBLE);
-		delete (double*)m_pv;
+		switch (m_type)
+		{
+		case FE_PARAM_BOOL  : delete (bool*  )m_pv; break;
+		case FE_PARAM_INT   : delete (int*   )m_pv; break;
+		case FE_PARAM_DOUBLE: delete (double*)m_pv; break;
+		default:
+			assert(false);
+		}
 	}
 }
 

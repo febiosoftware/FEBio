@@ -590,7 +590,6 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 	if (tag == "add_param")
 	{
 		// get the name and value
-		double v = 0.0; tag.value(v);
 		const char* szname = tag.AttributeValue("name");
 
 		const char* sztype = tag.AttributeValue("data_type", true);
@@ -600,8 +599,26 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		if (pp) throw XMLReader::InvalidTag(tag);
 
 		// add a new user parameter
-		pp = pl.AddParameter(new double(v), FE_PARAM_DOUBLE, 1, strdup(szname));
-		pp->SetFlags(FEParamFlag::FE_PARAM_USER);
+		if ((sztype == nullptr) || strcmp(sztype, "double") == 0)
+		{
+			double v = 0.0; tag.value(v);
+			pp = pl.AddParameter(new double(v), FE_PARAM_DOUBLE, 1, strdup(szname));
+		}
+		else if (strcmp(sztype, "int") == 0)
+		{
+			int v = 0; tag.value(v);
+			pp = pl.AddParameter(new int(v), FE_PARAM_INT, 1, strdup(szname));
+		}
+		else if (strcmp(sztype, "bool") == 0)
+		{
+			bool v = false; tag.value(v);
+			pp = pl.AddParameter(new bool(v), FE_PARAM_BOOL, 1, strdup(szname));
+		}
+		else
+			throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
+
+		// add the user parameter flag
+		pp->SetFlags(pp->GetFlags() | FEParamFlag::FE_PARAM_USER);
 	}
 	else
 	{

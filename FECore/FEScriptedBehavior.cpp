@@ -154,7 +154,14 @@ public:
 					FEParam& pi = *it;
 					if (pi.GetFlags() & FEParamFlag::FE_PARAM_USER)
 					{
-						vm.setInput(pi.name(), pi.value<double>());
+						switch (pi.type())
+						{
+						case FEParamType::FE_PARAM_BOOL  : vm.setInput(pi.name(), pi.value<bool  >()); break;
+						case FEParamType::FE_PARAM_INT   : vm.setInput(pi.name(), pi.value<int   >()); break;
+						case FEParamType::FE_PARAM_DOUBLE: vm.setInput(pi.name(), pi.value<double>()); break;
+						default:
+							assert(false);
+						}
 					}
 				}
 			}
