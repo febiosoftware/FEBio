@@ -47,8 +47,8 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 			throw std::runtime_error("Expected ';' after input declaration.");
 		}
 
-		Var var{ name, {}, nullptr, true };
-		return std::make_unique<VarDeclStmt>(varType, var);
+		Var var{ name, {}, nullptr };
+		return std::make_unique<VarDeclStmt>(varType, var, true);
 	}
 	else if (isType())
 	{
@@ -1128,6 +1128,8 @@ static void prettyPrintExpressionStmt(std::ostream& os, const ExpressionStmt& st
 static void prettyPrintVarDeclStmt(std::ostream& os, const VarDeclStmt& stmt)
 {
 	size_t n = stmt.vars.size();
+	if (stmt.input)
+		os << "in ";
 	os << TypeToString(stmt.type) << " ";
 	for (size_t i = 0; i < n; ++i)
 	{

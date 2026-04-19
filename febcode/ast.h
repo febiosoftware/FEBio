@@ -143,22 +143,22 @@ namespace febcode {
 		std::string name;
 		std::vector<size_t> arraySizes; // empty if not an array
 		ExprPtr initializer; // can be null
-		bool input = false;
 	};
 
 	struct VarDeclStmt : Statement {
 		Type type = nullptr;
+		bool input = false; // declare input variables (treated as const, non-differentiable)
 		std::vector<Var> vars;
-		VarDeclStmt(Type type, const std::string& name, ExprPtr initializer) : type(type)
+		VarDeclStmt(Type type, const std::string& name, ExprPtr initializer, bool input = false) : type(type), input(input)
 		{
 			vars.push_back({ name, std::vector<size_t>(), std::move(initializer)});
 		}
-		VarDeclStmt(Type type, Var& var)
-			: type(type) { 
+		VarDeclStmt(Type type, Var& var, bool input = false)
+			: type(type), input(input) { 
 			vars.emplace_back(std::move(var));
 		}
-		VarDeclStmt(Type type, std::vector<Var>& vars)
-			: type(type), vars(std::move(vars)) {}
+		VarDeclStmt(Type type, std::vector<Var>& vars, bool input = false)
+			: type(type), input(input), vars(std::move(vars)) {}
 	};
 
 	struct ReturnStmt : Statement {

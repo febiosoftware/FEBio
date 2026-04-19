@@ -646,14 +646,14 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 			type = prg.types.getArrayType(baseType, var.arraySizes);
 		}
 
-		if (!var.input && var.initializer)
+		if (!decl->input && var.initializer)
 		{
 			Type initType = coerce(compileExpression(var.initializer.get()), type);
 		}
 
 		if (m_scopeDepth == 0)
 		{
-			if (var.input)
+			if (decl->input)
 				prg.addInput(var.name, type);
 			else
 			{

@@ -117,6 +117,13 @@ void Differentiator::diffStructStmt(BlockStmt& ast, StructStmt* stmt, const Deri
 
 void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const DerivVar& var)
 {
+	if (stmt->input)
+	{
+		// input variables are treated as constants with respect to differentiation, so we can just copy the variable declaration to the derivative AST without creating a derivative variable for it.
+		ast.addStatement(std::make_unique<VarDeclStmt>(stmt->type, stmt->vars, stmt->input));
+		return;
+	}
+
 	std::vector<Var> copyVars; // copy of the original variables for the derivative AST
 	std::vector<Var> newVars; // new variables for the derivatives in the derivative AST
 
@@ -135,7 +142,7 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const De
 		}
 
 		// copy the original variable declaration to the derivative AST
-		copyVars.push_back({ var_i.name, var_i.arraySizes, clone(var_i.initializer.get()), var_i.input });
+		copyVars.push_back({ var_i.name, var_i.arraySizes, clone(var_i.initializer.get())});
 
 		// store the type of this variable in the map for later use when creating derivative variables for it.
 		varTypes[var_i.name] = type;
@@ -143,9 +150,6 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const De
 		// No need to differentiate non-numeric types, since they don't contribute to the derivative. 
 		// We can just copy them to the derivative AST without creating a derivative variable for them.
 		if (type->kind == TypeKind::Bool || type->kind == TypeKind::Int) continue;
-
-		// also, no need to differentiate input variables, since they are treated as constants with respect to differentiation.
-		if (var_i.input) continue;
 
 		// create a new variable for the derivative of this variable
 		std::string derivName = "__d" + var_i.name + "_d" + var.name;
@@ -655,10 +659,13 @@ bool febcode::dependsOn(const Statement* stmt, const std::string& varName)
 	}
 	else if (auto varDeclStmt = dynamic_cast<const VarDeclStmt*>(stmt))
 	{
-		for (const auto& var : varDeclStmt->vars)
+		if (!varDeclStmt->input)
 		{
-			if (::dependsOn(var.initializer.get(), varName))
-				return true;
+			for (const auto& var : varDeclStmt->vars)
+			{
+				if (::dependsOn(var.initializer.get(), varName))
+					return true;
+			}
 		}
 		return false;
 	}
