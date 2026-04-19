@@ -1,6 +1,367 @@
 #include "simplifier.h"
 using namespace febcode;
 
+Simplifier::Simplifier(Program& prg) : Modifier(prg) 
+{
+	// --- constant folding rules ---
+	// integer constant folding
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression *a, *b;
+		int l, r;
+		if (isAdd(e, a, b) && isInt(a, l) && isInt(b, r)) return Literal(l + r);
+		if (isSub(e, a, b) && isInt(a, l) && isInt(b, r)) return Literal(l - r);
+		if (isMul(e, a, b) && isInt(a, l) && isInt(b, r)) return Literal(l * r);
+		if (isDiv(e, a, b) && isInt(a, l) && isInt(b, r)) return Literal(l / r);
+		if (isExp(e, a, b) && isInt(a, l) && isInt(b, r)) return Literal(static_cast<int>(std::pow(l, r)));
+		if (isNegate(e, a) && isInt(a, l)) return Literal(-l);
+
+		return nullptr;
+	});
+
+	// scalar constant folding
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		double l, r;
+		if (isAdd(e, a, b) && isScalar(a, l) && isScalar(b, r)) return Literal(l + r);
+		if (isSub(e, a, b) && isScalar(a, l) && isScalar(b, r)) return Literal(l - r);
+		if (isMul(e, a, b) && isScalar(a, l) && isScalar(b, r)) return Literal(l * r);
+		if (isExp(e, a, b) && isScalar(a, l) && isScalar(b, r)) return Literal(std::pow(l, r));
+		if (isDiv(e, a, b) && isScalar(a, l) && isScalar(b, r))
+		{
+			if (r == 0.0)
+				throw std::runtime_error("Division by zero in constant folding");
+			return Literal(l / r);
+		}
+		if (isNegate(e, a) && isDouble(a, l)) return Literal(-l);
+		return nullptr;
+	});
+
+	// vec2 constant folding for binary operations
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		
+		vec2 l, r;
+		if (isAdd(e, a, b) && isVec2(a, l) && isVec2(b, r)) return Literal(l + r);
+		if (isSub(e, a, b) && isVec2(a, l) && isVec2(b, r)) return Literal(l - r);
+		if (isMul(e, a, b) && isVec2(a, l) && isVec2(b, r)) return Literal(l * r);
+
+		double scalar;
+		if (isMul(e, a, b) && isVec2(a, l) && isScalar(b, scalar)) return Literal(l * scalar);
+		if (isDiv(e, a, b) && isVec2(a, l) && isScalar(b, scalar)) return Literal(l / scalar);
+
+		if (isMul(e, a, b) && isScalar(a, scalar) && isVec2(b, r)) return Literal(r * scalar);
+
+		return nullptr;
+	});
+
+	// vec3 constant folding for binary operations
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+
+		vec3 l, r;
+		if (isAdd(e, a, b) && isVec3(a, l) && isVec3(b, r)) return Literal(l + r);
+		if (isSub(e, a, b) && isVec3(a, l) && isVec3(b, r)) return Literal(l - r);
+		if (isMul(e, a, b) && isVec3(a, l) && isVec3(b, r)) return Literal(l * r);
+
+		double scalar;
+		if (isMul(e, a, b) && isVec3(a, l) && isScalar(b, scalar)) return Literal(l * scalar);
+		if (isDiv(e, a, b) && isVec3(a, l) && isScalar(b, scalar)) return Literal(l / scalar);
+
+		if (isMul(e, a, b) && isScalar(a, scalar) && isVec3(b, r)) return Literal(r * scalar);
+
+		return nullptr;
+	});
+
+	// mat2 constant folding for binary operations
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+
+		mat2 l, r;
+		if (isAdd(e, a, b) && isMat2(a, l) && isMat2(b, r)) return Literal(l + r);
+		if (isSub(e, a, b) && isMat2(a, l) && isMat2(b, r)) return Literal(l - r);
+		if (isMul(e, a, b) && isMat2(a, l) && isMat2(b, r)) return Literal(l * r);
+
+		double scalar;
+		if (isMul(e, a, b) && isMat2(a, l) && isScalar(b, scalar)) return Literal(l * scalar);
+		if (isDiv(e, a, b) && isMat2(a, l) && isScalar(b, scalar)) return Literal(l / scalar);
+		if (isMul(e, a, b) && isScalar(a, scalar) && isMat2(b, r)) return Literal(r * scalar);
+
+		vec2 v;
+		if (isMul(e, a, b) && isMat2(a, l) && isVec2(b, v)) return Literal(l * v);
+
+		return nullptr;
+	});
+
+	// mat3 constant folding for binary operations
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+
+		mat3 l, r;
+		if (isAdd(e, a, b) && isMat3(a, l) && isMat3(b, r)) return Literal(l + r);
+		if (isSub(e, a, b) && isMat3(a, l) && isMat3(b, r)) return Literal(l - r);
+		if (isMul(e, a, b) && isMat3(a, l) && isMat3(b, r)) return Literal(l * r);
+
+		double scalar;
+		if (isMul(e, a, b) && isMat3(a, l) && isScalar(b, scalar)) return Literal(l * scalar);
+		if (isDiv(e, a, b) && isMat3(a, l) && isScalar(b, scalar)) return Literal(l / scalar);
+		if (isMul(e, a, b) && isScalar(a, scalar) && isMat3(b, r)) return Literal(r * scalar);
+
+		vec3 v;
+		if (isMul(e, a, b) && isMat3(a, l) && isVec3(b, v)) return Literal(l * v);
+
+		return nullptr;
+	});
+
+	// function evaluation for built-in functions with constant arguments
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		if (auto call = dynamic_cast<const CallExpr*>(e))
+		{
+			std::vector<double> scalarArgs;
+			for (const auto& arg : call->arguments)
+			{
+				double value;
+				if (!isScalar(arg.get(), value)) return nullptr; // not all arguments are scalar constants
+				scalarArgs.push_back(value);
+			}
+			const std::string& fname = call->name;
+			if (scalarArgs.size() == 1)
+			{
+				// Make sure this list matches the built-in functions defined in the math module!
+				if (fname == "abs"  ) return Literal(std::abs  (scalarArgs[0]));
+				if (fname == "acos" ) return Literal(std::acos (scalarArgs[0]));
+				if (fname == "acosh") return Literal(std::acosh(scalarArgs[0]));
+				if (fname == "asin" ) return Literal(std::asin (scalarArgs[0]));
+				if (fname == "asinh") return Literal(std::asinh(scalarArgs[0]));
+				if (fname == "atan" ) return Literal(std::atan (scalarArgs[0]));
+				if (fname == "atanh") return Literal(std::atanh(scalarArgs[0]));
+				if (fname == "cos"  ) return Literal(std::cos  (scalarArgs[0]));
+				if (fname == "cosh" ) return Literal(std::cosh (scalarArgs[0]));
+				if (fname == "exp"  ) return Literal(std::exp  (scalarArgs[0]));
+				if (fname == "log"  ) return Literal(std::log  (scalarArgs[0]));
+				if (fname == "log10") return Literal(std::log10(scalarArgs[0]));
+				if (fname == "sin"  ) return Literal(std::sin  (scalarArgs[0]));
+				if (fname == "sinh" ) return Literal(std::sinh (scalarArgs[0]));
+				if (fname == "sqrt" ) return Literal(std::sqrt (scalarArgs[0]));
+				if (fname == "tan"  ) return Literal(std::tan  (scalarArgs[0]));
+				if (fname == "tanh" ) return Literal(std::tanh (scalarArgs[0]));
+			}
+		}
+		return nullptr;
+	});
+
+	// --- algebraic simplification rules ---
+	
+	// -0 = 0
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a;
+		if (isNegate(e, a) && isZero(a)) return Zero(e->valType); // -0 = 0
+		return nullptr;
+	});
+
+	// --x = x
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression *a, *b;
+		if (isNegate(e, a) && isNegate(a, b)) return simplify(b); // --x = x
+		return nullptr;
+	});
+	
+	// x +/- 0 = x
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression *a, *b;
+		if (isAdd(e, a, b))
+		{
+			if (isZero(a)) return simplify(b); // 0 + x = x
+			if (isZero(b)) return simplify(a); // x + 0 = x
+		}
+		if (isSub(e, a, b))
+		{
+			if (isZero(a)) return simplify(Negate(b)); // 0 - x = -x
+			if (isZero(b)) return simplify(a); // x - 0 = x
+		}
+		return nullptr;
+	});
+
+	// a + (-b) = a - b, a - (-b) = a + b
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression *a, *n, *b;
+		if (isAdd(e, a, n) && isNegate(n, b))
+		{
+			 return simplify(Binary(BinaryOp::Minus, simplify(a), simplify(b))); // a + (-b) = a - b
+		}
+		if (isSub(e, a, n) && isNegate(n, b))
+		{
+			return simplify(Binary(BinaryOp::Plus, simplify(a), simplify(b))); // a - (-b) = a + b
+		}
+		return nullptr;
+	});
+
+	// x * 0 = 0
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression *a, *b;
+		if (isMul(e, a, b))
+		{
+			if (isZero(a)) return Zero(e->valType); // 0 * x = 0
+			if (isZero(b)) return Zero(e->valType); // x * 0 = 0
+		}
+		return nullptr;
+		});
+
+	// x * 1 = x
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression *a, *b;
+		if (isMul(e, a, b))
+		{
+			if (isOne(a)) return simplify(b); // 1 * x = x
+			if (isOne(b)) return simplify(a); // x * 1 = x
+		}
+		return nullptr;
+	});
+
+	// x / 1 = x
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isDiv(e, a, b))
+		{
+			if (isOne(b)) return simplify(a); // x / 1 = x
+		}
+		return nullptr;
+	});
+
+	// 0 / x = 0
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isDiv(e, a, b))
+		{
+			if (isZero(a) && !isZero(b)) return Zero(e->valType); // 0 / x = 0
+		}
+		return nullptr;
+	});
+
+	// x / 0 --> throws
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isDiv(e, a, b))
+		{
+			if (!isZero(a) && isZero(b)) throw std::runtime_error("Division by zero in algebraic simplification");
+		}
+		return nullptr;
+	});
+
+	// x ^ 1 = x, x ^ 0 = 1
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isExp(e, a, b))
+		{
+			if (isOne(b)) return simplify(a); // x ^ 1 = x
+
+			double l, r;
+			if (isScalar(a, l) && isScalar(b, r))
+			{
+				if ((l != 0.0) && (r == 0.0)) return Literal(1.0); // x ^ 0 = 1
+				if ((l == 1.0) && (r != 0.0)) return Literal(1.0); // 1 ^ x = 1
+			} 
+		}
+		return nullptr;
+	});
+
+	// I * x = x, x * I = x
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isMul(e, a, b))
+		{
+			if (isIdentity(a) && isVector(b)) return simplify(b); // I * x = x
+			if (isIdentity(a) && isMatrix(b)) return simplify(b); // I * x = x
+			if (isIdentity(b) && isMatrix(a)) return simplify(a); // x * I = x
+		}
+		return nullptr;
+	});
+
+	// a op a
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isAdd(e, a, b) && isEqual(a, b)) return simplify(Binary(BinaryOp::Multiply, Literal(2), simplify(a))); // a + a = 2 * a
+		if (isSub(e, a, b) && isEqual(a, b)) return Zero(e->valType); // a - a = 0
+		if (isMul(e, a, b) && isEqual(a, b) && isScalar(a)) return simplify(Binary(BinaryOp::Exponent, simplify(a), Literal(2))); // a * a = a ^ 2
+		if (isDiv(e, a, b) && isEqual(a, b) && isScalar(a)) return Literal(1.0); // a / a = 1
+		return nullptr;
+	});
+
+	// --- rules for built-in functions ---
+	// dot(0,x) = 0
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		const Expression* a, * b;
+		if (isCall2(e, "dot", a, b) && (isZero(a) || isZero(b))) return Literal(0.0);
+		return nullptr;
+	});
+
+	// length(0) = 0
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		const Expression* arg;
+		if (isCall1(e, "length", arg) && isZero(arg)) return Literal(0.0);
+		return nullptr;
+	});
+
+	// outer(0,x) = 0
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		const Expression* a, * b;
+		if (isCall2(e, "outer", a, b) && (isZero(a) || isZero(b))) return Zero(e->valType);
+		return nullptr;
+	});
+
+	// cross(0,x) = 0
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		const Expression* a, * b;
+		if (isCall2(e, "cross", a, b) && (isZero(a) || isZero(b))) return Zero(e->valType);
+		return nullptr;
+	});
+
+	// transpose(transpose(x)) = x
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		const Expression* arg;
+		if (isCall1(e, "transpose", arg) && isCall1(arg, "transpose", arg))
+		{
+			return simplify(arg);
+		}
+		return nullptr;
+	});
+
+	// transpose(symmetric) = symmetric
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		const Expression* arg;
+		if (isCall1(e, "transpose", arg) && isSymmetric(arg))
+		{
+			return simplify(arg);
+		}
+		return nullptr;
+	});
+
+	// --- rules for moving towards canonical forms ---
+	// scalar * (scalar * x) = (scalar * scalar) * x
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression *a, *m, *b, *c;
+		double l, r;
+		if (isMul(e, a, m) && isScalar(a, l) && isMul(m, b, c) && isScalar(b, r))
+		{
+			return simplify(Mul(Literal(l * r).get(), c));
+		}
+		if (isMul(e, a, m) && isScalar(a, l) && isMul(m, b, c) && isScalar(c, r))
+		{
+			return simplify(Mul(Literal(l * r).get(), b));
+		}
+		return nullptr;
+	});
+}
+
+ExprPtr Simplifier::applyRules(const Expression* expr)
+{
+	for (const auto& rule : rules)
+	{
+		if (auto result = rule(expr))
+			return result;
+	}
+	return nullptr;
+}
+
 ExprPtr Simplifier::simplify(const Expression* expr)
 {
 	if (auto ctor   = dynamic_cast<const ConstructorExpr*>(expr)) return simplifyConstructor(ctor  );
@@ -8,7 +369,8 @@ ExprPtr Simplifier::simplify(const Expression* expr)
 	if (auto init   = dynamic_cast<const InitExpr*       >(expr)) return simplifyInitializer(init  );
 	if (auto call   = dynamic_cast<const CallExpr*       >(expr)) return simplifyCall       (call  );
 	if (auto binary = dynamic_cast<const BinaryExpr*     >(expr)) return simplifyBinary     (binary);
-	return copy_expression(expr);
+	if (auto assign = dynamic_cast<const AssignExpr*     >(expr)) return simplifyAssign     (assign);
+	return clone(expr);
 }
 
 ExprPtr Simplifier::simplifyConstructor(const ConstructorExpr* ctor)
@@ -52,35 +414,13 @@ ExprPtr Simplifier::simplifyConstructor(const ConstructorExpr* ctor)
 
 ExprPtr Simplifier::simplifyUnary(const UnaryExpr* unary)
 {
-	if (unary->op == UnaryOp::Negate)
+	auto simplifiedRight = simplify(unary->right.get());
+	ExprPtr tmp = Unary(unary->op, simplifiedRight);
+	if (auto result = applyRules(tmp.get()))
 	{
-		auto simplifiedRight = simplify(unary->right.get());
-
-		// -0 = 0
-		if (isZero(simplifiedRight)) {
-			return simplifiedRight;
-		}
-
-		// absorb negative signs in number
-		if (auto lit = dynamic_cast<LiteralExpr*>(simplifiedRight.get()))
-		{
-			const Value& v = lit->value;
-			if (isInt(v)) return Literal(-getInt(v));
-			if (isDouble(v)) return Literal(-getDouble(v));
-		}
-		else if (auto innerUnary = dynamic_cast<const UnaryExpr*>(simplifiedRight.get()))
-		{
-			if (innerUnary->op == UnaryOp::Negate)
-			{
-				// --x --> x
-				return simplify(innerUnary->right.get());
-			}
-		}
-
-		return Negate(simplifiedRight);
+		return result;
 	}
-
-	return copy_expression(unary);
+	return std::move(tmp);
 }
 
 ExprPtr Simplifier::simplifyInitializer(const InitExpr* init)
@@ -101,70 +441,13 @@ ExprPtr Simplifier::simplifyCall(const CallExpr* call)
 		simplifiedArgs.push_back(simplify(arg.get()));
 	}
 
-	// handle some special cases for built-in functions
-	std::string fncName = call->name;
-	if ((fncName == "outer") && (simplifiedArgs.size() == 2))
+	ExprPtr tmp = Call(call->name, simplifiedArgs);
+	if (auto result = applyRules(tmp.get()))
 	{
-		auto& le = simplifiedArgs[0];
-		auto& re = simplifiedArgs[1];
-
-		if (isLiteral(le) && isZero(le))
-		{
-			Value lv = dynamic_cast<LiteralExpr*>(le.get())->value;
-			if      (isVec2(lv)) return Literal(mat2(0.0));
-			else if (isVec3(lv)) return Literal(mat3(0.0));
-		}
-
-		if (isLiteral(re) && isZero(re))
-		{
-			Value rv = dynamic_cast<LiteralExpr*>(re.get())->value;
-			if      (isVec2(rv)) return Literal(mat2(0.0));
-			else if (isVec3(rv)) return Literal(mat3(0.0));
-		}
-	}
-	if ((fncName == "cross") && (simplifiedArgs.size() == 2))
-	{
-		auto& le = simplifiedArgs[0];
-		auto& re = simplifiedArgs[1];
-
-		if (isLiteral(le) && isZero(le))
-		{
-			return Literal(vec3(0.0, 0.0, 0.0));
-		}
-
-		if (isLiteral(re) && isZero(re))
-		{
-			return Literal(vec3(0.0, 0.0, 0.0));
-		}
-	}
-	if ((fncName == "dot") && (simplifiedArgs.size() == 2))
-	{
-		auto& le = simplifiedArgs[0];
-		auto& re = simplifiedArgs[1];
-
-		if (isZero(le) || isZero(re))
-		{
-			return Literal(0.0);
-		}
-	}
-	if ((fncName == "transpose") && (simplifiedArgs.size() == 1))
-	{
-		auto& e = simplifiedArgs[0];
-		if (isLiteral(e))
-		{
-			Value v = dynamic_cast<LiteralExpr*>(e.get())->value;
-			if (isMat2(v))
-			{
-				if (isSymmetric(v.mat2Value)) return Literal(v.mat2Value);
-			}
-			else if (isMat3(v))
-			{
-				if (isSymmetric(v.mat3Value)) return Literal(v.mat3Value);
-			}
-		}
+		return result;
 	}
 
-	return Call(fncName, std::move(simplifiedArgs));
+	return std::move(tmp);
 }
 
 ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
@@ -172,315 +455,25 @@ ExprPtr Simplifier::simplifyBinary(const BinaryExpr* binary)
 	auto l = simplify(binary->left.get());
 	auto r = simplify(binary->right.get());
 
-	// for scalar operations, we can compute the result here
-	if (isScalar(l) && isScalar(r))
+	ExprPtr tmp = Binary(binary->op, l, r);
+	if (auto result = applyRules(tmp.get()))
 	{
-		Value lv = dynamic_cast<LiteralExpr*>(l.get())->value;
-		Value rv = dynamic_cast<LiteralExpr*>(r.get())->value;
-
-		if (isInt(lv) && isInt(rv))
-		{
-			int a = getInt(lv);
-			int b = getInt(rv);
-
-			switch (binary->op)
-			{
-			case BinaryOp::Plus    : return Literal(a + b);
-			case BinaryOp::Minus   : return Literal(a - b);
-			case BinaryOp::Multiply: return Literal(a * b);
-			case BinaryOp::Divide  : return Literal(a / b);
-			case BinaryOp::Exponent: return Literal(static_cast<int>(std::pow(a, b)));
-			}
-		}
-		else
-		{
-			double a = (isInt(lv) ? static_cast<double>(getInt(lv)) : getDouble(lv));
-			double b = (isInt(rv) ? static_cast<double>(getInt(rv)) : getDouble(rv));
-
-			switch (binary->op)
-			{
-			case BinaryOp::Plus    : return Literal(a + b);
-			case BinaryOp::Minus   : return Literal(a - b);
-			case BinaryOp::Multiply: return Literal(a * b);
-			case BinaryOp::Divide  : return Literal(a / b);
-			case BinaryOp::Exponent: return Literal(std::pow(a, b));
-			}
-		}
+		return result;
 	}
 
-	// plus/minus apply to all types, so we can simplify them even if we don't know the exact type of the operands
-	if (binary->op == BinaryOp::Plus)
+	return std::move(tmp);
+}
+
+ExprPtr Simplifier::simplifyAssign(const AssignExpr* assign)
+{
+	auto l = simplify(assign->target.get());
+	auto r = simplify(assign->value.get());
+
+	ExprPtr tmp = Assign(l, r);
+	if (auto result = applyRules(tmp.get()))
 	{
-		if (isZero(l)) return r; // 0 + r = r
-		if (isZero(r)) return l; // l + 0 = l
+		return result;
 	}
 
-	if (binary->op == BinaryOp::Minus)
-	{
-		if (isZero(l)) return simplify(Negate(r)); // 0 - r = -r
-		if (isZero(r)) return  l; // l - 0 = l
-	}
-
-	// if only left operand is a scalar and it's zero or one
-	if (isLiteral(l))
-	{
-		Value lv = dynamic_cast<LiteralExpr*>(l.get())->value;
-		if (isInt(lv) || isDouble(lv))
-		{
-			if (isZero(lv))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: return Literal(0.0); // 0 * r = 0
-				case BinaryOp::Divide: return Literal(0.0); // 0 / r = 0
-				}
-			}
-
-			if (isOne(lv))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: return r; // 1 * r = r
-				case BinaryOp::Exponent: return Literal(1.0); // 1 ^ r = 1
-				}
-			}
-
-			if ((binary->op == BinaryOp::Multiply) && isBinary(r))
-			{
-				auto rbin = dynamic_cast<BinaryExpr*>(r.get());
-				if (rbin->op == BinaryOp::Multiply)
-				{
-					auto a = simplify(rbin->left);
-					auto b = simplify(rbin->right);
-
-					if (isScalar(a))
-					{
-						ExprPtr newLeft = simplify(Binary(BinaryOp::Multiply, l, a)); // l * a
-						return simplify(Binary(BinaryOp::Multiply, newLeft, b)); // l * (a * b) --> (l * a) * b
-					}
-				}
-			}
-		}
-
-		if (isVec2(lv))
-		{
-			vec2 v = getVec2(lv);
-			if (isZero(v) && r->valType)
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply:
-				{
-					if (isScalarType(r->valType))
-						return Literal(vec2(0.0, 0.0)); // vec2(0) * scalar = vec2(0)
-					if (r->valType->kind == TypeKind::Vec2)
-						return Literal(0.0); // vec2(0) * vec2 = 0
-				}
-				break;
-				}
-			}
-		}
-
-		if (isVec3(lv))
-		{
-			vec3 v = getVec3(lv);
-			if (isZero(v))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply:
-					if (isScalarType(r->valType))
-						return Literal(vec3()); // vec3(0) * scalar = vec3(0)
-					if (r->valType->kind == TypeKind::Vec3)
-						return Literal(0.0); // vec3(0) * vec3 = 0
-					break;
-				case BinaryOp::Divide:
-					if (isScalarType(r->valType))
-						return Literal(vec3()); // vec3(0) / scalar = vec3(0)
-					break;
-				}
-			}
-		}
-
-		if (isMat2(lv))
-		{
-			mat2 m = getMat2(lv);
-			if (isIdentity(m))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: return r; // I * r = r
-				}
-			}
-		}
-
-		if (isMat3(lv))
-		{
-			mat3 m = getMat3(lv);
-			if (isIdentity(m) && 
-				((r->valType->kind == TypeKind::Mat3) || (r->valType->kind == TypeKind::Vec3)))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: return r; // I * r = r
-				}
-			}
-			if (isZero(m) && (binary->op == BinaryOp::Multiply))
-			{
-				if      (isScalarType(r->valType)) return Literal(mat3()); // mat3(0) * scalar = mat3(0)
-				else if (isVec3Type  (r->valType)) return Literal(vec3()); // mat3(0) * vec3 = vec3(0)
-				else if (isMat3Type  (r->valType)) return Literal(mat3()); // mat3(0) * mat3 = mat3(0)
-			}
-			if (isZero(m) && (binary->op == BinaryOp::Divide))
-			{
-				if (isScalarType(r->valType) && !isZero(r)) return Literal(mat3()); // mat3(0) / scalar = mat3(0)
-			}
-		}
-	}
-
-	// if only right operand is a scalar and it's zero or one
-	if (isLiteral(r))
-	{
-		Value rv = dynamic_cast<LiteralExpr*>(r.get())->value;
-		if (isInt(rv) || isDouble(rv))
-		{
-			if (isZero(rv))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Plus: return l; // l + 0 = l
-				case BinaryOp::Minus: return l; // l - 0 = l
-				case BinaryOp::Multiply: return Literal(0.0); // l * 0 = 0
-				case BinaryOp::Divide: // l / 0 --> no can do!
-					throw std::runtime_error("Division by zero in evaluation of derivative!");
-				case BinaryOp::Exponent: return Literal(1.0); // l ^ 0 = 1
-				}
-			}
-
-			if (isOne(rv))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: return l; // l * 1 = l
-				case BinaryOp::Divide: return l; // l / 1 = l
-				case BinaryOp::Exponent: return l; // l ^ 1 = l
-				}
-			}
-
-			if (isInt(rv) && (getInt(rv) < 0))
-			{
-				if (binary->op == BinaryOp::Plus)
-				{
-					return simplify(Binary(BinaryOp::Minus, l, Literal(-getInt(rv))));
-				}
-				if (binary->op == BinaryOp::Minus)
-				{
-					return simplify(Binary(BinaryOp::Plus, l, Literal(-getInt(rv))));
-				}
-			}
-
-			if (isDouble(rv) && (getDouble(rv) < 0))
-			{
-				if (binary->op == BinaryOp::Plus)
-				{
-					return simplify(Binary(BinaryOp::Minus, l, Literal(-getDouble(rv))));
-				}
-				if (binary->op == BinaryOp::Minus)
-				{
-					return simplify(Binary(BinaryOp::Plus, l, Literal(-getDouble(rv))));
-				}
-			}
-
-			if (binary->op == BinaryOp::Multiply)
-			{
-				// move literal to the left for better chances of simplification
-				return simplify(Binary(BinaryOp::Multiply, r, l));
-			}
-		}
-
-		if (isVec3(rv))
-		{
-			vec3 v = getVec3(rv);
-			if (isZero(v))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply:
-					if (isScalarType(l->valType))
-						return Literal(vec3(0.0, 0.0, 0.0)); // scalar * vec3(0) = vec3(0)
-					if (l->valType->kind == TypeKind::Vec3)
-						return Literal(0.0); // vec3 * vec3(0) = 0
-				}
-			}
-		}
-
-		if (isMat2(rv))
-		{
-			mat2 m = getMat2(rv);
-			if (isZero(m))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: // l*0 = 0
-				{
-					// we need the signature for this operation to determine the result type
-					BinaryOpSignature sig = prg.resolveBinaryOp(binary->op, l->valType, r->valType);
-					return Zero(sig.resultType);
-				}
-				}
-			}
-			if (isIdentity(m))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: return l; // l * I = l
-				}
-			}
-		}
-
-		if (isMat3(rv))
-		{
-			mat3 m = getMat3(rv);
-			if (isZero(m))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: return Zero(r->valType); // l * mat3(0) = mat3(0)
-				}
-			}
-			if (isIdentity(m) && (l->valType->kind == TypeKind::Mat3))
-			{
-				switch (binary->op)
-				{
-				case BinaryOp::Multiply: return l; // l * I = l
-				}
-			}
-		}
-	}
-
-	// if left and right are the same, we can simplify
-	if (febcode::isEqual(l, r))
-	{
-		if (binary->op == BinaryOp::Plus    ) return simplify(Binary(BinaryOp::Multiply, Literal(2.0), l));
-		if (binary->op == BinaryOp::Minus   ) return Zero(l->valType);
-		if ((binary->op == BinaryOp::Multiply) && isScalarType(l->valType)) return Binary(BinaryOp::Exponent, l, Literal(2.0));
-	}
-
-	if (isNegation(r))
-	{
-		if (binary->op == BinaryOp::Plus)
-		{
-			// a + (-b) --> a - b
-			auto neg = dynamic_cast<UnaryExpr*>(r.get());
-			return simplify(Binary(BinaryOp::Minus, l, neg->right));
-		}
-		if (binary->op == BinaryOp::Minus)
-		{
-			// a - (-b) --> a + b
-			auto neg = dynamic_cast<UnaryExpr*>(r.get());
-			return simplify(Binary(BinaryOp::Plus, l, neg->right));
-		}
-	}
-
-	return Binary(binary->op, l, r);
+	return std::move(tmp);
 }

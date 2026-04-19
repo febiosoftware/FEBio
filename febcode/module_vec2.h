@@ -6,6 +6,9 @@ namespace febcode
 	// double = dot(vec2)
 	Value DotVec2(FuncArgs args);
 
+	// double = length(vec2)
+	Value LengthVec2(FuncArgs args);
+
 	// normalized = Normalize(vec2)
 	Value NormalizeVec2(FuncArgs);
 
@@ -33,7 +36,8 @@ namespace febcode
 			prg.binaryOps[BinaryOp::EqualEqual].push_back({ vec2Type, vec2Type, bool_t });
 			prg.binaryOps[BinaryOp::NotEqual  ].push_back({ vec2Type, vec2Type, bool_t });
 
-			prg.registerNative("dot"      , vec2Type, { vec2Type }, DotVec2);
+			prg.registerNative("dot"      , doubleType, { vec2Type, vec2Type }, DotVec2);
+			prg.registerNative("length"   , doubleType, { vec2Type }, LengthVec2);
 			prg.registerNative("normalize", vec2Type, { vec2Type }, NormalizeVec2);
 			prg.registerNative("outer"    , mat2Type, { vec2Type, vec2Type }, OuterVec2);
 		}

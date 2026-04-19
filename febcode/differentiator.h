@@ -60,7 +60,7 @@ namespace febcode {
 			if (doSimplify)
 				return simplifier.simplify(expr); 
 			else
-				return copy_expression(expr);
+				return clone(expr);
 		}
 		ExprPtr simplify(const ExprPtr& expr) { return simplify(expr.get()); }
 

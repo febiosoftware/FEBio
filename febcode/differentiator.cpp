@@ -135,7 +135,7 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const De
 		}
 
 		// copy the original variable declaration to the derivative AST
-		copyVars.push_back({ var_i.name, var_i.arraySizes, copy_expression(var_i.initializer.get()), var_i.input });
+		copyVars.push_back({ var_i.name, var_i.arraySizes, clone(var_i.initializer.get()), var_i.input });
 
 		// store the type of this variable in the map for later use when creating derivative variables for it.
 		varTypes[var_i.name] = type;
@@ -198,7 +198,7 @@ void Differentiator::diffIfStmt(BlockStmt& ast, IfStmt* stmt, const DerivVar& va
 {
 	// copy the condition
 	auto newIf = std::make_unique<IfStmt>();
-	newIf->condition = std::move(copy_expression(stmt->condition.get()));
+	newIf->condition = std::move(clone(stmt->condition.get()));
 
 	// differentiate the then branch
 	std::unique_ptr<BlockStmt> thenStmt = std::make_unique<BlockStmt>();
@@ -379,7 +379,7 @@ std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary,
 					if (isIntNumber(e))
 					{
 						double p = (double)toIntNumber(e);
-						if (p == 1) return copy_expression(dleft.get());
+						if (p == 1) return clone(dleft.get());
 						else if (p != 0)
 						{
 							return Mul(Mul(Literal(p), Pow(left, Literal(p - 1.0))), dleft); // d(x^p) = p * x^(p-1)*dx
@@ -549,7 +549,7 @@ std::unique_ptr<Expression> Differentiator::diffAssign(const AssignExpr* assign,
 	// if the left is zero, that meants that it did not depend on the variable.
 	// In that case, we just copy the original expression, since it doesn't contribute to the derivative.
 	if (isZero(du))
-		return copy_expression(assign);
+		return clone(assign);
 
 	return Assign(du, dv);
 }

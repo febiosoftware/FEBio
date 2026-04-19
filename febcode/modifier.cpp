@@ -7,7 +7,7 @@ ExprPtr Modifier::Call(const std::string& name, const std::vector<ExprPtr>& args
 	std::vector<Type> argTypes;
 	for (const auto& arg : args)
 	{
-		copyArgs.emplace_back(copy_expression(arg.get()));
+		copyArgs.emplace_back(clone(arg.get()));
 		argTypes.push_back(arg->valType);
 	}
 
@@ -29,7 +29,7 @@ ExprPtr Modifier::Index(const ExprPtr& object, const ExprPtr& index)
 	if (object->valType && object->valType->kind == TypeKind::Array)
 	{
 		Type elementType = object->valType->elementType;
-		ExprPtr i = std::make_unique<IndexExpr>(copy_expression(object.get()), copy_expression(index.get()));
+		ExprPtr i = std::make_unique<IndexExpr>(clone(object.get()), clone(index.get()));
 		i->valType = elementType;
 		return i;
 	}
@@ -48,7 +48,7 @@ ExprPtr Modifier::Member(const ExprPtr& object, const std::string& property)
 		if (it != fields.end())
 		{
 			Type fieldType = it->first;
-			ExprPtr m = std::make_unique<MemberExpr>(copy_expression(object.get()), property);
+			ExprPtr m = std::make_unique<MemberExpr>(clone(object.get()), property);
 			m->valType = fieldType;
 			return m;
 		}
@@ -62,7 +62,7 @@ ExprPtr Modifier::Member(const ExprPtr& object, const std::string& property)
 		if (property == "x" || property == "y")
 		{
 			Type fieldType = prg.types.Double();
-			ExprPtr m = std::make_unique<MemberExpr>(copy_expression(object.get()), property);
+			ExprPtr m = std::make_unique<MemberExpr>(clone(object.get()), property);
 			m->valType = fieldType;
 			return m;
 		}
@@ -76,7 +76,7 @@ ExprPtr Modifier::Member(const ExprPtr& object, const std::string& property)
 		if (property == "x" || property == "y" || property == "z")
 		{
 			Type fieldType = prg.types.Double();
-			ExprPtr m = std::make_unique<MemberExpr>(copy_expression(object.get()), property);
+			ExprPtr m = std::make_unique<MemberExpr>(clone(object.get()), property);
 			m->valType = fieldType;
 			return m;
 		}
@@ -146,11 +146,18 @@ ExprPtr Modifier::Zero(Type type)
 	}
 }
 
-ExprPtr Modifier::Binary(BinaryOp op, const ExprPtr& left, const ExprPtr& right)
+ExprPtr Modifier::Unary(UnaryOp op, const Expression* arg)
+{
+	ExprPtr u = std::make_unique<UnaryExpr>(op, clone(arg));
+	u->valType = arg->valType;
+	return u;
+}
+
+ExprPtr Modifier::Binary(BinaryOp op, const Expression* left, const Expression* right)
 {
 	// get the signature for this operator and operand types (this throws if the operator is not defined for these types)
 	BinaryOpSignature sig = prg.resolveBinaryOp(op, left->valType, right->valType);
-	ExprPtr b = std::make_unique<BinaryExpr>(std::move(copy_expression(left.get())), op, std::move(copy_expression(right.get())));
+	ExprPtr b = std::make_unique<BinaryExpr>(std::move(clone(left)), op, std::move(clone(right)));
 	b->valType = sig.resultType;
 	return b;
 }

@@ -11,10 +11,17 @@ Value febcode::DotVec2(FuncArgs args)
 	return a*b;
 }
 
+Value febcode::LengthVec2(FuncArgs args)
+{
+	assert(args.count == 1);
+	const vec2& a = args.getVec2();
+	return std::sqrt(a.x*a.x + a.y*a.y);
+}
+
 Value febcode::NormalizeVec2(FuncArgs args)
 {
 	assert(args.count == 1);
-	const vec2& a = getVec2(args.getDouble());
+	const vec2& a = args.getVec2();
 
 	double x = a.x;
 	double y = a.y;

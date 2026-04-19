@@ -5,7 +5,7 @@
 
 using namespace febcode;
 
-ExprPtr febcode::copy_expression(const Expression* expr)
+ExprPtr febcode::clone(const Expression* expr)
 {
 	ExprPtr cpy;
 
@@ -16,17 +16,17 @@ ExprPtr febcode::copy_expression(const Expression* expr)
 		cpy = std::make_unique<VariableExpr>(variable->name);
 	}
 	else if (auto unary = dynamic_cast<const UnaryExpr*>(expr)) {
-		cpy = std::make_unique<UnaryExpr>(unary->op, copy_expression(unary->right.get()));
+		cpy = std::make_unique<UnaryExpr>(unary->op, clone(unary->right.get()));
 	}
 	else if (auto binary = dynamic_cast<const BinaryExpr*>(expr)) {
-		cpy = std::make_unique<BinaryExpr>(copy_expression(binary->left.get()), binary->op, copy_expression(binary->right.get()));
+		cpy = std::make_unique<BinaryExpr>(clone(binary->left.get()), binary->op, clone(binary->right.get()));
 	}
 	else if (auto call = dynamic_cast<const CallExpr*>(expr))
 	{
 		std::vector<ExprPtr> copyArgs;
 		for (auto& arg : call->arguments)
 		{
-			copyArgs.emplace_back(copy_expression(arg.get()));
+			copyArgs.emplace_back(clone(arg.get()));
 		}
 		cpy = std::make_unique<CallExpr>(call->name, std::move(copyArgs));
 	}
@@ -35,7 +35,7 @@ ExprPtr febcode::copy_expression(const Expression* expr)
 		std::vector<ExprPtr> copyArgs;
 		for (auto& arg : call->elements)
 		{
-			copyArgs.emplace_back(copy_expression(arg.get()));
+			copyArgs.emplace_back(clone(arg.get()));
 		}
 		cpy = std::make_unique<InitExpr>(std::move(copyArgs));
 	}
@@ -44,21 +44,21 @@ ExprPtr febcode::copy_expression(const Expression* expr)
 		std::vector<ExprPtr> copyArgs;
 		for (auto& arg : constructor->args)
 		{
-			copyArgs.emplace_back(copy_expression(arg.get()));
+			copyArgs.emplace_back(clone(arg.get()));
 		}
 		cpy = std::make_unique<ConstructorExpr>(constructor->valType, std::move(copyArgs));
 	}
 	else if (auto assign = dynamic_cast<const AssignExpr*>(expr))
 	{
-		cpy = std::make_unique<AssignExpr>(copy_expression(assign->target.get()), copy_expression(assign->value.get()));
+		cpy = std::make_unique<AssignExpr>(clone(assign->target.get()), clone(assign->value.get()));
 	}
 	else if (auto member = dynamic_cast<const MemberExpr*>(expr))
 	{
-		cpy = std::make_unique<MemberExpr>(copy_expression(member->object.get()), member->property);
+		cpy = std::make_unique<MemberExpr>(clone(member->object.get()), member->property);
 	}
 	else if (auto index = dynamic_cast<const IndexExpr*>(expr))
 	{
-		cpy = std::make_unique<IndexExpr>(copy_expression(index->object.get()), copy_expression(index->index.get()));
+		cpy = std::make_unique<IndexExpr>(clone(index->object.get()), clone(index->index.get()));
 	}
 	else
 	{
@@ -73,66 +73,71 @@ ExprPtr febcode::copy_expression(const Expression* expr)
 
 bool febcode::isEqual(const ExprPtr& l, const ExprPtr& r)
 {
+	return isEqual(l.get(), r.get());
+}
+
+bool febcode::isEqual(const Expression* l, const Expression* r)
+{
 	if (!l && !r) return true;
 	if (!l || !r) return false;
 
-	if (auto litL = dynamic_cast<LiteralExpr*>(l.get()))
+	if (auto litL = dynamic_cast<const LiteralExpr*>(l))
 	{
-		if (auto litR = dynamic_cast<LiteralExpr*>(r.get()))
+		if (auto litR = dynamic_cast<const LiteralExpr*>(r))
 		{
 			return litL->value == litR->value;
 		}
 	}
-	else if (auto varL = dynamic_cast<VariableExpr*>(l.get()))
+	else if (auto varL = dynamic_cast<const VariableExpr*>(l))
 	{
-		if (auto varR = dynamic_cast<VariableExpr*>(r.get()))
+		if (auto varR = dynamic_cast<const VariableExpr*>(r))
 		{
 			return varL->name == varR->name;
 		}
 	}
-	else if (auto binL = dynamic_cast<BinaryExpr*>(l.get()))
+	else if (auto binL = dynamic_cast<const BinaryExpr*>(l))
 	{
-		if (auto binR = dynamic_cast<BinaryExpr*>(r.get()))
+		if (auto binR = dynamic_cast<const BinaryExpr*>(r))
 		{
 			return binL->op == binR->op &&
 				isEqual(binL->left, binR->left) &&
 				isEqual(binL->right, binR->right);
 		}
 	}
-	else if (auto unL = dynamic_cast<UnaryExpr*>(l.get()))
+	else if (auto unL = dynamic_cast<const UnaryExpr*>(l))
 	{
-		if (auto unR = dynamic_cast<UnaryExpr*>(r.get()))
+		if (auto unR = dynamic_cast<const UnaryExpr*>(r))
 		{
 			return unL->op == unR->op &&
 				isEqual(unL->right, unR->right);
 		}
 	}
-	else if (auto memberL = dynamic_cast<MemberExpr*>(l.get()))
+	else if (auto memberL = dynamic_cast<const MemberExpr*>(l))
 	{
-		if (auto memberR = dynamic_cast<MemberExpr*>(r.get()))
+		if (auto memberR = dynamic_cast<const MemberExpr*>(r))
 		{
 			return isEqual(memberL->object, memberR->object) &&
 				memberL->property == memberR->property;
 		}
 	}
-	else if (auto indexL = dynamic_cast<IndexExpr*>(l.get()))
+	else if (auto indexL = dynamic_cast<const IndexExpr*>(l))
 	{
-		if (auto indexR = dynamic_cast<IndexExpr*>(r.get()))
+		if (auto indexR = dynamic_cast<const IndexExpr*>(r))
 		{
 			return isEqual(indexL->object, indexR->object) &&
 				isEqual(indexL->index, indexR->index);
 		}
 	}
-	else if (auto callL = dynamic_cast<CallExpr*>(l.get()))
+	else if (auto callL = dynamic_cast<const CallExpr*>(l))
 	{
-		if (auto callR = dynamic_cast<CallExpr*>(r.get()))
+		if (auto callR = dynamic_cast<const CallExpr*>(r))
 		{
 			return (callL->name == callR->name) && isEqual(callL->arguments, callR->arguments);
 		}
 	}
-	else if (auto ctorL = dynamic_cast<ConstructorExpr*>(l.get()))
+	else if (auto ctorL = dynamic_cast<const ConstructorExpr*>(l))
 	{
-		if (auto ctorR = dynamic_cast<ConstructorExpr*>(r.get()))
+		if (auto ctorR = dynamic_cast<const ConstructorExpr*>(r))
 		{
 			if (ctorL->valType != ctorR->valType) return false;
 			assert(ctorL->args.size() == ctorR->args.size());
@@ -225,11 +230,52 @@ std::string ValueToString(const febcode::Value& v)
 	else if (isBool  (v)) s = getBool(v) ? "true" : "false";
 	else if (isInt   (v)) s = std::to_string(getInt (v));
 	else if (isDouble(v)) s = to_nice_string(getDouble(v));
-	else if (isVec2  (v)) s = "vec2";
+	else if (isVec2(v))
+	{
+		s = "vec2(";
+		vec2 q = getVec2(v);
+		if (isZero(q))
+			s += to_nice_string(0.0);
+		else
+			s += to_nice_string(q.x) + ", " + to_nice_string(q.y);
+		s += ")";
+	}
 	else if (isVec3(v))
 	{
 		s = "vec3(";
-		s += to_nice_string(getVec3(v).x) + ", " + to_nice_string(getVec3(v).y) + ", " + to_nice_string(getVec3(v).z);
+		vec3 q = getVec3(v);
+		if (isZero(q))
+		{
+			s += to_nice_string(0.0);
+		}
+		else
+		{
+			s += to_nice_string(q.x) + ", " + to_nice_string(q.y) + ", " + to_nice_string(q.z);
+		}
+		s += ")";
+	}
+	else if (isMat2(v))
+	{
+		s = "mat2(";
+
+		const mat2& m = v.mat2Value;
+		if (isZero(m))
+		{
+			s += to_nice_string(0.0);
+		}
+		else if (isIdentity(m))
+		{
+			s += to_nice_string(1.0);
+		}
+		else
+		{
+			for (int i = 0; i < 2; ++i)
+				for (int j = 0; j < 2; ++j)
+				{
+					s += to_nice_string(m.m[i][j]);
+					if ((i != 1) || (j != 1)) s += ",";
+				}
+		}
 		s += ")";
 	}
 	else if (isMat3(v))

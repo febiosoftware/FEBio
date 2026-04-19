@@ -33,6 +33,7 @@ namespace febcode
 		vec2 operator+(const vec2& other) const { return vec2(x + other.x, y + other.y); }
 		vec2 operator-(const vec2& other) const { return vec2(x - other.x, y - other.y); }
 		vec2 operator*(double scalar) const { return vec2(x * scalar, y * scalar); }
+		vec2 operator/(double scalar) const { return vec2(x / scalar, y / scalar); }
 
 		// dot product
 		double operator*(const vec2& other) const { return x * other.x + y * other.y; }
@@ -51,6 +52,7 @@ namespace febcode
 		vec3 operator+(const vec3& other) const { return vec3(x + other.x, y + other.y, z + other.z); }
 		vec3 operator-(const vec3& other) const { return vec3(x - other.x, y - other.y, z - other.z); }
 		vec3 operator*(double scalar) const { return vec3(x * scalar, y * scalar, z * scalar); }
+		vec3 operator/(double scalar) const { return vec3(x / scalar, y / scalar, z / scalar); }
 
 		// dot product
 		double operator*(const vec3& other) const { return x * other.x + y * other.y + z * other.z; }

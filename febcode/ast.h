@@ -275,7 +275,7 @@ namespace febcode {
 	inline bool isReturn  (const StmtPtr& stmt) { return dynamic_cast<const ReturnStmt*    >(stmt.get()) != nullptr; }
 
 	// use this to make a deep copy of an expression when constructing new expressions from existing ones
-	ExprPtr copy_expression(const Expression* expr);
+	ExprPtr clone(const Expression* expr);
 
 	// expression checks
 	inline bool isLiteral    (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Literal    ); }
@@ -287,10 +287,175 @@ namespace febcode {
 	inline bool isInitializer(const ExprPtr& expr) { return (expr->exprType == ExpressionType::Initializer); }
 	inline bool isIndex      (const ExprPtr& expr) { return (expr->exprType == ExpressionType::Index      ); }
 
-	inline bool isScalar(const ExprPtr& expr) {
-		if (auto literal = dynamic_cast<const LiteralExpr*>(expr.get()))
-			return isInt(literal->value) || isDouble(literal->value);
+	inline bool isInt(const Expression* expr, int& value) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+			if (isInt(literal->value)) {
+				value = literal->value.i;
+				return true;
+			}
+		}
 		return false;
+	}
+
+	inline bool isDouble(const Expression* expr, double& value) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+			if (isDouble(literal->value)) {
+				value = literal->value.d;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isScalar(const Expression* expr, double& value) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+			if (isInt(literal->value)) {
+				value = static_cast<double>(literal->value.i);
+				return true;
+			}
+			if (isDouble(literal->value)) {
+				value = literal->value.d;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isVec2(const Expression* expr, vec2& value) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+			if (isVec2(literal->value)) {
+				value = literal->value.vec2Value;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isVec3(const Expression* expr, vec3& value) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+			if (isVec3(literal->value)) {
+				value = literal->value.vec3Value;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isMat2(const Expression* expr, mat2& value) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+			if (isMat2(literal->value)) {
+				value = literal->value.mat2Value;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isMat3(const Expression* expr, mat3& value) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr)) {
+			if (isMat3(literal->value)) {
+				value = literal->value.mat3Value;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isAdd(const Expression* expr, Expression*& left, Expression*& right) {
+		if (expr->exprType == ExpressionType::Binary) {
+			auto binary = dynamic_cast<const BinaryExpr*>(expr);
+			if (binary->op == BinaryOp::Plus) {
+				left  = binary->left.get();
+				right = binary->right.get();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isSub(const Expression* expr, Expression*& left, Expression*& right) {
+		if (expr->exprType == ExpressionType::Binary) {
+			auto binary = dynamic_cast<const BinaryExpr*>(expr);
+			if (binary->op == BinaryOp::Minus) {
+				left  = binary->left.get();
+				right = binary->right.get();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isMul(const Expression* expr, Expression*& left, Expression*& right) {
+		if (expr->exprType == ExpressionType::Binary) {
+			auto binary = dynamic_cast<const BinaryExpr*>(expr);
+			if (binary->op == BinaryOp::Multiply) {
+				left = binary->left.get();
+				right = binary->right.get();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isDiv(const Expression* expr, Expression*& left, Expression*& right) {
+		if (expr->exprType == ExpressionType::Binary) {
+			auto binary = dynamic_cast<const BinaryExpr*>(expr);
+			if (binary->op == BinaryOp::Divide) {
+				left = binary->left.get();
+				right = binary->right.get();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isExp(const Expression* expr, Expression*& left, Expression*& right) {
+		if (expr->exprType == ExpressionType::Binary) {
+			auto binary = dynamic_cast<const BinaryExpr*>(expr);
+			if (binary->op == BinaryOp::Exponent) {
+				left = binary->left.get();
+				right = binary->right.get();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	inline bool isNegate(const Expression* expr, Expression*& operand) {
+		if (expr->exprType != ExpressionType::Unary) return false;
+		auto unary = dynamic_cast<const UnaryExpr*>(expr);
+		if (unary->op == UnaryOp::Negate) {
+			operand = unary->right.get();
+			return true;
+		}
+		return false;
+	}
+
+	inline bool isCall1(const Expression* expr, const std::string& fncName, const Expression*& arg) {
+		if (expr->exprType != ExpressionType::Call) return false;
+		auto call = dynamic_cast<const CallExpr*>(expr);
+		if (call->arguments.size() != 1) return false;
+		if (fncName != call->name) return false;
+		arg = call->arguments[0].get();
+		return true;
+	}
+
+	inline bool isCall2(const Expression* expr, const std::string& fncName, const Expression*& arg1, const Expression*& arg2) {
+		if (expr->exprType != ExpressionType::Call) return false;
+		auto call = dynamic_cast<const CallExpr*>(expr);
+		if (call->arguments.size() != 2) return false;
+		if (fncName != call->name) return false;
+		arg1 = call->arguments[0].get();
+		arg2 = call->arguments[1].get();
+		return true;
+	}
+
+	inline bool isScalar(const Expression* expr) {
+		return isScalarType(expr->valType);
+	}
+
+	inline bool isScalar(const ExprPtr& expr) {
+		return isScalar(expr.get());
 	}
 
 	inline bool isZero(const Expression* expr) {
@@ -307,12 +472,51 @@ namespace febcode {
 		return isZero(expr.get());
 	}
 
-	inline bool isNegation   (const ExprPtr& expr) {
+	inline bool isOne(const Expression* expr) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr))
+			return isOne(literal->value);
+		return false;
+	}
+
+	inline bool isOne(const ExprPtr& expr) {
+		return isOne(expr.get());
+	}
+
+	inline bool isIdentity(const Expression* expr) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr))
+		{
+			const Value& v = literal->value;
+			if (isMat2(v) && v.mat2Value == mat2(1.0)) return true;
+			if (isMat3(v) && v.mat3Value == mat3(1.0)) return true;
+		}
+		return false;
+	}
+
+	inline bool isVector(const Expression* expr) {
+		return (isVec2Type(expr->valType) || isVec3Type(expr->valType));
+	}
+
+	inline bool isMatrix(const Expression* expr) {
+		return (isMat2Type(expr->valType) || isMat3Type(expr->valType));
+	}
+
+	inline bool isSymmetric(const Expression* expr) {
+		if (auto literal = dynamic_cast<const LiteralExpr*>(expr))
+		{
+			const Value& v = literal->value;
+			if (isMat2(v) && isSymmetric(v.mat2Value)) return true;
+			if (isMat3(v) && isSymmetric(v.mat3Value)) return true;
+		}
+		return false;
+	}
+
+	inline bool isNegation(const ExprPtr& expr) {
 		if (expr->exprType != ExpressionType::Unary) return false;
 		auto unary = dynamic_cast<UnaryExpr*>(expr.get());
 		return (unary->op == UnaryOp::Negate);
 	}
 
+	bool isEqual(const Expression* l, const Expression* r);
 	bool isEqual(const ExprPtr& l, const ExprPtr& r);
 	bool isEqual(const std::vector<ExprPtr>& l, const std::vector<ExprPtr>& r);
 

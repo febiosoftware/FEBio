@@ -134,7 +134,7 @@ int Program::addGlobal(const std::string& name, Type type)
 		throw std::runtime_error("Global variable '" + name + "' is already defined.");
 
 	int slot = (int)globals.size();
-	globals.push_back({ type, (int)globalStackSize, false, false });
+	globals.push_back({ type, (int)globalStackSize, false, 0 });
 	globalIndices[name] = slot;
 
 	globalStackSize += type->size(); // reserve stack slots for this global variable
@@ -150,7 +150,7 @@ int Program::injectGlobal(const std::string& name, Type type)
 		throw std::runtime_error("Global variable '" + name + "' is already defined.");
 
 	int slot = (int)globals.size();
-	globals.push_back({ type, (int)globalStackSize, true, true });
+	globals.push_back({ type, (int)globalStackSize, true, 0 });
 	globalIndices[name] = slot;
 
 	globalStackSize += type->size(); // reserve stack slots for this global variable

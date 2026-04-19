@@ -37,7 +37,7 @@ namespace febcode
 			prg.binaryOps[BinaryOp::NotEqual  ].push_back({ vec3Type, vec3Type, bool_t });
 
 			// Register native functions
-			prg.registerNative("dot"      , vec3Type, { vec3Type, vec3Type }, DotVec3);
+			prg.registerNative("dot"      , doubleType, { vec3Type, vec3Type }, DotVec3);
 			prg.registerNative("cross"    , vec3Type, { vec3Type, vec3Type }, CrossVec3);
 			prg.registerNative("normalize", vec3Type, { vec3Type }, NormalizeVec3);
 			prg.registerNative("length"   , doubleType, { vec3Type }, LengthVec3);

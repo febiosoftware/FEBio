@@ -24,7 +24,7 @@ namespace febcode
 
 		ExprPtr Variable(const std::string& name, Type type) { ExprPtr v = std::make_unique<VariableExpr>(name); v->valType = type; return v; }
 
-		ExprPtr Assign(const ExprPtr& target, const ExprPtr& value) { ExprPtr a = std::make_unique<AssignExpr>(copy_expression(target.get()), copy_expression(value.get())); a->valType = target->valType; return a; }
+		ExprPtr Assign(const ExprPtr& target, const ExprPtr& value) { ExprPtr a = std::make_unique<AssignExpr>(clone(target.get()), clone(value.get())); a->valType = target->valType; return a; }
 
 		ExprPtr Call(const std::string& name, const std::vector<ExprPtr>& args);
 
@@ -32,7 +32,8 @@ namespace febcode
 
 		ExprPtr Member(const ExprPtr& object, const std::string& property);
 
-		ExprPtr Negate(const ExprPtr& arg) { ExprPtr n = std::make_unique<UnaryExpr>(UnaryOp::Negate, copy_expression(arg.get())); n->valType = arg->valType; return n; }
+		ExprPtr Negate(const Expression* arg) { ExprPtr n = std::make_unique<UnaryExpr>(UnaryOp::Negate, clone(arg)); n->valType = arg->valType; return n; }
+		ExprPtr Negate(const ExprPtr& arg) { return Negate(arg.get()); }
 
 		// create zero initializer for array
 		ExprPtr Initializer(Type type);
@@ -43,28 +44,41 @@ namespace febcode
 		// make a literal expression of type with zero values.
 		ExprPtr Zero(Type type);
 
+		// create unary expression with the given operator and operand.
+		ExprPtr Unary(UnaryOp op, const Expression* arg);
+		ExprPtr Unary(UnaryOp op, const ExprPtr& arg) { return Unary(op, arg.get()); }
+
 		// create a binary expression with the given operator and operands.
-		ExprPtr Binary(BinaryOp op, const ExprPtr& left, const ExprPtr& right);
+		ExprPtr Binary(BinaryOp op, const Expression* left, const Expression* right);
+		ExprPtr Binary(BinaryOp op, const ExprPtr& left, const ExprPtr& right)
+		{
+			return Binary(op, left.get(), right.get());
+		}
+
+		ExprPtr Mul(const Expression* left, const Expression* right)
+		{
+			return Binary(BinaryOp::Multiply, left, right);
+		}
 
 		febcode::ExprPtr OuterProduct(const febcode::ExprPtr& left, const febcode::ExprPtr& right)
 		{
 			std::vector<febcode::ExprPtr> args(2);
-			args[0] = copy_expression(left.get());
-			args[1] = copy_expression(right.get());
+			args[0] = clone(left.get());
+			args[1] = clone(right.get());
 			return Call("outer", std::move(args));
 		}
 
 		febcode::ExprPtr Transpose(const febcode::ExprPtr& arg)
 		{
 			std::vector<febcode::ExprPtr> args(1);
-			args[0] = copy_expression(arg.get());
+			args[0] = clone(arg.get());
 			return Call("transpose", std::move(args));
 		}
 
 		febcode::ExprPtr Inverse(const febcode::ExprPtr& arg)
 		{
 			std::vector<febcode::ExprPtr> args(1);
-			args[0] = copy_expression(arg.get());
+			args[0] = clone(arg.get());
 			return Call("inverse", std::move(args));
 		}
 
