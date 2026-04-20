@@ -262,14 +262,9 @@ void XMLWriter::inc_level()
 {
 	++m_level;
 
-	m_sztab[0] = 0;
-	int l=0;
 	for (int i=0; i<m_level; ++i) 
-	{
-		snprintf(m_sztab+l, 1, "\t");
-		++l;
-	}
-	m_sztab[l] = 0;
+		m_sztab[i] = '\t';
+	m_sztab[m_level] = 0;
 }
 
 void XMLWriter::dec_level()
@@ -278,14 +273,9 @@ void XMLWriter::dec_level()
 
 	--m_level;
 
-	m_sztab[0] = 0;
-	int l=0;
-	for (int i=0; i<m_level; ++i) 
-	{
-		snprintf(m_sztab+l, 1, "\t");
-		++l;
-	}
-	m_sztab[l] = 0;
+	for (int i = 0; i < m_level; ++i)
+		m_sztab[i] = '\t';
+	m_sztab[m_level] = 0;
 }
 
 
