@@ -96,28 +96,35 @@ void FEScriptedTractionLoad::StiffnessMatrix(FELinearSystem& LS)
 		// evaluate traction at this material point
 		vec3d t = -Value(mp, vars).v3;
 
-		// evaluate traction gradient w.r.t. position
-		mat3d dtdx = -DerivValue(mp, vars, 0).m3;
-
-		// evaluate traction gradient w.r.t. normal
-		mat3d dtdn = -DerivValue(mp, vars, 1).m3;
-
 		double H_i = dof_a.shape;
 		double H_j = dof_b.shape;
 
 		double Gr_j = dof_b.shape_deriv_r;
 		double Gs_j = dof_b.shape_deriv_s;
 
-		mat3dd I(1.0);
-		mat3d H = (t & N) + dtdn*(I - (N & N));
+		mat3da Gr(mp.dxr);
+		mat3da Gs(mp.dxs);
+		mat3d Grs_j = Gr * Gs_j - Gs * Gr_j;
 
-		vec3d vab(0, 0, 0);
-		vab = (mp.dxr * Gs_j - mp.dxs * Gr_j) * ( H_i);
-		mat3da K(vab);
+		mat3d K = Grs_j* ((t & N)*H_i);
+		Kab.set(0, 0, K);
 
-		Kab.set(0, 0, H*K);
+		// evaluate traction gradient w.r.t. position
+		if (HasDerivative(0))
+		{
+			mat3d dtdx = -DerivValue(mp, vars, 0).m3;
+			K = dtdx * (H_i * H_j * J);
+			Kab.add(0, 0, K);
+		}
 
-		mat3d Kp = dtdx * (H_i * H_j * J);
-		Kab.add(0, 0, Kp);
-		});
+		// evaluate traction gradient w.r.t. normal
+		if (HasDerivative(1))
+		{
+			mat3d dtdn = -DerivValue(mp, vars, 1).m3;
+
+			mat3dd I(1.0);
+			K = dtdn * (I - (N & N)) * H_i;
+			Kab.add(0, 0, K);
+		}
+	});
 }

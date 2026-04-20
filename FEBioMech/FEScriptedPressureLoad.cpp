@@ -39,8 +39,9 @@ bool FEScriptedPressureLoad::Init()
 	m_dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 
 	SetSibling(this);
-	AddVariable("pos" , FEValueType::Vec3d);
-	AddVariable("time", FEValueType::Double, false);
+	AddVariable("pos"    , FEValueType::Vec3d);
+	AddVariable("normal" , FEValueType::Vec3d);
+	AddVariable("time"   , FEValueType::Double, false);
 
 	if (FESurfaceLoad::Init() == false) return false;
 	if (FEScriptedBehavior::Init() == false) return false;
@@ -55,9 +56,12 @@ void FEScriptedPressureLoad::LoadVector(FEGlobalVector& R)
 	FESurface& surf = GetSurface();
 	surf.LoadVector(R, m_dof, false, [&](FESurfaceMaterialPoint& pt, const FESurfaceDofShape& dof_a, std::vector<double>& val) {
 
-		std::vector<FEValue> vars(2);
+		vec3d normal = (pt.dxr ^ pt.dxs).normalized();
+
+		std::vector<FEValue> vars(3);
 		vars[0] = pt.m_rt;
-		vars[1] = t;
+		vars[1] = normal;
+		vars[2] = t;
 
 		// evaluate pressure at this material point
 		double P = -Value(pt, vars).d;
@@ -82,15 +86,18 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 	FESurface& surf = GetSurface();
 	surf.LoadStiffness(LS, m_dof, m_dof, [&](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, const FESurfaceDofShape& dof_b, matrix& Kab) {
 
-		std::vector<FEValue> vars(2);
+		vec3d normal = (mp.dxr ^ mp.dxs).normalized();
+
+		std::vector<FEValue> vars(3);
 		vars[0] = mp.m_rt;
-		vars[1] = t;
+		vars[1] = normal;
+		vars[2] = t;
 
 		// evaluate pressure at this material point
 		double P = Value(mp, vars).d;
 
 		// evaluate pressure gradient at this material point
-		vec3d dP = DerivValue(mp, vars, 0).v3;
+		vec3d dPn = DerivValue(mp, vars, 1).v3;
 
 		double H_i = dof_a.shape;
 		double H_j = dof_b.shape;
@@ -98,14 +105,29 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 		double Gr_j = dof_b.shape_deriv_r;
 		double Gs_j = dof_b.shape_deriv_s;
 
-		vec3d vab(0, 0, 0);
-		vab = (mp.dxr * Gs_j - mp.dxs * Gr_j) * (P * H_i);
-		mat3da K(vab);
+		mat3da Gr(mp.dxr);
+		mat3da Gs(mp.dxs);
+		mat3d Grs_j = Gr * Gs_j - Gs * Gr_j;
 
+		mat3d K = Grs_j * (P * H_i);
 		Kab.set(0, 0, K);
 
-		vec3d N = (mp.dxr ^ mp.dxs);
-		mat3d Kp = (N & dP)*(H_i * H_j);
-		Kab.add(0, 0, Kp);
+		if (HasDerivative(0))
+		{
+			vec3d dPx = DerivValue(mp, vars, 0).v3;
+			vec3d N = (mp.dxr ^ mp.dxs);
+			mat3d Kp = (N & dPx) * (H_i * H_j);
+			Kab.add(0, 0, Kp);
+		}
+
+		if (HasDerivative(1))
+		{
+			mat3dd I(1.0);
+			mat3d nxn = (normal & normal);
+
+			vec3d dPn = DerivValue(mp, vars, 1).v3;
+			mat3d Kp = Grs_j * ((normal & dPn)* (I - nxn) * H_i);
+			Kab.add(0, 0, Kp);
+		}
 	});
 }
