@@ -116,8 +116,8 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 		{
 			vec3d dPx = DerivValue(mp, vars, 0).v3;
 			vec3d N = (mp.dxr ^ mp.dxs);
-			mat3d Kp = (N & dPx) * (H_i * H_j);
-			Kab.add(0, 0, Kp);
+			K = (N & dPx) * (H_i * H_j);
+			Kab.add(0, 0, K);
 		}
 
 		if (HasDerivative(1))
@@ -126,8 +126,8 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 			mat3d nxn = (normal & normal);
 
 			vec3d dPn = DerivValue(mp, vars, 1).v3;
-			mat3d Kp = Grs_j * ((normal & dPn)* (I - nxn) * H_i);
-			Kab.add(0, 0, Kp);
+			K = Grs_j * ((normal & dPn)* (I - nxn) * H_i);
+			Kab.add(0, 0, K);
 		}
 	});
 }
