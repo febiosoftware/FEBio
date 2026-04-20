@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <functional>
+#include <cmath>
 #include <assert.h>
 
 namespace febcode

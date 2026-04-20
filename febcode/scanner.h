@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <cstring>
 namespace febcode {
 
 	enum class TokenType {
