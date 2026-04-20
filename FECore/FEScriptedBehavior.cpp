@@ -482,3 +482,57 @@ double FEScriptedBehavior::DerivValue(const FEMaterialPoint& mp, const std::vect
 	}
 	return 0.0;
 }
+
+bool ValidateScript(const std::string& script, const ScriptContext& context, std::string& err)
+{
+	err.clear();
+	febcode::Program program;
+
+	switch (context.returnType)
+	{
+	case FEValueType::Bool  : program.returnType = program.types.Bool(); break;
+	case FEValueType::Int   : program.returnType = program.types.Int(); break;
+	case FEValueType::Double: program.returnType = program.types.Double(); break;
+	case FEValueType::Vec3d : program.returnType = program.types.Vec3(); break;
+	case FEValueType::Mat3d : program.returnType = program.types.Mat3(); break;
+	default:
+		err = "Invalid return type specified in script context";
+		return false;
+	}
+
+	try {
+
+		std::string varPrefix = "_";
+		for (const auto& var : context.variables)
+		{
+			switch (var.second)
+			{
+			case FEValueType::Bool  : program.injectGlobal(varPrefix + var.first, program.types.Bool()); break;
+			case FEValueType::Int   : program.injectGlobal(varPrefix + var.first, program.types.Int()); break;
+			case FEValueType::Double: program.injectGlobal(varPrefix + var.first, program.types.Double()); break;
+			case FEValueType::Vec3d : program.injectGlobal(varPrefix + var.first, program.types.Vec3()); break;
+			case FEValueType::Mat3d : program.injectGlobal(varPrefix + var.first, program.types.Mat3()); break;
+			default:
+				err = "Unsupported variable type for variable \"" + var.first + "\" in script context";
+				return false;
+			}
+		}
+
+		febcode::ParseSource(program, script);
+
+		febcode::Compiler compiler(program);
+
+		compiler.compile();
+	}
+	catch (const std::exception& e)
+	{
+		err = e.what();
+		return false;
+	}
+	catch (...)
+	{
+		err = "Unknown error compiling code";
+		return false;
+	}
+	return true;
+}

@@ -98,3 +98,17 @@ protected:
 private:
 	Imp& m;
 };
+
+struct FECORE_API ScriptContext
+{
+	FEValueType returnType;
+	std::vector<std::pair<std::string, FEValueType>> variables;
+
+	void addVariable(const std::string& name, FEValueType type)
+	{
+		variables.push_back({ name, type });
+	}
+};
+
+// helper function to see if a script compiles. This is used in FEBio studio.
+FECORE_API bool ValidateScript(const std::string& script, const ScriptContext& context, std::string& err);
