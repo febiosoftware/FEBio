@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cstring>
+#include <cmath>
 #include "types.h"
 
 namespace febcode {

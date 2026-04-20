@@ -3,6 +3,7 @@
 #include <string>
 #include <functional>
 #include <stdexcept>
+#include <cstring>
 #include "compiler.h"
 #include <assert.h>
 

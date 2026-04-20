@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_set>
 #include "ast.h"
-#include "Modifier.h"
+#include "modifier.h"
 
 namespace febcode {
 	class Optimizer : public Modifier {

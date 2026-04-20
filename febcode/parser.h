@@ -4,6 +4,7 @@
 #include "program.h"
 #include <stdexcept>
 #include <ostream>
+#include <cstring>
 
 namespace febcode {
 
