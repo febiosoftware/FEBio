@@ -34,5 +34,5 @@ ZLIB="/c/usr/local/febio/vcpkg_installed/x64-windows/bin/zlib1.dll"
 cp -a "$ZLIB" "$FEBIO_LIB"
 
 # Run the test suite
-PYTHON="${ONEAPI}intelpython/latest/python"
-"$PYTHON" ./TestSuite/code/tools.py -r $FEBIO_BIN -n
+# PYTHON="${ONEAPI}intelpython/latest/python"
+python ./TestSuite/code/tools.py -r $FEBIO_BIN -n
