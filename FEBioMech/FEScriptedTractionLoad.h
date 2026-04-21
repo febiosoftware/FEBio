@@ -37,6 +37,9 @@ public:
 
 	Matrix_Type PreferredMatrixType() override { return Matrix_Type::REAL_UNSYMMETRIC; }
 
+public: // FEScriptedBehavior overrides
+	ScriptContext GetScriptContext() const override;
+
 public:
 	//! calculate residual
 	void LoadVector(FEGlobalVector& R) override;

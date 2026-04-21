@@ -229,7 +229,7 @@ public:
 	bool m_dotiming = true; // flag to enable/disable timings
 	std::vector<Timer>			m_timers;	// list of timers
 
-	std::unordered_map<std::string, std::string> m_scripts;
+	std::unordered_map<std::string, FEScript> m_scripts;
 
 public:
 	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
@@ -2692,11 +2692,12 @@ bool FEModel::AddScript(const std::string& name, const std::string& script)
 		return false;
 	}
 
-	m_imp->m_scripts[name] = script;
+
+	m_imp->m_scripts[name] = {name, script};
 	return true;
 }
 
-std::string FEModel::GetScript(const std::string& name) const
+FEScript FEModel::GetScript(const std::string& name) const
 {
 	auto it = m_imp->m_scripts.find(name);
 	if (it != m_imp->m_scripts.end())
@@ -2705,6 +2706,6 @@ std::string FEModel::GetScript(const std::string& name) const
 	}
 	else
 	{
-		return string();
+		return FEScript();
 	}
 }

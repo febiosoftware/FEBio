@@ -27,19 +27,23 @@ SOFTWARE.*/
 #include "FEScriptedBodyForce.h"
 
 BEGIN_FECORE_CLASS(FEScriptedBodyForce, FEBodyForce);
-	ADD_PARAMETER(m_scriptName, "script");
 END_FECORE_CLASS();
 
 FEScriptedBodyForce::FEScriptedBodyForce(FEModel* pfem) : FEBodyForce(pfem), FEScriptedBehavior(pfem)
 {
 }
 
+ScriptContext FEScriptedBodyForce::GetScriptContext() const
+{
+	ScriptContext sc;
+	sc.returnType = FEValueType::Vec3d;
+	sc.addVariable("pos" , FEValueType::Vec3d , true);
+	sc.addVariable("time", FEValueType::Double, false);
+	return sc;
+}
+
 bool FEScriptedBodyForce::Init()
 {
-	SetProgramReturnType(FEValueType::Vec3d);
-	AddVariable("pos", FEValueType::Vec3d);
-	AddVariable("time", FEValueType::Double, false);
-
 	if (FEBodyForce::Init() == false) return false;
 	if (FEScriptedBehavior::Init() == false) return false;
 	return true;

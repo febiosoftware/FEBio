@@ -65,6 +65,24 @@ struct FEValue
 	void operator = (const mat3d& v) { type = FEValueType::Mat3d; m3 = v; }
 };
 
+struct FECORE_API ScriptContext
+{
+	struct Variable
+	{
+		std::string name;
+		FEValueType type;
+		bool differentiable;
+	};
+
+	FEValueType returnType;
+	std::vector<Variable> variables;
+
+	void addVariable(const std::string& name, FEValueType type, bool differentiable)
+	{
+		variables.push_back({ name, type, differentiable });
+	}
+};
+
 class FECORE_API FEScriptedBehavior
 {
 	class Imp; // PIMPL for hiding implementation details
@@ -77,9 +95,7 @@ public:
 
 	void SetScriptName(const std::string& scriptName);
 
-	void SetProgramReturnType(FEValueType type);
-
-	void AddVariable(const std::string& varName, FEValueType type, bool differentiable = true);
+	virtual ScriptContext GetScriptContext() const = 0;
 
 	bool Init();
 
@@ -92,23 +108,20 @@ public:
 	FEValue DerivValue(const FEMaterialPoint& mp, const std::vector<FEValue>& vars, int varIndex);
 	double DerivValue(const FEMaterialPoint& mp, const std::vector<double>& vars, int varIndex);
 
-protected:
+private:
 	std::string m_scriptName;
 
 private:
 	Imp& m;
 };
 
-struct FECORE_API ScriptContext
-{
-	FEValueType returnType;
-	std::vector<std::pair<std::string, FEValueType>> variables;
-
-	void addVariable(const std::string& name, FEValueType type)
-	{
-		variables.push_back({ name, type });
-	}
-};
-
 // helper function to see if a script compiles. This is used in FEBio studio.
 FECORE_API bool ValidateScript(const std::string& script, const ScriptContext& context, std::string& err);
+
+struct FECORE_API ScriptInputVariable
+{
+	std::string name;
+	FEValueType type;
+};
+
+FECORE_API std::vector<ScriptInputVariable> GetScriptInputVariables(const std::string& script, const ScriptContext& context);

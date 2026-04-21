@@ -27,11 +27,20 @@ SOFTWARE.*/
 #include "FEScriptedPressureLoad.h"
 
 BEGIN_FECORE_CLASS(FEScriptedPressureLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_scriptName, "script");
 END_FECORE_CLASS()
 
 FEScriptedPressureLoad::FEScriptedPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), FEScriptedBehavior(pfem)
 {
+}
+
+ScriptContext FEScriptedPressureLoad::GetScriptContext() const
+{
+	ScriptContext sc;
+	sc.returnType = FEValueType::Double;
+	sc.addVariable("pos"   , FEValueType::Vec3d , true);
+	sc.addVariable("normal", FEValueType::Vec3d , true);
+	sc.addVariable("time"  , FEValueType::Double, false);
+	return sc;
 }
 
 bool FEScriptedPressureLoad::Init()
@@ -39,9 +48,6 @@ bool FEScriptedPressureLoad::Init()
 	m_dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 
 	SetSibling(this);
-	AddVariable("pos"    , FEValueType::Vec3d);
-	AddVariable("normal" , FEValueType::Vec3d);
-	AddVariable("time"   , FEValueType::Double, false);
 
 	if (FESurfaceLoad::Init() == false) return false;
 	if (FEScriptedBehavior::Init() == false) return false;

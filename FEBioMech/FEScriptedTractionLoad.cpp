@@ -27,11 +27,20 @@ SOFTWARE.*/
 #include "FEScriptedTractionLoad.h"
 
 BEGIN_FECORE_CLASS(FEScriptedTractionLoad, FESurfaceLoad)
-	ADD_PARAMETER(m_scriptName, "script");
 END_FECORE_CLASS()
 
 FEScriptedTractionLoad::FEScriptedTractionLoad(FEModel* pfem) : FESurfaceLoad(pfem), FEScriptedBehavior(pfem)
 {
+}
+
+ScriptContext FEScriptedTractionLoad::GetScriptContext() const
+{
+	ScriptContext sc;
+	sc.returnType = FEValueType::Vec3d;
+	sc.addVariable("pos"   , FEValueType::Vec3d , true);
+	sc.addVariable("normal", FEValueType::Vec3d , true);
+	sc.addVariable("time"  , FEValueType::Double, false);
+	return sc;
 }
 
 bool FEScriptedTractionLoad::Init()
@@ -39,11 +48,6 @@ bool FEScriptedTractionLoad::Init()
 	m_dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
 
 	SetSibling(this);
-	AddVariable("pos", FEValueType::Vec3d);
-	AddVariable("normal", FEValueType::Vec3d);
-	AddVariable("time", FEValueType::Double, false);
-
-	SetProgramReturnType(FEValueType::Vec3d);
 
 	if (FESurfaceLoad::Init() == false) return false;
 	if (FEScriptedBehavior::Init() == false) return false;

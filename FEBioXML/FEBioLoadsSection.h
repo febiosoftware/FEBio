@@ -92,3 +92,18 @@ protected:
 	void ParseSurfaceLoad(XMLTag& tag);
 	void ParseBodyLoad   (XMLTag& tag);
 };
+
+//-----------------------------------------------------------------------------
+// Version 4.0
+class FEBioLoadsSection4 : public FEFileSection
+{
+public:
+	FEBioLoadsSection4(FEFileImport* pim) : FEFileSection(pim) {}
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseNodalLoad(XMLTag& tag);
+	void ParseEdgeLoad(XMLTag& tag);
+	void ParseSurfaceLoad(XMLTag& tag);
+	void ParseBodyLoad(XMLTag& tag);
+};

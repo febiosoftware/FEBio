@@ -16,14 +16,7 @@ public:
 		std::string name;
 	};
 
-	struct Variable {
-		std::string name;
-		FEValueType type;
-		bool differentiable = true;
-	};
-
 	struct Script {
-		std::vector<Variable> vars;
 		std::vector<Global> globals;
 		std::string script;
 		febcode::Program program;
@@ -263,8 +256,6 @@ public:
 	FEModel* fem = nullptr;
 	FECoreBase* pc = nullptr;
 
-	FEValueType returnType = FEValueType::Double;
-
 	Script code;
 	std::vector<Derive> valDeriv; //!< programs for derivatives
 };
@@ -279,19 +270,9 @@ void FEScriptedBehavior::SetSibling(FECoreBase* pc)
 	m.pc = pc;
 }
 
-void FEScriptedBehavior::SetProgramReturnType(FEValueType type)
-{
-	m.returnType = type;
-}
-
 void FEScriptedBehavior::SetScriptName(const std::string& scriptName)
 {
 	m_scriptName = scriptName;
-}
-
-void FEScriptedBehavior::AddVariable(const std::string& varName, FEValueType type, bool differentiable)
-{
-	m.code.vars.push_back({ varName, type, differentiable });
 }
 
 bool FEScriptedBehavior::HasDerivative(int id) const
@@ -306,34 +287,37 @@ bool FEScriptedBehavior::Init()
 	feLogEx(m.fem, "compiling script \"%s\":\n", m_scriptName.c_str());
 #endif
 
-	m.code.script = m.fem->GetScript(m_scriptName);
+	m.code.script = m.fem->GetScript(m_scriptName).script;
 	if (m.code.script.empty())
 	{
 		feLogErrorEx(m.fem, "Script \"%s\" is empty", m_scriptName.c_str());
 		return false;
 	}
 
+	ScriptContext ctx = GetScriptContext();
+
+	m.code.SetReturnType(ctx.returnType);
 	m.code.pc = m.pc;
 
 	// get the number of variables
-	int nvars = (int)m.code.vars.size();
+	int nvars = (int)ctx.variables.size();
 
 	// prep the variable names (prefix with underscore)
 	std::vector<std::string> varNamesPrefixed(nvars);
 	for (int i = 0; i < nvars; ++i)
 	{
-		varNamesPrefixed[i] = "_" + m.code.vars[i].name;
+		varNamesPrefixed[i] = "_" + ctx.variables[i].name;
 	}
 
 	// add the variables to the globals list
 	for (int i = 0; i < nvars; ++i)
 	{
-		switch (m.code.vars[i].type)
+		switch (ctx.variables[i].type)
 		{
 		case FEValueType::Double: m.code.AddGlobalDouble(varNamesPrefixed[i]); break;
 		case FEValueType::Vec3d : m.code.AddGlobalVec3  (varNamesPrefixed[i]); break;
 		default:
-			feLogErrorEx(m.fem, "Unsupported variable type for variable \"%s\"", m.code.vars[i].name.c_str());
+			feLogErrorEx(m.fem, "Unsupported variable type for variable \"%s\"", ctx.variables[i].name.c_str());
 			return false;
 		}
 	}
@@ -349,7 +333,7 @@ bool FEScriptedBehavior::Init()
 		// add the variables to the derivative code's global list
 		for (int j = 0; j < nvars; ++j)
 		{
-			switch (m.code.vars[j].type)
+			switch (ctx.variables[j].type)
 			{
 			case FEValueType::Double: m.valDeriv[i].code.AddGlobalDouble(varNamesPrefixed[j]); break;
 			case FEValueType::Vec3d: m.valDeriv[i].code.AddGlobalVec3(varNamesPrefixed[j]); break;
@@ -358,7 +342,7 @@ bool FEScriptedBehavior::Init()
 	}
 
 	// compile the main program
-	m.code.SetReturnType(m.returnType);
+	m.code.SetReturnType(ctx.returnType);
 	if (m.code.Init() == false) return false;
 
 	// initialize the derivates
@@ -369,10 +353,10 @@ bool FEScriptedBehavior::Init()
 		// Set the return type of the original code. 
 		// The derivative code's return type will be set during differentiation based on the type of the variable 
 		// we're differentiating with respect to.
-		deriv_i.code.SetReturnType(m.returnType); 
+		deriv_i.code.SetReturnType(ctx.returnType); 
 
 		// if the corresponding variable is not differentiable, we mark the derivative program as null and skip initialization
-		if (!m.code.vars[i].differentiable)
+		if (!ctx.variables[i].differentiable)
 		{
 			deriv_i.isNullProgram = true;
 			continue;
@@ -483,10 +467,9 @@ double FEScriptedBehavior::DerivValue(const FEMaterialPoint& mp, const std::vect
 	return 0.0;
 }
 
-bool ValidateScript(const std::string& script, const ScriptContext& context, std::string& err)
+bool ValidateScript(febcode::Program& program, const std::string& script, const ScriptContext& context, std::string& err)
 {
 	err.clear();
-	febcode::Program program;
 
 	switch (context.returnType)
 	{
@@ -505,15 +488,15 @@ bool ValidateScript(const std::string& script, const ScriptContext& context, std
 		std::string varPrefix = "_";
 		for (const auto& var : context.variables)
 		{
-			switch (var.second)
+			switch (var.type)
 			{
-			case FEValueType::Bool  : program.injectGlobal(varPrefix + var.first, program.types.Bool()); break;
-			case FEValueType::Int   : program.injectGlobal(varPrefix + var.first, program.types.Int()); break;
-			case FEValueType::Double: program.injectGlobal(varPrefix + var.first, program.types.Double()); break;
-			case FEValueType::Vec3d : program.injectGlobal(varPrefix + var.first, program.types.Vec3()); break;
-			case FEValueType::Mat3d : program.injectGlobal(varPrefix + var.first, program.types.Mat3()); break;
+			case FEValueType::Bool  : program.injectGlobal(varPrefix + var.name, program.types.Bool()); break;
+			case FEValueType::Int   : program.injectGlobal(varPrefix + var.name, program.types.Int()); break;
+			case FEValueType::Double: program.injectGlobal(varPrefix + var.name, program.types.Double()); break;
+			case FEValueType::Vec3d : program.injectGlobal(varPrefix + var.name, program.types.Vec3()); break;
+			case FEValueType::Mat3d : program.injectGlobal(varPrefix + var.name, program.types.Mat3()); break;
 			default:
-				err = "Unsupported variable type for variable \"" + var.first + "\" in script context";
+				err = "Unsupported variable type for variable \"" + var.name + "\" in script context";
 				return false;
 			}
 		}
@@ -535,4 +518,39 @@ bool ValidateScript(const std::string& script, const ScriptContext& context, std
 		return false;
 	}
 	return true;
+}
+
+bool ValidateScript(const std::string& script, const ScriptContext& context, std::string& err)
+{
+	febcode::Program program;
+	return ValidateScript(program, script, context, err);
+}
+
+FECORE_API std::vector<ScriptInputVariable> GetScriptInputVariables(const std::string& script, const ScriptContext& context)
+{
+	std::vector<ScriptInputVariable> inputs;
+
+	febcode::Program program;
+	std::string err;
+	bool success = ValidateScript(program, script, context, /*out*/ err);
+	if (success)
+	{
+		for (auto& input : program.inputs)
+		{
+			FEValueType valueType;
+			switch (input.type->kind)
+			{
+			case febcode::TypeKind::Bool  : valueType = FEValueType::Bool  ; break;
+			case febcode::TypeKind::Int   : valueType = FEValueType::Int   ; break;
+			case febcode::TypeKind::Double: valueType = FEValueType::Double; break;
+			case febcode::TypeKind::Vec3  : valueType = FEValueType::Vec3d ; break;
+			case febcode::TypeKind::Mat3  : valueType = FEValueType::Mat3d ; break;
+			default:
+				assert(false);
+				continue;
+			}
+			inputs.push_back({input.name, valueType});
+		}
+	}
+	return inputs;
 }

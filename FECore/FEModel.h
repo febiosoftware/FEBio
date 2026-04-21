@@ -74,6 +74,14 @@ public:
 	string	name;
 };
 
+//-----------------------------------------------------------------------------
+// Definition of a febcode script
+struct FEScript
+{
+	string		name;		//!< script name
+	string		script;		//!< script content
+};
+
 //! The FEModel class stores all the data for the finite element model, including
 //! geometry, analysis steps, boundary and loading conditions, contact interfaces
 //! and so on.
@@ -459,7 +467,7 @@ public:
 
 	bool AddScript(const std::string& name, const std::string& script);
 
-	std::string GetScript(const std::string& name) const;
+	FEScript GetScript(const std::string& name) const;
 
 public:
 	void SetUnits(const char* szunits);

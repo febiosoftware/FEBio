@@ -283,7 +283,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection3     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);
-		m_map["Loads"      ] = new FEBioLoadsSection3       (this);
+		m_map["Loads"      ] = new FEBioLoadsSection4       (this);
 		m_map["Contact"    ] = new FEBioContactSection4     (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);

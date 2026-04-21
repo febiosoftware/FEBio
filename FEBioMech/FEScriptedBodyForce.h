@@ -41,6 +41,10 @@ public:
 
 	bool Init() override;
 
+public: // FEScriptedBehavior overrides
+	ScriptContext GetScriptContext() const override;
+
+public:
 	//! calculate the body force at a material point
 	vec3d force(FEMaterialPoint& pt) override;
 
