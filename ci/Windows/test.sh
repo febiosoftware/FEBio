@@ -1,22 +1,30 @@
 #! /usr/bin/bash
-# Uncomment next line if not global on target machine
 set -e
-set -x
+
 FEBIO_XML=$(realpath ./ci/febio.xml)
-PLUGIN_DIR=$(realpath ./plugins)
 FEBIO_DIR=$(realpath ./cmbuild/bin/Release)
 FEBIO_LIB=$(realpath ./cmbuild/bin/Release)
 FEBIO_BIN="${FEBIO_DIR}/febio4.exe"
 
-# Convert plugin dir to Windows style
-PLUGIN_DIR_WIN=$(cygpath -w "$PLUGIN_DIR" | sed 's|\\|/|g')
+# If PLUGIN_DIRS is not empty, the plugins were built and we need to copy them 
+# and set the plugin folder in the febio xml. 
+if [[ -n "$PLUGIN_DIRS" ]]; then
+    PLUGIN_DIR=$(realpath ./plugins)
 
-# Copy the plugins from their subdirectories directly to
-# the root of the plugin dir
-cp $PLUGIN_DIR/*/*.dll $PLUGIN_DIR
+    # Convert plugin dir to Windows style
+    PLUGIN_DIR_WIN=$(cygpath -w "$PLUGIN_DIR" | sed 's|\\|/|g')
 
-# Set the plugin dir in the FEBio XML
-sed -i "s@PLUGINS_FOLDER@${PLUGIN_DIR_WIN}@g" "$FEBIO_XML"
+    # Copy the plugins from their subdirectories directly to
+    # the root of the plugin dir
+    cp $PLUGIN_DIR/*/*.dll $PLUGIN_DIR
+
+    # Set the plugin dir in the FEBio XML
+    sed -i "s@PLUGINS_FOLDER@${PLUGIN_DIR_WIN}@g" "$FEBIO_XML"
+
+# Otherwise, remove the import_folder tag from the febio xml or FEBio will fail to start
+else
+    sed -i 's@<import_folder>PLUGINS_FOLDER</import_folder>@@' $FEBIO_XML
+fi
 
 # Copy febio xml into febio dir
 cp $FEBIO_XML $FEBIO_DIR
@@ -34,5 +42,4 @@ ZLIB="/c/usr/local/febio/vcpkg_installed/x64-windows/bin/zlib1.dll"
 cp -a "$ZLIB" "$FEBIO_LIB"
 
 # Run the test suite
-# PYTHON="${ONEAPI}intelpython/latest/python"
-python ./TestSuite/code/tools.py -r $FEBIO_BIN -n
+python ./TestSuite/code/tools.py -r $FEBIO_BIN -n -p $PLUGIN_DIRS
