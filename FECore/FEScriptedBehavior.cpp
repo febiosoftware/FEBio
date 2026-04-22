@@ -526,13 +526,14 @@ bool ValidateScript(const std::string& script, const ScriptContext& context, std
 	return ValidateScript(program, script, context, err);
 }
 
-FECORE_API std::vector<ScriptInputVariable> GetScriptInputVariables(const std::string& script, const ScriptContext& context)
+FECORE_API std::vector<ScriptInputVariable> GetScriptInputVariables(const std::string& script, const ScriptContext& context, bool& ok)
 {
 	std::vector<ScriptInputVariable> inputs;
 
 	febcode::Program program;
 	std::string err;
 	bool success = ValidateScript(program, script, context, /*out*/ err);
+	ok = success;
 	if (success)
 	{
 		for (auto& input : program.inputs)

@@ -154,4 +154,4 @@ struct FECORE_API ScriptInputVariable
 	FEValueType type;
 };
 
-FECORE_API std::vector<ScriptInputVariable> GetScriptInputVariables(const std::string& script, const ScriptContext& context);
+FECORE_API std::vector<ScriptInputVariable> GetScriptInputVariables(const std::string& script, const ScriptContext& context, bool& ok);
