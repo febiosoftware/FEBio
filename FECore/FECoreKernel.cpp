@@ -130,6 +130,7 @@ FECoreKernel::FECoreKernel()
 	ADD_SUPER_CLASS(FEEIGENSOLVER_ID);
 	ADD_SUPER_CLASS(FEDATARECORD_ID);
 	ADD_SUPER_CLASS(FECLASS_ID);
+	ADD_SUPER_CLASS(FESCRIPT_ID);
 }
 
 //-----------------------------------------------------------------------------

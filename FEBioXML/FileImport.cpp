@@ -1275,11 +1275,16 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 			}
 			else
 			{
+				const char* szname = tag.AttributeValue("name", true);
+
 				// see if the property is already allocated
 				if ((prop->IsArray() == false) && (prop->get(0)))
 				{
 					// If so, let's just read the parameters
 					FECoreBase* pc = prop->get(0);
+
+					if (szname) pc->SetName(szname);
+
 					if (tag.isleaf() == false) ReadParameterList(tag, pc);
 				}
 				else

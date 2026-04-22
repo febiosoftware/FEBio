@@ -27,31 +27,23 @@ SOFTWARE.*/
 #include "FEScriptedPressureLoad.h"
 
 BEGIN_FECORE_CLASS(FEScriptedPressureLoad, FESurfaceLoad)
+	ADD_PROPERTY(m_script, "script");
 END_FECORE_CLASS()
 
-FEScriptedPressureLoad::FEScriptedPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), FEScriptedBehavior(pfem)
-{
-}
-
-ScriptContext FEScriptedPressureLoad::GetScriptContext() const
+FEScriptedPressureLoad::FEScriptedPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_script(pfem)
 {
 	ScriptContext sc;
 	sc.returnType = FEValueType::Double;
-	sc.addVariable("pos"   , FEValueType::Vec3d , true);
-	sc.addVariable("normal", FEValueType::Vec3d , true);
+	sc.addVariable("pos"   , FEValueType::Vec3d, true);
+	sc.addVariable("normal", FEValueType::Vec3d, true);
 	sc.addVariable("time"  , FEValueType::Double, false);
-	return sc;
+	m_script.SetScriptContext(sc);
 }
 
 bool FEScriptedPressureLoad::Init()
 {
 	m_dof.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-
-	SetSibling(this);
-
-	if (FESurfaceLoad::Init() == false) return false;
-	if (FEScriptedBehavior::Init() == false) return false;
-	return true;
+	return FESurfaceLoad::Init();
 }
 
 void FEScriptedPressureLoad::LoadVector(FEGlobalVector& R)
@@ -70,7 +62,7 @@ void FEScriptedPressureLoad::LoadVector(FEGlobalVector& R)
 		vars[2] = t;
 
 		// evaluate pressure at this material point
-		double P = -Value(pt, vars).d;
+		double P = -m_script.Value(pt, vars).d;
 
 		// force vector
 		vec3d N = (pt.dxr ^ pt.dxs);
@@ -99,12 +91,6 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 		vars[1] = normal;
 		vars[2] = t;
 
-		// evaluate pressure at this material point
-		double P = Value(mp, vars).d;
-
-		// evaluate pressure gradient at this material point
-		vec3d dPn = DerivValue(mp, vars, 1).v3;
-
 		double H_i = dof_a.shape;
 		double H_j = dof_b.shape;
 
@@ -115,23 +101,26 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 		mat3da Gs(mp.dxs);
 		mat3d Grs_j = Gr * Gs_j - Gs * Gr_j;
 
+		// evaluate pressure at this material point
+		double P = m_script.Value(mp, vars).d;
+
 		mat3d K = Grs_j * (P * H_i);
 		Kab.set(0, 0, K);
 
-		if (HasDerivative(0))
+		if (m_script.HasDerivative(0))
 		{
-			vec3d dPx = DerivValue(mp, vars, 0).v3;
+			vec3d dPx = m_script.DerivValue(mp, vars, 0).v3;
 			vec3d N = (mp.dxr ^ mp.dxs);
 			K = (N & dPx) * (H_i * H_j);
 			Kab.add(0, 0, K);
 		}
 
-		if (HasDerivative(1))
+		if (m_script.HasDerivative(1))
 		{
 			mat3dd I(1.0);
 			mat3d nxn = (normal & normal);
 
-			vec3d dPn = DerivValue(mp, vars, 1).v3;
+			vec3d dPn = m_script.DerivValue(mp, vars, 1).v3;
 			K = Grs_j * ((normal & dPn)* (I - nxn) * H_i);
 			Kab.add(0, 0, K);
 		}

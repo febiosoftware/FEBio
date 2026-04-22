@@ -254,20 +254,26 @@ public:
 
 public:
 	FEModel* fem = nullptr;
-	FECoreBase* pc = nullptr;
+
+	ScriptContext context;
 
 	Script code;
 	std::vector<Derive> valDeriv; //!< programs for derivatives
 };
 
-FEScriptedBehavior::FEScriptedBehavior(FEModel* fem) : m(*new Imp())
+FEScriptedBehavior::FEScriptedBehavior(FEModel* fem) : FECoreBase(fem), m(*new Imp())
 {
 	m.fem = fem;
 }
 
-void FEScriptedBehavior::SetSibling(FECoreBase* pc)
+void FEScriptedBehavior::SetScriptContext(const ScriptContext& context)
 {
-	m.pc = pc;
+	m.context = context;
+}
+
+ScriptContext FEScriptedBehavior::GetScriptContext() const
+{
+	return m.context;
 }
 
 void FEScriptedBehavior::SetScriptName(const std::string& scriptName)
@@ -283,6 +289,9 @@ bool FEScriptedBehavior::HasDerivative(int id) const
 
 bool FEScriptedBehavior::Init()
 {
+	if (m_scriptName.empty())
+		m_scriptName = GetName();
+
 #ifndef NDEBUG
 	feLogEx(m.fem, "compiling script \"%s\":\n", m_scriptName.c_str());
 #endif
@@ -294,10 +303,10 @@ bool FEScriptedBehavior::Init()
 		return false;
 	}
 
-	ScriptContext ctx = GetScriptContext();
+	ScriptContext ctx = m.context;
 
 	m.code.SetReturnType(ctx.returnType);
-	m.code.pc = m.pc;
+	m.code.pc = this;
 
 	// get the number of variables
 	int nvars = (int)ctx.variables.size();
@@ -328,7 +337,7 @@ bool FEScriptedBehavior::Init()
 	{
 		m.valDeriv[i].code.script = m.code.script;
 		m.valDeriv[i].varName = varNamesPrefixed[i];
-		m.valDeriv[i].code.pc = m.pc;
+		m.valDeriv[i].code.pc = m.code.pc;
 
 		// add the variables to the derivative code's global list
 		for (int j = 0; j < nvars; ++j)

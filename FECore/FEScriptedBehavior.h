@@ -113,19 +113,22 @@ struct FECORE_API ScriptContext
 	}
 };
 
-class FECORE_API FEScriptedBehavior
+class FECORE_API FEScriptedBehavior : public FECoreBase
 {
 	class Imp; // PIMPL for hiding implementation details
+
+	FECORE_SUPER_CLASS(FESCRIPT_ID)
+	FECORE_BASE_CLASS(FEScriptedBehavior)
 
 public:
 	FEScriptedBehavior(FEModel* fem);
 	virtual ~FEScriptedBehavior() {}
 
-	void SetSibling(FECoreBase* pc);
-
 	void SetScriptName(const std::string& scriptName);
 
-	virtual ScriptContext GetScriptContext() const = 0;
+	void SetScriptContext(const ScriptContext& context);
+
+	ScriptContext GetScriptContext() const;
 
 	bool Init();
 

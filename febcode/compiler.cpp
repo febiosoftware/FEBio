@@ -489,12 +489,12 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 	switch (construct->valType->kind)
 	{
 	case TypeKind::Vec2:
-		if (nargs != 2)
-			throw std::runtime_error("Vec2 constructor must have exactly 2 arguments.");
+		if ((nargs != 1) && (nargs != 2))
+			throw std::runtime_error("Vec2 constructor must have 1 or 2 arguments.");
 		break;
 	case TypeKind::Vec3:
-		if (nargs != 3)
-			throw std::runtime_error("Vec3 constructor must have exactly 3 arguments.");
+		if ((nargs != 1) && (nargs != 3))
+			throw std::runtime_error("Vec3 constructor must have 1 or 3 arguments.");
 		break;
 	case TypeKind::Mat2:
 		if (nargs != 1 && nargs != 4)

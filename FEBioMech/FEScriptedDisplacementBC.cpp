@@ -23,28 +23,55 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
+#include "FEScriptedDisplacementBC.h"
+#include <FECore/FENode.h>
+#include <FECore/FEMaterialPoint.h>
+#include "FEBioMech.h"
 
-#include <FECore/FESurfaceLoad.h>
-#include <FECore/FEScriptedBehavior.h>
 
-class FEScriptedTractionLoad : public FESurfaceLoad
+BEGIN_FECORE_CLASS(FEScriptedDisplacementBC, FEPrescribedNodeSet)
+	ADD_PROPERTY(m_script, "script");
+END_FECORE_CLASS();
+
+FEScriptedDisplacementBC::FEScriptedDisplacementBC(FEModel* fem) : FEPrescribedNodeSet(fem), m_script(fem)
 {
-public:
-	FEScriptedTractionLoad(FEModel* pfem);
-	~FEScriptedTractionLoad() override = default;
-	bool Init() override;
+	ScriptContext sc;
+	sc.returnType = FEValueType::Vec3d;
+	sc.addVariable("pos0", FEValueType::Vec3d, false);
+	sc.addVariable("time", FEValueType::Double, false);
 
-	Matrix_Type PreferredMatrixType() override { return Matrix_Type::REAL_UNSYMMETRIC; }
+	m_script.SetScriptContext(sc);
+}
 
-public:
-	//! calculate residual
-	void LoadVector(FEGlobalVector& R) override;
-	//! calculate stiffness
-	void StiffnessMatrix(FELinearSystem& LS) override;
+bool FEScriptedDisplacementBC::Init()
+{
+	FEDofList dofs(GetFEModel());
+	dofs.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+	SetDOFList(dofs);
 
-private:
-	FEScriptedBehavior m_script;
+	return FEPrescribedNodeSet::Init();
+}
 
-	DECLARE_FECORE_CLASS();
-};
+// return the value for node i
+void FEScriptedDisplacementBC::GetNodalValues(int nodelid, std::vector<double>& val)
+{
+	FENodeSet* nodeSet = GetNodeSet();
+	FENode& node = *nodeSet->Node(nodelid);
+	std::vector<FEValue> vars(2);
+	vars[0] = node.m_r0; // initial position
+	vars[1] = GetTimeInfo().currentTime;
+
+	FEMaterialPoint mp;
+	mp.m_r0 = node.m_r0;
+	mp.m_index = nodelid;
+
+	vec3d v = m_script.Value(mp, vars).v3;
+	val[0] = v.x;
+	val[1] = v.y;
+	val[2] = v.z;
+}
+
+void FEScriptedDisplacementBC::CopyFrom(FEBoundaryCondition* pbc)
+{
+
+}

@@ -24,24 +24,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-
-#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEPrescribedBC.h>
 #include <FECore/FEScriptedBehavior.h>
 
-class FEScriptedTractionLoad : public FESurfaceLoad
+class FEScriptedDisplacementBC : public FEPrescribedNodeSet
 {
 public:
-	FEScriptedTractionLoad(FEModel* pfem);
-	~FEScriptedTractionLoad() override = default;
+	FEScriptedDisplacementBC(FEModel* fem);
+
 	bool Init() override;
 
-	Matrix_Type PreferredMatrixType() override { return Matrix_Type::REAL_UNSYMMETRIC; }
+	// return the value for node i, dof j
+	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
-public:
-	//! calculate residual
-	void LoadVector(FEGlobalVector& R) override;
-	//! calculate stiffness
-	void StiffnessMatrix(FELinearSystem& LS) override;
+	void CopyFrom(FEBoundaryCondition* pbc) override;
 
 private:
 	FEScriptedBehavior m_script;

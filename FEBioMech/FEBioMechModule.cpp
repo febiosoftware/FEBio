@@ -182,6 +182,7 @@ SOFTWARE.*/
 #include "FEScriptedPressureLoad.h"
 #include "FEScriptedTractionLoad.h"
 #include "FEScriptedBodyForce.h"
+#include "FEScriptedDisplacementBC.h"
 #include "FEPressureRobinBC.h"
 #include "FETractionLoad.h"
 #include "FETractionRobinBC.h"
@@ -652,6 +653,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement");
 	REGISTER_FECORE_CLASS(FEBCRigidDeformation          , "rigid deformation");
 	REGISTER_FECORE_CLASS(FERigidNodeSet                , "rigid");
+	REGISTER_FECORE_CLASS(FEScriptedDisplacementBC      , "displacement script", FECORE_EXPERIMENTAL);
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEInitialCondition

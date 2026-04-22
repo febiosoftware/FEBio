@@ -32,7 +32,6 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEEdge.h>
-#include <FECore/FEScriptedBehavior.h>
 
 void FEBioLoadsSection4::Parse(XMLTag& tag)
 {
@@ -131,20 +130,6 @@ void FEBioLoadsSection4::ParseSurfaceLoad(XMLTag& tag)
 	// create a surface from this facet set
 	FESurface* psurf = fecore_alloc(FESurface, &fem);
 	GetBuilder()->BuildSurface(*psurf, *pface);
-
-	// see if we have a script for this
-	const char* szscript = tag.AttributeValue("script", true);
-	if (auto scriptBehavior = dynamic_cast<FEScriptedBehavior*>(psl))
-	{
-		if (szscript == nullptr)
-			throw XMLReader::MissingAttribute(tag, "script");
-		scriptBehavior->SetScriptName(szscript);
-	}
-	else if (szscript != nullptr)
-	{
-		// if the load doesn't support scripting, then we can't have a script attribute
-		throw XMLReader::InvalidAttribute(tag, "script");
-	}
 
 	// assign it
 	mesh.AddSurface(psurf);

@@ -33,16 +33,11 @@ SOFTWARE.*/
 //! This class is the base class for body forces
 //! Derived classes need to implement the force and stiffness functions.
 //
-class FEBIOMECH_API FEScriptedBodyForce : public FEBodyForce, public FEScriptedBehavior
+class FEBIOMECH_API FEScriptedBodyForce : public FEBodyForce
 {
 public:
 	//! constructor
 	FEScriptedBodyForce(FEModel* pfem);
-
-	bool Init() override;
-
-public: // FEScriptedBehavior overrides
-	ScriptContext GetScriptContext() const override;
 
 public:
 	//! calculate the body force at a material point
@@ -50,6 +45,9 @@ public:
 
 	//! calculate constribution to stiffness matrix
 	mat3d stiffness(FEMaterialPoint& pt) override;
+
+private:
+	FEScriptedBehavior m_script;
 
 	DECLARE_FECORE_CLASS();
 };

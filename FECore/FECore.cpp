@@ -72,6 +72,7 @@ SOFTWARE.*/
 #include "FEModifiedNewtonStrategy.h"
 #include "FEFullNewtonStrategy.h"
 #include "SkylineSolver.h"
+#include "FEScriptedBehavior.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -210,5 +211,8 @@ REGISTER_FECORE_CLASS(FELogElemMath    , "_math", FECORE_EXPERIMENTAL);
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");
 REGISTER_FECORE_CLASS(SkylineSolver, "skyline");
+
+// scripts
+REGISTER_FECORE_CLASS(FEScriptedBehavior, "script", FECORE_EXPERIMENTAL);
 
 }

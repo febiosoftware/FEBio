@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEScriptedBehavior.h>
 
-class FEScriptedPressureLoad : public FESurfaceLoad, public FEScriptedBehavior
+class FEScriptedPressureLoad : public FESurfaceLoad
 {
 public:
 	FEScriptedPressureLoad(FEModel* pfem);
@@ -37,14 +37,14 @@ public:
 
 	Matrix_Type PreferredMatrixType() override { return Matrix_Type::REAL_UNSYMMETRIC; }
 
-public: // FEScriptedBehavior overrides
-	ScriptContext GetScriptContext() const override;
-
 public:
 	//! calculate residual
 	void LoadVector(FEGlobalVector& R) override;
 	//! calculate stiffness
 	void StiffnessMatrix(FELinearSystem& LS) override;
+
+private:
+	FEScriptedBehavior m_script;
 
 	DECLARE_FECORE_CLASS();
 };
