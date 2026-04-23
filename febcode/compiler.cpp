@@ -76,6 +76,7 @@ void Compiler::endScope()
 		}
 
 		m_locals.pop_back();
+		localStackSize -= local.type->size();
 	}
 	m_scopeDepth--;
 }
