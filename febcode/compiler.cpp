@@ -255,6 +255,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::GE_DOUBLE: return -1;
 	case OpCode::LE_DOUBLE: return -1;
 
+	case OpCode::CREATE_VEC2_1ARG: return +1; // pops the double, pushes the vec2
 	case OpCode::NEG_VEC2: return 0;
 	case OpCode::ADD_VEC2: return -2;
 	case OpCode::SUB_VEC2: return -2;
@@ -263,6 +264,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_DOUBLE_VEC2: return -1;
 	case OpCode::DIV_VEC2_DOUBLE: return -1;
 
+	case OpCode::CREATE_VEC3_1ARG: return +2; // pops the double, pushes the vec3
 	case OpCode::NEG_VEC3: return 0;
 	case OpCode::ADD_VEC3: return -3;
 	case OpCode::SUB_VEC3: return -3;
@@ -541,7 +543,11 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 	// emit special codes for matrix constructors
 	if (nargs == 1)
 	{
-		if (construct->valType->kind == TypeKind::Mat2)
+		if (construct->valType->kind == TypeKind::Vec2)
+			emit(CREATE_VEC2_1ARG);
+		else if (construct->valType->kind == TypeKind::Vec3)
+			emit(CREATE_VEC3_1ARG);
+		else if (construct->valType->kind == TypeKind::Mat2)
 			emit(CREATE_MAT2_DIAG);
 		else if (construct->valType->kind == TypeKind::Mat3)
 			emit(CREATE_MAT3_DIAG);
@@ -2063,6 +2069,7 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::NEG_INT       : return "NEGI";
 	case OpCode::NEG_DOUBLE    : return "NEGF";
 
+	case OpCode::CREATE_VEC2_1ARG: return "V2_1";
 	case OpCode::GET_VEC2_X    : return "GV2X";
 	case OpCode::GET_VEC2_Y    : return "GV2Y";
 	case OpCode::GET_VEC2_SWIZZLE: return "G2SW";
@@ -2075,6 +2082,7 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::DIV_VEC2_DOUBLE: return "DV2F";
 	case OpCode::NEG_VEC2      : return "NEG2";
 
+	case OpCode::CREATE_VEC3_1ARG: return "V3_1";
 	case OpCode::GET_VEC3_X    : return "GV3X";
 	case OpCode::GET_VEC3_Y    : return "GV3Y";
 	case OpCode::GET_VEC3_Z    : return "GV3Z";

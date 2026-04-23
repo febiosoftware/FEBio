@@ -689,6 +689,14 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::CREATE_VEC2_1ARG:
+		{
+			double a = popDouble();
+			pushDouble(a);
+			pushDouble(a);
+			break;
+		}
+
 		case OpCode::ADD_VEC3:
 		{
 			double* b = popPtr(3);
@@ -781,6 +789,15 @@ Value VM::execute()
 				result.x = c[(mask >> 4) & 0b11];
 				pushVec3(result);
 			}
+			break;
+		}
+
+		case OpCode::CREATE_VEC3_1ARG:
+		{
+			double a = popDouble();
+			pushDouble(a);
+			pushDouble(a);
+			pushDouble(a);
 			break;
 		}
 

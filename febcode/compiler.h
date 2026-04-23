@@ -130,6 +130,7 @@ namespace febcode
 		LE_DOUBLE,
 
 		// vec2 operators
+		CREATE_VEC2_1ARG, // create a vec2 from a single double (replicated to both components)
 		NEG_VEC2,
 		ADD_VEC2,
 		SUB_VEC2,
@@ -139,6 +140,7 @@ namespace febcode
 		DIV_VEC2_DOUBLE,
 
 		// vec3 operators
+		CREATE_VEC3_1ARG, // create a vec3 from a single double (replicated to all components)
 		NEG_VEC3,
 		ADD_VEC3,
 		SUB_VEC3,
