@@ -34,23 +34,31 @@ FEScriptedBodyForce::FEScriptedBodyForce(FEModel* pfem) : FEBodyForce(pfem), m_s
 {
 	ScriptContext sc;
 	sc.returnType = FEValueType::Vec3d;
-	sc.addVariable("pos", FEValueType::Vec3d, true);
+	sc.addVariable("pos0", FEValueType::Vec3d, false);
+	sc.addVariable("pos" , FEValueType::Vec3d, true);
 	sc.addVariable("time", FEValueType::Double, false);
 	m_script.SetScriptContext(sc);
 }
 
 vec3d FEScriptedBodyForce::force(FEMaterialPoint& mp)
 {
-	std::vector<FEValue> var(2);
-	var[0] = mp.m_rt;
-	var[1] = GetTimeInfo().currentTime;
+	std::vector<FEValue> var(3);
+	var[0] = mp.m_r0;
+	var[1] = mp.m_rt;
+	var[2] = GetTimeInfo().currentTime;
 	return m_script.Value(mp, var).v3;
 }
 
 mat3d FEScriptedBodyForce::stiffness(FEMaterialPoint& pt)
 {
-	std::vector<FEValue> var(2);
-	var[0] = pt.m_rt;
-	var[1] = GetTimeInfo().currentTime;
-	return m_script.DerivValue(pt, var, 0).m3;
+	if (m_script.HasDerivative(1))
+	{
+		std::vector<FEValue> var(3);
+		var[0] = pt.m_r0;
+		var[1] = pt.m_rt;
+		var[2] = GetTimeInfo().currentTime;
+		return m_script.DerivValue(pt, var, 1).m3;
+	}
+
+	return mat3d(0.0);
 }
