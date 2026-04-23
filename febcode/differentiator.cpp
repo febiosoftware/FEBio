@@ -10,12 +10,16 @@ Type Differentiator::getDerivativeType(Type varType, TypeKind derivType)
 	{
 		return varType;
 	}
+	else if (derivType == TypeKind::Vec2)
+	{
+		if (varType->kind == TypeKind::Double) return prg.types.Vec2();
+		if (varType->kind == TypeKind::Vec2) return prg.types.Mat2();
+	}
 	else if (derivType == TypeKind::Vec3)
 	{
 		if (varType->kind == TypeKind::Double) return prg.types.Vec3();
 		if (varType->kind == TypeKind::Vec3  ) return prg.types.Mat3();
 	}
-
 	throw std::runtime_error("Can't determine type of derivative.");
 }
 
@@ -565,6 +569,35 @@ std::unique_ptr<Expression> Differentiator::diffMember(const MemberExpr* member,
 		// For a member access expression, we can use the rule: d( obj.field ) --> dobj.field
 		auto dobj = differentiate(member->object.get(), var);
 		return Member(dobj, member->property);
+	}
+	else if (var.type->kind == TypeKind::Vec2)
+	{
+		if (isVariable(member->object))
+		{
+			auto var = dynamic_cast<const VariableExpr*>(member->object.get());
+			if (var->name == var->name)
+			{
+				if      (member->property == "x") return Literal(vec2(1, 0));
+				else if (member->property == "y") return Literal(vec2(0, 1));
+				else
+					throw std::runtime_error("Don't know how to differentiate this member access for vec2 variable.");
+			}
+		}
+	}
+	else if (var.type->kind == TypeKind::Vec3)
+	{
+		if (isVariable(member->object))
+		{
+			auto var = dynamic_cast<const VariableExpr*>(member->object.get());
+			if (var->name == var->name)
+			{
+				if      (member->property == "x") return Literal(vec3(1, 0, 0));
+				else if (member->property == "y") return Literal(vec3(0, 1, 0));
+				else if (member->property == "z") return Literal(vec3(0, 0, 1));
+				else
+					throw std::runtime_error("Don't know how to differentiate this member access for vec3 variable.");
+			}
+		}
 	}
 
 	throw std::runtime_error("Don't know how to differentiate member access for this variable type.");
