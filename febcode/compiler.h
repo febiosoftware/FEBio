@@ -172,6 +172,7 @@ namespace febcode
 		DIV_MAT3_DOUBLE,
 		GET_MAT3_INDEX,
 		CREATE_MAT3_DIAG,
+		CREATE_MAT3_VEC3, // create a mat3 from 3 row-vectors
 
 		ADD_GLOBAL_MAT3,
 		SUB_GLOBAL_MAT3,

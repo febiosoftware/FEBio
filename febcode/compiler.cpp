@@ -298,6 +298,7 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::SUB_GLOBAL_MAT3: return +9;
 	case OpCode::MUL_GLOBAL_MAT3: return +9;
 	case OpCode::CREATE_MAT3_DIAG: return +8;
+	case OpCode::CREATE_MAT3_VEC3: return +0;
 
 	case OpCode::NOT: return 0;
 
@@ -504,8 +505,8 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 			throw std::runtime_error("Mat2 constructor must have either 1 or 4 arguments.");
 		break;
 	case TypeKind::Mat3:
-		if (nargs != 1 && nargs != 9)
-			throw std::runtime_error("Mat3 constructor must have either 1 or 9 arguments.");
+		if (nargs != 1 && nargs != 3 && nargs != 9)
+			throw std::runtime_error("Mat3 constructor must have either 1, 3, or 9 arguments.");
 		break;
 	case TypeKind::Struct:
 		if (nargs != construct->valType->fields.size())
@@ -516,9 +517,11 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 	}
 
 	// process each argument and check their types
+	std::vector<Type> argTypes;
 	for (int i = 0; i < construct->args.size(); ++i)
 	{
 		Type argType = compileExpression(construct->args[i].get());
+		argTypes.push_back(argType);
 
 		// check the argument type against the expected type for the constructor
 		switch (construct->valType->kind)
@@ -526,10 +529,13 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 		case TypeKind::Vec2:
 		case TypeKind::Vec3:
 		case TypeKind::Mat2:
-		case TypeKind::Mat3:
 			argType = coerce(argType, prg.types.Double());
 			if (argType != prg.types.Double())
 				throw std::runtime_error("Vec2 constructor arguments must be of type double.");
+			break;
+		case TypeKind::Mat3:
+			if (!isScalarType(argType) && argType != prg.types.Vec3())
+				throw std::runtime_error("Mat3 constructor arguments must be of type int, double or vec3.");
 			break;
 		case TypeKind::Struct:
 			argType = coerce(argType, construct->valType->fields[i].first);
@@ -552,6 +558,12 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 			emit(CREATE_MAT2_DIAG);
 		else if (construct->valType->kind == TypeKind::Mat3)
 			emit(CREATE_MAT3_DIAG);
+	}
+
+	if (nargs == 3)
+	{
+		if (construct->valType->kind == TypeKind::Mat3)
+			emit(CREATE_MAT3_VEC3);
 	}
 
 	return construct->valType;
@@ -2121,6 +2133,7 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::SUB_GLOBAL_MAT3: return "SBM3";
 	case OpCode::MUL_GLOBAL_MAT3: return "MLM3";
 	case OpCode::CREATE_MAT3_DIAG: return "MAT3";
+	case OpCode::CREATE_MAT3_VEC3: return "C3V3";
 
 	case OpCode::NOT           : return "NOT ";
 

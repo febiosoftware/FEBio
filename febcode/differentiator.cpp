@@ -453,6 +453,23 @@ std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary,
 				return Div(Sub(Mul(dleft, right), OuterProduct(left, dright)), Mul(right, right));
 			}
 		}
+		if (binary->op == BinaryOp::Exponent)
+		{
+			if (isScalarType(ltype) && isLiteral(right))
+			{
+				LiteralExpr* exponent = dynamic_cast<LiteralExpr*>(right.get());
+				if (isIntNumber(exponent->value))
+				{
+					int p = toIntNumber(exponent->value);
+					if (p == 1) return clone(dleft.get());
+					else if (p != 0)
+					{
+						// grad(x^p) = p * x^(p-1)*grad(x), where x is a vector and p is a scalar literal
+						return Mul(Mul(Literal(p), Pow(left, Literal(p - 1.0))), dleft);
+					}
+				}
+			}
+		}
 	}
 
 	throw std::runtime_error("AD error: Unsupported binary operator '" + opToString(binary->op) + "' with operand types '" + TypeToString(ltype) + "' and '" + TypeToString(rtype) + "'.");
@@ -537,9 +554,24 @@ ExprPtr Differentiator::diffConstructor(const ConstructorExpr* ctor, const Deriv
 	}
 	else if (var.type->kind == TypeKind::Vec3)
 	{
-		if (!dependsOn(ctor, var.name))
+		if (ctor->args.size() == 3)
 		{
-			return Literal(mat3(0));
+			std::vector<ExprPtr> diffArgs;
+			for (const auto& arg : ctor->args)
+			{
+				ExprPtr darg = differentiate(arg.get(), var);
+				if (darg->valType != prg.types.Vec3())
+				{
+					throw std::runtime_error("Don't know how to differentiate this constructor for vec3 variable.");
+				}
+				diffArgs.push_back(std::move(darg));
+			}
+
+			// put all the components into a mat3 constructor
+			// grad(vec3(x, y, z)) = mat3( grad(x),
+			//                             grad(y),
+			//                             grad(z) )
+			return std::make_unique<ConstructorExpr>(prg.types.Mat3(), std::move(diffArgs));
 		}
 		else
 			throw std::runtime_error("Don't know how to differentiate this constructor for vec3 variable.");

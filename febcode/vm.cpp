@@ -987,6 +987,10 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::CREATE_MAT3_VEC3:
+			// don't need to do anything here
+			break;
+
 		case OpCode::ADD_GLOBAL_MAT3:
 		{
 			uint8_t slotA = readByte();
