@@ -158,3 +158,40 @@ struct FECORE_API ScriptInputVariable
 };
 
 FECORE_API std::vector<ScriptInputVariable> GetScriptInputVariables(const std::string& script, const ScriptContext& context, bool& ok);
+
+// use this as a base class for scripted model components.
+template <class Base> 
+class FEScripted : public Base
+{
+public:
+	FEScripted(FEModel* fem) : Base(fem), m_script(fem) {}
+
+	void BuildParamList() override {
+		Base::BuildParamList();
+
+		ADD_PROPERTY(m_script, "script");
+	}
+
+	void SetScriptContext(const ScriptContext& context)
+	{
+		m_script.SetScriptContext(context);
+	}
+
+	FEValue Value(const FEMaterialPoint& mp, const std::vector<FEValue>& vars)
+	{
+		return m_script.Value(mp, vars);
+	}
+
+	FEValue DerivValue(const FEMaterialPoint& mp, const std::vector<FEValue>& vars, int varIndex)
+	{
+		return m_script.DerivValue(mp, vars, varIndex);
+	}
+
+	bool HasDerivative(int varIndex) const
+	{
+		return m_script.HasDerivative(varIndex);
+	}
+
+private:
+	FEScriptedBehavior m_script;
+};

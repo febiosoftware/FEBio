@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include <FECore/FEPrescribedBC.h>
 #include <FECore/FEScriptedBehavior.h>
 
-class FEScriptedDisplacementBC : public FEPrescribedNodeSet
+class FEScriptedDisplacementBC : public FEScripted<FEPrescribedNodeSet>
 {
 public:
 	FEScriptedDisplacementBC(FEModel* fem);
@@ -38,9 +38,4 @@ public:
 	void GetNodalValues(int nodelid, std::vector<double>& val) override;
 
 	void CopyFrom(FEBoundaryCondition* pbc) override;
-
-private:
-	FEScriptedBehavior m_script;
-
-	DECLARE_FECORE_CLASS();
 };

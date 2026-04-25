@@ -28,19 +28,13 @@ SOFTWARE.*/
 #include <FECore/FEMaterialPoint.h>
 #include "FEBioMech.h"
 
-
-BEGIN_FECORE_CLASS(FEScriptedDisplacementBC, FEPrescribedNodeSet)
-	ADD_PROPERTY(m_script, "script");
-END_FECORE_CLASS();
-
-FEScriptedDisplacementBC::FEScriptedDisplacementBC(FEModel* fem) : FEPrescribedNodeSet(fem), m_script(fem)
+FEScriptedDisplacementBC::FEScriptedDisplacementBC(FEModel* fem) : FEScripted<FEPrescribedNodeSet>(fem)
 {
 	ScriptContext sc;
 	sc.returnType = FEValueType::Vec3d;
 	sc.addVariable("pos0", FEValueType::Vec3d, false);
 	sc.addVariable("time", FEValueType::Double, false);
-
-	m_script.SetScriptContext(sc);
+	SetScriptContext(sc);
 }
 
 bool FEScriptedDisplacementBC::Init()
@@ -65,7 +59,7 @@ void FEScriptedDisplacementBC::GetNodalValues(int nodelid, std::vector<double>& 
 	mp.m_r0 = node.m_r0;
 	mp.m_index = nodelid;
 
-	vec3d v = m_script.Value(mp, vars).v3;
+	vec3d v = Value(mp, vars).v3;
 	val[0] = v.x;
 	val[1] = v.y;
 	val[2] = v.z;

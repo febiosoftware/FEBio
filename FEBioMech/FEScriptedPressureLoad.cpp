@@ -26,18 +26,14 @@ SOFTWARE.*/
 #include "FEBioMech.h"
 #include "FEScriptedPressureLoad.h"
 
-BEGIN_FECORE_CLASS(FEScriptedPressureLoad, FESurfaceLoad)
-	ADD_PROPERTY(m_script, "script");
-END_FECORE_CLASS()
-
-FEScriptedPressureLoad::FEScriptedPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem), m_script(pfem)
+FEScriptedPressureLoad::FEScriptedPressureLoad(FEModel* pfem) : FEScripted<FESurfaceLoad>(pfem)
 {
 	ScriptContext sc;
 	sc.returnType = FEValueType::Double;
 	sc.addVariable("pos"   , FEValueType::Vec3d, true);
 	sc.addVariable("normal", FEValueType::Vec3d, true);
 	sc.addVariable("time"  , FEValueType::Double, false);
-	m_script.SetScriptContext(sc);
+	SetScriptContext(sc);
 }
 
 bool FEScriptedPressureLoad::Init()
@@ -62,7 +58,7 @@ void FEScriptedPressureLoad::LoadVector(FEGlobalVector& R)
 		vars[2] = t;
 
 		// evaluate pressure at this material point
-		double P = -m_script.Value(pt, vars).d;
+		double P = -Value(pt, vars).d;
 
 		// force vector
 		vec3d N = (pt.dxr ^ pt.dxs);
@@ -102,25 +98,25 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 		mat3d Grs_j = Gr * Gs_j - Gs * Gr_j;
 
 		// evaluate pressure at this material point
-		double P = m_script.Value(mp, vars).d;
+		double P = Value(mp, vars).d;
 
 		mat3d K = Grs_j * (P * H_i);
 		Kab.set(0, 0, K);
 
-		if (m_script.HasDerivative(0))
+		if (HasDerivative(0))
 		{
-			vec3d dPx = m_script.DerivValue(mp, vars, 0).v3;
+			vec3d dPx = DerivValue(mp, vars, 0).v3;
 			vec3d N = (mp.dxr ^ mp.dxs);
 			K = (N & dPx) * (H_i * H_j);
 			Kab.add(0, 0, K);
 		}
 
-		if (m_script.HasDerivative(1))
+		if (HasDerivative(1))
 		{
 			mat3dd I(1.0);
 			mat3d nxn = (normal & normal);
 
-			vec3d dPn = m_script.DerivValue(mp, vars, 1).v3;
+			vec3d dPn = DerivValue(mp, vars, 1).v3;
 			K = Grs_j * ((normal & dPn)* (I - nxn) * H_i);
 			Kab.add(0, 0, K);
 		}

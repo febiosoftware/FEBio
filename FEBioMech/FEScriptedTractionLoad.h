@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEScriptedBehavior.h>
 
-class FEScriptedTractionLoad : public FESurfaceLoad
+class FEScriptedTractionLoad : public FEScripted<FESurfaceLoad>
 {
 public:
 	FEScriptedTractionLoad(FEModel* pfem);
@@ -42,9 +42,4 @@ public:
 	void LoadVector(FEGlobalVector& R) override;
 	//! calculate stiffness
 	void StiffnessMatrix(FELinearSystem& LS) override;
-
-private:
-	FEScriptedBehavior m_script;
-
-	DECLARE_FECORE_CLASS();
 };

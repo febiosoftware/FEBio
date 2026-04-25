@@ -26,18 +26,14 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEScriptedBodyForce.h"
 
-BEGIN_FECORE_CLASS(FEScriptedBodyForce, FEBodyForce);
-	ADD_PROPERTY(m_script, "script");
-END_FECORE_CLASS();
-
-FEScriptedBodyForce::FEScriptedBodyForce(FEModel* pfem) : FEBodyForce(pfem), m_script(pfem)
+FEScriptedBodyForce::FEScriptedBodyForce(FEModel* pfem) : FEScripted<FEBodyForce>(pfem)
 {
 	ScriptContext sc;
 	sc.returnType = FEValueType::Vec3d;
 	sc.addVariable("pos0", FEValueType::Vec3d, false);
 	sc.addVariable("pos" , FEValueType::Vec3d, true);
 	sc.addVariable("time", FEValueType::Double, false);
-	m_script.SetScriptContext(sc);
+	SetScriptContext(sc);
 }
 
 vec3d FEScriptedBodyForce::force(FEMaterialPoint& mp)
@@ -46,18 +42,18 @@ vec3d FEScriptedBodyForce::force(FEMaterialPoint& mp)
 	var[0] = mp.m_r0;
 	var[1] = mp.m_rt;
 	var[2] = GetTimeInfo().currentTime;
-	return m_script.Value(mp, var).v3;
+	return Value(mp, var).v3;
 }
 
 mat3d FEScriptedBodyForce::stiffness(FEMaterialPoint& pt)
 {
-	if (m_script.HasDerivative(1))
+	if (HasDerivative(1))
 	{
 		std::vector<FEValue> var(3);
 		var[0] = pt.m_r0;
 		var[1] = pt.m_rt;
 		var[2] = GetTimeInfo().currentTime;
-		return m_script.DerivValue(pt, var, 1).m3;
+		return -DerivValue(pt, var, 1).m3;
 	}
 
 	return mat3d(0.0);
