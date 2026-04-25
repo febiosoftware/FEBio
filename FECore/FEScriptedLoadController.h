@@ -24,29 +24,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FELoadController.h>
-#include <febcode/compiler.h>
+#include "FELoadController.h"
+#include "FEScriptedBehavior.h"
 
-class FECodeController : public FELoadController
+class FEScriptedLoadController : public FEScripted<FELoadController>
 {
 public:
-	FECodeController(FEModel* fem);
-
-	bool Init() override;
+	FEScriptedLoadController(FEModel* fem);
 
 	void Serialize(DumpStream& ar) override;
 
 	void Reset() override;
 
 protected:
-	bool CompileScript();
 
 	double GetValue(double time) override;
-
-private:
-	std::string script;	//!< the script to execute
-	febcode::Program program;	//!< the compiled program
-	int globals[1] = { -1 }; // _time
-
-	DECLARE_FECORE_CLASS();
 };

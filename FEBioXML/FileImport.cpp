@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEPointFunction.h>
 #include <FECore/FEGlobalData.h>
+#include <FECore/FEScriptedBehavior.h>
 #include <FECore/log.h>
 #include <stdio.h>
 #include <string.h>
@@ -598,6 +599,16 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 
 		const char* sztype = tag.AttributeValue("data_type", true);
 
+		bool allowMappedParams = true;
+		bool allowVolatileParams = true;
+
+		if (auto scripted = dynamic_cast<FEScriptedBehavior*>(pc))
+		{
+			ScriptContext sc = scripted->GetScriptContext();
+			allowMappedParams = sc.allowMappedInputs;
+			allowVolatileParams = sc.allowVolatileInputs;
+		}
+
 		// make sure this parameter does not exist yet
 		pp = pl.FindFromName(szname);
 		if (pp) throw XMLReader::InvalidTag(tag);
@@ -606,17 +617,32 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		if ((sztype == nullptr) || strcmp(sztype, "double") == 0)
 		{
 			double v = 0.0; tag.value(v);
-			pp = pl.AddParameter(new FEParamDouble(v), FE_PARAM_DOUBLE_MAPPED, 1, strdup(szname));
+			if (allowMappedParams)
+				pp = pl.AddParameter(new FEParamDouble(v), FE_PARAM_DOUBLE_MAPPED, 1, strdup(szname));
+			else
+				pp = pl.AddParameter(new FEParamDouble(v), FE_PARAM_DOUBLE, 1, strdup(szname));
+
+			pp->MakeVolatile(allowVolatileParams);
 		}
 		else if (strcmp(sztype, "vec3") == 0)
 		{
 			vec3d v(0, 0, 0); tag.value(v);
-			pp = pl.AddParameter(new FEParamVec3(v), FE_PARAM_VEC3D_MAPPED, 1, strdup(szname));
+			if (allowMappedParams)
+				pp = pl.AddParameter(new FEParamVec3(v), FE_PARAM_VEC3D_MAPPED, 1, strdup(szname));
+			else
+				pp = pl.AddParameter(new FEParamVec3(v), FE_PARAM_VEC3D, 1, strdup(szname));
+
+			pp->MakeVolatile(allowVolatileParams);
 		}
 		else if (strcmp(sztype, "mat3") == 0)
 		{
 			mat3d m; tag.value(m);
-			pp = pl.AddParameter(new FEParamMat3d(m), FE_PARAM_MAT3D_MAPPED, 1, strdup(szname));
+			if (allowMappedParams)
+				pp = pl.AddParameter(new FEParamMat3d(m), FE_PARAM_MAT3D_MAPPED, 1, strdup(szname));
+			else
+				pp = pl.AddParameter(new FEParamMat3d(m), FE_PARAM_MAT3D, 1, strdup(szname));
+
+			pp->MakeVolatile(allowVolatileParams);
 		}
 		else if (strcmp(sztype, "int") == 0)
 		{

@@ -418,6 +418,16 @@ bool FEScriptedBehavior::Init()
 	return true;
 }
 
+double FEScriptedBehavior::Value(double v)
+{
+	thread_local std::vector<double> vars(1);
+	vars[0] = v;
+
+	static FEMaterialPoint dummy;
+
+	return Value(dummy, vars);
+}
+
 FEValue FEScriptedBehavior::Value(const FEMaterialPoint& mp)
 {
 	thread_local std::vector<FEValue> vars(2);

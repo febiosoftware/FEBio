@@ -94,8 +94,11 @@ struct FECORE_API ScriptContext
 		bool differentiable;
 	};
 
-	FEValueType returnType;
-	std::vector<Variable> variables;
+	FEValueType returnType; // expected return type of the script
+	std::vector<Variable> variables; // list injected variables
+
+	bool allowMappedInputs = true; // if true, input variables can be mapped. 
+	bool allowVolatileInputs = true; // if true, input variables can be assigned load controllers
 
 	void addVariable(const std::string& name, FEValueType type, bool differentiable)
 	{
@@ -145,6 +148,8 @@ public:
 	bool HasDerivative(int id) const;
 
 public:
+	double Value(double v);
+
 	FEValue Value(const FEMaterialPoint& mp);
 
 	FEValue Value(const FEMaterialPoint& mp, const std::vector<FEValue>& vars);
@@ -192,6 +197,11 @@ public:
 	void SetDefaultContext(FEValueType returnType, FECoreBase* parent)
 	{
 		m_script.SetDefaultContext(returnType, parent);
+	}
+
+	double Value(double v)
+	{
+		return m_script.Value(v);
 	}
 
 	FEValue Value(const FEMaterialPoint& mp)

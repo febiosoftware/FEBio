@@ -44,7 +44,7 @@ SOFTWARE.*/
 #include "FEMathController.h"
 #include "FEMathIntervalController.h"
 #include "FEPIDController.h"
-#include "FECodeController.h"
+#include "FEScriptedLoadController.h"
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
 #include "FEMat3dSphericalAngleMap.h"
@@ -176,7 +176,7 @@ REGISTER_FECORE_CLASS(FELoadCurve             , "loadcurve");
 REGISTER_FECORE_CLASS(FEMathController        , "math");
 REGISTER_FECORE_CLASS(FEMathIntervalController, "math-interval");
 REGISTER_FECORE_CLASS(FEPIDController         , "PID");
-REGISTER_FECORE_CLASS(FECodeController        , "code");
+REGISTER_FECORE_CLASS(FEScriptedLoadController, "load controller script");
 
 // Newton strategies
 REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");
