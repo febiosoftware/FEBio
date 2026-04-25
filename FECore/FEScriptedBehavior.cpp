@@ -163,10 +163,25 @@ public:
 						case FEParamType::FE_PARAM_BOOL  : vm.setInput(pi.name(), pi.value<bool  >()); break;
 						case FEParamType::FE_PARAM_INT   : vm.setInput(pi.name(), pi.value<int   >()); break;
 						case FEParamType::FE_PARAM_DOUBLE: vm.setInput(pi.name(), pi.value<double>()); break;
+						case FEParamType::FE_PARAM_VEC3D:
+						{
+							vec3d v3 = pi.value<vec3d>();
+							febcode::vec3 v3_febcode(v3.x, v3.y, v3.z);
+							vm.setInput(pi.name(), v3_febcode); 
+							break;
+						}
 						case FEParamType::FE_PARAM_DOUBLE_MAPPED:
 						{
 							FEParamDouble& p = pi.value<FEParamDouble>();
 							vm.setInput(pi.name(), p(mp));
+							break;
+						}
+						case FEParamType::FE_PARAM_VEC3D_MAPPED:
+						{
+							FEParamVec3& p = pi.value<FEParamVec3>();
+							vec3d v3 = p(mp);
+							febcode::vec3 v3_febcode(v3.x, v3.y, v3.z);
+							vm.setInput(pi.name(), v3_febcode);
 							break;
 						}
 						default:

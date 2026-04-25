@@ -626,7 +626,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		}
 		else if (strcmp(sztype, "vec3") == 0)
 		{
-			vec3d v(0, 0, 0); tag.value(v);
+			vec3d v(0, 0, 0); value(tag, v);
 			if (allowMappedParams)
 				pp = pl.AddParameter(new FEParamVec3(v), FE_PARAM_VEC3D_MAPPED, 1, strdup(szname));
 			else
@@ -636,7 +636,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		}
 		else if (strcmp(sztype, "mat3") == 0)
 		{
-			mat3d m; tag.value(m);
+			mat3d m; value(tag, m);
 			if (allowMappedParams)
 				pp = pl.AddParameter(new FEParamMat3d(m), FE_PARAM_MAT3D_MAPPED, 1, strdup(szname));
 			else
