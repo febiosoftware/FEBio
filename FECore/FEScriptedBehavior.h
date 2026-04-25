@@ -37,6 +37,14 @@ struct FEValue
 
 	FEValue() {}
 
+	bool   toBool  () const { assert(type == FEValueType::Bool  ); return  b; }
+	int    toInt   () const { assert(type == FEValueType::Int   ); return  i; }
+	double toDouble() const { assert(type == FEValueType::Double); return  d; }
+	vec2d  toVec2d () const { assert(type == FEValueType::Vec2d ); return v2; }
+	vec3d  toVec3d () const { assert(type == FEValueType::Vec3d ); return v3; }
+	mat2d  toMat2d () const { assert(type == FEValueType::Mat2d ); return m2; }
+	mat3d  toMat3d () const { assert(type == FEValueType::Mat3d ); return m3; }
+
 	FEValue(const FEValue& other)
 	{
 		type = other.type;
@@ -128,6 +136,8 @@ public:
 
 	void SetScriptContext(const ScriptContext& context);
 
+	void SetDefaultContext(FEValueType returnType, FECoreBase* parent);
+
 	ScriptContext GetScriptContext() const;
 
 	bool Init();
@@ -135,6 +145,8 @@ public:
 	bool HasDerivative(int id) const;
 
 public:
+	FEValue Value(const FEMaterialPoint& mp);
+
 	FEValue Value(const FEMaterialPoint& mp, const std::vector<FEValue>& vars);
 	double Value(const FEMaterialPoint& mp, const std::vector<double>& vars);
 
@@ -175,6 +187,16 @@ public:
 	void SetScriptContext(const ScriptContext& context)
 	{
 		m_script.SetScriptContext(context);
+	}
+
+	void SetDefaultContext(FEValueType returnType, FECoreBase* parent)
+	{
+		m_script.SetDefaultContext(returnType, parent);
+	}
+
+	FEValue Value(const FEMaterialPoint& mp)
+	{
+		return m_script.Value(mp);
 	}
 
 	FEValue Value(const FEMaterialPoint& mp, const std::vector<FEValue>& vars)

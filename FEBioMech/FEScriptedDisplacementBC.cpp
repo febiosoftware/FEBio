@@ -30,11 +30,7 @@ SOFTWARE.*/
 
 FEScriptedDisplacementBC::FEScriptedDisplacementBC(FEModel* fem) : FEScripted<FEPrescribedNodeSet>(fem)
 {
-	ScriptContext sc;
-	sc.returnType = FEValueType::Vec3d;
-	sc.addVariable("pos0", FEValueType::Vec3d, false);
-	sc.addVariable("time", FEValueType::Double, false);
-	SetScriptContext(sc);
+	SetDefaultContext(FEValueType::Vec3d, this);
 }
 
 bool FEScriptedDisplacementBC::Init()
@@ -51,15 +47,12 @@ void FEScriptedDisplacementBC::GetNodalValues(int nodelid, std::vector<double>& 
 {
 	FENodeSet* nodeSet = GetNodeSet();
 	FENode& node = *nodeSet->Node(nodelid);
-	std::vector<FEValue> vars(2);
-	vars[0] = node.m_r0; // initial position
-	vars[1] = GetTimeInfo().currentTime;
 
 	FEMaterialPoint mp;
 	mp.m_r0 = node.m_r0;
 	mp.m_index = nodelid;
 
-	vec3d v = Value(mp, vars).v3;
+	vec3d v = Value(mp).toVec3d();
 	val[0] = v.x;
 	val[1] = v.y;
 	val[2] = v.z;

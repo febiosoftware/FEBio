@@ -42,7 +42,7 @@ vec3d FEScriptedBodyForce::force(FEMaterialPoint& mp)
 	var[0] = mp.m_r0;
 	var[1] = mp.m_rt;
 	var[2] = GetTimeInfo().currentTime;
-	return Value(mp, var).v3;
+	return Value(mp, var).toVec3d();
 }
 
 mat3d FEScriptedBodyForce::stiffness(FEMaterialPoint& pt)
@@ -53,7 +53,7 @@ mat3d FEScriptedBodyForce::stiffness(FEMaterialPoint& pt)
 		var[0] = pt.m_r0;
 		var[1] = pt.m_rt;
 		var[2] = GetTimeInfo().currentTime;
-		return -DerivValue(pt, var, 1).m3;
+		return -DerivValue(pt, var, 1).toMat3d();
 	}
 
 	return mat3d(0.0);

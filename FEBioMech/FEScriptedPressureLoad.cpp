@@ -58,7 +58,7 @@ void FEScriptedPressureLoad::LoadVector(FEGlobalVector& R)
 		vars[2] = t;
 
 		// evaluate pressure at this material point
-		double P = -Value(pt, vars).d;
+		double P = -Value(pt, vars).toDouble();
 
 		// force vector
 		vec3d N = (pt.dxr ^ pt.dxs);
@@ -98,14 +98,14 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 		mat3d Grs_j = Gr * Gs_j - Gs * Gr_j;
 
 		// evaluate pressure at this material point
-		double P = Value(mp, vars).d;
+		double P = Value(mp, vars).toDouble();
 
 		mat3d K = Grs_j * (P * H_i);
 		Kab.set(0, 0, K);
 
 		if (HasDerivative(0))
 		{
-			vec3d dPx = DerivValue(mp, vars, 0).v3;
+			vec3d dPx = DerivValue(mp, vars, 0).toVec3d();
 			vec3d N = (mp.dxr ^ mp.dxs);
 			K = (N & dPx) * (H_i * H_j);
 			Kab.add(0, 0, K);
@@ -116,7 +116,7 @@ void FEScriptedPressureLoad::StiffnessMatrix(FELinearSystem& LS)
 			mat3dd I(1.0);
 			mat3d nxn = (normal & normal);
 
-			vec3d dPn = DerivValue(mp, vars, 1).v3;
+			vec3d dPn = DerivValue(mp, vars, 1).toVec3d();
 			K = Grs_j * ((normal & dPn)* (I - nxn) * H_i);
 			Kab.add(0, 0, K);
 		}

@@ -271,6 +271,15 @@ void FEScriptedBehavior::SetScriptContext(const ScriptContext& context)
 	m.context = context;
 }
 
+void FEScriptedBehavior::SetDefaultContext(FEValueType returnType, FECoreBase* parent)
+{
+	ScriptContext ctx;
+	ctx.returnType = returnType;
+	ctx.addVariable("pos0", FEValueType::Vec3d, false);
+	ctx.addVariable("time", FEValueType::Double, false);
+	SetScriptContext(ctx);
+}
+
 ScriptContext FEScriptedBehavior::GetScriptContext() const
 {
 	return m.context;
@@ -407,6 +416,14 @@ bool FEScriptedBehavior::Init()
 		if (!success) return false;
 	}
 	return true;
+}
+
+FEValue FEScriptedBehavior::Value(const FEMaterialPoint& mp)
+{
+	thread_local std::vector<FEValue> vars(2);
+	vars[0] = mp.m_r0; // pos0
+	vars[1] = GetFEModel()->GetCurrentTime(); // time
+	return Value(mp, vars);
 }
 
 FEValue FEScriptedBehavior::Value(const FEMaterialPoint& mp, const std::vector<FEValue>& vars)
