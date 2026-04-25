@@ -204,7 +204,17 @@ public:
 		return m_script.Value(mp, vars);
 	}
 
+	double Value(const FEMaterialPoint& mp, const std::vector<double>& vars)
+	{
+		return m_script.Value(mp, vars);
+	}
+
 	FEValue DerivValue(const FEMaterialPoint& mp, const std::vector<FEValue>& vars, int varIndex)
+	{
+		return m_script.DerivValue(mp, vars, varIndex);
+	}
+
+	double DerivValue(const FEMaterialPoint& mp, const std::vector<double>& vars, int varIndex)
 	{
 		return m_script.DerivValue(mp, vars, varIndex);
 	}
