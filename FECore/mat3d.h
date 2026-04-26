@@ -349,6 +349,7 @@ public:
 	// default constructor
 	mat3d() {}
 
+	// constructs diagonal matrix with a on the diagonal
 	explicit mat3d(double a);
 
 	// constructors
