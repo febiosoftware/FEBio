@@ -176,7 +176,7 @@ REGISTER_FECORE_CLASS(FELoadCurve             , "loadcurve");
 REGISTER_FECORE_CLASS(FEMathController        , "math");
 REGISTER_FECORE_CLASS(FEMathIntervalController, "math-interval");
 REGISTER_FECORE_CLASS(FEPIDController         , "PID");
-REGISTER_FECORE_CLASS(FEScriptedLoadController, "load controller script");
+REGISTER_FECORE_CLASS(FEScriptedLoadController, "load controller script", FECORE_EXPERIMENTAL);
 
 // Newton strategies
 REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");
