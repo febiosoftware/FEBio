@@ -115,8 +115,15 @@ public: // biphasic domain "properties"
     vec3d FluidFlux(FEMaterialPoint& mp) override;
 
 protected:
+    bool    m_secant_stress;    //!< use secant approximation to stress
+    bool    m_secant_tangent;   //!< flag for using secant tangent
+    bool    m_secant_perm_tangent;   //!< flag for using secant tangent on permeability
+    
+protected:
     int					m_dofSX;
     int					m_dofSY;
     int					m_dofSZ;
 	FEDofList			m_dof;
+
+    DECLARE_FECORE_CLASS();
 };

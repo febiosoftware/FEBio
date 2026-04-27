@@ -137,3 +137,30 @@ public:
 
 };
 
+//-----------------------------------------------------------------------------
+//! General growth
+//!
+class FEGeneralGrowth : public FEGrowthTensor
+{
+public:
+    FEGeneralGrowth(FEModel* pfem) : FEGrowthTensor(pfem) { m_gi = 1;  m_ga = 1; }
+    virtual ~FEGeneralGrowth(){}
+    
+    //! growth tensor
+    mat3d GrowthTensor(FEMaterialPoint& pt, const vec3d& a0) override;
+    
+    //! inverse of growth tensor
+    mat3d GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& a0) override;
+    
+    //! referential solid density
+    double GrowthDensity(FEMaterialPoint& pt, const vec3d& a0) override;
+    
+public:
+    FEParamDouble   m_gi;       //! growth multiplier for isotropic growth
+    FEParamDouble   m_ga;       //! growth multiplier for anisotropic growth
+
+    // declare the parameter list
+    DECLARE_FECORE_CLASS();
+    
+};
+

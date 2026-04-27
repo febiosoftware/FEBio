@@ -99,6 +99,20 @@ double FEQuemadaFluid::ShearViscosity(FEMaterialPoint& pt)
     return mu;
 }
 
+//! derivative of shear viscosity w.r.t. strain rate
+double FEQuemadaFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
+{
+	FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
+	mat3ds D = vt.RateOfDeformation();
+	double gdot = sqrt(2 * (D.sqr()).tr());
+	double grsqrt = sqrt(gdot / m_gc);
+	double dmu = (gdot > 0) ? 4 * m_mu0 * m_H / m_gc * (m_k0 - m_ki) * (1 + grsqrt) / grsqrt / pow(-2 * (1 + grsqrt) + m_H * (m_k0 + m_ki * grsqrt), 3) : 0.0;
+	
+   double dmu_dgdot = 0.5 * gdot * dmu;
+
+   return dmu_dgdot;
+}
+
 //-----------------------------------------------------------------------------
 //! bulk viscosity
 double FEQuemadaFluid::BulkViscosity(FEMaterialPoint& pt)

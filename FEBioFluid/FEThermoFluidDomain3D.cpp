@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEThermoFluidDomain3D.h"
 #include "FEThermoFluidSolver.h"
 #include "FEFluidHeatSupply.h"
+#include "FEThermoViscousFluid.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
 #include <FECore/FEModel.h>
@@ -565,11 +566,13 @@ void FEThermoFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         FEThermoFluidMaterialPoint& tf = *(mp.ExtractData<FEThermoFluidMaterialPoint>());
         double Jf = 1 + pt.m_ef;
 
+		FEThermoViscousFluid* pVisc = dynamic_cast<FEThermoViscousFluid*>(m_pMat->GetViscous());
+
         // get the tangents
-        mat3ds sv   = m_pMat->GetViscous()->Stress(mp);
-        mat3ds svJ  = m_pMat->GetViscous()->Tangent_Strain(mp);
-        mat3ds svT  = m_pMat->GetViscous()->Tangent_Temperature(mp);
-        tens4ds Cv  = m_pMat->Tangent_RateOfDeformation(mp);
+        mat3ds sv   = pVisc->Stress(mp);
+        mat3ds svJ  = pVisc->Tangent_Strain(mp);
+        mat3ds svT  = pVisc->Tangent_Temperature(mp);
+        tens4ds Cv  = pVisc->Tangent_RateOfDeformation(mp);
         double dpJ  = m_pMat->GetElastic()->Tangent_Strain(mp);
         double dpJJ = m_pMat->GetElastic()->Tangent_Strain_Strain(mp);
         double dpT  = m_pMat->GetElastic()->Tangent_Temperature(mp);

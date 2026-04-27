@@ -50,7 +50,7 @@ bool FEGrowthTensor::Init()
         m_fiber = val;
     }
     
-    return true;
+    return FEMaterialProperty::Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -154,3 +154,47 @@ double FEFiberGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
 {
     return m_gm(pt);
 }
+
+//-----------------------------------------------------------------------------
+//! General growth
+//!
+
+// define the material parameters
+BEGIN_FECORE_CLASS(FEGeneralGrowth, FEGrowthTensor)
+    ADD_PARAMETER(m_gi , "iso")->setLongName("isotropic growth multiplier");
+    ADD_PARAMETER(m_ga , "ani")->setLongName("anisotropic growth multiplier");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+//! growth tensor
+mat3d FEGeneralGrowth::GrowthTensor(FEMaterialPoint& pt, const vec3d& n0)
+{
+    double gmiso = m_gi(pt);
+    double gmani = m_ga(pt);
+    mat3d Fg = mat3dd(gmiso) + (n0 & n0)*(gmani - 1);
+    return Fg;
+}
+
+//-----------------------------------------------------------------------------
+//! inverse of growth tensor
+mat3d FEGeneralGrowth::GrowthTensorInverse(FEMaterialPoint& pt, const vec3d& n0)
+{
+    double gmiso = m_gi(pt);
+    double gmani = m_ga(pt);
+    double den = gmiso + gmani - 1;
+    double da = (gmani-1)/gmiso;
+    double di = 1 + da;
+    mat3d Fgi = mat3dd(di/den) - (n0 & n0)*(da/den);
+    return Fgi;
+}
+
+//-----------------------------------------------------------------------------
+//! referential solid density
+double FEGeneralGrowth::GrowthDensity(FEMaterialPoint& pt, const vec3d& n0)
+{
+    double gmiso = m_gi(pt);
+    double gmani = m_ga(pt);
+    double den = gmiso + gmani - 1;
+    return pow(gmiso,2)*(gmani+gmiso-1);
+}
+

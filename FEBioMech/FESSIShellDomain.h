@@ -42,19 +42,19 @@ class FEBIOMECH_API FESSIShellDomain : public FEShellDomainNew
 public:
 	FESSIShellDomain(FEModel* pfem);
 
-    //! initialize domain
-    //! one-time initialization, called during model initialization
+	//! initialize domain
+	//! one-time initialization, called during model initialization
 	bool Init() override;
 
 	//! serialization
 	void Serialize(DumpStream& ar) override;
-    
+
 	//! Update element data prior to solving time step
 	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
-    
-    //! Initialize shell normals
-    void InitShells() override;
-    
+
+	//! Initialize shell normals
+	bool InitShells() override;
+
 protected:
 	//! Find interfaces between solid element faces and shell elements
 	void FindSSI();

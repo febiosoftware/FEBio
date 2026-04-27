@@ -52,7 +52,9 @@ public:
 	int InitEquations(int neq) override;
 
 	//! Update Lagrange multipliers
-	void Update(const std::vector<double>& ui) override;
+	void PrepStep();
+	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
 	//! serialization
 	void Serialize(DumpStream& ar) override;
@@ -68,7 +70,7 @@ private:
 	int		m_maxaug;		//!< max nr of augmentations
 
 private:
-	vector<vec3d>	m_Lm;	//!< Lagrange multipliers
+	vector<vec3d>	m_Lm, m_Lp;	//!< Lagrange multipliers
 
 private:
 	vector<int>		m_eq;		//!< equation nr of LM

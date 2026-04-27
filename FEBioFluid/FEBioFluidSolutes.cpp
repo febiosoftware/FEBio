@@ -48,7 +48,6 @@ SOFTWARE.*/
 #include "FEBioFluidPlot.h"
 #include <FEBioMix/FESoluteFlux.h>
 #include <FECore/FECoreKernel.h>
-#include <FECore/FEModelUpdate.h>
 #include <FECore/FETimeStepController.h>
 #include "FEFluidSolutesAnalysis.h"
 
@@ -118,27 +117,5 @@ void FEBioFluidSolutes::InitModule()
 	REGISTER_FECORE_CLASS(FESolutesMaterial, "solutes");
 	REGISTER_FECORE_CLASS(FESolutesDomain, "solutes-3D");
 
-    //-----------------------------------------------------------------------------
-    // Reset solver parameters to preferred default settings
-    febio.OnCreateEvent(CallWhenCreating<FENewtonStrategy>([](FENewtonStrategy* pc) {
-        pc->m_maxups = 20;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FETimeStepController>([](FETimeStepController* pc) {
-        pc->m_iteopt = 100;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FEFluidSolutesAnalysis>([](FEFluidSolutesAnalysis* pc) {
-        pc->m_nanalysis = FEFluidSolutesAnalysis::DYNAMIC;
-    }));
-    
-    febio.OnCreateEvent(CallWhenCreating<FENewtonSolver>([](FENewtonSolver* pc) {
-        pc->m_maxref = 5;
-        pc->m_Rmax = 1.0e+20;
-        // turn off reform on each time step and diverge reform
-        pc->m_breformtimestep = true;
-        pc->m_bdivreform = false;
-    }));
-    
-    febio.SetActiveModule(0);
+	febio.SetActiveModule(0);
 }

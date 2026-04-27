@@ -34,30 +34,6 @@ SOFTWARE.*/
 class FEBIOMIX_API FESlidingSurfaceBiphasicMixed : public FEBiphasicContactSurface
 {
 public:
-    //! Integration point data
-    class Data : public FEBiphasicContactPoint
-    {
-    public:
-        Data();
-
-		void Serialize(DumpStream& ar) override;
-        
-    public:
-        vec3d   m_dg;       //!< vector gap
-        double	m_Lmd;      //!< Lagrange multipliers for normal traction
-        vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
-        double	m_epsn;     //!< penalty factor
-        double	m_epsp;     //!< pressure penalty factor
-        double  m_p1;       //!< fluid pressure
-        vec3d	m_nu;       //!< normal at integration points
-        vec3d   m_s1;       //!< tangent along slip direction
-        vec3d   m_tr;       //!< contact traction
-        vec2d	m_rs;       //!< natural coordinates of projection
-        vec2d   m_rsp;      //!< m_rs at the previous time step
-        bool    m_bstick;   //!< stick flag
-    };
-    
-public:
     //! constructor
 	FESlidingSurfaceBiphasicMixed(FEModel* pfem);
     

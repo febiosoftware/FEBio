@@ -45,4 +45,5 @@ protected:
 private:
 	FILE*	m_fp;
 	bool	m_writeMatrix;
+	int		m_nmax;
 };

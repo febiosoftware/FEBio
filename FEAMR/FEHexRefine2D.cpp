@@ -592,6 +592,7 @@ void FEHexRefine2D::BuildNewDomains(FEModel& fem)
 				FEElement& el1 = newDom->ElementRef(j);
 				for (int k = 0; k < el0.Nodes(); ++k) el1.m_node[k] = el0.m_node[k];
 				el1.m_val = el0.m_val;
+				el1.SetMatID(el0.GetMatID());
 			}
 
 			// reallocate the old domain
@@ -633,6 +634,7 @@ void FEHexRefine2D::BuildNewDomains(FEModel& fem)
 					for (int k = 0; k < 4; ++k)
 					{
 						FEElement& el1 = oldDom.ElementRef(nel++);
+						el1.SetMatID(el0.GetMatID());
 						el1.m_val = el0.m_val;
 
 						el1.m_node[0] = ENL[LUT[k][0]];
@@ -652,6 +654,7 @@ void FEHexRefine2D::BuildNewDomains(FEModel& fem)
 					FEElement& el1 = oldDom.ElementRef(nel++);
 					for (int k = 0; k < el0.Nodes(); ++k) el1.m_node[k] = el0.m_node[k];
 					el1.m_val = el0.m_val;
+					el1.SetMatID(el0.GetMatID());
 				}
 			}
 
@@ -722,6 +725,14 @@ bool FEHexRefine2D::UpdateSurface(FESurface& surf)
 
 	FEMeshTopo& topo = *m_topo;
 	int NF0 = surf.Elements();
+
+	// set all element pointers to zero
+	for (int i = 0; i < NF0; ++i)
+	{
+		FESurfaceElement& el = surf.Element(i);
+		el.m_elem[0].Reset();
+		el.m_elem[1].Reset();
+	}
 
 	// figure out which facets to split
 	vector<int> faceList = topo.FaceIndexList(surf);

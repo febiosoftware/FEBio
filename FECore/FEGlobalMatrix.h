@@ -133,7 +133,7 @@ public:
 	virtual void Assemble(const FEElementMatrix& ke);
 
 	//! return the nonzeroes in the sparse matrix
-	int NonZeroes() { return m_pA->NonZeroes(); }
+	size_t NonZeroes() { return m_pA->NonZeroes(); }
 
 	//! return the number of rows
 	int Rows() { return m_pA->Rows(); }

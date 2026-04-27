@@ -31,11 +31,11 @@
 //-----------------------------------------------------------------------------
 //! This class implements a scaled elastic material with user-specified scale
 //
-class FEScaledElasticMaterial :    public FEElasticMaterial
+class FEScaledElasticMaterial : public FEElasticMaterial
 {
 public:
     //! default constructor
-    FEScaledElasticMaterial(FEModel* pfem, FEElasticMaterial* pmat, FEFunction1D* scale);
+    FEScaledElasticMaterial(FEModel* pfem) : m_pBase(nullptr), FEElasticMaterial(pfem) {}
     
 public:
     //! stress function
@@ -46,8 +46,12 @@ public:
     
     //! strain energy density function
     double StrainEnergyDensity(FEMaterialPoint& pt) override;
+
+    FEMaterialPointData* CreateMaterialPointData() override;
+
+    DECLARE_FECORE_CLASS();
     
 private:
     FEElasticMaterial*  m_pBase;    //!< pointer to elastic solid material to scale
-    FEFunction1D*       m_scale;    //!< scale factor
+    FEParamDouble       m_scale;    //!< scale factor
 };

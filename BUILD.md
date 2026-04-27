@@ -1,32 +1,11 @@
 # FEBio Build Guide
 
 ### Table of contents
-- [Docker](#docker)
 - [Prerequisites](#prereq) 
 - [Running CMake](#runCMake)
 - [Building FEBio](#build)
 - [Limitations of CMake](#limits)
 - [Troubleshooting](#trouble)
-## Docker <a name="docker"></a>
-A Linux image can be built that circumvents depedency installations.
-### Install docker
-Download and install docker for your respective system https://docs.docker.com/get-docker/
-
-### Build image
-FEBio image is build on the `intel/oneapi-hpckit` layer.
-
-To build the image:
-
-```
-:/FEBIO# docker-compose run febio-build
-```
-
-### Build FEBio
-To build the FEBio:
-```
-:/FEBIO# docker-compose run febio-build
-```
-
 
 ## Prerequisites <a name="prereq"></a>
 
@@ -51,6 +30,8 @@ FEBio makes use of the following third party packages to add additional function
 
 * zlib is an open-source, lossless data-compression library that is used by FEBio to optionally compress plot files to save disc space. This library is generally pre-installed on macOS, and most Linux distributions. For Windows, you will need to download the latest source from zlib's website, and compile the library yourself.
 
+* FFTW: Fastest Fourier Transform in the West. Alternate library to perform FFTs since certain solvers use conflicting versions of MKL. The library can be found at [FFTW's wegpage](https://fftw.org/)
+
 ## Running CMake <a name="runCMake"></a>
 
 CMake is used to configure the build environment for FEBio on your machine. It can be used to generate a Microsoft Visual Studio Solution on Windows, an XCode Project on macOS, and a set of makefiles to be used with the GNU Make tool on Linux. 
@@ -59,7 +40,7 @@ CMake generates a large number of configuration files that can cause the build d
 
 ### CMake GUI
 
-<img src="Documentation/BuildGuide/CMakeGUI.png" href="https://gibboncode.org" alt="CMake GUI" width="75%">
+<img src="Documentation/BuildGuide/CMakeGUI.png" alt="CMake GUI" width="75%">
 <!-- ![cmake gui](Documentation/BuildGuide/CMakeGUI.png) -->
 
 On Windows, and macOS CMake is run using the CMake graphical user interface (GUI). The CMake GUI is also available on Linux, but is generally installed separately, and so the command line interface (CLI) version, _ccmake_ is generally used (see below).
@@ -68,7 +49,7 @@ To start the configuration process, enter the path to the root directory of the 
 
 ### ccmake
 
-<img src="Documentation/BuildGuide/ccmake.png" href="https://gibboncode.org" alt="ccmake" width="75%">
+<img src="Documentation/BuildGuide/ccmake.png" alt="ccmake" width="75%">
 <!-- ![cmake gui](Documentation/BuildGuide/ccmake.png) -->
 
 If you are running Linux and have not installed the CMake GUI, there are two ways to run cmake. You can run the command `cmake` which will call CMake and run through the configuration and generation processes automatically. This method, however does not allow for interactivity, and so it is highly recommended that you instead run the command `ccmake`. This will run an interactive version of CMake with an in-terminal GUI as shown above. Using ccmake should allow you to follow along with the rest of this tutorial. To start an out-of-source build with ccmake, open a terminal in the _cbuild_ directory of your local copy fo the FEBio Studio repository and run the following command:
@@ -87,7 +68,7 @@ The configuration step in the CMake build process runs the script defined in `CM
 
 To run the configuration process click the _Configure_ button in the lower left part of the GUI, or type `c` if you are using ccmake. If you are running the CMake GUI, you will be asked to choose a generator for the project. On Windows, choose the version of MSVC that you have installed and click _Finish_. On macOS, leave the default value and click _Finish_. CMake will now run the configuration process, the output of which can be seen in the text field at the bottom of the GUI. If all goes well, new fields will be added in red to the GUI, and it should look something like the image below:
 
-<img src="Documentation/BuildGuide/CMakeGUIFull.png" href="https://gibboncode.org" alt="ccmake" width="75%">
+<img src="Documentation/BuildGuide/CMakeGUIFull.png" alt="ccmake" width="75%">
 <!-- ![cmake gui](Documentation/BuildGuide/CMakeGUIFull.png) -->
 
 After running the configuration process, the CMake GUI will populate with several build options that can be toggled on or off, each corresponding to one of the third party packages listed above. Building FEBio with a given build option enabled requires the corresponding third party packages to be installed on your machine and to be located by CMake. 

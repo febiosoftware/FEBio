@@ -47,11 +47,11 @@ public:
     //! tangent of stress with respect to rate of deformation tensor D
     tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) override;
     
-    //! tangent of stress with respect to temperature
-    mat3ds Tangent_Temperature(FEMaterialPoint& mp) override { return mat3ds(0); };
-    
     //! dynamic viscosity
     double ShearViscosity(FEMaterialPoint& mp) override;
+
+	//! derivative of shear viscosity w.r.t. strain rate
+	double Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp) override;
     
     //! bulk viscosity
     double BulkViscosity(FEMaterialPoint& mp) override;

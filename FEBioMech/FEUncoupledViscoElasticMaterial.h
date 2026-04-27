@@ -61,10 +61,10 @@ public:
 	tens4ds DevTangent(FEMaterialPoint& pt) override;
 	
 	//! deviatoric strain energy density function
-	double DevStrainEnergyDensity(FEMaterialPoint& pt) override;
+    double DevStrainEnergyDensity(FEMaterialPoint& pt) override { return 0; }
     
     //! calculate exponent of right-stretch tensor in series spring
-    bool SeriesStretchExponent(FEMaterialPoint& pt);
+//    bool SeriesStretchExponent(FEMaterialPoint& pt);
 
 	//! returns a pointer to a new material point object
 	FEMaterialPointData* CreateMaterialPointData() override;

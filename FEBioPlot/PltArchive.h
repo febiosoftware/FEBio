@@ -34,13 +34,14 @@ SOFTWARE.*/
 #include <list>
 #include <vector>
 #include <stack>
+#include "febioplot_api.h"
 
 //-----------------------------------------------------------------------------
 enum IOResult { IO_ERROR, IO_OK, IO_END };
 
 //-----------------------------------------------------------------------------
 //! helper class for writing buffered data to file
-class FileStream
+class FEBIOPLOT_API FileStream
 {
 public:
 	FileStream(FILE* fp = nullptr, bool owner = true);
@@ -241,7 +242,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Implementation of an archiving class. Will be used by the FEBioPlotFile class.
-class PltArchive
+class FEBIOPLOT_API PltArchive
 {
 protected:
 	// CHUNK data structure for reading

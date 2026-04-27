@@ -119,9 +119,15 @@ public:
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 	
+    //! calculate secant stress at material point
+    mat3ds SecantStress(FEMaterialPoint& pt);
+    
 	//! calculate tangent stiffness at material point
-	tens4ds Tangent(FEMaterialPoint& pt);
+	tens4dmm Tangent(FEMaterialPoint& pt);
 
+    //! calculate secant tangent stiffness at material point
+    tens4dmm SecantTangent(FEMaterialPoint& pt);
+    
 	//! return the permeability tensor as a matrix
 	void Permeability(double k[3][3], FEMaterialPoint& pt);
 
@@ -131,9 +137,15 @@ public:
     //! return tangent of permeability with strain
     tens4dmm Tangent_Permeability_Strain(FEMaterialPoint& mp);
     
+    //! return secant tangent of permeability with strain
+    tens4dmm SecantTangent_Permeability_Strain(FEMaterialPoint& mp);
+    
 	//! return the permeability property
 	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
 	
+    //! return the material permeability property
+    mat3ds MaterialPermeability(FEMaterialPoint& mp, const mat3ds E);
+    
 	//! calculate actual fluid pressure
 	double Pressure(FEMaterialPoint& pt);
 

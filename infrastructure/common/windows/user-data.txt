@@ -33,6 +33,10 @@ $Key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
 $Setting = 'LocalAccountTokenFilterPolicy'
 Set-ItemProperty -Path $Key -Name $Setting -Value 1 -Force
 
+# Disable Windows Defender Firewall
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+Get-NetFirewallProfile | Select Name, Enabled
+
 # Configure and restart the WinRM Service; Enable the required firewall exception
 Stop-Service -Name WinRM
 Set-Service -Name WinRM -StartupType Automatic

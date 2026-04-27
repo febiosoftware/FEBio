@@ -46,7 +46,7 @@ void FEBioStepSection4::Parse(XMLTag& tag)
 	Map["Control"    ] = new FEBioControlSection4(imp);
 	Map["Initial"    ] = new FEBioInitialSection3(imp);
 	Map["Boundary"   ] = new FEBioBoundarySection3(imp);
-	Map["Loads"      ] = new FEBioLoadsSection3(imp);
+	Map["Loads"      ] = new FEBioLoadsSection4(imp);
 	Map["Constraints"] = new FEBioConstraintsSection25(imp);
 	Map["Contact"    ] = new FEBioContactSection25(imp);
 	Map["Rigid"      ] = new FEBioRigidSection4(imp);
@@ -63,6 +63,7 @@ void FEBioStepSection4::Parse(XMLTag& tag)
 			// parse the file sections
 			Map.Parse(tag);
 		}
+		else throw XMLReader::MissingTag(tag, "step");
 		++tag;
 	}
 	while (!tag.isend());

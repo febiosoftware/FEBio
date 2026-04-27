@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FERigidSpring.h"
 #include "FERigidBody.h"
@@ -93,15 +90,19 @@ void FERigidSpring::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 	double alpha = tp.alphaf;
 
     // body A
+	quatd Qat = RBa.GetRotation();
+	quatd Qap = RBa.m_qp;
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
-	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
-    vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
+	vec3d zat = Qat*m_qa0;
+    vec3d zap = Qap*m_qa0;
     vec3d za = zat*alpha + zap*(1-alpha);
     
     // body b
+	quatd Qbt = RBb.GetRotation();
+	quatd Qbp = RBb.m_qp;
     vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
-	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
-    vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
+	vec3d zbt = Qbt*m_qb0;
+    vec3d zbp = Qbp*m_qb0;
     vec3d zb = zbt*alpha + zbp*(1-alpha);
     
     vec3d c = rb + zb - ra - za;
@@ -147,6 +148,10 @@ void FERigidSpring::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 	FERigidBody& RBb = *m_rbB;
 
     // body A
+	quatd Qat = RBa.GetRotation();
+	quatd Qap = RBa.m_qp;
+	vec3d rat = RBa.m_rt;
+	vec3d rap = RBa.m_rp;
     vec3d ra = RBa.m_rt*alpha + RBa.m_rp*(1-alpha);
 	vec3d zat = m_qa0; RBa.GetRotation().RotateVector(zat);
     vec3d zap = m_qa0; RBa.m_qp.RotateVector(zap);
@@ -155,7 +160,11 @@ void FERigidSpring::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
     mat3d zathat; zathat.skew(zat);
     
     // body b
-    vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
+	quatd Qbt = RBb.GetRotation();
+	quatd Qbp = RBb.m_qp;
+	vec3d rbt = RBb.m_rt;
+	vec3d rbp = RBb.m_rp;
+	vec3d rb = RBb.m_rt*alpha + RBb.m_rp*(1-alpha);
 	vec3d zbt = m_qb0; RBb.GetRotation().RotateVector(zbt);
     vec3d zbp = m_qb0; RBb.m_qp.RotateVector(zbp);
     vec3d zb = zbt*alpha + zbp*(1-alpha);
@@ -169,106 +178,36 @@ void FERigidSpring::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
     mat3ds P;
     mat3dd I(1);
     P = (L > 0) ? I*(1 - m_L0/L) + dyad(n)*(m_L0/L) : I;
+
+	mat3da Fhat(m_F);
     
     mat3d K;
     
-    // (1,1)
-    K = P*(alpha*m_k);
-    ke[0][0] = K[0][0]; ke[0][1] = K[0][1]; ke[0][2] = K[0][2];
-    ke[1][0] = K[1][0]; ke[1][1] = K[1][1]; ke[1][2] = K[1][2];
-    ke[2][0] = K[2][0]; ke[2][1] = K[2][1]; ke[2][2] = K[2][2];
+    // row 0
+	ke.set(0, 0, P * (m_k));
+	ke.set(0, 3, P * zathat * (-m_k));
+	ke.set(0, 6, P * (-m_k));
+	ke.set(0, 9, P * zbthat * (m_k));
     
-    // (1,2)
-    K = (P*zathat)*(-alpha*m_k);
-    ke[0][3] = K[0][0]; ke[0][4] = K[0][1]; ke[0][5] = K[0][2];
-    ke[1][3] = K[1][0]; ke[1][4] = K[1][1]; ke[1][5] = K[1][2];
-    ke[2][3] = K[2][0]; ke[2][4] = K[2][1]; ke[2][5] = K[2][2];
+    // row 1
+	ke.set(3, 0, (zahat * P) * (m_k));
+	ke.set(3, 3, (zahat * P * zathat) * (-m_k) + (Fhat * zathat) * (-1.0));
+	ke.set(3, 6, (zahat * P) * (- m_k));
+	ke.set(3, 9, (zahat * P * zbthat) * (m_k));
     
-    // (1,3)
-    K = P*(-alpha*m_k);
-    ke[0][6] = K[0][0]; ke[0][7] = K[0][1]; ke[0][8] = K[0][2];
-    ke[1][6] = K[1][0]; ke[1][7] = K[1][1]; ke[1][8] = K[1][2];
-    ke[2][6] = K[2][0]; ke[2][7] = K[2][1]; ke[2][8] = K[2][2];
+    // row 2
+	ke.set(6, 0, P * (-m_k));
+	ke.set(6, 3, P * zathat * (m_k));
+	ke.set(6, 6, P * (m_k));
+	ke.set(6, 9, P * zbthat * (-m_k));
     
-    // (1,4)
-    K = P*zbthat*(alpha*m_k);
-    ke[0][9] = K[0][0]; ke[0][10] = K[0][1]; ke[0][11] = K[0][2];
-    ke[1][9] = K[1][0]; ke[1][10] = K[1][1]; ke[1][11] = K[1][2];
-    ke[2][9] = K[2][0]; ke[2][10] = K[2][1]; ke[2][11] = K[2][2];
-    
-    // (2,1)
-    K = zahat*P*(alpha*m_k);
-    ke[3][0] = K[0][0]; ke[3][1] = K[0][1]; ke[3][2] = K[0][2];
-    ke[4][0] = K[1][0]; ke[4][1] = K[1][1]; ke[4][2] = K[1][2];
-    ke[5][0] = K[2][0]; ke[5][1] = K[2][1]; ke[5][2] = K[2][2];
-    
-    // (2,2)
-    K = (zahat*P*zathat)*(-alpha*m_k);
-    ke[3][3] = K[0][0]; ke[3][4] = K[0][1]; ke[3][5] = K[0][2];
-    ke[4][3] = K[1][0]; ke[4][4] = K[1][1]; ke[4][5] = K[1][2];
-    ke[5][3] = K[2][0]; ke[5][4] = K[2][1]; ke[5][5] = K[2][2];
-    
-    // (2,3)
-    K = zahat*P*(-alpha*m_k);
-    ke[3][6] = K[0][0]; ke[3][7] = K[0][1]; ke[3][8] = K[0][2];
-    ke[4][6] = K[1][0]; ke[4][7] = K[1][1]; ke[4][8] = K[1][2];
-    ke[5][6] = K[2][0]; ke[5][7] = K[2][1]; ke[5][8] = K[2][2];
-    
-    // (2,4)
-    K = (zahat*P*zbthat)*(alpha*m_k);
-    ke[3][9] = K[0][0]; ke[3][10] = K[0][1]; ke[3][11] = K[0][2];
-    ke[4][9] = K[1][0]; ke[4][10] = K[1][1]; ke[4][11] = K[1][2];
-    ke[5][9] = K[2][0]; ke[5][10] = K[2][1]; ke[5][11] = K[2][2];
-    
-    
-    // (3,1)
-    K = P*(-alpha*m_k);
-    ke[6][0] = K[0][0]; ke[6][1] = K[0][1]; ke[6][2] = K[0][2];
-    ke[7][0] = K[1][0]; ke[7][1] = K[1][1]; ke[7][2] = K[1][2];
-    ke[8][0] = K[2][0]; ke[8][1] = K[2][1]; ke[8][2] = K[2][2];
-    
-    // (3,2)
-    K = (P*zathat)*(alpha*m_k);
-    ke[6][3] = K[0][0]; ke[6][4] = K[0][1]; ke[6][5] = K[0][2];
-    ke[7][3] = K[1][0]; ke[7][4] = K[1][1]; ke[7][5] = K[1][2];
-    ke[8][3] = K[2][0]; ke[8][4] = K[2][1]; ke[8][5] = K[2][2];
-    
-    // (3,3)
-    K = P*(alpha*m_k);
-    ke[6][6] = K[0][0]; ke[6][7] = K[0][1]; ke[6][8] = K[0][2];
-    ke[7][6] = K[1][0]; ke[7][7] = K[1][1]; ke[7][8] = K[1][2];
-    ke[8][6] = K[2][0]; ke[8][7] = K[2][1]; ke[8][8] = K[2][2];
-    
-    // (3,4)
-    K = P*zbthat*(-alpha*m_k);
-    ke[6][9] = K[0][0]; ke[6][10] = K[0][1]; ke[6][11] = K[0][2];
-    ke[7][9] = K[1][0]; ke[7][10] = K[1][1]; ke[7][11] = K[1][2];
-    ke[8][9] = K[2][0]; ke[8][10] = K[2][1]; ke[8][11] = K[2][2];
-    
-    
-    // (4,1)
-    K = zbhat*P*(-alpha*m_k);
-    ke[9 ][0] = K[0][0]; ke[ 9][1] = K[0][1]; ke[ 9][2] = K[0][2];
-    ke[10][0] = K[1][0]; ke[10][1] = K[1][1]; ke[10][2] = K[1][2];
-    ke[11][0] = K[2][0]; ke[11][1] = K[2][1]; ke[11][2] = K[2][2];
-    
-    // (4,2)
-    K = (zbhat*P*zathat)*(alpha*m_k);
-    ke[9 ][3] = K[0][0]; ke[ 9][4] = K[0][1]; ke[ 9][5] = K[0][2];
-    ke[10][3] = K[1][0]; ke[10][4] = K[1][1]; ke[10][5] = K[1][2];
-    ke[11][3] = K[2][0]; ke[11][4] = K[2][1]; ke[11][5] = K[2][2];
-    
-    // (4,3)
-    K = zbhat*P*(alpha*m_k);
-    ke[9 ][6] = K[0][0]; ke[ 9][7] = K[0][1]; ke[ 9][8] = K[0][2];
-    ke[10][6] = K[1][0]; ke[10][7] = K[1][1]; ke[10][8] = K[1][2];
-    ke[11][6] = K[2][0]; ke[11][7] = K[2][1]; ke[11][8] = K[2][2];
-    
-    // (4,4)
-    K = (zbhat*P*zbthat)*(-alpha*m_k);
-    ke[9 ][9] = K[0][0]; ke[ 9][10] = K[0][1]; ke[ 9][11] = K[0][2];
-    ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
-    ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];
+    // row 3
+	ke.set(9, 0, (zbhat * P)* (-m_k));
+	ke.set(9, 3, (zbhat * P * zathat) * (m_k));
+	ke.set(9, 6, (zbhat * P)* (m_k));
+	ke.set(9, 9, (zbhat * P * zbthat) * (-m_k) + (Fhat * zbthat));
+
+	if (alpha != 1) ke *= alpha;
     
     for (int j=0; j<6; ++j)
     {

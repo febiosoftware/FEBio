@@ -36,6 +36,7 @@ SOFTWARE.*/
 //! to the constructor.
 class FENodeSet;
 class FEMesh;
+class FESolver;
 
 //-----------------------------------------------------------------------------
 //! This class serves as a base class for many of the FECore classes. It defines
@@ -64,6 +65,7 @@ public: // some convenience functions (to pull data from FEModel without the nee
 	int GetDOFIndex(const char* szvar, int n) const;
 	int GetDOFIndex(const char* szdof) const;
 	const FETimeInfo& GetTimeInfo() const;
+	FESolver* GetSolver();
 	void AttachLoadController(const char* szparam, int lc);
 	void AttachLoadController(void* pd, int lc);
 

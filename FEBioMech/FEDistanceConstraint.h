@@ -55,12 +55,15 @@ public:
 	double	m_eps;		//!< penalty parameter
 	double	m_atol;		//!< augmented Lagrangian tolerance
 	bool	m_blaugon;	//!< augmentation flag
-	int		m_node[2];	//!< the two nodes that are connected
+	int		m_nodeID[2];	//!< the IDs of the two nodes that are connected
 	int		m_nminaug;	//!< min number of augmentations
 	int		m_nmaxaug;	//!< max number of augmentations
+	double	m_target; //!< target distance
+	bool	m_brelative; //!< relative to initial distance?
 
 	double	m_l0;		//!< reference length
 	double	m_Lm;		//!< Lagrange multiplier
+	int		m_node[2];	//!< nodal indices into mesh
 
 	FEDofList	m_dofU;
 

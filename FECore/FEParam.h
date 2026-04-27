@@ -75,7 +75,8 @@ enum FEParamFlag {
 	FE_PARAM_ADDLC     = 0x08,		// parameter should get a default load curve in FEBio Studio
 	FE_PARAM_VOLATILE  = 0x10,		// parameter can change (e.g. via a load curve)
 	FE_PARAM_TOPLEVEL  = 0x20,		// parameter should only defined at top-level (materials only)
-	FE_PARAM_WATCH	   = 0x40		// This is a watch parameter 
+	FE_PARAM_WATCH	   = 0x40,		// This is a watch parameter 
+	FE_PARAM_OBSOLETE  = 0x80		// Parameter is obsolete
 };
 
 class FEParam;
@@ -105,6 +106,7 @@ public:
 		m_param = p;
 	}
 
+	FEParamValue(int&    v) : FEParamValue(0, &v, FE_PARAM_INT) {}
 	FEParamValue(double& v) : FEParamValue(0, &v, FE_PARAM_DOUBLE) {}
 	FEParamValue(vec2d&  v) : FEParamValue(0, &v, FE_PARAM_VEC2D) {}
 	FEParamValue(vec3d&  v) : FEParamValue(0, &v, FE_PARAM_VEC3D) {}
@@ -156,6 +158,8 @@ public:
 
 	// set the parameter's validator
 	void SetValidator(FEParamValidator* pvalid);
+
+	FEParamValidator* GetValidator();
 
 	// see if the parameter's value is valid
 	bool is_valid() const;
@@ -210,6 +214,8 @@ public:
 
 	bool IsHidden() const;
 
+	bool IsObsolete() const;
+
 	bool IsVolatile() const;
 
 	FEParam* MakeVolatile(bool b);
@@ -258,3 +264,5 @@ template<class T> inline T* FEParam::pvalue(int n)
 
 //-----------------------------------------------------------------------------
 FECORE_API FEParamValue GetParameterComponent(const ParamString& paramName, FEParam* param);
+FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, int index);
+FECORE_API FEParamValue GetParameterComponent(FEParamValue& paramVal, const char* szcomp);

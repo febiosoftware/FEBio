@@ -489,7 +489,8 @@ FEDataMap* FEMappedValueMat3d::dataMap()
 
 mat3d FEMappedValueMat3d::operator()(const FEMaterialPoint& pt)
 {
-	return m_val->valueMat3d(pt);
+	assert(m_val);
+	return (m_val ? m_val->valueMat3d(pt) : mat3d::identity());
 }
 
 FEMat3dValuator* FEMappedValueMat3d::copy()

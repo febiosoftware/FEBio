@@ -80,7 +80,6 @@ FECoreKernel::FECoreKernel()
 	m_next_alloc_id = 1;
 	m_nspec = -1;
 	m_default_solver = nullptr;
-	m_blockEvents = true;
 	m_bshowDeprecationWarning = true;
 
 	// build the super class ID table
@@ -95,7 +94,7 @@ FECoreKernel::FECoreKernel()
 	ADD_SUPER_CLASS(FENLCONSTRAINT_ID);
 	ADD_SUPER_CLASS(FEPLOTDATA_ID);
 	ADD_SUPER_CLASS(FEANALYSIS_ID);
-	ADD_SUPER_CLASS(FESURFACEINTERFACE_ID);
+	ADD_SUPER_CLASS(FESURFACEINTERACTION_ID);
 	ADD_SUPER_CLASS(FELOGNODEDATA_ID);
 	ADD_SUPER_CLASS(FELOGFACEDATA_ID);
 	ADD_SUPER_CLASS(FELOGELEMDATA_ID);
@@ -131,6 +130,7 @@ FECoreKernel::FECoreKernel()
 	ADD_SUPER_CLASS(FEEIGENSOLVER_ID);
 	ADD_SUPER_CLASS(FEDATARECORD_ID);
 	ADD_SUPER_CLASS(FECLASS_ID);
+	ADD_SUPER_CLASS(FESCRIPT_ID);
 }
 
 //-----------------------------------------------------------------------------
@@ -255,6 +255,21 @@ void FECoreKernel::UnregisterFactories(int alloc_id)
 	}
 }
 
+//! unregister modules from allocator
+void FECoreKernel::UnregisterModules(int alloc_id)
+{
+    for (vector<FEModule*>::iterator it = m_modules.begin(); it != m_modules.end();)
+	{
+		FEModule* pfi = *it;
+        int alloc = pfi->GetAllocID();
+		if (pfi->GetAllocID() == alloc_id)
+		{
+			it = m_modules.erase(it);
+		}
+		else ++it;
+	}
+}
+
 //-----------------------------------------------------------------------------
 //! set the current allocator ID
 void FECoreKernel::SetAllocatorID(int alloc_id)
@@ -268,6 +283,16 @@ void FECoreKernel::SetAllocatorID(int alloc_id)
 FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, FEModel* pfem)
 {
 	FECoreFactory* fac = FindFactoryClass(superClassID, sztype);
+	if (fac == nullptr) return nullptr;
+	return CreateInstance(fac, pfem);
+}
+
+//-----------------------------------------------------------------------------
+//! Create an object. An object is created by specifying the super-class id
+//! and the type-string. 
+FECoreBase* FECoreKernel::Create(int superClassID, const char* sztype, const char* szmod, FEModel* pfem)
+{
+	FECoreFactory* fac = FindFactoryClass(superClassID, sztype, szmod);
 	if (fac == nullptr) return nullptr;
 	return CreateInstance(fac, pfem);
 }
@@ -416,17 +441,6 @@ FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 		}
 	}
 
-	if ((m_blockEvents == false) && pc && (m_createHandlers.empty() == false))
-	{
-		for (int i = 0; i < m_createHandlers.size(); ++i)
-		{
-			FECreateHandler* ph = m_createHandlers[i];
-			if (ph && (IsModuleActive(ph->GetModuleID())))
-			{
-				ph->handle(pc);
-			}
-		}
-	}
 	return pc;
 }
 
@@ -584,6 +598,41 @@ FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype)
 }
 
 //-----------------------------------------------------------------------------
+FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype, const char* szmod)
+{
+	if (sztype == nullptr) return nullptr;
+
+	int modId = FindModuleID(szmod);
+	if (modId == -1) return nullptr;	
+
+	std::vector<FECoreFactory*>::iterator pf;
+	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+	{
+		FECoreFactory* pfac = *pf;
+		if (pfac->GetSuperClassID() == superID) {
+
+			// see if we can match module first
+			unsigned int mid = pfac->GetModuleID();
+			if (mid == modId)
+			{
+				// see if the type name matches
+				if ((strcmp(pfac->GetTypeStr(), sztype) == 0))
+				{
+					// check the spec (TODO: What is this for?)
+					int nspec = pfac->GetSpecID();
+					if ((nspec == -1) || (m_nspec <= nspec))
+					{
+						return pfac;
+					}
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 //! set the active module
 bool FECoreKernel::SetActiveModule(const char* szmod)
 {
@@ -681,6 +730,7 @@ bool FECoreKernel::CreateModule(FEModule* pmodule, const char* szmod, const char
 		pmodule->SetName(szmod);
 		pmodule->SetID(newID);
 		pmodule->SetDescription(description);
+        pmodule->SetAllocID(m_alloc_id);
 		m_modules.push_back(pmodule);
 
 		// make this the active module
@@ -709,6 +759,23 @@ int FECoreKernel::GetModuleStatus(int i) const
 {
 	if ((i < 0) || (i >= m_modules.size())) return -1;
 	return m_modules[i]->GetStatus();
+}
+
+int FECoreKernel::GetModuleAllocatorID(int i) const
+{
+    if ((i < 0) || (i >= m_modules.size())) return -1;
+    return m_modules[i]->GetAllocID();
+}
+
+int FECoreKernel::FindModuleID(const char* szmodule) const
+{
+	if (szmodule == 0) return -1;
+	for (size_t i = 0; i<m_modules.size(); ++i)
+	{
+		FEModule& mi = *m_modules[i];
+		if (strcmp(mi.GetName(), szmodule) == 0) return mi.GetModuleID();
+	}
+	return -1;
 }
 
 //! Get a module
@@ -802,18 +869,6 @@ FEDomain* FECoreKernel::CreateDomainExplicit(int superClass, const char* sztype,
 }
 
 //-----------------------------------------------------------------------------
-void FECoreKernel::OnCreateEvent(FECreateHandler* pf)
-{
-	pf->SetModuleID(GetActiveModuleID());
-	m_createHandlers.push_back(pf);
-}
-
-//-----------------------------------------------------------------------------
-void FECoreKernel::BlockEvents(bool b)
-{
-	m_blockEvents = b;
-}
-
 void FECoreKernel::ShowDeprecationWarnings(bool b)
 {
 	m_bshowDeprecationWarning = b;

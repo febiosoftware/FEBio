@@ -44,6 +44,33 @@ public:
 	double value(const FENode& node); 
 };
 
+//-----------------------------------------------------------------------------
+// return the (nodal) effective fluid pressure
+class FENodeFluidPressure : public FELogNodeData
+{
+public:
+    FENodeFluidPressure(FEModel* pfem) : FELogNodeData(pfem) {}
+    double value(const FENode& node);
+};
+
+//-----------------------------------------------------------------------------
+class FENodeSoluteConcentration_ : public FELogNodeData
+{
+protected:
+    FENodeSoluteConcentration_(FEModel* pfem, int nsol) : FELogNodeData(pfem), m_nsol(nsol) {}
+    double value(const FENode& node);
+private:
+    int m_nsol;
+};
+
+template <int N> class FENodeSoluteConcentration_T : public FENodeSoluteConcentration_
+{
+public:
+    FENodeSoluteConcentration_T(FEModel* pfem) : FENodeSoluteConcentration_(pfem, N) {}
+    double value(const FENode& node) { return FENodeSoluteConcentration_::value(node); }
+};
+
+
 //=============================================================================
 // E L E M E N T   D A T A
 //=============================================================================
@@ -283,6 +310,21 @@ template <int n>
 class FELogElemSolidStress_T : public FELogElemSolidStress
 {
 public: FELogElemSolidStress_T(FEModel* fem) : FELogElemSolidStress(fem, n) {}
+};
+
+class FELogSBMRefAppDensity : public FELogElemData
+{
+public:
+	FELogSBMRefAppDensity(FEModel* fem, int n);
+	double value(FEElement& el);
+private:
+	int sbmid = -1;
+};
+
+template <int n>
+class FELogSBMRefAppDensity_T : public FELogSBMRefAppDensity
+{
+public: FELogSBMRefAppDensity_T(FEModel* fem) : FELogSBMRefAppDensity(fem, n) {}
 };
 
 //=============================================================================

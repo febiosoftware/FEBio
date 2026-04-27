@@ -31,7 +31,7 @@ SOFTWARE.*/
 #include "matrix.h"
 #include <vector>
 
-class FESolver;
+class FEModel;
 
 //-----------------------------------------------------------------------------
 // Experimental class to see if all the assembly operations can be moved to a class
@@ -44,16 +44,13 @@ public:
 	// and a vector F which contains the assembled contribution of the prescribed 
 	// degrees of freedom. The F vector must be added to the "force" vector. The u 
 	// vector contains the nodal values of the prescribed degrees of freedom.
-	FELinearSystem(FESolver* solver, FEGlobalMatrix& K, std::vector<double>& F, std::vector<double>& u, bool bsymm);
+	FELinearSystem(FEModel* fem, FEGlobalMatrix& K, std::vector<double>& F, std::vector<double>& u, bool bsymm);
 
 	// virtual destructor
 	virtual ~FELinearSystem();
 
 	// get symmetry flag
 	bool IsSymmetric() const;
-
-	// Get the solver that is using this linear system
-	FESolver* GetSolver();
 
 public:
 	// Assembly routine
@@ -70,7 +67,7 @@ public:
 
 protected:
 	bool					m_bsymm;	//!< symmetry flag
-	FESolver*				m_solver;
+	FEModel*				m_fem;
 	FEGlobalMatrix&			m_K;	//!< The global stiffness matrix
 	std::vector<double>&	m_F;	//!< Contributions from prescribed degrees of freedom
 	std::vector<double>&	m_u;	//!< the array with prescribed values

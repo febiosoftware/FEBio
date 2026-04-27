@@ -39,9 +39,12 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEBiphasicSoluteShellDomain::FEBiphasicSoluteShellDomain(FEModel* pfem) : FESSIShellDomain(pfem), FEBiphasicSoluteDomain(pfem), m_dof(pfem)
 {
-    m_dofSX = pfem->GetDOFIndex("sx");
-    m_dofSY = pfem->GetDOFIndex("sy");
-    m_dofSZ = pfem->GetDOFIndex("sz");
+	if (pfem)
+	{
+		m_dofSX = pfem->GetDOFIndex("sx");
+		m_dofSY = pfem->GetDOFIndex("sy");
+		m_dofSZ = pfem->GetDOFIndex("sz");
+	}
 }
 
 //-----------------------------------------------------------------------------

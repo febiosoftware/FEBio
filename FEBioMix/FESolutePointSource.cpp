@@ -45,7 +45,7 @@ BEGIN_FECORE_CLASS(FESolutePointSource, FEBodyLoad)
 	ADD_PARAMETER(m_pos.z, "z");
 END_FECORE_CLASS();
 
-FESolutePointSource::FESolutePointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
+FESolutePointSource::FESolutePointSource(FEModel* fem) : FEBodyLoad(fem), m_search(fem ? &fem->GetMesh() : nullptr)
 {
 	m_dofC = -1;
 	m_soluteId = -1;

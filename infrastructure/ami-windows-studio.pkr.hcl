@@ -12,10 +12,12 @@ locals {
   installation_path  = var.installation_path
   src_path           = "${local.installation_path}\\src"
   vcpkg_package_path = "${local.installation_path}\\febio"
+  qt_path = "${local.installation_path}\\Qt"
   environment = {
     "INSTALLATION_PATH"  = local.installation_path
     "SOURCE_PATH"        = local.src_path
     "VCPKG_PACKAGE_PATH" = local.vcpkg_package_path
+    "QT_INSTALL_DIR" = local.qt_path
   }
 }
 
@@ -46,12 +48,12 @@ data "amazon-parameterstore" "winrm_username" {
 
 variable "skip_create_ami" {
   type    = bool
-  default = true
+  default = false
 }
 
 source "amazon-ebs" "windows" {
   ami_name      = "packer-provisioned-windows-2019-febio-studio-${local.buildtime}"
-  instance_type = "c5a.8xlarge"
+  instance_type = "c7i.8xlarge"
   source_ami    = data.amazon-ami.windows.id
 
   communicator = "winrm"
@@ -73,7 +75,7 @@ source "amazon-ebs" "windows" {
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
     volume_size           = 150
-    volume_type           = "gp2"
+    volume_type           = "gp3"
     delete_on_termination = true
   }
 }
@@ -101,29 +103,19 @@ build {
     env    = local.environment
   }
 
+  # cmake
   provisioner "powershell" {
-    script = "./common/windows/msmpi.ps1"
+    script = "./common/windows/cmake.ps1"
     env    = local.environment
   }
+
+#   provisioner "powershell" {
+#     script = "./common/windows/msmpi.ps1"
+#     env    = local.environment
+#   }
 
   provisioner "powershell" {
     script = "./common/windows/aws.ps1"
-    env    = local.environment
-  }
-
-  provisioner "powershell" {
-    script = "./common/windows/install-builder.ps1"
-    env    = local.environment
-  }
-
-  # Lua 5.3
-  provisioner "powershell" {
-    script = "./common/windows/lua.ps1"
-    env    = local.environment
-  }
-
-  provisioner "powershell" {
-    script = "./common/windows/ffmpeg.ps1"
     env    = local.environment
   }
 
@@ -144,27 +136,9 @@ build {
     env    = local.environment
   }
 
-  # LEVMAR
-  provisioner "windows-shell" {
-    script = "./common/windows/levmar.bat"
-    env    = local.environment
-  }
-
-  # HYPRE
-  provisioner "windows-shell" {
-    script = "./common/windows/hypre.bat"
-    env    = local.environment
-  }
-
-  # # mmg
-  provisioner "windows-shell" {
-    script = "./common/windows/mmg.bat"
-    env    = local.environment
-  }
-
-  # # tetgen
-  provisioner "windows-shell" {
-    script = "./common/windows/tetgen.bat"
+  # Lua 5.3
+  provisioner "powershell" {
+    script = "./common/windows/lua.ps1"
     env    = local.environment
   }
 
@@ -177,6 +151,52 @@ build {
   # sitk
   provisioner "windows-shell" {
     script = "./common/windows/sitk.bat"
+    env    = local.environment
+  }
+
+  # qt
+  provisioner "windows-shell" {
+    script = "./common/windows/qt.bat"
+    env    = local.environment
+  }
+
+  provisioner "powershell" {
+    script = "./common/windows/install-builder.ps1"
+    env    = local.environment
+  }
+
+  provisioner "powershell" {
+    script = "./common/windows/ffmpeg.ps1"
+    env    = local.environment
+  }
+
+  # LEVMAR
+  provisioner "windows-shell" {
+    script = "./common/windows/levmar.bat"
+    env    = local.environment
+  }
+
+  # NLOPT
+   provisioner "windows-shell" {
+    script = "./common/windows/nlopt.bat"
+    env    = local.environment
+  }
+
+  # HYPRE
+  provisioner "windows-shell" {
+    script = "./common/windows/hypre.bat"
+    env    = local.environment
+  }
+
+  # mmg
+  provisioner "windows-shell" {
+    script = "./common/windows/mmg.bat"
+    env    = local.environment
+  }
+
+  # tetgen
+  provisioner "windows-shell" {
+    script = "./common/windows/tetgen.bat"
     env    = local.environment
   }
 
@@ -195,6 +215,12 @@ build {
   # libzip
   provisioner "windows-shell" {
     script = "./common/windows/libzip.bat"
+    env    = local.environment
+  }
+
+   # python
+  provisioner "windows-shell" {
+    script = "./common/windows/python.bat"
     env    = local.environment
   }
 

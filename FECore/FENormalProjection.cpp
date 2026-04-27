@@ -67,18 +67,22 @@ FESurfaceElement* FENormalProjection::Project(vec3d r, vec3d n, double rs[2])
 		int j = *it;
 		// project the node on the element
 		FESurfaceElement* pe = &m_surf.Element(j);
-		if (m_surf.Intersect(*pe, r, n, rsl, gl, m_tol)) {
-			if ((!found) && (gl > -m_rad)) {
-				found = true;
-				g = gl;
-				rs[0] = rsl[0];
-				rs[1] = rsl[1];
-				pei = pe;
-			} else if ((gl < g) && (gl > -m_rad)) {
-				g = gl;
-				rs[0] = rsl[0];
-				rs[1] = rsl[1];
-				pei = pe;
+		if (pe->isActive())
+		{
+			if (m_surf.Intersect(*pe, r, n, rsl, gl, m_tol)) {
+				if ((!found) && (gl > -m_rad)) {
+					found = true;
+					g = gl;
+					rs[0] = rsl[0];
+					rs[1] = rsl[1];
+					pei = pe;
+				}
+				else if ((gl < g) && (gl > -m_rad)) {
+					g = gl;
+					rs[0] = rsl[0];
+					rs[1] = rsl[1];
+					pei = pe;
+				}
 			}
 		}
 	}

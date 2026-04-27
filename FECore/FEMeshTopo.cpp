@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FEMeshTopo.h"
 #include "FEElementList.h"
@@ -33,6 +30,7 @@ SOFTWARE.*/
 #include "FEDomain.h"
 #include "FEElemElemList.h"
 #include "FESurface.h"
+#include <stack>
 
 class FEMeshTopo::MeshTopoImp
 {
@@ -40,6 +38,7 @@ public:
 	MeshTopoImp()
 	{
 		m_minId = -1;
+		m_mesh = nullptr;
 	}
 
 public:
@@ -289,11 +288,23 @@ std::vector<FEElement*> FEMeshTopo::ElementNeighborList(int n)
 	int nbrs = 0;
 	switch (el->Shape())
 	{
-	case ET_HEX8: nbrs = 8; break;
-	case ET_TET4: nbrs = 4; break;
-	case ET_TET5: nbrs = 4; break;
-	default:
-		assert(false);
+        case ET_HEX8:
+        case ET_HEX20:
+        case ET_HEX27:
+            nbrs = 6; break;
+        case ET_TET4:
+        case ET_TET5:
+        case ET_TET10:
+        case ET_TET15:
+        case ET_TET20:
+            nbrs = 4; break;
+        case ET_PENTA6:
+        case ET_PENTA15:
+        case ET_PYRA5:
+        case ET_PYRA13:
+            nbrs = 5; break;
+        default:
+            assert(false);
 	}
 
 	vector<FEElement*> elemList;
@@ -312,11 +323,23 @@ std::vector<int> FEMeshTopo::ElementNeighborIndexList(int n)
 	int nbrs = 0;
 	switch (el->Shape())
 	{
-	case ET_HEX8: nbrs = 8; break;
-	case ET_TET4: nbrs = 4; break;
-	case ET_TET5: nbrs = 4; break;
-	default:
-		assert(false);
+        case ET_HEX8:
+        case ET_HEX20:
+        case ET_HEX27:
+            nbrs = 6; break;
+        case ET_TET4:
+        case ET_TET5:
+        case ET_TET10:
+        case ET_TET15:
+        case ET_TET20:
+            nbrs = 4; break;
+        case ET_PENTA6:
+        case ET_PENTA15:
+        case ET_PYRA5:
+        case ET_PYRA13:
+            nbrs = 5; break;
+        default:
+            assert(false);
 	}
 
 	vector<int> elemList;
@@ -326,4 +349,70 @@ std::vector<int> FEMeshTopo::ElementNeighborIndexList(int n)
 	}
 
 	return elemList;
+}
+
+// evaluate centroid of element as average position of integration points
+vec3d ElementCentroid(FEElement& el)
+{
+    int nint = el.GaussPoints();
+    vec3d c(0,0,0);
+    for (int n=0; n<nint; ++n) {
+        FEMaterialPoint* pt = el.GetMaterialPoint(n);
+        c += pt->m_rt;
+    }
+    c /= nint;
+    return c;
+}
+
+// find neighboring elements that fall within given proximity d
+std::vector<int> FEMeshTopo::ElementProximityList(int i, double d, bool excludeSelf, bool matchMaterial)
+{
+	std::vector<int>    EPL; // element proximity list
+	std::vector<bool>   vst; // list of visited elements
+
+	int NE = Elements();
+	vst.assign(NE, false);
+
+	// exclude element i itself from the list, if requested
+	if (!excludeSelf)
+	{
+		EPL.push_back(i);
+	}
+
+	FEElement& el_i = *Element(i);
+
+	// get centroid of element i
+	vec3d x = ElementCentroid(el_i);
+
+	std::stack<int> stack;
+	stack.push(i);
+	vst[i] = true;
+	while (!stack.empty())
+	{
+		int n = stack.top(); stack.pop();
+		std::vector<int> ENIL = ElementNeighborIndexList(n);
+
+		// search each neighbor to see if it falls within given proximity d
+		for (int j = 0; j < ENIL.size(); ++j) 
+		{
+			int k = ENIL[j];
+			if ((k != -1) && !vst[k])
+			{
+				FEElement& el_k = *Element(k);
+				vec3d xk = ElementCentroid(el_k);
+				double dk = (x - xk).Length();
+				if (dk <= d)
+				{
+					if (!matchMaterial || (el_k.GetMatID() == el_i.GetMatID()))
+					{
+						EPL.push_back(k);
+						stack.push(k);
+					}
+				}
+				vst[k] = true;
+			}
+		}
+	}
+
+	return EPL;
 }

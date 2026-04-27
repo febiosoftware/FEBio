@@ -56,6 +56,9 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;
 
+    //! cale the penalty factor during Lagrange augmentation
+    double GetPenaltyScaleFactor();
+    
 public:
 	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
 	virtual void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) = 0;
@@ -73,9 +76,6 @@ protected:
 	// serialize the element pointers
 	void SerializeElementPointers(FEContactSurface& ss, FEContactSurface& ms, DumpStream& ar);
 
-    //! cale the penalty factor during Lagrange augmentation
-    double GetPenaltyScaleFactor();
-    
 public:
 	int		m_laugon;	//!< contact enforcement method
     double  m_psf;      //!< penalty scale factor during Lagrange augmentation

@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/log.h>
 #include <FECore/FEGlobalMatrix.h>
-#include <XML/XMLReader.h>
+#include <FEBioXML/XMLReader.h>
 
 FEJFNKTangentDiagnostic::FEJFNKTangentDiagnostic(FEModel* fem) : FECoreTask(fem)
 {

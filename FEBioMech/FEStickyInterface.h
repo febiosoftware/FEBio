@@ -48,6 +48,7 @@ public:
 
 	public:
 		vec3d				gap;	//!< "gap" function
+		double				scalar_gap;
 		vec2d				rs;		//!< natural coordinates of projection on secondary surface element
 		vec3d				Lm;		//!< Lagrange multiplier
 		vec3d				tn;		//!< traction vector
@@ -136,6 +137,8 @@ public:
 	int			m_naugmin;	//!< minimum nr of augmentations
 	double		m_tmax;		//!< max traction
 	double		m_snap;		//!< snap tolerance
+	bool		m_flip_secondary; //!< flip the normal on the secondary surface
+	double		m_gap_offset; //!< offset added to gap
 
 	DECLARE_FECORE_CLASS();
 };

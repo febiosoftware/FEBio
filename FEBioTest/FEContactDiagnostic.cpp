@@ -101,7 +101,7 @@ bool FEContactDiagnostic::Run()
 	int neq = solver.m_neq;
 	vector<double> Fd(neq, 0.0);
 	vector<double> ui(neq, 0.0);
-	FELinearSystem LS(&solver, K, Fd, ui, true);
+	FELinearSystem LS(&fem, K, Fd, ui, true);
 
 	// build the stiffness matrix
 	K0.Zero();

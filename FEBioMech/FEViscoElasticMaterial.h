@@ -95,17 +95,17 @@ public:
 	tens4ds Tangent(FEMaterialPoint& pt) override;
 
 	//! strain energy density
-	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+    double StrainEnergyDensity(FEMaterialPoint& pt) override { return 0; }
     
     //! calculate exponent of right-stretch tensor in series spring
-    bool SeriesStretchExponent(FEMaterialPoint& pt);
+//    bool SeriesStretchExponent(FEMaterialPoint& pt);
     
     // returns a pointer to a new material point object
 	FEMaterialPointData* CreateMaterialPointData() override;
 
 public: 
 	// material parameters
-	double	m_g0;			//!< intitial visco-elastic coefficient
+	FEParamDouble m_g0;			//!< intitial visco-elastic coefficient
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
 	double	m_t[MAX_TERMS];	//!< relaxation times
 

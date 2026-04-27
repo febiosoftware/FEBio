@@ -147,7 +147,7 @@ FESolver* FEModelBuilder::BuildSolver(FEModel& fem)
 void FEModelBuilder::NextStep()
 {
 	// reset the step pointer
-	if (m_nsteps != 0) m_pStep = 0;
+	if (m_nsteps != 0) m_pStep = nullptr;
 
 	// increase the step section counter
 	++m_nsteps;
@@ -732,6 +732,8 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 {
 	FEMesh& mesh = m_fem.GetMesh();
 
+	FENodeSet* nodeSet = nullptr;
+
 	if (setName.compare(0, 9, "@surface:") == 0)
 	{
 		// see if we can find a surface
@@ -741,19 +743,17 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		// we might have been here before. If so, we already create a nodeset
 		// with the same name as the surface, so look for that first.
-		FENodeSet* ps = mesh.FindNodeSet(surfName);
-		if (ps) return ps;
+		nodeSet = mesh.FindNodeSet(surfName);
+		if (nodeSet) return nodeSet;
 
 		// okay, first time here, so let's create a node set from this surface
 		FENodeList nodeList = surf->GetNodeList();
-		ps = new FENodeSet(&m_fem);
-		ps->Add(nodeList);
-		ps->SetName(surfName);
-		mesh.AddNodeSet(ps);
-
-		return ps;
+		nodeSet = new FENodeSet(&m_fem);
+		nodeSet->Add(nodeList);
+		nodeSet->SetName(surfName);
+		mesh.AddNodeSet(nodeSet);
 	}
-	if (setName.compare(0, 6, "@edge:") == 0)
+	else if (setName.compare(0, 6, "@edge:") == 0)
 	{
 		// see if we can find an edge
 		string edgeName = setName.substr(6);
@@ -762,17 +762,15 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		// we might have been here before. If so, we already create a nodeset
 		// with the same name as the edge, so look for that first.
-		FENodeSet* ps = mesh.FindNodeSet(edgeName);
-		if (ps) return ps;
+		nodeSet = mesh.FindNodeSet(edgeName);
+		if (nodeSet) return nodeSet;
 
 		// okay, first time here, so let's create a node set from this surface
 		FENodeList nodeList = edge->GetNodeList();
-		ps = new FENodeSet(&m_fem);
-		ps->Add(nodeList);
-		ps->SetName(edgeName);
-		mesh.AddNodeSet(ps);
-
-		return ps;
+		nodeSet = new FENodeSet(&m_fem);
+		nodeSet->Add(nodeList);
+		nodeSet->SetName(edgeName);
+		mesh.AddNodeSet(nodeSet);
 	}
 	else if (setName.compare(0, 10, "@elem_set:") == 0)
 	{
@@ -783,17 +781,15 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		// we might have been here before. If so, we already create a nodeset
 		// with the same name as the surface, so look for that first.
-		FENodeSet* ps = mesh.FindNodeSet(esetName);
-		if (ps) return ps;
+		nodeSet = mesh.FindNodeSet(esetName);
+		if (nodeSet) return nodeSet;
 
 		// okay, first time here, so let's create a node set from this element set
 		FENodeList nodeList = part->GetNodeList();
-		ps = new FENodeSet(&m_fem);
-		ps->Add(nodeList);
-		ps->SetName(esetName);
-		mesh.AddNodeSet(ps);
-
-		return ps;
+		nodeSet = new FENodeSet(&m_fem);
+		nodeSet->Add(nodeList);
+		nodeSet->SetName(esetName);
+		mesh.AddNodeSet(nodeSet);
 	}
 	else if (setName.compare(0, 11, "@part_list:") == 0)
 	{
@@ -803,19 +799,19 @@ FENodeSet* FEModelBuilder::FindNodeSet(const string& setName)
 
 		// we might have been here before. If so, we already create a nodeset
 		// with the same name as the surface, so look for that first.
-		FENodeSet* ps = mesh.FindNodeSet(setName);
-		if (ps) return ps;
+		nodeSet = mesh.FindNodeSet(setName);
+		if (nodeSet) return nodeSet;
 
 		// okay, first time here, so let's create a node set from this element set
 		FENodeList nodeList = part->GetNodeList();
-		ps = new FENodeSet(&m_fem);
-		ps->Add(nodeList);
-		ps->SetName(setName);
-		mesh.AddNodeSet(ps);
-
-		return ps;
+		nodeSet = new FENodeSet(&m_fem);
+		nodeSet->Add(nodeList);
+		nodeSet->SetName(setName);
+		mesh.AddNodeSet(nodeSet);
 	}
-	else return mesh.FindNodeSet(setName);
+	else nodeSet = mesh.FindNodeSet(setName);
+
+	return nodeSet;
 }
 
 void FEModelBuilder::MapLoadCurveToFunction(FEPointFunction* pf, int lc, double scale)
@@ -872,7 +868,7 @@ bool FEModelBuilder::GenerateMeshDataMaps()
 		if (fgen)
 		{
 			// see if this map is already defined
-			string mapName = ngen->GetName();
+			string mapName = fgen->GetName();
 			FESurfaceMap* oldMap = dynamic_cast<FESurfaceMap*>(mesh.FindDataMap(mapName));
 			if (oldMap) return false;
 

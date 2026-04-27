@@ -107,6 +107,11 @@ public:
 	FEMaterialPoint(FEMaterialPointData* data = nullptr);
 	virtual ~FEMaterialPoint();
 
+	// TODO: These functions copy  nothing! They are only included because we need them to create vectors!
+	//       I would like to delete these functions, but this means they cannot be used in vectors anymore.
+	FEMaterialPoint(const FEMaterialPoint&);
+	FEMaterialPoint& operator = (const FEMaterialPoint&);
+
 	//! The init function is used to intialize data
 	virtual void Init();
 

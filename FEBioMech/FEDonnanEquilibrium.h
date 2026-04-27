@@ -64,6 +64,8 @@ public:
 	//! Initialization routine
 	bool Init() override;
 
+	void Serialize(DumpStream& ar) override;
+
 	//! Returns the Cauchy stress
 	mat3ds Stress(FEMaterialPoint& mp) override;
 

@@ -27,13 +27,11 @@
 
 #include "FEScaledElasticMaterial.h"
 
-//-----------------------------------------------------------------------------
-//! constructor
-FEScaledElasticMaterial::FEScaledElasticMaterial(FEModel* pfem, FEElasticMaterial* pmat, FEFunction1D* scale) : FEElasticMaterial(pfem)
-{
-    m_pBase = pmat;
-    m_scale = scale;
-}
+// define the material parameters
+BEGIN_FECORE_CLASS(FEScaledElasticMaterial, FEElasticMaterial)
+	ADD_PROPERTY(m_pBase, "solid");
+    ADD_PARAMETER(m_scale, FE_RANGE_CLOSED(0,1), "scale");
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! stress function
@@ -42,13 +40,7 @@ mat3ds FEScaledElasticMaterial::Stress(FEMaterialPoint& pt)
     // get the elastic material point data
     FEElasticMaterialPoint& mp = *pt.ExtractData<FEElasticMaterialPoint>();
     
-    // evaluate spatial Hencky (logarithmic) strain
-    mat3ds h = mp.LeftHencky();
-    
-    // evaluate distortion magnitude (always positive)
-    double K2 = (h.dev()).norm();
-    
-    double scale = m_scale->value(K2);
+    double scale = m_scale(pt);
     return m_pBase->Stress(pt)*scale;
 }
 
@@ -59,13 +51,7 @@ tens4ds FEScaledElasticMaterial::Tangent(FEMaterialPoint& pt)
     // get the elastic material point data
     FEElasticMaterialPoint& mp = *pt.ExtractData<FEElasticMaterialPoint>();
     
-    // evaluate spatial Hencky (logarithmic) strain
-    mat3ds h = mp.LeftHencky();
-    
-    // evaluate distortion magnitude (always positive)
-    double K2 = (h.dev()).norm();
-    
-    double scale = m_scale->value(K2);
+    double scale = m_scale(pt);
     return m_pBase->Tangent(pt)*scale;
 }
 
@@ -76,13 +62,12 @@ double FEScaledElasticMaterial::StrainEnergyDensity(FEMaterialPoint& pt)
     // get the elastic material point data
     FEElasticMaterialPoint& mp = *pt.ExtractData<FEElasticMaterialPoint>();
     
-    // evaluate spatial Hencky (logarithmic) strain
-    mat3ds h = mp.LeftHencky();
-    
-    // evaluate distortion magnitude (always positive)
-    double K2 = (h.dev()).norm();
-    
-    double scale = m_scale->value(K2);
+    double scale = m_scale(pt);
     return m_pBase->StrainEnergyDensity(pt)*scale;
+}
+
+FEMaterialPointData* FEScaledElasticMaterial::CreateMaterialPointData()
+{
+    return m_pBase->CreateMaterialPointData();
 }
 

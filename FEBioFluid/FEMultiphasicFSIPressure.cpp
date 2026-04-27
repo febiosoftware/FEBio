@@ -25,8 +25,8 @@ FEMultiphasicFSIPressure::FEMultiphasicFSIPressure(FEModel* pfem) : FESurfaceLoa
     m_p = 0;
     
     
-    m_dofEF = pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_DILATATION), 0);
-    m_dofC = pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), 0);
+    m_dofEF = (pfem ? pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_DILATATION   ), 0) : -1);
+    m_dofC  = (pfem ? pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), 0) : -1);
     
     m_dof.Clear();
     m_dof.AddDof(m_dofEF);
@@ -42,7 +42,7 @@ bool FEMultiphasicFSIPressure::Init()
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_psurf->Element(0);
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == nullptr) return false;
     
     // get the material
@@ -98,7 +98,7 @@ void FEMultiphasicFSIPressure::Update()
     for (int i=0; i<ps->Elements(); ++i)
     {
         FESurfaceElement& el = ps->Element(i);
-        FEElement* e = el.m_elem[0];
+        FEElement* e = el.m_elem[0].pe;
         FESolidElement* se = dynamic_cast<FESolidElement*>(e);
         if (se) {
             double osci[FEElement::MAX_INTPOINTS];

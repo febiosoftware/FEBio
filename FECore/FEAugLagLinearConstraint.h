@@ -36,6 +36,8 @@ SOFTWARE.*/
 #include "fecore_api.h"
 #include <list>
 
+class FENode;
+
 //-----------------------------------------------------------------------------
 //! linear constraint enforced using augmented lagrangian
 
@@ -44,8 +46,11 @@ class FECORE_API FEAugLagLinearConstraintDOF : public FECoreClass
 public:
 	FEAugLagLinearConstraintDOF(FEModel* fem);
 
+	FENode& Node();
+	int NodeIndex();
+
 public:
-	int	m_node;		// the node to which this dof belongs to
+	int	m_nodeid;		// the ID of the node to which this dof belongs to
 	int	m_bc;			// the degree of freedom
 	double	m_val;	// coefficient value
 

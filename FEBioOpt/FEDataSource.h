@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/PointCurve.h>
 #include <functional>
 #include <FECore/NodeDataRecord.h>
+#include <FECore/ElementDataRecord.h>
 
 //-------------------------------------------------------------------------------------------------
 // The FEDataSource class is used by the FEObjectiveFunction to query model data and evaluate it
@@ -119,12 +120,11 @@ private:
 	FEDataSource*	m_src;
 };
 
-//-------------------------------------------------------------------------------------------------
-class FEDataFilterSum : public FEDataSource
+class FENodeDataFilterSum : public FEDataSource
 {
 public:
-	FEDataFilterSum(FEModel* fem);
-	~FEDataFilterSum();
+	FENodeDataFilterSum(FEModel* fem);
+	~FENodeDataFilterSum();
 
 	void SetData(FELogNodeData* data, FENodeSet* nodeSet);
 
@@ -145,5 +145,32 @@ private:
 private:
 	FELogNodeData*	m_data;
 	FENodeSet*		m_nodeSet;
+	PointCurve		m_rf;
+};
+
+class FEElemDataFilterSum : public FEDataSource
+{
+public:
+	FEElemDataFilterSum(FEModel* fem);
+	~FEElemDataFilterSum();
+
+	void SetData(FELogElemData* data, FEElementSet* elemSet);
+
+	// Initialize data
+	bool Init() override;
+
+	// reset data
+	void Reset() override;
+
+	// evaluate data source at x
+	double Evaluate(double x) override;
+
+private:
+	static bool update(FEModel* pmdl, unsigned int nwhen, void* pd);
+	void update();
+
+private:
+	FELogElemData*	m_data;
+	FEElementSet*	m_elemSet;
 	PointCurve		m_rf;
 };

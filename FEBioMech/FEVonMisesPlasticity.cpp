@@ -44,6 +44,8 @@ FEVonMisesPlasticity::FEVonMisesPlasticity(FEModel* pfem) : FESolidMaterial(pfem
 {
 	m_E = m_v = m_Y = m_H = 0;
 	m_K = m_G = 0;
+
+	AddDomainParameter(new FESolidStress());
 }
 
 //-----------------------------------------------------------------------------
@@ -145,4 +147,11 @@ tens4ds FEVonMisesPlasticity::Tangent(FEMaterialPoint &mp)
 	}
 
 	return C;
+}
+
+FESolidStress::FESolidStress() : FEDomainParameter("stress") {}
+FEParamValue FESolidStress::value(FEMaterialPoint& mp)
+{
+	FEJ2PlasticMaterialPoint& pp = *mp.ExtractData<FEJ2PlasticMaterialPoint>();
+	return pp.m_s;
 }

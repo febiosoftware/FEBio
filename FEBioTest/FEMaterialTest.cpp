@@ -35,9 +35,6 @@ FEMaterialTest::FEMaterialTest(FEModel* fem) : FEDiagnostic(fem)
 {
 	m_szoutfile = "stress.txt";
 
-	// make sure the correct module is active
-	fem->SetActiveModule("solid");
-
 	m_xout = "Ex";
 	m_yout = "sx";
 
@@ -45,17 +42,23 @@ FEMaterialTest::FEMaterialTest(FEModel* fem) : FEDiagnostic(fem)
 	m_strain = nullptr;
 	m_stress = nullptr;
 
-	// create an analysis step
-	FEAnalysis* pstep = new FEAnalysis(fem);
+	// make sure the correct module is active
+	if (fem)
+	{
+		fem->SetActiveModule("solid");
 
-	// create a new solver
-	FESolver* pnew_solver = fecore_new<FESolver>("solid", fem);
-	assert(pnew_solver);
-	pstep->SetFESolver(pnew_solver);
+		// create an analysis step
+		FEAnalysis* pstep = new FEAnalysis(fem);
 
-	// keep a pointer to the fem object
-	fem->AddStep(pstep);
-	fem->SetCurrentStep(pstep);
+		// create a new solver
+		FESolver* pnew_solver = fecore_new<FESolver>("solid", fem);
+		assert(pnew_solver);
+		pstep->SetFESolver(pnew_solver);
+
+		// keep a pointer to the fem object
+		fem->AddStep(pstep);
+		fem->SetCurrentStep(pstep);
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -153,7 +153,7 @@ tens4ds FEUncoupledViscoElasticMaterial::DevTangent(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! Strain energy density function
-double FEUncoupledViscoElasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& mp)
+/*double FEUncoupledViscoElasticMaterial::DevStrainEnergyDensity(FEMaterialPoint& mp)
 {
 	// get the viscoelastic point data
 	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
@@ -256,4 +256,4 @@ bool FEUncoupledViscoElasticMaterial::SeriesStretchExponent(FEMaterialPoint& mp)
     et.m_F = Fsafe; et.m_J = Jsafe;
     return true;
 }
-
+ */

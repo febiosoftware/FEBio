@@ -150,12 +150,6 @@ void FEBioMaterialSection3::Parse(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
-	// Make sure no materials are defined
-	if (fem.Materials() != 0) throw FEBioImport::DuplicateMaterialSection();
-
-	// reset material counter
-	m_nmat = 0;
-
 	++tag;
 	do
 	{
@@ -182,10 +176,9 @@ void FEBioMaterialSection3::Parse(XMLTag& tag)
 
 			// add the material
 			fem.AddMaterial(pmat);
-			++m_nmat;
 
 			// set the material's ID
-			pmat->SetID(m_nmat);
+			pmat->SetID(nid);
 
 			// parse the material parameters
 			ReadParameterList(tag, pmat);

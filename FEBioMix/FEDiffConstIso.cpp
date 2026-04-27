@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEDiffConstIso.h"
 #include <FECore/log.h>
+#include <FECore/FEMesh.h>
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FEDiffConstIso, FESoluteDiffusivity)
@@ -40,7 +41,8 @@ END_FECORE_CLASS();
 //! Constructor. 
 FEDiffConstIso::FEDiffConstIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 {
-	m_free_diff = m_diff = 1;
+	m_free_diff = 1;
+    m_diff = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -48,10 +50,17 @@ FEDiffConstIso::FEDiffConstIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 bool FEDiffConstIso::Validate()
 {
 	if (FESoluteDiffusivity::Validate() == false) return false;
-	if (m_free_diff < m_diff) {
-		feLogError("free_diff must be >= diff");
-		return false;
-	}
+    FEMesh& mesh = GetMesh();
+    for (int i=0; i<mesh.Elements(); ++i) {
+        FEElement& elem = *mesh.Element(i);
+        for (int n=0; n<elem.GaussPoints(); ++n) {
+            FEMaterialPoint& mp = *elem.GetMaterialPoint(n);
+            if (m_free_diff(mp) < m_diff(mp)) {
+                feLogError("free_diff must be >= diff in element %i", elem.GetID());
+                return false;
+            }
+        }
+    }
 	return true;
 }
 
@@ -59,7 +68,7 @@ bool FEDiffConstIso::Validate()
 //! Free diffusivity
 double FEDiffConstIso::Free_Diffusivity(FEMaterialPoint& mp)
 {
-	return m_free_diff;
+	return m_free_diff(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -75,7 +84,7 @@ mat3ds FEDiffConstIso::Diffusivity(FEMaterialPoint& mp)
 {
 	// --- constant isotropic diffusivity ---
 	
-	return mat3dd(m_diff);
+	return mat3dd(m_diff(mp));
 }
 
 //-----------------------------------------------------------------------------

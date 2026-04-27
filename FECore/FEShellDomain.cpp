@@ -62,12 +62,14 @@ void FEShellDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
-void FEShellDomain::InitShells()
+bool FEShellDomain::InitShells()
 {
 	ForEachShellElement([](FEShellElement& el) {
 		int n = el.Nodes();
 		for (int j = 0; j<n; ++j) el.m_ht[j] = el.m_h0[j];
 	});
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -205,9 +207,9 @@ double FEShellDomainOld::Volume(FEShellElement& se)
 //-----------------------------------------------------------------------------
 //! Calculate all shell normals (i.e. the shell directors).
 //! And find shell nodes
-void FEShellDomainOld::InitShells()
+bool FEShellDomainOld::InitShells()
 {
-	FEShellDomain::InitShells();
+	if (!FEShellDomain::InitShells()) return false;
 
 	FEMesh& mesh = *GetMesh();
 	for (int i = 0; i<Elements(); ++i)
@@ -221,6 +223,8 @@ void FEShellDomainOld::InitShells()
 			el.m_D0[j] = d0 * el.m_h0[j];
 		}
 	}
+
+	return true;
 }
 
 //=================================================================================================

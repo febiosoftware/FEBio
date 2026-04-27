@@ -130,7 +130,8 @@ double FERealVapor::Pressure(FEMaterialPoint& mp)
     double T = tf.m_T + m_Tr;
     double That = T/m_Tr;
     double J = 1 + fp.m_ef;
-    double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+    double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+    double q = log(1+pow(y,m_alpha));
     double Jsat = exp(m_esat->value(q));
     double Psat = exp(m_psat->value(q));
     double D[MAX_NVP];
@@ -152,7 +153,8 @@ double FERealVapor::SpecificFreeEnergy(FEMaterialPoint& mp)
     
     double T = tf.m_T + m_Tr;
     double That = T/m_Tr;
-    double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+    double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+    double q = log(1+pow(y,m_alpha));
     double asat = m_asat->value(q);
 
     double J = 1 + fp.m_ef;
@@ -181,7 +183,8 @@ double FERealVapor::SpecificEntropy(FEMaterialPoint& mp)
     
     double T = tf.m_T + m_Tr;
     double That = T/m_Tr;
-    double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+    double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+    double q = log(1+pow(y,m_alpha));
     double ssat = exp(m_ssat->value(q));
     
     double J = 1 + fp.m_ef;
@@ -224,7 +227,8 @@ double FERealVapor::SpecificStrainEnergy(FEMaterialPoint& mp)
     double a = SpecificFreeEnergy(mp);
     
     double That = (m_Tr+tf.m_T)/m_Tr;
-    double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+    double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+    double q = log(1+pow(y,m_alpha));
     double Jsat = exp(m_esat->value(q));
     double asat = m_asat->value(q)*m_Pr/m_rhor;
     
@@ -242,11 +246,12 @@ double FERealVapor::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
     double J = 1 + fp.m_ef;
     double T = tf.m_T + m_Tr;
     double That = T/m_Tr;
-    double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+    double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+    double q = log(1+pow(y,m_alpha));
     double Jsat = exp(m_esat->value(q));
-    double y = 1 - Jsat/J;
+    double x = 1 - Jsat/J;
     double cv = exp(m_cvsat->value(q));
-    for (int k=0; k<m_nvc; ++k) cv += m_C[k]->value(q)*pow(y,k+1);
+    for (int k=0; k<m_nvc; ++k) cv += m_C[k]->value(q)*pow(x,k+1);
 
     return cv*m_Pr/(m_Tr*m_rhor);
 }
@@ -255,13 +260,22 @@ double FERealVapor::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
 //! isobaric specific heat capacity
 double FERealVapor::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double cv = IsochoricSpecificHeatCapacity(mp);
-    double p = Pressure(mp);
+    double p = Pressure(mp);    // current gauge pressure
     double dpT = Tangent_Temperature(mp);
-    double dpJ = Tangent_Strain(mp);
-    double T = m_Tr + tf.m_T;
-    double cp = cv - T/m_rhor*pow(dpT,2)/dpJ;
+    // evaluate dpT/dpJ in the reference configuration
+    double efsafe = fp.m_ef;
+    double Tsafe = tf.m_T;
+    fp.m_ef = 0;
+    tf.m_T = 0;
+    double r = Tangent_Temperature(mp)/Tangent_Strain(mp);
+    // restore values before continuing
+    fp.m_ef = efsafe;
+    tf.m_T = Tsafe;
+    // evaluate isobaric specific heat capacity
+    double cp = cv + r/m_rhor*(p - (m_Tr + tf.m_T)*dpT);
     return cp;
 }
 
@@ -274,7 +288,8 @@ bool FERealVapor::Dilatation(const double T, const double p, double& e)
     // if valid, continue
     double Phat = 1 + p/m_Pr;
     double That = (T+m_Tr)/m_Tr;
-    double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+    double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+    double q = log(1+pow(y,m_alpha));
     double Psat = exp(m_psat->value(q));
     // check to make sure that we are in the vapor phase
     if (Phat > Psat) return false;
@@ -315,7 +330,8 @@ double FERealVapor::Tangent_Strain(FEMaterialPoint& mp)
     double T = tf.m_T + m_Tr;
     double That = T/m_Tr;
     double J = 1 + fp.m_ef;
-    double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+    double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+    double q = log(1+pow(y,m_alpha));
     double Jsat = exp(m_esat->value(q));
     double Psat = exp(m_psat->value(q));
     double D[MAX_NVP];
@@ -339,7 +355,8 @@ double FERealVapor::Tangent_Temperature(FEMaterialPoint& mp)
     double T = tf.m_T + m_Tr;
     double That = T/m_Tr;
     double J = 1 + fp.m_ef;
-    double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+    double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+    double q = log(1+pow(y,m_alpha));
     double Jsat = exp(m_esat->value(q));
     double Psat = exp(m_psat->value(q));
     double coef = -m_alpha*(1-exp(-q))/(m_Tc-That);

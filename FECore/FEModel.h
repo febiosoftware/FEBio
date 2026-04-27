@@ -34,6 +34,7 @@ SOFTWARE.*/
 #include "Callback.h"
 #include "FECoreKernel.h"
 #include "DataStore.h"
+#include "FEDataValue.h"
 #include <string>
 
 //-----------------------------------------------------------------------------
@@ -71,6 +72,14 @@ class FEGlobalVariable
 public:
 	double	v;
 	string	name;
+};
+
+//-----------------------------------------------------------------------------
+// Definition of a febcode script
+struct FEScript
+{
+	string		name;		//!< script name
+	string		script;		//!< script content
 };
 
 //! The FEModel class stores all the data for the finite element model, including
@@ -137,8 +146,11 @@ public:
 	//! Initialize the mesh
 	virtual bool InitMesh();
 
+	//! mesh validation
+	void ValidateMesh();
+
 	//! Initialize shells
-	virtual void InitShells();
+	virtual bool InitShells();
 
 	//! Build the matrix profile for this model
 	virtual void BuildMatrixProfile(FEGlobalMatrix& G, bool breset);
@@ -231,7 +243,7 @@ public:
 public: // --- Analysis steps functions ---
 
 	//! retrieve the number of steps
-	int Steps();
+	int Steps() const;
 
 	//! clear the steps
 	void ClearSteps();
@@ -345,7 +357,7 @@ public: // --- parameter functions ---
 	FEParam* FindParameter(const ParamString& s) override;
 
 	//! return a reference to the named parameter
-	virtual FEParamValue GetParameterValue(const ParamString& param);
+	FEParamValue GetParameterValue(const ParamString& param) override;
 
 	//! return the parameter string for a parameter
 	std::string GetParamString(FEParam* p);
@@ -359,6 +371,9 @@ public: // --- parameter functions ---
 
 	//! Get the print parameter flag
 	bool GetPrintParametersFlag() const;
+
+	//! return a data value object
+	FEDataValue GetDataValue(const ParamString& s);
 
 public:	// --- Miscellaneous routines ---
 
@@ -395,6 +410,8 @@ public:
 	void UnBlockLog();
 	bool LogBlocked() const;
 
+	void SetVerboseMode(bool b);
+
 public:
 	// Derived classes can use this to implement the actual logging mechanism
 	virtual void Log(int ntag, const char* msg);
@@ -427,6 +444,12 @@ public: // Data retrieval
 	const FEPlotDataStore& GetPlotDataStore() const;
 
 public:
+	// decide whether to collect timings
+	void CollectTimings(bool b);
+
+	// return if this model has timing collection on
+	bool CollectTimings() const;
+
 	// reset all the timers
 	void ResetAllTimers();
 
@@ -441,6 +464,10 @@ public:
 
 	// this can be used to change the update counter
 	void IncrementUpdateCounter();
+
+	bool AddScript(const std::string& name, const std::string& script);
+
+	FEScript GetScript(const std::string& name) const;
 
 public:
 	void SetUnits(const char* szunits);

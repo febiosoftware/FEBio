@@ -138,7 +138,7 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 	// open the XML file
 	if (m_xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening restart file %s\n", szfile);
 
-	m_builder = new FEModelBuilder(fem);
+	if (m_builder == nullptr) SetModelBuilder(new FEModelBuilder(fem));
 
 	m_szdmp[0] = 0;
 	m_newSteps = 0;

@@ -87,6 +87,9 @@ public:
 	// is this a top-level property
 	bool IsTopLevel() const { return (m_flags & TopLevel) != 0; }
 
+	// is this a fixed property
+	bool IsFixed() const { return (m_flags & Fixed) != 0; }
+
 	// set the flags
 	void SetFlags(unsigned int flags) { m_flags = flags; }
 

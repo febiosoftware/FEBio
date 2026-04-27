@@ -183,3 +183,44 @@ public:
     //! damage
     double DamageCriterion(FEMaterialPoint& pt);
 };
+
+//-----------------------------------------------------------------------------
+// Drucker-Prager yield criterion
+
+class FEDamageCriterionDruckerPrager : public FEDamageCriterion
+{
+public:
+    FEDamageCriterionDruckerPrager(FEModel* pfem) : FEDamageCriterion(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt) override;
+    
+    //! criterion tangent with respect to stress
+    mat3ds CriterionStressTangent(FEMaterialPoint& pt) override;
+    
+public:
+    FEParamDouble   m_b;    //!< Drucker-Prager material parameter
+    
+    DECLARE_FECORE_CLASS();
+};
+
+//-----------------------------------------------------------------------------
+// Deshpande-Fleck yield criterion
+
+class FEDamageCriterionDeshpandeFleck : public FEDamageCriterion
+{
+public:
+    FEDamageCriterionDeshpandeFleck(FEModel* pfem) : FEDamageCriterion(pfem) {}
+    
+    //! damage
+    double DamageCriterion(FEMaterialPoint& pt) override;
+    
+    //! criterion tangent with respect to stress
+    mat3ds CriterionStressTangent(FEMaterialPoint& pt) override;
+    
+public:
+    FEParamDouble   m_beta;    //!< Deshpande-Fleck material parameter
+    
+    DECLARE_FECORE_CLASS();
+};
+

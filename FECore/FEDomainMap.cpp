@@ -528,6 +528,16 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 			}
 		}
 		break;
+		case FE_VEC3D:
+		{
+			// set the new values of the map
+			for (int i = 0; i < set2->Elements(); ++i)
+			{
+				vec3d v = map.get<vec3d>(i);
+				set<vec3d>(oldElems + i, v);
+			}
+		}
+		break;
 		case FE_MAT3D:
 		{
 			// set the new values of the map
@@ -538,6 +548,8 @@ bool FEDomainMap::Merge(FEDomainMap& map)
 			}
 		}
 		break;
+		default:
+			assert(false);
 		}
 	}
 

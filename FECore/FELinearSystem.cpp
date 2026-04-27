@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FELinearSystem::FELinearSystem(FESolver* solver, FEGlobalMatrix& K, vector<double>& F, vector<double>& u, bool bsymm) : m_K(K), m_F(F), m_u(u), m_solver(solver)
+FELinearSystem::FELinearSystem(FEModel* fem, FEGlobalMatrix& K, vector<double>& F, vector<double>& u, bool bsymm) : m_K(K), m_F(F), m_u(u), m_fem(fem)
 {
 	m_bsymm = bsymm;
 }
@@ -50,14 +50,6 @@ bool FELinearSystem::IsSymmetric() const
 	return m_bsymm;
 }
 
-//-----------------------------------------------------------------------------
-// Get the solver that is using this linear system
-FESolver* FELinearSystem::GetSolver()
-{
-	return m_solver;
-}
-
-//-----------------------------------------------------------------------------
 //! assemble global stiffness matrix
 void FELinearSystem::Assemble(const FEElementMatrix& ke)
 {
@@ -98,16 +90,16 @@ void FELinearSystem::Assemble(const FEElementMatrix& ke)
 		}
 	}
 
-#pragma omp critical (LC_assemble)
+	if (m_fem) 
 	{
-	FEModel* fem = m_solver->GetFEModel();
-	FELinearConstraintManager& LCM = fem->GetLinearConstraintManager();
-	if (LCM.LinearConstraints())
-	{
-		const vector<int>& en = ke.Nodes();
-		LCM.AssembleStiffness(m_K, m_F, m_u, en, lmi, lmj, ke);
+		FELinearConstraintManager& LCM = m_fem->GetLinearConstraintManager();
+		if (LCM.LinearConstraints())
+		{
+			const vector<int>& en = ke.Nodes();
+			#pragma omp critical (LC_assemble)
+			LCM.AssembleStiffness(m_K, m_F, m_u, en, lmi, lmj, ke);
+		}
 	}
-	} // omp critical
 }
 
 //-----------------------------------------------------------------------------

@@ -37,9 +37,10 @@ SOFTWARE.*/
 class FECORE_API quatd
 {
 public:
-	// constructors
+	//! Default constructor - creates identity quaternion (0, 0, 0, 1)
 	quatd() { x = y = z = 0.0;  w = 1.0; }
 
+	//! Constructor from rotation angle and axis vector
 	quatd( const double angle, vec3d v)
 	{
 		w = (double) cos(angle * 0.5);
@@ -53,6 +54,7 @@ public:
 		z = v.z*sina;
 	}
 
+	//! Constructor from rotation vector (magnitude is angle, direction is axis)
 	quatd(vec3d v)
 	{
         double angle = v.unit();
@@ -66,6 +68,7 @@ public:
 		z = v.z*sina;
 	}
     
+	//! Constructor from two vectors - creates rotation from v1 to v2
 	quatd (const vec3d& v1, const vec3d& v2)
 	{
 		vec3d n = v1^v2;
@@ -84,6 +87,7 @@ public:
 
 	}
 
+	//! Constructor from four components
 	quatd(const double qx, const double qy, const double qz, const double qw = 1.0)
 	{
 		w = qw;
@@ -92,26 +96,31 @@ public:
 		z = qz;
 	}
 
+	//! Constructor from rotation matrix
 	quatd(const mat3d& a);
 
+	//! Inequality comparison operator
 	bool operator != (const quatd& q) const { return ((x!=q.x) || (y!=q.y) || (z!=q.z) || (w!=q.w)); }
 
+	//! Equality comparison operator
 	bool operator == (const quatd& q) const { return ((x == q.x) && (y == q.y) && (z == q.z) && (w == q.w)); }
 
+	//! Unary negation operator
 	quatd operator - () { return quatd(-x, -y, -z, -w); }
 
-	// addition and substraction
-
+	//! Quaternion addition operator
 	quatd operator + (const quatd& q) const
 	{
 		return quatd(x + q.x, y + q.y, z + q.z, w + q.w);
 	}
 
+	//! Quaternion subtraction operator
 	quatd operator - (const quatd& q) const
 	{
 		return quatd(x - q.x, y - q.y, z - q.z, w - q.w);
 	}
 
+	//! Quaternion addition assignment operator
 	quatd& operator += (const quatd& q)
 	{
 		x += q.x;
@@ -122,6 +131,7 @@ public:
 		return *this;
 	}
 
+	//! Quaternion subtraction assignment operator
 	quatd& operator -= (const quatd& q)
 	{
 		x -= q.x;
@@ -132,9 +142,7 @@ public:
 		return *this;
 	}
 
-
-	// multiplication
-
+	//! Quaternion multiplication operator
 	quatd operator * (const quatd& q) const
 	{
 		double qw = w*q.w - x*q.x - y*q.y - z*q.z;
@@ -145,6 +153,7 @@ public:
 		return quatd(qx, qy, qz, qw);
 	}
 
+	//! Quaternion multiplication assignment operator
 	quatd& operator *= (const quatd& q)
 	{
 		double qw = w*q.w - x*q.x - y*q.y - z*q.z;
@@ -160,18 +169,19 @@ public:
 		return *this;
 	}
 
+	//! Scalar multiplication operator
 	quatd operator*(const double a) const
 	{
 		return quatd(x*a, y*a, z*a, w*a);
 	}
 
-	// division
-
+	//! Scalar division operator
 	quatd operator / (const double a) const
 	{
 		return quatd(x/a, y/a, z/a, w/a);
 	}
 
+	//! Scalar division assignment operator
 	quatd& operator /= (const double a)
 	{
 		x /= a;
@@ -182,12 +192,13 @@ public:
 		return *this;
 	}
 
-	// Special ops
-
+	//! Return the conjugate of the quaternion
 	quatd Conjugate() const { return quatd(-x, -y, -z, w); }
 
+	//! Return the norm (squared magnitude) of the quaternion
 	double Norm() const { return w*w + x*x + y*y + z*z; } 
 
+	//! Normalize the quaternion to unit length
 	void MakeUnit() 
 	{
 		double N = (double) sqrt(w*w + x*x + y*y + z*z);
@@ -202,6 +213,7 @@ public:
 		else w = 1.f;
 	}
 
+	//! Return the inverse of the quaternion
 	quatd Inverse() const
 	{
 		double N = w*w + x*x + y*y + z*z;
@@ -209,11 +221,13 @@ public:
 		else return quatd(-x/N, -y/N, -z/N, w/N);
 	}
 
+	//! Calculate dot product with another quaternion
 	double DotProduct(const quatd& q) const
 	{
 		return w*q.w + x*q.x + y*q.y + z*q.z;
 	}
 
+	//! Get the normalized rotation axis vector
 	vec3d GetVector() const
 	{
 		vec3d r(x,y,z);
@@ -221,6 +235,7 @@ public:
 		return r;
 	}
 
+	//! Get the rotation vector (axis scaled by angle)
 	vec3d GetRotationVector() const
 	{
 		vec3d r(x,y,z);
@@ -229,6 +244,7 @@ public:
 		return r*a;
 	}
 
+	//! Get the rotation angle in radians
 	double GetAngle() const
 	{
         vec3d r(x,y,z);
@@ -237,7 +253,7 @@ public:
 		return (double)(atan2(sha,cha)*2.0);
 	}
 
-	// use only when *this is unit vector
+	//! Rotate a vector using this quaternion (in-place, for unit quaternions only)
 	void RotateVector(vec3d& v) const
 	{
 		if ((w == 0) || ((x==0) && (y==0) && (z==0))) return;
@@ -254,7 +270,7 @@ public:
 		v.z = w*qz + z*qw + x*qy - y*qx;
 	}
 
-	// use only when *this is unit vector
+	//! Vector rotation operator (for unit quaternions only)
 	vec3d operator * (const vec3d& r) const
 	{
 		vec3d n = r;
@@ -273,6 +289,7 @@ public:
 		return n;
 	}
 
+	//! Rotate vector using raw pointer arrays
 	void RotateVectorP(double* v, double* r) const
 	{
 		double qw = v[0]*x + v[1]*y + v[2]*z;
@@ -300,44 +317,38 @@ public:
 			w*w - x*x - y*y + z*z);
 	}
 
+	//! Calculate dot product between two quaternions
 	static double dot(quatd &q1, quatd &q2) 
 	{ return q1.x*q2.x + q1.y*q2.y + q1.z*q2.z + q1.w*q2.w; }
 
+	//! Linear interpolation between two quaternions
 	static quatd lerp(quatd &q1, quatd &q2, const double t) 
 	{ quatd q = (q1*(1.0-t) + q2*t); q.MakeUnit(); return q; }
 
+	//! Spherical linear interpolation between two quaternions
 	static quatd slerp(quatd &q1, quatd &q2, const double t);
 
-	// set a quaternion defined via the XYZ Euler angles (in radians)
-	// Convention is first rotate about z, then x, and then y
-	// This conforms to the Tait-Bryan angles (roll, pitch, yaw)
+	//! Set quaternion from XYZ Euler angles (roll, pitch, yaw in radians)
 	void SetEuler(double x, double y, double z);
+	//! Get XYZ Euler angles from quaternion (roll, pitch, yaw in radians)
 	void GetEuler(double& x, double& y, double& z) const;
 
 public:
+	//! X component of quaternion
 	double x, y, z, w;
 };
 
+//! Scalar multiplication operator (scalar * quaternion)
 inline quatd operator * (const double a, const quatd& q)
 {
 	return q*a;
 }
 
-// TODO: What Euler convention do these functions assume?
-// convert euler-angles to a rotation matrix
-// l[0] = psi   (x-rotation)
-// l[1] = theta (y-rotation)
-// l[2] = phi   (z-rotation)
+//! Convert euler-angles to a rotation matrix
 FECORE_API mat3d euler2rot(double l[3]);
 
-// convert a rotation matrix to euler angles
-// l[0] = psi   (x-rotation)
-// l[1] = theta (y-rotation)
-// l[2] = phi   (z-rotation)
+//! Convert a rotation matrix to euler angles
 FECORE_API void rot2euler(const mat3d& m, double l[3]);
 
-// extract euler angles from a quaternion
-// l[0] = psi   (x-rotation)
-// l[1] = theta (y-rotation)
-// l[2] = phi   (z-rotation)
+//! Extract euler angles from a quaternion
 FECORE_API void quat2euler(const quatd& q, double l[3]);

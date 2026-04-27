@@ -35,7 +35,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FENewtonianRealVapor, FEViscousFluid)
+BEGIN_FECORE_CLASS(FENewtonianRealVapor, FEThermoViscousFluid)
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("referential shear viscosity");
 // properties
     ADD_PROPERTY(m_esat , "esat",FEProperty::Optional)->SetLongName("saturation dilatation");
@@ -48,7 +48,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FENewtonianRealVapor::FENewtonianRealVapor(FEModel* pfem) : FEViscousFluid(pfem)
+FENewtonianRealVapor::FENewtonianRealVapor(FEModel* pfem) : FEThermoViscousFluid(pfem)
 {
     m_kappa = 0;
     m_mu = 0;
@@ -179,11 +179,12 @@ double FENewtonianRealVapor::ShearViscosity(FEMaterialPoint& mp)
         double T = tf.m_T + m_Tr;
         double That = T/m_Tr;
         double J = 1 + pf.m_ef;
-        double q = log(1+pow((m_Tc-That)/(m_Tc-1),m_alpha));
+        double y = (That < m_Tc) ? (m_Tc-That)/(m_Tc-1) : 0;
+        double q = log(1+pow(y,m_alpha));
         mu = m_musat->value(q);
         double Jsat = exp(m_esat->value(q));
-        double y = 1 - Jsat/J;
-        for (int k=0; k<m_nvc; ++k) mu += m_C[k]->value(q)*pow(y,k+1);
+        double x = 1 - Jsat/J;
+        for (int k=0; k<m_nvc; ++k) mu += m_C[k]->value(q)*pow(x,k+1);
     }
     return mu*m_mu;
 }

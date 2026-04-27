@@ -56,6 +56,24 @@ FEPermRefOrtho::FEPermRefOrtho(FEModel* pfem) : FEHydraulicPermeability(pfem)
 	m_alpha[0] = 0.0; m_alpha[1] = 0.0; m_alpha[2] = 0.0;
 }
 
+void FEPermRefOrtho::reportError(double J, double phisr)
+{
+	const int MAX_ERRORS = 1;
+	static int n = 0;
+	double t = CurrentTime();
+	static double t_last = 0;
+	if (t != t_last)
+	{
+		t = t_last;
+		n = 0;
+	}
+	if (n < MAX_ERRORS)
+	{
+		feLogError("The perm-ref-ortho permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.", J, phisr);
+		n++;
+	}
+}
+
 //-----------------------------------------------------------------------------
 //! Permeability tensor.
 mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
@@ -83,7 +101,7 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	double phisr = pt.m_phi0t;
 	
     // check for potential error
-    if (J <= phisr) feLogError("The perm-ref-ortho permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
+	if (J <= phisr) reportError(J, phisr);
     
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
@@ -143,7 +161,7 @@ tens4dmm FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
     double phisr = pt.m_phi0t;
 
     // check for potential error
-    if (J <= phisr) feLogError("The perm-ref-ortho permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g.",J,phisr);
+    if (J <= phisr) reportError(J, phisr);
     
 	// get local coordinates
 	mat3d Q = GetLocalCS(mp);

@@ -27,13 +27,13 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEViscousFluid.h"
+#include "FEThermoViscousFluid.h"
 #include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 // This class evaluates the viscous stress in a Newtonian fluid
 
-class FEBIOFLUID_API FENewtonianThermoFluid :	public FEViscousFluid
+class FEBIOFLUID_API FENewtonianThermoFluid :	public FEThermoViscousFluid
 {
 public:
     //! constructor

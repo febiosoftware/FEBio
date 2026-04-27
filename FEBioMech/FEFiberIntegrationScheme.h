@@ -71,5 +71,8 @@ public:
 	// The passed material point pointer will be zero when evaluating the integrated fiber density
 	virtual FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp = 0) = 0;
 
+	// returns the number of integration point (returns -1 if scheme does not use a fixed number of integration points.)
+	virtual int IntegrationPoints() const = 0;
+
 	FECORE_BASE_CLASS(FEFiberIntegrationScheme)
 };

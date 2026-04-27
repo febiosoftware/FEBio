@@ -122,6 +122,7 @@ enum FE_Element_Type {
 
 	// 2.5D surface elements
 	FE_QUAD4G4,
+	FE_QUAD4G16,
 	FE_QUAD4NI,
 	FE_TRI3G1,
 	FE_TRI3G3,
@@ -244,7 +245,7 @@ enum SUPER_CLASS_ID {
 	FENLCONSTRAINT_ID,           	// derived from FENLConstraint
 	FEPLOTDATA_ID,               	// derived from FEPlotData
 	FEANALYSIS_ID,               	// derived from FEAnalysis
-	FESURFACEINTERFACE_ID, 			// derived from FESurfaceInterface
+	FESURFACEINTERACTION_ID, 		// derived from FESurfaceInterface
 	FELOGNODEDATA_ID,            	// derived from FELogNodeData
 	FELOGFACEDATA_ID,            	// derived from FELogFaceData
 	FELOGELEMDATA_ID,            	// derived from FELogElemData
@@ -280,6 +281,7 @@ enum SUPER_CLASS_ID {
 	FEEIGENSOLVER_ID,				// derived from EigenSolver
 	FEDATARECORD_ID,				// derived from DataRecord
 	FECLASS_ID,						// derived from FECoreClass
+	FESCRIPT_ID,					// derived from FEScriptedBehavior
 };
 
 //-----------------------------------------------------------------------------

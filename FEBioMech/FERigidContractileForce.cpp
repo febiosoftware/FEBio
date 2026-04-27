@@ -157,13 +157,16 @@ void FERigidContractileForce::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
     mat3d zbhat; zbhat.skew(zb);
     mat3d zbthat; zbthat.skew(zbt);
     
-    vec3d n = rb + zb - ra - za;
+    vec3d c = rb + zb - ra - za;
+	vec3d n(c);
     double L = n.unit();
     m_F = n*m_f0;
     mat3ds P;
     mat3dd I(1);
     P = I - dyad(n);
     double k = (L > 0) ? m_f0/L : 0;
+
+	mat3da chat(c);
     
     mat3d K;
     
@@ -198,7 +201,7 @@ void FERigidContractileForce::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
     ke[5][0] = K[2][0]; ke[5][1] = K[2][1]; ke[5][2] = K[2][2];
     
     // (2,2)
-    K = (zahat*P*zathat)*(-alpha*k);
+    K = (zahat*P*zathat + chat*zathat)*(-alpha*k);
     ke[3][3] = K[0][0]; ke[3][4] = K[0][1]; ke[3][5] = K[0][2];
     ke[4][3] = K[1][0]; ke[4][4] = K[1][1]; ke[4][5] = K[1][2];
     ke[5][3] = K[2][0]; ke[5][4] = K[2][1]; ke[5][5] = K[2][2];
@@ -260,7 +263,7 @@ void FERigidContractileForce::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
     ke[11][6] = K[2][0]; ke[11][7] = K[2][1]; ke[11][8] = K[2][2];
     
     // (4,4)
-    K = (zbhat*P*zbthat)*(-alpha*k);
+    K = (zbhat*P*zbthat - chat*zbthat)*(-alpha*k);
     ke[9 ][9] = K[0][0]; ke[ 9][10] = K[0][1]; ke[ 9][11] = K[0][2];
     ke[10][9] = K[1][0]; ke[10][10] = K[1][1]; ke[10][11] = K[1][2];
     ke[11][9] = K[2][0]; ke[11][10] = K[2][1]; ke[11][11] = K[2][2];

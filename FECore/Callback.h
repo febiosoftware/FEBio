@@ -54,6 +54,7 @@ class FEModel;
 #define CB_SERIALIZE_SAVE	0x00004000		//!< Called at the end of FEModel::Serialize when saving
 #define CB_SERIALIZE_LOAD	0x00008000		//!< Called at the end of FEModel::Serialize when loading
 #define CB_TIMESTEP_FAILED	0x00010000		//!< Called when the time step failed
+#define CB_QUASIN_CONVERGED 0x00020000		//!< Called when Quasin is done (but before it finishes up)
 #define CB_USER1			0x01000000		//!< can be used by users
 
 typedef unsigned int FECORE_CB_WHEN;

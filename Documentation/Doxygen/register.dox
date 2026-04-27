@@ -17,13 +17,13 @@ The following code excerpt presents an example of PluginInitialize.
 \code
 FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)
 {
-	\\ Set the kernel to match FEBio's kernel
+	// Set the kernel to match FEBio's kernel
 	FECoreKernel::SetInstance(&fecore);
 
-	\\ set the active module to which to add this new feature
+	// set the active module to which to add this new feature
 	fecore.SetActiveModule("solid");
 	
-	\\ Register the classes in this plugin
+	// Register the classes in this plugin
 	REGISTER_FECORE_CLASS(MyMaterial, "My material");
 }
 \endcode

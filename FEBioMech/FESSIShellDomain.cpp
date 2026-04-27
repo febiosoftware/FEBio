@@ -95,12 +95,29 @@ void FESSIShellDomain::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 //! Calculate all shell normals (i.e. the shell directors).
 //! And find shell nodes
-void FESSIShellDomain::InitShells()
+bool FESSIShellDomain::InitShells()
 {
-    FEShellDomain::InitShells();
-    
+	if (!FEShellDomain::InitShells()) return false;
+
+	FEMesh& mesh = *GetMesh();
+
+	// check for zero shell thickness
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FEShellElementNew& el = ShellElement(i);
+		int nn = el.Nodes();
+		for (int j = 0; j < nn; ++j)
+		{
+			if (el.m_h0[j] <= 0.0)
+			{
+				string name = GetName();
+				feLogError("Zero shell thickness found in \"%s\"", name.c_str());
+				return false;
+			}
+		}
+	}
+
     if (!m_bnodalnormals) {
-        FEMesh& mesh = *GetMesh();
         for (int i = 0; i<Elements(); ++i)
         {
             FEShellElementNew& el = ShellElement(i);
@@ -122,7 +139,6 @@ void FESSIShellDomain::InitShells()
         }
     }
 
-	FEMesh& mesh = *GetMesh();
 	for (int i = 0; i < Elements(); ++i)
 	{
 		FEShellElementNew& el = ShellElement(i);
@@ -142,6 +158,8 @@ void FESSIShellDomain::InitShells()
 			el.m_G0[2][j] = el.m_Gt[2][j] = g0[2];
 		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1063,36 +1081,38 @@ void FESSIShellDomain::Update(const FETimeInfo& tp)
 	for (int i = 0; i < NE; ++i)
 	{
 		FEShellElement& e = Element(i);
-
-		int n = e.Nodes();
-		for (int j = 0; j<n; ++j)
+		if (e.isActive())
 		{
-			FENode& nj = mesh.Node(e.m_node[j]);
-			vec3d D = nj.m_dt;
-			double h = D.norm();
+			int n = e.Nodes();
+			for (int j = 0; j < n; ++j)
+			{
+				FENode& nj = mesh.Node(e.m_node[j]);
+				vec3d D = nj.m_dt;
+				double h = D.norm();
 
-			e.m_ht[j] = h;
-		}
+				e.m_ht[j] = h;
+			}
 
-		vec3d g[3];
-		int ni = e.GaussPoints();
-		for (int j = 0; j < ni; ++j)
-		{
-			CoBaseVectors(e, j, g);
-			e.m_gt[0][j] = g[0];
-			e.m_gt[1][j] = g[1];
-			e.m_gt[2][j] = g[2];
+			vec3d g[3];
+			int ni = e.GaussPoints();
+			for (int j = 0; j < ni; ++j)
+			{
+				CoBaseVectors(e, j, g);
+				e.m_gt[0][j] = g[0];
+				e.m_gt[1][j] = g[1];
+				e.m_gt[2][j] = g[2];
 
-			CoBaseVectorsP(e, j, g);
-			e.m_gp[0][j] = g[0];
-			e.m_gp[1][j] = g[1];
-			e.m_gp[2][j] = g[2];
+				CoBaseVectorsP(e, j, g);
+				e.m_gp[0][j] = g[0];
+				e.m_gp[1][j] = g[1];
+				e.m_gp[2][j] = g[2];
 
-			// NOTE: calculate covariant vectors first since contravariant depends on them
-			ContraBaseVectors(e, j, g);
-			e.m_Gt[0][j] = g[0];
-			e.m_Gt[1][j] = g[1];
-			e.m_Gt[2][j] = g[2];
+				// NOTE: calculate covariant vectors first since contravariant depends on them
+				ContraBaseVectors(e, j, g);
+				e.m_Gt[0][j] = g[0];
+				e.m_Gt[1][j] = g[1];
+				e.m_Gt[2][j] = g[2];
+			}
 		}
 	};
 }

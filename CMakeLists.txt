@@ -1,16 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
-set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE FEImgLib)
-set(STATIC_FEBIO_LIBS FEBioPlot FEBioTest FEBioXML XML)
+set(FEBIO_LIBS FEBioFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE FEImgLib FEBioPlot FEBioXML)
+set(STATIC_FEBIO_LIBS FEBioTest febcode)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_FILES_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER Autogen)
@@ -42,6 +40,17 @@ endif()
 ##### Search for library and include directories #####
 
 include(FindDependencies.cmake)
+
+##### Check compiler for std::filesystem support #####
+include(CheckCXXSourceCompiles)
+
+check_cxx_source_compiles("
+  #include <filesystem>
+  int main() {
+    std::filesystem::path p{\"test\"};
+    return 0;
+  }
+" HAS_STD_FILESYSTEM)
 
 #### Check if paths are valid and find libs ####
 
@@ -75,12 +84,22 @@ if(USE_MKL)
     foreach(name IN LISTS MKL_LIB_NAMES)
         findLib(${name} MKL_LIB_DIR MKL_LIB)
         list(APPEND MKL_LIBS ${MKL_LIB})
-        unset(MMG_LIB)
+        unset(MKL_LIB)
     endforeach(name)
     
     if(NOT EXISTS ${MKL_OMP_LIB})
         message(SEND_ERROR "Could not find MKL OMP library. Check MKL_OMP_LIB.")
     endif()
+endif()
+
+if(USE_FFTW)
+	if(NOT EXISTS ${FFTW_LIB})
+		message(SEND_ERROR "Could not find FFTW library libfftw3-3. Check FFTW_LIB.")
+        message(SEND_ERROR "The library is " ${FFTW_LIB})
+	endif()
+	if(NOT EXISTS ${FFTW_INC}/fftw3.h)
+		message(SEND_ERROR "Could not find fftw3.h. Check FFTW_INC.")
+	endif()
 endif()
 
 if(USE_HYPRE)
@@ -105,6 +124,9 @@ if(USE_MMG)
 	if(NOT EXISTS ${MMG_LIB})
 		message(SEND_ERROR "Could not find MMG library. Check MMG_LIB.")
 	endif()
+    if(NOT EXISTS ${MMGS_LIB})
+		message(SEND_ERROR "Could not find MMGS library. Check MMGS_LIB.")
+	endif()
 	if(NOT EXISTS ${MMG_INC}/mmg/libmmg.h)
 		message(SEND_ERROR "Could not find libmmg.h. Check MMG_INC.")
 	endif()
@@ -116,6 +138,15 @@ if(USE_LEVMAR)
 	endif()
 	if(NOT EXISTS ${LEVMAR_LIB})
 		message(SEND_ERROR "Could not find Levmar library. Check LEVMAR_LIB.")
+	endif()
+endif()
+
+if(USE_NLOPT)
+	if(NOT EXISTS ${NLOPT_INC}/nlopt.h)
+		message(SEND_ERROR "Could not find nlopt.h. Check NLOPT_INC.")
+	endif()
+	if(NOT EXISTS ${NLOPT_LIB})
+		message(SEND_ERROR "Could not find NLOPT library. Check NLOPT_LIB.")
 	endif()
 endif()
 
@@ -133,6 +164,8 @@ if(WIN32)
     add_compile_options(/MP /wd4996 /wd4251 /wd4275)
 elseif(APPLE)
     set(CMAKE_BUILD_RPATH @executable_path/../lib/;@executable_path/../Frameworks)
+    set(OMP_INC "" CACHE PATH "Path to the OMP include directory")
+    mark_as_advanced(OMP_INC)
 else()
 	add_compile_options(-fopenmp -w)
     
@@ -154,11 +187,9 @@ endif()
 ##### Find Source Files #####
 
 macro(findHdrSrc name)
-	file(GLOB HDR_${name} "${name}/*.h")
+	file(GLOB HDR_${name} "${name}/*.h*")
 	file(GLOB SRC_${name} "${name}/*.cpp")
 endmacro()
-
-findHdrSrc(FEBioStudio)
 
 foreach(name IN LISTS FEBIO_LIBS)
 	findHdrSrc(${name})
@@ -192,8 +223,9 @@ foreach(name IN LISTS STATIC_FEBIO_LIBS)
 endforeach(name)
 
 ##### Set up executable compilation #####
+file(GLOB HEADERS "FEBio/*.h")
 file(GLOB SOURCES "FEBio/*.cpp")
-add_executable (febio4 ${SOURCES})
+add_executable (febio4 ${HEADERS} ${SOURCES})
 
 if(WIN32)
     target_compile_options(febio4 PRIVATE /openmp)
@@ -209,7 +241,6 @@ if(WIN32)
     target_compile_options(febioplot PRIVATE /openmp)
     target_compile_options(febiotest PRIVATE /openmp)
     target_compile_options(febioxml PRIVATE /openmp)
-    target_compile_options(xml PRIVATE /openmp)
 endif()
 
 ##### Set dev commit information #####
@@ -232,7 +263,8 @@ macro(crossExecProcess OUT)
 endmacro()
 
 # Check for git and give warning if not available
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+option(SET_DEVCOMMIT "Set the DEVCOMMIT macro with git commit hash" ON)
+if(${SET_DEVCOMMIT} AND EXISTS ${CMAKE_SOURCE_DIR}/.git)
     if(WIN32)
         set(CMD where git)
     else()
@@ -271,11 +303,29 @@ mark_as_advanced(EXTRA_INC)
 ##### Setup includes, defnitions, and linking options #####
 include_directories(${PROJECT_SOURCE_DIR})
 
+if(HAS_STD_FILESYSTEM)
+    target_compile_definitions(febiolib PRIVATE HAS_STD_FILESYSTEM)
+endif()
+
 # Link LEVMAR
 if(USE_LEVMAR)
 	target_include_directories(febioopt PRIVATE ${LEVMAR_INC})
     target_compile_definitions(febioopt PRIVATE HAVE_LEVMAR)
     target_link_libraries(febioopt PRIVATE ${LEVMAR_LIB})
+endif()
+
+# Link NLOPT
+if(USE_NLOPT)
+	target_include_directories(febioopt PRIVATE ${NLOPT_INC})
+    target_compile_definitions(febioopt PRIVATE HAVE_NLOPT)
+    target_link_libraries(febioopt PRIVATE ${NLOPT_LIB})
+endif()
+
+# Link FFTW
+if(USE_FFTW)
+    target_include_directories(feimglib PRIVATE ${FFTW_INC})
+    target_compile_definitions(feimglib PRIVATE HAVE_FFTW)
+    target_link_libraries(feimglib PRIVATE ${FFTW_LIB})
 endif()
 
 # Link HYPRE
@@ -323,10 +373,16 @@ else()
     endif()
 endif()
 
+# Manually pull in include dirs for OpenMP on macOS
+if(APPLE)
+    target_include_directories(febiomech PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
+endif()
+
 # Link Pardiso-project
 if(USE_PDL)
     target_compile_definitions(numcore PRIVATE PARDISODL)
     target_link_libraries(numcore PRIVATE ${PDL_LIB})
+    set(ENV{PARDISOLICMESSAGE} "1")
 
     # We still need OpenMP from the system.
     if(${OpenMP_C_FOUND})
@@ -344,7 +400,7 @@ endif()
 if(USE_MMG)
 	target_include_directories(feamr PRIVATE ${MMG_INC})
     target_compile_definitions(feamr PRIVATE HAS_MMG)
-    target_link_libraries(feamr PRIVATE ${MMG_LIB})
+    target_link_libraries(feamr PRIVATE ${MMG_LIB} ${MMGS_LIB})
 endif()
 
 # USE_SUITESPARSE
@@ -394,17 +450,20 @@ endif()
 target_link_libraries(numcore PRIVATE fecore)
 target_link_libraries(febioxml PRIVATE fecore)
 target_link_libraries(febiotest PRIVATE fecore)
-target_link_libraries(febiorve PRIVATE fecore febiomech febioxml febioplot xml)
 target_link_libraries(febioplot PRIVATE fecore)
-target_link_libraries(febioopt PRIVATE fecore febioxml xml)
-target_link_libraries(febiomix PRIVATE febiomech fecore)
-target_link_libraries(febiomech PRIVATE fecore)
-target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
 target_link_libraries(feimglib PRIVATE fecore)
 target_link_libraries(feamr PRIVATE fecore)
+target_link_libraries(febiorve PRIVATE fecore febiomech febioxml febioplot)
+target_link_libraries(febioopt PRIVATE fecore febioxml)
+target_link_libraries(febiomix PRIVATE febiomech fecore)
+target_link_libraries(febiomech PRIVATE fecore feamr)
+target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
 
 target_link_libraries(febiolib PRIVATE febioplot febiomech 
-		febiomix febioxml numcore febioopt febiotest febiofluid feamr xml febiorve fecore feimglib)
+		febiomix febioxml numcore febioopt febiotest febiofluid feamr febiorve fecore feimglib)
+
+# pull febcode into FECore
+target_link_libraries(fecore PRIVATE febcode)
 
 if (WIN32)
     target_link_libraries(febiolib PRIVATE psapi.lib)
@@ -440,21 +499,21 @@ else()
     endif()
 endif()
 
-##### Create febio.xml #####
-if(NOT EXISTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml)
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
-<febio_config version=\"3.0\">
-    <default_linear_solver type=\"pardiso\"></default_linear_solver>
-</febio_config>")
-endif()
+#### Set up installation #####
+install(TARGETS febio4 numcore febioxml febiotest febiorve febioplot febioopt
+    febiomix febiomech febiofluid feamr feimglib fecore febiolib
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
 
-if(USE_MKL)
-    file(READ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml filedata)
-    string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"pardiso\"" filedata ${filedata})
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml ${filedata})
-else()
-    file(READ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml filedata)
-    string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"skyline\"" filedata "${filedata}")
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "${filedata}")
-endif()
+install(DIRECTORY 
+    FEBio NumCore FECore FEAMR FEImgLib FEBioFluid FEBioLib FEBioMech FEBioMix
+    FEBioOpt FEBioRVE FEBioPlot FEBioTest FEBioXML
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h*"
+    )
 
+install(FILES FEBioConfig.cmake 
+    DESTINATION lib/cmake/FEBio
+)

@@ -26,9 +26,10 @@ SOFTWARE.*/
 #pragma once
 #include "PlotFile.h"
 #include <stdio.h>
+#include "febioplot_api.h"
 
 //! This class stores the FEBio results to a family of VTK files. 
-class VTKPlotFile : public PlotFile
+class FEBIOPLOT_API VTKPlotFile : public PlotFile
 {
 public:
 	VTKPlotFile(FEModel* fem);
@@ -56,6 +57,7 @@ private:
 
 	void WriteScalarData(std::vector<float>& val, const std::string& szname);
 	void WriteVectorData(std::vector<float>& val, const std::string& szname);
+	void WriteMat3FData (std::vector<float>& val, const std::string& szname);
 	void WriteMat3FSData(std::vector<float>& val, const std::string& szname);
 	void WriteMat3FDData(std::vector<float>& val, const std::string& szname);
 	void WriteArrayData (std::vector<float>& val, const std::string& name, FEPlotData* pd);

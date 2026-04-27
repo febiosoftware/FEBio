@@ -100,17 +100,16 @@ tens4ds FENewtonianFluid::Tangent_RateOfDeformation(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of stress with respect to temperature T
-mat3ds FENewtonianFluid::Tangent_Temperature(FEMaterialPoint& mp)
-{
-    return mat3ds(0);
-}
-
-//-----------------------------------------------------------------------------
 //! dynamic shear viscosity
 double FENewtonianFluid::ShearViscosity(FEMaterialPoint& mp)
 {
     return m_mu;
+}
+
+//! derivative of shear viscosity w.r.t. strain rate
+double FENewtonianFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
+{
+	return 0.0;
 }
 
 //-----------------------------------------------------------------------------

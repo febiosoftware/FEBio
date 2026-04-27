@@ -57,6 +57,9 @@ public:
 	// get iterator
 	virtual FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
 
+	// get number of integration points
+	int IntegrationPoints() const override { return -1; };
+
 protected:
 	bool InitRule();
     

@@ -85,6 +85,15 @@ bool FELoadCurve::Init()
 	return FELoadController::Init();
 }
 
+void FELoadCurve::Reset()
+{
+	FELoadController::Reset();
+	m_fnc.SetInterpolator(m_int);
+	m_fnc.SetExtendMode(m_ext);
+	m_fnc.SetPoints(m_points);
+	m_fnc.Update();
+}
+
 void FELoadCurve::Serialize(DumpStream& ar)
 {
 	FELoadController::Serialize(ar);

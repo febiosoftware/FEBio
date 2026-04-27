@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FileImport.h"
-#include <XML/XMLReader.h>
+#include <FEBioXML/XMLReader.h>
 #include "FECore/FEAnalysis.h"
 #include "FECore/FESolver.h"
 #include "FECore/DataStore.h"
@@ -179,9 +179,6 @@ public:
 
 	//! read the contents of a file
 	bool ReadFile(const char* szfile, bool broot = true);
-
-	//! set a custom model builder (takes ownership of modelBuilder)
-	void SetModelBuilder(FEModelBuilder* modelBuilder);
 
 public:
 	void SetDumpfileName(const char* sz);

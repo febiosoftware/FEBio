@@ -23,31 +23,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "FECoreBase.h"
 #include "DataRecord.h"
+#include "FELogElemData.h"
 
 class FEElement;
 class FEElementSet;
 
-//-----------------------------------------------------------------------------
-//! Base class for element log data
-class FECORE_API FELogElemData : public FELogData
-{
-	FECORE_SUPER_CLASS(FELOGELEMDATA_ID)
-	FECORE_BASE_CLASS(FELogElemData)
-
-public:
-	FELogElemData(FEModel* fem);
-	virtual ~FELogElemData();
-	virtual double value(FEElement& el) = 0;
-
-};
-
-//-----------------------------------------------------------------------------
 class FECORE_API ElementDataRecord : public DataRecord
 {
 	struct ELEMREF

@@ -40,12 +40,13 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FEFiberEntropyChainUC, FEFiberMaterialUncoupled)
 	ADD_PARAMETER(m_N, FE_RANGE_GREATER_OR_EQUAL(0.0), "N");
 	ADD_PARAMETER(mm_ksi, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi");
-	ADD_PARAMETER(m_term, FE_RANGE_GREATER(3), "n_term");
+	ADD_PARAMETER(m_term, FE_RANGE_CLOSED(3, 30), "n_term");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEFiberEntropyChainUC::FEFiberEntropyChainUC(FEModel* pfem) : FEFiberMaterialUncoupled(pfem)
 {
+	m_N = 2;
 	m_term = 30;
 	m_epsf = 1.0;
 }
@@ -272,6 +273,6 @@ double FEFiberEntropyChainUC::DevFiberStrainEnergyDensity(FEMaterialPoint& mp, c
 BEGIN_FECORE_CLASS(FEUncoupledFiberEntropyChainUC, FEElasticFiberMaterialUC)
     ADD_PARAMETER(m_fib.m_N, FE_RANGE_GREATER_OR_EQUAL(0.0), "N");
     ADD_PARAMETER(m_fib.mm_ksi, FE_RANGE_GREATER_OR_EQUAL(0.0), "ksi");
-    ADD_PARAMETER(m_fib.m_term, FE_RANGE_GREATER(3), "n_term");
+    ADD_PARAMETER(m_fib.m_term, FE_RANGE_CLOSED(3, 30), "n_term");
 END_FECORE_CLASS();
 

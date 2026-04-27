@@ -109,3 +109,10 @@ public:
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
 };
+
+class FEBIOMECH_API FETrussStress : public FEDomainParameter
+{
+public:
+	FETrussStress();
+	FEParamValue value(FEMaterialPoint& mp) override;
+};

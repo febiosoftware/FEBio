@@ -45,8 +45,8 @@ FEMatchingOsmoticCoefficientBC::FEMatchingOsmoticCoefficientBC(FEModel* pfem) : 
     m_ambp = m_ambc = 0.0;
     m_bshellb = false;
     
-    m_dofP = pfem->GetDOFIndex("p");
-    m_dofQ = pfem->GetDOFIndex("q");
+    m_dofP = (pfem ? pfem->GetDOFIndex("p") : -1);
+    m_dofQ = (pfem ? pfem->GetDOFIndex("q") : -1);
 }
 
 //-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ void FEMatchingOsmoticCoefficientBC::Activate()
     for (int i=0; i<ps->Elements(); ++i) {
         FESurfaceElement& el = ps->Element(i);
         // get the element connected to this surface
-        FEElement* elem = el.m_elem[0];
+        FEElement* elem = el.m_elem[0].pe;
         FEMaterial* pm = fem->GetMaterial(elem->GetMatID());
         // get the multihasic material for this element
         FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*>(pm);
@@ -94,7 +94,7 @@ void FEMatchingOsmoticCoefficientBC::Update()
     for (int i=0; i<ps->Elements(); ++i) {
         FESurfaceElement& el = ps->Element(i);
         // get the element connected to this surface
-        FEElement* elem = el.m_elem[0];
+        FEElement* elem = el.m_elem[0].pe;
         FEMaterial* pm = fem->GetMaterial(elem->GetMatID());
         // get the multihasic material for this element
         FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*>(pm);

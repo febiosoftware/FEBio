@@ -50,6 +50,8 @@ public:
     
     //! initialization
     bool Init() override;
+
+	void Activate() override;
     
 private:
 	double GetFluidDilatation(FESurfaceMaterialPoint& mp, double alpha);

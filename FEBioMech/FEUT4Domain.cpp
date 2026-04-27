@@ -361,8 +361,8 @@ void FEUT4Domain::Update(const FETimeInfo& tp)
 	//		 in other words, we loose the material axis orientation
 	//		 For now, I solve this by copying the Q parameter
 	//       from the first element that the node connects to
-	FEElasticMaterialPoint ep;
-	FEMaterialPoint mp(&ep);
+	FEElasticMaterialPoint* ep = new FEElasticMaterialPoint();
+	FEMaterialPoint mp(ep);
 	mp.Init();
 
 	// loop over all the nodes
@@ -374,8 +374,8 @@ void FEUT4Domain::Update(const FETimeInfo& tp)
 		mp.m_r0 = m_pMesh->Node(node.inode).m_r0;
 		mp.m_rt = m_pMesh->Node(node.inode).m_rt;
 
-		ep.m_F = node.Fi;
-		ep.m_J = ep.m_F.det();
+		ep->m_F = node.Fi;
+		ep->m_J = ep->m_F.det();
 
 		// calculate the stress
 		node.si = m_pMat->Stress(mp);
@@ -825,19 +825,19 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	int* peli = m_NEL.ElementIndexList(node.inode);
 
 	// create a material point
-	FEElasticMaterialPoint ep;
-	FEMaterialPoint mp(&ep);
+	FEElasticMaterialPoint* ep = new FEElasticMaterialPoint;
+	FEMaterialPoint mp(ep);
 	mp.Init();
 
 	// set the material point data
 	mp.m_r0 = m_pMesh->Node(node.inode).m_r0;
 	mp.m_rt = m_pMesh->Node(node.inode).m_rt;
 
-	ep.m_F = node.Fi;
-	ep.m_J = ep.m_F.det();
+	ep->m_F = node.Fi;
+	ep->m_J = ep->m_F.det();
 
 	// set the Cauchy-stress
-	ep.m_s = node.si;
+	ep->m_s = node.si;
 
 	// Calculate the spatial tangent
 	tens4ds C = pme->Tangent(mp);
@@ -847,7 +847,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	{
 		// subtract the isochoric component from C;
 		// C = C - a*Ciso = C - (a*(C - Cvol)) = (1-a)*C + a*Cvol
-		C = C*(1 - m_alpha) + Cvol(C, ep.m_s)*m_alpha;
+		C = C*(1 - m_alpha) + Cvol(C, ep->m_s)*m_alpha;
 	}
 	else
 	{
@@ -855,7 +855,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	}
 
 	// convert spatial matrix to material
-	C = spatial_to_material(C, ep.m_F);
+	C = spatial_to_material(C, ep->m_F);
 
 	// extract the 'D' matrix
 	double D[6][6] = {0};

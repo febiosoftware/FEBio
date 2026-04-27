@@ -67,9 +67,6 @@ mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 	mat3d& F = pt.m_F;
 	double J = pt.m_J;
 
-	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.m_s.dev();
-
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
 
@@ -201,9 +198,6 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 	// deformation gradient
 	mat3d& F = pt.m_F;
 	double J = pt.m_J;
-
-	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.m_s.dev();
 
 	// get the local coordinate systems
 	mat3d Q = GetLocalCS(mp);
@@ -389,6 +383,11 @@ tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 	// let's put it all together
 	// cw
 	tens4ds cw =  IxI*((4.0/(9.0*J))*(CW2CCC)) + W2CC*(4/J) - dyad1s(WCCC, ID)*(4.0/(3.0*J));
+
+	// deviatoric Cauchy stress
+	mat3ds ABA = dyads(a, Ba);
+	mat3ds T = B * (W1 + W2 * I1) - B2 * W2 + AxA * (I4 * W4) + ABA * (I4 * W5);
+	mat3ds devs = T.dev() * (2.0 / J);
 
 	// elasticity tensor
 	return dyad1s(devs, ID)*(-2.0/3.0) + (I - IxI/3.0)*(4.0*WCC/(3.0*J)) + cw;

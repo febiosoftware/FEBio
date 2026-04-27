@@ -68,7 +68,7 @@ bool FEOptimize::Init(const char* szfile)
 //-----------------------------------------------------------------------------
 bool FEOptimize::Run()
 {
-	Timer timer;
+	Timer timer(false);
 	timer.start();
 
 	// solve the problem

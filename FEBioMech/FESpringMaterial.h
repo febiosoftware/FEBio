@@ -75,7 +75,7 @@ public:
 	double strainEnergy(double dl) override;
 
 public:
-	double m_E;	//!< spring constant
+	double m_E = 0; //!< spring constant
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();

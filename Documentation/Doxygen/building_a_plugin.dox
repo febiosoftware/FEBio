@@ -6,5 +6,6 @@ In order to create a plugin you need to have the FEBio SDK (Software Development
 \li \subpage create_plugin_vs
 \li \subpage create_plugin_osx
 \li \subpage create_plugin_linux
+\li \subpage create_plugin_fbs3
 
 */

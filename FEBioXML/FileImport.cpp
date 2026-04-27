@@ -36,11 +36,13 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEPointFunction.h>
 #include <FECore/FEGlobalData.h>
+#include <FECore/FEScriptedBehavior.h>
 #include <FECore/log.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include <sstream>
+#include <iostream>
 #include "FEBioImport.h"
 
 #ifndef WIN32
@@ -573,31 +575,102 @@ std::vector<std::string> split_string(const std::string& s, char delim)
 	return vs;
 }
 
+std::string trim_string(const std::string& s) {
+	auto start = std::find_if_not(s.begin(), s.end(), ::isspace);
+	auto end = std::find_if_not(s.rbegin(), s.rend(), ::isspace).base();
+	if (start >= end) return "";  // All spaces or empty string
+	return std::string(start, end);
+}
+
 //-----------------------------------------------------------------------------
 //! This function parses a parameter list
 bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam, FECoreBase* pc, bool parseAttributes)
 {
 	FEParam* pp = nullptr;
-	if (tag == "add_param")
+	const char* szparamName = (szparam == 0 ? tag.Name() : szparam);
+
+	// Read a user-parameter. 
+	// Note that we don't process this tag when parseAttributes is false. This is a bit of a hack to get around
+	// an issue with reading valuators. 
+	if ((tag == "add_param") && parseAttributes)
 	{
 		// get the name and value
-		double v = 0.0; tag.value(v);
 		const char* szname = tag.AttributeValue("name");
+
+		const char* sztype = tag.AttributeValue("data_type", true);
+
+		bool allowMappedParams = true;
+		bool allowVolatileParams = true;
+
+		if (auto scripted = dynamic_cast<FEScriptedBehavior*>(pc))
+		{
+			ScriptContext sc = scripted->GetScriptContext();
+			allowMappedParams = sc.allowMappedInputs;
+			allowVolatileParams = sc.allowVolatileInputs;
+		}
 
 		// make sure this parameter does not exist yet
 		pp = pl.FindFromName(szname);
 		if (pp) throw XMLReader::InvalidTag(tag);
 
 		// add a new user parameter
-		pp = pl.AddParameter(new double(v), FE_PARAM_DOUBLE, 1, strdup(szname));
-		pp->SetFlags(FEParamFlag::FE_PARAM_USER);
+		if ((sztype == nullptr) || strcmp(sztype, "double") == 0)
+		{
+			double v = 0.0; tag.value(v);
+			if (allowMappedParams)
+				pp = pl.AddParameter(new FEParamDouble(v), FE_PARAM_DOUBLE_MAPPED, 1, strdup(szname));
+			else
+				pp = pl.AddParameter(new FEParamDouble(v), FE_PARAM_DOUBLE, 1, strdup(szname));
+
+			pp->MakeVolatile(allowVolatileParams);
+		}
+		else if (strcmp(sztype, "vec3") == 0)
+		{
+			vec3d v(0, 0, 0); value(tag, v);
+			if (allowMappedParams)
+				pp = pl.AddParameter(new FEParamVec3(v), FE_PARAM_VEC3D_MAPPED, 1, strdup(szname));
+			else
+				pp = pl.AddParameter(new FEParamVec3(v), FE_PARAM_VEC3D, 1, strdup(szname));
+
+			pp->MakeVolatile(allowVolatileParams);
+		}
+		else if (strcmp(sztype, "mat3") == 0)
+		{
+			mat3d m; value(tag, m);
+			if (allowMappedParams)
+				pp = pl.AddParameter(new FEParamMat3d(m), FE_PARAM_MAT3D_MAPPED, 1, strdup(szname));
+			else
+				pp = pl.AddParameter(new FEParamMat3d(m), FE_PARAM_MAT3D, 1, strdup(szname));
+
+			pp->MakeVolatile(allowVolatileParams);
+		}
+		else if (strcmp(sztype, "int") == 0)
+		{
+			int v = 0; tag.value(v);
+			pp = pl.AddParameter(new int(v), FE_PARAM_INT, 1, strdup(szname));
+		}
+		else if (strcmp(sztype, "bool") == 0)
+		{
+			bool v = false; tag.value(v);
+			pp = pl.AddParameter(new bool(v), FE_PARAM_BOOL, 1, strdup(szname));
+		}
+		else
+			throw XMLReader::InvalidAttributeValue(tag, "data_type", sztype);
+
+		// add the user parameter flag
+		pp->SetFlags(pp->GetFlags() | FEParamFlag::FE_PARAM_USER);
 	}
 	else
 	{
 		// see if we can find this parameter
-		pp = pl.FindFromName((szparam == 0 ? tag.Name() : szparam));
+		pp = pl.FindFromName(szparamName);
 	}
 	if (pp == 0) return false;
+
+	if (pp->IsObsolete())
+	{
+		feLogWarning("parameter '%s' is obsolete.", szparamName);
+	}
 
 	if (pp->dim() == 1)
 	{
@@ -608,8 +681,9 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				// make sure the type attribute is not defined 
 				// This most likely means a user thinks this parameter can be mapped
 				// but the corresponding parameter is not a FEModelParam
-				const char* sztype = tag.AttributeValue("type", true);
-				if (sztype) throw XMLReader::InvalidAttribute(tag, "type");
+				XMLAtt* att = tag.Attribute("type", true);
+				if (att)
+					throw XMLReader::InvalidAttribute(tag, "type");
 
 				value(tag, pp->value<double  >());
 			}
@@ -787,6 +861,8 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			FEScalarValuator* val = fecore_new<FEScalarValuator>(sztype, GetFEModel());
 			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
+			val->SetParent(pc);
+
 			// Figure out the item list
 			FEItemList* itemList = nullptr;
 			if (dynamic_cast<FESurfaceLoad*>(pc))
@@ -804,7 +880,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -842,7 +921,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -876,7 +958,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -907,7 +992,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			// parameters after the rest of the file is processed
 			if (strcmp(sztype, "map") == 0)
 			{
-				GetBuilder()->AddMappedParameter(pp, pc, tag.szvalue());
+				string mapName = tag.szvalue();
+				string trimmedName = trim_string(mapName);
+				if (trimmedName.empty()) throw XMLReader::InvalidValue(tag);
+				GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str());
 			}
 			else {
 				// read the parameter list
@@ -990,12 +1078,15 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 						}
 						pi.SetItemList(itemList);
 
+						// trim the string
+						std::string trimmedName = trim_string(s[i]);
+
 						// mapped values require special treatment
 						// The value is just the name of the map, but the problem is that 
 						// these maps may not be defined yet.
 						// So, we add them to the FEBioModel, which will process mapped 
 						// parameters after the rest of the file is processed
-						GetBuilder()->AddMappedParameter(pp, pc, s[i].c_str(), i);
+						GetBuilder()->AddMappedParameter(pp, pc, trimmedName.c_str(), i);
 
 						// assign the valuator to the parameter
 						pi.setValuator(val);
@@ -1199,8 +1290,12 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 					if (edgeList == nullptr) throw XMLReader::InvalidValue(tag);
 
 					FEEdge* edge = dynamic_cast<FEEdge*>(prop->get(0));
-					GetBuilder()->BuildEdge(*edge, *edgeList);
-//					mesh.AddEdge(edge); // I think that makes the mesh the owner, which is not the case!
+					if (edge == nullptr) throw XMLReader::InvalidValue(tag);
+
+					if (GetBuilder()->BuildEdge(*edge, *edgeList))
+						mesh.AddEdge(edge);
+					else
+						throw XMLReader::InvalidValue(tag);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1211,6 +1306,10 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 				{
 					// If so, let's just read the parameters
 					FECoreBase* pc = prop->get(0);
+
+					const char* szname = tag.AttributeValue("name", true);
+					if (szname) pc->SetName(szname);
+
 					if (tag.isleaf() == false) ReadParameterList(tag, pc);
 				}
 				else
@@ -1267,6 +1366,9 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FECoreBase* pc, const char* szpar
 						}
 						else
 						{
+							// parse attributes first
+							ReadAttributes(tag, pp);
+
 							// we get here if the property was defined with an empty tag.
 							// We should still validate it.
 							int NP = pp->PropertyClasses();
@@ -1478,6 +1580,14 @@ bool FEFileImport::ParseFile(XMLTag& tag)
 FEModel* FEFileImport::GetFEModel()
 {
 	return &m_builder->GetFEModel();
+}
+
+//-----------------------------------------------------------------------------
+//! set a custom model builder 
+void FEFileImport::SetModelBuilder(FEModelBuilder* modelBuilder)
+{
+	delete m_builder;
+	m_builder = modelBuilder;
 }
 
 //-----------------------------------------------------------------------------

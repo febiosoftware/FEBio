@@ -58,12 +58,12 @@ public:
 	mat3ds Tangent_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol=0) override;
 	
 public:
-	double	m_free_diff;	//!< free diffusivity
-	double	m_diff0;		//!< diffusivity for I term
-	double	m_diff1;		//!< diffusivity for b term
-	double	m_diff2;		//!< diffusivity for b^2 term
-	double	m_M;			//!< nonlinear exponential coefficient
-	double	m_alpha;		//!< nonlinear power exponent
+    FEParamDouble	m_free_diff;	//!< free diffusivity
+    FEParamDouble	m_diff0;		//!< diffusivity for I term
+    FEParamDouble	m_diff1;		//!< diffusivity for b term
+    FEParamDouble	m_diff2;		//!< diffusivity for b^2 term
+    FEParamDouble	m_M;			//!< nonlinear exponential coefficient
+    FEParamDouble	m_alpha;		//!< nonlinear power exponent
 	
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

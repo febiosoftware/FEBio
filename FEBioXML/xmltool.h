@@ -23,13 +23,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include <XML/XMLReader.h>
 #include <FECore/FECoreBase.h>
 #include <FECore/ClassDescriptor.h>
+#include "XMLReader.h"
 #include "febioxml_api.h"
 
 //This namespace defines some helper functions that facilitate processing the FEBio xml formatted files.
@@ -38,7 +35,7 @@ namespace fexml
 //---------------------------------------------------------------------------------------
 // Reads the value of a parameter.
 // if paramName is zero, the tag's name will be used as the parameter name.
-bool FEBIOXML_API readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName = 0);
+bool FEBIOXML_API readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName = 0, FECoreBase* parent = nullptr);
 
 //---------------------------------------------------------------------------------------
 bool FEBIOXML_API readParameter(XMLTag& tag, FECoreBase* pc);
@@ -46,6 +43,9 @@ bool FEBIOXML_API readParameter(XMLTag& tag, FECoreBase* pc);
 //---------------------------------------------------------------------------------------
 // reads the parameters and properties of a FECore class
 bool FEBIOXML_API readParameterList(XMLTag& tag, FECoreBase* pc);
+
+// read parameters listed as attributes in the tag
+bool FEBIOXML_API readAttributeParams(XMLTag& tag, FECoreBase* pc);
 
 //---------------------------------------------------------------------------------------
 // read a list of integers

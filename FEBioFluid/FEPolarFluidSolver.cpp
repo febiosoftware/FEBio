@@ -531,7 +531,7 @@ void FEPolarFluidSolver::UpdateKinematics(vector<double>& ui)
     for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
     {
         FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
-        if (spc->IsActive()) spc->Update(ui);
+        if (spc->IsActive()) spc->Update(m_Ui, ui);
     }
 }
 
@@ -549,6 +549,12 @@ void FEPolarFluidSolver::UpdateIncrements(vector<double>& Ui, vector<double>& ui
         FENLConstraint* plc = fem.NonlinearConstraint(i);
         if (plc && plc->IsActive()) plc->UpdateIncrements(Ui, ui);
     }
+
+	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint* psc = fem.SurfacePairConstraint(i);
+		if (psc && psc->IsActive()) psc->UpdateIncrements(Ui, ui);
+	}
 
     // TODO: This is a hack!
     // The problem is that I only want to call the domain's IncrementalUpdate during
@@ -758,6 +764,12 @@ void FEPolarFluidSolver::PrepStep()
         FENLConstraint* plc = fem.NonlinearConstraint(i);
         if (plc && plc->IsActive()) plc->PrepStep();
     }
+
+	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+	{
+		FESurfacePairConstraint* psc = fem.SurfacePairConstraint(i);
+		if (psc && psc->IsActive()) psc->PrepStep();
+	}
     
     // apply prescribed DOFs for specialized surface loads
     int nsl = fem.ModelLoads();

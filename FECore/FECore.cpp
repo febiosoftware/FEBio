@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEInitialCondition.h"
 #include "FECorePlot.h"
 #include "FESurfaceToSurfaceMap.h"
+#include "FESurfaceToSurfaceVectorMap.h"
 #include "FEParabolicMap.h"
 #include "FEDataMathGenerator.h"
 #include "FEPointFunction.h"
@@ -43,6 +44,7 @@ SOFTWARE.*/
 #include "FEMathController.h"
 #include "FEMathIntervalController.h"
 #include "FEPIDController.h"
+#include "FEScriptedLoadController.h"
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
 #include "FEMat3dSphericalAngleMap.h"
@@ -64,11 +66,13 @@ SOFTWARE.*/
 #include "FELogElementVolume.h"
 #include "FELogDomainVolume.h"
 #include "FELogSolutionNorm.h"
+#include "FELogElemMath.h"
 #include "LUSolver.h"
 #include "FETimeStepController.h"
 #include "FEModifiedNewtonStrategy.h"
 #include "FEFullNewtonStrategy.h"
 #include "SkylineSolver.h"
+#include "FEScriptedBehavior.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -102,8 +106,8 @@ void FECore::InitModule()
 REGISTER_FECORE_CLASS(FETimeStepController, "default");
 
 // boundary conditions
-REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      , 0x300);	// obsolete in 4.0
-REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe", 0x300);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FEFixedDOF     , "fix"      , FECORE_DEPRECATED);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FEPrescribedDOF, "prescribe", FECORE_DEPRECATED);	// obsolete in 4.0
 REGISTER_FECORE_CLASS(FELinearConstraint, "linear constraint");
 REGISTER_FECORE_CLASS(FELinearConstraintDOF, "child_dof");
 
@@ -111,7 +115,7 @@ REGISTER_FECORE_CLASS(FELinearConstraintDOF, "child_dof");
 REGISTER_FECORE_CLASS(FENodalDOFLoad, "nodal_load");
 
 // initial conditions
-REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     , 0x300);	// obsolete in 4.0
+REGISTER_FECORE_CLASS(FEInitialDOF     , "init_dof"     , FECORE_DEPRECATED);	// obsolete in 4.0
 
 // (augmented lagrangian) linear constraints
 REGISTER_FECORE_CLASS(FELinearConstraintSet, "linear constraint");
@@ -124,9 +128,10 @@ REGISTER_FECORE_CLASS(FEPlotPIDController, "pid controller");
 REGISTER_FECORE_CLASS(FEPlotMeshData, "mesh_data");
 REGISTER_FECORE_CLASS(FEPlotFieldVariable, "field");
 
-// load curves
+// 1D functions
 REGISTER_FECORE_CLASS(FEPointFunction , "point");
 REGISTER_FECORE_CLASS(FEConstFunction, "const");
+REGISTER_FECORE_CLASS(FEScaleFunction, "scale");
 REGISTER_FECORE_CLASS(FELinearFunction, "linear ramp");
 REGISTER_FECORE_CLASS(FEStepFunction  , "step");
 REGISTER_FECORE_CLASS(FEMathFunction  , "math");
@@ -134,12 +139,13 @@ REGISTER_FECORE_CLASS(FEMathFunction  , "math");
 // data generators
 REGISTER_FECORE_CLASS(FEDataMathGenerator  , "math");
 REGISTER_FECORE_CLASS(FESurfaceToSurfaceMap, "surface-to-surface map");
+REGISTER_FECORE_CLASS(FESurfaceToSurfaceVectorMap, "surface-to-surface vector");
 REGISTER_FECORE_CLASS(FEParabolicMap       , "parabolic map");
 
 // scalar valuators
-REGISTER_FECORE_CLASS(FEConstValue , "const");
-REGISTER_FECORE_CLASS(FEMathValue  , "math" );
-REGISTER_FECORE_CLASS(FEMappedValue, "map"  );
+REGISTER_FECORE_CLASS(FEConstValue  , "const");
+REGISTER_FECORE_CLASS(FEMathValue   , "math" );
+REGISTER_FECORE_CLASS(FEMappedValue , "map"  );
 
 //  vector generators
 REGISTER_FECORE_CLASS(FELocalVectorGenerator          , "local");
@@ -170,6 +176,7 @@ REGISTER_FECORE_CLASS(FELoadCurve             , "loadcurve");
 REGISTER_FECORE_CLASS(FEMathController        , "math");
 REGISTER_FECORE_CLASS(FEMathIntervalController, "math-interval");
 REGISTER_FECORE_CLASS(FEPIDController         , "PID");
+REGISTER_FECORE_CLASS(FEScriptedLoadController, "load controller script");
 
 // Newton strategies
 REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");
@@ -199,9 +206,13 @@ REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 REGISTER_FECORE_CLASS(FELogIntegralDomainData, "integrate");
 REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
 REGISTER_FECORE_CLASS(FELogFaceArea    , "facet area");
+REGISTER_FECORE_CLASS(FELogElemMath    , "_math", FECORE_EXPERIMENTAL);
 
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");
 REGISTER_FECORE_CLASS(SkylineSolver, "skyline");
+
+// scripts
+REGISTER_FECORE_CLASS(FEScriptedBehavior, "script", FECORE_EXPERIMENTAL);
 
 }

@@ -11,17 +11,20 @@ on:
         required: false
         type: boolean
         default: false
+      build-plugins:
+        description: "Build all plugins?"
+        type: boolean
+        required: false
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 jobs:
   call_workflow:
-    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable-push.yml@develop
+    uses: febiosoftware/febio-workflows/.github/workflows/windows-reusable.yml@develop
     with:
       runTests: ${{ (github.event_name == 'workflow_dispatch' && inputs.runTests) || (github.event_name == 'push' && contains(fromJSON('["develop"]'), github.ref_name)) }}
+      build-plugins: ${{ (github.event_name == 'workflow_dispatch' && inputs.build-plugins) || github.event_name == 'push' }}
       package-name: febio4
       package-sdk: true
-      aws-ami-id: ami-0b18c665dbe9efa75
-      aws-sg-id: sg-0ca7912782cf1538b
-      aws-instance-type: c5a.8xlarge
+      publish: true
     secrets: inherit

@@ -46,16 +46,14 @@ public:
 	
     //! tangent of fluid supply with respect to rate of deformation
     mat3ds Tangent_Supply_RateOfDeformation(FEMaterialPoint& mp) override { return mat3ds(0); }
-    
-	//! Tangent of supply with respect to concentration
-//	double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
+
+    //! Initialization
+    bool Init() override { return FEFluidSupply::Init(); }
 	
    
 public:
 	FEParamDouble		m_kp;				//!< coefficient of pressure drop
     FEParamDouble		m_pv;				//!< prescribed (e.g., vascular) pressure
-//	vector<double>		m_qc;       //!< coefficients of concentration drops
-//	vector<double>		m_cv;       //!< prescribed (e.g., vascular) concentrations
 	
 	// declare parameter list
 	DECLARE_FECORE_CLASS();

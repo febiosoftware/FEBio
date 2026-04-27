@@ -207,6 +207,9 @@ public:
 		void SetPartList(const std::vector<std::string>& parts);
 		const std::vector<std::string>& GetPartList() const;
 
+		size_t Parts() const { return m_parts.size(); }
+		const std::string& PartName(size_t n) const { return m_parts[n]; }
+
 	private:
 		std::string					m_name;
 		std::vector<std::string>	m_parts;

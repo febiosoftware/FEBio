@@ -1,6 +1,8 @@
 //#include "stdafx.h"
 #include "ImageMap.h"
 #include "math.h"
+#include "algorithm"
+#include "iostream"
 
 ImageMap::ImageMap(Image& img) : m_img(img)
 {
@@ -32,9 +34,9 @@ ImageMap::POINT ImageMap::map(const vec3d& p)
 	double dy = 1.0 / (double) (ny - 1);
 	double dz = (nz>1?1.0 / (double) (nz - 1):1.0);
 
-	int i = (int) floor(x*(nx - 1));
-	int j = (int) floor(y*(ny - 1));
-	int k = (int) floor(z*(nz - 1));
+	int i = (int) std::max(floor(x * (nx - 1)), 0.0);
+	int j = (int) std::max(floor(y * (ny - 1)), 0.0);
+	int k = (int) std::max(floor(z * (nz - 1)), 0.0);
 
 	if (i == nx-1) i--;
 	if (j == ny-1) j--;
@@ -109,6 +111,16 @@ double ImageMap::value(const POINT& p)
 
 		return (p.h[0]*v[0] + p.h[1]*v[1] + p.h[2]*v[2] + p.h[3]*v[3] + p.h[4]*v[4] + p.h[5]*v[5] + p.h[6]*v[6] + p.h[7]*v[7]);
 	}
+}
+
+bool ImageMap::valid(const vec3d& p)
+{
+	int nz = m_img.depth();
+	bool r_valid = true;
+	r_valid &= (p.x >= m_r0.x && p.x <= m_r1.x);
+	r_valid &= (p.y >= m_r0.y && p.y <= m_r1.y);
+	r_valid &= (nz == 1) ? true : (p.z >= m_r0.z && p.z <= m_r1.z);
+	return r_valid;
 }
 
 vec3d ImageMap::gradient(const vec3d& r)
