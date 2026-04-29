@@ -208,16 +208,26 @@ bool fexml::readParameterList(XMLTag& tag, FECoreBase* pc)
 	if (!readAttributeParams(tag, pc)) return false;
 
 	// make sure this tag has children
-	if (tag.isleaf()) return true;
-
-	// process the parameter lists
-	++tag;
-	do
+	if (!tag.isleaf())
 	{
-		if (readParameter(tag, pc) == false) return false;
+		// process the parameter lists
 		++tag;
-	} 
-	while (!tag.isend());
+		do
+		{
+			if (readParameter(tag, pc) == false) return false;
+			++tag;
+		} while (!tag.isend());
+	}
+	else if ((tag.isempty() == false) && (pc->Parameters() > 0))
+	{
+		// there should be one parameter with the same name as the tag
+		if (readParameter(tag, pc) == false)
+		{
+			// try a parameter with the type string as name
+			if (readParameter(tag, pc, pc->GetTypeStr()) == false)
+				throw XMLReader::InvalidTag(tag);
+		}
+	}
 
 	return true;
 }
@@ -269,10 +279,10 @@ bool fexml::readAttributeParams(XMLTag& tag, FECoreBase* pc)
 	return true;
 }
 
-bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
+bool fexml::readParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
 {
 	FEParameterList& PL = pc->GetParameterList();
-	if (readParameter(tag, PL, nullptr, pc) == false)
+	if (readParameter(tag, PL, szparam, pc) == false)
 	{
 		// see if this is a property
 		// if we get here, the parameter is not found.
@@ -312,7 +322,8 @@ bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
 				throw XMLReader::MissingAttribute(tag, "type");
 			}
 		}
-		else throw XMLReader::InvalidTag(tag);
+		else
+			return false;
 	}
 
 	return true;

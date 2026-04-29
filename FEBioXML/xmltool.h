@@ -38,7 +38,7 @@ namespace fexml
 bool FEBIOXML_API readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName = 0, FECoreBase* parent = nullptr);
 
 //---------------------------------------------------------------------------------------
-bool FEBIOXML_API readParameter(XMLTag& tag, FECoreBase* pc);
+bool FEBIOXML_API readParameter(XMLTag& tag, FECoreBase* pc, const char* szparam = nullptr);
 
 //---------------------------------------------------------------------------------------
 // reads the parameters and properties of a FECore class
