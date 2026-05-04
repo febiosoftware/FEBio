@@ -38,7 +38,7 @@ SOFTWARE.*/
 #include <FECore/FEGlobalData.h>
 #include <FECore/FEScriptedBehavior.h>
 #include <FECore/log.h>
-#include "xmltool.h"
+#include <FECore/xmltool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>

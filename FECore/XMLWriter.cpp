@@ -23,11 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-// XMLWriter.cpp: implementation of the XMLWriter class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "XMLWriter.h"
 #include <sstream>
 #include <fstream>
@@ -435,7 +430,7 @@ void XMLWriter::add_leaf(XMLElement& el, const std::vector<int>& A)
 
         start = m_stream->tellp();
         *m_stream << A[i];
-        l += m_stream->tellp() - start;
+        l += (int) (m_stream->tellp() - start);
 
 		if (i < n-1)
 		{

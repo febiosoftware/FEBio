@@ -23,18 +23,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "FEBioStudy.h"
-#include <FEBioXML/XMLReader.h>
-#include <FEBioXML/xmltool.h>
-#include <FECore/log.h>
+#include "FECoreStudy.h"
+#include "XMLReader.h"
+#include "xmltool.h"
+#include "log.h"
 #include "FEBioReport.h"
 #include <filesystem>
 
-FEBioStudy::FEBioStudy(FEModel* fem) : FECoreTask(fem) {}
+FECoreStudy::FECoreStudy(FEModel* fem) : FECoreTask(fem) {}
 
-FEBioStudy::~FEBioStudy() {}
+FECoreStudy::~FECoreStudy() {}
 
-bool FEBioStudy::Init(const char* szfile)
+bool FECoreStudy::Init(const char* szfile)
 {
 	if (szfile == nullptr) {
 		feLogError("No control file specified.");
@@ -52,7 +52,7 @@ bool FEBioStudy::Init(const char* szfile)
 	return Init();
 }
 
-bool FEBioStudy::ReadControlFile(const char* szfile)
+bool FECoreStudy::ReadControlFile(const char* szfile)
 {
 	XMLReader xml;
 	if (xml.Open(szfile) == false) return false;
@@ -93,7 +93,7 @@ bool FEBioStudy::ReadControlFile(const char* szfile)
 	return true;
 }
 
-bool FEBioStudy::Run()
+bool FECoreStudy::Run()
 {
 	// execute the study
 	m_success = Execute();
@@ -118,7 +118,7 @@ bool FEBioStudy::Run()
 	return m_success;
 }
 
-void FEBioStudy::BuildReport(FEBioReport& report)
+void FECoreStudy::BuildReport(FEBioReport& report)
 {
 	report.AddSection("Summary").AddText(m_success ? "Study completed successfully." : "Study failed.");
 }

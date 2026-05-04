@@ -28,8 +28,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "febio.h"
-#include <FEBioXML/XMLReader.h>
-#include <FEBioXML/xmltool.h>
+#include <FECore/XMLReader.h>
+#include <FECore/xmltool.h>
 #include <FECore/FEModel.h>
 #include <FECore/FECoreTask.h>
 #include <FECore/FEMaterial.h>

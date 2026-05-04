@@ -24,21 +24,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FECoreTask.h>
+#include "FECoreTask.h"
 #include "FEBioReport.h"
-#include "febioopt_api.h"
+#include "fecore_api.h"
 
 class FEBioReport;
 
 // A study is a task that has a assumed structure. 
 // It requires a separate input file that can be processed with FEBioXML.
-class FEBIOOPT_API FEBioStudy : public FECoreTask
+class FECORE_API FECoreStudy : public FECoreTask
 {
-	FECORE_BASE_CLASS(FEBioStudy)
+	FECORE_BASE_CLASS(FECoreStudy)
 
 public:
-	FEBioStudy(FEModel* fem);
-	~FEBioStudy();
+	FECoreStudy(FEModel* fem);
+	~FECoreStudy();
 
 	bool Init(const char* szfile) final;
 

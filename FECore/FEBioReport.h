@@ -24,13 +24,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "febioopt_api.h"
+#include "fecore_api.h"
 #include <string>
 #include <vector>
 #include <memory>
 #include <variant>
 
-class FEBIOOPT_API FEReportItem
+class FECORE_API FEReportItem
 {
 public:
 	FEReportItem() = default;
@@ -41,7 +41,7 @@ public:
 
 using FEReportItemPtr = std::unique_ptr<FEReportItem>;
 
-class FEBIOOPT_API FEReportText : public FEReportItem
+class FECORE_API FEReportText : public FEReportItem
 {
 public:
 	std::string text;
@@ -51,7 +51,7 @@ public:
 	std::string Type() const override { return "text"; }
 };
 
-class FEBIOOPT_API FEReportFile : public FEReportItem
+class FECORE_API FEReportFile : public FEReportItem
 {
 public:
 	std::string filename;
@@ -62,7 +62,7 @@ public:
 	std::string Type() const override { return "file"; }
 };
 
-class FEBIOOPT_API FEReportValue: public FEReportItem
+class FECORE_API FEReportValue: public FEReportItem
 {
 public:
 	std::string name;
@@ -74,7 +74,7 @@ public:
 	std::string Type() const override { return "value"; }
 };
 
-class FEBIOOPT_API FEReportTable : public FEReportItem
+class FECORE_API FEReportTable : public FEReportItem
 {
 public:
 	using TableEntry = std::variant<double, std::string>;
@@ -111,7 +111,7 @@ public:
 	TableEntry GetEntry(size_t row, size_t column) const;
 };
 
-class FEBIOOPT_API FEReportTableView : public FEReportItem
+class FECORE_API FEReportTableView : public FEReportItem
 {
 public:
 	std::string tableId;
@@ -124,7 +124,7 @@ public:
 	FEReportTableView& SetCaption(const std::string& caption) { tableCaption = caption; return *this; }
 };
 
-class FEBIOOPT_API FEReportChart : public FEReportItem
+class FECORE_API FEReportChart : public FEReportItem
 {
 public:
 	enum ChartType { Line, Bar, Pie };
@@ -180,7 +180,7 @@ public:
 	}
 };
 
-class FEBIOOPT_API FEReportSection
+class FECORE_API FEReportSection
 {
 public:
 	std::string name;
@@ -210,7 +210,7 @@ public:
 
 using FEReportSectionPtr = std::unique_ptr<FEReportSection>;
 
-class FEBIOOPT_API FEBioReport
+class FECORE_API FEBioReport
 {
 	struct Imp;
 

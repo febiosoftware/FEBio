@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include "FEConstrainedLMOptimizeMethod.h"
 #include "FEOptimizeInput.h"
 #include <FECore/log.h>
-#include <FEBioXML/xmltool.h>
+#include <FECore/xmltool.h>
 #include <FECore/FELogElemMath.h>
 #include <FECore/FECoreKernel.h>
 

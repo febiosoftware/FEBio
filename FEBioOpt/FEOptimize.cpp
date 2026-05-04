@@ -32,7 +32,7 @@ SOFTWARE.*/
 #include "FECore/FECoreKernel.h"
 #include "FECore/log.h"
 #include "FECore/Timer.h"
-#include "FEBioReport.h"
+#include "FECore/FEBioReport.h"
 
 //-----------------------------------------------------------------------------
 #define VERSION 2

@@ -60,7 +60,7 @@ SOFTWARE.*/
 #include "FEBioScriptsSection.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
-#include "xmltool.h"
+#include "FECore/xmltool.h"
 #include <string.h>
 
 FEBioFileSection::FEBioFileSection(FEBioImport* feb) : FEFileSection(feb) {}
