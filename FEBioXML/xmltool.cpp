@@ -29,6 +29,10 @@ SOFTWARE.*/
 #include <FECore/FEScalarValuator.h>
 #include <FECore/FEModelParam.h>
 
+#ifndef WIN32
+#define strnicmp strncasecmp
+#endif
+
 int fexml::enumValue(const char* val, const char* szenum)
 {
 	if ((val == nullptr) || (szenum == nullptr)) return -1;

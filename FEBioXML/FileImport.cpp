@@ -46,10 +46,6 @@ SOFTWARE.*/
 #include <iostream>
 #include "FEBioImport.h"
 
-#ifndef WIN32
-#define strnicmp strncasecmp
-#endif
-
 FEObsoleteParamHandler::FEObsoleteParamHandler(XMLTag& tag, FECoreBase* pc) : m_pc(pc) 
 {
 	m_root = tag.Name();
