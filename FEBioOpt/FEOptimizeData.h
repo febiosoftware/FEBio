@@ -174,7 +174,18 @@ public:
 
 	FECoreTask* m_pTask;	// the task that will solve the FE model
 
+	bool m_createReport = false;	// flag to create a report at the end of the optimization run
+
+	bool m_status = false;
+	std::string m_filename;	// the name of the control file
+
+	std::vector<double> amin;	// the optimal parameter values
+	std::vector<double> ymin;	// the final measurement values
+	double minObj;				// the optimal objective value
+	double minR2;				// the optimal regression coefficient
+
 protected:
+
 	FEModel*	m_fem;
 
 	FEObjectiveFunction*	m_obj;		//!< the objective function

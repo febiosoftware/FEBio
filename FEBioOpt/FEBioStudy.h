@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,31 +23,38 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FECore/FECoreTask.h"
-#include "FEOptimizeData.h"
+#include <FECore/FECoreTask.h>
+#include "FEBioReport.h"
+#include "febioopt_api.h"
 
-//-----------------------------------------------------------------------------
-// This class defines the FEOptimize task. It allows FEBio to call the optimization
-// module to solve a parameter optimization problem.
-class FEOptimize : public FECoreTask
+class FEBioReport;
+
+// A study is a task that has a assumed structure. 
+// It requires a separate input file that can be processed with FEBioXML.
+class FEBIOOPT_API FEBioStudy : public FECoreTask
 {
+	FECORE_BASE_CLASS(FEBioStudy)
+
 public:
-	//! class constructor
-	FEOptimize(FEModel* pfem);
+	FEBioStudy(FEModel* fem);
+	~FEBioStudy();
 
-	//! initialization
-	bool Init(const char* szfile);
+	bool Init(const char* szfile) final;
 
-	//! Run the optimization module
-	bool Run();
+	bool Run() final;
+
+	using FECoreBase::Init;
+
+	virtual void BuildReport(FEBioReport& report);
+
+public:
+	virtual bool Execute() = 0;
 
 private:
-	void BuildReport();
+	bool ReadControlFile(const char* szfile);
 
 private:
-	FEOptimizeData	m_opt;
+	std::string m_optionsFile;
+	bool m_success = false;
 };

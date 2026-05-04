@@ -38,6 +38,7 @@ SOFTWARE.*/
 #include <FECore/FEGlobalData.h>
 #include <FECore/FEScriptedBehavior.h>
 #include <FECore/log.h>
+#include "xmltool.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -49,16 +50,6 @@ SOFTWARE.*/
 #define strnicmp strncasecmp
 #endif
 
-//-----------------------------------------------------------------------------
-// helper function to see if a string is a number
-bool is_number(const char* sz)
-{
-	char* cend;
-	double tmp = strtod(sz, &cend);
-	return ((cend == nullptr) || (cend[0] == 0));
-}
-
-//-----------------------------------------------------------------------------
 FEObsoleteParamHandler::FEObsoleteParamHandler(XMLTag& tag, FECoreBase* pc) : m_pc(pc) 
 {
 	m_root = tag.Name();
@@ -189,7 +180,7 @@ void FEFileSection::SetInvalidTagHandler(FEInvalidTagHandler* ith)
 void FEFileSection::value(XMLTag& tag, int& n)
 {
 	const char* val = tag.szvalue();
-	if (is_number(val) == false) throw XMLReader::InvalidValue(tag);
+	if (fexml::is_number(val) == false) throw XMLReader::InvalidValue(tag);
 	n = atoi(val);
 }
 
@@ -370,43 +361,6 @@ int FEFileSection::ReadNodeID(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-int enumValue(const char* val, const char* szenum)
-{
-	if ((val == nullptr) || (szenum == nullptr)) return -1;
-
-	// get the string's length. 
-	// there could be a comma, so correct for that.
-	size_t L = strlen(val);
-	const char* c = strchr(val, ',');
-	if (c) L = c - val;
-
-	const char* ch = szenum;
-
-	int n = 0;
-	while (ch && *ch)
-	{
-		size_t l = strlen(ch);
-		int nval = n;
-		// see if the value of the enum is overridden
-		const char* ce = strrchr(ch, '=');
-		if (ce)
-		{
-			l = ce - ch;
-			nval = atoi(ce + 1);
-		}
-
-		if ((L==l) && (strnicmp(ch, val, l) == 0))
-		{
-			return nval;
-		}
-		ch = strchr(ch, '\0');
-		if (ch) ch++;
-		n++;
-	}
-	return -1;
-}
-
-//-----------------------------------------------------------------------------
 bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 {
 	// get the enums
@@ -446,7 +400,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		else if (strcmp(var, "solutes") == 0)
 		{
 			int n = -1;
-			if (is_number(val)) n = atoi(val);
+			if (fexml::is_number(val)) n = atoi(val);
 			else
 			{
 				FEGlobalData* pd = fem->FindGlobalData(val);
@@ -460,7 +414,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		else if (strcmp(var, "sbms") == 0)
 		{
 			int n = -1;
-			if (is_number(val)) n = atoi(val);
+			if (fexml::is_number(val)) n = atoi(val);
 			else
 			{
 				FEGlobalData* pd = fem->FindGlobalData(val);
@@ -474,7 +428,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		else if (strcmp(var, "species") == 0)
 		{
 			int n = -1;
-			if (is_number(val)) n = atoi(val);
+			if (fexml::is_number(val)) n = atoi(val);
 			else
 			{
 				// NOTE: This assumes that the solutes are defined before the SBMS!
@@ -487,7 +441,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		}
 		else if (strcmp(var, "rigid_materials") == 0)
 		{
-			if (is_number(val))
+			if (fexml::is_number(val))
 			{
 				int n = atoi(val);
 				pp->value<int>() = n;
@@ -527,12 +481,12 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 	{
 	case FE_PARAM_INT:
 	{
-		int n = enumValue(val, szenums);
+		int n = fexml::enumValue(val, szenums);
 		if (n != -1) pp->value<int>() = n;
 		else
 		{
 			// see if the value is an actual number
-			if (is_number(val))
+			if (fexml::is_number(val))
 			{
 				n = atoi(val);
 				pp->value<int>() = n;
@@ -548,7 +502,7 @@ bool FEFileSection::parseEnumParam(FEParam* pp, const char* val)
 		const char* tmp = val;
 		while (tmp)
 		{
-			int n = enumValue(tmp, szenums);
+			int n = fexml::enumValue(tmp, szenums);
 			v.push_back(n);
 			tmp = strchr(tmp, ',');
 			if (tmp) tmp++;
@@ -854,7 +808,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 			if (sztype == 0)
 			{
 				const char* szval = tag.szvalue();
-				sztype = (is_number(szval) ? "const" : "math");
+				sztype = (fexml::is_number(szval) ? "const" : "math");
 			}
 
 			// allocate valuator
@@ -1106,7 +1060,7 @@ bool FEFileSection::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 						// if the type is not specified, we'll try to determine if 
 						// it's a math expression or a const
 						const char* szval = tag.szvalue();
-						sztype = (is_number(szval) ? "const" : "math");
+						sztype = (fexml::is_number(szval) ? "const" : "math");
 					}
 
 					if (strcmp(sztype, "const") == 0)

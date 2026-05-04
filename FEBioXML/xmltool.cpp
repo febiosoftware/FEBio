@@ -29,8 +29,50 @@ SOFTWARE.*/
 #include <FECore/FEScalarValuator.h>
 #include <FECore/FEModelParam.h>
 
-int enumValue(const char* val, const char* szenum);
-bool is_number(const char* sz);
+int fexml::enumValue(const char* val, const char* szenum)
+{
+	if ((val == nullptr) || (szenum == nullptr)) return -1;
+
+	// get the string's length. 
+	// there could be a comma, so correct for that.
+	size_t L = strlen(val);
+	const char* c = strchr(val, ',');
+	if (c) L = c - val;
+
+	const char* ch = szenum;
+
+	int n = 0;
+	while (ch && *ch)
+	{
+		size_t l = strlen(ch);
+		int nval = n;
+		// see if the value of the enum is overridden
+		const char* ce = strrchr(ch, '=');
+		if (ce)
+		{
+			l = ce - ch;
+			nval = atoi(ce + 1);
+		}
+
+		if ((L == l) && (strnicmp(ch, val, l) == 0))
+		{
+			return nval;
+		}
+		ch = strchr(ch, '\0');
+		if (ch) ch++;
+		n++;
+	}
+	return -1;
+}
+
+// helper function to see if a string is a number
+bool fexml::is_number(const char* sz)
+{
+	char* cend;
+	double tmp = strtod(sz, &cend);
+	return ((cend == nullptr) || (cend[0] == 0));
+}
+
 
 //-----------------------------------------------------------------------------
 bool parseEnumParam(FEParam* pp, const char* val)
@@ -61,12 +103,12 @@ bool parseEnumParam(FEParam* pp, const char* val)
 		return false;
 	}
 
-	int n = enumValue(val, ch);
+	int n = fexml::enumValue(val, ch);
 	if (n != -1) pp->value<int>() = n;
 	else
 	{
 		// see if the value is an actual number
-		if (is_number(val))
+		if (fexml::is_number(val))
 		{
 			n = atoi(val);
 			pp->value<int>() = n;

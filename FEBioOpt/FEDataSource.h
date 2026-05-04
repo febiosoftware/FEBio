@@ -66,9 +66,13 @@ public:
 	
 	// Set the model parameter name
 	void SetParameterName(const std::string& name);
+	
+	std::string GetParameterName() const { return m_param; }
 
 	// set the ordinate name
 	void SetOrdinateName(const std::string& name);
+
+	std::string GetOrdinateName() const { return m_ord; }
 
 	// Initialize data
 	bool Init() override;
