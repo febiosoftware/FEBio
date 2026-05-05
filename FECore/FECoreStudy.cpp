@@ -28,6 +28,8 @@ SOFTWARE.*/
 #include "xmltool.h"
 #include "log.h"
 #include "FEBioReport.h"
+#include "FEModel.h"
+#include "FEAnalysis.h"
 #include <filesystem>
 
 FECoreStudy::FECoreStudy(FEModel* fem) : FECoreTask(fem) {}
@@ -48,6 +50,14 @@ bool FECoreStudy::Init(const char* szfile)
 
 	// read the control file
 	if (ReadControlFile(szfile) == false) return false;
+
+	// suppress all standard output from FEBio (we assume that the study will report its results in a different way)
+	// TODO: how do I block output to log file? I can use BlockLog, but I think that blocks everything. 
+	FEModel* fem = GetFEModel();
+	for (int i = 0; i < fem->Steps(); ++i)
+	{
+		fem->GetStep(i)->SetPlotLevel(FE_PLOT_NEVER);
+	}
 
 	return Init();
 }
@@ -110,37 +120,13 @@ bool FECoreStudy::Run()
 	// execute the study
 	m_success = Execute();
 
-	// build the report
+	// create the report
 	FEBioReport report;
 	report.SetTitle(GetName());
 	report.SetOptionsFile(m_optionsFile);
 	report.SetStatus(m_success ? 1 : 0);
 
-	FEReportSection& optionsSection = report.AddSection("Options");
-	FEParameterList& pl = GetParameterList();
-	FEParamIteratorConst it = pl.first();
-	for (int i = 0; i < pl.Parameters(); ++i, ++it)
-	{
-		const FEParam& param = *it;
-		switch (param.type())
-		{
-		case FE_PARAM_BOOL      : optionsSection.AddValue(param.name(), param.value<bool>()); break;
-		case FE_PARAM_INT:
-		{
-			if (param.enums() != nullptr)
-				optionsSection.AddValue(param.name(), param.enumKey());
-			else
-				optionsSection.AddValue(param.name(), param.value<int>());
-			break;
-		}
-		case FE_PARAM_DOUBLE    : optionsSection.AddValue(param.name(), param.value<double>()); break;
-		case FE_PARAM_STD_STRING: optionsSection.AddValue(param.name(), param.value<std::string>()); break;
-		case FE_PARAM_STRING    : optionsSection.AddValue(param.name(), param.cvalue()); break;
-		default:
-			assert(false);
-		}
-	}
-
+	// build the report (this is overridden by derived classes to add content to the report)
 	BuildReport(report);
 
 	// write the report to a file

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include <vector>
 #include <memory>
 #include <variant>
+#include "FEParameterList.h"
 
 class FECORE_API FEReportItem
 {
@@ -200,6 +201,8 @@ public:
 	FEReportValue& AddValue(const std::string& name, const std::string& value, const std::string& units = "");
 	FEReportValue& AddValue(const std::string& name, int value, const std::string& units = "");
 	FEReportValue& AddValue(const std::string& name, double value, const std::string& units = "");
+
+	void AddValues(const FEParameterList& pl);
 
 	FEReportTable& AddTable();
 

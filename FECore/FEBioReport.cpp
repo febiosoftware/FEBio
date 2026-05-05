@@ -143,6 +143,33 @@ FEReportValue& FEReportSection::AddValue(const std::string& name, double value, 
 	return *static_cast<FEReportValue*>(m_items.back().get());
 }
 
+void FEReportSection::AddValues(const FEParameterList& pl)
+{
+	if (pl.Parameters() == 0) return;
+	FEParamIteratorConst it = pl.first();
+	for (int i = 0; i < pl.Parameters(); ++i, ++it)
+	{
+		const FEParam& param = *it;
+		switch (param.type())
+		{
+		case FE_PARAM_BOOL: AddValue(param.name(), param.value<bool>()); break;
+		case FE_PARAM_INT:
+		{
+			if (param.enums() != nullptr)
+				AddValue(param.name(), param.enumKey());
+			else
+				AddValue(param.name(), param.value<int>());
+			break;
+		}
+		case FE_PARAM_DOUBLE: AddValue(param.name(), param.value<double>()); break;
+		case FE_PARAM_STD_STRING: AddValue(param.name(), param.value<std::string>()); break;
+		case FE_PARAM_STRING: AddValue(param.name(), param.cvalue()); break;
+		default:
+			assert(false);
+		}
+	}
+}
+
 FEReportTable& FEReportSection::AddTable()
 {
 	// count all tables in the current section to generate a unique ID for the new table

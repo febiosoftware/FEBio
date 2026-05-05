@@ -48,6 +48,8 @@ public:
 
 	virtual void BuildReport(FEBioReport& report);
 
+	std::string GetOptionsFile() const { return m_optionsFile; }
+
 public:
 	virtual bool Execute() = 0;
 

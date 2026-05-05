@@ -29,8 +29,17 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/log.h>
+#include <FEBioPlot/FEBioPlotFile.h>
+#include <filesystem>
 
-FESweepParam::FESweepParam()
+BEGIN_FECORE_CLASS(FESweepParam, FECoreClass)
+	ADD_PARAMETER(m_paramName, "param_name");
+	ADD_PARAMETER(m_min, "min");
+	ADD_PARAMETER(m_max, "max");
+	ADD_PARAMETER(m_step, "step");
+END_FECORE_CLASS();
+
+FESweepParam::FESweepParam(FEModel* fem)
 {
 	m_min = m_max = m_step = 0.0;
 	m_pd = nullptr;
@@ -59,28 +68,37 @@ void FESweepParam::SetValue(double v)
 	*m_pd = v;
 }
 
-FEParameterSweep::FEParameterSweep(FEModel* fem) : FECoreTask(fem)
+BEGIN_FECORE_CLASS(FEParameterSweep, FECoreStudy)
+	ADD_PROPERTY(m_params, "param")->SetDefaultType("parameter_sweep_param");
+END_FECORE_CLASS();
+
+FEParameterSweep::FEParameterSweep(FEModel* fem) : FECoreStudy(fem)
 {
 	m_niter = 0;
 }
 
 //! initialization
-bool FEParameterSweep::Init(const char* szfile)
+bool FEParameterSweep::Init()
 {
-	// read the control file
-	if (Input(szfile) == false) return false;
-
 	// initialize the model
 	if (GetFEModel()->Init() == false) return false;
 
 	// check the parameters
 	if (InitParams() == false) return false;
 
-	// don't plot anything
-	GetFEModel()->GetCurrentStep()->SetPlotHint(FE_PLOT_APPEND);
-	GetFEModel()->GetCurrentStep()->SetPlotLevel(FE_PLOT_FINAL);
+	// create the output plot file
+	plotFileName = "parameter_sweep.xplt";
+	std::string optionsFile = GetOptionsFile();
+	if (!optionsFile.empty())
+	{
+		// replace the extension with .xplt
+		plotFileName = std::filesystem::path(optionsFile).stem().string() + ".xplt";
+	}
+	xplt = new FEBioPlotFile(GetFEModel());
+	xplt->Open(plotFileName.c_str());
+	xplt->Write(0);
 
-	return true;
+	return FECoreStudy::Init();
 }
 
 bool FEParameterSweep::InitParams()
@@ -127,54 +145,8 @@ bool FEParameterSweep::InitParams()
 	return true;
 }
 
-bool FEParameterSweep::Input(const char* szfile)
-{
-	// open the xml file
-	XMLReader xml;
-	if (xml.Open(szfile) == false) return false;
-
-	// find the root tag
-	XMLTag tag;
-	if (xml.FindTag("febio_sweep", tag) == false) return false;
-
-	++tag;
-	do
-	{
-		if (tag == "param")
-		{
-			FESweepParam p;
-
-			// read the parameter name
-			const char* szname = tag.AttributeValue("name");
-			p.m_paramName = szname;
-
-			// read the values
-			double d[3];
-			int n = tag.value(d, 3);
-			if (n != 3) throw XMLReader::InvalidValue(tag);
-
-			// some error checking
-			p.m_min = d[0];
-			p.m_max = d[1];
-			p.m_step = d[2];
-			if (p.m_max < p.m_min) throw XMLReader::InvalidValue(tag);
-			if (p.m_step <= 0.0) throw XMLReader::InvalidValue(tag);
-
-			// looks good, so throw it on the pile
-			m_params.push_back(p);
-		}
-		else throw XMLReader::InvalidTag(tag);
-		++tag;
-	} while (!tag.isend());
-
-	// all done
-	xml.Close();
-
-	return true;
-}
-
 //! Run the optimization module
-bool FEParameterSweep::Run()
+bool FEParameterSweep::Execute()
 {
 	size_t ma = m_params.size();
 	vector<double> a(ma);
@@ -203,6 +175,8 @@ bool FEParameterSweep::Run()
 	}
 	while (!bdone);
 
+	xplt->Close();
+
 	return true;
 }
 
@@ -212,16 +186,21 @@ bool FEParameterSweep::FESolve(const vector<double>& a)
 	feLog("\n----- Iteration: %d -----\n", m_niter);
 
 	// set the input parameters
+	Run run;
 	size_t nvar = m_params.size();
 	assert(nvar == a.size());
 	for (int i = 0; i<nvar; ++i)
 	{
 		FESweepParam& var = m_params[i];
 		var.SetValue(a[i]);
+		run.params.push_back(a[i]);
 
 		string name = var.m_paramName;
 		feLog("%-15s = %lg\n", name.c_str(), a[i]);
 	}
+
+	// write the current state to the plot file
+	xplt->Write(m_niter);
 
 	// reset the FEM data
 	FEModel& fem = *GetFEModel();
@@ -232,8 +211,44 @@ bool FEParameterSweep::FESolve(const vector<double>& a)
 
 	// solve the FE problem
 	bool bret = fem.Solve();
+	run.success = bret;
+	m_runs.push_back(run);
 
 	fem.UnBlockLog();
 
 	return bret;
+}
+
+void FEParameterSweep::BuildReport(FEBioReport& report)
+{
+	FEReportSection& section = report.AddSection("Runs");
+	FEReportTable& table = section.AddTable();
+
+	int nparams = (int)m_params.size();
+	std::vector<std::string> iterData(m_runs.size());
+	// add the first column for the iteration number
+	for (size_t j = 0; j < m_runs.size(); ++j)
+		iterData[j] = std::string("#") + std::to_string(j + 1);
+	table.AddColumn("Run", iterData);
+
+	// add columns for each parameter
+	std::vector<double> data(m_runs.size());
+	for (int i = 0; i < nparams; ++i)
+	{
+		for (size_t j = 0; j < m_runs.size(); ++j)
+			data[j] = m_runs[j].params[i];
+		table.AddColumn(m_params[i].m_paramName, data);
+	}
+	std::vector<std::string> successData(m_runs.size());
+	for (size_t j = 0; j < m_runs.size(); ++j)
+		successData[j] = m_runs[j].success ? "Success" : "Failed";
+	table.AddColumn("Status", successData);
+
+	section.AddText("The following table shows the parameters and status for each run of the parameter sweep.");
+	section.AddTableView(table)
+		.SetCaption("Parameter sweep runs.");
+
+	FEReportSection& outSec = report.AddSection("Output");
+	outSec.AddText("The following files were generated during the parameter sweep:");
+	outSec.AddFile(plotFileName, "Plot file containing the results of the parameter sweep");
 }
