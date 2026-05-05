@@ -252,6 +252,7 @@ public:
 
 	//! override the template for char pointers
 	char* cvalue();
+	const char* cvalue() const;
 };
 
 //-----------------------------------------------------------------------------

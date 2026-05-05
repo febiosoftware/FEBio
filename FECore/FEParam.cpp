@@ -286,6 +286,7 @@ void* FEParam::data_ptr() const { return m_pv; }
 
 //-----------------------------------------------------------------------------
 //! override the template for char pointers
+const char* FEParam::cvalue() const { return (const char*)data_ptr(); }
 char* FEParam::cvalue() { return (char*)data_ptr(); }
 
 //-----------------------------------------------------------------------------

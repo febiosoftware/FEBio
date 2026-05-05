@@ -64,8 +64,20 @@ bool FECoreStudy::ReadControlFile(const char* szfile)
 			return false;
 		}
 		XMLTag tag;
-		if (!xml.FindTag(sztype, tag)) {
-			feLogError("Failed finding root tag '%s'.", sztype);
+		if (!xml.FindTag("febio_study", tag)) {
+			feLogError("Failed finding root tag \"febio_study\".");
+			return false;
+		}
+
+		// make sure the type matches
+		const char* szval = tag.AttributeValue("type", true);
+		if (szval == nullptr) {
+			feLogError("The root tag is missing the required \"type\" attribute.");
+			return false;
+		}
+
+		if (strcmp(szval, sztype) != 0) {
+			feLogError("The study type \"%s\" does not match the expected type \"%s\".", szval, sztype);
 			return false;
 		}
 
@@ -103,6 +115,32 @@ bool FECoreStudy::Run()
 	report.SetTitle(GetName());
 	report.SetOptionsFile(m_optionsFile);
 	report.SetStatus(m_success ? 1 : 0);
+
+	FEReportSection& optionsSection = report.AddSection("Options");
+	FEParameterList& pl = GetParameterList();
+	FEParamIteratorConst it = pl.first();
+	for (int i = 0; i < pl.Parameters(); ++i, ++it)
+	{
+		const FEParam& param = *it;
+		switch (param.type())
+		{
+		case FE_PARAM_BOOL      : optionsSection.AddValue(param.name(), param.value<bool>()); break;
+		case FE_PARAM_INT:
+		{
+			if (param.enums() != nullptr)
+				optionsSection.AddValue(param.name(), param.enumKey());
+			else
+				optionsSection.AddValue(param.name(), param.value<int>());
+			break;
+		}
+		case FE_PARAM_DOUBLE    : optionsSection.AddValue(param.name(), param.value<double>()); break;
+		case FE_PARAM_STD_STRING: optionsSection.AddValue(param.name(), param.value<std::string>()); break;
+		case FE_PARAM_STRING    : optionsSection.AddValue(param.name(), param.cvalue()); break;
+		default:
+			assert(false);
+		}
+	}
+
 	BuildReport(report);
 
 	// write the report to a file
