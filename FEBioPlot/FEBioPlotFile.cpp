@@ -723,15 +723,23 @@ void FEBioPlotFile::Clear()
 	for (LineObject* l : m_Lines) delete l; m_Lines.clear();
 }
 
+std::string FEBioPlotFile::GetFilename() const
+{
+	return m_filename;
+}
+
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Open(const char *szfile)
 {
+	if (szfile == nullptr) return false;
+
 	FEModel* fem = GetFEModel();
 
 	m_meshesWritten = 0;
 
 	// open the archive
 	m_ar.Create(szfile);
+	m_filename = szfile;
 
 	// set compression
 	FEPlotDataStore& pltData = fem->GetPlotDataStore();
@@ -2120,8 +2128,11 @@ void FEBioPlotFile::WriteDomainDataField(FEModel &fem, FEPlotData* pd)
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Append(const char *szfile)
 {
+	if (szfile == nullptr) return false;
+
 	// try to open the file
 	if (m_ar.Open(szfile) == false) return false;
+	m_filename = szfile;
 
 	FEModel* fem = GetFEModel();
 	FEPlotDataStore& pltData = fem->GetPlotDataStore();

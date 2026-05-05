@@ -266,6 +266,9 @@ public:
 	//! see if the plot file is valid
 	bool IsValid() const override;
 
+	//! return the filename for this plot file
+	std::string GetFilename() const;
+
 public:
 	//! Set the compression level
 	void SetCompression(int n);
@@ -333,10 +336,11 @@ protected:
 	void Clear();
 
 protected:
+	std::string	m_filename;	// the name of the plot file
 	PltArchive	m_ar;	// the data archive
 	int			m_ncompress;	// compression level
 	int			m_meshesWritten;	// nr of meshes written
-	string		m_softwareString;	// the software string
+	std::string	m_softwareString;	// the software string
 	bool		m_exportUnitsFlag;	// flag that indicates whether to write units
 	bool		m_exportErodedElements; // export the eroded elements or not 
 
