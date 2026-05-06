@@ -394,7 +394,7 @@ bool ImportPluginFolder(const char* szfolder)
     
     for (const auto& entry : fs::directory_iterator(szfolder)) 
     {
-        if (entry.is_regular_file() && entry.path().extension() == extension)
+        if (fs::is_regular_file(entry.path()) && entry.path().extension() == extension)
         {
             // try to load the plugin
             bool ok = ImportPlugin(entry.path().string().c_str());

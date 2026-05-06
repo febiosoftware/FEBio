@@ -450,7 +450,7 @@ else()
         target_link_libraries(febiofluid PRIVATE -static-libstdc++ -static-libgcc)
         target_link_libraries(feimglib PRIVATE -static-libstdc++ -static-libgcc)
         target_link_libraries(feamr PRIVATE -static-libstdc++ -static-libgcc)
-        target_link_libraries(febiolib PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiolib PRIVATE -static-libstdc++ -static-libgcc stdc++fs)
         target_link_libraries(fecore PRIVATE -static-libstdc++ -static-libgcc stdc++fs)
         
         target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
