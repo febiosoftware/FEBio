@@ -51,6 +51,11 @@ bool FECoreStudy::Init(const char* szfile)
 	// read the control file
 	if (ReadControlFile(szfile) == false) return false;
 
+	return Init();
+}
+
+void FECoreStudy::DisableStandardOutput()
+{
 	// suppress all standard output from FEBio (we assume that the study will report its results in a different way)
 	// TODO: how do I block output to log file? I can use BlockLog, but I think that blocks everything. 
 	FEModel* fem = GetFEModel();
@@ -58,8 +63,6 @@ bool FECoreStudy::Init(const char* szfile)
 	{
 		fem->GetStep(i)->SetPlotLevel(FE_PLOT_NEVER);
 	}
-
-	return Init();
 }
 
 bool FECoreStudy::ReadControlFile(const char* szfile)

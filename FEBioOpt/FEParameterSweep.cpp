@@ -80,6 +80,9 @@ FEParameterSweep::FEParameterSweep(FEModel* fem) : FECoreStudy(fem)
 //! initialization
 bool FEParameterSweep::Init()
 {
+	// disable the standard output from FEBio.
+	DisableStandardOutput();
+
 	// initialize the model
 	if (GetFEModel()->Init() == false) return false;
 

@@ -50,6 +50,11 @@ public:
 
 	std::string GetOptionsFile() const { return m_optionsFile; }
 
+	// Disable the standard output from FEBio. 
+	// This is useful for studies that want to report their results in a different way.
+	// (Make sure to call this before model initialization!)
+	void DisableStandardOutput();
+
 public:
 	virtual bool Execute() = 0;
 
