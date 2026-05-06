@@ -41,17 +41,6 @@ endif()
 
 include(FindDependencies.cmake)
 
-##### Check compiler for std::filesystem support #####
-include(CheckCXXSourceCompiles)
-
-check_cxx_source_compiles("
-  #include <filesystem>
-  int main() {
-    std::filesystem::path p{\"test\"};
-    return 0;
-  }
-" HAS_STD_FILESYSTEM)
-
 #### Check if paths are valid and find libs ####
 
 function(findLib libName libDir libOut)
@@ -303,10 +292,6 @@ mark_as_advanced(EXTRA_INC)
 ##### Setup includes, defnitions, and linking options #####
 include_directories(${PROJECT_SOURCE_DIR})
 
-if(HAS_STD_FILESYSTEM)
-    target_compile_definitions(febiolib PRIVATE HAS_STD_FILESYSTEM)
-endif()
-
 # Link LEVMAR
 if(USE_LEVMAR)
 	target_include_directories(febioopt PRIVATE ${LEVMAR_INC})
@@ -465,8 +450,8 @@ else()
         target_link_libraries(febiofluid PRIVATE -static-libstdc++ -static-libgcc)
         target_link_libraries(feimglib PRIVATE -static-libstdc++ -static-libgcc)
         target_link_libraries(feamr PRIVATE -static-libstdc++ -static-libgcc)
-        target_link_libraries(febiolib PRIVATE -static-libstdc++ -static-libgcc)
-        target_link_libraries(fecore PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiolib PRIVATE -static-libstdc++ -static-libgcc stdc++fs)
+        target_link_libraries(fecore PRIVATE -static-libstdc++ -static-libgcc stdc++fs)
         
         target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
     endif()
