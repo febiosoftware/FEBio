@@ -36,17 +36,13 @@ SOFTWARE.*/
 #include <NumCore/MatrixTools.h>
 #include <FECore/LinearSolver.h>
 #include <FEBioTest/FEMaterialTest.h>
+#include <FECore/FEFilesystem.h>
 #include "plugin.h"
 #include <map>
 #include <iostream>
 
 #ifndef WIN32
 #include <dlfcn.h>
-#endif
-
-#ifdef HAS_STD_FILESYSTEM
-    #include <filesystem>
-    namespace fs = std::filesystem;
 #endif
 
 namespace febio {
@@ -387,7 +383,6 @@ namespace febio {
 
 bool ImportPluginFolder(const char* szfolder)
 {
-#ifdef HAS_STD_FILESYSTEM
     // get the default (system-dependant) extension
     #ifdef WIN32
         std::string extension = ".dll";
@@ -409,10 +404,6 @@ bool ImportPluginFolder(const char* szfolder)
     }
 
     return true;
-#else
-    fprintf(stderr, "This version of FEBio does not support the import_folder tag.\n");
-    return false;
-#endif
 }
 
 void ImportRepoPlugins(const char* szxmlFile)

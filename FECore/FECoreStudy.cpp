@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include "xmltool.h"
 #include "log.h"
 #include "FEBioReport.h"
-#include <filesystem>
+#include "FEFilesystem.h"
 
 FECoreStudy::FECoreStudy(FEModel* fem) : FECoreTask(fem) {}
 
@@ -43,7 +43,7 @@ bool FECoreStudy::Init(const char* szfile)
 
 	// set the file name as the study's name
 	m_optionsFile = szfile;
-	std::string name = std::filesystem::path(szfile).stem().string();
+	std::string name = fs::path(szfile).stem().string();
 	SetName(name);
 
 	// read the control file
