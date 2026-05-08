@@ -102,7 +102,7 @@ void FEBioReport::SetStatus(int status)
 
 FEReportSection& FEBioReport::AddSection(const std::string& name)
 {
-	auto section = make_unique<FEReportSection>();
+	auto section = make_unique<FEReportSection>(this);
 	section->name = name;
 	m.m_sections.push_back(std::move(section));
 	return *m.m_sections.back();
@@ -173,12 +173,7 @@ void FEReportSection::AddValues(const FEParameterList& pl)
 FEReportTable& FEReportSection::AddTable()
 {
 	// count all tables in the current section to generate a unique ID for the new table
-	size_t tableCount = 0;
-	for (const auto& item : m_items) {
-		if (dynamic_cast<FEReportTable*>(item.get())) {
-			++tableCount;
-		}
-	}
+	size_t tableCount = report->TableCount();
 
 	size_t tableIndex = tableCount + 1; // start from 1 for better readability
 
@@ -255,6 +250,19 @@ FEReportTable::TableColumn FEBioReport::GetTableColumn(const std::string& tableI
 		}
 	}
 	return FEReportTable::TableColumn("", FEReportTable::Text, {});
+}
+
+size_t FEBioReport::TableCount() const
+{
+	size_t count = 0;
+	for (const auto& section : m.m_sections) {
+		for (const auto& item : section->m_items) {
+			if (dynamic_cast<FEReportTable*>(item.get())) {
+				++count;
+			}
+		}
+	}
+	return count;
 }
 
 bool FEBioReport::Write(const std::string& filename) const

@@ -31,6 +31,8 @@ SOFTWARE.*/
 #include <variant>
 #include "FEParameterList.h"
 
+class FEBioReport;
+
 class FECORE_API FEReportItem
 {
 public:
@@ -186,8 +188,9 @@ class FECORE_API FEReportSection
 public:
 	std::string name;
 	std::vector<FEReportItemPtr> m_items;
+	FEBioReport* report = nullptr;
 
-	FEReportSection() = default;
+	FEReportSection(FEBioReport* report) : report(report) {};
 	FEReportSection(const FEReportSection&) = delete;
 	FEReportSection& operator=(const FEReportSection&) = delete;
 
@@ -258,6 +261,9 @@ public: // API for reading reports
 	FEReportTable GetTable(const std::string& tableId) const;
 
 	FEReportTable::TableColumn GetTableColumn(const std::string& tableId, const std::string& columnName) const;
+
+public: // some helper functions
+	size_t TableCount() const;
 
 private:
 	Imp& m;

@@ -202,9 +202,6 @@ bool FEParameterSweep::FESolve(const vector<double>& a)
 		feLog("%-15s = %lg\n", name.c_str(), a[i]);
 	}
 
-	// write the current state to the plot file
-	xplt->Write(m_niter);
-
 	// reset the FEM data
 	FEModel& fem = *GetFEModel();
 	fem.BlockLog();
@@ -219,11 +216,39 @@ bool FEParameterSweep::FESolve(const vector<double>& a)
 
 	fem.UnBlockLog();
 
+	// write the current state to the plot file
+	xplt->Write(m_niter);
+
 	return bret;
 }
 
 void FEParameterSweep::BuildReport(FEBioReport& report)
 {
+	FEReportSection& optSec = report.AddSection("Options");
+	optSec.AddText("The following parameters were used for the parameter sweep:");
+	FEReportTable& optTable = optSec.AddTable();
+	std::vector<std::string> paramNames(m_params.size());
+	std::vector<double> minData(m_params.size());
+	std::vector<double> maxData(m_params.size());
+	std::vector<double> stpData(m_params.size());
+	for (size_t i = 0; i < m_params.size(); ++i)
+	{
+		paramNames[i] = m_params[i].m_paramName;
+		minData[i] = m_params[i].m_min;
+		maxData[i] = m_params[i].m_max;
+		stpData[i] = m_params[i].m_step;
+	}
+	optTable.AddColumn("Parameter", paramNames);
+	optTable.AddColumn("Min", minData);
+	optTable.AddColumn("Max", maxData);
+	optTable.AddColumn("Step", stpData);
+	optSec.AddTableView(optTable)
+		.SetCaption("Parameters used in parameter sweep.");
+
+	FEReportSection& outSec = report.AddSection("Output");
+	outSec.AddText("The following files were generated during the parameter sweep:");
+	outSec.AddFile(plotFileName, "Plot file containing the results of the parameter sweep");
+
 	FEReportSection& section = report.AddSection("Runs");
 	FEReportTable& table = section.AddTable();
 
@@ -250,8 +275,4 @@ void FEParameterSweep::BuildReport(FEBioReport& report)
 	section.AddText("The following table shows the parameters and status for each run of the parameter sweep.");
 	section.AddTableView(table)
 		.SetCaption("Parameter sweep runs.");
-
-	FEReportSection& outSec = report.AddSection("Output");
-	outSec.AddText("The following files were generated during the parameter sweep:");
-	outSec.AddFile(plotFileName, "Plot file containing the results of the parameter sweep");
 }
