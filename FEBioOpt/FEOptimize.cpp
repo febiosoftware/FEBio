@@ -86,7 +86,7 @@ bool FEOptimize::Run()
 	else 
 		feLog("\n\n E R R O R   T E R M I N A T I O N\n\n");
 
-	if (m_opt.m_createReport)
+//	if (m_opt.m_createReport)
 		BuildReport();
 
 	return bret;
@@ -127,14 +127,16 @@ void FEOptimize::BuildReport()
 	if (obj)
 	{
 		int n = obj->Measurements();
-		std::vector<double> x(n), y(n), d(n);
+		std::vector<double> x(n), y(n), d(n), e(n);
 		obj->GetXValues(x);
 		obj->GetMeasurements(d);
 		obj->EvaluateFunctions(y);
+		for (int i = 0; i < n; ++i) e[i] = y[i] - d[i];
 
 		std::string x_name = "x";
 		std::string y_name = "y";
 		std::string d_name = "data"; // "data" from options file
+		std::string e_name = "error";
 
 		const FEDataParameter* src = dynamic_cast<const FEDataParameter*>(obj->GetDataSource());
 		if (src)
@@ -147,6 +149,7 @@ void FEOptimize::BuildReport()
 		table.AddColumn(x_name, x);
 		table.AddColumn(y_name, y);
 		table.AddColumn(d_name, d);
+		table.AddColumn(e_name, e);
 
 		FEReportChart& chart = section.AddChart(FEReportChart::Line);
 		chart.AddDataSeries("fit")
