@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/log.h>
 #include <FEBioPlot/FEBioPlotFile.h>
-#include <filesystem>
+#include <FECore/FEFilesystem.h>
 
 BEGIN_FECORE_CLASS(FESweepParam, FECoreClass)
 	ADD_PARAMETER(m_paramName, "param_name");
@@ -95,7 +95,7 @@ bool FEParameterSweep::Init()
 	if (!optionsFile.empty())
 	{
 		// replace the extension with .xplt
-		plotFileName = std::filesystem::path(optionsFile).stem().string() + ".xplt";
+		plotFileName = fs::path(optionsFile).stem().string() + ".xplt";
 	}
 	xplt = new FEBioPlotFile(GetFEModel());
 	xplt->Open(plotFileName.c_str());
