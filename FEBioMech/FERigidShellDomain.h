@@ -103,6 +103,10 @@ public: // from FEShellDomain
 	FEShellElement& Element(int i) override { return m_Elem[i]; }
 
 	void AssignDefaultShellThickness() override;
+    
+    double Volume(FEShellElement& el) override;
+    
+    double CurrentVolume(FEShellElement& el) override;
 
 public: // from FEElasticDomain
 	void InternalForces(FEGlobalVector& R) override;
@@ -133,6 +137,7 @@ private:
 
 public:
 	double detJ0(FEShellElement& el, int n);
+    double detJ(FEShellElement& el, int n);
 
 protected:
 	double	m_h0; // TODO: move to base class?
