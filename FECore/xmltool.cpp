@@ -181,6 +181,23 @@ bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* p
 			p.setValuator(val);
 		}
 		break;
+		case FE_PARAM_STD_VECTOR_VEC2D:
+		{
+			std::vector<vec2d>& data = pp->value< std::vector<vec2d> >();
+			data.clear();
+
+			double d[2];
+			++tag;
+			do
+			{
+				int nread = tag.value(d, 2);
+				if (nread != 2) throw XMLReader::InvalidValue(tag);
+				data.push_back(vec2d(d[0], d[1]));
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		break;
 		default:
 			assert(false);
 			return false;
