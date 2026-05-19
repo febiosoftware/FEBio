@@ -380,6 +380,19 @@ bool fexml::readParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
 					readParameterList(tag, pc);
 				}
 			}
+			else if (prop->GetDefaultType())
+			{
+				sztype = prop->GetDefaultType();
+
+				// try to allocate the class
+				FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, pc->GetFEModel());
+				if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				prop->SetProperty(pp);
+
+				// read the property data
+				readParameterList(tag, pp);
+			}
 			else
 			{
 				throw XMLReader::MissingAttribute(tag, "type");
