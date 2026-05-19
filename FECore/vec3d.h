@@ -41,7 +41,7 @@ public:
 	//! Constructor with three components
 	vec3d(double X, double Y, double Z) : x(X), y(Y), z(Z) {}
 	//! Constructor from 2D vector - sets z component to 0
-	vec3d(const vec2d& v) { x = v.r[0]; y = v.r[1]; z = 0.0; }
+	vec3d(const vec2d& v) { x = v.x; y = v.y; z = 0.0; }
 
 	//! Vector addition operator
 	vec3d operator + (const vec3d& r) const { return vec3d(x+r.x, y+r.y, z+r.z); }

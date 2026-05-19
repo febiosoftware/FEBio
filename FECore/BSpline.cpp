@@ -88,8 +88,8 @@ bool BSpline::init(int korder, const std::vector<vec2d>& p)
     // extract breakpoint sequence and spline coefficients
     std::vector<double> bp(ncoef);
     for (int i=0; i< ncoef; ++i) {
-        bp[i] = p[i].x();
-        im->coeff[i] = p[i].y();
+        bp[i] = p[i].x;
+        im->coeff[i] = p[i].y;
     }
     
     // evaluate knot sequence from breakpoint sequence
@@ -253,9 +253,9 @@ bool BSpline::fit(int korder, int ncoef, const std::vector<vec2d>& p)
     // otherwise, generate breakpoints uniformly over range of x
     else {
         std::vector<vec2d> q(ncoef,vec2d(0, 0));
-        double dx = (p[np-1].x() - p[0].x())/(ncoef-1);
+        double dx = (p[np-1].x - p[0].x)/(ncoef-1);
         for (int i=0; i<ncoef; ++i)
-            q[i].x() = p[0].x() + i*dx;
+            q[i].x = p[0].x + i*dx;
         binit = init(korder, q);
     }
     if (binit == false) return binit;
@@ -263,7 +263,7 @@ bool BSpline::fit(int korder, int ncoef, const std::vector<vec2d>& p)
     // evaluate B-spline blending functions at p.x using this knot sequence
     matrix wk1(np,ncoef);
     for (int j=0; j<np; ++j) {
-        std::vector<double> bsbldg = blending_functions(p[j].x());
+        std::vector<double> bsbldg = blending_functions(p[j].x);
         for (int i=0; i<ncoef; ++i) wk1(j,i) = bsbldg[i];
     }
     
@@ -274,7 +274,7 @@ bool BSpline::fit(int korder, int ncoef, const std::vector<vec2d>& p)
     std::vector<double> rhs(ncoef,0);
     for (int k=0; k<ncoef; ++k)
         for (int j=0; j<np; ++j)
-            rhs[k] += p[j].y()*wk1(j,k);
+            rhs[k] += p[j].y*wk1(j,k);
 
     // solve the system of equations
     wk2.solve(im->coeff, rhs);

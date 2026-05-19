@@ -31,46 +31,39 @@ class vec2d
 {
 public:
 	// constructor
-	vec2d() { r[0] = r[1] = 0; }
-	explicit vec2d(double v) { r[0] = r[1] = v; }
-	vec2d(double x, double y) { r[0] = x; r[1] = y; }
+	vec2d() { x = y = 0.0; }
+	explicit vec2d(double v) { x = y = v; }
+	vec2d(double x, double y) : x(x), y(y) {}
 
-	bool operator == (const vec2d& r) const { return (r[0] == r.r[0]) && (r[1] == r.r[1]); }
+	bool operator == (const vec2d& r) const { return (x == r.x) && (y == r.y); }
 
 	// access operators
-	double operator [] (int i) const { return r[i]; }
-	double& operator [] (int i) { return r[i]; }
+	double operator [] (int i) const { return (i == 0) ? x : y; }
+	double& operator [] (int i) { return (i == 0) ? x : y; }
+	double norm() const { return sqrt(x * x + y * y); }
+	double norm2() const { return x * x + y * y; }
 
-	double& x() { return r[0]; }
-	double& y() { return r[1]; }
-
-	double x() const { return r[0]; }
-	double y() const { return r[1]; }
-
-	double norm() const { return sqrt(r[0] * r[0] + r[1] * r[1]); }
-	double norm2() const { return r[0] * r[0] + r[1] * r[1]; }
-
-	double unit() { double R = norm(); if (R != 0) { r[0] /= R; r[1] /= R; }; return R; }
+	double unit() { double R = norm(); if (R != 0) { x /= R; y /= R; }; return R; }
 
 public: // arithmetic operators
 
-	vec2d operator + (const vec2d& v) const { return vec2d(r[0]+v.r[0], r[1]+v.r[1]); }
-	vec2d operator - (const vec2d& v) const { return vec2d(r[0]-v.r[0], r[1]-v.r[1]); }
-	vec2d operator * (double g) const { return vec2d(r[0]*g, r[1]*g); }
-	vec2d operator / (double g) const { return vec2d(r[0]/g, r[1]/g); }
+	vec2d operator + (const vec2d& v) const { return vec2d(x+v.x, y+v.y); }
+	vec2d operator - (const vec2d& v) const { return vec2d(x-v.x, y-v.y); }
+	vec2d operator * (double g) const { return vec2d(x*g, y*g); }
+	vec2d operator / (double g) const { return vec2d(x/g, y/g); }
 
-	vec2d& operator += (const vec2d& v) { r[0] += v.r[0]; r[1] += v.r[1]; return *this; }
-	vec2d& operator -= (const vec2d& v) { r[0] -= v.r[0]; r[1] -= v.r[1]; return *this; }
-	vec2d& operator *= (double g) { r[0] *= g; r[1] *= g; return *this; }
-	vec2d& operator /= (double g) { r[0] /= g; r[1] /= g; return *this; }
+	vec2d& operator += (const vec2d& v) { x += v.x; y += v.y; return *this; }
+	vec2d& operator -= (const vec2d& v) { x -= v.x; y -= v.y; return *this; }
+	vec2d& operator *= (double g) { x *= g; y *= g; return *this; }
+	vec2d& operator /= (double g) { x /= g; y /= g; return *this; }
 
-    vec2d operator - () const { return vec2d(-r[0], -r[1]); }
+    vec2d operator - () const { return vec2d(-x, -y); }
     
 	// dot product
-	double operator * (const vec2d& v) const { return r[0]*v[0] + r[1]*v[1]; }
+	double operator * (const vec2d& v) const { return x*v.x + y*v.y; }
 
 public:
-	double r[2];
+	double x, y;
 };
 
 //-----------------------------------------------------------------------------

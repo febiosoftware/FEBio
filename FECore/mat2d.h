@@ -98,4 +98,4 @@ protected:
 inline vec2d operator * (mat2d& m, vec2d& a) { return vec2d(m[0][0]*a[0]+m[0][1]*a[1], m[1][0]*a[0]+m[1][1]*a[1]); }
 
 // dyadic product
-inline mat2d dyad(vec2d& a, vec2d& b) { return mat2d(a.r[0]*b.r[0], a.r[0]*b.r[1], a.r[1]*b.r[0], a.r[1]*b.r[1]); }
+inline mat2d dyad(vec2d& a, vec2d& b) { return mat2d(a.x*b.x, a.x*b.y, a.y*b.x, a.y*b.y); }
