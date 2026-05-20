@@ -358,12 +358,6 @@ int Compiler::stackEffect(OpCode op, int arg)
 	}
 }
 
-uint8_t Compiler::addConstant(const Value& v)
-{
-	prg.constants.push_back(v);
-	return (uint8_t)(prg.constants.size() - 1);
-}
-
 int Compiler::emitJump(OpCode op)
 {
 	emit(op);
@@ -1023,7 +1017,7 @@ Type Compiler::compileLiteral(LiteralExpr* expr)
 		throw std::runtime_error("Unsupported literal type");
 	}
 
-	uint8_t idx = addConstant(expr->value);
+	uint8_t idx = prg.addConstant(expr->value);
 	emitUint8(idx);
 	return type;
 }

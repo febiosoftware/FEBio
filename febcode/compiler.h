@@ -314,8 +314,6 @@ namespace febcode
 
 		int stackEffect(OpCode op, int arg);
 
-		uint8_t addConstant(const Value& v);
-
 		int emitJump(OpCode op);
 		void patchJump(int offset);
 		void emitLoop(int loopStart);

@@ -38,6 +38,9 @@ namespace febcode {
 	public:
 		Program();
 
+		// add a constant value to the program's constant pool and return its index
+		uint8_t addConstant(const Value& value);
+
 		// adds a global variable (from compiled code)
 		int addGlobal(const std::string& name, Type type);
 

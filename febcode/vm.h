@@ -391,6 +391,8 @@ namespace febcode
 				case TypeKind::Double: arr.elements[i] = popDouble(); break;
 				case TypeKind::Vec2  : arr.elements[i] = popVec2(); break;
 				case TypeKind::Vec3  : arr.elements[i] = popVec3(); break;
+				case TypeKind::Mat2  : arr.elements[i] = popMat2(); break;
+				case TypeKind::Mat3  : arr.elements[i] = popMat3(); break;
 				case TypeKind::Array : arr.elements[i] = std::make_shared<ArrayValue >(popArray(type->elementType)); break;
 				case TypeKind::Struct: arr.elements[i] = std::make_shared<StructValue>(popStruct(type->elementType)); break;
 				default:
@@ -416,10 +418,12 @@ namespace febcode
 				case TypeKind::Double: field = popDouble(); break;
 				case TypeKind::Vec2  : field = popVec2(); break;
 				case TypeKind::Vec3  : field = popVec3(); break;
+				case TypeKind::Mat2  : field = popMat2(); break;
+				case TypeKind::Mat3  : field = popMat3(); break;
 				case TypeKind::Array : field = std::make_shared<ArrayValue >(popArray (type->fields[i].first)); break;
 				case TypeKind::Struct: field = std::make_shared<StructValue>(popStruct(type->fields[i].first)); break;
 				default:
-					throw std::runtime_error("Unsupported array element type for pop.");
+					throw std::runtime_error("Unsupported struct element type for pop.");
 				};
 			}
 			return obj;

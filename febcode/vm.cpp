@@ -20,7 +20,7 @@ static int ipow(int base, int exp)
 
 void printStack(std::ostream& os, const std::vector<double>& stack, int numGlobals, int stackSize, double* ref)
 {
-	os << "Stack: [";
+	os << "[";
 	for (size_t i = 0; i < numGlobals; i++)
 	{
 		if (ref == &stack[i])
@@ -62,6 +62,15 @@ Value VM::execute()
 	ref.ptr = nullptr;
 	const uint8_t* lastIP = m_program->code.data() + instructions;
 
+#ifndef NDEBUG
+	if (m_debug && m_debugOutput)
+	{
+		*m_debugOutput << " IP | OpCode | Stack \n";
+		*m_debugOutput << "----+--------+--------\n";
+	}
+#endif
+
+
 	while (ip < lastIP)
 	{
 		OpCode instruction = (OpCode)readByte();
@@ -69,8 +78,7 @@ Value VM::execute()
 #ifndef NDEBUG
 		if (m_debug && m_debugOutput)
 		{
-			*m_debugOutput << "IP: " << std::setw(4) << (ip - &m_program->code[0]) - 1;
-			*m_debugOutput << " | Executing: " << OpCodeToString(instruction) << " | ";
+			*m_debugOutput << std::setw(4) << (ip - &m_program->code[0]) - 1 << "| " << OpCodeToString(instruction) << "   | ";
 		}
 #endif
 
