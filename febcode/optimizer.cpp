@@ -19,11 +19,12 @@ void Optimizer::optimize()
 
 bool Optimizer::shouldRemove(Statement* stmt)
 {
-	if (auto retStmt  = dynamic_cast<ReturnStmt*    >(stmt)) return shouldRemoveReturn   (retStmt);
-	if (auto varDecl  = dynamic_cast<VarDeclStmt*   >(stmt)) return shouldRemoveVarDecl  (varDecl);
-	if (auto exprStmt = dynamic_cast<ExpressionStmt*>(stmt)) return shouldRemoveExprStmt (exprStmt);
-	if (auto blckStmt = dynamic_cast<BlockStmt     *>(stmt)) return shouldRemoveBlockStmt(blckStmt);
-	if (auto ifStmt   = dynamic_cast<IfStmt        *>(stmt)) return shouldRemoveIfStmt   (ifStmt  );
+	if      (auto retStmt  = dynamic_cast<ReturnStmt*    >(stmt)) return shouldRemoveReturn   (retStmt);
+	else if (auto varDecl  = dynamic_cast<VarDeclStmt*   >(stmt)) return shouldRemoveVarDecl  (varDecl);
+	else if (auto exprStmt = dynamic_cast<ExpressionStmt*>(stmt)) return shouldRemoveExprStmt (exprStmt);
+	else if (auto blckStmt = dynamic_cast<BlockStmt     *>(stmt)) return shouldRemoveBlockStmt(blckStmt);
+	else if (auto ifStmt   = dynamic_cast<IfStmt        *>(stmt)) return shouldRemoveIfStmt   (ifStmt  );
+	else if (auto structStmt = dynamic_cast<StructStmt*>(stmt)) return false; // don't remove struct declarations, since they are needed for type information, even if they are not used directly.
 
 	throw std::runtime_error("Unsupported statement type in optimizer");
 }

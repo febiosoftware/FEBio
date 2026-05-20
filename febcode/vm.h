@@ -20,7 +20,7 @@ namespace febcode
 		enum { MAX_CALL_DEPTH = 8 };
 
 	public:
-		VM() : m_program(nullptr) {}
+		VM();
 
 		void setProgram(const Program& program)
 		{
@@ -43,6 +43,7 @@ namespace febcode
 		}
 
 		void setDebugMode(bool b) { m_debug = b; }
+		void setDebugOutput(std::ostream& os) { m_debugOutput = &os; }
 
 		bool stackEmpty() const { return stackTop == globalStackSize; }
 		size_t stackSize() const { return stackTop - globalStackSize; }
@@ -674,6 +675,7 @@ namespace febcode
 		const uint8_t*  ip = nullptr; // current instruction pointer
 
 		bool m_debug = false;
+		std::ostream* m_debugOutput = nullptr;
 	};
 
 	Value runScript(const std::string& script);

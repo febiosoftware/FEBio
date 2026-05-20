@@ -18,32 +18,39 @@ static int ipow(int base, int exp)
 	return result;
 }
 
-void printStack(const std::vector<double>& stack, int numGlobals, int stackSize, double* ref)
+void printStack(std::ostream& os, const std::vector<double>& stack, int numGlobals, int stackSize, double* ref)
 {
-	std::cout << "Stack: [";
+	os << "Stack: [";
 	for (size_t i = 0; i < numGlobals; i++)
 	{
 		if (ref == &stack[i])
-			std::cout << "*";
-
-		std::cout << ValueToString(stack[i]);
+			os << "*";
+		os << ValueToString(stack[i]);
 		if (i < numGlobals - 1)
-			std::cout << ",";
+			os << ",";
 	}
-	std::cout << "|";
+	os << "|";
 	for (size_t i = numGlobals; i < stackSize; i++)
 	{
-		std::cout << ValueToString(stack[i]);
+		os << ValueToString(stack[i]);
 		if (i < stack.size() - 1)
-			std::cout << ",";
+			os << ",";
 	}
 	for (size_t i= stackSize; i < stack.size(); i++)
 	{
-		std::cout << "_";
+		os << "_";
 		if (i < stack.size() - 1)
-			std::cout << ",";
+			os << ",";
 	}
-	std::cout << "]" << std::endl;
+	os << "]" << std::endl;
+}
+
+VM::VM() : m_program(nullptr) 
+{
+#ifndef NDEBUG
+	m_debug = false;
+	m_debugOutput = &std::cerr;
+#endif
 }
 
 Value VM::execute()
@@ -60,10 +67,10 @@ Value VM::execute()
 		OpCode instruction = (OpCode)readByte();
 
 #ifndef NDEBUG
-		if (m_debug)
+		if (m_debug && m_debugOutput)
 		{
-			std::cout << "IP: " << std::setw(4) << (ip - &m_program->code[0]) - 1;
-			std::cout << " | Executing: " << OpCodeToString(instruction) << " | ";
+			*m_debugOutput << "IP: " << std::setw(4) << (ip - &m_program->code[0]) - 1;
+			*m_debugOutput << " | Executing: " << OpCodeToString(instruction) << " | ";
 		}
 #endif
 
@@ -1496,9 +1503,9 @@ Value VM::execute()
 			}
 
 #ifndef NDEBUG
-			if (m_debug)
+			if (m_debug && m_debugOutput)
 			{
-				printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
+				printStack(*m_debugOutput, m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 			}
 #endif
 
@@ -1510,9 +1517,9 @@ Value VM::execute()
 		}
 
 #ifndef NDEBUG
-		if (m_debug && (instruction < OpCode::RETURN_VOID))
+		if (m_debug && m_debugOutput && (instruction < OpCode::RETURN_VOID))
 		{
-			printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
+			printStack(*m_debugOutput, m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 		}
 #endif
 	}
