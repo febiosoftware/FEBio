@@ -131,20 +131,8 @@ public:
 					case FEValueType::Bool  : vm.setGlobal(g.slot, (double)vars[i].b); break;
 					case FEValueType::Int   : vm.setGlobal(g.slot, (double)vars[i].i); break;
 					case FEValueType::Double: vm.setGlobal(g.slot, vars[i].d); break;
-					case FEValueType::Vec3d:
-						{
-							const vec3d& v3 = vars[i].v3;
-							febcode::vec3 v3_febcode(v3.x, v3.y, v3.z);
-							vm.setGlobal(g.slot, v3_febcode);
-							break;
-						}
-					case FEValueType::Mat3d:
-						{
-							const mat3d& m3 = vars[i].m3;
-							febcode::mat3 m3_febcode(m3(0,0), m3(0, 1), m3(0, 2), m3(1, 0), m3(1, 1), m3(1, 2), m3(2, 0), m3(2, 1), m3(2, 2));
-							vm.setGlobal(g.slot, m3_febcode);
-							break;
-						}
+					case FEValueType::Vec3d : vm.setGlobal(g.slot, vars[i].v3); break;
+					case FEValueType::Mat3d : vm.setGlobal(g.slot, vars[i].m3); break;
 					}
 				}
 			}
@@ -163,13 +151,7 @@ public:
 						case FEParamType::FE_PARAM_BOOL  : vm.setInput(pi.name(), pi.value<bool  >()); break;
 						case FEParamType::FE_PARAM_INT   : vm.setInput(pi.name(), pi.value<int   >()); break;
 						case FEParamType::FE_PARAM_DOUBLE: vm.setInput(pi.name(), pi.value<double>()); break;
-						case FEParamType::FE_PARAM_VEC3D:
-						{
-							vec3d v3 = pi.value<vec3d>();
-							febcode::vec3 v3_febcode(v3.x, v3.y, v3.z);
-							vm.setInput(pi.name(), v3_febcode); 
-							break;
-						}
+						case FEParamType::FE_PARAM_VEC3D : vm.setInput(pi.name(), pi.value<vec3d >()); break;
 						case FEParamType::FE_PARAM_DOUBLE_MAPPED:
 						{
 							FEParamDouble& p = pi.value<FEParamDouble>();
@@ -179,9 +161,7 @@ public:
 						case FEParamType::FE_PARAM_VEC3D_MAPPED:
 						{
 							FEParamVec3& p = pi.value<FEParamVec3>();
-							vec3d v3 = p(mp);
-							febcode::vec3 v3_febcode(v3.x, v3.y, v3.z);
-							vm.setInput(pi.name(), v3_febcode);
+							vm.setInput(pi.name(), p(mp));
 							break;
 						}
 						default:
@@ -210,12 +190,12 @@ public:
 				break;
 			case febcode::ValueIndex::VEC3:
 				result.type = FEValueType::Vec3d;
-				result.v3 = vec3d(v.vec3Value.x, v.vec3Value.y, v.vec3Value.z);
+				result.v3 = v.vec3Value;
 				break;
 			case febcode::ValueIndex::MAT3:
 				result.type = FEValueType::Mat3d;
 				febcode::mat3& m = v.mat3Value;
-				result.m3 = mat3d(m.m[0][0], m.m[0][1], m.m[0][2], m.m[1][0], m.m[1][1], m.m[1][2], m.m[2][0], m.m[2][1], m.m[2][2]);
+				result.m3 = m;
 				break;
 			}
 			return result;

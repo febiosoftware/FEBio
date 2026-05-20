@@ -94,7 +94,21 @@ public:
 	double operator * (const vec3d& r) const { return (x*r.x + y*r.y + z*r.z); }
 
 	//! Cross product operator
-	vec3d operator ^ (const vec3d& r) const { return vec3d(y*r.z-z*r.y,z*r.x-x*r.z,x*r.y-y*r.x); }
+	vec3d operator ^ (const vec3d& r) const { 
+		return vec3d(
+			y * r.z - z * r.y,
+			z * r.x - x * r.z,
+			x * r.y - y * r.x
+		); 
+	}
+
+	vec3d cross(const vec3d& other) const {
+		return vec3d(
+			y * other.z - z * other.y,
+			z * other.x - x * other.z,
+			x * other.y - y * other.x
+		);
+	}
 
 	//! Normalize the vector in place and return original length
 	double unit()

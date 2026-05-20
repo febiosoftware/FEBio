@@ -832,19 +832,8 @@ static void printStatement(const Statement* stmt);
 
 static std::ostream& operator << (std::ostream& o, TypeKind type)
 {
-	switch (type)
-	{
-	case TypeKind::Void  : return o << "void";
-	case TypeKind::Bool  : return o << "bool";
-	case TypeKind::Int   : return o << "int";
-	case TypeKind::Double: return o << "double";
-	case TypeKind::Vec2  : return o << "vec2";
-	case TypeKind::Vec3  : return o << "vec3";
-	case TypeKind::Mat2  : return o << "mat2";
-	case TypeKind::Mat3  : return o << "mat3";
-	default:
-		return o << "<unknown type>";
-	}
+	o << febcode::TypeKindToString(type);
+	return o;
 }
 
 static void printVarDeclStmt(const VarDeclStmt* s)

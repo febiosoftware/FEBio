@@ -240,15 +240,15 @@ namespace febcode
 
 		void pushMat2(const mat2& m)
 		{
-			push(m.m[0][0]);
-			push(m.m[0][1]);
-			push(m.m[1][0]);
-			push(m.m[1][1]);
+			push(m(0,0));
+			push(m(0,1));
+			push(m(1,0));
+			push(m(1,1));
 		}
 
 		void pushMat3(const mat3& m)
 		{
-			memcpy(&m_stack[stackTop], &(m.m[0][0]), 9 * sizeof(double));
+			memcpy(&m_stack[stackTop], &(m(0,0)), 9 * sizeof(double));
 			stackTop += 9;
 		}
 
@@ -659,18 +659,6 @@ namespace febcode
 
 			if (dest + size > stackTop)
 				stackTop = dest + size;
-		}
-
-		std::string toString(const Value& v)
-		{
-			switch (v.index)
-			{
-			case ValueIndex::VOID  : return "void";
-			case ValueIndex::BOOL  : return getBool(v) ? "true" : "false";
-			case ValueIndex::INT   : return std::to_string(getInt(v));
-			case ValueIndex::DOUBLE: return std::to_string(getDouble(v));
-			}
-			return "";
 		}
 
 	private:

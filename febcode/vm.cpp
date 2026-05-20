@@ -341,10 +341,10 @@ Value VM::execute()
 		{
 			mat2 v = peekMat2();
 			double* xPtr = ref.ptr;
-			xPtr[0] = v.m[0][0];
-			xPtr[1] = v.m[0][1];
-			xPtr[2] = v.m[1][0];
-			xPtr[3] = v.m[1][1];
+			xPtr[0] = v(0,0);
+			xPtr[1] = v(0,1);
+			xPtr[2] = v(1,0);
+			xPtr[3] = v(1,1);
 			ref.ptr = nullptr;
 			break;
 		}
@@ -884,7 +884,7 @@ Value VM::execute()
 			if (index < 0 || index > 1)
 				throw std::runtime_error("mat2 index out of bounds.");
 #endif
-			pushVec2(*((vec2*)(&A.m[index][0])));
+			pushVec2(*((vec2*)(&A(index,0))));
 			break;
 		}
 
@@ -902,9 +902,9 @@ Value VM::execute()
 		case OpCode::NEG_MAT3:
 		{
 			mat3& A = peekMat3();
-			A.m[0][0] = -A.m[0][0]; A.m[0][1] = -A.m[0][1]; A.m[0][2] = -A.m[0][2];
-			A.m[1][0] = -A.m[1][0]; A.m[1][1] = -A.m[1][1]; A.m[1][2] = -A.m[1][2];
-			A.m[2][0] = -A.m[2][0]; A.m[2][1] = -A.m[2][1]; A.m[2][2] = -A.m[2][2];
+			A(0,0) = -A(0,0); A(0,1) = -A(0,1); A(0,2) = -A(0,2);
+			A(1,0) = -A(1,0); A(1,1) = -A(1,1); A(1,2) = -A(1,2);
+			A(2,0) = -A(2,0); A(2,1) = -A(2,1); A(2,2) = -A(2,2);
 			break;
 		}
 		case OpCode::ADD_MAT3:
@@ -966,7 +966,7 @@ Value VM::execute()
 			if (index < 0 || index > 2)
 				throw std::runtime_error("mat3 index out of bounds.");
 #endif
-			pushVec3(*((vec3*)(&A.m[index][0])));
+			pushVec3(*((vec3*)(&A(index,0))));
 			break;
 		}
 

@@ -34,7 +34,7 @@ class mat2d
 {
 public:
 	// constructors
-	mat2d(){}
+	mat2d() { d[0][0] = d[0][1] = d[1][0] = d[1][1] = 0.0; }
 	mat2d(double a) { d[0][0] = d[1][1] = a; d[1][0] = d[0][1] = 0; }
 	mat2d(double a00, double a01, double a10, double a11)
 	{
@@ -47,6 +47,10 @@ public:
 	double operator () (int i, int j) const { return d[i][j]; }
 	double* operator [] (int i) { return d[i]; }
 	const double* operator [] (int i) const { return d[i]; }
+
+	// comparison operators
+	bool operator == (const mat2d& m) const { return (d[0][0] == m.d[0][0]) && (d[0][1] == m.d[0][1]) && (d[1][0] == m.d[1][0]) && (d[1][1] == m.d[1][1]); }
+	bool operator != (const mat2d& m) const { return !(*this == m); }
 
 public: // arithmetic operations
 	mat2d operator + (const mat2d& m) { return mat2d(d[0][0]+m.d[0][0], d[0][1]+m.d[0][1], d[1][0]+m.d[1][0], d[1][1]+m.d[1][1]); }

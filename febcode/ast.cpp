@@ -205,12 +205,12 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 	else if (isMat2(v))
 	{
 		const febcode::mat2& mat = getMat2(v);
-		return o << "mat2(" << mat.m[0][0] << ", " << mat.m[0][1] << ", " << mat.m[1][0] << ", " << mat.m[1][1] << ")";
+		return o << "mat2(" << mat(0,0) << ", " << mat(0,1) << ", " << mat(1,0) << ", " << mat(1,1) << ")";
 	}
 	else if (isMat3(v))
 	{
 		const febcode::mat3& mat = getMat3(v);
-		return o << "mat3(" << mat.m[0][0] << ", " << mat.m[0][1] << ", " << mat.m[0][2] << ", " << mat.m[1][0] << ", " << mat.m[1][1] << ", " << mat.m[1][2] << ", " << mat.m[2][0] << ", " << mat.m[2][1] << ", " << mat.m[2][2] << ")";
+		return o << "mat3(" << mat(0,0) << ", " << mat(0,1) << ", " << mat(0,2) << ", " << mat(1,0) << ", " << mat(1,1) << ", " << mat(1,2) << ", " << mat(2,0) << ", " << mat(2,1) << ", " << mat(2,2) << ")";
 	}
 	else
 		return o << "<unknown value>";
@@ -272,7 +272,7 @@ std::string ValueToString(const febcode::Value& v)
 			for (int i = 0; i < 2; ++i)
 				for (int j = 0; j < 2; ++j)
 				{
-					s += to_nice_string(m.m[i][j]);
+					s += to_nice_string(m(i,j));
 					if ((i != 1) || (j != 1)) s += ",";
 				}
 		}
@@ -296,7 +296,7 @@ std::string ValueToString(const febcode::Value& v)
 			for (int i = 0; i < 3; ++i)
 				for (int j = 0; j < 3; ++j)
 				{
-					s += to_nice_string(m.m[i][j]);
+					s += to_nice_string(m(i,j));
 					if ((i != 2) || (j != 2)) s += ",";
 				}
 		}
@@ -319,20 +319,6 @@ std::string ValueToString(const febcode::Value& v)
 	}
 	else s = "unknown";
 	return s;
-}
-
-std::string ValueTypeToString(const febcode::Value& v)
-{
-	if      (isVoid  (v)) return "void";
-	else if (isBool  (v)) return "bool";
-	else if (isInt   (v)) return "int";
-	else if (isDouble(v)) return "double";
-	else if (isArray (v)) return "array";
-	else if (isStruct(v)) return "struct";
-	else if (isVec2  (v)) return "vec2";
-	else if (isVec3  (v)) return "vec3";
-	else if (isRef    (v)) return "ref";
-	else return "<unknown type>";
 }
 
 std::string opToString(BinaryOp op)

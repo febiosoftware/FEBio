@@ -528,6 +528,4 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v);
 
 std::string ValueToString(const febcode::Value& v);
 
-std::string ValueTypeToString(const febcode::Value& v);
-
 std::string opToString(febcode::BinaryOp op);

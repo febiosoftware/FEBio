@@ -347,7 +347,7 @@ class mat3d
 {
 public:
 	// default constructor
-	mat3d() {}
+	mat3d();
 
 	// constructs diagonal matrix with a on the diagonal
 	explicit mat3d(double a);
@@ -394,6 +394,10 @@ public:
 	const double& operator () (int i, int j) const;
 	double* operator [] (int i);
 	const double* operator [] (int i) const;
+
+	// comparison operators
+	bool operator == (const mat3d& m) const;
+	bool operator != (const mat3d& m) const { return !(*this == m); }
 
 	// arithmetic operators
 	mat3d operator + (const mat3d& m) const;

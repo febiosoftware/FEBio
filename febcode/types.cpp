@@ -1,7 +1,6 @@
 #include "types.h"
 using namespace febcode;
 
-
 ArrayValuePtr febcode::copyArray(const ArrayValue& src)
 {
 	auto arr = std::make_shared<ArrayValue>();
@@ -247,20 +246,30 @@ Type TypeRegistry::defineStructType(const std::string& name, const std::vector<s
 	return defineStructType(name, resolvedFields);
 }
 
+const char* febcode::TypeKindToString(TypeKind kind)
+{
+	switch (kind)
+	{
+	case TypeKind::Void: return "void";
+	case TypeKind::Bool: return "bool";
+	case TypeKind::Int: return "int";
+	case TypeKind::Double: return "double";
+	case TypeKind::Vec2: return "vec2";
+	case TypeKind::Vec3: return "vec3";
+	case TypeKind::Mat2: return "mat2";
+	case TypeKind::Mat3: return "mat3";
+	default:
+		assert(false);
+		return "<unknown type>";
+	}
+}
+
 std::string febcode::TypeToString(Type type)
 {
 	if (type == nullptr) return "<null>";
 
 	switch (type->kind)
 	{
-	case TypeKind::Void  : return "void";
-	case TypeKind::Bool  : return "bool";
-	case TypeKind::Int   : return "int";
-	case TypeKind::Double: return "double";
-	case TypeKind::Vec2  : return "vec2";
-	case TypeKind::Vec3  : return "vec3";
-	case TypeKind::Mat2  : return "mat2";
-	case TypeKind::Mat3  : return "mat3";
 	case TypeKind::Struct: return type->name;
 	case TypeKind::Array:
 	{
@@ -268,7 +277,7 @@ std::string febcode::TypeToString(Type type)
 		return "(" + elemStr + ")[" + std::to_string(type->arraySize) + "]";
 	}
 	default:
-		return "<unknown type>";
+		return TypeKindToString(type->kind);
 	}
 }
 
