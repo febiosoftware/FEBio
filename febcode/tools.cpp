@@ -238,6 +238,14 @@ void febcode::writeProgramOpCodes(std::ostream& os, const Program& prg)
 			os << " [" << offset << "] (=" << v << ")";
 		}
 		break;
+		case febcode::OpCode::PUSH_LOCAL:
+		{
+			os << opcodeName;
+			i++;
+			int size = code[i];
+			os << " " << size;
+			break;
+		}
 		case febcode::OpCode::GET_GLOBAL_BOOL:
 		case febcode::OpCode::GET_GLOBAL_INT:
 		case febcode::OpCode::GET_GLOBAL_DOUBLE:

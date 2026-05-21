@@ -533,10 +533,10 @@ namespace febcode {
 	[[noreturn]]
 	void error(const ASTNode* node, const std::string& msg);
 
+	std::string ValueToString(const febcode::Value& v);
+
+	std::string opToString(febcode::BinaryOp op);
 } // namespace febcode
 
 std::ostream& operator << (std::ostream& o, const febcode::Value& v);
 
-std::string ValueToString(const febcode::Value& v);
-
-std::string opToString(febcode::BinaryOp op);

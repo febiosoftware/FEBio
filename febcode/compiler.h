@@ -16,6 +16,7 @@ namespace febcode
 		PUSH_VEC3,
 		PUSH_MAT2,
 		PUSH_MAT3,
+		PUSH_LOCAL,
 
 		GET_GLOBAL_BOOL,
 		GET_GLOBAL_INT,

@@ -143,6 +143,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::PUSH_DOUBLE: 
 		return +1;
 
+	case OpCode::PUSH_LOCAL: return +arg;
+
 	case OpCode::PUSH_VEC2: return +2;
 	case OpCode::PUSH_VEC3: return +3;
 	case OpCode::PUSH_MAT2: return +4;
@@ -740,6 +742,16 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 			m_locals.push_back({ var.name, type, m_scopeDepth, localStackSize });
 
 			localStackSize += (int)type->size();
+			if (var.initializer == nullptr)
+			{
+				emit(OpCode::PUSH_LOCAL, (uint8_t)type->size()); // reserve space on the stack for the variable
+				emitUint8((uint8_t)type->size());
+
+				// If an initializer was defined, the global stack effect has already been calculated. 
+				stackDepth += (int)type->size();
+				if (stackDepth > maxStackDepth)
+					maxStackDepth = stackDepth;
+			}
 		}
 	}
 }
@@ -918,6 +930,8 @@ void Compiler::compileFunction(FunctionStmt* fn)
 		localStackSize += (int)p.first->size();
 		info.argSize += (int)p.first->size();
 		stackDepth += (int)p.first->size();
+		if (stackDepth > maxStackDepth)
+			maxStackDepth = stackDepth;
 	}
 
 	size_t currentStackSize = stackDepth;
@@ -974,6 +988,8 @@ void Compiler::compileFunction(FunctionStmt* fn)
 	hasReturn = hasReturnBefore;
 
 	info.maxStackSize = maxStackDepth - currentStackSize;
+
+	stackDepth = currentStackSize;
 
 	currentFunction = -1;
 }
@@ -1984,6 +2000,9 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::PUSH_MAT2  :
 	case OpCode::PUSH_MAT3  :
 		return "MOV ";
+
+	case OpCode::PUSH_LOCAL:
+		return "PSHL";
 
 	case OpCode::GET_GLOBAL_BOOL  :
 	case OpCode::GET_GLOBAL_INT   :

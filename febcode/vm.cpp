@@ -139,6 +139,13 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::PUSH_LOCAL:
+		{
+			uint8_t size = readByte();
+			growStack(size);
+			break;
+		}
+
 		case OpCode::GET_GLOBAL_BOOL:
 		{
 			uint8_t slot = readByte();

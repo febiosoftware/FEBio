@@ -187,6 +187,12 @@ namespace febcode
 			return (high << 8) | low;
 		}
 
+		void growStack(size_t n)
+		{
+			memset(&m_stack[stackTop], 0, n * sizeof(double));
+			stackTop += n;
+		}
+
 		void push(const double& v)
 		{
 #ifndef NDEBUG

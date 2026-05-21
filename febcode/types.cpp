@@ -264,6 +264,21 @@ const char* febcode::TypeKindToString(TypeKind kind)
 	}
 }
 
+TypeKind febcode::StringToTypeKind(const std::string& str)
+{
+	if (str == "void") return TypeKind::Void;
+	if (str == "bool") return TypeKind::Bool;
+	if (str == "int") return TypeKind::Int;
+	if (str == "double") return TypeKind::Double;
+	if (str == "vec2") return TypeKind::Vec2;
+	if (str == "vec3") return TypeKind::Vec3;
+	if (str == "mat2") return TypeKind::Mat2;
+	if (str == "mat3") return TypeKind::Mat3;
+
+	assert(false);
+	return TypeKind::Void;
+}
+
 std::string febcode::TypeToString(Type type)
 {
 	if (type == nullptr) return "<null>";

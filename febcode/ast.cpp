@@ -223,7 +223,7 @@ std::string to_nice_string(double d)
 	return ss.str();
 }
 
-std::string ValueToString(const febcode::Value& v)
+std::string febcode::ValueToString(const febcode::Value& v)
 {
 	std::string s;
 	if      (isVoid  (v)) s = "null";
@@ -321,7 +321,7 @@ std::string ValueToString(const febcode::Value& v)
 	return s;
 }
 
-std::string opToString(BinaryOp op)
+std::string febcode::opToString(BinaryOp op)
 {
 	switch (op)
 	{

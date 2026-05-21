@@ -198,7 +198,9 @@ void Resolver::resolveAssignment(AssignExpr* expr)
 	resolveExpression(expr->value.get());
 	if (expr->target->valType == nullptr)
 		error(expr->target.get(), "Invalid assignment target.");
-	if (expr->target->valType != expr->value->valType)
+
+	Type type = coerce(expr->value->valType, expr->target->valType); // try to coerce value type to target type
+	if (expr->target->valType != type)
 		error(expr->value.get(), "Type mismatch in assignment. Expected type: " + TypeToString(expr->target->valType) + ", but got: " + TypeToString(expr->value->valType));
 	expr->valType = expr->target->valType;
 }

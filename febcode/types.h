@@ -55,7 +55,7 @@ namespace febcode
 		size_t size() const {
 			switch (kind)
 			{
-			case TypeKind::Void:   return 1;
+			case TypeKind::Void:   return 0;
 			case TypeKind::Bool:   return 1;
 			case TypeKind::Int:    return 1;
 			case TypeKind::Double: return 1;
@@ -431,6 +431,8 @@ namespace febcode
 	}
 
 	const char* TypeKindToString(TypeKind kind);
+	TypeKind StringToTypeKind(const std::string& str);
+
 	std::string TypeToString(Type type);
 
 	struct BinaryOpSignature
