@@ -4,18 +4,21 @@
 using namespace febcode;
 
 std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
+
+	SourceLocation currentLoc = peek().loc;
+
 	if (match(TokenType::Input)) 
 	{
 		if (!isType()) {
-			throw std::runtime_error("Expected type after 'in'.");
+			error(currentLoc, "Expected type after 'in'.");
 		}
 
 		Type type = prg.types.getType(lexeme(previous()));
 		if (type == nullptr)
-			throw std::runtime_error("Unknown type name");
+			error(currentLoc, "Unknown type name");
 
 		if (!match(TokenType::Identifier)) {
-			throw std::runtime_error("Expected identifier after type.");
+			error(currentLoc, "Expected identifier after type.");
 		}
 
 		std::string name = lexeme(previous());
@@ -26,14 +29,14 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 		while (match(TokenType::LeftBrack))
 		{
 			if (!match(TokenType::Integer))
-				throw std::runtime_error("Expected array size after '['.");
+				error(currentLoc, "Expected array size after '['.");
 
 			int size = std::stoul(lexeme(previous()));
 			if (size == 0)
-				throw std::runtime_error("Array size must be greater than zero.");
+				error(currentLoc, "Array size must be greater than zero.");
 
 			if (!match(TokenType::RightBrack))
-				throw std::runtime_error("Expected ']' after array size.");
+				error(currentLoc, "Expected ']' after array size.");
 
 			arraySizes.push_back(size);
 		}
@@ -44,17 +47,19 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 		}
 
 		if (!match(TokenType::Semicolon)) {
-			throw std::runtime_error("Expected ';' after input declaration.");
+			error(currentLoc, "Expected ';' after input declaration.");
 		}
 
 		Var var{ name, {}, nullptr };
-		return std::make_unique<VarDeclStmt>(varType, var, true);
+		auto stmt = std::make_unique<VarDeclStmt>(varType, var, true);
+		stmt->location = currentLoc;
+		return stmt;
 	}
 	else if (isType())
 	{
 		Type type = prg.types.getType(lexeme(previous()));
 		if (type == nullptr)
-			throw std::runtime_error("Unknown type name");
+			error(currentLoc, "Unknown type name");
 
 		if (match(TokenType::Identifier)) {
 			std::string name = lexeme(previous());
@@ -73,14 +78,18 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 			return parseVarDeclaration(type, name);
 		}
 		else
-			throw std::runtime_error("Expected identifier after type.");
+			error(currentLoc, "Expected identifier after type.");
 	}
 	if (match(TokenType::Struct)) return parseStructDeclaration();
 	return parseStatement();
 }
 
 std::unique_ptr<febcode::Statement> Parser::parseBlockStatement() {
+
+	Token startToken = previous(); assert(startToken.type == TokenType::LeftBrace);
+
 	auto block = std::make_unique<BlockStmt>();
+	block->location = startToken.loc;
 
 	while (!check(TokenType::RightBrace) && !isAtEnd()) {
 		auto decl = parseDeclaration();
@@ -90,7 +99,7 @@ std::unique_ptr<febcode::Statement> Parser::parseBlockStatement() {
 	}
 
 	if (!match(TokenType::RightBrace)) {
-		throw std::runtime_error("Expected '}' after block.");
+		error(currentLoc, "Expected '}' after block.");
 	}
 
 	return block;
@@ -107,17 +116,23 @@ std::unique_ptr<Statement> Parser::parseStatement() {
 }
 
 std::unique_ptr<Statement> Parser::parseExpressionStatement() {
+
+	SourceLocation currentLoc = peek().loc;
 	auto expr = parseExpression();
 	if (!match(TokenType::Semicolon)) {
-		throw std::runtime_error("Expected ';' after expression.");
+		error(currentLoc, "Expected ';' after expression.");
 	}
-	return std::make_unique<ExpressionStmt>(std::move(expr));
+	auto stmt = std::make_unique<ExpressionStmt>(std::move(expr));
+	stmt->location = currentLoc;
+	return stmt;
 }
 
 std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::string& name) 
 {
+	Token startToken = previous(); assert(startToken.type == TokenType::Identifier);
+
 	if (type == prg.types.Void())
-		throw std::runtime_error("Variables cannot be of type void.");
+		error(currentLoc, "Variables cannot be of type void.");
 
 	std::vector<Var> vars;
 	std::string varName = name;
@@ -129,14 +144,14 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 		while (match(TokenType::LeftBrack))
 		{
 			if (!match(TokenType::Integer))
-				throw std::runtime_error("Expected array size after '['.");
+				error(currentLoc, "Expected array size after '['.");
 
 			int size = std::stoul(lexeme(previous()));
 			if (size == 0)
-				throw std::runtime_error("Array size must be greater than zero.");
+				error(currentLoc, "Array size must be greater than zero.");
 
 			if (!match(TokenType::RightBrack))
-				throw std::runtime_error("Expected ']' after array size.");
+				error(currentLoc, "Expected ']' after array size.");
 
 			arraySizes.push_back(size);
 		}
@@ -157,97 +172,106 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 
 		// make sure the name doesn't start with an underscore, which is reserved for internal use
 		if (!varName.empty() && varName[0] == '_')
-			throw std::runtime_error("Variable names cannot start with an underscore.");
+			error(currentLoc, "Variable names cannot start with an underscore.");
 
 		vars.push_back({varName, arraySizes, std::move(initializer)});
 
 		if (!match(TokenType::Comma)) break;
 
 		if (!match(TokenType::Identifier))
-			throw std::runtime_error("Identifier expected after comma.");
+			error(currentLoc, "Identifier expected after comma.");
 
 		varName = std::string(lexeme(previous()));
 	}
 
 	if (!match(TokenType::Semicolon)) {
-		throw std::runtime_error("Expected ';' after variable declaration.");
+		error(currentLoc, "Expected ';' after variable declaration.");
 	}
 
-	return std::make_unique<VarDeclStmt>(type, vars);
+	auto stmt = std::make_unique<VarDeclStmt>(type, vars);
+	stmt->location = startToken.loc;
+	return stmt;
 }
 
 std::unique_ptr<Statement> Parser::parseStructDeclaration() {
+
+	Token startToken = previous(); assert(startToken.type == TokenType::Struct);
+
 	if (!match(TokenType::Identifier)) {
-		throw std::runtime_error("Expected struct name.");
+		error(currentLoc, "Expected struct name.");
 	}
 	std::string name(lexeme(previous()));
 	if (!match(TokenType::LeftBrace)) {
-		throw std::runtime_error("Expected '{' after struct name.");
+		error(currentLoc, "Expected '{' after struct name.");
 	}
 	std::vector<std::pair<Type, std::string>> fields;
 	while (!check(TokenType::RightBrace) && !isAtEnd()) 
 	{
 		if (!isType()) {
-			throw std::runtime_error("Expected field type in struct.");
+			error(currentLoc, "Expected field type in struct.");
 		}
 
 		Type type = prg.types.getType(lexeme(previous()));
 		if (type == nullptr)
-			throw std::runtime_error("Unknown type name");
+			error(currentLoc, "Unknown type name.");
 
 		if (!match(TokenType::Identifier)) {
-			throw std::runtime_error("Expected field name in struct.");
+			error(currentLoc, "Expected field name in struct.");
 		}
 		std::string fieldName(lexeme(previous()));
 
 		if (match(TokenType::LeftBrack))
 		{
 			if (!match(TokenType::Integer))
-				throw std::runtime_error("Expected array size after '[' in struct field.");
+				error(currentLoc, "Expected array size after '[' in struct field.");
 			size_t arraySize = std::stoul(lexeme(previous()));
 			if (arraySize == 0)
-				throw std::runtime_error("Array size must be greater than zero.");
+				error(currentLoc, "Array size must be greater than zero.");
 			if (!match(TokenType::RightBrack))
-				throw std::runtime_error("Expected ']' after array size in struct field.");
+				error(currentLoc, "Expected ']' after array size in struct field.");
 
 			type = prg.types.getArrayType(type, arraySize);
 		}
 
 		if (!match(TokenType::Semicolon)) {
-			throw std::runtime_error("Expected ';' after struct field declaration.");
+			error(currentLoc, "Expected ';' after struct field declaration.");
 		}
 
 		fields.push_back({ type, fieldName });
 	}
 	if (!match(TokenType::RightBrace)) {
-		throw std::runtime_error("Expected '}' after struct body.");
+		error(currentLoc, "Expected '}' after struct body.");
 	}
 
 	if (!match(TokenType::Semicolon)) {
-		throw std::runtime_error("Expected ';' after struct declaration.");
+		error(currentLoc, "Expected ';' after struct declaration.");
 	}
 
 	Type type = prg.types.defineStructType(name, fields);
 
-	return std::make_unique<StructStmt>(name, type, std::move(fields));
+	auto stmt = std::make_unique<StructStmt>(name, type, std::move(fields));
+	stmt->location = startToken.loc;
+	return stmt;
 }
 
 std::unique_ptr<Statement> Parser::parseFunctionDeclaration(Type type, const std::string& name) 
 {
+	Token startToken = previous(); assert(startToken.type == TokenType::LeftParen);
+
 	std::vector<std::pair<Type, std::string>> parameters;
 
 	if (!check(TokenType::RightParen)) {
 		do {
 			if (!isType()) {
-				throw std::runtime_error("Expect type.");
+				error(currentLoc, "Expect type.");
 			}
 
 			Type paramType = prg.types.getType(lexeme(previous()));
 			if (paramType == nullptr)
-				throw std::runtime_error("Unknown type name");
+				error(currentLoc, "Unknown type name.");
 
 			if (!match(TokenType::Identifier)) {
-				throw std::runtime_error("Expected parameter name.");
+				error(currentLoc, "Expected parameter name.");
 			}
 
 			std::string param = lexeme(previous());
@@ -255,12 +279,12 @@ std::unique_ptr<Statement> Parser::parseFunctionDeclaration(Type type, const std
 			if (match(TokenType::LeftBrack))
 			{
 				if (!match(TokenType::Integer))
-					throw std::runtime_error("Expected array size after '[' in parameter.");
+					error(currentLoc, "Expected array size after '[' in parameter.");
 				size_t arraySize = std::stoul(lexeme(previous()));
 				if (arraySize == 0)
-					throw std::runtime_error("Array size must be greater than zero.");
+					error(currentLoc, "Array size must be greater than zero.");
 				if (!match(TokenType::RightBrack))
-					throw std::runtime_error("Expected ']' after array size in parameter.");
+					error(currentLoc, "Expected ']' after array size in parameter.");
 				paramType = prg.types.getArrayType(paramType, arraySize);
 			}
 
@@ -269,45 +293,55 @@ std::unique_ptr<Statement> Parser::parseFunctionDeclaration(Type type, const std
 	}
 
 	if (!match(TokenType::RightParen)) {
-		throw std::runtime_error("Expected ')' after parameters.");
+		error(currentLoc, "Expected ')' after parameters.");
 	}
 
 	if (!match(TokenType::LeftBrace)) {
-		throw std::runtime_error("Expected '{' before function body.");
+		error(currentLoc, "Expected '{' before function body.");
 	}
 
 	auto body = parseBlockStatement();
 
-	return std::make_unique<FunctionStmt>(
+	auto stmt = std::make_unique<FunctionStmt>(
 		name,
 		type,
 		std::move(parameters),
 		std::move(body)
 	);
+	stmt->location = startToken.loc;
+	return stmt;
 }
 
 std::unique_ptr<Statement> Parser::parseReturnStatement() {
+
+	Token startToken = previous(); assert(startToken.type == TokenType::Return);
+
 	std::unique_ptr<Expression> value = nullptr;
 	if (!check(TokenType::Semicolon)) {
 		value = parseExpression();
 	}
 
 	if (!match(TokenType::Semicolon)) {
-		throw std::runtime_error("Expected ';' after return value.");
+		error(currentLoc, "Expected ';' after return value.");
 	}
 
-	return std::make_unique<febcode::ReturnStmt>(std::move(value));
+	std::unique_ptr<Statement> ret = std::make_unique<febcode::ReturnStmt>(std::move(value));
+	ret->location = startToken.loc;
+	return ret;
 }
 
 std::unique_ptr<febcode::Statement> Parser::parseIfStatement() {
+
+	Token startToken = previous(); assert(startToken.type == TokenType::If);
+
 	if (!match(TokenType::LeftParen)) {
-		throw std::runtime_error("Expected '(' after 'if'.");
+		error(currentLoc, "Expected '(' after 'if'.");
 	}
 
 	auto condition = parseExpression();
 
 	if (!match(TokenType::RightParen)) {
-		throw std::runtime_error("Expected ')' after if condition.");
+		error(currentLoc, "Expected ')' after if condition.");
 	}
 
 	auto thenBranch = parseStatement(); // could be block or single statement
@@ -317,58 +351,70 @@ std::unique_ptr<febcode::Statement> Parser::parseIfStatement() {
 		elseBranch = parseStatement();
 	}
 
-	return std::make_unique<IfStmt>(std::move(condition),
+	auto stmt = std::make_unique<IfStmt>(std::move(condition),
 		std::move(thenBranch),
 		std::move(elseBranch));
+	stmt->location = startToken.loc;
+	return stmt;
 }
 
 std::unique_ptr<febcode::Statement> Parser::parseWhileStatement() {
+
+	Token startToken = previous(); assert(startToken.type == TokenType::While);
+
 	if (!match(TokenType::LeftParen)) {
-		throw std::runtime_error("Expected '(' after 'while'.");
+		error(currentLoc, "Expected '(' after 'while'.");
 	}
 
 	auto condition = parseExpression();
 
 	if (!match(TokenType::RightParen)) {
-		throw std::runtime_error("Expected ')' after while condition.");
+		error(currentLoc, "Expected ')' after while condition.");
 	}
 
 	auto body = parseStatement(); // can be block or single statement
 
-	return std::make_unique<WhileStmt>(
+	auto stmt = std::make_unique<WhileStmt>(
 		std::move(condition),
 		std::move(body));
+	stmt->location = startToken.loc;
+	return stmt;
 }
 
 std::unique_ptr<febcode::Statement> Parser::parseForStatement() {
+
+	Token startToken = previous(); assert(startToken.type == TokenType::For);
+
 	if (!match(TokenType::LeftParen)) {
-		throw std::runtime_error("Expected '(' after 'for'.");
+		error(currentLoc, "Expected '(' after 'for'.");
 	}
 
 	auto init = parseDeclaration(); // initializer (can be var decl, expression stmt, or empty)
 	if (!init && !isVarDecl(init) && !isExprStmt(init)) {
-		throw std::runtime_error("Expected variable declaration, expression statement, or ';' in for loop initializer.");
+		error(currentLoc, "Expected variable declaration, expression statement, or ';' in for loop initializer.");
 	}
 
 	auto condition = parseExpression();
 
 	if (!match(TokenType::Semicolon)) {
-		throw std::runtime_error("Expected ';' after for initializer.");
+		error(currentLoc, "Expected ';' after for initializer.");
 	}
 
 	auto increment = parseExpression();
 
 	if (!match(TokenType::RightParen)) {
-		throw std::runtime_error("Expected ')' after for increment.");
+		error(currentLoc, "Expected ')' after for increment.");
 	}
 
 	auto body = parseStatement(); // can be block or single statement
 
-	return std::make_unique<ForStmt>(
+	auto stmt = std::make_unique<ForStmt>(
 		std::move(init),
 		std::move(condition),
 		std::move(increment),
 		std::move(body));
+	stmt->location = startToken.loc;
+	return stmt;
 }
 
 std::unique_ptr<Expression> Parser::parseAssignment() {
@@ -376,14 +422,14 @@ std::unique_ptr<Expression> Parser::parseAssignment() {
 
 	// Check if this is an assignment
 	if (match(TokenType::Equal)) {
-		const Token& equalsToken = previous();
-
+		SourceLocation opLoc = previous().loc;
 		auto value = parseAssignment();
-
-		return std::make_unique<AssignExpr>(
+		auto assign = std::make_unique<AssignExpr>(
 			std::move(expr),
 			std::move(value)
 		);
+		assign->location = opLoc;
+		return assign;
 	}
 
 	return expr; // just an equality/expression if no '='
@@ -396,11 +442,13 @@ std::unique_ptr<Expression> Parser::parseOr()
 	while (match(TokenType::OrOr))
 	{
 		BinaryOp op = tokenToBinaryOp(previous());
+		SourceLocation opLoc = previous().loc;
 		auto right = parseAnd();
 		expr = std::make_unique<BinaryExpr>(
 			std::move(expr),
 			op,
 			std::move(right));
+		expr->location = opLoc;
 	}
 
 	return expr;
@@ -413,11 +461,13 @@ std::unique_ptr<Expression> Parser::parseAnd()
 	while (match(TokenType::AndAnd))
 	{
 		BinaryOp op = tokenToBinaryOp(previous());
+		SourceLocation opLoc = previous().loc;
 		auto right = parseEquality();
 		expr = std::make_unique<BinaryExpr>(
 			std::move(expr),
 			op,
 			std::move(right));
+		expr->location = opLoc;
 	}
 
 	return expr;
@@ -428,8 +478,10 @@ std::unique_ptr<Expression> Parser::parseEquality() {
 
 	while (match(TokenType::EqualEqual) || match(TokenType::NotEqual)) {
 		BinaryOp op = tokenToBinaryOp(previous());
+		SourceLocation opLoc = previous().loc;
 		auto right = parseComparison();
 		expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+		expr->location = opLoc;
 	}
 
 	return expr;
@@ -441,8 +493,10 @@ std::unique_ptr<Expression> Parser::parseComparison() {
 	while (match(TokenType::Greater) || match(TokenType::GreaterEqual) ||
 		match(TokenType::Less) || match(TokenType::LessEqual)) {
 		BinaryOp op = tokenToBinaryOp(previous());
+		SourceLocation opLoc = previous().loc;
 		auto right = parseTerm();
 		expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+		expr->location = opLoc;
 	}
 
 	return expr;
@@ -452,9 +506,11 @@ std::unique_ptr<Expression> Parser::parseTerm() {
 	auto expr = parseFactor();
 
 	while (match(TokenType::Plus) || match(TokenType::Minus)) {
+		SourceLocation opLoc = previous().loc;
 		BinaryOp op = tokenToBinaryOp(previous());
 		auto right = parseFactor();
 		expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+		expr->location = opLoc;
 	}
 
 	return expr;
@@ -464,9 +520,11 @@ std::unique_ptr<Expression> Parser::parseFactor() {
 	auto expr = parseUnary();
 
 	while (match(TokenType::Star) || match(TokenType::Slash)) {
+		SourceLocation opLoc = previous().loc;
 		BinaryOp op = tokenToBinaryOp(previous());
 		auto right = parseUnary();
 		expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
+		expr->location = opLoc;
 	}
 
 	return expr;
@@ -475,18 +533,33 @@ std::unique_ptr<Expression> Parser::parseFactor() {
 std::unique_ptr<Expression> Parser::parseUnary() {
 	if (match(TokenType::Minus) || match(TokenType::Not)) {
 		UnaryOp op = tokenToUnaryOp(previous());
+		SourceLocation opLoc = previous().loc;
+
 		auto right = parseUnary();
 
 		// absorbe negative sign for scalars.
 		if (op == UnaryOp::Negate) {
 
 			int n;
-			if (isInt(right.get(), n)) return std::make_unique<LiteralExpr>(-n);
+			if (isInt(right.get(), n))
+			{
+				auto expr = std::make_unique<LiteralExpr>(-n);
+				expr->location = opLoc;
+				return expr;
+			}
+
 			double d;
-			if (isDouble(right.get(), d)) return std::make_unique<LiteralExpr>(-d);
+			if (isDouble(right.get(), d))
+			{
+				auto expr = std::make_unique<LiteralExpr>(-d);
+				expr->location = opLoc;
+				return expr;
+			}
 		}
 
-		return std::make_unique<UnaryExpr>(op, std::move(right));
+		auto expr = std::make_unique<UnaryExpr>(op, std::move(right));
+		expr->location = opLoc;
+		return expr;
 	}
 
 	return parseExponent();
@@ -497,9 +570,13 @@ std::unique_ptr<Expression> Parser::parseExponent() {
 
 	if (match(TokenType::Exponent)) {
 		BinaryOp op = tokenToBinaryOp(previous());
+		SourceLocation opLoc = previous().loc;
+
 		auto right = parseUnary();
-		return std::make_unique<BinaryExpr>(
+		auto expr = std::make_unique<BinaryExpr>(
 			std::move(left), op, std::move(right));
+		expr->location = opLoc;
+		return expr;
 	}
 
 	return left;
@@ -512,7 +589,7 @@ std::unique_ptr<Expression> Parser::parseCall() {
 		std::string typeName = lexeme(previous());
 		Type type = prg.types.getType(typeName);
 		if (type == nullptr)
-			throw std::runtime_error("Unknown type name in constructor expression.");
+			error(currentLoc, "Unknown type name in constructor expression.");
 
 		return parseConstructor(type);
 	}
@@ -526,7 +603,7 @@ std::unique_ptr<Expression> Parser::parseCall() {
 		else if (match(TokenType::Dot))
 		{
 			if (!match(TokenType::Identifier)) {
-				throw std::runtime_error("Expected property name after '.'.");
+				error(currentLoc, "Expected property name after '.'.");
 			}
 
 			expr = std::make_unique<MemberExpr>(
@@ -537,7 +614,7 @@ std::unique_ptr<Expression> Parser::parseCall() {
 		else if (match(TokenType::LeftBrack)) {
 			auto index = parseExpression();
 			if (!match(TokenType::RightBrack))
-				throw std::runtime_error("Expect ']' after index.");
+				error(currentLoc, "Expect ']' after index.");
 
 			expr = std::make_unique<IndexExpr>(
 				std::move(expr),
@@ -555,7 +632,7 @@ std::unique_ptr<Expression> Parser::parseConstructor(Type type)
 	std::vector<std::unique_ptr<Expression>> arguments;
 
 	if (!match(TokenType::LeftParen))
-		throw std::runtime_error("Expected '(' after type name in constructor expression.");
+		error(currentLoc, "Expected '(' after type name in constructor expression.");
 
 	if (!check(TokenType::RightParen)) {
 		do {
@@ -564,7 +641,7 @@ std::unique_ptr<Expression> Parser::parseConstructor(Type type)
 	}
 
 	if (!match(TokenType::RightParen))
-		throw std::runtime_error("Expected ')' after arguments.");
+		error(currentLoc, "Expected ')' after arguments.");
 
 	return std::make_unique<ConstructorExpr>(type, std::move(arguments));
 }
@@ -573,7 +650,7 @@ std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> calle
 {
 	auto* varExpr = dynamic_cast<VariableExpr*>(callee.get());
 	if (!varExpr) {
-		throw std::runtime_error("Can only call functions by name.");
+		error(currentLoc, "Can only call functions by name.");
 	}
 
 	std::vector<std::unique_ptr<Expression>> arguments;
@@ -585,7 +662,7 @@ std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> calle
 	}
 
 	if (!match(TokenType::RightParen))
-		throw std::runtime_error("Expected ')' after arguments.");
+		error(currentLoc, "Expected ')' after arguments.");
 
 	return std::make_unique<CallExpr>(
 		varExpr->name,
@@ -595,39 +672,57 @@ std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> calle
 
 std::unique_ptr<Expression> Parser::parsePrimary() 
 {
+	std::unique_ptr<Expression> expr;
+
 	if (match(TokenType::Integer)) {
 		int value = std::stoi(std::string(previous().start, previous().length));
-		return std::make_unique<LiteralExpr>(value);
+		expr = std::make_unique<LiteralExpr>(value);
+		expr->location = previous().loc;
+		return expr;
 	}
 
 	if (match(TokenType::Double)) {
 		double value = std::stod(std::string(previous().start, previous().length));
-		return std::make_unique<LiteralExpr>(value);
+		expr = std::make_unique<LiteralExpr>(value);
+		expr->location = previous().loc;
+		return expr;
 	}
 
 	if (match(TokenType::True))
-		return std::make_unique<LiteralExpr>(true);
+	{
+		expr = std::make_unique<LiteralExpr>(true);
+		expr->location = previous().loc;
+		return expr;
+	}
 	
 	if (match(TokenType::False))
-		return std::make_unique<LiteralExpr>(false);
+	{
+		expr = std::make_unique<LiteralExpr>(false);
+		expr->location = previous().loc;
+		return expr;
+	}
 
 	if (match(TokenType::Identifier)) {
 		std::string name(previous().start, previous().length);
 
 		// check some special built-in constants like "PI"
 		if (name == "PI") {
-			return std::make_unique<LiteralExpr>(3.14159265358979323846);
+			expr = std::make_unique<LiteralExpr>(3.14159265358979323846);
+			expr->location = previous().loc;
+			return expr;
 		}
 
 		// otherwise, it's a variable
-		return std::make_unique<VariableExpr>(
+		auto expr = std::make_unique<VariableExpr>(
 			std::string(previous().start, previous().length));
+		expr->location = previous().loc;
+		return expr;
 	}
 
 	if (match(TokenType::LeftParen)) {
 		auto expr = parseExpression();
 		if (!match(TokenType::RightParen)) {
-			throw std::runtime_error("Expected ')' after expression.");
+			error(currentLoc, "Expected ')' after expression.");
 		}
 		return expr;
 	}
@@ -636,6 +731,8 @@ std::unique_ptr<Expression> Parser::parsePrimary()
 	{
 		std::vector<std::unique_ptr<Expression>> elements;
 
+		SourceLocation opLoc = previous().loc;
+
 		if (!check(TokenType::RightBrace)) {
 			do {
 				elements.push_back(parseExpression());
@@ -643,24 +740,31 @@ std::unique_ptr<Expression> Parser::parsePrimary()
 		}
 
 		if (!match(TokenType::RightBrace))
-			throw std::runtime_error("Expected '}' after initializer list.");
+			error(currentLoc, "Expected '}' after initializer list.");
 
-		return std::make_unique<InitExpr>(std::move(elements));
+		auto expr = std::make_unique<InitExpr>(std::move(elements));
+		expr->location = opLoc;
+		return expr;
 	}
 
-	throw std::runtime_error("Expected expression.");
+	if (match(TokenType::Error))
+	{
+		error(previous().loc, "Unexpected token.");
+	}
+
+	error(currentLoc, "Expected expression.");
 }
 
 //---------------------------------------------------------------------
 static int l = 0;
-static void printTabs()
-{
-	for (int i = 0; i < l; ++i) std::cout << "    ";
-}
-
 static void printTabs(std::ostream& os)
 {
 	for (int i = 0; i < l; ++i) os << "    ";
+}
+
+static std::ostream& operator << (std::ostream& o, const SourceLocation& loc)
+{
+	return o << "Line " << loc.line << ", Column " << loc.column;
 }
 
 std::ostream& operator << (std::ostream& o, const UnaryOp& op)
@@ -706,129 +810,129 @@ std::ostream& operator << (std::ostream& o, const BinaryOp& op)
 	}
 }
 
-static void printExpr(const Expression* e);
+static void printExpr(std::ostream& os, const Expression* e);
 
-static void printLiteralExpr(const LiteralExpr* e)
+static void printLiteralExpr(std::ostream& os, const LiteralExpr* e)
 {
-	std::cout << ValueToString(e->value);
+	os << ValueToString(e->value);
 }
 
-static void printVariableExpr(const VariableExpr* e)
+static void printVariableExpr(std::ostream& os, const VariableExpr* e)
 {
-	std::cout << e->name;
+	os << e->name;
 }
 
-static void printMemberExpr(const MemberExpr* e)
+static void printMemberExpr(std::ostream& os, const MemberExpr* e)
 {
-	std::cout << "MemberExpr {\n"; l++;
-	printTabs(); std::cout << "object: "; printExpr(e->object.get()); std::cout << ",\n";
-	printTabs(); std::cout << "property: " << e->property << "\n";
-	l--; printTabs(); std::cout << "}";
+	os << "MemberExpr {\n"; l++;
+	printTabs(os); os << "object: "; printExpr(os, e->object.get()); os << ",\n";
+	printTabs(os); os << "property: " << e->property << "\n";
+	l--; printTabs(os); os << "}";
 }
 
-static void printAssignmentExpr(const AssignExpr* e)
+static void printAssignmentExpr(std::ostream& os, const AssignExpr* e)
 {
-	std::cout << "AssignExpr {\n"; l++;
-	printTabs(); std::cout << "target: "; printExpr(e->target.get()); std::cout << ",\n";
-	printTabs(); std::cout << "value: "; printExpr(e->value.get()); std::cout << "\n";
+	os << "AssignExpr {\n"; l++;
+	printTabs(os); os << "target: "; printExpr(os, e->target.get()); os << ",\n";
+	printTabs(os); os << "value: "; printExpr(os, e->value.get()); os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printUnaryExpr(const UnaryExpr* e)
+static void printUnaryExpr(std::ostream& os, const UnaryExpr* e)
 {
-	std::cout << "UnaryExpr {\n"; l++;
-	printTabs(); std::cout << "op: " << e->op << ",\n";
-	printTabs(); std::cout << "right: "; printExpr(e->right.get()); std::cout << "\n";
+	os << "UnaryExpr {\n"; l++;
+	printTabs(os); os << "op: " << e->op << ",\n";
+	printTabs(os); os << "right: "; printExpr(os, e->right.get()); os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printBinaryExpr(const BinaryExpr* e)
+static void printBinaryExpr(std::ostream& os, const BinaryExpr* e)
 {
-	std::cout << "BinaryExpr {\n"; l++;
-	printTabs(); std::cout << "op: " << e->op << ",\n";
-	printTabs(); std::cout << "left: "; printExpr(e->left.get()); std::cout << ",\n";
-	printTabs(); std::cout << "right: "; printExpr(e->right.get()); std::cout << "\n";
+	os << "BinaryExpr {\n"; l++;
+	printTabs(os); os << "op: " << e->op << ",\n";
+	printTabs(os); os << "left: "; printExpr(os, e->left.get()); os << ",\n";
+	printTabs(os); os << "right: "; printExpr(os, e->right.get()); os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printExprList(const std::vector<std::unique_ptr<Expression>>& a)
+static void printExprList(std::ostream& os, const std::vector<std::unique_ptr<Expression>>& a)
 {
-	std::cout << "[\n"; l++;
+	os << "[\n"; l++;
 	for (size_t i = 0; i < a.size(); ++i)
 	{
-		printTabs(); printExpr(a[i].get());
-		if (i != a.size() - 1) std::cout << ",\n";
-		else std::cout << "\n";
+		printTabs(os); printExpr(os, a[i].get());
+		if (i != a.size() - 1) os << ",\n";
+		else os << "\n";
 	}
-	l--; printTabs(); std::cout << "]";
+	l--; printTabs(os); os << "]";
 }
 
-static void printCallExpr(const CallExpr* e)
+static void printCallExpr(std::ostream& os, const CallExpr* e)
 {
-	std::cout << "CallExpr {\n"; l++;
-	printTabs(); std::cout << "callee: " << e->name << ",\n";
-	printTabs(); std::cout << "args: "; printExprList(e->arguments); std::cout << "\n";
+	os << "CallExpr {\n"; l++;
+	printTabs(os); os << "callee: " << e->name << ",\n";
+	printTabs(os); os << "args: "; printExprList(os, e->arguments); os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printInitializerExpr(const InitExpr* e)
+static void printInitializerExpr(std::ostream& os, const InitExpr* e)
 {
-	std::cout << "InitializerExpr {\n"; l++;
-	printTabs(); std::cout << "elements: "; printExprList(e->elements); std::cout << "\n";
+	os << "InitializerExpr {\n"; l++;
+	printTabs(os); os << "elements: "; printExprList(os, e->elements); os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printIndexExpr(const IndexExpr* e)
+static void printIndexExpr(std::ostream& os, const IndexExpr* e)
 {
-	std::cout << "IndexExpr {\n"; l++;
-	printTabs(); std::cout << "object: "; printExpr(e->object.get()); std::cout << ",\n";
-	printTabs(); std::cout << "index: "; printExpr(e->index.get()); std::cout << "\n";
+	os << "IndexExpr {\n"; l++;
+	printTabs(os); os << "object: "; printExpr(os, e->object.get()); os << ",\n";
+	printTabs(os); os << "index: "; printExpr(os, e->index.get()); os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printConstructorExpr(const ConstructorExpr* e)
+static void printConstructorExpr(std::ostream& os, const ConstructorExpr* e)
 {
-	std::cout << "ConstructorExpr {\n"; l++;
-	printTabs(); std::cout << "type: " << TypeToString(e->valType) << ",\n";
-	printTabs(); std::cout << "args: "; printExprList(e->args); std::cout << "\n";
+	os << "ConstructorExpr {\n"; l++;
+	printTabs(os); os << "type: " << TypeToString(e->valType) << ",\n";
+	printTabs(os); os << "args: "; printExprList(os, e->args); os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printExpr(const Expression* e)
+static void printExpr(std::ostream& os, const Expression* e)
 {
-	if      (auto l = dynamic_cast<const LiteralExpr*      >(e)) printLiteralExpr      (l);
-	else if (auto v = dynamic_cast<const VariableExpr*     >(e)) printVariableExpr     (v);
-	else if (auto m = dynamic_cast<const MemberExpr*       >(e)) printMemberExpr       (m);
-	else if (auto a = dynamic_cast<const AssignExpr*       >(e)) printAssignmentExpr   (a);
-	else if (auto u = dynamic_cast<const UnaryExpr*        >(e)) printUnaryExpr        (u);
-	else if (auto b = dynamic_cast<const BinaryExpr*       >(e)) printBinaryExpr       (b);
-	else if (auto c = dynamic_cast<const CallExpr*         >(e)) printCallExpr         (c);
-	else if (auto c = dynamic_cast<const InitExpr*         >(e)) printInitializerExpr  (c);
-	else if (auto c = dynamic_cast<const IndexExpr*        >(e)) printIndexExpr        (c);
-	else if (auto c = dynamic_cast<const ConstructorExpr*  >(e)) printConstructorExpr  (c);
+	if      (auto l = dynamic_cast<const LiteralExpr*      >(e)) printLiteralExpr      (os, l);
+	else if (auto v = dynamic_cast<const VariableExpr*     >(e)) printVariableExpr     (os, v);
+	else if (auto m = dynamic_cast<const MemberExpr*       >(e)) printMemberExpr       (os, m);
+	else if (auto a = dynamic_cast<const AssignExpr*       >(e)) printAssignmentExpr   (os, a);
+	else if (auto u = dynamic_cast<const UnaryExpr*        >(e)) printUnaryExpr        (os, u);
+	else if (auto b = dynamic_cast<const BinaryExpr*       >(e)) printBinaryExpr       (os, b);
+	else if (auto c = dynamic_cast<const CallExpr*         >(e)) printCallExpr         (os, c);
+	else if (auto c = dynamic_cast<const InitExpr*         >(e)) printInitializerExpr  (os, c);
+	else if (auto c = dynamic_cast<const IndexExpr*        >(e)) printIndexExpr        (os, c);
+	else if (auto c = dynamic_cast<const ConstructorExpr*  >(e)) printConstructorExpr  (os, c);
 	else if (e == nullptr)
-		std::cout << "null";
+		os << "null";
 	else
-		std::cout << "(Unknown Expression)";
+		os << "(Unknown Expression)";
 }
 
-static void printExpressionStmt(const ExpressionStmt* s)
+static void printExpressionStmt(std::ostream& os, const ExpressionStmt* s)
 {
-	std::cout << "ExpressionStmt: {\n"; l++;
-	printTabs(); std::cout << "expr: "; printExpr(s->expr.get());
-	std::cout << "\n";
+	os << "ExpressionStmt: {\n"; l++;
+	printTabs(os); os << "expr: "; printExpr(os, s->expr.get());
+	os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printStatement(const Statement* stmt);
+static void printStatement(std::ostream& os, const Statement* stmt);
 
 static std::ostream& operator << (std::ostream& o, TypeKind type)
 {
@@ -836,152 +940,152 @@ static std::ostream& operator << (std::ostream& o, TypeKind type)
 	return o;
 }
 
-static void printVarDeclStmt(const VarDeclStmt* s)
+static void printVarDeclStmt(std::ostream& os, const VarDeclStmt* s)
 {
-	std::cout << "VarDeclStmt: {\n"; l++;
-	printTabs(); std::cout << "type: " << TypeToString(s->type) << ",\n";
-	printTabs(); std::cout << "vars: [\n"; l++;
+	os << "VarDeclStmt: {\n"; l++;
+	printTabs(os); os << "type: " << TypeToString(s->type) << ",\n";
+	printTabs(os); os << "vars: [\n"; l++;
 	for (const auto& var : s->vars) {
-		printTabs(); std::cout << "{ name: " << var.name;
+		printTabs(os); os << "{ name: " << var.name;
 		if (!var.arraySizes.empty())
 		{
-			std::cout << ", size: [";
+			os << ", size: [";
 			for (size_t i = 0; i < var.arraySizes.size(); ++i)
 			{
-				std::cout << var.arraySizes[i];
-				if (i != var.arraySizes.size() - 1) std::cout << "][";
+				os << var.arraySizes[i];
+				if (i != var.arraySizes.size() - 1) os << "][";
 			}
-			std::cout << "]";
+			os << "]";
 		}
-		std::cout << ", initializer: ";
-		printExpr(var.initializer.get());
-		std::cout << " },\n";
+		os << ", initializer: ";
+		printExpr(os, var.initializer.get());
+		os << " },\n";
 	}
-	l--; printTabs(); std::cout << "],\n";
+	l--; printTabs(os); os << "],\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printReturnStmt(const ReturnStmt* s)
+static void printReturnStmt(std::ostream& os, const ReturnStmt* s)
 {
-	std::cout << "ReturnStmt: {\n"; l++;
-	printTabs(); std::cout << "value: "; printExpr(s->value.get());
-	std::cout << "\n";
+	os << "ReturnStmt: {\n"; l++;
+	printTabs(os); os << "value: "; printExpr(os, s->value.get());
+	os << "\n";
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printBlockStmt(const BlockStmt* s)
+static void printBlockStmt(std::ostream& os, const BlockStmt* s)
 {
-	std::cout << "BlockStmt: [\n"; l++;
+	os << "BlockStmt: [\n"; l++;
 	size_t n = s->statements.size();
 	for (size_t i = 0; i < n; ++i)
 	{
 		auto& stmt = s->statements[i];
-		printStatement(stmt.get());
-		if (i != n - 1) std::cout << ",\n";
-	}	std::cout << "\n";
+		printStatement(os, stmt.get());
+		if (i != n - 1) os << ",\n";
+	}	os << "\n";
 	l--;
-	printTabs(); std::cout << "]";
+	printTabs(os); os << "]";
 }
 
-static void printIfStmt(const IfStmt* s)
+static void printIfStmt(std::ostream& os, const IfStmt* s)
 {
-	std::cout << "IfStmt: {\n"; l++;
-	printTabs(); std::cout << "condition: "; printExpr(s->condition.get()); std::cout << ",\n";
-	printTabs(); std::cout << "thenBranch: {\n"; l++; printStatement(s->thenBranch.get());
-	std::cout << "\n";
-	l--; printTabs(); std::cout << "}\n";
+	os << "IfStmt: {\n"; l++;
+	printTabs(os); os << "condition: "; printExpr(os, s->condition.get()); os << ",\n";
+	printTabs(os); os << "thenBranch: {\n"; l++; printStatement(os, s->thenBranch.get());
+	os << "\n";
+	l--; printTabs(os); os << "}\n";
 	if (s->elseBranch)
 	{
-		printTabs(); std::cout << "elseBranch: {\n"; l++;
-		printStatement(s->elseBranch.get());
-		std::cout << "\n";
-		l--; printTabs(); std::cout << "}\n";
+		printTabs(os); os << "elseBranch: {\n"; l++;
+		printStatement(os, s->elseBranch.get());
+		os << "\n";
+		l--; printTabs(os); os << "}\n";
 	}
 	l--;
-	printTabs(); std::cout << "}";
+	printTabs(os); os << "}";
 }
 
-static void printWhileStmt(const WhileStmt* s)
+static void printWhileStmt(std::ostream& os, const WhileStmt* s)
 {
-	std::cout << "WhileStmt: {\n"; l++;
-	printTabs(); std::cout << "condition: "; printExpr(s->condition.get()); std::cout << ",\n";
-	printTabs(); std::cout << "body: {\n"; l++; printStatement(s->body.get());
-	std::cout << "\n";
-	l--; printTabs(); std::cout << "}\n";
+	os << "WhileStmt: {\n"; l++;
+	printTabs(os); os << "condition: "; printExpr(os, s->condition.get()); os << ",\n";
+	printTabs(os); os << "body: {\n"; l++; printStatement(os, s->body.get());
+	os << "\n";
+	l--; printTabs(os); os << "}\n";
 }
 
-static void printForStmt(const ForStmt* s)
+static void printForStmt(std::ostream& os, const ForStmt* s)
 {
-	std::cout << "ForStmt: {\n"; l++;
-	printTabs(); std::cout << "initializer: "; printStatement(s->initializer.get()); std::cout << ",\n";
-	printTabs(); std::cout << "condition: "; printExpr(s->condition.get()); std::cout << ",\n";
-	printTabs(); std::cout << "increment: "; printExpr(s->increment.get()); std::cout << ",\n";
-	printTabs(); std::cout << "body: {\n"; l++; printStatement(s->body.get());
-	std::cout << "\n";
-	l--; printTabs(); std::cout << "}\n";
-	l--; printTabs(); std::cout << "}";
+	os << "ForStmt: {\n"; l++;
+	printTabs(os); os << "initializer: "; printStatement(os, s->initializer.get()); os << ",\n";
+	printTabs(os); os << "condition: "; printExpr(os, s->condition.get()); os << ",\n";
+	printTabs(os); os << "increment: "; printExpr(os, s->increment.get()); os << ",\n";
+	printTabs(os); os << "body: {\n"; l++; printStatement(os, s->body.get());
+	os << "\n";
+	l--; printTabs(os); os << "}\n";
+	l--; printTabs(os); os << "}";
 }
 
-static void printFunctionStmt(const FunctionStmt* s)
+static void printFunctionStmt(std::ostream& os, const FunctionStmt* s)
 {
-	std::cout << "FunctionStmt: {\n"; l++;
-	printTabs(); std::cout << "type: " << TypeToString(s->returnType) << ",\n";
-	printTabs(); std::cout << "name: " << s->name << ",\n";
-	printTabs(); std::cout << "params: [\n"; l++;
+	os << "FunctionStmt: {\n"; l++;
+	printTabs(os); os << "type: " << TypeToString(s->returnType) << ",\n";
+	printTabs(os); os << "name: " << s->name << ",\n";
+	printTabs(os); os << "params: [\n"; l++;
 	for (const auto& param : s->params)
 	{
-		printTabs(); std::cout << "{ type: " << TypeToString(param.first) << ", name: " << param.second << " },\n";
+		printTabs(os); os << "{ type: " << TypeToString(param.first) << ", name: " << param.second << " },\n";
 	}
-	l--; printTabs(); std::cout << "],\n";
-	printTabs(); std::cout << "body: {\n"; l++; printStatement(s->body.get());
-	std::cout << "\n";
-	l--; printTabs(); std::cout << "}\n";
-	l--; printTabs(); std::cout << "}";
+	l--; printTabs(os); os << "],\n";
+	printTabs(os); os << "body: {\n"; l++; printStatement(os, s->body.get());
+	os << "\n";
+	l--; printTabs(os); os << "}\n";
+	l--; printTabs(os); os << "}";
 }
 
-static void printStructStmt(const StructStmt* s)
+static void printStructStmt(std::ostream& os, const StructStmt* s)
 {
-	std::cout << "StructStmt: {\n"; l++;
-	printTabs(); std::cout << "name: " << s->name << ",\n";
-	printTabs(); std::cout << "fields: [\n"; l++;
+	os << "StructStmt: {\n"; l++;
+	printTabs(os); os << "name: " << s->name << ",\n";
+	printTabs(os); os << "fields: [\n"; l++;
 	for (const auto& field : s->fields)
 	{
-		printTabs(); std::cout << "{ name: " << field.second << ", type: " << TypeToString(field.first) << " },\n";
+		printTabs(os); os << "{ name: " << field.second << ", type: " << TypeToString(field.first) << " },\n";
 	}
-	l--; printTabs(); std::cout << "]\n";
-	l--; printTabs(); std::cout << "}";
+	l--; printTabs(os); os << "]\n";
+	l--; printTabs(os); os << "}";
 }
 
-static void printStatement(const Statement* stmt)
+static void printStatement(std::ostream& os, const Statement* stmt)
 {
-	printTabs();
-	if      (auto e = dynamic_cast<const ExpressionStmt*>(stmt)) printExpressionStmt(e);
-	else if (auto v = dynamic_cast<const VarDeclStmt*   >(stmt)) printVarDeclStmt   (v);
-	else if (auto r = dynamic_cast<const ReturnStmt*    >(stmt)) printReturnStmt    (r);
-	else if (auto b = dynamic_cast<const BlockStmt*     >(stmt)) printBlockStmt     (b);
-	else if (auto i = dynamic_cast<const IfStmt*        >(stmt)) printIfStmt        (i);
-	else if (auto w = dynamic_cast<const WhileStmt*     >(stmt)) printWhileStmt     (w);
-	else if (auto l = dynamic_cast<const ForStmt*       >(stmt)) printForStmt       (l);
-	else if (auto f = dynamic_cast<const FunctionStmt*  >(stmt)) printFunctionStmt  (f);
-	else if (auto s = dynamic_cast<const StructStmt*    >(stmt)) printStructStmt    (s);
+	printTabs(os); os << stmt->location; os << ": ";
+	if      (auto e = dynamic_cast<const ExpressionStmt*>(stmt)) printExpressionStmt(os, e);
+	else if (auto v = dynamic_cast<const VarDeclStmt*   >(stmt)) printVarDeclStmt   (os, v);
+	else if (auto r = dynamic_cast<const ReturnStmt*    >(stmt)) printReturnStmt    (os, r);
+	else if (auto b = dynamic_cast<const BlockStmt*     >(stmt)) printBlockStmt     (os, b);
+	else if (auto i = dynamic_cast<const IfStmt*        >(stmt)) printIfStmt        (os, i);
+	else if (auto w = dynamic_cast<const WhileStmt*     >(stmt)) printWhileStmt     (os, w);
+	else if (auto l = dynamic_cast<const ForStmt*       >(stmt)) printForStmt       (os, l);
+	else if (auto f = dynamic_cast<const FunctionStmt*  >(stmt)) printFunctionStmt  (os, f);
+	else if (auto s = dynamic_cast<const StructStmt*    >(stmt)) printStructStmt    (os, s);
 	else
-		std::cout << "(Unknown Statement)";
+		os << "(Unknown Statement)";
 }
 
-void febcode::printAST(const AST& ast)
+void febcode::printAST(std::ostream& os, const AST& ast)
 {
 	l = 0;
 	size_t n = ast.size();
 	for (size_t i = 0; i < n; ++i)
 	{
 		auto stmt = ast[i];
-		printStatement(stmt);
-		if (i != n - 1) std::cout << ",\n";
+		printStatement(os, stmt);
+		if (i != n - 1) os << ",\n";
 	}
 
-	std::cout << std::endl;
+	os << std::endl;
 }
 
 void febcode::ParseSource(Program& prg, const std::string& source)
@@ -1198,7 +1302,7 @@ static void prettyPrintFunctionStmt(std::ostream& os, const FunctionStmt& stmt)
 	{
 		const auto& param = stmt.params[i];
 		os << TypeToString(param.first) << " " << param.second;
-		if (i != n - 1) std::cout << ", ";
+		if (i != n - 1) os << ", ";
 	}
 	os << ")\n";
 	printTabs(os); prettyPrintStatement(os, *stmt.body);
@@ -1226,7 +1330,7 @@ static void prettyPrintStatement(std::ostream& os, const febcode::Statement& stm
 	else if (auto f = dynamic_cast<const FunctionStmt*  >(&stmt)) prettyPrintFunctionStmt  (os, *f);
 	else if (auto s = dynamic_cast<const StructStmt*    >(&stmt)) prettyPrintStructStmt    (os, *s);
 	else
-		std::cout << "(Unknown Statement)";
+		os << "(Unknown Statement)";
 }
 
 void febcode::prettyPrintAST(std::ostream& os, const AST& ast)

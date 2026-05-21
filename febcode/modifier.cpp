@@ -157,6 +157,12 @@ ExprPtr Modifier::Binary(BinaryOp op, const Expression* left, const Expression* 
 {
 	// get the signature for this operator and operand types (this throws if the operator is not defined for these types)
 	BinaryOpSignature sig = prg.resolveBinaryOp(op, left->valType, right->valType);
+
+	if (sig.resultType == nullptr)
+	{
+		throw std::runtime_error("Invalid binary operator: " + std::to_string(static_cast<int>(op)) + " for types " + std::to_string(static_cast<int>(left->valType->kind)) + " and " + std::to_string(static_cast<int>(right->valType->kind)));
+	}
+
 	ExprPtr b = std::make_unique<BinaryExpr>(std::move(clone(left)), op, std::move(clone(right)));
 	b->valType = sig.resultType;
 	return b;

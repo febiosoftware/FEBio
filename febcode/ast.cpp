@@ -342,3 +342,15 @@ std::string opToString(BinaryOp op)
 		return "unknown_op";
 	}
 }
+
+[[noreturn]]
+void febcode::error(SourceLocation loc, const std::string& msg)
+{
+	throw FatalError(msg, loc);
+}
+
+[[noreturn]]
+void febcode::error(const ASTNode* node, const std::string& msg)
+{
+	throw FatalError(msg, (node ? node->location : SourceLocation()));
+}

@@ -38,12 +38,16 @@ namespace febcode {
 		Constructor
 	};
 
+	struct ASTNode {
+		virtual ~ASTNode() = default;
+		SourceLocation location;
+	};
+
 	// --- Expressions ---
 
 	// Base classes
-	struct Expression {
+	struct Expression : ASTNode {
 		Expression(ExpressionType type) : exprType(type) {}
-		virtual ~Expression() = default;
 		ExpressionType exprType;
 		Type valType = nullptr; // Value type of expression. Determined during resolution
 	};
@@ -131,9 +135,10 @@ namespace febcode {
 
 	// --- Statements ---
 
-	struct Statement {
-		virtual ~Statement() = default;
+	struct Statement : ASTNode 
+	{
 	};
+
 	using StmtPtr = std::unique_ptr<Statement>;
 
 	struct ExpressionStmt : Statement {
@@ -521,6 +526,12 @@ namespace febcode {
 	bool isEqual(const Expression* l, const Expression* r);
 	bool isEqual(const ExprPtr& l, const ExprPtr& r);
 	bool isEqual(const std::vector<ExprPtr>& l, const std::vector<ExprPtr>& r);
+
+	[[noreturn]]
+	void error(SourceLocation loc, const std::string& msg);
+
+	[[noreturn]]
+	void error(const ASTNode* node, const std::string& msg);
 
 } // namespace febcode
 

@@ -416,7 +416,7 @@ void Compiler::compileStatement(Statement* stmt)
 	else if (auto r = dynamic_cast<ReturnStmt*    >(stmt)) compileReturn(r);
 	else if (auto s = dynamic_cast<StructStmt*    >(stmt)) compileStruct(s);
 	else
-		throw std::runtime_error("Unsupported statement type");
+		error(stmt, "Unsupported statement type");
 }
 
 void Compiler::compileExprStmt(ExpressionStmt* stmt)
@@ -463,7 +463,7 @@ void Compiler::compileBlock(BlockStmt* stmt)
 Type Compiler::compileInitializer(InitExpr* init)
 {
 	if (init->elements.empty())
-		throw std::runtime_error("Initializer cannot be empty.");
+		error(init, "Initializer cannot be empty.");
 
 	// deduce the array type from the first element
 	Type elemType = compileExpression(init->elements[0].get());
@@ -474,7 +474,7 @@ Type Compiler::compileInitializer(InitExpr* init)
 	{
 		Type type = coerce(compileExpression(init->elements[i].get()), elemType);
 		if (type != elemType)
-			throw std::runtime_error("Initializer element type mismatch.");
+			error(init->elements[i].get(), "Initializer element type mismatch.");
 	}
 
 	return arrayType;
@@ -840,7 +840,7 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 				returnType = coerceType;
 
 			if (returnType != expectedReturnType)
-				throw std::runtime_error("Return type mismatch. Expected " + TypeToString(expectedReturnType) + " but got " + TypeToString(returnType));
+				error(stmt->value->location, "Return type mismatch. Expected " + TypeToString(expectedReturnType) + " but got " + TypeToString(returnType));
 		}
 
 		switch (returnType->kind)
@@ -867,7 +867,7 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 	else
 	{
 		if (expectedReturnType != nullptr && expectedReturnType != prg.types.Void())
-			throw std::runtime_error("Missing return value in function with non-void return type.");
+			error(stmt, "Missing return value in function with non-void return type.");
 
 		// return without value -> push monostate
 		emit(OpCode::PUSH_VOID);

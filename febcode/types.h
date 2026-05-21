@@ -481,4 +481,16 @@ namespace febcode
 	};
 
 	using NativeFnc = std::function<Value(FuncArgs args)>;
+
+	struct SourceLocation {
+		int line = 0;
+		int column = 0;
+	};
+
+	class FatalError : public std::runtime_error {
+	public:
+		FatalError(const std::string& message, const SourceLocation& loc)
+			: std::runtime_error(message), location(loc) {}
+		SourceLocation location;
+	};
 }
