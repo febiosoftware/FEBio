@@ -1240,8 +1240,3 @@ void febcode::prettyPrintAST(std::ostream& os, const AST& ast)
 		if (i != n - 1) os << "\n";
 	}
 }
-
-void febcode::prettyPrintAST(const AST& ast)
-{
-	prettyPrintAST(std::cout, ast);
-}
