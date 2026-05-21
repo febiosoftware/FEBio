@@ -134,7 +134,7 @@ bool Optimizer::shouldRemoveIfStmt(IfStmt* stmt)
 	if (stmt->elseBranch)
 	{
 		live = liveBefore; // reset live variables before processing else branch
-		bool removeElse = shouldRemove(stmt->elseBranch.get());
+		removeElse = shouldRemove(stmt->elseBranch.get());
 	}
 
 	if (removeThen && removeElse && !hasSideEffects(stmt->condition.get()))
