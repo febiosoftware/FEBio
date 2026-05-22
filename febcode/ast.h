@@ -247,11 +247,11 @@ namespace febcode {
 	struct FunctionStmt : Statement {
 		std::string name;
 		Type returnType = nullptr;
-		std::vector<std::pair<Type,std::string>> params;
+		std::vector<VarPtr> params;
 		StmtPtr body;
 
 		FunctionStmt(std::string name, Type returnType,
-			std::vector<std::pair<Type,std::string>> parameters,
+			std::vector<VarPtr>& parameters,
 			std::unique_ptr<Statement> bdy)
 			: Statement(StatementType::FunctionStatement), name(std::move(name)),
 			returnType(returnType),

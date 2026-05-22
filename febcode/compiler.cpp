@@ -902,7 +902,7 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	std::vector<Type> argTypes;
 	for (auto& p : fn->params)
-		argTypes.push_back(p.first);
+		argTypes.push_back(p->type);
 
 	int fnIndex = prg.resolveFunction(fn->name, argTypes);
 	if (fnIndex < 0)
@@ -921,10 +921,10 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	for (auto& p : fn->params)
 	{
-		m_locals.push_back({ p.second, p.first, m_scopeDepth, localStackSize });
-		localStackSize += (int)p.first->size();
-		info.argSize += (int)p.first->size();
-		stackDepth += (int)p.first->size();
+		m_locals.push_back({ p->name, p->type, m_scopeDepth, localStackSize });
+		localStackSize += (int)p->type->size();
+		info.argSize += (int)p->type->size();
+		stackDepth += (int)p->type->size();
 		if (stackDepth > maxStackDepth)
 			maxStackDepth = stackDepth;
 	}

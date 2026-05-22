@@ -257,7 +257,7 @@ std::unique_ptr<Statement> Parser::parseFunctionDeclaration(Type type, const std
 {
 	Token startToken = previous(); assert(startToken.type == TokenType::LeftParen);
 
-	std::vector<std::pair<Type, std::string>> parameters;
+	std::vector<VarPtr> parameters;
 
 	if (!check(TokenType::RightParen)) {
 		do {
@@ -287,7 +287,7 @@ std::unique_ptr<Statement> Parser::parseFunctionDeclaration(Type type, const std
 				paramType = prg.types.getArrayType(paramType, arraySize);
 			}
 
-			parameters.push_back({ paramType, param });
+			parameters.push_back(std::make_unique<Var>(Var{ param, paramType, nullptr }));
 		} while (match(TokenType::Comma));
 	}
 
@@ -1035,7 +1035,7 @@ static void printFunctionStmt(std::ostream& os, const FunctionStmt* s)
 	printTabs(os); os << "params: [\n"; l++;
 	for (const auto& param : s->params)
 	{
-		printTabs(os); os << "{ type: " << TypeToString(param.first) << ", name: " << param.second << " },\n";
+		printTabs(os); os << "{ type: " << TypeToString(param->type) << ", name: " << param->name << " },\n";
 	}
 	l--; printTabs(os); os << "],\n";
 	printTabs(os); os << "body: {\n"; l++; printStatement(os, s->body.get());
@@ -1298,7 +1298,7 @@ static void prettyPrintFunctionStmt(std::ostream& os, const FunctionStmt& stmt)
 	for (size_t i = 0; i < n; ++i)
 	{
 		const auto& param = stmt.params[i];
-		os << TypeToString(param.first) << " " << param.second;
+		os << TypeToString(param->type) << " " << param->name;
 		if (i != n - 1) os << ", ";
 	}
 	os << ")\n";

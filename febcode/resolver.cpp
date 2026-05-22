@@ -134,8 +134,8 @@ void Resolver::resolveFunctionStmt(FunctionStmt* fn)
 	// add function parameters to variables map
 	for (const auto& param : fn->params)
 	{
-		info.args.push_back(param.first);
-		declare(param.second, param.first);
+		info.args.push_back(param->type);
+		declare(param->name, param->type);
 	}
 	resolveStatement(fn->body.get());
 	popScope();
