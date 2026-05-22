@@ -354,3 +354,24 @@ void febcode::error(const ASTNode* node, const std::string& msg)
 {
 	throw FatalError(msg, (node ? node->location : SourceLocation()));
 }
+
+std::string febcode::StatementTypeToString(febcode::StatementType type)
+{
+	std::string stmtType;
+	switch (type)
+	{
+	case StatementType::ExpressionStatement: stmtType = "ExpressionStatement"; break;
+	case StatementType::VarDeclStatement   : stmtType = "VarDeclStatement"; break;
+	case StatementType::ReturnStatement    : stmtType = "ReturnStatement"; break;
+	case StatementType::BlockStatement     : stmtType = "BlockStatement"; break;
+	case StatementType::IfStatement        : stmtType = "IfStatement"; break;
+	case StatementType::WhileStatement     : stmtType = "WhileStatement"; break;
+	case StatementType::ForStatement       : stmtType = "ForStatement"; break;
+	case StatementType::FunctionStatement  : stmtType = "FunctionStatement"; break;
+	case StatementType::StructStatement    : stmtType = "StructStatement"; break;
+	default:
+		assert(false);
+		stmtType = "UnknownStatement"; break;
+	}
+	return stmtType;
+}

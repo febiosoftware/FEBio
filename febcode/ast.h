@@ -135,15 +135,29 @@ namespace febcode {
 
 	// --- Statements ---
 
+	enum StatementType {
+		ExpressionStatement,
+		VarDeclStatement,
+		ReturnStatement,
+		BlockStatement,
+		IfStatement,
+		WhileStatement,
+		ForStatement,
+		FunctionStatement,
+		StructStatement
+	};
+
 	struct Statement : ASTNode 
 	{
+		Statement(StatementType type) : stmtType(type) {}
+		StatementType stmtType;
 	};
 
 	using StmtPtr = std::unique_ptr<Statement>;
 
 	struct ExpressionStmt : Statement {
 		ExprPtr expr;
-		ExpressionStmt(ExprPtr e) : expr(std::move(e)) {}
+		ExpressionStmt(ExprPtr e) : Statement(StatementType::ExpressionStatement), expr(std::move(e)) {}
 	};
 
 	struct Var {
@@ -156,25 +170,27 @@ namespace febcode {
 		Type type = nullptr;
 		bool input = false; // declare input variables (treated as const, non-differentiable)
 		std::vector<Var> vars;
-		VarDeclStmt(Type type, const std::string& name, ExprPtr initializer, bool input = false) : type(type), input(input)
+		VarDeclStmt(Type type, const std::string& name, ExprPtr initializer, bool input = false) : Statement(StatementType::VarDeclStatement), type(type), input(input)
 		{
 			vars.push_back({ name, std::vector<size_t>(), std::move(initializer)});
 		}
 		VarDeclStmt(Type type, Var& var, bool input = false)
-			: type(type), input(input) { 
+			: Statement(StatementType::VarDeclStatement), type(type), input(input) { 
 			vars.emplace_back(std::move(var));
 		}
 		VarDeclStmt(Type type, std::vector<Var>& vars, bool input = false)
-			: type(type), input(input), vars(std::move(vars)) {}
+			: Statement(StatementType::VarDeclStatement), type(type), input(input), vars(std::move(vars)) {}
 	};
 
 	struct ReturnStmt : Statement {
 		ExprPtr value; // can be null
-		ReturnStmt(ExprPtr v) : value(std::move(v)) {}
+		ReturnStmt(ExprPtr v) : Statement(StatementType::ReturnStatement), value(std::move(v)) {}
 	};
 
 	struct BlockStmt : Statement {
 		std::vector<StmtPtr> statements;
+
+		BlockStmt() : Statement(StatementType::BlockStatement) {}
 
 		void addStatement(StmtPtr stmt) {
 			statements.push_back(std::move(stmt));
@@ -186,12 +202,12 @@ namespace febcode {
 		StmtPtr thenBranch;
 		StmtPtr elseBranch; // optional
 
-		IfStmt() {}
+		IfStmt() : Statement(StatementType::IfStatement) {}
 
 		IfStmt(ExprPtr cond,
 			StmtPtr thenStmt,
 			StmtPtr elseStmt = nullptr)
-			: condition(std::move(cond)),
+			: Statement(StatementType::IfStatement), condition(std::move(cond)),
 			thenBranch(std::move(thenStmt)),
 			elseBranch(std::move(elseStmt)) {
 		}
@@ -203,7 +219,7 @@ namespace febcode {
 
 		WhileStmt(ExprPtr cond,
 			std::unique_ptr<Statement> bodyStmt)
-			: condition(std::move(cond)),
+			: Statement(StatementType::WhileStatement), condition(std::move(cond)),
 			body(std::move(bodyStmt)) {
 		}
 	};
@@ -218,7 +234,7 @@ namespace febcode {
 			ExprPtr cond,
 			ExprPtr incr,
 			std::unique_ptr<Statement> bodyStmt)
-			: initializer(std::move(init)),
+			: Statement(StatementType::ForStatement), initializer(std::move(init)),
 			condition(std::move(cond)),
 			increment(std::move(incr)),
 			body(std::move(bodyStmt)) {
@@ -234,7 +250,7 @@ namespace febcode {
 		FunctionStmt(std::string name, Type returnType,
 			std::vector<std::pair<Type,std::string>> parameters,
 			std::unique_ptr<Statement> bdy)
-			: name(std::move(name)),
+			: Statement(StatementType::FunctionStatement), name(std::move(name)),
 			returnType(returnType),
 			params(std::move(parameters)),
 			body(std::move(bdy)) {
@@ -247,7 +263,7 @@ namespace febcode {
 		std::vector<std::pair<Type, std::string>> fields;
 		StructStmt(std::string name, Type type,
 			std::vector<std::pair<Type, std::string>> fields)
-			: name(std::move(name)),
+			: Statement(StatementType::StructStatement), name(std::move(name)),
 			type(type),
 			fields(std::move(fields)) {
 		}
@@ -536,6 +552,9 @@ namespace febcode {
 	std::string ValueToString(const febcode::Value& v);
 
 	std::string opToString(febcode::BinaryOp op);
+
+	std::string StatementTypeToString(febcode::StatementType type);
+
 } // namespace febcode
 
 std::ostream& operator << (std::ostream& o, const febcode::Value& v);

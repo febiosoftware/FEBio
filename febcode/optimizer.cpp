@@ -1,20 +1,14 @@
 #include "optimizer.h"
+#include <iostream>
 using namespace febcode;
 
 Optimizer::Optimizer(Program& program) : Modifier(program) {}
 
 void Optimizer::optimize()
 {
+	removedStatements = 0;
 	AST& ast = *prg.ast;
-	for (int i = (int)ast.root.statements.size() - 1; i >= 0; --i)
-	{
-		Statement* stmt = ast.root.statements[i].get();
-
-		if (shouldRemove(stmt))
-		{
-			ast.root.statements.erase(ast.root.statements.begin() + i);
-		}
-	}
+	shouldRemoveBlockStmt(&ast.root);
 }
 
 bool Optimizer::shouldRemove(Statement* stmt)
@@ -24,6 +18,7 @@ bool Optimizer::shouldRemove(Statement* stmt)
 	else if (auto exprStmt = dynamic_cast<ExpressionStmt*>(stmt)) return shouldRemoveExprStmt (exprStmt);
 	else if (auto blckStmt = dynamic_cast<BlockStmt     *>(stmt)) return shouldRemoveBlockStmt(blckStmt);
 	else if (auto ifStmt   = dynamic_cast<IfStmt        *>(stmt)) return shouldRemoveIfStmt   (ifStmt  );
+	else if (auto fncStmt  = dynamic_cast<FunctionStmt  *>(stmt)) return shouldRemoveFncStmt  (fncStmt );
 	else if (auto structStmt = dynamic_cast<StructStmt*>(stmt)) return false; // don't remove struct declarations, since they are needed for type information, even if they are not used directly.
 
 	throw std::runtime_error("Unsupported statement type in optimizer");
@@ -117,6 +112,15 @@ bool Optimizer::shouldRemoveBlockStmt(BlockStmt* blckStmt)
 
 		if (shouldRemove(stmt))
 		{
+			if (log)
+			{
+				std::string stmtType = febcode::StatementTypeToString(stmt->stmtType);
+
+				// log the removed statement with its source location
+				SourceLocation loc = stmt->location;
+				*log << "Removed " << stmtType << " at line " << loc.line << "\n";
+				removedStatements++;
+			}
 			blckStmt->statements.erase(blckStmt->statements.begin() + i);
 		}
 	}
@@ -156,6 +160,19 @@ bool Optimizer::shouldRemoveIfStmt(IfStmt* stmt)
 
 		return false;
 	}
+}
+
+bool Optimizer::shouldRemoveFncStmt(FunctionStmt* stmt)
+{
+	auto liveBefore = live; // save live variables before processing function body
+	auto assignedBefore = assignedLater;
+	live.clear();
+	assignedLater.clear();
+	shouldRemove(stmt->body.get());
+	live = liveBefore; // restore live variables before processing function body
+	assignedLater = assignedBefore; // restore assignedLater before processing function body
+
+	return false; // don't remove function declarations. Even if they are not used directly, they don't cost anything.
 }
 
 void Optimizer::updateLiveness(Expression* expr) 
