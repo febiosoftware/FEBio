@@ -124,29 +124,24 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const De
 	if (stmt->input)
 	{
 		// input variables are treated as constants with respect to differentiation, so we can just copy the variable declaration to the derivative AST without creating a derivative variable for it.
-		ast.addStatement(std::make_unique<VarDeclStmt>(stmt->type, stmt->vars, stmt->input));
+		ast.addStatement(std::make_unique<VarDeclStmt>(stmt->baseType, stmt->vars, stmt->input));
 		return;
 	}
 
 	std::vector<VarPtr> copyVars; // copy of the original variables for the derivative AST
 	std::vector<VarPtr> newVars; // new variables for the derivatives in the derivative AST
 
-	Type baseType = stmt->type;
+	Type baseType = stmt->baseType;
 
 	// determine the type of the derivative variable based on the type of the original variable and the derivative variable.
 	Type derivType = getDerivativeType(baseType, var.type->kind);
 
 	for (auto& var_i : stmt->vars)
 	{
-		// handle array types by getting the base type and then reconstructing the array type
-		Type type = baseType;
-		if (var_i->arraySizes.size() > 0)
-		{
-			type = prg.types.getArrayType(baseType, var_i->arraySizes);
-		}
+		Type type = var_i->type;
 
 		// copy the original variable declaration to the derivative AST
-		copyVars.push_back(std::make_unique<Var>(Var{ var_i->name, var_i->arraySizes, clone(var_i->initializer.get())}));
+		copyVars.push_back(std::make_unique<Var>(Var{ var_i->name, type, clone(var_i->initializer.get())}));
 		// store the type of this variable in the map for later use when creating derivative variables for it.
 		varTypes[var_i->name] = type;
 
@@ -186,18 +181,20 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const De
 		}
 
 		// add the new derivative variable to the map and the list of new variables for the derivative AST
-		std::vector<size_t> arraySizes;
-		if (type->kind == TypeKind::Array)
+		Type derivVarType = derivType;
+		while (isArrayType(type))
 		{
-			arraySizes.push_back(type->arraySize);
+			derivVarType = prg.types.getArrayType(derivVarType, type->arraySize);
+			type = type->elementType;
 		}
+
 		deriveVars[var_i->name] = derivName;
 		varTypes[derivName] = derivType;
-		newVars.push_back(std::make_unique<Var>(Var{ derivName, arraySizes, std::move(init)}));
+		newVars.push_back(std::make_unique<Var>(Var{ derivName, derivVarType, std::move(init)}));
 	}
 
 	// create new variable declaration statements for the derivatives and add it to the derivative AST
-	ast.addStatement(std::make_unique<VarDeclStmt>(stmt->type, copyVars));
+	ast.addStatement(std::make_unique<VarDeclStmt>(stmt->baseType, copyVars));
 	if (!newVars.empty()) ast.addStatement(std::make_unique<VarDeclStmt>(derivType, newVars));
 }
 

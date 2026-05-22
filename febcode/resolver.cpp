@@ -63,24 +63,18 @@ void Resolver::resolveVarDecl(VarDeclStmt* stmt)
 {
 	for (auto& var : stmt->vars)
 	{
-		Type varType = nullptr;
-		if (var->arraySizes.size() > 0)
-			varType = prg.types.getArrayType(stmt->type, var->arraySizes);
-		else
-			varType = stmt->type;
-
 		// resolve initializer first!
 		if (var->initializer)
 		{
 			resolveExpression(var->initializer.get());
 
 			// make sure initializer type can be converted to variable type
-			if (commonType(var->initializer->valType, varType) == nullptr)
-				error(var->initializer.get(), "Type mismatch in variable initializer for variable '" + var->name + "'. Expected type: " + TypeToString(varType) + ", but got: " + TypeToString(var->initializer->valType));
+			if (commonType(var->initializer->valType, var->type) == nullptr)
+				error(var->initializer.get(), "Type mismatch in variable initializer for variable '" + var->name + "'. Expected type: " + TypeToString(var->type) + ", but got: " + TypeToString(var->initializer->valType));
 		}
 
 		// now we can declare the variable in the current scope
-		declare(var->name, varType);
+		declare(var->name, var->type);
 	}
 }
 

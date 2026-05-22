@@ -50,8 +50,8 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 			error(currentLoc, "Expected ';' after input declaration.");
 		}
 
-		VarPtr var = std::make_unique<Var>(Var{ name, {}, nullptr });
-		auto stmt = std::make_unique<VarDeclStmt>(varType, std::move(var), true);
+		VarPtr var = std::make_unique<Var>(Var{ name, varType, nullptr });
+		auto stmt = std::make_unique<VarDeclStmt>(type, std::move(var), true);
 		stmt->location = currentLoc;
 		return stmt;
 	}
@@ -138,8 +138,6 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 	std::string varName = name;
 	while (true)
 	{
-		Type varType = type;
-
 		std::vector<size_t> arraySizes;
 		while (match(TokenType::LeftBrack))
 		{
@@ -156,6 +154,7 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 			arraySizes.push_back(size);
 		}
 
+		Type varType = type;
 		for (int i = (int)arraySizes.size() -1; i >= 0; --i)
 		{
 			varType = prg.types.getArrayType(varType, arraySizes[i]);
@@ -174,7 +173,7 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 		if (!varName.empty() && varName[0] == '_')
 			error(currentLoc, "Variable names cannot start with an underscore.");
 
-		vars.push_back(std::make_unique<Var>(Var{ varName, arraySizes, std::move(initializer) }));
+		vars.push_back(std::make_unique<Var>(Var{ varName, varType, std::move(initializer) }));
 
 		if (!match(TokenType::Comma)) break;
 
@@ -943,19 +942,19 @@ static std::ostream& operator << (std::ostream& o, TypeKind type)
 static void printVarDeclStmt(std::ostream& os, const VarDeclStmt* s)
 {
 	os << "VarDeclStmt: {\n"; l++;
-	printTabs(os); os << "type: " << TypeToString(s->type) << ",\n";
+	printTabs(os); os << "type: " << TypeToString(s->baseType) << ",\n";
 	printTabs(os); os << "vars: [\n"; l++;
 	for (const auto& var : s->vars) {
 		printTabs(os); os << "{ name: " << var->name;
-		if (!var->arraySizes.empty())
+		if (isArrayType(var->type))
 		{
-			os << ", size: [";
-			for (size_t i = 0; i < var->arraySizes.size(); ++i)
+			os << ", size: ";
+			Type type = var->type;
+			while (isArrayType(type))
 			{
-				os << var->arraySizes[i];
-				if (i != var->arraySizes.size() - 1) os << "][";
+				os << "[" << type->arraySize <<	"]";
+				type = type->elementType;	
 			}
-			os << "]";
 		}
 		os << ", initializer: ";
 		printExpr(os, var->initializer.get());
@@ -1223,19 +1222,17 @@ static void prettyPrintVarDeclStmt(std::ostream& os, const VarDeclStmt& stmt)
 	size_t n = stmt.vars.size();
 	if (stmt.input)
 		os << "in ";
-	os << TypeToString(stmt.type) << " ";
+	os << TypeToString(stmt.baseType) << " ";
 	for (size_t i = 0; i < n; ++i)
 	{
 		const auto& var = stmt.vars[i];
 		os << var->name;
-		if (!var->arraySizes.empty())
+
+		Type type = var->type;
+		while (isArrayType(type))
 		{
-			for (size_t j = 0; j < var->arraySizes.size(); ++j)
-			{
-				os << "[";
-				os << var->arraySizes[j];
-				os << "]";
-			}
+			os << "[" << type->arraySize << "]";
+			type = type->elementType;
 		}
 		if (var->initializer)
 		{

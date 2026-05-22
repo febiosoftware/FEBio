@@ -652,14 +652,9 @@ Type Compiler::expressionType(Expression* expr)
 
 void Compiler::compileVarDecl(VarDeclStmt* decl)
 {
-	Type baseType = decl->type;
 	for (auto& var : decl->vars)
 	{
-		Type type = baseType;
-		if (var->arraySizes.size() > 0)
-		{
-			type = prg.types.getArrayType(baseType, var->arraySizes);
-		}
+		Type type = var->type;
 
 		if (!decl->input && var->initializer)
 		{
