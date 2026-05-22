@@ -37,22 +37,22 @@ bool Optimizer::shouldRemoveVarDecl(VarDeclStmt* stmt)
 	for (int i = (int)stmt->vars.size() - 1; i >= 0; i--)
 	{
 		auto& var = stmt->vars[i];
-		if (live.find(var.name) == live.end())
+		if (live.find(var->name) == live.end())
 		{
-			if (assignedLater.find(var.name) != assignedLater.end())
+			if (assignedLater.find(var->name) != assignedLater.end())
 			{
 				// the variable is assigned later, so we can't remove the declaration, 
 				// but we can remove the initializer if it exists.
-				assignedLater.erase(var.name);
-				var.initializer.reset();
+				assignedLater.erase(var->name);
+				var->initializer.reset();
 			}
 			else
 				stmt->vars.erase(stmt->vars.begin() + i);
 		}
 		else
 		{
-			live.erase(var.name);
-			updateLiveness(var.initializer.get());
+			live.erase(var->name);
+			updateLiveness(var->initializer.get());
 		}
 	}
 	return stmt->vars.empty();

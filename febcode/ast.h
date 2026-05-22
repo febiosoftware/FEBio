@@ -166,20 +166,23 @@ namespace febcode {
 		ExprPtr initializer; // can be null
 	};
 
+	using VarPtr = std::unique_ptr<Var>;
+
 	struct VarDeclStmt : Statement {
 		Type type = nullptr;
 		bool input = false; // declare input variables (treated as const, non-differentiable)
-		std::vector<Var> vars;
+		std::vector<VarPtr> vars;
 		VarDeclStmt(Type type, const std::string& name, ExprPtr initializer, bool input = false) : Statement(StatementType::VarDeclStatement), type(type), input(input)
 		{
-			vars.push_back({ name, std::vector<size_t>(), std::move(initializer)});
+			vars.push_back(std::make_unique<Var>(Var{ name, std::vector<size_t>(), std::move(initializer)}));
 		}
-		VarDeclStmt(Type type, Var& var, bool input = false)
+		VarDeclStmt(Type type, VarPtr& var, bool input = false)
 			: Statement(StatementType::VarDeclStatement), type(type), input(input) { 
 			vars.emplace_back(std::move(var));
 		}
-		VarDeclStmt(Type type, std::vector<Var>& vars, bool input = false)
-			: Statement(StatementType::VarDeclStatement), type(type), input(input), vars(std::move(vars)) {}
+		VarDeclStmt(Type type, std::vector<VarPtr>& vars, bool input = false)
+			: Statement(StatementType::VarDeclStatement), type(type), input(input), vars(std::move(vars)) {
+		}
 	};
 
 	struct ReturnStmt : Statement {

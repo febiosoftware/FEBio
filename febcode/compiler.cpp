@@ -656,27 +656,27 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 	for (auto& var : decl->vars)
 	{
 		Type type = baseType;
-		if (var.arraySizes.size() > 0)
+		if (var->arraySizes.size() > 0)
 		{
-			type = prg.types.getArrayType(baseType, var.arraySizes);
+			type = prg.types.getArrayType(baseType, var->arraySizes);
 		}
 
-		if (!decl->input && var.initializer)
+		if (!decl->input && var->initializer)
 		{
-			Type initType = coerce(compileExpression(var.initializer.get()), type);
+			Type initType = coerce(compileExpression(var->initializer.get()), type);
 		}
 
 		if (m_scopeDepth == 0)
 		{
 			if (decl->input)
-				prg.addInput(var.name, type);
+				prg.addInput(var->name, type);
 			else
 			{
-				prg.addGlobal(var.name, type);
+				prg.addGlobal(var->name, type);
 
-				if (var.initializer)
+				if (var->initializer)
 				{
-					auto it = prg.globalIndices.find(var.name);
+					auto it = prg.globalIndices.find(var->name);
 
 					Program::Global& global = prg.globals[it->second];
 
@@ -735,14 +735,14 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 			{
 				if (m_locals[i].depth < m_scopeDepth)
 					break;
-				if (m_locals[i].name == var.name)
-					throw std::runtime_error("Variable '" + var.name + "' is already declared in this scope.");
+				if (m_locals[i].name == var->name)
+					throw std::runtime_error("Variable '" + var->name + "' is already declared in this scope.");
 			}
 
-			m_locals.push_back({ var.name, type, m_scopeDepth, localStackSize });
+			m_locals.push_back({ var->name, type, m_scopeDepth, localStackSize });
 
 			localStackSize += (int)type->size();
-			if (var.initializer == nullptr)
+			if (var->initializer == nullptr)
 			{
 				emit(OpCode::PUSH_LOCAL, (uint8_t)type->size()); // reserve space on the stack for the variable
 				emitUint8((uint8_t)type->size());

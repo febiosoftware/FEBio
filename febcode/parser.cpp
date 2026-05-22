@@ -50,8 +50,8 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 			error(currentLoc, "Expected ';' after input declaration.");
 		}
 
-		Var var{ name, {}, nullptr };
-		auto stmt = std::make_unique<VarDeclStmt>(varType, var, true);
+		VarPtr var = std::make_unique<Var>(Var{ name, {}, nullptr });
+		auto stmt = std::make_unique<VarDeclStmt>(varType, std::move(var), true);
 		stmt->location = currentLoc;
 		return stmt;
 	}
@@ -134,7 +134,7 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 	if (type == prg.types.Void())
 		error(currentLoc, "Variables cannot be of type void.");
 
-	std::vector<Var> vars;
+	std::vector<VarPtr> vars;
 	std::string varName = name;
 	while (true)
 	{
@@ -174,7 +174,7 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 		if (!varName.empty() && varName[0] == '_')
 			error(currentLoc, "Variable names cannot start with an underscore.");
 
-		vars.push_back({varName, arraySizes, std::move(initializer)});
+		vars.push_back(std::make_unique<Var>(Var{ varName, arraySizes, std::move(initializer) }));
 
 		if (!match(TokenType::Comma)) break;
 
@@ -188,7 +188,7 @@ std::unique_ptr<Statement> Parser::parseVarDeclaration(Type type, const std::str
 		error(currentLoc, "Expected ';' after variable declaration.");
 	}
 
-	auto stmt = std::make_unique<VarDeclStmt>(type, vars);
+	auto stmt = std::make_unique<VarDeclStmt>(type, std::move(vars));
 	stmt->location = startToken.loc;
 	return stmt;
 }
@@ -946,19 +946,19 @@ static void printVarDeclStmt(std::ostream& os, const VarDeclStmt* s)
 	printTabs(os); os << "type: " << TypeToString(s->type) << ",\n";
 	printTabs(os); os << "vars: [\n"; l++;
 	for (const auto& var : s->vars) {
-		printTabs(os); os << "{ name: " << var.name;
-		if (!var.arraySizes.empty())
+		printTabs(os); os << "{ name: " << var->name;
+		if (!var->arraySizes.empty())
 		{
 			os << ", size: [";
-			for (size_t i = 0; i < var.arraySizes.size(); ++i)
+			for (size_t i = 0; i < var->arraySizes.size(); ++i)
 			{
-				os << var.arraySizes[i];
-				if (i != var.arraySizes.size() - 1) os << "][";
+				os << var->arraySizes[i];
+				if (i != var->arraySizes.size() - 1) os << "][";
 			}
 			os << "]";
 		}
 		os << ", initializer: ";
-		printExpr(os, var.initializer.get());
+		printExpr(os, var->initializer.get());
 		os << " },\n";
 	}
 	l--; printTabs(os); os << "],\n";
@@ -1227,20 +1227,20 @@ static void prettyPrintVarDeclStmt(std::ostream& os, const VarDeclStmt& stmt)
 	for (size_t i = 0; i < n; ++i)
 	{
 		const auto& var = stmt.vars[i];
-		os << var.name;
-		if (!var.arraySizes.empty())
+		os << var->name;
+		if (!var->arraySizes.empty())
 		{
-			for (size_t j = 0; j < var.arraySizes.size(); ++j)
+			for (size_t j = 0; j < var->arraySizes.size(); ++j)
 			{
 				os << "[";
-				os << var.arraySizes[j];
+				os << var->arraySizes[j];
 				os << "]";
 			}
 		}
-		if (var.initializer)
+		if (var->initializer)
 		{
 			os << " = ";
-			prettyPrintExpression(os, *var.initializer);
+			prettyPrintExpression(os, *var->initializer);
 		}
 		if (i != n - 1) os << ", ";
 	}

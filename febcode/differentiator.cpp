@@ -128,8 +128,8 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const De
 		return;
 	}
 
-	std::vector<Var> copyVars; // copy of the original variables for the derivative AST
-	std::vector<Var> newVars; // new variables for the derivatives in the derivative AST
+	std::vector<VarPtr> copyVars; // copy of the original variables for the derivative AST
+	std::vector<VarPtr> newVars; // new variables for the derivatives in the derivative AST
 
 	Type baseType = stmt->type;
 
@@ -140,29 +140,28 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const De
 	{
 		// handle array types by getting the base type and then reconstructing the array type
 		Type type = baseType;
-		if (var_i.arraySizes.size() > 0)
+		if (var_i->arraySizes.size() > 0)
 		{
-			type = prg.types.getArrayType(baseType, var_i.arraySizes);
+			type = prg.types.getArrayType(baseType, var_i->arraySizes);
 		}
 
 		// copy the original variable declaration to the derivative AST
-		copyVars.push_back({ var_i.name, var_i.arraySizes, clone(var_i.initializer.get())});
-
+		copyVars.push_back(std::make_unique<Var>(Var{ var_i->name, var_i->arraySizes, clone(var_i->initializer.get())}));
 		// store the type of this variable in the map for later use when creating derivative variables for it.
-		varTypes[var_i.name] = type;
+		varTypes[var_i->name] = type;
 
 		// No need to differentiate non-numeric types, since they don't contribute to the derivative. 
 		// We can just copy them to the derivative AST without creating a derivative variable for them.
 		if (type->kind == TypeKind::Bool || type->kind == TypeKind::Int) continue;
 
 		// create a new variable for the derivative of this variable
-		std::string derivName = "__d" + var_i.name + "_d" + var.name;
+		std::string derivName = "__d" + var_i->name + "_d" + var.name;
 
 		ExprPtr init = nullptr;
-		if (var_i.initializer)
+		if (var_i->initializer)
 		{
 			// lets differentiate the initializer.
-			init = differentiate(var_i.initializer.get(), var);
+			init = differentiate(var_i->initializer.get(), var);
 
 			// if it's zero, then this variable didn't contribute to the derivative, so we can skip creating a derivative variable for it.
 			if (isZero(init))
@@ -192,9 +191,9 @@ void Differentiator::diffVarDeclStmt(BlockStmt& ast, VarDeclStmt* stmt, const De
 		{
 			arraySizes.push_back(type->arraySize);
 		}
-		deriveVars[var_i.name] = derivName;
+		deriveVars[var_i->name] = derivName;
 		varTypes[derivName] = derivType;
-		newVars.push_back({ derivName, arraySizes, std::move(init)});
+		newVars.push_back(std::make_unique<Var>(Var{ derivName, arraySizes, std::move(init)}));
 	}
 
 	// create new variable declaration statements for the derivatives and add it to the derivative AST
@@ -728,7 +727,7 @@ bool febcode::dependsOn(const Statement* stmt, const std::string& varName)
 		{
 			for (const auto& var : varDeclStmt->vars)
 			{
-				if (::dependsOn(var.initializer.get(), varName))
+				if (::dependsOn(var->initializer.get(), varName))
 					return true;
 			}
 		}
