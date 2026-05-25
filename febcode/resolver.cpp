@@ -14,12 +14,13 @@ Resolver::~Resolver()
 
 void Resolver::resolve()
 {
-	// add all global variables to the variables map so they can be resolved in expressions
+	// start with a global scope
 	pushScope();
-	for (const auto& var : prg.globalIndices)
+
+	// add all injected variables to the variables map so they can be resolved in expressions
+	for (const auto& var : prg.injects)
 	{
-		auto& global = prg.globals[var.second];
-		declare(var.first, global.type);
+		declare(var->name, var.get());
 	}
 
 	// resolve all statements in the program
@@ -74,7 +75,7 @@ void Resolver::resolveVarDecl(VarDeclStmt* stmt)
 		}
 
 		// now we can declare the variable in the current scope
-		declare(var->name, var->type);
+		declare(var->name, var.get());
 	}
 }
 
@@ -135,7 +136,7 @@ void Resolver::resolveFunctionStmt(FunctionStmt* fn)
 	for (const auto& param : fn->params)
 	{
 		info.args.push_back(param->type);
-		declare(param->name, param->type);
+		declare(param->name, param.get());
 	}
 	resolveStatement(fn->body.get());
 	popScope();
@@ -180,10 +181,11 @@ void Resolver::resolveLiteral(LiteralExpr* expr)
 
 void Resolver::resolveVariable(VariableExpr* expr)
 {
-	Type type = lookup(expr->name);
-	if (type == nullptr)
+	Var* var = lookup(expr->name);
+	if (var == nullptr)
 		error(expr, "Undefined variable: " + expr->name);
-	expr->valType = type;
+	expr->valType = var->type;
+	expr->var = var;
 }
 
 void Resolver::resolveAssignment(AssignExpr* expr)

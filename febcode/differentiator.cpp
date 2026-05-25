@@ -1,5 +1,6 @@
 #include "differentiator.h"
 #include "simplifier.h"
+#include "resolver.h"
 #include <math.h>
 
 using namespace febcode;
@@ -42,6 +43,10 @@ void Differentiator::differentiate(const std::string& var)
 	// differentiate the program's AST
 	auto diffAST = differentiate(*prg.ast, dvar);
 	prg.ast.reset(diffAST.release()); // replace original AST with derivative AST
+
+	// apply another resolve phase
+	Resolver resolver(prg);
+	resolver.resolve();
 }
 
 std::unique_ptr<AST> Differentiator::differentiate(const AST& ast, const DerivVar& var)

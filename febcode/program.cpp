@@ -167,6 +167,8 @@ int Program::injectGlobal(const std::string& name, Type type)
 	globals.push_back({ type, (int)globalStackSize, true, 0 });
 	globalIndices[name] = slot;
 
+	injects.emplace_back(std::make_unique<Var>(Var{ name, type, nullptr })); // add to injects list for later initialization
+
 	globalStackSize += type->size(); // reserve stack slots for this global variable
 
 	return slot;

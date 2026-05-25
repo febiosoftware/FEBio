@@ -126,6 +126,8 @@ namespace febcode
 			case TypeKind::Double: setDoubleAt(slot, value.d); break;
 			case TypeKind::Vec2: setVec2At(slot, value.vec2Value); break;
 			case TypeKind::Vec3: setVec3At(slot, value.vec3Value); break;
+			case TypeKind::Mat2: setMat2At(slot, value.mat2Value); break;
+			case TypeKind::Mat3: setMat3At(slot, value.mat3Value); break;
 			default:
 				throw std::runtime_error("Unsupported global variable type for setGlobal.");
 				break;
@@ -536,10 +538,23 @@ namespace febcode
 			m_stack[slot+3] = s[3];
 		}
 
+		void setMat2At(int slot, const mat2& m)
+		{
+			m_stack[slot    ] = m[0][0];
+			m_stack[slot + 1] = m[0][1];
+			m_stack[slot + 2] = m[1][0];
+			m_stack[slot + 3] = m[1][1];
+		}
+
 		void setMat3At(int slot)
 		{
 			double* s = &m_stack[stackTop - 9]; // last 9 slots
 			memcpy(&m_stack[slot], s, 9 * sizeof(double));
+		}
+
+		void setMat3At(int slot, const mat3& m)
+		{
+			memcpy(&m_stack[slot], &m(0,0), 9 * sizeof(double));
 		}
 
 		void setArrayAt(int slot, const ArrayValue& arr)

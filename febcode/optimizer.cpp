@@ -33,17 +33,37 @@ bool Optimizer::shouldRemoveReturn(ReturnStmt* stmt)
 
 bool Optimizer::shouldRemoveVarDecl(VarDeclStmt* stmt)
 {
+	// Don't remove inputs 
+	if (stmt->input)
+	{
+		for (int i = (int)stmt->vars.size() - 1; i >= 0; i--)
+		{
+			auto& var = stmt->vars[i];
+
+			auto liveIt = live.find(var.get());
+			if (liveIt != live.end())
+				live.erase(liveIt);
+
+			auto assignedIt = assignedLater.find(var.get());
+			if (assignedIt != assignedLater.end())
+				assignedLater.erase(assignedIt);
+
+			updateLiveness(var->initializer.get());
+		}
+		return false;
+	}
+
 	// remove unused variables.
 	for (int i = (int)stmt->vars.size() - 1; i >= 0; i--)
 	{
 		auto& var = stmt->vars[i];
-		if (live.find(var->name) == live.end())
+		if (live.find(var.get()) == live.end())
 		{
-			if (assignedLater.find(var->name) != assignedLater.end())
+			if (assignedLater.find(var.get()) != assignedLater.end())
 			{
 				// the variable is assigned later, so we can't remove the declaration, 
 				// but we can remove the initializer if it exists.
-				assignedLater.erase(var->name);
+				assignedLater.erase(var.get());
 				var->initializer.reset();
 			}
 			else
@@ -51,7 +71,7 @@ bool Optimizer::shouldRemoveVarDecl(VarDeclStmt* stmt)
 		}
 		else
 		{
-			live.erase(var->name);
+			live.erase(var.get());
 			updateLiveness(var->initializer.get());
 		}
 	}
@@ -68,14 +88,14 @@ bool Optimizer::shouldRemoveExprStmt(ExpressionStmt* stmt)
 
 		if (assignExpr->target->exprType == ExpressionType::Variable)
 		{
-			const auto* varExpr = static_cast<const VariableExpr*>(assignExpr->target.get());
-			if (live.find(varExpr->name) == live.end())
+			const auto* varExpr = static_cast<const VariableExpr*>(assignExpr->target.get()); assert(varExpr->var);
+			if (live.find(varExpr->var) == live.end())
 			{
 				// the variable is not live, so we can remove the assignment, but
 				// only if the value being assigned doesn't have side effects, otherwise we need to keep the assignment for the side effects.
 				if (hasSideEffects(assignExpr->value.get()))
 				{
-					assignedLater.insert(varExpr->name);
+					assignedLater.insert(varExpr->var);
 					updateLiveness(assignExpr->value.get());
 					return false; // keep the assignment for the side effects, even though the variable is not live.
 				}
@@ -84,8 +104,8 @@ bool Optimizer::shouldRemoveExprStmt(ExpressionStmt* stmt)
 			}
 			else
 			{
-				assignedLater.insert(varExpr->name);
-				live.erase(varExpr->name);
+				assignedLater.insert(varExpr->var);
+				live.erase(varExpr->var);
 				updateLiveness(assignExpr->value.get());
 				return false;
 			}
@@ -185,7 +205,7 @@ void Optimizer::updateLiveness(Expression* expr)
 	case ExpressionType::Variable:
 	{
 		const auto* varExpr = static_cast<const VariableExpr*>(expr);
-		live.insert(varExpr->name);
+		live.insert(varExpr->var);
 		break;
 	}
 	case ExpressionType::Member:

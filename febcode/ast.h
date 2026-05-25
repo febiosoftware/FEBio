@@ -59,8 +59,11 @@ namespace febcode {
 		LiteralExpr(const Value& v) : Expression(ExpressionType::Literal), value(v) {}
 	};
 
+	struct Var; // see below
+
 	struct VariableExpr : Expression {
 		std::string name;
+		Var* var = nullptr; // pointer to the variable declaration, set during resolution
 		VariableExpr(const std::string& n) : Expression(ExpressionType::Variable), name(n) {}
 	};
 

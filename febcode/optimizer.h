@@ -28,8 +28,8 @@ namespace febcode {
 		bool shouldRemoveFncStmt  (FunctionStmt*   stmt);
 
 	private:
-		std::unordered_set<std::string> live; // variables that are currently live (used in the future)
-		std::unordered_set<std::string> assignedLater; // variables that are re-assigned later
+		std::unordered_set<const Var*> live; // variables that are currently live (used in the future)
+		std::unordered_set<const Var*> assignedLater; // variables that are re-assigned later
 
 		std::ostream* log = nullptr;
 		size_t removedStatements = 0;

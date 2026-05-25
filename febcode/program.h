@@ -80,6 +80,8 @@ namespace febcode {
 		std::vector<Input> inputs;
 		std::unordered_map<std::string, size_t> inputIndices; // maps global variable names to their slot index
 
+		std::vector<VarPtr> injects; // injected variables
+
 		size_t maxStackSize = 0;
 
 		// binary operator signatures for operator overloading

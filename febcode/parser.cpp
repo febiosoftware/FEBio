@@ -9,6 +9,11 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 
 	if (match(TokenType::Input)) 
 	{
+		// make sure we are at the global scope, since inputs can only be declared at the global level
+		if (scopeDepth > 0) {
+			error(currentLoc, "Input declarations can only be made at the global scope.");
+		}
+
 		if (!isType()) {
 			error(currentLoc, "Expected type after 'in'.");
 		}
@@ -84,7 +89,9 @@ std::unique_ptr<febcode::Statement> Parser::parseDeclaration() {
 	return parseStatement();
 }
 
-std::unique_ptr<febcode::Statement> Parser::parseBlockStatement() {
+std::unique_ptr<febcode::Statement> Parser::parseBlockStatement() 
+{
+	scopeDepth++;
 
 	Token startToken = previous(); assert(startToken.type == TokenType::LeftBrace);
 
@@ -101,6 +108,8 @@ std::unique_ptr<febcode::Statement> Parser::parseBlockStatement() {
 	if (!match(TokenType::RightBrace)) {
 		error(currentLoc, "Expected '}' after block.");
 	}
+
+	scopeDepth--;
 
 	return block;
 }

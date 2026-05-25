@@ -16,6 +16,7 @@ namespace febcode {
 			m_ast = prg.ast.get();
 			this->tokens = tokens;
 			current = 0;
+			scopeDepth = 0;
 			currentLoc = tokens.empty() ? SourceLocation{ 0, 0 } : tokens[0].loc;
 			while (!isAtEnd()) {
 				m_ast->root.statements.push_back(parseDeclaration());
@@ -28,6 +29,7 @@ namespace febcode {
 		std::vector<Token> tokens;
 		size_t current;
 		SourceLocation currentLoc;
+		int scopeDepth = 0;
 
 		AST* m_ast;
 
