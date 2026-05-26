@@ -23,3 +23,17 @@ Value febcode::InvertMat2(FuncArgs args)
 		-c * invDet, a * invDet
 	);
 }
+
+Value febcode::TraceMat2(FuncArgs args)
+{
+	assert(args.count == 1);
+	const mat2& m = args.getMat2();
+	return m.trace();
+}
+
+Value febcode::DeterminantMat2(FuncArgs args)
+{
+	assert(args.count == 1);
+	const mat2& m = args.getMat2();
+	return m.det();
+}

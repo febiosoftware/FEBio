@@ -26,3 +26,17 @@ Value febcode::OuterVec3(FuncArgs args)
 		a.z * b.x, a.z * b.y, a.z * b.z
 	);
 }
+
+Value febcode::TraceMat3(FuncArgs args)
+{
+	assert(args.count == 1);
+	const mat3& m = args.getMat3();
+	return m.trace();
+}
+
+Value febcode::DeterminantMat3(FuncArgs args)
+{
+	assert(args.count == 1);
+	const mat3& m = args.getMat3();
+	return m.det();
+}

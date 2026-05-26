@@ -10,6 +10,10 @@ namespace febcode
 	// outer product = outer(vec3, vec3) -> mat3
 	Value OuterVec3(FuncArgs args);
 
+	Value TraceMat3(FuncArgs args);
+
+	Value DeterminantMat3(FuncArgs args);
+
 	class Mat3Module : public Module
 	{
 	public:
@@ -35,6 +39,8 @@ namespace febcode
 			prg.registerNative("transpose", mat3_t, { mat3_t }, TransposeMat3);
 			prg.registerNative("inverse", mat3_t, { mat3_t }, InvertMat3);
 			prg.registerNative("outer", mat3_t, { vec3_t, vec3_t }, OuterVec3);
+			prg.registerNative("trace", double_t, { mat3_t }, TraceMat3);
+			prg.registerNative("det", double_t, { mat3_t }, DeterminantMat3);
 		}
 	};
 }

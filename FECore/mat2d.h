@@ -93,6 +93,16 @@ public:	// matrix operations
 		d[0][0] = d[1][1] = 1.0;
 		d[0][1] = d[1][0] = 0.0;
 	}
+
+	double trace() const 
+	{
+		return d[0][0] + d[1][1];
+	}
+
+	double det() const
+	{
+		return d[0][0]*d[1][1] - d[0][1]*d[1][0];
+	}
 	
 protected:
 	double	d[2][2];
