@@ -19,7 +19,9 @@ ExprPtr Modifier::Call(const std::string& name, const std::vector<ExprPtr>& args
 
 	Type returnType = prg.functions[index].returnType;
 
-	ExprPtr c = std::make_unique<CallExpr>(name, std::move(copyArgs));
+	ExprPtr var = std::make_unique<VariableExpr>(name);
+
+	ExprPtr c = std::make_unique<CallExpr>(std::move(var), std::move(copyArgs));
 	c->valType = returnType;
 	return c;
 }

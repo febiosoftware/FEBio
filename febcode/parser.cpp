@@ -673,7 +673,7 @@ std::unique_ptr<Expression> Parser::finishCall(std::unique_ptr<Expression> calle
 		error(currentLoc, "Expected ')' after arguments.");
 
 	return std::make_unique<CallExpr>(
-		varExpr->name,
+		std::move(callee),
 		std::move(arguments)
 	);
 }
@@ -881,7 +881,8 @@ static void printExprList(std::ostream& os, const std::vector<std::unique_ptr<Ex
 static void printCallExpr(std::ostream& os, const CallExpr* e)
 {
 	os << "CallExpr {\n"; l++;
-	printTabs(os); os << "callee: " << e->name << ",\n";
+	VariableExpr* var = dynamic_cast<VariableExpr*>(e->callee.get());
+	printTabs(os); os << "callee: " << var->name << ",\n";
 	printTabs(os); os << "args: "; printExprList(os, e->arguments); os << "\n";
 	l--;
 	printTabs(os); os << "}";
@@ -1158,7 +1159,8 @@ static void prettyPrintBinaryExpr(std::ostream& os, const BinaryExpr& expr)
 
 static void prettyPrintCallExpr(std::ostream& os, const CallExpr& expr)
 {
-	os << expr.name;
+	VariableExpr* var = dynamic_cast<VariableExpr*>(expr.callee.get());
+	os << var->name;
 	os << "(";
 	size_t n = expr.arguments.size();
 	for (size_t i = 0; i < n; ++i)

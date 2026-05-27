@@ -485,25 +485,26 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const DerivVar& var)
 	}
 
 	// find the function with the matching name and argument types in the program's function definitions
-	int fnIndex = prg.resolveFunction(call->name, argTypes);
+	VariableExpr* calleeVar = dynamic_cast<VariableExpr*>(call->callee.get());
+	std::string fncName = calleeVar->name;
+	int fnIndex = prg.resolveFunction(fncName, argTypes);
 	if (fnIndex == -1)
-		throw std::runtime_error("Function \"" + call->name + "\" not found for differentiation.");
+		throw std::runtime_error("Function \"" + fncName + "\" not found for differentiation.");
 
 	Type returnType = call->valType;
 	Type derivType = getDerivativeType(returnType, var.type->kind);
 
-	const std::string& fnc = call->name;
 	auto& args = call->arguments;
 	if (args.size() == 1)
 	{
 		// differentiate argument
 		auto diffArg = differentiate(args[0].get(), var);
 
-		if      (fnc == "sin") return Mul(Call("cos", args), diffArg);
-		else if (fnc == "cos") return Negate(Mul(Call("sin", args), diffArg));
-		else if (fnc == "exp") return Mul(Call("exp", args), diffArg);
-		else if (fnc == "sqrt") return Mul(Div(Literal(0.5), Call("sqrt", args)), diffArg);
-		else if (fnc == "length" && isVec3Type(args[0]->valType))
+		if      (fncName == "sin") return Mul(Call("cos", args), diffArg);
+		else if (fncName == "cos") return Negate(Mul(Call("sin", args), diffArg));
+		else if (fncName == "exp") return Mul(Call("exp", args), diffArg);
+		else if (fncName == "sqrt") return Mul(Div(Literal(0.5), Call("sqrt", args)), diffArg);
+		else if (fncName == "length" && isVec3Type(args[0]->valType))
 		{
 			if (derivType->kind == TypeKind::Double)
 			{
@@ -518,7 +519,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const DerivVar& var)
 				return Div(Mul(Transpose(diffArg), args[0]), Call("length", args));
 			}
 		}
-		else if (fnc == "normalize" && isVec3Type(args[0]->valType))
+		else if (fncName == "normalize" && isVec3Type(args[0]->valType))
 		{
 			// rewrite normalize(v) as v / length(v), then derivate that
 			ExprPtr normalize = Div(args[0], Call("length", args));
@@ -526,7 +527,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const DerivVar& var)
 		}
 	}
 
-	throw std::runtime_error("Don't know how to differentiate function \"" + fnc + "\".");
+	throw std::runtime_error("Don't know how to differentiate function \"" + fncName + "\".");
 }
 
 ExprPtr Differentiator::diffInit(const InitExpr* init, const DerivVar& var)

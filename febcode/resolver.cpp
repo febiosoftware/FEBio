@@ -373,13 +373,38 @@ void Resolver::resolveCall(CallExpr* expr)
 	{
 		resolveExpression(expr->arguments[i].get());
 		if (expr->arguments[i]->valType == nullptr)
-			error(expr->arguments[i].get(), "Invalid function call argument with unresolved type.");
+			error(expr->arguments[i].get(), "Invalid argument with unresolved type.");
 		argTypes.push_back(expr->arguments[i]->valType);
 	}
 
-	int index = prg.resolveFunction(expr->name, argTypes);
+	// see if the name is a variable first.
+	VariableExpr* varExpr = dynamic_cast<VariableExpr*>(expr->callee.get());
+	Var* var = lookup(varExpr->name);
+	if (var)
+	{
+		varExpr->var = var;
+		varExpr->valType = var->type;
+
+		// this is only allowed for matrix types
+		if (var->type->kind != TypeKind::Mat2 && var->type->kind != TypeKind::Mat3)
+			error(expr, "Variable '" + varExpr->name + "' is not a matrix type.");
+
+		// make sure we only have two arguments for matrix access (row and column)
+		if (expr->arguments.size() != 2)
+			error(expr, "Matrix access requires two indices.");
+
+		// make sure args are ints
+		if (expr->arguments[0]->valType != prg.types.Int() || expr->arguments[1]->valType != prg.types.Int())
+			error(expr, "Matrix access indices must be of type int.");
+
+		expr->valType = prg.types.Double(); // matrix element type is always double
+		return;
+	}
+
+	// assume this is a function call
+	int index = prg.resolveFunction(varExpr->name, argTypes);
 	if (index < 0)
-		error(expr, "Undefined function: " + expr->name + " (or can't match arguments)");
+		error(expr, "Undefined function: " + varExpr->name + " (or can't match arguments)");
 
 	FunctionInfo& func = prg.functions[index];
 	if (func.returnType == nullptr)

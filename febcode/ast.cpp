@@ -28,7 +28,8 @@ ExprPtr febcode::clone(const Expression* expr)
 		{
 			copyArgs.emplace_back(clone(arg.get()));
 		}
-		cpy = std::make_unique<CallExpr>(call->name, std::move(copyArgs));
+		ExprPtr calleeCopy = clone(call->callee.get());
+		cpy = std::make_unique<CallExpr>(std::move(calleeCopy), std::move(copyArgs));
 	}
 	else if (auto call = dynamic_cast<const InitExpr*>(expr))
 	{
@@ -132,7 +133,7 @@ bool febcode::isEqual(const Expression* l, const Expression* r)
 	{
 		if (auto callR = dynamic_cast<const CallExpr*>(r))
 		{
-			return (callL->name == callR->name) && isEqual(callL->arguments, callR->arguments);
+			return isEqual(callL->callee, callR->callee) && isEqual(callL->arguments, callR->arguments);
 		}
 	}
 	else if (auto ctorL = dynamic_cast<const ConstructorExpr*>(l))

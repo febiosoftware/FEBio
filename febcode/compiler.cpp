@@ -284,8 +284,9 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_DOUBLE_MAT2: return -1;
 	case OpCode::DIV_MAT2_DOUBLE: return -1;
 	case OpCode::MUL_MAT2_VEC2 : return -4;
-	case OpCode::GET_MAT2_INDEX: return -3;
 	case OpCode::CREATE_MAT2_DIAG: return +3;
+	case OpCode::GET_MAT2_ELEMENT: return -5; // pops the mat2 and indices, pushes the element
+	case OpCode::GET_MAT2_ELEMENT_REF: return -2; // pops indices
 
 	case OpCode::NEG_MAT3: return 0;
 	case OpCode::ADD_MAT3: return -9;
@@ -295,12 +296,13 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::DIV_MAT3_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_MAT3: return -1;
 	case OpCode::MUL_MAT3_VEC3  : return -9;
-	case OpCode::GET_MAT3_INDEX : return -7;
 	case OpCode::ADD_GLOBAL_MAT3: return +9;
 	case OpCode::SUB_GLOBAL_MAT3: return +9;
 	case OpCode::MUL_GLOBAL_MAT3: return +9;
 	case OpCode::CREATE_MAT3_DIAG: return +8;
 	case OpCode::CREATE_MAT3_VEC3: return +0;
+	case OpCode::GET_MAT3_ELEMENT: return -10; // pops the mat3 and indices, pushes the element
+	case OpCode::GET_MAT3_ELEMENT_REF: return -2; // pops indices
 
 	case OpCode::NOT: return 0;
 
@@ -567,6 +569,10 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 
 Type Compiler::expressionType(Expression* expr)
 {
+	return expr->valType;
+}
+
+/*
 	if (auto l = dynamic_cast<LiteralExpr*>(expr))
 	{
 		return prg.types.getBuiltinType(l->value);
@@ -649,6 +655,7 @@ Type Compiler::expressionType(Expression* expr)
 	}
 	throw std::runtime_error("Unsupported expression type in expressionType");
 }
+*/
 
 void Compiler::compileVarDecl(VarDeclStmt* decl)
 {
@@ -1159,6 +1166,11 @@ Type Compiler::compileLValue(Expression* expr)
 		return compileIndexRef(index);
 	}
 
+	if (auto call = dynamic_cast<CallExpr*>(expr))
+	{
+		return compileCallRef(call);
+	}
+
 	throw std::runtime_error("Invalid assignment target.");
 }
 
@@ -1306,6 +1318,31 @@ Type Compiler::compileIndexRef(IndexExpr* expr)
 	}
 
 	return objectType->elementType;
+}
+
+Type Compiler::compileCallRef(CallExpr* expr)
+{
+	VariableExpr* varExpr = dynamic_cast<VariableExpr*>(expr->callee.get());
+	if ((varExpr == nullptr) || (varExpr->var == nullptr))
+		throw std::runtime_error("Can only assign to the result of a function call if the callee is a simple variable.");
+
+	compileVariableRef(varExpr);
+	compileExpression(expr->arguments[0].get());
+	compileExpression(expr->arguments[1].get());
+
+	if (varExpr->var->type == prg.types.Mat2())
+	{
+		emit(OpCode::GET_MAT2_ELEMENT_REF);
+		return prg.types.Double();
+	}
+
+	if (varExpr->var->type == prg.types.Mat3())
+	{
+		emit(OpCode::GET_MAT3_ELEMENT_REF);
+		return prg.types.Double();
+	}
+
+	throw std::runtime_error("Cannot assign to the result of a function call.");
 }
 
 //
@@ -1723,27 +1760,55 @@ std::vector<Type> Compiler::compileFncArgs(std::vector<std::unique_ptr<Expressio
 
 Type Compiler::compileCall(CallExpr* call)
 {
-	// don't copy args for native functions
+	VariableExpr* varExpr = dynamic_cast<VariableExpr*>(call->callee.get());
+	if (!varExpr)
+		throw std::runtime_error("Only direct function calls are supported.");
+
+	// see if this is a matrix variable
+	if (varExpr->var)
+	{
+		compileVariable(varExpr);
+
+		Type type = compileExpression(call->arguments[0].get());
+		if (type != prg.types.Int())
+			throw std::runtime_error("Row index to matrix must be an integer.");
+
+		type = compileExpression(call->arguments[1].get());
+		if (type != prg.types.Int())
+			throw std::runtime_error("Column index to matrix must be an integer.");
+
+		if (isMat2Type(varExpr->valType))
+			emit(OpCode::GET_MAT2_ELEMENT);
+		else if (isMat3Type(varExpr->valType))
+			emit(OpCode::GET_MAT3_ELEMENT);
+		else
+			error(call, "Only mat2 and mat3 types can be called with two integer arguments.");
+
+		return prg.types.Double();
+	}
+
+	// proceed as normal function call
+	std::string fncName = varExpr->name;
 	std::vector<Type> argTypes = compileFncArgs(call->arguments);
-	int fnIndex = prg.resolveFunction(call->name, argTypes);
+	int fnIndex = prg.resolveFunction(varExpr->name, argTypes);
 	if (fnIndex == -1)
-		throw std::runtime_error("Undefined function: " + call->name);
+		throw std::runtime_error("Undefined function: " + fncName);
 
 	// We don't allow recursive calls.
 	if (currentFunction == fnIndex)
-		throw std::runtime_error("Recursive calls are not allowed: " + call->name);
+		throw std::runtime_error("Recursive calls are not allowed: " + fncName);
 
 	const FunctionInfo& fi = prg.functions[fnIndex];
 
 	// check arg count
 	if (fi.args.size() != (int)call->arguments.size())
-		throw std::runtime_error("Argument count mismatch in call to function: " + call->name);
+		throw std::runtime_error("Argument count mismatch in call to function: " + fncName);
 
 	// check arg types
 	for (int i = 0; i < argTypes.size(); ++i)
 	{
 		if (argTypes[i] != fi.args[i])
-			throw std::runtime_error("Argument type mismatch in call to function: " + call->name);
+			throw std::runtime_error("Argument type mismatch in call to function: " + fncName);
 	}
 
 	stackDepth += (int)fi.maxStackSize;
@@ -1934,26 +1999,6 @@ Type Compiler::compileIndex(IndexExpr* expr)
 		return prg.types.Double();
 	}
 
-	// mat2 indexing
-	if (exprType->kind == TypeKind::Mat2)
-	{
-		if (indxType->kind != TypeKind::Int)
-			throw std::runtime_error("mat2 index must be an integer.");
-
-		emit(OpCode::GET_MAT2_INDEX);
-		return prg.types.Vec2();
-	}
-
-	// mat3 indexing
-	if (exprType->kind == TypeKind::Mat3)
-	{
-		if (indxType->kind != TypeKind::Int)
-			throw std::runtime_error("mat3 index must be an integer.");
-
-		emit(OpCode::GET_MAT3_INDEX);
-		return prg.types.Vec3();
-	}
-
 	if (exprType->kind != TypeKind::Array)
 		throw std::runtime_error("Cannot index non-array type.");
 	if (indxType->kind != TypeKind::Int)
@@ -2125,8 +2170,9 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::MUL_MAT2_VEC2  : return "M2V2";
 	case OpCode::DIV_MAT2_DOUBLE: return "DM2F";
 	case OpCode::NEG_MAT2       : return "NGM2";
-	case OpCode::GET_MAT2_INDEX : return "GM2I";
 	case OpCode::CREATE_MAT2_DIAG: return "MAT2";
+	case OpCode::GET_MAT2_ELEMENT: return "GME2";
+	case OpCode::GET_MAT2_ELEMENT_REF: return "GME2";
 
 	case OpCode::ADD_MAT3       : return "ADM3";
 	case OpCode::SUB_MAT3       : return "SBM3";
@@ -2136,12 +2182,13 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::MUL_DOUBLE_MAT3: return "FM3 ";
 	case OpCode::MUL_MAT3_VEC3  : return "M3V3";
 	case OpCode::NEG_MAT3       : return "NGM3";
-	case OpCode::GET_MAT3_INDEX : return "GM3I";
 	case OpCode::ADD_GLOBAL_MAT3: return "ADM3";
 	case OpCode::SUB_GLOBAL_MAT3: return "SBM3";
 	case OpCode::MUL_GLOBAL_MAT3: return "MLM3";
 	case OpCode::CREATE_MAT3_DIAG: return "MAT3";
 	case OpCode::CREATE_MAT3_VEC3: return "C3V3";
+	case OpCode::GET_MAT3_ELEMENT: return "GME3";
+	case OpCode::GET_MAT3_ELEMENT_REF: return "GME3";
 
 	case OpCode::NOT           : return "NOT ";
 

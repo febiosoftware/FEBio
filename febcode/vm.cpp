@@ -898,18 +898,6 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::GET_MAT2_INDEX:
-		{
-			int index = popInt();
-			mat2& A = popMat2();
-#ifndef NDEBUG
-			if (index < 0 || index > 1)
-				throw std::runtime_error("mat2 index out of bounds.");
-#endif
-			pushVec2(*((vec2*)(&A(index,0))));
-			break;
-		}
-
 		case OpCode::CREATE_MAT2_DIAG:
 		{
 			double a = popDouble();
@@ -917,6 +905,31 @@ Value VM::execute()
 			pushDouble(0.0);
 			pushDouble(0.0);
 			pushDouble(a);
+			break;
+		}
+
+		case OpCode::GET_MAT2_ELEMENT:
+		{
+			int col = popInt();
+			int row = popInt();
+			mat2& A = popMat2();
+#ifndef NDEBUG
+			if (row < 0 || row > 1 || col < 0 || col > 1)
+				throw std::runtime_error("mat2 index out of bounds.");
+#endif
+			pushDouble(A(row, col));
+			break;
+		}
+
+		case OpCode::GET_MAT2_ELEMENT_REF:
+		{
+			int col = popInt();
+			int row = popInt();
+#ifndef NDEBUG
+			if (row < 0 || row > 1 || col < 0 || col > 1)
+				throw std::runtime_error("mat2 index out of bounds.");
+#endif
+			ref.ptr += row * 2 + col;
 			break;
 		}
 
@@ -980,18 +993,6 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::GET_MAT3_INDEX:
-		{
-			int index = popInt();
-			mat3& A = popMat3();
-#ifndef NDEBUG
-			if (index < 0 || index > 2)
-				throw std::runtime_error("mat3 index out of bounds.");
-#endif
-			pushVec3(*((vec3*)(&A(index,0))));
-			break;
-		}
-
 		case OpCode::CREATE_MAT3_DIAG:
 		{
 			double a = popDouble();
@@ -1040,6 +1041,31 @@ Value VM::execute()
 			mat3& A = getMat3At(slotA);
 			mat3& B = getMat3At(slotB);
 			pushMat3(A * B);
+			break;
+		}
+
+		case OpCode::GET_MAT3_ELEMENT:
+		{
+			int col = popInt();
+			int row = popInt();
+			mat3& A = popMat3();
+#ifndef NDEBUG
+			if (row < 0 || row > 2 || col < 0 || col > 2)
+				throw std::runtime_error("mat3 index out of bounds.");
+#endif
+			pushDouble(A(row, col));
+			break;
+		}
+
+		case OpCode::GET_MAT3_ELEMENT_REF:
+		{
+			int col = popInt();
+			int row = popInt();
+#ifndef NDEBUG
+			if (row < 0 || row > 2 || col < 0 || col > 2)
+				throw std::runtime_error("mat3 index out of bounds.");
+#endif
+			ref.ptr += row * 3 + col;
 			break;
 		}
 

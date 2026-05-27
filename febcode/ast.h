@@ -98,11 +98,11 @@ namespace febcode {
 	};
 
 	struct CallExpr : Expression {
-		std::string name;
+		ExprPtr callee;
 		std::vector<ExprPtr> arguments;
 
-		CallExpr(const std::string& name, std::vector<ExprPtr> arguments)
-			: Expression(ExpressionType::Call), name(name),
+		CallExpr(ExprPtr callee, std::vector<ExprPtr> arguments)
+			: Expression(ExpressionType::Call), callee(std::move(callee)),
 			arguments(std::move(arguments)) {}
 	};
 
@@ -134,6 +134,14 @@ namespace febcode {
 			Expression(ExpressionType::Constructor), args(std::move(arguments)) {
 			valType = type;
 		}
+	};
+
+	struct MatAccessExpr : Expression {
+		ExprPtr matrix;
+		int row;
+		int col;
+		MatAccessExpr(ExprPtr matrix, int row, int col)
+			: Expression(ExpressionType::Index), matrix(std::move(matrix)), row(row), col(col) {}
 	};
 
 	// --- Statements ---
@@ -464,7 +472,8 @@ namespace febcode {
 		if (expr->exprType != ExpressionType::Call) return false;
 		auto call = dynamic_cast<const CallExpr*>(expr);
 		if (call->arguments.size() != 1) return false;
-		if (fncName != call->name) return false;
+		VariableExpr* var = dynamic_cast<VariableExpr*>(call->callee.get());
+		if (!var || fncName != var->name) return false;
 		arg = call->arguments[0].get();
 		return true;
 	}
@@ -473,7 +482,8 @@ namespace febcode {
 		if (expr->exprType != ExpressionType::Call) return false;
 		auto call = dynamic_cast<const CallExpr*>(expr);
 		if (call->arguments.size() != 2) return false;
-		if (fncName != call->name) return false;
+		VariableExpr* var = dynamic_cast<VariableExpr*>(call->callee.get());
+		if (!var || fncName != var->name) return false;
 		arg1 = call->arguments[0].get();
 		arg2 = call->arguments[1].get();
 		return true;

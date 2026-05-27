@@ -159,8 +159,9 @@ namespace febcode
 		MUL_DOUBLE_MAT2,
 		MUL_MAT2_VEC2,
 		DIV_MAT2_DOUBLE,
-		GET_MAT2_INDEX,
 		CREATE_MAT2_DIAG,
+		GET_MAT2_ELEMENT,
+		GET_MAT2_ELEMENT_REF,
 
 		// mat3 operators
 		NEG_MAT3,
@@ -171,9 +172,10 @@ namespace febcode
 		MUL_DOUBLE_MAT3,
 		MUL_MAT3_VEC3,
 		DIV_MAT3_DOUBLE,
-		GET_MAT3_INDEX,
 		CREATE_MAT3_DIAG,
 		CREATE_MAT3_VEC3, // create a mat3 from 3 row-vectors
+		GET_MAT3_ELEMENT,
+		GET_MAT3_ELEMENT_REF,
 
 		ADD_GLOBAL_MAT3,
 		SUB_GLOBAL_MAT3,
@@ -298,6 +300,7 @@ namespace febcode
 		Type compileVariableRef(VariableExpr* expr);
 		Type compileMemberRef(MemberExpr* expr);
 		Type compileIndexRef(IndexExpr* expr);
+		Type compileCallRef(CallExpr* expr);
 
 		int resolveMember(Type type, const std::string& member);
 		int resolveMemberOffset(Type type, const std::string& member);

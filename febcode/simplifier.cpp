@@ -123,7 +123,12 @@ Simplifier::Simplifier(Program& prg) : Modifier(prg)
 				if (!isScalar(arg.get(), value)) return nullptr; // not all arguments are scalar constants
 				scalarArgs.push_back(value);
 			}
-			const std::string& fname = call->name;
+
+			VariableExpr* calleeVar = dynamic_cast<VariableExpr*>(call->callee.get());
+			if (!calleeVar) 
+				febcode::error(call, "Unsupported function call in constant folding: callee is not a variable");
+
+			const std::string& fname = calleeVar->name;
 			if (scalarArgs.size() == 1)
 			{
 				// Make sure this list matches the built-in functions defined in the math module!
@@ -441,7 +446,11 @@ ExprPtr Simplifier::simplifyCall(const CallExpr* call)
 		simplifiedArgs.push_back(simplify(arg.get()));
 	}
 
-	ExprPtr tmp = Call(call->name, simplifiedArgs);
+	VariableExpr* calleeVar = dynamic_cast<VariableExpr*>(call->callee.get());
+	if (!calleeVar)
+		febcode::error(call, "Unsupported function call in constant folding: callee is not a variable");
+
+	ExprPtr tmp = Call(calleeVar->name, simplifiedArgs);
 	if (auto result = applyRules(tmp.get()))
 	{
 		return result;

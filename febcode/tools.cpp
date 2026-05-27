@@ -108,13 +108,6 @@ void febcode::writeProgramOpCodes(std::ostream& os, const Program& prg)
 			os << opcodeName << " [" << (int)code[i] << "]";
 			break;
 		}
-		case febcode::OpCode::GET_MAT2_INDEX:
-		{
-			i++;
-			os << opcodeName << " [" << (int)code[i] << "]";
-			break;
-		}
-
 		case febcode::OpCode::CREATE_VEC3_1ARG: os << opcodeName; break;
 		case febcode::OpCode::NEG_VEC3: os << opcodeName; break;
 		case febcode::OpCode::ADD_VEC3: os << opcodeName; break;
@@ -203,6 +196,14 @@ void febcode::writeProgramOpCodes(std::ostream& os, const Program& prg)
 		case febcode::OpCode::GET_INDEX_VEC3:
 		case febcode::OpCode::GET_INDEX_ARRAY:
 		case febcode::OpCode::GET_INDEX_STRUCT:
+			os << opcodeName; break;
+
+		case febcode::OpCode::GET_MAT2_ELEMENT:
+		case febcode::OpCode::GET_MAT2_ELEMENT_REF:
+			os << opcodeName; break;
+
+		case febcode::OpCode::GET_MAT3_ELEMENT:
+		case febcode::OpCode::GET_MAT3_ELEMENT_REF:
 			os << opcodeName; break;
 
 		case febcode::OpCode::GET_VEC2_X_REF: os << opcodeName; break;
