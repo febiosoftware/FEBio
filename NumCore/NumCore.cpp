@@ -50,6 +50,7 @@ SOFTWARE.*/
 #include "SuperLU_MT.h"
 #include "MKLDSSolver.h"
 #include "numcore_api.h"
+#include "ClusterPardisoSolver.h"
 
 //=============================================================================
 // Call this to initialize the NumCore module
@@ -60,6 +61,7 @@ NUMCORE_API void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(PardisoSolver  , "pardiso");
 	REGISTER_FECORE_CLASS(PardisoSolver64, "pardiso_64");
 	REGISTER_FECORE_CLASS(MKLDSSolver, "mkl_dss");
+	REGISTER_FECORE_CLASS(ClusterPardisoSolver, "cpardiso");
 #endif
 
     REGISTER_FECORE_CLASS(PardisoProjectSolver, "pardiso-project");

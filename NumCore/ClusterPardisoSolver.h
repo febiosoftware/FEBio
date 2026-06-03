@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,61 +23,49 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include "FEBioApp.h"
-#include <mpi.h>
-#include <FEBioLib/febio.h>
+#pragma once
+#include <FECore/LinearSolver.h>
+#include "numcore_api.h"
 
-//-----------------------------------------------------------------------------
-// The starting point of the application
-//
-int main(int argc, char* argv[])
+// interface to the cluster pardiso solver from MKL
+class NUMCORE_API ClusterPardisoSolver : public LinearSolver
 {
-	MPI_Init(&argc, &argv);
+	struct Imp;
 
-	int rank = 0;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+public:
+	ClusterPardisoSolver(FEModel* fem);
+	~ClusterPardisoSolver();
 
-	int nret = 0;
-	if (rank == 0)
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) override;
+	bool SetSparseMatrix(SparseMatrix* pA) override;
+
+	bool PreProcess() override;
+	bool Factor() override;
+	bool BackSolve(double* x, double* y) override;
+	void Destroy() override;
+
+private:
+	Imp& m;
+};
+
+class NUMCORE_API ClusterPardisoRuntime
+{
+public:
+	enum COMMANDS
 	{
-		// create the FEBio app
-		FEBioApp febio;
+		SYMBOLIC,
+		FACTOR,
+		BACKSOLVE,
+		DESTROY,
+		FINISH
+	};
 
-		// initialize the app
-		bool init_ok = febio.Init(argc, argv);
+public:
+	static void WorkerLoop();
 
-		// Tell everyone whether initialization was successful
-		int init_status = init_ok ? 1 : 0;
-		MPI_Bcast(&init_status, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	static void Finish();
 
-		// start the FEBio app
-		nret = febio.Run();
-
-		// Don't forget to cleanup
-		febio.Finish();
-
-		// finish the worker threads
-		febio::FinishMPIWorkers();
-	}
-	else
-	{
-		// check whether initialization was successful on rank 0
-		int init_status = 0;
-		MPI_Bcast(&init_status, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-		if (init_status == 0)
-		{
-			fprintf(stderr, "Initialization failed on rank 0. Exiting.\n");
-			nret = 1;
-		}
-		else
-		{
-			febio::RunMPIWorkers();
-		}
-	}
-
-	MPI_Finalize();
-
-	return nret;
-}
+private:
+	// make sure this class cannot be instantiated
+	ClusterPardisoRuntime() = delete;
+};

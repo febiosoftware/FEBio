@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include <FECore/FEMaterial.h>
 #include <NumCore/MatrixTools.h>
 #include <FECore/LinearSolver.h>
+#include <NumCore/ClusterPardisoSolver.h>
 #include <FEBioTest/FEMaterialTest.h>
 #include <FECore/FEFilesystem.h>
 #include "plugin.h"
@@ -592,6 +593,18 @@ bool RunMaterialTest(FEMaterial* mat, double simtime, int steps, double strain, 
 	}
 
 	return b;
+}
+
+// This will start the worker loop for the MPI version of the Pardiso solver.
+// This function is called from the main function, and will not return until the worker is shut down by the master process.
+void RunMPIWorkers()
+{
+	ClusterPardisoRuntime::WorkerLoop();
+}
+
+void FinishMPIWorkers()
+{
+	ClusterPardisoRuntime::Finish();
 }
 
 } // namespace febio

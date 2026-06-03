@@ -91,4 +91,10 @@ namespace febio
 
 	// run a material test
 	FEBIOLIB_API bool RunMaterialTest(FEMaterial* mat, double simtime, int steps, double strain, const char* sztest, std::vector<pair<double, double> >& out);
+
+	// run an MPI worker process
+	FEBIOLIB_API void RunMPIWorkers();
+
+	// finish the MPI worker processes
+	FEBIOLIB_API void FinishMPIWorkers();
 }
