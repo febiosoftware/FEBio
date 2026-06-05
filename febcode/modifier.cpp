@@ -11,13 +11,27 @@ ExprPtr Modifier::Call(const std::string& name, const std::vector<ExprPtr>& args
 		argTypes.push_back(arg->valType);
 	}
 
-	int index = prg.resolveFunction(name, argTypes);
-	if (index < 0)
-	{
-		throw std::runtime_error("Undefined function: " + name);
-	}
 
-	Type returnType = prg.functions[index].returnType;
+	Type returnType;
+	// see if this is a function defined in the program
+	int index = prg.resolveFunction(name, argTypes);
+	if (index >= 0)
+	{
+		returnType = prg.functions[index].returnType;
+	}
+	else
+	{
+		// this could be a matrix variable. Unfortunately, we can't tell that here. 
+		// If there are two args and they are of type int then we assume this is a matrix component extraction
+		if ((args.size() == 2) && (argTypes[0] == prg.types.Int()) && (argTypes[1] == prg.types.Int()))
+		{
+			returnType = prg.types.Double(); // matrix components are always doubles
+		}
+		else
+		{
+			throw std::runtime_error("Undefined function: " + name);
+		}
+	}
 
 	ExprPtr var = std::make_unique<VariableExpr>(name);
 
@@ -168,4 +182,66 @@ ExprPtr Modifier::Binary(BinaryOp op, const Expression* left, const Expression* 
 	ExprPtr b = std::make_unique<BinaryExpr>(std::move(clone(left)), op, std::move(clone(right)));
 	b->valType = sig.resultType;
 	return b;
+}
+
+ExprPtr Modifier::Component(const ExprPtr& expr, int component)
+{
+	if (auto lit = dynamic_cast<const LiteralExpr*>(expr.get()))
+	{
+		if (isVec2(lit->value)) return Literal(lit->value.vec2Value[component]);
+		if (isVec3(lit->value)) return Literal(lit->value.vec3Value(component));
+		if (isMat2(lit->value)) return Literal(lit->value.mat2Value(component / 2, component % 2));
+		if (isMat3(lit->value)) return Literal(lit->value.mat3Value(component / 3, component % 3));
+	}
+	else if (auto var = dynamic_cast<const VariableExpr*>(expr.get()))
+	{
+		if (isVec2Type(var->valType) || isVec3Type(var->valType))
+		{
+			std::string compName;
+			switch (component)
+			{
+			case 0: compName = "x"; break;
+			case 1: compName = "y"; break;
+			case 2: compName = "z"; break;
+			default: throw std::runtime_error("Invalid component index in extractComponent");
+			}
+
+			auto varExpr = std::make_unique<VariableExpr>(var->name);
+			varExpr->valType = var->valType;
+			return Member(std::move(varExpr), compName);
+		}
+		else if (isMat2Type(var->valType))
+		{
+			auto varCopy = std::make_unique<VariableExpr>(var->name);
+			varCopy->valType = var->valType;
+
+			int i = component / 2;
+			int j = component % 2;
+
+			std::vector<ExprPtr> args;
+			args.emplace_back(Literal(i));
+			args.emplace_back(Literal(j));
+
+			auto compExpr = std::make_unique<CallExpr>(std::move(varCopy), std::move(args));
+			compExpr->valType = prg.types.Double();
+			return compExpr;
+		}
+		else if (isMat3Type(var->valType))
+		{
+			auto varCopy = std::make_unique<VariableExpr>(var->name);
+			varCopy->valType = var->valType;
+
+			int i = component / 3;
+			int j = component % 3;
+
+			std::vector<ExprPtr> args;
+			args.emplace_back(Literal(i));
+			args.emplace_back(Literal(j));
+
+			auto compExpr = std::make_unique<CallExpr>(std::move(varCopy), std::move(args));
+			compExpr->valType = prg.types.Double();
+			return compExpr;
+		}
+	}
+	throw std::runtime_error("Cannot extract component from expression");
 }

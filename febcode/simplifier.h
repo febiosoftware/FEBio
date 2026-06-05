@@ -21,6 +21,8 @@ namespace febcode {
 		ExprPtr simplifyBinary     (const BinaryExpr* expr);
 		ExprPtr simplifyAssign     (const AssignExpr* expr);
 
+		ExprPtr extractComponent(const Expression* expr, int component);
+
 		ExprPtr applyRules(const Expression* expr);
 
 		using RuleFn = std::function<ExprPtr (const Expression* e)>;

@@ -87,6 +87,8 @@ namespace febcode
 			return Binary(febcode::BinaryOp::Exponent, left, right); 
 		}
 
+		febcode::ExprPtr Component(const febcode::ExprPtr& expr, int component);
+
 		febcode::ExprPtr Add(const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(febcode::BinaryOp::Plus    , left, right); }
 		febcode::ExprPtr Sub(const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(febcode::BinaryOp::Minus   , left, right); }
 		febcode::ExprPtr Mul(const febcode::ExprPtr& left, const febcode::ExprPtr& right) { return Binary(febcode::BinaryOp::Multiply, left, right); }

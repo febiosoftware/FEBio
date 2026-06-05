@@ -13,12 +13,13 @@ namespace febcode {
 		{
 			std::string name; // name of the derivative variable
 			Type type; // type of the derivative variable
+			int component = -1; // -1 for full derivative, or component index for partial derivative of nonscalar variables
 		};
 
 	public:
 		Differentiator(Program& prg) : Modifier(prg), simplifier(prg) {}
 
-		void differentiate(const std::string& var);
+		void differentiate(const std::string& var, int component = -1);
 
 		bool DependencyFound() const { return dependencyFound; }
 
@@ -53,7 +54,7 @@ namespace febcode {
 		std::unique_ptr<Expression> diffIndex      (const IndexExpr*       index   , const DerivVar& var);
 		std::unique_ptr<Expression> diffMember     (const MemberExpr*      member  , const DerivVar& var);
 
-		Type getDerivativeType(Type varType, TypeKind derivType);
+		Type getDerivativeType(Type varType, const DerivVar& dvar);
 
 		ExprPtr simplify(const Expression* expr) 
 		{ 

@@ -143,6 +143,7 @@ void febcode::writeProgramOpCodes(std::ostream& os, const Program& prg)
 		case febcode::OpCode::MUL_DOUBLE_MAT3: os << opcodeName; break;
 		case febcode::OpCode::DIV_MAT3_DOUBLE: os << opcodeName; break;
 		case febcode::OpCode::MUL_MAT3_VEC3: os << opcodeName; break;
+		case febcode::OpCode::NEG_MAT3: os << opcodeName; break;
 
 		case febcode::OpCode::ADD_GLOBAL_MAT3:
 		case febcode::OpCode::SUB_GLOBAL_MAT3:
