@@ -178,6 +178,7 @@ SOFTWARE.*/
 #include "FEYeoh.h"
 #include "FEScaledElasticMaterial.h"
 #include "FEScaledUncoupledMaterial.h"
+#include "FEScriptedElasticMaterial.h"
 #include "FEPressureLoad.h"
 #include "FEScriptedPressureLoad.h"
 #include "FEScriptedTractionLoad.h"
@@ -393,6 +394,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELungMaterial, "lung");
     REGISTER_FECORE_CLASS(FEKinematicGrowth, "kinematic growth");
     REGISTER_FECORE_CLASS(FEScaledElasticMaterial, "scaled elastic");
+	REGISTER_FECORE_CLASS(FEScriptedElasticMaterial, "elastic material script");
 
 	// These materials are derived from FEElasticMaterial and use FEElasticMaterials
 	REGISTER_FECORE_CLASS(FEElasticMixture, "solid mixture");

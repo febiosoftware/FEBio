@@ -40,6 +40,15 @@ public:
 			return g.slot;
 		}
 
+		int AddGlobalMat3(const std::string& name)
+		{
+			Global g;
+			g.name = name;
+			g.slot = program.injectGlobal(name, program.types.Mat3());
+			globals.push_back(g);
+			return g.slot;
+		}
+
 		void SetReturnType(FEValueType type)
 		{
 			switch (type)
@@ -205,6 +214,7 @@ public:
 	struct Derive {
 		Script code;
 		std::string varName; // variable with respect to which we are taking the derivative
+		int varComp = -1; // component of derivative variable 
 		bool isNullProgram = false; // flag to indicate if the derivative program is null (i.e. the original program does not depend on the variable we're differentiating with respect to)
 
 		bool Init()
@@ -221,7 +231,7 @@ public:
 			if (varType == nullptr) return false;
 
 			febcode::Differentiator diff(code.program);
-			diff.differentiate(varName);
+			diff.differentiate(varName, varComp);
 
 			if (!diff.DependencyFound())
 			{
@@ -323,35 +333,78 @@ bool FEScriptedBehavior::Init()
 	}
 
 	// add the variables to the globals list
+	int nderivs = 0;
 	for (int i = 0; i < nvars; ++i)
 	{
 		switch (ctx.variables[i].type)
 		{
 		case FEValueType::Double: m.code.AddGlobalDouble(varNamesPrefixed[i]); break;
 		case FEValueType::Vec3d : m.code.AddGlobalVec3  (varNamesPrefixed[i]); break;
+		case FEValueType::Mat3d : m.code.AddGlobalMat3  (varNamesPrefixed[i]); break;
 		default:
 			feLogErrorEx(m.fem, "Unsupported variable type for variable \"%s\"", ctx.variables[i].name.c_str());
 			return false;
 		}
+
+		// count components for differentiation
+		if (ctx.variables[i].differentiable && ctx.variables[i].diffComponents)
+		{
+			switch (ctx.variables[i].type)
+			{
+			case FEValueType::Double: nderivs += 1; break;
+			case FEValueType::Vec3d : nderivs += 3; break;
+			case FEValueType::Mat3d : nderivs += 9; break;
+			}
+		}
+		else
+		{
+			nderivs += 1; // even if a variable is not differentiable, we still add a placeholder for its derivative (which will be optimized out later)
+		}
 	}
 
 	// construct the derivatives
-	m.valDeriv.resize(nvars);
+	m.valDeriv.resize(nderivs);
+	nderivs = 0;
 	for (int i = 0; i < nvars; ++i)
 	{
-		m.valDeriv[i].code.script = m.code.script;
-		m.valDeriv[i].varName = varNamesPrefixed[i];
-		m.valDeriv[i].code.pc = m.code.pc;
+		ScriptContext::Variable& var = ctx.variables[i];
 
-		// add the variables to the derivative code's global list
-		for (int j = 0; j < nvars; ++j)
+		if (var.differentiable)
 		{
-			switch (ctx.variables[j].type)
+			int ncomps = 1;
+			if (var.diffComponents)
 			{
-			case FEValueType::Double: m.valDeriv[i].code.AddGlobalDouble(varNamesPrefixed[j]); break;
-			case FEValueType::Vec3d: m.valDeriv[i].code.AddGlobalVec3(varNamesPrefixed[j]); break;
+				switch (var.type)
+				{
+				case FEValueType::Vec3d: ncomps = 3; break;
+				case FEValueType::Mat3d: ncomps = 9; break;
+				default:
+					return false;
+				}
+			}
+
+			for (int j=0; j<ncomps; ++j)
+			{
+				m.valDeriv[nderivs].code.script = m.code.script;
+				m.valDeriv[nderivs].varName = varNamesPrefixed[i];
+				m.valDeriv[nderivs].varComp = (ncomps == 1 ? -1 : j);
+				m.valDeriv[nderivs].code.pc = m.code.pc;
+
+				// add the variables to the derivative code's global list
+				for (int j = 0; j < nvars; ++j)
+				{
+					switch (ctx.variables[j].type)
+					{
+					case FEValueType::Double: m.valDeriv[nderivs].code.AddGlobalDouble(varNamesPrefixed[j]); break;
+					case FEValueType::Vec3d : m.valDeriv[nderivs].code.AddGlobalVec3(varNamesPrefixed[j]); break;
+					case FEValueType::Mat3d : m.valDeriv[nderivs].code.AddGlobalMat3(varNamesPrefixed[j]); break;
+					}
+				}
+				nderivs++;
 			}
 		}
+		else
+			nderivs++;
 	}
 
 	// compile the main program
@@ -369,7 +422,7 @@ bool FEScriptedBehavior::Init()
 		deriv_i.code.SetReturnType(ctx.returnType); 
 
 		// if the corresponding variable is not differentiable, we mark the derivative program as null and skip initialization
-		if (!ctx.variables[i].differentiable)
+		if (deriv_i.varName.empty())
 		{
 			deriv_i.isNullProgram = true;
 			continue;
@@ -402,7 +455,11 @@ bool FEScriptedBehavior::Init()
 		}
 		else
 		{
-			feLogEx(m.fem, "Derivative AST w.r.t %s :\n>>>\n", deriv_i.varName.c_str());
+			if (deriv_i.varComp == -1)
+				feLogEx(m.fem, "Derivative AST w.r.t %s :\n>>>\n", deriv_i.varName.c_str());
+			else
+				feLogEx(m.fem, "Derivative AST w.r.t %s[%d] :\n>>>\n", deriv_i.varName.c_str(), deriv_i.varComp);
+
 			std::stringstream ss;
 			febcode::prettyPrintAST(ss, *deriv_i.code.program.ast);
 			feLogEx(m.fem, "%s\n<<<\n\n", ss.str().c_str());
