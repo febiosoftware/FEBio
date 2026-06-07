@@ -117,6 +117,7 @@ SOFTWARE.*/
 #include "FEVerondaWestmann.h"
 #include "FEViscoElasticDamage.h"
 #include "FEViscoElasticMaterial.h"
+#include "FESSVQLV.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEElasticFiberMaterial.h"
 #include "FEElasticFiberMaterialUC.h"
@@ -377,6 +378,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEStVenantKirchhoff, "St.Venant-Kirchhoff");
     REGISTER_FECORE_CLASS(FEViscoElasticDamage, "viscoelastic damage");
 	REGISTER_FECORE_CLASS(FEViscoElasticMaterial, "viscoelastic");
+    REGISTER_FECORE_CLASS(FESSVQLV, "SSV-QLV");
 	REGISTER_FECORE_CLASS(FEElasticMultigeneration, "multigeneration");
 	REGISTER_FECORE_CLASS(FERemodelingElasticMaterial, "remodeling solid");
 	REGISTER_FECORE_CLASS(FECarterHayesOld, "Carter-Hayes (old)");
