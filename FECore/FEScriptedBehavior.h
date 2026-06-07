@@ -92,7 +92,7 @@ struct FECORE_API ScriptContext
 		std::string name;
 		FEValueType type;
 		bool differentiable;
-		bool diffComponents;
+		bool directional;
 	};
 
 	FEValueType returnType; // expected return type of the script
@@ -101,9 +101,9 @@ struct FECORE_API ScriptContext
 	bool allowMappedInputs = true; // if true, input variables can be mapped. 
 	bool allowVolatileInputs = true; // if true, input variables can be assigned load controllers
 
-	void addVariable(const std::string& name, FEValueType type, bool differentiable, bool diffComponents = false)
+	void addVariable(const std::string& name, FEValueType type, bool differentiable, bool directional = false)
 	{
-		variables.push_back({ name, type, differentiable, diffComponents });
+		variables.push_back({ name, type, differentiable, directional });
 	}
 
 	bool operator == (const ScriptContext& other) const

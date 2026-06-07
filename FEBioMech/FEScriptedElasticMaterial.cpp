@@ -54,16 +54,16 @@ tens4ds FEScriptedElasticMaterial::Tangent(FEMaterialPoint& pt)
 {
 	FEElasticMaterialPoint& ep = *pt.ExtractData<FEElasticMaterialPoint>();
 
-	std::vector<FEValue> vars(1);
+	std::vector<FEValue> vars(2); // we need one more for the directional derivative
 	vars[0] = ep.RightCauchyGreen();
 
 	// calculate derivatives
-	mat3ds dSdC00 = DerivValue(pt, vars, 0).toMat3d().sym();
-	mat3ds dSdC01 = DerivValue(pt, vars, 1).toMat3d().sym();
-	mat3ds dSdC02 = DerivValue(pt, vars, 2).toMat3d().sym();
-	mat3ds dSdC11 = DerivValue(pt, vars, 4).toMat3d().sym();
-	mat3ds dSdC12 = DerivValue(pt, vars, 5).toMat3d().sym();
-	mat3ds dSdC22 = DerivValue(pt, vars, 8).toMat3d().sym();
+	vars[1] = mat3d(1, 0, 0, 0, 0, 0, 0, 0, 0);	mat3ds dSdC00 = DerivValue(pt, vars, 0).toMat3d().sym();
+	vars[1] = mat3d(0, 1, 0, 0, 0, 0, 0, 0, 0);	mat3ds dSdC01 = DerivValue(pt, vars, 0).toMat3d().sym();
+	vars[1] = mat3d(0, 0, 1, 0, 0, 0, 0, 0, 0);	mat3ds dSdC02 = DerivValue(pt, vars, 0).toMat3d().sym();
+	vars[1] = mat3d(0, 0, 0, 0, 1, 0, 0, 0, 0);	mat3ds dSdC11 = DerivValue(pt, vars, 0).toMat3d().sym();
+	vars[1] = mat3d(0, 0, 0, 0, 0, 1, 0, 0, 0);	mat3ds dSdC12 = DerivValue(pt, vars, 0).toMat3d().sym();
+	vars[1] = mat3d(0, 0, 0, 0, 0, 0, 0, 0, 1);	mat3ds dSdC22 = DerivValue(pt, vars, 0).toMat3d().sym();
 
 	// collect all terms
 	double D[6][6] = { 0 };
