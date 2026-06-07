@@ -9,17 +9,27 @@
 namespace febcode {
 	class Differentiator : public Modifier {
 
+	public:
+		enum DiffMode {
+			SCALAR,		// scalar differentiation (for scalar variables or components of non-scalar variables)
+			GRADIENT,	// gradient differentiation (for vector variables)
+			DIRECTIONAL // directional differentiation (for directional derivatives)
+		};
+
+	private:
 		struct DerivVar
 		{
+			DiffMode mode; // differentiation mode
 			std::string name; // name of the derivative variable
 			Type type; // type of the derivative variable
 			int component = -1; // -1 for full derivative, or component index for partial derivative of nonscalar variables
+			std::string tangentVar; // name of the tangent variable for directional differentiation
 		};
 
 	public:
 		Differentiator(Program& prg) : Modifier(prg), simplifier(prg) {}
 
-		void differentiate(const std::string& var, int component = -1);
+		void differentiate(DiffMode dm, const std::string& var, int component = -1, const std::string& tangentVar = "");
 
 		bool DependencyFound() const { return dependencyFound; }
 

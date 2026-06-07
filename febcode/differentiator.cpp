@@ -9,60 +9,45 @@ Type Differentiator::getDerivativeType(Type varType, const DerivVar& dvar)
 {
 	TypeKind derivType = dvar.type->kind;
 
-	// taking derivative w.r.t. a component is the same as scalar differentiation
-	if (dvar.component != -1) derivType = TypeKind::Double;
-
-	if (derivType == TypeKind::Double)
+	switch (dvar.mode)
 	{
-		// only floating types are supported for derivation. 
-		switch (varType->kind)
+	case DiffMode::SCALAR:
+		return varType; // scalar differentiation does not change the type
+	case DiffMode::GRADIENT:
+	{
+		if (derivType == TypeKind::Vec2)
 		{
-		case TypeKind::Int: return prg.types.Double(); // treat this as double due to coercion rule
-		case TypeKind::Double:
-		case TypeKind::Vec2:
-		case TypeKind::Vec3:
-		case TypeKind::Mat2:
-		case TypeKind::Mat3:
-		case TypeKind::Struct:
-		case TypeKind::Array:
-			return varType;
+			if (varType->kind == TypeKind::Double) return prg.types.Vec2();
+			if (varType->kind == TypeKind::Vec2) return prg.types.Mat2();
 		}
+		if (derivType == TypeKind::Vec3)
+		{
+			if (varType->kind == TypeKind::Double) return prg.types.Vec3();
+			if (varType->kind == TypeKind::Vec3  ) return prg.types.Mat3();
+		}
+		break;
 	}
-	else if (derivType == TypeKind::Vec2)
-	{
-		if (varType->kind == TypeKind::Double) return prg.types.Vec2();
-		if (varType->kind == TypeKind::Vec2) return prg.types.Mat2();
+	case DiffMode::DIRECTIONAL:
+		return varType; // directional differentiation does not change the type
 	}
-	else if (derivType == TypeKind::Vec3)
-	{
-		if (varType->kind == TypeKind::Double) return prg.types.Vec3();
-		if (varType->kind == TypeKind::Vec3  ) return prg.types.Mat3();
-	}
+
 	throw std::runtime_error("Can't determine type of derivative.");
 }
 
-void Differentiator::differentiate(const std::string& var, int component)
+void Differentiator::differentiate(DiffMode dm, const std::string& var, int component, const std::string& tangentVar)
 {
 	// get the variable's type
 	Type varType = prg.globalType(var);
 	if (varType == nullptr)
 		throw std::runtime_error("Variable not found in program: " + var);
 
-	DerivVar dvar{ var, varType, component };
+	DerivVar dvar{ dm, var, varType, component, tangentVar };
 
-	// update the program's return type
-	if (prg.returnType)
+	// verify inputs
+	if (dm == DiffMode::SCALAR)
 	{
-		Type derivType = getDerivativeType(prg.returnType, dvar);
-		prg.returnType = derivType;
-	}
-
-	// verify components
-	if (varType == prg.types.Double() && component != -1)
-		throw std::runtime_error("Cannot specify component index for scalar variable: " + var);
-
-	if (component != -1)
-	{
+		if ((varType->kind == TypeKind::Double) && (component != -1))
+			throw std::runtime_error("Cannot specify component index for scalar variable: " + var);
 		if (varType->kind == TypeKind::Vec2 && (component < 0 || component > 1))
 			throw std::runtime_error("Invalid component index for vec2 variable: " + std::to_string(component));
 		if (varType->kind == TypeKind::Vec3 && (component < 0 || component > 2))
@@ -71,6 +56,37 @@ void Differentiator::differentiate(const std::string& var, int component)
 			throw std::runtime_error("Invalid component index for mat2 variable: " + std::to_string(component));
 		if (varType->kind == TypeKind::Mat3 && (component < 0 || component > 8))
 			throw std::runtime_error("Invalid component index for mat3 variable: " + std::to_string(component));
+	}
+	else if (dm == DiffMode::GRADIENT)
+	{
+		if (varType->kind != TypeKind::Vec2 && varType->kind != TypeKind::Vec3)
+			throw std::runtime_error("Gradient differentiation is only supported for vector variables: " + var);
+		if (component != -1)
+			throw std::runtime_error("Cannot specify component index for gradient differentiation: " + var);
+	}
+	else if (dm == DiffMode::DIRECTIONAL)
+	{
+		if (tangentVar.empty())
+			throw std::runtime_error("Tangent variable name must be specified for directional differentiation.");
+		Type tangentType = prg.globalType(tangentVar);
+		if (tangentType == nullptr)
+			throw std::runtime_error("Tangent variable not found in program: " + tangentVar);
+		if (tangentType->kind != varType->kind)
+			throw std::runtime_error("Tangent variable type must match the type of the variable being differentiated: " + tangentVar);
+		if (component != -1)
+			throw std::runtime_error("Cannot specify component index for directional differentiation: " + var);
+		if ((varType->kind != TypeKind::Vec2) && (varType->kind != TypeKind::Vec3) &&
+			(varType->kind != TypeKind::Mat2) && (varType->kind != TypeKind::Mat3))
+		{
+			throw std::runtime_error("Directional differentiation is only supported for vector and matrix variables: " + var);
+		}
+	}
+
+	// update the program's return type
+	if (prg.returnType)
+	{
+		Type derivType = getDerivativeType(prg.returnType, dvar);
+		prg.returnType = derivType;
 	}
 
 	// differentiate the program's AST
@@ -313,7 +329,7 @@ ExprPtr Differentiator::differentiate(const Expression* expr, const DerivVar& va
 ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const DerivVar& var)
 {
 	// scalar derivation
-	if ((var.type->kind == TypeKind::Double) || (var.component != -1))
+	if ((var.type->kind == TypeKind::Double) || (var.component != -1) || (var.mode == DiffMode::DIRECTIONAL))
 	{
 		// The derivative of a constant is zero
 		switch (literal->value.index)
@@ -349,6 +365,20 @@ ExprPtr Differentiator::diffLiteral(const LiteralExpr* literal, const DerivVar& 
 		}
 	}
 
+	// directional derivative
+	if (var.mode == DiffMode::DIRECTIONAL)
+	{
+		switch (literal->value.index)
+		{
+		case ValueIndex::INT:
+		case ValueIndex::DOUBLE: return Literal(0.0);
+		case ValueIndex::VEC2  : return Literal(vec2());
+		case ValueIndex::VEC3  : return Literal(vec3());
+		case ValueIndex::MAT2  : return Literal(mat2());
+		case ValueIndex::MAT3  : return Literal(mat3());
+		}
+	}
+
 	throw std::runtime_error("Don't know how to differentiate this literal type.");
 }
 
@@ -358,7 +388,12 @@ ExprPtr Differentiator::diffVariable(const VariableExpr* variable, const DerivVa
 
 	if (variable->name == var.name)
 	{
-		// The derivative of a variable with respect to itself is 1
+		if (var.mode  == DiffMode::DIRECTIONAL)
+		{
+			// The derivative of a variable with respect to itself in the direction of a tangent variable is the tangent variable
+			return Variable(var.tangentVar, derivType);
+		}
+
 		if (var.component == -1)
 		{
 			switch (derivType->kind)
@@ -467,7 +502,7 @@ std::unique_ptr<Expression> Differentiator::diffBinary(const BinaryExpr* binary,
 	Type drtype = dright->valType;
 
 	// scalar differentation
-	if ((var.type->kind == TypeKind::Double) || (var.component != -1))
+	if ((var.type->kind == TypeKind::Double) || (var.component != -1) || (var.mode == DiffMode::DIRECTIONAL))
 	{
 		if (isScalarType(ltype) && isScalarType(rtype))
 		{
@@ -624,7 +659,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const DerivVar& var)
 		}
 		else if ((fncName == "trace") && isMat3Type(args[0]->valType))
 		{
-			if ((var.type->kind == TypeKind::Double) || (var.component != -1))
+			if ((var.type->kind == TypeKind::Double) || (var.component != -1) || (var.mode == DiffMode::DIRECTIONAL))
 			{
 				assert(diffArg->valType->kind == TypeKind::Mat3);
 				// d(trace(m)) = sum of the diagonal elements of d(m)
@@ -633,7 +668,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const DerivVar& var)
 		}
 		else if ((fncName == "det") && isMat3Type(args[0]->valType))
 		{
-			if ((var.type->kind == TypeKind::Double) || (var.component != -1))
+			if ((var.type->kind == TypeKind::Double) || (var.component != -1) || (var.mode == DiffMode::DIRECTIONAL))
 			{
 				assert(diffArg->valType->kind == TypeKind::Mat3);
 				// d(det(m)) = det(m) * trace( inverse(m) * d(m) )
@@ -644,7 +679,7 @@ ExprPtr Differentiator::diffCall(const CallExpr* call, const DerivVar& var)
 		}
 		else if ((fncName == "inverse") && isMat3Type(args[0]->valType))
 		{
-			if ((derivType->kind == TypeKind::Double) || (var.component != -1))
+			if ((derivType->kind == TypeKind::Double) || (var.component != -1) || (var.mode == DiffMode::DIRECTIONAL))
 			{
 				assert(diffArg->valType->kind == TypeKind::Mat3);
 				// d(inverse(m)) = - inverse(m) * d(m) * inverse(m)
@@ -671,7 +706,7 @@ ExprPtr Differentiator::diffConstructor(const ConstructorExpr* ctor, const Deriv
 	// determine the type of the derivative variable based on the type of the original variable and the derivative variable.
 	Type derivType = getDerivativeType(ctor->valType, var);
 
-	if ((var.type->kind == TypeKind::Double) || (var.component != -1))
+	if ((var.type->kind == TypeKind::Double) || (var.component != -1) || (var.mode == DiffMode::DIRECTIONAL))
 	{
 		std::vector<ExprPtr> diffArgs;
 		for (const auto& arg : ctor->args)
@@ -786,7 +821,7 @@ std::unique_ptr<Expression> Differentiator::diffMember(const MemberExpr* member,
 
 std::unique_ptr<Expression> Differentiator::diffIndex(const IndexExpr* index, const DerivVar& var)
 {
-	if ((var.type->kind == TypeKind::Double) || (var.component != -1))
+	if ((var.type->kind == TypeKind::Double) || (var.component != -1) || (var.mode == DiffMode::DIRECTIONAL))
 	{
 		// For an index access expression, we can use the rule: d( obj[i] ) --> d(obj)[i]
 		auto dobj = differentiate(index->object.get(), var);
