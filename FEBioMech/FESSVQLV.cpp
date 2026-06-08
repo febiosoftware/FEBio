@@ -53,6 +53,7 @@ FESSVQLVMaterialPoint::FESSVQLVMaterialPoint(FEMaterialPointData* mp) : FEMateri
     m_Cs = m_Csp = mat3dd(1);
     m_Cd = m_Cdp = mat3dd(1);
     m_H = m_Hp = mat3ds(0);
+    m_sed = m_sedp = 0;
     m_Sm = m_Smp = mat3ds(0);
     m_Chatm.zero(); m_Chatmp.zero();
 }
@@ -66,6 +67,7 @@ void FESSVQLVMaterialPoint::Init()
     m_Cs = m_Csp = mat3dd(1);
     m_Cd = m_Cdp = mat3dd(1);
     m_H = m_Hp = mat3ds(0);
+    m_sed = m_sedp = 0;
     m_Sm = m_Smp = mat3ds(0);
     m_Chatm.zero(); m_Chatmp.zero();
 }
@@ -128,7 +130,7 @@ tens4dmm FESSVQLVMaterialPoint::dHdC(mat3ds C)
         std::swap(lam2[0], lam2[2]);
         std::swap(Ui[0], Ui[2]);
     }
-    if ((fabs(lam2[0] - lam2[2]) < eps) && (fabs(lam2[1] - lam2[2]) > eps)) {
+    else if ((fabs(lam2[0] - lam2[2]) < eps) && (fabs(lam2[1] - lam2[2]) > eps)) {
         // swap eigenvalues 1 and 2
         rep = 1;
         std::swap(lam2[1], lam2[2]);
@@ -173,7 +175,7 @@ tens4dmm FESSVQLVMaterialPoint::dHdC(mat3ds C)
 
 tens4dmm FESSVQLVMaterialPoint::dCdH(mat3ds C)
 {
-    double eps = 1e-6;
+/*    double eps = 1e-6;
     double lam2[3];
     vec3d u[3];
     C.eigen2(lam2,u);
@@ -188,7 +190,7 @@ tens4dmm FESSVQLVMaterialPoint::dCdH(mat3ds C)
         std::swap(lam2[0], lam2[2]);
         std::swap(Ui[0], Ui[2]);
     }
-    if ((fabs(lam2[0] - lam2[2]) < eps) && (fabs(lam2[1] - lam2[2]) > eps)) {
+    else if ((fabs(lam2[0] - lam2[2]) < eps) && (fabs(lam2[1] - lam2[2]) > eps)) {
         // swap eigenvalues 1 and 2
         rep = 1;
         std::swap(lam2[1], lam2[2]);
@@ -203,6 +205,8 @@ tens4dmm FESSVQLVMaterialPoint::dCdH(mat3ds C)
         for (int i=0; i<3; ++i) Ui[i] = dyad(u[i]);
     }
     
+    double lnlam2[3];
+    for (int i=0; i<3; ++i) lnlam2[i] = log(lam2[i]);
     tens4dmm result, UixUi, IoI;
     IoI = dyad4s(mat3dd(1));
     result.zero(); UixUi.zero();
@@ -212,24 +216,26 @@ tens4dmm FESSVQLVMaterialPoint::dCdH(mat3ds C)
         result += tmp*lam2[i];
     }
     
-    tens4ds dUidC[3];
+    tens4ds dUidH[3];
     if (rep == 0) {
-        dUidC[0] = dyad4s(Ui[0], Ui[1])/(lam2[0]-lam2[1]) + dyad4s(Ui[0], Ui[2])/(lam2[0]-lam2[2]);
-        dUidC[1] = dyad4s(Ui[1], Ui[2])/(lam2[1]-lam2[2]) + dyad4s(Ui[1], Ui[0])/(lam2[1]-lam2[0]);
-        dUidC[2] = dyad4s(Ui[2], Ui[0])/(lam2[2]-lam2[0]) + dyad4s(Ui[2], Ui[1])/(lam2[2]-lam2[1]);
+        dUidH[0] = dyad4s(Ui[0], Ui[1])/(lnlam2[0]-lnlam2[1]) + dyad4s(Ui[0], Ui[2])/(lnlam2[0]-lnlam2[2]);
+        dUidH[1] = dyad4s(Ui[1], Ui[2])/(lnlam2[1]-lnlam2[2]) + dyad4s(Ui[1], Ui[0])/(lnlam2[1]-lnlam2[0]);
+        dUidH[2] = dyad4s(Ui[2], Ui[0])/(lnlam2[2]-lnlam2[0]) + dyad4s(Ui[2], Ui[1])/(lnlam2[2]-lnlam2[1]);
         
-        for (int i=0; i<3; ++i) result += dUidC[i]*lam2[i];
+        for (int i=0; i<3; ++i) result += dUidH[i]*lam2[i];
     }
     else if (rep == 1) {
-        dUidC[2] = dyad4s(Ui[2], Ui[0])/(lam2[2]-lam2[0]) + dyad4s(Ui[2], Ui[1])/(lam2[2]-lam2[1]);
-        
-        result += (IoI-UixUi)*(lam2[0]/log(lam2[0])) + dUidC[2]*(lam2[2]-log(lam2[2])*lam2[0]/log(lam2[0]));
+        dUidH[2] = dyad4s(Ui[2], Ui[0])/(lnlam2[2]-lnlam2[0]) + dyad4s(Ui[2], Ui[1])/(lnlam2[2]-lnlam2[1]);
+
+        result += (IoI-UixUi)*(lam2[0]/lnlam2[0]) + dUidH[2]*(lam2[2]-lnlam2[2]*lam2[0]/lnlam2[0]);
     }
     else {
-        result += (IoI-UixUi)*(lam2[0]/log(lam2[0]));
+        if (lnlam2[0] > 0) result += (IoI-UixUi)*(lam2[0]/lnlam2[0]);
     }
     
-    return result;
+    return result;*/
+    tens4dmm result = dHdC(C);
+    return result.inverse();
 }
 
 //-----------------------------------------------------------------------------
@@ -242,7 +248,7 @@ FEMaterialPointData* FESSVQLVMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
-//! Update material point data.
+//! p p material point data.
 void FESSVQLVMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
     double dt = timeInfo.timeIncrement;
@@ -293,6 +299,7 @@ FESSVQLV::FESSVQLV(FEModel* pfem) : FEElasticMaterial(pfem)
     m_Mxwl = nullptr;
     m_eta = 0.0;
     m_kappa = 0.0;
+    m_secant_tangent = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -317,7 +324,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     double dt = timePoint.timeIncrement;
     double tp = t - dt;
     
-    double errel = 1e-6;
+    double errrel = 1e-6;
     double errabs = 1e-9;
     int itmax = 100;
     
@@ -334,6 +341,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     // evaluate base stress
     pt.m_C = ep.RightCauchyGreen();
     pt.m_H = pt.CtoH(pt.m_C);
+    if (pt.m_H.norm() <= errrel) return mat3ds(0);
     mat3ds E = (pt.m_C-I)/2;
     mat3ds S = m_Base->PK2Stress(mp, E);
 
@@ -344,6 +352,8 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     tens4dmm dCsdHs;
     double Jd;
     do {
+        // initialize Cs to C
+        pt.m_Cs = pt.m_C;
         mat3ds Hs = pt.CtoH(pt.m_Cs);
         mat3ds Hd = pt.m_H - Hs;
         pt.m_Cd = pt.HtoC(Hd);
@@ -358,7 +368,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
         mat3ds dCs = -pt.m_Cs;
         pt.m_Cs = pt.HtoC(Hs);
         dCs += pt.m_Cs;
-        if (dCs.dotdot(pt.m_Cs) <= errel) convgd = true;
+        if (dCs.dotdot(pt.m_Cs) <= errrel) convgd = true;
         if (dCs.dotdot(dCs) <= errabs) convgd = true;
         if (++it > itmax) { convgd = true; maxed = true; }
     } while (!convgd);
@@ -379,24 +389,9 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
 //! Material tangent
 tens4ds FESSVQLV::Tangent(FEMaterialPoint& mp)
 {
-    // get the elastic part
-    FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
-    
-    // get the viscoelastic point data
-    FESSVQLVMaterialPoint& pt = *mp.ExtractData<FESSVQLVMaterialPoint>();
-
-    // Calculate the new elastic Cauchy stress
-    tens4ds c = m_Base->Tangent(mp);
-    
-    // convert Hs to Es
-    mat3ds Es = (pt.m_Cs-mat3dd(1))/2;
-    
-    tens4dmm G = dyad4s(pt.m_Cd.inverse(),mat3dd(1))/2;
-    tens4ds Cm = m_Mxwl->MaterialTangent(mp, Es).supersymm();
-    tens4ds A = (G.ddot(Cm)).supersymm();
-    c += A.pp(ep.m_F)/ep.m_J;
-    
-    // return the total elastic tangent,
+    // we should not come here since we are evaluating the tangent numerically
+    assert(false);
+    tens4ds c; c.zero();
     return c;
 }
 

@@ -116,6 +116,8 @@ public:
     //! update specialize material point data
     void UpdateSpecializedMaterialPoints(FEMaterialPoint& mp, const FETimeInfo& tp) override;
     
+    bool UseSecantTangent() override { return m_secant_tangent; }
+    
 public:
     // material parameters
     FEParamDouble   m_eta;          //!< dashpot shear vicosity
@@ -124,6 +126,7 @@ public:
 private:
     FEElasticMaterial*    m_Base;   //!< pointer to parallel elastic solid material
     FEElasticMaterial*    m_Mxwl;   //!< pointer to Maxwell elastic solid material
+    bool    m_secant_tangent;
 
 public:
     // declare parameter list
