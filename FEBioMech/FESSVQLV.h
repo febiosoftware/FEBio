@@ -57,8 +57,8 @@ public:
     mat3ds CtoU(mat3ds C);
 
     //! evaluate fourth-order tensor derivatives
-    tens4dmm dHdC(mat3ds C);
-    tens4dmm dCdH(mat3ds C);
+    tens4ds dHdC(mat3ds C);
+    tens4ds dCdH(mat3ds C);
     
 public:
     mat3ds  m_C;                    //!< parallel spring right Cauchy-Green tensor at current time
@@ -70,12 +70,12 @@ public:
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
     double  m_rd;                   //!< residual dissipation at current time
-    mat3ds  m_H;                  //!< measure appearing in evolution equation at current time
-    mat3ds  m_Hp;                 //!< measure appearing in evolution equation at previous time
+    mat3ds  m_G;                    //!< measure appearing in evolution equation at current time
+    mat3ds  m_Gp;                   //!< measure appearing in evolution equation at previous time
     mat3ds  m_Sm;
     mat3ds  m_Smp;
-    tens4dmm m_Chatm;
-    tens4dmm m_Chatmp;
+    tens4ds m_Chatm;
+    tens4ds m_Chatmp;
 };
 
 
