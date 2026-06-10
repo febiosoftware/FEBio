@@ -52,7 +52,7 @@ FESSVQLVMaterialPoint::FESSVQLVMaterialPoint(FEMaterialPointData* mp) : FEMateri
     m_C = m_Cp = mat3dd(1);
     m_Cs = m_Csp = mat3dd(1);
     m_Cd = m_Cdp = mat3dd(1);
-    m_G = m_Gp = mat3ds(0);
+    m_G = m_Gp = mat3dd(1);
     m_sed = m_sedp = 0;
     m_Sm = m_Smp = mat3ds(0);
     m_Chatm.zero(); m_Chatmp.zero();
@@ -66,7 +66,7 @@ void FESSVQLVMaterialPoint::Init()
     m_C = m_Cp = mat3dd(1);
     m_Cs = m_Csp = mat3dd(1);
     m_Cd = m_Cdp = mat3dd(1);
-    m_G = m_Gp = mat3ds(0);
+    m_G = m_Gp = mat3dd(1);
     m_sed = m_sedp = 0;
     m_Sm = m_Smp = mat3ds(0);
     m_Chatm.zero(); m_Chatmp.zero();
@@ -113,7 +113,7 @@ mat3ds FESSVQLVMaterialPoint::HtoC(mat3ds H)
 
 //-----------------------------------------------------------------------------
 //! evaluate fourth-order tensor derivatives
-tens4ds FESSVQLVMaterialPoint::dHdC(mat3ds C)
+tens4dmm FESSVQLVMaterialPoint::dHdC(mat3ds C)
 {
     double eps = 1e-6;
     double lam2[3];
@@ -145,7 +145,7 @@ tens4ds FESSVQLVMaterialPoint::dHdC(mat3ds C)
         for (int i=0; i<3; ++i) Ui[i] = dyad(u[i]);
     }
     
-    tens4ds result, UixUi, IoI;
+    tens4dmm result, UixUi, IoI;
     IoI = dyad4s(mat3dd(1));
     result.zero(); UixUi.zero();
     for (int i=0; i<3; ++i) {
@@ -153,7 +153,7 @@ tens4ds FESSVQLVMaterialPoint::dHdC(mat3ds C)
         result += dyad1s(Ui[i])/lam2[i];
     }
     
-    tens4ds dUidC[3];
+    tens4dmm dUidC[3];
     if (rep == 0) {
         dUidC[0] = dyad4s(Ui[0], Ui[1])/(lam2[0]-lam2[1]) + dyad4s(Ui[0], Ui[2])/(lam2[0]-lam2[2]);
         dUidC[1] = dyad4s(Ui[1], Ui[2])/(lam2[1]-lam2[2]) + dyad4s(Ui[1], Ui[0])/(lam2[1]-lam2[0]);
@@ -169,7 +169,7 @@ tens4ds FESSVQLVMaterialPoint::dHdC(mat3ds C)
     return result;
 }
 
-tens4ds FESSVQLVMaterialPoint::dCdH(mat3ds C)
+tens4dmm FESSVQLVMaterialPoint::dCdH(mat3ds C)
 {
     double eps = 1e-6;
     double lam2[3];
@@ -203,7 +203,7 @@ tens4ds FESSVQLVMaterialPoint::dCdH(mat3ds C)
     
     double lnlam2[3];
     for (int i=0; i<3; ++i) lnlam2[i] = log(lam2[i]);
-    tens4ds result, UixUi, IoI;
+    tens4dmm result, UixUi, IoI;
     IoI = dyad4s(mat3dd(1));
     result.zero(); UixUi.zero();
     for (int i=0; i<3; ++i) {
@@ -212,7 +212,7 @@ tens4ds FESSVQLVMaterialPoint::dCdH(mat3ds C)
         result += tmp*lam2[i];
     }
     
-    tens4ds dUidH[3];
+    tens4dmm dUidH[3];
     if (rep == 0) {
         dUidH[0] = dyad4s(Ui[0], Ui[1])/(lnlam2[0]-lnlam2[1]) + dyad4s(Ui[0], Ui[2])/(lnlam2[0]-lnlam2[2]);
         dUidH[1] = dyad4s(Ui[1], Ui[2])/(lnlam2[1]-lnlam2[2]) + dyad4s(Ui[1], Ui[0])/(lnlam2[1]-lnlam2[0]);
@@ -339,7 +339,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     bool maxed = false;
     int it = 0;
     mat3ds Hsp = pt.CtoH(pt.m_Csp);
-    tens4ds dCsdHs;
+    tens4dmm dCsdHs;
     double Jd;
     do {
         // initialize Cs to previoust time point
@@ -350,10 +350,10 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
         pt.m_Cd = pt.HtoC(Hd);
         Jd = sqrt(pt.m_Cd.det());
         dCsdHs = pt.dCdH(pt.m_Cs);
-        mat3ds Gd = ddots(dCsdHs,pt.dHdC(pt.m_Cd)).dot(pt.m_Cd);
-        pt.m_G = ddots(dCsdHs,pt.dHdC(pt.m_C)).dot(pt.m_C);
+        mat3ds Gd = ddot(dCsdHs,pt.dHdC(pt.m_Cd)).dot(pt.m_Cd);
+        pt.m_G = ddot(dCsdHs,pt.dHdC(pt.m_C)).dot(pt.m_C);
         double tmp = (kappa > 0) ? 1./(3*kappa) : 0;
-        pt.m_Chatm =ddots(((dyad4s(Gd)/2/eta+dyad1s(Gd)*(tmp-1./2/eta)/3)*2./ep.m_J),dCsdHs);
+        pt.m_Chatm =ddot(((dyad4s(Gd)/2/eta+dyad1s(Gd)*(tmp-1./2/eta)/3)*2./ep.m_J),dCsdHs);
         mat3ds Es = (pt.m_Cs-I)/2;
         pt.m_Sm = m_Mxwl->PK2Stress(mp, Es);
         mat3ds dCs = pt.m_G - pt.m_Gp-(pt.m_Chatm.dot(pt.m_Sm) + pt.m_Chatmp.dot(pt.m_Smp))*dt/2;
@@ -365,7 +365,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     
     if (maxed) feLogWarning("SSV-QLV iterations did not converge!\n");
     
-    S += ddots(pt.dHdC(pt.m_C),dCsdHs).dot(pt.m_Sm);
+    S += ddot(pt.dHdC(pt.m_C),dCsdHs).dot(pt.m_Sm);
     mat3ds s = (ep.m_F*(S*(ep.m_F).transpose())/ep.m_J).sym();
 
     // evaluate residual dissipation
