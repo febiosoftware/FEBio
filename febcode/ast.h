@@ -191,7 +191,14 @@ namespace febcode {
 			: Statement(StatementType::VarDeclStatement), baseType(type), input(input) { 
 			vars.emplace_back(std::move(var));
 		}
+		VarDeclStmt(Type type, VarPtr&& var, bool input = false)
+			: Statement(StatementType::VarDeclStatement), baseType(type), input(input) {
+			vars.emplace_back(std::move(var));
+		}
 		VarDeclStmt(Type type, std::vector<VarPtr>& vars, bool input = false)
+			: Statement(StatementType::VarDeclStatement), baseType(type), input(input), vars(std::move(vars)) {
+		}
+		VarDeclStmt(Type type, std::vector<VarPtr>&& vars, bool input = false)
 			: Statement(StatementType::VarDeclStatement), baseType(type), input(input), vars(std::move(vars)) {
 		}
 	};
@@ -263,6 +270,14 @@ namespace febcode {
 
 		FunctionStmt(std::string name, Type returnType,
 			std::vector<VarPtr>& parameters,
+			std::unique_ptr<Statement> bdy)
+			: Statement(StatementType::FunctionStatement), name(std::move(name)),
+			returnType(returnType),
+			params(std::move(parameters)),
+			body(std::move(bdy)) {
+		}
+		FunctionStmt(std::string name, Type returnType,
+			std::vector<VarPtr>&& parameters,
 			std::unique_ptr<Statement> bdy)
 			: Statement(StatementType::FunctionStatement), name(std::move(name)),
 			returnType(returnType),
