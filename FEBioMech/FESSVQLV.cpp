@@ -353,11 +353,11 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
         mat3ds Gd = ddot(dCsdHs,pt.dHdC(pt.m_Cd)).dot(pt.m_Cd);
         pt.m_G = ddot(dCsdHs,pt.dHdC(pt.m_C)).dot(pt.m_C);
         double tmp = (kappa > 0) ? 1./(3*kappa) : 0;
-        pt.m_Chatm =ddot(((dyad4s(Gd)/2/eta+dyad1s(Gd)*(tmp-1./2/eta)/3)*2./ep.m_J),dCsdHs);
+        pt.m_Chatm = (dyad4s(Gd)/2/eta+dyad1s(Gd)*(tmp-1./2/eta)/3)*(2./ep.m_J);
         mat3ds Es = (pt.m_Cs-I)/2;
         pt.m_Sm = m_Mxwl->PK2Stress(mp, Es);
         mat3ds dCs = pt.m_G - pt.m_Gp-(pt.m_Chatm.dot(pt.m_Sm) + pt.m_Chatmp.dot(pt.m_Smp))*dt/2;
-        pt.m_Cs += dCs;
+        pt.m_Cs = pt.m_Csp + dCs;
         if (dCs.dotdot(pt.m_Cs) <= errrel) convgd = true;
         if (dCs.dotdot(dCs) <= errabs) convgd = true;
         if (++it > itmax) { convgd = true; maxed = true; }
