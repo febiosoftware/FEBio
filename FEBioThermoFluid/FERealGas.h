@@ -39,7 +39,7 @@
 class FEBIOTHERMOFLUID_API FERealGas : public FEThermoElasticFluid
 {
 public:
-    enum { MAX_NVA = 7, MAX_NVC = 5 };
+    enum { MAX_NVA = 10, MAX_NVC = 5 };
     
 public:
     FERealGas(FEModel* pfem);

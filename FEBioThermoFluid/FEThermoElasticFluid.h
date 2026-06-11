@@ -44,6 +44,9 @@ public:
     //! gauge pressure
     virtual double Pressure(FEMaterialPoint& pt) = 0;
     
+    //! absolute temperature
+    virtual double Temperature(FEMaterialPoint& mp);
+
     //! tangent of pressure with respect to strain J
     virtual double Tangent_Strain(FEMaterialPoint& mp);
     

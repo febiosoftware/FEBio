@@ -318,3 +318,66 @@ public:
     double value(FEElement& el);
 };
 
+//-----------------------------------------------------------------------------
+class FELogFluidSpecificFreeEnergy : public FELogElemData
+{
+public:
+    FELogFluidSpecificFreeEnergy(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidSpecificEntropy : public FELogElemData
+{
+public:
+    FELogFluidSpecificEntropy(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidSpecificInternalEnergy : public FELogElemData
+{
+public:
+    FELogFluidSpecificInternalEnergy(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidSpecificEnthalpy : public FELogElemData
+{
+public:
+    FELogFluidSpecificEnthalpy(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidSpecificStrainEnergy : public FELogElemData
+{
+public:
+    FELogFluidSpecificStrainEnergy(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidIsochoricSpecificHeatCapacity : public FELogElemData
+{
+public:
+    FELogFluidIsochoricSpecificHeatCapacity(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidIsobaricSpecificHeatCapacity : public FELogElemData
+{
+public:
+    FELogFluidIsobaricSpecificHeatCapacity(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
+class FELogFluidTemperature : public FELogElemData
+{
+public:
+    FELogFluidTemperature(FEModel* pfem) : FELogElemData(pfem){}
+    double value(FEElement& el);
+};

@@ -502,6 +502,33 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Specific entropy
+class FEPlotFluidSpecificEntropy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificEntropy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific enthalpy
+class FEPlotFluidSpecificEnthalpy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific internal energy
+class FEPlotFluidSpecificInternalEnergy : public FEPlotDomainData
+{
+public:
+    FEPlotFluidSpecificInternalEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Specific strain energy
 class FEPlotFluidSpecificStrainEnergy : public FEPlotDomainData
 {

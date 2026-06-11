@@ -520,3 +520,154 @@ double FELogFluidRateOfDefXZ::value(FEElement& el)
     return val / (double) nint;
 }
 
+//-----------------------------------------------------------------------------
+double FELogFluidSpecificFreeEnergy::value(FEElement& el)
+{
+    double val = 0.0;
+    FEModel* fem = GetFEModel();
+    FEMaterial* pmat = fem->GetMaterial(el.GetMatID());
+    FEElasticFluid* pfluid = pmat->ExtractProperty<FEElasticFluid>();
+    if (pfluid) {
+        int nint = el.GaussPoints();
+        for (int i=0; i<nint; ++i) {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+            val += pfluid->SpecificFreeEnergy(mp);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidSpecificEntropy::value(FEElement& el)
+{
+    double val = 0.0;
+    FEModel* fem = GetFEModel();
+    FEMaterial* pmat = fem->GetMaterial(el.GetMatID());
+    FEElasticFluid* pfluid = pmat->ExtractProperty<FEElasticFluid>();
+    if (pfluid) {
+        int nint = el.GaussPoints();
+        for (int i=0; i<nint; ++i) {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+            val += pfluid->SpecificEntropy(mp);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidSpecificInternalEnergy::value(FEElement& el)
+{
+    double val = 0.0;
+    FEModel* fem = GetFEModel();
+    FEMaterial* pmat = fem->GetMaterial(el.GetMatID());
+    FEElasticFluid* pfluid = pmat->ExtractProperty<FEElasticFluid>();
+    if (pfluid) {
+        int nint = el.GaussPoints();
+        for (int i=0; i<nint; ++i) {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+            val += pfluid->SpecificInternalEnergy(mp);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidSpecificEnthalpy::value(FEElement& el)
+{
+    double val = 0.0;
+    FEModel* fem = GetFEModel();
+    FEMaterial* pmat = fem->GetMaterial(el.GetMatID());
+    FEElasticFluid* pfluid = pmat->ExtractProperty<FEElasticFluid>();
+    if (pfluid) {
+        int nint = el.GaussPoints();
+        for (int i=0; i<nint; ++i) {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+            val += pfluid->SpecificEnthalpy(mp);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidSpecificStrainEnergy::value(FEElement& el)
+{
+    double val = 0.0;
+    FEModel* fem = GetFEModel();
+    FEMaterial* pmat = fem->GetMaterial(el.GetMatID());
+    FEElasticFluid* pfluid = pmat->ExtractProperty<FEElasticFluid>();
+    if (pfluid) {
+        int nint = el.GaussPoints();
+        for (int i=0; i<nint; ++i) {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+            val += pfluid->SpecificStrainEnergy(mp);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidIsochoricSpecificHeatCapacity::value(FEElement& el)
+{
+    double val = 0.0;
+    FEModel* fem = GetFEModel();
+    FEMaterial* pmat = fem->GetMaterial(el.GetMatID());
+    FEElasticFluid* pfluid = pmat->ExtractProperty<FEElasticFluid>();
+    if (pfluid) {
+        int nint = el.GaussPoints();
+        for (int i=0; i<nint; ++i) {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+            val += pfluid->IsochoricSpecificHeatCapacity(mp);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidIsobaricSpecificHeatCapacity::value(FEElement& el)
+{
+    double val = 0.0;
+    FEModel* fem = GetFEModel();
+    FEMaterial* pmat = fem->GetMaterial(el.GetMatID());
+    FEElasticFluid* pfluid = pmat->ExtractProperty<FEElasticFluid>();
+    if (pfluid) {
+        int nint = el.GaussPoints();
+        for (int i=0; i<nint; ++i) {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+            val += pfluid->IsobaricSpecificHeatCapacity(mp);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidTemperature::value(FEElement& el)
+{
+    double val = 0.0;
+    FEModel* fem = GetFEModel();
+    FEMaterial* pmat = fem->GetMaterial(el.GetMatID());
+    FEElasticFluid* pfluid = pmat->ExtractProperty<FEElasticFluid>();
+    if (pfluid) {
+        int nint = el.GaussPoints();
+        for (int i=0; i<nint; ++i) {
+            FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+            val += pfluid->Temperature(mp);
+        }
+        return val / (double) nint;
+    }
+    else
+        return 0;
+}

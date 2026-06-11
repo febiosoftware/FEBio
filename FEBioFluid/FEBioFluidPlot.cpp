@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include <FECore/writeplot.h>
 #include <FECore/FEDomainParameter.h>
 #include <FEBioThermoFluid/FEThermoFluidMaterial.h>
+#include <FEBioThermoFluid/FEThermoElasticFluid.h>
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -1237,6 +1238,48 @@ bool FEPlotFluidSpecificFreeEnergy::Save(FEDomain &dom, FEDataStream& a)
     writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
         FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
         return pfluid->SpecificFreeEnergy(mp_noconst);
+    });
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificEntropy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->SpecificEntropy(mp_noconst);
+    });
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificEnthalpy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->SpecificEnthalpy(mp_noconst);
+    });
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidSpecificInternalEnergy::Save(FEDomain &dom, FEDataStream& a)
+{
+    FEElasticFluid* pfluid = dom.GetMaterial()->ExtractProperty<FEElasticFluid>();
+    if (pfluid == 0) return false;
+
+    writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+        FEMaterialPoint& mp_noconst = const_cast<FEMaterialPoint&>(mp);
+        return pfluid->SpecificInternalEnergy(mp_noconst);
     });
 
     return true;

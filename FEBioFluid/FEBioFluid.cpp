@@ -298,6 +298,14 @@ REGISTER_FECORE_CLASS(FELogFluidRateOfDefZZ    , "fdzz");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefXY    , "fdxy");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefYZ    , "fdyz");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefXZ    , "fdxz");
+REGISTER_FECORE_CLASS(FELogFluidSpecificFreeEnergy, "af");
+REGISTER_FECORE_CLASS(FELogFluidSpecificEntropy,    "sf");
+REGISTER_FECORE_CLASS(FELogFluidSpecificInternalEnergy, "uf");
+REGISTER_FECORE_CLASS(FELogFluidSpecificStrainEnergy, "wf");
+REGISTER_FECORE_CLASS(FELogFluidSpecificEnthalpy, "hf");
+REGISTER_FECORE_CLASS(FELogFluidIsochoricSpecificHeatCapacity, "cvf");
+REGISTER_FECORE_CLASS(FELogFluidIsobaricSpecificHeatCapacity, "cpf");
+REGISTER_FECORE_CLASS(FELogFluidTemperature, "Tf");
 
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptor

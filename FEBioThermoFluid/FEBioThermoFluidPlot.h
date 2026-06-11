@@ -27,108 +27,117 @@ SOFTWARE.*/
 #include <FECore/FEPlotData.h>
 
 //! Element fluid temperature
-class FEPlotFluidTemperature : public FEPlotDomainData
+class FEPlotThermoFluidTemperature : public FEPlotDomainData
 {
 public:
-	FEPlotFluidTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RELATIVE_TEMPERATURE); }
+	FEPlotThermoFluidTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RELATIVE_TEMPERATURE); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal fluid temperature
-class FEPlotNodalFluidTemperature : public FEPlotNodeData
+class FEPlotNodalThermoFluidTemperature : public FEPlotNodeData
 {
 public:
-	FEPlotNodalFluidTemperature(FEModel* pfem) : FEPlotNodeData(pfem, PLT_FLOAT, FMT_NODE) { SetUnits(UNIT_RELATIVE_TEMPERATURE); }
+	FEPlotNodalThermoFluidTemperature(FEModel* pfem) : FEPlotNodeData(pfem, PLT_FLOAT, FMT_NODE) { SetUnits(UNIT_RELATIVE_TEMPERATURE); }
 	bool Save(FEMesh& m, FEDataStream& a);
 };
 
 //! Fluid pressure tangent temperature
-class FEPlotFluidPressureTangentTemperature : public FEPlotDomainData
+class FEPlotThermoFluidPressureTangentTemperature : public FEPlotDomainData
 {
 public:
-	FEPlotFluidPressureTangentTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+	FEPlotThermoFluidPressureTangentTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Element fluid heat flux
-class FEPlotFluidHeatFlux : public FEPlotDomainData
+class FEPlotThermoFluidHeatFlux : public FEPlotDomainData
 {
 public:
-	FEPlotFluidHeatFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_ENERGY_FLUX); }
+	FEPlotThermoFluidHeatFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_ENERGY_FLUX); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Element relative thermal Peclet number
-class FEPlotFluidRelativeThermalPecletNumber : public FEPlotDomainData
+class FEPlotThermoFluidRelativeThermalPecletNumber : public FEPlotDomainData
 {
 public:
-	FEPlotFluidRelativeThermalPecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RECIPROCAL_LENGTH); }
+	FEPlotThermoFluidRelativeThermalPecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RECIPROCAL_LENGTH); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Thermal conductivity
-class FEPlotFluidThermalConductivity : public FEPlotDomainData
+class FEPlotThermoFluidThermalConductivity : public FEPlotDomainData
 {
 public:
-	FEPlotFluidThermalConductivity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_THERMAL_CONDUCTIVITY); }
+	FEPlotThermoFluidThermalConductivity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_THERMAL_CONDUCTIVITY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Specific isochoric heat capacity
-class FEPlotFluidIsochoricSpecificHeatCapacity : public FEPlotDomainData
+class FEPlotThermoFluidIsochoricSpecificHeatCapacity : public FEPlotDomainData
 {
 public:
-	FEPlotFluidIsochoricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+	FEPlotThermoFluidIsochoricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Specific isobaric heat capacity
-class FEPlotFluidIsobaricSpecificHeatCapacity : public FEPlotDomainData
+class FEPlotThermoFluidIsobaricSpecificHeatCapacity : public FEPlotDomainData
 {
 public:
-	FEPlotFluidIsobaricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+	FEPlotThermoFluidIsobaricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Specific free enthalpy
-class FEPlotFluidSpecificFreeEnthalpy : public FEPlotDomainData
+class FEPlotThermoFluidSpecificFreeEnthalpy : public FEPlotDomainData
 {
 public:
-	FEPlotFluidSpecificFreeEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
+	FEPlotThermoFluidSpecificFreeEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Specific gauge enthalpy
-class FEPlotFluidSpecificGaugeEnthalpy : public FEPlotDomainData
+class FEPlotThermoFluidSpecificGaugeEnthalpy : public FEPlotDomainData
 {
 public:
-	FEPlotFluidSpecificGaugeEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
+	FEPlotThermoFluidSpecificGaugeEnthalpy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Specific internal energy
-class FEPlotFluidSpecificInternalEnergy : public FEPlotDomainData
+class FEPlotThermoFluidSpecificInternalEnergy : public FEPlotDomainData
 {
 public:
-	FEPlotFluidSpecificInternalEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
+	FEPlotThermoFluidSpecificInternalEnergy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENERGY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //! Specific entropy
-class FEPlotFluidSpecificEntropy : public FEPlotDomainData
+class FEPlotThermoFluidSpecificEntropy : public FEPlotDomainData
 {
 public:
-	FEPlotFluidSpecificEntropy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
+	FEPlotThermoFluidSpecificEntropy(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
-//-----------------------------------------------------------------------------
-//! Element fluid heat supply density
-class FEPlotFluidHeatSupplyDensity : public FEPlotDomainData
+//! Specific free energy
+class FEPlotThermoFluidSpecificFreeEnergy : public FEPlotDomainData
 {
 public:
-    FEPlotFluidHeatSupplyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_POWER_DENSITY); }
+    FEPlotThermoFluidSpecificFreeEnergy(FEModel* fem) : FEPlotDomainData(fem, PLT_FLOAT, FMT_ITEM){
+        SetUnits(UNIT_SPECIFIC_ENERGY); }
+    bool Save(FEDomain& dom, FEDataStream& a) override;
+};
+
+//-----------------------------------------------------------------------------
+//! Element ThermoFluid heat supply density
+class FEPlotThermoFluidHeatSupplyDensity : public FEPlotDomainData
+{
+public:
+    FEPlotThermoFluidHeatSupplyDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_POWER_DENSITY); }
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 

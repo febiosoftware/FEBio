@@ -46,6 +46,10 @@ ADD_PROPERTY(m_A[3], "A4", FEProperty::Optional)->SetLongName("4th p virial coef
 ADD_PROPERTY(m_A[4], "A5", FEProperty::Optional)->SetLongName("5th p virial coeff");
 ADD_PROPERTY(m_A[5], "A6", FEProperty::Optional)->SetLongName("6th p virial coeff");
 ADD_PROPERTY(m_A[6], "A7", FEProperty::Optional)->SetLongName("7th p virial coeff");
+ADD_PROPERTY(m_A[7], "A8", FEProperty::Optional)->SetLongName("8th p virial coeff");
+ADD_PROPERTY(m_A[8], "A9", FEProperty::Optional)->SetLongName("9th p virial coeff");
+ADD_PROPERTY(m_A[9], "A10", FEProperty::Optional)->SetLongName("10th p virial coeff");
+
 
 ADD_PROPERTY(m_C[0], "C0")->SetLongName("1st cv virial coeff");
 ADD_PROPERTY(m_C[1], "C1", FEProperty::Optional)->SetLongName("2nd cv virial coeff");

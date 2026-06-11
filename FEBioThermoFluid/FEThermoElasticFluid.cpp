@@ -28,6 +28,12 @@ SOFTWARE.*/
 #include "FEThermoFluid.h"
 #include <FEBioFluid/FEFluidMaterialPoint.h>
 
+double FEThermoElasticFluid::Temperature(FEMaterialPoint& mp)
+{
+    FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
+    return tf.m_T;
+}
+
 //-----------------------------------------------------------------------------
 //! tangent of pressure with respect to strain J
 double FEThermoElasticFluid::Tangent_Strain(FEMaterialPoint& mp)

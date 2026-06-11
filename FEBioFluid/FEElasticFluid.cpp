@@ -25,13 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
 #include "FEElasticFluid.h"
-#include "FEFluidMaterialPoint.h"
+#include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
-// By default, the absolute temperature is the ambient temperature for isothermal fluids
+// By default, the temperature is the ambient temperature for isothermal fluids
 double FEElasticFluid::Temperature(FEMaterialPoint& mp)
 {
-    return GetGlobalConstant("T");
+    return 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -89,3 +89,11 @@ double FEElasticFluid::Tangent_Strain(const double ef, const double T)
     double dpJ = Tangent_Strain(tmp);
     return dpJ;
 }
+
+//-----------------------------------------------------------------------------
+//! specific enthalpy
+double FEElasticFluid::SpecificEnthalpy(FEMaterialPoint& mp) {
+    double rhof = m_pFluid->Density(mp);
+    return SpecificInternalEnergy(mp) + Pressure(mp)/rhof;
+}
+ 

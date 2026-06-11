@@ -72,6 +72,12 @@ public:
     //! specific entropy (zero by default for isothermal fluids)
     virtual double SpecificEntropy(FEMaterialPoint& mp) { return 0; }
     
+    //! specific internal energy
+    double SpecificInternalEnergy(FEMaterialPoint& mp) { return SpecificFreeEnergy(mp); }
+     
+    //! specific enthalpy
+    double SpecificEnthalpy(FEMaterialPoint& mp);
+     
     //! specific strain energy
     virtual double SpecificStrainEnergy(FEMaterialPoint& mp) { return SpecificFreeEnergy(mp); }
     

@@ -55,6 +55,8 @@ SOFTWARE.*/
 #include "FEThermalPropLnJvirial.h"
 #include "FEThermalPropTempDpndnt.h"
 #include "FEFluidFourierLaw.h"
+#include "FEThermoElasticFluid.h"
+#include "FEBioThermoFluidData.h"
 
 const char* FEBioThermoFluid::GetVariableName(FEBioThermoFluid::THERMOFLUID_VARIABLE var)
 {
@@ -147,20 +149,35 @@ void FEBioThermoFluid::InitModule()
     REGISTER_FECORE_CLASS(FEThermoFluidPressureLoad, "fluid pressure constraint");
 
     //-----------------------------------------------------------------------------
-    // classes derived from FEPlotData
-	REGISTER_FECORE_CLASS(FEPlotFluidTemperature, "fluid temperature");
-	REGISTER_FECORE_CLASS(FEPlotNodalFluidTemperature, "nodal fluid temperature");
-	REGISTER_FECORE_CLASS(FEPlotFluidPressureTangentTemperature, "fluid pressure tangent temperature");
-	REGISTER_FECORE_CLASS(FEPlotFluidRelativeThermalPecletNumber, "fluid relative thermal Peclet number");
-	REGISTER_FECORE_CLASS(FEPlotFluidIsochoricSpecificHeatCapacity, "fluid isochoric specific heat capacity");
-	REGISTER_FECORE_CLASS(FEPlotFluidIsobaricSpecificHeatCapacity, "fluid isobaric specific heat capacity");
-	REGISTER_FECORE_CLASS(FEPlotFluidHeatFlux, "fluid heat flux");
-	REGISTER_FECORE_CLASS(FEPlotFluidSpecificEntropy, "fluid specific entropy");
-	REGISTER_FECORE_CLASS(FEPlotFluidSpecificInternalEnergy, "fluid specific internal energy");
-	REGISTER_FECORE_CLASS(FEPlotFluidSpecificGaugeEnthalpy, "fluid specific gauge enthalpy");
-	REGISTER_FECORE_CLASS(FEPlotFluidSpecificFreeEnthalpy, "fluid specific free enthalpy");
-    REGISTER_FECORE_CLASS(FEPlotFluidThermalConductivity, "fluid thermal conductivity");
-    REGISTER_FECORE_CLASS(FEPlotFluidHeatSupplyDensity, "fluid heat supply density");
+    // plot variables
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidTemperature, "fluid temperature");
+	REGISTER_FECORE_CLASS(FEPlotNodalThermoFluidTemperature, "nodal fluid temperature");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidPressureTangentTemperature, "fluid pressure tangent temperature");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidRelativeThermalPecletNumber, "fluid relative thermal Peclet number");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidIsochoricSpecificHeatCapacity, "fluid isochoric specific heat capacity");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidIsobaricSpecificHeatCapacity, "fluid isobaric specific heat capacity");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidHeatFlux, "fluid heat flux");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidSpecificEntropy, "fluid specific entropy");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidSpecificInternalEnergy, "fluid specific internal energy");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidSpecificGaugeEnthalpy, "fluid specific gauge enthalpy");
+	REGISTER_FECORE_CLASS(FEPlotThermoFluidSpecificFreeEnthalpy, "fluid specific free enthalpy");
+    REGISTER_FECORE_CLASS(FEPlotThermoFluidThermalConductivity, "fluid thermal conductivity");
+    REGISTER_FECORE_CLASS(FEPlotThermoFluidHeatSupplyDensity, "fluid heat supply density");
+    
+    //-----------------------------------------------------------------------------
+    // log variables
+    REGISTER_FECORE_CLASS(FENodeThermoFluidTemperature, "nodal fluid temperature");
+    REGISTER_FECORE_CLASS(FELogThermoElasticFluidPressure, "fp");
+    REGISTER_FECORE_CLASS(FELogThermoFluidVolumeRatio, "fJ");
+    REGISTER_FECORE_CLASS(FELogThermoFluidDensity, "fd");
+    REGISTER_FECORE_CLASS(FELogThermoFluidSpecificFreeEnergy, "af");
+    REGISTER_FECORE_CLASS(FELogThermoFluidSpecificEntropy,    "sf");
+    REGISTER_FECORE_CLASS(FELogThermoFluidSpecificInternalEnergy, "uf");
+    REGISTER_FECORE_CLASS(FELogThermoFluidSpecificStrainEnergy, "wf");
+    REGISTER_FECORE_CLASS(FELogThermoFluidSpecificEnthalpy, "hf");
+    REGISTER_FECORE_CLASS(FELogThermoFluidIsochoricSpecificHeatCapacity, "cvf");
+    REGISTER_FECORE_CLASS(FELogThermoFluidIsobaricSpecificHeatCapacity, "cpf");
+    REGISTER_FECORE_CLASS(FELogThermoFluidTemperature, "Tf");
 
 	febio.SetActiveModule(0);
 }
