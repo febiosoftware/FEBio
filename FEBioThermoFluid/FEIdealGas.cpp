@@ -211,7 +211,7 @@ double FEIdealGas::SpecificStrainEnergy(FEMaterialPoint& mp)
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     
     double J = 1 + fp.m_ef;
-    double T = tf.m_T;
+    double T = tf.m_T + m_Tr;
     double That = T/m_Tr;
     double scl = m_R*m_Tr/m_M;
 
@@ -245,7 +245,11 @@ double FEIdealGas::IsochoricSpecificHeatCapacity(FEMaterialPoint& mp)
 //! tangent of isochoric specific heat capacity with respect to strain J
 double FEIdealGas::Tangent_cv_Strain(FEMaterialPoint& mp)
 {
-    return 0;
+    double scl = m_R/m_M;
+
+    double dcv = m_cp->Tangent_NormalizedProperty_Strain(mp);
+    
+    return dcv*scl;
 }
 
 //-----------------------------------------------------------------------------
