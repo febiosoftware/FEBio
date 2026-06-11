@@ -340,10 +340,10 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     int it = 0;
     mat3ds Hsp = pt.CtoH(pt.m_Csp);
     tens4dmm dCsdHs;
+    // initialize Cs to previoust time point
+    pt.m_Cs = pt.m_C;
     double Jd;
     do {
-        // initialize Cs to previoust time point
-        pt.m_Cs = pt.m_C;
         // Evaluate Cd
         mat3ds Hs = pt.CtoH(pt.m_Cs);
         mat3ds Hd = H - Hs;
@@ -356,10 +356,11 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
         pt.m_Chatm = (dyad4s(Gd)/2/eta+dyad1s(Gd)*(tmp-1./2/eta)/3)*(2./ep.m_J);
         mat3ds Es = (pt.m_Cs-I)/2;
         pt.m_Sm = m_Mxwl->PK2Stress(mp, Es);
-        mat3ds dCs = pt.m_G - pt.m_Gp-(pt.m_Chatm.dot(pt.m_Sm) + pt.m_Chatmp.dot(pt.m_Smp))*dt/2;
-        pt.m_Cs = pt.m_Csp + dCs;
-        if (dCs.dotdot(pt.m_Cs) <= errrel) convgd = true;
-        if (dCs.dotdot(dCs) <= errabs) convgd = true;
+        mat3ds dCs = -pt.m_Cs;
+        pt.m_Cs = pt.m_Csp + pt.m_G - pt.m_Gp-(pt.m_Chatm.dot(pt.m_Sm) + pt.m_Chatmp.dot(pt.m_Smp))*dt/2;
+        dCs += pt.m_Cs;
+        if (fabs(dCs.dotdot(pt.m_Cs)) <= errrel) convgd = true;
+        if (dCs.norm() <= errabs) convgd = true;
         if (++it > itmax) { convgd = true; maxed = true; }
     } while (!convgd);
     
