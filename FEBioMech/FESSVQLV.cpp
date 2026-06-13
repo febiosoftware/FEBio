@@ -327,6 +327,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     FESSVQLVMaterialPoint& pt = *mp.ExtractData<FESSVQLVMaterialPoint>();
 
     mat3dd I(1);
+    tens4dmm IoI = dyad4mm(I, I);
     
     // evaluate base stress
     pt.m_C = ep.RightCauchyGreen();
@@ -350,6 +351,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
         pt.m_Cd = pt.HtoC(Hd);
         Jd = sqrt(pt.m_Cd.det());
         dCsdHs = pt.dCdH(pt.m_Cs);
+        tens4dmm tmp4dmm = ddot(IoI,dCsdHs);
         mat3ds Gd = ddot(dCsdHs,pt.dHdC(pt.m_Cd)).dot(pt.m_Cd);
         pt.m_G = ddot(dCsdHs,pt.dHdC(pt.m_C)).dot(pt.m_C);
         double tmp = (kappa > 0) ? 1./(3*kappa) : 0;

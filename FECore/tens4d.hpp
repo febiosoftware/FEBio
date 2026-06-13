@@ -1200,8 +1200,23 @@ inline tens4d dyad3(const mat3d& a, const mat3d& b)
 // (a ddot b)_ijkl = a_ijmn b_mnkl
 inline tens4d ddot(const tens4d& a, const tens4d& b)
 {
-    tens4d c;
-    
+    double A[9][9] = {0};
+    double B[9][9] = {0};
+    double C[9][9] = {0};
+    tens4d aa = a, bb = b;
+    aa.extract(A); bb.extract(B);
+
+    // perform matrix multiplication
+    for (int  i=0; i<9; ++i) {
+        for (int j=0; j<9; ++j) {
+            C[i][j] = 0;
+            for (int k=0; k<9; ++k) {
+                C[i][j] += A[i][k]*B[k][j];
+            }
+        }
+    }
+    tens4d c(C);
+/*
     c.d[0] = a.d[0]*b.d[0] + a.d[9]*b.d[1] + a.d[18]*b.d[2] + a.d[27]*b.d[3] + a.d[36]*b.d[4] + a.d[45]*b.d[5] + a.d[54]*b.d[6] + a.d[63]*b.d[7] + a.d[72]*b.d[8];
     c.d[1] = a.d[0]*b.d[9] + a.d[9]*b.d[10] + a.d[18]*b.d[11] + a.d[27]*b.d[12] + a.d[36]*b.d[13] + a.d[45]*b.d[14] + a.d[54]*b.d[15] + a.d[63]*b.d[16] + a.d[72]*b.d[17];
     c.d[2] = a.d[0]*b.d[18] + a.d[9]*b.d[19] + a.d[18]*b.d[20] + a.d[27]*b.d[21] + a.d[36]*b.d[22] + a.d[45]*b.d[23] + a.d[54]*b.d[24] + a.d[63]*b.d[25] + a.d[72]*b.d[26];
@@ -1291,7 +1306,7 @@ inline tens4d ddot(const tens4d& a, const tens4d& b)
     c.d[78] = a.d[8]*b.d[54] + a.d[17]*b.d[55] + a.d[26]*b.d[56] + a.d[35]*b.d[57] + a.d[44]*b.d[58] + a.d[53]*b.d[59] + a.d[62]*b.d[60] + a.d[71]*b.d[61] + a.d[80]*b.d[62];
     c.d[79] = a.d[8]*b.d[63] + a.d[17]*b.d[64] + a.d[26]*b.d[65] + a.d[35]*b.d[66] + a.d[44]*b.d[67] + a.d[53]*b.d[68] + a.d[62]*b.d[69] + a.d[71]*b.d[70] + a.d[80]*b.d[71];
     c.d[80] = a.d[8]*b.d[72] + a.d[17]*b.d[73] + a.d[26]*b.d[74] + a.d[35]*b.d[75] + a.d[44]*b.d[76] + a.d[53]*b.d[77] + a.d[62]*b.d[78] + a.d[71]*b.d[79] + a.d[80]*b.d[80];
-
+*/
     return c;
     
 }
