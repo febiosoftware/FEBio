@@ -89,8 +89,6 @@ public:
 	int		m_laugon;	//!< enforcement method
 
 protected:
-	int		m_nID;	//!< ID of rigid joint
-
 	vector<int>		m_LM;	// Lagrange multiplier equation numbers
 
 	DECLARE_FECORE_CLASS();

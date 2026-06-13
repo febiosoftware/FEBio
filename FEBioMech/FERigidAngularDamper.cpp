@@ -42,7 +42,7 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidAngularDamper::FERigidAngularDamper(FEModel* pfem) : FERigidConnector(pfem)
 {
-    m_nID = m_ncount++;
+	m_c = 0.0;
 }
 
 //-----------------------------------------------------------------------------
