@@ -372,35 +372,17 @@ inline void tens4ds::extract(double D[6][6])
 inline tens4ds dyad1s(const mat3dd& a)
 {
 	tens4ds c;
-    
-    c.d[ 0] = a.xx()*a.xx();
+    c.zero();
+    c.d[ 0] = a.diag(0)*a.diag(0);
 
-    c.d[ 1] = a.xx()*a.yy();
-    c.d[ 2] = a.yy()*a.yy();
+    c.d[ 1] = a.diag(0)*a.diag(1);
+    c.d[ 2] = a.diag(2)*a.diag(2);
 
-    c.d[ 3] = a.xx()*a.zz();
-    c.d[ 4] = a.yy()*a.zz();
-    c.d[ 5] = a.zz()*a.zz();
+    c.d[ 3] = a.diag(0)*a.diag(2);
+    c.d[ 4] = a.diag(1)*a.diag(2);
+    c.d[ 5] = a.diag(2)*a.diag(2);
 
-    c.d[ 6] = 0.0;
-    c.d[ 7] = 0.0;
-    c.d[ 8] = 0.0;
-    c.d[ 9] = 0.0;
-
-    c.d[10] = 0.0;
-    c.d[11] = 0.0;
-    c.d[12] = 0.0;
-    c.d[13] = 0.0;
-    c.d[14] = 0.0;
-
-    c.d[15] = 0.0;
-    c.d[16] = 0.0;
-    c.d[17] = 0.0;
-    c.d[18] = 0.0;
-    c.d[19] = 0.0;
-    c.d[20] = 0.0;
-    
-	return c;
+    return c;
 }
 
 //-----------------------------------------------------------------------------
@@ -940,59 +922,45 @@ inline mat3d vdotTdotv(const vec3d& a, const tens4ds& T, const vec3d& b)
 // inverse
 inline tens4ds tens4ds::inverse() const
 {
-	matrix c(6,6);
-	
-	// populate c
-	c(0,0) = d[0];
-	c(1,1) = d[2];
-	c(2,2) = d[5];
-	c(3,3) = d[9];
-	c(4,4) = d[14];
-	c(5,5) = d[20];
-	c(0,1) = c(1,0) = d[1];
-	c(0,2) = c(2,0) = d[3];
-	c(0,3) = c(3,0) = d[6];
-	c(0,4) = c(4,0) = d[10];
-	c(0,5) = c(5,0) = d[15];
-	c(1,2) = c(2,1) = d[4];
-	c(1,3) = c(3,1) = d[7];
-	c(1,4) = c(4,1) = d[11];
-	c(1,5) = c(5,1) = d[16];
-	c(2,3) = c(3,2) = d[8];
-	c(2,4) = c(4,2) = d[12];
-	c(2,5) = c(5,2) = d[17];
-	c(3,4) = c(4,3) = d[13];
-	c(3,5) = c(5,3) = d[18];
-	c(4,5) = c(5,4) = d[19];
-	
-	// invert c
-	matrix s = c.inverse();
-	
-	// return inverse
-	tens4ds S;
-	S.d[ 0] = s(0,0);
-	S.d[ 2] = s(1,1);
-	S.d[ 5] = s(2,2);
-	S.d[ 9] = s(3,3);
-	S.d[14] = s(4,4);
-	S.d[20] = s(5,5);
-	S.d[ 1] = s(0,1);
-	S.d[ 3] = s(0,2);
-	S.d[ 6] = s(0,3);
-	S.d[10] = s(0,4);
-	S.d[15] = s(0,5);
-	S.d[ 4] = s(1,2);
-	S.d[ 7] = s(1,3);
-	S.d[11] = s(1,4);
-	S.d[16] = s(1,5);
-	S.d[ 8] = s(2,3);
-	S.d[12] = s(2,4);
-	S.d[17] = s(2,5);
-	S.d[13] = s(3,4);
-	S.d[18] = s(3,5);
-	S.d[19] = s(4,5);
-	
-	return S;
+    // extract the 6 x 6 contents of this 4th-order tensor with minor symmetries
+    tens4ds t = *this;
+    double T[6][6];
+    t.extract(T);
+    matrix Tm(6,6);
+    double a = sqrt(2);
+    // copy the contents of this array into a matrix converted to Voigt format
+    for (int i=0; i<3; ++i)
+        for (int j=0; j<3; ++j)
+            Tm[i][j] = T[i][j];
+    for (int i=0; i<3; ++i)
+        for (int j=3; j<6; ++j) {
+            Tm[i][j] = a*T[i][j];
+            Tm[j][i] = Tm[i][j];
+        }
+    for (int i=3; i<6; ++i)
+        for (int j=3; j<6; ++j)
+            Tm[i][j] = 2*T[i][j];
+
+    // evaluate the matrix inverse
+    matrix Ti = Tm.inverse();
+
+    // copy the contents of the inverse matrix back into the double array
+    // while also converting back from the Voigt format
+    for (int i=0; i<3; ++i)
+        for (int j=0; j<3; ++j)
+            T[i][j] = Ti[i][j];
+    for (int i=0; i<3; ++i)
+        for (int j=3; j<6; ++j) {
+            T[i][j] = Ti[i][j]/a;
+            T[j][i] = T[i][j];
+        }
+    for (int i=3; i<6; ++i)
+        for (int j=3; j<6; ++j)
+            T[i][j] = Ti[i][j]/2;
+
+    // create a tens4d object from this double array
+    tens4ds S(T);
+    return S;
 }
 
 //-----------------------------------------------------------------------------

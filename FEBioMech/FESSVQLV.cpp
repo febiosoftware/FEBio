@@ -145,11 +145,12 @@ tens4dmm FESSVQLVMaterialPoint::dHdC(mat3ds C)
         for (int i=0; i<3; ++i) Ui[i] = dyad(u[i]);
     }
     
-    tens4dmm result, UixUi, IoI;
+    tens4dmm result, UixUi, IoI, UioUi;
     IoI = dyad4s(mat3dd(1));
-    result.zero(); UixUi.zero();
+    result.zero(); UixUi.zero(); UioUi.zero();
     for (int i=0; i<3; ++i) {
         UixUi += dyad1s(Ui[i]);
+        UioUi += dyad4s(Ui[i]);
         result += dyad1s(Ui[i])/lam2[i];
     }
     
@@ -351,6 +352,9 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
         pt.m_Cd = pt.HtoC(Hd);
         Jd = sqrt(pt.m_Cd.det());
         dCsdHs = pt.dCdH(pt.m_Cs);
+        tens4dmm dHsdCs = pt.dHdC(pt.m_Cs);
+        tens4dmm tmpdot = ddot(dCsdHs,dHsdCs);
+        tens4dmm dCsdHsi = dCsdHs.inverse();
         mat3ds Gd = ddot(dCsdHs,pt.dHdC(pt.m_Cd)).dot(pt.m_Cd);
         pt.m_G = ddot(dCsdHs,pt.dHdC(pt.m_C)).dot(pt.m_C);
         double tmp = (kappa > 0) ? 1./(3*kappa) : 0;
