@@ -427,6 +427,9 @@ public:
     // calculates the inverse
     tens4d inverse() const;
     
+    // compute the minor-symmetric (only minor symmetric) component of the tensor
+    tens4dmm mmsymm() const;
+    
     // evaluate push/pull operation
 //    tens4d pp(const mat3d& F);
 
@@ -475,7 +478,7 @@ inline tens4d dyad4(const mat3ds& as, const mat3dd& bd) { mat3d a(as); mat3d b(b
 // other common operations
 mat3d vdotTdotv(const vec3d& a, const tens4d& T, const vec3d& b);
 tens4d ddot(const tens4d& a, const tens4d& b);
-tens4d ddot(const tens4d& a, const tens4ds& b);
+//tens4d ddot(const tens4d& a, const tens4ds& b);
 inline mat3d ddot(const tens4d& a, const mat3d& m) { return a.dot(m); }
 inline mat3d ddot(const tens4d& a, const mat3ds& m) { return a.dot(m); }
 inline mat3d ddot(const tens4d& a, const mat3dd& m) { return a.dot(m); }

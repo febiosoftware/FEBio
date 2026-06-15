@@ -900,6 +900,78 @@ inline tens4d tens4d::right_transpose() const
 }
 
 //-----------------------------------------------------------------------------
+// calculates the inverse
+inline tens4d tens4d::inverse() const
+{
+    // extract the 9 x 9 contents of this 4th-order tensor with minor symmetries
+    tens4d t = *this;
+    double T[9][9];
+    t.extract(T);
+    matrix Tm(9,9);
+    double a = sqrt(2);
+    // evaluate the matrix inverse
+    matrix Ti = Tm.inverse();
+    
+    // copy the contents of the inverse matrix back into the double array
+    // while also converting back from the Voigt format
+    for (int i=0; i<9; ++i)
+        for (int j=0; j<9; ++j)
+            T[i][j] = Ti[i][j];
+    
+    // create a tens4d object from this double array
+    tens4d S(T);
+    return S;
+
+}
+
+//-----------------------------------------------------------------------------
+// compute the minor symmetric component of the tensor
+// Sijkl = (1/4)*(Cijkl + Cjikl + Cijlk + Cjilk)
+inline tens4dmm tens4d::mmsymm() const
+{
+    tens4dmm s;
+    
+    s.d[ 0] = d[0];
+    s.d[ 1] = d[1];
+    s.d[ 2] = d[2];
+    s.d[ 3] = (d[3]+d[6])/2;
+    s.d[ 4] = (d[4]+d[7])/2;;
+    s.d[ 5] = (d[5]+d[8])/2;
+    s.d[ 6] = d[9];
+    s.d[ 7] = d[10];
+    s.d[ 8] = d[11];
+    s.d[ 9] = (d[12]+d[15])/2;
+    s.d[10] = (d[13]+d[15])/2;
+    s.d[11] = (d[14]+d[17])/2;
+    s.d[12] = d[18];
+    s.d[13] = d[19];
+    s.d[14] = d[20];
+    s.d[15] = (d[21]+d[24])/2;
+    s.d[16] = (d[22]+d[25])/2;
+    s.d[17] = (d[23]+d[26])/2;
+    s.d[18] = (d[27]+d[54])/2;
+    s.d[19] = (d[28]+d[55])/2;
+    s.d[20] = (d[29]+d[56])/2;
+    s.d[21] = (d[30]+d[57]+d[33]+d[60])/4;
+    s.d[22] = (d[31]+d[58]+d[34]+d[61])/4;
+    s.d[23] = (d[32]+d[59]+d[35]+d[62])/4;
+    s.d[24] = (d[36]+d[63])/2;;
+    s.d[25] = (d[37]+d[64])/2;
+    s.d[26] = (d[38]+d[65])/2;
+    s.d[27] = (d[39]+d[42]+d[66]+d[69])/4;
+    s.d[28] = (d[40]+d[43]+d[67]+d[70])/4;
+    s.d[29] = (d[41]+d[44]+d[69]+d[71])/4;
+    s.d[30] = (d[45]+d[72])/2;
+    s.d[31] = (d[46]+d[73])/2;
+    s.d[32] = (d[47]+d[74])/2;
+    s.d[33] = (d[48]+d[51]+d[75]+d[78])/4;
+    s.d[34] = (d[49]+d[52]+d[76]+d[79])/4;
+    s.d[35] = (d[50]+d[53]+d[77]+d[80])/4;
+
+    return s;
+}
+
+//-----------------------------------------------------------------------------
 // (a dyad1 b)_ijkl = a_ij b_kl
 inline tens4d dyad1(const mat3d& a, const mat3d& b)
 {
@@ -1197,32 +1269,8 @@ inline tens4d dyad3(const mat3d& a, const mat3d& b)
 }
 
 //-----------------------------------------------------------------------------
-// (a ddot b)_ijkl = a_ijmn b_mnkl
-inline tens4d ddot(const tens4d& a, const tens4d& b)
-{
-    double A[9][9] = {0};
-    double B[9][9] = {0};
-    double C[9][9] = {0};
-    tens4d aa = a, bb = b;
-    aa.extract(A); bb.extract(B);
-
-    // perform matrix multiplication
-    for (int  i=0; i<9; ++i) {
-        for (int j=0; j<9; ++j) {
-            C[i][j] = 0;
-            for (int k=0; k<9; ++k) {
-                C[i][j] += A[i][k]*B[k][j];
-            }
-        }
-    }
-    tens4d c(C);
-    return c;
-    
-}
-
-//-----------------------------------------------------------------------------
 // (a ddot b)_ijkl = a_ijmn b_mnkl where b is super-symmetric
-inline tens4d ddot(const tens4d& a, const tens4ds& b)
+/*inline tens4d ddot(const tens4d& a, const tens4ds& b)
 {
     //! TODO: needs to be checked
     tens4d c;
@@ -1319,7 +1367,7 @@ inline tens4d ddot(const tens4d& a, const tens4ds& b)
 
     return c;
     
-}
+}*/
 
 //-----------------------------------------------------------------------------
 // vdotTdotv_jk = a_i T_ijkl b_l
@@ -1335,28 +1383,3 @@ inline mat3d vdotTdotv(const vec3d& a, const tens4d& T, const vec3d& b)
     a.y*b.z*T.d[19] + a.x*b.z*T.d[21] + a.z*b.z*T.d[25] + a.y*b.x*T.d[46] + a.x*b.x*T.d[48] + a.z*b.x*T.d[52] + a.y*b.y*T.d[64] + a.x*b.y*T.d[66] + a.z*b.y*T.d[70],
     a.z*b.z*T.d[20] + a.y*b.z*T.d[22] + a.x*b.z*T.d[26] + a.z*b.x*T.d[47] + a.y*b.x*T.d[49] + a.x*b.x*T.d[53] + a.z*b.y*T.d[65] + a.y*b.y*T.d[67] + a.x*b.y*T.d[71]);
 }
-
-//-----------------------------------------------------------------------------
-// inverse
-inline tens4d tens4d::inverse() const
-{
-    // extract the 9 x 9 contents of this 4th-order general tensor
-    tens4d t = *this;
-    double T[9][9];
-    t.extract(T);
-    matrix Tm(9,9);
-    for (int i=0; i<9; ++i)
-        for (int j=0; j<9; ++j)
-            Tm[i][j] = T[i][j];
-    // evluate the matrix inverse
-    matrix Ti = Tm.inverse();
-    // copy the contents of the inverse matrix back into the double array
-    for (int i=0; i<9; ++i)
-        for (int j=0; j<9; ++j)
-            T[i][j] = Ti[i][j];
-
-    // create a tens4d object from this double array
-    tens4d S(T);
-    return S;
-}
-

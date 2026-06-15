@@ -809,51 +809,6 @@ inline tens4dmm ddot(const tens4dmm& a, const tens4ds& b)
 }
 
 //-----------------------------------------------------------------------------
-// inverse
-inline tens4dmm tens4dmm::inverse() const
-{
-    // extract the 6 x 6 contents of this 4th-order tensor with minor symmetries
-    tens4dmm t = *this;
-    double T[6][6];
-    t.extract(T);
-    matrix Tm(6,6);
-    double a = sqrt(2);
-    // copy the contents of this array into a matrix converted to Voigt format
-    for (int i=0; i<3; ++i)
-        for (int j=0; j<3; ++j)
-            Tm[i][j] = T[i][j];
-    for (int i=0; i<3; ++i)
-        for (int j=3; j<6; ++j) {
-            Tm[i][j] = a*T[i][j];
-            Tm[j][i] = a*T[j][i];
-        }
-    for (int i=3; i<6; ++i)
-        for (int j=3; j<6; ++j)
-            Tm[i][j] = 2*T[i][j];
-
-    // evaluate the matrix inverse
-    matrix Ti = Tm.inverse();
-
-    // copy the contents of the inverse matrix back into the double array
-    // while also converting back from the Voigt format
-    for (int i=0; i<3; ++i)
-        for (int j=0; j<3; ++j)
-            T[i][j] = Ti[i][j];
-    for (int i=0; i<3; ++i)
-        for (int j=3; j<6; ++j) {
-            T[i][j] = Ti[i][j]/a;
-            T[j][i] = Ti[j][i]/a;
-        }
-    for (int i=3; i<6; ++i)
-        for (int j=3; j<6; ++j)
-            T[i][j] = Ti[i][j]/2;
-
-    // create a tens4d object from this double array
-    tens4dmm S(T);
-    return S;
-}
-
-//-----------------------------------------------------------------------------
 // evaluate push/pull operation
 // c_ijpq = F_ik F_jl C_klmn F_pm F_qn
 inline tens4dmm tens4dmm::pp(const mat3d& F)

@@ -84,3 +84,44 @@ bool IsPositiveDefinite(const tens4ds& t)
 	// but we'd have some good reasons to believe so.
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+// (a ddot b)_ijkl = a_ijmn b_mnkl
+tens4d ddot(const tens4d& a, const tens4d& b)
+{
+    double A[9][9] = {0};
+    double B[9][9] = {0};
+    double C[9][9] = {0};
+    tens4d aa = a, bb = b;
+    aa.extract(A); bb.extract(B);
+    
+    // perform matrix multiplication
+    for (int  i=0; i<9; ++i) {
+        for (int j=0; j<9; ++j) {
+            C[i][j] = 0;
+            for (int k=0; k<9; ++k) {
+                C[i][j] += A[i][k]*B[k][j];
+            }
+        }
+    }
+    tens4d c(C);
+    return c;
+    
+}
+
+//-----------------------------------------------------------------------------
+// inverse
+tens4dmm tens4dmm::inverse() const
+{
+    // convert this tens4dmm into a tens4d object
+    const tens4d t(*this);
+    // invert the tens4d object
+    const tens4d ti = t.inverse();
+    
+    // debug check
+//    tens4d tIoI = ddot(t,ti);
+    
+    // create a tens4dmm object from this ten4d inverse
+    tens4dmm S = ti.mmsymm();
+    return S;
+}
