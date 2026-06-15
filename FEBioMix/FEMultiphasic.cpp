@@ -955,7 +955,7 @@ tens4dmm FEMultiphasic::TangentPermeabilityStrain(FEMaterialPoint& pt, const mat
         // solute diffusiviety strain tangent, normalized by D0
         tens4dmm dDdE = m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Strain(pt)/D0;
         
-        dKedE += (dDdE + (dyad4mm(I, D) + dyad4mm(D,I) - dyad4mm(I,I))*2
+        dKedE += (dDdE + (dyad4mm(I, D) - dyad4mm(I))*2
         - dyad1mm(D,I) + dyad1mm(I-D,I)*(1./phiw - ept.m_J*spt.m_dkdJ[isol]/spt.m_k[isol]))*ca/D0;
     }
     

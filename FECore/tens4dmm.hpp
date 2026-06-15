@@ -646,6 +646,28 @@ inline tens4dmm dyad1mm(const mat3ds& a, const mat3ds& b)
 }
 
 //-----------------------------------------------------------------------------
+// (a dyad1 ab)_ijkl = a_ij a_kl
+inline tens4dmm dyad1mm(const mat3ds& a)
+{
+    tens4dmm c;
+    
+    c.d[ 0] = a.xx()*a.xx();    c.d[12] = a.xx()*a.zz();    c.d[24] = a.xx()*a.yz();
+    c.d[ 1] = a.yy()*a.xx();    c.d[13] = a.yy()*a.zz();    c.d[25] = a.yy()*a.yz();
+    c.d[ 2] = a.zz()*a.xx();    c.d[14] = a.zz()*a.zz();    c.d[26] = a.zz()*a.yz();
+    c.d[ 3] = a.xy()*a.xx();    c.d[15] = a.xy()*a.zz();    c.d[27] = a.xy()*a.yz();
+    c.d[ 4] = a.yz()*a.xx();    c.d[16] = a.yz()*a.zz();    c.d[28] = a.yz()*a.yz();
+    c.d[ 5] = a.xz()*a.xx();    c.d[17] = a.xz()*a.zz();    c.d[29] = a.xz()*a.yz();
+    c.d[ 6] = a.xx()*a.yy();    c.d[18] = a.xx()*a.xy();    c.d[30] = a.xx()*a.xz();
+    c.d[ 7] = a.yy()*a.yy();    c.d[19] = a.yy()*a.xy();    c.d[31] = a.yy()*a.xz();
+    c.d[ 8] = a.zz()*a.yy();    c.d[20] = a.zz()*a.xy();    c.d[32] = a.zz()*a.xz();
+    c.d[ 9] = a.xy()*a.yy();    c.d[21] = a.xy()*a.xy();    c.d[33] = a.xy()*a.xz();
+    c.d[10] = a.yz()*a.yy();    c.d[22] = a.yz()*a.xy();    c.d[34] = a.yz()*a.xz();
+    c.d[11] = a.xz()*a.yy();    c.d[23] = a.xz()*a.xy();    c.d[35] = a.xz()*a.xz();
+
+    return c;
+}
+
+//-----------------------------------------------------------------------------
 // (a dyad2 b)_ijkl = a_ik b_jl
 inline tens4dmm dyad2mm(const mat3ds& a, const mat3ds& b)
 {
@@ -656,13 +678,13 @@ inline tens4dmm dyad2mm(const mat3ds& a, const mat3ds& b)
     c.d[ 2] = a.xz()*b.xz();    c.d[14] = a.zz()*b.zz();    c.d[26] = a.yz()*b.zz();
     c.d[ 3] = a.xx()*b.xy();    c.d[15] = a.xz()*b.yz();    c.d[27] = a.xy()*b.yz();
     c.d[ 4] = a.xy()*b.xz();    c.d[16] = a.yz()*b.zz();    c.d[28] = a.yy()*b.zz();
-    c.d[ 5] = a.xx()*b.xz();    c.d[17] = a.xz()*b.zz();    c.d[29] = a.xy()*b.zz();
-    c.d[ 6] = a.xy()*b.xy();    c.d[18] = a.xx()*b.xy();    c.d[30] = a.xx()*b.xz();
-    c.d[ 7] = a.yy()*b.yy();    c.d[19] = a.xy()*b.yy();    c.d[31] = a.xy()*b.yz();
-    c.d[ 8] = a.yz()*b.yz();    c.d[20] = a.xz()*b.yz();    c.d[32] = a.xz()*b.zz();
-    c.d[ 9] = a.xy()*b.yy();    c.d[21] = a.xx()*b.yy();    c.d[33] = a.xx()*b.yz();
-    c.d[10] = a.yy()*b.yz();    c.d[22] = a.xy()*b.yz();    c.d[34] = a.xy()*b.zz();
-    c.d[11] = a.xy()*b.yz();    c.d[23] = a.xx()*b.yz();    c.d[35] = a.xx()*b.zz();
+    c.d[ 5] = a.xz()*b.xx();    c.d[17] = a.zz()*b.xz();    c.d[29] = a.yz()*b.xz();
+    c.d[ 6] = a.xy()*b.xy();    c.d[18] = a.xx()*b.xy();    c.d[30] = a.xz()*b.xx();
+    c.d[ 7] = a.yy()*b.yy();    c.d[19] = a.xy()*b.yy();    c.d[31] = a.yz()*b.xy();
+    c.d[ 8] = a.yz()*b.yz();    c.d[20] = a.xz()*b.yz();    c.d[32] = a.zz()*b.xz();
+    c.d[ 9] = a.xy()*b.yy();    c.d[21] = a.xx()*b.yy();    c.d[33] = a.xz()*b.xy();
+    c.d[10] = a.yy()*b.yz();    c.d[22] = a.xy()*b.yz();    c.d[34] = a.yz()*b.xz();
+    c.d[11] = a.yz()*b.xy();    c.d[23] = a.xz()*b.xy();    c.d[35] = a.zz()*b.xx();
     
     return c;
 }
@@ -678,22 +700,44 @@ inline tens4dmm dyad3mm(const mat3ds& a, const mat3ds& b)
     c.d[ 2] = a.xz()*b.xz();    c.d[14] = a.zz()*b.zz();    c.d[26] = a.zz()*b.yz();
     c.d[ 3] = a.xx()*b.xy();    c.d[15] = a.xz()*b.yz();    c.d[27] = a.xz()*b.yy();
     c.d[ 4] = a.xy()*b.xz();    c.d[16] = a.yz()*b.zz();    c.d[28] = a.yz()*b.yz();
-    c.d[ 5] = a.xx()*b.xz();    c.d[17] = a.xz()*b.zz();    c.d[29] = a.xz()*b.yz();
-    c.d[ 6] = a.xy()*b.xy();    c.d[18] = a.xy()*b.xx();    c.d[30] = a.xz()*b.xx();
-    c.d[ 7] = a.yy()*b.yy();    c.d[19] = a.yy()*b.xy();    c.d[31] = a.yz()*b.xy();
-    c.d[ 8] = a.yz()*b.yz();    c.d[20] = a.yz()*b.xz();    c.d[32] = a.zz()*b.xz();
-    c.d[ 9] = a.xy()*b.yy();    c.d[21] = a.xy()*b.xy();    c.d[33] = a.xz()*b.xy();
-    c.d[10] = a.yy()*b.yz();    c.d[22] = a.yy()*b.xz();    c.d[34] = a.yz()*b.xz();
-    c.d[11] = a.xy()*b.yz();    c.d[23] = a.xy()*b.xz();    c.d[35] = a.xz()*b.xz();
-
+    c.d[ 5] = a.xz()*b.xx();    c.d[17] = a.zz()*b.xz();    c.d[29] = a.zz()*b.xy();
+    c.d[ 6] = a.xy()*b.xy();    c.d[18] = a.xy()*b.xx();    c.d[30] = a.xx()*b.xz();
+    c.d[ 7] = a.yy()*b.yy();    c.d[19] = a.yy()*b.xy();    c.d[31] = a.xy()*b.yz();
+    c.d[ 8] = a.yz()*b.yz();    c.d[20] = a.yz()*b.xz();    c.d[32] = a.xz()*b.zz();
+    c.d[ 9] = a.xy()*b.yy();    c.d[21] = a.xy()*b.xy();    c.d[33] = a.xx()*b.yz();
+    c.d[10] = a.yy()*b.yz();    c.d[22] = a.yy()*b.xz();    c.d[34] = a.xy()*b.zz();
+    c.d[11] = a.yz()*b.xy();    c.d[23] = a.yz()*b.xx();    c.d[35] = a.xz()*b.xz();
+    
     return c;
 }
 
-//-----------------------------------------------------------------------------
-// (a dyad4 b)_ijkl = 0.5(a_ik b_jl + a_il b_jk)
+//----------------------------------------------------------------------------------
+// (a dyad4 b + b dyad4 a)_ijkl = 0.5(a_ik b_jl + a_il b_jk + b_ik a_jl + b_il a_jk)
 inline tens4dmm dyad4mm(const mat3ds& a, const mat3ds& b)
 {
-    return (dyad2mm(a,b) + dyad3mm(a,b))/2;
+    return (dyad2mm(a,b) + dyad3mm(a,b) + dyad2mm(b,a) + dyad3mm(b,a))/2;
+}
+
+//-----------------------------------------------------------------------------
+// (a dyad4 a)_ijkl = 0.5(a_ik a_jl + a_il a_jk)
+inline tens4dmm dyad4mm(const mat3ds& a)
+{
+    tens4dmm c;
+    
+    c.d[0] = pow(a.xx(),2);    c.d[12] = pow(a.xz(),2);    c.d[24] = a.xy()*a.xz();
+    c.d[1] = pow(a.xy(),2);    c.d[13] = pow(a.yz(),2);    c.d[25] = a.yy()*a.yz();
+    c.d[2] = pow(a.xz(),2);    c.d[14] = pow(a.zz(),2);    c.d[26] = a.yz()*a.zz();
+    c.d[3] = a.xx()*a.xy();    c.d[15] = a.xz()*a.yz();    c.d[27] = (a.xz()*a.yy() + a.xy()*a.yz())/2.;
+    c.d[4] = a.xy()*a.xz();    c.d[16] = a.yz()*a.zz();    c.d[28] = (pow(a.yz(),2) + a.yy()*a.zz())/2.;
+    c.d[5] = a.xx()*a.xz();    c.d[17] = a.xz()*a.zz();    c.d[29] = (a.xz()*a.yz() + a.xy()*a.zz())/2.;
+    c.d[6] = pow(a.xy(),2);    c.d[18] = a.xx()*a.xy();    c.d[30] = a.xx()*a.xz();
+    c.d[7] = pow(a.yy(),2);    c.d[19] = a.xy()*a.yy();    c.d[31] = a.xy()*a.yz();
+    c.d[8] = pow(a.yz(),2);    c.d[20] = a.xz()*a.yz();    c.d[32] = a.xz()*a.zz();
+    c.d[9] = a.xy()*a.yy();    c.d[21] = (pow(a.xy(),2) + a.xx()*a.yy())/2.;    c.d[33] = (a.xy()*a.xz() + a.xx()*a.yz())/2.;
+    c.d[10] = a.yy()*a.yz();    c.d[22] = (a.xz()*a.yy() + a.xy()*a.yz())/2.;    c.d[34] = (a.xz()*a.yz() + a.xy()*a.zz())/2.;
+    c.d[11] = a.xy()*a.yz();    c.d[23] = (a.xy()*a.xz() + a.xx()*a.yz())/2.;    c.d[35] = (pow(a.xz(),2) + a.xx()*a.zz())/2.;
+    
+    return c;
 }
 
 //-----------------------------------------------------------------------------
