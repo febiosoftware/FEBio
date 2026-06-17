@@ -998,6 +998,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemStrainYZ, "Eyz");
 	REGISTER_FECORE_CLASS(FELogElemStrainXZ, "Exz");
 	REGISTER_FECORE_CLASS(FELogElemStrainEffective, "effective strain");
+	REGISTER_FECORE_CLASS(FELogElemMaxShearStrain, "max shear strain");
 	REGISTER_FECORE_CLASS(FELogElemStrain1, "E1");
 	REGISTER_FECORE_CLASS(FELogElemStrain2, "E2");
 	REGISTER_FECORE_CLASS(FELogElemStrain3, "E3");
