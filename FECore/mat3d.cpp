@@ -194,6 +194,36 @@ void mat3ds::eigen2(double l[3], vec3d r[3]) const
     }
 }
 
+//------------------------------------------------------------------------------------
+// Sort the eigenvalues and eigenvectors from smallest to largest
+// and identify the number of repeated eigenvalues
+// (irep = 0 = no repeats, 1 = first and secon, and 2 = all)
+void mat3ds::sort(double l[3], vec3d r[3], int& irep, const double eps) const
+{
+    double dl[3] = {fabs(l[1] - l[0]),fabs(l[2] - l[1]), fabs(l[0] - l[2])};
+    
+    // check for repeated eigenvalues and reorder as needed
+    if ((dl[1] < eps) && (dl[0] > eps)) {
+        // swap eigenvalues 2 and 0
+        irep = 1;
+        std::swap(l[0], l[2]);
+        std::swap(r[0], r[2]);
+    }
+    else if ((dl[2] < eps) && (dl[1] > eps)) {
+        // swap eigenvalues 1 and 2
+        irep = 1;
+        std::swap(l[1], l[2]);
+        std::swap(r[1], r[2]);
+    }
+    else if ((dl[0] < eps) && (dl[1] > eps)) {
+        irep = 1;
+    }
+    else if ((dl[1] < eps) && (dl[0] < eps)) {
+        irep = 2;
+        r[0] = vec3d(1,0,0); r[1] = vec3d(0,1,0); r[2] = vec3d(0,0,1);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // calculates the unique right polar decomposition F = R*U
 void mat3d::right_polar(mat3d& R, mat3ds& U) const

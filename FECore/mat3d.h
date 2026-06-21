@@ -256,7 +256,12 @@ public:
 	FECORE_API void exact_eigen(double l[3]) const;
 	FECORE_API void eigen2(double d[3], vec3d r[3] = 0) const;
 
-	// L2-norm 
+    // sort the eigenvalues and eigenvectors from smallest to largest
+    // and identify the number of repeated eigenvalues
+    // (irep = 0 = no repeats, 1 = first and secon, and 2 = all)
+    void sort(double d[3], vec3d r[3], int& irep, const double eps = 1e-6) const;
+
+    // L2-norm
 	double norm() const;
 
 	// double contraction
