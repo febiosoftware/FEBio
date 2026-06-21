@@ -525,12 +525,6 @@ inline mat3ds dyads(const vec3d& a, const vec3d& b)
 	return mat3ds(2.0*a.x*b.x, 2.0*a.y*b.y, 2.0*a.z*b.z, a.x*b.y + a.y*b.x, a.y*b.z + a.z*b.y, a.x*b.z + a.z*b.x);
 }
 
-// c_ij = a_i*a_j
-inline mat3ds dyads(const vec3d& a)
-{
-    return mat3ds(a.x*a.x, a.y*a.y, a.z*a.z, a.x*a.y, a.y*a.z, a.x*a.z);
-}
-
 // skew-symmetric matrix of dual vector
 inline mat3d skew(const vec3d& a)
 {

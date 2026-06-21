@@ -105,7 +105,7 @@ mat3ds FESSVQLVMaterialPoint::CtoU(mat3ds C) {
     mat3ds U; U.zero();
     for (int i=0; i<3; ++i) {
         lam[i] = sqrt(lam[i]);
-        U += dyads(u[i])*lam[i];
+        U += dyad(u[i])*lam[i];
     }
     return U;
 }
