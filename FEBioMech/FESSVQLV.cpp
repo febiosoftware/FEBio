@@ -47,186 +47,19 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FESSVQLVMaterialPoint::FESSVQLVMaterialPoint(FEMaterialPointData* mp) : FEMaterialPointData(mp)
 {
-    m_sed = 0.0;
-    m_sedp = 0.0;
-    m_C = m_Cp = mat3dd(1);
-    m_Cs = m_Csp = mat3dd(1);
-    m_Cd = m_Cdp = mat3dd(1);
-    m_G = m_Gp = mat3dd(1);
+    m_E = m_Ep = mat3dd(0);
+    m_Es = m_Esp = mat3dd(0);
+    m_G = m_Gp = mat3dd(0);
     m_sed = m_sedp = 0;
-    m_Sm = m_Smp = mat3ds(0);
-    m_Chatm.zero(); m_Chatmp.zero();
 }
 
 //-----------------------------------------------------------------------------
 void FESSVQLVMaterialPoint::Init()
 {
-    m_sed = 0.0;
-    m_sedp = 0.0;
-    m_C = m_Cp = mat3dd(1);
-    m_Cs = m_Csp = mat3dd(1);
-    m_Cd = m_Cdp = mat3dd(1);
-    m_G = m_Gp = mat3dd(1);
+    m_E = m_Ep = mat3dd(0);
+    m_Es = m_Esp = mat3dd(0);
+    m_G = m_Gp = mat3dd(0);
     m_sed = m_sedp = 0;
-    m_Sm = m_Smp = mat3ds(0);
-    m_Chatm.zero(); m_Chatmp.zero();
-}
-
-//-----------------------------------------------------------------------------
-mat3ds FESSVQLVMaterialPoint::CtoH(mat3ds C)
-{
-    double lam2[3];
-    vec3d u[3];
-    C.eigen2(lam2,u);
-    mat3ds H(0);
-    for (int i=0; i<3; ++i) {
-        H += dyad(u[i])*log(lam2[i]);
-    }
-    return H;
-}
-
-//-----------------------------------------------------------------------------
-mat3ds FESSVQLVMaterialPoint::CtoU(mat3ds C)
-{
-    double lam2[3];
-    vec3d u[3];
-    C.eigen2(lam2,u);
-    mat3ds U(0);
-    for (int i=0; i<3; ++i) {
-        U += dyad(u[i])*sqrt(lam2[i]);
-    }
-    return U;
-}
-
-//-----------------------------------------------------------------------------
-mat3ds FESSVQLVMaterialPoint::HtoC(mat3ds H)
-{
-    double lnlam2[3];
-    vec3d u[3];
-    H.eigen2(lnlam2,u);
-    mat3ds C(0);
-    for (int i=0; i<3; ++i) {
-        C += dyad(u[i])*exp(lnlam2[i]);
-    }
-    return C;
-}
-
-//-----------------------------------------------------------------------------
-//! evaluate fourth-order tensor derivatives
-tens4dmm FESSVQLVMaterialPoint::dHdC(mat3ds C)
-{
-    double eps = 1e-6;
-    double lam2[3];
-    vec3d u[3];
-    C.eigen2(lam2,u);
-    mat3ds Ui[3];
-    for (int i=0; i<3; ++i) Ui[i] = dyad(u[i]);
-    
-    // check for repeated eigenvalues and reorder as needed
-    int rep = 0;
-    if ((fabs(lam2[1] - lam2[2]) < eps) && (fabs(lam2[0] - lam2[1]) > eps)) {
-        // swap eigenvalues 2 and 0
-        rep = 1;
-        std::swap(lam2[0], lam2[2]);
-        std::swap(u[0],u[2]);
-        std::swap(Ui[0], Ui[2]);
-    }
-    else if ((fabs(lam2[0] - lam2[2]) < eps) && (fabs(lam2[1] - lam2[2]) > eps)) {
-        // swap eigenvalues 1 and 2
-        rep = 1;
-        std::swap(lam2[1], lam2[2]);
-        std::swap(u[1],u[2]);
-        std::swap(Ui[1], Ui[2]);
-    }
-    else if ((fabs(lam2[0] - lam2[1]) < eps) && (fabs(lam2[1] - lam2[2]) > eps)) {
-        rep = 1;
-    }
-    else if ((fabs(lam2[1] - lam2[2]) < eps) && (fabs(lam2[0] - lam2[1]) < eps)) {
-        rep = 2;
-        u[0] = vec3d(1,0,0); u[1] = vec3d(0,1,0); u[2] = vec3d(0,0,1);
-        for (int i=0; i<3; ++i) Ui[i] = dyad(u[i]);
-    }
-    
-    tens4dmm result, UixUi;
-    result.zero(); UixUi.zero();
-    for (int i=0; i<3; ++i) {
-        UixUi += dyad1mm(Ui[i]);
-        result += dyad1mm(Ui[i]/lam2[i]);
-    }
-    
-    tens4dmm dUidC[3];
-    if (rep == 0) {
-        dUidC[0] = dyad4mm(Ui[0], Ui[1])/(lam2[0]-lam2[1]) + dyad4mm(Ui[0], Ui[2])/(lam2[0]-lam2[2]);
-        dUidC[1] = dyad4mm(Ui[1], Ui[2])/(lam2[1]-lam2[2]) + dyad4mm(Ui[1], Ui[0])/(lam2[1]-lam2[0]);
-        dUidC[2] = dyad4mm(Ui[2], Ui[0])/(lam2[2]-lam2[0]) + dyad4mm(Ui[2], Ui[1])/(lam2[2]-lam2[1]);
-        
-        for (int i=0; i<3; ++i) result += dUidC[i]*log(lam2[i]);
-    }
-    else if (rep == 1) {
-        dUidC[2] = dyad4mm(Ui[2], Ui[0])/(lam2[2]-lam2[0]) + dyad4mm(Ui[2], Ui[1])/(lam2[2]-lam2[1]);
-        result += dUidC[2]*(log(lam2[2]) - log(lam2[0]));
-    }
-    
-    return result;
-}
-
-tens4dmm FESSVQLVMaterialPoint::dCdH(mat3ds C)
-{
-    double eps = 1e-6;
-    double lam2[3];
-    vec3d u[3];
-    C.eigen2(lam2,u);
-    mat3ds Ui[3];
-    for (int i=0; i<3; ++i) Ui[i] = dyad(u[i]);
-    
-    // check for repeated eigenvalues and reorder as needed
-    int rep = 0;
-    if ((fabs(lam2[1] - lam2[2]) < eps) && (fabs(lam2[0] - lam2[1]) > eps)) {
-        // swap eigenvalues 2 and 0
-        rep = 1;
-        std::swap(lam2[0], lam2[2]);
-        std::swap(Ui[0], Ui[2]);
-    }
-    else if ((fabs(lam2[0] - lam2[2]) < eps) && (fabs(lam2[1] - lam2[2]) > eps)) {
-        // swap eigenvalues 1 and 2
-        rep = 1;
-        std::swap(lam2[1], lam2[2]);
-        std::swap(Ui[1], Ui[2]);
-    }
-    else if ((fabs(lam2[0] - lam2[1]) < eps) && (fabs(lam2[1] - lam2[2]) > eps)) {
-        rep = 1;
-    }
-    else if ((fabs(lam2[1] - lam2[2]) < eps) && (fabs(lam2[0] - lam2[1]) < eps)) {
-        rep = 2;
-        u[0] = vec3d(1,0,0); u[1] = vec3d(0,1,0); u[2] = vec3d(0,0,1);
-        for (int i=0; i<3; ++i) Ui[i] = dyad(u[i]);
-    }
-    
-    double lnlam2[3];
-    for (int i=0; i<3; ++i) lnlam2[i] = log(lam2[i]);
-    tens4dmm result, UixUi, IoI;
-    IoI = dyad4mm(mat3dd(1));
-    result.zero(); UixUi.zero();
-    for (int i=0; i<3; ++i) {
-        tens4dmm tmp = dyad1mm(Ui[i]);
-        UixUi += tmp;
-        result += tmp*lam2[i];
-    }
-    
-    tens4dmm dUidH[3];
-    if (rep == 0) {
-        dUidH[0] = dyad4mm(Ui[0], Ui[1])/(lnlam2[0]-lnlam2[1]) + dyad4mm(Ui[0], Ui[2])/(lnlam2[0]-lnlam2[2]);
-        dUidH[1] = dyad4mm(Ui[1], Ui[2])/(lnlam2[1]-lnlam2[2]) + dyad4mm(Ui[1], Ui[0])/(lnlam2[1]-lnlam2[0]);
-        dUidH[2] = dyad4mm(Ui[2], Ui[0])/(lnlam2[2]-lnlam2[0]) + dyad4mm(Ui[2], Ui[1])/(lnlam2[2]-lnlam2[1]);
-        
-        for (int i=0; i<3; ++i) result += dUidH[i]*lam2[i];
-    }
-    else if (rep == 1) {
-        dUidH[2] = dyad4mm(Ui[2], Ui[0])/(lnlam2[2]-lnlam2[0]) + dyad4mm(Ui[2], Ui[1])/(lnlam2[2]-lnlam2[1]);
-        result += dUidH[2]*(lam2[2]-lam2[0]);
-    }
-    
-    return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -244,12 +77,9 @@ void FESSVQLVMaterialPoint::Update(const FETimeInfo& timeInfo)
 {
     double dt = timeInfo.timeIncrement;
     m_sedp = m_sed;
-    m_Cp = m_C;
-    m_Csp = m_Cs;
-    m_Cdp = m_Cd;
+    m_Ep = m_E;
+    m_Esp = m_Es;
     m_Gp = m_G;
-    m_Smp = m_Sm;
-    m_Chatmp = m_Chatm;
 
     // don't forget to call the base class
     FEMaterialPointData::Update(timeInfo);
@@ -261,12 +91,23 @@ void FESSVQLVMaterialPoint::Serialize(DumpStream& ar)
 {
     FEMaterialPointData::Serialize(ar);
     ar & m_sed & m_sedp;
-    ar & m_C & m_Cp;
-    ar & m_Cs & m_Csp;
-    ar & m_Cd & m_Cdp;
+    ar & m_E & m_Ep;
+    ar & m_Es & m_Esp;
     ar & m_G & m_Gp;
-    ar & m_Sm & m_Smp;
-    ar & m_Chatm & m_Chatmp;
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate right stretch tensor from right Cauchy-Green tensor
+mat3ds FESSVQLVMaterialPoint::CtoU(mat3ds C) {
+    double lam[3];
+    vec3d u[3];
+    C.eigen2(lam,u);
+    mat3ds U; U.zero();
+    for (int i=0; i<3; ++i) {
+        lam[i] = sqrt(lam[i]);
+        U += dyads(u[i])*lam[i];
+    }
+    return U;
 }
 
 //-----------------------------------------------------------------------------
@@ -315,8 +156,8 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     double dt = timePoint.timeIncrement;
     double tp = t - dt;
     
-    double errrel = 1e-6;
-    double errabs = 1e-9;
+    double errrel = 1e-9;
+    double errabs = 1e-12;
     int itmax = 100;
     
     double eta = m_eta(mp);
@@ -331,52 +172,45 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     tens4dmm IoI = dyad4mm(I);
     
     // evaluate base stress
-    pt.m_C = ep.RightCauchyGreen();
-    mat3ds H = pt.CtoH(pt.m_C);
-    if (H.norm() < errrel) return mat3ds(0);
-    mat3ds E = (pt.m_C-I)/2;
-    mat3ds S = m_Base->PK2Stress(mp, E);
+    pt.m_E = ep.Strain();
+    if (pt.m_E.norm() < errrel) return mat3ds(0);
+    mat3ds S = m_Base->PK2Stress(mp, pt.m_E);
 
     bool convgd = false;
     bool maxed = false;
     int it = 0;
-    mat3ds Hsp = pt.CtoH(pt.m_Csp);
-    tens4dmm dCsdHs;
-    // initialize Cs to previoust time point
-    pt.m_Cs = pt.m_C;
-    double Jd;
+    mat3ds Sm; Sm.zero();
+    // initialize Es to previoust time point
+    pt.m_Es = (pt.m_Esp.norm() > errrel) ? pt.m_Esp : pt.m_E;
     do {
         // Evaluate Cd
-        mat3ds Hs = pt.CtoH(pt.m_Cs);
-        mat3ds Hd = H - Hs;
-        pt.m_Cd = pt.HtoC(Hd);
-        Jd = sqrt(pt.m_Cd.det());
-        dCsdHs = pt.dCdH(pt.m_Cs);
-        tens4dmm dHsdCs = pt.dHdC(pt.m_Cs);
-        tens4dmm tmpdot = ddot(dCsdHs,dHsdCs);
-        tens4d dCsdHs4d(dCsdHs);
-        tens4d dCsdHsi = dCsdHs4d.inverse();
-        mat3ds Gd = ddot(dCsdHs,pt.dHdC(pt.m_Cd)).dot(pt.m_Cd);
-        pt.m_G = ddot(dCsdHs,pt.dHdC(pt.m_C)).dot(pt.m_C);
-        double tmp = (kappa > 0) ? 1./(3*kappa) : 0;
-        pt.m_Chatm = (dyad4mm(Gd)/2/eta+dyad1mm(Gd)*(tmp-1./2/eta)/3)*(2./ep.m_J);
-        mat3ds Es = (pt.m_Cs-I)/2;
-        pt.m_Sm = m_Mxwl->PK2Stress(mp, Es);
-        mat3ds dCs = -pt.m_Cs;
-        pt.m_Cs = pt.m_Csp + pt.m_G - pt.m_Gp-(pt.m_Chatm.dot(pt.m_Sm) + pt.m_Chatmp.dot(pt.m_Smp))*dt/2;
-        dCs += pt.m_Cs;
-        if (fabs(dCs.dotdot(pt.m_Cs)) <= errrel) convgd = true;
-        if (dCs.norm() <= errabs) convgd = true;
+        mat3ds Ed = pt.m_E - pt.m_Es;
+        mat3ds Cd = I + Ed*2;
+        // Evaluate G
+        double tmpk = (kappa > 0) ? 1./(3*kappa) : 0;
+        double tmpe = (eta > 0) ? 1./(2*eta) : 0;
+        tens4dmm Hdi = (dyad4s(Cd)*tmpe + dyad1s(Cd)*((tmpk - tmpe)/3))/ep.m_J;
+        // Evaluate G
+        Sm = m_Mxwl->PK2Stress(mp,pt.m_Es);
+        pt.m_G = Hdi.dot(Sm);
+        mat3ds dEs = -pt.m_Es;
+        pt.m_Es = pt.m_Esp + pt.m_E - pt.m_Ep - (pt.m_G + pt.m_Gp)*(dt/2);
+        dEs += pt.m_Es;
+        if (fabs(dEs.dotdot(pt.m_Es)) <= errrel) convgd = true;
+        if (dEs.norm() <= errabs) convgd = true;
         if (++it > itmax) { convgd = true; maxed = true; }
+        // make sure we get at least two iterations
+        if (it < 2) { convgd = false; maxed = false; }
     } while (!convgd);
     
     if (maxed) feLogWarning("SSV-QLV iterations did not converge!\n");
     
-    S += ddot(pt.dHdC(pt.m_C),dCsdHs).dot(pt.m_Sm);
+    S += Sm;
     mat3ds s = (ep.m_F*(S*(ep.m_F).transpose())/ep.m_J).sym();
 
     // evaluate residual dissipation
-//    pt.m_rd = ?;
+    mat3ds Eddot = (pt.m_E - pt.m_Ep - pt.m_Es + pt.m_Esp)/dt;
+    pt.m_rd = Sm.dotdot(Eddot)/ep.m_J;
     
     // return the total Cauchy stress,
     return s;
@@ -412,9 +246,9 @@ double FESSVQLV::StrainEnergyDensity(FEMaterialPoint& mp)
     double Jsafe = ep.m_J;
 
     // evaluate Fs and Js to calculate stress in Maxwell spring
-    mat3ds Us = pt.CtoU(pt.m_Cs);
-    ep.m_F = Us; // Fs
-    ep.m_J = Us.det();  // Js
+    mat3ds Cs = mat3dd(1) + pt.m_Es*2;
+    ep.m_F = pt.CtoU(Cs); // Fs
+    ep.m_J = ep.m_F.det();  // Js
     sed += m_Mxwl->StrainEnergyDensity(mp);
 
     ep.m_F = Fsafe;

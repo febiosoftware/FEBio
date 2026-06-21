@@ -1671,6 +1671,33 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! SIV spring strain
+class FEPlotSIVSpringStrain : public FEPlotDomainData
+{
+public:
+    FEPlotSIVSpringStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! SIV dashpot strain
+class FEPlotSIVDashpotStrain : public FEPlotDomainData
+{
+public:
+    FEPlotSIVDashpotStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
+//-----------------------------------------------------------------------------
+//! SIV residual dissipation
+class FEPlotSIVResidualDissipation : public FEPlotDomainData
+{
+public:
+    FEPlotSIVResidualDissipation(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //=============================================================================
 //                            E D G E   D A T A
 //=============================================================================

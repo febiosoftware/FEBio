@@ -51,31 +51,20 @@ public:
     
     //! Serialize data to archive
     void Serialize(DumpStream& ar);
-    
-    mat3ds CtoH(mat3ds C);
-    mat3ds HtoC(mat3ds H);
+
+    //! Evaluate right stretch tensor from right Cauchy-Green tensor
     mat3ds CtoU(mat3ds C);
 
-    //! evaluate fourth-order tensor derivatives
-    tens4dmm dHdC(mat3ds C);
-    tens4dmm dCdH(mat3ds C);
-    
 public:
-    mat3ds  m_C;                    //!< parallel spring right Cauchy-Green tensor at current time
-    mat3ds  m_Cp;                   //!< parallel spring right Cauchy-Green tensor at previous time
-    mat3ds  m_Cs;                   //!< Maxwell spring right Cauchy-Green tensor at current time
-    mat3ds  m_Csp;                  //!< Maxwell spring right Cauchy-Green tensor at previous time
-    mat3ds  m_Cd;                   //!< Maxwell dashpot right Cauchy-Green tensor at current time
-    mat3ds  m_Cdp;                  //!< Maxwell dashpot right Cauchy-Green tensor at current time
+    mat3ds  m_E;                    //!< parallel spring Green-Lagrange strain tensor at current time
+    mat3ds  m_Ep;                   //!< parallel spring Green-Lagrange strain tensor at previous time
+    mat3ds  m_Es;                   //!< Maxwell spring Green-Lagrange strain tensor at current time
+    mat3ds  m_Esp;                  //!< Maxwell spring Green-Lagrange strain tensor at previous time
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
     double  m_rd;                   //!< residual dissipation at current time
     mat3ds  m_G;                    //!< measure appearing in evolution equation at current time
     mat3ds  m_Gp;                   //!< measure appearing in evolution equation at previous time
-    mat3ds  m_Sm;
-    mat3ds  m_Smp;
-    tens4dmm m_Chatm;
-    tens4dmm m_Chatmp;
 };
 
 

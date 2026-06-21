@@ -960,6 +960,11 @@ void FEBioMech::InitModule()
 
 	// 2O continuum fields
 	REGISTER_FECORE_CLASS(FEPlotElementsnorm, "s norm");
+    
+    // SSV-QLV variables
+    REGISTER_FECORE_CLASS(FEPlotSIVSpringStrain, "SIV spring strain");
+    REGISTER_FECORE_CLASS(FEPlotSIVDashpotStrain, "SIV dashpot strain");
+    REGISTER_FECORE_CLASS(FEPlotSIVResidualDissipation, "SIV residual dissipation");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogNodeData

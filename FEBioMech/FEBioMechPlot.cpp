@@ -67,6 +67,7 @@ SOFTWARE.*/
 #include "FEStickyInterface.h"
 #include "FEReactiveVEMaterialPoint.h"
 #include "FELinearTrussDomain.h"
+#include "FESSVQLV.h"
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FETrussDomain.h>
@@ -5215,3 +5216,73 @@ bool FEPlotTotalEnergy::Save(FEDomain& dom, FEDataStream& a)
 	}
 	return false;
 }
+
+//=============================================================================
+//! Store the average SIV spring strain (Maxwell element spring)
+class FESIVSpringStrain
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FESSVQLVMaterialPoint* pt = mp.ExtractData<FESSVQLVMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->m_Es;
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotSIVSpringStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FESIVSpringStrain());
+    return true;
+}
+
+//=============================================================================
+//! Store the average SIV dashpot strain (Maxwell element dashpot)
+class FESIVDashpotStrain
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FESSVQLVMaterialPoint* pt = mp.ExtractData<FESSVQLVMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->m_E - pt->m_Es;
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotSIVDashpotStrain::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FESIVDashpotStrain());
+    return true;
+}
+
+//=============================================================================
+//! Store the average residual dissipation (Maxwell element dashpot dissipation)
+class FESIVResidualDissipation
+{
+public:
+    double operator()(const FEMaterialPoint& mp)
+    {
+        const FESSVQLVMaterialPoint* pt = mp.ExtractData<FESSVQLVMaterialPoint>();
+        if (pt == 0) return 0;
+            
+        return pt->m_rd;
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotSIVResidualDissipation::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<double>(dom, a, FESIVResidualDissipation());
+    return true;
+}
+
