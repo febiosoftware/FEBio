@@ -63,8 +63,11 @@ public:
     double  m_sed;                  //!< elastic strain energy density
     double  m_sedp;                 //!< sed at previous time step
     double  m_rd;                   //!< residual dissipation at current time
-    mat3ds  m_G;                    //!< measure appearing in evolution equation at current time
-    mat3ds  m_Gp;                   //!< measure appearing in evolution equation at previous time
+    mat3ds  m_Sm;                   //!< PK2 stess in the Maxwell element
+    mat3ds  m_Edot;                 //!< time derivative of m_E at current time
+    mat3ds  m_Edotp;                //!< time derivative of m_E at previous time
+    mat3ds  m_Esdot;                //!< time derivative of m_Es at current time
+    mat3ds  m_Esdotp;               //!< //!< time derivative of m_Es at previous time
 };
 
 

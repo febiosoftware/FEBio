@@ -965,6 +965,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotSIVSpringStrain, "SIV spring strain");
     REGISTER_FECORE_CLASS(FEPlotSIVDashpotStrain, "SIV dashpot strain");
     REGISTER_FECORE_CLASS(FEPlotSIVResidualDissipation, "SIV residual dissipation");
+    REGISTER_FECORE_CLASS(FEPlotSIVSpringStress, "SIV spring stress");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogNodeData

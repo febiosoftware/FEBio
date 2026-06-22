@@ -49,8 +49,10 @@ FESSVQLVMaterialPoint::FESSVQLVMaterialPoint(FEMaterialPointData* mp) : FEMateri
 {
     m_E = m_Ep = mat3dd(0);
     m_Es = m_Esp = mat3dd(0);
-    m_G = m_Gp = mat3dd(0);
     m_sed = m_sedp = 0;
+    m_Sm = mat3dd(0);
+    m_Edot = m_Edotp = mat3dd(0);
+    m_Esdot = m_Esdotp = mat3dd(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -58,8 +60,10 @@ void FESSVQLVMaterialPoint::Init()
 {
     m_E = m_Ep = mat3dd(0);
     m_Es = m_Esp = mat3dd(0);
-    m_G = m_Gp = mat3dd(0);
     m_sed = m_sedp = 0;
+    m_Sm = mat3dd(0);
+    m_Edot = m_Edotp = mat3dd(0);
+    m_Esdot = m_Esdotp = mat3dd(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -79,7 +83,8 @@ void FESSVQLVMaterialPoint::Update(const FETimeInfo& timeInfo)
     m_sedp = m_sed;
     m_Ep = m_E;
     m_Esp = m_Es;
-    m_Gp = m_G;
+    m_Edotp = m_Edot;
+    m_Esdotp = m_Esdot;
 
     // don't forget to call the base class
     FEMaterialPointData::Update(timeInfo);
@@ -93,7 +98,9 @@ void FESSVQLVMaterialPoint::Serialize(DumpStream& ar)
     ar & m_sed & m_sedp;
     ar & m_E & m_Ep;
     ar & m_Es & m_Esp;
-    ar & m_G & m_Gp;
+    ar & m_Sm;
+    ar & m_Edot & m_Edotp;
+    ar & m_Esdot & m_Esdotp;
 }
 
 //-----------------------------------------------------------------------------
@@ -155,13 +162,21 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     double t = timePoint.currentTime;
     double dt = timePoint.timeIncrement;
     double tp = t - dt;
+    double rhoi = 0;
+    // Generalized-alpha integration (2nd order system)
+    double alphaf = 1.0 / (1 + rhoi);
+    double alpham = 0.5*(3 - rhoi) / (1 + rhoi);
+    double gamma = 0.5 + alpham - alphaf;
+    double ksi = alpham/(gamma*alphaf);
     
-    double errrel = 1e-9;
-    double errabs = 1e-12;
+    double errrel = 1e-6;
+    double errabs = 1e-9;
     int itmax = 100;
     
     double eta = m_eta(mp);
     double kappa = m_kappa(mp);
+    // If kappa is not specified, or set to zero, use Stokes' condition
+    if (kappa == 0) kappa = 2*eta/3;
 
     // get the elastic material point data
     FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -172,44 +187,62 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     tens4dmm IoI = dyad4mm(I);
     
     // evaluate base stress
-    pt.m_E = ep.Strain();
-    if (pt.m_E.norm() < errrel) return mat3ds(0);
-    mat3ds S = m_Base->PK2Stress(mp, pt.m_E);
+    mat3ds E = ep.Strain();
+    if (E.norm() < errrel) return mat3ds(0);
+    mat3ds S = m_Base->PK2Stress(mp, E);
 
     bool convgd = false;
     bool maxed = false;
     int it = 0;
     mat3ds Sm; Sm.zero();
-    // initialize Es to previoust time point
-    pt.m_Es = (pt.m_Esp.norm() > errrel) ? pt.m_Esp : pt.m_E;
+    // initialize Es at current time, at start of iterations
+    pt.m_Es = pt.m_Esp + pt.m_Esdotp*(dt*(1-gamma));
+    // evaluate Es at intermediate time
+    mat3ds Es = (pt.m_Esp.norm() > errrel) ? pt.m_Es*alphaf + pt.m_Esp*(1-alphaf) : E;
+    // evaluate initial values of Esdot snd Edot
+    mat3ds Esdot = pt.m_Esdotp*(1-alpham/gamma) + (Es - pt.m_Esp)*(ksi/dt);
+    mat3ds Edot = pt.m_Edotp*(1-alpham/gamma) + (E - pt.m_Ep)*(ksi/dt);
     do {
         // Evaluate Cd
-        mat3ds Ed = pt.m_E - pt.m_Es;
+        mat3ds Ed = E - Es;
         mat3ds Cd = I + Ed*2;
-        // Evaluate G
-        double tmpk = (kappa > 0) ? 1./(3*kappa) : 0;
-        double tmpe = (eta > 0) ? 1./(2*eta) : 0;
-        tens4dmm Hdi = (dyad4s(Cd)*tmpe + dyad1s(Cd)*((tmpk - tmpe)/3))/ep.m_J;
-        // Evaluate G
-        Sm = m_Mxwl->PK2Stress(mp,pt.m_Es);
-        pt.m_G = Hdi.dot(Sm);
-        mat3ds dEs = -pt.m_Es;
-        pt.m_Es = pt.m_Esp + pt.m_E - pt.m_Ep - (pt.m_G + pt.m_Gp)*(dt/2);
-        dEs += pt.m_Es;
-        if (fabs(dEs.dotdot(pt.m_Es)) <= errrel) convgd = true;
-        if (dEs.norm() <= errabs) convgd = true;
+        // Evaluate Gm
+        Sm = m_Mxwl->PK2Stress(mp,Es);
+        double tmp = (1./3.-kappa/(2*eta))/(1-3*(1./3.-kappa/(2*eta)));
+        mat3ds Gm = ((Cd*(Sm*Cd)).sym() + Cd*((Cd.dotdot(Sm)*tmp)))/(ep.m_J*2*eta);
+        // Update Esdot at intermediate time
+        mat3ds dEsdot = -Esdot;
+        // evaluate the Maxwell spring strain at this intermediate time
+        Es = pt.m_Esp + (Esdot - pt.m_Esdotp*(1-alpham/gamma))*(dt/ksi);
+        Esdot = Edot - Gm;
+        dEsdot += Esdot;
+        if (fabs(dEsdot.dotdot(Esdot)) <= errrel) convgd = true;
+        if (dEsdot.norm() <= errabs) convgd = true;
         if (++it > itmax) { convgd = true; maxed = true; }
         // make sure we get at least two iterations
         if (it < 2) { convgd = false; maxed = false; }
     } while (!convgd);
     
     if (maxed) feLogWarning("SSV-QLV iterations did not converge!\n");
+
+    // update the total PK2 stress at this intermediate time
+    S += m_Mxwl->PK2Stress(mp,Es);
     
-    S += Sm;
+    // update current strain measures
+    pt.m_Es = pt.m_Esp + (Es-pt.m_Esp)/alphaf;
+    pt.m_E = pt.m_Ep + (E-pt.m_Ep)/alphaf;
+    // update current strain rate measures
+    pt.m_Esdot = pt.m_Esdotp + (Esdot-pt.m_Esdotp)/alpham;
+    pt.m_Edot = pt.m_Edotp + (Edot-pt.m_Edotp)/alpham;
+
+    // evaluate Maxwell spring PK2 stress at current value of the Maxwell strain
+    pt.m_Sm = m_Mxwl->PK2Stress(mp,pt.m_Es);
+
+    // convert to Cauchy stress
     mat3ds s = (ep.m_F*(S*(ep.m_F).transpose())/ep.m_J).sym();
 
-    // evaluate residual dissipation
-    mat3ds Eddot = (pt.m_E - pt.m_Ep - pt.m_Es + pt.m_Esp)/dt;
+    // evaluate residual dissipation at current time
+    mat3ds Eddot = pt.m_Edot - pt.m_Esdot;
     pt.m_rd = Sm.dotdot(Eddot)/ep.m_J;
     
     // return the total Cauchy stress,

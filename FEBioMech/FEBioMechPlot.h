@@ -1698,6 +1698,15 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! SIV spring stress
+class FEPlotSIVSpringStress : public FEPlotDomainData
+{
+public:
+    FEPlotSIVSpringStress(FEModel* pfem) : FEPlotDomainData(pfem, PLT_MAT3FS, FMT_ITEM){}
+    bool Save(FEDomain& dom, FEDataStream& a);
+};
+
 //=============================================================================
 //                            E D G E   D A T A
 //=============================================================================

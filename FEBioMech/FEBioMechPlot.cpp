@@ -5286,3 +5286,26 @@ bool FEPlotSIVResidualDissipation::Save(FEDomain& dom, FEDataStream& a)
     return true;
 }
 
+//=============================================================================
+//! Store the average SIV spring stress (Maxwell element spring)
+class FESIVSpringStress
+{
+public:
+    mat3ds operator()(const FEMaterialPoint& mp)
+    {
+        const FESSVQLVMaterialPoint* pt = mp.ExtractData<FESSVQLVMaterialPoint>();
+        if (pt == 0) return mat3ds(0, 0, 0, 0, 0, 0);
+            
+        return pt->m_Sm;
+    }
+};
+
+//-----------------------------------------------------------------------------
+bool FEPlotSIVSpringStress::Save(FEDomain& dom, FEDataStream& a)
+{
+    FEElasticMaterial* pme = dom.GetMaterial()->ExtractProperty<FEElasticMaterial>();
+    if (pme == nullptr) return false;
+    writeAverageElementValue<mat3ds>(dom, a, FESIVSpringStress());
+    return true;
+}
+
