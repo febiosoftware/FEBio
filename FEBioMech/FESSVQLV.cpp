@@ -121,14 +121,14 @@ mat3ds FESSVQLVMaterialPoint::CtoU(mat3ds C) {
 BEGIN_FECORE_CLASS(FESSVQLV, FEElasticMaterial)
 
     // material parameters
+    ADD_PARAMETER(m_beta , "beta" )->setLongName("Maxwell spring scale factor")->setUnits(UNIT_NONE);
     ADD_PARAMETER(m_eta  , "eta"  )->setLongName("Dashpot shear viscosity")->setUnits(UNIT_VISCOSITY);
     ADD_PARAMETER(m_kappa, "kappa")->setLongName("Dashpot bulk viscosity" )->setUnits(UNIT_VISCOSITY);
-    ADD_PARAMETER(m_itmin, "min_iter")->setLongName("Minimum iterations"     )->setUnits(UNIT_NONE);
-    ADD_PARAMETER(m_itmax, "max_iter")->setLongName("Maximum iterations"     )->setUnits(UNIT_NONE);
+    ADD_PARAMETER(m_itmin, "min_iter")->setLongName("Minimum iterations"     )->setUnits(UNIT_NONE)->SetFlags(FE_PARAM_HIDDEN);
+    ADD_PARAMETER(m_itmax, "max_iter")->setLongName("Maximum iterations"     )->setUnits(UNIT_NONE)->SetFlags(FE_PARAM_HIDDEN);
 
     // define the material properties
-    ADD_PROPERTY(m_Base, "parallel");
-    ADD_PROPERTY(m_Mxwl, "Maxwell");
+    ADD_PROPERTY(m_Base, "elastic");
 
 END_FECORE_CLASS();
 
@@ -137,12 +137,12 @@ END_FECORE_CLASS();
 FESSVQLV::FESSVQLV(FEModel* pfem) : FEElasticMaterial(pfem)
 {
     m_Base = nullptr;
-    m_Mxwl = nullptr;
     m_eta = 0.0;
     m_kappa = 0.0;
     m_secant_tangent = true;
     m_itmin = 2;
     m_itmax = 100;
+    m_beta = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -178,6 +178,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     
     double eta = m_eta(mp);
     double kappa = m_kappa(mp);
+    double beta = m_beta(mp);
     // If kappa is not specified, or set to zero, use Stokes' condition
     if (kappa == 0) kappa = 2*eta/3;
 
@@ -211,7 +212,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
             mat3ds Ed = E - Es;
             mat3ds Cd = I + Ed*2;
             // Evaluate Gm
-            Sm = m_Mxwl->PK2Stress(mp,Es);
+            Sm = m_Base->PK2Stress(mp,Es)*beta;
             double tmp = (1./3.-kappa/(2*eta))/(1-3*(1./3.-kappa/(2*eta)));
             mat3ds Gm = ((Cd*(Sm*Cd)).sym() + Cd*((Cd.dotdot(Sm)*tmp)))/(ep.m_J*2*eta);
             // Update Esdot at intermediate time
@@ -235,7 +236,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     if (maxed) feLogWarning("SSV-QLV iterations did not converge!\n");
 
     // update the total PK2 stress at this intermediate time
-    S += m_Mxwl->PK2Stress(mp,Es);
+    S += m_Base->PK2Stress(mp,Es)*beta;
     
     // update current strain measures
     pt.m_Es = pt.m_Esp + (Es-pt.m_Esp)/alphaf;
@@ -245,7 +246,7 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     pt.m_Edot = pt.m_Edotp + (Edot-pt.m_Edotp)/alpham;
 
     // evaluate Maxwell spring PK2 stress at current value of the Maxwell strain
-    pt.m_Sm = m_Mxwl->PK2Stress(mp,pt.m_Es);
+    pt.m_Sm = m_Base->PK2Stress(mp,pt.m_Es)*beta;
 
     // convert to Cauchy stress
     mat3ds s = (ep.m_F*(S*(ep.m_F).transpose())/ep.m_J).sym();
@@ -291,7 +292,8 @@ double FESSVQLV::StrainEnergyDensity(FEMaterialPoint& mp)
     mat3ds Cs = mat3dd(1) + pt.m_Es*2;
     ep.m_F = pt.CtoU(Cs); // Fs
     ep.m_J = ep.m_F.det();  // Js
-    sed += m_Mxwl->StrainEnergyDensity(mp);
+    double beta = m_beta(mp);
+    sed += m_Base->StrainEnergyDensity(mp)*beta;
 
     ep.m_F = Fsafe;
     ep.m_J = Jsafe;

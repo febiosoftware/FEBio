@@ -36,12 +36,9 @@ public:
 	FEHolmesMow(FEModel* pfem) : FEElasticMaterial(pfem) {}
 		
 public:
-	double	m_E;	//!< Young's modulus
-	double	m_v;	//!< Poisson's ratio
-	double	m_b;	//!< Exponential stiffening coefficient
-	double	lam;	//!< first Lame coefficient
-	double	mu;		//!< second Lame coefficient
-	double	Ha;		//!< aggregate modulus
+	FEParamDouble	m_E;	//!< Young's modulus
+    FEParamDouble	m_v;	//!< Poisson's ratio
+    FEParamDouble	m_b;	//!< Exponential stiffening coefficient
 		
 public:
 	//! calculate stress at material point

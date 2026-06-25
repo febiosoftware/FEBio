@@ -42,11 +42,6 @@ bool FEHolmesMow::Validate()
 {
 	if (FEElasticMaterial::Validate() == false) return false;
 	
-	// Lame coefficients
-	lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-	mu  = 0.5*m_E/(1+m_v);
-	Ha = lam + 2*mu;	
-
 	return true;
 }
 
@@ -68,8 +63,16 @@ mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 	double I2 = (I1*I1 - b2.tr())/2.;
 	double I3 = b.det();
 
+    // Lame coefficients
+    double E = m_E(mp);
+    double v = m_v(mp);
+    double beta = m_b(mp);
+    double lam = v*E/((1+v)*(1-2*v));
+    double mu  = 0.5*E/(1+v);
+    double Ha = lam + 2*mu;
+    
 	// Exponential term
-	double eQ = exp(m_b*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,m_b);
+	double eQ = exp(beta*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,beta);
 	
 	// calculate stress
 	mat3ds s = 0.5*detFi*eQ*((2*mu+lam*(I1-1))*b - lam*b2 - Ha*identity);
@@ -95,14 +98,22 @@ tens4ds FEHolmesMow::Tangent(FEMaterialPoint& mp)
 	double I2 = (I1*I1 - b2.tr())*0.5;
 	double I3 = b.det();
 	
+    // Lame coefficients
+    double E = m_E(mp);
+    double v = m_v(mp);
+    double beta = m_b(mp);
+    double lam = v*E/((1+v)*(1-2*v));
+    double mu  = 0.5*E/(1+v);
+    double Ha = lam + 2*mu;
+    
 	// Exponential term
-	double eQ = exp(m_b*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,m_b);
+	double eQ = exp(beta*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,beta);
 	
 	// calculate stress
 	mat3ds s = 0.5*detFi*eQ*((2*mu+lam*(I1-1))*b - lam*b2 - Ha*identity);
 	
 	// calculate elasticity tensor
-	tens4ds c = 4.*m_b/Ha*detF/eQ*dyad1s(s) 
+	tens4ds c = 4.*beta/Ha*detF/eQ*dyad1s(s)
 	+ detFi*eQ*(lam*(dyad1s(b) - dyad4s(b)) + Ha*dyad4s(identity));
 	
 	return c;
@@ -122,11 +133,20 @@ double FEHolmesMow::StrainEnergyDensity(FEMaterialPoint& mp)
 	double I2 = (I1*I1 - b2.tr())/2.;
 	double I3 = b.det();
     
+    // Lame coefficients
+    double E = m_E(mp);
+    double v = m_v(mp);
+    double beta = m_b(mp);
+    double lam = v*E/((1+v)*(1-2*v));
+    double mu  = 0.5*E/(1+v);
+    double Ha = lam + 2*mu;
+    
 	// Exponential term
-	double eQ = exp(m_b*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,m_b);
+	double eQ = exp(beta*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,beta);
+    double c = (beta > 0) ? Ha/(2*beta) : 0;
 	
 	// calculate strain energy density
-	double sed = Ha/(4*m_b)*(eQ - 1);
+	double sed = c*(eQ - 1)/2;
 	
 	return sed;
 }

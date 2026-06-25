@@ -83,14 +83,8 @@ public:
     //! get the elastic base material
     FEElasticMaterial* GetBaseMaterial() { return m_Base; }
 
-    //! get the elastic Maxwell material
-    FEElasticMaterial* GetMxwlMaterial() { return m_Mxwl; }
-
     //! Set the base material
     void SetBaseMaterial(FEElasticMaterial* pbase) { m_Base = pbase; }
-
-    //! Set the Maxwell material
-    void SetMxwlMaterial(FEElasticMaterial* pmxwl) { m_Mxwl = pmxwl; }
 
 public:
     //! stress function
@@ -114,12 +108,12 @@ public:
     // material parameters
     FEParamDouble   m_eta;          //!< dashpot shear vicosity
     FEParamDouble   m_kappa;        //!< dashpot bulk vicosity
+    FEParamDouble   m_beta;         //!< scale factor for Maxwell spring relative to parallel spring
     int             m_itmin;        //!< minimum number of iterations
     int             m_itmax;        //!< maximum number of iterations
 
 private:
     FEElasticMaterial*    m_Base;   //!< pointer to parallel elastic solid material
-    FEElasticMaterial*    m_Mxwl;   //!< pointer to Maxwell elastic solid material
     bool    m_secant_tangent;
 
 public:
