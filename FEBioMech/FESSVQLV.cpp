@@ -123,6 +123,8 @@ BEGIN_FECORE_CLASS(FESSVQLV, FEElasticMaterial)
     // material parameters
     ADD_PARAMETER(m_eta  , "eta"  )->setLongName("Dashpot shear viscosity")->setUnits(UNIT_VISCOSITY);
     ADD_PARAMETER(m_kappa, "kappa")->setLongName("Dashpot bulk viscosity" )->setUnits(UNIT_VISCOSITY);
+    ADD_PARAMETER(m_itmin, "min_iter")->setLongName("Minimum iterations"     )->setUnits(UNIT_NONE);
+    ADD_PARAMETER(m_itmax, "max_iter")->setLongName("Maximum iterations"     )->setUnits(UNIT_NONE);
 
     // define the material properties
     ADD_PROPERTY(m_Base, "parallel");
@@ -139,6 +141,8 @@ FESSVQLV::FESSVQLV(FEModel* pfem) : FEElasticMaterial(pfem)
     m_eta = 0.0;
     m_kappa = 0.0;
     m_secant_tangent = true;
+    m_itmin = 2;
+    m_itmax = 100;
 }
 
 //-----------------------------------------------------------------------------
@@ -169,9 +173,8 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     double gamma = 0.5 + alpham - alphaf;
     double ksi = alpham/(gamma*alphaf);
     
-    double errrel = 1e-6;
-    double errabs = 1e-9;
-    int itmax = 100;
+    double errrel = 1e-7;
+    double errabs = 1e-10;
     
     double eta = m_eta(mp);
     double kappa = m_kappa(mp);
@@ -202,26 +205,32 @@ mat3ds FESSVQLV::Stress(FEMaterialPoint& mp)
     // evaluate initial values of Esdot snd Edot
     mat3ds Esdot = pt.m_Esdotp*(1-alpham/gamma) + (Es - pt.m_Esp)*(ksi/dt);
     mat3ds Edot = pt.m_Edotp*(1-alpham/gamma) + (E - pt.m_Ep)*(ksi/dt);
-    do {
-        // Evaluate Cd
-        mat3ds Ed = E - Es;
-        mat3ds Cd = I + Ed*2;
-        // Evaluate Gm
-        Sm = m_Mxwl->PK2Stress(mp,Es);
-        double tmp = (1./3.-kappa/(2*eta))/(1-3*(1./3.-kappa/(2*eta)));
-        mat3ds Gm = ((Cd*(Sm*Cd)).sym() + Cd*((Cd.dotdot(Sm)*tmp)))/(ep.m_J*2*eta);
-        // Update Esdot at intermediate time
-        mat3ds dEsdot = -Esdot;
-        // evaluate the Maxwell spring strain at this intermediate time
-        Es = pt.m_Esp + (Esdot - pt.m_Esdotp*(1-alpham/gamma))*(dt/ksi);
-        Esdot = Edot - Gm;
-        dEsdot += Esdot;
-        if (fabs(dEsdot.dotdot(Esdot)) <= errrel) convgd = true;
-        if (dEsdot.norm() <= errabs) convgd = true;
-        if (++it > itmax) { convgd = true; maxed = true; }
-        // make sure we get at least two iterations
-        if (it < 2) { convgd = false; maxed = false; }
-    } while (!convgd);
+    if (Edot.norm() > errrel) {
+        do {
+            // Evaluate Cd
+            mat3ds Ed = E - Es;
+            mat3ds Cd = I + Ed*2;
+            // Evaluate Gm
+            Sm = m_Mxwl->PK2Stress(mp,Es);
+            double tmp = (1./3.-kappa/(2*eta))/(1-3*(1./3.-kappa/(2*eta)));
+            mat3ds Gm = ((Cd*(Sm*Cd)).sym() + Cd*((Cd.dotdot(Sm)*tmp)))/(ep.m_J*2*eta);
+            // Update Esdot at intermediate time
+            mat3ds dEsdot = -Esdot;
+            // evaluate the Maxwell spring strain at this intermediate time
+            Es = pt.m_Esp + (Esdot - pt.m_Esdotp*(1-alpham/gamma))*(dt/ksi);
+            Esdot = Edot - Gm;
+            dEsdot += Esdot;
+            if (fabs(dEsdot.dotdot(Esdot)) <= errrel) convgd = true;
+            if (dEsdot.norm() <= errabs) convgd = true;
+            if (++it > m_itmax) { convgd = true; maxed = true; }
+            // make sure we get at least a few iterations
+            if (it < m_itmin) { convgd = false; maxed = false; }
+        } while (!convgd);
+    }
+    else {
+        Es = pt.m_Esp;
+        Esdot = mat3ds(0);
+    }
     
     if (maxed) feLogWarning("SSV-QLV iterations did not converge!\n");
 

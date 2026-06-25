@@ -114,6 +114,8 @@ public:
     // material parameters
     FEParamDouble   m_eta;          //!< dashpot shear vicosity
     FEParamDouble   m_kappa;        //!< dashpot bulk vicosity
+    int             m_itmin;        //!< minimum number of iterations
+    int             m_itmax;        //!< maximum number of iterations
 
 private:
     FEElasticMaterial*    m_Base;   //!< pointer to parallel elastic solid material
