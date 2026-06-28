@@ -99,8 +99,8 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
         pt.m_s.zero();
         
         // get the tangent (stiffness) and it inverse (compliance) at this point
-        tens4ds S = pme->Tangent(mp);
-        tens4ds C = S.inverse();
+        tens4dmm S = pme->SolidTangent(mp);
+        tens4dmm C = S.inverse();
         
 		// restore the material point
 		pt.m_F = F0;
