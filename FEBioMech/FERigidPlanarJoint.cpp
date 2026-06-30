@@ -55,8 +55,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidPlanarJoint::FERigidPlanarJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-    m_nID = m_ncount++;
-
 	m_laugon = FECore::AUGLAG_METHOD; // for backward compatibility
     m_atol = 0;
     m_gtol = 0;
@@ -717,8 +715,8 @@ bool FERigidPlanarJoint::Augment(int naug, const FETimeInfo& tp)
     normM1 = sqrt(Um*Um);
     
     // check convergence of constraints
-    feLog(" rigid connector # %d (planar joint)\n", m_nID+1);
-    feLog("                  CURRENT        REQUIRED\n");
+	feLog("\n=== rigid connector #%d (%s):\n", m_nID, GetName().c_str());
+	feLog("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();
     double qap = ksi.norm();

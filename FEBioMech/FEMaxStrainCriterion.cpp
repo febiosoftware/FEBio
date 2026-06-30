@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,20 +23,48 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FEBioXML/FEModelBuilder.h>
-#include "febiolib_api.h"
 
-class FEBioModel;
 
-class FEBIOLIB_API FEBioModelBuilder : public FEModelBuilder
+
+#include "stdafx.h"
+#include "FEMaxStrainCriterion.h"
+#include "FEElasticMaterial.h"
+#include <FECore/FEElement.h>
+
+BEGIN_FECORE_CLASS(FEStrainCriterion, FEMeshAdaptorCriterion)
+	ADD_PARAMETER(m_metric, "metric");
+END_FECORE_CLASS();
+
+FEStrainCriterion::FEStrainCriterion(FEModel* fem) : FEMeshAdaptorCriterion(fem)
 {
-public:
-	FEBioModelBuilder(FEBioModel& fem);
+	m_metric = 0;
+}
 
-public:
-	FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat) override;
-	void AddMaterial(FEMaterial* mat) override;
-	void AddRigidComponent(FEStepComponent* prc) override;
-};
+bool FEStrainCriterion::GetMaterialPointValue(FEMaterialPoint& mp, double& value)
+{
+	FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
+	if (ep == nullptr) return false;
 
+	mat3ds s = ep->Strain();
+
+	// get the metric
+	value = 0.0;
+	switch (m_metric)
+	{
+	case 0: value = s.effective_norm(); break;
+	case 1:
+	{
+		double l[3], lmax;
+		s.exact_eigen(l);
+		lmax = l[0];
+		if (l[1] > lmax) lmax = l[1];
+		if (l[2] > lmax) lmax = l[2];
+		value = lmax;
+	}
+	break;
+	default:
+		return false;
+	}
+
+	return true;
+}

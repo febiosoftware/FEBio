@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,19 +24,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FEBioXML/FEModelBuilder.h>
-#include "febiolib_api.h"
+#include <FECore/FEMeshAdaptorCriterion.h>
 
-class FEBioModel;
-
-class FEBIOLIB_API FEBioModelBuilder : public FEModelBuilder
+class FEStrainCriterion : public FEMeshAdaptorCriterion
 {
 public:
-	FEBioModelBuilder(FEBioModel& fem);
+	FEStrainCriterion(FEModel* fem);
 
-public:
-	FEDomain* CreateDomain(FE_Element_Spec espec, FEMaterial* mat) override;
-	void AddMaterial(FEMaterial* mat) override;
-	void AddRigidComponent(FEStepComponent* prc) override;
+	bool GetMaterialPointValue(FEMaterialPoint& mp, double& value) override;
+
+private:
+	int		m_metric;
+
+	DECLARE_FECORE_CLASS()
 };
 

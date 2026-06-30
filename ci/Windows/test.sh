@@ -43,3 +43,6 @@ cp -a "$ZLIB" "$FEBIO_LIB"
 
 # Run the test suite
 python ./TestSuite/code/tools.py -r $FEBIO_BIN -n -p $PLUGIN_DIRS
+
+# remove the febio.xml file to prevent it from getting uploaded to the repo server.
+rm $FEBIO_DIR/febio.xml 

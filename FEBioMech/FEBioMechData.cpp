@@ -533,6 +533,31 @@ double FELogElemStrainEffective::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogElemMaxShearStrain::value(FEElement& el)
+{
+	int nint = el.GaussPoints();
+	mat3ds Eavg; Eavg.zero();
+	for (int n = 0; n < nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
+		if (ep)
+		{
+			mat3ds C = ep->LeftCauchyGreen();
+			mat3dd I(1.0);
+			mat3ds E = (C - I) * 0.5;
+
+			Eavg += E;
+		}
+	}
+	Eavg /= (double)nint;
+	double val = Eavg.max_shear();
+
+	return val;
+}
+
+
+//-----------------------------------------------------------------------------
 double FELogElemStrain2::value(FEElement& el)
 {
 	double l[3];
