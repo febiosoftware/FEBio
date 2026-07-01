@@ -97,8 +97,9 @@ public:
     double      m_ar;       //!< referential specific free energy
     double      m_sr;       //!< referential specific entropy
     FEThermalPropTempDpndnt*   m_cp;   //!< isobaric specific heat capacity
-    FEThermalPropTempDpndnt*   m_ao;   //!< specific free energy a-circle
     // declare parameter list
     DECLARE_FECORE_CLASS();
 
+private:
+    FEThermalPropTempDpndnt*   m_ao;   //!< specific free energy a-circle
 };

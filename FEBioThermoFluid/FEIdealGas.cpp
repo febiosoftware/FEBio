@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 #include "FEIdealGas.h"
 #include <FECore/log.h>
+#include <FECore/FEPointFunction.h>
 #include <FEBioFluid/FEFluidMaterialPoint.h>
 #include "FEThermoFluid.h"
 #include "FEThermoFluidMaterialPoint.h"
@@ -38,7 +39,7 @@ BEGIN_FECORE_CLASS(FEIdealGas, FEThermoElasticFluid)
     ADD_PARAMETER(m_M   , FE_RANGE_GREATER(0.0), "M")->setUnits(UNIT_MOLAR_MASS)->setLongName("molar mass");
     ADD_PARAMETER(m_ar  , "ar")->setLongName("normalized referential specific free energy");    // ar normalized by R.Tr/M
     ADD_PARAMETER(m_sr  , "sr")->setLongName("normalized referential specific entropy");        // sr normalized by R/M
-    ADD_PROPERTY (m_ao  , "ao")->SetLongName("normalized specific free energy circle");         // a-circle normalized by R.Tr/M
+//    ADD_PROPERTY (m_ao  , "ao")->SetLongName("normalized specific free energy circle");         // a-circle normalized by R.Tr/M
     ADD_PROPERTY (m_cp  , "cp", FEProperty::Optional)->SetLongName("normalized isobaric specific heat capacity");     // cp normalized by R/M
 
 END_FECORE_CLASS();
@@ -67,8 +68,42 @@ bool FEIdealGas::Init()
         feLogWarning("The referential absolute pressure P is calculated internally as %g\n",m_Pr);
     }
     
-    m_ao->Init();
     m_cp->Init();
+    m_ao = new FEThermalPropTempDpndnt(GetFEModel());
+    
+    // construct the desired function m_ao
+    int np = 0;
+    std::vector<vec2d> cp;
+    FEPointFunction* pf = dynamic_cast<FEPointFunction*>(m_cp->m_prop);
+    FEConstFunction* cf = dynamic_cast<FEConstFunction*>(m_cp->m_prop);
+    if (pf) {
+        m_ao->m_prop = new FEPointFunction(GetFEModel());
+        FEPointFunction::LOADPOINT lp;
+        np = pf->Points();
+        cp.assign(np, vec2d(0,0));
+        // Generate T and cp(T) for all points
+        for (int i=0; i< np; ++i) {
+            lp = pf->LoadPoint(i);
+            cp[i].x() = lp.time;
+            cp[i].y() = lp.value;
+        }
+        // perform integration
+        
+    }
+    else if (cf) {
+        m_ao->m_prop = new FEMathFunction(GetFEModel());
+        FEMathFunction* mf = dynamic_cast<FEMathFunction*>(m_ao->m_prop);
+        double cp0 = cf->value(1);
+        std::string cps = std::to_string(cp0);
+        std::string formula = cps + "*(t-1-t*log(t))";
+        mf->SetMathString(formula);
+    }
+    else {
+        assert(false);
+        np = 64;
+        cp.assign(np,vec2d(0,0));
+    }
+    m_ao->Init();
     
     return true;
 }
