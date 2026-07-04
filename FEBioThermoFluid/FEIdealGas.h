@@ -88,6 +88,9 @@ public:
     
     //! dilatation from temperature and pressure
     bool Dilatation(const double T, const double p, double& e) override;
+    
+    //! perform integration using Simpson's rule
+    bool SimpsonIntegration(const std::vector<vec2d> &cp, std::vector<vec2d> &so);
 
 public:
     double      m_R;        //!< universal gas constant
@@ -97,9 +100,8 @@ public:
     double      m_ar;       //!< referential specific free energy
     double      m_sr;       //!< referential specific entropy
     FEThermalPropTempDpndnt*   m_cp;   //!< isobaric specific heat capacity
+    FEThermalPropTempDpndnt*   m_ao;   //!< specific free energy a-circle
+
     // declare parameter list
     DECLARE_FECORE_CLASS();
-
-private:
-    FEThermalPropTempDpndnt*   m_ao;   //!< specific free energy a-circle
 };
