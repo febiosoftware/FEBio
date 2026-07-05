@@ -33,7 +33,7 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 // This class evaluates the viscous stress in a Newtonian fluid
 
-class FEBIOTHERMOFLUID_API FENewtonianThermoFluid :	public FEThermoViscousFluid
+class FEBIOTHERMOFLUID_API FENewtonianThermoFluid :    public FEThermoViscousFluid
 {
 public:
     //! constructor
@@ -42,9 +42,6 @@ public:
     //! initialization
     bool Init() override;
     
-    //! Serialization
-    void Serialize(DumpStream& ar) override;
-
     //! viscous stress
     mat3ds Stress(FEMaterialPoint& pt) override;
     
@@ -61,19 +58,19 @@ public:
     double ShearViscosity(FEMaterialPoint& mp) override;
     double TangentShearViscosityTemperature(FEMaterialPoint& mp);
     double TangentShearViscosityStrain(FEMaterialPoint& mp);
-
+    
     //! bulk viscosity
     double BulkViscosity(FEMaterialPoint& mp) override;
     double TangentBulkViscosityTemperature(FEMaterialPoint& mp);
     double TangentBulkViscosityStrain(FEMaterialPoint& mp);
-
+    
 public:
     // viscosities
     double              m_kappa;    //!< referential bulk viscosity
     double              m_mu;       //!< referential shear viscosity
     FEThermoFluidProperty*  m_kappahat; //!< normalized bulk viscosity
     FEThermoFluidProperty*  m_muhat;    //!< normalized shear viscosity
-
+    
     // declare parameter list
     DECLARE_FECORE_CLASS();
 };
