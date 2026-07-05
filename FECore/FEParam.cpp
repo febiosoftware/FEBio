@@ -156,8 +156,17 @@ FEParam::~FEParam()
 	if (m_flag & FEParamFlag::FE_PARAM_USER)
 	{
 		free((void*)m_szname);
-		assert(m_type == FE_PARAM_DOUBLE);
-		delete (double*)m_pv;
+		switch (m_type)
+		{
+		case FE_PARAM_BOOL  : delete (bool*  )m_pv; break;
+		case FE_PARAM_INT   : delete (int*   )m_pv; break;
+		case FE_PARAM_DOUBLE: delete (double*)m_pv; break;
+		case FE_PARAM_DOUBLE_MAPPED: delete (FEParamDouble*)m_pv; break;
+		case FE_PARAM_VEC3D_MAPPED : delete (FEParamVec3*  )m_pv; break;
+		case FE_PARAM_MAT3D_MAPPED : delete (FEParamMat3d* )m_pv; break;
+		default:
+			assert(false);
+		}
 	}
 }
 
@@ -239,7 +248,22 @@ FEParam* FEParam::setUnits(const char* szunit) { m_szunit = szunit; return this;
 
 //-----------------------------------------------------------------------------
 // set the enum values (\0 separated. Make sure the end of the string has two \0's)
-FEParam* FEParam::setEnums(const char* sz) { m_szenum = sz; return this; }
+FEParam* FEParam::setEnums(const char* sz)
+{ 
+	// count the enums
+	if (sz && (sz[0] != '$') && (type() == FE_PARAM_INT))
+	{
+		int n = 0;
+		const char* s = sz;
+		while ((s != nullptr) && (*s != 0))
+		{
+			s += strlen(s) + 1;
+			n++;
+		}
+		SetValidator(new FEIntValidator(FEParamRange::FE_CLOSED, 0, n - 1));
+	}
+	m_szenum = sz; return this; 
+}
 
 //-----------------------------------------------------------------------------
 FEParam* FEParam::setLongName(const char* sz)
@@ -262,6 +286,7 @@ void* FEParam::data_ptr() const { return m_pv; }
 
 //-----------------------------------------------------------------------------
 //! override the template for char pointers
+const char* FEParam::cvalue() const { return (const char*)data_ptr(); }
 char* FEParam::cvalue() { return (char*)data_ptr(); }
 
 //-----------------------------------------------------------------------------

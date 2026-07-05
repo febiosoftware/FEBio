@@ -120,6 +120,9 @@ public:
 	// set the data source
 	void SetDataSource(FEDataSource* src);
 
+	// get the data source
+	const FEDataSource* GetDataSource() const { return m_src; }
+
 	// set the data measurements
 	void SetMeasurements(const std::vector<pair<double, double> >& data);
 

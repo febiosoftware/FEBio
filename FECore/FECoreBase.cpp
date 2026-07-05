@@ -709,9 +709,10 @@ FEProperty* FECoreBase::FindProperty(const ParamString& prop)
 			}
 			else
 			{
+				FECoreBase* pc = mp->get(0);
 				ParamString next = prop.next();
 				if (next.count() == 0) return mp;
-				else return FindProperty(next);
+				else return pc->FindProperty(next);
 			}
 		}
 	}

@@ -107,7 +107,9 @@ double FEPowellEyringFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& m
 	double dmu = (lamg < 1e-3) ? -2 * (m_mu0 - m_mui) * m_lam * m_lam / 3. :
 		(2 * (m_mu0 - m_mui) * (gdot / sqrt(1 + pow(lamg, 2)) - asinh(lamg) / m_lam)) / pow(gdot, 3);
 
-	return dmu;
+	double dmu_dgdot = 0.5 * gdot * dmu;
+
+   return dmu_dgdot;
 }
 
 //-----------------------------------------------------------------------------

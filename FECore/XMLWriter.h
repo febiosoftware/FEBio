@@ -30,10 +30,10 @@ SOFTWARE.*/
 #include <vector>
 #include <string>
 #include <assert.h>
-#include "febioxml_api.h"
+#include "fecore_api.h"
 class XMLWriter;
 
-class FEBIOXML_API XMLElement
+class FECORE_API XMLElement
 {
 public:
 	class XMLAtt
@@ -104,7 +104,7 @@ public:
 	friend class XMLWriter;
 };
 
-class FEBIOXML_API XMLWriter
+class FECORE_API XMLWriter
 {
 	enum {MAX_TAGS = 32};
 

@@ -57,10 +57,11 @@ SOFTWARE.*/
 #include "FEBioMeshSection4.h"
 #include "FEBioMeshDomainsSection4.h"
 #include "FEBioStepSection3.h"
+#include "FEBioScriptsSection.h"
 #include "FECore/FEModel.h"
 #include "FECore/FECoreKernel.h"
+#include "FECore/xmltool.h"
 #include <string.h>
-#include "xmltool.h"
 
 FEBioFileSection::FEBioFileSection(FEBioImport* feb) : FEFileSection(feb) {}
 
@@ -282,7 +283,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["Include"    ] = new FEBioIncludeSection      (this);
 		m_map["Initial"    ] = new FEBioInitialSection3     (this);
 		m_map["Boundary"   ] = new FEBioBoundarySection3    (this);
-		m_map["Loads"      ] = new FEBioLoadsSection3       (this);
+		m_map["Loads"      ] = new FEBioLoadsSection4       (this);
 		m_map["Contact"    ] = new FEBioContactSection4     (this);
 		m_map["Discrete"   ] = new FEBioDiscreteSection25   (this);
 		m_map["Constraints"] = new FEBioConstraintsSection25(this);
@@ -290,6 +291,7 @@ void FEBioImport::BuildFileSectionMap(int nversion)
 		m_map["MeshData"   ] = new FEBioMeshDataSection4    (this);	// added in febio4
 		m_map["LoadData"   ] = new FEBioLoadDataSection3    (this);
 		m_map["Rigid"      ] = new FEBioRigidSection4       (this); // added in FEBio 4.0
+		m_map["Scripts"    ] = new FEBioScriptsSection      (this);
 		m_map["Step"       ] = new FEBioStepSection4        (this);
 		m_map["MeshAdaptor"] = new FEBioMeshAdaptorSection  (this);	// added in FEBio 3.0
 	}

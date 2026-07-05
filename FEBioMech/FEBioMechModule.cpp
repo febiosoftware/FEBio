@@ -178,8 +178,11 @@ SOFTWARE.*/
 #include "FEYeoh.h"
 #include "FEScaledElasticMaterial.h"
 #include "FEScaledUncoupledMaterial.h"
-
 #include "FEPressureLoad.h"
+#include "FEScriptedPressureLoad.h"
+#include "FEScriptedTractionLoad.h"
+#include "FEScriptedBodyForce.h"
+#include "FEScriptedDisplacementBC.h"
 #include "FEPressureRobinBC.h"
 #include "FETractionLoad.h"
 #include "FETractionRobinBC.h"
@@ -276,6 +279,7 @@ SOFTWARE.*/
 #include "FEBCRigidDeformation.h"
 #include "FEPrescribedNormalDisplacement.h"
 #include "FEMaxStressCriterion.h"
+#include "FEMaxStrainCriterion.h"
 #include "FEMaxDamageCriterion.h"
 #include "FESpringRuptureCriterion.h"
 #include "FEContactGapCriterion.h"
@@ -650,6 +654,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEPrescribedNormalDisplacement, "normal displacement");
 	REGISTER_FECORE_CLASS(FEBCRigidDeformation          , "rigid deformation");
 	REGISTER_FECORE_CLASS(FERigidNodeSet                , "rigid");
+	REGISTER_FECORE_CLASS(FEScriptedDisplacementBC      , "displacement script", FECORE_EXPERIMENTAL);
 
 	//-----------------------------------------------------------------------------
 	// classes derived from FEInitialCondition
@@ -675,6 +680,9 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FETractionRobinBC, "traction Robin BC", FECORE_EXPERIMENTAL);
     REGISTER_FECORE_CLASS(FEPipetteAspiration, "pipette aspiration");
 
+	REGISTER_FECORE_CLASS(FEScriptedPressureLoad, "pressure script", FECORE_EXPERIMENTAL);
+	REGISTER_FECORE_CLASS(FEScriptedTractionLoad, "traction script", FECORE_EXPERIMENTAL);
+
 	//-----------------------------------------------------------------------------
 	// classes derived from FEBodyForce
 	REGISTER_FECORE_CLASS(FEConstBodyForceOld, "const");	// obsolete in 3.0
@@ -688,6 +696,8 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FEMovingFrameLoad, "moving frame");
 	REGISTER_FECORE_CLASS(FERadialBodyForce, "radial force");
 	REGISTER_FECORE_CLASS(FEAxialBodyForce, "axial force");
+
+	REGISTER_FECORE_CLASS(FEScriptedBodyForce, "body force script", FECORE_EXPERIMENTAL);
 
 	//-----------------------------------------------------------------------------
 	// constraint classes
@@ -988,6 +998,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemStrainYZ, "Eyz");
 	REGISTER_FECORE_CLASS(FELogElemStrainXZ, "Exz");
 	REGISTER_FECORE_CLASS(FELogElemStrainEffective, "effective strain");
+	REGISTER_FECORE_CLASS(FELogElemMaxShearStrain, "max shear strain");
 	REGISTER_FECORE_CLASS(FELogElemStrain1, "E1");
 	REGISTER_FECORE_CLASS(FELogElemStrain2, "E2");
 	REGISTER_FECORE_CLASS(FELogElemStrain3, "E3");
@@ -1263,6 +1274,7 @@ void FEBioMech::InitModule()
 	//-----------------------------------------------------------------------------
 	// Derived from FEMeshAdaptorCriterion
 	REGISTER_FECORE_CLASS(FEStressCriterion, "stress");
+	REGISTER_FECORE_CLASS(FEStrainCriterion, "strain");
 	REGISTER_FECORE_CLASS(FEDamageAdaptorCriterion, "damage");
     REGISTER_FECORE_CLASS(FERelativeVolumeCriterion, "relative volume");
 	REGISTER_FECORE_CLASS(FESpringForceCriterion, "spring force");

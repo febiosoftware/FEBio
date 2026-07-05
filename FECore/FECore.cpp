@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include "FEMathController.h"
 #include "FEMathIntervalController.h"
 #include "FEPIDController.h"
+#include "FEScriptedLoadController.h"
 #include "Preconditioner.h"
 #include "FEMat3dValuator.h"
 #include "FEMat3dSphericalAngleMap.h"
@@ -71,6 +72,7 @@ SOFTWARE.*/
 #include "FEModifiedNewtonStrategy.h"
 #include "FEFullNewtonStrategy.h"
 #include "SkylineSolver.h"
+#include "FEScriptedBehavior.h"
 
 #define FECORE_VERSION		0
 #define FECORE_SUBVERSION	1
@@ -141,9 +143,9 @@ REGISTER_FECORE_CLASS(FESurfaceToSurfaceVectorMap, "surface-to-surface vector");
 REGISTER_FECORE_CLASS(FEParabolicMap       , "parabolic map");
 
 // scalar valuators
-REGISTER_FECORE_CLASS(FEConstValue , "const");
-REGISTER_FECORE_CLASS(FEMathValue  , "math" );
-REGISTER_FECORE_CLASS(FEMappedValue, "map"  );
+REGISTER_FECORE_CLASS(FEConstValue  , "const");
+REGISTER_FECORE_CLASS(FEMathValue   , "math" );
+REGISTER_FECORE_CLASS(FEMappedValue , "map"  );
 
 //  vector generators
 REGISTER_FECORE_CLASS(FELocalVectorGenerator          , "local");
@@ -174,6 +176,7 @@ REGISTER_FECORE_CLASS(FELoadCurve             , "loadcurve");
 REGISTER_FECORE_CLASS(FEMathController        , "math");
 REGISTER_FECORE_CLASS(FEMathIntervalController, "math-interval");
 REGISTER_FECORE_CLASS(FEPIDController         , "PID");
+REGISTER_FECORE_CLASS(FEScriptedLoadController, "load controller script", FECORE_EXPERIMENTAL);
 
 // Newton strategies
 REGISTER_FECORE_CLASS(BFGSSolver       , "BFGS");
@@ -208,5 +211,8 @@ REGISTER_FECORE_CLASS(FELogElemMath    , "_math", FECORE_EXPERIMENTAL);
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");
 REGISTER_FECORE_CLASS(SkylineSolver, "skyline");
+
+// scripts
+REGISTER_FECORE_CLASS(FEScriptedBehavior, "script", FECORE_EXPERIMENTAL);
 
 }

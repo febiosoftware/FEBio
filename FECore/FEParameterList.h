@@ -121,6 +121,9 @@ public:
 	FEParameterList& GetParameterList();
 	const FEParameterList& GetParameterList() const;
 
+	//! return true if this container has a parameter list
+	bool HasParameterList() const { return (m_pParam != nullptr); }
+
 	//! find a parameter using it's name
 	virtual FEParam* GetParameter(const char* szname);
 	virtual FEParam* FindParameter(const ParamString& s);

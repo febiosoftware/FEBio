@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 project(FEBio)
 set(FEBIO_LIBS FEBioFluid FEBioThermoFluid FEBioLib FEBioMech FEBioMix FEBioOpt FECore NumCore FEAMR FEBioRVE FEImgLib FEBioPlot FEBioXML)
@@ -41,17 +40,6 @@ endif()
 ##### Search for library and include directories #####
 
 include(FindDependencies.cmake)
-
-##### Check compiler for std::filesystem support #####
-include(CheckCXXSourceCompiles)
-
-check_cxx_source_compiles("
-  #include <filesystem>
-  int main() {
-    std::filesystem::path p{\"test\"};
-    return 0;
-  }
-" HAS_STD_FILESYSTEM)
 
 #### Check if paths are valid and find libs ####
 
@@ -305,10 +293,6 @@ mark_as_advanced(EXTRA_INC)
 ##### Setup includes, defnitions, and linking options #####
 include_directories(${PROJECT_SOURCE_DIR})
 
-if(HAS_STD_FILESYSTEM)
-    target_compile_definitions(febiolib PRIVATE HAS_STD_FILESYSTEM)
-endif()
-
 # Link LEVMAR
 if(USE_LEVMAR)
 	target_include_directories(febioopt PRIVATE ${LEVMAR_INC})
@@ -436,7 +420,7 @@ target_link_libraries(febioplot PRIVATE fecore)
 target_link_libraries(feimglib PRIVATE fecore)
 target_link_libraries(feamr PRIVATE fecore)
 target_link_libraries(febiorve PRIVATE fecore febiomech febioxml febioplot)
-target_link_libraries(febioopt PRIVATE fecore febioxml)
+target_link_libraries(febioopt PRIVATE fecore febioxml febioplot)
 target_link_libraries(febiomix PRIVATE febiomech fecore)
 target_link_libraries(febiomech PRIVATE fecore feamr)
 target_link_libraries(febiofluid PRIVATE febiomix febiomech fecore)
@@ -444,6 +428,9 @@ target_link_libraries(febiothermofluid PRIVATE febiofluid febiomix febiomech fec
 
 target_link_libraries(febiolib PRIVATE febioplot febiomech 
 		febiomix febioxml numcore febioopt febiotest febiofluid febiothermofluid feamr febiorve fecore feimglib)
+
+# pull febcode into FECore
+target_link_libraries(fecore PRIVATE febcode)
 
 if (WIN32)
     target_link_libraries(febiolib PRIVATE psapi.lib)
@@ -466,8 +453,8 @@ else()
         target_link_libraries(febiothermofluid PRIVATE -static-libstdc++ -static-libgcc)
         target_link_libraries(feimglib PRIVATE -static-libstdc++ -static-libgcc)
         target_link_libraries(feamr PRIVATE -static-libstdc++ -static-libgcc)
-        target_link_libraries(febiolib PRIVATE -static-libstdc++ -static-libgcc)
-        target_link_libraries(fecore PRIVATE -static-libstdc++ -static-libgcc)
+        target_link_libraries(febiolib PRIVATE -static-libstdc++ -static-libgcc stdc++fs)
+        target_link_libraries(fecore PRIVATE -static-libstdc++ -static-libgcc stdc++fs)
         
         target_link_libraries(febio4 -static-libstdc++ -static-libgcc)
     endif()
@@ -480,21 +467,21 @@ else()
     endif()
 endif()
 
-##### Create febio.xml #####
-if(NOT EXISTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml)
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
-<febio_config version=\"3.0\">
-    <default_linear_solver type=\"pardiso\"></default_linear_solver>
-</febio_config>")
-endif()
+#### Set up installation #####
+install(TARGETS febio4 numcore febioxml febiotest febiorve febioplot febioopt
+    febiomix febiomech febiofluid feamr feimglib fecore febiolib
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
 
-if(USE_MKL)
-    file(READ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml filedata)
-    string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"pardiso\"" filedata ${filedata})
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml ${filedata})
-else()
-    file(READ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml filedata)
-    string(REGEX REPLACE "type=\"[a-z]*\"" "type=\"skyline\"" filedata "${filedata}")
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/febio.xml "${filedata}")
-endif()
+install(DIRECTORY 
+    FEBio NumCore FECore FEAMR FEImgLib FEBioFluid FEBioLib FEBioMech FEBioMix
+    FEBioOpt FEBioRVE FEBioPlot FEBioTest FEBioXML
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h*"
+    )
 
+install(FILES FEBioConfig.cmake 
+    DESTINATION lib/cmake/FEBio
+)

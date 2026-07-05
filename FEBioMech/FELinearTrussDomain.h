@@ -91,7 +91,7 @@ public: // overloads from FEElasticDomain
 	//! elemental mass matrix
 	void ElementMassMatrix(FETrussElement& el, matrix& ke);
 
-protected:
+public:
 	//! calculates the truss element stiffness matrix
 	void ElementStiffness(FETrussElement&, matrix& ke);
 

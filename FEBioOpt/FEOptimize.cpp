@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FECore/FECoreKernel.h"
 #include "FECore/log.h"
 #include "FECore/Timer.h"
+#include "FECore/FEBioReport.h"
 
 //-----------------------------------------------------------------------------
 #define VERSION 2
@@ -72,7 +73,7 @@ bool FEOptimize::Run()
 	timer.start();
 
 	// solve the problem
-	bool bret = m_opt.Solve();
+	bool bret = m_opt.m_status = m_opt.Solve();
 
 	timer.stop();
 	double elapsedTime = timer.GetTime();
@@ -85,5 +86,92 @@ bool FEOptimize::Run()
 	else 
 		feLog("\n\n E R R O R   T E R M I N A T I O N\n\n");
 
+//	if (m_opt.m_createReport)
+		BuildReport();
+
 	return bret;
+}
+
+void FEOptimize::BuildReport()
+{
+	FEBioReport report;
+
+	report.SetTitle("Parameter Optimization Report");
+	report.SetStatus(m_opt.m_status ? 1 : 0);
+	report.SetOptionsFile(m_opt.m_filename);
+
+	FEReportSection& section = report.AddSection("Optimization Results");
+
+	section.AddValue("Total iterations", m_opt.m_niter);
+	section.AddValue("Final objective value", m_opt.minObj);
+	section.AddValue("Final regression coef", m_opt.minR2);
+
+	std::vector<std::string> paramNames(m_opt.InputParameters());
+	std::vector<double> paramValues(m_opt.InputParameters());
+
+	// report the parameters for the minimal value
+	for (int i = 0; i < m_opt.InputParameters(); ++i)
+	{
+		FEInputParameter& var = *m_opt.GetInputParameter(i);
+		paramNames[i] = var.GetName();
+		paramValues[i] = m_opt.amin[i];
+	}
+
+	FEReportTable& paramTable = section.AddTable();
+	paramTable.AddColumn("Parameter", paramNames);
+	paramTable.AddColumn("Optimal Value", paramValues);
+
+	section.AddTableView(paramTable).SetCaption("Optimal parameter values.");
+
+	FEDataFitObjective* obj = dynamic_cast<FEDataFitObjective*>(&m_opt.GetObjective());
+	if (obj)
+	{
+		int n = obj->Measurements();
+		std::vector<double> x(n), y(n), d(n), e(n);
+		obj->GetXValues(x);
+		obj->GetMeasurements(d);
+		obj->EvaluateFunctions(y);
+		for (int i = 0; i < n; ++i) e[i] = y[i] - d[i];
+
+		std::string x_name = "x";
+		std::string y_name = "y";
+		std::string d_name = "data"; // "data" from options file
+		std::string e_name = "error";
+
+		const FEDataParameter* src = dynamic_cast<const FEDataParameter*>(obj->GetDataSource());
+		if (src)
+		{
+			x_name = src->GetOrdinateName();
+			y_name = src->GetParameterName();
+		}
+
+		FEReportTable& table = section.AddTable();
+		table.AddColumn(x_name, x);
+		table.AddColumn(y_name, y);
+		table.AddColumn(d_name, d);
+		table.AddColumn(e_name, e);
+
+		FEReportChart& chart = section.AddChart(FEReportChart::Line);
+		chart.AddDataSeries("fit")
+			.AddData(FEReportChart::X, table.id, x_name)
+			.AddData(FEReportChart::Y, table.id, y_name)
+			.AddData(FEReportChart::Y, table.id, d_name);
+		chart.SetCaption("Comparison of fitted values and measurements.");
+
+		section.AddTableView(table).SetCaption("Table of fitted values and measurements.");
+	}
+
+	// create the report's file name from the options file name (change the extension to .febr)
+	std::string filename = m_opt.m_filename;
+	size_t lastdot = filename.find_last_of(".");
+	if (lastdot != std::string::npos)
+		filename = filename.substr(0, lastdot);
+
+	if (filename.empty())
+		filename = "report";
+
+	filename += ".febr";
+	
+	report.Write(filename);
+	feLog("Report written to %s\n", filename.c_str());
 }

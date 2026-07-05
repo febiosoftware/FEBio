@@ -142,32 +142,78 @@ void FERigidShellDomain::AssignDefaultShellThickness()
 	}
 }
 
+//-----------------------------------------------------------------------------
+double FERigidShellDomain::Volume(FEShellElement& el)
+{
+    // loop over integration points
+    int nint = el.GaussPoints();
+    double* gw = el.GaussWeights();
+    double vol = 0;
+    for (int n = 0; n < nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        
+        // calculate jacobian
+        double detJ = detJ0(el, n);
+        
+        // add to total vol
+        vol += detJ * gw[n];
+    }
+    return vol;
+}
+
+//-----------------------------------------------------------------------------
+double FERigidShellDomain::CurrentVolume(FEShellElement& el)
+{
+    // loop over integration points
+    int nint = el.GaussPoints();
+    double* gw = el.GaussWeights();
+    double vol = 0;
+    for (int n = 0; n < nint; ++n)
+    {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        
+        // calculate jacobian
+        double J = detJ(el, n);
+        
+        // add to total vol
+        vol += J * gw[n];
+    }
+    return vol;
+}
+
+//-----------------------------------------------------------------------------
 void FERigidShellDomain::SetMaterial(FEMaterial* pm)
 {
 	m_pMat = dynamic_cast<FERigidMaterial*>(pm); assert(m_pMat);
 	FEShellDomain::SetMaterial(pm);
 }
 
+//-----------------------------------------------------------------------------
 FEMaterial* FERigidShellDomain::GetMaterial()
 { 
 	return m_pMat; 
 }
 
+//-----------------------------------------------------------------------------
 void FERigidShellDomain::Update(const FETimeInfo& tp)
 {
 	// nothing to do
 }
 
+//-----------------------------------------------------------------------------
 void FERigidShellDomain::Reset()
 {
 	// nothing to do
 }
 
+//-----------------------------------------------------------------------------
 void FERigidShellDomain::InternalForces(FEGlobalVector& R)
 {
 	// nothing to do
 }
 
+//-----------------------------------------------------------------------------
 void FERigidShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
 {
 	int NS = (int)m_Elem.size();
@@ -337,6 +383,32 @@ double FERigidShellDomain::detJ0(FEShellElement& el, int n)
 	for (int i = 0; i < el.Nodes(); ++i) h += H[i] * el.m_h0[i];
 
 	return J0*h;
+}
+
+double FERigidShellDomain::detJ(FEShellElement& el, int n)
+{
+    vector<vec3d> x(FEElement::MAX_NODES);
+    for (int i = 0; i < el.Nodes(); ++i) x[i] = Node(el.m_lnode[i]).m_rt;
+    
+    double* Gr = el.Hr(n);
+    double* Gs = el.Hs(n);
+    
+    vec3d dr = vec3d(0, 0, 0);
+    vec3d ds = vec3d(0, 0, 0);
+    for (int i = 0; i < el.Nodes(); ++i)
+    {
+        dr += x[i] * Gr[i];
+        ds += x[i] * Gs[i];
+    }
+    
+    double J = (dr ^ ds).norm();
+    
+    // multiply with current shell thickness
+    double h = 0.0;
+    double* H = el.H(n);
+    for (int i = 0; i < el.Nodes(); ++i) h += H[i] * el.m_ht[i];
+    
+    return J*h;
 }
 
 mat3d FERigidShellDomain::CalculateMOI()

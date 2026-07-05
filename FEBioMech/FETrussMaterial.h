@@ -70,7 +70,7 @@ public:
 	~FETrussMaterial();
 
 public:
-	double	m_rho;	// density
+	FEParamDouble m_rho;	// density
 
 public:
 	//! calculate Kirchhoff stress of truss
@@ -83,7 +83,7 @@ public:
 	FEMaterialPointData* CreateMaterialPointData() override { return new FETrussMaterialPoint; }
 
 	//! material density
-	double Density();
+	double Density(FEMaterialPoint& mp);
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
@@ -103,7 +103,7 @@ public:
 	double Tangent(FEMaterialPoint& pt) override;
 
 public:
-	double	m_E;	// Elastic modulus
+	FEParamDouble	m_E;	// Elastic modulus
 	double	m_v;	// Poisson's ratio
 
 	// declare the parameter list

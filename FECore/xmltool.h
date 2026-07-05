@@ -24,35 +24,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FECoreBase.h>
-#include <FECore/ClassDescriptor.h>
+#include "FECoreBase.h"
+#include "ClassDescriptor.h"
 #include "XMLReader.h"
-#include "febioxml_api.h"
+#include "fecore_api.h"
 
 //This namespace defines some helper functions that facilitate processing the FEBio xml formatted files.
 namespace fexml
 {
-//---------------------------------------------------------------------------------------
 // Reads the value of a parameter.
 // if paramName is zero, the tag's name will be used as the parameter name.
-bool FEBIOXML_API readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName = 0, FECoreBase* parent = nullptr);
+bool FECORE_API readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName = 0, FECoreBase* parent = nullptr);
 
-//---------------------------------------------------------------------------------------
-bool FEBIOXML_API readParameter(XMLTag& tag, FECoreBase* pc);
+bool FECORE_API readParameter(XMLTag& tag, FECoreBase* pc, const char* szparam = nullptr);
 
-//---------------------------------------------------------------------------------------
 // reads the parameters and properties of a FECore class
-bool FEBIOXML_API readParameterList(XMLTag& tag, FECoreBase* pc);
+bool FECORE_API readParameterList(XMLTag& tag, FECoreBase* pc);
 
 // read parameters listed as attributes in the tag
-bool FEBIOXML_API readAttributeParams(XMLTag& tag, FECoreBase* pc);
+bool FECORE_API readAttributeParams(XMLTag& tag, FECoreBase* pc);
 
-//---------------------------------------------------------------------------------------
 // read a list of integers
-void FEBIOXML_API readList(XMLTag& tag, vector<int>& l);
+void FECORE_API readList(XMLTag& tag, vector<int>& l);
 
-//---------------------------------------------------------------------------------------
 // create a class descriptor from the current tag
-FEBIOXML_API FEClassDescriptor* readParameterList(XMLTag& tag);
+FECORE_API FEClassDescriptor* readParameterList(XMLTag& tag);
 
+// helper function to find the index of an enum value.
+FECORE_API int enumValue(const char* val, const char* szenum);
+
+// helper function to see if a string is a number
+FECORE_API bool is_number(const char* sz);
 }

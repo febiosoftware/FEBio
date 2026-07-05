@@ -192,6 +192,13 @@ template <class T> inline T* FEMaterialPointData::ExtractData()
 		}
 	}
 
+	// as a last resort, search recursively on next
+	if (m_pNext)
+	{
+		p = m_pNext->ExtractData<T>();
+		if (p) return p;
+	}
+
 	// Everything has failed. Material point data can not be found
 	return 0;
 }

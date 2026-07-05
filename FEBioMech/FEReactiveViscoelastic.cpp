@@ -351,6 +351,9 @@ mat3ds FEReactiveViscoelasticMaterial::StressWeakBonds(FEMaterialPoint& mp)
     FEElasticMaterialPoint& ep = *wb.ExtractData<FEElasticMaterialPoint>();
     
     // get fiber material point data (if it exists)
+	// NOTE: I'm concerned that this will not always find the correct fiber material point. For instance
+	//       if the bond material is a mixture of multiple fiber materials, then this will only find the first one.
+	//       (see cf10 test problem).
     FEFiberMaterialPoint* fp = wb.ExtractData<FEFiberMaterialPoint>();
     
     mat3ds D = ep.RateOfDeformation();

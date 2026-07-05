@@ -23,11 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-// XMLWriter.cpp: implementation of the XMLWriter class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "XMLWriter.h"
 #include <sstream>
 #include <fstream>
@@ -262,14 +257,9 @@ void XMLWriter::inc_level()
 {
 	++m_level;
 
-	m_sztab[0] = 0;
-	int l=0;
 	for (int i=0; i<m_level; ++i) 
-	{
-		snprintf(m_sztab+l, 256, "\t");
-		++l;
-	}
-	m_sztab[l] = 0;
+		m_sztab[i] = '\t';
+	m_sztab[m_level] = 0;
 }
 
 void XMLWriter::dec_level()
@@ -278,14 +268,9 @@ void XMLWriter::dec_level()
 
 	--m_level;
 
-	m_sztab[0] = 0;
-	int l=0;
-	for (int i=0; i<m_level; ++i) 
-	{
-		snprintf(m_sztab+l, 256, "\t");
-		++l;
-	}
-	m_sztab[l] = 0;
+	for (int i = 0; i < m_level; ++i)
+		m_sztab[i] = '\t';
+	m_sztab[m_level] = 0;
 }
 
 
@@ -445,7 +430,7 @@ void XMLWriter::add_leaf(XMLElement& el, const std::vector<int>& A)
 
         start = m_stream->tellp();
         *m_stream << A[i];
-        l += m_stream->tellp() - start;
+        l += (int) (m_stream->tellp() - start);
 
 		if (i < n-1)
 		{

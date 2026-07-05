@@ -1,5 +1,5 @@
-#LyX 2.4 created this file. For more info see https://www.lyx.org/
-\lyxformat 620
+#LyX 2.5 created this file. For more info see https://www.lyx.org/
+\lyxformat 643
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -70,11 +70,19 @@ figs-within-sections
 \use_indices false
 \paperorientation portrait
 \suppress_date false
-\justification true
-\use_refstyle 0
+\justification default
+\crossref_package prettyref
 \use_formatted_ref 0
 \use_minted 0
 \use_lineno 0
+\backgroundcolor none
+\fontcolor none
+\notefontcolor lightgray
+\boxbgcolor red
+\table_border_color default
+\table_odd_row_color default
+\table_even_row_color default
+\table_alt_row_colors_start 1
 \index Index
 \shortcut idx
 \color #008000
@@ -269,6 +277,7 @@ figs-within-sections
 \html_be_strict false
 \docbook_table_output 0
 \docbook_mathml_prefix 1
+\docbook_mathml_version 0
 \end_header
 
 \begin_body
@@ -327,7 +336,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 
 \backslash
@@ -361,7 +369,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 
 \backslash
@@ -380,7 +387,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{mailto:steve.maas@utah.edu}{steve.maas@utah.edu}
 \end_layout
@@ -392,7 +398,6 @@ href{mailto:steve.maas@utah.edu}{steve.maas@utah.edu}
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 
@@ -409,7 +414,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{mailto:jeff.weiss@utah.edu}{jeff.weiss@utah.edu}
 \end_layout
@@ -421,7 +425,6 @@ href{mailto:jeff.weiss@utah.edu}{jeff.weiss@utah.edu}
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 
@@ -438,7 +441,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{mailto:ateshian@columbia.edu}{ateshian@columbia.edu}
 \end_layout
@@ -454,7 +456,6 @@ Contact address
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 
@@ -475,7 +476,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 
 \backslash
@@ -491,7 +491,6 @@ status open
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 
@@ -512,7 +511,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 
 \backslash
@@ -532,7 +530,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 url{https://weisslabutah.org}
 \end_layout
@@ -544,7 +541,6 @@ url{https://weisslabutah.org}
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 
@@ -561,7 +557,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 url{http://febio.org}
 \end_layout
@@ -577,7 +572,6 @@ Forum
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 
@@ -596,7 +590,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 url{https://forums.febio.org/}
 \end_layout
@@ -612,7 +605,6 @@ Acknowledgments
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 
@@ -688,7 +680,6 @@ FEBio is a nonlinear finite element solver that is specifically designed for bio
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 url{http://febio.org}
@@ -806,7 +797,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/febio-studio/}{
 \backslash
@@ -851,7 +841,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://help.febio.org/doxygen/html/index.html}{
 \backslash
@@ -866,7 +855,6 @@ emph{Developer's Manual}}
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 href{https://febio.org/knowledgebase/}{
@@ -1032,7 +1020,6 @@ This section provides a brief overview of how FEBio works.
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 href{https://febio.org/knowledgebase/}{
@@ -5442,7 +5429,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{http://software.intel.com/en-us/intel-mkl/}{
 \backslash
@@ -5456,7 +5442,6 @@ emph{MKL}}
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 href{http://www.pardiso-project.org/}{
@@ -6000,7 +5985,6 @@ plot file
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 href{https://febio.org/febio-studio/}{
@@ -11489,7 +11473,7 @@ FEBio determines convergence of a time step based on three convergence criteria:
  means that the ratio of the displacement increment (i.e.
  the solution of the linearized FE equations,
  
-\begin_inset Formula $\Delta\mathbf{U}=-\mathbf{K}_{k}^{-1}\mathbf{R}_{k}$
+\begin_inset Formula $\Delta\mathbf{U}=-\mathbf{K}^{-1}_{k}\mathbf{R}_{k}$
 \end_inset
 
 ) norm at the current iteration 
@@ -13179,7 +13163,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -13650,7 +13633,7 @@ name
 
 ,
  and density 
-\begin_inset Formula $\rho_{T}^{\alpha}$
+\begin_inset Formula $\rho^{\alpha}_{T}$
 \end_inset
 
 :
@@ -17216,7 +17199,6 @@ parameter is a flag that chooses between two slightly different formulations of 
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 href{https://febio.org/knowledgebase/}{
@@ -27583,11 +27565,11 @@ Rigid joints produce nonlinear constraints between rigid bodies,
  a joint origin common to both bodies,
  and a set of axes that determine the relative orientation of the joint degrees of freedom.
  These axes define orthonormal basis vectors 
-\begin_inset Formula $\left\{ \mathbf{e}_{1}^{a},\mathbf{e}_{2}^{a},\mathbf{e}_{3}^{a}\right\} $
+\begin_inset Formula $\left\{ \mathbf{e}^{a}_{1},\mathbf{e}^{a}_{2},\mathbf{e}^{a}_{3}\right\} $
 \end_inset
 
  and 
-\begin_inset Formula $\left\{ \mathbf{e}_{1}^{b},\mathbf{e}_{2}^{b},\mathbf{e}_{3}^{b}\right\} $
+\begin_inset Formula $\left\{ \mathbf{e}^{b}_{1},\mathbf{e}^{b}_{2},\mathbf{e}^{b}_{3}\right\} $
 \end_inset
 
  on each rigid body,
@@ -28802,12 +28784,12 @@ rotation_z
  of rotation (with units of radians),
  with optional associated load curves.
  The rotation occurs about the axis directed along 
-\begin_inset Formula $\theta_{1}\mathbf{e}_{1}^{a}+\theta_{2}\mathbf{e}_{2}^{a}+\theta_{3}\mathbf{e}_{3}^{a}$
+\begin_inset Formula $\theta_{1}\mathbf{e}^{a}_{1}+\theta_{2}\mathbf{e}^{a}_{2}+\theta_{3}\mathbf{e}^{a}_{3}$
 \end_inset
 
 ,
  with a magnitude 
-\begin_inset Formula $\sqrt{\theta_{1}^{2}+\theta_{2}^{2}+\theta_{3}^{2}}$
+\begin_inset Formula $\sqrt{\theta^{2}_{1}+\theta^{2}_{2}+\theta^{2}_{3}}$
 \end_inset
 
 .
@@ -30202,11 +30184,11 @@ A rigid planar joint connects rigid bodies
  through that point,
  and two degrees of freedom for translations in the plane perpendicular to that axis,
  along 
-\begin_inset Formula $\mathbf{e}_{2}^{a}$
+\begin_inset Formula $\mathbf{e}^{a}_{2}$
 \end_inset
 
  and 
-\begin_inset Formula $\mathbf{e}_{3}^{a}$
+\begin_inset Formula $\mathbf{e}^{a}_{3}$
 \end_inset
 
 .
@@ -30532,7 +30514,7 @@ element defines the orientation of the joint rotation axis
 translation_axis_1
 \shape default
  element defines the orientation of the joint translation axis 
-\begin_inset Formula $\mathbf{e}_{2}^{a}$
+\begin_inset Formula $\mathbf{e}^{a}_{2}$
 \end_inset
 
  in the plane perpendicular to the joint rotation axis,
@@ -30585,7 +30567,7 @@ Optionally,
 \end_inset
 
  may be prescribed along 
-\begin_inset Formula $\mathbf{e}_{2}^{a}$
+\begin_inset Formula $\mathbf{e}^{a}_{2}$
 \end_inset
 
  using the additional tags
@@ -30610,7 +30592,7 @@ Optionally,
 \end_inset
 
  may be prescribed along 
-\begin_inset Formula $\mathbf{e}_{3}^{a}$
+\begin_inset Formula $\mathbf{e}^{a}_{3}$
 \end_inset
 
  using the additional tags
@@ -33087,7 +33069,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://help.febio.org/docs/FEBioTheory-4-5/TM45-Section-3.2.html}{
 \backslash
@@ -33095,7 +33076,6 @@ emph{FEBio Theory
 \end_layout
 
 \begin_layout Plain Layout
-
 Manual}}
 \end_layout
 
@@ -33171,7 +33151,7 @@ effective traction
 \end_inset
 
  (the normal component of the mixture traction) or 
-\begin_inset Formula $t_{n}^{e}=\mathbf{t}^{e}\cdot\mathbf{n}$
+\begin_inset Formula $t^{e}_{n}=\mathbf{t}^{e}\cdot\mathbf{n}$
 \end_inset
 
  (the normal component of the effective traction):
@@ -33285,7 +33265,7 @@ nolink "false"
 \end_inset
 
  (or 
-\begin_inset Formula $t_{n}^{e}=0$
+\begin_inset Formula $t^{e}_{n}=0$
 \end_inset
 
 ).
@@ -33432,11 +33412,11 @@ The flux of fluid relative to the solid matrix is given by the vector
 \end_layout
 
 \begin_layout LyX-Code
-  <mixture>1</mixture>
+  <mixture>0</mixture>
 \end_layout
 
 \begin_layout LyX-Code
-</fluidflux>
+</surface_load>
 \end_layout
 
 \begin_layout Standard
@@ -33579,7 +33559,7 @@ For example,
 .
  If the upstream face is free,
  the companion boundary condition would be to let 
-\begin_inset Formula $t_{n}^{e}=0$
+\begin_inset Formula $t^{e}_{n}=0$
 \end_inset
 
  on that face as well.
@@ -33633,14 +33613,14 @@ nolink "false"
  on a boundary surface may not be prescribed.
  Only the normal component of the relative solute flux,
  
-\begin_inset Formula $j_{n}^{\iota}=\mathbf{j}^{\iota}\cdot\mathbf{n}$
+\begin_inset Formula $j^{\iota}_{n}=\mathbf{j}^{\iota}\cdot\mathbf{n}$
 \end_inset
 
 ,
  represents a natural boundary condition.
  Since a multiphasic mixture may contain electrically charged solutes,
  the solute flux that must be prescribed as a boundary condition is the effective solute flux 
-\begin_inset Formula $\tilde{j}_{n}^{\iota}=j_{n}^{\iota}+\sum_{\gamma}z^{\gamma}j_{n}^{\gamma}$
+\begin_inset Formula $\tilde{j}^{\iota}_{n}=j^{\iota}_{n}+\sum_{\gamma}z^{\gamma}j^{\gamma}_{n}$
 \end_inset
 
 ,
@@ -33661,7 +33641,7 @@ nolink "false"
 
 .
  To prescribe a value for 
-\begin_inset Formula $\tilde{j}_{n}^{\iota}$
+\begin_inset Formula $\tilde{j}^{\iota}_{n}$
 \end_inset
 
  on a surface,
@@ -33854,14 +33834,14 @@ In fluid-solutes analyses the molar flux of solute
  on a boundary surface may not be prescribed.
  Only the normal component of the relative solute flux,
  
-\begin_inset Formula $j_{n}^{\iota}=\mathbf{j}^{\iota}\cdot\mathbf{n}$
+\begin_inset Formula $j^{\iota}_{n}=\mathbf{j}^{\iota}\cdot\mathbf{n}$
 \end_inset
 
 ,
  represents a natural boundary condition.
  Since a fluid-solutes mixture may contain electrically charged solutes,
  the solute flux that must be prescribed as a boundary condition is the effective solute flux 
-\begin_inset Formula $\tilde{j}_{n}^{\iota}=j_{n}^{\iota}+\sum_{\gamma}z^{\gamma}j_{n}^{\gamma}$
+\begin_inset Formula $\tilde{j}^{\iota}_{n}=j^{\iota}_{n}+\sum_{\gamma}z^{\gamma}j^{\gamma}_{n}$
 \end_inset
 
 ,
@@ -33878,7 +33858,7 @@ nolink "false"
 
 .
  To prescribe a value for 
-\begin_inset Formula $\tilde{j}_{n}^{\iota}$
+\begin_inset Formula $\tilde{j}^{\iota}_{n}$
 \end_inset
 
  on a surface,
@@ -34057,7 +34037,7 @@ true
  when the iterative numerical solution fails to converge.
  This surface load is only needed for biphasic-solute and multiphasic analyses,
  since 
-\begin_inset Formula $\tilde{j}_{n}^{\iota}=0$
+\begin_inset Formula $\tilde{j}^{\iota}_{n}=0$
 \end_inset
 
  is the natural boundary condition for fluid-solutes analyses.
@@ -34350,7 +34330,7 @@ name "subsec:Fluid-Normal-Traction"
 \begin_layout Standard
 In a fluid or fluid-FSI analysis,
  the normal component 
-\begin_inset Formula $t_{n}^{\tau}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
+\begin_inset Formula $t^{\tau}_{n}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
 \end_inset
 
  of the viscous traction 
@@ -34375,7 +34355,7 @@ nolink "false"
  fluid normal traction
 \emph default
  surface load prescribes 
-\begin_inset Formula $t_{n}^{\tau}$
+\begin_inset Formula $t^{\tau}_{n}$
 \end_inset
 
  on a boundary surface.
@@ -34424,7 +34404,7 @@ nolink "false"
 
 ),
  
-\begin_inset Formula $t_{n}^{\tau}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
+\begin_inset Formula $t^{\tau}_{n}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
 \end_inset
 
 ,
@@ -34437,7 +34417,7 @@ nolink "false"
  is negative.
  Specifically,
  
-\begin_inset Formula $t_{n}^{\tau}=\beta\rho_{r}v_{n}^{2}$
+\begin_inset Formula $t^{\tau}_{n}=\beta\rho_{r}v^{2}_{n}$
 \end_inset
 
  when 
@@ -34499,7 +34479,7 @@ nolink "false"
 
 ),
  
-\begin_inset Formula $\mathbf{t}_{t}^{\tau}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{t}^{\tau}$
+\begin_inset Formula $\mathbf{t}^{\tau}_{t}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{t}^{\tau}$
 \end_inset
 
 ,
@@ -34515,7 +34495,7 @@ nolink "false"
  representing the outward normal to this surface.
  Specifically,
  
-\begin_inset Formula $\mathbf{t}_{t}^{\tau}=-\beta\rho_{r}\left|\mathbf{v}_{t}\right|\mathbf{v}_{t}$
+\begin_inset Formula $\mathbf{t}^{\tau}_{t}=-\beta\rho_{r}\left|\mathbf{v}_{t}\right|\mathbf{v}_{t}$
 \end_inset
 
 ,
@@ -35372,7 +35352,7 @@ name "subsec:Solute-Backflow-Stabilization"
 In a fluid-solutes analysis this surface load checks for the presence of solvent (fluid) backflow,
  i.e.,
  when 
-\begin_inset Formula $v_{n}^{f}=\mathbf{v}^{f}\cdot\mathbf{n}$
+\begin_inset Formula $v^{f}_{n}=\mathbf{v}^{f}\cdot\mathbf{n}$
 \end_inset
 
  is negative.
@@ -37588,7 +37568,6 @@ normal penalty scale factor (1)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37609,7 +37588,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37630,7 +37608,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37651,7 +37628,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37672,7 +37648,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37722,7 +37697,6 @@ auto-penalty calculation flag (2)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37743,7 +37717,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37764,7 +37737,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37785,7 +37757,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37806,7 +37777,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37865,7 +37835,6 @@ updated auto-penalty calculation at each step (2)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37886,7 +37855,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37907,7 +37875,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37928,7 +37895,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37978,7 +37944,6 @@ two-pass flag (3)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -37999,7 +37964,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38020,7 +37984,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38041,7 +38004,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38062,7 +38024,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38112,7 +38073,6 @@ augmented Lagrangian flag (4)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38133,7 +38093,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38154,7 +38113,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38175,7 +38133,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38196,7 +38153,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38247,7 +38203,6 @@ aug.
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38268,7 +38223,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38289,7 +38243,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38310,7 +38263,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38331,7 +38283,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38381,7 +38332,6 @@ tolerance for gap value (4)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38402,7 +38352,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38423,7 +38372,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38444,7 +38392,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38465,7 +38412,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38515,7 +38461,6 @@ minimum number of augmentations (4)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38536,7 +38481,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38557,7 +38501,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38578,7 +38521,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38637,7 +38579,6 @@ maximum number of augmentations (4)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38658,7 +38599,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38679,7 +38619,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38700,7 +38639,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38759,7 +38697,6 @@ frictional coefficient (5)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38789,7 +38726,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38810,7 +38746,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38869,7 +38804,6 @@ tangential penalty factor (5)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38955,7 +38889,6 @@ tangential stiffness multiplier (5)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -38985,7 +38918,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39053,7 +38985,6 @@ maximum number of segment updates (6)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39083,7 +39014,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39104,7 +39034,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39172,7 +39101,6 @@ smoothed Lagrangian augmentation (7)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39193,7 +39121,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39214,7 +39141,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39235,7 +39161,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39312,7 +39237,6 @@ smoothed fluid load support for friction calculation (7)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39398,7 +39322,6 @@ solid-on-solid contact area fraction for friction calculation (5)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39475,7 +39398,6 @@ symmetric stiffness matrix flag (8)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39496,7 +39418,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39517,7 +39438,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39567,7 +39487,6 @@ Projection search tolerance (9)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39588,7 +39507,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39609,7 +39527,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39630,7 +39547,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39651,7 +39567,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39710,7 +39625,6 @@ search radius (10)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39731,7 +39645,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39752,7 +39665,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39773,7 +39685,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39841,7 +39752,6 @@ tension flag (11)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39927,7 +39837,6 @@ flip normal on primary surface
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -39948,7 +39857,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -40025,7 +39933,6 @@ flip normal on secondary surface
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -40046,7 +39953,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -40123,7 +40029,6 @@ contact with bottom of shell on primary surface
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -40144,7 +40049,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -40221,7 +40125,6 @@ contact with bottom of shell on secondary surface
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -40242,7 +40145,6 @@ bullet$
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -40319,7 +40221,6 @@ offset distance between contacting surfaces (12)
 status open
 
 \begin_layout Plain Layout
-
 $
 \backslash
 bullet$
@@ -40597,7 +40498,6 @@ With this parameter set,
 status collapsed
 
 \begin_layout Plain Layout
-
 {
 \end_layout
 
@@ -40608,7 +40508,6 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-
 }
 \end_layout
 
@@ -40759,7 +40658,6 @@ sliding-biphasic
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 href{https://febio.org/knowledgebase/}{
@@ -41060,7 +40958,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -41131,23 +41028,23 @@ contact_frac
 
  is the fraction of the apparent contact area where fluid contacts fluid or solid.
  For perfectly smooth contact surfaces one may assume that 
-\begin_inset Formula $\varphi=\varphi_{1}^{s}\varphi_{2}^{s}$
+\begin_inset Formula $\varphi=\varphi^{s}_{1}\varphi^{s}_{2}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $\varphi_{1}^{s}$
+\begin_inset Formula $\varphi^{s}_{1}$
 \end_inset
 
  and 
-\begin_inset Formula $\varphi_{2}^{s}$
+\begin_inset Formula $\varphi^{s}_{2}$
 \end_inset
 
  are the solid area (or volume) fractions of the primary and secondary contact surfaces,
  respectively.
  For example,
  when both contact surfaces are non-porous (
-\begin_inset Formula $\varphi_{1}^{s}=\varphi_{2}^{s}=1$
+\begin_inset Formula $\varphi^{s}_{1}=\varphi^{s}_{2}=1$
 \end_inset
 
 ),
@@ -48297,7 +48194,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -50080,7 +49976,7 @@ The uncoupled strain energy function for the Arruda-Boyce material is given by:
  
 \begin_inset Formula 
 \[
-\Psi=\mu\sum\limits_{i=1}^{5}\frac{C_{i}}{N^{i-1}}\left(\tilde{I}_{1}^{i}-3^{i}\right)+U\left(J\right),
+\Psi=\mu\sum\limits^{5}_{i=1}\frac{C_{i}}{N^{i-1}}\left(\tilde{I}^{i}_{1}-3^{i}\right)+U\left(J\right),
 \]
 
 \end_inset
@@ -50335,13 +50231,13 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\tilde{\boldsymbol{\sigma}}=\int_{0}^{2\pi}\int_{0}^{\pi}H\left(\tilde{I}_{n}-1\right)\tilde{\sigma}_{n}\left(\mathbf{n}\right)\sin\varphi\,d\varphi\,d\theta.
+\tilde{\boldsymbol{\sigma}}=\int^{2\pi}_{0}\int^{\pi}_{0}H\left(\tilde{I}_{n}-1\right)\tilde{\sigma}_{n}\left(\mathbf{n}\right)\sin\varphi\,d\varphi\,d\theta.
 \]
 
 \end_inset
 
 
-\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}_{n}^{2}=\mathbf{N}\cdot\mathbf{\tilde{C}}\cdot\mathbf{N}$
+\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}^{2}_{n}=\mathbf{N}\cdot\mathbf{\tilde{C}}\cdot\mathbf{N}$
 \end_inset
 
  is the square of the fiber stretch 
@@ -50399,8 +50295,8 @@ The materials parameters
  
 \begin_inset Formula 
 \[
-\begin{aligned}\xi\left(\mathbf{n}\right) & =\left(\frac{\cos^{2}\theta\sin^{2}\varphi}{\xi_{1}^{2}}+\frac{\sin^{2}\theta\sin^{2}\varphi}{\xi_{2}^{2}}+\frac{\cos^{2}\varphi}{\xi_{3}^{2}}\right)^{-1/2}\\
-\beta\left(\mathbf{n}\right) & =\left(\frac{\cos^{2}\theta\sin^{2}\varphi}{\beta_{1}^{2}}+\frac{\sin^{2}\theta\sin^{2}\varphi}{\beta_{2}^{2}}+\frac{\cos^{2}\varphi}{\beta_{3}^{2}}\right)^{-1/2}
+\begin{aligned}\xi\left(\mathbf{n}\right) & =\left(\frac{\cos^{2}\theta\sin^{2}\varphi}{\xi^{2}_{1}}+\frac{\sin^{2}\theta\sin^{2}\varphi}{\xi^{2}_{2}}+\frac{\cos^{2}\varphi}{\xi^{2}_{3}}\right)^{-1/2}\\
+\beta\left(\mathbf{n}\right) & =\left(\frac{\cos^{2}\theta\sin^{2}\varphi}{\beta^{2}_{1}}+\frac{\sin^{2}\theta\sin^{2}\varphi}{\beta^{2}_{2}}+\frac{\cos^{2}\varphi}{\beta^{2}_{3}}\right)^{-1/2}
 \end{aligned}
 \,.
 \]
@@ -51561,7 +51457,7 @@ where,
  
 \begin_inset Formula 
 \[
-\tilde{Q}=c^{-1}\sum\limits_{a=1}^{3}\left[2\mu_{a}\mathbf{M}_{a}:\mathbf{\tilde{E}}^{2}+\sum\limits_{b=1}^{3}\lambda_{ab}\left(\mathbf{M}_{a}:\mathbf{\tilde{E}}\right)\left(\mathbf{M}_{b}:\mathbf{\tilde{E}}\right)\right].
+\tilde{Q}=c^{-1}\sum\limits^{3}_{a=1}\left[2\mu_{a}\mathbf{M}_{a}:\mathbf{\tilde{E}}^{2}+\sum\limits^{3}_{b=1}\lambda_{ab}\left(\mathbf{M}_{a}:\mathbf{\tilde{E}}\right)\left(\mathbf{M}_{b}:\mathbf{\tilde{E}}\right)\right].
 \]
 
 \end_inset
@@ -52320,7 +52216,7 @@ This material model uncouples deviatoric and volumetric behaviors.
 where
 \begin_inset Formula 
 \[
-\tilde{\Psi}_{r}=\frac{c}{2}\left(\tilde{I}_{1}-3\right)+\frac{k_{1}}{2k_{2}}\sum_{\alpha=1}^{2}\left(\exp\left(k_{2}\left\langle \tilde{E}_{\alpha}\right\rangle ^{2}\right)-1\right)
+\tilde{\Psi}_{r}=\frac{c}{2}\left(\tilde{I}_{1}-3\right)+\frac{k_{1}}{2k_{2}}\sum^{2}_{\alpha=1}\left(\exp\left(k_{2}\left\langle \tilde{E}_{\alpha}\right\rangle ^{2}\right)-1\right)
 \]
 
 \end_inset
@@ -53045,7 +52941,7 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\Psi\left(B_{1},B_{2},\lambda\right)=G_{1}\tilde{B}_{1}^{2}+G_{2}\tilde{B}_{2}^{2}+F_{m}\left(\tilde{\lambda}\right)+U\left(J\right).
+\Psi\left(B_{1},B_{2},\lambda\right)=G_{1}\tilde{B}^{2}_{1}+G_{2}\tilde{B}^{2}_{2}+F_{m}\left(\tilde{\lambda}\right)+U\left(J\right).
 \]
 
 \end_inset
@@ -53059,7 +52955,7 @@ is the strain energy contribution of the muscle fibers.
  
 \begin_inset Formula 
 \[
-\lambda\frac{\partial F_{m}}{\partial\lambda}=\sigma_{\max}\left(f_{m}^{\text{passive}}\left(\lambda\right)+\alpha f_{m}^{\text{active}}\left(\lambda\right)\right)\frac{\lambda}{\lambda_{ofl}},
+\lambda\frac{\partial F_{m}}{\partial\lambda}=\sigma_{\max}\left(f^{\text{passive}}_{m}\left(\lambda\right)+\alpha f^{\text{active}}_{m}\left(\lambda\right)\right)\frac{\lambda}{\lambda_{ofl}},
 \]
 
 \end_inset
@@ -53068,7 +52964,7 @@ where,
  
 \begin_inset Formula 
 \[
-f_{m}^{\text{passive}}\left(\lambda\right)=\begin{cases}
+f^{\text{passive}}_{m}\left(\lambda\right)=\begin{cases}
 0 & \lambda\leqslant\lambda_{ofl}\\
 P_{1}\left(e^{P_{2}\left(\lambda/\lambda_{ofl}-1\right)}-1\right) & \lambda_{ofl}<\lambda<\lambda^{\ast}\\
 P_{3}\lambda/\lambda_{ofl}+P_{4} & \lambda\geqslant\lambda^{\ast}
@@ -53080,7 +52976,7 @@ P_{3}\lambda/\lambda_{ofl}+P_{4} & \lambda\geqslant\lambda^{\ast}
 and 
 \begin_inset Formula 
 \[
-f_{m}^{\text{active}}\left(\lambda\right)=\begin{cases}
+f^{\text{active}}_{m}\left(\lambda\right)=\begin{cases}
 9\left(\lambda/\lambda_{ofl}-0.4\right)^{2} & \lambda\leqslant0.6\lambda_{ofl}\\
 9\left(\lambda/\lambda_{ofl}-1.6\right)^{2} & \lambda\geqslant1.4\lambda_{ofl}\\
 1-4\left(1-\lambda/\lambda_{ofl}\right)^{2} & 0.6\lambda_{ofl}<\lambda<1.4\lambda_{ofl}
@@ -53318,14 +53214,14 @@ The uncoupled hyperelastic strain energy function for this material is given in 
  
 \begin_inset Formula 
 \[
-\Psi=\sum\limits_{i=1}^{N}\frac{c_{i}}{m_{i}^{2}}\left(\tilde{\lambda}_{1}^{m_{i}}+\tilde{\lambda}_{2}^{m_{i}}+\tilde{\lambda}_{3}^{m_{i}}-3\right)+U\left(J\right).
+\Psi=\sum\limits^{N}_{i=1}\frac{c_{i}}{m^{2}_{i}}\left(\tilde{\lambda}^{m_{i}}_{1}+\tilde{\lambda}^{m_{i}}_{2}+\tilde{\lambda}^{m_{i}}_{3}-3\right)+U\left(J\right).
 \]
 
 \end_inset
 
 Here,
  
-\begin_inset Formula $\tilde{\lambda}_{i}^{2}$
+\begin_inset Formula $\tilde{\lambda}^{2}_{i}$
 \end_inset
 
  are the eigenvalues of 
@@ -53921,7 +53817,7 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\Psi\left(\mathbf{C},\lambda_{1},\lambda_{2},\lambda_{3}\right)=\tilde{\Psi}_{iso}\left(\mathbf{\tilde{C}}\right)+\sum\limits_{i=1}^{3}\tilde{\Psi}_{i}^{TC}\left(\tilde{\lambda}_{i}\right)+U\left(J\right)\,.
+\Psi\left(\mathbf{C},\lambda_{1},\lambda_{2},\lambda_{3}\right)=\tilde{\Psi}_{iso}\left(\mathbf{\tilde{C}}\right)+\sum\limits^{3}_{i=1}\tilde{\Psi}^{TC}_{i}\left(\tilde{\lambda}_{i}\right)+U\left(J\right)\,.
 \]
 
 \end_inset
@@ -53939,7 +53835,7 @@ and the dilatational energy
  
 \begin_inset Formula 
 \[
-\tilde{\Psi}_{i}^{TC}\left(\tilde{\lambda}_{i}\right)=\begin{cases}
+\tilde{\Psi}^{TC}_{i}\left(\tilde{\lambda}_{i}\right)=\begin{cases}
 \xi_{i}\left(\tilde{\lambda}_{i}-1\right)^{\beta_{i}} & \tilde{\lambda}_{i}>1\\
 0 & \tilde{\lambda}_{i}\leqslant1
 \end{cases}\quad\xi_{i}\geqslant0\quad\left(\text{no sum over }i\right)\,.
@@ -53955,13 +53851,13 @@ The
  
 \begin_inset Formula 
 \[
-\tilde{\lambda}_{i}=\left(\mathbf{a}_{i}^{0}\cdot\mathbf{\tilde{C}}\cdot\mathbf{a}_{i}^{0}\right)^{1/2}\,.
+\tilde{\lambda}_{i}=\left(\mathbf{a}^{0}_{i}\cdot\mathbf{\tilde{C}}\cdot\mathbf{a}^{0}_{i}\right)^{1/2}\,.
 \]
 
 \end_inset
 
 The local material fibers are defined (in the reference frame) as an orthonormal set of vectors 
-\begin_inset Formula $\mathbf{a}_{i}^{0}$
+\begin_inset Formula $\mathbf{a}^{0}_{i}$
 \end_inset
 
 .
@@ -55871,7 +55767,7 @@ This constitutive model is designed for thin soft tissues.
  
 \begin_inset Formula 
 \[
-\Psi=F_{1}\left(\tilde{I}_{1},\tilde{I}_{2}\right)+\int\limits_{\theta_{P}-\pi/2}^{\theta_{P}+\pi/2}P\left(\theta\right)F_{2}\left(\tilde{\lambda}\left[\theta\right]\right)d\theta+\frac{K}{2}\left[\ln\left(J\right)\right]^{2},
+\Psi=F_{1}\left(\tilde{I}_{1},\tilde{I}_{2}\right)+\int\limits^{\theta_{P}+\pi/2}_{\theta_{P}-\pi/2}P\left(\theta\right)F_{2}\left(\tilde{\lambda}\left[\theta\right]\right)d\theta+\frac{K}{2}\left[\ln\left(J\right)\right]^{2},
 \]
 
 \end_inset
@@ -55884,7 +55780,7 @@ where
  
 \begin_inset Formula 
 \[
-\int\limits_{\theta_{P}-\pi/2}^{\theta_{P}+\pi/2}P\left(\theta\right)d\theta=1.
+\int\limits^{\theta_{P}+\pi/2}_{\theta_{P}-\pi/2}P\left(\theta\right)d\theta=1.
 \]
 
 \end_inset
@@ -56650,7 +56546,7 @@ The strain-energy density function for this material combines a neo-Hookean matr
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Psi=\sum_{i=1}^{6}c_{i}\left(\tilde{I}_{1}-3\right)^{i}
+\Psi=\sum^{6}_{i=1}c_{i}\left(\tilde{I}_{1}-3\right)^{i}
 \]
 
 \end_inset
@@ -56766,7 +56662,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -56789,7 +56684,7 @@ emph{FEBio Theory Manual}}
  and
 \begin_inset Formula 
 \[
-T^{a}=T_{\max}\frac{Ca_{0}^{2}}{Ca_{0}^{2}+ECa_{50}^{2}}C\left(t\right)
+T^{a}=T_{\max}\frac{Ca^{2}_{0}}{Ca^{2}_{0}+ECa^{2}_{50}}C\left(t\right)
 \]
 
 \end_inset
@@ -57181,7 +57076,7 @@ literal "false"
  and
 \begin_inset Formula 
 \[
-T^{a}=e\left(t\right)\underbrace{T_{\max}\frac{Ca_{0}^{2}}{Ca_{0}^{2}+ECa_{50}^{2}}}_{\begin{array}{c}
+T^{a}=e\left(t\right)\underbrace{T_{\max}\frac{Ca^{2}_{0}}{Ca^{2}_{0}+ECa^{2}_{50}}}_{\begin{array}{c}
 \text{instantaneous length}\\
 \text{dependence}
 \end{array}}\underbrace{\frac{1+aQ\left(t,\lambda\left(t\right)\right)}{1-Q\left(t,\lambda\left(t\right)\right)}}_{\text{force-velocity}}
@@ -57200,7 +57095,7 @@ ECa_{50}=\frac{\left(\text{Ca}_{0}\right)_{\max}}{\sqrt{\exp\left[\beta\left(\la
 and
 \begin_inset Formula 
 \[
-Q\left(t,\lambda\left(t\right)\right)=\sum_{k=1}^{3}A_{k}\int_{-\infty}^{t}e^{-\alpha_{k}\left(t-\tau\right)}\dot{\lambda}\left(\tau\right)\,d\tau
+Q\left(t,\lambda\left(t\right)\right)=\sum^{3}_{k=1}A_{k}\int^{t}_{-\infty}e^{-\alpha_{k}\left(t-\tau\right)}\dot{\lambda}\left(\tau\right)\,d\tau
 \]
 
 \end_inset
@@ -58245,7 +58140,7 @@ literal "true"
 \end_inset
 
  whose Young's modulus is a power-law function of the referential apparent density 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  of a solid-bound molecule.
@@ -58272,7 +58167,7 @@ Here,
 
 \begin_layout Standard
 Young's modulus depends on 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  according to a power law 
@@ -58287,7 +58182,7 @@ literal "true"
  
 \begin_inset Formula 
 \[
-E_{Y}=E_{0}\left(\frac{\rho_{r}^{\sigma}}{\rho_{0}}\right)^{\gamma}\,.
+E_{Y}=E_{0}\left(\frac{\rho^{\sigma}_{r}}{\rho_{0}}\right)^{\gamma}\,.
 \]
 
 \end_inset
@@ -58325,12 +58220,12 @@ sbm
 \shape default
  must refer to the global index of that solid-bound molecule.
  The value of 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  is specified within the <solid_bound> tag.
  If a chemical reaction is defined within that multiphasic mixture that alters the value of 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
 ,
@@ -58538,7 +58433,7 @@ literal "true"
 \begin_layout Plain Layout
 intracellular solid volume fraction in reference (strain-free) configuration,
  
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
 
@@ -58676,7 +58571,7 @@ where
  given by 
 \begin_inset Formula 
 \[
-\pi=RT\left(\frac{c_{r}}{J-\varphi_{r}^{s}}-c_{e}\right),
+\pi=RT\left(\frac{c_{r}}{J-\varphi^{s}_{r}}-c_{e}\right),
 \]
 
 \end_inset
@@ -58700,7 +58595,7 @@ where
 \begin_layout Standard
 Cell growth may be modeled by simply increasing the mass of the intracellular solid matrix and membrane-impermeant solute.
  This is achieved by allowing the parameters 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  and 
@@ -58712,7 +58607,7 @@ Cell growth may be modeled by simply increasing the mass of the intracellular so
  Since cell growth is often accompanied by cell division,
  and since daughter cells typically achieve the same solid and solute content as their parent,
  it may be convenient to assume that 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  and 
@@ -58723,7 +58618,7 @@ Cell growth may be modeled by simply increasing the mass of the intracellular so
  though this is not an obligatory relationship.
  To ensure that the initial configuration is a stress-free reference configuration,
  let 
-\begin_inset Formula $c_{r}=\left(1-\varphi_{r}^{s}\right)c_{e}$
+\begin_inset Formula $c_{r}=\left(1-\varphi^{s}_{r}\right)c_{e}$
 \end_inset
 
  in the initial state prior to growth.
@@ -59365,10 +59260,10 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\Psi_{r}=\mu\mathbf{I}:\mathbf{E}^{2}+\sum\limits_{a=1}^{3}\frac{1}{2}\lambda_{1}\left[\mathbf{A}_{a}^{r}:\mathbf{E}\right]\left(\mathbf{A}_{a}^{r}:\mathbf{E}\right)^{2}+\frac{1}{2}\lambda_{2}\sum\limits_{\begin{array}{c}
+\Psi_{r}=\mu\mathbf{I}:\mathbf{E}^{2}+\sum\limits^{3}_{a=1}\frac{1}{2}\lambda_{1}\left[\mathbf{A}^{r}_{a}:\mathbf{E}\right]\left(\mathbf{A}^{r}_{a}:\mathbf{E}\right)^{2}+\frac{1}{2}\lambda_{2}\sum\limits^{3}_{\begin{array}{c}
 b=1\\
 b\ne a
-\end{array}}^{3}\left(\mathbf{A}_{a}^{r}:\mathbf{E}\right)\left(\mathbf{A}_{b}^{r}:\mathbf{E}\right)\,,
+\end{array}}\left(\mathbf{A}^{r}_{a}:\mathbf{E}\right)\left(\mathbf{A}^{r}_{b}:\mathbf{E}\right)\,,
 \]
 
 \end_inset
@@ -59376,9 +59271,9 @@ b\ne a
 where 
 \begin_inset Formula 
 \[
-\lambda_{1}\left[\mathbf{A}_{a}^{r}:\mathbf{E}\right]=\begin{cases}
-\lambda_{+1} & \mathbf{A}_{a}^{r}:\mathbf{E}\geqslant0\\
-\lambda_{-1} & \mathbf{A}_{a}^{r}:\mathbf{\,}.E<0
+\lambda_{1}\left[\mathbf{A}^{r}_{a}:\mathbf{E}\right]=\begin{cases}
+\lambda_{+1} & \mathbf{A}^{r}_{a}:\mathbf{E}\geqslant0\\
+\lambda_{-1} & \mathbf{A}^{r}_{a}:\mathbf{\,}.E<0
 \end{cases}
 \]
 
@@ -59390,12 +59285,12 @@ Here,
 \end_inset
 
  is the Lagrangian strain tensor and 
-\begin_inset Formula $\mathbf{A}_{a}^{r}=\mathbf{a}_{a}^{r}\otimes\mathbf{a}_{a}^{r}$
+\begin_inset Formula $\mathbf{A}^{r}_{a}=\mathbf{a}^{r}_{a}\otimes\mathbf{a}^{r}_{a}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $\mathbf{a}_{a}^{r}$
+\begin_inset Formula $\mathbf{a}^{r}_{a}$
 \end_inset
 
  (
@@ -59544,7 +59439,7 @@ nolink "false"
 \begin_layout Plain Layout
 gel porosity (fluid volume fraction) in reference (strain-free) configuration,
  
-\begin_inset Formula $\varphi_{0}^{w}$
+\begin_inset Formula $\varphi^{w}_{0}$
 \end_inset
 
 
@@ -59578,7 +59473,7 @@ gel porosity (fluid volume fraction) in reference (strain-free) configuration,
 \begin_layout Plain Layout
 fixed-charge density in reference (strain-free) configuration,
  
-\begin_inset Formula $c_{0}^{F}$
+\begin_inset Formula $c^{F}_{0}$
 \end_inset
 
 
@@ -59738,7 +59633,7 @@ and
  related to the reference configuration via 
 \begin_inset Formula 
 \[
-c^{F}=\frac{\varphi_{0}^{w}}{J-1+\varphi_{0}^{w}}c_{0}^{F},
+c^{F}=\frac{\varphi^{w}_{0}}{J-1+\varphi^{w}_{0}}c^{F}_{0},
 \]
 
 \end_inset
@@ -59767,12 +59662,12 @@ where
 
 \begin_layout Standard
 Note that 
-\begin_inset Formula $c_{0}^{F}$
+\begin_inset Formula $c^{F}_{0}$
 \end_inset
 
  may be negative or positive;
  the gel porosity is unitless and must be in the range 
-\begin_inset Formula $0<\varphi_{0}^{w}<1$
+\begin_inset Formula $0<\varphi^{w}_{0}<1$
 \end_inset
 
 .
@@ -59910,7 +59805,7 @@ K
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $c_{0}^{F}$
+\begin_inset Formula $c^{F}_{0}$
 \end_inset
 
 
@@ -60084,7 +59979,7 @@ equilibrium
 
 \begin_layout Standard
 Donnan osmotic swelling reduces to zero when either 
-\begin_inset Formula $c_{0}^{F}=0$
+\begin_inset Formula $c^{F}_{0}=0$
 \end_inset
 
  or 
@@ -60094,7 +59989,7 @@ Donnan osmotic swelling reduces to zero when either
 .
  Therefore,
  entering any other values for 
-\begin_inset Formula $c_{0}^{F}$
+\begin_inset Formula $c^{F}_{0}$
 \end_inset
 
  and 
@@ -60387,14 +60282,14 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\boldsymbol{\sigma}=\int_{0}^{2\pi}\int_{0}^{\pi}H\left(I_{n}-1\right)\sigma_{n}\left(\mathbf{n}\right)\sin\varphi\,d\varphi\,d\theta.
+\boldsymbol{\sigma}=\int^{2\pi}_{0}\int^{\pi}_{0}H\left(I_{n}-1\right)\sigma_{n}\left(\mathbf{n}\right)\sin\varphi\,d\varphi\,d\theta.
 \]
 
 \end_inset
 
 Here,
  
-\begin_inset Formula $I_{n}=\lambda_{n}^{2}=\mathbf{N}\cdot\mathbf{C}\cdot\mathbf{N}$
+\begin_inset Formula $I_{n}=\lambda^{2}_{n}=\mathbf{N}\cdot\mathbf{C}\cdot\mathbf{N}$
 \end_inset
 
  is the square of the fiber stretch 
@@ -60460,8 +60355,8 @@ are assumed to vary ellipsoidally with
  according to 
 \begin_inset Formula 
 \[
-\begin{aligned}\xi\left(\mathbf{n}\right) & =\left(\frac{\cos^{2}\theta\sin^{2}\varphi}{\xi_{1}^{2}}+\frac{\sin^{2}\theta\sin^{2}\varphi}{\xi_{2}^{2}}+\frac{\cos^{2}\varphi}{\xi_{3}^{2}}\right)^{-1/2}\\
-\beta\left(\mathbf{n}\right) & =\left(\frac{\cos^{2}\theta\sin^{2}\varphi}{\beta_{1}^{2}}+\frac{\sin^{2}\theta\sin^{2}\varphi}{\beta_{2}^{2}}+\frac{\cos^{2}\varphi}{\beta_{3}^{2}}\right)^{-1/2}
+\begin{aligned}\xi\left(\mathbf{n}\right) & =\left(\frac{\cos^{2}\theta\sin^{2}\varphi}{\xi^{2}_{1}}+\frac{\sin^{2}\theta\sin^{2}\varphi}{\xi^{2}_{2}}+\frac{\cos^{2}\varphi}{\xi^{2}_{3}}\right)^{-1/2}\\
+\beta\left(\mathbf{n}\right) & =\left(\frac{\cos^{2}\theta\sin^{2}\varphi}{\beta^{2}_{1}}+\frac{\sin^{2}\theta\sin^{2}\varphi}{\beta^{2}_{2}}+\frac{\cos^{2}\varphi}{\beta^{2}_{3}}\right)^{-1/2}
 \end{aligned}
 \,.
 \]
@@ -60879,7 +60774,7 @@ EFD Donnan equilibrium
 \begin_layout Plain Layout
 gel porosity (fluid volume fraction) in reference (strain-free) configuration,
  
-\begin_inset Formula $\varphi_{0}^{w}$
+\begin_inset Formula $\varphi^{w}_{0}$
 \end_inset
 
 
@@ -60913,7 +60808,7 @@ gel porosity (fluid volume fraction) in reference (strain-free) configuration,
 \begin_layout Plain Layout
 fixed-charge density in reference (strain-free) configuration,
  
-\begin_inset Formula $c_{0}^{F}$
+\begin_inset Formula $c^{F}_{0}$
 \end_inset
 
 
@@ -61682,7 +61577,7 @@ where,
  
 \begin_inset Formula 
 \[
-Q=c^{-1}\sum\limits_{a=1}^{3}\left[2\mu_{a}\mathbf{M}_{a}:\mathbf{E}^{2}+\sum\limits_{b=1}^{3}\lambda_{ab}\left(\mathbf{M}_{a}:\mathbf{E}\right)\left(\mathbf{M}_{b}:\mathbf{E}\right)\right],
+Q=c^{-1}\sum\limits^{3}_{a=1}\left[2\mu_{a}\mathbf{M}_{a}:\mathbf{E}^{2}+\sum\limits^{3}_{b=1}\lambda_{ab}\left(\mathbf{M}_{a}:\mathbf{E}\right)\left(\mathbf{M}_{b}:\mathbf{E}\right)\right],
 \]
 
 \end_inset
@@ -64220,10 +64115,10 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\Psi_{r}=\sum\limits_{a=1}^{3}\mu_{a}\mathbf{A}_{a}^{r}:\mathbf{E}^{2}+\frac{1}{2}\lambda_{aa}\left[\mathbf{A}_{a}^{r}:\mathbf{E}\right]\left(\mathbf{A}_{a}^{r}:\mathbf{E}\right)^{2}+\sum\limits_{\begin{array}{c}
+\Psi_{r}=\sum\limits^{3}_{a=1}\mu_{a}\mathbf{A}^{r}_{a}:\mathbf{E}^{2}+\frac{1}{2}\lambda_{aa}\left[\mathbf{A}^{r}_{a}:\mathbf{E}\right]\left(\mathbf{A}^{r}_{a}:\mathbf{E}\right)^{2}+\sum\limits^{3}_{\begin{array}{c}
 b=1\\
 b\ne a
-\end{array}}^{3}\frac{1}{2}\lambda_{ab}\left(\mathbf{A}_{a}^{r}:\mathbf{E}\right)\left(\mathbf{A}_{b}^{r}:\mathbf{E}\right)
+\end{array}}\frac{1}{2}\lambda_{ab}\left(\mathbf{A}^{r}_{a}:\mathbf{E}\right)\left(\mathbf{A}^{r}_{b}:\mathbf{E}\right)
 \]
 
 \end_inset
@@ -64235,9 +64130,9 @@ where
  and 
 \begin_inset Formula 
 \[
-\lambda_{aa}\left[\mathbf{A}_{a}^{r}:\mathbf{E}\right]=\begin{cases}
-\lambda_{+aa} & \mathbf{A}_{a}^{r}:\mathbf{E}\geqslant0\\
-\lambda_{-aa} & \mathbf{A}_{a}^{r}:\mathbf{E}<0
+\lambda_{aa}\left[\mathbf{A}^{r}_{a}:\mathbf{E}\right]=\begin{cases}
+\lambda_{+aa} & \mathbf{A}^{r}_{a}:\mathbf{E}\geqslant0\\
+\lambda_{-aa} & \mathbf{A}^{r}_{a}:\mathbf{E}<0
 \end{cases},\quad a=1,2,3
 \]
 
@@ -64249,12 +64144,12 @@ Here,
 \end_inset
 
  is the Lagrangian strain tensor and 
-\begin_inset Formula $\mathbf{A}_{a}^{r}=\mathbf{a}_{a}^{r}\otimes\mathbf{a}_{a}^{r}$
+\begin_inset Formula $\mathbf{A}^{r}_{a}=\mathbf{a}^{r}_{a}\otimes\mathbf{a}^{r}_{a}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $\mathbf{a}_{a}^{r}$
+\begin_inset Formula $\mathbf{a}^{r}_{a}$
 \end_inset
 
  (
@@ -64395,7 +64290,7 @@ osmotic virial expansion
 \begin_layout Plain Layout
 Fluid volume fraction in reference (strain-free) configuration,
  
-\begin_inset Formula $\varphi_{r}^{w}$
+\begin_inset Formula $\varphi^{w}_{r}$
 \end_inset
 
  
@@ -64650,7 +64545,7 @@ where
  given by 
 \begin_inset Formula 
 \[
-\pi=c_{1}c+c_{2}c^{2}+c_{3}c^{3},\quad c=\frac{\varphi_{r}^{w}c_{r}}{J-1+\varphi_{r}^{w}}\,,
+\pi=c_{1}c+c_{2}c^{2}+c_{3}c^{3},\quad c=\frac{\varphi^{w}_{r}c_{r}}{J-1+\varphi^{w}_{r}}\,,
 \]
 
 \end_inset
@@ -64893,7 +64788,7 @@ and
  
 \begin_inset Formula 
 \[
-W=\frac{\kappa}{2}K_{1}^{2}+\mu K_{2}^{2},
+W=\frac{\kappa}{2}K^{2}_{1}+\mu K^{2}_{2},
 \]
 
 \end_inset
@@ -65864,14 +65759,14 @@ The hyperelastic strain energy function for this material is given in terms of t
  
 \begin_inset Formula 
 \[
-W\left(\lambda_{1},\lambda_{2},\lambda_{3}\right)=\frac{1}{2}c_{p}\left(J-1\right)^{2}+\sum\limits_{i=1}^{N}\frac{c_{i}}{m_{i}^{2}}\left(\lambda_{1}^{m_{i}}+\lambda_{2}^{m_{i}}+\lambda_{3}^{m_{i}}-3-m_{i}\ln J\right).
+W\left(\lambda_{1},\lambda_{2},\lambda_{3}\right)=\frac{1}{2}c_{p}\left(J-1\right)^{2}+\sum\limits^{N}_{i=1}\frac{c_{i}}{m^{2}_{i}}\left(\lambda^{m_{i}}_{1}+\lambda^{m_{i}}_{2}+\lambda^{m_{i}}_{3}-3-m_{i}\ln J\right).
 \]
 
 \end_inset
 
 Here,
  
-\begin_inset Formula $\lambda_{i}^{2}$
+\begin_inset Formula $\lambda^{2}_{i}$
 \end_inset
 
  are the eigenvalues of the right or left Cauchy deformation tensor,
@@ -66022,7 +65917,7 @@ nolink "false"
 \begin_layout Plain Layout
 gel porosity (fluid volume fraction) in reference (strain-free) configuration,
  
-\begin_inset Formula $\varphi_{0}^{w}$
+\begin_inset Formula $\varphi^{w}_{0}$
 \end_inset
 
 
@@ -66174,7 +66069,7 @@ where
  related to the reference configuration via 
 \begin_inset Formula 
 \[
-\bar{c}=\frac{\varphi_{0}^{w}}{J-1+\varphi_{0}^{w}}\bar{c}_{0}\,,
+\bar{c}=\frac{\varphi^{w}_{0}}{J-1+\varphi^{w}_{0}}\bar{c}_{0}\,,
 \]
 
 \end_inset
@@ -66355,12 +66250,12 @@ porous neo-Hookean
 
 .
  This material describes a porous neo-Hookean material with referential solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  (i.e.,
  porosity 
-\begin_inset Formula $\varphi_{r}^{w}=1-\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{w}_{r}=1-\varphi^{s}_{r}$
 \end_inset
 
 ).
@@ -66370,7 +66265,7 @@ porous neo-Hookean
  the material behavior needs to switch from compressible to incompressible.
  This material may be used to model the porous solid matrix of a biphasic or multiphasic material,
  in which case it inherits the value of 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  from that parent material.
@@ -66445,7 +66340,7 @@ P
 
 \begin_layout Plain Layout
  (
-\begin_inset Formula $0\le\varphi_{r}^{s}<1$
+\begin_inset Formula $0\le\varphi^{s}_{r}<1$
 \end_inset
 
 )
@@ -66492,7 +66387,7 @@ where
  evaluated from
 \begin_inset Formula 
 \[
-\bar{J}=\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\,,
+\bar{J}=\frac{J-\varphi^{s}_{r}}{1-\varphi^{s}_{r}}\,,
 \]
 
 \end_inset
@@ -66526,14 +66421,14 @@ and
  according to
 \begin_inset Formula 
 \[
-\varphi^{w}=\frac{J-1+\varphi_{r}^{w}}{J}=\frac{J-\varphi_{r}^{s}}{J}=\bar{J}\left(1-\varphi_{r}^{s}\right)\,.
+\varphi^{w}=\frac{J-1+\varphi^{w}_{r}}{J}=\frac{J-\varphi^{s}_{r}}{J}=\bar{J}\left(1-\varphi^{s}_{r}\right)\,.
 \]
 
 \end_inset
 
 Thus,
  pore closure occurs when 
-\begin_inset Formula $J=\varphi_{r}^{s}$
+\begin_inset Formula $J=\varphi^{s}_{r}$
 \end_inset
 
  and 
@@ -66548,7 +66443,7 @@ By comparison to a standard neo-Hookean material,
  this porous neo-Hookean material has an effective Young's modulus equal to
 \begin_inset Formula 
 \[
-E=\frac{3\mu}{1+\frac{1}{2}\left(\varphi_{r}^{w}\right)^{2}}\,,
+E=\frac{3\mu}{1+\frac{1}{2}\left(\varphi^{w}_{r}\right)^{2}}\,,
 \]
 
 \end_inset
@@ -66556,7 +66451,7 @@ E=\frac{3\mu}{1+\frac{1}{2}\left(\varphi_{r}^{w}\right)^{2}}\,,
 and an effective Poisson's ratio equal to
 \begin_inset Formula 
 \[
-\nu=\frac{1-\left(\varphi_{r}^{w}\right)^{2}}{2+\left(\varphi_{r}^{w}\right)^{2}}\,.
+\nu=\frac{1-\left(\varphi^{w}_{r}\right)^{2}}{2+\left(\varphi^{w}_{r}\right)^{2}}\,.
 \]
 
 \end_inset
@@ -66567,14 +66462,14 @@ Therefore,
 \end_inset
 
  and the referential porosity 
-\begin_inset Formula $\varphi_{r}^{s}=1-\varphi_{r}^{w}$
+\begin_inset Formula $\varphi^{s}_{r}=1-\varphi^{w}_{r}$
 \end_inset
 
 .
  Poisson's ratio in the limit of infinitesimal strains is dictated by the porosity according to the above formula.
  In particular,
  a highly porous material (
-\begin_inset Formula $\varphi_{r}^{w}\to1$
+\begin_inset Formula $\varphi^{w}_{r}\to1$
 \end_inset
 
 ) has an effective Poisson ratio that approaches zero (
@@ -66587,7 +66482,7 @@ Therefore,
 
  in the range of infinitesimal strains.
  A low porosity material (
-\begin_inset Formula $\varphi_{r}^{w}\to0$
+\begin_inset Formula $\varphi^{w}_{r}\to0$
 \end_inset
 
 ) has 
@@ -66601,11 +66496,11 @@ Therefore,
 ,
  which is the expected behavior of an incompressible neo-Hookean solid.
  Note that setting 
-\begin_inset Formula $\varphi_{r}^{w}=0$
+\begin_inset Formula $\varphi^{w}_{r}=0$
 \end_inset
 
  (
-\begin_inset Formula $\varphi_{r}^{s}=1$
+\begin_inset Formula $\varphi^{s}_{r}=1$
 \end_inset
 
 ) would not produce good numerical behavior,
@@ -66923,7 +66818,7 @@ This model is derived from the following hyperelastic strain-energy function:
 \begin_layout Standard
 \begin_inset Formula 
 \[
-W=c\left(I_{1}-3\right)+\frac{c}{\beta}\left(I_{3}^{-\beta}-1\right)+c_{1}\left(I_{3}^{-\frac{1}{3}}I_{1}-3\right)^{d_{1}}+c_{3}\left(I_{3}^{\frac{1}{3}}-1\right)^{d_{3}},
+W=c\left(I_{1}-3\right)+\frac{c}{\beta}\left(I^{-\beta}_{3}-1\right)+c_{1}\left(I^{-\frac{1}{3}}_{3}I_{1}-3\right)^{d_{1}}+c_{3}\left(I^{\frac{1}{3}}_{3}-1\right)^{d_{3}},
 \]
 
 \end_inset
@@ -67436,14 +67331,14 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\boldsymbol{\sigma}=\int_{0}^{2\pi}\int_{0}^{\pi}H\left(I_{n}-1\right)\sigma_{n}\left(\mathbf{n}\right)\sin\varphi\,d\varphi\,d\theta\,.
+\boldsymbol{\sigma}=\int^{2\pi}_{0}\int^{\pi}_{0}H\left(I_{n}-1\right)\sigma_{n}\left(\mathbf{n}\right)\sin\varphi\,d\varphi\,d\theta\,.
 \]
 
 \end_inset
 
 Here,
  
-\begin_inset Formula $I_{n}=\lambda_{n}^{2}=\mathbf{N}\cdot\mathbf{C}\cdot\mathbf{N}$
+\begin_inset Formula $I_{n}=\lambda^{2}_{n}=\mathbf{N}\cdot\mathbf{C}\cdot\mathbf{N}$
 \end_inset
 
  is the square of the fiber stretch 
@@ -67911,14 +67806,14 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\boldsymbol{\sigma}=\int_{0}^{2\pi}\int_{0}^{\pi}H\left(I_{n}-1\right)\sigma_{n}\left(\mathbf{n}\right)\sin\varphi\,d\varphi\,d\theta\,.
+\boldsymbol{\sigma}=\int^{2\pi}_{0}\int^{\pi}_{0}H\left(I_{n}-1\right)\sigma_{n}\left(\mathbf{n}\right)\sin\varphi\,d\varphi\,d\theta\,.
 \]
 
 \end_inset
 
 Here,
  
-\begin_inset Formula $I_{n}=\lambda_{n}^{2}=\mathbf{N}\cdot\mathbf{C}\cdot\mathbf{N}$
+\begin_inset Formula $I_{n}=\lambda^{2}_{n}=\mathbf{N}\cdot\mathbf{C}\cdot\mathbf{N}$
 \end_inset
 
  is the square of the fiber stretch 
@@ -67984,13 +67879,13 @@ where
 
 .
  The fiber modulus is dependent on the solid-bound molecule referential density 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  according to the power law relation 
 \begin_inset Formula 
 \[
-\xi=\xi_{0}\left(\frac{\rho_{r}^{\sigma}}{\rho_{0}}\right)^{\gamma}\,,
+\xi=\xi_{0}\left(\frac{\rho^{\sigma}_{r}}{\rho_{0}}\right)^{\gamma}\,,
 \]
 
 \end_inset
@@ -68040,12 +67935,12 @@ sbm
 \shape default
  must refer to the global index of that solid-bound molecule.
  The value of 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  is specified within the <solid_bound> tag.
  If a chemical reaction is defined within that multiphasic mixture that alters the value of 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
 ,
@@ -69106,7 +69001,7 @@ where:
 \[
 \begin{aligned}W_{\text{fiber}} & =\frac{1}{2}\frac{c_{1}}{c_{2}}\left(e^{c_{2}\left({\lambda-1}\right)^{2}-1}\right),\\
 W_{\text{matrix}} & =\frac{\mu}{2}\left(I_{1}-3\right)-\mu\ln\left(\sqrt{I_{3}}\right),\\
-W_{\text{vol}} & =\frac{\kappa}{2}\left(\ln\left(\frac{I_{5}-I_{1}I_{4}+I_{2}}{I_{4}^{2(m-v_{0})}e^{-4m\left(\lambda-1\right)}}\right)\right)^{2}.
+W_{\text{vol}} & =\frac{\kappa}{2}\left(\ln\left(\frac{I_{5}-I_{1}I_{4}+I_{2}}{I^{2(m-v_{0})}_{4}e^{-4m\left(\lambda-1\right)}}\right)\right)^{2}.
 \end{aligned}
 \]
 
@@ -70054,7 +69949,7 @@ nolink "false"
 \end_inset
 
 where 
-\begin_inset Formula $I_{n}=\lambda_{n}^{2}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}$
+\begin_inset Formula $I_{n}=\lambda^{2}_{n}=\mathbf{n}_{r}\cdot\mathbf{C}\cdot\mathbf{n}_{r}$
 \end_inset
 
  is the square of the fiber stretch,
@@ -70064,7 +69959,7 @@ where
 
 ,
  
-\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\begin_inset Formula $I_{0}=\lambda^{2}_{0}$
 \end_inset
 
  is the square of the stretch threshold for the tensile response (
@@ -70902,21 +70797,21 @@ The fiber strain energy density is given by
 \Psi_{n}\left(I_{n}\right)=\begin{cases}
 0 & I_{n}<1\\
 \frac{\xi}{\beta}\left(I_{n}-1\right)^{\beta} & 1\leqslant I_{n}\leqslant I_{0}\\
-B\left(I_{n}-I_{0}\right)-E\left(I_{n}^{1/2}-I_{0}^{1/2}\right)+\frac{\xi}{\beta}\left(I_{0}-1\right)^{\beta} & I_{0}<I_{n}
+B\left(I_{n}-I_{0}\right)-E\left(I^{1/2}_{n}-I^{1/2}_{0}\right)+\frac{\xi}{\beta}\left(I_{0}-1\right)^{\beta} & I_{0}<I_{n}
 \end{cases}\,,
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\begin_inset Formula $I_{0}=\lambda^{2}_{0}$
 \end_inset
 
 ,
  
 \begin_inset Formula 
 \[
-\xi=\frac{E}{4\left(\beta-1\right)}I_{0}^{-3/2}\left(I_{0}-1\right)^{2-\beta},\,B=\xi\left(I_{0}-1\right)^{\beta-1}+\frac{E}{2}I_{0}^{-1/2}
+\xi=\frac{E}{4\left(\beta-1\right)}I^{-3/2}_{0}\left(I_{0}-1\right)^{2-\beta},\,B=\xi\left(I_{0}-1\right)^{\beta-1}+\frac{E}{2}I^{-1/2}_{0}
 \]
 
 \end_inset
@@ -71199,21 +71094,21 @@ The fiber strain energy density is given by
 \Psi_{n}=\begin{cases}
 0 & I_{n}<1\\
 \frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{n}-1\right)^{\beta}\right]-1\right) & 1\le I_{n}\le I_{0}\\
-B\left(I_{n}-I_{0}\right)-E\left(I_{n}^{1/2}-I_{0}^{1/2}\right)+\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]-1\right) & I_{n}>I_{0}
+B\left(I_{n}-I_{0}\right)-E\left(I^{1/2}_{n}-I^{1/2}_{0}\right)+\frac{\xi}{\alpha\beta}\left(\exp\left[\alpha\left(I_{0}-1\right)^{\beta}\right]-1\right) & I_{n}>I_{0}
 \end{cases}
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\begin_inset Formula $I_{0}=\lambda^{2}_{0}$
 \end_inset
 
 ,
  
 \begin_inset Formula 
 \[
-\xi=\frac{E\left(I_{0}-1\right)^{2-\beta}\exp\left[-\alpha\left(I_{0}-1\right)^{\beta}\right]}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
+\xi=\frac{E\left(I_{0}-1\right)^{2-\beta}\exp\left[-\alpha\left(I_{0}-1\right)^{\beta}\right]}{4I^{3/2}_{0}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
 \]
 
 \end_inset
@@ -71221,7 +71116,7 @@ where
 and
 \begin_inset Formula 
 \[
-B=E\frac{2I_{0}\left(\beta-\frac{1}{2}+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)-1}{4I_{0}^{3/2}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
+B=E\frac{2I_{0}\left(\beta-\frac{1}{2}+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)-1}{4I^{3/2}_{0}\left(\beta-1+\alpha\beta\left(I_{0}-1\right)^{\beta}\right)}
 \]
 
 \end_inset
@@ -71272,14 +71167,14 @@ fiber-pow-linear
 \[
 \Psi_{n}=\begin{cases}
 0 & I_{n}<1\\
-\frac{E}{2}\left(I_{n}^{1/2}-1\right)^{2} & I_{n}>1
+\frac{E}{2}\left(I^{1/2}_{n}-1\right)^{2} & I_{n}>1
 \end{cases}
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $I_{n}^{1/2}=\lambda_{n}$
+\begin_inset Formula $I^{1/2}_{n}=\lambda_{n}$
 \end_inset
 
  is the stretch ratio along the fiber.
@@ -72425,7 +72320,7 @@ nolink "false"
 \end_inset
 
 where 
-\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}_{n}^{2}=\mathbf{n}_{r}\cdot\mathbf{\tilde{C}}\cdot\mathbf{n}_{r}$
+\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}^{2}_{n}=\mathbf{n}_{r}\cdot\mathbf{\tilde{C}}\cdot\mathbf{n}_{r}$
 \end_inset
 
  is the square of the fiber stretch,
@@ -72895,7 +72790,7 @@ The fiber strain energy density is given by
 \end_inset
 
 where 
-\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}_{n}^{2}=\mathbf{n}_{r}\cdot\mathbf{\tilde{C}}\cdot\mathbf{n}_{r}$
+\begin_inset Formula $\tilde{I}_{n}=\tilde{\lambda}^{2}_{n}=\mathbf{n}_{r}\cdot\mathbf{\tilde{C}}\cdot\mathbf{n}_{r}$
 \end_inset
 
  is the square of the fiber stretch and 
@@ -73127,21 +73022,21 @@ The fiber strain energy density is given by
 \tilde{\Psi}_{n}\left(\tilde{I}_{n}\right)=\begin{cases}
 0 & \tilde{I}_{n}<1\\
 \frac{\xi}{\beta}\left(\tilde{I}_{n}-1\right)^{\beta} & 1\leqslant\tilde{I}_{n}\leqslant I_{0}\\
-B\left(\tilde{I}_{n}-I_{0}\right)-E\left(\tilde{I}_{n}^{1/2}-I_{0}^{1/2}\right)+\frac{\xi}{\beta}\left(I_{0}-1\right)^{\beta} & I_{0}<\tilde{I}_{n}
+B\left(\tilde{I}_{n}-I_{0}\right)-E\left(\tilde{I}^{1/2}_{n}-I^{1/2}_{0}\right)+\frac{\xi}{\beta}\left(I_{0}-1\right)^{\beta} & I_{0}<\tilde{I}_{n}
 \end{cases}\,,
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $I_{0}=\lambda_{0}^{2}$
+\begin_inset Formula $I_{0}=\lambda^{2}_{0}$
 \end_inset
 
 ,
  
 \begin_inset Formula 
 \[
-\xi=\frac{E}{4\left(\beta-1\right)}I_{0}^{-3/2}\left(I_{0}-1\right)^{2-\beta},\,B=\xi\left(I_{0}-1\right)^{\beta-1}+\frac{E}{2}I_{0}^{-1/2}\,.
+\xi=\frac{E}{4\left(\beta-1\right)}I^{-3/2}_{0}\left(I_{0}-1\right)^{2-\beta},\,B=\xi\left(I_{0}-1\right)^{\beta-1}+\frac{E}{2}I^{-1/2}_{0}\,.
 \]
 
 \end_inset
@@ -75353,7 +75248,7 @@ literal "true"
  It corresponds to 
 \begin_inset Formula 
 \[
-R\left(\mathbf{n}\right)=\frac{1}{\pi}\sqrt{\frac{b}{2\pi}}\frac{\exp\left(2bn_{1}^{2}\right)}{\mbox{erfi}\left(\sqrt{2b}\right)}\,,
+R\left(\mathbf{n}\right)=\frac{1}{\pi}\sqrt{\frac{b}{2\pi}}\frac{\exp\left(2bn^{2}_{1}\right)}{\mbox{erfi}\left(\sqrt{2b}\right)}\,,
 \]
 
 \end_inset
@@ -75804,7 +75699,7 @@ von-Mises-2d
  This distribution corresponds to 
 \begin_inset Formula 
 \[
-R\left(\mathbf{n}\right)=\frac{\exp\left[b\left(2n_{1}^{2}-1\right)\right]}{2\pi I_{0}\left(b\right)}
+R\left(\mathbf{n}\right)=\frac{\exp\left[b\left(2n^{2}_{1}-1\right)\right]}{2\pi I_{0}\left(b\right)}
 \]
 
 \end_inset
@@ -76757,7 +76652,7 @@ elastic component (must be an uncoupled elastic solid)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\mathbf{S}\left(t\right)=\int\limits_{-\infty}^{t}G\left(t-s\right)\frac{d\mathbf{S}^{e}}{ds}\,ds
+\mathbf{S}\left(t\right)=\int\limits^{t}_{-\infty}G\left(t-s\right)\frac{d\mathbf{S}^{e}}{ds}\,ds
 \]
 
 \end_inset
@@ -76775,7 +76670,7 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\mathbf{S}\left(t\right)=pJ\,\mathbf{C}^{-1}+J^{-2/3}\int\limits_{-\infty}^{t}G\left(t-s\right)\frac{d\left(\Dev\left[\mathbf{\tilde{S}}^{e}\right]\right)}{ds}\,ds\,,
+\mathbf{S}\left(t\right)=pJ\,\mathbf{C}^{-1}+J^{-2/3}\int\limits^{t}_{-\infty}G\left(t-s\right)\frac{d\left(\Dev\left[\mathbf{\tilde{S}}^{e}\right]\right)}{ds}\,ds\,,
 \]
 
 \end_inset
@@ -76809,7 +76704,7 @@ nolink "false"
  
 \begin_inset Formula 
 \[
-G\left(t\right)=\gamma_{0}+\sum\limits_{i=1}^{N}\gamma_{i}\exp\left(-t/\tau_{i}\right),
+G\left(t\right)=\gamma_{0}+\sum\limits^{N}_{i=1}\gamma_{i}\exp\left(-t/\tau_{i}\right),
 \]
 
 \end_inset
@@ -77188,7 +77083,7 @@ literal "true"
  
 \begin_inset Formula 
 \[
-\mathbf{S}\left(t\right)=\int\limits_{-\infty}^{t}G\left(t-s\right)\frac{d\mathbf{S}^{e}}{ds}\,ds\,,
+\mathbf{S}\left(t\right)=\int\limits^{t}_{-\infty}G\left(t-s\right)\frac{d\mathbf{S}^{e}}{ds}\,ds\,,
 \]
 
 \end_inset
@@ -77206,7 +77101,7 @@ where
  
 \begin_inset Formula 
 \[
-G\left(t\right)=\gamma_{0}+\sum\limits_{i=1}^{N}\gamma_{i}\exp\left(-t/\tau_{i}\right)\,,
+G\left(t\right)=\gamma_{0}+\sum\limits^{N}_{i=1}\gamma_{i}\exp\left(-t/\tau_{i}\right)\,,
 \]
 
 \end_inset
@@ -77346,17 +77241,17 @@ literal "true"
  the strain energy density is given by 
 \begin_inset Formula 
 \begin{equation}
-\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits_{u}w^{u}\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\label{eq:rvs-sed}
+\Psi_{r}\left(\mathbf{F}\right)=\Psi^{e}_{r}\left(\mathbf{F}\right)+\sum\limits_{u}w^{u}\Psi^{b}_{0}\left(\mathbf{F}^{u}\right)\label{eq:rvs-sed}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\Psi_{r}^{e}$
+\begin_inset Formula $\Psi^{e}_{r}$
 \end_inset
 
  is the strain energy density of strong bonds and 
-\begin_inset Formula $\Psi_{0}^{b}$
+\begin_inset Formula $\Psi^{b}_{0}$
 \end_inset
 
  is the strain energy density of weak bonds,
@@ -77586,7 +77481,7 @@ For a material with an uncoupled formulation,
  the strain energy density has the form 
 \begin_inset Formula 
 \begin{equation}
-\Psi_{r}\left(\mathbf{F}\right)=U\left(J\right)+\tilde{\Psi}_{r}^{e}\left(\mathbf{\tilde{F}}\right)+\sum\limits_{u}w^{u}\tilde{\Psi}_{0}^{b}\left(\mathbf{\tilde{F}}^{u}\right)\label{eq:rvs-sed-uncoupled}
+\Psi_{r}\left(\mathbf{F}\right)=U\left(J\right)+\tilde{\Psi}^{e}_{r}\left(\mathbf{\tilde{F}}\right)+\sum\limits_{u}w^{u}\tilde{\Psi}^{b}_{0}\left(\mathbf{\tilde{F}}^{u}\right)\label{eq:rvs-sed-uncoupled}
 \end{equation}
 
 \end_inset
@@ -78035,7 +77930,7 @@ nolink "false"
  with
 \begin_inset Formula 
 \begin{equation}
-\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\sum\limits_{u}w^{u}F\left(\Xi\left(u\right)\right)\Psi_{0}^{b}\left(\mathbf{F}^{u}\right)\,.\label{eq:rvs-reformed-with-recruitment}
+\Psi_{r}\left(\mathbf{F}\right)=\Psi^{e}_{r}\left(\mathbf{F}\right)+\sum\limits_{u}w^{u}F\left(\Xi\left(u\right)\right)\Psi^{b}_{0}\left(\mathbf{F}^{u}\right)\,.\label{eq:rvs-reformed-with-recruitment}
 \end{equation}
 
 \end_inset
@@ -78860,7 +78755,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -79447,7 +79341,7 @@ These parameters must satisfy
  the reduced relaxation function for this material type is given by
 \begin_inset Formula 
 \[
-g\left(t\right)=\frac{\left(\beta-1\right)t^{1-\beta}}{\tau_{1}^{1-\beta}-\tau_{2}^{1-\beta}}\left[\Gamma\left(\beta-1,\frac{t}{\tau_{2}}\right)-\Gamma\left(\beta-1,\frac{t}{\tau_{1}}\right)\right]
+g\left(t\right)=\frac{\left(\beta-1\right)t^{1-\beta}}{\tau^{1-\beta}_{1}-\tau^{1-\beta}_{2}}\left[\Gamma\left(\beta-1,\frac{t}{\tau_{2}}\right)-\Gamma\left(\beta-1,\frac{t}{\tau_{1}}\right)\right]
 \]
 
 \end_inset
@@ -81498,7 +81392,7 @@ t
 The reduced relaxation function for this material type is given by 
 \begin_inset Formula 
 \[
-g\left(t\right)=\frac{\sum_{i=1}^{6}\gamma_{i}e^{-t/\tau_{i}}}{\sum_{i=1}^{6}\gamma_{i}}
+g\left(t\right)=\frac{\sum^{6}_{i=1}\gamma_{i}e^{-t/\tau_{i}}}{\sum^{6}_{i=1}\gamma_{i}}
 \]
 
 \end_inset
@@ -85766,7 +85660,7 @@ literal "true"
  For this criterion,
 \begin_inset Formula 
 \[
-\Xi\left(\mathbf{F}\right)=k=\left(J_{2}^{3}-cJ_{3}^{2}\right)^{1/6}
+\Xi\left(\mathbf{F}\right)=k=\left(J^{3}_{2}-cJ^{2}_{3}\right)^{1/6}
 \]
 
 \end_inset
@@ -86092,7 +85986,7 @@ literal "true"
  we let
 \begin_inset Formula 
 \[
-\Xi\left(\mathbf{F}\right)=\sqrt{\frac{\sigma_{e}^{2}+\left(3\beta\sigma_{m}\right)^{2}}{1+\beta^{2}}}
+\Xi\left(\mathbf{F}\right)=\sqrt{\frac{\sigma^{2}_{e}+\left(3\beta\sigma_{m}\right)^{2}}{1+\beta^{2}}}
 \]
 
 \end_inset
@@ -86376,13 +86270,13 @@ nolink "false"
 The fatigue reaction (2 in the list given above) progresses with a reaction rate
 \begin_inset Formula 
 \[
-k^{if}=k_{0}^{if}\left(\left|\dot{\Xi}^{i}\right|w^{b}\right)^{\beta}
+k^{if}=k^{if}_{0}\left(\left|\dot{\Xi}^{i}\right|w^{b}\right)^{\beta}
 \]
 
 \end_inset
 
 where 
-\begin_inset Formula $k_{0}^{if}$
+\begin_inset Formula $k^{if}_{0}$
 \end_inset
 
  and 
@@ -86421,7 +86315,7 @@ Remarks:
 
 \emph default
  The parameter 
-\begin_inset Formula $k_{0}^{if}$
+\begin_inset Formula $k^{if}_{0}$
 \end_inset
 
  determines the rate at which the fatigue reaction proceeds,
@@ -86431,7 +86325,7 @@ Remarks:
 
 .
  Decreasing 
-\begin_inset Formula $k_{0}^{if}$
+\begin_inset Formula $k^{if}_{0}$
 \end_inset
 
  shifts the 
@@ -86449,7 +86343,7 @@ Remarks:
 
  curve,
  for a given 
-\begin_inset Formula $k_{0}^{if}$
+\begin_inset Formula $k^{if}_{0}$
 \end_inset
 
 .
@@ -86564,7 +86458,7 @@ uncoupled reactive fatigue
 
 \begin_layout Plain Layout
 Specification of the reaction rate constant 
-\begin_inset Formula $k_{0}^{if}$
+\begin_inset Formula $k^{if}_{0}$
 \end_inset
 
  for the fatigue reaction (units vary)
@@ -87058,7 +86952,7 @@ The deformation gradient of a reactive plasticity material is
  is evaluated as
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)=\sum_{\beta}w_{\beta}\left(w_{\beta}^{s}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+w_{\beta}^{y}\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{y}\right)\right)\,,\label{eq:rp-mixture-stress}
+\boldsymbol{\sigma}\left(\mathbf{F}^{s}\right)=\sum_{\beta}w_{\beta}\left(w^{s}_{\beta}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+w^{y}_{\beta}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{y}_{\beta}\right)\right)\,,\label{eq:rp-mixture-stress}
 \end{equation}
 
 \end_inset
@@ -87073,7 +86967,7 @@ where
 
  in the mixture,
  
-\begin_inset Formula $w_{\beta}^{s}$
+\begin_inset Formula $w^{s}_{\beta}$
 \end_inset
 
  is the evolving mass fraction of intact bonds in family 
@@ -87082,7 +86976,7 @@ where
 
  which still exhibit an elastic response,
  and 
-\begin_inset Formula $w_{\beta}^{y}$
+\begin_inset Formula $w^{y}_{\beta}$
 \end_inset
 
  is the evolving mass fraction of bonds in family 
@@ -87095,21 +86989,21 @@ where
 \end_inset
 
  and 
-\begin_inset Formula $w_{\beta}^{s}+w_{\beta}^{y}=1$
+\begin_inset Formula $w^{s}_{\beta}+w^{y}_{\beta}=1$
 \end_inset
 
 .
  The bond breaking-and-reforming reaction is denoted by 
-\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{y}$
+\begin_inset Formula $\mathcal{E}^{s}_{\beta}\to\mathcal{E}^{y}_{\beta}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $\mathcal{E}_{\beta}^{s}$
+\begin_inset Formula $\mathcal{E}^{s}_{\beta}$
 \end_inset
 
  is the species associated with intact bonds while 
-\begin_inset Formula $\mathcal{E}_{\beta}^{y}$
+\begin_inset Formula $\mathcal{E}^{y}_{\beta}$
 \end_inset
 
  is associated with yielded bonds,
@@ -87123,26 +87017,26 @@ where
 \end_inset
 
  satisfy 
-\begin_inset Formula $w_{\beta}^{s}=1$
+\begin_inset Formula $w^{s}_{\beta}=1$
 \end_inset
 
  and 
-\begin_inset Formula $w_{\beta}^{y}=0$
+\begin_inset Formula $w^{y}_{\beta}=0$
 \end_inset
 
  prior to yielding,
  and 
-\begin_inset Formula $w_{\beta}^{s}=0$
+\begin_inset Formula $w^{s}_{\beta}=0$
 \end_inset
 
  and 
-\begin_inset Formula $w_{\beta}^{y}=1$
+\begin_inset Formula $w^{y}_{\beta}=1$
 \end_inset
 
  after yielding.
  Here,
  
-\begin_inset Formula $\mathbf{F}_{\beta}^{y}$
+\begin_inset Formula $\mathbf{F}^{y}_{\beta}$
 \end_inset
 
  is the deformation gradient of yielded bonds 
@@ -87155,12 +87049,12 @@ where
 
  was first reached;
  it is calculated from the relation 
-\begin_inset Formula $\mathbf{F}^{s}=\mathbf{F}_{\beta}^{y}\cdot\mathbf{F}_{\beta}^{ys}$
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{F}^{y}_{\beta}\cdot\mathbf{F}^{ys}_{\beta}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\begin_inset Formula $\mathbf{F}^{ys}_{\beta}$
 \end_inset
 
  is a function of state that maps the yielded configuration 
@@ -87173,7 +87067,7 @@ where
 
 .
  The specific form of the constitutive model for 
-\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\begin_inset Formula $\mathbf{F}^{ys}_{\beta}$
 \end_inset
 
  used in FEBio can be found in 
@@ -87190,7 +87084,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -87203,7 +87096,7 @@ emph{FEBio Theory Manual}}
  Currently that constitutive model is not user-definable,
  though the user has the option to enforce isochoric plastic flow,
  implying that 
-\begin_inset Formula $\det\mathbf{F}_{\beta}^{ys}=1$
+\begin_inset Formula $\det\mathbf{F}^{ys}_{\beta}=1$
 \end_inset
 
 .
@@ -87383,7 +87276,7 @@ apparent yield threshold
  via
 \begin_inset Formula 
 \[
-\begin{aligned}\Phi_{m\beta} & =\Phi_{m,\beta-1}+\frac{\Upsilon_{\beta}-\Upsilon_{\beta-1}}{1-\sum_{b=0}^{\beta-1}w_{b}}\,, & \Phi_{m0} & =\Upsilon_{0}\,.\end{aligned}
+\begin{aligned}\Phi_{m\beta} & =\Phi_{m,\beta-1}+\frac{\Upsilon_{\beta}-\Upsilon_{\beta-1}}{1-\sum^{\beta-1}_{b=0}w_{b}}\,, & \Phi_{m0} & =\Upsilon_{0}\,.\end{aligned}
 \]
 
 \end_inset
@@ -88627,7 +88520,7 @@ reactive plasticity
 
 \begin_layout Plain Layout
 Flag (0 or 1) for enforcing isochoric plastic flow (1 implies 
-\begin_inset Formula $\det\mathbf{F}_{\beta}^{ys}=1,\,\forall\beta$
+\begin_inset Formula $\det\mathbf{F}^{ys}_{\beta}=1,\,\forall\beta$
 \end_inset
 
 )
@@ -89539,11 +89432,11 @@ nolink "false"
 
 ),
  which reduces the generation mass fractions 
-\begin_inset Formula $w_{\beta}^{s}$
+\begin_inset Formula $w^{s}_{\beta}$
 \end_inset
 
  or 
-\begin_inset Formula $w_{\beta}^{y}$
+\begin_inset Formula $w^{y}_{\beta}$
 \end_inset
 
  
@@ -89574,12 +89467,12 @@ generation which is present at
  This distinction is necessary so we can then distinguish between damage to intact bonds (elastic damage) and damage to yielded bonds (plastic damage),
  since intact bonds which get damaged never have the ability to yield.
  Damage to intact bonds is represented by the reaction
-\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{b}$
+\begin_inset Formula $\mathcal{E}^{s}_{\beta}\to\mathcal{E}^{b}_{\beta}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $\mathcal{E}_{\beta}^{b}$
+\begin_inset Formula $\mathcal{E}^{b}_{\beta}$
 \end_inset
 
  is the species associated with broken bonds in bond family 
@@ -89590,7 +89483,7 @@ generation which is present at
  It may represent some initial damage value for a material with defects,
  or damage due to intermolecular failure of bonds that never yielded;
  this damage alters the value of 
-\begin_inset Formula $w_{\beta}^{s}$
+\begin_inset Formula $w^{s}_{\beta}$
 \end_inset
 
  and we refer to it as 
@@ -89604,11 +89497,11 @@ plastic damage
 \emph default
 ;
  it is represented by the reaction 
-\begin_inset Formula $\mathcal{E}_{\beta}^{y}\to\mathcal{E}_{\beta}^{b}$
+\begin_inset Formula $\mathcal{E}^{y}_{\beta}\to\mathcal{E}^{b}_{\beta}$
 \end_inset
 
  and it alters the value of 
-\begin_inset Formula $w_{\beta}^{y}$
+\begin_inset Formula $w^{y}_{\beta}$
 \end_inset
 
 .
@@ -89638,7 +89531,7 @@ nolink "false"
 In a reactive constrained mixture framework the insertion of damage into the reactive plasticity formulation is straightforward.
  Since bonds break permanently in a damage reaction,
  there is no need to define a function of state 
-\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\begin_inset Formula $\mathbf{F}^{ys}_{\beta}$
 \end_inset
 
  to describe a (non-existing) reformed configuration.
@@ -89688,7 +89581,7 @@ nolink "false"
 elastic damage threshold
 \shape default
  
-\begin_inset Formula $\Xi_{m\beta}^{e}$
+\begin_inset Formula $\Xi^{e}_{m\beta}$
 \end_inset
 
 .
@@ -89699,18 +89592,18 @@ elastic damage threshold
 
 ,
  denoted by 
-\begin_inset Formula $F^{e}\left(\Xi_{\beta}^{e}\right)$
+\begin_inset Formula $F^{e}\left(\Xi^{e}_{\beta}\right)$
 \end_inset
 
 ,
  such that 
-\begin_inset Formula $0\le F^{e}\left(\Xi_{\beta}^{e}\right)\le1$
+\begin_inset Formula $0\le F^{e}\left(\Xi^{e}_{\beta}\right)\le1$
 \end_inset
 
 .
  Here,
  
-\begin_inset Formula $F^{e}\left(\Xi_{\beta}^{e}\right)$
+\begin_inset Formula $F^{e}\left(\Xi^{e}_{\beta}\right)$
 \end_inset
 
  is a function of state;
@@ -89729,7 +89622,7 @@ literal "true"
 
  as a cumulative distribution function (CDF),
  whose corresponding probability distribution function (PDF) represents the probability of damage at a particular value of 
-\begin_inset Formula $\Xi_{\beta}^{e}$
+\begin_inset Formula $\Xi^{e}_{\beta}$
 \end_inset
 
 .
@@ -89771,29 +89664,29 @@ nolink "false"
 
  applies,
  and the material composition is generally a mixture of intact (
-\begin_inset Formula $\text{\ensuremath{\mathcal{E}_{\beta}^{s}}}$
+\begin_inset Formula $\text{\ensuremath{\mathcal{E}^{s}_{\beta}}}$
 \end_inset
 
 ) and broken (
-\begin_inset Formula $\mathcal{E}_{\beta}^{b}$
+\begin_inset Formula $\mathcal{E}^{b}_{\beta}$
 \end_inset
 
 ) bonds satisfying the reaction 
-\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{b}$
+\begin_inset Formula $\mathcal{E}^{s}_{\beta}\to\mathcal{E}^{b}_{\beta}$
 \end_inset
 
 .
  The corresponding bond mass fractions satisfy 
-\begin_inset Formula $1=w_{\beta}^{s}+w_{\beta}^{b}$
+\begin_inset Formula $1=w^{s}_{\beta}+w^{b}_{\beta}$
 \end_inset
 
  and 
-\begin_inset Formula $w_{\beta}^{y}=0$
+\begin_inset Formula $w^{y}_{\beta}=0$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $w_{\beta}^{b}=F^{e}\left(\Xi_{\beta}^{e}\right)$
+\begin_inset Formula $w^{b}_{\beta}=F^{e}\left(\Xi^{e}_{\beta}\right)$
 \end_inset
 
  is the elastic damage in bond family 
@@ -89807,22 +89700,22 @@ nolink "false"
 
 ,
  the remaining intact bonds 
-\begin_inset Formula $w_{\beta}^{s}=1-w_{\beta}^{b}$
+\begin_inset Formula $w^{s}_{\beta}=1-w^{b}_{\beta}$
 \end_inset
 
  all yield,
  following the reaction 
-\begin_inset Formula $\mathcal{E}_{\beta}^{s}\to\mathcal{E}_{\beta}^{y}$
+\begin_inset Formula $\mathcal{E}^{s}_{\beta}\to\mathcal{E}^{y}_{\beta}$
 \end_inset
 
 .
  The family mass balance is then given as 
-\begin_inset Formula $1=w_{\beta}^{y}+w_{\beta}^{b}$
+\begin_inset Formula $1=w^{y}_{\beta}+w^{b}_{\beta}$
 \end_inset
 
 ,
  since 
-\begin_inset Formula $w_{\beta}^{s}=0$
+\begin_inset Formula $w^{s}_{\beta}=0$
 \end_inset
 
  after yielding.
@@ -89837,12 +89730,12 @@ For time
 ,
  yielded bonds may continue to yield,
  but they may also sustain damage according to the reaction 
-\begin_inset Formula $\mathcal{E}_{\beta}^{y}\to\mathcal{E}_{\beta}^{b}$
+\begin_inset Formula $\mathcal{E}^{y}_{\beta}\to\mathcal{E}^{b}_{\beta}$
 \end_inset
 
 ,
  which reduces their mass fraction 
-\begin_inset Formula $w_{\beta}^{y}$
+\begin_inset Formula $w^{y}_{\beta}$
 \end_inset
 
 .
@@ -89855,11 +89748,11 @@ For time
 plastic damage measure
 \shape default
  as 
-\begin_inset Formula $\Xi^{p}\left(\mathbf{F}_{\beta}^{ys}\right)$
+\begin_inset Formula $\Xi^{p}\left(\mathbf{F}^{ys}_{\beta}\right)$
 \end_inset
 
  and its cumulative distribution function by 
-\begin_inset Formula $F^{p}\left(\Xi_{\beta}^{p}\right)$
+\begin_inset Formula $F^{p}\left(\Xi^{p}_{\beta}\right)$
 \end_inset
 
 ,
@@ -89882,7 +89775,7 @@ plastic damage measure
 
 ,
  only the remaining undamaged fraction 
-\begin_inset Formula $1-F^{p}\left(\Xi_{\beta}^{p}\right)$
+\begin_inset Formula $1-F^{p}\left(\Xi^{p}_{\beta}\right)$
 \end_inset
 
  of yielded bonds may break and reform as the next yielded generation.
@@ -89891,12 +89784,12 @@ plastic damage measure
 \begin_layout Standard
 It must be recognized that,
  just as 
-\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\begin_inset Formula $\mathbf{F}^{ys}_{\beta}$
 \end_inset
 
  is a constitutively-prescribed function of state and does not carry the meaning of a plastic deformation gradient,
  the plastic damage measure 
-\begin_inset Formula $\Xi^{p}\left(\mathbf{F}_{\beta}^{ys}\right)$
+\begin_inset Formula $\Xi^{p}\left(\mathbf{F}^{ys}_{\beta}\right)$
 \end_inset
 
  is also a function of state.
@@ -89912,7 +89805,7 @@ Recognizing that damaged (broken) bonds do not store free energy,
  the mixture stress is given by
 \begin_inset Formula 
 \begin{equation}
-\boldsymbol{\sigma}=\sum_{\beta}w_{\beta}\left(w_{\beta}^{s}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+w_{\beta}^{y}\boldsymbol{\sigma}_{0}\left(\mathbf{F}_{\beta}^{y}\right)\right)\,,\label{eq:plasticdmg-mixture-stress}
+\boldsymbol{\sigma}=\sum_{\beta}w_{\beta}\left(w^{s}_{\beta}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{s}\right)+w^{y}_{\beta}\boldsymbol{\sigma}_{0}\left(\mathbf{F}^{y}_{\beta}\right)\right)\,,\label{eq:plasticdmg-mixture-stress}
 \end{equation}
 
 \end_inset
@@ -89940,7 +89833,7 @@ nolink "false"
  may be evaluated for elastoplastic damage as the fraction of all bonds that are broken,
 \begin_inset Formula 
 \begin{equation}
-D=w^{b}=\sum_{\beta}w_{\beta}w_{\beta}^{b}\,.\label{eq:plasticdmg-damage-variable}
+D=w^{b}=\sum_{\beta}w_{\beta}w^{b}_{\beta}\,.\label{eq:plasticdmg-damage-variable}
 \end{equation}
 
 \end_inset
@@ -89978,14 +89871,14 @@ For elastic damage,
 
 ,
  we use the constitutively-determined mapping 
-\begin_inset Formula $\mathbf{F}_{\beta}^{ys}$
+\begin_inset Formula $\mathbf{F}^{ys}_{\beta}$
 \end_inset
 
  to define plastic right Cauchy-Green and Lagrange strain tensors through
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{C}_{\beta}^{ys} & =\left(\mathbf{F}_{\beta}^{ys}\right)^{T}\cdot\mathbf{F}_{\beta}^{ys}\\
-\mathbf{E}_{\beta}^{ys} & =\frac{1}{2}\left(\mathbf{C}_{\beta}^{ys}-\mathbf{I}\right)
+\begin{aligned}\mathbf{C}^{ys}_{\beta} & =\left(\mathbf{F}^{ys}_{\beta}\right)^{T}\cdot\mathbf{F}^{ys}_{\beta}\\
+\mathbf{E}^{ys}_{\beta} & =\frac{1}{2}\left(\mathbf{C}^{ys}_{\beta}-\mathbf{I}\right)
 \end{aligned}
 \,.
 \end{equation}
@@ -90003,7 +89896,7 @@ One possible constitutive relation for
 effective plastic strain
 \shape default
  
-\begin_inset Formula $e_{\beta}^{p}$
+\begin_inset Formula $e^{p}_{\beta}$
 \end_inset
 
  for the various bond families 
@@ -90014,14 +89907,14 @@ effective plastic strain
  
 \begin_inset Formula 
 \begin{equation}
-e_{\beta}^{p}=\sqrt{\frac{2}{3}\dev\mathbf{E}_{\beta}^{ys}:\dev\mathbf{E}_{\beta}^{ys}}\,.\label{eq:plasticdmg-effective-plastic-strain}
+e^{p}_{\beta}=\sqrt{\frac{2}{3}\dev\mathbf{E}^{ys}_{\beta}:\dev\mathbf{E}^{ys}_{\beta}}\,.\label{eq:plasticdmg-effective-plastic-strain}
 \end{equation}
 
 \end_inset
 
 In a numerical implementation,
  the effective plastic strain 
-\begin_inset Formula $e_{0}^{p}$
+\begin_inset Formula $e^{p}_{0}$
 \end_inset
 
  of the first bond family to yield may be reported as the effective plastic strain in the entire material,
@@ -90032,7 +89925,7 @@ In a numerical implementation,
 Quantities in this section do not represent plastic strains or plastic strain tensors,
  though we adopt the terminology due to similarities.
  Recall that the non-observable function of state 
-\begin_inset Formula $\mathbf{F}_{\beta}^{ys}=\mathbf{F}_{\beta}^{ys}\left(\mathbf{F}^{s},\rho_{r\beta}^{\alpha}\right)$
+\begin_inset Formula $\mathbf{F}^{ys}_{\beta}=\mathbf{F}^{ys}_{\beta}\left(\mathbf{F}^{s},\rho^{\alpha}_{r\beta}\right)$
 \end_inset
 
  is a time-invariant mapping providing the reference configuration of a yielded bond 
@@ -90050,17 +89943,17 @@ Quantities in this section do not represent plastic strains or plastic strain te
 
 .
  The quantities 
-\begin_inset Formula $\mathbf{C}_{\beta}^{ys}$
+\begin_inset Formula $\mathbf{C}^{ys}_{\beta}$
 \end_inset
 
  and 
-\begin_inset Formula $\mathbf{E}_{\beta}^{ys}$
+\begin_inset Formula $\mathbf{E}^{ys}_{\beta}$
 \end_inset
 
  then also represent non-observable functions of state calculated as strain tensors.
  Consequently,
  
-\begin_inset Formula $e_{\beta}^{p}$
+\begin_inset Formula $e^{p}_{\beta}$
 \end_inset
 
  is a measure of the relative motion of the reference configuration of bond family 
@@ -90142,7 +90035,7 @@ reactive plastic damage
 
 \begin_layout Plain Layout
 Flag (0 or 1) for enforcing isochoric plastic flow (1 implies 
-\begin_inset Formula $\det\mathbf{F}_{\beta}^{ys}=1,\,\forall\beta$
+\begin_inset Formula $\det\mathbf{F}^{ys}_{\beta}=1,\,\forall\beta$
 \end_inset
 
 )
@@ -90311,7 +90204,7 @@ nolink "false"
 
 \begin_layout Plain Layout
 Specification of the plastic damage CDF 
-\begin_inset Formula $F^{p}\left(\Xi_{\beta}^{p}\right)$
+\begin_inset Formula $F^{p}\left(\Xi^{p}_{\beta}\right)$
 \end_inset
 
 
@@ -90344,7 +90237,7 @@ Specification of the plastic damage CDF
 
 \begin_layout Plain Layout
 Specification of the plastic damage criterion 
-\begin_inset Formula $\Xi^{p}\left(\mathbf{F}_{\beta}^{ys}\right)$
+\begin_inset Formula $\Xi^{p}\left(\mathbf{F}^{ys}_{\beta}\right)$
 \end_inset
 
 
@@ -90377,7 +90270,7 @@ Specification of the plastic damage criterion
 
 \begin_layout Plain Layout
 Specification of the elastic damage CDF 
-\begin_inset Formula $F^{e}\left(\Xi_{\beta}^{e}\right)$
+\begin_inset Formula $F^{e}\left(\Xi^{e}_{\beta}\right)$
 \end_inset
 
 
@@ -91656,7 +91549,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -91675,7 +91567,7 @@ emph{FEBio Theory Manual}}
  of the viscoelastic solid is given by 
 \begin_inset Formula 
 \[
-\Psi_{r}\left(\mathbf{F}\right)=\Psi_{r}^{e}\left(\mathbf{F}\right)+\gamma\Psi_{r}^{e}\left(\mathbf{F}_{s}\right)
+\Psi_{r}\left(\mathbf{F}\right)=\Psi^{e}_{r}\left(\mathbf{F}\right)+\gamma\Psi^{e}_{r}\left(\mathbf{F}_{s}\right)
 \]
 
 \end_inset
@@ -91699,7 +91591,7 @@ where
 
  (an internal variable which evolves based on a first-order ODE),
  and 
-\begin_inset Formula $\Psi_{r}^{e}$
+\begin_inset Formula $\Psi^{e}_{r}$
 \end_inset
 
  is the strain energy density of the elastic spring.
@@ -92546,7 +92438,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -92706,11 +92597,11 @@ Specification of the solid matrix
 
 \begin_layout Plain Layout
 solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  in the reference configuration (
-\begin_inset Formula $0<\varphi_{r}^{s}<1)$
+\begin_inset Formula $0<\varphi^{s}_{r}<1)$
 \end_inset
 
 
@@ -92743,7 +92634,7 @@ solid volume fraction
 
 \begin_layout Plain Layout
 Fluid density 
-\begin_inset Formula $\rho_{T}^{w}$
+\begin_inset Formula $\rho^{w}_{T}$
 \end_inset
 
  
@@ -92902,16 +92793,16 @@ nolink "false"
 .
  The parameter <phi0> must be greater than 0 (no solid) and less than 1 (no porosity).
  The volume fraction of fluid (also known as the porosity) in the reference configuration is given by 
-\begin_inset Formula $1-\varphi_{r}^{s}$
+\begin_inset Formula $1-\varphi^{s}_{r}$
 \end_inset
 
 .
  The fluid density 
-\begin_inset Formula $\rho_{T}^{w}$
+\begin_inset Formula $\rho^{w}_{T}$
 \end_inset
 
  specified in <fluid_density> and the solid density 
-\begin_inset Formula $\rho_{T}^{s}$
+\begin_inset Formula $\rho^{s}_{T}$
 \end_inset
 
  specified in <density> within the <solid> tag are needed only when body forces are prescribed.
@@ -93692,7 +93583,7 @@ where,
  
 \begin_inset Formula 
 \[
-k\left(J\right)=k_{0}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha}e^{\frac{1}{2}M\left(J^{2}-1\right)}\,,
+k\left(J\right)=k_{0}\left(\frac{J-\varphi^{s}_{r}}{1-\varphi_{0}}\right)^{\alpha}e^{\frac{1}{2}M\left(J^{2}-1\right)}\,,
 \]
 
 \end_inset
@@ -93718,14 +93609,53 @@ and
 is the deformation gradient.
  Here,
  
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  is the referential solid volume fraction in the current configuration and 
-\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\begin_inset Formula $\varphi_{0}=\varphi^{s}_{r}\left(0\right)$
 \end_inset
 
  is its value in the reference configuration.
+ These equations show that the smallest acceptable value of 
+\begin_inset Formula $J$
+\end_inset
+
+ is 
+\begin_inset Formula $\varphi^{s}_{r}$
+\end_inset
+
+,
+ which corresponds to pore closure (and thus,
+ zero permeability).
+ If FEBio encounters 
+\begin_inset Formula $J\le\varphi^{s}_{r}$
+\end_inset
+
+ during the iterative process,
+ it will issue a warning and restart the iterations using a shorter time step (assuming that the auto-stepper is active).
+ If convergence is eventually achieved,
+ the warning may be safely ignored.
+ However,
+ if the analysis terminates prematurely,
+ consider prescribing shorter time steps in the time span when 
+\begin_inset Formula $J$
+\end_inset
+
+ approaches the value of 
+\begin_inset Formula $\varphi^{s}_{r}$
+\end_inset
+
+.
+ In an analytical solution (i.e.,
+ not in a finite element analysis that discretizes time),
+ it takes an infinite amount of time for a biphasic material to achieve pore closure,
+ as the permeability approaches zero when selected to be strain-dependent,
+ as in this model.
+ Thus,
+ using a shorter time increment,
+ which better simulates analytical solutions,
+ should help reduce the chance of premature termination of a finite element solution.
 \end_layout
 
 \begin_layout Standard
@@ -94054,7 +93984,7 @@ This material uses a strain-dependent permeability tensor that accommodates stra
  
 \begin_inset Formula 
 \[
-\mathbf{k}=\left(k_{0r}\mathbf{I}+\frac{k_{1r}}{J^{2}}\mathbf{b}+\frac{k_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha}e^{M\left(J^{2}-1\right)/2},
+\mathbf{k}=\left(k_{0r}\mathbf{I}+\frac{k_{1r}}{J^{2}}\mathbf{b}+\frac{k_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi^{s}_{r}}{1-\varphi_{0}}\right)^{\alpha}e^{M\left(J^{2}-1\right)/2},
 \]
 
 \end_inset
@@ -94081,11 +94011,11 @@ where
  is the left Cauchy-Green tensor.
  Here,
  
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  is the referential solid volume fraction in the current configuration and 
-\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\begin_inset Formula $\varphi_{0}=\varphi^{s}_{r}\left(0\right)$
 \end_inset
 
  is its value in the reference configuration.Note that the permeability in the reference state (
@@ -94248,7 +94178,7 @@ t
 
 \begin_layout Plain Layout
 hydraulic permeabilities 
-\begin_inset Formula $k_{1r}^{a}$
+\begin_inset Formula $k^{a}_{1r}$
 \end_inset
 
  along orthogonal directions (
@@ -94305,7 +94235,7 @@ t
 
 \begin_layout Plain Layout
 hydraulic permeabilities 
-\begin_inset Formula $k_{2r}^{a}$
+\begin_inset Formula $k^{a}_{2r}$
 \end_inset
 
  along orthogonal directions (
@@ -94521,7 +94451,7 @@ This material uses a strain-dependent permeability tensor that accommodates stra
  
 \begin_inset Formula 
 \[
-\mathbf{k}=k_{0}\mathbf{I}+\sum\limits_{a=1}^{3}k_{1}^{a}\mathbf{m}_{a}+k_{2}^{a}\left(\mathbf{m}_{a}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}_{a}\right)\,,
+\mathbf{k}=k_{0}\mathbf{I}+\sum\limits^{3}_{a=1}k^{a}_{1}\mathbf{m}_{a}+k^{a}_{2}\left(\mathbf{m}_{a}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}_{a}\right)\,,
 \]
 
 \end_inset
@@ -94530,9 +94460,9 @@ where,
  
 \begin_inset Formula 
 \[
-\begin{aligned}k_{0} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{0}}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\\
-k_{1}^{a} & =\frac{k_{1r}^{a}}{J^{2}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{a}}}e^{M_{^{a}}\left(J^{2}-1\right)/2}\\
-k_{2}^{a} & =\frac{k_{2r}^{a}}{2J^{4}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{^{a}}}e^{M_{a}\left(J^{2}-1\right)/2}
+\begin{aligned}k_{0} & =k_{0r}\left(\frac{J-\varphi^{s}_{r}}{1-\varphi_{0}}\right)^{\alpha_{^{0}}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\\
+k^{a}_{1} & =\frac{k^{a}_{1r}}{J^{2}}\left(\frac{J-\varphi^{s}_{r}}{1-\varphi_{0}}\right)^{\alpha_{^{a}}}e^{M_{^{a}}\left(J^{2}-1\right)/2}\\
+k^{a}_{2} & =\frac{k^{a}_{2r}}{2J^{4}}\left(\frac{J-\varphi^{s}_{r}}{1-\varphi_{0}}\right)^{\alpha_{^{a}}}e^{M_{a}\left(J^{2}-1\right)/2}
 \end{aligned}
 ,\quad a=1,2,3\,.
 \]
@@ -94586,11 +94516,11 @@ nolink "false"
 ).
  Here,
  
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  is the referential solid volume fraction in the current configuration and 
-\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\begin_inset Formula $\varphi_{0}=\varphi^{s}_{r}\left(0\right)$
 \end_inset
 
  is its value in the reference configuration.
@@ -94599,7 +94529,7 @@ nolink "false"
 \end_inset
 
  is given by 
-\begin_inset Formula $\mathbf{k}=k_{0r}\mathbf{I}+\sum\limits_{a=1}^{3}\left(k_{1r}^{a}+k_{2r}^{a}\right)\mathbf{V}_{a}\otimes\mathbf{V}_{a}$
+\begin_inset Formula $\mathbf{k}=k_{0r}\mathbf{I}+\sum\limits^{3}_{a=1}\left(k^{a}_{1r}+k^{a}_{2r}\right)\mathbf{V}_{a}\otimes\mathbf{V}_{a}$
 \end_inset
 
 .
@@ -94770,7 +94700,7 @@ t
 
 \begin_layout Plain Layout
 axial hydraulic permeability 
-\begin_inset Formula $k_{1r}^{A}$
+\begin_inset Formula $k^{A}_{1r}$
 \end_inset
 
 
@@ -94823,7 +94753,7 @@ t
 
 \begin_layout Plain Layout
 axial hydraulic permeability 
-\begin_inset Formula $k_{2r}^{A}$
+\begin_inset Formula $k^{A}_{2r}$
 \end_inset
 
 
@@ -94876,7 +94806,7 @@ t
 
 \begin_layout Plain Layout
 transverse hydraulic permeability 
-\begin_inset Formula $k_{1r}^{T}$
+\begin_inset Formula $k^{T}_{1r}$
 \end_inset
 
 
@@ -94929,7 +94859,7 @@ t
 
 \begin_layout Plain Layout
 transverse hydraulic permeability 
-\begin_inset Formula $k_{2r}^{T}$
+\begin_inset Formula $k^{T}_{2r}$
 \end_inset
 
 
@@ -95205,9 +95135,9 @@ This material uses a strain-dependent permeability tensor that accommodates stra
  
 \begin_inset Formula 
 \[
-\begin{aligned}\mathbf{k} & =k_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{0}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\mathbf{I}\\
- & +\left(\frac{k_{1r}^{T}}{J^{2}}\left(\mathbf{b}-\mathbf{m}\right)+\frac{k_{2r}^{T}}{2J^{4}}\left[2\mathbf{b}^{2}-\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right]\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{T}}e^{M_{T}\left(J^{2}-1\right)/2}\\
- & +\left(\frac{1}{J^{2}}k_{1r}^{A}\mathbf{m}+\frac{1}{2J^{4}}k_{2r}^{A}\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{0}}\right)^{\alpha_{A}}e^{M_{A}\left(J^{2}-1\right)/2}
+\begin{aligned}\mathbf{k} & =k_{0r}\left(\frac{J-\varphi^{s}_{r}}{1-\varphi_{0}}\right)^{\alpha_{0}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\mathbf{I}\\
+ & +\left(\frac{k^{T}_{1r}}{J^{2}}\left(\mathbf{b}-\mathbf{m}\right)+\frac{k^{T}_{2r}}{2J^{4}}\left[2\mathbf{b}^{2}-\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right]\right)\left(\frac{J-\varphi^{s}_{r}}{1-\varphi_{0}}\right)^{\alpha_{T}}e^{M_{T}\left(J^{2}-1\right)/2}\\
+ & +\left(\frac{1}{J^{2}}k^{A}_{1r}\mathbf{m}+\frac{1}{2J^{4}}k^{A}_{2r}\left(\mathbf{m}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}\right)\right)\left(\frac{J-\varphi^{s}_{r}}{1-\varphi_{0}}\right)^{\alpha_{A}}e^{M_{A}\left(J^{2}-1\right)/2}
 \end{aligned}
 ,
 \]
@@ -95266,11 +95196,11 @@ nolink "false"
 ).
  Here,
  
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  is the referential solid volume fraction in the current configuration and 
-\begin_inset Formula $\varphi_{0}=\varphi_{r}^{s}\left(0\right)$
+\begin_inset Formula $\varphi_{0}=\varphi^{s}_{r}\left(0\right)$
 \end_inset
 
  is its value in the reference configuration.
@@ -95284,7 +95214,7 @@ nolink "false"
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\mathbf{k_{|F=I}}=\left(k_{0r}+k_{1r}^{T}+k_{2r}^{T}\right)\mathbf{I}+\left(k_{1r}^{A}-k_{1r}^{T}+k_{2r}^{A}-k_{2r}^{T}\right)\left(\mathbf{V}\otimes\mathbf{V}\right)
+\mathbf{k_{|F=I}}=\left(k_{0r}+k^{T}_{1r}+k^{T}_{2r}\right)\mathbf{I}+\left(k^{A}_{1r}-k^{T}_{1r}+k^{A}_{2r}-k^{T}_{2r}\right)\left(\mathbf{V}\otimes\mathbf{V}\right)
 \]
 
 \end_inset
@@ -95650,7 +95580,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -95761,13 +95690,13 @@ In a biphasic-solute material,
  is given by 
 \begin_inset Formula 
 \begin{equation}
-\tilde{\mu}^{w}=\mu_{0}^{w}\left(\theta\right)+\frac{1}{\rho_{T}^{w}}\left(p-R\theta\Phi c\right)\,,\label{eq:bs-solvent-chemical-potential}
+\tilde{\mu}^{w}=\mu^{w}_{0}\left(\theta\right)+\frac{1}{\rho^{w}_{T}}\left(p-R\theta\Phi c\right)\,,\label{eq:bs-solvent-chemical-potential}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\mu_{0}^{w}$
+\begin_inset Formula $\mu^{w}_{0}$
 \end_inset
 
  is the solvent chemical potential at some reference temperature 
@@ -95776,7 +95705,7 @@ where
 
 ;
  
-\begin_inset Formula $\rho_{T}^{w}$
+\begin_inset Formula $\rho^{w}_{T}$
 \end_inset
 
  is the true density of the solvent (an invariant property for an intrinsically incompressible fluid);
@@ -96250,7 +96179,7 @@ specification of the solid matrix
 
 \begin_layout Plain Layout
 solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  in the reference configuration 
@@ -97087,7 +97016,7 @@ When the permeability is orhotropic,
  
 \begin_inset Formula 
 \[
-\mathbf{d}=\sum\limits_{a=1}^{3}d^{a}\mathbf{V}_{a}\otimes\mathbf{V}_{a}
+\mathbf{d}=\sum\limits^{3}_{a=1}d^{a}\mathbf{V}_{a}\otimes\mathbf{V}_{a}
 \]
 
 \end_inset
@@ -97463,7 +97392,7 @@ This material uses a strain-dependent diffusivity tensor that accommodates strai
  
 \begin_inset Formula 
 \[
-\mathbf{d}=\left(d_{0r}\mathbf{I}+\frac{d_{1r}}{J^{2}}\mathbf{b}+\frac{d_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)e^{M\left(J^{2}-1\right)/2},
+\mathbf{d}=\left(d_{0r}\mathbf{I}+\frac{d_{1r}}{J^{2}}\mathbf{b}+\frac{d_{2r}}{J^{4}}\mathbf{b}^{2}\right)\left(\frac{J-\varphi^{s}_{r}}{1-\varphi^{s}_{r}}\right)e^{M\left(J^{2}-1\right)/2},
 \]
 
 \end_inset
@@ -97693,7 +97622,7 @@ t
 
 \begin_layout Plain Layout
 diffusivities 
-\begin_inset Formula $d_{1r}^{a}$
+\begin_inset Formula $d^{a}_{1r}$
 \end_inset
 
  along orthogonal directions (
@@ -97742,7 +97671,7 @@ t
 
 \begin_layout Plain Layout
 diffusivities 
-\begin_inset Formula $d_{2r}^{a}$
+\begin_inset Formula $d^{a}_{2r}$
 \end_inset
 
  along orthogonal directions (
@@ -97950,7 +97879,7 @@ This material uses a strain-dependent diffusivity tensor that accommodates strai
  
 \begin_inset Formula 
 \[
-\mathbf{d}=d_{0}\mathbf{I}+\sum\limits_{a=1}^{3}d_{1}^{a}\mathbf{m}_{a}+d_{2}^{a}\left(\mathbf{m}_{a}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}_{a}\right),
+\mathbf{d}=d_{0}\mathbf{I}+\sum\limits^{3}_{a=1}d^{a}_{1}\mathbf{m}_{a}+d^{a}_{2}\left(\mathbf{m}_{a}\cdot\mathbf{b}+\mathbf{b}\cdot\mathbf{m}_{a}\right),
 \]
 
 \end_inset
@@ -97959,9 +97888,9 @@ where,
  
 \begin_inset Formula 
 \[
-\begin{aligned}d_{0} & =d_{0r}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{0}}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\\
-d_{1}^{a} & =\frac{d_{1r}^{a}}{J^{2}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{a}}}e^{M_{^{a}}\left(J^{2}-1\right)/2}\\
-d_{2}^{a} & =\frac{d_{2r}^{a}}{2J^{4}}\left(\frac{J-\varphi_{r}^{s}}{1-\varphi_{r}^{s}}\right)^{\alpha_{^{a}}}e^{M_{a}\left(J^{2}-1\right)/2}
+\begin{aligned}d_{0} & =d_{0r}\left(\frac{J-\varphi^{s}_{r}}{1-\varphi^{s}_{r}}\right)^{\alpha_{^{0}}}e^{M_{^{0}}\left(J^{2}-1\right)/2}\\
+d^{a}_{1} & =\frac{d^{a}_{1r}}{J^{2}}\left(\frac{J-\varphi^{s}_{r}}{1-\varphi^{s}_{r}}\right)^{\alpha_{^{a}}}e^{M_{^{a}}\left(J^{2}-1\right)/2}\\
+d^{a}_{2} & =\frac{d^{a}_{2r}}{2J^{4}}\left(\frac{J-\varphi^{s}_{r}}{1-\varphi^{s}_{r}}\right)^{\alpha_{^{a}}}e^{M_{a}\left(J^{2}-1\right)/2}
 \end{aligned}
 ,\quad a=1,2,3
 \]
@@ -98018,7 +97947,7 @@ nolink "false"
 \end_inset
 
  is given by 
-\begin_inset Formula $\mathbf{d}=d_{0r}\mathbf{I}+\sum\limits_{a=1}^{3}\left(d_{1r}^{a}+d_{2r}^{a}\right)\mathbf{V}_{a}\otimes\mathbf{V}_{a}$
+\begin_inset Formula $\mathbf{d}=d_{0r}\mathbf{I}+\sum\limits^{3}_{a=1}\left(d^{a}_{1r}+d^{a}_{2r}\right)\mathbf{V}_{a}\otimes\mathbf{V}_{a}$
 \end_inset
 
 .
@@ -98189,7 +98118,7 @@ t
 
 \begin_layout Plain Layout
 inverse of characteristic concentration for concentration-dependence 
-\begin_inset Formula $c_{D}^{-1}$
+\begin_inset Formula $c^{-1}_{D}$
 \end_inset
 
 
@@ -98274,7 +98203,7 @@ This material uses a porosity and concentration-dependent diffusivity tensor tha
 \end_inset
 
 where 
-\begin_inset Formula $c_{D}^{-1}=1/c_{D}$
+\begin_inset Formula $c^{-1}_{D}=1/c_{D}$
 \end_inset
 
  and the porosity 
@@ -98284,7 +98213,7 @@ where
  varies with deformation according to the kinematic constraint 
 \begin_inset Formula 
 \[
-\varphi^{w}=1-\frac{\varphi_{r}^{s}}{J}\,.
+\varphi^{w}=1-\frac{\varphi^{s}_{r}}{J}\,.
 \]
 
 \end_inset
@@ -98304,7 +98233,7 @@ where
 \end_inset
 
  is the deformation gradient and 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  is the referential solid volume fraction.
@@ -98695,7 +98624,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -98751,14 +98679,14 @@ Due to steric volume exclusion and short-range electrostatic interactions,
  of the solute is given by 
 \begin_inset Formula 
 \begin{equation}
-\mu^{\alpha}=\mu_{0}^{\alpha}\left(\theta\right)+\frac{R\theta}{M^{\alpha}}\ln\frac{c^{\alpha}}{\hat{\kappa}^{\alpha}}\,.\label{eq:mp-solute-chemical-potential}
+\mu^{\alpha}=\mu^{\alpha}_{0}\left(\theta\right)+\frac{R\theta}{M^{\alpha}}\ln\frac{c^{\alpha}}{\hat{\kappa}^{\alpha}}\,.\label{eq:mp-solute-chemical-potential}
 \end{equation}
 
 \end_inset
 
 In this expression,
  
-\begin_inset Formula $\mu_{0}^{\alpha}$
+\begin_inset Formula $\mu^{\alpha}_{0}$
 \end_inset
 
  is the solute chemical potential at some reference temperature 
@@ -98814,17 +98742,17 @@ The solid matrix of a multiphasic material may be charged and its charge density
  
 \begin_inset Formula 
 \begin{equation}
-c^{F}=\frac{1-\varphi_{r}^{s}}{J-\varphi_{r}^{s}}c_{r}^{F},\label{eq:mp-CFD-mass-balance}
+c^{F}=\frac{1-\varphi^{s}_{r}}{J-\varphi^{s}_{r}}c^{F}_{r},\label{eq:mp-CFD-mass-balance}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  is the solid volume fraction and 
-\begin_inset Formula $c_{r}^{F}$
+\begin_inset Formula $c^{F}_{r}$
 \end_inset
 
  is the fixed charge density in the reference configuration.
@@ -98866,7 +98794,7 @@ where
  where 
 \begin_inset Formula 
 \begin{equation}
-\tilde{\mu}^{\alpha}=\mu_{0}^{\alpha}\left(\theta\right)+\frac{R\theta}{M^{\alpha}}\ln\frac{c^{\alpha}}{\hat{\kappa}^{\alpha}}+\frac{z^{\alpha}}{M^{\alpha}}F_{c}\psi\,.\label{eq:mp-solute-ecp}
+\tilde{\mu}^{\alpha}=\mu^{\alpha}_{0}\left(\theta\right)+\frac{R\theta}{M^{\alpha}}\ln\frac{c^{\alpha}}{\hat{\kappa}^{\alpha}}+\frac{z^{\alpha}}{M^{\alpha}}F_{c}\psi\,.\label{eq:mp-solute-ecp}
 \end{equation}
 
 \end_inset
@@ -98880,7 +98808,7 @@ In this expression,
  It is also possible to rearrange this expression as 
 \begin_inset Formula 
 \begin{equation}
-\tilde{\mu}^{\alpha}=\mu_{0}^{\alpha}\left(\theta\right)+\frac{R\theta}{M^{\alpha}}\ln\left[\exp\left(z^{\alpha}\frac{F_{c}\psi}{R\theta}\right)\frac{c^{\alpha}}{\hat{\kappa}^{\alpha}}\right]\,.\label{eq:mp-solute-ecp-redux}
+\tilde{\mu}^{\alpha}=\mu^{\alpha}_{0}\left(\theta\right)+\frac{R\theta}{M^{\alpha}}\ln\left[\exp\left(z^{\alpha}\frac{F_{c}\psi}{R\theta}\right)\frac{c^{\alpha}}{\hat{\kappa}^{\alpha}}\right]\,.\label{eq:mp-solute-ecp-redux}
 \end{equation}
 
 \end_inset
@@ -98901,13 +98829,13 @@ In a multiphasic material,
  is given by 
 \begin_inset Formula 
 \begin{equation}
-\tilde{\mu}^{w}=\mu_{0}^{w}\left(\theta\right)+\frac{1}{\rho_{T}^{w}}\left(p-R\theta\Phi\sum\limits_{\alpha}c^{\alpha}\right)\,,\label{eq:mp-solven-mcp}
+\tilde{\mu}^{w}=\mu^{w}_{0}\left(\theta\right)+\frac{1}{\rho^{w}_{T}}\left(p-R\theta\Phi\sum\limits_{\alpha}c^{\alpha}\right)\,,\label{eq:mp-solven-mcp}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\mu_{0}^{w}$
+\begin_inset Formula $\mu^{w}_{0}$
 \end_inset
 
  is the solvent chemical potential at some reference temperature 
@@ -98916,7 +98844,7 @@ where
 
 ;
  
-\begin_inset Formula $\rho_{T}^{w}$
+\begin_inset Formula $\rho^{w}_{T}$
 \end_inset
 
  is the true density of the solvent (an invariant property for an intrinsically incompressible fluid);
@@ -99108,8 +99036,8 @@ The natural boundary conditions for the solvent and solutes are similarly
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{w} & =-\mathbf{\tilde{k}}\cdot\left(\nabla\tilde{p}+R\theta\sum\limits_{\alpha}\frac{\tilde{\kappa}^{\alpha}}{d_{0}^{\alpha}}\mathbf{d}^{\alpha}\cdot\nabla\tilde{c}^{\alpha}\right),\\
-\mathbf{j}^{\alpha} & =\tilde{\kappa}^{\alpha}\,\mathbf{d}^{\alpha}\cdot\left(-\varphi^{w}\nabla\tilde{c}^{\alpha}+\frac{\tilde{c}^{\alpha}}{d_{0}^{\alpha}}\mathbf{w}\right),
+\begin{aligned}\mathbf{w} & =-\mathbf{\tilde{k}}\cdot\left(\nabla\tilde{p}+R\theta\sum\limits_{\alpha}\frac{\tilde{\kappa}^{\alpha}}{d^{\alpha}_{0}}\mathbf{d}^{\alpha}\cdot\nabla\tilde{c}^{\alpha}\right),\\
+\mathbf{j}^{\alpha} & =\tilde{\kappa}^{\alpha}\,\mathbf{d}^{\alpha}\cdot\left(-\varphi^{w}\nabla\tilde{c}^{\alpha}+\frac{\tilde{c}^{\alpha}}{d^{\alpha}_{0}}\mathbf{w}\right),
 \end{aligned}
 \label{eq:mp-fluxes-w-j}
 \end{equation}
@@ -99119,7 +99047,7 @@ The natural boundary conditions for the solvent and solutes are similarly
 where
 \begin_inset Formula 
 \begin{equation}
-\mathbf{\tilde{k}}=\left[\mathbf{k}^{-1}+\frac{R\theta}{\varphi^{w}}\sum\limits_{\alpha}\frac{\tilde{\kappa}^{\alpha}c^{\alpha}}{d_{0}^{\alpha}}\left(\mathbf{I}-\frac{\mathbf{d}^{\alpha}}{d_{0}^{\alpha}}\right)\right]^{-1}\label{eq:mp-effective-perm}
+\mathbf{\tilde{k}}=\left[\mathbf{k}^{-1}+\frac{R\theta}{\varphi^{w}}\sum\limits_{\alpha}\frac{\tilde{\kappa}^{\alpha}c^{\alpha}}{d^{\alpha}_{0}}\left(\mathbf{I}-\frac{\mathbf{d}^{\alpha}}{d^{\alpha}_{0}}\right)\right]^{-1}\label{eq:mp-effective-perm}
 \end{equation}
 
 \end_inset
@@ -99140,7 +99068,7 @@ is the effective hydraulic permeability of the interstitial fluid solution (solv
 
  through the mixture (frictional interactions with solvent and solid);
  and 
-\begin_inset Formula $d_{0}^{\alpha}$
+\begin_inset Formula $d^{\alpha}_{0}$
 \end_inset
 
  is its free diffusivity (frictional interactions with solvent only).
@@ -99382,23 +99310,23 @@ In most analyses,
  For example,
  in a triphasic analysis,
  
-\begin_inset Formula $c_{\ast}^{+}=c_{\ast}^{-}\equiv c_{\ast}$
+\begin_inset Formula $c^{+}_{\ast}=c^{-}_{\ast}\equiv c_{\ast}$
 \end_inset
 
 .
  It follows that the effective fluid pressure in the external environment is 
-\begin_inset Formula $\tilde{p}_{\ast}=-R\theta\Phi_{\ast}\sum\nolimits_{\alpha}c_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{p}_{\ast}=-R\theta\Phi_{\ast}\sum\nolimits_{\alpha}c^{\alpha}_{\ast}$
 \end_inset
 
  and the effective concentrations are 
-\begin_inset Formula $\tilde{c}_{\ast}^{\alpha}=c_{\ast}^{\alpha}/\hat{\kappa}_{\ast}^{\alpha}\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{\ast}=c^{\alpha}_{\ast}/\hat{\kappa}^{\alpha}_{\ast}\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
 .
  Therefore,
  in multiphasic analyses,
  whenever the external environment contains solutes with non-zero concentrations 
-\begin_inset Formula $c_{\ast}^{\alpha}$
+\begin_inset Formula $c^{\alpha}_{\ast}$
 \end_inset
 
 ,
@@ -99444,7 +99372,7 @@ nolink "false"
  when a non-zero value is assumed for the electric potential of the external environment,
  the prescribed boundary conditions for the effective concentrations should be evaluated using the corresponding partition coefficient,
  
-\begin_inset Formula $\tilde{c}_{\ast}^{\alpha}=c_{\ast}^{\alpha}/\tilde{\kappa}_{\ast}^{\alpha}\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{\ast}=c^{\alpha}_{\ast}/\tilde{\kappa}^{\alpha}_{\ast}\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
 .
@@ -99467,7 +99395,7 @@ When a multiphasic material is initially exposed to a given external environment
 \end_inset
 
  and effective concentrations 
-\begin_inset Formula $\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
 ,
@@ -99476,7 +99404,7 @@ When a multiphasic material is initially exposed to a given external environment
 \end_inset
 
  and 
-\begin_inset Formula $\tilde{c}^{\alpha}=\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}=\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
  in order to expedite the evaluation of the initial state of swelling.
@@ -99485,7 +99413,7 @@ When a multiphasic material is initially exposed to a given external environment
 \end_inset
 
  and 
-\begin_inset Formula $\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
  should be evaluated as described in Section
@@ -99520,12 +99448,12 @@ The finite element formulation for multiphasic materials in FEBio requires that 
 \end_inset
 
  be prescribed as 
-\begin_inset Formula $\tilde{j}_{n}^{\alpha}\equiv j_{n}^{\alpha}+\sum\nolimits_{\beta}z^{\beta}j_{n}^{\beta}$
+\begin_inset Formula $\tilde{j}^{\alpha}_{n}\equiv j^{\alpha}_{n}+\sum\nolimits_{\beta}z^{\beta}j^{\beta}_{n}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $\tilde{j}_{n}^{\alpha}$
+\begin_inset Formula $\tilde{j}^{\alpha}_{n}$
 \end_inset
 
  is the effective solute flux.
@@ -99535,7 +99463,7 @@ The finite element formulation for multiphasic materials in FEBio requires that 
 
  ),
  it follows that 
-\begin_inset Formula $\tilde{j}_{n}^{\alpha}=j_{n}^{\alpha}$
+\begin_inset Formula $\tilde{j}^{\alpha}_{n}=j^{\alpha}_{n}$
 \end_inset
 
 .
@@ -99563,7 +99491,7 @@ The electric current density in a mixture is a linear superposition of the ion f
 \end_inset
 
 Since only the normal component 
-\begin_inset Formula $j_{n}^{\alpha}=\mathbf{j}^{\alpha}\cdot\mathbf{n}$
+\begin_inset Formula $j^{\alpha}_{n}=\mathbf{j}^{\alpha}\cdot\mathbf{n}$
 \end_inset
 
  of ion fluxes may be prescribed at a boundary,
@@ -99609,12 +99537,12 @@ Since only the normal component
 \end_inset
 
  (
-\begin_inset Formula $j_{n}^{+}=0$
+\begin_inset Formula $j^{+}_{n}=0$
 \end_inset
 
 ) at the electrode-mixture interface,
  so that the prescribed boundary condition should be 
-\begin_inset Formula $j_{n}^{-}=-I_{n}/F_{c}$
+\begin_inset Formula $j^{-}_{n}=-I_{n}/F_{c}$
 \end_inset
 
 .
@@ -99628,11 +99556,11 @@ Since only the normal component
 
  in a triphasic mixture,
  the corresponding effective fluxes are given by 
-\begin_inset Formula $\tilde{j}_{n}^{+}=2j_{n}^{+}-j_{n}^{-}=I_{n}/F_{c}$
+\begin_inset Formula $\tilde{j}^{+}_{n}=2j^{+}_{n}-j^{-}_{n}=I_{n}/F_{c}$
 \end_inset
 
  and 
-\begin_inset Formula $\tilde{j}_{n}^{-}=j_{n}^{+}=0$
+\begin_inset Formula $\tilde{j}^{-}_{n}=j^{+}_{n}=0$
 \end_inset
 
 .
@@ -99716,7 +99644,7 @@ In multiphasic analyses,
  representing all the degrees of freedom in an analysis.
  Once the solution has converged at each time point,
  FEBio solves for the referential mass densities 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  of solid-bound molecules by solving the corresponding mass balance equation in eq.
@@ -99736,7 +99664,7 @@ nolink "false"
  However,
  occasionally,
  the numerical solution for 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  may produce numerical round-off errors that may get amplified as the analysis time progresses.
@@ -99758,14 +99686,14 @@ An alternative to using solid-bound molecules is to define solutes
 
  (however,
  the free diffusivity 
-\begin_inset Formula $d_{0}^{\sigma}$
+\begin_inset Formula $d^{\sigma}_{0}$
 \end_inset
 
  should not be set to zero,
  to prevent a division by zero;
  its exact value is not important,
  thus let 
-\begin_inset Formula $d_{0}^{\sigma}=1$
+\begin_inset Formula $d^{\sigma}_{0}=1$
 \end_inset
 
 ).
@@ -99794,7 +99722,7 @@ An alternative to using solid-bound molecules is to define solutes
 
 \begin_layout Standard
 To evaluate the contribution of these solutes to the referential solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  and to chemical reactions,
@@ -99803,7 +99731,7 @@ To evaluate the contribution of these solutes to the referential solid volume fr
 \end_inset
 
  is related to the referential mass density 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  via eq.
@@ -99819,7 +99747,7 @@ nolink "false"
 
 .
  Using the expression for 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  in eq.
@@ -99837,13 +99765,13 @@ nolink "false"
  we find that
 \begin_inset Formula 
 \[
-\varphi_{r}^{s}=\varphi_{0}^{s}+\left(J-\varphi_{r}^{s}\right)\sum\limits_{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}
+\varphi^{s}_{r}=\varphi^{s}_{0}+\left(J-\varphi^{s}_{r}\right)\sum\limits_{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho^{\sigma}_{T}}
 \]
 
 \end_inset
 
 which can be solved for 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  using the concentrations 
@@ -99853,7 +99781,7 @@ which can be solved for
 ,
 \begin_inset Formula 
 \[
-\varphi_{r}^{s}=\frac{\varphi_{0}^{s}+J\sum\limits_{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}}{1+\sum\limits_{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho_{T}^{\sigma}}}\,.
+\varphi^{s}_{r}=\frac{\varphi^{s}_{0}+J\sum\limits_{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho^{\sigma}_{T}}}{1+\sum\limits_{\sigma}\frac{M^{\sigma}c^{\sigma}}{\rho^{\sigma}_{T}}}\,.
 \]
 
 \end_inset
@@ -99912,7 +99840,7 @@ multiphasic
 
 ,
  the solute free diffusivity 
-\begin_inset Formula $d_{0}^{\alpha}$
+\begin_inset Formula $d^{\alpha}_{0}$
 \end_inset
 
 ,
@@ -99981,7 +99909,7 @@ specification of the solid matrix
 
 \begin_layout Plain Layout
 solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  in the reference configuration
@@ -100014,7 +99942,7 @@ solid volume fraction
 
 \begin_layout Plain Layout
 fixed charge density 
-\begin_inset Formula $c_{r}^{F}$
+\begin_inset Formula $c^{F}_{r}$
 \end_inset
 
  in the reference configuration
@@ -100320,7 +100248,7 @@ specification of the solute diffusivities
 \end_inset
 
  and 
-\begin_inset Formula $d_{0}^{\alpha}$
+\begin_inset Formula $d^{\alpha}_{0}$
 \end_inset
 
  
@@ -100453,7 +100381,7 @@ nolink "false"
 
 \begin_layout Plain Layout
 initial value of the referential apparent density of the solid-bound molecule 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  
@@ -100498,7 +100426,7 @@ L
 
 \begin_layout Plain Layout
 optional minimum allowable value of 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  (zero by default)
@@ -100543,7 +100471,7 @@ L
 
 \begin_layout Plain Layout
 optional maximum allowable value of 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  (none by default)
@@ -100587,7 +100515,7 @@ L
 \begin_layout Standard
 If a chemical reaction involves this solid-bound molecule its referential apparent density may evolve over time.
  The user may place lower and upper bounds on the allowable range of an evolving 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
 .
@@ -101504,7 +101432,7 @@ n
 \begin_layout Plain Layout
 osmotic filtration coefficient,
  
-\begin_inset Formula $q_{c}^{\alpha}$
+\begin_inset Formula $q^{\alpha}_{c}$
 \end_inset
 
  
@@ -101566,7 +101494,7 @@ n
 \begin_layout Plain Layout
 effective solute concentration in external source,
  
-\begin_inset Formula $\tilde{c}_{v}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{v}$
 \end_inset
 
 
@@ -101612,7 +101540,7 @@ The fluid supply is given by Starling's equation,
  
 \begin_inset Formula 
 \[
-\hat{\varphi}^{w}=k_{p}\left(\tilde{p}_{v}-\tilde{p}\right)+\sum\limits_{\alpha}q_{c}^{\alpha}\left(\tilde{c}_{v}^{\alpha}-\tilde{c}^{\alpha}\right)\,,
+\hat{\varphi}^{w}=k_{p}\left(\tilde{p}_{v}-\tilde{p}\right)+\sum\limits_{\alpha}q^{\alpha}_{c}\left(\tilde{c}^{\alpha}_{v}-\tilde{c}^{\alpha}\right)\,,
 \]
 
 \end_inset
@@ -101725,7 +101653,7 @@ Chemical reactions may be modeled within a multiphasic mixture.
  
 \begin_inset Formula 
 \begin{equation}
-\sum\limits_{\alpha}\nu_{R}^{\alpha}\mathcal{E}^{\alpha}\to\sum\limits_{\alpha}\nu_{P}^{\alpha}\mathcal{E}^{\alpha},\label{eq:cr-forward-reaction}
+\sum\limits_{\alpha}\nu^{\alpha}_{R}\mathcal{E}^{\alpha}\to\sum\limits_{\alpha}\nu^{\alpha}_{P}\mathcal{E}^{\alpha},\label{eq:cr-forward-reaction}
 \end{equation}
 
 \end_inset
@@ -101740,11 +101668,11 @@ where
 
  in the mixture;
  
-\begin_inset Formula $\nu_{R}^{\alpha}$
+\begin_inset Formula $\nu^{\alpha}_{R}$
 \end_inset
 
  and 
-\begin_inset Formula $\nu_{P}^{\alpha}$
+\begin_inset Formula $\nu^{\alpha}_{P}$
 \end_inset
 
  represent stoichiometric coefficients of the reactants and products,
@@ -101796,7 +101724,7 @@ where
  
 \begin_inset Formula 
 \begin{equation}
-\nu^{\alpha}=\nu_{P}^{\alpha}-\nu_{R}^{\alpha}.\label{eq:cr-net-stoich-coeff}
+\nu^{\alpha}=\nu^{\alpha}_{P}-\nu^{\alpha}_{R}.\label{eq:cr-net-stoich-coeff}
 \end{equation}
 
 \end_inset
@@ -101815,7 +101743,7 @@ Thus,
  
 \begin_inset Formula 
 \begin{equation}
-\sum\limits_{\alpha}\nu_{R}^{\alpha}\mathcal{E}^{\alpha}\rightleftharpoons\sum\limits_{\alpha}\nu_{P}^{\alpha}\mathcal{E}^{\alpha},\label{eq:cr-reversible-reaction}
+\sum\limits_{\alpha}\nu^{\alpha}_{R}\mathcal{E}^{\alpha}\rightleftharpoons\sum\limits_{\alpha}\nu^{\alpha}_{P}\mathcal{E}^{\alpha},\label{eq:cr-reversible-reaction}
 \end{equation}
 
 \end_inset
@@ -101873,32 +101801,32 @@ Consider the dissociation of CaCl
 
 The mixture contains three constituents.
  The stoichiometric coefficients of the reactants are 
-\begin_inset Formula $\nu_{R}^{\mbox{CaCl}_{2}}=1$
+\begin_inset Formula $\nu^{\mbox{CaCl}_{2}}_{R}=1$
 \end_inset
 
 ,
  
-\begin_inset Formula $\nu_{R}^{\mbox{Ca}^{2+}}=0$
+\begin_inset Formula $\nu^{\mbox{Ca}^{2+}}_{R}=0$
 \end_inset
 
 ,
  
-\begin_inset Formula $\nu_{R}^{\mbox{Cl}^{-}}=0$
+\begin_inset Formula $\nu^{\mbox{Cl}^{-}}_{R}=0$
 \end_inset
 
 ,
  and those of the products are 
-\begin_inset Formula $\nu_{P}^{\mbox{CaCl}_{2}}=0$
+\begin_inset Formula $\nu^{\mbox{CaCl}_{2}}_{P}=0$
 \end_inset
 
 ,
  
-\begin_inset Formula $\nu_{P}^{\mbox{Ca}^{2+}}=1$
+\begin_inset Formula $\nu^{\mbox{Ca}^{2+}}_{P}=1$
 \end_inset
 
 ,
  
-\begin_inset Formula $\nu_{P}^{\mbox{Cl}^{-}}=2$
+\begin_inset Formula $\nu^{\mbox{Cl}^{-}}_{P}=2$
 \end_inset
 
 .
@@ -101932,7 +101860,7 @@ where
 \end_inset
 
  and 
-\begin_inset Formula $\mathcal{V}^{\alpha}=M^{\alpha}/\rho_{T}^{\alpha}$
+\begin_inset Formula $\mathcal{V}^{\alpha}=M^{\alpha}/\rho^{\alpha}_{T}$
 \end_inset
 
  is the molar volume of 
@@ -101944,13 +101872,13 @@ where
  
 \begin_inset Formula 
 \begin{equation}
-D^{s}\rho_{r}^{\sigma}/Dt=\hat{\rho}_{r}^{\sigma}\,,\label{eq:cr-sbm-mass-balance}
+D^{s}\rho^{\sigma}_{r}/Dt=\hat{\rho}^{\sigma}_{r}\,,\label{eq:cr-sbm-mass-balance}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  is the referential apparent mass density (mass of 
@@ -101959,7 +101887,7 @@ where
 
  per mixture volume in the reference configuration),
  and 
-\begin_inset Formula $\hat{\rho}_{r}^{\sigma}$
+\begin_inset Formula $\hat{\rho}^{\sigma}_{r}$
 \end_inset
 
  is the referential apparent mass supply of solid constituent 
@@ -101970,14 +101898,14 @@ where
  related to molar concentrations and supplies via 
 \begin_inset Formula 
 \begin{equation}
-c^{\sigma}=\frac{\rho_{r}^{\sigma}}{\left(J-\varphi_{r}^{s}\right)M^{\sigma}},\quad\hat{c}^{\sigma}=\frac{\hat{\rho}_{r}^{\sigma}}{\left(J-\varphi_{r}^{s}\right)M^{\sigma}}\,.\label{eq:concentration-density-relations}
+c^{\sigma}=\frac{\rho^{\sigma}_{r}}{\left(J-\varphi^{s}_{r}\right)M^{\sigma}},\quad\hat{c}^{\sigma}=\frac{\hat{\rho}^{\sigma}_{r}}{\left(J-\varphi^{s}_{r}\right)M^{\sigma}}\,.\label{eq:concentration-density-relations}
 \end{equation}
 
 \end_inset
 
 Internally,
  the content of solid-bound species is stored in 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
  and 
@@ -102007,12 +101935,12 @@ nolink "false"
 \end_inset
 
  is integrated to produce an updated value of 
-\begin_inset Formula $\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{\sigma}_{r}$
 \end_inset
 
 ,
  using 
-\begin_inset Formula $\hat{\rho}_{r}^{\sigma}=\left(J-\varphi_{r}^{s}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}$
+\begin_inset Formula $\hat{\rho}^{\sigma}_{r}=\left(J-\varphi^{s}_{r}\right)M^{\sigma}\nu^{\sigma}\hat{\zeta}$
 \end_inset
 
  based on 
@@ -102036,20 +101964,20 @@ nolink "false"
 
 \begin_layout Standard
 Evolving solid content due to chemical reactions implies that the referential solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  may not remain constant.
  This value is updated at every time point using 
 \begin_inset Formula 
 \begin{equation}
-\varphi_{r}^{s}=\varphi_{0}^{s}+\sum\limits_{\sigma}\frac{\rho_{r}^{\sigma}}{\rho_{T}^{\sigma}}\,,\label{eq:cr-referential-solid-vol-frac}
+\varphi^{s}_{r}=\varphi^{s}_{0}+\sum\limits_{\sigma}\frac{\rho^{\sigma}_{r}}{\rho^{\sigma}_{T}}\,,\label{eq:cr-referential-solid-vol-frac}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\varphi_{0}^{s}$
+\begin_inset Formula $\varphi^{s}_{0}$
 \end_inset
 
  is the solid volume fraction specified by the multiphasic material parameter 
@@ -102071,13 +101999,13 @@ nolink "false"
 ).
  Thus,
  
-\begin_inset Formula $\varphi_{0}^{s}$
+\begin_inset Formula $\varphi^{s}_{0}$
 \end_inset
 
  may be used to account for the solid volume fraction not contributed explicitly by solid-bound molecules.
  Based on kinematics,
  the solid volume fraction in the current configuration is given by 
-\begin_inset Formula $\varphi^{s}=\varphi_{r}^{s}/J$
+\begin_inset Formula $\varphi^{s}=\varphi^{s}_{r}/J$
 \end_inset
 
 .
@@ -102088,7 +102016,7 @@ nolink "false"
 
  by definition,
  it follows that 
-\begin_inset Formula $0\leqslant\varphi_{r}^{s}\leqslant J$
+\begin_inset Formula $0\leqslant\varphi^{s}_{r}\leqslant J$
 \end_inset
 
 ,
@@ -102101,13 +102029,13 @@ Similarly,
  the referential fixed charge density may also evolve with chemical reactions according to 
 \begin_inset Formula 
 \begin{equation}
-c_{r}^{F}=c_{0}^{F}+\frac{1}{1-\varphi_{r}^{s}}\sum\limits_{\sigma}\frac{z^{\sigma}\rho_{r}^{\sigma}}{M^{\sigma}}\,,\label{eq:cr-referential-FCD}
+c^{F}_{r}=c^{F}_{0}+\frac{1}{1-\varphi^{s}_{r}}\sum\limits_{\sigma}\frac{z^{\sigma}\rho^{\sigma}_{r}}{M^{\sigma}}\,,\label{eq:cr-referential-FCD}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $c_{0}^{F}$
+\begin_inset Formula $c^{F}_{0}$
 \end_inset
 
  is the referential fixed charge density specified by the multiphasic material parameter 
@@ -102129,7 +102057,7 @@ nolink "false"
 ).
  Thus,
  
-\begin_inset Formula $c_{0}^{F}$
+\begin_inset Formula $c^{F}_{0}$
 \end_inset
 
  may be used to account for the fixed charge density not contributed explicitly by solid-bound molecules.
@@ -102180,7 +102108,7 @@ The user may opt to model only the glucose reactant and the protein product expl
  In these types of analyses the user must beware of potential inconsistencies in the evolving mass of reactants and products since only some of those constituents are modeled explicitly.
  In particular,
  the evolution of 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  as given in 
@@ -102224,7 +102152,7 @@ nolink "false"
 \end_inset
 
  is a reasonable choice equivalent to assuming that all the constituents have approximately the same density 
-\begin_inset Formula $\rho_{T}^{\alpha}$
+\begin_inset Formula $\rho^{\alpha}_{T}$
 \end_inset
 
 ,
@@ -102308,11 +102236,11 @@ type
 
 \begin_layout Standard
 The stoichiometric coefficients 
-\begin_inset Formula $\nu_{R}^{\alpha}$
+\begin_inset Formula $\nu^{\alpha}_{R}$
 \end_inset
 
  of the reactants and 
-\begin_inset Formula $\nu_{P}^{\alpha}$
+\begin_inset Formula $\nu^{\alpha}_{P}$
 \end_inset
 
  for the products must be specified in every reaction.
@@ -102353,7 +102281,7 @@ The stoichiometric coefficients
 
 \begin_layout Plain Layout
 reactant stoichiometric coefficient 
-\begin_inset Formula $\nu_{R}^{\alpha}$
+\begin_inset Formula $\nu^{\alpha}_{R}$
 \end_inset
 
 
@@ -102386,7 +102314,7 @@ reactant stoichiometric coefficient
 
 \begin_layout Plain Layout
 product stoichiometric coefficient 
-\begin_inset Formula $\nu_{P}^{\alpha}$
+\begin_inset Formula $\nu^{\alpha}_{P}$
 \end_inset
 
  
@@ -102601,7 +102529,7 @@ specific forward reaction rate
 For this type of reaction the constitutive relation for the molar production rate is given by 
 \begin_inset Formula 
 \[
-\hat{\zeta}=k\prod\limits_{\alpha}\left(c^{\alpha}\right)^{\nu_{R}^{\alpha}}\,.
+\hat{\zeta}=k\prod\limits_{\alpha}\left(c^{\alpha}\right)^{\nu^{\alpha}_{R}}\,.
 \]
 
 \end_inset
@@ -102821,8 +102749,8 @@ For this type of reaction the constitutive relation for the molar production rat
 where 
 \begin_inset Formula 
 \[
-\begin{aligned}\hat{\zeta}_{F} & =k_{F}\prod\limits_{\alpha}\left(c^{\alpha}\right)^{\nu_{R}^{\alpha}}\\
-\hat{\zeta}_{R} & =k_{R}\prod\limits_{\alpha}\left(c^{\alpha}\right)^{\nu_{P}^{\alpha}}
+\begin{aligned}\hat{\zeta}_{F} & =k_{F}\prod\limits_{\alpha}\left(c^{\alpha}\right)^{\nu^{\alpha}_{R}}\\
+\hat{\zeta}_{R} & =k_{R}\prod\limits_{\alpha}\left(c^{\alpha}\right)^{\nu^{\alpha}_{P}}
 \end{aligned}
 \,.
 \]
@@ -103215,7 +103143,7 @@ Therefore,
  this reaction accepts only one reactant tag <vR> and one product tag <vP>.
  For consistency with the formulation of this reaction,
  the stoichiometric coefficients should be set to 
-\begin_inset Formula $\nu_{R}^{s}=\nu_{P}^{p}=1$
+\begin_inset Formula $\nu^{s}_{R}=\nu^{p}_{P}=1$
 \end_inset
 
 ,
@@ -103627,7 +103555,7 @@ L
 The Huiskes specific reaction rate has the form 
 \begin_inset Formula 
 \[
-k=\frac{1}{\left(J-\varphi_{r}^{s}\right)M^{s}}\left(B\left(\frac{\Psi_{r}}{\rho_{r}^{s}}-\psi_{0}\right)+\sum_{i=1}^{N}e^{-d_{i}/D}B_{i}\left(\frac{\Psi_{ri}}{\rho_{ri}^{s}}-\psi_{0}\right)\right)\,,
+k=\frac{1}{\left(J-\varphi^{s}_{r}\right)M^{s}}\left(B\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)+\sum^{N}_{i=1}e^{-d_{i}/D}B_{i}\left(\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0}\right)\right)\,,
 \]
 
 \end_inset
@@ -103637,19 +103565,19 @@ where
 \end_inset
 
  is the strain energy density of the solid (strain energy in current configuration per mixture volume in the reference configuration) and 
-\begin_inset Formula $\rho_{r}^{s}=\sum\nolimits_{\sigma}\rho_{r}^{\sigma}$
+\begin_inset Formula $\rho^{s}_{r}=\sum\nolimits_{\sigma}\rho^{\sigma}_{r}$
 \end_inset
 
  is the referential apparent solid density (mass of solid in current configuration per mixture volume in reference configuration).
  The ratio 
-\begin_inset Formula $\Psi_{r}/\rho_{r}^{s}$
+\begin_inset Formula $\Psi_{r}/\rho^{s}_{r}$
 \end_inset
 
  is the specific strain energy (strain energy per mass of solid in the current configuration).
  The Huiskes specific reaction rate may assume positive and negative values;
  it reduces to zero at homeostasis,
  when 
-\begin_inset Formula $\Psi_{r}/\rho_{r}^{s}=\psi_{0}$
+\begin_inset Formula $\Psi_{r}/\rho^{s}_{r}=\psi_{0}$
 \end_inset
 
 .
@@ -103776,7 +103704,7 @@ literal "false"
 
 \begin_layout Standard
 Since the referential solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  of a multiphasic mixture evolves with its composition as per eq.
@@ -103792,7 +103720,7 @@ nolink "false"
 
 ,
  users must be careful not to allow 
-\begin_inset Formula $J-\varphi_{r}^{s}\to0$
+\begin_inset Formula $J-\varphi^{s}_{r}\to0$
 \end_inset
 
  as Huikes remodeling takes place,
@@ -103803,7 +103731,7 @@ nolink "false"
  from the above formula becomes nearly singular.
  Typically this can be done by specifying the true density of the solid,
  
-\begin_inset Formula $\rho_{T}^{s}$
+\begin_inset Formula $\rho^{s}_{T}$
 \end_inset
 
  (<density> in Section
@@ -103823,7 +103751,7 @@ nolink "false"
 
 ),
  to be much greater than the maximum apparent density 
-\begin_inset Formula $\rho_{r}^{s}$
+\begin_inset Formula $\rho^{s}_{r}$
 \end_inset
 
  allowed in the solid remodeling reaction (<rhomax> in Section
@@ -103844,11 +103772,11 @@ nolink "false"
 ).
  Then,
  the contribution of the evolving 
-\begin_inset Formula $\rho_{r}^{s}$
+\begin_inset Formula $\rho^{s}_{r}$
 \end_inset
 
  to 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  in eq.
@@ -106827,13 +106755,13 @@ linear
  according to
 \begin_inset Formula 
 \begin{equation}
-\rho^{f}=\frac{\rho_{r}^{f}}{J^{f}}\,,\label{eq:cfd-density}
+\rho^{f}=\frac{\rho^{f}_{r}}{J^{f}}\,,\label{eq:cfd-density}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\rho_{r}^{f}$
+\begin_inset Formula $\rho^{f}_{r}$
 \end_inset
 
  is the fluid density in the reference configuration (when the pressure 
@@ -106877,7 +106805,6 @@ nolink "false"
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 href{https://febio.org/knowledgebase/}{
@@ -107140,16 +107067,16 @@ nolink "false"
 ,
  leaving the option to also prescribe the normal component of the viscous traction,
  
-\begin_inset Formula $t_{n}^{\tau}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
+\begin_inset Formula $t^{\tau}_{n}=\mathbf{t}^{\tau}\cdot\mathbf{n}$
 \end_inset
 
 ,
  to completely determine the normal traction 
-\begin_inset Formula $t_{n}^{f}=\mathbf{t}^{f}\cdot\mathbf{n}$
+\begin_inset Formula $t^{f}_{n}=\mathbf{t}^{f}\cdot\mathbf{n}$
 \end_inset
 
  (or else 
-\begin_inset Formula $t_{n}^{\tau}$
+\begin_inset Formula $t^{\tau}_{n}$
 \end_inset
 
  naturally equals zero).
@@ -107195,7 +107122,7 @@ nolink "false"
 
  and the tangential component of the viscous traction,
  
-\begin_inset Formula $\mathbf{t}_{t}^{\tau}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{t}^{\tau}$
+\begin_inset Formula $\mathbf{t}^{\tau}_{t}=\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\mathbf{t}^{\tau}$
 \end_inset
 
 .
@@ -109735,11 +109662,11 @@ nolink "false"
 
 \begin_layout Plain Layout
 solid volume fraction 
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
  in the reference configuration (
-\begin_inset Formula $0<\varphi_{r}^{s}<1)$
+\begin_inset Formula $0<\varphi^{s}_{r}<1)$
 \end_inset
 
 
@@ -111408,7 +111335,7 @@ where
 \end_inset
 
  with 
-\begin_inset Formula $\tilde{\beta}=\intop_{0}^{t}\dot{\Psi^{0}}ds$
+\begin_inset Formula $\tilde{\beta}=\intop^{t}_{0}\dot{\Psi^{0}}ds$
 \end_inset
 
 ,
@@ -111557,7 +111484,7 @@ where
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\gamma=\underset{s\epsilon\left[0,t\right]}{max}\left\langle \varPsi^{0}-\varPsi_{ini}^{0}\right\rangle ,
+\gamma=\underset{s\epsilon\left[0,t\right]}{max}\left\langle \varPsi^{0}-\varPsi^{0}_{ini}\right\rangle ,
 \]
 
 \end_inset
@@ -111598,7 +111525,7 @@ and
 
 ).
  
-\begin_inset Formula $\Psi_{ini}^{0}$
+\begin_inset Formula $\Psi^{0}_{ini}$
 \end_inset
 
  denotes the strain energy density at an initial damage state obtained at the limit of the physiological domain (e.g.
@@ -111652,19 +111579,19 @@ where the modified internal energy function
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $\bar{P}_{1}:=J_{4}^{(a)}$
+\begin_inset Formula $\bar{P}_{1}:=J^{(a)}_{4}$
 \end_inset
 
 ,
-\begin_inset Formula $\bar{P}_{3}:=K_{1}^{(a)}$
+\begin_inset Formula $\bar{P}_{3}:=K^{(a)}_{1}$
 \end_inset
 
 ,
-\begin_inset Formula $\bar{P}_{2}:=K_{2}^{(a)}$
+\begin_inset Formula $\bar{P}_{2}:=K^{(a)}_{2}$
 \end_inset
 
 ,
-\begin_inset Formula $\bar{P}_{4}:=K_{3}^{(a)}$
+\begin_inset Formula $\bar{P}_{4}:=K^{(a)}_{3}$
 \end_inset
 
 ,
@@ -111696,7 +111623,7 @@ where
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $K_{1}^{(a)}=tr\left[\mathrm{Cof}CM_{(a)}\right]=J_{5}^{(a)}-I_{1}J_{4}^{(a)}+I_{2}$
+\begin_inset Formula $K^{(a)}_{1}=tr\left[\mathrm{Cof}CM_{(a)}\right]=J^{(a)}_{5}-I_{1}J^{(a)}_{4}+I_{2}$
 \end_inset
 
 ,
@@ -111704,7 +111631,7 @@ where
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $K_{2}^{(a)}=tr\left[C(I-M_{(a)})\right]=I_{1}-J_{4}^{(a)}$
+\begin_inset Formula $K^{(a)}_{2}=tr\left[C(I-M_{(a)})\right]=I_{1}-J^{(a)}_{4}$
 \end_inset
 
 ,
@@ -111712,7 +111639,7 @@ where
 
 \begin_layout Standard
 \align center
-\begin_inset Formula $K_{3}^{(a)}=tr\left[\mathrm{Cof}C(I-M_{(a)})\right]=I_{1}J_{4}^{(a)}+J_{5}^{(a)}$
+\begin_inset Formula $K^{(a)}_{3}=tr\left[\mathrm{Cof}C(I-M_{(a)})\right]=I_{1}J^{(a)}_{4}+J^{(a)}_{5}$
 \end_inset
 
 .
@@ -114675,7 +114602,7 @@ In any case,
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\varphi\left(\mathbf{a}\right)=\sum\limits_{i=1}^{n}\left[y_{i}-f\left(x_{i};\mathbf{a}\right)\right]^{2}.
+\varphi\left(\mathbf{a}\right)=\sum\limits^{n}_{i=1}\left[y_{i}-f\left(x_{i};\mathbf{a}\right)\right]^{2}.
 \]
 
 \end_inset
@@ -114981,7 +114908,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 url{http://users.ics.forth.gr/~lourakis/levmar/}
 \end_layout
@@ -115264,7 +115190,7 @@ The objective function that is to be minimized is a function of the form:
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\varphi\left(\mathbf{a}\right)=\sum\limits_{i=1}^{n}\left[y_{i}-f\left(x_{i};\mathbf{a}\right)\right]^{2}.
+\varphi\left(\mathbf{a}\right)=\sum\limits^{n}_{i=1}\left[y_{i}-f\left(x_{i};\mathbf{a}\right)\right]^{2}.
 \]
 
 \end_inset
@@ -117870,7 +117796,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://febio.org/knowledgebase/}{
 \backslash
@@ -118289,23 +118214,23 @@ In most analyses,
  For example,
  for a triphasic analysis,
  
-\begin_inset Formula $c_{\ast}^{+}=c_{\ast}^{-}\equiv c_{\ast}$
+\begin_inset Formula $c^{+}_{\ast}=c^{-}_{\ast}\equiv c_{\ast}$
 \end_inset
 
 .
  It follows that the effective fluid pressure in the external environment is 
-\begin_inset Formula $\tilde{p}_{\ast}=-R\theta\Phi_{\ast}\sum\nolimits_{\alpha}c_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{p}_{\ast}=-R\theta\Phi_{\ast}\sum\nolimits_{\alpha}c^{\alpha}_{\ast}$
 \end_inset
 
  and the effective concentrations are 
-\begin_inset Formula $\tilde{c}_{\ast}^{\alpha}=c_{\ast}^{\alpha}/\hat{\kappa}_{\ast}^{\alpha}\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{\ast}=c^{\alpha}_{\ast}/\hat{\kappa}^{\alpha}_{\ast}\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
 .
  Therefore,
  in multiphasic analyses,
  whenever the external environment contains solutes with concentrations 
-\begin_inset Formula $c_{\ast}^{\alpha}$
+\begin_inset Formula $c^{\alpha}_{\ast}$
 \end_inset
 
 ,
@@ -118351,7 +118276,7 @@ nolink "false"
  when a non-zero value is assumed for the electric potential of the external environment,
  the prescribed boundary conditions for the effective concentrations should be evaluated using the corresponding partition coefficient,
  
-\begin_inset Formula $\tilde{c}_{\ast}^{\alpha}=c_{\ast}^{\alpha}/\tilde{\kappa}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{\ast}=c^{\alpha}_{\ast}/\tilde{\kappa}^{\alpha}_{\ast}$
 \end_inset
 
 .
@@ -118374,7 +118299,7 @@ When a multiphasic material is initially exposed to a given external environment
 \end_inset
 
  and effective concentrations 
-\begin_inset Formula $\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
 ,
@@ -118383,7 +118308,7 @@ When a multiphasic material is initially exposed to a given external environment
 \end_inset
 
  and 
-\begin_inset Formula $\tilde{c}^{\alpha}=\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}=\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
  in order to expedite the evaluation of the initial state of swelling.
@@ -118392,7 +118317,7 @@ When a multiphasic material is initially exposed to a given external environment
 \end_inset
 
  and 
-\begin_inset Formula $\tilde{c}_{\ast}^{\alpha}$
+\begin_inset Formula $\tilde{c}^{\alpha}_{\ast}$
 \end_inset
 
  should be evaluated as described in Section
@@ -118427,12 +118352,12 @@ The finite element formulation for multiphasic materials in FEBio requires that 
 \end_inset
 
  be prescribed as 
-\begin_inset Formula $\tilde{j}_{n}^{\alpha}\equiv j_{n}^{\alpha}+\sum\nolimits_{\beta}z^{\beta}j_{n}^{\beta}$
+\begin_inset Formula $\tilde{j}^{\alpha}_{n}\equiv j^{\alpha}_{n}+\sum\nolimits_{\beta}z^{\beta}j^{\beta}_{n}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $\tilde{j}_{n}^{\alpha}$
+\begin_inset Formula $\tilde{j}^{\alpha}_{n}$
 \end_inset
 
  is the effective solute flux.
@@ -118442,7 +118367,7 @@ The finite element formulation for multiphasic materials in FEBio requires that 
 
  ),
  it follows that 
-\begin_inset Formula $\tilde{j}_{n}^{\alpha}=j_{n}^{\alpha}$
+\begin_inset Formula $\tilde{j}^{\alpha}_{n}=j^{\alpha}_{n}$
 \end_inset
 
 .
@@ -118470,7 +118395,7 @@ The electric current density in a mixture is a linear superposition of the ion f
 \end_inset
 
 Since only the normal component 
-\begin_inset Formula $j_{n}^{\alpha}=\mathbf{j}^{\alpha}\cdot\mathbf{n}$
+\begin_inset Formula $j^{\alpha}_{n}=\mathbf{j}^{\alpha}\cdot\mathbf{n}$
 \end_inset
 
  of ion fluxes may be prescribed at a boundary,
@@ -118516,12 +118441,12 @@ Since only the normal component
 \end_inset
 
  (
-\begin_inset Formula $j_{n}^{+}=0)$
+\begin_inset Formula $j^{+}_{n}=0)$
 \end_inset
 
  at the electrode-mixture interface,
  so that the prescribed boundary condition should be 
-\begin_inset Formula $j_{n}^{-}=-I_{n}/F_{c}$
+\begin_inset Formula $j^{-}_{n}=-I_{n}/F_{c}$
 \end_inset
 
 .
@@ -118535,11 +118460,11 @@ Since only the normal component
 
  in a triphasic mixture,
  the corresponding effective fluxes are given by 
-\begin_inset Formula $\tilde{j}_{n}^{+}=2j_{n}^{+}-j_{n}^{-}=I_{n}/F_{c}$
+\begin_inset Formula $\tilde{j}^{+}_{n}=2j^{+}_{n}-j^{-}_{n}=I_{n}/F_{c}$
 \end_inset
 
  and 
-\begin_inset Formula $\tilde{j}_{n}^{-}=j_{n}^{+}=0$
+\begin_inset Formula $\tilde{j}^{-}_{n}=j^{+}_{n}=0$
 \end_inset
 
 .
@@ -118742,12 +118667,12 @@ fluid-solutes
 \end_inset
 
  mixture is always equal to 
-\begin_inset Formula $d_{0}^{\iota}\mathbf{I}$
+\begin_inset Formula $d^{\iota}_{0}\mathbf{I}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $d_{0}^{\iota}$
+\begin_inset Formula $d^{\iota}_{0}$
 \end_inset
 
  is the solute diffusivity in free solution.
@@ -118767,7 +118692,7 @@ fluid-solutes
 
  solver code,
  where it is replaced by 
-\begin_inset Formula $d_{0}^{\iota}\mathbf{I}$
+\begin_inset Formula $d^{\iota}_{0}\mathbf{I}$
 \end_inset
 
 .
@@ -119936,16 +119861,16 @@ name "subsec:Fluid-Solutes-Analyses"
 \begin_layout Standard
 Fluid-solutes analyses introduce two types of molar fluxes into an analysis:
  (1) The diffusive molar flux 
-\begin_inset Formula $\mathbf{j}_{d}^{\iota}=-\tilde{\kappa}^{\iota}d_{0}^{\iota}\grad\tilde{c}^{\iota}$
+\begin_inset Formula $\mathbf{j}^{\iota}_{d}=-\tilde{\kappa}^{\iota}d^{\iota}_{0}\grad\tilde{c}^{\iota}$
 \end_inset
 
  and (2) the sedimentation flux 
-\begin_inset Formula $\mathbf{j}_{b}^{\iota}=s^{\iota}c^{\iota}\mathbf{b}^{\iota}$
+\begin_inset Formula $\mathbf{j}^{\iota}_{b}=s^{\iota}c^{\iota}\mathbf{b}^{\iota}$
 \end_inset
 
 ,
  where 
-\begin_inset Formula $s^{\iota}\equiv d_{0}^{\iota}\frac{M^{\iota}}{R\theta}$
+\begin_inset Formula $s^{\iota}\equiv d^{\iota}_{0}\frac{M^{\iota}}{R\theta}$
 \end_inset
 
  is the sedimentation coefficient and 
@@ -119959,14 +119884,14 @@ Fluid-solutes analyses introduce two types of molar fluxes into an analysis:
 .
  These molar fluxes represent the flux of the solute relative to the solvent.
  The natural boundary condition for solutes is 
-\begin_inset Formula $\tilde{j}_{n}^{\iota}=0$
+\begin_inset Formula $\tilde{j}^{\iota}_{n}=0$
 \end_inset
 
 ,
  where 
 \begin_inset Formula 
 \begin{equation}
-\tilde{j}_{n}^{\iota}=\left(\mathbf{j}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}^{\gamma}\right)\cdot\mathbf{n}\label{eq:normal-effective-solute-flux}
+\tilde{j}^{\iota}_{n}=\left(\mathbf{j}^{\iota}+\sum_{\gamma}z^{\gamma}\mathbf{j}^{\gamma}\right)\cdot\mathbf{n}\label{eq:normal-effective-solute-flux}
 \end{equation}
 
 \end_inset
@@ -119977,7 +119902,7 @@ is the normal component of the effective molar flux
 
  on a boundary,
  with 
-\begin_inset Formula $\mathbf{j}^{\iota}=\mathbf{j}_{d}^{\iota}+\mathbf{j}_{b}^{\iota}$
+\begin_inset Formula $\mathbf{j}^{\iota}=\mathbf{j}^{\iota}_{d}+\mathbf{j}^{\iota}_{b}$
 \end_inset
 
  representing the sum of diffusive and sedimentation fluxes.
@@ -120017,13 +119942,13 @@ nolink "false"
 
 \begin_layout Standard
 Zero natural flux 
-\begin_inset Formula $\tilde{j}_{n}^{\iota}$
+\begin_inset Formula $\tilde{j}^{\iota}_{n}$
 \end_inset
 
  implies that the solute moves at the velocity of the solvent (the fluid).
  Therefore,
  if the fluid satisfies 
-\begin_inset Formula $v_{n}^{f}=0$
+\begin_inset Formula $v^{f}_{n}=0$
 \end_inset
 
  on that boundary,
@@ -120224,7 +120149,7 @@ As done in the multiphasic solver,
  When a solute is convected by the solvent,
  it means that the solvent exerts a frictional force on the solute,
  whose magnitude is inversely proportional to the solute diffusivity 
-\begin_inset Formula $d_{0}^{\iota}$
+\begin_inset Formula $d^{\iota}_{0}$
 \end_inset
 
 .
@@ -120870,7 +120795,6 @@ When you get here,
 status open
 
 \begin_layout Plain Layout
-
 
 \backslash
 url{https://forums.febio.org/}
@@ -122624,7 +122548,6 @@ This solver,
 status open
 
 \begin_layout Plain Layout
-
 https://hypre.readthedocs.io/en/latest/index.html
 \end_layout
 
@@ -124522,7 +124445,6 @@ The Accelerate sparse solver is only available on Apple computers (
 status open
 
 \begin_layout Plain Layout
-
 https://developer.apple.com/documentation/accelerate/sparse_solvers
 \end_layout
 
@@ -124756,7 +124678,6 @@ The factorization methods include:
 status open
 
 \begin_layout Plain Layout
-
 https://developer.apple.com/documentation/accelerate/sparsefactorization_t
 \end_layout
 
@@ -124771,7 +124692,6 @@ https://developer.apple.com/documentation/accelerate/sparsefactorization_t
 status open
 
 \begin_layout Plain Layout
-
 https://developer.apple.com/documentation/accelerate/sparseorder_t
 \end_layout
 
@@ -124788,7 +124708,6 @@ https://developer.apple.com/documentation/accelerate/sparseorder_t
 status open
 
 \begin_layout Plain Layout
-
 https://developer.apple.com/documentation/accelerate/sparse_solvers/sparse_iterative_methods
 \end_layout
 
@@ -124865,7 +124784,6 @@ status open
 
 \begin_layout Plain Layout
 
-
 \backslash
 href{https://help.febio.org/doxygen/html/index.html}{
 \backslash
@@ -124873,7 +124791,6 @@ emph{FEBio Developer's
 \end_layout
 
 \begin_layout Plain Layout
-
 Manual}}
 \end_layout
 
@@ -137808,7 +137725,7 @@ SCALAR
 
 \begin_layout Plain Layout
 Referential fixed charge density 
-\begin_inset Formula $c_{r}^{F}$
+\begin_inset Formula $c^{F}_{r}$
 \end_inset
 
 ,
@@ -137868,7 +137785,7 @@ Element
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\varphi_{r}^{s}$
+\begin_inset Formula $\varphi^{s}_{r}$
 \end_inset
 
 ,

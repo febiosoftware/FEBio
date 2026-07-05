@@ -229,6 +229,8 @@ public:
 	bool m_dotiming = true; // flag to enable/disable timings
 	std::vector<Timer>			m_timers;	// list of timers
 
+	std::unordered_map<std::string, FEScript> m_scripts;
+
 public:
 	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
 	int				m_nStep;	//!< current index of analysis step
@@ -2677,4 +2679,33 @@ const char* FEModel::GetUnits() const
 {
 	if (m_imp->m_units.empty()) return nullptr;
 	else return m_imp->m_units.c_str();
+}
+
+bool FEModel::AddScript(const std::string& name, const std::string& script)
+{
+	if (name.empty() || script.empty()) return false;
+
+	// make sure the script name is unique
+	if (m_imp->m_scripts.count(name) > 0)
+	{
+		feLogError("A script with the name \"%s\" already exists", name.c_str());
+		return false;
+	}
+
+
+	m_imp->m_scripts[name] = {name, script};
+	return true;
+}
+
+FEScript FEModel::GetScript(const std::string& name) const
+{
+	auto it = m_imp->m_scripts.find(name);
+	if (it != m_imp->m_scripts.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		return FEScript();
+	}
 }

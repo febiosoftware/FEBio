@@ -103,12 +103,12 @@ double FEBinghamFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
 {
 	FEFluidMaterialPoint& vt = *mp.ExtractData<FEFluidMaterialPoint>();
 	mat3ds D = vt.RateOfDeformation();
-	double dmu = 0;
+	double dmu_dgdot = 0;
 	double gdot = sqrt(2 * (D.sqr()).tr());
 	if (gdot > 0) {
-		dmu = m_tauy / pow(gdot, 2) * ((1 + m_n * gdot) * exp(-m_n * gdot) - 1);
+		dmu_dgdot = m_tauy / pow(gdot, 2) * ((1 + m_n * gdot) * exp(-m_n * gdot) - 1);
 	}
-	return dmu;
+	return dmu_dgdot;
 }
 
 //-----------------------------------------------------------------------------

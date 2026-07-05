@@ -213,6 +213,10 @@ template <class T> void writeNodalProjectedElementValues(FEMeshPartition& dom, F
 	}
 }
 
+FECORE_API void writeNodalProjectedElementValues(FEMeshPartition& dom, FEDataStream& ar, FEParamDouble& var);
+
+FECORE_API void writeNodalProjectedElementValues(FESurface& dom, FEDataStream& ar, FEParamDouble& var);
+
 //=================================================================================================
 template <class T> void writeShellElementValues(FEMeshPartition& dom, FEDataStream& ar, std::function<T(const FEMaterialPoint&)> var, bool bbot)
 {

@@ -158,9 +158,7 @@ bool FEOptimizeData::Solve()
 
 	// go for it!
 	int NVAR = (int) m_Var.size();
-	vector<double> amin(NVAR, 0.0);
-	vector<double> ymin;
-	double minObj = 0.0;
+	amin.resize(NVAR, 0.0);
 	bool bret = m_pSolver->Solve(this, amin, ymin, &minObj);
 	if (bret)
 	{
@@ -178,7 +176,7 @@ bool FEOptimizeData::Solve()
 		// evaluate final regression coefficient
 		vector<double> y0;
 		m_obj->GetMeasurements(y0);
-		double minR2 = m_obj->RegressionCoefficient(y0, ymin);
+		minR2 = m_obj->RegressionCoefficient(y0, ymin);
 
 		feLog("\n\tTotal iterations ........ : %15d\n\n", m_niter);
 		feLog("\tFinal objective value ... : %15lg\n\n", minObj);
@@ -201,6 +199,7 @@ bool FEOptimizeData::Solve()
 //!
 bool FEOptimizeData::Input(const char *szfile)
 {
+	m_filename = szfile;
 	FEOptimizeInput in;
 	if (in.Input(szfile, this) == false) return false;
 	return true;

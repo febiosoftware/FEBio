@@ -48,8 +48,10 @@ void FEBioOpt::InitModule()
 {
 	// Task classes
 	REGISTER_FECORE_CLASS(FEOptimize      , "optimize");
-	REGISTER_FECORE_CLASS(FEParameterSweep, "parameter_sweep");
 	REGISTER_FECORE_CLASS(FEBioParamRun   , "param_run");
+
+	REGISTER_FECORE_CLASS(FEParameterSweep, "parameter_sweep");
+	REGISTER_FECORE_CLASS(FESweepParam, "parameter_sweep_param");
 
 	// optimization methods
 	REGISTER_FECORE_CLASS(FELMOptimizeMethod, "levmar");

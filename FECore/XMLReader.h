@@ -23,9 +23,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +32,7 @@ SOFTWARE.*/
 #include <vector>
 #include <stdexcept>
 #include <assert.h>
-#include "febioxml_api.h"
+#include "fecore_api.h"
 
 //-------------------------------------------------------------------------
 // forward declaration
@@ -43,7 +40,7 @@ class XMLReader;
 
 //-------------------------------------------------------------------------
 //! This class represents a xml-attribute
-class FEBIOXML_API XMLAtt
+class FECORE_API XMLAtt
 {
 public:
 	//! constructor
@@ -81,7 +78,7 @@ template <> inline std::string XMLAtt::value<std::string>() { return m_val; }
 //! \todo I would like to get rid of the m_szroot element and replace it with a 
 //!       parent tag. The root element can then be identified by the tag that 
 //!       does not have a parent
-class FEBIOXML_API XMLTag
+class FECORE_API XMLTag
 {
 public:
 	std::string	m_sztag;			// tag name
@@ -183,7 +180,7 @@ template <> inline std::string XMLTag::AttributeValue<std::string>(const char* s
 
 //-----------------------------------------------------------------------------
 //! This class implements a reader for XML files
-class FEBIOXML_API XMLReader
+class FECORE_API XMLReader
 {
 public:
 	enum {BUF_SIZE = 32768};
@@ -204,35 +201,35 @@ public:
 	};
 
 	// A syntax error was found
-	class FEBIOXML_API XMLSyntaxError : public Error
+	class FECORE_API XMLSyntaxError : public Error
 	{
 	public:
 		XMLSyntaxError(int line_number = -1);
 	};
 
 	// an end tag was not matched
-	class FEBIOXML_API UnmatchedEndTag : public Error
+	class FECORE_API UnmatchedEndTag : public Error
 	{
 	public:
 		UnmatchedEndTag(XMLTag& t);
 	};
 
 	// an unknown tag was encountered 
-	class FEBIOXML_API InvalidTag : public Error
+	class FECORE_API InvalidTag : public Error
 	{
 	public:
 		InvalidTag(XMLTag& t);
 	};
 
 	// The value of a tag was invald 
-	class FEBIOXML_API InvalidValue : public Error
+	class FECORE_API InvalidValue : public Error
 	{
 	public:
 		InvalidValue(XMLTag& t);
 	};
 
 	// the value of an attribute was invalid 
-	class FEBIOXML_API InvalidAttributeValue : public Error
+	class FECORE_API InvalidAttributeValue : public Error
 	{
 	public:
 		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv = 0);
@@ -240,20 +237,20 @@ public:
 	};
 
 	// an attribute is invalid
-	class FEBIOXML_API InvalidAttribute : public Error
+	class FECORE_API InvalidAttribute : public Error
 	{
 	public:
 		InvalidAttribute(XMLTag& t, const char* sza);
 	};
 
 	// an attribute was missing
-	class FEBIOXML_API MissingAttribute : public Error
+	class FECORE_API MissingAttribute : public Error
 	{
 	public:
 		MissingAttribute(XMLTag& t, const char* sza);
 	};
 
-	class FEBIOXML_API MissingTag : public Error
+	class FECORE_API MissingTag : public Error
 	{
 	public:
 		MissingTag(XMLTag& t, const char* szt);

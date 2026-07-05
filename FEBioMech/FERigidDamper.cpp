@@ -44,7 +44,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidDamper::FERigidDamper(FEModel* pfem) : FERigidConnector(pfem)
 {
-    m_nID = m_ncount++;
     m_c = 1.0;
 }
 

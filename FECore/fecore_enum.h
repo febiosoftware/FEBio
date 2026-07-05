@@ -281,6 +281,7 @@ enum SUPER_CLASS_ID {
 	FEEIGENSOLVER_ID,				// derived from EigenSolver
 	FEDATARECORD_ID,				// derived from DataRecord
 	FECLASS_ID,						// derived from FECoreClass
+	FESCRIPT_ID,					// derived from FEScriptedBehavior
 };
 
 //-----------------------------------------------------------------------------

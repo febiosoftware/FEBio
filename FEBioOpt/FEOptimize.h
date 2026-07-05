@@ -46,5 +46,8 @@ public:
 	bool Run();
 
 private:
+	void BuildReport();
+
+private:
 	FEOptimizeData	m_opt;
 };

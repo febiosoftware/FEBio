@@ -305,6 +305,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class FELogElemMaxShearStrain: public FELogElemData
+{
+public:
+	FELogElemMaxShearStrain(FEModel* pfem) : FELogElemData(pfem) {}
+	double value(FEElement& el);
+};
+
+//-----------------------------------------------------------------------------
 class FELogElemStrain2 : public FELogElemData
 {
 public:

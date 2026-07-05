@@ -29,8 +29,54 @@ SOFTWARE.*/
 #include <FECore/FEScalarValuator.h>
 #include <FECore/FEModelParam.h>
 
-int enumValue(const char* val, const char* szenum);
-bool is_number(const char* sz);
+#ifndef WIN32
+#define strnicmp strncasecmp
+#endif
+
+int fexml::enumValue(const char* val, const char* szenum)
+{
+	if ((val == nullptr) || (szenum == nullptr)) return -1;
+
+	// get the string's length. 
+	// there could be a comma, so correct for that.
+	size_t L = strlen(val);
+	const char* c = strchr(val, ',');
+	if (c) L = c - val;
+
+	const char* ch = szenum;
+
+	int n = 0;
+	while (ch && *ch)
+	{
+		size_t l = strlen(ch);
+		int nval = n;
+		// see if the value of the enum is overridden
+		const char* ce = strrchr(ch, '=');
+		if (ce)
+		{
+			l = ce - ch;
+			nval = atoi(ce + 1);
+		}
+
+		if ((L == l) && (strnicmp(ch, val, l) == 0))
+		{
+			return nval;
+		}
+		ch = strchr(ch, '\0');
+		if (ch) ch++;
+		n++;
+	}
+	return -1;
+}
+
+// helper function to see if a string is a number
+bool fexml::is_number(const char* sz)
+{
+	char* cend;
+	double tmp = strtod(sz, &cend);
+	return ((cend == nullptr) || (cend[0] == 0));
+}
+
 
 //-----------------------------------------------------------------------------
 bool parseEnumParam(FEParam* pp, const char* val)
@@ -61,12 +107,12 @@ bool parseEnumParam(FEParam* pp, const char* val)
 		return false;
 	}
 
-	int n = enumValue(val, ch);
+	int n = fexml::enumValue(val, ch);
 	if (n != -1) pp->value<int>() = n;
 	else
 	{
 		// see if the value is an actual number
-		if (is_number(val))
+		if (fexml::is_number(val))
 		{
 			n = atoi(val);
 			pp->value<int>() = n;
@@ -133,6 +179,23 @@ bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* p
 
 			// assign the valuator to the parameter
 			p.setValuator(val);
+		}
+		break;
+		case FE_PARAM_STD_VECTOR_VEC2D:
+		{
+			std::vector<vec2d>& data = pp->value< std::vector<vec2d> >();
+			data.clear();
+
+			double d[2];
+			++tag;
+			do
+			{
+				int nread = tag.value(d, 2);
+				if (nread != 2) throw XMLReader::InvalidValue(tag);
+				data.push_back(vec2d(d[0], d[1]));
+				++tag;
+			}
+			while (!tag.isend());
 		}
 		break;
 		default:
@@ -208,16 +271,26 @@ bool fexml::readParameterList(XMLTag& tag, FECoreBase* pc)
 	if (!readAttributeParams(tag, pc)) return false;
 
 	// make sure this tag has children
-	if (tag.isleaf()) return true;
-
-	// process the parameter lists
-	++tag;
-	do
+	if (!tag.isleaf())
 	{
-		if (readParameter(tag, pc) == false) return false;
+		// process the parameter lists
 		++tag;
-	} 
-	while (!tag.isend());
+		do
+		{
+			if (readParameter(tag, pc) == false) return false;
+			++tag;
+		} while (!tag.isend());
+	}
+	else if ((tag.isempty() == false) && (pc->Parameters() > 0))
+	{
+		// there should be one parameter with the same name as the tag
+		if (readParameter(tag, pc) == false)
+		{
+			// try a parameter with the type string as name
+			if (readParameter(tag, pc, pc->GetTypeStr()) == false)
+				throw XMLReader::InvalidTag(tag);
+		}
+	}
 
 	return true;
 }
@@ -269,10 +342,10 @@ bool fexml::readAttributeParams(XMLTag& tag, FECoreBase* pc)
 	return true;
 }
 
-bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
+bool fexml::readParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
 {
 	FEParameterList& PL = pc->GetParameterList();
-	if (readParameter(tag, PL, nullptr, pc) == false)
+	if (readParameter(tag, PL, szparam, pc) == false)
 	{
 		// see if this is a property
 		// if we get here, the parameter is not found.
@@ -307,12 +380,26 @@ bool fexml::readParameter(XMLTag& tag, FECoreBase* pc)
 					readParameterList(tag, pc);
 				}
 			}
+			else if (prop->GetDefaultType())
+			{
+				sztype = prop->GetDefaultType();
+
+				// try to allocate the class
+				FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, pc->GetFEModel());
+				if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				prop->SetProperty(pp);
+
+				// read the property data
+				readParameterList(tag, pp);
+			}
 			else
 			{
 				throw XMLReader::MissingAttribute(tag, "type");
 			}
 		}
-		else throw XMLReader::InvalidTag(tag);
+		else
+			return false;
 	}
 
 	return true;
