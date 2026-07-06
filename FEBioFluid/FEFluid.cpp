@@ -169,6 +169,6 @@ double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 //! invert pressure-dilatation relation
 bool FEFluid::Dilatation(const double T, const double p, double& e)
 {
-    e = -p/m_k;
-    return true;
+    FEElasticFluid *m_pe = GetElastic();
+    return m_pe->Dilatation(T,p,e);
 }

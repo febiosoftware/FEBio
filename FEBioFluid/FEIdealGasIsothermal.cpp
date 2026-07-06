@@ -109,7 +109,7 @@ double FEIdealGasIsothermal::Tangent_Strain_Strain(FEMaterialPoint& mp)
 //! evaluate temperature
 double FEIdealGasIsothermal::Temperature(FEMaterialPoint& mp)
 {
-    return m_Tr;
+    return 0;
 }
 
 //-----------------------------------------------------------------------------
