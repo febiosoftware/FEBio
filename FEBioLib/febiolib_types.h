@@ -46,6 +46,7 @@ struct TimingInfo {
 	double total_rhs = 0;
 	double total_update = 0;
 	double total_qn = 0;
+	double total_line_search = 0;
 	double total_serialize = 0;
 	double total_callback = 0;
 	double total_other = 0;
