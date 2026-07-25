@@ -663,37 +663,39 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 	m_rigidSolver.UpdateIncrements(Ui, ui, emap);
         
 	// update flexible nodes
-	int n;
-	for (int i=0; i<mesh.Nodes(); ++i)
+	int NN = mesh.Nodes();
+#pragma omp parallel for 
+	for (int i=0; i<NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
+		const std::vector<int>& id = node.m_ID;
+		int n;
         
 		// displacement dofs
 		// current position = initial + total at prev conv step + total increment so far + current increment
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofU[0]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofU[1]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofU[2]]) >= 0) Ui[n] += ui[n];
  
 		// beam rotations
+		if ((id[m_dofQ[0]] >= 0) || (id[m_dofQ[1]] >= 0) || (id[m_dofQ[2]] >= 0))
 		{
 			vec3d ri, Ri;
-			if ((n = node.m_ID[m_dofQ[0]]) >= 0) { ri.x = ui[n]; Ri.x = Ui[n]; }
-			if ((n = node.m_ID[m_dofQ[1]]) >= 0) { ri.y = ui[n]; Ri.y = Ui[n]; }
-			if ((n = node.m_ID[m_dofQ[2]]) >= 0) { ri.z = ui[n]; Ri.z = Ui[n]; }
+			if ((n = id[m_dofQ[0]]) >= 0) { ri.x = ui[n]; Ri.x = Ui[n]; }
+			if ((n = id[m_dofQ[1]]) >= 0) { ri.y = ui[n]; Ri.y = Ui[n]; }
+			if ((n = id[m_dofQ[2]]) >= 0) { ri.z = ui[n]; Ri.z = Ui[n]; }
 			quatd qi(ri), Qi(Ri);
 			quatd Qn = qi * Qi;
 			vec3d rn = Qn.GetRotationVector();
-			if ((n = node.m_ID[m_dofQ[0]]) >= 0) { Ui[n] = rn.x; }
-			if ((n = node.m_ID[m_dofQ[1]]) >= 0) { Ui[n] = rn.y; }
-			if ((n = node.m_ID[m_dofQ[2]]) >= 0) { Ui[n] = rn.z; }
+			if ((n = id[m_dofQ[0]]) >= 0) { Ui[n] = rn.x; }
+			if ((n = id[m_dofQ[1]]) >= 0) { Ui[n] = rn.y; }
+			if ((n = id[m_dofQ[2]]) >= 0) { Ui[n] = rn.z; }
 		}
 
 		// shell dofs
-		{
-			if ((n = node.m_ID[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
-			if ((n = node.m_ID[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
-			if ((n = node.m_ID[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
-		}
+		if ((n = id[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
 	}
 
 	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
@@ -727,23 +729,26 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 //! Updates the current state of the model
 void FESolidSolver2::Update(vector<double>& ui)
 {
-    FEModel& fem = *GetFEModel();
-    FETimeInfo& tp = fem.GetTime();
-    tp.currentIteration = m_niter;
-    
-    // update EAS
-    UpdateEAS(ui);
-    UpdateIncrementsEAS(ui, true);
-
-	// update kinematics
-	UpdateKinematics(ui);
-
-	// update domains 
-	FEMesh& mesh = fem.GetMesh();
-	for (int i = 0; i < mesh.Domains(); ++i)
 	{
-		FEDomain& dom = mesh.Domain(i);
-		dom.IncrementalUpdate(ui, false);
+		TRACK_TIME(Timer_Update)
+			FEModel& fem = *GetFEModel();
+		FETimeInfo& tp = fem.GetTime();
+		tp.currentIteration = m_niter;
+
+		// update EAS
+		UpdateEAS(ui);
+		UpdateIncrementsEAS(ui, true);
+
+		// update kinematics
+		UpdateKinematics(ui);
+
+		// update domains 
+		FEMesh& mesh = fem.GetMesh();
+		for (int i = 0; i < mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			dom.IncrementalUpdate(ui, false);
+		}
 	}
 
 	// update model state
@@ -864,7 +869,9 @@ void FESolidSolver2::PrepStep()
 
 		// store previous mesh state
 		// we need them for velocity and acceleration calculations
-		for (int i = 0; i < mesh.Nodes(); ++i)
+		int NN = mesh.Nodes();
+#pragma omp parallel for
+		for (int i = 0; i < NN; ++i)
 		{
 			FENode& ni = mesh.Node(i);
 			ni.m_rp = ni.m_rt;
@@ -1616,25 +1623,27 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
-	for (int i = 0; i<mesh.Nodes(); ++i)
+	int NN = mesh.Nodes();
+#pragma omp parallel for
+	for (int i = 0; i<NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
-		node.set_load(m_dofU[0], 0);
-		node.set_load(m_dofU[1], 0);
-		node.set_load(m_dofU[2], 0);
 
 		int n;
 		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
-		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
+		else if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
+		else node.set_load(m_dofU[0], 0);
 
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
-		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
+		else if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
+		else node.set_load(m_dofU[1], 0);
 
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
-		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
+		else if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
+		else node.set_load(m_dofU[2], 0);
 
 		// add nodal loads
-		double s = (m_arcLength>0 ? m_al_lam : 1.0);
+//		double s = (m_arcLength>0 ? m_al_lam : 1.0);
 //		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fn[n]*s);
 //		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fn[n]*s);
 //		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fn[n]*s);

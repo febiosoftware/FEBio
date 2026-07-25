@@ -882,7 +882,6 @@ double FENewtonSolver::DoLineSearch()
 	m_ls = 1.0;
 	if (m_lineSearch && (m_lineSearch->m_LStol > 0.0))
 	{
-		TRACK_TIME(TimerID::Timer_LineSearch);
 		m_ls = m_lineSearch->DoLineSearch();
 	}
 	else

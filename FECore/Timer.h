@@ -101,7 +101,6 @@ enum TimerID {
 	Timer_Serialize,
 	Timer_ModelSolve,
 	Timer_Callback,
-	Timer_LineSearch,
 	Timer_USER1,
 	Timer_USER2,
 	Timer_USER3,

@@ -50,6 +50,8 @@ void FENormalProjection::Init()
 //! of the intersection point. It searches for the closest patch based on
 //! algebraic value of the gap function
 //!
+//!
+/*
 FESurfaceElement* FENormalProjection::Project(vec3d r, vec3d n, double rs[2])
 {
 	// let's find all the candidate surface elements
@@ -88,6 +90,44 @@ FESurfaceElement* FENormalProjection::Project(vec3d r, vec3d n, double rs[2])
 	}
 	if (found) return pei;
 	
+	// we did not find a surface
+	return 0;
+}
+*/
+
+FESurfaceElement* FENormalProjection::Project(vec3d r, vec3d n, double rs[2])
+{
+	bool found = false;
+
+	// now that we found candidate surface elements, lets see if we can find 
+	// those that intersect the ray, then pick the closest intersection
+	double rsl[2], gl, g = 0;
+	FESurfaceElement* pei = 0;
+	m_OT.VisitIntersectedLeaves(r, n, m_rad, [&](int j) {
+		// get the surface element
+		// project the node on the element
+		FESurfaceElement* pe = &m_surf.Element(j);
+		if (pe->isActive())
+		{
+			if (m_surf.Intersect(*pe, r, n, rsl, gl, m_tol)) {
+				if ((!found) && (gl > -m_rad)) {
+					found = true;
+					g = gl;
+					rs[0] = rsl[0];
+					rs[1] = rsl[1];
+					pei = pe;
+				}
+				else if ((gl < g) && (gl > -m_rad)) {
+					g = gl;
+					rs[0] = rsl[0];
+					rs[1] = rsl[1];
+					pei = pe;
+				}
+			}
+		}
+		});
+	if (found) return pei;
+
 	// we did not find a surface
 	return 0;
 }

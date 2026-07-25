@@ -31,8 +31,11 @@ SOFTWARE.*/
 #include "vec3d.h"
 #include "vector.h"
 #include <set>
+#include <functional>
+#include "FEBox.h"
 
 class FESurface;
+class FEOctree;
 
 //-----------------------------------------------------------------------------
 //! This is a class for an octree node
@@ -45,18 +48,19 @@ public:
 	void Clear();
 	void CreateChildren(const int max_level, const int max_elem);
 	void FillNode(const std::vector<int>& parent_selist);
-	bool ElementIntersectsNode(const int j);
 	void PrintNodeContent();
 	bool RayIntersectsNode(const vec3d& p, const vec3d& n);
 	void FindIntersectedLeaves(const vec3d& p, const vec3d& n, std::set<int>& sel, double srad);
 	void CountNodes(int& nnode, int& nlevel);
-	
+
+	void VisitIntersectedLeaves(const vec3d& p, const vec3d& n, double srad, const std::function<void(int elem)>& callback);
+
 public:
 	int				level;		//!< node level
 	vec3d			cmin, cmax;	//!< node bounding box
 	std::vector<int>		selist;		//!< list of surface elements inside this node
 	std::vector<OTnode>	children;	//!< children of this node
-	FESurface*		m_ps;		//!< the surface to search
+	FEOctree*		m_po;		//!< the surface to search
 };
 
 //-----------------------------------------------------------------------------
@@ -64,7 +68,11 @@ public:
 
 class FECORE_API FEOctree
 {
-	
+public:
+	struct Box {
+		vec3d r0, r1;
+	};
+
 public:
 	FEOctree(FESurface* ps = 0);
 	~FEOctree();
@@ -77,10 +85,22 @@ public:
 	
 	//! find all candidate surface elements intersected by ray
 	void FindCandidateSurfaceElements(vec3d p, vec3d n, std::set<int>& sel, double srad);
+
+	FESurface* GetSurface() { return m_ps; }
+
+	void VisitIntersectedLeaves(const vec3d& p, const vec3d& n, double srad, const std::function<void(int elem)>& callback)
+	{
+		root.VisitIntersectedLeaves(p, n, srad, callback);
+	}
 	
 protected:
 	FESurface*	m_ps;	//!< the surface to search
 	OTnode root;		//!< root node in octree
 	int max_level;		//!< maximum allowable number of levels in octree
 	int max_elem;		//!< maximum allowable number of elements in any node
+
+	// temp storage for element's bounding boxes
+	std::vector<Box> m_boxes;
+
+	friend class OTnode;
 };
