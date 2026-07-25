@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEOctree.h"
 #include "FESurface.h"
 #include "FEMesh.h"
+#include <stack>
 
 OTnode::OTnode()
 {
@@ -208,34 +209,6 @@ void OTnode::FindIntersectedLeaves(const vec3d& p, const vec3d& n, set<int>& sel
 	}
 }
 
-void OTnode::VisitIntersectedLeaves(const vec3d& p, const vec3d& n, double srad, const std::function<void(int elem)>& callback)
-{
-	// Check if octree node is within search radius from p.
-	bool bNodeWithinSRad = ((cmin.x - srad <= p.x) && (cmax.x + srad >= p.x) &&
-		(cmin.y - srad <= p.y) && (cmax.y + srad >= p.y) &&
-		(cmin.z - srad <= p.z) && (cmax.z + srad >= p.z));
-
-	if (bNodeWithinSRad && RayIntersectsNode(p, n)) {
-		int nc = (int)children.size();
-		// if this node has children, search them for intersections
-		if (nc) {
-			for (int ic = 0; ic < nc; ++ic) {
-				children[ic].VisitIntersectedLeaves(p, n, srad, callback);
-			}
-		}
-		// otherwise we have reached the smallest intersected node in this
-		// branch, return its surface element list
-		else {
-			// using a 'set' container avoids duplication of surface
-			// elements shared by multiple octree nodes
-			for (int i = 0; i < (int)selist.size(); ++i) {
-				callback(selist[i]);
-			}
-		}
-	}
-}
-
-
 //-----------------------------------------------------------------------------
 // Print node content (for debugging purposes)
 
@@ -362,4 +335,43 @@ void FEOctree::Init(const double stol)
 void FEOctree::FindCandidateSurfaceElements(vec3d p, vec3d n, set<int>& sel, double srad)
 {
 	root.FindIntersectedLeaves(p, n, sel, srad);
+}
+
+void FEOctree::VisitIntersectedLeaves(const vec3d& p, const vec3d& n, double srad, const std::function<void(int elem)>& callback)
+{
+	std::stack<OTnode*> S;
+
+	S.push(&root);
+
+	while (!S.empty())
+	{
+		OTnode* node = S.top(); S.pop();
+
+		vec3d cmin = node->cmin;
+		vec3d cmax = node->cmax;
+
+		// Check if octree node is within search radius from p.
+		bool bNodeWithinSRad = ((cmin.x - srad <= p.x) && (cmax.x + srad >= p.x) &&
+			(cmin.y - srad <= p.y) && (cmax.y + srad >= p.y) &&
+			(cmin.z - srad <= p.z) && (cmax.z + srad >= p.z));
+
+		if (bNodeWithinSRad && node->RayIntersectsNode(p, n)) {
+			int nc = (int)node->children.size();
+			// if this node has children, search them for intersections
+			if (nc) {
+				for (int ic = 0; ic < nc; ++ic) {
+					S.push(&node->children[ic]);
+				}
+			}
+			// otherwise we have reached the smallest intersected node in this
+			// branch, return its surface element list
+			else {
+				// using a 'set' container avoids duplication of surface
+				// elements shared by multiple octree nodes
+				for (int i = 0; i < (int)node->selist.size(); ++i) {
+					callback(node->selist[i]);
+				}
+			}
+		}
+	}
 }

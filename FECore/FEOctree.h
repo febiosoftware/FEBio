@@ -53,8 +53,6 @@ public:
 	void FindIntersectedLeaves(const vec3d& p, const vec3d& n, std::set<int>& sel, double srad);
 	void CountNodes(int& nnode, int& nlevel);
 
-	void VisitIntersectedLeaves(const vec3d& p, const vec3d& n, double srad, const std::function<void(int elem)>& callback);
-
 public:
 	int				level;		//!< node level
 	vec3d			cmin, cmax;	//!< node bounding box
@@ -88,10 +86,7 @@ public:
 
 	FESurface* GetSurface() { return m_ps; }
 
-	void VisitIntersectedLeaves(const vec3d& p, const vec3d& n, double srad, const std::function<void(int elem)>& callback)
-	{
-		root.VisitIntersectedLeaves(p, n, srad, callback);
-	}
+	void VisitIntersectedLeaves(const vec3d& p, const vec3d& n, double srad, const std::function<void(int elem)>& callback);
 	
 protected:
 	FESurface*	m_ps;	//!< the surface to search
