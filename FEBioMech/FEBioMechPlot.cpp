@@ -67,6 +67,7 @@ SOFTWARE.*/
 #include "FEStickyInterface.h"
 #include "FEReactiveVEMaterialPoint.h"
 #include "FELinearTrussDomain.h"
+#include "FEElasticTrussDomain.h"
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FETrussDomain.h>
@@ -4621,15 +4622,38 @@ bool FEPlotWeakBondDevSED::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotTrussStretch::Save(FEDomain& dom, FEDataStream& a)
 {
-	FETrussDomain* td = dynamic_cast<FETrussDomain*>(&dom);
-	if (td == nullptr) return false;
-
-	for (int i = 0; i < td->Elements(); ++i)
+	if (dynamic_cast<FELinearTrussDomain*>(&dom))
 	{
-		FETrussElement& el = td->Element(i);
-		a << el.m_lam;
+		FELinearTrussDomain* td = dynamic_cast<FELinearTrussDomain*>(&dom);
+		for (int i = 0; i < td->Elements(); ++i)
+		{
+			FETrussElement& el = td->Element(i);
+
+			double lam = 0.0;
+			int nint = el.GaussPoints();
+			for (int n = 0; n < nint; ++n)
+			{
+				// get the material point
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
+				lam += pt.m_lam;
+			}
+			lam /= (double)nint;
+			a << lam;
+		}
+		return true;
 	}
-	return true;
+	else if (dynamic_cast<FEElasticTrussDomain*>(&dom))
+	{
+		FEElasticTrussDomain* td = dynamic_cast<FEElasticTrussDomain*>(&dom);
+		for (int i = 0; i < td->Elements(); ++i)
+		{
+			FETrussElement& el = td->Element(i);
+			a << el.m_lam;
+		}
+		return true;
+	}
+	return false;
 }
 
 //=============================================================================
