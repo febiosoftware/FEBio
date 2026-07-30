@@ -168,7 +168,7 @@ void FESlideLineConstraint::BuildMatrixProfile(FEGlobalMatrix& K)
 		if (pe != 0)
 		{
 			FELineElement& me = *pe;
-			int* en = &me.m_lnode[0];
+			int* en = &me.m_node[0];
 
 			int n = me.Nodes();
 			lm.assign(LMSIZE, -1);
