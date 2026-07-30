@@ -814,7 +814,10 @@ bool FEPlotRelativeFluidVelocity::Save(FEDomain &dom, FEDataStream& a)
     writeAverageElementValue<vec3d>(dom, a, [](const FEMaterialPoint& mp) {
         const FEFluidMaterialPoint* fpt = mp.ExtractData<FEFluidMaterialPoint>();
         const FEElasticMaterialPoint* ept = mp.ExtractData<FEElasticMaterialPoint>();
-        return (fpt ? fpt->m_vft - ept->m_v : vec3d(0.0));
+        vec3d vf(0,0,0), vs(0,0,0);
+        if (fpt) vf = fpt->m_vft;
+        if (ept) vs = ept->m_v;
+        return vf - vs;
     });
     
     return true;

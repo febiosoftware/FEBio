@@ -42,6 +42,8 @@ struct POINT2D
 // Calculates the intersection between two convex polygons
 FECORE_API int ConvexIntersect(POINT2D* P, int n, POINT2D* Q, int m, POINT2D* R);
 
+FECORE_API int ConvexIntersectSH(POINT2D* P, int n, POINT2D* Q, int m, POINT2D* R);
+
 //-----------------------------------------------------------------------------
 class FECORE_API Patch
 {
