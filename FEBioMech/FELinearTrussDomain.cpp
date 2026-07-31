@@ -42,9 +42,12 @@ FELinearTrussDomain::FELinearTrussDomain(FEModel* pfem) : FETrussDomain(pfem), F
 {
 	m_pMat = nullptr;
 	m_a0 = 0.0;
-	m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
-	m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
-	m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
+	if (pfem)
+	{
+		m_dofU.AddVariable(FEBioMech::GetVariableName(FEBioMech::DISPLACEMENT));
+		m_dofR.AddVariable(FEBioMech::GetVariableName(FEBioMech::RIGID_ROTATION));
+		m_dofV.AddVariable(FEBioMech::GetVariableName(FEBioMech::VELOCITY));
+	}
 }
 
 const FEDofList& FELinearTrussDomain::GetDOFList() const
@@ -159,7 +162,9 @@ void FELinearTrussDomain::ElementMassMatrix(FETrussElement& el, matrix& me)
 {
 	double L = el.m_L0;
 	double A = el.m_a0;
-	double rho = m_pMat->Density();
+
+	FEMaterialPoint& mp = *el.GetMaterialPoint(0);
+	double rho = m_pMat->Density(mp);
 
 	me[0][0] = rho * A * L / 3.0; me[0][1] = rho * A * L / 6.0;
 	me[1][0] = rho * A * L / 6.0; me[1][1] = rho * A * L / 3.0;
@@ -326,8 +331,6 @@ void FELinearTrussDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
 	vector<double> fe(6);
 	vector<int> lm;
 
-	double density = m_pMat->Density();
-
 	for (FETrussElement& el : m_Elem)
 	{
 		zero(fe);
@@ -336,6 +339,8 @@ void FELinearTrussDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
 		for (int n = 0; n < nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			double density = m_pMat->Density(mp);
 
 			// get the force
 			vec3d f = bf.force(mp);
@@ -363,8 +368,6 @@ void FELinearTrussDomain::BodyForce(FEGlobalVector& R, FEBodyForce& bf)
 //! body force stiffness matrix
 void FELinearTrussDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf)
 {
-	double density = m_pMat->Density();
-
 	vector<int> lm;
 	for (FETrussElement& el : m_Elem)
 	{
@@ -375,6 +378,8 @@ void FELinearTrussDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& bf
 		for (int n = 0; n < nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+
+			double density = m_pMat->Density(mp);
 
 			double* H = el.H(n);
 

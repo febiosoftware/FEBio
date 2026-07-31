@@ -34,14 +34,38 @@ SOFTWARE.*/
 class FEBIOMIX_API FEBiphasicContactPoint : public FEContactMaterialPoint
 {
 public:
-	double	m_Lmp;	//!< lagrange multipliers for fluid pressures
-	double	m_pg;	//!< pressure "gap" for biphasic contact
+    vec3d   m_dg;       //!< vector gap
+    double  m_Lmd;      //!< Lagrange multipliers for normal traction
+    vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
+    double  m_epsn;     //!< penalty factor
+    double  m_epsp;     //!< pressure penalty factor
+    double  m_p1;       //!< fluid pressure
+    vec3d   m_nu;       //!< normal at integration points
+    vec3d   m_s1;       //!< tangent along slip direction
+    vec3d   m_tr;       //!< contact traction
+    vec2d   m_rs;       //!< natural coordinates of projection
+    vec2d   m_rsp;      //!< m_rs at the previous time step
+    bool    m_bstick;   //!< stick flag
+	double  m_Lmp;      //!< lagrange multipliers for fluid pressures
+	double	m_pg;       //!< pressure "gap" for biphasic contact
     double  m_mueff;    //!< effective friction coefficient
     double  m_fls;      //!< local fluid load support
 
 	void Init() override
 	{
 		FEContactMaterialPoint::Init();
+        m_Lmd   = 0.0;
+        m_Lmt   = m_tr = vec3d(0,0,0);
+        m_Lmp   = 0.0;
+        m_epsn  = 1.0;
+        m_epsp  = 1.0;
+        m_pg    = 0.0;
+        m_p1    = 0.0;
+        m_mueff = 0.0;
+        m_fls   = 0.0;
+        m_nu    = m_s1 = m_dg = vec3d(0,0,0);
+        m_rs    = m_rsp = vec2d(0,0);
+        m_bstick = false;
 		m_Lmp = 0.0;
 		m_pg = 0.0;
 		m_mueff = 0.0;

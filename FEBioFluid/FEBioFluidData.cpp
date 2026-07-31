@@ -355,6 +355,76 @@ double FELogFluidStressXZ::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+double FELogFluidStress1::value(FEElement& el)
+{
+    double l[3];
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        if (ppt) {
+            ppt->m_sf.exact_eigen(l);
+            val += l[0];
+        }
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidStress2::value(FEElement& el)
+{
+    double l[3];
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        if (ppt) {
+            ppt->m_sf.exact_eigen(l);
+            val += l[1];
+        }
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidStress3::value(FEElement& el)
+{
+    double l[3];
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        if (ppt) {
+            ppt->m_sf.exact_eigen(l);
+            val += l[2];
+        }
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogFluidMaxShearStress::value(FEElement& el)
+{
+    double l[3];
+    double val = 0.0;
+    int nint = el.GaussPoints();
+    for (int i=0; i<nint; ++i)
+    {
+        FEFluidMaterialPoint* ppt = el.GetMaterialPoint(i)->ExtractData<FEFluidMaterialPoint>();
+        if (ppt) {
+            ppt->m_sf.exact_eigen(l);
+            double mxs = max(fabs(l[1]-l[0])/2,fabs(l[2]-l[1])/2);
+            mxs = max(mxs,fabs(l[0]-l[2])/2);
+            val += mxs;
+        }
+    }
+    return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
 double FELogFluidRateOfDefXX::value(FEElement& el)
 {
     double val = 0.0;

@@ -220,9 +220,6 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
-	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.m_s.dev();
-
 	// deviatoric right Cauchy-Green tensor: C = Ft*F
 	mat3ds C = pt.DevRightCauchyGreen();
 
@@ -244,6 +241,10 @@ tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	double W2 = m_c2;
 
 	// --- M A T R I X   C O N T R I B U T I O N ---
+
+	// deviatoric cauchy-stress, trs = trace[s]/3
+	mat3ds T = B * (W1 + W2 * I1) - B2 * W2;
+	mat3ds devs = T.dev() * (2.0 / J);
 
 	// calculate dWdC:C
 	double WC = W1*I1 + 2*W2*I2;

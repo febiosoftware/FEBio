@@ -71,45 +71,50 @@ bool FEFluidFSITraction::Init()
 	surf.SetInterfaceStatus(true);
 	if (FESurfaceLoad::Init() == false) return false;
 
-	// get the list of fluid-FSI elements connected to this interface
-	FEModel* fem = GetFEModel();
-	int NF = surf.Elements();
-	m_elem.resize(NF);
-	m_s.resize(NF, 1);
-	for (int j = 0; j<NF; ++j)
-	{
-        bool bself = false;
-		FESurfaceElement& el = surf.Element(j);
-		// extract the first of two elements on this interface
-		m_elem[j] = el.m_elem[0];
-		if (el.m_elem[1] == nullptr) bself = true;
-		// get its material and check if FluidFSI
-		FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
-		FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
-		if (pfsi) {
-            double s = m_psurf->FacePointing(el, *m_elem[j]);
-            m_s[j] = bself ? -s : s;
-            if (m_s[j] == 0) return false;
-		}
-		else if (!bself) {
-			// extract the second of two elements on this interface
-			m_elem[j] = el.m_elem[1];
-			pm = fem->GetMaterial(m_elem[j]->GetMatID());
-			pfsi = dynamic_cast<FEFluidFSI*>(pm);
-			if (pfsi == nullptr) return false;
-            m_s[j] = m_psurf->FacePointing(el, *m_elem[j]);
-            if (m_s[j] == 0) return false;
-		}
-		else
-			return false;
-	}
-
     // TODO: Deal with the case when the surface is a shell domain separating two FSI domains
     // that use different fluid bulk moduli
     // (for now, users have to define two FEFluidFSITraction loads, one on front shell
     // face and the other on back shell face)
     
     return true;
+}
+
+void FEFluidFSITraction::Activate()
+{
+	FESurface& surf = GetSurface();
+
+	// get the list of fluid-FSI elements connected to this interface
+	FEModel* fem = GetFEModel();
+	int NF = surf.Elements();
+	m_elem.resize(NF);
+	m_s.resize(NF, 1);
+	for (int j = 0; j < NF; ++j)
+	{
+		bool bself = false;
+		FESurfaceElement& el = surf.Element(j);
+		// extract the first of two elements on this interface
+		m_elem[j] = el.m_elem[0].pe;
+		if (el.m_elem[1].pe == nullptr) bself = true;
+		// get its material and check if FluidFSI
+		FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
+		FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
+		if (pfsi) {
+			double s = m_psurf->FacePointing(el, *m_elem[j]);
+			m_s[j] = bself ? -s : s;
+			assert(m_s[j]);
+		}
+		else if (!bself) {
+			// extract the second of two elements on this interface
+			m_elem[j] = el.m_elem[1].pe;
+			pm = fem->GetMaterial(m_elem[j]->GetMatID());
+			pfsi = dynamic_cast<FEFluidFSI*>(pm);
+			assert(pfsi);
+			m_s[j] = m_psurf->FacePointing(el, *m_elem[j]);
+			assert(m_s[j]);
+		}
+		else
+			assert(false);
+	}
 }
 
 //-----------------------------------------------------------------------------

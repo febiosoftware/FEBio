@@ -86,7 +86,7 @@ void FEMultiphasicFSIPressureBC::Update()
             p += m_p(*pt);
         }
         p /= el.GaussPoints();
-        FEElement* e = el.m_elem[0];
+        FEElement* e = el.m_elem[0].pe;
         FEMaterial* pm = GetFEModel()->GetMaterial(e->GetMatID());
         FEFluid* pfl = pm->ExtractProperty<FEFluid>();
         FESoluteInterface* psi = pm->ExtractProperty<FESoluteInterface>();

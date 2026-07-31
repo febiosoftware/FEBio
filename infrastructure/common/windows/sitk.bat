@@ -10,7 +10,15 @@ cmake .  -LA -B cmbuild ^
   -DBUILD_EXAMPLES:BOOL=OFF ^
   -DBUILD_TESTING:BOOL=OFF ^
   -DBUILD_SHARED_LIBS:BOOL=OFF ^
-  -DCMAKE_BUILD_TYPE=Release
+  -DCMAKE_BUILD_TYPE=Release ^
+  -DUSE_CCACHE=OFF ^
+  -DWRAP_CSHARP=OFF ^
+  -DWRAP_JAVA=OFF ^
+  -DWRAP_LUA=OFF ^
+  -DWRAP_PYTHON=OFF ^
+  -DWRAP_R=OFF ^
+  -DWRAP_RUBY=OFF ^
+  -DWRAP_TCL=OFF
 pushd cmbuild
 msbuild /P:Configuration=Release /m:%NUMBER_OF_PROCESSORS% INSTALL.vcxproj
 popd

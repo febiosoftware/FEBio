@@ -25,6 +25,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "ad.h"
 
+double ad::Evaluate(std::function<ad::number(vec3d&)> W, const ::vec3d& a)
+{
+	ad::vec3d da(a);
+	return W(da).r;
+}
+
+::vec3d ad::Grad(std::function<ad::number(vec3d&)> W, const ::vec3d& a)
+{
+	ad::vec3d da(a);
+	da.x.dr = 1; da.y.dr = 0; da.z.dr = 0; double dx = W(da).dr;
+	da.x.dr = 0; da.y.dr = 1; da.z.dr = 0; double dy = W(da).dr;
+	da.x.dr = 0; da.y.dr = 0; da.z.dr = 1; double dz = W(da).dr;
+	return ::vec3d(dx, dy, dz);
+}
+
+::mat3d ad::Grad(std::function<ad::vec3d(ad::vec3d&)> F, const ::vec3d& a)
+{
+	ad::vec3d da(a);
+	double D[3][3] = { 0 };
+	for (int i = 0; i < 3; ++i)
+	{
+		da[i].dr = 1;
+		::vec3d Fi = F(da).partials();
+		da[i].dr = 0;
+		D[0][i] = Fi.x;
+		D[1][i] = Fi.y;
+		D[2][i] = Fi.z;
+	}
+	return ::mat3d(D);
+}
+
 double ad::Evaluate(std::function<ad::number(ad::mat3ds& C)> W, const ::mat3ds& C)
 {
 	ad::mat3ds dC(C);

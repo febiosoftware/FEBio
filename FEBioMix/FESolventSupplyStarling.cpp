@@ -36,8 +36,8 @@ SOFTWARE.*/
 
 // define the material parameters
 BEGIN_FECORE_CLASS(FESolventSupplyStarling, FESolventSupply)
-	ADD_PARAMETER(m_kp, "kp")->setLongName("filtration coefficient");
-	ADD_PARAMETER(m_pv, "pv")->setLongName("external pressure");
+	ADD_PARAMETER(m_kp, "kp")->setLongName("hydraulic filtration coefficient, $k_p$")->setUnits("L^2/F.t");
+	ADD_PARAMETER(m_pv, "pv")->setLongName("fluid pressure in external source, $p_v$")->setUnits(UNIT_PRESSURE);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -48,15 +48,18 @@ FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSuppl
 	m_pv = 0;
 
     // get number of DOFS
-	DOFS& fedofs = pfem->GetDOFS();
-    int MAX_CDOFS = fedofs.GetVariableSize("concentration");
-    
-    if (MAX_CDOFS > 0) {
-        FEParamDouble tmp;
-        tmp = 0;
-        m_qc.assign(MAX_CDOFS,tmp);
-        m_cv.assign(MAX_CDOFS,tmp);
-    }
+	if (pfem)
+	{
+		DOFS& fedofs = pfem->GetDOFS();
+		int MAX_CDOFS = fedofs.GetVariableSize("concentration");
+
+		if (MAX_CDOFS > 0) {
+			FEParamDouble tmp;
+			tmp = 0;
+			m_qc.assign(MAX_CDOFS, tmp);
+			m_cv.assign(MAX_CDOFS, tmp);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

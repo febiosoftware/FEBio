@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEUncoupledReactiveViscoelastic.h"
 #include "FEUncoupledElasticMixture.h"
 #include "FEFiberMaterialPoint.h"
+#include "FEElasticFiberMaterialUC.h"
 #include "FEScaledUncoupledMaterial.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/log.h>
@@ -43,9 +44,9 @@ SOFTWARE.*/
 
 // Material parameters for the FEUncoupledReactiveViscoelastic material
 BEGIN_FECORE_CLASS(FEUncoupledReactiveViscoelasticMaterial, FEUncoupledMaterial)
-	ADD_PARAMETER(m_wmin , FE_RANGE_CLOSED(0.0, 1.0), "wmin"    );
-	ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1, 2), "kinetics");
-	ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0, 2), "trigger" );
+	ADD_PARAMETER(m_wmin , FE_RANGE_CLOSED(0.0, 1.0), "wmin");
+	ADD_PARAMETER(m_btype, FE_RANGE_CLOSED(1, 2), "kinetics")->setEnums("(invalid)\0Type I\0Type II\0");
+	ADD_PARAMETER(m_ttype, FE_RANGE_CLOSED(0, 2), "trigger" )->setEnums("any strain\0distortional\0dilatational\0");
     ADD_PARAMETER(m_emin , FE_RANGE_GREATER_OR_EQUAL(0.0), "emin");
 
 	// set material properties
@@ -61,7 +62,7 @@ END_FECORE_CLASS();
 FEUncoupledReactiveViscoelasticMaterial::FEUncoupledReactiveViscoelasticMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
     m_wmin = 0;
-    m_btype = 0;
+    m_btype = 1;
     m_ttype = 0;
     m_emin = 0;
 
@@ -641,6 +642,10 @@ void FEUncoupledReactiveViscoelasticMaterial::UpdateSpecializedMaterialPoints(FE
     // start by updating specialized material points of base and bond materials
     m_pBase->UpdateSpecializedMaterialPoints(sb, tp);
     m_pBond->UpdateSpecializedMaterialPoints(wb, tp);
+    
+    // if the this material is a fiber and if the fiber is in compression, skip this update
+    if ((dynamic_cast<FEElasticFiberMaterialUC*>(m_pBase)) && (dynamic_cast<FEElasticFiberMaterialUC*>(m_pBond)))
+        if ((m_pBase->DevStress(mp)).norm() == 0) return;
     
     // get the reactive viscoelastic point data
     FEReactiveVEMaterialPoint& pt = *wb.ExtractData<FEReactiveVEMaterialPoint>();

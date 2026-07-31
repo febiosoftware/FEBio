@@ -384,6 +384,7 @@ public:
 	MFuncND(FUNCNPTR pf, const std::string& s, const MSequence& l) : MNary(l, MFND), m_name(s), m_pf(pf) {}
 	MItem* copy() const override;
 	const std::string& Name() const { return m_name; }
+	FUNCNPTR funcptr() const { return m_pf; }
 
 protected:
 	std::string		m_name;

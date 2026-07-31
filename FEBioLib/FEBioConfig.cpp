@@ -40,4 +40,5 @@ void FEBioConfig::Defaults()
 {
 	m_printParams = -1;
 	m_bshowErrors = true;
+	readPlugins = true;
 }

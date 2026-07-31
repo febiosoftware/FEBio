@@ -35,7 +35,7 @@ class FERigidSolver;
 class FEBIOMECH_API FESolidLinearSystem : public FELinearSystem
 {
 public:
-	FESolidLinearSystem(FESolver* solver, FERigidSolver* rigidSolver, FEGlobalMatrix& K, std::vector<double>& F, std::vector<double>& u, bool bsymm, double alpha, int nreq);
+	FESolidLinearSystem(FEModel* fem, FERigidSolver* rigidSolver, FEGlobalMatrix& K, std::vector<double>& F, std::vector<double>& u, bool bsymm, double alpha, int nreq);
 
 	// Assembly routine
 	// This assembles the element stiffness matrix ke into the global matrix.
@@ -46,6 +46,7 @@ public:
 	void StiffnessAssemblyScaleFactor(double a);
 
 private:
+	FEModel* fem;
 	FERigidSolver*	m_rigidSolver;
 	double			m_alpha;
 	int				m_nreq;

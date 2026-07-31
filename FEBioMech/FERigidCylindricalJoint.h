@@ -86,7 +86,9 @@ protected:
     
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
-	void Update(const std::vector<double>& ui) override;
+	void PrepStep();
+	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
 	void UnpackLM(vector<int>& lm);
 
@@ -119,6 +121,9 @@ protected:
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
 	double	m_u;
+
+	vec3d m_Lp;
+	double m_up;
 
 	vector<int> m_EQ;
     

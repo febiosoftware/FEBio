@@ -32,7 +32,7 @@ SOFTWARE.*/
 
 // Material parameters for FEElasticMaterial
 BEGIN_FECORE_CLASS(FESolidMaterial, FEMaterial)
-	ADD_PARAMETER(m_density, "density")->setUnits(UNIT_DENSITY)->MakeTopLevel(true);
+	ADD_PARAMETER(m_density, FE_RANGE_GREATER_OR_EQUAL(0.0), "density")->setUnits(UNIT_DENSITY)->MakeTopLevel(true);
 END_FECORE_CLASS();
 
 FESolidMaterial::FESolidMaterial(FEModel* pfem) : FEMaterial(pfem)

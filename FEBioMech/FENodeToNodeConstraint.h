@@ -46,11 +46,15 @@ public:
 protected:
 	void UnpackLM(vector<int>& lm);
 
-	void Update(const std::vector<double>& ui) override;
+	void Serialize(DumpStream& ar) override;
+	
+	void PrepStep();
+	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
 private:
 	int		m_a, m_b;
-	vec3d	m_Lm;
+	vec3d	m_Lm, m_Lp;
 
 	vector<int> m_LM;
 

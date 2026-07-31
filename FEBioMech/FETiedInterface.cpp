@@ -262,6 +262,9 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 	cpp.HandleSpecialCases(m_bspecial);
 	cpp.Init();
 
+	// let's count contact pairs
+	int contacts = 0;
+
 	// loop over all primary nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
@@ -302,8 +305,17 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 
 				// calculate force
 				ss.m_data[i].m_Tc = ss.m_data[i].m_Lm + ss.m_data[i].m_vgap*m_eps;
+
+				contacts++;
 			}
 		}
+	}
+
+	// if we found no contact pairs, let's report this since this is probably not the user's intention
+	if (contacts == 0)
+	{
+		std::string name = GetName();
+		feLogWarning("No contact pairs found for tied interface \"%s\".\nThis contact interface may not have any effect.", name.c_str());
 	}
 }
 
@@ -679,17 +691,39 @@ void FETiedInterface::Serialize(DumpStream &ar)
 	}
 }
 
-//-----------------------------------------------------------------------------
-//! Update Lagrange multipliers
-void FETiedInterface::Update(vector<double>& ui)
+void FETiedInterface::PrepStep()
 {
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		for (int i = 0; i < ss.Nodes(); ++i)
 		{
-			ss.m_data[i].m_Lm.x += ui[m_LM[3 * i    ]];
-			ss.m_data[i].m_Lm.y += ui[m_LM[3 * i + 1]];
-			ss.m_data[i].m_Lm.z += ui[m_LM[3 * i + 2]];
+			ss.m_data[i].m_Lp = ss.m_data[i].m_Lm;
 		}
+	}
+}
+
+//! Update Lagrange multipliers
+void FETiedInterface::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon == FECore::LAGMULT_METHOD)
+	{
+		for (int i = 0; i < ss.Nodes(); ++i)
+		{
+			ss.m_data[i].m_Lm.x = ss.m_data[i].m_Lp.x + Ui[m_LM[3 * i    ]] + ui[m_LM[3 * i    ]];
+			ss.m_data[i].m_Lm.y = ss.m_data[i].m_Lp.y + Ui[m_LM[3 * i + 1]] + ui[m_LM[3 * i + 1]];
+			ss.m_data[i].m_Lm.z = ss.m_data[i].m_Lp.z + Ui[m_LM[3 * i + 2]] + ui[m_LM[3 * i + 2]];
+		}
+	}
+}
+
+void FETiedInterface::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	if (m_laugon != FECore::LAGMULT_METHOD) return;
+
+	for (int i = 0; i < ss.Nodes(); ++i)
+	{
+		Ui[m_LM[3 * i    ]] += ui[m_LM[3 * i    ]];
+		Ui[m_LM[3 * i + 1]] += ui[m_LM[3 * i + 1]];
+		Ui[m_LM[3 * i + 2]] += ui[m_LM[3 * i + 2]];
 	}
 }

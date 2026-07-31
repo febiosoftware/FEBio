@@ -1,13 +1,15 @@
 {
+  "builtin-baseline": "f415cba6374936225962ef0fcd262ba09fdb84ce",
   "dependencies": [
     "eigen3",
-    "glew",
     "libssh",
-    "mpi",
     "opengl",
     "openssl",
     "pthread",
-    "qtbase",
-    "zlib"
+    "zstd",
+    "zlib",
+    "sqlite3",
+    "fftw3",
+    "vulkan"
   ]
 }

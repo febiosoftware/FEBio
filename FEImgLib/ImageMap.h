@@ -25,6 +25,9 @@ public:
 	// evaluate image
 	double value(const POINT& p);
 	double value(const vec3d& r) { return value(map(r)); }
+	
+	// determine if a point is in bounds
+	bool valid(const vec3d& p);
 
 	// image gradient
 	vec3d gradient(const vec3d& r);
@@ -36,6 +39,8 @@ public:
 	double dx() { return (m_r1.x - m_r0.x)/(double) (m_img.width () - 1); }
 	double dy() { return (m_r1.y - m_r0.y)/(double) (m_img.height() - 1); }
 	double dz() { int nz = m_img.depth(); if (nz == 1) return 1.0; else return (m_r1.z - m_r0.z)/(double) (m_img.depth () - 1); }
+
+    Image& GetImage() { return m_img; }
 
 protected:
 	double grad_x(int i, int j, int k);

@@ -136,7 +136,7 @@ void FEBioMeshDomainsSection4::ParseSolidDomainSection(XMLTag& tag)
 
 	// see if the element type is specified
 	const char* szelem = tag.AttributeValue("elem_type", true);
-	if (szelem)
+	if (szelem && (strcmp(szelem, "default") != 0))
 	{
 		FE_Element_Spec elemSpec = partDomain->ElementSpec();
 		FE_Element_Spec newSpec = GetBuilder()->ElementSpec(szelem);

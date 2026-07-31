@@ -28,10 +28,10 @@ SOFTWARE.*/
 
 #pragma once
 #include "FileImport.h"
-#include <XML/XMLReader.h>
-#include "FECore/FEAnalysis.h"
-#include "FECore/FESolver.h"
-#include "FECore/DataStore.h"
+#include <FECore/XMLReader.h>
+#include <FECore/FEAnalysis.h>
+#include <FECore/FESolver.h>
+#include <FECore/DataStore.h>
 #include <FECore/FEMesh.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/tens3d.h>
@@ -179,9 +179,6 @@ public:
 
 	//! read the contents of a file
 	bool ReadFile(const char* szfile, bool broot = true);
-
-	//! set a custom model builder (takes ownership of modelBuilder)
-	void SetModelBuilder(FEModelBuilder* modelBuilder);
 
 public:
 	void SetDumpfileName(const char* sz);

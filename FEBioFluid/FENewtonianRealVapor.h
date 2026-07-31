@@ -27,13 +27,13 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FEViscousFluid.h"
+#include "FEThermoViscousFluid.h"
 #include <FECore/FEFunction1D.h>
 
 //-----------------------------------------------------------------------------
 // This class evaluates the viscous stress in a Newtonian viscous real vapor
 
-class FEBIOFLUID_API FENewtonianRealVapor :	public FEViscousFluid
+class FEBIOFLUID_API FENewtonianRealVapor :	public FEThermoViscousFluid
 {
 public:
     enum { MAX_NVC = 4 };

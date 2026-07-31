@@ -34,38 +34,25 @@ SOFTWARE.*/
 #include <map>
 
 //-----------------------------------------------------------------------------
-class FEBIOMIX_API FESlidingSurfaceMP : public FEBiphasicContactSurface
+class FEBIOMIX_API FEMultiphasicContactPoint : public FEBiphasicContactPoint
 {
 public:
-    //! integration point data
-    class Data : public FEBiphasicContactPoint
-    {
-    public:
-        Data();
-        
-        void Init() override;
-        
-        void Serialize(DumpStream& ar) override;
-        
-    public:
-        vec3d   m_dg;       //!< vector gap
-        double  m_Lmd;      //!< Lagrange multipliers for displacements
-        vec3d   m_Lmt;      //!< Lagrange multipliers for vector traction
-        double  m_epsn;     //!< displacement penalty factors
-        double  m_epsp;     //!< pressure penalty factors
-        double  m_p1;       //!< fluid pressure
-        vec3d   m_nu;       //!< normal at integration points
-        vec3d   m_s1;       //!< tangent along slip direction
-        vec3d   m_tr;       //!< contact traction
-        vec2d   m_rs;       //!< natural coordinates of projection of integration point
-        vec2d   m_rsp;      //!< m_rs at the previous time step
-        bool    m_bstick;   //!< stick flag
-        vector<double>  m_Lmc;  //!< Lagrange multipliers for solute concentrations
-        vector<double>  m_epsc; //!< concentration penalty factors
-        vector<double>  m_cg;   //!< concentration "gap"
-        vector<double>  m_c1;   //!< solute concentration
-    };
+    vector<double>  m_Lmc;  //!< Lagrange multipliers for solute concentrations
+    vector<double>  m_epsc; //!< concentration penalty factors
+    vector<double>  m_cg;   //!< concentration "gap"
+    vector<double>  m_c1;   //!< solute concentration
 
+    void Init() override
+    {
+        FEBiphasicContactPoint::Init();
+    }
+    
+    void Serialize(DumpStream& ar) override;
+};
+
+//-----------------------------------------------------------------------------
+class FEBIOMIX_API FESlidingSurfaceMP : public FEBiphasicContactSurface
+{
 public:
 	//! constructor
 	FESlidingSurfaceMP(FEModel* pfem);

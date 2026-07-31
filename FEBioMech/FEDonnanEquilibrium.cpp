@@ -93,6 +93,12 @@ bool FEDonnanEquilibrium::Init()
 	return FEElasticMaterial::Init();
 }
 
+void FEDonnanEquilibrium::Serialize(DumpStream& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	ar & m_Rgas & m_Tabs & m_binit & m_bnew & m_phiwr;
+}
+
 //-----------------------------------------------------------------------------
 mat3ds FEDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 {

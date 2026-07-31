@@ -1672,7 +1672,8 @@ bool FESlidingInterface::Augment(int naug, const FETimeInfo& tp)
 	// calculate and print convergence norms
 	double lnorm = 0, gnorm = 0;
 	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
-	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
+//	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
+	gnorm = fabs(normg1 - m_normg0);
 
 	feLog(" sliding interface # %d\n", GetID());
 	feLog("                        CURRENT        REQUIRED\n");

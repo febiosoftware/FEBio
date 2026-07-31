@@ -49,6 +49,8 @@ public:
 	//! serialization
 	void Serialize(DumpStream& ar) override;
 
+	virtual void Reset();
+
 protected:
 	// This must be implemented by derived classes
 	virtual double GetValue(double time) = 0;

@@ -52,6 +52,7 @@ public:
 public:
 	mat3ds Strain() const;
 	mat3ds SmallStrain() const;
+    mat3ds AlmansiStrain() const;
 
 	mat3ds RightCauchyGreen() const;
 	mat3ds LeftCauchyGreen () const;
@@ -84,7 +85,6 @@ public:
 	// deformation data at intermediate time
 	mat3d	m_F;	//!< deformation gradient
 	double	m_J;	//!< determinant of F
-    vec3d   m_gradJ;  //!< gradient of J
     vec3d   m_v;    //!< velocity
     vec3d   m_a;    //!< acceleration
     mat3d   m_L;    //!< spatial velocity gradient

@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEMaterial.h>
+#include "febiomech_api.h"
 
 class FEElasticBeamMaterialPoint : public FEMaterialPointData
 {
@@ -65,6 +66,9 @@ public:
 
 	vec3d	m_dpt;	// rate of linear momentum (current)
 	vec3d	m_dht;	// rate of angular momentum (current)
+
+	// for output
+	mat3ds m_s; // Cauchy stress tensor in global coordinates
 };
 
 class FEElasticBeamMaterial : public FEMaterial
@@ -85,4 +89,11 @@ public:
 	double	m_I1, m_I2;
 
 	DECLARE_FECORE_CLASS();
+};
+
+class FEBIOMECH_API FEBeamStress : public FEDomainParameter
+{
+public:
+	FEBeamStress();
+	FEParamValue value(FEMaterialPoint& mp) override;
 };

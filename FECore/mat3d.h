@@ -349,6 +349,7 @@ public:
 	// default constructor
 	mat3d() {}
 
+	// constructs diagonal matrix with a on the diagonal
 	explicit mat3d(double a);
 
 	// constructors
@@ -381,7 +382,7 @@ public:
 	mat3d& operator = (const double m[3][3]);
 
 	// mat3d
-	mat3d operator - () 
+	mat3d operator - ()  const
 	{
 		return mat3d(-d[0][0], -d[0][1], -d[0][2], \
 					 -d[1][0], -d[1][1], -d[1][2], \

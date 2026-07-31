@@ -49,13 +49,17 @@ public:
 	// create iterator
 	FEFiberIntegrationSchemeIterator* GetIterator(FEMaterialPoint* mp) override;
 
+	// get number of integration points
+	int IntegrationPoints() const override { return m_nint; };
+
 protected:
 	void InitIntegrationRule();
     
 public: // parameters
 	int             m_nres;	// resolution
+    int             m_nre;  // resolution entry
 
-protected:
+public:
     int             m_nint; // number of integration points
 	double          m_cth[2000];
 	double          m_sth[2000];

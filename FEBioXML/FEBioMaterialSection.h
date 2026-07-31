@@ -49,12 +49,9 @@ protected:
 class FEBIOXML_API FEBioMaterialSection3 : public FEFileSection
 {
 public:
-	FEBioMaterialSection3(FEFileImport* pim) : FEFileSection(pim) { m_nmat = 0; }
+	FEBioMaterialSection3(FEFileImport* pim) : FEFileSection(pim) {}
 	void Parse(XMLTag& tag);
 
 protected:
 	FEMaterial* CreateMaterial(XMLTag& tag);
-
-protected:
-	int	m_nmat;
 };

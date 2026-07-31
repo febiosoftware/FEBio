@@ -49,12 +49,12 @@ public:
     
     //! tangent of stress with respect to rate of deformation tensor D
     virtual tens4ds Tangent_RateOfDeformation(FEMaterialPoint& mp) = 0;
-    
-    //! tangent of stress with respect to temperature
-    virtual mat3ds Tangent_Temperature(FEMaterialPoint& mp) = 0;
-    
+
     //! dynamic viscosity
     virtual double ShearViscosity(FEMaterialPoint& mp) = 0;
+
+	//! derivative of shear viscosity w.r.t. strain rate
+	virtual double Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp) { return 0.0; }
     
     //! bulk viscosity
     virtual double BulkViscosity(FEMaterialPoint& mp) = 0;

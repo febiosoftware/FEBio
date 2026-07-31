@@ -357,7 +357,8 @@ tens4ds FEMRVonMisesFibers::DevTangent(FEMaterialPoint& mp)
 	tens4ds B4  = dyad4s(B);
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.m_s.dev();
+	mat3ds T = B * (W1 + W2 * I1) - B2 * W2;
+	mat3ds devs = T.dev() * (2.0 / J);
 
 	// d2W/dCdC:C
 	mat3ds WCCxC = B*(W2*I1) - B2*W2;

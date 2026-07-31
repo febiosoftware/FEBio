@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <stdio.h>
-#include <XML/XMLReader.h>
+#include <FECore/XMLReader.h>
 #include <FECore/vec3d.h>
 #include <FECore/mat3d.h>
 #include <FECore/tens3d.h>
@@ -206,6 +206,9 @@ public:
 
 	//! Get the current FE model that is being processed
 	FEModel* GetFEModel();
+
+	//! set a custom model builder (takes ownership of modelBuilder)
+	void SetModelBuilder(FEModelBuilder* modelBuilder);
 
 	//! Get the model builder
 	FEModelBuilder* GetBuilder();

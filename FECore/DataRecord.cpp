@@ -294,9 +294,3 @@ void DataRecord::Serialize(DumpStream &ar)
 		}
 	}
 }
-
-//=============================================================================
-FELogData::FELogData(FEModel* fem) : FECoreBase(fem)
-{
-
-}

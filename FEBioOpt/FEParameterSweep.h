@@ -25,43 +25,63 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 #pragma once
-#include <FECore/FECoreTask.h>
+#include <FECore/FECoreStudy.h>
+#include <FECore/FECoreClass.h>
+
+class FEBioPlotFile;
 
 // This class represents a parameter that will be swept
-class FESweepParam
+class FESweepParam : public FECoreClass
 {
 public:
-	FESweepParam();
+	FESweepParam(FEModel* fem = nullptr);
 	FESweepParam(const FESweepParam& p);
 	void operator = (const FESweepParam& p);
 
 	void SetValue(double v);
 
 public:
-	string	m_paramName;
+	std::string	m_paramName;
 	double	m_min, m_max, m_step;
 	double*	m_pd;
+
+	DECLARE_FECORE_CLASS();
+	FECORE_BASE_CLASS(FESweepParam);
 };
 
 // This task implements a parameter sweep, where the same model is run similar times,
 // each time with one or more parameters modified.
-class FEParameterSweep : public FECoreTask
+class FEParameterSweep : public FECoreStudy
 {
+	struct Run {
+		std::vector<double> params;
+		bool success;
+	};
+
 public:
 	FEParameterSweep(FEModel* fem);
 
 	//! initialization
-	bool Init(const char* szfile) override;
+	bool Init() override;
 
 	//! Run the optimization module
-	bool Run() override;
+	bool Execute() override;
+
+	// prepare report
+	void BuildReport(FEBioReport& report) override;
 
 private:
-	bool Input(const char* szfile);
 	bool InitParams();
 	bool FESolve(const vector<double>& a);
 
 private:
-	vector<FESweepParam>	m_params;
-	int						m_niter;
+	int m_niter;
+	std::vector<FESweepParam> m_params;
+
+	std::vector<Run> m_runs;
+
+	FEBioPlotFile* xplt = nullptr;
+	std::string plotFileName;
+
+	DECLARE_FECORE_CLASS();
 };

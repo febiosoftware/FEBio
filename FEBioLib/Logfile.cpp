@@ -138,8 +138,11 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 		char right[60] = {0};
 		strncpy(left, sztitle, l/2);
 		strncpy(right, sztitle+l/2, l - l/2);
-		snprintf(ch,1024, " * %33s", left); ch += strlen(ch);
-		snprintf(ch,1024, "%-36s *\n", right); ch += strlen(ch);
+
+		size_t remaining = sizeof(szmsg) - (ch - szmsg);
+		snprintf(ch,remaining, " * %33s", left); ch += strlen(ch);
+		remaining = sizeof(szmsg) - (ch - szmsg);
+		snprintf(ch,remaining, "%-36s *\n", right); ch += strlen(ch);
 //		snprintf(ch,1024, " *%71s*\n", ""); ch += strlen(ch);
 	}
 
@@ -162,13 +165,15 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 			if (cn) *cn = '\n';
 			cn = ct + n; 
 		}
-		snprintf(ch,1024," * %-69s *\n", ct); ch += strlen(ch);
+		size_t remaining = sizeof(szmsg) - (ch - szmsg);
+		snprintf(ch,remaining," * %-69s *\n", ct); ch += strlen(ch);
 		if (wrap) { ct[n] = tmp; }
 		if (cn) ct = cn+1;
 	}
 	while (cn);
 //	sprintf(ch," *                                                                       *\n"); ch += strlen(ch);
-	snprintf(ch,1024," *************************************************************************\n");
+	size_t remaining = sizeof(szmsg) - (ch - szmsg);
+	snprintf(ch,remaining," *************************************************************************\n");
 
 	// print the message
 	printf(szmsg);

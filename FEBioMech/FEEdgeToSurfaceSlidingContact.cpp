@@ -410,7 +410,6 @@ void FEEdgeToSurfaceSlidingContact::LoadVector(FEGlobalVector& R, const FETimeIn
 	const int MN = FEElement::MAX_NODES;
 	vec3d r0[MN];
 	double w[MN];
-	double* Gr, * Gs;
 	double detJ[MN];
 	vec3d dxr, dxs;
 
@@ -503,22 +502,15 @@ void FEEdgeToSurfaceSlidingContact::ContactNodalForce(int m, FESurfaceElement& m
 	vec3d rtm[MAXMN];
 
 	// shape function values
-	double H[MAXMN], Hr[MAXMN], Hs[MAXMN];
+	double H[MAXMN];
 
 	// contact vectors
-	double N[3 * (MAXMN + 1)], N1[3 * (MAXMN + 1)], N2[3 * (MAXMN + 1)];
-	double T1[3 * (MAXMN + 1)], T2[3 * (MAXMN + 1)], D1[3 * (MAXMN + 1)], D2[3 * (MAXMN + 1)];
-
-	// surface metrics
-	double A[2][2], M[2][2], K[2][2];
-	double detA;
+	double N[3 * (MAXMN + 1)];
 
 	double eps = m_eps;
 
 	// get the mesh
 	FEMesh& mesh = GetFEModel()->GetMesh();
-
-	double Tt[2];
 
 	int nmeln, ndof;
 
@@ -575,7 +567,7 @@ void FEEdgeToSurfaceSlidingContact::StiffnessMatrix(FELinearSystem& LS, const FE
 	vector<int> lm(3 * (MAXMN + 1));
 	vector<int> en(MAXMN + 1);
 
-	double* Gr, * Gs, w[MAXMN];
+	double w[MAXMN];
 	vec3d r0[MAXMN];
 
 	double detJ[MAXMN];

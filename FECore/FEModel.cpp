@@ -64,6 +64,9 @@ SOFTWARE.*/
 #include "FEDiscreteDomain.h"
 #include "FEDataGenerator.h"
 #include "FEModule.h"
+#include "FELogNodeData.h"
+#include "FELogElemData.h"
+#include "log.h"
 #include <stdarg.h>
 #include <sstream>
 using namespace std;
@@ -148,7 +151,13 @@ public:
 
 		// allocate timers
 		// Make sure enough timers are allocated for all the TimerIds!
-		m_timers.resize(7);
+		m_timers.resize(TIMER_COUNT);
+	}
+
+	~Implementation()
+	{
+		for (auto p : m_logData) delete p;
+		m_logData.clear();
 	}
 
 	void Serialize(DumpStream& ar);
@@ -184,7 +193,7 @@ public:
 		n = findComponentInVector<FEBoundaryCondition    >(m_BC  , pc); if (n >= 0) return { FEBC_ID, n };
 		n = findComponentInVector<FEModelLoad            >(m_ML  , pc); if (n >= 0) return { FELOAD_ID, n };
 		n = findComponentInVector<FEInitialCondition     >(m_IC  , pc); if (n >= 0) return { FEIC_ID, n };
-		n = findComponentInVector<FESurfacePairConstraint>(m_CI  , pc); if (n >= 0) return { FESURFACEINTERFACE_ID, n };
+		n = findComponentInVector<FESurfacePairConstraint>(m_CI  , pc); if (n >= 0) return { FESURFACEINTERACTION_ID, n };
 		n = findComponentInVector<FENLConstraint         >(m_NLC , pc); if (n >= 0) return { FENLCONSTRAINT_ID, n };
 		n = findComponentInVector<FELoadController       >(m_LC  , pc); if (n >= 0) return { FELOADCONTROLLER_ID, n };
 		n = findComponentInVector<FEAnalysis             >(m_Step, pc); if (n >= 0) return { FEANALYSIS_ID, n };
@@ -199,6 +208,7 @@ public: // TODO: Find a better place for these parameters
 	double		m_ftime0;			//!< start time of current step
 
 	bool	m_block_log;
+	bool	m_log_verbose = false;
 
 	int		m_nupdates;	//!< number of calls to FEModel::Update
 
@@ -215,7 +225,11 @@ public:
 	std::vector<FEMeshDataGenerator*>		m_MD;		//!< mesh data generators
 
 	std::vector<LoadParam>		m_Param;	//!< list of parameters controller by load controllers
+	
+	bool m_dotiming = true; // flag to enable/disable timings
 	std::vector<Timer>			m_timers;	// list of timers
+
+	std::unordered_map<std::string, FEScript> m_scripts;
 
 public:
 	FEAnalysis*		m_pStep;	//!< pointer to current analysis step
@@ -248,6 +262,9 @@ public:
 	FEPlotDataStore	m_plotData;		//!< Output request for plot file
 
 	DumpMemStream	m_dmp;	// only used by incremental solver
+
+	// user-requested log data (via GetDataValue)
+	vector<FELogData*> m_logData;
 
 public: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
@@ -292,6 +309,12 @@ FEModel::FEModel(void) : FECoreBase(this), m_imp(new FEModel::Implementation(thi
 FEModel::~FEModel(void)
 {
 	Clear();
+	delete m_imp;
+}
+
+void FEModel::SetVerboseMode(bool b)
+{
+	m_imp->m_log_verbose = b;
 }
 
 //-----------------------------------------------------------------------------
@@ -397,7 +420,7 @@ void FEModel::AddInitialCondition(FEInitialCondition* pbc) { m_imp->m_IC.push_ba
 
 //-----------------------------------------------------------------------------
 //! retrieve the number of steps
-int FEModel::Steps() { return (int)m_imp->m_Step.size(); }
+int FEModel::Steps() const { return (int)m_imp->m_Step.size(); }
 
 //-----------------------------------------------------------------------------
 //! clear the steps
@@ -486,6 +509,7 @@ bool FEModel::Init()
 	// intitialize time
 	FETimeInfo& tp = GetTime();
 	tp.currentTime = 0;
+	tp.timeIncrement = m_imp->m_Step[0]->m_dt0;
 	m_imp->m_ftime0 = 0;
 
 	// initialize global data
@@ -515,6 +539,9 @@ bool FEModel::Init()
 	// NOTE: This must be called after the rigid system is initialiazed since the rigid materials will
 	//       reference the rigid bodies
 	if (InitMaterials() == false) return false;
+
+	// Validate the materials
+	if (ValidateMaterials() == false) return false;
 
 	// initialize mesh data
 	// NOTE: this must be done AFTER the elements have been assigned material point data !
@@ -671,54 +698,66 @@ void FEModel::IncrementUpdateCounter()
 //-----------------------------------------------------------------------------
 void FEModel::Update()
 {
-	TRACK_TIME(TimerID::Timer_Update);
-
 	// update model counter
 	m_imp->m_nupdates++;
 	
 	// update mesh
 	FEMesh& mesh = GetMesh();
 	const FETimeInfo& tp = GetTime();
-	mesh.Update(tp);
-
-	// set the mesh update flag to false
-	// If any load sets this to true, the
-	// mesh will also be update after the loads are updated
-	m_imp->m_meshUpdate = false;
-
-	int nvel = BoundaryConditions();
-	for (int i = 0; i < nvel; ++i)
-	{
-		FEBoundaryCondition& bc = *BoundaryCondition(i);
-		if (bc.IsActive()) bc.UpdateModel();
-	}
-
-	// update all model loads
-	for (int i = 0; i < ModelLoads(); ++i)
-	{
-		FEModelLoad* pml = ModelLoad(i);
-		if (pml && pml->IsActive()) pml->Update();
-	}
-
-	// update all paired-interfaces
-	for (int i = 0; i < SurfacePairConstraints(); ++i)
-	{
-		FESurfacePairConstraint* psc = SurfacePairConstraint(i);
-		if (psc && psc->IsActive()) psc->Update();
-	}
-
-	// update all constraints
-	for (int i = 0; i < NonlinearConstraints(); ++i)
-	{
-		FENLConstraint* pc = NonlinearConstraint(i);
-		if (pc && pc->IsActive()) pc->Update();
-	}
-
-    // some of the loads may alter the prescribed dofs, so we update the mesh again
-	if (m_imp->m_meshUpdate)
-	{
+	try {
+		TRACK_TIME(TimerID::Timer_Update);
 		mesh.Update(tp);
+	}
+	catch (NegativeJacobianDetected e)
+	{
+		// for debug modes we do want to see inverted elements on the post side
+		DoCallback(CB_MODEL_UPDATE);
+		throw;
+	}
+
+	// update model components
+	{
+		TRACK_TIME(TimerID::Timer_Update);
+
+		// set the mesh update flag to false
+		// If any load sets this to true, the
+		// mesh will also be update after the loads are updated
 		m_imp->m_meshUpdate = false;
+
+		int nvel = BoundaryConditions();
+		for (int i = 0; i < nvel; ++i)
+		{
+			FEBoundaryCondition& bc = *BoundaryCondition(i);
+			if (bc.IsActive()) bc.UpdateModel();
+		}
+
+		// update all model loads
+		for (int i = 0; i < ModelLoads(); ++i)
+		{
+			FEModelLoad* pml = ModelLoad(i);
+			if (pml && pml->IsActive()) pml->Update();
+		}
+
+		// update all paired-interfaces
+		for (int i = 0; i < SurfacePairConstraints(); ++i)
+		{
+			FESurfacePairConstraint* psc = SurfacePairConstraint(i);
+			if (psc && psc->IsActive()) psc->Update();
+		}
+
+		// update all constraints
+		for (int i = 0; i < NonlinearConstraints(); ++i)
+		{
+			FENLConstraint* pc = NonlinearConstraint(i);
+			if (pc && pc->IsActive()) pc->Update();
+		}
+
+		// some of the loads may alter the prescribed dofs, so we update the mesh again
+		if (m_imp->m_meshUpdate)
+		{
+			mesh.Update(tp);
+			m_imp->m_meshUpdate = false;
+		}
 	}
     
 	// do the callback
@@ -995,7 +1034,11 @@ bool FEModel::InitMesh()
 
 	// Initialize shell data
 	// This has to be done before the domains are initialized below
-	InitShells();
+	if (!InitShells())
+	{
+		feLogError("Errors found during initialization of shells.");
+		return false;
+	}
 
 	// reset data
 	// TODO: Not sure why this is here
@@ -1032,12 +1075,39 @@ bool FEModel::InitMesh()
 		if (mesh.Surface(i).Init() == false) return false;
 	}
 
+	// do some additional mesh validation
+	ValidateMesh();
+
 	// All done
 	return true;
 }
 
+void FEModel::ValidateMesh()
+{
+	FEMesh& mesh = GetMesh();
+
+	for (int i = 0; i < mesh.NodeSets(); ++i)
+	{
+		FENodeSet* ns = mesh.NodeSet(i);
+		if (ns->Size() == 0)
+		{
+			std::string name = ns->GetName();
+			feLogWarning("The nodeset \"%s\" is empty!", name.c_str());
+		}
+	}
+	for (int i = 0; i < mesh.Surfaces(); ++i)
+	{
+		FESurface& surf = mesh.Surface(i);
+		if (surf.Elements() == 0)
+		{
+			std::string name = surf.GetName();
+			feLogWarning("The surface \"%s\" is empty!", name.c_str());
+		}
+	}
+}
+
 //-----------------------------------------------------------------------------
-void FEModel::InitShells()
+bool FEModel::InitShells()
 {
 	FEMesh& mesh = GetMesh();
 
@@ -1093,9 +1163,11 @@ void FEModel::InitShells()
 		if (dom.Class() == FE_DOMAIN_SHELL)
 		{
 			FEShellDomain& shellDom = static_cast<FEShellDomain&>(dom);
-			shellDom.InitShells();
+			if (!shellDom.InitShells()) return false;
 		}
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1147,56 +1219,59 @@ bool FEModel::InitConstraints()
 //! This function solves the FE problem by calling the solve method for each step.
 bool FEModel::Solve()
 {
-	TRACK_TIME(Timer_ModelSolve);
-
 	// error flag
 	bool bok = true;
 
-	// loop over all analysis steps
-	// Note that we don't necessarily from step 0.
-	// This is because the user could have restarted
-	// the analysis. 
-	for (size_t nstep = m_imp->m_nStep; nstep < Steps(); ++nstep)
 	{
-		// set the current analysis step
-		m_imp->m_nStep = (int)nstep;
-		m_imp->m_pStep = m_imp->m_Step[(int)nstep];
+		TRACK_TIME(Timer_ModelSolve);
 
-		// In the case we restarted, the current step can already be active
-		// so don't activate it again. 
-		if (m_imp->m_pStep->IsActive() == false)
+
+		// loop over all analysis steps
+		// Note that we don't necessarily from step 0.
+		// This is because the user could have restarted
+		// the analysis. 
+		for (size_t nstep = m_imp->m_nStep; nstep < Steps(); ++nstep)
 		{
-			if (m_imp->m_pStep->Activate() == false)
+			// set the current analysis step
+			m_imp->m_nStep = (int)nstep;
+			m_imp->m_pStep = m_imp->m_Step[(int)nstep];
+
+			// In the case we restarted, the current step can already be active
+			// so don't activate it again. 
+			if (m_imp->m_pStep->IsActive() == false)
 			{
-				bok = false;
-				break;
+				if (m_imp->m_pStep->Activate() == false)
+				{
+					bok = false;
+					break;
+				}
+
+				// do callback
+				DoCallback(CB_STEP_ACTIVE);
 			}
 
-			// do callback
-			DoCallback(CB_STEP_ACTIVE);
+			// solve the analaysis step
+			bok = m_imp->m_pStep->Solve();
+
+			// do callbacks
+			DoCallback(CB_STEP_SOLVED);
+
+			if (nstep + 1 == Steps())
+			{
+				// set the solved flag
+				m_imp->m_bsolved = bok;
+			}
+
+			// wrap it up
+			m_imp->m_pStep->Deactivate();
+
+			// break if the step has failed
+			if (bok == false) break;
 		}
 
-		// solve the analaysis step
-		bok = m_imp->m_pStep->Solve();
-
-		if (nstep + 1 == Steps())
-		{
-			// set the solved flag
-			m_imp->m_bsolved = bok;
-		}
-
-		// do callbacks
-		DoCallback(CB_STEP_SOLVED);
-
-		// wrap it up
-		m_imp->m_pStep->Deactivate();
-
-		// break if the step has failed
-		if (bok == false) break;
+		// do the callbacks
+		DoCallback(CB_SOLVED);
 	}
-
-	// do the callbacks
-	DoCallback(CB_SOLVED);
 
 	return bok;
 }
@@ -1219,7 +1294,7 @@ bool FEModel::RCI_ClearRewindStack()
 bool FEModel::RCI_Init()
 {
 	// start the timer
-	GetTimer(Timer_ModelSolve)->start();
+	TRACK_TIME(Timer_ModelSolve);
 
 	// reset solver status flag
 	m_imp->m_bsolved = false;
@@ -1474,6 +1549,11 @@ bool FEModel::Reset()
 	Activate();
 
 	// Reevaluate load parameters
+	for (int i = 0; i < LoadControllers(); ++i)
+	{
+		FELoadController& lc = *GetLoadController(i);
+		lc.Reset();
+	}
 	EvaluateLoadParameters();
 
 	DoCallback(CB_RESET);
@@ -1590,16 +1670,16 @@ std::string FEModel::GetParamString(FEParam* p)
 	string typeStr;
 	switch (typeId)
 	{
-	case FEMATERIAL_ID         : typeStr = "material"; break;
-	case FEBC_ID               : typeStr = "bc"; break;
-	case FELOAD_ID             : typeStr = "load"; break;
-	case FEIC_ID               : typeStr = "initial"; break;
-	case FESURFACEINTERFACE_ID : typeStr = "contact"; break;
-	case FENLCONSTRAINT_ID     : typeStr = "constraint"; break;
-	case FEMESHADAPTOR_ID      : typeStr = "mesh_adaptor"; break;
-	case FELOADCONTROLLER_ID   : typeStr = "load_controller"; break;
-	case FEMESHDATAGENERATOR_ID: typeStr = "mesh_data"; break;
-	case FEANALYSIS_ID         : typeStr = "step"; break;
+	case FEMATERIAL_ID          : typeStr = "material"; break;
+	case FEBC_ID                : typeStr = "bc"; break;
+	case FELOAD_ID              : typeStr = "load"; break;
+	case FEIC_ID                : typeStr = "initial"; break;
+	case FESURFACEINTERACTION_ID: typeStr = "contact"; break;
+	case FENLCONSTRAINT_ID      : typeStr = "constraint"; break;
+	case FEMESHADAPTOR_ID       : typeStr = "mesh_adaptor"; break;
+	case FELOADCONTROLLER_ID    : typeStr = "load_controller"; break;
+	case FEMESHDATAGENERATOR_ID : typeStr = "mesh_data"; break;
+	case FEANALYSIS_ID          : typeStr = "step"; break;
 	default:
 		return string();
 	}
@@ -1626,7 +1706,7 @@ FEParamValue FEModel::GetMeshParameter(const ParamString& paramString)
 			ParamString fnc = next.next();
 			if (fnc == "fromId")
 			{
-				nid = fnc.Index();
+				nid = fnc.ID();
 				node = mesh.FindNodeFromID(nid);
 				next = next.next();
 			}
@@ -1731,32 +1811,45 @@ FEParamValue FEModel::GetParameterValue(const ParamString& paramString)
 {
 	// make sure it starts with the name of this model
 	if (paramString != GetName()) return FEParamValue();
-
-	ParamString paramComp = paramString.last();
-	FEParam* param = FindParameter(paramString);
-	if (param)
+	ParamString next = paramString.next();
+	FEParamValue val = FECoreBase::GetParameterValue(next);
+	if (!val.isValid())
 	{
-		if ((strcmp(param->name(), paramComp.c_str()) != 0) || (paramComp.Index() != -1))
-			return GetParameterComponent(paramComp, param);
-		else
-		{
-			if (param->type() == FE_PARAM_DOUBLE_MAPPED)
-			{
-				FEParamDouble& v = param->value<FEParamDouble>();
-				if (v.isConst()) return FEParamValue(param, &v.constValue(), FE_PARAM_DOUBLE);
-			}
-			return FEParamValue(param, param->data_ptr(), param->type());
-		}
+		if (next == "mesh") return GetMeshParameter(next);
+	}
+	return val;
+}
+
+FEDataValue FEModel::GetDataValue(const ParamString& s)
+{
+	FEDataValue val;
+	if (s != GetName()) return val;
+	ParamString data = s.next();
+
+	if (data == "node_data")
+	{
+		string params = data.IDString();
+
+		FELogNodeData* pd = fecore_new<FELogNodeData>(params.c_str(), this);
+		if (pd == nullptr) { feLogError("Invalid data variable %s", params.c_str()); return val; }
+
+		m_imp->m_logData.push_back(pd);
+
+		val.SetLogData(pd);
+	}
+	else if (data == "elem_data")
+	{
+		string params = data.IDString();
+
+		FELogElemData* pd = fecore_new<FELogElemData>(params.c_str(), this);
+		if (pd == nullptr) { feLogError("Invalid data variable %s", params.c_str()); return val; }
+
+		m_imp->m_logData.push_back(pd);
+
+		val.SetLogData(pd);
 	}
 
-	// see what the next reference is
-	ParamString next = paramString.next();
-
-	// if we get here, handle some special cases
-	if (next == "mesh") return GetMeshParameter(next);
-
-	// oh, oh, we didn't find it
-	return FEParamValue();
+	return val;
 }
 
 //-----------------------------------------------------------------------------
@@ -1908,15 +2001,60 @@ int FEModel::GetDOFIndex(const char* szvar, int n) const
 	return m_imp->m_dofs.GetDOF(szvar, n);
 }
 
+std::string CallbackId2String(unsigned int nevent)
+{
+	switch (nevent)
+	{
+	case CB_INIT            : return "CB_INIT"            ; break;
+	case CB_STEP_ACTIVE     : return "CB_STEP_ACTIVE"     ; break;
+	case CB_MAJOR_ITERS     : return "CB_MAJOR_ITERS"     ; break;
+	case CB_MINOR_ITERS     : return "CB_MINOR_ITERS"     ; break;
+	case CB_SOLVED          : return "CB_SOLVED"          ; break;
+	case CB_UPDATE_TIME     : return "CB_UPDATE_TIME"     ; break;
+	case CB_AUGMENT         : return "CB_AUGMENT"         ; break;
+	case CB_STEP_SOLVED     : return "CB_STEP_SOLVED"     ; break;
+	case CB_MATRIX_REFORM   : return "CB_MATRIX_REFORM"   ; break;
+	case CB_REMESH          : return "CB_REMESH"          ; break;
+	case CB_PRE_MATRIX_SOLVE: return "CB_PRE_MATRIX_SOLVE"; break;
+	case CB_RESET           : return "CB_RESET"           ; break;
+	case CB_MODEL_UPDATE    : return "CB_MODEL_UPDATE"    ; break;
+	case CB_TIMESTEP_SOLVED : return "CB_TIMESTEP_SOLVED" ; break;
+	case CB_SERIALIZE_SAVE  : return "CB_SERIALIZE_SAVE"  ; break;
+	case CB_SERIALIZE_LOAD  : return "CB_SERIALIZE_LOAD"  ; break;
+	case CB_TIMESTEP_FAILED : return "CB_TIMESTEP_FAILED" ; break;
+	case CB_QUASIN_CONVERGED: return "CB_QUASIN_CONVERGED"; break;
+	case CB_USER1           : return "CB_USER1"           ; break;
+	default:
+		return "<unknown>";
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Call the callback function if there is one defined
 //
 bool FEModel::DoCallback(unsigned int nevent)
 {
+	TRACK_TIME(TimerID::Timer_Callback);
+
+	if (m_imp->m_log_verbose)
+	{
+		string name = GetName();
+		string cbname = CallbackId2String(nevent);
+		feLog("[%s.%s]===>\n", name.c_str(), cbname.c_str());
+	}
+
 	try
 	{
 		// do the callbacks
 		bool bret = CallbackHandler::DoCallback(this, nevent);
+
+		if (m_imp->m_log_verbose)
+		{
+			string name = GetName();
+			string cbname = CallbackId2String(nevent);
+			feLog("<===[%s.%s]\n", name.c_str(), cbname.c_str());
+		}
+
 		return bret;
 	}
 	catch (ForceConversion)
@@ -2344,6 +2482,9 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		ar & m_timeInfo;
 
 		// stream mesh
+		ar & m_mesh;
+
+		// stream domains
 		m_fem->SerializeGeometry(ar);
 
 		// serialize contact
@@ -2373,10 +2514,13 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 		ar & m_ftime0;
 		ar & m_bsolved;
 
-		// we have to stream materials before the mesh
+		// serialize the mesh first
+		ar & m_mesh;
+
+		// we have to stream materials before we serialize the domains
 		ar & m_MAT;
 
-		// we have to stream the mesh before any boundary conditions
+		// stream geometry (domains)
 		m_fem->SerializeGeometry(ar);
 
 		// stream all boundary conditions
@@ -2419,7 +2563,7 @@ void FEModel::Implementation::Serialize(DumpStream& ar)
 //! Derived classes can override this
 void FEModel::SerializeGeometry(DumpStream& ar)
 {
-	ar & m_imp->m_mesh;
+	m_imp->m_mesh.SerializeDomains(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -2427,7 +2571,7 @@ void FEModel::SerializeGeometry(DumpStream& ar)
 // This is used for running and cold restarts.
 void FEModel::Serialize(DumpStream& ar)
 {
-	TRACK_TIME(TimerID::Timer_Update);
+	TRACK_TIME(TimerID::Timer_Serialize);
 
 	m_imp->Serialize(ar);
 	DoCallback(ar.IsSaving() ? CB_SERIALIZE_SAVE : CB_SERIALIZE_LOAD);
@@ -2465,6 +2609,16 @@ bool FEModel::GetNodeData(int ndof, vector<double>& data)
 	}
 	
 	return true;
+}
+
+void FEModel::CollectTimings(bool b)
+{
+	m_imp->m_dotiming = b;
+}
+
+bool FEModel::CollectTimings() const
+{
+	return m_imp->m_dotiming;
 }
 
 //-----------------------------------------------------------------------------
@@ -2525,4 +2679,33 @@ const char* FEModel::GetUnits() const
 {
 	if (m_imp->m_units.empty()) return nullptr;
 	else return m_imp->m_units.c_str();
+}
+
+bool FEModel::AddScript(const std::string& name, const std::string& script)
+{
+	if (name.empty() || script.empty()) return false;
+
+	// make sure the script name is unique
+	if (m_imp->m_scripts.count(name) > 0)
+	{
+		feLogError("A script with the name \"%s\" already exists", name.c_str());
+		return false;
+	}
+
+
+	m_imp->m_scripts[name] = {name, script};
+	return true;
+}
+
+FEScript FEModel::GetScript(const std::string& name) const
+{
+	auto it = m_imp->m_scripts.find(name);
+	if (it != m_imp->m_scripts.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		return FEScript();
+	}
 }

@@ -34,26 +34,6 @@ SOFTWARE.*/
 class FEBIOMIX_API FESlidingSurface3 : public FEBiphasicContactSurface
 {
 public:
-	//! integration point data
-	class Data : public FEBiphasicContactPoint
-	{
-	public:
-		Data();
-
-		void Serialize(DumpStream& ar) override;
-
-	public:
-		double	m_Lmd;	//!< Lagrange multipliers for displacements
-		double	m_Lmc;	//!< Lagrange multipliers for solute concentrations
-		double	m_epsn;	//!< displacement penalty factors
-		double	m_epsp;	//!< pressure penalty factors
-		double	m_epsc;	//!< concentration penatly factors
-		double	m_cg;	//!< concentration "gap"
-		vec3d	m_nu;	//!< normal at integration points
-		vec2d	m_rs;	//!< natural coordinates of projection of integration point
-	};
-
-public:
 	//! constructor
 	FESlidingSurface3(FEModel* pfem);
 	

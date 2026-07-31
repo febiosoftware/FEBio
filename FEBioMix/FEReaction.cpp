@@ -50,10 +50,22 @@ bool FEReaction::Init()
         return false;
     }
     
-    // now call base class
-    return FEMaterialProperty::Init();
+	// TODO: Why does calling the base class cause a crash in cr02???
+	return true;// FEMaterialProperty::Init();
 }
 
+void FEReaction::Serialize(DumpStream& dmp)
+{
+	FEMaterialProperty::Serialize(dmp);
+	if (!dmp.IsShallow())
+	{
+		if (dmp.IsLoading())
+		{
+			m_psm = dynamic_cast<FESoluteInterface*>(GetAncestor());
+			assert(m_psm);
+		}
+	}
+}
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEReactionSpeciesRef, FEMaterialProperty)

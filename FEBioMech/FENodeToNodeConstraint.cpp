@@ -38,6 +38,13 @@ FENodeToNodeConstraint::FENodeToNodeConstraint(FEModel* fem) : FENLConstraint(fe
 {
 	m_a = m_b = -1;
 	m_Lm = vec3d(0, 0, 0);
+	m_Lp = vec3d(0, 0, 0);
+}
+
+void FENodeToNodeConstraint::Serialize(DumpStream& ar)
+{
+	FENLConstraint::Serialize(ar);
+	ar & m_a & m_b & m_Lm & m_Lp;
 }
 
 // allocate equations
@@ -79,11 +86,23 @@ void FENodeToNodeConstraint::UnpackLM(vector<int>& lm)
 	lm.push_back(m_LM[2]);
 }
 
-void FENodeToNodeConstraint::Update(const std::vector<double>& ui)
+void FENodeToNodeConstraint::PrepStep()
 {
-	m_Lm.x += ui[m_LM[0]];
-	m_Lm.y += ui[m_LM[1]];
-	m_Lm.z += ui[m_LM[2]];
+	m_Lp = m_Lm;
+}
+
+void FENodeToNodeConstraint::Update(const std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	m_Lm.x = m_Lp.x + Ui[m_LM[0]] + ui[m_LM[0]];
+	m_Lm.y = m_Lp.x + Ui[m_LM[1]] + ui[m_LM[1]];
+	m_Lm.z = m_Lp.x + Ui[m_LM[2]] + ui[m_LM[2]];
+}
+
+void FENodeToNodeConstraint::UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui)
+{
+	Ui[m_LM[0]] += ui[m_LM[0]];
+	Ui[m_LM[1]] += ui[m_LM[1]];
+	Ui[m_LM[2]] += ui[m_LM[2]];
 }
 
 // The LoadVector function evaluates the "forces" that contribute to the residual of the system

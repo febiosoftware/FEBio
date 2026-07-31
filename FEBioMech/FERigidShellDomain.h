@@ -98,11 +98,21 @@ public: // from FEDomain
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() override;
 
+	void Serialize(DumpStream& ar) override;
+
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
+
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
+
 public: // from FEShellDomain
 	// get a shell element
 	FEShellElement& Element(int i) override { return m_Elem[i]; }
 
 	void AssignDefaultShellThickness() override;
+    
+    double Volume(FEShellElement& el) override;
+    
+    double CurrentVolume(FEShellElement& el) override;
 
 public: // from FEElasticDomain
 	void InternalForces(FEGlobalVector& R) override;
@@ -133,6 +143,7 @@ private:
 
 public:
 	double detJ0(FEShellElement& el, int n);
+    double detJ(FEShellElement& el, int n);
 
 protected:
 	double	m_h0; // TODO: move to base class?

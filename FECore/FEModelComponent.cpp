@@ -29,6 +29,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEModelComponent.h"
 #include "FEModel.h"
+#include "FEAnalysis.h"
 #include "DumpStream.h"
 #include <string.h>
 
@@ -90,6 +91,13 @@ FEMesh& FEModelComponent::GetMesh()
 const FETimeInfo& FEModelComponent::GetTimeInfo() const
 {
 	return GetFEModel()->GetTime();
+}
+
+FESolver* FEModelComponent::GetSolver()
+{
+	FEAnalysis* step = GetFEModel()->GetCurrentStep();
+	if (step == nullptr) return nullptr;
+	return step->GetFESolver();
 }
 
 //-----------------------------------------------------------------------------

@@ -38,6 +38,8 @@ END_FECORE_CLASS();
 FETrussMaterial::FETrussMaterial(FEModel* pfem) : FEMaterial(pfem) 
 {
 	m_rho = 1.0;
+
+	AddDomainParameter(new FETrussStress());
 }
 
 //-----------------------------------------------------------------------------
@@ -47,9 +49,9 @@ FETrussMaterial::~FETrussMaterial()
 
 //-----------------------------------------------------------------------------
 //! material density
-double FETrussMaterial::Density()
+double FETrussMaterial::Density(FEMaterialPoint& mp)
 {
-	return m_rho;
+	return m_rho(mp);
 }
 
 //=============================================================================
@@ -71,11 +73,21 @@ FELinearTrussMaterial::FELinearTrussMaterial(FEModel* fem) : FETrussMaterial(fem
 double FELinearTrussMaterial::Stress(FEMaterialPoint &mp)
 {
 	FETrussMaterialPoint& pt = *mp.ExtractData<FETrussMaterialPoint>();
-	return m_E*log(pt.m_lam);
+	double E = m_E(mp);
+	return E*log(pt.m_lam);
 }
 
 //-----------------------------------------------------------------------------
-double FELinearTrussMaterial::Tangent(FEMaterialPoint &pt)
+double FELinearTrussMaterial::Tangent(FEMaterialPoint &mp)
 {
-	return m_E;
+	double E = m_E(mp);
+	return E;
+}
+
+FETrussStress::FETrussStress() : FEDomainParameter("stress") {}
+
+FEParamValue FETrussStress::value(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	return pt.m_s;
 }

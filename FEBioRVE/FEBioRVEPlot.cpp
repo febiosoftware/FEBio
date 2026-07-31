@@ -91,7 +91,7 @@ bool FEPlotElementPK1norm::Save(FEDomain& dom, FEDataStream& a)
 	}
 
 	FEMicroMaterial2O* pm2O = dynamic_cast<FEMicroMaterial2O*>(dom.GetMaterial());
-	if (pm2O == 0)
+	if (pm2O)
 	{
 		writeAverageElementValue<mat3d, double>(dom, a, FEMicro2OPK1Stress(), [](const mat3d& m) {return m.dotdot(m); });
 		return true;

@@ -91,6 +91,8 @@ mat3ds FEContinuousFiberDistribution::Stress(FEMaterialPoint& mp)
     
     double IFD = IntegratedFiberDensity(mp);
 
+	fp.m_index = 0;
+
 	// obtain an integration point iterator
 	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
@@ -109,6 +111,8 @@ mat3ds FEContinuousFiberDistribution::Stress(FEMaterialPoint& mp)
 			// calculate the stress
 			double wn = it->m_weight;
 			s += m_pFmat->FiberStress(mp, fp.FiberPreStretch(n0))*(R*wn);
+
+			fp.m_index++;
 		}
 		while (it->Next());
 	}
@@ -136,6 +140,8 @@ tens4ds FEContinuousFiberDistribution::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	c.zero();
 
+	fp.m_index = 0;
+
 	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
 	{
@@ -152,6 +158,8 @@ tens4ds FEContinuousFiberDistribution::Tangent(FEMaterialPoint& mp)
 
 			// calculate the tangent
 			c += m_pFmat->FiberTangent(mp, fp.FiberPreStretch(n0))*(R*it->m_weight);
+
+			fp.m_index++;
 		}
 		while (it->Next());
 	}
@@ -176,6 +184,8 @@ double FEContinuousFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
     
     double IFD = IntegratedFiberDensity(mp);
 
+	fp.m_index = 0;
+
 	double sed = 0.0;
 	FEFiberIntegrationSchemeIterator* it = m_pFint->GetIterator(&mp);
 	if (it->IsValid())
@@ -193,6 +203,8 @@ double FEContinuousFiberDistribution::StrainEnergyDensity(FEMaterialPoint& mp)
 
 			// calculate the stress
 			sed += m_pFmat->FiberStrainEnergyDensity(mp, fp.FiberPreStretch(n0))*(R*it->m_weight);
+
+			fp.m_index++;
 		}
 		while (it->Next());
 	}

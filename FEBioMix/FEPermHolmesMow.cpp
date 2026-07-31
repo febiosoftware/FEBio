@@ -77,12 +77,15 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 	{
 		FEElement* pe = mp.m_elem;
 		int id = (pe ? pe->GetID() : -1);
+		// NOTE: This function can be called from a parallel (omp) section
+		//       however, logging should be done in serial. 
+#pragma omp critical
 		feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g. (element %d)", J, phi0, id);
 	}
 
     // --- strain-dependent isotropic permeability ---
-	
-	return mat3dd(m_perm*pow((J-phi0)/(1.0-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0));
+	double perm = m_perm(mp);
+	return mat3dd(perm*pow((J-phi0)/(1.0-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0));
 }
 
 //-----------------------------------------------------------------------------
@@ -103,12 +106,16 @@ tens4dmm FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	{
 		FEElement* pe = mp.m_elem;
 		int id = (pe ? pe->GetID() : -1);
+		// NOTE: This function can be called from a parallel (omp) section
+		//       however, logging should be done in serial. 
+#pragma omp critical
 		feLogError("The Holmes-Mow permeability calculation failed!\nThe volume ratio (J=%g) dropped below its theoretical minimum phi0=%g. (element %d)", J, phi0, id);
 	}
 
 	mat3dd I(1);	// Identity
-	
-	double k0 = m_perm*pow((J-phi0)/(1.0-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double perm = m_perm(mp);
+
+	double k0 = perm*pow((J-phi0)/(1.0-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double K0prime = (J*J*m_M+(J*(m_alpha+1)-phi0)/(J-phi0))*k0;
 	mat3ds k0hat = I*K0prime;
 	

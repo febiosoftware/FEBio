@@ -50,7 +50,7 @@ bool FEGrowthTensor::Init()
         m_fiber = val;
     }
     
-    return true;
+    return FEMaterialProperty::Init();
 }
 
 //-----------------------------------------------------------------------------

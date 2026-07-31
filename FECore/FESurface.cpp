@@ -61,8 +61,8 @@ void FESurface::Create(int nsize, int elemType)
 		FESurfaceElement& el = m_el[i];
 		el.SetLocalID(i);
 		el.SetMeshPartition(this);
-		el.m_elem[0] = nullptr;
-		el.m_elem[1] = nullptr;
+		el.m_elem[0].Reset();
+		el.m_elem[1].Reset();
 	}
 
 	if (elemType != -1)
@@ -200,11 +200,14 @@ void FESurface::Update(const FETimeInfo& tp)
 
 			double* Gr = el.Gr(n);
 			double* Gs = el.Gs(n);
+            double* H = el.H(n);
 
+            mp.m_rt = vec3d(0,0,0);
 			mp.dxr = vec3d(0, 0, 0);
 			mp.dxs = vec3d(0, 0, 0);
 			for (int i = 0; i < neln; ++i)
 			{
+                mp.m_rt += rt[i] * H[i];
 				mp.dxr += rt[i] * Gr[i];
 				mp.dxs += rt[i] * Gs[i];
 			}
@@ -279,11 +282,11 @@ bool FESurface::Init()
 	for (int i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
-        if (m_bitfc && (el.m_elem[0] == nullptr)) FindElements(el);
-		else if (el.m_elem[0] == nullptr) el.m_elem[0] = FindElement(el);
+        if (m_bitfc && (el.m_elem[0].pe == nullptr)) FindElements(el);
+		else if (el.m_elem[0].pe == nullptr) el.m_elem[0] = FindElement(el);
         //to make sure
-        else if (m_bitfc && (el.m_elem[1] == nullptr)) FindElements(el);
-		if (el.m_elem[0] == nullptr) { invalidFacets++; }
+        else if (m_bitfc && (el.m_elem[1].pe == nullptr)) FindElements(el);
+		if (el.m_elem[0].pe == nullptr) { invalidFacets++; }
 	}
 
 	if (invalidFacets > 0)
@@ -317,6 +320,7 @@ bool FESurface::Init()
 			}
 
 			pt->m_r0 = rn;
+            pt->m_rt = pt->m_rp = rn;
 
 			// calculate initial surface tangents
 			double* Gr = el.Gr(n);
@@ -346,11 +350,13 @@ bool FESurface::Init()
 //-----------------------------------------------------------------------------
 //! Find the element that a face belongs to
 // TODO: I should be able to speed this up
-FEElement* FESurface::FindElement(FESurfaceElement& el)
+FESurfaceElement::ELEMENT_REF FESurface::FindElement(FESurfaceElement& el)
 {
 	// get the mesh to which this surface belongs
 	FEMesh& mesh = *GetMesh();
 	FENodeElemList& NEL = mesh.NodeElementList();
+
+	FESurfaceElement::ELEMENT_REF ref;
 
 	int node = el.m_node[0];
 	int nval = NEL.Valence(node);
@@ -366,23 +372,31 @@ FEElement* FESurface::FindElement(FESurfaceElement& el)
 			nn = pe->GetFace(j, nf);
 			if (nn == el.Nodes())
 			{
+				int orient = 0;
 				switch (nn)
 				{
-				case  3: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return pe; break;
-				case  4: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return pe; break;
-				case  6: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return pe; break;
-				case  7: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return pe; break;
-				case  8: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return pe; break;
-				case  9: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return pe; break;
-				case 10: if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return pe; break;
+				case 3: orient = el.HasNodes(nf, 3); break;
+				case 4: orient = el.HasNodes(nf, 4); break;
+				case 6: orient = el.HasNodes(nf, 3); break;
+				case 7: orient = el.HasNodes(nf, 3); break;
+				case 8: orient = el.HasNodes(nf, 4); break;
+				case 9: orient = el.HasNodes(nf, 4); break;
 				default:
 					assert(false);
+				}
+
+				if (orient != 0)
+				{
+					ref.pe = pe;
+					ref.face = j;
+					ref.orient = orient;
+					return ref;
 				}
 			}
 		}
 	}
 
-	return nullptr;
+	return ref;
 }
 
 void FESurface::ForEachSurfaceElement(std::function<void(FESurfaceElement& el)> f)
@@ -403,36 +417,47 @@ void FESurface::FindElements(FESurfaceElement& el)
 	for (int i = 0; i < nval; ++i)
 	{
 		FEElement& sel = *ppe[i];
-            
-		// check all faces of this solid element
-		int nfaces = sel.Faces();
-		for (int j = 0; j<nfaces; ++j) 
+		if (sel.isActive())
 		{
-			int nf[9];
-			vec3d g[3];
-			int nn = sel.GetFace(j, nf);
-                
-			int found = 0;
-			if (nn == el.Nodes())
+			// check all faces of this solid element
+			int orient = 0;
+			int nfaces = sel.Faces();
+			for (int j = 0; j < nfaces; ++j)
 			{
-                switch (nn)
-                {
-                    case 3: found = el.HasNodes(nf,3); break;
-                    case 4: found = el.HasNodes(nf,4); break;
-                    case 6: found = el.HasNodes(nf,3); break;
-                    case 7: found = el.HasNodes(nf,3); break;
-                    case 8: found = el.HasNodes(nf,4); break;
-                    case 9: found = el.HasNodes(nf,4); break;
-                    default:
-                        assert(false);
-                }
-            }
-            if (found != 0) {
-                if (el.m_elem[0] == nullptr) { el.m_elem[0] = &sel; }
-                else if (el.m_elem[0] != &sel) el.m_elem[1] = &sel;
-            }
-        }
-    }
+				int nf[FEElement::MAX_NODES];
+				vec3d g[3];
+				int nn = sel.GetFace(j, nf);
+				if (nn == el.Nodes())
+				{
+					switch (nn)
+					{
+					case 3: orient = el.HasNodes(nf, 3); break;
+					case 4: orient = el.HasNodes(nf, 4); break;
+					case 6: orient = el.HasNodes(nf, 3); break;
+					case 7: orient = el.HasNodes(nf, 3); break;
+					case 8: orient = el.HasNodes(nf, 4); break;
+					case 9: orient = el.HasNodes(nf, 4); break;
+					default:
+						assert(false);
+					}
+				}
+				if (orient != 0) {
+					if (el.m_elem[0].pe == nullptr) 
+					{ 
+						el.m_elem[0].pe = &sel;
+						el.m_elem[0].face = j;
+						el.m_elem[0].orient = orient;
+					}
+					else if (el.m_elem[0].pe != &sel)
+					{
+						el.m_elem[1].pe = &sel;
+						el.m_elem[1].face = j;
+						el.m_elem[1].orient = orient;
+					}
+				}
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -741,6 +766,14 @@ void FESurface::NodalCoordinates(FESurfaceElement& el, vec3d* re)
 	int ne = el.Nodes();
 	if (!m_bshellb) for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).m_rt;
     else for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).st();
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::PreviousNodalCoordinates(FESurfaceElement& el, vec3d* re)
+{
+    int ne = el.Nodes();
+    if (!m_bshellb) for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).m_rp;
+    else for (int i = 0; i < ne; ++i) re[i] = Node(el.m_lnode[i]).sp();
 }
 
 //-----------------------------------------------------------------------------
@@ -1647,7 +1680,7 @@ bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double ep
 //! This function calculates the intersection of a ray with a quad
 //! and returns true if the ray intersected.
 //!
-bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps, bool checkNormal = true)
 {
 	// first we're going to see if the ray intersects the two subtriangles
 	vec3d x1[3], x2[3];
@@ -1733,10 +1766,13 @@ bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double e
 		rs[0] = l1;
 		rs[1] = l2;
 		g     = l3;
-        vec3d nu2 = F1 ^ F2;
-        nu2.unit();
-        double cosq = n*nu2;
-        if (cosq > 0) return false;
+		if (checkNormal)
+		{
+			vec3d nu2 = F1 ^ F2;
+			nu2.unit();
+			double cosq = n * nu2;
+			if (cosq > 0) return false;
+		}
 
 		// see if the point is inside the quad
 		if ((rs[0] >= -1-eps) && (rs[0] <= 1+eps) && 
@@ -2234,7 +2270,7 @@ void FESurface::Invert()
 //! It simply calls the correct intersection function based on the type
 //! of element.
 //!
-bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps)
+bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps, bool checkNormal)
 {
 	int N = el.Nodes();
 
@@ -2248,7 +2284,7 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 	switch (N)
 	{
 	case 3: return IntersectTri  (y, r, n, rs, g, eps); break;
-	case 4: return IntersectQuad (y, r, n, rs, g, eps); break;
+	case 4: return IntersectQuad (y, r, n, rs, g, eps, checkNormal); break;
 	case 6: return IntersectTri6 (y, r, n, rs, g, eps); break;
 	case 7: return IntersectTri7 (y, r, n, rs, g, eps); break;
 	case 8: return IntersectQuad8(y, r, n, rs, g, eps); break;
@@ -2298,11 +2334,11 @@ void FESurface::Serialize(DumpStream &ar)
 		for (int i = 0; i<ne; ++i)
 		{
 			FESurfaceElement& el = Element(i);
-			if (m_bitfc && (el.m_elem[0] == nullptr)) FindElements(el);
-			else if (el.m_elem[0] == nullptr) el.m_elem[0] = FindElement(el);
+			if (m_bitfc && (el.m_elem[0].pe == nullptr)) FindElements(el);
+			else if (el.m_elem[0].pe == nullptr) el.m_elem[0] = FindElement(el);
 			//to make sure
-			else if (m_bitfc && (el.m_elem[1] == nullptr)) FindElements(el);
-			assert(el.m_elem[0] != nullptr);
+			else if (m_bitfc && (el.m_elem[1].pe == nullptr)) FindElements(el);
+			assert(el.m_elem[0].pe != nullptr);
 		}
 	}
 

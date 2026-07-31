@@ -41,6 +41,9 @@ public:
 	FEModelParam();
 	virtual ~FEModelParam();
 
+	// initialization
+	virtual bool Init() { return true; }
+
 	// set the domain
 	void SetItemList(FEItemList* itemList) { m_dom = itemList; }
 
@@ -73,6 +76,8 @@ public:
 	FEParamDouble();
 	~FEParamDouble();
 
+	FEParamDouble(double v);
+
 	FEParamDouble(const FEParamDouble& p);
 
 	// set the value
@@ -97,7 +102,7 @@ public:
 
 	void Serialize(DumpStream& ar) override;
 
-	bool Init();
+	bool Init() override;
 
 private:
 	FEScalarValuator*	m_val;
@@ -110,11 +115,12 @@ class FECORE_API FEParamVec3 : public FEModelParam
 {
 public:
 	FEParamVec3();
+	FEParamVec3(vec3d v);
 	~FEParamVec3();
 
 	FEParamVec3(const FEParamVec3& p);
 
-	bool Init();
+	bool Init() override;
 
 	// set the value
 	void operator = (const vec3d& v);
@@ -149,6 +155,7 @@ class FECORE_API FEParamMat3d : public FEModelParam
 {
 public:
 	FEParamMat3d();
+	FEParamMat3d(const mat3d& m);
 	~FEParamMat3d();
 
 	FEParamMat3d(const FEParamMat3d& p);
@@ -157,7 +164,7 @@ public:
 	void operator = (const mat3d& v);
 	void operator = (const FEParamMat3d& v);
 
-	bool Init();
+	bool Init() override;
 
 	// set the valuator
 	void setValuator(FEMat3dValuator* val);
@@ -193,6 +200,8 @@ public:
 	// set the value
 	void operator = (const mat3ds& v);
 	void operator = (const FEParamMat3ds& v);
+
+	bool Init() override;
 
 	// set the valuator
 	void setValuator(FEMat3dsValuator* val);

@@ -58,6 +58,9 @@ public:
 
 	int GetModuleID() const;
 
+    void SetAllocID(int id);
+    int GetAllocID() const;
+
 	const char* GetName() const;
 
 	const char* GetDescription() const;

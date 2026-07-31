@@ -1,0 +1,613 @@
+/*This file is part of the FEBio source code and is licensed under the MIT license
+listed below.
+
+See Copyright-FEBio.txt for details.
+
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+the City of New York, and others.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
+
+#include "sphericalHarmonics.h"
+#include "SpherePointsGenerator.h"
+#include <algorithm>
+#include <unordered_map>
+#include <vector>
+
+#ifdef HAS_MMG
+#include <mmg/mmgs/libmmgs.h>
+#endif
+
+#ifndef M_PI
+#define M_PI 3.141592653589793238462643
+#endif
+
+using std::vector;
+using std::unordered_map;
+using sphere = SpherePointsGenerator;
+
+enum NUMTYPE { REALTYPE, IMAGTYPE, COMPLEXTYPE };
+
+double fact(int val)
+{
+    double ans = 1;
+    
+    for(int i = 1; i <= val; i++)
+    {
+        ans *= i;
+    } 
+    
+    return ans;
+}
+
+void getSphereCoords(std::vector<vec3d>& coords, std::vector<double>& theta, std::vector<double>& phi)
+{
+    theta.resize(coords.size());
+    phi.resize(coords.size());
+
+    // get spherical coordinates
+    for(int index = 0; index < coords.size(); index++)
+    {
+        double val = coords[index].z;
+
+        if (val<=-1)
+        {
+            theta[index] = M_PI;
+        } 
+        else if (val>=1)
+        {
+             theta[index] = 0;
+        } 
+        else 
+        {
+            theta[index] = acos(coords[index].z);
+        }
+    }
+
+    for(int index = 0; index < coords.size(); index++)
+    {
+        double x = coords[index].x;
+        double y = coords[index].y;
+
+        if(x > 0)
+        {
+            phi[index] = atan(y/x);
+        }
+        else if(x < 0 && y >= 0)
+        {
+            phi[index] = atan(y/x) + M_PI;
+        }
+        else if(x < 0 && y < 0)
+        {
+            phi[index] = atan(y/x) - M_PI;
+        }
+        else if(x == 0 && y > 0)
+        {
+            phi[index] = M_PI/2;
+        }
+        else if(x == 0 && y < 0)
+        {
+            phi[index] = -M_PI/2;
+        }
+    }
+
+}
+
+std::unique_ptr<matrix> compSH(int order, std::vector<double>& theta, std::vector<double>& phi)
+{
+    int numPts = theta.size();
+    int numCols = (order+1)*(order+2)/2;
+    std::unique_ptr<matrix> out = std::make_unique<matrix>(numPts, numCols);
+    out->fill(0,0,numPts, numCols, 0.0);
+
+    for(int k = 0; k <= order; k+=2)
+    {
+        for(int m = -k; m <= k; m++)
+        {
+            int j = (k*k + k + 2)/2 + m - 1;
+
+            int numType = COMPLEXTYPE;
+            double factor = 1;
+            if(m < 0)
+            {
+                numType = REALTYPE;
+                factor = sqrt(2);
+            }
+            else if(m > 0)
+            {
+                numType = IMAGTYPE;
+                factor = sqrt(2);
+            }
+
+            for(int index = 0; index < numPts; index++)
+            {
+                (*out)[index][j] = factor*harmonicY(k, m, theta[index], phi[index], numType);
+            }
+        }
+    }
+
+    return std::move(out);
+}
+
+double harmonicY(int degree, int order, double theta, double phi, int numType)
+{
+    // Will be true if order is both positive and odd
+    // In that case, we need to negate the answer to match the output
+    // in Adam's MATLAB code.
+    int negate = 1;
+    if(order % 2 == 1) negate = -1;
+    
+    order = abs(order);
+
+    double a = (2*degree+1)/(4*M_PI);
+    double b = fact(degree-order)/fact(degree+order);
+
+    double normalization = sqrt(a*b);
+
+    double e;
+    switch (numType)
+    {
+    case REALTYPE:
+        e = cos(order*phi);
+        break;
+    case IMAGTYPE:
+        e = sin(order*phi);
+        break;
+    case COMPLEXTYPE:
+        e = 1;
+        break;
+    
+    default:
+        break;
+    }
+
+    return normalization*__assoc_legendre_p(degree, order, cos(theta))*pow(-1, degree)*e*negate;
+}
+
+void reconstructODF(std::vector<double>& sphHarm, std::vector<double>& ODF, std::vector<double>& theta, std::vector<double>& phi)
+{
+    int order = (sqrt(8*sphHarm.size() + 1) - 3)/2;
+
+    ODF.resize(theta.size());  
+    auto T = compSH(order, theta, phi);
+    (*T).mult(sphHarm, ODF);
+
+    // Normalize ODF
+    double sum = 0;
+    for(int index = 0; index < ODF.size(); index++)
+    {
+        if(ODF[index] < 0)
+        {
+            ODF[index] = 0;
+        }
+        
+        sum += ODF[index];
+    }
+
+    for(int index = 0; index < ODF.size(); index++)
+    {
+        ODF[index] /= sum;
+    }
+}
+
+void altGradient(int order, std::vector<double>& ODF, std::vector<double>& gradient)
+{
+    auto& faces = sphere::GetFaces(FULL);
+
+    gradient.resize(ODF.size());
+    std::fill(gradient.begin(), gradient.end(), 0);
+
+    std::vector<int> count(ODF.size(), 0);
+
+    for(int index = 0; index < faces.size(); index++)
+    {
+        int n0 = faces[index][0];
+        int n1 = faces[index][1];
+        int n2 = faces[index][2];
+
+        double val0 = ODF[n0];
+        double val1 = ODF[n1];
+        double val2 = ODF[n2];
+
+        double diff0 = abs(val0 - val1);
+        double diff1 = abs(val0 - val2);
+        double diff2 = abs(val1 - val2);
+
+        gradient[n0] += diff0 + diff1;
+        gradient[n1] += diff0 + diff2;
+        gradient[n2] += diff1 + diff2;
+
+        count[n0]++;
+        count[n1]++;
+        count[n2]++;
+    }
+
+    for(int index = 0; index < gradient.size(); index++)
+    {
+        gradient[index] /= count[index];
+    }
+}
+
+#ifdef HAS_MMG
+void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
+{
+    auto& nodes = sphere::GetNodes(FULL);
+    auto& faces = sphere::GetFaces(FULL);
+
+	int NN = nodes.size();
+	int NF = faces.size();;
+    int NC;
+
+    // we only want to remesh half of the sphere, so here we discard 
+    // any nodes that have a z coordinate < 0, and any elements defined
+    // with those nodes.
+    unordered_map<int, int> newNodeIDs;
+    int newNodeID = 1;
+    for(int index = 0; index < NN; index++)
+    {
+        if(nodes[index].z >= 0)
+        {
+            newNodeIDs[index] = newNodeID;
+            newNodeID++;
+        }
+    }
+
+    unordered_map<int, int> newElemIDs;
+    int newElemID = 1;
+    for(int index = 0; index < NF; index++)
+    {
+        if(newNodeIDs.count(faces[index][0]) == 0 || newNodeIDs.count(faces[index][1]) == 0 || newNodeIDs.count(faces[index][2]) == 0)
+        {
+            continue;
+        }
+
+        newElemIDs[index] = newElemID;
+        newElemID++;
+    }
+
+	// build the MMG mesh
+	MMG5_pMesh mmgMesh;
+	MMG5_pSol  mmgSol;
+	mmgMesh = NULL;
+	mmgSol = NULL;
+	MMGS_Init_mesh(MMG5_ARG_start,
+		MMG5_ARG_ppMesh, &mmgMesh,
+		MMG5_ARG_ppMet, &mmgSol,
+		MMG5_ARG_end);
+
+	// allocate mesh size
+	if (MMGS_Set_meshSize(mmgMesh, newNodeID-1, newElemID-1, 0) != 1)
+	{
+		assert(false);
+	}
+
+	// build the MMG mesh
+	for (int i = 0; i < NN; ++i)
+	{
+        if(newNodeIDs.count(i))
+        {
+            MMGS_Set_vertex(mmgMesh, nodes[i].x, nodes[i].y, nodes[i].z, 0, newNodeIDs[i]);
+        }
+	}
+
+	for (int i = 0; i < NF; ++i)
+	{
+        if(newElemIDs.count(i))
+        {
+            MMGS_Set_triangle(mmgMesh, newNodeIDs[faces[i][0]], newNodeIDs[faces[i][1]], newNodeIDs[faces[i][2]], 0, newElemIDs[i]);
+        }
+	}
+	
+    // Now, we build the "solution", i.e. the target element size.
+	// If no elements are selected, we set a homogenous remeshing using the element size parameter.
+	// set the "solution", i.e. desired element size
+	if (MMGS_Set_solSize(mmgMesh, mmgSol, MMG5_Vertex, newNodeID-1, MMG5_Scalar) != 1)
+	{
+		assert(false);
+	}
+
+    int n0 = faces[0][0];
+    int n1 = faces[0][1];
+
+    vec3d pos0 = nodes[n0];
+    vec3d pos1 = nodes[n1];
+
+    double minLength = (pos0 - pos1).Length();
+    double maxLength = minLength*lengthScale;
+
+    double min = *std::min_element(gradient.begin(), gradient.end());
+    double max = *std::max_element(gradient.begin(), gradient.end());
+    double range = max-min;
+
+
+    for (int k = 0; k < NN; k++) {
+        if(newNodeIDs.count(k))
+        {
+            double val = (maxLength - minLength)*(1-(gradient[k] - min)/range) + minLength;
+            MMGS_Set_scalarSol(mmgSol, val, newNodeIDs[k]);
+        }
+    }
+
+	// set the control parameters
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hmin, minLength);
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hausd, hausd);
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hgrad, grad);
+
+    // prevent MMG from outputing information to stdout
+    MMGS_Set_iparameter(mmgMesh, mmgSol, MMGS_IPARAM_verbose, -1);
+
+	// run the mesher
+	int ier = MMGS_mmgslib(mmgMesh, mmgSol);
+
+	if (ier == MMG5_STRONGFAILURE)
+    {
+		assert(false);
+	}
+	else if (ier == MMG5_LOWFAILURE)
+	{
+		assert(false);
+	}
+
+	// get the new mesh sizes
+	MMGS_Get_meshSize(mmgMesh, &NN, &NF, &NC);
+
+    nodePos.resize(NN);
+
+	// get the vertex coordinates
+	for (int i = 0; i < NN; ++i)
+	{
+        double x,y,z;
+        int g;
+		int isCorner = 0;
+		MMGS_Get_vertex(mmgMesh, &x, &y, &z, &g, &isCorner, NULL);
+
+        nodePos[i] = vec3d(x,y,z);
+	}
+
+    elems.resize(NF);
+
+    // create elements
+	for (int i=0; i<NF; ++i)
+	{
+        int n0, n1, n2, id;
+
+        MMGS_Get_triangle(mmgMesh, &n0, &n1, &n2, &id, NULL);
+		n0--;
+		n1--;
+		n2--;
+
+        elems[i] = vec3i(n0, n1,n2);
+	}
+
+	// Clean up
+	MMGS_Free_all(MMG5_ARG_start,
+		MMG5_ARG_ppMesh, &mmgMesh, MMG5_ARG_ppMet, &mmgSol,
+		MMG5_ARG_end);
+}
+
+void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems)
+{
+	auto& nodes = sphere::GetNodes(FULL);
+    auto& faces = sphere::GetFaces(FULL);
+
+	int NN = nodes.size();
+	int NF = faces.size();
+    int NC;
+
+	// build the MMG mesh
+	MMG5_pMesh mmgMesh;
+	MMG5_pSol  mmgSol;
+	mmgMesh = NULL;
+	mmgSol = NULL;
+	MMGS_Init_mesh(MMG5_ARG_start,
+		MMG5_ARG_ppMesh, &mmgMesh,
+		MMG5_ARG_ppMet, &mmgSol,
+		MMG5_ARG_end);
+
+	// allocate mesh size
+	if (MMGS_Set_meshSize(mmgMesh, NN, NF, 0) != 1)
+	{
+		assert(false);
+	}
+
+	// build the MMG mesh
+	for (int i = 0; i < NN; ++i)
+	{
+        MMGS_Set_vertex(mmgMesh, nodes[i].x, nodes[i].y, nodes[i].z, 0, i+1);
+	}
+
+	for (int i = 0; i < NF; ++i)
+	{
+        MMGS_Set_triangle(mmgMesh, faces[i][0]+1, faces[i][1]+1, faces[i][2]+1, 0, i+1);
+	}
+	
+    // Now, we build the "solution", i.e. the target element size.
+	// If no elements are selected, we set a homogenous remeshing using the element size parameter.
+	// set the "solution", i.e. desired element size
+	if (MMGS_Set_solSize(mmgMesh, mmgSol, MMG5_Vertex, NN, MMG5_Scalar) != 1)
+	{
+		assert(false);
+	}
+
+    int n0 = faces[0][0];
+    int n1 = faces[0][1];
+
+    vec3d pos0 = nodes[n0];
+    vec3d pos1 = nodes[n1];
+
+    double minLength = (pos0 - pos1).Length();
+    double maxLength = minLength*lengthScale;
+
+    double min = *std::min_element(gradient.begin(), gradient.end());
+    double max = *std::max_element(gradient.begin(), gradient.end());
+    double range = max-min;
+
+
+    for (int k = 0; k < NN; k++)
+    {
+        double val = (maxLength - minLength)*(1-(gradient[k] - min)/range) + minLength;
+        MMGS_Set_scalarSol(mmgSol, val, k+1);
+    }
+
+	// set the control parameters
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hmin, minLength);
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hausd, hausd);
+	MMGS_Set_dparameter(mmgMesh, mmgSol, MMGS_DPARAM_hgrad, grad);
+
+    // prevent MMG from outputing information to stdout
+    MMGS_Set_iparameter(mmgMesh, mmgSol, MMGS_IPARAM_verbose, -1);
+
+	// run the mesher
+	int ier = MMGS_mmgslib(mmgMesh, mmgSol);
+
+	if (ier == MMG5_STRONGFAILURE) 
+    {
+        assert(false);
+	}
+	else if (ier == MMG5_LOWFAILURE)
+	{
+		assert(false);
+	}
+
+	// get the new mesh sizes
+	MMGS_Get_meshSize(mmgMesh, &NN, &NF, &NC);
+
+    nodePos.resize(NN);
+
+	// get the vertex coordinates
+	for (int i = 0; i < NN; ++i)
+	{
+        double x,y,z;
+        int g;
+		int isCorner = 0;
+		MMGS_Get_vertex(mmgMesh, &x, &y, &z, &g, &isCorner, NULL);
+
+        nodePos[i] = vec3d(x,y,z);
+	}
+
+    elems.resize(NF);
+
+    // create elements
+	for (int i=0; i<NF; ++i)
+	{
+        int n0, n1, n2, id;
+
+        MMGS_Get_triangle(mmgMesh, &n0, &n1, &n2, &id, NULL);
+		n0--;
+		n1--;
+		n2--;
+
+        elems[i] = vec3i(n0, n1,n2);
+	}
+
+	// Clean up
+	MMGS_Free_all(MMG5_ARG_start,
+		MMG5_ARG_ppMesh, &mmgMesh, MMG5_ARG_ppMet, &mmgSol,
+		MMG5_ARG_end);
+}
+#else
+void remesh(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems) {}
+void remeshFull(std::vector<double>& gradient, double lengthScale, double hausd, double grad, std::vector<vec3d>& nodePos, std::vector<vec3i>& elems) {}
+#endif
+
+// Taken from std::assoc_legendre definition in GCC
+template<typename _Tp>
+_Tp
+__poly_legendre_p(unsigned int __l, _Tp __x)
+{
+
+    if (isnan(__x))
+    return std::numeric_limits<_Tp>::quiet_NaN();
+    else if (__x == +_Tp(1))
+    return +_Tp(1);
+    else if (__x == -_Tp(1))
+    return (__l % 2 == 1 ? -_Tp(1) : +_Tp(1));
+    else
+    {
+        _Tp __p_lm2 = _Tp(1);
+        if (__l == 0)
+        return __p_lm2;
+
+        _Tp __p_lm1 = __x;
+        if (__l == 1)
+        return __p_lm1;
+
+        _Tp __p_l = 0;
+        for (unsigned int __ll = 2; __ll <= __l; ++__ll)
+        {
+            //  This arrangement is supposed to be better for roundoff
+            //  protection, Arfken, 2nd Ed, Eq 12.17a.
+            __p_l = _Tp(2) * __x * __p_lm1 - __p_lm2
+                - (__x * __p_lm1 - __p_lm2) / _Tp(__ll);
+            __p_lm2 = __p_lm1;
+            __p_lm1 = __p_l;
+        }
+
+        return __p_l;
+    }
+}
+
+template<typename _Tp>
+_Tp
+__assoc_legendre_p(unsigned int __l, unsigned int __m, _Tp __x,
+            _Tp __phase)
+{
+
+    if (__m > __l)
+    return _Tp(0);
+    else if (isnan(__x))
+    return std::numeric_limits<_Tp>::quiet_NaN();
+    else if (__m == 0)
+    return __poly_legendre_p(__l, __x);
+    else
+    {
+        _Tp __p_mm = _Tp(1);
+        if (__m > 0)
+        {
+            //  Two square roots seem more accurate more of the time
+            //  than just one.
+            _Tp __root = std::sqrt(_Tp(1) - __x) * std::sqrt(_Tp(1) + __x);
+            _Tp __fact = _Tp(1);
+            for (unsigned int __i = 1; __i <= __m; ++__i)
+            {
+                __p_mm *= __phase * __fact * __root;
+                __fact += _Tp(2);
+            }
+        }
+        if (__l == __m)
+        return __p_mm;
+
+        _Tp __p_mp1m = _Tp(2 * __m + 1) * __x * __p_mm;
+        if (__l == __m + 1)
+        return __p_mp1m;
+
+        _Tp __p_lm2m = __p_mm;
+        _Tp __P_lm1m = __p_mp1m;
+        _Tp __p_lm = _Tp(0);
+        for (unsigned int __j = __m + 2; __j <= __l; ++__j)
+        {
+            __p_lm = (_Tp(2 * __j - 1) * __x * __P_lm1m
+                    - _Tp(__j + __m - 1) * __p_lm2m) / _Tp(__j - __m);
+            __p_lm2m = __P_lm1m;
+            __P_lm1m = __p_lm;
+        }
+
+        return __p_lm;
+    }
+}

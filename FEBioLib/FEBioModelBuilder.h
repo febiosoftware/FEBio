@@ -25,10 +25,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FEBioXML/FEModelBuilder.h>
+#include "febiolib_api.h"
 
 class FEBioModel;
 
-class FEBioModelBuilder : public FEModelBuilder
+class FEBIOLIB_API FEBioModelBuilder : public FEModelBuilder
 {
 public:
 	FEBioModelBuilder(FEBioModel& fem);

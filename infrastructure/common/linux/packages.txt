@@ -22,6 +22,7 @@ libsqlite3-dev
 tcl-dev
 tk-dev
 libx11-dev
+libxcb-cursor0
 libxmu-dev
 libinsighttoolkit5-dev
 swig
@@ -30,3 +31,15 @@ jq
 yasm
 patchelf
 zip
+python3-pip
+libfftw3-dev
+libvulkan-dev
+vulkan-tools
+build-essential
+libssl-dev
+zlib1g-dev
+libbz2-dev
+libreadline-dev
+libffi-dev
+liblzma-dev
+uuid-dev

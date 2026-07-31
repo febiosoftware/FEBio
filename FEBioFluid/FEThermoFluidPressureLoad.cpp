@@ -57,8 +57,8 @@ FEThermoFluidPressureLoad::FEThermoFluidPressureLoad(FEModel* pfem) : FESurfaceC
     m_naugmin = 0;
     m_naugmax = 10;
     
-    m_dofEF = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0);
-    m_dofT = pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0);
+    m_dofEF = (pfem ? pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::FLUID_DILATATION), 0) : -1);
+    m_dofT  = (pfem ? pfem->GetDOFIndex(FEBioThermoFluid::GetVariableName(FEBioThermoFluid::TEMPERATURE), 0) : -1);
 }
 
 //-----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ bool FEThermoFluidPressureLoad::Init()
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_surf.Element(0);
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == nullptr) return false;
     
     // get the material

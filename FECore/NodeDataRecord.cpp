@@ -33,12 +33,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
-FELogNodeData::FELogNodeData(FEModel* fem) : FELogData(fem) {}
-
-//-----------------------------------------------------------------------------
-FELogNodeData::~FELogNodeData() {}
-
-//-----------------------------------------------------------------------------
 NodeDataRecord::NodeDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_NODE) {}
 
 //-----------------------------------------------------------------------------
@@ -80,7 +74,7 @@ void NodeDataRecord::SetData(const char* szexpr)
 double NodeDataRecord::Evaluate(int item, int ndata)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
-	int nnode = item - 1;
+	int nnode = mesh.FindNodeIndexFromID(item);
 	assert((nnode>=0)&&(nnode<mesh.Nodes()));
 	if ((nnode < 0) || (nnode >= mesh.Nodes())) return 0;
 

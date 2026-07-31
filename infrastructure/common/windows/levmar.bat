@@ -4,7 +4,8 @@ git clone https://github.com/jturney/levmar.git
 pushd levmar
 cmake . -LA -B cmbuild ^
   -DCMAKE_INSTALL_PREFIX=%INSTALLATION_PATH% ^
-  -DBUILD_DEMO:BOOLEAN=false
+  -DBUILD_DEMO:BOOLEAN=false ^
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 pushd cmbuild
 msbuild /P:Configuration=Release /m:%NUMBER_OF_PROCESSORS% INSTALL.vcxproj
 popd

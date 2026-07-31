@@ -34,7 +34,7 @@ SOFTWARE.*/
 #include <FECore/log.h>
 
 // define the material parameters
-BEGIN_FECORE_CLASS(FENewtonianThermoFluid, FEViscousFluid)
+BEGIN_FECORE_CLASS(FENewtonianThermoFluid, FEThermoViscousFluid)
     ADD_PARAMETER(m_kappa, FE_RANGE_GREATER_OR_EQUAL(0.0), "kappa")->setUnits(UNIT_VISCOSITY)->setLongName("bulk viscosity");
     ADD_PARAMETER(m_mu   , FE_RANGE_GREATER_OR_EQUAL(0.0), "mu"   )->setUnits(UNIT_VISCOSITY)->setLongName("shear viscosity");
 // properties
@@ -44,7 +44,7 @@ END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 //! Constructor.
-FENewtonianThermoFluid::FENewtonianThermoFluid(FEModel* pfem) : FEViscousFluid(pfem)
+FENewtonianThermoFluid::FENewtonianThermoFluid(FEModel* pfem) : FEThermoViscousFluid(pfem)
 {
     m_kappa = 0;
     m_mu = 0;

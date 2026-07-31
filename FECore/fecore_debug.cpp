@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <stdarg.h>
 #include "version.h"
 #include <assert.h>
+#include <iomanip>
 using namespace std;
 
 std::list<FECoreDebugger::Variable*>	FECoreDebugger::m_var;
@@ -147,7 +148,7 @@ template <> void fecore_print_T<matrix>(matrix* pd)
 	{
 		for (int j=0; j<nc; ++j)
 		{
-			cout << m(i,j) << " ";
+			cout << std::setw(8) << std::setprecision(4) << m(i,j);
 		}
 		cout << endl;
 	}

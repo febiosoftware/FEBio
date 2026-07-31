@@ -61,8 +61,11 @@ public:
 	//! Initialization
 	virtual bool Init();
 
-	//! validates all properties and parameters
+	//! validates all properties and parameters recursively
 	bool Validate() override;
+
+	//! validate parameters only
+	bool ValidateParameters();
 
 	//! call this after the parameters are changed
 	virtual bool UpdateParams();
@@ -84,6 +87,8 @@ public:
 
 	//! return a parameter
 	virtual FEParam* FindParameter(const ParamString& s) override;
+
+	virtual FEParamValue GetParameterValue(const ParamString& paramString);
 
 	//! return the property (or this) that owns a parameter
 	FECoreBase* FindParameterOwner(void* pd);
@@ -189,6 +194,14 @@ private:
 template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, T* pp, const char* sz)
 {
 	FEFixedPropertyT<T>* prop = new FEFixedPropertyT<T>(pp);
+	prop->SetDefaultType(sz);
+	pc->AddProperty(prop, sz, FEProperty::Fixed);
+	return prop;
+}
+
+template <class T>	FEProperty* AddClassProperty(FECoreBase* pc, std::vector<T>* pp, const char* sz)
+{
+	FEFixedVecPropertyT<T>* prop = new FEFixedVecPropertyT<T>(pp);
 	prop->SetDefaultType(sz);
 	pc->AddProperty(prop, sz, FEProperty::Fixed);
 	return prop;

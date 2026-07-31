@@ -1,0 +1,68 @@
+/**
+\page create_plugin_fbs3 Creating a plugin project with FEBio Studio 3
+
+As of version 3.0, FEBio Studio has a build-in tool for generating plugin templates. This tool is often a more convenient starting point than trying to set up the plugin in your build environment manually. For most plugin types, the tool will generate skeleton code that is ready to build. 
+
+\section prep Prerequisites
+Before you can use FEBio Studio to generate a plugin template, you must have the following installed. 
+
+\li FEBio Studio, version 3.0 or newer.
+\li A build environment, e.g. Visual Studio on Windows. 
+\li CMake, which is used to generate the project files for the build environment.
+
+With FEBioStudio3 installed, open the <b>Options</b> dialog box (menu Tools\Options) and select the <b>FEBio</b> item from the list. Set the locations for the FEBio SDK Include path, Library path, and set the default path where you would like FEBio Studio to place the plugin files. Make sure that this folder is writeable. (E.g. don't use the FEBioStudio installation folder.) You only have to set these fields once, the first time you create a plugin.
+
+\section wizard The FEBio Plugin Wizard
+Creating an FEBio plugin project is as simple as following the steps in the FEBio Plugin wizard. To start the wizard, select the menu <b>FEBio\Create FEBio Plugin...</b>. 
+
+\subsection wizard_page1 Page1 - Create FEBio Plugin
+The first page of the wizard allows you to choose a name for the plugin. Since this name will be used to generate the plugin files, make sure to use only characters that are valid in file names. In addition, you can also choose the location where FEBioStudio will generate the plugin files. Lastly, choose the FEBio module that you will expand. For instance, if you intend to add a new constitutive model for an elastic material, select the <i>solid</i> module. 
+
+\image html plugin_wizard_page1.png
+
+After filling out the information, click the <b>Next</b> button to proceed to the next page.
+
+\subsection wizard_page2 Page2 - Configure Plugin
+On the second page, you can select the plugin type (e.g. Elastic Material, if you intend to implement a new constitutive model) and enter the name of the class. Make sure to use a valid C++ class name. Optionally, you can enter the type string of the plugin class. This is the string value that will be used when registering the plugin and the string that users will use as the value for the type attribute in the FEBio input file. By default, the name of the plugin class will be used. 
+
+\image html plugin_wizard_page2.png
+
+Once this page is completed, click <b>Next</b> to continue.
+
+\subsection wizard_page3 Page 3 - Plugin Properties
+This page will list properties you can set to further configure the particular plugin you want to create. The properties that are listed will depend on the type of plugin you selected. For example, if you selected the "Elastic Material" plugin, the properties will allow you to choose the base class for the material class. 
+
+\image html plugin_wizard_page3.png
+
+Once the properties are set, click <b>Finish</b> to exit the wizard. 
+
+\subsection wizard_finish Finishing the Wizard
+At this point, the wizard will generate all the necessary files for building the plugin. A dialog box will inform you whether FEBio Studio was able to generate the plugin files or not. If the wizard was successful, the following files should have been generated.
+
+\li <b>CMakeLists.txt</b> This is the CMake file that will generate the project files for your build environment. 
+\li <b>main.cpp</b> This is the file that contains the required functions that FEBio needs to integrate your plugin. 
+\li <b>MyPluginName.h</b> The header file containing the class declaration. (The actual name will use the class name you entered in the wizard.)
+\li <b>MyPluginName.cpp</b> The code file containing the class definition. (The actual name will use the class name you entered in the wizard.)
+
+\section build_plugin Building the plugin
+The wizard will generate a template code that is ready to build. Of course, the plugin may not actually do anything yet, but at this point, you can verify that the plugin builds correctly with your build environment and can be loaded in FEBio Studio.
+
+The first step will be to build the project files for your build environment. This essentially means that you have to run CMake on the CMakeLists.txt that the wizard generated. If you are familiar with CMake, you can do this outside FEBioStudio, however, you can also do this from FEBio Studio. In fact, you can build the plugin directly from FEBio Studio. 
+
+If you show the Project panel, you'll notice that your plugin files are listed there under a new item that is named after your plugin. Double-clicking a file will open it up in an editor in FEBio Studio.
+
+\image html plugin_project.png
+
+To build the plugin, right-click the top-level item with the plugin's name and select the <i>Build</i> option. When doing this, FEBio Studio will now first call CMake to generate the project files, and then call CMake again to build the plugin with your native build environment. You can monitor the progress on the Output panel. (Make sure "Build" is selected in the <i>show output from</i> dropdown list.)
+
+\section plugin_load Loading the Plugin
+
+If the build was successful, you can now load the plugin into FEBio Studio. To load the plugin, right-click the item with the plugin's name in the Project panel and select the <i>Load</i> menu option. A dialog box will inform you whether the plugin was loaded successfully or not. 
+
+\section wrap_up Limitations
+Although FEBioStudio has now the ability to generate plugin files, edit the files, and build the plugin, it is still highly recommended to familiarize yourself with your build environment since some tasks can only be done there.
+
+One important thing to keep in mind is that FEBio Studio will only build the <b>Release</b> configuration of the plugin, since only the Release build can be loaded into FEBio Studio. For the purpose of testing your plugin code, it is more convenient to build the <b>Debug</b> configuration. However, this can only be done from your build environment. To build your Debug configuration, you can still use the wizard to generate the plugin files and build the Release configuration, as this will generate all the project files for your build environment. However, after that, you'll have to open the IDE (or manually change the project files) to build and test the Debug configuration of your plugin.
+
+You can check out some of the other links in the \ref building_a_plugin section to learn more about how to use different build environments to build FEBio plugins.
+*/

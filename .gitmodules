@@ -1,3 +1,3 @@
-[submodule "ci-common"]
+[submodule "ci/common"]
 	path = ci/common
-	url = git@github.com:febiosoftware/ci-common.git
+	url = https://github.com/febiosoftware/ci-common

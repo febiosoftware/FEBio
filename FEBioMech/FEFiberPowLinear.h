@@ -56,6 +56,7 @@ public:
     FEParamDouble   m_lam0;     // stretch ratio at end of toe region
     FEParamDouble   m_beta;     // power law exponent in toe region
 	double	m_epsf;
+	bool	m_tension_only;
 };
 
 class FEElasticFiberPowLinear : public FEElasticFiberMaterial_T<FEFiberPowLinear>

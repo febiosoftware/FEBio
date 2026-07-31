@@ -990,7 +990,6 @@ void FEBiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         
         //calculate gradJ gradphif
         bt.m_gradJ = Fi.transpose()*(GradJ*alphaf + GradJp*(1-alphaf));
-        ept.m_gradJ = bt.m_gradJ;
         
         // FSI material point data
         ft.m_w = el.Evaluate(w, n);

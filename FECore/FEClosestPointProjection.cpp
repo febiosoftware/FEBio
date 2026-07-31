@@ -136,21 +136,24 @@ FESurfaceElement* projectToPatch(FEPatch& patch, const vec3d& x, vec3d& q, doubl
 	{
 		// get the element
 		FESurfaceElement& el = *patch.Element(j);
-		int N = el.Nodes();
-
-		// project the node on the element
-		double p[2] = { 0, 0 };
-		vec3d qj = surf->ProjectToSurface(el, x, p[0], p[1]);
-		double d2 = (qj - x).norm2();
-		if (surf->IsInsideElement(el, p[0], p[1], tol))
+		if (el.isActive())
 		{
-			if ((pemin == nullptr) || (d2 < d2min))
+			int N = el.Nodes();
+
+			// project the node on the element
+			double p[2] = { 0, 0 };
+			vec3d qj = surf->ProjectToSurface(el, x, p[0], p[1]);
+			double d2 = (qj - x).norm2();
+			if (surf->IsInsideElement(el, p[0], p[1], tol))
 			{
-				d2min = d2;
-				q = qj;
-				r = p[0];
-				s = p[1];
-				pemin = &el;
+				if ((pemin == nullptr) || (d2 < d2min))
+				{
+					d2min = d2;
+					q = qj;
+					r = p[0];
+					s = p[1];
+					pemin = &el;
+				}
 			}
 		}
 	}

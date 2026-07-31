@@ -102,6 +102,13 @@ bool FEPlotParameter::SetFilter(const char* sz)
 		}
 
 		SetVarType(PLT_FLOAT);
+
+		FEMappedValue* mapval = dynamic_cast<FEMappedValue*>(p.valuator());
+		if (mapval)
+		{
+			FEDomainMap* map = dynamic_cast<FEDomainMap*>(mapval->dataMap()); assert(map);
+			if (map->StorageFormat() == FMT_ITEM) SetStorageFormat(FMT_ITEM);
+		}
 	}
 	break;
 	case FE_PARAM_VEC3D_MAPPED:
@@ -284,8 +291,6 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 		}
 		else if (m_dom->IsMember(&dom) == false) return false;
 
-		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
-
 		if (m_param.type() == FE_PARAM_DOUBLE_MAPPED)
 		{
 			FEParamDouble& mapDouble = dynamic_cast<FEParamDouble&>(map);
@@ -303,10 +308,15 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 						FEElement& e = dom.ElementRef(i);
 						int ne = e.Nodes();
 
-						vector<double> sn(ne);
-						for (int j = 0; j < ne; ++j)
+						const FEElementSet* elset = map->GetElementSet();
+						int n = elset->GetLocalIndex(e);
+						vector<double> sn(ne, 0.0);
+						if (n >= 0)
 						{
-							sn[j] = map->value<double>(i, j);
+							for (int j = 0; j < ne; ++j)
+							{
+								sn[j] = map->value<double>(n, j);
+							}
 						}
 
 						// push data to archive
@@ -315,24 +325,42 @@ bool FEPlotParameter::Save(FEDomain& dom, FEDataStream& a)
 
 					return true;
 				}
+				else if (map->StorageFormat() == FMT_ITEM)
+				{
+					assert(StorageFormat() == FMT_ITEM);
+					// loop over all elements
+					int NE = dom.Elements();
+					const FEElementSet* elset = map->GetElementSet();
+					for (int i = 0; i < NE; ++i)
+					{
+						FEElement& el = dom.ElementRef(i);
+						int n = elset->GetLocalIndex(el);
+						if (n < 0) a << 0.0;
+						else
+							a << map->get<double>(n);
+					}
+
+					return true;
+				}
+
 			}
 
-			writeNodalProjectedElementValues<double>(sd, a, mapDouble);
+			writeNodalProjectedElementValues(dom, a, mapDouble);
 		}
 		else if (m_param.type() == FE_PARAM_VEC3D_MAPPED)
 		{
 			FEParamVec3& mapVec3 = dynamic_cast<FEParamVec3&>(map);
-			writeNodalProjectedElementValues<vec3d>(sd, a, mapVec3);
+			writeNodalProjectedElementValues<vec3d>(dom, a, mapVec3);
 		}
 		else if (m_param.type() == FE_PARAM_MAT3D_MAPPED)
 		{
 			FEParamMat3d& mapMat3 = dynamic_cast<FEParamMat3d&>(map);
-			writeElementValue<mat3d>(sd, a, mapMat3);
+			writeElementValue<mat3d>(dom, a, mapMat3);
 		}
 		else if (m_param.type() == FE_PARAM_MAT3DS_MAPPED)
 		{
 			FEParamMat3ds& mapMat3 = dynamic_cast<FEParamMat3ds&>(map);
-			writeElementValue<mat3ds>(sd, a, mapMat3);
+			writeElementValue<mat3ds>(dom, a, mapMat3);
 		}
 		else return false;
 
@@ -723,7 +751,7 @@ bool FEPlotFieldVariable::SetFilter(const char* sz)
 	case VAR_ARRAY :
 	{
 		SetVarType(Var_Type::PLT_ARRAY);
-		SetArraySize(m_dofs.size());
+		SetArraySize((int)m_dofs.size());
 		vector<string> dofNames;
 		for (int i = 0; i < m_dofs.size(); ++i) dofNames.push_back(dofs.GetDOFName(nvar, i));
 		SetArrayNames(dofNames);

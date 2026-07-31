@@ -34,6 +34,18 @@ SOFTWARE.*/
 void FEBiphasicContactPoint::Serialize(DumpStream& ar)
 {
     FEContactMaterialPoint::Serialize(ar);
+    ar & m_dg;
+    ar & m_Lmd;
+    ar & m_Lmt;
+    ar & m_epsn;
+    ar & m_epsp;
+    ar & m_p1;
+    ar & m_nu;
+    ar & m_s1;
+    ar & m_tr;
+    ar & m_rs;
+    ar & m_rsp;
+    ar & m_bstick;
     ar & m_Lmp & m_pg & m_mueff & m_fls;
 }
 
@@ -147,7 +159,7 @@ void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 void FEBiphasicContactSurface::GetGPLocalFLS(int nface, double* pt, double pamb)
 {
     FESurfaceElement& el = Element(nface);
-    FEElement* e = el.m_elem[0];
+    FEElement* e = el.m_elem[0].pe;
     FESolidElement* se = dynamic_cast<FESolidElement*>(e);
     if (se) {
         mat3ds s; s.zero();

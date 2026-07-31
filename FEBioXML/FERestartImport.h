@@ -28,7 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FileImport.h"
-#include <XML/XMLReader.h>
+#include <FECore/XMLReader.h>
 
 //-----------------------------------------------------------------------------
 class FERestartControlSection : public FEFileSection

@@ -35,6 +35,7 @@ SOFTWARE.*/
 #include "mat3d.h"
 #include "quatd.h"
 #include "tens3d.h"
+#include "tens4d.h"
 #include "fecore_api.h"
 #include "FECoreKernel.h"
 #include "matrix.h"
@@ -62,7 +63,10 @@ enum TypeID
 	TYPE_QUATD,
 	TYPE_TENS3DS,
 	TYPE_TENS3DRS,
-	TYPE_MATRIX
+	TYPE_MATRIX,
+    TYPE_TENS4D,
+    TYPE_TENS4DS,
+    TYPE_TENS4DMM
 };
 
 typedef unsigned char uchar;
@@ -97,6 +101,9 @@ public:
                     case TypeID::TYPE_TENS3DS: delete (tens3ds*) m_pd; break;
                     case TypeID::TYPE_TENS3DRS: delete (tens3drs*) m_pd; break;
                     case TypeID::TYPE_MATRIX: delete (matrix*) m_pd; break;
+                    case TypeID::TYPE_TENS4D: delete (tens4d*) m_pd; break;
+                    case TypeID::TYPE_TENS4DS: delete (tens4ds*) m_pd; break;
+                    case TypeID::TYPE_TENS4DMM: delete (tens4dmm*) m_pd; break;
                     default: break;
                 }
             }
@@ -258,6 +265,9 @@ template <> class typeInfo<quatd>        { public: static uchar typeId() { retur
 template <> class typeInfo<tens3ds>      { public: static uchar typeId() { return (uchar)TypeID::TYPE_TENS3DS; }};
 template <> class typeInfo<tens3drs>     { public: static uchar typeId() { return (uchar)TypeID::TYPE_TENS3DRS;}};
 template <> class typeInfo<matrix>       { public: static uchar typeId() { return (uchar)TypeID::TYPE_MATRIX;  }};
+template <> class typeInfo<tens4d>       { public: static uchar typeId() { return (uchar)TypeID::TYPE_TENS4D;  }};
+template <> class typeInfo<tens4ds>      { public: static uchar typeId() { return (uchar)TypeID::TYPE_TENS4DS; }};
+template <> class typeInfo<tens4dmm>     { public: static uchar typeId() { return (uchar)TypeID::TYPE_TENS4DMM;}};
 
 template <typename T> DumpStream& DumpStream::write_raw(const T& o)
 {
@@ -293,6 +303,9 @@ template <> inline DumpStream& DumpStream::operator << (mat3da&   o) { return wr
 template <> inline DumpStream& DumpStream::operator << (tens3ds&  o) { return write_raw(o); }
 template <> inline DumpStream& DumpStream::operator << (tens3drs& o) { return write_raw(o); }
 template <> inline DumpStream& DumpStream::operator << (matrix&   o) { return write_matrix(o); }
+template <> inline DumpStream& DumpStream::operator << (tens4d&   o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (tens4ds&  o) { return write_raw(o); }
+template <> inline DumpStream& DumpStream::operator << (tens4dmm& o) { return write_raw(o); }
 
 template <> inline DumpStream& DumpStream::operator >> (int&          o) { return read_raw(o); }
 template <> inline DumpStream& DumpStream::operator >> (unsigned int& o) { return read_raw(o); }
@@ -308,6 +321,9 @@ template <> inline DumpStream& DumpStream::operator >> (mat3da&   o) { return re
 template <> inline DumpStream& DumpStream::operator >> (tens3ds&  o) { return read_raw(o); }
 template <> inline DumpStream& DumpStream::operator >> (tens3drs& o) { return read_raw(o); }
 template <> inline DumpStream& DumpStream::operator >> (matrix&   o) { return read_matrix(o); }
+template <> inline DumpStream& DumpStream::operator >> (tens4d&   o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (tens4ds&  o) { return read_raw(o); }
+template <> inline DumpStream& DumpStream::operator >> (tens4dmm& o) { return read_raw(o); }
 
 template <typename T> inline DumpStream& DumpStream::operator << (T& o)
 {

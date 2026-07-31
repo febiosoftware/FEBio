@@ -36,10 +36,19 @@ SOFTWARE.*/
 #include <FECore/FELinearSystem.h>
 #include "FEBioMix.h"
 
+BEGIN_FECORE_CLASS(FEBiphasicSolidDomain, FESolidDomain)
+    ADD_PARAMETER(m_secant_stress, "secant_stress");
+    ADD_PARAMETER(m_secant_tangent, "secant_tangent");
+    ADD_PARAMETER(m_secant_perm_tangent, "secant_permeability_tangent");
+END_FECORE_CLASS();
+
 //-----------------------------------------------------------------------------
 FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem), FEBiphasicDomain(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofR(pfem), m_dof(pfem)
 {
 	EXPORT_DATA(PLT_FLOAT, FMT_NODE, &m_nodePressure, "NPR fluid pressure");
+    m_secant_stress = false;
+    m_secant_tangent = false;
+    m_secant_perm_tangent = false;
 
 	if (pfem)
 	{
@@ -641,15 +650,15 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
         mat3ds s = ept.m_s;
         
         // get elasticity tensor
-        tens4ds c = m_pMat->Tangent(mp);
-        
+        tens4dmm c = (m_secant_tangent) ? m_pMat->SecantTangent(mp) : m_pMat->Tangent(mp);
+
         // get the fluid flux and pressure gradient
         vec3d gradp = pt.m_gradp + (pt.m_gradp - pt.m_gradpp)*(tau/dt);
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->Permeability(mp);
-        tens4dmm dKdE = m_pMat->Tangent_Permeability_Strain(mp);
-        
+        tens4dmm dKdE = (m_secant_perm_tangent) ? m_pMat->SecantTangent_Permeability_Strain(mp) : m_pMat->Tangent_Permeability_Strain(mp);
+
         // evaluate the solvent supply and its derivatives
         double phiwhat = 0;
         mat3ds Phie; Phie.zero();
@@ -796,15 +805,15 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
         mat3ds s = ept.m_s;
         
         // get elasticity tensor
-        tens4ds c = m_pMat->Tangent(mp);
-        
+        tens4dmm c = (m_secant_tangent) ? m_pMat->SecantTangent(mp) : m_pMat->Tangent(mp);
+
         // get the fluid flux and pressure gradient
         vec3d gradp = pt.m_gradp;
         
         // evaluate the permeability and its derivatives
         mat3ds K = m_pMat->Permeability(mp);
-        tens4dmm dKdE = m_pMat->Tangent_Permeability_Strain(mp);
-        
+        tens4dmm dKdE = (m_secant_perm_tangent) ? m_pMat->SecantTangent_Permeability_Strain(mp) : m_pMat->Tangent_Permeability_Strain(mp);
+
         // evaluate the solvent supply and its derivatives
         double phiwhat = 0;
         mat3ds Phie; Phie.zero();
@@ -981,10 +990,10 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
         m_pMat->UpdateSpecializedMaterialPoints(mp, GetFEModel()->GetTime());
         
         // calculate the solid stress at this material point
-        ppt.m_ss = m_pMat->GetElasticMaterial()->Stress(mp);
-        
+        ppt.m_ss = (m_secant_stress) ? m_pMat->GetElasticMaterial()->SecantStress(mp) : m_pMat->GetElasticMaterial()->Stress(mp);
+
 		// calculate the stress at this material point
-		pt.m_s = m_pMat->Stress(mp);
+		pt.m_s = (m_secant_stress) ? m_pMat->SecantStress(mp) : m_pMat->Stress(mp);
 	}
 }
 

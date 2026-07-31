@@ -79,6 +79,8 @@ public:
 	// create from a surface
 	void Create(const FESurface& surf);
 
+	void Clear();
+
 	// return the size of the facet ste
 	int Faces() const;
 

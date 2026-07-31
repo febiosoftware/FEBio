@@ -42,7 +42,7 @@ class FEOptimizeMethod;
 class FEInputParameter
 {
 public:
-	FEInputParameter(FEModel* fem) : m_fem(fem) { m_min = -1e99; m_max = 1e99; m_scale = 1.0; }
+	FEInputParameter() { m_min = -1e99; m_max = 1e99; m_scale = 1.0; m_initVal = 0.0; }
 	virtual ~FEInputParameter() {}
 
 	// implement this to initialize the input parameter
@@ -73,15 +73,11 @@ public:
 	//! get the name
 	string GetName() { return m_name; }
 
-	//! Get the FEModel
-	FEModel* GetFEModel() { return m_fem; }
-
 private:
 	string		m_name;			//!< name of input parameter
 	double		m_initVal;		//!< initial value
 	double		m_min, m_max;	//!< min, max values for parameter
 	double		m_scale;		//!< scale factor
-	FEModel*	m_fem;			//!< pointer to model data
 };
 
 //-----------------------------------------------------------------------------
@@ -94,6 +90,8 @@ public:
 	//! Initialize
 	bool Init();
 
+	FEModel* GetFEModel() { return m_fem; }
+
 public:
 	//! return the current value of the input parameter
 	double GetValue();
@@ -103,9 +101,9 @@ public:
 	bool SetValue(double newValue);
 
 private:
-	string	m_name;		//!< variable name
 	double*	m_pd;		//!< pointer to variable data
 	double	m_val;		//!< value
+	FEModel* m_fem;		//!< pointer to model data
 };
 
 //=============================================================================
@@ -176,7 +174,18 @@ public:
 
 	FECoreTask* m_pTask;	// the task that will solve the FE model
 
+	bool m_createReport = false;	// flag to create a report at the end of the optimization run
+
+	bool m_status = false;
+	std::string m_filename;	// the name of the control file
+
+	std::vector<double> amin;	// the optimal parameter values
+	std::vector<double> ymin;	// the final measurement values
+	double minObj;				// the optimal objective value
+	double minR2;				// the optimal regression coefficient
+
 protected:
+
 	FEModel*	m_fem;
 
 	FEObjectiveFunction*	m_obj;		//!< the objective function

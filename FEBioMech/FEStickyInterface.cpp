@@ -35,6 +35,7 @@ SOFTWARE.*/
 FEStickySurface::Data::Data() 
 { 
 	gap = vec3d(0.0, 0.0, 0.0); 
+	scalar_gap = 0;
 	pme = nullptr; 
 }
 
@@ -58,6 +59,8 @@ BEGIN_FECORE_CLASS(FEStickyInterface, FEContactInterface)
 	ADD_PARAMETER(m_stol   , "search_tolerance");
 	ADD_PARAMETER(m_tmax   , "max_traction"    );
 	ADD_PARAMETER(m_snap   , "snap_tol"        );
+	ADD_PARAMETER(m_flip_secondary, "flip_secondary");
+	ADD_PARAMETER(m_gap_offset, "gap_offset");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -142,6 +145,8 @@ FEStickyInterface::FEStickyInterface(FEModel* pfem) : FEContactInterface(pfem), 
 	m_naugmax = 10;
 	m_tmax = 0.0;
 	m_snap = 0.0;
+	m_flip_secondary = false;
+	m_gap_offset = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -235,10 +240,8 @@ void FEStickyInterface::Update()
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();
 
-	// flag used for contact searching algorithm
-	bool binit = true;
-
 	// loop over all primary nodes
+#pragma omp parallel for shared(cpp, mesh) schedule(dynamic, 5)
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
 		FEStickySurface::Data& sni = ss.m_data[i];
@@ -247,6 +250,11 @@ void FEStickyInterface::Update()
 		{
 			// get the current primary nodal position
 			vec3d rt = ss.Node(i).m_rt;
+			if (m_gap_offset != 0)
+			{
+				vec3d n = ss.NodeNormal(i);
+				rt += n * m_gap_offset;
+			}
 
 			// get the natural coordinates of the primary projection
 			// onto the secondary element
@@ -272,6 +280,8 @@ void FEStickyInterface::Update()
 
 				// calculate the secondary normal
 				vec3d nu = ms.SurfaceNormal(*sni.pme, sni.rs[0], sni.rs[1]);
+				if (m_flip_secondary) nu = -nu;
+
 				double t = nu*tc;
 				if (t > m_tmax)
 				{
@@ -283,11 +293,16 @@ void FEStickyInterface::Update()
 				}
 			}
 		}
-		else
+		else if (m_eps != 0)
 		{
 			// get the nodal position of this primary node
 			FENode& node = ss.Node(i);
 			vec3d x = node.m_rt;
+			if (m_gap_offset != 0)
+			{
+				vec3d n = ss.NodeNormal(i);
+				x += n * m_gap_offset;
+			}
 
 			// find the secondary element
 			vec3d q; vec2d rs;
@@ -296,6 +311,7 @@ void FEStickyInterface::Update()
 			{
 				// calculate the secondary normal
 				vec3d nu = ms.SurfaceNormal(*pme, rs[0], rs[1]);
+				if (m_flip_secondary) nu = -nu;
 
 				// calculate gap
 				double d = nu*(q - x);
@@ -305,6 +321,7 @@ void FEStickyInterface::Update()
 				{
 					// calculate signed distance
 					sni.gap = x - q;
+					sni.scalar_gap = d;
 
 					// store the secondary element
 					sni.pme = pme;
@@ -321,6 +338,8 @@ void FEStickyInterface::Update()
 
 void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms, bool bmove)
 {
+	if (m_eps == 0) return;
+
 	// closest point projection method
 	FEClosestPointProjection cpp(ms);
 	cpp.HandleSpecialCases(true);
@@ -328,6 +347,7 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 	cpp.Init();
 
 	// loop over all primary nodes
+#pragma omp parallel for shared(cpp) schedule(dynamic, 5)
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
 		// get the next node
@@ -339,6 +359,11 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 
 		// get the nodal position of this primary node
 		vec3d x = node.m_rt;
+		if (m_gap_offset != 0)
+		{
+			vec3d n = ss.NodeNormal(i);
+			x += n* m_gap_offset;
+		}
 
 		// find the secondary element
 		vec3d q; vec2d rs;
@@ -347,6 +372,7 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 		{
 			// calculate the secondary normal
 			vec3d nu = ms.SurfaceNormal(*pme, rs[0], rs[1]);
+			if (m_flip_secondary) nu = -nu;
 
 			// calculate gap
 			double d = nu*(q - x);
@@ -379,112 +405,118 @@ void FEStickyInterface::ProjectSurface(FEStickySurface& ss, FEStickySurface& ms,
 
 void FEStickyInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	// shape function values
-	double N[FEElement::MAX_NODES];
-
-	// element contact force vector
-	vector<double> fe;
-
-	// the lm array for this force vector
-	vector<int> lm;
-
-	// the en array
-	vector<int> en;
-
-	vector<int> sLM;
-	vector<int> mLM;
-
-	// loop over all primary facets
-	const int NE = ss.Elements();
-	for (int j=0; j<NE; ++j)
+#pragma omp parallel shared(R, tp)
 	{
-		// get the primary element
-		FESurfaceElement& sel = ss.Element(j);
+		// shape function values
+		double N[FEElement::MAX_NODES];
 
-		// get the element's LM vector
-		ss.UnpackLM(sel, sLM);
+		// element contact force vector
+		vector<double> fe;
 
-		int nseln = sel.Nodes();
+		// the lm array for this force vector
+		vector<int> lm;
 
-		double* w = sel.GaussWeights();
+		// the en array
+		vector<int> en;
 
-		// loop over primary element nodes (which are the integration points as well)
-		for (int n=0; n<nseln; ++n)
+		vector<int> sLM;
+		vector<int> mLM;
+
+		// loop over all primary facets
+		const int NE = ss.Elements();
+#pragma omp for
+		for (int j = 0; j < NE; ++j)
 		{
-			int m = sel.m_lnode[n];
+			// get the primary element
+			FESurfaceElement& sel = ss.Element(j);
 
-			FEStickySurface::Data& sm = ss.m_data[m];
+			// get the element's LM vector
+			ss.UnpackLM(sel, sLM);
 
-			// see if this node's constraint is active
-			// that is, if it has a secondary element associated with it
-			// TODO: is this a good way to test for an active constraint
-			// The rigid wall criteria seems to work much better.
-			if (sm.pme != 0)
+			int nseln = sel.Nodes();
+
+			double* w = sel.GaussWeights();
+
+			// loop over primary element nodes (which are the integration points as well)
+			for (int n = 0; n < nseln; ++n)
 			{
-				// calculate jacobian
-				double detJ = ss.jac0(sel, n);
+				int m = sel.m_lnode[n];
 
-				// get primary node contact force
-				vec3d tc = sm.Lm + sm.gap*m_eps;
+				FEStickySurface::Data& sm = ss.m_data[m];
 
-				// cap it
-				if (m_tmax > 0.0)
+				// see if this node's constraint is active
+				// that is, if it has a secondary element associated with it
+				// TODO: is this a good way to test for an active constraint
+				// The rigid wall criteria seems to work much better.
+				if (sm.pme != 0)
 				{
-					// calculate the secondary normal
-					vec3d nu = ms.SurfaceNormal(*sm.pme, sm.rs[0], sm.rs[1]);
-					double t = nu*tc;
-					if (t > m_tmax) tc = vec3d(0,0,0);
+					// calculate jacobian
+					double detJ = ss.jac0(sel, n);
+
+					// get primary node contact force
+					vec3d tc = sm.Lm + sm.gap * m_eps;
+
+					// cap it
+					if (m_tmax > 0.0)
+					{
+						// calculate the secondary normal
+						vec3d nu = ms.SurfaceNormal(*sm.pme, sm.rs[0], sm.rs[1]);
+						if (m_flip_secondary) nu = -nu;
+
+						double t = nu * tc;
+						if (t > m_tmax) tc = vec3d(0, 0, 0);
+					}
+
+					// store traction
+					sm.tn = tc;
+
+					// get the secondary element
+					FESurfaceElement& mel = *sm.pme;
+					ms.UnpackLM(mel, mLM);
+
+					int nmeln = mel.Nodes();
+
+					// isoparametric coordinates of the projected primary node
+					// onto the secondary element
+					double r = sm.rs[0];
+					double s = sm.rs[1];
+
+					// get the secondary shape function values at this primary node
+					mel.shape_fnc(N, r, s);
+
+					// calculate force vector
+					fe.resize(3 * (nmeln + 1));
+					fe[0] = -detJ * w[n] * tc.x;
+					fe[1] = -detJ * w[n] * tc.y;
+					fe[2] = -detJ * w[n] * tc.z;
+					for (int l = 0; l < nmeln; ++l)
+					{
+						fe[3 * (l + 1)] = detJ * w[n] * tc.x * N[l];
+						fe[3 * (l + 1) + 1] = detJ * w[n] * tc.y * N[l];
+						fe[3 * (l + 1) + 2] = detJ * w[n] * tc.z * N[l];
+					}
+
+					// fill the lm array
+					lm.resize(3 * (nmeln + 1));
+					lm[0] = sLM[n * 3];
+					lm[1] = sLM[n * 3 + 1];
+					lm[2] = sLM[n * 3 + 2];
+
+					for (int l = 0; l < nmeln; ++l)
+					{
+						lm[3 * (l + 1)] = mLM[l * 3];
+						lm[3 * (l + 1) + 1] = mLM[l * 3 + 1];
+						lm[3 * (l + 1) + 2] = mLM[l * 3 + 2];
+					}
+
+					// fill the en array
+					en.resize(nmeln + 1);
+					en[0] = sel.m_node[n];
+					for (int l = 0; l < nmeln; ++l) en[l + 1] = mel.m_node[l];
+
+					// assemble into global force vector
+					R.Assemble(en, lm, fe);
 				}
-
-				// store traction
-				sm.tn = tc;
-
-				// get the secondary element
-				FESurfaceElement& mel = *sm.pme;
-				ms.UnpackLM(mel, mLM);
-
-				int nmeln = mel.Nodes();
-
-				// isoparametric coordinates of the projected primary node
-				// onto the secondary element
-				double r = sm.rs[0];
-				double s = sm.rs[1];
-
-				// get the secondary shape function values at this primary node
-				mel.shape_fnc(N, r, s);
-
-				// calculate force vector
-				fe.resize(3*(nmeln+1));
-				fe[0] = -detJ*w[n]*tc.x;
-				fe[1] = -detJ*w[n]*tc.y;
-				fe[2] = -detJ*w[n]*tc.z;
-				for (int l=0; l<nmeln; ++l)
-				{	
-					fe[3*(l+1)  ] = detJ*w[n]*tc.x*N[l];
-					fe[3*(l+1)+1] = detJ*w[n]*tc.y*N[l];
-					fe[3*(l+1)+2] = detJ*w[n]*tc.z*N[l];
-				}
-	
-				// fill the lm array
-				lm.resize(3*(nmeln+1));
-				lm[0] = sLM[n*3  ];
-				lm[1] = sLM[n*3+1];
-				lm[2] = sLM[n*3+2];
-
-				for (int l=0; l<nmeln; ++l)
-				{
-					lm[3*(l+1)  ] = mLM[l*3  ];
-					lm[3*(l+1)+1] = mLM[l*3+1];
-					lm[3*(l+1)+2] = mLM[l*3+2];
-				}
-
-				// fill the en array
-				en.resize(nmeln+1);
-				en[0] = sel.m_node[n];
-				for (int l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
-
-				// assemble into global force vector
-				R.Assemble(en, lm, fe);
 			}
 		}
 	}

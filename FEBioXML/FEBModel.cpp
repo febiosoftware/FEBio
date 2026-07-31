@@ -515,7 +515,16 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		// copy indices
 		vector<int> nodeList = set->NodeList();
 		int nn = (int)nodeList.size();
-		for (int j=0; j<nn; ++j) nodeList[j] = NLT[nodeList[j] - noff];
+		for (int j = 0; j < nn; ++j)
+		{
+			int nj = nodeList[j] - noff;
+			if (nj < 0 || nj >= NLT.size() || NLT[nj] < 0)
+			{
+				feLogErrorEx(&fem, "Invalid node index %d in node set %s", nodeList[j], set->Name().c_str());
+				return false;
+			}
+			nodeList[j] = NLT[nj];
+		}
 		feset->Add(nodeList);
 
 		// add it to the mesh
@@ -543,7 +552,16 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 
 			seg.ntype = edge.ntype;
 			int nn = edge.ntype;	// we assume that the type also identifies the number of nodes
-			for (int n = 0; n < nn; ++n) seg.node[n] = NLT[edge.node[n] - noff];
+			for (int n = 0; n < nn; ++n)
+			{
+				int nid = edge.node[n] - noff;
+				if (nid < 0 || nid >= NLT.size() || NLT[nid] < 0)
+				{
+					feLogErrorEx(&fem, "Invalid node index %d in edge set %s", edge.node[n], edgeSet->Name().c_str());
+					return false;
+				}
+				seg.node[n] = NLT[nid];
+			}
 		}
 
 		// add it to the mesh
@@ -677,6 +695,22 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		FEFacetSet* surf2 = mesh.FindFacetSet(spair.m_secondary);
 		if (surf2 == nullptr) return false;
 		fesurfPair->SetSecondarySurface(surf2);
+	}
+
+	// create domain lists
+	for (int i = 0; i < part.PartLists(); ++i)
+	{
+		FEBModel::PartList* partList = part.GetPartList(i);
+
+		FEDomainList* domList = new FEDomainList();
+		domList->SetName(partList->Name());
+		for (int j = 0; j < partList->Parts(); ++j)
+		{
+			FEDomain* dom = mesh.FindDomain(partList->PartName(j)); assert(dom);
+			if (dom) domList->AddDomain(dom);
+		}
+
+		mesh.AddDomainList(domList);
 	}
 
 	// create discrete element sets

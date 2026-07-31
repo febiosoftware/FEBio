@@ -3,7 +3,7 @@ if(DEFINED ENV{MKLROOT})
     set(MKLROOT $ENV{MKLROOT} CACHE PATH "MKL root directory")
 else()
     if(WIN32)
-        set(MKLPATHS $ENV{ProgramFiles\(x86\)}/IntelSWTools $ENV{PROGRAMFILES}/Intel* $ENV{SystemDrive} $ENV{SystemDrive}/Intel*)
+        set(MKLPATHS $ENV{ProgramFiles\(x86\)}\\IntelSWTools $ENV{PROGRAMFILES}\\Intel* $ENV{ProgramFiles\(x86\)}\\Intel $ENV{SystemDrive} $ENV{SystemDrive}\\Intel*)
         set(MKLSUFFIXES "compilers_and_libraries/windows" "oneapi")
     elseif(APPLE)
         set(MKLPATHS /opt/intel /intel /usr/local/intel /usr/local/opt/intel)
@@ -20,26 +20,31 @@ else()
 endif()
 
 if(MKLROOT)
-    if(${MKLROOT} MATCHES "oneapi")
-        find_path(MKL_INC mkl.h 
+    if(${MKLROOT} MATCHES "oneapi" OR ${MKLROOT} MATCHES "oneAPI")
+        find_path(MKL_INC mkl.h
             PATHS
               ${MKLROOT}/latest/include
               ${MKLROOT}/include
+              ${MKLROOT}/mkl/latest/include
             DOC "MKL include directory")
-            
-        find_library(MKL_CORE mkl_core
+        
+        find_library(MKL_CORE
+            NAMES mkl_core mkl_core.lib
             PATHS
               ${MKLROOT}/latest/lib
               ${MKLROOT}/lib
+              ${MKLROOT}/mkl/latest/lib
             PATH_SUFFIXES "intel64"
             NO_DEFAULT_PATH)
             
-        find_library(MKL_OMP_LIB 
+        find_library(MKL_OMP_LIB
             NAMES iomp5 iomp5md libiomp5md.lib
             PATHS
               ${MKLROOT}/../compiler/latest/*/compiler/lib/
+              ${MKLROOT}/../compiler/latest/lib/
               ${MKLROOT}/../../compiler/latest/*/compiler/lib/
               ${MKLROOT}/../../compiler/latest/lib/
+              ${MKLROOT}/compiler/latest/lib/
             PATH_SUFFIXES "intel64" "mac"
             NO_DEFAULT_PATH
             DOC "MKL OMP Library")
@@ -97,6 +102,35 @@ else()
 	option(USE_MKL "Required for pardiso and iterative solvers" OFF)
 endif()
 
+# FFTW
+if(WIN32)
+	find_path(FFTW_INC fftw3.h
+      PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+      PATH_SUFFIXES "include" "fftw*" "include/fftw*"
+      DOC "FFTW include directory")
+	find_library(FFTW_LIB fftw3 libfftw3-3
+      PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+      PATH_SUFFIXES "vs2017/Release"
+      DOC "FFTW library path")
+else()
+	find_path(FFTW_INC fftw3.h
+      PATHS /usr/local/ /opt/fftw* $ENV{HOME}/* $ENV{HOME}/*/*
+      PATH_SUFFIXES "include" "fftw*" "include/fftw*"
+	  DOC "FFTW include directory")
+	find_library(FFTW_LIB fftw3
+      PATHS /usr/local/ /opt/fftw* $ENV{HOME}/* $ENV{HOME}/*/*
+      PATH_SUFFIXES "lib" "build" "cbuild" "cmbuild"
+	  DOC "FFTW library path")
+endif()	
+
+if(FFTW_INC AND FFTW_LIB)		
+	option(USE_FFTW "Required for FFTW functions" ON)
+    mark_as_advanced(FFTW_INC FFTW_LIB)
+else()
+	option(USE_FFTW "Required for FFTW functions" OFF)
+    mark_as_advanced(CLEAR FFTW_INC FFTW_LIB)
+endif()
+
 # HYPRE
 if(WIN32)
 	find_path(HYPRE_INC HYPRE_IJ_mv.h
@@ -138,23 +172,31 @@ if(WIN32)
         PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* $ENV{HOMEPATH}/source/repos/*
         PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib" "cmbuild/lib/Release"
 		DOC "MMG library path")
+    find_library(MMGS_LIB mmgs 
+        PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* $ENV{HOMEPATH}/source/repos/*
+        PATH_SUFFIXES "build/lib" "cmbuild/lib" "src/build/lib" "src/cmbuild/lib" "cmbuild/lib/Release"
+		DOC "MMGS library path")
 else()
 	find_path(MMG_INC mmg/mmg3d/libmmg3d.h
         PATHS /opt/hypre* $ENV{HOME}/* $ENV{HOME}/*/*
         PATH_SUFFIXES "include" "include/mmg" "build" "build/include" "cbuild" "cbuild/include" "src" 
 		DOC "MMG include directory")
 	find_library(MMG_LIB mmg3d 
-        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/*
+        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/* $ENV{HOME}/local/x86_64/lib
         PATH_SUFFIXES "lib" "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
 		DOC "MMG library path")
+    find_library(MMGS_LIB mmgs 
+        PATHS /opt/mmg* $ENV{HOME}/* $ENV{HOME}/*/* $ENV{HOME}/local/x86_64/lib
+        PATH_SUFFIXES "lib" "build/lib" "cbuild/lib" "src/build/lib" "src/cbuild/lib"
+		DOC "MMGS library path")
 endif()	
 
-if(MMG_INC AND MMG_LIB)		
+if(MMG_INC AND MMG_LIB AND MMGS_LIB)		
 	option(USE_MMG "Required for MMG use" ON)
-    mark_as_advanced(MMG_INC MMG_LIB)
+    mark_as_advanced(MMG_INC MMG_LIB MMGS_LIB)
 else()
 	option(USE_MMG "Required for MMG use" OFF)
-    mark_as_advanced(CLEAR MMG_INC MMG_LIB)
+    mark_as_advanced(CLEAR MMG_INC MMG_LIB MMGS_LIB)
 endif()
 
 # LEVMAR
@@ -172,7 +214,42 @@ else()
 	find_library(LEVMAR_LIB levmar PATHS /usr/local/ /opt/levmar* $ENV{HOME}/* $ENV{HOME}/*/*
         PATH_SUFFIXES "lib" "build" "cbuild" "cmbuild"
 		DOC "Levmar library path")
-endif()	
+endif()
+
+if(LEVMAR_INC AND LEVMAR_LIB)		
+	option(USE_LEVMAR "Required for optimization in FEBio" ON)
+    mark_as_advanced(LEVMAR_INC LEVMAR_LIB)
+else()
+	option(USE_LEVMAR "Required for optimization in FEBio" OFF)
+    mark_as_advanced(CLEAR LEVMAR_INC LEVMAR_LIB)
+endif()
+
+# NLOPT
+if(WIN32)
+	find_path(NLOPT_INC nlopt.h PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/* 
+      PATH_SUFFIXES "nlopt"
+      DOC "NLOPT include directory")
+	find_library(NLOPT_LIB nlopt PATHS C::/Program\ Files/* $ENV{HOMEPATH}/* $ENV{HOMEPATH}/*/*
+      PATH_SUFFIXES "vs2017/Release"
+      DOC "NLOPT library path")
+else()
+	find_path(NLOPT_INC nlopt.h PATHS /usr/local/ /opt/nlopt* $ENV{HOME}/* $ENV{HOME}/*/*
+      PATH_SUFFIXES "include" "nlopt" "include/nlopt"
+		DOC "NLOPT include directory")
+	find_library(NLOPT_LIB nlopt PATHS /usr/local/ /opt/nlopt* $ENV{HOME}/* $ENV{HOME}/*/*
+        PATH_SUFFIXES "lib" "build" "cbuild" "cmbuild"
+		DOC "NLOPT library path")
+endif()
+
+if(NLOPT_INC AND NLOPT_LIB)		
+	option(USE_NLOPT "Required for optimization in FEBio" ON)
+    mark_as_advanced(NLOPT_INC NLOPT_LIB)
+else()
+	option(USE_NLOPT "Required for optimization in FEBio" OFF)
+    mark_as_advanced(CLEAR NLOPT_INC NLOPT_LIB)
+endif()
+
+
 
 # SuperLU_MT
 if (WIN32)
@@ -193,15 +270,6 @@ if(SUPERLU_MT_INC AND SUPERLU_MT_LIB)
 else()
 	option(USE_SUPERLU_MT "Option for using SuperLU_MT" OFF)
     mark_as_advanced(CLEAR SUPERLU_MT_INC SUPERLU_MT_LIB)
-endif()
-
-
-if(LEVMAR_INC AND LEVMAR_LIB)		
-	option(USE_LEVMAR "Required for optimization in FEBio" ON)
-    mark_as_advanced(LEVMAR_INC LEVMAR_LIB)
-else()
-	option(USE_LEVMAR "Required for optimization in FEBio" OFF)
-    mark_as_advanced(CLEAR LEVMAR_INC LEVMAR_LIB)
 endif()
 
 # PDL

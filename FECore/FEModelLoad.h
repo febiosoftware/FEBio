@@ -53,6 +53,8 @@ public:
 
 	virtual void PrepStep();
 
+	virtual Matrix_Type PreferredMatrixType();
+
 public:
 	// all classes derived from this base class must implement
 	// the following functions.

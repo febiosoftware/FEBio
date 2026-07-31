@@ -627,9 +627,9 @@ inline vec3d mat3da::operator * (const vec3d& a)
 
 inline mat3d::mat3d(double a)
 {
-	d[0][0] = a; d[0][1] = a; d[0][2] = a;
-	d[1][0] = a; d[1][1] = a; d[1][2] = a;
-	d[2][0] = a; d[2][1] = a; d[2][2] = a;
+	d[0][0] = a; d[0][1] = 0; d[0][2] = 0;
+	d[1][0] = 0; d[1][1] = a; d[1][2] = 0;
+	d[2][0] = 0; d[2][1] = 0; d[2][2] = a;
 }
 
 inline mat3d::mat3d(double a00, double a01, double a02,

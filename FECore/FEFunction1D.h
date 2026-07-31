@@ -99,6 +99,35 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
+// A scale function
+class FECORE_API FEScaleFunction : public FEFunction1D
+{
+public:
+	FEScaleFunction(FEModel* fem) : FEFunction1D(fem), m_scale(1.0) {}
+	FEScaleFunction(FEModel* fem, double s) : FEFunction1D(fem), m_scale(s) {}
+	FEFunction1D* copy() override { return new FEScaleFunction(GetFEModel(), m_scale); }
+
+	double value(double t) const override
+	{
+		return m_scale * t;
+	}
+
+	double derive(double t) const override
+	{
+		return m_scale;
+	}
+
+	double deriv2(double t) const override
+	{
+		return 0;
+	}
+
+private:
+	double	m_scale;
+
+	DECLARE_FECORE_CLASS();
+};
+
 //-----------------------------------------------------------------------------
 // A linear function
 class FECORE_API FELinearFunction : public FEFunction1D

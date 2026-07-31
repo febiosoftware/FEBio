@@ -129,15 +129,12 @@ bool FEMicroMaterial::Init()
 	if (FEElasticMaterial::Init() == false) return false;
 
 	// load the RVE model
-#ifndef FEBIOMECH_EXPORTS
 	FEBioImport fim;
 	if (fim.Load(m_mrve, m_szrve.c_str()) == false)
 	{
+		feLogError("Failed to load RVE model.");
 		return false;
 	}
-#else
-	return false;
-#endif
 
 	// set the parent FEM
 	m_mrve.SetParentModel(GetFEModel());

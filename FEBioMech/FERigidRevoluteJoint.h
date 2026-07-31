@@ -81,8 +81,16 @@ public:
 	//! current axis
 	quatd Orientation() const;
 
+private: // lag. mult. methods
+	int InitEquations(int neq) override;
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
+	void UnpackLM(vector<int>& lm);
+	void PrepStep();
+	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
+	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
 public: // parameters
+	int		m_laugon;
     double	m_atol;	//! augmented Lagrangian tolerance
     double  m_gtol; //! augmented Lagrangian gap tolerance
     double  m_qtol; //! augmented Lagrangian angular gap tolerance
@@ -97,7 +105,8 @@ public: // parameters
     bool    m_bq;   //! flag for prescribing rotation
     double  m_Mp;   //! prescribed moment
 	bool	m_bautopen;	//!< auto-penalty for gap and ang tolerance
-	bool	m_blaugon;	//!< augmented Lagrangian flag
+
+	double m_torsion_stiffness = 0.0; //!< torsional stiffness about the joint axis
 
 protected:
     vec3d	m_qa0;	//! initial relative position vector of joint w.r.t. A
@@ -109,6 +118,10 @@ protected:
     
     vec3d	m_L;	//! Lagrange multiplier for constraining force
     vec3d	m_U;	//! Lagrange multiplier for constraining moment
-   
+
+	vec3d m_Fp, m_Up;
+
+	vector<int>		m_LM;	// Lagrange multiplier equation numbers
+
     DECLARE_FECORE_CLASS();
 };

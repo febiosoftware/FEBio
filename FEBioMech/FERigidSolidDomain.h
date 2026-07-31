@@ -44,6 +44,13 @@ public:
 	//! reset data
 	void Reset() override;
 
+	//! serialization
+	void Serialize(DumpStream& ar) override;
+
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
+
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
+
 public:
 
 	//! calculates the global stiffness matrix for this domain

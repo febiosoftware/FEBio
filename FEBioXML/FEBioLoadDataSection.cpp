@@ -133,6 +133,11 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 				++tag;
 			}
 			while (!tag.isend());
+
+			if (m_redefineCurves)
+			{
+				plc->Init();
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 

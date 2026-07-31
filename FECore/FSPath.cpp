@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include <regex>
 #include <string>
 #include <cstring>
+#include <string.h>
 #include "FSPath.h"
 
 

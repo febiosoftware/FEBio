@@ -43,7 +43,7 @@ FEFluidPressureLoad::FEFluidPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem)
     m_pfluid = nullptr;
     m_p0 = 0;
     
-    m_dofEF = pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0);
+    m_dofEF = (pfem ? pfem->GetDOFIndex(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION), 0) : -1);
     
     m_dof.Clear();
     m_dof.AddDof(m_dofEF);
@@ -57,7 +57,7 @@ bool FEFluidPressureLoad::Init()
     // get fluid from first surface element
     // assuming the entire surface bounds the same fluid
     FESurfaceElement& el = m_psurf->Element(0);
-    FEElement* pe = el.m_elem[0];
+    FEElement* pe = el.m_elem[0].pe;
     if (pe == nullptr) return false;
     
     // get the material

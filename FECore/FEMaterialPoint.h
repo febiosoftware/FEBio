@@ -107,6 +107,11 @@ public:
 	FEMaterialPoint(FEMaterialPointData* data = nullptr);
 	virtual ~FEMaterialPoint();
 
+	// TODO: These functions copy  nothing! They are only included because we need them to create vectors!
+	//       I would like to delete these functions, but this means they cannot be used in vectors anymore.
+	FEMaterialPoint(const FEMaterialPoint&);
+	FEMaterialPoint& operator = (const FEMaterialPoint&);
+
 	//! The init function is used to intialize data
 	virtual void Init();
 
@@ -185,6 +190,13 @@ template <class T> inline T* FEMaterialPointData::ExtractData()
 			p = mpi->ExtractData<T>();
 			if (p) return p;
 		}
+	}
+
+	// as a last resort, search recursively on next
+	if (m_pNext)
+	{
+		p = m_pNext->ExtractData<T>();
+		if (p) return p;
 	}
 
 	// Everything has failed. Material point data can not be found

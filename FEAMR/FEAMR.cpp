@@ -37,6 +37,10 @@ SOFTWARE.*/
 #include "FEScaleAdaptorCriterion.h"
 #include "FEFilterAdaptorCriterion.h"
 #include "FEDomainErrorCriterion.h"
+#include "FEElementDataCriterion.h"
+#include "FETetQualityCriterion.h"
+#include "FEElementQualityCriterion.h"
+#include "FEAMRPlot.h"
 
 //-----------------------------------------------------------------------------
 void FEAMR::InitModule()
@@ -47,7 +51,7 @@ REGISTER_FECORE_CLASS(FEHexRefine     , "hex_refine");
 REGISTER_FECORE_CLASS(FEHexRefine2D   , "hex_refine2d");
 REGISTER_FECORE_CLASS(FETetRefine     , "tet_refine");
 REGISTER_FECORE_CLASS(FEMMGRemesh     , "mmg_remesh");
-REGISTER_FECORE_CLASS(FETestRefine    , "test_refine");
+REGISTER_FECORE_CLASS(FETestRefine    , "test_refine", FECORE_EXPERIMENTAL);
 
 // adaptor criteria
 REGISTER_FECORE_CLASS(FEVariableCriterion        , "max_variable");
@@ -55,4 +59,13 @@ REGISTER_FECORE_CLASS(FEElementSelectionCriterion, "element_selection");
 REGISTER_FECORE_CLASS(FEScaleAdaptorCriterion    , "math");
 REGISTER_FECORE_CLASS(FEMinMaxFilterAdaptorCriterion, "min-max filter");
 REGISTER_FECORE_CLASS(FEDomainErrorCriterion, "relative error");
+REGISTER_FECORE_CLASS(FEElementDataCriterion, "element data");
+REGISTER_FECORE_CLASS(FETetQualityCriterion, "tet-quality");
+REGISTER_FECORE_CLASS(FEMeanRatioQualityCriterion, "mean-ratio");
+REGISTER_FECORE_CLASS(FEScaledJacobianQualityCriterion, "scaled Jacobian");
+
+// plot variables
+REGISTER_FECORE_CLASS(FEPlotTetQuality, "tet-quality");
+REGISTER_FECORE_CLASS(FEPlotMeanRatio, "mean-ratio");
+REGISTER_FECORE_CLASS(FEPlotScaledJacobian, "scaled-Jacobian");
 }

@@ -1,0 +1,456 @@
+/*This file is part of the FEBio source code and is licensed under the MIT license
+listed below.
+
+See Copyright-FEBio.txt for details.
+
+Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+the City of New York, and others.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
+#include "stdafx.h"
+#include "xmltool.h"
+#include <FECore/FECoreKernel.h>
+#include <FECore/FEScalarValuator.h>
+#include <FECore/FEModelParam.h>
+
+#ifndef WIN32
+#define strnicmp strncasecmp
+#endif
+
+int fexml::enumValue(const char* val, const char* szenum)
+{
+	if ((val == nullptr) || (szenum == nullptr)) return -1;
+
+	// get the string's length. 
+	// there could be a comma, so correct for that.
+	size_t L = strlen(val);
+	const char* c = strchr(val, ',');
+	if (c) L = c - val;
+
+	const char* ch = szenum;
+
+	int n = 0;
+	while (ch && *ch)
+	{
+		size_t l = strlen(ch);
+		int nval = n;
+		// see if the value of the enum is overridden
+		const char* ce = strrchr(ch, '=');
+		if (ce)
+		{
+			l = ce - ch;
+			nval = atoi(ce + 1);
+		}
+
+		if ((L == l) && (strnicmp(ch, val, l) == 0))
+		{
+			return nval;
+		}
+		ch = strchr(ch, '\0');
+		if (ch) ch++;
+		n++;
+	}
+	return -1;
+}
+
+// helper function to see if a string is a number
+bool fexml::is_number(const char* sz)
+{
+	char* cend;
+	double tmp = strtod(sz, &cend);
+	return ((cend == nullptr) || (cend[0] == 0));
+}
+
+
+//-----------------------------------------------------------------------------
+bool parseEnumParam(FEParam* pp, const char* val)
+{
+	// get the enums
+	const char* ch = pp->enums();
+	if (ch == nullptr) return false;
+
+	// special cases
+	if (strncmp(ch, "@factory_list", 13) == 0)
+	{
+		int classID = atoi(ch + 14);
+
+		FECoreKernel& fecore = FECoreKernel::GetInstance();
+		for (int i = 0, n = 0; i < fecore.FactoryClasses(); ++i)
+		{
+			const FECoreFactory* fac = fecore.GetFactoryClass(i);
+			if (fac->GetSuperClassID() == classID)
+			{
+				if (strcmp(fac->GetTypeStr(), val) == 0)
+				{
+					pp->value<int>() = n;
+					return true;
+				}
+				n++;
+			}
+		}
+		return false;
+	}
+
+	int n = fexml::enumValue(val, ch);
+	if (n != -1) pp->value<int>() = n;
+	else
+	{
+		// see if the value is an actual number
+		if (fexml::is_number(val))
+		{
+			n = atoi(val);
+			pp->value<int>() = n;
+		}
+	}
+
+	return (n != -1);
+}
+
+//-----------------------------------------------------------------------------
+//! This function parses a parameter list
+bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* paramName, FECoreBase* parent)
+{
+	// see if we can find this parameter
+	FEParam* pp = paramList.FindFromName((paramName == 0 ? tag.Name() : paramName));
+	if (pp == 0) return false;
+	
+	if (pp->dim() == 1)
+	{
+		switch (pp->type())
+		{
+		case FE_PARAM_DOUBLE  : { double d; tag.value(d); pp->value<double  >() = d; } break;
+		case FE_PARAM_INT     : 
+		{ 
+			const char* szenum = pp->enums();
+			if (szenum == 0)
+			{
+				int n;
+				tag.value(n); pp->value<int>() = n;
+			}
+			else
+			{
+				bool bfound = parseEnumParam(pp, tag.szvalue());
+				if (bfound == false) throw XMLReader::InvalidValue(tag);
+			}
+		}
+		break;
+		case FE_PARAM_BOOL    : { bool b; tag.value(b); pp->value<bool>() = b; } break;
+		case FE_PARAM_STD_STRING: { std::string s; tag.value(s); pp->value<std::string>() = s; } break;
+		case FE_PARAM_DOUBLE_MAPPED:
+		{
+			if (parent == nullptr) return false;
+
+			// get the model parameter
+			FEParamDouble& p = pp->value<FEParamDouble>();
+
+			// get the type
+			const char* sztype = tag.AttributeValue("type", true);
+
+			// if the type is not specified, we'll try to determine if 
+			// it's a math expression or a const
+			if (sztype == 0)
+			{
+				const char* szval = tag.szvalue();
+				sztype = (is_number(szval) ? "const" : "math");
+			}
+
+			// allocate valuator
+			FEScalarValuator* val = fecore_new<FEScalarValuator>(sztype, parent->GetFEModel());
+			if (val == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			// read the parameter list
+			readParameterList(tag, val);
+
+			// assign the valuator to the parameter
+			p.setValuator(val);
+		}
+		break;
+		case FE_PARAM_STD_VECTOR_VEC2D:
+		{
+			std::vector<vec2d>& data = pp->value< std::vector<vec2d> >();
+			data.clear();
+
+			double d[2];
+			++tag;
+			do
+			{
+				int nread = tag.value(d, 2);
+				if (nread != 2) throw XMLReader::InvalidValue(tag);
+				data.push_back(vec2d(d[0], d[1]));
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		break;
+		default:
+			assert(false);
+			return false;
+		}
+	}
+	else
+	{
+		switch (pp->type())
+		{
+		case FE_PARAM_INT   : { 
+			vector<int> d(pp->dim()); 
+			tag.value(&d[0], pp->dim()); 
+			for (int i=0; i<pp->dim(); ++i) 
+				*(pp->pvalue<int>()+i) = d[i]; 
+		} 
+		break;
+		case FE_PARAM_DOUBLE: 
+		{ 
+			vector<double> d(pp->dim()); 
+			tag.value(&d[0], pp->dim()); 
+			for (int i = 0; i < pp->dim(); ++i) 
+				*(pp->pvalue<double>() + i) = d[i];
+		}
+		break;
+		default:
+			assert(false);
+			break;
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void fexml::readList(XMLTag& tag, vector<int>& l)
+{
+	// make sure the list is empty
+	l.clear();
+
+	// get a pointer to the value
+	const char* sz = tag.szvalue();
+
+	// parse the string
+	const char* ch;
+	do
+	{
+		int n0, n1, nn;
+		int nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
+		switch (nread)
+		{
+		case 1:
+			n1 = n0;
+			nn = 1;
+			break;
+		case 2:
+			nn = 1;
+			break;
+		}
+
+		for (int i = n0; i <= n1; i += nn) l.push_back(i);
+
+		ch = strchr(sz, ',');
+		if (ch) sz = ch + 1;
+	}
+	while (ch != 0);
+}
+
+bool fexml::readParameterList(XMLTag& tag, FECoreBase* pc)
+{
+	// read attribute parameters
+	if (!readAttributeParams(tag, pc)) return false;
+
+	// make sure this tag has children
+	if (!tag.isleaf())
+	{
+		// process the parameter lists
+		++tag;
+		do
+		{
+			if (readParameter(tag, pc) == false) return false;
+			++tag;
+		} while (!tag.isend());
+	}
+	else if ((tag.isempty() == false) && (pc->Parameters() > 0))
+	{
+		// there should be one parameter with the same name as the tag
+		if (readParameter(tag, pc) == false)
+		{
+			// try a parameter with the type string as name
+			if (readParameter(tag, pc, pc->GetTypeStr()) == false)
+				throw XMLReader::InvalidTag(tag);
+		}
+	}
+
+	return true;
+}
+
+bool fexml::readAttributeParams(XMLTag& tag, FECoreBase* pc)
+{
+	FEParameterList& pl = pc->GetParameterList();
+
+	// process all the other attributes
+	for (XMLAtt& att : tag.m_att)
+	{
+		const char* szatt = att.name();
+		const char* szval = att.cvalue();
+		if ((att.m_bvisited == false) && szatt && szval)
+		{
+			FEParam* param = pl.FindFromName(szatt);
+			if (param && (param->GetFlags() & FE_PARAM_ATTRIBUTE))
+			{
+				switch (param->type())
+				{
+				case FE_PARAM_INT:
+				{
+					if (param->enums() == nullptr)
+						param->value<int>() = atoi(szval);
+					else
+					{
+						if (parseEnumParam(param, szval) == false) throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+					}
+					break;
+				}
+				case FE_PARAM_DOUBLE: param->value<double>() = atof(szval); break;
+				case FE_PARAM_STD_STRING: param->value<std::string>() = szval; break;
+				default:
+					throw XMLReader::InvalidAttributeValue(tag, szatt, szval);
+				}
+			}
+			else if (strcmp("name", szatt) == 0) pc->SetName(szval);
+			else if (strcmp("id", szatt) == 0) pc->SetID(atoi(szval));
+			else if (strcmp("type", szatt) == 0) { /* don't do anything here */ }
+			else if (strcmp("lc", szatt) == 0) { /* don't do anything. Loadcurves are processed elsewhere. */ }
+			else
+			{
+				assert(false);
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+bool fexml::readParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
+{
+	FEParameterList& PL = pc->GetParameterList();
+	if (readParameter(tag, PL, szparam, pc) == false)
+	{
+		// see if this is a property
+		// if we get here, the parameter is not found.
+		// See if the parameter container has defined a property of this name
+		int n = pc->FindPropertyIndex(tag.Name());
+		if (n >= 0)
+		{
+			FEProperty* prop = pc->PropertyClass(n);
+			const char* sztype = tag.AttributeValue("type", true);
+
+			if (sztype)
+			{
+				// try to allocate the class
+				FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, pc->GetFEModel());
+				if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				prop->SetProperty(pp);
+
+				// read the property data
+				readParameterList(tag, pp);
+			}
+			else if (prop->Flags() & FEProperty::Fixed)
+			{
+				if (prop->IsArray())
+				{
+					FECoreBase* pc = prop->get(prop->size());
+					readParameterList(tag, pc);
+				}
+				else
+				{
+					FECoreBase* pc = prop->get(0);
+					readParameterList(tag, pc);
+				}
+			}
+			else if (prop->GetDefaultType())
+			{
+				sztype = prop->GetDefaultType();
+
+				// try to allocate the class
+				FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, pc->GetFEModel());
+				if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				prop->SetProperty(pp);
+
+				// read the property data
+				readParameterList(tag, pp);
+			}
+			else
+			{
+				throw XMLReader::MissingAttribute(tag, "type");
+			}
+		}
+		else
+			return false;
+	}
+
+	return true;
+}
+
+void readClassVariable(XMLTag& tag, FEClassDescriptor::ClassVariable* vars)
+{
+	if (tag.isleaf()) return;
+
+	++tag;
+	do {
+		if (tag.isleaf())
+		{
+			const char* szname = tag.Name();
+
+			// see if the type attribute is defined
+			const char* sztype = tag.AttributeValue("type", true);
+			if (sztype)
+			{
+				FEClassDescriptor::ClassVariable* child = new FEClassDescriptor::ClassVariable(szname, sztype);
+				vars->AddVariable(child);
+			}
+			else
+			{
+				const char* szval = tag.szvalue();
+				FEClassDescriptor::SimpleVariable* var = new FEClassDescriptor::SimpleVariable(szname, szval);
+				vars->AddVariable(var);
+			}
+		}
+		else
+		{
+			const char* szname = tag.Name();
+			const char* sztype = tag.AttributeValue("type");
+
+			FEClassDescriptor::ClassVariable* child = new FEClassDescriptor::ClassVariable(szname, sztype);
+			vars->AddVariable(child);
+			readClassVariable(tag, child);
+		}
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+// create a class descriptor from the current tag
+FEClassDescriptor* fexml::readParameterList(XMLTag& tag)
+{
+	const char* sztype = tag.AttributeValue("type");
+	FEClassDescriptor* cd = new FEClassDescriptor(sztype);
+
+	FEClassDescriptor::ClassVariable* root = cd->Root();
+	readClassVariable(tag, root);
+
+	return cd;
+}

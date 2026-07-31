@@ -41,22 +41,6 @@ class FEModel;
 class LinearSolver;
 class FEModule;
 
-
-//-----------------------------------------------------------------------------
-// base class for handling create events.
-class FECreateHandler{
-public:
-	FECreateHandler() { m_moduleId = -1; }
-	virtual ~FECreateHandler() {}
-	virtual void handle(FECoreBase*) = 0;
-
-	int GetModuleID() const { return m_moduleId; }
-	void SetModuleID(int n) { m_moduleId = n; }
-
-private:
-	int	m_moduleId;
-};
-
 //-----------------------------------------------------------------------------
 //! This is the FECore kernel class that manages the interactions between the 
 //! different modules. In particular, it manages the factory classes
@@ -83,6 +67,9 @@ public:
 
 	//! Create a specific using a superclass ID and an alias
 	FECoreBase* Create(int superClassID, const char* szalias, FEModel* pfem);
+
+	//! Creat a specific class using a superclass ID, an alias and a module name
+	FECoreBase* Create(int superClassID, const char* szalias, const char* szmod, FEModel* pfem);
 
 	//! Create a class from its base class name and type string
 	FECoreBase* Create(const char* baseClassName, const char* typeStr, FEModel* pfem);
@@ -114,11 +101,17 @@ public:
 	//! find a factory class
 	FECoreFactory* FindFactoryClass(int classID, const char* sztype);
 
+	//! find a factory class (also match module name)
+	FECoreFactory* FindFactoryClass(int classID, const char* sztype, const char* szmod);
+
 	//! remove a factory class
 	bool UnregisterFactory(FECoreFactory* ptf);
 
 	//! unregister factories from allocator
 	void UnregisterFactories(int alloc_id);
+
+    //! unregister modules from allocator
+	void UnregisterModules(int alloc_id);
 
 	//! set the current allocator ID
 	void SetAllocatorID(int alloc_id);
@@ -155,6 +148,9 @@ public: // Modules
 	const char* GetModuleNameFromId(int id) const;
 	const char* GetModuleDescription(int i) const;
 	int GetModuleStatus(int i) const;
+    int GetModuleAllocatorID(int i) const;
+
+	int FindModuleID(const char* szmodule) const;
 
 	//! Get a module's dependencies
 	vector<int> GetModuleDependencies(int i) const;
@@ -186,18 +182,11 @@ public:
 	LinearSolver* CreateDefaultLinearSolver(FEModel* fem);
 
 public:
-	void OnCreateEvent(FECreateHandler* pf);
-
-	void BlockEvents(bool b);
-
 	void ShowDeprecationWarnings(bool b);
 
 private:
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
-
-	std::vector<FECreateHandler*>		m_createHandlers;
-	bool								m_blockEvents;
 
 	bool	m_bshowDeprecationWarning;
 
@@ -270,6 +259,15 @@ template <typename TBase> inline TBase* fecore_new(const char* sztype, FEModel* 
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, pfem));
 //	return static_cast<TBase*>(fecore.Create(TBase::BaseClassName(), sztype, pfem));
+}
+
+//-----------------------------------------------------------------------------
+// Create an instance of a class in a particulare module.
+// This assumes that TBase is derived from FECoreBase and defines a class ID. 
+template <typename TBase> inline TBase* fecore_new_ex(const char* sztype, const char* szmod, FEModel* pfem)
+{
+	FECoreKernel& fecore = FECoreKernel::GetInstance();
+	return static_cast<TBase*>(fecore.Create(TBase::superClassID(), sztype, szmod, pfem));
 }
 
 //-----------------------------------------------------------------------------

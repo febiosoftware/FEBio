@@ -43,7 +43,7 @@ END_FECORE_CLASS();
 FESoluteBackflowStabilization::FESoluteBackflowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_isol = -1;
-    m_dofC = pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0);
+    m_dofC = (pfem ? pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0) : -1);
 }
 
 //-----------------------------------------------------------------------------

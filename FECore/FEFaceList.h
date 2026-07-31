@@ -38,7 +38,7 @@ class FEEdgeList;
 class FECORE_API FEFaceList
 {
 public:
-	struct FACE
+	struct FECORE_API FACE
 	{
 		int		ntype;		// 3 = triangle, 4 = quad
 		int		node[4];

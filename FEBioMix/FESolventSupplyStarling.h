@@ -46,6 +46,9 @@ public:
 	
 	//! Tangent of supply with respect to concentration
 	double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
+
+    //! Initialization
+    bool Init() override { return FESolventSupply::Init(); }
 	
    
 public:

@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <XML/XMLReader.h>
+#include <FECore/XMLReader.h>
 
 //-----------------------------------------------------------------------------
 //! FEBio error terminated during the optimization
@@ -48,6 +48,12 @@ private:
 	void ParseObjective(XMLTag& tag);
 
 	FEDataSource* ParseDataSource(XMLTag& tag);
+
+private:
+	void ParseObjectiveDataFit(XMLTag& tag);
+	void ParseObjectiveTarget(XMLTag& tag);
+	void ParseObjectiveElementData(XMLTag& tag);
+	void ParseObjectiveNodeData(XMLTag& tag);
 
 private:
 	FEOptimizeData*	m_opt;

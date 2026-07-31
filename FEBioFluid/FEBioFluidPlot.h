@@ -88,15 +88,6 @@ public:
     bool Save(FEMesh& m, FEDataStream& a);
 };
 
-//-----------------------------------------------------------------------------
-//! Nodal fluid temperature
-class FEPlotNodalFluidTemperature : public FEPlotNodeData
-{
-public:
-    FEPlotNodalFluidTemperature(FEModel* pfem) : FEPlotNodeData(pfem, PLT_FLOAT, FMT_NODE) { SetUnits(UNIT_RELATIVE_TEMPERATURE); }
-    bool Save(FEMesh& m, FEDataStream& a);
-};
-
 //=============================================================================
 //                         S U R F A C E   D A T A
 //=============================================================================
@@ -211,15 +202,6 @@ class FEPlotElasticFluidPressure : public FEPlotDomainData
 public:
 	FEPlotElasticFluidPressure(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
 	bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element fluid temperature
-class FEPlotFluidTemperature : public FEPlotDomainData
-{
-public:
-    FEPlotFluidTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RELATIVE_TEMPERATURE); }
-    bool Save(FEDomain& dom, FEDataStream& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -372,15 +354,6 @@ class FEPlotPolarFluidRegionalAngularVelocity : public FEPlotDomainData
 {
 public:
     FEPlotPolarFluidRegionalAngularVelocity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_ANGULAR_VELOCITY); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Element fluid heat flux
-class FEPlotFluidHeatFlux : public FEPlotDomainData
-{
-public:
-    FEPlotFluidHeatFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM) { SetUnits(UNIT_ENERGY_FLUX); }
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -565,47 +538,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Specific isochoric heat capacity
-class FEPlotFluidIsochoricSpecificHeatCapacity : public FEPlotDomainData
-{
-public:
-    FEPlotFluidIsochoricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Specific isobaric heat capacity
-class FEPlotFluidIsobaricSpecificHeatCapacity : public FEPlotDomainData
-{
-public:
-    FEPlotFluidIsobaricSpecificHeatCapacity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Fluid pressure tangent temperature
-class FEPlotFluidPressureTangentTemperature : public FEPlotDomainData
-{
-public:
-    FEPlotFluidPressureTangentTemperature(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Fluid pressure tangent strain
 class FEPlotFluidPressureTangentStrain : public FEPlotDomainData
 {
 public:
     FEPlotFluidPressureTangentStrain(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_SPECIFIC_ENTROPY); }
-    bool Save(FEDomain& dom, FEDataStream& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Thermal conductivity
-class FEPlotFluidThermalConductivity : public FEPlotDomainData
-{
-public:
-    FEPlotFluidThermalConductivity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_THERMAL_CONDUCTIVITY); }
     bool Save(FEDomain& dom, FEDataStream& a);
 };
 
@@ -663,13 +600,4 @@ public:
     bool Save(FEDomain& dom, FEDataStream& a);
 protected:
     vector<int>    m_sol;
-};
-
-//-----------------------------------------------------------------------------
-//! Element relative thermal Peclet number
-class FEPlotFluidRelativeThermalPecletNumber : public FEPlotDomainData
-{
-public:
-    FEPlotFluidRelativeThermalPecletNumber(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_RECIPROCAL_LENGTH); }
-    bool Save(FEDomain& dom, FEDataStream& a);
 };

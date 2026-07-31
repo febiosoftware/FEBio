@@ -56,10 +56,13 @@ FERigidWallSurface::FERigidWallSurface(FEModel* pfem) : FESurface(pfem)
 	m_NQ.Attach(this); 
 
 	// I want to use the FEModel class for this, but don't know how
-	DOFS& dofs = pfem->GetDOFS();
-	m_dofX = dofs.GetDOF("x");
-	m_dofY = dofs.GetDOF("y");
-	m_dofZ = dofs.GetDOF("z");
+	if (pfem)
+	{
+		DOFS& dofs = pfem->GetDOFS();
+		m_dofX = dofs.GetDOF("x");
+		m_dofY = dofs.GetDOF("y");
+		m_dofZ = dofs.GetDOF("z");
+	}
 }
 
 //-----------------------------------------------------------------------------

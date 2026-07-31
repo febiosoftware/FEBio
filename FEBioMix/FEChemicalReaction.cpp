@@ -83,12 +83,14 @@ bool FEChemicalReaction::Init()
     for (int i = 0; i < m_vRtmp.size(); ++i)
     {
         FEReactionSpeciesRef* pvr = m_vRtmp[i];
+        pvr->Init();
         if (pvr->IsSolute()) SetStoichiometricCoefficient(m_solR, pvr->m_speciesID - 1, pvr->m_v);
         if (pvr->IsSBM()   ) SetStoichiometricCoefficient(m_sbmR, pvr->m_speciesID - 1, pvr->m_v);
     }
     for (int i = 0; i < m_vPtmp.size(); ++i)
     {
         FEReactionSpeciesRef* pvp = m_vPtmp[i];
+        pvp->Init();
         if (pvp->IsSolute()) SetStoichiometricCoefficient(m_solP, pvp->m_speciesID - 1, pvp->m_v);
         if (pvp->IsSBM()   ) SetStoichiometricCoefficient(m_sbmP, pvp->m_speciesID - 1, pvp->m_v);
     }
@@ -153,6 +155,9 @@ bool FEChemicalReaction::Init()
 		feLogError("chemical reaction must satisfy electroneutrality");
 		return false;
 	}
+    
+    if (m_pFwd && !m_pFwd->Init()) return false;
+    if (m_pRev && !m_pRev->Init()) return false;
 
 	return true;
 }

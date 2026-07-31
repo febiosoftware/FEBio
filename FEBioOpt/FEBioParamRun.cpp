@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include <FECore/FEAnalysis.h>
 #include <FECore/FEShellDomain.h>
 #include <FECore/log.h>
-#include <XML/XMLReader.h>
+#include <FECore/XMLReader.h>
 
 //! class constructor
 FEBioParamRun::FEBioParamRun(FEModel* pfem) : FECoreTask(pfem)
@@ -87,7 +87,7 @@ bool FEBioParamRun::Init(const char* szfile)
 		FEShellDomainNew* shellDomain = dynamic_cast<FEShellDomainNew*>(&mesh.Domain(i));
 		if (shellDomain) shellDomain->AssignDefaultShellThickness();
 	}
-	fem->InitShells();
+	if (!fem->InitShells()) return false;
 
 	return true;
 }

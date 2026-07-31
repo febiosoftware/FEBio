@@ -59,10 +59,10 @@ public:
     bool Init() override;
     
 public:
-    double	m_diff0;        //!< free diffusivity
-    double	m_cdinv;		//!< inverse of characteristic concentration c_D
-    double	m_alphad;		//!< non-dimensional coefficient for porosity term
-    int     m_lsol;         //!< local ID of solute
+    FEParamDouble	m_diff0;        //!< free diffusivity
+    FEParamDouble	m_cdinv;		//!< inverse of characteristic concentration c_D
+    FEParamDouble	m_alphad;		//!< non-dimensional coefficient for porosity term
+    int     m_lsol;                 //!< local ID of solute
     
     // declare parameter list
     DECLARE_FECORE_CLASS();

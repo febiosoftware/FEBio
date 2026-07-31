@@ -36,6 +36,10 @@ SOFTWARE.*/
 #include "FEConstrainedLMOptimizeMethod.h"
 #include "FEPowellOptimizeMethod.h"
 #include "FEScanOptimizeMethod.h"
+#include "NLOptOptimizeMethod.h"
+#ifdef HAVE_LEVMAR
+#include "levmar.h"
+#endif
 
 //-----------------------------------------------------------------------------
 //! Initialization of the FEBioOpt module. This function registers all the classes
@@ -44,8 +48,10 @@ void FEBioOpt::InitModule()
 {
 	// Task classes
 	REGISTER_FECORE_CLASS(FEOptimize      , "optimize");
-	REGISTER_FECORE_CLASS(FEParameterSweep, "parameter_sweep");
 	REGISTER_FECORE_CLASS(FEBioParamRun   , "param_run");
+
+	REGISTER_FECORE_CLASS(FEParameterSweep, "parameter_sweep");
+	REGISTER_FECORE_CLASS(FESweepParam, "parameter_sweep_param");
 
 	// optimization methods
 	REGISTER_FECORE_CLASS(FELMOptimizeMethod, "levmar");
@@ -54,4 +60,22 @@ void FEBioOpt::InitModule()
 #endif
 	REGISTER_FECORE_CLASS(FEPowellOptimizeMethod, "powell");
 	REGISTER_FECORE_CLASS(FEScanOptimizeMethod, "scan");
+
+#ifdef HAVE_NLOPT
+	REGISTER_FECORE_CLASS(FEMMAOptimizeMethod    , "mma");
+	REGISTER_FECORE_CLASS(FENelderMeadOptMethod  , "nelder-mead");
+	REGISTER_FECORE_CLASS(FESubplexOptimizeMethod, "sbplx");
+#endif
+}
+
+int FEBioOpt::optimize(
+	void (*func)(double* p, double* hx, int m, int n, void* adata),
+	double* p, double* x, int m, int n, double* lb, double* ub, double* dscl,
+	int itmax, double* opts, double* info, double* work, double* covar, void* adata)
+{
+#ifdef HAVE_LEVMAR
+	return dlevmar_bc_dif(func, p, x, m, n, lb, ub, dscl, itmax, opts, info, work, covar, adata);
+#else
+	return -1;
+#endif
 }

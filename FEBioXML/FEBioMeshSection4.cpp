@@ -239,12 +239,14 @@ void FEBioMeshSection4::ParseSurfaceSection(XMLTag& tag, FEBModel::Part* part)
 	FEBModel::Surface* ps = part->FindSurface(szname);
 	if (ps) throw FEBioImport::RepeatedSurface(szname);
 
-	// count nr of faces
-	int faces = tag.children();
-
 	// allocate storage for faces
 	ps = new FEBModel::Surface(szname);
 	part->AddSurface(ps);
+
+	if (tag.isleaf() || tag.isempty()) return;
+
+	// count nr of faces
+	int faces = tag.children();
 	ps->Create(faces);
 
 	// read faces

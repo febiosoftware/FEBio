@@ -316,6 +316,9 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 	cpp.SetTolerance(m_stol);
 	cpp.Init();
 
+	// let's count contact pairs
+	int contacts = 0;
+
 	// loop over all primary elements
 	for (int i=0; i<ss.Elements(); ++i)
 	{
@@ -351,9 +354,18 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 				pt.m_vgap = x - q;
 
 				pt.m_gap = pt.m_vgap.norm();
+
+				contacts++;
 			}
-			else pt.m_pme = 0;
+			else pt.m_pme = nullptr;
 		}
+	}
+
+	// if we found no contact pairs, let's report this since this is probably not the user's intention
+	if (contacts == 0)
+	{
+		std::string name = GetName();
+		feLogWarning("No contact pairs found for tied interface \"%s\".\nThis contact interface may not have any effect.", name.c_str());
 	}
 }
 

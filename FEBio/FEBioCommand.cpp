@@ -27,6 +27,13 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <FEBioLib/plugin.h>
+
+// TODO: On Windows the GetCurrentTime macro gets in here via plugin.h. 
+// I need to look into how to prevent this
+#ifdef GetCurrentTime
+#undef GetCurrentTime
+#endif
 #include <cstdlib>
 #include <FEBioLib/FEBioModel.h>
 #include <FEBioLib/version.h>
@@ -39,18 +46,12 @@ SOFTWARE.*/
 #include "console.h"
 #include <FEBioLib/cmdoptions.h>
 #include <FEBioLib/febio.h>
-#include <FEBioLib/plugin.h>
 #include "FEBioApp.h"
 #include "breakpoint.h"
 #include <iostream>
 #include <fstream>
 
-//-----------------------------------------------------------------------------
-// TODO: On Windows the GetCurrentTime macro gets in here via plugin.h. 
-// I need to look into how to prevent this
-#ifdef GetCurrentTime
-#undef GetCurrentTime
-#endif
+
 
 //-----------------------------------------------------------------------------
 #ifdef WIN32
@@ -741,7 +742,7 @@ int FEBioCmd_set::run(int nargs, char** argv)
 	FEBioModel* fem = GetFEM();
 	if (nargs == 1)
 	{
-		printf("output_negative_jacobians = %d\n", (NegativeJacobian::m_boutput ? 1 : 0));
+		printf("output_negative_jacobians = %d\n", NegativeJacobian::m_maxout);
 		if (fem)
 		{
 			printf("print_model_params        = %d\n", (fem->GetPrintParametersFlag() ? 1 : 0));
@@ -760,7 +761,7 @@ int FEBioCmd_set::run(int nargs, char** argv)
 
 	if (strcmp(argv[1], "output_negative_jacobians") == 0)
 	{
-		NegativeJacobian::m_boutput = (n != 0);
+		NegativeJacobian::m_maxout = n;
 		printf("output_negative_jacobians = %d", n);
 	}
 	else if (fem && strcmp(argv[1], "print_model_params") == 0)

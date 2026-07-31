@@ -362,12 +362,22 @@ double FERealGas::Tangent_cv_Temperature(FEMaterialPoint& mp)
 //! isobaric specific heat capacity
 double FERealGas::IsobaricSpecificHeatCapacity(FEMaterialPoint& mp)
 {
+    FEFluidMaterialPoint& fp = *mp.ExtractData<FEFluidMaterialPoint>();
     FEThermoFluidMaterialPoint& tf = *mp.ExtractData<FEThermoFluidMaterialPoint>();
     double cv = IsochoricSpecificHeatCapacity(mp);
-    double p = Pressure(mp);
+    double p = Pressure(mp);    // current gauge pressure
     double dpT = Tangent_Temperature(mp);
-    double dpJ = Tangent_Strain(mp);
-    double cp = cv + (dpT/dpJ)/m_rhor*(p - (m_Tr + tf.m_T)*dpT);
+    // evaluate dpT/dpJ in the reference configuration
+    double efsafe = fp.m_ef;
+    double Tsafe = tf.m_T;
+    fp.m_ef = 0;
+    tf.m_T = 0;
+    double r = Tangent_Temperature(mp)/Tangent_Strain(mp);
+    // restore values before continuing
+    fp.m_ef = efsafe;
+    tf.m_T = Tsafe;
+    // evaluate isobaric specific heat capacity
+    double cp = cv + r/m_rhor*(p - (m_Tr + tf.m_T)*dpT);
     return cp;
 }
 
