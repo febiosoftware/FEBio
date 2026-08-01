@@ -18,6 +18,8 @@
 BEGIN_FECORE_CLASS(FEExplicitFluidSolver, FEFluidSolver)
     ADD_PARAMETER(m_dynDamping,    "dyn_damping");
     ADD_PARAMETER(m_capacityFloor, "capacity_floor");
+    ADD_PARAMETER(m_minVolumeRatio, "min_volume_ratio");
+    ADD_PARAMETER(m_maxLogIncrement, "max_log_J_increment");
 END_FECORE_CLASS();
 
 FEExplicitFluidSolver::FEExplicitFluidSolver(FEModel* fem)
@@ -25,6 +27,8 @@ FEExplicitFluidSolver::FEExplicitFluidSolver(FEModel* fem)
 {
     m_dynDamping = 1.0;
     m_capacityFloor = 1.0e-30;
+    m_minVolumeRatio = 1.0e-12;
+    m_maxLogIncrement = 50.0;
 
     // In this FEBio branch, rhoi=-1 selects alpha_f=alpha_m=gamma=1.
     // UpdateKinematics then reconstructs accepted rates from first differences.
@@ -60,7 +64,7 @@ bool FEExplicitFluidSolver::Init()
     }
 
     m_capacity.assign(m_neq, 0.0);
-
+    m_baseJ.assign(mesh.Nodes(), 1.0);
 
     return true;
 }
@@ -127,7 +131,7 @@ bool FEExplicitFluidSolver::BuildLumpedOperators()
                 const double dv = dom->detJ0(el, n) * el.GaussWeights()[n];
                 const double* H = el.H(n);
 
-                if (!(J > 0.0) || !std::isfinite(J) ||
+                if (!(J > m_minVolumeRatio) || !std::isfinite(J) ||
                     !(rho > 0.0) || !std::isfinite(rho) ||
                     !(dv > 0.0) || !std::isfinite(dv))
                 {
@@ -274,6 +278,180 @@ bool FEExplicitFluidSolver::FormExplicitRate(
     return (active > 0);
 }
 
+
+bool FEExplicitFluidSolver::CaptureBaseVolumeRatios()
+{
+    const FEMesh& mesh = GetFEModel()->GetMesh();
+    const int NN = mesh.Nodes();
+    m_baseJ.assign(NN, 1.0);
+
+    int invalidNode = NN;
+#pragma omp parallel for reduction(min:invalidNode)
+    for (int i = 0; i < NN; ++i)
+    {
+        const double J = 1.0 + mesh.Node(i).get(m_dofEF[0]);
+        if (!std::isfinite(J) || !(J > m_minVolumeRatio))
+            invalidNode = std::min(invalidNode, i);
+        else
+            m_baseJ[i] = J;
+    }
+
+    if (invalidNode < NN)
+    {
+        const double J = 1.0 + mesh.Node(invalidNode).get(m_dofEF[0]);
+        feLogError("Cannot start RK4 step with invalid fluid volume ratio at node %d: J = %.16g",
+            invalidNode + 1, J);
+        return false;
+    }
+    return true;
+}
+
+bool FEExplicitFluidSolver::ConvertDilatationRatesToLogRates(vector<double>& rate) const
+{
+    const FEMesh& mesh = GetFEModel()->GetMesh();
+    const int NN = mesh.Nodes();
+    int invalidNode = NN;
+
+#pragma omp parallel for reduction(min:invalidNode)
+    for (int i = 0; i < NN; ++i)
+    {
+        const FENode& node = mesh.Node(i);
+        const int eq = node.m_ID[m_dofEF[0]];
+        if ((eq >= 0) && (eq < (int)rate.size()))
+        {
+            const double J = 1.0 + node.get(m_dofEF[0]);
+            if (!std::isfinite(J) || !(J > m_minVolumeRatio))
+            {
+                invalidNode = std::min(invalidNode, i);
+                continue;
+            }
+            rate[eq] /= J;
+            if (!std::isfinite(rate[eq])) invalidNode = std::min(invalidNode, i);
+        }
+    }
+
+    if (invalidNode < NN)
+    {
+        const double J = 1.0 + mesh.Node(invalidNode).get(m_dofEF[0]);
+        feLogError("Invalid J or logarithmic dilatation rate at node %d: J = %.16g",
+            invalidNode + 1, J);
+        return false;
+    }
+    return true;
+}
+
+bool FEExplicitFluidSolver::BuildStageIncrement(const vector<double>& rate, double factor,
+    const vector<double>& prescribed, double prescribedScale,
+    vector<double>& increment) const
+{
+    const FEMesh& mesh = GetFEModel()->GetMesh();
+    const int NN = mesh.Nodes();
+    increment.assign(m_neq, 0.0);
+
+#pragma omp parallel for
+    for (int i = 0; i < m_neq; ++i) increment[i] = factor * rate[i];
+
+    int invalidNode = NN;
+#pragma omp parallel for reduction(min:invalidNode)
+    for (int i = 0; i < NN; ++i)
+    {
+        const FENode& node = mesh.Node(i);
+        const int eq = node.m_ID[m_dofEF[0]];
+        if ((eq >= 0) && (eq < m_neq))
+        {
+            const double dq = factor * rate[eq];
+            if (!std::isfinite(dq) || ((m_maxLogIncrement > 0.0) &&
+                (std::fabs(dq) > m_maxLogIncrement)))
+            {
+                invalidNode = std::min(invalidNode, i);
+                continue;
+            }
+
+            const double J0 = m_baseJ[i];
+            const double Jstage = J0 * std::exp(dq);
+            if (!std::isfinite(Jstage) || !(Jstage > m_minVolumeRatio))
+            {
+                invalidNode = std::min(invalidNode, i);
+                continue;
+            }
+
+            // Update() expects an increment in e relative to the step base.
+            increment[eq] = Jstage - J0;
+        }
+    }
+
+    if (invalidNode < NN)
+    {
+        feLogError("Invalid logarithmic J stage increment at node %d. Reduce the time step.",
+            invalidNode + 1);
+        return false;
+    }
+
+    InsertPrescribedIncrements(prescribed, increment, prescribedScale);
+    return true;
+}
+
+bool FEExplicitFluidSolver::BuildFinalIncrement(const vector<double>& k1,
+    const vector<double>& k2, const vector<double>& k3, const vector<double>& k4,
+    double dt, const vector<double>& prescribed, vector<double>& increment,
+    double& maxRate, double& maxIncrement) const
+{
+    const FEMesh& mesh = GetFEModel()->GetMesh();
+    const int NN = mesh.Nodes();
+    increment.assign(m_neq, 0.0);
+    maxRate = 0.0;
+    maxIncrement = 0.0;
+
+#pragma omp parallel for reduction(max:maxRate,maxIncrement)
+    for (int i = 0; i < m_neq; ++i)
+    {
+        const double r = (k1[i] + 2.0*k2[i] + 2.0*k3[i] + k4[i]) / 6.0;
+        increment[i] = dt * r;
+        maxRate = std::max(maxRate, std::fabs(r));
+        maxIncrement = std::max(maxIncrement, std::fabs(increment[i]));
+    }
+
+    int invalidNode = NN;
+#pragma omp parallel for reduction(min:invalidNode) reduction(max:maxIncrement)
+    for (int i = 0; i < NN; ++i)
+    {
+        const FENode& node = mesh.Node(i);
+        const int eq = node.m_ID[m_dofEF[0]];
+        if ((eq >= 0) && (eq < m_neq))
+        {
+            const double qrate = (k1[eq] + 2.0*k2[eq] + 2.0*k3[eq] + k4[eq]) / 6.0;
+            const double dq = dt * qrate;
+            if (!std::isfinite(dq) || ((m_maxLogIncrement > 0.0) &&
+                (std::fabs(dq) > m_maxLogIncrement)))
+            {
+                invalidNode = std::min(invalidNode, i);
+                continue;
+            }
+
+            const double J0 = m_baseJ[i];
+            const double Jnew = J0 * std::exp(dq);
+            if (!std::isfinite(Jnew) || !(Jnew > m_minVolumeRatio))
+            {
+                invalidNode = std::min(invalidNode, i);
+                continue;
+            }
+
+            increment[eq] = Jnew - J0;
+            maxIncrement = std::max(maxIncrement, std::fabs(increment[eq]));
+        }
+    }
+
+    if (invalidNode < NN)
+    {
+        feLogError("Invalid accepted logarithmic J increment at node %d. Reduce the time step.",
+            invalidNode + 1);
+        return false;
+    }
+
+    InsertPrescribedIncrements(prescribed, increment, 1.0);
+    return true;
+}
+
 bool FEExplicitFluidSolver::EvaluateStage(
     const vector<double>& stageIncrement, vector<double>& rate)
 {
@@ -288,7 +466,8 @@ bool FEExplicitFluidSolver::EvaluateStage(
     vector<double> R(m_neq, 0.0);
     if (Residual(R) == false) return false;
 
-    return FormExplicitRate(R, rate);
+    if (FormExplicitRate(R, rate) == false) return false;
+    return ConvertDilatationRatesToLogRates(rate);
 }
 
 void FEExplicitFluidSolver::LogPrimaryState(const char* label) const
@@ -329,7 +508,7 @@ bool FEExplicitFluidSolver::CheckExplicitState() const
         const double e = node.get(m_dofEF[0]);
         const double J = 1.0 + e;
 
-        bool bad = (!std::isfinite(e) || !(J > 0.0));
+        bool bad = (!std::isfinite(e) || !(J > m_minVolumeRatio));
         if (!bad)
         {
             for (int k = 0; k < 3; ++k)
@@ -349,7 +528,7 @@ bool FEExplicitFluidSolver::CheckExplicitState() const
     {
         const FENode& node = mesh.Node(invalidNode);
         const double J = 1.0 + node.get(m_dofEF[0]);
-        if (!std::isfinite(J) || !(J > 0.0))
+        if (!std::isfinite(J) || !(J > m_minVolumeRatio))
             feLogError("RK4 fluid update produced invalid J at node %d: J = %.16g", invalidNode + 1, J);
         else
             feLogError("RK4 fluid update produced non-finite velocity at node %d.", invalidNode + 1);
@@ -379,41 +558,30 @@ bool FEExplicitFluidSolver::Quasin()
     PrepStep();
     const vector<double> prescribed = m_ui;
 
+    // Establish the accepted-step base J before evaluating RK stages.
     vector<double> y0(m_neq, 0.0);
+    Update(y0);
+    if (CaptureBaseVolumeRatios() == false) return false;
+
     vector<double> stage(m_neq, 0.0);
     vector<double> k1, k2, k3, k4;
 
     if (EvaluateStage(y0, k1) == false) return false;
 
-#pragma omp parallel for
-    for (int i = 0; i < m_neq; ++i) stage[i] = 0.5 * dt * k1[i];
-    InsertPrescribedIncrements(prescribed, stage, 0.5);
+    if (BuildStageIncrement(k1, 0.5*dt, prescribed, 0.5, stage) == false) return false;
     if (EvaluateStage(stage, k2) == false) return false;
 
-#pragma omp parallel for
-    for (int i = 0; i < m_neq; ++i) stage[i] = 0.5 * dt * k2[i];
-    InsertPrescribedIncrements(prescribed, stage, 0.5);
+    if (BuildStageIncrement(k2, 0.5*dt, prescribed, 0.5, stage) == false) return false;
     if (EvaluateStage(stage, k3) == false) return false;
 
-#pragma omp parallel for
-    for (int i = 0; i < m_neq; ++i) stage[i] = dt * k3[i];
-    InsertPrescribedIncrements(prescribed, stage, 1.0);
+    if (BuildStageIncrement(k3, dt, prescribed, 1.0, stage) == false) return false;
     if (EvaluateStage(stage, k4) == false) return false;
 
-    vector<double> du(m_neq, 0.0);
+    vector<double> du;
     double maxRate = 0.0;
     double maxDu = 0.0;
-
-#pragma omp parallel for reduction(max:maxRate,maxDu)
-    for (int i = 0; i < m_neq; ++i)
-    {
-        const double r = (k1[i] + 2.0*k2[i] + 2.0*k3[i] + k4[i]) / 6.0;
-        du[i] = dt * r;
-        maxRate = std::max(maxRate, std::fabs(r));
-        maxDu = std::max(maxDu, std::fabs(du[i]));
-    }
-
-    InsertPrescribedIncrements(prescribed, du, 1.0);
+    if (BuildFinalIncrement(k1, k2, k3, k4, dt, prescribed, du,
+        maxRate, maxDu) == false) return false;
 
     feLog("RK4 fluid update: max|rate|=%.16g, max|du|=%.16g\n", maxRate, maxDu);
 
@@ -439,6 +607,7 @@ bool FEExplicitFluidSolver::Quasin()
 void FEExplicitFluidSolver::Serialize(DumpStream& ar)
 {
     FEFluidSolver::Serialize(ar);
-    ar & m_capacity;
+    ar & m_capacity & m_baseJ;
     ar & m_dynDamping & m_capacityFloor;
+    ar & m_minVolumeRatio & m_maxLogIncrement;
 }
