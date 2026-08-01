@@ -45,6 +45,7 @@ SOFTWARE.*/
 #include "FELogNonlinearElasticFluid.h"
 
 #include "FEFluidSolver.h"
+#include "FEExplicitFluidSolver.h"
 #include "FEFluidDomain3D.h"
 
 #include "FEFluidPressureLoad.h"
@@ -130,7 +131,8 @@ void FEBioFluid::InitModule()
 
 //-----------------------------------------------------------------------------
 // solver classes
-REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
+    REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
+    REGISTER_FECORE_CLASS(FEExplicitFluidSolver, "explicit-fluid");
 
 //-----------------------------------------------------------------------------
 // Materials
