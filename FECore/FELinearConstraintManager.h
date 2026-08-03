@@ -76,7 +76,7 @@ public:
 	bool Activate();
 
 	// assemble element residual into global residual
-	void AssembleResidual(vector<double>& R, vector<int>& en, vector<int>& elm, vector<double>& fe);
+	void AssembleResidual(fecore::ArrayRef<double> R, vector<int>& en, vector<int>& elm, vector<double>& fe);
 
 	// assemble element matrix into (reduced) global matrix
 	void AssembleStiffness(FEGlobalMatrix& K, vector<double>& R, vector<double>& ui, const vector<int>& en, const vector<int>& lmi, const vector<int>& lmj, const matrix& ke);

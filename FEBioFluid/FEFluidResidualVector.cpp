@@ -47,7 +47,7 @@ FEFluidResidualVector::~FEFluidResidualVector()
 void FEFluidResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe)
 {
     
-    vector<double>& R = m_R;
+    fecore::ArrayRef<double>& R = m_R;
     
     int i, I;
     

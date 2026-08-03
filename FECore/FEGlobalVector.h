@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <vector>
 #include "fecore_api.h"
+#include "ArrayRef.h"
 
 class FEModel;
 
@@ -40,7 +41,10 @@ class FECORE_API FEGlobalVector
 {
 public:
 	//! constructor
+	[[deprecated("Use FEGlobalVector(FEModel& fem, fecore::ArrayRef<double> R, fecore::ArrayRef<double> Fr) instead")]]
 	FEGlobalVector(FEModel& fem, std::vector<double>& R, std::vector<double>& Fr);
+
+	FEGlobalVector(FEModel& fem, fecore::ArrayRef<double> R, fecore::ArrayRef<double> Fr);
 
 	//! destructor
 	virtual ~FEGlobalVector();
@@ -63,10 +67,8 @@ public:
 	//! get the size of the vector
 	int Size() const { return (int) m_R.size(); }
 
-	operator std::vector<double>& () { return m_R; }
-
 protected:
 	FEModel&			m_fem;	//!< model
-	std::vector<double>&		m_R;	//!< residual
-	std::vector<double>&		m_Fr;	//!< nodal reaction forces \todo I want to remove this
+	fecore::ArrayRef<double> m_R;	//!< residual
+	fecore::ArrayRef<double> m_Fr;	//!< nodal reaction forces \todo I want to remove this
 };

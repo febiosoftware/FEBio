@@ -43,6 +43,8 @@ public:
 	//! constructor
 	FEResidualVector(FEModel& fem, std::vector<double>& R, std::vector<double>& Fr);
 
+	FEResidualVector(FEModel& fem, fecore::ArrayRef<double> R, fecore::ArrayRef<double> Fr);
+
 	//! destructor
 	~FEResidualVector();
 

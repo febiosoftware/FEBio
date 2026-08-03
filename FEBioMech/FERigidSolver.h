@@ -72,7 +72,7 @@ public:
     void RigidStiffnessShell(SparseMatrix& K, std::vector<double>& ui, std::vector<double>& F, const std::vector<int>& en, const std::vector<int>& lmi, const std::vector<int>& lmj, const matrix& ke, double alpha);
     
 	// adjust residual for rigid-deformable interface nodes
-	void AssembleResidual(int node_id, int dof, double f, std::vector<double>& R);
+	void AssembleResidual(int node_id, int dof, double f, fecore::ArrayRef<double> R);
     
 	// this is called during residual evaluation
 	// Currently, this is used for resetting rigid body forces

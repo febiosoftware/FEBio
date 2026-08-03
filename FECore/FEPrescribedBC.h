@@ -53,7 +53,7 @@ public:
 	// This function is called when the solver needs to know the 
 	// prescribed dof values. The brel flag indicates wheter the total 
 	// value is needed or the value with respect to the current nodal dof value
-	void PrepStep(std::vector<double>& ui, bool brel = true) override;
+	void PrepStep(fecore::ArrayRef<double> ui, bool brel = true) override;
 
 	// serialization
 	void Serialize(DumpStream& ar) override;

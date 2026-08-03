@@ -36,6 +36,12 @@ using namespace std;
 //-----------------------------------------------------------------------------
 FEResidualVector::FEResidualVector(FEModel& fem, vector<double>& R, vector<double>& Fr) : FEGlobalVector(fem, R, Fr)
 {
+
+}
+
+FEResidualVector::FEResidualVector(FEModel& fem, fecore::ArrayRef<double> R, fecore::ArrayRef<double> Fr) : FEGlobalVector(fem, R, Fr)
+{
+
 }
 
 //-----------------------------------------------------------------------------
@@ -48,7 +54,7 @@ void FEResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<double
 {
 	FEMesh& mesh = m_fem.GetMesh();
 
-	vector<double>& R = m_R;
+	fecore::ArrayRef<double>& R = m_R;
 
 	// assemble the element residual into the global residual
 	int ndof = (int)fe.size();

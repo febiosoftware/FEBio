@@ -364,7 +364,7 @@ bool FELinearConstraintManager::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraintManager::AssembleResidual(vector<double>& R, vector<int>& en, vector<int>& elm, vector<double>& fe)
+void FELinearConstraintManager::AssembleResidual(fecore::ArrayRef<double> R, vector<int>& en, vector<int>& elm, vector<double>& fe)
 {
 	FEMesh& mesh = m_fem->GetMesh();
 

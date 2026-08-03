@@ -97,7 +97,7 @@ void FEPrescribedNodeSet::Deactivate()
 // This function is called when the solver needs to know the 
 // prescribed dof values. The brel flag indicates wheter the total 
 // value is needed or the value with respect to the current nodal dof value
-void FEPrescribedNodeSet::PrepStep(std::vector<double>& ui, bool brel)
+void FEPrescribedNodeSet::PrepStep(fecore::ArrayRef<double> ui, bool brel)
 {
 	FENodeSet& nodeSet = *GetNodeSet();
 	int N = nodeSet.Size();

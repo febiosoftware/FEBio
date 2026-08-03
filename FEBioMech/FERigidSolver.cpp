@@ -899,7 +899,7 @@ void FERigidSolver::RigidStiffnessShell(SparseMatrix& K, vector<double>& ui, vec
 }
 
 //-----------------------------------------------------------------------------
-void FERigidSolver::AssembleResidual(int node_id, int dof, double f, vector<double>& R)
+void FERigidSolver::AssembleResidual(int node_id, int dof, double f, fecore::ArrayRef<double> R)
 {
 	if (m_fem == nullptr) return;
 	FEMechModel& fem = *m_fem;

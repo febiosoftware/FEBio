@@ -34,6 +34,12 @@ SOFTWARE.*/
 //-----------------------------------------------------------------------------
 FEGlobalVector::FEGlobalVector(FEModel& fem, vector<double>& R, vector<double>& Fr) : m_fem(fem), m_R(R), m_Fr(Fr)
 {
+
+}
+
+FEGlobalVector::FEGlobalVector(FEModel& fem, fecore::ArrayRef<double> R, fecore::ArrayRef<double> Fr) : m_fem(fem), m_R(R), m_Fr(Fr)
+{
+
 }
 
 //-----------------------------------------------------------------------------
@@ -45,7 +51,7 @@ FEGlobalVector::~FEGlobalVector()
 //-----------------------------------------------------------------------------
 void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe, bool bdom)
 {
-	vector<double>& R = m_R;
+	fecore::ArrayRef<double>& R = m_R;
 
 	// assemble the element residual into the global residual
 	int ndof = (int)fe.size();
@@ -68,7 +74,7 @@ void FEGlobalVector::Assemble(vector<int>& en, vector<int>& elm, vector<double>&
 //! \todo This function does not add to m_Fr. Is this a problem?
 void FEGlobalVector::Assemble(vector<int>& lm, vector<double>& fe)
 {
-	vector<double>& R = m_R;
+	fecore::ArrayRef<double>& R = m_R;
 	const int n = (int) lm.size();
 	for (int i=0; i<n; ++i)
 	{

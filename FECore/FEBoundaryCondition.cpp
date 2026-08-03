@@ -44,7 +44,12 @@ FEBoundaryCondition::~FEBoundaryCondition()
 //! fill the prescribed values
 void FEBoundaryCondition::PrepStep(std::vector<double>& u, bool brel)
 {
+	fecore::ArrayRef<double> uref(u.data(), u.size());
+	PrepStep(uref, brel);
+}
 
+void FEBoundaryCondition::PrepStep(fecore::ArrayRef<double> u, bool brel)
+{
 }
 
 void FEBoundaryCondition::Serialize(DumpStream& ar)

@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include "FEStepComponent.h"
 #include "FENodeSet.h"
 #include "FEDofList.h"
+#include "ArrayRef.h"
 
 //-----------------------------------------------------------------------------
 class FEFacetSet;
@@ -51,7 +52,10 @@ public:
 	~FEBoundaryCondition();
 
 	//! fill the prescribed values
+	[[deprecated("Use PrepStep(fecore::ArrayRef<double> u, bool brel) instead")]]
 	virtual void PrepStep(std::vector<double>& u, bool brel = true);
+
+	virtual void PrepStep(fecore::ArrayRef<double> u, bool brel = true);
 
 	// copy data from another class
 	virtual void CopyFrom(FEBoundaryCondition* pbc) = 0;
