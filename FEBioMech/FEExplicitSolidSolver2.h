@@ -3,27 +3,10 @@
 #include "FESolidSolver2.h"
 #include "febiomech_api.h"
 
-// Explicit velocity-Verlet / central-difference solver for three-dimensional
-// deformable solid domains.
-//
-// The solver advances
-//
-//     u_dot = v,
-//     M_L v_dot = R(u, v),
-//
-// where M_L is the row-sum-lumped translational mass. It derives from
-// FESolidSolver2 so that FEBio's equation numbering, prescribed-displacement
-// handling, load preparation, domain updates, and accepted-step bookkeeping
-// remain available.
-//
-// Current scope:
-//   * dynamic analyses only;
-//   * FEElasticSolidDomain domains only;
-//   * translational displacement equations only;
-//   * no shells, beams, rigid bodies, nonlinear constraints, or contact;
-//   * no mass scaling or automatic critical-time-step estimator yet.
-//
-// OpenMP follows FEBio's pragma-based convention.
+// Explicit velocity-Verlet / central-difference solver for deformable solids,
+// shells, and beams. Penalty contact is supported through the ordinary
+// FESolidSolver2 residual and contact lifecycle. Rigid bodies, nonlinear
+// constraint equations, and augmented-Lagrangian contact are not supported.
 class FEBIOMECH_API FEExplicitSolidSolver2 : public FESolidSolver2
 {
 public:
@@ -47,10 +30,13 @@ protected:
         vector<double>& acceleration) const;
 
     void CaptureAcceptedVelocity();
-    void InsertPrescribedDisplacement(const vector<double>& prescribed,
-        vector<double>& increment) const;
-    void InsertPrescribedVelocity(const vector<double>& prescribed,
-        vector<double>& velocity, double dt) const;
+    void InsertPrescribedPrimaryDofs(const vector<double>& prescribed,
+        vector<double>& values, double velocityScale) const;
+
+    void GatherNodeRate(const FENode& node, const FEDofList& primary,
+        const FEDofList& rate, vector<double>& globalRate) const;
+    void SetStageNodeRate(FENode& node, const FEDofList& primary,
+        const FEDofList& rate, const FEDofList* accelerationRate) const;
 
     bool CheckNodalState() const;
     bool CheckElementJacobians(const char* stage, double& minJ) const;

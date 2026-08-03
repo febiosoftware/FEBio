@@ -1,9 +1,14 @@
 #include "stdafx.h"
 #include "FEExplicitSolidSolver2.h"
 #include "FEElasticSolidDomain.h"
+#include "FEElasticShellDomain.h"
+#include "FEElasticEASShellDomain.h"
+#include "FEElasticANSShellDomain.h"
+#include "FEElasticBeamDomain.h"
+#include "FEElasticDomain.h"
 #include "FEElasticMaterial.h"
-#include "FESolidMaterial.h"
 #include "FESolidAnalysis.h"
+#include "FEContactInterface.h"
 
 #include <FECore/FEModel.h>
 #include <FECore/FEMesh.h>
@@ -12,8 +17,10 @@
 #include <FECore/FEBoundaryCondition.h>
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FENLConstraint.h>
+#include <FECore/FESurfacePairConstraint.h>
 #include <FECore/FEModelLoad.h>
-#include <FECore/log.h>
+#include <FECore/FELinearSystem.h>
+#include <FECore/log.h>/Users/gerard/GitHub/FEBio-safe/FEBioMech/FEBioMech.cpp
 
 #include <algorithm>
 #include <cmath>
@@ -25,6 +32,51 @@ namespace
     {
         return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z);
     }
+
+    inline int EquationIndex(int id)
+    {
+        return (id >= 0 ? id : (id < -1 ? -id - 2 : -1));
+    }
+
+    // Intercepts element mass-matrix assembly and accumulates the row sums
+    // directly, avoiding dependence on the sparse matrix implementation.
+    class FERowSumMassSystem : public FELinearSystem
+    {
+    public:
+        FERowSumMassSystem(FEModel* fem, FEGlobalMatrix& K,
+            vector<double>& dummyF, vector<double>& dummyU,
+            vector<double>& lumpedMass)
+            : FELinearSystem(fem, K, dummyF, dummyU, false),
+              m_lumpedMass(lumpedMass)
+        {
+        }
+
+        void Assemble(const FEElementMatrix& ke) override
+        {
+            const int nr = ke.rows();
+            const int nc = ke.columns();
+            if ((nr == 0) || (nc == 0)) return;
+
+            const vector<int>& lmi = ke.RowIndices();
+            for (int i = 0; i < nr; ++i)
+            {
+                const int I = EquationIndex(lmi[i]);
+                if ((I < 0) || (I >= (int)m_lumpedMass.size())) continue;
+
+                double rowSum = 0.0;
+                for (int j = 0; j < nc; ++j) rowSum += ke[i][j];
+
+                if (std::isfinite(rowSum))
+                {
+#pragma omp atomic
+                    m_lumpedMass[I] += rowSum;
+                }
+            }
+        }
+
+    private:
+        vector<double>& m_lumpedMass;
+    };
 }
 
 BEGIN_FECORE_CLASS(FEExplicitSolidSolver2, FESolidSolver2)
@@ -39,12 +91,7 @@ FEExplicitSolidSolver2::FEExplicitSolidSolver2(FEModel* fem)
     m_dynDamping = 1.0;
     m_massFloor = 1.0e-30;
     m_minJ = 1.0e-12;
-
-    // Initial accelerations are calculated from the explicit residual and the
-    // lumped mass, not by the consistent-mass linear solve in FESolidSolver2.
     m_init_accelerations = false;
-
-    // This solver never reforms a stiffness matrix during time stepping.
     m_persistMatrix = true;
 }
 
@@ -63,13 +110,7 @@ bool FEExplicitSolidSolver2::Init()
 
     if (fem.NonlinearConstraints() != 0)
     {
-        feLogError("The explicit solid solver does not currently support nonlinear-constraint equations.");
-        return false;
-    }
-
-    if (fem.SurfacePairConstraints() != 0)
-    {
-        feLogError("The explicit solid solver does not currently support contact or surface-pair constraints.");
+        feLogError("The explicit solid solver does not support nonlinear-constraint equations.");
         return false;
     }
 
@@ -77,20 +118,44 @@ bool FEExplicitSolidSolver2::Init()
     {
         if (mesh.Node(i).m_rid >= 0)
         {
-            feLogError("The explicit solid solver does not currently support rigid bodies or rigid nodes.");
+            feLogError("The explicit solid solver does not support rigid bodies or rigid nodes.");
+            return false;
+        }
+    }
+
+    // Contact is supported in penalty form. Augmented-Lagrangian contact needs
+    // an outer augmentation loop and is therefore rejected here.
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        FEContactInterface* ci = dynamic_cast<FEContactInterface*>(spc);
+        if (spc && spc->IsActive() && (ci == nullptr))
+        {
+            feLogError("Surface-pair constraint %d is not an FEContactInterface.", i + 1);
+            return false;
+        }
+        if (ci && ci->IsActive() && (ci->m_laugon == FECore::AUGLAG_METHOD))
+        {
+            feLogError("The explicit solid solver currently supports penalty contact only; contact %d uses augmented Lagrangian enforcement.", i + 1);
             return false;
         }
     }
 
     for (int i = 0; i < mesh.Domains(); ++i)
     {
-        FEElasticSolidDomain* dom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(i));
-        if (dom == nullptr)
+        FEDomain& d = mesh.Domain(i);
+        FEElasticSolidDomain* solid = dynamic_cast<FEElasticSolidDomain*>(&d);
+        FEElasticShellDomain* shell = dynamic_cast<FEElasticShellDomain*>(&d);
+        FEElasticBeamDomain* beam = dynamic_cast<FEElasticBeamDomain*>(&d);
+
+        if ((solid == nullptr) && (shell == nullptr) && (beam == nullptr))
         {
-            feLogError("The explicit solid solver currently supports FEElasticSolidDomain only (domain %d is unsupported).", i + 1);
+            feLogError("Domain %d is unsupported. Supported domain families are elastic solids, elastic shells, and elastic beams.", i + 1);
             return false;
         }
-        dom->SetDynamicUpdateFlag(true);
+
+        if (solid) solid->SetDynamicUpdateFlag(true);
+        if (shell) shell->SetDynamicUpdateFlag(true);
     }
 
     m_lumpedMass.assign(m_neq, 0.0);
@@ -113,7 +178,6 @@ void FEExplicitSolidSolver2::PrepStep()
 
     tp.augmentation = 0;
     tp.currentIteration = 0;
-
     zero(m_Ui);
 
     const int NN = mesh.Nodes();
@@ -128,7 +192,6 @@ void FEExplicitSolidSolver2::PrepStep()
         node.UpdateValues();
     }
 
-    // FEBio stores prescribed displacement increments in m_ui.
     zero(m_ui);
     for (int i = 0; i < fem.BoundaryConditions(); ++i)
     {
@@ -144,9 +207,13 @@ void FEExplicitSolidSolver2::PrepStep()
         if (dom.IsActive()) dom.PreSolveUpdate(tp);
     }
 
-    // The accepted state is already present on the nodes. Update material-point
-    // history before evaluating the first explicit residual of this step.
     UpdateModel();
+
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc && spc->IsActive()) spc->PrepStep();
+    }
 
     for (int i = 0; i < fem.ModelLoads(); ++i)
     {
@@ -162,88 +229,44 @@ bool FEExplicitSolidSolver2::BuildLumpedMass()
     FEModel& fem = *GetFEModel();
     FEMesh& mesh = fem.GetMesh();
 
-    m_lumpedMass.assign(m_neq, 0.0);
+    if (m_pK == nullptr)
+    {
+        feLogError("The global matrix wrapper was not allocated before explicit mass assembly.");
+        return false;
+    }
 
+    m_lumpedMass.assign(m_neq, 0.0);
+    vector<double> dummyF(m_neq, 0.0), dummyU(m_neq, 0.0);
+    FERowSumMassSystem LS(&fem, *m_pK, dummyF, dummyU, m_lumpedMass);
+
+    // FEElasticDomain::MassMatrix dispatches to the domain-specific solid,
+    // shell, or beam element mass implementation. The custom linear system
+    // intercepts each element matrix and accumulates its row sums.
     for (int nd = 0; nd < mesh.Domains(); ++nd)
     {
-        FEElasticSolidDomain* dom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
-        if (dom == nullptr) return false;
-
-        FESolidMaterial* mat = dynamic_cast<FESolidMaterial*>(dom->GetMaterial());
-        if (mat == nullptr)
+        FEDomain& baseDomain = mesh.Domain(nd);
+        FEElasticDomain* dom = dynamic_cast<FEElasticDomain*>(&baseDomain);
+        if (dom == nullptr)
         {
-            feLogError("Solid domain %d does not reference an FESolidMaterial.", nd + 1);
+            feLogError("Domain %d is not an FEElasticDomain.", nd + 1);
             return false;
         }
-
-        const int NE = dom->Elements();
-        int failed = 0;
-
-#pragma omp parallel for schedule(static) reduction(|:failed)
-        for (int iel = 0; iel < NE; ++iel)
-        {
-            FESolidElement& el = dom->Element(iel);
-            if (!el.isActive()) continue;
-
-            const int neln = el.Nodes();
-            vector<double> me(neln, 0.0);
-            bool elementOK = true;
-
-            for (int n = 0; n < el.GaussPoints(); ++n)
-            {
-                FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-                const double rho = mat->Density(mp);
-                const double dV0 = dom->detJ0(el, n) * el.GaussWeights()[n];
-                const double* H = el.H(n);
-
-                if (!(rho > 0.0) || !std::isfinite(rho) ||
-                    !(dV0 > 0.0) || !std::isfinite(dV0))
-                {
-                    elementOK = false;
-                    break;
-                }
-
-                // Row sum of integral rho N_a N_b dV0.
-                for (int a = 0; a < neln; ++a)
-                    me[a] += rho * H[a] * dV0;
-            }
-
-            if (!elementOK)
-            {
-                failed = 1;
-                continue;
-            }
-
-            for (int a = 0; a < neln; ++a)
-            {
-                FENode& node = mesh.Node(el.m_node[a]);
-                for (int k = 0; k < 3; ++k)
-                {
-                    const int eq = node.m_ID[m_dofU[k]];
-                    if ((eq >= 0) && (eq < m_neq))
-                    {
-#pragma omp atomic
-                        m_lumpedMass[eq] += me[a];
-                    }
-                }
-            }
-        }
-
-        if (failed)
-        {
-            feLogError("Invalid density or reference Jacobian while assembling lumped mass in domain %d.", nd + 1);
-            return false;
-        }
+        if (baseDomain.IsActive()) dom->MassMatrix(LS, 1.0);
     }
 
     int active = 0;
     double mmin = std::numeric_limits<double>::max();
     double mmax = 0.0;
-#pragma omp parallel for reduction(+:active) reduction(min:mmin) reduction(max:mmax)
+    int invalid = m_neq;
+#pragma omp parallel for reduction(+:active) reduction(min:mmin,invalid) reduction(max:mmax)
     for (int i = 0; i < m_neq; ++i)
     {
         const double m = m_lumpedMass[i];
-        if (m > m_massFloor)
+        if (!std::isfinite(m) || (m < -m_massFloor))
+        {
+            invalid = std::min(invalid, i);
+        }
+        else if (m > m_massFloor)
         {
             active += 1;
             mmin = std::min(mmin, m);
@@ -251,14 +274,32 @@ bool FEExplicitSolidSolver2::BuildLumpedMass()
         }
     }
 
+    if (invalid < m_neq)
+    {
+        feLogError("Invalid row-sum lumped mass in equation %d.", invalid);
+        return false;
+    }
     if (active == 0)
     {
-        feLogError("No positive translational lumped masses were assembled.");
+        feLogError("No positive lumped masses were assembled.");
         return false;
     }
 
-    feLog("Explicit solid lumped mass: active=%d, min=%.16g, max=%.16g\n", active, mmin, mmax);
+    feLog("Explicit solid/shell/beam lumped mass: active=%d, min=%.16g, max=%.16g\n", active, mmin, mmax);
     return true;
+}
+
+void FEExplicitSolidSolver2::GatherNodeRate(const FENode& node,
+    const FEDofList& primary, const FEDofList& rate,
+    vector<double>& globalRate) const
+{
+    const vec3d v = node.get_vec3d(rate[0], rate[1], rate[2]);
+    const double a[3] = { v.x, v.y, v.z };
+    for (int k = 0; k < 3; ++k)
+    {
+        const int eq = EquationIndex(node.m_ID[primary[k]]);
+        if ((eq >= 0) && (eq < (int)globalRate.size())) globalRate[eq] = a[k];
+    }
 }
 
 void FEExplicitSolidSolver2::CaptureAcceptedVelocity()
@@ -266,65 +307,64 @@ void FEExplicitSolidSolver2::CaptureAcceptedVelocity()
     FEMesh& mesh = GetFEModel()->GetMesh();
     std::fill(m_velocity.begin(), m_velocity.end(), 0.0);
 
-    const int NN = mesh.Nodes();
-#pragma omp parallel for
-    for (int i = 0; i < NN; ++i)
+    for (int i = 0; i < mesh.Nodes(); ++i)
     {
-        FENode& node = mesh.Node(i);
-        const vec3d v = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
-        for (int k = 0; k < 3; ++k)
-        {
-            const int id = node.m_ID[m_dofU[k]];
-            const int eq = (id < -1 ? -id - 2 : id);
-            if ((eq >= 0) && (eq < m_neq))
-                m_velocity[eq] = (k == 0 ? v.x : (k == 1 ? v.y : v.z));
-        }
+        const FENode& node = mesh.Node(i);
+        GatherNodeRate(node, m_dofU,  m_dofV,  m_velocity);
+        GatherNodeRate(node, m_dofSU, m_dofSV, m_velocity);
+        GatherNodeRate(node, m_dofQ,  m_dofBW, m_velocity);
     }
 }
 
-void FEExplicitSolidSolver2::InsertPrescribedDisplacement(
-    const vector<double>& prescribed, vector<double>& increment) const
+void FEExplicitSolidSolver2::InsertPrescribedPrimaryDofs(
+    const vector<double>& prescribed, vector<double>& values,
+    double velocityScale) const
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
-    const int NN = mesh.Nodes();
-#pragma omp parallel for
-    for (int i = 0; i < NN; ++i)
+    const FEDofList* primary[3] = { &m_dofU, &m_dofSU, &m_dofQ };
+
+    for (int i = 0; i < mesh.Nodes(); ++i)
     {
         FENode& node = mesh.Node(i);
-        for (int k = 0; k < 3; ++k)
+        for (int family = 0; family < 3; ++family)
         {
-            const int id = node.m_ID[m_dofU[k]];
-            if (id < -1)
+            const FEDofList& dofs = *primary[family];
+            for (int k = 0; k < 3; ++k)
             {
-                const int eq = -id - 2;
-                if ((eq >= 0) && (eq < (int)increment.size()))
-                    increment[eq] = prescribed[eq];
+                const int id = node.m_ID[dofs[k]];
+                if (id < -1)
+                {
+                    const int eq = -id - 2;
+                    if ((eq >= 0) && (eq < (int)values.size()))
+                        values[eq] = prescribed[eq] * velocityScale;
+                }
             }
         }
     }
 }
 
-void FEExplicitSolidSolver2::InsertPrescribedVelocity(
-    const vector<double>& prescribed, vector<double>& velocity, double dt) const
+void FEExplicitSolidSolver2::SetStageNodeRate(FENode& node,
+    const FEDofList& primary, const FEDofList& rate,
+    const FEDofList* accelerationRate) const
 {
-    if (!(dt > 0.0)) return;
-    FEMesh& mesh = GetFEModel()->GetMesh();
-    const int NN = mesh.Nodes();
-#pragma omp parallel for
-    for (int i = 0; i < NN; ++i)
+    vec3d v(0, 0, 0), a(0, 0, 0);
+    for (int k = 0; k < 3; ++k)
     {
-        FENode& node = mesh.Node(i);
-        for (int k = 0; k < 3; ++k)
+        const int eq = EquationIndex(node.m_ID[primary[k]]);
+        if ((eq >= 0) && (eq < (int)m_stageVelocity.size()))
         {
-            const int id = node.m_ID[m_dofU[k]];
-            if (id < -1)
-            {
-                const int eq = -id - 2;
-                if ((eq >= 0) && (eq < (int)velocity.size()))
-                    velocity[eq] = prescribed[eq] / dt;
-            }
+            const double vk = m_stageVelocity[eq];
+            const double ak = m_stageAcceleration[eq];
+            if (k == 0) { v.x = vk; a.x = ak; }
+            else if (k == 1) { v.y = vk; a.y = ak; }
+            else { v.z = vk; a.z = ak; }
         }
     }
+    node.set_vec3d(rate[0], rate[1], rate[2], v);
+    if (accelerationRate)
+        node.set_vec3d((*accelerationRate)[0], (*accelerationRate)[1], (*accelerationRate)[2], a);
+    else
+        node.m_at = a;
 }
 
 void FEExplicitSolidSolver2::UpdateKinematics(vector<double>& ui)
@@ -333,12 +373,12 @@ void FEExplicitSolidSolver2::UpdateKinematics(vector<double>& ui)
     FEMesh& mesh = fem.GetMesh();
 
     vector<double> U(m_Ut.size(), 0.0);
-    const int neq = (int)U.size();
 #pragma omp parallel for
-    for (int i = 0; i < neq; ++i)
-        U[i] = ui[i] + m_Ui[i] + m_Ut[i];
+    for (int i = 0; i < (int)U.size(); ++i) U[i] = ui[i] + m_Ui[i] + m_Ut[i];
 
-    scatter3(U, mesh, m_dofU[0], m_dofU[1], m_dofU[2]);
+    scatter3(U, mesh, m_dofU[0],  m_dofU[1],  m_dofU[2]);
+    scatter3(U, mesh, m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+    scatter3(U, mesh, m_dofQ[0],  m_dofQ[1],  m_dofQ[2]);
 
     for (int i = 0; i < fem.BoundaryConditions(); ++i)
     {
@@ -349,29 +389,24 @@ void FEExplicitSolidSolver2::UpdateKinematics(vector<double>& ui)
     FELinearConstraintManager& LCM = fem.GetLinearConstraintManager();
     if (LCM.LinearConstraints() > 0) LCM.Update();
 
-    const int NN = mesh.Nodes();
 #pragma omp parallel for
-    for (int i = 0; i < NN; ++i)
+    for (int i = 0; i < mesh.Nodes(); ++i)
     {
         FENode& node = mesh.Node(i);
         node.m_rt = node.m_r0 + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
+        node.m_dt = node.m_d0
+            + node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2])
+            - node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
 
-        vec3d v(0, 0, 0), a(0, 0, 0);
-        for (int k = 0; k < 3; ++k)
-        {
-            const int id = node.m_ID[m_dofU[k]];
-            const int eq = (id < -1 ? -id - 2 : id);
-            if ((eq >= 0) && (eq < (int)m_stageVelocity.size()))
-            {
-                const double vk = m_stageVelocity[eq];
-                const double ak = m_stageAcceleration[eq];
-                if (k == 0) { v.x = vk; a.x = ak; }
-                else if (k == 1) { v.y = vk; a.y = ak; }
-                else { v.z = vk; a.z = ak; }
-            }
-        }
-        node.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], v);
-        node.m_at = a;
+        SetStageNodeRate(node, m_dofU,  m_dofV,  nullptr);
+        SetStageNodeRate(node, m_dofSU, m_dofSV, &m_dofSA);
+        SetStageNodeRate(node, m_dofQ,  m_dofBW, &m_dofBA);
+    }
+
+    for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+    {
+        FESurfacePairConstraint* spc = fem.SurfacePairConstraint(i);
+        if (spc && spc->IsActive()) spc->Update(m_Ui, ui);
     }
 }
 
@@ -395,13 +430,8 @@ bool FEExplicitSolidSolver2::FormAcceleration(
         if (mass > m_massFloor)
         {
             const double a = m_dynDamping * R[i] / mass;
-            if (!std::isfinite(a))
-            {
-                invalidEq = std::min(invalidEq, i);
-                continue;
-            }
-            acceleration[i] = a;
-            active += 1;
+            if (!std::isfinite(a)) invalidEq = std::min(invalidEq, i);
+            else { acceleration[i] = a; active += 1; }
         }
     }
 
@@ -410,7 +440,6 @@ bool FEExplicitSolidSolver2::FormAcceleration(
         feLogError("Non-finite residual or acceleration in equation %d.", invalidEq);
         return false;
     }
-
     if (active == 0)
     {
         feLogError("No active massive equations were found during the explicit update.");
@@ -428,12 +457,13 @@ bool FEExplicitSolidSolver2::CheckElementJacobians(const char* stage, double& mi
 
     for (int nd = 0; nd < mesh.Domains(); ++nd)
     {
-        FEElasticSolidDomain* dom = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+        FEDomain& baseDomain = mesh.Domain(nd);
+        FEElasticDomain* dom = dynamic_cast<FEElasticDomain*>(&baseDomain);
         if (dom == nullptr) continue;
 
-        for (int iel = 0; iel < dom->Elements(); ++iel)
+        for (int iel = 0; iel < baseDomain.Elements(); ++iel)
         {
-            FESolidElement& el = dom->Element(iel);
+            FEElement& el = baseDomain.ElementRef(iel);
             if (!el.isActive()) continue;
             for (int n = 0; n < el.GaussPoints(); ++n)
             {
@@ -444,9 +474,7 @@ bool FEExplicitSolidSolver2::CheckElementJacobians(const char* stage, double& mi
                 minJ = std::min(minJ, J);
                 if (!std::isfinite(J) || !(J > m_minJ))
                 {
-                    badDomain = nd;
-                    badElement = iel;
-                    badPoint = n;
+                    badDomain = nd; badElement = iel; badPoint = n;
                     break;
                 }
             }
@@ -461,12 +489,12 @@ bool FEExplicitSolidSolver2::CheckElementJacobians(const char* stage, double& mi
             stage, badDomain + 1, badElement + 1, badPoint + 1);
         return false;
     }
+    if (minJ == std::numeric_limits<double>::max()) minJ = 1.0;
     return true;
 }
 
 bool FEExplicitSolidSolver2::EvaluateAcceleration(
-    const vector<double>& stageU,
-    const vector<double>& stageV,
+    const vector<double>& stageU, const vector<double>& stageV,
     vector<double>& acceleration)
 {
     m_stageVelocity = stageV;
@@ -485,22 +513,28 @@ bool FEExplicitSolidSolver2::EvaluateAcceleration(
 
 bool FEExplicitSolidSolver2::CheckNodalState() const
 {
-    FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
-    const int NN = mesh.Nodes();
-    int badNode = NN;
+    FEMesh& mesh = GetFEModel()->GetMesh();
+    int badNode = mesh.Nodes();
 
 #pragma omp parallel for reduction(min:badNode)
-    for (int i = 0; i < NN; ++i)
+    for (int i = 0; i < mesh.Nodes(); ++i)
     {
         FENode& node = mesh.Node(i);
-        const vec3d u = node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]);
-        const vec3d v = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
-        if (!IsFiniteVec3d(u) || !IsFiniteVec3d(v) || !IsFiniteVec3d(node.m_at))
+        const vec3d u  = node.get_vec3d(m_dofU[0],  m_dofU[1],  m_dofU[2]);
+        const vec3d v  = node.get_vec3d(m_dofV[0],  m_dofV[1],  m_dofV[2]);
+        const vec3d su = node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]);
+        const vec3d sv = node.get_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
+        const vec3d q  = node.get_vec3d(m_dofQ[0],  m_dofQ[1],  m_dofQ[2]);
+        const vec3d w  = node.get_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2]);
+        const vec3d sa = node.get_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
+        const vec3d ba = node.get_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2]);
+        if (!IsFiniteVec3d(u) || !IsFiniteVec3d(v) || !IsFiniteVec3d(node.m_at) ||
+            !IsFiniteVec3d(su) || !IsFiniteVec3d(sv) || !IsFiniteVec3d(sa) ||
+            !IsFiniteVec3d(q) || !IsFiniteVec3d(w) || !IsFiniteVec3d(ba))
             badNode = std::min(badNode, i);
     }
 
-    if (badNode < NN)
+    if (badNode < mesh.Nodes())
     {
         feLogError("Explicit solid update produced a non-finite state at node %d.", badNode + 1);
         return false;
@@ -510,28 +544,32 @@ bool FEExplicitSolidSolver2::CheckNodalState() const
 
 void FEExplicitSolidSolver2::LogState(const char* label) const
 {
-    FEModel& fem = *GetFEModel();
-    FEMesh& mesh = fem.GetMesh();
-    const int NN = mesh.Nodes();
+    FEMesh& mesh = GetFEModel()->GetMesh();
     double umax = 0.0, vmax = 0.0, amax = 0.0;
 
 #pragma omp parallel for reduction(max:umax,vmax,amax)
-    for (int i = 0; i < NN; ++i)
+    for (int i = 0; i < mesh.Nodes(); ++i)
     {
         FENode& node = mesh.Node(i);
         umax = std::max(umax, node.get_vec3d(m_dofU[0], m_dofU[1], m_dofU[2]).norm());
+        umax = std::max(umax, node.get_vec3d(m_dofSU[0], m_dofSU[1], m_dofSU[2]).norm());
+        umax = std::max(umax, node.get_vec3d(m_dofQ[0], m_dofQ[1], m_dofQ[2]).norm());
         vmax = std::max(vmax, node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]).norm());
+        vmax = std::max(vmax, node.get_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2]).norm());
+        vmax = std::max(vmax, node.get_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2]).norm());
         amax = std::max(amax, node.m_at.norm());
+        amax = std::max(amax, node.get_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2]).norm());
+        amax = std::max(amax, node.get_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2]).norm());
     }
 
-    feLog("%s: umax=%.16g, vmax=%.16g, amax=%.16g\n", label, umax, vmax, amax);
+    feLog("%s: max primary=%.16g, max rate=%.16g, max acceleration=%.16g\n",
+        label, umax, vmax, amax);
 }
 
 bool FEExplicitSolidSolver2::Quasin()
 {
     FEModel& fem = *GetFEModel();
-    FETimeInfo& tp = fem.GetTime();
-    const double dt = tp.timeIncrement;
+    const double dt = fem.GetTime().timeIncrement;
 
     if (!(dt > 0.0) || !std::isfinite(dt))
     {
@@ -539,26 +577,19 @@ bool FEExplicitSolidSolver2::Quasin()
         return false;
     }
 
-    m_niter = 0;
-    m_nrhs = 0;
-    m_nref = 0;
-    m_ntotref = 0;
+    m_niter = 0; m_nrhs = 0; m_nref = 0; m_ntotref = 0;
 
     PrepStep();
     const vector<double> prescribed = m_ui;
 
-    // Synchronize the accepted velocity from the state saved by PrepStep.
     CaptureAcceptedVelocity();
-    InsertPrescribedVelocity(prescribed, m_velocity, dt);
+    InsertPrescribedPrimaryDofs(prescribed, m_velocity, 1.0 / dt);
 
-    vector<double> zeroU(m_neq, 0.0);
-    vector<double> a0;
+    vector<double> zeroU(m_neq, 0.0), a0;
     if (!EvaluateAcceleration(zeroU, m_velocity, a0)) return false;
 
-    vector<double> du(m_neq, 0.0);
-    vector<double> vPredict(m_neq, 0.0);
+    vector<double> du(m_neq, 0.0), vPredict(m_neq, 0.0);
     double maxDu = 0.0;
-
 #pragma omp parallel for reduction(max:maxDu)
     for (int i = 0; i < m_neq; ++i)
     {
@@ -570,8 +601,8 @@ bool FEExplicitSolidSolver2::Quasin()
         }
     }
 
-    InsertPrescribedDisplacement(prescribed, du);
-    InsertPrescribedVelocity(prescribed, vPredict, dt);
+    InsertPrescribedPrimaryDofs(prescribed, du, 1.0);
+    InsertPrescribedPrimaryDofs(prescribed, vPredict, 1.0 / dt);
 
     vector<double> a1;
     if (!EvaluateAcceleration(du, vPredict, a1)) return false;
@@ -588,9 +619,8 @@ bool FEExplicitSolidSolver2::Quasin()
             maxDv = std::max(maxDv, std::fabs(dv));
         }
     }
-    InsertPrescribedVelocity(prescribed, vNew, dt);
+    InsertPrescribedPrimaryDofs(prescribed, vNew, 1.0 / dt);
 
-    // Re-evaluate the accepted state with its accepted velocity and acceleration.
     m_stageVelocity = vNew;
     m_stageAcceleration = a1;
     vector<double> acceptedIncrement(du);
@@ -607,7 +637,7 @@ bool FEExplicitSolidSolver2::Quasin()
     m_velocity = vNew;
     m_acceleration = a1;
 
-    feLog("Explicit solid central-difference update: max|du|=%.16g, max|dv|=%.16g, minJ=%.16g\n",
+    feLog("Explicit solid/shell/beam update: max|dq|=%.16g, max|dv|=%.16g, minJ=%.16g\n",
         maxDu, maxDv, minJ);
     LogState("Explicit solid post-update state");
 
