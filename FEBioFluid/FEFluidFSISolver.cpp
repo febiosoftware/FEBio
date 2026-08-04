@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEFluidFSIDomain.h"
 #include "FEFluidDomain.h"
 #include "FEBiphasicFSIDomain.h"
+#include "FETiedFluidFSI.h"
 #include <FEBioMech/FEElasticDomain.h>
 #include <FEBioMech/FEPressureLoad.h>
 #include <FEBioMech/FERigidConnector.h>
@@ -162,8 +163,13 @@ void FEFluidFSISolver:: SolverWarnings()
             {
                 FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairConstraint(i));
                 FESlidingElasticInterface* pbw = dynamic_cast<FESlidingElasticInterface*>(pci);
+                FETiedFluidFSI* ptf = dynamic_cast<FETiedFluidFSI*>(pci);
                 if (pbw) {
                     feLogWarning("The sliding-elastic contact algorithm runs better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness 0 to false in Control section.");
+                    break;
+                }
+                if (ptf) {
+                    feLogWarning("The tied fluid-FSI contact algorithm runs better with a non-symmetric stiffness matrix.\nYou may set symmetric_stiffness 0 to false in Control section.");
                     break;
                 }
             }
@@ -740,6 +746,13 @@ void FEFluidFSISolver::UpdateIncrementsEAS(vector<double>& ui, const bool binc)
         FESSIShellDomain* sdom = dynamic_cast<FESSIShellDomain*>(&mesh.Domain(i));
         if (sdom && sdom->IsActive()) sdom->UpdateIncrementsEAS(ui, binc);
     }
+}
+
+void FEFluidFSISolver::UpdateModel()
+{
+    // Update all contact interfaces
+    // NOTE: note that we call the base class version here, not the overridden one!!
+    FENewtonSolver::UpdateModel();
 }
 
 //-----------------------------------------------------------------------------

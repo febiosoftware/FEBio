@@ -70,6 +70,9 @@ public:
     //! Perform an update
     void Update(vector<double>& ui) override;
 
+    //! update contact
+    void UpdateModel() override;
+
 	//! update nodal positions, velocities, accelerations, etc.
 	void UpdateKinematics(vector<double>& ui);
 

@@ -42,6 +42,7 @@ SOFTWARE.*/
 #include "FEFluidModule.h"
 #include "FEFluidFSIAnalysis.h"
 #include "FEFluidSupplyStarling.h"
+#include "FETiedFluidFSI.h"
 #include <FECore/FETimeStepController.h>
 
 //-----------------------------------------------------------------------------
@@ -96,6 +97,8 @@ void FEBioFSI::InitModule()
 	REGISTER_FECORE_CLASS(FEFluidFSIDomain3D, "fluid-FSI-3D");
 
 	REGISTER_FECORE_CLASS(FEFluidFSITraction, "fluid-FSI traction");
+    
+    REGISTER_FECORE_CLASS(FETiedFluidFSI, "tied fluid-FSI");
     
     REGISTER_FECORE_CLASS(FEBiphasicFSITraction, "biphasic-FSI traction");
     

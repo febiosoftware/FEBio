@@ -27,23 +27,25 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
-#include "FETiedElasticInterface.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEAnalysis.h"
-#include "FECore/FENormalProjection.h"
+#include "FETiedFluidFSI.h"
+#include "FEFluid.h"
+#include "FEFluidFSI.h"
+#include "FEBioFSI.h"
+#include <FECore/FEModel.h>
+#include <FECore/FEAnalysis.h>
+#include <FECore/FENormalProjection.h>
 #include <FECore/FELinearSystem.h>
-#include "FECore/log.h"
+#include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_FECORE_CLASS(FETiedElasticInterface, FEContactInterface)
+BEGIN_FECORE_CLASS(FETiedFluidFSI, FEContactInterface)
 	ADD_PARAMETER(m_laugon   , "laugon"             )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol     , "tolerance"          );
 	ADD_PARAMETER(m_gtol     , "gaptol"             );
 	ADD_PARAMETER(m_epsn     , "penalty"            );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
     ADD_PARAMETER(m_bupdtpen , "update_penalty"     );
-	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
 	ADD_PARAMETER(m_knmult   , "knmult"             );
 	ADD_PARAMETER(m_stol     , "search_tol"         );
 	ADD_PARAMETER(m_bsymm    , "symmetric_stiffness");
@@ -52,10 +54,11 @@ BEGIN_FECORE_CLASS(FETiedElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_naugmax  , "maxaug"             );
 	ADD_PARAMETER(m_bflips   , "flip_primary"       );
 	ADD_PARAMETER(m_bflipm   , "flip_secondary"     );
+    ADD_PARAMETER(m_bshellb  , "shell_bottom");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FETiedElasticSurface::Data::Data()
+FETiedFluidFSISurface::Data::Data()
 {
     m_Gap = vec3d(0,0,0);
     m_dg = vec3d(0,0,0);
@@ -67,7 +70,7 @@ FETiedElasticSurface::Data::Data()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticSurface::Data::Serialize(DumpStream& ar)
+void FETiedFluidFSISurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
 	ar & m_Gap;
@@ -79,7 +82,7 @@ void FETiedElasticSurface::Data::Serialize(DumpStream& ar)
 	ar & m_tr;
 }
 
-void FETiedElasticSurface::Data::Init()
+void FETiedFluidFSISurface::Data::Init()
 {
     FEContactMaterialPoint::Init();
     m_Gap = vec3d(0, 0, 0);
@@ -92,16 +95,16 @@ void FETiedElasticSurface::Data::Init()
 }
 
 //-----------------------------------------------------------------------------
-// FETiedElasticSurface
+// FETiedFluidFSISurface
 //-----------------------------------------------------------------------------
 
-FETiedElasticSurface::FETiedElasticSurface(FEModel* pfem) : FEContactSurface(pfem)
+FETiedFluidFSISurface::FETiedFluidFSISurface(FEModel* pfem) : FEContactSurface(pfem)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-bool FETiedElasticSurface::Init()
+bool FETiedFluidFSISurface::Init()
 {
     // initialize surface data first
     if (FEContactSurface::Init() == false) return false;
@@ -121,7 +124,7 @@ bool FETiedElasticSurface::Init()
 //! obtain a unique normal the normal is averaged for each node over all the
 //! element normals at the node
 
-void FETiedElasticSurface::UpdateNodeNormals()
+void FETiedFluidFSISurface::UpdateNodeNormals()
 {
     int N = Nodes(), i, j, ne, jp1, jm1;
     vec3d y[FEElement::MAX_NODES], n;
@@ -154,20 +157,20 @@ void FETiedElasticSurface::UpdateNodeNormals()
 
 //-----------------------------------------------------------------------------
 //! create material point data
-FEMaterialPoint* FETiedElasticSurface::CreateMaterialPoint()
+FEMaterialPoint* FETiedFluidFSISurface::CreateMaterialPoint()
 {
-	return new FETiedElasticSurface::Data;
+	return new FETiedFluidFSISurface::Data;
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticSurface::Serialize(DumpStream& ar)
+void FETiedFluidFSISurface::Serialize(DumpStream& ar)
 {
 	FEContactSurface::Serialize(ar);
 	ar & m_nn & m_Fn;
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticSurface::GetVectorGap(int nface, vec3d& pg)
+void FETiedFluidFSISurface::GetVectorGap(int nface, vec3d& pg)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
@@ -181,7 +184,7 @@ void FETiedElasticSurface::GetVectorGap(int nface, vec3d& pg)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticSurface::GetContactTraction(int nface, vec3d& pt)
+void FETiedFluidFSISurface::GetContactTraction(int nface, vec3d& pt)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
@@ -195,7 +198,7 @@ void FETiedElasticSurface::GetContactTraction(int nface, vec3d& pt)
 }
 
 //-----------------------------------------------------------------------------
-vec3d FETiedElasticSurface::GetContactForce()
+vec3d FETiedFluidFSISurface::GetContactForce()
 {
     // initialize contact force
     vec3d f(0, 0, 0);
@@ -208,7 +211,7 @@ vec3d FETiedElasticSurface::GetContactForce()
 
 //-----------------------------------------------------------------------------
 //! evaluate net contact area
-double FETiedElasticSurface::GetContactArea()
+double FETiedFluidFSISurface::GetContactArea()
 {
     // initialize contact area
     double a = 0;
@@ -247,10 +250,10 @@ double FETiedElasticSurface::GetContactArea()
 }
 
 //-----------------------------------------------------------------------------
-// FETiedElasticInterface
+// FETiedFluidFSI
 //-----------------------------------------------------------------------------
 
-FETiedElasticInterface::FETiedElasticInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
+FETiedFluidFSI::FETiedFluidFSI(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofW(pfem)
 {
     static int count = 1;
     SetID(count++);
@@ -259,7 +262,6 @@ FETiedElasticInterface::FETiedElasticInterface(FEModel* pfem) : FEContactInterfa
     m_knmult = 1;
     m_atol = 0.1;
     m_epsn = 1;
-    m_btwo_pass = false;
     m_stol = 0.01;
     m_bsymm = true;
     m_srad = 1.0;
@@ -279,20 +281,33 @@ FETiedElasticInterface::FETiedElasticInterface(FEModel* pfem) : FEContactInterfa
 
     m_ss.SetSibling(&m_ms);
     m_ms.SetSibling(&m_ss);
+
+    m_bshellb = false;
+    
+    // get the degrees of freedom
+    // TODO: Can this be done in Init, since  there is no error checking
+    if (pfem)
+    {
+        m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+        m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+        m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+        m_dofEF = GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+    }
 }
 
 //-----------------------------------------------------------------------------
 
-FETiedElasticInterface::~FETiedElasticInterface()
+FETiedFluidFSI::~FETiedFluidFSI()
 {
 }
 
 //-----------------------------------------------------------------------------
-bool FETiedElasticInterface::Init()
+bool FETiedFluidFSI::Init()
 {
     // initialize surface data
     if (m_ss.Init() == false) return false;
     if (m_ms.Init() == false) return false;
+    m_ss.SetShellBottom(m_bshellb);
 
 	// Flip secondary and primary surfaces, if requested.
 	// Note that we turn off those flags because otherwise we keep flipping, each time we get here (e.g. in optimization)
@@ -306,7 +321,7 @@ bool FETiedElasticInterface::Init()
 
 //-----------------------------------------------------------------------------
 //! build the matrix profile for use in the stiffness matrix
-void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
+void FETiedFluidFSI::BuildMatrixProfile(FEGlobalMatrix& K)
 {
     FEMesh& mesh = GetMesh();
     
@@ -314,17 +329,18 @@ void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
     const int dof_X = GetDOFIndex("x");
     const int dof_Y = GetDOFIndex("y");
     const int dof_Z = GetDOFIndex("z");
-    const int dof_RU = GetDOFIndex("Ru");
-    const int dof_RV = GetDOFIndex("Rv");
-    const int dof_RW = GetDOFIndex("Rw");
+    const int dof_WX = GetDOFIndex("wx");
+    const int dof_WY = GetDOFIndex("wy");
+    const int dof_WZ = GetDOFIndex("wz");
+    const int dof_EF = GetDOFIndex("ef");
+
+    const int ndpn1 = 3;
+    const int ndpn2 = 7;
+    vector<int> lm((ndpn1+ndpn2)*FEElement::MAX_NODES);
     
-    const int ndpn = 6;
-    vector<int> lm(ndpn*FEElement::MAX_NODES*2);
-    
-    int npass = (m_btwo_pass?2:1);
-    for (int np=0; np<npass; ++np)
+    for (int np=0; np<1; ++np)
     {
-        FETiedElasticSurface& ss = (np == 0? m_ss : m_ms);
+        FETiedFluidFSISurface& ss = (np == 0? m_ss : m_ms);
         
         int ni = 0, k, l;
         for (int j=0; j<ss.Elements(); ++j)
@@ -334,7 +350,7 @@ void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
             int* sn = &se.m_node[0];
             for (k=0; k<nint; ++k, ++ni)
             {
-				FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*se.GetMaterialPoint(k));
+                FETiedFluidFSISurface::Data& pt = static_cast<FETiedFluidFSISurface::Data&>(*se.GetMaterialPoint(k));
                 FESurfaceElement* pe = pt.m_pme;
                 if (pe != 0)
                 {
@@ -349,23 +365,21 @@ void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
                     for (l=0; l<nseln; ++l)
                     {
                         vector<int>& id = mesh.Node(sn[l]).m_ID;
-                        lm[ndpn*l  ] = id[dof_X];
-                        lm[ndpn*l+1] = id[dof_Y];
-                        lm[ndpn*l+2] = id[dof_Z];
-                        lm[ndpn*l+3] = id[dof_RU];
-                        lm[ndpn*l+4] = id[dof_RV];
-                        lm[ndpn*l+5] = id[dof_RW];
+                        lm[ndpn1*l  ] = id[dof_X];
+                        lm[ndpn1*l+1] = id[dof_Y];
+                        lm[ndpn1*l+2] = id[dof_Z];
                     }
                     
                     for (l=0; l<nmeln; ++l)
                     {
                         vector<int>& id = mesh.Node(mn[l]).m_ID;
-                        lm[ndpn*(l+nseln)  ] = id[dof_X];
-                        lm[ndpn*(l+nseln)+1] = id[dof_Y];
-                        lm[ndpn*(l+nseln)+2] = id[dof_Z];
-                        lm[ndpn*(l+nseln)+3] = id[dof_RU];
-                        lm[ndpn*(l+nseln)+4] = id[dof_RV];
-                        lm[ndpn*(l+nseln)+5] = id[dof_RW];
+                        lm[ndpn1*(l+nseln)  ] = id[dof_X];
+                        lm[ndpn1*(l+nseln)+1] = id[dof_Y];
+                        lm[ndpn1*(l+nseln)+2] = id[dof_Z];
+                        lm[ndpn1*(l+nseln)+3] = id[dof_WX];
+                        lm[ndpn1*(l+nseln)+4] = id[dof_WY];
+                        lm[ndpn1*(l+nseln)+5] = id[dof_WZ];
+                        lm[ndpn1*(l+nseln)+6] = id[dof_EF];
                     }
                     
                     K.build_add(lm);
@@ -376,18 +390,17 @@ void FETiedElasticInterface::BuildMatrixProfile(FEGlobalMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::UpdateAutoPenalty()
+void FETiedFluidFSI::UpdateAutoPenalty()
 {
     // calculate the penalty
     if (m_bautopen)
     {
         CalcAutoPenalty(m_ss);
-        if (m_btwo_pass) CalcAutoPenalty(m_ms);
     }
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::Activate()
+void FETiedFluidFSI::Activate()
 {
     // don't forget to call the base class
     FEContactInterface::Activate();
@@ -397,11 +410,42 @@ void FETiedElasticInterface::Activate()
     // project the surfaces onto each other
     // this will evaluate the gap functions in the reference configuration
     InitialProjection(m_ss, m_ms);
-    if (m_btwo_pass) InitialProjection(m_ms, m_ss);
+    
+    // get the list of fluid-FSI elements connected to this interface
+    FEModel* fem = GetFEModel();
+    int NF = m_ms.Elements();
+    m_elem.resize(NF);
+    m_s.resize(NF, 1);
+    for (int j = 0; j < NF; ++j)
+    {
+        bool bself = false;
+        FESurfaceElement& el = m_ms.Element(j);
+        // extract the first of two elements on this interface
+        m_elem[j] = el.m_elem[0].pe;
+        // get its material and check if FluidFSI
+        FEMaterial* pm = fem->GetMaterial(m_elem[j]->GetMatID());
+        FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
+        if (pfsi) {
+            double s = m_ms.FacePointing(el, *m_elem[j]);
+            m_s[j] = bself ? -s : s;
+            assert(m_s[j]);
+        }
+        else if (!bself) {
+            // extract the second of two elements on this interface
+            m_elem[j] = el.m_elem[1].pe;
+            pm = fem->GetMaterial(m_elem[j]->GetMatID());
+            pfsi = dynamic_cast<FEFluidFSI*>(pm);
+            assert(pfsi);
+            m_s[j] = m_ms.FacePointing(el, *m_elem[j]);
+            assert(m_s[j]);
+        }
+        else
+            assert(false);
+    }
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::CalcAutoPenalty(FETiedElasticSurface& s)
+void FETiedFluidFSI::CalcAutoPenalty(FETiedFluidFSISurface& s)
 {
     // loop over all surface elements
     for (int i=0; i<s.Elements(); ++i)
@@ -416,7 +460,7 @@ void FETiedElasticInterface::CalcAutoPenalty(FETiedElasticSurface& s)
         int nint = el.GaussPoints();
         for (int j=0; j<nint; ++j)
         {
-			FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedFluidFSISurface::Data& pt = static_cast<FETiedFluidFSISurface::Data&>(*el.GetMaterialPoint(j));
 			pt.m_epsn = eps;
         }
     }
@@ -424,7 +468,7 @@ void FETiedElasticInterface::CalcAutoPenalty(FETiedElasticSurface& s)
 
 //-----------------------------------------------------------------------------
 // Perform initial projection between tied surfaces in reference configuration
-void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedElasticSurface& ms)
+void FETiedFluidFSI::InitialProjection(FETiedFluidFSISurface& ss, FETiedFluidFSISurface& ms)
 {
     FESurfaceElement* pme;
     vec3d r, nu;
@@ -458,7 +502,7 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
             // find the intersection point with the secondary surface
             pme = np.Project2(r, nu, rs);
             
-			FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedFluidFSISurface::Data& pt = static_cast<FETiedFluidFSISurface::Data&>(*el.GetMaterialPoint(j));
 			pt.m_pme = pme;
             pt.m_rs[0] = rs[0];
             pt.m_rs[1] = rs[1];
@@ -491,7 +535,7 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
 
 //-----------------------------------------------------------------------------
 // Evaluate gap functions for position and fluid pressure
-void FETiedElasticInterface::ProjectSurface(FETiedElasticSurface& ss, FETiedElasticSurface& ms)
+void FETiedFluidFSI::ProjectSurface(FETiedFluidFSISurface& ss, FETiedFluidFSISurface& ms)
 {
     FESurfaceElement* pme;
     vec3d r;
@@ -505,7 +549,7 @@ void FETiedElasticInterface::ProjectSurface(FETiedElasticSurface& ss, FETiedElas
         
         for (int j=0; j<nint; ++j)
         {
-			FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedFluidFSISurface::Data& pt = static_cast<FETiedFluidFSISurface::Data&>(*el.GetMaterialPoint(j));
 
             // calculate the global position of the integration point
             r = ss.Local2Global(el, j);
@@ -537,22 +581,108 @@ void FETiedElasticInterface::ProjectSurface(FETiedElasticSurface& ss, FETiedElas
 
 //-----------------------------------------------------------------------------
 
-void FETiedElasticInterface::Update()
+void FETiedFluidFSI::Update()
 {
     // project the surfaces onto each other
     // this will update the gap functions as well
     ProjectSurface(m_ss, m_ms);
-    if (m_btwo_pass) ProjectSurface(m_ms, m_ss);
     
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+double FETiedFluidFSI::GetFluidDilatation(FESurfaceElement& el, vec2d rs, double alpha)
+{
+    double ef = 0;
+    double* H;
+    el.shape_fnc(H, rs.x(), rs.y());
+    int neln = el.Nodes();
+    for (int j = 0; j < neln; ++j) {
+        FENode& node = m_ms.Node(el.m_lnode[j]);
+        double ej = node.get(m_dofEF)*alpha + node.get_prev(m_dofEF)*(1.0 - alpha);
+        ef += ej*H[j];
+    }
+    return ef;
+}
+
+//-----------------------------------------------------------------------------
+mat3ds FETiedFluidFSI::GetFluidStress(FESurfaceElement& el, vec2d rs)
+{
+    FEElement* e = el.m_elem[0].pe;
+    // get the fluid-FSI material of this element
+    FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(GetFEModel()->GetMaterial(e->GetMatID()));
+
+    if (e && pfsi) {
+        mat3ds si[FEElement::MAX_INTPOINTS];
+        mat3ds so[FEElement::MAX_NODES];
+        for (int i=0; i<el.GaussPoints(); ++i) {
+            FEMaterialPoint* pt = el.GetMaterialPoint(i);
+            FEFluidMaterialPoint* ep = pt->ExtractData<FEFluidMaterialPoint>();
+            if (ep)
+                si[i] = ep->m_sf;
+            else
+                si[i].zero();
+        }
+        // project stresses from integration points to nodes
+        el.project_to_nodes(si, so);
+        // only keep the stresses at the nodes of the contact face
+        mat3ds sn[FEElement::MAX_NODES];
+        for (int i=0; i<el.Nodes(); ++i)
+            sn[i] = so[el.FindNode(el.m_node[i])];
+        // evaluate fluid stress at given parametric coordinates
+        mat3ds sf; sf.zero();
+        double H[FEElement::MAX_INTPOINTS];
+        el.shape_fnc(H, rs.x(), rs.y());
+        for (int j=0; j<el.Nodes(); ++j) {
+            sf += sn[j]*H[j];
+        }
+        return sf;
+    }
+    else
+        return mat3ds(0);
+}
+
+//-----------------------------------------------------------------------------
+mat3ds FETiedFluidFSI::GetViscousFluidStress(FESurfaceElement& el, vec2d rs)
+{
+    FEElement* e = el.m_elem[0].pe;
+    // get the fluid-FSI material of this element
+    FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(GetFEModel()->GetMaterial(e->GetMatID()));
+    FESolidElement* se = dynamic_cast<FESolidElement*>(e);
+    
+    if (se && pfsi) {
+        mat3ds si[FEElement::MAX_INTPOINTS];
+        mat3ds so[FEElement::MAX_NODES];
+        for (int i=0; i<se->GaussPoints(); ++i) {
+            FEMaterialPoint& pt = *se->GetMaterialPoint(i);
+            si[i] = pfsi->Fluid()->GetViscous()->Stress(pt);
+        }
+        // project stresses from integration points to nodes
+        se->project_to_nodes(si, so);
+        // only keep the stresses at the nodes of the contact face
+        mat3ds sn[FEElement::MAX_NODES];
+        for (int i=0; i<el.Nodes(); ++i)
+            sn[i] = so[se->FindNode(el.m_node[i])];
+        // evaluate fluid stress at given parametric coordinates
+        mat3ds sv; sv.zero();
+        double H[FEElement::MAX_INTPOINTS];
+        el.shape_fnc(H, rs.x(), rs.y());
+        for (int j=0; j<el.Nodes(); ++j) {
+            sv += sn[j]*H[j];
+        }
+        return sv;
+    }
+    else
+        return mat3ds(0);
+}
+
+//-----------------------------------------------------------------------------
+void FETiedFluidFSI::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
     vector<int> LM1, LM2, LM, en;
     vector<double> fe;
     const int MI = FEElement::MAX_INTPOINTS;
-    double detJ[MI], w[MI], *H1, H2[MI];
+    double detJ[MI], w[MI], *N1, N2[MI];
+    vec3d n1[MI];
     const int MN = FEElement::MAX_NODES;
     vec3d f1[MN], f2[MN];
 
@@ -565,12 +695,12 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
         UpdateAutoPenalty();
     
     // loop over the nr of passes
-    int npass = (m_btwo_pass?2:1);
+    int npass = 1;
     for (int np=0; np<npass; ++np)
     {
         // get primary and secondary surface
-        FETiedElasticSurface& s1 = (np == 0? m_ss : m_ms);
-        FETiedElasticSurface& s2 = (np == 0? m_ms : m_ss);
+        FETiedFluidFSISurface& s1 = (np == 0? m_ss : m_ms);
+        FETiedFluidFSISurface& s2 = (np == 0? m_ms : m_ss);
         
         // loop over all primary elements
         for (int i=0; i<s1.Elements(); ++i)
@@ -594,7 +724,8 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                 s1.CoBaseVectors(se1, j, g);
                 
                 // jacobians: J = |g0xg1|
-                detJ[j] = (g[0] ^ g[1]).norm();
+                n1[j] = g[0] ^ g[1];
+                detJ[j] = n1[j].unit();
                 
                 // integration weights
                 w[j] = se1.GaussWeights()[j];
@@ -604,7 +735,7 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
             // note that we are integrating over the current surface
             for (int j=0; j<nint1; ++j)
             {
-                FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*se1.GetMaterialPoint(j));
+                FETiedFluidFSISurface::Data& pt = static_cast<FETiedFluidFSISurface::Data&>(*se1.GetMaterialPoint(j));
 
                 // get the secondary element
                 FESurfaceElement* pme = pt.m_pme;
@@ -618,6 +749,8 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     
                     // copy LM vector
                     s2.UnpackLM(se2, LM2);
+                    
+                    mat3ds sf = GetFluidStress(se2, pt.m_rs);
                     
                     // calculate degrees of freedom
                     int ndof = 3*(neln1 + neln2);
@@ -644,12 +777,12 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     for (int b=0; b<neln2; ++b) en[b+neln1] = se2.m_node[b];
                     
                     // get primary element shape functions
-                    H1 = se1.H(j);
+                    N1 = se1.H(j);
                     
                     // get secondary element shape functions
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
-                    se2.shape_fnc(H2, r, s);
+                    se2.shape_fnc(N2, r, s);
                     
                     // gap function
                     vec3d dg = pt.m_dg;
@@ -661,15 +794,15 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     double eps = m_epsn*pt.m_epsn;
                     
                     // contact traction
-                    vec3d t1 = Lm + dg*eps;
+                    vec3d t1 = Lm + dg*eps - sf*n1[j];
                     pt.m_tr = t1;
                     
                     // calculate the force vector
                     fe.resize(ndof);
                     zero(fe);
                     
-                    for (int a=0; a<neln1; ++a) f1[a] = t1*H1[a];
-                    for (int b=0; b<neln2; ++b) f2[b] = -t1*H2[b];
+                    for (int a=0; a<neln1; ++a) f1[a] = t1*N1[a];
+                    for (int b=0; b<neln2; ++b) f2[b] = -t1*N2[b];
                     
                     for (int a = 0; a<neln1; ++a) {
                         fe[3*a  ] += f1[a].x*detJ[j]*w[j];
@@ -692,13 +825,14 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
         }
     }
 }
+
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FETiedFluidFSI::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
     vector<int> LM1, LM2, LM, en;
     const int MI = FEElement::MAX_INTPOINTS;
     const int MN = FEElement::MAX_NODES;
-    double detJ[MI], w[MI], *H1, H2[MI];
+    double detJ[MI], w[MI], *N1, N2[MI];
     FEElementMatrix ke;
     
     // see how many reformations we've had to do so far
@@ -720,15 +854,17 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
         else knmult = 0;
     }
     
-    double alpha = GetTimeInfo().alphaf;
-    
+    double dt = tp.timeIncrement;
+    double alpha = tp.alphaf;
+    double ksi = tp.gamma / (tp.beta*dt);
+
     // do single- or two-pass
-    int npass = (m_btwo_pass?2:1);
+    int npass = 1;
     for (int np=0; np < npass; ++np)
     {
         // get the primary and secondary surface
-        FETiedElasticSurface& s1 = (np == 0? m_ss : m_ms);
-        FETiedElasticSurface& s2 = (np == 0? m_ms : m_ss);
+        FETiedFluidFSISurface& s1 = (np == 0? m_ss : m_ms);
+        FETiedFluidFSISurface& s2 = (np == 0? m_ms : m_ss);
         
         // loop over all primary elements
         for (int i=0; i<s1.Elements(); ++i)
@@ -762,22 +898,42 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
             // loop over all integration points
             for (int j=0; j<nint1; ++j)
             {
-                FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*se1.GetMaterialPoint(j));
+                FETiedFluidFSISurface::Data& pt = static_cast<FETiedFluidFSISurface::Data&>(*se1.GetMaterialPoint(j));
 
                 // get the secondary element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
                 {
                     FESurfaceElement& se2 = *pme;
+                    FEElement* e2 = se2.m_elem[0].pe;
                     
                     // get the nr of secondary nodes
                     int neln2 = se2.Nodes();
+                    
+                    int nint2 = se2.GaussPoints();
                     
                     // copy the LM vector
                     s2.UnpackLM(se2, LM2);
                     
                     int ndpn;    // number of dofs per node
                     int ndof;    // number of dofs in stiffness matrix
+
+                    FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(GetFEModel()->GetMaterial(e2->GetMatID()));
+                    assert(pfsi);
+                    mat3d Ls2; Ls2.zero();
+                    tens4ds Cv2; Cv2.zero();
+                    for (int n = 0; n<e2->GaussPoints(); ++n)
+                    {
+                        FEMaterialPoint& mp = *e2->GetMaterialPoint(n);
+                        FEElasticMaterialPoint& ep = *(mp.ExtractData<FEElasticMaterialPoint>());
+                        Ls2 += ep.m_L;
+                        Cv2 += pfsi->Fluid()->GetViscous()->Tangent_RateOfDeformation(mp);
+                    }
+                    Ls2 /= e2->GaussPoints();
+                    Cv2 /= e2->GaussPoints();
+
+                    // get the fluid stress
+                    mat3ds sf = GetFluidStress(se2, pt.m_rs);
                     
                     // calculate degrees of freedom for elastic-on-elastic contact
                     ndpn = 3;
@@ -806,12 +962,12 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                     for (int b=0; b<neln2; ++b) en[b+neln1] = se2.m_node[b];
                     
                     // primary shape functions
-                    H1 = se1.H(j);
+                    N1 = se1.H(j);
                     
                     // secondary shape functions
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
-                    se2.shape_fnc(H2, r, s);
+                    se2.shape_fnc(N2, r, s);
                     
                     // get primary normal vector
                     vec3d n1 = pt.m_nu;
@@ -826,7 +982,7 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                     double eps = m_epsn*pt.m_epsn;
                     
                     // contact traction
-                    vec3d t1 = Lm + dg*eps;
+                    vec3d t1 = Lm + dg*eps - sf*n1;
                     
                     // create the stiffness matrix
                     ke.resize(ndof, ndof); ke.zero();
@@ -839,14 +995,14 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                     for (int a=0; a<neln1; ++a) {
                         for (int c=0; c<neln1; ++c)
                         {
-                            mat3dd K11(eps*H1[a]*H1[c]*detJ[j]*w[j]*alpha);
+                            mat3dd K11(eps*N1[a]*N1[c]*detJ[j]*w[j]*alpha);
                             ke[ndpn*a    ][ndpn*c    ] += K11.xx();
                             ke[ndpn*a + 1][ndpn*c + 1] += K11.yy();
                             ke[ndpn*a + 2][ndpn*c + 2] += K11.zz();
                         }
                         for (int d=0; d<neln2; ++d)
                         {
-                            mat3dd K12(-eps*H1[a]*H2[d]*detJ[j]*w[j]*alpha);
+                            mat3dd K12(-eps*N1[a]*N2[d]*detJ[j]*w[j]*alpha);
                             ke[ndpn*a    ][ndpn*(neln1+d)    ] += K12.xx();
                             ke[ndpn*a + 1][ndpn*(neln1+d) + 1] += K12.yy();
                             ke[ndpn*a + 2][ndpn*(neln1+d) + 2] += K12.zz();
@@ -856,14 +1012,14 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                     for (int b=0; b<neln2; ++b) {
                         for (int c=0; c<neln1; ++c)
                         {
-                            mat3dd K21(-eps*H2[b]*H1[c]*detJ[j]*w[j]*alpha);
+                            mat3dd K21(-eps*N2[b]*N1[c]*detJ[j]*w[j]*alpha);
                             ke[ndpn*(neln1+b)    ][ndpn*c    ] += K21.xx();
                             ke[ndpn*(neln1+b) + 1][ndpn*c + 1] += K21.yy();
                             ke[ndpn*(neln1+b) + 2][ndpn*c + 2] += K21.zz();
                         }
                         for (int d=0; d<neln2; ++d)
                         {
-                            mat3dd K22(eps*H2[b]*H2[d]*detJ[j]*w[j]*alpha);
+                            mat3dd K22(eps*N2[b]*N2[d]*detJ[j]*w[j]*alpha);
                             ke[ndpn*(neln1+b)    ][ndpn*(neln1+d)    ] += K22.xx();
                             ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d) + 1] += K22.yy();
                             ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d) + 2] += K22.zz();
@@ -873,17 +1029,24 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                     // b. A-term
                     //-------------------------------------
                     
-                    double* Gr = se1.Gr(j);
-                    double* Gs = se1.Gs(j);
+                    double* Gr1 = se1.Gr(j);
+                    double* Gs1 = se1.Gs(j);
                     vec3d g1[2];
                     s1.CoBaseVectors(se1, j, g1);
                     
                     vec3d a1[MN];
                     mat3d A1[MN];
                     for (int c=0; c<neln1; ++c) {
-                        a1[c] = n1 ^ (g1[1]*Gr[c] - g1[0]*Gs[c]);
+                        a1[c] = n1 ^ (g1[1]*Gr1[c] - g1[0]*Gs1[c]);
                         A1[c] = t1 & a1[c];
                     }
+                    
+                    double Gr2[MN], Gs2[MN];
+                    vec3d g2[2];
+                    s2.ContraBaseVectors(se2, pt.m_rs.x(), pt.m_rs.y(), g2);
+                    se2.shape_deriv(Gr2, Gs2, pt.m_rs.x(), pt.m_rs.y());
+                    vec3d gradN2[MN];
+                    for (int d=0; d<neln2; ++d) gradN2[d] = g2[0]*Gr2[d] + g2[1]*Gs2[d];
                     
                     if (!m_bsymm)
                     {
@@ -891,7 +1054,7 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                         for (int a=0; a<neln1; ++a) {
                             for (int c=0; c<neln1; ++c)
                             {
-                                mat3d A11 = A1[c]*(H1[a]*w[j]*alpha);
+                                mat3d A11 = A1[c]*(N1[a]*w[j]*alpha);
                                 ke[ndpn*a    ][ndpn*c    ] += A11(0,0);
                                 ke[ndpn*a    ][ndpn*c + 1] += A11(0,1);
                                 ke[ndpn*a    ][ndpn*c + 2] += A11(0,2);
@@ -904,12 +1067,28 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                                 ke[ndpn*a + 2][ndpn*c + 1] += A11(2,1);
                                 ke[ndpn*a + 2][ndpn*c + 2] += A11(2,2);
                             }
+                            
+                            for (int d=0; d<neln2; ++d)
+                            {
+                                mat3d H12 = -Cv2.dot(mat3dd(alpha*ksi)-Ls2)*(N1[a]*(gradN2[d]*(g1[0]^g1[1])));
+                                ke[ndpn*a    ][ndpn*(neln1+d)    ] += H12(0,0);
+                                ke[ndpn*a    ][ndpn*(neln1+d) + 1] += H12(0,1);
+                                ke[ndpn*a    ][ndpn*(neln1+d) + 2] += H12(0,2);
+
+                                ke[ndpn*a + 1][ndpn*(neln1+d)    ] += H12(1,0);
+                                ke[ndpn*a + 1][ndpn*(neln1+d) + 1] += H12(1,1);
+                                ke[ndpn*a + 1][ndpn*(neln1+d) + 2] += H12(1,2);
+
+                                ke[ndpn*a + 2][ndpn*(neln1+d)    ] += H12(2,0);
+                                ke[ndpn*a + 2][ndpn*(neln1+d) + 1] += H12(2,1);
+                                ke[ndpn*a + 2][ndpn*(neln1+d) + 2] += H12(2,2);
+                            }
                         }
                         
                         for (int b=0; b<neln2; ++b) {
                             for (int c=0; c<neln1; ++c)
                             {
-                                mat3d A21 = A1[c]*(-H2[b]*w[j]*alpha);
+                                mat3d A21 = A1[c]*(-N2[b]*w[j]*alpha);
                                 ke[ndpn*(neln1+b)    ][ndpn*c    ] += A21(0,0);
                                 ke[ndpn*(neln1+b)    ][ndpn*c + 1] += A21(0,1);
                                 ke[ndpn*(neln1+b)    ][ndpn*c + 2] += A21(0,2);
@@ -922,6 +1101,22 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                                 ke[ndpn*(neln1+b) + 2][ndpn*c + 1] += A21(2,1);
                                 ke[ndpn*(neln1+b) + 2][ndpn*c + 2] += A21(2,2);
                             }
+                            
+                            for (int d=0; d<neln2; ++d)
+                            {
+                                mat3d H22 = Cv2.dot(mat3dd(alpha*ksi)-Ls2)*(N2[b]*(gradN2[d]*(g1[0]^g1[1])));
+                                ke[ndpn*(neln1+b)     ][ndpn*(neln1+d)    ] += H22(0,0);
+                                ke[ndpn*(neln1+b)     ][ndpn*(neln1+d) + 1] += H22(0,1);
+                                ke[ndpn*(neln1+b)     ][ndpn*(neln1+d) + 2] += H22(0,2);
+
+                                ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d)    ] += H22(1,0);
+                                ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d) + 1] += H22(1,1);
+                                ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d) + 2] += H22(1,2);
+
+                                ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d)    ] += H22(2,0);
+                                ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d) + 1] += H22(2,1);
+                                ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d) + 2] += H22(2,2);
+                            }
                         }
                         
                     }
@@ -931,7 +1126,7 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                         for (int a=0; a<neln1; ++a) {
                             for (int c=0; c<neln1; ++c)
                             {
-                                mat3ds A11 = (A1[c]*(H1[a]*w[j]*alpha)).sym();
+                                mat3ds A11 = (A1[c]*(N1[a]*w[j]*alpha)).sym();
                                 ke[ndpn*a    ][ndpn*c    ] += A11(0,0);
                                 ke[ndpn*a    ][ndpn*c + 1] += A11(0,1);
                                 ke[ndpn*a    ][ndpn*c + 2] += A11(0,2);
@@ -949,7 +1144,7 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                         for (int b=0; b<neln2; ++b) {
                             for (int c=0; c<neln1; ++c)
                             {
-                                mat3ds A21 = (A1[c]*(-H2[b]*w[j]*alpha)).sym();
+                                mat3ds A21 = (A1[c]*(-N2[b]*w[j]*alpha)).sym();
                                 ke[ndpn*(neln1+b)    ][ndpn*c    ] += A21(0,0);
                                 ke[ndpn*(neln1+b)    ][ndpn*c + 1] += A21(0,1);
                                 ke[ndpn*(neln1+b)    ][ndpn*c + 2] += A21(0,2);
@@ -975,7 +1170,7 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
 }
 
 //-----------------------------------------------------------------------------
-bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
+bool FETiedFluidFSI::Augment(int naug, const FETimeInfo& tp)
 {
     // make sure we need to augment
     if (m_laugon != FECore::AUGLAG_METHOD) return true;
@@ -995,7 +1190,7 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ss.Element(i);
         for (int j=0; j<el.GaussPoints(); ++j)
         {
-			FETiedElasticSurface::Data& ds = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedFluidFSISurface::Data& ds = static_cast<FETiedFluidFSISurface::Data&>(*el.GetMaterialPoint(j));
 			normL0 += ds.m_Lmd*ds.m_Lmd;
         }
     }
@@ -1004,7 +1199,7 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ms.Element(i);
 		for (int j=0; j<el.GaussPoints(); ++j)
         {
-			FETiedElasticSurface::Data& dm = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedFluidFSISurface::Data& dm = static_cast<FETiedFluidFSISurface::Data&>(*el.GetMaterialPoint(j));
 			normL0 += dm.m_Lmd*dm.m_Lmd;
         }
     }
@@ -1020,7 +1215,7 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ss.Element(i);
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
-			FETiedElasticSurface::Data& ds = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedFluidFSISurface::Data& ds = static_cast<FETiedFluidFSISurface::Data&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on primary surface
             eps = m_epsn*ds.m_epsn;
@@ -1037,7 +1232,7 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 		FESurfaceElement& el = m_ms.Element(i);
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
-			FETiedElasticSurface::Data& dm = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
+            FETiedFluidFSISurface::Data& dm = static_cast<FETiedFluidFSISurface::Data&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on secondary surface
             eps = m_epsn*dm.m_epsn;
@@ -1078,7 +1273,7 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedElasticInterface::Serialize(DumpStream &ar)
+void FETiedFluidFSI::Serialize(DumpStream &ar)
 {
     // store contact data
     FEContactInterface::Serialize(ar);
