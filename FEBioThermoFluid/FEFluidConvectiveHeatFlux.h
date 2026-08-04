@@ -23,58 +23,37 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
-#include "FEElasticSolidDomain.h"
+#include <FECore/FESurfaceLoad.h>
+#include <FECore/FEModelParam.h>
+#include <FECore/FEDofList.h>
+#include "febiothermofluid_api.h"
 
 //-----------------------------------------------------------------------------
-//! domain class for 3D rigid elements
-//!
-class FERigidSolidDomain : public FEElasticSolidDomain
+//! FEFluidNormalHeatFlux is a thermo-fluid surface that has a normal
+//! heat flux prescribed on it.
+class FEBIOTHERMOFLUID_API FEFluidConvectiveHeatFlux : public FESurfaceLoad
 {
 public:
-	//! constructor
-	FERigidSolidDomain(FEModel* pfem);
-
-	//! Initialize
-	bool Init() override;
-
-	//! reset data
-	void Reset() override;
-
-	//! serialization
-	void Serialize(DumpStream& ar) override;
-
-	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
-
-	void BuildMatrixProfile(FEGlobalMatrix& M) override;
-
-public:
-
-	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FELinearSystem& LS) override;
-
-	//! calculates the residual (nothing to do)
-	void InternalForces(FEGlobalVector& R) override;
-
-	//! calculates mass matrix (nothing to do)
-	void MassMatrix(FELinearSystem& LS, double scale) override;
-
-	//! calculates the inertial forces (nothing to do)
-	void InertialForces(FEGlobalVector& R, std::vector<double>& F) override;
-
-	// update domain data
-	void Update(const FETimeInfo& tp) override;
-
-	void BodyForce(FEGlobalVector& R, FEBodyForce& BF) override;
-
-public:
-	// calculate contribution of MOI for this domain
-	mat3d CalculateMOI();
-
-	double CalculateMass();
-
-	vec3d CalculateCOM();
+    //! constructor
+    FEFluidConvectiveHeatFlux(FEModel* pfem);
+    
+    //! initialization
+    bool Init() override;
+    
+    //! calculate load vector
+    void LoadVector(FEGlobalVector& R) override;
+    
+    //! calculate heat flux stiffness (there is none)
+    void StiffnessMatrix(FELinearSystem& LS) override;
+    
+private:
+    int   m_dofT;
+    FEDofList  m_dof;
+    
+protected:
+    FEParamDouble   m_h;    //!< heat transfer coefficient
+    FEParamDouble   m_Tinf;  //!< sink temperature
+    
+    DECLARE_FECORE_CLASS();
 };

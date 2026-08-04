@@ -652,6 +652,8 @@ void FESolidSolver2::UpdateKinematics(vector<double>& ui)
 //! Update DOF increments
 void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bool emap)
 {
+	TRACK_TIME(TimerID::Timer_Update);
+
 	FEModel& fem = *GetFEModel();
 
 	// get the mesh
@@ -661,37 +663,39 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 	m_rigidSolver.UpdateIncrements(Ui, ui, emap);
         
 	// update flexible nodes
-	int n;
-	for (int i=0; i<mesh.Nodes(); ++i)
+	int NN = mesh.Nodes();
+#pragma omp parallel for 
+	for (int i=0; i<NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
+		const std::vector<int>& id = node.m_ID;
+		int n;
         
 		// displacement dofs
 		// current position = initial + total at prev conv step + total increment so far + current increment
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) Ui[n] += ui[n];
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofU[0]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofU[1]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofU[2]]) >= 0) Ui[n] += ui[n];
  
 		// beam rotations
+		if ((id[m_dofQ[0]] >= 0) || (id[m_dofQ[1]] >= 0) || (id[m_dofQ[2]] >= 0))
 		{
 			vec3d ri, Ri;
-			if ((n = node.m_ID[m_dofQ[0]]) >= 0) { ri.x = ui[n]; Ri.x = Ui[n]; }
-			if ((n = node.m_ID[m_dofQ[1]]) >= 0) { ri.y = ui[n]; Ri.y = Ui[n]; }
-			if ((n = node.m_ID[m_dofQ[2]]) >= 0) { ri.z = ui[n]; Ri.z = Ui[n]; }
+			if ((n = id[m_dofQ[0]]) >= 0) { ri.x = ui[n]; Ri.x = Ui[n]; }
+			if ((n = id[m_dofQ[1]]) >= 0) { ri.y = ui[n]; Ri.y = Ui[n]; }
+			if ((n = id[m_dofQ[2]]) >= 0) { ri.z = ui[n]; Ri.z = Ui[n]; }
 			quatd qi(ri), Qi(Ri);
 			quatd Qn = qi * Qi;
 			vec3d rn = Qn.GetRotationVector();
-			if ((n = node.m_ID[m_dofQ[0]]) >= 0) { Ui[n] = rn.x; }
-			if ((n = node.m_ID[m_dofQ[1]]) >= 0) { Ui[n] = rn.y; }
-			if ((n = node.m_ID[m_dofQ[2]]) >= 0) { Ui[n] = rn.z; }
+			if ((n = id[m_dofQ[0]]) >= 0) { Ui[n] = rn.x; }
+			if ((n = id[m_dofQ[1]]) >= 0) { Ui[n] = rn.y; }
+			if ((n = id[m_dofQ[2]]) >= 0) { Ui[n] = rn.z; }
 		}
 
 		// shell dofs
-		{
-			if ((n = node.m_ID[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
-			if ((n = node.m_ID[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
-			if ((n = node.m_ID[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
-		}
+		if ((n = id[m_dofSU[0]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofSU[1]]) >= 0) Ui[n] += ui[n];
+		if ((n = id[m_dofSU[2]]) >= 0) Ui[n] += ui[n];
 	}
 
 	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
@@ -725,23 +729,26 @@ void FESolidSolver2::UpdateIncrements(vector<double>& Ui, vector<double>& ui, bo
 //! Updates the current state of the model
 void FESolidSolver2::Update(vector<double>& ui)
 {
-    FEModel& fem = *GetFEModel();
-    FETimeInfo& tp = fem.GetTime();
-    tp.currentIteration = m_niter;
-    
-    // update EAS
-    UpdateEAS(ui);
-    UpdateIncrementsEAS(ui, true);
-
-	// update kinematics
-	UpdateKinematics(ui);
-
-	// update domains 
-	FEMesh& mesh = fem.GetMesh();
-	for (int i = 0; i < mesh.Domains(); ++i)
 	{
-		FEDomain& dom = mesh.Domain(i);
-		dom.IncrementalUpdate(ui, false);
+		TRACK_TIME(Timer_Update)
+			FEModel& fem = *GetFEModel();
+		FETimeInfo& tp = fem.GetTime();
+		tp.currentIteration = m_niter;
+
+		// update EAS
+		UpdateEAS(ui);
+		UpdateIncrementsEAS(ui, true);
+
+		// update kinematics
+		UpdateKinematics(ui);
+
+		// update domains 
+		FEMesh& mesh = fem.GetMesh();
+		for (int i = 0; i < mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			dom.IncrementalUpdate(ui, false);
+		}
 	}
 
 	// update model state
@@ -848,147 +855,156 @@ bool FESolidSolver2::InitStep(double time)
 void FESolidSolver2::PrepStep()
 {
 	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
     FETimeInfo& tp = fem.GetTime();
 	double dt = tp.timeIncrement;
 	tp.augmentation = 0;
     
 	// zero total displacements
-	zero(m_Ui);
-
-	// store previous mesh state
-	// we need them for velocity and acceleration calculations
-	FEMesh& mesh = fem.GetMesh();
-	for (int i=0; i<mesh.Nodes(); ++i)
 	{
-		FENode& ni = mesh.Node(i);
-		ni.m_rp = ni.m_rt;
-		ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
-		ni.m_ap = ni.m_at;
-        ni.m_dp = ni.m_dt;
-		ni.UpdateValues();
+		TRACK_TIME(TimerID::Timer_Update);
 
-        // initial guess at start of new time step
-        // solid
-        ni.m_at = ni.m_ap*(1-0.5/m_beta) - ni.m_vp/(m_beta*dt);
-        vec3d vs = ni.m_vp + (ni.m_at*m_gamma + ni.m_ap*(1-m_gamma))*dt;
-        ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vs);
-        
-        // solid shell
-        vec3d aqp = ni.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
-        vec3d vqp = ni.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
-        vec3d aqt = aqp*(1-0.5/m_beta) - vqp/(m_beta*dt);
-        ni.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
-        vec3d vqt = vqp + (aqt*m_gamma + aqp*(1-m_gamma))*dt;
-        ni.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
+		zero(m_Ui);
 
-		// beams (rotational kinematics)
+		// store previous mesh state
+		// we need them for velocity and acceleration calculations
+		int NN = mesh.Nodes();
+#pragma omp parallel for
+		for (int i = 0; i < NN; ++i)
 		{
-			// get rotation
-			vec3d rp = ni.get_vec3d_prev(m_dofQ[0], m_dofQ[1], m_dofQ[2]);
-			quatd Q(rp);
-			quatd Qt = Q.Conjugate();
+			FENode& ni = mesh.Node(i);
+			ni.m_rp = ni.m_rt;
+			ni.m_vp = ni.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+			ni.m_ap = ni.m_at;
+			ni.m_dp = ni.m_dt;
+			ni.UpdateValues();
 
-			// get previous spatial quantities
-			vec3d wp = ni.get_vec3d_prev(m_dofBW[0], m_dofBW[1], m_dofBW[2]);
-			vec3d ap = ni.get_vec3d_prev(m_dofBA[0], m_dofBA[1], m_dofBA[2]);
+			// initial guess at start of new time step
+			// solid
+			ni.m_at = ni.m_ap * (1 - 0.5 / m_beta) - ni.m_vp / (m_beta * dt);
+			vec3d vs = ni.m_vp + (ni.m_at * m_gamma + ni.m_ap * (1 - m_gamma)) * dt;
+			ni.set_vec3d(m_dofV[0], m_dofV[1], m_dofV[2], vs);
 
-			// convert to material frame
-			vec3d Wp = Qt * wp;
-			vec3d Ap = Qt * ap;
+			// solid shell
+			vec3d aqp = ni.get_vec3d_prev(m_dofSA[0], m_dofSA[1], m_dofSA[2]);
+			vec3d vqp = ni.get_vec3d_prev(m_dofSV[0], m_dofSV[1], m_dofSV[2]);
+			vec3d aqt = aqp * (1 - 0.5 / m_beta) - vqp / (m_beta * dt);
+			ni.set_vec3d(m_dofSA[0], m_dofSA[1], m_dofSA[2], aqt);
+			vec3d vqt = vqp + (aqt * m_gamma + aqp * (1 - m_gamma)) * dt;
+			ni.set_vec3d(m_dofSV[0], m_dofSV[1], m_dofSV[2], vqt);
 
-			// initial guess 
-			vec3d At = Ap * (1.0 - 0.5/m_beta) - Wp / (m_beta*dt);
-			vec3d Wt = Wp + (Ap * (1.0 - m_gamma) + At*m_gamma)*dt;
+			// beams (rotational kinematics)
+			{
+				// get rotation
+				vec3d rp = ni.get_vec3d_prev(m_dofQ[0], m_dofQ[1], m_dofQ[2]);
+				quatd Q(rp);
+				quatd Qt = Q.Conjugate();
 
-			// back to spatial frame
-			vec3d at = Q * At;
-			vec3d wt = Q * Wt;
+				// get previous spatial quantities
+				vec3d wp = ni.get_vec3d_prev(m_dofBW[0], m_dofBW[1], m_dofBW[2]);
+				vec3d ap = ni.get_vec3d_prev(m_dofBA[0], m_dofBA[1], m_dofBA[2]);
 
-			ni.set_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2], wt);
-			ni.set_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2], at);
+				// convert to material frame
+				vec3d Wp = Qt * wp;
+				vec3d Ap = Qt * ap;
+
+				// initial guess 
+				vec3d At = Ap * (1.0 - 0.5 / m_beta) - Wp / (m_beta * dt);
+				vec3d Wt = Wp + (Ap * (1.0 - m_gamma) + At * m_gamma) * dt;
+
+				// back to spatial frame
+				vec3d at = Q * At;
+				vec3d wt = Q * Wt;
+
+				ni.set_vec3d(m_dofBW[0], m_dofBW[1], m_dofBW[2], wt);
+				ni.set_vec3d(m_dofBA[0], m_dofBA[1], m_dofBA[2], at);
+			}
 		}
-    }
 
-    // apply concentrated nodal forces
-	// since these forces do not depend on the geometry
-	// we can do this once outside the NR loop.
-//	vector<double> dummy(m_neq, 0.0);
-//	zero(m_Fn);
-//	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
-//	NodalLoads(Fn, tp);
+		// apply concentrated nodal forces
+		// since these forces do not depend on the geometry
+		// we can do this once outside the NR loop.
+	//	vector<double> dummy(m_neq, 0.0);
+	//	zero(m_Fn);
+	//	FEResidualVector Fn(*GetFEModel(), m_Fn, dummy);
+	//	NodalLoads(Fn, tp);
 
-	// apply boundary conditions
-	// we save the prescribed displacements increments in the ui vector
-	vector<double>& ui = m_ui;
-	zero(ui);
-	int nbc = fem.BoundaryConditions();
-	for (int i=0; i<nbc; ++i)
-	{
-		FEBoundaryCondition& dc = *fem.BoundaryCondition(i);
-		if (dc.IsActive()) dc.PrepStep(ui);
-	}
+		// apply boundary conditions
+		// we save the prescribed displacements increments in the ui vector
+		vector<double>& ui = m_ui;
+		zero(ui);
+		int nbc = fem.BoundaryConditions();
+		for (int i = 0; i < nbc; ++i)
+		{
+			FEBoundaryCondition& dc = *fem.BoundaryCondition(i);
+			if (dc.IsActive()) dc.PrepStep(ui);
+		}
 
-	// do the linear constraints
-	fem.GetLinearConstraintManager().PrepStep();
+		// do the linear constraints
+		fem.GetLinearConstraintManager().PrepStep();
 
-	// initialize rigid bodies
-	m_rigidSolver.PrepStep(tp, ui);
+		// initialize rigid bodies
+		m_rigidSolver.PrepStep(tp, ui);
 
-	// intialize material point data
-	// NOTE: do this before the stresses are updated
-	// TODO: does it matter if the stresses are updated before
-	//       the material point data is initialized
-	for (int i=0; i<mesh.Domains(); ++i) 
-	{
-		FEDomain& dom = mesh.Domain(i);
-		if (dom.IsActive()) dom.PreSolveUpdate(tp);
+		// intialize material point data
+		// NOTE: do this before the stresses are updated
+		// TODO: does it matter if the stresses are updated before
+		//       the material point data is initialized
+		for (int i = 0; i < mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			if (dom.IsActive()) dom.PreSolveUpdate(tp);
+		}
 	}
 
 	// update model state
 	UpdateModel();
 
-	for (int i = 0; i < fem.NonlinearConstraints(); ++i)
 	{
-		FENLConstraint* plc = fem.NonlinearConstraint(i);
-		if (plc && plc->IsActive()) plc->PrepStep();
+		TRACK_TIME(TimerID::Timer_Update);
+		for (int i = 0; i < fem.NonlinearConstraints(); ++i)
+		{
+			FENLConstraint* plc = fem.NonlinearConstraint(i);
+			if (plc && plc->IsActive()) plc->PrepStep();
+		}
+
+		for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+		{
+			FESurfacePairConstraint* psc = fem.SurfacePairConstraint(i);
+			if (psc && psc->IsActive()) psc->PrepStep();
+		}
+
+		for (int i = 0; i < fem.ModelLoads(); ++i)
+		{
+			FEModelLoad* pl = fem.ModelLoad(i);
+			if (pl->IsActive()) pl->PrepStep();
+		}
+
+		// see if we need to do contact augmentations
+		m_baugment = false;
+		for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
+		{
+			FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
+			if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
+		}
+
+		// see if we need to do incompressible augmentations
+		// TODO: Should I do these augmentations in a nlconstraint class instead?
+		int ndom = mesh.Domains();
+		for (int i = 0; i < ndom; ++i)
+		{
+			FEDomain* dom = &mesh.Domain(i);
+			FE3FieldElasticSolidDomain* dom3f = dynamic_cast<FE3FieldElasticSolidDomain*>(dom);
+			if (dom3f && dom3f->DoAugmentations()) m_baugment = true;
+
+			FE3FieldElasticShellDomain* dom3fs = dynamic_cast<FE3FieldElasticShellDomain*>(dom);
+			if (dom3fs && dom3fs->DoAugmentations()) m_baugment = true;
+		}
+
+		// see if we have to do nonlinear constraint augmentations
+		if (fem.NonlinearConstraints() != 0) m_baugment = true;
 	}
-
-	for (int i = 0; i < fem.SurfacePairConstraints(); ++i)
-	{
-		FESurfacePairConstraint* psc = fem.SurfacePairConstraint(i);
-		if (psc && psc->IsActive()) psc->PrepStep();
-	}
-
-	for (int i = 0; i < fem.ModelLoads(); ++i)
-	{
-		FEModelLoad* pl = fem.ModelLoad(i);
-		if (pl->IsActive()) pl->PrepStep();
-	}
-
-	// see if we need to do contact augmentations
-	m_baugment = false;
-	for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
-	{
-		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*fem.SurfacePairConstraint(i));
-		if (ci.IsActive() && (ci.m_laugon == FECore::AUGLAG_METHOD)) m_baugment = true;
-	}
-
-	// see if we need to do incompressible augmentations
-	// TODO: Should I do these augmentations in a nlconstraint class instead?
-	int ndom = mesh.Domains();
-	for (int i = 0; i < ndom; ++i)
-	{
-		FEDomain* dom = &mesh.Domain(i);
-		FE3FieldElasticSolidDomain* dom3f = dynamic_cast<FE3FieldElasticSolidDomain*>(dom);
-		if (dom3f && dom3f->DoAugmentations()) m_baugment = true;
-
-		FE3FieldElasticShellDomain* dom3fs = dynamic_cast<FE3FieldElasticShellDomain*>(dom);
-		if (dom3fs && dom3fs->DoAugmentations()) m_baugment = true;
-	}
-
-	// see if we have to do nonlinear constraint augmentations
-	if (fem.NonlinearConstraints() != 0) m_baugment = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1036,7 +1052,7 @@ bool FESolidSolver2::Quasin()
 	bool bconv = false;		// convergence flag
 	do
 	{
-		feLog(" %d\n", m_niter+1);
+		feLog(" %d\n", m_niter + 1);
 
 		// assume we'll converge. 
 		bconv = true;
@@ -1053,9 +1069,9 @@ bool FESolidSolver2::Quasin()
 		// set initial convergence norms
 		if (m_niter == 0)
 		{
-			normRi = fabs(m_R0*m_R0);
-			normEi = fabs(m_ui*m_R0);
-			normUi = fabs(m_ui*m_ui);
+			normRi = fabs(m_R0 * m_R0);
+			normEi = fabs(m_ui * m_R0);
+			normUi = fabs(m_ui * m_ui);
 			normEm = normEi;
 
 			m_residuNorm.norm0 = normRi;
@@ -1067,16 +1083,16 @@ bool FESolidSolver2::Quasin()
 		// NOTE: We don't apply the line search directly to m_ui since we need the unscaled search direction for the QN update below
 		int neq = (int)m_Ui.size();
 		vector<double> ui(m_ui);
-		for (int i = 0; i<neq; ++i) ui[i] *= s;
+		for (int i = 0; i < neq; ++i) ui[i] *= s;
 
 		// update total displacements
 		UpdateIncrements(m_Ui, ui, false);
 
 		// calculate norms
-		normR1 = m_R1*m_R1;
-		normu  = ui*ui;
-		normU  = m_Ui*m_Ui;
-		normE1 = fabs(ui*m_R1);
+		normR1 = m_R1 * m_R1;
+		normu = ui * ui;
+		normU = m_Ui * m_Ui;
+		normE1 = fabs(ui * m_R1);
 
 		m_residuNorm.norm = normR1;
 		m_energyNorm.norm = normE1;
@@ -1087,13 +1103,13 @@ bool FESolidSolver2::Quasin()
 		if (ISNAN(normu)) throw NANInSolutionDetected();
 
 		// check residual norm
-		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
+		if ((m_Rtol > 0) && (normR1 > m_Rtol * normRi)) bconv = false;
 
 		// check displacement norm
-		if ((m_Dtol > 0) && (normu  > (m_Dtol*m_Dtol)*normU )) bconv = false;
+		if ((m_Dtol > 0) && (normu > (m_Dtol * m_Dtol) * normU)) bconv = false;
 
 		// check energy norm
-		if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
+		if ((m_Etol > 0) && (normE1 > m_Etol * normEi)) bconv = false;
 
 		// check linestep size
 		if ((m_lineSearch->m_LStol > 0) && (s < m_lineSearch->m_LSmin)) bconv = false;
@@ -1111,9 +1127,9 @@ bool FESolidSolver2::Quasin()
 		feLog("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_lineSearch->m_LStol > 0) feLog("\tstep from line search         = %lf\n", s);
 		feLog("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		feLog("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
-		feLog("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
-		feLog("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
+		feLog("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol * normRi);
+		feLog("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol * normEi);
+		feLog("\t   displacement     %15le %15le %15le \n", normUi, normu, (m_Dtol * m_Dtol) * normU);
 
 		// see if we may have a small residual
 		if ((bconv == false) && (normR1 < m_Rmin))
@@ -1177,6 +1193,8 @@ bool FESolidSolver2::Quasin()
 	// if converged we update the total displacements
 	if (bconv)
 	{
+		TRACK_TIME(TimerID::Timer_Update);
+
         UpdateIncrementsEAS(m_Ui, false);
         UpdateIncrements(m_Ut, m_Ui, true);
 
@@ -1605,25 +1623,27 @@ void FESolidSolver2::ExternalForces(FEGlobalVector& RHS)
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
-	for (int i = 0; i<mesh.Nodes(); ++i)
+	int NN = mesh.Nodes();
+#pragma omp parallel for
+	for (int i = 0; i<NN; ++i)
 	{
 		FENode& node = mesh.Node(i);
-		node.set_load(m_dofU[0], 0);
-		node.set_load(m_dofU[1], 0);
-		node.set_load(m_dofU[2], 0);
 
 		int n;
 		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
-		if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
+		else if ((n = -node.m_ID[m_dofU[0]] - 2) >= 0) node.set_load(m_dofU[0], -m_Fr[n]);
+		else node.set_load(m_dofU[0], 0);
 
 		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
-		if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
+		else if ((n = -node.m_ID[m_dofU[1]] - 2) >= 0) node.set_load(m_dofU[1], -m_Fr[n]);
+		else node.set_load(m_dofU[1], 0);
 
 		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
-		if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
+		else if ((n = -node.m_ID[m_dofU[2]] - 2) >= 0) node.set_load(m_dofU[2], -m_Fr[n]);
+		else node.set_load(m_dofU[2], 0);
 
 		// add nodal loads
-		double s = (m_arcLength>0 ? m_al_lam : 1.0);
+//		double s = (m_arcLength>0 ? m_al_lam : 1.0);
 //		if ((n = node.m_ID[m_dofU[0]]) >= 0) node.set_load(m_dofU[0], -m_Fn[n]*s);
 //		if ((n = node.m_ID[m_dofU[1]]) >= 0) node.set_load(m_dofU[1], -m_Fn[n]*s);
 //		if ((n = node.m_ID[m_dofU[2]]) >= 0) node.set_load(m_dofU[2], -m_Fn[n]*s);

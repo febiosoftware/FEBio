@@ -105,6 +105,10 @@ enum TimerID {
 	Timer_USER2,
 	Timer_USER3,
 	Timer_USER4,
+	Timer_USER5,
+	Timer_USER6,
+	Timer_USER7,
+	Timer_USER8,
 	TIMER_COUNT // leave this at the end so that it equals the nr. of timers we need
 };
 

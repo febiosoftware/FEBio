@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include "FEFluidHeatSupplyConst.h"
 #include "FEFluidNormalHeatFlux.h"
 #include "FEFluidNaturalHeatFlux.h"
+#include "FEFluidConvectiveHeatFlux.h"
 #include "FENewtonianThermoFluid.h"
 #include "FENewtonianRealVapor.h"
 #include "FEIdealGas.h"
@@ -116,6 +117,7 @@ void FEBioThermoFluid::InitModule()
     // Surface loads
     REGISTER_FECORE_CLASS(FEFluidNormalHeatFlux, "fluid heat flux");
     REGISTER_FECORE_CLASS(FEFluidNaturalHeatFlux, "fluid natural heat flux");
+    REGISTER_FECORE_CLASS(FEFluidConvectiveHeatFlux, "fluid convective heat flux");
     REGISTER_FECORE_CLASS(FETemperatureBackFlowStabilization, "temperature backflow stabilization");
 
     //-----------------------------------------------------------------------------
