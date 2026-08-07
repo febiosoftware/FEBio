@@ -711,6 +711,13 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		}
 
 		mesh.AddDomainList(domList);
+
+		// we'll also create an element set of this
+		FEElementSet* feset = new FEElementSet(&fem);
+		string name = "@part_list:" + string(partList->Name());
+		feset->SetName(name);
+		feset->Create(*domList);
+		mesh.AddElementSet(feset);
 	}
 
 	// create discrete element sets

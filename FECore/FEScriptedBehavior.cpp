@@ -40,6 +40,15 @@ public:
 			return g.slot;
 		}
 
+		int AddGlobalMat3(const std::string& name)
+		{
+			Global g;
+			g.name = name;
+			g.slot = program.injectGlobal(name, program.types.Mat3());
+			globals.push_back(g);
+			return g.slot;
+		}
+
 		void SetReturnType(FEValueType type)
 		{
 			switch (type)
@@ -131,20 +140,8 @@ public:
 					case FEValueType::Bool  : vm.setGlobal(g.slot, (double)vars[i].b); break;
 					case FEValueType::Int   : vm.setGlobal(g.slot, (double)vars[i].i); break;
 					case FEValueType::Double: vm.setGlobal(g.slot, vars[i].d); break;
-					case FEValueType::Vec3d:
-						{
-							const vec3d& v3 = vars[i].v3;
-							febcode::vec3 v3_febcode(v3.x, v3.y, v3.z);
-							vm.setGlobal(g.slot, v3_febcode);
-							break;
-						}
-					case FEValueType::Mat3d:
-						{
-							const mat3d& m3 = vars[i].m3;
-							febcode::mat3 m3_febcode(m3(0,0), m3(0, 1), m3(0, 2), m3(1, 0), m3(1, 1), m3(1, 2), m3(2, 0), m3(2, 1), m3(2, 2));
-							vm.setGlobal(g.slot, m3_febcode);
-							break;
-						}
+					case FEValueType::Vec3d : vm.setGlobal(g.slot, vars[i].v3); break;
+					case FEValueType::Mat3d : vm.setGlobal(g.slot, vars[i].m3); break;
 					}
 				}
 			}
@@ -163,13 +160,7 @@ public:
 						case FEParamType::FE_PARAM_BOOL  : vm.setInput(pi.name(), pi.value<bool  >()); break;
 						case FEParamType::FE_PARAM_INT   : vm.setInput(pi.name(), pi.value<int   >()); break;
 						case FEParamType::FE_PARAM_DOUBLE: vm.setInput(pi.name(), pi.value<double>()); break;
-						case FEParamType::FE_PARAM_VEC3D:
-						{
-							vec3d v3 = pi.value<vec3d>();
-							febcode::vec3 v3_febcode(v3.x, v3.y, v3.z);
-							vm.setInput(pi.name(), v3_febcode); 
-							break;
-						}
+						case FEParamType::FE_PARAM_VEC3D : vm.setInput(pi.name(), pi.value<vec3d >()); break;
 						case FEParamType::FE_PARAM_DOUBLE_MAPPED:
 						{
 							FEParamDouble& p = pi.value<FEParamDouble>();
@@ -179,9 +170,7 @@ public:
 						case FEParamType::FE_PARAM_VEC3D_MAPPED:
 						{
 							FEParamVec3& p = pi.value<FEParamVec3>();
-							vec3d v3 = p(mp);
-							febcode::vec3 v3_febcode(v3.x, v3.y, v3.z);
-							vm.setInput(pi.name(), v3_febcode);
+							vm.setInput(pi.name(), p(mp));
 							break;
 						}
 						default:
@@ -210,12 +199,12 @@ public:
 				break;
 			case febcode::ValueIndex::VEC3:
 				result.type = FEValueType::Vec3d;
-				result.v3 = vec3d(v.vec3Value.x, v.vec3Value.y, v.vec3Value.z);
+				result.v3 = v.vec3Value;
 				break;
 			case febcode::ValueIndex::MAT3:
 				result.type = FEValueType::Mat3d;
 				febcode::mat3& m = v.mat3Value;
-				result.m3 = mat3d(m.m[0][0], m.m[0][1], m.m[0][2], m.m[1][0], m.m[1][1], m.m[1][2], m.m[2][0], m.m[2][1], m.m[2][2]);
+				result.m3 = m;
 				break;
 			}
 			return result;
@@ -225,6 +214,8 @@ public:
 	struct Derive {
 		Script code;
 		std::string varName; // variable with respect to which we are taking the derivative
+		std::string tangentVar; // name of the tangent variable for directional differentiation
+
 		bool isNullProgram = false; // flag to indicate if the derivative program is null (i.e. the original program does not depend on the variable we're differentiating with respect to)
 
 		bool Init()
@@ -241,7 +232,18 @@ public:
 			if (varType == nullptr) return false;
 
 			febcode::Differentiator diff(code.program);
-			diff.differentiate(varName);
+
+			febcode::Differentiator::DiffMode diffMode = febcode::Differentiator::SCALAR; // differentiation mode
+			if (varType == code.program.types.Vec3())
+			{
+				diffMode = febcode::Differentiator::GRADIENT;
+			}
+			else if (!tangentVar.empty())
+			{
+				diffMode = febcode::Differentiator::DIRECTIONAL;
+			}
+
+			diff.differentiate(diffMode, varName, -1, tangentVar);
 
 			if (!diff.DependencyFound())
 			{
@@ -349,6 +351,7 @@ bool FEScriptedBehavior::Init()
 		{
 		case FEValueType::Double: m.code.AddGlobalDouble(varNamesPrefixed[i]); break;
 		case FEValueType::Vec3d : m.code.AddGlobalVec3  (varNamesPrefixed[i]); break;
+		case FEValueType::Mat3d : m.code.AddGlobalMat3  (varNamesPrefixed[i]); break;
 		default:
 			feLogErrorEx(m.fem, "Unsupported variable type for variable \"%s\"", ctx.variables[i].name.c_str());
 			return false;
@@ -359,17 +362,40 @@ bool FEScriptedBehavior::Init()
 	m.valDeriv.resize(nvars);
 	for (int i = 0; i < nvars; ++i)
 	{
-		m.valDeriv[i].code.script = m.code.script;
-		m.valDeriv[i].varName = varNamesPrefixed[i];
-		m.valDeriv[i].code.pc = m.code.pc;
+		ScriptContext::Variable& var = ctx.variables[i];
 
-		// add the variables to the derivative code's global list
-		for (int j = 0; j < nvars; ++j)
+		if (var.differentiable)
 		{
-			switch (ctx.variables[j].type)
+			auto& D = m.valDeriv[i];
+			D.code.script = m.code.script;
+			D.varName = varNamesPrefixed[i];
+			D.code.pc = m.code.pc;
+
+			// add the variables to the derivative code's global list
+			for (int j = 0; j < nvars; ++j)
 			{
-			case FEValueType::Double: m.valDeriv[i].code.AddGlobalDouble(varNamesPrefixed[j]); break;
-			case FEValueType::Vec3d: m.valDeriv[i].code.AddGlobalVec3(varNamesPrefixed[j]); break;
+				switch (ctx.variables[j].type)
+				{
+				case FEValueType::Double: D.code.AddGlobalDouble(varNamesPrefixed[j]); break;
+				case FEValueType::Vec3d : D.code.AddGlobalVec3(varNamesPrefixed[j]); break;
+				case FEValueType::Mat3d : D.code.AddGlobalMat3(varNamesPrefixed[j]); break;
+				}
+			}
+
+			// for the directional mode we need to add an additional global variable for the tangent 
+			if (var.directional)
+			{
+				D.tangentVar = "__d" + ctx.variables[i].name;
+				// add the tangent variable to the derivative code's global list
+				switch (var.type)
+				{
+				case FEValueType::Double: D.code.AddGlobalDouble(D.tangentVar); break;
+				case FEValueType::Vec3d : D.code.AddGlobalVec3(D.tangentVar); break;
+				case FEValueType::Mat3d : D.code.AddGlobalMat3(D.tangentVar); break;
+				default:
+					feLogErrorEx(m.fem, "Unsupported variable type for variable \"%s\"", var.name.c_str());
+					return false;
+				}
 			}
 		}
 	}
@@ -389,7 +415,7 @@ bool FEScriptedBehavior::Init()
 		deriv_i.code.SetReturnType(ctx.returnType); 
 
 		// if the corresponding variable is not differentiable, we mark the derivative program as null and skip initialization
-		if (!ctx.variables[i].differentiable)
+		if (deriv_i.varName.empty())
 		{
 			deriv_i.isNullProgram = true;
 			continue;

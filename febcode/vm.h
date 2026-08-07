@@ -20,7 +20,7 @@ namespace febcode
 		enum { MAX_CALL_DEPTH = 8 };
 
 	public:
-		VM() : m_program(nullptr) {}
+		VM();
 
 		void setProgram(const Program& program)
 		{
@@ -43,6 +43,7 @@ namespace febcode
 		}
 
 		void setDebugMode(bool b) { m_debug = b; }
+		void setDebugOutput(std::ostream& os) { m_debugOutput = &os; }
 
 		bool stackEmpty() const { return stackTop == globalStackSize; }
 		size_t stackSize() const { return stackTop - globalStackSize; }
@@ -125,6 +126,8 @@ namespace febcode
 			case TypeKind::Double: setDoubleAt(slot, value.d); break;
 			case TypeKind::Vec2: setVec2At(slot, value.vec2Value); break;
 			case TypeKind::Vec3: setVec3At(slot, value.vec3Value); break;
+			case TypeKind::Mat2: setMat2At(slot, value.mat2Value); break;
+			case TypeKind::Mat3: setMat3At(slot, value.mat3Value); break;
 			default:
 				throw std::runtime_error("Unsupported global variable type for setGlobal.");
 				break;
@@ -186,6 +189,12 @@ namespace febcode
 			return (high << 8) | low;
 		}
 
+		void growStack(size_t n)
+		{
+			memset(&m_stack[stackTop], 0, n * sizeof(double));
+			stackTop += n;
+		}
+
 		void push(const double& v)
 		{
 #ifndef NDEBUG
@@ -240,15 +249,15 @@ namespace febcode
 
 		void pushMat2(const mat2& m)
 		{
-			push(m.m[0][0]);
-			push(m.m[0][1]);
-			push(m.m[1][0]);
-			push(m.m[1][1]);
+			push(m(0,0));
+			push(m(0,1));
+			push(m(1,0));
+			push(m(1,1));
 		}
 
 		void pushMat3(const mat3& m)
 		{
-			memcpy(&m_stack[stackTop], &(m.m[0][0]), 9 * sizeof(double));
+			memcpy(&m_stack[stackTop], &(m(0,0)), 9 * sizeof(double));
 			stackTop += 9;
 		}
 
@@ -390,6 +399,8 @@ namespace febcode
 				case TypeKind::Double: arr.elements[i] = popDouble(); break;
 				case TypeKind::Vec2  : arr.elements[i] = popVec2(); break;
 				case TypeKind::Vec3  : arr.elements[i] = popVec3(); break;
+				case TypeKind::Mat2  : arr.elements[i] = popMat2(); break;
+				case TypeKind::Mat3  : arr.elements[i] = popMat3(); break;
 				case TypeKind::Array : arr.elements[i] = std::make_shared<ArrayValue >(popArray(type->elementType)); break;
 				case TypeKind::Struct: arr.elements[i] = std::make_shared<StructValue>(popStruct(type->elementType)); break;
 				default:
@@ -415,10 +426,12 @@ namespace febcode
 				case TypeKind::Double: field = popDouble(); break;
 				case TypeKind::Vec2  : field = popVec2(); break;
 				case TypeKind::Vec3  : field = popVec3(); break;
+				case TypeKind::Mat2  : field = popMat2(); break;
+				case TypeKind::Mat3  : field = popMat3(); break;
 				case TypeKind::Array : field = std::make_shared<ArrayValue >(popArray (type->fields[i].first)); break;
 				case TypeKind::Struct: field = std::make_shared<StructValue>(popStruct(type->fields[i].first)); break;
 				default:
-					throw std::runtime_error("Unsupported array element type for pop.");
+					throw std::runtime_error("Unsupported struct element type for pop.");
 				};
 			}
 			return obj;
@@ -525,10 +538,23 @@ namespace febcode
 			m_stack[slot+3] = s[3];
 		}
 
+		void setMat2At(int slot, const mat2& m)
+		{
+			m_stack[slot    ] = m[0][0];
+			m_stack[slot + 1] = m[0][1];
+			m_stack[slot + 2] = m[1][0];
+			m_stack[slot + 3] = m[1][1];
+		}
+
 		void setMat3At(int slot)
 		{
 			double* s = &m_stack[stackTop - 9]; // last 9 slots
 			memcpy(&m_stack[slot], s, 9 * sizeof(double));
+		}
+
+		void setMat3At(int slot, const mat3& m)
+		{
+			memcpy(&m_stack[slot], &m(0,0), 9 * sizeof(double));
 		}
 
 		void setArrayAt(int slot, const ArrayValue& arr)
@@ -661,18 +687,6 @@ namespace febcode
 				stackTop = dest + size;
 		}
 
-		std::string toString(const Value& v)
-		{
-			switch (v.index)
-			{
-			case ValueIndex::VOID  : return "void";
-			case ValueIndex::BOOL  : return getBool(v) ? "true" : "false";
-			case ValueIndex::INT   : return std::to_string(getInt(v));
-			case ValueIndex::DOUBLE: return std::to_string(getDouble(v));
-			}
-			return "";
-		}
-
 	private:
 		const Program* m_program;
 		size_t globalStackSize = 0;
@@ -686,6 +700,7 @@ namespace febcode
 		const uint8_t*  ip = nullptr; // current instruction pointer
 
 		bool m_debug = false;
+		std::ostream* m_debugOutput = nullptr;
 	};
 
 	Value runScript(const std::string& script);

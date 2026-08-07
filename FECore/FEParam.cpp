@@ -42,8 +42,8 @@ FEParamValue FEParamValue::component(int n)
 	case FE_PARAM_VEC2D:
 	{
 		vec2d& r = value<vec2d>();
-		if (n == 0) return FEParamValue(m_param, &r.x(), FE_PARAM_DOUBLE);
-		if (n == 1) return FEParamValue(m_param, &r.y(), FE_PARAM_DOUBLE);
+		if (n == 0) return FEParamValue(m_param, &r.x, FE_PARAM_DOUBLE);
+		if (n == 1) return FEParamValue(m_param, &r.y, FE_PARAM_DOUBLE);
 	}
 	break;
 	case FE_PARAM_VEC3D:

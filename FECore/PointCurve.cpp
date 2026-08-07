@@ -43,7 +43,7 @@ size_t binarySearch(const std::vector<vec2d>& points, double x)
 	while (low <= high) {
 		size_t mid = low + (high - low) / 2;
 
-		if (points[mid].x() <= x)
+		if (points[mid].x <= x)
 			low = mid + 1;
 		else
 			high = mid - 1;
@@ -112,7 +112,7 @@ int PointCurve::Add(double x, double y)
 	// find the place to insert the data point
 	int n = 0;
 	int nsize = Points();
-	while ((n < nsize) && (im->points[n].x() < x)) ++n;
+	while ((n < nsize) && (im->points[n].x < x)) ++n;
 
 	// insert loadpoint
 	im->points.insert(im->points.begin() + n, vec2d(x, y));
@@ -123,7 +123,7 @@ int PointCurve::Add(double x, double y)
 //-----------------------------------------------------------------------------
 int PointCurve::Add(const vec2d& p)
 {
-	return Add(p.x(), p.y());
+	return Add(p.x, p.y);
 }
 
 //-----------------------------------------------------------------------------
@@ -153,8 +153,8 @@ int PointCurve::Points() const
 void PointCurve::SetPoint(int i, double x, double y)
 {
 	vec2d& pt = im->points[i];
-	pt.x() = x;
-	pt.y() = y;
+	pt.x = x;
+	pt.y = y;
 }
 
 //-----------------------------------------------------------------------------
@@ -246,7 +246,7 @@ void PointCurve::Scale(double s)
 {
 	for (int i = 0; i < Points(); ++i)
 	{
-		im->points[i].y() *= s;
+		im->points[i].y *= s;
 	}
 }
 
@@ -282,15 +282,15 @@ double PointCurve::value(double time) const
 	std::vector<vec2d>& points = im->points;
 	int nsize = Points();
 	if (nsize == 0) return 0;
-	if (nsize == 1) return points[0].y();
+	if (nsize == 1) return points[0].y;
 
 	int N = nsize - 1;
 
-	if (time == points[0].x()) return points[0].y();
-	if (time == points[N].x()) return points[N].y();
+	if (time == points[0].x) return points[0].y;
+	if (time == points[N].x) return points[N].y;
 
-	double tmax = points[N].x();
-	double tmin = points[0].x();
+	double tmax = points[N].x;
+	double tmin = points[0].x;
 
 	if (time < tmin) return ExtendValue(time);
 	if (time > tmax) return ExtendValue(time);
@@ -299,29 +299,28 @@ double PointCurve::value(double time) const
 	{
         size_t n = binarySearch(points, time);
 
-		double t0 = points[n - 1].x();
-		double t1 = points[n].x();
+		double t0 = points[n - 1].x;
+		double t1 = points[n].x;
 
-		double f0 = points[n - 1].y();
-		double f1 = points[n].y();
-
+		double f0 = points[n - 1].y;
+		double f1 = points[n].y;
 		return lerp(time, t0, f0, t1, f1);
 	}
 	else if (im->fnc == STEP)
 	{
         size_t n = binarySearch(points, time);
 
-		return points[n].y();
+		return points[n].y;
 	}
 	else if (im->fnc == SMOOTH_STEP)
 	{
         size_t n = binarySearch(points, time);
 
-		double t0 = points[n - 1].x();
-		double t1 = points[n].x();
+		double t0 = points[n - 1].x;
+		double t1 = points[n].x;
 
-		double f0 = points[n - 1].y();
-		double f1 = points[n].y();
+		double f0 = points[n - 1].y;
+		double f1 = points[n].y;
 
 		double w = (time - t0) / (t1 - t0);
 		double w2 = w * w;
@@ -338,23 +337,23 @@ double PointCurve::value(double time) const
 	{
 		if (nsize == 2)
 		{
-			double t0 = points[0].x();
-			double t1 = points[1].x();
+			double t0 = points[0].x;
+			double t1 = points[1].x;
 
-			double f0 = points[0].y();
-			double f1 = points[1].y();
+			double f0 = points[0].y;
+			double f1 = points[1].y;
 
 			return lerp(time, t0, f0, t1, f1);
 		}
 		else if (nsize == 3)
 		{
-			double t0 = points[0].x();
-			double t1 = points[1].x();
-			double t2 = points[2].x();
+			double t0 = points[0].x;
+			double t1 = points[1].x;
+			double t2 = points[2].x;
 
-			double f0 = points[0].y();
-			double f1 = points[1].y();
-			double f2 = points[2].y();
+			double f0 = points[0].y;
+			double f1 = points[1].y;
+			double f2 = points[2].y;
 
 			return qerp(time, t0, f0, t1, f1, t2, f2);
 		}
@@ -364,39 +363,39 @@ double PointCurve::value(double time) const
 
 			if (n == 1)
 			{
-				double t0 = points[0].x();
-				double t1 = points[1].x();
-				double t2 = points[2].x();
+				double t0 = points[0].x;
+				double t1 = points[1].x;
+				double t2 = points[2].x;
 
-				double f0 = points[0].y();
-				double f1 = points[1].y();
-				double f2 = points[2].y();
+				double f0 = points[0].y;
+				double f1 = points[1].y;
+				double f2 = points[2].y;
 
 				return qerp(time, t0, f0, t1, f1, t2, f2);
 			}
 			else if (n == nsize - 1)
 			{
-				double t0 = points[n - 2].x();
-				double t1 = points[n - 1].x();
-				double t2 = points[n].x();
+				double t0 = points[n - 2].x;
+				double t1 = points[n - 1].x;
+				double t2 = points[n].x;
 
-				double f0 = points[n - 2].y();
-				double f1 = points[n - 1].y();
-				double f2 = points[n].y();
+				double f0 = points[n - 2].y;
+				double f1 = points[n - 1].y;
+				double f2 = points[n].y;
 
 				return qerp(time, t0, f0, t1, f1, t2, f2);
 			}
 			else
 			{
-				double t0 = points[n - 2].x();
-				double t1 = points[n - 1].x();
-				double t2 = points[n].x();
-				double t3 = points[n + 1].x();
+				double t0 = points[n - 2].x;
+				double t1 = points[n - 1].x;
+				double t2 = points[n].x;
+				double t3 = points[n + 1].x;
 
-				double f0 = points[n - 2].y();
-				double f1 = points[n - 1].y();
-				double f2 = points[n].y();
-				double f3 = points[n + 1].y();
+				double f0 = points[n - 2].y;
+				double f1 = points[n - 1].y;
+				double f2 = points[n].y;
+				double f3 = points[n + 1].y;
 
 				double q1 = qerp(time, t0, f0, t1, f1, t2, f2);
 				double q2 = qerp(time, t1, f1, t2, f2, t3, f3);
@@ -419,17 +418,16 @@ double PointCurve::ExtendValue(double t) const
 	std::vector<vec2d>& points = im->points;
 
 	if (nsize == 0) return 0;
-	if (nsize == 1) return points[0].y();
+	if (nsize == 1) return points[0].y;
 
-	double Dt = (points[N].x() - points[0].x());
+	double Dt = (points[N].x - points[0].x);
 	double dt = 0.001 * Dt;
-	if (dt == 0) return points[0].y();
-
+	if (dt == 0) return points[0].y;
 	switch (im->ext)
 	{
 	case CONSTANT:
-		if (t < points[0].x()) return points[0].y();
-		if (t > points[N].x()) return points[N].y();
+		if (t < points[0].x) return points[0].y;
+		if (t > points[N].x) return points[N].y;
 		break;
 	case EXTRAPOLATE:
 		switch (im->fnc)
@@ -437,14 +435,14 @@ double PointCurve::ExtendValue(double t) const
 		case STEP:
 		case SMOOTH_STEP:
 		{
-			if (t < points[0].x()) return points[0].y();
-			if (t > points[N].x()) return points[N].y();
+			if (t < points[0].x) return points[0].y;
+			if (t > points[N].x) return points[N].y;
 		}
 		break;
 		case LINEAR:
 		{
-			if (t < points[0].x()) return lerp(t, points[0].x(), points[0].y(), points[1].x(), points[1].y());
-			else return lerp(t, points[N - 1].x(), points[N - 1].y(), points[N].x(), points[N].y());
+			if (t < points[0].x) return lerp(t, points[0].x, points[0].y, points[1].x, points[1].y);
+			else return lerp(t, points[N - 1].x, points[N - 1].y, points[N].x, points[N].y);
 		}
 		break;
 		case SMOOTH:
@@ -453,25 +451,25 @@ double PointCurve::ExtendValue(double t) const
         case APPROX:
         case C2SMOOTH:
 		{
-			if (t < points[0].x()) return lerp(t, points[0].x(), points[0].y(), points[0].x() + dt, value(points[0].x() + dt));
-			else return lerp(t, points[N].x() - dt, value(points[N].x() - dt), points[N].x(), points[N].y());
+			if (t < points[0].x) return lerp(t, points[0].x, points[0].y, points[0].x + dt, value(points[0].x + dt));
+			else return lerp(t, points[N].x - dt, value(points[N].x - dt), points[N].x, points[N].y);
 		}
 		return 0;
 		}
 		break;
 	case REPEAT:
 	{
-		if (t < points[0].x()) while (t < points[0].x()) t += Dt;
-		else while (t > points[N].x()) t -= Dt;
+		if (t < points[0].x) while (t < points[0].x) t += Dt;
+		else while (t > points[N].x) t -= Dt;
 		return value(t);
 	}
 	break;
 	case REPEAT_OFFSET:
 	{
 		int n = 0;
-		if (t < points[0].x()) while (t < points[0].x()) { t += Dt; --n; }
-		else while (t > points[N].x()) { t -= Dt; ++n; }
-		double off = n * (points[N].y() - points[0].y());
+		if (t < points[0].x) while (t < points[0].x) { t += Dt; --n; }
+		else while (t > points[N].x) { t -= Dt; ++n; }
+		double off = n * (points[N].y - points[0].y);
 		return value(t) + off;
 	}
 	break;
@@ -499,7 +497,7 @@ int PointCurve::FindPoint(double t, double& tval, int startIndex)
 			double ti = 0;
 			for (int i = 0; i < Points(); ++i)
 			{
-				ti = im->points[i].x() + toff;
+				ti = im->points[i].x + toff;
 				if (ti > t) { tval = ti; return i; }
 			}
 			toff = ti;
@@ -511,7 +509,7 @@ int PointCurve::FindPoint(double t, double& tval, int startIndex)
 		if (startIndex >= Points()) return -1;
 		for (int i = startIndex; i < Points(); ++i)
 		{
-			double ti = im->points[i].x();
+			double ti = im->points[i].x;
 			if (ti > t) { tval = ti; return i; }
 		}
 	}
@@ -522,10 +520,10 @@ int PointCurve::FindPoint(double t, double& tval, int startIndex)
 
 bool PointCurve::HasPoint(double t) const
 {
-	const double tmax = im->points[Points() - 1].x();
+	const double tmax = im->points[Points() - 1].x;
 	const double eps = 1e-7 * tmax;
 
-	for (int i = 0; i < Points(); ++i) if (fabs(im->points[i].x() - t) < eps) return true;
+	for (int i = 0; i < Points(); ++i) if (fabs(im->points[i].x - t) < eps) return true;
 
 	return false;
 }
@@ -535,10 +533,10 @@ double PointCurve::derive(double time) const
 {
 	int N = (int)im->points.size();
 	if (N <= 1) return 0;
-	double tmax = im->points[N - 1].x();
-	double tmin = im->points[0].x();
+	double tmax = im->points[N - 1].x;
+	double tmin = im->points[0].x;
 
-    double Dt = im->points[N - 1].x() - im->points[0].x();
+    double Dt = im->points[N - 1].x - im->points[0].x;
     double dt = Dt * 1e-9;
     double D = 0;
     
@@ -574,13 +572,13 @@ double PointCurve::derive(double time) const
     {
         if (N == 3)
         {
-            double t0 = im->dpts[0].x();
-            double t1 = im->dpts[1].x();
-            double t2 = im->dpts[2].x();
+            double t0 = im->dpts[0].x;
+            double t1 = im->dpts[1].x;
+            double t2 = im->dpts[2].x;
             
-            double f0 = im->dpts[0].y();
-            double f1 = im->dpts[1].y();
-            double f2 = im->dpts[2].y();
+            double f0 = im->dpts[0].y;
+            double f1 = im->dpts[1].y;
+            double f2 = im->dpts[2].y;
             
             return qerp(time, t0, f0, t1, f1, t2, f2);
         }
@@ -590,39 +588,39 @@ double PointCurve::derive(double time) const
             
             if (n == 1)
             {
-                double t0 = im->dpts[0].x();
-                double t1 = im->dpts[1].x();
-                double t2 = im->dpts[2].x();
+                double t0 = im->dpts[0].x;
+                double t1 = im->dpts[1].x;
+                double t2 = im->dpts[2].x;
                 
-                double f0 = im->dpts[0].y();
-                double f1 = im->dpts[1].y();
-                double f2 = im->dpts[2].y();
+                double f0 = im->dpts[0].y;
+                double f1 = im->dpts[1].y;
+                double f2 = im->dpts[2].y;
                 
                 return qerp(time, t0, f0, t1, f1, t2, f2);
             }
             else if (n == N - 1)
             {
-                double t0 = im->dpts[n - 2].x();
-                double t1 = im->dpts[n - 1].x();
-                double t2 = im->dpts[n].x();
+                double t0 = im->dpts[n - 2].x;
+                double t1 = im->dpts[n - 1].x;
+                double t2 = im->dpts[n].x;
                 
-                double f0 = im->dpts[n - 2].y();
-                double f1 = im->dpts[n - 1].y();
-                double f2 = im->dpts[n].y();
+                double f0 = im->dpts[n - 2].y;
+                double f1 = im->dpts[n - 1].y;
+                double f2 = im->dpts[n].y;
                 
                 return qerp(time, t0, f0, t1, f1, t2, f2);
             }
             else
             {
-                double t0 = im->dpts[n - 2].x();
-                double t1 = im->dpts[n - 1].x();
-                double t2 = im->dpts[n].x();
-                double t3 = im->dpts[n + 1].x();
+                double t0 = im->dpts[n - 2].x;
+                double t1 = im->dpts[n - 1].x;
+                double t2 = im->dpts[n].x;
+                double t3 = im->dpts[n + 1].x;
                 
-                double f0 = im->dpts[n - 2].y();
-                double f1 = im->dpts[n - 1].y();
-                double f2 = im->dpts[n].y();
-                double f3 = im->dpts[n + 1].y();
+                double f0 = im->dpts[n - 2].y;
+                double f1 = im->dpts[n - 1].y;
+                double f2 = im->dpts[n].y;
+                double f3 = im->dpts[n + 1].y;
                 
                 double q1 = qerp(time, t0, f0, t1, f1, t2, f2);
                 double q2 = qerp(time, t1, f1, t2, f2, t3, f3);
@@ -648,10 +646,10 @@ double PointCurve::deriv2(double time) const
 {
 	int N = (int)im->points.size();
 	if (N <= 1) return 0;
-	double tmax = im->points[N - 1].x();
-	double tmin = im->points[0].x();
+	double tmax = im->points[N - 1].x;
+	double tmin = im->points[0].x;
 
-    double Dt = im->points[N - 1].x() - im->points[0].x();
+    double Dt = im->points[N - 1].x - im->points[0].x;
     double dt = Dt * 1e-3;
     
     if (time > tmax) {
@@ -717,7 +715,7 @@ double PointCurve::integrate(double a, double b) const
 	// just do a single trapezoid
 	// TODO: add cases for  repeat and repeat offset curves
 	std::vector<vec2d>& points = im->points;
-	if (a > points[Points() - 1].x() || b < points[0].x())
+	if (a > points[Points() - 1].x || b < points[0].x)
 	{
 		integral = (b - a) * (value(a) + value(b)) / 2;
 	}
@@ -728,7 +726,7 @@ double PointCurve::integrate(double a, double b) const
 
 		for (int index = 0; index < Points(); index++)
 		{
-			if (points[index].x() > a)
+			if (points[index].x > a)
 			{
 				start = index;
 				break;
@@ -736,7 +734,7 @@ double PointCurve::integrate(double a, double b) const
 		}
 
 		// Do trapezoid rule from a to next point
-		integral += (points[start].x() - value(a)) * ((points[start].y() + value(a)) / 2);
+		integral += (points[start].x - value(a)) * ((points[start].y + value(a)) / 2);
 
 
 		// Loop over points between a and b and do trapezoid rule for each interval
@@ -744,12 +742,12 @@ double PointCurve::integrate(double a, double b) const
 		for (index = start; index < Points() - 1; index++)
 		{
 			// Stop before overshooting b
-			if (points[index + 1].x() >= b) break;
-			integral += (points[index + 1].x() - points[index].x()) * ((points[index + 1].y() + points[index].y()) * 0.5);
+			if (points[index + 1].x >= b) break;
+			integral += (points[index + 1].x - points[index].x) * ((points[index + 1].y + points[index].y) * 0.5);
 		}
 
 		//Do trapezoid rule from most recent point to b
-		integral += (value(b) - points[index].x()) * ((value(b) + points[index].y()) * 0.5);
+		integral += (value(b) - points[index].x) * ((value(b) + points[index].y) * 0.5);
 	}
 
 	return integral * neg;
@@ -803,22 +801,22 @@ bool PointCurve::Update()
 			dpts = im->points;
             double d01, d10, d11, d20,d21, d02, d12;
             // forward difference at first point
-            d10 = dpts[1].x() - dpts[0].x();
-            d20 = dpts[2].x() - dpts[0].x();
-            d21 = dpts[2].x() - dpts[1].x();
-            dpts[0].y() = (im->points[0].y()*(pow(d10,2)-pow(d20,2)) + im->points[1].y()*pow(d20,2) - im->points[2].y()*pow(d10,2))/(d10*d20*d21);
+            d10 = dpts[1].x - dpts[0].x;
+            d20 = dpts[2].x - dpts[0].x;
+            d21 = dpts[2].x - dpts[1].x;
+            dpts[0].y = (im->points[0].y*(pow(d10,2)-pow(d20,2)) + im->points[1].y*pow(d20,2) - im->points[2].y*pow(d10,2))/(d10*d20*d21);
             // backward difference at last point
             int n = N-1;
-            d02 = dpts[n].x() - dpts[n-2].x();
-            d01 = dpts[n].x() - dpts[n-1].x();
-            d12 = dpts[n-1].x() - dpts[n-2].x();
-            dpts[n].y() = (im->points[n].y()*(pow(d02,2)-pow(d01,2)) - im->points[n-1].y()*pow(d02,2) + im->points[n-2].y()*pow(d01,2))/(d01*d02*d12);
+            d02 = dpts[n].x - dpts[n-2].x;
+            d01 = dpts[n].x - dpts[n-1].x;
+            d12 = dpts[n-1].x - dpts[n-2].x;
+            dpts[n].y = (im->points[n].y*(pow(d02,2)-pow(d01,2)) - im->points[n-1].y*pow(d02,2) + im->points[n-2].y*pow(d01,2))/(d01*d02*d12);
             // central difference at intermediate points
             for (int i=1; i<n; ++i) {
-                d10 = dpts[i+1].x() - dpts[i].x();
-                d01 = dpts[i].x() - dpts[i-1].x();
-                d11 = dpts[i+1].x() - dpts[i-1].x();
-                dpts[i].y() = (im->points[i].y()*(pow(d10,2)-pow(d01,2)) - im->points[i-1].y()*pow(d10,2) + im->points[i+1].y()*pow(d01,2))/(d01*d10*d11);
+                d10 = dpts[i+1].x - dpts[i].x;
+                d01 = dpts[i].x - dpts[i-1].x;
+                d11 = dpts[i+1].x - dpts[i-1].x;
+                dpts[i].y = (im->points[i].y*(pow(d10,2)-pow(d01,2)) - im->points[i-1].y*pow(d10,2) + im->points[i+1].y*pow(d01,2))/(d01*d10*d11);
             }
         }
         break;

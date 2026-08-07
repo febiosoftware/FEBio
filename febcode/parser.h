@@ -16,6 +16,8 @@ namespace febcode {
 			m_ast = prg.ast.get();
 			this->tokens = tokens;
 			current = 0;
+			scopeDepth = 0;
+			currentLoc = tokens.empty() ? SourceLocation{ 0, 0 } : tokens[0].loc;
 			while (!isAtEnd()) {
 				m_ast->root.statements.push_back(parseDeclaration());
 			}
@@ -26,6 +28,8 @@ namespace febcode {
 		Program& prg;
 		std::vector<Token> tokens;
 		size_t current;
+		SourceLocation currentLoc;
+		int scopeDepth = 0;
 
 		AST* m_ast;
 
@@ -39,11 +43,16 @@ namespace febcode {
 
 		const Token& advance() {
 			if (!isAtEnd()) current++;
+			currentLoc = peek().loc;
 			return previous();
 		}
 
 		void rewind() {
-			if (current > 0) current--;
+			if (current > 0)
+			{
+				current--;
+				currentLoc = peek().loc;
+			}
 		}
 
 		bool check(TokenType type) const {
@@ -146,9 +155,8 @@ namespace febcode {
 		}
 	};
 
-	void printAST(const AST& ast);
+	void printAST(std::ostream& os, const AST& ast);
 
-	void prettyPrintAST(const AST& ast);
 	void prettyPrintAST(std::ostream& os, const AST& ast);
 	void prettyPrintExpression(std::ostream& os, const Expression& expr);
 

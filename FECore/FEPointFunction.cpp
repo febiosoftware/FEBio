@@ -112,8 +112,8 @@ LOADPOINT FEPointFunction::LoadPoint(int i) const
 { 
 	const vec2d& p = m_points[i];
 	LOADPOINT lp;
-	lp.time  = p.x();
-	lp.value = p.y();
+	lp.time  = p.x;
+	lp.value = p.y;
 	return lp; 
 }
 
@@ -125,8 +125,8 @@ void FEPointFunction::Add(double x, double y)
 {
 	// find the place to insert the data point
 	int n = 0;
-	int nsize = m_points.size();
-	while ((n<nsize) && (m_points[n].x() < x)) ++n;
+	int nsize = (int)m_points.size();
+	while ((n<nsize) && (m_points[n].x < x)) ++n;
 
 	// insert loadpoint
 	m_points.insert(m_points.begin() + n, vec2d(x, y));
@@ -137,14 +137,14 @@ void FEPointFunction::Scale(double s)
 {
 	for (int i = 0; i < Points(); ++i)
 	{
-		m_points[i].y() *= s;
+		m_points[i].y *= s;
 	}
 }
 
 //-----------------------------------------------------------------------------
 double FEPointFunction::value(double time) const
 {
-    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x();
+    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x;
 	return m_fnc.value(time);
 }
 
@@ -175,14 +175,14 @@ void FEPointFunction::Serialize(DumpStream& ar)
 //-----------------------------------------------------------------------------
 double FEPointFunction::derive(double time) const
 {
-    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x();
+    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x;
 	return m_fnc.derive(time);
 }
 
 //-----------------------------------------------------------------------------
 double FEPointFunction::deriv2(double time) const
 {
-    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x();
+    if (m_bln) time = (time > 0) ? log(time) : m_points[0].x;
 	return m_fnc.deriv2(time);
 }
 

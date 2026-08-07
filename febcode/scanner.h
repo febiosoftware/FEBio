@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include "types.h"
 namespace febcode {
 
 	enum class TokenType {
@@ -50,7 +51,7 @@ namespace febcode {
 		TokenType type;
 		const char* start;
 		int length;
-		int line;
+		SourceLocation loc;
 	};
 
 	class Scanner {
@@ -60,7 +61,8 @@ namespace febcode {
 		{
 			start = source.c_str();
 			current = start;
-			line = 1;
+			currentLocation = { 1, 1 };
+			startLocation = currentLocation;
 		}
 
 		std::vector<Token> scanTokens() {
@@ -76,6 +78,8 @@ namespace febcode {
 		Token nextToken() {
 			skipWhitespace();
 			start = current;
+
+			startLocation = currentLocation;
 
 			if (isAtEnd()) return makeToken(TokenType::EndOfFile);
 
@@ -169,6 +173,7 @@ namespace febcode {
 		}
 
 		char advance() {
+			currentLocation.column++;
 			return *current++;
 		}
 
@@ -179,10 +184,12 @@ namespace febcode {
 				case ' ':
 				case '\r':
 				case '\t':
+					currentLocation.column++;
 					current++;
 					break;
 				case '\n':
-					line++;
+					currentLocation.line++;
+					currentLocation.column = 1;
 					current++;
 					break;
 				default:
@@ -192,11 +199,11 @@ namespace febcode {
 		}
 
 		Token makeToken(TokenType type) const {
-			return Token{ type, start, int(current - start), line };
+			return Token{ type, start, int(current - start), startLocation };
 		}
 
 		Token errorToken(const char* message) const {
-			return Token{ TokenType::Error, message, int(std::strlen(message)), line };
+			return Token{ TokenType::Error, message, int(std::strlen(message)), startLocation };
 		}
 
 		Token number() {
@@ -293,6 +300,9 @@ namespace febcode {
 		const std::string& source;
 		const char* start;
 		const char* current;
-		int line;
+		SourceLocation currentLocation;
+		SourceLocation startLocation;
 	};
+
+	const char* TokenTypeToString(TokenType type);
 }

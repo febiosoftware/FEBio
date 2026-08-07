@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,63 +23,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#include "stdafx.h"
-#include <regex>
-#include <string>
-#include <cstring>
-#include <string.h>
-#include "FSPath.h"
+#pragma once
+#include "FEElasticMaterial.h"
+#include <FECore/FEScriptedBehavior.h>
+#include "febiomech_api.h"
 
-
-bool FSPath::isAbsolute(const char* path)
+class FEBIOMECH_API FEScriptedElasticMaterial : public FEScripted<FEElasticMaterial>
 {
-#ifdef WIN32
-	return std::regex_search(path, std::regex("^([A-Z]|[a-z])\\:[\\\\\\/]"));
-#else
-	return std::regex_search(path, std::regex("^\\/"));
-#endif
-}
+public:
+	FEScriptedElasticMaterial(FEModel* pfem);
+	~FEScriptedElasticMaterial();
 
-bool FSPath::isPath(const char* path)
-{
-	return std::regex_search(path, std::regex("\\/|\\\\"));
-}
+	mat3ds Stress(FEMaterialPoint& pt) override;
 
-void FSPath::filePath(char* filename, char* path)
-{
-	std::string name(filename);
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
-	int index = name.find_last_of("/\\");
-
-    if(index == std::string::npos)
-    {
-        strcpy(path,"");
-        return;
-    }
-
-#ifdef WIN32
-    char sep = '\\';
-#else
-    char sep = '/';
-#endif
-
-    snprintf(path, name.length(), "%s%c", name.substr(0,index).c_str(), sep);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
+};
