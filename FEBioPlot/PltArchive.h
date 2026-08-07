@@ -168,7 +168,7 @@ public:
 		memcpy(m_pd, pd, sizeof(T)*nsize);
 		m_nsize = nsize;
 	}
-	~OLeaf() { delete m_pd; }
+	~OLeaf() { delete[] m_pd; }
 
 	int Size() { return sizeof(T)*m_nsize; }
 	void Write(FileStream* fp)
@@ -194,7 +194,7 @@ public:
 		m_psz = new char[l+1];
 		memcpy(m_psz, sz, l+1);
 	}
-	~OLeaf() { delete m_psz; }
+	~OLeaf() { delete[] m_psz; }
 
 	int Size() { return (int)strlen(m_psz)+sizeof(int); }
 	void Write(FileStream* fp)
@@ -224,7 +224,7 @@ public:
 			memcpy(m_pd, &a[0], sizeof(T) * m_nsize);
 		}
 	}
-	~OLeaf() { delete m_pd; }
+	~OLeaf() { delete[] m_pd; }
 
 	int Size() { return sizeof(T)*m_nsize; }
 	void Write(FileStream* fp)
