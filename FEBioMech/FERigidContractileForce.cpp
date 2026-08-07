@@ -43,7 +43,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidContractileForce::FERigidContractileForce(FEModel* pfem) : FERigidConnector(pfem)
 {
-    m_nID = m_ncount++;
     m_f0 = 0;
 }
 

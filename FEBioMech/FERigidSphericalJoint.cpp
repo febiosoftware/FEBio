@@ -53,8 +53,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidSphericalJoint::FERigidSphericalJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-    m_nID = m_ncount++;
-
 	m_laugon = FECore::AUGLAG_METHOD; // for backwards compatibility
     m_atol = 0;
     m_gtol = 0;
@@ -92,7 +90,7 @@ vec3d FERigidSphericalJoint::Position() const
 bool FERigidSphericalJoint::Init()
 {
     if (m_bq && ((m_Mpx != 0) || (m_Mpy != 0) || (m_Mpz != 0))) {
-        feLogError("Rotation and moment cannot be prescribed simultaneously in rigid connector %d (spherical joint)\n", m_nID+1);
+        feLogError("Rotation and moment cannot be prescribed simultaneously in rigid connector %d (spherical joint)\n", m_nID);
         return false;
     }
     
@@ -387,8 +385,8 @@ bool FERigidSphericalJoint::Augment(int naug, const FETimeInfo& tp)
     normF1 = sqrt(Lm*Lm);
     
     // check convergence of constraints
-    feLog(" rigid connector # %d (spherical joint)\n", m_nID+1);
-    feLog("                  CURRENT        REQUIRED\n");
+	feLog("\n=== rigid connector #%d (%s):\n", m_nID, GetName().c_str());
+	feLog("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();
     double qap = ksi.norm();

@@ -1514,6 +1514,7 @@ void FERigidSolverNew::UpdateRigidBodies(vector<double>& Ui, vector<double>& ui)
 	// Since the rigid nodes are repositioned we need to update the displacement DOFS
 	FEMesh& mesh = m_fem->GetMesh();
 	int N = mesh.Nodes();
+#pragma omp parallel for schedule(dynamic, 64)
 	for (int i = 0; i<N; ++i)
 	{
 		FENode& node = mesh.Node(i);

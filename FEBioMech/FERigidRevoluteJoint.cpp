@@ -54,8 +54,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidRevoluteJoint::FERigidRevoluteJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-    m_nID = m_ncount++;
-
 	m_laugon = FECore::AUGLAG_METHOD; // for backward compatibility
 	m_atol = 0;
     m_gtol = 0;
@@ -110,7 +108,7 @@ quatd FERigidRevoluteJoint::Orientation() const
 bool FERigidRevoluteJoint::Init()
 {
     if (m_bq && (m_Mp != 0)) {
-        feLogError("Rotation and moment cannot be prescribed simultaneously in rigid connector %d (revolute joint)\n", m_nID+1);
+        feLogError("Rotation and moment cannot be prescribed simultaneously in rigid connector %d (revolute joint)\n", m_nID);
         return false;
     }
     
@@ -688,8 +686,8 @@ bool FERigidRevoluteJoint::Augment(int naug, const FETimeInfo& tp)
     normM1 = sqrt(Um*Um);
     
     // check convergence of constraints
-    feLog(" rigid connector # %d (revolute joint)\n", m_nID+1);
-    feLog("                  CURRENT        REQUIRED\n");
+	feLog("\n=== rigid connector #%d (%s):\n", m_nID, GetName().c_str());
+	feLog("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();
     double qap = ksi.norm();

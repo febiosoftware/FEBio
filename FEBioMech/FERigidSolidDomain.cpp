@@ -64,6 +64,22 @@ void FERigidSolidDomain::Reset()
 	// nothing to reset here
 }
 
+void FERigidSolidDomain::Serialize(DumpStream& ar)
+{
+	// we bypass FEDomain::Serialize since we don't need to serialize anything for the rigid solids
+	FEMeshPartition::Serialize(ar);
+}
+
+void FERigidSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
+{
+	// nothing to do here
+}
+
+void FERigidSolidDomain::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	// nothing to do here
+}
+
 //-----------------------------------------------------------------------------
 //! Calculates the stiffness matrix for 3D rigid elements.
 //! Rigid elements don't generate stress, so there is nothing to do here

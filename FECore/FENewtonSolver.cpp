@@ -313,6 +313,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 	// Do the preprocessing of the solver
 	{
+		TRACK_TIME(TimerID::Timer_LinSol_Factor);
 		if (!m_plinsolve->PreProcess())
 		{
 			feLogError("An error occurred during preprocessing of linear solver");
@@ -879,7 +880,10 @@ double FENewtonSolver::DoLineSearch()
 {
 	// the geometry is also updated in the line search
 	m_ls = 1.0;
-	if (m_lineSearch && (m_lineSearch->m_LStol > 0.0)) m_ls = m_lineSearch->DoLineSearch();
+	if (m_lineSearch && (m_lineSearch->m_LStol > 0.0))
+	{
+		m_ls = m_lineSearch->DoLineSearch();
+	}
 	else
 	{
 		// Update geometry
