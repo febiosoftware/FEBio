@@ -159,7 +159,7 @@ void scatter(vector<double>& v, FEMesh& mesh, int ndof)
 	}
 }
 
-void scatter3(vector<double>& v, FEMesh& mesh, int ndof1, int ndof2, int ndof3)
+void scatter3(fecore::ArrayRef<double> v, FEMesh& mesh, int ndof1, int ndof2, int ndof3)
 {
 	const int NN = mesh.Nodes();
 #pragma omp parallel for 

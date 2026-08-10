@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include <algorithm>
 #include "vec3d.h"
 #include "fecore_api.h"
+#include "ArrayRef.h"
 
 class FEMesh;
 class FEDofList;
@@ -68,7 +69,7 @@ void FECORE_API gather(std::vector<double>& v, FEMesh& mesh, const std::vector<i
 
 // scatter operation (copy vector data to mesh)
 void FECORE_API scatter(std::vector<double>& v, FEMesh& mesh, int ndof);
-void FECORE_API scatter3(std::vector<double>& v, FEMesh& mesh, int ndof1, int ndof2, int ndof3);
+void FECORE_API scatter3(fecore::ArrayRef<double> v, FEMesh& mesh, int ndof1, int ndof2, int ndof3);
 void FECORE_API scatter(std::vector<double>& v, FEMesh& mesh, const FEDofList& dofs);
 
 // calculate l2 norm of vector

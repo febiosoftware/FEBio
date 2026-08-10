@@ -45,6 +45,8 @@ namespace fecore {
 
 		ConstArrayRef(const std::vector<T>& v) : m_data(v.data()), m_size(v.size()) {}
 
+		ConstArrayRef(const ArrayRef<T>& arr) : m_data(arr.data()), m_size(arr.size()) {}
+
 		FECORE_CUDA_HOST_DEVICE
 			size_t size() const { return m_size; }
 
