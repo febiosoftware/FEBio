@@ -65,12 +65,12 @@ public:
 	FESlideLine(FEModel* pfem);
 
 	//! Initializes data structures
-	bool Init();
+	bool Init() override;
 
 	FEMaterialPoint* CreateMaterialPoint() override;
 
 	//! Serialize data to archive
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 	Projection ClosestProjection(const vec3d& x);
 
