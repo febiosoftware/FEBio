@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 
 #if defined(__CUDACC__)
 	#define FECORE_CUDA_HOST_DEVICE __host__ __device__
