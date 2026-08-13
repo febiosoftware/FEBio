@@ -1861,6 +1861,17 @@ void FEBioModel::on_cb_solved()
 		Timer::time_str(linsol_time         , sztime); feLog("\t   time in linear solver ........ : %s (%lg sec)\n\n", sztime, linsol_time);
 		Timer::time_str(ti.total_time       , sztime); feLog("\tTotal elapsed time .............. : %s (%lg sec)\n\n", sztime, ti.total_time);
 
+		// print user timers if any were used
+		for (int i = Timer_USER1; i <= Timer_USER8; ++i)
+		{
+			Timer* pt = GetTimer((TimerID)i);
+			if (pt && pt->GetTime() > 0)
+			{
+				Timer::time_str(pt->GetTime(), sztime);
+				feLog("\tuser %d time ................ : %s (%lg sec)\n\n", i - Timer_USER1 + 1, sztime, pt->GetTime());
+			}
+		}
+
 
 		m_log.SetMode(old_mode);
 
