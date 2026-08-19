@@ -741,8 +741,15 @@ void FENewtonSolver::Rewind()
 void FENewtonSolver::PrepStep()
 {
 	FEModel& fem = *GetFEModel();
-
+	FEMesh& mesh = fem.GetMesh();
 	const FETimeInfo& tp = fem.GetTime();
+
+	// update nodal values
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& ni = mesh.Node(i);
+		ni.UpdateValues();
+	}
 
 	// zero total DOFs
 	zero(m_Ui);
@@ -763,7 +770,6 @@ void FENewtonSolver::PrepStep()
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
 	// update domain data
-	FEMesh& mesh = fem.GetMesh();
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	// update model

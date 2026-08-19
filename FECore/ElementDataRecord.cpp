@@ -42,6 +42,8 @@ ElementDataRecord::ElementDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_E
 //-----------------------------------------------------------------------------
 void ElementDataRecord::SetData(const char *szexpr)
 {
+	DataStore& DS = GetFEModel()->GetDataStore();
+
 	char szcopy[MAX_STRING] = {0};
 	strcpy(szcopy, szexpr);
 	char* sz = szcopy, *ch;
@@ -51,21 +53,7 @@ void ElementDataRecord::SetData(const char *szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FELogElemData* pdata = nullptr;
-		if (sz && sz[0] == '=')
-		{
-			FELogElemMath* logMath = fecore_alloc(FELogElemMath, GetFEModel());
-			if (logMath)
-			{
-				string smath(sz + 1);
-				if (logMath->SetExpression(smath))
-				{
-					pdata = logMath;
-				}
-			}
-		}
-		else
-			pdata = fecore_new<FELogElemData>(sz, GetFEModel());
+		FELogElemSource* pdata = DS.GetElementDataSource(sz);
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;
