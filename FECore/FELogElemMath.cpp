@@ -62,6 +62,7 @@ double FELogElemMath::value(FEElement& el)
 bool FELogElemMath::SetExpression(const std::string& smath)
 {
 	Clear();
+	m_exp = smath;
 
 	DataStore& DS = GetFEModel()->GetDataStore();
 
