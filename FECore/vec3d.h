@@ -41,7 +41,7 @@ public:
 	//! Constructor with three components
 	vec3d(double X, double Y, double Z) : x(X), y(Y), z(Z) {}
 	//! Constructor from 2D vector - sets z component to 0
-	vec3d(const vec2d& v) { x = v.r[0]; y = v.r[1]; z = 0.0; }
+	vec3d(const vec2d& v) { x = v.x; y = v.y; z = 0.0; }
 
 	//! Vector addition operator
 	vec3d operator + (const vec3d& r) const { return vec3d(x+r.x, y+r.y, z+r.z); }
@@ -94,7 +94,21 @@ public:
 	double operator * (const vec3d& r) const { return (x*r.x + y*r.y + z*r.z); }
 
 	//! Cross product operator
-	vec3d operator ^ (const vec3d& r) const { return vec3d(y*r.z-z*r.y,z*r.x-x*r.z,x*r.y-y*r.x); }
+	vec3d operator ^ (const vec3d& r) const { 
+		return vec3d(
+			y * r.z - z * r.y,
+			z * r.x - x * r.z,
+			x * r.y - y * r.x
+		); 
+	}
+
+	vec3d cross(const vec3d& other) const {
+		return vec3d(
+			y * other.z - z * other.y,
+			z * other.x - x * other.z,
+			x * other.y - y * other.x
+		);
+	}
 
 	//! Normalize the vector in place and return original length
 	double unit()

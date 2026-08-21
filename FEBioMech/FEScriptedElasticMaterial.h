@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2021 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,39 +24,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include <FECore/FENLConstraint.h>
+#include "FEElasticMaterial.h"
+#include <FECore/FEScriptedBehavior.h>
+#include "febiomech_api.h"
 
-class FENodeToNodeConstraint : public FENLConstraint
+class FEBIOMECH_API FEScriptedElasticMaterial : public FEScripted<FEElasticMaterial>
 {
 public:
-	FENodeToNodeConstraint(FEModel* fem);
+	FEScriptedElasticMaterial(FEModel* pfem);
+	~FEScriptedElasticMaterial();
 
-	// allocate equations
-	int InitEquations(int neq) override;
+	mat3ds Stress(FEMaterialPoint& pt) override;
 
-	// The LoadVector function evaluates the "forces" that contribute to the residual of the system
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	tens4ds Tangent(FEMaterialPoint& pt) override;
 
-	// Evaluates the contriubtion to the stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
-
-	// Build the matrix profile
-	void BuildMatrixProfile(FEGlobalMatrix& M) override;
-
-protected:
-	void UnpackLM(vector<int>& lm);
-
-	void Serialize(DumpStream& ar) override;
-	
-	void PrepStep() override;
-	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
-	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
-
-private:
-	int		m_a, m_b;
-	vec3d	m_Lm, m_Lp;
-
-	vector<int> m_LM;
-
-	DECLARE_FECORE_CLASS();
+	double StrainEnergyDensity(FEMaterialPoint& pt) override;
 };

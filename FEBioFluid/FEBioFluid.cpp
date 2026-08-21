@@ -133,7 +133,7 @@ void FEBioFluid::InitModule()
 
 //-----------------------------------------------------------------------------
 // solver classes
-REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
+    REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
 
 //-----------------------------------------------------------------------------
 // Materials

@@ -154,8 +154,8 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 				// see if the node might have moved to another secondary element
 				vec2d rs(0,0);
 				nodeData.pe = cpp.Project(x, q, rs);
-				nodeData.proj[0] = rs.x();
-				nodeData.proj[1] = rs.y();
+				nodeData.proj[0] = rs.x;
+				nodeData.proj[1] = rs.y;
 				nodeData.q = q;
 			}
 		}
@@ -163,8 +163,8 @@ void FEDiscreteContact::ProjectSurface(bool bsegup)
 		{
 			vec2d rs(0,0); vec3d q;
 			nodeData.pe = cpp.Project(x, q, rs);
-			nodeData.proj[0] = rs.x();
-			nodeData.proj[1] = rs.y();
+			nodeData.proj[0] = rs.x;
+			nodeData.proj[1] = rs.y;
 			nodeData.q = q;
 		}
 
@@ -859,8 +859,8 @@ void FEDiscreteContact2::ProjectNodes()
 					// project onto surface
 					vec2d rs(r,s);
 					pe = cpp.Project(c, q, rs);
-					r = rs.x();
-					s = rs.y();
+					r = rs.x;
+					s = rs.y;
 				}
 
 				if (pe)
@@ -912,12 +912,12 @@ void FEDiscreteContact2::ProjectNodes()
 				// and position the node
 				if (pe)
 				{
-					vec3d nu = m_surf.SurfaceNormal(*pe, rs.x(), rs.y());
+					vec3d nu = m_surf.SurfaceNormal(*pe, rs.x, rs.y);
 					if (nu*(x - q) < 0)
 					{
 						nodeData.pe = pe;
-						nodeData.proj[0] = rs.x();
-						nodeData.proj[1] = rs.y();
+						nodeData.proj[0] = rs.x;
+						nodeData.proj[1] = rs.y;
 						nodeData.nu = nu;
 						nodeData.q = q;
 

@@ -8,6 +8,11 @@
 #include <cmath>
 #include <assert.h>
 
+#include <FECore/vec2d.h>
+#include <FECore/vec3d.h>
+#include <FECore/mat2d.h>
+#include <FECore/mat3d.h>
+
 namespace febcode
 {
 	enum class TypeKind : uint8_t {
@@ -23,202 +28,10 @@ namespace febcode
 		Struct,
 	};
 
-	struct Value;
-
-	struct vec2
-	{
-		double x, y;
-
-		vec2() : x(0), y(0) {}
-		vec2(double x, double y) : x(x), y(y) {}
-
-		vec2 operator+(const vec2& other) const { return vec2(x + other.x, y + other.y); }
-		vec2 operator-(const vec2& other) const { return vec2(x - other.x, y - other.y); }
-		vec2 operator*(double scalar) const { return vec2(x * scalar, y * scalar); }
-		vec2 operator/(double scalar) const { return vec2(x / scalar, y / scalar); }
-
-		// dot product
-		double operator*(const vec2& other) const { return x * other.x + y * other.y; }
-
-		bool operator==(const vec2& other) const { return (x == other.x) && (y == other.y); }
-		bool operator!=(const vec2& other) const { return !(*this == other); }
-	};
-
-	struct vec3
-	{
-		double x, y, z;
-
-		vec3() : x(0), y(0), z(0) {}
-		vec3(double x, double y, double z) : x(x), y(y), z(z) {}
-
-		vec3 operator+(const vec3& other) const { return vec3(x + other.x, y + other.y, z + other.z); }
-		vec3 operator-(const vec3& other) const { return vec3(x - other.x, y - other.y, z - other.z); }
-		vec3 operator*(double scalar) const { return vec3(x * scalar, y * scalar, z * scalar); }
-		vec3 operator/(double scalar) const { return vec3(x / scalar, y / scalar, z / scalar); }
-
-		// dot product
-		double operator*(const vec3& other) const { return x * other.x + y * other.y + z * other.z; }
-
-		bool operator==(const vec3& other) const { return (x == other.x) && (y == other.y) && (z == other.z); }
-		bool operator!=(const vec3& other) const { return !(*this == other); }
-
-		vec3 cross(const vec3& other) const {
-			return vec3(
-				y * other.z - z * other.y,
-				z * other.x - x * other.z,
-				x * other.y - y * other.x
-			);
-		}
-	};
-
-	struct mat2 {
-		double m[2][2];
-		mat2() {
-			m[0][0] = m[0][1] = m[1][0] = m[1][1] = 0.0;
-		}
-		mat2(double d)
-		{
-			m[0][0] = m[1][1] = d;
-			m[0][1] = m[1][0] = 0.0;
-		}
-		mat2(double a00, double a01, double a10, double a11) {
-			m[0][0] = a00; m[0][1] = a01;
-			m[1][0] = a10; m[1][1] = a11;
-		}
-		mat2 operator + (const mat2& other) const {
-			return mat2(
-				m[0][0] + other.m[0][0], m[0][1] + other.m[0][1],
-				m[1][0] + other.m[1][0], m[1][1] + other.m[1][1]
-			);
-		}
-		mat2 operator-(const mat2& other) const {
-			return mat2(
-				m[0][0] - other.m[0][0], m[0][1] - other.m[0][1],
-				m[1][0] - other.m[1][0], m[1][1] - other.m[1][1]
-			);
-		}
-		mat2 operator*(double scalar) const {
-			return mat2(
-				m[0][0] * scalar, m[0][1] * scalar,
-				m[1][0] * scalar, m[1][1] * scalar
-			);
-		}
-		mat2 operator/(double scalar) const {
-			return mat2(
-				m[0][0] / scalar, m[0][1] / scalar,
-				m[1][0] / scalar, m[1][1] / scalar
-			);
-		}
-		vec2 operator*(const vec2& other) const {
-			return vec2(
-				m[0][0] * other.x + m[0][1] * other.y,
-				m[1][0] * other.x + m[1][1] * other.y
-			);
-		}
-		mat2 operator*(const mat2& other) const {
-			return mat2(
-				m[0][0] * other.m[0][0] + m[0][1] * other.m[1][0],
-				m[0][0] * other.m[0][1] + m[0][1] * other.m[1][1],
-				m[1][0] * other.m[0][0] + m[1][1] * other.m[1][0],
-				m[1][0] * other.m[0][1] + m[1][1] * other.m[1][1]
-			);
-		}
-		bool operator==(const mat2& other) const {
-			return (m[0][0] == other.m[0][0]) && (m[0][1] == other.m[0][1]) &&
-				   (m[1][0] == other.m[1][0]) && (m[1][1] == other.m[1][1]);
-		}
-		bool operator!=(const mat2& other) const {
-			return !(*this == other);
-		}
-	};
-
-	struct mat3 {
-		double m[3][3];
-		mat3() {
-			m[0][0] = m[0][1] = m[0][2] = 0.0;
-			m[1][0] = m[1][1] = m[1][2] = 0.0;
-			m[2][0] = m[2][1] = m[2][2] = 0.0;
-		}
-		mat3(double d) {
-			m[0][0] = m[1][1] = m[2][2] = d;
-
-			m[0][1] = m[1][0] = 0.0;
-			m[0][2] = m[2][0] = 0.0;
-			m[1][2] = m[2][1] = 0.0;
-		}
-		mat3(double a00, double a01, double a02,
-			 double a10, double a11, double a12,
-			 double a20, double a21, double a22) {
-			m[0][0] = a00; m[0][1] = a01; m[0][2] = a02;
-			m[1][0] = a10; m[1][1] = a11; m[1][2] = a12;
-			m[2][0] = a20; m[2][1] = a21; m[2][2] = a22;
-		}
-
-		mat3 operator + (const mat3& other) const {
-			return mat3(
-				m[0][0] + other.m[0][0], m[0][1] + other.m[0][1], m[0][2] + other.m[0][2],
-				m[1][0] + other.m[1][0], m[1][1] + other.m[1][1], m[1][2] + other.m[1][2],
-				m[2][0] + other.m[2][0], m[2][1] + other.m[2][1], m[2][2] + other.m[2][2]
-			);
-		}
-
-		mat3 operator - (const mat3& other) const {
-			return mat3(
-				m[0][0] - other.m[0][0], m[0][1] - other.m[0][1], m[0][2] - other.m[0][2],
-				m[1][0] - other.m[1][0], m[1][1] - other.m[1][1], m[1][2] - other.m[1][2],
-				m[2][0] - other.m[2][0], m[2][1] - other.m[2][1], m[2][2] - other.m[2][2]
-			);
-		}
-
-		mat3 operator*(double scalar) const {
-			return mat3(
-				m[0][0] * scalar, m[0][1] * scalar, m[0][2] * scalar,
-				m[1][0] * scalar, m[1][1] * scalar, m[1][2] * scalar,
-				m[2][0] * scalar, m[2][1] * scalar, m[2][2] * scalar
-			);
-		}
-
-		mat3 operator/(double scalar) const {
-			return mat3(
-				m[0][0] / scalar, m[0][1] / scalar, m[0][2] / scalar,
-				m[1][0] / scalar, m[1][1] / scalar, m[1][2] / scalar,
-				m[2][0] / scalar, m[2][1] / scalar, m[2][2] / scalar
-			);
-		}
-
-		vec3 operator*(const vec3& other) const {
-			return vec3(
-				m[0][0] * other.x + m[0][1] * other.y + m[0][2] * other.z,
-				m[1][0] * other.x + m[1][1] * other.y + m[1][2] * other.z,
-				m[2][0] * other.x + m[2][1] * other.y + m[2][2] * other.z
-			);
-		}
-
-		mat3 operator*(const mat3& other) const {
-			return mat3(
-				m[0][0] * other.m[0][0] + m[0][1] * other.m[1][0] + m[0][2] * other.m[2][0],
-				m[0][0] * other.m[0][1] + m[0][1] * other.m[1][1] + m[0][2] * other.m[2][1],
-				m[0][0] * other.m[0][2] + m[0][1] * other.m[1][2] + m[0][2] * other.m[2][2],
-
-				m[1][0] * other.m[0][0] + m[1][1] * other.m[1][0] + m[1][2] * other.m[2][0],
-				m[1][0] * other.m[0][1] + m[1][1] * other.m[1][1] + m[1][2] * other.m[2][1],
-				m[1][0] * other.m[0][2] + m[1][1] * other.m[1][2] + m[1][2] * other.m[2][2],
-
-				m[2][0] * other.m[0][0] + m[2][1] * other.m[1][0] + m[2][2] * other.m[2][0],
-				m[2][0] * other.m[0][1] + m[2][1] * other.m[1][1] + m[2][2] * other.m[2][1],
-				m[2][0] * other.m[0][2] + m[2][1] * other.m[1][2] + m[2][2] * other.m[2][2]
-			);
-		}
-
-		bool operator==(const mat3& other) const {
-			return (m[0][0] == other.m[0][0]) && (m[0][1] == other.m[0][1]) && (m[0][2] == other.m[0][2]) &&
-				   (m[1][0] == other.m[1][0]) && (m[1][1] == other.m[1][1]) && (m[1][2] == other.m[1][2]) &&
-				   (m[2][0] == other.m[2][0]) && (m[2][1] == other.m[2][1]) && (m[2][2] == other.m[2][2]);
-		}
-		bool operator!=(const mat3& other) const {
-			return !(*this == other);
-		}
-	};
+	using vec2 = vec2d;
+	using vec3 = vec3d;
+	using mat2 = mat2d;
+	using mat3 = mat3d;
 
 	struct TypeStruct;
 	using Type = const TypeStruct*;
@@ -242,7 +55,7 @@ namespace febcode
 		size_t size() const {
 			switch (kind)
 			{
-			case TypeKind::Void:   return 1;
+			case TypeKind::Void:   return 0;
 			case TypeKind::Bool:   return 1;
 			case TypeKind::Int:    return 1;
 			case TypeKind::Double: return 1;
@@ -535,12 +348,12 @@ namespace febcode
 
 	inline bool isSymmetric(const mat2& m)
 	{
-		return (m.m[0][1] == m.m[1][0]);
+		return (m(0,1) == m(1,0));
 	}
 
 	inline bool isSymmetric(const mat3& m)
 	{
-		return (m.m[0][1] == m.m[1][0]) && (m.m[0][2] == m.m[2][0]) && (m.m[1][2] == m.m[2][1]);
+		return (m(0,1) == m(1,0)) && (m(0,2) == m(2,0)) && (m(1,2) == m(2,1));
 	}
 
 	inline bool isIntNumber(const Value& v)
@@ -617,6 +430,9 @@ namespace febcode
 		return (TypeKind)v.index;
 	}
 
+	const char* TypeKindToString(TypeKind kind);
+	TypeKind StringToTypeKind(const std::string& str);
+
 	std::string TypeToString(Type type);
 
 	struct BinaryOpSignature
@@ -667,4 +483,16 @@ namespace febcode
 	};
 
 	using NativeFnc = std::function<Value(FuncArgs args)>;
+
+	struct SourceLocation {
+		int line = 0;
+		int column = 0;
+	};
+
+	class FatalError : public std::runtime_error {
+	public:
+		FatalError(const std::string& message, const SourceLocation& loc)
+			: std::runtime_error(message), location(loc) {}
+		SourceLocation location;
+	};
 }

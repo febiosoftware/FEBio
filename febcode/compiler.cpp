@@ -76,7 +76,7 @@ void Compiler::endScope()
 		}
 
 		m_locals.pop_back();
-		localStackSize -= local.type->size();
+		localStackSize -= (int)local.type->size();
 	}
 	m_scopeDepth--;
 }
@@ -142,6 +142,8 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::PUSH_INT: 
 	case OpCode::PUSH_DOUBLE: 
 		return +1;
+
+	case OpCode::PUSH_LOCAL: return +arg;
 
 	case OpCode::PUSH_VEC2: return +2;
 	case OpCode::PUSH_VEC3: return +3;
@@ -282,8 +284,9 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::MUL_DOUBLE_MAT2: return -1;
 	case OpCode::DIV_MAT2_DOUBLE: return -1;
 	case OpCode::MUL_MAT2_VEC2 : return -4;
-	case OpCode::GET_MAT2_INDEX: return -3;
 	case OpCode::CREATE_MAT2_DIAG: return +3;
+	case OpCode::GET_MAT2_ELEMENT: return -5; // pops the mat2 and indices, pushes the element
+	case OpCode::GET_MAT2_ELEMENT_REF: return -2; // pops indices
 
 	case OpCode::NEG_MAT3: return 0;
 	case OpCode::ADD_MAT3: return -9;
@@ -293,12 +296,13 @@ int Compiler::stackEffect(OpCode op, int arg)
 	case OpCode::DIV_MAT3_DOUBLE: return -1;
 	case OpCode::MUL_DOUBLE_MAT3: return -1;
 	case OpCode::MUL_MAT3_VEC3  : return -9;
-	case OpCode::GET_MAT3_INDEX : return -7;
 	case OpCode::ADD_GLOBAL_MAT3: return +9;
 	case OpCode::SUB_GLOBAL_MAT3: return +9;
 	case OpCode::MUL_GLOBAL_MAT3: return +9;
 	case OpCode::CREATE_MAT3_DIAG: return +8;
 	case OpCode::CREATE_MAT3_VEC3: return +0;
+	case OpCode::GET_MAT3_ELEMENT: return -10; // pops the mat3 and indices, pushes the element
+	case OpCode::GET_MAT3_ELEMENT_REF: return -2; // pops indices
 
 	case OpCode::NOT: return 0;
 
@@ -356,12 +360,6 @@ int Compiler::stackEffect(OpCode op, int arg)
 		assert(false);
 		return 0;
 	}
-}
-
-uint8_t Compiler::addConstant(const Value& v)
-{
-	prg.constants.push_back(v);
-	return (uint8_t)(prg.constants.size() - 1);
 }
 
 int Compiler::emitJump(OpCode op)
@@ -422,7 +420,7 @@ void Compiler::compileStatement(Statement* stmt)
 	else if (auto r = dynamic_cast<ReturnStmt*    >(stmt)) compileReturn(r);
 	else if (auto s = dynamic_cast<StructStmt*    >(stmt)) compileStruct(s);
 	else
-		throw std::runtime_error("Unsupported statement type");
+		error(stmt, "Unsupported statement type");
 }
 
 void Compiler::compileExprStmt(ExpressionStmt* stmt)
@@ -469,7 +467,7 @@ void Compiler::compileBlock(BlockStmt* stmt)
 Type Compiler::compileInitializer(InitExpr* init)
 {
 	if (init->elements.empty())
-		throw std::runtime_error("Initializer cannot be empty.");
+		error(init, "Initializer cannot be empty.");
 
 	// deduce the array type from the first element
 	Type elemType = compileExpression(init->elements[0].get());
@@ -480,7 +478,7 @@ Type Compiler::compileInitializer(InitExpr* init)
 	{
 		Type type = coerce(compileExpression(init->elements[i].get()), elemType);
 		if (type != elemType)
-			throw std::runtime_error("Initializer element type mismatch.");
+			error(init->elements[i].get(), "Initializer element type mismatch.");
 	}
 
 	return arrayType;
@@ -571,6 +569,10 @@ Type Compiler::compileConstructor(ConstructorExpr* construct)
 
 Type Compiler::expressionType(Expression* expr)
 {
+	return expr->valType;
+}
+
+/*
 	if (auto l = dynamic_cast<LiteralExpr*>(expr))
 	{
 		return prg.types.getBuiltinType(l->value);
@@ -653,34 +655,30 @@ Type Compiler::expressionType(Expression* expr)
 	}
 	throw std::runtime_error("Unsupported expression type in expressionType");
 }
+*/
 
 void Compiler::compileVarDecl(VarDeclStmt* decl)
 {
-	Type baseType = decl->type;
 	for (auto& var : decl->vars)
 	{
-		Type type = baseType;
-		if (var.arraySizes.size() > 0)
-		{
-			type = prg.types.getArrayType(baseType, var.arraySizes);
-		}
+		Type type = var->type;
 
-		if (!decl->input && var.initializer)
+		if (!decl->input && var->initializer)
 		{
-			Type initType = coerce(compileExpression(var.initializer.get()), type);
+			Type initType = coerce(compileExpression(var->initializer.get()), type);
 		}
 
 		if (m_scopeDepth == 0)
 		{
 			if (decl->input)
-				prg.addInput(var.name, type);
+				prg.addInput(var->name, type);
 			else
 			{
-				prg.addGlobal(var.name, type);
+				prg.addGlobal(var->name, type);
 
-				if (var.initializer)
+				if (var->initializer)
 				{
-					auto it = prg.globalIndices.find(var.name);
+					auto it = prg.globalIndices.find(var->name);
 
 					Program::Global& global = prg.globals[it->second];
 
@@ -739,13 +737,23 @@ void Compiler::compileVarDecl(VarDeclStmt* decl)
 			{
 				if (m_locals[i].depth < m_scopeDepth)
 					break;
-				if (m_locals[i].name == var.name)
-					throw std::runtime_error("Variable '" + var.name + "' is already declared in this scope.");
+				if (m_locals[i].name == var->name)
+					throw std::runtime_error("Variable '" + var->name + "' is already declared in this scope.");
 			}
 
-			m_locals.push_back({ var.name, type, m_scopeDepth, localStackSize });
+			m_locals.push_back({ var->name, type, m_scopeDepth, localStackSize });
 
 			localStackSize += (int)type->size();
+			if (var->initializer == nullptr)
+			{
+				emit(OpCode::PUSH_LOCAL, (uint8_t)type->size()); // reserve space on the stack for the variable
+				emitUint8((uint8_t)type->size());
+
+				// If an initializer was defined, the global stack effect has already been calculated. 
+				stackDepth += (int)type->size();
+				if (stackDepth > maxStackDepth)
+					maxStackDepth = stackDepth;
+			}
 		}
 	}
 }
@@ -846,7 +854,7 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 				returnType = coerceType;
 
 			if (returnType != expectedReturnType)
-				throw std::runtime_error("Return type mismatch. Expected " + TypeToString(expectedReturnType) + " but got " + TypeToString(returnType));
+				error(stmt->value->location, "Return type mismatch. Expected " + TypeToString(expectedReturnType) + " but got " + TypeToString(returnType));
 		}
 
 		switch (returnType->kind)
@@ -873,7 +881,7 @@ void Compiler::compileReturn(ReturnStmt* stmt)
 	else
 	{
 		if (expectedReturnType != nullptr && expectedReturnType != prg.types.Void())
-			throw std::runtime_error("Missing return value in function with non-void return type.");
+			error(stmt, "Missing return value in function with non-void return type.");
 
 		// return without value -> push monostate
 		emit(OpCode::PUSH_VOID);
@@ -901,7 +909,7 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	std::vector<Type> argTypes;
 	for (auto& p : fn->params)
-		argTypes.push_back(p.first);
+		argTypes.push_back(p->type);
 
 	int fnIndex = prg.resolveFunction(fn->name, argTypes);
 	if (fnIndex < 0)
@@ -920,10 +928,12 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	for (auto& p : fn->params)
 	{
-		m_locals.push_back({ p.second, p.first, m_scopeDepth, localStackSize });
-		localStackSize += (int)p.first->size();
-		info.argSize += (int)p.first->size();
-		stackDepth += (int)p.first->size();
+		m_locals.push_back({ p->name, p->type, m_scopeDepth, localStackSize });
+		localStackSize += (int)p->type->size();
+		info.argSize += (int)p->type->size();
+		stackDepth += (int)p->type->size();
+		if (stackDepth > maxStackDepth)
+			maxStackDepth = stackDepth;
 	}
 
 	size_t currentStackSize = stackDepth;
@@ -981,6 +991,8 @@ void Compiler::compileFunction(FunctionStmt* fn)
 
 	info.maxStackSize = maxStackDepth - currentStackSize;
 
+	stackDepth = currentStackSize;
+
 	currentFunction = -1;
 }
 
@@ -1023,7 +1035,7 @@ Type Compiler::compileLiteral(LiteralExpr* expr)
 		throw std::runtime_error("Unsupported literal type");
 	}
 
-	uint8_t idx = addConstant(expr->value);
+	uint8_t idx = prg.addConstant(expr->value);
 	emitUint8(idx);
 	return type;
 }
@@ -1152,6 +1164,11 @@ Type Compiler::compileLValue(Expression* expr)
 	if (auto index = dynamic_cast<IndexExpr*>(expr))
 	{
 		return compileIndexRef(index);
+	}
+
+	if (auto call = dynamic_cast<CallExpr*>(expr))
+	{
+		return compileCallRef(call);
 	}
 
 	throw std::runtime_error("Invalid assignment target.");
@@ -1301,6 +1318,31 @@ Type Compiler::compileIndexRef(IndexExpr* expr)
 	}
 
 	return objectType->elementType;
+}
+
+Type Compiler::compileCallRef(CallExpr* expr)
+{
+	VariableExpr* varExpr = dynamic_cast<VariableExpr*>(expr->callee.get());
+	if ((varExpr == nullptr) || (varExpr->var == nullptr))
+		throw std::runtime_error("Can only assign to the result of a function call if the callee is a simple variable.");
+
+	compileVariableRef(varExpr);
+	compileExpression(expr->arguments[0].get());
+	compileExpression(expr->arguments[1].get());
+
+	if (varExpr->var->type == prg.types.Mat2())
+	{
+		emit(OpCode::GET_MAT2_ELEMENT_REF);
+		return prg.types.Double();
+	}
+
+	if (varExpr->var->type == prg.types.Mat3())
+	{
+		emit(OpCode::GET_MAT3_ELEMENT_REF);
+		return prg.types.Double();
+	}
+
+	throw std::runtime_error("Cannot assign to the result of a function call.");
 }
 
 //
@@ -1718,27 +1760,55 @@ std::vector<Type> Compiler::compileFncArgs(std::vector<std::unique_ptr<Expressio
 
 Type Compiler::compileCall(CallExpr* call)
 {
-	// don't copy args for native functions
+	VariableExpr* varExpr = dynamic_cast<VariableExpr*>(call->callee.get());
+	if (!varExpr)
+		throw std::runtime_error("Only direct function calls are supported.");
+
+	// see if this is a matrix variable
+	if (varExpr->var)
+	{
+		compileVariable(varExpr);
+
+		Type type = compileExpression(call->arguments[0].get());
+		if (type != prg.types.Int())
+			throw std::runtime_error("Row index to matrix must be an integer.");
+
+		type = compileExpression(call->arguments[1].get());
+		if (type != prg.types.Int())
+			throw std::runtime_error("Column index to matrix must be an integer.");
+
+		if (isMat2Type(varExpr->valType))
+			emit(OpCode::GET_MAT2_ELEMENT);
+		else if (isMat3Type(varExpr->valType))
+			emit(OpCode::GET_MAT3_ELEMENT);
+		else
+			error(call, "Only mat2 and mat3 types can be called with two integer arguments.");
+
+		return prg.types.Double();
+	}
+
+	// proceed as normal function call
+	std::string fncName = varExpr->name;
 	std::vector<Type> argTypes = compileFncArgs(call->arguments);
-	int fnIndex = prg.resolveFunction(call->name, argTypes);
+	int fnIndex = prg.resolveFunction(varExpr->name, argTypes);
 	if (fnIndex == -1)
-		throw std::runtime_error("Undefined function: " + call->name);
+		throw std::runtime_error("Undefined function: " + fncName);
 
 	// We don't allow recursive calls.
 	if (currentFunction == fnIndex)
-		throw std::runtime_error("Recursive calls are not allowed: " + call->name);
+		throw std::runtime_error("Recursive calls are not allowed: " + fncName);
 
 	const FunctionInfo& fi = prg.functions[fnIndex];
 
 	// check arg count
 	if (fi.args.size() != (int)call->arguments.size())
-		throw std::runtime_error("Argument count mismatch in call to function: " + call->name);
+		throw std::runtime_error("Argument count mismatch in call to function: " + fncName);
 
 	// check arg types
 	for (int i = 0; i < argTypes.size(); ++i)
 	{
 		if (argTypes[i] != fi.args[i])
-			throw std::runtime_error("Argument type mismatch in call to function: " + call->name);
+			throw std::runtime_error("Argument type mismatch in call to function: " + fncName);
 	}
 
 	stackDepth += (int)fi.maxStackSize;
@@ -1929,26 +1999,6 @@ Type Compiler::compileIndex(IndexExpr* expr)
 		return prg.types.Double();
 	}
 
-	// mat2 indexing
-	if (exprType->kind == TypeKind::Mat2)
-	{
-		if (indxType->kind != TypeKind::Int)
-			throw std::runtime_error("mat2 index must be an integer.");
-
-		emit(OpCode::GET_MAT2_INDEX);
-		return prg.types.Vec2();
-	}
-
-	// mat3 indexing
-	if (exprType->kind == TypeKind::Mat3)
-	{
-		if (indxType->kind != TypeKind::Int)
-			throw std::runtime_error("mat3 index must be an integer.");
-
-		emit(OpCode::GET_MAT3_INDEX);
-		return prg.types.Vec3();
-	}
-
 	if (exprType->kind != TypeKind::Array)
 		throw std::runtime_error("Cannot index non-array type.");
 	if (indxType->kind != TypeKind::Int)
@@ -1990,6 +2040,9 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::PUSH_MAT2  :
 	case OpCode::PUSH_MAT3  :
 		return "MOV ";
+
+	case OpCode::PUSH_LOCAL:
+		return "PSHL";
 
 	case OpCode::GET_GLOBAL_BOOL  :
 	case OpCode::GET_GLOBAL_INT   :
@@ -2117,8 +2170,9 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::MUL_MAT2_VEC2  : return "M2V2";
 	case OpCode::DIV_MAT2_DOUBLE: return "DM2F";
 	case OpCode::NEG_MAT2       : return "NGM2";
-	case OpCode::GET_MAT2_INDEX : return "GM2I";
 	case OpCode::CREATE_MAT2_DIAG: return "MAT2";
+	case OpCode::GET_MAT2_ELEMENT: return "GME2";
+	case OpCode::GET_MAT2_ELEMENT_REF: return "GME2";
 
 	case OpCode::ADD_MAT3       : return "ADM3";
 	case OpCode::SUB_MAT3       : return "SBM3";
@@ -2128,12 +2182,13 @@ const char* febcode::OpCodeToString(febcode::OpCode op)
 	case OpCode::MUL_DOUBLE_MAT3: return "FM3 ";
 	case OpCode::MUL_MAT3_VEC3  : return "M3V3";
 	case OpCode::NEG_MAT3       : return "NGM3";
-	case OpCode::GET_MAT3_INDEX : return "GM3I";
 	case OpCode::ADD_GLOBAL_MAT3: return "ADM3";
 	case OpCode::SUB_GLOBAL_MAT3: return "SBM3";
 	case OpCode::MUL_GLOBAL_MAT3: return "MLM3";
 	case OpCode::CREATE_MAT3_DIAG: return "MAT3";
 	case OpCode::CREATE_MAT3_VEC3: return "C3V3";
+	case OpCode::GET_MAT3_ELEMENT: return "GME3";
+	case OpCode::GET_MAT3_ELEMENT_REF: return "GME3";
 
 	case OpCode::NOT           : return "NOT ";
 

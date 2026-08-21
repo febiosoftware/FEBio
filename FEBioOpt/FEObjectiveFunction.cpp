@@ -187,7 +187,7 @@ void FEDataFitObjective::GetMeasurements(vector<double>& y0)
 {
 	int ndata = m_lc.Points();
 	y0.resize(ndata);
-	for (int i = 0; i<ndata; ++i) y0[i] = m_lc.Point(i).y();
+	for (int i = 0; i<ndata; ++i) y0[i] = m_lc.Point(i).y;
 }
 
 void FEDataFitObjective::GetXValues(std::vector<double>& x)
@@ -202,7 +202,7 @@ void FEDataFitObjective::EvaluateFunctions(vector<double>& f)
 	m_x.resize(ndata);
 	for (int i = 0; i<ndata; ++i)
 	{
-		double xi = m_lc.Point(i).x();
+		double xi = m_lc.Point(i).x;
 		m_x[i] = xi;
 		f[i] = m_src->Evaluate(xi);
 	}
@@ -222,7 +222,7 @@ bool FEMinimizeObjective::ParamFunction::Init()
 	return true;
 }
 
-FEMinimizeObjective::FilterAvgFunction::FilterAvgFunction(FEModel* fem, FELogElemData* pd, FEElementSet* elemSet, double trg) : Function(fem)
+FEMinimizeObjective::FilterAvgFunction::FilterAvgFunction(FEModel* fem, FELogElemSource* pd, FEElementSet* elemSet, double trg) : Function(fem)
 {
 	m_pd = pd;
 	m_elemSet = elemSet;
@@ -323,7 +323,7 @@ void FEElementDataTable::AddValue(int elemID, double v)
 	m_Data.push_back(d);
 }
 
-void FEElementDataTable::SetVariable(FELogElemData* var)
+void FEElementDataTable::SetVariable(FELogElemSource* var)
 {
 	m_var = var;
 }

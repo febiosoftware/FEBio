@@ -164,8 +164,8 @@ template <> inline void FEDataArray::push_back<double>(const double& v)
 template <> inline void FEDataArray::push_back<vec2d>(const vec2d& v)
 {
 	assert(m_dataSize == fecoreType<vec2d>::size());
-	m_val.push_back(v.x());
-	m_val.push_back(v.y());
+	m_val.push_back(v.x);
+	m_val.push_back(v.y);
 	m_dataCount++;
 }
 
@@ -211,8 +211,8 @@ template <> inline bool FEDataArray::set<double>(int n, const double& v)
 template <> inline bool FEDataArray::set<vec2d>(int n, const vec2d& v)
 {
 	assert(m_dataSize == fecoreType<vec2d>::size());
-	m_val[2 * n] = v.x();
-	m_val[2 * n + 1] = v.y();
+	m_val[2 * n] = v.x;
+	m_val[2 * n + 1] = v.y;
 	return true;
 }
 
@@ -265,8 +265,8 @@ template <> inline bool FEDataArray::set<vec2d>(const vec2d& v)
 	assert(m_dataSize == fecoreType<vec2d>::size());
 	for (int i = 0; i<(int)m_val.size(); i += 2)
 	{
-		m_val[i] = v.x();
-		m_val[i + 1] = v.y();
+		m_val[i] = v.x;
+		m_val[i + 1] = v.y;
 	}
 	return true;
 }

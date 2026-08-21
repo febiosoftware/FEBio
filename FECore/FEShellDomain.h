@@ -39,10 +39,10 @@ public:
 	FEShellDomain(FEModel* fem);
 
 	//! Update element data prior to solving time step
-	void PreSolveUpdate(const FETimeInfo& timeInfo);
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
 
 	//! Reset element data
-	void Reset();
+	void Reset() override;
 
 	// get a shell element
 	virtual FEShellElement& Element(int i) = 0;

@@ -57,5 +57,5 @@ protected:
 protected:
 	vector<ELEMREF>	m_ELT;
 	int				m_offset;
-	vector<FELogElemData*>	m_Data;
+	vector<FELogElemSource*>	m_Data;
 };

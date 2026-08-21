@@ -24,18 +24,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "ElementDataRecord.h"
+#include "FELogElemData.h"
 #include "MathObject.h"
 #include <string>
 #include "fecore_api.h"
 
-class FECORE_API FELogElemMath : public FELogElemData
+class FECORE_API FELogElemMath : public FELogElemDefinition
 {
 public:
 	FELogElemMath(FEModel* pfem);
 	~FELogElemMath();
 
-	double value(FEElement& el);
+	bool Init() override;
+
+	double value(FEElement& el) override;
 
 	bool SetExpression(const std::string& smath);
 
@@ -43,7 +45,10 @@ private:
 	void Clear();
 
 private:
+	std::string m_exp;
 	MSimpleExpression m;
-	std::vector<FELogElemData*> m_data;
+	std::vector<FELogElemSource*> m_data;
+
+	DECLARE_FECORE_CLASS();
 };
 

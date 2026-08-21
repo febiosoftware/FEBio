@@ -145,7 +145,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		}
 
 		// get the data attribute
-		const char* szdata = tag.AttributeValue("data");
+		const char* szdata = tag.AttributeValue("data", true);
 
 		// get the name attribute
 		const char* szname = tag.AttributeValue("name", true);
@@ -269,7 +269,22 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
         {
             pdr = new FEModelDataRecord(&fem);
         }
-		else throw XMLReader::InvalidTag(tag);
+		else if (tag == "define_element_data")
+		{
+			if (szname == nullptr) throw XMLReader::MissingAttribute(tag, "name");
+			const char* sztype = tag.AttributeValue("type");
+
+			FELogElemDefinition* pdef = fecore_new<FELogElemDefinition>(sztype, &fem);
+			if (pdef == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			pdef->SetName(szname);
+
+			DataStore& DS = GetFEModel()->GetDataStore();
+			DS.AddElementDataDefinition(pdef);
+
+			ReadParameterList(tag, pdef);
+		}
+		else
+			throw XMLReader::InvalidTag(tag);
 
 		if (pdr)
 		{

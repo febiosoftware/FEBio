@@ -123,7 +123,12 @@ Simplifier::Simplifier(Program& prg) : Modifier(prg)
 				if (!isScalar(arg.get(), value)) return nullptr; // not all arguments are scalar constants
 				scalarArgs.push_back(value);
 			}
-			const std::string& fname = call->name;
+
+			VariableExpr* calleeVar = dynamic_cast<VariableExpr*>(call->callee.get());
+			if (!calleeVar) 
+				febcode::error(call, "Unsupported function call in constant folding: callee is not a variable");
+
+			const std::string& fname = calleeVar->name;
 			if (scalarArgs.size() == 1)
 			{
 				// Make sure this list matches the built-in functions defined in the math module!
@@ -275,6 +280,42 @@ Simplifier::Simplifier(Program& prg) : Modifier(prg)
 		}
 		return nullptr;
 	});
+
+	// vec3(1,0,0) * vec3 = vec3.x, vec3 * vec3(1,0,0) = vec3.x
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isMul(e, a, b))
+		{
+			vec3 v;
+			if (isVec3(a, v) && (v == vec3(1, 0, 0)) && (b->valType->kind == TypeKind::Vec3)) return extractComponent(b, 0);
+			if (isVec3(b, v) && (v == vec3(1, 0, 0)) && (a->valType->kind == TypeKind::Vec3)) return extractComponent(a, 0);
+		}
+		return nullptr;
+	});
+
+	// vec3(0,1,0) * vec3 = vec3.y, vec3 * vec3(0,1,0) = vec3.y
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isMul(e, a, b))
+		{
+			vec3 v;
+			if (isVec3(a, v) && (v == vec3(0, 1, 0)) && (b->valType->kind == TypeKind::Vec3)) return extractComponent(b, 1);
+			if (isVec3(b, v) && (v == vec3(0, 1, 0)) && (a->valType->kind == TypeKind::Vec3)) return extractComponent(a, 1);
+		}
+		return nullptr;
+		});
+
+	// vec3(0,0,1) * vec3 = vec3.z, vec3 * vec3(0,0,1) = vec3.z
+	rules.push_back([this](const Expression* e) -> ExprPtr {
+		Expression* a, * b;
+		if (isMul(e, a, b))
+		{
+			vec3 v;
+			if (isVec3(a, v) && (v == vec3(0, 0, 1)) && (b->valType->kind == TypeKind::Vec3)) return extractComponent(b, 2);
+			if (isVec3(b, v) && (v == vec3(0, 0, 1)) && (a->valType->kind == TypeKind::Vec3)) return extractComponent(a, 2);
+		}
+		return nullptr;
+		});
 
 	// a op a
 	rules.push_back([this](const Expression* e) -> ExprPtr {
@@ -441,7 +482,11 @@ ExprPtr Simplifier::simplifyCall(const CallExpr* call)
 		simplifiedArgs.push_back(simplify(arg.get()));
 	}
 
-	ExprPtr tmp = Call(call->name, simplifiedArgs);
+	VariableExpr* calleeVar = dynamic_cast<VariableExpr*>(call->callee.get());
+	if (!calleeVar)
+		febcode::error(call, "Unsupported function call in constant folding: callee is not a variable");
+
+	ExprPtr tmp = Call(calleeVar->name, simplifiedArgs);
 	if (auto result = applyRules(tmp.get()))
 	{
 		return result;
@@ -476,4 +521,31 @@ ExprPtr Simplifier::simplifyAssign(const AssignExpr* assign)
 	}
 
 	return std::move(tmp);
+}
+
+ExprPtr Simplifier::extractComponent(const Expression* expr, int component)
+{
+	if (expr->exprType == ExpressionType::Literal)
+	{
+		const LiteralExpr* lit = dynamic_cast<const LiteralExpr*>(expr);
+		if (isVec2(lit->value)) return Literal(lit->value.vec2Value[component]);
+		if (isVec3(lit->value)) return Literal(lit->value.vec3Value(component));
+	}
+	else if (auto var = dynamic_cast<const VariableExpr*>(expr))
+	{
+		std::string compName;
+		switch (component)
+		{
+			case 0: compName = "x"; break;
+			case 1: compName = "y"; break;
+			case 2: compName = "z"; break;
+			default: throw std::runtime_error("Invalid component index in extractComponent");
+		}
+
+		auto varExpr = std::make_unique<VariableExpr>(var->name);
+		varExpr->valType = var->valType;
+		return Member(std::move(varExpr), compName);
+	}
+
+	return nullptr;
 }

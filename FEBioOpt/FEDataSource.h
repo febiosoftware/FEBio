@@ -158,7 +158,7 @@ public:
 	FEElemDataFilterSum(FEModel* fem);
 	~FEElemDataFilterSum();
 
-	void SetData(FELogElemData* data, FEElementSet* elemSet);
+	void SetData(FELogElemSource* data, FEElementSet* elemSet);
 
 	// Initialize data
 	bool Init() override;
@@ -174,7 +174,7 @@ private:
 	void update();
 
 private:
-	FELogElemData*	m_data;
+	FELogElemSource*	m_data;
 	FEElementSet*	m_elemSet;
 	PointCurve		m_rf;
 };

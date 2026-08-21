@@ -624,6 +624,12 @@ inline vec3d mat3da::operator * (const vec3d& a)
 //-----------------------------------------------------------------------------
 
 // constructors
+inline mat3d::mat3d()
+{
+	d[0][0] = d[0][1] = d[0][2] = 0;
+	d[1][0] = d[1][1] = d[1][2] = 0;
+	d[2][0] = d[2][1] = d[2][2] = 0;
+}
 
 inline mat3d::mat3d(double a)
 {
@@ -757,6 +763,14 @@ inline double& mat3d::operator () (int i, int j) { return d[i][j]; }
 inline const double& mat3d::operator () (int i, int j) const { return d[i][j]; }
 inline double* mat3d::operator [] (int i) { return d[i]; }
 inline const double* mat3d::operator [] (int i) const { return d[i]; }
+
+// comparison operator
+inline bool mat3d::operator == (const mat3d& m) const
+{
+	return (d[0][0] == m.d[0][0]) && (d[0][1] == m.d[0][1]) && (d[0][2] == m.d[0][2]) &&
+		   (d[1][0] == m.d[1][0]) && (d[1][1] == m.d[1][1]) && (d[1][2] == m.d[1][2]) &&
+		   (d[2][0] == m.d[2][0]) && (d[2][1] == m.d[2][1]) && (d[2][2] == m.d[2][2]);
+}
 
 // arithmetic operators
 inline mat3d mat3d::operator + (const mat3d& m) const

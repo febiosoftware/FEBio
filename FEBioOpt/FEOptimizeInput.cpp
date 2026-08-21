@@ -275,7 +275,7 @@ void FEOptimizeInput::ParseObjectiveTarget(XMLTag& tag)
 			if (strcmp(sztype, "filter_avg") == 0)
 			{
 				FEElementSet* elset = nullptr;
-				FELogElemData* pdata = nullptr;
+				FELogElemSource* pdata = nullptr;
 				double target = 0;
 				++tag;
 				do
@@ -334,7 +334,7 @@ void FEOptimizeInput::ParseObjectiveElementData(XMLTag& tag)
 			const char* sztype = tag.AttributeValue("type");
 
 			// try to allocate the element data record
-			FELogElemData* var = nullptr;
+			FELogElemSource* var = nullptr;
 			if (sztype && (sztype[0]=='='))
 			{
 				FELogElemMath* logMath = fecore_alloc(FELogElemMath, &fem);
@@ -521,7 +521,7 @@ FEDataSource* FEOptimizeInput::ParseDataSource(XMLTag& tag)
 				FEElementSet* elemSet = mesh.FindElementSet(szset);
 				if (elemSet == nullptr) throw XMLReader::InvalidAttributeValue(tag, "elem_set", szset);
 
-				FELogElemData* elemData = nullptr;
+				FELogElemSource* elemData = nullptr;
 				if (szdata && (szdata[0] == '='))
 				{
 					FELogElemMath* logMath = fecore_alloc(FELogElemMath, &fem);

@@ -129,7 +129,7 @@ public:
 	};
 
 public:
-	Implementation(FEModel* fem) : m_fem(fem), m_mesh(fem), m_dmp(*fem)
+	Implementation(FEModel* fem) : m_fem(fem), m_mesh(fem), m_dmp(*fem), m_dataStore(fem)
 	{
 		// --- Analysis Data ---
 		m_pStep = 0;
@@ -511,6 +511,9 @@ bool FEModel::Init()
 	tp.currentTime = 0;
 	tp.timeIncrement = m_imp->m_Step[0]->m_dt0;
 	m_imp->m_ftime0 = 0;
+
+	// initialize data store
+	if (!m_imp->m_dataStore.Init()) return false;
 
 	// initialize global data
 	// TODO: I'd like to do this here for consistency, but
@@ -1841,7 +1844,9 @@ FEDataValue FEModel::GetDataValue(const ParamString& s)
 	{
 		string params = data.IDString();
 
-		FELogElemData* pd = fecore_new<FELogElemData>(params.c_str(), this);
+		DataStore& DS = GetDataStore();
+
+		FELogElemSource* pd = DS.GetElementDataSource(params.c_str());
 		if (pd == nullptr) { feLogError("Invalid data variable %s", params.c_str()); return val; }
 
 		m_imp->m_logData.push_back(pd);

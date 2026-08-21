@@ -129,7 +129,7 @@ bool FETimeStepController::Init()
 				if (f.Points() < 2) return false;
 				for (int i = 0; i < f.Points(); ++i)
 				{
-					double ti = f.Point(i).x();
+					double ti = f.Point(i).x;
 					m_must_points.push_back(ti);
 				}
 

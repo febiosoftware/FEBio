@@ -75,8 +75,8 @@ bool FELoadCurve::Init()
 	{
 		for (int i = 1; i < m_points.size(); ++i)
 		{
-			double t0 = m_points[i - 1].x();
-			double t1 = m_points[i    ].x();
+			double t0 = m_points[i - 1].x;
+			double t1 = m_points[i    ].x;
 			if (t0 == t1) feLogWarning("Repeated time coordinate in load controller %d", GetID() + 1);
 		}
 	}

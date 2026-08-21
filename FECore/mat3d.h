@@ -67,7 +67,7 @@ class mat3dd
 {
 public:
 	// default constructor
-	mat3dd(){}
+	mat3dd() { d[0] = d[1] = d[2] = 0.0; }
 
 	// constructors
 	explicit mat3dd(double a);
@@ -158,7 +158,7 @@ protected:
 		ZZ = 5 };
 public:
 	// default constructor
-	mat3ds(){}
+	mat3ds() { m[0] = m[1] = m[2] = m[3] = m[4] = m[5] = 0.0; }
 
 	// constructors
 	explicit mat3ds(double a);
@@ -291,7 +291,7 @@ class mat3da
 {
 public:
 	// default constructor
-	mat3da(){}
+	mat3da() { d[0] = d[1] = d[2] = 0.0; }
 
 	// constructors
 	mat3da(double xy, double yz, double xz);
@@ -347,7 +347,7 @@ class mat3d
 {
 public:
 	// default constructor
-	mat3d() {}
+	mat3d();
 
 	// constructs diagonal matrix with a on the diagonal
 	explicit mat3d(double a);
@@ -394,6 +394,10 @@ public:
 	const double& operator () (int i, int j) const;
 	double* operator [] (int i);
 	const double* operator [] (int i) const;
+
+	// comparison operators
+	bool operator == (const mat3d& m) const;
+	bool operator != (const mat3d& m) const { return !(*this == m); }
 
 	// arithmetic operators
 	mat3d operator + (const mat3d& m) const;

@@ -126,6 +126,20 @@ Program::Program()
 	mat3Module.Register(*this);
 }
 
+uint8_t Program::addConstant(const Value& value)
+{
+	// see if this value already exists in the constant pool
+	for (size_t i = 0; i < constants.size(); ++i)
+	{
+		if (constants[i] == value)
+			return (uint8_t)i;
+	}
+
+	// add new constant to the pool
+	constants.push_back(value);
+	return (uint8_t)(constants.size() - 1);
+}
+
 int Program::addGlobal(const std::string& name, Type type)
 {
 	// make sure the global variable name is unique
@@ -152,6 +166,8 @@ int Program::injectGlobal(const std::string& name, Type type)
 	int slot = (int)globals.size();
 	globals.push_back({ type, (int)globalStackSize, true, 0 });
 	globalIndices[name] = slot;
+
+	injects.emplace_back(std::make_unique<Var>(Var{ name, type, nullptr })); // add to injects list for later initialization
 
 	globalStackSize += type->size(); // reserve stack slots for this global variable
 
@@ -258,5 +274,6 @@ BinaryOpSignature Program::resolveBinaryOp(BinaryOp op, Type left, Type right)
 			}
 		}
 	}
-	throw std::runtime_error("No matching binary operator found for operator '" + opToString(op) + "' with operand types '" + TypeToString(left) + "' and '" + TypeToString(right) + "'.");
+
+	return BinaryOpSignature({ nullptr, nullptr, nullptr });
 }

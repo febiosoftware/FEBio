@@ -183,11 +183,11 @@ public:
 	class FilterAvgFunction : public Function
 	{
 	public:
-		FELogElemData* m_pd = nullptr;
+		FELogElemSource* m_pd = nullptr;
 		FEElementSet* m_elemSet = nullptr;
 		double	m_y0 = 0;
 
-		FilterAvgFunction(FEModel* fem, FELogElemData* pd, FEElementSet* elemSet, double trg);
+		FilterAvgFunction(FEModel* fem, FELogElemSource* pd, FEElementSet* elemSet, double trg);
 
 	public:
 		bool Init() override;
@@ -236,7 +236,7 @@ public:
 
 	void AddValue(int elemID, double v);
 
-	void SetVariable(FELogElemData* var);
+	void SetVariable(FELogElemSource* var);
 
 public:
 	// return number of measurements (i.e. nr of terms in objective function)
@@ -250,7 +250,7 @@ public:
 
 private:
 	std::vector<Entry>	m_Data;
-	FELogElemData*		m_var;
+	FELogElemSource*	m_var;
 };
 
 //=============================================================================
