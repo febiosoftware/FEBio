@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FEBioMech/FEContactInterface.h>
 #include <FEBioMech/FEContactSurface.h>
+#include <FECore/FESolidElement.h>
 #include "FEFluidMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -45,16 +46,16 @@ public:
         
     public:
         vec3d   m_Gap;      //!< initial gap in reference configuration
-        vec3d   m_vg;       //!< tangential velocity gap function at integration points
+        vec3d   m_vg;       //!< velocity gap function at integration points
         vec3d   m_nu;       //!< normal at integration points
         vec2d   m_rs;       //!< natural coordinates of projection of integration point
-        vec3d   m_Lmd;      //!< lagrange multipliers for tangential velocity
-        vec3d   m_tv;       //!< viscous tangential traction
-        double  m_Lmp;      //!< lagrange multipliers for fluid pressures
+        vec3d   m_Lmd;      //!< lagrange multipliers for velocity
+        vec3d   m_tv;       //!< viscous traction
+        double  m_Lmp;      //!< lagrange multipliers for fluid dilatations
         double  m_epst;     //!< viscous traction penalty factor
         double  m_epsn;     //!< normal velocity penalty factor
-        double  m_pg;       //!< pressure "gap"
-        double  m_vn;       //!< normal fluid velocity gap
+        double  m_Jg;       //!< dilatation "gap"
+        double  m_vn;       //!< normal velocity
     };
     
     //! constructor
@@ -71,10 +72,11 @@ public:
     
 public:
     void GetVelocityGap     (int nface, vec3d& vg);
-    void GetPressureGap     (int nface, double& pg);
+    void GetDilatationGap   (int nface, double& Jg);
     void GetViscousTraction (int nface, vec3d& tv);
     void GetNormalVelocity  (int nface, double& vn);
-
+    double GetArea          (FESurfaceElement& el);
+    double GetVolume        (FESolidElement& el);
    
 public:
 	FEDofList	m_dofWE;
@@ -100,8 +102,8 @@ public:
     void Serialize(DumpStream& ar) override;
     
     //! return the primary and secondary surfaces
-	FESurface* GetPrimarySurface() override { return &m_ss; }
-	FESurface* GetSecondarySurface() override { return &m_ms; }
+	FESurface* GetPrimarySurface() override { return &m_s1; }
+	FESurface* GetSecondarySurface() override { return &m_s2; }
     
     //! return integration rule class
     bool UseNodalIntegration() override { return false; }
@@ -127,17 +129,19 @@ protected:
     void ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
     
     //! calculate penalty factor
-    void CalcAutoPressurePenalty(FETiedFluidSurface& s);
-    double AutoPressurePenalty(FESurfaceElement& el, FETiedFluidSurface& s);
+    void CalcAutoViscousTractionPenalty(FETiedFluidSurface& s);
+    void CalcAutoNormalVelocityPenalty(FETiedFluidSurface& s);
     
+    double AutoViscousTractionPenalty(FESurfaceElement& el, FETiedFluidSurface& s);
+    double AutoNormalVelocityPenalty(FESurfaceElement& el, FETiedFluidSurface& s);
 public:
-	FETiedFluidSurface    m_ss;    //!< primary surface
-	FETiedFluidSurface    m_ms;    //!< secondary surface
+	FETiedFluidSurface    m_s1;    //!< primary surface
+	FETiedFluidSurface    m_s2;    //!< secondary surface
     
     bool            m_btwo_pass;    //!< two-pass flag
     double          m_atol;         //!< augmentation tolerance
-    double          m_gtol;         //!< gap tolerance
-    double          m_ptol;         //!< pressure gap tolerance
+    double          m_gtol;         //!< velocity gap tolerance
+    double          m_etol;         //!< dilatation gap tolerance
     double          m_stol;         //!< search tolerance
     double          m_srad;         //!< contact search radius
     int             m_naugmax;      //!< maximum nr of augmentations
