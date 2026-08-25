@@ -89,21 +89,21 @@ bool FEIdealGas::Init()
             // Generate T and cp(T)/T (denoted as cp here) for all points
             for (int i=0; i< np; ++i) {
                 lp = pf->LoadPoint(i);
-                cp[i].x() = lp.time;
-                cp[i].y() = lp.value/lp.time;
+                cp[i].x = lp.time;
+                cp[i].y = lp.value/lp.time;
             }
             // first, perform integration to s_circle
             std::vector<vec2d> so(np,vec2d(0,0));
             if (SimpsonIntegration(cp, so) == false) return false;
             // next, perform integration to a_circle
             // start by negating s_circle
-            for (int i=0; i<np; ++i) so[i].y() *= -1;
+            for (int i=0; i<np; ++i) so[i].y *= -1;
             // now perform integration and store results temporarily in ao
             std::vector<vec2d> ao(np,vec2d(0,0));
             if (SimpsonIntegration(so, ao) == false) return false;
             // store the resulting values of ao as points in the point curve associated with m_ao
             for (int i=0; i<np; ++i) {
-                apf->Add(ao[i].x(), ao[i].y());
+                apf->Add(ao[i].x, ao[i].y);
             }
         }
         // if cp is a constant, use an analytical expression for its integration
@@ -122,30 +122,30 @@ bool FEIdealGas::Init()
             apf->SetExtendMode(PointCurve::EXTRAPOLATE);
             np = 64;    // arbitrary number of points for the point function of ao
             cp.assign(np, vec2d(0,0));
-            cp[0].x() = 1;
-            cp[np-1].x() = 6;
-            double dT = (cp[np-1].x() - cp[0].x())/(np-1);
+            cp[0].x = 1;
+            cp[np-1].x = 6;
+            double dT = (cp[np-1].x - cp[0].x)/(np-1);
             for (int i=1; i<np; ++i) {
-                cp[i].x() = cp[i-1].x() + dT;
-                cp[i].y() = m_cp->m_prop->value(cp[i].x());
+                cp[i].x = cp[i-1].x + dT;
+                cp[i].y = m_cp->m_prop->value(cp[i].x);
             }
             // the initial value of the normalized temperature is 1.  The final value is arbitrary
             // Generate T and cp(T)/T (denoted as cp here) for all points
             for (int i=0; i< np; ++i) {
-                cp[i].y() /= cp[i].x();
+                cp[i].y /= cp[i].x;
             }
             // first, perform integration to s_circle
             std::vector<vec2d> so(np,vec2d(0,0));
             if (SimpsonIntegration(cp, so) == false) return false;
             // next, perform integration to a_circle
             // start by negating s_circle
-            for (int i=0; i<np; ++i) so[i].y() *= -1;
+            for (int i=0; i<np; ++i) so[i].y *= -1;
             // now perform integration and store results temporarily in ao
             std::vector<vec2d> ao(np,vec2d(0,0));
             if (SimpsonIntegration(so, ao) == false) return false;
             // store the resulting values of ao as points in the point curve associated with m_ao
             for (int i=0; i<np; ++i) {
-                apf->Add(ao[i].x(), ao[i].y());
+                apf->Add(ao[i].x, ao[i].y);
             }
         }
         else {
@@ -367,32 +367,32 @@ bool FEIdealGas::SimpsonIntegration(const std::vector<vec2d> &cp, std::vector<ve
     if (np < 2) return false;
     else {
         // the initial value of so at That = 1 is zero
-        so[0].x() = cp[0].x();
+        so[0].x = cp[0].x;
         // start from first non-zero value
-        so[1].x() = cp[1].x();
+        so[1].x = cp[1].x;
         // if there is only one interval, use trapezoidal rule
         if (np < 3) {
-            so[1].y() = (cp[0].y() + cp[1].y())/2*(cp[1].x()-cp[0].x());
+            so[1].y = (cp[0].y + cp[1].y)/2*(cp[1].x-cp[0].x);
         }
         // if there is an even number of intervals use Simpson's rule
         else {
             bool odd = (np-1) % 2;
             int ifinal = odd ? np - 2 : np - 1;
             for (int i=1; i<ifinal; i += 2) {
-                so[i].x() = cp[i].x();
-                so[i+1].x() = cp[i+1].x();
-                double h1 = cp[i].x() - cp[i-1].x();
-                double h2 = cp[i+1].x() - cp[i].x();
-                double y0 = cp[i-1].y();
-                double y1 = cp[i].y();
-                double y2 = cp[i+1].y();
-                so[i].y() = so[i-1].y() + h1*(pow(h1,2)*(y1-y2)+2*h1*h2*(y0+2*y1)+3*pow(h2,2)*(y0+y1))/(6*h2*(h1+h2));
-                so[i+1].y() = so[i].y() + h2*(3*pow(h1,2)*(y1+y2)+2*h1*h2*(y2+2*y1)+pow(h2,2)*(y1-y0))/(6*h1*(h1+h2));
+                so[i].x = cp[i].x;
+                so[i+1].x = cp[i+1].x;
+                double h1 = cp[i].x - cp[i-1].x;
+                double h2 = cp[i+1].x - cp[i].x;
+                double y0 = cp[i-1].y;
+                double y1 = cp[i].y;
+                double y2 = cp[i+1].y;
+                so[i].y = so[i-1].y + h1*(pow(h1,2)*(y1-y2)+2*h1*h2*(y0+2*y1)+3*pow(h2,2)*(y0+y1))/(6*h2*(h1+h2));
+                so[i+1].y = so[i].y + h2*(3*pow(h1,2)*(y1+y2)+2*h1*h2*(y2+2*y1)+pow(h2,2)*(y1-y0))/(6*h1*(h1+h2));
             }
             // otherwise, use trapezoidal rule for the last interval
             if (odd) {
-                so[np-1].x() = cp[np-1].x();
-                so[np-1].y() = so[np-2].y() + (cp[np-2].y() + cp[np-1].y())/2*(cp[np-1].x()-cp[np-2].x());
+                so[np-1].x = cp[np-1].x;
+                so[np-1].y = so[np-2].y + (cp[np-2].y + cp[np-1].y)/2*(cp[np-1].x-cp[np-2].x);
             }
         }
     }

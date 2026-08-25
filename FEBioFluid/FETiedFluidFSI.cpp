@@ -594,7 +594,7 @@ double FETiedFluidFSI::GetFluidDilatation(FESurfaceElement& el, vec2d rs, double
 {
     double ef = 0;
     double* H;
-    el.shape_fnc(H, rs.x(), rs.y());
+    el.shape_fnc(H, rs.x, rs.y);
     int neln = el.Nodes();
     for (int j = 0; j < neln; ++j) {
         FENode& node = m_ms.Node(el.m_lnode[j]);
@@ -631,7 +631,7 @@ mat3ds FETiedFluidFSI::GetFluidStress(FESurfaceElement& el, vec2d rs)
         // evaluate fluid stress at given parametric coordinates
         mat3ds sf; sf.zero();
         double H[FEElement::MAX_INTPOINTS];
-        el.shape_fnc(H, rs.x(), rs.y());
+        el.shape_fnc(H, rs.x, rs.y);
         for (int j=0; j<el.Nodes(); ++j) {
             sf += sn[j]*H[j];
         }
@@ -665,7 +665,7 @@ mat3ds FETiedFluidFSI::GetViscousFluidStress(FESurfaceElement& el, vec2d rs)
         // evaluate fluid stress at given parametric coordinates
         mat3ds sv; sv.zero();
         double H[FEElement::MAX_INTPOINTS];
-        el.shape_fnc(H, rs.x(), rs.y());
+        el.shape_fnc(H, rs.x, rs.y);
         for (int j=0; j<el.Nodes(); ++j) {
             sv += sn[j]*H[j];
         }
@@ -1043,8 +1043,8 @@ void FETiedFluidFSI::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
                     
                     double Gr2[MN], Gs2[MN];
                     vec3d g2[2];
-                    s2.ContraBaseVectors(se2, pt.m_rs.x(), pt.m_rs.y(), g2);
-                    se2.shape_deriv(Gr2, Gs2, pt.m_rs.x(), pt.m_rs.y());
+                    s2.ContraBaseVectors(se2, pt.m_rs.x, pt.m_rs.y, g2);
+                    se2.shape_deriv(Gr2, Gs2, pt.m_rs.x, pt.m_rs.y);
                     vec3d gradN2[MN];
                     for (int d=0; d<neln2; ++d) gradN2[d] = g2[0]*Gr2[d] + g2[1]*Gs2[d];
                     
