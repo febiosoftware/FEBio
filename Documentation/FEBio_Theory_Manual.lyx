@@ -21983,7 +21983,7 @@ literal "true"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta W & =\int_{\Omega}\delta\mathbf{v}\cdot\left(\divg\boldsymbol{\sigma}+\rho\left(\mathbf{b}-\mathbf{a}\right)\right)dv\\
- & +\int_{\Omega}\delta J\left(\frac{\dot{J}}{J}-\divg\mathbf{v}\right)dv\,,
+ & +\int_{\Omega}\delta J\left(\divg\mathbf{v}-\frac{\dot{J}}{J}\right)dv\,,
 \end{aligned}
 \label{eq:virtual work}
 \end{equation}
@@ -22037,7 +22037,7 @@ nolink "false"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta W_{int} & =\int_{\Omega}\boldsymbol{\tau}:\grad\delta\mathbf{v}\,dv+\int_{\Omega}\delta\mathbf{v}\cdot\left(\grad p+\rho\mathbf{a}\right)\,dv\\
- & -\int_{\Omega}\left(\delta J\frac{\dot{J}}{J}+\grad\delta J\cdot\mathbf{v}\right)\,dv\,,
+ & +\int_{\Omega}\left(\delta J\frac{\dot{J}}{J}+\grad\delta J\cdot\mathbf{v}\right)dv\,,
 \end{aligned}
 \label{eq:virtual-work-internal-1}
 \end{equation}
@@ -22047,7 +22047,7 @@ nolink "false"
 and
 \begin_inset Formula 
 \begin{equation}
-\delta W_{ext}=\int_{\partial\Omega}\delta\mathbf{v}\cdot\mathbf{t}^{\tau}\,da+\int_{\Omega}\delta\mathbf{v}\cdot\rho\mathbf{b}\,dv-\int_{\partial\Omega}\delta J\,v_{n}\,da\,.\label{eq:virtual-work-external-1}
+\delta W_{ext}=\int_{\partial\Omega}\delta\mathbf{v}\cdot\mathbf{t}^{\tau}\,da+\int_{\Omega}\delta\mathbf{v}\cdot\rho\mathbf{b}\,dv+\int_{\partial\Omega}\delta J\,v_{n}\,da\,.\label{eq:virtual-work-external-1}
 \end{equation}
 
 \end_inset
@@ -22491,8 +22491,8 @@ literal "true"
  this relation may be expanded as
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned} & D\delta W_{int}\left[\Delta\mathbf{v}\right]+D\delta W_{int}\left[\Delta J\right]-D\delta W_{ext}\left[\Delta\mathbf{v}\right]\\
- & -D\delta W_{ext}\left[\Delta J\right]\approx\delta W_{ext}-\delta W_{int}\,.
+\begin{aligned} & D\left(\delta W_{int}\right)\left[\Delta\mathbf{v}\right]+D\left(\delta W_{int}\right)\left[\Delta J\right]\\
+ & -D\left(\delta W_{ext}\right)\left[\Delta\mathbf{v}\right]-D\left(\delta W_{ext}\right)\left[\Delta J\right]\approx\delta W_{ext}-\delta W_{int}\,.
 \end{aligned}
 \label{eq:linearized-work-split}
 \end{equation}
@@ -22624,7 +22624,7 @@ The linearization of
 \begin{equation}
 \begin{aligned}D\left(\delta W_{int}\right)\left[\Delta\mathbf{v}\right] & =\alpha_{f}\int_{\Omega}\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}^{\tau}:\grad\Delta\mathbf{v}\,dv\\
  & +\alpha_{f}\int_{\Omega}\delta\mathbf{v}\cdot\rho\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\mathbf{I}}{\Delta t}+\mathbf{L}\right)\cdot\Delta\mathbf{v}+\grad\Delta\mathbf{v}\cdot\mathbf{v}\right)\,dv\\
- & -\alpha_{f}\int_{\Omega}\left(\frac{\delta J}{J}\grad J+\grad\delta J\right)\cdot\Delta\mathbf{v}\,dv
+ & +\alpha_{f}\int_{\Omega}\left(\frac{\delta J}{J}\grad J+\grad\delta J\right)\cdot\Delta\mathbf{v}\,dv
 \end{aligned}
 \label{eq:Wint-linearization-v}
 \end{equation}
@@ -22694,7 +22694,7 @@ The linearization of
 \begin{equation}
 \begin{aligned}D\left(\delta W_{int}\right)\left[\Delta J\right] & =\alpha_{f}\int_{b}\Delta J\,\boldsymbol{\tau}^{\prime}_{J}:\grad\delta\mathbf{v}\,dv-\alpha_{f}\int_{\Omega}\delta\mathbf{v}\cdot\Delta J\frac{\rho}{J}\mathbf{a}\,dv\\
  & +\alpha_{f}\int_{\Omega}\delta\mathbf{v}\cdot\left(p^{\prime}\grad\Delta J+\Delta J\,p^{\prime\prime}\grad J\right)\,dv\\
- & -\alpha_{f}\int_{\Omega}\frac{\delta J}{J}\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}-\frac{\dot{J}}{J}\right)\Delta J+\grad\Delta J\cdot\mathbf{v}\right)\,dv
+ & +\alpha_{f}\int_{\Omega}\frac{\delta J}{J}\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}-\frac{\dot{J}}{J}\right)\Delta J+\grad\Delta J\cdot\mathbf{v}\right)\,dv
 \end{aligned}
 \label{eq:Wint-linearization-J}
 \end{equation}
@@ -23042,7 +23042,7 @@ where
 \begin{equation}
 \begin{aligned}\mathbf{f}^{\sigma}_{a} & =\int_{\Omega}\left(\boldsymbol{\tau}\cdot\grad N_{a}+N_{a}\grad p\right)\,dv\,,\\
 \mathbf{f}^{\rho}_{a} & =\int_{\Omega}N_{a}\rho\mathbf{a}\,dv\,,\\
-f^{J}_{a} & =\int_{\Omega}-\left(N_{a}\frac{\dot{J}}{J}+\grad N_{a}\cdot\mathbf{v}\right)\,dv\,.
+f^{J}_{a} & =\int_{\Omega}\left(N_{a}\frac{\dot{J}}{J}+\grad N_{a}\cdot\mathbf{v}\right)\,dv\,.
 \end{aligned}
 \label{eq:discretized-internal-forces}
 \end{equation}
@@ -23078,7 +23078,7 @@ where
 \begin{equation}
 \begin{aligned}\mathbf{K}^{vv}_{ab} & =\alpha_{f}\int_{\Omega}\grad N_{a}\cdot\boldsymbol{\mathcal{C}}^{v}\cdot\grad N_{b}\,dv\,,\\
 \mathbf{M}^{vv}_{ab} & =\alpha_{f}\int_{\Omega}N_{a}\rho\left(N_{b}\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{\mathbf{I}}{\Delta t}+\grad\mathbf{v}\right)+\left(\grad N_{b}\cdot\mathbf{v}\right)\mathbf{I}\right)\,dv\,,\\
-\mathbf{k}^{Jv}_{ab} & =-\alpha_{f}\int_{\Omega}\left(\frac{N_{a}}{J}\grad J+\grad N_{a}\right)N_{b}\,dv\,,
+\mathbf{k}^{Jv}_{ab} & =\alpha_{f}\int_{\Omega}\left(\frac{N_{a}}{J}\grad J+\grad N_{a}\right)N_{b}\,dv\,,
 \end{aligned}
 \label{eq:discretized-stiffness-v}
 \end{equation}
@@ -23113,7 +23113,7 @@ where
 \begin{equation}
 \begin{aligned}\mathbf{k}^{vJ}_{ab} & =\alpha_{f}\int_{\Omega}\left[N_{b}\boldsymbol{\tau}^{\prime}_{J}\cdot\grad N_{a}+N_{a}\left(p^{\prime}\grad N_{b}+N_{b}p^{\prime\prime}\grad J\right)\right]\,dv\,,\\
 \mathbf{m}^{vJ}_{ab} & =-\alpha_{f}\int_{\Omega}N_{a}N_{b}\frac{\rho}{J}\mathbf{a}\,dv\,,\\
-k^{JJ}_{ab} & =-\alpha_{f}\int_{\Omega}\frac{N_{a}}{J}\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}-\frac{\dot{J}}{J}\right)N_{b}+\grad N_{b}\cdot\mathbf{v}\right)\,dv\,.
+k^{JJ}_{ab} & =\alpha_{f}\int_{\Omega}\frac{N_{a}}{J}\left(\left(\frac{\alpha_{m}}{\alpha_{f}\gamma}\frac{1}{\Delta t}-\frac{\dot{J}}{J}\right)N_{b}+\grad N_{b}\cdot\mathbf{v}\right)\,dv\,.
 \end{aligned}
 \label{eq:discretized-stiffness-J}
 \end{equation}
@@ -23146,7 +23146,7 @@ where
 \begin{equation}
 \begin{aligned}\mathbf{f}^{\text{t}}_{a} & =\int_{\partial\Omega}N_{a}\mathbf{t}^{\tau}\,da\,,\\
 \mathbf{f}^{\text{b}}_{a} & =\int_{\Omega}N_{a}\rho\mathbf{b}\,dv\,,\\
-f^{v}_{a} & =-\int_{\Omega}N_{a}v_{n}\,da\,.
+f^{v}_{a} & =\int_{\Omega}N_{a}v_{n}\,da\,.
 \end{aligned}
 \label{eq:discretized-external-forces}
 \end{equation}
@@ -23176,7 +23176,7 @@ D\left(\delta W_{ext}\right)\left[\Delta J\right]=\sum_{a}\delta\mathbf{v}_{a}\c
 where
 \begin_inset Formula 
 \begin{equation}
-\mathbf{k}^{\text{b}}_{ab}=-\alpha_{f}\int_{\Omega}N_{a}N_{b}\frac{\rho}{J}\mathbf{b}\,dv\,.\label{eq:discretized-stiffness-ext}
+\mathbf{k}^{\text{b}}_{ab}=\alpha_{f}\int_{\Omega}N_{a}N_{b}\frac{\rho}{J}\mathbf{b}\,dv\,.\label{eq:discretized-stiffness-ext}
 \end{equation}
 
 \end_inset
@@ -63079,7 +63079,7 @@ literal "true"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
- & -\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v^{\left(1\right)}_{n}da^{\left(1\right)}\,.
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v^{\left(1\right)}_{n}da^{\left(1\right)}\,.
 \end{aligned}
 \label{eq696-2}
 \end{equation}
@@ -63394,7 +63394,7 @@ The directional derivatives of the various terms appearing in the integrand of
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}D\delta G_{c}\left[\Delta\mathbf{v}^{\left(1\right)}\right] & =\alpha_{f}\varepsilon_{t}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
-D\delta G_{c}\left[\Delta\mathbf{v}^{\left(2\right)}\right] & =\alpha_{f}\varepsilon_{t}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(2\right)}-\delta\mathbf{v}^{\left(1\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+D\delta G_{c}\left[\Delta\mathbf{v}^{\left(2\right)}\right] & =-\alpha_{f}\varepsilon_{t}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
 \end{aligned}
 \,,\label{eq:TFI-G-linearization-v}
 \end{equation}
@@ -63404,7 +63404,7 @@ D\delta G_{c}\left[\Delta\mathbf{v}^{\left(2\right)}\right] & =\alpha_{f}\vareps
 and
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\delta G_{c}\left[\Delta J^{\left(1\right)}\right] & =\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(2\right)}-\delta J^{\left(1\right)}\right)\Delta J^{\left(1\right)}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+\begin{aligned}D\delta G_{c}\left[\Delta J^{\left(1\right)}\right] & =-\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(1\right)}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
 D\delta G_{c}\left[\Delta J^{\left(2\right)}\right] & =\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
 \end{aligned}
 \label{eq:TFI-G-linearization-e}
@@ -63431,7 +63431,7 @@ The contact integral may be discretized as ***check sign of second equation ***
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{t}\left(\mathbf{v}^{\left(1\right)}-\mathbf{v}^{\left(2\right)}\right)\right]\\
- & -\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\right]
+ & +\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\right]
 \end{aligned}
 \,.\label{eq:TFI-discrete-1}
 \end{equation}
@@ -63453,19 +63453,6 @@ The variables may be interpolated over each element face according to
 
 Then,
  
-\begin_inset Formula 
-\[
-\begin{aligned}\delta G_{c} & =\sum\limits^{m^{\left(1\right)}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a}\cdot\int_{\gamma^{\left(1\right)}}N^{\left(1\right)}_{a}\mathbf{t}^{\tau}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
- & +\sum\limits^{m^{\left(2\right)}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\cdot\int_{\gamma^{\left(1\right)}}-N^{\left(2\right)}_{b}\mathbf{t}^{\tau}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
- & +\sum\limits^{m^{\left(1\right)}}_{a=1}\delta J^{\left(1\right)}_{a}\int_{\gamma^{\left(1\right)}}N^{\left(1\right)}_{a}v_{n}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
- & +\sum\limits^{m^{\left(2\right)}}_{b=1}\delta J^{\left(2\right)}_{b}\int_{\gamma^{\left(1\right)}}-N^{\left(2\right)}_{b}v_{n}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
-\end{aligned}
-\,,
-\]
-
-\end_inset
-
-
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{cc}
@@ -63499,7 +63486,7 @@ Similarly,
  
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}-D\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\\
+\begin{aligned}D\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\\
  & \times\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{cc}
 \delta\mathbf{v}^{\left(1\right)}_{a} & \delta J^{\left(1\right)}_{a}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{cc}
 \mathbf{K}^{\left(1,1\right)}_{ac} & \mathbf{0}\\
@@ -63539,10 +63526,10 @@ Similarly,
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\\
-\mathbf{K}^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\\
-\mathbf{K}^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\\
-\mathbf{K}^{\left(2,2\right)}_{bd,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)
+\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
+\mathbf{K}^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(2,2\right)}_{bd,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
 \end{aligned}
 \,,\label{eq:TFI-discrete-6}
 \end{equation}
@@ -63552,10 +63539,10 @@ where
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}k^{\left(1,1\right)}_{ac} & =-K\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
-k^{\left(1,2\right)}_{ad,k} & =K\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
-k^{\left(2,1\right)}_{bc,k} & =K\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
-k^{\left(2,2\right)}_{bd,k} & =-K\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
+\begin{aligned}k^{\left(1,1\right)}_{ac} & =-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
+k^{\left(1,2\right)}_{ad,k} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
+k^{\left(2,1\right)}_{bc,k} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
+k^{\left(2,2\right)}_{bd,k} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
 \end{aligned}
 \,.\label{eq:TFI-discrete-7}
 \end{equation}

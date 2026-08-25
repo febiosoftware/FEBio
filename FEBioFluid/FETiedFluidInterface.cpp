@@ -581,13 +581,13 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& s1, FETiedFluidSur
                 vec3d vm[FEElement::MAX_NODES];
                 for (int k=0; k<pme->Nodes(); ++k) vm[k] = mesh.Node(pme->m_node[k]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
                 vec3d v2 = pme->eval(vm, pt.m_rs[0], pt.m_rs[1]);
-                pt.m_vg = v2 - v1;
+                pt.m_vg = v1 - v2;
 
                 // calculate the pressure gap function
                 double em[FEElement::MAX_NODES];
                 for (int k=0; k<pme->Nodes(); ++k) em[k] = mesh.Node(pme->m_node[k]).get(m_dofWE[3]);
                 double e2 = pme->eval(em, pt.m_rs[0], pt.m_rs[1]);
-                pt.m_Jg = e1 - e2;
+                pt.m_Jg = e2 - e1;
             }
             else
             {
@@ -723,7 +723,7 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     double epsn = m_epsn*pt.m_epsn;
 
                     // viscous traction
-                    vec3d tv = Lmv - dg*epst;
+                    vec3d tv = Lmv + dg*epst;
                     pt.m_tv = tv;
 
                     // normal velocity jump
@@ -745,16 +745,16 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     
                     for (int a=0; a<neln1; ++a)
                     {
-                        fe[4*a  ] -= f1[a].x*detJ[j]*w[j];
-                        fe[4*a+1] -= f1[a].y*detJ[j]*w[j];
-                        fe[4*a+2] -= f1[a].z*detJ[j]*w[j];
-                        fe[4*a+3] -= w1[a]*detJ[j]*w[j];
+                        fe[4*a  ] += f1[a].x*detJ[j]*w[j];
+                        fe[4*a+1] += f1[a].y*detJ[j]*w[j];
+                        fe[4*a+2] += f1[a].z*detJ[j]*w[j];
+                        fe[4*a+3] += w1[a]*detJ[j]*w[j];
                     }
                     for (int b = 0; b<neln2; ++b) {
-                        fe[4*(b+neln1)  ] -= f2[b].x*detJ[j]*w[j];
-                        fe[4*(b+neln1)+1] -= f2[b].y*detJ[j]*w[j];
-                        fe[4*(b+neln1)+2] -= f2[b].z*detJ[j]*w[j];
-                        fe[4*(b+neln1)+3] -= w2[b]*detJ[j]*w[j];
+                        fe[4*(b+neln1)  ] += f2[b].x*detJ[j]*w[j];
+                        fe[4*(b+neln1)+1] += f2[b].y*detJ[j]*w[j];
+                        fe[4*(b+neln1)+2] += f2[b].z*detJ[j]*w[j];
+                        fe[4*(b+neln1)+3] += w2[b]*detJ[j]*w[j];
                     }
 
                     // assemble the global residual
@@ -875,7 +875,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     double epsn = m_epsn*pt.m_epsn;
 
                     // viscous traction
-                    vec3d tv = Lmv - dg*epst;
+                    vec3d tv = Lmv + dg*epst;
                     pt.m_tv = tv;
 
                     // normal velocity jump
@@ -892,19 +892,19 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         {
                             mat3dd K11(-epst*H1[a]*H1[c]*detJ[j]*w[j]*alpha);
                             double k11 = -epsn*H1[a]*H1[c]*detJ[j]*w[j]*alpha;
-                            ke[ndpn*a    ][ndpn*c    ] += K11.xx();
-                            ke[ndpn*a + 1][ndpn*c + 1] += K11.yy();
-                            ke[ndpn*a + 2][ndpn*c + 2] += K11.zz();
-                            ke[ndpn*a + 3][ndpn*c + 3] += k11;
+                            ke[ndpn*a    ][ndpn*c    ] -= K11.xx();
+                            ke[ndpn*a + 1][ndpn*c + 1] -= K11.yy();
+                            ke[ndpn*a + 2][ndpn*c + 2] -= K11.zz();
+                            ke[ndpn*a + 3][ndpn*c + 3] -= k11;
                         }
                         for (int d=0; d<neln2; ++d)
                         {
                             mat3dd K12(epst*H1[a]*H2[d]*detJ[j]*w[j]*alpha);
                             double k12 = epsn*H1[a]*H2[d]*detJ[j]*w[j]*alpha;
-                            ke[ndpn*a    ][ndpn*(neln1+d)    ] += K12.xx();
-                            ke[ndpn*a + 1][ndpn*(neln1+d) + 1] += K12.yy();
-                            ke[ndpn*a + 2][ndpn*(neln1+d) + 2] += K12.zz();
-                            ke[ndpn*a + 3][ndpn*(neln1+d) + 3] += k12;
+                            ke[ndpn*a    ][ndpn*(neln1+d)    ] -= K12.xx();
+                            ke[ndpn*a + 1][ndpn*(neln1+d) + 1] -= K12.yy();
+                            ke[ndpn*a + 2][ndpn*(neln1+d) + 2] -= K12.zz();
+                            ke[ndpn*a + 3][ndpn*(neln1+d) + 3] -= k12;
                         }
                     }
 
@@ -913,19 +913,19 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         {
                             mat3dd K21(epst*H2[b]*H1[c]*detJ[j]*w[j]*alpha);
                             double k21 = epsn*H2[b]*H1[c]*detJ[j]*w[j]*alpha;
-                            ke[ndpn*(neln1+b)    ][ndpn*c    ] += K21.xx();
-                            ke[ndpn*(neln1+b) + 1][ndpn*c + 1] += K21.yy();
-                            ke[ndpn*(neln1+b) + 2][ndpn*c + 2] += K21.zz();
-                            ke[ndpn*(neln1+b) + 3][ndpn*c + 3] += k21;
+                            ke[ndpn*(neln1+b)    ][ndpn*c    ] -= K21.xx();
+                            ke[ndpn*(neln1+b) + 1][ndpn*c + 1] -= K21.yy();
+                            ke[ndpn*(neln1+b) + 2][ndpn*c + 2] -= K21.zz();
+                            ke[ndpn*(neln1+b) + 3][ndpn*c + 3] -= k21;
                         }
                         for (int d=0; d<neln2; ++d)
                         {
                             mat3dd K22(-epst*H2[b]*H2[d]*detJ[j]*w[j]*alpha);
                             double k22 = -epsn*H2[b]*H2[d]*detJ[j]*w[j]*alpha;
-                            ke[ndpn*(neln1+b)    ][ndpn*(neln1+d)    ] += K22.xx();
-                            ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d) + 1] += K22.yy();
-                            ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d) + 2] += K22.zz();
-                            ke[ndpn*(neln1+b) + 3][ndpn*(neln1+d) + 3] += k22;
+                            ke[ndpn*(neln1+b)    ][ndpn*(neln1+d)    ] -= K22.xx();
+                            ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d) + 1] -= K22.yy();
+                            ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d) + 2] -= K22.zz();
+                            ke[ndpn*(neln1+b) + 3][ndpn*(neln1+d) + 3] -= k22;
                         }
                     }
  
@@ -993,7 +993,7 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
             if (ds.m_pme) {
                 // update Lagrange multipliers on primary surface
                 eps = m_epst*ds.m_epst;
-                ds.m_Lmd = ds.m_Lmd - ds.m_vg*eps;
+                ds.m_Lmd = ds.m_Lmd + ds.m_vg*eps;
                 maxgap = max(maxgap,sqrt(ds.m_vg*ds.m_vg));
                 normL1 += ds.m_Lmd*ds.m_Lmd;
                 
