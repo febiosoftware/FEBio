@@ -62,7 +62,7 @@ mat3ds FEYeoh::DevStress(FEMaterialPoint& mp)
 
     double sum = 0;
     for (int i=0; i<MAX_TERMS; ++i)
-        sum += c[i]*pow(I1-3,i);
+        sum += (i+1)*c[i]*pow(I1-3,i);
     
 	// calculate sigma tilde
 	mat3ds sig = B*(sum*2.0/J);
@@ -92,10 +92,10 @@ tens4ds FEYeoh::DevTangent(FEMaterialPoint& mp)
     
     double sum = 0;
     for (int i=0; i<MAX_TERMS; ++i)
-        sum += c[i]*pow(I1-3,i);
+        sum += (i+1)*c[i]*pow(I1-3,i);
     double csum = 0;
     for (int i=1; i<MAX_TERMS; ++i)
-        csum += c[i]*pow(I1-3,i-1);
+        csum += (i+1)*i*c[i]*pow(I1-3,i-1);
 
     // calculate sigma tilde
     mat3ds sd = (B*(sum*2.0/J));
@@ -107,7 +107,7 @@ tens4ds FEYeoh::DevTangent(FEMaterialPoint& mp)
     
 	tens4ds BxB = dyad1s(B);
 
-	tens4ds C = BxB*(csum*4.0/J);
+	tens4ds C = BxB*(csum*2.0/J);
 
     C += - 1./3.*(ddots(C,IxI) - IxI*(C.tr()/3.))
     + 2./3.*((I4-IxI/3.)*sd.tr()-dyad1s(sd.dev(),I));
