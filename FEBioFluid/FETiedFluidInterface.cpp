@@ -544,9 +544,10 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& s1, FETiedFluidSur
     FEMesh& mesh = GetMesh();
     FESurfaceElement* pme;
     vec3d r;
+    double alpha = GetFEModel()->GetTime().alphaf;
     
-    vec3d  vt[FEElement::MAX_NODES], v1;
-    double es[FEElement::MAX_NODES], e1;
+    vec3d  vt[FEElement::MAX_NODES], vp[FEElement::MAX_NODES], v1;
+    double et[FEElement::MAX_NODES], ep[FEElement::MAX_NODES], e1;
     
     // loop over all integration points
     for (int i=0; i<s1.Elements(); ++i)
@@ -556,10 +557,13 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& s1, FETiedFluidSur
         int ne = el.Nodes();
         int nint = el.GaussPoints();
         
-        // get the nodal velocities and pressures
+        // get the nodal velocities and dilatations
         for (int j=0; j<ne; ++j) {
-            vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-            es[j] = mesh.Node(el.m_node[j]).get(m_dofWE[3]);
+            FENode& node = mesh.Node(el.m_node[j]);
+            vt[j] = node.get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+            vp[j] = node.get_vec3d_prev(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+            et[j] = node.get(m_dofWE[3]);
+            ep[j] = node.get_prev(m_dofWE[3]);
         }
 
         for (int j=0; j<nint; ++j)
@@ -569,25 +573,29 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& s1, FETiedFluidSur
             // calculate the global position of the integration point
             r = s1.Local2Global(el, j);
             
-            // get the velocity and pressure at the integration point
-            v1 = el.eval(vt, j);
-            e1 = el.eval(es, j);
+            // get the velocity and dilatation at the integration point
+            v1 = el.eval(vt, j)*alpha + el.eval(vp, j)*(1-alpha);
+            e1 = el.eval(et, j)*alpha + el.eval(ep, j)*(1-alpha);
             
             // if this node is tied, evaluate gap functions
             pme = pt.m_pme;
             if (pme)
             {
-                // calculate the tangential velocity gap function
-                vec3d vm[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) vm[k] = mesh.Node(pme->m_node[k]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-                vec3d v2 = pme->eval(vm, pt.m_rs[0], pt.m_rs[1]);
-                pt.m_vg = v1 - v2;
+                // calculate the velocity gap function
+                vec3d vmt[FEElement::MAX_NODES], vmp[FEElement::MAX_NODES];
+                double emt[FEElement::MAX_NODES], emp[FEElement::MAX_NODES];
+                for (int k=0; k<pme->Nodes(); ++k) {
+                    FENode& node = mesh.Node(pme->m_node[k]);
+                    vmt[k] = node.get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+                    vmp[k] = node.get_vec3d_prev(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+                    emt[k] = node.get(m_dofWE[3]);
+                    emp[k] = node.get_prev(m_dofWE[3]);
+                }
+                vec3d v2 = pme->eval(vmt, pt.m_rs[0], pt.m_rs[1])*alpha + pme->eval(vmp, pt.m_rs[0], pt.m_rs[1])*(1-alpha);
+                pt.m_vg = v2 - v1;
 
-                // calculate the pressure gap function
-                double em[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) em[k] = mesh.Node(pme->m_node[k]).get(m_dofWE[3]);
-                double e2 = pme->eval(em, pt.m_rs[0], pt.m_rs[1]);
-                pt.m_Jg = e2 - e1;
+                double e2 = pme->eval(emt, pt.m_rs[0], pt.m_rs[1])*alpha + pme->eval(emp, pt.m_rs[0], pt.m_rs[1])*(1-alpha);
+                pt.m_Jg = e1 - e2;
             }
             else
             {
@@ -677,25 +685,16 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     s2.UnpackLM(se2, LM2);
                     
                     // calculate degrees of freedom
-                    int ndof = 4*(neln1 + neln2);
+                    int ndpn = 4;
+                    int ndof = ndpn*(neln1 + neln2);
                     
                     // build the LM vector
                     LM.resize(ndof);
                     for (int a=0; a<neln1; ++a)
-                    {
-                        LM[4*a  ] = LM1[4*a  ];
-                        LM[4*a+1] = LM1[4*a+1];
-                        LM[4*a+2] = LM1[4*a+2];
-                        LM[4*a+3] = LM1[4*a+3];
-                    }
+                        for (int k=0; k< ndpn; ++k) LM[ndpn*a+k] = LM1[ndpn*a+k];
                     
                     for (int b=0; b<neln2; ++b)
-                    {
-                        LM[4*(b+neln1)  ] = LM2[4*b  ];
-                        LM[4*(b+neln1)+1] = LM2[4*b+1];
-                        LM[4*(b+neln1)+2] = LM2[4*b+2];
-                        LM[4*(b+neln1)+3] = LM2[4*b+3];
-                    }
+                        for (int k=0; k< ndpn; ++k) LM[ndpn*(b+neln1)+k] = LM2[ndpn*b+k];
                     
                     // build the en vector
                     en.resize(neln1+neln2);
@@ -841,10 +840,10 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     LM.resize(ndof);
                     
                     for (int a=0; a<neln1; ++a)
-                        for (int i=0; i<ndpn; ++i) LM[ndpn*a+i] = LM1[ndpn*a+i];
+                        for (int k=0; k<ndpn; ++k) LM[ndpn*a+k] = LM1[ndpn*a+k];
                     
                     for (int b=0; b<neln2; ++b)
-                        for (int i=0; i<ndpn; ++i) LM[ndpn*(b+neln1)+i] = LM2[ndpn*b+i];
+                        for (int k=0; k<ndpn; ++k) LM[ndpn*(b+neln1)+k] = LM2[ndpn*b+k];
 
                     // build the en vector
                     en.resize(neln1+neln2);
@@ -858,9 +857,6 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
                     se2.shape_fnc(H2, r, s);
-                    
-                    // get primary normal vector
-                    vec3d n1 = pt.m_nu;
                     
                     // gap functions
                     vec3d dg = pt.m_vg;
@@ -891,7 +887,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         for (int c=0; c<neln1; ++c)
                         {
                             mat3dd K11(-epst*H1[a]*H1[c]*detJ[j]*w[j]*alpha);
-                            double k11 = -epsn*H1[a]*H1[c]*detJ[j]*w[j]*alpha;
+                            double k11 = epsn*H1[a]*H1[c]*detJ[j]*w[j]*alpha;
                             ke[ndpn*a    ][ndpn*c    ] -= K11.xx();
                             ke[ndpn*a + 1][ndpn*c + 1] -= K11.yy();
                             ke[ndpn*a + 2][ndpn*c + 2] -= K11.zz();
@@ -900,7 +896,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         for (int d=0; d<neln2; ++d)
                         {
                             mat3dd K12(epst*H1[a]*H2[d]*detJ[j]*w[j]*alpha);
-                            double k12 = epsn*H1[a]*H2[d]*detJ[j]*w[j]*alpha;
+                            double k12 = -epsn*H1[a]*H2[d]*detJ[j]*w[j]*alpha;
                             ke[ndpn*a    ][ndpn*(neln1+d)    ] -= K12.xx();
                             ke[ndpn*a + 1][ndpn*(neln1+d) + 1] -= K12.yy();
                             ke[ndpn*a + 2][ndpn*(neln1+d) + 2] -= K12.zz();
@@ -912,7 +908,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         for (int c=0; c<neln1; ++c)
                         {
                             mat3dd K21(epst*H2[b]*H1[c]*detJ[j]*w[j]*alpha);
-                            double k21 = epsn*H2[b]*H1[c]*detJ[j]*w[j]*alpha;
+                            double k21 = -epsn*H2[b]*H1[c]*detJ[j]*w[j]*alpha;
                             ke[ndpn*(neln1+b)    ][ndpn*c    ] -= K21.xx();
                             ke[ndpn*(neln1+b) + 1][ndpn*c + 1] -= K21.yy();
                             ke[ndpn*(neln1+b) + 2][ndpn*c + 2] -= K21.zz();
@@ -921,7 +917,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         for (int d=0; d<neln2; ++d)
                         {
                             mat3dd K22(-epst*H2[b]*H2[d]*detJ[j]*w[j]*alpha);
-                            double k22 = -epsn*H2[b]*H2[d]*detJ[j]*w[j]*alpha;
+                            double k22 = epsn*H2[b]*H2[d]*detJ[j]*w[j]*alpha;
                             ke[ndpn*(neln1+b)    ][ndpn*(neln1+d)    ] -= K22.xx();
                             ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d) + 1] -= K22.yy();
                             ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d) + 2] -= K22.zz();
@@ -949,30 +945,30 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     vec3d Ln;
     bool bconv = true;
     
-    int NS = m_s1.Elements();
-    int NM = m_s2.Elements();
+    int N1 = m_s1.Elements();
+    int N2 = m_s2.Elements();
     
     // --- c a l c u l a t e   i n i t i a l   n o r m s ---
     // a. normal component
-    double normL0 = 0, normP0 = 0;
-    for (int i=0; i<NS; ++i)
+    double normL0 = 0, normJ0 = 0;
+    for (int i=0; i<N1; ++i)
     {
-		FESurfaceElement& se = m_s1.Element(i);
-        for (int j=0; j<se.GaussPoints(); ++j)
+		FESurfaceElement& s1 = m_s1.Element(i);
+        for (int j=0; j<s1.GaussPoints(); ++j)
         {
-			FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
-			normL0 += ds.m_Lmd*ds.m_Lmd;
-            normP0 += ds.m_Lmp*ds.m_Lmp;
+			FETiedFluidSurface::Data& d1 = static_cast<FETiedFluidSurface::Data&>(*s1.GetMaterialPoint(j));
+			normL0 += d1.m_Lmd*d1.m_Lmd;
+            normJ0 += d1.m_Lmp*d1.m_Lmp;
         }
     }
-    for (int i=0; i<NM; ++i)
+    for (int i=0; i<N2; ++i)
     {
-		FESurfaceElement& me = m_s2.Element(i);
-        for (int j=0; j<me.GaussPoints(); ++j)
+		FESurfaceElement& s2 = m_s2.Element(i);
+        for (int j=0; j<s2.GaussPoints(); ++j)
         {
-			FETiedFluidSurface::Data& dm = static_cast<FETiedFluidSurface::Data&>(*me.GetMaterialPoint(j));
-			normL0 += dm.m_Lmd*dm.m_Lmd;
-            normP0 += dm.m_Lmp*dm.m_Lmp;
+			FETiedFluidSurface::Data& d2 = static_cast<FETiedFluidSurface::Data&>(*s2.GetMaterialPoint(j));
+			normL0 += d2.m_Lmd*d2.m_Lmd;
+            normJ0 += d2.m_Lmp*d2.m_Lmp;
         }
     }
     
@@ -982,54 +978,54 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     double maxJg = 0;
     
     // update Lagrange multipliers
-    double normL1 = 0, normP1 = 0, eps, epsn;
-    for (i=0; i<NS; ++i)
+    double normL1 = 0, normJ1 = 0, eps, epsn;
+    for (i=0; i<N1; ++i)
     {
-		FESurfaceElement& se = m_s1.Element(i);
-		for (int j = 0; j<se.GaussPoints(); ++j)
+		FESurfaceElement& s1 = m_s1.Element(i);
+		for (int j = 0; j<s1.GaussPoints(); ++j)
 		{
-			FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+			FETiedFluidSurface::Data& d1 = static_cast<FETiedFluidSurface::Data&>(*s1.GetMaterialPoint(j));
 
-            if (ds.m_pme) {
+            if (d1.m_pme) {
                 // update Lagrange multipliers on primary surface
-                eps = m_epst*ds.m_epst;
-                ds.m_Lmd = ds.m_Lmd + ds.m_vg*eps;
-                maxgap = max(maxgap,sqrt(ds.m_vg*ds.m_vg));
-                normL1 += ds.m_Lmd*ds.m_Lmd;
+                eps = m_epst*d1.m_epst;
+                d1.m_Lmd = d1.m_Lmd + d1.m_vg*eps;
+                maxgap = max(maxgap,sqrt(d1.m_vg*d1.m_vg));
+                normL1 += d1.m_Lmd*d1.m_Lmd;
                 
-                epsn = m_epsn*ds.m_epsn;
-                ds.m_Lmp = ds.m_Lmp + epsn*ds.m_Jg;
-                maxJg = max(maxJg,fabs(ds.m_Jg));
-                normP1 += ds.m_Lmp*ds.m_Lmp;
+                epsn = m_epsn*d1.m_epsn;
+                d1.m_Lmp = d1.m_Lmp + epsn*d1.m_Jg;
+                maxJg = max(maxJg,fabs(d1.m_Jg));
+                normJ1 += d1.m_Lmp*d1.m_Lmp;
             }
         }
     }
     
-    for (i=0; i<NM; ++i)
+    for (i=0; i<N2; ++i)
     {
-		FESurfaceElement& me = m_s2.Element(i);
-		for (int j = 0; j<me.GaussPoints(); ++j)
+		FESurfaceElement& s2 = m_s2.Element(i);
+		for (int j = 0; j<s2.GaussPoints(); ++j)
 		{
-			FETiedFluidSurface::Data& dm = static_cast<FETiedFluidSurface::Data&>(*me.GetMaterialPoint(j));
+			FETiedFluidSurface::Data& d2 = static_cast<FETiedFluidSurface::Data&>(*s2.GetMaterialPoint(j));
 
-            if (dm.m_pme) {
+            if (d2.m_pme) {
                 // update Lagrange multipliers on secondary surface
-                eps = m_epst*dm.m_epst;
-                dm.m_Lmd = dm.m_Lmd + dm.m_vg*eps;
-                maxgap = max(maxgap,sqrt(dm.m_vg*dm.m_vg));
-                normL1 += dm.m_Lmd*dm.m_Lmd;
+                eps = m_epst*d2.m_epst;
+                d2.m_Lmd = d2.m_Lmd + d2.m_vg*eps;
+                maxgap = max(maxgap,sqrt(d2.m_vg*d2.m_vg));
+                normL1 += d2.m_Lmd*d2.m_Lmd;
                 
-                epsn = m_epsn*dm.m_epsn;
-                dm.m_Lmp = dm.m_Lmp + epsn*dm.m_Jg;
-                double maxJg = max(maxJg,fabs(dm.m_Jg));
-                normP1 += dm.m_Lmp*dm.m_Lmp;
+                epsn = m_epsn*d2.m_epsn;
+                d2.m_Lmp = d2.m_Lmp + epsn*d2.m_Jg;
+                double maxJg = max(maxJg,fabs(d2.m_Jg));
+                normJ1 += d2.m_Lmp*d2.m_Lmp;
             }
         }
     }
     
-    // calculate relative nors2
+    // calculate relative norms
     double lnorm = (normL1 != 0 ? fabs((normL1 - normL0) / normL1) : fabs(normL1 - normL0));
-    double pnorm = (normP1 != 0 ? fabs((normP1 - normP0) / normP1) : fabs(normP1 - normP0));
+    double pnorm = (normJ1 != 0 ? fabs((normJ1 - normJ0) / normJ1) : fabs(normJ1 - normJ0));
     
     // check convergence
     if ((m_gtol > 0) && (maxgap > m_gtol)) bconv = false;

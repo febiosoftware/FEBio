@@ -63225,7 +63225,7 @@ The vector gap function
  is defined by 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{g}=\mathbf{v}^{\left(1\right)}-\mathbf{v}^{\left(2\right)}\,,\label{TFI-vt-gap}
+\mathbf{g}=\mathbf{v}^{\left(2\right)}-\mathbf{v}^{\left(1\right)}\,,\label{TFI-vt-gap}
 \end{equation}
 
 \end_inset
@@ -63238,7 +63238,7 @@ We may similarly define the scalar gap function
  representing the difference between fluid dilatations (or volume ratios) across the interface,
 \begin_inset Formula 
 \begin{equation}
-\pi=J^{\left(2\right)}-J^{\left(1\right)}\,.\label{eq:TFI-e-gap}
+\pi=J^{\left(1\right)}-J^{\left(2\right)}\,.\label{eq:TFI-e-gap}
 \end{equation}
 
 \end_inset
@@ -63262,7 +63262,7 @@ Let the tied interface viscous traction be described by the penalty function,
  
 \begin_inset Formula 
 \begin{equation}
-\mathbf{t}^{\tau}=\varepsilon_{t}\mathbf{g}=\varepsilon_{t}\left(\mathbf{v}^{\left(1\right)}-\mathbf{v}^{\left(2\right)}\right)\,,\label{eq:TFI-t-penalty}
+\mathbf{t}^{\tau}=\varepsilon_{t}\mathbf{g}\,,\label{eq:TFI-t-penalty}
 \end{equation}
 
 \end_inset
@@ -63276,28 +63276,31 @@ where
 \end_inset
 
 .
- The sign in front of this equation implies that 
+ This traction is selected such that a positive vectorial difference (
+\begin_inset Formula $\mathbf{v}^{\left(2\right)}$
+\end_inset
+
+ faster than 
+\begin_inset Formula $\mathbf{v}^{\left(1\right)}$
+\end_inset
+
+) implies that 
 \begin_inset Formula $\mathbf{t}^{\tau}$
 \end_inset
 
- should be in the opposite direction to 
-\begin_inset Formula $\mathbf{g}$
+ needs to act on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
 \end_inset
 
-,
- to 
-\begin_inset Quotes eld
+ to pull 
+\begin_inset Formula $\mathbf{v}^{\left(1\right)}$
 \end_inset
 
-restore
-\begin_inset Quotes erd
+ toward 
+\begin_inset Formula $\mathbf{v}^{\left(2\right)}$
 \end_inset
 
- the velocity gap 
-\begin_inset Formula $\mathbf{g}$
-\end_inset
-
- to a magnitude of zero.
+.
  The penalty factor 
 \begin_inset Formula $\varepsilon_{t}$
 \end_inset
@@ -63315,35 +63318,20 @@ restore
 \begin_inset Formula $p^{\left(2\right)}$
 \end_inset
 
-,
- we want the normal velocity to got from 
-\begin_inset Formula $\gamma^{\left(1\right)}$
+ (i.e.,
+ when 
+\begin_inset Formula $\pi<0$
 \end_inset
 
- to 
-\begin_inset Formula $\gamma^{\left(2\right)}$
+) we want the prescribed normal velocity 
+\begin_inset Formula $v_{n}$
 \end_inset
 
-.
- For a linear constitutive model for the pressure,
- we have 
-\begin_inset Formula $p^{\left(1\right)}=K\left(1-J^{\left(1\right)}\right)$
-\end_inset
-
- and 
-\begin_inset Formula $p^{\left(2\right)}=K\left(1-J^{\left(2\right)}\right)$
-\end_inset
-
-,
- therefore 
-\begin_inset Formula $p^{\left(1\right)}-p^{\left(2\right)}=K\left(J^{\left(2\right)}-J^{\left(1\right)}\right)$
-\end_inset
-
- ,
- so we pick
+ to counteract the flow from high pressure to low pressure,
+ thus
 \begin_inset Formula 
 \begin{equation}
-v_{n}=\varepsilon_{n}\pi=\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\,,\label{eq:TFI-v-penalty}
+v_{n}=\varepsilon_{n}\pi\,,\label{eq:TFI-v-penalty}
 \end{equation}
 
 \end_inset
@@ -63370,8 +63358,8 @@ where
  is given by
 \begin_inset Formula 
 \[
-\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{t}\left(\mathbf{v}^{\left(1\right)}-\mathbf{v}^{\left(2\right)}\right)\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
- & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
 \end{aligned}
 \,,
 \]
@@ -63393,8 +63381,8 @@ The directional derivatives of the various terms appearing in the integrand of
  are 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\delta G_{c}\left[\Delta\mathbf{v}^{\left(1\right)}\right] & =\alpha_{f}\varepsilon_{t}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
-D\delta G_{c}\left[\Delta\mathbf{v}^{\left(2\right)}\right] & =-\alpha_{f}\varepsilon_{t}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+\begin{aligned}D\delta G_{c}\left[\Delta\mathbf{v}^{\left(1\right)}\right] & =-\alpha_{f}\varepsilon_{t}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(1\right)}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+D\delta G_{c}\left[\Delta\mathbf{v}^{\left(2\right)}\right] & =\alpha_{f}\varepsilon_{t}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\Delta\mathbf{v}^{\left(2\right)}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
 \end{aligned}
 \,,\label{eq:TFI-G-linearization-v}
 \end{equation}
@@ -63404,8 +63392,8 @@ D\delta G_{c}\left[\Delta\mathbf{v}^{\left(2\right)}\right] & =-\alpha_{f}\varep
 and
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\delta G_{c}\left[\Delta J^{\left(1\right)}\right] & =-\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(1\right)}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
-D\delta G_{c}\left[\Delta J^{\left(2\right)}\right] & =\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+\begin{aligned}D\delta G_{c}\left[\Delta J^{\left(1\right)}\right] & =\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(1\right)}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+D\delta G_{c}\left[\Delta J^{\left(2\right)}\right] & =-\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
 \end{aligned}
 \label{eq:TFI-G-linearization-e}
 \end{equation}
@@ -63427,11 +63415,11 @@ name "subsec:Tied-BP-Discretization-2"
 \end_layout
 
 \begin_layout Standard
-The contact integral may be discretized as ***check sign of second equation ***
+The contact integral may be discretized as
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{t}\left(\mathbf{v}^{\left(1\right)}-\mathbf{v}^{\left(2\right)}\right)\right]\\
- & +\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\varepsilon_{n}\left(J^{\left(2\right)}-J^{\left(1\right)}\right)\right]
+\begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\right]\\
+ & +\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\right]
 \end{aligned}
 \,.\label{eq:TFI-discrete-1}
 \end{equation}
@@ -63526,10 +63514,10 @@ Similarly,
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\mathbf{I}\\
-\mathbf{K}^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
-\mathbf{K}^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\mathbf{I}\\
-\mathbf{K}^{\left(2,2\right)}_{bd,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
+\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(1,2\right)}_{ad,k} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
+\mathbf{K}^{\left(2,1\right)}_{bc,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(2,2\right)}_{bd,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
 \end{aligned}
 \,,\label{eq:TFI-discrete-6}
 \end{equation}
@@ -63539,10 +63527,10 @@ where
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}k^{\left(1,1\right)}_{ac} & =-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
-k^{\left(1,2\right)}_{ad,k} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
-k^{\left(2,1\right)}_{bc,k} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
-k^{\left(2,2\right)}_{bd,k} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
+\begin{aligned}k^{\left(1,1\right)}_{ac} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
+k^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
+k^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
+k^{\left(2,2\right)}_{bd,k} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
 \end{aligned}
 \,.\label{eq:TFI-discrete-7}
 \end{equation}
@@ -63568,7 +63556,7 @@ A
 \emph on
 rigid connector
 \emph default
- connects two rigid bodies denoted by 
+ connects two rigid bodies deoted by 
 \begin_inset Formula $\left(1\right)$
 \end_inset
 
