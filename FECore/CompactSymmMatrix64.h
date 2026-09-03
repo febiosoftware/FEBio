@@ -81,7 +81,7 @@ private:
 	int* Pointers() override { return nullptr; }
 	bool mult_vector(double* x, double* r) override { return false; }
 
-	void Clear();
+	void Clear() override;
 
 private:
 	double* m_pvalues;			//!< matrix values

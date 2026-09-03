@@ -31,9 +31,11 @@ SOFTWARE.*/
 #include "log.h"
 #include "FEModel.h"
 #include "FEAnalysis.h"
+#include "FELogElemMath.h"
+#include "FECoreKernel.h"
 
 //-----------------------------------------------------------------------------
-DataStore::DataStore()
+DataStore::DataStore(FEModel* fem) : m_fem(fem)
 {
 }
 
@@ -47,6 +49,16 @@ void DataStore::Clear()
 {
 	for (size_t i=0; i<m_data.size(); ++i) delete m_data[i];
 	m_data.clear();
+}
+
+bool DataStore::Init()
+{
+	for (size_t i = 0; i < m_elemDefs.size(); ++i)
+	{
+		auto& def = *m_elemDefs[i];
+		if (def.Init() == false) return false;
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,4 +78,49 @@ void DataStore::AddRecord(DataRecord* prec)
 {
 	prec->m_nid = (int) m_data.size() + 1;
 	m_data.push_back(prec);
+}
+
+void DataStore::AddElementDataDefinition(FELogElemDefinition* def)
+{
+	m_elemDefs.push_back(def);
+}
+
+FELogElemDefinition* DataStore::FindElementDataDefinition(const std::string& name)
+{
+	for (size_t i = 0; i < m_elemDefs.size(); ++i)
+	{
+		if (m_elemDefs[i]->GetName() == name) return m_elemDefs[i];
+	}
+	return nullptr;
+}
+
+FELogElemSource* DataStore::GetElementDataSource(const std::string& name)
+{
+	if (name.empty()) return nullptr;
+
+	FELogElemSource* pdata = nullptr;
+	if (name[0] == '=')
+	{
+		FELogElemMath* logMath = fecore_alloc(FELogElemMath, m_fem);
+		if (logMath)
+		{
+			string smath(name.c_str() + 1);
+			if (logMath->SetExpression(smath))
+			{
+				pdata = logMath;
+			}
+		}
+	}
+	else
+	{
+		// try to allocate a built-in element data source
+		pdata = fecore_new<FELogElemData>(name.c_str(), m_fem);
+		if (pdata == nullptr)
+		{
+			// see if it's a user-defined element data source
+			pdata = FindElementDataDefinition(name);
+		}
+	}
+
+	return pdata;
 }

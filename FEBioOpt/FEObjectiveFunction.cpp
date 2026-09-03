@@ -222,7 +222,7 @@ bool FEMinimizeObjective::ParamFunction::Init()
 	return true;
 }
 
-FEMinimizeObjective::FilterAvgFunction::FilterAvgFunction(FEModel* fem, FELogElemData* pd, FEElementSet* elemSet, double trg) : Function(fem)
+FEMinimizeObjective::FilterAvgFunction::FilterAvgFunction(FEModel* fem, FELogElemSource* pd, FEElementSet* elemSet, double trg) : Function(fem)
 {
 	m_pd = pd;
 	m_elemSet = elemSet;
@@ -323,7 +323,7 @@ void FEElementDataTable::AddValue(int elemID, double v)
 	m_Data.push_back(d);
 }
 
-void FEElementDataTable::SetVariable(FELogElemData* var)
+void FEElementDataTable::SetVariable(FELogElemSource* var)
 {
 	m_var = var;
 }

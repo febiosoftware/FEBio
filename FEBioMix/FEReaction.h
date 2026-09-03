@@ -50,7 +50,7 @@ public:
     bool Init() override;
 
 	//! serialization
-	void Serialize(DumpStream& dmp);
+	void Serialize(DumpStream& dmp) override;
     
 public:
     //! set stoichiometric coefficient

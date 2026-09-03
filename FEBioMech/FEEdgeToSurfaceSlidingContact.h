@@ -83,7 +83,7 @@ public:
 
 	void UnpackLM(FELineElement& el, vector<int>& lm);
 
-	void Serialize(DumpStream& ar);
+	void Serialize(DumpStream& ar) override;
 
 public:
 	int m_dofX = -1;
