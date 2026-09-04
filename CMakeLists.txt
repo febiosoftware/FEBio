@@ -109,15 +109,30 @@ if(USE_SUPERLU_MT)
 	endif()
 endif()
 
-if(USE_MMG)
-	if(NOT EXISTS ${MMG_LIB})
-		message(SEND_ERROR "Could not find MMG library. Check MMG_LIB.")
+if(USE_SUPERLU_MT)
+	if(NOT EXISTS ${SUPERLU_MT_LIB})
+		message(SEND_ERROR "Could not find SUPERLU_MT library. Check SUPERLU_MT_LIB.")
 	endif()
-    if(NOT EXISTS ${MMGS_LIB})
-		message(SEND_ERROR "Could not find MMGS library. Check MMGS_LIB.")
+	if(NOT EXISTS ${SUPERLU_MT_INC}/slu_mt_ddefs.h)
+		message(SEND_ERROR "Could not find slu_mt_ddefs.h. Check SUPERLU_MT_INC.")
 	endif()
-	if(NOT EXISTS ${MMG_INC}/mmg/libmmg.h)
-		message(SEND_ERROR "Could not find libmmg.h. Check MMG_INC.")
+endif()
+
+if(USE_PASTIX)
+	if(NOT EXISTS ${PASTIX_LIB})
+		message(SEND_ERROR "Could not find pastix library. Check PASTIX_LIB.")
+	endif()
+	if(NOT EXISTS ${PASTIX_INC}/pastix.h)
+		message(SEND_ERROR "Could not find pastix.h. Check PASTIX_INC.")
+	endif()
+endif()
+
+if(USE_MUMPS)
+	if(NOT EXISTS ${MUMPS_LIB})
+		message(SEND_ERROR "Could not find mumps library. Check MUMPS_LIB.")
+	endif()
+	if(NOT EXISTS ${MUMPS_INC}/dmumps_c.h)
+		message(SEND_ERROR "Could not find dmumps_c.h. Check MUMPS_INC.")
 	endif()
 endif()
 
@@ -379,6 +394,20 @@ endif()
 # Link Accelerate framework
 if (APPLE)
   target_link_libraries(numcore PRIVATE "-framework Accelerate")
+endif()
+
+# Link PasTiX
+if(USE_PASTIX)
+    target_include_directories(numcore PRIVATE ${PASTIX_INC})
+    target_compile_definitions(numcore PRIVATE PASTIX)
+    target_link_libraries(numcore PRIVATE ${PASTIX_LIB})
+endif()
+
+# Link MUMPS
+if(USE_MUMPS)
+    target_include_directories(numcore PRIVATE ${MUMPS_INC})
+    target_compile_definitions(numcore PRIVATE MUMPS)
+    target_link_libraries(numcore PRIVATE ${MUMPS_LIB})
 endif()
 
 # Link MMG
