@@ -25,8 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FELogElemMath.h"
 #include "MObjBuilder.h"
+#include "FEModel.h"
 
-FELogElemMath::FELogElemMath(FEModel* pfem) : FELogElemData(pfem) 
+BEGIN_FECORE_CLASS(FELogElemMath, FELogElemDefinition)
+	ADD_PARAMETER(m_exp, "math");
+END_FECORE_CLASS();
+
+FELogElemMath::FELogElemMath(FEModel* pfem) : FELogElemDefinition(pfem)
 {
 
 }
@@ -36,9 +41,14 @@ FELogElemMath::~FELogElemMath()
 	Clear();
 }
 
+bool FELogElemMath::Init()
+{
+	return SetExpression(m_exp);
+}
+
 void FELogElemMath::Clear()
 {
-	for (FELogElemData* d : m_data) delete d;
+	for (FELogElemSource* d : m_data) delete d;
 	m_data.clear();
 }
 
@@ -52,6 +62,9 @@ double FELogElemMath::value(FEElement& el)
 bool FELogElemMath::SetExpression(const std::string& smath)
 {
 	Clear();
+	m_exp = smath;
+
+	DataStore& DS = GetFEModel()->GetDataStore();
 
 	MObjBuilder o;
 	o.setAutoVars(true);
@@ -62,7 +75,7 @@ bool FELogElemMath::SetExpression(const std::string& smath)
 	{
 		MVariable& var = *m.Variable(i);
 		string varName = var.Name();
-		FELogElemData* pd = fecore_new<FELogElemData>(varName.c_str(), GetFEModel());
+		FELogElemSource* pd = DS.GetElementDataSource(varName);
 		if (pd == nullptr) return false;
 		m_data.push_back(pd);
 	}

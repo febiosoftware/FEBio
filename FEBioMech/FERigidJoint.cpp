@@ -44,9 +44,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FERigidJoint::FERigidJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-	static int count = 1;
-	m_nID = count++;
-
 	m_laugon = FECore::AUGLAG_METHOD;		// Augmented Lagrangian by default for backward compatibility
 	m_eps = 0.0;
 	m_atol = 0.01;
@@ -285,9 +282,9 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 
 	// For Lagrange multipliers we just report the values
 	// of the LM and the constraint
+	feLog("\n=== rigid connector #%d (%s):\n", m_nID, GetName().c_str());
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
-		feLog("\n=== rigid joint # %d:\n", m_nID);
 		feLog("\tLagrange m. : %15.7lg, %15.7lg, %15.7lg\n", m_F.x, m_F.y, m_F.z);
 		feLog("\tconstraint  : %15.7lg, %15.7lg, %15.7lg\n", c.x, c.y, c.z);
 		return true;
@@ -304,7 +301,6 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 	double normF1 = sqrt(Lm*Lm);
 
 	// check convergence of constraints
-	feLog(" rigid joint # %d\n", m_nID);
 	feLog("                  CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normF1) > 1e-10) pctn = fabs((normF1 - normF0)/normF1);
@@ -329,7 +325,6 @@ bool FERigidJoint::Augment(int naug, const FETimeInfo& tp)
 void FERigidJoint::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
-	ar & m_nID;
 	ar & m_q0 & m_qa0 & m_qb0;
 	ar & m_F & m_Fp & m_L & m_eps & m_atol & m_laugon;
 }

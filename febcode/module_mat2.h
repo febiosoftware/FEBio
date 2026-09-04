@@ -7,6 +7,10 @@ namespace febcode
 
 	Value InvertMat2(FuncArgs args);
 
+	Value TraceMat2(FuncArgs args);
+
+	Value DeterminantMat2(FuncArgs args);
+
 	class Mat2Module : public Module
 	{
 	public:
@@ -31,6 +35,8 @@ namespace febcode
 
 			prg.registerNative("transpose", mat2_t, { mat2_t }, TransposeMat2);
 			prg.registerNative("inverse", mat2_t, { mat2_t }, InvertMat2);
+			prg.registerNative("trace", double_t, { mat2_t }, TraceMat2);
+			prg.registerNative("det", double_t, { mat2_t }, DeterminantMat2);
 		}
 	};
 }

@@ -181,6 +181,23 @@ bool fexml::readParameter(XMLTag& tag, FEParameterList& paramList, const char* p
 			p.setValuator(val);
 		}
 		break;
+		case FE_PARAM_STD_VECTOR_VEC2D:
+		{
+			std::vector<vec2d>& data = pp->value< std::vector<vec2d> >();
+			data.clear();
+
+			double d[2];
+			++tag;
+			do
+			{
+				int nread = tag.value(d, 2);
+				if (nread != 2) throw XMLReader::InvalidValue(tag);
+				data.push_back(vec2d(d[0], d[1]));
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		break;
 		default:
 			assert(false);
 			return false;
@@ -362,6 +379,19 @@ bool fexml::readParameter(XMLTag& tag, FECoreBase* pc, const char* szparam)
 					FECoreBase* pc = prop->get(0);
 					readParameterList(tag, pc);
 				}
+			}
+			else if (prop->GetDefaultType())
+			{
+				sztype = prop->GetDefaultType();
+
+				// try to allocate the class
+				FECoreBase* pp = fecore_new<FECoreBase>(prop->GetSuperClassID(), sztype, pc->GetFEModel());
+				if (pp == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+				prop->SetProperty(pp);
+
+				// read the property data
+				readParameterList(tag, pp);
 			}
 			else
 			{

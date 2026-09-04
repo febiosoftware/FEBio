@@ -694,8 +694,11 @@ bool FESolver::InitEquations2()
 						FEDofList& dofs = *var.m_dofs;
 						assert(dofs.Size() == 1);
 						assert(el.m_lm == -1);
-						el.m_lm = neq++;
-						m_dofMap.push_back(dofs[0]);
+						if (el.m_dof != DOF_FIXED)
+						{
+							el.m_lm = neq++;
+							m_dofMap.push_back(dofs[0]);
+						}
 					}
 				}
 			}
@@ -747,8 +750,11 @@ bool FESolver::InitEquations2()
 						FEDofList& dofs = *var.m_dofs;
 						assert(dofs.Size() == 1);
 						assert(el.m_lm == -1);
-						el.m_lm = neq++;
-						m_dofMap.push_back(dofs[0]);
+						if (el.m_dof != DOF_FIXED)
+						{
+							el.m_lm = neq++;
+							m_dofMap.push_back(dofs[0]);
+						}
 					}
 				}
 			}

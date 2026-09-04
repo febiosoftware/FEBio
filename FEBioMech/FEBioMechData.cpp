@@ -132,17 +132,6 @@ double FENodeZAcc::value(const FENode& node)
 //-----------------------------------------------------------------------------
 double FENodeForceX::value(const FENode& node)
 {
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
-	if (psolid_solver)
-	{
-		vector<double>& Fr = psolid_solver->m_Fr;
-		const vector<int>& id = node.m_ID;
-		return (-id[0] - 2 >= 0 ? Fr[-id[0] - 2] : 0);
-	}
-
-	// This code is from the "reaction forces" plot variable
-	// TODO: Need to check if code above produces the same answer as below. If so, 
-	//       just use code below.
 	FEModel& fem = *GetFEModel();
 	int dofX = fem.GetDOFIndex("x");
 	if (dofX >= 0)
@@ -157,17 +146,6 @@ double FENodeForceX::value(const FENode& node)
 //-----------------------------------------------------------------------------
 double FENodeForceY::value(const FENode& node)
 {
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(GetFEModel()->GetCurrentStep()->GetFESolver());
-	if (psolid_solver)
-	{
-		vector<double>& Fr = psolid_solver->m_Fr;
-		const vector<int>& id = node.m_ID;
-		return (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);
-	}
-
-	// This code is from the "reaction forces" plot variable
-	// TODO: Need to check if code above produces the same answer as below. If so, 
-	//       just use code below.
 	FEModel& fem = *GetFEModel();
 	int dofY = fem.GetDOFIndex("y");
 	if (dofY >= 0)
@@ -182,25 +160,6 @@ double FENodeForceY::value(const FENode& node)
 //-----------------------------------------------------------------------------
 double FENodeForceZ::value(const FENode& node)
 {
-	FESolver* solver = GetFEModel()->GetCurrentStep()->GetFESolver();
-	FESolidSolver2* psolid_solver = dynamic_cast<FESolidSolver2*>(solver);
-	if (psolid_solver)
-	{
-		vector<double>& Fr = psolid_solver->m_Fr;
-		const vector<int>& id = node.m_ID;
-		return (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
-	}
-	FEExplicitSolidSolver* explicitSolver = dynamic_cast<FEExplicitSolidSolver*>(solver);
-	if (explicitSolver)
-	{
-		vector<double>& Fr = explicitSolver->m_Fr;
-		const vector<int>& id = node.m_ID;
-		return (-id[2] - 2 >= 0 ? Fr[-id[2] - 2] : 0);
-	}
-
-	// This code is from the "reaction forces" plot variable
-	// TODO: Need to check if code above produces the same answer as below. If so, 
-	//       just use code below.
 	FEModel& fem = *GetFEModel();
 	int dofZ = fem.GetDOFIndex("z");
 	if (dofZ >= 0)
@@ -531,6 +490,31 @@ double FELogElemStrainEffective::value(FEElement& el)
 
 	return val;
 }
+
+//-----------------------------------------------------------------------------
+double FELogElemMaxShearStrain::value(FEElement& el)
+{
+	int nint = el.GaussPoints();
+	mat3ds Eavg; Eavg.zero();
+	for (int n = 0; n < nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint* ep = mp.ExtractData<FEElasticMaterialPoint>();
+		if (ep)
+		{
+			mat3ds C = ep->LeftCauchyGreen();
+			mat3dd I(1.0);
+			mat3ds E = (C - I) * 0.5;
+
+			Eavg += E;
+		}
+	}
+	Eavg /= (double)nint;
+	double val = Eavg.max_shear();
+
+	return val;
+}
+
 
 //-----------------------------------------------------------------------------
 double FELogElemStrain2::value(FEElement& el)

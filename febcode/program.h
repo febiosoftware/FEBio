@@ -38,6 +38,9 @@ namespace febcode {
 	public:
 		Program();
 
+		// add a constant value to the program's constant pool and return its index
+		uint8_t addConstant(const Value& value);
+
 		// adds a global variable (from compiled code)
 		int addGlobal(const std::string& name, Type type);
 
@@ -76,6 +79,8 @@ namespace febcode {
 
 		std::vector<Input> inputs;
 		std::unordered_map<std::string, size_t> inputIndices; // maps global variable names to their slot index
+
+		std::vector<VarPtr> injects; // injected variables
 
 		size_t maxStackSize = 0;
 

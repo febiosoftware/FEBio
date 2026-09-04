@@ -370,12 +370,10 @@ FEDataFilterPositive::FEDataFilterPositive(FEModel* fem) : FEDataSource(fem)
 
 FEDataFilterPositive::~FEDataFilterPositive()
 {
-	if (m_src) delete m_src;
 }
 
 void FEDataFilterPositive::SetDataSource(FEDataSource* src)
 {
-	if (m_src) delete m_src;
 	m_src = src;
 }
 
@@ -407,7 +405,6 @@ FENodeDataFilterSum::FENodeDataFilterSum(FEModel* fem) : FEDataSource(fem)
 
 FENodeDataFilterSum::~FENodeDataFilterSum()
 {
-	delete m_data;
 }
 
 void FENodeDataFilterSum::SetData(FELogNodeData* data, FENodeSet* nodeSet)
@@ -482,10 +479,10 @@ FEElemDataFilterSum::FEElemDataFilterSum(FEModel* fem) : FEDataSource(fem)
 
 FEElemDataFilterSum::~FEElemDataFilterSum()
 {
-	delete m_data;
+	
 }
 
-void FEElemDataFilterSum::SetData(FELogElemData* data, FEElementSet* elemSet)
+void FEElemDataFilterSum::SetData(FELogElemSource* data, FEElementSet* elemSet)
 {
 	m_data = data;
 	m_elemSet = elemSet;

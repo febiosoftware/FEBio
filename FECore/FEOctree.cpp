@@ -30,10 +30,11 @@ SOFTWARE.*/
 #include "FEOctree.h"
 #include "FESurface.h"
 #include "FEMesh.h"
+#include <stack>
 
 OTnode::OTnode()
 {
-	m_ps = nullptr;
+	m_po = nullptr;
 	level = 0;
 }
 
@@ -51,12 +52,13 @@ void OTnode::Clear()
 
 void OTnode::CreateChildren(const int max_level, const int max_elem)
 {
+	children.reserve(8);
 	vec3d dc = (cmax - cmin)/2;
 	for (int i=0; i<=1; ++i) {
 		for (int j=0; j<=1; ++j) {
 			for (int k=0; k<=1; ++k) {
 				OTnode node;
-				node.m_ps = m_ps;
+				node.m_po = m_po;
 				// evaluate bounding box by subdividing parent node box
 				node.cmin = vec3d(cmin.x+i*dc.x,
 								  cmin.y+j*dc.y,
@@ -83,56 +85,41 @@ void OTnode::CreateChildren(const int max_level, const int max_elem)
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Find all surface elements that fall inside a node
-
-void OTnode::FillNode(const vector<int>& parent_selist)
+// determine whether two boxes intersect (cheap version)
+inline bool CheckBoxIntersection(const FEOctree::Box& src, const FEOctree::Box& dst)
 {
-	// Loop over all surface elements in the parent node
-	int nsize = (int)parent_selist.size();
-	for (int i=0; i<nsize; ++i) {
-		int j = parent_selist[i];
-		if (ElementIntersectsNode(j)) {
-			// add this surface element to the current node
-			selist.push_back(j);
-		}
-	}
-}
+	// get element's bounding box
+	vec3d fmin = src.r0;
+	vec3d fmax = src.r1;
 
-//-----------------------------------------------------------------------------
-// Determine whether a surface element intersects a node
-
-bool OTnode::ElementIntersectsNode(const int iel)
-{
-	// Extract FE node coordinates from surface element
-	// and determine bounding box of surface element
-	FEMesh& mesh = *(m_ps->GetMesh());
-	FESurfaceElement& el = m_ps->Element(iel);
-	vec3d rn = mesh.Node(el.m_node[0]).m_rt;
-	vec3d fmin = rn;
-	vec3d fmax = rn;
-	int N = el.Nodes();
-	for (int i=1; i<N; ++i) {
-		rn = mesh.Node(el.m_node[i]).m_rt;
-		if (rn.x < fmin.x) fmin.x = rn.x;
-		if (rn.x > fmax.x) fmax.x = rn.x;
-		if (rn.y < fmin.y) fmin.y = rn.y;
-		if (rn.y > fmax.y) fmax.y = rn.y;
-		if (rn.z < fmin.z) fmin.z = rn.z;
-		if (rn.z > fmax.z) fmax.z = rn.z;
-	}
-	
 	// Check if bounding boxes of OT node and surface element overlap
-	if ((fmax.x < cmin.x) || (fmin.x > cmax.x)) return false;
-	if ((fmax.y < cmin.y) || (fmin.y > cmax.y)) return false;
-	if ((fmax.z < cmin.z) || (fmin.z > cmax.z)) return false;
-	
+	if ((fmax.x < dst.r0.x) || (fmin.x > dst.r1.x)) return false;
+	if ((fmax.y < dst.r0.y) || (fmin.y > dst.r1.y)) return false;
+	if ((fmax.z < dst.r0.z) || (fmin.z > dst.r1.z)) return false;
+
 	// At this point we find that bounding boxes overlap.
 	// Technically that does not prove that the surface element is
 	// inside the octree node, but any additional check would be
 	// more expensive.
-	
+
 	return true;
+}
+
+// Find all surface elements that fall inside a node
+void OTnode::FillNode(const vector<int>& parent_selist)
+{
+	FEOctree::Box self = { cmin, cmax };
+	selist.reserve(parent_selist.size());
+	// Loop over all surface elements in the parent node
+	int nsize = (int)parent_selist.size();
+	for (int i=0; i<nsize; ++i) {
+		int j = parent_selist[i];
+
+		if (CheckBoxIntersection(m_po->m_boxes[j], self)) {
+			// add this surface element to the current node
+			selist.push_back(j);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -260,8 +247,8 @@ void OTnode::CountNodes(int& nnode, int& nlevel)
 FEOctree::FEOctree(FESurface* ps)
 {
 	m_ps = ps;
-	max_level = 6;
-	max_elem = 9;
+	max_level = 5;
+	max_elem = 32;
 	assert(max_level && max_elem);
 }
 
@@ -276,9 +263,33 @@ void FEOctree::Init(const double stol)
 {
 	assert(m_ps);
 	root.Clear();
+
+	// calculate bounding boxes for all elements
+	int NE = m_ps->Elements();
+	FEMesh& mesh = *(m_ps->GetMesh());
+	m_boxes.resize(NE);
+#pragma omp parallel for
+	for (int i = 0; i < NE; ++i)
+	{
+		FESurfaceElement& el = m_ps->Element(i);
+		vec3d rn = mesh.Node(el.m_node[0]).m_rt;
+		vec3d fmin = rn;
+		vec3d fmax = rn;
+		int N = el.Nodes();
+		for (int i = 1; i < N; ++i) {
+			rn = mesh.Node(el.m_node[i]).m_rt;
+			if (rn.x < fmin.x) fmin.x = rn.x;
+			if (rn.x > fmax.x) fmax.x = rn.x;
+			if (rn.y < fmin.y) fmin.y = rn.y;
+			if (rn.y > fmax.y) fmax.y = rn.y;
+			if (rn.z < fmin.z) fmin.z = rn.z;
+			if (rn.z > fmax.z) fmax.z = rn.z;
+		}
+		m_boxes[i] = { fmin, fmax };
+	}
 	
 	// Set up the root node in the octree
-	root.m_ps = m_ps;
+	root.m_po = this;
 	root.level = 0;
 	
 	// Create the list of all surface elements in the root node
@@ -294,11 +305,13 @@ void FEOctree::Init(const double stol)
 	for (int i=1; i<m_ps->Nodes(); ++i) {
 		fenode = (m_ps->Node(i)).m_rt;
 		if (fenode.x < root.cmin.x) root.cmin.x = fenode.x;
-		if (fenode.x > root.cmax.x) root.cmax.x = fenode.x;
+		else if (fenode.x > root.cmax.x) root.cmax.x = fenode.x;
+		
 		if (fenode.y < root.cmin.y) root.cmin.y = fenode.y;
-		if (fenode.y > root.cmax.y) root.cmax.y = fenode.y;
+		else if (fenode.y > root.cmax.y) root.cmax.y = fenode.y;
+		
 		if (fenode.z < root.cmin.z) root.cmin.z = fenode.z;
-		if (fenode.z > root.cmax.z) root.cmax.z = fenode.z;
+		else if (fenode.z > root.cmax.z) root.cmax.z = fenode.z;
 	}
     
     // expand bounding box by search tolerance stol
@@ -312,6 +325,9 @@ void FEOctree::Init(const double stol)
 			(root.selist.size() > max_elem))
 			root.CreateChildren(max_level, max_elem);
 	}
+
+	int nodes = 0, levels = 0;
+	root.CountNodes(nodes, levels);
 	
 	return;
 }
@@ -319,4 +335,43 @@ void FEOctree::Init(const double stol)
 void FEOctree::FindCandidateSurfaceElements(vec3d p, vec3d n, set<int>& sel, double srad)
 {
 	root.FindIntersectedLeaves(p, n, sel, srad);
+}
+
+void FEOctree::VisitIntersectedLeaves(const vec3d& p, const vec3d& n, double srad, const std::function<void(int elem)>& callback)
+{
+	std::stack<OTnode*> S;
+
+	S.push(&root);
+
+	while (!S.empty())
+	{
+		OTnode* node = S.top(); S.pop();
+
+		vec3d cmin = node->cmin;
+		vec3d cmax = node->cmax;
+
+		// Check if octree node is within search radius from p.
+		bool bNodeWithinSRad = ((cmin.x - srad <= p.x) && (cmax.x + srad >= p.x) &&
+			(cmin.y - srad <= p.y) && (cmax.y + srad >= p.y) &&
+			(cmin.z - srad <= p.z) && (cmax.z + srad >= p.z));
+
+		if (bNodeWithinSRad && node->RayIntersectsNode(p, n)) {
+			int nc = (int)node->children.size();
+			// if this node has children, search them for intersections
+			if (nc) {
+				for (int ic = 0; ic < nc; ++ic) {
+					S.push(&node->children[ic]);
+				}
+			}
+			// otherwise we have reached the smallest intersected node in this
+			// branch, return its surface element list
+			else {
+				// using a 'set' container avoids duplication of surface
+				// elements shared by multiple octree nodes
+				for (int i = 0; i < (int)node->selist.size(); ++i) {
+					callback(node->selist[i]);
+				}
+			}
+		}
+	}
 }

@@ -167,6 +167,11 @@ bool PardisoSolver::PreProcess()
 	assert(m_isFactored == false);
 	pardisoinit(m_pt, &m_mtype, m_iparm);
 
+	// For saddle-point systems, disable nonsymmetric scaling/matching; 
+	// These can disturb fragile spurious modes in PARDISO mtype=11.
+//	m_iparm[10] = 0;
+//	m_iparm[12] = 0;
+
 	// Turn off reporting the number of non-zero elements in the factors.
 	// According to the documentation turning this on (set to -1) will 
 	// increase the reordering time.

@@ -98,6 +98,12 @@ public: // from FEDomain
 	//! get the material (overridden from FEDomain)
 	FEMaterial* GetMaterial() override;
 
+	void Serialize(DumpStream& ar) override;
+
+	void PreSolveUpdate(const FETimeInfo& timeInfo) override;
+
+	void BuildMatrixProfile(FEGlobalMatrix& M) override;
+
 public: // from FEShellDomain
 	// get a shell element
 	FEShellElement& Element(int i) override { return m_Elem[i]; }

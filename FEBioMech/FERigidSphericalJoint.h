@@ -82,7 +82,7 @@ private: // lag. mult. methods
 	int InitEquations(int neq) override;
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 	void UnpackLM(vector<int>& lm);
-	void PrepStep();
+	void PrepStep() override;
 	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
 	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 

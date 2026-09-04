@@ -129,10 +129,10 @@ private:
 };
 
 
-class FEBioPlotVariable : public FEPlotNodeData
+class FEBioPlotVariable : public FEPlotData
 {
 public:
-	FEBioPlotVariable(FEModel* fem, const char* szname, Var_Type itype, Storage_Fmt fmt) : FEPlotNodeData(fem, itype, fmt) { strcpy(m_szname, szname); }
+	FEBioPlotVariable(FEModel* fem, const char* szname, Region_Type regionType, Var_Type itype, Storage_Fmt fmt) : FEPlotData(fem, regionType, itype, fmt) { strcpy(m_szname, szname); }
 	bool Save(FEMesh& mesh, FEDataStream& str)
 	{
 		// get the DOFS
@@ -159,6 +159,16 @@ public:
 			for (int j = 0; j<n; ++j) str << node.get(ndof + j);
 		}
 
+		return true;
+	}
+	bool Save(FEDomain& dom, FEDataStream& str)
+	{
+		int NE = dom.Elements();
+		for (int i = 0; i < NE; ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			str << el.m_val;
+		}
 		return true;
 	}
 
@@ -398,32 +408,45 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 		int nvar = dofs.GetVariableIndex(szfield);
 		if (nvar >= 0)
 		{
+			// get the data type of the variable
 			int vartype = dofs.GetVariableType(nvar);
-			if (vartype == VAR_SCALAR)
-			{
-				ps = new FEBioPlotVariable(pfem, szfield, PLT_FLOAT, FMT_NODE);
-				return AddNodalVariable(ps, szname, item);
-			}
-			else if (vartype == VAR_VEC3)
-			{
-				ps = new FEBioPlotVariable(pfem, szfield, PLT_VEC3F, FMT_NODE);
-				return AddNodalVariable(ps, szname, item);
-			}
-			else if (vartype == VAR_ARRAY)
-			{
-				int ndofs = dofs.GetVariableSize(szfield);
-				int index = -1;
-				if (PD.IsNumberFilter()) index = PD.numFilter;
-				else if (PD.IsStringFilter())
-				{
-					const char* szflt = PD.strFilter.c_str();
-					index = dofs.GetIndex(szfield, szflt);
-					if (index < 0) index = pfem->GetDOFIndex(szflt);
-				}
-				if ((index < 0) || (index >= ndofs)) return false;
 
-				ps = new FEPlotArrayVariable(pfem, szfield, index);
+			// get the interpolation order
+			int order = dofs.GetVariableInterpolationOrder(nvar);
+			if (order == 0)
+			{
+				assert(vartype == VAR_SCALAR);
+				ps = new FEBioPlotVariable(pfem, szfield, FE_REGION_DOMAIN, PLT_FLOAT, FMT_ITEM);
 				return AddDomainVariable(ps, szname, item);
+			}
+			else
+			{
+				if (vartype == VAR_SCALAR)
+				{
+					ps = new FEBioPlotVariable(pfem, szfield, FE_REGION_NODE, PLT_FLOAT, FMT_NODE);
+					return AddNodalVariable(ps, szname, item);
+				}
+				else if (vartype == VAR_VEC3)
+				{
+					ps = new FEBioPlotVariable(pfem, szfield, FE_REGION_NODE, PLT_VEC3F, FMT_NODE);
+					return AddNodalVariable(ps, szname, item);
+				}
+				else if (vartype == VAR_ARRAY)
+				{
+					int ndofs = dofs.GetVariableSize(szfield);
+					int index = -1;
+					if (PD.IsNumberFilter()) index = PD.numFilter;
+					else if (PD.IsStringFilter())
+					{
+						const char* szflt = PD.strFilter.c_str();
+						index = dofs.GetIndex(szfield, szflt);
+						if (index < 0) index = pfem->GetDOFIndex(szflt);
+					}
+					if ((index < 0) || (index >= ndofs)) return false;
+
+					ps = new FEPlotArrayVariable(pfem, szfield, index);
+					return AddDomainVariable(ps, szname, item);
+				}
 			}
 		}
 	}

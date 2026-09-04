@@ -176,8 +176,8 @@ vec2d FEDomain2D::gradient(FEElement2D& el, double* fn, int n)
         Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i];
         
         // calculate gradient
-        gradf.x() += Gx*fn[i];
-        gradf.y() += Gy*fn[i];
+        gradf.x += Gx*fn[i];
+        gradf.y += Gy*fn[i];
     }
     
     return gradf;
@@ -204,8 +204,8 @@ vec2d FEDomain2D::gradient(FEElement2D& el, vector<double>& fn, int n)
         double Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i];
         
         // calculate pressure gradient
-        gradf.x() += Gx*fn[i];
-        gradf.y() += Gy*fn[i];
+        gradf.x += Gx*fn[i];
+        gradf.y += Gy*fn[i];
     }
     
     return gradf;
@@ -354,8 +354,8 @@ void FEDomain2D::ContraBaseVectors(FEElement2D& el, int j, vec2d gcnt[2])
     vec2d gcov[2];
     CoBaseVectors(el, j, gcov);
     
-    mat2d J = mat2d(gcov[0].x(), gcov[1].x(),
-                    gcov[0].y(), gcov[1].y());
+    mat2d J = mat2d(gcov[0].x, gcov[1].x,
+                    gcov[0].y, gcov[1].y);
     mat3d Ji = J.inverse();
     
     gcnt[0] = vec2d(Ji(0,0),Ji(0,1));

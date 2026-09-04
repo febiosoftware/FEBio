@@ -18,32 +18,39 @@ static int ipow(int base, int exp)
 	return result;
 }
 
-void printStack(const std::vector<double>& stack, int numGlobals, int stackSize, double* ref)
+void printStack(std::ostream& os, const std::vector<double>& stack, int numGlobals, int stackSize, double* ref)
 {
-	std::cout << "Stack: [";
+	os << "[";
 	for (size_t i = 0; i < numGlobals; i++)
 	{
 		if (ref == &stack[i])
-			std::cout << "*";
-
-		std::cout << ValueToString(stack[i]);
+			os << "*";
+		os << ValueToString(stack[i]);
 		if (i < numGlobals - 1)
-			std::cout << ",";
+			os << ",";
 	}
-	std::cout << "|";
+	os << "|";
 	for (size_t i = numGlobals; i < stackSize; i++)
 	{
-		std::cout << ValueToString(stack[i]);
+		os << ValueToString(stack[i]);
 		if (i < stack.size() - 1)
-			std::cout << ",";
+			os << ",";
 	}
 	for (size_t i= stackSize; i < stack.size(); i++)
 	{
-		std::cout << "_";
+		os << "_";
 		if (i < stack.size() - 1)
-			std::cout << ",";
+			os << ",";
 	}
-	std::cout << "]" << std::endl;
+	os << "]" << std::endl;
+}
+
+VM::VM() : m_program(nullptr) 
+{
+#ifndef NDEBUG
+	m_debug = false;
+	m_debugOutput = &std::cerr;
+#endif
 }
 
 Value VM::execute()
@@ -55,15 +62,23 @@ Value VM::execute()
 	ref.ptr = nullptr;
 	const uint8_t* lastIP = m_program->code.data() + instructions;
 
+#ifndef NDEBUG
+	if (m_debug && m_debugOutput)
+	{
+		*m_debugOutput << " IP | OpCode | Stack \n";
+		*m_debugOutput << "----+--------+--------\n";
+	}
+#endif
+
+
 	while (ip < lastIP)
 	{
 		OpCode instruction = (OpCode)readByte();
 
 #ifndef NDEBUG
-		if (m_debug)
+		if (m_debug && m_debugOutput)
 		{
-			std::cout << "IP: " << std::setw(4) << (ip - &m_program->code[0]) - 1;
-			std::cout << " | Executing: " << OpCodeToString(instruction) << " | ";
+			*m_debugOutput << std::setw(4) << (ip - &m_program->code[0]) - 1 << "| " << OpCodeToString(instruction) << "   | ";
 		}
 #endif
 
@@ -121,6 +136,13 @@ Value VM::execute()
 		{
 			uint8_t idx = readByte();
 			pushMat3(m_program->constants[idx].mat3Value);
+			break;
+		}
+
+		case OpCode::PUSH_LOCAL:
+		{
+			uint8_t size = readByte();
+			growStack(size);
 			break;
 		}
 
@@ -341,10 +363,10 @@ Value VM::execute()
 		{
 			mat2 v = peekMat2();
 			double* xPtr = ref.ptr;
-			xPtr[0] = v.m[0][0];
-			xPtr[1] = v.m[0][1];
-			xPtr[2] = v.m[1][0];
-			xPtr[3] = v.m[1][1];
+			xPtr[0] = v(0,0);
+			xPtr[1] = v(0,1);
+			xPtr[2] = v(1,0);
+			xPtr[3] = v(1,1);
 			ref.ptr = nullptr;
 			break;
 		}
@@ -876,18 +898,6 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::GET_MAT2_INDEX:
-		{
-			int index = popInt();
-			mat2& A = popMat2();
-#ifndef NDEBUG
-			if (index < 0 || index > 1)
-				throw std::runtime_error("mat2 index out of bounds.");
-#endif
-			pushVec2(*((vec2*)(&A.m[index][0])));
-			break;
-		}
-
 		case OpCode::CREATE_MAT2_DIAG:
 		{
 			double a = popDouble();
@@ -898,13 +908,38 @@ Value VM::execute()
 			break;
 		}
 
+		case OpCode::GET_MAT2_ELEMENT:
+		{
+			int col = popInt();
+			int row = popInt();
+			mat2& A = popMat2();
+#ifndef NDEBUG
+			if (row < 0 || row > 1 || col < 0 || col > 1)
+				throw std::runtime_error("mat2 index out of bounds.");
+#endif
+			pushDouble(A(row, col));
+			break;
+		}
+
+		case OpCode::GET_MAT2_ELEMENT_REF:
+		{
+			int col = popInt();
+			int row = popInt();
+#ifndef NDEBUG
+			if (row < 0 || row > 1 || col < 0 || col > 1)
+				throw std::runtime_error("mat2 index out of bounds.");
+#endif
+			ref.ptr += row * 2 + col;
+			break;
+		}
+
 		// ----- Mat3 operators ------
 		case OpCode::NEG_MAT3:
 		{
 			mat3& A = peekMat3();
-			A.m[0][0] = -A.m[0][0]; A.m[0][1] = -A.m[0][1]; A.m[0][2] = -A.m[0][2];
-			A.m[1][0] = -A.m[1][0]; A.m[1][1] = -A.m[1][1]; A.m[1][2] = -A.m[1][2];
-			A.m[2][0] = -A.m[2][0]; A.m[2][1] = -A.m[2][1]; A.m[2][2] = -A.m[2][2];
+			A(0,0) = -A(0,0); A(0,1) = -A(0,1); A(0,2) = -A(0,2);
+			A(1,0) = -A(1,0); A(1,1) = -A(1,1); A(1,2) = -A(1,2);
+			A(2,0) = -A(2,0); A(2,1) = -A(2,1); A(2,2) = -A(2,2);
 			break;
 		}
 		case OpCode::ADD_MAT3:
@@ -958,18 +993,6 @@ Value VM::execute()
 			break;
 		}
 
-		case OpCode::GET_MAT3_INDEX:
-		{
-			int index = popInt();
-			mat3& A = popMat3();
-#ifndef NDEBUG
-			if (index < 0 || index > 2)
-				throw std::runtime_error("mat3 index out of bounds.");
-#endif
-			pushVec3(*((vec3*)(&A.m[index][0])));
-			break;
-		}
-
 		case OpCode::CREATE_MAT3_DIAG:
 		{
 			double a = popDouble();
@@ -1018,6 +1041,31 @@ Value VM::execute()
 			mat3& A = getMat3At(slotA);
 			mat3& B = getMat3At(slotB);
 			pushMat3(A * B);
+			break;
+		}
+
+		case OpCode::GET_MAT3_ELEMENT:
+		{
+			int col = popInt();
+			int row = popInt();
+			mat3& A = popMat3();
+#ifndef NDEBUG
+			if (row < 0 || row > 2 || col < 0 || col > 2)
+				throw std::runtime_error("mat3 index out of bounds.");
+#endif
+			pushDouble(A(row, col));
+			break;
+		}
+
+		case OpCode::GET_MAT3_ELEMENT_REF:
+		{
+			int col = popInt();
+			int row = popInt();
+#ifndef NDEBUG
+			if (row < 0 || row > 2 || col < 0 || col > 2)
+				throw std::runtime_error("mat3 index out of bounds.");
+#endif
+			ref.ptr += row * 3 + col;
 			break;
 		}
 
@@ -1496,9 +1544,9 @@ Value VM::execute()
 			}
 
 #ifndef NDEBUG
-			if (m_debug)
+			if (m_debug && m_debugOutput)
 			{
-				printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
+				printStack(*m_debugOutput, m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 			}
 #endif
 
@@ -1510,9 +1558,9 @@ Value VM::execute()
 		}
 
 #ifndef NDEBUG
-		if (m_debug && (instruction < OpCode::RETURN_VOID))
+		if (m_debug && m_debugOutput && (instruction < OpCode::RETURN_VOID))
 		{
-			printStack(m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
+			printStack(*m_debugOutput, m_stack, (int)globalStackSize, (int)stackTop, ref.ptr);
 		}
 #endif
 	}

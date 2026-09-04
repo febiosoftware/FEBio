@@ -226,6 +226,7 @@ public:
 	// Elements can now also have degrees of freedom, only currently just one.
 	// Like with nodes, a degree of freedom needs an equation number and a value
 	// The equation number is in m_lm and the value is in m_val
+	int		m_dof;	//!< degree of freedom index
 	int		m_lm;	//!< equation number of element degree of freedom
 	double	m_val;	//!< solution value of element degree of freedom
 

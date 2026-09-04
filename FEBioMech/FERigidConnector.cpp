@@ -37,11 +37,12 @@ BEGIN_FECORE_CLASS(FERigidConnector, FENLConstraint);
 	ADD_PARAMETER(m_nRBb, "body_b")->setEnums("$(rigid_materials)");
 END_FECORE_CLASS();
 
-int FERigidConnector::m_ncount = 0;
-
 //-----------------------------------------------------------------------------
 FERigidConnector::FERigidConnector(FEModel* pfem) : FENLConstraint(pfem) 
 {
+	static int count = 1;
+	m_nID = count++;
+
     m_F = m_M = vec3d(0, 0, 0);
 	m_rbA = m_rbB = 0;
 };
@@ -61,7 +62,7 @@ bool FERigidConnector::Init()
 	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(m_nRBa - 1));
 	if (pm == nullptr)
 	{
-		feLogError("Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID + 1);
+		feLogError("Rigid connector %d (spring) does not connect two rigid bodies\n", m_nID);
 		return false;
 	}
 	m_nRBa = pm->GetRigidBodyID();

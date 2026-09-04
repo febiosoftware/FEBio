@@ -359,6 +359,22 @@ void FERigidShellDomain::MassMatrix(FELinearSystem& LS, double scale)
 	// nothing to do here
 }
 
+void FERigidShellDomain::Serialize(DumpStream& ar)
+{
+	// we bypass FEDomain::Serialize since we don't need to serialize anything for the rigid shells
+	FEMeshPartition::Serialize(ar);
+}
+
+void FERigidShellDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
+{
+	// nothing to do here
+}
+
+void FERigidShellDomain::BuildMatrixProfile(FEGlobalMatrix& M)
+{
+	// nothing to do here
+}
+
 double FERigidShellDomain::detJ0(FEShellElement& el, int n)
 {
 	vector<vec3d> X(FEElement::MAX_NODES);

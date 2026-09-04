@@ -206,7 +206,11 @@ REGISTER_FECORE_CLASS(FELogPctDomainData, "pct");
 REGISTER_FECORE_CLASS(FELogIntegralDomainData, "integrate");
 REGISTER_FECORE_CLASS(FELogSolutionNorm, "solution_norm");
 REGISTER_FECORE_CLASS(FELogFaceArea    , "facet area");
-REGISTER_FECORE_CLASS(FELogElemMath    , "_math", FECORE_EXPERIMENTAL);
+
+// log data definitions
+REGISTER_FECORE_CLASS(FELogElemAlias   , "alias");
+REGISTER_FECORE_CLASS(FELogElemMath    , "math");
+REGISTER_FECORE_CLASS(FELogElemFunction, "function");
 
 // linear solvers
 REGISTER_FECORE_CLASS(LUSolver, "LU");

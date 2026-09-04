@@ -24,7 +24,51 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FELogElemData.h"
+#include "FEModel.h"
 
-FELogElemData::FELogElemData(FEModel* fem) : FELogData(fem) {}
+FELogElemData::FELogElemData(FEModel* fem) : FELogElemSource(fem) {}
 
 FELogElemData::~FELogElemData() {}
+
+BEGIN_FECORE_CLASS(FELogElemAlias, FELogElemDefinition)
+	ADD_PARAMETER(m_var, "var");
+END_FECORE_CLASS();
+
+FELogElemAlias::FELogElemAlias(FEModel* fem) : FELogElemDefinition(fem) {}
+
+bool FELogElemAlias::Init()
+{
+	if (m_var.empty()) return false;
+	m_pdata = fecore_new<FELogElemData>(m_var.c_str(), GetFEModel());
+	return (m_pdata != nullptr);
+}
+
+double FELogElemAlias::value(FEElement& el)
+{
+	if (m_pdata) return m_pdata->value(el);
+	return 0.0;
+}
+
+BEGIN_FECORE_CLASS(FELogElemFunction, FELogElemDefinition)
+	ADD_PARAMETER(m_var, "var");
+	ADD_PROPERTY(m_func, "function");
+END_FECORE_CLASS();
+
+FELogElemFunction::FELogElemFunction(FEModel* fem) : FELogElemDefinition(fem) {}
+
+bool FELogElemFunction::Init()
+{
+	DataStore& DS = GetFEModel()->GetDataStore();
+	m_pdata = DS.GetElementDataSource(m_var);
+	if (m_pdata == nullptr) return false;
+
+	return FELogElemDefinition::Init();
+}
+
+double FELogElemFunction::value(FEElement& el)
+{
+	if (m_pdata == nullptr) return 0.0;
+	double val = m_pdata->value(el);
+	if (m_func) return m_func->value(val);
+	return val;
+}

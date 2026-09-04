@@ -70,7 +70,7 @@ bool FEDataValue::GetValues(const FEItemList* itemList, std::vector<double>& val
 		return true;
 	}
 
-	FELogElemData* elemData = dynamic_cast<FELogElemData*>(m_logData);
+	FELogElemSource* elemData = dynamic_cast<FELogElemSource*>(m_logData);
 	if (elemData)
 	{
 		const FEElementSet* eset = dynamic_cast<const FEElementSet*>(itemList);

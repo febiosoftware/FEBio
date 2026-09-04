@@ -28,7 +28,8 @@ ExprPtr febcode::clone(const Expression* expr)
 		{
 			copyArgs.emplace_back(clone(arg.get()));
 		}
-		cpy = std::make_unique<CallExpr>(call->name, std::move(copyArgs));
+		ExprPtr calleeCopy = clone(call->callee.get());
+		cpy = std::make_unique<CallExpr>(std::move(calleeCopy), std::move(copyArgs));
 	}
 	else if (auto call = dynamic_cast<const InitExpr*>(expr))
 	{
@@ -132,7 +133,7 @@ bool febcode::isEqual(const Expression* l, const Expression* r)
 	{
 		if (auto callR = dynamic_cast<const CallExpr*>(r))
 		{
-			return (callL->name == callR->name) && isEqual(callL->arguments, callR->arguments);
+			return isEqual(callL->callee, callR->callee) && isEqual(callL->arguments, callR->arguments);
 		}
 	}
 	else if (auto ctorL = dynamic_cast<const ConstructorExpr*>(l))
@@ -205,12 +206,12 @@ std::ostream& operator << (std::ostream& o, const febcode::Value& v)
 	else if (isMat2(v))
 	{
 		const febcode::mat2& mat = getMat2(v);
-		return o << "mat2(" << mat.m[0][0] << ", " << mat.m[0][1] << ", " << mat.m[1][0] << ", " << mat.m[1][1] << ")";
+		return o << "mat2(" << mat(0,0) << ", " << mat(0,1) << ", " << mat(1,0) << ", " << mat(1,1) << ")";
 	}
 	else if (isMat3(v))
 	{
 		const febcode::mat3& mat = getMat3(v);
-		return o << "mat3(" << mat.m[0][0] << ", " << mat.m[0][1] << ", " << mat.m[0][2] << ", " << mat.m[1][0] << ", " << mat.m[1][1] << ", " << mat.m[1][2] << ", " << mat.m[2][0] << ", " << mat.m[2][1] << ", " << mat.m[2][2] << ")";
+		return o << "mat3(" << mat(0,0) << ", " << mat(0,1) << ", " << mat(0,2) << ", " << mat(1,0) << ", " << mat(1,1) << ", " << mat(1,2) << ", " << mat(2,0) << ", " << mat(2,1) << ", " << mat(2,2) << ")";
 	}
 	else
 		return o << "<unknown value>";
@@ -223,7 +224,7 @@ std::string to_nice_string(double d)
 	return ss.str();
 }
 
-std::string ValueToString(const febcode::Value& v)
+std::string febcode::ValueToString(const febcode::Value& v)
 {
 	std::string s;
 	if      (isVoid  (v)) s = "null";
@@ -272,7 +273,7 @@ std::string ValueToString(const febcode::Value& v)
 			for (int i = 0; i < 2; ++i)
 				for (int j = 0; j < 2; ++j)
 				{
-					s += to_nice_string(m.m[i][j]);
+					s += to_nice_string(m(i,j));
 					if ((i != 1) || (j != 1)) s += ",";
 				}
 		}
@@ -296,7 +297,7 @@ std::string ValueToString(const febcode::Value& v)
 			for (int i = 0; i < 3; ++i)
 				for (int j = 0; j < 3; ++j)
 				{
-					s += to_nice_string(m.m[i][j]);
+					s += to_nice_string(m(i,j));
 					if ((i != 2) || (j != 2)) s += ",";
 				}
 		}
@@ -321,21 +322,7 @@ std::string ValueToString(const febcode::Value& v)
 	return s;
 }
 
-std::string ValueTypeToString(const febcode::Value& v)
-{
-	if      (isVoid  (v)) return "void";
-	else if (isBool  (v)) return "bool";
-	else if (isInt   (v)) return "int";
-	else if (isDouble(v)) return "double";
-	else if (isArray (v)) return "array";
-	else if (isStruct(v)) return "struct";
-	else if (isVec2  (v)) return "vec2";
-	else if (isVec3  (v)) return "vec3";
-	else if (isRef    (v)) return "ref";
-	else return "<unknown type>";
-}
-
-std::string opToString(BinaryOp op)
+std::string febcode::opToString(BinaryOp op)
 {
 	switch (op)
 	{
@@ -355,4 +342,37 @@ std::string opToString(BinaryOp op)
 	default:
 		return "unknown_op";
 	}
+}
+
+[[noreturn]]
+void febcode::error(SourceLocation loc, const std::string& msg)
+{
+	throw FatalError(msg, loc);
+}
+
+[[noreturn]]
+void febcode::error(const ASTNode* node, const std::string& msg)
+{
+	throw FatalError(msg, (node ? node->location : SourceLocation()));
+}
+
+std::string febcode::StatementTypeToString(febcode::StatementType type)
+{
+	std::string stmtType;
+	switch (type)
+	{
+	case StatementType::ExpressionStatement: stmtType = "ExpressionStatement"; break;
+	case StatementType::VarDeclStatement   : stmtType = "VarDeclStatement"; break;
+	case StatementType::ReturnStatement    : stmtType = "ReturnStatement"; break;
+	case StatementType::BlockStatement     : stmtType = "BlockStatement"; break;
+	case StatementType::IfStatement        : stmtType = "IfStatement"; break;
+	case StatementType::WhileStatement     : stmtType = "WhileStatement"; break;
+	case StatementType::ForStatement       : stmtType = "ForStatement"; break;
+	case StatementType::FunctionStatement  : stmtType = "FunctionStatement"; break;
+	case StatementType::StructStatement    : stmtType = "StructStatement"; break;
+	default:
+		assert(false);
+		stmtType = "UnknownStatement"; break;
+	}
+	return stmtType;
 }

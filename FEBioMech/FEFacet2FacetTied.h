@@ -43,7 +43,7 @@ public:
 
 		void Init() override;
 
-		void Serialize(DumpStream& ar);
+		void Serialize(DumpStream& ar) override;
 
 	public:
 		vec3d	m_vgap;		//!< gap function

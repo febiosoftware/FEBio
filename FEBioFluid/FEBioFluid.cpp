@@ -43,7 +43,6 @@ SOFTWARE.*/
 #include "FELinearElasticFluid.h"
 #include "FENonlinearElasticFluid.h"
 #include "FELogNonlinearElasticFluid.h"
-
 #include "FEFluidSolver.h"
 #include "FEFluidDomain3D.h"
 
@@ -130,7 +129,7 @@ void FEBioFluid::InitModule()
 
 //-----------------------------------------------------------------------------
 // solver classes
-REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
+    REGISTER_FECORE_CLASS(FEFluidSolver, "fluid");
 
 //-----------------------------------------------------------------------------
 // Materials

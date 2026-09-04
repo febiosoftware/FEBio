@@ -28,25 +28,37 @@ SOFTWARE.*/
 
 #pragma once
 #include "DataRecord.h"
+#include "FELogElemData.h"
 #include "fecore_api.h"
 
 //-----------------------------------------------------------------------------
 class FECORE_API DataStore
 {
 public:
-	DataStore();
+	DataStore(FEModel* fem);
 	virtual ~DataStore();
+
+	bool Init();
 
 	void Clear();
 
 	void Write();
 
+public:
 	void AddRecord(DataRecord* prec);
 
 	int Size() { return (int) m_data.size(); }
 
 	DataRecord* GetDataRecord(int i) { return m_data[i]; }
 
+	FELogElemSource* GetElementDataSource(const std::string& name);
+
+public:
+	void AddElementDataDefinition(FELogElemDefinition* def);
+	FELogElemDefinition* FindElementDataDefinition(const std::string& name);
+
 protected:
+	FEModel* m_fem = nullptr;
 	std::vector<DataRecord*>	m_data;	//!< the data records
+	std::vector<FELogElemDefinition*> m_elemDefs;
 };

@@ -964,24 +964,20 @@ bool FEExplicitSolidSolver::DoSolve()
 	int N = mesh.Nodes(); // this is the total number of nodes in the mesh
 	double dt = fem.GetTime().timeIncrement;
 
-	// collect accelerations, velocities, displacements
-	// NOTE: I don't think this is necessary
-/*
 #pragma omp parallel for shared(mesh)
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		vec3d vt = node.get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 		int n;
-		if ((n = node.m_ID[m_dofU[0]]) >= 0) { m_vn[n] = vt.x; m_an[n] = node.m_at.x; }
-		if ((n = node.m_ID[m_dofU[1]]) >= 0) { m_vn[n] = vt.y; m_an[n] = node.m_at.y; }
-		if ((n = node.m_ID[m_dofU[2]]) >= 0) { m_vn[n] = vt.z; m_an[n] = node.m_at.z; }
+		if ((n = node.m_ID[m_dofU[0]]) >= 0) { m_data[n].v = vt.x;}
+		if ((n = node.m_ID[m_dofU[1]]) >= 0) { m_data[n].v = vt.y;}
+		if ((n = node.m_ID[m_dofU[2]]) >= 0) { m_data[n].v = vt.z;}
 
-		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { m_vn[n] = node.get(m_dofSV[0]); m_an[n] = node.get(m_dofSA[0]); }
-		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { m_vn[n] = node.get(m_dofSV[1]); m_an[n] = node.get(m_dofSA[1]); }
-		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { m_vn[n] = node.get(m_dofSV[2]); m_an[n] = node.get(m_dofSA[2]); }
+		if ((n = node.m_ID[m_dofSU[0]]) >= 0) { m_data[n].v = node.get(m_dofSV[0]); }
+		if ((n = node.m_ID[m_dofSU[1]]) >= 0) { m_data[n].v = node.get(m_dofSV[1]); }
+		if ((n = node.m_ID[m_dofSU[2]]) >= 0) { m_data[n].v = node.get(m_dofSV[2]); }
 	}
-*/
 
 	// do rigid bodies
 	for (int i = 0; i < fem.RigidBodies(); ++i)

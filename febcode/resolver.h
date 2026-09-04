@@ -15,7 +15,7 @@ namespace febcode {
 		~Resolver();
 		void resolve();
 
-		using Scope = std::unordered_map<std::string, Type>;
+		using Scope = std::unordered_map<std::string, Var*>;
 
 	private:
 		void resolveStatement   (Statement*      stmt);
@@ -50,12 +50,12 @@ namespace febcode {
 			scopeStack.pop_back();
 		}
 
-		void declare(const std::string& name, Type type) {
+		void declare(const std::string& name, Var* var) {
 			Scope& current = scopeStack.back();
-			current[name] = { type };
+			current[name] = var;
 		}
 
-		Type lookup(const std::string& name) {
+		Var* lookup(const std::string& name) {
 			for (int i = (int)scopeStack.size() - 1; i >= 0; --i) {
 				auto it = scopeStack[i].find(name);
 				if (it != scopeStack[i].end())

@@ -114,7 +114,7 @@ vec2d map_facet_to_facet(int* na, int* nb, int nodes, double r, double s)
 // Notice that this depends on how the facet nodes are numbered (see FEElement::GetFace) 
 vec3d map_facet_to_volume_coordinates_tet(int nface, const vec2d& q)
 {
-	double h1 = q.x(), h2 = q.y(), h3 = 1.0 - h1 - h2;
+	double h1 = q.x, h2 = q.y, h3 = 1.0 - h1 - h2;
 	double g1, g2, g3;
 	switch (nface)
 	{
@@ -132,7 +132,7 @@ vec3d map_facet_to_volume_coordinates_tet(int nface, const vec2d& q)
 // Notice that this depends on how the facet nodes are numbered (see FEElement::GetFace) 
 vec3d map_facet_to_volume_coordinates_hex(int nface, const vec2d& q)
 {
-	double h1 = q.x(), h2 = q.y();
+	double h1 = q.x, h2 = q.y;
 	double g1, g2, g3;
 	switch (nface)
 	{

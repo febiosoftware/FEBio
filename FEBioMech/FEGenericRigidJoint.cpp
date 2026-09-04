@@ -50,9 +50,6 @@ END_FECORE_CLASS();
 //-----------------------------------------------------------------------------
 FEGenericRigidJoint::FEGenericRigidJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-	static int count = 1;
-	m_nID = count++;
-
 	m_rbA = m_rbB = nullptr;
 
 	m_bc[0] = false;
@@ -539,7 +536,7 @@ bool FEGenericRigidJoint::Augment(int naug, const FETimeInfo& tp)
 		}
 	}
 
-	feLog("\n=== rigid connector # %d:\n", m_nID);
+	feLog("\n=== rigid connector #%d (%s):\n", m_nID, GetName().c_str());
 
 	bool bconv = true;
 	double e[6] = { 0 };
@@ -600,7 +597,6 @@ bool FEGenericRigidJoint::Augment(int naug, const FETimeInfo& tp)
 void FEGenericRigidJoint::Serialize(DumpStream& ar)
 {
 	FERigidConnector::Serialize(ar);
-	ar & m_nID;
 	ar & m_q0 & m_qa0 & m_qb0;
 	ar & m_Lm & m_Lmp;
 }

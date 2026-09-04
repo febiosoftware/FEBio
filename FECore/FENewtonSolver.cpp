@@ -313,6 +313,7 @@ bool FENewtonSolver::CreateStiffness(bool breset)
 
 	// Do the preprocessing of the solver
 	{
+		TRACK_TIME(TimerID::Timer_LinSol_Factor);
 		if (!m_plinsolve->PreProcess())
 		{
 			feLogError("An error occurred during preprocessing of linear solver");
@@ -740,8 +741,15 @@ void FENewtonSolver::Rewind()
 void FENewtonSolver::PrepStep()
 {
 	FEModel& fem = *GetFEModel();
-
+	FEMesh& mesh = fem.GetMesh();
 	const FETimeInfo& tp = fem.GetTime();
+
+	// update nodal values
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& ni = mesh.Node(i);
+		ni.UpdateValues();
+	}
 
 	// zero total DOFs
 	zero(m_Ui);
@@ -762,7 +770,6 @@ void FENewtonSolver::PrepStep()
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
 	// update domain data
-	FEMesh& mesh = fem.GetMesh();
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
 	// update model
@@ -879,7 +886,10 @@ double FENewtonSolver::DoLineSearch()
 {
 	// the geometry is also updated in the line search
 	m_ls = 1.0;
-	if (m_lineSearch && (m_lineSearch->m_LStol > 0.0)) m_ls = m_lineSearch->DoLineSearch();
+	if (m_lineSearch && (m_lineSearch->m_LStol > 0.0))
+	{
+		m_ls = m_lineSearch->DoLineSearch();
+	}
 	else
 	{
 		// Update geometry
@@ -1018,7 +1028,10 @@ void FENewtonSolver::Update(std::vector<double>& ui)
 		{
 			ConvergenceInfo& ci = m_solutionNorm[i];
 			FESolutionVariable& var = m_Var[ci.nvar];
-			scatter(U, mesh, *var.m_dofs);
+			if (var.m_order == 0)
+				scatterToElements(U, mesh, *var.m_dofs);
+			else
+				scatter(U, mesh, *var.m_dofs);
 		}
 
 		// enforce the linear constraints

@@ -14,12 +14,13 @@ Resolver::~Resolver()
 
 void Resolver::resolve()
 {
-	// add all global variables to the variables map so they can be resolved in expressions
+	// start with a global scope
 	pushScope();
-	for (const auto& var : prg.globalIndices)
+
+	// add all injected variables to the variables map so they can be resolved in expressions
+	for (const auto& var : prg.injects)
 	{
-		auto& global = prg.globals[var.second];
-		declare(var.first, global.type);
+		declare(var->name, var.get());
 	}
 
 	// resolve all statements in the program
@@ -41,7 +42,7 @@ void Resolver::resolveStatement(Statement* stmt)
 	else if (auto c = dynamic_cast<FunctionStmt*  >(stmt)) resolveFunctionStmt(c);
 	else if (auto s = dynamic_cast<StructStmt*    >(stmt)) resolveStructStmt  (s);
 	else 
-		throw std::runtime_error("cannot resolve statement");
+		error(stmt, "cannot resolve statement");
 }
 
 void Resolver::resolveBlockStmt(BlockStmt* stmt)
@@ -63,24 +64,18 @@ void Resolver::resolveVarDecl(VarDeclStmt* stmt)
 {
 	for (auto& var : stmt->vars)
 	{
-		Type varType = nullptr;
-		if (var.arraySizes.size() > 0)
-			varType = prg.types.getArrayType(stmt->type, var.arraySizes);
-		else
-			varType = stmt->type;
-
 		// resolve initializer first!
-		if (var.initializer)
+		if (var->initializer)
 		{
-			resolveExpression(var.initializer.get());
+			resolveExpression(var->initializer.get());
 
 			// make sure initializer type can be converted to variable type
-			if (commonType(var.initializer->valType, varType) == nullptr)
-				throw std::runtime_error("Type mismatch in variable initializer for variable '" + var.name + "'. Expected type: " + TypeToString(varType) + ", but got: " + TypeToString(var.initializer->valType));
+			if (commonType(var->initializer->valType, var->type) == nullptr)
+				error(var->initializer.get(), "Type mismatch in variable initializer for variable '" + var->name + "'. Expected type: " + TypeToString(var->type) + ", but got: " + TypeToString(var->initializer->valType));
 		}
 
 		// now we can declare the variable in the current scope
-		declare(var.name, varType);
+		declare(var->name, var.get());
 	}
 }
 
@@ -88,7 +83,8 @@ void Resolver::resolveIfStmt(IfStmt* stmt)
 {
 	resolveExpression(stmt->condition.get());
 	if (!isLogicalType(stmt->condition->valType))
-		throw std::runtime_error("Condition expression in if statement must be of type bool. Got: " + TypeToString(stmt->condition->valType));
+		error(stmt->condition->location, "Condition expression in if statement must be of type bool. Got: " + TypeToString(stmt->condition->valType));
+
 	resolveStatement(stmt->thenBranch.get());
 	if (stmt->elseBranch)
 		resolveStatement(stmt->elseBranch.get());
@@ -98,7 +94,7 @@ void Resolver::resolveWhileStmt(WhileStmt* stmt)
 {
 	resolveExpression(stmt->condition.get());
 	if (!isLogicalType(stmt->condition->valType))
-		throw std::runtime_error("Condition expression in while statement must be of type bool. Got: " + TypeToString(stmt->condition->valType));
+		error(stmt->condition->location, "Condition expression in while statement must be of type bool. Got: " + TypeToString(stmt->condition->valType));
 	resolveStatement(stmt->body.get());
 }
 
@@ -108,7 +104,7 @@ void Resolver::resolveForStmt(ForStmt* stmt)
 		resolveStatement(stmt->initializer.get());
 	resolveExpression(stmt->condition.get());
 	if (stmt->condition->valType != prg.types.Bool())
-		throw std::runtime_error("Condition expression in for statement must be of type bool. Got: " + TypeToString(stmt->condition->valType));
+		error(stmt->condition->location, "Condition expression in for statement must be of type bool. Got: " + TypeToString(stmt->condition->valType));
 	resolveExpression(stmt->increment.get());
 	resolveStatement(stmt->body.get());
 }
@@ -119,12 +115,12 @@ void Resolver::resolveReturnStmt(ReturnStmt* stmt)
 	{
 		resolveExpression(stmt->value.get());
 		if (prg.returnType && (stmt->value->valType != prg.returnType))
-			throw std::runtime_error("Type mismatch in return statement. Expected type: " + TypeToString(prg.returnType) + ", but got: " + TypeToString(stmt->value->valType));
+			error(stmt->value->location, "Type mismatch in return statement. Expected type: " + TypeToString(prg.returnType) + ", but got: " + TypeToString(stmt->value->valType));
 	}
 	else
 	{
 		if (prg.returnType && (prg.returnType != prg.types.Void()))
-			throw std::runtime_error("Missing return value in function with non-void return type.");
+			error(stmt->location, "Missing return value in function with non-void return type.");
 	}
 }
 
@@ -139,8 +135,8 @@ void Resolver::resolveFunctionStmt(FunctionStmt* fn)
 	// add function parameters to variables map
 	for (const auto& param : fn->params)
 	{
-		info.args.push_back(param.first);
-		declare(param.second, param.first);
+		info.args.push_back(param->type);
+		declare(param->name, param.get());
 	}
 	resolveStatement(fn->body.get());
 	popScope();
@@ -148,7 +144,7 @@ void Resolver::resolveFunctionStmt(FunctionStmt* fn)
 	// make sure the function is not defined yet
 	int index = prg.resolveFunction(fn->name, info.args);
 	if (index != -1)
-		throw std::runtime_error("Function '" + fn->name + "' with the same parameter types is already defined.");
+		error(fn, "Function '" + fn->name + "' with the same parameter types is already defined.");
 
 	// add it to the program's function list
 	prg.functions.push_back(info);
@@ -175,7 +171,7 @@ void Resolver::resolveExpression(Expression* expr)
 	else if (auto c = dynamic_cast<CallExpr*       >(expr)) resolveCall       (c);
 	else if (auto c = dynamic_cast<ConstructorExpr*>(expr)) resolveConstructor(c);
 	else
-		throw std::runtime_error("cannot resolve expression");
+		error(expr, "cannot resolve expression");
 }
 
 void Resolver::resolveLiteral(LiteralExpr* expr)
@@ -185,10 +181,11 @@ void Resolver::resolveLiteral(LiteralExpr* expr)
 
 void Resolver::resolveVariable(VariableExpr* expr)
 {
-	Type type = lookup(expr->name);
-	if (type == nullptr)
-		throw std::runtime_error("Undefined variable: " + expr->name);
-	expr->valType = type;
+	Var* var = lookup(expr->name);
+	if (var == nullptr)
+		error(expr, "Undefined variable: " + expr->name);
+	expr->valType = var->type;
+	expr->var = var;
 }
 
 void Resolver::resolveAssignment(AssignExpr* expr)
@@ -196,9 +193,11 @@ void Resolver::resolveAssignment(AssignExpr* expr)
 	resolveExpression(expr->target.get());
 	resolveExpression(expr->value.get());
 	if (expr->target->valType == nullptr)
-		throw std::runtime_error("Invalid assignment target.");
-	if (expr->target->valType != expr->value->valType)
-		throw std::runtime_error("Type mismatch in assignment. Expected type: " + TypeToString(expr->target->valType) + ", but got: " + TypeToString(expr->value->valType));
+		error(expr->target.get(), "Invalid assignment target.");
+
+	Type type = coerce(expr->value->valType, expr->target->valType); // try to coerce value type to target type
+	if (expr->target->valType != type)
+		error(expr->value.get(), "Type mismatch in assignment. Expected type: " + TypeToString(expr->target->valType) + ", but got: " + TypeToString(expr->value->valType));
 	expr->valType = expr->target->valType;
 }
 
@@ -211,14 +210,14 @@ void Resolver::resolveUnary(UnaryExpr* expr)
 	{
 	case UnaryOp::Negate:
 		if (!isNumericType(expr->valType))
-			throw std::runtime_error("Unary '-' operator can only be applied to numeric types. Got: " + TypeToString(expr->valType));
+			error(expr, "Unary '-' operator can only be applied to numeric types. Got: " + TypeToString(expr->valType));
 		break;
 	case UnaryOp::Not:
 		if (expr->valType != prg.types.Bool())
-			throw std::runtime_error("Unary '!' operator can only be applied to bool type. Got: " + TypeToString(expr->valType));
+			error(expr, "Unary '!' operator can only be applied to bool type. Got: " + TypeToString(expr->valType));
 		break;
 	default:
-		throw std::runtime_error("Unsupported unary operator.");
+		error(expr, "Unsupported unary operator.");
 	}
 }
 
@@ -228,6 +227,11 @@ void Resolver::resolveBinary(BinaryExpr* expr)
 	resolveExpression(expr->right.get());
 
 	BinaryOpSignature sig = prg.resolveBinaryOp(expr->op, expr->left->valType, expr->right->valType);
+	if (sig.resultType == nullptr)
+	{
+		error(expr, "Invalid binary operator \'" + opToString(expr->op) + "\' for types " + TypeToString(expr->left->valType) + " and " + TypeToString(expr->right->valType));
+	}
+
 	expr->valType = sig.resultType;
 }
 
@@ -236,7 +240,7 @@ void Resolver::resolveMember(MemberExpr* expr)
 	resolveExpression(expr->object.get());
 	Type objType = expr->object->valType;
 	if (objType == nullptr)
-		throw std::runtime_error("Invalid member access on unresolved type.");
+		error(expr->object.get(), "Invalid member access on unresolved type.");
 
 	if (objType->kind == TypeKind::Vec2)
 	{
@@ -245,14 +249,14 @@ void Resolver::resolveMember(MemberExpr* expr)
 		for (char c : expr->property)
 		{
 			if ((c != 'x') && (c != 'y'))
-				throw std::runtime_error("Invalid character '" + std::string(1, c) + "' in swizzle. Only 'x' and 'y' are allowed.");
+				error(expr, "Invalid character '" + std::string(1, c) + "' in swizzle. Only 'x' and 'y' are allowed.");
 		}
 
 		if      (l == 1) expr->valType = prg.types.Double();
 		else if (l == 2) expr->valType = prg.types.Vec2();
 		else if (l == 3) expr->valType = prg.types.Vec3();
 		else
-			throw std::runtime_error("Invalid property '" + expr->property + "' for type vec2.");
+			error(expr, "Invalid property '" + expr->property + "' for type vec2.");
 
 		return;
 	}
@@ -263,19 +267,19 @@ void Resolver::resolveMember(MemberExpr* expr)
 		for (char c : expr->property)
 		{
 			if ((c != 'x') && (c != 'y') && (c != 'z'))
-				throw std::runtime_error("Invalid character '" + std::string(1, c) + "' in swizzle. Only 'x', 'y', and 'z' are allowed.");
+				error(expr, "Invalid character '" + std::string(1, c) + "' in swizzle. Only 'x', 'y', and 'z' are allowed.");
 		}
 
 		if      (l == 1) expr->valType = prg.types.Double();
 		else if (l == 2) expr->valType = prg.types.Vec2();
 		else if (l == 3) expr->valType = prg.types.Vec3();
 		else
-			throw std::runtime_error("Invalid property '" + expr->property + "' for type vec3.");
+			error(expr, "Invalid property '" + expr->property + "' for type vec3.");
 
 		return;
 	}
 	else if (objType->kind != TypeKind::Struct)
-		throw std::runtime_error("Member access on non-struct type.");
+		error(expr, "Member access on non-struct type.");
 
 	const auto& fields = objType->fields;
 	for (const auto& field : fields)
@@ -287,7 +291,7 @@ void Resolver::resolveMember(MemberExpr* expr)
 		}
 	}
 
-	throw std::runtime_error("Field '" + expr->property + "' not found in struct.");
+	error(expr, "Field '" + expr->property + "' not found in struct.");
 }
 
 void Resolver::resolveIndex(IndexExpr* expr)
@@ -296,12 +300,11 @@ void Resolver::resolveIndex(IndexExpr* expr)
 	resolveExpression(expr->index.get());
 
 	if (expr->index->valType != prg.types.Int())
-		throw std::runtime_error("Index must be of type int. Got: " + TypeToString(expr->index->valType));
+		error(expr->index.get(), "Index must be of type int. Got: " + TypeToString(expr->index->valType));
 
 	Type arrayType = expr->object->valType;
 	if (arrayType == nullptr)
-		throw std::runtime_error("Invalid indexing on unresolved type.");
-
+		error(expr->object.get(), "Invalid indexing on unresolved type.");
 	if (arrayType->kind == TypeKind::Array)
 	{
 		expr->valType = arrayType->elementType;
@@ -324,7 +327,7 @@ void Resolver::resolveIndex(IndexExpr* expr)
 	}
 	else
 	{
-		throw std::runtime_error("Indexing can only be applied to array, vector, or matrix types. Got: " + TypeToString(arrayType));
+		error(expr, "Indexing can only be applied to array, vector, or matrix types. Got: " + TypeToString(arrayType));
 	}
 }
 
@@ -335,7 +338,7 @@ void Resolver::resolveInitializer(InitExpr* expr)
 	{
 		resolveExpression(element.get());
 		if (element->valType == nullptr)
-			throw std::runtime_error("Invalid initializer element with unresolved type.");
+			error(element.get(), "Invalid initializer element with unresolved type.");
 
 		if (elemType == nullptr)
 			{
@@ -343,7 +346,7 @@ void Resolver::resolveInitializer(InitExpr* expr)
 		}
 		else if (element->valType != elemType)
 		{
-			throw std::runtime_error("All elements in an initializer must have the same type. Got: " + TypeToString(elemType) + " and " + TypeToString(element->valType));
+			error(element.get(), "All elements in an initializer must have the same type. Got: " + TypeToString(elemType) + " and " + TypeToString(element->valType));
 		}
 	}
 
@@ -353,13 +356,13 @@ void Resolver::resolveInitializer(InitExpr* expr)
 void Resolver::resolveConstructor(ConstructorExpr* expr)
 {
 	if (expr->valType == nullptr)
-		throw std::runtime_error("Invalid constructor with unresolved type.");
+		error(expr, "Invalid constructor with unresolved type.");
 
 	for (auto& arg : expr->args)
 	{
 		resolveExpression(arg.get());
 		if (arg->valType == nullptr)
-			throw std::runtime_error("Invalid constructor argument with unresolved type.");
+			error(expr, "Invalid constructor argument with unresolved type.");
 	}
 }
 
@@ -370,17 +373,42 @@ void Resolver::resolveCall(CallExpr* expr)
 	{
 		resolveExpression(expr->arguments[i].get());
 		if (expr->arguments[i]->valType == nullptr)
-			throw std::runtime_error("Invalid function call argument with unresolved type.");
+			error(expr->arguments[i].get(), "Invalid argument with unresolved type.");
 		argTypes.push_back(expr->arguments[i]->valType);
 	}
 
-	int index = prg.resolveFunction(expr->name, argTypes);
+	// see if the name is a variable first.
+	VariableExpr* varExpr = dynamic_cast<VariableExpr*>(expr->callee.get());
+	Var* var = lookup(varExpr->name);
+	if (var)
+	{
+		varExpr->var = var;
+		varExpr->valType = var->type;
+
+		// this is only allowed for matrix types
+		if (var->type->kind != TypeKind::Mat2 && var->type->kind != TypeKind::Mat3)
+			error(expr, "Variable '" + varExpr->name + "' is not a matrix type.");
+
+		// make sure we only have two arguments for matrix access (row and column)
+		if (expr->arguments.size() != 2)
+			error(expr, "Matrix access requires two indices.");
+
+		// make sure args are ints
+		if (expr->arguments[0]->valType != prg.types.Int() || expr->arguments[1]->valType != prg.types.Int())
+			error(expr, "Matrix access indices must be of type int.");
+
+		expr->valType = prg.types.Double(); // matrix element type is always double
+		return;
+	}
+
+	// assume this is a function call
+	int index = prg.resolveFunction(varExpr->name, argTypes);
 	if (index < 0)
-		throw std::runtime_error("Undefined function: " + expr->name + " (or can't match arguments)");
+		error(expr, "Undefined function: " + varExpr->name + " (or can't match arguments)");
 
 	FunctionInfo& func = prg.functions[index];
 	if (func.returnType == nullptr)
-		throw std::runtime_error("Invalid function with unresolved return type.");
+		error(expr, "Invalid function with unresolved return type.");
 
 	expr->valType = func.returnType;
 }

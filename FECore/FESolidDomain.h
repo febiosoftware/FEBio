@@ -237,6 +237,8 @@ public:
     
     //! calculate spatial gradient of shapefunctions at integration point in reference frame (returns Jacobian determinant)
     double ShapeGradient0(FESolidElement& el, int n, vec3d* GradH);
+
+	double ShapeGradient0(FESolidElement& el, int order, int n, vec3d* GradH);
     
     //! calculate spatial gradient of shapefunctions at integration point (returns Jacobian determinant)
     double ShapeGradient(FESolidElement& el, double r, double s, double t, vec3d* GradH);

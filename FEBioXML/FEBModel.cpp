@@ -515,7 +515,16 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		// copy indices
 		vector<int> nodeList = set->NodeList();
 		int nn = (int)nodeList.size();
-		for (int j=0; j<nn; ++j) nodeList[j] = NLT[nodeList[j] - noff];
+		for (int j = 0; j < nn; ++j)
+		{
+			int nj = nodeList[j] - noff;
+			if (nj < 0 || nj >= NLT.size() || NLT[nj] < 0)
+			{
+				feLogErrorEx(&fem, "Invalid node index %d in node set %s", nodeList[j], set->Name().c_str());
+				return false;
+			}
+			nodeList[j] = NLT[nj];
+		}
 		feset->Add(nodeList);
 
 		// add it to the mesh
@@ -702,6 +711,13 @@ bool FEBModel::BuildPart(FEModel& fem, Part& part, bool buildDomains, const Tran
 		}
 
 		mesh.AddDomainList(domList);
+
+		// we'll also create an element set of this
+		FEElementSet* feset = new FEElementSet(&fem);
+		string name = "@part_list:" + string(partList->Name());
+		feset->SetName(name);
+		feset->Create(*domList);
+		mesh.AddElementSet(feset);
 	}
 
 	// create discrete element sets

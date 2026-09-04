@@ -1,29 +1,25 @@
 #include "optimizer.h"
+#include <iostream>
 using namespace febcode;
 
 Optimizer::Optimizer(Program& program) : Modifier(program) {}
 
 void Optimizer::optimize()
 {
+	removedStatements = 0;
 	AST& ast = *prg.ast;
-	for (int i = (int)ast.root.statements.size() - 1; i >= 0; --i)
-	{
-		Statement* stmt = ast.root.statements[i].get();
-
-		if (shouldRemove(stmt))
-		{
-			ast.root.statements.erase(ast.root.statements.begin() + i);
-		}
-	}
+	shouldRemoveBlockStmt(&ast.root);
 }
 
 bool Optimizer::shouldRemove(Statement* stmt)
 {
-	if (auto retStmt  = dynamic_cast<ReturnStmt*    >(stmt)) return shouldRemoveReturn   (retStmt);
-	if (auto varDecl  = dynamic_cast<VarDeclStmt*   >(stmt)) return shouldRemoveVarDecl  (varDecl);
-	if (auto exprStmt = dynamic_cast<ExpressionStmt*>(stmt)) return shouldRemoveExprStmt (exprStmt);
-	if (auto blckStmt = dynamic_cast<BlockStmt     *>(stmt)) return shouldRemoveBlockStmt(blckStmt);
-	if (auto ifStmt   = dynamic_cast<IfStmt        *>(stmt)) return shouldRemoveIfStmt   (ifStmt  );
+	if      (auto retStmt  = dynamic_cast<ReturnStmt*    >(stmt)) return shouldRemoveReturn   (retStmt);
+	else if (auto varDecl  = dynamic_cast<VarDeclStmt*   >(stmt)) return shouldRemoveVarDecl  (varDecl);
+	else if (auto exprStmt = dynamic_cast<ExpressionStmt*>(stmt)) return shouldRemoveExprStmt (exprStmt);
+	else if (auto blckStmt = dynamic_cast<BlockStmt     *>(stmt)) return shouldRemoveBlockStmt(blckStmt);
+	else if (auto ifStmt   = dynamic_cast<IfStmt        *>(stmt)) return shouldRemoveIfStmt   (ifStmt  );
+	else if (auto fncStmt  = dynamic_cast<FunctionStmt  *>(stmt)) return shouldRemoveFncStmt  (fncStmt );
+	else if (auto structStmt = dynamic_cast<StructStmt*>(stmt)) return false; // don't remove struct declarations, since they are needed for type information, even if they are not used directly.
 
 	throw std::runtime_error("Unsupported statement type in optimizer");
 }
@@ -37,26 +33,46 @@ bool Optimizer::shouldRemoveReturn(ReturnStmt* stmt)
 
 bool Optimizer::shouldRemoveVarDecl(VarDeclStmt* stmt)
 {
+	// Don't remove inputs 
+	if (stmt->input)
+	{
+		for (int i = (int)stmt->vars.size() - 1; i >= 0; i--)
+		{
+			auto& var = stmt->vars[i];
+
+			auto liveIt = live.find(var.get());
+			if (liveIt != live.end())
+				live.erase(liveIt);
+
+			auto assignedIt = assignedLater.find(var.get());
+			if (assignedIt != assignedLater.end())
+				assignedLater.erase(assignedIt);
+
+			updateLiveness(var->initializer.get());
+		}
+		return false;
+	}
+
 	// remove unused variables.
 	for (int i = (int)stmt->vars.size() - 1; i >= 0; i--)
 	{
 		auto& var = stmt->vars[i];
-		if (live.find(var.name) == live.end())
+		if (live.find(var.get()) == live.end())
 		{
-			if (assignedLater.find(var.name) != assignedLater.end())
+			if (assignedLater.find(var.get()) != assignedLater.end())
 			{
 				// the variable is assigned later, so we can't remove the declaration, 
 				// but we can remove the initializer if it exists.
-				assignedLater.erase(var.name);
-				var.initializer.reset();
+				assignedLater.erase(var.get());
+				var->initializer.reset();
 			}
 			else
 				stmt->vars.erase(stmt->vars.begin() + i);
 		}
 		else
 		{
-			live.erase(var.name);
-			updateLiveness(var.initializer.get());
+			live.erase(var.get());
+			updateLiveness(var->initializer.get());
 		}
 	}
 	return stmt->vars.empty();
@@ -72,14 +88,14 @@ bool Optimizer::shouldRemoveExprStmt(ExpressionStmt* stmt)
 
 		if (assignExpr->target->exprType == ExpressionType::Variable)
 		{
-			const auto* varExpr = static_cast<const VariableExpr*>(assignExpr->target.get());
-			if (live.find(varExpr->name) == live.end())
+			const auto* varExpr = static_cast<const VariableExpr*>(assignExpr->target.get()); assert(varExpr->var);
+			if (live.find(varExpr->var) == live.end())
 			{
 				// the variable is not live, so we can remove the assignment, but
 				// only if the value being assigned doesn't have side effects, otherwise we need to keep the assignment for the side effects.
 				if (hasSideEffects(assignExpr->value.get()))
 				{
-					assignedLater.insert(varExpr->name);
+					assignedLater.insert(varExpr->var);
 					updateLiveness(assignExpr->value.get());
 					return false; // keep the assignment for the side effects, even though the variable is not live.
 				}
@@ -88,8 +104,8 @@ bool Optimizer::shouldRemoveExprStmt(ExpressionStmt* stmt)
 			}
 			else
 			{
-				assignedLater.insert(varExpr->name);
-				live.erase(varExpr->name);
+				assignedLater.insert(varExpr->var);
+				live.erase(varExpr->var);
 				updateLiveness(assignExpr->value.get());
 				return false;
 			}
@@ -116,6 +132,15 @@ bool Optimizer::shouldRemoveBlockStmt(BlockStmt* blckStmt)
 
 		if (shouldRemove(stmt))
 		{
+			if (log)
+			{
+				std::string stmtType = febcode::StatementTypeToString(stmt->stmtType);
+
+				// log the removed statement with its source location
+				SourceLocation loc = stmt->location;
+				*log << "Removed " << stmtType << " at line " << loc.line << "\n";
+				removedStatements++;
+			}
 			blckStmt->statements.erase(blckStmt->statements.begin() + i);
 		}
 	}
@@ -133,7 +158,7 @@ bool Optimizer::shouldRemoveIfStmt(IfStmt* stmt)
 	if (stmt->elseBranch)
 	{
 		live = liveBefore; // reset live variables before processing else branch
-		bool removeElse = shouldRemove(stmt->elseBranch.get());
+		removeElse = shouldRemove(stmt->elseBranch.get());
 	}
 
 	if (removeThen && removeElse && !hasSideEffects(stmt->condition.get()))
@@ -157,6 +182,19 @@ bool Optimizer::shouldRemoveIfStmt(IfStmt* stmt)
 	}
 }
 
+bool Optimizer::shouldRemoveFncStmt(FunctionStmt* stmt)
+{
+	auto liveBefore = live; // save live variables before processing function body
+	auto assignedBefore = assignedLater;
+	live.clear();
+	assignedLater.clear();
+	shouldRemove(stmt->body.get());
+	live = liveBefore; // restore live variables before processing function body
+	assignedLater = assignedBefore; // restore assignedLater before processing function body
+
+	return false; // don't remove function declarations. Even if they are not used directly, they don't cost anything.
+}
+
 void Optimizer::updateLiveness(Expression* expr) 
 {
 	if (!expr) return;
@@ -167,7 +205,7 @@ void Optimizer::updateLiveness(Expression* expr)
 	case ExpressionType::Variable:
 	{
 		const auto* varExpr = static_cast<const VariableExpr*>(expr);
-		live.insert(varExpr->name);
+		live.insert(varExpr->var);
 		break;
 	}
 	case ExpressionType::Member:

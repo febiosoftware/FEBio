@@ -67,6 +67,7 @@ SOFTWARE.*/
 #include "FEStickyInterface.h"
 #include "FEReactiveVEMaterialPoint.h"
 #include "FELinearTrussDomain.h"
+#include "FEElasticTrussDomain.h"
 #include <FECore/FESurface.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FETrussDomain.h>
@@ -3022,34 +3023,60 @@ bool FEPlotDamage::Save(FEDomain &dom, FEDataStream& a)
 {
     if (m_comp == -1) {
         writeAverageElementValue<double>(dom, a, [](const FEMaterialPoint& pt) {
-			const FEReactiveMaterialPoint* ppd = pt.ExtractData<FEReactiveMaterialPoint>();
+			const FEReactiveMaterialPoint* prv = pt.ExtractData<FEReactiveMaterialPoint>();
 			FEElasticMixtureMaterialPoint* pem = const_cast<FEElasticMixtureMaterialPoint*>(pt.ExtractData<FEElasticMixtureMaterialPoint>());
 			FEMultigenerationMaterialPoint* pmg = const_cast<FEMultigenerationMaterialPoint*>(pt.ExtractData<FEMultigenerationMaterialPoint>());
 			double D = 0.0;
-			if (ppd) D += (float)ppd->BrokenBonds();
-			else if (pem) {
-				for (int k = 0; k < pem->Components(); ++k)
-				{
-					const FEReactiveMaterialPoint* ppd = pem->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
-					if (ppd) D += (float)ppd->BrokenBonds();
-				}
-			}
-			else if (pmg) {
-				for (int k = 0; k < pmg->Components(); ++k)
-				{
-					FEReactiveMaterialPoint* ppd = pmg->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
-					FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
-					if (ppd) D += (float)ppd->BrokenBonds();
-					else if (pem)
-					{
-						for (int l = 0; l < pem->Components(); ++l)
-						{
-							FEReactiveMaterialPoint* ppd = pem->GetPointData(l)->ExtractData<FEReactiveMaterialPoint>();
-							if (ppd) D += (float)ppd->BrokenBonds();
-						}
-					}
-				}
-			}
+            if (prv && pem) {
+                int n = 0;
+                for (int k = 0; k < pem->Components(); ++k)
+                {
+                    const FEReactiveMaterialPoint* prm = pem->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
+                    if (prm) {
+                        n++;
+                        D += (float)prm->BrokenBonds();
+                    }
+                }
+                if (n > 0) D /= n;
+            }
+            else if (prv && pmg) {
+                int n = 0;
+                for (int k = 0; k < pmg->Components(); ++k) {
+                    FEReactiveMaterialPoint* prm = pmg->GetPointData(k)->ExtractData<FEReactiveMaterialPoint>();
+                    if (prm) {
+                        n++;
+                        D += (float)prm->BrokenBonds();
+                    }
+                }
+                if (n > 0) D /= n;
+            }
+            else if (pem) {
+                int n = 0;
+                for (int k = 0; k < pem->Components(); ++k)
+                {
+                    FEElasticMixtureMaterialPoint* pep = pem->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
+                    FEDamageMaterialPoint* pdm = pep->ExtractData<FEDamageMaterialPoint>();
+                    if (pdm) {
+                        n++;
+                        D += (float)pdm->m_D;
+                    }
+                }
+                if (n > 0) D /= n;
+            }
+            else if (pmg) {
+                int n = 0;
+                for (int k = 0; k < pmg->Components(); ++k)
+                {
+                    FEMultigenerationMaterialPoint* pmp = pmg->GetPointData(k)->ExtractData<FEMultigenerationMaterialPoint>();
+                    FEDamageMaterialPoint* ppd = pmp->ExtractData<FEDamageMaterialPoint>();
+                    if (ppd) {
+                        n++;
+                        D += (float)ppd->m_D;
+                    }
+                }
+                if (n > 0) D /= n;
+            }
+            else if (prv) D += (float)prv->BrokenBonds();
             return D;
         });
         return true;
@@ -4621,15 +4648,38 @@ bool FEPlotWeakBondDevSED::Save(FEDomain& dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 bool FEPlotTrussStretch::Save(FEDomain& dom, FEDataStream& a)
 {
-	FETrussDomain* td = dynamic_cast<FETrussDomain*>(&dom);
-	if (td == nullptr) return false;
-
-	for (int i = 0; i < td->Elements(); ++i)
+	if (dynamic_cast<FELinearTrussDomain*>(&dom))
 	{
-		FETrussElement& el = td->Element(i);
-		a << el.m_lam;
+		FELinearTrussDomain* td = dynamic_cast<FELinearTrussDomain*>(&dom);
+		for (int i = 0; i < td->Elements(); ++i)
+		{
+			FETrussElement& el = td->Element(i);
+
+			double lam = 0.0;
+			int nint = el.GaussPoints();
+			for (int n = 0; n < nint; ++n)
+			{
+				// get the material point
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
+				lam += pt.m_lam;
+			}
+			lam /= (double)nint;
+			a << lam;
+		}
+		return true;
 	}
-	return true;
+	else if (dynamic_cast<FEElasticTrussDomain*>(&dom))
+	{
+		FEElasticTrussDomain* td = dynamic_cast<FEElasticTrussDomain*>(&dom);
+		for (int i = 0; i < td->Elements(); ++i)
+		{
+			FETrussElement& el = td->Element(i);
+			a << el.m_lam;
+		}
+		return true;
+	}
+	return false;
 }
 
 //=============================================================================

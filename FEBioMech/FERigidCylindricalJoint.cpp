@@ -58,7 +58,6 @@ END_FECORE_CLASS();
 //FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FENLConstraint(pfem)
 FERigidCylindricalJoint::FERigidCylindricalJoint(FEModel* pfem) : FERigidConnector(pfem)
 {
-    m_nID = m_ncount++;
     m_atol = 0;
     m_gtol = 0;
     m_qtol = 0;
@@ -117,12 +116,12 @@ quatd FERigidCylindricalJoint::Orientation() const
 bool FERigidCylindricalJoint::Init()
 {
     if (m_bd && (m_Fp != 0)) {
-		feLogError("Translation and force cannot be prescribed simultaneously in rigid connector %d (cylindrical joint)\n", m_nID+1);
+		feLogError("Translation and force cannot be prescribed simultaneously in rigid connector %d (cylindrical joint)\n", m_nID);
         return false;
     }
     
     if (m_bq && (m_Mp != 0)) {
-		feLogError("Rotation and moment cannot be prescribed simultaneously in rigid connector %d (cylindrical joint)\n", m_nID+1);
+		feLogError("Rotation and moment cannot be prescribed simultaneously in rigid connector %d (cylindrical joint)\n", m_nID);
         return false;
     }
     
@@ -795,8 +794,8 @@ bool FERigidCylindricalJoint::Augment(int naug, const FETimeInfo& tp)
     normM1 = sqrt(Um*Um);
     
     // check convergence of constraints
-    feLog(" rigid connector # %d (cylindrical joint)\n", m_nID+1);
-    feLog("                  CURRENT        REQUIRED\n");
+	feLog("\n=== rigid connector #%d (%s):\n", m_nID, GetName().c_str());
+	feLog("                  CURRENT        REQUIRED\n");
     double pctn = 0;
     double gap = c.norm();
     double qap = ksi.norm();

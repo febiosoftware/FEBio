@@ -73,7 +73,7 @@ protected:
 	// Build the matrix profile
 	void BuildMatrixProfile(FEGlobalMatrix& M) override;
 
-	void PrepStep();
+	void PrepStep() override;
 	void Update(const std::vector<double>& Ui, const std::vector<double>& ui) override;
 	void UpdateIncrements(std::vector<double>& Ui, const std::vector<double>& ui) override;
 
@@ -89,8 +89,6 @@ public:
 	int		m_laugon;	//!< enforcement method
 
 protected:
-	int		m_nID;	//!< ID of rigid joint
-
 	vector<int>		m_LM;	// Lagrange multiplier equation numbers
 
 	DECLARE_FECORE_CLASS();

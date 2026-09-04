@@ -282,6 +282,9 @@ enum SUPER_CLASS_ID {
 	FEDATARECORD_ID,				// derived from DataRecord
 	FECLASS_ID,						// derived from FECoreClass
 	FESCRIPT_ID,					// derived from FEScriptedBehavior
+	FELOGNODEDEFINITION_ID,			// derived from FELogNodeDefinition
+	FELOGFACEDEFINITION_ID,			// derived from FELogFaceDefinition
+	FELOGELEMDEFINITION_ID,			// derived from FELogElemDefinition
 };
 
 //-----------------------------------------------------------------------------

@@ -25,11 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include "FELogData.h"
+#include "FEFunction1D.h"
 
 class FEElement;
 
+class FECORE_API FELogElemSource : public FELogData
+{
+public:
+	FELogElemSource(FEModel* fem) : FELogData(fem) {}
+	virtual double value(FEElement& el) = 0;
+};
+
 //! Base class for element log data
-class FECORE_API FELogElemData : public FELogData
+class FECORE_API FELogElemData : public FELogElemSource
 {
 	FECORE_SUPER_CLASS(FELOGELEMDATA_ID)
 	FECORE_BASE_CLASS(FELogElemData)
@@ -37,5 +45,47 @@ class FECORE_API FELogElemData : public FELogData
 public:
 	FELogElemData(FEModel* fem);
 	virtual ~FELogElemData();
-	virtual double value(FEElement& el) = 0;
+};
+
+//! Base class for element log data definitions 
+class FECORE_API FELogElemDefinition : public FELogElemSource
+{
+	FECORE_SUPER_CLASS(FELOGELEMDEFINITION_ID)
+	FECORE_BASE_CLASS(FELogElemData)
+
+public:
+	FELogElemDefinition(FEModel* fem) : FELogElemSource(fem) {}
+};
+
+class FECORE_API FELogElemAlias : public FELogElemDefinition
+{
+public:
+	FELogElemAlias(FEModel* fem);
+
+	bool Init() override;
+
+	double value(FEElement& el) override;
+
+private:
+	std::string m_var;
+
+	FELogElemData* m_pdata = nullptr;
+
+	DECLARE_FECORE_CLASS();
+};
+
+class FECORE_API FELogElemFunction : public FELogElemDefinition
+{
+public:
+	FELogElemFunction(FEModel* fem);
+	bool Init() override;
+	double value(FEElement& el) override;
+
+private:
+	std::string m_var;
+	FEFunction1D* m_func = nullptr;
+
+	FELogElemSource* m_pdata = nullptr;
+
+	DECLARE_FECORE_CLASS();
 };

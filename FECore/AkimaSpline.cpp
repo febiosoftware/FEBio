@@ -93,7 +93,7 @@ bool AkimaSpline::init(const std::vector<vec2d>& p)
     // extract m sequence
     std::vector<double> m(ncoef-1);
     for (int i=0; i< ncoef-1; ++i)
-        m[i] = (p[i+1].y()-p[i].y())/(p[i+1].x()-p[i].x());
+        m[i] = (p[i+1].y-p[i].y)/(p[i+1].x-p[i].x);
     
     // extract slopes s
     const double eps = 10*std::numeric_limits<double>::epsilon();
@@ -111,26 +111,26 @@ bool AkimaSpline::init(const std::vector<vec2d>& p)
 
     // evaluate knots and coefficients
     if (ncoef == 2) {
-        double dx = p[1].x()-p[0].x();
+        double dx = p[1].x-p[0].x;
         if (fabs(dx) <= eps) return false;
-        im->xknot[0] = p[0].x();
-        im->xknot[1] = p[1].x();
-        im->acoef[0] = p[0].y();
+        im->xknot[0] = p[0].x;
+        im->xknot[1] = p[1].x;
+        im->acoef[0] = p[0].y;
         im->bcoef[0] = s[0];
         im->ccoef[0] = 0;
         im->dcoef[0] = 0;
     }
     else {
         for (int i=0; i<ncoef-1; ++i) {
-            double dx = p[i+1].x()-p[i].x();
+            double dx = p[i+1].x-p[i].x;
             if (fabs(dx) <= eps) return false;
-            im->xknot[i] = p[i].x();
-            im->acoef[i] = p[i].y();
+            im->xknot[i] = p[i].x;
+            im->acoef[i] = p[i].y;
             im->bcoef[i] = s[i];
             im->ccoef[i] = (3*m[i] - 2*s[i] - s[i+1])/dx;
             im->dcoef[i] = (s[i] + s[i+1] - 2*m[i])/(dx*dx);
         }
-        im->xknot[ncoef-1] = p[ncoef-1].x();
+        im->xknot[ncoef-1] = p[ncoef-1].x;
     }
     
     return true;
