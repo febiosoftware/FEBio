@@ -55,6 +55,8 @@ public:
 
 	void UseIterativeFactorization(bool b);
 
+    void EnableInternalScaling(bool b);
+
 protected:
 
 	CompactMatrix*	m_pA;
@@ -66,6 +68,7 @@ protected:
 	double m_dparm[64];
 
 	bool m_iparm3;	// use direct-iterative method
+    bool m_iparm11; // enable/disable internal two-sided scaling/equilibration
 
 	// Matrix data
 	int m_n, m_nnz, m_nrhs;

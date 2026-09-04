@@ -90,6 +90,7 @@ void print_err(int nerror)
 BEGIN_FECORE_CLASS(PardisoSolver, LinearSolver)
 	ADD_PARAMETER(m_print_cn, "print_condition_number");
 	ADD_PARAMETER(m_iparm3  , "precondition");
+    ADD_PARAMETER(m_iparm11 , "internal_scaling");
 	ADD_PARAMETER(m_msglvl  , "msglvl");
 END_FECORE_CLASS();
 
@@ -99,6 +100,7 @@ PardisoSolver::PardisoSolver(FEModel* fem) : LinearSolver(fem), m_pA(0)
 	m_print_cn = false;
 	m_mtype = -2;
 	m_iparm3 = false;
+    m_iparm11 = false;
 	m_isFactored = false;
 	m_msglvl = 0; /* 0 Suppress printing, 1 Print statistical information */
 }
@@ -121,6 +123,12 @@ void PardisoSolver::PrintConditionNumber(bool b)
 void PardisoSolver::UseIterativeFactorization(bool b)
 {
 	m_iparm3 = b;
+}
+
+//-----------------------------------------------------------------------------
+void PardisoSolver::EnableInternalScaling(bool b)
+{
+    m_iparm11 = b;
 }
 
 //-----------------------------------------------------------------------------

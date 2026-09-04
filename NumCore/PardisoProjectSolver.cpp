@@ -71,8 +71,9 @@ void print_err_pdl(int nerror)
 //////////////////////////////////////////////////////////////
 
 BEGIN_FECORE_CLASS(PardisoProjectSolver, LinearSolver)
-ADD_PARAMETER(m_print_cn, "print_condition_number");
-ADD_PARAMETER(m_iparm3  , "precondition");
+    ADD_PARAMETER(m_print_cn, "print_condition_number");
+    ADD_PARAMETER(m_iparm3  , "precondition");
+    ADD_PARAMETER(m_iparm11 , "internal_scaling");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -105,6 +106,12 @@ void PardisoProjectSolver::PrintConditionNumber(bool b)
 void PardisoProjectSolver::UseIterativeFactorization(bool b)
 {
     m_iparm3 = b;
+}
+
+//-----------------------------------------------------------------------------
+void PardisoProjectSolver::EnableInternalScaling(bool b)
+{
+    m_iparm11 = b;
 }
 
 //-----------------------------------------------------------------------------

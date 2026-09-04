@@ -41,6 +41,8 @@ SOFTWARE.*/
 #include "BlockSolver.h"
 #include "BiCGStabSolver.h"
 #include "StrategySolver.h"
+#include "PastixSparseSolver.h"
+#include "MumpsSparseSolver.h"
 #include <FECore/fecore_enum.h>
 #include <FECore/FECoreFactory.h>
 #include <FECore/FECoreKernel.h>
@@ -75,7 +77,9 @@ NUMCORE_API void NumCore::InitModule()
 	REGISTER_FECORE_CLASS(StrategySolver      , "strategy");
 	REGISTER_FECORE_CLASS(TestSolver          , "test");
     REGISTER_FECORE_CLASS(AccelerateSparseSolver, "accelerate");
-    REGISTER_FECORE_CLASS(SuperLU_MT_Solver     , "superlu_mt");
+    REGISTER_FECORE_CLASS(SuperLU_MT_Solver   , "superlu_mt");
+    REGISTER_FECORE_CLASS(PastixSparseSolver  , "pastix");
+    REGISTER_FECORE_CLASS(MumpsSparseSolver   , "mumps");
 
 	// register preconditioners
 	REGISTER_FECORE_CLASS(ILU0_Preconditioner, "ilu0");
