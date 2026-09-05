@@ -78,7 +78,6 @@ bool PastixSparseSolver::PreProcess()
 
     pastixInitParam(m_iparm, m_dparm);
 
-//    m_iparm[IPARM_MODIFY_PARAMETER] = 1;
     m_iparm[IPARM_FLOAT]            = PastixDouble;
     m_iparm[IPARM_MTX_TYPE]         = m_mtype;
     m_iparm[IPARM_FACTORIZATION]    = (m_mtype == SpmSymmetric) ? PastixFactLDLT : PastixFactLU;
@@ -88,7 +87,7 @@ bool PastixSparseSolver::PreProcess()
     
     // --- Ordering ---
     // Choose one; benchmark both on your real meshes
-    m_iparm[IPARM_ORDERING] = PastixOrderMetis;   // or PastixOrderScotch
+    m_iparm[IPARM_ORDERING] = PastixOrderScotch;   // or PastixOrderMetis
     
     // --- Static pivoting / numerical stability ---
     m_iparm[IPARM_STATIC_PIVOTING] = 1;              // enable
@@ -103,8 +102,8 @@ bool PastixSparseSolver::PreProcess()
     m_iparm[IPARM_REFINEMENT] = PastixRefineGMRES;
     
     // --- Threading / scheduler ---
-    m_iparm[IPARM_THREAD_NBR] = 18;                    // set explicitly, don't rely on default
-    m_iparm[IPARM_SCHEDULER]  = PastixSchedDynamic;   // or PastixSchedStatic, PastixSchedSequential,
+    m_iparm[IPARM_THREAD_NBR] = -1;                    // auto-detect
+    m_iparm[IPARM_SCHEDULER]  = PastixSchedDynamic;    // or PastixSchedStatic, PastixSchedSequential,
     // PastixSchedParsec, PastixSchedStarPU
     // (Parsec/StarPU require the runtime to be built in)
     
@@ -116,7 +115,7 @@ bool PastixSparseSolver::PreProcess()
     m_dparm[DPARM_COMPRESS_TOLERANCE]  = 1e-8;  // compression accuracy tradeoff
     
     // --- Verbosity (useful while tuning) ---
-    m_iparm[IPARM_VERBOSE] = PastixVerboseYes;  // or PastixVerboseNo / PastixVerboseNot
+    m_iparm[IPARM_VERBOSE] = PastixVerboseNot;  // or PastixVerboseYes / PastixVerboseNo
     
     // Then proceed as usual:
     pastix_data_t *pastix_data = nullptr;
