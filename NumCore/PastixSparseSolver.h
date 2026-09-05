@@ -32,6 +32,7 @@
 #include "numcore_api.h"
 
 #include <pastix.h>
+#include "/usr/local/include/metis.h"
 #include <vector>
 
 class PastixSparseSolver : public LinearSolver
@@ -68,5 +69,10 @@ private:
     bool m_initialized = false;
     bool m_factored = false;
 
+    std::vector<double> m_scale;        // diagonal scaling factors, size n
+    std::vector<double> m_scaledValues; // scaled copy of matrix values, size nnz
+    
+    bool ComputeAndApplyScaling();
+    
     bool CopyPatternToPastix();
 };

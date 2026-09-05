@@ -30,6 +30,9 @@
 #include <FECore/log.h>
 #include <cstring>
 #include <iostream>
+#include <pastix.h>
+#include <spm.h>
+#include <cmath>
 
 PastixSparseSolver::PastixSparseSolver(FEModel* fem)
     : LinearSolver(fem)
@@ -75,19 +78,49 @@ bool PastixSparseSolver::PreProcess()
 
     pastixInitParam(m_iparm, m_dparm);
 
-    m_iparm[IPARM_MODIFY_PARAMETER] = 1;
-    m_iparm[IPARM_THREAD_NBR]       = 1;
-    m_iparm[IPARM_VERBOSE]          = PastixVerboseNot;
+//    m_iparm[IPARM_MODIFY_PARAMETER] = 1;
     m_iparm[IPARM_FLOAT]            = PastixDouble;
     m_iparm[IPARM_MTX_TYPE]         = m_mtype;
     m_iparm[IPARM_FACTORIZATION]    = (m_mtype == SpmSymmetric) ? PastixFactLDLT : PastixFactLU;
-    m_iparm[IPARM_REFINEMENT]       = PastixRefineGMRES;
     m_iparm[IPARM_ITERMAX]          = 100;
-    m_iparm[IPARM_MC64]             = 1;
-    m_iparm[IPARM_ORDERING]         = PastixOrderScotch;
-    m_iparm[35]          = 2;    // enable internal two-sided scaling/equilibration
-
-    pastixInit(&m_pastix, 0, m_iparm, m_dparm);
+    
+    // new stuff recommended by Claude:
+    
+    // --- Ordering ---
+    // Choose one; benchmark both on your real meshes
+    m_iparm[IPARM_ORDERING] = PastixOrderMetis;   // or PastixOrderScotch
+    
+    // --- Static pivoting / numerical stability ---
+    m_iparm[IPARM_STATIC_PIVOTING] = 1;              // enable
+    m_dparm[DPARM_EPSILON_MAGN_CTRL] = 1e-31;        // magnitude control threshold
+    // (tune per problem; smaller = stricter)
+    
+    // --- Iterative refinement after the direct solve ---
+    m_iparm[IPARM_ITERMAX] = 20;                      // max refinement iterations
+    m_dparm[DPARM_EPSILON_REFINEMENT] = 1e-12;        // convergence tolerance
+    // iparm[IPARM_REFINEMENT] can select the refinement algorithm,
+    // e.g. PastixRefineGMRES (default) vs PastixRefineBiCGSTAB, etc.
+    m_iparm[IPARM_REFINEMENT] = PastixRefineGMRES;
+    
+    // --- Threading / scheduler ---
+    m_iparm[IPARM_THREAD_NBR] = 18;                    // set explicitly, don't rely on default
+    m_iparm[IPARM_SCHEDULER]  = PastixSchedDynamic;   // or PastixSchedStatic, PastixSchedSequential,
+    // PastixSchedParsec, PastixSchedStarPU
+    // (Parsec/StarPU require the runtime to be built in)
+    
+    // --- Block low-rank compression (memory/speed for large 3D problems) ---
+    m_iparm[IPARM_COMPRESS_WHEN]       = PastixCompressWhenDuring; // or PastixCompressBegin / PastixCompressNever
+    m_iparm[IPARM_COMPRESS_METHOD]     = PastixCompressMethodPQRCP; // or PastixCompressMethodSVD
+    m_iparm[IPARM_COMPRESS_MIN_WIDTH]  = 128;   // min supernode width to consider compressing
+    m_iparm[IPARM_COMPRESS_MIN_HEIGHT] = 20;    // min off-diagonal block height to compress
+    m_dparm[DPARM_COMPRESS_TOLERANCE]  = 1e-8;  // compression accuracy tradeoff
+    
+    // --- Verbosity (useful while tuning) ---
+    m_iparm[IPARM_VERBOSE] = PastixVerboseYes;  // or PastixVerboseNo / PastixVerboseNot
+    
+    // Then proceed as usual:
+    pastix_data_t *pastix_data = nullptr;
+    pastixInit(&m_pastix, MPI_COMM_WORLD, m_iparm, m_dparm);
 
     m_initialized = true;
     m_factored = false;
@@ -127,79 +160,84 @@ bool PastixSparseSolver::Factor()
 {
     if (m_pA == nullptr) return false;
     if (m_pA->Rows() == 0) return true;
-
+    
     if (!m_initialized) {
         if (!PreProcess()) return false;
     }
-
+    
     if (!CopyPatternToPastix()) return false;
-
+    
+    // NEW: compute diagonal scaling and produce a scaled copy of the values
+    // (matrix values change every Newton reformation, so recompute each Factor() call)
+    if (!ComputeAndApplyScaling()) return false;
+    
     std::vector<double> dummy_rhs(m_n, 0.0);
-
+    
     m_iparm[IPARM_START_TASK] = PastixTaskOrdering;
     m_iparm[IPARM_END_TASK]   = PastixTaskNumfact;
-
+    
     int ierr = pastix(
-        &m_pastix,
-        0,
-        static_cast<pastix_int_t>(m_n),
-        m_colptr.data(),
-        m_rowind.data(),
-        m_pA->Values(),
-        m_perm.data(),
-        m_invp.data(),
-        dummy_rhs.data(),
-        static_cast<pastix_int_t>(m_nrhs),
-        m_iparm,
-        m_dparm
-    );
-
-// For debugging
-//    feLog("Number of refinement iterations: %d\n", m_iparm[IPARM_NBITER]);
+                      &m_pastix,
+                      0,
+                      static_cast<pastix_int_t>(m_n),
+                      m_colptr.data(),
+                      m_rowind.data(),
+                      m_scaledValues.data(),      // CHANGED: was m_pA->Values()
+                      m_perm.data(),
+                      m_invp.data(),
+                      dummy_rhs.data(),
+                      static_cast<pastix_int_t>(m_nrhs),
+                      m_iparm,
+                      m_dparm
+                      );
     
     if (ierr != 0) {
         std::cerr << "PaStiX factorization error: " << ierr << std::endl;
         return false;
     }
-
+    
     m_factored = true;
     return true;
 }
-
 bool PastixSparseSolver::BackSolve(double* x, double* b)
 {
     if (m_pA == nullptr) return false;
     if (m_pA->Rows() == 0) return true;
     if (!m_factored) return false;
-
-    // PaStiX overwrites RHS with the solution.
-    std::vector<double> rhs(b, b + m_n);
-
+    
+    std::vector<double> rhs(m_n);
+    for (int i = 0; i < m_n; ++i)
+        rhs[i] = m_scale[i] * b[i];
+    
     m_iparm[IPARM_START_TASK] = PastixTaskSolve;
     m_iparm[IPARM_END_TASK]   = PastixTaskRefine;
-
+    m_iparm[IPARM_TRANSPOSE_SOLVE] = PastixTrans;   // NEW: compensate for CRSSparseMatrix's
+    // row-major storage being fed to PaStiX's
+    // column-major colptr/rowind parameters
+    
     int ierr = pastix(
-        &m_pastix,
-        0,
-        static_cast<pastix_int_t>(m_n),
-        m_colptr.data(),
-        m_rowind.data(),
-        m_pA->Values(),
-        m_perm.data(),
-        m_invp.data(),
-        rhs.data(),
-        static_cast<pastix_int_t>(m_nrhs),
-        m_iparm,
-        m_dparm
-    );
-
+                      &m_pastix,
+                      0,
+                      static_cast<pastix_int_t>(m_n),
+                      m_colptr.data(),
+                      m_rowind.data(),
+                      m_scaledValues.data(),
+                      m_perm.data(),
+                      m_invp.data(),
+                      rhs.data(),
+                      static_cast<pastix_int_t>(m_nrhs),
+                      m_iparm,
+                      m_dparm
+                      );
+    
     if (ierr != 0) {
         std::cerr << "PaStiX solve error: " << ierr << std::endl;
         return false;
     }
-
-    std::memcpy(x, rhs.data(), sizeof(double) * m_n);
-
+    
+    for (int i = 0; i < m_n; ++i)
+        x[i] = m_scale[i] * rhs[i];
+    
     UpdateStats(1);
     return true;
 }
@@ -217,4 +255,71 @@ void PastixSparseSolver::Destroy()
     m_rowind.clear();
     m_perm.clear();
     m_invp.clear();
+}
+
+// Computes symmetric diagonal (Jacobi-type) scaling: scale[i] = 1/sqrt(|A_ii|),
+// and produces a scaled copy of the matrix values: A'_ij = scale[i] * A_ij * scale[j].
+// This compensates for PaStiX 6.4's lack of an MC64-equivalent matching/scaling step.
+bool PastixSparseSolver::ComputeAndApplyScaling()
+{
+    const int n   = m_n;
+    const int nnz = static_cast<int>(m_rowind.size());
+    
+    m_scale.assign(n, 1.0);
+    m_scaledValues.resize(nnz);
+    
+    double* values = m_pA->Values();
+    
+    // --- Step 1: determine partition boundaries from FEBio's own block structure ---
+    // (m_part is inherited from LinearSolver; set via SetPartitions() before Factor())
+    int nparts = Partitions();
+    std::vector<int> partStart(nparts + 1, 0);
+    for (int p = 0; p < nparts; ++p)
+        partStart[p + 1] = partStart[p] + GetPartitionSize(p);
+    
+    // Map each equation index to its partition id
+    std::vector<int> partOf(n, 0);
+    for (int p = 0; p < nparts; ++p)
+        for (int i = partStart[p]; i < partStart[p + 1]; ++i)
+            partOf[i] = p;
+    
+    // --- Step 2: find max |A_ij| touching each row/column, accumulated per partition ---
+    std::vector<double> maxAbsPart(nparts, 0.0);
+    
+    for (int col = 0; col < n; ++col)
+    {
+        int colPart = partOf[col];
+        for (pastix_int_t idx = m_colptr[col]; idx < m_colptr[col + 1]; ++idx)
+        {
+            int row = static_cast<int>(m_rowind[idx]);
+            double v = std::abs(values[idx]);
+            int rowPart = partOf[row];
+            if (v > maxAbsPart[rowPart]) maxAbsPart[rowPart] = v;
+            if (v > maxAbsPart[colPart]) maxAbsPart[colPart] = v;
+        }
+    }
+    
+    // --- Step 3: one scale factor per partition (not per equation) ---
+    std::vector<double> scalePart(nparts, 1.0);
+    for (int p = 0; p < nparts; ++p)
+    {
+        if (maxAbsPart[p] > 1e-30)
+            scalePart[p] = 1.0 / std::sqrt(maxAbsPart[p]);
+    }
+    
+    for (int i = 0; i < n; ++i)
+        m_scale[i] = scalePart[partOf[i]];
+    
+    // --- Step 4: apply A'_ij = scale[i] * A_ij * scale[j] ---
+    for (int col = 0; col < n; ++col)
+    {
+        double sCol = m_scale[col];
+        for (pastix_int_t idx = m_colptr[col]; idx < m_colptr[col + 1]; ++idx)
+        {
+            int row = static_cast<int>(m_rowind[idx]);
+            m_scaledValues[idx] = values[idx] * m_scale[row] * sCol;
+        }
+    }
+    
+    return true;
 }
