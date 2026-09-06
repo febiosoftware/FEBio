@@ -92,5 +92,7 @@ public:
 private:
     Implementation*    imp;
         
+    bool ComputeAndApplyScaling();
+
     DECLARE_FECORE_CLASS();
 };

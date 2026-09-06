@@ -32,6 +32,8 @@
 #include "AccelerateSparseSolver.h"
 #include "MatrixTools.h"
 #include <FECore/log.h>
+#include <cmath>
+#include <vector>
 
 #ifdef HAS_ACCEL
 
@@ -54,6 +56,10 @@ public:
     SparseIterativeStatus_t SStatus;
 #endif
     
+    // NEW: partition-aware diagonal scaling
+    std::vector<double> m_scale;
+    std::vector<double> m_scaledValues;
+
     // solver control parameters
     
     
@@ -315,6 +321,9 @@ bool AccelerateSparseSolver::Factor()
 
     if (__builtin_available(macOS 10.13, *)) {
 
+        // NEW: compute partition-aware scaling before handing values to Accelerate
+        if (!ComputeAndApplyScaling()) return false;
+
         // create the sparse matrix
         imp->A.data = imp->m_pA->Values();
         imp->A.structure = imp->SMS;
@@ -373,6 +382,11 @@ bool AccelerateSparseSolver::BackSolve(double* x, double* b)
     if (imp->m_pA->Rows() == 0) return true;
     if ((!imp->m_iparm3) && (imp->m_isFactored == false)) return true;
     
+    // NEW: scale RHS -- b' = D * b
+    std::vector<double> bs(imp->m_n);
+    for (int i = 0; i < imp->m_n; ++i)
+        bs[i] = imp->m_scale[i] * b[i];
+
     DenseVector_Double X, B;
     X.count = B.count = imp->m_n;
     X.data = x; B.data = b;
@@ -534,3 +548,69 @@ void AccelerateSparseSolver::SetFactorizationType(int ftype) {}
 void AccelerateSparseSolver::SetPrintLevel(int printlevel) {}
 bool AccelerateSparseSolver::IsIterative() const { return false; }
 #endif
+
+// Computes symmetric diagonal (Jacobi-type) scaling: scale[i] = 1/sqrt(|A_ii|),
+// and produces a scaled copy of the matrix values: A'_ij = scale[i] * A_ij * scale[j].
+// This compensates for PaStiX 6.4's lack of an MC64-equivalent matching/scaling step.
+//-----------------------------------------------------------------------------
+bool AccelerateSparseSolver::ComputeAndApplyScaling()
+{
+    const int n   = imp->m_n;
+    const int nnz = imp->m_nnz;
+
+    imp->m_scale.assign(n, 1.0);
+    imp->m_scaledValues.resize(nnz);
+
+    double* values  = imp->m_pA->Values();
+    int*    pointers = imp->m_pA->Pointers();  // column starts, size n+1, 0-based
+    int*    indices  = imp->m_pA->Indices();   // row indices per column
+
+    // --- Determine partition boundaries from FEBio's own block structure ---
+    int nparts = Partitions();
+    std::vector<int> partStart(nparts + 1, 0);
+    for (int p = 0; p < nparts; ++p)
+        partStart[p + 1] = partStart[p] + GetPartitionSize(p);
+
+    std::vector<int> partOf(n, 0);
+    for (int p = 0; p < nparts; ++p)
+        for (int i = partStart[p]; i < partStart[p + 1]; ++i)
+            partOf[i] = p;
+
+    // --- Max |A_ij| touching each row/column, accumulated per partition ---
+    std::vector<double> maxAbsPart(nparts, 0.0);
+
+    for (int col = 0; col < n; ++col)
+    {
+        int colPart = partOf[col];
+        for (int idx = pointers[col]; idx < pointers[col + 1]; ++idx)
+        {
+            int row = indices[idx];
+            double v = std::abs(values[idx]);
+            int rowPart = partOf[row];
+            if (v > maxAbsPart[rowPart]) maxAbsPart[rowPart] = v;
+            if (v > maxAbsPart[colPart]) maxAbsPart[colPart] = v;
+        }
+    }
+
+    // --- One scale factor per partition ---
+    std::vector<double> scalePart(nparts, 1.0);
+    for (int p = 0; p < nparts; ++p)
+        if (maxAbsPart[p] > 1e-30)
+            scalePart[p] = 1.0 / std::sqrt(maxAbsPart[p]);
+
+    for (int i = 0; i < n; ++i)
+        imp->m_scale[i] = scalePart[partOf[i]];
+
+    // --- Apply A'_ij = scale[i] * A_ij * scale[j] ---
+    for (int col = 0; col < n; ++col)
+    {
+        double sCol = imp->m_scale[col];
+        for (int idx = pointers[col]; idx < pointers[col + 1]; ++idx)
+        {
+            int row = indices[idx];
+            imp->m_scaledValues[idx] = values[idx] * imp->m_scale[row] * sCol;
+        }
+    }
+
+    return true;
+}
