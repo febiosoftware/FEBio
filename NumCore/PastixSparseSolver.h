@@ -32,7 +32,6 @@
 #include "numcore_api.h"
 
 #include <pastix.h>
-#include "/usr/local/include/metis.h"
 #include <vector>
 
 class PastixSparseSolver : public LinearSolver
