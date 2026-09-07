@@ -181,12 +181,12 @@ public:
 BEGIN_FECORE_CLASS(AccelerateSparseSolver, LinearSolver)
     ADD_PARAMETER(imp->m_print_cn   , "print_condition_number");
     ADD_PARAMETER(imp->m_iparm3     , "iterative");   // legacy; folded into "strategy"
-    ADD_PARAMETER(imp->m_sstrategy  , "strategy");
+    ADD_PARAMETER(imp->m_sstrategy  , "strategy")->setEnums("direct\0iterative\0factor_preconditioned\0");
     ADD_PARAMETER(imp->m_pcMaxAge   , "preconditioner_max_age");
-    ADD_PARAMETER(imp->m_sftype     , "factorization");
-    ADD_PARAMETER(imp->m_sordmthd   , "order_method");
-    ADD_PARAMETER(imp->m_sitrmthd   , "iterative_method");
-    ADD_PARAMETER(imp->m_sprecond   , "preconditioner");
+    ADD_PARAMETER(imp->m_sftype     , "factorization")->setEnums("Cholesky\0LDLT\0LDLT_unpivoted\0LDLT_SBK\0LDLT_TPP\0QR\0CholeskyATA\0default\0LU\0LU_unpivoted\0LU_SPP\0LU_TPP\0");
+    ADD_PARAMETER(imp->m_sordmthd   , "order_method")->setEnums("AMD\0METIS\0COLAMD\0default\0");
+    ADD_PARAMETER(imp->m_sitrmthd   , "iterative_method")->setEnums("CG\0GMRES\0DQGMRES\0FGMRES\0LSMR\0");
+    ADD_PARAMETER(imp->m_sprecond   , "preconditioner")->setEnums("none\0diagonal\0diag_scaling\0");
     ADD_PARAMETER(imp->m_maxiter    , "max_iter");
     ADD_PARAMETER(imp->m_nvec       , "nvec");
     ADD_PARAMETER(imp->m_print_level, "print_level");
