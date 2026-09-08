@@ -192,8 +192,8 @@ BEGIN_FECORE_CLASS(AccelerateSparseSolver, LinearSolver)
     ADD_PARAMETER(imp->m_print_level, "print_level");
     ADD_PARAMETER(imp->m_rtol       , "rtol");
     ADD_PARAMETER(imp->m_atol       , "atol");
-    ADD_PARAMETER(imp->m_sscaling   , "partition_scaling");
-    ADD_PARAMETER(imp->m_sfscaling  , "factor_scaling");
+    ADD_PARAMETER(imp->m_sscaling   , "partition_scaling")->setEnums("off\0on\0");
+    ADD_PARAMETER(imp->m_sfscaling  , "factor_scaling")->setEnums("none\0equilibration-inf\0default\0");
     ADD_PARAMETER(imp->m_pivotTol   , "pivot_tolerance");
 END_FECORE_CLASS();
 
