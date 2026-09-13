@@ -53,7 +53,7 @@ void FEFluidResidualVector::Assemble(vector<int>& en, vector<int>& elm, vector<d
     
     vec3d a, d;
     
-    //#pragma omp critical
+#pragma omp critical
     {
         // assemble the element residual into the global residual
         int ndof = (int)fe.size();
