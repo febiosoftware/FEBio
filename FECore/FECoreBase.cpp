@@ -169,11 +169,25 @@ bool FECoreBase::SetParameters(const FEClassDescriptor::ClassVariable& cv)
 		{
 			// could be a property
 			const FEClassDescriptor::ClassVariable* ci = dynamic_cast<const FEClassDescriptor::ClassVariable*>(vari);
-			assert(ci);
+
+			// A SimpleVariable whose name matches neither a parameter nor a
+			// property ends up here, and the dynamic_cast above yields null.
+			// assert() is compiled out in release builds, so the ci->m_name
+			// dereference below used to turn a misspelled entry in a config
+			// file into a segfault with no diagnostic at all. Report it.
+			if (ci == nullptr)
+			{
+				feLogError("\"%s\" is not a valid parameter of \"%s\".", vari->m_name.c_str(), GetTypeStr());
+				return false;
+			}
 
 			// find the property
-			FEProperty* prop = FindProperty(ci->m_name.c_str()); assert(prop);
-			if (prop == nullptr) return false;
+			FEProperty* prop = FindProperty(ci->m_name.c_str());
+			if (prop == nullptr)
+			{
+				feLogError("\"%s\" is not a valid property of \"%s\".", ci->m_name.c_str(), GetTypeStr());
+				return false;
+			}
 
 			// allocate a new child class
 			FECoreBase* pc = fecore_new<FECoreBase>(prop->GetSuperClassID(), ci->m_type.c_str(), GetFEModel()); assert(pc);

@@ -395,7 +395,12 @@ endif()
 
 # Link Accelerate framework
 if (APPLE)
+  if(${OpenMP_C_FOUND})
+    add_compile_options(-Xpreprocessor -fopenmp)
+  endif()
   target_link_libraries(numcore PRIVATE "-framework Accelerate")
+  target_include_directories(febiomech PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
+  target_include_directories(numcore PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
 endif()
 
 # Link MMG

@@ -67,6 +67,9 @@ public:
 	double	m_tol;
 	int		m_print_level;
 	double	m_amg_tol;
+	int		m_amg_maxiter;	// AMG cycles per preconditioner application
+	int		m_kdim;			// GMRES restart (Krylov subspace dimension)
+	bool	m_symmetric;	// use CG instead of FlexGMRES (requires an SPD matrix)
 
 public:
 	Implementation() : A(0)
@@ -74,7 +77,21 @@ public:
 		m_print_level = 0;
 		m_maxiter = 1000;
 		m_tol = 1e-7;
-		m_amg_tol = 1e-7;
+
+		// As a PRECONDITIONER, AMG should apply a single V-cycle with no
+		// convergence test of its own. The previous defaults (tol 1e-7, up to
+		// m_maxiter cycles) ran AMG all the way to convergence on every single
+		// preconditioner application, which is enormously more work than the
+		// outer Krylov method needs.
+		m_amg_tol = 0.0;
+		m_amg_maxiter = 1;
+
+		m_kdim = 30;
+
+		// Default to FlexGMRES. CG is only valid for a symmetric positive
+		// definite matrix; every FEBio fluid solver sets
+		// m_msymm = REAL_UNSYMMETRIC, so CG has no convergence guarantee there.
+		m_symmetric = false;
 
 		m_iters = 0;
 
@@ -201,8 +218,8 @@ public:
 		HYPRE_BoomerAMGSetAggNumLevels(precond, 1);			// One level of aggressive coarsening
 		HYPRE_BoomerAMGSetNumPaths(precond, 1);				// Number of paths of length 2 for aggressive coarsening
 		HYPRE_BoomerAMGSetInterpType(precond, 6);			// Extended+i interpolation
-		HYPRE_BoomerAMGSetMaxIter(precond, m_maxiter);      // Set maximum iterations
-		HYPRE_BoomerAMGSetTol(precond, m_amg_tol);			// conv. tolerance
+		HYPRE_BoomerAMGSetMaxIter(precond, m_amg_maxiter);	// cycles per preconditioner application (1 = single V-cycle)
+		HYPRE_BoomerAMGSetTol(precond, m_amg_tol);			// conv. tolerance (0 = no convergence test)
 
 		FESolver* fesolve = m_fem->GetCurrentStep()->GetFESolver();
 
@@ -238,40 +255,76 @@ public:
 	// allocate solver
 	void allocSolver()
 	{
-		// Create the solver object
-		HYPRE_ParCSRPCGCreate(MPI_COMM_WORLD, &solver);
+		if (m_symmetric)
+		{
+			// Conjugate gradient. Valid ONLY for a symmetric positive definite
+			// matrix. Kept as an opt-in for problems that genuinely are SPD.
+			HYPRE_ParCSRPCGCreate(MPI_COMM_WORLD, &solver);
 
-		/* Set some parameters (See Reference Manual for more parameters) */
-		HYPRE_PCGSetTwoNorm(solver, 1);
-		HYPRE_PCGSetTol(solver, m_tol);
+			HYPRE_PCGSetTwoNorm(solver, 1);
+			HYPRE_PCGSetTol(solver, m_tol);
+			// NOTE: this call was missing entirely, so "maxiter" never limited
+			// the Krylov iterations -- it was being applied to the AMG
+			// preconditioner instead.
+			HYPRE_PCGSetMaxIter(solver, m_maxiter);
+			if (m_print_level > 1) HYPRE_PCGSetPrintLevel(solver, 2);
 
-		// Set the preconditioner
-		HYPRE_ParCSRPCGSetPrecond(solver, (HYPRE_PtrToParSolverFcn) HYPRE_BoomerAMGSolve,
-			(HYPRE_PtrToParSolverFcn) HYPRE_BoomerAMGSetup, precond);
+			HYPRE_ParCSRPCGSetPrecond(solver, (HYPRE_PtrToParSolverFcn) HYPRE_BoomerAMGSolve,
+				(HYPRE_PtrToParSolverFcn) HYPRE_BoomerAMGSetup, precond);
+		}
+		else
+		{
+			// Flexible GMRES: makes no symmetry assumption, so it is the correct
+			// Krylov method for the unsymmetric systems the fluid/CFD solvers
+			// produce. "Flexible" also permits the preconditioner to vary
+			// between iterations, which a multigrid cycle technically does.
+			HYPRE_ParCSRFlexGMRESCreate(MPI_COMM_WORLD, &solver);
+
+			HYPRE_FlexGMRESSetKDim(solver, m_kdim);
+			HYPRE_FlexGMRESSetTol(solver, m_tol);
+			HYPRE_FlexGMRESSetMaxIter(solver, m_maxiter);
+			if (m_print_level > 1) HYPRE_FlexGMRESSetPrintLevel(solver, 2);
+
+			HYPRE_FlexGMRESSetPrecond(solver, (HYPRE_PtrToSolverFcn) HYPRE_BoomerAMGSolve,
+				(HYPRE_PtrToSolverFcn) HYPRE_BoomerAMGSetup, precond);
+		}
 	}
 
 	// destroy the solver
 	void destroySolver()
 	{
-		if (solver) HYPRE_ParCSRPCGDestroy(solver);
+		if (solver)
+		{
+			if (m_symmetric) HYPRE_ParCSRPCGDestroy(solver);
+			else             HYPRE_ParCSRFlexGMRESDestroy(solver);
+		}
 		solver = nullptr;
 	}
 
 	// calculate the preconditioner
 	void doPrecond()
 	{
-		HYPRE_ParCSRPCGSetup(solver, par_A, par_b, par_x);
+		if (m_symmetric) HYPRE_ParCSRPCGSetup(solver, par_A, par_b, par_x);
+		else             HYPRE_ParCSRFlexGMRESSetup(solver, par_A, par_b, par_x);
 	}
 
 	// solve the linear system
 	void doSolve(double* x)
 	{
-		HYPRE_ParCSRPCGSolve(solver, par_A, par_b, par_x);
-
 		/* Run info - needed logging turned on */
-		double final_res_norm;
-		HYPRE_ParCSRPCGGetNumIterations(solver, (HYPRE_Int*)&m_iters);
-		HYPRE_ParCSRPCGGetFinalRelativeResidualNorm(solver, &final_res_norm);
+		double final_res_norm = 0.0;
+		if (m_symmetric)
+		{
+			HYPRE_ParCSRPCGSolve(solver, par_A, par_b, par_x);
+			HYPRE_ParCSRPCGGetNumIterations(solver, (HYPRE_Int*)&m_iters);
+			HYPRE_ParCSRPCGGetFinalRelativeResidualNorm(solver, &final_res_norm);
+		}
+		else
+		{
+			HYPRE_ParCSRFlexGMRESSolve(solver, par_A, par_b, par_x);
+			HYPRE_FlexGMRESGetNumIterations(solver, (HYPRE_Int*)&m_iters);
+			HYPRE_FlexGMRESGetFinalRelativeResidualNorm(solver, &final_res_norm);
+		}
 		if (m_print_level != 0)
 		{
 			feLogEx(m_fem, "\n");
@@ -291,6 +344,9 @@ BEGIN_FECORE_CLASS(Hypre_PCG_AMG, LinearSolver)
 	ADD_PARAMETER(imp->m_maxiter    , "maxiter"    );
 	ADD_PARAMETER(imp->m_tol        , "tol"        );
 	ADD_PARAMETER(imp->m_amg_tol    , "amg_tol"    );
+	ADD_PARAMETER(imp->m_amg_maxiter, "amg_maxiter");
+	ADD_PARAMETER(imp->m_kdim       , "kdim"       );
+	ADD_PARAMETER(imp->m_symmetric  , "symmetric"  );
 END_FECORE_CLASS();
 
 Hypre_PCG_AMG::Hypre_PCG_AMG(FEModel* fem) : LinearSolver(fem), imp(new Hypre_PCG_AMG::Implementation)
