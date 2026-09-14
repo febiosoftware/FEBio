@@ -301,6 +301,17 @@ void SchurSolver::DoJacobiPreconditioning(bool b)
 SparseMatrix* SchurSolver::CreateSparseMatrix(Matrix_Type ntype)
 {
 	if (m_part.size() != 2) return 0;
+
+	// The A_solver property has no default: it must be supplied in the
+	// configuration. Init() checks for it, but CreateSparseMatrix runs first
+	// (from FENewtonSolver::AllocateLinearSystem), so without this guard a
+	// missing <A_solver> is a null dereference rather than an error message.
+	if (m_Asolver == nullptr)
+	{
+		feLogError("The schur solver requires an \"A_solver\" to be defined.");
+		return nullptr;
+	}
+
 	m_pK = new BlockMatrix();
 	m_pK->Partition(m_part, ntype, 1);
 

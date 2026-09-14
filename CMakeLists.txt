@@ -31,6 +31,23 @@ if(WIN32)
 elseif(APPLE)
     add_definitions(-D__APPLE__)
     add_definitions(-DHAS_ACCEL)
+
+    # Pin the architecture and the minimum macOS explicitly. Without these,
+    # every library here inherits the build host's SDK (e.g. minos 26.5), which
+    # then becomes the floor for anything that bundles them — FEBioStudio.app
+    # included — regardless of what FEBioStudio itself targets.
+    #
+    # Keep in sync with FEBioStudio's CMakeLists.txt and with
+    # LSMinimumSystemVersion in FEBioStudio's ci/macOS/Info.plist. The real
+    # floor is the highest minos among the third-party libraries being
+    # bundled; Homebrew bottles built against the macOS 26 SDK put that at
+    # 26.0. Lower it only once those dependencies are built for an older SDK.
+    if(NOT CMAKE_OSX_ARCHITECTURES)
+        set(CMAKE_OSX_ARCHITECTURES arm64 CACHE STRING "macOS architectures to build" FORCE)
+    endif()
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET 26.0 CACHE STRING "Minimum macOS version" FORCE)
+    endif()
 else()
 	add_definitions(-DLINUX)
     
@@ -378,7 +395,12 @@ endif()
 
 # Link Accelerate framework
 if (APPLE)
+  if(${OpenMP_C_FOUND})
+    add_compile_options(-Xpreprocessor -fopenmp)
+  endif()
   target_link_libraries(numcore PRIVATE "-framework Accelerate")
+  target_include_directories(febiomech PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
+  target_include_directories(numcore PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
 endif()
 
 # Link MMG
