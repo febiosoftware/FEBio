@@ -194,11 +194,18 @@ void FETiedFluidSurface::GetNormalVelocity(int nface, double& vn)
 }
 
 //-----------------------------------------------------------------------------
-double FETiedFluidSurface::GetArea(FESurfaceElement& el)
+//! Evaluate the area of a surface element. Set breference to true to evaluate it in
+//! the reference configuration, so that it is consistent with GetVolume below (which
+//! is always evaluated in the reference configuration).
+double FETiedFluidSurface::GetArea(FESurfaceElement& el, bool breference)
 {
     int ni = el.GaussPoints();
     vec3d rt[FEElement::MAX_NODES];
-    GetNodalCoordinates(el, 1.0, rt);
+    if (breference) {
+        for (int i=0; i<el.Nodes(); ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+    }
+    else
+        GetNodalCoordinates(el, 1.0, rt);
     double* gw = el.GaussWeights();
     double area = 0;
     for (int i=0; i<ni;++i) {
@@ -250,6 +257,8 @@ FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(p
     m_naugmin = 0;
     m_naugmax = 10;
     
+    m_pfluid = nullptr;
+    
     // set parents
     m_s1.SetContactInterface(this);
     m_s2.SetContactInterface(this);
@@ -271,13 +280,47 @@ bool FETiedFluidInterface::Init()
     if (m_s1.Init() == false) return false;
     if (m_s2.Init() == false) return false;
     
-    int N = m_s1.Nodes() + m_s2.Nodes();
-    
     // get the DOFS
-    m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
+    if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
+    if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
+    
+    // Get the fluid material on either side of the interface.
+    // The theory behind this interface enforces [[J]] = 0 as a surrogate for [[p]] = 0.
+    // That equivalence only holds if both sides share the same free energy density
+    // (and the same referential density), i.e. the same fluid material.
+    FEFluidMaterial* pf1 = GetFluidMaterial(m_s1);
+    FEFluidMaterial* pf2 = GetFluidMaterial(m_s2);
+    if ((pf1 == nullptr) || (pf2 == nullptr)) {
+        feLogWarning("Tied fluid interface %d: could not identify a unique fluid material on both surfaces.\n"
+                     "Automatic penalty factors and the [[J]] = 0 constraint may not be meaningful.", GetID());
+    }
+    else if (pf1 != pf2) {
+        feLogWarning("Tied fluid interface %d: the primary and secondary surfaces use different fluid materials.\n"
+                     "Enforcing continuity of the fluid dilatation J does not enforce continuity of the fluid\n"
+                     "pressure p unless both sides share the same constitutive relation p(J).", GetID());
+    }
+    m_pfluid = pf1;
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Return the fluid material shared by all elements attached to this surface.
+//! Returns nullptr if the elements are not all backed by the same fluid material.
+FEFluidMaterial* FETiedFluidInterface::GetFluidMaterial(FETiedFluidSurface& s)
+{
+    FEFluidMaterial* pfluid = nullptr;
+    for (int i=0; i<s.Elements(); ++i)
+    {
+        FESurfaceElement& el = s.Element(i);
+        if (el.m_elem[0].pe == nullptr) return nullptr;
+        FEMaterial* pmat = GetFEModel()->GetMaterial(el.m_elem[0].pe->GetMatID());
+        FEFluidMaterial* pf = dynamic_cast<FEFluidMaterial*>(pmat);
+        if (pf == nullptr) return nullptr;
+        if (pfluid == nullptr) pfluid = pf;
+        else if (pfluid != pf) return nullptr;
+    }
+    return pfluid;
 }
 
 //-----------------------------------------------------------------------------
@@ -345,16 +388,23 @@ void FETiedFluidInterface::Activate()
     FEContactInterface::Activate();
     
     // calculate the penalty
+    // NOTE: in a two-pass analysis the second pass integrates over m_s2, so the
+    // integration point penalties on m_s2 must be evaluated as well (otherwise they
+    // retain their default value of 1)
     if (m_bautopen)
     {
         CalcAutoViscousTractionPenalty(m_s1);
         CalcAutoNormalVelocityPenalty(m_s1);
+        if (m_btwo_pass) {
+            CalcAutoViscousTractionPenalty(m_s2);
+            CalcAutoNormalVelocityPenalty(m_s2);
+        }
     }
     
     // project the surfaces onto each other
     // this will evaluate the gap functions in the reference configuration
-    InitialProjection(m_s1, m_s2);
-    if (m_btwo_pass) InitialProjection(m_s2, m_s1);
+    InitialProjection(m_s1, m_s2, true);
+    if (m_btwo_pass) InitialProjection(m_s2, m_s1, false);
 }
 
 //-----------------------------------------------------------------------------
@@ -380,18 +430,21 @@ void FETiedFluidInterface::CalcAutoViscousTractionPenalty(FETiedFluidSurface& s)
 }
 
 //-----------------------------------------------------------------------------
+//! The viscous traction penalty has units of viscosity per length, therefore it is
+//! scaled by the ratio of the fluid viscosity to the element thickness.
 double FETiedFluidInterface::AutoViscousTractionPenalty(FESurfaceElement& el, FETiedFluidSurface& s)
 {
     // get the solid element attached to the surface element
+    if (el.m_elem[0].pe == nullptr) return 1.0;
     FESolidElement& sel = static_cast<FESolidElement&>(*el.m_elem[0].pe);
-    // get the fluid material for thast solid element
+    // get the fluid material for that solid element
     FEMaterial* pmat = GetFEModel()->GetMaterial(sel.GetMatID());
     FEFluidMaterial* pfluid = dynamic_cast<FEFluidMaterial*>(pmat);
-    if (pfluid == nullptr) return 0;
+    if (pfluid == nullptr) return 1.0;
     // get the viscous part of this fluid
     FEViscousFluid* pvfluid = pfluid->GetViscous();
     
-    // evaluate the viscosity for each material point ang get its average
+    // evaluate the viscosity for each material point and get its average
     double eta = 0;
     int nint = sel.GaussPoints();
     for (int i=0; i<nint; ++i) {
@@ -400,10 +453,12 @@ double FETiedFluidInterface::AutoViscousTractionPenalty(FESurfaceElement& el, FE
     }
     eta /= nint;
     
-    // get the element thickness
-    double area = s.GetArea(el);
+    // get the element thickness (both measures evaluated in the reference configuration)
+    double area = s.GetArea(el, true);
     double vol = s.GetVolume(sel);
+    if (area <= 0) return 1.0;
     double h = vol/area;
+    if (h <= 0) return 1.0;
     
     return eta/h;
 }
@@ -431,39 +486,61 @@ void FETiedFluidInterface::CalcAutoNormalVelocityPenalty(FETiedFluidSurface& s)
 }
 
 //-----------------------------------------------------------------------------
+//! The normal velocity penalty has units of velocity. Without augmentation the
+//! converged dilatation gap is pi = vn/eps_n, so eps_n must be large compared to the
+//! throughflow velocity divided by the acceptable gap. In a low-Mach viscous flow the
+//! pressure scale is the viscous one, p ~ eta*U*L/h^2, hence a dilatation scale
+//! e ~ eta*U*L/(h^2*K). Choosing eps_n = h/tau = h*K/eta makes the pressure drop across
+//! the interface eta*v/h, i.e. a fraction h/(12*L) of the channel pressure drop, so the
+//! tie is transparent. Scaling eps_n to the acoustic impedance sqrt(K/rho) instead makes
+//! the gap equal to the Mach number, which in a low-speed flow is the same order as the
+//! entire physical dilatation field: the interface then carries most of the pressure drop.
 double FETiedFluidInterface::AutoNormalVelocityPenalty(FESurfaceElement& el, FETiedFluidSurface& s)
 {
     // get the solid element attached to the surface element
+    if (el.m_elem[0].pe == nullptr) return 1.0;
     FESolidElement& sel = static_cast<FESolidElement&>(*el.m_elem[0].pe);
-    // get the fluid material for thast solid element
+    // get the fluid material for that solid element
     FEMaterial* pmat = GetFEModel()->GetMaterial(sel.GetMatID());
     FEFluidMaterial* pfluid = dynamic_cast<FEFluidMaterial*>(pmat);
-    if (pfluid == nullptr) return 0;
-    // get the viscous part of this fluid
-    FEViscousFluid* pvfluid = pfluid->GetViscous();
+    if (pfluid == nullptr) return 1.0;
     
-    // evaluate the viscosity and bulk modulus for each material point ang get its average
+    // bulk modulus
+    double K = pfluid->m_k;
+    if (K <= 0) return 1.0;
+    
+    // evaluate the viscosity for each material point and get its average
+    FEViscousFluid* pvfluid = pfluid->GetViscous();
     double eta = 0;
-    double k = 0;
     int nint = sel.GaussPoints();
     for (int i=0; i<nint; ++i) {
         FEMaterialPoint* mp = sel.GetMaterialPoint(i);
         eta += pvfluid->ShearViscosity(*mp);
     }
     eta /= nint;
-    double tau = eta/pfluid->m_k;
     
-    // get the element thickness
-    double area = s.GetArea(el);
+    // get the element thickness (both measures evaluated in the reference configuration)
+    double area = s.GetArea(el, true);
     double vol = s.GetVolume(sel);
-    double h = vol/area;
+    double h = (area > 0 ? vol/area : 0);
     
-    return h/tau;
+    if ((eta > 0) && (h > 0)) {
+        // viscous relaxation scaling h/tau, with tau = eta/K
+        double tau = eta/K;
+        return h/tau;
+    }
+    
+    // inviscid fluid: fall back on the acoustic impedance of the fluid, eps_n = sqrt(K/rho),
+    // for which vn = (p(1)-p(2))/(rho*c)
+    double rho = pfluid->m_rhor;
+    if (rho > 0) return sqrt(K/rho);
+    
+    return 1.0;
 }
 
 //-----------------------------------------------------------------------------
 // Perform initial projection between tied surfaces in reference configuration
-void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& s1, FETiedFluidSurface& s2)
+void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& s1, FETiedFluidSurface& s2, bool bfirst)
 {
     FEMesh& mesh = GetMesh();
     FESurfaceElement* pme;
@@ -483,6 +560,10 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& s1, FETiedFluid
     vec3d sq;
     vec2d srs;
 
+    // projection diagnostics
+    int nproj = 0, nfail = 0;
+    double maxgap = 0;
+    
     // loop over all integration points
     int n = 0;
     for (int i=0; i<s1.Elements(); ++i)
@@ -515,25 +596,46 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& s1, FETiedFluid
                 
                 // calculate the gap function
                 pt.m_Gap = q - r;
+                ++nproj;
+                maxgap = max(maxgap, pt.m_Gap.norm());
                 
                 // free the nodal dofs of pme if requested
-                if (m_bfreedofs) {
+                // NOTE: this is only done on the first pass, so that dofs are only ever
+                // freed on the secondary surface, never on the primary surface
+                if (m_bfreedofs && bfirst) {
                     for (int k=0; k<pme->Nodes(); ++k) {
                         FENode& node = mesh.Node(pme->m_node[k]);
                         FESurfaceElement* sme = cp.Project(node.m_rt, sq, srs);
                         if (sme) {
                             for (int l=0; l<m_dofWE.Size(); ++l)
-                                if (node.get_bc(m_dofWE[l]) != DOF_OPEN) node.set_bc(m_dofWE[l], DOF_OPEN);
+                                if (node.get_bc(m_dofWE[l]) != DOF_OPEN) {
+                                    feLogWarning("Tied fluid interface %d: releasing a constrained degree of freedom "
+                                                 "on node %d of the secondary surface.", GetID(), node.GetID());
+                                    node.set_bc(m_dofWE[l], DOF_OPEN);
+                                }
                         }
                     }
                 }
             }
             else
             {
-                // the node is not in contact
+                // the integration point could not be projected onto the opposing surface
                 pt.m_Gap = vec3d(0,0,0);
+                ++nfail;
             }
         }
+    }
+    
+    // report the outcome of the projection. Integration points that could not be
+    // projected are left untied: they revert to the natural boundary conditions
+    // t_tau = 0 and vn = 0, i.e. a frictionless impermeable wall.
+    feLog(" tied fluid interface # %d: %s pass\n", GetID(), (bfirst ? "primary" : "secondary"));
+    feLog("    tied integration points  : %d\n", nproj);
+    feLog("    maximum initial gap      : %15le\n", maxgap);
+    if (nfail > 0) {
+        feLogWarning("Tied fluid interface %d: %d integration point(s) could not be projected onto the\n"
+                     "opposing surface. These points remain untied and behave as a frictionless\n"
+                     "impermeable wall. Consider increasing search_radius or search_tol.", GetID(), nfail);
     }
 }
 
@@ -594,14 +696,35 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& s1, FETiedFluidSur
                 vec3d v2 = pme->eval(vmt, pt.m_rs[0], pt.m_rs[1])*alpha + pme->eval(vmp, pt.m_rs[0], pt.m_rs[1])*(1-alpha);
                 pt.m_vg = v2 - v1;
 
+                // Dilatation gap function, pi = J(2) - J(1) = e(2) - e(1).
+                // NOTE: This is the opposite of the sign originally used (and of the sign
+                // in eq.(7.8.13) of the theory manual). With vn = eps_n*pi, a positive
+                // gap (J(2) > J(1), i.e. p(1) > p(2)) produces an outflow from side 1,
+                // driving fluid from the high-pressure side to the low-pressure side and
+                // thus reducing the gap. This is the direct analog of eq.(7.7.9) for tied
+                // multiphasic contact, wn = eps_p*(p(1)-p(2)). Using pi = J(1) - J(2)
+                // instead reverses the flux and amplifies the dilatation gap; it also
+                // makes the contribution of this interface to the stiffness matrix
+                // negative definite, whereas the J-block of the fluid solver (eq.(3.5.20))
+                // is positive definite.
                 double e2 = pme->eval(emt, pt.m_rs[0], pt.m_rs[1])*alpha + pme->eval(emp, pt.m_rs[0], pt.m_rs[1])*(1-alpha);
-                pt.m_Jg = e1 - e2;
+                pt.m_Jg = e2 - e1;
+                
+                // penalty factors
+                double epst = m_epst*pt.m_epst;
+                double epsn = m_epsn*pt.m_epsn;
+                
+                // viscous traction and normal velocity (augmented Lagrangian form)
+                pt.m_tv = pt.m_Lmd + pt.m_vg*epst;
+                pt.m_vn = pt.m_Lmp + pt.m_Jg*epsn;
             }
             else
             {
                 // the node is not tied
                 pt.m_vg = vec3d(0,0,0);
                 pt.m_Jg = 0;
+                pt.m_tv = vec3d(0,0,0);
+                pt.m_vn = 0;
             }
         }
     }
@@ -624,8 +747,8 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
     vector<int> LM1, LM2, LM, en;
     vector<double> fe;
     const int MI = FEElement::MAX_INTPOINTS;
-    double detJ[MI], w[MI], *H1, H2[MI];
     const int MN = FEElement::MAX_NODES;
+    double detJ[MI], w[MI], *H1, H2[MN];
     vec3d f1[MN], f2[MN];
     double w1[MN], w2[MN];
 
@@ -709,25 +832,10 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     double s = pt.m_rs[1];
                     se2.shape_fnc(H2, r, s);
                     
-                    // gap functions
-                    vec3d dg = pt.m_vg;
-                    double dJ = pt.m_Jg;
-                    
-                    // lagrange multipliers
-                    vec3d Lmv = pt.m_Lmd;
-                    double Lmp = pt.m_Lmp;
-                    
-                    // penalties
-                    double epst = m_epst*pt.m_epst;
-                    double epsn = m_epsn*pt.m_epsn;
-
-                    // viscous traction
-                    vec3d tv = Lmv + dg*epst;
-                    pt.m_tv = tv;
-
-                    // normal velocity jump
-                    double vn = Lmp + dJ*epsn;
-                    pt.m_vn = vn;
+                    // viscous traction and normal velocity
+                    // (evaluated in ProjectSurface, called from Update)
+                    vec3d tv = pt.m_tv;
+                    double vn = pt.m_vn;
                     
                     // calculate the force vector
                     fe.resize(ndof);
@@ -770,7 +878,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
     vector<int> LM1, LM2, LM, en;
     const int MI = FEElement::MAX_INTPOINTS;
     const int MN = FEElement::MAX_NODES;
-    double detJ[MI], w[MI], *H1, H2[MI], pt[MN], dpr[MN], dps[MN];
+    double detJ[MI], w[MI], *H1, H2[MN];
     FEElementMatrix ke;
     
     double alpha = tp.alphaf;
@@ -858,36 +966,27 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                     double s = pt.m_rs[1];
                     se2.shape_fnc(H2, r, s);
                     
-                    // gap functions
-                    vec3d dg = pt.m_vg;
-                    double dJ = pt.m_Jg;
-                    
-                    // lagrange multipliers
-                    vec3d Lmv = pt.m_Lmd;
-                    double Lmp = pt.m_Lmp;
-                    
                     // penalties
                     double epst = m_epst*pt.m_epst;
                     double epsn = m_epsn*pt.m_epsn;
-
-                    // viscous traction
-                    vec3d tv = Lmv + dg*epst;
-                    pt.m_tv = tv;
-
-                    // normal velocity jump
-                    double vn = Lmp + dJ*epsn;
-                    pt.m_vn = vn;
-                                        
+                    
                     // create the stiffness matrix
                     ke.resize(ndof, ndof); ke.zero();
                     
                     //------------------------------------
                     
+                    // NOTE: The dilatation blocks k11..k22 have the opposite sign of the
+                    // velocity blocks K11..K22, because the dilatation gap is now
+                    // pi = J(2) - J(1) whereas the velocity gap is g = v(2) - v(1) and
+                    // both enter the residual with the same sign. Both the velocity and
+                    // the dilatation contributions to ke are then positive semi-definite,
+                    // as a penalty contribution must be.
+                    
                     for (int a=0; a<neln1; ++a) {
                         for (int c=0; c<neln1; ++c)
                         {
                             mat3dd K11(-epst*H1[a]*H1[c]*detJ[j]*w[j]*alpha);
-                            double k11 = epsn*H1[a]*H1[c]*detJ[j]*w[j]*alpha;
+                            double k11 = -epsn*H1[a]*H1[c]*detJ[j]*w[j]*alpha;
                             ke[ndpn*a    ][ndpn*c    ] -= K11.xx();
                             ke[ndpn*a + 1][ndpn*c + 1] -= K11.yy();
                             ke[ndpn*a + 2][ndpn*c + 2] -= K11.zz();
@@ -896,7 +995,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         for (int d=0; d<neln2; ++d)
                         {
                             mat3dd K12(epst*H1[a]*H2[d]*detJ[j]*w[j]*alpha);
-                            double k12 = -epsn*H1[a]*H2[d]*detJ[j]*w[j]*alpha;
+                            double k12 = epsn*H1[a]*H2[d]*detJ[j]*w[j]*alpha;
                             ke[ndpn*a    ][ndpn*(neln1+d)    ] -= K12.xx();
                             ke[ndpn*a + 1][ndpn*(neln1+d) + 1] -= K12.yy();
                             ke[ndpn*a + 2][ndpn*(neln1+d) + 2] -= K12.zz();
@@ -908,7 +1007,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         for (int c=0; c<neln1; ++c)
                         {
                             mat3dd K21(epst*H2[b]*H1[c]*detJ[j]*w[j]*alpha);
-                            double k21 = -epsn*H2[b]*H1[c]*detJ[j]*w[j]*alpha;
+                            double k21 = epsn*H2[b]*H1[c]*detJ[j]*w[j]*alpha;
                             ke[ndpn*(neln1+b)    ][ndpn*c    ] -= K21.xx();
                             ke[ndpn*(neln1+b) + 1][ndpn*c + 1] -= K21.yy();
                             ke[ndpn*(neln1+b) + 2][ndpn*c + 2] -= K21.zz();
@@ -917,7 +1016,7 @@ void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                         for (int d=0; d<neln2; ++d)
                         {
                             mat3dd K22(-epst*H2[b]*H2[d]*detJ[j]*w[j]*alpha);
-                            double k22 = epsn*H2[b]*H2[d]*detJ[j]*w[j]*alpha;
+                            double k22 = -epsn*H2[b]*H2[d]*detJ[j]*w[j]*alpha;
                             ke[ndpn*(neln1+b)    ][ndpn*(neln1+d)    ] -= K22.xx();
                             ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d) + 1] -= K22.yy();
                             ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d) + 2] -= K22.zz();
@@ -941,8 +1040,6 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     // make sure we need to augment
 	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
-    int i;
-    vec3d Ln;
     bool bconv = true;
     
     int N1 = m_s1.Elements();
@@ -971,6 +1068,8 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
             normJ0 += d2.m_Lmp*d2.m_Lmp;
         }
     }
+    normL0 = sqrt(normL0);
+    normJ0 = sqrt(normJ0);
     
     // b. gap component
     // (is calculated during update)
@@ -979,7 +1078,7 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     
     // update Lagrange multipliers
     double normL1 = 0, normJ1 = 0, eps, epsn;
-    for (i=0; i<N1; ++i)
+    for (int i=0; i<N1; ++i)
     {
 		FESurfaceElement& s1 = m_s1.Element(i);
 		for (int j = 0; j<s1.GaussPoints(); ++j)
@@ -997,11 +1096,16 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
                 d1.m_Lmp = d1.m_Lmp + epsn*d1.m_Jg;
                 maxJg = max(maxJg,fabs(d1.m_Jg));
                 normJ1 += d1.m_Lmp*d1.m_Lmp;
+                
+                // keep the reported traction and normal velocity consistent with the
+                // updated multipliers (they are re-evaluated on the next Update)
+                d1.m_tv = d1.m_Lmd + d1.m_vg*eps;
+                d1.m_vn = d1.m_Lmp + epsn*d1.m_Jg;
             }
         }
     }
     
-    for (i=0; i<N2; ++i)
+    for (int i=0; i<N2; ++i)
     {
 		FESurfaceElement& s2 = m_s2.Element(i);
 		for (int j = 0; j<s2.GaussPoints(); ++j)
@@ -1017,11 +1121,16 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
                 
                 epsn = m_epsn*d2.m_epsn;
                 d2.m_Lmp = d2.m_Lmp + epsn*d2.m_Jg;
-                double maxJg = max(maxJg,fabs(d2.m_Jg));
+                maxJg = max(maxJg,fabs(d2.m_Jg));
                 normJ1 += d2.m_Lmp*d2.m_Lmp;
+                
+                d2.m_tv = d2.m_Lmd + d2.m_vg*eps;
+                d2.m_vn = d2.m_Lmp + epsn*d2.m_Jg;
             }
         }
     }
+    normL1 = sqrt(normL1);
+    normJ1 = sqrt(normJ1);
     
     // calculate relative norms
     double lnorm = (normL1 != 0 ? fabs((normL1 - normL0) / normL1) : fabs(normL1 - normL0));
@@ -1038,13 +1147,12 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     if (naug >= m_naugmax) bconv = true;
     
     feLog(" tied fluid interface # %d\n", GetID());
-    feLog("                        CURRENT        REQUIRED\n");
-    feLog("    V multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
-    feLog("    P multiplier        : %15le", pnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
-    
+    feLog("                                CURRENT        REQUIRED\n");
+    feLog("    velocity multiplier   : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
+    feLog("    dilatation multiplier : %15le", pnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
     feLog("    maximum velocity gap  : %15le", maxgap);
     if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
-    feLog("    maximum pressure gap : %15le", maxJg);
+    feLog("    maximum dilatation gap: %15le", maxJg);
     if (m_etol > 0) feLog("%15le\n", m_etol); else feLog("       ***\n");
 
     return bconv;

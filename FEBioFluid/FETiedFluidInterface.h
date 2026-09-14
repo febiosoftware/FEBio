@@ -54,7 +54,7 @@ public:
         double  m_Lmp;      //!< lagrange multipliers for fluid dilatations
         double  m_epst;     //!< viscous traction penalty factor
         double  m_epsn;     //!< normal velocity penalty factor
-        double  m_Jg;       //!< dilatation "gap"
+        double  m_Jg;       //!< dilatation "gap", pi = J(2) - J(1)
         double  m_vn;       //!< normal velocity
     };
     
@@ -75,7 +75,7 @@ public:
     void GetDilatationGap   (int nface, double& Jg);
     void GetViscousTraction (int nface, vec3d& tv);
     void GetNormalVelocity  (int nface, double& vn);
-    double GetArea          (FESurfaceElement& el);
+    double GetArea          (FESurfaceElement& el, bool breference = false);
     double GetVolume        (FESolidElement& el);
    
 public:
@@ -125,8 +125,14 @@ public:
     void Update() override;
     
 protected:
-    void InitialProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
+    //! initial projection; bfirst is true only on the first (primary->secondary) pass,
+    //! so that the m_bfreedofs option only ever frees dofs on the secondary surface
+    void InitialProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms, bool bfirst);
     void ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
+    
+    //! return the fluid material shared by all elements attached to this surface
+    //! (returns nullptr if the surface is not backed by a single fluid material)
+    FEFluidMaterial* GetFluidMaterial(FETiedFluidSurface& s);
     
     //! calculate penalty factor
     void CalcAutoViscousTractionPenalty(FETiedFluidSurface& s);
@@ -153,7 +159,7 @@ public:
     
     bool            m_bfreedofs;    //!< flag to free constrained/fixed DOFS on secondary surface
     
-    FEFluidMaterial* m_pfluid;       //!< fluid pointer
+    FEFluidMaterial* m_pfluid = nullptr;    //!< fluid pointer (set in Init)
 
 	FEDofList		m_dofWE;
    

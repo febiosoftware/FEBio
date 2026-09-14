@@ -62756,7 +62756,7 @@ where
 \end_inset
 
  is the viscous shear stress.
- Susbtituting this relation into the energy jump of eq.
+ Substituting this relation into the energy jump of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:jump-energy"
@@ -62851,10 +62851,10 @@ nolink "false"
 
 ;
  thus,
- from eq.
+ from the mass jump condition of eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:mass-balance-integrated"
+reference "eq:jump-mass"
 plural "false"
 caps "false"
 noprefix "false"
@@ -62863,11 +62863,35 @@ nolink "false"
 \end_inset
 
  we conclude that 
-\begin_inset Formula $\mathbf{u}^{\Gamma}\cdot\mathbf{n}$
+\begin_inset Formula $\left[\left[\mathbf{u}^{\Gamma}\cdot\mathbf{n}\right]\right]=0$
 \end_inset
 
- is continuous,
- hence eq.
+.
+ The remaining term in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-energy-redux"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ requires 
+\begin_inset Formula $\left[\left[\mathbf{u}^{\Gamma}\cdot\mathbf{u}^{\Gamma}\right]\right]=0$
+\end_inset
+
+,
+ which does not follow from continuity of the normal component alone;
+ it is implied however by the no-slip condition adopted below for a viscous fluid,
+ namely 
+\begin_inset Formula $\left[\left[\mathbf{u}^{\Gamma}\right]\right]=\mathbf{0}$
+\end_inset
+
+.
+ Under that condition,
+ eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:jump-energy-redux"
@@ -63012,11 +63036,116 @@ nolink "false"
 \end_inset
 
 ,
- thus 
-\begin_inset Formula $\left[\left[\mathbf{v}\right]\right]\cdot\mathbf{n}^{\Gamma}=0$
+ which serves as the flux-type (natural) channel through which 
+\begin_inset Formula $\left[\left[J\right]\right]=0$
+\end_inset
+
+ is enforced weakly.
+ This is the same device used for tied multiphasic contact (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Multiphasic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ where continuity of the effective fluid pressure is enforced through the solvent flux 
+\begin_inset Formula $w_{n}$
+\end_inset
+
+ of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq704-1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+The equivalence between 
+\begin_inset Formula $\left[\left[J\right]\right]=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\left[\left[p\right]\right]=0$
+\end_inset
+
+ presumes that the same fluid material occupies both sides of 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+,
+ so that 
+\begin_inset Formula $\psi\left(J\right)$
+\end_inset
+
+,
+ 
+\begin_inset Formula $p\left(J\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\rho_{r}$
+\end_inset
+
+ are the same functions of state on either side.
+ If the two sides are occupied by different fluids,
+ continuity of 
+\begin_inset Formula $J$
+\end_inset
+
+ implies neither continuity of 
+\begin_inset Formula $p$
+\end_inset
+
+ nor of 
+\begin_inset Formula $\rho$
+\end_inset
+
+,
+ so that the mass and momentum jump conditions of eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-mass"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-linear-momentum"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ are no longer satisfied;
+ in that case the constraint would have to be applied to 
+\begin_inset Formula $p$
+\end_inset
+
+ directly.
+ FEBio issues a warning when the primary and secondary surfaces of a tied fluid interface are backed by different fluid materials.
 \end_layout
 
 \begin_layout Subsection
@@ -63160,6 +63289,52 @@ D\delta G_{c}=\sum\limits^{2}_{i=1}D\delta G_{c}\left[\Delta\mathbf{v}^{\left(i\
 
 \end_layout
 
+\begin_layout Standard
+This linearization only involves increments in the nodal degrees of freedom 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $J$
+\end_inset
+
+.
+ In conventional computational fluid dynamics the finite element mesh is fixed (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Computational-Fluid-Dynamics"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ therefore 
+\begin_inset Formula $J^{\left(1\right)}_{\eta}$
+\end_inset
+
+ and the parametric coordinates of the projected points are invariant,
+ and 
+\begin_inset Formula $D\delta G_{c}\left[\Delta\mathbf{u}^{\left(i\right)}\right]=0$
+\end_inset
+
+.
+ Should a tied fluid interface be used in a formulation where the mesh moves,
+ such as fluid-structure interaction,
+ the linearization of 
+\begin_inset Formula $J^{\left(1\right)}_{\eta}$
+\end_inset
+
+ and of the ray projection along increments in the mesh displacement would have to be included;
+ those terms are not part of the present formulation.
+\end_layout
+
 \begin_layout Subsection
 Gap Functions
 \begin_inset CommandInset label
@@ -63212,7 +63387,32 @@ The premise of a tied interface is that the parametric coordinates of coincident
 \end_inset
 
 .
- 
+ If the two surfaces are not initially conforming,
+ the jump conditions are only enforced at those integration points of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ for which an intersection with 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ was found.
+ At integration points where the projection fails,
+ the natural boundary conditions 
+\begin_inset Formula $\mathbf{t}^{\tau}=\mathbf{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $v_{n}=0$
+\end_inset
+
+ apply by default,
+ which represent a frictionless impermeable wall;
+ FEBio reports the number of such points,
+ along with the largest initial distance between projected pairs of points.
+ Since the projection is node-to-surface rather than mortar-based,
+ the attainable gap across non-conforming meshes is also limited by the mismatch in the interpolations of the two surfaces,
+ independently of the magnitude of the penalty factors.
 \end_layout
 
 \begin_layout Standard
@@ -63236,9 +63436,21 @@ We may similarly define the scalar gap function
 
 ,
  representing the difference between fluid dilatations (or volume ratios) across the interface,
+ adopting the same ordering of the surfaces as in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "TFI-vt-gap"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
 \begin_inset Formula 
 \begin{equation}
-\pi=J^{\left(1\right)}-J^{\left(2\right)}\,.\label{eq:TFI-e-gap}
+\pi=J^{\left(2\right)}-J^{\left(1\right)}\,.\label{eq:TFI-e-gap}
 \end{equation}
 
 \end_inset
@@ -63309,25 +63521,94 @@ where
  Therefore,
  in an auto-penalty scheme,
  it may be scaled to the ratio of fluid viscosity to element thickness.
- Similarly,
- if the fluid pressure 
+ Note that 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ acts as the Lagrange multiplier conjugate to the constraint 
+\begin_inset Formula $\left[\left[\mathbf{v}\right]\right]=\mathbf{0}$
+\end_inset
+
+,
+ and therefore possesses a normal component in general.
+ It does not need to transmit the fluid pressure across 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+,
+ since 
+\begin_inset Formula $\grad p$
+\end_inset
+
+ is not integrated by parts in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:virtual-work-internal-1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ so that 
+\begin_inset Formula $p$
+\end_inset
+
+ does not appear in the external virtual work of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:virtual-work-external-1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Turning now to the dilatation constraint,
+ since the elastic fluid pressure is a decreasing function of the volume ratio (
+\begin_inset Formula $p^{\prime}\left(J\right)=-K<0$
+\end_inset
+
+ for the constitutive relation of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:ideal-fluid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ a fluid pressure 
 \begin_inset Formula $p^{\left(1\right)}$
 \end_inset
 
- is greater than 
+ greater than 
 \begin_inset Formula $p^{\left(2\right)}$
 \end_inset
 
- (i.e.,
- when 
-\begin_inset Formula $\pi<0$
+ corresponds to 
+\begin_inset Formula $\pi>0$
 \end_inset
 
-) we want the prescribed normal velocity 
+.
+ In that case the prescribed normal velocity 
 \begin_inset Formula $v_{n}$
 \end_inset
 
- to counteract the flow from high pressure to low pressure,
+ must drive fluid out of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+,
+ from the high pressure side toward the low pressure side,
+ since that is the flow which equilibrates the dilatations across the interface;
  thus
 \begin_inset Formula 
 \begin{equation}
@@ -63350,6 +63631,28 @@ where
 \end_inset
 
  has units of velocity.
+ Using 
+\begin_inset Formula $p=K\left(1-J\right)$
+\end_inset
+
+,
+ this relation may be rewritten as 
+\begin_inset Formula $v_{n}=\left(\varepsilon_{n}/K\right)\left(p^{\left(1\right)}-p^{\left(2\right)}\right)$
+\end_inset
+
+,
+ showing that it is the direct analog of the solvent flux penalty of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq704-1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ for tied multiphasic contact.
  Given these relations,
  
 \begin_inset Formula $\delta G_{c}$
@@ -63392,8 +63695,8 @@ D\delta G_{c}\left[\Delta\mathbf{v}^{\left(2\right)}\right] & =\alpha_{f}\vareps
 and
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\delta G_{c}\left[\Delta J^{\left(1\right)}\right] & =\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(1\right)}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
-D\delta G_{c}\left[\Delta J^{\left(2\right)}\right] & =-\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+\begin{aligned}D\delta G_{c}\left[\Delta J^{\left(1\right)}\right] & =-\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(1\right)}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+D\delta G_{c}\left[\Delta J^{\left(2\right)}\right] & =\alpha_{f}\varepsilon_{n}\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\Delta J^{\left(2\right)}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
 \end{aligned}
 \label{eq:TFI-G-linearization-e}
 \end{equation}
@@ -63401,6 +63704,327 @@ D\delta G_{c}\left[\Delta J^{\left(2\right)}\right] & =-\alpha_{f}\varepsilon_{n
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The ordering of the surfaces in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-e-gap"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ is not arbitrary.
+ Both terms of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq696-2"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ enter the external virtual work with the same sign,
+ cf.
+ eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:virtual-work-external-1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ The first term may be written as 
+\begin_inset Formula $-\delta\left[\int_{\gamma^{\left(1\right)}}\frac{\varepsilon_{t}}{2}\left|\mathbf{g}\right|^{2}da\right]$
+\end_inset
+
+,
+ that is,
+ minus the variation of a penalty potential;
+ the second term reduces to the same form,
+ 
+\begin_inset Formula $-\delta\left[\int_{\gamma^{\left(1\right)}}\frac{\varepsilon_{n}}{2}\pi^{2}da\right]$
+\end_inset
+
+,
+ only for the ordering adopted in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-e-gap"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The magnitudes of the penalty factors deserve some attention.
+ In a penalty scheme the converged dilatation gap is 
+\begin_inset Formula $\pi=v_{n}/\varepsilon_{n}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $v_{n}$
+\end_inset
+
+ is the normal velocity crossing the interface;
+ therefore 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ must be large compared to the ratio of the throughflow velocity to the largest acceptable gap.
+ In a low speed viscous flow the dilatation scales as 
+\begin_inset Formula $e\sim\eta UL/\left(h^{2}K\right)$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\eta$
+\end_inset
+
+,
+ 
+\begin_inset Formula $U$
+\end_inset
+
+ and 
+\begin_inset Formula $L$
+\end_inset
+
+ are the fluid viscosity,
+ a representative velocity and a representative length of the flow domain.
+ A suitable auto-penalty choice is then 
+\begin_inset Formula $\varepsilon_{n}=h/\tau$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\tau=\eta/K$
+\end_inset
+
+ is the viscous relaxation time of the fluid,
+ so that 
+\begin_inset Formula $\varepsilon_{n}=hK/\eta$
+\end_inset
+
+.
+ The pressure drop across the interface is then 
+\begin_inset Formula $\eta v_{n}/h$
+\end_inset
+
+,
+ a fraction 
+\begin_inset Formula $\sim h/L$
+\end_inset
+
+ of the pressure drop along the flow domain,
+ and the interface is effectively transparent.
+ By contrast,
+ scaling 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ to the acoustic impedance of the fluid,
+ 
+\begin_inset Formula $\varepsilon_{n}=\sqrt{K/\rho}$
+\end_inset
+
+,
+ produces a dilatation gap equal to the Mach number of the flow,
+ which in a low speed flow is of the same order as the entire dilatation field;
+ the interface would then sustain most of the pressure drop and would not behave as a tie.
+ Similarly,
+ 
+\begin_inset Formula $\varepsilon_{t}=\eta/h$
+\end_inset
+
+ produces a slip velocity 
+\begin_inset Formula $\left|\mathbf{g}\right|=h\left|\mathbf{t}^{\tau}\right|/\eta$
+\end_inset
+
+ comparable to the velocity difference across one element.
+\end_layout
+
+\begin_layout Subsection
+Augmented Lagrangian Scheme
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-Fluid-Augmented-Lagrangian"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The dependence of the converged solution on the penalty factors may be removed by augmenting the penalty with Lagrange multipliers,
+ following the Uzawa algorithm described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Augmented-Lagrangian-Method"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-t-penalty"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-v-penalty"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ are then replaced by
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{t}^{\tau} & =\boldsymbol{\lambda}_{v}+\varepsilon_{t}\mathbf{g}\\
+v_{n} & =\lambda_{J}+\varepsilon_{n}\pi
+\end{aligned}
+\,,\label{eq:TFI-auglag}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\lambda}_{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $\lambda_{J}$
+\end_inset
+
+ are Lagrange multipliers conjugate to the constraints 
+\begin_inset Formula $\left[\left[\mathbf{v}\right]\right]=\mathbf{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left[\left[J\right]\right]=0$
+\end_inset
+
+,
+ respectively.
+ The multipliers are held fixed within each Newton iteration and updated in an outer loop according to
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\boldsymbol{\lambda}_{v} & \leftarrow\boldsymbol{\lambda}_{v}+\varepsilon_{t}\mathbf{g}\\
+\lambda_{J} & \leftarrow\lambda_{J}+\varepsilon_{n}\pi
+\end{aligned}
+\,,\label{eq:TFI-uzawa}
+\end{equation}
+
+\end_inset
+
+until the largest values of 
+\begin_inset Formula $\left|\mathbf{g}\right|$
+\end_inset
+
+ and 
+\begin_inset Formula $\left|\pi\right|$
+\end_inset
+
+ fall below user-specified tolerances,
+ or the relative change in the norms of the multipliers falls below the augmentation tolerance.
+ Since the multipliers are constant during a Newton iteration,
+ the linearizations of eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-G-linearization-v"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-G-linearization-e"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ are unaffected,
+ and the stiffness matrices given below apply equally to the penalty and augmented Lagrangian schemes.
+ On convergence 
+\begin_inset Formula $\boldsymbol{\lambda}_{v}$
+\end_inset
+
+ tends to the viscous traction,
+ and 
+\begin_inset Formula $\lambda_{J}$
+\end_inset
+
+ to the normal fluid velocity crossing 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+,
+ that satisfy the jump conditions of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-tied-fluid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ exactly,
+ so that the solution becomes independent of 
+\begin_inset Formula $\varepsilon_{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -63446,12 +64070,12 @@ Then,
 \begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{cc}
 \delta\mathbf{v}^{\left(1\right)}_{a} & \delta J^{\left(1\right)}_{a}\end{array}\right]\cdot\left[\begin{array}{c}
 \mathbf{f}^{\left(1\right)}_{a}\\
-v^{\left(1\right)}_{a}
+w^{\left(1\right)}_{a}
 \end{array}\right]\right.\\
  & \left.+\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{cc}
-\delta\mathbf{v}^{\left(1\right)}_{b,k} & \delta J^{\left(1\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
-\mathbf{f}^{\left(1\right)}_{b,k}\\
-v^{\left(1\right)}_{b,k}
+\delta\mathbf{v}^{\left(2\right)}_{b,k} & \delta J^{\left(2\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}^{\left(2\right)}_{b,k}\\
+w^{\left(2\right)}_{b,k}
 \end{array}\right]\right)
 \end{aligned}
 \,,\label{eq:TFI-discrete-3}
@@ -63514,10 +64138,10 @@ Similarly,
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\mathbf{I}\\
-\mathbf{K}^{\left(1,2\right)}_{ad,k} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
-\mathbf{K}^{\left(2,1\right)}_{bc,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\mathbf{I}\\
-\mathbf{K}^{\left(2,2\right)}_{bd,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
+\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =-\alpha_{f}\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(1,2\right)}_{ad,k} & =\alpha_{f}\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
+\mathbf{K}^{\left(2,1\right)}_{bc,k} & =\alpha_{f}\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(2,2\right)}_{bd,k} & =-\alpha_{f}\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
 \end{aligned}
 \,,\label{eq:TFI-discrete-6}
 \end{equation}
@@ -63527,10 +64151,10 @@ where
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}k^{\left(1,1\right)}_{ac} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
-k^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
-k^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
-k^{\left(2,2\right)}_{bd,k} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
+\begin{aligned}k^{\left(1,1\right)}_{ac} & =-\alpha_{f}\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
+k^{\left(1,2\right)}_{ad,k} & =\alpha_{f}\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
+k^{\left(2,1\right)}_{bc,k} & =\alpha_{f}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
+k^{\left(2,2\right)}_{bd,k} & =-\alpha_{f}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
 \end{aligned}
 \,.\label{eq:TFI-discrete-7}
 \end{equation}
@@ -63538,6 +64162,63 @@ k^{\left(2,2\right)}_{bd,k} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\r
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The contribution of the tied interface to the global stiffness matrix is obtained by subtracting 
+\begin_inset Formula $D\delta G_{c}$
+\end_inset
+
+ from the linearization of the internal virtual work,
+ cf.
+ eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:linearized-work-split"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ That contribution is symmetric,
+ and positive semi-definite in both the velocity and the dilatation degrees of freedom,
+ as required of a penalty regularization;
+ this provides a convenient check on the signs of eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-discrete-6"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-discrete-7"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ The integrals above are evaluated over 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+,
+ treating it as the primary surface.
+ FEBio optionally repeats the evaluation with the roles of the two surfaces reversed (two-pass).
+ Since a tied fluid interface constrains all four degrees of freedom at each integration point,
+ a two-pass evaluation applies each constraint twice,
+ which doubles the effective penalty factors and may over-constrain non-conforming meshes.
 \end_layout
 
 \begin_layout Section
