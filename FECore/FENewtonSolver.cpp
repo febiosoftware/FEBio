@@ -1028,7 +1028,10 @@ void FENewtonSolver::Update(std::vector<double>& ui)
 		{
 			ConvergenceInfo& ci = m_solutionNorm[i];
 			FESolutionVariable& var = m_Var[ci.nvar];
-			scatter(U, mesh, *var.m_dofs);
+			if (var.m_order == 0)
+				scatterToElements(U, mesh, *var.m_dofs);
+			else
+				scatter(U, mesh, *var.m_dofs);
 		}
 
 		// enforce the linear constraints

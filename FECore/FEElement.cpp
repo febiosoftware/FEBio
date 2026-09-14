@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEElement.h"
 #include "DumpStream.h"
 #include <math.h>
+#include "DOFS.h"
 
 //-----------------------------------------------------------------------------
 FEElementState::FEElementState(const FEElementState& s)
@@ -155,6 +156,7 @@ FEElement::FEElement() : m_pT(0)
 { 
 	static int n = 1;
 	m_nID = n++;
+	m_dof = DOF_FIXED;
 	m_lm = -1;
 	m_val = 0.0;
 	m_lid = -1;

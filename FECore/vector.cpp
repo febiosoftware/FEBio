@@ -27,6 +27,7 @@ SOFTWARE.*/
 #include <assert.h>
 #include "vector.h"
 #include "FEMesh.h"
+#include "FEDomain.h"
 #include "FEDofList.h"
 #include <algorithm>
 using namespace std;
@@ -182,6 +183,22 @@ void scatter(vector<double>& v, FEMesh& mesh, const FEDofList& dofs)
 		for (int j = 0; j < dofs.Size(); ++j)
 		{
 			int n = node.m_ID[dofs[j]]; if (n >= 0) node.set(dofs[j], v[n]);
+		}
+	}
+}
+
+void scatterToElements(std::vector<double>& v, FEMesh& mesh, const FEDofList& dofs)
+{
+	assert(dofs.Size() == 1); // for now, only support one dof
+	for (int i = 0; i < mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		int NE = dom.Elements();
+		for (int j = 0; j < NE; ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			int n = el.m_lm;
+			if (n >= 0) el.m_val = v[n];
 		}
 	}
 }
