@@ -502,7 +502,7 @@ double FETiedFluidInterface::AutoNormalVelocityPenalty(FESurfaceElement& el, FET
     FESolidElement& sel = static_cast<FESolidElement&>(*el.m_elem[0].pe);
     // get the fluid material for that solid element
     FEMaterial* pmat = GetFEModel()->GetMaterial(sel.GetMatID());
-    FEFluidMaterial* pfluid = dynamic_cast<FEFluidMaterial*>(pmat);
+    FEFluid* pfluid = dynamic_cast<FEFluid*>(pmat);
     if (pfluid == nullptr) return 1.0;
     
     // bulk modulus
