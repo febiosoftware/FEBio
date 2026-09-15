@@ -300,8 +300,25 @@ bool FETiedFluidInterface::Init()
                      "pressure p unless both sides share the same constitutive relation p(J).", GetID());
     }
     m_pfluid = pf1;
-    
+
+    RegisterFreeDofsCallback();
+
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! The free_dofs option has to re-assert itself at every step boundary, because each step
+//! activates its own boundary conditions and those overwrite the dof status. CB_STEP_ACTIVE
+//! runs after that activation and before the equations are numbered.
+void FETiedFluidInterface::RegisterFreeDofsCallback()
+{
+    if ((m_bfreedofs == false) || m_bfreecb) return;
+
+    FEModel* pfem = GetFEModel();
+    if (pfem == nullptr) return;
+
+    pfem->AddCallback(free_dofs_cb, CB_STEP_ACTIVE, this);
+    m_bfreecb = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -563,6 +580,10 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& s1, FETiedFluid
     // projection diagnostics
     int nproj = 0, nfail = 0;
     double maxgap = 0;
+
+    // Activate() can run more than once (e.g. FEModel::Reactivate after a remesh), and the
+    // node indices recorded by a previous pass are then stale. Rebuild the list from scratch.
+    if (m_bfreedofs && bfirst) { m_freeNode.clear(); m_freeDof.clear(); }
     
     // loop over all integration points
     int n = 0;
@@ -608,11 +629,8 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& s1, FETiedFluid
                         FESurfaceElement* sme = cp.Project(node.m_rt, sq, srs);
                         if (sme) {
                             for (int l=0; l<m_dofWE.Size(); ++l)
-                                if (node.get_bc(m_dofWE[l]) != DOF_OPEN) {
-                                    feLogWarning("Tied fluid interface %d: releasing a constrained degree of freedom "
-                                                 "on node %d of the secondary surface.", GetID(), node.GetID());
-                                    node.set_bc(m_dofWE[l], DOF_OPEN);
-                                }
+                                if (node.get_bc(m_dofWE[l]) != DOF_OPEN)
+                                    RecordFreeDof(pme->m_node[k], m_dofWE[l]);
                         }
                     }
                 }
@@ -637,6 +655,69 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& s1, FETiedFluid
                      "opposing surface. These points remain untied and behave as a frictionless\n"
                      "impermeable wall. Consider increasing search_radius or search_tol.", GetID(), nfail);
     }
+}
+
+//-----------------------------------------------------------------------------
+//! Record a dof on the secondary surface that the free_dofs option has to keep open,
+//! and open it now. The record is what allows the release to be re-applied later: the
+//! dof status is reset by every boundary condition that activates in a subsequent step.
+void FETiedFluidInterface::RecordFreeDof(int nodeIndex, int dof)
+{
+    FENode& node = GetMesh().Node(nodeIndex);
+
+    feLogWarning("Tied fluid interface %d: releasing a constrained degree of freedom "
+                 "on node %d of the secondary surface.", GetID(), node.GetID());
+
+    node.set_bc(dof, DOF_OPEN);
+
+    // only record the pair once; an integration point loop visits the same node many times
+    for (size_t i=0; i<m_freeNode.size(); ++i)
+        if ((m_freeNode[i] == nodeIndex) && (m_freeDof[i] == dof)) return;
+
+    m_freeNode.push_back(nodeIndex);
+    m_freeDof.push_back(dof);
+}
+
+//-----------------------------------------------------------------------------
+//! Re-open every dof recorded by RecordFreeDof.
+//!
+//! The initial release happens in Activate(), which runs before the solver numbers the
+//! equations, so the first step sees the freed dofs. A later step, however, activates its
+//! own boundary conditions, and FEPrescribedNodeSet::Activate overwrites the dof status
+//! unconditionally -- so a prescribed velocity or dilatation introduced in step 2 on a
+//! tied node would silently re-constrain a dof this interface needs open. Re-applying the
+//! release at the start of each step keeps the tie well posed for as long as the interface
+//! is active. Any dof that actually had to be re-opened is reported, since it means the
+//! model prescribes a value on the interface that is being overridden.
+void FETiedFluidInterface::ReleaseFreeDofs()
+{
+    if (m_freeNode.empty()) return;
+
+    FEMesh& mesh = GetMesh();
+    for (size_t i=0; i<m_freeNode.size(); ++i)
+    {
+        FENode& node = mesh.Node(m_freeNode[i]);
+        if (node.get_bc(m_freeDof[i]) != DOF_OPEN)
+        {
+            feLogWarning("Tied fluid interface %d: a boundary condition activated in this step "
+                         "constrains a tied degree of freedom on node %d of the secondary surface.\n"
+                         "The free_dofs option is releasing it again; the prescribed value is ignored\n"
+                         "on this node for as long as the interface is active.", GetID(), node.GetID());
+            node.set_bc(m_freeDof[i], DOF_OPEN);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! CB_STEP_ACTIVE fires after FEAnalysis::Activate() has activated the step's boundary
+//! conditions and before FEAnalysis::InitSolver() calls FESolver::InitEquations(), which
+//! is where the dof status is read to allocate equations. That makes it the last point at
+//! which the status can be changed without having to patch the equation numbers by hand.
+bool FETiedFluidInterface::free_dofs_cb(FEModel* pfem, unsigned int nwhen, void* pd)
+{
+    FETiedFluidInterface* pci = static_cast<FETiedFluidInterface*>(pd);
+    if (pci && pci->IsActive()) pci->ReleaseFreeDofs();
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1175,4 +1256,15 @@ void FETiedFluidInterface::Serialize(DumpStream &ar)
     if (ar.IsShallow()) return;
     ar & m_pfluid;
     ar & m_dofWE;
+
+    // the list of dofs released by the free_dofs option. This has to survive a restart:
+    // the dumped dof status is restored, but the step boundaries that follow the restart
+    // still need to know which dofs to keep open.
+    ar & m_freeNode;
+    ar & m_freeDof;
+
+    // A restart from a dump file deserializes the model without calling Init(), so the
+    // step callback has to be hooked up here as well or the release would stop being
+    // re-applied at every step boundary after the restart.
+    if (ar.IsLoading()) RegisterFreeDofsCallback();
 }

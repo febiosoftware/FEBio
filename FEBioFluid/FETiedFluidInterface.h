@@ -129,6 +129,22 @@ protected:
     //! so that the m_bfreedofs option only ever frees dofs on the secondary surface
     void InitialProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms, bool bfirst);
     void ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms);
+
+    //! Record a dof that the m_bfreedofs option has to keep open, and open it.
+    //! nodeIndex is an index into the mesh node array, not a node ID.
+    void RecordFreeDof(int nodeIndex, int dof);
+
+    //! Re-open every dof recorded by RecordFreeDof. Run at the start of every analysis
+    //! step, because a step activates its own BCs and those may re-constrain these dofs.
+    void ReleaseFreeDofs();
+
+    //! Hook ReleaseFreeDofs() up to CB_STEP_ACTIVE. Idempotent, and called both from
+    //! Init() and from Serialize() on load, since a dump restart does not re-run Init().
+    void RegisterFreeDofsCallback();
+
+    //! CB_STEP_ACTIVE callback: re-applies ReleaseFreeDofs() after the step's boundary
+    //! conditions have been activated and before the solver numbers the equations.
+    static bool free_dofs_cb(FEModel* pfem, unsigned int nwhen, void* pd);
     
     //! return the fluid material shared by all elements attached to this surface
     //! (returns nullptr if the surface is not backed by a single fluid material)
@@ -158,7 +174,13 @@ public:
     bool            m_bautopen;     //!< use autopenalty factor
     
     bool            m_bfreedofs;    //!< flag to free constrained/fixed DOFS on secondary surface
-    
+
+    //! dofs released by the m_bfreedofs option, as parallel (node index, dof) lists.
+    //! Kept so the release can be re-applied at every step boundary.
+    std::vector<int>    m_freeNode;
+    std::vector<int>    m_freeDof;
+    bool                m_bfreecb = false;  //!< true once the CB_STEP_ACTIVE callback is registered
+
     FEFluidMaterial* m_pfluid = nullptr;    //!< fluid pointer (set in Init)
 
 	FEDofList		m_dofWE;
