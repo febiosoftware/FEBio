@@ -23627,7 +23627,7 @@ Here,
 
  is the fluid viscous traction,
  and 
-\begin_inset Formula $w_{n}=\mathbf{w}_{n}\cdot\mathbf{n}$
+\begin_inset Formula $w_{n}=\mathbf{w}\cdot\mathbf{n}$
 \end_inset
 
  is the normal component of the relative fluid velocity on the boundary 
@@ -25488,7 +25488,7 @@ Here,
 
  is the true fluid viscous traction,
  and 
-\begin_inset Formula $w_{n}=\mathbf{w}_{n}\cdot\mathbf{n}$
+\begin_inset Formula $w_{n}=\mathbf{w}\cdot\mathbf{n}$
 \end_inset
 
  is the normal component of the relative fluid flux on the boundary 
@@ -61690,7 +61690,7 @@ The vector gap function
  is defined by 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{g}=\mathbf{x}^{\left(2\right)}-\mathbf{x}^{\left(1\right)}\,.\label{eq701}
+\mathbf{g}=\mathbf{x}^{\left(2\right)}-\mathbf{x}^{\left(1\right)}\,.\label{eq:vectorial-gap}
 \end{equation}
 
 \end_inset
@@ -63210,7 +63210,7 @@ literal "true"
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
  & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v^{\left(1\right)}_{n}da^{\left(1\right)}\,.
 \end{aligned}
-\label{eq696-2}
+\label{eq:tied-fluid-integral}
 \end{equation}
 
 \end_inset
@@ -63223,7 +63223,7 @@ To evaluate and linearize
  define the covariant basis vectors on each surface as 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{g}^{\left(i\right)}_{\alpha}=\frac{\partial\mathbf{x}^{\left(i\right)}}{\partial\eta^{\alpha}_{\left(i\right)}},\quad\alpha=1,2,\label{eq697-2}
+\mathbf{g}^{\left(i\right)}_{\alpha}=\frac{\partial\mathbf{x}^{\left(i\right)}}{\partial\eta^{\alpha}_{\left(i\right)}},\quad\alpha=1,2,\label{eq:covariant-basis-vectors}
 \end{equation}
 
 \end_inset
@@ -63245,7 +63245,7 @@ where
  The unit outward normal on each surface is then given by 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{n}^{\left(i\right)}=\frac{\mathbf{g}^{\left(i\right)}_{1}\times\mathbf{g}^{\left(i\right)}_{2}}{\left|\mathbf{g}^{\left(i\right)}_{1}\times\mathbf{g}^{\left(i\right)}_{2}\right|}\,.\label{eq698-2}
+\mathbf{n}^{\left(i\right)}=\frac{\mathbf{g}^{\left(i\right)}_{1}\times\mathbf{g}^{\left(i\right)}_{2}}{\left|\mathbf{g}^{\left(i\right)}_{1}\times\mathbf{g}^{\left(i\right)}_{2}\right|}\,.\label{eq:normal-vector}
 \end{equation}
 
 \end_inset
@@ -63256,7 +63256,7 @@ Now the contact integral may be rewritten as
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\,\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right|\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
  & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right|\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
 \end{aligned}
-\,,\label{eq699-2}
+\,,\label{eq:tied-fluid-integral-redux}
 \end{equation}
 
 \end_inset
@@ -63331,8 +63331,44 @@ nolink "false"
 \begin_inset Formula $J^{\left(1\right)}_{\eta}$
 \end_inset
 
- and of the ray projection along increments in the mesh displacement would have to be included;
- those terms are not part of the present formulation.
+ along increments in the mesh displacement would have to be included;
+ those terms are not part of the present formulation,
+ but they are accounted for in the tied fluid-FSI interface of Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Fluid-FSI-Interface"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ The ray projection itself requires no linearization,
+ because the parametric coordinates of coincident points on a tied interface are invariants,
+ as noted in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Tied-Fluid-Gap-Function"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -63417,7 +63453,7 @@ The premise of a tied interface is that the parametric coordinates of coincident
 
 \begin_layout Standard
 The vector gap function 
-\begin_inset Formula $\mathbf{g}$
+\begin_inset Formula $\mathbf{g}^{v}$
 \end_inset
 
 ,
@@ -63425,7 +63461,7 @@ The vector gap function
  is defined by 
 \begin_inset Formula 
 \begin{equation}
-\mathbf{g}=\mathbf{v}^{\left(2\right)}-\mathbf{v}^{\left(1\right)}\,,\label{TFI-vt-gap}
+\mathbf{g}^{v}=\mathbf{v}^{\left(2\right)}-\mathbf{v}^{\left(1\right)}\,,\label{TFI-vt-gap}
 \end{equation}
 
 \end_inset
@@ -63462,7 +63498,7 @@ nolink "false"
 Penalty Method
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Tied-BP-Penalty-Method-1"
+name "subsec:TFI-Penalty-Method"
 
 \end_inset
 
@@ -63474,7 +63510,7 @@ Let the tied interface viscous traction be described by the penalty function,
  
 \begin_inset Formula 
 \begin{equation}
-\mathbf{t}^{\tau}=\varepsilon_{t}\mathbf{g}\,,\label{eq:TFI-t-penalty}
+\mathbf{t}^{\tau}=\varepsilon_{t}\mathbf{g}^{v}\,,\label{eq:TFI-t-penalty}
 \end{equation}
 
 \end_inset
@@ -63660,20 +63696,20 @@ nolink "false"
 
  is given by
 \begin_inset Formula 
-\[
+\begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
  & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
 \end{aligned}
-\,,
-\]
+\,,\label{eq:TFI-integral-J-eta}
+\end{equation}
 
 \end_inset
 
 where
 \begin_inset Formula 
-\[
-J^{\left(1\right)}_{\eta}\equiv\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right|
-\]
+\begin{equation}
+J^{\left(1\right)}_{\eta}\equiv\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right|\label{eq:TFI-J-eta}
+\end{equation}
 
 \end_inset
 
@@ -63726,7 +63762,7 @@ nolink "false"
  in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq696-2"
+reference "eq:tied-fluid-integral"
 plural "false"
 caps "false"
 noprefix "false"
@@ -63868,7 +63904,7 @@ The magnitudes of the penalty factors deserve some attention.
 Augmented Lagrangian Scheme
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Tied-Fluid-Augmented-Lagrangian"
+name "subsec:TFI-Augmented-Lagrangian"
 
 \end_inset
 
@@ -63918,7 +63954,7 @@ nolink "false"
  are then replaced by
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{t}^{\tau} & =\boldsymbol{\lambda}_{v}+\varepsilon_{t}\mathbf{g}\\
+\begin{aligned}\mathbf{t}^{\tau} & =\boldsymbol{\lambda}_{v}+\varepsilon_{t}\mathbf{g}^{v}\\
 v_{n} & =\lambda_{J}+\varepsilon_{n}\pi
 \end{aligned}
 \,,\label{eq:TFI-auglag}
@@ -63947,7 +63983,7 @@ where
  The multipliers are held fixed within each Newton iteration and updated in an outer loop according to
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\boldsymbol{\lambda}_{v} & \leftarrow\boldsymbol{\lambda}_{v}+\varepsilon_{t}\mathbf{g}\\
+\begin{aligned}\boldsymbol{\lambda}_{v} & \leftarrow\boldsymbol{\lambda}_{v}+\varepsilon_{t}\mathbf{g}^{v}\\
 \lambda_{J} & \leftarrow\lambda_{J}+\varepsilon_{n}\pi
 \end{aligned}
 \,,\label{eq:TFI-uzawa}
@@ -64031,7 +64067,7 @@ nolink "false"
 Discretization
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Tied-BP-Discretization-2"
+name "subsec:TFI-Discretization"
 
 \end_inset
 
@@ -64186,7 +64222,7 @@ nolink "false"
  That contribution is symmetric,
  and positive semi-definite in both the velocity and the dilatation degrees of freedom,
  as required of a penalty regularization;
- this provides a convenient check on the signs of eqs.
+ this provides a convenient check on the signs of Eqs.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:TFI-discrete-6"
@@ -64222,6 +64258,696 @@ nolink "false"
 \end_layout
 
 \begin_layout Section
+Tied Fluid-FSI Interface
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Tied-Fluid-FSI-Interface"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The tied fluid-FSI interface follows the same formulation as that of the Tied Fluid Interface presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Fluid-Interface"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ with two modifications.
+ First,
+ the solid displacement 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ is added to the list of nodal degrees of freedom.
+ Second,
+ the nodal fluid degree of freedom in the FSI framework (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Weak-Formulation-FSI"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+) is not the fluid velocity 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ but the fluid velocity relative to the solid,
+ 
+\begin_inset Formula $\mathbf{w}=\mathbf{v}^{f}-\mathbf{v}^{s}$
+\end_inset
+
+ of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fsi-fluid-relative-velocity"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+;
+ accordingly,
+ it is 
+\begin_inset Formula $\delta\mathbf{w}$
+\end_inset
+
+ that is conjugate to the viscous traction 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+,
+ and 
+\begin_inset Formula $w_{n}=\mathbf{w}\cdot\mathbf{n}$
+\end_inset
+
+ that is conjugate to 
+\begin_inset Formula $\delta J$
+\end_inset
+
+,
+ in the external virtual work of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fsi-external-virtual-work"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ Since this tied interface also enforces 
+\begin_inset Formula $\left[\left[\mathbf{u}\right]\right]=\mathbf{0}$
+\end_inset
+
+,
+ and therefore 
+\begin_inset Formula $\left[\left[\mathbf{v}^{s}\right]\right]=\mathbf{0}$
+\end_inset
+
+,
+ constraining 
+\begin_inset Formula $\left[\left[\mathbf{w}\right]\right]=\mathbf{0}$
+\end_inset
+
+ is equivalent to enforcing the no-slip condition 
+\begin_inset Formula $\left[\left[\mathbf{v}^{f}\right]\right]=\mathbf{0}$
+\end_inset
+
+ of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-tied-fluid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+\begin_inset Formula $_{2}$
+\end_inset
+
+.
+ Here,
+ it should be noted that the traction which is continuous across the interface is the total traction (or mixture traction),
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}=\mathbf{t}^{f}+\mathbf{t}^{s}\label{eq:TFSI-mixture-traction}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{t}^{f}$
+\end_inset
+
+ is the fluid traction and 
+\begin_inset Formula $\mathbf{t}^{s}$
+\end_inset
+
+ is the solid traction.
+ But
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}^{f}=-p\mathbf{n}+\mathbf{t}^{\tau}\label{eq:TFSI-fluid-traction}
+\end{equation}
+
+\end_inset
+
+and since 
+\begin_inset Formula $\left[\left[p\right]\right]=0$
+\end_inset
+
+ as explained in the paragraph after Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-energy-redux"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ and 
+\begin_inset Formula $\left[\left[\mathbf{t}^{\tau}\right]\right]=\mathbf{0}$
+\end_inset
+
+ according to Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:jump-tied-fluid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+
+\begin_inset Formula $_{3}$
+\end_inset
+
+,
+ it follows that 
+\begin_inset Formula $\left[\left[\mathbf{t}^{f}\right]\right]=\mathbf{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left[\left[\mathbf{t}^{s}\right]\right]=\mathbf{0}$
+\end_inset
+
+.
+ This latter relation becomes the basis for implementing the following tied interface.
+ Just like a regular tied biphasic interface (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Biphasic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+),
+ we propose that the virtual work on the tied fluid-FSI interface takes the form
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\mathbf{t}^{s\left(1\right)}da^{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)w^{\left(1\right)}_{n}da^{\left(1\right)}\,.
+\end{aligned}
+\label{eq:TFSI-integral}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\delta\mathbf{v}^{s}$
+\end_inset
+
+ is the virtual solid velocity and 
+\begin_inset Formula $\delta\mathbf{w}$
+\end_inset
+
+ is the virtual relative fluid velocity.
+ Here,
+ we must recognize that the domain 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ is not fixed,
+ it may deform with time.
+ Using the relations of Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:covariant-basis-vectors"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:normal-vector"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ we may rewrite Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFSI-integral"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\mathbf{t}^{s}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)w_{n}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+\end{aligned}
+\label{eq:TFSI-Integral-redux}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{t}^{s}\equiv\mathbf{t}^{s\left(1\right)}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\mathbf{t}^{\tau}\equiv\mathbf{t}^{\tau\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{n}\equiv w^{\left(1\right)}_{n}$
+\end_inset
+
+,
+ and where 
+\begin_inset Formula $J^{\left(1\right)}_{\eta}$
+\end_inset
+
+ is defined in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-J-eta"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Using the penalty method,
+ the material in Section
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:TFI-Penalty-Method"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ requires two supplements.
+ First,
+ since the nodal fluid degree of freedom is the relative velocity 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+,
+ the vectorial velocity gap of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "TFI-vt-gap"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ is evaluated as
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}^{w}=\mathbf{w}^{\left(2\right)}-\mathbf{w}^{\left(1\right)}\,,\label{eq:TFSI-w-gap}
+\end{equation}
+
+\end_inset
+
+so that the viscous traction penalty of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-t-penalty"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ becomes 
+\begin_inset Formula $\mathbf{t}^{\tau}=\varepsilon_{t}\mathbf{g}^{w}$
+\end_inset
+
+,
+ whereas the dilatation penalty of Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFI-v-penalty"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ carries over unchanged as 
+\begin_inset Formula $w_{n}=\varepsilon_{n}\pi$
+\end_inset
+
+.
+ Second,
+ the solid traction is prescribed by
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}^{s}=\varepsilon_{s}\mathbf{g}\label{eq:fluid-FSI-solid-traction}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+ is the vectorial gap defined in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:vectorial-gap"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ The augmented Lagrangian scheme is a natural extension of Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:TFI-Augmented-Lagrangian"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ in which Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fluid-FSI-solid-traction"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ is replaced with 
+\begin_inset Formula $\mathbf{t}^{s}=\boldsymbol{\lambda}_{s}+\varepsilon_{s}\mathbf{g}$
+\end_inset
+
+,
+ supplemented with the multiplier update
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\lambda}_{s}\leftarrow\boldsymbol{\lambda}_{s}+\varepsilon_{s}\mathbf{g}\label{eq:TFSI-uzawa}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discretization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:TFSI-Discretization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Following the material presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:TFI-Discretization"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ we recognize that
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\mathbf{t}^{s}\right]\\
+ & +\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\right]\\
+ & +\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)w_{n}\right]
+\end{aligned}
+\label{eq:TFSI-discrete-1}
+\end{equation}
+
+\end_inset
+
+The variables may be interpolated over each element face according to 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{v}^{s\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{a=1}N^{\left(1\right)}_{a}\delta\mathbf{v}^{s\left(1\right)}_{a} & \delta\mathbf{v}^{s\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{b=1}N^{\left(2\right)}_{b}\delta\mathbf{v}^{s\left(2\right)}_{b}\\
+\Delta\mathbf{u}^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{u}^{\left(1\right)}_{c} & \Delta\mathbf{u}^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+\delta\mathbf{w}^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{a=1}N^{\left(1\right)}_{a}\delta\mathbf{w}^{\left(1\right)}_{a} & \delta\mathbf{w}^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{b=1}N^{\left(2\right)}_{b}\delta\mathbf{w}^{\left(2\right)}_{b}\\
+\Delta\mathbf{w}^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{w}^{\left(1\right)}_{c} & \Delta\mathbf{w}^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{w}^{\left(2\right)}_{d}\\
+\delta J^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{a=1}N^{\left(1\right)}_{a}\delta J^{\left(1\right)}_{a} & \delta J^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{b=1}N^{\left(2\right)}_{b}\delta J^{\left(2\right)}_{b}\\
+\Delta J^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{c=1}N^{\left(1\right)}_{c}\Delta J^{\left(1\right)}_{c} & \Delta J^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{d=1}N^{\left(2\right)}_{d}\Delta J^{\left(2\right)}_{d}
+\end{aligned}
+\,.\label{eq:TFSI-discrete-2}
+\end{equation}
+
+\end_inset
+
+Then,
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{s\left(1\right)}_{a} & \delta\mathbf{w}^{\left(1\right)}_{a} & \delta J^{\left(1\right)}_{a}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}^{s\left(1\right)}_{a}\\
+\mathbf{f}^{\left(1\right)}_{a}\\
+f^{J\left(1\right)}_{a}
+\end{array}\right]\right.\\
+ & \left.+\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{s\left(2\right)}_{b,k} & \delta\mathbf{w}^{\left(2\right)}_{b,k} & \delta J^{\left(2\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}^{s\left(2\right)}_{b,k}\\
+\mathbf{f}^{\left(2\right)}_{b,k}\\
+f^{J\left(2\right)}_{b,k}
+\end{array}\right]\right)
+\end{aligned}
+\,,\label{eq:TFSI-discrete-3}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}^{s\left(1\right)}_{a} & =N^{\left(1\right)}_{a}\mathbf{t}^{s} & \mathbf{f}^{s\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}\mathbf{t}^{s}\\
+\mathbf{f}^{\left(1\right)}_{a} & =N^{\left(1\right)}_{a}\mathbf{t}^{\tau} & \mathbf{f}^{\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}\mathbf{t}^{\tau}\\
+f^{J\left(1\right)}_{a} & =N^{\left(1\right)}_{a}w_{n} & f^{J\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}w_{n}
+\end{aligned}
+\,.\label{eq:TFSI-discrete-4}
+\end{equation}
+
+\end_inset
+
+Similarly,
+ the linearizations of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ produce
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\\
+ & \times\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{s\left(1\right)}_{a} & \delta\mathbf{w}^{\left(1\right)}_{a} & \delta J^{\left(1\right)}_{a}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{ccc}
+\mathbf{K}^{s\left(1,1\right)}_{ac} & \mathbf{0} & \mathbf{0}\\
+\mathbf{K}^{fs\left(1,1\right)}_{ac} & \mathbf{K}^{\left(1,1\right)}_{ac} & \mathbf{0}\\
+\mathbf{k}^{fs\left(1,1\right)}_{ac} & \mathbf{0} & k^{\left(1,1\right)}_{ac}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+\Delta\mathbf{w}^{\left(1\right)}_{c}\\
+\Delta J^{\left(1\right)}_{c}
+\end{array}\right]\right.\right.\\
+ & +\left.\sum\limits^{m^{\left(2\right)}_{k}}_{d=1}\left[\begin{array}{ccc}
+\mathbf{K}^{s\left(1,2\right)}_{ad,k} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{K}^{\left(1,2\right)}_{ad,k} & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} & k^{\left(1,2\right)}_{ad,k}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+\Delta\mathbf{w}^{\left(2\right)}_{d}\\
+\Delta J^{\left(2\right)}_{d}
+\end{array}\right]\right)\\
+ & +\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{s\left(2\right)}_{b,k} & \delta\mathbf{w}^{\left(2\right)}_{b,k} & \delta J^{\left(2\right)}_{b,k}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{ccc}
+\mathbf{K}^{s\left(2,1\right)}_{bc,k} & \mathbf{0} & \mathbf{0}\\
+\mathbf{K}^{fs\left(2,1\right)}_{bc,k} & \mathbf{K}^{\left(2,1\right)}_{bc,k} & \mathbf{0}\\
+\mathbf{k}^{fs\left(2,1\right)}_{bc,k} & \mathbf{0} & k^{\left(2,1\right)}_{bc,k}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+\Delta\mathbf{w}^{\left(1\right)}_{c}\\
+\Delta J^{\left(1\right)}_{c}
+\end{array}\right]\right.\\
+ & +\left.\left.\sum\limits^{m^{\left(2\right)}_{k}}_{d=1}\left[\begin{array}{ccc}
+\mathbf{K}^{s\left(2,2\right)}_{bd,k} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{K}^{\left(2,2\right)}_{bd,k} & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} & k^{\left(2,2\right)}_{bd,k}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+\Delta\mathbf{w}^{\left(2\right)}_{d}\\
+\Delta J^{\left(2\right)}_{d}
+\end{array}\right]\right)\right)\,,
+\end{aligned}
+\label{eq:TFSI-discrete-5}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}^{s\left(1,1\right)}_{ac} & =-\alpha_{f}N^{\left(1\right)}_{a}\left(\frac{\mathbf{t}^{s}\otimes\left(\boldsymbol{\mathcal{A}}^{\left(1\right)}_{c}\cdot\mathbf{n}^{\left(1\right)}\right)}{J^{\left(1\right)}_{\eta}}+\varepsilon_{s}N^{\left(1\right)}_{c}\mathbf{I}\right)\\
+\mathbf{K}^{s\left(1,2\right)}_{ad,k} & =\alpha_{f}\varepsilon_{s}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
+\mathbf{K}^{s\left(2,1\right)}_{bc,k} & =\alpha_{f}N^{\left(2\right)}_{b}\left(\frac{\mathbf{t}^{s}\otimes\left(\boldsymbol{\mathcal{A}}^{\left(1\right)}_{c}\cdot\mathbf{n}^{\left(1\right)}\right)}{J^{\left(1\right)}_{\eta}}+\varepsilon_{s}N^{\left(1\right)}_{c}\mathbf{I}\right)\\
+\mathbf{K}^{s\left(2,2\right)}_{bd,k} & =-\alpha_{f}\varepsilon_{s}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
+\end{aligned}
+\label{eq:TFSI-discrete-6}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}^{fs\left(1,1\right)}_{ac} & =-\alpha_{f}N^{\left(1\right)}_{a}\left(\frac{\mathbf{t}^{\tau}\otimes\left(\boldsymbol{\mathcal{A}}^{\left(1\right)}_{c}\cdot\mathbf{n}^{\left(1\right)}\right)}{J^{\left(1\right)}_{\eta}}\right)\\
+\mathbf{K}^{fs\left(2,1\right)}_{bc,k} & =\alpha_{f}N^{\left(2\right)}_{b}\left(\frac{\mathbf{t}^{\tau}\otimes\left(\boldsymbol{\mathcal{A}}^{\left(1\right)}_{c}\cdot\mathbf{n}^{\left(1\right)}\right)}{J^{\left(1\right)}_{\eta}}\right)\\
+\mathbf{k}^{fs\left(1,1\right)}_{ac} & =-\alpha_{f}\frac{w_{n}}{J^{\left(1\right)}_{\eta}}N^{\left(1\right)}_{a}\boldsymbol{\mathcal{A}}^{\left(1\right)}_{c}\cdot\mathbf{n}^{\left(1\right)}\\
+\mathbf{k}^{fs\left(2,1\right)}_{bc,k} & =\alpha_{f}\frac{w_{n}}{J^{\left(1\right)}_{\eta}}N^{\left(2\right)}_{b}\boldsymbol{\mathcal{A}}^{\left(1\right)}_{c}\cdot\mathbf{n}^{\left(1\right)}
+\end{aligned}
+\label{eq:TFSI-discrete-7}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =-\alpha_{f}\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(1,2\right)}_{ad,k} & =\alpha_{f}\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
+\mathbf{K}^{\left(2,1\right)}_{bc,k} & =\alpha_{f}\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(2,2\right)}_{bd,k} & =-\alpha_{f}\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
+\end{aligned}
+\,,\label{eq:TFSI-discrete-8}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}k^{\left(1,1\right)}_{ac} & =-\alpha_{f}\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
+k^{\left(1,2\right)}_{ad,k} & =\alpha_{f}\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
+k^{\left(2,1\right)}_{bc,k} & =\alpha_{f}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
+k^{\left(2,2\right)}_{bd,k} & =-\alpha_{f}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
+\end{aligned}
+\,.\label{eq:TFSI-discrete-9}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{\mathcal{A}}^{\left(1\right)}_{c}\equiv\boldsymbol{\mathcal{A}}\left\{ \frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{2}}\mathbf{g}^{\left(1\right)}_{1}-\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{1}}\mathbf{g}^{\left(1\right)}_{2}\right\} \label{eq:TFSI-Ac1}
+\end{equation}
+
+\end_inset
+
+is the antisymmetric tensor whose dual vector appears between the curly brackets.
+\end_layout
+
+\begin_layout Section
 Rigid Connectors
 \begin_inset CommandInset label
 LatexCommand label
@@ -64237,7 +64963,7 @@ A
 \emph on
 rigid connector
 \emph default
- connects two rigid bodies deoted by 
+ connects two rigid bodies denoted by 
 \begin_inset Formula $\left(1\right)$
 \end_inset
 
