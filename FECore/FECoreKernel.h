@@ -243,13 +243,13 @@ public:
 
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
-#define REGISTER_FECORE_CLASS_T(theClass, theArg, theName) \
-	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::superClassID(), #theClass, theClass<theArg>::BaseClassName(), theName);
+#define REGISTER_FECORE_CLASS_T(theClass, theArg, theName, ...) \
+	static FERegisterClass_T<theClass<theArg> > _##theClass##theArg##_rc(theClass<theArg>::superClassID(), #theClass, theClass<theArg>::BaseClassName(), theName, __VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // version for classes that require template arguments
-#define REGISTER_FECORE_CLASS_T2(theClass, theArg1, theArg2, theName) \
-	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::superClassID(), #theClass, theClass<theArg1, theArg2>::BaseClassName(), theName);
+#define REGISTER_FECORE_CLASS_T2(theClass, theArg1, theArg2, theName, ...) \
+	static FERegisterClass_T<theClass<theArg1, theArg2> > _##theClass##theArg1##theArg2##_rc(theClass<theArg1, theArg2>::superClassID(), #theClass, theClass<theArg1, theArg2>::BaseClassName(), theName, __VA_ARGS__);
 
 //-----------------------------------------------------------------------------
 // Create an instance of a class.

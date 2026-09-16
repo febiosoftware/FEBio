@@ -50,9 +50,31 @@ void ElementDataRecord::SetData(const char *szexpr)
 	for (size_t i = 0; i < data.size(); ++i)
 	{
 		FELogElemSource* pdata = DS.GetElementDataSource(data[i].name);
-		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(data[i].name);
+		if (pdata == nullptr) throw UnknownDataField(data[i].name);
+
+		if (!data[i].comp.empty())
+		{
+			if (pdata->SetComponent(data[i].comp) == false)
+				throw UnknownDataField(data[i].name);
+		}
+
+		if (data[i].index != -1)
+		{
+			if (pdata->SetIndex(data[i].index) == false)
+				throw UnknownDataField(data[i].name);
+		}
+
+		m_Data.push_back(pdata);
 	}
+}
+
+bool ElementDataRecord::Init()
+{
+	for (size_t i = 0; i < m_Data.size(); ++i)
+	{
+		if (m_Data[i] == nullptr || m_Data[i]->Init() == false) return false;
+	}
+	return DataRecord::Init();
 }
 
 //-----------------------------------------------------------------------------

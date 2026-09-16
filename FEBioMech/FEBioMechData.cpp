@@ -246,51 +246,19 @@ double FELogContactPressure::value(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
-double FELogContactTractionX::value(FESurfaceElement& el)
+vec3d FELogContactTraction::value_vec3d(FESurfaceElement& el)
 {
 	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
-	if (ps == nullptr) return 0.0;
+	if (ps == nullptr) return vec3d(0.0,0.0,0.0);
 
 	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
 	if ((pci == 0) || pci->IsActive())
 	{
 		vec3d tn;
 		ps->GetSurfaceTraction(el.m_lid, tn);
-		return tn.x;
+		return tn;
 	}
-	return 0.0;
-}
-
-//-----------------------------------------------------------------------------
-double FELogContactTractionY::value(FESurfaceElement& el)
-{
-	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
-	if (ps == nullptr) return 0.0;
-
-	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
-	if ((pci == 0) || pci->IsActive())
-	{
-		vec3d tn;
-		ps->GetSurfaceTraction(el.m_lid, tn);
-		return tn.y;
-	}
-	return 0.0;
-}
-
-//-----------------------------------------------------------------------------
-double FELogContactTractionZ::value(FESurfaceElement& el)
-{
-	FEContactSurface* ps = dynamic_cast<FEContactSurface*>(el.GetMeshPartition());
-	if (ps == nullptr) return 0.0;
-
-	FEContactInterface* pci = ps->GetContactInterface(); assert(pci);
-	if ((pci == 0) || pci->IsActive())
-	{
-		vec3d tn;
-		ps->GetSurfaceTraction(el.m_lid, tn);
-		return tn.z;
-	}
-	return 0.0;
+	return vec3d(0.0,0.0,0.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -1842,6 +1810,30 @@ double FELogElemStressEigenVector::value(FEElement& el)
 	return v;
 }
 
+mat3d FELogTotalDeformationGradient::value_mat3d(FEElement& el)
+{
+	mat3d val; val.zero();
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEElasticMaterialPoint* pt = mp.ExtractData<FEElasticMaterialPoint>();
+		if (pt)
+		{
+			FEPrestrainMaterialPoint* pp = mp.ExtractData<FEPrestrainMaterialPoint>();
+			mat3d F = pt->m_F;
+			if (pp)
+			{
+				mat3d Fp = pp->prestrain();
+				F = F * Fp;
+			}
+
+			val += F;
+		}
+	}
+	return val / (double)nint;
+}
+
 //-----------------------------------------------------------------------------
 double FELogElemDeformationGradientXX::value(FEElement& el)
 {
@@ -1986,7 +1978,7 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 	return val / (double) nint;
 }
 
-double FELogTotalDeformationGradient::value(FEElement& el)
+double FELogTotalDeformationGradient_::value(FEElement& el)
 {
 	double val = 0.0;
 	int nint = el.GaussPoints();
@@ -2090,6 +2082,39 @@ double FELogElemFiberStretch::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
+vec3d FELogElemFiberVector::value_vec3d(FEElement& el)
+{
+	int matID = el.GetMatID();
+	FEMaterial* mat = GetFEModel()->GetMaterial(matID);
+
+	FEElasticMaterial* pme = mat->ExtractProperty<FEElasticMaterial>();
+	if (pme == nullptr) return vec3d(0.0,0.0,0.0);
+
+	FEVec3dValuator* vec = dynamic_cast<FEVec3dValuator*>(pme->GetProperty("fiber"));
+	if (vec == nullptr) return vec3d(0.0,0.0,0.0);
+
+	int n = el.GaussPoints();
+	vec3d l(0.0, 0.0, 0.0);
+	for (int j = 0; j < n; ++j)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+
+		const FEElasticMaterialPoint* pt = mp.ExtractData<const FEElasticMaterialPoint>();
+		if (pt)
+		{
+			mat3d Q = pme->GetLocalCS(mp);
+			mat3d F = pt->m_F;
+			vec3d a0 = vec->unitVector(mp);
+			vec3d ar = Q * a0;
+			vec3d a = F * ar; a.unit();
+
+			l += a;
+		}
+	}
+	l /= (double)n;
+	return l;
+}
+
 double FELogElemFiberVector_::value(FEElement& el)
 {
 	int matID = el.GetMatID();
@@ -2397,7 +2422,7 @@ double FELogDiscreteElementElongation::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-double FELogDiscreteElementForce::value(FEElement& el)
+double FELogDiscreteElementScalarForce::value(FEElement& el)
 {
 	if (dynamic_cast<FEDiscreteElement*>(&el) == nullptr) return 0.0;
 
@@ -2420,55 +2445,43 @@ double FELogDiscreteElementForce::value(FEElement& el)
 }
 
 //-----------------------------------------------------------------------------
-double FELogDiscreteElementForceX::value(FEElement& el)
+vec3d FELogDiscreteElementForce::value_vec3d(FEElement& el)
 {
 	FEDiscreteElasticMaterialPoint* mp = el.GetMaterialPoint(0)->ExtractData<FEDiscreteElasticMaterialPoint>();
-	if (mp) return mp->m_Ft.x;
-	else return 0.0;
+	if (mp) return mp->m_Ft;
+	else return vec3d(0.0, 0.0, 0.0);
 }
 
 //-----------------------------------------------------------------------------
-double FELogDiscreteElementForceY::value(FEElement& el)
+bool FELogElementMixtureStress::SetIndex(int n)
 {
-	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
-	if (mp) return mp->m_Ft.y;
-	else return 0.0;
+	m_index = n;
+	return true;
 }
 
-//-----------------------------------------------------------------------------
-double FELogDiscreteElementForceZ::value(FEElement& el)
+bool FELogElementMixtureStress::Init()
 {
-	FEDiscreteElasticMaterialPoint* mp = dynamic_cast<FEDiscreteElasticMaterialPoint*>(el.GetMaterialPoint(0));
-	if (mp) return mp->m_Ft.z;
-	else return 0.0;
+	if (m_index < 0) return false;
+	return FELogElemMat3dsData::Init();
 }
 
-//-----------------------------------------------------------------------------
-double FELogElementMixtureStress::value(FEElement& el)
+mat3ds FELogElementMixtureStress::value_mat3ds(FEElement& el)
 {
-	if (m_comp < 0) return 0.0;
+	if (m_index < 0) return mat3ds(0.0);
 
-	double s = 0.0;
+	mat3ds s(0.0);
 	for (int n = 0; n < el.GaussPoints(); ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEElasticMixtureMaterialPoint* mmp = mp.ExtractData< FEElasticMixtureMaterialPoint>();
 		if (mmp)
 		{
-			if (m_comp < mmp->Components())
+			if (m_index < mmp->Components())
 			{
-				FEElasticMaterialPoint* ep = mmp->GetPointData(m_comp)->ExtractData<FEElasticMaterialPoint>();
+				FEElasticMaterialPoint* ep = mmp->GetPointData(m_index)->ExtractData<FEElasticMaterialPoint>();
 				if (ep)
 				{
-					switch (m_metric)
-					{
-					case 0: s += ep->m_s.xx(); break;
-					case 1: s += ep->m_s.xy(); break;
-					case 2: s += ep->m_s.yy(); break;
-					case 3: s += ep->m_s.xz(); break;
-					case 4: s += ep->m_s.yz(); break;
-					case 5: s += ep->m_s.zz(); break;
-					}
+					s += ep->m_s;
 				}
 			}
 		}

@@ -314,6 +314,25 @@ std::vector<DataRecordItem> ProcessDataString(const char* szdata)
 
 			item.params.push_back(params);
 		}
+
+		// see if the name has a component defined
+		size_t dot = name.find(".");
+		if (dot != std::string::npos)
+		{
+			item.comp = name.substr(dot + 1);
+			name = name.substr(0, dot);
+		}
+
+		cl = name.find("[");
+		if (cl != std::string::npos)
+		{
+			size_t cr = name.rfind("]");
+			if (cr == std::string::npos) throw UnknownDataField(name);
+			string index = name.substr(cl + 1, cr - cl - 1);
+			name = name.substr(0, cl);
+			item.index = atoi(index.c_str());
+		}
+
 		item.name = name;
 
 		data.push_back(item);

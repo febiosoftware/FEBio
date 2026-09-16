@@ -53,6 +53,11 @@ void DataStore::Clear()
 
 bool DataStore::Init()
 {
+	for (size_t i = 0; i < m_data.size(); ++i)
+	{
+		if (m_data[i]->Init() == false) return false;
+	}
+
 	for (size_t i = 0; i < m_elemDefs.size(); ++i)
 	{
 		auto& def = *m_elemDefs[i];

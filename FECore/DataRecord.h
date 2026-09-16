@@ -114,6 +114,8 @@ struct DataRecordItem
 {
 	string name;
 	std::vector<std::string> params;
+	int index = -1;
+	string comp;
 };
 
 FECORE_API std::vector<DataRecordItem> ProcessDataString(const char* szdata);

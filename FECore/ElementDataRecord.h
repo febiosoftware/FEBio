@@ -42,6 +42,8 @@ class FECORE_API ElementDataRecord : public DataRecord
 public:
 	ElementDataRecord(FEModel* pfem);
 
+	bool Init() override;
+
 	double Evaluate(int item, int ndata) override;
 	void SetData(const char* sz) override;
 	void SelectAllItems() override;

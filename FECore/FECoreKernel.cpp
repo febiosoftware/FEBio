@@ -437,7 +437,7 @@ FECoreBase* FECoreKernel::CreateInstance(const FECoreFactory* fac, FEModel* fem)
 		{
 			int n1 = FECORE_SPEC_MAJOR(nspec);
 			int n2 = FECORE_SPEC_MINOR(nspec);
-			feLogWarningEx(fem, "\"%s\" is deprecated in spec %d.%d!", fac->GetTypeStr(), n1, n2);
+			feLogWarningEx(fem, "\"%s\" is deprecated in version %d.%d!", fac->GetTypeStr(), n1, n2);
 		}
 	}
 

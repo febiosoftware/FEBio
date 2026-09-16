@@ -32,4 +32,10 @@ class FECORE_API FELogData : public FECoreBase
 {
 public:
 	FELogData(FEModel* fem);
+
+	virtual bool SetParameters(std::vector<std::string>& params) { return params.empty(); }
+
+	virtual bool SetComponent(const std::string& comp) { return false; }
+
+	virtual bool SetIndex(int n) { return false; }
 };

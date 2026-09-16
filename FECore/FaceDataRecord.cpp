@@ -35,6 +35,36 @@ FELogFaceData::FELogFaceData(FEModel* fem) : FELogData(fem) {}
 //-----------------------------------------------------------------------------
 FELogFaceData::~FELogFaceData() {}
 
+
+bool FELogFaceVec3dData::SetComponent(const std::string& comp)
+{
+	if      (comp == "x") m_comp = 0;
+	else if (comp == "y") m_comp = 1;
+	else if (comp == "z") m_comp = 2;
+	else return false;
+	return true;
+}
+
+bool FELogFaceVec3dData::Init()
+{
+	if (m_comp == -1) return false;
+	return FELogFaceData::Init();
+}
+
+double FELogFaceVec3dData::value(FESurfaceElement& el)
+{
+	vec3d v = value_vec3d(el);
+	switch (m_comp)
+	{
+	case 0: return v.x; break;
+	case 1: return v.y; break;
+	case 2: return v.z; break;
+	default:
+		assert(false);
+	}
+	return 0.0;
+}
+
 //-----------------------------------------------------------------------------
 FaceDataRecord::FaceDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_FACE) 
 {
