@@ -41,25 +41,16 @@ void NodeDataRecord::SetData(const char* szexpr)
 	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
 	if (data.empty()) throw UnknownDataField(szexpr);
 
+	DataStore& DS = GetFEModel()->GetDataStore();
+
 	m_Data.clear();
 	m_data = szexpr;
 	FEModel* fem = GetFEModel();
 	for (int i=0; i<data.size(); ++i)
 	{
-		FELogNodeData* pdata = fecore_new<FELogNodeData>(data[i].name.c_str(), fem);
+		FELogNodeData* pdata = DS.GetNodeDataSource(data[i].name);
 		if (pdata) m_Data.push_back(pdata);
-		else 
-		{
-			// see if this refers to a DOF of the model
-			int ndof = fem->GetDOFIndex(data[i].name.c_str());
-			if (ndof >= 0)
-			{
-				// Add an output for a nodal variable
-				pdata = new FENodeVarData(fem, ndof);
-				m_Data.push_back(pdata);
-			}
-			else throw UnknownDataField(data[i].name);
-		}
+		else throw UnknownDataField(data[i].name);
 	}
 }
 

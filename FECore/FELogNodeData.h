@@ -39,3 +39,14 @@ public:
 	virtual ~FELogNodeData();
 	virtual double value(const FENode& node) = 0;
 };
+
+// Special class for outputting nodal field variables
+class FECORE_API FENodeVarData : public FELogNodeData
+{
+public:
+	FENodeVarData(FEModel* pfem, int ndof);
+	double value(const FENode& node) override;
+
+private:
+	int	m_ndof;
+};
