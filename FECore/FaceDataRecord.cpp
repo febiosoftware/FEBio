@@ -47,21 +47,17 @@ int FaceDataRecord::Size() const { return (int)m_Data.size(); }
 //-----------------------------------------------------------------------------
 void FaceDataRecord::SetData(const char* szexpr)
 {
-	char szcopy[MAX_STRING] = { 0 };
-	strcpy(szcopy, szexpr);
-	char* sz = szcopy, *ch;
+	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
+	if (data.empty()) throw UnknownDataField(szexpr);
+
 	m_Data.clear();
-	strcpy(m_szdata, szexpr);
-	do
+	m_data = szexpr;
+	for (size_t i = 0; i < data.size(); ++i)
 	{
-		ch = strchr(sz, ';');
-		if (ch) *ch++ = 0;
-		FELogFaceData* pdata = fecore_new<FELogFaceData>(sz, GetFEModel());
+		FELogFaceData* pdata = fecore_new<FELogFaceData>(data[i].name.c_str(), GetFEModel());
 		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(sz);
-		sz = ch;
+		else throw UnknownDataField(data[i].name);
 	}
-	while (ch);
 }
 
 //-----------------------------------------------------------------------------

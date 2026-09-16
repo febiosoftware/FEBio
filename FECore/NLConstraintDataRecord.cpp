@@ -31,33 +31,25 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FEModel.h"
 
-//-----------------------------------------------------------------------------
 void NLConstraintDataRecord::SetData(const char* szexpr)
 {
-    char szcopy[MAX_STRING] = {0};
-    strcpy(szcopy, szexpr);
-    char* sz = szcopy, *ch;
-    m_Data.clear();
-    strcpy(m_szdata, szexpr);
-    do
-    {
-        ch = strchr(sz, ';');
-        if (ch) *ch++ = 0;
-        FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(sz, GetFEModel());
-        if (pdata) m_Data.push_back(pdata);
-        else throw UnknownDataField(sz);
-        sz = ch;
-    }
-    while (ch);
+	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
+	if (data.empty()) throw UnknownDataField(szexpr);
+
+	m_Data.clear();
+	m_data = szexpr;
+	for (int i=0; i<data.size(); ++i)
+	{
+		FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(data[i].name.c_str(), GetFEModel());
+		if (pdata) m_Data.push_back(pdata);
+		else throw UnknownDataField(data[i].name);
+	}
 }
 
-//-----------------------------------------------------------------------------
 NLConstraintDataRecord::NLConstraintDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_NLC) {}
 
-//-----------------------------------------------------------------------------
 int NLConstraintDataRecord::Size() const { return (int)m_Data.size(); }
 
-//-----------------------------------------------------------------------------
 double NLConstraintDataRecord::Evaluate(int item, int ndata)
 {
     FEModel* fem = GetFEModel();
@@ -68,7 +60,6 @@ double NLConstraintDataRecord::Evaluate(int item, int ndata)
 	return m_Data[ndata]->value(nlc);
 }
 
-//-----------------------------------------------------------------------------
 void NLConstraintDataRecord::SelectAllItems()
 {
     FEModel* fem = GetFEModel();

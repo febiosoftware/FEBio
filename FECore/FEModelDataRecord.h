@@ -53,5 +53,5 @@ public:
 	int Size() const;
 
 private:
-	std::vector<FEModelLogData*>	m_data;
+	std::vector<FEModelLogData*>	m_Data;
 };

@@ -42,7 +42,7 @@ public:
     virtual ~FELogDomainData() {}
     virtual double value(FEDomain& rc) = 0;
 
-    virtual bool SetParameters(std::vector<std::string>& params) { return false; }
+    virtual bool SetParameters(std::vector<std::string>& params) { return params.empty(); }
 };
 
 //-----------------------------------------------------------------------------
