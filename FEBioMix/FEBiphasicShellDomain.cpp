@@ -512,7 +512,7 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
     int neln = el.Nodes();
     
     double dt = GetFEModel()->GetTime().timeIncrement;
-    double tau = m_pMat->m_tau;
+    double tau_scale = m_pMat->m_tau;
     
     vector<vec3d> gradMu(neln), gradMd(neln);
     vector<double> Mu(neln), Md(neln);
@@ -532,6 +532,8 @@ bool FEBiphasicShellDomain::ElementBiphasicStiffness(FEShellElement& el, matrix&
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint >());
         FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+
+		double tau = pt.m_tau * tau_scale;
         
         // calculate the jacobian
         detJt = detJ(el, n);

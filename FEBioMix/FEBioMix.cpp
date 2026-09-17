@@ -244,6 +244,7 @@ void FEBioMix::InitModule()
 	REGISTER_FECORE_CLASS(FEPlotSolidStress                      , "solid stress"        );
 	REGISTER_FECORE_CLASS(FEPlotLocalFluidLoadSupport            , "local fluid load support"        );
 	REGISTER_FECORE_CLASS(FEPlotEffectiveFrictionCoeff           , "effective friction coefficient"  );
+	REGISTER_FECORE_CLASS(FEPlotPressureStabilization            , "pressure stabilization");
 
 	//-----------------------------------------------------------------------------
 	// Element log data

@@ -35,11 +35,13 @@ SOFTWARE.*/
 #include <FEBioMech/FEBioMech.h>
 #include <FECore/FELinearSystem.h>
 #include "FEBioMix.h"
+#include <FECore/FEEdgeList.h>
 
 BEGIN_FECORE_CLASS(FEBiphasicSolidDomain, FESolidDomain)
     ADD_PARAMETER(m_secant_stress, "secant_stress");
     ADD_PARAMETER(m_secant_tangent, "secant_tangent");
     ADD_PARAMETER(m_secant_perm_tangent, "secant_permeability_tangent");
+	ADD_PARAMETER(m_auto_pressure_stab, "auto_pressure_stabilization");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -49,6 +51,7 @@ FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem
     m_secant_stress = false;
     m_secant_tangent = false;
     m_secant_perm_tangent = false;
+	m_auto_pressure_stab = false;
 
 	if (pfem)
 	{
@@ -154,6 +157,15 @@ bool FEBiphasicSolidDomain::Init()
 
 	// allocate nodal pressures
 	m_nodePressure.resize(Nodes(), 0.0);
+
+	if (m_auto_pressure_stab)
+	{
+		if (!CalcAutoPressureStabilization())
+		{
+			feLogError("Failed to calculate automatic pressure stabilization factor.");
+			return false;
+		}
+	}
     
 	return true;
 }
@@ -600,7 +612,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
     double* gw = el.GaussWeights();
     
     double dt = GetFEModel()->GetTime().timeIncrement;
-    double tau = m_pMat->m_tau;
+    double tau_scale = m_pMat->m_tau;
     
     // zero stiffness matrix
     ke.zero();
@@ -611,6 +623,8 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
         FEMaterialPoint& mp = *el.GetMaterialPoint(n);
         FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint >());
         FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+
+		double tau = pt.m_tau * tau_scale;
         
         // calculate jacobian
         double detJ = invjact(el, Ji, n);
@@ -1158,7 +1172,7 @@ vec3d FEBiphasicSolidDomain::FluidFlux(FEMaterialPoint& mp)
     
     vec3d w = -(kt*gradp);
     
-    double tau = m_pMat->m_tau;
+    double tau = ppt.m_tau * m_pMat->m_tau;
     if (tau > 0) {
         double dt = GetFEModel()->GetTime().timeIncrement;
         w -= kt*(gradp - ppt.m_gradpp)*(tau/dt);
@@ -1249,4 +1263,61 @@ void FEBiphasicSolidDomain::GetNodalPressures(vector<double>& data)
 	{
 		data[NodeIndex(i)] = m_nodePressure[i];
 	}
+}
+
+bool FEBiphasicSolidDomain::CalcAutoPressureStabilization()
+{
+	// make sure that the biphasic tau parameter is not zero
+	if (m_pMat->m_tau == 0.0)
+	{
+		feLogError("When using automatic pressure stabilization, the biphasic tau parameter must be non-zero.");
+		return false;
+	}
+
+	FEEdgeList EL;
+	if (!EL.Create(this)) return false;
+
+	FEElementEdgeList EEL;
+	if (!EEL.Create(*this, EL)) return false;
+
+	FEMesh& mesh = *GetMesh();
+
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESolidElement& el = Element(i);
+
+		// get the largest edge length
+		const std::vector<int>& edges = EEL.EdgeList(i);
+		vec3d e0;
+		for (int j=0; j<edges.size(); ++j)
+		{
+			int edge = edges[j];
+			vec3d p0 = mesh.Node(EL.Edge(edge).node[0]).m_rt;
+			vec3d p1 = mesh.Node(EL.Edge(edge).node[1]).m_rt;
+			vec3d d = p1 - p0;
+			if (j == 0 || d.norm() > e0.norm()) e0 = d;
+		}
+		double he = e0.unit();
+
+		int nint = el.GaussPoints();
+		for (int n=0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+			if (bpt == nullptr) return false;
+
+			// get the tangent stiffness
+			tens4dmm C = m_pMat->Tangent(mp);
+			double Ha = e0 * (vdotTdotv(e0, C, e0) * e0);
+
+			// get the permeability tensor
+			mat3ds K = m_pMat->Permeability(mp);
+			double k = e0 * (K * e0);
+
+			double tau = he * he / (4 * Ha * k);
+
+			bpt->m_tau = tau;
+		}
+	}
+	return true;
 }
