@@ -260,6 +260,16 @@ bool FEEdgeList::Create(FEDomain* dom)
 	for (size_t i = 0; i < edges; ++i, ++edgeIter)
 	{
 		m_edgeList[i] = *edgeIter;
+
+		// make sure edge is normalized (i.e. first index is smaller than second index)
+		// this assumption is required for creating element-edge lists
+		FEEdgeList::EDGE& edge = m_edgeList[i];
+		if (edge.node[0] > edge.node[1])
+		{
+			int tmp = edge.node[0];
+			edge.node[0] = edge.node[1];
+			edge.node[1] = tmp;
+		}
 	}
 
 	return true;
