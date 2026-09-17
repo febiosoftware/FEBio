@@ -279,6 +279,15 @@ std::vector<DataRecordItem> ProcessDataString(const char* szdata)
 	std::vector<DataRecordItem> data;
 	if ((szdata == nullptr) || (szdata[0] == 0)) return data;
 
+	// if szdata starts with an equal sign, it's a math expression and we just return it as a single item
+	if (szdata[0] == '=')
+	{
+		DataRecordItem item;
+		item.name = szdata;
+		data.push_back(item);
+		return data;
+	}
+
 	std::string s = szdata;
 	while (!s.empty())
 	{
