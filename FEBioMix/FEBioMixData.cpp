@@ -35,21 +35,21 @@ SOFTWARE.*/
 #include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
-double FENodeConcentration::value(const FENode& node) 
+double FELogNodeConcentration::value(const FENode& node)
 {
 	const int dof_C = GetFEModel()->GetDOFIndex("concentration", 0);
 	return node.get(dof_C); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeFluidPressure::value(const FENode& node)
+double FELogNodeFluidPressure::value(const FENode& node)
 {
     const int dof_P = GetFEModel()->GetDOFIndex("p");
     return node.get(dof_P);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeSoluteConcentration_::value(const FENode& node)
+double FELogNodeSoluteConcentration_::value(const FENode& node)
 {
     double val = 0.0;
     const int dof_C = GetFEModel()->GetDOFIndex("concentration", m_nsol);

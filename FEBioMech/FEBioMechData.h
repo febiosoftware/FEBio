@@ -41,122 +41,122 @@ SOFTWARE.*/
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-class FENodeXPos : public FELogNodeData
+class FELogNodeXPos : public FELogNodeData
 { 
 public: 
-	FENodeXPos(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeXPos(FEModel* pfem) : FELogNodeData(pfem){}
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeYPos : public FELogNodeData 
+class FELogNodeYPos : public FELogNodeData
 { 
 public: 
-	FENodeYPos(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeYPos(FEModel* pfem) : FELogNodeData(pfem){}
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeZPos : public FELogNodeData
+class FELogNodeZPos : public FELogNodeData
 { 
 public: 
-	FENodeZPos(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeZPos(FEModel* pfem) : FELogNodeData(pfem){}
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeXDisp : public FELogNodeData
+class FELogNodeXDisp : public FELogNodeData
 { 
 public: 
-	FENodeXDisp(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeXDisp(FEModel* pfem) : FELogNodeData(pfem){}
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeYDisp : public FELogNodeData
+class FELogNodeYDisp : public FELogNodeData
 { 
 public: 
-	FENodeYDisp(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeYDisp(FEModel* pfem) : FELogNodeData(pfem){}
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeZDisp : public FELogNodeData
+class FELogNodeZDisp : public FELogNodeData
 { 
 public: 
-	FENodeZDisp(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeZDisp(FEModel* pfem) : FELogNodeData(pfem){}
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeXVel : public FELogNodeData
+class FELogNodeXVel : public FELogNodeData
 { 
 public: 
-	FENodeXVel(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeXVel(FEModel* pfem) : FELogNodeData(pfem){}
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeYVel : public FELogNodeData
+class FELogNodeYVel : public FELogNodeData
 { 
 public: 
-	FENodeYVel(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeYVel(FEModel* pfem) : FELogNodeData(pfem){}
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeZVel : public FELogNodeData
+class FELogNodeZVel : public FELogNodeData
 { 
 public: 
-	FENodeZVel(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeZVel(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeXAcc : public FELogNodeData
+class FELogNodeXAcc : public FELogNodeData
 { 
 public: 
-	FENodeXAcc(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeXAcc(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeYAcc : public FELogNodeData
+class FELogNodeYAcc : public FELogNodeData
 { 
 public: 
-	FENodeYAcc(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeYAcc(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeZAcc : public FELogNodeData
+class FELogNodeZAcc : public FELogNodeData
 { 
 public: 
-	FENodeZAcc(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeZAcc(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeForceX: public FELogNodeData
+class FELogNodeForceX: public FELogNodeData
 { 
 public: 
-	FENodeForceX(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeForceX(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeForceY: public FELogNodeData
+class FELogNodeForceY: public FELogNodeData
 { 
 public: 
-	FENodeForceY(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeForceY(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(const FENode& node) override;
 };
 
 //-----------------------------------------------------------------------------
-class FENodeForceZ: public FELogNodeData
+class FELogNodeForceZ: public FELogNodeData
 { 
 public: 
-	FENodeForceZ(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeForceZ(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(const FENode& node) override;
 };
 
@@ -1894,10 +1894,10 @@ public:
 //=============================================================================
 // from Gibbons, "Finite Element Modeling of Blast Lung Injury in Sheep", JBME 2015
 // this calculates the normalized time-summed internal energy
-class FENormalizedInternalEnergy : public FELogDomainData
+class FELogNormalizedInternalEnergy : public FELogDomainData
 {
 public:
-	FENormalizedInternalEnergy(FEModel* fem) : FELogDomainData(fem), m_sum(0) {}
+	FELogNormalizedInternalEnergy(FEModel* fem) : FELogDomainData(fem), m_sum(0) {}
 	double value(FEDomain& dom) override;
 
 private:

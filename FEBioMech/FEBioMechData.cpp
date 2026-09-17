@@ -52,85 +52,85 @@ SOFTWARE.*/
 #include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
-double FENodeXPos::value(const FENode& node)
+double FELogNodeXPos::value(const FENode& node)
 {
 	return node.m_rt.x; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYPos::value(const FENode& node)
+double FELogNodeYPos::value(const FENode& node)
 {
 	return node.m_rt.y; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZPos::value(const FENode& node)
+double FELogNodeZPos::value(const FENode& node)
 {
 	return node.m_rt.z; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXDisp::value(const FENode& node)
+double FELogNodeXDisp::value(const FENode& node)
 {
 	const int dof_X = GetFEModel()->GetDOFIndex("x");
 	return node.get(dof_X); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYDisp::value(const FENode& node)
+double FELogNodeYDisp::value(const FENode& node)
 {
 	const int dof_Y = GetFEModel()->GetDOFIndex("y");
 	return node.get(dof_Y); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZDisp::value(const FENode& node)
+double FELogNodeZDisp::value(const FENode& node)
 {
 	const int dof_Z = GetFEModel()->GetDOFIndex("z");
 	return node.get(dof_Z); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXVel::value(const FENode& node)
+double FELogNodeXVel::value(const FENode& node)
 {
 	const int dof_VX = GetFEModel()->GetDOFIndex("vx");
 	return node.get(dof_VX);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYVel::value(const FENode& node)
+double FELogNodeYVel::value(const FENode& node)
 {
 	const int dof_VY = GetFEModel()->GetDOFIndex("vy");
 	return node.get(dof_VY); 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZVel::value(const FENode& node)
+double FELogNodeZVel::value(const FENode& node)
 {
 	const int dof_VZ = GetFEModel()->GetDOFIndex("vz");
 	return node.get(dof_VZ);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeXAcc::value(const FENode& node)
+double FELogNodeXAcc::value(const FENode& node)
 {
 	return node.m_at.x; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeYAcc::value(const FENode& node)
+double FELogNodeYAcc::value(const FENode& node)
 {
 	return node.m_at.y; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeZAcc::value(const FENode& node)
+double FELogNodeZAcc::value(const FENode& node)
 {
 	return node.m_at.z; 
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceX::value(const FENode& node)
+double FELogNodeForceX::value(const FENode& node)
 {
 	FEModel& fem = *GetFEModel();
 	int dofX = fem.GetDOFIndex("x");
@@ -144,7 +144,7 @@ double FENodeForceX::value(const FENode& node)
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceY::value(const FENode& node)
+double FELogNodeForceY::value(const FENode& node)
 {
 	FEModel& fem = *GetFEModel();
 	int dofY = fem.GetDOFIndex("y");
@@ -158,7 +158,7 @@ double FENodeForceY::value(const FENode& node)
 }
 
 //-----------------------------------------------------------------------------
-double FENodeForceZ::value(const FENode& node)
+double FELogNodeForceZ::value(const FENode& node)
 {
 	FEModel& fem = *GetFEModel();
 	int dofZ = fem.GetDOFIndex("z");
@@ -2845,7 +2845,7 @@ double FELogMaxContactGap::value(FESurface& surface)
 	return 0.0;
 }
 
-double FENormalizedInternalEnergy::value(FEDomain& dom)
+double FELogNormalizedInternalEnergy::value(FEDomain& dom)
 {
 	double sum = 0.0;
 	double vol = 0.0;

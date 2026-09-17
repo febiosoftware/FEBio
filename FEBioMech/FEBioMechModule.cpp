@@ -963,21 +963,21 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogNodeData
-	REGISTER_FECORE_CLASS(FENodeXPos, "x");
-	REGISTER_FECORE_CLASS(FENodeYPos, "y");
-	REGISTER_FECORE_CLASS(FENodeZPos, "z");
-	REGISTER_FECORE_CLASS(FENodeXDisp, "ux");
-	REGISTER_FECORE_CLASS(FENodeYDisp, "uy");
-	REGISTER_FECORE_CLASS(FENodeZDisp, "uz");
-	REGISTER_FECORE_CLASS(FENodeXVel, "vx");
-	REGISTER_FECORE_CLASS(FENodeYVel, "vy");
-	REGISTER_FECORE_CLASS(FENodeZVel, "vz");
-	REGISTER_FECORE_CLASS(FENodeXAcc, "ax");
-	REGISTER_FECORE_CLASS(FENodeYAcc, "ay");
-	REGISTER_FECORE_CLASS(FENodeZAcc, "az");
-	REGISTER_FECORE_CLASS(FENodeForceX, "Rx");
-	REGISTER_FECORE_CLASS(FENodeForceY, "Ry");
-	REGISTER_FECORE_CLASS(FENodeForceZ, "Rz");
+	REGISTER_FECORE_CLASS(FELogNodeXPos, "x");
+	REGISTER_FECORE_CLASS(FELogNodeYPos, "y");
+	REGISTER_FECORE_CLASS(FELogNodeZPos, "z");
+	REGISTER_FECORE_CLASS(FELogNodeXDisp, "ux");
+	REGISTER_FECORE_CLASS(FELogNodeYDisp, "uy");
+	REGISTER_FECORE_CLASS(FELogNodeZDisp, "uz");
+	REGISTER_FECORE_CLASS(FELogNodeXVel, "vx");
+	REGISTER_FECORE_CLASS(FELogNodeYVel, "vy");
+	REGISTER_FECORE_CLASS(FELogNodeZVel, "vz");
+	REGISTER_FECORE_CLASS(FELogNodeXAcc, "ax");
+	REGISTER_FECORE_CLASS(FELogNodeYAcc, "ay");
+	REGISTER_FECORE_CLASS(FELogNodeZAcc, "az");
+	REGISTER_FECORE_CLASS(FELogNodeForceX, "Rx");
+	REGISTER_FECORE_CLASS(FELogNodeForceY, "Ry");
+	REGISTER_FECORE_CLASS(FELogNodeForceZ, "Rz");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogFaceData
@@ -1151,7 +1151,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 2, "Ft_zz", 0x040E); // deprecated in version 4.14
 
 	// derived from FELogDomainData
-	REGISTER_FECORE_CLASS(FENormalizedInternalEnergy, "normalized internal energy");
+	REGISTER_FECORE_CLASS(FELogNormalizedInternalEnergy, "normalized internal energy");
 	REGISTER_FECORE_CLASS(FELogTotalEnergy, "total energy");
 
 	//-----------------------------------------------------------------------------
