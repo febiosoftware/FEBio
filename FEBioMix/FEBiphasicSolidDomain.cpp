@@ -1277,7 +1277,7 @@ void FEBiphasicSolidDomain::GetNodalPressures(vector<double>& data)
 
 bool FEBiphasicSolidDomain::CalcAutoPressureStabilization()
 {
-	feLog("Updating stabilization factor for biphasic solid domain '%s'\n", GetName());
+	feLog("Updating stabilization factor for biphasic solid domain '%s'\n", GetName().c_str());
 
 	// make sure that the biphasic tau parameter is not zero
 	if (m_pMat->m_tau == 0.0)
