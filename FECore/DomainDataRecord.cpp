@@ -29,61 +29,28 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEDomain.h"
 
-//-----------------------------------------------------------------------------
 void FEDomainDataRecord::SetData(const char* szexpr)
 {
-    char szcopy[MAX_STRING] = { 0 };
-    strcpy(szcopy, szexpr);
-    char* sz = szcopy, * ch;
-    m_Data.clear();
-    strcpy(m_szdata, szexpr);
-    do
-    {
-		const char* szparam = nullptr;
-        ch = strchr(sz, ';');
-        if (ch) *ch++ = 0;
+	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
+	if (data.empty()) throw UnknownDataField(szexpr);
 
-		// see if parameters are defined
-		char* cl = strchr(sz, '(');
-		if (cl)
-		{
-			char* cr = strrchr(sz, ')');
-			if (cr == nullptr) throw UnknownDataField(sz);
+	m_Data.clear();
+	m_data = szexpr;
+	for (int i=0; i<data.size(); ++i)
+	{
+		const char* sz = data[i].name.c_str();
+		FELogDomainData* pdata = fecore_new<FELogDomainData>(sz, GetFEModel());
+		if (pdata == nullptr) throw UnknownDataField(sz);
 
-			*cl++ = 0;
-			*cr = 0;
-
-			cl = strchr (cl, '\''); if (cl == nullptr) throw UnknownDataField(sz);
-			cr = strrchr(cl, '\''); if (cr == nullptr) throw UnknownDataField(sz);
-
-			*cl++ = 0;
-			*cr = 0;
-
-			szparam = cl;
-		}
-
-        FELogDomainData* pdata = fecore_new<FELogDomainData>(sz, GetFEModel());
-		if (pdata)
-		{
-			m_Data.push_back(pdata);
-			if (szparam)
-			{
-				vector<string> params; params.push_back(szparam);
-				if (pdata->SetParameters(params) == false) throw UnknownDataField(sz);
-			}
-		}
-        else throw UnknownDataField(sz);
-        sz = ch;
-    } while (ch);
+		m_Data.push_back(pdata);
+		if (pdata->SetParameters(data[i].params) == false) throw UnknownDataField(sz);
+	}
 }
 
-//-----------------------------------------------------------------------------
 FEDomainDataRecord::FEDomainDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_DOMAIN) {}
 
-//-----------------------------------------------------------------------------
 int FEDomainDataRecord::Size() const { return (int)m_Data.size(); }
 
-//-----------------------------------------------------------------------------
 double FEDomainDataRecord::Evaluate(int item, int ndata)
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
@@ -94,14 +61,12 @@ double FEDomainDataRecord::Evaluate(int item, int ndata)
     return m_Data[ndata]->value(dom);
 }
 
-//-----------------------------------------------------------------------------
 void FEDomainDataRecord::SetDomain(int domainIndex)
 {
     m_item.clear();
     m_item.push_back(domainIndex + 1);
 }
 
-//-----------------------------------------------------------------------------
 void FEDomainDataRecord::SelectAllItems()
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
@@ -134,7 +99,6 @@ bool FELogAvgDomainData::SetParameters(std::vector<std::string>& params)
     return true;
 }
 
-//-----------------------------------------------------------------------------
 double FELogAvgDomainData::value(FEDomain& dom)
 {
     if (m_elemData == nullptr) return 0.0;
@@ -180,7 +144,6 @@ bool FELogPctDomainData::SetParameters(std::vector<std::string>& params)
     return true;
 }
 
-//-----------------------------------------------------------------------------
 double FELogPctDomainData::value(FEDomain& dom)
 {
     if (m_elemData == nullptr) return 0.0;
@@ -224,7 +187,6 @@ bool FELogIntegralDomainData::SetParameters(std::vector<std::string>& params)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
 double FELogIntegralDomainData::value(FEDomain& dom)
 {
 	if (m_elemData == nullptr) return 0.0;

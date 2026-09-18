@@ -963,29 +963,27 @@ void FEBioMech::InitModule()
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogNodeData
-	REGISTER_FECORE_CLASS(FENodeXPos, "x");
-	REGISTER_FECORE_CLASS(FENodeYPos, "y");
-	REGISTER_FECORE_CLASS(FENodeZPos, "z");
-	REGISTER_FECORE_CLASS(FENodeXDisp, "ux");
-	REGISTER_FECORE_CLASS(FENodeYDisp, "uy");
-	REGISTER_FECORE_CLASS(FENodeZDisp, "uz");
-	REGISTER_FECORE_CLASS(FENodeXVel, "vx");
-	REGISTER_FECORE_CLASS(FENodeYVel, "vy");
-	REGISTER_FECORE_CLASS(FENodeZVel, "vz");
-	REGISTER_FECORE_CLASS(FENodeXAcc, "ax");
-	REGISTER_FECORE_CLASS(FENodeYAcc, "ay");
-	REGISTER_FECORE_CLASS(FENodeZAcc, "az");
-	REGISTER_FECORE_CLASS(FENodeForceX, "Rx");
-	REGISTER_FECORE_CLASS(FENodeForceY, "Ry");
-	REGISTER_FECORE_CLASS(FENodeForceZ, "Rz");
+	REGISTER_FECORE_CLASS(FELogNodeXPos, "x");
+	REGISTER_FECORE_CLASS(FELogNodeYPos, "y");
+	REGISTER_FECORE_CLASS(FELogNodeZPos, "z");
+	REGISTER_FECORE_CLASS(FELogNodeXDisp, "ux");
+	REGISTER_FECORE_CLASS(FELogNodeYDisp, "uy");
+	REGISTER_FECORE_CLASS(FELogNodeZDisp, "uz");
+	REGISTER_FECORE_CLASS(FELogNodeXVel, "vx");
+	REGISTER_FECORE_CLASS(FELogNodeYVel, "vy");
+	REGISTER_FECORE_CLASS(FELogNodeZVel, "vz");
+	REGISTER_FECORE_CLASS(FELogNodeXAcc, "ax");
+	REGISTER_FECORE_CLASS(FELogNodeYAcc, "ay");
+	REGISTER_FECORE_CLASS(FELogNodeZAcc, "az");
+	REGISTER_FECORE_CLASS(FELogNodeForceX, "Rx");
+	REGISTER_FECORE_CLASS(FELogNodeForceY, "Ry");
+	REGISTER_FECORE_CLASS(FELogNodeForceZ, "Rz");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogFaceData
 	REGISTER_FECORE_CLASS(FELogContactGap     , "contact gap");
 	REGISTER_FECORE_CLASS(FELogContactPressure, "contact pressure");
-	REGISTER_FECORE_CLASS(FELogContactTractionX, "contact_traction.x");
-	REGISTER_FECORE_CLASS(FELogContactTractionY, "contact_traction.y");
-	REGISTER_FECORE_CLASS(FELogContactTractionZ, "contact_traction.z");
+	REGISTER_FECORE_CLASS(FELogContactTraction, "contact_traction");
 
 	//-----------------------------------------------------------------------------
 	// Derived from FELogElemData
@@ -1117,6 +1115,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS(FELogElemStrainEnergyDensity, "sed");
 	REGISTER_FECORE_CLASS(FELogElemDevStrainEnergyDensity, "devsed");
 	REGISTER_FECORE_CLASS(FELogElemFiberStretch, "fiber_stretch");
+	REGISTER_FECORE_CLASS(FELogElemFiberVector, "fiber vector");
 	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 0, "fiber_x");
 	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 1, "fiber_y");
 	REGISTER_FECORE_CLASS_T(FELogElemFiberVector_N, 2, "fiber_z");
@@ -1135,30 +1134,12 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FELogOctahedralPlasticStrain, "ops");
     REGISTER_FECORE_CLASS(FELogDiscreteElementStretch   , "discrete element stretch");
     REGISTER_FECORE_CLASS(FELogDiscreteElementElongation, "discrete element elongation");
-    REGISTER_FECORE_CLASS(FELogDiscreteElementForce     , "discrete element force"  );
-    REGISTER_FECORE_CLASS(FELogDiscreteElementForceX    , "Fde.x");
-    REGISTER_FECORE_CLASS(FELogDiscreteElementForceY    , "Fde.y");
-    REGISTER_FECORE_CLASS(FELogDiscreteElementForceZ    , "Fde.z");
+    REGISTER_FECORE_CLASS(FELogDiscreteElementScalarForce, "discrete element force"  );
+    REGISTER_FECORE_CLASS(FELogDiscreteElementForce    , "Fde");
 	REGISTER_FECORE_CLASS(FELogContactArea, "contact area");
 	REGISTER_FECORE_CLASS(FELogMaxContactGap, "max contact gap");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 0, "mixture_stress[0].xx");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 1, "mixture_stress[0].xy");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 2, "mixture_stress[0].yy");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 3, "mixture_stress[0].xz");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 4, "mixture_stress[0].yz");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 0, 5, "mixture_stress[0].zz");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 0, "mixture_stress[1].xx");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 1, "mixture_stress[1].xy");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 2, "mixture_stress[1].yy");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 3, "mixture_stress[1].xz");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 4, "mixture_stress[1].yz");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 1, 5, "mixture_stress[1].zz");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 0, "mixture_stress[2].xx");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 1, "mixture_stress[2].xy");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 2, "mixture_stress[2].yy");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 3, "mixture_stress[2].xz");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 4, "mixture_stress[2].yz");
-	REGISTER_FECORE_CLASS_T2(FELogElementMixtureStress_T, 2, 5, "mixture_stress[2].zz");
+	REGISTER_FECORE_CLASS(FELogElementMixtureStress, "mixture_stress");
+	REGISTER_FECORE_CLASS(FELogTotalDeformationGradient, "Ft");
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 0, "Ft_xx");
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 1, "Ft_xy");
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 0, 2, "Ft_xz");
@@ -1170,7 +1151,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 2, "Ft_zz");
 
 	// derived from FELogDomainData
-	REGISTER_FECORE_CLASS(FENormalizedInternalEnergy, "normalized internal energy");
+	REGISTER_FECORE_CLASS(FELogNormalizedInternalEnergy, "normalized internal energy");
 	REGISTER_FECORE_CLASS(FELogTotalEnergy, "total energy");
 
 	//-----------------------------------------------------------------------------

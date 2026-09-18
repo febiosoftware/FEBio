@@ -43,6 +43,24 @@ public:
 	virtual double value(FESurfaceElement& el) = 0;
 };
 
+class FECORE_API FELogFaceVec3dData : public FELogFaceData
+{
+public:
+	FELogFaceVec3dData(FEModel* fem) : FELogFaceData(fem) {}
+
+	bool SetComponent(const std::string& comp) override;
+
+	bool Init() override;
+
+	double value(FESurfaceElement& el) final;
+
+public:
+	virtual vec3d value_vec3d(FESurfaceElement& el) = 0;
+
+private:
+	int m_comp = -1;
+};
+
 //-----------------------------------------------------------------------------
 //! This class records surface data
 class FECORE_API FaceDataRecord : public DataRecord

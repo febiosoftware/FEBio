@@ -34,26 +34,16 @@ SOFTWARE.*/
 #include "log.h"
 #include <sstream>
 
-//-----------------------------------------------------------------------------
-UnknownDataField::UnknownDataField(const char* sz) : std::runtime_error(sz)
+UnknownDataField::UnknownDataField(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-//-----------------------------------------------------------------------------
 DataRecord::DataRecord(FEModel* pfem, int ntype) : FECoreBase(pfem), m_type(ntype)
 {
 	m_nid = 0;
-	m_szname[0] = 0;
-	m_szdata[0] = 0;
-	m_szfmt[0] = 0;
-
-	strcpy(m_szdelim, " ");
-	
+	m_delim = " ";
 	m_bcomm = true;
-
-	m_fp = 0;
-	m_szfile[0] = 0;
-
+	m_fp = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -61,7 +51,7 @@ bool DataRecord::SetFileName(const char* szfile)
 {
 	if (szfile == nullptr) return false;
 
-	strcpy(m_szfile, szfile);
+	m_filename = szfile;
 	m_fp = fopen(szfile, "wt");
 	if (m_fp == 0)
 	{
@@ -72,32 +62,28 @@ bool DataRecord::SetFileName(const char* szfile)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
 DataRecord::~DataRecord()
 {
 	if (m_fp)
 	{
 		fclose(m_fp);
-		m_fp = 0;
+		m_fp = nullptr;
 	}
 }
 
-//-----------------------------------------------------------------------------
 void DataRecord::SetName(const char* sz)
 {
-	strcpy(m_szname, sz);
+	m_name = sz;
 }
 
-//-----------------------------------------------------------------------------
 void DataRecord::SetDelim(const char* sz)
 {
-	strcpy(m_szdelim, sz);
+	m_delim = sz;
 }
 
-//-----------------------------------------------------------------------------
 void DataRecord::SetFormat(const char* sz)
 {
-	strcpy(m_szfmt, sz);
+	m_fmt = sz;
 }
 
 //-----------------------------------------------------------------------------
@@ -113,13 +99,13 @@ std::string DataRecord::printToString(int i)
 	std::stringstream ss;
 	ss.precision(12);
 
-	ss << m_item[i] << m_szdelim;
+	ss << m_item[i] << m_delim;
 	int nd = Size();
 	for (int j = 0; j<nd; ++j)
 	{
 		double val = Evaluate(m_item[i], j);
 		ss << val;
-		if (j != nd - 1) ss << m_szdelim;
+		if (j != nd - 1) ss << m_delim;
 		else ss << "\n";
 	}
 
@@ -130,13 +116,12 @@ std::string DataRecord::printToString(int i)
 std::string DataRecord::printToFormatString(int i)
 {
 	int ndata = Size();
-	char szfmt[MAX_STRING];
-	strcpy(szfmt, m_szfmt);
+	string fmt = m_fmt;
 
 	std::stringstream ss;
 
 	int nitem = m_item[i];
-	char* sz = szfmt, *ch = 0;
+	char* sz = fmt.data(), * ch = 0;
 	int j = 0;
 	do
 	{
@@ -196,7 +181,6 @@ std::string DataRecord::printToFormatString(int i)
 	return ss.str();
 }
 
-//-----------------------------------------------------------------------------
 bool DataRecord::Write()
 {
 	FEModel* fem = GetFEModel();
@@ -208,23 +192,23 @@ bool DataRecord::Write()
 	feLog("===========================================================================\n");
 	feLog("Step = %d\n", nstep);
 	feLog("Time = %.9lg\n", ftime);
-	feLog("Data = %s\n", m_szname);
+	feLog("Data = %s\n", m_name.c_str());
 
 	// write some comments
 	FILE* fp = m_fp;
 	if (fp && m_bcomm)
 	{
 		// we save the data in a seperate file
-		feLog("File = %s\n", m_szfile);
+		feLog("File = %s\n", m_filename.c_str());
 
 		// make a note in the data file
 		fprintf(fp,"*Step  = %d\n", nstep);
 		fprintf(fp,"*Time  = %.9lg\n", ftime);
-		fprintf(fp,"*Data  = %s\n", m_szname);
+		fprintf(fp,"*Data  = %s\n", m_name.c_str());
 	}
 
 	// save the data
-	if (m_szfmt[0]==0)
+	if (m_fmt.empty())
 	{
 		for (size_t i=0; i<m_item.size(); ++i)
 		{
@@ -251,21 +235,16 @@ bool DataRecord::Write()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-
 void DataRecord::SetItemList(const std::vector<int>& items)
 {
 	m_item = items;
 }
 
-//-----------------------------------------------------------------------------
 void DataRecord::SetItemList(FEItemList* items, const std::vector<int>& selection)
 {
 	// derived classes should override this
 	assert(false);
 }
-
-//-----------------------------------------------------------------------------
 
 void DataRecord::Serialize(DumpStream &ar)
 {
@@ -273,24 +252,100 @@ void DataRecord::Serialize(DumpStream &ar)
 
 	// serialize data
 	ar & m_nid;
-	ar & m_szname;
-	ar & m_szdelim;
-	ar & m_szfile;
+	ar & m_name;
+	ar & m_delim;
+	ar & m_filename;
 	ar & m_bcomm;
 	ar & m_item;
-	ar & m_szdata;
+	ar & m_data;
 
 	// when we're loading we need to reinitialize the file
 	if (ar.IsLoading())
 	{
-		SetData(m_szdata);
+		SetData(m_data.c_str());
 
 		if (m_fp) fclose(m_fp);
 		m_fp = 0;
-		if (m_szfile[0] != 0)
+		if (m_filename[0] != 0)
 		{
 			// reopen data file for appending
-			m_fp = fopen(m_szfile, "a+");
+			m_fp = fopen(m_filename.c_str(), "a+");
 		}
 	}
+}
+
+std::vector<DataRecordItem> ProcessDataString(const char* szdata)
+{
+	std::vector<DataRecordItem> data;
+	if ((szdata == nullptr) || (szdata[0] == 0)) return data;
+
+	// if szdata starts with an equal sign, it's a math expression and we just return it as a single item
+	if (szdata[0] == '=')
+	{
+		DataRecordItem item;
+		item.name = szdata;
+		data.push_back(item);
+		return data;
+	}
+
+	std::string s = szdata;
+	while (!s.empty())
+	{
+		size_t pos = s.find(";");
+		std::string name;
+		if (pos != std::string::npos)
+		{
+			name = s.substr(0, pos);
+			s.erase(0, pos + strlen(";"));
+		}
+		else
+		{
+			name = s;
+			s.clear();
+		}
+
+		DataRecordItem item;
+
+		// see if parameters are defined
+		// TODO: This only processes one parameter. We need to implement a more robust parser that can handle multiple parameters.
+		size_t cl = name.find("(");
+		if (cl != std::string::npos)
+		{
+			size_t cr = name.rfind(")");
+			if (cr == std::string::npos) throw UnknownDataField(name);
+
+			string params = name.substr(cl + 1, cr - cl - 1);
+			name = name.substr(0, cl);
+
+			cl = params.find("'"); if (cl == std::string::npos) throw UnknownDataField(name);
+			cr = params.rfind("'"); if (cr == std::string::npos) throw UnknownDataField(name);
+			params = params.substr(cl + 1, cr - cl - 1);
+
+			item.params.push_back(params);
+		}
+
+		// see if the name has a component defined
+		size_t dot = name.find(".");
+		if (dot != std::string::npos)
+		{
+			item.comp = name.substr(dot + 1);
+			name = name.substr(0, dot);
+		}
+
+		cl = name.find("[");
+		if (cl != std::string::npos)
+		{
+			size_t cr = name.rfind("]");
+			if (cr == std::string::npos) throw UnknownDataField(name);
+			string index = name.substr(cl + 1, cr - cl - 1);
+			name = name.substr(0, cl);
+			item.index = atoi(index.c_str());
+		}
+
+		item.name = name;
+
+		data.push_back(item);
+		
+	}
+	return data;
 }

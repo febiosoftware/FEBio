@@ -33,32 +33,48 @@ SOFTWARE.*/
 #include "FEDomain.h"
 #include "FELogElemMath.h"
 
-//-----------------------------------------------------------------------------
 ElementDataRecord::ElementDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_ELEM)
 {
 	m_offset = 0;
 }
 
-//-----------------------------------------------------------------------------
 void ElementDataRecord::SetData(const char *szexpr)
 {
+	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
+	if (data.empty()) throw UnknownDataField(szexpr);
+
 	DataStore& DS = GetFEModel()->GetDataStore();
 
-	char szcopy[MAX_STRING] = {0};
-	strcpy(szcopy, szexpr);
-	char* sz = szcopy, *ch;
 	m_Data.clear();
-	strcpy(m_szdata, szexpr);
-	do
+	m_data = szexpr;
+	for (size_t i = 0; i < data.size(); ++i)
 	{
-		ch = strchr(sz, ';');
-		if (ch) *ch++ = 0;
-		FELogElemSource* pdata = DS.GetElementDataSource(sz);
-		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(sz);
-		sz = ch;
+		FELogElemSource* pdata = DS.GetElementDataSource(data[i].name);
+		if (pdata == nullptr) throw UnknownDataField(data[i].name);
+
+		if (!data[i].comp.empty())
+		{
+			if (pdata->SetComponent(data[i].comp) == false)
+				throw UnknownDataField(data[i].name);
+		}
+
+		if (data[i].index != -1)
+		{
+			if (pdata->SetIndex(data[i].index) == false)
+				throw UnknownDataField(data[i].name);
+		}
+
+		m_Data.push_back(pdata);
 	}
-	while (ch);
+}
+
+bool ElementDataRecord::Init()
+{
+	for (size_t i = 0; i < m_Data.size(); ++i)
+	{
+		if (m_Data[i] == nullptr || m_Data[i]->Init() == false) return false;
+	}
+	return DataRecord::Init();
 }
 
 //-----------------------------------------------------------------------------

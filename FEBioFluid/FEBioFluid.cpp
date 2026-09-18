@@ -259,9 +259,9 @@ REGISTER_FECORE_CLASS(FEPlotFSISolidStress             , "solid stress"         
 REGISTER_FECORE_CLASS(FEPlotFluidShearStressError      , "fluid shear stress error");
 
 //-----------------------------------------------------------------------------
-REGISTER_FECORE_CLASS(FENodeFluidXVel          , "nfvx");
-REGISTER_FECORE_CLASS(FENodeFluidYVel          , "nfvy");
-REGISTER_FECORE_CLASS(FENodeFluidZVel          , "nfvz");
+REGISTER_FECORE_CLASS(FELogNodeFluidXVel          , "nfvx");
+REGISTER_FECORE_CLASS(FELogNodeFluidYVel          , "nfvy");
+REGISTER_FECORE_CLASS(FELogNodeFluidZVel          , "nfvz");
 REGISTER_FECORE_CLASS(FELogElemFluidPosX       , "fx");
 REGISTER_FECORE_CLASS(FELogElemFluidPosY       , "fy");
 REGISTER_FECORE_CLASS(FELogElemFluidPosZ       , "fz");

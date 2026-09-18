@@ -41,8 +41,6 @@ public:
     FELogDomainData(FEModel* fem) : FELogData(fem) {}
     virtual ~FELogDomainData() {}
     virtual double value(FEDomain& rc) = 0;
-
-    virtual bool SetParameters(std::vector<std::string>& params) { return false; }
 };
 
 //-----------------------------------------------------------------------------
