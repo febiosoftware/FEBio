@@ -434,8 +434,8 @@ bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
 			EELi.resize(6);
 			for (int j = 0; j < 6; ++j)
 			{
-				int n0 = el.m_node[ETET[j][0]];
-				int n1 = el.m_node[ETET[j][1]];
+				int n0 = el.m_lnode[ETET[j][0]];
+				int n1 = el.m_lnode[ETET[j][1]];
 
 				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
 
@@ -457,8 +457,8 @@ bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
 			EELi.resize(12);
 			for (int j = 0; j < 12; ++j)
 			{
-				int n0 = el.m_node[EHEX[j][0]];
-				int n1 = el.m_node[EHEX[j][1]];
+				int n0 = el.m_lnode[EHEX[j][0]];
+				int n1 = el.m_lnode[EHEX[j][1]];
 
 				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
 
@@ -480,8 +480,8 @@ bool FEElementEdgeList::Create(FEDomain& domain, FEEdgeList& edgeList)
 			EELi.resize(9);
 			for (int j = 0; j < 9; ++j)
 			{
-				int n0 = el.m_node[EPEN[j][0]];
-				int n1 = el.m_node[EPEN[j][1]];
+				int n0 = el.m_lnode[EPEN[j][0]];
+				int n1 = el.m_lnode[EPEN[j][1]];
 
 				if (n1 < n0) { int nt = n1; n1 = n0; n0 = nt; }
 

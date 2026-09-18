@@ -1292,8 +1292,8 @@ bool FEBiphasicSolidDomain::CalcAutoPressureStabilization()
 		for (int j=0; j<edges.size(); ++j)
 		{
 			int edge = edges[j];
-			vec3d p0 = mesh.Node(EL.Edge(edge).node[0]).m_rt;
-			vec3d p1 = mesh.Node(EL.Edge(edge).node[1]).m_rt;
+			vec3d p0 = Node(EL.Edge(edge).node[0]).m_rt;
+			vec3d p1 = Node(EL.Edge(edge).node[1]).m_rt;
 			vec3d d = p1 - p0;
 			if (j == 0 || d.norm() > e0.norm()) e0 = d;
 		}
