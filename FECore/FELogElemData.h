@@ -73,7 +73,7 @@ public:
 private:
 	std::string m_var;
 
-	FELogElemData* m_pdata = nullptr;
+	FELogElemSource* m_pdata = nullptr;
 
 	DECLARE_FECORE_CLASS();
 };

@@ -33,19 +33,21 @@ SOFTWARE.*/
 
 void NLConstraintDataRecord::SetData(const char* szexpr)
 {
-	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
-	if (data.empty()) throw UnknownDataField(szexpr);
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
 
 	m_Data.clear();
 	m_data = szexpr;
-	for (int i=0; i<data.size(); ++i)
+	for (size_t i=0; i<strings.size(); ++i)
 	{
-		FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(data[i].name.c_str(), GetFEModel());
-		if (pdata == nullptr) throw UnknownDataField(data[i].name);
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(it.name.c_str(), GetFEModel());
+		if (pdata == nullptr) throw UnknownDataField(it.name);
 		m_Data.push_back(pdata);
 
-		if (!ApplyDataRecordItem(*pdata, data[i]))
-			throw UnknownDataField(data[i].name);
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
 	}
 }
 
