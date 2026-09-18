@@ -26,42 +26,10 @@ SOFTWARE.*/
 #pragma once
 #include "FECoreBase.h"
 #include "DataRecord.h"
+#include "FELogFaceData.h"
 
 class FESurface;
-class FESurfaceElement;
 
-//-----------------------------------------------------------------------------
-//! This is the base class for a face data value.
-class FECORE_API FELogFaceData : public FELogData
-{
-	FECORE_SUPER_CLASS(FELOGFACEDATA_ID)
-	FECORE_BASE_CLASS(FELogFaceData)
-
-public:
-	FELogFaceData(FEModel* fem);
-	virtual ~FELogFaceData();
-	virtual double value(FESurfaceElement& el) = 0;
-};
-
-class FECORE_API FELogFaceVec3dData : public FELogFaceData
-{
-public:
-	FELogFaceVec3dData(FEModel* fem) : FELogFaceData(fem) {}
-
-	bool SetComponent(const std::string& comp) override;
-
-	bool Init() override;
-
-	double value(FESurfaceElement& el) final;
-
-public:
-	virtual vec3d value_vec3d(FESurfaceElement& el) = 0;
-
-private:
-	int m_comp = -1;
-};
-
-//-----------------------------------------------------------------------------
 //! This class records surface data
 class FECORE_API FaceDataRecord : public DataRecord
 {

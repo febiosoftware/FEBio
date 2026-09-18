@@ -119,3 +119,4 @@ struct DataRecordItem
 };
 
 FECORE_API std::vector<DataRecordItem> ProcessDataString(const char* szdata);
+FECORE_API bool ApplyDataRecordItem(FELogData& data, const DataRecordItem& item);

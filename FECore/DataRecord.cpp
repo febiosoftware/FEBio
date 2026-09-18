@@ -349,3 +349,11 @@ std::vector<DataRecordItem> ProcessDataString(const char* szdata)
 	}
 	return data;
 }
+
+bool ApplyDataRecordItem(FELogData& data, const DataRecordItem& item)
+{
+	if (!data.SetParameters(item.params)) return false;
+	if (!item.comp.empty() && !data.SetComponent(item.comp)) return false;
+	if (item.index != -1 && !data.SetIndex(item.index)) return false;
+	return true;
+}

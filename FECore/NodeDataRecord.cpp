@@ -49,8 +49,11 @@ void NodeDataRecord::SetData(const char* szexpr)
 	for (int i=0; i<data.size(); ++i)
 	{
 		FELogNodeData* pdata = DS.GetNodeDataSource(data[i].name);
-		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(data[i].name);
+		if (pdata == nullptr) throw UnknownDataField(data[i].name);
+		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, data[i]))
+			throw UnknownDataField(data[i].name);
 	}
 }
 

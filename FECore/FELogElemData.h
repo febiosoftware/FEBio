@@ -47,59 +47,9 @@ public:
 	virtual ~FELogElemData();
 };
 
-class FECORE_API FELogElemVec3dData : public FELogElemData
-{
-public:
-	FELogElemVec3dData(FEModel* fem) : FELogElemData(fem) {}
-
-	bool SetComponent(const std::string& comp) override;
-
-	bool Init() override;
-
-	double value(FEElement& el) final;
-
-public:
-	virtual vec3d value_vec3d(FEElement& el) = 0;
-
-private:
-	int m_comp = -1;
-};
-
-class FECORE_API FELogElemMat3dsData : public FELogElemData
-{
-public:
-	FELogElemMat3dsData(FEModel* fem) : FELogElemData(fem) {}
-
-	bool SetComponent(const std::string& comp) override;
-
-	bool Init() override;
-
-	double value(FEElement& el) final;
-
-public:
-	virtual mat3ds value_mat3ds(FEElement& el) = 0;
-
-private:
-	int m_comp = -1;
-};
-
-class FECORE_API FELogElemMat3dData : public FELogElemData
-{
-public:
-	FELogElemMat3dData(FEModel* fem) : FELogElemData(fem) {}
-
-	bool SetComponent(const std::string& comp) override;
-
-	bool Init() override;
-
-	double value(FEElement& el) final;
-
-public:
-	virtual mat3d value_mat3d(FEElement& el) = 0;
-
-private:
-	int m_comp = -1;
-};
+using FELogElemVec3dData  = FELogComponentData<FELogElemData, FEElement, vec3d, Vec3dLogTraits>;
+using FELogElemMat3dsData = FELogComponentData<FELogElemData, FEElement, mat3ds, Mat3dsLogTraits>;
+using FELogElemMat3dData  = FELogComponentData<FELogElemData, FEElement, mat3d, Mat3dLogTraits>;
 
 //! Base class for element log data definitions 
 class FECORE_API FELogElemDefinition : public FELogElemSource

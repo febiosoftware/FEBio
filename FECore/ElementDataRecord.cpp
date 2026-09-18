@@ -51,20 +51,10 @@ void ElementDataRecord::SetData(const char *szexpr)
 	{
 		FELogElemSource* pdata = DS.GetElementDataSource(data[i].name);
 		if (pdata == nullptr) throw UnknownDataField(data[i].name);
-
-		if (!data[i].comp.empty())
-		{
-			if (pdata->SetComponent(data[i].comp) == false)
-				throw UnknownDataField(data[i].name);
-		}
-
-		if (data[i].index != -1)
-		{
-			if (pdata->SetIndex(data[i].index) == false)
-				throw UnknownDataField(data[i].name);
-		}
-
 		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, data[i]))
+			throw UnknownDataField(data[i].name);
 	}
 }
 

@@ -49,8 +49,11 @@ void ObjectDataRecord::SetData(const char* szexpr)
 	for (int i=0; i<data.size(); ++i)
 	{
 		FELogObjectData* pdata = fecore_new<FELogObjectData>(data[i].name.c_str(), GetFEModel());
-		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(data[i].name);
+		if (pdata == nullptr) throw UnknownDataField(data[i].name);
+		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, data[i]))
+			throw UnknownDataField(data[i].name);
 	}
 }
 
