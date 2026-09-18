@@ -294,6 +294,10 @@ REGISTER_FECORE_CLASS(FELogFluidRateOfDefZZ    , "fdzz");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefXY    , "fdxy");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefYZ    , "fdyz");
 REGISTER_FECORE_CLASS(FELogFluidRateOfDefXZ    , "fdxz");
+REGISTER_FECORE_CLASS(FELogFluidSurfaceForceX  , "fsfx");
+REGISTER_FECORE_CLASS(FELogFluidSurfaceForceY  , "fsfy");
+REGISTER_FECORE_CLASS(FELogFluidSurfaceForceZ  , "fsfz");
+REGISTER_FECORE_CLASS(FELogFluidSurfaceForce   , "fsf" );
 
 //-----------------------------------------------------------------------------
 // Derived from FEMeshAdaptor

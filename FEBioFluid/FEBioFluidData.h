@@ -27,8 +27,9 @@ SOFTWARE.*/
 
 
 #pragma once
-#include "FECore/NodeDataRecord.h"
-#include "FECore/ElementDataRecord.h"
+#include <FECore/NodeDataRecord.h>
+#include <FECore/ElementDataRecord.h>
+#include <FECore/SurfaceDataRecord.h>
 
 //=============================================================================
 // N O D E  D A T A
@@ -318,3 +319,55 @@ public:
     double value(FEElement& el);
 };
 
+//=============================================================================
+//                         S U R F A C E   D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Fluid surface force along X
+//!
+class FELogFluidSurfaceForceX : public FELogSurfaceData
+{
+private:
+    vector<vec3d>       m_area;
+    
+public:
+    FELogFluidSurfaceForceX(FEModel* pfem) : FELogSurfaceData(pfem) {}
+    double value(FESurface& surface) override;
+};
+
+//! Fluid surface force along Y
+//!
+class FELogFluidSurfaceForceY : public FELogSurfaceData
+{
+private:
+    vector<vec3d>       m_area;
+    
+public:
+    FELogFluidSurfaceForceY(FEModel* pfem) : FELogSurfaceData(pfem) {}
+    double value(FESurface& surface) override;
+};
+
+//! Fluid surface force along Z
+//!
+class FELogFluidSurfaceForceZ : public FELogSurfaceData
+{
+private:
+    vector<vec3d>       m_area;
+    
+public:
+    FELogFluidSurfaceForceZ(FEModel* pfem) : FELogSurfaceData(pfem) {}
+    double value(FESurface& surface) override;
+};
+
+//! Fluid surface force magnitude
+//!
+class FELogFluidSurfaceForce : public FELogSurfaceData
+{
+private:
+    vector<vec3d>       m_area;
+    
+public:
+    FELogFluidSurfaceForce(FEModel* pfem) : FELogSurfaceData(pfem) {}
+    double value(FESurface& surface) override;
+};
