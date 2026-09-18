@@ -32,45 +32,28 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FEModel.h"
 
-//-----------------------------------------------------------------------------
 NodeDataRecord::NodeDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_NODE) {}
 
-//-----------------------------------------------------------------------------
 int NodeDataRecord::Size() const { return (int)m_Data.size(); }
 
-//-----------------------------------------------------------------------------
 void NodeDataRecord::SetData(const char* szexpr)
 {
-	char szcopy[MAX_STRING] = {0};
-	strcpy(szcopy, szexpr);
-	char* sz = szcopy, *ch;
+	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
+	if (data.empty()) throw UnknownDataField(szexpr);
+
+	DataStore& DS = GetFEModel()->GetDataStore();
+
 	m_Data.clear();
-	strcpy(m_szdata, szexpr);
+	m_data = szexpr;
 	FEModel* fem = GetFEModel();
-	do
+	for (int i=0; i<data.size(); ++i)
 	{
-		ch = strchr(sz, ';');
-		if (ch) *ch++ = 0;
-		FELogNodeData* pdata = fecore_new<FELogNodeData>(sz, fem);
+		FELogNodeData* pdata = DS.GetNodeDataSource(data[i].name);
 		if (pdata) m_Data.push_back(pdata);
-		else 
-		{
-			// see if this refers to a DOF of the model
-			int ndof = fem->GetDOFIndex(sz);
-			if (ndof >= 0)
-			{
-				// Add an output for a nodal variable
-				pdata = new FENodeVarData(fem, ndof);
-				m_Data.push_back(pdata);
-			}
-			else throw UnknownDataField(sz);
-		}
-		sz = ch;
+		else throw UnknownDataField(data[i].name);
 	}
-	while (ch);
 }
 
-//-----------------------------------------------------------------------------
 double NodeDataRecord::Evaluate(int item, int ndata)
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
@@ -82,7 +65,6 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 	return m_Data[ndata]->value(node);
 }
 
-//-----------------------------------------------------------------------------
 void NodeDataRecord::SelectAllItems()
 {
 	int n = GetFEModel()->GetMesh().Nodes();
@@ -90,7 +72,6 @@ void NodeDataRecord::SelectAllItems()
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }
 
-//-----------------------------------------------------------------------------
 void NodeDataRecord::SetItemList(FEItemList* items, const std::vector<int>& selection)
 {
 	// TODO: We don't support using a selection of a node set yet. 
@@ -101,10 +82,8 @@ void NodeDataRecord::SetItemList(FEItemList* items, const std::vector<int>& sele
 	for (int i = 0; i < n; ++i) m_item[i] = (*pns)[i] + 1;
 }
 
-//-----------------------------------------------------------------------------
 FENodeVarData::FENodeVarData(FEModel* pfem, int ndof) : FELogNodeData(pfem), m_ndof(ndof) {}
 
-//-----------------------------------------------------------------------------
 double FENodeVarData::value(const FENode& node)
 {
 	return node.get(m_ndof);

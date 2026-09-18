@@ -70,6 +70,7 @@ public:
 	double		m_phi0hat;	//!< referential solid volume fraction supply at current time
     double      m_Jp;       //!< determinant of solid deformation gradient at previous time
     mat3ds      m_ss;       //!< solid (elastic or effective) stress
+	double		m_tau;		//!< characteristic time constant for stabilization
 };
 
 //-----------------------------------------------------------------------------

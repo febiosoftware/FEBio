@@ -113,7 +113,7 @@ public:
 
 #define FECORE_SPEC(major, minor) ((major << 8) + minor)
 #define FECORE_SPEC_MAJOR(n) ((n) >> 8)
-#define FECORE_SPEC_MINOR(n) ((n) & 0x0F)
+#define FECORE_SPEC_MINOR(n) ((n) & 0x00FF)
 
 // macro for tagging a feature as experimental (i.e. in development)
 #define FECORE_EXPERIMENTAL	int(0xFFFF)

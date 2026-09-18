@@ -33,21 +33,21 @@ SOFTWARE.*/
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-double FENodeFluidXVel::value(const FENode& node)
+double FELogNodeFluidXVel::value(const FENode& node)
 {
     const int dof_VFX = GetFEModel()->GetDOFIndex("wx");
     return node.get(dof_VFX);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeFluidYVel::value(const FENode& node)
+double FELogNodeFluidYVel::value(const FENode& node)
 {
     const int dof_VFY = GetFEModel()->GetDOFIndex("wy");
     return node.get(dof_VFY);
 }
 
 //-----------------------------------------------------------------------------
-double FENodeFluidZVel::value(const FENode& node)
+double FELogNodeFluidZVel::value(const FENode& node)
 {
     const int dof_VFZ = GetFEModel()->GetDOFIndex("wz");
     return node.get(dof_VFZ);
@@ -520,3 +520,250 @@ double FELogFluidRateOfDefXZ::value(FEElement& el)
     return val / (double) nint;
 }
 
+//=============================================================================
+//                         S U R F A C E   D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Fluid surface force along X
+//-----------------------------------------------------------------------------
+double FELogFluidSurfaceForceX::value(FESurface& surface)
+{
+    FESurface* pcs = &surface;
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    vec3d fn(0,0,0);    // initialize
+    
+    // calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    m_area.resize(NF);
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+    }
+    
+    // calculate net fluid force
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        
+        // get the element this surface element belongs to
+        FEElement* pe = el.m_elem[0].pe;
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+            
+            if (!pfluid) {
+                pe = el.m_elem[1].pe;
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+            
+            // see if this is a fluid element
+            if (pfluid) {
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                mat3d s(mat3dd(0));
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += pt.m_sf;
+                }
+                s /= nint;
+                
+                // Evaluate contribution to net force on surface.
+                // Negate the fluid traction since we want the traction on the surface,
+                // which is the opposite of the traction on the fluid.
+                fn -= s*m_area[j];
+            }
+        }
+    }
+    
+    return fn.x;
+}
+
+//-----------------------------------------------------------------------------
+//! Fluid surface force along Y
+//-----------------------------------------------------------------------------
+double FELogFluidSurfaceForceY::value(FESurface& surface)
+{
+    FESurface* pcs = &surface;
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    vec3d fn(0,0,0);    // initialize
+    
+    // calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    m_area.resize(NF);
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+    }
+    
+    // calculate net fluid force
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        
+        // get the element this surface element belongs to
+        FEElement* pe = el.m_elem[0].pe;
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+            
+            if (!pfluid) {
+                pe = el.m_elem[1].pe;
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+            
+            // see if this is a fluid element
+            if (pfluid) {
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                mat3d s(mat3dd(0));
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += pt.m_sf;
+                }
+                s /= nint;
+                
+                // Evaluate contribution to net force on surface.
+                // Negate the fluid traction since we want the traction on the surface,
+                // which is the opposite of the traction on the fluid.
+                fn -= s*m_area[j];
+            }
+        }
+    }
+    
+    return fn.y;
+}
+
+//-----------------------------------------------------------------------------
+//! Fluid surface force along Z
+//-----------------------------------------------------------------------------
+double FELogFluidSurfaceForceZ::value(FESurface& surface)
+{
+    FESurface* pcs = &surface;
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    vec3d fn(0,0,0);    // initialize
+    
+    // calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    m_area.resize(NF);
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+    }
+    
+    // calculate net fluid force
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        
+        // get the element this surface element belongs to
+        FEElement* pe = el.m_elem[0].pe;
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+            
+            if (!pfluid) {
+                pe = el.m_elem[1].pe;
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+            
+            // see if this is a fluid element
+            if (pfluid) {
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                mat3d s(mat3dd(0));
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += pt.m_sf;
+                }
+                s /= nint;
+                
+                // Evaluate contribution to net force on surface.
+                // Negate the fluid traction since we want the traction on the surface,
+                // which is the opposite of the traction on the fluid.
+                fn -= s*m_area[j];
+            }
+        }
+    }
+    
+    return fn.z;
+}
+
+//-----------------------------------------------------------------------------
+//! Fluid surface force magnitude
+//-----------------------------------------------------------------------------
+double FELogFluidSurfaceForce::value(FESurface& surface)
+{
+    FESurface* pcs = &surface;
+    if (pcs == 0) return false;
+    
+    int NF = pcs->Elements();
+    vec3d fn(0,0,0);    // initialize
+    
+    // calculate the vectorial area of each surface element and to identify solid element associated with this surface element
+    m_area.resize(NF);
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        m_area[j] = pcs->SurfaceNormal(el,0,0)*pcs->FaceArea(el);
+    }
+    
+    // calculate net fluid force
+    for (int j=0; j<NF; ++j)
+    {
+        FESurfaceElement& el = pcs->Element(j);
+        
+        // get the element this surface element belongs to
+        FEElement* pe = el.m_elem[0].pe;
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+            
+            if (!pfluid) {
+                pe = el.m_elem[1].pe;
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+            
+            // see if this is a fluid element
+            if (pfluid) {
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                mat3d s(mat3dd(0));
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += pt.m_sf;
+                }
+                s /= nint;
+                
+                // Evaluate contribution to net force on surface.
+                // Negate the fluid traction since we want the traction on the surface,
+                // which is the opposite of the traction on the fluid.
+                fn -= s*m_area[j];
+            }
+        }
+    }
+    
+    return fn.norm();
+}

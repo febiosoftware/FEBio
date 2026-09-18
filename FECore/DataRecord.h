@@ -55,7 +55,7 @@ enum FEDataRecordType {
 class FECORE_API UnknownDataField : public std::runtime_error
 {
 public:
-	UnknownDataField(const char* sz);
+	UnknownDataField(const std::string& msg);
 };
 
 //-----------------------------------------------------------------------------
@@ -65,8 +65,6 @@ class FECORE_API DataRecord : public FECoreBase
 	FECORE_SUPER_CLASS(FEDATARECORD_ID)
 	FECORE_BASE_CLASS(DataRecord)
 
-public:
-	enum {MAX_DELIM=16, MAX_STRING=1024};
 public:
 	DataRecord(FEModel* pfem, int ntype);
 	virtual ~DataRecord();
@@ -102,12 +100,22 @@ public:
 
 protected:
 	bool	m_bcomm;				//!< export comments or not
-	char	m_szname[MAX_STRING];	//!< name of expression
-	char	m_szdelim[MAX_DELIM];	//!< data delimitor
-	char	m_szdata[MAX_STRING];	//!< data expression
-	char	m_szfmt[MAX_STRING];	//!< max format string
+	std::string m_name;	//!< name of expression
+	std::string m_delim;	//!< data delimitor
+	std::string m_data;	//!< data expression
+	std::string m_fmt;	//!< max format string
 
 protected:
-	char	m_szfile[MAX_STRING];	//!< file name of data record
+	std::string m_filename;	//!< file name of data record
 	FILE*		m_fp;
 };
+
+struct DataRecordItem
+{
+	string name;
+	std::vector<std::string> params;
+	int index = -1;
+	string comp;
+};
+
+FECORE_API std::vector<DataRecordItem> ProcessDataString(const char* szdata);

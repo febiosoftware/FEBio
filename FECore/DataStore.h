@@ -29,9 +29,9 @@ SOFTWARE.*/
 #pragma once
 #include "DataRecord.h"
 #include "FELogElemData.h"
+#include "FELogNodeData.h"
 #include "fecore_api.h"
 
-//-----------------------------------------------------------------------------
 class FECORE_API DataStore
 {
 public:
@@ -52,6 +52,8 @@ public:
 	DataRecord* GetDataRecord(int i) { return m_data[i]; }
 
 	FELogElemSource* GetElementDataSource(const std::string& name);
+
+	FELogNodeData* GetNodeDataSource(const std::string& name);
 
 public:
 	void AddElementDataDefinition(FELogElemDefinition* def);

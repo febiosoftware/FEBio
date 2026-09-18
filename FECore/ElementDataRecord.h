@@ -41,13 +41,16 @@ class FECORE_API ElementDataRecord : public DataRecord
 
 public:
 	ElementDataRecord(FEModel* pfem);
+
+	bool Init() override;
+
 	double Evaluate(int item, int ndata) override;
 	void SetData(const char* sz) override;
 	void SelectAllItems() override;
 	int Size() const override;
 	void SetElementSet(FEElementSet* pg);
 
-	void SetItemList(FEItemList* itemList, const vector<int>& selection) override;
+	void SetItemList(FEItemList* itemList, const std::vector<int>& selection) override;
 
 	using DataRecord::SetItemList;
 
@@ -55,7 +58,7 @@ protected:
 	void BuildELT();
 
 protected:
-	vector<ELEMREF>	m_ELT;
+	std::vector<ELEMREF>	m_ELT;
 	int				m_offset;
-	vector<FELogElemSource*>	m_Data;
+	std::vector<FELogElemSource*>	m_Data;
 };
