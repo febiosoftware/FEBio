@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2025 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,33 +24,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
-#include "FELogData.h"
 
-class FENode;
+class FESurface;
 
-//! This is the base class for a node data value.
-class FECORE_API FELogNodeData : public FELogData
+//! Base class for surface log data
+class FECORE_API FELogSurfaceData : public FELogData
 {
-	FECORE_SUPER_CLASS(FELOGNODEDATA_ID)
-	FECORE_BASE_CLASS(FELogNodeData)
+	FECORE_SUPER_CLASS(FELOGSURFACEDATA_ID)
+		FECORE_BASE_CLASS(FELogSurfaceData);
 
 public:
-	FELogNodeData(FEModel* fem);
-	virtual ~FELogNodeData();
-	virtual double value(const FENode& node) = 0;
+	FELogSurfaceData(FEModel* fem) : FELogData(fem) {}
+	virtual ~FELogSurfaceData() {}
+	virtual double value(FESurface& surface) = 0;
 };
 
-// Special class for outputting nodal field variables
-class FECORE_API FENodeVarData : public FELogNodeData
-{
-public:
-	FENodeVarData(FEModel* pfem, int ndof);
-	double value(const FENode& node) override;
-
-private:
-	int	m_ndof;
-};
-
-using FELogNodeVec3dData  = FELogComponentData<FELogNodeData, FENode, vec3d , Vec3dLogTraits>;
-using FELogNodeMat3dsData = FELogComponentData<FELogNodeData, FENode, mat3ds, Mat3dsLogTraits>;
-using FELogNodeMat3dData  = FELogComponentData<FELogNodeData, FENode, mat3d , Mat3dLogTraits>;
+using FELogSurfaceVec3dData  = FELogComponentData<FELogSurfaceData, FESurface, vec3d , Vec3dLogTraits>;
+using FELogSurfaceMat3dsData = FELogComponentData<FELogSurfaceData, FESurface, mat3ds, Mat3dsLogTraits>;
+using FELogSurfaceMat3dData  = FELogComponentData<FELogSurfaceData, FESurface, mat3d , Mat3dLogTraits>;

@@ -3,7 +3,7 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2025 University of Utah, The Trustees of Columbia University in
+Copyright (c) 2026 University of Utah, The Trustees of Columbia University in
 the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,31 +26,19 @@ SOFTWARE.*/
 #pragma once
 #include "FELogData.h"
 
-class FENode;
+class FESurfaceElement;
 
-//! This is the base class for a node data value.
-class FECORE_API FELogNodeData : public FELogData
+//! This is the base class for a face data value.
+class FECORE_API FELogFaceData : public FELogData
 {
-	FECORE_SUPER_CLASS(FELOGNODEDATA_ID)
-	FECORE_BASE_CLASS(FELogNodeData)
+	FECORE_SUPER_CLASS(FELOGFACEDATA_ID)
+	FECORE_BASE_CLASS(FELogFaceData)
 
 public:
-	FELogNodeData(FEModel* fem);
-	virtual ~FELogNodeData();
-	virtual double value(const FENode& node) = 0;
+	FELogFaceData(FEModel* fem) : FELogData(fem) {}
+	virtual double value(FESurfaceElement& el) = 0;
 };
 
-// Special class for outputting nodal field variables
-class FECORE_API FENodeVarData : public FELogNodeData
-{
-public:
-	FENodeVarData(FEModel* pfem, int ndof);
-	double value(const FENode& node) override;
-
-private:
-	int	m_ndof;
-};
-
-using FELogNodeVec3dData  = FELogComponentData<FELogNodeData, FENode, vec3d , Vec3dLogTraits>;
-using FELogNodeMat3dsData = FELogComponentData<FELogNodeData, FENode, mat3ds, Mat3dsLogTraits>;
-using FELogNodeMat3dData  = FELogComponentData<FELogNodeData, FENode, mat3d , Mat3dLogTraits>;
+using FELogFaceVec3dData  = FELogComponentData<FELogFaceData, FESurfaceElement, vec3d , Vec3dLogTraits>;
+using FELogFaceMat3dsData = FELogComponentData<FELogFaceData, FESurfaceElement, mat3ds, Mat3dsLogTraits>;
+using FELogFaceMat3dData  = FELogComponentData<FELogFaceData, FESurfaceElement, mat3d , Mat3dLogTraits>;

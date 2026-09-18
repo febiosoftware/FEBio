@@ -27,23 +27,8 @@ SOFTWARE.*/
 #include "FECoreBase.h"
 #include "DataRecord.h"
 #include "ElementDataRecord.h"
+#include "FELogDomainData.h"
 
-class FEDomain;
-
-//-----------------------------------------------------------------------------
-//! Base class for domain log data
-class FECORE_API FELogDomainData : public FELogData
-{
-    FECORE_SUPER_CLASS(FELOGDOMAINDATA_ID)
-    FECORE_BASE_CLASS(FELogDomainData)
-
-public:
-    FELogDomainData(FEModel* fem) : FELogData(fem) {}
-    virtual ~FELogDomainData() {}
-    virtual double value(FEDomain& rc) = 0;
-};
-
-//-----------------------------------------------------------------------------
 class FECORE_API FEDomainDataRecord : public DataRecord
 {
 public:
@@ -58,45 +43,3 @@ private:
     vector<FELogDomainData*>	m_Data;
 };
 
-//-----------------------------------------------------------------------------
-class FECORE_API FELogAvgDomainData : public FELogDomainData
-{
-public:
-    FELogAvgDomainData(FEModel* pfem);
-    ~FELogAvgDomainData();
-    double value(FEDomain& rc) override;
-
-    bool SetParameters(std::vector<std::string>& params) override;
-
-private:
-    FELogElemData* m_elemData;
-};
-
-//-----------------------------------------------------------------------------
-class FECORE_API FELogPctDomainData : public FELogDomainData
-{
-public:
-    FELogPctDomainData(FEModel* pfem);
-    ~FELogPctDomainData();
-    double value(FEDomain& rc) override;
-
-    bool SetParameters(std::vector<std::string>& params) override;
-
-private:
-    double          m_pct;
-    FELogElemData* m_elemData;
-};
-
-//-----------------------------------------------------------------------------
-class FECORE_API FELogIntegralDomainData : public FELogDomainData
-{
-public:
-	FELogIntegralDomainData(FEModel* pfem);
-	~FELogIntegralDomainData();
-	double value(FEDomain& rc) override;
-
-	bool SetParameters(std::vector<std::string>& params) override;
-
-private:
-	FELogElemData* m_elemData;
-};

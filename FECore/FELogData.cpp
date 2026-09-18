@@ -24,8 +24,93 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FELogData.h"
+#include <assert.h>
 
 FELogData::FELogData(FEModel* fem) : FECoreBase(fem)
 {
 
+}
+
+int Vec3dLogTraits::ComponentIndex(const std::string& c)
+{
+	if (c == "x") return 0;
+	if (c == "y") return 1;
+	if (c == "z") return 2;
+	assert(false);
+	return -1;
+}
+
+double Vec3dLogTraits::Component(const vec3d& v, int i)
+{
+	switch (i)
+	{
+	case 0: return v.x;
+	case 1: return v.y;
+	case 2: return v.z;
+	default:
+		assert(false);
+		return 0.0;
+	}
+}
+
+int Mat3dsLogTraits::ComponentIndex(const std::string& c)
+{
+	if (c == "xx") return 0;
+	if (c == "yy") return 1;
+	if (c == "zz") return 2;
+	if (c == "xy" || c == "yx") return 3;
+	if (c == "yz" || c == "zy") return 4;
+	if (c == "xz" || c == "zx") return 5;
+	assert(false);
+	return -1;
+}
+
+double Mat3dsLogTraits::Component(const mat3ds& v, int i)
+{
+	switch (i)
+	{
+	case 0: return v.xx();
+	case 1: return v.yy();
+	case 2: return v.zz();
+	case 3: return v.xy();
+	case 4: return v.yz();
+	case 5: return v.xz();
+	default:
+		assert(false);
+		return 0.0;
+	}
+}
+
+int Mat3dLogTraits::ComponentIndex(const std::string& c)
+{
+	if (c == "xx") return 0;
+	if (c == "xy") return 1;
+	if (c == "xz") return 2;
+	if (c == "yx") return 3;
+	if (c == "yy") return 4;
+	if (c == "yz") return 5;
+	if (c == "zx") return 6;
+	if (c == "zy") return 7;
+	if (c == "zz") return 8;
+	assert(false);
+	return -1;
+}
+
+double Mat3dLogTraits::Component(const mat3d& v, int i)
+{
+	switch (i)
+	{
+	case 0: return v(0,0);
+	case 1: return v(0,1);
+	case 2: return v(0,2);
+	case 3: return v(1,0);
+	case 4: return v(1,1);
+	case 5: return v(1,2);
+	case 6: return v(2,0);
+	case 7: return v(2,1);
+	case 8: return v(2,2);
+	default:
+		assert(false);
+		return 0.0;
+	}
 }

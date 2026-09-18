@@ -29,43 +29,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FESurface.h"
 
-//-----------------------------------------------------------------------------
-FELogFaceData::FELogFaceData(FEModel* fem) : FELogData(fem) {}
-
-//-----------------------------------------------------------------------------
-FELogFaceData::~FELogFaceData() {}
-
-
-bool FELogFaceVec3dData::SetComponent(const std::string& comp)
-{
-	if      (comp == "x") m_comp = 0;
-	else if (comp == "y") m_comp = 1;
-	else if (comp == "z") m_comp = 2;
-	else return false;
-	return true;
-}
-
-bool FELogFaceVec3dData::Init()
-{
-	if (m_comp == -1) return false;
-	return FELogFaceData::Init();
-}
-
-double FELogFaceVec3dData::value(FESurfaceElement& el)
-{
-	vec3d v = value_vec3d(el);
-	switch (m_comp)
-	{
-	case 0: return v.x; break;
-	case 1: return v.y; break;
-	case 2: return v.z; break;
-	default:
-		assert(false);
-	}
-	return 0.0;
-}
-
-//-----------------------------------------------------------------------------
 FaceDataRecord::FaceDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_FACE) 
 {
 	m_surface = nullptr;
@@ -85,8 +48,11 @@ void FaceDataRecord::SetData(const char* szexpr)
 	for (size_t i = 0; i < data.size(); ++i)
 	{
 		FELogFaceData* pdata = fecore_new<FELogFaceData>(data[i].name.c_str(), GetFEModel());
-		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(data[i].name);
+		if (pdata == nullptr) throw UnknownDataField(data[i].name);
+		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, data[i]))
+			throw UnknownDataField(data[i].name);
 	}
 }
 

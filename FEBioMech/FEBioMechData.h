@@ -185,7 +185,7 @@ class FELogContactTraction : public FELogFaceVec3dData
 {
 public:
 	FELogContactTraction(FEModel* fem) : FELogFaceVec3dData(fem) {}
-	vec3d value_vec3d(FESurfaceElement& el) override;
+	vec3d typedValue(FESurfaceElement& el) override;
 };
 
 //=============================================================================
@@ -981,7 +981,7 @@ class FELogTotalDeformationGradient : public FELogElemMat3dData
 {
 public:
 	FELogTotalDeformationGradient(FEModel* fem) : FELogElemMat3dData(fem) {}
-	mat3d value_mat3d(FEElement& el) override;
+	mat3d typedValue(FEElement& el) override;
 };
 
 class FELogTotalDeformationGradient_ : public FELogElemData
@@ -1046,7 +1046,7 @@ class FELogElemFiberVector : public FELogElemVec3dData
 {
 public:
 	FELogElemFiberVector(FEModel* pfem) : FELogElemVec3dData(pfem) {}
-	vec3d value_vec3d(FEElement& el) override;
+	vec3d typedValue(FEElement& el) override;
 };
 
 class FELogElemFiberVector_ : public FELogElemData
@@ -1157,7 +1157,7 @@ class FELogDiscreteElementForce : public FELogElemVec3dData
 {
 public:
 	FELogDiscreteElementForce(FEModel* fem) : FELogElemVec3dData(fem) {}
-	vec3d value_vec3d(FEElement& el) override;
+	vec3d typedValue(FEElement& el) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -1165,7 +1165,7 @@ class FELogElementMixtureStress : public FELogElemMat3dsData
 {
 public:
 	FELogElementMixtureStress(FEModel* fem) : FELogElemMat3dsData(fem) {}
-	mat3ds value_mat3ds(FEElement& el) override;
+	mat3ds typedValue(FEElement& el) override;
 
 	bool SetIndex(int n) override;
 
