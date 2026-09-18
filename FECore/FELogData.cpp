@@ -36,6 +36,7 @@ int Vec3dLogTraits::ComponentIndex(const std::string& c)
 	if (c == "x") return 0;
 	if (c == "y") return 1;
 	if (c == "z") return 2;
+	if (c == "norm") return 3;
 	assert(false);
 	return -1;
 }
@@ -47,6 +48,7 @@ double Vec3dLogTraits::Component(const vec3d& v, int i)
 	case 0: return v.x;
 	case 1: return v.y;
 	case 2: return v.z;
+	case 3: return v.norm();
 	default:
 		assert(false);
 		return 0.0;
