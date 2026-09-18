@@ -324,50 +324,12 @@ public:
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-//! Fluid surface force along X
-//!
-class FELogFluidSurfaceForceX : public FELogSurfaceData
+class FELogFluidSurfaceForce : public FELogSurfaceVec3dData
 {
 private:
     vector<vec3d>       m_area;
     
 public:
-    FELogFluidSurfaceForceX(FEModel* pfem) : FELogSurfaceData(pfem) {}
-    double value(FESurface& surface) override;
-};
-
-//! Fluid surface force along Y
-//!
-class FELogFluidSurfaceForceY : public FELogSurfaceData
-{
-private:
-    vector<vec3d>       m_area;
-    
-public:
-    FELogFluidSurfaceForceY(FEModel* pfem) : FELogSurfaceData(pfem) {}
-    double value(FESurface& surface) override;
-};
-
-//! Fluid surface force along Z
-//!
-class FELogFluidSurfaceForceZ : public FELogSurfaceData
-{
-private:
-    vector<vec3d>       m_area;
-    
-public:
-    FELogFluidSurfaceForceZ(FEModel* pfem) : FELogSurfaceData(pfem) {}
-    double value(FESurface& surface) override;
-};
-
-//! Fluid surface force magnitude
-//!
-class FELogFluidSurfaceForce : public FELogSurfaceData
-{
-private:
-    vector<vec3d>       m_area;
-    
-public:
-    FELogFluidSurfaceForce(FEModel* pfem) : FELogSurfaceData(pfem) {}
-    double value(FESurface& surface) override;
+    FELogFluidSurfaceForce(FEModel* fem) : FELogSurfaceVec3dData(fem) {}
+    vec3d typedValue(FESurface& surf) override;
 };
