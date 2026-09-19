@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEAnalysis.h"
 #include "FECoreKernel.h"
 #include "FEModel.h"
+#include "DataStore.h"
 
 NodeDataRecord::NodeDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_NODE) {}
 

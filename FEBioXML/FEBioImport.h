@@ -31,10 +31,10 @@ SOFTWARE.*/
 #include <FECore/XMLReader.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FESolver.h>
-#include <FECore/DataStore.h>
 #include <FECore/FEMesh.h>
 #include <FECore/FESurfaceMap.h>
 #include <FECore/tens3d.h>
+#include <FECore/DataStore.h>
 #include <string>
 
 class FENodeSet;

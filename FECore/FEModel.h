@@ -33,7 +33,6 @@ SOFTWARE.*/
 #include "FEStepComponent.h"
 #include "Callback.h"
 #include "FECoreKernel.h"
-#include "DataStore.h"
 #include "FEDataValue.h"
 #include <string>
 
@@ -55,6 +54,7 @@ class FEMeshAdaptor;
 class Timer;
 class FEPlotDataStore;
 class FEMeshDataGenerator;
+class DataStore;
 
 //-----------------------------------------------------------------------------
 // struct that breaks down memory usage of FEModel

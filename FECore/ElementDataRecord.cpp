@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEDomain.h"
 #include "FELogElemMath.h"
+#include "DataStore.h"
 
 ElementDataRecord::ElementDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_ELEM)
 {

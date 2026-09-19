@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/DataRecord.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEDomain.h>
+#include <FECore/DataStore.h>
 
 FEMaterialTest::FEMaterialTest(FEModel* fem) : FEDiagnostic(fem)
 {

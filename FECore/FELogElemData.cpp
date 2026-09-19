@@ -25,6 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FELogElemData.h"
 #include "FEModel.h"
+#include "DataStore.h"
+
 
 FELogElemData::FELogElemData(FEModel* fem) : FELogElemSource(fem) {}
 
