@@ -106,12 +106,20 @@ public:
     //! interface activation
     void Activate() override;
     
+    //! prep step
+    void PrepStep() override;
+    
     //! calculate the slip direction on the primary surface
     vec3d SlipTangent(FESlidingSurfaceBiphasic& ss, const int nel, const int nint, FESlidingSurfaceBiphasic& ms, double& dh, vec3d& r);
     
     //! calculate contact traction
     vec3d ContactTraction(FESlidingSurfaceBiphasic& ss, const int nel, const int n, FESlidingSurfaceBiphasic& ms, double& pn);
-    
+
+    //! release an integration point that has separated (tn >= 0)
+    //! This resets *all* contact state at that point, so that no stale
+    //! traction, multiplier, slip direction or pressure gap survives.
+    void ReleaseContactPoint(FEBiphasicContactPoint& data);
+
     //! calculate contact pressures for file output
     void UpdateContactPressures();
     
@@ -194,6 +202,17 @@ public:
     
 protected:
     int	m_dofP;
-    
+
+    // iteration bookkeeping for Update().
+    // NOTE: these used to be function-local statics inside Update(), which are
+    //       shared by *all* instances of this class.  With more than one
+    //       sliding-biphasic interface in a model (or across a restart, a
+    //       parameter optimization, or FEModel::Reset) that produced wrong
+    //       segment-update and node-relocation behavior.  They are now
+    //       per-instance members.
+    int             m_naugprev;     //!< nr of augmentations at last Update()
+    int             m_biter;        //!< iteration nr at last augmentation
+    bool            m_bfirst;       //!< first call to Update() (node relocation)
+
     DECLARE_FECORE_CLASS();
 };
