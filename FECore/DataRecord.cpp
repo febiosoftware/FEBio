@@ -274,20 +274,10 @@ void DataRecord::Serialize(DumpStream &ar)
 	}
 }
 
-std::vector<DataRecordItem> ProcessDataString(const char* szdata)
+FECORE_API std::vector<std::string> SplitDataString(const char* szdata)
 {
-	std::vector<DataRecordItem> data;
+	std::vector<std::string> data;
 	if ((szdata == nullptr) || (szdata[0] == 0)) return data;
-
-	// if szdata starts with an equal sign, it's a math expression and we just return it as a single item
-	if (szdata[0] == '=')
-	{
-		DataRecordItem item;
-		item.name = szdata;
-		data.push_back(item);
-		return data;
-	}
-
 	std::string s = szdata;
 	while (!s.empty())
 	{
@@ -303,51 +293,64 @@ std::vector<DataRecordItem> ProcessDataString(const char* szdata)
 			name = s;
 			s.clear();
 		}
-
-		DataRecordItem item;
-
-		// see if parameters are defined
-		// TODO: This only processes one parameter. We need to implement a more robust parser that can handle multiple parameters.
-		size_t cl = name.find("(");
-		if (cl != std::string::npos)
-		{
-			size_t cr = name.rfind(")");
-			if (cr == std::string::npos) throw UnknownDataField(name);
-
-			string params = name.substr(cl + 1, cr - cl - 1);
-			name = name.substr(0, cl);
-
-			cl = params.find("'"); if (cl == std::string::npos) throw UnknownDataField(name);
-			cr = params.rfind("'"); if (cr == std::string::npos) throw UnknownDataField(name);
-			params = params.substr(cl + 1, cr - cl - 1);
-
-			item.params.push_back(params);
-		}
-
-		// see if the name has a component defined
-		size_t dot = name.find(".");
-		if (dot != std::string::npos)
-		{
-			item.comp = name.substr(dot + 1);
-			name = name.substr(0, dot);
-		}
-
-		cl = name.find("[");
-		if (cl != std::string::npos)
-		{
-			size_t cr = name.rfind("]");
-			if (cr == std::string::npos) throw UnknownDataField(name);
-			string index = name.substr(cl + 1, cr - cl - 1);
-			name = name.substr(0, cl);
-			item.index = atoi(index.c_str());
-		}
-
-		item.name = name;
-
-		data.push_back(item);
-		
+		data.push_back(name);
 	}
 	return data;
+}
+
+DataRecordItem ProcessDataString(const char* szdata)
+{
+	DataRecordItem item;
+	if ((szdata == nullptr) || (szdata[0] == 0)) return item;
+
+	// if szdata starts with an equal sign, it's a math expression and we just return it as a single item
+	if (szdata[0] == '=')
+	{
+		item.name = szdata;
+		return item;
+	}
+
+	std::string name = szdata;
+
+	// see if parameters are defined
+	// TODO: This only processes one parameter. We need to implement a more robust parser that can handle multiple parameters.
+	size_t cl = name.find("(");
+	if (cl != std::string::npos)
+	{
+		size_t cr = name.rfind(")");
+		if (cr == std::string::npos) throw UnknownDataField(name);
+
+		string params = name.substr(cl + 1, cr - cl - 1);
+		name = name.substr(0, cl);
+
+		cl = params.find("'"); if (cl == std::string::npos) throw UnknownDataField(name);
+		cr = params.rfind("'"); if (cr == std::string::npos) throw UnknownDataField(name);
+		params = params.substr(cl + 1, cr - cl - 1);
+
+		item.params.push_back(params);
+	}
+
+	// see if the name has a component defined
+	size_t dot = name.find(".");
+	if (dot != std::string::npos)
+	{
+		item.comp = name.substr(dot + 1);
+		name = name.substr(0, dot);
+	}
+
+	cl = name.find("[");
+	if (cl != std::string::npos)
+	{
+		size_t cr = name.rfind("]");
+		if (cr == std::string::npos) throw UnknownDataField(name);
+		string index = name.substr(cl + 1, cr - cl - 1);
+		name = name.substr(0, cl);
+		item.index = atoi(index.c_str());
+	}
+
+	item.name = name;
+
+	return item;
 }
 
 bool ApplyDataRecordItem(FELogData& data, const DataRecordItem& item)

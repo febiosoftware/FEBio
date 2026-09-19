@@ -25,6 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FELogElemData.h"
 #include "FEModel.h"
+#include "DataStore.h"
+
 
 FELogElemData::FELogElemData(FEModel* fem) : FELogElemSource(fem) {}
 
@@ -39,8 +41,13 @@ FELogElemAlias::FELogElemAlias(FEModel* fem) : FELogElemDefinition(fem) {}
 bool FELogElemAlias::Init()
 {
 	if (m_var.empty()) return false;
-	m_pdata = fecore_new<FELogElemData>(m_var.c_str(), GetFEModel());
-	return (m_pdata != nullptr);
+	DataRecordItem data = ProcessDataString(m_var.c_str());
+	if (!data.isValid()) return false;
+	DataStore& DS = GetFEModel()->GetDataStore();
+	m_pdata = DS.GetElementDataSource(data.name);
+	if (m_pdata == nullptr) return false;
+	if (!ApplyDataRecordItem(*m_pdata, data)) return false;
+	return FELogElemDefinition::Init();
 }
 
 double FELogElemAlias::value(FEElement& el)
@@ -58,9 +65,13 @@ FELogElemFunction::FELogElemFunction(FEModel* fem) : FELogElemDefinition(fem) {}
 
 bool FELogElemFunction::Init()
 {
+	if (m_var.empty()) return false;
+	DataRecordItem data = ProcessDataString(m_var.c_str());
+	if (!data.isValid()) return false;
 	DataStore& DS = GetFEModel()->GetDataStore();
-	m_pdata = DS.GetElementDataSource(m_var);
+	m_pdata = DS.GetElementDataSource(data.name);
 	if (m_pdata == nullptr) return false;
+	if (!ApplyDataRecordItem(*m_pdata, data)) return false;
 
 	return FELogElemDefinition::Init();
 }

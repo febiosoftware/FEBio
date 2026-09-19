@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include <FECore/FESurface.h>
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
+#include <stdexcept>
 
 BEGIN_FECORE_CLASS(FETestRefine, FERefineMesh)
 END_FECORE_CLASS();

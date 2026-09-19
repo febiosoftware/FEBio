@@ -41,7 +41,7 @@ BEGIN_FECORE_CLASS(FEBiphasicSolidDomain, FESolidDomain)
     ADD_PARAMETER(m_secant_stress, "secant_stress");
     ADD_PARAMETER(m_secant_tangent, "secant_tangent");
     ADD_PARAMETER(m_secant_perm_tangent, "secant_permeability_tangent");
-	ADD_PARAMETER(m_auto_pressure_stab, "auto_pressure_stabilization");
+	ADD_PARAMETER(m_auto_pressure_stab, "auto_pressure_stabilization")->setEnums("off\0on\0adaptive\0");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ FEBiphasicSolidDomain::FEBiphasicSolidDomain(FEModel* pfem) : FESolidDomain(pfem
     m_secant_stress = false;
     m_secant_tangent = false;
     m_secant_perm_tangent = false;
-	m_auto_pressure_stab = false;
+	m_auto_pressure_stab = 0;
 
 	if (pfem)
 	{
@@ -138,6 +138,16 @@ void FEBiphasicSolidDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
             mp.Update(timeInfo);
 		}
 	}
+
+	// see if we update the stabilization factor
+	if (m_auto_pressure_stab > 1)
+	{
+		if (!CalcAutoPressureStabilization())
+		{
+			feLogError("Failed to calculate automatic pressure stabilization factor.");
+			return;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -158,7 +168,7 @@ bool FEBiphasicSolidDomain::Init()
 	// allocate nodal pressures
 	m_nodePressure.resize(Nodes(), 0.0);
 
-	if (m_auto_pressure_stab)
+	if (m_auto_pressure_stab > 0)
 	{
 		if (!CalcAutoPressureStabilization())
 		{
@@ -1267,6 +1277,8 @@ void FEBiphasicSolidDomain::GetNodalPressures(vector<double>& data)
 
 bool FEBiphasicSolidDomain::CalcAutoPressureStabilization()
 {
+	feLog("Updating stabilization factor for biphasic solid domain '%s'\n", GetName().c_str());
+
 	// make sure that the biphasic tau parameter is not zero
 	if (m_pMat->m_tau == 0.0)
 	{
@@ -1282,7 +1294,9 @@ bool FEBiphasicSolidDomain::CalcAutoPressureStabilization()
 
 	FEMesh& mesh = *GetMesh();
 
-	for (int i = 0; i < Elements(); ++i)
+	int NE = Elements();
+#pragma omp parallel for shared(EL, EEL, mesh)
+	for (int i = 0; i < NE; ++i)
 	{
 		FESolidElement& el = Element(i);
 
@@ -1304,7 +1318,6 @@ bool FEBiphasicSolidDomain::CalcAutoPressureStabilization()
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 			FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
-			if (bpt == nullptr) return false;
 
 			// get the tangent stiffness
 			tens4dmm C = m_pMat->Tangent(mp);
