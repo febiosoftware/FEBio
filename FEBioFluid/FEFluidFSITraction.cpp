@@ -196,6 +196,22 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
+//! Impose the interface-with-a-solid orientation on every face, overriding the
+//! free-surface sign flip Activate() applies to faces with a single neighbour.
+//! See the declaration for why a tied interface needs this.
+void FEFluidFSITraction::SetInterfaceOrientation()
+{
+	FESurface& surf = GetSurface();
+	int NF = surf.Elements();
+	for (int j = 0; j < NF; ++j)
+	{
+		if (m_elem[j] == nullptr) continue;
+		FESurfaceElement& el = surf.Element(j);
+		m_s[j] = m_psurf->FacePointing(el, *m_elem[j]);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS)
 {
 	FEModel* fem = GetFEModel();

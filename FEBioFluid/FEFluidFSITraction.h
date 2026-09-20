@@ -52,7 +52,23 @@ public:
     bool Init() override;
 
 	void Activate() override;
-    
+
+    //! Force the face orientation used at an interface with a solid domain.
+    //!
+    //! Activate() picks the orientation from whether the face has a second adjacent
+    //! element: with one it assumes a free surface (t = 0, so t^s = -t^f) and flips
+    //! the sign; with two it assumes an interface with a solid domain. At a tied,
+    //! non-conforming interface the FSI face is geometrically exterior but physically
+    //! an interface with a solid, so the flip is wrong. Call this after Activate() to
+    //! impose the interface orientation regardless of the neighbour count.
+    void SetInterfaceOrientation();
+
+    //! Select the shell bottom face. Must be set before Init(), which forwards it to
+    //! the surface. It also picks the dof set the traction is assembled onto
+    //! (shell displacement rather than displacement), so setting the flag on the
+    //! surface alone is not enough.
+    void SetShellBottom(bool b) { m_bshellb = b; }
+
 private:
 	double GetFluidDilatation(FESurfaceMaterialPoint& mp, double alpha);
 	mat3ds GetFluidStress(FESurfaceMaterialPoint& mp);
