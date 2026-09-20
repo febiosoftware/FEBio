@@ -66,6 +66,7 @@ SOFTWARE.*/
 #include "FEModule.h"
 #include "FELogNodeData.h"
 #include "FELogElemData.h"
+#include "DataStore.h"
 #include "log.h"
 #include <stdarg.h>
 #include <sstream>

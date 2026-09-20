@@ -54,6 +54,7 @@ BEGIN_FECORE_CLASS(FESlidingElasticInterface, FEContactInterface)
 	ADD_PARAMETER(m_naugmax  , "maxaug"             );
 	ADD_PARAMETER(m_breloc   , "node_reloc"         );
 	ADD_PARAMETER(m_mu       , "fric_coeff"         );
+	ADD_PARAMETER(m_sliptol  , "slip_tol"           )->setLongName("slip regularization (fraction of element size)");
 	ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
 	ADD_PARAMETER(m_bflips   , "flip_primary"       );
 	ADD_PARAMETER(m_bflipm   , "flip_secondary"     );
@@ -306,15 +307,20 @@ FESlidingElasticInterface::FESlidingElasticInterface(FEModel* pfem) : FEContactI
     m_breloc = false;
     m_bsmaug = false;
     m_mu = 0.0;
-    
+    m_sliptol = 0.0;
+
     m_naugmin = 0;
     m_naugmax = 10;
     
     m_bfreeze = false;
     m_bflipm = m_bflips = false;
     m_bshellbm = m_bshellbs = false;
-    
+
     m_offset = 0;
+
+    m_naugprev = 0;
+    m_biter    = 0;
+    m_bfirst   = true;
 
     // set parents
     m_ss.SetContactInterface(this);
@@ -381,6 +387,16 @@ void FESlidingElasticInterface::Activate()
     
     // update sliding interface data
     Update();
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingElasticInterface::PrepStep()
+{
+    // don't forget to call the base class!
+    FEContactInterface::PrepStep();
+    
+    m_ss.InitSlidingSurface();
+    if (m_btwo_pass) m_ms.InitSlidingSurface();
 }
 
 //-----------------------------------------------------------------------------
@@ -479,6 +495,32 @@ void FESlidingElasticInterface::CalcAutoPenalty(FESlidingElasticSurface& s)
             data.m_epsn = eps;
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+//! Release an integration point whose contact traction has become tensile, or
+//! which no longer projects onto the secondary surface.
+//!
+//! Unless tension is explicitly admitted across the interface (m_btension),
+//! contact exists only while tn < 0; when tn = 0 the surfaces have pulled
+//! apart and every contact quantity at that point must vanish.
+//!
+//! Previously this reset was open-coded in ProjectSurface() only, and was
+//! incomplete: m_bstick, m_s1, m_tr and m_Ln were left at their last
+//! contacting values.  A separated point therefore stayed flagged as "stick"
+//! -- so Augment() kept taking the stick branch for it, the "stick status"
+//! plot variable was wrong, and a stale slip direction was carried into
+//! m_Lmt = -(nu + s1*mu)*m_Lmd.
+void FESlidingElasticInterface::ReleaseContactPoint(FESlidingElasticSurface::Data& data)
+{
+    data.m_pme    = nullptr;
+    data.m_Lmd    = 0.0;
+    data.m_Lmt    = vec3d(0,0,0);
+    data.m_dg     = vec3d(0,0,0);
+    data.m_tr     = vec3d(0,0,0);
+    data.m_Ln     = 0.0;
+    data.m_s1     = vec3d(0,0,0);
+    data.m_bstick = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -607,8 +649,17 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
 
 				data.m_pme = pme;
 				data.m_nu = nu;
-				data.m_rs[0] = rs[0];
-				data.m_rs[1] = rs[1];
+				// NOTE: only overwrite the parametric coordinates of intersection
+				//       when we actually have a projection.  Otherwise rs holds
+				//       whatever the failed Intersect()/Project() call left
+				//       behind, and those garbage coordinates are promoted to
+				//       m_rsp at the next PrepStep() and are then used by the
+				//       stick kinematics.
+				if (pme)
+				{
+					data.m_rs[0] = rs[0];
+					data.m_rs[1] = rs[1];
+				}
 				if (pme)
 				{
 					// the node could potentially be in contact
@@ -627,18 +678,26 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
 					data.m_gap = (g <= m_srad ? g : 0);
 
 					if ((g > m_srad) || ((!m_btension) && (Ln < 0))) {
-						data.m_Lmd = 0;
-						data.m_pme = 0;
-						data.m_gap = 0;
-						data.m_dg = data.m_Lmt = vec3d(0, 0, 0);
+						// the surfaces have separated, or the projection is
+						// beyond the search radius: release the point completely
+						ReleaseContactPoint(data);
+						// NOTE: m_gap deliberately retains the value assigned
+						//       just above (the true, negative normal gap when
+						//       g <= m_srad, zero otherwise).  Zeroing it here,
+						//       as was done before, makes the release criterion
+						//       Ln = Lmd + eps*g a discontinuous function of the
+						//       configuration: on the next iteration the point
+						//       re-projects, recovers the negative g, releases
+						//       again, and the status chatters.  It also made
+						//       'maximum gap' in the augmentation report and the
+						//       plotted gap meaningless on separation.
 					}
 				}
 				else
 				{
 					// the node is not in contact
-					data.m_Lmd = 0;
+					ReleaseContactPoint(data);
 					data.m_gap = 0;
-					data.m_dg = data.m_Lmt = vec3d(0, 0, 0);
 				}
 			}
 		}
@@ -649,26 +708,23 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
 
 void FESlidingElasticInterface::Update()
 {
-    static int naug = 0;
-    static int biter = 0;
-    
     FEModel& fem = *GetFEModel();
-    
+
     // get the iteration number
     // we need this number to see if we can do segment updates or not
     // also reset number of iterations after each augmentation
     FEAnalysis* pstep = fem.GetCurrentStep();
     FESolver* psolver = pstep->GetFESolver();
     if (psolver->m_niter == 0) {
-        biter = 0;
-        naug = psolver->m_naug;
+        m_biter = 0;
+        m_naugprev = psolver->m_naug;
         // check update of auto-penalty
         if (m_bautopen && m_bupdtpen) UpdateAutoPenalty();
-    } else if (psolver->m_naug > naug) {
-        biter = psolver->m_niter;
-        naug = psolver->m_naug;
+    } else if (psolver->m_naug > m_naugprev) {
+        m_biter = psolver->m_niter;
+        m_naugprev = psolver->m_naug;
     }
-    int niter = psolver->m_niter - biter;
+    int niter = psolver->m_niter - m_biter;
     bool bupseg = ((m_nsegup == 0)? true : (niter <= m_nsegup));
     // get the logfile
     //	Logfile& log = GetLogfile();
@@ -676,22 +732,13 @@ void FESlidingElasticInterface::Update()
     
     // project the surfaces onto each other
     // this will update the gap functions as well
-    static bool bfirst = true;
-    ProjectSurface(m_ss, m_ms, bupseg, (m_breloc && bfirst));
-    bfirst = false;
+    ProjectSurface(m_ss, m_ms, bupseg, (m_breloc && m_bfirst));
+    m_bfirst = false;
     if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupseg);
-    
-	int nsolve_iter = GetFEModel()->GetCurrentStep()->GetFESolver()->m_niter;
-    if (nsolve_iter == 0)
-    {
-        m_ss.InitSlidingSurface();
-        if (m_btwo_pass) m_ms.InitSlidingSurface();
-        m_bfreeze = false;
-    }
     
     // Update the net contact pressures
     UpdateContactPressures();
-    
+
     if (niter == 0) m_bfreeze = false;
     
     return;
@@ -745,19 +792,80 @@ vec3d FESlidingElasticInterface::SlipTangent(FESlidingElasticSurface& ss, const 
     vec3d c = Nhat*m*(1.0/detJ);
     
     // calculate slip direction s1
-    double norm = (Nhat*(c*(-g)*m_knmult + dx1 - dx2)).norm();
-    if (norm != 0)
+    //
+    // REGULARIZATION (slip_tol).  dx1, dx2 and dgscov are increments over the
+    // *time step*, so the slip magnitude below is O(dt).  With the original
+    // s1 = w/|w| and hd = 1/|w| this makes both the friction traction
+    // direction and its linearization degenerate as dt -> 0:
+    //
+    //   - |w| falls to round-off, so the *direction* of s1 becomes noise while
+    //     the friction traction keeps its full magnitude mu*pn.  The residual
+    //     then oscillates with an amplitude independent of dt.
+    //   - StiffnessMatrix() forms Sh1 = (I - s1 (x) s1)*hd with hd = 1/|w|,
+    //     which enters the tangent through B, L1 and Jc as mu*tn/|w| and
+    //     mu*tn*g/|w|.  Both are unbounded as dt -> 0, while the normal
+    //     penalty term stays at eps.
+    //
+    // The net effect is that Newton converges *worse* as the time step is
+    // reduced, so the auto-stepper enters a death spiral: cut dt -> harder to
+    // converge -> cut again -> dtmin -> failure.
+    //
+    // The cure is the standard Oden-Martins regularization: replace the unit
+    // vector w/|w| by
+    //
+    //       s1 = w / sqrt(|w|^2 + h0^2),        h0 = slip_tol * sqrt(detJ)
+    //
+    // whose exact Jacobian is
+    //
+    //       d s1 / d w = (I - s1 (x) s1) / sqrt(|w|^2 + h0^2)
+    //
+    // i.e. precisely the existing Sh1 expression with hd = 1/sqrt(|w|^2+h0^2).
+    // So returning dh = sqrt(|w|^2 + h0^2) both bounds the tangent (by 1/h0)
+    // and keeps it the *consistent* Jacobian of the regularized traction --
+    // quadratic convergence is preserved rather than traded away.
+    //
+    // h0 is scaled by the local element length sqrt(detJ), so slip_tol is
+    // dimensionless and mesh-independent: it is the per-step slip, as a
+    // fraction of the element size, below which the friction traction ramps
+    // down.  slip_tol = 0 (the default) reproduces the original formulation
+    // exactly, bit for bit.
+    //
+    // NOTE: for slip increments below h0 the friction traction becomes
+    //       dt-dependent (it scales as |w|/h0).  Choose slip_tol well below
+    //       the per-step slip of genuinely sliding points so the ramp only
+    //       acts where the slip direction is unresolvable anyway.
+    vec3d w = c*(-g)*m_knmult + dx1 - dx2;
+    double norm = (Nhat*w).norm();
+    double h0 = m_sliptol*sqrt(detJ);
+    double dhr = sqrt(norm*norm + h0*h0);
+    if (dhr > 0)
     {
-        s1 = (Nhat*(c*(-g)*m_knmult + dx1 - dx2))/norm;
-        dh = norm;
-        r = c*(-g)*m_knmult + dx1 - dx2;
+        s1 = (Nhat*w)/dhr;
+        dh = dhr;
+        r = w;
     }
-    
+
     return s1;
-    
+
 }
 
 //-----------------------------------------------------------------------------
+//! Evaluate the contact traction at integration point n of element nel.
+//!
+//! This function was restructured to make the *contact / no-contact* decision
+//! explicit and to separate it cleanly from the *stick / slip* decision.  The
+//! two are distinct: the return map selects stick vs. slip, but contact itself
+//! exists only while tn < 0 (unless m_btension admits tension).
+//!
+//! In the previous version the release condition was applied only through
+//! pn = MBRACKET(...), which zeroes the contact *pressure* but leaves every
+//! other quantity at the point untouched.  On the m_bfreeze stick branch a
+//! separating point was still re-attached to its previous projection
+//! (m_pme = m_pmep), had its vector gap overwritten, kept m_bstick = true, and
+//! returned a *tensile* traction t.  Since m_bfreeze is set at the end of
+//! every augmentation, a point that separates during the augmentation loop was
+//! locked in stick and could not disengage.  Freezing the stick/slip status
+//! must never freeze the contact status.
 vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, const int nel, const int n, FESlidingElasticSurface& ms, double& pn)
 {
     vec3d s1(0,0,0);
@@ -765,178 +873,175 @@ vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, co
     vec3d t(0,0,0);
     pn = 0;
     double tn = 0, ts = 0;
-    
+
     double psf = GetPenaltyScaleFactor();
 
-	// get the primary surface element
-	FESurfaceElement& se = ss.Element(nel);
+    // get the primary surface element
+    FESurfaceElement& se = ss.Element(nel);
 
     // get the integration point data
-	FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*se.GetMaterialPoint(n));
+    FESlidingElasticSurface::Data& data = static_cast<FESlidingElasticSurface::Data&>(*se.GetMaterialPoint(n));
 
     // penalty
     double eps = m_epsn*data.m_epsn*psf;
-    
+
     // normal gap
     double g = data.m_gap;
-    
+
     // normal traction Lagrange multiplier
     double Lm = data.m_Lmd;
-    
+
     // vector traction Lagrange multiplier
     vec3d Lt = data.m_Lmt;
-    
+
     // calculate the normal at this integration point
     vec3d nu = data.m_nu;
-    
+
     // get current and previous secondary elements
-    FESurfaceElement* pme = data.m_pme;
+    FESurfaceElement* pme  = data.m_pme;
     FESurfaceElement* pmep = data.m_pmep;
-    
-    // if we just returned from an augmentation, do not update stick or slip status
-    if (m_bfreeze && pme) {
-        if (data.m_bstick) {
-            // calculate current global position of the integration point
+
+    // ------------------------------------------------------------------
+    // 0. No projection onto the secondary surface => no contact.
+    //    This also covers the case where the stick/slip status is frozen
+    //    (m_bfreeze) but the point has since lost its projection; the old
+    //    code fell through to the "update" branch in that case and silently
+    //    cleared m_bstick, defeating the freeze.
+    // ------------------------------------------------------------------
+    if (pme == nullptr)
+    {
+        if (!m_btension) ReleaseContactPoint(data);
+        else data.m_bstick = false;
+        return vec3d(0,0,0);
+    }
+
+    // ------------------------------------------------------------------
+    // 1. Determine the stick/slip status.
+    //    If we just returned from an augmentation, keep the status we had.
+    //    Otherwise perform the trial state and evaluate the slip criterion.
+    // ------------------------------------------------------------------
+    bool bstick = false;
+
+    if (m_bfreeze)
+    {
+        bstick = data.m_bstick;
+    }
+    else
+    {
+        data.m_bstick = false;
+
+        if (pmep)
+        {
+            // assume stick and calculate the trial traction
             vec3d xo = ss.Local2Global(se, n);
-            
-            // calculate current global position of the previous intersection point
             vec3d xt = ms.Local2Global(*pmep, data.m_rsp[0], data.m_rsp[1]);
-            
-            // vector and normal gaps
             vec3d dg = xt - xo;
-            
-            // calculate trial stick traction, normal component, shear component
-            t = Lt + dg*eps;
+
+            t  = Lt + dg*eps;
             tn = t*nu;
             ts = (t - nu*tn).norm();
-            
-            // contact pressure
-            pn = m_btension ? (-tn) : MBRACKET(-tn);
-            
-            // store the previous values as the current
-            data.m_pme = data.m_pmep;
-            data.m_rs = data.m_rsp;
-            
-            // recalculate gap
-            data.m_dg = dg + nu*m_offset;
-        }
-        else {
-            // recalculate contact pressure for slip
-            pn = m_btension ? (Lm + eps*g) : MBRACKET(Lm + eps*g);
-            
-            if (pn != 0)
-            {
-                
-                double dh = 0;
-                
-                // slip direction
-                s1 = FESlidingElasticInterface::SlipTangent(ss, nel, n, ms, dh, drdot);
-                
-                // total traction
-                t = (nu + s1*(m_mu))*(-pn);
-                
-                // reset slip direction
-                data.m_s1 = s1;
-            }
-            else
-            {
-                t = vec3d(0,0,0);
-            }
+
+            // check if stick
+            if ( (tn < 0) && (ts < m_mu*fabs(tn)) ) bstick = true;
         }
     }
-    // update contact tractions
-    else {
-        data.m_bstick = false;
-        
-        if (pme)
+
+    // ------------------------------------------------------------------
+    // 2a. S T I C K
+    // ------------------------------------------------------------------
+    if (bstick)
+    {
+        // Stick kinematics are anchored on the *previous* projection, so every
+        // quantity below must be evaluated on pmep.  Guard against a null
+        // pmep: m_bstick can survive from the previous time step, while
+        // InitSlidingSurface() may have just set m_pmep = m_pme = nullptr.
+        // The old code dereferenced *pmep unconditionally on this path.
+        if (pmep == nullptr)
         {
-            // assume stick and calculate traction
-            if (pmep)
-            {
-                // calculate current global position of the integration point
-                vec3d xo = ss.Local2Global(se, n);
-                
-                // calculate current global position of the previous intersection point
-                vec3d xt = ms.Local2Global(*pmep, data.m_rsp[0], data.m_rsp[1]);
-                
-                // vector and normal gaps
-                vec3d dg = xt - xo;
-                
-                // calculate trial stick traction, normal component, shear component
-                t = Lt + dg*eps;
-                tn = t*nu;
-                ts = (t - nu*tn).norm();
-                
-                // check if stick
-                if ( (tn < 0) && (ts < m_mu*fabs(tn)) )
-                {
-                    // set boolean flag for stick
-                    data.m_bstick = true;
-                    
-                    // contact pressure
-                    pn = m_btension ? (-tn) : MBRACKET(-tn);
-                    
-                    // store the previous values as the current
-                    data.m_pme = data.m_pmep;
-                    data.m_rs = data.m_rsp;
-                    
-                    // recalculate gap
-                    data.m_dg = dg + nu*m_offset;
-                }
-                else
-                {
-                    // recalculate contact pressure for slip
-                    pn = m_btension ? (Lm + eps*g) : MBRACKET(Lm + eps*g);
-                    
-                    if (pn != 0)
-                    {
-                        
-                        double dh = 0;
-                        
-                        // slip direction
-                        s1 = FESlidingElasticInterface::SlipTangent(ss, nel, n, ms, dh, drdot);
-                        
-                        // total traction
-                        t = (nu + s1*(m_mu))*(-pn);
-                        
-                        // reset slip direction
-                        data.m_s1 = s1;
-                        data.m_bstick = false;
-                    }
-                    else
-                    {
-                        t = vec3d(0,0,0);
-                    }
-                    
-                }
-            }
-            else
-            {
-                // assume slip upon first contact
-                // calculate contact pressure for slip
-                pn = m_btension ? (Lm + eps*g) : MBRACKET(Lm + eps*g);
-                
-                if (pn != 0)
-                {
-                    
-                    double dh = 0;
-                    
-                    // slip direction
-                    s1 = FESlidingElasticInterface::SlipTangent(ss, nel, n, ms, dh, drdot);
-                    
-                    // calculate frictional traction
-                    t = (nu + s1*(m_mu))*(-pn);
-                    
-                    // reset slip direction
-                    data.m_s1 = s1;
-                    data.m_bstick = false;
-                }
-            }
+            if (!m_btension) ReleaseContactPoint(data);
+            else data.m_bstick = false;
+            return vec3d(0,0,0);
+        }
+
+        // calculate current global position of the integration point
+        vec3d xo = ss.Local2Global(se, n);
+
+        // calculate current global position of the previous intersection point
+        vec3d xt = ms.Local2Global(*pmep, data.m_rsp[0], data.m_rsp[1]);
+
+        // vector gap
+        vec3d dg = xt - xo;
+
+        // calculate stick traction, normal component, shear component
+        t  = Lt + dg*eps;
+        tn = t*nu;
+        ts = (t - nu*tn).norm();
+
+        // ---- R E L E A S E   T E S T ----
+        // A stick point whose normal traction has become tensile has
+        // disengaged and must be released completely, whether or not the
+        // stick/slip status is frozen.  Skipped when tension is admitted
+        // across the interface, in which case the point stays bonded.
+        if ((!m_btension) && (tn >= 0))
+        {
+            ReleaseContactPoint(data);
+            return vec3d(0,0,0);
+        }
+
+        // contact pressure
+        // (for !m_btension the release test above guarantees tn < 0, so this
+        //  is identical to the former MBRACKET(-tn))
+        pn = -tn;
+
+        data.m_bstick = true;
+
+        // store the previous values as the current
+        data.m_pme = pmep;
+        data.m_rs  = data.m_rsp;
+
+        // recalculate gap
+        data.m_dg = dg + nu*m_offset;
+    }
+    // ------------------------------------------------------------------
+    // 2b. S L I P   (this also covers first contact, where pmep == nullptr)
+    // ------------------------------------------------------------------
+    else
+    {
+        data.m_bstick = false;
+
+        // normal traction for slip
+        double Ln = Lm + eps*g;
+
+        // ---- R E L E A S E   T E S T ----
+        if ((!m_btension) && (Ln <= 0))
+        {
+            ReleaseContactPoint(data);
+            return vec3d(0,0,0);
+        }
+
+        pn = Ln;
+
+        if (pn != 0)
+        {
+            double dh = 0;
+
+            // slip direction
+            s1 = FESlidingElasticInterface::SlipTangent(ss, nel, n, ms, dh, drdot);
+
+            // total traction
+            t = (nu + s1*(m_mu))*(-pn);
+
+            // reset slip direction
+            data.m_s1 = s1;
+        }
+        else
+        {
+            // only reachable with m_btension, where Ln may be exactly zero
+            t = vec3d(0,0,0);
         }
     }
-    
+
     return t;
-    
 }
 
 //-----------------------------------------------------------------------------
@@ -1566,8 +1671,6 @@ void FESlidingElasticInterface::UpdateContactPressures()
 					// get integration point data
 					FESlidingElasticSurface::Data& sd = static_cast<FESlidingElasticSurface::Data&>(*el.GetMaterialPoint(i));
 
-					double pn = 0;
-
 					// evaluate traction on primary surface
 					double eps = m_epsn * sd.m_epsn * psf;
 					if (sd.m_bstick) {
@@ -1575,6 +1678,19 @@ void FESlidingElasticInterface::UpdateContactPressures()
 						sd.m_tr = sd.m_Lmt + sd.m_dg * eps;
 						// then derive normal component
 						sd.m_Ln = -sd.m_tr * sd.m_nu;
+						// Unless tension is admitted, contact cannot sustain it.
+						// The slip branch below has always applied MBRACKET here;
+						// the stick branch never did, so a separating stick point
+						// reported a negative m_Ln.  That negative value is what
+						// GetNodalContactPressure() plots, and what
+						// GetContactArea() tests, so the reported contact
+						// pressure went tensile and the contact area dropped
+						// the face while the point was still assembling a
+						// residual.
+						if ((!m_btension) && (sd.m_Ln <= 0)) {
+							sd.m_Ln = 0;
+							sd.m_tr = vec3d(0, 0, 0);
+						}
 					}
 					else {
 						// if slip, evaluate normal traction
@@ -1596,7 +1712,6 @@ void FESlidingElasticInterface::UpdateContactPressures()
 						{
 							FESlidingElasticSurface::Data& md = static_cast<FESlidingElasticSurface::Data&>(*pme->GetMaterialPoint(j));
 
-							pn = 0;
 							// evaluate traction on secondary surface
 							double eps = m_epsn * md.m_epsn * psf;
 							if (md.m_bstick) {
@@ -1604,6 +1719,11 @@ void FESlidingElasticInterface::UpdateContactPressures()
 								ti[j] = md.m_Lmt + md.m_dg * eps;
 								// then derive normal component
 								pi[j] = -ti[j] * md.m_nu;
+								// no tension (see note above)
+								if ((!m_btension) && (pi[j] <= 0)) {
+									pi[j] = 0;
+									ti[j] = vec3d(0, 0, 0);
+								}
 							}
 							else {
 								// if slip, evaluate normal traction
@@ -1715,11 +1835,20 @@ bool FESlidingElasticInterface::Augment(int naug, const FETimeInfo& tp)
 					// then derive normal component
 					data.m_Lmd = -data.m_Lmt * data.m_nu;
 					Ln = data.m_Lmd;
-					normL1 += data.m_Lmt * data.m_Lmt;
 
-					if (m_btension)
+					// RELEASE TEST.  A stick point whose augmented normal
+					// multiplier has become tensile has disengaged.  No
+					// Macaulay bracket was applied on this branch, so a
+					// separating stick point carried a tensile m_Lmd and m_Lmt
+					// straight back into ContactTraction() on the next
+					// iteration, and stayed flagged m_bstick.
+					if ((!m_btension) && (Ln <= 0)) {
+						ReleaseContactPoint(data);
+					}
+					else {
+						normL1 += data.m_Lmt * data.m_Lmt;
 						maxgap = max(maxgap, data.m_dg.norm());
-					else if (Ln > 0) maxgap = max(maxgap, data.m_dg.norm());
+					}
 				}
 				else {
 					// if slip, augment normal traction
@@ -1733,13 +1862,16 @@ bool FESlidingElasticInterface::Augment(int naug, const FETimeInfo& tp)
 						Ln = data.m_Lmd + eps * data.m_gap;
 						data.m_Lmd = m_btension ? Ln : MBRACKET(Ln);
 					}
-					// then derive total traction
-					data.m_Lmt = -(data.m_nu + data.m_s1 * m_mu) * data.m_Lmd;
-					normL1 += data.m_Lmd * data.m_Lmd;
-
-					if (m_btension)
+					// release test (see the stick branch above)
+					if ((!m_btension) && (data.m_Lmd <= 0)) {
+						ReleaseContactPoint(data);
+					}
+					else {
+						// then derive total traction
+						data.m_Lmt = -(data.m_nu + data.m_s1 * m_mu) * data.m_Lmd;
+						normL1 += data.m_Lmd * data.m_Lmd;
 						maxgap = max(maxgap, fabs(data.m_gap));
-					else if (Ln > 0) maxgap = max(maxgap, fabs(data.m_gap));
+					}
 				}
 			}
 		}
@@ -1767,11 +1899,15 @@ bool FESlidingElasticInterface::Augment(int naug, const FETimeInfo& tp)
 					// then derive normal component
 					data.m_Lmd = -data.m_Lmt * data.m_nu;
 					Ln = data.m_Lmd;
-					normL1 += data.m_Lmt * data.m_Lmt;
 
-					if (m_btension)
+					// release test (see the primary-surface loop above)
+					if ((!m_btension) && (Ln <= 0)) {
+						ReleaseContactPoint(data);
+					}
+					else {
+						normL1 += data.m_Lmt * data.m_Lmt;
 						maxgap = max(maxgap, fabs(data.m_dg.norm()));
-					else if (Ln > 0) maxgap = max(maxgap, fabs(data.m_dg.norm()));
+					}
 				}
 				else {
 					// if slip, augment normal traction
@@ -1785,13 +1921,16 @@ bool FESlidingElasticInterface::Augment(int naug, const FETimeInfo& tp)
 						Ln = data.m_Lmd + eps * data.m_gap;
 						data.m_Lmd = m_btension ? Ln : MBRACKET(Ln);
 					}
-					// then derive total traction
-					data.m_Lmt = -(data.m_nu + data.m_s1 * m_mu) * data.m_Lmd;
-					normL1 += data.m_Lmd * data.m_Lmd;
-
-					if (m_btension)
+					// release test (see the primary-surface loop above)
+					if ((!m_btension) && (data.m_Lmd <= 0)) {
+						ReleaseContactPoint(data);
+					}
+					else {
+						// then derive total traction
+						data.m_Lmt = -(data.m_nu + data.m_s1 * m_mu) * data.m_Lmd;
+						normL1 += data.m_Lmd * data.m_Lmd;
 						maxgap = max(maxgap, fabs(data.m_gap));
-					else if (Ln > 0) maxgap = max(maxgap, fabs(data.m_gap));
+					}
 				}
 			}
 		}

@@ -31,6 +31,7 @@ SOFTWARE.*/
 #include "FEAnalysis.h"
 #include "FECoreKernel.h"
 #include "FEModel.h"
+#include "DataStore.h"
 
 NodeDataRecord::NodeDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_NODE) {}
 
@@ -38,22 +39,24 @@ int NodeDataRecord::Size() const { return (int)m_Data.size(); }
 
 void NodeDataRecord::SetData(const char* szexpr)
 {
-	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
-	if (data.empty()) throw UnknownDataField(szexpr);
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
 
 	DataStore& DS = GetFEModel()->GetDataStore();
 
 	m_Data.clear();
 	m_data = szexpr;
 	FEModel* fem = GetFEModel();
-	for (int i=0; i<data.size(); ++i)
+	for (size_t i = 0; i < strings.size(); ++i)
 	{
-		FELogNodeData* pdata = DS.GetNodeDataSource(data[i].name);
-		if (pdata == nullptr) throw UnknownDataField(data[i].name);
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FELogNodeData* pdata = DS.GetNodeDataSource(it.name);
+		if (pdata == nullptr) throw UnknownDataField(it.name);
 		m_Data.push_back(pdata);
 
-		if (!ApplyDataRecordItem(*pdata, data[i]))
-			throw UnknownDataField(data[i].name);
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
 	}
 }
 

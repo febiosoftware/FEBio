@@ -44,6 +44,7 @@ SOFTWARE.*/
 #include "FELeastSquaresInterpolator.h"
 #include "FEMeshShapeInterpolator.h"
 #include "FEDomainShapeInterpolator.h"
+#include <stdexcept>
 
 BEGIN_FECORE_CLASS(FERefineMesh, FEMeshAdaptor)
 	ADD_PARAMETER(m_maxiter, "max_iters");

@@ -116,7 +116,10 @@ struct DataRecordItem
 	std::vector<std::string> params;
 	int index = -1;
 	string comp;
+
+	bool isValid() const { return !name.empty(); }
 };
 
-FECORE_API std::vector<DataRecordItem> ProcessDataString(const char* szdata);
+FECORE_API std::vector<std::string> SplitDataString(const char* szdata);
+FECORE_API DataRecordItem ProcessDataString(const char* szdata);
 FECORE_API bool ApplyDataRecordItem(FELogData& data, const DataRecordItem& item);

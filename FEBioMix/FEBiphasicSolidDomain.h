@@ -142,7 +142,7 @@ protected:
     bool    m_secant_stress;    //!< use secant approximation to stress
     bool    m_secant_tangent;   //!< flag for using secant tangent
     bool    m_secant_perm_tangent;   //!< flag for using secant tangent on permeability
-	bool    m_auto_pressure_stab; //!< flag for automatic pressure stabilization
+	int		m_auto_pressure_stab; //!< flag for automatic pressure stabilization
     
 protected:
 	int			m_varU, m_varP;	// displacement, pressure field indices

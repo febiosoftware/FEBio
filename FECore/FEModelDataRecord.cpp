@@ -44,19 +44,21 @@ void FEModelDataRecord::ClearData()
 
 void FEModelDataRecord::SetData(const char* szexpr)
 {
-	std::vector<DataRecordItem> data = ProcessDataString(szexpr);
-	if (data.empty()) throw UnknownDataField(szexpr);
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
 
 	ClearData();
 	m_data = szexpr;
-	for (int i=0; i<data.size(); ++i)
+	for (size_t i=0; i<strings.size(); ++i)
 	{
-		FEModelLogData* pdata = fecore_new<FEModelLogData>(data[i].name.c_str(), GetFEModel());
-		if (pdata == nullptr) throw UnknownDataField(data[i].name);
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FEModelLogData* pdata = fecore_new<FEModelLogData>(it.name.c_str(), GetFEModel());
+		if (pdata == nullptr) throw UnknownDataField(it.name);
 		m_Data.push_back(pdata);
 
-		if (!ApplyDataRecordItem(*pdata, data[i]))
-			throw UnknownDataField(data[i].name);
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
 	}
 }
 
