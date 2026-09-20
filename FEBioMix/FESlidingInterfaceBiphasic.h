@@ -190,6 +190,8 @@ public:
     bool            m_bupdtpen;     //!< update penalty at each time step
     
     double          m_mu;           //!< friction coefficient
+    double          m_sliptol;      //!< slip regularization, as a fraction of the local
+                                    //!< element size (see SlipTangent). 0 = original behavior.
     bool            m_bfreeze;      //!< freeze stick/slip status
     bool            m_bflips;       //!< flip primary surface normal
     bool            m_bflipm;       //!< flip secondary surface normal

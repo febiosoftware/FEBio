@@ -56,6 +56,7 @@ BEGIN_FECORE_CLASS(FESlidingInterfaceBiphasic, FEContactInterface)
 	ADD_PARAMETER(m_naugmax  , "maxaug"             );
 	ADD_PARAMETER(m_breloc   , "node_reloc"         );
 	ADD_PARAMETER(m_mu       , "fric_coeff"         );
+	ADD_PARAMETER(m_sliptol  , "slip_tol"           )->setLongName("slip regularization (fraction of element size)");
 	ADD_PARAMETER(m_phi      , "contact_frac"       );
 	ADD_PARAMETER(m_bsmaug   , "smooth_aug"         );
     ADD_PARAMETER(m_bsmfls   , "smooth_fls"         );
@@ -506,6 +507,7 @@ FESlidingInterfaceBiphasic::FESlidingInterfaceBiphasic(FEModel* pfem) : FEContac
     m_bupdtpen = false;
     m_mu = 0.0;
     m_phi = 0.0;
+    m_sliptol = 0.0;
     
     m_naugmin = 0;
     m_naugmax = 10;
@@ -859,7 +861,7 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
     }
     
     // loop over all integration points
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
     for (int i=0; i<ss.Elements(); ++i)
     {
         FESurfaceElement& el = ss.Element(i);
@@ -1163,12 +1165,42 @@ vec3d FESlidingInterfaceBiphasic::SlipTangent(FESlidingSurfaceBiphasic& ss, cons
     vec3d c = Nhat*m*(1.0/detJ);
     
     // calculate slip direction s1
-    double norm = (Nhat*(c*(-g) + dx1 - dx2)).norm();
-    if (norm != 0)
+    //
+    // REGULARIZATION (slip_tol).  dx1, dx2 and dgscov are increments over the
+    // *time step*, so the slip magnitude below is O(dt).  With the original
+    // s1 = w/|w| and hd = 1/|w| both the friction traction direction and its
+    // linearization degenerate as dt -> 0: |w| falls to round-off so the
+    // direction of s1 becomes noise while the traction keeps its full
+    // magnitude, and StiffnessMatrix() forms Sh1 = (I - s1 (x) s1)/|w| which
+    // enters the tangent as mueff*tn/|w| and mueff*tn*g/|w| -- unbounded,
+    // while the normal penalty term stays at eps.  Newton then converges
+    // *worse* as the time step is reduced.
+    //
+    // Standard Oden-Martins regularization: replace w/|w| by
+    //
+    //       s1 = w / sqrt(|w|^2 + h0^2),        h0 = slip_tol * sqrt(detJ)
+    //
+    // whose exact Jacobian is (I - s1 (x) s1)/sqrt(|w|^2 + h0^2), i.e. exactly
+    // the existing Sh1 with hd = 1/sqrt(|w|^2 + h0^2).  Returning
+    // dh = sqrt(|w|^2 + h0^2) therefore bounds the tangent by 1/h0 *and* keeps
+    // it the consistent Jacobian, preserving quadratic convergence.
+    //
+    // h0 scales with the local element length sqrt(detJ), so slip_tol is
+    // dimensionless and mesh-independent.  slip_tol = 0 (the default)
+    // reproduces the original formulation exactly.
+    //
+    // NOTE: below h0 the friction traction becomes dt-dependent (it scales as
+    //       |w|/h0).  Choose slip_tol well below the per-step slip of
+    //       genuinely sliding points.
+    vec3d w = c*(-g) + dx1 - dx2;
+    double norm = (Nhat*w).norm();
+    double h0 = m_sliptol*sqrt(detJ);
+    double dhr = sqrt(norm*norm + h0*h0);
+    if (dhr > 0)
     {
-        s1 = (Nhat*(c*(-g) + dx1 - dx2))/norm;
-        dh = norm;
-        r = c*(-g) + dx1 - dx2;
+        s1 = (Nhat*w)/dhr;
+        dh = dhr;
+        r = w;
     }
     
     return s1;
