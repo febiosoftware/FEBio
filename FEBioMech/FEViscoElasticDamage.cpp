@@ -28,6 +28,7 @@
 #include "FEViscoElasticDamage.h"
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
+#include <stdexcept>
 
 
 //-----------------------------------------------------------------------------

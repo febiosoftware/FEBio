@@ -402,7 +402,11 @@ bool FEAnalysis::Solve()
 	double starttime = fem.GetStartTime();
 //	double endtime = fem.m_ftime0 + m_ntime*m_dt0;
 	double endtime = m_tend;
-	const double eps = endtime*1e-7;
+	// Use the same time tolerance as FETimeStepController::CheckMustPoints.  Otherwise,
+	// we may terminate the analysis step before reaching the last must point, or get an
+	// extra must point at the transition between two analysis steps due to accumulated
+	// early-termination error in m_timeController->m_tstart and m_timeController->m_tend.
+	const double eps = endtime*1e-12;
 
 	// if we restarted we need to update the timestep
 	// before continuing

@@ -29,13 +29,6 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FESurface.h"
 
-//-----------------------------------------------------------------------------
-FELogFaceData::FELogFaceData(FEModel* fem) : FELogData(fem) {}
-
-//-----------------------------------------------------------------------------
-FELogFaceData::~FELogFaceData() {}
-
-//-----------------------------------------------------------------------------
 FaceDataRecord::FaceDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_FACE) 
 {
 	m_surface = nullptr;
@@ -47,21 +40,22 @@ int FaceDataRecord::Size() const { return (int)m_Data.size(); }
 //-----------------------------------------------------------------------------
 void FaceDataRecord::SetData(const char* szexpr)
 {
-	char szcopy[MAX_STRING] = { 0 };
-	strcpy(szcopy, szexpr);
-	char* sz = szcopy, *ch;
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
+
 	m_Data.clear();
-	strcpy(m_szdata, szexpr);
-	do
+	m_data = szexpr;
+	for (size_t i = 0; i < strings.size(); ++i)
 	{
-		ch = strchr(sz, ';');
-		if (ch) *ch++ = 0;
-		FELogFaceData* pdata = fecore_new<FELogFaceData>(sz, GetFEModel());
-		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(sz);
-		sz = ch;
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FELogFaceData* pdata = fecore_new<FELogFaceData>(it.name.c_str(), GetFEModel());
+		if (pdata == nullptr) throw UnknownDataField(it.name);
+		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
 	}
-	while (ch);
 }
 
 //-----------------------------------------------------------------------------

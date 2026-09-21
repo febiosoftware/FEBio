@@ -32,6 +32,8 @@ SOFTWARE.*/
 #include <FECore/FSPath.h>
 #include <FECore/FEPlotDataStore.h>
 #include <FECore/FESurface.h>
+#include <FECore/DataStore.h>
+
 
 bool string_to_int_vector(const char* szlist, std::vector<int>& list)
 {

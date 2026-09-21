@@ -26,24 +26,10 @@ SOFTWARE.*/
 #pragma once
 #include "FECoreBase.h"
 #include "DataRecord.h"
+#include "FELogFaceData.h"
 
 class FESurface;
-class FESurfaceElement;
 
-//-----------------------------------------------------------------------------
-//! This is the base class for a face data value.
-class FECORE_API FELogFaceData : public FELogData
-{
-	FECORE_SUPER_CLASS(FELOGFACEDATA_ID)
-	FECORE_BASE_CLASS(FELogFaceData)
-
-public:
-	FELogFaceData(FEModel* fem);
-	virtual ~FELogFaceData();
-	virtual double value(FESurfaceElement& el) = 0;
-};
-
-//-----------------------------------------------------------------------------
 //! This class records surface data
 class FECORE_API FaceDataRecord : public DataRecord
 {

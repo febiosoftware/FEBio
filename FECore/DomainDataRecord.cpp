@@ -29,61 +29,30 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEDomain.h"
 
-//-----------------------------------------------------------------------------
 void FEDomainDataRecord::SetData(const char* szexpr)
 {
-    char szcopy[MAX_STRING] = { 0 };
-    strcpy(szcopy, szexpr);
-    char* sz = szcopy, * ch;
-    m_Data.clear();
-    strcpy(m_szdata, szexpr);
-    do
-    {
-		const char* szparam = nullptr;
-        ch = strchr(sz, ';');
-        if (ch) *ch++ = 0;
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
 
-		// see if parameters are defined
-		char* cl = strchr(sz, '(');
-		if (cl)
-		{
-			char* cr = strrchr(sz, ')');
-			if (cr == nullptr) throw UnknownDataField(sz);
+	m_Data.clear();
+	m_data = szexpr;
+	for (size_t i=0; i<strings.size(); ++i)
+	{
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FELogDomainData* pdata = fecore_new<FELogDomainData>(it.name.c_str(), GetFEModel());
+		if (pdata == nullptr) throw UnknownDataField(it.name);
+		m_Data.push_back(pdata);
 
-			*cl++ = 0;
-			*cr = 0;
-
-			cl = strchr (cl, '\''); if (cl == nullptr) throw UnknownDataField(sz);
-			cr = strrchr(cl, '\''); if (cr == nullptr) throw UnknownDataField(sz);
-
-			*cl++ = 0;
-			*cr = 0;
-
-			szparam = cl;
-		}
-
-        FELogDomainData* pdata = fecore_new<FELogDomainData>(sz, GetFEModel());
-		if (pdata)
-		{
-			m_Data.push_back(pdata);
-			if (szparam)
-			{
-				vector<string> params; params.push_back(szparam);
-				if (pdata->SetParameters(params) == false) throw UnknownDataField(sz);
-			}
-		}
-        else throw UnknownDataField(sz);
-        sz = ch;
-    } while (ch);
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
+	}
 }
 
-//-----------------------------------------------------------------------------
 FEDomainDataRecord::FEDomainDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_DOMAIN) {}
 
-//-----------------------------------------------------------------------------
 int FEDomainDataRecord::Size() const { return (int)m_Data.size(); }
 
-//-----------------------------------------------------------------------------
 double FEDomainDataRecord::Evaluate(int item, int ndata)
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
@@ -94,151 +63,16 @@ double FEDomainDataRecord::Evaluate(int item, int ndata)
     return m_Data[ndata]->value(dom);
 }
 
-//-----------------------------------------------------------------------------
 void FEDomainDataRecord::SetDomain(int domainIndex)
 {
     m_item.clear();
     m_item.push_back(domainIndex + 1);
 }
 
-//-----------------------------------------------------------------------------
 void FEDomainDataRecord::SelectAllItems()
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
     int n = mesh.Domains();
     m_item.resize(n);
     for (int i = 0; i < n; ++i) m_item[i] = i + 1;
-}
-
-//============================================================================
-FELogAvgDomainData::FELogAvgDomainData(FEModel* pfem) : FELogDomainData(pfem) 
-{
-    m_elemData = nullptr;
-}
-
-FELogAvgDomainData::~FELogAvgDomainData()
-{
-    if (m_elemData) delete m_elemData;
-    m_elemData = nullptr;
-}
-
-bool FELogAvgDomainData::SetParameters(std::vector<std::string>& params)
-{
-    if (params.size() != 1) return false;
-    std::string& v1 = params[0];
-    if (v1.empty()) return false;
-
-    m_elemData = fecore_new<FELogElemData>(v1.c_str(), GetFEModel());
-    if (m_elemData == nullptr) return false;
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-double FELogAvgDomainData::value(FEDomain& dom)
-{
-    if (m_elemData == nullptr) return 0.0;
-
-    double avg = 0.0;
-    const int NE = dom.Elements();
-    for (int i = 0; i < dom.Elements(); ++i)
-    {
-        FEElement& el = dom.ElementRef(i);
-        double eval = m_elemData->value(el);
-        avg += eval;
-    }
-    avg /= (double)NE;
-    return avg;
-}
-
-//============================================================================
-FELogPctDomainData::FELogPctDomainData(FEModel* pfem) : FELogDomainData(pfem)
-{
-    m_pct = 0.0;
-    m_elemData = nullptr;
-}
-
-FELogPctDomainData::~FELogPctDomainData()
-{
-    if (m_elemData) delete m_elemData;
-    m_elemData = nullptr;
-}
-
-bool FELogPctDomainData::SetParameters(std::vector<std::string>& params)
-{
-    if (params.size() != 2) return false;
-    std::string& v1 = params[0];
-    std::string& v2 = params[1];
-    if (v1.empty() || v2.empty()) return false;
-
-    m_elemData = fecore_new<FELogElemData>(v1.c_str(), GetFEModel());
-    if (m_elemData == nullptr) return false;
-
-    m_pct = atof(v2.c_str());
-    if ((m_pct < 0.0) || (m_pct > 1.0)) return false;
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-double FELogPctDomainData::value(FEDomain& dom)
-{
-    if (m_elemData == nullptr) return 0.0;
-
-    const int NE = dom.Elements();
-    vector<double> val(NE, 0.0);
-    for (int i = 0; i < NE; ++i)
-    {
-        FEElement& el = dom.ElementRef(i);
-        val[i] = m_elemData->value(el);
-    }
-
-    std::sort(val.begin(), val.end());
-
-    int n = (int) (m_pct * ((double)val.size() - 1.0));
-    return val[n];
-}
-
-
-//============================================================================
-FELogIntegralDomainData::FELogIntegralDomainData(FEModel* pfem) : FELogDomainData(pfem)
-{
-	m_elemData = nullptr;
-}
-
-FELogIntegralDomainData::~FELogIntegralDomainData()
-{
-	if (m_elemData) delete m_elemData;
-	m_elemData = nullptr;
-}
-
-bool FELogIntegralDomainData::SetParameters(std::vector<std::string>& params)
-{
-	if (params.size() != 1) return false;
-	std::string& v1 = params[0];
-	if (v1.empty()) return false;
-
-	m_elemData = fecore_new<FELogElemData>(v1.c_str(), GetFEModel());
-	if (m_elemData == nullptr) return false;
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-double FELogIntegralDomainData::value(FEDomain& dom)
-{
-	if (m_elemData == nullptr) return 0.0;
-
-	FEMesh* mesh = dom.GetMesh();
-
-	double sum = 0.0;
-	const int NE = dom.Elements();
-	for (int i = 0; i < dom.Elements(); ++i)
-	{
-		FEElement& el = dom.ElementRef(i);
-		double eval = m_elemData->value(el);
-		double vol = mesh->ElementVolume(el);
-		sum += eval*vol;
-	}
-	return sum;
 }

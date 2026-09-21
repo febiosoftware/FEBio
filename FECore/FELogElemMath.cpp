@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "FELogElemMath.h"
 #include "MObjBuilder.h"
 #include "FEModel.h"
+#include "DataStore.h"
 
 BEGIN_FECORE_CLASS(FELogElemMath, FELogElemDefinition)
 	ADD_PARAMETER(m_exp, "math");

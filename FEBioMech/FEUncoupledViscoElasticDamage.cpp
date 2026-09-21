@@ -28,7 +28,7 @@
 #include "FEUncoupledViscoElasticDamage.h"
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
-
+#include <stdexcept>
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEUncoupledViscoElasticDamage, FEUncoupledMaterial)

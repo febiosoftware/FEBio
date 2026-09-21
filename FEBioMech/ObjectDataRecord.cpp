@@ -41,21 +41,22 @@ ObjectDataRecord::ObjectDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_RB)
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::SetData(const char* szexpr)
 {
-	char szcopy[MAX_STRING] = {0};
-	strcpy(szcopy, szexpr);
-	char* sz = szcopy, *ch;
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
+
 	m_Data.clear();
-	strcpy(m_szdata, szexpr);
-	do
+	m_data = szexpr;
+	for (int i=0; i<strings.size(); ++i)
 	{
-		ch = strchr(sz, ';');
-		if (ch) *ch++ = 0;
-		FELogObjectData* pdata = fecore_new<FELogObjectData>(sz, GetFEModel());
-		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(sz);
-		sz = ch;
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FELogObjectData* pdata = fecore_new<FELogObjectData>(it.name.c_str(), GetFEModel());
+		if (pdata == nullptr) throw UnknownDataField(it.name);
+		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
 	}
-	while (ch);
 }
 
 //-----------------------------------------------------------------------------

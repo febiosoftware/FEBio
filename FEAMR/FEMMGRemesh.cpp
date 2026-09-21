@@ -40,6 +40,7 @@ SOFTWARE.*/
 #include "FEDomainShapeInterpolator.h"
 #include <FECore/FECoreKernel.h>
 #include <FECore/FEMaterial.h>
+#include <stdexcept>
 #ifdef HAS_MMG
 #include "mmg/mmg3d/libmmg3d.h"
 

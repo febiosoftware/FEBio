@@ -31,33 +31,30 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FEModel.h"
 
-//-----------------------------------------------------------------------------
 void NLConstraintDataRecord::SetData(const char* szexpr)
 {
-    char szcopy[MAX_STRING] = {0};
-    strcpy(szcopy, szexpr);
-    char* sz = szcopy, *ch;
-    m_Data.clear();
-    strcpy(m_szdata, szexpr);
-    do
-    {
-        ch = strchr(sz, ';');
-        if (ch) *ch++ = 0;
-        FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(sz, GetFEModel());
-        if (pdata) m_Data.push_back(pdata);
-        else throw UnknownDataField(sz);
-        sz = ch;
-    }
-    while (ch);
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
+
+	m_Data.clear();
+	m_data = szexpr;
+	for (size_t i=0; i<strings.size(); ++i)
+	{
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FELogNLConstraintData* pdata = fecore_new<FELogNLConstraintData>(it.name.c_str(), GetFEModel());
+		if (pdata == nullptr) throw UnknownDataField(it.name);
+		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
+	}
 }
 
-//-----------------------------------------------------------------------------
 NLConstraintDataRecord::NLConstraintDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_NLC) {}
 
-//-----------------------------------------------------------------------------
 int NLConstraintDataRecord::Size() const { return (int)m_Data.size(); }
 
-//-----------------------------------------------------------------------------
 double NLConstraintDataRecord::Evaluate(int item, int ndata)
 {
     FEModel* fem = GetFEModel();
@@ -68,7 +65,6 @@ double NLConstraintDataRecord::Evaluate(int item, int ndata)
 	return m_Data[ndata]->value(nlc);
 }
 
-//-----------------------------------------------------------------------------
 void NLConstraintDataRecord::SelectAllItems()
 {
     FEModel* fem = GetFEModel();

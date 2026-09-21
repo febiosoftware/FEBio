@@ -47,6 +47,10 @@ public:
 	virtual ~FELogElemData();
 };
 
+using FELogElemVec3dData  = FELogComponentData<FELogElemData, FEElement, vec3d, Vec3dLogTraits>;
+using FELogElemMat3dsData = FELogComponentData<FELogElemData, FEElement, mat3ds, Mat3dsLogTraits>;
+using FELogElemMat3dData  = FELogComponentData<FELogElemData, FEElement, mat3d, Mat3dLogTraits>;
+
 //! Base class for element log data definitions 
 class FECORE_API FELogElemDefinition : public FELogElemSource
 {
@@ -69,7 +73,7 @@ public:
 private:
 	std::string m_var;
 
-	FELogElemData* m_pdata = nullptr;
+	FELogElemSource* m_pdata = nullptr;
 
 	DECLARE_FECORE_CLASS();
 };

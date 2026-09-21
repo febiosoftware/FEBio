@@ -1573,3 +1573,18 @@ bool FEPlotOsmoticCoefficient::Save(FEDomain &dom, FEDataStream& a)
 
     return true;
 }
+
+bool FEPlotPressureStabilization::Save(FEDomain& dom, FEDataStream& a)
+{
+	FEBiphasic* pb = dynamic_cast<FEBiphasic*>(dom.GetMaterial());
+	if (pb == nullptr) return false;
+
+	double tau_scale = pb->m_tau;
+
+	writeAverageElementValue<double>(dom, a, [=](const FEMaterialPoint& mp) {
+		const FEBiphasicMaterialPoint* bp = mp.ExtractData<FEBiphasicMaterialPoint>();
+		return (bp ? tau_scale * bp->m_tau : 0.0);
+		});
+
+	return true;
+}

@@ -28,6 +28,8 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETiedFluidInterface.h"
+#include "FEFluidMaterial.h"
+#include "FEFluidDomain3D.h"
 #include <FECore/FENormalProjection.h>
 #include <FECore/FEClosestPointProjection.h>
 #include <FECore/log.h>
@@ -42,13 +44,13 @@ SOFTWARE.*/
 BEGIN_FECORE_CLASS(FETiedFluidInterface, FEContactInterface)
 	ADD_PARAMETER(m_laugon   , "laugon")->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
 	ADD_PARAMETER(m_atol     , "tolerance"          );
-	ADD_PARAMETER(m_gtol     , "gaptol"             );
-	ADD_PARAMETER(m_ptol     , "ptol"               );
-	ADD_PARAMETER(m_epst     , "penalty"            );
+	ADD_PARAMETER(m_gtol     , "vtol"               );
+	ADD_PARAMETER(m_etol     , "etol"               );
+	ADD_PARAMETER(m_epst     , "traction_penalty"   );
 	ADD_PARAMETER(m_bautopen , "auto_penalty"       );
 	ADD_PARAMETER(m_btwo_pass, "two_pass"           );
 	ADD_PARAMETER(m_stol     , "search_tol"         );
-	ADD_PARAMETER(m_epsn     , "pressure_penalty"   );
+	ADD_PARAMETER(m_epsn     , "dilatation_penalty"   );
 	ADD_PARAMETER(m_srad     , "search_radius"      );
 	ADD_PARAMETER(m_naugmin  , "minaug"             );
 	ADD_PARAMETER(m_naugmax  , "maxaug"             );
@@ -67,8 +69,8 @@ FETiedFluidSurface::Data::Data()
     m_Lmp = 0.0;
     m_epst= 1.0;
     m_epsn= 1.0;
-    m_pg  = 0.0;
-    m_vn  = 0.0;
+    m_Jg  = 0.0;
+    m_vn = 0;
     m_pme = (FESurfaceElement*)0;
 }
 
@@ -85,8 +87,8 @@ void FETiedFluidSurface::Data::Serialize(DumpStream& ar)
     ar & m_Lmp;
 	ar & m_epst;
 	ar & m_epsn;
-	ar & m_pg;
-	ar & m_vn;
+	ar & m_Jg;
+    ar & m_vn;
 }
 
 //-----------------------------------------------------------------------------
@@ -150,17 +152,17 @@ void FETiedFluidSurface::GetVelocityGap(int nface, vec3d& vg)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedFluidSurface::GetPressureGap(int nface, double& pg)
+void FETiedFluidSurface::GetDilatationGap(int nface, double& Jg)
 {
     FESurfaceElement& el = Element(nface);
     int ni = el.GaussPoints();
-    pg = 0;
+    Jg = 0;
 	for (int k = 0; k < ni; ++k)
 	{
 		Data& d = static_cast<Data&>(*el.GetMaterialPoint(k));
-		pg += d.m_pg;
+		Jg += d.m_Jg;
 	}
-    pg /= ni;
+    Jg /= ni;
 }
 
 //-----------------------------------------------------------------------------
@@ -192,10 +194,50 @@ void FETiedFluidSurface::GetNormalVelocity(int nface, double& vn)
 }
 
 //-----------------------------------------------------------------------------
+//! Evaluate the area of a surface element. Set breference to true to evaluate it in
+//! the reference configuration, so that it is consistent with GetVolume below (which
+//! is always evaluated in the reference configuration).
+double FETiedFluidSurface::GetArea(FESurfaceElement& el, bool breference)
+{
+    int ni = el.GaussPoints();
+    vec3d rt[FEElement::MAX_NODES];
+    if (breference) {
+        for (int i=0; i<el.Nodes(); ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+    }
+    else
+        GetNodalCoordinates(el, 1.0, rt);
+    double* gw = el.GaussWeights();
+    double area = 0;
+    for (int i=0; i<ni;++i) {
+        FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+        vec3d dxr = el.eval_deriv1(rt, mp.m_index);
+        vec3d dxs = el.eval_deriv2(rt, mp.m_index);
+        // normal and area element
+        vec3d n = dxr ^ dxs;
+        double da = n.unit();
+        area += da*gw[i];
+    }
+    return area;
+}
+
+//-----------------------------------------------------------------------------
+double FETiedFluidSurface::GetVolume(FESolidElement& el)
+{
+    int ni = el.GaussPoints();
+    double* gw = el.GaussWeights();
+    double volume = 0;
+    for (int i=0; i<ni; ++i) {
+        double detJ = 1./(el.m_J0i[i].det());
+        volume += detJ*gw[i];
+    }
+    return volume;
+}
+
+//-----------------------------------------------------------------------------
 // FETiedFluidInterface
 //-----------------------------------------------------------------------------
 
-FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem), m_dofWE(pfem)
+FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(pfem), m_s1(pfem), m_s2(pfem), m_dofWE(pfem)
 {
     static int count = 1;
     SetID(count++);
@@ -208,19 +250,21 @@ FETiedFluidInterface::FETiedFluidInterface(FEModel* pfem) : FEContactInterface(p
     m_stol = 0.01;
     m_srad = 1.0;
     m_gtol = -1;    // we use augmentation tolerance by default
-    m_ptol = -1;    // we use augmentation tolerance by default
+    m_etol = -1;    // we use augmentation tolerance by default
     m_bautopen = false;
     m_bfreedofs = false;
     
     m_naugmin = 0;
     m_naugmax = 10;
     
+    m_pfluid = nullptr;
+    
     // set parents
-    m_ss.SetContactInterface(this);
-    m_ms.SetContactInterface(this);
+    m_s1.SetContactInterface(this);
+    m_s2.SetContactInterface(this);
 
-    m_ss.SetSibling(&m_ms);
-    m_ms.SetSibling(&m_ss);
+    m_s1.SetSibling(&m_s2);
+    m_s2.SetSibling(&m_s1);
 }
 
 //-----------------------------------------------------------------------------
@@ -233,14 +277,50 @@ FETiedFluidInterface::~FETiedFluidInterface()
 bool FETiedFluidInterface::Init()
 {
     // initialize surface data
-    if (m_ss.Init() == false) return false;
-    if (m_ms.Init() == false) return false;
+    if (m_s1.Init() == false) return false;
+    if (m_s2.Init() == false) return false;
     
     // get the DOFS
-    m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY));
-    m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION));
+    if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::RELATIVE_FLUID_VELOCITY)) == false) return false;
+    if (m_dofWE.AddVariable(FEBioFluid::GetVariableName(FEBioFluid::FLUID_DILATATION)) == false) return false;
+    
+    // Get the fluid material on either side of the interface.
+    // The theory behind this interface enforces [[J]] = 0 as a surrogate for [[p]] = 0.
+    // That equivalence only holds if both sides share the same free energy density
+    // (and the same referential density), i.e. the same fluid material.
+    FEFluidMaterial* pf1 = GetFluidMaterial(m_s1);
+    FEFluidMaterial* pf2 = GetFluidMaterial(m_s2);
+    if ((pf1 == nullptr) || (pf2 == nullptr)) {
+        feLogWarning("Tied fluid interface %d: could not identify a unique fluid material on both surfaces.\n"
+                     "Automatic penalty factors and the [[J]] = 0 constraint may not be meaningful.", GetID());
+    }
+    else if (pf1 != pf2) {
+        feLogWarning("Tied fluid interface %d: the primary and secondary surfaces use different fluid materials.\n"
+                     "Enforcing continuity of the fluid dilatation J does not enforce continuity of the fluid\n"
+                     "pressure p unless both sides share the same constitutive relation p(J).", GetID());
+    }
+    m_pfluid = pf1;
     
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Return the fluid material shared by all elements attached to this surface.
+//! Returns nullptr if the elements are not all backed by the same fluid material.
+FEFluidMaterial* FETiedFluidInterface::GetFluidMaterial(FETiedFluidSurface& s)
+{
+    FEFluidMaterial* pfluid = nullptr;
+    for (int i=0; i<s.Elements(); ++i)
+    {
+        FESurfaceElement& el = s.Element(i);
+        if (el.m_elem[0].pe == nullptr) return nullptr;
+        FEMaterial* pmat = GetFEModel()->GetMaterial(el.m_elem[0].pe->GetMatID());
+        FEFluidMaterial* pf = dynamic_cast<FEFluidMaterial*>(pmat);
+        if (pf == nullptr) return nullptr;
+        if (pfluid == nullptr) pfluid = pf;
+        else if (pfluid != pf) return nullptr;
+    }
+    return pfluid;
 }
 
 //-----------------------------------------------------------------------------
@@ -254,12 +334,12 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& K)
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np<npass; ++np)
     {
-        FETiedFluidSurface& ss = (np == 0? m_ss : m_ms);
+        FETiedFluidSurface& s1 = (np == 0? m_s1 : m_s2);
         
         int ni = 0, k, l;
-        for (int j=0; j<ss.Elements(); ++j)
+        for (int j=0; j<s1.Elements(); ++j)
         {
-            FESurfaceElement& se = ss.Element(j);
+            FESurfaceElement& se = s1.Element(j);
             int nint = se.GaussPoints();
             int* sn = &se.m_node[0];
             for (k=0; k<nint; ++k, ++ni)
@@ -273,10 +353,10 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& K)
                     
                     assign(lm, -1);
                     
-                    int nseln = se.Nodes();
-                    int nmeln = me.Nodes();
+                    int neln1 = se.Nodes();
+                    int neln2 = me.Nodes();
                     
-                    for (l=0; l<nseln; ++l)
+                    for (l=0; l<neln1; ++l)
                     {
                         vector<int>& id = mesh.Node(sn[l]).m_ID;
                         lm[4*l  ] = id[m_dofWE[0]];
@@ -285,13 +365,13 @@ void FETiedFluidInterface::BuildMatrixProfile(FEGlobalMatrix& K)
                         lm[4*l+3] = id[m_dofWE[3]];
                     }
                     
-                    for (l=0; l<nmeln; ++l)
+                    for (l=0; l<neln2; ++l)
                     {
                         vector<int>& id = mesh.Node(mn[l]).m_ID;
-                        lm[4*(l+nseln)  ] = id[m_dofWE[0]];
-                        lm[4*(l+nseln)+1] = id[m_dofWE[1]];
-                        lm[4*(l+nseln)+2] = id[m_dofWE[2]];
-                        lm[4*(l+nseln)+3] = id[m_dofWE[3]];
+                        lm[4*(l+neln1)  ] = id[m_dofWE[0]];
+                        lm[4*(l+neln1)+1] = id[m_dofWE[1]];
+                        lm[4*(l+neln1)+2] = id[m_dofWE[2]];
+                        lm[4*(l+neln1)+3] = id[m_dofWE[3]];
                     }
                     
                     K.build_add(lm);
@@ -308,20 +388,27 @@ void FETiedFluidInterface::Activate()
     FEContactInterface::Activate();
     
     // calculate the penalty
+    // NOTE: in a two-pass analysis the second pass integrates over m_s2, so the
+    // integration point penalties on m_s2 must be evaluated as well (otherwise they
+    // retain their default value of 1)
     if (m_bautopen)
     {
-        CalcAutoPressurePenalty(m_ss);
-        if (m_btwo_pass) CalcAutoPressurePenalty(m_ms);
+        CalcAutoViscousTractionPenalty(m_s1);
+        CalcAutoNormalVelocityPenalty(m_s1);
+        if (m_btwo_pass) {
+            CalcAutoViscousTractionPenalty(m_s2);
+            CalcAutoNormalVelocityPenalty(m_s2);
+        }
     }
     
     // project the surfaces onto each other
     // this will evaluate the gap functions in the reference configuration
-    InitialProjection(m_ss, m_ms);
-    if (m_btwo_pass) InitialProjection(m_ms, m_ss);
+    InitialProjection(m_s1, m_s2, true);
+    if (m_btwo_pass) InitialProjection(m_s2, m_s1, false);
 }
 
 //-----------------------------------------------------------------------------
-void FETiedFluidInterface::CalcAutoPressurePenalty(FETiedFluidSurface& s)
+void FETiedFluidInterface::CalcAutoViscousTractionPenalty(FETiedFluidSurface& s)
 {
     // loop over all surface elements
     for (int i=0; i<s.Elements(); ++i)
@@ -330,7 +417,7 @@ void FETiedFluidInterface::CalcAutoPressurePenalty(FETiedFluidSurface& s)
         FESurfaceElement& el = s.Element(i);
         
         // calculate a penalty
-        double eps = AutoPressurePenalty(el, s);
+        double eps = AutoViscousTractionPenalty(el, s);
         
         // assign to integration points of surface element
         int nint = el.GaussPoints();
@@ -338,52 +425,122 @@ void FETiedFluidInterface::CalcAutoPressurePenalty(FETiedFluidSurface& s)
         {
 			FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*el.GetMaterialPoint(j));
 			pt.m_epst = eps;
-            if (eps != 0) pt.m_epsn = 1./eps;
         }
     }
 }
 
 //-----------------------------------------------------------------------------
-double FETiedFluidInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedFluidSurface& s)
+//! The viscous traction penalty has units of viscosity per length, therefore it is
+//! scaled by the ratio of the fluid viscosity to the element thickness.
+double FETiedFluidInterface::AutoViscousTractionPenalty(FESurfaceElement& el, FETiedFluidSurface& s)
 {
-    // get the mesh
-    FEMesh& m = GetMesh();
+    // get the solid element attached to the surface element
+    if (el.m_elem[0].pe == nullptr) return 1.0;
+    FESolidElement& sel = static_cast<FESolidElement&>(*el.m_elem[0].pe);
+    // get the fluid material for that solid element
+    FEMaterial* pmat = GetFEModel()->GetMaterial(sel.GetMatID());
+    FEFluidMaterial* pfluid = dynamic_cast<FEFluidMaterial*>(pmat);
+    if (pfluid == nullptr) return 1.0;
+    // get the viscous part of this fluid
+    FEViscousFluid* pvfluid = pfluid->GetViscous();
     
-    // evaluate element surface normal at parametric center
-    vec3d t[2];
-    s.CoBaseVectors0(el, 0, 0, t);
-    vec3d n = t[0] ^ t[1];
-    n.unit();
+    // evaluate the viscosity for each material point and get its average
+    double eta = 0;
+    int nint = sel.GaussPoints();
+    for (int i=0; i<nint; ++i) {
+        FEMaterialPoint* mp = sel.GetMaterialPoint(i);
+        eta += pvfluid->ShearViscosity(*mp);
+    }
+    eta /= nint;
     
-    // get the element this surface element belongs to
-    FEElement* pe = el.m_elem[0].pe;
-    if (pe == 0) return 0.0;
+    // get the element thickness (both measures evaluated in the reference configuration)
+    double area = s.GetArea(el, true);
+    double vol = s.GetVolume(sel);
+    if (area <= 0) return 1.0;
+    double h = vol/area;
+    if (h <= 0) return 1.0;
     
-    // get the material
-    FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-    
-    // check that it is a fluid material
-    FEFluidMaterial* fluid = dynamic_cast<FEFluidMaterial*> (pm);
-    if (fluid == 0) return 0.0;
-    m_pfluid = fluid;
+    return eta/h;
+}
 
-    // get a material point
-    FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
-    // get the shear viscosity
-    double mu = fluid->GetViscous()->ShearViscosity(mp);
+//-----------------------------------------------------------------------------
+void FETiedFluidInterface::CalcAutoNormalVelocityPenalty(FETiedFluidSurface& s)
+{
+    // loop over all surface elements
+    for (int i=0; i<s.Elements(); ++i)
+    {
+        // get the surface element
+        FESurfaceElement& el = s.Element(i);
+        
+        // calculate a penalty
+        double eps = AutoNormalVelocityPenalty(el, s);
+        
+        // assign to integration points of surface element
+        int nint = el.GaussPoints();
+        for (int j=0; j<nint; ++j)
+        {
+            FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*el.GetMaterialPoint(j));
+            pt.m_epsn = eps;
+        }
+    }
+}
 
-    // get the area of the surface element
-    double A = s.FaceArea(el);
+//-----------------------------------------------------------------------------
+//! The normal velocity penalty has units of velocity. Without augmentation the
+//! converged dilatation gap is pi = vn/eps_n, so eps_n must be large compared to the
+//! throughflow velocity divided by the acceptable gap. In a low-Mach viscous flow the
+//! pressure scale is the viscous one, p ~ eta*U*L/h^2, hence a dilatation scale
+//! e ~ eta*U*L/(h^2*K). Choosing eps_n = h/tau = h*K/eta makes the pressure drop across
+//! the interface eta*v/h, i.e. a fraction h/(12*L) of the channel pressure drop, so the
+//! tie is transparent. Scaling eps_n to the acoustic impedance sqrt(K/rho) instead makes
+//! the gap equal to the Mach number, which in a low-speed flow is the same order as the
+//! entire physical dilatation field: the interface then carries most of the pressure drop.
+double FETiedFluidInterface::AutoNormalVelocityPenalty(FESurfaceElement& el, FETiedFluidSurface& s)
+{
+    // get the solid element attached to the surface element
+    if (el.m_elem[0].pe == nullptr) return 1.0;
+    FESolidElement& sel = static_cast<FESolidElement&>(*el.m_elem[0].pe);
+    // get the fluid material for that solid element
+    FEMaterial* pmat = GetFEModel()->GetMaterial(sel.GetMatID());
+    FEFluid* pfluid = dynamic_cast<FEFluid*>(pmat);
+    if (pfluid == nullptr) return 1.0;
     
-    // get the volume of the volume element
-    double V = m.ElementVolume(*pe);
+    // bulk modulus
+    double K = pfluid->m_k;
+    if (K <= 0) return 1.0;
     
-    return mu*A/V;
+    // evaluate the viscosity for each material point and get its average
+    FEViscousFluid* pvfluid = pfluid->GetViscous();
+    double eta = 0;
+    int nint = sel.GaussPoints();
+    for (int i=0; i<nint; ++i) {
+        FEMaterialPoint* mp = sel.GetMaterialPoint(i);
+        eta += pvfluid->ShearViscosity(*mp);
+    }
+    eta /= nint;
+    
+    // get the element thickness (both measures evaluated in the reference configuration)
+    double area = s.GetArea(el, true);
+    double vol = s.GetVolume(sel);
+    double h = (area > 0 ? vol/area : 0);
+    
+    if ((eta > 0) && (h > 0)) {
+        // viscous relaxation scaling h/tau, with tau = eta/K
+        double tau = eta/K;
+        return h/tau;
+    }
+    
+    // inviscid fluid: fall back on the acoustic impedance of the fluid, eps_n = sqrt(K/rho),
+    // for which vn = (p(1)-p(2))/(rho*c)
+    double rho = pfluid->m_rhor;
+    if (rho > 0) return sqrt(K/rho);
+    
+    return 1.0;
 }
 
 //-----------------------------------------------------------------------------
 // Perform initial projection between tied surfaces in reference configuration
-void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluidSurface& ms)
+void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& s1, FETiedFluidSurface& s2, bool bfirst)
 {
     FEMesh& mesh = GetMesh();
     FESurfaceElement* pme;
@@ -391,33 +548,37 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluid
     double rs[2];
     
     // initialize projection data
-    FENormalProjection np(ms);
+    FENormalProjection np(s2);
     np.SetTolerance(m_stol);
     np.SetSearchRadius(m_srad);
     np.Init();
     
-    FEClosestPointProjection cp(ss);
+    FEClosestPointProjection cp(s1);
     cp.SetTolerance(m_stol);
     cp.SetSearchRadius(m_srad);
     cp.Init();
     vec3d sq;
     vec2d srs;
 
+    // projection diagnostics
+    int nproj = 0, nfail = 0;
+    double maxgap = 0;
+    
     // loop over all integration points
     int n = 0;
-    for (int i=0; i<ss.Elements(); ++i)
+    for (int i=0; i<s1.Elements(); ++i)
     {
-        FESurfaceElement& el = ss.Element(i);
+        FESurfaceElement& el = s1.Element(i);
         
         int nint = el.GaussPoints();
         
         for (int j=0; j<nint; ++j, ++n)
         {
             // calculate the global position of the integration point
-            r = ss.Local2Global(el, j);
+            r = s1.Local2Global(el, j);
             
             // calculate the normal at this integration point
-            nu = ss.SurfaceNormal(el, j);
+            nu = s1.SurfaceNormal(el, j);
             
             // find the intersection point with the secondary surface
             pme = np.Project2(r, nu, rs);
@@ -431,55 +592,80 @@ void FETiedFluidInterface::InitialProjection(FETiedFluidSurface& ss, FETiedFluid
             {
                 // the node could potentially be in contact
                 // find the global location of the intersection point
-                vec3d q = ms.Local2Global(*pme, rs[0], rs[1]);
+                vec3d q = s2.Local2Global(*pme, rs[0], rs[1]);
                 
                 // calculate the gap function
                 pt.m_Gap = q - r;
+                ++nproj;
+                maxgap = max(maxgap, pt.m_Gap.norm());
                 
                 // free the nodal dofs of pme if requested
-                if (m_bfreedofs) {
+                // NOTE: this is only done on the first pass, so that dofs are only ever
+                // freed on the secondary surface, never on the primary surface
+                if (m_bfreedofs && bfirst) {
                     for (int k=0; k<pme->Nodes(); ++k) {
                         FENode& node = mesh.Node(pme->m_node[k]);
                         FESurfaceElement* sme = cp.Project(node.m_rt, sq, srs);
                         if (sme) {
                             for (int l=0; l<m_dofWE.Size(); ++l)
-                                if (node.get_bc(m_dofWE[l]) != DOF_OPEN) node.set_bc(m_dofWE[l], DOF_OPEN);
+                                if (node.get_bc(m_dofWE[l]) != DOF_OPEN) {
+                                    feLogWarning("Tied fluid interface %d: releasing a constrained degree of freedom "
+                                                 "on node %d of the secondary surface.", GetID(), node.GetID());
+                                    node.set_bc(m_dofWE[l], DOF_OPEN);
+                                }
                         }
                     }
                 }
             }
             else
             {
-                // the node is not in contact
+                // the integration point could not be projected onto the opposing surface
                 pt.m_Gap = vec3d(0,0,0);
+                ++nfail;
             }
         }
+    }
+    
+    // report the outcome of the projection. Integration points that could not be
+    // projected are left untied: they revert to the natural boundary conditions
+    // t_tau = 0 and vn = 0, i.e. a frictionless impermeable wall.
+    feLog(" tied fluid interface # %d: %s pass\n", GetID(), (bfirst ? "primary" : "secondary"));
+    feLog("    tied integration points  : %d\n", nproj);
+    feLog("    maximum initial gap      : %15le\n", maxgap);
+    if (nfail > 0) {
+        feLogWarning("Tied fluid interface %d: %d integration point(s) could not be projected onto the\n"
+                     "opposing surface. These points remain untied and behave as a frictionless\n"
+                     "impermeable wall. Consider increasing search_radius or search_tol.", GetID(), nfail);
     }
 }
 
 //-----------------------------------------------------------------------------
 // Evaluate gap functions for fluid velocity and fluid pressure
-void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSurface& ms)
+void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& s1, FETiedFluidSurface& s2)
 {
     FEMesh& mesh = GetMesh();
     FESurfaceElement* pme;
     vec3d r;
+    double alpha = GetFEModel()->GetTime().alphaf;
     
-    vec3d  vt[FEElement::MAX_NODES], v1;
-    double ps[FEElement::MAX_NODES], p1;
+    vec3d  vt[FEElement::MAX_NODES], vp[FEElement::MAX_NODES], v1;
+    double et[FEElement::MAX_NODES], ep[FEElement::MAX_NODES], e1;
     
     // loop over all integration points
-    for (int i=0; i<ss.Elements(); ++i)
+    for (int i=0; i<s1.Elements(); ++i)
     {
-        FESurfaceElement& el = ss.Element(i);
+        FESurfaceElement& el = s1.Element(i);
         
         int ne = el.Nodes();
         int nint = el.GaussPoints();
         
-        // get the nodal velocities and pressures
+        // get the nodal velocities and dilatations
         for (int j=0; j<ne; ++j) {
-            vt[j] = mesh.Node(el.m_node[j]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-            ps[j] = m_pfluid->Pressure(mesh.Node(el.m_node[j]).get(m_dofWE[3]),0);
+            FENode& node = mesh.Node(el.m_node[j]);
+            vt[j] = node.get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+            vp[j] = node.get_vec3d_prev(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+            et[j] = node.get(m_dofWE[3]);
+            ep[j] = node.get_prev(m_dofWE[3]);
         }
 
         for (int j=0; j<nint; ++j)
@@ -487,33 +673,58 @@ void FETiedFluidInterface::ProjectSurface(FETiedFluidSurface& ss, FETiedFluidSur
 			FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*el.GetMaterialPoint(j));
 
             // calculate the global position of the integration point
-            r = ss.Local2Global(el, j);
+            r = s1.Local2Global(el, j);
             
-            // get the velocity and pressure at the integration point
-            v1 = el.eval(vt, j);
-            p1 = el.eval(ps, j);
+            // get the velocity and dilatation at the integration point
+            v1 = el.eval(vt, j)*alpha + el.eval(vp, j)*(1-alpha);
+            e1 = el.eval(et, j)*alpha + el.eval(ep, j)*(1-alpha);
             
             // if this node is tied, evaluate gap functions
             pme = pt.m_pme;
             if (pme)
             {
-                // calculate the tangential velocity gap function
-                vec3d vm[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) vm[k] = mesh.Node(pme->m_node[k]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-                vec3d v2 = pme->eval(vm, pt.m_rs[0], pt.m_rs[1]);
+                // calculate the velocity gap function
+                vec3d vmt[FEElement::MAX_NODES], vmp[FEElement::MAX_NODES];
+                double emt[FEElement::MAX_NODES], emp[FEElement::MAX_NODES];
+                for (int k=0; k<pme->Nodes(); ++k) {
+                    FENode& node = mesh.Node(pme->m_node[k]);
+                    vmt[k] = node.get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+                    vmp[k] = node.get_vec3d_prev(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
+                    emt[k] = node.get(m_dofWE[3]);
+                    emp[k] = node.get_prev(m_dofWE[3]);
+                }
+                vec3d v2 = pme->eval(vmt, pt.m_rs[0], pt.m_rs[1])*alpha + pme->eval(vmp, pt.m_rs[0], pt.m_rs[1])*(1-alpha);
                 pt.m_vg = v2 - v1;
 
-                // calculate the pressure gap function
-                double pm[FEElement::MAX_NODES];
-                for (int k=0; k<pme->Nodes(); ++k) pm[k] = m_pfluid->Pressure(mesh.Node(pme->m_node[k]).get(m_dofWE[3]),0);
-                double p2 = pme->eval(pm, pt.m_rs[0], pt.m_rs[1]);
-                pt.m_pg = p1 - p2;
+                // Dilatation gap function, pi = J(2) - J(1) = e(2) - e(1).
+                // NOTE: This is the opposite of the sign originally used (and of the sign
+                // in eq.(7.8.13) of the theory manual). With vn = eps_n*pi, a positive
+                // gap (J(2) > J(1), i.e. p(1) > p(2)) produces an outflow from side 1,
+                // driving fluid from the high-pressure side to the low-pressure side and
+                // thus reducing the gap. This is the direct analog of eq.(7.7.9) for tied
+                // multiphasic contact, wn = eps_p*(p(1)-p(2)). Using pi = J(1) - J(2)
+                // instead reverses the flux and amplifies the dilatation gap; it also
+                // makes the contribution of this interface to the stiffness matrix
+                // negative definite, whereas the J-block of the fluid solver (eq.(3.5.20))
+                // is positive definite.
+                double e2 = pme->eval(emt, pt.m_rs[0], pt.m_rs[1])*alpha + pme->eval(emp, pt.m_rs[0], pt.m_rs[1])*(1-alpha);
+                pt.m_Jg = e2 - e1;
+                
+                // penalty factors
+                double epst = m_epst*pt.m_epst;
+                double epsn = m_epsn*pt.m_epsn;
+                
+                // viscous traction and normal velocity (augmented Lagrangian form)
+                pt.m_tv = pt.m_Lmd + pt.m_vg*epst;
+                pt.m_vn = pt.m_Lmp + pt.m_Jg*epsn;
             }
             else
             {
                 // the node is not tied
                 pt.m_vg = vec3d(0,0,0);
-                pt.m_pg = 0;
+                pt.m_Jg = 0;
+                pt.m_tv = vec3d(0,0,0);
+                pt.m_vn = 0;
             }
         }
     }
@@ -525,168 +736,135 @@ void FETiedFluidInterface::Update()
 {
     // project the surfaces onto each other
     // this will update the gap functions as well
-    ProjectSurface(m_ss, m_ms);
-    if (m_btwo_pass) ProjectSurface(m_ms, m_ss);
+    ProjectSurface(m_s1, m_s2);
+    if (m_btwo_pass) ProjectSurface(m_s2, m_s1);
     
 }
 
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    int i, j, k;
-    vector<int> sLM, mLM, LM, en;
+    vector<int> LM1, LM2, LM, en;
     vector<double> fe;
+    const int MI = FEElement::MAX_INTPOINTS;
     const int MN = FEElement::MAX_NODES;
-    double detJ[MN], w[MN], *Hs, Hm[MN];
-    double N[8*MN];
-    
+    double detJ[MI], w[MI], *H1, H2[MN];
+    vec3d f1[MN], f2[MN];
+    double w1[MN], w2[MN];
+
     // loop over the nr of passes
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np<npass; ++np)
     {
         // get primary and secondary surfaces
-        FETiedFluidSurface& ss = (np == 0? m_ss : m_ms);
-        FETiedFluidSurface& ms = (np == 0? m_ms : m_ss);
+        FETiedFluidSurface& s1 = (np == 0? m_s1 : m_s2);
+        FETiedFluidSurface& s2 = (np == 0? m_s2 : m_s1);
         
         // loop over all elements of primary surface
-        for (i=0; i<ss.Elements(); ++i)
+        for (int i=0; i<s1.Elements(); ++i)
         {
             // get the surface element
-            FESurfaceElement& se = ss.Element(i);
+            FESurfaceElement& se1 = s1.Element(i);
             
             // get the nr of nodes and integration points
-            int nseln = se.Nodes();
-            int nint = se.GaussPoints();
+            int neln1 = se1.Nodes();
+            int nint1 = se1.GaussPoints();
             
             // copy the LM vector; we'll need it later
-            ss.UnpackLM(se, sLM);
+            s1.UnpackLM(se1, LM1);
             
             // we calculate all the metrics we need before we
             // calculate the nodal forces
-            for (j=0; j<nint; ++j)
+            for (int j=0; j<nint1; ++j)
             {
                 // get the base vectors
                 vec3d g[2];
-                ss.CoBaseVectors(se, j, g);
+                s1.CoBaseVectors(se1, j, g);
                 
                 // jacobians: J = |g0xg1|
                 detJ[j] = (g[0] ^ g[1]).norm();
                 
                 // integration weights
-                w[j] = se.GaussWeights()[j];
+                w[j] = se1.GaussWeights()[j];
             }
             
             // loop over all integration points
             // note that we are integrating over the current surface
-            for (j=0; j<nint; ++j)
+            for (int j=0; j<nint1; ++j)
             {
-				FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+				FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se1.GetMaterialPoint(j));
 
                 // get the secondary surface element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
                 {
                     // get the secondary surface element
-                    FESurfaceElement& me = *pme;
+                    FESurfaceElement& se2 = *pme;
                     
                     // get the nr of secondary element nodes
-                    int nmeln = me.Nodes();
+                    int neln2 = se2.Nodes();
                     
                     // copy LM vector
-                    ms.UnpackLM(me, mLM);
+                    s2.UnpackLM(se2, LM2);
                     
                     // calculate degrees of freedom
-                    int ndof = 3*(nseln + nmeln);
+                    int ndpn = 4;
+                    int ndof = ndpn*(neln1 + neln2);
                     
                     // build the LM vector
                     LM.resize(ndof);
-                    for (k=0; k<nseln; ++k)
-                    {
-                        LM[3*k  ] = sLM[4*k  ];
-                        LM[3*k+1] = sLM[4*k+1];
-                        LM[3*k+2] = sLM[4*k+2];
-                    }
+                    for (int a=0; a<neln1; ++a)
+                        for (int k=0; k< ndpn; ++k) LM[ndpn*a+k] = LM1[ndpn*a+k];
                     
-                    for (k=0; k<nmeln; ++k)
-                    {
-                        LM[3*(k+nseln)  ] = mLM[4*k  ];
-                        LM[3*(k+nseln)+1] = mLM[4*k+1];
-                        LM[3*(k+nseln)+2] = mLM[4*k+2];
-                    }
+                    for (int b=0; b<neln2; ++b)
+                        for (int k=0; k< ndpn; ++k) LM[ndpn*(b+neln1)+k] = LM2[ndpn*b+k];
                     
                     // build the en vector
-                    en.resize(nseln+nmeln);
-                    for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
-                    for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+                    en.resize(neln1+neln2);
+                    for (int a=0; a<neln1; ++a) en[a      ] = se1.m_node[a];
+                    for (int b=0; b<neln2; ++b) en[b+neln1] = se2.m_node[b];
                     
                     // get primary element shape functions
-                    Hs = se.H(j);
+                    H1 = se1.H(j);
                     
                     // get secondary element shape functions
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
-                    me.shape_fnc(Hm, r, s);
+                    se2.shape_fnc(H2, r, s);
                     
-                    // gap function
-                    vec3d dg = pt.m_vg;
-                    
-                    // lagrange multiplier
-                    vec3d Lm = pt.m_Lmd;
-                    
-                    // penalty
-                    double eps = m_epst*pt.m_epst;
-                    
-                    // viscous traction
-                    vec3d tv = Lm + dg*eps;
-                    pt.m_tv = tv;
+                    // viscous traction and normal velocity
+                    // (evaluated in ProjectSurface, called from Update)
+                    vec3d tv = pt.m_tv;
+                    double vn = pt.m_vn;
                     
                     // calculate the force vector
                     fe.resize(ndof);
                     zero(fe);
                     
-                    for (k=0; k<nseln; ++k)
-                    {
-                        N[3*k  ] = Hs[k]*tv.x;
-                        N[3*k+1] = Hs[k]*tv.y;
-                        N[3*k+2] = Hs[k]*tv.z;
+                    for (int a=0; a<neln1; ++a) {
+                        f1[a] = tv*H1[a];
+                        w1[a] = vn*H1[a];
+                    }
+                    for (int b=0; b<neln2; ++b) {
+                        f2[b] = -tv*H2[b];
+                        w2[b] = -vn*H2[b];
                     }
                     
-                    for (k=0; k<nmeln; ++k)
+                    for (int a=0; a<neln1; ++a)
                     {
-                        N[3*(k+nseln)  ] = -Hm[k]*tv.x;
-                        N[3*(k+nseln)+1] = -Hm[k]*tv.y;
-                        N[3*(k+nseln)+2] = -Hm[k]*tv.z;
+                        fe[4*a  ] += f1[a].x*detJ[j]*w[j];
+                        fe[4*a+1] += f1[a].y*detJ[j]*w[j];
+                        fe[4*a+2] += f1[a].z*detJ[j]*w[j];
+                        fe[4*a+3] += w1[a]*detJ[j]*w[j];
                     }
-                    
-                    for (k=0; k<ndof; ++k) fe[k] += N[k]*detJ[j]*w[j];
-                    
-                    // assemble the global residual
-                    R.Assemble(en, LM, fe);
-                    
-                    // do the pressure stuff
-                    // calculate nr of pressure dofs
-                    ndof = nseln + nmeln;
-                    
-                    // calculate the flow rate
-                    double epsn = m_epsn*pt.m_epsn;
-                    
-                    double vn = pt.m_Lmp + epsn*pt.m_pg;
-                    pt.m_vn = vn;
-                    
-                    // fill the LM
-                    LM.resize(ndof);
-                    for (k=0; k<nseln; ++k) LM[k        ] = sLM[4*k+3];
-                    for (k=0; k<nmeln; ++k) LM[k + nseln] = mLM[4*k+3];
-                    
-                    // fill the force array
-                    fe.resize(ndof);
-                    zero(fe);
-                    for (k=0; k<nseln; ++k) N[k      ] = -Hs[k];
-                    for (k=0; k<nmeln; ++k) N[k+nseln] =  Hm[k];
-                    
-                    for (k=0; k<ndof; ++k) fe[k] += vn*N[k]*detJ[j]*w[j];
+                    for (int b = 0; b<neln2; ++b) {
+                        fe[4*(b+neln1)  ] += f2[b].x*detJ[j]*w[j];
+                        fe[4*(b+neln1)+1] += f2[b].y*detJ[j]*w[j];
+                        fe[4*(b+neln1)+2] += f2[b].z*detJ[j]*w[j];
+                        fe[4*(b+neln1)+3] += w2[b]*detJ[j]*w[j];
+                    }
 
-                    // assemble residual
+                    // assemble the global residual
                     R.Assemble(en, LM, fe);
                 }
             }
@@ -697,194 +875,159 @@ void FETiedFluidInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FETiedFluidInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-    int i, j, k, l;
-    vector<int> sLM, mLM, LM, en;
+    vector<int> LM1, LM2, LM, en;
+    const int MI = FEElement::MAX_INTPOINTS;
     const int MN = FEElement::MAX_NODES;
-    double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN], dpr[MN], dps[MN];
+    double detJ[MI], w[MI], *H1, H2[MN];
     FEElementMatrix ke;
+    
+    double alpha = tp.alphaf;
     
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np < npass; ++np)
     {
 		// get primary and secondary surfaces
-		FETiedFluidSurface& ss = (np == 0? m_ss : m_ms);
-        FETiedFluidSurface& ms = (np == 0? m_ms : m_ss);
+		FETiedFluidSurface& s1 = (np == 0? m_s1 : m_s2);
+        FETiedFluidSurface& s2 = (np == 0? m_s2 : m_s1);
         
         // loop over all elements of primary surface
-        for (i=0; i<ss.Elements(); ++i)
+        for (int i=0; i<s1.Elements(); ++i)
         {
             // get the next element
-            FESurfaceElement& se = ss.Element(i);
-            FEElement* sse = se.m_elem[0].pe;
-
-            // get nr of nodes and integration points
-            int nseln = se.Nodes();
-            int nint = se.GaussPoints();
+            FESurfaceElement& se1 = s1.Element(i);
             
-            // nodal velocities and pressures
-            vec3d vt[FEElement::MAX_NODES];
-            double pn[FEElement::MAX_NODES];
-            for (j=0; j<nseln; ++j) {
-                vt[j] = ss.GetMesh()->Node(se.m_node[j]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-                pn[j] = m_pfluid->Pressure(ss.GetMesh()->Node(se.m_node[j]).get(m_dofWE[3]),0);
-            }
+            // get nr of nodes and integration points
+            int neln1 = se1.Nodes();
+            int nint1 = se1.GaussPoints();
             
             // copy the LM vector
-            ss.UnpackLM(se, sLM);
+            s1.UnpackLM(se1, LM1);
             
             // we calculate all the metrics we need before we
             // calculate the nodal forces
-            for (j=0; j<nint; ++j)
+            for (int j=0; j<nint1; ++j)
             {
                 // get the base vectors
                 vec3d g[2];
-                ss.CoBaseVectors(se, j, g);
+                s1.CoBaseVectors(se1, j, g);
                 
                 // jacobians: J = |g0xg1|
                 detJ[j] = (g[0] ^ g[1]).norm();
                 
                 // integration weights
-                w[j] = se.GaussWeights()[j];
+                w[j] = se1.GaussWeights()[j];
                 
-                // pressure
-                pt[j] = se.eval(pn, j);
-                dpr[j] = se.eval_deriv1(pn, j);
-                dps[j] = se.eval_deriv2(pn, j);
             }
             
             // loop over all integration points
-            for (j=0; j<nint; ++j)
+            for (int j=0; j<nint1; ++j)
             {
-				FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+                FETiedFluidSurface::Data& pt = static_cast<FETiedFluidSurface::Data&>(*se1.GetMaterialPoint(j));
 
                 // get the secondary element
                 FESurfaceElement* pme = pt.m_pme;
                 if (pme)
                 {
-                    FESurfaceElement& me = *pme;
+                    FESurfaceElement& se2 = *pme;
                     
                     // get the nr of secondary nodes
-                    int nmeln = me.Nodes();
-                    
-                    // nodal pressure
-                    vec3d vm[FEElement::MAX_NODES];
-                    double pm[FEElement::MAX_NODES];
-                    for (k=0; k<nmeln; ++k) {
-                        vm[k] = ms.GetMesh()->Node(me.m_node[k]).get_vec3d(m_dofWE[0], m_dofWE[1], m_dofWE[2]);
-                        pm[k] = m_pfluid->Pressure(ms.GetMesh()->Node(me.m_node[k]).get(m_dofWE[3]),0);
-                    }
+                    int neln2 = se2.Nodes();
                     
                     // copy the LM vector
-                    ms.UnpackLM(me, mLM);
+                    s2.UnpackLM(se2, LM2);
                     
                     int ndpn;    // number of dofs per node
                     int ndof;    // number of dofs in stiffness matrix
                     
-                    // calculate degrees of freedom for fluid-on-fluid contact
+                    // calculate degrees of freedom for elastic-on-elastic contact
                     ndpn = 4;
-                    ndof = ndpn*(nseln+nmeln);
+                    ndof = ndpn*(neln1 + neln2);
                     
                     // build the LM vector
                     LM.resize(ndof);
                     
-                    for (k=0; k<nseln; ++k)
-                    {
-                        LM[4*k  ] = sLM[4*k  ];             // wx-dof
-                        LM[4*k+1] = sLM[4*k+1];             // wy-dof
-                        LM[4*k+2] = sLM[4*k+2];             // wz-dof
-                        LM[4*k+3] = sLM[4*k+3];             // ef-dof
-                    }
-                    for (k=0; k<nmeln; ++k)
-                    {
-                        LM[4*(k+nseln)  ] = mLM[4*k  ];     // wx-dof
-                        LM[4*(k+nseln)+1] = mLM[4*k+1];     // wy-dof
-                        LM[4*(k+nseln)+2] = mLM[4*k+2];     // wz-dof
-                        LM[4*(k+nseln)+3] = mLM[4*k+3];     // ef-dof
-                    }
+                    for (int a=0; a<neln1; ++a)
+                        for (int k=0; k<ndpn; ++k) LM[ndpn*a+k] = LM1[ndpn*a+k];
+                    
+                    for (int b=0; b<neln2; ++b)
+                        for (int k=0; k<ndpn; ++k) LM[ndpn*(b+neln1)+k] = LM2[ndpn*b+k];
 
                     // build the en vector
-                    en.resize(nseln+nmeln);
-                    for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
-                    for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+                    en.resize(neln1+neln2);
+                    for (int a=0; a<neln1; ++a) en[a      ] = se1.m_node[a];
+                    for (int b=0; b<neln2; ++b) en[b+neln1] = se2.m_node[b];
                     
-                    // primary element shape functions
-                    Hs = se.H(j);
+                    // primary shape functions
+                    H1 = se1.H(j);
                     
-                    // secondary element shape functions
+                    // secondary shape functions
                     double r = pt.m_rs[0];
                     double s = pt.m_rs[1];
-                    me.shape_fnc(Hm, r, s);
+                    se2.shape_fnc(H2, r, s);
                     
-                    // penalty
-                    double eps = m_epst*pt.m_epst;
+                    // penalties
+                    double epst = m_epst*pt.m_epst;
+                    double epsn = m_epsn*pt.m_epsn;
                     
                     // create the stiffness matrix
                     ke.resize(ndof, ndof); ke.zero();
                     
-                    // a. K-term
                     //------------------------------------
                     
-                    for (k=0; k<nseln; ++k) {
-                        for (l=0; l<nseln; ++l)
-                        {
-                            double K = eps*Hs[k]*Hs[l]*detJ[j]*w[j];
-                            ke[ndpn*k    ][ndpn*l    ] += K;
-                            ke[ndpn*k + 1][ndpn*l + 1] += K;
-                            ke[ndpn*k + 2][ndpn*l + 2] += K;
-                            
-                        }
-                        for (l=0; l<nmeln; ++l)
-                        {
-                            double K = -eps*Hs[k]*Hm[l]*detJ[j]*w[j];
-                            ke[ndpn*k    ][ndpn*(nseln+l)    ] += K;
-                            ke[ndpn*k + 1][ndpn*(nseln+l) + 1] += K;
-                            ke[ndpn*k + 2][ndpn*(nseln+l) + 2] += K;
-                        }
-                    }
+                    // NOTE: The dilatation blocks k11..k22 have the opposite sign of the
+                    // velocity blocks K11..K22, because the dilatation gap is now
+                    // pi = J(2) - J(1) whereas the velocity gap is g = v(2) - v(1) and
+                    // both enter the residual with the same sign. Both the velocity and
+                    // the dilatation contributions to ke are then positive semi-definite,
+                    // as a penalty contribution must be.
                     
-                    for (k=0; k<nmeln; ++k) {
-                        for (l=0; l<nseln; ++l)
+                    for (int a=0; a<neln1; ++a) {
+                        for (int c=0; c<neln1; ++c)
                         {
-                            double K = -eps*Hm[k]*Hs[l]*detJ[j]*w[j];
-                            ke[ndpn*(nseln+k)    ][ndpn*l    ] += K;
-                            ke[ndpn*(nseln+k) + 1][ndpn*l + 1] += K;
-                            ke[ndpn*(nseln+k) + 2][ndpn*l + 2] += K;
+                            mat3dd K11(-epst*H1[a]*H1[c]*detJ[j]*w[j]*alpha);
+                            double k11 = -epsn*H1[a]*H1[c]*detJ[j]*w[j]*alpha;
+                            ke[ndpn*a    ][ndpn*c    ] -= K11.xx();
+                            ke[ndpn*a + 1][ndpn*c + 1] -= K11.yy();
+                            ke[ndpn*a + 2][ndpn*c + 2] -= K11.zz();
+                            ke[ndpn*a + 3][ndpn*c + 3] -= k11;
                         }
-                        for (l=0; l<nmeln; ++l)
+                        for (int d=0; d<neln2; ++d)
                         {
-                            double K = eps*Hm[k]*Hm[l]*detJ[j]*w[j];
-                            ke[ndpn*(nseln+k)    ][ndpn*(nseln+l)    ] += K;
-                            ke[ndpn*(nseln+k) + 1][ndpn*(nseln+l) + 1] += K;
-                            ke[ndpn*(nseln+k) + 2][ndpn*(nseln+l) + 2] += K;
+                            mat3dd K12(epst*H1[a]*H2[d]*detJ[j]*w[j]*alpha);
+                            double k12 = epsn*H1[a]*H2[d]*detJ[j]*w[j]*alpha;
+                            ke[ndpn*a    ][ndpn*(neln1+d)    ] -= K12.xx();
+                            ke[ndpn*a + 1][ndpn*(neln1+d) + 1] -= K12.yy();
+                            ke[ndpn*a + 2][ndpn*(neln1+d) + 2] -= K12.zz();
+                            ke[ndpn*a + 3][ndpn*(neln1+d) + 3] -= k12;
                         }
-                    }
-                    
-                    // --- D I L A T A T I O N   S T I F F N E S S ---
-                    {
-                        double epsn = m_epsn*pt.m_epsn;
-                        double K = m_pfluid->BulkModulus(*sse->GetMaterialPoint(0));
-                        
-                        for (k=0; k<nseln; ++k) {
-                            for (l=0; l<nseln; ++l)
-                                ke[4*k + 3][4*l+3] += -K*epsn*w[j]*detJ[j]*Hs[k]*Hs[l];
-                            for (l=0; l<nmeln; ++l)
-                                ke[4*k + 3][4*(nseln+l)+3] += K*epsn*w[j]*detJ[j]*Hs[k]*Hm[l];
-                        }
-                        
-                        for (k=0; k<nmeln; ++k) {
-                            for (l=0; l<nseln; ++l)
-                                ke[4*(nseln+k)+3][4*l + 3] += K*epsn*w[j]*detJ[j]*Hm[k]*Hs[l];
-                            for (l=0; l<nmeln; ++l)
-                                ke[4*(nseln+k)+3][4*(nseln+l) + 3] += -K*epsn*w[j]*detJ[j]*Hm[k]*Hm[l];
-                        }
-                        
                     }
 
+                    for (int b=0; b<neln2; ++b) {
+                        for (int c=0; c<neln1; ++c)
+                        {
+                            mat3dd K21(epst*H2[b]*H1[c]*detJ[j]*w[j]*alpha);
+                            double k21 = epsn*H2[b]*H1[c]*detJ[j]*w[j]*alpha;
+                            ke[ndpn*(neln1+b)    ][ndpn*c    ] -= K21.xx();
+                            ke[ndpn*(neln1+b) + 1][ndpn*c + 1] -= K21.yy();
+                            ke[ndpn*(neln1+b) + 2][ndpn*c + 2] -= K21.zz();
+                            ke[ndpn*(neln1+b) + 3][ndpn*c + 3] -= k21;
+                        }
+                        for (int d=0; d<neln2; ++d)
+                        {
+                            mat3dd K22(-epst*H2[b]*H2[d]*detJ[j]*w[j]*alpha);
+                            double k22 = -epsn*H2[b]*H2[d]*detJ[j]*w[j]*alpha;
+                            ke[ndpn*(neln1+b)    ][ndpn*(neln1+d)    ] -= K22.xx();
+                            ke[ndpn*(neln1+b) + 1][ndpn*(neln1+d) + 1] -= K22.yy();
+                            ke[ndpn*(neln1+b) + 2][ndpn*(neln1+d) + 2] -= K22.zz();
+                            ke[ndpn*(neln1+b) + 3][ndpn*(neln1+d) + 3] -= k22;
+                        }
+                    }
+ 
                     // assemble the global stiffness
-					ke.SetNodes(en);
-					ke.SetIndices(LM);
-					LS.Assemble(ke);
+                    ke.SetNodes(en);
+                    ke.SetIndices(LM);
+                    LS.Assemble(ke);
                 }
             }
         }
@@ -897,95 +1040,105 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     // make sure we need to augment
 	if (m_laugon != FECore::AUGLAG_METHOD) return true;
 
-    int i;
-    vec3d Ln;
     bool bconv = true;
     
-    int NS = m_ss.Elements();
-    int NM = m_ms.Elements();
+    int N1 = m_s1.Elements();
+    int N2 = m_s2.Elements();
     
     // --- c a l c u l a t e   i n i t i a l   n o r m s ---
     // a. normal component
-    double normL0 = 0, normP0 = 0;
-    for (int i=0; i<NS; ++i)
+    double normL0 = 0, normJ0 = 0;
+    for (int i=0; i<N1; ++i)
     {
-		FESurfaceElement& se = m_ss.Element(i);
-        for (int j=0; j<se.GaussPoints(); ++j)
+		FESurfaceElement& s1 = m_s1.Element(i);
+        for (int j=0; j<s1.GaussPoints(); ++j)
         {
-			FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
-			normL0 += ds.m_Lmd*ds.m_Lmd;
-            normP0 += ds.m_Lmp*ds.m_Lmp;
+			FETiedFluidSurface::Data& d1 = static_cast<FETiedFluidSurface::Data&>(*s1.GetMaterialPoint(j));
+			normL0 += d1.m_Lmd*d1.m_Lmd;
+            normJ0 += d1.m_Lmp*d1.m_Lmp;
         }
     }
-    for (int i=0; i<NM; ++i)
+    for (int i=0; i<N2; ++i)
     {
-		FESurfaceElement& me = m_ms.Element(i);
-        for (int j=0; j<me.GaussPoints(); ++j)
+		FESurfaceElement& s2 = m_s2.Element(i);
+        for (int j=0; j<s2.GaussPoints(); ++j)
         {
-			FETiedFluidSurface::Data& dm = static_cast<FETiedFluidSurface::Data&>(*me.GetMaterialPoint(j));
-			normL0 += dm.m_Lmd*dm.m_Lmd;
-            normP0 += dm.m_Lmp*dm.m_Lmp;
+			FETiedFluidSurface::Data& d2 = static_cast<FETiedFluidSurface::Data&>(*s2.GetMaterialPoint(j));
+			normL0 += d2.m_Lmd*d2.m_Lmd;
+            normJ0 += d2.m_Lmp*d2.m_Lmp;
         }
     }
+    normL0 = sqrt(normL0);
+    normJ0 = sqrt(normJ0);
     
     // b. gap component
     // (is calculated during update)
     double maxgap = 0;
-    double maxpg = 0;
+    double maxJg = 0;
     
     // update Lagrange multipliers
-    double normL1 = 0, normP1 = 0, eps, epsn;
-    for (i=0; i<NS; ++i)
+    double normL1 = 0, normJ1 = 0, eps, epsn;
+    for (int i=0; i<N1; ++i)
     {
-		FESurfaceElement& se = m_ss.Element(i);
-		for (int j = 0; j<se.GaussPoints(); ++j)
+		FESurfaceElement& s1 = m_s1.Element(i);
+		for (int j = 0; j<s1.GaussPoints(); ++j)
 		{
-			FETiedFluidSurface::Data& ds = static_cast<FETiedFluidSurface::Data&>(*se.GetMaterialPoint(j));
+			FETiedFluidSurface::Data& d1 = static_cast<FETiedFluidSurface::Data&>(*s1.GetMaterialPoint(j));
 
-            if (ds.m_pme) {
+            if (d1.m_pme) {
                 // update Lagrange multipliers on primary surface
-                eps = m_epst*ds.m_epst;
-                ds.m_Lmd = ds.m_Lmd + ds.m_vg*eps;
-                maxgap = max(maxgap,sqrt(ds.m_vg*ds.m_vg));
-                normL1 += ds.m_Lmd*ds.m_Lmd;
+                eps = m_epst*d1.m_epst;
+                d1.m_Lmd = d1.m_Lmd + d1.m_vg*eps;
+                maxgap = max(maxgap,sqrt(d1.m_vg*d1.m_vg));
+                normL1 += d1.m_Lmd*d1.m_Lmd;
                 
-                epsn = m_epsn*ds.m_epsn;
-                ds.m_Lmp = ds.m_Lmp + epsn*ds.m_pg;
-                maxpg = max(maxpg,fabs(ds.m_pg));
-                normP1 += ds.m_Lmp*ds.m_Lmp;
+                epsn = m_epsn*d1.m_epsn;
+                d1.m_Lmp = d1.m_Lmp + epsn*d1.m_Jg;
+                maxJg = max(maxJg,fabs(d1.m_Jg));
+                normJ1 += d1.m_Lmp*d1.m_Lmp;
+                
+                // keep the reported traction and normal velocity consistent with the
+                // updated multipliers (they are re-evaluated on the next Update)
+                d1.m_tv = d1.m_Lmd + d1.m_vg*eps;
+                d1.m_vn = d1.m_Lmp + epsn*d1.m_Jg;
             }
         }
     }
     
-    for (i=0; i<NM; ++i)
+    for (int i=0; i<N2; ++i)
     {
-		FESurfaceElement& me = m_ms.Element(i);
-		for (int j = 0; j<me.GaussPoints(); ++j)
+		FESurfaceElement& s2 = m_s2.Element(i);
+		for (int j = 0; j<s2.GaussPoints(); ++j)
 		{
-			FETiedFluidSurface::Data& dm = static_cast<FETiedFluidSurface::Data&>(*me.GetMaterialPoint(j));
+			FETiedFluidSurface::Data& d2 = static_cast<FETiedFluidSurface::Data&>(*s2.GetMaterialPoint(j));
 
-            if (dm.m_pme) {
+            if (d2.m_pme) {
                 // update Lagrange multipliers on secondary surface
-                eps = m_epst*dm.m_epst;
-                dm.m_Lmd = dm.m_Lmd + dm.m_vg*eps;
-                maxgap = max(maxgap,sqrt(dm.m_vg*dm.m_vg));
-                normL1 += dm.m_Lmd*dm.m_Lmd;
+                eps = m_epst*d2.m_epst;
+                d2.m_Lmd = d2.m_Lmd + d2.m_vg*eps;
+                maxgap = max(maxgap,sqrt(d2.m_vg*d2.m_vg));
+                normL1 += d2.m_Lmd*d2.m_Lmd;
                 
-                epsn = m_epsn*dm.m_epsn;
-                dm.m_Lmp = dm.m_Lmp + epsn*dm.m_pg;
-                maxpg = max(maxpg,fabs(dm.m_pg));
-                normP1 += dm.m_Lmp*dm.m_Lmp;
+                epsn = m_epsn*d2.m_epsn;
+                d2.m_Lmp = d2.m_Lmp + epsn*d2.m_Jg;
+                maxJg = max(maxJg,fabs(d2.m_Jg));
+                normJ1 += d2.m_Lmp*d2.m_Lmp;
+                
+                d2.m_tv = d2.m_Lmd + d2.m_vg*eps;
+                d2.m_vn = d2.m_Lmp + epsn*d2.m_Jg;
             }
         }
     }
+    normL1 = sqrt(normL1);
+    normJ1 = sqrt(normJ1);
     
     // calculate relative norms
     double lnorm = (normL1 != 0 ? fabs((normL1 - normL0) / normL1) : fabs(normL1 - normL0));
-    double pnorm = (normP1 != 0 ? fabs((normP1 - normP0) / normP1) : fabs(normP1 - normP0));
+    double pnorm = (normJ1 != 0 ? fabs((normJ1 - normJ0) / normJ1) : fabs(normJ1 - normJ0));
     
     // check convergence
     if ((m_gtol > 0) && (maxgap > m_gtol)) bconv = false;
-    if ((m_ptol > 0) && (maxpg > m_ptol)) bconv = false;
+    if ((m_etol > 0) && (maxJg > m_etol)) bconv = false;
     
     if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
     if ((m_atol > 0) && (pnorm > m_atol)) bconv = false;
@@ -994,14 +1147,13 @@ bool FETiedFluidInterface::Augment(int naug, const FETimeInfo& tp)
     if (naug >= m_naugmax) bconv = true;
     
     feLog(" tied fluid interface # %d\n", GetID());
-    feLog("                        CURRENT        REQUIRED\n");
-    feLog("    V multiplier : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
-    feLog("    P multiplier        : %15le", pnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
-    
+    feLog("                                CURRENT        REQUIRED\n");
+    feLog("    velocity multiplier   : %15le", lnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
+    feLog("    dilatation multiplier : %15le", pnorm); if (m_atol > 0) feLog("%15le\n", m_atol); else feLog("       ***\n");
     feLog("    maximum velocity gap  : %15le", maxgap);
     if (m_gtol > 0) feLog("%15le\n", m_gtol); else feLog("       ***\n");
-    feLog("    maximum pressure gap : %15le", maxpg);
-    if (m_ptol > 0) feLog("%15le\n", m_ptol); else feLog("       ***\n");
+    feLog("    maximum dilatation gap: %15le", maxJg);
+    if (m_etol > 0) feLog("%15le\n", m_etol); else feLog("       ***\n");
 
     return bconv;
 }
@@ -1013,12 +1165,12 @@ void FETiedFluidInterface::Serialize(DumpStream &ar)
     FEContactInterface::Serialize(ar);
     
     // store contact surface data
-    m_ms.Serialize(ar);
-    m_ss.Serialize(ar);
-    
+    m_s1.Serialize(ar);
+    m_s2.Serialize(ar);
+
 	// serialize element pointers
-	SerializeElementPointers(m_ss, m_ms, ar);
-	SerializeElementPointers(m_ms, m_ss, ar);
+	SerializeElementPointers(m_s1, m_s2, ar);
+	SerializeElementPointers(m_s2, m_s1, ar);
     
     if (ar.IsShallow()) return;
     ar & m_pfluid;

@@ -32,33 +32,42 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEDomain.h"
 #include "FELogElemMath.h"
+#include "DataStore.h"
 
-//-----------------------------------------------------------------------------
 ElementDataRecord::ElementDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_ELEM)
 {
 	m_offset = 0;
 }
 
-//-----------------------------------------------------------------------------
-void ElementDataRecord::SetData(const char *szexpr)
+void ElementDataRecord::SetData(const char* szexpr)
 {
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
+
 	DataStore& DS = GetFEModel()->GetDataStore();
 
-	char szcopy[MAX_STRING] = {0};
-	strcpy(szcopy, szexpr);
-	char* sz = szcopy, *ch;
 	m_Data.clear();
-	strcpy(m_szdata, szexpr);
-	do
+	m_data = szexpr;
+	for (size_t i = 0; i < strings.size(); ++i)
 	{
-		ch = strchr(sz, ';');
-		if (ch) *ch++ = 0;
-		FELogElemSource* pdata = DS.GetElementDataSource(sz);
-		if (pdata) m_Data.push_back(pdata);
-		else throw UnknownDataField(sz);
-		sz = ch;
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FELogElemSource* pdata = DS.GetElementDataSource(it.name);
+		if (pdata == nullptr) throw UnknownDataField(it.name);
+		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
 	}
-	while (ch);
+}
+
+bool ElementDataRecord::Init()
+{
+	for (size_t i = 0; i < m_Data.size(); ++i)
+	{
+		if (m_Data[i] == nullptr || m_Data[i]->Init() == false) return false;
+	}
+	return DataRecord::Init();
 }
 
 //-----------------------------------------------------------------------------

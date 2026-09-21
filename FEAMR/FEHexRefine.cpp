@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/FEMeshAdaptorCriterion.h>
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
+#include <stdexcept>
 
 BEGIN_FECORE_CLASS(FEHexRefine, FERefineMesh)
 	ADD_PARAMETER(m_elemRefine, "max_elem_refine");

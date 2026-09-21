@@ -33,31 +33,33 @@ FEModelDataRecord::FEModelDataRecord(FEModel* pfem) : DataRecord(pfem, FE_DATA_M
 double FEModelDataRecord::Evaluate(int item, int ndata)
 {
 	assert(item == 0);
-	return m_data[ndata]->value();
+	return m_Data[ndata]->value();
 }
 
 void FEModelDataRecord::ClearData()
 {
-	for (int i = 0; i < m_data.size(); ++i) delete m_data[i];
-	m_data.clear();
+	for (int i = 0; i < m_data.size(); ++i) delete m_Data[i];
+	m_Data.clear();
 }
 
 void FEModelDataRecord::SetData(const char* szexpr)
 {
-	char szcopy[MAX_STRING] = { 0 };
-	strcpy(szcopy, szexpr);
-	char* sz = szcopy, * ch;
+	std::vector<std::string> strings = SplitDataString(szexpr);
+	if (strings.empty()) throw UnknownDataField(szexpr);
+
 	ClearData();
-	strcpy(m_szdata, szexpr);
-	do
+	m_data = szexpr;
+	for (size_t i=0; i<strings.size(); ++i)
 	{
-		ch = strchr(sz, ';');
-		if (ch) *ch++ = 0;
-		FEModelLogData* pdata = fecore_new<FEModelLogData>(sz, GetFEModel());
-		if (pdata) m_data.push_back(pdata);
-		else throw UnknownDataField(sz);
-		sz = ch;
-	} while (ch);
+		DataRecordItem it = ProcessDataString(strings[i].c_str());
+		if (!it.isValid()) throw UnknownDataField(strings[i]);
+		FEModelLogData* pdata = fecore_new<FEModelLogData>(it.name.c_str(), GetFEModel());
+		if (pdata == nullptr) throw UnknownDataField(it.name);
+		m_Data.push_back(pdata);
+
+		if (!ApplyDataRecordItem(*pdata, it))
+			throw UnknownDataField(strings[i]);
+	}
 }
 
 void FEModelDataRecord::SelectAllItems()

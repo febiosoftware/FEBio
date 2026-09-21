@@ -32,4 +32,58 @@ class FECORE_API FELogData : public FECoreBase
 {
 public:
 	FELogData(FEModel* fem);
+
+	virtual bool SetParameters(const std::vector<std::string>& params) { return params.empty(); }
+
+	virtual bool SetComponent(const std::string& comp) { return false; }
+
+	virtual bool SetIndex(int n) { return false; }
+};
+
+template <class Base, class Item, class T, class Traits>
+class FELogComponentData : public Base
+{
+public:
+	using Base::Base;
+
+	bool SetComponent(const std::string& comp) override
+	{
+		m_comp = Traits::ComponentIndex(comp);
+		return m_comp >= 0;
+	}
+
+	bool Init() override
+	{
+		return (m_comp >= 0) && Base::Init();
+	}
+
+	double value(Item& item) final
+	{
+		T v = typedValue(item);
+		return Traits::Component(v, m_comp);
+	}
+
+protected:
+	virtual T typedValue(Item& item) = 0;
+
+private:
+	int m_comp = -1;
+};
+
+struct FECORE_API Vec3dLogTraits
+{
+	static int ComponentIndex(const std::string& c);
+	static double Component(const vec3d& v, int i);
+};
+
+struct FECORE_API Mat3dsLogTraits
+{
+	static int ComponentIndex(const std::string& c);
+	static double Component(const mat3ds& v, int i);
+};
+
+struct FECORE_API Mat3dLogTraits
+{
+	static int ComponentIndex(const std::string& c);
+	static double Component(const mat3d& v, int i);
 };

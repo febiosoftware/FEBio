@@ -37,37 +37,37 @@ SOFTWARE.*/
 
 //-----------------------------------------------------------------------------
 // This class uses the deprecated "c" variable to denote concentrations.
-class FENodeConcentration : public FELogNodeData
+class FELogNodeConcentration : public FELogNodeData
 { 
 public: 
-	FENodeConcentration(FEModel* pfem) : FELogNodeData(pfem){} 
+	FELogNodeConcentration(FEModel* pfem) : FELogNodeData(pfem){} 
 	double value(const FENode& node); 
 };
 
 //-----------------------------------------------------------------------------
 // return the (nodal) effective fluid pressure
-class FENodeFluidPressure : public FELogNodeData
+class FELogNodeFluidPressure : public FELogNodeData
 {
 public:
-    FENodeFluidPressure(FEModel* pfem) : FELogNodeData(pfem) {}
+    FELogNodeFluidPressure(FEModel* pfem) : FELogNodeData(pfem) {}
     double value(const FENode& node);
 };
 
 //-----------------------------------------------------------------------------
-class FENodeSoluteConcentration_ : public FELogNodeData
+class FELogNodeSoluteConcentration_ : public FELogNodeData
 {
 protected:
-    FENodeSoluteConcentration_(FEModel* pfem, int nsol) : FELogNodeData(pfem), m_nsol(nsol) {}
+    FELogNodeSoluteConcentration_(FEModel* pfem, int nsol) : FELogNodeData(pfem), m_nsol(nsol) {}
     double value(const FENode& node);
 private:
     int m_nsol;
 };
 
-template <int N> class FENodeSoluteConcentration_T : public FENodeSoluteConcentration_
+template <int N> class FELogNodeSoluteConcentration_T : public FELogNodeSoluteConcentration_
 {
 public:
-    FENodeSoluteConcentration_T(FEModel* pfem) : FENodeSoluteConcentration_(pfem, N) {}
-    double value(const FENode& node) { return FENodeSoluteConcentration_::value(node); }
+    FELogNodeSoluteConcentration_T(FEModel* pfem) : FELogNodeSoluteConcentration_(pfem, N) {}
+    double value(const FENode& node) { return FELogNodeSoluteConcentration_::value(node); }
 };
 
 

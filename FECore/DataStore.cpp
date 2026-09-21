@@ -53,6 +53,11 @@ void DataStore::Clear()
 
 bool DataStore::Init()
 {
+	for (size_t i = 0; i < m_data.size(); ++i)
+	{
+		if (m_data[i]->Init() == false) return false;
+	}
+
 	for (size_t i = 0; i < m_elemDefs.size(); ++i)
 	{
 		auto& def = *m_elemDefs[i];
@@ -122,5 +127,22 @@ FELogElemSource* DataStore::GetElementDataSource(const std::string& name)
 		}
 	}
 
+	return pdata;
+}
+
+FELogNodeData* DataStore::GetNodeDataSource(const std::string& name)
+{
+	FELogNodeData* pdata = fecore_new<FELogNodeData>(name.c_str(), m_fem);
+	if (pdata == nullptr)
+	{
+		// see if this refers to a DOF of the model
+		int ndof = m_fem->GetDOFIndex(name.c_str());
+		if (ndof >= 0)
+		{
+			// Add an output for a nodal variable
+			pdata = new FENodeVarData(m_fem, ndof);
+		}
+		else throw UnknownDataField(name);
+	}
 	return pdata;
 }

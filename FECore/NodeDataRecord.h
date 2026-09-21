@@ -48,15 +48,3 @@ public:
 private:
 	vector<FELogNodeData*>	m_Data;
 };
-
-//-----------------------------------------------------------------------------
-// Special class for outputting nodal variables
-class FECORE_API FENodeVarData : public FELogNodeData
-{
-public:
-	FENodeVarData(FEModel* pfem, int ndof);
-	double value(const FENode& node) override;
-
-private:
-	int	m_ndof;
-};
