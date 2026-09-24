@@ -182,6 +182,21 @@ int FEBioApp::RunModel()
 
 	if (!m_ops.boutputLog) fem.SetLogLevel(0);
 
+	// select backend if specified
+	if (m_ops.backend.empty() == false)
+	{
+		FECoreKernel& febio = FECoreKernel::GetInstance();
+		if (febio.SetActiveBackend(m_ops.backend, false) == false)
+		{
+			feLogErrorEx(&fem, "FATAL ERROR: failed to select backend %s\n", m_ops.backend.c_str());
+			return 1;
+		}
+		else
+		{
+			feLogInfoEx(&fem, "Selected backend: %s\n", m_ops.backend.c_str());
+		}
+	}
+
 	// read the input file if specified
 	int nret = 0;
 	if (m_ops.szfile[0])
@@ -256,6 +271,8 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 	bool bplt = false;
 	bool bdmp = false;
 	bool brun = true;
+
+	ops.backend.clear();
 
 	// initialize file names
 	ops.szfile[0] = 0;
@@ -478,6 +495,11 @@ bool FEBioApp::ParseCmdLine(int nargs, char* argv[])
 				n = atoi(szval);
 			}
 			NegativeJacobian::m_maxout = n;
+		}
+		else if (strncmp(sz, "-backend", 8) == 0)
+		{
+			if (sz[8] != '=') { fprintf(stderr, "command line error when parsing backend\n"); return false; }
+			ops.backend = sz + 9;
 		}
 		else if (sz[0] == '-')
 		{

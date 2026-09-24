@@ -131,6 +131,10 @@ FECoreKernel::FECoreKernel()
 	ADD_SUPER_CLASS(FEDATARECORD_ID);
 	ADD_SUPER_CLASS(FECLASS_ID);
 	ADD_SUPER_CLASS(FESCRIPT_ID);
+
+	// Add native backend
+	m_backends.push_back(new FECoreBackend("native"));
+	m_activeBackend = m_backends[0];
 }
 
 //-----------------------------------------------------------------------------
@@ -186,6 +190,33 @@ LinearSolver* FECoreKernel::CreateDefaultLinearSolver(FEModel* fem)
 	}
 }
 
+bool FECoreKernel::SetActiveBackend(const std::string& name, bool createIfNotDefined)
+{
+	// see if the backend already exists
+	for (int i = 0; i < m_backends.size(); ++i)
+	{
+		if (m_backends[i]->name == name)
+		{
+			m_activeBackend = m_backends[i];
+			return true;
+		}
+	}
+	// it doesn't so create it
+	if (createIfNotDefined)
+	{
+		FECoreBackend* pbe = new FECoreBackend(name);
+		m_backends.push_back(pbe);
+		m_activeBackend = pbe;
+		return true;
+	}
+	return false;
+}
+
+std::string FECoreKernel::GetActiveBackendName() const 
+{ 
+	return m_activeBackend ? m_activeBackend->name : std::string(); 
+}
+
 //-----------------------------------------------------------------------------
 void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 {
@@ -197,9 +228,9 @@ void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 	}
 
 	// see if the name already exists
-	for (int i=0; i<m_Fac.size(); ++i)
+	for (int i=0; i< m_activeBackend->m_Fac.size(); ++i)
 	{
-		FECoreFactory* pfi = m_Fac[i];
+		FECoreFactory* pfi = m_activeBackend->m_Fac[i];
 
 		if ((pfi->GetSuperClassID() == ptf->GetSuperClassID()) && 
 			(strcmp(pfi->GetTypeStr(), ptf->GetTypeStr()) == 0))
@@ -213,7 +244,7 @@ void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 			if ((modId == activeID) && (pfi->GetSpecID() == ptf->GetSpecID()))
 			{
 				fprintf(stderr, "WARNING: \"%s\" feature is redefined\n", ptf->GetTypeStr());
-				m_Fac[i] = ptf;
+				m_activeBackend->m_Fac[i] = ptf;
 				return;
 			}
 		}
@@ -222,18 +253,18 @@ void FECoreKernel::RegisterFactory(FECoreFactory* ptf)
 	// it doesn't so add it
 	ptf->SetModuleID(activeID);
 	ptf->SetAllocatorID(m_alloc_id);
-	m_Fac.push_back(ptf);
+	m_activeBackend->m_Fac.push_back(ptf);
 }
 
 //-----------------------------------------------------------------------------
 bool FECoreKernel::UnregisterFactory(FECoreFactory* ptf)
 {
-	for (vector<FECoreFactory*>::iterator it = m_Fac.begin(); it != m_Fac.end(); ++it)
+	for (vector<FECoreFactory*>::iterator it = m_activeBackend->m_Fac.begin(); it != m_activeBackend->m_Fac.end(); ++it)
 	{
 		FECoreFactory* pfi = *it;
 		if (pfi == ptf)
 		{
-			m_Fac.erase(it);
+			m_activeBackend->m_Fac.erase(it);
 			return true;
 		}
 	}
@@ -244,14 +275,17 @@ bool FECoreKernel::UnregisterFactory(FECoreFactory* ptf)
 //! unregister factories from allocator
 void FECoreKernel::UnregisterFactories(int alloc_id)
 {
-	for (vector<FECoreFactory*>::iterator it = m_Fac.begin(); it != m_Fac.end();)
+	for (auto be : m_backends)
 	{
-		FECoreFactory* pfi = *it;
-		if (pfi->GetAllocatorID() == alloc_id)
+		for (vector<FECoreFactory*>::iterator it = be->m_Fac.begin(); it != be->m_Fac.end();)
 		{
-			it = m_Fac.erase(it);
+			FECoreFactory* pfi = *it;
+			if (pfi->GetAllocatorID() == alloc_id)
+			{
+				it = be->m_Fac.erase(it);
+			}
+			else ++it;
 		}
-		else ++it;
 	}
 }
 
@@ -318,7 +352,7 @@ FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel
 	if ((activeID > 0) || (activeID == 0))
 	{
 		std::vector<FECoreFactory*>::iterator pf;
-		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		for (pf = m_activeBackend->m_Fac.begin(); pf != m_activeBackend->m_Fac.end(); ++pf)
 		{
 			FECoreFactory* pfac = *pf;
 			if (strcmp(pfac->GetBaseClassName(), szbase) == 0) {
@@ -347,7 +381,7 @@ FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel
 	for (int i = 0; i < moduleDepends.size(); ++i)
 	{
 		unsigned modId = moduleDepends[i];
-		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		for (pf = m_activeBackend->m_Fac.begin(); pf != m_activeBackend->m_Fac.end(); ++pf)
 		{
 			FECoreFactory* pfac = *pf;
 			if (strcmp(pfac->GetBaseClassName(), szbase) == 0) {
@@ -378,7 +412,7 @@ FECoreBase* FECoreKernel::Create(const char* szbase, const char* sztype, FEModel
 FECoreBase* FECoreKernel::CreateClass(const char* szclassName, FEModel* fem)
 {
 	std::vector<FECoreFactory*>::iterator pf;
-	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+	for (pf = m_activeBackend->m_Fac.begin(); pf != m_activeBackend->m_Fac.end(); ++pf)
 	{
 		FECoreFactory* pfac = *pf;
 		const char* szfacName = pfac->GetClassName();
@@ -449,7 +483,7 @@ int FECoreKernel::Count(SUPER_CLASS_ID sid)
 {
 	int N = 0;
 	std::vector<FECoreFactory*>::iterator pf;
-	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
+	for (pf=m_activeBackend->m_Fac.begin(); pf!= m_activeBackend->m_Fac.end(); ++pf)
 	{
 		FECoreFactory* pfac = *pf;
 		if (pfac->GetSuperClassID() == sid) N++;
@@ -461,7 +495,7 @@ int FECoreKernel::Count(SUPER_CLASS_ID sid)
 void FECoreKernel::List(SUPER_CLASS_ID sid)
 {
   std::vector<FECoreFactory*>::iterator pf;
-  for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+  for (pf = m_activeBackend->m_Fac.begin(); pf != m_activeBackend->m_Fac.end(); ++pf)
     {
       FECoreFactory* pfac = *pf;
       if (pfac->GetSuperClassID() == sid) fprintf(stdout, "%s\n", pfac->GetTypeStr());
@@ -471,14 +505,14 @@ void FECoreKernel::List(SUPER_CLASS_ID sid)
 //-----------------------------------------------------------------------------
 int FECoreKernel::FactoryClasses()
 {
-	return (int) m_Fac.size();
+	return (int) m_activeBackend->m_Fac.size();
 }
 
 //-----------------------------------------------------------------------------
 const FECoreFactory* FECoreKernel::GetFactoryClass(int i)
 {
-	if ((i < 0) || (i >= m_Fac.size())) return nullptr;
-	else return m_Fac[i];
+	if ((i < 0) || (i >= m_activeBackend->m_Fac.size())) return nullptr;
+	else return m_activeBackend->m_Fac[i];
 }
 
 //-----------------------------------------------------------------------------
@@ -486,9 +520,9 @@ const FECoreFactory* FECoreKernel::GetFactoryClass(int i)
 const FECoreFactory* FECoreKernel::GetFactoryClass(int classID, int i)
 {
 	int n = 0;
-	for (int j = 0; j < m_Fac.size(); ++j)
+	for (int j = 0; j < m_activeBackend->m_Fac.size(); ++j)
 	{
-		FECoreFactory* fac = m_Fac[j];
+		FECoreFactory* fac = m_activeBackend->m_Fac[j];
 		if (fac->GetSuperClassID() == classID)
 		{
 			if (i == n) return fac;
@@ -504,9 +538,9 @@ int FECoreKernel::GetFactoryIndex(int superClassId, const char* sztype)
 {
 	FEModule* mod = GetActiveModule();
 	if (mod == nullptr) return -1;
-	for (int j = 0; j < m_Fac.size(); ++j)
+	for (int j = 0; j < m_activeBackend->m_Fac.size(); ++j)
 	{
-		FECoreFactory* fac = m_Fac[j];
+		FECoreFactory* fac = m_activeBackend->m_Fac[j];
 		int modId = fac->GetModuleID();
 
 		// check the super-class first
@@ -542,7 +576,7 @@ FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype)
 	if ((activeID > 0) || (activeID == 0))
 	{
 		std::vector<FECoreFactory*>::iterator pf;
-		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		for (pf = m_activeBackend->m_Fac.begin(); pf != m_activeBackend->m_Fac.end(); ++pf)
 		{
 			FECoreFactory* pfac = *pf;
 			if (pfac->GetSuperClassID() == superID) {
@@ -571,7 +605,7 @@ FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype)
 	for (int i = 0; i < moduleDepends.size(); ++i)
 	{
 		unsigned modId = moduleDepends[i];
-		for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+		for (pf = m_activeBackend->m_Fac.begin(); pf != m_activeBackend->m_Fac.end(); ++pf)
 		{
 			FECoreFactory* pfac = *pf;
 			if (pfac->GetSuperClassID() == superID) {
@@ -606,7 +640,7 @@ FECoreFactory* FECoreKernel::FindFactoryClass(int superID, const char* sztype, c
 	if (modId == -1) return nullptr;	
 
 	std::vector<FECoreFactory*>::iterator pf;
-	for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+	for (pf = m_activeBackend->m_Fac.begin(); pf != m_activeBackend->m_Fac.end(); ++pf)
 	{
 		FECoreFactory* pfac = *pf;
 		if (pfac->GetSuperClassID() == superID) {
@@ -845,17 +879,17 @@ bool FECoreKernel::AddModuleDependency(const char* szmodule)
 void FECoreKernel::RegisterDomain(FEDomainFactory* pf, bool pushFront)
 {
 	if (pushFront)
-		m_Dom.insert(m_Dom.begin(), pf);
+		m_activeBackend->m_Dom.insert(m_activeBackend->m_Dom.begin(), pf);
 	else
-		m_Dom.push_back(pf); 
+		m_activeBackend->m_Dom.push_back(pf); 
 }
 
 //-----------------------------------------------------------------------------
 FEDomain* FECoreKernel::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
 {
-	for (int i=0; i<(int)m_Dom.size(); ++i)
+	for (int i=0; i<(int)m_activeBackend->m_Dom.size(); ++i)
 	{
-		FEDomain* pdom = m_Dom[i]->CreateDomain(spec, pm, pmat);
+		FEDomain* pdom = m_activeBackend->m_Dom[i]->CreateDomain(spec, pm, pmat);
 		if (pdom != 0) return pdom;
 	}
 	return 0;

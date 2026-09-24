@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FECoreFactory.h"
 #include "ClassDescriptor.h"
+#include "FECoreBackend.h"
 #include <vector>
 #include <map>
 #include <string.h>
@@ -62,6 +63,12 @@ public:
 	static std::map<unsigned int, const char*>	GetSuperClassMap();
 
 public:
+	//! set the active backend (creates the backend if it is not defined)
+	bool SetActiveBackend(const std::string& name, bool createIfNotDefined = true);
+
+	//! get the name of active backend (returns empty string if no valid backend is active)
+	std::string GetActiveBackendName() const;
+
 	//! Register a class with the framework
 	void RegisterFactory(FECoreFactory* ptf);
 
@@ -185,8 +192,8 @@ public:
 	void ShowDeprecationWarnings(bool b);
 
 private:
-	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
-	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
+	std::vector<FECoreBackend*> m_backends;	// list of registered backends
+	FECoreBackend* m_activeBackend;	// the active backend
 
 	bool	m_bshowDeprecationWarning;
 

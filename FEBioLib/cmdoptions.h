@@ -45,6 +45,8 @@ struct FEBIOLIB_API CMDOPTIONS
 	int		dumpLevel;		//!< requested restart level
 	int		dumpStride;		//!< (cold) restart file stride
 
+	std::string backend;		//!< backend name
+
 	char	szfile[MAXFILE];	//!< model input file name
 	char	szlog[MAXFILE];	//!< log file name
 	char	szplt[MAXFILE];	//!< plot file name
@@ -70,6 +72,8 @@ struct FEBIOLIB_API CMDOPTIONS
 		bappendFiles = true;
 		bupdateTitle = true;
 		boutputLog = true;
+
+		backend.clear();
 
 		szfile[0] = 0;
 		szlog[0] = 0;

@@ -236,7 +236,16 @@ void FEBioModel::echo_input()
 	FEMesh& mesh = GetMesh();
 
 	// print title
-	feLog("%s\n\n", fem.GetTitle().c_str());
+	string title = fem.GetTitle();
+	if (!title.empty())
+		feLog("%s\n\n", title.c_str());
+
+	FECoreKernel& febio = FECoreKernel::GetInstance();
+	std::string backendName = febio.GetActiveBackendName();
+	if (backendName != "native")
+	{
+		feLog("Selected backend : %s\n\n", backendName.c_str());
+	}
 
 	// print file info
 	feLog(" FILES USED\n");

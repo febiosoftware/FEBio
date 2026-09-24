@@ -179,7 +179,8 @@ int FEBioPlugin::Load(const char* szfile)
 	if (pfnc_init)
 	{
 		pfnc_init(febio);
-		febio.SetActiveModule(0);
+		febio.SetActiveModule(0); // reset the active module to the default module
+		febio.SetActiveBackend("native"); // reset the active backend to the native backend
 	}
 
 	// find out how many classes there are in this plugin
