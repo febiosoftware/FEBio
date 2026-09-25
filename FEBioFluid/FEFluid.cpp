@@ -170,5 +170,10 @@ double FEFluid::StrainEnergyDensity(FEMaterialPoint& mp)
 bool FEFluid::Dilatation(const double T, const double p, double& e)
 {
     FEElasticFluid *m_pe = GetElastic();
+    if (m_pe == nullptr) {
+        Init();
+        m_pe = GetElastic();
+    }
+	        
     return m_pe->Dilatation(T,p,e);
 }
