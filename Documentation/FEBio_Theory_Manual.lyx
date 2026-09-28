@@ -63565,7 +63565,62 @@ name "sec:Tied-Fluid-FSI-Traction"
 \end_layout
 
 \begin_layout Standard
-The tied fluid-FSI-Solid traction interface is technically a surface load acting on a tied solid interface.q
+The linearization of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ takes the form
+\begin_inset Formula 
+\[
+D\delta G_{c}=D\delta G_{c}\left[\Delta\mathbf{u}^{\left(1\right)}\right]+D\delta G_{c}\left[\Delta\mathbf{u}^{\left(2\right)}\right]+D\delta G_{c}\left[\Delta\mathbf{w}^{\left(1\right)}\right]+D\delta G_{c}\left[\Delta J^{f\left(1\right)}\right]
+\]
+
+\end_inset
+
+needs to be performed along 
+\begin_inset Formula $\Delta\mathbf{u}^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Delta\mathbf{u}^{\left(2\right)}$
+\end_inset
+
+,
+ where
+\begin_inset Formula 
+\[
+\delta G_{c}=\int_{\Gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\varepsilon_{n}\mathbf{g}J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+J^{\left(1\right)}_{\eta}=\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right|\quad\mathbf{g}^{\left(1\right)}_{\alpha}=\frac{\partial\mathbf{x}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{\alpha}}\quad\alpha=1-2
+\]
+
+\end_inset
+
+Note that
+\begin_inset Formula 
+\[
+\begin{aligned}D\mathbf{g}\left[\Delta\mathbf{u}^{\left(1\right)}\right] & =-\alpha_{f}\Delta\mathbf{u}^{\left(1\right)}\\
+D\mathbf{g}\left[\Delta\mathbf{u}^{\left(2\right)}\right] & =\alpha_{f}\Delta\mathbf{u}^{\left(2\right)}
+\end{aligned}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+DJ^{\left(1\right)}_{\eta}\left[\Delta\mathbf{u}^{\left(1\right)}\right]=\alpha_{f}\left(+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}-\mathbf{g}^{\left(1\right)}_{2}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\right)\cdot\mathbf{n}^{\left(1\right)}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -63580,200 +63635,184 @@ name "subsec:Contact-Integral-TFSI"
 \end_layout
 
 \begin_layout Standard
-Currently,
- in one configuration,
- the Fluid-FSI traction surface load is prescribed on a contiguous mesh between a fluid-FSI domain,
- denoted by 
+The tied fluid-FSI-Solid traction interface is technically an enforcement of a tied-elastic interface between the solid matrix of the fluid-FSI material and the solid material.
+ In addition,
+ we need to superpose upon this tied-elastic interface the condition that the fluid traction needs to be prescribed on the solid surface,
+ as explained in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-traction-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Let the fluid-FSI domain reside in 
 \begin_inset Formula $\left(1\right)$
 \end_inset
 
-,
- and a solid domain,
- denoted by 
+ and the solid domain in 
 \begin_inset Formula $\left(2\right)$
 \end_inset
 
 .
- At a fluid-FSI interface we would normally satisfy continuity of the total traction,
+ The tied-elastic interface satisfies
 \begin_inset Formula 
-\begin{equation}
-\left[\left[\boldsymbol{\sigma}\right]\right]\cdot\mathbf{n}_{\Gamma}=\left[\left[\boldsymbol{\sigma}^{f}+\boldsymbol{\sigma}^{s}\right]\right]\cdot\mathbf{n}_{\Gamma}\label{eq:TFSI-momentum-jump}
-\end{equation}
+\[
+\delta G_{c}=\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\mathbf{t}^{s\left(1\right)}_{n+\alpha_{f}}da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{s\left(2\right)}\cdot\mathbf{t}^{s\left(2\right)}_{n+\alpha_{f}}da^{\left(2\right)}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+\mathbf{t}^{s\left(i\right)}=\boldsymbol{\sigma}^{s\left(i\right)}\cdot\mathbf{n}^{\left(i\right)}\quad\left(i=1,2\right)
+\]
+
+\end_inset
+
+Moreover,
+ the fluid traction acting on the solid is given in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-traction-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ Thus,
+ we supplement 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+with
+\begin_inset Formula 
+\[
+\delta G_{c}=\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\mathbf{t}^{s\left(1\right)}_{n+\alpha_{f}}-\mathbf{t}^{f\left(1\right)}_{n+\alpha_{f}}\right)da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{s\left(2\right)}\cdot\mathbf{t}^{s\left(2\right)}_{n+\alpha_{f}}da^{\left(2\right)}
+\]
+
+\end_inset
+
+Since 
+\begin_inset Formula $\mathbf{n}^{\left(1\right)}=-\mathbf{n}^{\left(2\right)}$
+\end_inset
+
+,
+ we may rewrite this tied-elastic contact virtual work as
+\begin_inset Formula 
+\[
+\delta G_{c}=\int_{\Gamma^{\left(1\right)}}\left(\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\mathbf{t}^{s}_{n+\alpha_{f}}-\delta\mathbf{v}^{s\left(1\right)}\cdot\mathbf{t}^{f\left(1\right)}_{n+\alpha_{f}}\right)da^{\left(1\right)}
+\]
+
+\end_inset
+
+where we also used 
+\begin_inset Formula $\mathbf{t}^{s\left(2\right)}_{n+\alpha_{f}}=\mathbf{t}^{s\left(1\right)}_{n+\alpha_{f}}\equiv\mathbf{t}^{s}_{n+\alpha_{f}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Using the penalty method,
+ we propose that
+\begin_inset Formula 
+\[
+\mathbf{t}^{s}_{n+\alpha}=\varepsilon_{n}\mathbf{g}_{n+\alpha_{f}}
+\]
+
+\end_inset
+
+where the vectorial gap 
+\begin_inset Formula $\mathbf{g}_{n+\alpha_{f}}$
+\end_inset
+
+ is evaluated at the intermediate time point 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\mathbf{g}_{n+\alpha_{f}}=\mathbf{x}^{\left(2\right)}_{n+\alpha_{f}}-\mathbf{x}^{\left(1\right)}_{n+\alpha_{f}}
+\]
+
+\end_inset
+
+ If we update this method to a Lagrangian augmentation,
+ we get
+\begin_inset Formula 
+\[
+\mathbf{t}^{s}_{n+\alpha}=\boldsymbol{\lambda}+\varepsilon_{n}\mathbf{g}_{n+\alpha_{f}}
+\]
+
+\end_inset
+
+In this presentation,
+ the penalty parameter 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ in an auto-penalty scheme may be normalized locally by
+\begin_inset Formula 
+\[
+\varepsilon_{n}\propto\frac{A}{V}E
+\]
 
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{n}_{\Gamma}\equiv\mathbf{n}^{\left(1\right)}$
+\begin_inset Formula $E$
 \end_inset
 
-.
- However,
- we nned to acknowledge that this jump condition is not enforced in the fluid-FSI domain.
- Instead,
- there no fluid on the solid domain side 
-\begin_inset Formula $\Gamma^{\left(2\right)}$
-\end_inset
-
-;
- thus the fluid pressure 
-\begin_inset Formula $p^{\left(2\right)}$
-\end_inset
-
- is not defined on the solid domain side.
- Instead,
- we need to satisfy that the interface 
-\begin_inset Formula $\Gamma$
-\end_inset
-
- be impermeable to the fluid,
- hence 
-\begin_inset Formula $w^{\left(1\right)}_{n}=\mathbf{w}^{\left(1\right)}\cdot\mathbf{n}_{\Gamma}=0$
-\end_inset
-
-.
- The jump condition given in Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:TFSI-momentum-jump"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-tuple "list"
-
-\end_inset
-
- reduces to
-\begin_inset Formula 
-\begin{equation}
-\left(\boldsymbol{\sigma}^{f\left(1\right)}+\boldsymbol{\sigma}^{s\left(1\right)}\right)\cdot\mathbf{n}_{\Gamma}-\boldsymbol{\sigma}^{s\left(2\right)}\cdot\mathbf{n}_{\Gamma}=\mathbf{0}\label{eq:TFSI-jump-explicit}
-\end{equation}
-
-\end_inset
-
-However,
- in a fluid-FSI domain,
- the elasticity of the solid is set to be negligible,
- thus 
-\begin_inset Formula $\boldsymbol{\sigma}^{s\left(1\right)}\approx\mathbf{0}$
-\end_inset
-
-.
- So the above expression reduces to
-\begin_inset Formula 
-\begin{equation}
-\boldsymbol{\sigma}^{f\left(1\right)}\cdot\mathbf{n}_{\Gamma}-\boldsymbol{\sigma}^{s\left(2\right)}\cdot\mathbf{n}_{\Gamma}\approx\mathbf{0}\label{eq:TFSI-jump-explicit-2}
-\end{equation}
-
-\end_inset
-
-where
-\begin_inset Formula 
-\begin{equation}
-\boldsymbol{\sigma}^{f\left(1\right)}=-p^{\left(1\right)}\mathbf{I}+\boldsymbol{\tau}^{\left(1\right)}\label{eq:fluid-stress}
-\end{equation}
-
-\end_inset
-
-The virtual work integral on a contact interface 
-\begin_inset Formula $\Gamma$
-\end_inset
-
- is normally given by
-\begin_inset Formula 
-\begin{equation}
-\delta G_{c}\approx\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\boldsymbol{\sigma}^{f\left(1\right)}\cdot\mathbf{n}^{\left(1\right)}da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{s\left(2\right)}\cdot\boldsymbol{\sigma}^{s\left(2\right)}\cdot\mathbf{n}^{\left(2\right)}da^{\left(2\right)}=0\label{eq:TFSI-contact-integral-1}
-\end{equation}
-
-\end_inset
-
-Recognizing that 
-\begin_inset Formula $\mathbf{n}^{\left(2\right)}=-\mathbf{n}^{\left(1\right)}=-\mathbf{n}_{\Gamma}$
-\end_inset
-
-,
+ is the referential modulus of the solid material in the solid element below each contact face,
  
-\begin_inset Formula $\Gamma^{\left(2\right)}=\Gamma^{\left(1\right)}\equiv\Gamma$
+\begin_inset Formula $A$
 \end_inset
 
-.
- and using the jump condition of Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:TFSI-jump-explicit-2"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-tuple "list"
-
+ is the surface area of the contact face,
+ and 
+\begin_inset Formula $V$
 \end_inset
 
- produces
-\begin_inset Formula 
-\begin{equation}
-\delta G_{c}\approx\int_{\Gamma}\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\boldsymbol{\sigma}^{f\left(1\right)}\cdot\mathbf{n}_{\Gamma}da_{\Gamma}=0\label{eq:TFSI-contact-integral-2}
-\end{equation}
-
-\end_inset
-
-Using the penalty method,
- we propose that
-\begin_inset Formula 
-\begin{equation}
-\boldsymbol{\sigma}^{f\left(1\right)}\cdot\mathbf{n}_{\Gamma}=\mathbf{t}^{f\left(1\right)}=\varepsilon_{n}\left(\mathbf{u}^{\left(2\right)}-\mathbf{u}^{\left(1\right)}\right)=\varepsilon_{n}\mathbf{g}\label{eq:TFSI-penalty}
-\end{equation}
-
-\end_inset
-
-where
-\begin_inset Formula 
-\begin{equation}
-\mathbf{g}=\mathbf{u}^{\left(2\right)}-\mathbf{u}^{\left(1\right)}\label{eq:TFSI-gap-function}
-\end{equation}
-
-\end_inset
-
-Here,
+ is the volume of said solid element.
+ Moreover,
  we note that
 \begin_inset Formula 
-\begin{equation}
-\mathbf{n}_{\Gamma}=\frac{\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}}{\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right|}\quad\mathbf{g}^{\left(1\right)}_{\alpha}=\frac{\partial\mathbf{x}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{\alpha}}\label{eq:TFSI-unit-normal}
-\end{equation}
+\[
+\mathbf{t}^{f\left(1\right)}_{n+\alpha_{f}}=\left(\boldsymbol{\sigma}^{f\left(1\right)}\cdot\mathbf{n}^{\left(1\right)}\right)_{n+\alpha_{f}}
+\]
 
 \end_inset
 
-and
+thus
 \begin_inset Formula 
-\begin{equation}
-da_{\Gamma}=\underbrace{\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right|}_{J^{\left(1\right)}_{\eta}}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\label{eq:TFSI-parametric-J}
-\end{equation}
-
-\end_inset
-
-Thus,
- using the symmetry of 
-\begin_inset Formula $\boldsymbol{\sigma}^{f\left(1\right)}$
-\end_inset
-
-,
- we may reduce the contact integral in Eq.
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:TFSI-contact-integral-2"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-tuple "list"
-
-\end_inset
-
- to
-\begin_inset Formula 
-\begin{equation}
-\delta G_{c}\approx\int_{\Gamma}\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\varepsilon_{n}\mathbf{g}J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}=0\label{eq:TFSI-contact-integral-3}
-\end{equation}
+\[
+\begin{aligned}\delta G_{c} & =\int_{\Gamma^{\left(1\right)}}\left(\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\mathbf{t}^{s}_{n+\alpha_{f}}\right)J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
+ & -\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\boldsymbol{\sigma}^{f\left(1\right)}_{n+\alpha_{f}}\cdot\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}=0
+\end{aligned}
+\]
 
 \end_inset
 
@@ -63824,7 +63863,7 @@ we need to linearize
 Note that
 \begin_inset Formula 
 \[
-\begin{aligned}\varepsilon_{n}D\mathbf{g} & =\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)\end{aligned}
+\begin{aligned}\varepsilon_{n}D\mathbf{g}_{n+\alpha_{f}} & =\alpha_{f}\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)\end{aligned}
 \]
 
 \end_inset
@@ -63832,7 +63871,25 @@ Note that
 We also note that
 \begin_inset Formula 
 \[
-DJ^{\left(1\right)}_{\eta}=\mathbf{n}_{\Gamma}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)
+DJ^{\left(1\right)}_{\eta}=\alpha_{f}\mathbf{n}_{\Gamma}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+D\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)_{n+\alpha_{f}}=\alpha_{f}\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\begin{aligned}D\left(-p^{\left(1\right)}\mathbf{I}+\boldsymbol{\tau}^{\left(1\right)}\right)_{n+\alpha_{f}} & =\alpha_{f}J^{s}\frac{\partial\boldsymbol{\tau}^{\left(1\right)}}{\partial J^{s\left(1\right)}}:\grad\Delta\mathbf{u}^{\left(1\right)}-\alpha_{f}\frac{\partial p^{\left(1\right)}}{\partial J^{f\left(1\right)}}\Delta J^{f\left(1\right)}\\
+ & +\alpha_{f}\boldsymbol{\mathcal{C}}^{\left(1\right)}_{\tau}:\frac{1}{2}\left(\grad\Delta\mathbf{w}^{\left(1\right)}\grad^{T}\Delta\mathbf{w}^{\left(1\right)}\right)
+\end{aligned}
 \]
 
 \end_inset
@@ -63840,8 +63897,11 @@ DJ^{\left(1\right)}_{\eta}=\mathbf{n}_{\Gamma}\cdot\left(\frac{\partial\Delta\ma
 Thus,
 \begin_inset Formula 
 \[
-\begin{aligned}D\delta G_{c} & \approx\int_{\Gamma}\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
- & +\left(\int_{\Gamma}\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\varepsilon_{n}\mathbf{g}\right)\left(\mathbf{n}_{\Gamma}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}
+\begin{aligned}D\delta G_{c} & =\alpha_{f}\int_{\Gamma^{\left(1\right)}}\left(\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)\right)J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
+ & +\alpha_{f}\int_{\Gamma^{\left(1\right)}}\left(\left(\delta\mathbf{v}^{s\left(1\right)}-\delta\mathbf{v}^{s\left(2\right)}\right)\cdot\mathbf{t}^{s}_{n+\alpha_{f}}\right)\mathbf{n}_{\Gamma}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
+ & -\alpha_{f}\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(J^{s}\boldsymbol{\tau}^{\left(1\right)\prime}_{J^{s\left(1\right)}}:\grad\Delta\mathbf{u}^{\left(1\right)}-\frac{\partial p^{\left(1\right)}_{n+\alpha_{f}}}{\partial J^{f\left(1\right)}}\Delta J^{f\left(1\right)}\right)\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
+ & -\alpha_{f}\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\boldsymbol{\mathcal{C}}^{\left(1\right)}_{\tau}:\frac{1}{2}\left(\grad\Delta\mathbf{w}^{\left(1\right)}+\grad^{T}\Delta\mathbf{w}^{\left(1\right)}\right)\right)\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
+ & -\alpha_{f}\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\boldsymbol{\sigma}^{f\left(1\right)}_{n+\alpha_{f}}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}=0
 \end{aligned}
 \]
 
@@ -63866,13 +63926,25 @@ We use the following discretizations,
 \begin_inset Formula 
 \[
 \begin{aligned}\delta\mathbf{v}^{s\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{a=1}N^{\left(1\right)}_{a}\delta\mathbf{v}^{s\left(1\right)}_{a} & \delta\mathbf{v}^{s\left(2\right)} & =\sum^{n^{\left(b\right)}_{e}}_{b=1}N^{\left(2\right)}_{b}\delta\mathbf{v}^{s\left(2\right)}_{b}\\
-\Delta\mathbf{u}^{\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{u}^{\left(1\right)}_{c} & \Delta\mathbf{u}^{\left(2\right)} & =\sum^{n^{\left(2\right)}_{e}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{u}^{\left(2\right)}_{d}
+\Delta\mathbf{u}^{\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{u}^{\left(1\right)}_{c} & \Delta\mathbf{u}^{\left(2\right)} & =\sum^{n^{\left(2\right)}_{e}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+\Delta J^{f\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{c=1}N^{\left(1\right)}_{c}\Delta J^{\left(1\right)}_{c} & \Delta\mathbf{w}^{\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{w}^{\left(1\right)}_{c}
 \end{aligned}
 \]
 
 \end_inset
 
 Then,
+\begin_inset Formula 
+\[
+\begin{aligned}\delta G_{c} & =\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{s\left(1\right)}_{a}\cdot\int_{\Gamma^{\left(1\right)}}N^{\left(1\right)}_{a}\mathbf{t}^{s}_{n+\alpha_{f}}J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
+ & -\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{s\left(1\right)}_{a}\cdot\int_{\Gamma^{\left(1\right)}}N^{\left(1\right)}_{a}\boldsymbol{\sigma}^{f\left(1\right)}_{n+\alpha_{f}}\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
+ & -\sum^{n^{\left(b\right)}_{e}}_{b=1}\delta\mathbf{v}^{s\left(2\right)}_{b}\cdot\int_{\Gamma^{\left(1\right)}}N^{\left(2\right)}_{b}\mathbf{t}^{s}_{n+\alpha_{f}}J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}=0
+\end{aligned}
+\]
+
+\end_inset
+
+
 \begin_inset Formula 
 \[
 \begin{aligned}\delta G_{c} & \approx\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{s\left(1\right)}_{a}\cdot\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}\mathbf{f}^{\left(1\right)}_{a}\\
@@ -63885,7 +63957,7 @@ Then,
 where
 \begin_inset Formula 
 \[
-\begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =\varepsilon_{n}N^{\left(1\right)}_{a}\mathbf{g}J^{\left(1\right)}_{\eta}\\
+\begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =N^{\left(1\right)}_{a}\left(\mathbf{t}^{s}_{n+\alpha_{f}}J^{\left(1\right)}_{\eta}-\boldsymbol{\sigma}^{f\left(1\right)}_{n+\alpha_{f}}\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)\right)\\
 \mathbf{f}^{\left(2\right)}_{b} & =-\varepsilon_{n}N^{\left(2\right)}_{b}\mathbf{g}J^{\left(1\right)}_{\eta}
 \end{aligned}
 \]
@@ -63893,6 +63965,22 @@ where
 \end_inset
 
 We also get
+\begin_inset Formula 
+\[
+\begin{aligned}D\delta G_{c} & =-\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{s\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\int_{\Gamma^{\left(1\right)}}\varepsilon_{n}N^{\left(1\right)}_{a}\left(N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\,d\eta^{\left(1\right)}_{1}+\mathbf{g}_{n+\alpha_{f}}\otimes\left(\boldsymbol{\mathcal{A}}_{c}\cdot\mathbf{n}_{\Gamma}\right)\right)d\eta^{\left(1\right)}_{2}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+ & -\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{s\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\int_{\Gamma^{\left(1\right)}}N^{\left(1\right)}_{a}\left(J^{s}\boldsymbol{\tau}^{\left(1\right)\prime}_{J^{s\left(1\right)}}\cdot\grad N^{\left(1\right)}_{c}\right)\otimes\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+ & +\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{s\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\int_{\Gamma^{\left(1\right)}}N^{\left(1\right)}_{a}\left(\boldsymbol{\sigma}^{f\left(1\right)}_{n+\alpha_{f}}\cdot\boldsymbol{\mathcal{A}}_{c}+\varepsilon_{n}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+ & -\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{s\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\int_{\Gamma^{\left(1\right)}}N^{\left(1\right)}_{a}\left(\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)\cdot\boldsymbol{\mathcal{C}}^{\left(1\right)}_{\tau}\cdot\grad N^{\left(1\right)}_{c}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\cdot\Delta\mathbf{w}^{\left(1\right)}_{c}\\
+ & +\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{s\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\int_{\Gamma^{\left(1\right)}}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}p^{\left(1\right)\prime}_{J^{f\left(1\right)}}\left(\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\Delta J^{\left(1\right)}_{c}\\
+ & +\alpha_{f}\sum^{n^{\left(b\right)}_{e}}_{b=1}\delta\mathbf{v}^{s\left(2\right)}_{b}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\int_{\Gamma^{\left(1\right)}}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+ & -\alpha_{f}\sum^{n^{\left(b\right)}_{e}}_{b=1}\delta\mathbf{v}^{s\left(2\right)}_{b}\cdot\sum^{n^{\left(2\right)}_{e}}_{d=1}\int_{\Gamma^{\left(1\right)}}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\cdot\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+ & +\alpha_{f}\sum^{n^{\left(b\right)}_{e}}_{b=1}\delta\mathbf{v}^{s\left(2\right)}_{b}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\int_{\Gamma^{\left(1\right)}}N^{\left(2\right)}_{b}\mathbf{t}^{s}_{n+\alpha_{f}}\otimes\left(\boldsymbol{\mathcal{A}}_{c}\cdot\mathbf{n}_{\Gamma}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}
+\end{aligned}
+\]
+
+\end_inset
+
+
 \begin_inset Formula 
 \[
 \begin{aligned}D\delta G_{c} & =\sum^{n^{\left(1\right)}_{e}}_{a=1}\left[\begin{array}{ccc}
@@ -64043,33 +64131,7 @@ tuple "list"
 .
  Thus,
  the linearization stays the same.
- This presentation strongly suggests that the value of 
-\begin_inset Formula $\varepsilon_{n}$
-\end_inset
-
- in an auto-penalty scheme may be normalized locally by
-\begin_inset Formula 
-\[
-\varepsilon_{n}\propto\frac{A}{V}E
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $E$
-\end_inset
-
- is the referential modulus of the solid material in the solid element below each contact face,
  
-\begin_inset Formula $A$
-\end_inset
-
- is the surface area of the contact face,
- and 
-\begin_inset Formula $V$
-\end_inset
-
- is the volume of said solid element.
 \end_layout
 
 \begin_layout Section
