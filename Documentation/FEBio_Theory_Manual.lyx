@@ -23873,6 +23873,54 @@ literal "true"
 .
 \end_layout
 
+\begin_layout Standard
+Importantly,
+ it follows that
+\begin_inset Formula 
+\[
+D\dot{\mathbf{v}}^{s}_{n+1}\left[\Delta\mathbf{u}\right]=\frac{\Delta\mathbf{u}}{\beta\Delta t^{2}}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+D\mathbf{v}^{s}_{n+1}\left[\Delta\mathbf{u}\right]=\frac{\gamma}{\beta\Delta t}\Delta\mathbf{u}
+\]
+
+\end_inset
+
+Moreover,
+ since 
+\begin_inset Formula $\mathbf{w}=\mathbf{v}^{f}-\mathbf{v}^{s}$
+\end_inset
+
+,
+ we have
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{L}^{w} & =\mathbf{L}^{f}-\mathbf{L}^{s}\\
+\mathbf{D}^{w} & =\mathbf{D}^{f}-\mathbf{D}^{s}
+\end{aligned}
+\]
+
+\end_inset
+
+thus,
+\begin_inset Formula 
+\[
+\begin{aligned}D\boldsymbol{\sigma}^{f}_{n+\alpha_{f}}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\boldsymbol{\mathcal{C}}^{\tau}:\left(\frac{\gamma}{\beta\Delta t}\mathbf{I}-\grad\mathbf{v}^{s}\right)\cdot\grad\Delta\mathbf{u}\\
+D\boldsymbol{\sigma}^{f}_{n+\alpha_{f}}\left[\Delta\mathbf{w}\right] & =\alpha_{f}\boldsymbol{\mathcal{C}}^{\tau}:\grad\Delta\mathbf{w}\\
+D\boldsymbol{\sigma}^{f}_{n+\alpha_{f}}\left[\Delta J^{f}\right] & =\alpha_{f}\left(-p^{\prime}_{J^{f}}\mathbf{I}+\boldsymbol{\tau}^{\prime}_{J^{f}}\right)\Delta J^{f}
+\end{aligned}
+\]
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Discretization
 \end_layout
@@ -25021,15 +25069,19 @@ At a fluid-solid interface
  The resulting virtual work on the solid domain is
 \begin_inset Formula 
 \[
-\delta G=\int_{\Gamma}\delta\mathbf{v}^{s}\cdot\mathbf{t}^{s}_{n+\alpha_{f}}\,da=\int_{\Gamma}-\delta\mathbf{v}^{s}\cdot\boldsymbol{\sigma}^{f}\cdot\mathbf{n}\,da=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\boldsymbol{\sigma}^{f}\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\,d\eta^{1}d\eta^{2}
+\delta G=\int_{\Gamma}\delta\mathbf{v}^{s}\cdot\mathbf{t}^{s}_{n+\alpha_{f}}\,da=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\boldsymbol{\sigma}^{f}_{n+\alpha_{f}}\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)_{n+\alpha_{f}}\,d\eta^{1}d\eta^{2}
 \]
 
 \end_inset
 
-The linearization of this work is given by
+The linearization of this work uses 
+\begin_inset Formula $D\boldsymbol{\sigma}^{f}_{n+\alpha_{f}}$
+\end_inset
+
+ and is given by
 \begin_inset Formula 
 \[
-D\delta G\left[\Delta\mathbf{u}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\alpha_{f}\left[\left(\boldsymbol{\mathcal{C}}^{v}:\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)+\boldsymbol{\sigma}^{f}\cdot\left(\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\times\mathbf{g}_{2}+\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}\right)\right]\,d\eta^{1}d\eta^{2}
+D\delta G\left[\Delta\mathbf{u}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\alpha_{f}\left[\left(\boldsymbol{\mathcal{C}}^{\tau}:\mathbf{M}\cdot\grad\Delta\mathbf{u}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)+\boldsymbol{\sigma}^{f}\cdot\left(\mathbf{g}_{1}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{2}}-\mathbf{g}_{2}\times\frac{\partial\Delta\mathbf{u}}{\partial\eta^{1}}\right)\right]\,d\eta^{1}d\eta^{2}
 \]
 
 \end_inset
@@ -25037,7 +25089,15 @@ D\delta G\left[\Delta\mathbf{u}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}
 where 
 \begin_inset Formula 
 \[
-\mathbf{g}_{\alpha}=\frac{\partial\mathbf{x}}{\partial\eta^{\alpha}}
+\mathbf{M}=\frac{\gamma}{\beta\Delta t}\mathbf{I}-\grad\mathbf{v}^{s}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\left(\mathbf{g}_{\alpha}\right)_{n+\alpha_{f}}=\frac{\partial\mathbf{x}_{n+\alpha_{f}}}{\partial\eta^{\alpha}}
 \]
 
 \end_inset
@@ -25050,7 +25110,7 @@ are covariant basis vectors on
  Similarly,
 \begin_inset Formula 
 \[
-D\delta G\left[\Delta\mathbf{w}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\alpha_{f}\left[\left(\boldsymbol{\mathcal{C}}^{v}:\grad\Delta\mathbf{w}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\right]\,d\eta^{1}d\eta^{2}
+D\delta G\left[\Delta\mathbf{w}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\alpha_{f}\left[\left(\boldsymbol{\mathcal{C}}^{\tau}:\grad\Delta\mathbf{w}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\right]\,d\eta^{1}d\eta^{2}
 \]
 
 \end_inset
@@ -25058,7 +25118,7 @@ D\delta G\left[\Delta\mathbf{w}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}
 and
 \begin_inset Formula 
 \[
-D\delta G\left[\Delta J^{f}\right]=\int_{\Gamma_{\eta}}-\Delta J^{f}\delta\mathbf{v}^{s}\cdot\alpha_{f}\left[\left(-p^{\prime}\left(J^{f}\right)+\boldsymbol{\tau}^{\prime}_{J}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\right]\,d\eta^{1}d\eta^{2}
+D\delta G\left[\Delta J^{f}\right]=\int_{\Gamma_{\eta}}-\delta\mathbf{v}^{s}\cdot\alpha_{f}\left(-p^{\prime}_{J^{f}}\mathbf{I}+\boldsymbol{\tau}^{\prime}_{J^{f}}\right)\cdot\left(\mathbf{g}_{1}\times\mathbf{g}_{2}\right)\Delta J^{f}\,d\eta^{1}d\eta^{2}
 \]
 
 \end_inset
@@ -61588,6 +61648,354 @@ where
 \end_layout
 
 \begin_layout Section
+Tied Elastic Contact
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Tied-Elastic-Contact"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This contact interface nearly identical to the Tied Contact Interface described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ except that the formulation uses the notation employed in the subsequent tied interfaces described below,
+ and followd the Generalized
+\begin_inset Formula $-\alpha$
+\end_inset
+
+ integration scheme.
+ Here,
+ the contact integral takes the form
+\begin_inset Formula 
+\begin{equation}
+\delta G_{c}=\left(\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{\left(1\right)}\cdot\mathbf{t}^{\left(1\right)}da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{\left(2\right)}\cdot\mathbf{t}^{\left(2\right)}da^{\left(2\right)}\right)_{n+\alpha_{f}}=0\label{eq:te-contact-integral-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma^{\left(2\right)}$
+\end_inset
+
+ represent the two sides of the interface 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+,
+ and this entire integral is evaluated at the intermediate time 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+.
+ Recognizing that 
+\begin_inset Formula $\mathbf{t}^{\left(\alpha\right)}=\boldsymbol{\sigma}^{\left(\alpha\right)}\cdot\mathbf{n}^{\left(\alpha\right)}$
+\end_inset
+
+ and that 
+\begin_inset Formula $\mathbf{n}^{\left(2\right)}=-\mathbf{n}^{\left(1\right)}$
+\end_inset
+
+,
+ and recognizing that both 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma^{\left(2\right)}$
+\end_inset
+
+ collapse onto 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ in a tied-contact interface,
+ we may rewrite this integral as
+\begin_inset Formula 
+\begin{equation}
+\delta G_{c}=\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}_{n+\alpha_{f}}\,J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}=0\label{eq:te-contact-integral-2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{t}_{n+\alpha_{f}}\equiv\mathbf{t}^{\left(1\right)}_{n+\alpha_{f}}$
+\end_inset
+
+ and
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}J^{\left(1\right)}_{\eta} & =\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right| & \mathbf{g}^{\left(1\right)}_{\alpha} & =\frac{\partial\mathbf{x}^{\left(1\right)}_{n+\alpha_{f}}}{\partial\eta^{\left(1\right)}_{\alpha}}\end{aligned}
+\label{eq:te-area-determinant}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Gap Function
+\end_layout
+
+\begin_layout Standard
+Using the penalty method,
+ we let
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{t}_{n+\alpha_{f}} & =\varepsilon_{n}\mathbf{g}_{n+\alpha_{f}} & \mathbf{g}_{n+\alpha_{f}} & =\mathbf{x}^{\left(2\right)}_{n+\alpha_{f}}-\mathbf{x}^{\left(1\right)}_{n+\alpha_{f}}\end{aligned}
+\label{eq:te-penalty-gap}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{g}_{n+\alpha_{f}}$
+\end_inset
+
+ is the gap function and 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ is a penalty factor.
+ When using an augmented Lagrangian method,
+ we supplement this expression with the vectorial Lagrangian augmentation 
+\begin_inset Formula $\boldsymbol{\lambda}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}_{n+\alpha_{f}}=\boldsymbol{\lambda}+\varepsilon_{n}\mathbf{g}_{n+\alpha_{f}}\label{eq:te-augmented-Lagrangian}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linearization of the Contact Integral
+\end_layout
+
+\begin_layout Standard
+We solve this system by using Newton's method,
+\begin_inset Formula 
+\begin{equation}
+\delta G_{c}+D\left(\delta G_{c}\right)\approx0\label{eq:te-Newton-method}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+D\left(\delta G_{c}\right)=D\left(\delta G_{c}\right)\left[\Delta\mathbf{u}^{\left(1\right)}\right]+D\left(\delta G_{c}\right)\left[\Delta\mathbf{u}^{\left(2\right)}\right]\label{eq:te-contact-integral-linearization-1}
+\end{equation}
+
+\end_inset
+
+represents the linearization of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+.
+ We find that
+\begin_inset Formula 
+\begin{equation}
+D\left(\delta G_{c}\right)=\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(D\mathbf{t}_{n+\alpha_{f}}\,J^{\left(1\right)}_{\eta}+\mathbf{t}_{n+\alpha_{f}}\,DJ^{\left(1\right)}_{\eta}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\label{eq:et-contact-integra-linearization-2}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{t}_{n+\alpha_{f}} & =D\mathbf{t}_{n+\alpha_{f}}\left[\Delta\mathbf{u}^{\left(1\right)}\right]+D\mathbf{t}_{n+\alpha_{f}}\left[\Delta\mathbf{u}^{\left(2\right)}\right]\\
+ & =\alpha_{f}\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)
+\end{aligned}
+\label{eq:te-contact-traction-linearization}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}DJ^{\left(1\right)}_{\eta} & =DJ^{\left(1\right)}_{\eta}\left[\Delta\mathbf{u}^{\left(1\right)}\right]\\
+ & =\alpha_{f}\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)
+\end{aligned}
+\label{eq:te-area-determinant-linearization}
+\end{equation}
+
+\end_inset
+
+thus,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\left(\delta G_{c}\right) & =\alpha_{f}\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)J^{\left(1\right)}_{\eta}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
+ & +\alpha_{f}\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)\right)\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}
+\end{aligned}
+\label{eq:te-contact-integral-linearization-3}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discretization
+\end_layout
+
+\begin_layout Standard
+To discretize 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+and 
+\begin_inset Formula $D\left(\delta G_{c}\right)$
+\end_inset
+
+,
+ we use
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{v}^{\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{a=1}N^{\left(1\right)}_{a}\delta\mathbf{v}^{\left(1\right)}_{a} & \delta\mathbf{v}^{\left(2\right)} & =\sum^{n^{\left(2\right)}_{e}}_{b=1}N^{\left(2\right)}_{b}\delta\mathbf{v}^{\left(2\right)}_{b}\\
+\Delta\mathbf{u}^{\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{u}^{\left(1\right)}_{c} & \Delta\mathbf{u}^{\left(2\right)} & =\sum^{n^{\left(2\right)}_{e}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{u}^{\left(2\right)}_{d}
+\end{aligned}
+\label{eq:te-discretization}
+\end{equation}
+
+\end_inset
+
+and we integrate using Gaussian quadrature,
+ such that
+\begin_inset Formula 
+\begin{equation}
+\int_{\Gamma}f\left(\eta^{\left(1\right)}_{1},\eta^{\left(1\right)}_{2}\right)\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\approx\sum^{ni^{\left(1\right)}}_{k=1}W_{k}f\left(\eta^{\left(1\right)}_{1k},\eta^{\left(1\right)}_{2k}\right)\label{eq:te-Gaussian-quadrature}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $ni^{\left(1\right)}$
+\end_inset
+
+ is the number of integration points on 
+\begin_inset Formula $\Gamma\equiv\Gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\left(\eta^{\left(1\right)}_{1k},\eta^{\left(1\right)}_{2k}\right)$
+\end_inset
+
+ are the corresponding quadrature points.
+ Thus,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\left[\begin{array}{cc}
+\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\left[\begin{array}{c}
+\mathbf{f}^{\left(1\right)}_{a}\\
+\mathbf{f}^{\left(2\right)}_{b}
+\end{array}\right]\end{aligned}
+\label{eq:te-contact-integral-discretized}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =J^{\left(1\right)}_{\eta}N^{\left(1\right)}_{a}\mathbf{t}_{n+\alpha_{f}}\\
+\mathbf{f}^{\left(2\right)}_{b} & =J^{\left(1\right)}_{\eta}N^{\left(2\right)}_{b}\mathbf{t}_{n+\alpha_{f}}
+\end{aligned}
+}\label{eq:te-element-load-vectors}
+\end{equation}
+
+\end_inset
+
+Similarly,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\left(\delta G_{c}\right) & =-\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+ & +\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a}\cdot\sum^{n^{\left(2\right)}_{e}}_{d=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\cdot\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+ & +\alpha_{f}\sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+ & -\alpha_{f}\sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\cdot\sum^{n^{\left(2\right)}_{e}}_{d=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\cdot\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+ & +\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}N^{\left(1\right)}_{a}\left(\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\boldsymbol{\mathcal{A}_{c}}\right)\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+ & -\alpha_{f}\sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}N^{\left(2\right)}_{b}\left(\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\mathcal{A}_{c}\right)\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}
+\end{aligned}
+\label{eq:te-linearized-discretized-contact}
+\end{equation}
+
+\end_inset
+
+or equivalently
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\left(\delta G_{c}\right) & =\left[\begin{array}{cc}
+\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\alpha_{f}\left[\begin{array}{cc}
+\sum^{n^{\left(1\right)}_{e}}_{c=1}\mathbf{K}^{\left(1,1\right)}_{ac} & \sum^{n^{\left(2\right)}_{e}}_{d=1}\mathbf{K}^{\left(1,2\right)}_{ad}\\
+\sum^{n^{\left(1\right)}_{e}}_{c=1}\mathbf{K}^{\left(2,1\right)}_{bc} & \sum^{n^{\left(2\right)}_{e}}_{d=1}\mathbf{K}^{\left(2,2\right)}_{bd}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+\Delta\mathbf{u}^{\left(2\right)}_{d}
+\end{array}\right]\end{aligned}
+\label{eq:te-linearized-contact-matrix}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\mathcal{A}_{c}}$
+\end_inset
+
+ is the antiymmetric tensor whose dual vector is
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{\left(1\right)}_{2}}\mathbf{g}^{\left(1\right)}_{1}-\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{\left(1\right)}_{1}}\mathbf{g}^{\left(1\right)}_{2}\label{eq:te-dual-vector-Ac}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\boxed{\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =N^{\left(1\right)}_{a}\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\boldsymbol{\mathcal{A}_{c}}-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\\
+\mathbf{K}^{\left(1,2\right)}_{ad} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\\
+\mathbf{K}^{\left(2,1\right)}_{bc} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}-N^{\left(2\right)}_{b}\left(\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\mathcal{A}_{c}\right)\\
+\mathbf{K}^{\left(2,2\right)}_{bd} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}
+\end{aligned}
+}\label{eq:te-element-stiffnesses}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 Tied Biphasic Contact
 \begin_inset CommandInset label
 LatexCommand label
@@ -63565,6 +63973,31 @@ name "sec:Tied-Fluid-FSI-Traction"
 \end_layout
 
 \begin_layout Standard
+The tied fluid-FSI-Solid traction interface is technically an enforcement of a tied-elastic interface between the solid matrix of the fluid-FSI material and the solid material.
+ In addition,
+ we need to superpose upon this tied-elastic interface the condition that the fluid traction needs to be prescribed on the solid surface,
+ as explained in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-traction-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ Thus,
+ the 
+\end_layout
+
+\begin_layout Standard
 The linearization of 
 \begin_inset Formula $\delta G_{c}$
 \end_inset
@@ -63632,29 +64065,6 @@ name "subsec:Contact-Integral-TFSI"
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-The tied fluid-FSI-Solid traction interface is technically an enforcement of a tied-elastic interface between the solid matrix of the fluid-FSI material and the solid material.
- In addition,
- we need to superpose upon this tied-elastic interface the condition that the fluid traction needs to be prescribed on the solid surface,
- as explained in Section
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Fluid-traction-Solid"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-tuple "list"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard

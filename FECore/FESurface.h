@@ -248,6 +248,9 @@ public:
 	//! calculates the covariant base vectors of a surface
 	void CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
+    //! calculates the covariant base vectors of a surface, at previous time step
+    void CoBaseVectorsP(FESurfaceElement& el, double r, double s, vec3d t[2]);
+
     //! calculates the covariant base vectors of a surface at an integration point in the reference configuration
     void CoBaseVectors0(const FESurfaceElement& el, int j, vec3d t[2]) const;
     
@@ -271,6 +274,9 @@ public:
     
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
+
+    //! calculates contravariant base vectors of a surface at previous time step
+    void ContraBaseVectorsP(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
