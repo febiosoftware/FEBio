@@ -352,12 +352,12 @@ MITEM MProduct::operator / (const MProduct& d)
 }
 
 //-----------------------------------------------------------------------------
-bool MProduct::operator==(const MProduct& b)
+bool MProduct::operator==(const MProduct& b) const
 {
-	list<MITEM>::iterator pf;
+	list<MITEM>::const_iterator pf;
 	for (pf = m_p.begin(); pf != m_p.end(); ++pf)
 	{
-		MITEM& i = *pf;
+		const MITEM& i = *pf;
 		if (b.contains(i) == false) return false;
 	}
 	return true;
