@@ -507,7 +507,7 @@ bool XMLTag::AttributeValue(const char* szat, int& n, bool bopt)
 //=============================================================================
 
 // helper function for formatting a string
-string format_string(const char* sz, ...)
+string format_error(const char* sz, ...)
 {
 	// get a pointer to the argument list
 	va_list	args;
@@ -523,11 +523,11 @@ string format_string(const char* sz, ...)
 
 //-----------------------------------------------------------------------------
 XMLReader::Error::Error(XMLTag& tag, const std::string& err) : \
-std::runtime_error(format_string("tag \"%s\" (line %d) : ", tag.Name(), tag.m_nstart_line) + err) {}
+std::runtime_error(format_error("tag \"%s\" (line %d) : ", tag.Name(), tag.m_nstart_line) + err) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::XMLSyntaxError::XMLSyntaxError(int line_number) : \
-XMLReader::Error(format_string("syntax error (line %d)", line_number)) {}
+XMLReader::Error(format_error("syntax error (line %d)", line_number)) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::UnmatchedEndTag::UnmatchedEndTag(XMLTag& tag) : \
@@ -539,26 +539,26 @@ XMLReader::Error(tag, "unrecognized tag") {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidValue::InvalidValue(XMLTag& tag) : \
-XMLReader::Error(tag, format_string("invalid value: %s", tag.isleaf() ? tag.szvalue() : "")) {}
+XMLReader::Error(tag, format_error("invalid value: %s", tag.isleaf() ? tag.szvalue() : "")) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, const char* sza, const char* szv) : \
-XMLReader::Error(tag, format_string("invalid value for attribute \"%s\"", sza)) {}
+XMLReader::Error(tag, format_error("invalid value for attribute \"%s\"", sza)) {}
 
 XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, XMLAtt& att) : \
-XMLReader::Error(tag, format_string("invalid value for attribute \"%s\"", att.cvalue())) {}
+XMLReader::Error(tag, format_error("invalid value for attribute \"%s\"", att.cvalue())) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidAttribute::InvalidAttribute(XMLTag& tag, const char* sza) :\
-XMLReader::Error(tag, format_string("invalid attribute \"%s\"", sza)) {}
+XMLReader::Error(tag, format_error("invalid attribute \"%s\"", sza)) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::MissingAttribute::MissingAttribute(XMLTag& tag, const char* sza) : \
-XMLReader::Error(tag, format_string("missing attribute \"%s\"", sza)) {}
+XMLReader::Error(tag, format_error("missing attribute \"%s\"", sza)) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::MissingTag::MissingTag(XMLTag& tag, const char* sza) : \
-XMLReader::Error(tag, format_string("missing tag \"%s\"", sza)) {}
+XMLReader::Error(tag, format_error("missing tag \"%s\"", sza)) {}
 
 //=============================================================================
 // XMLReader
