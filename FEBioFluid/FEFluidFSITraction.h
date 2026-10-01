@@ -28,7 +28,6 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FESurfaceLoad.h>
-#include <FEBioMech/FETiedElasticInterface.h>
 #include "FEFluid.h"
 
 //-----------------------------------------------------------------------------
@@ -68,11 +67,7 @@ protected:
     
 protected:
     bool                m_bshellb;  //!< flag for prescribing traction on shell bottom
-    bool                m_btied;    //!< flag for using a tied-elastic interface
-
-private:
-    FETiedElasticInterface* m_tei;  //!< pointer to tied-elastic interface
-    FESurface*          m_psolid;   //!< point to solid surface in tied-elastic interface
+    bool                m_btied;    //!< flag for when a tied-elastic interface is used
     
     DECLARE_FECORE_CLASS();
 };
