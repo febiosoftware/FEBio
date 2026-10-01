@@ -63972,6 +63972,10 @@ name "sec:Tied-Fluid-FSI-Traction"
 
 \end_layout
 
+\begin_layout Subsection
+Use Tied-Elastic Contact
+\end_layout
+
 \begin_layout Standard
 The tied fluid-FSI-Solid traction interface needs to enforce the following virtual work,
  where 
@@ -64072,6 +64076,222 @@ tuple "list"
  but may be set to 'true' when modeling this tied-fluid-FSI-solid traction,
  to reverse the sign of the fluid-FSI traction (load vector and stiffness matrix).
  
+\end_layout
+
+\begin_layout Standard
+However,
+ we have a problem here,
+ in the sense that the tied-elastic contact interface enforces
+\begin_inset Formula 
+\[
+\mathbf{t}^{s\left(1\right)}=\mathbf{t}^{s\left(2\right)}=\varepsilon_{n}\mathbf{g}
+\]
+
+\end_inset
+
+whereas,
+ for a fluid-FSI domain,
+ we should have a negligible 
+\begin_inset Formula $\mathbf{t}^{s\left(1\right)}\approx\mathbf{0}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Use Continuity of Solid Velocity
+\end_layout
+
+\begin_layout Standard
+So,
+ instead of enforcing a tied-elastic contact interface,
+ what if we explicitly enforce 
+\begin_inset Formula $\mathbf{v}^{s\left(1\right)}=\mathbf{v}^{s\left(2\right)}$
+\end_inset
+
+,
+ equivalent to 
+\begin_inset Formula $\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}=0$
+\end_inset
+
+?
+ We would need to project rays from integration points on 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ to intersect 
+\begin_inset Formula $\Gamma^{\left(2\right)}$
+\end_inset
+
+,
+ to find the matching 
+\begin_inset Formula $\mathbf{v}^{s\left(2\right)}$
+\end_inset
+
+ for a given 
+\begin_inset Formula $\mathbf{v}^{s\left(1\right)}$
+\end_inset
+
+.
+ Then,
+ our virtual work takes the form
+\begin_inset Formula 
+\begin{equation}
+\delta G_{v}=\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)\,da^{\left(1\right)}=0\label{eq:cvs-virtual-work}
+\end{equation}
+
+\end_inset
+
+where the integrand is evaluated at the intermediate time point 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+,
+ and where 
+\begin_inset Formula $\mathbf{v}^{2\left(s\right)}$
+\end_inset
+
+ is evaluated at the parametric coordinates of the intersection point of the ray issued from integration points on 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+.
+ The linearization of 
+\begin_inset Formula $\delta G_{v}$
+\end_inset
+
+ would take the form
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{v} & =\int_{\Gamma_{\eta}}\delta\mathbf{v}^{s\left(1\right)}\cdot D\left(\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)\,J^{\left(1\right)}_{\eta}\right)d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+ & =\int_{\Gamma_{\eta}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\left(D\mathbf{v}^{s\left(1\right)}-D\mathbf{v}^{s\left(2\right)}\right)J^{\left(1\right)}_{\eta}+\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)DJ^{\left(1\right)}_{\eta}\right)d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+\end{aligned}
+\label{eq:cvs-linearization-vw}
+\end{equation}
+
+\end_inset
+
+Recall that
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{v}^{s\left(1\right)}_{n+\alpha_{f}} & =\alpha_{f}\frac{\gamma}{\beta\Delta t}\Delta\mathbf{u}^{\left(1\right)}\\
+D\mathbf{v}^{s\left(2\right)}_{n+\alpha_{f}} & =\alpha_{f}\frac{\gamma}{\beta\Delta t}\Delta\mathbf{u}^{\left(2\right)}\\
+D\left(J^{\left(1\right)}_{\eta}\right)_{n+\alpha_{f}} & =\alpha_{f}\left(\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{2}_{\left(1\right)}}-\mathbf{g}^{\left(1\right)}_{2}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{1}_{\left(1\right)}}\right)\cdot\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\\
+ & =\alpha_{f}\mathcal{\boldsymbol{A}}\cdot\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}
+\end{aligned}
+\label{eq:cvs-time-discretization-linearization}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathcal{\boldsymbol{A}}$
+\end_inset
+
+ is the antisymmetric tensor whose dual vector is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}=\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{2}_{\left(1\right)}}-\mathbf{g}^{\left(1\right)}_{2}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{1}_{\left(1\right)}}\label{eq:cvs-dual-vector}
+\end{equation}
+
+\end_inset
+
+Thus,
+\begin_inset Formula 
+\begin{equation}
+D\delta G_{v}=\alpha_{f}\int_{\Gamma_{\eta}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\frac{\gamma}{\beta\Delta t}\left(\Delta\mathbf{u}^{\left(1\right)}-\Delta\mathbf{u}^{\left(2\right)}\right)J^{\left(1\right)}_{\eta}+\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)\mathcal{\boldsymbol{A}}\cdot\mathbf{n}^{\left(1\right)}\right)d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\label{eq:cvs-linearization-vw-final}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discretization
+\end_layout
+
+\begin_layout Standard
+Using
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{v}^{s\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{a=1}N^{\left(1\right)}_{a}\delta\mathbf{v}^{\left(1\right)}_{a}\\
+\Delta\mathbf{u}^{\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{u}^{\left(1\right)}_{c} & \Delta\mathbf{u}^{\left(2\right)} & =\sum^{n^{\left(2\right)}_{e}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{u}^{\left(2\right)}_{d}
+\end{aligned}
+\label{eq:cvs-discretization}
+\end{equation}
+
+\end_inset
+
+we get
+\begin_inset Formula 
+\begin{equation}
+\delta G_{v}=\left[\begin{array}{cc}
+\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\left[\begin{array}{c}
+\mathbf{f}^{\left(1\right)}_{a}\\
+\mathbf{0}
+\end{array}\right]\label{eq:cvs-vw-discretization}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{f}^{\left(1\right)}_{a}=N^{\left(1\right)}_{a}\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)J^{\left(1\right)}_{\eta}\label{eq:cvs-element-load-vector}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{v} & =\left[\begin{array}{cc}
+\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}\alpha_{f}W_{k}\left[\begin{array}{cc}
+\mathbf{K}^{\left(1,1\right)}_{ac} & \mathbf{K}^{\left(1,2\right)}_{ad}\\
+\mathbf{0} & \mathbf{0}
+\end{array}\right]\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+\Delta\mathbf{u}^{\left(2\right)}_{d}
+\end{array}\right]\end{aligned}
+\label{eq:cvs-linerized-vw-discretization}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =N^{\left(1\right)}_{a}\left(\frac{\gamma}{\beta\Delta t}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}+\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)\otimes\mathbf{n}^{\left(1\right)}\cdot\mathcal{\boldsymbol{A}}^{\left(1\right)}_{c}\right)\\
+\mathbf{K}^{\left(1,2\right)}_{ad} & =-N^{\left(1\right)}_{a}\frac{\gamma}{\beta\Delta t}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}
+\end{aligned}
+\label{eq:cvs-element-stiffness-matrix}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathcal{\boldsymbol{A}}=\sum^{n^{\left(1\right)}_{e}}_{c=1}\mathcal{\boldsymbol{A}}^{\left(1\right)}_{c}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\label{eq:cvs-A-Ac-relation}
+\end{equation}
+
+\end_inset
+
+and where 
+\begin_inset Formula $\mathcal{\boldsymbol{A}}^{\left(1\right)}_{c}$
+\end_inset
+
+ is the antisymmetric tensor whose dual vector is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}^{\left(1\right)}_{c}=\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{2}_{\left(1\right)}}\mathbf{g}^{\left(1\right)}_{1}-\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{1}_{\left(1\right)}}\mathbf{g}^{\left(1\right)}_{2}\label{eq:cvs-dual-vector-Ac}
+\end{equation}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
