@@ -335,8 +335,8 @@ bool FEExplicitSolidSolver::CalculateMassMatrix()
 					{
 						FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 						double d = pme->Density(mp);
-						double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
-						Me += d * detJ0 * w[n];
+						double detJ0 = pbd->detJ0(el, n)*w[n];
+						Me += d * detJ0;
 
 						double* H = el.H(n);
 						for (int i = 0; i < neln; ++i)
