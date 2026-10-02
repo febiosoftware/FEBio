@@ -102,7 +102,16 @@ void FEFluidFSITraction::Activate()
 		FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
 		if (pfsi) {
 			double s = m_psurf->FacePointing(el, *m_elem[j]);
-			m_s[j] = bself ? -s : s;
+			// m_s[j]*(g1 x g2) points outward from the fluid-FSI element when m_s[j] = s.
+			// By default, the orientation is reversed on faces attached to a single
+			// (fluid-FSI) element. When this traction is combined with a tied interface
+			// (non-contiguous fluid-FSI and solid meshes), every face is attached to a
+			// single fluid-FSI element, and the normal must point outward from the
+			// fluid-FSI domain so that the solid degrees of freedom receive -t^f,
+			// consistent with Eq. (2.19) of Shim et al., JBME 2019 (FEBio Theory Manual,
+			// Section "Fluid traction acting on solid interface"). The tied interface
+			// then transmits this traction to the solid domain.
+			m_s[j] = (bself && !m_btied) ? -s : s;
 			assert(m_s[j]);
 		}
 		else if (!bself) {
@@ -187,8 +196,8 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R)
 		double ef = GetFluidDilatation(mp, tp.alphaf);
         double p = pfsi->Fluid()->Pressure(ef);
 
-		// evaluate traction
-		vec3d f = m_btied ? -gt*p + sv*gt : gt*p - sv*gt;
+		// evaluate traction f = -sigma^f . (g1 x g2), with sigma^f = -p I + tau
+		vec3d f = gt*p - sv*gt;
 
 		double H = dof_a.shape;
 		fa[0] = H * f.x;
@@ -272,19 +281,20 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS)
 		ps->ContraBaseVectors(el, mp.m_index, gcnt);
 		ps->ContraBaseVectorsP(el, mp.m_index, gcntp);
 		for (int i = 0; i<neln; ++i)
-			gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*(Gr[i]*m_s[iel]) +
+			gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*Gr[i] +
 			(gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i];
 
 		// calculate stiffness component
 		int i = dof_a.index;
 		int j = dof_b.index;
-		vec3d v = gr*Gs[j] - gs*Gr[j];
+		// dual vector of D(m_s*(g1 x g2)); note that gr already includes m_s
+		vec3d v = gr*Gs[j] - gs*(Gr[j]*m_s[iel]);
 		mat3d A; A.skew(v);
 		mat3d Kv = vdotTdotv(gt, cv, gradN[j]);
 
-        mat3d Kuu = (sv*A + Kv*M)*N[i] - A*(N[i] * p); Kuu *= m_btied ? alpha : -alpha;
-        mat3d Kuw = Kv*N[i]; Kuw *= m_btied ? alpha : -alpha;
-        vec3d kuJ = svJ*gt*(N[i] * N[j]) - f*(N[i] * N[j]); kuJ *= m_btied ? alpha : -alpha;
+        mat3d Kuu = (sv*A + Kv*M)*N[i] - A*(N[i] * p); Kuu *= -alpha;
+        mat3d Kuw = Kv*N[i]; Kuw *= -alpha;
+        vec3d kuJ = svJ*gt*(N[i] * N[j]) - f*(N[i] * N[j]); kuJ *= -alpha;
 
 		Kab.zero();
 		Kab.sub(0, 0, Kuu);

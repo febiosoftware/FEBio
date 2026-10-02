@@ -67,7 +67,9 @@ protected:
     
 protected:
     bool                m_bshellb;  //!< flag for prescribing traction on shell bottom
-    bool                m_btied;    //!< flag for when a tied-elastic interface is used
+    bool                m_btied;    //!< set to true when the fluid-FSI and solid meshes are non-contiguous and
+                                    //!< joined by a tied interface (e.g., tied-elastic); the traction normal then
+                                    //!< points outward from the fluid-FSI domain on every face (see Activate)
     
     DECLARE_FECORE_CLASS();
 };

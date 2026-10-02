@@ -63989,12 +63989,70 @@ The tied fluid-FSI-Solid traction interface needs to enforce the following virtu
  represents the solid domain:
 \begin_inset Formula 
 \[
-\delta G=\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\mathbf{t}^{s\left(1\right)}+\mathbf{t}^{f\left(1\right)}\right)\,da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{s\left(2\right)}\cdot\mathbf{t}^{s\left(2\right)}\,da^{\left(2\right)}
+\delta G=\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\mathbf{t}^{s\left(1\right)}-\mathbf{t}^{f\left(1\right)}\right)\,da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{s\left(2\right)}\cdot\mathbf{t}^{s\left(2\right)}\,da^{\left(2\right)}
 \]
 
 \end_inset
 
-However,
+where 
+\begin_inset Formula $\mathbf{t}^{f\left(1\right)}=\boldsymbol{\sigma}^{f}\cdot\mathbf{n}^{\left(1\right)}$
+\end_inset
+
+ is the fluid traction,
+ 
+\begin_inset Formula $\mathbf{n}^{\left(1\right)}$
+\end_inset
+
+ is the outward unit normal to the fluid-FSI domain on 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+,
+ and 
+\begin_inset Formula $\mathbf{t}^{s\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{t}^{s\left(2\right)}$
+\end_inset
+
+ are the tractions acting across the interface on the solid constituent of the fluid-FSI domain and on the solid domain,
+ respectively.
+ The term 
+\begin_inset Formula $-\mathbf{t}^{f\left(1\right)}$
+\end_inset
+
+ is needed because the internal virtual work of the solid constituent of a fluid-FSI domain only includes the (negligible) stress 
+\begin_inset Formula $\boldsymbol{\sigma}^{s}$
+\end_inset
+
+ of that constituent;
+ the fluid traction is therefore not transferred to the solid degrees of freedom and must be supplemented explicitly 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim19"
+literal "false"
+
+\end_inset
+
+ (see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-traction-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+).
+ Furthermore,
  one may note that 
 \begin_inset Formula $\delta G$
 \end_inset
@@ -64031,7 +64089,7 @@ tuple "list"
  in the form
 \begin_inset Formula 
 \[
-\delta G=\underbrace{\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\mathbf{t}^{f\left(1\right)}\,da^{\left(1\right)}}_{\delta F}+\underbrace{\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\mathbf{t}^{s\left(1\right)}\,da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{s\left(2\right)}\cdot\mathbf{t}^{s\left(2\right)}\,da^{\left(2\right)}}_{\delta G_{c}}
+\delta G=\underbrace{-\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\mathbf{t}^{f\left(1\right)}\,da^{\left(1\right)}}_{\delta F}+\underbrace{\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\mathbf{t}^{s\left(1\right)}\,da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{s\left(2\right)}\cdot\mathbf{t}^{s\left(2\right)}\,da^{\left(2\right)}}_{\delta G_{c}}
 \]
 
 \end_inset
@@ -64040,11 +64098,7 @@ whereas the remainder
 \begin_inset Formula $\delta F$
 \end_inset
 
- of 
-\begin_inset Formula $\delta G_{c}$
-\end_inset
-
- is just the negative of the fluid-FSI traction described in Section
+ is identical to the fluid-FSI traction described in Section
 \begin_inset space ~
 \end_inset
 
@@ -64060,7 +64114,21 @@ tuple "list"
 
 \end_inset
 
-.
+,
+ applied on 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ with its original sign (Eq.
+ (2.19) of 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim19"
+literal "false"
+
+\end_inset
+
+).
  Therefore,
  it is easy to implement this type of tied-fluid-FSI-solid traction by adding a tied-elastic interface to a model with non-contiguous mesh domains for fluid-FSI and solid,
  with 
@@ -64072,226 +64140,157 @@ tuple "list"
 \end_inset
 
  as the secondary surface.
- Then add a flag to the fluid-FSI traction which defaults to 'false',
- but may be set to 'true' when modeling this tied-fluid-FSI-solid traction,
- to reverse the sign of the fluid-FSI traction (load vector and stiffness matrix).
+ The fluid-FSI traction should be prescribed on the facets of the fluid-FSI elements on 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+,
+ so that 
+\begin_inset Formula $\mathbf{g}_{1}\times\mathbf{g}_{2}$
+\end_inset
+
+ points outward from the fluid-FSI domain,
+ consistent with Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Fluid-traction-Solid"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+;
+ no reversal of its sign is needed.
+ In addition,
+ a no-slip condition 
+\begin_inset Formula $\mathbf{w}=\mathbf{0}$
+\end_inset
+
+ must be prescribed on 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+.
  
 \end_layout
 
 \begin_layout Standard
-However,
- we have a problem here,
- in the sense that the tied-elastic contact interface enforces
+Note that the tied-elastic contact interface enforces
 \begin_inset Formula 
 \[
-\mathbf{t}^{s\left(1\right)}=\mathbf{t}^{s\left(2\right)}=\varepsilon_{n}\mathbf{g}
+\mathbf{t}^{s\left(1\right)}=-\mathbf{t}^{s\left(2\right)}=\varepsilon_{n}\mathbf{g}
 \]
 
 \end_inset
 
-whereas,
- for a fluid-FSI domain,
- we should have a negligible 
-\begin_inset Formula $\mathbf{t}^{s\left(1\right)}\approx\mathbf{0}$
+(Eqs.
+\begin_inset space ~
 \end_inset
 
-.
- 
-\end_layout
 
-\begin_layout Subsection
-Use Continuity of Solid Velocity
-\end_layout
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-contact-integral-2"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
 
-\begin_layout Standard
-So,
- instead of enforcing a tied-elastic contact interface,
- what if we explicitly enforce 
-\begin_inset Formula $\mathbf{v}^{s\left(1\right)}=\mathbf{v}^{s\left(2\right)}$
 \end_inset
 
-,
- equivalent to 
-\begin_inset Formula $\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}=0$
+ and
+\begin_inset space ~
 \end_inset
 
-?
- We would need to project rays from integration points on 
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-penalty-gap"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+).
+ These contact tractions should not be confused with the traction 
+\begin_inset Formula $\boldsymbol{\sigma}^{s\left(1\right)}\cdot\mathbf{n}^{\left(1\right)}$
+\end_inset
+
+ produced by the stress in the solid constituent of the fluid-FSI domain,
+ which remains negligible because of the negligible stiffness of that constituent.
+ Indeed,
+ the boundary condition on 
 \begin_inset Formula $\Gamma^{\left(1\right)}$
 \end_inset
 
- to intersect 
-\begin_inset Formula $\Gamma^{\left(2\right)}$
+ implied by 
+\begin_inset Formula $\delta G$
+\end_inset
+
+ is 
+\begin_inset Formula $\boldsymbol{\sigma}^{s\left(1\right)}\cdot\mathbf{n}^{\left(1\right)}=\mathbf{t}^{s\left(1\right)}-\mathbf{t}^{f\left(1\right)}$
 \end_inset
 
 ,
- to find the matching 
-\begin_inset Formula $\mathbf{v}^{s\left(2\right)}$
+ so that 
+\begin_inset Formula $\mathbf{t}^{s\left(1\right)}\approx\mathbf{t}^{f\left(1\right)}$
 \end_inset
 
- for a given 
-\begin_inset Formula $\mathbf{v}^{s\left(1\right)}$
-\end_inset
-
-.
- Then,
- our virtual work takes the form
-\begin_inset Formula 
-\begin{equation}
-\delta G_{v}=\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)\,da^{\left(1\right)}=0\label{eq:cvs-virtual-work}
-\end{equation}
-
-\end_inset
-
-where the integrand is evaluated at the intermediate time point 
-\begin_inset Formula $t_{n+\alpha_{f}}$
+ and the solid domain receives the traction 
+\begin_inset Formula $\mathbf{t}^{s\left(2\right)}\approx-\mathbf{t}^{f\left(1\right)}$
 \end_inset
 
 ,
- and where 
-\begin_inset Formula $\mathbf{v}^{2\left(s\right)}$
-\end_inset
+ as required by the balance of the mixture traction across the interface 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim19"
+literal "false"
 
- is evaluated at the parametric coordinates of the intersection point of the ray issued from integration points on 
-\begin_inset Formula $\Gamma^{\left(1\right)}$
 \end_inset
 
 .
- The linearization of 
-\begin_inset Formula $\delta G_{v}$
+ Thus,
+ the tied-elastic contact interface transmits the fluid traction to the solid domain.
+ Since the contact traction has the magnitude of the fluid traction,
+ the residual gap is 
+\begin_inset Formula $\left|\mathbf{g}\right|\approx\left|\mathbf{t}^{f\left(1\right)}\right|/\varepsilon_{n}$
 \end_inset
 
- would take the form
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}D\delta G_{v} & =\int_{\Gamma_{\eta}}\delta\mathbf{v}^{s\left(1\right)}\cdot D\left(\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)\,J^{\left(1\right)}_{\eta}\right)d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
- & =\int_{\Gamma_{\eta}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\left(D\mathbf{v}^{s\left(1\right)}-D\mathbf{v}^{s\left(2\right)}\right)J^{\left(1\right)}_{\eta}+\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)DJ^{\left(1\right)}_{\eta}\right)d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
-\end{aligned}
-\label{eq:cvs-linearization-vw}
-\end{equation}
-
+;
+ the penalty 
+\begin_inset Formula $\varepsilon_{n}$
 \end_inset
 
-Recall that
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}D\mathbf{v}^{s\left(1\right)}_{n+\alpha_{f}} & =\alpha_{f}\frac{\gamma}{\beta\Delta t}\Delta\mathbf{u}^{\left(1\right)}\\
-D\mathbf{v}^{s\left(2\right)}_{n+\alpha_{f}} & =\alpha_{f}\frac{\gamma}{\beta\Delta t}\Delta\mathbf{u}^{\left(2\right)}\\
-D\left(J^{\left(1\right)}_{\eta}\right)_{n+\alpha_{f}} & =\alpha_{f}\left(\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{2}_{\left(1\right)}}-\mathbf{g}^{\left(1\right)}_{2}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{1}_{\left(1\right)}}\right)\cdot\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\\
- & =\alpha_{f}\mathcal{\boldsymbol{A}}\cdot\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}
-\end{aligned}
-\label{eq:cvs-time-discretization-linearization}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula $\mathcal{\boldsymbol{A}}$
-\end_inset
-
- is the antisymmetric tensor whose dual vector is
-\begin_inset Formula 
-\begin{equation}
-\mathbf{a}=\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{2}_{\left(1\right)}}-\mathbf{g}^{\left(1\right)}_{2}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{1}_{\left(1\right)}}\label{eq:cvs-dual-vector}
-\end{equation}
-
-\end_inset
-
-Thus,
-\begin_inset Formula 
-\begin{equation}
-D\delta G_{v}=\alpha_{f}\int_{\Gamma_{\eta}}\delta\mathbf{v}^{s\left(1\right)}\cdot\left(\frac{\gamma}{\beta\Delta t}\left(\Delta\mathbf{u}^{\left(1\right)}-\Delta\mathbf{u}^{\left(2\right)}\right)J^{\left(1\right)}_{\eta}+\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)\mathcal{\boldsymbol{A}}\cdot\mathbf{n}^{\left(1\right)}\right)d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\label{eq:cvs-linearization-vw-final}
-\end{equation}
-
+ should be large enough to make this gap negligible,
+ or the augmented Lagrangian scheme of Eq.
+\begin_inset space ~
 \end_inset
 
 
-\end_layout
-
-\begin_layout Subsection
-Discretization
-\end_layout
-
-\begin_layout Standard
-Using
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\delta\mathbf{v}^{s\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{a=1}N^{\left(1\right)}_{a}\delta\mathbf{v}^{\left(1\right)}_{a}\\
-\Delta\mathbf{u}^{\left(1\right)} & =\sum^{n^{\left(1\right)}_{e}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{u}^{\left(1\right)}_{c} & \Delta\mathbf{u}^{\left(2\right)} & =\sum^{n^{\left(2\right)}_{e}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{u}^{\left(2\right)}_{d}
-\end{aligned}
-\label{eq:cvs-discretization}
-\end{equation}
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-augmented-Lagrangian"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
 
 \end_inset
 
-we get
-\begin_inset Formula 
-\begin{equation}
-\delta G_{v}=\left[\begin{array}{cc}
-\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\left[\begin{array}{c}
-\mathbf{f}^{\left(1\right)}_{a}\\
-\mathbf{0}
-\end{array}\right]\label{eq:cvs-vw-discretization}
-\end{equation}
-
-\end_inset
-
-where
-\begin_inset Formula 
-\begin{equation}
-\mathbf{f}^{\left(1\right)}_{a}=N^{\left(1\right)}_{a}\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)J^{\left(1\right)}_{\eta}\label{eq:cvs-element-load-vector}
-\end{equation}
-
-\end_inset
-
-and
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}D\delta G_{v} & =\left[\begin{array}{cc}
-\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}\alpha_{f}W_{k}\left[\begin{array}{cc}
-\mathbf{K}^{\left(1,1\right)}_{ac} & \mathbf{K}^{\left(1,2\right)}_{ad}\\
-\mathbf{0} & \mathbf{0}
-\end{array}\right]\left[\begin{array}{c}
-\Delta\mathbf{u}^{\left(1\right)}_{c}\\
-\Delta\mathbf{u}^{\left(2\right)}_{d}
-\end{array}\right]\end{aligned}
-\label{eq:cvs-linerized-vw-discretization}
-\end{equation}
-
-\end_inset
-
-where
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =N^{\left(1\right)}_{a}\left(\frac{\gamma}{\beta\Delta t}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}+\left(\mathbf{v}^{s\left(1\right)}-\mathbf{v}^{s\left(2\right)}\right)\otimes\mathbf{n}^{\left(1\right)}\cdot\mathcal{\boldsymbol{A}}^{\left(1\right)}_{c}\right)\\
-\mathbf{K}^{\left(1,2\right)}_{ad} & =-N^{\left(1\right)}_{a}\frac{\gamma}{\beta\Delta t}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}
-\end{aligned}
-\label{eq:cvs-element-stiffness-matrix}
-\end{equation}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{equation}
-\mathcal{\boldsymbol{A}}=\sum^{n^{\left(1\right)}_{e}}_{c=1}\mathcal{\boldsymbol{A}}^{\left(1\right)}_{c}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\label{eq:cvs-A-Ac-relation}
-\end{equation}
-
-\end_inset
-
-and where 
-\begin_inset Formula $\mathcal{\boldsymbol{A}}^{\left(1\right)}_{c}$
-\end_inset
-
- is the antisymmetric tensor whose dual vector is
-\begin_inset Formula 
-\begin{equation}
-\mathbf{a}^{\left(1\right)}_{c}=\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{2}_{\left(1\right)}}\mathbf{g}^{\left(1\right)}_{1}-\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{1}_{\left(1\right)}}\mathbf{g}^{\left(1\right)}_{2}\label{eq:cvs-dual-vector-Ac}
-\end{equation}
-
-\end_inset
-
-
+ should be used.
 \end_layout
 
 \begin_layout Section
