@@ -176,6 +176,26 @@ public:
 		return a;
 	}
 
+    vec3d eval_deriv1(vec3d* d, double r, double s)
+    {
+        double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
+        shape_deriv(Hr, Hs, r, s);
+        int n = Nodes();
+        vec3d v(0,0,0);
+        for (int i = 0; i<n; ++i) v += d[i]*Hr[i];
+        return v;
+    }
+    
+    vec3d eval_deriv2(vec3d* d, double r, double s)
+    {
+        double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
+        shape_deriv(Hr, Hs, r, s);
+        int n = Nodes();
+        vec3d v(0,0,0);
+        for (int i = 0; i<n; ++i) v += d[i]*Hs[i];
+        return v;
+    }
+    
 	double eval_deriv1(int order, double* d, double r, double s)
 	{
 		double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];

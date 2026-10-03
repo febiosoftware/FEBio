@@ -28,15 +28,18 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidFSITraction.h"
-#include "FECore/FEModel.h"
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
 #include "FEFluid.h"
 #include "FEFluidFSI.h"
 #include "FEBioFSI.h"
+#include <FEBioMech/FETiedElasticInterface.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_FECORE_CLASS(FEFluidFSITraction, FESurfaceLoad)
     ADD_PARAMETER(m_bshellb , "shell_bottom");
+    ADD_PARAMETER(m_btied   , "use_tied_elastic_interface");
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
@@ -44,22 +47,8 @@ END_FECORE_CLASS()
 FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofW(pfem)
 {
 	m_bshellb = false;
+    m_btied = false;
 
-    // get the degrees of freedom
-	// TODO: Can this be done in Init, since  there is no error checking
-	if (pfem)
-	{
-		m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
-		m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
-		m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
-		m_dofEF = GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
-
-		m_dof.Clear();
-		m_dof.AddDofs(m_dofU);
-		m_dof.AddDofs(m_dofSU);
-		m_dof.AddDofs(m_dofW);
-		m_dof.AddDof(m_dofEF);
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -76,9 +65,37 @@ bool FEFluidFSITraction::Init()
     // (for now, users have to define two FEFluidFSITraction loads, one on front shell
     // face and the other on back shell face)
     
+    // get the degrees of freedom
+    m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+    m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+    m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+    
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofU);
+    m_dof.AddDofs(m_dofSU);
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDof(m_dofEF);
+
+    if (m_btied) {
+        // check that there are tied-elastic contact interfaces in this model
+        FEModel& fem = *GetFEModel();
+        int ntei = 0;
+        for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+        {
+            FETiedElasticInterface* tei = dynamic_cast<FETiedElasticInterface*>(fem.SurfacePairConstraint(i));
+            if (tei && tei->IsActive()) ++ntei;
+        }
+        if (ntei == 0) {
+            feLogError("There are no tied-elastic contact interfaces in this model.  Either create one (between a fluid-FSI domain and a congruent but discontinuous solid mesh) or uncheck the use_tied_elastic_interface flag in fluidFSI-traction loads");
+            return false;
+        }
+    }
+    
     return true;
 }
 
+//-----------------------------------------------------------------------------
 void FEFluidFSITraction::Activate()
 {
 	FESurface& surf = GetSurface();
@@ -100,7 +117,16 @@ void FEFluidFSITraction::Activate()
 		FEFluidFSI* pfsi = dynamic_cast<FEFluidFSI*>(pm);
 		if (pfsi) {
 			double s = m_psurf->FacePointing(el, *m_elem[j]);
-			m_s[j] = bself ? -s : s;
+			// m_s[j]*(g1 x g2) points outward from the fluid-FSI element when m_s[j] = s.
+			// By default, the orientation is reversed on faces attached to a single
+			// (fluid-FSI) element. When this traction is combined with a tied interface
+			// (non-contiguous fluid-FSI and solid meshes), every face is attached to a
+			// single fluid-FSI element, and the normal must point outward from the
+			// fluid-FSI domain so that the solid degrees of freedom receive -t^f,
+			// consistent with Eq. (2.19) of Shim et al., JBME 2019 (FEBio Theory Manual,
+			// Section "Fluid traction acting on solid interface"). The tied interface
+			// then transmits this traction to the solid domain.
+			m_s[j] = (bself && !m_btied) ? -s : s;
 			assert(m_s[j]);
 		}
 		else if (!bself) {
@@ -185,7 +211,7 @@ void FEFluidFSITraction::LoadVector(FEGlobalVector& R)
 		double ef = GetFluidDilatation(mp, tp.alphaf);
         double p = pfsi->Fluid()->Pressure(ef);
 
-		// evaluate traction
+		// evaluate traction f = -sigma^f . (g1 x g2), with sigma^f = -p I + tau
 		vec3d f = gt*p - sv*gt;
 
 		double H = dof_a.shape;
@@ -270,13 +296,14 @@ void FEFluidFSITraction::StiffnessMatrix(FELinearSystem& LS)
 		ps->ContraBaseVectors(el, mp.m_index, gcnt);
 		ps->ContraBaseVectorsP(el, mp.m_index, gcntp);
 		for (int i = 0; i<neln; ++i)
-			gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*(Gr[i]*m_s[iel]) +
+			gradN[i] = (gcnt[0] * alpha + gcntp[0] * (1 - alpha))*Gr[i] +
 			(gcnt[1] * alpha + gcntp[1] * (1 - alpha))*Gs[i];
 
 		// calculate stiffness component
 		int i = dof_a.index;
 		int j = dof_b.index;
-		vec3d v = gr*Gs[j] - gs*Gr[j];
+		// dual vector of D(m_s*(g1 x g2)); note that gr already includes m_s
+		vec3d v = gr*Gs[j] - gs*(Gr[j]*m_s[iel]);
 		mat3d A; A.skew(v);
 		mat3d Kv = vdotTdotv(gt, cv, gradN[j]);
 

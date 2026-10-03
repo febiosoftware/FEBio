@@ -1416,6 +1416,38 @@ void FESurface::CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[
     }
 }
 
+//-----------------------------------------------------------------------------
+//! This function calculates the covariant base vectors of a surface element
+//! at an integration point, at the previous time step
+
+void FESurface::CoBaseVectorsP(FESurfaceElement& el, double r, double s, vec3d t[2])
+{
+    FEMesh& m = *m_pMesh;
+
+    // get the nr of nodes
+    int n = el.Nodes();
+
+    // get the shape function derivatives
+    double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
+    el.shape_deriv(Hr, Hs, r, s);
+
+    t[0] = t[1] = vec3d(0,0,0);
+    if (!m_bshellb) {
+        for (int i=0; i<n; ++i)
+        {
+            t[0] += m.Node(el.m_node[i]).m_rp*Hr[i];
+            t[1] += m.Node(el.m_node[i]).m_rp*Hs[i];
+        }
+    }
+    else {
+        for (int i=0; i<n; ++i)
+        {
+            t[0] -= m.Node(el.m_node[i]).sp()*Hr[i];
+            t[1] -= m.Node(el.m_node[i]).sp()*Hs[i];
+        }
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 //! This function calculates the covariant base vectors of a surface element
@@ -1560,6 +1592,18 @@ void FESurface::ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3
 
 	t[0] = e[0]*Mi[0][0] + e[1]*Mi[0][1];
 	t[1] = e[0]*Mi[1][0] + e[1]*Mi[1][1];
+}
+
+//-----------------------------------------------------------------------------
+void FESurface::ContraBaseVectorsP(FESurfaceElement& el, double r, double s, vec3d t[2])
+{
+    vec3d e[2];
+    CoBaseVectorsP(el, r, s, e);
+    mat2d M = Metric(el, r, s);
+    mat2d Mi = M.inverse();
+
+    t[0] = e[0]*Mi[0][0] + e[1]*Mi[0][1];
+    t[1] = e[0]*Mi[1][0] + e[1]*Mi[1][1];
 }
 
 //-----------------------------------------------------------------------------
