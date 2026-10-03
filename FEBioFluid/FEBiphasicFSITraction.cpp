@@ -26,15 +26,18 @@
 
 #include "stdafx.h"
 #include "FEBiphasicFSITraction.h"
-#include "FECore/FEModel.h"
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
 #include "FEFluid.h"
 #include "FEBiphasicFSI.h"
 #include "FEBioFSI.h"
+#include <FEBioMech/FETiedElasticInterface.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
 BEGIN_FECORE_CLASS(FEBiphasicFSITraction, FESurfaceLoad)
-ADD_PARAMETER(m_bshellb , "shell_bottom");
+    ADD_PARAMETER(m_bshellb , "shell_bottom");
+    ADD_PARAMETER(m_btied   , "use_tied_elastic_interface");
 END_FECORE_CLASS()
 
 //-----------------------------------------------------------------------------
@@ -42,22 +45,8 @@ END_FECORE_CLASS()
 FEBiphasicFSITraction::FEBiphasicFSITraction(FEModel* pfem) : FESurfaceLoad(pfem), m_dofU(pfem), m_dofSU(pfem), m_dofW(pfem)
 {
     m_bshellb = false;
+    m_btied = false;
 
-    // get the degrees of freedom
-    // TODO: Can this be done in Init, since  there is no error checking
-    if (pfem)
-    {
-        m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
-        m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
-        m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
-        m_dofEF = pfem->GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
-
-        m_dof.Clear();
-        m_dof.AddDofs(m_dofU);
-        m_dof.AddDofs(m_dofSU);
-        m_dof.AddDofs(m_dofW);
-        m_dof.AddDof(m_dofEF);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -69,12 +58,50 @@ bool FEBiphasicFSITraction::Init()
     surf.SetInterfaceStatus(true);
     if (FESurfaceLoad::Init() == false) return false;
     
+    // TODO: Deal with the case when the surface is a shell domain separating two BFSI domains
+    // that use different fluid bulk moduli
+    
+    // get the degrees of freedom
+    m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+    m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+    m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+    
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofU);
+    m_dof.AddDofs(m_dofSU);
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDof(m_dofEF);
+
+    if (m_btied) {
+        // check that there are tied-elastic contact interfaces in this model
+        FEModel& fem = *GetFEModel();
+        int ntei = 0;
+        for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+        {
+            FETiedElasticInterface* tei = dynamic_cast<FETiedElasticInterface*>(fem.SurfacePairConstraint(i));
+            if (tei && tei->IsActive()) ++ntei;
+        }
+        if (ntei == 0) {
+            feLogError("There are no tied-elastic contact interfaces in this model.  Either create one (between a fluid-FSI domain and a congruent but discontinuous solid mesh) or uncheck the use_tied_elastic_interface flag in fluidFSI-traction loads");
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicFSITraction::Activate()
+{
+    FESurface& surf = GetSurface();
+    
     // get the list of fluid-FSI elements connected to this interface
     FEModel* fem = GetFEModel();
     int NF = surf.Elements();
     m_elem.resize(NF);
     m_s.resize(NF, 1);
-    for (int j = 0; j<NF; ++j)
+    for (int j = 0; j < NF; ++j)
     {
         bool bself = false;
         FESurfaceElement& el = surf.Element(j);
@@ -86,26 +113,30 @@ bool FEBiphasicFSITraction::Init()
         FEBiphasicFSI* pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
         if (pfsi) {
             double s = m_psurf->FacePointing(el, *m_elem[j]);
-            m_s[j] = bself ? -s : s;
-            if (m_s[j] == 0) return false;
+            // m_s[j]*(g1 x g2) points outward from the fluid-FSI element when m_s[j] = s.
+            // By default, the orientation is reversed on faces attached to a single
+            // (fluid-FSI) element. When this traction is combined with a tied interface
+            // (non-contiguous fluid-FSI and solid meshes), every face is attached to a
+            // single fluid-FSI element, and the normal must point outward from the
+            // fluid-FSI domain so that the solid degrees of freedom receive -t^f,
+            // consistent with Eq. (2.19) of Shim et al., JBME 2019 (FEBio Theory Manual,
+            // Section "Fluid traction acting on solid interface"). The tied interface
+            // then transmits this traction to the solid domain.
+            m_s[j] = (bself && !m_btied) ? -s : s;
+            assert(m_s[j]);
         }
         else if (!bself) {
             // extract the second of two elements on this interface
             m_elem[j] = el.m_elem[1].pe;
             pm = fem->GetMaterial(m_elem[j]->GetMatID());
             pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
-            if (pfsi == nullptr) return false;
+            assert(pfsi);
             m_s[j] = m_psurf->FacePointing(el, *m_elem[j]);
-            if (m_s[j] == 0) return false;
+            assert(m_s[j]);
         }
         else
-            return false;
+            assert(false);
     }
-    
-    // TODO: Deal with the case when the surface is a shell domain separating two FSI domains
-    // that use different fluid bulk moduli
-    
-    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -312,11 +343,10 @@ void FEBiphasicFSITraction::StiffnessMatrix(FELinearSystem& LS)
 void FEBiphasicFSITraction::Serialize(DumpStream& ar)
 {
     FESurfaceLoad::Serialize(ar);
-    
-    ar & m_s;
-    
+       
     if (ar.IsShallow() == false)
     {
+        ar & m_s;
         if (ar.IsSaving())
         {
             int NE = (int)m_elem.size();

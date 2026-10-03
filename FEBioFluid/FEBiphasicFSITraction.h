@@ -49,6 +49,8 @@ public:
     //! initialization
     bool Init() override;
     
+    void Activate() override;
+    
 private:
     double GetFluidDilatation(FESurfaceMaterialPoint& mp, double alpha);
     mat3ds GetFluidStress(FESurfaceMaterialPoint& mp);
@@ -63,6 +65,9 @@ protected:
     
 protected:
     bool                m_bshellb;  //!< flag for prescribing traction on shell bottom
-    
+    bool                m_btied;    //!< set to true when the fluid-FSI and solid meshes are congruent but non-continuous
+    //!< and joined by a tied interface (e.g., tied-elastic); the traction normal then
+    //!< points outward from the fluid-FSI domain on every face (see Activate)
+
     DECLARE_FECORE_CLASS();
 };

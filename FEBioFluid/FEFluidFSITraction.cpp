@@ -28,10 +28,12 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEFluidFSITraction.h"
-#include "FECore/FEModel.h"
+#include <FECore/FEModel.h>
+#include <FECore/log.h>
 #include "FEFluid.h"
 #include "FEFluidFSI.h"
 #include "FEBioFSI.h"
+#include <FEBioMech/FETiedElasticInterface.h>
 
 //-----------------------------------------------------------------------------
 // Parameter block for pressure loads
@@ -47,21 +49,6 @@ FEFluidFSITraction::FEFluidFSITraction(FEModel* pfem) : FESurfaceLoad(pfem), m_d
 	m_bshellb = false;
     m_btied = false;
 
-    // get the degrees of freedom
-	// TODO: Can this be done in Init, since  there is no error checking
-	if (pfem)
-	{
-		m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
-		m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
-		m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
-		m_dofEF = GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
-
-		m_dof.Clear();
-		m_dof.AddDofs(m_dofU);
-		m_dof.AddDofs(m_dofSU);
-		m_dof.AddDofs(m_dofW);
-		m_dof.AddDof(m_dofEF);
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -78,9 +65,37 @@ bool FEFluidFSITraction::Init()
     // (for now, users have to define two FEFluidFSITraction loads, one on front shell
     // face and the other on back shell face)
     
+    // get the degrees of freedom
+    m_dofU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::DISPLACEMENT));
+    m_dofSU.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::SHELL_DISPLACEMENT));
+    m_dofW.AddVariable(FEBioFSI::GetVariableName(FEBioFSI::RELATIVE_FLUID_VELOCITY));
+    m_dofEF = GetDOFIndex(FEBioFSI::GetVariableName(FEBioFSI::FLUID_DILATATION), 0);
+    
+    m_dof.Clear();
+    m_dof.AddDofs(m_dofU);
+    m_dof.AddDofs(m_dofSU);
+    m_dof.AddDofs(m_dofW);
+    m_dof.AddDof(m_dofEF);
+
+    if (m_btied) {
+        // check that there are tied-elastic contact interfaces in this model
+        FEModel& fem = *GetFEModel();
+        int ntei = 0;
+        for (int i = 0; i<fem.SurfacePairConstraints(); ++i)
+        {
+            FETiedElasticInterface* tei = dynamic_cast<FETiedElasticInterface*>(fem.SurfacePairConstraint(i));
+            if (tei && tei->IsActive()) ++ntei;
+        }
+        if (ntei == 0) {
+            feLogError("There are no tied-elastic contact interfaces in this model.  Either create one (between a fluid-FSI domain and a congruent but discontinuous solid mesh) or uncheck the use_tied_elastic_interface flag in fluidFSI-traction loads");
+            return false;
+        }
+    }
+    
     return true;
 }
 
+//-----------------------------------------------------------------------------
 void FEFluidFSITraction::Activate()
 {
 	FESurface& surf = GetSurface();
