@@ -54,38 +54,46 @@ if(_FEBIO_IS_SOURCE_TREE)
     set(_FEBIO_PREFIX "${_FEBIO_CONFIG_DIR}")
     set(_FEBIO_INCLUDE_DIR "${_FEBIO_PREFIX}")
 
-    # This is the default build output directory
-    set(_FEBIO_LIB_DIR "${_FEBIO_PREFIX}/build")
+    set(FEBio_BUILD_DIR "" CACHE PATH
+        "Path to the FEBio build tree when using FEBio from source")
 
-    # Try to find the build directory by searching for fecore
-    file(GLOB _MATCHED_DIRS LIST_DIRECTORIES true "${_FEBIO_PREFIX}/*build*")
+    if(FEBio_BUILD_DIR)
+        # An explicit build tree takes precedence over auto-discovery.
+        set(_FEBIO_LIB_DIR "${FEBio_BUILD_DIR}")
+    else()
+        # This is the default build output directory.
+        set(_FEBIO_LIB_DIR "${_FEBIO_PREFIX}/build")
 
-    if(_MATCHED_DIRS)
+        # Try to find the build directory by searching for fecore.
+        file(GLOB _MATCHED_DIRS LIST_DIRECTORIES true "${_FEBIO_PREFIX}/*build*")
 
-        if(WIN32)
-            set(_LIB_NAME "fecore.lib")
-        elseif(APPLE)
-            set(_LIB_NAME "libfecore.dylib")
-        else()
-            set(_LIB_NAME "libfecore.so")
-        endif()
+        if(_MATCHED_DIRS)
 
-
-        foreach(dir IN LISTS _MATCHED_DIRS)
-            find_file(_test
-                NAMES ${_LIB_NAME}
-                PATHS ${dir}
-                PATH_SUFFIXES lib lib/Release Release/lib Debug/lib lib/Debug
-                NO_DEFAULT_PATH            
-            )
-
-            if(_test)
-                set(_FEBIO_LIB_DIR "${dir}")
-                break()
+            if(WIN32)
+                set(_LIB_NAME "fecore.lib")
+            elseif(APPLE)
+                set(_LIB_NAME "libfecore.dylib")
+            else()
+                set(_LIB_NAME "libfecore.so")
             endif()
-        endforeach()
 
-        unset(_test CACHE)
+
+            foreach(dir IN LISTS _MATCHED_DIRS)
+                find_file(_test
+                    NAMES ${_LIB_NAME}
+                    PATHS ${dir}
+                    PATH_SUFFIXES lib lib/Release Release/lib Debug/lib lib/Debug
+                    NO_DEFAULT_PATH
+                )
+
+                if(_test)
+                    set(_FEBIO_LIB_DIR "${dir}")
+                    break()
+                endif()
+            endforeach()
+
+            unset(_test CACHE)
+        endif()
     endif()
 else()
     # Installed SDK: <prefix>/lib/cmake/FEBio/FEBioConfig.cmake

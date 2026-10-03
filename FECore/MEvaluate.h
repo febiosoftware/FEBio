@@ -65,7 +65,7 @@ public:
 
 	MITEM Item();
 
-	bool operator == (const MProduct& a);
+	bool operator == (const MProduct& a) const;
 
 	bool contains(const MITEM& i) const;
 

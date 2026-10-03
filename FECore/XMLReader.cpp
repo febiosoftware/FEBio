@@ -28,7 +28,6 @@ SOFTWARE.*/
 #include <stdarg.h>
 #include <fstream>
 #include <sstream>
-using namespace std;
 
 //=============================================================================
 // XMLAtt
@@ -208,7 +207,7 @@ int XMLTag::value(int* pi, int n)
 }
 
 //-----------------------------------------------------------------------------
-int XMLTag::value(std::vector<string>& stringList, int n)
+int XMLTag::value(std::vector<std::string>& stringList, int n)
 {
 	stringList.clear();
 
@@ -237,7 +236,7 @@ int XMLTag::value(std::vector<string>& stringList, int n)
 }
 
 //-----------------------------------------------------------------------------
-void XMLTag::value(std::vector<string>& stringList)
+void XMLTag::value(std::vector<std::string>& stringList)
 {
 	stringList.clear();
 
@@ -283,7 +282,7 @@ void XMLTag::value(std::string& val)
 }
 
 //-----------------------------------------------------------------------------
-void XMLTag::value(vector<int>& l)
+void XMLTag::value(std::vector<int>& l)
 {
 	int i, n = 0, n0, n1, nn;
 	char* szval = strdup(m_szval.c_str());
@@ -360,7 +359,7 @@ void XMLTag::value(vector<int>& l)
 }
 
 //-----------------------------------------------------------------------------
-void XMLTag::value(vector<double>& l)
+void XMLTag::value(std::vector<double>& l)
 {
 	l.clear();
 	const char *sz = m_szval.c_str();
@@ -507,7 +506,7 @@ bool XMLTag::AttributeValue(const char* szat, int& n, bool bopt)
 //=============================================================================
 
 // helper function for formatting a string
-string format_string(const char* sz, ...)
+std::string format_error(const char* sz, ...)
 {
 	// get a pointer to the argument list
 	va_list	args;
@@ -523,11 +522,11 @@ string format_string(const char* sz, ...)
 
 //-----------------------------------------------------------------------------
 XMLReader::Error::Error(XMLTag& tag, const std::string& err) : \
-std::runtime_error(format_string("tag \"%s\" (line %d) : ", tag.Name(), tag.m_nstart_line) + err) {}
+std::runtime_error(format_error("tag \"%s\" (line %d) : ", tag.Name(), tag.m_nstart_line) + err) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::XMLSyntaxError::XMLSyntaxError(int line_number) : \
-XMLReader::Error(format_string("syntax error (line %d)", line_number)) {}
+XMLReader::Error(format_error("syntax error (line %d)", line_number)) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::UnmatchedEndTag::UnmatchedEndTag(XMLTag& tag) : \
@@ -539,26 +538,26 @@ XMLReader::Error(tag, "unrecognized tag") {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidValue::InvalidValue(XMLTag& tag) : \
-XMLReader::Error(tag, format_string("invalid value: %s", tag.isleaf() ? tag.szvalue() : "")) {}
+XMLReader::Error(tag, format_error("invalid value: %s", tag.isleaf() ? tag.szvalue() : "")) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, const char* sza, const char* szv) : \
-XMLReader::Error(tag, format_string("invalid value for attribute \"%s\"", sza)) {}
+XMLReader::Error(tag, format_error("invalid value for attribute \"%s\"", sza)) {}
 
 XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLTag& tag, XMLAtt& att) : \
-XMLReader::Error(tag, format_string("invalid value for attribute \"%s\"", att.cvalue())) {}
+XMLReader::Error(tag, format_error("invalid value for attribute \"%s\"", att.cvalue())) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::InvalidAttribute::InvalidAttribute(XMLTag& tag, const char* sza) :\
-XMLReader::Error(tag, format_string("invalid attribute \"%s\"", sza)) {}
+XMLReader::Error(tag, format_error("invalid attribute \"%s\"", sza)) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::MissingAttribute::MissingAttribute(XMLTag& tag, const char* sza) : \
-XMLReader::Error(tag, format_string("missing attribute \"%s\"", sza)) {}
+XMLReader::Error(tag, format_error("missing attribute \"%s\"", sza)) {}
 
 //-----------------------------------------------------------------------------
 XMLReader::MissingTag::MissingTag(XMLTag& tag, const char* sza) : \
-XMLReader::Error(tag, format_string("missing tag \"%s\"", sza)) {}
+XMLReader::Error(tag, format_error("missing tag \"%s\"", sza)) {}
 
 //=============================================================================
 // XMLReader
@@ -588,7 +587,7 @@ void XMLReader::Close()
 {
     if(m_stream)
     {
-        ifstream* fileStream = dynamic_cast<ifstream*>(m_stream);
+        std::ifstream* fileStream = dynamic_cast<std::ifstream*>(m_stream);
         if(fileStream)
         {
             fileStream->close();
@@ -612,8 +611,8 @@ bool XMLReader::Open(const char* szfile, bool checkForXMLTag)
     if(m_stream) return false;
 
 	// open the file
-    m_stream = new ifstream;
-    static_cast<ifstream*>(m_stream)->open(szfile, ifstream::in|ifstream::binary);
+    m_stream = new std::ifstream;
+    static_cast<std::ifstream*>(m_stream)->open(szfile, std::ifstream::in|std::ifstream::binary);
     if(m_stream->fail()) return false;
 
 
@@ -775,14 +774,14 @@ private:
 
 private:
 	char*	m_path;
-	vector<TAG>	m_tag;
+    std::vector<TAG>	m_tag;
 	int			m_index;
 };
 
 bool XMLReader::FindTag(const char* xpath, XMLTag& tag)
 {
 	// go to the beginning of the file
-    m_stream->seekg(0, ios_base::beg);
+    m_stream->seekg(0, std::ios_base::beg);
 	m_bufIndex = m_bufSize = 0;
 	m_currentPos = 0;
 	m_eof = false;
@@ -838,7 +837,7 @@ void XMLReader::NextTag(XMLTag& tag)
 	// set the current file position
 	if (m_currentPos != tag.m_fpos)
 	{
-        m_stream->seekg(tag.m_fpos, ios_base::beg);
+        m_stream->seekg(tag.m_fpos, std::ios_base::beg);
 		m_currentPos = tag.m_fpos;
 		m_bufSize = m_bufIndex = 0;
 		m_eof = false;
@@ -1162,14 +1161,14 @@ void XMLReader::rewind(int64_t nstep)
 
 	if (m_bufIndex < 0)
 	{
-		m_stream->seekg(m_bufIndex - m_bufSize, ios_base::cur);
+        m_stream->seekg(m_bufIndex - m_bufSize, std::ios_base::cur);
 		m_bufIndex = m_bufSize = 0;
 		m_eof = false;
 	}
 }
 
 // clean the string by removing whitespace at the front and back
-void clean_string(string& s)
+void clean_string(std::string& s)
 {
 	if (s.empty()) return;
 
@@ -1277,9 +1276,9 @@ char XMLReader::GetNextChar()
 	return ch;
 }
 
-ifstream* XMLReader::GetFileStream()
+std::ifstream* XMLReader::GetFileStream()
 {
-    return dynamic_cast<ifstream*>(m_stream);
+    return dynamic_cast<std::ifstream*>(m_stream);
 }
 
 //! return the current line
