@@ -66,14 +66,45 @@ tens4ds FENewtonianViscousSolid::Tangent(FEMaterialPoint& mp)
 {
     const FETimeInfo& tp = GetTimeInfo();
     tens4ds Cv;
-    
+
     if (tp.timeIncrement > 0) {
         mat3dd I(1);
-        double tmp = tp.alphaf*tp.gamma/(tp.beta*tp.timeIncrement);
+
+        // Linearization factor d(D)/d(sym grad du).
+        //
+        // Stress() above uses D = sym(m_L), and every domain forms m_L by a
+        // BACKWARD EULER difference of the deformation gradient, e.g.
+        // FEElasticSolidDomain / FEMultiphasicSolidDomain:
+        //
+        //     m_L = (F - Fp)*F^-1 / dt
+        //
+        // Perturbing the current configuration gives
+        //
+        //     dL = Fp*F^-1 (grad du)/dt = (I - dt*L)(grad du)/dt
+        //        ~ (grad du)/dt    to leading order,
+        //
+        // so the factor consistent with that stress is 1/dt.
+        //
+        // NOTE: this used to be alphaf*gamma/(beta*dt), the Newmark factor
+        //       d(v)/d(u) -- appropriate only if m_L were built from a Newmark
+        //       velocity, which it never is.  FETimeInfo defaults beta = 0.25
+        //       and gamma = 0.5, and only FESolidSolver2 ever overwrites them,
+        //       so in every biphasic/multiphasic analysis (FEBiphasicSolver and
+        //       FEMultiphasicSolver derive from FENewtonSolver, not from
+        //       FESolidSolver2) the factor evaluated to 0.5/(0.25*dt) = 2/dt --
+        //       an exactly 2x over-stiff viscous tangent.  An over-stiff
+        //       tangent does not diverge outright; it under-relaxes, which
+        //       shows up as a line search that keeps cutting the step and a
+        //       Newton iteration that converges linearly at best.
+        //
+        //       The neglected part of the exact factor, Fp*F^-1 = I - dt*L, is
+        //       O(dt*L) and cannot be represented in tens4ds anyway: it makes
+        //       the moduli act on the unsymmetrized grad du.
+        double tmp = 1.0/tp.timeIncrement;
         Cv = (dyad1s(I)*(m_kappa - 2 * m_mu / 3) + dyad4s(I)*(2 * m_mu))*tmp;
     }
     else Cv.zero();
-    
+
     return Cv;
 }
 
