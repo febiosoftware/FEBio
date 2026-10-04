@@ -902,10 +902,10 @@ void FEMultiphasicShellDomain::ElementInternalForceSS(FEShellElement& el, vector
             fe[ndpn*i+7] -= dt*(w*gradMw + Mw*phiwhat)*detJt;
             for (isol=0; isol<nsol; ++isol) {
                 fe[ndpn*i+8+2*isol] -= dt*(gradMu*(j[isol]+je*m_pMat->m_penalty)
-                                         + Mu*phiw*chat[isol]
+                                         + Mu*chat[isol]
                                          )*detJt;
                 fe[ndpn*i+9+2*isol] -= dt*(gradMw*(j[isol]+je*m_pMat->m_penalty)
-                                           + Mw*phiw*chat[isol]
+                                           + Mw*chat[isol]
                                            )*detJt;
             }
         }
@@ -1663,7 +1663,7 @@ bool FEMultiphasicShellDomain::ElementMultiphasicStiffnessSS(FEShellElement& el,
         
         // membrane reactions
         for (i=0; i<mreact; ++i)
-            Phie += m_pMat->GetReaction(i)->m_Vbar*mat3dd(m_pMat->GetMembraneReaction(i)->ReactionSupply(mp)
+            Phie += m_pMat->GetMembraneReaction(i)->m_Vbar*mat3dd(m_pMat->GetMembraneReaction(i)->ReactionSupply(mp)
                                                     +m_pMat->GetMembraneReaction(i)->Tangent_ReactionSupply_Strain(mp)*(J*phiw));
         
         for (isol=0; isol<nsol; ++isol) {
