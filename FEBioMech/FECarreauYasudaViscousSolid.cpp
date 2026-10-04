@@ -84,7 +84,18 @@ tens4ds FECarreauYasudaViscousSolid::Tangent(FEMaterialPoint& mp)
         double dmu = 2*(mu0 - mui)*(n-1)*pow(lam,a)*pow(gdot,a-2)*pow(1+lamga, (n-a-1)/a);
 
         mat3dd I(1);
-        double tmp = tp.alphaf*tp.gamma/(tp.beta*tp.timeIncrement);
+        // Linearization factor d(D)/d(sym grad du).  Stress() uses D = sym(m_L)
+        // and every domain forms m_L by a backward Euler difference,
+        // m_L = (F - Fp)*F^-1/dt, so the consistent factor is 1/dt.
+        //
+        // NOTE: this used to be alphaf*gamma/(beta*dt), the Newmark factor
+        //       d(v)/d(u), which applies only if m_L were built from a Newmark
+        //       velocity -- it never is.  With the FETimeInfo defaults
+        //       (beta = 0.25, gamma = 0.5), which every solver except
+        //       FESolidSolver2 leaves untouched, that evaluated to 2/dt: an
+        //       exactly 2x over-stiff viscous tangent.  See the longer note in
+        //       FENewtonianViscousSolid::Tangent.
+        double tmp = 1.0/tp.timeIncrement;
         Cv = (dyad1s(D)*(2*dmu) + dyad4s(I)*(2*mu))*tmp;
     }
     else Cv.zero();
