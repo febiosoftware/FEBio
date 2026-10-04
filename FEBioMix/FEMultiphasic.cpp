@@ -573,7 +573,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
             for (isol=0; isol<nsol; ++isol) {
                 zidzdJr[isbm] += SQR(z[isol])*dkdJ[isol]*c[isol];
             }
-            zidzdJr[isbm] = 1/(J-phi0) + zidzdJr[isbm]/den;
+            zidzdJr[isbm] = -1/(J-phi0) - zidzdJr[isbm]/den;
             zidzdJr[isbm] = (zidzdJr[isbm] + zidzdJ)*zidzdr[isbm];
             zidzdJr[isbm] += cF/SBMDensity(isbm)/SQR(J-phi0)/den;
             
@@ -581,7 +581,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
                 zidzdrc[isbm][isol] = SQR(z[isol])*kappa[isol];
                 for (jsol=0; jsol<nsol; ++jsol)
                     zidzdrc[isbm][isol] += SQR(z[jsol])*zz[jsol]*c[jsol]*dkhdc[jsol][isol];
-                zidzdrc[isbm][isol] = zidzdr[isbm]*(zidzdc[isol]*(1+num/den) - zidzdrc[isbm][isol]/den);
+                zidzdrc[isbm][isol] = zidzdr[isbm]*(zidzdc[isol]*(1-num/den) - zidzdrc[isbm][isol]/den);
             }
         }
 	}

@@ -335,7 +335,7 @@ void FEMultiphasicSolidDomain::InitMaterialPoints()
                 FENode& ni = m.Node(el.m_node[i]);
                 p0[i] = el.m_bitfc[i] ? ni.get(m_dofQ) : ni.get(m_dofP);
                 for (int isol = 0; isol<nsol; ++isol)
-                    c0[isol][i] = (ni.m_ID[m_dofD + isol] != -1) ? ni.get(m_dofD + sid[isol]) : ni.get(m_dofC + sid[isol]);
+                    c0[isol][i] = (ni.m_ID[m_dofD + sid[isol]] != -1) ? ni.get(m_dofD + sid[isol]) : ni.get(m_dofC + sid[isol]);
             }
         }
         
@@ -806,7 +806,7 @@ void FEMultiphasicSolidDomain::ElementInternalForceSS(FESolidElement& el, vector
             fe[ndpn*i+3] -= dt*(w*gradN + H[i]*phiwhat)*detJt;
             for (isol=0; isol<nsol; ++isol)
                 fe[ndpn*i+4+isol] -= dt*(gradN*(j[isol]+je*m_pMat->m_penalty)
-                                         + H[i]*phiw*chat[isol]
+                                         + H[i]*chat[isol]
                                          )*detJt;
         }
     }

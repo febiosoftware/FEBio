@@ -861,7 +861,7 @@ void FESlidingInterfaceBiphasic::ProjectSurface(FESlidingSurfaceBiphasic& ss, FE
     }
     
     // loop over all integration points
-#pragma omp parallel for schedule(dynamic)
+//#pragma omp parallel for schedule(dynamic)
     for (int i=0; i<ss.Elements(); ++i)
     {
         FESurfaceElement& el = ss.Element(i);

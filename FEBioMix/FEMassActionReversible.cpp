@@ -145,7 +145,7 @@ mat3ds FEMassActionReversible::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt
         dzhatFde += I*(m_vR[isol]*dkdJ/k);
     }
 	for (int isbm = 0; isbm<nsbm; ++isbm)
-		dzhatFde += I*(m_vR[nsol+isbm]/(J-phi0));
+		dzhatFde -= I*(m_vR[nsol+isbm]/(J-phi0));
 	
 	dzhatFde *= zhatF;
 	
