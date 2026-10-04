@@ -54,30 +54,28 @@ FEAmbientConcentration::FEAmbientConcentration(FEModel* fem) : FECoreClass(fem)
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_FECORE_CLASS(FESlidingInterfaceMP, FEContactInterface)
-	ADD_PARAMETER(m_laugon   , "laugon"               )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
-	ADD_PARAMETER(m_atol     , "tolerance"            );
-    ADD_PARAMETER(m_gtol     , "gaptol"               )->setUnits(UNIT_LENGTH);;
-    ADD_PARAMETER(m_ptol     , "ptol"                 );
-    ADD_PARAMETER(m_ctol     , "ctol"                 );
-    ADD_PARAMETER(m_epsn     , "penalty"              );
+    ADD_PARAMETER(m_laugon   , "laugon"               )->setLongName("Enforcement method")->setEnums("PENALTY\0AUGLAG\0");
+    ADD_PARAMETER(m_atol     , FE_RANGE_GREATER_OR_EQUAL(0.0), "tolerance"            );
+    ADD_PARAMETER(m_gtol     , FE_RANGE_GREATER_OR_EQUAL(0.0), "gaptol"               )->setUnits(UNIT_LENGTH);
+    ADD_PARAMETER(m_ptol     , FE_RANGE_GREATER_OR_EQUAL(0.0), "ptol"                 );
+    ADD_PARAMETER(m_ctol     , FE_RANGE_GREATER_OR_EQUAL(0.0), "ctol"                 );
+    ADD_PARAMETER(m_epsn     , FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty"              );
     ADD_PARAMETER(m_bautopen , "auto_penalty"         );
     ADD_PARAMETER(m_bupdtpen , "update_penalty"       );
     ADD_PARAMETER(m_btwo_pass, "two_pass"             );
-    ADD_PARAMETER(m_knmult   , "knmult"               );
-    ADD_PARAMETER(m_stol     , "search_tol"           );
-    ADD_PARAMETER(m_epsp     , "pressure_penalty"     );
-    ADD_PARAMETER(m_epsc     , "concentration_penalty");
-    ADD_PARAMETER(m_bsymm    , "symmetric_stiffness"  );
-    ADD_PARAMETER(m_srad     , "search_radius"        )->setUnits(UNIT_LENGTH);;
-    ADD_PARAMETER(m_nsegup   , "seg_up"               );
+    ADD_PARAMETER(m_stol     , FE_RANGE_GREATER(0.0)         , "search_tol"           );
+    ADD_PARAMETER(m_epsp     , FE_RANGE_GREATER_OR_EQUAL(0.0), "pressure_penalty"     );
+    ADD_PARAMETER(m_epsc     , FE_RANGE_GREATER_OR_EQUAL(0.0), "concentration_penalty");
+    ADD_PARAMETER(m_srad     , FE_RANGE_GREATER(0.0)         , "search_radius"        )->setUnits(UNIT_LENGTH);
+    ADD_PARAMETER(m_nsegup   , FE_RANGE_GREATER_OR_EQUAL(0)  , "seg_up"               );
     ADD_PARAMETER(m_breloc   , "node_reloc"           );
-    ADD_PARAMETER(m_mu       , "fric_coeff"           );
-	ADD_PARAMETER(m_sliptol  , "slip_tol"           )->setLongName("slip regularization (fraction of element size)");
-    ADD_PARAMETER(m_phi      , "contact_frac"         );
+    ADD_PARAMETER(m_mu       , FE_RANGE_GREATER_OR_EQUAL(0.0), "fric_coeff"           );
+    ADD_PARAMETER(m_sliptol  , FE_RANGE_GREATER_OR_EQUAL(0.0), "slip_tol"             )->setLongName("slip regularization (fraction of element size)");
+    ADD_PARAMETER(m_phi      , FE_RANGE_CLOSED(0.0, 1.0)     , "contact_frac"         );
     ADD_PARAMETER(m_bsmaug   , "smooth_aug"           );
     ADD_PARAMETER(m_bsmfls   , "smooth_fls"           );
-    ADD_PARAMETER(m_naugmin  , "minaug"               );
-    ADD_PARAMETER(m_naugmax  , "maxaug"               );
+    ADD_PARAMETER(m_naugmin  , FE_RANGE_GREATER_OR_EQUAL(0)  , "minaug"               );
+    ADD_PARAMETER(m_naugmax  , FE_RANGE_GREATER_OR_EQUAL(0)  , "maxaug"               );
     ADD_PARAMETER(m_ambp     , "ambient_pressure"     );
 
 	ADD_PROPERTY(m_ambctmp, "ambient_concentration",FEProperty::Optional);
@@ -165,6 +163,10 @@ bool FESlidingSurfaceMP::Init()
 
 	// determine solutes for this surface using the first surface element
 	// TODO: Check that all elements use the same set of solutes as the first element
+	// NOTE: clear the list first; Init() may be called more than once (model
+	//       reset / restart) and the plain-biphasic branch below leaves it
+	//       untouched.
+	m_sid.clear();
 	int nsol = 0;
 	if (Elements()) {
 		FESurfaceElement& se = Element(0);
@@ -289,9 +291,9 @@ void FESlidingSurfaceMP::EvaluateNodalContactPressures()
 }
 
 //-----------------------------------------------------------------------------
-//! Evaluate the nodal contact pressures by averaging values from surrounding
-//! faces.  This function ensures that nodal contact pressures are always
-//! positive, so that they can be used to detect free-draining status.
+//! Evaluate the nodal contact tractions by averaging values from surrounding
+//! faces.  Only faces carrying a positive contact pressure contribute, so the
+//! nodal traction stays consistent with the nodal pressure evaluated above.
 
 void FESlidingSurfaceMP::EvaluateNodalContactTractions()
 {
@@ -419,7 +421,7 @@ vec3d FESlidingSurfaceMP::GetFluidForce()
 	
     // get parent contact interface to extract ambient fluid pressure
     FESlidingInterfaceMP* simp = dynamic_cast<FESlidingInterfaceMP*>(GetContactInterface());
-    double ambp = simp->m_ambp;
+    double ambp = (simp ? simp->m_ambp : 0.0);
     
 	// initialize contact force
 	vec3d f(0,0,0);
@@ -607,14 +609,12 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	SetID(count++);
 	
 	// initial values
-	m_knmult = 1;
 	m_atol = 0.1;
 	m_epsn = 1;
 	m_epsp = 1;
 	m_epsc = 1;
 	m_btwo_pass = false;
 	m_stol = 0.01;
-	m_bsymm = true;
 	m_srad = 1.0;
 	m_gtol = 0;
 	m_ptol = 0;
@@ -624,6 +624,7 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	m_bautopen = false;
     m_breloc = false;
     m_bsmaug = false;
+    m_bsmfls = false;
     m_bupdtpen = false;
     m_mu = 0.0;
     m_phi = 0.0;
@@ -637,6 +638,7 @@ FESlidingInterfaceMP::FESlidingInterfaceMP(FEModel* pfem) : FEContactInterface(p
 	m_naugprev = 0;
 	m_biter    = 0;
 	m_bfirst   = true;
+	m_maxgapprev = -1.0;
 
 	m_dofP = -1;
 	m_dofC = -1;
@@ -659,6 +661,19 @@ bool FESlidingInterfaceMP::Init()
 	m_Rgas = GetFEModel()->GetGlobalConstant("R");
 	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 
+	// R and T scale the concentration augmentation norm below (normC); a zero
+	// value divides by zero there and would silently force convergence.
+	if (m_Rgas <= 0.0)
+	{
+		feLogError("A positive universal gas constant R must be defined in Globals.");
+		return false;
+	}
+	if (m_Tabs <= 0.0)
+	{
+		feLogError("A positive absolute temperature T must be defined in Globals.");
+		return false;
+	}
+
 	// get number of DOFS
 	FEModel* fem = GetFEModel();
 	DOFS& fedofs = fem->GetDOFS();
@@ -673,24 +688,35 @@ bool FESlidingInterfaceMP::Init()
 	
 	// determine which solutes are common to both contact surfaces
     m_sid.clear(); m_ssl.clear(); m_msl.clear(); m_sz.clear();
-	for (int is=0; is<m_ss.m_sid.size(); ++is) {
-		for (int im=0; im<m_ms.m_sid.size(); ++im) {
+	for (int is=0; is<(int)m_ss.m_sid.size(); ++is) {
+		for (int im=0; im<(int)m_ms.m_sid.size(); ++im) {
 			if (m_ms.m_sid[im] == m_ss.m_sid[is]) {
 				m_sid.push_back(m_ss.m_sid[is]);
 				m_ssl.push_back(is);
 				m_msl.push_back(im);
                 FESoluteData* sd = FindSoluteData(m_ss.m_sid[is]+1);
+                if (sd == nullptr)
+                {
+                    feLogError("Invalid solute id %d in contact interface %d.", m_ss.m_sid[is]+1, GetID());
+                    return false;
+                }
                 m_sz.push_back(sd->m_z);
 			}
 		}
 	}
 
     // cycle through all the solutes and determine ambient concentrations
-	for (int i = 0; i < m_ambctmp.size(); ++i)
+	for (int i = 0; i < (int)m_ambctmp.size(); ++i)
 	{
 		FEAmbientConcentration* aci = m_ambctmp[i];
 		int isol = aci->m_sol - 1;
-		assert((isol >= 0) && (isol < nsol));
+		// NOTE: this used to be an assert, which is compiled out in a release
+		//       build and then let an invalid id write past the end of m_ambc.
+		if ((isol < 0) || (isol >= nsol))
+		{
+			feLogError("Invalid solute id %d in ambient_concentration of contact interface %d.", aci->m_sol, GetID());
+			return false;
+		}
 		m_ambc[isol] = aci->m_ambc;
 	}
 
@@ -782,10 +808,10 @@ void FESlidingInterfaceMP::UpdateAutoPenalty()
         CalcAutoPenalty(m_ss);
         CalcAutoPenalty(m_ms);
         if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
-        for (int is=0; is<m_ssl.size(); ++is)
+        for (int is=0; is<(int)m_ssl.size(); ++is)
             CalcAutoConcentrationPenalty(m_ss, m_ssl[is]);
         if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
-        for (int im=0; im<m_msl.size(); ++im)
+        for (int im=0; im<(int)m_msl.size(); ++im)
             CalcAutoConcentrationPenalty(m_ms, m_msl[im]);
     }
 }
@@ -810,7 +836,10 @@ void FESlidingInterfaceMP::Activate()
 void FESlidingInterfaceMP::PrepStep()
 {
     m_ss.InitSlidingSurface();
-    if (m_btwo_pass) m_ms.InitSlidingSurface();
+    // NOTE: Update() projects the secondary surface whenever we do two passes
+    //       *or* whenever the secondary surface is poroelastic, so its
+    //       previous-step projection must be committed under the same condition.
+    if (m_btwo_pass || m_ms.m_bporo) m_ms.InitSlidingSurface();
 }
 
 //-----------------------------------------------------------------------------
@@ -899,6 +928,12 @@ double FESlidingInterfaceMP::AutoPenalty(FESurfaceElement& el, FESurface &s)
         FEElasticMaterial* pm = dynamic_cast<FEElasticMaterial*>(pme);
         S = pm->Tangent(mp);
     }
+    else {
+        // this material does not provide an elasticity tensor, so we cannot
+        // evaluate an auto-penalty factor for it.  (S used to be left
+        // uninitialised here and S.inverse() then operated on garbage.)
+        return 0.0;
+    }
     // get the inverse (compliance) at this point
     tens4ds C = S.inverse();
             
@@ -940,7 +975,8 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
 
 	// get the material
 	FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-		
+	if (pm == nullptr) return 0.0;
+
     // get a material point
     FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
         
@@ -959,6 +995,10 @@ double FESlidingInterfaceMP::AutoPressurePenalty(FESurfaceElement& el, FESliding
         K = ptp->GetPermeability()->Permeability(mp);
 	else if (pmp)
 		K = pmp->GetPermeability()->Permeability(mp);
+	else
+		// not a poroelastic material: no permeability, no pressure penalty
+		// (K used to be left uninitialised here).
+		return 0.0;
         
 	double eps = n*(K*n);
 	
@@ -976,7 +1016,6 @@ void FESlidingInterfaceMP::CalcAutoConcentrationPenalty(FESlidingSurfaceMP& s,
 														const int isol)
 {
 	// loop over all surface elements
-	int ni = 0;
 	for (int i=0; i<s.Elements(); ++i)
 	{
 		// get the surface element
@@ -987,7 +1026,7 @@ void FESlidingInterfaceMP::CalcAutoConcentrationPenalty(FESlidingSurfaceMP& s,
 		
 		// assign to integation points of surface element
 		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j, ++ni)
+		for (int j=0; j<nint; ++j)
         {
             FEMultiphasicContactPoint& pt = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
 			pt.m_epsc[isol] = eps;
@@ -1016,7 +1055,8 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
 
 	// get the material
 	FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
-		
+	if (pm == nullptr) return 0.0;
+
     // get a material point
     FEMaterialPoint& mp = *pe->GetMaterialPoint(0);
         
@@ -1041,7 +1081,13 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
 		D = pmp->GetSolute(isol)->m_pDiff->Diffusivity(mp)
 		*(pmp->Porosity(mp)*pmp->GetSolute(isol)->m_pSolub->Solubility(mp));
 	}
-        
+	else
+	{
+		// not a solute-carrying material: no diffusivity, no concentration
+		// penalty (D used to be left uninitialised here).
+		return 0.0;
+	}
+
 	// evaluate normal component of diffusivity
 	double eps = n*(D*n);
 
@@ -1055,18 +1101,30 @@ double FESlidingInterfaceMP::AutoConcentrationPenalty(FESurfaceElement& el,
 }
 
 //-----------------------------------------------------------------------------
-//! Clamp the local fluid load support p/(-tn) to its thermodynamic upper bound
-//! (1-phi)^-1, per Eq. (2.5) and the discussion following it in
-//! Zimmerman et al., J Biomech Eng 144:021008 (2022).  Guards phi = 1, where
-//! (1-phi)*fls = 0 identically and no clamp is needed.
+//! Clamp the local fluid load support to its physical range [0, (1-phi)^-1],
+//! per Eq. (2.5) and the discussion following it in Zimmerman et al.,
+//! J Biomech Eng 144:021008 (2022).  This keeps the effective friction
+//! coefficient
 //!
-//! NOTE: sliding-biphasic has clamped m_fls this way since 2022; the
-//!       multiphasic variant never did, so the plotted 'local FLS' could
-//!       exceed its theoretical bound.  The mechanics are unaffected, since
-//!       MBRACKET(mueff) already produced the same effective friction
-//!       coefficient once the bound was passed.
+//!     mueff = mu*(1 - (1-phi)*fls)
+//!
+//! inside [0, mu]: fls = 0 means the solid carries the whole load (boundary
+//! friction, mueff = mu) and fls = (1-phi)^-1 means the fluid does
+//! (mueff = 0).  phi >= 1 is guarded, where (1-phi)*fls = 0 identically.
+//!
+//! NOTE: the lower bound matters, and only became reachable with smooth_fls.
+//!       On the direct path fls = ph/pn and mueff is always multiplied by pn
+//!       again, so pn cancels and the friction traction stays bounded even for
+//!       a wild fls.  With smooth_fls, fls comes from GetGPLocalFLS() as
+//!       -p/tn with tn the element-averaged effective normal stress; where the
+//!       solid is in tension, or lightly loaded, tn turns small or positive,
+//!       fls goes large and negative, and mueff = mu*(1 + (1-phi)*|fls|) grows
+//!       without bound -- this time with no pn to cancel it, because mueff no
+//!       longer depends on pn at all.  A friction coefficient of 10 or 100
+//!       then enters the traction directly.
 static double clamp_fls(double fls, double phi)
 {
+    if (fls < 0.0) return 0.0;
     if (phi >= 1.0) return fls;
     const double flsmax = 1.0/(1.0 - phi);
     return (fls > flsmax) ? flsmax : fls;
@@ -1091,12 +1149,16 @@ static double clamp_fls(double fls, double phi)
 //! solute concentration dof* of the node -- flip on and off between Newton
 //! iterations.
 //!
-//! NOTE on solute indexing: the solute slots are addressed through m_ssl, to
-//!       match ProjectSurface(), ContactTraction() and Augment(), all of which
-//!       use m_ssl on both surfaces.  (LoadVector() and StiffnessMatrix()
-//!       instead select m_ssl or m_msl per pass.  That discrepancy predates
-//!       these changes and is left alone here.)
-void FESlidingInterfaceMP::ReleaseContactPoint(FEMultiphasicContactPoint& data)
+//! NOTE on solute indexing: the per-integration-point solute arrays are sized
+//!       and indexed with the *owning surface's* local solute numbering, so
+//!       the caller passes the matching list: m_ssl for a point on the primary
+//!       surface, m_msl for a point on the secondary surface.  ProjectSurface(),
+//!       ContactTraction(), LoadVector(), StiffnessMatrix() and Augment() now
+//!       all follow that one convention.  Previously the first three used m_ssl
+//!       on both surfaces while the last two selected per pass, so on the
+//!       second pass (and on the whole secondary-surface branch of Augment())
+//!       the residual and stiffness read solute slots that were never written.
+void FESlidingInterfaceMP::ReleaseContactPoint(FEMultiphasicContactPoint& data, const vector<int>& sl)
 {
     data.m_pme    = nullptr;
     data.m_Lmd    = 0.0;
@@ -1112,14 +1174,14 @@ void FESlidingInterfaceMP::ReleaseContactPoint(FEMultiphasicContactPoint& data)
     data.m_p1     = 0.0;
     data.m_bstick = false;
 
-    // The per-point solute arrays are sized by the *owning surface's* solute
-    // count (FESlidingSurfaceMP::Init), whereas m_ssl is a primary-surface
-    // local index.  Since this helper is called from more places than the old
-    // open-coded reset was, bounds-check rather than assume the two agree.
-    const int nsol = (int)m_sid.size();
+    // The per-point solute arrays are sized by the owning surface's solute
+    // count (FESlidingSurfaceMP::Init), and sl holds the slot, in that same
+    // local numbering, of each solute common to both surfaces.  The bounds
+    // check below is a safety net only; with a matching sl it never fires.
+    const int nsol = (int)sl.size();
     const int nc   = (int)data.m_cg.size();
     for (int isol=0; isol<nsol; ++isol) {
-        int l = m_ssl[isol];
+        int l = sl[isol];
         if ((l < 0) || (l >= nc)) continue;
         data.m_Lmc[l] = 0.0;
         data.m_cg[l]  = 0.0;
@@ -1131,17 +1193,12 @@ void FESlidingInterfaceMP::ReleaseContactPoint(FEMultiphasicContactPoint& data)
 void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfaceMP& ms, bool bupseg, bool bmove)
 {
     FEMesh& mesh = GetFEModel()->GetMesh();
-    FESurfaceElement* pme;
-    vec3d r, nu;
-    double rs[2] = {0,0};
-    double Ln;
     
     const int MN = FEElement::MAX_NODES;
     int nsol = (int)m_sid.size();
-    double ps[MN], p1 = 0.0;
-    vector< vector<double> > cs(nsol, vector<double>(MN));
-    vector<double> c1(nsol);
-    c1.assign(nsol,0);
+    
+    // surface-local solute slots of the surface we are projecting FROM
+    const vector<int>& sl = (&ss == &m_ss ? m_ssl : m_msl);
     
     double psf = GetPenaltyScaleFactor();
     
@@ -1184,7 +1241,6 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
             vec3d nu = normal[i];
             
             // project onto the secondary surface
-            vec3d q;
             double rs[2] = {0,0};
             FESurfaceElement* pme = np.Project(rt, nu, rs);
             if (pme)
@@ -1203,8 +1259,11 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
         }
     }
     
-    // loop over all integration points
-    // TODO: commenting this pragma line made my code recover slidingelastic test case results
+    // loop over all integration points.
+    // NOTE: this loop is safe to run in parallel now that every scratch
+    //       variable is declared inside it (see the note below).  It was not
+    //       before, which is why commenting out the pragma used to "fix" the
+    //       sliding-elastic test case.
 #pragma omp parallel for schedule(dynamic)
     for (int i=0; i<ss.Elements(); ++i)
     {
@@ -1214,6 +1273,21 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
         
         int ne = el.Nodes();
         int nint = el.GaussPoints();
+        
+        // NOTE: every scratch variable below MUST be declared inside this
+        //       loop.  They used to be declared at function scope which, with
+        //       the OpenMP parallel-for above, made them SHARED across threads:
+        //       all threads wrote the same ps/cs/c1/rs/pme/r/nu/Ln, so the
+        //       projections, gaps and pressure/concentration gaps came out
+        //       nondeterministic -- and the concurrent writes into the cs/c1
+        //       vectors were undefined behaviour outright.
+        double ps[MN], p1 = 0.0;
+        vector< vector<double> > cs(nsol, vector<double>(MN));
+        vector<double> c1(nsol, 0.0);
+        FESurfaceElement* pme = nullptr;
+        vec3d r, nu;
+        double rs[2] = {0,0};
+        double Ln = 0;
         
         // get the nodal pressures
         if (sporo)
@@ -1322,15 +1396,15 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
                         double cm[MN];
                         for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).get(m_dofC + sid);
                         double c2 = pme->eval(cm, rs[0], rs[1]);
-                        pt.m_cg[m_ssl[isol]] = c1[isol] - c2;
-                        pt.m_c1[m_ssl[isol]] = c1[isol];
+                        pt.m_cg[sl[isol]] = c1[isol] - c2;
+                        pt.m_c1[sl[isol]] = c1[isol];
                     }
                 }
                 else
                 {
                     // the surfaces have separated (Ln < 0) or the projection is
                     // beyond the search radius: release the point completely.
-                    ReleaseContactPoint(pt);
+                    ReleaseContactPoint(pt, sl);
                     // NOTE: m_gap deliberately retains the true (negative)
                     //       normal gap assigned just above.  Zeroing it, as was
                     //       done before, makes the release criterion
@@ -1345,7 +1419,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
             else
             {
                 // the node is not in contact
-                ReleaseContactPoint(pt);
+                ReleaseContactPoint(pt, sl);
                 pt.m_gap = 0;
             }
         }
@@ -1623,6 +1697,9 @@ vec3d FESlidingInterfaceMP::ContactTraction(FESlidingSurfaceMP& ss, const int ne
     vector<double> c1(nsol);
     c1.assign(nsol,0);
 
+    // surface-local solute slots of the surface this point belongs to
+    const vector<int>& sl = (&ss == &m_ss ? m_ssl : m_msl);
+
     // get the mesh
     FEMesh& m = GetFEModel()->GetMesh();
 
@@ -1651,7 +1728,7 @@ vec3d FESlidingInterfaceMP::ContactTraction(FESlidingSurfaceMP& ss, const int ne
     double p = data.m_p1;
 
     // get the solute concentrations at this integration point
-    for (int isol=0; isol<nsol; ++isol) c1[isol] = data.m_c1[m_ssl[isol]];
+    for (int isol=0; isol<nsol; ++isol) c1[isol] = data.m_c1[sl[isol]];
 
     // get the fluid pressure for load sharing at this integration point
     double ph = data.m_p1 - m_ambp;
@@ -1677,7 +1754,7 @@ vec3d FESlidingInterfaceMP::ContactTraction(FESlidingSurfaceMP& ss, const int ne
     // ------------------------------------------------------------------
     if (pme == nullptr)
     {
-        ReleaseContactPoint(data);
+        ReleaseContactPoint(data, sl);
         return vec3d(0,0,0);
     }
 
@@ -1741,7 +1818,7 @@ vec3d FESlidingInterfaceMP::ContactTraction(FESlidingSurfaceMP& ss, const int ne
         // quantity below must be evaluated on pmep.
         if (pmep == nullptr)
         {
-            ReleaseContactPoint(data);
+            ReleaseContactPoint(data, sl);
             return vec3d(0,0,0);
         }
 
@@ -1765,7 +1842,7 @@ vec3d FESlidingInterfaceMP::ContactTraction(FESlidingSurfaceMP& ss, const int ne
         // completely, whether or not the stick/slip status is frozen.
         if (tn >= 0)
         {
-            ReleaseContactPoint(data);
+            ReleaseContactPoint(data, sl);
             return vec3d(0,0,0);
         }
 
@@ -1818,7 +1895,7 @@ vec3d FESlidingInterfaceMP::ContactTraction(FESlidingSurfaceMP& ss, const int ne
             double cm[FEElement::MAX_NODES];
             for (int k=0; k<pmep->Nodes(); ++k) cm[k] = m.Node(pmep->m_node[k]).get(m_dofC + sid);
             double c2 = pmep->eval(cm, data.m_rs[0], data.m_rs[1]);
-            data.m_cg[m_ssl[isol]] = c1[isol] - c2;
+            data.m_cg[sl[isol]] = c1[isol] - c2;
         }
     }
     // ------------------------------------------------------------------
@@ -1834,7 +1911,7 @@ vec3d FESlidingInterfaceMP::ContactTraction(FESlidingSurfaceMP& ss, const int ne
         // ---- R E L E A S E   T E S T ----
         if (Ln <= 0)
         {
-            ReleaseContactPoint(data);
+            ReleaseContactPoint(data, sl);
             return vec3d(0,0,0);
         }
 
@@ -2089,25 +2166,6 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
      
     double psf = GetPenaltyScaleFactor();
     
-    // see how many reformations we've had to do so far
-    int nref = GetSolver()->m_nref;
-    
-    // set higher order stiffness mutliplier
-    // NOTE: this algorithm doesn't really need this
-    // but I've added this functionality to compare with the other contact
-    // algorithms and to see the effect of the different stiffness contributions
-    double knmult = m_knmult;
-    if (m_knmult < 0)
-    {
-        int ni = int(-m_knmult);
-        if (nref >= ni)
-        {
-            knmult = 1;
-            feLog("Higher order stiffness terms included.\n");
-        }
-        else knmult = 0;
-    }
-    
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np < npass; ++np)
@@ -2128,18 +2186,6 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
             // get nr of nodes and integration points
             int nseln = se.Nodes();
             int nint = se.GaussPoints();
-            
-            double pn[MN] = {0};
-            vector< vector<double> >cn(nsol,vector<double>(MN));
-            if (sporo) {
-                for (j=0; j<nseln; ++j)
-                {
-                    pn[j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofP);
-                    for (int isol=0; isol<nsol; ++isol) {
-                        cn[isol][j] = ss.GetMesh()->Node(se.m_node[j]).get(m_dofC + m_sid[isol]);
-                    }
-                }
-            }
             
             // copy the LM vector
             ss.UnpackLM(se, sLM);
@@ -2175,9 +2221,9 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                 // calculate normal effective solute flux
                 for (int isol=0; isol<nsol; ++isol)
                 {
-                    int l = sl[isol];
-                    double epsc = m_epsc*pt.m_epsc[l]*psf;
-                    jn[isol] = pt.m_Lmc[l] + epsc*pt.m_cg[l];
+                    int isl = sl[isol];
+                    double epsc = m_epsc*pt.m_epsc[isl]*psf;
+                    jn[isol] = pt.m_Lmc[isl] + epsc*pt.m_cg[isl];
                 }
                 
                 // normal fluid flux
@@ -2461,7 +2507,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                         ke[k+3][l+3] += gac;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             for (int jsol=0; jsol<nsol; ++jsol) {
-                                                int z = (isol == jsol? 1.0 : 0.0);
+                                                double z = (isol == jsol ? 1.0 : 0.0);
                                                 double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                                 double hac = (-Hs[a]*Hs[c]*epsc*z)*tmp*dt;
                                                 ke[k+4+isol][l+4+jsol] += hac;
@@ -2474,7 +2520,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                         ke[k+3][l+3] += gad;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             for (int jsol=0; jsol<nsol; ++jsol) {
-                                                int z = (isol == jsol? 1.0 : 0.0);
+                                                double z = (isol == jsol ? 1.0 : 0.0);
                                                 double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                                 double had = (Hs[a]*Hm[d]*epsc*z)*tmp*dt;
                                                 ke[k+4+isol][l+4+jsol] += had;
@@ -2490,7 +2536,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                         ke[k+3][l+3] += gbc;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             for (int jsol=0; jsol<nsol; ++jsol) {
-                                                int z = (isol == jsol? 1.0 : 0.0);
+                                                double z = (isol == jsol ? 1.0 : 0.0);
                                                 double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                                 double hbc = (Hm[b]*Hs[c]*epsc*z)*tmp*dt;
                                                 ke[k+4+isol][l+4+jsol] += hbc;
@@ -2503,7 +2549,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                         ke[k+3][l+3] += gbd;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             for (int jsol=0; jsol<nsol; ++jsol) {
-                                                int z = (isol == jsol? 1.0 : 0.0);
+                                                double z = (isol == jsol ? 1.0 : 0.0);
                                                 double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                                 double hbd = (-Hm[b]*Hm[d]*epsc*z)*tmp*dt;
                                                 ke[k+4+isol][l+4+jsol] += hbd;
@@ -2572,8 +2618,15 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                             vec3d c1 = Pn*m*(1/detJ[j]);
                             mat3d Q1 = (mat3dd(1)*(nu * m) + (nu & m))*(1/detJ[j]);
                             mat3d B = ((Ps*c1) & (Nb1*nu)) - Ps*Pn;
-                            mat3d R = (mat3dd(1)*(nu * dr) + (nu & dr))/(-g);
-                            mat3d L1 = Ps*(Pn*Q1 + R - mat3dd(1))*Pn*(-g);
+                            // NOTE: R used to be formed as
+                            //   (mat3dd(1)*(nu*dr) + (nu & dr))/(-g)
+                            // and then multiplied by (-g) again in L1 below.
+                            // g == 0 is reachable on first contact while
+                            // Lmd > 0, and inf*0 = NaN.  Fold the factor in
+                            // analytically instead: Rg == R*(-g) exactly, so
+                            // L1 is unchanged but finite for every g.
+                            mat3d Rg = mat3dd(1)*(nu * dr) + (nu & dr);
+                            mat3d L1 = Ps*((Pn*Q1 - mat3dd(1))*(-g) + Rg)*Pn;
                             
                             // evaluate Ac, Mc, and combine into As
                             double* Gr = se.Gr(j);
@@ -2664,18 +2717,50 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 }
                             }
                             
+                            // Coefficient of the solid-pressure frictional
+                            // coupling terms k^(1,1)_ac and k^(2,1)_bc
+                            // (Eq. S6.25).  These linearize
+                            //
+                            //     mueff = mu*(1 - (1-phi)*fls),
+                            //     fls   = (p1 - ambp)/pn
+                            //
+                            // with respect to the primary nodal pressures, so
+                            // they are only correct where that expression is
+                            // what actually produced mueff:
+                            //
+                            //  - with smooth_fls, fls comes from
+                            //    GetGPLocalFLS() -- an average over the parent
+                            //    solid element -- whose linearization bears no
+                            //    relation to mu*(1-phi).  Including this term
+                            //    there is worse than omitting it.
+                            //  - wherever clamp_fls() or MBRACKET() clipped the
+                            //    value, d(mueff)/dp is identically zero.
+                            //
+                            // Marginally-contacting points sit in the clipped
+                            // regime, which is exactly where a spurious
+                            // coupling of this magnitude does the most damage.
+                            //
+                            // NOTE: these terms must NOT carry a factor dt.
+                            //       They are d(mechanical residual)/d(pressure),
+                            //       and the mechanical residual in LoadVector()
+                            //       has no dt -- only the fluid and solute flux
+                            //       residuals do.
+                            vec3d rfric(0,0,0);
+                            if ((m_bsmfls == false) && (pt.m_mueff > 0.0))
+                            {
+                                bool bclamped = (m_phi < 1.0) && (pt.m_fls >= 1.0/(1.0 - m_phi));
+                                if (bclamped == false) rfric = s1*(m_mu*(1.0 - m_phi));
+                            }
+
                             // --- M U L T I P H A S I C   S T I F F N E S S ---
                             // Mixed multiphasic/single-phase contact has no
                             // pressure- or solute-continuity equations on the
                             // secondary surface.  The mechanical traction in
                             // slip still depends on the primary pressure through
                             // the friction law, however, so retain the two
-                            // solid-pressure frictional terms k^(1,1)_ac and
-                            // k^(2,1)_bc from Eq. (S6.25).
+                            // solid-pressure frictional terms.
                             if (sporo && !mporo)
                             {
-                                double dt = fem.GetTime().timeIncrement;
-                                
                                 // --- S O L I D - P R E S S U R E   C O N T A C T ---
                                 // Only the primary pressure column exists in
                                 // this mixed case.  There are no corresponding
@@ -2685,7 +2770,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                     k = a*ndpn;
                                     for (int c=0; c<nseln; ++c) {
                                         l = c*ndpn;
-                                        vec3d kac = (s1*m_mu*(1.0-m_phi))*(-Hs[a]*Hs[c])*tmp*dt;
+                                        vec3d kac = rfric*(-Hs[a]*Hs[c])*tmp;
                                         ke[k  ][l+3] += kac.x; ke[k+1][l+3] += kac.y; ke[k+2][l+3] += kac.z;
                                     }
                                 }
@@ -2693,7 +2778,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                     k = (nseln+b)*ndpn;
                                     for (int c=0; c<nseln; ++c) {
                                         l = c*ndpn;
-                                        vec3d kbc = (s1*m_mu*(1.0-m_phi))*(Hm[b]*Hs[c])*tmp*dt;
+                                        vec3d kbc = rfric*(Hm[b]*Hs[c])*tmp;
                                         ke[k  ][l+3] += kbc.x; ke[k+1][l+3] += kbc.y; ke[k+2][l+3] += kbc.z;
                                     }
                                 }
@@ -2711,9 +2796,9 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                 vec3d p = gmcnt[0]*dpmr + gmcnt[1]*dpms;
                                 
                                 // evaluate Pc
-                                double Pc[MN];
+                                double Pcp[MN];
                                 for (int k=0; k<nseln; ++k) {
-                                    Pc[k] = (a[0][0]*dpmr*Gr[k]
+                                    Pcp[k] = (a[0][0]*dpmr*Gr[k]
                                              + a[0][1]*dpmr*Gs[k]
                                              + a[1][0]*dpms*Gr[k]
                                              + a[1][1]*dpms*Gs[k])*(-g);
@@ -2741,9 +2826,9 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                     k = a*ndpn;
                                     for (int c=0; c<nseln; ++c) {
                                         l = c*ndpn;
-                                        vec3d gac = (p*Hs[a]*Hs[c]*epsp-((Ac[c]*nu)*wn+nu*epsp*Pc[c])*Hs[a])*tmp*dt;
+                                        vec3d gac = (p*Hs[a]*Hs[c]*epsp-((Ac[c]*nu)*wn+nu*epsp*Pcp[c])*Hs[a])*tmp*dt;
                                         ke[k+3][l  ] += gac.x; ke[k+3][l+1] += gac.y; ke[k+3][l+2] += gac.z;
-                                        vec3d kac = (s1*m_mu*(1.0-m_phi))*(-Hs[a]*Hs[c])*tmp*dt;
+                                        vec3d kac = rfric*(-Hs[a]*Hs[c])*tmp;
                                         ke[k  ][l+3] += kac.x; ke[k+1][l+3] += kac.y; ke[k+2][l+3] += kac.z;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
@@ -2766,9 +2851,9 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                     k = (nseln+b)*ndpn;
                                     for (int c=0; c<nseln; ++c) {
                                         l = c*ndpn;
-                                        vec3d gbc = (p*(-Hm[b]*Hs[c]*epsp)+((Ac[c]*nu)*wn + nu*Pc[c]*epsp)*Hm[b] + (mb[b]*wn*Hs[c]) - nu*Gbc[b][c]*wn)*tmp*dt;
+                                        vec3d gbc = (p*(-Hm[b]*Hs[c]*epsp)+((Ac[c]*nu)*wn + nu*Pcp[c]*epsp)*Hm[b] + (mb[b]*wn*Hs[c]) - nu*Gbc[b][c]*wn)*tmp*dt;
                                         ke[k+3][l  ] += gbc.x; ke[k+3][l+1] += gbc.y; ke[k+3][l+2] += gbc.z;
-                                        vec3d kbc = (s1*m_mu*(1.0-m_phi))*(Hm[b]*Hs[c])*tmp*dt;
+                                        vec3d kbc = rfric*(Hm[b]*Hs[c])*tmp;
                                         ke[k  ][l+3] += kbc.x; ke[k+1][l+3] += kbc.y; ke[k+2][l+3] += kbc.z;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
@@ -2798,7 +2883,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                         ke[k+3][l+3] += gac;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             for (int jsol=0; jsol<nsol; ++jsol) {
-                                                int z = (isol == jsol? 1.0 : 0.0);
+                                                double z = (isol == jsol ? 1.0 : 0.0);
                                                 double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                                 double hac = (-Hs[a]*Hs[c]*epsc*z)*(dt*detJ[j]*w[j]);
                                                 ke[k+4+isol][l+4+jsol] += hac;
@@ -2811,7 +2896,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                         ke[k+3][l+3] += gad;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             for (int jsol=0; jsol<nsol; ++jsol) {
-                                                int z = (isol == jsol? 1.0 : 0.0);
+                                                double z = (isol == jsol ? 1.0 : 0.0);
                                                 double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                                 double had = (Hs[a]*Hm[d]*epsc*z)*(dt*detJ[j]*w[j]);
                                                 ke[k+4+isol][l+4+jsol] += had;
@@ -2827,7 +2912,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                         ke[k+3][l+3] += gbc;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             for (int jsol=0; jsol<nsol; ++jsol) {
-                                                int z = (isol == jsol? 1.0 : 0.0);
+                                                double z = (isol == jsol ? 1.0 : 0.0);
                                                 double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                                 double hbc = (Hm[b]*Hs[c]*epsc*z)*(dt*detJ[j]*w[j]);
                                                 ke[k+4+isol][l+4+jsol] += hbc;
@@ -2840,7 +2925,7 @@ void FESlidingInterfaceMP::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo&
                                         ke[k+3][l+3] += gbd;
                                         for (int isol=0; isol<nsol; ++isol) {
                                             for (int jsol=0; jsol<nsol; ++jsol) {
-                                                int z = (isol == jsol? 1.0 : 0.0);
+                                                double z = (isol == jsol ? 1.0 : 0.0);
                                                 double epsc = m_epsc*pt.m_epsc[sl[isol]]*psf;
                                                 double hbd = (-Hm[b]*Hm[d]*epsc*z)*(dt*detJ[j]*w[j]);
                                                 ke[k+4+isol][l+4+jsol] += hbd;
@@ -2872,7 +2957,6 @@ void FESlidingInterfaceMP::UpdateContactPressures()
     for (np=0; np<npass; ++np)
     {
         FESlidingSurfaceMP& ss = (np == 0? m_ss : m_ms);
-        FESlidingSurfaceMP& ms = (np == 0? m_ms : m_ss);
         
         // loop over all elements of the primary surface
         for (n=0; n<ss.Elements(); ++n)
@@ -3050,7 +3134,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
                 // ContactTraction() on the next iteration, and stayed flagged
                 // m_bstick.
                 if (Ln <= 0) {
-                    ReleaseContactPoint(ds);
+                    ReleaseContactPoint(ds, m_ssl);
                     Ln = 0;
                 }
                 else {
@@ -3072,7 +3156,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
                 }
                 if (ds.m_Lmd <= 0) {
                     // the surfaces have separated at this point
-                    ReleaseContactPoint(ds);
+                    ReleaseContactPoint(ds, m_ssl);
                     Ln = 0;
                 }
                 else {
@@ -3146,7 +3230,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
 
                 // release test (see the primary-surface loop above)
                 if (Ln <= 0) {
-                    ReleaseContactPoint(dm);
+                    ReleaseContactPoint(dm, m_msl);
                     Ln = 0;
                 }
                 else {
@@ -3168,7 +3252,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
                 }
                 if (dm.m_Lmd <= 0) {
                     // the surfaces have separated at this point
-                    ReleaseContactPoint(dm);
+                    ReleaseContactPoint(dm, m_msl);
                     Ln = 0;
                 }
                 else {
@@ -3192,7 +3276,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
                     maxpg = max(maxpg,fabs(dm.m_pg));
                     normDP += dm.m_pg*dm.m_pg;
                     for (int isol=0; isol<nsol; ++isol) {
-                        int l = m_ssl[isol];
+                        int l = m_msl[isol];
                         epsc = m_epsc*dm.m_epsc[l]*psf;
                         Lc[isol] = dm.m_Lmc[l] + epsc*dm.m_cg[l];
                         maxcg[isol] = max(maxcg[isol],fabs(dm.m_cg[l]));
@@ -3200,7 +3284,7 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
                     }
                 }
                 dm.m_Lmp = Lp;
-                for (int isol=0; isol<nsol; ++isol) dm.m_Lmc[m_ssl[isol]] = Lc[isol];
+                for (int isol=0; isol<nsol; ++isol) dm.m_Lmc[m_msl[isol]] = Lc[isol];
             }
         }
     }
@@ -3212,7 +3296,30 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
     normC = normL1/(m_Rgas*m_Tabs);
     
     // calculate relative norms
+    //
+    // NOTE: normL0 == 0 with normL1 > 0 means every multiplier was zero going
+    //       into this augmentation, i.e. the multipliers set by the *previous*
+    //       augmentation were destroyed by ReleaseContactPoint() during the
+    //       Newton iterations that followed.  The relative measure below is
+    //       then identically 1 no matter how well converged the contact
+    //       actually is, so it can never meet m_atol and the augmentation loop
+    //       runs to maxaug every step while reporting a meaningless
+    //       "D multiplier : 1.000000e+00".  Detect that case and fall back on
+    //       the gap criterion instead of testing against a ratio that carries
+    //       no information.
+    bool bLreset = (normL0 == 0.0) && (normL1 > 0.0);
     double lnorm = (normL1 != 0 ? fabs((normL1 - normL0) / normL1) : fabs(normL1 - normL0));
+
+    // relative change in the maximum gap since the previous augmentation.
+    // naug == 0 is the first augmentation of this time step, so there is
+    // nothing to compare against yet and we must augment at least once more.
+    double gnorm = 1.0;
+    if ((naug > 0) && (m_maxgapprev >= 0.0))
+    {
+        double gref = (maxgap > m_maxgapprev ? maxgap : m_maxgapprev);
+        gnorm = (gref > 0 ? fabs(maxgap - m_maxgapprev)/gref : 0.0);
+    }
+    m_maxgapprev = maxgap;
     double pnorm = (normP != 0 ? (normDP/normP) : normDP);
     vector<double> cnorm(nsol);
     for (int isol=0; isol<nsol; ++isol)
@@ -3224,19 +3331,61 @@ bool FESlidingInterfaceMP::Augment(int naug, const FETimeInfo& tp)
     for (int isol=0; isol<nsol; ++isol)
         if ((m_ctol > 0) && (bsolu && maxcg[isol] > m_ctol)) bconv = false;
     
-    if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
+    if (bLreset)
+    {
+        // The multiplier ratio carries no information this augmentation (see
+        // the note above), so measure instead whether the augmentation loop has
+        // stopped changing the solution: the relative change in the maximum gap
+        // between successive augmentations.  Unlike the absolute 'gaptol' this
+        // is self-scaling, so it does not depend on the user having guessed a
+        // gap tolerance that happens to sit below the converged gap.
+        if ((m_atol > 0) && (gnorm > m_atol)) bconv = false;
+    }
+    else
+    {
+        if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
+    }
     if ((m_atol > 0) && (pnorm > m_atol)) bconv = false;
     for (int isol=0; isol<nsol; ++isol)
         if ((m_atol > 0) && (cnorm[isol] > m_atol)) bconv = false;
-    
+
     if (naug < m_naugmin ) bconv = false;
-    if (naug >= m_naugmax) bconv = true;
-    
+    if (naug >= m_naugmax)
+    {
+        // NOTE: reaching maxaug forces convergence.  That used to happen
+        //       silently, so an augmentation loop that never converged was
+        //       indistinguishable in the log from one that did.
+        if (bconv == false)
+        {
+            if (bLreset)
+                feLogWarning("sliding interface %d: reached the maximum number of augmentations (%d).\n"
+                             "The Lagrange multipliers are being reset by contact release between\n"
+                             "augmentations, so convergence was measured on the change in the\n"
+                             "maximum gap instead, and that is still changing by more than\n"
+                             "'tolerance'. Accepting the contact solution as is.", GetID(), m_naugmax);
+            else
+                feLogWarning("sliding interface %d: reached the maximum number of augmentations (%d)\n"
+                             "without meeting the augmentation tolerance. Accepting the contact\n"
+                             "solution as is.", GetID(), m_naugmax);
+        }
+        bconv = true;
+    }
+
     feLog(" sliding interface # %d\n", GetID());
     feLog("                        CURRENT        REQUIRED\n");
-    feLog("    D multiplier : %15le", lnorm);
-    if (m_atol > 0) feLog("%15le\n", m_atol);
-    else feLog("       ***\n");
+    if (bLreset) {
+        // the multiplier ratio is 1 by construction here, so report the gap
+        // change that is actually being tested instead
+        feLog("    D multiplier : %15s       ***   (multipliers reset by contact release)\n", "n/a");
+        feLog("    gap change   : %15le", gnorm);
+        if (m_atol > 0) feLog("%15le\n", m_atol);
+        else feLog("       ***\n");
+    }
+    else {
+        feLog("    D multiplier : %15le", lnorm);
+        if (m_atol > 0) feLog("%15le\n", m_atol);
+        else feLog("       ***\n");
+    }
     if (bporo) { feLog("    P gap       : %15le", pnorm);
         if (m_atol > 0) feLog("%15le\n", m_atol);
         else feLog("       ***\n");
@@ -3283,6 +3432,16 @@ void FESlidingInterfaceMP::Serialize(DumpStream &ar)
     ar & m_ssl;
     ar & m_msl;
     ar & m_sz;
+    
+    // iteration bookkeeping.  These used to be function-local statics inside
+    // Update(); as members they belong in the restart data, otherwise a
+    // restart resumes with m_bfirst == true (spurious node relocation) and
+    // with the segment-update counters reset.
+    ar & m_naugprev;
+    ar & m_biter;
+    ar & m_bfirst;
+    ar & m_bfreeze;
+    ar & m_maxgapprev;
     
     // serialize element pointers
     SerializeElementPointers(m_ss, m_ms, ar);

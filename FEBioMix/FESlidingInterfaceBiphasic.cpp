@@ -1208,12 +1208,30 @@ vec3d FESlidingInterfaceBiphasic::SlipTangent(FESlidingSurfaceBiphasic& ss, cons
 }
 
 //-----------------------------------------------------------------------------
-//! Clamp the local fluid load support p/(-tn) to its thermodynamic upper bound
-//! (1-phi)^-1, per Eq. (2.5) and the discussion following it in
-//! Zimmerman et al., J Biomech Eng 144:021008 (2022).  Guards phi = 1, where
-//! (1-phi)*fls = 0 identically and no clamp is needed.
+//! Clamp the local fluid load support to its physical range [0, (1-phi)^-1],
+//! per Eq. (2.5) and the discussion following it in Zimmerman et al.,
+//! J Biomech Eng 144:021008 (2022).  This keeps the effective friction
+//! coefficient
+//!
+//!     mueff = mu*(1 - (1-phi)*fls)
+//!
+//! inside [0, mu]: fls = 0 means the solid carries the whole load (boundary
+//! friction, mueff = mu) and fls = (1-phi)^-1 means the fluid does
+//! (mueff = 0).  phi >= 1 is guarded, where (1-phi)*fls = 0 identically.
+//!
+//! NOTE: the lower bound matters, and only became reachable with smooth_fls.
+//!       On the direct path fls = ph/pn and mueff is always multiplied by pn
+//!       again, so pn cancels and the friction traction stays bounded even for
+//!       a wild fls.  With smooth_fls, fls comes from GetGPLocalFLS() as
+//!       -p/tn with tn the element-averaged effective normal stress; where the
+//!       solid is in tension, or lightly loaded, tn turns small or positive,
+//!       fls goes large and negative, and mueff = mu*(1 + (1-phi)*|fls|) grows
+//!       without bound -- this time with no pn to cancel it, because mueff no
+//!       longer depends on pn at all.  A friction coefficient of 10 or 100
+//!       then enters the traction directly.
 static double clamp_fls(double fls, double phi)
 {
+    if (fls < 0.0) return 0.0;
     if (phi >= 1.0) return fls;
     const double flsmax = 1.0/(1.0 - phi);
     return (fls > flsmax) ? flsmax : fls;
@@ -2169,9 +2187,32 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FELinearSystem& LS, const FETim
                                 
                                 double epsp = m_epsp*pt.m_epsp*psf;
                                 
-                                vec3d r = s1*m_mu*(1.0 - m_phi);
-                                
-                                
+                                // Coefficient of the solid-pressure frictional
+                                // term (the "c. s-term" block below), which
+                                // linearizes
+                                //
+                                //     mueff = mu*(1 - (1-phi)*fls),  fls = p/pn
+                                //
+                                // with respect to the primary nodal pressures.
+                                // That is only what produced mueff when:
+                                //  - smooth_fls is off.  With it on, fls comes
+                                //    from GetGPLocalFLS() -- an average over the
+                                //    parent solid element -- whose linearization
+                                //    bears no relation to mu*(1-phi).
+                                //  - clamp_fls()/MBRACKET() did not clip the
+                                //    value, in which case d(mueff)/dp = 0.
+                                // Marginally-contacting points sit in the clipped
+                                // regime, so leaving this unguarded injects a
+                                // large spurious coupling exactly where the
+                                // contact status is already chattering.
+                                vec3d r(0,0,0);
+                                if ((m_bsmfls == false) && (pt.m_mueff > 0.0))
+                                {
+                                    bool bclamped = (m_phi < 1.0) && (pt.m_fls >= 1.0/(1.0 - m_phi));
+                                    if (bclamped == false) r = s1*(m_mu*(1.0 - m_phi));
+                                }
+
+
                                 // --- S O L I D - P R E S S U R E   C O N T A C T ---
                                 
                                 // a. q-term
@@ -2201,13 +2242,25 @@ void FESlidingInterfaceBiphasic::StiffnessMatrix(FELinearSystem& LS, const FETim
 
                                 // c. s-term
                                 //-------------------------------------
-                                
+                                //
+                                // NOTE: this is the only block here whose rows
+                                //       are mechanical dofs, i.e. it is
+                                //       d(mechanical residual)/d(pressure).  The
+                                //       mechanical contact residual assembled in
+                                //       LoadVector() carries no dt -- only the
+                                //       fluid flux residual does -- so this term
+                                //       must NOT use tmp, which was redefined
+                                //       above to dt*w[j]*detJ[j].  Every other
+                                //       block in this section has a pressure row
+                                //       and is correct to use tmp.
+                                double tmps = w[j]*detJ[j];
+
                                 for (int l=0; l<nseln; ++l) {
                                     for (int k=0; k<nseln+nmeln; ++k)
                                     {
-                                        ke[4*k    ][4*l+3] -= tmp*N[k]*N[l]*r.x;
-                                        ke[4*k + 1][4*l+3] -= tmp*N[k]*N[l]*r.y;
-                                        ke[4*k + 2][4*l+3] -= tmp*N[k]*N[l]*r.z;
+                                        ke[4*k    ][4*l+3] -= tmps*N[k]*N[l]*r.x;
+                                        ke[4*k + 1][4*l+3] -= tmps*N[k]*N[l]*r.y;
+                                        ke[4*k + 2][4*l+3] -= tmps*N[k]*N[l]*r.z;
                                     }
                                 }
 
