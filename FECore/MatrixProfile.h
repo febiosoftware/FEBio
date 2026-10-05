@@ -126,6 +126,9 @@ public:
 	// Extracts a block profile
 	SparseMatrixProfile GetBlockProfile(int nrow0, int ncol0, int nrow1, int ncol1) const;
 
+	// Calculate the transpose of the profile
+	SparseMatrixProfile Transpose() const;
+
 private:
 	int	m_nrow, m_ncol;				//!< dimensions of matrix
 	std::vector<ColumnProfile>	m_prof;	//!< the actual profile in condensed format

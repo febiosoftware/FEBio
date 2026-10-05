@@ -358,3 +358,22 @@ SparseMatrixProfile SparseMatrixProfile::GetBlockProfile(int nrow0, int ncol0, i
 
 	return bMP;
 }
+
+SparseMatrixProfile SparseMatrixProfile::Transpose() const
+{
+	SparseMatrixProfile tmp(m_ncol, m_nrow);
+	for (int j=0; j<m_ncol; ++j)
+	{
+		const ColumnProfile& a = m_prof[j];
+		int n = a.size();
+		for (int k=0; k<n; ++k)
+		{
+			const RowEntry& re = a[k];
+			for (int i=re.start; i<=re.end; ++i)
+			{
+				tmp.Insert(j, i);
+			}
+		}
+	}
+	return tmp;
+}
