@@ -2408,20 +2408,27 @@ void FEMultiphasicShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp
             // calculate the gradient of c at gauss-point
             spt.m_gradc[k] = gradient(el, cn[sid[k]], dn[sid[k]], n);
         }
-        
+
+        // evaluate fluid pressure at gauss-point
+        ppt.m_p = evaluate(el, pn, qn, n);
+
+        // calculate the gradient of p at gauss-point
+        ppt.m_gradp = gradient(el, pn, qn, n);
+
+        // evaluate actual solute concentrations at the current J and effective
+        // concentrations (using SBM densities from the previous iteration), so that
+        // the reaction supplies used to update the SBM densities are not lagged
+        // by one iteration relative to the nodal solution
+        for (k=0; k<nsol; ++k)
+            spt.m_ca[k] = pmb->Concentration(mp,k);
+
         // update SBM referential densities
         pmb->UpdateSolidBoundMolecules(mp);
-        
+
         // evaluate referential solid volume fraction
         ppt.m_phi0t = pmb->SolidReferentialVolumeFraction(mp);
         if (m_breset) ppt.m_phi0 = ppt.m_phi0t;
-        
-        // evaluate fluid pressure at gauss-point
-        ppt.m_p = evaluate(el, pn, qn, n);
-        
-        // calculate the gradient of p at gauss-point
-        ppt.m_gradp = gradient(el, pn, qn, n);
-        
+
         // update the fluid and solute fluxes
         // and evaluate the actual fluid pressure and solute concentration
         ppt.m_w = pmb->FluidFlux(mp);

@@ -1704,26 +1704,33 @@ void FEMultiphasicSolidDomain::UpdateElementStress(int iel, double dt)
         FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
         FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
         
-        // update SBM referential densities
-        pmb->UpdateSolidBoundMolecules(mp);
-        
-        // evaluate referential solid volume fraction
-        ppt.m_phi0t = pmb->SolidReferentialVolumeFraction(mp);
-        if (m_breset) ppt.m_phi0 = ppt.m_phi0t;
-
         // evaluate fluid pressure at gauss-point
         ppt.m_p = el.Evaluate(pn, n);
-        
+
         // calculate the gradient of p at gauss-point
         ppt.m_gradp = gradient(el, pn, n);
-        
+
         for (k=0; k<nsol; ++k) {
             // evaluate effective solute concentrations at gauss-point
             spt.m_c[k] = el.Evaluate(&ct[k][0], n);
             // calculate the gradient of c at gauss-point
             spt.m_gradc[k] = gradient(el, &ct[k][0], n);
         }
-        
+
+        // evaluate actual solute concentrations at the current J and effective
+        // concentrations (using SBM densities from the previous iteration), so that
+        // the reaction supplies used to update the SBM densities are not lagged
+        // by one iteration relative to the nodal solution
+        for (k=0; k<nsol; ++k)
+            spt.m_ca[k] = pmb->Concentration(mp,k);
+
+        // update SBM referential densities
+        pmb->UpdateSolidBoundMolecules(mp);
+
+        // evaluate referential solid volume fraction
+        ppt.m_phi0t = pmb->SolidReferentialVolumeFraction(mp);
+        if (m_breset) ppt.m_phi0 = ppt.m_phi0t;
+
         // update the fluid and solute fluxes
         // and evaluate the actual fluid pressure and solute concentration
         ppt.m_w = pmb->FluidFlux(mp);
