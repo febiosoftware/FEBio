@@ -61,6 +61,15 @@ public:
     //! Update solid bound molecules
     virtual void UpdateSolidBoundMolecules(FEMaterialPoint& mp) = 0;
 
+    //! Weight of the current-step SBM mass supply in the time integration rule
+    //! used by UpdateSolidBoundMolecules (1 for backward Euler, 1/2 for trapezoidal rule).
+    virtual double SBMSupplyIntegrationWeight() const { return 1.0; }
+
+    //! Derivative of the SBM referential density with respect to its current referential
+    //! mass supply, divided by dt. Returns zero when the SBM density is held at a bound.
+    //! Used for the consistent linearization of the solute mass balance.
+    double SBMDensitySupplyWeight(FEMaterialPoint& mp, const int sbm);
+
 public:
 	
 	//! calculate stress at material point
