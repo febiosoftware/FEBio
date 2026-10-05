@@ -98,25 +98,6 @@ void FEMultiphasic::AddMembraneReaction(FEMembraneReaction* pcr)
 }
 
 //-----------------------------------------------------------------------------
-//! Derivative of the SBM referential density with respect to its current referential
-//! mass supply, divided by dt. When the integrated density violates the bounds
-//! [rhomin, rhomax], UpdateSolidBoundMolecules clamps it, so it no longer depends
-//! on the supply and this function returns zero.
-double FEMultiphasic::SBMDensitySupplyWeight(FEMaterialPoint& mp, const int sbm)
-{
-	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
-	double alpha = SBMSupplyIntegrationWeight();
-	double dt = CurrentTimeIncrement();
-
-	// SBM referential density before the bounds are enforced
-	double rhor = spt.m_sbmrp[sbm] + dt*(alpha*spt.m_sbmrhat[sbm] + (1 - alpha)*spt.m_sbmrhatp[sbm]);
-	if (rhor < spt.m_sbmrmin[sbm]) return 0;
-	if ((spt.m_sbmrmax[sbm] > 0) && (rhor > spt.m_sbmrmax[sbm])) return 0;
-
-	return alpha;
-}
-
-//-----------------------------------------------------------------------------
 //! Returns the local ID of the SBM, given the global ID.
 //! \param nid global ID (one - based)
 //! \return the local ID (zero-based index) or -1 if not found.

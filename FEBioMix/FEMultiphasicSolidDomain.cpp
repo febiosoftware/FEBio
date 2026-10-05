@@ -963,6 +963,8 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
         vector<double> dkdJ(spt.m_dkdJ);
         vector< vector<double> > dkdc(spt.m_dkdc);
         vector< vector<double> > dkdr(spt.m_dkdr);
+        vector< vector<double> > dkdJr(spt.m_dkdJr);
+        vector< vector< vector<double> > > dkdrc(spt.m_dkdrc);
         
         // evaluate the porosity and its derivative
         double phiw = m_pMat->Porosity(mp);
@@ -1019,13 +1021,8 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
 
 		}
         
-        // sensitivity of SBM referential densities to their current supply (divided by dt)
-        vector<double> sbmw(nsbm);
-        for (int isbm=0; isbm<nsbm; ++isbm)
-            sbmw[isbm] = m_pMat->SBMDensitySupplyWeight(mp, isbm);
-
         for (int isol=0; isol<nsol; ++isol) {
-
+        
 			FESolute* soli = m_pMat->GetSolute(isol);
 
 			// evaluate the permeability derivatives
@@ -1155,20 +1152,23 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
                     De += D[isol]*(z[isol]*kappa[isol]*c[isol]/D0[isol]);
                     qcu[isol] = qpu*(c[isol]*(kappa[isol]+J*phiw*dkdJ[isol]));
                     
-                    // chemical reactions: dependence of (J-phisr)*kappa*c on the SBM
-                    // referential densities, which change with u through the SBM supply
+                    // chemical reactions
                     for (int ireact=0; ireact<nreact; ++ireact) {
 						FEChemicalReaction* reacti = m_pMat->GetReaction(ireact);
 
                         double sum1 = 0;
+                        double sum2 = 0;
                         for (int isbm=0; isbm<nsbm; ++isbm) {
-                            sum1 += sbmw[isbm]*m_pMat->SBMMolarMass(isbm)*reacti->m_v[nsol+isbm]*
+                            sum1 += m_pMat->SBMMolarMass(isbm)*reacti->m_v[nsol+isbm]*
                             ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/m_pMat->SBMDensity(isbm));
+                            sum2 += m_pMat->SBMMolarMass(isbm)*reacti->m_v[nsol+isbm]*
+                            (dkdr[isol][isbm]+(J-phi0)*dkdJr[isol][isbm]-dkdJ[isol]/m_pMat->SBMDensity(isbm));
                         }
                         double zhat = reactionSupply[ireact];
                         mat3dd zhatI(zhat);
                         mat3ds dzde = tangentReactionSupplyStrain[ireact];
-                        qcu[isol] -= ((zhatI+dzde*(J-phi0))*gradN[j])*(sum1*c[isol]);
+                        qcu[isol] -= ((zhatI+dzde*(J-phi0))*gradN[j])*(sum1*c[isol])
+                        +gradN[j]*(c[isol]*(J-phi0)*sum2*zhat);
                     }
                 }
                 
@@ -1236,15 +1236,22 @@ bool FEMultiphasicSolidDomain::ElementMultiphasicStiffness(FESolidElement& el, m
                             dchatdc[isol][jsol] += reacti->m_v[isol]
                             * tangentReactionSupplyConcentration[ireact][jsol];
 
-                            // dependence of (J-phisr)*kappa*c on the SBM referential densities,
-                            // which change with c through the SBM supply
                             double sum1 = 0;
+                            double sum2 = 0;
                             for (int isbm=0; isbm<nsbm; ++isbm) {
-                                sum1 += sbmw[isbm]*m_pMat->SBMMolarMass(isbm)*reacti->m_v[nsol+isbm]*
+                                sum1 += m_pMat->SBMMolarMass(isbm)*reacti->m_v[nsol+isbm]*
                                 ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/m_pMat->SBMDensity(isbm));
+                                sum2 += m_pMat->SBMMolarMass(isbm)*reacti->m_v[nsol+isbm]*
+                                ((J-phi0)*dkdrc[isol][isbm][jsol]-dkdc[isol][jsol]/m_pMat->SBMDensity(isbm));
                             }
+                            double zhat = reactionSupply[ireact];
                             double dzdc = tangentReactionSupplyConcentration[ireact][jsol];
-                            qcc[isol][jsol] -= H[j]*phiw*c[isol]*dzdc*sum1;
+                            if (jsol != isol) {
+                                qcc[isol][jsol] -= H[j]*phiw*c[isol]*(dzdc*sum1+zhat*sum2);
+                            }
+                            else {
+                                qcc[isol][jsol] -= H[j]*phiw*((zhat+c[isol]*dzdc)*sum1+c[isol]*zhat*sum2);
+                            }
                         }
                     }
                 }
