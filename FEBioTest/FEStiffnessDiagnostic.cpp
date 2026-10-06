@@ -35,6 +35,10 @@ SOFTWARE.*/
 #include <FEBioMech/FERigidBody.h>
 #include <FEBioMech/FESolidSolver2.h>
 #include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cmath>
 
 //-----------------------------------------------------------------------------
 FEStiffnessDiagnostic::FEStiffnessDiagnostic(FEModel* fem) : FECoreTask(fem)
@@ -81,6 +85,7 @@ bool FEStiffnessDiagnostic::Run()
 	m_fp = fopen(logfile.c_str(), "wt");
 	fprintf(m_fp, "FEBio Stiffness Diagnostics:\n");
 	fprintf(m_fp, "============================\n");
+	fflush(m_fp);
 
 	fem.BlockLog();
 	bool bret = fem.Solve();
@@ -88,6 +93,9 @@ bool FEStiffnessDiagnostic::Run()
 	if (bret == false)
 	{
 		feLogError("FEBio error terminated. Aborting diagnostic.\n");
+		fprintf(m_fp, "FEBio error terminated. Diagnostic aborted.\n");
+		fclose(m_fp);
+		m_fp = nullptr;
 		return false;
 	}
 
@@ -100,6 +108,12 @@ bool FEStiffnessDiagnostic::Run()
 }
 
 //-----------------------------------------------------------------------------
+// Compares the assembled stiffness matrix with a central finite-difference
+// approximation of the derivative of the global residual, evaluated at the
+// converged state of each time step. In addition to the overall maximum error,
+// a summary is written for each block of the matrix, where blocks are defined
+// by the names of the degrees of freedom associated with the rows and columns
+// (e.g. x, p, c1, ...). This helps locate inconsistent tangent terms.
 bool FEStiffnessDiagnostic::Diagnose()
 {
 	FEModel* fem = GetFEModel();
@@ -108,24 +122,51 @@ bool FEStiffnessDiagnostic::Diagnose()
 	FEAnalysis* step = fem->GetCurrentStep();
 	if (step == nullptr) return false;
 
-	FESolidSolver2* solver = dynamic_cast<FESolidSolver2*>(step->GetFESolver());
-	FENewtonSolver* nlsolve = dynamic_cast<FENewtonSolver*>(solver);
-	if (nlsolve == nullptr) return false;
+	// any Newton solver will do (e.g. solid, biphasic, multiphasic, ...)
+	FENewtonSolver* nlsolve = dynamic_cast<FENewtonSolver*>(step->GetFESolver());
+	if (nlsolve == nullptr)
+	{
+		fprintf(m_fp, "stiffness diagnostic requires a Newton solver.\n");
+		return false;
+	}
 
 	SparseMatrix* pA = nlsolve->m_pK->GetSparseMatrixPtr();
 	if (pA == nullptr) return false;
 
-	const double eps = 1e-8;
-	int neq = pA->Rows();
+	// re-evaluate the stiffness matrix at the converged state, since the matrix in
+	// memory was evaluated at the start of the last iteration.
+	nlsolve->m_pK->Zero();
+	std::fill(nlsolve->m_Fd.begin(), nlsolve->m_Fd.end(), 0.0);
+	if (nlsolve->StiffnessMatrix() == false)
+	{
+		fprintf(m_fp, "failed to evaluate the stiffness matrix.\n");
+		return false;
+	}
 
-	// need to know which dofs are prescribed
-	// 0 == fixed, 1 == free
+	const int neq = pA->Rows();
+
+	// label each equation with the name of its degree of freedom and its node
+	DOFS& dofs = fem->GetDOFS();
+	std::vector<std::string> eqname(neq, "other");
+	std::vector<int> eqnode(neq, -1);
+
 	vector<int> bc(neq, 0);
 	int nmax = -1;
 	FEMesh& mesh = fem->GetMesh();
 	for (int i = 0; i < mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
+		for (int j = 0; j < (int)node.m_ID.size(); ++j)
+		{
+			int n = node.m_ID[j];
+			if ((n >= 0) && (n < neq))
+			{
+				const char* sz = dofs.GetDOFName(j);
+				eqname[n] = (sz ? sz : "?");
+				eqnode[n] = i + 1;
+			}
+		}
+
 		if (node.m_rid < 0)
 		{
 			for (int j = 0; j < node.m_ID.size(); ++j)
@@ -154,6 +195,7 @@ bool FEStiffnessDiagnostic::Diagnose()
 			for (int j = 0; j < 6; ++j)
 			{
 				int n = rb.m_LM[j];
+				if ((n >= 0) && (n < neq)) eqname[n] = "rigid";
 				if (n >= 0) bc[n] = 1;
 				if (n > nmax) nmax = n;
 			}
@@ -166,45 +208,74 @@ bool FEStiffnessDiagnostic::Diagnose()
 		for (int i = nmax + 1; i < neq; ++i) bc[i] = 1;
 	}
 
-	std::vector<double> R0(neq, 0);
-	nlsolve->Residual(R0);
+	// assign a block index to each dof name
+	std::vector<std::string> names;
+	std::vector<int> eqblk(neq, 0);
+	for (int i = 0; i < neq; ++i)
+	{
+		int k = -1;
+		for (int l = 0; l < (int)names.size(); ++l) if (names[l] == eqname[i]) { k = l; break; }
+		if (k < 0) { names.push_back(eqname[i]); k = (int)names.size() - 1; }
+		eqblk[i] = k;
+	}
+	const int nb = (int)names.size();
+
+	// block statistics
+	struct BlockStats {
+		double kmax = 0;	// max |K_fd|
+		double emax = 0;	// max |K - K_fd|
+		double e2 = 0;		// sum of squared errors
+		double k2 = 0;		// sum of squared K_fd
+		int imax = -1, jmax = -1;
+	};
+	std::vector<BlockStats> blk(nb*nb);
+
+	// current solution (used to scale the perturbations)
+	std::vector<double> U(neq, 0.0);
+	for (int i = 0; i < neq; ++i)
+	{
+		if (i < (int)nlsolve->m_Ut.size()) U[i] += nlsolve->m_Ut[i];
+		if (i < (int)nlsolve->m_Ui.size()) U[i] += nlsolve->m_Ui[i];
+	}
+
+	const double eps = 1e-6;
+	int nreq = (m_nmax <= 0 ? neq : m_nmax);
+	if (nreq > neq) nreq = neq;
+
 	double max_val = 0, max_err = 0.0;
 	int i_max = -1, j_max = -1;
 	std::cerr << "\nstarting diagnostic:\nprogress:";
 	int pct = 0;
 
-	int nreq = (m_nmax <= 0 ? neq : m_nmax);
-	if (nreq > neq) nreq = neq;
-
+	std::vector<double> u(neq, 0), Rp(neq, 0), Rm(neq, 0);
 	for (int j = 0; j < nreq; ++j)
 	{
-		std::vector<double> u(neq, 0);
-		std::vector<double> R(neq, 0);
-		u[j] = eps;
-		nlsolve->Update(u);
-		nlsolve->Residual(R);
-
-		int new_pct = (100 * j) / neq;
+		int new_pct = (100 * j) / nreq;
 		if (pct != new_pct) {
-			if ((new_pct % 10) == 0)
-				std::cerr << "+"; 
-			else
-				std::cerr << "-"; 
+			std::cerr << (((new_pct % 10) == 0) ? "+" : "-");
 			pct = new_pct;
 		}
+		if (bc[j] == 0) continue;
+
+		// central difference
+		double h = eps*(1.0 + fabs(U[j]));
+		std::fill(u.begin(), u.end(), 0.0);
+		u[j] = h;
+		nlsolve->Update(u);
+		std::fill(Rp.begin(), Rp.end(), 0.0);
+		nlsolve->Residual(Rp);
+		u[j] = -h;
+		nlsolve->Update(u);
+		std::fill(Rm.begin(), Rm.end(), 0.0);
+		nlsolve->Residual(Rm);
 
 		for (int i = 0; i < nreq; ++i)
 		{
+			if (bc[i] == 0) continue;
+
 			// note that we flip the sign on ka.
 			// this is because febio actually calculates the negative of the residual
-			double ka_ij = 0;
-			if ((bc[i] == 0) || (bc[j] == 0))
-			{
-				if (i == j) ka_ij = 1;
-				else ka_ij = 0;
-			}
-			else ka_ij = -(R[i] - R0[i]) / eps;
-
+			double ka_ij = -(Rp[i] - Rm[i]) / (2*h);
 			double kt_ij = pA->get(i, j);
 
 			if (fabs(kt_ij) > max_val) max_val = fabs(kt_ij);
@@ -217,6 +288,12 @@ bool FEStiffnessDiagnostic::Diagnose()
 				j_max = j;
 			}
 
+			BlockStats& b = blk[eqblk[i]*nb + eqblk[j]];
+			if (fabs(ka_ij) > b.kmax) b.kmax = fabs(ka_ij);
+			if (err > b.emax) { b.emax = err; b.imax = i; b.jmax = j; }
+			b.e2 += err*err;
+			b.k2 += ka_ij*ka_ij;
+
 			if (m_writeMatrix)
 			{
 				fprintf(m_fp, "%d, %d : %lg, %lg (%lg)\n", i, j, kt_ij, ka_ij, err);
@@ -226,11 +303,12 @@ bool FEStiffnessDiagnostic::Diagnose()
 	std::cerr << "\n";
 
 	// let's make sure we leave the model in a consistent state
-	std::vector<double> u(neq, 0);
-	std::vector<double> R(neq, 0);
+	std::fill(u.begin(), u.end(), 0.0);
 	nlsolve->Update(u);
-	nlsolve->Residual(R);
+	nlsolve->Residual(Rp);
 
+	double t = fem->GetCurrentTime();
+	fprintf(m_fp, "\n=== time = %lg ===\n", t);
 	printf("Max abs. value: %lg\n", max_val);
 	fprintf(m_fp, "Max abs. value: %lg\n", max_val);
 	if (max_val == 0) max_val = 1;
@@ -239,6 +317,21 @@ bool FEStiffnessDiagnostic::Diagnose()
 	printf("Max rel. error: %lg (%d, %d)\n", max_err / max_val, i_max, j_max);
 	fprintf(m_fp, "Max error: %lg (%d, %d)\n", max_err, i_max, j_max);
 	fprintf(m_fp, "Max rel. error: %lg (%d, %d)\n", max_err / max_val, i_max, j_max);
+
+	// block summary
+	fprintf(m_fp, "\nblock summary (row dof / column dof):\n");
+	fprintf(m_fp, "%-8s %-8s %12s %12s %12s   %s\n", "row", "col", "max|Kfd|", "max err", "rel.err(F)", "worst entry: row eq (node), col eq (node)");
+	for (int bi = 0; bi < nb; ++bi)
+		for (int bj = 0; bj < nb; ++bj)
+		{
+			BlockStats& b = blk[bi*nb + bj];
+			if ((b.kmax == 0) && (b.emax == 0)) continue;
+			double rel = (b.k2 > 0 ? sqrt(b.e2 / b.k2) : (b.e2 > 0 ? 1.0 : 0.0));
+			fprintf(m_fp, "%-8s %-8s %12.4le %12.4le %12.4le   %d (%d), %d (%d)\n",
+				names[bi].c_str(), names[bj].c_str(), b.kmax, b.emax, rel,
+				b.imax, (b.imax >= 0 ? eqnode[b.imax] : -1), b.jmax, (b.jmax >= 0 ? eqnode[b.jmax] : -1));
+		}
+	fflush(m_fp);
 
 	return true;
 }
