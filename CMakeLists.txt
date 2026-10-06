@@ -355,6 +355,13 @@ if(USE_MKL)
     target_include_directories(febioopt PRIVATE ${MKL_INC})
 	target_compile_definitions(febioopt PRIVATE MKL_ISS PARDISO)
 
+    # macOS: use LLVM's libomp (the runtime matching Apple clang) for MKL too,
+    # so only one OpenMP runtime is ever loaded. The oneAPI 2023 libiomp5 lacks
+    # __kmpc_dispatch_deinit, which clang 17+ emits for schedule(dynamic) loops.
+    if(APPLE AND OpenMP_libomp_LIBRARY)
+        set(MKL_OMP_LIB ${OpenMP_libomp_LIBRARY})
+    endif()
+
     if(WIN32 OR APPLE)
         target_link_libraries(numcore PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
         target_link_libraries(febioopt PRIVATE ${MKL_OMP_LIB} ${MKL_LIBS})
@@ -378,6 +385,14 @@ endif()
 # Manually pull in include dirs for OpenMP on macOS
 if(APPLE)
     target_include_directories(febiomech PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
+
+    # Link libomp explicitly instead of relying on "-undefined dynamic_lookup"
+    # to pick up whatever OpenMP runtime happens to be loaded at run time.
+    if(OpenMP_libomp_LIBRARY)
+        target_include_directories(fecore PRIVATE ${OpenMP_C_INCLUDE_DIRS} ${OMP_INC})
+        target_link_libraries(fecore PRIVATE ${OpenMP_libomp_LIBRARY})
+        target_link_libraries(febiomech PRIVATE ${OpenMP_libomp_LIBRARY})
+    endif()
 endif()
 
 # Link Pardiso-project
