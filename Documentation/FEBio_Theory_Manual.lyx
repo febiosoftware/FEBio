@@ -196,7 +196,7 @@ status open
 
 
 \series default
-Theory Manual Version 4.13 
+Theory Manual Version 4.13
 \end_layout
 
 \begin_layout Date
@@ -523,7 +523,7 @@ name "chap:introduction"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Section
@@ -2656,7 +2656,6 @@ deformation gradient
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -2697,7 +2696,6 @@ right Cauchy-Green deformation tensor
 \end_inset
 
  is symmetric.
- 
 \end_layout
 
 \begin_layout Standard
@@ -2974,7 +2972,6 @@ engineering shear strain
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -3721,7 +3718,7 @@ Note that
 \end_inset
 
 .
- The elemental volume defined by these three elements has the magnitude 
+ The elemental volume defined by these three elements has the magnitude
 \end_layout
 
 \begin_layout Standard
@@ -3733,7 +3730,7 @@ dV_{r}=\left(d\mathbf{X}_{1}\times d\mathbf{X}_{2}\right)\cdot d\mathbf{X}_{3}\t
 \end_inset
 
  in the reference state,
- and the magnitude 
+ and the magnitude
 \end_layout
 
 \begin_layout Standard
@@ -3759,7 +3756,7 @@ in the deformed state.
 \begin_inset Formula $d\mathbf{X}_{3}$
 \end_inset
 
- be aligned with the orthogonal coordinate axes such that 
+ be aligned with the orthogonal coordinate axes such that
 \end_layout
 
 \begin_layout Standard
@@ -3780,7 +3777,7 @@ where
 \end_inset
 
 .
- From (b) we get that 
+ From (b) we get that
 \end_layout
 
 \begin_layout Standard
@@ -4380,7 +4377,6 @@ state variables
 \end_inset
 
  for a gas should exhibit the same dependencies.
- 
 \end_layout
 
 \begin_layout Standard
@@ -4730,7 +4726,6 @@ literal "false"
  Prior to that formulation,
  other constitutive relations had been proposed for elastic solids (such as hypoelasticity),
  though it is now believed that the only thermodynamically valid formulation is the one given here.
- 
 \end_layout
 
 \begin_layout Standard
@@ -10063,7 +10058,6 @@ multiphasic-multigeneration
 \end_inset
 
  remains constant during that generation.
- 
 \end_layout
 
 \begin_layout Standard
@@ -12386,7 +12380,6 @@ where
 
 ,
  it is an intrinsic material property that must be invariant in time and space.
- 
 \end_layout
 
 \begin_layout Standard
@@ -13616,7 +13609,6 @@ where
 \end_inset
 
  is the solid deformation gradient.
- 
 \end_layout
 
 \begin_layout Standard
@@ -16968,8 +16960,6 @@ i/k
 
 \series bold
 j/l
-\series default
- 
 \end_layout
 
 \end_inset
@@ -16998,7 +16988,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -17027,7 +17017,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-2 
+2
 \end_layout
 
 \end_inset
@@ -17056,7 +17046,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-3 
+3
 \end_layout
 
 \end_inset
@@ -17085,7 +17075,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-2 
+2
 \end_layout
 
 \end_inset
@@ -17114,7 +17104,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-3 
+3
 \end_layout
 
 \end_inset
@@ -17143,7 +17133,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-3 
+3
 \end_layout
 
 \end_inset
@@ -22160,7 +22150,6 @@ Here,
 a priori
 \emph default
  on a frictionless boundary and must be obtained from the solution of the analysis.
- 
 \end_layout
 
 \begin_layout Standard
@@ -24037,7 +24026,6 @@ where the operator
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -26374,7 +26362,6 @@ literal "true"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -29494,8 +29481,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -29533,7 +29518,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29571,7 +29556,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29609,7 +29594,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29647,7 +29632,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29685,7 +29670,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29723,7 +29708,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29761,7 +29746,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29799,7 +29784,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29963,8 +29948,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -30002,7 +29985,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30040,7 +30023,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30078,7 +30061,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30116,7 +30099,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30154,7 +30137,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30192,7 +30175,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30346,8 +30329,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -30385,7 +30366,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30492,8 +30473,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -30513,7 +30492,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30522,7 +30501,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30531,7 +30510,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30542,7 +30521,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.58541020 
+0.58541020
 \end_layout
 
 \end_inset
@@ -30551,7 +30530,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30560,7 +30539,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30569,7 +30548,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30580,7 +30559,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30589,7 +30568,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.58541020 
+0.58541020
 \end_layout
 
 \end_inset
@@ -30598,7 +30577,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30607,7 +30586,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30618,7 +30597,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30627,7 +30606,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30636,7 +30615,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.58541020 
+0.58541020
 \end_layout
 
 \end_inset
@@ -30645,7 +30624,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30850,8 +30829,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -30889,7 +30866,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30927,7 +30904,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30965,7 +30942,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -31003,7 +30980,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -31110,8 +31087,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -31149,7 +31124,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.023087995 
+0.023087995
 \end_layout
 
 \end_inset
@@ -31187,7 +31162,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.023087995 
+0.023087995
 \end_layout
 
 \end_inset
@@ -31225,7 +31200,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.023087995 
+0.023087995
 \end_layout
 
 \end_inset
@@ -31263,7 +31238,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.023087995 
+0.023087995
 \end_layout
 
 \end_inset
@@ -31301,7 +31276,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.018578672 
+0.018578672
 \end_layout
 
 \end_inset
@@ -31339,7 +31314,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.018578672 
+0.018578672
 \end_layout
 
 \end_inset
@@ -31377,7 +31352,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.018578672 
+0.018578672
 \end_layout
 
 \end_inset
@@ -31415,7 +31390,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.018578672 
+0.018578672
 \end_layout
 
 \end_inset
@@ -31522,8 +31497,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -31561,7 +31534,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002777778 
+0.002777778
 \end_layout
 
 \end_inset
@@ -31599,7 +31572,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002777778 
+0.002777778
 \end_layout
 
 \end_inset
@@ -31637,7 +31610,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002777778 
+0.002777778
 \end_layout
 
 \end_inset
@@ -31675,7 +31648,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002777778 
+0.002777778
 \end_layout
 
 \end_inset
@@ -31713,7 +31686,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31751,7 +31724,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31789,7 +31762,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31827,7 +31800,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31865,7 +31838,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31903,7 +31876,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31941,7 +31914,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.088888889 
+0.088888889
 \end_layout
 
 \end_inset
@@ -32046,7 +32019,7 @@ The following integration rules are implemented for this element type.
 status collapsed
 
 \begin_layout Plain Layout
- Note that weights sum up to one and not to the volume of the tet in the natural coordinate system (i.e.
+Note that weights sum up to one and not to the volume of the tet in the natural coordinate system (i.e.
  1/6).
 \end_layout
 
@@ -32126,8 +32099,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -32165,7 +32136,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.138527967 
+0.138527967
 \end_layout
 
 \end_inset
@@ -32203,7 +32174,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.138527967 
+0.138527967
 \end_layout
 
 \end_inset
@@ -32241,7 +32212,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.138527967 
+0.138527967
 \end_layout
 
 \end_inset
@@ -32279,7 +32250,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.138527967 
+0.138527967
 \end_layout
 
 \end_inset
@@ -32317,7 +32288,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.111472033 
+0.111472033
 \end_layout
 
 \end_inset
@@ -32355,7 +32326,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.111472033 
+0.111472033
 \end_layout
 
 \end_inset
@@ -32393,7 +32364,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.111472033 
+0.111472033
 \end_layout
 
 \end_inset
@@ -32431,7 +32402,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.111472033 
+0.111472033
 \end_layout
 
 \end_inset
@@ -32538,8 +32509,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -32559,7 +32528,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.25 
+0.25
 \end_layout
 
 \end_inset
@@ -32568,7 +32537,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.25 
+0.25
 \end_layout
 
 \end_inset
@@ -32577,7 +32546,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
--0.01315555556 
+-0.01315555556
 \end_layout
 
 \end_inset
@@ -32597,7 +32566,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32606,7 +32575,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32615,7 +32584,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.007622222222 
+0.007622222222
 \end_layout
 
 \end_inset
@@ -32635,7 +32604,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32644,7 +32613,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32653,7 +32622,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.007622222222 
+0.007622222222
 \end_layout
 
 \end_inset
@@ -32664,7 +32633,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32673,7 +32642,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.785714285714286 
+0.785714285714286
 \end_layout
 
 \end_inset
@@ -32682,7 +32651,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32691,7 +32660,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.007622222222 
+0.007622222222
 \end_layout
 
 \end_inset
@@ -32702,7 +32671,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32711,7 +32680,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32720,7 +32689,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.785714285714286 
+0.785714285714286
 \end_layout
 
 \end_inset
@@ -32729,7 +32698,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.007622222222 
+0.007622222222
 \end_layout
 
 \end_inset
@@ -32758,7 +32727,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32767,7 +32736,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32778,7 +32747,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32787,7 +32756,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32796,7 +32765,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32805,7 +32774,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32816,7 +32785,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32825,7 +32794,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32834,7 +32803,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32843,7 +32812,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32854,7 +32823,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32863,7 +32832,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32872,7 +32841,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32881,7 +32850,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32892,7 +32861,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32901,7 +32870,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32910,7 +32879,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32919,7 +32888,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32930,7 +32899,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32939,7 +32908,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32948,7 +32917,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32957,7 +32926,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -33064,8 +33033,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -33103,7 +33070,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.030283678097089 
+0.030283678097089
 \end_layout
 
 \end_inset
@@ -33141,7 +33108,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.006026785714286 
+0.006026785714286
 \end_layout
 
 \end_inset
@@ -33179,7 +33146,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.006026785714286 
+0.006026785714286
 \end_layout
 
 \end_inset
@@ -33217,7 +33184,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.006026785714286 
+0.006026785714286
 \end_layout
 
 \end_inset
@@ -33255,7 +33222,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.006026785714286 
+0.006026785714286
 \end_layout
 
 \end_inset
@@ -33293,7 +33260,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011645249086029 
+0.011645249086029
 \end_layout
 
 \end_inset
@@ -33331,7 +33298,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011645249086029 
+0.011645249086029
 \end_layout
 
 \end_inset
@@ -33369,7 +33336,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011645249086029 
+0.011645249086029
 \end_layout
 
 \end_inset
@@ -33407,7 +33374,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011645249086029 
+0.011645249086029
 \end_layout
 
 \end_inset
@@ -33445,7 +33412,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33483,7 +33450,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33521,7 +33488,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33559,7 +33526,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33597,7 +33564,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33635,7 +33602,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33958,7 +33925,6 @@ Example of shell elements with four mid-surface nodal positions
 
 ,
  reduced from a solid element.
- 
 \end_layout
 
 \end_inset
@@ -34535,7 +34501,6 @@ Example of shell element with front-face nodal positions
 
 ,
  reduced from a solid element.
- 
 \end_layout
 
 \end_inset
@@ -35401,7 +35366,7 @@ The following table relates the Lamé parameters to the more familiar Young's mo
 \begin_inset Formula $K,G$
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -35454,7 +35419,7 @@ E=\frac{9KG}{3K+G}\\
 \end{array}$
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -35507,7 +35472,7 @@ E=\frac{9KG}{3K+G}\\
 \end{array}$
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -35662,7 +35627,7 @@ name "sec:Compressible-materials"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -37914,7 +37879,6 @@ HGO unconstrained
 \end_inset
 
  material.
- 
 \end_layout
 
 \begin_layout Standard
@@ -38043,7 +38007,6 @@ where,
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -38069,7 +38032,7 @@ name "sec:Nearly-Incompressible-Materials"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -39340,10 +39303,6 @@ name "fig:spring-dashpot-model"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -39974,7 +39933,7 @@ calculate elastic stress:
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Enumerate
@@ -39987,7 +39946,7 @@ evaluate internal variables:
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Enumerate
@@ -40000,7 +39959,7 @@ find the total stress:
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Standard
@@ -41218,10 +41177,6 @@ name "fig:Malkin-relaxation-spectrum"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -41323,10 +41278,6 @@ name "fig:Malkin-reduced-relaxation"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -41540,10 +41491,6 @@ name "fig:relaxation-continuous-exponential"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -44478,10 +44425,6 @@ name "fig:hardening-families-superposition"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -50563,7 +50506,6 @@ where
 \end_inset
 
  in the reference configuration.
- 
 \end_layout
 
 \begin_layout Standard
@@ -50584,7 +50526,6 @@ where
 \end_inset
 
  is the virtual angular velocity of the rigid body.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -52416,7 +52357,6 @@ k & =k+1\,.
 Return
 \series default
  to the solution phase.
- 
 \end_layout
 
 \begin_layout Standard
@@ -53031,7 +52971,6 @@ literal "true"
 
 ,
  and also serves to greatly reduce the complexity of the linearizations and the resulting stiffness matrices.
- 
 \end_layout
 
 \begin_layout Subsubsection
@@ -53194,7 +53133,6 @@ nolink "false"
  therefore we are only concerned with velocities of opposing contact points in slip.
  The development of velocities presented below anticipates the need for a relative velocity as required by Coulomb's law of kinetic friction,
  which aligns the friction force with this slip direction.
- 
 \end_layout
 
 \begin_layout Standard
@@ -53602,7 +53540,6 @@ literal "true"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -53660,7 +53597,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -53872,7 +53808,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -53960,7 +53895,6 @@ An active-passive strategy for the multipliers ensures consistency when the cont
 
 ,
  in conjunction with an exact return mapping for slip.
- 
 \end_layout
 
 \begin_layout Standard
@@ -54252,7 +54186,6 @@ nolink "false"
  In this way,
  the double-counting of the gap function does not unnecessarily shift the contact status,
  but augmentation is able to modify the stick-slip status if accurate enforcement of the contact constraints requires it.
- 
 \end_layout
 
 \begin_layout Subsubsection
@@ -54338,7 +54271,6 @@ nolink "false"
 
  are slight abuses of notation,
  used to compactly denote changes in a quantity from the previous time step.
- 
 \end_layout
 
 \begin_layout Paragraph
@@ -54515,7 +54447,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Paragraph
@@ -54600,7 +54531,6 @@ where we recall that
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -55160,7 +55090,6 @@ nolink "false"
 \end_inset
 
  shows that the stiffness matrix associated with this contact formulation is not symmetric in stick.
- 
 \end_layout
 
 \begin_layout Standard
@@ -55547,7 +55476,6 @@ literal "true"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Subsubsection
@@ -55629,7 +55557,6 @@ nolink "false"
 
 ,
  we must first propose a temporal discretization scheme for these rate quantities.
- 
 \end_layout
 
 \begin_layout Standard
@@ -56133,7 +56060,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -57681,7 +57607,6 @@ nolink "false"
 \end_inset
 
  must be evaluated after the stick-slip status has been resolved.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -58004,7 +57929,6 @@ nolink "false"
 
  sets up and uses more formal notation and definitions,
  before we dispense of this cumbersome notation for the remainder of the treatment.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -58352,7 +58276,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -58770,7 +58693,6 @@ nolink "false"
 
  for penalty and augmented Lagrange methods,
  respectively.
- 
 \end_layout
 
 \begin_layout Standard
@@ -59552,7 +59474,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Paragraph
@@ -60205,7 +60126,7 @@ name "sec:Biphasic-Solute-Contact"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -60756,7 +60677,7 @@ name "sec:Multiphasic-Contact"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -62003,7 +61924,7 @@ name "sec:Tied-Biphasic-Contact"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -63126,7 +63047,7 @@ name "sec:Tied-Fluid-Interface"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Standard
@@ -63557,7 +63478,7 @@ literal "true"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
- & -\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v^{\left(1\right)}_{n}da^{\left(1\right)}\,.
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v^{\left(1\right)}_{n}da^{\left(1\right)}\,.
 \end{aligned}
 \label{eq696-2}
 \end{equation}
@@ -63690,7 +63611,6 @@ The premise of a tied interface is that the parametric coordinates of coincident
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -63788,8 +63708,8 @@ where
  It follows that 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\mathbf{t}^{\tau} & =\varepsilon_{t}\left(\Delta\mathbf{v}^{\left(2\right)}-\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
-Dv_{n} & =\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
+\begin{aligned}D\mathbf{t}^{\tau} & =\alpha_{f}\varepsilon_{t}\left(\Delta\mathbf{v}^{\left(2\right)}-\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
+Dv_{n} & =\alpha_{f}\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
 \end{aligned}
 \label{eq:TFI-penalty-linearization}
 \end{equation}
@@ -63805,7 +63725,7 @@ Given these relations,
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned} & -D\left(J^{\left(1\right)}_{\eta}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\right)=\\
- & \varepsilon_{t}J^{\left(1\right)}_{\eta}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\Delta\mathbf{v}^{\left(1\right)}-\Delta\mathbf{v}^{\left(2\right)}\right)
+ & \alpha_{f}\varepsilon_{t}J^{\left(1\right)}_{\eta}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\Delta\mathbf{v}^{\left(1\right)}-\Delta\mathbf{v}^{\left(2\right)}\right)
 \end{aligned}
 \,,\label{eq:TFI-G-linearization-v}
 \end{equation}
@@ -63815,7 +63735,7 @@ Given these relations,
 
 \begin_inset Formula 
 \begin{equation}
-D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J^{\left(1\right)}_{\eta}\right)=-\varepsilon_{n}J^{\left(1\right)}_{\eta}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
+D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J^{\left(1\right)}_{\eta}\right)=-\alpha_{f}\varepsilon_{n}J^{\left(1\right)}_{\eta}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
 \end{equation}
 
 \end_inset
@@ -63842,7 +63762,7 @@ name "subsec:Tied-BP-Discretization-2"
 The contact integral may be discretized as 
 \begin_inset Formula 
 \begin{equation}
-\delta G_{c}=\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}-\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\right]\,.\label{eq:TFI-discrete-1}
+\delta G_{c}=\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}+\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\right]\,.\label{eq:TFI-discrete-1}
 \end{equation}
 
 \end_inset
@@ -63870,9 +63790,9 @@ Then,
 v^{\left(1\right)}_{a}
 \end{array}\right]\right.\\
  & \left.+\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{cc}
-\delta\mathbf{v}^{\left(1\right)}_{b,k} & \delta J^{\left(1\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
-\mathbf{f}^{\left(1\right)}_{b,k}\\
-v^{\left(1\right)}_{b,k}
+\delta\mathbf{v}^{\left(2\right)}_{b,k} & \delta J^{\left(2\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}^{\left(2\right)}_{b,k}\\
+v^{\left(2\right)}_{b,k}
 \end{array}\right]\right)
 \end{aligned}
 \,,\label{eq:TFI-discrete-3}
@@ -63884,7 +63804,7 @@ where
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =N^{\left(1\right)}_{a}\mathbf{t}^{\tau} & \mathbf{f}^{\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}\mathbf{t}^{\tau}\\
-w^{\left(1\right)}_{a} & =-N^{\left(1\right)}_{a}v_{n} & w^{\left(2\right)}_{b,k} & =N^{\left(2\right)}_{b}v_{n}
+v^{\left(1\right)}_{a} & =N^{\left(1\right)}_{a}v_{n} & v^{\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}v_{n}
 \end{aligned}
 \,.\label{eq:TFI-discrete-4}
 \end{equation}
@@ -63895,7 +63815,7 @@ Similarly,
  
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}-D\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\\
+\begin{aligned}-D\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}\alpha_{f}W_{k}J^{\left(1\right)}_{\eta}\\
  & \times\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{cc}
 \delta\mathbf{v}^{\left(1\right)}_{a} & \delta J^{\left(1\right)}_{a}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{cc}
 \mathbf{K}^{\left(1,1\right)}_{ac} & \mathbf{0}\\
@@ -63935,10 +63855,10 @@ Similarly,
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\\
-\mathbf{K}^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\\
-\mathbf{K}^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\\
-\mathbf{K}^{\left(2,2\right)}_{bd,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)
+\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
+\mathbf{K}^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(2,2\right)}_{bd,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
 \end{aligned}
 \,,\label{eq:TFI-discrete-6}
 \end{equation}
@@ -63948,10 +63868,10 @@ where
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}k^{\left(1,1\right)}_{ac} & =-K\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
-k^{\left(1,2\right)}_{ad,k} & =K\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
-k^{\left(2,1\right)}_{bc,k} & =K\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
-k^{\left(2,2\right)}_{bd,k} & =-K\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
+\begin{aligned}k^{\left(1,1\right)}_{ac} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
+k^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
+k^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
+k^{\left(2,2\right)}_{bd,k} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
 \end{aligned}
 \,.\label{eq:TFI-discrete-7}
 \end{equation}
@@ -64178,7 +64098,6 @@ tuple "list"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -64294,7 +64213,6 @@ tuple "list"
 \end_layout
 
 \begin_layout Section
-
 Tied Fluid-FSI Interface
 \begin_inset CommandInset label
 LatexCommand label
@@ -64302,7 +64220,7 @@ name "sec:Tied-Fluid-FSI-Interface"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -64408,8 +64326,8 @@ literal "true"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{s\left(1\right)}da^{\left(1\right)}\\
- & +\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta w^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
- & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{f\left(1\right)}-\delta J^{\left(2\right)}\right)w^{f\left(1\right)}_{n}da^{\left(1\right)}\,.
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{f\left(1\right)}-\delta J^{f\left(2\right)}\right)w^{\left(1\right)}_{n}da^{\left(1\right)}\,.
 \end{aligned}
 \label{eq:TFSI-virtual-work}
 \end{equation}
@@ -64479,7 +64397,7 @@ where
  has the form 
 \begin_inset Formula 
 \begin{equation}
-D\delta G_{c}=\sum\limits^{2}_{i=1}D\delta G_{c}\left[\Delta\mathbf{u}^{\left(i\right)}\right]+D\delta G_{c}\left[\Delta\mathbf{w}^{\left(i\right)}\right]+D\delta G_{c}\left[\Delta J^{f\left(i\right)}\right]\,.\label{eq:TFSI-vw-linearization}
+D\delta G_{c}=\sum\limits^{2}_{i=1}\left(D\delta G_{c}\left[\Delta\mathbf{u}^{\left(i\right)}\right]+D\delta G_{c}\left[\Delta\mathbf{w}^{\left(i\right)}\right]+D\delta G_{c}\left[\Delta J^{f\left(i\right)}\right]\right)\,.\label{eq:TFSI-vw-linearization}
 \end{equation}
 
 \end_inset
@@ -64539,7 +64457,6 @@ The premise of a tied interface is that the parametric coordinates of coincident
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -64548,7 +64465,7 @@ The vector positional gap function
 \end_inset
 
 ,
- representing the difference between velocities across the interface,
+ representing the difference between positions across the interface,
  is defined by
 \begin_inset Formula 
 \begin{equation}
@@ -64577,7 +64494,7 @@ We may similarly define the scalar gap function
  representing the difference between fluid dilatations (or volume ratios) across the interface,
 \begin_inset Formula 
 \begin{equation}
-\pi=J^{f\left(2\right)}-J^{f\left(1\right)}\,.\label{eq:TFI-e-gap-1}
+\pi_{n+\alpha_{f}}=J^{f\left(2\right)}_{n+\alpha_{f}}-J^{f\left(1\right)}_{n+\alpha_{f}}\,.\label{eq:TFI-e-gap-1}
 \end{equation}
 
 \end_inset
@@ -64607,7 +64524,7 @@ When using the penalty method,
 \end_inset
 
  on 
-\begin_inset Formula $\Gamma^{\left(1\right)}$
+\begin_inset Formula $\gamma^{\left(1\right)}$
 \end_inset
 
  are given,
@@ -64702,7 +64619,7 @@ where
  we add a vectorial or scalar Lagrangian to each of the expressions in Eqs.
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:TFSI-gap"
+reference "eq:TFSI-ts-tt-penalty"
 plural "false"
 caps "false"
 noprefix "false"
@@ -64714,7 +64631,7 @@ tuple "list"
 -
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "eq:TFSI-w-gap"
+reference "eq:TFSI-wn-penalty"
 plural "false"
 caps "false"
 noprefix "false"
@@ -64786,7 +64703,7 @@ tuple "list"
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\delta G_{c}\left[\Delta\mathbf{u}^{\left(2\right)}\right] & =\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{s}J^{\left(1\right)}_{\eta}\Delta\mathbf{u}^{\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\end{aligned}
+\begin{aligned}D\delta G_{c}\left[\Delta\mathbf{u}^{\left(2\right)}\right] & =\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{s}J^{\left(1\right)}_{\eta}\Delta\mathbf{u}^{\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\end{aligned}
 \label{eq:TFSI-G-linearization-u2}
 \end{equation}
 
@@ -64870,17 +64787,17 @@ Then,
  
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{ccc}
-\delta\mathbf{v}^{\left(1\right)}_{a} & \delta\mathbf{w}^{\left(1\right)}_{a} & \delta J^{\left(1\right)}_{a}\end{array}\right]\cdot\left[\begin{array}{c}
+\begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{\left(1\right)}_{a} & \delta\mathbf{w}^{\left(1\right)}_{a} & \delta J^{f\left(1\right)}_{a}\end{array}\right]\cdot\left[\begin{array}{c}
 \mathbf{f}^{s\left(1\right)}_{a}\\
 \mathbf{f}^{w\left(1\right)}_{a}\\
 w^{\left(1\right)}_{a}
 \end{array}\right]\right.\\
  & \left.+\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{ccc}
-\delta\mathbf{v}^{\left(1\right)}_{b,k} & \delta\mathbf{w}^{\left(1\right)}_{b,k} & \delta J^{\left(1\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
-\mathbf{f}^{s\left(1\right)}_{b,k}\\
-\mathbf{f}^{w\left(1\right)}_{b,k}\\
-w^{\left(1\right)}_{b,k}
+\delta\mathbf{v}^{\left(2\right)}_{b,k} & \delta\mathbf{w}^{\left(2\right)}_{b,k} & \delta J^{f\left(2\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}^{s\left(2\right)}_{b,k}\\
+\mathbf{f}^{w\left(2\right)}_{b,k}\\
+w^{\left(2\right)}_{b,k}
 \end{array}\right]\right)
 \end{aligned}
 \,,\label{eq:TFSI-discrete-vw}
@@ -64961,17 +64878,17 @@ we find that
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}^{\left(2\right)}_{d}\\
 \Delta\mathbf{w}^{\left(2\right)}_{d}\\
-\Delta J^{\left(2\right)}_{d}
+\Delta J^{f\left(2\right)}_{d}
 \end{array}\right]\right)\\
  & +\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{ccc}
-\delta\mathbf{v}^{\left(2\right)}_{b,k} & \delta\mathbf{w}^{\left(2\right)}_{b,k} & \delta J^{\left(2\right)}_{b,k}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{\left(2\right)}_{b,k} & \delta\mathbf{w}^{\left(2\right)}_{b,k} & \delta J^{f\left(2\right)}_{b,k}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{ccc}
 \mathbf{K}^{uu}_{bc} & \mathbf{0} & \mathbf{0}\\
 \mathbf{K}^{wu}_{bc} & \mathbf{K}^{ww}_{bc} & \mathbf{0}\\
 \mathbf{k}^{Ju}_{bc} & \mathbf{0} & k^{JJ}_{bc}
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}^{\left(1\right)}_{c}\\
 \Delta\mathbf{w}^{\left(1\right)}_{c}\\
-\Delta J^{\left(1\right)}_{c}
+\Delta J^{f\left(1\right)}_{c}
 \end{array}\right]\right.\\
  & +\left.\left.\sum\limits^{m^{\left(2\right)}_{k}}_{d=1}\left[\begin{array}{ccc}
 \mathbf{K}^{uu}_{bd} & \mathbf{0} & \mathbf{0}\\
@@ -64980,7 +64897,7 @@ we find that
 \end{array}\right]\cdot\left[\begin{array}{c}
 \Delta\mathbf{u}^{\left(2\right)}_{d}\\
 \Delta\mathbf{w}^{\left(2\right)}_{d}\\
-\Delta J^{\left(2\right)}_{d}
+\Delta J^{f\left(2\right)}_{d}
 \end{array}\right]\right)\right)\,,
 \end{aligned}
 \label{eq:TFSI-discrete-D-vw}
@@ -65113,7 +65030,6 @@ where
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -68244,7 +68160,7 @@ The method of Lagrange multipliers increases the number of equations that need t
  This means that these equations can only be solved with linear solvers that support pivoting.
  (Most linear solvers in FEBio,
  including the default pardiso solver,
- can handle zero-diagonal elements.) 
+ can handle zero-diagonal elements.)
 \end_layout
 
 \begin_layout Example
@@ -68302,7 +68218,6 @@ objective function
 \emph default
 ,
  to be introduced below.
- 
 \end_layout
 
 \begin_layout Section
@@ -68352,7 +68267,6 @@ a
 
 ,
  which will usually call FEBio to solve a forward FE problem.
- 
 \end_layout
 
 \begin_layout Section
@@ -68385,7 +68299,6 @@ The Levenberg-Marquardt method is a numerical algorithm that minimizes a functio
  i.e.
  the objective function as defined above.
  It combines the steepest-descent method with a Gauss-Newton method to find the parameters that minimize the objective function.
- 
 \end_layout
 
 \begin_layout Standard
@@ -68479,12 +68392,10 @@ f
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
 The main idea of the LM method is to replace this linear equation with the following.
- 
 \end_layout
 
 \begin_layout Standard
@@ -68530,7 +68441,6 @@ a
 obj_tol
 \emph default
  parameter in FEBio).
- 
 \end_layout
 
 \begin_layout Standard
@@ -68550,7 +68460,6 @@ a
 \end_inset
 
 -th component of the gradient is approximated as follows.
- 
 \end_layout
 
 \begin_layout Standard
@@ -68684,7 +68593,6 @@ tensor
 \shape default
 .
  Vectors are first-order tensors and scalars are zeroth-order tensors.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -68731,7 +68639,7 @@ a_{1}=\mathbf{e}_{1}\cdot\mathbf{a},\quad a_{2}=\mathbf{e}_{2}\cdot\mathbf{a},\q
 \begin_inset Formula $\mathbf{a}\cdot\mathbf{e}_{j}=a_{i}\mathbf{e}_{i}\cdot\mathbf{e}_{j}=a_{i}\delta_{ij}=a_{j}$
 \end_inset
 
-.) 
+.)
 \end_layout
 
 \begin_layout Standard
@@ -68778,7 +68686,7 @@ The Cartesian components of a tensor
 
 .
  By convention,
- we denote this component as 
+ we denote this component as
 \end_layout
 
 \begin_layout Standard
@@ -68899,7 +68807,7 @@ T_{32}
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Example
@@ -69036,7 +68944,7 @@ s_{1} & 0 & 0\\
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -69088,7 +68996,6 @@ The sum of two tensors
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Subsection
@@ -69241,7 +69148,6 @@ This turns out to be an important result that can be generalized to higher order
 
 ,
  and similarly for higher orders.
- 
 \end_layout
 
 \begin_layout Example
@@ -69310,7 +69216,6 @@ The trace operator yields a scalar function.
 \end_inset
 
  The trace of a tensor is the sum of its diagonal components.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -69379,7 +69284,6 @@ Clearly,
 
 .
  Similarly,
- 
 \end_layout
 
 \begin_layout Standard
@@ -69411,7 +69315,6 @@ associative
 not commutative
 \shape default
 .
- 
 \end_layout
 
 \begin_layout Subsection
@@ -69446,7 +69349,7 @@ The identity tensor,
 \begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
- are given by 
+ are given by
 \end_layout
 
 \begin_layout Standard
@@ -69624,7 +69527,6 @@ double contraction
 \end_inset
 
 The double product of second order tensors is commutative.
- 
 \end_layout
 
 \begin_layout Example
@@ -69637,7 +69539,6 @@ Show that
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Example
@@ -69736,7 +69637,6 @@ An orthogonal tensor
  is a linear transformation which preserves the length of a vector and the angle between vectors.
  Thus,
  by definition,
- 
 \end_layout
 
 \begin_layout Standard
@@ -69805,7 +69705,6 @@ An orthogonal tensor
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -69906,7 +69805,6 @@ improper
 \end_inset
 
 ).
- 
 \end_layout
 
 \begin_layout Subsection
@@ -70011,7 +69909,6 @@ Let
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Example
@@ -70128,7 +70025,6 @@ For any vector
 ,
  respectively.
  Using the above relation,
- 
 \end_layout
 
 \begin_layout Standard
@@ -70212,7 +70108,6 @@ not the same
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -70325,7 +70220,6 @@ not the same
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Subsection
@@ -70412,7 +70306,6 @@ skew-symmetric
 \end_inset
 
 Any tensor can be written as the sum of a symmetric and antisymmetric tensor,
- 
 \end_layout
 
 \begin_layout Standard
@@ -70433,7 +70326,6 @@ This is a unique decomposition.
 \end_inset
 
  is antisymmetric.
- 
 \end_layout
 
 \begin_layout Standard
@@ -70670,14 +70562,12 @@ Using all these relations,
 
 \begin_layout Theorem*
 The eigenvalues of real symmetric tensors are real (proof not provided here).
- 
 \end_layout
 
 \begin_deeper
 \begin_layout Theorem*
 If the eigenvalues of a real symmetric tensor are all distinct,
  the eigenvectors are orthogonal to each other.
- 
 \end_layout
 
 \end_deeper
@@ -70711,7 +70601,6 @@ Proof:
 \end_inset
 
  ,
- 
 \end_layout
 
 \begin_layout Standard
@@ -70738,7 +70627,6 @@ When two of the eigenvalues are repeated (a double root of the characteristic eq
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Example
@@ -71175,7 +71063,6 @@ Proof:
 
 ,
  thus completing the proof.
- 
 \end_layout
 
 \begin_layout Standard
