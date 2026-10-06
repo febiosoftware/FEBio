@@ -561,9 +561,10 @@ void FEPolarFluidDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                 mat3d Kgv = cva*gNb*H[i];
                 vec3d kJv = (pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j];
                 mat3d Kvg = -gNa*cva*H[j];
-                //! TODO: There may be a mistake in vdotTdotv when using tens4d object, evaluates as b.T.a instead of a.T.b
-//                mat3d Kgg = vdotTdotv(gradN[i], m, gradN[j])-cva*(2*H[i]*H[j]);
-                mat3d Kgg = vdotTdotv(gradN[j], m, gradN[i])-cva*(2*H[i]*H[j]);
+                // NOTE: vdotTdotv(vec3d, tens4d, vec3d) used to return the transpose of a.T.b, which was
+                // compensated here by swapping its arguments. It now returns a.T.b, so the arguments
+                // are swapped back.
+                mat3d Kgg = vdotTdotv(gradN[i], m, gradN[j])-cva*(2*H[i]*H[j]);
                 vec3d kvJ = (svJ*gradN[i])*H[j] + (gradN[j]*dp+pt.m_gradef*(H[j]*d2p))*H[i];
                 vec3d kgJ = mJ*gradN[i]*H[j] - thJ*(2*H[i]*H[j]);
                 double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;

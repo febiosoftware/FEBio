@@ -1264,7 +1264,7 @@ void FESlidingInterfaceMP::ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfa
     //       variable is declared inside it (see the note below).  It was not
     //       before, which is why commenting out the pragma used to "fix" the
     //       sliding-elastic test case.
-#pragma omp parallel for schedule(dynamic)
+//#pragma omp parallel for schedule(dynamic)
     for (int i=0; i<ss.Elements(); ++i)
     {
         FESurfaceElement& el = ss.Element(i);

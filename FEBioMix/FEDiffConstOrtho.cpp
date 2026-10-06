@@ -107,9 +107,12 @@ mat3ds FEDiffConstOrtho::Diffusivity(FEMaterialPoint& mp)
 //! Tangent of diffusivity with respect to strain
 tens4dmm FEDiffConstOrtho::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 {
-	tens4dmm D;
-	D.zero();
-	return D;
+	// Even though the spatial diffusivity d is constant, the tangent is the push-forward
+	// of 2*dD/dC, where D = J F^-1 d F^-T is the referential diffusivity. Therefore it
+	// includes the geometric terms d x I - (d o I + I o d).
+	mat3dd I(1);
+	mat3ds d = Diffusivity(mp);
+	return dyad1mm(d, mat3ds(I)) - dyad4s(d, I);
 }
 
 //-----------------------------------------------------------------------------

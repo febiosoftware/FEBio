@@ -98,6 +98,25 @@ void FEMultiphasic::AddMembraneReaction(FEMembraneReaction* pcr)
 }
 
 //-----------------------------------------------------------------------------
+//! Derivative of the SBM referential density with respect to its current referential
+//! mass supply, divided by dt. When the integrated density violates the bounds
+//! [rhomin, rhomax], UpdateSolidBoundMolecules clamps it, so it no longer depends
+//! on the supply and this function returns zero.
+double FEMultiphasic::SBMDensitySupplyWeight(FEMaterialPoint& mp, const int sbm)
+{
+	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
+	double alpha = SBMSupplyIntegrationWeight();
+	double dt = CurrentTimeIncrement();
+
+	// SBM referential density before the bounds are enforced
+	double rhor = spt.m_sbmrp[sbm] + dt*(alpha*spt.m_sbmrhat[sbm] + (1 - alpha)*spt.m_sbmrhatp[sbm]);
+	if (rhor < spt.m_sbmrmin[sbm]) return 0;
+	if ((spt.m_sbmrmax[sbm] > 0) && (rhor > spt.m_sbmrmax[sbm])) return 0;
+
+	return alpha;
+}
+
+//-----------------------------------------------------------------------------
 //! Returns the local ID of the SBM, given the global ID.
 //! \param nid global ID (one - based)
 //! \return the local ID (zero-based index) or -1 if not found.
@@ -573,7 +592,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
             for (isol=0; isol<nsol; ++isol) {
                 zidzdJr[isbm] += SQR(z[isol])*dkdJ[isol]*c[isol];
             }
-            zidzdJr[isbm] = 1/(J-phi0) + zidzdJr[isbm]/den;
+            zidzdJr[isbm] = -1/(J-phi0) - zidzdJr[isbm]/den;
             zidzdJr[isbm] = (zidzdJr[isbm] + zidzdJ)*zidzdr[isbm];
             zidzdJr[isbm] += cF/SBMDensity(isbm)/SQR(J-phi0)/den;
             
@@ -581,7 +600,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<do
                 zidzdrc[isbm][isol] = SQR(z[isol])*kappa[isol];
                 for (jsol=0; jsol<nsol; ++jsol)
                     zidzdrc[isbm][isol] += SQR(z[jsol])*zz[jsol]*c[jsol]*dkhdc[jsol][isol];
-                zidzdrc[isbm][isol] = zidzdr[isbm]*(zidzdc[isol]*(1+num/den) - zidzdrc[isbm][isol]/den);
+                zidzdrc[isbm][isol] = zidzdr[isbm]*(zidzdc[isol]*(1-num/den) - zidzdrc[isbm][isol]/den);
             }
         }
 	}
