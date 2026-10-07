@@ -128,7 +128,7 @@ void FEBioLoadsSection4::ParseSurfaceLoad(XMLTag& tag)
 	if (pface == 0) throw XMLReader::InvalidAttributeValue(tag, "surface", surfaceName);
 
 	// create a surface from this facet set
-	FESurface* psurf = fecore_alloc(FESurface, &fem);
+	FESurface* psurf = fecore_new<FESurface>("surface", &fem);
 	GetBuilder()->BuildSurface(*psurf, *pface);
 
 	// assign it
