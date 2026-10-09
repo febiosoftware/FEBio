@@ -35,4 +35,7 @@ struct FECoreBackend
 	std::string name;
 	std::vector<FECoreFactory*>			m_Fac;	// list of registered factory classes
 	std::vector<FEDomainFactory*>		m_Dom;	// list of domain factory classes
+
+	std::string			m_default_solver_type;	// default linear solver
+	FEClassDescriptor* m_default_solver = nullptr;
 };

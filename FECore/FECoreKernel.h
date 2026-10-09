@@ -199,9 +199,6 @@ private:
 
 	std::map<unsigned int, const char*>	m_sidMap;	// super class ID map
 
-	std::string			m_default_solver_type;	// default linear solver
-	FEClassDescriptor*	m_default_solver;
-
 	// module list
 	vector<FEModule*>	m_modules;
 	int					m_activeModule;

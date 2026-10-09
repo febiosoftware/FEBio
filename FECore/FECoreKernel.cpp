@@ -79,7 +79,6 @@ FECoreKernel::FECoreKernel()
 	m_alloc_id = 0;
 	m_next_alloc_id = 1;
 	m_nspec = -1;
-	m_default_solver = nullptr;
 	m_bshowDeprecationWarning = true;
 
 	// build the super class ID table
@@ -147,24 +146,27 @@ int FECoreKernel::GenerateAllocatorID()
 //-----------------------------------------------------------------------------
 FECoreFactory* FECoreKernel::SetDefaultSolverType(const char* sztype)
 {
+	if (m_activeBackend == nullptr) return nullptr;
 	FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
-	if (fac) m_default_solver_type = sztype;
+	if (fac) m_activeBackend->m_default_solver_type = sztype;
 	return fac;
 }
 
 //-----------------------------------------------------------------------------
 void FECoreKernel::SetDefaultSolver(FEClassDescriptor* linsolve)
 {
-	delete m_default_solver;
-	m_default_solver = linsolve;
+	if (m_activeBackend == nullptr) { assert(false); return; }
+	
+	delete m_activeBackend->m_default_solver;
+	m_activeBackend->m_default_solver = linsolve;
 
 	if (linsolve)
 	{
-		m_default_solver_type = linsolve->ClassType();
+		m_activeBackend->m_default_solver_type = linsolve->ClassType();
 	}
 	else
 	{
-		m_default_solver_type.clear();
+		m_activeBackend->m_default_solver_type.clear();
 	}
 }
 
@@ -172,21 +174,23 @@ void FECoreKernel::SetDefaultSolver(FEClassDescriptor* linsolve)
 //! get the linear solver type
 const char* FECoreKernel::GetLinearSolverType() const
 {
-	return m_default_solver_type.c_str();
+	if (m_activeBackend == nullptr) return nullptr;
+	return m_activeBackend->m_default_solver_type.c_str();
 }
 
 //-----------------------------------------------------------------------------
 LinearSolver* FECoreKernel::CreateDefaultLinearSolver(FEModel* fem)
 {
-	if (m_default_solver == nullptr)
+	if (m_activeBackend == nullptr) return nullptr;
+	if (m_activeBackend->m_default_solver == nullptr)
 	{
-		const char* sztype = m_default_solver_type.c_str();
+		const char* sztype = m_activeBackend->m_default_solver_type.c_str();
 		FECoreFactory* fac = FindFactoryClass(FELINEARSOLVER_ID, sztype);
 		return (LinearSolver*)CreateInstance(fac, fem);
 	}
 	else
 	{
-		return (LinearSolver*)Create(FELINEARSOLVER_ID, fem, *m_default_solver);
+		return (LinearSolver*)Create(FELINEARSOLVER_ID, fem, *m_activeBackend->m_default_solver);
 	}
 }
 
