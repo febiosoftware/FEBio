@@ -108,7 +108,14 @@ public:
     
     //! tangent of molar supply with effective concentration at material point
     virtual double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) = 0;
-    
+
+protected:
+    //! Derivative of the mass-action product P = prod_i (c_i)^nu_i * prod_k (sbm_k)^nu_k
+    //! with respect to the effective concentration of solute sol, where c_i are actual
+    //! solute concentrations. Uses the product rule, so it remains valid when some
+    //! concentrations are zero (unlike the logarithmic derivative P*sum(nu_i/c_i)).
+    double MassActionProductTangentConcentration(FEMaterialPoint& pt, const vector<int>& nu, const int sol);
+
 public:
 	//! Serialization
 	void Serialize(DumpStream& ar) override;

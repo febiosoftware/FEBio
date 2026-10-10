@@ -36,6 +36,7 @@ SOFTWARE.*/
 #include <FECore/sys.h>
 #include "FEBioFluidSolutes.h"
 #include <FECore/FELinearSystem.h>
+#include <FEBioMech/FEBodyForce.h>
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -204,7 +205,11 @@ void FEFluidSolutesDomain3D::InitMaterialPoints()
     vector< vector<double> > c0(nsol, vector<double>(NE));
     vector<int> sid(nsol);
     for (int j = 0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteDOF();
-    
+
+    // body forces acting on this domain (needed for current density)
+    vector<FEBodyForce*> bfs;
+    GetBodyForces(bfs);
+
     for (int j = 0; j<(int)m_Elem.size(); ++j)
     {
         // get the solid element
@@ -240,7 +245,7 @@ void FEFluidSolutesDomain3D::InitMaterialPoints()
             }
             
             ps.m_psi = m_pMat->ElectricPotential(mp);
-            ps.m_Ie = m_pMat->CurrentDensity(mp);
+            ps.m_Ie = m_pMat->CurrentDensity(mp, NetBodyForce(mp, bfs));
             
             for (int isol = 0; isol<nsol; ++isol)
                 ps.m_j[isol] = m_pMat->SoluteDiffusiveFlux(mp, isol);
@@ -631,7 +636,9 @@ void FEFluidSolutesDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidE
             for (int jsol=0; jsol<nsol; ++jsol)
             {
                 d0p[isol][jsol] = m_pMat->GetSolute(isol)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp, jsol);
-                wkcc[isol][jsol] = s[isol]*spt.m_dkdc[isol][jsol]*spt.m_c[isol];
+                // include the dependence of the sedimentation coefficient s = d0*M/(R*T) on concentration
+                wkcc[isol][jsol] = s[isol]*spt.m_dkdc[isol][jsol]*spt.m_c[isol]
+                + d0p[isol][jsol]*M[isol]/(R*T)*spt.m_k[isol]*spt.m_c[isol];
                 wkce[jsol] += z[isol]*wkcc[isol][jsol];
                 wkvc[isol] += f*(M[jsol]*spt.m_dkdc[jsol][isol]*spt.m_c[jsol]*dms);
             }
@@ -806,6 +813,17 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                 }
             }
         }
+        // derivative of the mixture volume supply phiwhat = sum Vbar*zhat with respect to concentrations
+        for (int jsol = 0; jsol < nsol; ++jsol) {
+            for (i=0; i<nreact; ++i) {
+                FEChemicalReaction* pri = m_pMat->GetReaction(i);
+                vbardzdc[jsol] += pri->m_Vbar*pri->Tangent_ReactionSupply_Concentration(mp,jsol);
+            }
+        }
+        // derivatives of the solute supplies and mixture volume supply with respect to J
+        vector<double> dchatdJ(nsol, 0.0);
+        double dphiwdJ = 0;
+        ReactionSupplyTangentDilatation(mp, dchatdJ, dphiwdJ);
         
         // evaluate spatial gradient of shape functions
         for (i=0; i<neln; ++i)
@@ -819,7 +837,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                 mat3d Kvv = vdotTdotv(gradN[i], cv, gradN[j]);
                 vec3d kJv = (pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j];
                 vec3d kvJ = ((pt.m_gradef*d2ep + ovJ)*H[j] + gradN[j]*dep)*H[i] + svJ*gradN[i]*H[j];
-                double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf;
+                double kJJ = (H[j]*(ksi/dt - dJoJ) + gradN[j]*pt.m_vft)*H[i]/Jf + H[i]*H[j]*dphiwdJ;
                 
                 ke[i4  ][j4  ] += Kvv(0,0)*detJ;
                 ke[i4  ][j4+1] += Kvv(0,1)*detJ;
@@ -844,11 +862,14 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                 for (int isol=0; isol<nsol; ++isol) {
                     vec3d kcv = (pt.m_gradef*spt.m_ca[isol]/Jf + spt.m_gradc[isol]*spt.m_k[isol] + gradk[isol]*spt.m_c[isol])*(-H[i]*H[j]);
                     vec3d kvc = (gradN[j]*spt.m_k[isol] + ovc[isol]*H[j])*(H[i]*R*T*dms);
-                    double kJc = 0;
-                    double kcJ = (spt.m_ca[isol]*pt.m_efdot + spt.m_k[isol]*spt.m_cdot[isol] + spt.m_c[isol]*dkdt[isol])*H[i]*H[j]/Jf
+                    // stiffness of mixture mass balance with respect to concentration (reactive volume supply)
+                    double kJc = H[i]*H[j]*vbardzdc[isol];
+                    // note: d(ca*Jdot/J)/dJ = -ca*Jdot/J^2, hence ca*dJoJ/Jf below
+                    double kcJ = (spt.m_ca[isol]*dJoJ + spt.m_k[isol]*spt.m_cdot[isol] + spt.m_c[isol]*dkdt[isol])*H[i]*H[j]/Jf
                     - spt.m_c[isol]*(spt.m_k[isol]/Jf + spt.m_dkdJ[isol])*H[i]*(ksi/dt*H[j] + gradN[j]*pt.m_vft)
                     - spt.m_c[isol]*dJoJ*(2*spt.m_dkdJ[isol])*H[i]*H[j]
-                    - sum1[isol]*H[i]*H[j] - (gradN[i]*sum2[isol])*H[j];
+                    - sum1[isol]*H[i]*H[j] - (gradN[i]*sum2[isol])*H[j]
+                    + H[i]*H[j]*dchatdJ[isol];
                     
                     int irow = i4+4+isol;
                     int jrow = j4+4+isol;
@@ -866,6 +887,7 @@ void FEFluidSolutesDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                     {
                         double kd = (jsol == isol) ? 1 : 0;
                         double kcc = -H[i]*(kd*spt.m_k[jsol] + spt.m_c[isol]*spt.m_dkdc[isol][jsol])*(H[j]*(ksi/dt + dJoJ) + gradN[j]*pt.m_vft)
+                        - H[i]*H[j]*(spt.m_dkdc[isol][jsol]*spt.m_cdot[isol] + kd*dkdt[isol])
                         + H[i]*H[j]*dchatdc[isol][jsol]
                         - gradN[i]*(gradN[j]*(spt.m_k[jsol]*d0[jsol]*kd) + spt.m_gradc[isol]*(d0[isol]*spt.m_dkdc[isol][jsol] + spt.m_k[isol]*d0c[isol][jsol])*H[j])
                         - gradN[i]*(gradN[j]*(z[jsol]*spt.m_k[jsol]*d0[jsol]) + sum3[jsol]*H[j]);
@@ -1117,6 +1139,11 @@ void FEFluidSolutesDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
     vector< vector<double> > acp(nsol, vector<double>(NELN));
     vector<int> sid(nsol);
     for (int j=0; j<nsol; ++j) sid[j] = m_pMat->GetSolute(j)->GetSoluteDOF();
+
+    // body forces acting on this domain (needed for current density)
+    vector<FEBodyForce*> bfs;
+    GetBodyForces(bfs);
+
     for (int j=0; j<neln; ++j) {
         FENode& node = m_pMesh->Node(el.m_node[j]);
         vt[j] = node.get_vec3d(m_dofW[0], m_dofW[1], m_dofW[2]);
@@ -1176,9 +1203,14 @@ void FEFluidSolutesDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
         
         // calculate the fluid pressure
         pt.m_pf = m_pMat->PressureActual(mp);
+
+        // the fluid (mixture) stress must use the actual fluid pressure p (which includes the
+        // osmotic contribution), not the effective pressure p~ used by FEFluid::Stress
+        pt.m_sf = m_pMat->Fluid()->GetViscous()->Stress(mp) - mat3dd(pt.m_pf);
         
         spt.m_psi = m_pMat->ElectricPotential(mp);
-        spt.m_Ie = m_pMat->CurrentDensity(mp);
+        // current density includes sedimentation (electrophoretic) fluxes due to body forces
+        spt.m_Ie = m_pMat->CurrentDensity(mp, NetBodyForce(mp, bfs));
         
         // update chemical reaction element data
         for (int j=0; j<m_pMat->Reactions(); ++j)
@@ -1258,4 +1290,69 @@ void FEFluidSolutesDomain3D::ElementInertialForce(FESolidElement& el, vector<dou
             fe[ndpn*i+2] -= f.z*detJ;
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate the derivatives of the solute molar supplies chat[i] = sum_r v[r][i]*zhat[r]
+//! and of the mixture volume supply phiwhat = sum_r Vbar[r]*zhat[r] with respect to the
+//! fluid volume ratio J. Reaction classes only provide strain tangents for solid mixtures,
+//! so the derivative is evaluated by a forward difference on the fluid dilatation.
+//! When the reaction supplies do not depend on J (e.g., constant rates and solubilities),
+//! this evaluates to exactly zero.
+void FEFluidSolutesDomain3D::ReactionSupplyTangentDilatation(FEMaterialPoint& mp, vector<double>& dchatdJ, double& dphiwdJ)
+{
+    const int nsol = m_pMat->Solutes();
+    const int nreact = m_pMat->Reactions();
+    dchatdJ.assign(nsol, 0.0);
+    dphiwdJ = 0.0;
+    if (nreact == 0) return;
+
+    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+    const double ef0 = pt.m_ef;
+    const double h = 1e-7*(1.0 + fabs(ef0));
+
+    // unperturbed and perturbed reaction supplies
+    vector<double> z0(nreact), z1(nreact);
+    for (int r = 0; r < nreact; ++r) z0[r] = m_pMat->GetReaction(r)->ReactionSupply(mp);
+    pt.m_ef = ef0 + h;
+    for (int r = 0; r < nreact; ++r) z1[r] = m_pMat->GetReaction(r)->ReactionSupply(mp);
+    pt.m_ef = ef0;
+
+    for (int r = 0; r < nreact; ++r)
+    {
+        FEChemicalReaction* pri = m_pMat->GetReaction(r);
+        double dzdJ = (z1[r] - z0[r])/h;
+        dphiwdJ += pri->m_Vbar*dzdJ;
+        for (int isol = 0; isol < nsol; ++isol)
+            dchatdJ[isol] += pri->m_v[isol]*dzdJ;
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! get the active body forces acting on this domain
+void FEFluidSolutesDomain3D::GetBodyForces(vector<FEBodyForce*>& bfs)
+{
+    bfs.clear();
+    FEModel* fem = GetFEModel();
+    for (int j = 0; j < fem->ModelLoads(); ++j)
+    {
+        FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem->ModelLoad(j));
+        if (pbf && pbf->IsActive())
+        {
+            for (int i = 0; i < pbf->Domains(); ++i)
+            {
+                if (pbf->Domain(i) == this) { bfs.push_back(pbf); break; }
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Net body force per unit mass. Note that FEBodyForce::force returns -b in the
+//! fluid solvers (consistent with ElementBodyForce), so b = -sum(force).
+vec3d FEFluidSolutesDomain3D::NetBodyForce(FEMaterialPoint& mp, const vector<FEBodyForce*>& bfs)
+{
+    vec3d b(0,0,0);
+    for (size_t i = 0; i < bfs.size(); ++i) b -= bfs[i]->force(mp);
+    return b;
 }

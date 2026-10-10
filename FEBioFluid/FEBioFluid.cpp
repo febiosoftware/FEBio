@@ -235,6 +235,7 @@ REGISTER_FECORE_CLASS(FEPlotFluidSurfaceTractionPower  , "fluid surface traction
 REGISTER_FECORE_CLASS(FEPlotFluidSurfaceEnergyFlux     , "fluid surface energy flux");
 REGISTER_FECORE_CLASS(FEPlotFluidShearViscosity        , "fluid shear viscosity"    );
 REGISTER_FECORE_CLASS(FEPlotFluidMassFlowRate          , "fluid mass flow rate"     );
+REGISTER_FECORE_CLASS(FEPlotFluidWallShearStress       , "fluid wall shear stress"  );
 REGISTER_FECORE_CLASS(FEPlotFluidStrainEnergyDensity   , "fluid strain energy density");
 REGISTER_FECORE_CLASS(FEPlotFluidKineticEnergyDensity  , "fluid kinetic energy density");
 REGISTER_FECORE_CLASS(FEPlotFluidEnergyDensity         , "fluid energy density"     );

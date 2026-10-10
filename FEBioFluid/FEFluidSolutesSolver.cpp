@@ -54,6 +54,7 @@ SOFTWARE.*/
 #include <FECore/FELinearConstraintManager.h>
 #include <FECore/FELinearSystem.h>
 #include "FEFluidSolutesAnalysis.h"
+#include "FEFluidSolutes.h"
 #include <limits>
 
 //-----------------------------------------------------------------------------
@@ -69,6 +70,7 @@ BEGIN_FECORE_CLASS(FEFluidSolutesSolver, FENewtonSolver)
     ADD_PARAMETER(m_minJf, "min_volume_ratio");
     ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
     ADD_PARAMETER(m_solve_strategy, "solve_strategy")->setEnums("coupled\0sequential\0");
+    ADD_PARAMETER(m_maxSeqPasses, "max_sequential_passes")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
     ADD_PARAMETER(m_cmin , "min_C_drop")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
     ADD_PARAMETER(m_cmax , "min_C_rise")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
     ADD_PARAMETER(m_cnum , "min_C_num")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
@@ -102,7 +104,8 @@ FEFluidSolutesSolver::FEFluidSolutesSolver(FEModel* pfem) : FENewtonSolver(pfem)
     m_forcePositive = true;    // force all concentrations to remain positive
 
 	m_solve_strategy = SOLVE_COUPLED;
-    
+    m_maxSeqPasses = 10;
+
     m_rhoi = 0;
     m_pred = 0;
     
@@ -286,8 +289,53 @@ bool FEFluidSolutesSolver::InitEquations()
 		vector<int> p = { nfeq, m_nseq };
 		SetPartitions(p);
 	}
-    
+
+    // identify the solute equations
+    BuildSoluteEquationFlags();
+
     return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Flag all equations (free or prescribed) associated with solute concentrations
+void FEFluidSolutesSolver::BuildSoluteEquationFlags()
+{
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    m_bsoleq.assign(m_neq, false);
+    const int nc = (int)m_dofC.Size();
+    for (int i = 0; i < mesh.Nodes(); ++i)
+    {
+        FENode& node = mesh.Node(i);
+        for (int j = 0; j < nc; ++j)
+        {
+            int id = node.m_ID[m_dofC[j]];
+            int eq = (id >= 0 ? id : (id < -1 ? -id - 2 : -1));
+            if ((eq >= 0) && (eq < m_neq)) m_bsoleq[eq] = true;
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! When negative concentrations are clipped to zero at the nodes (m_forcePositive),
+//! the accumulated increment m_Ui must be adjusted accordingly. Otherwise the solver's
+//! total solution vector (m_Ut + m_Ui) drifts away from the nodal values used to
+//! evaluate the residual and the time derivatives.
+void FEFluidSolutesSolver::ClipAccumulatedConcentrations()
+{
+    if (m_forcePositive == false) return;
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    const int nc = (int)m_dofC.Size();
+    for (int i = 0; i < mesh.Nodes(); ++i)
+    {
+        FENode& node = mesh.Node(i);
+        for (int j = 0; j < nc; ++j)
+        {
+            int n = node.m_ID[m_dofC[j]];
+            if ((n >= 0) && (m_Ut[n] + m_Ui[n] < 0.0)) m_Ui[n] = -m_Ut[n];
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -740,55 +788,84 @@ bool FEFluidSolutesSolver::Quasin()
 	// this flag indicates whether the velocity has converged for a sequential solve
 	// (This is not used for a coupled solve.)
 	bool vel_converged = false;
-    
+
+    // data for the staggered (velocity <-> solute) passes of a sequential solve
+    const bool bseq = (m_solve_strategy == SOLVE_SEQUENTIAL);
+    int niterPrev = 0;          // iterations of previous passes (sequential solve)
+    if (bseq && ((int)m_bsoleq.size() != m_neq)) BuildSoluteEquationFlags();
+    int nvelPass = 1;           // number of velocity passes in this time step
+    double normRv0 = 0.0;       // (squared) velocity residual norm at the start of the solute pass
+    double normRv = 0.0;        // (squared) velocity residual norm during the solute pass
+
+    // The velocity residual depends on the solutes only if osmotic effects are included
+    // ("include osmosis" = dms) in at least one fluid-solutes material. (When dms is off, the
+    // momentum balance, body forces, and fluid pressure BC are all independent of the solutes.)
+    // Only then do we need to check whether the solute pass altered the flow; otherwise
+    // round-off differences between residual evaluations could trigger needless extra passes.
+    bool bflowCoupled = false;
+    if (bseq) {
+        for (int i = 0; i < fem.Materials(); ++i) {
+            FEFluidSolutes* pfs = dynamic_cast<FEFluidSolutes*>(fem.GetMaterial(i));
+            if (pfs && pfs->m_diffMtmSupp) { bflowCoupled = true; break; }
+        }
+    }
+
     // loop until converged or when max nr of reformations reached
     bool bconv = false; // convergence flag
     do
     {
         feLog(" %d\n", m_niter+1);
-        
+
         // assume we'll converge.
         bconv = true;
 
 		// for sequential solve, we set one of the residual components to zero
-		if (m_solve_strategy == SOLVE_SEQUENTIAL)
+		if (bseq)
 		{
-			int veq = m_neq - m_nseq;
-			if (vel_converged == false)
+			for (int i = 0; i < m_neq; ++i)
 			{
-				// zero the solute residual
-				for (int i = veq; i < m_neq; ++i) m_R0[i] = 0.0;
-			}
-			else
-			{
-				// zero the velocity residual
-				for (int i = 0; i < veq; ++i) m_R0[i] = 0.0;
+				// velocity pass: zero the solute residual; solute pass: zero the velocity residual
+				if (m_bsoleq[i] != vel_converged) m_R0[i] = 0.0;
 			}
 		}
-        
-        // solve the equations (returns line search; solution stored in m_ui)
-        double s = QNSolve();
+
+        // solve the equations (solution stored in m_ui)
+        SolveEquations(m_ui, m_R0);
+
+        // For a sequential solve, zero the increments of the inactive block before the
+        // line search, so that the state at which the residual is evaluated only reflects
+        // the unknowns being solved for in this pass.
+        if (bseq)
+        {
+            for (int i = 0; i < m_neq; ++i)
+                if (m_bsoleq[i] != vel_converged) m_ui[i] = 0.0;
+        }
+
+        // perform the line search (returns line search factor)
+        double s = DoLineSearch();
 
 		// for sequential solve, we set one of the residual components to zero
-		if (m_solve_strategy == SOLVE_SEQUENTIAL)
+		if (bseq)
 		{
-			int veq = m_neq - m_nseq;
 			if (vel_converged == false)
 			{
 				// zero the solute residual
-				for (int i = veq; i < m_neq; ++i) m_R1[i] = 0.0;
-
-				// zero the solute solution
-				for (int i = veq; i < m_neq; ++i) m_ui[i] = 0.0;
+				for (int i = 0; i < m_neq; ++i) if (m_bsoleq[i]) m_R1[i] = 0.0;
 			}
 			else
 			{
+                // keep track of the velocity residual, which may change during the
+                // solute pass if the flow is coupled to the solutes
+                normRv = 0.0;
+                for (int i = 0; i < m_neq; ++i) if (!m_bsoleq[i]) normRv += m_R1[i] * m_R1[i];
+
 				// zero the velocity residual
-				for (int i = 0; i < veq; ++i) m_R1[i] = 0.0;
+				for (int i = 0; i < m_neq; ++i) if (!m_bsoleq[i]) m_R1[i] = 0.0;
+
                 // if solving sequentially with ctol = 0, ignore solute residual
                 if (m_Ctol == 0) {
                     // zero the solute residual
-                    for (int i = veq; i < m_neq; ++i) m_R1[i] = 0.0;
+                    for (int i = 0; i < m_neq; ++i) if (m_bsoleq[i]) m_R1[i] = 0.0;
                 }
 			}
 		}
@@ -810,7 +887,10 @@ bool FEFluidSolutesSolver::Quasin()
         // calculate norms
         // update all degrees of freedom
         for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
-        
+
+        // keep the accumulated increments consistent with clipped nodal concentrations
+        ClipAccumulatedConcentrations();
+
         // update velocities
         for (int i = 0; i<m_nveq; ++i) m_Vi[i] += s*m_vi[i];
         
@@ -946,17 +1026,56 @@ bool FEFluidSolutesSolver::Quasin()
             bconv = DoAugmentations();
         }
 
-		if (bconv && (m_solve_strategy == SOLVE_SEQUENTIAL))
+		if (bconv && bseq)
 		{
 			if (vel_converged == false)
 			{
-				vel_converged = true;
-				bconv = false;
-				m_qnstrategy->m_nups = 0;
-				m_niter = -1;
-				Residual(m_R0);
-				feLog("\n*** Velocity converged. Now solving for solutes.\n");
+                // If this is a repeated velocity pass that converged on its first iteration,
+                // the flow was not altered appreciably by the last solute pass, so the
+                // staggered scheme has converged.
+                if ((nvelPass > 1) && (m_niter == 0))
+                {
+                    feLog("\n*** Velocity unchanged after solute update. Sequential solve converged.\n");
+                }
+                else
+                {
+                    vel_converged = true;
+                    bconv = false;
+                    m_qnstrategy->m_nups = 0;
+                    niterPrev += m_niter + 1;
+                    m_niter = -1;
+                    Residual(m_R0);
+                    normRv0 = 0.0;
+                    for (int i = 0; i < m_neq; ++i) if (!m_bsoleq[i]) normRv0 += m_R0[i] * m_R0[i];
+                    normRv = normRv0;
+                    feLog("\n*** Velocity converged. Now solving for solutes.\n");
+                }
 			}
+            else
+            {
+                // The solutes have converged. Check whether the solute update has altered the
+                // velocity residual (e.g., when osmosis is included, or when a fluid pressure
+                // boundary condition depends on the solute concentrations). If so, the
+                // velocity must be solved for again.
+                const double rtolv = 1e-6;
+                if (bflowCoupled && (normRv > normRv0*(1.0 + rtolv) + m_Rmin))
+                {
+                    if (nvelPass >= m_maxSeqPasses)
+                    {
+                        feLogWarning("Sequential solve: velocity and solutes failed to converge after %d passes.", nvelPass);
+                        bconv = false;
+                        break;
+                    }
+                    vel_converged = false;
+                    bconv = false;
+                    m_qnstrategy->m_nups = 0;
+                    niterPrev += m_niter + 1;
+                    m_niter = -1;
+                    nvelPass++;
+                    Residual(m_R0);
+                    feLog("\n*** Solute update altered the flow. Solving for velocity again (pass %d).\n", nvelPass);
+                }
+            }
 		}
         
         // check for sudden solute concentration change
@@ -973,6 +1092,12 @@ bool FEFluidSolutesSolver::Quasin()
         fem.DoCallback(CB_MINOR_ITERS);
     }
     while (bconv == false);
+
+    // notify that the quasi-Newton loop has finished (used by e.g. the stiffness diagnostic)
+    // include the iterations of all the passes of a sequential solve in the iteration count
+    m_niter += niterPrev;
+
+    GetFEModel()->DoCallback(CB_QUASIN_CONVERGED);
     
     // if converged we update the total velocities
     if (bconv)
@@ -982,6 +1107,74 @@ bool FEFluidSolutesSolver::Quasin()
     }
     
     return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! Linear system used for sequential solves. It drops the coupling block that
+//! links the velocity/dilatation equations to the solute unknowns, so that the
+//! assembled matrix is block lower-triangular:
+//!   [ K_vv   0   ] [dv]   [R_v]
+//!   [ K_cv  K_cc ] [dc] = [R_c]
+//! The velocity phase (R_c = 0) then yields dv = K_vv^-1 R_v exactly, and the solute
+//! phase (R_v = 0) yields dv = 0 and dc = K_cc^-1 R_c, whether or not osmosis is included.
+//! Any coupling of the flow to the solutes is resolved by the outer staggered iterations
+//! in Quasin().
+class FEFluidSolutesSequentialLinearSystem : public FELinearSystem
+{
+public:
+    FEFluidSolutesSequentialLinearSystem(FEModel* fem, FEGlobalMatrix& K, vector<double>& F, vector<double>& u, bool bsymm, const vector<bool>& bsoleq)
+    : FELinearSystem(fem, K, F, u, bsymm), m_bsoleq(bsoleq) {}
+
+    void Assemble(const FEElementMatrix& ke) override
+    {
+        const vector<int>& lmi = ke.RowIndices();
+        const vector<int>& lmj = ke.ColumnsIndices();
+        const int nr = (int)lmi.size();
+        const int nc = (int)lmj.size();
+
+        // check if this element matrix has any velocity-solute coupling terms
+        bool bcoupled = false;
+        for (int i = 0; (i < nr) && !bcoupled; ++i) {
+            int I = Equation(lmi[i]);
+            if ((I < 0) || IsSolute(I)) continue;
+            for (int j = 0; j < nc; ++j) {
+                int J = Equation(lmj[j]);
+                if ((J >= 0) && IsSolute(J) && (ke[i][j] != 0.0)) { bcoupled = true; break; }
+            }
+        }
+        if (!bcoupled) { FELinearSystem::Assemble(ke); return; }
+
+        // zero the coupling terms and assemble
+        FEElementMatrix kf(ke);
+        for (int i = 0; i < nr; ++i) {
+            int I = Equation(lmi[i]);
+            if ((I < 0) || IsSolute(I)) continue;
+            for (int j = 0; j < nc; ++j) {
+                int J = Equation(lmj[j]);
+                if ((J >= 0) && IsSolute(J)) kf[i][j] = 0.0;
+            }
+        }
+        FELinearSystem::Assemble(kf);
+    }
+
+private:
+    static int Equation(int id) { return (id >= 0 ? id : (id < -1 ? -id - 2 : -1)); }
+    bool IsSolute(int eq) const { return (eq < (int)m_bsoleq.size()) && m_bsoleq[eq]; }
+
+private:
+    const vector<bool>& m_bsoleq;
+};
+
+//-----------------------------------------------------------------------------
+bool FEFluidSolutesSolver::StiffnessMatrix()
+{
+    if (m_solve_strategy == SOLVE_SEQUENTIAL)
+    {
+        if ((int)m_bsoleq.size() != m_neq) BuildSoluteEquationFlags();
+        FEFluidSolutesSequentialLinearSystem LS(GetFEModel(), *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_bsoleq);
+        return StiffnessMatrix(LS);
+    }
+    return FENewtonSolver::StiffnessMatrix();
 }
 
 //-----------------------------------------------------------------------------

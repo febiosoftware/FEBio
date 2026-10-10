@@ -553,6 +553,64 @@ bool FEPlotFluidFlowRate::Save(FESurface &surf, FEDataStream &a)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotFluidWallShearStress::Save(FESurface& surf, FEDataStream& a)
+{
+    FESurface* pcs = &surf;
+    if (pcs == 0) return false;
+    
+    writeAverageElementValue<double>(surf, a, [=](const FEMaterialPoint& mp) {
+        FESurfaceElement& el = static_cast<FESurfaceElement&>(*mp.m_elem);
+        int n = mp.m_index;
+        vec3d nu = pcs->SurfaceNormal(el,n);
+        // get the element this surface element belongs to
+        FEElement* pe = el.m_elem[0].pe;
+        if (pe)
+        {
+            // get the material
+            FEMaterial* pm = GetFEModel()->GetMaterial(pe->GetMatID());
+            FEFluidMaterial* pfluid = pm->ExtractProperty<FEFluidMaterial>();
+            
+            if (!pfluid) {
+                pe = el.m_elem[1].pe;
+                if (pe) pfluid = GetFEModel()->GetMaterial(pe->GetMatID())->ExtractProperty<FEFluidMaterial>();
+            }
+            
+            // see if this is a fluid element
+            if (pfluid) {
+                FEPolarFluidMaterial* polar = pfluid->ExtractProperty<FEPolarFluidMaterial>();
+                // evaluate the average stress in this element
+                int nint = pe->GaussPoints();
+                mat3d s(mat3dd(0));
+                for (int n=0; n<nint; ++n)
+                {
+                    FEMaterialPoint& mp = *pe->GetMaterialPoint(n);
+                    FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+                    s += pt.m_sf;
+                    if (polar)
+                        s += polar->GetViscousPolar()->SkewStress(mp);
+                }
+                s /= nint;
+                
+                // evaluate the traction vector
+                vec3d t = s*nu;
+                
+                // get its normal component
+                double tn = t*nu;
+                
+                // evaluate the magnitude of the shear component
+                double ts = sqrt(t*t - tn*tn);
+                
+                return ts;
+            }
+            else
+                return 0.;
+        }
+        else return 0.;
+    });
+    return true;
+}
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

@@ -218,3 +218,47 @@ void FEChemicalReaction::Serialize(DumpStream& ar)
         }
     }
 }
+
+//-----------------------------------------------------------------------------
+//! Derivative of the mass-action product with respect to the effective concentration of solute sol
+double FEChemicalReaction::MassActionProductTangentConcentration(FEMaterialPoint& pt, const vector<int>& nu, const int sol)
+{
+    const int nsol = m_psm->Solutes();
+    if ((sol < 0) || (sol >= nsol)) return 0.0;
+
+    // contribution of solid-bound molecules (independent of solute concentrations)
+    double psbm = 1.0;
+    const int nsbm = m_psm->SBMs();
+    for (int k = 0; k < nsbm; ++k) {
+        int vk = nu[nsol + k];
+        if (vk > 0) psbm *= pow(m_psm->SBMConcentration(pt, k), vk);
+    }
+
+    // actual solute concentrations
+    vector<double> ca(nsol, 0.0);
+    for (int i = 0; i < nsol; ++i)
+        if (nu[i] > 0) ca[i] = m_psm->GetActualSoluteConcentration(pt, i);
+
+    // product rule
+    double dP = 0.0;
+    for (int i = 0; i < nsol; ++i)
+    {
+        int vi = nu[i];
+        if (vi <= 0) continue;
+
+        // derivative of actual concentration c_i = kappa_i*c~_i with respect to c~_sol
+        double kappa = m_psm->GetPartitionCoefficient(pt, i);
+        double ce = m_psm->GetEffectiveSoluteConcentration(pt, i);
+        double dcadc = m_psm->dkdc(pt, i, sol)*ce + ((i == sol) ? kappa : 0.0);
+        if (dcadc == 0.0) continue;
+
+        // d(c_i^vi)/dc_i * prod_{k != i} c_k^vk
+        double term = vi*pow(ca[i], vi - 1);
+        for (int k = 0; k < nsol; ++k)
+            if ((k != i) && (nu[k] > 0)) term *= pow(ca[k], nu[k]);
+
+        dP += term*dcadc;
+    }
+
+    return dP*psbm;
+}

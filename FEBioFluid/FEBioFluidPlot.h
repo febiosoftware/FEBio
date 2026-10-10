@@ -181,6 +181,16 @@ public:
 	bool Save(FESurface& surf, FEDataStream& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Fluid surface wall shear stress
+//!
+class FEPlotFluidWallShearStress : public FEPlotSurfaceData
+{
+public:
+    FEPlotFluidWallShearStress(FEModel* pfem) : FEPlotSurfaceData(pfem, PLT_FLOAT, FMT_ITEM) { SetUnits(UNIT_PRESSURE); }
+    bool Save(FESurface& surf, FEDataStream& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

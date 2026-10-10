@@ -130,7 +130,7 @@ void FEFluidSolutesNaturalFlux::Update()
                 if (!nsrf[i]) {
                     int n = pe->m_node[i];
                     FENode& node = GetMesh().Node(n);
-                    int dof = m_dofC[m_isol-1];
+                    int dof = m_dofC[0];
                     if (dof != -1) {
                         cavg += node.get(dof);
                         ++m;
@@ -144,7 +144,7 @@ void FEFluidSolutesNaturalFlux::Update()
                     if (nsrf[i]) {
                         int n = pe->m_node[i];
                         FENode& node = GetMesh().Node(n);
-                        int dof = m_dofC[m_isol-1];
+                        int dof = m_dofC[0];
                         if (dof != -1) node.set(dof, cavg);
                     }
                 }
@@ -159,7 +159,6 @@ void FEFluidSolutesNaturalFlux::LoadVector(FEGlobalVector& R)
     FEFluidSolutesNaturalFlux* flux = this;
     m_psurf->LoadVector(R, m_dofC, true, [=](FESurfaceMaterialPoint& mp, const FESurfaceDofShape& dof_a, std::vector<double>& fa) {
         
-        const FETimeInfo& tp = GetTimeInfo();
         
         // get surface element
         FESurfaceElement& el = *mp.SurfaceElement();
@@ -173,20 +172,27 @@ void FEFluidSolutesNaturalFlux::LoadVector(FEGlobalVector& R)
             return;
         }
         FEFluidSolutes* pmat = dynamic_cast<FEFluidSolutes*>(pm);
+        // local solute index in this material (may differ from the global solute ID - 1)
         int sid = psi->FindLocalSoluteID(flux->m_isol);
+        if ((pmat == nullptr) || (sid < 0)) {
+            fa[0] = 0;
+            return;
+        }
         vec3d dxt = mp.dxr ^ mp.dxs;
-        
+
         // get element-averaged diffusive flux
         vec3d jd(0,0,0);
         int nint = pe->GaussPoints();
         for (int n=0; n<nint; ++n) {
             FEMaterialPoint& pt = *pe->GetMaterialPoint(n);
-            jd += pmat->SoluteDiffusiveFlux(pt, m_isol-1);
+            jd += pmat->SoluteDiffusiveFlux(pt, sid);
         }
         jd /= nint;
-        
-        // evaluate desired natural solute flux = normal convective flux * area
-        double jn = jd*dxt*tp.alphaf;
+
+        // evaluate desired natural solute flux = normal diffusive flux * area
+        // (the material point data is already evaluated at the intermediate time t_{n+alpha_f},
+        // and residual contributions are not scaled by alpha_f)
+        double jn = jd*dxt;
         
         
         double H_i = dof_a.shape;
