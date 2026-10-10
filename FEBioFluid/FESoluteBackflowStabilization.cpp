@@ -43,6 +43,7 @@ END_FECORE_CLASS();
 FESoluteBackflowStabilization::FESoluteBackflowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_isol = -1;
+    m_tlast = -1e300;
     m_dofC = (pfem ? pfem->GetDOFIndex(FEBioFluidSolutes::GetVariableName(FEBioFluidSolutes::FLUID_CONCENTRATION), 0) : -1);
 }
 
@@ -96,8 +97,16 @@ void FESoluteBackflowStabilization::Activate()
 //! Evaluate and prescribe the resistance pressure
 void FESoluteBackflowStabilization::Update()
 {
-    // determine backflow conditions
-    MarkBackFlow();
+    // Determine backflow conditions only once per time step (at the first update of
+    // the time step, based on the velocity at the start of the step). Re-evaluating the
+    // backflow status at every iteration could switch the concentration DOFs between free
+    // and prescribed within a time step, without reforming the stiffness matrix.
+    const FETimeInfo& tp = GetTimeInfo();
+    if (tp.currentTime != m_tlast)
+    {
+        MarkBackFlow();
+        m_tlast = tp.currentTime;
+    }
     
     // prescribe solute backflow constraint at the nodes
     FESurface* ps = &GetSurface();

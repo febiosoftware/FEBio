@@ -135,6 +135,14 @@ bool FEStiffnessDiagnostic::Diagnose()
 
 	// re-evaluate the stiffness matrix at the converged state, since the matrix in
 	// memory was evaluated at the start of the last iteration.
+	// make sure that the material point data reflects the current solution state
+	// (the stiffness matrix is evaluated from the material point data, while the
+	// finite-difference residuals below are evaluated after calling Update)
+	{
+		std::vector<double> u0(nlsolve->m_pK->Rows(), 0.0);
+		nlsolve->Update(u0);
+	}
+
 	nlsolve->m_pK->Zero();
 	std::fill(nlsolve->m_Fd.begin(), nlsolve->m_Fd.end(), 0.0);
 	if (nlsolve->StiffnessMatrix() == false)

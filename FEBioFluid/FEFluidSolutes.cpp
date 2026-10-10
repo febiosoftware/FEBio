@@ -383,14 +383,22 @@ void FEFluidSolutes::PartitionCoefficientFunctions(const FEMaterialPoint& mp, ve
 //! Current density
 vec3d FEFluidSolutes::CurrentDensity(const FEMaterialPoint& pt)
 {
+    return CurrentDensity(pt, vec3d(0,0,0));
+}
+
+//-----------------------------------------------------------------------------
+//! Current density, using solute fluxes relative to the solvent, including
+//! sedimentation fluxes due to body force per mass b
+vec3d FEFluidSolutes::CurrentDensity(const FEMaterialPoint& pt, const vec3d& b)
+{
     int i;
     const int nsol = (int)m_pSolute.size();
-    
+
     vector<vec3d> j(nsol);
     vector<int> z(nsol);
     vec3d Ie(0,0,0);
     for (i=0; i<nsol; ++i) {
-        j[i] = SoluteFlux(pt, i);
+        j[i] = SoluteFlux(pt, i, b);
         z[i] = m_pSolute[i]->ChargeNumber();
         Ie += j[i]*z[i];
     }
@@ -447,28 +455,33 @@ double FEFluidSolutes::PressureActual(const FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-//! Calculate solute molar flux
+//! Calculate solute molar flux relative to the solvent, j = c(v^i - v^f) (Eq. 4 of Shim et al., 2023).
+//! Without body forces this reduces to the diffusive flux. (The convective flux c*v^f is not
+//! part of j, which is defined relative to the solvent.)
 
 vec3d FEFluidSolutes::SoluteFlux(const FEMaterialPoint& pt, const int sol)
 {
+    return SoluteDiffusiveFlux(pt, sol);
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate solute molar flux relative to the solvent, including sedimentation flux
+vec3d FEFluidSolutes::SoluteFlux(const FEMaterialPoint& pt, const int sol, const vec3d& b)
+{
+    return SoluteDiffusiveFlux(pt, sol) + SoluteSedimentationFlux(pt, sol, b);
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate sedimentation solute molar flux jb = s*c*b, with s = d0*M/(R*T)
+vec3d FEFluidSolutes::SoluteSedimentationFlux(const FEMaterialPoint& pt, const int sol, const vec3d& b)
+{
     const FEFluidSolutesMaterialPoint& spt = *pt.ExtractData<FEFluidSolutesMaterialPoint>();
-    const FEFluidMaterialPoint& fpt = *pt.ExtractData<FEFluidMaterialPoint>();
-    
-    // concentration gradient
-    vec3d gradc = spt.m_gradc[sol];
-    
-    // solute free diffusivity
     FEMaterialPoint& mp = const_cast<FEMaterialPoint&>(pt);
     double D0 = m_pSolute[sol]->m_pDiff->Free_Diffusivity(mp);
-    double kappa = PartitionCoefficient(pt, sol);
-    
-    double c = spt.m_c[sol];
-    vec3d v = fpt.m_vft;
-    
-    // solute flux j
-    vec3d j = -gradc*D0*kappa + v*c*kappa;
-    
-    return j;
+    double M = m_pSolute[sol]->MolarMass();
+    double s = D0*M/(m_Rgas*m_Tabs);
+    double ca = PartitionCoefficient(pt, sol)*spt.m_c[sol];
+    return b*(s*ca);
 }
 
 //-----------------------------------------------------------------------------

@@ -102,7 +102,11 @@ void DenseMatrix::Assemble(const matrix& ke, const vector<int>& lm)
 		{
 			for (int j=0; j<M; ++j)
 			{
-				if ((J = lm[j]) >= 0) m_pr[I][J] += ke[i][j];
+				if ((J = lm[j]) >= 0)
+				{
+#pragma omp atomic
+					m_pr[I][J] += ke[i][j];
+				}
 			}
 		}
 	}
@@ -122,7 +126,11 @@ void DenseMatrix::Assemble(const matrix& ke, const vector<int>& LMi, const vecto
 		{
 			for (int j=0; j<M; ++j)
 			{
-				if ((J = LMj[j]) >= 0) m_pr[I][J] += ke[i][j];
+				if ((J = LMj[j]) >= 0)
+				{
+#pragma omp atomic
+					m_pr[I][J] += ke[i][j];
+				}
 			}
 		}
 	}

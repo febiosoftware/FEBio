@@ -110,6 +110,10 @@ public:
     
     //! calculates the solid element mass matrix
     void ElementMassMatrix(FESolidElement& el, matrix& ke);
+
+    //! calculates the stiffness with respect to the solid displacement (internal + inertial forces)
+    //! consistent with the residual evaluated in ElementInternalForce and ElementInertialForce
+    void ElementStiffnessDisplacement(FESolidElement& el, matrix& ke);
     
     //! calculates the stiffness matrix due to body forces
     void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);
@@ -124,6 +128,12 @@ public:
     
     //! Calculates the inertial force vector for solid elements
     void ElementInertialForce(FESolidElement& el, vector<double>& fe);
+
+    //! Net body force per unit mass acting on this domain at a material point (b = -sum of FEBodyForce::force)
+    vec3d NetBodyForce(FEMaterialPoint& mp, const vector<FEBodyForce*>& bfs);
+
+    //! Get the active body forces acting on this domain
+    void GetBodyForces(vector<FEBodyForce*>& bfs);
     
 protected:
     FEMultiphasicFSI*    m_pMat;

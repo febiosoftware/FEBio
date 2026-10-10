@@ -207,34 +207,15 @@ double FEMassActionReversible::Tangent_ReactionSupply_Concentration(FEMaterialPo
         return 0;
     }
     
-    // forward reaction
-    double zhatF = FwdReactionSupply(pt);
-    double dzhatFdc = 0;
-    for (int isol=0; isol<nsol; ++isol) {
-        double dkdc = m_psm->dkdc(pt, isol, sol);
-        double k = m_psm->GetPartitionCoefficient(pt, isol);
-        double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-        dzhatFdc += m_vR[isol]*dkdc/k;
-        if ((isol == sol) && (c > 0))
-            dzhatFdc += m_vR[isol]/c;
-    }
-    
-    dzhatFdc *= zhatF;
-    
-    // reverse reaction
-    double zhatR = RevReactionSupply(pt);
-    double dzhatRdc = 0;
-    for (int isol=0; isol<nsol; ++isol) {
-        double dkdc = m_psm->dkdc(pt, isol, sol);
-        double k = m_psm->GetPartitionCoefficient(pt, isol);
-        double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
+    // use the product rule, which remains valid when reactant or product concentrations are zero
 
-        dzhatRdc += m_vP[isol]*dkdc/k;
-        if ((isol == sol) && (c > 0))
-            dzhatRdc += m_vP[isol]/c;
-    }
-    
-    dzhatRdc *= zhatR;
-    
+    // forward reaction
+    double kF = m_pFwd->ReactionRate(pt);
+    double dzhatFdc = kF*MassActionProductTangentConcentration(pt, m_vR, sol);
+
+    // reverse reaction
+    double kR = m_pRev->ReactionRate(pt);
+    double dzhatRdc = kR*MassActionProductTangentConcentration(pt, m_vP, sol);
+
     return dzhatFdc - dzhatRdc;
 }

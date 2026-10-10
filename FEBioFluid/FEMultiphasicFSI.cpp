@@ -462,6 +462,13 @@ void FEMultiphasicFSI::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector
 //! Current density
 vec3d FEMultiphasicFSI::CurrentDensity(FEMaterialPoint& pt)
 {
+    return CurrentDensity(pt, vec3d(0,0,0));
+}
+
+//-----------------------------------------------------------------------------
+//! Current density, including sedimentation fluxes due to body force per mass b
+vec3d FEMultiphasicFSI::CurrentDensity(FEMaterialPoint& pt, const vec3d& b)
+{
     int i;
     const int nsol = (int)m_pSolute.size();
     
@@ -469,7 +476,7 @@ vec3d FEMultiphasicFSI::CurrentDensity(FEMaterialPoint& pt)
     vector<int> z(nsol);
     vec3d Ie(0,0,0);
     for (i=0; i<nsol; ++i) {
-        j[i] = SoluteFlux(pt, i);
+        j[i] = SoluteFlux(pt, i, b);
         z[i] = m_pSolute[i]->ChargeNumber();
         Ie += j[i]*z[i];
     }
@@ -569,6 +576,26 @@ vec3d FEMultiphasicFSI::SoluteFlux(FEMaterialPoint& pt, const int sol)
     // solute flux j
     vec3d j = D*(-gradc*phif + w*c/d0)*kappa;
     
+    return j;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate solute molar flux, including the sedimentation term (Eq. 8.2):
+//! j = kappa*D*(-phif*grad c + (M/(R*T))*phif*c*b + c*w/d0)
+//! (The residual uses the flux without the body force term, since the sedimentation
+//! contribution is evaluated with the body force loads.)
+vec3d FEMultiphasicFSI::SoluteFlux(FEMaterialPoint& pt, const int sol, const vec3d& b)
+{
+    vec3d j = SoluteFlux(pt, sol);
+    if ((b.x == 0) && (b.y == 0) && (b.z == 0)) return j;
+
+    FEMultiphasicFSIMaterialPoint& spt = *pt.ExtractData<FEMultiphasicFSIMaterialPoint>();
+    mat3ds D = Diffusivity(pt, sol);
+    double kappa = PartitionCoefficient(pt, sol);
+    double M = m_pSolute[sol]->MolarMass();
+    double phif = Porosity(pt);
+    double c = spt.m_c[sol];
+    j += (D*b)*(kappa*M/(m_Rgas*m_Tabs)*phif*c);
     return j;
 }
 

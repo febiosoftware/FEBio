@@ -122,7 +122,16 @@ public:
 
     //! Calculates the inertial force vector for solid elements
     void ElementInertialForce(FESolidElement& el, vector<double>& fe);
-    
+
+    //! Derivatives of the solute molar supplies (chat) and mixture volume supply (phiwhat) with respect to J
+    void ReactionSupplyTangentDilatation(FEMaterialPoint& mp, vector<double>& dchatdJ, double& dphiwdJ);
+
+    //! Net body force per unit mass acting on this domain at a material point (b = -sum of FEBodyForce::force)
+    vec3d NetBodyForce(FEMaterialPoint& mp, const vector<FEBodyForce*>& bfs);
+
+    //! Get the active body forces acting on this domain
+    void GetBodyForces(vector<FEBodyForce*>& bfs);
+
 protected:
     FEFluidSolutes*     m_pMat;
     

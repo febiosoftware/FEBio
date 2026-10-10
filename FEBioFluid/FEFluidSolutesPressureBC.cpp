@@ -26,6 +26,7 @@ SOFTWARE.*/
 #include "stdafx.h"
 #include "FEFluidSolutesPressureBC.h"
 #include "FEBioFluidSolutes.h"
+#include "FEFluidSolutes.h"
 #include <FECore/FEModel.h>
 
 //=============================================================================
@@ -89,9 +90,15 @@ void FEFluidSolutesPressureBC::Update()
         FEFluid* pfl = pm->ExtractProperty<FEFluid>();
         FESoluteInterface* psi = pm->ExtractProperty<FESoluteInterface>();
         FESolidElement* se = dynamic_cast<FESolidElement*>(e);
+        // For a fluid-solutes material in which osmosis is not included ("include osmosis" = false),
+        // the fluid momentum balance is driven by the gradient of the effective pressure p~ only.
+        // Subtracting the osmotic pressure here would then produce a spurious driving pressure
+        // R*T*osc*osm at this boundary, so in that case the prescribed pressure is applied to p~.
+        FEFluidSolutes* pfs = dynamic_cast<FEFluidSolutes*>(pm);
+        bool bosmotic = (pfs == nullptr) || pfs->m_diffMtmSupp;
         if (se) {
             double efo[FEElement::MAX_NODES] = {0};
-            if (psi) {
+            if (psi && bosmotic) {
                 const int nsol = psi->Solutes();
                 std::vector<double> kappa(nsol,0);
                 double osc = 0;

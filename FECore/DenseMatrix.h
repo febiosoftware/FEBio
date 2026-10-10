@@ -68,6 +68,7 @@ public:
 	void add(int i, int j, double v) override { m_pr[i][j] += v; }
 	void set(int i, int j, double v) override { m_pr[i][j] = v; }
 	double diag(int i) override { return m_pr[i][i]; }
+	double get(int i, int j) override { return m_pr[i][j]; }
 
 protected:
 	double*		m_pd;	//!< matrix values

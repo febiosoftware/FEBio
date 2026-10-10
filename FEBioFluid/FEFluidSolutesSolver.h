@@ -91,8 +91,12 @@ public:
     //{ --- Stiffness matrix routines ---
     
     //! calculates the global stiffness matrix
+    //! (overridden so that a block-triangular matrix can be assembled for sequential solves)
+    bool StiffnessMatrix() override;
+
+    //! calculates the global stiffness matrix
     bool StiffnessMatrix(FELinearSystem& LS) override;
-    
+
     //! contact stiffness
     void ContactStiffness(FELinearSystem& LS);
     
@@ -117,6 +121,12 @@ protected:
     void GetVelocityData(vector<double>& vi, vector<double>& ui);
     void GetDilatationData(vector<double>& ei, vector<double>& ui);
     void GetConcentrationData(vector<double>& ci, vector<double>& ui, const int sol);
+
+    //! build the flags identifying solute equations (free and prescribed)
+    void BuildSoluteEquationFlags();
+
+    //! make the accumulated solution increment consistent with clipped (non-negative) nodal concentrations
+    void ClipAccumulatedConcentrations();
 
 public:
     // convergence tolerances
@@ -163,7 +173,9 @@ protected:
     int             m_dofAC;
 
 	int				m_solve_strategy;
-    
+    int             m_maxSeqPasses;     //!< max number of velocity/solute passes per time step in sequential solves
+    vector<bool>    m_bsoleq;           //!< flags identifying solute equations
+
 private:
     bool            m_sudden_C_change;
     
