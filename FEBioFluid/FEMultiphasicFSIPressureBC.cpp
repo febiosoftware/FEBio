@@ -32,6 +32,8 @@
 //=============================================================================
 BEGIN_FECORE_CLASS(FEMultiphasicFSIPressureBC, FEPrescribedSurface)
     ADD_PARAMETER(m_p, "pressure")->setUnits("P")->setLongName("fluid pressure");
+    ADD_PARAMETER(m_bbath, "bath")->setLongName("osmolarity from bath concentrations");
+    ADD_PARAMETER(m_bathosmc, "bath_osmotic_coefficient")->setLongName("bath osmotic coefficient");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -39,6 +41,8 @@ END_FECORE_CLASS();
 FEMultiphasicFSIPressureBC::FEMultiphasicFSIPressureBC(FEModel* pfem) : FEPrescribedSurface(pfem)
 {
     m_p = 0;
+    m_bbath = false;
+    m_bathosmc = -1;
     m_dofEF = -1;
     m_dofC = -1;
     m_Rgas = 0;
@@ -107,6 +111,17 @@ void FEMultiphasicFSIPressureBC::Update()
                 }
                 osc /= nint;
                 for (int k=0; k<nsol; ++k) kappa[k] /= nint;
+                // When this surface is in contact with a bath, the effective pressure p~ is continuous
+                // with that of the bath, p~ = p - R*T*osc*sum(c_bath). Since the effective concentrations
+                // are continuous across the interface and the partition coefficients of an ideal,
+                // electroneutral bath are equal to one, the bath osmolarity is the sum of the nodal
+                // effective concentrations. (Using the partition coefficients of the adjoining element
+                // would instead use the interstitial osmolarity, which includes the Donnan osmotic
+                // pressure of a charged tissue.)
+                if (m_bbath) {
+                    for (int k=0; k<nsol; ++k) kappa[k] = 1.0;
+                    if (m_bathosmc >= 0) osc = m_bathosmc;
+                }
                 // loop over face nodes
                 for (int j=0; j<el.Nodes(); ++j) {
                     double osm = 0;
