@@ -1197,7 +1197,7 @@ void FEMultiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                                 }
                             }
                         }
-                        ke[i7+7+isol][j7+7+jsol] += kcc;
+                        // (solute-solute block evaluated in ElementStiffnessConcentration)
                     }
                     ke[i7  ][j7+7+isol] += kuc.x;
                     ke[i7+1][j7+7+isol] += kuc.y;
@@ -1217,6 +1217,10 @@ void FEMultiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
     // stiffness with respect to the solid displacement (internal and inertial forces)
     // (replaces the previous closed-form expressions for Kuu, Kwu, kJu, and kcu)
     ElementStiffnessDisplacement(el, ke);
+
+    // stiffness of the solute mass balances with respect to the concentrations
+    // (replaces the previous closed-form expression for kcc)
+    ElementStiffnessConcentration(el, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -2103,6 +2107,161 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
                         vec3d djt = dj[a] + dje*penalty;
                         double fc = jt*gi + H[i]*(phif*chat[a] - S);
                         double dfc = djt*gi + jt*dgi + H[i]*(dphif*chat[a] + phif*dchat[a] - dS) + fc*div;
+                        ke[r+7+a][cl] += dfc*dv;
+                    }
+                }
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Stiffness of the solute mass balances with respect to the effective concentrations.
+//! Evaluated as directional derivatives of the solute residual in ElementInternalForce,
+//! including the dependence of the partition coefficients (and their derivatives) on the
+//! concentrations through the electroneutrality condition. The second derivatives of the
+//! partition coefficients are evaluated with a forward difference on the concentrations.
+void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el, matrix& ke)
+{
+    const FETimeInfo& tp = GetFEModel()->GetTime();
+    const int nint = el.GaussPoints();
+    const int neln = el.Nodes();
+    const int nsol = m_pMat->Solutes();
+    if (nsol == 0) return;
+    const int nreact = m_pMat->Reactions();
+    const int ndpn = 7 + nsol;
+
+    const double dt = tp.timeIncrement;
+    const double af = tp.alphaf;
+    const double dtrans = m_btrans ? 1 : m_sseps;
+    // derivative of the (intermediate) concentration rate with respect to the nodal concentration
+    const double cfac = tp.alpham/(tp.gamma*dt)*dtrans;
+    const double penalty = m_pMat->m_penalty;
+
+    vector<vec3d> gradN(neln);
+    double Ji[3][3];
+    const double* gw = el.GaussWeights();
+
+    vector<int> z(nsol);
+    for (int a=0; a<nsol; ++a) z[a] = m_pMat->GetSolute(a)->ChargeNumber();
+
+    vector<double> d0(nsol), kap(nsol), c(nsol), cdot(nsol), dkdJ(nsol), dkdt(nsol);
+    vector<vec3d> gradc(nsol), flux(nsol), jsol(nsol);
+    vector<mat3ds> D(nsol);
+    vector< vector<double> > dkdc(nsol, vector<double>(nsol));
+    vector< vector<double> > d0p(nsol, vector<double>(nsol));
+    vector< vector<mat3ds> > dDdc(nsol, vector<mat3ds>(nsol));
+    vector< vector<double> > dzdc(nreact, vector<double>(nsol));
+    // second derivatives of partition coefficients w.r.t. concentration g
+    vector< vector<double> > ddkdJdc(nsol, vector<double>(nsol));                  // [a][g]
+    vector< vector< vector<double> > > ddkdcdc(nsol, vector< vector<double> >(nsol, vector<double>(nsol))); // [a][b][g]
+    vector<double> k1, dkdJ1; vector< vector<double> > dkdc1;
+
+    for (int n=0; n<nint; ++n)
+    {
+        double dv = invjact(el, Ji, n, af)*gw[n];
+        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+        double* H = el.H(n);
+        double* Gr = el.Gr(n); double* Gs = el.Gs(n); double* Gt = el.Gt(n);
+        for (int i=0; i<neln; ++i) gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& et = *(mp.ExtractData<FEElasticMaterialPoint>());
+        FEFSIMaterialPoint& fpt = *(mp.ExtractData<FEFSIMaterialPoint>());
+        FEMultiphasicFSIMaterialPoint& mt = *(mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
+
+        const double J = et.m_J;
+        const double Jdot = fpt.m_Jdot;
+        const vec3d w = fpt.m_w;
+        double phif = m_pMat->Porosity(mp);
+        double phis = m_pMat->SolidVolumeFrac(mp);
+
+        for (int a=0; a<nsol; ++a) {
+            d0[a] = m_pMat->GetSolute(a)->m_pDiff->Free_Diffusivity(mp);
+            kap[a] = mt.m_k[a];
+            c[a] = mt.m_c[a];
+            cdot[a] = mt.m_cdot[a];
+            dkdJ[a] = mt.m_dkdJ[a];
+            gradc[a] = mt.m_gradc[a];
+            D[a] = m_pMat->Diffusivity(mp, a);
+            flux[a] = -gradc[a]*phif + w*(c[a]/d0[a]);
+            jsol[a] = mt.m_j[a];
+            for (int b=0; b<nsol; ++b) {
+                dkdc[a][b] = mt.m_dkdc[a][b];
+                d0p[a][b] = m_pMat->GetSolute(a)->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp, b);
+                dDdc[a][b] = m_pMat->Diffusivity_Tangent_Concentration(mp, a, b);
+            }
+        }
+        for (int a=0; a<nsol; ++a) {
+            dkdt[a] = dkdJ[a]*Jdot;
+            for (int b=0; b<nsol; ++b) dkdt[a] += dkdc[a][b]*cdot[b];
+        }
+        vec3d je(0,0,0);
+        for (int a=0; a<nsol; ++a) je += jsol[a]*z[a];
+        vector<double> chat(nsol, 0.0);
+        for (int r=0; r<nreact; ++r) {
+            double zr = m_pMat->GetReaction(r)->ReactionSupply(mp);
+            for (int a=0; a<nsol; ++a) chat[a] += m_pMat->GetReaction(r)->m_v[a]*zr;
+            for (int g=0; g<nsol; ++g) dzdc[r][g] = m_pMat->GetReaction(r)->Tangent_ReactionSupply_Concentration(mp, g);
+        }
+
+        // second derivatives of the partition coefficients (forward difference on each concentration)
+        for (int g=0; g<nsol; ++g) {
+            double cg = mt.m_c[g];
+            double h = 1e-7*(fabs(cg) + 1e-3);
+            mt.m_c[g] = cg + h;
+            m_pMat->PartitionCoefficientFunctions(mp, k1, dkdJ1, dkdc1);
+            mt.m_c[g] = cg;
+            for (int a=0; a<nsol; ++a) {
+                ddkdJdc[a][g] = (dkdJ1[a] - dkdJ[a])/h;
+                for (int b=0; b<nsol; ++b) ddkdcdc[a][b][g] = (dkdc1[a][b] - dkdc[a][b])/h;
+            }
+        }
+
+        for (int j=0; j<neln; ++j)
+        {
+            const vec3d& gj = gradN[j];
+            for (int g=0; g<nsol; ++g)
+            {
+                // perturbation of concentration g at node j
+                double dcg = af*H[j];           // d c~_g
+                vec3d dgcg = gj*af;             // d grad c~_g
+                double dcdotg = cfac*H[j];      // d (dc~_g/dt)
+
+                vector<double> dkap(nsol), ddkdJ(nsol), dkdt_d(nsol);
+                vector<vec3d> dj(nsol);
+                vec3d dje(0,0,0);
+                for (int a=0; a<nsol; ++a) {
+                    dkap[a] = dkdc[a][g]*dcg;
+                    ddkdJ[a] = ddkdJdc[a][g]*dcg;
+                    // d flux_a
+                    vec3d dflux(0,0,0);
+                    if (a == g) dflux = -dgcg*phif + w*(dcg/d0[a]);
+                    dflux -= w*(c[a]*d0p[a][g]*dcg/(d0[a]*d0[a]));
+                    dj[a] = (D[a]*flux[a])*dkap[a] + (dDdc[a][g]*flux[a])*(kap[a]*dcg) + (D[a]*dflux)*kap[a];
+                    dje += dj[a]*z[a];
+                    // d (dkappa/dt)
+                    dkdt_d[a] = ddkdJ[a]*Jdot + dkdc[a][g]*dcdotg;
+                    for (int b=0; b<nsol; ++b) dkdt_d[a] += ddkdcdc[a][b][g]*dcg*cdot[b];
+                }
+
+                for (int i=0; i<neln; ++i)
+                {
+                    const vec3d& gi = gradN[i];
+                    int r = ndpn*i, cl = ndpn*j + 7 + g;
+                    for (int a=0; a<nsol; ++a)
+                    {
+                        double dca = (a == g ? dcg : 0);
+                        double dcdota = (a == g ? dcdotg : 0);
+                        double dchat = 0;
+                        for (int rr=0; rr<nreact; ++rr) dchat += m_pMat->GetReaction(rr)->m_v[a]*dzdc[rr][g]*dcg;
+                        double dS = (Jdot/J)*(phif + phis)*(dkap[a]*c[a] + kap[a]*dca)
+                                  + dkdt_d[a]*phif*c[a] + dkdt[a]*phif*dca
+                                  + dcdota*phif*kap[a] + cdot[a]*phif*dkap[a];
+                        vec3d djt = dj[a] + dje*penalty;
+                        double dfc = djt*gi + H[i]*(phif*dchat - dS);
                         ke[r+7+a][cl] += dfc*dv;
                     }
                 }

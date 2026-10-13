@@ -55,6 +55,8 @@ public:
 
 private:
     FEParamDouble   m_p;       //!< prescribed fluid pressure
+    bool            m_bbath;   //!< evaluate the osmotic pressure from the bath (effective) concentrations
+    double          m_bathosmc;//!< osmotic coefficient of the bath (if negative, use that of the material)
 
 private:
     std::vector<double> m_e;

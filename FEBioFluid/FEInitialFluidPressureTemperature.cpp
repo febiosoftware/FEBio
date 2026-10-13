@@ -99,6 +99,11 @@ void FEInitialFluidPressureTemperature::Activate()
     
     FEMesh& mesh = *m_nodeSet->GetMesh();
 
+    // map from global node index to the local index in this node set
+    // (only nodes of this node set receive an initial dilatation)
+    std::vector<int> g2l(mesh.Nodes(), -1);
+    for (int i = 0; i < N; ++i) g2l[nodeList[i]] = i;
+
     // evaluate average prescribed pressure and temperature in each element
     // project them from int points to nodes
     for (int i=0; i<mesh.Elements(); ++i)
@@ -120,12 +125,12 @@ void FEInitialFluidPressureTemperature::Activate()
             el.project_to_nodes(efi, efo);
             if (good) {
                 for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_node[j]].push_back(efo[j]);
+                    { int l = g2l[el.m_node[j]]; if (l >= 0) efNodes[l].push_back(efo[j]); }
             }
             else {
                 for (int j=0; j<el.Nodes(); ++j) {
                     efo[j] = 0;
-                    efNodes[el.m_node[j]].push_back(efo[j]);
+                    { int l = g2l[el.m_node[j]]; if (l >= 0) efNodes[l].push_back(efo[j]); }
                 }
             }
         }
@@ -141,16 +146,16 @@ void FEInitialFluidPressureTemperature::Activate()
             el.project_to_nodes(efi, efo);
             if (good) {
                 for (int j=0; j<el.Nodes(); ++j)
-                    efNodes[el.m_node[j]].push_back(efo[j]);
+                    { int l = g2l[el.m_node[j]]; if (l >= 0) efNodes[l].push_back(efo[j]); }
             }
             else {
                 for (int j=0; j<el.Nodes(); ++j) {
                     efo[j] = 0;
-                    efNodes[el.m_node[j]].push_back(efo[j]);
+                    { int l = g2l[el.m_node[j]]; if (l >= 0) efNodes[l].push_back(efo[j]); }
                 }
             }
         }
-        else break;
+        // skip elements whose material has no fluid (e.g., rigid or solid domains)
     }
     
     //For each node, average the nodal ef
@@ -159,7 +164,7 @@ void FEInitialFluidPressureTemperature::Activate()
         double ef = 0;
         for (int j = 0; j < efNodes[i].size(); ++j)
             ef += efNodes[i][j];
-        ef /= efNodes[i].size();
+        if (efNodes[i].size() > 0) ef /= efNodes[i].size();
             
         // store value for now
         m_e[i] = ef;
