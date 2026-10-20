@@ -207,26 +207,29 @@ int XMLTag::value(int* pi, int n)
 }
 
 //-----------------------------------------------------------------------------
+// An item of a comma-separated list, from sz up to sze (or the end of the
+// string when sze is null), without the whitespace around it. So "a, b" lists
+// "a" and "b", not "a" and " b".
+static std::string listItem(const char* sz, const char* sze)
+{
+	std::string s = (sze ? std::string(sz, sze - sz) : std::string(sz));
+	size_t n0 = s.find_first_not_of(" \t\r\n");
+	if (n0 == std::string::npos) return std::string();
+	size_t n1 = s.find_last_not_of(" \t\r\n");
+	return s.substr(n0, n1 - n0 + 1);
+}
+
+//-----------------------------------------------------------------------------
 int XMLTag::value(std::vector<std::string>& stringList, int n)
 {
 	stringList.clear();
-
-	char tmp[256] = { 0 };
 
 	const char* sz = m_szval.c_str();
 	int nr = 0;
 	for (int i = 0; i<n; ++i)
 	{
 		const char* sze = strchr(sz, ',');
-		if (sze)
-		{
-			int l = (int)(sze - sz);
-			if (l > 0) strncpy(tmp, sz, l);
-			tmp[l] = 0;
-
-			stringList.push_back(tmp);
-		}
-		else stringList.push_back(sz);
+		stringList.push_back(listItem(sz, sze));
 		nr++;
 
 		if (sze) sz = sze + 1;
@@ -240,21 +243,11 @@ void XMLTag::value(std::vector<std::string>& stringList)
 {
 	stringList.clear();
 
-	char tmp[256] = { 0 };
-
 	const char* sz = m_szval.c_str();
 	while (sz && *sz)
 	{
 		const char* sze = strchr(sz, ',');
-		if (sze)
-		{
-			int l = (int)(sze - sz);
-			if (l > 0) strncpy(tmp, sz, l);
-			tmp[l] = 0;
-
-			stringList.push_back(tmp);
-		}
-		else stringList.push_back(sz);
+		stringList.push_back(listItem(sz, sze));
 
 		if (sze) sz = sze + 1;
 		else break;
