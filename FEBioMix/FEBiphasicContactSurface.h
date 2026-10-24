@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FEBioMech/FEContactSurface.h>
+#include <FEBioMech/FEContactFrame.h>
 #include "febiomix_api.h"
 
 //-----------------------------------------------------------------------------
@@ -50,6 +51,7 @@ public:
 	double	m_pg;       //!< pressure "gap" for biphasic contact
     double  m_mueff;    //!< effective friction coefficient
     double  m_fls;      //!< local fluid load support
+    FEContactFrame m_Rp; //!< corotational frame at start of time step (for pushing stored vectors forward)
 
 	void Init() override
 	{
@@ -70,6 +72,7 @@ public:
 		m_pg = 0.0;
 		m_mueff = 0.0;
 		m_fls = 0.0;
+		m_Rp = FEContactFrame();
 	}
 
 	void Serialize(DumpStream& ar) override;

@@ -40,6 +40,7 @@ FETiedContactSurface::Data::Data()
 	m_Lp = vec3d(0, 0, 0);
 	m_Tc = vec3d(0, 0, 0);
 	m_off = 0.0;
+	m_Rp = FEContactFrame();
 }
 
 void FETiedContactSurface::Data::Init()
@@ -51,6 +52,7 @@ void FETiedContactSurface::Data::Init()
 	m_Lp = vec3d(0, 0, 0);
 	m_Tc = vec3d(0, 0, 0);
 	m_off = 0.0;
+	m_Rp = FEContactFrame();
 }
 
 void FETiedContactSurface::Data::Serialize(DumpStream& ar)
@@ -61,6 +63,7 @@ void FETiedContactSurface::Data::Serialize(DumpStream& ar)
 	ar & m_Lm & m_Lp;
 	ar & m_Tc;
 	ar & m_off;
+	m_Rp.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

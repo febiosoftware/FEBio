@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
+#include "FEContactFrame.h"
 
 // Elastic sliding contact, reducing the algorithm of biphasic sliding contact
 // (FESlidingInterface2) to elastic case.  The algorithm derives from Bonet
@@ -59,6 +60,7 @@ public:
         vec2d	m_rs;		//!< natural coordinates of this integration point
         vec2d   m_rsp;      //!< m_rs at the previous time step
         bool    m_bstick;   //!< stick flag
+        FEContactFrame m_Rp; //!< corotational frame at start of time step (for pushing m_Lmt forward)
     };
     
 public:

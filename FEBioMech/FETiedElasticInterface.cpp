@@ -92,6 +92,80 @@ void FETiedElasticSurface::Data::Init()
 }
 
 //-----------------------------------------------------------------------------
+// Helpers for the frame-invariant formulation (see Theory Manual, Section 7.6)
+//-----------------------------------------------------------------------------
+namespace {
+
+// nodal positions of a surface element at current (prev=false) or previous (prev=true) time
+void TiedNodalPositions(FESurface& s, FESurfaceElement& el, bool prev, vec3d* y)
+{
+    FEMesh& m = *s.GetMesh();
+    int ne = el.Nodes();
+    bool bshb = s.IsShellBottom();
+    for (int i = 0; i < ne; ++i)
+    {
+        FENode& nd = m.Node(el.m_node[i]);
+        if (bshb) y[i] = (prev ? nd.sp() : nd.st());
+        else      y[i] = (prev ? nd.m_rp : nd.m_rt);
+    }
+}
+
+// Kinematics of a tied integration point.
+// The contact forces derive from the potential (per unit reference area)
+//    Pi = lam.dg + eps/2 dg.dg,   dg = g - Rn.Gap,   lam = Rn.Lmd
+// where Rn is the corotational frame (FEContactFrame) of the primary surface at
+// the start of the time step. The initial gap and the multiplier are stored by
+// their components in this frame, so they rotate with the interface from one
+// time step to the next (frame invariance), while acting as dead vectors within
+// a time step (which keeps the tangent simple and the formulation stable).
+struct TiedKinematics
+{
+    FEContactFrame Rn;  // corotational frame at start of time step
+    vec3d   gap;    // full gap x2 - x1
+    vec3d   dg;     // gap - Rn.Gap
+    vec3d   t;      // traction (per unit reference area) = Rn.Lmd + eps*dg
+    double  J;      // current area Jacobian
+    double  J0;     // reference area Jacobian (integration weight)
+};
+
+void TiedEvalKinematics(FESurface& ss, FESurfaceElement& se, int j, FESurface& ms,
+                        FETiedElasticSurface::Data& pt, double eps, bool prev, TiedKinematics& k)
+{
+    vec3d ys[FEElement::MAX_NODES], ym[FEElement::MAX_NODES];
+    TiedNodalPositions(ss, se, prev, ys);
+
+    // primary point and base vectors
+    double* H = se.H(j);
+    double* Gr = se.Gr(j);
+    double* Gs = se.Gs(j);
+    vec3d r(0, 0, 0), g1(0, 0, 0), g2(0, 0, 0);
+    for (int i = 0; i < se.Nodes(); ++i) { r += ys[i]*H[i]; g1 += ys[i]*Gr[i]; g2 += ys[i]*Gs[i]; }
+    k.J = (g1 ^ g2).norm();
+
+    // tied point on secondary surface
+    FESurfaceElement& me = *pt.m_pme;
+    TiedNodalPositions(ms, me, prev, ym);
+    double Hm[FEElement::MAX_NODES];
+    me.shape_fnc(Hm, pt.m_rs[0], pt.m_rs[1]);
+    vec3d q(0, 0, 0);
+    for (int i = 0; i < me.Nodes(); ++i) q += ym[i]*Hm[i];
+
+    // frame at start of time step
+    k.Rn.Evaluate(ss, se, j, true);
+
+    k.gap = q - r;
+    k.dg  = k.gap - k.Rn.R(pt.m_Gap);
+    k.t   = k.Rn.R(pt.m_Lmd) + k.dg*eps;
+
+    // reference area Jacobian
+    vec3d G[2];
+    ss.CoBaseVectors0(se, j, G);
+    k.J0 = (G[0] ^ G[1]).norm();
+}
+
+} // namespace
+
+//-----------------------------------------------------------------------------
 // FETiedElasticSurface
 //-----------------------------------------------------------------------------
 
@@ -468,8 +542,11 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
                 // find the global location of the intersection point
                 vec3d q = ms.Local2Global(*pme, rs[0], rs[1]);
                 
-                // calculate the gap function
-                pt.m_Gap = q - r;
+                // calculate the gap function and store its components
+                // in the corotational frame of the primary surface
+                FEContactFrame f;
+                f.Evaluate(ss, el, j, true);
+                pt.m_Gap = f.Rt(q - r);
 
 				contacts++;
             }
@@ -520,10 +597,13 @@ void FETiedElasticInterface::ProjectSurface(FETiedElasticSurface& ss, FETiedElas
                 // find the global location of the intersection point
                 vec3d q = ms.Local2Global(*pme, pt.m_rs[0], pt.m_rs[1]);
                 
-                // calculate the gap function
+                // calculate the gap function, relative to the initial gap
+                // rotated with the corotational frame (frame invariant)
                 vec3d g = q - r;
-                pt.m_dg = g - pt.m_Gap;
-				pt.m_gap = pt.m_dg.norm();                
+                FEContactFrame f;
+                f.Evaluate(ss, el, j, true);
+                pt.m_dg = g - f.R(pt.m_Gap);
+				pt.m_gap = pt.m_dg.norm();
             }
             else
             {
@@ -543,18 +623,16 @@ void FETiedElasticInterface::Update()
     // this will update the gap functions as well
     ProjectSurface(m_ss, m_ms);
     if (m_btwo_pass) ProjectSurface(m_ms, m_ss);
-    
+
 }
 
 //-----------------------------------------------------------------------------
 void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-    int i, j, k;
     vector<int> sLM, mLM, LM, en;
     vector<double> fe;
-    const int MN = FEElement::MAX_NODES;
-    double detJ[MN], w[MN], *Hs, Hm[MN];
-    double N[8*MN];
+    double Hm[FEElement::MAX_NODES];
+    
 
     // zero nodal forces
     m_ss.m_Fn.assign(m_ss.Nodes(), vec3d(0, 0, 0));
@@ -573,123 +651,88 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
         FETiedElasticSurface& ms = (np == 0? m_ms : m_ss);
         
         // loop over all primary elements
-        for (i=0; i<ss.Elements(); ++i)
+        for (int i=0; i<ss.Elements(); ++i)
         {
-            // get the surface element
             FESurfaceElement& se = ss.Element(i);
-            
-            // get the nr of nodes and integration points
             int nseln = se.Nodes();
             int nint = se.GaussPoints();
-            
-            // copy the LM vector; we'll need it later
             ss.UnpackLM(se, sLM);
             
-            // we calculate all the metrics we need before we
-            // calculate the nodal forces
-            for (j=0; j<nint; ++j)
-            {
-                // get the base vectors
-                vec3d g[2];
-                ss.CoBaseVectors(se, j, g);
-                
-                // jacobians: J = |g0xg1|
-                detJ[j] = (g[0] ^ g[1]).norm();
-                
-                // integration weights
-                w[j] = se.GaussWeights()[j];
-            }
-            
-            // loop over all integration points
-            // note that we are integrating over the current surface
-            for (j=0; j<nint; ++j)
+            for (int j=0; j<nint; ++j)
             {
 				FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*se.GetMaterialPoint(j));
-
-                // get the secondary element
                 FESurfaceElement* pme = pt.m_pme;
-                if (pme)
+                if (pme == nullptr) continue;
+                
+                FESurfaceElement& me = *pme;
+                int nmeln = me.Nodes();
+                ms.UnpackLM(me, mLM);
+                
+                int ndof = 3*(nseln + nmeln);
+                LM.resize(ndof);
+                for (int k=0; k<nseln; ++k)
                 {
-                    // get the secondary element
-                    FESurfaceElement& me = *pme;
-                    
-                    // get the nr of secondary element nodes
-                    int nmeln = me.Nodes();
-                    
-                    // copy LM vector
-                    ms.UnpackLM(me, mLM);
-                    
-                    // calculate degrees of freedom
-                    int ndof = 3*(nseln + nmeln);
-                    
-                    // build the LM vector
-                    LM.resize(ndof);
-                    for (k=0; k<nseln; ++k)
-                    {
-                        LM[3*k  ] = sLM[3*k  ];
-                        LM[3*k+1] = sLM[3*k+1];
-                        LM[3*k+2] = sLM[3*k+2];
-                    }
-                    
-                    for (k=0; k<nmeln; ++k)
-                    {
-                        LM[3*(k+nseln)  ] = mLM[3*k  ];
-                        LM[3*(k+nseln)+1] = mLM[3*k+1];
-                        LM[3*(k+nseln)+2] = mLM[3*k+2];
-                    }
-                    
-                    // build the en vector
-                    en.resize(nseln+nmeln);
-                    for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
-                    for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
-                    
-                    // get primary element shape functions
-                    Hs = se.H(j);
-                    
-                    // get secondary element shape functions
-                    double r = pt.m_rs[0];
-                    double s = pt.m_rs[1];
-                    me.shape_fnc(Hm, r, s);
-                    
-                    // gap function
-                    vec3d dg = pt.m_dg;
-                    
-                    // lagrange multiplier
-                    vec3d Lm = pt.m_Lmd;
-                    
-                    // penalty
-                    double eps = m_epsn*pt.m_epsn;
-                    
-                    // contact traction
-                    vec3d t = Lm + dg*eps;
-                    pt.m_tr = t;
-                    
-                    // calculate the force vector
-                    fe.resize(ndof);
-                    zero(fe);
-                    
-                    for (k=0; k<nseln; ++k)
-                    {
-                        N[3*k  ] = Hs[k]*t.x;
-                        N[3*k+1] = Hs[k]*t.y;
-                        N[3*k+2] = Hs[k]*t.z;
-                    }
-                    
-                    for (k=0; k<nmeln; ++k)
-                    {
-                        N[3*(k+nseln)  ] = -Hm[k]*t.x;
-                        N[3*(k+nseln)+1] = -Hm[k]*t.y;
-                        N[3*(k+nseln)+2] = -Hm[k]*t.z;
-                    }
-                    
-                    for (k=0; k<ndof; ++k) fe[k] += N[k]*detJ[j]*w[j];
-
-                    for (int k = 0; k < nseln; ++k) ss.m_Fn[se.m_lnode[k]] += vec3d(fe[3 * k], fe[3 * k + 1], fe[3 * k + 2]);
-                    for (int k = 0; k < nmeln; ++k) ms.m_Fn[me.m_lnode[k]] += vec3d(fe[3 * nseln + 3 * k], fe[3 * nseln + 3 * k + 1], fe[3 * nseln + 3 * k + 2]);
-
-                    // assemble the global residual
-                    R.Assemble(en, LM, fe);
+                    LM[3*k  ] = sLM[3*k  ];
+                    LM[3*k+1] = sLM[3*k+1];
+                    LM[3*k+2] = sLM[3*k+2];
                 }
+                for (int k=0; k<nmeln; ++k)
+                {
+                    LM[3*(k+nseln)  ] = mLM[3*k  ];
+                    LM[3*(k+nseln)+1] = mLM[3*k+1];
+                    LM[3*(k+nseln)+2] = mLM[3*k+2];
+                }
+                en.resize(nseln+nmeln);
+                for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
+                for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+                
+                // shape functions and derivatives
+                double* Hs = se.H(j);
+                me.shape_fnc(Hm, pt.m_rs[0], pt.m_rs[1]);
+                double w = se.GaussWeights()[j];
+                
+                // penalty
+                double eps = m_epsn*pt.m_epsn;
+                
+                // kinematics, traction and angular momentum correction at t_{n+1}
+                TiedKinematics kn;
+                TiedEvalKinematics(ss, se, j, ms, pt, eps, false, kn);
+                // report traction per current area
+                pt.m_tr = kn.t*(kn.J0/kn.J);
+                
+                // NOTE: as in all other FEBio contact interfaces, the tied constraint
+                // forces are evaluated on the end-of-step configuration t_{n+1}
+                // (constraint forces at t_{n+1} in the generalized-alpha method, cf.
+                // Arnold & Bruls, 2007). This is objective, and was found to be more
+                // robust with augmented Lagrangian than alpha-weighted force interpolation.
+                vec3d Jt = kn.t*kn.J0;
+                
+                // nodal forces
+                //   f1_a =  J0*N_a t
+                //   f2_b = -J0*N_b t
+                // These are minus the gradient of the potential
+                //   Pi = J0*(lam.dg + eps/2 dg.dg)
+                fe.assign(ndof, 0.0);
+                for (int k=0; k<nseln; ++k)
+                {
+                    vec3d f = Jt*(Hs[k]*w);
+                    fe[3*k  ] = f.x;
+                    fe[3*k+1] = f.y;
+                    fe[3*k+2] = f.z;
+                }
+                for (int k=0; k<nmeln; ++k)
+                {
+                    vec3d f = -Jt*(Hm[k]*w);
+                    fe[3*(k+nseln)  ] = f.x;
+                    fe[3*(k+nseln)+1] = f.y;
+                    fe[3*(k+nseln)+2] = f.z;
+                }
+                
+                for (int k = 0; k < nseln; ++k) ss.m_Fn[se.m_lnode[k]] += vec3d(fe[3 * k], fe[3 * k + 1], fe[3 * k + 2]);
+                for (int k = 0; k < nmeln; ++k) ms.m_Fn[me.m_lnode[k]] += vec3d(fe[3 * nseln + 3 * k], fe[3 * nseln + 3 * k + 1], fe[3 * nseln + 3 * k + 2]);
+                
+                // assemble the global residual
+                R.Assemble(en, LM, fe);
             }
         }
     }
@@ -698,287 +741,82 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 //-----------------------------------------------------------------------------
 void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
-    int i, j, k, l;
     vector<int> sLM, mLM, LM, en;
-    const int MN = FEElement::MAX_NODES;
-    double detJ[MN], w[MN], *Hs, Hm[MN];
+    double Hm[FEElement::MAX_NODES];
     FEElementMatrix ke;
     
-    // see how many reformations we've had to do so far
-    int nref = GetSolver()->m_nref;
-    
-    // set higher order stiffness mutliplier
-    // NOTE: this algrotihm doesn't really need this
-    // but I've added this functionality to compare with the other contact
-    // algorithms and to see the effect of the different stiffness contributions
-    double knmult = m_knmult;
-    if (m_knmult < 0)
-    {
-        int ni = int(-m_knmult);
-        if (nref >= ni)
-        {
-            knmult = 1;
-            feLog("Higher order stiffness terms included.\n");
-        }
-        else knmult = 0;
-    }
     
     // do single- or two-pass
     int npass = (m_btwo_pass?2:1);
     for (int np=0; np < npass; ++np)
     {
-        // get the primary and secondary surface
         FETiedElasticSurface& ss = (np == 0? m_ss : m_ms);
         FETiedElasticSurface& ms = (np == 0? m_ms : m_ss);
         
-        // loop over all primary elements
-        for (i=0; i<ss.Elements(); ++i)
+        for (int i=0; i<ss.Elements(); ++i)
         {
-            // get ths primary element
             FESurfaceElement& se = ss.Element(i);
-            
-            // get nr of nodes and integration points
             int nseln = se.Nodes();
             int nint = se.GaussPoints();
-            
-            // copy the LM vector
             ss.UnpackLM(se, sLM);
             
-            // we calculate all the metrics we need before we
-            // calculate the nodal forces
-            for (j=0; j<nint; ++j)
-            {
-                // get the base vectors
-                vec3d g[2];
-                ss.CoBaseVectors(se, j, g);
-                
-                // jacobians: J = |g0xg1|
-                detJ[j] = (g[0] ^ g[1]).norm();
-                
-                // integration weights
-                w[j] = se.GaussWeights()[j];
-                
-            }
-            
-            // loop over all integration points
-            for (j=0; j<nint; ++j)
+            for (int j=0; j<nint; ++j)
             {
 				FETiedElasticSurface::Data& pt = static_cast<FETiedElasticSurface::Data&>(*se.GetMaterialPoint(j));
-
-                // get the secondary element
                 FESurfaceElement* pme = pt.m_pme;
-                if (pme)
+                if (pme == nullptr) continue;
+                
+                FESurfaceElement& me = *pme;
+                int nmeln = me.Nodes();
+                ms.UnpackLM(me, mLM);
+                
+                const int ndpn = 3;
+                int ndof = ndpn*(nseln + nmeln);
+                LM.resize(ndof);
+                for (int k=0; k<nseln; ++k)
                 {
-                    FESurfaceElement& me = *pme;
-                    
-                    // get the nr of secondary nodes
-                    int nmeln = me.Nodes();
-                    
-                    // copy the LM vector
-                    ms.UnpackLM(me, mLM);
-                    
-                    int ndpn;    // number of dofs per node
-                    int ndof;    // number of dofs in stiffness matrix
-                    
-                    // calculate degrees of freedom for elastic-on-elastic contact
-                    ndpn = 3;
-                    ndof = ndpn*(nseln + nmeln);
-                    
-                    // build the LM vector
-                    LM.resize(ndof);
-                    
-                    for (k=0; k<nseln; ++k)
-                    {
-                        LM[3*k  ] = sLM[3*k  ];
-                        LM[3*k+1] = sLM[3*k+1];
-                        LM[3*k+2] = sLM[3*k+2];
-                    }
-                    
-                    for (k=0; k<nmeln; ++k)
-                    {
-                        LM[3*(k+nseln)  ] = mLM[3*k  ];
-                        LM[3*(k+nseln)+1] = mLM[3*k+1];
-                        LM[3*(k+nseln)+2] = mLM[3*k+2];
-                    }
-
-                    // build the en vector
-                    en.resize(nseln+nmeln);
-                    for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
-                    for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
-                    
-                    // primary shape functions
-                    Hs = se.H(j);
-                    
-                    // secondary shape functions
-                    double r = pt.m_rs[0];
-                    double s = pt.m_rs[1];
-                    me.shape_fnc(Hm, r, s);
-                    
-                    // get primary normal vector
-                    vec3d nu = pt.m_nu;
-                    
-                    // gap function
-                    vec3d dg = pt.m_dg;
-                    
-                    // lagrange multiplier
-                    vec3d Lm = pt.m_Lmd;
-                    
-                    // penalty
-                    double eps = m_epsn*pt.m_epsn;
-                    
-                    // contact traction
-                    vec3d t = Lm + dg*eps;
-                    
-                    // create the stiffness matrix
-                    ke.resize(ndof, ndof); ke.zero();
-                    
-                    // --- S O L I D - S O L I D   C O N T A C T ---
-                    
-                    // a. I-term
-                    //------------------------------------
-                    
-                    for (k=0; k<nseln; ++k) {
-                        for (l=0; l<nseln; ++l)
-                        {
-                            ke[ndpn*k    ][ndpn*l    ] += eps*Hs[k]*Hs[l]*detJ[j]*w[j];
-                            ke[ndpn*k + 1][ndpn*l + 1] += eps*Hs[k]*Hs[l]*detJ[j]*w[j];
-                            ke[ndpn*k + 2][ndpn*l + 2] += eps*Hs[k]*Hs[l]*detJ[j]*w[j];
-                        }
-                        for (l=0; l<nmeln; ++l)
-                        {
-                            ke[ndpn*k    ][ndpn*(nseln+l)    ] += -eps*Hs[k]*Hm[l]*detJ[j]*w[j];
-                            ke[ndpn*k + 1][ndpn*(nseln+l) + 1] += -eps*Hs[k]*Hm[l]*detJ[j]*w[j];
-                            ke[ndpn*k + 2][ndpn*(nseln+l) + 2] += -eps*Hs[k]*Hm[l]*detJ[j]*w[j];
-                        }
-                    }
-                    
-                    for (k=0; k<nmeln; ++k) {
-                        for (l=0; l<nseln; ++l)
-                        {
-                            ke[ndpn*(nseln+k)    ][ndpn*l    ] += -eps*Hm[k]*Hs[l]*detJ[j]*w[j];
-                            ke[ndpn*(nseln+k) + 1][ndpn*l + 1] += -eps*Hm[k]*Hs[l]*detJ[j]*w[j];
-                            ke[ndpn*(nseln+k) + 2][ndpn*l + 2] += -eps*Hm[k]*Hs[l]*detJ[j]*w[j];
-                        }
-                        for (l=0; l<nmeln; ++l)
-                        {
-                            ke[ndpn*(nseln+k)    ][ndpn*(nseln+l)    ] += eps*Hm[k]*Hm[l]*detJ[j]*w[j];
-                            ke[ndpn*(nseln+k) + 1][ndpn*(nseln+l) + 1] += eps*Hm[k]*Hm[l]*detJ[j]*w[j];
-                            ke[ndpn*(nseln+k) + 2][ndpn*(nseln+l) + 2] += eps*Hm[k]*Hm[l]*detJ[j]*w[j];
-                        }
-                    }
-                    
-                    // b. A-term
-                    //-------------------------------------
-                    
-                    double* Gr = se.Gr(j);
-                    double* Gs = se.Gs(j);
-                    vec3d gs[2];
-                    ss.CoBaseVectors(se, j, gs);
-                    
-                    vec3d as[FEElement::MAX_NODES];
-                    mat3d As[FEElement::MAX_NODES];
-                    for (l=0; l<nseln; ++l) {
-                        as[l] = nu ^ (gs[1]*Gr[l] - gs[0]*Gs[l]);
-                        As[l] = t & as[l];
-                    }
-                    
-                    if (!m_bsymm)
-                    {
-                        // non-symmetric
-                        for (k=0; k<nseln; ++k) {
-                            for (l=0; l<nseln; ++l)
-                            {
-                                ke[ndpn*k    ][ndpn*l    ] += Hs[k]*As[l](0,0)*w[j];
-                                ke[ndpn*k    ][ndpn*l + 1] += Hs[k]*As[l](0,1)*w[j];
-                                ke[ndpn*k    ][ndpn*l + 2] += Hs[k]*As[l](0,2)*w[j];
-                                
-                                ke[ndpn*k + 1][ndpn*l    ] += Hs[k]*As[l](1,0)*w[j];
-                                ke[ndpn*k + 1][ndpn*l + 1] += Hs[k]*As[l](1,1)*w[j];
-                                ke[ndpn*k + 1][ndpn*l + 2] += Hs[k]*As[l](1,2)*w[j];
-                                
-                                ke[ndpn*k + 2][ndpn*l    ] += Hs[k]*As[l](2,0)*w[j];
-                                ke[ndpn*k + 2][ndpn*l + 1] += Hs[k]*As[l](2,1)*w[j];
-                                ke[ndpn*k + 2][ndpn*l + 2] += Hs[k]*As[l](2,2)*w[j];
-                            }
-                        }
-                        
-                        for (k=0; k<nmeln; ++k) {
-                            for (l=0; l<nseln; ++l)
-                            {
-                                ke[ndpn*(nseln+k)    ][ndpn*l    ] += -Hm[k]*As[l](0,0)*w[j];
-                                ke[ndpn*(nseln+k)    ][ndpn*l + 1] += -Hm[k]*As[l](0,1)*w[j];
-                                ke[ndpn*(nseln+k)    ][ndpn*l + 2] += -Hm[k]*As[l](0,2)*w[j];
-                                
-                                ke[ndpn*(nseln+k) + 1][ndpn*l    ] += -Hm[k]*As[l](1,0)*w[j];
-                                ke[ndpn*(nseln+k) + 1][ndpn*l + 1] += -Hm[k]*As[l](1,1)*w[j];
-                                ke[ndpn*(nseln+k) + 1][ndpn*l + 2] += -Hm[k]*As[l](1,2)*w[j];
-                                
-                                ke[ndpn*(nseln+k) + 2][ndpn*l    ] += -Hm[k]*As[l](2,0)*w[j];
-                                ke[ndpn*(nseln+k) + 2][ndpn*l + 1] += -Hm[k]*As[l](2,1)*w[j];
-                                ke[ndpn*(nseln+k) + 2][ndpn*l + 2] += -Hm[k]*As[l](2,2)*w[j];
-                            }
-                        }
-                        
-                    }
-                    else
-                    {
-                        // symmetric
-                        for (k=0; k<nseln; ++k) {
-                            for (l=0; l<nseln; ++l)
-                            {
-                                ke[ndpn*k    ][ndpn*l    ] += 0.5*(Hs[k]*As[l](0,0)+Hs[l]*As[k](0,0))*w[j];
-                                ke[ndpn*k    ][ndpn*l + 1] += 0.5*(Hs[k]*As[l](0,1)+Hs[l]*As[k](1,0))*w[j];
-                                ke[ndpn*k    ][ndpn*l + 2] += 0.5*(Hs[k]*As[l](0,2)+Hs[l]*As[k](2,0))*w[j];
-                                
-                                ke[ndpn*k + 1][ndpn*l    ] += 0.5*(Hs[k]*As[l](1,0)+Hs[l]*As[k](0,1))*w[j];
-                                ke[ndpn*k + 1][ndpn*l + 1] += 0.5*(Hs[k]*As[l](1,1)+Hs[l]*As[k](1,1))*w[j];
-                                ke[ndpn*k + 1][ndpn*l + 2] += 0.5*(Hs[k]*As[l](1,2)+Hs[l]*As[k](2,1))*w[j];
-                                
-                                ke[ndpn*k + 2][ndpn*l    ] += 0.5*(Hs[k]*As[l](2,0)+Hs[l]*As[k](0,2))*w[j];
-                                ke[ndpn*k + 2][ndpn*l + 1] += 0.5*(Hs[k]*As[l](2,1)+Hs[l]*As[k](1,2))*w[j];
-                                ke[ndpn*k + 2][ndpn*l + 2] += 0.5*(Hs[k]*As[l](2,2)+Hs[l]*As[k](2,2))*w[j];
-                            }
-                        }
-                        
-                        for (k=0; k<nmeln; ++k) {
-                            for (l=0; l<nseln; ++l)
-                            {
-                                ke[ndpn*(nseln+k)    ][ndpn*l    ] += -0.5*Hm[k]*As[l](0,0)*w[j];
-                                ke[ndpn*(nseln+k)    ][ndpn*l + 1] += -0.5*Hm[k]*As[l](0,1)*w[j];
-                                ke[ndpn*(nseln+k)    ][ndpn*l + 2] += -0.5*Hm[k]*As[l](0,2)*w[j];
-                                
-                                ke[ndpn*(nseln+k) + 1][ndpn*l    ] += -0.5*Hm[k]*As[l](1,0)*w[j];
-                                ke[ndpn*(nseln+k) + 1][ndpn*l + 1] += -0.5*Hm[k]*As[l](1,1)*w[j];
-                                ke[ndpn*(nseln+k) + 1][ndpn*l + 2] += -0.5*Hm[k]*As[l](1,2)*w[j];
-                                
-                                ke[ndpn*(nseln+k) + 2][ndpn*l    ] += -0.5*Hm[k]*As[l](2,0)*w[j];
-                                ke[ndpn*(nseln+k) + 2][ndpn*l + 1] += -0.5*Hm[k]*As[l](2,1)*w[j];
-                                ke[ndpn*(nseln+k) + 2][ndpn*l + 2] += -0.5*Hm[k]*As[l](2,2)*w[j];
-                            }
-                        }
-                        
-                        for (k=0; k<nseln; ++k) {
-                            for (l=0; l<nmeln; ++l)
-                            {
-                                ke[ndpn*k    ][ndpn*(nseln+l)    ] += -0.5*Hm[l]*As[k](0,0)*w[j];
-                                ke[ndpn*k    ][ndpn*(nseln+l) + 1] += -0.5*Hm[l]*As[k](1,0)*w[j];
-                                ke[ndpn*k    ][ndpn*(nseln+l) + 2] += -0.5*Hm[l]*As[k](2,0)*w[j];
-                                
-                                ke[ndpn*k + 1][ndpn*(nseln+l)    ] += -0.5*Hm[l]*As[k](0,1)*w[j];
-                                ke[ndpn*k + 1][ndpn*(nseln+l) + 1] += -0.5*Hm[l]*As[k](1,1)*w[j];
-                                ke[ndpn*k + 1][ndpn*(nseln+l) + 2] += -0.5*Hm[l]*As[k](2,1)*w[j];
-                                
-                                ke[ndpn*k + 2][ndpn*(nseln+l)    ] += -0.5*Hm[l]*As[k](0,2)*w[j];
-                                ke[ndpn*k + 2][ndpn*(nseln+l) + 1] += -0.5*Hm[l]*As[k](1,2)*w[j];
-                                ke[ndpn*k + 2][ndpn*(nseln+l) + 2] += -0.5*Hm[l]*As[k](2,2)*w[j];
-                            }
-                        }
-                    }
-                    // assemble the global stiffness
-					ke.SetNodes(en);
-					ke.SetIndices(LM);
-					LS.Assemble(ke);
+                    LM[3*k  ] = sLM[3*k  ];
+                    LM[3*k+1] = sLM[3*k+1];
+                    LM[3*k+2] = sLM[3*k+2];
                 }
+                for (int k=0; k<nmeln; ++k)
+                {
+                    LM[3*(k+nseln)  ] = mLM[3*k  ];
+                    LM[3*(k+nseln)+1] = mLM[3*k+1];
+                    LM[3*(k+nseln)+2] = mLM[3*k+2];
+                }
+                en.resize(nseln+nmeln);
+                for (int k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
+                for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+                
+                double* Hs = se.H(j);
+                me.shape_fnc(Hm, pt.m_rs[0], pt.m_rs[1]);
+                double w = se.GaussWeights()[j];
+                double eps = m_epsn*pt.m_epsn;
+                
+                TiedKinematics k;
+                TiedEvalKinematics(ss, se, j, ms, pt, eps, false, k);
+                const double W = k.J0;      // integration weight (reference area)
+                
+                // Tangent T = d(f)/d(u) = -Hessian of Pi (symmetric), with
+                // f1_a = W*N_a*t, f2_b = -W*N_b*t and d(t)/d(u1_c) = -eps*N_c*I,
+                // d(t)/d(u2_d) = eps*N_d*I. FEBio stiffness ke = -w*T.
+                ke.resize(ndof, ndof); ke.zero();
+                double c = w*W*eps;
+                for (int a=0; a<nseln+nmeln; ++a)
+                {
+                    double Na = (a < nseln ? Hs[a] : -Hm[a-nseln]);
+                    for (int b=0; b<nseln+nmeln; ++b)
+                    {
+                        double Nb = (b < nseln ? Hs[b] : -Hm[b-nseln]);
+                        for (int l=0; l<3; ++l) ke[ndpn*a + l][ndpn*b + l] += c*Na*Nb;
+                    }
+                }
+                
+                // assemble the global stiffness
+				ke.SetNodes(en);
+				ke.SetIndices(LM);
+				LS.Assemble(ke);
             }
         }
     }
@@ -1033,8 +871,14 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 			FETiedElasticSurface::Data& ds = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on primary surface
-            eps = m_epsn*ds.m_epsn;
-            ds.m_Lmd = ds.m_Lmd + ds.m_dg*eps;
+            // (components in corotational frame at start of step: Lmd += eps*Rn^T.dg)
+            if (ds.m_pme)
+            {
+                eps = m_epsn*ds.m_epsn;
+                FEContactFrame f;
+                f.Evaluate(m_ss, el, j, true);
+                ds.m_Lmd = ds.m_Lmd + f.Rt(ds.m_dg)*eps;
+            }
             
             normL1 += ds.m_Lmd*ds.m_Lmd;
             
@@ -1050,8 +894,14 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 			FETiedElasticSurface::Data& dm = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on secondary surface
-            eps = m_epsn*dm.m_epsn;
-            dm.m_Lmd = dm.m_Lmd + dm.m_dg*eps;
+            // (components in corotational frame at start of step: Lmd += eps*Rn^T.dg)
+            if (dm.m_pme)
+            {
+                eps = m_epsn*dm.m_epsn;
+                FEContactFrame f;
+                f.Evaluate(m_ms, el, j, true);
+                dm.m_Lmd = dm.m_Lmd + f.Rt(dm.m_dg)*eps;
+            }
             
             normL1 += dm.m_Lmd*dm.m_Lmd;
             

@@ -247,6 +247,12 @@ void FESlidingSurfaceMP::InitSlidingSurface()
             FEMultiphasicContactPoint& data = static_cast<FEMultiphasicContactPoint&>(*el.GetMaterialPoint(j));
             data.m_rsp = data.m_rs;
             data.m_pmep = data.m_pme;
+
+            // Push the vectorial multiplier forward with the rotation of the
+            // surface over the previous time step (frame invariance)
+            FEContactFrame Rn;
+            Rn.Evaluate(*this, el, j, true);
+            data.m_Rp.Update(Rn, &data.m_Lmt, 1);
         }
     }
 }

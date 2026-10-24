@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEMortarInterface.h"
 #include "FEMortarContactSurface.h"
+#include "FEContactFrame.h"
 
 //-----------------------------------------------------------------------------
 //! This class represents a surface used by the mortar contact interface.
@@ -40,8 +41,17 @@ public:
 	//! Initializes data structures
 	bool Init();
 
+	//! initialize the nodal corotational frames
+	void InitFrames();
+
+	//! push the Lagrange multipliers forward with the rotation of the surface
+	void PushForwardMultipliers();
+
 public:
 	vector<vec3d>	m_L;		//!< Lagrange multipliers
+
+	vector<int>				m_nel;	//!< a surface element that contains each node
+	vector<FEContactFrame>	m_Rp;	//!< nodal corotational frame at start of time step
 };
 
 //-----------------------------------------------------------------------------
@@ -83,6 +93,9 @@ public:
 
 	//! update interface data
 	void Update() override;
+
+	//! push multipliers forward with the interface rotation (frame invariance)
+	void PrepStep() override;
 
 private:
 	double	m_atol;		//!< augmented Lagrangian tolerance

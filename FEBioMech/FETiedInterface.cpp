@@ -188,6 +188,14 @@ void FETiedInterface::Activate()
 
 	// project primary surface onto secondary surface
 	ProjectSurface(ss, ms, m_breloc);
+
+	// initialize the corotational frames used to push the multipliers forward
+	for (int i = 0; i < ss.Nodes(); ++i)
+	{
+		FETiedContactSurface::Data& d = ss.m_data[i];
+		d.m_Rp = FEContactFrame();
+		if (d.m_pme) d.m_Rp.Evaluate(ms, *d.m_pme, d.m_rs[0], d.m_rs[1], true);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -693,6 +701,18 @@ void FETiedInterface::Serialize(DumpStream &ar)
 
 void FETiedInterface::PrepStep()
 {
+	// Push the (spatial) Lagrange multipliers forward with the rotation of the
+	// interface over the last time step, so that they remain frame invariant.
+	// The frame is evaluated on the secondary surface at the (fixed) tied point.
+	for (int i = 0; i < ss.Nodes(); ++i)
+	{
+		FETiedContactSurface::Data& d = ss.m_data[i];
+		if (d.m_pme == nullptr) continue;
+		FEContactFrame Rn;
+		Rn.Evaluate(ms, *d.m_pme, d.m_rs[0], d.m_rs[1], true);
+		d.m_Rp.Update(Rn, &d.m_Lm, 1);
+	}
+
 	if (m_laugon == FECore::LAGMULT_METHOD)
 	{
 		for (int i = 0; i < ss.Nodes(); ++i)

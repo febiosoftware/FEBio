@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include "FEContactSurface.h"
+#include "FEContactFrame.h"
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact surface used for tied contact.
@@ -53,6 +54,7 @@ public:
 		vec3d				m_Lm, m_Lp;	//!< Lagrange multipliers (current, previous time step)
 		vec3d				m_Tc;	//!< contact forces
 		double				m_off;	//!< offset values (used for shells)
+		FEContactFrame		m_Rp;	//!< corotational frame at start of time step (for pushing m_Lm forward)
 	};
 
 public:

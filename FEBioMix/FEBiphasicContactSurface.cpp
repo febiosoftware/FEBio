@@ -47,6 +47,7 @@ void FEBiphasicContactPoint::Serialize(DumpStream& ar)
     ar & m_rsp;
     ar & m_bstick;
     ar & m_Lmp & m_pg & m_mueff & m_fls;
+    m_Rp.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

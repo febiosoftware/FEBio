@@ -129,6 +129,7 @@ FETiedFluidFSISurface::Data::Data()
     m_epss= 1.0;
     m_epst= 1.0;
     m_epsn= 1.0;
+    m_Rp  = FEContactFrame();
 }
 
 //-----------------------------------------------------------------------------
@@ -150,6 +151,7 @@ void FETiedFluidFSISurface::Data::Serialize(DumpStream& ar)
 	ar & m_epss;
 	ar & m_epst;
 	ar & m_epsn;
+	m_Rp.Serialize(ar);
 }
 
 void FETiedFluidFSISurface::Data::Init()
@@ -170,6 +172,7 @@ void FETiedFluidFSISurface::Data::Init()
     m_epss= 1.0;
     m_epst= 1.0;
     m_epsn= 1.0;
+    m_Rp  = FEContactFrame();
 }
 
 //-----------------------------------------------------------------------------
@@ -843,6 +846,10 @@ void FETiedFluidFSI::Activate()
     InitialProjection(m_ss, m_ms, true);
     if (m_btwo_pass) InitialProjection(m_ms, m_ss, false);
 
+    // initialize the corotational frames used to push stored vectors forward
+    PushForward(m_ss, true);
+    if (m_btwo_pass) PushForward(m_ms, true);
+
     // The owned traction load builds its element list and face orientations here.
     // Because its tied flag was set in Init, every face is oriented outward from the
     // fluid-FSI domain, so the traction is applied with its original sign (Sec. 7.10).
@@ -854,6 +861,38 @@ void FETiedFluidFSI::Activate()
 void FETiedFluidFSI::PrepStep()
 {
     if (m_bupdtpen) UpdateAutoPenalty();
+
+    // push stored spatial vectors forward with the interface rotation
+    PushForward(m_ss, false);
+    if (m_btwo_pass) PushForward(m_ms, false);
+}
+
+//-----------------------------------------------------------------------------
+//! The initial gap m_Gap and the Lagrange multipliers m_Lmd, m_Lmt are stored as
+//! spatial vectors. At the start of each time step they are pushed forward with
+//! the rotation of the interface (corotational frame at the integration point, in
+//! the configuration at the start of the time step) over the previous time step,
+//! so that they remain frame invariant. If binit is true, the frames are only
+//! initialized.
+void FETiedFluidFSI::PushForward(FETiedFluidFSISurface& ss, bool binit)
+{
+    for (int i = 0; i < ss.Elements(); ++i)
+    {
+        FESurfaceElement& se = ss.Element(i);
+        for (int j = 0; j < se.GaussPoints(); ++j)
+        {
+            FETiedFluidFSISurface::Data& pt = static_cast<FETiedFluidFSISurface::Data&>(*se.GetMaterialPoint(j));
+            if (binit) pt.m_Rp = FEContactFrame();
+            if (pt.m_pme == nullptr) continue;
+            FEContactFrame Rn;
+            Rn.Evaluate(ss, se, j, true);
+            vec3d v[3] = { pt.m_Gap, pt.m_Lmd, pt.m_Lmt };
+            pt.m_Rp.Update(Rn, v, 3);
+            pt.m_Gap = v[0];
+            pt.m_Lmd = v[1];
+            pt.m_Lmt = v[2];
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------

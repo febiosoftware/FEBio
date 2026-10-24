@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include <FEBioMech/FEContactInterface.h>
 #include <FEBioMech/FEContactSurface.h>
+#include <FEBioMech/FEContactFrame.h>
 #include <FECore/FESolidElement.h>
 #include "FEFluid.h"
 #include "FEFluidFSI.h"
@@ -121,6 +122,7 @@ public:
         double   m_epss;    //!< solid traction penalty factor
         double   m_epst;    //!< viscous traction penalty factor
         double   m_epsn;    //!< dilatation penalty factor
+        FEContactFrame m_Rp; //!< corotational frame at start of time step (for pushing m_Gap, m_Lmd, m_Lmt forward)
     };
 
     //! constructor
@@ -240,6 +242,9 @@ public:
     //! called at the start of each time step; recomputes the automatic penalties
     //! when update_penalty is set
     void PrepStep() override;
+
+    //! push stored spatial vectors forward with the interface rotation (frame invariance)
+    void PushForward(FETiedFluidFSISurface& ss, bool binit);
 
 protected:
     //! initial projection. bfirst is true only on the first (primary->secondary)

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEBioMech/FEContactInterface.h"
 #include "FEContactSurface.h"
+#include "FEContactFrame.h"
 
 //-----------------------------------------------------------------------------
 class FETiedElasticSurface : public FEContactSurface
@@ -45,12 +46,16 @@ public:
         void Init() override;
         
     public:
-        vec3d    m_Gap;     //!< initial gap in reference configuration
-        vec3d    m_dg;      //!< gap function at integration points
+        // NOTE: m_Gap and m_Lmd store components in the corotational frame
+        // (FEContactFrame) of the primary surface at the start of the time step, so
+        // that they rotate with the interface from one time step to the next (frame
+        // invariance), while remaining fixed within a time step.
+        vec3d    m_Gap;     //!< initial gap, components in corotational frame
+        vec3d    m_dg;      //!< gap function (deviation from initial gap), spatial
         vec3d    m_nu;      //!< normal at integration points
         vec2d    m_rs;      //!< natural coordinates of projection of integration point
-        vec3d    m_Lmd;     //!< lagrange multipliers for displacements
-        vec3d    m_tr;      //!< contact traction
+        vec3d    m_Lmd;     //!< lagrange multipliers, components in corotational frame
+        vec3d    m_tr;      //!< contact traction, spatial
         double   m_epsn;    //!< penalty factors
     };
     
@@ -124,7 +129,8 @@ public:
     
     //! update
     void Update() override;
-    
+
+
 protected:
     void InitialProjection(FETiedElasticSurface& ss, FETiedElasticSurface& ms);
     void ProjectSurface(FETiedElasticSurface& ss, FETiedElasticSurface& ms);
