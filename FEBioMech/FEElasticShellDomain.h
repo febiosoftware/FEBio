@@ -102,6 +102,10 @@ public:
 	//! calculates the shell element stiffness matrix
 	void ElementStiffness(int iel, matrix& ke);
 
+	//! element stiffness for alpha_f < 1, consistent with the incrementally objective
+	//! interpolation of the deformation gradient at the intermediate time (not symmetric)
+	void ElementObjectiveStiffness(int iel, matrix& ke);
+
     //! calculates the solid element mass matrix
     void ElementMassMatrix(FEShellElement& el, matrix& ke, double a);
     

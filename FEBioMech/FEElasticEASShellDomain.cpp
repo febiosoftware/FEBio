@@ -1123,18 +1123,13 @@ void FEElasticEASShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         mat3d Ft, Fp;
         double Jt = defgrad(el, Ft, n);
         double Jp = defgradp(el, Fp, n);
-        if (tp.alphaf == 1.0)
-        {
-            pt.m_F = Ft;
-            pt.m_J = Jt;
-        }
-        else
-        {
-            pt.m_F = Ft * tp.alphaf + Fp * (1 - tp.alphaf);
-            pt.m_J = pt.m_F.det();
-        }
-        mat3d Fi = pt.m_F.inverse();
-        pt.m_L = (Ft - Fp)*Fi/dt;
+        // incrementally objective kinematics at the intermediate time (see FEObjectiveKinematics.h):
+        // rotation and stretch are interpolated separately, and the velocity gradient
+        // is evaluated on the midpoint configuration, so that a rigid-body increment
+        // produces neither strain nor rate of deformation
+        pt.m_F = FEObjectiveInterpolateF(Fp, Ft, tp.alphaf);
+        pt.m_J = (tp.alphaf == 1.0 ? Jt : pt.m_F.det());
+        pt.m_L = FEMidpointVelocityGradient(Fp, Ft, dt);
         if (m_update_dynamic)
         {
             pt.m_v = evaluate(el, v, w, n);

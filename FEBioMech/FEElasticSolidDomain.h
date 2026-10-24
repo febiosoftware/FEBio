@@ -108,6 +108,11 @@ public:
 	//! material stiffness component
 	virtual void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
 
+	//! Material and geometrical stiffness for alpha_f < 1, consistent with the
+	//! incrementally objective interpolation of the deformation gradient at the
+	//! intermediate time (see FEObjectiveKinematics.h). The matrix is not symmetric.
+	void ElementObjectiveStiffness(FESolidElement& el, matrix& ke);
+
 	// --- R E S I D U A L ---
 
 	//! Calculates the internal stress vector for solid elements

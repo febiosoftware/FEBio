@@ -150,21 +150,29 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FELinearSystem& LS)
 		ke.resize(ndof, ndof);
 		ke.zero();
 
-		// calculate material stiffness (i.e. constitutive component)
-		ElementMaterialStiffness(iel, ke);
+		if (m_alphaf != 1.0)
+		{
+			// stiffness consistent with the objective interpolation at the intermediate time
+			ElementObjectiveStiffness3F(iel, ke);
+		}
+		else
+		{
+			// calculate material stiffness (i.e. constitutive component)
+			ElementMaterialStiffness(iel, ke);
 
-		// calculate geometrical stiffness
-		ElementGeometricalStiffness(iel, ke);
+			// calculate geometrical stiffness
+			ElementGeometricalStiffness(iel, ke);
 
-		// Calculate dilatational stiffness
-		ElementDilatationalStiffness(fem, iel, ke);
+			// Calculate dilatational stiffness
+			ElementDilatationalStiffness(fem, iel, ke);
 
-		// assign symmetic parts
-		// TODO: Can this be omitted by changing the Assemble routine so that it only
-		// grabs elements from the upper diagonal matrix?
-		for (int i=0; i<ndof; ++i)
-			for (int j=i+1; j<ndof; ++j)
-				ke[j][i] = ke[i][j];
+			// assign symmetic parts
+			// TODO: Can this be omitted by changing the Assemble routine so that it only
+			// grabs elements from the upper diagonal matrix?
+			for (int i=0; i<ndof; ++i)
+				for (int j=i+1; j<ndof; ++j)
+					ke[j][i] = ke[i][j];
+		}
 
 		// get the element's LM vector
 		vector<int> lm;
@@ -174,6 +182,85 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FELinearSystem& LS)
 		// assemble element matrix in global stiffness matrix
 		LS.Assemble(ke);
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Material, geometrical, and dilatational stiffness for alpha_f < 1, consistent
+//! with the incrementally objective interpolation F_a of the deformation gradient
+//! (see FEElasticSolidDomain::ElementObjectiveStiffness). A perturbation
+//! dF = du_j (x) GradN_j of F_{n+1} perturbs the intermediate configuration by
+//! A = dF_a.F_a^-1, so that
+//!   - deviatoric and pressure stress: d(s.grad N_i dv) = [ C:sym(A) + A.s ].grad N_i dv,
+//!     with C = DevTangent + p*(I(x)I - 2 I4) at fixed element pressure p;
+//!   - element pressure: dp = (U'' + Lk h'') dv_e/V_e, dv_e = sum tr(A) dv.
+void FE3FieldElasticSolidDomain::ElementObjectiveStiffness3F(int iel, matrix& ke)
+{
+	FESolidElement& el = Element(iel);
+	ELEM_DATA& ed = m_Data[iel];
+
+	const int nint = el.GaussPoints();
+	const int neln = el.Nodes();
+	const int ndof = 3*neln;
+	const double* gw = el.GaussWeights();
+	const vec3d e[3] = { vec3d(1,0,0), vec3d(0,1,0), vec3d(0,0,1) };
+
+	FEUncoupledMaterial& mat = dynamic_cast<FEUncoupledMaterial&>(*m_pMat);
+	mat3dd I(1);
+	tens4ds Cp = dyad1s(I) - dyad4s(I)*2;
+
+	vec3d G[FEElement::MAX_NODES], G0[FEElement::MAX_NODES];
+	vector<double> gradV(ndof, 0.0), dV(ndof, 0.0);
+	double Ve = 0;
+
+	for (int n = 0; n<nint; ++n)
+	{
+		double dv = ShapeGradient(el, n, G, m_alphaf)*gw[n];
+		Ve += detJ0(el, n)*gw[n];
+
+		const mat3d& J0i = el.m_J0i[n];
+		double* Gr = el.Gr(n); double* Gs = el.Gs(n); double* Gt = el.Gt(n);
+		for (int i = 0; i<neln; ++i)
+			G0[i] = vec3d(J0i(0,0)*Gr[i] + J0i(1,0)*Gs[i] + J0i(2,0)*Gt[i],
+				          J0i(0,1)*Gr[i] + J0i(1,1)*Gs[i] + J0i(2,1)*Gt[i],
+				          J0i(0,2)*Gr[i] + J0i(1,2)*Gs[i] + J0i(2,2)*Gt[i]);
+
+		FEObjectiveInterpolation oi;
+		ObjectiveInterpolation(el, n, m_alphaf, oi);
+		mat3d Fai = oi.F().inverse();
+
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+		const mat3ds& s = pt.m_s;
+		tens4ds C = Cp*ed.ep + mat.DevTangent(mp);
+
+		for (int i = 0; i<neln; ++i)
+		{
+			gradV[3*i  ] += G[i].x*dv;
+			gradV[3*i+1] += G[i].y*dv;
+			gradV[3*i+2] += G[i].z*dv;
+		}
+
+		for (int j = 0; j<neln; ++j)
+			for (int k = 0; k<3; ++k)
+			{
+				mat3d A = oi.dF(e[k] & G0[j])*Fai;
+				dV[3*j + k] += A.trace()*dv;
+				mat3ds dS = C.dot(A.sym());
+				for (int i = 0; i<neln; ++i)
+				{
+					vec3d f = (dS*G[i] + A*(s*G[i]))*dv;
+					ke[3*i  ][3*j + k] += f.x;
+					ke[3*i+1][3*j + k] += f.y;
+					ke[3*i+2][3*j + k] += f.z;
+				}
+			}
+	}
+
+	// dilatational stiffness
+	double k = (mat.UJJ(ed.eJ) + ed.Lk*mat.hpp(ed.eJ))/Ve;
+	for (int i = 0; i<ndof; ++i)
+		for (int j = 0; j<ndof; ++j)
+			ke[i][j] += k*gradV[i]*dV[j];
 }
 
 //-----------------------------------------------------------------------------
@@ -545,10 +632,13 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& 
         mat3d Ft, Fp;
         Jt = defgrad(el, Ft, n);
         Jp = defgradp(el, Fp, n);
-        pt.m_F = (m_alphaf==1.0? Ft : Ft*m_alphaf + Fp*(1-m_alphaf));
+        // incrementally objective kinematics at the intermediate time (see FEObjectiveKinematics.h):
+        // rotation and stretch are interpolated separately, and the velocity gradient
+        // is evaluated on the midpoint configuration, so that a rigid-body increment
+        // produces neither strain nor rate of deformation
+        pt.m_F = FEObjectiveInterpolateF(Fp, Ft, m_alphaf);
         pt.m_J = pt.m_F.det();
-        mat3d Fi = pt.m_F.inverse();
-        pt.m_L = (Ft - Fp)*Fi/dt;
+        pt.m_L = FEMidpointVelocityGradient(Fp, Ft, dt);
         pt.m_v = el.Evaluate(vel, n);
         pt.m_a = el.Evaluate(acc, n);
 

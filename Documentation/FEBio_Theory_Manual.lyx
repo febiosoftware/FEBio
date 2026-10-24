@@ -23680,15 +23680,100 @@ J^{f}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)J^{f}_{n}+\alpha_{f}J^{f}_{n+1}
 
 \end_inset
 
-In particular,
- it follows that
+The interpolated motion 
+\begin_inset Formula $\boldsymbol{\chi}^{s}_{n+\alpha_{f}}$
+\end_inset
+
+ is used where position-dependent loads are evaluated,
+ whereas the intermediate configuration on which the weak form is integrated is defined at each integration point by the deformation gradient given below (volume element
+\begin_inset Formula $dv=J^{s}_{n+\alpha_{f}}dV$
+\end_inset
+
+,
+ spatial gradients
+\begin_inset Formula $\grad f=\Grad f\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}$
+\end_inset
+
+).
+The deformation gradient that follows from the interpolated motion,
 \begin_inset Formula 
 \[
-\mathbf{F}^{s}_{n+\alpha_{f}}=\frac{\partial\boldsymbol{\chi}^{s}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}^{s}_{n}+\alpha_{f}\mathbf{F}^{s}_{n+1}
+\frac{\partial\boldsymbol{\chi}^{s}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}^{s}_{n}+\alpha_{f}\mathbf{F}^{s}_{n+1}\,,
 \]
 
 \end_inset
 
+is not incrementally objective.
+For a rigid-body rotation increment 
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ over the time step,
+ it is not a rotation,
+ so that a constitutive relation evaluated with it produces a spurious strain of order 
+\begin_inset Formula $\alpha_{f}\left(1-\alpha_{f}\right)\Delta\theta^{2}$
+\end_inset
+
+ whenever 
+\begin_inset Formula $\alpha_{f}<1$
+\end_inset
+
+.
+Therefore,
+ the deformation gradient used to evaluate the constitutive response at 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+ interpolates the stretch linearly and the rotation along the geodesic between 
+\begin_inset Formula $\mathbf{R}^{s}_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{R}^{s}_{n+1}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{F}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n+\alpha_{f}}\cdot\mathbf{U}^{s}_{n+\alpha_{f}}\,, & \mathbf{U}^{s}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{U}^{s}_{n}+\alpha_{f}\mathbf{U}^{s}_{n+1}\,,\\
+ & & \mathbf{R}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n}\cdot\exp\left[\alpha_{f}\log\left(\mathbf{R}^{sT}_{n}\cdot\mathbf{R}^{s}_{n+1}\right)\right]\,,
+\end{aligned}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{R}^{s}\cdot\mathbf{U}^{s}$
+\end_inset
+
+ is the right polar decomposition,
+ and the exponential and logarithm map a rotation vector to a rotation tensor and vice versa.
+This interpolation reduces to 
+\begin_inset Formula $\mathbf{F}^{s}_{n+1}$
+\end_inset
+
+ when 
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+ (the default value 
+\begin_inset Formula $\rho_{\infty}=0$
+\end_inset
+
+ for this solver).
+It is objective,
+ since a rigid-body increment leaves 
+\begin_inset Formula $\mathbf{U}^{s}$
+\end_inset
+
+ unchanged,
+ and it differs from the linear interpolation by terms of second order in the rotation increment,
+ so the accuracy of the generalized 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ method is preserved.
+This deformation gradient and its inverse (used to evaluate spatial gradients of the fluid variables at the material point) are used to evaluate the following kinematic quantities,
 
 \begin_inset Formula 
 \[
@@ -23722,14 +23807,103 @@ In practice however,
 
 \end_inset
 
-
+and evaluating the velocity gradient over the time step on the midpoint configuration
 \begin_inset Formula 
 \[
-\mathbf{L}^{s}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}
+\mathbf{L}^{s}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}^{-1}_{n+1/2}\,,\quad\mathbf{F}_{n+1/2}=\frac{1}{2}\left(\mathbf{F}_{n}+\mathbf{F}_{n+1}\right)\,.
 \]
 
 \end_inset
 
+The previous form,
+ 
+\begin_inset Formula $\mathbf{L}^{s}_{n+\alpha_{f}}=\left(\mathbf{F}_{n+1}-\mathbf{F}_{n}\right)\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}/\Delta t$
+\end_inset
+
+,
+ is not incrementally objective:
+ under a rigid-body rotation increment 
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ its symmetric part,
+ which enters the viscous fluid stress through the rate of deformation of the fluid 
+\begin_inset Formula $\mathbf{D}^{f}$
+\end_inset
+
+,
+ does not vanish,
+ but is of order 
+\begin_inset Formula $\left(\alpha_{f}-\frac{1}{2}\right)\Delta\theta/\Delta t$
+\end_inset
+
+.
+For example,
+ with the default value 
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+ and a rotation increment of 0.1 radian per time step,
+ a rigidly rotating fluid-FSI domain exhibits a spurious rate of deformation equal to about 5% of its angular velocity.
+In contrast,
+ the midpoint form is the Cayley transform of the rotation increment for a rigid-body motion,
+ whose symmetric part vanishes exactly for rotation increments of any size (Hughes and Winget,
+ 1980).
+It is also the second-order accurate approximation of the velocity gradient over the time step.
+The same incrementally objective kinematics are used in the biphasic-FSI and multiphasic-FSI domains.
+The stiffness with respect to the solid displacement is consistent with these kinematics:
+ each column is evaluated as the directional derivative of the residual integrand for a perturbation
+\begin_inset Formula $\delta\mathbf{F}_{n+1}=\mathbf{e}_{k}\otimes\Grad N_{b}$
+\end_inset
+
+ of a single displacement degree of freedom,
+ which perturbs the intermediate configuration by
+\begin_inset Formula $\mathbf{A}=\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}$
+\end_inset
+
+ (Eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:edy-objective-interpolation-derivative"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+),
+ the velocity gradient by
+\begin_inset Formula $D\mathbf{L}^{s}=\left(\mathbf{I}/\Delta t-\mathbf{L}^{s}/2\right)\cdot\delta\mathbf{F}_{n+1}\cdot\mathbf{F}^{-1}_{n+1/2}$
+\end_inset
+
+,
+ and
+\begin_inset Formula $\dot{J}^{s}$
+\end_inset
+
+ by
+\begin_inset Formula $\left(J^{s}_{n+1}/\Delta t\right)\mathbf{F}^{-T}_{n+1}:\delta\mathbf{F}_{n+1}$
+\end_inset
+
+.
+ Spatial gradients and the volume element vary as
+\begin_inset Formula $D\left(\grad f\right)=-\mathbf{A}^{T}\cdot\grad f$
+\end_inset
+
+ and
+\begin_inset Formula $D\left(dv\right)=\left(\mathrm{tr}\,\mathbf{A}\right)dv$
+\end_inset
+
+,
+ and the solid stress as
+\begin_inset Formula $D\boldsymbol{\sigma}^{s}=\boldsymbol{\mathcal{C}}^{s}:\mathbf{A}^{s}+\mathbf{A}\cdot\boldsymbol{\sigma}^{s}+\boldsymbol{\sigma}^{s}\cdot\mathbf{A}^{T}-\left(\mathrm{tr}\,\mathbf{A}\right)\boldsymbol{\sigma}^{s}$
+\end_inset
+
+.
+ The resulting tangent was verified against a finite-difference derivative of the residual for the fluid-FSI,
+ biphasic-FSI and multiphasic-FSI domains.
 Similarly,
  we evaluate velocity derivatives at the intermediate time 
 \begin_inset Formula $t_{n+\alpha_{m}}=t_{n}+\alpha_{m}\left(t_{n+1}-t_{n}\right)$
@@ -48821,16 +48995,107 @@ where
 \end_inset
 
  is the displacement.
- In particular,
- it follows that the deformation gradient and its determinant are given at the intermediate time by
+ The deformation gradient that follows from the linear interpolation of the motion,
+\begin_inset Formula $\partial\boldsymbol{\chi}_{n+\alpha_{f}}/\partial\mathbf{X}=\left(1-\alpha_{f}\right)\mathbf{F}_{n}+\alpha_{f}\mathbf{F}_{n+1}$
+\end_inset
+
+,
+ is not incrementally objective:
+ for a rigid-body rotation increment
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ over the time step it is not a rotation,
+ so that a constitutive relation evaluated with it produces a spurious strain of order
+\begin_inset Formula $\alpha_{f}\left(1-\alpha_{f}\right)\Delta\theta^{2}$
+\end_inset
+
+ whenever
+\begin_inset Formula $\alpha_{f}<1$
+\end_inset
+
+,
+ and the intermediate configuration contracts spuriously.
+ Therefore,
+ the deformation gradient at the intermediate time is defined by interpolating the stretch linearly and the rotation along the geodesic between
+\begin_inset Formula $\mathbf{R}_{n}$
+\end_inset
+
+ and
+\begin_inset Formula $\mathbf{R}_{n+1}$
+\end_inset
+
+,
 \begin_inset Formula 
 \begin{equation}
-\mathbf{F}_{n+\alpha_{f}}=\frac{\partial\boldsymbol{\chi}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}_{n}+\alpha_{f}\mathbf{F}_{n+1}\,,\label{eq:edy-mp-defgrad}
+\begin{aligned}\mathbf{F}_{n+\alpha_{f}} & =\mathbf{R}_{n+\alpha_{f}}\cdot\mathbf{U}_{n+\alpha_{f}}\,, & \mathbf{U}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{U}_{n}+\alpha_{f}\mathbf{U}_{n+1}\,,\\
+ &  & \mathbf{R}_{n+\alpha_{f}} & =\mathbf{R}_{n}\cdot\exp\left[\alpha_{f}\log\left(\mathbf{R}^{T}_{n}\cdot\mathbf{R}_{n+1}\right)\right]\,,
+\end{aligned}
+\label{eq:edy-mp-defgrad}
 \end{equation}
 
 \end_inset
 
-and
+where
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
+\end_inset
+
+ is the right polar decomposition,
+ and the exponential and logarithm map a rotation vector to a rotation tensor and vice versa.
+ This interpolation is objective,
+ since a rigid-body increment leaves
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ unchanged;
+ it reduces to
+\begin_inset Formula $\mathbf{F}_{n+1}$
+\end_inset
+
+ when
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+,
+ and it differs from the linear interpolation by terms of second order in the rotation increment,
+ so the accuracy of the generalized
+\begin_inset Formula $\alpha$
+\end_inset
+
+ method is preserved.
+ The intermediate configuration on which the weak form is integrated is defined by this deformation gradient at each integration point:
+ the volume element is
+\begin_inset Formula $dv=J_{n+\alpha_{f}}dV$
+\end_inset
+
+,
+ and spatial gradients are evaluated as
+\begin_inset Formula $\grad f=\Grad f\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}$
+\end_inset
+
+,
+ where
+\begin_inset Formula $\Grad f$
+\end_inset
+
+ is evaluated in the reference configuration.
+ (The positions
+\begin_inset Formula $\boldsymbol{\chi}_{n+\alpha_{f}}$
+\end_inset
+
+ of Eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:edy-motion-interpolation"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ are only used where position-dependent loads are evaluated.) The determinant of the deformation gradient is given at the intermediate time by
 \begin_inset Formula 
 \begin{equation}
 J_{n+\alpha_{f}}=\det\mathbf{F}_{n+\alpha_{f}}\,.\label{eq:edy-mp-detJ}
@@ -48872,14 +49137,43 @@ In practice however,
 
 \end_inset
 
-and
+and we evaluate the velocity gradient over the time step on the midpoint configuration,
 \begin_inset Formula 
 \begin{equation}
-\mathbf{L}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}\,.\label{eq:edy-L-approx}
+\mathbf{L}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}^{-1}_{n+1/2}\,,\quad\mathbf{F}_{n+1/2}=\frac{1}{2}\left(\mathbf{F}_{n}+\mathbf{F}_{n+1}\right)\,.\label{eq:edy-L-approx}
 \end{equation}
 
 \end_inset
 
+The form
+\begin_inset Formula $\left(\mathbf{F}_{n+1}-\mathbf{F}_{n}\right)\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}/\Delta t$
+\end_inset
+
+ is not incrementally objective:
+ under a rigid-body rotation increment
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+,
+ its symmetric part does not vanish but is of order
+\begin_inset Formula $\left(\alpha_{f}-\frac{1}{2}\right)\Delta\theta/\Delta t$
+\end_inset
+
+,
+ which produces a spurious viscous stress in rate-dependent materials,
+ including for
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+ (quasi-static analyses).
+ The midpoint form is the Cayley transform of the rotation increment for a rigid-body motion,
+ whose symmetric part vanishes exactly for rotation increments of any size (Hughes and Winget,
+ 1980);
+ it is also the second-order accurate approximation of the velocity gradient over the time step.
+ FEBio uses this form in all solid,
+ shell,
+ biphasic,
+ multiphasic and FSI domains.
 
 \end_layout
 
@@ -49085,10 +49379,10 @@ literal "true"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}D\mathbf{u}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\Delta\mathbf{u}\\
-D\mathbf{F}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\Grad\Delta\mathbf{u}\\
-DJ\left[\Delta\mathbf{u}\right] & =\alpha_{f}J\left(\divg\Delta\mathbf{u}\right)\\
-D\dot{J}\left[\Delta\mathbf{u}\right] & =D\left(J\mathbf{F}^{-T}:\Grad\mathbf{v}\right)\left[\Delta\mathbf{u}\right]\\
- & =\alpha_{f}J\left[\left(\divg\mathbf{v}+\frac{\gamma}{\beta\Delta t}\right)\left(\divg\Delta\mathbf{u}\right)-\left(\grad\Delta\mathbf{u}\right)^{T}:\mathbf{L}\right]\\
+D\mathbf{F}\left[\Delta\mathbf{u}\right] & =\mathcal{D}_{\alpha_{f}}\left[\Grad\Delta\mathbf{u}\right]\equiv\mathbf{A}\cdot\mathbf{F}\\
+DJ\left[\Delta\mathbf{u}\right] & =J\,\mathrm{tr}\,\mathbf{A}\\
+D\dot{J}\left[\Delta\mathbf{u}\right] & =\frac{J_{n+1}}{\Delta t}\mathbf{F}^{-T}_{n+1}:\Grad\Delta\mathbf{u}\\
+D\mathbf{L}\left[\Delta\mathbf{u}\right] & =\left(\frac{1}{\Delta t}\mathbf{I}-\frac{1}{2}\mathbf{L}\right)\cdot\Grad\Delta\mathbf{u}\cdot\mathbf{F}^{-1}_{n+1/2}\\
 D\mathbf{v}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{f}\gamma}{\beta\Delta t}\Delta\mathbf{u}\\
 D\dot{\mathbf{v}}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{m}}{\beta\Delta t^{2}}\Delta\mathbf{u}
 \end{aligned}
@@ -49097,6 +49391,127 @@ D\dot{\mathbf{v}}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{m}}{\beta\Delta 
 
 \end_inset
 
+Here,
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ and
+\begin_inset Formula $J$
+\end_inset
+
+ are evaluated at
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+,
+\begin_inset Formula $\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]$
+\end_inset
+
+ is the derivative of the interpolation in Eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:edy-mp-defgrad"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ with respect to
+\begin_inset Formula $\mathbf{F}_{n+1}$
+\end_inset
+
+,
+ and
+\begin_inset Formula $\mathbf{A}=D\mathbf{F}\left[\Delta\mathbf{u}\right]\cdot\mathbf{F}^{-1}$
+\end_inset
+
+ is the resulting perturbation of the intermediate configuration (which replaces
+\begin_inset Formula $\alpha_{f}\grad\Delta\mathbf{u}$
+\end_inset
+
+ of the linear interpolation).
+ Using
+\begin_inset Formula $\delta\mathbf{F}_{n+1}=\mathbf{R}_{n+1}\cdot\left(\boldsymbol{\Omega}\cdot\mathbf{U}_{n+1}+\delta\mathbf{U}_{n+1}\right)$
+\end_inset
+
+,
+ the derivative of the polar decomposition is obtained from
+\begin_inset Formula $\left(\mathrm{tr}\,\mathbf{U}_{n+1}\,\mathbf{I}-\mathbf{U}_{n+1}\right)\cdot\boldsymbol{\omega}=\mathrm{axl}\left(\mathbf{B}-\mathbf{B}^{T}\right)$
+\end_inset
+
+,
+\begin_inset Formula $\delta\mathbf{U}_{n+1}=\mathbf{B}-\boldsymbol{\Omega}\cdot\mathbf{U}_{n+1}$
+\end_inset
+
+,
+ where
+\begin_inset Formula $\mathbf{B}=\mathbf{R}^{T}_{n+1}\cdot\delta\mathbf{F}_{n+1}$
+\end_inset
+
+,
+\begin_inset Formula $\boldsymbol{\Omega}$
+\end_inset
+
+ is the skew tensor whose axial vector is
+\begin_inset Formula $\boldsymbol{\omega}$
+\end_inset
+
+,
+ and
+\begin_inset Formula $\mathrm{axl}\left(\cdot\right)$
+\end_inset
+
+ denotes the axial vector.
+ Then
+\begin_inset Formula 
+\begin{equation}
+\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]=\mathbf{R}_{n+\alpha_{f}}\cdot\left(\boldsymbol{\Omega}_{\alpha}\cdot\mathbf{U}_{n+\alpha_{f}}+\alpha_{f}\delta\mathbf{U}_{n+1}\right)\,,\quad\boldsymbol{\omega}_{\alpha}=\alpha_{f}\mathbf{J}_{r}\left(\alpha_{f}\boldsymbol{\phi}\right)\cdot\mathbf{J}^{-1}_{r}\left(\boldsymbol{\phi}\right)\cdot\boldsymbol{\omega}\,,\label{eq:edy-objective-interpolation-derivative}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula $\boldsymbol{\Omega}_{\alpha}$
+\end_inset
+
+ is the skew tensor whose axial vector is
+\begin_inset Formula $\boldsymbol{\omega}_{\alpha}$
+\end_inset
+
+,
+\begin_inset Formula $\boldsymbol{\phi}=\log\left(\mathbf{R}^{T}_{n}\cdot\mathbf{R}_{n+1}\right)$
+\end_inset
+
+,
+ and
+\begin_inset Formula $\mathbf{J}_{r}\left(\boldsymbol{\phi}\right)=\mathbf{I}-\frac{1-\cos\phi}{\phi^{2}}\hat{\boldsymbol{\phi}}+\frac{\phi-\sin\phi}{\phi^{3}}\hat{\boldsymbol{\phi}}^{2}$
+\end_inset
+
+ is the right Jacobian of the rotation group (with
+\begin_inset Formula $\phi=\left|\boldsymbol{\phi}\right|$
+\end_inset
+
+ and
+\begin_inset Formula $\hat{\boldsymbol{\phi}}$
+\end_inset
+
+ the skew tensor whose axial vector is
+\begin_inset Formula $\boldsymbol{\phi}$
+\end_inset
+
+).
+ For
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+,
+\begin_inset Formula $\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]=\delta\mathbf{F}_{n+1}$
+\end_inset
+
+.
 To linearize the virtual work,
  we need to express the integrals appearing in 
 \begin_inset Formula $\delta W_{int}$
@@ -49151,7 +49566,7 @@ where
  
 \begin_inset Formula 
 \begin{equation}
-D\mathbf{E}\left[\Delta\mathbf{u}\right]=\frac{\alpha_{f}}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)\,.\label{eq:edy-E-linearization}
+D\mathbf{E}\left[\Delta\mathbf{u}\right]=\frac{1}{2}\left(D\mathbf{F}^{T}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot D\mathbf{F}\right)=\mathbf{F}^{T}\cdot\mathbf{A}^{s}\cdot\mathbf{F}\,,\quad\mathbf{A}^{s}=\frac{1}{2}\left(\mathbf{A}+\mathbf{A}^{T}\right)\,.\label{eq:edy-E-linearization}
 \end{equation}
 
 \end_inset
@@ -49166,8 +49581,8 @@ Therefore,
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}D\mathbf{S}\left[\Delta\mathbf{u}\right] & =\frac{\partial\mathbf{S}}{\partial\mathbf{E}}:D\mathbf{E}\left[\Delta\mathbf{u}\right]\\
- & =\alpha_{f}\boldsymbol{\mathbb{C}}:\frac{1}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)\\
- & =\alpha_{f}\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right):\Delta\boldsymbol{\varepsilon}
+ & =\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\cdot\mathbf{A}^{s}\cdot\mathbf{F}\right)\\
+ & =\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right):\mathbf{A}^{s}
 \end{aligned}
 \,,\label{eq:edy-solid-stress-linearization}
 \end{equation}
@@ -49188,7 +49603,7 @@ where
 \begin_inset Formula 
 \begin{equation}
 \boxed{\begin{aligned} & D\left(\int_{B}\mathbf{F}\cdot\mathbf{S}:\Grad\delta\mathbf{v}\,dV\right)\left[\Delta\mathbf{u}\right]\\
- & =\int_{v}\alpha_{f}\left(\grad\delta\mathbf{v}:\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}+\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}:\grad\Delta\mathbf{u}\right)\,dv
+ & =\int_{v}\left(\grad\delta\mathbf{v}:\mathbf{A}\cdot\boldsymbol{\sigma}+\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}:\mathbf{A}\right)\,dv
 \end{aligned}
 }\,.\label{eq:edy-Dint-1}
 \end{equation}
@@ -49337,7 +49752,7 @@ where the contravariant basis vectors
  may be evaluated from the covariant basis vectors
 \begin_inset Formula 
 \[
-\mathbf{g}^{n+\alpha_{f}}_{i}=\frac{\partial\mathbf{x}_{n+\alpha_{f}}}{\partial\eta^{i}}=\left(1-\alpha_{f}\right)\frac{\partial\mathbf{x}_{n}}{\partial\eta^{i}}+\alpha_{f}\frac{\partial\mathbf{x}_{n+1}}{\partial\eta^{i}}
+\mathbf{g}^{n+\alpha_{f}}_{i}=\mathbf{F}_{n+\alpha_{f}}\cdot\mathbf{G}_{i}\,,\quad\mathbf{G}_{i}=\frac{\partial\mathbf{X}}{\partial\eta^{i}}
 \]
 
 \end_inset
@@ -49388,6 +49803,57 @@ where
 
 \end_inset
 
+This expression applies when
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+,
+ for which
+\begin_inset Formula $\mathbf{A}=\Delta\mathbf{u}_{b}\otimes\grad N_{b}$
+\end_inset
+
+.
+ For
+\begin_inset Formula $\alpha_{f}<1$
+\end_inset
+
+,
+ the perturbation
+\begin_inset Formula $\mathbf{A}_{bk}=\mathcal{D}_{\alpha_{f}}\left[\mathbf{e}_{k}\otimes\Grad N_{b}\right]\cdot\mathbf{F}^{-1}$
+\end_inset
+
+ associated with the displacement component
+\begin_inset Formula $k$
+\end_inset
+
+ of node
+\begin_inset Formula $b$
+\end_inset
+
+ is not a dyad,
+ and the column of the stiffness matrix for that degree of freedom is evaluated directly from Eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:edy-Dint-1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{a,bk}=\left[\boldsymbol{\mathcal{C}}:\mathbf{A}^{s}_{bk}+\mathbf{A}_{bk}\cdot\boldsymbol{\sigma}\right]\cdot\grad N_{a}\,,\label{eq:edy-Wint-Kab-objective}
+\end{equation}
+
+\end_inset
+
+which is not symmetric (a non-symmetric linear solver gives the best convergence).
+ The same approach is used in the three-field solid and shell domains,
+ where the element pressure is evaluated from the element volume in the corresponding configuration.
 The discretization of the mass term in the internal work is
 \begin_inset Formula 
 \[

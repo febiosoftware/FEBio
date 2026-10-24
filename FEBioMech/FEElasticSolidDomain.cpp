@@ -416,6 +416,73 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 }
 
 //-----------------------------------------------------------------------------
+//! Material and geometrical stiffness for alpha_f < 1. The stress at the
+//! intermediate time is evaluated with the objective interpolation F_a of the
+//! deformation gradient, and the internal forces are integrated over the
+//! corresponding intermediate configuration. A perturbation dF = du_j (x) GradN_j
+//! of F_{n+1} perturbs the intermediate configuration by A = dF_a.F_a^-1, where
+//! dF_a is the derivative of the objective interpolation, so that
+//!     d(s.grad N_i dv) = [ c:sym(A) + A.s ].grad N_i dv ,
+//! where c is the spatial elasticity tensor. For alpha_f = 1, A = du_j (x) grad N_j
+//! and this reduces to the usual material and geometrical stiffness.
+void FEElasticSolidDomain::ElementObjectiveStiffness(FESolidElement& el, matrix& ke)
+{
+	const int nint = el.GaussPoints();
+	const int neln = el.Nodes();
+	const double* gw = el.GaussWeights();
+	const vec3d e[3] = { vec3d(1,0,0), vec3d(0,1,0), vec3d(0,0,1) };
+
+	vec3d G[FEElement::MAX_NODES], G0[FEElement::MAX_NODES];
+
+	for (int n = 0; n<nint; ++n)
+	{
+		// spatial gradients and volume element in the (objective) intermediate configuration
+		double dv = ShapeGradient(el, n, G, m_alphaf)*gw[n];
+
+		// reference gradients of the shape functions
+		const mat3d& J0i = el.m_J0i[n];
+		double* Gr = el.Gr(n); double* Gs = el.Gs(n); double* Gt = el.Gt(n);
+		for (int i = 0; i<neln; ++i)
+			G0[i] = vec3d(J0i(0,0)*Gr[i] + J0i(1,0)*Gs[i] + J0i(2,0)*Gt[i],
+				          J0i(0,1)*Gr[i] + J0i(1,1)*Gs[i] + J0i(2,1)*Gt[i],
+				          J0i(0,2)*Gr[i] + J0i(1,2)*Gs[i] + J0i(2,2)*Gt[i]);
+
+		// objective interpolation and its derivative
+		FEObjectiveInterpolation oi;
+		ObjectiveInterpolation(el, n, m_alphaf, oi);
+		mat3d Fai = oi.F().inverse();
+
+		// material point data
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+		const mat3ds& s = pt.m_s;
+		tens4dmm C = (m_secant_tangent ? m_pMat->SecantTangent(mp) : m_pMat->SolidTangent(mp));
+
+		for (int j = 0; j<neln; ++j)
+			for (int k = 0; k<3; ++k)
+			{
+				mat3d A = oi.dF(e[k] & G0[j])*Fai;
+				// full double contraction C:sym(A)
+				// (tens4dmm::dot does not account for both shear components)
+				mat3d As = A.sym();
+				mat3d dS; dS.zero();
+				for (int p = 0; p<3; ++p) for (int q = 0; q<3; ++q) {
+					double v = 0;
+					for (int r = 0; r<3; ++r) for (int t = 0; t<3; ++t) v += C(p,q,r,t)*As(r,t);
+					dS(p,q) = v;
+				}
+				for (int i = 0; i<neln; ++i)
+				{
+					vec3d f = (dS*G[i] + A*(s*G[i]))*dv;
+					ke[3*i  ][3*j + k] += f.x;
+					ke[3*i+1][3*j + k] += f.y;
+					ke[3*i+2][3*j + k] += f.z;
+				}
+			}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticSolidDomain::StiffnessMatrix(FELinearSystem& LS)
 {
 	// repeat over all solid elements
@@ -440,11 +507,19 @@ void FEElasticSolidDomain::StiffnessMatrix(FELinearSystem& LS)
 			ke.resize(ndof, ndof);
 			ke.zero();
 
-			// calculate geometrical stiffness
-			ElementGeometricalStiffness(el, ke);
+			if (m_alphaf == 1.0)
+			{
+				// calculate geometrical stiffness
+				ElementGeometricalStiffness(el, ke);
 
-			// calculate material stiffness
-			ElementMaterialStiffness(el, ke);
+				// calculate material stiffness
+				ElementMaterialStiffness(el, ke);
+			}
+			else
+			{
+				// stiffness consistent with the objective interpolation at the intermediate time
+				ElementObjectiveStiffness(el, ke);
+			}
 
 /*			// assign symmetic parts
 			// TODO: Can this be omitted by changing the Assemble routine so that it only
@@ -526,6 +601,14 @@ void FEElasticSolidDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& b
 void FEElasticSolidDomain::ElementStiffness(const FETimeInfo& tp, int iel, matrix& ke)
 {
 	FESolidElement& el = Element(iel);
+
+	if (m_alphaf != 1.0)
+	{
+		// stiffness consistent with the objective interpolation at the intermediate time
+		// (this matrix is not symmetric)
+		ElementObjectiveStiffness(el, ke);
+		return;
+	}
 
 	// calculate material stiffness (i.e. constitutive component)
 	ElementMaterialStiffness(el, ke);
@@ -621,19 +704,13 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         Jt = defgrad(el, Ft, n);
         defgradp(el, Fp, n);
 
-		if (m_alphaf == 1.0)
-		{
-			pt.m_F = Ft;
-            pt.m_J = Jt;
-		}
-		else
-		{
-			pt.m_F = Ft*m_alphaf + Fp*(1-m_alphaf);
-            pt.m_J = pt.m_F.det();
-		}
-
-        mat3d Fi = pt.m_F.inverse();
-        pt.m_L = (Ft - Fp)*Fi / dt;
+        // incrementally objective kinematics at the intermediate time (see FEObjectiveKinematics.h):
+        // rotation and stretch are interpolated separately, and the velocity gradient
+        // is evaluated on the midpoint configuration, so that a rigid-body increment
+        // produces neither strain nor rate of deformation
+        pt.m_F = FEObjectiveInterpolateF(Fp, Ft, m_alphaf);
+        pt.m_J = (m_alphaf == 1.0 ? Jt : pt.m_F.det());
+        pt.m_L = FEMidpointVelocityGradient(Fp, Ft, dt);
 		if (m_update_dynamic)
 		{
 			pt.m_v = el.Evaluate(v, n);

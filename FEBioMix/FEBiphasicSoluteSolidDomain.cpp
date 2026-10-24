@@ -1104,7 +1104,8 @@ void FEBiphasicSoluteSolidDomain::UpdateElementStress(int iel)
         mat3d Fp;
         defgradp(el, Fp, n);
         mat3d Fi = pt.m_F.inverse();
-        pt.m_L = (pt.m_F - Fp)*Fi / dt;
+        // velocity gradient on the midpoint configuration (incrementally objective, see FEObjectiveKinematics.h)
+        pt.m_L = FEMidpointVelocityGradient(Fp, pt.m_F, dt);
 
         // solute-poroelastic data
         FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());

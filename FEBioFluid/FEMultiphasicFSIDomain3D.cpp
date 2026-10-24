@@ -25,6 +25,7 @@
  SOFTWARE.*/
 
 #include "stdafx.h"
+#include <FECore/FEObjectiveKinematics.h>
 #include "FEMultiphasicFSIDomain3D.h"
 #include <FECore/log.h>
 #include "FECore/DOFS.h"
@@ -1563,10 +1564,14 @@ void FEMultiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp
         double Jt, Jp;
         Jt = defgrad(el, Ft, n);
         Jp = defgradp(el, Fp, n);
-        ept.m_F = Ft*alphaf + Fp*(1 - alphaf);
+        // incrementally objective kinematics at t_(n+alphaf) (see FEObjectiveKinematics.h):
+        // rotation and stretch are interpolated separately, and the velocity gradient
+        // is evaluated on the midpoint configuration, so that a rigid-body increment
+        // produces neither strain nor rate of deformation
+        ept.m_F = FEObjectiveInterpolateF(Fp, Ft, alphaf);
         ept.m_J = ept.m_F.det();
         mat3d Fi = ept.m_F.inverse();
-        ept.m_L = (Ft - Fp)*Fi*(dtrans / dt);
+        ept.m_L = FEMidpointVelocityGradient(Fp, Ft, dt)*dtrans;
         ept.m_v = m_btrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
         ept.m_a = m_btrans ? el.Evaluate(a, n) : vec3d(0, 0, 0);
         //NOTE: Made these new function. Converts from GradJ to gradJ
@@ -1857,6 +1862,19 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
 
         // kinematics
         mat3d Ft; double Jt = defgrad(el, Ft, n);
+        mat3d Fp; defgradp(el, Fp, n);
+        // incrementally objective interpolation of the deformation gradient at the
+        // intermediate time, and its derivative with respect to F_{n+1}
+        FEObjectiveInterpolation oi;
+        oi.Init(Fp, Ft, af);
+        mat3d Fai = oi.F().inverse();
+        // reference gradients of the shape functions
+        const mat3d& J0i = el.m_J0i[n];
+        vector<vec3d> GradN0(neln);
+        for (int i=0; i<neln; ++i)
+            GradN0[i] = vec3d(J0i(0,0)*Gr[i] + J0i(1,0)*Gs[i] + J0i(2,0)*Gt[i],
+                              J0i(0,1)*Gr[i] + J0i(1,1)*Gs[i] + J0i(2,1)*Gt[i],
+                              J0i(0,2)*Gr[i] + J0i(1,2)*Gs[i] + J0i(2,2)*Gt[i]);
         mat3d G = et.m_F*Ft.inverse();
         // quantities in the configuration at time t (needed for the derivative of grad J when alpha_f < 1)
         mat3d Fti = Ft.inverse();
@@ -1972,8 +1990,12 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
             for (int k=0; k<3; ++k)
             {
                 const vec3d& s = e[k];
-                mat3d A = (s & gj)*af;          // grad(du)
-                double div = (gj*s)*af;         // div(du)
+                // perturbation of F_{n+1} and of the (intermediate) configuration:
+                // A = dF_a.F_a^-1, where dF_a is the derivative of the objective
+                // interpolation (for af = 1, A = grad(du))
+                mat3d dFt = s & GradN0[j];
+                mat3d A = oi.dF(dFt)*Fai;
+                double div = A.trace();         // div(du)
                 mat3d At = A.transpose();
 
                 double dJ = J*div;
@@ -1991,9 +2013,10 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
                 vec3d dgradJ = -(At*gradJ) + Fit*dGradJt*af;
                 vec3d dgradphif = -gradphif*(2*div) + dgradJ*(phi0/(J*J));
                 double dc1 = -c1*div*(2 + phis/phif);
-                mat3d dL = ((s & gj)/dt - ((L*s) & gj)*af)*dtrans;
+                // derivative of the midpoint velocity gradient
+                mat3d dL = FEMidpointVelocityGradientDerivative(Fp, Ft, dt, dFt)*dtrans;
                 double dJdot = (Jt/dt)*((G.transpose()*gj)*s)*dtrans;
-                mat3d dLw = -((Lw*s) & gj)*af;
+                mat3d dLw = -(Lw*A);
                 mat3d dLf = dL + dLw/phif - Lw*(dphif/(phif*phif)) - (w & dgradphif)/(phif*phif) + (w & gradphif)*(2*dphif/(phif*phif*phif));
                 mat3ds dsv = cv.dot(dLf.sym());
                 mat3d KtA; KtA.zero();
@@ -2068,7 +2091,7 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
                     vec3d dgi = -(At*gi);
 
                     // solid momentum
-                    vec3d dFs = (mat3dd(gi*(se*gj)) + vdotTdotv(gi, cs, gj))*s*af;
+                    vec3d dFs = cs.dot(A.sym())*gi + A*(se*gi);
                     dFs -= (sv*gi)*dphis + (dsv*gi)*phis + (sv*dgi)*phis + (sv*gi)*(phis*div);
                     // osmotic stress -R*T*osmc*osm*I
                     dFs -= (gi*(dosmc*osm + osmc*dosm) + dgi*(osmc*osm) + gi*(osmc*osm*div))*RT;

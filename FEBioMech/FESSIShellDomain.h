@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <functional>
 #include "febiomech_api.h"
 #include <FECore/FEDofList.h>
+#include <FECore/FEObjectiveKinematics.h>
 class FEDataStream;
 
 //-----------------------------------------------------------------------------
@@ -123,6 +124,14 @@ public:
     
     // calculate deformation gradient at an integration point
     double defgrad(FEShellElement& el, mat3d& F, int n);
+
+    //! incrementally objective deformation gradient at an integration point at the
+    //! intermediate time t_{n+alpha} (see FEObjectiveKinematics.h). For alpha < 1, the
+    //! base vectors and Jacobian at the intermediate time are evaluated from it.
+    mat3d ObjectiveDefGrad(FEShellElement& el, int n, const double alpha);
+
+    //! objective interpolation data (deformation gradient and its derivative) at t_{n+alpha}
+    void ObjectiveInterpolation(FEShellElement& el, int n, const double alpha, FEObjectiveInterpolation& oi);
     
     // calculate deformation gradient at any point
     double defgrad(FEShellElement& el, mat3d& F, double r, double s, double t);
