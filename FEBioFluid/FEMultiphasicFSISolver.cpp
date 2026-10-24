@@ -73,6 +73,8 @@ BEGIN_FECORE_CLASS(FEMultiphasicFSISolver, FENewtonSolver)
     ADD_PARAMETER(m_Rtol, FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
     ADD_PARAMETER(m_rhoi , "rhoi"        );
     ADD_PARAMETER(m_pred , "predictor"   );
+    ADD_PARAMETER(m_solve_strategy, "solve_strategy")->setEnums("coupled\0sequential\0");
+    ADD_PARAMETER(m_maxSeqPasses, "max_sequential_passes")->SetFlags(FEParamFlag::FE_PARAM_HIDDEN);
     ADD_PARAMETER(m_minJf, "min_volume_ratio");
     ADD_PARAMETER(m_order, "order"      );
     ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
@@ -114,6 +116,9 @@ m_dofU(pfem), m_dofV(pfem), m_dofSU(pfem), m_dofSV(pfem), m_dofSA(pfem),m_dofR(p
     m_order = 2;
     
     m_forcePositive = true;    // force all concentrations to remain positive
+
+    m_solve_strategy = SOLVE_COUPLED;
+    m_maxSeqPasses = 10;
     
     // Preferred strategy is Broyden's method
     SetDefaultStrategy(QN_BROYDEN);
@@ -386,6 +391,9 @@ bool FEMultiphasicFSISolver::InitEquations()
             m_neq += spc->InitEquations(m_neq);
         }
     }
+
+    // identify the solute equations (used by the sequential solve strategy)
+    BuildSoluteEquationFlags();
 
     // All initialization is done
     return true;
@@ -1048,6 +1056,15 @@ bool FEMultiphasicFSISolver::Quasin()
     // init QN method
     if (QNInit() == false) return false;
     
+    // data for the staggered (mixture <-> solute) passes of a sequential solve
+    const bool bseq = (m_solve_strategy == SOLVE_SEQUENTIAL);
+    int niterPrev = 0;          // iterations of previous passes (sequential solve)
+    if (bseq && ((int)m_bsoleq.size() != m_neq)) BuildSoluteEquationFlags();
+    bool mix_converged = false; // set to true once the mixture (u, w, ef) has converged
+    int nmixPass = 1;           // number of mixture passes in this time step
+    double normRm0 = 0.0;       // (squared) mixture residual norm at the start of the solute pass
+    double normRm = 0.0;        // (squared) mixture residual norm during the solute pass
+
     // loop until converged or when max nr of reformations reached
     bool bconv = false;        // convergence flag
     do
@@ -1056,9 +1073,53 @@ bool FEMultiphasicFSISolver::Quasin()
         
         // assume we'll converge.
         bconv = true;
+
+        // for a sequential solve, zero the residual of the inactive block
+        // (mixture pass: zero the solute residual; solute pass: zero the mixture residual)
+        if (bseq)
+        {
+            for (int i = 0; i < m_neq; ++i)
+                if (m_bsoleq[i] != mix_converged) m_R0[i] = 0.0;
+        }
         
-        // solve the equations (returns line search; solution stored in m_ui)
-        double s = QNSolve();
+        // solve the equations (solution stored in m_ui)
+        SolveEquations(m_ui, m_R0);
+
+        // For a sequential solve, zero the increments of the inactive block before the
+        // line search, so that the state at which the residual is evaluated only reflects
+        // the unknowns being solved for in this pass.
+        if (bseq)
+        {
+            for (int i = 0; i < m_neq; ++i)
+                if (m_bsoleq[i] != mix_converged) m_ui[i] = 0.0;
+        }
+
+        // perform the line search (returns line search factor)
+        double s = DoLineSearch();
+
+        if (bseq)
+        {
+            if (mix_converged == false)
+            {
+                // zero the solute residual
+                for (int i = 0; i < m_neq; ++i) if (m_bsoleq[i]) m_R1[i] = 0.0;
+            }
+            else
+            {
+                // keep track of the mixture residual, which changes during the solute
+                // pass when the mixture is coupled to the solutes (e.g., osmotic stress)
+                normRm = 0.0;
+                for (int i = 0; i < m_neq; ++i) if (!m_bsoleq[i]) normRm += m_R1[i]*m_R1[i];
+
+                // zero the mixture residual
+                for (int i = 0; i < m_neq; ++i) if (!m_bsoleq[i]) m_R1[i] = 0.0;
+
+                // if solving sequentially with ctol = 0, ignore the solute residual
+                if (m_Ctol == 0) {
+                    for (int i = 0; i < m_neq; ++i) if (m_bsoleq[i]) m_R1[i] = 0.0;
+                }
+            }
+        }
         
         // extract the velocity and dilatation increments
         GetDisplacementData(m_di, m_ui);
@@ -1079,7 +1140,10 @@ bool FEMultiphasicFSISolver::Quasin()
         // calculate norms
         // update all degrees of freedom
         for (int i=0; i<m_neq; ++i) m_Ui[i] += s*m_ui[i];
-        
+
+        // keep the accumulated increments consistent with clipped nodal concentrations
+        ClipAccumulatedConcentrations();
+
         // update displacements
         for (int i = 0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
         
@@ -1218,6 +1282,57 @@ bool FEMultiphasicFSISolver::Quasin()
             // Do augmentations
             bconv = DoAugmentations();
         }
+
+        // staggered passes of the sequential solve
+        if (bconv && bseq)
+        {
+            if (mix_converged == false)
+            {
+                // A repeated mixture pass that converged on its first iteration means that
+                // the last solute pass did not alter the mixture appreciably: we're done.
+                if ((nmixPass > 1) && (m_niter == 0))
+                {
+                    feLog("\n*** Mixture unchanged after solute update. Sequential solve converged.\n");
+                }
+                else
+                {
+                    mix_converged = true;
+                    bconv = false;
+                    m_qnstrategy->m_nups = 0;
+                    niterPrev += m_niter + 1;
+                    m_niter = -1;
+                    Residual(m_R0);
+                    normRm0 = 0.0;
+                    for (int i = 0; i < m_neq; ++i) if (!m_bsoleq[i]) normRm0 += m_R0[i]*m_R0[i];
+                    normRm = normRm0;
+                    feLog("\n*** Mixture (solid, fluid, dilatation) converged. Now solving for solutes.\n");
+                }
+            }
+            else
+            {
+                // The solutes have converged. If the solute update altered the mixture residual
+                // (osmotic stress, solute drag, osmotic pressure boundary conditions), solve for
+                // the mixture again.
+                const double rtolm = 1e-6;
+                if (normRm > normRm0*(1.0 + rtolm) + m_Rmin)
+                {
+                    if (nmixPass >= m_maxSeqPasses)
+                    {
+                        feLogWarning("Sequential solve: mixture and solutes failed to converge after %d passes.", nmixPass);
+                        bconv = false;
+                        break;
+                    }
+                    mix_converged = false;
+                    bconv = false;
+                    m_qnstrategy->m_nups = 0;
+                    niterPrev += m_niter + 1;
+                    m_niter = -1;
+                    nmixPass++;
+                    Residual(m_R0);
+                    feLog("\n*** Solute update altered the mixture. Solving for the mixture again (pass %d).\n", nmixPass);
+                }
+            }
+        }
         
         // increase iteration number
         m_niter++;
@@ -1226,6 +1341,12 @@ bool FEMultiphasicFSISolver::Quasin()
         fem.DoCallback(CB_MINOR_ITERS);
     }
     while (bconv == false);
+
+    // notify that the quasi-Newton loop has finished (used by e.g. the stiffness diagnostic)
+    // include the iterations of all the passes of a sequential solve in the iteration count
+    m_niter += niterPrev;
+
+    GetFEModel()->DoCallback(CB_QUASIN_CONVERGED);
     
     // if converged we update the total velocities
     if (bconv)
@@ -1236,6 +1357,61 @@ bool FEMultiphasicFSISolver::Quasin()
     
     return bconv;
 }
+
+//-----------------------------------------------------------------------------
+//! Linear system used for sequential solves. It drops the coupling block that links the
+//! solid, fluid, and dilatation equations to the solute unknowns, so that the assembled
+//! matrix is block lower-triangular:
+//!   [ K_mm   0   ] [dm]   [R_m]
+//!   [ K_cm  K_cc ] [dc] = [R_c]
+//! where m denotes the mixture (u, w, ef) unknowns. The mixture pass (R_c = 0) then yields
+//! dm = K_mm^-1 R_m and the solute pass (R_m = 0) yields dm = 0 and dc = K_cc^-1 R_c.
+//! The coupling of the mixture to the solutes is resolved by the outer staggered iterations
+//! in Quasin().
+class FEMultiphasicFSISequentialLinearSystem : public FESolidLinearSystem
+{
+public:
+    FEMultiphasicFSISequentialLinearSystem(FEModel* fem, FERigidSolver* rigidSolver, FEGlobalMatrix& K, vector<double>& F, vector<double>& u, bool bsymm, double alpha, int nreq, const vector<bool>& bsoleq)
+    : FESolidLinearSystem(fem, rigidSolver, K, F, u, bsymm, alpha, nreq), m_bsoleq(bsoleq) {}
+
+    void Assemble(const FEElementMatrix& ke) override
+    {
+        const vector<int>& lmi = ke.RowIndices();
+        const vector<int>& lmj = ke.ColumnsIndices();
+        const int nr = (int)lmi.size();
+        const int nc = (int)lmj.size();
+
+        // check if this element matrix has any mixture-solute coupling terms
+        bool bcoupled = false;
+        for (int i = 0; (i < nr) && !bcoupled; ++i) {
+            int I = Equation(lmi[i]);
+            if ((I < 0) || IsSolute(I)) continue;
+            for (int j = 0; j < nc; ++j) {
+                int J = Equation(lmj[j]);
+                if ((J >= 0) && IsSolute(J) && (ke[i][j] != 0.0)) { bcoupled = true; break; }
+            }
+        }
+        if (!bcoupled) { FESolidLinearSystem::Assemble(ke); return; }
+
+        FEElementMatrix kf(ke);
+        for (int i = 0; i < nr; ++i) {
+            int I = Equation(lmi[i]);
+            if ((I < 0) || IsSolute(I)) continue;
+            for (int j = 0; j < nc; ++j) {
+                int J = Equation(lmj[j]);
+                if ((J >= 0) && IsSolute(J)) kf[i][j] = 0.0;
+            }
+        }
+        FESolidLinearSystem::Assemble(kf);
+    }
+
+private:
+    static int Equation(int id) { return (id >= 0 ? id : (id < -1 ? -id - 2 : -1)); }
+    bool IsSolute(int eq) const { return (eq < (int)m_bsoleq.size()) && m_bsoleq[eq]; }
+
+private:
+    const vector<bool>& m_bsoleq;
+};
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
@@ -1249,7 +1425,10 @@ bool FEMultiphasicFSISolver::StiffnessMatrix()
     // get the mesh
     FEMesh& mesh = fem.GetMesh();
     
-    FESolidLinearSystem LS(&fem, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alphaf, m_nreq);
+    if ((m_solve_strategy == SOLVE_SEQUENTIAL) && ((int)m_bsoleq.size() != m_neq)) BuildSoluteEquationFlags();
+    FEMultiphasicFSISequentialLinearSystem LSseq(&fem, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alphaf, m_nreq, m_bsoleq);
+    FESolidLinearSystem LScpl(&fem, &m_rigidSolver, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC), m_alphaf, m_nreq);
+    FESolidLinearSystem& LS = (m_solve_strategy == SOLVE_SEQUENTIAL ? (FESolidLinearSystem&)LSseq : LScpl);
     
     // calculate the stiffness matrix for each domain
     for (int i=0; i<mesh.Domains(); ++i)
@@ -1555,5 +1734,49 @@ void FEMultiphasicFSISolver::NonLinearConstraintForces(FEGlobalVector& R, const 
     {
         FENLConstraint* plc = fem.NonlinearConstraint(i);
         if (plc->IsActive()) plc->LoadVector(R, tp);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! When negative concentrations are clipped to zero at the nodes (m_forcePositive),
+//! the accumulated increment m_Ui must be adjusted accordingly. Otherwise the solver's
+//! total solution vector (m_Ut + m_Ui) drifts away from the nodal values used to
+//! evaluate the residual and the time derivatives.
+void FEMultiphasicFSISolver::ClipAccumulatedConcentrations()
+{
+    if (m_forcePositive == false) return;
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    DOFS& fedofs = fem.GetDOFS();
+    int MAX_CDOFS = fedofs.GetVariableSize(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION));
+    for (int i = 0; i < mesh.Nodes(); ++i)
+    {
+        FENode& node = mesh.Node(i);
+        for (int j = 0; j < MAX_CDOFS; ++j)
+        {
+            int n = node.m_ID[m_dofC + j];
+            if ((n >= 0) && (m_Ut[n] + m_Ui[n] < 0.0)) m_Ui[n] = -m_Ut[n];
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Flag all equations (free or prescribed) associated with solute concentrations
+void FEMultiphasicFSISolver::BuildSoluteEquationFlags()
+{
+    FEModel& fem = *GetFEModel();
+    FEMesh& mesh = fem.GetMesh();
+    DOFS& fedofs = fem.GetDOFS();
+    int MAX_CDOFS = fedofs.GetVariableSize(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION));
+    m_bsoleq.assign(m_neq, false);
+    for (int i = 0; i < mesh.Nodes(); ++i)
+    {
+        FENode& node = mesh.Node(i);
+        for (int j = 0; j < MAX_CDOFS; ++j)
+        {
+            int id = node.m_ID[m_dofC + j];
+            int eq = (id >= 0 ? id : (id < -1 ? -id - 2 : -1));
+            if ((eq >= 0) && (eq < m_neq)) m_bsoleq[eq] = true;
+        }
     }
 }

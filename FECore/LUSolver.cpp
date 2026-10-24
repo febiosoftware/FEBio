@@ -149,7 +149,7 @@ bool LUSolver::BackSolve(double* x, double* b)
 		x[i] = sum/a(i,i);
 	}
 
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

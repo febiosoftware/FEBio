@@ -116,7 +116,13 @@ protected:
     void GetVelocityData(vector<double>& vi, vector<double>& ui);
     void GetDilatationData(vector<double>& ei, vector<double>& ui);
     void GetConcentrationData(vector<double>& ci, vector<double>& ui, const int sol);
-    
+
+    //! make the accumulated solution increment consistent with clipped (non-negative) nodal concentrations
+    void ClipAccumulatedConcentrations();
+
+    //! build the flags identifying solute equations (free and prescribed)
+    void BuildSoluteEquationFlags();
+
 public:
     // convergence tolerances
     double    m_Dtol;            //!< displacement tolerance
@@ -173,6 +179,15 @@ protected:
     int          m_dofC;
     int          m_dofAC;
     
+protected:
+    enum SOLVE_STRATEGY {
+        SOLVE_COUPLED,          // monolithic solution approach
+        SOLVE_SEQUENTIAL        // first solve solid and fluid (u, w, ef), then solutes
+    };
+    int             m_solve_strategy;   //!< solution strategy
+    int             m_maxSeqPasses;     //!< max number of mixture/solute passes per time step in sequential solves
+    vector<bool>    m_bsoleq;           //!< flags identifying solute equations
+
 protected:
     FERigidSolverNew    m_rigidSolver;
     

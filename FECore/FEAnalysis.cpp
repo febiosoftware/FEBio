@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEAnalysis.h"
+#include <typeinfo>
 #include "FEModel.h"
 #include "FECoreKernel.h"
 #include "log.h"
@@ -644,14 +645,17 @@ int FEAnalysis::SolveTimeStep()
 		feLogError("The RVE problem has failed. Aborting macro run.");
 		nerr = 2;
 	}
-	catch (std::bad_alloc e)
+	catch (const std::bad_alloc& e)
 	{
 		feLogError("A memory allocation failure has occured.\nThe program will now be terminated.");
 		nerr = 2;
 	}
-	catch (std::exception e)
+	// NOTE: catch by reference, not by value.  Catching std::exception BY VALUE
+	//       slices the thrown object, so what() always returned the useless base
+	//       string "std::exception" instead of naming the actual failure.
+	catch (const std::exception& e)
 	{
-		feLogError("Exception detected: %s\n", e.what());
+		feLogError("Exception detected: %s (type: %s)\n", e.what(), typeid(e).name());
 		nerr = 2;
 	}
 	catch (...)

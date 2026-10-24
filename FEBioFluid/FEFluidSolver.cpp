@@ -818,6 +818,9 @@ bool FEFluidSolver::Quasin()
         fem.DoCallback(CB_MINOR_ITERS);
     }
     while (bconv == false);
+
+    // notify that the quasi-Newton loop has finished (used by e.g. the stiffness diagnostic)
+    GetFEModel()->DoCallback(CB_QUASIN_CONVERGED);
     
     // if converged we update the total velocities
     if (bconv)

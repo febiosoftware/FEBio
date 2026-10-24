@@ -120,6 +120,9 @@ public:
     
     //! calculate solute molar flux
     vec3d SoluteFlux(FEMaterialPoint& pt, const int sol);
+
+    //! calculate solute molar flux including the sedimentation term due to body force per mass b (Eq. 8.2)
+    vec3d SoluteFlux(FEMaterialPoint& pt, const int sol, const vec3d& b);
     
     //! actual concentration (as opposed to effective concentration)
     double ConcentrationActual(FEMaterialPoint& pt, const int sol);
@@ -143,6 +146,9 @@ public:
     
     //! current density
     vec3d CurrentDensity(FEMaterialPoint& pt);
+
+    //! current density, including sedimentation (electrophoretic) fluxes due to body force per mass b
+    vec3d CurrentDensity(FEMaterialPoint& pt, const vec3d& b);
     
     //! solute density
     double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }

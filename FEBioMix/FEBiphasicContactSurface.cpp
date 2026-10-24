@@ -156,37 +156,73 @@ void FEBiphasicContactSurface::UnpackLM(FEElement& el, vector<int>& lm)
 }
 //-----------------------------------------------------------------------------
 // Evaluate the local fluid load support projected from the element to the surface Gauss points
-void FEBiphasicContactSurface::GetGPLocalFLS(int nface, double* pt, double pamb)
+void FEBiphasicContactSurface::GetGPLocalFLS(int nface, double* fls, double pamb)
 {
     FESurfaceElement& el = Element(nface);
+
+    const int nint = el.GaussPoints();
+    const int neln = el.Nodes();
+
+    // NOTE: the output array is indexed by integration point, so it must be
+    //       zeroed over nint entries.  This used to zero el.Nodes() entries,
+    //       which left fls[neln..nint-1] uninitialized on any facet with more
+    //       integration points than nodes (QUAD8G9, for example).
+    for (int i=0; i<nint; ++i) fls[i] = 0.0;
+
     FEElement* e = el.m_elem[0].pe;
     FESolidElement* se = dynamic_cast<FESolidElement*>(e);
-    if (se) {
-        mat3ds s; s.zero();
-        double p = 0;
-        for (int i=0; i<se->GaussPoints(); ++i) {
-            FEMaterialPoint* pt = se->GetMaterialPoint(i);
-            FEElasticMaterialPoint* ep = pt->ExtractData<FEElasticMaterialPoint>();
-            FEBiphasicMaterialPoint* bp = pt->ExtractData<FEBiphasicMaterialPoint>();
-            if (ep) s += ep->m_s;
-            if (bp) p += bp->m_p;
-        }
-        s /= se->GaussPoints();
-        p /= se->GaussPoints();
-        // account for ambient pressure
-        p -= pamb;
-        // evaluate FLS at integration points of that face
-        for (int i=0; i<el.GaussPoints(); ++i) {
-            double *H = el.H(i);
-            pt[i] = 0;
-            for (int j=0; j<el.Nodes(); ++j) {
-                vec3d n = SurfaceNormal(el, j);
-                double tn = n*(s*n);
-                double fls = (tn != 0) ? -p/tn : 0;
-                pt[i] += fls*H[j];
-            }
-        }
+    if (se == nullptr) return;
+
+    // average the effective stress and the fluid pressure over the parent
+    // solid element
+    mat3ds s; s.zero();
+    double p = 0;
+    for (int i=0; i<se->GaussPoints(); ++i) {
+        FEMaterialPoint* mp = se->GetMaterialPoint(i);
+        FEElasticMaterialPoint* ep = mp->ExtractData<FEElasticMaterialPoint>();
+        FEBiphasicMaterialPoint* bp = mp->ExtractData<FEBiphasicMaterialPoint>();
+        if (ep) s += ep->m_s;
+        if (bp) p += bp->m_p;
     }
-    else
-        for (int i=0; i<el.Nodes(); ++i) pt[i] = 0;
+    s /= se->GaussPoints();
+    p /= se->GaussPoints();
+
+    // account for ambient pressure
+    p -= pamb;
+
+    // Evaluate a normal at each node of the facet, averaged from the facet's
+    // integration points and weighted by that node's shape function, so the
+    // integration points nearest the node dominate.
+    //
+    // NOTE: FESurface::SurfaceNormal(el, n) takes an INTEGRATION POINT index,
+    //       not a node index.  This function used to call it as
+    //       SurfaceNormal(el, j) with j a node index, which indexes the shape
+    //       function derivative tables (el.Gr(n), el.Gs(n)) out of range on
+    //       every facet type with fewer integration points than nodes --
+    //       including TRI3, which FESurface::Create() builds as FE_TRI3G1:
+    //       one integration point, three nodes.  That is an out-of-bounds read
+    //       followed by a dereference of whatever it returns.
+    vec3d nn[FEElement::MAX_NODES];
+    for (int j=0; j<neln; ++j) nn[j] = vec3d(0,0,0);
+    for (int i=0; i<nint; ++i) {
+        vec3d ni = SurfaceNormal(el, i);
+        double* H = el.H(i);
+        for (int j=0; j<neln; ++j) nn[j] += ni*H[j];
+    }
+
+    // evaluate the FLS at the nodes
+    double flsn[FEElement::MAX_NODES];
+    for (int j=0; j<neln; ++j) {
+        // vec3d::unit() leaves a zero vector alone, which would give tn = 0
+        // and hence fls = 0 below -- the same result as a degenerate facet.
+        nn[j].unit();
+        double tn = nn[j]*(s*nn[j]);
+        flsn[j] = (tn != 0) ? -p/tn : 0;
+    }
+
+    // interpolate to the integration points of the facet
+    for (int i=0; i<nint; ++i) {
+        double* H = el.H(i);
+        for (int j=0; j<neln; ++j) fls[i] += flsn[j]*H[j];
+    }
 }

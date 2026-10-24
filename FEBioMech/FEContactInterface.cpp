@@ -70,13 +70,22 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 	FEElement* pe = el.m_elem[0].pe;
 	if (pe == nullptr) return 0.0;
 
-	// make sure the parent domain is an elastic domain
-	FEElasticDomain* ped = dynamic_cast<FEElasticDomain*>(pe->GetMeshPartition());
-	if (ped == nullptr)
+	// make sure the parent element has a solid (elastic or rigid) response. Besides elastic
+	// domains, this includes domains whose material has an elastic solid component without
+	// being an elastic domain (e.g., biphasic-FSI and multiphasic-FSI domains). Previously these
+	// were rejected, which returned a zero auto-penalty and effectively disabled contact.
+	auto hasSolid = [this](FEElement* pel) {
+		if (pel == nullptr) return false;
+		if (dynamic_cast<FEElasticDomain*>(pel->GetMeshPartition())) return true;
+		FEMaterial* pm = GetFEModel()->GetMaterial(pel->GetMatID());
+		if (pm == nullptr) return false;
+		if (pm->ExtractProperty<FEElasticMaterial>() == nullptr) return false;
+		return (pel->GetMaterialPoint(0) && pel->GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>());
+	};
+	if (!hasSolid(pe))
 	{
 		if ((pe = el.m_elem[1].pe) == nullptr) return 0.0;
-		ped = dynamic_cast<FEElasticDomain*>(pe->GetMeshPartition());
-		if (ped == nullptr) return 0.0;
+		if (!hasSolid(pe)) return 0.0;
 	}
 
 	double eps = 0;
