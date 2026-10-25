@@ -933,6 +933,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotStrongBondDevSED, "deviatoric strong bond SED");
     REGISTER_FECORE_CLASS(FEPlotWeakBondDevSED, "deviatoric weak bond SED");
     REGISTER_FECORE_CLASS(FEPlotTrussStretch  , "truss stretch");
+    REGISTER_FECORE_CLASS(FEPlotGrowthDeformationGradient, "growth deformation gradient");
     REGISTER_FECORE_CLASS(FEPlotGrowthLagrangeStrain, "growth Lagrange strain");
     REGISTER_FECORE_CLASS(FEPlotGrowthInfStrain, "growth infinitesimal strain");
     REGISTER_FECORE_CLASS(FEPlotGrowthRightStretch, "growth right stretch");

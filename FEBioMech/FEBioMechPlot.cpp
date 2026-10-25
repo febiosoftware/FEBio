@@ -4683,25 +4683,51 @@ bool FEPlotTrussStretch::Save(FEDomain& dom, FEDataStream& a)
 }
 
 //=============================================================================
-//! Store the average growth  Lagrangian strain
-class FEGrowthLagrangeStrain
+//! Store the average growth  deformation gradient (Kinematic Growht)
+bool FEPlotGrowthDeformationGradient::Save(FEDomain& dom, FEDataStream& a)
 {
-public:
-    mat3ds operator()(const FEMaterialPoint& mp)
+    FEKinematicGrowth* pme = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
+    if (pme == nullptr) return false;
+    
+    if (dom.Class() == FE_DOMAIN_SOLID)
     {
-        const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
-        if (pe == nullptr) return mat3ds(0, 0, 0, 0, 0, 0);
-        const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
-        if (kp == 0) return mat3ds(0, 0, 0, 0, 0, 0);
-        mat3d Fg = kp->m_Fg;
-        
-        mat3d C = Fg.transpose()*Fg;
-        mat3ds E = ((C - mat3dd(1.0))*0.5).sym();
-        return E;
+        writeAverageElementValue<mat3d>(dom, a, [](const FEMaterialPoint& mp) {
+            const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+            if (pe == nullptr) return mat3d(0, 0, 0, 0, 0, 0, 0, 0, 0);
+            const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+            if (kp == 0) return mat3d(0, 0, 0, 0, 0, 0, 0, 0, 0);
+            mat3d Fg = kp->m_Fg;
+            return Fg;
+        });
     }
-};
+    else if (dom.Class() == FE_DOMAIN_SHELL)
+    {
+        FEShellDomain* sd = dynamic_cast<FEShellDomain*>(&dom); assert(sd);
+        FEElasticEASShellDomain* easd = dynamic_cast<FEElasticEASShellDomain*>(&dom);
+        FEElasticANSShellDomain* ansd = dynamic_cast<FEElasticANSShellDomain*>(&dom);
+        if (easd || ansd)
+        {
+            return false;
+        }
+        else
+        {
+            writeAverageElementValue<mat3d>(dom, a, [](const FEMaterialPoint& mp) {
+                const FEElasticMaterialPoint* pe = mp.ExtractData<FEElasticMaterialPoint>();
+                if (pe == nullptr) return mat3d(0, 0, 0, 0, 0, 0, 0, 0, 0);
+                const FEKinematicMaterialPoint* kp = pe->ExtractData<FEKinematicMaterialPoint>();
+                if (kp == 0) return mat3d(0, 0, 0, 0, 0, 0, 0, 0, 0);
+                mat3d Fg = kp->m_Fg;
+                return Fg;
+            });
+        }
+    }
+    else return false;
+    
+    return true;
+}
 
-//-----------------------------------------------------------------------------
+//=============================================================================
+//! Store the average growth  Lagrangian strain
 bool FEPlotGrowthLagrangeStrain::Save(FEDomain& dom, FEDataStream& a)
 {
     FEKinematicGrowth* pme = dom.GetMaterial()->ExtractProperty<FEKinematicGrowth>();
