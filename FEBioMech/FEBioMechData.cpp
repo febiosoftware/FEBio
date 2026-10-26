@@ -49,7 +49,6 @@ SOFTWARE.*/
 #include "FEDiscreteElasticMaterial.h"
 #include "FESlidingInterface.h"
 #include "FEPreStrainElastic.h"
-#include "FEKinematicGrowth.h"
 #include <FECore/FESolidDomain.h>
 
 //-----------------------------------------------------------------------------
@@ -1842,13 +1841,8 @@ double FELogElemDeformationGradientXX::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(0,0);
-        }
-		else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(0,0);
 		}
@@ -1863,13 +1857,8 @@ double FELogElemDeformationGradientXY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(0,1);
-        }
-        else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(0,1);
 		}
@@ -1884,13 +1873,8 @@ double FELogElemDeformationGradientXZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(0,2);
-        }
-        else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(0,2);
 		}
@@ -1905,13 +1889,8 @@ double FELogElemDeformationGradientYX::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(1,0);
-        }
-        else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(1,0);
 		}
@@ -1926,13 +1905,8 @@ double FELogElemDeformationGradientYY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(1,1);
-        }
-        else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(1,1);
 		}
@@ -1947,13 +1921,8 @@ double FELogElemDeformationGradientYZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(1,2);
-        }
-        else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(1,2);
 		}
@@ -1968,13 +1937,8 @@ double FELogElemDeformationGradientZX::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(2,0);
-        }
-        else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(2,0);
 		}
@@ -1989,13 +1953,8 @@ double FELogElemDeformationGradientZY::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(2,1);
-        }
-        else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(2,1);
 		}
@@ -2010,13 +1969,8 @@ double FELogElemDeformationGradientZZ::value(FEElement& el)
 	int nint = el.GaussPoints();
 	for (int i=0; i<nint; ++i)
 	{
-        FEKinematicMaterialPoint* kp = el.GetMaterialPoint(i)->ExtractData<FEKinematicMaterialPoint>();
 		FEElasticMaterialPoint* pt = el.GetMaterialPoint(i)->ExtractData<FEElasticMaterialPoint>();
-        if (kp)
-        {
-            val += kp->m_Fe(2,2);
-        }
-        else if (pt)
+		if (pt)
 		{
 			val += pt->m_F(2,2);
 		}
