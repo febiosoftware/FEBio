@@ -42,6 +42,10 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEPIDController.h"
 #include "FEDataMap.h"
+#include <FECore/FELogNodeData.h>
+#include <FECore/FELogFaceData.h>
+#include <FECore/FELogElemData.h>
+#include <FECore/DataRecord.h>
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -781,4 +785,94 @@ void FEPlotFieldVariable::Serialize(DumpStream& ar)
 {
 	FEPlotNodeData::Serialize(ar);
 	ar & m_dofs;
+}
+
+FEPlotLogVariable::FEPlotLogVariable(FEModel* pfem) : FEPlotData(pfem)
+{
+	SetStorageFormat(FMT_ITEM);
+	SetVarType(PLT_FLOAT);
+}
+
+bool FEPlotLogVariable::SetFilter(const char* sz)
+{
+	if (sz == nullptr) return false;
+	FEModel* fem = GetFEModel();
+	DataStore& DS = fem->GetDataStore();
+
+	DataRecordItem it = ProcessDataString(sz);
+	if (!it.isValid()) return false;
+
+	const char* szvar = it.name.c_str();
+
+	// try nodal variables first
+	m_logvar = fecore_new<FELogNodeData>(szvar, fem);
+	if (m_logvar == nullptr)
+	{
+		// try element variables next
+		m_logvar = fecore_new<FELogElemData>(szvar, fem);
+		if (m_logvar == nullptr)
+		{
+			// try face variables next
+			m_logvar = fecore_new<FELogFaceData>(szvar, fem);
+			if (m_logvar == nullptr) return false;
+			else SetRegionType(FE_REGION_SURFACE);
+		}
+		else 
+			SetRegionType(FE_REGION_DOMAIN);
+	}
+	else
+		SetRegionType(FE_REGION_NODE);
+
+	if (!ApplyDataRecordItem(*m_logvar, it))
+		return false;
+
+	return true;
+}
+
+bool FEPlotLogVariable::Save(FEDomain& dom, FEDataStream& a)
+{
+	if (RegionType() != FE_REGION_DOMAIN) return false;
+	FELogElemData* logvar = dynamic_cast<FELogElemData*>(m_logvar);
+	if (logvar == nullptr) return false;
+
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double v = logvar->value(el);
+		a << v;
+	}
+	
+	return true;
+}
+
+bool FEPlotLogVariable::Save(FESurface& surf, FEDataStream& a)
+{
+	if (RegionType() != FE_REGION_SURFACE) return false;
+	FELogFaceData* logvar = dynamic_cast<FELogFaceData*>(m_logvar);
+	if (logvar == nullptr) return false;
+
+	for (int i = 0; i < surf.Elements(); ++i)
+	{
+		FESurfaceElement& face = surf.Element(i);
+		double v = logvar->value(face);
+		a << v;
+	}
+
+	return true;
+}
+
+bool FEPlotLogVariable::Save(FEMesh& mesh, FEDataStream& a)
+{
+	if (RegionType() != FE_REGION_NODE) return false;
+	FELogNodeData* logvar = dynamic_cast<FELogNodeData*>(m_logvar);
+	if (logvar == nullptr) return false;
+
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		double v = logvar->value(node);
+		a << v;
+	}
+
+	return true;
 }
