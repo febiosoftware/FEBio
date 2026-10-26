@@ -127,7 +127,7 @@ REGISTER_FECORE_CLASS(FEPlotParameter, "parameter");
 REGISTER_FECORE_CLASS(FEPlotPIDController, "pid controller");
 REGISTER_FECORE_CLASS(FEPlotMeshData, "mesh_data");
 REGISTER_FECORE_CLASS(FEPlotFieldVariable, "field");
-REGISTER_FECORE_CLASS(FEPlotLogVariable, "log");
+REGISTER_FECORE_CLASS(FEPlotLogVariable, "log_data");
 
 // 1D functions
 REGISTER_FECORE_CLASS(FEPointFunction , "point");
