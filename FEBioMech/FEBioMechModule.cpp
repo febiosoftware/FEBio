@@ -1150,6 +1150,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 0, "Ft_zx");
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 1, "Ft_zy");
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 2, "Ft_zz");
+	REGISTER_FECORE_CLASS(FELogKGElasticDeformationGradient, "Fkge");
 
 	// derived from FELogDomainData
 	REGISTER_FECORE_CLASS(FELogNormalizedInternalEnergy, "normalized internal energy");

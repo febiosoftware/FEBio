@@ -50,6 +50,7 @@ SOFTWARE.*/
 #include "FESlidingInterface.h"
 #include "FEPreStrainElastic.h"
 #include <FECore/FESolidDomain.h>
+#include "FEKinematicGrowth.h"
 
 //-----------------------------------------------------------------------------
 double FELogNodeXPos::value(const FENode& node)
@@ -2489,6 +2490,22 @@ mat3ds FELogElementMixtureStress::typedValue(FEElement& el)
 	s /= (double)el.GaussPoints();
 
 	return s;
+}
+
+mat3d FELogKGElasticDeformationGradient::typedValue(FEElement& el)
+{
+	mat3d Fe(0.0);
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEKinematicMaterialPoint* pt = mp.ExtractData<FEKinematicMaterialPoint>();
+		if (pt)
+		{
+			Fe += pt->m_Fe;
+		}
+	}
+	return Fe / (double)nint;
 }
 
 //-----------------------------------------------------------------------------
