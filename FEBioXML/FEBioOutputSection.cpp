@@ -90,9 +90,6 @@ void FEBioOutputSection::Parse(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 {
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-
 	// Get the feb file path
 	const char* szpath = GetFileReader()->GetFilePath();
 
@@ -154,137 +151,15 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 		// allocate data record
 		DataRecord* pdr = nullptr;
-		if (tag == "node_data")
-		{
-			pdr = fecore_new<DataRecord>("node_data", &fem);
-
-			const char* sztmp = "set";
-			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "node_set";
-			const char* sz = tag.AttributeValue(sztmp, true);
-			if (sz)
-			{
-				FENodeSet* pns = mesh.FindNodeSet(sz);
-				if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
-
-				vector<int> items;
-				int n = pns->Size();
-				assert(n);
-				items.resize(n);
-				for (int i = 0; i < n; ++i) items[i] = (*pns)[i] + 1;
-
-				pdr->SetItemList(items);
-			}
-			else
-			{
-				std::vector<int> items;
-				string_to_int_vector(tag.szvalue(), items);
-				pdr->SetItemList(items);
-			}
-		}
-		else if (tag == "face_data")
-		{
-			pdr = fecore_new<DataRecord>("face_data", &fem);
-
-			const char* sz = tag.AttributeValue("surface");
-			FESurface* surf = mesh.FindSurface(sz);
-			if (surf == nullptr)
-			{
-				FEFacetSet* pfs = mesh.FindFacetSet(sz);
-				if (pfs == nullptr) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-
-				surf = new FESurface(&fem);
-				surf->Create(*pfs);
-				surf->SetName(sz);
-				surf->Init();
-				mesh.AddSurface(surf);
-			}
-
-			std::vector<int> items;
-			string_to_int_vector(tag.szvalue(), items);
-
-			// TODO: This is a bit of a hack, because the face data record needs an FEItemList, but FESurface is derived from that.
-			FEFacetSet* fset = surf->GetFacetSet();
-			fset->SetSurface(surf);
-			pdr->SetItemList(fset, items);
-		}
-		else if (tag == "element_data")
-		{
-			pdr = fecore_new<DataRecord>("element_data", &fem);
-
-			const char* sztmp = "elset";
-			if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "elem_set";
-
-			const char* sz = tag.AttributeValue(sztmp, true);
-			if (sz)
-			{
-				vector<int> dummy;
-				FEElementSet* pes = mesh.FindElementSet(sz);
-				if (pes == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
-				pdr->SetItemList(pes, dummy);
-			}
-			else
-			{
-				std::vector<int> items;
-				string_to_int_vector(tag.szvalue(), items);
-				pdr->SetItemList(items);
-			}
-		}
-		else if (tag == "rigid_body_data")
-		{
-			pdr = fecore_new<DataRecord>("rigid_body_data", &fem);
-			std::vector<int> items;
-			string_to_int_vector(tag.szvalue(), items);
-			pdr->SetItemList(items);
-		}
-        else if (tag == "rigid_connector_data")
-        {
-			pdr = fecore_new<DataRecord>("rigid_connector_data", &fem);
-			std::vector<int> items;
-			string_to_int_vector(tag.szvalue(), items);
-			pdr->SetItemList(items);
-        }
-        else if (tag == "surface_data")
-        {
-            FESurfaceDataRecord* prec = new FESurfaceDataRecord(&fem);
-			pdr = prec;
-			const char* sz = tag.AttributeValue("surface");
-			if (sz)
-			{
-				int surfIndex = mesh.FindSurfaceIndex(sz);
-				if (surfIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
-				prec->SetSurface(surfIndex);
-			}
-        }
-        else if (tag == "domain_data")
-        {
-            FEDomainDataRecord* prec = new FEDomainDataRecord(&fem);
-			pdr = prec;
-			const char* sz = tag.AttributeValue("domain", true);
-			if (sz)
-			{
-				int domainIndex = mesh.FindDomainIndex(sz);
-				if (domainIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "domain", sz);
-				prec->SetDomain(domainIndex);
-			}
-        }
-        else if (tag == "model_data")
-        {
-            pdr = new FEModelDataRecord(&fem);
-        }
-		else if (tag == "define_element_data")
-		{
-			if (szname == nullptr) throw XMLReader::MissingAttribute(tag, "name");
-			const char* sztype = tag.AttributeValue("type");
-
-			FELogElemDefinition* pdef = fecore_new<FELogElemDefinition>(sztype, &fem);
-			if (pdef == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-			pdef->SetName(szname);
-
-			DataStore& DS = GetFEModel()->GetDataStore();
-			DS.AddElementDataDefinition(pdef);
-
-			ReadParameterList(tag, pdef);
-		}
+		if      (tag == "node_data"           ) pdr = ParseNodeData(tag);
+		else if (tag == "face_data"           ) pdr = ParseFaceData(tag);
+		else if (tag == "element_data"        ) pdr = ParseElemData(tag);
+		else if (tag == "rigid_body_data"     ) pdr = ParseRigidBodyData(tag);
+		else if (tag == "rigid_connector_data") pdr = ParseRigidConnectorData(tag);
+		else if (tag == "surface_data"        ) pdr = ParseSurfaceData(tag);
+		else if (tag == "domain_data"         ) pdr = ParseDomainData(tag);
+		else if (tag == "model_data"          ) pdr = ParseModelData(tag);
+		else if (tag == "define_element_data" ) pdr = ParseDefineElementData(tag);
 		else
 			throw XMLReader::InvalidTag(tag);
 
@@ -304,7 +179,179 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 	while (!tag.isend());
 }
 
-//-----------------------------------------------------------------------------
+DataRecord* FEBioOutputSection::ParseNodeData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	DataRecord* pdr = fecore_new<DataRecord>("node_data", &fem);
+
+	const char* sztmp = "set";
+	if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "node_set";
+	const char* sz = tag.AttributeValue(sztmp, true);
+	if (sz)
+	{
+		FENodeSet* pns = mesh.FindNodeSet(sz);
+		if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
+
+		vector<int> items;
+		int n = pns->Size();
+		assert(n);
+		items.resize(n);
+		for (int i = 0; i < n; ++i) items[i] = (*pns)[i] + 1;
+
+		pdr->SetItemList(items);
+	}
+	else
+	{
+		std::vector<int> items;
+		string_to_int_vector(tag.szvalue(), items);
+		pdr->SetItemList(items);
+	}
+
+	return pdr;
+}
+
+DataRecord* FEBioOutputSection::ParseFaceData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	DataRecord* pdr = fecore_new<DataRecord>("face_data", &fem);
+
+	const char* sz = tag.AttributeValue("surface");
+	FESurface* surf = mesh.FindSurface(sz);
+	if (surf == nullptr)
+	{
+		FEFacetSet* pfs = mesh.FindFacetSet(sz);
+		if (pfs == nullptr) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+
+		surf = new FESurface(&fem);
+		surf->Create(*pfs);
+		surf->SetName(sz);
+		surf->Init();
+		mesh.AddSurface(surf);
+	}
+
+	std::vector<int> items;
+	string_to_int_vector(tag.szvalue(), items);
+
+	// TODO: This is a bit of a hack, because the face data record needs an FEItemList, but FESurface is derived from that.
+	FEFacetSet* fset = surf->GetFacetSet();
+	fset->SetSurface(surf);
+	pdr->SetItemList(fset, items);
+
+	return pdr;
+}
+
+DataRecord* FEBioOutputSection::ParseElemData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	DataRecord* pdr = fecore_new<DataRecord>("element_data", &fem);
+
+	const char* sztmp = "elset";
+	if (GetFileReader()->GetFileVersion() >= 0x0205) sztmp = "elem_set";
+
+	const char* sz = tag.AttributeValue(sztmp, true);
+	if (sz)
+	{
+		vector<int> dummy;
+		FEElementSet* pes = mesh.FindElementSet(sz);
+		if (pes == 0) throw XMLReader::InvalidAttributeValue(tag, sztmp, sz);
+		pdr->SetItemList(pes, dummy);
+	}
+	else
+	{
+		std::vector<int> items;
+		string_to_int_vector(tag.szvalue(), items);
+		pdr->SetItemList(items);
+	}
+
+	return pdr;
+}
+
+DataRecord* FEBioOutputSection::ParseRigidBodyData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	DataRecord* pdr = fecore_new<DataRecord>("rigid_body_data", &fem);
+	std::vector<int> items;
+	string_to_int_vector(tag.szvalue(), items);
+	pdr->SetItemList(items);
+
+	return pdr;
+}
+
+DataRecord* FEBioOutputSection::ParseRigidConnectorData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	DataRecord* pdr = fecore_new<DataRecord>("rigid_connector_data", &fem);
+	std::vector<int> items;
+	string_to_int_vector(tag.szvalue(), items);
+	pdr->SetItemList(items);
+
+	return pdr;
+}
+
+DataRecord* FEBioOutputSection::ParseSurfaceData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	FESurfaceDataRecord* pdr = new FESurfaceDataRecord(&fem);
+	const char* sz = tag.AttributeValue("surface");
+	if (sz)
+	{
+		int surfIndex = mesh.FindSurfaceIndex(sz);
+		if (surfIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "surface", sz);
+		pdr->SetSurface(surfIndex);
+	}
+
+	return pdr;
+}
+
+DataRecord* FEBioOutputSection::ParseDomainData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	FEDomainDataRecord* pdr = new FEDomainDataRecord(&fem);
+	const char* sz = tag.AttributeValue("domain", true);
+	if (sz)
+	{
+		int domainIndex = mesh.FindDomainIndex(sz);
+		if (domainIndex == -1) throw XMLReader::InvalidAttributeValue(tag, "domain", sz);
+		pdr->SetDomain(domainIndex);
+	}
+	return pdr;
+}
+
+DataRecord* FEBioOutputSection::ParseModelData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	return new FEModelDataRecord(&fem);
+}
+
+DataRecord* FEBioOutputSection::ParseDefineElementData(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	const char* szname = tag.AttributeValue("name");
+	const char* sztype = tag.AttributeValue("type");
+
+	FELogElemDefinition* pdef = fecore_new<FELogElemDefinition>(sztype, &fem);
+	if (pdef == nullptr) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	pdef->SetName(szname);
+
+	DataStore& DS = GetFEModel()->GetDataStore();
+	DS.AddElementDataDefinition(pdef);
+
+	ReadParameterList(tag, pdef);
+
+	return nullptr;
+}
+
 void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
