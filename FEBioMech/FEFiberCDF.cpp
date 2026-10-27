@@ -92,8 +92,8 @@ mat3ds FEFiberCDF::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
         Integrate(mp, In_1);
 
 		// calculate strain energy first derivative
-        double Wl = ksi*fp.m_ds_t*In_1;
-
+        double Wl = ksi*fp.m_ds_t;
+        
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
 	}
