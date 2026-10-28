@@ -77,12 +77,13 @@ tens4ds FEQuemadaFluid::Tangent_RateOfDeformation(FEMaterialPoint& pt)
     FEFluidMaterialPoint& vt = *pt.ExtractData<FEFluidMaterialPoint>();
     mat3ds D = vt.RateOfDeformation();
     double gdot = sqrt(2*(D.sqr()).tr());
-    double grsqrt = sqrt(gdot/m_gc);
-    double k = (m_k0 + m_ki*grsqrt)/(1+grsqrt);
-    double mu = m_mu0*pow(1-0.5*k*m_H,-2);
-    double dmu = (gdot > 0) ? 4*m_mu0*m_H/m_gc*(m_k0 - m_ki)*(1+grsqrt)/grsqrt/pow(-2*(1+grsqrt)+m_H*(m_k0+m_ki*grsqrt),3) : 0.0;
+    double mu = ShearViscosity(pt);
+    // dmu = d(mu)/d(gdot)
+    double dmu = Tangent_ShearViscosity_StrainRate(pt);
     mat3dd I(1.0);
-    tens4ds c = dyad1s(D)*(2*dmu) + dyad4s(I)*(2*mu);
+    // d(sigma)/dD = 2*mu*I4 + 2*D x d(mu)/dD,  with d(mu)/dD = dmu*(2/gdot)*D
+    tens4ds c = dyad4s(I)*(2*mu);
+    if (gdot > 0) c += dyad1s(D)*(4*dmu/gdot);
     return c;
 }
 
@@ -106,11 +107,10 @@ double FEQuemadaFluid::Tangent_ShearViscosity_StrainRate(FEMaterialPoint& mp)
 	mat3ds D = vt.RateOfDeformation();
 	double gdot = sqrt(2 * (D.sqr()).tr());
 	double grsqrt = sqrt(gdot / m_gc);
-	double dmu = (gdot > 0) ? 4 * m_mu0 * m_H / m_gc * (m_k0 - m_ki) * (1 + grsqrt) / grsqrt / pow(-2 * (1 + grsqrt) + m_H * (m_k0 + m_ki * grsqrt), 3) : 0.0;
-	
-   double dmu_dgdot = 0.5 * gdot * dmu;
+	// closed-form d(mu)/d(gdot)
+	double dmu_dgdot = (gdot > 0) ? 4 * m_mu0 * m_H / m_gc * (m_k0 - m_ki) * (1 + grsqrt) / grsqrt / pow(-2 * (1 + grsqrt) + m_H * (m_k0 + m_ki * grsqrt), 3) : 0.0;
 
-   return dmu_dgdot;
+	return dmu_dgdot;
 }
 
 //-----------------------------------------------------------------------------
