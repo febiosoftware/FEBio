@@ -54,7 +54,11 @@ mat3ds FEPermConstIso::Permeability(FEMaterialPoint& mp)
 //! Tangent of permeability
 tens4dmm FEPermConstIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
-	tens4dmm K;
-	K.zero();
-	return K;
+	// Even though the spatial permeability k is constant, the tangent is the push-forward
+	// of 2*dK/dC, where K = J F^-1 k F^-T is the referential permeability. Therefore it
+	// includes the geometric terms k (I x I - 2 I o I), consistent with the other
+	// permeability materials (e.g. Holmes-Mow with k' = 0).
+	mat3dd I(1);
+	double k = m_perm(mp);
+	return dyad1mm(I, mat3ds(I*k)) - dyad4s(I)*(2*k);
 }

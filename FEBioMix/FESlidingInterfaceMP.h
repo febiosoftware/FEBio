@@ -31,7 +31,6 @@ SOFTWARE.*/
 #include "FEBiphasicContactSurface.h"
 #include "FESolute.h"
 #include <FECore/FECoreClass.h>
-#include <map>
 
 //-----------------------------------------------------------------------------
 class FEBIOMIX_API FEMultiphasicContactPoint : public FEBiphasicContactPoint
@@ -45,6 +44,14 @@ public:
     void Init() override
     {
         FEBiphasicContactPoint::Init();
+        // Reset the solute contact data.  The arrays themselves are sized by
+        // FESlidingSurfaceMP::Init(); here we only reset their contents, so
+        // that a model reset or a restart does not inherit stale Lagrange
+        // multipliers, concentration gaps or penalty factors.
+        m_Lmc.assign (m_Lmc.size() , 0.0);
+        m_cg.assign  (m_cg.size()  , 0.0);
+        m_c1.assign  (m_c1.size()  , 0.0);
+        m_epsc.assign(m_epsc.size(), 1.0);
     }
     
     void Serialize(DumpStream& ar) override;
@@ -164,7 +171,9 @@ public:
     //! This resets *all* contact state at that point -- including the solute
     //! multipliers and concentration gaps -- so that no stale traction,
     //! multiplier, slip direction, pressure gap or concentration gap survives.
-    void ReleaseContactPoint(FEMultiphasicContactPoint& data);
+    //! \param sl surface-local solute slots of the surface that owns this
+    //!           point: m_ssl for the primary surface, m_msl for the secondary.
+    void ReleaseContactPoint(FEMultiphasicContactPoint& data, const vector<int>& sl);
 
 	//! calculate contact pressures for file output
 	void UpdateContactPressures();
@@ -224,14 +233,12 @@ public:
 	FESlidingSurfaceMP	m_ss;	//!< primary surface
 	FESlidingSurfaceMP	m_ms;	//!< secondary surface
 	
-	int				m_knmult;		//!< higher order stiffness multiplier
 	bool			m_btwo_pass;	//!< two-pass flag
 	double			m_atol;			//!< augmentation tolerance
 	double			m_gtol;			//!< gap tolerance
 	double			m_ptol;			//!< pressure gap tolerance
 	double			m_ctol;			//!< concentration gap tolerance
 	double			m_stol;			//!< search tolerance
-	bool			m_bsymm;		//!< use symmetric stiffness components only
 	double			m_srad;			//!< contact search radius
 	int				m_naugmax;		//!< maximum nr of augmentations
 	int				m_naugmin;		//!< minimum nr of augmentations
@@ -278,6 +285,11 @@ protected:
 	int             m_naugprev;     //!< nr of augmentations at last Update()
 	int             m_biter;        //!< iteration nr at last augmentation
 	bool            m_bfirst;       //!< first call to Update() (node relocation)
+
+	//! maximum gap at the previous augmentation.  Used as a fallback
+	//! convergence measure when the multiplier ratio is degenerate because
+	//! contact release zeroed the multipliers between augmentations.
+	double          m_maxgapprev;
 
 	DECLARE_FECORE_CLASS();
 };

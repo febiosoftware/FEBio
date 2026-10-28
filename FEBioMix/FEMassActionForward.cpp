@@ -136,19 +136,9 @@ double FEMassActionForward::Tangent_ReactionSupply_Concentration(FEMaterialPoint
         return 0;
     }
     
-    double zhat = ReactionSupply(pt);
-    double dzhatdc = 0;
-	for (int isol = 0; isol < nsol; ++isol) 
-	{
-		double dkdc = m_psm->dkdc(pt, isol, sol);
-		double k = m_psm->GetPartitionCoefficient(pt, isol);
-		double c = m_psm->GetEffectiveSoluteConcentration(pt, sol);
-		dzhatdc += m_vR[isol]*dkdc/k;
-        if ((isol == sol) && (c > 0))
-            dzhatdc += m_vR[isol]/c;
-    }
-    
-    dzhatdc *= zhat;
-    
+    // use the product rule, which remains valid when reactant concentrations are zero
+    double kF = m_pFwd->ReactionRate(pt);
+    double dzhatdc = kF*MassActionProductTangentConcentration(pt, m_vR, sol);
+
     return dzhatdc;
 }

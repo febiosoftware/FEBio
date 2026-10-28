@@ -39,8 +39,11 @@ public:
 	FEMultiphasicStandard(FEModel* pfem);
     
     //! returns a pointer to a new material point object
-	FEMaterialPointData* CreateMaterialPointData();
+	FEMaterialPointData* CreateMaterialPointData() override;
 	
     //! Update solid bound molecules
-    void UpdateSolidBoundMolecules(FEMaterialPoint& mp);
+    void UpdateSolidBoundMolecules(FEMaterialPoint& mp) override;
+
+    //! SBM densities are integrated with the trapezoidal rule
+    double SBMSupplyIntegrationWeight() const override { return 0.5; }
 };

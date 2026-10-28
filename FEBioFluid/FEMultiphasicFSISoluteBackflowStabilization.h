@@ -68,6 +68,7 @@ private:
     FEDofList   m_dofW;
     int         m_dofC;
     vector<bool> m_backflow;    //!< flag for nodes that have backflow
+    double      m_tlast;        //!< time at which backflow status was last evaluated
     FENodeNodeList m_nnlist;
     
     DECLARE_FECORE_CLASS();

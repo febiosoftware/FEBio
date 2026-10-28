@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FETriphasicDomain.h"
+#include "FEMixtureFluxTangent.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 #include "FECore/DOFS.h"
@@ -732,13 +733,10 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
         // evaluate the effective permeability and its derivatives
         mat3ds Ki = K.inverse();
         mat3ds Ke(0,0,0,0,0,0);
-        tens4d G = (dyad1(Ki,I) - dyad4(Ki,I)*2)*2 - ddot(dyad2(Ki,Ki),dKdE);
         vector<mat3ds> Gc(nsol);
         vector<mat3ds> dKedc(nsol);
         for (isol=0; isol<nsol; ++isol) {
             Ke += ImD[isol]*(kappa[isol]*c[isol]/D0[isol]);
-            G += dyad1(ImD[isol],I)*(R*T*c[isol]*J/D0[isol]/phiw*(dkdJ[isol]-kappa[isol]/phiw*dpdJ))
-            +(dyad1(I,I) - dyad2(I,I)*2 - dDdE[isol]/D0[isol])*(R*T*kappa[isol]*c[isol]/phiw/D0[isol]);
             Gc[isol] = ImD[isol]*(kappa[isol]/D0[isol]);
             for (jsol=0; jsol<nsol; ++jsol) {
                 Gc[isol] += ImD[jsol]*(c[jsol]/D0[jsol]*(dkdc[jsol][isol]-kappa[jsol]/D0[jsol]*dD0dc[jsol][isol]))
@@ -747,7 +745,6 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
             Gc[isol] *= R*T/phiw;
         }
         Ke = (Ki + Ke*(R*T/phiw)).inverse();
-        tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
         for (isol=0; isol<nsol; ++isol)
             dKedc[isol] = -(Ke*(-Ki*dKdc[isol]*Ki + Gc[isol])*Ke).sym();
         
@@ -774,12 +771,10 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
                 gp = vec3d(0,0,0);
                 for (isol=0; isol<nsol; ++isol) gp += (D[isol]*gradc[isol])*(kappa[isol]/D0[isol]);
                 gp = gradp+gp*(R*T);
-                wu = vdotTdotv(-gp, dKedE, gradN[j]);
-                for (isol=0; isol<nsol; ++isol) {
-                    wu += (((Ke*(D[isol]*gradc[isol])) & gradN[j])*(J*dkdJ[isol] - kappa[isol])
-                           +Ke*(2*kappa[isol]*(gradN[j]*(D[isol]*gradc[isol]))))*(-R*T/D0[isol])
-                    + (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
-                }
+                // consistent linearization of the fluid and solute fluxes w.r.t. displacement
+                vector<mat3d> djdu;
+                MixtureFluxTangent(gradN[j], J, phiw, R*T, K, dKdE, Ke, gradp, w, D, dDdE, D0,
+                                   kappa, dkdJ, c, gradc, spt.m_j, wu, djdu);
                 qpu = -gradN[j]*(1.0/dt);
                 vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(detJ*dt);
                 ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
@@ -800,12 +795,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
                 De.zero();
                 for (isol=0; isol<nsol; ++isol) {
                     gc[isol] = -gradc[isol]*phiw + w*c[isol]/D0[isol];
-                    ju[isol] = ((D[isol]*gc[isol]) & gradN[j])*(J*dkdJ[isol])
-                    + vdotTdotv(gc[isol], dDdE[isol], gradN[j])*kappa[isol]
-                    + (((D[isol]*gradc[isol]) & gradN[j])*(-phis)
-                       +(D[isol]*((gradN[j]*w)*2) - ((D[isol]*w) & gradN[j]))*c[isol]/D0[isol]
-                       )*kappa[isol]
-                    +D[isol]*wu*(kappa[isol]*c[isol]/D0[isol]);
+                    ju[isol] = djdu[isol];
                     jue += ju[isol]*z[isol];
                     De += D[isol]*(z[isol]*kappa[isol]*c[isol]/D0[isol]);
                     qcu[isol] = qpu*(c[isol]*(kappa[isol]+J*phiw*dkdJ[isol]));
@@ -1036,13 +1026,10 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
         // evaluate the effective permeability and its derivatives
         mat3ds Ki = K.inverse();
         mat3ds Ke(0,0,0,0,0,0);
-        tens4d G = (dyad1(Ki,I) - dyad4(Ki,I)*2)*2 - ddot(dyad2(Ki,Ki),dKdE);
         vector<mat3ds> Gc(nsol);
         vector<mat3ds> dKedc(nsol);
         for (isol=0; isol<nsol; ++isol) {
             Ke += ImD[isol]*(kappa[isol]*c[isol]/D0[isol]);
-            G += dyad1(ImD[isol],I)*(R*T*c[isol]*J/D0[isol]/phiw*(dkdJ[isol]-kappa[isol]/phiw*dpdJ))
-            +(dyad1(I,I) - dyad2(I,I)*2 - dDdE[isol]/D0[isol])*(R*T*kappa[isol]*c[isol]/phiw/D0[isol]);
             Gc[isol] = ImD[isol]*(kappa[isol]/D0[isol]);
             for (jsol=0; jsol<nsol; ++jsol) {
                 Gc[isol] += ImD[jsol]*(c[jsol]/D0[jsol]*(dkdc[jsol][isol]-kappa[jsol]/D0[jsol]*dD0dc[jsol][isol]))
@@ -1051,7 +1038,6 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
             Gc[isol] *= R*T/phiw;
         }
         Ke = (Ki + Ke*(R*T/phiw)).inverse();
-        tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
         for (isol=0; isol<nsol; ++isol)
             dKedc[isol] = -(Ke*(-Ki*dKdc[isol]*Ki + Gc[isol])*Ke).sym();
         
@@ -1077,12 +1063,10 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
                 gp = vec3d(0,0,0);
                 for (isol=0; isol<nsol; ++isol) gp += (D[isol]*gradc[isol])*(kappa[isol]/D0[isol]);
                 gp = gradp+gp*(R*T);
-                wu = vdotTdotv(-gp, dKedE, gradN[j]);
-                for (isol=0; isol<nsol; ++isol) {
-                    wu += (((Ke*(D[isol]*gradc[isol])) & gradN[j])*(J*dkdJ[isol] - kappa[isol])
-                           +Ke*(2*kappa[isol]*(gradN[j]*(D[isol]*gradc[isol]))))*(-R*T/D0[isol])
-                    + (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
-                }
+                // consistent linearization of the fluid and solute fluxes w.r.t. displacement
+                vector<mat3d> djdu;
+                MixtureFluxTangent(gradN[j], J, phiw, R*T, K, dKdE, Ke, gradp, w, D, dDdE, D0,
+                                   kappa, dkdJ, c, gradc, spt.m_j, wu, djdu);
                 vtmp = (wu.transpose()*gradN[i])*(detJ*dt);
                 ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
                 ke[ndpn*i+3][ndpn*j+1] += vtmp.y;
@@ -1102,12 +1086,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
                 De.zero();
                 for (isol=0; isol<nsol; ++isol) {
                     gc[isol] = -gradc[isol]*phiw + w*c[isol]/D0[isol];
-                    ju[isol] = ((D[isol]*gc[isol]) & gradN[j])*(J*dkdJ[isol])
-                    + vdotTdotv(gc[isol], dDdE[isol], gradN[j])*kappa[isol]
-                    + (((D[isol]*gradc[isol]) & gradN[j])*(-phis)
-                       +(D[isol]*((gradN[j]*w)*2) - ((D[isol]*w) & gradN[j]))*c[isol]/D0[isol]
-                       )*kappa[isol]
-                    +D[isol]*wu*(kappa[isol]*c[isol]/D0[isol]);
+                    ju[isol] = djdu[isol];
                     jue += ju[isol]*z[isol];
                     De += D[isol]*(z[isol]*kappa[isol]*c[isol]/D0[isol]);
                 }

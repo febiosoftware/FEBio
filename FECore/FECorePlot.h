@@ -114,3 +114,47 @@ public:
 protected:
 	std::vector<int>	m_dofs;
 };
+
+//! Plot variable for log variables
+class FELogNodeData;
+class FELogFaceData;
+class FELogElemData;
+
+class FECORE_API FEPlotLogNodeData : public FEPlotNodeData
+{
+public:
+	FEPlotLogNodeData(FEModel* pfem);
+
+	bool SetFilter(const char* sz) override;
+
+	bool Save(FEMesh& mesh, FEDataStream& a) override;
+
+private:
+	FELogNodeData* m_logvar = nullptr;
+};
+
+class FECORE_API FEPlotLogFaceData : public FEPlotSurfaceData
+{
+public:
+	FEPlotLogFaceData(FEModel* pfem);
+
+	bool SetFilter(const char* sz) override;
+
+	bool Save(FESurface& dom, FEDataStream& a) override;
+
+private:
+	FELogFaceData* m_logvar = nullptr;
+};
+
+class FECORE_API FEPlotLogElemData : public FEPlotDomainData
+{
+public:
+	FEPlotLogElemData(FEModel* pfem);
+
+	bool SetFilter(const char* sz) override;
+
+	bool Save(FEDomain& dom, FEDataStream& a) override;
+
+private:
+	FELogElemData* m_logvar = nullptr;
+};

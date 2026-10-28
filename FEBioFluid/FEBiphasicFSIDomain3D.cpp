@@ -500,7 +500,6 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
     vector<mat3d> gradgradN(neln);
     
     double dt = tp.timeIncrement;
-    double a = tp.gamma/(tp.beta*dt);
     double c = tp.alpham/(tp.alphaf*tp.gamma*dt);
     
     double dtrans = m_btrans ? 1 : m_sseps;
@@ -547,20 +546,12 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         double Jf = 1 + pt.m_ef;
 
         // get the tangents
-        mat3ds se = m_pMat->Solid()->Stress(mp);
-        tens4ds cs = m_pMat->Solid()->Tangent(mp);
-        mat3ds sv = m_pMat->Fluid()->GetViscous()->Stress(mp);
         mat3ds svJ = m_pMat->Fluid()->GetViscous()->Tangent_Strain(mp);
         tens4ds cv = m_pMat->Fluid()->Tangent_RateOfDeformation(mp);
         double dp = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
         double d2p = m_pMat->Fluid()->Tangent_Pressure_Strain_Strain(mp);
-        vec3d gradp = pt.m_gradef*dp;
-        // Jsdot/Js = div(vs)
-        double dJsoJ = fpt.m_Jdot/et.m_J;
         mat3ds km1 = m_pMat->InvPermeability(mp);
         
-        //Include dependence of permeability on displacement
-        tens4dmm K = m_pMat->Permeability_Tangent(mp);
         
         // include contributions from fluid supply (if present)
         double phifhat = 0;
@@ -597,38 +588,25 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         {
             for (j=0, j7 = 0; j<neln; ++j, j7 += 7)
             {
-                mat3d M = mat3dd(a*dtrans) - et.m_L;
-                tens4d km1km1 = dyad2(km1,km1);
-                tens4d Kfull = tens4d(K);
                 
-                mat3d Kuu = (sv*((gradN[j]&gradN[i])*phis) - (-((sv*gradN[i])&gradN[j])*phis/phif + vdotTdotv(gradN[i], cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M))*phis - vdotTdotv(gradN[i], cv, fpt.m_w*phis/(phif*phif)) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif)) + vdotTdotv(gradN[i], cv, fpt.m_w*phis*phis/(phif*phif)) * ((-bpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + mat3dd((se*gradN[i])*gradN[j]) + vdotTdotv(gradN[i], cs, gradN[j]) - (((sv*bpt.m_gradJ)*phis/(et.m_J*phif*phif))&gradN[j])*H[i] + (-((sv*bpt.m_gradJ)&gradN[j])*phis/phif + vdotTdotv(bpt.m_gradJ, cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M))*phis/(phif*et.m_J)*H[i] + vdotTdotv(bpt.m_gradJ, cv, fpt.m_w*phis/(phif*phif*phif*et.m_J)*H[i]) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif)) - vdotTdotv(bpt.m_gradJ, cv, fpt.m_w*phis*phis/(phif*phif*phif*et.m_J)*H[i]) * ((-bpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + sv*((bpt.m_gradJ&gradN[j]) - (gradN[j]&bpt.m_gradJ) + gradgradN[j]*et.m_J)*H[i]*phis/(phif*et.m_J) + (-((km1*fpt.m_w)&gradN[j])*2.0 + (gradN[j]&(km1*fpt.m_w)) + km1*(gradN[j]*fpt.m_w) + ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i])*detJ; //mixture 3 adjusted viscous stress
                 
-                mat3d Kuw = (vdotTdotv(gradN[i], cv, (gradphif*H[j]/phif-gradN[j]))*phis/phif + vdotTdotv((-gradphif*H[j]/phif + gradN[j]), cv, bpt.m_gradJ)*H[i]*phis/(phif*phif*et.m_J) - km1*H[i]*H[j])*detJ; //mixture 3 adjusted stress
+                mat3d Kuw = (vdotTdotv(gradN[i], cv, (gradphif*H[j]/phif-gradN[j]))*phis/phif + vdotTdotv(bpt.m_gradJ, cv, (-gradphif*H[j]/phif + gradN[j]))*H[i]*phis/(phif*phif*et.m_J) - km1*H[i]*H[j])*detJ; //mixture 3 adjusted stress
                 
                 vec3d kuJ = ((-svJ*gradN[i])*H[j]*phis + svJ*bpt.m_gradJ*H[j]*H[i]*phis/(phif*et.m_J))*detJ; //mixture 3 adjusted stress
                 
-                mat3d Kwu = (((gradp&gradN[j])-(gradN[j]&gradp))*H[i] + sv*((bpt.m_gradJ&gradN[j])*(phis/phif)+(gradN[j]&bpt.m_gradJ) - gradgradN[j]*et.m_J)*(phis*H[i]/(et.m_J*phif)) - (-((sv*bpt.m_gradJ)&gradN[j])*phis/phif + vdotTdotv(bpt.m_gradJ, cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M))*H[i]*phis/(phif*et.m_J) - vdotTdotv(bpt.m_gradJ*H[i]*phis/(et.m_J*phif*phif*phif), cv, fpt.m_w) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif)) + vdotTdotv(bpt.m_gradJ*H[i]*phis*phis/(et.m_J*phif*phif*phif), cv, fpt.m_w) * (-(bpt.m_gradJ&gradN[j])/et.m_J + gradgradN[j]) + sv*((gradN[i]&gradN[j])-(gradN[j]&gradN[i])) + (-((sv*gradN[i])&gradN[j])*phis/phif + vdotTdotv(gradN[i], cv, gradN[j])*(-bpt.m_Lw.sym()*phis/(phif*phif) + M)) + vdotTdotv(gradN[i], cv, fpt.m_w/(phif*phif)) * ((gradphif&gradN[j])*2.0*phis/phif + (gradN[j]&gradphif)) + vdotTdotv(gradN[i], cv, fpt.m_w*phis/(phif*phif)) * ((bpt.m_gradJ&gradN[j])/et.m_J - gradgradN[j]) + (((km1*fpt.m_w)&gradN[j])*2.0 - (gradN[j]&(km1*fpt.m_w)) - km1*(gradN[j]*fpt.m_w) - ddot(ddot(km1km1,Kfull),mat3dd(gradN[j]*fpt.m_w)))*H[i])*detJ; //fluid adjusted visc stress
                 
                 mat3d Kww = ((vdotTdotv(bpt.m_gradJ, cv, (gradphif*H[j]/phif-gradN[j]))*phis/(phif*phif*et.m_J) + km1*H[j])*H[i] + vdotTdotv(gradN[i], cv, (-gradphif*H[j]/phif+gradN[j]))/phif)*detJ; //fluid adjusted visc stress
                 
                 vec3d kwJ = ((svJ*gradN[i])*H[j] +(gradN[j]*dp+(pt.m_gradef*d2p - svJ*bpt.m_gradJ*phis/(phif*et.m_J))*H[j])*H[i])*detJ; //fluid adjusted visc stress
-                vec3d kJu = (((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w)) * gradN[i] + ((gradN[j]*pt.m_efdot + ((gradN[j]&fpt.m_w) - mat3dd(gradN[j]*fpt.m_w))*pt.m_gradef)/Jf - gradN[j]*(dJsoJ + a*dtrans) + et.m_L.transpose()*gradN[j]*dtrans
-                                                                                           + (dphifhatdE+mat3dd(phifhat))*gradN[j])*H[i])*detJ;
                 vec3d kJw = ((pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j] + dphifhatdD*(gradN[j]-gradphif*(H[j]/phif))*(H[i]/phif))*detJ;
                 double kJJ = (((c*phif*dtrans - (pt.m_efdot*phif + pt.m_gradef*fpt.m_w)/Jf)*H[j] + gradN[j]*fpt.m_w)*H[i]/Jf
                               +H[i]*H[j]*dphifhatdef)*detJ;
 
-                ke[i7  ][j7  ] += Kuu(0,0); ke[i7  ][j7+1] += Kuu(0,1); ke[i7  ][j7+2] += Kuu(0,2);
-                ke[i7+1][j7  ] += Kuu(1,0); ke[i7+1][j7+1] += Kuu(1,1); ke[i7+1][j7+2] += Kuu(1,2);
-                ke[i7+2][j7  ] += Kuu(2,0); ke[i7+2][j7+1] += Kuu(2,1); ke[i7+2][j7+2] += Kuu(2,2);
                 
                 ke[i7  ][j7+3] += Kuw(0,0); ke[i7  ][j7+4] += Kuw(0,1); ke[i7  ][j7+5] += Kuw(0,2);
                 ke[i7+1][j7+3] += Kuw(1,0); ke[i7+1][j7+4] += Kuw(1,1); ke[i7+1][j7+5] += Kuw(1,2);
                 ke[i7+2][j7+3] += Kuw(2,0); ke[i7+2][j7+4] += Kuw(2,1); ke[i7+2][j7+5] += Kuw(2,2);
                 
-                ke[i7+3][j7  ] += Kwu(0,0); ke[i7+3][j7+1] += Kwu(0,1); ke[i7+3][j7+2] += Kwu(0,2);
-                ke[i7+4][j7  ] += Kwu(1,0); ke[i7+4][j7+1] += Kwu(1,1); ke[i7+4][j7+2] += Kwu(1,2);
-                ke[i7+5][j7  ] += Kwu(2,0); ke[i7+5][j7+1] += Kwu(2,1); ke[i7+5][j7+2] += Kwu(2,2);
                 
                 ke[i7+3][j7+3] += Kww(0,0); ke[i7+3][j7+4] += Kww(0,1); ke[i7+3][j7+5] += Kww(0,2);
                 ke[i7+4][j7+3] += Kww(1,0); ke[i7+4][j7+4] += Kww(1,1); ke[i7+4][j7+5] += Kww(1,2);
@@ -642,9 +620,6 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                 ke[i7+4][j7+6] += kwJ.y;
                 ke[i7+5][j7+6] += kwJ.z;
                 
-                ke[i7+6][j7  ] += kJu.x;
-                ke[i7+6][j7+1] += kJu.y;
-                ke[i7+6][j7+2] += kJu.z;
                 
                 ke[i7+6][j7+3] += kJw.x;
                 ke[i7+6][j7+4] += kJw.y;
@@ -654,6 +629,10 @@ void FEBiphasicFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
             }
         }
     }
+
+    // stiffness with respect to the solid displacement (internal and inertial forces)
+    // (replaces the previous closed-form expressions for Kuu, Kwu, and kJu)
+    ElementStiffnessDisplacement(el, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -787,8 +766,6 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
     const double *gw = el.GaussWeights();
     
     double dt = tp.timeIncrement;
-    double a = tp.gamma/(tp.beta*dt);
-    double b = tp.alpham/(tp.alphaf*tp.beta*dt*dt);
     double c = tp.alpham/(tp.alphaf*tp.gamma*dt);
     
     // calculate element stiffness matrix
@@ -821,10 +798,8 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
         FEElasticMaterialPoint& et = *(mp.ExtractData<FEElasticMaterialPoint>());
         FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
         FEFSIMaterialPoint& fpt = *(mp.ExtractData<FEFSIMaterialPoint>());
-        FEBiphasicFSIMaterialPoint& bpt = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
         double Jf = 1 + pt.m_ef;
 
-        double denss = m_pMat->SolidDensity(mp);
         double densTf = m_pMat->TrueFluidDensity(mp);
         
         // Jsdot/Js = div(vs)
@@ -854,26 +829,18 @@ void FEBiphasicFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
             for (j=0, j7 = 0; j<neln; ++j, j7 += 7)
             {
                 
-                mat3d Kuu = ((mat3dd(b*H[j]*dtrans))*denss*H[i] + (((et.m_a*phis)&gradN[j]) + mat3dd(b*phif*H[j]*dtrans) - ((fpt.m_w&gradN[j]) * (-1.0/phif*dJsoJ + a*dtrans) - (fpt.m_w&(et.m_L.transpose()*gradN[j]*dtrans)))*phis/phif + mat3dd(gradN[j]*fpt.m_w*a*dtrans) - ((bpt.m_Lw*fpt.m_w)&gradN[j])*phis/(phif*phif) + ((fpt.m_w&gradN[j])*((gradphif*2.0/phif + bpt.m_gradJ/et.m_J)*fpt.m_w) - (fpt.m_w&(gradgradN[j].transpose()*fpt.m_w)))*phis/(phif*phif) - pt.m_Lf*(mat3dd(gradN[j]*fpt.m_w)) - (pt.m_aft&gradN[j])*phis)*(-H[i]*densTf*phis/phif))*detJ; //mixture 2
                 
                 mat3d Kuw = ((mat3dd(c*dtrans-phis/phif*dJsoJ-(gradphif*fpt.m_w)/(phif*phif))+pt.m_Lf)*H[j] + mat3dd(gradN[j]*fpt.m_w)/phif)*(-H[i]*densTf/phif*phis*detJ); //mixture 2
                 
                 vec3d kuJ = pt.m_aft*(densTf/Jf*H[i]*H[j]*phis*detJ); //mixture 2
-                mat3d Kwu = (((et.m_a&gradN[j])*phis + mat3dd(b*phif*H[j]*dtrans) - ((fpt.m_w&gradN[j]) * (-1.0/phif*dJsoJ + a*dtrans) - (fpt.m_w&(et.m_L.transpose()*gradN[j]*dtrans)))*phis/phif + mat3dd(gradN[j]*fpt.m_w*a*dtrans) - ((bpt.m_Lw*fpt.m_w)&gradN[j])*phis/(phif*phif) + ((fpt.m_w&gradN[j])*((gradphif*2.0/phif + bpt.m_gradJ/et.m_J)*fpt.m_w) - (fpt.m_w&(gradgradN[j].transpose()*fpt.m_w)))*phis/(phif*phif) - pt.m_Lf*mat3dd(gradN[j]*fpt.m_w))*(H[i]*densTf/phif) + (pt.m_aft&gradN[j])*H[i]*densTf*(1.0-phis/phif))*detJ;
                 mat3d Kww = ((mat3dd(c*dtrans-phis/phif*dJsoJ-(gradphif*fpt.m_w)/(phif*phif))+pt.m_Lf)*H[j] + mat3dd(gradN[j]*fpt.m_w)/phif)*(H[i]*densTf/phif*detJ);
                 vec3d kwJ = pt.m_aft*(-densTf/Jf*H[i]*H[j]*detJ);
 
-                ke[i7+0][j7  ] += Kuu(0,0); ke[i7+0][j7+1] += Kuu(0,1); ke[i7+0][j7+2] += Kuu(0,2);
-                ke[i7+1][j7  ] += Kuu(1,0); ke[i7+1][j7+1] += Kuu(1,1); ke[i7+1][j7+2] += Kuu(1,2);
-                ke[i7+2][j7  ] += Kuu(2,0); ke[i7+2][j7+1] += Kuu(2,1); ke[i7+2][j7+2] += Kuu(2,2);
                 
                 ke[i7+0][j7+3] += Kuw(0,0); ke[i7+0][j7+4] += Kuw(0,1); ke[i7+0][j7+5] += Kuw(0,2);
                 ke[i7+1][j7+3] += Kuw(1,0); ke[i7+1][j7+4] += Kuw(1,1); ke[i7+1][j7+5] += Kuw(1,2);
                 ke[i7+2][j7+3] += Kuw(2,0); ke[i7+2][j7+4] += Kuw(2,1); ke[i7+2][j7+5] += Kuw(2,2);
                 
-                ke[i7+3][j7  ] += Kwu(0,0); ke[i7+3][j7+1] += Kwu(0,1); ke[i7+3][j7+2] += Kwu(0,2);
-                ke[i7+4][j7  ] += Kwu(1,0); ke[i7+4][j7+1] += Kwu(1,1); ke[i7+4][j7+2] += Kwu(1,2);
-                ke[i7+5][j7  ] += Kwu(2,0); ke[i7+5][j7+1] += Kwu(2,1); ke[i7+5][j7+2] += Kwu(2,2);
                 
                 ke[i7+3][j7+3] += Kww(0,0); ke[i7+3][j7+4] += Kww(0,1); ke[i7+3][j7+5] += Kww(0,2);
                 ke[i7+4][j7+3] += Kww(1,0); ke[i7+4][j7+4] += Kww(1,1); ke[i7+4][j7+5] += Kww(1,2);
@@ -1113,4 +1080,206 @@ void FEBiphasicFSIDomain3D::Serialize(DumpStream& ar)
 {
     FESolidDomain::Serialize(ar);
     ar & m_sseps & m_btrans;
+}
+
+//-----------------------------------------------------------------------------
+//! Stiffness of the internal and inertial forces with respect to the solid displacement.
+//! The columns of the element stiffness matrix associated with the displacement DOFs
+//! are evaluated as directional derivatives of the residual terms in ElementInternalForce
+//! and ElementInertialForce, consistent with the kinematics evaluated in UpdateElementStress
+//! (the velocity gradient L and the rate dJ/dt of the solid volume ratio are evaluated with a
+//! backward difference, whereas the solid velocity and acceleration use the Newmark/generalized-alpha
+//! update of the solver). The relative fluid flux w is a nodal DOF and does not change when the
+//! displacement is perturbed.
+void FEBiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, matrix& ke)
+{
+    const FETimeInfo& tp = GetFEModel()->GetTime();
+    const int nint = el.GaussPoints();
+    const int neln = el.Nodes();
+    const int ndpn = 7;
+
+    const double dt = tp.timeIncrement;
+    const double af = tp.alphaf;
+    const double am = tp.alpham;
+    const double dtrans = m_btrans ? 1 : m_sseps;
+    const double atrans = m_btrans ? 1 : 0;
+    // derivative of the nodal solid acceleration with respect to the nodal position
+    const double bacc = (tp.beta > 0) ? 1.0/(tp.beta*dt*dt) : 0;
+
+    vector<vec3d> gradN(neln);
+    vector<mat3d> gradgradN(neln);
+    vec3d g[3], dg[3][3];
+    double Ji[3][3];
+    const double* gw = el.GaussWeights();
+    const vec3d e[3] = { vec3d(1,0,0), vec3d(0,1,0), vec3d(0,0,1) };
+
+    for (int n=0; n<nint; ++n)
+    {
+        // current (intermediate) volume element
+        double dv = invjact(el, Ji, n, af)*gw[n];
+
+        ContraBaseVectors(el, n, g, af);
+        ContraBaseVectorDerivatives(el, n, dg, af);
+        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+        double* H = el.H(n);
+        double* Gr = el.Gr(n); double* Gs = el.Gs(n); double* Gt = el.Gt(n);
+        double* Grr = el.Grr(n); double* Grs = el.Grs(n); double* Grt = el.Grt(n);
+        double* Gsr = el.Gsr(n); double* Gss = el.Gss(n); double* Gst = el.Gst(n);
+        double* Gtr = el.Gtr(n); double* Gts = el.Gts(n); double* Gtt = el.Gtt(n);
+        for (int i=0; i<neln; ++i) {
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+            gradgradN[i] = (((dg[0][0] & g[0]) + (dg[0][1] & g[1]) + (dg[0][2] & g[2]))*Gr[i]
+                            + ((dg[1][0] & g[0]) + (dg[1][1] & g[1]) + (dg[1][2] & g[2]))*Gs[i]
+                            + ((dg[2][0] & g[0]) + (dg[2][1] & g[1]) + (dg[2][2] & g[2]))*Gt[i]
+                            + (g[0] & g[0])*Grr[i] + (g[0] & g[1])*Gsr[i] + (g[0] & g[2])*Gtr[i]
+                            + (g[1] & g[0])*Grs[i] + (g[1] & g[1])*Gss[i] + (g[1] & g[2] )*Gts[i]
+                            + (g[2] & g[0])*Grt[i] + (g[2] & g[1])*Gst[i] + (g[2] & g[2])*Gtt[i]);
+        }
+
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& et = *(mp.ExtractData<FEElasticMaterialPoint>());
+        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+        FEFSIMaterialPoint& fpt = *(mp.ExtractData<FEFSIMaterialPoint>());
+        FEBiphasicFSIMaterialPoint& bpt = *(mp.ExtractData<FEBiphasicFSIMaterialPoint>());
+
+        // kinematics
+        mat3d Ft; double Jt = defgrad(el, Ft, n);
+        mat3d G = et.m_F*Ft.inverse();
+        // quantities in the configuration at time t (needed for the derivative of grad J when alpha_f < 1)
+        mat3d Fti = Ft.inverse();
+        mat3d Fit = et.m_F.inverse().transpose();
+        vec3d GradJt = FESolidDomain::GradJ(el, n);
+        vec3d gt[3], dgt[3][3];
+        ContraBaseVectors(el, n, gt, 1.0);
+        ContraBaseVectorDerivatives(el, n, dgt, 1.0);
+        const double J = et.m_J;
+        const double Jf = 1 + pt.m_ef;
+        const mat3d& L = et.m_L;
+        const mat3d& Lw = bpt.m_Lw;
+        const vec3d& w = fpt.m_w;
+        const vec3d& gradJ = bpt.m_gradJ;
+        const double Jdot = fpt.m_Jdot;
+        const vec3d& as = et.m_a;
+        const vec3d& aft = pt.m_aft;
+        const double phi0 = bpt.m_phi0;
+
+        // material response
+        mat3ds se = m_pMat->Solid()->Stress(mp);
+        tens4ds cs = m_pMat->Solid()->Tangent(mp);
+        mat3ds sv = m_pMat->Fluid()->GetViscous()->Stress(mp);
+        tens4ds cv = m_pMat->Fluid()->Tangent_RateOfDeformation(mp);
+        double dp = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
+        vec3d gradp = pt.m_gradef*dp;
+        mat3ds km1 = m_pMat->InvPermeability(mp);
+        mat3ds kp = m_pMat->Permeability(mp);
+        tens4dmm Kt = m_pMat->Permeability_Tangent(mp);
+        double densTf = m_pMat->TrueFluidDensity(mp);
+        double densTs = m_pMat->TrueSolidDensity(mp);
+        double phif = m_pMat->Porosity(mp);
+        double phis = m_pMat->SolidVolumeFrac(mp);
+        vec3d gradphif = m_pMat->gradPorosity(mp);
+        double c1 = phis/(phif*J);
+
+        // fluid supply (if present)
+        double phifhat = 0;
+        mat3d dphifhatdE(mat3dd(0));
+        mat3ds dphifhatdD(0);
+        if (m_pMat->FluidSupply()) {
+            phifhat = m_pMat->FluidSupply()->Supply(mp);
+            dphifhatdE = m_pMat->FluidSupply()->Tangent_Supply_Strain(mp);
+            dphifhatdD = m_pMat->FluidSupply()->Tangent_Supply_RateOfDeformation(mp);
+        }
+
+        // unperturbed quantities used in the derivatives
+        double Q = (pt.m_efdot*phif + pt.m_gradef*w)/Jf - Jdot/J + phifhat;
+        vec3d I0 = -aft*densTf + as*densTs;
+        vec3d kw = km1*w;
+        vec3d svgJ = sv*gradJ;
+
+        for (int j=0; j<neln; ++j)
+        {
+            const vec3d& gj = gradN[j];
+            for (int k=0; k<3; ++k)
+            {
+                const vec3d& s = e[k];
+                // perturbation of the (intermediate) configuration
+                mat3d A = (s & gj)*af;          // grad(du)
+                double div = (gj*s)*af;         // div(du)
+                mat3d At = A.transpose();
+
+                double dphis = -phis*div;
+                double dphif = phis*div;
+                // grad J = F^-T (af*GradJt + (1-af)*GradJp): perturbation of F^-T and of GradJt
+                vec3d gtj = Fti.transpose()*(et.m_F.transpose()*gj);   // grad N_j in configuration at time t
+                mat3d HessT = (((dgt[0][0] & gt[0]) + (dgt[0][1] & gt[1]) + (dgt[0][2] & gt[2]))*Gr[j]
+                            + ((dgt[1][0] & gt[0]) + (dgt[1][1] & gt[1]) + (dgt[1][2] & gt[2]))*Gs[j]
+                            + ((dgt[2][0] & gt[0]) + (dgt[2][1] & gt[1]) + (dgt[2][2] & gt[2]))*Gt[j]
+                            + (gt[0] & gt[0])*Grr[j] + (gt[0] & gt[1])*Gsr[j] + (gt[0] & gt[2])*Gtr[j]
+                            + (gt[1] & gt[0])*Grs[j] + (gt[1] & gt[1])*Gss[j] + (gt[1] & gt[2] )*Gts[j]
+                            + (gt[2] & gt[0])*Grt[j] + (gt[2] & gt[1])*Gst[j] + (gt[2] & gt[2])*Gtt[j]);
+                vec3d dGradJt = GradJt*(gtj*s) + Ft.transpose()*(HessT*s)*Jt;
+                vec3d dgradJ = -(At*gradJ) + Fit*dGradJt*af;
+                vec3d dgradphif = -gradphif*(2*div) + dgradJ*(phi0/(J*J));
+                double dc1 = -c1*div*(2 + phis/phif);
+                mat3d dL = ((s & gj)/dt - ((L*s) & gj)*af)*dtrans;
+                double dJdot = (Jt/dt)*((G.transpose()*gj)*s)*dtrans;
+                mat3d dLw = -((Lw*s) & gj)*af;
+                mat3d dLf = dL + dLw/phif - Lw*(dphif/(phif*phif)) - (w & dgradphif)/(phif*phif) + (w & gradphif)*(2*dphif/(phif*phif*phif));
+                mat3ds dsv = cv.dot(dLf.sym());
+                // full double contraction Kt:A (tens4dmm::dot does not account for both shear components)
+                mat3d KtA; KtA.zero();
+                for (int p=0; p<3; ++p) for (int q=0; q<3; ++q) {
+                    double v = 0;
+                    for (int r=0; r<3; ++r) for (int t=0; t<3; ++t) v += Kt(p,q,r,t)*A(r,t);
+                    KtA(p,q) = v;
+                }
+                mat3d dk = KtA - mat3d(kp)*div + A*kp + mat3d(kp)*At;
+                mat3d dkm1 = -(mat3d(km1)*dk*km1);
+                vec3d das = s*(am*bacc*H[j]*atrans);
+                double dJsoJ = dJdot/J - (Jdot/J)*div;
+                vec3d dN = das*phif + as*dphif - w*((Jdot/J)*(-phis*div/(phif*phif)) + (phis/phif)*dJsoJ) + dLf*w;
+                vec3d daf = dN/phif - aft*(dphif/phif);
+                vec3d dgradp = -(At*gradp);
+                vec3d dgradef = -(At*pt.m_gradef);
+                double dphifhat = 0;
+                for (int a=0; a<3; ++a) for (int b=0; b<3; ++b) dphifhat += dphifhatdE(a,b)*A(a,b);
+                dphifhat += dphifhatdD.dotdot(dLf.sym());
+                double dQ = (pt.m_efdot*dphif + dgradef*w)/Jf - dJsoJ + dphifhat;
+                vec3d dkw = dkm1*w;
+                vec3d dsvgJ = dsv*gradJ + sv*dgradJ;
+
+                for (int i=0; i<neln; ++i)
+                {
+                    const vec3d& gi = gradN[i];
+                    vec3d dgi = -(At*gi);
+
+                    // solid momentum
+                    vec3d dFs = (mat3dd(gi*(se*gj)) + vdotTdotv(gi, cs, gj))*s*af;
+                    dFs -= (sv*gi)*dphis + (dsv*gi)*phis + (sv*dgi)*phis + (sv*gi)*(phis*div);
+                    dFs += (svgJ*dc1 + dsvgJ*c1 + svgJ*(c1*div))*H[i];
+                    dFs -= (dkw + kw*div)*H[i];
+                    dFs += (I0*dphis + (-daf*densTf + das*densTs)*phis + I0*(phis*div))*H[i];
+
+                    // fluid momentum
+                    vec3d dFf = dsv*gi + sv*dgi + (sv*gi)*div;
+                    dFf += (dgradp + dkw - (svgJ*dc1 + dsvgJ*c1) + (gradp + kw - svgJ*c1)*div)*H[i];
+                    dFf += (daf + aft*div)*(densTf*H[i]);
+
+                    // mixture mass balance
+                    double dFJ = H[i]*dQ + dgi*w + (H[i]*Q + gi*w)*div;
+
+                    int r = ndpn*i, c = ndpn*j + k;
+                    ke[r  ][c] += dFs.x*dv;
+                    ke[r+1][c] += dFs.y*dv;
+                    ke[r+2][c] += dFs.z*dv;
+                    ke[r+3][c] += dFf.x*dv;
+                    ke[r+4][c] += dFf.y*dv;
+                    ke[r+5][c] += dFf.z*dv;
+                    ke[r+6][c] += dFJ*dv;
+                }
+            }
+        }
+    }
 }

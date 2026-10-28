@@ -1194,6 +1194,28 @@ vec3d FESlidingInterfaceBiphasicMixed::SlipTangent(FESlidingSurfaceBiphasicMixed
 }
 
 //-----------------------------------------------------------------------------
+//! Clamp the local fluid load support to its physical range [0, (1-phi)^-1],
+//! per Eq. (2.5) and the discussion following it in Zimmerman et al.,
+//! J Biomech Eng 144:021008 (2022).  This keeps the effective friction
+//! coefficient mueff = mu*(1 - (1-phi)*fls) inside [0, mu].
+//!
+//! NOTE: this class had no clamp at all, and it defaults smooth_fls to TRUE.
+//!       On the direct path fls = p/pn and mueff is multiplied by pn again, so
+//!       pn cancels and the traction stays bounded whatever fls does.  With
+//!       smooth_fls, fls comes from GetGPLocalFLS() as -p/tn with tn the
+//!       element-averaged effective normal stress; where the solid is in
+//!       tension, or lightly loaded, tn turns small or positive, fls goes
+//!       large and negative, and mueff grows without bound -- with no pn left
+//!       to cancel it, since mueff no longer depends on pn.
+static double clamp_fls(double fls, double phi)
+{
+    if (fls < 0.0) return 0.0;
+    if (phi >= 1.0) return fls;
+    const double flsmax = 1.0/(1.0 - phi);
+    return (fls > flsmax) ? flsmax : fls;
+}
+
+//-----------------------------------------------------------------------------
 vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicMixed& ss, const int nel, const int n, FESlidingSurfaceBiphasicMixed& ms, double& pn)
 {
 	DOFS& dofs = GetFEModel()->GetDOFS();
@@ -1278,7 +1300,7 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
             if (pn > 0)
             {
                 data.m_mueff = ts/pn;
-                data.m_fls = m_bsmfls ? fls : p/pn;
+                data.m_fls = clamp_fls(m_bsmfls ? fls : p/pn, m_phi);
             }
 
             // store the previous values as the current
@@ -1313,7 +1335,7 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
                 s1 = SlipTangent(ss, nel, n, ms, dh, dr);
                 
                 // calculate effective friction coefficient
-                data.m_fls = m_bsmfls ? fls : p/pn;
+                data.m_fls = clamp_fls(m_bsmfls ? fls : p/pn, m_phi);
                 data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                 data.m_mueff = MBRACKET(data.m_mueff);
 
@@ -1355,7 +1377,7 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
                 // calculate effective friction coefficient
                 if (tn != 0)
                 {
-                    data.m_fls = m_bsmfls ? fls : p/(-tn);
+                    data.m_fls = clamp_fls(m_bsmfls ? fls : p/(-tn), m_phi);
                     mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                     mueff = MBRACKET(mueff);
                 }
@@ -1372,7 +1394,7 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
                     // calculate effective friction coefficient
                     if (pn > 0) {
                         data.m_mueff = ts/pn;
-                        data.m_fls = m_bsmfls ? fls : p/pn;
+                        data.m_fls = clamp_fls(m_bsmfls ? fls : p/pn, m_phi);
                     }
 
                     // store the previous values as the current
@@ -1407,7 +1429,7 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
                         s1 = SlipTangent(ss, nel, n, ms, dh, dr);
                         
                         // calculate effective friction coefficient
-                        data.m_fls = m_bsmfls ? fls : p/pn;
+                        data.m_fls = clamp_fls(m_bsmfls ? fls : p/pn, m_phi);
                         data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                         data.m_mueff = MBRACKET(data.m_mueff);
 
@@ -1440,7 +1462,7 @@ vec3d FESlidingInterfaceBiphasicMixed::ContactTraction(FESlidingSurfaceBiphasicM
                     s1 = SlipTangent(ss, nel, n, ms, dh, dr);
                     
                     // calculate effective friction coefficient
-                    data.m_fls = m_bsmfls ? fls : p/pn;
+                    data.m_fls = clamp_fls(m_bsmfls ? fls : p/pn, m_phi);
                     data.m_mueff = m_mu*(1.0-(1.0-m_phi)*data.m_fls);
                     data.m_mueff = MBRACKET(data.m_mueff);
 
@@ -2256,15 +2278,46 @@ void FESlidingInterfaceBiphasicMixed::StiffnessMatrix(FESlidingSurfaceBiphasicMi
 
                             // c. s-term (Frictional term)
                             //-------------------------------------
-                                
-							vec3d q = s1*m_mu*(1.0 - m_phi);
+                            //
+                            // This linearizes
+                            //
+                            //     mueff = mu*(1 - (1-phi)*fls),  fls = p/pn
+                            //
+                            // with respect to the primary nodal pressures, so it
+                            // is only valid where that expression is what
+                            // produced mueff:
+                            //  - not under smooth_fls, where fls comes from
+                            //    GetGPLocalFLS() -- an average over the parent
+                            //    solid element -- whose linearization bears no
+                            //    relation to mu*(1-phi).  NOTE that smooth_fls
+                            //    defaults to TRUE in this class, so this was the
+                            //    default path.
+                            //  - not where MBRACKET() clipped mueff to zero, in
+                            //    which case d(mueff)/dp = 0.  Marginally-
+                            //    contacting points sit in that regime, so
+                            //    leaving it unguarded injects a large spurious
+                            //    coupling exactly where the contact status is
+                            //    already chattering.
+                            vec3d q(0,0,0);
+                            if ((m_bsmfls == false) && (pt.m_mueff > 0.0))
+                                q = s1*(m_mu*(1.0 - m_phi));
+
+                            // NOTE: this is the only block in this section whose
+                            //       rows are mechanical dofs, i.e. it is
+                            //       d(mechanical residual)/d(pressure).  The
+                            //       mechanical contact residual assembled in
+                            //       LoadVector() carries no dt -- only the fluid
+                            //       flux residual does -- so it must NOT use tmp,
+                            //       which was redefined above to
+                            //       dt*w[j]*detJ[j].
+                            double tmps = w[j]*detJ[j];
 
                             for (int l=0; l<nseln; ++l) {
                                 for (int k=0; k<nseln+nmeln; ++k)
                                 {
-                                    ke[4*k    ][4*l+3] -= tmp*H[k]*N[l]*q.x;
-                                    ke[4*k + 1][4*l+3] -= tmp*H[k]*N[l]*q.y;
-                                    ke[4*k + 2][4*l+3] -= tmp*H[k]*N[l]*q.z;
+                                    ke[4*k    ][4*l+3] -= tmps*H[k]*N[l]*q.x;
+                                    ke[4*k + 1][4*l+3] -= tmps*H[k]*N[l]*q.y;
+                                    ke[4*k + 2][4*l+3] -= tmps*H[k]*N[l]*q.z;
                                 }
                             }
 

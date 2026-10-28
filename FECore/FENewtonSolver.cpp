@@ -627,6 +627,9 @@ bool FENewtonSolver::Quasin()
 	}
 	while (!bconv);
 
+	// notify that the nonlinear iterations are done (but before the solution is committed)
+	fem.DoCallback(CB_QUASIN_CONVERGED);
+
 	// if converged we update the total solution
 	if (bconv)
 	{

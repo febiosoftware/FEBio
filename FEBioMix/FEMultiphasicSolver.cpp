@@ -635,6 +635,9 @@ bool FEMultiphasicSolver::Quasin()
 	}
 	while (bconv == false);
 
+	// notify that the nonlinear iterations are done (but before the solution is committed)
+	fem.DoCallback(CB_QUASIN_CONVERGED);
+
 	// if converged we update the total displacements
 	if (bconv)
 	{

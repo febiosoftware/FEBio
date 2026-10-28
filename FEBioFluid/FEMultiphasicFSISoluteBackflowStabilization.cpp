@@ -43,6 +43,7 @@ END_FECORE_CLASS();
 FEMultiphasicFSISoluteBackflowStabilization::FEMultiphasicFSISoluteBackflowStabilization(FEModel* pfem) : FESurfaceLoad(pfem), m_dofW(pfem)
 {
     m_sol = -1;
+    m_tlast = -1e300;
     m_dofC = (pfem ? pfem->GetDOFIndex(FEBioMultiphasicFSI::GetVariableName(FEBioMultiphasicFSI::FLUID_CONCENTRATION), 0) : -1);
     m_nnlist = FENodeNodeList();
 }
@@ -93,25 +94,40 @@ void FEMultiphasicFSISoluteBackflowStabilization::Activate()
 //! Evaluate and prescribe the resistance pressure
 void FEMultiphasicFSISoluteBackflowStabilization::Update()
 {
-    // determine backflow conditions
-    MarkBackFlow();
-    
     // prescribe solute backflow constraint at the nodes
     FESurface* ps = &GetSurface();
     
     int dofc = m_dofC + m_sol - 1;
+
+    // Determine backflow conditions only once per time step (at the first update of
+    // the time step, based on the flow at the start of the step). Re-evaluating the
+    // backflow status at every iteration could switch nodes between the two types of
+    // prescribed values within a time step, without reforming the stiffness matrix.
+    const FETimeInfo& tp = GetTimeInfo();
+    if ((tp.currentTime != m_tlast) || ((int)m_backflow.size() != ps->Nodes()))
+    {
+        MarkBackFlow();
+        m_backflow.assign(ps->Nodes(), false);
+        for (int i=0; i<ps->Nodes(); ++i)
+            m_backflow[i] = (ps->Node(i).m_ID[dofc] < -1);
+        m_tlast = tp.currentTime;
+    }
     
     for (int i=0; i<ps->Nodes(); ++i)
     {
         FENode& node = ps->Node(i);
-        // set node as having prescribed DOF (concentration at previous time)
-        //Otherwise set node as having concentration of adjacent node
-        if (node.m_ID[dofc] < -1)
-            node.set(dofc, node.get_prev(dofc));
-        else
+        // all nodes on this surface have a prescribed concentration
+        if (node.m_ID[dofc] > -1)
         {
             node.set_bc(dofc, DOF_PRESCRIBED);
             node.m_ID[dofc] = -node.m_ID[dofc] - 2;
+        }
+        // set node as having prescribed DOF (concentration at previous time)
+        //Otherwise set node as having concentration of adjacent node
+        if (m_backflow[i])
+            node.set(dofc, node.get_prev(dofc));
+        else
+        {
             int nid = node.GetID()-1; //0 based
             int val = m_nnlist.Valence(nid);
             int* nlist = m_nnlist.NodeList(nid);

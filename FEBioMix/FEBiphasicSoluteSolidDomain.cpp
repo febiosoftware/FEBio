@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #include "stdafx.h"
 #include "FEBiphasicSoluteSolidDomain.h"
+#include "FEMixtureFluxTangent.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/log.h"
 #include <FECore/FEModel.h>
@@ -727,13 +728,15 @@ bool FEBiphasicSoluteSolidDomain::ElementBiphasicSoluteStiffness(FESolidElement&
         mat3ds Ki = K.inverse();
         mat3ds ImD = I-D/D0;
         mat3ds Ke = (Ki + ImD*(R*T*kappa*c/phiw/D0)).inverse();
-        tens4d G = (dyad1(Ki,I) - dyad4(Ki,I)*2)*2 - ddot(dyad2(Ki,Ki),dKdE)
-        +dyad1(ImD,I)*(R*T*c*J/D0/phiw*(dkdJ-kappa/phiw*dpdJ))
-        +(dyad1(I,I) - dyad2(I,I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
-        tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
         mat3ds Gc = -(Ki*dKdc*Ki).sym() + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
         +R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
         mat3ds dKedc = -(Ke*Gc*Ke).sym();
+        
+        // data for the consistent linearization of the fluid and solute fluxes w.r.t. displacement
+        std::vector<mat3ds> Dv(1, D); std::vector<tens4dmm> dDdEv(1, dDdE);
+        std::vector<double> D0v(1, D0), kappav(1, kappa), dkdJv(1, dkdJ), cv(1, c);
+        std::vector<vec3d> gradcv(1, gradc), jv(1, spt.m_j[0]);
+        std::vector<mat3d> djdu;
         
         // evaluate the tangents of solute supply
         double dcrhatdJ = 0;
@@ -773,10 +776,8 @@ bool FEBiphasicSoluteSolidDomain::ElementBiphasicSoluteStiffness(FESolidElement&
                 
                 // calculate the kpu matrix
                 gp = gradp+(D*gradc)*R*T*kappa/D0;
-                wu = vdotTdotv(-gp, dKedE, gradN[j])
-                -(((Ke*(D*gradc)) & gradN[j])*(J*dkdJ - kappa)
-                  +Ke*(2*kappa*(gradN[j]*(D*gradc))))*R*T/D0
-                - Ke*vdotTdotv(gradc, dDdE, gradN[j])*(kappa*R*T/D0);
+                MixtureFluxTangent(gradN[j], J, phiw, R*T, K, dKdE, Ke, gradp, w, Dv, dDdEv, D0v,
+                                   kappav, dkdJv, cv, gradcv, jv, wu, djdu);
                 qpu = -gradN[j]*(1.0/dt);
                 vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(detJ*dt);
                 ke[5*i+3][5*j  ] += vtmp.x; ke[5*i+3][5*j+1] += vtmp.y; ke[5*i+3][5*j+2] += vtmp.z;
@@ -792,12 +793,7 @@ bool FEBiphasicSoluteSolidDomain::ElementBiphasicSoluteStiffness(FESolidElement&
                 
                 // calculate the kcu matrix
                 gc = -gradc*phiw + w*c/D0;
-                ju = ((D*gc) & gradN[j])*(J*dkdJ)
-                + vdotTdotv(gc, dDdE, gradN[j])*kappa
-                + (((D*gradc) & gradN[j])*(-phis)
-                   +(D*((gradN[j]*w)*2) - ((D*w) & gradN[j]))*c/D0
-                   )*kappa
-                +D*wu*(kappa*c/D0);
+                ju = djdu[0];
                 qcu = qpu*(c*(kappa+J*phiw*dkdJ));
                 vtmp = (ju.transpose()*gradN[i] + qcu*H[i])*(detJ*dt);
                 ke[5*i+4][5*j  ] += vtmp.x; ke[5*i+4][5*j+1] += vtmp.y; ke[5*i+4][5*j+2] += vtmp.z;
@@ -940,13 +936,15 @@ bool FEBiphasicSoluteSolidDomain::ElementBiphasicSoluteStiffnessSS(FESolidElemen
         mat3ds Ki = K.inverse();
         mat3ds ImD = I-D/D0;
         mat3ds Ke = (Ki + ImD*(R*T*kappa*c/phiw/D0)).inverse();
-        tens4d G = (dyad1(Ki,I) - dyad4(Ki,I)*2)*2 - ddot(dyad2(Ki,Ki),dKdE)
-        +dyad1(ImD,I)*(R*T*c*J/D0/phiw*(dkdJ-kappa/phiw*dpdJ))
-        +(dyad1(I,I) - dyad2(I,I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
-        tens4d dKedE = (dyad1(Ke,I) - 2*dyad4(Ke,I))*2 - ddot(dyad2(Ke,Ke),G);
         mat3ds Gc = -(Ki*dKdc*Ki).sym() + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
         +R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
         mat3ds dKedc = -(Ke*Gc*Ke).sym();
+        
+        // data for the consistent linearization of the fluid and solute fluxes w.r.t. displacement
+        std::vector<mat3ds> Dv(1, D); std::vector<tens4dmm> dDdEv(1, dDdE);
+        std::vector<double> D0v(1, D0), kappav(1, kappa), dkdJv(1, dkdJ), cv(1, c);
+        std::vector<vec3d> gradcv(1, gradc), jv(1, spt.m_j[0]);
+        std::vector<mat3d> djdu;
         
         // calculate all the matrices
         vec3d vtmp,gp,gc,wc,jc;
@@ -964,10 +962,8 @@ bool FEBiphasicSoluteSolidDomain::ElementBiphasicSoluteStiffnessSS(FESolidElemen
                 
                 // calculate the kpu matrix
                 gp = gradp+(D*gradc)*R*T*kappa/D0;
-                wu = vdotTdotv(-gp, dKedE, gradN[j])
-                -(((Ke*(D*gradc)) & gradN[j])*(J*dkdJ - kappa)
-                  +Ke*(2*kappa*(gradN[j]*(D*gradc))))*R*T/D0
-                - Ke*vdotTdotv(gradc, dDdE, gradN[j])*(kappa*R*T/D0);
+                MixtureFluxTangent(gradN[j], J, phiw, R*T, K, dKdE, Ke, gradp, w, Dv, dDdEv, D0v,
+                                   kappav, dkdJv, cv, gradcv, jv, wu, djdu);
                 vtmp = (wu.transpose()*gradN[i])*(detJ*dt);
                 ke[5*i+3][5*j  ] += vtmp.x;
                 ke[5*i+3][5*j+1] += vtmp.y;
@@ -975,12 +971,7 @@ bool FEBiphasicSoluteSolidDomain::ElementBiphasicSoluteStiffnessSS(FESolidElemen
                 
                 // calculate the kcu matrix
                 gc = -gradc*phiw + w*c/D0;
-                ju = ((D*gc) & gradN[j])*(J*dkdJ)
-                + vdotTdotv(gc, dDdE, gradN[j])*kappa
-                + (((D*gradc) & gradN[j])*(-phis)
-                   +(D*((gradN[j]*w)*2) - ((D*w) & gradN[j]))*c/D0
-                   )*kappa
-                +D*wu*(kappa*c/D0);
+                ju = djdu[0];
                 vtmp = (ju.transpose()*gradN[i])*(detJ*dt);
                 ke[5*i+4][5*j  ] += vtmp.x;
                 ke[5*i+4][5*j+1] += vtmp.y;

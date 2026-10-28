@@ -1398,6 +1398,7 @@ inline tens4d ddot(const tens4d& a, const tens4ds& b)
 
 //-----------------------------------------------------------------------------
 // vdotTdotv_jk = a_i T_ijkl b_l
+// NOTE: the expression below evaluates (a.T.b)^T, so it is transposed before returning.
 inline mat3d vdotTdotv(const vec3d& a, const tens4d& T, const vec3d& b)
 {
     return mat3d(a.x*b.x*T.d[0] + a.z*b.x*T.d[5] + a.y*b.x*T.d[6] + a.x*b.y*T.d[27] + a.z*b.y*T.d[32] + a.y*b.y*T.d[33] + a.x*b.z*T.d[72] + a.z*b.z*T.d[77] + a.y*b.z*T.d[78],
@@ -1408,7 +1409,7 @@ inline mat3d vdotTdotv(const vec3d& a, const tens4d& T, const vec3d& b)
     a.z*b.y*T.d[11] + a.y*b.y*T.d[13] + a.x*b.y*T.d[17] + a.z*b.z*T.d[38] + a.y*b.z*T.d[40] + a.x*b.z*T.d[44] + a.z*b.x*T.d[56] + a.y*b.x*T.d[58] + a.x*b.x*T.d[62],
     a.x*b.z*T.d[18] + a.z*b.z*T.d[23] + a.y*b.z*T.d[24] + a.x*b.x*T.d[45] + a.z*b.x*T.d[50] + a.y*b.x*T.d[51] + a.x*b.y*T.d[63] + a.z*b.y*T.d[68] + a.y*b.y*T.d[69],
     a.y*b.z*T.d[19] + a.x*b.z*T.d[21] + a.z*b.z*T.d[25] + a.y*b.x*T.d[46] + a.x*b.x*T.d[48] + a.z*b.x*T.d[52] + a.y*b.y*T.d[64] + a.x*b.y*T.d[66] + a.z*b.y*T.d[70],
-    a.z*b.z*T.d[20] + a.y*b.z*T.d[22] + a.x*b.z*T.d[26] + a.z*b.x*T.d[47] + a.y*b.x*T.d[49] + a.x*b.x*T.d[53] + a.z*b.y*T.d[65] + a.y*b.y*T.d[67] + a.x*b.y*T.d[71]);
+    a.z*b.z*T.d[20] + a.y*b.z*T.d[22] + a.x*b.z*T.d[26] + a.z*b.x*T.d[47] + a.y*b.x*T.d[49] + a.x*b.x*T.d[53] + a.z*b.y*T.d[65] + a.y*b.y*T.d[67] + a.x*b.y*T.d[71]).transpose();
 }
 
 //-----------------------------------------------------------------------------

@@ -86,7 +86,13 @@ bool FEBiphasicFSITraction::Init()
         FEBiphasicFSI* pfsi = dynamic_cast<FEBiphasicFSI*>(pm);
         if (pfsi) {
             double s = m_psurf->FacePointing(el, *m_elem[j]);
-            m_s[j] = bself ? -s : s;
+            // s > 0 when the surface normal points out of the biphasic/multiphasic-FSI element.
+            // The traction -p~ n + t_tau is evaluated with n pointing out of the FSI domain,
+            // both on free surfaces and on interfaces with other domains. (Using -s on free
+            // surfaces reversed the sign of the effective pressure term, which went unnoticed
+            // when p~ = 0 on the free surface, but breaks equilibrium when p~ != 0, e.g. when
+            // the bath osmotic pressure is nonzero in multiphasic-FSI.)
+            m_s[j] = s;
             if (m_s[j] == 0) return false;
         }
         else if (!bself) {

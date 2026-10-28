@@ -95,8 +95,15 @@ public:
 public:
     FEFluid* Fluid() { return m_pFluid; }
     
-    //! calculate solute molar flux
+    //! calculate solute molar flux relative to the solvent (diffusive flux only, no body force)
     vec3d SoluteFlux(const FEMaterialPoint& pt, const int sol);
+
+    //! calculate solute molar flux relative to the solvent (diffusive + sedimentation flux),
+    //! where b is the net body force per unit mass acting on the solute
+    vec3d SoluteFlux(const FEMaterialPoint& pt, const int sol, const vec3d& b);
+
+    //! calculate sedimentation solute molar flux for body force per mass b
+    vec3d SoluteSedimentationFlux(const FEMaterialPoint& pt, const int sol, const vec3d& b);
     
     //! calculate diffusive solute molar flux
     vec3d SoluteDiffusiveFlux(const FEMaterialPoint& pt, const int sol);
@@ -118,8 +125,11 @@ public:
     //! electric potential
     double ElectricPotential(const FEMaterialPoint& pt, const bool eform=false);
     
-    //! current density
+    //! current density (no body force)
     vec3d CurrentDensity(const FEMaterialPoint& pt);
+
+    //! current density, including sedimentation (electrophoresis) fluxes due to body force per mass b
+    vec3d CurrentDensity(const FEMaterialPoint& pt, const vec3d& b);
     
     //! solute density
     double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }

@@ -933,6 +933,7 @@ void FEBioMech::InitModule()
     REGISTER_FECORE_CLASS(FEPlotStrongBondDevSED, "deviatoric strong bond SED");
     REGISTER_FECORE_CLASS(FEPlotWeakBondDevSED, "deviatoric weak bond SED");
     REGISTER_FECORE_CLASS(FEPlotTrussStretch  , "truss stretch");
+    REGISTER_FECORE_CLASS(FEPlotGrowthDeformationGradient, "growth deformation gradient");
     REGISTER_FECORE_CLASS(FEPlotGrowthLagrangeStrain, "growth Lagrange strain");
     REGISTER_FECORE_CLASS(FEPlotGrowthInfStrain, "growth infinitesimal strain");
     REGISTER_FECORE_CLASS(FEPlotGrowthRightStretch, "growth right stretch");
@@ -1149,6 +1150,7 @@ void FEBioMech::InitModule()
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 0, "Ft_zx");
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 1, "Ft_zy");
 	REGISTER_FECORE_CLASS_T2(FELogTotalDeformationGradient_T, 2, 2, "Ft_zz");
+	REGISTER_FECORE_CLASS(FELogKGElasticDeformationGradient, "Fkge");
 
 	// derived from FELogDomainData
 	REGISTER_FECORE_CLASS(FELogNormalizedInternalEnergy, "normalized internal energy");

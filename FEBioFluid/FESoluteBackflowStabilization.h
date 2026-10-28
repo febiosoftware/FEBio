@@ -75,6 +75,7 @@ private:
     FEDofList   m_dofW;
     int         m_dofC;
     vector<int> m_ndof;
+    double      m_tlast;    //!< time at which backflow status was last evaluated
 
     DECLARE_FECORE_CLASS();
 };
