@@ -73,6 +73,7 @@ void print_err_pdl(int nerror)
 BEGIN_FECORE_CLASS(PardisoProjectSolver, LinearSolver)
 ADD_PARAMETER(m_print_cn, "print_condition_number");
 ADD_PARAMETER(m_iparm3  , "precondition");
+ADD_PARAMETER(m_pivot_perturbation, "pivot_perturbation");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -81,6 +82,7 @@ PardisoProjectSolver::PardisoProjectSolver(FEModel* fem) : LinearSolver(fem), m_
     m_print_cn = false;
     m_mtype = -2;
     m_iparm3 = false;
+    m_pivot_perturbation = 14;
     m_isFactored = false;
     
     /* If both PARDISO AND PARDISODL are defined, print a warning */
@@ -145,6 +147,12 @@ bool PardisoProjectSolver::PreProcess()
     int error = 0;
     int solver = 0; /* use sparse direct solver */
     pardisoinit(m_pt, &m_mtype, &solver, m_iparm, m_dparm, &error);
+    
+    /* Pivot perturbation threshold 10^-m_pivot_perturbation (iparm(10)).
+     The Panua defaults (12 for nonsymmetric, 8 for symmetric) can perturb many
+     pivots of badly scaled matrices (e.g. fluid-FSI), degrading the solution.
+     A value of 0 keeps the Panua default. */
+    if (m_pivot_perturbation > 0) m_iparm[9] = m_pivot_perturbation;
     
     m_n = m_pA->Rows();
     m_nnz = m_pA->NonZeroes();
@@ -316,9 +324,10 @@ void PardisoProjectSolver::Destroy()
 BEGIN_FECORE_CLASS(PardisoProjectSolver, LinearSolver)
 	ADD_PARAMETER(m_print_cn, "print_condition_number");
 	ADD_PARAMETER(m_iparm3, "precondition");
+	ADD_PARAMETER(m_pivot_perturbation, "pivot_perturbation");
 END_FECORE_CLASS();
 
-PardisoProjectSolver::PardisoProjectSolver(FEModel* fem) : LinearSolver(fem) {}
+PardisoProjectSolver::PardisoProjectSolver(FEModel* fem) : LinearSolver(fem) { m_pivot_perturbation = 14; }
 PardisoProjectSolver::~PardisoProjectSolver() {}
 bool PardisoProjectSolver::PreProcess() { return false; }
 bool PardisoProjectSolver::Factor() { return false; }
