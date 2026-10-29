@@ -126,20 +126,12 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
     // extract inverse of plastic deformation gradient and evaluate elastic deformation gradient
     FEReactivePlasticDamageMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
     FEPlasticFlowCurveMaterialPoint& fp = *pt.ExtractData<FEPlasticFlowCurveMaterialPoint>();
-    FEShellElementNew* sel = dynamic_cast<FEShellElementNew*>(pt.m_elem);
 
     for (int i=0; i<n; ++i) {
+        // total deformation gradient (for EAS and ANS shells, the shell domain sets
+        // pe.m_F to the right stretch tensor of the enhanced strain before calling
+        // this material, see FESolidMaterial::PK2Stress and MaterialTangent)
         mat3d Fs = pe.m_F;
-        mat3d R = pe.m_F*pe.RightStretchInverse();
-        // for EAS and ANS shells, adjust calculation of Fs using enhanced strain Es
-        if (sel) {
-            mat3ds Cs = mat3dd(1) + sel->m_E[pt.m_index]*2;
-            double eval[3];
-            vec3d evec[3];
-            Cs.eigen2(eval,evec);
-            mat3ds Us = dyad(evec[0])*sqrt(eval[0]) + dyad(evec[1])*sqrt(eval[1]) + dyad(evec[2])*sqrt(eval[2]);
-            Fs = R*Us;
-        }
         mat3d Fe = Fs*pp.m_Fusi[i];
         
         // store safe copy of total deformation gradient
@@ -204,14 +196,28 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
         pp.Init();
     }
     
-    ElasticDeformationGradient(pt);
-    int n = (int)m_pFlow->BondFamilies(pt);
-
     // extract total deformation gradient
     FEElasticMaterialPoint& pe = *pt.ExtractData<FEElasticMaterialPoint>();
     // extract plastic damage material point
     FEReactivePlasticDamageMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
     FEPlasticFlowCurveMaterialPoint& fp = *pt.ExtractData<FEPlasticFlowCurveMaterialPoint>();
+    
+    // EAS and ANS shell domains evaluate stresses at the enhanced strain, but call this
+    // function with the compatible deformation gradient; for consistency, evaluate the
+    // damage at the right stretch tensor of the enhanced strain (as in PK2Stress)
+    mat3d Fsafe = pe.m_F; double Jsafe = pe.m_J;
+    FEShellElementNew* sel = dynamic_cast<FEShellElementNew*>(pt.m_elem);
+    if (sel && (pt.m_index < (int)sel->m_E.size()) && (sel->m_E[pt.m_index].norm() > 0)) {
+        mat3ds C = mat3dd(1) + sel->m_E[pt.m_index]*2;
+        double eval[3];
+        vec3d evec[3];
+        C.eigen2(eval,evec);
+        mat3ds U = dyad(evec[0])*sqrt(eval[0]) + dyad(evec[1])*sqrt(eval[1]) + dyad(evec[2])*sqrt(eval[2]);
+        pe.m_F = U; pe.m_J = U.det();
+    }
+    
+    ElasticDeformationGradient(pt);
+    int n = (int)m_pFlow->BondFamilies(pt);
 
     // zero the total damage variable
     pp.m_D = 0.0;
@@ -258,6 +264,9 @@ void FEReactivePlasticDamage::UpdateSpecializedMaterialPoints(FEMaterialPoint& p
     pp.m_di[n] = m_pIDamg ? m_pIDamg->cdf(pt,Es) : 0;
     pp.m_d[n] = pp.m_di[n]*fp.m_w[n];
     pp.m_D += pp.m_d[n];
+    
+    // restore the deformation gradient
+    pe.m_F = Fsafe; pe.m_J = Jsafe;
 }
 
 

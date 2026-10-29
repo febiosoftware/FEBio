@@ -114,20 +114,12 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
     // extract inverse of plastic deformation gradient and evaluate elastic deformation gradient
     FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
     FEPlasticFlowCurveMaterialPoint& fp = *pt.ExtractData<FEPlasticFlowCurveMaterialPoint>();
-    FEShellElementNew* sel = dynamic_cast<FEShellElementNew*>(pt.m_elem);
     
     for (int i=0; i<n; ++i) {
+        // total deformation gradient (for EAS and ANS shells, the shell domain sets
+        // pe.m_F to the right stretch tensor of the enhanced strain before calling
+        // this material, see FESolidMaterial::PK2Stress and MaterialTangent)
         mat3d Fs = pe.m_F;
-        mat3d R = pe.m_F*pe.RightStretchInverse();
-        // for EAS and ANS shells, adjust calculation of Fs using enhanced strain Es
-        if (sel) {
-            mat3ds Cs = mat3dd(1) + sel->m_E[pt.m_index]*2;
-            double eval[3];
-            vec3d evec[3];
-            Cs.eigen2(eval,evec);
-            mat3ds Us = dyad(evec[0])*sqrt(eval[0]) + dyad(evec[1])*sqrt(eval[1]) + dyad(evec[2])*sqrt(eval[2]);
-            Fs = R*Us;
-        }
         mat3d Fe = Fs*pp.m_Fusi[i];
         
         // store safe copy of total deformation gradient
