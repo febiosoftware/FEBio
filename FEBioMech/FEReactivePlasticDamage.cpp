@@ -397,12 +397,14 @@ void FEReactivePlasticDamage::OctahedralPlasticStrain(FEMaterialPoint& pt)
     // extract plastic material point
     FEReactivePlasticDamageMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
     
-    double ev[3];
     for (int i=0; i<n; ++i) {
-        mat3ds Cvsi = (pp.m_Fvsi[i].transpose()*pp.m_Fvsi[i]).sym();
-        Cvsi.eigen2(ev);
-        for (int j=0; j<3; ++j) ev[j] = 1./sqrt(ev[j]);
-        pp.m_gp[i] = sqrt(2.)/3.*sqrt(pow(ev[0] - ev[1],2) + pow(ev[1] - ev[2],2) + pow(ev[2] - ev[0],2));
+        // effective plastic strain sqrt(2/3 devE:devE), where E is the Lagrange strain
+        // of the plastic deformation gradient Fvs (Zimmerman et al., JMPS 2021, Eq. 5.10);
+        // this is the same measure as the "DC octahedral shear strain" criterion
+        mat3d Fvs = pp.m_Fvsi[i].inverse();
+        mat3ds Evs = ((Fvs.transpose()*Fvs).sym() - mat3dd(1))*0.5;
+        mat3ds devE = Evs.dev();
+        pp.m_gp[i] = sqrt(devE.dotdot(devE)*(2./3.));
     }
 }
 
