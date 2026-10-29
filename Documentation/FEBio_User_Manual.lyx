@@ -72037,6 +72037,232 @@ Example
 
 \end_layout
 
+\begin_layout Subsubsection
+Fiber with Cumulative Distribution Function
+\begin_inset CommandInset label
+LatexCommand label
+name "fiber-CDF"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This material assumes that fibers are initial crimped by different amounts.
+ Upon loading,
+ more fibers become recruited as the transition from an unloaded crimped state to a loaded uncrimped state.
+ To account for this uncrimping with increasing strain,
+ the modulus of fibers is scaled by the fraction 
+\begin_inset Formula $F\left(I_{n}-1\right)$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $I_{n}$
+\end_inset
+
+ is the square of the stretch 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ of the fiber along its referential orientation 
+\begin_inset Formula $\mathbf{n}_{r}$
+\end_inset
+
+.
+ In the material frame it is assumed that this modulus is constant and given by 
+\begin_inset Formula $E$
+\end_inset
+
+,
+ thus the material elasticity tensor is
+\begin_inset Formula 
+\[
+\boldsymbol{\mathbb{C}}=4\frac{\partial^{2}\Psi_{r}}{\partial I^{2}_{n}}\mathbf{N}_{r}\otimes\mathbf{N}_{r}=F\left(I_{n}-1\right)E\mathbf{N}_{r}\otimes\mathbf{N}_{r}
+\]
+
+\end_inset
+
+when 
+\begin_inset Formula $I_{n}>1$
+\end_inset
+
+,
+ from which we conclude that
+\begin_inset Formula 
+\[
+\frac{d^{2}\Psi_{r}}{dI^{2}_{n}}=\begin{cases}
+0 & I_{n}\le1\\
+\frac{E}{4}F\left(I_{n}-1\right) & I_{n}>1
+\end{cases}
+\]
+
+\end_inset
+
+Then it follows that
+\begin_inset Formula 
+\[
+\frac{d\Psi_{r}}{dI_{n}}=\begin{cases}
+0 & I_{n}\le1\\
+\frac{E}{4}\int^{I_{n}-1}_{0}F\left(t\right)\,dt & I_{n}>1
+\end{cases}
+\]
+
+\end_inset
+
+and
+\begin_inset Formula 
+\[
+\Psi_{r}=\begin{cases}
+0 & I_{n}\le1\\
+\frac{E}{4}\int^{I_{n}-1}_{0}\left(I_{n}-1-t\right)F\left(t\right)\,dt & I_{n}>1
+\end{cases}
+\]
+
+\end_inset
+
+Here,
+ as usual,
+ the 2nd P-K stress tensor is given by
+\begin_inset Formula 
+\[
+\mathbf{S}=2\frac{\partial\Psi_{r}}{\partial I_{n}}\mathbf{N}_{r}
+\]
+
+\end_inset
+
+and the corresponding Cauchy stress tensor is
+\begin_inset Formula 
+\[
+\boldsymbol{\sigma}=\frac{2}{J}I_{n}\frac{\partial\Psi_{r}}{\partial I_{n}}\mathbf{N}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\lambda_{n}\mathbf{n}=\mathbf{F}\cdot\mathbf{n}_{r}$
+\end_inset
+
+ (
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+ is the fiber orientation in the current configuration) and 
+\begin_inset Formula $\mathbf{N}=\mathbf{n}\otimes\mathbf{n}$
+\end_inset
+
+.
+ The spatial tangent is
+\begin_inset Formula 
+\[
+\boldsymbol{\mathcal{C}}=\frac{4}{J}I^{2}_{n}\frac{\partial^{2}\Psi_{r}}{\partial I^{2}_{n}}\mathbf{N}\otimes\mathbf{N}=\begin{cases}
+\mathbf{0} & I_{n}\le1\\
+\frac{E}{J}I^{2}_{n}F\left(I_{n}-1\right)\mathbf{N}\otimes\mathbf{N} & I_{n}>1
+\end{cases}
+\]
+
+\end_inset
+
+The specification of this material thus requires:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<cdf>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+specification of the cumulative distribution function 
+\begin_inset Formula $F$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<E>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fiber modulus 
+\begin_inset Formula $E$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+P
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Uncoupled Fiber Models
 \begin_inset CommandInset label
@@ -83678,6 +83904,21 @@ Cumulative distribution functions provide the function
 \end_inset
 
  up until the current time.
+ The first derivative 
+\begin_inset Formula $F^{\prime}\left(\Xi\right)=f\left(\Xi\right)$
+\end_inset
+
+ of 
+\begin_inset Formula $F$
+\end_inset
+
+ with respect to its argument represents the probability density function.
+ The second derivative,
+ 
+\begin_inset Formula $F^{\prime\prime}\left(\Xi\right)=f^{\prime}\left(\Xi\right)$
+\end_inset
+
+ does not have a specific name.
 \end_layout
 
 \begin_layout Standard
@@ -83889,6 +84130,20 @@ represents the maximum allowable damage.
 
 
 \begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that
+\begin_inset Formula 
+\[
+\begin{aligned}f\left(\Xi\right) & =F^{\prime}\left(\Xi\right)=\frac{e^{-\Xi/\alpha}}{\Xi^{2}}\left(1-\beta\right)\left(\alpha\left(e^{-\Xi/\alpha}-1\right)-\Xi\right)\\
+f^{\prime}\left(\Xi\right) & =\frac{e^{-\frac{\Xi}{\alpha}}}{\alpha\Xi^{3}}\left(\beta-1\right)\left(2\alpha^{2}\left(e^{\frac{\Xi}{\alpha}}-1\right)-2\alpha\Xi-\Xi^{2}\right)
+\end{aligned}
+\]
+
 \end_inset
 
 
@@ -84149,6 +84404,21 @@ which shows that
 
 
 \begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align block
+Note that
+\begin_inset Formula 
+\[
+\begin{aligned}f\left(\Xi\right) & =F^{\prime}\left(\Xi\right)=\frac{1}{\sigma\sqrt{2\pi}\Xi}e^{-\frac{\log^{2}\left(\frac{\Xi}{\mu}\right)}{2\sigma^{2}}}\\
+f^{\prime}\left(\Xi\right) & =-\frac{\left(\log\left(\frac{\Xi}{\mu}\right)+\sigma^{2}\right)}{\sigma^{3}\sqrt{2\pi}\Xi^{2}}e^{-\frac{\log^{2}\left(\frac{\Xi}{\mu}\right)}{2\sigma^{2}}}
+\end{aligned}
+\]
+
 \end_inset
 
 
@@ -84419,6 +84689,20 @@ which shows that
 \end_layout
 
 \begin_layout Standard
+Note that
+\begin_inset Formula 
+\[
+\begin{aligned}f\left(\Xi\right) & =F^{\prime}\left(\Xi\right)=\alpha\frac{\left(\frac{\Xi}{\mu}\right)^{\alpha}}{\Xi}e^{-\left(\frac{\Xi}{\mu}\right)^{\alpha}}\\
+f^{\prime}\left(\Xi\right) & =-\alpha\left(\frac{\Xi}{\mu}\right)^{\alpha}\frac{\left(\alpha\left(\left(\frac{\Xi}{\mu}\right)^{\alpha}-1\right)+1\right)}{\Xi^{2}}e^{-\left(\frac{\Xi}{\mu}\right)^{\alpha}}
+\end{aligned}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 
 \shape italic
 Example:
@@ -84683,6 +84967,29 @@ which shows that
 \end_layout
 
 \begin_layout Standard
+Note that
+\begin_inset Formula 
+\[
+\begin{aligned}f\left(\Xi\right) & =F^{\prime}\left(\Xi\right)=\begin{cases}
+0 & \Xi\leqslant\mu_{\min}\\
+30x^{2}\left(x-1\right)^{2}\frac{dx}{d\Xi} & \mu_{\min}<\Xi\leqslant\mu_{\max}\\
+0 & \mu_{\max}<\Xi
+\end{cases}\\
+f^{\prime}\left(\Xi\right) & =\begin{cases}
+0 & \Xi\leqslant\mu_{\min}\\
+60x\left(2x^{2}-3x+1\right)\left(\frac{dx}{d\Xi}\right)^{2} & \mu_{\min}<\Xi\leqslant\mu_{\max}\\
+0 & \mu_{\max}<\Xi
+\end{cases}
+\end{aligned}
+\quad\frac{dx}{d\Xi}=\frac{1}{\mu_{\max}-\mu_{\min}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 
 \shape italic
 Example:
@@ -84869,8 +85176,15 @@ where
 \end_inset
 
  are the lower and upper incomplete gamma functions,
- respectively.
- The normalization by 
+ respectively,
+\begin_inset Formula 
+\[
+\gamma\left(\alpha,z\right)=\Gamma\left(\alpha\right)-\Gamma\left(\alpha,z\right)
+\]
+
+\end_inset
+
+The normalization by 
 \begin_inset Formula $\Gamma\left(\alpha,0\right)$
 \end_inset
 
@@ -84901,6 +85215,20 @@ where
 
 
 \begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that
+\begin_inset Formula 
+\[
+\begin{aligned}f\left(\Xi\right) & =F^{\prime}\left(\Xi\right)=\frac{1}{\Xi\,\Gamma\left(\alpha,0\right)}\left(\frac{\Xi}{\mu}\right)^{\alpha}e^{-\frac{\Xi}{\mu}}\\
+f^{\prime}\left(\Xi\right) & =\frac{\mu\left(\alpha-1\right)-\Xi}{\Xi^{3}\,\Gamma(\alpha,0)}\left(\frac{\Xi}{\mu}\right)^{\alpha+1}e^{-\frac{\Xi}{\mu}}
+\end{aligned}
+\]
+
 \end_inset
 
 
@@ -85093,6 +85421,24 @@ where
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Note that
+\begin_inset Formula 
+\[
+\begin{aligned}f\left(\Xi\right) & =F^{\prime}\left(\Xi\right)=\delta\left(\Xi\right)\\
+f^{\prime}\left(\Xi\right) & =\delta^{\prime}\left(\Xi\right)
+\end{aligned}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\delta\left(\cdot\right)$
+\end_inset
+
+ is the Dirac delta function.
 \end_layout
 
 \begin_layout Standard

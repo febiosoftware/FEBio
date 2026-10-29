@@ -2333,44 +2333,40 @@ double FELogFatigueBonds::value(FEElement& el)
 //-----------------------------------------------------------------------------
 double FELogOctahedralPlasticStrain::value(FEElement& el)
 {
+    // effective plastic strain of the first bond family at a reactive plasticity material point
+    // (the plastic data is not allocated until the flow curve has been initialized)
+    auto gp = [](FEMaterialPoint& mp) {
+        FEReactivePlasticityMaterialPoint* prp = mp.ExtractData<FEReactivePlasticityMaterialPoint>();
+        FEReactivePlasticDamageMaterialPoint* prd = mp.ExtractData<FEReactivePlasticDamageMaterialPoint>();
+        if (prp && prp->m_gp.size()) return (double) (float) prp->m_gp[0];
+        if (prd && prd->m_gp.size()) return (double) (float) prd->m_gp[0];
+        return 0.0;
+    };
+    
     int nint = el.GaussPoints();
     double D = 0;
     for (int j=0; j<nint; ++j)
     {
         FEMaterialPoint& pt = *el.GetMaterialPoint(j);
-        FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
-        FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
         FEElasticMixtureMaterialPoint* pem = pt.ExtractData<FEElasticMixtureMaterialPoint>();
         FEMultigenerationMaterialPoint* pmg = pt.ExtractData<FEMultigenerationMaterialPoint>();
-        if (prp) D += (float) prp->m_gp[0];
-        else if (prd) D += (float) prd->m_gp[0];
+        if (pt.ExtractData<FEReactivePlasticityMaterialPoint>() || pt.ExtractData<FEReactivePlasticDamageMaterialPoint>())
+            D += gp(pt);
         else if (pem) {
             for (int k=0; k<pem->Components(); ++k)
-            {
-                FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
-                FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-                if (prp) D += (float) prp->m_gp[0];
-                else if (prd) D += (float) prd->m_gp[0];
-            }
+                D += gp(*pem->GetPointData(k));
         }
         else if (pmg) {
             for (int k=0; k<pmg->Components(); ++k)
             {
-                FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
-                FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-                FEElasticMixtureMaterialPoint* pem = pmg->GetPointData(k)->ExtractData<FEElasticMixtureMaterialPoint>();
-                if (prp) D += (float) prp->m_gp[0];
-                else if (prd) D += (float) prd->m_gp[0];
-                else if (pem)
-                {
-                    for (int l=0; l<pem->Components(); ++l)
-                    {
-                        FEReactivePlasticityMaterialPoint* prp = pt.ExtractData<FEReactivePlasticityMaterialPoint>();
-                        FEReactivePlasticDamageMaterialPoint* prd = pt.ExtractData<FEReactivePlasticDamageMaterialPoint>();
-                        if (prp) D += (float) prp->m_gp[0];
-                        else if (prd) D += (float) prd->m_gp[0];
-                    }
+                FEMaterialPoint& mpk = *pmg->GetPointData(k);
+                FEElasticMixtureMaterialPoint* pemk = mpk.ExtractData<FEElasticMixtureMaterialPoint>();
+                if (pemk) {
+                    for (int l=0; l<pemk->Components(); ++l)
+                        D += gp(*pemk->GetPointData(l));
                 }
+                else
+                    D += gp(mpk);
             }
         }
     }

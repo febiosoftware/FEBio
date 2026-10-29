@@ -33,6 +33,8 @@
 #include "MatrixTools.h"
 #include <FECore/log.h>
 #include <cmath>
+#include <cfloat>
+#include <cstdarg>
 #include <vector>
 #include <string>
 #include <string.h>
@@ -54,6 +56,44 @@
 #endif
 
 #ifdef HAS_ACCEL
+
+//-----------------------------------------------------------------------------
+// Logging.
+//
+// All messages go through the FEBio log so that they end up in the .log file
+// and not only on the terminal. Previously they were written with
+// fprintf(stderr), so problems such as Accelerate's pivot tolerance warning
+// never reached the log file.
+//
+// Accelerate's reportError/reportStatus callbacks receive only a message and
+// no user pointer, so the model to log to is held in a thread_local for the
+// duration of every call into this solver (see AccelLogContext). If no model
+// is set, messages fall back to the terminal.
+namespace {
+
+thread_local FEModel* g_accelLogModel = nullptr;
+
+struct AccelLogContext
+{
+    FEModel* m_prev;
+    explicit AccelLogContext(FEModel* fem) : m_prev(g_accelLogModel) { g_accelLogModel = fem; }
+    ~AccelLogContext() { g_accelLogModel = m_prev; }
+};
+
+// ntag follows write_log: 0 = message, 1 = warning, 2 = error.
+void accelLog(int ntag, const char* szfmt, ...)
+{
+    char sz[2048] = { 0 };
+    va_list args;
+    va_start(args, szfmt);
+    vsnprintf(sz, sizeof(sz), szfmt, args);
+    va_end(args);
+
+    if (g_accelLogModel) write_log(g_accelLogModel, ntag, "%s", sz);
+    else fprintf((ntag == 0) ? stdout : stderr, "%s\n", sz);
+}
+
+} // namespace
 
 class AccelerateSparseSolver::Implementation
 {
@@ -193,7 +233,7 @@ BEGIN_FECORE_CLASS(AccelerateSparseSolver, LinearSolver)
     ADD_PARAMETER(imp->m_rtol       , "rtol");
     ADD_PARAMETER(imp->m_atol       , "atol");
     ADD_PARAMETER(imp->m_sscaling   , "partition_scaling")->setEnums("off\0on\0");
-    ADD_PARAMETER(imp->m_sfscaling  , "factor_scaling")->setEnums("none\0equilibration-inf\0default\0");
+    ADD_PARAMETER(imp->m_sfscaling  , "factor_scaling")->setEnums("none\0equilibriation_inf\0default\0");
     ADD_PARAMETER(imp->m_pivotTol   , "pivot_tolerance");
 END_FECORE_CLASS();
 
@@ -297,8 +337,9 @@ bool resolveOne(const std::string& sin, const EnumEntry* tbl, const char* paramN
     long v = strtol(s.c_str(), &endp, 10);
     if (endp && (*endp == 0)) { out = (int) v; return true; }
 
-    fprintf(stderr, "\nERROR: unrecognized value \"%s\" for %s.\n", s.c_str(), paramName);
-    fprintf(stderr, "Valid values are: %s (or the equivalent integer).\n", enumList(tbl).c_str());
+    accelLog(2, "Accelerate solver: unrecognized value \"%s\" for %s.\n"
+                "Valid values are: %s (or the equivalent integer).",
+             s.c_str(), paramName, enumList(tbl).c_str());
     return false;
 }
 
@@ -366,8 +407,8 @@ static bool toSparseFactorization(int ftype, bool bsymm, SparseFactorization_t& 
             case AccelerateSparseSolver::FTSparseFactorizationLUUnpivoted:
             case AccelerateSparseSolver::FTSparseFactorizationLUSPP:
             case AccelerateSparseSolver::FTSparseFactorizationLUTPP:
-                fprintf(stderr, "\nSparse LU requires macOS 15.5 / iOS 18.5 or later"
-                                " (both to build and to run). Use qr instead.\n");
+                accelLog(2, "Accelerate solver: sparse LU requires macOS 15.5 / iOS 18.5 or later"
+                            " (both to build and to run). Use qr instead.");
                 return false;
             default: break;
         }
@@ -504,13 +545,12 @@ void AccelerateSparseSolver::ApplyStoredFactor(void* mem, enum CBLAS_TRANSPOSE t
 // solve", which made symbolic-factorization failures look like iterative-solver
 // problems.
 void AccelerateSparseSolver::MyReportError(const char* message) {
-    fprintf(stderr, "\n\tAccelerate sparse solver error: %s\n", message);
+    accelLog(2, "Accelerate sparse solver error:\n%s", message);
 }
 
 //-----------------------------------------------------------------------------
 void AccelerateSparseSolver::MyReportStatus(const char* message) {
-    fprintf(stdout, "iterative solver status: %s",message);
-    return;
+    accelLog(0, "\titerative solver status: %s", message);
 }
 
 //-----------------------------------------------------------------------------
@@ -568,6 +608,8 @@ bool AccelerateSparseSolver::SetSparseMatrix(SparseMatrix* pA)
 //-----------------------------------------------------------------------------
 bool AccelerateSparseSolver::PreProcess()
 {
+    AccelLogContext logctx(GetFEModel());
+
     assert(imp->m_isFactored == false);
 
     if (imp->m_pA == nullptr) return false;
@@ -591,16 +633,14 @@ bool AccelerateSparseSolver::PreProcess()
 
     // Accelerate expects 0-based indices.
     if (imp->m_pA->Offset() != 0) {
-        fprintf(stderr, "\nERROR during preprocessing: ");
-        fprintf(stderr, "\nAccelerate solver requires a 0-based matrix (offset = %d).\n", imp->m_pA->Offset());
+        accelLog(2, "Accelerate solver requires a 0-based matrix (offset = %d).", imp->m_pA->Offset());
         return false;
     }
 
     // Accelerate's SparseMatrixStructure is column-based. Handing it the row
     // pointers of a CRS matrix would silently factor the transpose.
     if (imp->m_pA->isRowBased()) {
-        fprintf(stderr, "\nERROR during preprocessing: ");
-        fprintf(stderr, "\nAccelerate solver requires a column-based (CCS) matrix.\n");
+        accelLog(2, "Accelerate solver requires a column-based (CCS) matrix.");
         return false;
     }
 
@@ -638,9 +678,22 @@ bool AccelerateSparseSolver::PreProcess()
             imp->SSFO.free                 = free;
             imp->SSFO.reportError          = MyReportError;
 
+            // NOTE: value-initializing the struct sets pivotTolerance and
+            // zeroTolerance to 0, which is NOT Accelerate's default. With a
+            // zero pivot tolerance the threshold-pivoted factorizations (LU,
+            // LDLT TPP) accept any nonzero diagonal pivot, i.e. they effectively
+            // stop pivoting, and Accelerate warns
+            //   "nfoptions->pivotTolerance <= 0 for a pivoted factorization
+            //    may indicate an initialization error for nfoptions".
+            // On ill-conditioned systems (e.g. fluid-FSI with a near-zero
+            // solid modulus) this produced inaccurate factors: Newton/Broyden
+            // drifted and failed in direct mode, and GMRES preconditioned by
+            // the factors stalled. Set the documented defaults explicitly.
             imp->SNFO = SparseNumericFactorOptions{};
-            imp->SNFO.control = SparseDefaultControl;
-            imp->SNFO.scaling = nullptr;
+            imp->SNFO.control        = SparseDefaultControl;
+            imp->SNFO.scaling        = nullptr;
+            imp->SNFO.pivotTolerance = 0.01;
+            imp->SNFO.zeroTolerance  = 1e-4 * DBL_EPSILON;
 
             // Accelerate's own equilibration. Note SparseScalingUser with a
             // null scaling array means "no scaling at all", which is how FSNone
@@ -676,15 +729,16 @@ bool AccelerateSparseSolver::PreProcess()
             // legal depends on which factorization was chosen.
             SparseFactorization_t ftype;
             if (!toSparseFactorization(imp->m_ftype, bsymm, ftype)) {
-                fprintf(stderr, "\nIncorrect factorization type (%d) for %s matrix!",
-                        imp->m_ftype, bsymm ? "symmetric" : "non-symmetric");
                 if (bsymm)
-                    fprintf(stderr, "\nValid choices are: cholesky, ldlt, ldlt_unpivoted, ldlt_sbk, ldlt_tpp, default.\n");
-                else {
-                    fprintf(stderr, "\nValid choices are: lu, lu_spp, lu_tpp, lu_unpivoted, qr, cholesky_ata, default.");
-                    fprintf(stderr, "\n(lu* requires macOS 15.5 / iOS 18.5 or later.)");
-                    fprintf(stderr, "\ncholesky and the ldlt* variants require a symmetric matrix.\n");
-                }
+                    accelLog(2, "Accelerate solver: incorrect factorization type (%d) for symmetric matrix.\n"
+                                "Valid choices are: cholesky, ldlt, ldlt_unpivoted, ldlt_sbk, ldlt_tpp, default.",
+                             imp->m_ftype);
+                else
+                    accelLog(2, "Accelerate solver: incorrect factorization type (%d) for non-symmetric matrix.\n"
+                                "Valid choices are: lu, lu_spp, lu_tpp, lu_unpivoted, qr, cholesky_ata, default.\n"
+                                "(lu* requires macOS 15.5 / iOS 18.5 or later; cholesky and the ldlt*\n"
+                                "variants require a symmetric matrix.)",
+                             imp->m_ftype);
                 return false;
             }
 
@@ -722,23 +776,23 @@ bool AccelerateSparseSolver::PreProcess()
 
                 case OMSparseOrderCOLAMD:
                     if (!bQRbased) {
-                        fprintf(stderr, "\nOrder method 'colamd' is only valid for the qr and cholesky_ata"
-                                        "\nfactorizations (it orders A^T A). Use amd, metis, or default.\n");
+                        accelLog(2, "Accelerate solver: order method 'colamd' is only valid for the qr and\n"
+                                    "cholesky_ata factorizations (it orders A^T A). Use amd, metis, or default.");
                         return false;
                     }
                     imp->SSFO.orderMethod = SparseOrderCOLAMD;
                     break;
 
                 default:
-                    fprintf(stderr, "\nIncorrect order method (%d)!", imp->m_ordmthd);
-                    fprintf(stderr, "\nValid choices are: amd, metis, colamd, default.\n");
+                    accelLog(2, "Accelerate solver: incorrect order method (%d).\n"
+                                "Valid choices are: amd, metis, colamd, default.", imp->m_ordmthd);
                     return false;
             }
 
             imp->ASS = SparseFactor(ftype, imp->SMS, imp->SSFO);
 
             if (imp->ASS.status != SparseStatusOK) {
-                fprintf(stderr, "\n\tERROR during symbolic factorization (status = %d)\n", (int)imp->ASS.status);
+                accelLog(2, "Accelerate solver: symbolic factorization failed (status = %d).", (int)imp->ASS.status);
                 return false;
             }
             imp->m_isSymbolic = true;
@@ -759,8 +813,7 @@ bool AccelerateSparseSolver::PreProcess()
     }
     else {
         // Fallback on earlier versions
-        fprintf(stderr, "\nERROR during preprocessing: ");
-        fprintf(stderr, "\naccelerate solver not available for macOS earlier than 10.13!");
+        accelLog(2, "Accelerate solver not available for macOS earlier than 10.13.");
         return false;
     }
 
@@ -770,6 +823,8 @@ bool AccelerateSparseSolver::PreProcess()
 //-----------------------------------------------------------------------------
 bool AccelerateSparseSolver::Factor()
 {
+    AccelLogContext logctx(GetFEModel());
+
     // make sure we have work to do
     if (imp->m_pA->Rows() == 0) return true;
 
@@ -823,8 +878,7 @@ bool AccelerateSparseSolver::Factor()
     }
     else {
         // Fallback on earlier versions
-        fprintf(stderr, "\nERROR during factorization: ");
-        fprintf(stderr, "\nAccelerate solver not available for macOS earlier than 10.13!");
+        accelLog(2, "Accelerate solver not available for macOS earlier than 10.13.");
         return false;
     }
 
@@ -855,23 +909,15 @@ bool AccelerateSparseSolver::FactorNow()
 
         imp->ASF = SparseFactor(imp->ASS, imp->A, imp->SNFO);
         if (imp->ASF.status != SparseStatusOK) {
-            fprintf(stderr, "\n\tERROR during factorization:");
+            const char* szerr = "unknown error";
             switch (imp->ASF.status) {
-                case SparseFactorizationFailed:
-                    fprintf(stderr, "\n\tFactorization failed!");
-                    break;
-                case SparseMatrixIsSingular:
-                    fprintf(stderr, "\n\tSparse matrix is singular!");
-                    break;
-                case SparseInternalError:
-                    fprintf(stderr, "\n\tSolver called internal error!");
-                    break;
-                case SparseParameterError:
-                    fprintf(stderr, "\n\tSolver called parameter error!");
-                    break;
-                default:
-                    fprintf(stderr, "\n\tUnknown error!");
+                case SparseFactorizationFailed: szerr = "factorization failed";      break;
+                case SparseMatrixIsSingular:    szerr = "sparse matrix is singular"; break;
+                case SparseInternalError:       szerr = "internal error";            break;
+                case SparseParameterError:      szerr = "parameter error";           break;
+                default: break;
             }
+            accelLog(2, "Accelerate solver: numeric factorization failed (%s).", szerr);
             return false;
         }
 
@@ -884,6 +930,8 @@ bool AccelerateSparseSolver::FactorNow()
 //-----------------------------------------------------------------------------
 bool AccelerateSparseSolver::BackSolve(double* x, double* b)
 {
+    AccelLogContext logctx(GetFEModel());
+
     // make sure we have work to do
     if (imp->m_pA->Rows() == 0) return true;
 
@@ -1016,36 +1064,27 @@ bool AccelerateSparseSolver::BackSolve(double* x, double* b)
                     break;
                 }
                 default:
-                    fprintf(stderr, "\nUnknown iterative method (%d)!\n", imp->m_itrmthd);
+                    accelLog(2, "Accelerate solver: unknown iterative method (%d).", imp->m_itrmthd);
                     return false;
             }
         }
 
         // Status reporting is shared by both iterative strategies.
         if ((strat != SSDirect) && (imp->SStatus != SparseIterativeConverged)) {
-            fprintf(stderr, "\n\tERROR during iterative solution:\n");
+            const char* szerr = "unknown error";
             switch (imp->SStatus) {
-                case SparseIterativeIllConditioned:
-                    fprintf(stderr, "\n\tIll-conditioned system!\n");
-                    break;
-                case SparseIterativeInternalError:
-                    fprintf(stderr, "\n\tInternal failure!\n");
-                    break;
-                case SparseIterativeMaxIterations:
-                    fprintf(stderr, "\n\tExceeded maximum iteration limit!\n");
-                    break;
-                case SparseIterativeParameterError:
-                    fprintf(stderr, "\n\tError with one or more parameters!\n");
-                    break;
-                default:
-                    fprintf(stderr, "\n\tUnknown error!\n");
+                case SparseIterativeIllConditioned: szerr = "ill-conditioned system";              break;
+                case SparseIterativeInternalError:  szerr = "internal failure";                    break;
+                case SparseIterativeMaxIterations:  szerr = "exceeded maximum iteration limit";    break;
+                case SparseIterativeParameterError: szerr = "error with one or more parameters";   break;
+                default: break;
             }
+            accelLog(2, "Accelerate solver: iterative solution failed (%s).", szerr);
             return false;
         }
     } else {
         // Fallback on earlier versions
-        fprintf(stderr, "\nERROR during back solve: ");
-        fprintf(stderr, "\nAccelerate solver not available for macOS earlier than 10.13!");
+        accelLog(2, "Accelerate solver not available for macOS earlier than 10.13.");
         return false;
     }
 
@@ -1108,8 +1147,8 @@ bool AccelerateSparseSolver::ComputeAndApplyScaling()
         // the previous version indexed scalePart[] with a partition id that
         // could exceed its size whenever Partitions() returned 0.
         if (partStart[nparts] != n) {
-            fprintf(stderr, "\nWARNING: partition sizes (%d) do not sum to the number of equations (%d);"
-                            " partition scaling disabled.\n", partStart[nparts], n);
+            accelLog(1, "Accelerate solver: partition sizes (%d) do not sum to the number of equations (%d);\n"
+                        "partition scaling disabled.", partStart[nparts], n);
         }
         else {
             for (int p = 0; p < nparts; ++p)
