@@ -67,7 +67,8 @@ public:
     vector<vec3d>       m_gradc;    //!< spatial gradient of solute concentration
     vector<vec3d>       m_j;        //!< solute molar flux
     vector<double>      m_cdot;     //!< material time derivative of solute concentration following fluid
-    double            m_psi;        //!< electric potential
+    vector<double>      m_crp;      //!< referential solute content J*phif*ca at the end of the previous time step
+    double            m_psi;      //!< electric potential
     vec3d            m_Ie;        //!< current density
     double            m_pe;        //!< effective fluid pressure
     double            m_cF;        //!< fixed charge density in current configuration

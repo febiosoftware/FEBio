@@ -71,6 +71,7 @@ void FEMultiphasicFSIMaterialPoint::Serialize(DumpStream& ar)
     ar & m_nsol & m_psi & m_Ie & m_cF & m_pe;
     ar & m_c & m_ca & m_gradc & m_j & m_cdot & m_k & m_dkdJ;
     ar & m_dkdc;
+    ar & m_crp;
 }
 
 //-----------------------------------------------------------------------------
@@ -85,6 +86,7 @@ void FEMultiphasicFSIMaterialPoint::Init()
     m_gradc.clear();
     m_j.clear();
     m_cdot.clear();
+    m_crp.clear();
     m_k.clear();
     m_dkdJ.clear();
     m_dkdJJ.clear();
