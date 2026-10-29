@@ -146,10 +146,11 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         
         // find Fv
         bool conv = false;
-        bool done = false;
+        bool triedLroot = false;
         int maxit = 20;
         int iter = 0;
         double lam = 0;
+        double tol = m_rtol*fp.m_Ky[i];     // convergence tolerance on phi (same units as Ky)
         mat3d Fv = Fe;
         Ftmp = pe.m_F;  // store safe copy
         Jtmp = pe.m_J;
@@ -160,13 +161,36 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         mat3dd I(1);
         double beta = 1;
         mat3ds ImN = I;
-        double phi0=0, phi1=0, phi2=0, lam0 = 0, lam1=0, lam2=0, a, b, c=0, d;
+        double phi0=0, phi1=0, phi2=0, lam0 = 0, lam1=0, lam2=0, a=0, b=0, c=0, d=0;
         bool mroot = false;
         double lroot = 0;
-        while (!done) {
+        double lbest = 0, phibest = phi;    // iterate closest to the yield surface
+        // evaluate Fv for the current value of lam
+        auto updateFv = [&]() {
+            ImN = I - Nv*(lam/Nvmag);
+            if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
+            Uv = (Ue*ImN).sym()*beta;
+            Fv = R*Uv;
+        };
+        while (true) {
+            // evaluate the actual yield function at the current Fv
             pe.m_F = Fv; pe.m_J = Fv.det();
             pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
             phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
+            if (fabs(phi) <= tol) { conv = true; break; }
+            if (fabs(phi) < fabs(phibest)) { phibest = phi; lbest = lam; }
+            if (iter > maxit) {
+                // if a quadratic fit produced two roots of the same sign, try the larger one
+                if (mroot && !triedLroot) {
+                    triedLroot = true;
+                    mroot = false;
+                    iter = 0;
+                    lam = lroot;
+                    updateFv();
+                    continue;
+                }
+                break;
+            }
             int it = iter % 3;
             if (it == 0) {
                 phi0 = phi;
@@ -185,27 +209,27 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                 dUvdlam += Ue*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
             double dlam = -phi/(Nv*dUvdlam.transpose()).trace();
             lam += dlam;
+            // every third iteration, replace the Newton update with a quadratic fit
+            // of phi(lam) through the last three samples (keep the Newton update if
+            // the samples are not distinct)
             if (it == 2) {
                 d = (lam0-lam1)*(lam0-lam2)*(lam1-lam2);
-                if (d == 0) {
-                    if (lam0 == lam1) lam = lam1;
-                    else if (lam1 == lam2) lam = lam2;
-                    else lam = lam2;
-                }
-                else {
+                if (d != 0) {
                     a = (lam2*(phi1-phi0)+lam1*(phi0-phi2)+lam0*(phi2-phi1))/d;
                     b = (pow(lam2,2)*(phi0-phi1)+pow(lam0,2)*(phi1-phi2)+pow(lam1,2)*(phi2-phi0))/d;
                     c = (lam0*lam2*(lam2-lam0)*phi1+pow(lam1,2)*(lam2*phi0-lam0*phi2)+lam1*(phi2*pow(lam0,2)-phi0*pow(lam2,2)))/d;
-                    d = b*b - 4*a*c;
-                    if (d >= 0) {
+                    double disc = b*b - 4*a*c;
+                    if (disc >= 0) {
                         if (a != 0) {
-                            lam1 = (-b+sqrt(d))/(2*a);
-                            lam2 = (-b-sqrt(d))/(2*a);
-                            if (lam1*lam2 < 0) lam = max(lam1,lam2);
+                            // numerically stable evaluation of both roots
+                            double q = -0.5*(b + copysign(sqrt(disc), b));
+                            double r1 = q/a;
+                            double r2 = (q != 0) ? c/q : r1;
+                            if (r1*r2 < 0) lam = max(r1,r2);
                             else {
                                 mroot = true;
-                                lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
-                                lroot = (fabs(lam1) >= fabs(lam2)) ? lam1 : lam2;
+                                lam = (fabs(r1) < fabs(r2)) ? r1 : r2;
+                                lroot = (fabs(r1) >= fabs(r2)) ? r1 : r2;
                             }
                         }
                         else if (b != 0) lam = -c/b;
@@ -226,29 +250,24 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
                     else
                         lam = (fabs(b) > 0) ? -c/b : 0;
                 }
-                phi = a*pow(lam,2) + b*lam +  c;
-                if (fabs(phi) < m_rtol) { conv = true; done = true; }
             }
-            ImN = I - Nv*(lam/Nvmag);
-            if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
-            Uv = (Ue*ImN).sym()*beta;
-            Fv = R*Uv;
-            if (fabs(phi) <= m_rtol) { conv = true; done = true;}
-            if (++iter > maxit) done = true;
-            if (done && !conv && mroot) {
-                done = mroot = false;
-                lam = lroot;
-                ImN = I - Nv*(lam/Nvmag);
-                if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
-                Uv = (Ue*ImN).sym()*beta;
-                Fv = R*Uv;
-            }
+            updateFv();
+            ++iter;
         }
-        if (!conv)
-            feLogWarning("Plasticity iterations did not converge for bond family %d!\n",i);
-        pe.m_F = Fv; pe.m_J = Fv.det();
-        pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-        pp.m_Kv[i]  = phi + fp.m_Ky[i];
+        if (!conv) {
+            // the yield surface may not be reachable along the fixed flow direction
+            // (e.g., pressure-dependent yield criteria far from equilibrium), so fall
+            // back to the iterate closest to the yield surface rather than the last one
+            if (lam != lbest) {
+                lam = lbest;
+                updateFv();
+                pe.m_F = Fv; pe.m_J = Fv.det();
+                pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
+                phi = pp.m_Kv[i] - fp.m_Ky[i];
+            }
+            feLogWarning("Plasticity iterations did not converge for bond family %d (phi/Ky = %lg)!\n",i,phi/fp.m_Ky[i]);
+        }
+        // pp.m_Kv[i] now holds the actual yield measure evaluated at the final Fv
         pe.m_F = Ftmp; pe.m_J = Jtmp;
         pp.m_Fvsi[i] = Fs.inverse()*Fv;
     }
