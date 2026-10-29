@@ -28,6 +28,7 @@
 #include "stdafx.h"
 #include <cmath>
 #include "FEReactivePlasticity.h"
+#include "FEReactivePlasticReturnMap.h"
 #include "FEDamageCriterion.h"
 #include "FEElasticMaterial.h"
 #include "FEUncoupledMaterial.h"
@@ -47,6 +48,8 @@ ADD_PROPERTY(m_pFlow, "flow_curve");
 ADD_PARAMETER(m_isochrc, "isochoric");
 ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 ADD_PARAMETER(m_secant_tangent, "secant_tangent");
+ADD_PARAMETER(m_formulation, "formulation")->setEnums("original\0symmetric\0");
+ADD_PARAMETER(m_mandel, "mandel_normal");
 
 END_FECORE_CLASS();
 
@@ -60,6 +63,8 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
     m_pCrit = nullptr;
     m_pFlow = nullptr;
     m_secant_tangent = true;
+    m_formulation = 0;
+    m_mandel = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,6 +72,10 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
 bool FEReactivePlasticity::Init()
 {
     if (m_pFlow->Init() == false) return false;
+    if (m_mandel && (m_formulation != 1)) {
+        feLogError("mandel_normal requires formulation = symmetric");
+        return false;
+    }
     
     return FEElasticMaterial::Init();
 }
@@ -76,7 +85,7 @@ bool FEReactivePlasticity::Init()
 void FEReactivePlasticity::Serialize(DumpStream& ar)
 {
     FEElasticMaterial::Serialize(ar);
-    ar & m_isochrc & m_rtol;
+    ar & m_isochrc & m_rtol & m_formulation & m_mandel;
 }
 
 //-----------------------------------------------------------------------------
@@ -125,7 +134,6 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
         mat3d Ftmp = pe.m_F;
         double Jtmp = pe.m_J;
         pe.m_F = Fe; pe.m_J = Fe.det();
-        mat3ds Ue = pe.RightStretch();
         
         // evaluate yield measure
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
@@ -145,131 +153,15 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             pp.m_w[i] = fp.m_w[i];
         
         // find Fv
-        bool conv = false;
-        bool triedLroot = false;
-        int maxit = 20;
-        int iter = 0;
-        double lam = 0;
-        double tol = m_rtol*fp.m_Ky[i];     // convergence tolerance on phi (same units as Ky)
-        mat3d Fv = Fe;
-        Ftmp = pe.m_F;  // store safe copy
-        Jtmp = pe.m_J;
-        pe.m_F = Fv; pe.m_J = Fv.det();
-        mat3ds Uv = pe.RightStretch();
-        mat3ds Nv = YieldSurfaceNormal(pt);
-        double Nvmag = Nv.norm();
-        mat3dd I(1);
-        double beta = 1;
-        mat3ds ImN = I;
-        double phi0=0, phi1=0, phi2=0, lam0 = 0, lam1=0, lam2=0, a=0, b=0, c=0, d=0;
-        bool mroot = false;
-        double lroot = 0;
-        double lbest = 0, phibest = phi;    // iterate closest to the yield surface
-        // evaluate Fv for the current value of lam
-        auto updateFv = [&]() {
-            ImN = I - Nv*(lam/Nvmag);
-            if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
-            Uv = (Ue*ImN).sym()*beta;
-            Fv = R*Uv;
-        };
-        while (true) {
-            // evaluate the actual yield function at the current Fv
-            pe.m_F = Fv; pe.m_J = Fv.det();
-            pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-            phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
-            if (fabs(phi) <= tol) { conv = true; break; }
-            if (fabs(phi) < fabs(phibest)) { phibest = phi; lbest = lam; }
-            if (iter > maxit) {
-                // if a quadratic fit produced two roots of the same sign, try the larger one
-                if (mroot && !triedLroot) {
-                    triedLroot = true;
-                    mroot = false;
-                    iter = 0;
-                    lam = lroot;
-                    updateFv();
-                    continue;
-                }
-                break;
-            }
-            int it = iter % 3;
-            if (it == 0) {
-                phi0 = phi;
-                lam0 = lam;
-            }
-            else if (it == 1) {
-                phi1 = phi;
-                lam1 = lam;
-            }
-            else if (it == 2) {
-                phi2 = phi;
-                lam2 = lam;
-            }
-            mat3d dUvdlam = -Ue*Nv*(beta/Nvmag);
-            if (m_isochrc)
-                dUvdlam += Ue*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
-            double dlam = -phi/(Nv*dUvdlam.transpose()).trace();
-            lam += dlam;
-            // every third iteration, replace the Newton update with a quadratic fit
-            // of phi(lam) through the last three samples (keep the Newton update if
-            // the samples are not distinct)
-            if (it == 2) {
-                d = (lam0-lam1)*(lam0-lam2)*(lam1-lam2);
-                if (d != 0) {
-                    a = (lam2*(phi1-phi0)+lam1*(phi0-phi2)+lam0*(phi2-phi1))/d;
-                    b = (pow(lam2,2)*(phi0-phi1)+pow(lam0,2)*(phi1-phi2)+pow(lam1,2)*(phi2-phi0))/d;
-                    c = (lam0*lam2*(lam2-lam0)*phi1+pow(lam1,2)*(lam2*phi0-lam0*phi2)+lam1*(phi2*pow(lam0,2)-phi0*pow(lam2,2)))/d;
-                    double disc = b*b - 4*a*c;
-                    if (disc >= 0) {
-                        if (a != 0) {
-                            // numerically stable evaluation of both roots
-                            double q = -0.5*(b + copysign(sqrt(disc), b));
-                            double r1 = q/a;
-                            double r2 = (q != 0) ? c/q : r1;
-                            if (r1*r2 < 0) lam = max(r1,r2);
-                            else {
-                                mroot = true;
-                                lam = (fabs(r1) < fabs(r2)) ? r1 : r2;
-                                lroot = (fabs(r1) >= fabs(r2)) ? r1 : r2;
-                            }
-                        }
-                        else if (b != 0) lam = -c/b;
-                        else lam = 0;
-                    }
-                    else if (a != 0) {
-                        // first try a least squares linear fit
-                        double sx = lam0 + lam1 + lam2;
-                        double sy = phi0 + phi1 + phi2;
-                        double sx2 = pow(lam0,2) + pow(lam1,2) + pow(lam2,2);
-                        double sxy = lam0*phi0 + lam1*phi1 + lam2*phi2;
-                        double slope = (3*sxy - sx*sy)/(3*sx2 - pow(sx,2));
-                        double intercept = (sy - slope*sx)/3;
-                        lam = -intercept/slope;
-                        // if that produces a negative root, use the minimum of the parabola
-                        if (lam < 0) lam = -b/(2*a);
-                    }
-                    else
-                        lam = (fabs(b) > 0) ? -c/b : 0;
-                }
-            }
-            updateFv();
-            ++iter;
-        }
-        if (!conv) {
-            // the yield surface may not be reachable along the fixed flow direction
-            // (e.g., pressure-dependent yield criteria far from equilibrium), so fall
-            // back to the iterate closest to the yield surface rather than the last one
-            if (lam != lbest) {
-                lam = lbest;
-                updateFv();
-                pe.m_F = Fv; pe.m_J = Fv.det();
-                pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-                phi = pp.m_Kv[i] - fp.m_Ky[i];
-            }
-            feLogWarning("Plasticity iterations did not converge for bond family %d (phi/Ky = %lg)!\n",i,phi/fp.m_Ky[i]);
-        }
-        // pp.m_Kv[i] now holds the actual yield measure evaluated at the final Fv
-        pe.m_F = Ftmp; pe.m_J = Jtmp;
-        pp.m_Fvsi[i] = Fs.inverse()*Fv;
+        FEReactivePlasticReturnMap rm(m_pBase, m_pCrit, m_isochrc, m_rtol);
+        FEReactivePlasticReturnMap::Result r = (m_formulation == 1) ?
+            rm.Symmetric(pt, Fs, pp.m_Fusi[i], fp.m_Ky[i], m_mandel) :
+            rm.Original(pt, Fs, pp.m_Fusi[i], fp.m_Ky[i]);
+        if (!r.conv)
+            feLogWarning("Plasticity iterations did not converge for bond family %d (phi/Ky = %lg)!\n",i,r.phi/fp.m_Ky[i]);
+        // m_Kv holds the actual yield measure evaluated at the final Fv
+        pp.m_Kv[i] = r.Kv;
+        pp.m_Fvsi[i] = r.Fvsi;
     }
     
     // if bond family has not yielded at this instant, and had not yielded at previous times,
@@ -399,15 +291,8 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
 // get the yield surface normal
 mat3ds FEReactivePlasticity::YieldSurfaceNormal(FEMaterialPoint& mp)
 {
-    FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
-    mat3ds s = m_pBase->Stress(mp);
-    tens4ds c = m_pBase->Tangent(mp);
-    mat3ds dPhi = m_pCrit->CriterionStressTangent(mp);
-    mat3d M = dPhi*s*2 - mat3dd((dPhi*s).trace()) + c.dot(dPhi);
-    mat3ds Ui = pe.RightStretchInverse();
-    mat3d R = pe.m_F*Ui;
-    mat3ds N = (R.transpose()*M*R*Ui).sym();
-    return N;
+    FEReactivePlasticReturnMap rm(m_pBase, m_pCrit, m_isochrc, m_rtol);
+    return rm.YieldSurfaceNormal(mp);
 }
 
 //-----------------------------------------------------------------------------

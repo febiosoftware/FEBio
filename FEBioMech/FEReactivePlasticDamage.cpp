@@ -27,6 +27,7 @@
 
 #include "stdafx.h"
 #include "FEReactivePlasticDamage.h"
+#include "FEReactivePlasticReturnMap.h"
 #include "FEDamageCriterion.h"
 #include "FEElasticMaterial.h"
 #include "FEDamageCDF.h"
@@ -56,6 +57,8 @@ BEGIN_FECORE_CLASS(FEReactivePlasticDamage, FEElasticMaterial)
     ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 
     ADD_PARAMETER(m_secant_tangent, "secant_tangent");
+    ADD_PARAMETER(m_formulation, "formulation")->setEnums("original\0symmetric\0");
+    ADD_PARAMETER(m_mandel, "mandel_normal");
 
 END_FECORE_CLASS();
 
@@ -73,6 +76,8 @@ FEReactivePlasticDamage::FEReactivePlasticDamage(FEModel* pfem) : FEElasticMater
     m_pIDamg = nullptr;
     m_pIDCrit = nullptr;
     m_secant_tangent = true;
+    m_formulation = 0;
+    m_mandel = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -80,6 +85,10 @@ FEReactivePlasticDamage::FEReactivePlasticDamage(FEModel* pfem) : FEElasticMater
 bool FEReactivePlasticDamage::Init()
 {
     if (m_pFlow->Init() == false) return false;
+    if (m_mandel && (m_formulation != 1)) {
+        feLogError("mandel_normal requires formulation = symmetric");
+        return false;
+    }
 
     return FEElasticMaterial::Init();
 }
@@ -88,7 +97,7 @@ bool FEReactivePlasticDamage::Init()
 void FEReactivePlasticDamage::Serialize(DumpStream& ar)
 {
     FEElasticMaterial::Serialize(ar);
-    ar & m_isochrc & m_rtol;
+    ar & m_isochrc & m_rtol & m_formulation & m_mandel;
 }
 
 //-----------------------------------------------------------------------------
@@ -137,7 +146,6 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
         mat3d Ftmp = pe.m_F;
         double Jtmp = pe.m_J;
         pe.m_F = Fe; pe.m_J = Fe.det();
-        mat3ds Ue = pe.RightStretch();
 
         // evaluate yield measure
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
@@ -168,79 +176,15 @@ void FEReactivePlasticDamage::ElasticDeformationGradient(FEMaterialPoint& pt)
         }
 
         // find Fv
-        bool conv = false;
-        int iter = 0;
-        double lam = 0;
-        mat3d Fv = Fe;
-        Ftmp = pe.m_F;  // store safe copy
-        Jtmp = pe.m_J;
-        pe.m_F = Fv; pe.m_J = Fv.det();
-        mat3ds Uv = pe.RightStretch();
-        mat3ds Nv = YieldSurfaceNormal(pt);
-        double Nvmag = Nv.norm();
-        mat3dd I(1);
-        double beta = 1;
-        mat3ds ImN = I;
-        double phi0=0, phi1=0, phi2=0, lam1=0, lam2=0, a, b, c=0, d;
-        while (!conv) {
-            ++iter;
-            pe.m_F = Fv; pe.m_J = Fv.det();
-            pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-            phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
-            if (iter == 1) {
-                phi0 = phi;
-                c = phi0;
-            }
-            else if (iter == 2) {
-                phi1 = phi;
-                lam1 = lam;
-            }
-            else if (iter == 3) {
-                phi2 = phi;
-                lam2 = lam;
-            }
-            mat3d dUvdlam = -Ue*Nv*(beta/Nvmag);
-            if (m_isochrc)
-                dUvdlam += Ue*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
-            double dlam = -phi/(Nv*dUvdlam.transpose()).trace();
-            lam += dlam;
-            if (iter == 3) {
-                d = lam1*lam2*(lam1-lam2);
-                if (d == 0) {
-                    lam = (lam1*lam2 == 0) ? 0 : lam2;
-                }
-                else {
-                    a = (lam2*(phi1-phi0)-lam1*(phi2-phi0))/d;
-                    b = ((phi2-phi0)*lam1*lam1-(phi1-phi0)*lam2*lam2)/d;
-                    d = b*b - 4*a*c;
-                    if (d >= 0) {
-                        if (a != 0) {
-                            lam1 = (-b+sqrt(d))/(2*a);
-                            lam2 = (-b-sqrt(d))/(2*a);
-                            lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
-                        }
-                        else if (b != 0) lam = -c/b;
-                        else lam = 0;
-                    }
-                    else if (a != 0) {
-                        lam = -b/(2*a);
-                    }
-                    else
-                        lam = 0;
-                }
-                conv = true;
-            }
-            ImN = I - Nv*(lam/Nvmag);
-            if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
-            Uv = (Ue*ImN).sym()*beta;
-            Fv = R*Uv;
-            if (fabs(dlam) <= m_rtol*fabs(lam)) conv = true;
-            if (fabs(lam) <= m_rtol*m_rtol) conv = true;
-        }
-        pe.m_F = Fv; pe.m_J = Fv.det();
-        pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-        pe.m_F = Ftmp; pe.m_J = Jtmp;
-        pp.m_Fvsi[i] = Fs.inverse()*Fv;
+        FEReactivePlasticReturnMap rm(m_pBase, m_pCrit, m_isochrc, m_rtol);
+        FEReactivePlasticReturnMap::Result r = (m_formulation == 1) ?
+            rm.Symmetric(pt, Fs, pp.m_Fusi[i], fp.m_Ky[i], m_mandel) :
+            rm.Original(pt, Fs, pp.m_Fusi[i], fp.m_Ky[i]);
+        if (!r.conv)
+            feLogWarning("Plasticity iterations did not converge for bond family %d (phi/Ky = %lg)!\n",i,r.phi/fp.m_Ky[i]);
+        // m_Kv holds the actual yield measure evaluated at the final Fv
+        pp.m_Kv[i] = r.Kv;
+        pp.m_Fvsi[i] = r.Fvsi;
     }
     
     // evaluate octahedral plastic strain
@@ -431,15 +375,8 @@ double FEReactivePlasticDamage::Damage(FEMaterialPoint& pt, int k)
 // get the yield surface normal
 mat3ds FEReactivePlasticDamage::YieldSurfaceNormal(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
-    mat3ds s = m_pBase->Stress(mp);
-    tens4ds c = m_pBase->Tangent(mp);
-    mat3ds dPhi = m_pCrit->CriterionStressTangent(mp);
-    mat3d M = dPhi*s*2 - mat3dd((dPhi*s).trace()) + c.dot(dPhi);
-    mat3ds Ui = pe.RightStretchInverse();
-    mat3d R = pe.m_F*Ui;
-    mat3ds N = (R.transpose()*M*R*Ui).sym();
-    return N;
+    FEReactivePlasticReturnMap rm(m_pBase, m_pCrit, m_isochrc, m_rtol);
+    return rm.YieldSurfaceNormal(mp);
 }
 
 //-----------------------------------------------------------------------------
