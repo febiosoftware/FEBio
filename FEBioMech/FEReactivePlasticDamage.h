@@ -92,6 +92,8 @@ public:
 public:
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
+    int         m_formulation;  // 0 = original (stretch-based, shared rotation), 1 = symmetric G
+    bool        m_mandel;   // flow direction normal to yield surface in Mandel stress space (formulation 1 only)
     double      m_bias;     // biasing factor for intervals in yield measures and bond fractions
     bool        m_secant_tangent;   //!< flag for using secant tangent
 
