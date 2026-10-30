@@ -82,7 +82,7 @@ PardisoProjectSolver::PardisoProjectSolver(FEModel* fem) : LinearSolver(fem), m_
     m_print_cn = false;
     m_mtype = -2;
     m_iparm3 = false;
-    m_pivot_perturbation = 14;
+    m_pivot_perturbation = 0;  // try 14 when problem does not converge
     m_isFactored = false;
     
     /* If both PARDISO AND PARDISODL are defined, print a warning */
