@@ -94,7 +94,7 @@ figs-within-sections
 \papersides 2
 \paperpagestyle default
 \tablestyle default
-\tracking_changes false
+\tracking_changes true
 \output_changes false
 \change_bars false
 \postpone_fragile_content false
@@ -196,7 +196,7 @@ status open
 
 
 \series default
-Theory Manual Version 4.13 
+Theory Manual Version 4.13
 \end_layout
 
 \begin_layout Date
@@ -523,7 +523,7 @@ name "chap:introduction"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Section
@@ -2656,7 +2656,6 @@ deformation gradient
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -2697,7 +2696,6 @@ right Cauchy-Green deformation tensor
 \end_inset
 
  is symmetric.
- 
 \end_layout
 
 \begin_layout Standard
@@ -2974,7 +2972,6 @@ engineering shear strain
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -3721,7 +3718,7 @@ Note that
 \end_inset
 
 .
- The elemental volume defined by these three elements has the magnitude 
+ The elemental volume defined by these three elements has the magnitude
 \end_layout
 
 \begin_layout Standard
@@ -3733,7 +3730,7 @@ dV_{r}=\left(d\mathbf{X}_{1}\times d\mathbf{X}_{2}\right)\cdot d\mathbf{X}_{3}\t
 \end_inset
 
  in the reference state,
- and the magnitude 
+ and the magnitude
 \end_layout
 
 \begin_layout Standard
@@ -3759,7 +3756,7 @@ in the deformed state.
 \begin_inset Formula $d\mathbf{X}_{3}$
 \end_inset
 
- be aligned with the orthogonal coordinate axes such that 
+ be aligned with the orthogonal coordinate axes such that
 \end_layout
 
 \begin_layout Standard
@@ -3780,7 +3777,7 @@ where
 \end_inset
 
 .
- From (b) we get that 
+ From (b) we get that
 \end_layout
 
 \begin_layout Standard
@@ -4380,7 +4377,6 @@ state variables
 \end_inset
 
  for a gas should exhibit the same dependencies.
- 
 \end_layout
 
 \begin_layout Standard
@@ -4730,7 +4726,6 @@ literal "false"
  Prior to that formulation,
  other constitutive relations had been proposed for elastic solids (such as hypoelasticity),
  though it is now believed that the only thermodynamically valid formulation is the one given here.
- 
 \end_layout
 
 \begin_layout Standard
@@ -10063,7 +10058,6 @@ multiphasic-multigeneration
 \end_inset
 
  remains constant during that generation.
- 
 \end_layout
 
 \begin_layout Standard
@@ -12386,7 +12380,6 @@ where
 
 ,
  it is an intrinsic material property that must be invariant in time and space.
- 
 \end_layout
 
 \begin_layout Standard
@@ -13616,7 +13609,6 @@ where
 \end_inset
 
  is the solid deformation gradient.
- 
 \end_layout
 
 \begin_layout Standard
@@ -16968,8 +16960,6 @@ i/k
 
 \series bold
 j/l
-\series default
- 
 \end_layout
 
 \end_inset
@@ -16998,7 +16988,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -17027,7 +17017,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-2 
+2
 \end_layout
 
 \end_inset
@@ -17056,7 +17046,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-3 
+3
 \end_layout
 
 \end_inset
@@ -17085,7 +17075,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-2 
+2
 \end_layout
 
 \end_inset
@@ -17114,7 +17104,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-3 
+3
 \end_layout
 
 \end_inset
@@ -17143,7 +17133,7 @@ j/l
 \begin_inset Text
 
 \begin_layout Plain Layout
-3 
+3
 \end_layout
 
 \end_inset
@@ -22160,7 +22150,6 @@ Here,
 a priori
 \emph default
  on a frictionless boundary and must be obtained from the solution of the analysis.
- 
 \end_layout
 
 \begin_layout Standard
@@ -24037,7 +24026,6 @@ where the operator
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -26374,7 +26362,6 @@ literal "true"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -29494,8 +29481,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -29533,7 +29518,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29571,7 +29556,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29609,7 +29594,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29647,7 +29632,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29685,7 +29670,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29723,7 +29708,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29761,7 +29746,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29799,7 +29784,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 
+1
 \end_layout
 
 \end_inset
@@ -29963,8 +29948,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -30002,7 +29985,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30040,7 +30023,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30078,7 +30061,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30116,7 +30099,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30154,7 +30137,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30192,7 +30175,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30346,8 +30329,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -30385,7 +30366,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.166666667 
+0.166666667
 \end_layout
 
 \end_inset
@@ -30492,8 +30473,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -30513,7 +30492,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30522,7 +30501,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30531,7 +30510,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30542,7 +30521,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.58541020 
+0.58541020
 \end_layout
 
 \end_inset
@@ -30551,7 +30530,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30560,7 +30539,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30569,7 +30548,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30580,7 +30559,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30589,7 +30568,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.58541020 
+0.58541020
 \end_layout
 
 \end_inset
@@ -30598,7 +30577,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30607,7 +30586,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30618,7 +30597,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30627,7 +30606,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.13819660 
+0.13819660
 \end_layout
 
 \end_inset
@@ -30636,7 +30615,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.58541020 
+0.58541020
 \end_layout
 
 \end_inset
@@ -30645,7 +30624,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30850,8 +30829,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -30889,7 +30866,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30927,7 +30904,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -30965,7 +30942,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -31003,7 +30980,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.041666667 
+0.041666667
 \end_layout
 
 \end_inset
@@ -31110,8 +31087,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -31149,7 +31124,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.023087995 
+0.023087995
 \end_layout
 
 \end_inset
@@ -31187,7 +31162,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.023087995 
+0.023087995
 \end_layout
 
 \end_inset
@@ -31225,7 +31200,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.023087995 
+0.023087995
 \end_layout
 
 \end_inset
@@ -31263,7 +31238,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.023087995 
+0.023087995
 \end_layout
 
 \end_inset
@@ -31301,7 +31276,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.018578672 
+0.018578672
 \end_layout
 
 \end_inset
@@ -31339,7 +31314,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.018578672 
+0.018578672
 \end_layout
 
 \end_inset
@@ -31377,7 +31352,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.018578672 
+0.018578672
 \end_layout
 
 \end_inset
@@ -31415,7 +31390,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.018578672 
+0.018578672
 \end_layout
 
 \end_inset
@@ -31522,8 +31497,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -31561,7 +31534,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002777778 
+0.002777778
 \end_layout
 
 \end_inset
@@ -31599,7 +31572,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002777778 
+0.002777778
 \end_layout
 
 \end_inset
@@ -31637,7 +31610,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002777778 
+0.002777778
 \end_layout
 
 \end_inset
@@ -31675,7 +31648,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002777778 
+0.002777778
 \end_layout
 
 \end_inset
@@ -31713,7 +31686,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31751,7 +31724,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31789,7 +31762,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31827,7 +31800,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31865,7 +31838,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31903,7 +31876,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011111111 
+0.011111111
 \end_layout
 
 \end_inset
@@ -31941,7 +31914,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.088888889 
+0.088888889
 \end_layout
 
 \end_inset
@@ -32046,7 +32019,7 @@ The following integration rules are implemented for this element type.
 status collapsed
 
 \begin_layout Plain Layout
- Note that weights sum up to one and not to the volume of the tet in the natural coordinate system (i.e.
+Note that weights sum up to one and not to the volume of the tet in the natural coordinate system (i.e.
  1/6).
 \end_layout
 
@@ -32126,8 +32099,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -32165,7 +32136,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.138527967 
+0.138527967
 \end_layout
 
 \end_inset
@@ -32203,7 +32174,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.138527967 
+0.138527967
 \end_layout
 
 \end_inset
@@ -32241,7 +32212,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.138527967 
+0.138527967
 \end_layout
 
 \end_inset
@@ -32279,7 +32250,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.138527967 
+0.138527967
 \end_layout
 
 \end_inset
@@ -32317,7 +32288,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.111472033 
+0.111472033
 \end_layout
 
 \end_inset
@@ -32355,7 +32326,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.111472033 
+0.111472033
 \end_layout
 
 \end_inset
@@ -32393,7 +32364,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.111472033 
+0.111472033
 \end_layout
 
 \end_inset
@@ -32431,7 +32402,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.111472033 
+0.111472033
 \end_layout
 
 \end_inset
@@ -32538,8 +32509,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -32559,7 +32528,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.25 
+0.25
 \end_layout
 
 \end_inset
@@ -32568,7 +32537,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.25 
+0.25
 \end_layout
 
 \end_inset
@@ -32577,7 +32546,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
--0.01315555556 
+-0.01315555556
 \end_layout
 
 \end_inset
@@ -32597,7 +32566,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32606,7 +32575,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32615,7 +32584,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.007622222222 
+0.007622222222
 \end_layout
 
 \end_inset
@@ -32635,7 +32604,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32644,7 +32613,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32653,7 +32622,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.007622222222 
+0.007622222222
 \end_layout
 
 \end_inset
@@ -32664,7 +32633,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32673,7 +32642,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.785714285714286 
+0.785714285714286
 \end_layout
 
 \end_inset
@@ -32682,7 +32651,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32691,7 +32660,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.007622222222 
+0.007622222222
 \end_layout
 
 \end_inset
@@ -32702,7 +32671,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32711,7 +32680,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.071428571428571 
+0.071428571428571
 \end_layout
 
 \end_inset
@@ -32720,7 +32689,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.785714285714286 
+0.785714285714286
 \end_layout
 
 \end_inset
@@ -32729,7 +32698,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.007622222222 
+0.007622222222
 \end_layout
 
 \end_inset
@@ -32758,7 +32727,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32767,7 +32736,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32778,7 +32747,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32787,7 +32756,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32796,7 +32765,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32805,7 +32774,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32816,7 +32785,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32825,7 +32794,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32834,7 +32803,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32843,7 +32812,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32854,7 +32823,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32863,7 +32832,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32872,7 +32841,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32881,7 +32850,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32892,7 +32861,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32901,7 +32870,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32910,7 +32879,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32919,7 +32888,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -32930,7 +32899,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.100596423833201 
+0.100596423833201
 \end_layout
 
 \end_inset
@@ -32939,7 +32908,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32948,7 +32917,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.399403576166799 
+0.399403576166799
 \end_layout
 
 \end_inset
@@ -32957,7 +32926,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.024888888889 
+0.024888888889
 \end_layout
 
 \end_inset
@@ -33064,8 +33033,6 @@ t
 
 \series bold
 w
-\series default
- 
 \end_layout
 
 \end_inset
@@ -33103,7 +33070,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.030283678097089 
+0.030283678097089
 \end_layout
 
 \end_inset
@@ -33141,7 +33108,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.006026785714286 
+0.006026785714286
 \end_layout
 
 \end_inset
@@ -33179,7 +33146,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.006026785714286 
+0.006026785714286
 \end_layout
 
 \end_inset
@@ -33217,7 +33184,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.006026785714286 
+0.006026785714286
 \end_layout
 
 \end_inset
@@ -33255,7 +33222,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.006026785714286 
+0.006026785714286
 \end_layout
 
 \end_inset
@@ -33293,7 +33260,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011645249086029 
+0.011645249086029
 \end_layout
 
 \end_inset
@@ -33331,7 +33298,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011645249086029 
+0.011645249086029
 \end_layout
 
 \end_inset
@@ -33369,7 +33336,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011645249086029 
+0.011645249086029
 \end_layout
 
 \end_inset
@@ -33407,7 +33374,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011645249086029 
+0.011645249086029
 \end_layout
 
 \end_inset
@@ -33445,7 +33412,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33483,7 +33450,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33521,7 +33488,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33559,7 +33526,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33597,7 +33564,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33635,7 +33602,7 @@ w
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.010949141561386 
+0.010949141561386
 \end_layout
 
 \end_inset
@@ -33958,7 +33925,6 @@ Example of shell elements with four mid-surface nodal positions
 
 ,
  reduced from a solid element.
- 
 \end_layout
 
 \end_inset
@@ -34535,7 +34501,6 @@ Example of shell element with front-face nodal positions
 
 ,
  reduced from a solid element.
- 
 \end_layout
 
 \end_inset
@@ -35401,7 +35366,7 @@ The following table relates the Lamé parameters to the more familiar Young's mo
 \begin_inset Formula $K,G$
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -35454,7 +35419,7 @@ E=\frac{9KG}{3K+G}\\
 \end{array}$
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -35507,7 +35472,7 @@ E=\frac{9KG}{3K+G}\\
 \end{array}$
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -35662,7 +35627,7 @@ name "sec:Compressible-materials"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -37914,7 +37879,6 @@ HGO unconstrained
 \end_inset
 
  material.
- 
 \end_layout
 
 \begin_layout Standard
@@ -38043,7 +38007,6 @@ where,
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -38069,7 +38032,7 @@ name "sec:Nearly-Incompressible-Materials"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -39340,10 +39303,6 @@ name "fig:spring-dashpot-model"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -39974,7 +39933,7 @@ calculate elastic stress:
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Enumerate
@@ -39987,7 +39946,7 @@ evaluate internal variables:
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Enumerate
@@ -40000,7 +39959,7 @@ find the total stress:
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Standard
@@ -41218,10 +41177,6 @@ name "fig:Malkin-relaxation-spectrum"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -41323,10 +41278,6 @@ name "fig:Malkin-reduced-relaxation"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -41540,10 +41491,6 @@ name "fig:relaxation-continuous-exponential"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -43471,6 +43418,69 @@ When yield thresholds are formulated in stress space,
 \end_layout
 
 \begin_layout Standard
+When the yield measure is expressed in terms of the Cauchy stress 
+\begin_inset Formula $\boldsymbol{\sigma}^{\sigma}$
+\end_inset
+
+,
+ the normal may be evaluated analytically using the chain rule 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21"
+literal "false"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{N}^{\sigma}=\frac{1}{2}\left(\mathbf{R}^{T}\cdot\mathbf{M}^{\sigma}\cdot\mathbf{R}\cdot\left(\mathbf{U}^{\sigma}\right)^{-1}+\left(\mathbf{U}^{\sigma}\right)^{-1}\cdot\mathbf{R}^{T}\cdot\left(\mathbf{M}^{\sigma}\right)^{T}\cdot\mathbf{R}\right)\,,\label{eq:plasticity-normal-analytical}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{M}^{\sigma}=\frac{\partial\Phi}{\partial\boldsymbol{\sigma}^{\sigma}}:\boldsymbol{\mathcal{C}}^{\sigma}+2\,\frac{\partial\Phi}{\partial\boldsymbol{\sigma}^{\sigma}}\cdot\boldsymbol{\sigma}^{\sigma}-\left(\frac{\partial\Phi}{\partial\boldsymbol{\sigma}^{\sigma}}:\boldsymbol{\sigma}^{\sigma}\right)\mathbf{I}\,,\label{eq:plasticity-M-tensor}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}^{\sigma}$
+\end_inset
+
+ is the spatial elasticity tensor of generation 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ The tensor 
+\begin_inset Formula $\mathbf{M}^{\sigma}$
+\end_inset
+
+ satisfies 
+\begin_inset Formula $d\Phi=\mathbf{M}^{\sigma}:\mathbf{L}^{\sigma}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\mathbf{L}^{\sigma}=d\mathbf{F}^{\sigma}\cdot\left(\mathbf{F}^{\sigma}\right)^{-1}$
+\end_inset
+
+,
+ a property used in the numerical implementation below.
+ For example,
+ for the von Mises stress,
+ 
+\begin_inset Formula $\partial\Phi/\partial\boldsymbol{\sigma}=\frac{3}{2\Phi}\dev\boldsymbol{\sigma}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 Consider two consecutive generations 
 \begin_inset Formula $\sigma$
 \end_inset
@@ -43539,7 +43549,7 @@ is the unit tensor along
 \begin_inset Formula $\lambda$
 \end_inset
 
- is a non-dimensional scalar which may be determined analytically by enforcing the plastic consistency condition in eq.
+ is a non-dimensional scalar which may be determined by enforcing the plastic consistency condition in eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:plastic-consistency-condition"
@@ -43551,12 +43561,57 @@ nolink "false"
 \end_inset
 
 .
+ In FEBio,
+ 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is evaluated numerically for finite increments by enforcing 
+\begin_inset Formula $\varphi\left(\mathbf{U}^{v}\right)=0$
+\end_inset
+
+ directly (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Reactive-Plasticity-Numerical"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
  When the plastic deformation is assumed to be isochoric the solution for 
 \begin_inset Formula $\lambda$
 \end_inset
 
  is obtained while enforcing 
 \begin_inset Formula $\det\mathbf{F}^{\sigma s}=1$
+\end_inset
+
+,
+ which is achieved by scaling eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-normality"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{equation}
+\left(\mathbf{F}^{vs}\right)^{-1}=\xi\left(\mathbf{F}^{us}\right)^{-1}\cdot\left(\mathbf{I}-\lambda\hat{\mathbf{N}}^{v}\right)\,,\quad\xi=\left[\det\left(\left(\mathbf{F}^{us}\right)^{-1}\cdot\left(\mathbf{I}-\lambda\hat{\mathbf{N}}^{v}\right)\right)\right]^{-1/3}\label{eq:plasticity-Fvsi-isochoric}
+\end{equation}
+
 \end_inset
 
 .
@@ -43579,6 +43634,115 @@ generation is in the elastic regime;
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "eq:plasticity-Fvsi-normality"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The normality condition of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-yield-surface-normal"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ is expressed in the space of stretch tensors 
+\begin_inset Formula $\mathbf{U}^{\sigma}$
+\end_inset
+
+.
+ Under infinitesimal strains,
+ eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-normal-analytical"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-M-tensor"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ reduce to 
+\begin_inset Formula $\mathbf{N}^{\sigma}\approx\left(\partial\Phi/\partial\boldsymbol{\sigma}\right):\boldsymbol{\mathcal{C}}$
+\end_inset
+
+,
+ so that the plastic strain increment implied by eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-normality"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ is co-directional with 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}:\left(\partial\Phi/\partial\boldsymbol{\sigma}\right)$
+\end_inset
+
+ rather than with 
+\begin_inset Formula $\partial\Phi/\partial\boldsymbol{\sigma}$
+\end_inset
+
+,
+ as it would be in classical associated plasticity.
+ These two directions coincide when 
+\begin_inset Formula $\partial\Phi/\partial\boldsymbol{\sigma}$
+\end_inset
+
+ is an eigentensor of 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}$
+\end_inset
+
+,
+ as is the case for the von Mises yield measure with an isotropic elastic response,
+ since 
+\begin_inset Formula $\boldsymbol{\mathcal{C}}:\dev\boldsymbol{\sigma}=2\mu\dev\boldsymbol{\sigma}$
+\end_inset
+
+.
+ For pressure-dependent yield measures (e.g.,
+ the Deshpande-Fleck criterion),
+ or for anisotropic elastic responses,
+ this flow rule is non-associative in the classical sense;
+ for an isotropic elastic response,
+ the volumetric part of the flow direction is amplified by the factor 
+\begin_inset Formula $3\kappa/2\mu$
+\end_inset
+
+ relative to its deviatoric part.
+ A flow direction which recovers classical associated flow is presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Reactive-Plasticity-Numerical"
 plural "false"
 caps "false"
 noprefix "false"
@@ -43674,7 +43838,34 @@ nolink "false"
 
 \end_inset
 
+ (the product 
+\begin_inset Formula $\mathbf{U}^{s}\cdot\left(\mathbf{F}^{\sigma s}\right)^{-1}$
+\end_inset
+
+ is generally not symmetric,
+ except under proportional loading;
+ more generally,
+ 
+\begin_inset Formula $\mathbf{F}^{\sigma}=\mathbf{F}^{s}\cdot\left(\mathbf{F}^{\sigma s}\right)^{-1}$
+\end_inset
+
 ,
+ see Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Reactive-Plasticity-Numerical"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
  and 
 \begin_inset Formula $\boldsymbol{\sigma}_{0}$
 \end_inset
@@ -43783,6 +43974,510 @@ nolink "false"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+Numerical Implementation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Reactive-Plasticity-Numerical"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In FEBio,
+ the yielding reaction is evaluated independently for each bond family 
+\begin_inset Formula $\beta$
+\end_inset
+
+ at each integration point,
+ whenever the stress is evaluated.
+ Let 
+\begin_inset Formula $\mathbf{F}^{u}=\mathbf{F}^{s}\cdot\left(\mathbf{F}^{us}\right)^{-1}$
+\end_inset
+
+ denote the 
+\shape italic
+elastic predictor
+\shape default
+,
+ i.e.,
+ the relative deformation gradient of 
+\begin_inset Formula $u-$
+\end_inset
+
+generation bonds if no further yielding took place at the current time (the subscript 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is omitted for clarity).
+ Since the yield function is invariant to rigid rotations,
+ it may be evaluated from either 
+\begin_inset Formula $\mathbf{F}^{\sigma}$
+\end_inset
+
+ or 
+\begin_inset Formula $\mathbf{U}^{\sigma}$
+\end_inset
+
+.
+ If 
+\begin_inset Formula $\varphi\left(\mathbf{F}^{u}\right)\le\varepsilon\Phi_{m\beta}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ is a user-defined relative tolerance (
+\shape italic
+rtol
+\shape default
+),
+ the bond family does not yield and 
+\begin_inset Formula $\mathbf{F}^{vs}=\mathbf{F}^{us}$
+\end_inset
+
+.
+ Otherwise,
+ 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is evaluated iteratively until 
+\begin_inset Formula $\left|\varphi\left(\mathbf{F}^{v}\right)\right|\le\varepsilon\Phi_{m\beta}$
+\end_inset
+
+,
+ with the flow direction 
+\begin_inset Formula $\hat{\mathbf{N}}^{v}$
+\end_inset
+
+ evaluated at the elastic predictor;
+ this approximation becomes exact as the increment decreases 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21"
+literal "false"
+
+\end_inset
+
+.
+ Two formulations are available,
+ selected with the material parameter 
+\shape italic
+formulation
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Original formulation.
+
+\shape default
+ In the default formulation,
+ 
+\begin_inset Formula $\mathbf{F}^{v}$
+\end_inset
+
+ shares the rotation 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zimmerman21"
+literal "false"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{U}^{v}=\xi\,\mathrm{sym}\left(\mathbf{U}^{u}\cdot\left(\mathbf{I}-\lambda\hat{\mathbf{N}}^{v}\right)\right)\,,\quad\mathbf{F}^{v}=\mathbf{R}\cdot\mathbf{U}^{v}\,,\quad\left(\mathbf{F}^{vs}\right)^{-1}=\left(\mathbf{F}^{s}\right)^{-1}\cdot\mathbf{F}^{v}\,,\label{eq:plasticity-original-update}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{U}^{u}$
+\end_inset
+
+ is the right stretch tensor of 
+\begin_inset Formula $\mathbf{F}^{u}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\xi$
+\end_inset
+
+ is given in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-isochoric"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ (
+\begin_inset Formula $\xi=1$
+\end_inset
+
+ when plastic deformation is not constrained to be isochoric),
+ and 
+\begin_inset Formula $\hat{\mathbf{N}}^{v}$
+\end_inset
+
+ is evaluated from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-normal-analytical"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ The scalar 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is updated with Newton's method,
+\begin_inset Formula 
+\begin{equation}
+\Delta\lambda=-\varphi\left(\mathbf{U}^{v}\right)\Big/\left(\mathbf{N}^{v}:\frac{\partial\mathbf{U}^{v}}{\partial\lambda}\right)\,,\quad\frac{\partial\mathbf{U}^{v}}{\partial\lambda}=-\xi\,\mathbf{U}^{u}\cdot\hat{\mathbf{N}}^{v}+\frac{\xi}{3}\left[\left(\mathbf{I}-\lambda\hat{\mathbf{N}}^{v}\right)^{-1}:\hat{\mathbf{N}}^{v}\right]\mathbf{U}^{u}\cdot\left(\mathbf{I}-\lambda\hat{\mathbf{N}}^{v}\right)\,,\label{eq:plasticity-original-newton}
+\end{equation}
+
+\end_inset
+
+where the last term is omitted when plastic deformation is not constrained to be isochoric.
+ Every third iteration,
+ the Newton update is replaced by the root of a quadratic interpolation of 
+\begin_inset Formula $\varphi\left(\lambda\right)$
+\end_inset
+
+ through the three most recent iterates.
+ Since 
+\begin_inset Formula $\mathbf{U}^{s}\cdot\left(\mathbf{F}^{us}\right)^{-1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{U}^{u}\cdot\left(\mathbf{I}-\lambda\hat{\mathbf{N}}^{v}\right)$
+\end_inset
+
+ are generally not symmetric,
+ this formulation uses the right stretch tensor of 
+\begin_inset Formula $\mathbf{F}^{u}$
+\end_inset
+
+ and symmetrizes the product in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-original-update"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Consequently,
+ eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-isochoric"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ and the constraint 
+\begin_inset Formula $\det\mathbf{F}^{vs}=1$
+\end_inset
+
+ are satisfied exactly only under proportional loading,
+ when all these tensors are coaxial.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Symmetric formulation.
+
+\shape default
+ When 
+\shape italic
+formulation
+\shape default
+ is set to 
+\shape italic
+symmetric
+\shape default
+,
+ the assumption that 
+\begin_inset Formula $\mathbf{F}^{v}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+ share the same rotation is replaced by the assumption that the plastic deformation increment 
+\begin_inset Formula $\mathbf{G}=\mathbf{I}-\lambda\hat{\mathbf{N}}^{v}$
+\end_inset
+
+ in eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-isochoric"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ is symmetric,
+ i.e.,
+ that there is no plastic spin in the reference configuration of the 
+\begin_inset Formula $u-$
+\end_inset
+
+generation.
+ Then eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-Fvsi-isochoric"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ is enforced exactly,
+ without polar decomposition,
+ since
+\begin_inset Formula 
+\begin{equation}
+\mathbf{F}^{v}=\mathbf{F}^{s}\cdot\left(\mathbf{F}^{vs}\right)^{-1}=\xi\,\mathbf{F}^{u}\cdot\mathbf{G}\,,\label{eq:plasticity-symmetric-update}
+\end{equation}
+
+\end_inset
+
+and the right Cauchy-Green tensor 
+\begin_inset Formula $\mathbf{C}^{v}=\xi^{2}\,\mathbf{G}\cdot\mathbf{C}^{u}\cdot\mathbf{G}$
+\end_inset
+
+ remains symmetric.
+ In this formulation the flow direction is normal to the yield surface with respect to 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+,
+ such that 
+\begin_inset Formula $d\Phi=\mathbf{N}^{v}_{G}:d\mathbf{G}$
+\end_inset
+
+,
+ which yields
+\begin_inset Formula 
+\begin{equation}
+\mathbf{N}^{v}_{G}=\mathrm{sym}\left(\left(\mathbf{F}^{v}\right)^{T}\cdot\mathbf{M}^{v}\cdot\left(\mathbf{F}^{v}\right)^{-T}\right)\,,\label{eq:plasticity-normal-G}
+\end{equation}
+
+\end_inset
+
+evaluated at the elastic predictor,
+ with 
+\begin_inset Formula $\mathbf{M}^{v}$
+\end_inset
+
+ given by eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-M-tensor"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Using 
+\begin_inset Formula $d\Phi=\mathbf{M}^{v}:\mathbf{L}^{v}$
+\end_inset
+
+,
+ the derivative of the yield function along the path of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-symmetric-update"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+\frac{d\varphi}{d\lambda}=\mathbf{M}^{v}:\left(\frac{1}{3}\left(\mathbf{G}^{-1}:\hat{\mathbf{N}}^{v}\right)\mathbf{I}-\mathbf{F}^{u}\cdot\hat{\mathbf{N}}^{v}\cdot\mathbf{G}^{-1}\cdot\left(\mathbf{F}^{u}\right)^{-1}\right)\,,\label{eq:plasticity-symmetric-slope}
+\end{equation}
+
+\end_inset
+
+where the first term is omitted when plastic deformation is not constrained to be isochoric.
+ This derivative is re-evaluated at each iterate.
+ Newton updates of 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ are safeguarded by bracketing the root and reverting to bisection whenever an update leaves the bracket;
+ 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ must also remain positive definite,
+ which requires 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ to be smaller than the reciprocal of the largest eigenvalue of 
+\begin_inset Formula $\hat{\mathbf{N}}^{v}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Mandel stress normal.
+
+\shape default
+ With the symmetric formulation,
+ setting the parameter 
+\shape italic
+mandel_normal
+\shape default
+ replaces the flow direction of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticity-normal-G"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ with
+\begin_inset Formula 
+\begin{equation}
+\hat{\mathbf{N}}^{v}\propto\mathrm{sym}\left(\left(\mathbf{F}^{v}\right)^{-1}\cdot\frac{\partial\Phi}{\partial\boldsymbol{\sigma}^{v}}\cdot\mathbf{F}^{v}\right)\,,\label{eq:plasticity-normal-Mandel}
+\end{equation}
+
+\end_inset
+
+which is normal to the yield surface in the space of the Mandel stress 
+\begin_inset Formula $\boldsymbol{\Sigma}^{v}=\left(\mathbf{F}^{v}\right)^{T}\cdot\boldsymbol{\tau}^{v}\cdot\left(\mathbf{F}^{v}\right)^{-T}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\boldsymbol{\tau}^{v}=J^{v}\boldsymbol{\sigma}^{v}$
+\end_inset
+
+ is the Kirchhoff stress.
+ Under infinitesimal strains this choice reduces to classical associated flow,
+ 
+\begin_inset Formula $\Delta\boldsymbol{\varepsilon}^{p}\propto\partial\Phi/\partial\boldsymbol{\sigma}$
+\end_inset
+
+,
+ and it is therefore recommended for pressure-dependent yield measures.
+ For the von Mises yield measure with an isotropic elastic response,
+ the original formulation and the symmetric formulation with either flow direction produce essentially the same response under proportional loading;
+ under non-proportional loading they converge to the same response as the increment size decreases.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $\hat{\mathbf{N}}^{v}$
+\end_inset
+
+ is evaluated at the elastic predictor rather than at the converged state,
+ the yield surface may not be reachable along the search direction when the elastic predictor lies far outside the yield surface.
+ This may occur at trial states during the first iterations of the global Newton solution,
+ particularly with pressure-dependent yield measures.
+ In that case the iterate with the smallest 
+\begin_inset Formula $\left|\varphi\right|$
+\end_inset
+
+ is retained and a warning is issued;
+ the global iterations then typically proceed to equilibrium states at which the plastic consistency condition is satisfied.
+ Since the error introduced by evaluating the flow direction at the elastic predictor increases with the size of the increment,
+ time steps should be small enough that the solution is insensitive to them.
+\end_layout
+
+\begin_layout Standard
+By default (
+\shape italic
+secant_tangent
+\shape default
+),
+ the material tangent is evaluated numerically from the stresses obtained at perturbed values of the Lagrange strain,
+ each evaluation including the return mapping of every bond family.
+ The resulting tangent is consistent with the algorithm described above;
+ it generally lacks major symmetry when the flow rule is non-associative,
+ so that a non-symmetric stiffness matrix (as also required,
+ for example,
+ by frictional contact) retains the full tangent.
+\end_layout
+
+\begin_layout Standard
+The return mapping is evaluated with the deformation gradient supplied by the element formulation at each integration point.
+ For shell elements with enhanced assumed strains (EAS) or assumed natural strains (ANS),
+ this is the right stretch tensor of the enhanced Lagrange strain,
+ which is also used to evaluate elastic and plastic damage in the reactive elastoplastic damage material (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Plasticity-with-damage"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsection
@@ -44478,10 +45173,6 @@ name "fig:hardening-families-superposition"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -45382,6 +46073,23 @@ nolink "false"
 \end_inset
 
  remains unchanged.
+ In particular,
+ yielded generations are evaluated with the same algorithm and options (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Reactive-Plasticity-Numerical"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
  Damage modifies the material behavior by reducing the fraction of bonds in various generations,
  which scales the response accordingly.
 \end_layout
@@ -45768,7 +46476,7 @@ nolink "false"
 \begin_inset Formula $F^{e}\left(\Xi^{e}_{m\beta}\right)$
 \end_inset
 
- remains constant constant for bond family 
+ remains constant for bond family 
 \begin_inset Formula $\beta$
 \end_inset
 
@@ -46150,6 +46858,56 @@ In a numerical implementation,
 
  of the first bond family to yield may be reported as the effective plastic strain in the entire material,
  for consistency with plastic strain measures in classical models of plasticity.
+ In FEBio,
+ 
+\begin_inset Formula $e^{p}_{0}$
+\end_inset
+
+ is available as the plot variable 
+\shape italic
+octahedral plastic strain
+\shape default
+ and the log variable 
+\shape italic
+ops
+\shape default
+,
+ and the plastic damage criterion 
+\shape italic
+DC octahedral shear strain
+\shape default
+ evaluates 
+\begin_inset Formula $\Xi^{p}=e^{p}_{\beta}$
+\end_inset
+
+ from eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:plasticdmg-effective-plastic-strain"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Despite these names,
+ 
+\begin_inset Formula $e^{p}_{\beta}$
+\end_inset
+
+ is the von Mises equivalent strain of 
+\begin_inset Formula $\mathbf{E}^{ys}_{\beta}$
+\end_inset
+
+,
+ which reduces to the plastic strain under uniaxial isochoric deformation and infinitesimal strains;
+ the engineering octahedral shear strain is larger by a factor 
+\begin_inset Formula $\sqrt{2}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -50563,7 +51321,6 @@ where
 \end_inset
 
  in the reference configuration.
- 
 \end_layout
 
 \begin_layout Standard
@@ -50584,7 +51341,6 @@ where
 \end_inset
 
  is the virtual angular velocity of the rigid body.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -52416,7 +53172,6 @@ k & =k+1\,.
 Return
 \series default
  to the solution phase.
- 
 \end_layout
 
 \begin_layout Standard
@@ -53031,7 +53786,6 @@ literal "true"
 
 ,
  and also serves to greatly reduce the complexity of the linearizations and the resulting stiffness matrices.
- 
 \end_layout
 
 \begin_layout Subsubsection
@@ -53194,7 +53948,6 @@ nolink "false"
  therefore we are only concerned with velocities of opposing contact points in slip.
  The development of velocities presented below anticipates the need for a relative velocity as required by Coulomb's law of kinetic friction,
  which aligns the friction force with this slip direction.
- 
 \end_layout
 
 \begin_layout Standard
@@ -53602,7 +54355,6 @@ literal "true"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -53660,7 +54412,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -53872,7 +54623,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -53960,7 +54710,6 @@ An active-passive strategy for the multipliers ensures consistency when the cont
 
 ,
  in conjunction with an exact return mapping for slip.
- 
 \end_layout
 
 \begin_layout Standard
@@ -54252,7 +55001,6 @@ nolink "false"
  In this way,
  the double-counting of the gap function does not unnecessarily shift the contact status,
  but augmentation is able to modify the stick-slip status if accurate enforcement of the contact constraints requires it.
- 
 \end_layout
 
 \begin_layout Subsubsection
@@ -54338,7 +55086,6 @@ nolink "false"
 
  are slight abuses of notation,
  used to compactly denote changes in a quantity from the previous time step.
- 
 \end_layout
 
 \begin_layout Paragraph
@@ -54515,7 +55262,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Paragraph
@@ -54600,7 +55346,6 @@ where we recall that
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -55160,7 +55905,6 @@ nolink "false"
 \end_inset
 
  shows that the stiffness matrix associated with this contact formulation is not symmetric in stick.
- 
 \end_layout
 
 \begin_layout Standard
@@ -55547,7 +56291,6 @@ literal "true"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Subsubsection
@@ -55629,7 +56372,6 @@ nolink "false"
 
 ,
  we must first propose a temporal discretization scheme for these rate quantities.
- 
 \end_layout
 
 \begin_layout Standard
@@ -56133,7 +56875,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -57681,7 +58422,6 @@ nolink "false"
 \end_inset
 
  must be evaluated after the stick-slip status has been resolved.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -58004,7 +58744,6 @@ nolink "false"
 
  sets up and uses more formal notation and definitions,
  before we dispense of this cumbersome notation for the remainder of the treatment.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -58352,7 +59091,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -58770,7 +59508,6 @@ nolink "false"
 
  for penalty and augmented Lagrange methods,
  respectively.
- 
 \end_layout
 
 \begin_layout Standard
@@ -59552,7 +60289,6 @@ nolink "false"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Paragraph
@@ -60205,7 +60941,7 @@ name "sec:Biphasic-Solute-Contact"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -60756,7 +61492,7 @@ name "sec:Multiphasic-Contact"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -62003,7 +62739,7 @@ name "sec:Tied-Biphasic-Contact"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -63126,7 +63862,7 @@ name "sec:Tied-Fluid-Interface"
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Standard
@@ -63690,7 +64426,6 @@ The premise of a tied interface is that the parametric coordinates of coincident
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -64372,7 +65107,6 @@ where
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -67503,7 +68237,7 @@ The method of Lagrange multipliers increases the number of equations that need t
  This means that these equations can only be solved with linear solvers that support pivoting.
  (Most linear solvers in FEBio,
  including the default pardiso solver,
- can handle zero-diagonal elements.) 
+ can handle zero-diagonal elements.)
 \end_layout
 
 \begin_layout Example
@@ -67561,7 +68295,6 @@ objective function
 \emph default
 ,
  to be introduced below.
- 
 \end_layout
 
 \begin_layout Section
@@ -67611,7 +68344,6 @@ a
 
 ,
  which will usually call FEBio to solve a forward FE problem.
- 
 \end_layout
 
 \begin_layout Section
@@ -67644,7 +68376,6 @@ The Levenberg-Marquardt method is a numerical algorithm that minimizes a functio
  i.e.
  the objective function as defined above.
  It combines the steepest-descent method with a Gauss-Newton method to find the parameters that minimize the objective function.
- 
 \end_layout
 
 \begin_layout Standard
@@ -67738,12 +68469,10 @@ f
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
 The main idea of the LM method is to replace this linear equation with the following.
- 
 \end_layout
 
 \begin_layout Standard
@@ -67789,7 +68518,6 @@ a
 obj_tol
 \emph default
  parameter in FEBio).
- 
 \end_layout
 
 \begin_layout Standard
@@ -67809,7 +68537,6 @@ a
 \end_inset
 
 -th component of the gradient is approximated as follows.
- 
 \end_layout
 
 \begin_layout Standard
@@ -67943,7 +68670,6 @@ tensor
 \shape default
 .
  Vectors are first-order tensors and scalars are zeroth-order tensors.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -67990,7 +68716,7 @@ a_{1}=\mathbf{e}_{1}\cdot\mathbf{a},\quad a_{2}=\mathbf{e}_{2}\cdot\mathbf{a},\q
 \begin_inset Formula $\mathbf{a}\cdot\mathbf{e}_{j}=a_{i}\mathbf{e}_{i}\cdot\mathbf{e}_{j}=a_{i}\delta_{ij}=a_{j}$
 \end_inset
 
-.) 
+.)
 \end_layout
 
 \begin_layout Standard
@@ -68037,7 +68763,7 @@ The Cartesian components of a tensor
 
 .
  By convention,
- we denote this component as 
+ we denote this component as
 \end_layout
 
 \begin_layout Standard
@@ -68158,7 +68884,7 @@ T_{32}
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Example
@@ -68295,7 +69021,7 @@ s_{1} & 0 & 0\\
 
 \end_inset
 
- 
+
 \end_layout
 
 \begin_layout Subsection
@@ -68347,7 +69073,6 @@ The sum of two tensors
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Subsection
@@ -68500,7 +69225,6 @@ This turns out to be an important result that can be generalized to higher order
 
 ,
  and similarly for higher orders.
- 
 \end_layout
 
 \begin_layout Example
@@ -68569,7 +69293,6 @@ The trace operator yields a scalar function.
 \end_inset
 
  The trace of a tensor is the sum of its diagonal components.
- 
 \end_layout
 
 \begin_layout Subsection
@@ -68638,7 +69361,6 @@ Clearly,
 
 .
  Similarly,
- 
 \end_layout
 
 \begin_layout Standard
@@ -68670,7 +69392,6 @@ associative
 not commutative
 \shape default
 .
- 
 \end_layout
 
 \begin_layout Subsection
@@ -68705,7 +69426,7 @@ The identity tensor,
 \begin_inset Formula $\left\{ \mathbf{e}_{1},\mathbf{e}_{2},\mathbf{e}_{3}\right\} $
 \end_inset
 
- are given by 
+ are given by
 \end_layout
 
 \begin_layout Standard
@@ -68883,7 +69604,6 @@ double contraction
 \end_inset
 
 The double product of second order tensors is commutative.
- 
 \end_layout
 
 \begin_layout Example
@@ -68896,7 +69616,6 @@ Show that
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Example
@@ -68995,7 +69714,6 @@ An orthogonal tensor
  is a linear transformation which preserves the length of a vector and the angle between vectors.
  Thus,
  by definition,
- 
 \end_layout
 
 \begin_layout Standard
@@ -69064,7 +69782,6 @@ An orthogonal tensor
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -69165,7 +69882,6 @@ improper
 \end_inset
 
 ).
- 
 \end_layout
 
 \begin_layout Subsection
@@ -69270,7 +69986,6 @@ Let
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Example
@@ -69387,7 +70102,6 @@ For any vector
 ,
  respectively.
  Using the above relation,
- 
 \end_layout
 
 \begin_layout Standard
@@ -69471,7 +70185,6 @@ not the same
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -69584,7 +70297,6 @@ not the same
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Subsection
@@ -69671,7 +70383,6 @@ skew-symmetric
 \end_inset
 
 Any tensor can be written as the sum of a symmetric and antisymmetric tensor,
- 
 \end_layout
 
 \begin_layout Standard
@@ -69692,7 +70403,6 @@ This is a unique decomposition.
 \end_inset
 
  is antisymmetric.
- 
 \end_layout
 
 \begin_layout Standard
@@ -69929,14 +70639,12 @@ Using all these relations,
 
 \begin_layout Theorem*
 The eigenvalues of real symmetric tensors are real (proof not provided here).
- 
 \end_layout
 
 \begin_deeper
 \begin_layout Theorem*
 If the eigenvalues of a real symmetric tensor are all distinct,
  the eigenvectors are orthogonal to each other.
- 
 \end_layout
 
 \end_deeper
@@ -69970,7 +70678,6 @@ Proof:
 \end_inset
 
  ,
- 
 \end_layout
 
 \begin_layout Standard
@@ -69997,7 +70704,6 @@ When two of the eigenvalues are repeated (a double root of the characteristic eq
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Example
@@ -70434,7 +71140,6 @@ Proof:
 
 ,
  thus completing the proof.
- 
 \end_layout
 
 \begin_layout Standard

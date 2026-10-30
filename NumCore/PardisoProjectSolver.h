@@ -65,6 +65,7 @@ protected:
 	double m_dparm[64];
 
 	bool m_iparm3;	// use direct-iterative method
+	int  m_pivot_perturbation;	// pivot perturbation exponent: eps = 10^-m_pivot_perturbation (0 = Panua default)
 
 	// Matrix data
 	int m_n, m_nnz, m_nrhs;

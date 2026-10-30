@@ -28,6 +28,7 @@
 #include "stdafx.h"
 #include <cmath>
 #include "FEReactivePlasticity.h"
+#include "FEReactivePlasticReturnMap.h"
 #include "FEDamageCriterion.h"
 #include "FEElasticMaterial.h"
 #include "FEUncoupledMaterial.h"
@@ -47,6 +48,8 @@ ADD_PROPERTY(m_pFlow, "flow_curve");
 ADD_PARAMETER(m_isochrc, "isochoric");
 ADD_PARAMETER(m_rtol   , FE_RANGE_GREATER_OR_EQUAL(0.0), "rtol");
 ADD_PARAMETER(m_secant_tangent, "secant_tangent");
+ADD_PARAMETER(m_formulation, "formulation")->setEnums("original\0symmetric\0");
+ADD_PARAMETER(m_mandel, "mandel_normal");
 
 END_FECORE_CLASS();
 
@@ -60,6 +63,8 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
     m_pCrit = nullptr;
     m_pFlow = nullptr;
     m_secant_tangent = true;
+    m_formulation = 0;
+    m_mandel = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,6 +72,10 @@ FEReactivePlasticity::FEReactivePlasticity(FEModel* pfem) : FEElasticMaterial(pf
 bool FEReactivePlasticity::Init()
 {
     if (m_pFlow->Init() == false) return false;
+    if (m_mandel && (m_formulation != 1)) {
+        feLogError("mandel_normal requires formulation = symmetric");
+        return false;
+    }
     
     return FEElasticMaterial::Init();
 }
@@ -76,7 +85,7 @@ bool FEReactivePlasticity::Init()
 void FEReactivePlasticity::Serialize(DumpStream& ar)
 {
     FEElasticMaterial::Serialize(ar);
-    ar & m_isochrc & m_rtol;
+    ar & m_isochrc & m_rtol & m_formulation & m_mandel;
 }
 
 //-----------------------------------------------------------------------------
@@ -105,27 +114,18 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
     // extract inverse of plastic deformation gradient and evaluate elastic deformation gradient
     FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
     FEPlasticFlowCurveMaterialPoint& fp = *pt.ExtractData<FEPlasticFlowCurveMaterialPoint>();
-    FEShellElementNew* sel = dynamic_cast<FEShellElementNew*>(pt.m_elem);
     
     for (int i=0; i<n; ++i) {
+        // total deformation gradient (for EAS and ANS shells, the shell domain sets
+        // pe.m_F to the right stretch tensor of the enhanced strain before calling
+        // this material, see FESolidMaterial::PK2Stress and MaterialTangent)
         mat3d Fs = pe.m_F;
-        mat3d R = pe.m_F*pe.RightStretchInverse();
-        // for EAS and ANS shells, adjust calculation of Fs using enhanced strain Es
-        if (sel) {
-            mat3ds Cs = mat3dd(1) + sel->m_E[pt.m_index]*2;
-            double eval[3];
-            vec3d evec[3];
-            Cs.eigen2(eval,evec);
-            mat3ds Us = dyad(evec[0])*sqrt(eval[0]) + dyad(evec[1])*sqrt(eval[1]) + dyad(evec[2])*sqrt(eval[2]);
-            Fs = R*Us;
-        }
         mat3d Fe = Fs*pp.m_Fusi[i];
         
         // store safe copy of total deformation gradient
         mat3d Ftmp = pe.m_F;
         double Jtmp = pe.m_J;
         pe.m_F = Fe; pe.m_J = Fe.det();
-        mat3ds Ue = pe.RightStretch();
         
         // evaluate yield measure
         pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
@@ -145,112 +145,15 @@ void FEReactivePlasticity::ElasticDeformationGradient(FEMaterialPoint& pt)
             pp.m_w[i] = fp.m_w[i];
         
         // find Fv
-        bool conv = false;
-        bool done = false;
-        int maxit = 20;
-        int iter = 0;
-        double lam = 0;
-        mat3d Fv = Fe;
-        Ftmp = pe.m_F;  // store safe copy
-        Jtmp = pe.m_J;
-        pe.m_F = Fv; pe.m_J = Fv.det();
-        mat3ds Uv = pe.RightStretch();
-        mat3ds Nv = YieldSurfaceNormal(pt);
-        double Nvmag = Nv.norm();
-        mat3dd I(1);
-        double beta = 1;
-        mat3ds ImN = I;
-        double phi0=0, phi1=0, phi2=0, lam0 = 0, lam1=0, lam2=0, a, b, c=0, d;
-        bool mroot = false;
-        double lroot = 0;
-        while (!done) {
-            pe.m_F = Fv; pe.m_J = Fv.det();
-            pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-            phi = pp.m_Kv[i] - fp.m_Ky[i];    // phi = 0 => stay on yield surface
-            int it = iter % 3;
-            if (it == 0) {
-                phi0 = phi;
-                lam0 = lam;
-            }
-            else if (it == 1) {
-                phi1 = phi;
-                lam1 = lam;
-            }
-            else if (it == 2) {
-                phi2 = phi;
-                lam2 = lam;
-            }
-            mat3d dUvdlam = -Ue*Nv*(beta/Nvmag);
-            if (m_isochrc)
-                dUvdlam += Ue*ImN*((ImN.inverse()*Nv/Nvmag).trace()*beta/3.);
-            double dlam = -phi/(Nv*dUvdlam.transpose()).trace();
-            lam += dlam;
-            if (it == 2) {
-                d = (lam0-lam1)*(lam0-lam2)*(lam1-lam2);
-                if (d == 0) {
-                    if (lam0 == lam1) lam = lam1;
-                    else if (lam1 == lam2) lam = lam2;
-                    else lam = lam2;
-                }
-                else {
-                    a = (lam2*(phi1-phi0)+lam1*(phi0-phi2)+lam0*(phi2-phi1))/d;
-                    b = (pow(lam2,2)*(phi0-phi1)+pow(lam0,2)*(phi1-phi2)+pow(lam1,2)*(phi2-phi0))/d;
-                    c = (lam0*lam2*(lam2-lam0)*phi1+pow(lam1,2)*(lam2*phi0-lam0*phi2)+lam1*(phi2*pow(lam0,2)-phi0*pow(lam2,2)))/d;
-                    d = b*b - 4*a*c;
-                    if (d >= 0) {
-                        if (a != 0) {
-                            lam1 = (-b+sqrt(d))/(2*a);
-                            lam2 = (-b-sqrt(d))/(2*a);
-                            if (lam1*lam2 < 0) lam = max(lam1,lam2);
-                            else {
-                                mroot = true;
-                                lam = (fabs(lam1) < fabs(lam2)) ? lam1 : lam2;
-                                lroot = (fabs(lam1) >= fabs(lam2)) ? lam1 : lam2;
-                            }
-                        }
-                        else if (b != 0) lam = -c/b;
-                        else lam = 0;
-                    }
-                    else if (a != 0) {
-                        // first try a least squares linear fit
-                        double sx = lam0 + lam1 + lam2;
-                        double sy = phi0 + phi1 + phi2;
-                        double sx2 = pow(lam0,2) + pow(lam1,2) + pow(lam2,2);
-                        double sxy = lam0*phi0 + lam1*phi1 + lam2*phi2;
-                        double slope = (3*sxy - sx*sy)/(3*sx2 - pow(sx,2));
-                        double intercept = (sy - slope*sx)/3;
-                        lam = -intercept/slope;
-                        // if that produces a negative root, use the minimum of the parabola
-                        if (lam < 0) lam = -b/(2*a);
-                    }
-                    else
-                        lam = (fabs(b) > 0) ? -c/b : 0;
-                }
-                phi = a*pow(lam,2) + b*lam +  c;
-                if (fabs(phi) < m_rtol) { conv = true; done = true; }
-            }
-            ImN = I - Nv*(lam/Nvmag);
-            if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
-            Uv = (Ue*ImN).sym()*beta;
-            Fv = R*Uv;
-            if (fabs(phi) <= m_rtol) { conv = true; done = true;}
-            if (++iter > maxit) done = true;
-            if (done && !conv && mroot) {
-                done = mroot = false;
-                lam = lroot;
-                ImN = I - Nv*(lam/Nvmag);
-                if (m_isochrc) beta = pow((pp.m_Fusi[i]*ImN).det(), -1./3.);
-                Uv = (Ue*ImN).sym()*beta;
-                Fv = R*Uv;
-            }
-        }
-        if (!conv)
-            feLogWarning("Plasticity iterations did not converge for bond family %d!\n",i);
-        pe.m_F = Fv; pe.m_J = Fv.det();
-        pp.m_Kv[i] = m_pCrit->DamageCriterion(pt);
-        pp.m_Kv[i]  = phi + fp.m_Ky[i];
-        pe.m_F = Ftmp; pe.m_J = Jtmp;
-        pp.m_Fvsi[i] = Fs.inverse()*Fv;
+        FEReactivePlasticReturnMap rm(m_pBase, m_pCrit, m_isochrc, m_rtol);
+        FEReactivePlasticReturnMap::Result r = (m_formulation == 1) ?
+            rm.Symmetric(pt, Fs, pp.m_Fusi[i], fp.m_Ky[i], m_mandel) :
+            rm.Original(pt, Fs, pp.m_Fusi[i], fp.m_Ky[i]);
+        if (!r.conv)
+            feLogWarning("Plasticity iterations did not converge for bond family %d (phi/Ky = %lg)!\n",i,r.phi/fp.m_Ky[i]);
+        // m_Kv holds the actual yield measure evaluated at the final Fv
+        pp.m_Kv[i] = r.Kv;
+        pp.m_Fvsi[i] = r.Fvsi;
     }
     
     // if bond family has not yielded at this instant, and had not yielded at previous times,
@@ -380,15 +283,8 @@ double FEReactivePlasticity::StrainEnergyDensity(FEMaterialPoint& pt)
 // get the yield surface normal
 mat3ds FEReactivePlasticity::YieldSurfaceNormal(FEMaterialPoint& mp)
 {
-    FEElasticMaterialPoint& pe = *mp.ExtractData<FEElasticMaterialPoint>();
-    mat3ds s = m_pBase->Stress(mp);
-    tens4ds c = m_pBase->Tangent(mp);
-    mat3ds dPhi = m_pCrit->CriterionStressTangent(mp);
-    mat3d M = dPhi*s*2 - mat3dd((dPhi*s).trace()) + c.dot(dPhi);
-    mat3ds Ui = pe.RightStretchInverse();
-    mat3d R = pe.m_F*Ui;
-    mat3ds N = (R.transpose()*M*R*Ui).sym();
-    return N;
+    FEReactivePlasticReturnMap rm(m_pBase, m_pCrit, m_isochrc, m_rtol);
+    return rm.YieldSurfaceNormal(mp);
 }
 
 //-----------------------------------------------------------------------------
@@ -399,12 +295,14 @@ void FEReactivePlasticity::OctahedralPlasticStrain(FEMaterialPoint& pt)
     // extract plastic material point
     FEReactivePlasticityMaterialPoint& pp = *pt.ExtractData<FEReactivePlasticityMaterialPoint>();
     
-    double ev[3];
     for (int i=0; i<n; ++i) {
-        mat3ds Cvsi = (pp.m_Fvsi[i].transpose()*pp.m_Fvsi[i]).sym();
-        Cvsi.eigen2(ev);
-        for (int j=0; j<3; ++j) ev[j] = 1./sqrt(ev[j]);
-        pp.m_gp[i] = sqrt(2.)/3.*sqrt(pow(ev[0] - ev[1],2) + pow(ev[1] - ev[2],2) + pow(ev[2] - ev[0],2));
+        // effective plastic strain sqrt(2/3 devE:devE), where E is the Lagrange strain
+        // of the plastic deformation gradient Fvs (Zimmerman et al., JMPS 2021, Eq. 5.10);
+        // this is the same measure as the "DC octahedral shear strain" criterion
+        mat3d Fvs = pp.m_Fvsi[i].inverse();
+        mat3ds Evs = ((Fvs.transpose()*Fvs).sym() - mat3dd(1))*0.5;
+        mat3ds devE = Evs.dev();
+        pp.m_gp[i] = sqrt(devE.dotdot(devE)*(2./3.));
     }
 }
 

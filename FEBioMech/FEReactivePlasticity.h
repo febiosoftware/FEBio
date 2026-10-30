@@ -67,7 +67,7 @@ public:
     
     // get the yield surface normal
     mat3ds YieldSurfaceNormal(FEMaterialPoint& mp);
-    
+
     // evaluate octahedral plastic strain
     void OctahedralPlasticStrain(FEMaterialPoint& pt);
     
@@ -86,6 +86,8 @@ public:
 public:
     bool        m_isochrc;  // flag for constraining plastic def grad to be isochoric
     double      m_rtol;     // user-defined relative tolerance
+    int         m_formulation;  // 0 = original (stretch-based, shared rotation), 1 = symmetric G
+    bool        m_mandel;   // flow direction normal to yield surface in Mandel stress space (formulation 1 only)
 
     bool    m_secant_tangent;
 

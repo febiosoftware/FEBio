@@ -42,6 +42,10 @@ SOFTWARE.*/
 #include "FEModel.h"
 #include "FEPIDController.h"
 #include "FEDataMap.h"
+#include <FECore/FELogNodeData.h>
+#include <FECore/FELogFaceData.h>
+#include <FECore/FELogElemData.h>
+#include <FECore/DataRecord.h>
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -781,4 +785,118 @@ void FEPlotFieldVariable::Serialize(DumpStream& ar)
 {
 	FEPlotNodeData::Serialize(ar);
 	ar & m_dofs;
+}
+
+FEPlotLogNodeData::FEPlotLogNodeData(FEModel* pfem) : FEPlotNodeData(pfem, Var_Type::PLT_FLOAT, Storage_Fmt::FMT_ITEM)
+{
+}
+
+bool FEPlotLogNodeData::SetFilter(const char* sz)
+{
+	if (sz == nullptr) return false;
+	FEModel* fem = GetFEModel();
+	DataStore& DS = fem->GetDataStore();
+
+	DataRecordItem it = ProcessDataString(sz);
+	if (!it.isValid()) return false;
+
+	const char* szvar = it.name.c_str();
+
+	// try nodal variables first
+	m_logvar = fecore_new<FELogNodeData>(szvar, fem);
+	if (m_logvar == nullptr) return false;
+
+	if (!ApplyDataRecordItem(*m_logvar, it))
+		return false;
+
+	return true;
+}
+
+bool FEPlotLogNodeData::Save(FEMesh& mesh, FEDataStream& a)
+{
+	if (m_logvar == nullptr) return false;
+
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		double v = m_logvar->value(node);
+		a << v;
+	}
+	return true;
+}
+
+FEPlotLogFaceData::FEPlotLogFaceData(FEModel* pfem) : FEPlotSurfaceData(pfem, Var_Type::PLT_FLOAT, Storage_Fmt::FMT_ITEM)
+{}
+
+bool FEPlotLogFaceData::SetFilter(const char* sz)
+{
+	if (sz == nullptr) return false;
+	FEModel* fem = GetFEModel();
+	DataStore& DS = fem->GetDataStore();
+
+	DataRecordItem it = ProcessDataString(sz);
+	if (!it.isValid()) return false;
+
+	const char* szvar = it.name.c_str();
+
+	// try nodal variables first
+	m_logvar = fecore_new<FELogFaceData>(szvar, fem);
+	if (m_logvar == nullptr) return false;
+
+	if (!ApplyDataRecordItem(*m_logvar, it))
+		return false;
+
+	return true;
+}
+
+bool FEPlotLogFaceData::Save(FESurface& surf, FEDataStream& a)
+{
+	if (m_logvar == nullptr) return false;
+
+	for (int i = 0; i < surf.Elements(); ++i)
+	{
+		FESurfaceElement& face = surf.Element(i);
+		double v = m_logvar->value(face);
+		a << v;
+	}
+
+	return true;
+}
+
+FEPlotLogElemData::FEPlotLogElemData(FEModel* pfem) : FEPlotDomainData(pfem, Var_Type::PLT_FLOAT, Storage_Fmt::FMT_ITEM)
+{}
+
+bool FEPlotLogElemData::SetFilter(const char* sz)
+{
+	if (sz == nullptr) return false;
+	FEModel* fem = GetFEModel();
+	DataStore& DS = fem->GetDataStore();
+
+	DataRecordItem it = ProcessDataString(sz);
+	if (!it.isValid()) return false;
+
+	const char* szvar = it.name.c_str();
+
+	// try nodal variables first
+	m_logvar = fecore_new<FELogElemData>(szvar, fem);
+	if (m_logvar == nullptr) return false;
+
+	if (!ApplyDataRecordItem(*m_logvar, it))
+		return false;
+
+	return true;
+}
+
+bool FEPlotLogElemData::Save(FEDomain& dom, FEDataStream& a)
+{
+	if (m_logvar == nullptr) return false;
+
+	for (int i = 0; i < dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		double v = m_logvar->value(el);
+		a << v;
+	}
+	
+	return true;
 }

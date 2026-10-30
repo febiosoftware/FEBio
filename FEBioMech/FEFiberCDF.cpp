@@ -30,6 +30,7 @@
 #include "FEFiberCDF.h"
 #include "FEFiberCDFMaterialPoint.h"
 #include <limits>
+#include <cmath>
 #include <FECore/log.h>
 
 //-----------------------------------------------------------------------------
@@ -47,6 +48,7 @@ FEFiberCDF::FEFiberCDF(FEModel* pfem) : FEFiberMaterial(pfem)
 { 
 	m_E = 0;
 	m_epsf = 1.0;
+    m_dImax = 0.05;
     m_CDF = nullptr;
 }
 
@@ -92,8 +94,8 @@ mat3ds FEFiberCDF::FiberStress(FEMaterialPoint& mp, const vec3d& n0)
         Integrate(mp, In_1);
 
 		// calculate strain energy first derivative
-        double Wl = ksi*fp.m_ds_t*In_1;
-
+        double Wl = ksi*fp.m_ds_t;
+        
 		// calculate the fiber stress
 		s = N*(2.0*Wl/J);
 	}
@@ -188,41 +190,50 @@ double FEFiberCDF::FiberStrainEnergyDensity(FEMaterialPoint& mp, const vec3d& n0
 }
 
 //-----------------------------------------------------------------------------
+// Evaluate, with x = In - 1,
+//   d2s = cdf(x)
+//   ds  = int_0^x cdf(t) dt              (first derivative of sed w.r.t. In)
+//   sed = int_0^x (x - t) cdf(t) dt      (= double integral of cdf, by Cauchy's formula)
+// using composite 5-point Gauss-Legendre quadrature on [0,x], with segments
+// no wider than m_dImax. The result depends only on the current value of x,
+// so the response is hyperelastic (path-independent) and needs no history.
 void FEFiberCDF::Integrate(FEMaterialPoint& mp, const double In_1)
 {
-    double dImax = 1e-2;
+    // 5-point Gauss-Legendre rule on [-1,1] (exact for polynomials of degree 9)
+    const int NGP = 5;
+    static const double xi[NGP] = {
+        -0.906179845938663992797627, -0.538469310105683091036314, 0.0,
+         0.538469310105683091036314,  0.906179845938663992797627 };
+    static const double wi[NGP] = {
+         0.236926885056189087514264,  0.478628670499366468041292, 0.568888888888888888888889,
+         0.478628670499366468041292,  0.236926885056189087514264 };
+
     FEFiberCDFMaterialPoint& fp = *mp.ExtractData<FEFiberCDFMaterialPoint>();
-    
-    // check increment in strain
-    double dIn = In_1 - fp.m_In_1_p;
-    
-    // if small enough, integrate in a single step
-    if (fabs(dIn) <= dImax) {
-        fp.Integrate(m_CDF->cdf(mp,In_1));
-        return;
+
+    double ds = 0.0, sed = 0.0;
+    if (In_1 > 0.0)
+    {
+        // number of segments and their half-width
+        int nseg = (int)ceil(In_1/m_dImax);
+        if (nseg < 1) nseg = 1;
+        double hw = 0.5*In_1/nseg;
+
+        for (int k=0; k<nseg; ++k)
+        {
+            double tc = (2*k + 1)*hw;   // segment midpoint
+            for (int i=0; i<NGP; ++i)
+            {
+                double t = tc + hw*xi[i];
+                double f = wi[i]*hw*m_CDF->cdf(mp, t);
+                ds  += f;
+                sed += f*(In_1 - t);
+            }
+        }
     }
-    // otherwise, integrate over multiple steps
-    double In_1_p = fp.m_In_1_p;
-    double d2s_p = fp.m_d2s_p;
-    double ds_p = fp.m_ds_p;
-    double sed_p = fp.m_sed_p;
-    double In_1_t, d2s_t, ds_t, sed_t;
-    do {
-        In_1_t = In_1_p + dImax;
-        if (In_1_t > In_1) In_1_t = In_1;
-        dIn = In_1_t - In_1_p;
-        d2s_t = m_CDF->cdf(mp,In_1_t);
-        sed_t = sed_p + ds_p*dIn + 0.25*dIn*dIn*(d2s_t + d2s_p);
-        ds_t = ds_p + 0.5*dIn*(d2s_t + d2s_p);
-        fp.m_d2s_t = d2s_t;
-        fp.m_ds_t = ds_t;
-        fp.m_sed_t = sed_t;
-        In_1_p = In_1_t;
-        d2s_p = d2s_t;
-        ds_p = ds_t;
-        sed_p = sed_t;
-    } while (In_1_t < In_1);
-    return;
+
+    fp.m_d2s_t = (In_1 > 0.0) ? m_CDF->cdf(mp, In_1) : 0.0;
+    fp.m_ds_t  = ds;
+    fp.m_sed_t = sed;
 }
 
 //-----------------------------------------------------------------------------
