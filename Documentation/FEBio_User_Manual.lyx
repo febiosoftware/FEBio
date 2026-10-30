@@ -319,6 +319,12 @@ figs-within-sections
 \end_inset
 
 
+\begin_inset FormulaMacro
+\newcommand{\sym}{\operatorname{sym}}
+{\text{sym}}
+\end_inset
+
+
 \end_layout
 
 \begin_layout Title
@@ -88823,7 +88829,23 @@ name "subsec:Reactive-Elastoplastic-Solid"
 \end_layout
 
 \begin_layout Standard
-The material type of a reactive elasto-plastic solid with kinematic hardening is 
+A more complete description of reactive plasticity materials can be found in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\backslash
+href{https://febio.org/knowledgebase/}{
+\backslash
+emph{FEBio Theory Manual}}
+\end_layout
+
+\end_inset
+
+,
+ needed to better understand some of the requirements and variables presented below.
+ The material type of a reactive elasto-plastic solid with kinematic hardening is 
 \begin_inset Quotes eld
 \end_inset
 
@@ -88846,7 +88868,7 @@ reactive plasticity
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="3">
+<lyxtabular version="3" rows="7" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -88977,7 +88999,7 @@ nolink "false"
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -88986,7 +89008,7 @@ nolink "false"
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -89010,11 +89032,114 @@ nolink "false"
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<secant_tangent>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Flag determining the method fpr numerical evaluation of the tangent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+true
+\emph default
+ (1)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<formulation>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+original
+\emph default
+ (0) or 
+\emph on
+symmetric
+\emph default
+ (1).
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<mandel_normal>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Use Mandel normal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+false
+\emph default
+ (0)
 \end_layout
 
 \end_inset
@@ -89092,6 +89217,86 @@ nolink "false"
 \end_inset
 
 .The default value in FEBio is isochoric=1.
+ <formulation>:
+ 
+\emph on
+original
+\emph default
+ (default) keeps the stretch-based update 
+\begin_inset Formula $\mathbf{U}^{v}=\xi\sym\left(\mathbf{U}^{e}\cdot\left(\mathbf{I}-\hat{\mathbf{N}}\right)\right)$
+\end_inset
+
+,
+ and 
+\begin_inset Formula $\mathbf{F}^{v}=\mathbf{R}\cdot\mathbf{U}^{v}$
+\end_inset
+
+,
+ which assumes 
+\begin_inset Formula $\mathbf{F}^{v}$
+\end_inset
+
+ shares the rotation of 
+\begin_inset Formula $\mathbf{F}^{s}$
+\end_inset
+
+.
+ one may use this setting with the von Mises yield criterion.
+
+\emph on
+ symmetric
+\emph default
+ instead evaluates 
+\begin_inset Formula $\mathbf{F}^{v}=\xi\mathbf{F}^{e}\cdot\mathbf{G}$
+\end_inset
+
+ directly,
+ with 
+\begin_inset Formula $\mathbf{G}=\mathbf{I}-\lambda\hat{\mathbf{N}}$
+\end_inset
+
+ symmetric (zero plastic spin) and stores 
+\begin_inset Formula $\left(\mathbf{F}^{vs}\right)^{-1}=\xi\left(\mathbf{F}^{us}\right)^{-1}\cdot\mathbf{G}$
+\end_inset
+
+.
+ The flow direction is 
+\begin_inset Formula $\hat{\mathbf{N}}=\nicefrac{\partial\Phi}{\partial\mathbf{G}}$
+\end_inset
+
+,
+ and the Newton slope 
+\begin_inset Formula $\nicefrac{\partial\Phi}{\partial\lambda}$
+\end_inset
+
+ is exact and re-evaluated at each iterate,
+ with a bracketed (bisection) safeguard.
+ <mandel_normal> (
+\emph on
+symmetric
+\emph default
+ formulation only):
+ use the normal to the yield surface in Mandel stress space (classical associated flow) instead of 
+\begin_inset Formula $\nicefrac{\partial\Phi}{\partial\mathbf{G}}$
+\end_inset
+
+.
+ In general,
+ it is appropriate to set <formulation> to 
+\emph on
+symmetric
+\emph default
+ and <mandel_normal> to 
+\emph on
+true
+\emph default
+ for all yield criteria.
+\end_layout
+
+\begin_layout Standard
+<secant_tangent> is set to 1 by default and should not be changed,
+ as there is currently no reliable evaluation of the tangent stiffness in FEBio,
+ using an analytical expression.
 \end_layout
 
 \begin_layout Standard
@@ -124799,8 +125004,13 @@ https://developer.apple.com/documentation/accelerate/sparse_solvers
 ).
  It uses the native Accelerate framework of Mac OS.
  It may be used as a direct solver or an iterative solver.
- Users should consult the Apple documentation to determine optimal settings for this solver,
- based on their application.
+ Historically,
+ it was much slower than the MKL Pardiso solver,
+ but starting with the release of a arm64-only version of FEBio/FEBioStudio,
+ changes to the FEBio code and updates in the Accelerate framework and M-series chip performance make this solver highly efficient,
+ especially for computational fluid dynamics problems.
+ (Users may optionally consult the Apple documentation to determine optimal settings for this solver,
+ based on their application.) In FEBio,
 \end_layout
 
 \begin_layout Standard
@@ -124813,7 +125023,7 @@ https://developer.apple.com/documentation/accelerate/sparse_solvers
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="15" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -124925,7 +125135,7 @@ factorization
 \begin_inset Text
 
 \begin_layout Plain Layout
-Factorization method (0 to 6)
+Factorization method (0 to 10)
 \end_layout
 
 \end_inset
@@ -124934,8 +125144,39 @@ Factorization method (0 to 6)
 \begin_inset Text
 
 \begin_layout Plain Layout
-U:5=QR,
- S:4=DLTTPP
+7 (LU)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+factor_scaling
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Preconditioning
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (LDLT:
+ 2,
+ Cholesky/LU:
+ 1)
 \end_layout
 
 \end_inset
@@ -124955,7 +125196,7 @@ order_method
 \begin_inset Text
 
 \begin_layout Plain Layout
-Ordering algorithm (0 to 2)
+Ordering algorithm (0 to 3)
 \end_layout
 
 \end_inset
@@ -124964,15 +125205,46 @@ Ordering algorithm (0 to 2)
 \begin_inset Text
 
 \begin_layout Plain Layout
-U:2=COLAMD,
- S:0=AMD
+3 (let Accelerate choose)
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+preconditioner
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Iterative only.
+ 0=none,
+ 1=diagonal,
+ 2=diag_scaling
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (none)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -124981,7 +125253,7 @@ iterative_method
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -124990,11 +125262,224 @@ Iterative method (0 to 4)
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-4=LSMR
+4 (LSMR)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+strategy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0=direct,
+ 1=iterative,
+ 2=factor_preconditioned
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (Direct)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+partition_scaling
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Scales the diagonal of each partition (on/off)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+off
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nvec
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nr.
+ of orthogonal vectors kept by GMRES
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 (Accelerate default of 16)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+rtol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Relative convergence tolerance for iterative solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+atol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Absolute convergence tolerance for iterative solver
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{-12}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+print_level
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0=none,
+ 1=verbose
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+pivot_tolerance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+threshold use by partial pivoting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" color="default" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-1 (Accelerate's default)
 \end_layout
 
 \end_inset
@@ -125019,7 +125504,12 @@ The factorization methods include:
  3=LDLTSBK,
  4=LDLTTPP ,
  5=QR,
- 6=CholeskyAtA (
+ 6=CholeskyAtA,
+ 7=LU (default),
+ 8=LUUnpivoted,
+ 9=LUSPP,
+ 10=LUTPP (use lower-case textual versions in configuration file).
+ (
 \begin_inset Flex URL
 status open
 
@@ -125030,10 +125520,14 @@ https://developer.apple.com/documentation/accelerate/sparsefactorization_t
 \end_inset
 
 ).
+ factor_scaling includes 0=default,
+ 1=none,
+ 2=equilibrium-inf).
  The ordering algorithms include:
  0=AMD,
  1=Metis,
- 2=COLAMD (
+ 2=COLAMD,
+ 3=default (
 \begin_inset Flex URL
 status open
 
@@ -125045,11 +125539,12 @@ https://developer.apple.com/documentation/accelerate/sparseorder_t
 
 ).
  The iterative methods include:
- 0=ConjugateGradient,
+ 0=SparseConjugateGradient,
  1=GMRES,
  2=DQGMRES,
  3=FGMRES,
- 4=LSMR (
+ 4=LSMR (default).
+ (
 \begin_inset Flex URL
 status open
 
@@ -125060,6 +125555,93 @@ https://developer.apple.com/documentation/accelerate/sparse_solvers/sparse_itera
 \end_inset
 
 ).
+ The easiest way to run the accelerate solver is to include a febio.xml file in some directory (if located in the FEBioStudio.app/Contents/Resources directory,
+ this febio.xml file becomes the default,
+ otherwise,
+ run the executable with -cnf febio.xml -i your_filename.feb),
+ which contains
+\end_layout
+
+\begin_layout LyX-Code
+<?xml version="1.0" encoding="ISO-8859-1"?>
+\end_layout
+
+\begin_layout LyX-Code
+<febio_config version="3.0">
+\end_layout
+
+\begin_layout LyX-Code
+  <default_linear_solver type="accelerate"/>
+\end_layout
+
+\begin_layout LyX-Code
+</febio_config>
+\end_layout
+
+\begin_layout Standard
+for the direct solver,
+ or,
+ for example,
+\end_layout
+
+\begin_layout LyX-Code
+<?xml version="1.0" encoding="ISO-8859-1"?>
+\end_layout
+
+\begin_layout LyX-Code
+<febio_config version="3.0">
+\end_layout
+
+\begin_layout LyX-Code
+  <default_linear_solver type="accelerate">
+\end_layout
+
+\begin_layout LyX-Code
+    <strategy>iterative</strategy>
+\end_layout
+
+\begin_layout LyX-Code
+    <iterative_method>gmres</iterative_method>
+\end_layout
+
+\begin_layout LyX-Code
+    <preconditioner>diagonal</preconditioner>
+\end_layout
+
+\begin_layout LyX-Code
+    <partition_scaling>on</partition_scaling>
+\end_layout
+
+\begin_layout LyX-Code
+    <nvec>100</nvec>
+\end_layout
+
+\begin_layout LyX-Code
+    <max_iter>2000</max_iter>
+\end_layout
+
+\begin_layout LyX-Code
+    <rtol>1e-07</rtol>
+\end_layout
+
+\begin_layout LyX-Code
+    <atol>1e-14</atol>
+\end_layout
+
+\begin_layout LyX-Code
+    <print_level>1</print_level>
+\end_layout
+
+\begin_layout LyX-Code
+  </default_linear_solver>
+\end_layout
+
+\begin_layout LyX-Code
+</febio_config>
+\end_layout
+
+\begin_layout Standard
+for the iterative solver.
 \end_layout
 
 \begin_layout Subsection
