@@ -69,6 +69,7 @@ SOFTWARE.*/
 #include <sstream>
 #include <fstream>
 #include <functional>
+#include <mutex>
 
 #ifdef WIN32
 size_t FEBIOLIB_API GetPeakMemory();	// in memory.cpp
@@ -762,6 +763,15 @@ string removeNewLines(const char* sz)
 //-----------------------------------------------------------------------------
 void FEBioModel::Log(int ntag, const char* szmsg)
 {
+	// Log can be called concurrently from OpenMP worker threads (e.g. material
+	// warnings such as FEReactivePlasticity's "did not converge" message, which
+	// is issued from inside FEElasticSolidDomain::Update's parallel loop).
+	// The logfile, the report string and the IO timer are not thread-safe, so
+	// serialize access. A recursive mutex is used in case a log stream ends up
+	// calling back into Log on the same thread.
+	static std::recursive_mutex logMutex;
+	std::lock_guard<std::recursive_mutex> lock(logMutex);
+
 	TimerTracker t(&m_IOTimer);
 
 	if      (ntag == 0) m_log.printf(szmsg);
