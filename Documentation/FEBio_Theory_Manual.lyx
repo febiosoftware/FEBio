@@ -67859,6 +67859,674 @@ D\delta G=-\alpha\left[\begin{array}{cc}
 \end_layout
 
 \begin_layout Section
+Robin Boundary Condition for Elastic Support
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Robin-BC"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The surface of a deformable body is often supported by a surrounding medium that is not modeled explicitly,
+ such as the perivascular tissue that tethers a blood vessel,
+ or the soft tissues that surround an organ.
+ A common approach is to represent this medium by a continuous distribution of springs and dashpots attached to the surface 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Moireau12"
+literal "true"
+
+\end_inset
+
+,
+ which produces a boundary condition of Robin type (a linear combination of kinematic and traction conditions).
+ The classical form of this condition,
+ 
+\begin_inset Formula $\mathbf{t}=-k\mathbf{u}-c\dot{\mathbf{u}}-p_{0}\mathbf{n}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ is the surface displacement,
+ is not frame-indifferent:
+ a superposed rigid motion of the body produces a nonzero displacement and velocity,
+ and therefore spurious restoring and damping forces.
+ This section describes a frame-indifferent (objective) formulation in which the springs and dashpots connect the surface to an anchor representing the surrounding medium,
+ which may itself undergo a prescribed rigid-body motion.
+ This boundary condition is available in FEBio as the 
+\emph on
+Robin BC
+\emph default
+ surface load.
+\end_layout
+
+\begin_layout Subsection
+Anchor Kinematics and Constitutive Relation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Robin-BC-kinematics"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+ denote the position of a point on the boundary surface 
+\begin_inset Formula $\Gamma_{0}$
+\end_inset
+
+ in the reference configuration,
+ 
+\begin_inset Formula $\mathbf{x}=\mathbf{X}+\mathbf{u}$
+\end_inset
+
+ its position in the current configuration,
+ and 
+\begin_inset Formula $\mathbf{N}$
+\end_inset
+
+ the unit outward normal to 
+\begin_inset Formula $\Gamma_{0}$
+\end_inset
+
+ at 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+.
+ The point of the anchor to which 
+\begin_inset Formula $\mathbf{X}$
+\end_inset
+
+ is attached has the current position
+\begin_inset Formula 
+\begin{equation}
+\mathbf{y}\left(\mathbf{X},t\right)=\mathbf{X}_{c}+\mathbf{c}\left(t\right)+\mathbf{R}\left(t\right)\cdot\left(\mathbf{X}-\mathbf{X}_{c}\right)+\mathbf{w}\left(\mathbf{X},t\right)\,,\label{eq:robin-anchor}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{X}_{c}$
+\end_inset
+
+ is the center of rotation of the anchor in the reference configuration,
+ 
+\begin_inset Formula $\mathbf{c}\left(t\right)$
+\end_inset
+
+ is the anchor translation,
+ 
+\begin_inset Formula $\mathbf{w}\left(\mathbf{X},t\right)$
+\end_inset
+
+ is an optional additional (spatially varying) anchor displacement,
+ and 
+\begin_inset Formula $\mathbf{R}\left(t\right)$
+\end_inset
+
+ is the anchor rotation tensor.
+ The rotation is parameterized by a rotation vector 
+\begin_inset Formula $\boldsymbol{\theta}\left(t\right)=\theta\,\mathbf{e}$
+\end_inset
+
+,
+ with angle 
+\begin_inset Formula $\theta=\left|\boldsymbol{\theta}\right|$
+\end_inset
+
+ and unit axis 
+\begin_inset Formula $\mathbf{e}$
+\end_inset
+
+,
+ using the Rodrigues formula,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{R}=\mathbf{I}+\sin\theta\,\left[\mathbf{e}\right]_{\times}+\left(1-\cos\theta\right)\left[\mathbf{e}\right]^{2}_{\times}\,,\label{eq:robin-rodrigues}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\left[\mathbf{e}\right]_{\times}$
+\end_inset
+
+ is the skew-symmetric tensor such that 
+\begin_inset Formula $\left[\mathbf{e}\right]_{\times}\cdot\mathbf{a}=\mathbf{e}\times\mathbf{a}$
+\end_inset
+
+ for any vector 
+\begin_inset Formula $\mathbf{a}$
+\end_inset
+
+.
+ The gap between the surface point and its anchor point is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}=\mathbf{x}-\mathbf{y}\,.\label{eq:robin-gap}
+\end{equation}
+
+\end_inset
+
+In the reference configuration,
+ and in the absence of an initial anchor displacement,
+ the gap is zero.
+\end_layout
+
+\begin_layout Standard
+The springs and dashpots are oriented relative to the anchor,
+ using the anchor-convected normal 
+\begin_inset Formula $\tilde{\mathbf{n}}=\mathbf{R}\cdot\mathbf{N}$
+\end_inset
+
+.
+ The stiffness and damping tensors are
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}=k_{n}\,\tilde{\mathbf{n}}\otimes\tilde{\mathbf{n}}+k_{t}\left(\mathbf{I}-\tilde{\mathbf{n}}\otimes\tilde{\mathbf{n}}\right)\,,\quad\mathbf{C}=c_{n}\,\tilde{\mathbf{n}}\otimes\tilde{\mathbf{n}}+c_{t}\left(\mathbf{I}-\tilde{\mathbf{n}}\otimes\tilde{\mathbf{n}}\right)\,,\label{eq:robin-K-C}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $k_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $k_{t}$
+\end_inset
+
+ are the normal and tangential spring stiffnesses,
+ and 
+\begin_inset Formula $c_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $c_{t}$
+\end_inset
+
+ are the normal and tangential damping coefficients,
+ all defined per unit reference area.
+ The traction exerted by the support on the surface,
+ per unit reference area,
+ is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}_{0}=-\mathbf{K}\cdot\mathbf{g}-\mathbf{C}\cdot\overset{\circ}{\mathbf{g}}-p_{0}\,\mathbf{n}\,\frac{da}{dA}\,,\label{eq:robin-traction}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $p_{0}$
+\end_inset
+
+ is an optional external (follower) pressure acting on the current area 
+\begin_inset Formula $da$
+\end_inset
+
+ with current unit normal 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+,
+ and 
+\begin_inset Formula $\overset{\circ}{\mathbf{g}}$
+\end_inset
+
+ is the rate of the gap,
+ defined below.
+ Using the reference normal convected by the anchor,
+ rather than the current normal 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+,
+ makes 
+\begin_inset Formula $\mathbf{K}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ independent of the surface deformation,
+ so that the spring and dashpot terms derive from the quadratic potential 
+\begin_inset Formula $\frac{1}{2}\mathbf{g}\cdot\mathbf{K}\cdot\mathbf{g}$
+\end_inset
+
+ and the dissipation 
+\begin_inset Formula $\overset{\circ}{\mathbf{g}}\cdot\mathbf{C}\cdot\overset{\circ}{\mathbf{g}}\geq0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Two definitions are available for the rate of the gap.
+ The 
+\emph on
+objective rate
+\emph default
+ is the rate of the gap observed in the frame of the anchor,
+\begin_inset Formula 
+\begin{equation}
+\overset{\circ}{\mathbf{g}}=\mathbf{R}\cdot\frac{d}{dt}\left(\mathbf{R}^{T}\cdot\mathbf{g}\right)=\dot{\mathbf{g}}-\boldsymbol{\Omega}\cdot\mathbf{g}\,,\quad\boldsymbol{\Omega}=\dot{\mathbf{R}}\cdot\mathbf{R}^{T}\,,\label{eq:robin-objective-rate}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{\Omega}$
+\end_inset
+
+ is the spin of the anchor.
+ Alternatively,
+ the material time derivative 
+\begin_inset Formula $\overset{\circ}{\mathbf{g}}=\dot{\mathbf{g}}$
+\end_inset
+
+ may be used.
+\end_layout
+
+\begin_layout Subsection
+Frame Indifference
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Robin-BC-objectivity"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Consider a superposed rigid motion 
+\begin_inset Formula $\mathbf{x}^{+}=\mathbf{Q}\left(t\right)\cdot\mathbf{x}+\mathbf{b}\left(t\right)$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ is a proper orthogonal tensor,
+ applied to both the body and the anchor,
+ so that 
+\begin_inset Formula $\mathbf{y}^{+}=\mathbf{Q}\cdot\mathbf{y}+\mathbf{b}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{R}^{+}=\mathbf{Q}\cdot\mathbf{R}$
+\end_inset
+
+.
+ Then 
+\begin_inset Formula $\mathbf{g}^{+}=\mathbf{Q}\cdot\mathbf{g}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\tilde{\mathbf{n}}^{+}=\mathbf{Q}\cdot\tilde{\mathbf{n}}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\mathbf{K}^{+}=\mathbf{Q}\cdot\mathbf{K}\cdot\mathbf{Q}^{T}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{C}^{+}=\mathbf{Q}\cdot\mathbf{C}\cdot\mathbf{Q}^{T}$
+\end_inset
+
+.
+ Most importantly,
+ the gap expressed in the anchor frame is invariant,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{Z}\equiv\mathbf{R}^{T}\cdot\mathbf{g}\,,\quad\mathbf{Z}^{+}=\mathbf{R}^{T}\cdot\mathbf{Q}^{T}\cdot\mathbf{Q}\cdot\mathbf{g}=\mathbf{Z}\,,\label{eq:robin-Z}
+\end{equation}
+
+\end_inset
+
+so that the objective rate of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:robin-objective-rate"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) satisfies 
+\begin_inset Formula $\overset{\circ}{\mathbf{g}}^{+}=\mathbf{Q}\cdot\overset{\circ}{\mathbf{g}}$
+\end_inset
+
+.
+ Since the follower pressure term is also objective,
+ the traction of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:robin-traction"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) transforms as 
+\begin_inset Formula $\mathbf{t}^{+}_{0}=\mathbf{Q}\cdot\mathbf{t}_{0}$
+\end_inset
+
+.
+ In contrast,
+ 
+\begin_inset Formula $\dot{\mathbf{g}}^{+}=\mathbf{Q}\cdot\dot{\mathbf{g}}+\dot{\mathbf{Q}}\cdot\mathbf{g}$
+\end_inset
+
+,
+ so the material time derivative of the gap produces a spurious damping force proportional to the spin of the superposed motion.
+ Both definitions of the rate produce exactly zero traction when the surface moves rigidly with the anchor (
+\begin_inset Formula $\mathbf{g}=\mathbf{0}$
+\end_inset
+
+ at all times).
+ The classical support condition is recovered when the anchor is fixed (
+\begin_inset Formula $\mathbf{c}=\mathbf{w}=\mathbf{0}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\mathbf{R}=\mathbf{I}$
+\end_inset
+
+),
+ in which case 
+\begin_inset Formula $\mathbf{g}=\mathbf{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\overset{\circ}{\mathbf{g}}=\dot{\mathbf{u}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Virtual Work and Time Integration
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Robin-BC-time-integration"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The contribution of the support to the external virtual work is
+\begin_inset Formula 
+\begin{equation}
+\delta W_{e}=\int_{\Gamma_{0}}\delta\mathbf{v}\cdot\mathbf{t}_{0}\,dA\,,\label{eq:robin-virtual-work}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\delta\mathbf{v}$
+\end_inset
+
+ is the virtual velocity.
+ The rate of the gap is evaluated from the tracked variable 
+\begin_inset Formula $\mathbf{Z}=\mathbf{R}^{T}\cdot\mathbf{g}$
+\end_inset
+
+ when the objective rate is used (so that 
+\begin_inset Formula $\overset{\circ}{\mathbf{g}}=\mathbf{R}\cdot\dot{\mathbf{Z}}$
+\end_inset
+
+),
+ or 
+\begin_inset Formula $\mathbf{Z}=\mathbf{g}$
+\end_inset
+
+ otherwise (so that 
+\begin_inset Formula $\overset{\circ}{\mathbf{g}}=\dot{\mathbf{Z}}$
+\end_inset
+
+).
+ In quasi-static analyses,
+ the rate is evaluated with a backward Euler scheme,
+\begin_inset Formula 
+\begin{equation}
+\dot{\mathbf{Z}}_{n+1}=\frac{\mathbf{Z}_{n+1}-\mathbf{Z}_{n}}{\Delta t}\,.\label{eq:robin-backward-euler}
+\end{equation}
+
+\end_inset
+
+In dynamic analyses,
+ the rate is evaluated with the Newmark formulas (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Newmark-Integration"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ using the same parameters 
+\begin_inset Formula $\beta$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ as the solver,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\ddot{\mathbf{Z}}_{n+1} & =\frac{\mathbf{Z}_{n+1}-\mathbf{Z}_{n}}{\beta\Delta t^{2}}-\frac{\dot{\mathbf{Z}}_{n}}{\beta\Delta t}-\left(\frac{1}{2\beta}-1\right)\ddot{\mathbf{Z}}_{n}\,,\\
+\dot{\mathbf{Z}}_{n+1} & =\dot{\mathbf{Z}}_{n}+\Delta t\left[\left(1-\gamma\right)\ddot{\mathbf{Z}}_{n}+\gamma\ddot{\mathbf{Z}}_{n+1}\right]\,,
+\end{aligned}
+\label{eq:robin-newmark}
+\end{equation}
+
+\end_inset
+
+and the spring and dashpot traction is evaluated at the intermediate time 
+\begin_inset Formula $t_{n+\alpha}$
+\end_inset
+
+ of the generalized-
+\begin_inset Formula $\alpha$
+\end_inset
+
+ method 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Chung93"
+literal "true"
+
+\end_inset
+
+ (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Generalized-Alpha-Method"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}_{0,n+\alpha}=\alpha\,\mathbf{t}_{0,n+1}+\left(1-\alpha\right)\mathbf{t}_{0,n}\,,\label{eq:robin-alpha}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\alpha=\alpha_{f}$
+\end_inset
+
+ in dynamic analyses and 
+\begin_inset Formula $\alpha=1$
+\end_inset
+
+ in quasi-static analyses.
+ The follower pressure 
+\begin_inset Formula $p_{0}$
+\end_inset
+
+ is evaluated at 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+,
+ as for the pressure load.
+ Since 
+\begin_inset Formula $\mathbf{Z}$
+\end_inset
+
+ is exactly invariant under superposed rigid motions of the body and anchor,
+ the discrete objective rate inherits this invariance at every time step,
+ not only in the limit 
+\begin_inset Formula $\Delta t\to0$
+\end_inset
+
+.
+ The surface is assumed to start at rest relative to the anchor (
+\begin_inset Formula $\dot{\mathbf{Z}}_{0}=\ddot{\mathbf{Z}}_{0}=\mathbf{0}$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+Linearization and Discretization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Robin-BC-linearization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Formula $\mathbf{y}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ are prescribed functions of time,
+ the linearization of the gap along an incremental displacement 
+\begin_inset Formula $\Delta\mathbf{u}$
+\end_inset
+
+ is 
+\begin_inset Formula $D\mathbf{g}\left[\Delta\mathbf{u}\right]=\Delta\mathbf{u}$
+\end_inset
+
+.
+ From (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:robin-backward-euler"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) or (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:robin-newmark"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ 
+\begin_inset Formula $D\dot{\mathbf{Z}}_{n+1}=\kappa\,D\mathbf{Z}_{n+1}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\kappa=1/\Delta t$
+\end_inset
+
+ for backward Euler and 
+\begin_inset Formula $\kappa=\gamma/\left(\beta\Delta t\right)$
+\end_inset
+
+ for Newmark integration.
+ For both definitions of the rate,
+ 
+\begin_inset Formula $D\overset{\circ}{\mathbf{g}}\left[\Delta\mathbf{u}\right]=\kappa\,\mathbf{R}\cdot\mathbf{R}^{T}\cdot\Delta\mathbf{u}=\kappa\,\Delta\mathbf{u}$
+\end_inset
+
+,
+ so that
+\begin_inset Formula 
+\begin{equation}
+D\mathbf{t}_{0,n+\alpha}\left[\Delta\mathbf{u}\right]=-\alpha\left(\mathbf{K}+\kappa\,\mathbf{C}\right)\cdot\Delta\mathbf{u}-D\left(p_{0}\,\mathbf{n}\,\frac{da}{dA}\right)\left[\Delta\mathbf{u}\right]\,.\label{eq:robin-linearization}
+\end{equation}
+
+\end_inset
+
+Discretizing the surface with shape functions 
+\begin_inset Formula $N_{a}\left(r,s\right)$
+\end_inset
+
+ and integrating over the reference area produces the nodal stiffness matrix
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{ab}=\alpha\int_{\Gamma_{0}}N_{a}N_{b}\left(\mathbf{K}+\kappa\,\mathbf{C}\right)dA-\int p_{0}\,N_{a}\left[\frac{\partial N_{b}}{\partial r}\frac{\partial\mathbf{x}}{\partial s}-\frac{\partial N_{b}}{\partial s}\frac{\partial\mathbf{x}}{\partial r}\right]_{\times}dr\,ds\,,\label{eq:robin-stiffness}
+\end{equation}
+
+\end_inset
+
+where the second term is the familiar non-symmetric stiffness of a follower pressure.
+ Because the spring and dashpot terms act on the reference area and use the anchor-convected normal,
+ their contribution to the stiffness matrix is symmetric and contains no geometric (area-variation) terms.
+ The corresponding nodal force is 
+\begin_inset Formula $\mathbf{f}_{a}=\int_{\Gamma_{0}}N_{a}\,\mathbf{t}_{0,n+\alpha}\,dA$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
 Nonlinear Constraints
 \begin_inset CommandInset label
 LatexCommand label
