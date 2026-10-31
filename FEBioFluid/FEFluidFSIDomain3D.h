@@ -101,6 +101,9 @@ public:
     
     //! calculates the solid element mass matrix
     void ElementMassMatrix(FESolidElement& el, matrix& ke);
+
+    //! calculates the stiffness with respect to the solid displacement (internal and inertial forces)
+    void ElementStiffnessDisplacement(FESolidElement& el, matrix& ke);
     
     //! calculates the stiffness matrix due to body forces
     void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);

@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
+#include "FEContactFrame.h"
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact surface used for sticky contact.
@@ -53,6 +54,7 @@ public:
 		vec3d				Lm;		//!< Lagrange multiplier
 		vec3d				tn;		//!< traction vector
 		FESurfaceElement*	pme;	//!< secondary surface element a node penetrates
+		FEContactFrame		Rp;		//!< corotational frame at start of time step (for pushing Lm forward)
 	};
 
 public:
@@ -93,6 +95,9 @@ public:
 
 	//! interface activation
 	void Activate() override;
+
+	//! push multipliers forward with the interface rotation (frame invariance)
+	void PrepStep() override;
 
 	//! projects nodes onto secondary surface
 	void ProjectSurface(FEStickySurface& ss, FEStickySurface& ms, bool bmove = false);

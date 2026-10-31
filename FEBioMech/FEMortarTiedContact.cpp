@@ -52,7 +52,45 @@ bool FEMortarTiedSurface::Init()
 	// allocate data structures
 	m_L.resize(NN, vec3d(0,0,0));
 
+	// find an element that contains each node
+	m_nel.assign(NN, -1);
+	for (int i = 0; i < Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		for (int j = 0; j < el.Nodes(); ++j)
+		{
+			int n = el.m_lnode[j];
+			if (m_nel[n] < 0) m_nel[n] = i;
+		}
+	}
+	m_Rp.assign(NN, FEContactFrame());
+
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEMortarTiedSurface::InitFrames()
+{
+	for (int i = 0; i < Nodes(); ++i)
+	{
+		m_Rp[i] = FEContactFrame();
+		if (m_nel[i] >= 0) m_Rp[i].EvaluateCenter(*this, Element(m_nel[i]), true);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! The Lagrange multipliers are stored as spatial vectors. At the start of each
+//! time step they are pushed forward with the local rotation of the surface over
+//! the previous time step, so that they remain frame invariant.
+void FEMortarTiedSurface::PushForwardMultipliers()
+{
+	for (int i = 0; i < Nodes(); ++i)
+	{
+		if (m_nel[i] < 0) continue;
+		FEContactFrame Rn;
+		Rn.EvaluateCenter(*this, Element(m_nel[i]), true);
+		m_Rp[i].Update(Rn, &m_L[i], 1);
+	}
 }
 
 //=============================================================================
@@ -101,6 +139,15 @@ void FEMortarTiedContact::Activate()
 	// update the nodal gaps
 	// (must be done after mortar eights are updated)
 	UpdateNodalGaps(m_ss, m_ms);
+
+	// initialize corotational frames
+	m_ss.InitFrames();
+}
+
+//-----------------------------------------------------------------------------
+void FEMortarTiedContact::PrepStep()
+{
+	m_ss.PushForwardMultipliers();
 }
 
 //-----------------------------------------------------------------------------

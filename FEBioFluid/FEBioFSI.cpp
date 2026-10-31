@@ -33,6 +33,7 @@ SOFTWARE.*/
 #include "FEFluidFSI.h"
 #include "FEFluidFSIDomain3D.h"
 #include "FEFluidFSITraction.h"
+#include "FETiedFluidFSI.h"
 #include "FEFluidFSIDomainFactory.h"
 #include "FEBackFlowFSIStabilization.h"
 #include "FETangentialFlowFSIStabilization.h"
@@ -109,5 +110,7 @@ void FEBioFSI::InitModule()
 
     REGISTER_FECORE_CLASS(FEFluidSupplyStarling, "Starling");
 
+    REGISTER_FECORE_CLASS(FETiedFluidFSI, "tied-fluid-FSI");
+    
 	febio.SetActiveModule(0);
 }

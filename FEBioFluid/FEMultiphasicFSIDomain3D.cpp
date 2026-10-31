@@ -25,6 +25,7 @@
  SOFTWARE.*/
 
 #include "stdafx.h"
+#include <FECore/FEObjectiveKinematics.h>
 #include "FEMultiphasicFSIDomain3D.h"
 #include <FECore/log.h>
 #include "FECore/DOFS.h"
@@ -221,9 +222,14 @@ void FEMultiphasicFSIDomain3D::InitMaterialPoints()
             }
             
             ps.m_psi = m_pMat->ElectricPotential(mp);
+            ps.m_crp.assign(nsol, 0.0);
+            FEElasticMaterialPoint& et = *(mp.ExtractData<FEElasticMaterialPoint>());
+            double phif0 = m_pMat->Porosity(mp);
             for (int isol = 0; isol<nsol; ++isol) {
                 ps.m_ca[isol] = m_pMat->ConcentrationActual(mp, isol);
                 ps.m_j[isol] = m_pMat->SoluteFlux(mp, isol);
+                // referential solute content at the initial time
+                ps.m_crp[isol] = et.m_J*phif0*ps.m_ca[isol];
             }
             ft.m_pf = m_pMat->PressureActual(mp);
             
@@ -258,6 +264,7 @@ void FEMultiphasicFSIDomain3D::Reset()
         ps.m_c.assign(nsol,0);
         ps.m_ca.assign(nsol,0);
         ps.m_cdot.assign(nsol,0);
+        ps.m_crp.assign(nsol,0);
         ps.m_gradc.assign(nsol,vec3d(0,0,0));
         ps.m_j.assign(nsol,vec3d(0,0,0));
         ps.m_k.assign(nsol, 0);
@@ -290,6 +297,10 @@ void FEMultiphasicFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
     const int NE = FEElement::MAX_NODES;
     vec3d x0[NE], xt[NE], r0, rt, v;
     FEMesh& m = *GetMesh();
+    const int nsol = m_pMat->Solutes();
+    vector<int> sid(nsol);
+    for (int k = 0; k<nsol; ++k) sid[k] = m_pMat->GetSolute(k)->GetSoluteDOF();
+    vector< vector<double> > cp(nsol, vector<double>(NE));
     for (size_t i=0; i<m_Elem.size(); ++i)
     {
         FESolidElement& el = m_Elem[i];
@@ -300,6 +311,8 @@ void FEMultiphasicFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
             {
                 x0[i] = m.Node(el.m_node[i]).m_r0;
                 xt[i] = m.Node(el.m_node[i]).m_rt;
+                // converged concentrations at the end of the previous time step
+                for (int k = 0; k<nsol; ++k) cp[k][i] = m.Node(el.m_node[i]).get_prev(m_dofC + sid[k]);
             }
             
             int n = el.GaussPoints();
@@ -320,10 +333,33 @@ void FEMultiphasicFSIDomain3D::PreSolveUpdate(const FETimeInfo& timeInfo)
                     throw NegativeJacobianDetected();
                 }
                 
+                // store the referential solute content J*phif*ca of the converged state at the
+                // end of the previous time step (positions m_rp and previous nodal concentrations).
+                // The solute mass balances use the conservative difference
+                // (J*phif*ca - m_crp)/(J*dt), which conserves solute content exactly across
+                // large changes over a time step (e.g. jumps in the electric potential after
+                // a step load), unlike the product-rule expansion of d(J*phif*ca)/dt.
+                if (nsol > 0)
+                {
+                    FEMultiphasicFSIMaterialPoint& ps = *mp.ExtractData<FEMultiphasicFSIMaterialPoint>();
+                    mat3d Fp;
+                    double Jp = defgradp(el, Fp, j);
+                    mat3d Fs = et.m_F; double Js = et.m_J;
+                    vector<double> cs = ps.m_c;
+                    et.m_F = Fp; et.m_J = Jp;
+                    for (int k = 0; k<nsol; ++k) ps.m_c[k] = el.Evaluate(&cp[k][0], j);
+                    double phifp = m_pMat->Porosity(mp);
+                    ps.m_crp.resize(nsol);
+                    for (int k = 0; k<nsol; ++k)
+                        ps.m_crp[k] = Jp*phifp*m_pMat->ConcentrationActual(mp, k);
+                    et.m_F = Fs; et.m_J = Js;
+                    ps.m_c = cs;
+                }
+
                 // reset chemical reaction element data
                 for (int j=0; j<m_pMat->Reactions(); ++j)
                     m_pMat->GetReaction(j)->InitializeElementData(mp);
-                
+
                 mp.Update(timeInfo);
             }
         }
@@ -420,6 +456,7 @@ void FEMultiphasicFSIDomain3D::InternalForces(FEGlobalVector& R)
 void FEMultiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
     const FETimeInfo& tp = GetFEModel()->GetTime();
+    const double dtrans = m_btrans ? 1 : m_sseps;
     int i, n;
     
     // jacobian matrix, inverse jacobian matrix and determinants
@@ -576,7 +613,9 @@ void FEMultiphasicFSIDomain3D::ElementInternalForce(FESolidElement& el, vector<d
             
             for (int isol=0; isol<nsol; ++isol)
             {
-                double fc = ((mt.m_j[isol]+je*penalty)*gradN[i] + H[i]*(phif*chat[isol] - (ft.m_Jdot*phif*mt.m_k[isol]*mt.m_c[isol] + phifdot*et.m_J*mt.m_k[isol]*mt.m_c[isol] + dkdt[isol]*et.m_J*phif*mt.m_c[isol] + mt.m_cdot[isol]*et.m_J*phif*mt.m_k[isol])/et.m_J))*detJ;
+                // rate of solute content, conservative form: (J*phif*ca - (J*phif*ca)_n)/(J*alphaf*dt)
+                double crate = (phif*mt.m_k[isol]*mt.m_c[isol] - mt.m_crp[isol]/et.m_J)/(tp.alphaf*tp.timeIncrement)*dtrans;
+                double fc = ((mt.m_j[isol]+je*penalty)*gradN[i] + H[i]*(phif*chat[isol] - crate))*detJ;
                 fe[ndpn*i+7+isol] -= fc;
             }
         }
@@ -1563,10 +1602,14 @@ void FEMultiphasicFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp
         double Jt, Jp;
         Jt = defgrad(el, Ft, n);
         Jp = defgradp(el, Fp, n);
-        ept.m_F = Ft*alphaf + Fp*(1 - alphaf);
+        // incrementally objective kinematics at t_(n+alphaf) (see FEObjectiveKinematics.h):
+        // rotation and stretch are interpolated separately, and the velocity gradient
+        // is evaluated on the midpoint configuration, so that a rigid-body increment
+        // produces neither strain nor rate of deformation
+        ept.m_F = FEObjectiveInterpolateF(Fp, Ft, alphaf);
         ept.m_J = ept.m_F.det();
         mat3d Fi = ept.m_F.inverse();
-        ept.m_L = (Ft - Fp)*Fi*(dtrans / dt);
+        ept.m_L = FEMidpointVelocityGradient(Fp, Ft, dt)*dtrans;
         ept.m_v = m_btrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
         ept.m_a = m_btrans ? el.Evaluate(a, n) : vec3d(0, 0, 0);
         //NOTE: Made these new function. Converts from GradJ to gradJ
@@ -1799,6 +1842,7 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
     const double dtrans = m_btrans ? 1 : m_sseps;
     const double atrans = m_btrans ? 1 : 0;
     const double bacc = (tp.beta > 0) ? 1.0/(tp.beta*dt*dt) : 0;
+    const double sfac = dtrans/(af*dt);     // factor of the conservative solute content rate
 
     const double R = m_pMat->m_Rgas;
     const double T = m_pMat->m_Tabs;
@@ -1857,6 +1901,19 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
 
         // kinematics
         mat3d Ft; double Jt = defgrad(el, Ft, n);
+        mat3d Fp; defgradp(el, Fp, n);
+        // incrementally objective interpolation of the deformation gradient at the
+        // intermediate time, and its derivative with respect to F_{n+1}
+        FEObjectiveInterpolation oi;
+        oi.Init(Fp, Ft, af);
+        mat3d Fai = oi.F().inverse();
+        // reference gradients of the shape functions
+        const mat3d& J0i = el.m_J0i[n];
+        vector<vec3d> GradN0(neln);
+        for (int i=0; i<neln; ++i)
+            GradN0[i] = vec3d(J0i(0,0)*Gr[i] + J0i(1,0)*Gs[i] + J0i(2,0)*Gt[i],
+                              J0i(0,1)*Gr[i] + J0i(1,1)*Gs[i] + J0i(2,1)*Gt[i],
+                              J0i(0,2)*Gr[i] + J0i(1,2)*Gs[i] + J0i(2,2)*Gt[i]);
         mat3d G = et.m_F*Ft.inverse();
         // quantities in the configuration at time t (needed for the derivative of grad J when alpha_f < 1)
         mat3d Fti = Ft.inverse();
@@ -1972,8 +2029,12 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
             for (int k=0; k<3; ++k)
             {
                 const vec3d& s = e[k];
-                mat3d A = (s & gj)*af;          // grad(du)
-                double div = (gj*s)*af;         // div(du)
+                // perturbation of F_{n+1} and of the (intermediate) configuration:
+                // A = dF_a.F_a^-1, where dF_a is the derivative of the objective
+                // interpolation (for af = 1, A = grad(du))
+                mat3d dFt = s & GradN0[j];
+                mat3d A = oi.dF(dFt)*Fai;
+                double div = A.trace();         // div(du)
                 mat3d At = A.transpose();
 
                 double dJ = J*div;
@@ -1991,9 +2052,10 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
                 vec3d dgradJ = -(At*gradJ) + Fit*dGradJt*af;
                 vec3d dgradphif = -gradphif*(2*div) + dgradJ*(phi0/(J*J));
                 double dc1 = -c1*div*(2 + phis/phif);
-                mat3d dL = ((s & gj)/dt - ((L*s) & gj)*af)*dtrans;
+                // derivative of the midpoint velocity gradient
+                mat3d dL = FEMidpointVelocityGradientDerivative(Fp, Ft, dt, dFt)*dtrans;
                 double dJdot = (Jt/dt)*((G.transpose()*gj)*s)*dtrans;
-                mat3d dLw = -((Lw*s) & gj)*af;
+                mat3d dLw = -(Lw*A);
                 mat3d dLf = dL + dLw/phif - Lw*(dphif/(phif*phif)) - (w & dgradphif)/(phif*phif) + (w & gradphif)*(2*dphif/(phif*phif*phif));
                 mat3ds dsv = cv.dot(dLf.sym());
                 mat3d KtA; KtA.zero();
@@ -2068,7 +2130,7 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
                     vec3d dgi = -(At*gi);
 
                     // solid momentum
-                    vec3d dFs = (mat3dd(gi*(se*gj)) + vdotTdotv(gi, cs, gj))*s*af;
+                    vec3d dFs = cs.dot(A.sym())*gi + A*(se*gi);
                     dFs -= (sv*gi)*dphis + (dsv*gi)*phis + (sv*dgi)*phis + (sv*gi)*(phis*div);
                     // osmotic stress -R*T*osmc*osm*I
                     dFs -= (gi*(dosmc*osm + osmc*dosm) + dgi*(osmc*osm) + gi*(osmc*osm*div))*RT;
@@ -2099,10 +2161,9 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
                     for (int a=0; a<nsol; ++a)
                     {
                         // fc = (j + penalty*je).gradN + H*(phif*chat - S)
-                        // S = (Jdot/J)*k*c*(phif+phis) + dkdt*phif*c + cdot*phif*k
-                        double S = (Jdot/J)*kap[a]*c[a]*(phif + phis) + dkdt[a]*phif*c[a] + cdot[a]*phif*kap[a];
-                        double dS = dJsoJ*kap[a]*c[a]*(phif + phis) + (Jdot/J)*dkap[a]*c[a]*(phif + phis)
-                                  + dkdt_d[a]*phif*c[a] + dkdt[a]*dphif*c[a] + cdot[a]*(dphif*kap[a] + phif*dkap[a]);
+                        // S = (phif*k*c - crp/J)/(alphaf*dt)   (conservative rate of solute content)
+                        double S = (phif*kap[a]*c[a] - mt.m_crp[a]/J)*sfac;
+                        double dS = (dphif*kap[a]*c[a] + phif*dkap[a]*c[a] + mt.m_crp[a]/J*div)*sfac;
                         vec3d jt = jsol[a] + je*penalty;
                         vec3d djt = dj[a] + dje*penalty;
                         double fc = jt*gi + H[i]*(phif*chat[a] - S);
@@ -2119,8 +2180,9 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, 
 //! Stiffness of the solute mass balances with respect to the effective concentrations.
 //! Evaluated as directional derivatives of the solute residual in ElementInternalForce,
 //! including the dependence of the partition coefficients (and their derivatives) on the
-//! concentrations through the electroneutrality condition. The second derivatives of the
-//! partition coefficients are evaluated with a forward difference on the concentrations.
+//! concentrations through the electroneutrality condition. The solute content rate is the
+//! conservative difference (phif*k*c - crp/J)/(alphaf*dt), so only first derivatives of the
+//! partition coefficients are needed.
 void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el, matrix& ke)
 {
     const FETimeInfo& tp = GetFEModel()->GetTime();
@@ -2134,8 +2196,6 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el,
     const double dt = tp.timeIncrement;
     const double af = tp.alphaf;
     const double dtrans = m_btrans ? 1 : m_sseps;
-    // derivative of the (intermediate) concentration rate with respect to the nodal concentration
-    const double cfac = tp.alpham/(tp.gamma*dt)*dtrans;
     const double penalty = m_pMat->m_penalty;
 
     vector<vec3d> gradN(neln);
@@ -2145,17 +2205,13 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el,
     vector<int> z(nsol);
     for (int a=0; a<nsol; ++a) z[a] = m_pMat->GetSolute(a)->ChargeNumber();
 
-    vector<double> d0(nsol), kap(nsol), c(nsol), cdot(nsol), dkdJ(nsol), dkdt(nsol);
+    vector<double> d0(nsol), kap(nsol), c(nsol);
     vector<vec3d> gradc(nsol), flux(nsol), jsol(nsol);
     vector<mat3ds> D(nsol);
     vector< vector<double> > dkdc(nsol, vector<double>(nsol));
     vector< vector<double> > d0p(nsol, vector<double>(nsol));
     vector< vector<mat3ds> > dDdc(nsol, vector<mat3ds>(nsol));
     vector< vector<double> > dzdc(nreact, vector<double>(nsol));
-    // second derivatives of partition coefficients w.r.t. concentration g
-    vector< vector<double> > ddkdJdc(nsol, vector<double>(nsol));                  // [a][g]
-    vector< vector< vector<double> > > ddkdcdc(nsol, vector< vector<double> >(nsol, vector<double>(nsol))); // [a][b][g]
-    vector<double> k1, dkdJ1; vector< vector<double> > dkdc1;
 
     for (int n=0; n<nint; ++n)
     {
@@ -2172,18 +2228,13 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el,
         FEFSIMaterialPoint& fpt = *(mp.ExtractData<FEFSIMaterialPoint>());
         FEMultiphasicFSIMaterialPoint& mt = *(mp.ExtractData<FEMultiphasicFSIMaterialPoint>());
 
-        const double J = et.m_J;
-        const double Jdot = fpt.m_Jdot;
         const vec3d w = fpt.m_w;
         double phif = m_pMat->Porosity(mp);
-        double phis = m_pMat->SolidVolumeFrac(mp);
 
         for (int a=0; a<nsol; ++a) {
             d0[a] = m_pMat->GetSolute(a)->m_pDiff->Free_Diffusivity(mp);
             kap[a] = mt.m_k[a];
             c[a] = mt.m_c[a];
-            cdot[a] = mt.m_cdot[a];
-            dkdJ[a] = mt.m_dkdJ[a];
             gradc[a] = mt.m_gradc[a];
             D[a] = m_pMat->Diffusivity(mp, a);
             flux[a] = -gradc[a]*phif + w*(c[a]/d0[a]);
@@ -2194,10 +2245,6 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el,
                 dDdc[a][b] = m_pMat->Diffusivity_Tangent_Concentration(mp, a, b);
             }
         }
-        for (int a=0; a<nsol; ++a) {
-            dkdt[a] = dkdJ[a]*Jdot;
-            for (int b=0; b<nsol; ++b) dkdt[a] += dkdc[a][b]*cdot[b];
-        }
         vec3d je(0,0,0);
         for (int a=0; a<nsol; ++a) je += jsol[a]*z[a];
         vector<double> chat(nsol, 0.0);
@@ -2205,19 +2252,6 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el,
             double zr = m_pMat->GetReaction(r)->ReactionSupply(mp);
             for (int a=0; a<nsol; ++a) chat[a] += m_pMat->GetReaction(r)->m_v[a]*zr;
             for (int g=0; g<nsol; ++g) dzdc[r][g] = m_pMat->GetReaction(r)->Tangent_ReactionSupply_Concentration(mp, g);
-        }
-
-        // second derivatives of the partition coefficients (forward difference on each concentration)
-        for (int g=0; g<nsol; ++g) {
-            double cg = mt.m_c[g];
-            double h = 1e-7*(fabs(cg) + 1e-3);
-            mt.m_c[g] = cg + h;
-            m_pMat->PartitionCoefficientFunctions(mp, k1, dkdJ1, dkdc1);
-            mt.m_c[g] = cg;
-            for (int a=0; a<nsol; ++a) {
-                ddkdJdc[a][g] = (dkdJ1[a] - dkdJ[a])/h;
-                for (int b=0; b<nsol; ++b) ddkdcdc[a][b][g] = (dkdc1[a][b] - dkdc[a][b])/h;
-            }
         }
 
         for (int j=0; j<neln; ++j)
@@ -2228,23 +2262,18 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el,
                 // perturbation of concentration g at node j
                 double dcg = af*H[j];           // d c~_g
                 vec3d dgcg = gj*af;             // d grad c~_g
-                double dcdotg = cfac*H[j];      // d (dc~_g/dt)
 
-                vector<double> dkap(nsol), ddkdJ(nsol), dkdt_d(nsol);
+                vector<double> dkap(nsol);
                 vector<vec3d> dj(nsol);
                 vec3d dje(0,0,0);
                 for (int a=0; a<nsol; ++a) {
                     dkap[a] = dkdc[a][g]*dcg;
-                    ddkdJ[a] = ddkdJdc[a][g]*dcg;
                     // d flux_a
                     vec3d dflux(0,0,0);
                     if (a == g) dflux = -dgcg*phif + w*(dcg/d0[a]);
                     dflux -= w*(c[a]*d0p[a][g]*dcg/(d0[a]*d0[a]));
                     dj[a] = (D[a]*flux[a])*dkap[a] + (dDdc[a][g]*flux[a])*(kap[a]*dcg) + (D[a]*dflux)*kap[a];
                     dje += dj[a]*z[a];
-                    // d (dkappa/dt)
-                    dkdt_d[a] = ddkdJ[a]*Jdot + dkdc[a][g]*dcdotg;
-                    for (int b=0; b<nsol; ++b) dkdt_d[a] += ddkdcdc[a][b][g]*dcg*cdot[b];
                 }
 
                 for (int i=0; i<neln; ++i)
@@ -2254,12 +2283,10 @@ void FEMultiphasicFSIDomain3D::ElementStiffnessConcentration(FESolidElement& el,
                     for (int a=0; a<nsol; ++a)
                     {
                         double dca = (a == g ? dcg : 0);
-                        double dcdota = (a == g ? dcdotg : 0);
                         double dchat = 0;
                         for (int rr=0; rr<nreact; ++rr) dchat += m_pMat->GetReaction(rr)->m_v[a]*dzdc[rr][g]*dcg;
-                        double dS = (Jdot/J)*(phif + phis)*(dkap[a]*c[a] + kap[a]*dca)
-                                  + dkdt_d[a]*phif*c[a] + dkdt[a]*phif*dca
-                                  + dcdota*phif*kap[a] + cdot[a]*phif*dkap[a];
+                        // conservative rate of solute content: (phif*k*c - crp/J)/(alphaf*dt)
+                        double dS = phif*(dkap[a]*c[a] + kap[a]*dca)*dtrans/(af*dt);
                         vec3d djt = dj[a] + dje*penalty;
                         double dfc = djt*gi + H[i]*(phif*dchat - dS);
                         ke[r+7+a][cl] += dfc*dv;

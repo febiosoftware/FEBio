@@ -23680,15 +23680,100 @@ J^{f}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)J^{f}_{n}+\alpha_{f}J^{f}_{n+1}
 
 \end_inset
 
-In particular,
- it follows that
+The interpolated motion 
+\begin_inset Formula $\boldsymbol{\chi}^{s}_{n+\alpha_{f}}$
+\end_inset
+
+ is used where position-dependent loads are evaluated,
+ whereas the intermediate configuration on which the weak form is integrated is defined at each integration point by the deformation gradient given below (volume element
+\begin_inset Formula $dv=J^{s}_{n+\alpha_{f}}dV$
+\end_inset
+
+,
+ spatial gradients
+\begin_inset Formula $\grad f=\Grad f\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}$
+\end_inset
+
+).
+The deformation gradient that follows from the interpolated motion,
 \begin_inset Formula 
 \[
-\mathbf{F}^{s}_{n+\alpha_{f}}=\frac{\partial\boldsymbol{\chi}^{s}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}^{s}_{n}+\alpha_{f}\mathbf{F}^{s}_{n+1}
+\frac{\partial\boldsymbol{\chi}^{s}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}^{s}_{n}+\alpha_{f}\mathbf{F}^{s}_{n+1}\,,
 \]
 
 \end_inset
 
+is not incrementally objective.
+For a rigid-body rotation increment 
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ over the time step,
+ it is not a rotation,
+ so that a constitutive relation evaluated with it produces a spurious strain of order 
+\begin_inset Formula $\alpha_{f}\left(1-\alpha_{f}\right)\Delta\theta^{2}$
+\end_inset
+
+ whenever 
+\begin_inset Formula $\alpha_{f}<1$
+\end_inset
+
+.
+Therefore,
+ the deformation gradient used to evaluate the constitutive response at 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+ interpolates the stretch linearly and the rotation along the geodesic between 
+\begin_inset Formula $\mathbf{R}^{s}_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{R}^{s}_{n+1}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\begin{aligned}\mathbf{F}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n+\alpha_{f}}\cdot\mathbf{U}^{s}_{n+\alpha_{f}}\,, & \mathbf{U}^{s}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{U}^{s}_{n}+\alpha_{f}\mathbf{U}^{s}_{n+1}\,,\\
+ & & \mathbf{R}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n}\cdot\exp\left[\alpha_{f}\log\left(\mathbf{R}^{sT}_{n}\cdot\mathbf{R}^{s}_{n+1}\right)\right]\,,
+\end{aligned}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{F}^{s}=\mathbf{R}^{s}\cdot\mathbf{U}^{s}$
+\end_inset
+
+ is the right polar decomposition,
+ and the exponential and logarithm map a rotation vector to a rotation tensor and vice versa.
+This interpolation reduces to 
+\begin_inset Formula $\mathbf{F}^{s}_{n+1}$
+\end_inset
+
+ when 
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+ (the default value 
+\begin_inset Formula $\rho_{\infty}=0$
+\end_inset
+
+ for this solver).
+It is objective,
+ since a rigid-body increment leaves 
+\begin_inset Formula $\mathbf{U}^{s}$
+\end_inset
+
+ unchanged,
+ and it differs from the linear interpolation by terms of second order in the rotation increment,
+ so the accuracy of the generalized 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ method is preserved.
+This deformation gradient and its inverse (used to evaluate spatial gradients of the fluid variables at the material point) are used to evaluate the following kinematic quantities,
 
 \begin_inset Formula 
 \[
@@ -23722,14 +23807,103 @@ In practice however,
 
 \end_inset
 
-
+and evaluating the velocity gradient over the time step on the midpoint configuration
 \begin_inset Formula 
 \[
-\mathbf{L}^{s}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}
+\mathbf{L}^{s}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}^{-1}_{n+1/2}\,,\quad\mathbf{F}_{n+1/2}=\frac{1}{2}\left(\mathbf{F}_{n}+\mathbf{F}_{n+1}\right)\,.
 \]
 
 \end_inset
 
+The previous form,
+ 
+\begin_inset Formula $\mathbf{L}^{s}_{n+\alpha_{f}}=\left(\mathbf{F}_{n+1}-\mathbf{F}_{n}\right)\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}/\Delta t$
+\end_inset
+
+,
+ is not incrementally objective:
+ under a rigid-body rotation increment 
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ its symmetric part,
+ which enters the viscous fluid stress through the rate of deformation of the fluid 
+\begin_inset Formula $\mathbf{D}^{f}$
+\end_inset
+
+,
+ does not vanish,
+ but is of order 
+\begin_inset Formula $\left(\alpha_{f}-\frac{1}{2}\right)\Delta\theta/\Delta t$
+\end_inset
+
+.
+For example,
+ with the default value 
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+ and a rotation increment of 0.1 radian per time step,
+ a rigidly rotating fluid-FSI domain exhibits a spurious rate of deformation equal to about 5% of its angular velocity.
+In contrast,
+ the midpoint form is the Cayley transform of the rotation increment for a rigid-body motion,
+ whose symmetric part vanishes exactly for rotation increments of any size (Hughes and Winget,
+ 1980).
+It is also the second-order accurate approximation of the velocity gradient over the time step.
+The same incrementally objective kinematics are used in the biphasic-FSI and multiphasic-FSI domains.
+The stiffness with respect to the solid displacement is consistent with these kinematics:
+ each column is evaluated as the directional derivative of the residual integrand for a perturbation
+\begin_inset Formula $\delta\mathbf{F}_{n+1}=\mathbf{e}_{k}\otimes\Grad N_{b}$
+\end_inset
+
+ of a single displacement degree of freedom,
+ which perturbs the intermediate configuration by
+\begin_inset Formula $\mathbf{A}=\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}$
+\end_inset
+
+ (Eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:edy-objective-interpolation-derivative"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+),
+ the velocity gradient by
+\begin_inset Formula $D\mathbf{L}^{s}=\left(\mathbf{I}/\Delta t-\mathbf{L}^{s}/2\right)\cdot\delta\mathbf{F}_{n+1}\cdot\mathbf{F}^{-1}_{n+1/2}$
+\end_inset
+
+,
+ and
+\begin_inset Formula $\dot{J}^{s}$
+\end_inset
+
+ by
+\begin_inset Formula $\left(J^{s}_{n+1}/\Delta t\right)\mathbf{F}^{-T}_{n+1}:\delta\mathbf{F}_{n+1}$
+\end_inset
+
+.
+ Spatial gradients and the volume element vary as
+\begin_inset Formula $D\left(\grad f\right)=-\mathbf{A}^{T}\cdot\grad f$
+\end_inset
+
+ and
+\begin_inset Formula $D\left(dv\right)=\left(\mathrm{tr}\,\mathbf{A}\right)dv$
+\end_inset
+
+,
+ and the solid stress as
+\begin_inset Formula $D\boldsymbol{\sigma}^{s}=\boldsymbol{\mathcal{C}}^{s}:\mathbf{A}^{s}+\mathbf{A}\cdot\boldsymbol{\sigma}^{s}+\boldsymbol{\sigma}^{s}\cdot\mathbf{A}^{T}-\left(\mathrm{tr}\,\mathbf{A}\right)\boldsymbol{\sigma}^{s}$
+\end_inset
+
+.
+ The resulting tangent was verified against a finite-difference derivative of the residual for the fluid-FSI,
+ biphasic-FSI and multiphasic-FSI domains.
 Similarly,
  we evaluate velocity derivatives at the intermediate time 
 \begin_inset Formula $t_{n+\alpha_{m}}=t_{n}+\alpha_{m}\left(t_{n+1}-t_{n}\right)$
@@ -49636,16 +49810,107 @@ where
 \end_inset
 
  is the displacement.
- In particular,
- it follows that the deformation gradient and its determinant are given at the intermediate time by
+ The deformation gradient that follows from the linear interpolation of the motion,
+\begin_inset Formula $\partial\boldsymbol{\chi}_{n+\alpha_{f}}/\partial\mathbf{X}=\left(1-\alpha_{f}\right)\mathbf{F}_{n}+\alpha_{f}\mathbf{F}_{n+1}$
+\end_inset
+
+,
+ is not incrementally objective:
+ for a rigid-body rotation increment
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ over the time step it is not a rotation,
+ so that a constitutive relation evaluated with it produces a spurious strain of order
+\begin_inset Formula $\alpha_{f}\left(1-\alpha_{f}\right)\Delta\theta^{2}$
+\end_inset
+
+ whenever
+\begin_inset Formula $\alpha_{f}<1$
+\end_inset
+
+,
+ and the intermediate configuration contracts spuriously.
+ Therefore,
+ the deformation gradient at the intermediate time is defined by interpolating the stretch linearly and the rotation along the geodesic between
+\begin_inset Formula $\mathbf{R}_{n}$
+\end_inset
+
+ and
+\begin_inset Formula $\mathbf{R}_{n+1}$
+\end_inset
+
+,
 \begin_inset Formula 
 \begin{equation}
-\mathbf{F}_{n+\alpha_{f}}=\frac{\partial\boldsymbol{\chi}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}_{n}+\alpha_{f}\mathbf{F}_{n+1}\,,\label{eq:edy-mp-defgrad}
+\begin{aligned}\mathbf{F}_{n+\alpha_{f}} & =\mathbf{R}_{n+\alpha_{f}}\cdot\mathbf{U}_{n+\alpha_{f}}\,, & \mathbf{U}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{U}_{n}+\alpha_{f}\mathbf{U}_{n+1}\,,\\
+ &  & \mathbf{R}_{n+\alpha_{f}} & =\mathbf{R}_{n}\cdot\exp\left[\alpha_{f}\log\left(\mathbf{R}^{T}_{n}\cdot\mathbf{R}_{n+1}\right)\right]\,,
+\end{aligned}
+\label{eq:edy-mp-defgrad}
 \end{equation}
 
 \end_inset
 
-and
+where
+\begin_inset Formula $\mathbf{F}=\mathbf{R}\cdot\mathbf{U}$
+\end_inset
+
+ is the right polar decomposition,
+ and the exponential and logarithm map a rotation vector to a rotation tensor and vice versa.
+ This interpolation is objective,
+ since a rigid-body increment leaves
+\begin_inset Formula $\mathbf{U}$
+\end_inset
+
+ unchanged;
+ it reduces to
+\begin_inset Formula $\mathbf{F}_{n+1}$
+\end_inset
+
+ when
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+,
+ and it differs from the linear interpolation by terms of second order in the rotation increment,
+ so the accuracy of the generalized
+\begin_inset Formula $\alpha$
+\end_inset
+
+ method is preserved.
+ The intermediate configuration on which the weak form is integrated is defined by this deformation gradient at each integration point:
+ the volume element is
+\begin_inset Formula $dv=J_{n+\alpha_{f}}dV$
+\end_inset
+
+,
+ and spatial gradients are evaluated as
+\begin_inset Formula $\grad f=\Grad f\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}$
+\end_inset
+
+,
+ where
+\begin_inset Formula $\Grad f$
+\end_inset
+
+ is evaluated in the reference configuration.
+ (The positions
+\begin_inset Formula $\boldsymbol{\chi}_{n+\alpha_{f}}$
+\end_inset
+
+ of Eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:edy-motion-interpolation"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ are only used where position-dependent loads are evaluated.) The determinant of the deformation gradient is given at the intermediate time by
 \begin_inset Formula 
 \begin{equation}
 J_{n+\alpha_{f}}=\det\mathbf{F}_{n+\alpha_{f}}\,.\label{eq:edy-mp-detJ}
@@ -49687,14 +49952,43 @@ In practice however,
 
 \end_inset
 
-and
+and we evaluate the velocity gradient over the time step on the midpoint configuration,
 \begin_inset Formula 
 \begin{equation}
-\mathbf{L}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}\,.\label{eq:edy-L-approx}
+\mathbf{L}_{n+\alpha_{f}}=\frac{\mathbf{F}_{n+1}-\mathbf{F}_{n}}{\Delta t}\cdot\mathbf{F}^{-1}_{n+1/2}\,,\quad\mathbf{F}_{n+1/2}=\frac{1}{2}\left(\mathbf{F}_{n}+\mathbf{F}_{n+1}\right)\,.\label{eq:edy-L-approx}
 \end{equation}
 
 \end_inset
 
+The form
+\begin_inset Formula $\left(\mathbf{F}_{n+1}-\mathbf{F}_{n}\right)\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}/\Delta t$
+\end_inset
+
+ is not incrementally objective:
+ under a rigid-body rotation increment
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+,
+ its symmetric part does not vanish but is of order
+\begin_inset Formula $\left(\alpha_{f}-\frac{1}{2}\right)\Delta\theta/\Delta t$
+\end_inset
+
+,
+ which produces a spurious viscous stress in rate-dependent materials,
+ including for
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+ (quasi-static analyses).
+ The midpoint form is the Cayley transform of the rotation increment for a rigid-body motion,
+ whose symmetric part vanishes exactly for rotation increments of any size (Hughes and Winget,
+ 1980);
+ it is also the second-order accurate approximation of the velocity gradient over the time step.
+ FEBio uses this form in all solid,
+ shell,
+ biphasic,
+ multiphasic and FSI domains.
 
 \end_layout
 
@@ -49900,10 +50194,10 @@ literal "true"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}D\mathbf{u}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\Delta\mathbf{u}\\
-D\mathbf{F}\left[\Delta\mathbf{u}\right] & =\alpha_{f}\Grad\Delta\mathbf{u}\\
-DJ\left[\Delta\mathbf{u}\right] & =\alpha_{f}J\left(\divg\Delta\mathbf{u}\right)\\
-D\dot{J}\left[\Delta\mathbf{u}\right] & =D\left(J\mathbf{F}^{-T}:\Grad\mathbf{v}\right)\left[\Delta\mathbf{u}\right]\\
- & =\alpha_{f}J\left[\left(\divg\mathbf{v}+\frac{\gamma}{\beta\Delta t}\right)\left(\divg\Delta\mathbf{u}\right)-\left(\grad\Delta\mathbf{u}\right)^{T}:\mathbf{L}\right]\\
+D\mathbf{F}\left[\Delta\mathbf{u}\right] & =\mathcal{D}_{\alpha_{f}}\left[\Grad\Delta\mathbf{u}\right]\equiv\mathbf{A}\cdot\mathbf{F}\\
+DJ\left[\Delta\mathbf{u}\right] & =J\,\mathrm{tr}\,\mathbf{A}\\
+D\dot{J}\left[\Delta\mathbf{u}\right] & =\frac{J_{n+1}}{\Delta t}\mathbf{F}^{-T}_{n+1}:\Grad\Delta\mathbf{u}\\
+D\mathbf{L}\left[\Delta\mathbf{u}\right] & =\left(\frac{1}{\Delta t}\mathbf{I}-\frac{1}{2}\mathbf{L}\right)\cdot\Grad\Delta\mathbf{u}\cdot\mathbf{F}^{-1}_{n+1/2}\\
 D\mathbf{v}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{f}\gamma}{\beta\Delta t}\Delta\mathbf{u}\\
 D\dot{\mathbf{v}}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{m}}{\beta\Delta t^{2}}\Delta\mathbf{u}
 \end{aligned}
@@ -49912,6 +50206,127 @@ D\dot{\mathbf{v}}\left[\Delta\mathbf{u}\right] & =\frac{\alpha_{m}}{\beta\Delta 
 
 \end_inset
 
+Here,
+\begin_inset Formula $\mathbf{F}$
+\end_inset
+
+ and
+\begin_inset Formula $J$
+\end_inset
+
+ are evaluated at
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+,
+\begin_inset Formula $\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]$
+\end_inset
+
+ is the derivative of the interpolation in Eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:edy-mp-defgrad"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ with respect to
+\begin_inset Formula $\mathbf{F}_{n+1}$
+\end_inset
+
+,
+ and
+\begin_inset Formula $\mathbf{A}=D\mathbf{F}\left[\Delta\mathbf{u}\right]\cdot\mathbf{F}^{-1}$
+\end_inset
+
+ is the resulting perturbation of the intermediate configuration (which replaces
+\begin_inset Formula $\alpha_{f}\grad\Delta\mathbf{u}$
+\end_inset
+
+ of the linear interpolation).
+ Using
+\begin_inset Formula $\delta\mathbf{F}_{n+1}=\mathbf{R}_{n+1}\cdot\left(\boldsymbol{\Omega}\cdot\mathbf{U}_{n+1}+\delta\mathbf{U}_{n+1}\right)$
+\end_inset
+
+,
+ the derivative of the polar decomposition is obtained from
+\begin_inset Formula $\left(\mathrm{tr}\,\mathbf{U}_{n+1}\,\mathbf{I}-\mathbf{U}_{n+1}\right)\cdot\boldsymbol{\omega}=\mathrm{axl}\left(\mathbf{B}-\mathbf{B}^{T}\right)$
+\end_inset
+
+,
+\begin_inset Formula $\delta\mathbf{U}_{n+1}=\mathbf{B}-\boldsymbol{\Omega}\cdot\mathbf{U}_{n+1}$
+\end_inset
+
+,
+ where
+\begin_inset Formula $\mathbf{B}=\mathbf{R}^{T}_{n+1}\cdot\delta\mathbf{F}_{n+1}$
+\end_inset
+
+,
+\begin_inset Formula $\boldsymbol{\Omega}$
+\end_inset
+
+ is the skew tensor whose axial vector is
+\begin_inset Formula $\boldsymbol{\omega}$
+\end_inset
+
+,
+ and
+\begin_inset Formula $\mathrm{axl}\left(\cdot\right)$
+\end_inset
+
+ denotes the axial vector.
+ Then
+\begin_inset Formula 
+\begin{equation}
+\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]=\mathbf{R}_{n+\alpha_{f}}\cdot\left(\boldsymbol{\Omega}_{\alpha}\cdot\mathbf{U}_{n+\alpha_{f}}+\alpha_{f}\delta\mathbf{U}_{n+1}\right)\,,\quad\boldsymbol{\omega}_{\alpha}=\alpha_{f}\mathbf{J}_{r}\left(\alpha_{f}\boldsymbol{\phi}\right)\cdot\mathbf{J}^{-1}_{r}\left(\boldsymbol{\phi}\right)\cdot\boldsymbol{\omega}\,,\label{eq:edy-objective-interpolation-derivative}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula $\boldsymbol{\Omega}_{\alpha}$
+\end_inset
+
+ is the skew tensor whose axial vector is
+\begin_inset Formula $\boldsymbol{\omega}_{\alpha}$
+\end_inset
+
+,
+\begin_inset Formula $\boldsymbol{\phi}=\log\left(\mathbf{R}^{T}_{n}\cdot\mathbf{R}_{n+1}\right)$
+\end_inset
+
+,
+ and
+\begin_inset Formula $\mathbf{J}_{r}\left(\boldsymbol{\phi}\right)=\mathbf{I}-\frac{1-\cos\phi}{\phi^{2}}\hat{\boldsymbol{\phi}}+\frac{\phi-\sin\phi}{\phi^{3}}\hat{\boldsymbol{\phi}}^{2}$
+\end_inset
+
+ is the right Jacobian of the rotation group (with
+\begin_inset Formula $\phi=\left|\boldsymbol{\phi}\right|$
+\end_inset
+
+ and
+\begin_inset Formula $\hat{\boldsymbol{\phi}}$
+\end_inset
+
+ the skew tensor whose axial vector is
+\begin_inset Formula $\boldsymbol{\phi}$
+\end_inset
+
+).
+ For
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+,
+\begin_inset Formula $\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]=\delta\mathbf{F}_{n+1}$
+\end_inset
+
+.
 To linearize the virtual work,
  we need to express the integrals appearing in 
 \begin_inset Formula $\delta W_{int}$
@@ -49966,7 +50381,7 @@ where
  
 \begin_inset Formula 
 \begin{equation}
-D\mathbf{E}\left[\Delta\mathbf{u}\right]=\frac{\alpha_{f}}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)\,.\label{eq:edy-E-linearization}
+D\mathbf{E}\left[\Delta\mathbf{u}\right]=\frac{1}{2}\left(D\mathbf{F}^{T}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot D\mathbf{F}\right)=\mathbf{F}^{T}\cdot\mathbf{A}^{s}\cdot\mathbf{F}\,,\quad\mathbf{A}^{s}=\frac{1}{2}\left(\mathbf{A}+\mathbf{A}^{T}\right)\,.\label{eq:edy-E-linearization}
 \end{equation}
 
 \end_inset
@@ -49981,8 +50396,8 @@ Therefore,
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}D\mathbf{S}\left[\Delta\mathbf{u}\right] & =\frac{\partial\mathbf{S}}{\partial\mathbf{E}}:D\mathbf{E}\left[\Delta\mathbf{u}\right]\\
- & =\alpha_{f}\boldsymbol{\mathbb{C}}:\frac{1}{2}\left(\Grad^{T}\Delta\mathbf{u}\cdot\mathbf{F}+\mathbf{F}^{T}\cdot\Grad\Delta\mathbf{u}\right)\\
- & =\alpha_{f}\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right):\Delta\boldsymbol{\varepsilon}
+ & =\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\cdot\mathbf{A}^{s}\cdot\mathbf{F}\right)\\
+ & =\boldsymbol{\mathbb{C}}:\left(\mathbf{F}^{T}\oslash\mathbf{F}^{T}\right):\mathbf{A}^{s}
 \end{aligned}
 \,,\label{eq:edy-solid-stress-linearization}
 \end{equation}
@@ -50003,7 +50418,7 @@ where
 \begin_inset Formula 
 \begin{equation}
 \boxed{\begin{aligned} & D\left(\int_{B}\mathbf{F}\cdot\mathbf{S}:\Grad\delta\mathbf{v}\,dV\right)\left[\Delta\mathbf{u}\right]\\
- & =\int_{v}\alpha_{f}\left(\grad\delta\mathbf{v}:\grad\Delta\mathbf{u}\cdot\boldsymbol{\sigma}+\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}:\grad\Delta\mathbf{u}\right)\,dv
+ & =\int_{v}\left(\grad\delta\mathbf{v}:\mathbf{A}\cdot\boldsymbol{\sigma}+\grad\delta\mathbf{v}:\boldsymbol{\mathcal{C}}:\mathbf{A}\right)\,dv
 \end{aligned}
 }\,.\label{eq:edy-Dint-1}
 \end{equation}
@@ -50152,7 +50567,7 @@ where the contravariant basis vectors
  may be evaluated from the covariant basis vectors
 \begin_inset Formula 
 \[
-\mathbf{g}^{n+\alpha_{f}}_{i}=\frac{\partial\mathbf{x}_{n+\alpha_{f}}}{\partial\eta^{i}}=\left(1-\alpha_{f}\right)\frac{\partial\mathbf{x}_{n}}{\partial\eta^{i}}+\alpha_{f}\frac{\partial\mathbf{x}_{n+1}}{\partial\eta^{i}}
+\mathbf{g}^{n+\alpha_{f}}_{i}=\mathbf{F}_{n+\alpha_{f}}\cdot\mathbf{G}_{i}\,,\quad\mathbf{G}_{i}=\frac{\partial\mathbf{X}}{\partial\eta^{i}}
 \]
 
 \end_inset
@@ -50203,6 +50618,57 @@ where
 
 \end_inset
 
+This expression applies when
+\begin_inset Formula $\alpha_{f}=1$
+\end_inset
+
+,
+ for which
+\begin_inset Formula $\mathbf{A}=\Delta\mathbf{u}_{b}\otimes\grad N_{b}$
+\end_inset
+
+.
+ For
+\begin_inset Formula $\alpha_{f}<1$
+\end_inset
+
+,
+ the perturbation
+\begin_inset Formula $\mathbf{A}_{bk}=\mathcal{D}_{\alpha_{f}}\left[\mathbf{e}_{k}\otimes\Grad N_{b}\right]\cdot\mathbf{F}^{-1}$
+\end_inset
+
+ associated with the displacement component
+\begin_inset Formula $k$
+\end_inset
+
+ of node
+\begin_inset Formula $b$
+\end_inset
+
+ is not a dyad,
+ and the column of the stiffness matrix for that degree of freedom is evaluated directly from Eq.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:edy-Dint-1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{K}_{a,bk}=\left[\boldsymbol{\mathcal{C}}:\mathbf{A}^{s}_{bk}+\mathbf{A}_{bk}\cdot\boldsymbol{\sigma}\right]\cdot\grad N_{a}\,,\label{eq:edy-Wint-Kab-objective}
+\end{equation}
+
+\end_inset
+
+which is not symmetric (a non-symmetric linear solver gives the best convergence).
+ The same approach is used in the three-field solid and shell domains,
+ where the element pressure is evaluated from the element volume in the corresponding configuration.
 The discretization of the mass term in the internal work is
 \begin_inset Formula 
 \[
@@ -54829,6 +55295,29 @@ where
  allowing enforcement of the non-penetration and stick constraints to arbitrarily small precision.
 \end_layout
 
+\begin_layout Standard
+The vectorial Lagrange multiplier 
+\begin_inset Formula $\boldsymbol{\lambda}_{s}$
+\end_inset
+
+ is stored as a spatial vector.
+ To preserve frame invariance,
+ it is pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Contact-Frame-Invariance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsubsection
 Stick-Slip Algorithm
 \begin_inset CommandInset label
@@ -58422,6 +58911,29 @@ nolink "false"
 \end_inset
 
  must be evaluated after the stick-slip status has been resolved.
+\end_layout
+
+\begin_layout Standard
+As in the sliding-elastic interface,
+ the vectorial Lagrange multiplier 
+\begin_inset Formula $\boldsymbol{\lambda}_{s}$
+\end_inset
+
+ is pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
+ to preserve frame invariance (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Contact-Frame-Invariance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+).
+ The same treatment is applied in the sliding-biphasic-mixed and sliding-multiphasic interfaces.
 \end_layout
 
 \begin_layout Subsection
@@ -62383,6 +62895,31 @@ where
 
 \end_layout
 
+\begin_layout Standard
+The Lagrange multipliers 
+\begin_inset Formula $\boldsymbol{\lambda}$
+\end_inset
+
+ are stored as spatial vectors at the primary nodes.
+ To preserve frame invariance,
+ they are pushed forward at the start of each time step with the rotation of the secondary surface at the tied projection point,
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Contact-Frame-Invariance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ The same treatment is applied in the related tied-facet-on-facet,
+ sticky and mortar-tied interfaces.
+\end_layout
+
 \begin_layout Section
 Tied Elastic Contact
 \begin_inset CommandInset label
@@ -62395,11 +62932,7 @@ name "sec:Tied-Elastic-Contact"
 \end_layout
 
 \begin_layout Standard
-This contact interface nearly identical to the Tied Contact Interface described in Section
-\begin_inset space ~
-\end_inset
-
-
+This contact interface is nearly identical to the Tied Contact Interface described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Tied-Contact"
@@ -62412,17 +62945,12 @@ tuple "list"
 \end_inset
 
 ,
- except that the formulation uses the notation employed in the subsequent tied interfaces described below,
- and followd the Generalized
-\begin_inset Formula $-\alpha$
-\end_inset
-
- integration scheme.
+ except that the formulation uses the notation employed in the subsequent tied interfaces described below.
  Here,
  the contact integral takes the form
 \begin_inset Formula 
 \begin{equation}
-\delta G_{c}=\left(\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{\left(1\right)}\cdot\mathbf{t}^{\left(1\right)}da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{\left(2\right)}\cdot\mathbf{t}^{\left(2\right)}da^{\left(2\right)}\right)_{n+\alpha_{f}}=0\label{eq:te-contact-integral-1}
+\delta G_{c}=\int_{\Gamma^{\left(1\right)}}\delta\mathbf{v}^{\left(1\right)}\cdot\mathbf{t}^{\left(1\right)}da^{\left(1\right)}+\int_{\Gamma^{\left(2\right)}}\delta\mathbf{v}^{\left(2\right)}\cdot\mathbf{t}^{\left(2\right)}da^{\left(2\right)}=0\label{eq:te-contact-integral-1}
 \end{equation}
 
 \end_inset
@@ -62439,13 +62967,71 @@ where
 \begin_inset Formula $\Gamma$
 \end_inset
 
+.
+ As in all other contact interfaces in FEBio,
+ this integral is evaluated on the configuration at the end of the time step,
+ 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
 ,
- and this entire integral is evaluated at the intermediate time 
-\begin_inset Formula $t_{n+\alpha_{f}}$
+ including when the generalized-
+\begin_inset Formula $\alpha$
+\end_inset
+
+ integration scheme is used;
+ in that case the tied tractions act as constraint forces evaluated at 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+,
+ as in the generalized-
+\begin_inset Formula $\alpha$
+\end_inset
+
+ scheme for constrained mechanical systems of Arnold and Brüls 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Arnold07"
+literal "false"
+
 \end_inset
 
 .
- Recognizing that 
+ This choice preserves frame invariance.
+ In contrast,
+ the intermediate configuration 
+\begin_inset Formula $\mathbf{x}_{n+\alpha_{f}}=\alpha_{f}\mathbf{x}_{n+1}+\left(1-\alpha_{f}\right)\mathbf{x}_{n}$
+\end_inset
+
+ is not incrementally objective:
+ under a superposed rigid rotation by an angle 
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ over a time step,
+ lengths normal to the rotation axis contract by the factor 
+\begin_inset Formula $\sqrt{\alpha^{2}_{f}+\left(1-\alpha_{f}\right)^{2}+2\alpha_{f}\left(1-\alpha_{f}\right)\cos\Delta\theta}<1$
+\end_inset
+
+,
+ so that gaps and surface areas evaluated on that configuration change under rigid motion alone.
+ An 
+\begin_inset Formula $\alpha_{f}$
+\end_inset
+
+-weighted interpolation of the contact forces,
+ 
+\begin_inset Formula $\alpha_{f}\mathbf{f}\left(\mathbf{x}_{n+1}\right)+\left(1-\alpha_{f}\right)\mathbf{f}\left(\mathbf{x}_{n}\right)$
+\end_inset
+
+,
+ would also be objective,
+ but it was found to be less robust than the constraint-force approach when combined with the augmented Lagrangian scheme.
+\end_layout
+
+\begin_layout Standard
+Recognizing that 
 \begin_inset Formula $\mathbf{t}^{\left(\alpha\right)}=\boldsymbol{\sigma}^{\left(\alpha\right)}\cdot\mathbf{n}^{\left(\alpha\right)}$
 \end_inset
 
@@ -62467,63 +63053,223 @@ where
 \end_inset
 
  in a tied-contact interface,
- we may rewrite this integral as
+ we may rewrite this integral over the parametric domain of 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ as
 \begin_inset Formula 
 \begin{equation}
-\delta G_{c}=\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}_{n+\alpha_{f}}\,J^{\left(1\right)}_{\eta}d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}=0\label{eq:te-contact-integral-2}
+\delta G_{c}=\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}\,J^{\left(1\right)}_{\eta0}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}=0\label{eq:te-contact-integral-2}
 \end{equation}
 
 \end_inset
 
-where 
-\begin_inset Formula $\mathbf{t}_{n+\alpha_{f}}\equiv\mathbf{t}^{\left(1\right)}_{n+\alpha_{f}}$
-\end_inset
-
- and
+where
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}J^{\left(1\right)}_{\eta} & =\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right| & \mathbf{g}^{\left(1\right)}_{\alpha} & =\frac{\partial\mathbf{x}^{\left(1\right)}_{n+\alpha_{f}}}{\partial\eta^{\left(1\right)}_{\alpha}}\end{aligned}
+\begin{aligned}J^{\left(1\right)}_{\eta} & =\left|\mathbf{g}^{\left(1\right)}_{1}\times\mathbf{g}^{\left(1\right)}_{2}\right| & \mathbf{g}^{\left(1\right)}_{\alpha} & =\frac{\partial\mathbf{x}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{\alpha}}\\
+J^{\left(1\right)}_{\eta0} & =\left|\mathbf{G}^{\left(1\right)}_{1}\times\mathbf{G}^{\left(1\right)}_{2}\right| & \mathbf{G}^{\left(1\right)}_{\alpha} & =\frac{\partial\mathbf{X}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{\alpha}}
+\end{aligned}
 \label{eq:te-area-determinant}
 \end{equation}
 
 \end_inset
 
+are the area Jacobians in the current and reference configurations.
+ Thus,
+ 
+\begin_inset Formula $\mathbf{t}$
+\end_inset
 
+ denotes the contact traction on 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ per unit reference area;
+ the Cauchy traction is 
+\begin_inset Formula $\mathbf{t}^{\left(1\right)}=\mathbf{t}\,J^{\left(1\right)}_{\eta0}/J^{\left(1\right)}_{\eta}$
+\end_inset
+
+,
+ which is the value reported in the output.
+ Integrating over the reference area makes the contact forces derivable from a potential (see below),
+ which yields a symmetric tangent stiffness matrix.
+ (When a tied interface is evaluated on the intermediate configuration 
+\begin_inset Formula $\mathbf{x}_{n+\alpha_{f}}$
+\end_inset
+
+,
+ as in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Fluid-FSI-Interface"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ the base vectors 
+\begin_inset Formula $\mathbf{g}^{\left(1\right)}_{\alpha}$
+\end_inset
+
+ and 
+\begin_inset Formula $J^{\left(1\right)}_{\eta}$
+\end_inset
+
+ are evaluated on that configuration.)
 \end_layout
 
 \begin_layout Subsection
 Gap Function
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-Elastic-Gap-Function"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Using the penalty method,
- we let
+The parametric coordinates of the tied points are determined once,
+ when the interface is activated:
+ 
+\begin_inset Formula $\mathbf{x}^{\left(1\right)}$
+\end_inset
+
+ is located at an integration point of 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+,
+ and 
+\begin_inset Formula $\mathbf{x}^{\left(2\right)}$
+\end_inset
+
+ is found by shooting a ray along the normal to 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ at that integration point until it intersects 
+\begin_inset Formula $\Gamma^{\left(2\right)}$
+\end_inset
+
+.
+ The gap function is
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{t}_{n+\alpha_{f}} & =\varepsilon_{n}\mathbf{g}_{n+\alpha_{f}} & \mathbf{g}_{n+\alpha_{f}} & =\mathbf{x}^{\left(2\right)}_{n+\alpha_{f}}-\mathbf{x}^{\left(1\right)}_{n+\alpha_{f}}\end{aligned}
-\label{eq:te-penalty-gap}
+\mathbf{g}=\mathbf{x}^{\left(2\right)}-\mathbf{x}^{\left(1\right)}\label{eq:te-gap}
+\end{equation}
+
+\end_inset
+
+If the two surfaces are not conforming,
+ the gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ found upon activation is not closed by the interface;
+ instead,
+ the interface maintains this initial gap as it rotates with the interface.
+ To preserve frame invariance,
+ 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ is not stored as a fixed spatial vector.
+ Instead,
+ its components 
+\begin_inset Formula $\hat{\mathbf{G}}=\mathbf{R}^{T}\cdot\mathbf{G}$
+\end_inset
+
+ in the corotational frame 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ of 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ at the integration point (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Contact-Frame-Invariance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+) are stored.
+ Over the time step from 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+ to 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+,
+ the interface enforces the vanishing of
+\begin_inset Formula 
+\begin{equation}
+\mathbf{d}=\mathbf{g}-\mathbf{R}_{n}\cdot\hat{\mathbf{G}}\label{eq:te-gap-deviation}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{g}_{n+\alpha_{f}}$
+\begin_inset Formula $\mathbf{R}_{n}$
 \end_inset
 
- is the gap function and 
+ is the corotational frame evaluated on the converged configuration at 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+.
+ Using the penalty method,
+ we let
+\begin_inset Formula 
+\begin{equation}
+\mathbf{t}=\varepsilon_{n}\mathbf{d}\label{eq:te-penalty-gap}
+\end{equation}
+
+\end_inset
+
+where 
 \begin_inset Formula $\varepsilon_{n}$
 \end_inset
 
  is a penalty factor.
  When using an augmented Lagrangian method,
- we supplement this expression with the vectorial Lagrangian augmentation 
+ we supplement this expression with a vectorial Lagrange multiplier 
 \begin_inset Formula $\boldsymbol{\lambda}$
 \end_inset
 
 ,
 \begin_inset Formula 
 \begin{equation}
-\mathbf{t}_{n+\alpha_{f}}=\boldsymbol{\lambda}+\varepsilon_{n}\mathbf{g}_{n+\alpha_{f}}\label{eq:te-augmented-Lagrangian}
+\mathbf{t}=\boldsymbol{\lambda}+\varepsilon_{n}\mathbf{d}\,,\quad\boldsymbol{\lambda}=\mathbf{R}_{n}\cdot\hat{\boldsymbol{\lambda}}\label{eq:te-augmented-Lagrangian}
+\end{equation}
+
+\end_inset
+
+where the components 
+\begin_inset Formula $\hat{\boldsymbol{\lambda}}$
+\end_inset
+
+ of the multiplier in the corotational frame are held constant during the Newton iterations,
+ and updated after each converged Newton solution according to
+\begin_inset Formula 
+\begin{equation}
+\hat{\boldsymbol{\lambda}}\leftarrow\hat{\boldsymbol{\lambda}}+\varepsilon_{n}\mathbf{R}^{T}_{n}\cdot\mathbf{d}\label{eq:te-augmentation}
 \end{equation}
 
 \end_inset
@@ -62531,8 +63277,78 @@ where
 
 \end_layout
 
+\begin_layout Standard
+Since 
+\begin_inset Formula $\hat{\mathbf{G}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\boldsymbol{\lambda}}$
+\end_inset
+
+ are referred to 
+\begin_inset Formula $\mathbf{R}_{n}$
+\end_inset
+
+,
+ both rotate with the interface from one time step to the next,
+ while remaining fixed within a time step.
+ Under a superposed rigid motion,
+ the vectorial Lagrange multiplier is therefore frame invariant once the augmentations have converged,
+ and the enforced initial gap lags the rotation by at most one time step,
+ producing an error of order 
+\begin_inset Formula $\left|\mathbf{G}\right|\Delta\theta$
+\end_inset
+
+ that does not accumulate over time steps.
+ (Rotating 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ with the current frame 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ within the time step would be exactly objective,
+ but it introduces a rotational coupling of the two surfaces that was found to over-constrain non-conforming interfaces with large initial gaps in dynamic analyses using the augmented Lagrangian method.)
+\end_layout
+
+\begin_layout Standard
+With 
+\begin_inset Formula $\boldsymbol{\lambda}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{R}_{n}\cdot\hat{\mathbf{G}}$
+\end_inset
+
+ held constant within a time step,
+ the contact forces derive from the potential
+\begin_inset Formula 
+\begin{equation}
+\Pi=\int_{\Gamma}\left(\boldsymbol{\lambda}\cdot\mathbf{d}+\frac{\varepsilon_{n}}{2}\mathbf{d}\cdot\mathbf{d}\right)J^{\left(1\right)}_{\eta0}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\,,\quad\delta G_{c}=-\delta\Pi\label{eq:te-potential}
+\end{equation}
+
+\end_inset
+
+since 
+\begin_inset Formula $\delta\mathbf{d}=\delta\mathbf{v}^{\left(2\right)}-\delta\mathbf{v}^{\left(1\right)}$
+\end_inset
+
+.
+ Therefore the tied interface is conservative,
+ and its tangent stiffness is symmetric.
+\end_layout
+
 \begin_layout Subsection
 Linearization of the Contact Integral
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-Elastic-Linearization"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -62557,52 +63373,94 @@ represents the linearization of
 \end_inset
 
 .
- We find that
+ Since 
+\begin_inset Formula $\boldsymbol{\lambda}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\mathbf{R}_{n}\cdot\hat{\mathbf{G}}$
+\end_inset
+
+ and 
+\begin_inset Formula $J^{\left(1\right)}_{\eta0}$
+\end_inset
+
+ are constant within a time step,
+ and the parametric coordinates of the tied points are invariant,
 \begin_inset Formula 
 \begin{equation}
-D\left(\delta G_{c}\right)=\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(D\mathbf{t}_{n+\alpha_{f}}\,J^{\left(1\right)}_{\eta}+\mathbf{t}_{n+\alpha_{f}}\,DJ^{\left(1\right)}_{\eta}\right)d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\label{eq:et-contact-integra-linearization-2}
+D\mathbf{t}=\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)\label{eq:te-contact-traction-linearization}
 \end{equation}
 
 \end_inset
 
-where
+and thus
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\mathbf{t}_{n+\alpha_{f}} & =D\mathbf{t}_{n+\alpha_{f}}\left[\Delta\mathbf{u}^{\left(1\right)}\right]+D\mathbf{t}_{n+\alpha_{f}}\left[\Delta\mathbf{u}^{\left(2\right)}\right]\\
- & =\alpha_{f}\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)
-\end{aligned}
-\label{eq:te-contact-traction-linearization}
+D\left(\delta G_{c}\right)=\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)J^{\left(1\right)}_{\eta0}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\label{eq:te-contact-integral-linearization-3}
 \end{equation}
 
 \end_inset
 
-and
+which is symmetric in the virtual velocities and the displacement increments.
+ For use in other tied interfaces (e.g.,
+ Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Fluid-FSI-Interface"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+),
+ we also note the linearization of the current area Jacobian,
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}DJ^{\left(1\right)}_{\eta} & =DJ^{\left(1\right)}_{\eta}\left[\Delta\mathbf{u}^{\left(1\right)}\right]\\
- & =\alpha_{f}\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)
-\end{aligned}
-\label{eq:te-area-determinant-linearization}
+DJ^{\left(1\right)}_{\eta}=DJ^{\left(1\right)}_{\eta}\left[\Delta\mathbf{u}^{\left(1\right)}\right]=\mathbf{n}^{\left(1\right)}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)\label{eq:te-area-determinant-linearization}
 \end{equation}
 
 \end_inset
 
-thus,
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}D\left(\delta G_{c}\right) & =\alpha_{f}\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)J^{\left(1\right)}_{\eta}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\\
- & +\alpha_{f}\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\left(\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\right)\right)\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}
-\end{aligned}
-\label{eq:te-contact-integral-linearization-3}
-\end{equation}
-
+When the surface is evaluated on the intermediate configuration 
+\begin_inset Formula $\mathbf{x}_{n+\alpha_{f}}$
 \end_inset
 
+,
+ the vectors 
+\begin_inset Formula $\mathbf{n}^{\left(1\right)}$
+\end_inset
 
+ and 
+\begin_inset Formula $\mathbf{g}^{\left(1\right)}_{\alpha}$
+\end_inset
+
+ are evaluated on that configuration,
+ and the right-hand side is multiplied by 
+\begin_inset Formula $\alpha_{f}$
+\end_inset
+
+,
+ since 
+\begin_inset Formula $\partial\mathbf{x}_{n+\alpha_{f}}/\partial\mathbf{x}_{n+1}=\alpha_{f}\mathbf{I}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
 Discretization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Tied-Elastic-Discretization"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -62610,7 +63468,7 @@ To discretize
 \begin_inset Formula $\delta G_{c}$
 \end_inset
 
-and 
+ and 
 \begin_inset Formula $D\left(\delta G_{c}\right)$
 \end_inset
 
@@ -62651,12 +63509,11 @@ where
  Thus,
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\delta G_{c} & =\left[\begin{array}{cc}
+\delta G_{c}=\left[\begin{array}{cc}
 \sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\left[\begin{array}{c}
 \mathbf{f}^{\left(1\right)}_{a}\\
 \mathbf{f}^{\left(2\right)}_{b}
-\end{array}\right]\end{aligned}
-\label{eq:te-contact-integral-discretized}
+\end{array}\right]\label{eq:te-contact-integral-discretized}
 \end{equation}
 
 \end_inset
@@ -62664,8 +63521,8 @@ where
 where
 \begin_inset Formula 
 \begin{equation}
-\boxed{\begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =J^{\left(1\right)}_{\eta}N^{\left(1\right)}_{a}\mathbf{t}_{n+\alpha_{f}}\\
-\mathbf{f}^{\left(2\right)}_{b} & =J^{\left(1\right)}_{\eta}N^{\left(2\right)}_{b}\mathbf{t}_{n+\alpha_{f}}
+\boxed{\begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =J^{\left(1\right)}_{\eta0}N^{\left(1\right)}_{a}\mathbf{t}\\
+\mathbf{f}^{\left(2\right)}_{b} & =-J^{\left(1\right)}_{\eta0}N^{\left(2\right)}_{b}\mathbf{t}
 \end{aligned}
 }\label{eq:te-element-load-vectors}
 \end{equation}
@@ -62675,60 +63532,54 @@ where
 Similarly,
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\left(\delta G_{c}\right) & =-\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
- & +\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a}\cdot\sum^{n^{\left(2\right)}_{e}}_{d=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\cdot\Delta\mathbf{u}^{\left(2\right)}_{d}\\
- & +\alpha_{f}\sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
- & -\alpha_{f}\sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\cdot\sum^{n^{\left(2\right)}_{e}}_{d=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\cdot\Delta\mathbf{u}^{\left(2\right)}_{d}\\
- & +\alpha_{f}\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}N^{\left(1\right)}_{a}\left(\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\boldsymbol{\mathcal{A}_{c}}\right)\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}\\
- & -\alpha_{f}\sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\cdot\sum^{n^{\left(1\right)}_{e}}_{c=1}\sum^{ni^{\left(1\right)}}_{k=1}W_{k}N^{\left(2\right)}_{b}\left(\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\mathcal{A}_{c}\right)\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}
-\end{aligned}
-\label{eq:te-linearized-discretized-contact}
-\end{equation}
-
-\end_inset
-
-or equivalently
-\begin_inset Formula 
-\begin{equation}
-\begin{aligned}D\left(\delta G_{c}\right) & =\left[\begin{array}{cc}
-\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\alpha_{f}\left[\begin{array}{cc}
+D\left(\delta G_{c}\right)=\left[\begin{array}{cc}
+\sum^{n^{\left(1\right)}_{e}}_{a=1}\delta\mathbf{v}^{\left(1\right)}_{a} & \sum^{n^{\left(2\right)}_{e}}_{b=1}\delta\mathbf{v}^{\left(2\right)}_{b}\end{array}\right]\sum^{ni^{\left(1\right)}}_{k=1}W_{k}\left[\begin{array}{cc}
 \sum^{n^{\left(1\right)}_{e}}_{c=1}\mathbf{K}^{\left(1,1\right)}_{ac} & \sum^{n^{\left(2\right)}_{e}}_{d=1}\mathbf{K}^{\left(1,2\right)}_{ad}\\
 \sum^{n^{\left(1\right)}_{e}}_{c=1}\mathbf{K}^{\left(2,1\right)}_{bc} & \sum^{n^{\left(2\right)}_{e}}_{d=1}\mathbf{K}^{\left(2,2\right)}_{bd}
 \end{array}\right]\left[\begin{array}{c}
 \Delta\mathbf{u}^{\left(1\right)}_{c}\\
 \Delta\mathbf{u}^{\left(2\right)}_{d}
-\end{array}\right]\end{aligned}
-\label{eq:te-linearized-contact-matrix}
+\end{array}\right]\label{eq:te-linearized-discretized-contact}
 \end{equation}
 
 \end_inset
 
-where 
-\begin_inset Formula $\boldsymbol{\mathcal{A}_{c}}$
-\end_inset
-
- is the antiymmetric tensor whose dual vector is
+with
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{\left(1\right)}_{2}}\mathbf{g}^{\left(1\right)}_{1}-\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{\left(1\right)}_{1}}\mathbf{g}^{\left(1\right)}_{2}\label{eq:te-dual-vector-Ac}
-\end{equation}
-
-\end_inset
-
-and
-\begin_inset Formula 
-\begin{equation}
-\boxed{\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =N^{\left(1\right)}_{a}\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\boldsymbol{\mathcal{A}_{c}}-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\\
-\mathbf{K}^{\left(1,2\right)}_{ad} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\\
-\mathbf{K}^{\left(2,1\right)}_{bc} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}-N^{\left(2\right)}_{b}\left(\mathbf{t}_{n+\alpha_{f}}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\mathcal{A}_{c}\right)\\
-\mathbf{K}^{\left(2,2\right)}_{bd} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}
+\boxed{\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta0}\mathbf{I} & \mathbf{K}^{\left(1,2\right)}_{ad} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta0}\mathbf{I}\\
+\mathbf{K}^{\left(2,1\right)}_{bc} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta0}\mathbf{I} & \mathbf{K}^{\left(2,2\right)}_{bd} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta0}\mathbf{I}
 \end{aligned}
 }\label{eq:te-element-stiffnesses}
 \end{equation}
 
 \end_inset
 
+This element stiffness matrix is symmetric,
+ consistent with the potential of Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-potential"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
 
+\end_inset
+
+.
+ If the interface is used with the two-pass option,
+ the same expressions are evaluated with the roles of 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma^{\left(2\right)}$
+\end_inset
+
+ interchanged.
 \end_layout
 
 \begin_layout Section
@@ -62999,6 +63850,62 @@ nolink "false"
 \end_inset
 
  is prescribed over those regions.
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ are not initially conforming,
+ the gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ found when the interface is activated is not closed;
+ instead,
+ the interface enforces 
+\begin_inset Formula $\mathbf{g}-\mathbf{G}=\mathbf{0}$
+\end_inset
+
+,
+ and the penalty and augmented Lagrangian expressions below use 
+\begin_inset Formula $\mathbf{g}-\mathbf{G}$
+\end_inset
+
+ in place of 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+.
+ The initial gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ and the vectorial Lagrange multiplier 
+\begin_inset Formula $\boldsymbol{\lambda}$
+\end_inset
+
+ are stored as spatial vectors.
+ To preserve frame invariance,
+ they are pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Contact-Frame-Invariance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -63537,6 +64444,62 @@ nolink "false"
 \end_inset
 
  are prescribed over those regions.
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ are not initially conforming,
+ the gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ found when the interface is activated is not closed;
+ instead,
+ the interface enforces 
+\begin_inset Formula $\mathbf{g}-\mathbf{G}=\mathbf{0}$
+\end_inset
+
+,
+ and the penalty and augmented Lagrangian expressions below use 
+\begin_inset Formula $\mathbf{g}-\mathbf{G}$
+\end_inset
+
+ in place of 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+.
+ The initial gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ and the vectorial Lagrange multiplier 
+\begin_inset Formula $\boldsymbol{\lambda}$
+\end_inset
+
+ are stored as spatial vectors.
+ To preserve frame invariance,
+ they are pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Contact-Frame-Invariance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -64293,7 +65256,7 @@ literal "true"
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
- & -\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v^{\left(1\right)}_{n}da^{\left(1\right)}\,.
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v^{\left(1\right)}_{n}da^{\left(1\right)}\,.
 \end{aligned}
 \label{eq696-2}
 \end{equation}
@@ -64523,8 +65486,8 @@ where
  It follows that 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}D\mathbf{t}^{\tau} & =\varepsilon_{t}\left(\Delta\mathbf{v}^{\left(2\right)}-\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
-Dv_{n} & =\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
+\begin{aligned}D\mathbf{t}^{\tau} & =\alpha_{f}\varepsilon_{t}\left(\Delta\mathbf{v}^{\left(2\right)}-\Delta\mathbf{v}^{\left(1\right)}\right)\,,\\
+Dv_{n} & =\alpha_{f}\varepsilon_{n}\left(\Delta J^{\left(2\right)}-\Delta J^{\left(1\right)}\right)\,.
 \end{aligned}
 \label{eq:TFI-penalty-linearization}
 \end{equation}
@@ -64540,7 +65503,7 @@ Given these relations,
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned} & -D\left(J^{\left(1\right)}_{\eta}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\right)=\\
- & \varepsilon_{t}J^{\left(1\right)}_{\eta}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\Delta\mathbf{v}^{\left(1\right)}-\Delta\mathbf{v}^{\left(2\right)}\right)
+ & \alpha_{f}\varepsilon_{t}J^{\left(1\right)}_{\eta}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(\Delta\mathbf{v}^{\left(1\right)}-\Delta\mathbf{v}^{\left(2\right)}\right)
 \end{aligned}
 \,,\label{eq:TFI-G-linearization-v}
 \end{equation}
@@ -64550,7 +65513,7 @@ Given these relations,
 
 \begin_inset Formula 
 \begin{equation}
-D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J^{\left(1\right)}_{\eta}\right)=-\varepsilon_{n}J^{\left(1\right)}_{\eta}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
+D\left(v_{n}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)J^{\left(1\right)}_{\eta}\right)=-\alpha_{f}\varepsilon_{n}J^{\left(1\right)}_{\eta}\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)\left(\Delta J^{\left(1\right)}-\Delta J^{\left(2\right)}\right)\,,\label{eq:TFI-G-linearization-e}
 \end{equation}
 
 \end_inset
@@ -64577,7 +65540,7 @@ name "subsec:Tied-BP-Discretization-2"
 The contact integral may be discretized as 
 \begin_inset Formula 
 \begin{equation}
-\delta G_{c}=\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}-\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\right]\,.\label{eq:TFI-discrete-1}
+\delta G_{c}=\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}+\left(\delta J^{\left(1\right)}-\delta J^{\left(2\right)}\right)v_{n}\right]\,.\label{eq:TFI-discrete-1}
 \end{equation}
 
 \end_inset
@@ -64605,9 +65568,9 @@ Then,
 v^{\left(1\right)}_{a}
 \end{array}\right]\right.\\
  & \left.+\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{cc}
-\delta\mathbf{v}^{\left(1\right)}_{b,k} & \delta J^{\left(1\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
-\mathbf{f}^{\left(1\right)}_{b,k}\\
-v^{\left(1\right)}_{b,k}
+\delta\mathbf{v}^{\left(2\right)}_{b,k} & \delta J^{\left(2\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}^{\left(2\right)}_{b,k}\\
+v^{\left(2\right)}_{b,k}
 \end{array}\right]\right)
 \end{aligned}
 \,,\label{eq:TFI-discrete-3}
@@ -64619,7 +65582,7 @@ where
 \begin_inset Formula 
 \begin{equation}
 \begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =N^{\left(1\right)}_{a}\mathbf{t}^{\tau} & \mathbf{f}^{\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}\mathbf{t}^{\tau}\\
-w^{\left(1\right)}_{a} & =-N^{\left(1\right)}_{a}v_{n} & w^{\left(2\right)}_{b,k} & =N^{\left(2\right)}_{b}v_{n}
+v^{\left(1\right)}_{a} & =N^{\left(1\right)}_{a}v_{n} & v^{\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}v_{n}
 \end{aligned}
 \,.\label{eq:TFI-discrete-4}
 \end{equation}
@@ -64630,7 +65593,7 @@ Similarly,
  
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}-D\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\\
+\begin{aligned}-D\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}\alpha_{f}W_{k}J^{\left(1\right)}_{\eta}\\
  & \times\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{cc}
 \delta\mathbf{v}^{\left(1\right)}_{a} & \delta J^{\left(1\right)}_{a}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{cc}
 \mathbf{K}^{\left(1,1\right)}_{ac} & \mathbf{0}\\
@@ -64670,10 +65633,10 @@ Similarly,
 where 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\\
-\mathbf{K}^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)\\
-\mathbf{K}^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\left(\mathbf{I}-\mathbf{n}^{\left(1\right)}\otimes\mathbf{n}^{\left(1\right)}\right)\\
-\mathbf{K}^{\left(2,2\right)}_{bd,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\left(\mathbf{I}-\mathbf{n}^{\left(2\right)}\otimes\mathbf{n}^{\left(2\right)}\right)
+\begin{aligned}\mathbf{K}^{\left(1,1\right)}_{ac} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\mathbf{I}\\
+\mathbf{K}^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\mathbf{I}\\
+\mathbf{K}^{\left(2,2\right)}_{bd,k} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}\mathbf{I}
 \end{aligned}
 \,,\label{eq:TFI-discrete-6}
 \end{equation}
@@ -64683,10 +65646,10 @@ where
 
 \begin_inset Formula 
 \begin{equation}
-\begin{aligned}k^{\left(1,1\right)}_{ac} & =-K\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
-k^{\left(1,2\right)}_{ad,k} & =K\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
-k^{\left(2,1\right)}_{bc,k} & =K\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
-k^{\left(2,2\right)}_{bd,k} & =-K\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
+\begin{aligned}k^{\left(1,1\right)}_{ac} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}\\
+k^{\left(1,2\right)}_{ad,k} & =-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}\\
+k^{\left(2,1\right)}_{bc,k} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}\\
+k^{\left(2,2\right)}_{bd,k} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}
 \end{aligned}
 \,.\label{eq:TFI-discrete-7}
 \end{equation}
@@ -64913,7 +65876,6 @@ tuple "list"
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Standard
@@ -65026,6 +65988,1161 @@ tuple "list"
 \end_inset
 
  should be used.
+\end_layout
+
+\begin_layout Section
+Tied Fluid-FSI Interface
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Tied-Fluid-FSI-Interface"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Contact Integral
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:TFSI-Contact-Integral"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This tied-fluid-FSI interface between two fluid-FSI domains extends the formulation of the tied-fluid interface presented in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Fluid-Interface"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ to include solid deformation,
+ and the reformulation of the fluid motion 
+\begin_inset Formula $\mathbf{v}^{f}$
+\end_inset
+
+ to the fluid motion 
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ relative to the solid,
+ as per Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:fsi-fluid-relative-velocity"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ See Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Fluid-Structure-Interactions"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ for a review of fluid-FSI materials,
+ and 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Shim19"
+literal "true"
+
+\end_inset
+
+ for additional details on the FEBio fluid-FSI solver.
+ The tied fluid-FSI interface is defined between surfaces 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+.
+ Due to continuity requirements on the viscous traction and normal fluid flux,
+ the external virtual work resulting from tractions 
+\begin_inset Formula $\mathbf{t}^{\tau\left(i\right)}$
+\end_inset
+
+ and normal fluxes 
+\begin_inset Formula $w^{\left(i\right)}_{n}$
+\end_inset
+
+ (
+\begin_inset Formula $i=1,2$
+\end_inset
+
+) may be combined into the tied interface integral 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{s\left(1\right)}da^{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau\left(1\right)}da^{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{f\left(1\right)}-\delta J^{f\left(2\right)}\right)w^{\left(1\right)}_{n}da^{\left(1\right)}\,.
+\end{aligned}
+\label{eq:TFSI-virtual-work}
+\end{equation}
+
+\end_inset
+
+To evaluate and linearize 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+,
+ define the covariant basis vectors on each surface as per Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:te-area-determinant"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.Now the contact integral may be rewritten as 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}^{s}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\mathbf{t}^{\tau}\,J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+ & +\int_{\gamma^{\left(1\right)}}\left(\delta J^{f\left(1\right)}-\delta J^{f\left(2\right)}\right)w_{n}J^{\left(1\right)}_{\eta}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+\end{aligned}
+\,,\label{eq:TFSI-virtual-work-redux}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{t}^{s}\equiv\mathbf{t}^{s\left(1\right)}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\mathbf{t}^{\tau}\equiv\mathbf{t}^{\tau\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{n}\equiv w^{\left(1\right)}_{n}$
+\end_inset
+
+.
+ This integral 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ is evaluated at the intermediate time point 
+\begin_inset Formula $t_{n+\alpha_{f}}$
+\end_inset
+
+.
+ The linearization 
+\begin_inset Formula $D\delta G_{c}$
+\end_inset
+
+ of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ has the form 
+\begin_inset Formula 
+\begin{equation}
+D\delta G_{c}=\sum\limits^{2}_{i=1}\left(D\delta G_{c}\left[\Delta\mathbf{u}^{\left(i\right)}\right]+D\delta G_{c}\left[\Delta\mathbf{w}^{\left(i\right)}\right]+D\delta G_{c}\left[\Delta J^{f\left(i\right)}\right]\right)\,.\label{eq:TFSI-vw-linearization}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Gap Functions
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:TFSI-Gap-Functions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The premise of a tied interface is that the parametric coordinates of coincident points 
+\begin_inset Formula $\mathbf{x}^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{x}^{\left(2\right)}$
+\end_inset
+
+ on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ are both invariants (i.e.,
+ they are determined in the reference configuration and remain unchanged over time).
+ The parametric coordinates of 
+\begin_inset Formula $\mathbf{x}^{\left(1\right)}$
+\end_inset
+
+ correspond to the integration points on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+,
+ and those of 
+\begin_inset Formula $\mathbf{x}^{\left(2\right)}$
+\end_inset
+
+ are evaluated once by shooting a ray from the integration point on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ to intersect 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The vector positional gap function 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+,
+ representing the difference between positions across the interface,
+ is defined by
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}_{n+\alpha_{f}}=\mathbf{x}^{\left(2\right)}_{n+\alpha_{f}}-\mathbf{x}^{\left(1\right)}_{n+\alpha_{f}}\,,\label{eq:TFSI-gap}
+\end{equation}
+
+\end_inset
+
+and the vector velocity gap function 
+\begin_inset Formula $\mathbf{g}^{w}$
+\end_inset
+
+ is similarly defined as
+\begin_inset Formula 
+\begin{equation}
+\mathbf{g}^{w}_{n+\alpha_{f}}=\mathbf{w}^{\left(2\right)}_{n+\alpha_{f}}-\mathbf{w}^{\left(1\right)}_{n+\alpha_{f}}\label{eq:TFSI-w-gap}
+\end{equation}
+
+\end_inset
+
+We may similarly define the scalar gap function 
+\begin_inset Formula $\pi$
+\end_inset
+
+,
+ representing the difference between fluid dilatations (or volume ratios) across the interface,
+\begin_inset Formula 
+\begin{equation}
+\pi_{n+\alpha_{f}}=J^{f\left(2\right)}_{n+\alpha_{f}}-J^{f\left(1\right)}_{n+\alpha_{f}}\,.\label{eq:TFI-e-gap-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma^{\left(2\right)}$
+\end_inset
+
+ are not initially conforming,
+ the gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ found when the interface is activated is not closed;
+ instead,
+ the interface enforces 
+\begin_inset Formula $\mathbf{g}-\mathbf{G}=\mathbf{0}$
+\end_inset
+
+,
+ and the penalty and augmented Lagrangian expressions below use 
+\begin_inset Formula $\mathbf{g}-\mathbf{G}$
+\end_inset
+
+ in place of 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+.
+ The initial gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ and the vectorial Lagrange multipliers 
+\begin_inset Formula $\boldsymbol{\lambda}_{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\lambda}_{\tau}$
+\end_inset
+
+ of the solid and viscous tractions are stored as spatial vectors.
+ To preserve frame invariance,
+ they are pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Contact-Frame-Invariance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Penalty Method
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:TFSI-Penalty-Method"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When using the penalty method,
+ the tractions 
+\begin_inset Formula $\mathbf{t}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+ on 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ are given,
+ respectively,
+ by 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{t}^{s} & =\varepsilon_{s}\mathbf{g}\\
+\mathbf{t}^{\tau} & =\varepsilon_{t}\mathbf{g}^{w}\,
+\end{aligned}
+\label{eq:TFSI-ts-tt-penalty}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{t}$
+\end_inset
+
+ are penalty factors associated with 
+\begin_inset Formula $\mathbf{t}^{s}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{t}^{\tau}$
+\end_inset
+
+,
+ respectively.
+ The penalty factor 
+\begin_inset Formula $\varepsilon_{s}$
+\end_inset
+
+ is expressed in units of elastic modulus per length,
+ as in the tied-elastic contact interface (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Elastic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+),
+ whereas the penalty factor 
+\begin_inset Formula $\varepsilon_{t}$
+\end_inset
+
+ is expressed in units of viscosity per length.
+ Therefore,
+ in an auto-penalty scheme,
+ it may be scaled to the ratio of fluid viscosity to element thickness.
+ Similarly,
+ let 
+\begin_inset Formula 
+\begin{equation}
+w_{n}=\varepsilon_{n}\pi=\varepsilon_{n}\left(J^{f\left(2\right)}-J^{f\left(1\right)}\right)\,,\label{eq:TFSI-wn-penalty}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ is a penalty factor associated with 
+\begin_inset Formula $w_{n}$
+\end_inset
+
+.
+ Note that 
+\begin_inset Formula $w_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+ have units of velocity.
+ When using an augmented Lagrangian approach,
+ we add a vectorial or scalar Lagrangian to each of the expressions in Eqs.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFSI-ts-tt-penalty"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFSI-wn-penalty"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ as shown in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:te-augmented-Lagrangian"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ It follows that 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\mathbf{t}^{s} & =\alpha_{f}\varepsilon_{s}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)\\
+D\mathbf{t}^{\tau} & =\alpha_{f}\varepsilon_{t}\left(\Delta\mathbf{w}^{\left(2\right)}-\Delta\mathbf{w}^{\left(1\right)}\right)\,,\\
+Dw_{n} & =\alpha_{f}\varepsilon_{n}\left(\Delta J^{f\left(2\right)}-\Delta J^{f\left(1\right)}\right)\,.
+\end{aligned}
+\label{eq:TFI-penalty-linearization-1}
+\end{equation}
+
+\end_inset
+
+We also use the linearization of 
+\begin_inset Formula $J^{\left(1\right)}_{\eta}$
+\end_inset
+
+ given in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:te-area-determinant-linearization"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ Then,
+ the directional derivatives of the various terms appearing in the integrand of 
+\begin_inset Formula $\delta G_{c}$
+\end_inset
+
+ are 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{c}\left[\Delta\mathbf{u}^{\left(1\right)}\right] & =\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\left(-\varepsilon_{s}J^{\left(1\right)}_{\eta}\Delta\mathbf{u}^{\left(1\right)}+\left(\mathbf{t}^{s}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\right)\cdot\mathbf{a}\left(\Delta\mathbf{u}^{\left(1\right)}\right)\right)\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+ & +\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\left(\mathbf{t}^{\tau}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\right)\cdot\mathbf{a}\left(\Delta\mathbf{u}^{\left(1\right)}\right)d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\\
+ & +\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta J^{f\left(1\right)}-\delta J^{f\left(2\right)}\right)w_{n}\left(\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\cdot\mathbf{a}\left(\Delta\mathbf{u}^{\left(1\right)}\right)\right)\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}
+\end{aligned}
+\label{eq:TFSI-G-linearization-u1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{c}\left[\Delta\mathbf{u}^{\left(2\right)}\right] & =\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{s}J^{\left(1\right)}_{\eta}\Delta\mathbf{u}^{\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\end{aligned}
+\label{eq:TFSI-G-linearization-u2}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{c}\left[\Delta\mathbf{w}^{\left(1\right)}\right] & =-\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\varepsilon_{t}J^{\left(1\right)}_{\eta}\Delta\mathbf{w}^{\left(1\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\end{aligned}
+\label{eq:TFSI-G-linearization-w1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{c}\left[\Delta\mathbf{w}^{\left(2\right)}\right] & =\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta\mathbf{w}^{\left(1\right)}-\delta\mathbf{w}^{\left(2\right)}\right)\cdot\varepsilon_{t}J^{\left(1\right)}_{\eta}\Delta\mathbf{w}^{\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\end{aligned}
+\label{eq:TFSI-G-linearization-w2}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{c}\left[\Delta J^{f\left(1\right)}\right] & =-\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta J^{f\left(1\right)}-\delta J^{f\left(2\right)}\right)\varepsilon_{n}J^{\left(1\right)}_{\eta}\Delta J^{f\left(1\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\end{aligned}
+\label{eq:TFSI-G-linearization-Jf1}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{c}\left[\Delta J^{f\left(2\right)}\right] & =\alpha_{f}\int_{\gamma^{\left(1\right)}}\left(\delta J^{f\left(1\right)}-\delta J^{f\left(2\right)}\right)\varepsilon_{n}J^{\left(1\right)}_{\eta}\Delta J^{f\left(2\right)}\,d\eta^{1}_{\left(1\right)}d\eta^{2}_{\left(1\right)}\end{aligned}
+\label{eq:TFSI-G-linearization-Jf2}
+\end{equation}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{equation}
+\mathbf{a}\left(\Delta\mathbf{u}^{\left(1\right)}\right)=\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{1}}\times\mathbf{g}^{\left(1\right)}_{2}+\mathbf{g}^{\left(1\right)}_{1}\times\frac{\partial\Delta\mathbf{u}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{2}}\label{eq:TFSI-a-Du1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discretization
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:TFSI-Discretization"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The variables may be interpolated over each element face according to 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta\mathbf{v}^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{a=1}N^{\left(1\right)}_{a}\delta\mathbf{v}^{\left(1\right)}_{a} & \delta\mathbf{v}^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{b=1}N^{\left(2\right)}_{b}\delta\mathbf{v}^{\left(2\right)}_{b}\\
+\Delta\mathbf{u}^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{u}^{\left(1\right)}_{c} & \Delta\mathbf{u}^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+\delta\mathbf{w}^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{a=1}N^{\left(1\right)}_{a}\delta\mathbf{w}^{\left(1\right)}_{a} & \delta\mathbf{w}^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{b=1}N^{\left(2\right)}_{b}\delta\mathbf{w}^{\left(2\right)}_{b}\\
+\Delta\mathbf{w}^{\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{c=1}N^{\left(1\right)}_{c}\Delta\mathbf{w}^{\left(1\right)}_{c} & \Delta\mathbf{w}^{\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{d=1}N^{\left(2\right)}_{d}\Delta\mathbf{w}^{\left(2\right)}_{d}\\
+\delta J^{f\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{a=1}N^{\left(1\right)}_{a}\delta J^{f\left(1\right)}_{a} & \delta J^{f\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{b=1}N^{\left(2\right)}_{b}\delta J^{f\left(2\right)}_{b}\\
+\Delta J^{f\left(1\right)} & =\sum\limits^{m^{\left(1\right)}}_{c=1}N^{\left(1\right)}_{c}\Delta J^{f\left(1\right)}_{c} & \Delta J^{f\left(2\right)} & =\sum\limits^{m^{\left(2\right)}}_{d=1}N^{\left(2\right)}_{d}\Delta J^{f\left(2\right)}_{d}
+\end{aligned}
+\,.\label{eq:TFSI-discrete}
+\end{equation}
+
+\end_inset
+
+Then,
+ 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}W_{k}J^{\left(1\right)}_{\eta}\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{\left(1\right)}_{a} & \delta\mathbf{w}^{\left(1\right)}_{a} & \delta J^{f\left(1\right)}_{a}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}^{s\left(1\right)}_{a}\\
+\mathbf{f}^{w\left(1\right)}_{a}\\
+w^{\left(1\right)}_{a}
+\end{array}\right]\right.\\
+ & \left.+\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{\left(2\right)}_{b,k} & \delta\mathbf{w}^{\left(2\right)}_{b,k} & \delta J^{f\left(2\right)}_{b,k}\end{array}\right]\cdot\left[\begin{array}{c}
+\mathbf{f}^{s\left(2\right)}_{b,k}\\
+\mathbf{f}^{w\left(2\right)}_{b,k}\\
+w^{\left(2\right)}_{b,k}
+\end{array}\right]\right)
+\end{aligned}
+\,,\label{eq:TFSI-discrete-vw}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{f}^{s\left(1\right)}_{a} & =N^{\left(1\right)}_{a}\mathbf{t}^{s} & \mathbf{f}^{s\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}\mathbf{t}^{s}\\
+\mathbf{f}^{w\left(1\right)}_{a} & =N^{\left(1\right)}_{a}\mathbf{t}^{\tau} & \mathbf{f}^{w\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}\mathbf{t}^{\tau}\\
+w^{\left(1\right)}_{a} & =N^{\left(1\right)}_{a}w_{n} & w^{\left(2\right)}_{b,k} & =-N^{\left(2\right)}_{b}w_{n}
+\end{aligned}
+\,.\label{eq:TFSI-discrete-load-}
+\end{equation}
+
+\end_inset
+
+Similarly,
+ using the discretization of 
+\begin_inset Formula $\mathbf{a}\left(\Delta\mathbf{u}^{\left(1\right)}\right)$
+\end_inset
+
+ in Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:TFSI-a-Du1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{a}\left(\Delta\mathbf{u}^{\left(1\right)}\right) & =\sum\limits^{m^{\left(1\right)}}_{c=1}\left(\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{\left(1\right)}_{2}}\mathbf{g}^{\left(1\right)}_{1}-\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{\left(1\right)}_{1}}\mathbf{g}^{\left(1\right)}_{2}\right)\times\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+ & =\sum\limits^{m^{\left(1\right)}}_{c=1}\mathcal{\boldsymbol{A}}_{c}\cdot\Delta\mathbf{u}^{\left(1\right)}_{c}
+\end{aligned}
+\label{eq:TFSI-a-Du1-discrete}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathcal{\boldsymbol{A}}_{c}$
+\end_inset
+
+ is the antisymmetric tensor with dual vector
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{\left(1\right)}_{2}}\mathbf{g}^{\left(1\right)}_{1}-\frac{\partial N^{\left(1\right)}_{c}}{\partial\eta^{\left(1\right)}_{1}}\mathbf{g}^{\left(1\right)}_{2}\,,\label{eq:TFSI-Ac-dual-vector}
+\end{equation}
+
+\end_inset
+
+we find that
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}D\delta G_{c} & =\sum\limits^{n^{\left(1\right)}_{e}}_{e=1}\sum\limits^{n^{\left(e\right)}_{\mbox{int}}}_{k=1}\alpha_{f}W_{k}\\
+ & \times\left(\sum\limits^{m^{\left(1\right)}}_{a=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{\left(1\right)}_{a} & \delta\mathbf{w}^{\left(1\right)}_{a} & \delta J^{f\left(1\right)}_{a}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{ccc}
+\mathbf{K}^{uu}_{ac} & \mathbf{0} & \mathbf{0}\\
+\mathbf{K}^{wu}_{ac} & \mathbf{K}^{ww}_{ac} & \mathbf{0}\\
+\mathbf{k}^{Ju}_{ac} & \mathbf{0} & k^{JJ}_{ac}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+\Delta\mathbf{w}^{\left(1\right)}_{c}\\
+\Delta J^{f\left(1\right)}_{c}
+\end{array}\right]\right.\right.\\
+ & +\left.\sum\limits^{m^{\left(2\right)}_{k}}_{d=1}\left[\begin{array}{ccc}
+\mathbf{K}^{uu}_{ad} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{K}^{ww}_{ad} & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} & k^{JJ}_{ad}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+\Delta\mathbf{w}^{\left(2\right)}_{d}\\
+\Delta J^{f\left(2\right)}_{d}
+\end{array}\right]\right)\\
+ & +\sum\limits^{m^{\left(2\right)}_{k}}_{b=1}\left[\begin{array}{ccc}
+\delta\mathbf{v}^{\left(2\right)}_{b,k} & \delta\mathbf{w}^{\left(2\right)}_{b,k} & \delta J^{f\left(2\right)}_{b,k}\end{array}\right]\cdot\left(\sum\limits^{m^{\left(1\right)}}_{c=1}\left[\begin{array}{ccc}
+\mathbf{K}^{uu}_{bc} & \mathbf{0} & \mathbf{0}\\
+\mathbf{K}^{wu}_{bc} & \mathbf{K}^{ww}_{bc} & \mathbf{0}\\
+\mathbf{k}^{Ju}_{bc} & \mathbf{0} & k^{JJ}_{bc}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(1\right)}_{c}\\
+\Delta\mathbf{w}^{\left(1\right)}_{c}\\
+\Delta J^{f\left(1\right)}_{c}
+\end{array}\right]\right.\\
+ & +\left.\left.\sum\limits^{m^{\left(2\right)}_{k}}_{d=1}\left[\begin{array}{ccc}
+\mathbf{K}^{uu}_{bd} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{K}^{ww}_{bd} & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} & k^{JJ}_{bd}
+\end{array}\right]\cdot\left[\begin{array}{c}
+\Delta\mathbf{u}^{\left(2\right)}_{d}\\
+\Delta\mathbf{w}^{\left(2\right)}_{d}\\
+\Delta J^{f\left(2\right)}_{d}
+\end{array}\right]\right)\right)\,,
+\end{aligned}
+\label{eq:TFSI-discrete-D-vw}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{K}^{uu}_{ac} & =N^{\left(1\right)}_{a}\left(\left(\mathbf{t}^{s}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\right)\cdot\mathcal{\boldsymbol{A}}_{c}-\varepsilon_{s}J^{\left(1\right)}_{\eta}N^{\left(1\right)}_{c}\mathbf{I}\right)\\
+\mathbf{K}^{wu}_{ac} & =N^{\left(1\right)}_{a}\left(\mathbf{t}^{\tau}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\right)\cdot\mathcal{\boldsymbol{A}}_{c}\\
+\mathbf{K}^{ww}_{ac} & =-\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\\
+\mathbf{K}^{uu}_{ad} & =\varepsilon_{s}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\\
+\mathbf{K}^{ww}_{ad} & =\varepsilon_{t}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\\
+\mathbf{K}^{uu}_{bc} & =N^{\left(2\right)}_{b}\left(\varepsilon_{s}J^{\left(1\right)}_{\eta}N^{\left(1\right)}_{c}\mathbf{I}-\left(\mathbf{t}^{s}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\right)\cdot\mathcal{\boldsymbol{A}}_{c}\right)\\
+\mathbf{K}^{wu}_{bc} & =-N^{\left(2\right)}_{b}\left(\mathbf{t}^{\tau}\otimes\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\right)\cdot\mathcal{\boldsymbol{A}}_{c}\\
+\mathbf{K}^{ww}_{bc} & =\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\mathbf{I}\\
+\mathbf{K}^{uu}_{bd} & =-\varepsilon_{s}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}\\
+\mathbf{K}^{ww}_{bd} & =-\varepsilon_{t}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\mathbf{I}
+\end{aligned}
+\,,\label{eq:TFSI-tensors-discrete}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\mathbf{k}^{Ju}_{ac} & =-N^{\left(1\right)}_{a}w_{n}\mathcal{\boldsymbol{A}}_{c}\cdot\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}\\
+\mathbf{k}^{Ju}_{bc} & =N^{\left(2\right)}_{b}w_{n}\mathcal{\boldsymbol{A}}_{c}\cdot\mathbf{n}^{\left(1\right)}_{n+\alpha_{f}}
+\end{aligned}
+\,.\label{eq:TFSI-vectors-discrete}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}k^{JJ}_{ac} & =-\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\\
+k^{JJ}_{ad} & =\varepsilon_{n}N^{\left(1\right)}_{a}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}\\
+k^{JJ}_{bc} & =\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(1\right)}_{c}J^{\left(1\right)}_{\eta}\\
+k^{JJ}_{bd} & =-\varepsilon_{n}N^{\left(2\right)}_{b}N^{\left(2\right)}_{d}J^{\left(1\right)}_{\eta}
+\end{aligned}
+\label{eq:TFSI-scalars-discrete}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Frame Invariance of Stored Interface Vectors
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Contact-Frame-Invariance"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Contact interfaces must be frame invariant (objective).
+ Under a superposed rigid motion 
+\begin_inset Formula $\mathbf{x}^{*}=\mathbf{Q}\left(t\right)\cdot\mathbf{x}+\mathbf{c}\left(t\right)$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\mathbf{Q}$
+\end_inset
+
+ is a proper orthogonal tensor,
+ gap vectors and contact tractions must transform as 
+\begin_inset Formula $\mathbf{g}^{*}=\mathbf{Q}\cdot\mathbf{g}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{t}^{*}=\mathbf{Q}\cdot\mathbf{t}$
+\end_inset
+
+,
+ and the solution must be the rigidly rotated solution.
+ Kinematic quantities evaluated from the current nodal positions satisfy this requirement automatically.
+ However,
+ several interfaces store vectors that persist from one time step to the next.
+ These are the vectorial Lagrange multipliers of the augmented Lagrangian scheme and,
+ in some tied interfaces,
+ the initial gap between non-conforming surfaces.
+ If such vectors are stored as fixed spatial vectors,
+ they do not rotate with the interface,
+ and the solution is not frame invariant.
+ For example,
+ in a test where a tied assembly of two non-conforming blocks was rotated rigidly by 
+\begin_inset Formula $90^{\circ}$
+\end_inset
+
+,
+ storing the multipliers as fixed spatial vectors produced position errors of the order of 20% of the block size with the augmented Lagrangian method.
+ With a non-zero initial gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+,
+ the tied body was displaced by 
+\begin_inset Formula $\left|\mathbf{Q}\cdot\mathbf{G}-\mathbf{G}\right|$
+\end_inset
+
+ even with the penalty method.
+\end_layout
+
+\begin_layout Standard
+To remedy this,
+ a corotational frame is attached to each material point of the contact surface where such vectors are stored.
+ Let 
+\begin_inset Formula $\mathbf{g}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{g}_{2}$
+\end_inset
+
+ denote the covariant base vectors of a surface element at that point.
+ The orthonormal frame is
+\begin_inset Formula 
+\begin{equation}
+\mathbf{e}_{1}=\frac{\mathbf{g}_{1}}{\left|\mathbf{g}_{1}\right|}\,,\quad\mathbf{n}=\frac{\mathbf{g}_{1}\times\mathbf{g}_{2}}{\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|}\,,\quad\mathbf{e}_{2}=\mathbf{n}\times\mathbf{e}_{1}\,,\quad\mathbf{R}=\left[\begin{array}{ccc}
+\mathbf{e}_{1} & \mathbf{e}_{2} & \mathbf{n}\end{array}\right]\label{eq:contact-corotational-frame}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ is the proper orthogonal tensor whose columns are 
+\begin_inset Formula $\mathbf{e}_{1}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\mathbf{e}_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{n}$
+\end_inset
+
+.
+ Under a superposed rigid motion,
+ 
+\begin_inset Formula $\mathbf{R}^{*}=\mathbf{Q}\cdot\mathbf{R}$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula $\mathbf{R}_{n}$
+\end_inset
+
+ denote this frame evaluated on the converged configuration at time 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+.
+ At the start of each time step,
+ from 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+ to 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+,
+ every stored vector 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is pushed forward with the incremental rotation of the interface over the previous time step,
+\begin_inset Formula 
+\begin{equation}
+\mathbf{v}\leftarrow\mathbf{R}_{n}\cdot\mathbf{R}^{T}_{n-1}\cdot\mathbf{v}\label{eq:contact-push-forward}
+\end{equation}
+
+\end_inset
+
+after which 
+\begin_inset Formula $\mathbf{R}_{n}$
+\end_inset
+
+ is stored in place of 
+\begin_inset Formula $\mathbf{R}_{n-1}$
+\end_inset
+
+.
+ Equivalently,
+ one may store the components 
+\begin_inset Formula $\hat{\mathbf{v}}=\mathbf{R}^{T}_{n}\cdot\mathbf{v}$
+\end_inset
+
+ and use 
+\begin_inset Formula $\mathbf{v}=\mathbf{R}_{n}\cdot\hat{\mathbf{v}}$
+\end_inset
+
+ during the time step,
+ as done in the tied-elastic interface (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Elastic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+).
+ Since the frame is always evaluated on the configuration at the start of the time step,
+ repeated evaluations within a time step are idempotent.
+\end_layout
+
+\begin_layout Standard
+Within a time step the stored vectors are held fixed,
+ so the Newton tangents,
+ the augmentation updates and the stability of each formulation are unchanged.
+ Under a superposed rigid motion,
+ the push-forward rotates each stored vector by 
+\begin_inset Formula $\mathbf{Q}_{n}\cdot\mathbf{Q}^{T}_{n-1}$
+\end_inset
+
+,
+ as required.
+ Vectorial Lagrange multipliers are frame invariant once the augmentations have converged,
+ since they converge to the constraint traction.
+ An initial gap lags the rotation by at most one time step,
+ producing an error of order 
+\begin_inset Formula $\left|\mathbf{G}\right|\Delta\theta$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ is the rotation increment over a time step.
+ This error does not accumulate,
+ because 
+\begin_inset Formula $\mathbf{R}_{n}$
+\end_inset
+
+ is exact at every time step.
+\end_layout
+
+\begin_layout Standard
+This scheme is used in the following interfaces:
+\end_layout
+
+\begin_layout Itemize
+tied-elastic (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Elastic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+):
+ vectorial Lagrange multiplier and initial gap,
+ frame at the integration points of the primary surface;
+\end_layout
+
+\begin_layout Itemize
+tied-node-on-facet (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+):
+ Lagrange multipliers at the primary nodes,
+ frame on the secondary surface at the tied projection point;
+\end_layout
+
+\begin_layout Itemize
+tied-facet-on-facet:
+ Lagrange multipliers and initial gap (gap_offset option),
+ frame at the integration points of the primary surface;
+\end_layout
+
+\begin_layout Itemize
+sticky:
+ Lagrange multipliers at the primary nodes,
+ frame on the secondary surface at the point where the node became stuck (initialized at that time);
+\end_layout
+
+\begin_layout Itemize
+mortar-tied:
+ nodal Lagrange multipliers,
+ frame at the center of a primary surface element containing the node;
+\end_layout
+
+\begin_layout Itemize
+tied-biphasic and tied-multiphasic (Sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Biphasic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Multiphasic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+):
+ Lagrange multipliers and initial gap,
+ frame at the integration points of the primary surface;
+\end_layout
+
+\begin_layout Itemize
+tied-fluid-FSI (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Fluid-FSI-Interface"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+):
+ initial gap and the Lagrange multipliers of the solid and viscous tractions,
+ frame at the integration points of the primary surface;
+\end_layout
+
+\begin_layout Itemize
+sliding-elastic,
+ sliding-biphasic,
+ sliding-biphasic-mixed and sliding-multiphasic (Sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SE-Augmented-Lagrangian"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SB-Augmented-Lagrangian"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+):
+ vectorial Lagrange multiplier in stick,
+ frame at the integration points of the primary surface.
+\end_layout
+
+\begin_layout Standard
+No such treatment is needed for scalar (normal) Lagrange multipliers;
+ for friction multipliers stored by their components in the convected basis of the secondary surface (sliding-node-on-facet),
+ since these components rotate with that surface;
+ for rigid walls,
+ which are fixed in space;
+ or for the tied-fluid interface,
+ whose fluid meshes do not move.
+ Line constraints,
+ which have no surface frame to define a rotation about the line,
+ are not treated by this scheme.
 \end_layout
 
 \begin_layout Section

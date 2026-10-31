@@ -64,12 +64,14 @@ void FEFacetTiedSurface::Data::Init()
 	m_Lm = vec3d(0, 0, 0);
 	m_rs = vec2d(0, 0);
 	m_pme = (FESurfaceElement*)0;
+	m_Rp = FEContactFrame();
 }
 
 void FEFacetTiedSurface::Data::Serialize(DumpStream& ar)
 {
 	FEContactMaterialPoint::Serialize(ar);
 	ar & m_vgap & m_vgap0 & m_Lm & m_rs;
+	m_Rp.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -300,6 +302,44 @@ void FEFacet2FacetTied::Activate()
 				pt.m_vgap = vec3d(0, 0, 0);
 				pt.m_gap = 0.0;
 			}
+		}
+	}
+
+	// initialize the corotational frames at the primary integration points
+	for (int i = 0; i < m_ss.Elements(); ++i)
+	{
+		FESurfaceElement& se = m_ss.Element(i);
+		for (int j = 0; j < se.GaussPoints(); ++j)
+		{
+			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
+			pt.m_Rp = FEContactFrame();
+			if (pt.m_pme) pt.m_Rp.Evaluate(m_ss, se, j, true);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! The initial gap and the Lagrange multipliers are stored as spatial vectors.
+//! At the start of each time step they are pushed forward with the rotation of
+//! the interface (local corotational frame) over the previous time step, so
+//! that they remain frame invariant.
+void FEFacet2FacetTied::PrepStep()
+{
+	FEContactInterface::PrepStep();
+
+	for (int i = 0; i < m_ss.Elements(); ++i)
+	{
+		FESurfaceElement& se = m_ss.Element(i);
+		for (int j = 0; j < se.GaussPoints(); ++j)
+		{
+			FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
+			if (pt.m_pme == nullptr) continue;
+			FEContactFrame Rn;
+			Rn.Evaluate(m_ss, se, j, true);
+			vec3d v[2] = { pt.m_vgap0, pt.m_Lm };
+			pt.m_Rp.Update(Rn, v, 2);
+			pt.m_vgap0 = v[0];
+			pt.m_Lm = v[1];
 		}
 	}
 }

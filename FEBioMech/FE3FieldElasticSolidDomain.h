@@ -86,6 +86,10 @@ protected:
 	//! geometrical stiffness (i.e. initial stress)
 	void ElementGeometricalStiffness(int iel, matrix& ke);
 
+	//! material, geometrical, and dilatational stiffness for alpha_f < 1, consistent with
+	//! the incrementally objective interpolation of the deformation gradient (not symmetric)
+	void ElementObjectiveStiffness3F(int iel, matrix& ke);
+
 	//! update the stress of an element
 	void UpdateElementStress(int iel, const FETimeInfo& tp) override;
 

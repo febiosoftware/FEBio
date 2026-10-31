@@ -644,8 +644,37 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, int n, vec3d g[3], cons
 	gp[0] = el.m_gp[0][n];
 	gp[1] = el.m_gp[1][n];
 	gp[2] = el.m_gp[2][n];
-    for (int i=0; i<3; ++i)
-        g[i] = gt[i]*alpha + gp[i]*(1-alpha);
+    if (alpha == 1.0)
+    {
+        for (int i=0; i<3; ++i) g[i] = gt[i];
+        return;
+    }
+
+    // incrementally objective intermediate configuration: g_i = F_a.G_i
+    mat3d Fa = ObjectiveDefGrad(el, n, alpha);
+    vec3d Gcnt[3] = { el.m_G0[0][n], el.m_G0[1][n], el.m_G0[2][n] };
+    mat3d Gc(Gcnt[0].x, Gcnt[0].y, Gcnt[0].z,
+             Gcnt[1].x, Gcnt[1].y, Gcnt[1].z,
+             Gcnt[2].x, Gcnt[2].y, Gcnt[2].z);
+    mat3d Ga = Fa*Gc.inverse();     // columns are F_a.G_i
+    for (int i=0; i<3; ++i) g[i] = vec3d(Ga(0,i), Ga(1,i), Ga(2,i));
+}
+
+//-----------------------------------------------------------------------------
+mat3d FESSIShellDomain::ObjectiveDefGrad(FEShellElement& el, int n, const double alpha)
+{
+    FEObjectiveInterpolation oi;
+    ObjectiveInterpolation(el, n, alpha, oi);
+    return oi.F();
+}
+
+//-----------------------------------------------------------------------------
+void FESSIShellDomain::ObjectiveInterpolation(FEShellElement& el, int n, const double alpha, FEObjectiveInterpolation& oi)
+{
+    mat3d Ft, Fp;
+    defgrad(el, Ft, n);
+    if (alpha != 1.0) defgradp(el, Fp, n); else Fp = Ft;
+    oi.Init(Fp, Ft, alpha);
 }
 
 //-----------------------------------------------------------------------------
@@ -690,6 +719,21 @@ void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, dou
 void FESSIShellDomain::CoBaseVectors(FEShellElement& el, double r, double s, double t, vec3d g[3], const double alpha)
 {
     int i;
+
+    // for alpha < 1, use the incrementally objective intermediate configuration: g_i = F_a.G_i
+    if ((alpha != 1.0) && (alpha != 0.0))
+    {
+        vec3d gt[3], gp[3], G[3], Gc[3];
+        CoBaseVectors(el, r, s, t, gt, 1.0);
+        CoBaseVectors(el, r, s, t, gp, 0.0);
+        CoBaseVectors0(el, r, s, t, G);
+        ContraBaseVectors0(el, r, s, t, Gc);
+        mat3d Ft = (gt[0] & Gc[0]) + (gt[1] & Gc[1]) + (gt[2] & Gc[2]);
+        mat3d Fp = (gp[0] & Gc[0]) + (gp[1] & Gc[1]) + (gp[2] & Gc[2]);
+        mat3d Fa = FEObjectiveInterpolateF(Fp, Ft, alpha);
+        for (i=0; i<3; ++i) g[i] = Fa*G[i];
+        return;
+    }
     
     int neln = el.Nodes();
     
@@ -827,8 +871,8 @@ double FESSIShellDomain::detJ(FEShellElement& el, int n, const double alpha)
 	gcovp[0] = el.m_gp[0][n];
 	gcovp[1] = el.m_gp[1][n];
 	gcovp[2] = el.m_gp[2][n];
-	for (int i=0; i<3; ++i)
-        gcov[i] = gcovt[i]*alpha + gcovp[i]*(1-alpha);
+    // incrementally objective intermediate configuration
+    CoBaseVectors(el, n, gcov, alpha);
 
     mat3d J = mat3d(gcov[0].x, gcov[1].x, gcov[2].x,
                     gcov[0].y, gcov[1].y, gcov[2].y,

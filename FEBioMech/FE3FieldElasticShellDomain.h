@@ -72,6 +72,13 @@ public: // overridden from FEElasticDomain
     
     // calculate stiffness matrix
     void StiffnessMatrix(FELinearSystem& LS) override;
+
+protected:
+    //! element stiffness for alpha_f < 1, consistent with the incrementally objective
+    //! interpolation of the deformation gradient at the intermediate time (not symmetric)
+    void ElementObjectiveStiffness3F(int iel, matrix& ke);
+
+public:
     
 protected:
     //! Dilatational stiffness component for nearly-incompressible materials

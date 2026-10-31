@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #include "stdafx.h"
+#include <FECore/FEObjectiveKinematics.h>
 #include "FEFluidFSIDomain3D.h"
 #include <FECore/log.h>
 #include <FECore/FEModel.h>
@@ -400,7 +401,7 @@ void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEleme
         FEFluidMaterialPoint& pt = *mp.ExtractData<FEFluidMaterialPoint>();
         
         // calculate the jacobian
-        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n]*tp.alphaf;
+        detJ = invjact(el, Ji, n, tp.alphaf)*gw[n];
         
         vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
         vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
@@ -409,6 +410,25 @@ void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEleme
         H = el.H(n);
         
         double dens = m_pMat->Fluid()->Density(mp);
+
+        // derivative of the (intermediate) volume element with respect to the nodal
+        // displacements: d(dv)/du_j = dv*tr(dF_a.F_a^-1), with the objective interpolation dF_a
+        FEObjectiveInterpolation oi;
+        ObjectiveInterpolation(el, n, tp.alphaf, oi);
+        mat3d Fai = oi.F().inverse();
+        const mat3d& J0i = el.m_J0i[n];
+        vector<vec3d> ddv(neln);
+        for (int j=0; j<neln; ++j) {
+            vec3d G0(J0i(0,0)*el.Gr(n)[j] + J0i(1,0)*el.Gs(n)[j] + J0i(2,0)*el.Gt(n)[j],
+                     J0i(0,1)*el.Gr(n)[j] + J0i(1,1)*el.Gs(n)[j] + J0i(2,1)*el.Gt(n)[j],
+                     J0i(0,2)*el.Gr(n)[j] + J0i(1,2)*el.Gs(n)[j] + J0i(2,2)*el.Gt(n)[j]);
+            for (int k=0; k<3; ++k) {
+                vec3d sk(k==0, k==1, k==2);
+                ddv[j].x = (k==0 ? (oi.dF(sk & G0)*Fai).trace() : ddv[j].x);
+                ddv[j].y = (k==1 ? (oi.dF(sk & G0)*Fai).trace() : ddv[j].y);
+                ddv[j].z = (k==2 ? (oi.dF(sk & G0)*Fai).trace() : ddv[j].z);
+            }
+        }
         
         // get the force
         f = BF.force(mp);
@@ -426,15 +446,15 @@ void FEFluidFSIDomain3D::ElementBodyForceStiffness(FEBodyForce& BF, FESolidEleme
         for (int i=0; i<neln; ++i) {
             for (int j=0; j<neln; ++j)
             {
-                kwJ = f*(-H[i]*H[j]*dens/(pt.m_ef+1)*detJ);
-                Kwu = (f & gradN[j])*(dens*H[i]*detJ);
-                Kww = K*(H[i]*H[j]*dens*detJ);
+                kwJ = f*(-H[i]*H[j]*dens/(pt.m_ef+1)*detJ*tp.alphaf);
+                Kwu = (f & ddv[j])*(dens*H[i]*detJ);
+                Kww = K*(H[i]*H[j]*dens*detJ*tp.alphaf);
                 ke[ndof*i+3][ndof*j  ] += Kwu(0,0); ke[ndof*i+3][ndof*j+1] += Kwu(0,1); ke[ndof*i+3][ndof*j+2] += Kwu(0,2);
                 ke[ndof*i+4][ndof*j  ] += Kwu(1,0); ke[ndof*i+4][ndof*j+1] += Kwu(1,1); ke[ndof*i+4][ndof*j+2] += Kwu(1,2);
                 ke[ndof*i+5][ndof*j  ] += Kwu(2,0); ke[ndof*i+5][ndof*j+1] += Kwu(2,1); ke[ndof*i+5][ndof*j+2] += Kwu(2,2);
-                ke[ndof*i+3][ndof*j+3] += Kww(0,0); ke[ndof*i+3][ndof*j+4] += Kwu(0,1); ke[ndof*i+3][ndof*j+5] += Kwu(0,2);
-                ke[ndof*i+4][ndof*j+3] += Kww(1,0); ke[ndof*i+4][ndof*j+4] += Kwu(1,1); ke[ndof*i+4][ndof*j+5] += Kwu(1,2);
-                ke[ndof*i+5][ndof*j+3] += Kww(2,0); ke[ndof*i+5][ndof*j+4] += Kwu(2,1); ke[ndof*i+5][ndof*j+5] += Kwu(2,2);
+                ke[ndof*i+3][ndof*j+3] += Kww(0,0); ke[ndof*i+3][ndof*j+4] += Kww(0,1); ke[ndof*i+3][ndof*j+5] += Kww(0,2);
+                ke[ndof*i+4][ndof*j+3] += Kww(1,0); ke[ndof*i+4][ndof*j+4] += Kww(1,1); ke[ndof*i+4][ndof*j+5] += Kww(1,2);
+                ke[ndof*i+5][ndof*j+3] += Kww(2,0); ke[ndof*i+5][ndof*j+4] += Kww(2,1); ke[ndof*i+5][ndof*j+5] += Kww(2,2);
                 ke[ndof*i+3][ndof*j+6] += kwJ.x;
                 ke[ndof*i+4][ndof*j+6] += kwJ.y;
                 ke[ndof*i+5][ndof*j+6] += kwJ.z;
@@ -519,30 +539,14 @@ void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
         {
             for (j=0, j7 = 0; j<neln; ++j, j7 += 7)
             {
-                mat3d M = mat3dd(a*dtrans) - et.m_L;
-                mat3d Kuu = (vdotTdotv(gradN[i], cs, gradN[j])
-                             + mat3dd(gradN[i]*(ss*gradN[j])))*detJ;
-                mat3d Kwu = (vdotTdotv(gradN[i], cv, gradN[j])*M
-                             + sv*((gradN[i] & gradN[j]) - (gradN[j] & gradN[i]))
-                             + ((gradp & gradN[j]) - (gradN[j] & gradp)*H[i]))*detJ;
+                // NOTE: the columns for the solid displacement are evaluated in
+                //       ElementStiffnessDisplacement
                 mat3d Kww = vdotTdotv(gradN[i], cv, gradN[j])*detJ;
                 vec3d kwJ = ((svJ*gradN[i])*H[j]
                              + (gradN[j]*dp+pt.m_gradef*(H[j]*d2p))*H[i])*detJ;
-                vec3d kJu = ((gradN[j]*(dJfoJ - dJsoJ - a)*dtrans
-                              + ((gradN[j] & pt.m_gradef) - (pt.m_gradef & gradN[j]))*fpt.m_w/Jf + et.m_L.transpose()*gradN[j])*H[i]
-                             + ((gradN[j] & gradN[i]) - (gradN[i] & gradN[j]))*fpt.m_w
-                             )*detJ;
                 vec3d kJw = ((pt.m_gradef*(H[i]/Jf) + gradN[i])*H[j])*detJ;
                 double kJJ = (((c - dJfoJ)*dtrans - (pt.m_gradef*fpt.m_w)/Jf)*H[j]
                               + gradN[j]*fpt.m_w)*H[i]/Jf*detJ;
-                
-                ke[i7  ][j7  ] += Kuu(0,0); ke[i7  ][j7+1] += Kuu(0,1); ke[i7  ][j7+2] += Kuu(0,2);
-                ke[i7+1][j7  ] += Kuu(1,0); ke[i7+1][j7+1] += Kuu(1,1); ke[i7+1][j7+2] += Kuu(1,2);
-                ke[i7+2][j7  ] += Kuu(2,0); ke[i7+2][j7+1] += Kuu(2,1); ke[i7+2][j7+2] += Kuu(2,2);
-                
-                ke[i7+3][j7  ] += Kwu(0,0); ke[i7+3][j7+1] += Kwu(0,1); ke[i7+3][j7+2] += Kwu(0,2);
-                ke[i7+4][j7  ] += Kwu(1,0); ke[i7+4][j7+1] += Kwu(1,1); ke[i7+4][j7+2] += Kwu(1,2);
-                ke[i7+5][j7  ] += Kwu(2,0); ke[i7+5][j7+1] += Kwu(2,1); ke[i7+5][j7+2] += Kwu(2,2);
                 
                 ke[i7+3][j7+3] += Kww(0,0); ke[i7+3][j7+4] += Kww(0,1); ke[i7+3][j7+5] += Kww(0,2);
                 ke[i7+4][j7+3] += Kww(1,0); ke[i7+4][j7+4] += Kww(1,1); ke[i7+4][j7+5] += Kww(1,2);
@@ -552,10 +556,6 @@ void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
                 ke[i7+4][j7+6] += kwJ.y;
                 ke[i7+5][j7+6] += kwJ.z;
                 
-                ke[i7+6][j7  ] += kJu.x;
-                ke[i7+6][j7+1] += kJu.y;
-                ke[i7+6][j7+2] += kJu.z;
-
                 ke[i7+6][j7+3] += kJw.x;
                 ke[i7+6][j7+4] += kJw.y;
                 ke[i7+6][j7+5] += kJw.z;
@@ -564,6 +564,9 @@ void FEFluidFSIDomain3D::ElementStiffness(FESolidElement &el, matrix &ke)
             }
         }
     }
+
+    // stiffness with respect to the solid displacement (internal and inertial forces)
+    ElementStiffnessDisplacement(el, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -733,16 +736,10 @@ void FEFluidFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
         {
             for (j=0, j7 = 0; j<neln; ++j, j7 += 7)
             {
-                mat3d Kwu = ((pt.m_aft & gradN[j]) - pt.m_Lf*(fpt.m_w*gradN[j])
-                             + mat3dd((gradN[j]*fpt.m_w)*a*dtrans)
-                             + mat3dd(b*H[j]*dtrans)
-                             )*(H[i]*dens*detJ);
+                // NOTE: the columns for the solid displacement are evaluated in
+                //       ElementStiffnessDisplacement
                 mat3d Kww = (mat3dd(c*dtrans*H[j] + gradN[j]*fpt.m_w) + pt.m_Lf*H[j])*(H[i]*dens*detJ);
                 vec3d kwJ = pt.m_aft*(-dens/(pt.m_ef+1)*H[i]*H[j]*detJ);
-                
-                ke[i7+3][j7  ] += Kwu(0,0); ke[i7+3][j7+1] += Kwu(0,1); ke[i7+3][j7+2] += Kwu(0,2);
-                ke[i7+4][j7  ] += Kwu(1,0); ke[i7+4][j7+1] += Kwu(1,1); ke[i7+4][j7+2] += Kwu(1,2);
-                ke[i7+5][j7  ] += Kwu(2,0); ke[i7+5][j7+1] += Kwu(2,1); ke[i7+5][j7+2] += Kwu(2,2);
                 
                 ke[i7+3][j7+3] += Kww(0,0); ke[i7+3][j7+4] += Kww(0,1); ke[i7+3][j7+5] += Kww(0,2);
                 ke[i7+4][j7+3] += Kww(1,0); ke[i7+4][j7+4] += Kww(1,1); ke[i7+4][j7+5] += Kww(1,2);
@@ -751,6 +748,139 @@ void FEFluidFSIDomain3D::ElementMassMatrix(FESolidElement& el, matrix& ke)
                 ke[i7+3][j7+6] += kwJ.x;
                 ke[i7+4][j7+6] += kwJ.y;
                 ke[i7+5][j7+6] += kwJ.z;
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+//! Stiffness with respect to the solid displacement u_{n+1} (internal and
+//! inertial forces). Each column is evaluated as the directional derivative of
+//! the residual integrand for a perturbation of a single displacement degree of
+//! freedom, using the kinematics of UpdateElementStress:
+//! - the intermediate configuration and F_{n+af} follow from the incrementally
+//!   objective interpolation (dF_a = d(F_a)/d(F_{n+1})[dF], A = dF_a.F_a^-1);
+//! - the solid velocity gradient is evaluated on the midpoint configuration;
+//! - J^s_dot = (J_{n+1} - J_n)/dt.
+void FEFluidFSIDomain3D::ElementStiffnessDisplacement(FESolidElement& el, matrix& ke)
+{
+    const FETimeInfo& tp = GetFEModel()->GetTime();
+    const int nint = el.GaussPoints();
+    const int neln = el.Nodes();
+    const int ndpn = 7;
+
+    const double dt = tp.timeIncrement;
+    const double af = tp.alphaf;
+    const double am = tp.alpham;
+    const double dtrans = m_btrans ? 1 : m_sseps;
+    const double atrans = m_btrans ? 1 : 0;
+    // derivative of the nodal solid acceleration with respect to the nodal position
+    const double bacc = (tp.beta > 0) ? 1.0/(tp.beta*dt*dt) : 0;
+
+    vector<vec3d> gradN(neln), GradN0(neln);
+    double Ji[3][3];
+    const double* gw = el.GaussWeights();
+    const vec3d e[3] = { vec3d(1,0,0), vec3d(0,1,0), vec3d(0,0,1) };
+
+    for (int n=0; n<nint; ++n)
+    {
+        // current (intermediate) volume element
+        double dv = invjact(el, Ji, n, af)*gw[n];
+        vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
+        vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
+        vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
+        double* H = el.H(n);
+        double* Gr = el.Gr(n); double* Gs = el.Gs(n); double* Gt = el.Gt(n);
+        const mat3d& J0i = el.m_J0i[n];
+        for (int i=0; i<neln; ++i) {
+            gradN[i] = g1*Gr[i] + g2*Gs[i] + g3*Gt[i];
+            GradN0[i] = vec3d(J0i(0,0)*Gr[i] + J0i(1,0)*Gs[i] + J0i(2,0)*Gt[i],
+                              J0i(0,1)*Gr[i] + J0i(1,1)*Gs[i] + J0i(2,1)*Gt[i],
+                              J0i(0,2)*Gr[i] + J0i(1,2)*Gs[i] + J0i(2,2)*Gt[i]);
+        }
+
+        FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+        FEElasticMaterialPoint& et = *(mp.ExtractData<FEElasticMaterialPoint>());
+        FEFluidMaterialPoint& pt = *(mp.ExtractData<FEFluidMaterialPoint>());
+        FEFSIMaterialPoint& fpt = *(mp.ExtractData<FEFSIMaterialPoint>());
+
+        // kinematics
+        mat3d Ft, Fp;
+        double Jt = defgrad(el, Ft, n);
+        defgradp(el, Fp, n);
+        FEObjectiveInterpolation oi;
+        oi.Init(Fp, Ft, af);
+        mat3d Fai = oi.F().inverse();
+        mat3d Fti = Ft.inverse();
+        const double J = et.m_J;
+        const double Jf = 1 + pt.m_ef;
+        const mat3d Lw = pt.m_Lf - et.m_L;
+        const vec3d& w = fpt.m_w;
+        const double Jdot = fpt.m_Jdot;
+        const vec3d& aft = pt.m_aft;
+
+        // material response
+        mat3ds ss = fpt.m_ss;
+        tens4ds cs = m_pMat->Solid()->Tangent(mp);
+        mat3ds sv = m_pMat->Fluid()->GetViscous()->Stress(mp);
+        tens4ds cv = m_pMat->Fluid()->Tangent_RateOfDeformation(mp);
+        double dp = m_pMat->Fluid()->Tangent_Pressure_Strain(mp);
+        vec3d gradp = pt.m_gradef*dp;
+        double dens = m_pMat->Fluid()->Density(mp);
+
+        // unperturbed quantities
+        double Q = (pt.m_efdot/Jf - Jdot/J)*dtrans + (pt.m_gradef*w)/Jf;
+
+        for (int j=0; j<neln; ++j)
+        {
+            for (int k=0; k<3; ++k)
+            {
+                const vec3d& s = e[k];
+                // perturbation of F_{n+1} and of the intermediate configuration
+                mat3d dFt = s & GradN0[j];
+                mat3d A = oi.dF(dFt)*Fai;
+                mat3d At = A.transpose();
+                double div = A.trace();
+
+                // perturbations of the kinematic quantities
+                mat3d dL = FEMidpointVelocityGradientDerivative(Fp, Ft, dt, dFt)*dtrans;
+                mat3d dLw = -(Lw*A);
+                mat3d dLf = dL + dLw;
+                mat3ds dsv = cv.dot(dLf.sym());
+                mat3ds dss = cs.dot(A.sym());
+                double dJdot = (Jt/dt)*((Fti.transpose()*GradN0[j])*s)*dtrans;
+                double dJsoJ = dJdot/J - (Jdot/J)*div;
+                vec3d dgradp = -(At*gradp);
+                vec3d dgradef = -(At*pt.m_gradef);
+                vec3d das = s*(am*bacc*H[j]*atrans);
+                vec3d daf = das + dLf*w;
+                double dQ = -dJsoJ*dtrans + (dgradef*w)/Jf;
+
+                for (int i=0; i<neln; ++i)
+                {
+                    const vec3d& gi = gradN[i];
+                    vec3d dgi = -(At*gi);
+
+                    // solid momentum: d(ss.grad N dv)/dv = (cs:A).gradN + A.ss.gradN
+                    vec3d dFs = dss*gi + A*(ss*gi);
+
+                    // fluid momentum (internal and inertial)
+                    vec3d dFf = dsv*gi + sv*dgi + (sv*gi)*div
+                              + (dgradp + gradp*div)*H[i]
+                              + (daf + aft*div)*(dens*H[i]);
+
+                    // fluid mass balance
+                    double dFJ = H[i]*dQ + dgi*w + (H[i]*Q + gi*w)*div;
+
+                    int r = ndpn*i, c = ndpn*j + k;
+                    ke[r  ][c] += dFs.x*dv;
+                    ke[r+1][c] += dFs.y*dv;
+                    ke[r+2][c] += dFs.z*dv;
+                    ke[r+3][c] += dFf.x*dv;
+                    ke[r+4][c] += dFf.y*dv;
+                    ke[r+5][c] += dFf.z*dv;
+                    ke[r+6][c] += dFJ*dv;
+                }
             }
         }
     }
@@ -843,10 +973,14 @@ void FEFluidFSIDomain3D::UpdateElementStress(int iel, const FETimeInfo& tp)
 		double Jt, Jp;
 		Jt = defgrad(el, Ft, n);
 		Jp = defgradp(el, Fp, n);
-		ept.m_F = Ft*alphaf + Fp*(1 - alphaf);
+		// incrementally objective kinematics at t_(n+alphaf) (see FEObjectiveKinematics.h):
+		// rotation and stretch are interpolated separately, and the velocity gradient
+		// is evaluated on the midpoint configuration, so that a rigid-body increment
+		// produces neither strain nor rate of deformation
+		ept.m_F = FEObjectiveInterpolateF(Fp, Ft, alphaf);
 		ept.m_J = ept.m_F.det();
 		mat3d Fi = ept.m_F.inverse();
-		ept.m_L = (Ft - Fp)*Fi*(dtrans / dt);
+		ept.m_L = FEMidpointVelocityGradient(Fp, Ft, dt)*dtrans;
 		ept.m_v = m_btrans ? el.Evaluate(vs, n) : vec3d(0, 0, 0);
 		ept.m_a = m_btrans ? el.Evaluate(a, n) : vec3d(0, 0, 0);
 

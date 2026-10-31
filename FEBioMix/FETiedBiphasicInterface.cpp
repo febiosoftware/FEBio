@@ -348,6 +348,17 @@ void FETiedBiphasicInterface::Activate()
 	// this will evaluate the gap functions in the reference configuration
 	InitialProjection(m_ss, m_ms);
 	if (m_btwo_pass) InitialProjection(m_ms, m_ss);
+
+	// initialize corotational frames
+	FETiedBiphasicPushForward(m_ss, true);
+	if (m_btwo_pass) FETiedBiphasicPushForward(m_ms, true);
+}
+
+//-----------------------------------------------------------------------------
+void FETiedBiphasicInterface::PrepStep()
+{
+	FETiedBiphasicPushForward(m_ss, false);
+	if (m_btwo_pass) FETiedBiphasicPushForward(m_ms, false);
 }
 
 //-----------------------------------------------------------------------------

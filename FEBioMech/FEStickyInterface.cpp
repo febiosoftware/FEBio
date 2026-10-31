@@ -45,6 +45,7 @@ void FEStickySurface::Data::Serialize(DumpStream& ar)
 	ar & rs;
 	ar & Lm;
 	ar & tn;
+	Rp.Serialize(ar);
 }
 
 
@@ -223,6 +224,31 @@ void FEStickyInterface::Activate()
 
 	// project primary surface onto secondary surface
 	ProjectSurface(ss, ms, false);
+
+	// initialize corotational frames
+	for (int i = 0; i < ss.Nodes(); ++i)
+	{
+		FEStickySurface::Data& d = ss.m_data[i];
+		d.Rp = FEContactFrame();
+		if (d.pme) d.Rp.Evaluate(ms, *d.pme, d.rs[0], d.rs[1], true);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! The Lagrange multipliers are stored as spatial vectors. At the start of each
+//! time step they are pushed forward with the rotation of the interface over the
+//! previous time step (frame evaluated on the secondary surface at the stuck
+//! point), so that they remain frame invariant.
+void FEStickyInterface::PrepStep()
+{
+	for (int i = 0; i < ss.Nodes(); ++i)
+	{
+		FEStickySurface::Data& d = ss.m_data[i];
+		if (d.pme == nullptr) continue;
+		FEContactFrame Rn;
+		Rn.Evaluate(ms, *d.pme, d.rs[0], d.rs[1], true);
+		d.Rp.Update(Rn, &d.Lm, 1);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -290,6 +316,7 @@ void FEStickyInterface::Update()
 					sni.pme = 0;
 					sni.Lm = vec3d(0,0,0);
 					sni.tn = vec3d(0,0,0);
+					sni.Rp = FEContactFrame();
 				}
 			}
 		}
@@ -327,6 +354,9 @@ void FEStickyInterface::Update()
 					sni.pme = pme;
 					sni.rs[0] = rs[0];
 					sni.rs[1] = rs[1];
+
+					// corotational frame (start of time step) at the stuck point
+					sni.Rp.Evaluate(ms, *pme, rs[0], rs[1], true);
 				}
 			}			
 		}

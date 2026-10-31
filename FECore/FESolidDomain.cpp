@@ -1309,6 +1309,18 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n, const 
 //! The return value is the determinant of the Jacobian (not the inverse!)
 double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n, const double alpha)
 {
+    // for alpha < 1, use the incrementally objective intermediate configuration
+    if (alpha != 1.0)
+    {
+        mat3d Fa = ObjectiveDefGrad(el, n, alpha);
+        const mat3d& J0i = el.m_J0i[n];
+        double det = Fa.det() / J0i.det();
+        if (det <= 0) throw NegativeJacobian(el.GetID(), n+1, det);
+        mat3d Jai = J0i*Fa.inverse();
+        for (int i=0; i<3; ++i) for (int j=0; j<3; ++j) Ji[i][j] = Jai(i,j);
+        return det;
+    }
+
     // nodal coordinates
     vec3d rt[FEElement::MAX_NODES];
 	GetCurrentNodalCoordinates(el, rt, alpha);
@@ -1355,6 +1367,26 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n, const 
     Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
     
     return det;
+}
+
+//-----------------------------------------------------------------------------
+//! Incrementally objective deformation gradient at the intermediate time t_{n+alpha}.
+//! The right stretch tensor is interpolated linearly and the rotation along the
+//! geodesic between F_n and F_{n+1} (see FEObjectiveKinematics.h).
+mat3d FESolidDomain::ObjectiveDefGrad(FESolidElement& el, int n, const double alpha)
+{
+    FEObjectiveInterpolation oi;
+    ObjectiveInterpolation(el, n, alpha, oi);
+    return oi.F();
+}
+
+//-----------------------------------------------------------------------------
+void FESolidDomain::ObjectiveInterpolation(FESolidElement& el, int n, const double alpha, FEObjectiveInterpolation& oi)
+{
+    mat3d Ft, Fp;
+    defgrad(el, Ft, n);
+    if (alpha != 1.0) defgradp(el, Fp, n); else Fp = Ft;
+    oi.Init(Fp, Ft, alpha);
 }
 
 //-----------------------------------------------------------------------------
@@ -1865,6 +1897,13 @@ double FESolidDomain::detJt(FESolidElement &el, int n)
 //! Calculate jacobian with respect to current frame
 double FESolidDomain::detJt(FESolidElement &el, int n, const double alpha)
 {
+    // for alpha < 1, use the incrementally objective intermediate configuration
+    if (alpha != 1.0)
+    {
+        mat3d Fa = ObjectiveDefGrad(el, n, alpha);
+        return Fa.det() / el.m_J0i[n].det();
+    }
+
     // nodal coordinates
     vec3d rt[FEElement::MAX_NODES];
 	GetCurrentNodalCoordinates(el, rt, alpha);
@@ -1995,6 +2034,16 @@ void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3])
 
 void FESolidDomain::CoBaseVectors(FESolidElement& el, int j, vec3d g[3], const double alpha)
 {
+    // for alpha < 1, use the incrementally objective intermediate configuration: g_i = F_a.G_i
+    if (alpha != 1.0)
+    {
+        mat3d Ja = ObjectiveDefGrad(el, j, alpha)*el.m_J0i[j].inverse();
+        g[0] = vec3d(Ja(0,0), Ja(1,0), Ja(2,0));
+        g[1] = vec3d(Ja(0,1), Ja(1,1), Ja(2,1));
+        g[2] = vec3d(Ja(0,2), Ja(1,2), Ja(2,2));
+        return;
+    }
+
     // get the shape function derivatives
     double* Hr = el.Gr(j);
     double* Hs = el.Gs(j);

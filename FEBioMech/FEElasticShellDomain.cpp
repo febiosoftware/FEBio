@@ -553,6 +553,12 @@ void FEElasticShellDomain::BodyForceStiffness(FELinearSystem& LS, FEBodyForce& b
 
 void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 {
+    if (m_alphaf != 1.0)
+    {
+        ElementObjectiveStiffness(iel, ke);
+        return;
+    }
+
     FEShellElement& el = Element(iel);
     
     int i, i6, j, j6, n;
@@ -669,6 +675,87 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
     
 }
 
+
+//-----------------------------------------------------------------------------
+//! Element stiffness for alpha_f < 1. The stress at the intermediate time is
+//! evaluated with the objective interpolation F_a of the deformation gradient
+//! and the internal forces are integrated over the corresponding intermediate
+//! configuration. The deformation gradient is linear in the nodal (front and
+//! back face) displacements, F = sum_j (u_j (x) GradMu_j + d_j (x) GradMd_j), so a
+//! perturbation of a nodal dof perturbs F_{n+1} by dF = e_k (x) GradM0_j and the
+//! intermediate configuration by A = dF_a.F_a^-1, where dF_a is the derivative of
+//! the objective interpolation. Then d(s.grad M_i dv) = [ c:sym(A) + A.s ].grad M_i dv.
+void FEElasticShellDomain::ElementObjectiveStiffness(int iel, matrix& ke)
+{
+    FEShellElement& el = Element(iel);
+    const int nint = el.GaussPoints();
+    const int neln = el.Nodes();
+    const double* gw = el.GaussWeights();
+    const vec3d e[3] = { vec3d(1,0,0), vec3d(0,1,0), vec3d(0,0,1) };
+
+    vec3d gradMu[FEElement::MAX_NODES], gradMd[FEElement::MAX_NODES];
+    vec3d Grad0[2][FEElement::MAX_NODES];
+
+    ke.zero();
+    for (int n=0; n<nint; ++n)
+    {
+        FEMaterialPoint& mp = *(el.GetMaterialPoint(n));
+        FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+        // volume element and base vectors in the (objective) intermediate configuration
+        double dv = detJ(el, n, m_alphaf)*gw[n];
+        vec3d gcnt[3];
+        ContraBaseVectors(el, n, gcnt, m_alphaf);
+
+        // reference contravariant base vectors
+        vec3d Gcnt[3] = { el.m_G0[0][n], el.m_G0[1][n], el.m_G0[2][n] };
+
+        double eta = el.gt(n);
+        const double* Mr = el.Hr(n);
+        const double* Ms = el.Hs(n);
+        const double* M  = el.H(n);
+        for (int i=0; i<neln; ++i)
+        {
+            vec3d gradM = gcnt[0]*Mr[i] + gcnt[1]*Ms[i];
+            gradMu[i] = (gradM*(1+eta) + gcnt[2]*M[i])/2;
+            gradMd[i] = (gradM*(1-eta) - gcnt[2]*M[i])/2;
+            vec3d GradM = Gcnt[0]*Mr[i] + Gcnt[1]*Ms[i];
+            Grad0[0][i] = (GradM*(1+eta) + Gcnt[2]*M[i])/2;
+            Grad0[1][i] = (GradM*(1-eta) - Gcnt[2]*M[i])/2;
+        }
+
+        // objective interpolation and its derivative
+        FEObjectiveInterpolation oi;
+        ObjectiveInterpolation(el, n, m_alphaf, oi);
+        mat3d Fai = oi.F().inverse();
+
+        const mat3ds& s = pt.m_s;
+        tens4dmm C = (m_secant_tangent ? m_pMat->SecantTangent(mp) : m_pMat->SolidTangent(mp));
+
+        for (int j=0; j<neln; ++j)
+            for (int b=0; b<2; ++b)         // front (u) and back (d) dofs
+                for (int k=0; k<3; ++k)
+                {
+                    mat3d A = oi.dF(e[k] & Grad0[b][j])*Fai;
+                    // full double contraction C:sym(A)
+                    mat3d As = A.sym();
+                    mat3d dS; dS.zero();
+                    for (int p=0; p<3; ++p) for (int q=0; q<3; ++q) {
+                        double v = 0;
+                        for (int r=0; r<3; ++r) for (int t=0; t<3; ++t) v += C(p,q,r,t)*As(r,t);
+                        dS(p,q) = v;
+                    }
+                    int c = 6*j + 3*b + k;
+                    for (int i=0; i<neln; ++i)
+                    {
+                        vec3d fu = (dS*gradMu[i] + A*(s*gradMu[i]))*dv;
+                        vec3d fd = (dS*gradMd[i] + A*(s*gradMd[i]))*dv;
+                        ke[6*i  ][c] += fu.x; ke[6*i+1][c] += fu.y; ke[6*i+2][c] += fu.z;
+                        ke[6*i+3][c] += fd.x; ke[6*i+4][c] += fd.y; ke[6*i+5][c] += fd.z;
+                    }
+                }
+    }
+}
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
@@ -868,18 +955,13 @@ void FEElasticShellDomain::UpdateElementStress(int iel, const FETimeInfo& tp)
         mat3d Ft, Fp;
         double Jt = defgrad(el, Ft, n);
         double Jp = defgradp(el, Fp, n);
-		if (m_alphaf == 1.0)
-		{
-			pt.m_F = Ft;
-			pt.m_J = Jt;
-		}
-		else
-		{
-			pt.m_F = Ft * m_alphaf + Fp * (1 - m_alphaf);
-			pt.m_J = pt.m_F.det();
-		}
-        mat3d Fi = pt.m_F.inverse();
-        pt.m_L = (Ft - Fp)*Fi/dt;
+		// incrementally objective kinematics at the intermediate time (see FEObjectiveKinematics.h):
+		// rotation and stretch are interpolated separately, and the velocity gradient
+		// is evaluated on the midpoint configuration, so that a rigid-body increment
+		// produces neither strain nor rate of deformation
+		pt.m_F = FEObjectiveInterpolateF(Fp, Ft, m_alphaf);
+		pt.m_J = (m_alphaf == 1.0 ? Jt : pt.m_F.det());
+		pt.m_L = FEMidpointVelocityGradient(Fp, Ft, dt);
         if (m_update_dynamic)
         {
             pt.m_v = evaluate(el, v, w, n);

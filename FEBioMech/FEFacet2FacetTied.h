@@ -29,6 +29,7 @@ SOFTWARE.*/
 #pragma once
 #include "FEContactInterface.h"
 #include "FEContactSurface.h"
+#include "FEContactFrame.h"
 
 //-----------------------------------------------------------------------------
 //! Surface definition for the facet-to-facet tied interface
@@ -50,6 +51,7 @@ public:
 		vec3d	m_vgap0;	//!< initial gap function
 		vec3d	m_Lm;	//!< Lagrange multiplier
 		vec2d	m_rs;	//!< natural coordinates on secondary surface element
+		FEContactFrame	m_Rp;	//!< corotational frame at start of time step
 	};
 
 public:
@@ -79,6 +81,9 @@ public:
 
 	//! interface activation
 	void Activate() override;
+
+	//! push stored vectors forward with the interface rotation (frame invariance)
+	void PrepStep() override;
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;

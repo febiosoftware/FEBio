@@ -56,6 +56,32 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! The initial gap m_Gap and the Lagrange multipliers m_Lmd are stored as spatial
+//! vectors. At the start of each time step they are pushed forward with the
+//! rotation of the interface (corotational frame at the primary integration
+//! point) over the previous time step, so that they remain frame invariant.
+//! If binit is true, the frames are only initialized.
+inline void FETiedBiphasicPushForward(FESurface& ss, bool binit)
+{
+    for (int i = 0; i < ss.Elements(); ++i)
+    {
+        FESurfaceElement& se = ss.Element(i);
+        for (int j = 0; j < se.GaussPoints(); ++j)
+        {
+            FETiedBiphasicContactPoint& pt = static_cast<FETiedBiphasicContactPoint&>(*se.GetMaterialPoint(j));
+            if (binit) pt.m_Rp = FEContactFrame();
+            if (pt.m_pme == nullptr) continue;
+            FEContactFrame Rn;
+            Rn.Evaluate(ss, se, j, true);
+            vec3d v[2] = { pt.m_Gap, pt.m_Lmd };
+            pt.m_Rp.Update(Rn, v, 2);
+            pt.m_Gap = v[0];
+            pt.m_Lmd = v[1];
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 class FEBIOMIX_API FETiedBiphasicSurface : public FEBiphasicContactSurface
 {
 public:
@@ -101,6 +127,9 @@ public:
 	
 	//! interface activation
 	void Activate() override;
+
+	//! push stored vectors forward with the interface rotation (frame invariance)
+	void PrepStep() override;
 
 	//! serialize data to archive
 	void Serialize(DumpStream& ar) override;

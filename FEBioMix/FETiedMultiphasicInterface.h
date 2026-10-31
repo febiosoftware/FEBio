@@ -99,6 +99,9 @@ public:
     
     //! interface activation
     void Activate() override;
+
+    //! push stored vectors forward with the interface rotation (frame invariance)
+    void PrepStep() override;
     
     //! serialize data to archive
     void Serialize(DumpStream& ar) override;

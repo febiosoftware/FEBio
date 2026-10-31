@@ -27,6 +27,7 @@ SOFTWARE.*/
 
 
 #pragma once
+#include "FEObjectiveKinematics.h"
 #include "FEDomain.h"
 #include "FEDofList.h"
 #include "FELinearSystem.h"
@@ -131,7 +132,16 @@ public:
     double invjact(FESolidElement& el, double J[3][3], double r, double s, double t);
     
     //! calculate inverse jacobian matrix w.r.t. intermediate frame
+    //! NOTE: for alpha < 1, the intermediate configuration is defined by the incrementally
+    //! objective deformation gradient returned by ObjectiveDefGrad (not by the linear
+    //! interpolation of nodal positions), see FEObjectiveKinematics.h
     double invjact(FESolidElement& el, double J[3][3], int n, const double alpha);
+
+    //! incrementally objective deformation gradient at the intermediate time t_{n+alpha}
+    mat3d ObjectiveDefGrad(FESolidElement& el, int n, const double alpha);
+
+    //! objective interpolation data (deformation gradient and its derivative) at t_{n+alpha}
+    void ObjectiveInterpolation(FESolidElement& el, int n, const double alpha, FEObjectiveInterpolation& oi);
     
     //! calculate inverse jacobian matrix w.r.t. previous time
     double invjactp(FESolidElement& el, double J[3][3], int n);

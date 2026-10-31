@@ -87,6 +87,7 @@ void FESlidingElasticSurface::Data::Init()
 	m_tr = vec3d(0, 0, 0);
 	m_rs = m_rsp = vec2d(0, 0);
 	m_bstick = false;
+	m_Rp = FEContactFrame();
 }
 
 //-----------------------------------------------------------------------------
@@ -103,6 +104,7 @@ void FESlidingElasticSurface::Data::Serialize(DumpStream& ar)
 	ar & m_rs;
 	ar & m_rsp;
 	ar & m_bstick;
+	m_Rp.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------
@@ -136,6 +138,12 @@ void FESlidingElasticSurface::InitSlidingSurface()
             // Store current surface projection values as previous
             data.m_rsp = data.m_rs;
 			data.m_pmep = data.m_pme;
+
+            // Push the vectorial multiplier forward with the rotation of the
+            // surface over the previous time step (frame invariance)
+            FEContactFrame Rn;
+            Rn.Evaluate(*this, el, j, true);
+            data.m_Rp.Update(Rn, &data.m_Lmt, 1);
         }
     }
 }
@@ -606,7 +614,7 @@ void FESlidingElasticInterface::ProjectSurface(FESlidingElasticSurface& ss, FESl
     }
     
     // loop over all integration points
-#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel
     for (int i=0; i<ss.Elements(); ++i)
     {
         FESurfaceElement& el = ss.Element(i);
