@@ -23694,8 +23694,7 @@ The interpolated motion
 \begin_inset Formula $\grad f=\Grad f\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}$
 \end_inset
 
-).
-The deformation gradient that follows from the interpolated motion,
+).The deformation gradient that follows from the interpolated motion,
 \begin_inset Formula 
 \[
 \frac{\partial\boldsymbol{\chi}^{s}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}^{s}_{n}+\alpha_{f}\mathbf{F}^{s}_{n+1}\,,
@@ -23703,8 +23702,7 @@ The deformation gradient that follows from the interpolated motion,
 
 \end_inset
 
-is not incrementally objective.
-For a rigid-body rotation increment 
+is not incrementally objective.For a rigid-body rotation increment 
 \begin_inset Formula $\Delta\theta$
 \end_inset
 
@@ -23718,8 +23716,7 @@ For a rigid-body rotation increment
 \begin_inset Formula $\alpha_{f}<1$
 \end_inset
 
-.
-Therefore,
+.Therefore,
  the deformation gradient used to evaluate the constitutive response at 
 \begin_inset Formula $t_{n+\alpha_{f}}$
 \end_inset
@@ -23736,7 +23733,7 @@ Therefore,
 \begin_inset Formula 
 \[
 \begin{aligned}\mathbf{F}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n+\alpha_{f}}\cdot\mathbf{U}^{s}_{n+\alpha_{f}}\,, & \mathbf{U}^{s}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{U}^{s}_{n}+\alpha_{f}\mathbf{U}^{s}_{n+1}\,,\\
- & & \mathbf{R}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n}\cdot\exp\left[\alpha_{f}\log\left(\mathbf{R}^{sT}_{n}\cdot\mathbf{R}^{s}_{n+1}\right)\right]\,,
+ &  & \mathbf{R}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n}\cdot\exp\left[\alpha_{f}\log\left(\mathbf{R}^{sT}_{n}\cdot\mathbf{R}^{s}_{n+1}\right)\right]\,,
 \end{aligned}
 \]
 
@@ -23747,8 +23744,7 @@ where
 \end_inset
 
  is the right polar decomposition,
- and the exponential and logarithm map a rotation vector to a rotation tensor and vice versa.
-This interpolation reduces to 
+ and the exponential and logarithm map a rotation vector to a rotation tensor and vice versa.This interpolation reduces to 
 \begin_inset Formula $\mathbf{F}^{s}_{n+1}$
 \end_inset
 
@@ -23760,8 +23756,7 @@ This interpolation reduces to
 \begin_inset Formula $\rho_{\infty}=0$
 \end_inset
 
- for this solver).
-It is objective,
+ for this solver).It is objective,
  since a rigid-body increment leaves 
 \begin_inset Formula $\mathbf{U}^{s}$
 \end_inset
@@ -23772,9 +23767,7 @@ It is objective,
 \begin_inset Formula $\alpha$
 \end_inset
 
- method is preserved.
-This deformation gradient and its inverse (used to evaluate spatial gradients of the fluid variables at the material point) are used to evaluate the following kinematic quantities,
-
+ method is preserved.This deformation gradient and its inverse (used to evaluate spatial gradients of the fluid variables at the material point) are used to evaluate the following kinematic quantities,
 \begin_inset Formula 
 \[
 J^{s}_{n+\alpha_{f}}=\det\mathbf{F}^{s}_{n+\alpha_{f}}
@@ -23837,21 +23830,16 @@ The previous form,
 \begin_inset Formula $\left(\alpha_{f}-\frac{1}{2}\right)\Delta\theta/\Delta t$
 \end_inset
 
-.
-For example,
+.For example,
  with the default value 
 \begin_inset Formula $\alpha_{f}=1$
 \end_inset
 
  and a rotation increment of 0.1 radian per time step,
- a rigidly rotating fluid-FSI domain exhibits a spurious rate of deformation equal to about 5% of its angular velocity.
-In contrast,
+ a rigidly rotating fluid-FSI domain exhibits a spurious rate of deformation equal to about 5% of its angular velocity.In contrast,
  the midpoint form is the Cayley transform of the rotation increment for a rigid-body motion,
  whose symmetric part vanishes exactly for rotation increments of any size (Hughes and Winget,
- 1980).
-It is also the second-order accurate approximation of the velocity gradient over the time step.
-The same incrementally objective kinematics are used in the biphasic-FSI and multiphasic-FSI domains.
-The stiffness with respect to the solid displacement is consistent with these kinematics:
+ 1980).It is also the second-order accurate approximation of the velocity gradient over the time step.The same incrementally objective kinematics are used in the biphasic-FSI and multiphasic-FSI domains.The stiffness with respect to the solid displacement is consistent with these kinematics:
  each column is evaluated as the directional derivative of the residual integrand for a perturbation
 \begin_inset Formula $\delta\mathbf{F}_{n+1}=\mathbf{e}_{k}\otimes\Grad N_{b}$
 \end_inset
@@ -23903,8 +23891,7 @@ tuple "list"
 
 .
  The resulting tangent was verified against a finite-difference derivative of the residual for the fluid-FSI,
- biphasic-FSI and multiphasic-FSI domains.
-Similarly,
+ biphasic-FSI and multiphasic-FSI domains.Similarly,
  we evaluate velocity derivatives at the intermediate time 
 \begin_inset Formula $t_{n+\alpha_{m}}=t_{n}+\alpha_{m}\left(t_{n+1}-t_{n}\right)$
 \end_inset
@@ -46352,7 +46339,7 @@ The final set of constitutive relations required to fully define an elastoplasti
 .
  As shown by 
 \begin_inset CommandInset citation
-LatexCommand citet
+LatexCommand citep
 key "Nims16"
 literal "false"
 
@@ -49174,7 +49161,6 @@ The form
  shell,
  biphasic,
  multiphasic and FSI domains.
-
 \end_layout
 
 \begin_layout Standard
@@ -49511,8 +49497,7 @@ where
 \begin_inset Formula $\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]=\delta\mathbf{F}_{n+1}$
 \end_inset
 
-.
-To linearize the virtual work,
+.To linearize the virtual work,
  we need to express the integrals appearing in 
 \begin_inset Formula $\delta W_{int}$
 \end_inset
@@ -49853,8 +49838,7 @@ tuple "list"
 
 which is not symmetric (a non-symmetric linear solver gives the best convergence).
  The same approach is used in the three-field solid and shell domains,
- where the element pressure is evaluated from the element volume in the corresponding configuration.
-The discretization of the mass term in the internal work is
+ where the element pressure is evaluated from the element volume in the corresponding configuration.The discretization of the mass term in the internal work is
 \begin_inset Formula 
 \[
 \int_{b}\delta\mathbf{v}\cdot\frac{\alpha_{m}}{\beta\Delta t^{2}}\rho\Delta\mathbf{u}\,dv=\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\int_{b}\mathbf{M}_{ab}\,dv\cdot\Delta\mathbf{u}_{b}\,,
