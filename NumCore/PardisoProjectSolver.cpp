@@ -41,11 +41,177 @@ SOFTWARE.*/
 
 #include <thread>
 
+#ifdef PARDISODL_RUNTIME
+//-----------------------------------------------------------------------------
+// Run-time binding of the Panua Pardiso library.
+//
+// FEBio is NOT linked against libpardiso. Instead, the library is located and
+// opened with dlopen the first time it is needed. If it is missing, or Panua's
+// license check fails, the solver reports itself unavailable and NumCore falls
+// back to another default solver (Accelerate on macOS). This lets one binary
+// be distributed to users with or without a Panua license.
+//
+// Search order:
+//   1. $PARDISO_LIB_PATH (full path to the library, or the directory holding it)
+//   2. ~/Library/Application Support/FEBio/lib   (macOS)
+//      ~/.febio/lib                              (Linux)
+//   3. ~/panua-pardiso-*/lib  (Panua's default install location; newest first)
+//   4. PDL_DEFAULT_PATH  (the PDL_LIB path FEBio was configured with, if any)
+//   5. /usr/local/lib, /opt/homebrew/lib (macOS)
+//   6. the dynamic loader's default search
+#include <dlfcn.h>
+#include <glob.h>
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <mutex>
+
+typedef void (*pardisoinit_fn)(void*, int*, int*, int*, double*, int*);
+typedef void (*pardiso_fn)(void*, int*, int*, int*, int*, int*,
+                           double*, int*, int*, int*, int*, int*,
+                           int*, double*, double*, int*, double*);
+
+static pardisoinit_fn pardisoinit = nullptr;
+static pardiso_fn     pardiso     = nullptr;
+static std::string    s_pdl_path;     // library that was loaded
+static std::string    s_pdl_error;    // reason the library is unavailable
+static bool           s_pdl_ok = false;
+
+#ifdef __APPLE__
+static const char* PDL_LIBNAME = "libpardiso.dylib";
+#else
+static const char* PDL_LIBNAME = "libpardiso.so";
+#endif
+
+static void load_pardiso_library()
+{
+	std::vector<std::string> candidates;
+
+	const char* env = getenv("PARDISO_LIB_PATH");
+	if (env && *env)
+	{
+		std::string p(env);
+		// accept either a file or a directory
+		auto ends_with = [&](const char* sfx) {
+			size_t n = strlen(sfx);
+			return (p.size() >= n) && (p.compare(p.size() - n, n, sfx) == 0);
+		};
+		if (!ends_with(".dylib") && !ends_with(".so"))
+			p += std::string("/") + PDL_LIBNAME;
+		candidates.push_back(p);
+	}
+
+	const char* home = getenv("HOME");
+	if (home)
+	{
+#ifdef __APPLE__
+		candidates.push_back(std::string(home) + "/Library/Application Support/FEBio/lib/" + PDL_LIBNAME);
+#else
+		candidates.push_back(std::string(home) + "/.febio/lib/" + PDL_LIBNAME);
+#endif
+
+		// Panua's default install location: ~/panua-pardiso-<yyyymmdd>-<platform>/lib.
+		// The date sorts lexicographically, so try the newest release first.
+		std::string pattern = std::string(home) + "/panua-pardiso-*/lib/" + PDL_LIBNAME;
+		glob_t g;
+		if (glob(pattern.c_str(), 0, nullptr, &g) == 0)
+		{
+			std::vector<std::string> found(g.gl_pathv, g.gl_pathv + g.gl_pathc);
+			std::sort(found.rbegin(), found.rend());
+			candidates.insert(candidates.end(), found.begin(), found.end());
+		}
+		globfree(&g);
+	}
+
+#ifdef PDL_DEFAULT_PATH
+	// the PDL_LIB path FEBio was configured with (only useful on the build machine)
+	candidates.push_back(PDL_DEFAULT_PATH);
+#endif
+	candidates.push_back(std::string("/usr/local/lib/") + PDL_LIBNAME);
+#ifdef __APPLE__
+	candidates.push_back(std::string("/opt/homebrew/lib/") + PDL_LIBNAME);
+#endif
+	candidates.push_back(PDL_LIBNAME);
+
+	void* h = nullptr;
+	std::string lastErr;
+	for (const std::string& c : candidates)
+	{
+		h = dlopen(c.c_str(), RTLD_NOW | RTLD_LOCAL);
+		if (h) { s_pdl_path = c; break; }
+		const char* e = dlerror();
+		// remember the first error from a file that exists but failed to load
+		// (e.g. code-signature or quarantine rejection, missing dependency)
+		if (e && lastErr.empty() && strstr(e, "no such file") == nullptr && strstr(e, "not found") == nullptr)
+			lastErr = e;
+	}
+
+	if (h == nullptr)
+	{
+		s_pdl_error = std::string(PDL_LIBNAME) + " not found";
+		if (!lastErr.empty()) s_pdl_error += " (" + lastErr + ")";
+		return;
+	}
+
+	pardisoinit = (pardisoinit_fn)dlsym(h, "pardisoinit");
+	pardiso     = (pardiso_fn)    dlsym(h, "pardiso");
+	if ((pardisoinit == nullptr) || (pardiso == nullptr))
+	{
+		s_pdl_error = s_pdl_path + " does not export pardisoinit/pardiso";
+		pardisoinit = nullptr; pardiso = nullptr;
+		dlclose(h);
+		return;
+	}
+
+	// Suppress Panua's license banner, then run the license check.
+	setenv("PARDISOLICMESSAGE", "1", 0);
+	void* pt[64] = { nullptr };
+	int iparm[64] = { 0 };
+	double dparm[64] = { 0.0 };
+	int mtype = 11, solver = 0, error = 0;
+	pardisoinit(pt, &mtype, &solver, iparm, dparm, &error);
+	switch (error)
+	{
+	case 0: s_pdl_ok = true; break;
+	case -10: s_pdl_error = "no Panua Pardiso license file found"; break;
+	case -11: s_pdl_error = "Panua Pardiso license has expired"; break;
+	case -12: s_pdl_error = "Panua Pardiso license: wrong username or hostname"; break;
+	default : s_pdl_error = "pardisoinit failed with error " + std::to_string(error); break;
+	}
+}
+
+static bool pardiso_available()
+{
+	static std::once_flag once;
+	std::call_once(once, load_pardiso_library);
+	return s_pdl_ok;
+}
+
+#else
 /* PARDISO prototype. */
 extern "C" void pardisoinit (void   *, int    *,   int *, int *, double *, int *);
 extern "C" void pardiso     (void   *, int    *,   int *, int *,    int *, int *,
                              double *, int    *,    int *, int *,   int *, int *,
                              int *, double *, double *, int *, double *);
+static bool pardiso_available() { return true; }
+#endif
+
+//-----------------------------------------------------------------------------
+bool PardisoProjectSolver::IsAvailable()
+{
+	return pardiso_available();
+}
+
+std::string PardisoProjectSolver::UnavailableReason()
+{
+#ifdef PARDISODL_RUNTIME
+	pardiso_available();
+	return s_pdl_error;
+#else
+	return std::string();
+#endif
+}
 
 //-----------------------------------------------------------------------------
 // print pardiso error message
@@ -82,11 +248,14 @@ PardisoProjectSolver::PardisoProjectSolver(FEModel* fem) : LinearSolver(fem), m_
     m_print_cn = false;
     m_mtype = -2;
     m_iparm3 = false;
-    m_pivot_perturbation = 14;
+    m_pivot_perturbation = 0;  // try 14 when problem does not converge
     m_isFactored = false;
     
     /* If both PARDISO AND PARDISODL are defined, print a warning */
-#ifdef PARDISO
+    // Linking both MKL and Panua at build time makes their pardiso/pardisoinit
+    // symbols clash. Run-time loading resolves Panua's symbols from its own
+    // library handle (dlsym), so both can coexist.
+#if defined(PARDISO) && !defined(PARDISODL_RUNTIME)
     fprintf(stderr, "WARNING: The pardiso-project version of the Pardiso solver is being used\n\n");
     exit(1);
 #endif
@@ -144,10 +313,22 @@ bool PardisoProjectSolver::PreProcess()
     
     //fprintf(stderr, "In PreProcess\n");
     assert(m_isFactored == false);
+
+    if (!IsAvailable())
+    {
+        feLogError("pardiso-project solver is unavailable: %s", UnavailableReason().c_str());
+        return false;
+    }
+
     int error = 0;
     int solver = 0; /* use sparse direct solver */
     pardisoinit(m_pt, &m_mtype, &solver, m_iparm, m_dparm, &error);
-    
+    if (error != 0)
+    {
+        feLogError("pardisoinit failed with error %d", error);
+        return false;
+    }
+
     /* Pivot perturbation threshold 10^-m_pivot_perturbation (iparm(10)).
      The Panua defaults (12 for nonsymmetric, 8 for symmetric) can perturb many
      pivots of badly scaled matrices (e.g. fluid-FSI), degrading the solution.
@@ -321,6 +502,9 @@ void PardisoProjectSolver::Destroy()
 }
 
 #else
+bool PardisoProjectSolver::IsAvailable() { return false; }
+std::string PardisoProjectSolver::UnavailableReason() { return "FEBio was built without pardiso-project support"; }
+
 BEGIN_FECORE_CLASS(PardisoProjectSolver, LinearSolver)
 	ADD_PARAMETER(m_print_cn, "print_condition_number");
 	ADD_PARAMETER(m_iparm3, "precondition");
