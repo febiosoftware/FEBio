@@ -118,7 +118,7 @@ protected:
 //! Plot variable for log variables
 class FELogNodeData;
 class FELogFaceData;
-class FELogElemData;
+class FELogElemSource;
 
 class FECORE_API FEPlotLogNodeData : public FEPlotNodeData
 {
@@ -156,5 +156,5 @@ public:
 	bool Save(FEDomain& dom, FEDataStream& a) override;
 
 private:
-	FELogElemData* m_logvar = nullptr;
+	FELogElemSource* m_logvar = nullptr;
 };
