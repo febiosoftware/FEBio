@@ -692,7 +692,7 @@ bool AccelerateSparseSolver::PreProcess()
             imp->SNFO = SparseNumericFactorOptions{};
             imp->SNFO.control        = SparseDefaultControl;
             imp->SNFO.scaling        = nullptr;
-            imp->SNFO.pivotTolerance = 0.01;
+            imp->SNFO.pivotTolerance = 0;
             imp->SNFO.zeroTolerance  = 1e-4 * DBL_EPSILON;
 
             // Accelerate's own equilibration. Note SparseScalingUser with a
