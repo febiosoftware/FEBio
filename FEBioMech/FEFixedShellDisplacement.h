@@ -25,8 +25,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #pragma once
 #include <FECore/FEFixedBC.h>
+#include "febiomech_api.h"
 
-class FEFixedShellDisplacement : public FEFixedBC
+class FEBIOMECH_API FEFixedShellDisplacement : public FEFixedBC
 {
 public:
 	FEFixedShellDisplacement(FEModel* fem);
