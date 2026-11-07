@@ -62,7 +62,7 @@ bool FEHuiskesSupply::Init()
         feLogInfo("Evaluating element proximity...");
         m_EPL.assign(mesh.Elements(), std::vector<int>());
         for (int i=0; i< mesh.Elements(); ++i) {
-            std::vector<int> epl = m_topo.ElementProximityList(i, m_D*mult);
+            std::vector<int> epl = m_topo.ElementProximityList(i, m_D*mult, false);
             m_EPL[i] = epl;
         }
         feLogInfo("Done.");
@@ -80,28 +80,34 @@ double FEHuiskesSupply::Supply(FEMaterialPoint& pt)
 	double sed = rpt->m_sed;
 	double rhorhat = m_B*(sed/rhor - m_k);
     
+    // nonlocal contributions are weighted by exp(-d/D) and the weighted sum is
+    // normalized by the sum of weights W, so that D sets the averaging distance
+    // of the stimulus without changing the magnitude of the response
+    double W = 1;
     if (m_D > 0) {
         FEMesh& mesh = GetFEModel()->GetMesh();
         // m_EPL is indexed by the mesh-wide element index (not the domain-local ID)
         int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
         int NEPL = (int)m_EPL[ie].size();
-#pragma omp parallel for shared (NEPL)
+        // serial loop: rhorhat and W are shared accumulators
         for (int i=0; i<NEPL; ++i) {
             int je = m_EPL[ie][i];
             if (je > -1) {
                 FEElement* el = mesh.Element(je);
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-                    double d = (pt.m_rt - mp.m_rt).unit();
-                    rpt = mp.ExtractData<FERemodelingMaterialPoint>();
-                    FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-                    rhorhat += exp(-d/m_D)*m_B*(rpt->m_sed/rpt->m_rhor - m_k);
+                    if (&mp == &pt) continue;   // this point's own contribution is added above
+                    FERemodelingMaterialPoint* rptn = mp.ExtractData<FERemodelingMaterialPoint>();
+                    if (rptn == nullptr) continue;
+                    double w = exp(-(pt.m_rt - mp.m_rt).norm()/m_D);
+                    W += w;
+                    rhorhat += w*m_B*(rptn->m_sed/rptn->m_rhor - m_k);
                 }
             }
         }
     }
 
-    return rhorhat;
+    return rhorhat/W;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,28 +116,11 @@ mat3ds FEHuiskesSupply::Tangent_Supply_Strain(FEMaterialPoint &pt)
 {
     FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
 	FERemodelingMaterialPoint* rpt = pt.ExtractData<FERemodelingMaterialPoint>();
-    mat3ds ruhat = et.m_s*(m_B/rpt->m_rhor);
+    mat3ds ruhat = et.m_s*(m_B/rpt->m_rhor/ProximityWeight(pt));
 
-    if (m_D > 0) {
-        FEMesh& mesh = GetFEModel()->GetMesh();
-        // m_EPL is indexed by the mesh-wide element index (not the domain-local ID)
-        int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
-        int NEPL = (int)m_EPL[ie].size();
-#pragma omp parallel for shared (NEPL)
-        for (int i=0; i<NEPL; ++i) {
-            int je = m_EPL[ie][i];
-            if (je > -1) {
-                FEElement* el = mesh.Element(je);
-                for (int k=0; k<el->GaussPoints(); ++k) {
-                    FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-                    double d = (pt.m_rt - mp.m_rt).unit();
-                    rpt = mp.ExtractData<FERemodelingMaterialPoint>();
-                    FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-                    ruhat += et.m_s*(exp(-d/m_D)*m_B/rpt->m_rhor);
-                }
-            }
-        }
-    }
+    // Neighboring points contribute to the supply (see Supply), but their contributions
+    // depend on the strains at those points, not at this point, so they do not
+    // contribute to this tangent (this cross-element coupling is neglected).
 
     return ruhat;
 }
@@ -144,6 +133,28 @@ double FEHuiskesSupply::Tangent_Supply_Density(FEMaterialPoint &mp)
     double rhor = rpt.m_rhor;
     double sed = rpt.m_sed;
     double dsed = rpt.m_dsed;
-	return (dsed - sed/rhor)*m_B/rhor;
+	return (dsed - sed/rhor)*m_B/rhor/ProximityWeight(mp);
 }
 
+//-----------------------------------------------------------------------------
+//! sum of the proximity weights exp(-d/D) of all integration points that contribute
+//! to the supply at this point (including this point, whose weight is 1)
+double FEHuiskesSupply::ProximityWeight(FEMaterialPoint& pt)
+{
+    double W = 1;
+    if (m_D > 0) {
+        FEMesh& mesh = GetFEModel()->GetMesh();
+        int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
+        for (int je : m_EPL[ie]) {
+            if (je < 0) continue;
+            FEElement* el = mesh.Element(je);
+            for (int k=0; k<el->GaussPoints(); ++k) {
+                FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
+                if (&mp == &pt) continue;
+                if (mp.ExtractData<FERemodelingMaterialPoint>() == nullptr) continue;
+                W += exp(-(pt.m_rt - mp.m_rt).norm()/m_D);
+            }
+        }
+    }
+    return W;
+}
