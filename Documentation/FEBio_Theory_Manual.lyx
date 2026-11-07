@@ -94,7 +94,7 @@ figs-within-sections
 \papersides 2
 \paperpagestyle default
 \tablestyle default
-\tracking_changes true
+\tracking_changes false
 \output_changes false
 \change_bars false
 \postpone_fragile_content false
@@ -48589,6 +48589,134 @@ Here,
 \end_inset
 
  represents the distance between these neighboring points and the current material point.
+\end_layout
+
+\begin_layout Subsection
+Huiskes Remodeling with Lazy Zone
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Huiskes-Remodeling-LZ"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material,
+ the specific reaction rate depends on the deviation of the specific strain energy from two threshold values,
+ 
+\begin_inset Formula $\psi^{lb}_{0}$
+\end_inset
+
+ (lower bound) and 
+\begin_inset Formula $\psi^{ub}_{0}$
+\end_inset
+
+ (upper bound),
+ 
+\begin_inset Formula 
+\begin{equation}
+\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}=\begin{cases}
+\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi^{lb}_{0} & \frac{\Psi_{r}}{\rho^{s}_{r}}<\psi^{lb}_{0}\\
+0 & \psi^{lb}_{0}\le\frac{\Psi_{r}}{\rho^{s}_{r}}\le\psi^{ub}_{0}\\
+\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi^{ub}_{0} & \frac{\Psi_{r}}{\rho^{s}_{r}}>\psi^{ub}_{0}
+\end{cases}\label{eq:lazy-zone-0-D}
+\end{equation}
+
+\end_inset
+
+This expression may be substituted into Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq531"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ to produce 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\nospellcheck off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $k\left(\mathbf{F},\rho^{s}_{r}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If we also let osteocytes serve as sensing cells,
+ the model of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:lazy-zone-0-D"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ is extended to include the contribution from neighboring sensing cells,
+ 
+\begin_inset Formula 
+\begin{equation}
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{lb}_{0}=\begin{cases}
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{lb}_{0} & \frac{\Psi_{ri}}{\rho^{s}_{ri}}<\psi^{lb}_{0}\\
+0 & \psi^{lb}_{0}\le\frac{\Psi_{ri}}{\rho^{s}_{ri}}\le\psi^{ub}_{0}\\
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{ub}_{0} & \frac{\Psi_{ri}}{\rho^{s}_{ri}}>\psi^{ub}_{0}
+\end{cases}\label{eq:lazy-zone-D}
+\end{equation}
+
+\end_inset
+
+This expression may be substituted into Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:eq531b"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ to produce 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\nospellcheck off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $k\left(\mathbf{F},\rho^{s}_{r}\right)$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section

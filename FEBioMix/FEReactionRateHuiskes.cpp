@@ -134,7 +134,7 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
         FEMesh& mesh = GetFEModel()->GetMesh();
         int ie = pt.m_elem->GetLocalID();
         int NEPL = (int)m_EPL[ie].size();
-#pragma omp parallel for shared (NEPL)
+        // serial loop: zhat, dzhatde and the temporaries below are shared accumulators
         for (int i=0; i<NEPL; ++i) {
             int je = m_EPL[ie][i];
             if (je > -1) {
@@ -144,20 +144,17 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
                     double d = (pt.m_rt - mp.m_rt).unit();
                     if (m_comp == -1) {
                         rpt = mp.ExtractData<FERemodelingMaterialPoint>();
-                        FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-                        J = et.m_J;
                     }
                     else {
                         FEElasticMixtureMaterialPoint* mmp = mp.ExtractData<FEElasticMixtureMaterialPoint>();
                         FEMaterialPoint& mpi = *mmp->GetPointData(m_comp);
                         rpt = mpi.ExtractData<FERemodelingMaterialPoint>();
                     }
-                    sed = rpt->m_sed;
-                    rhor = pbm->SolidReferentialApparentDensity(mp);
-                    phir = pbm->SolidReferentialVolumeFraction(mp);
-                    B = m_B(mp);
-                    psi0 = m_psi0(mp);
-                    zhat += exp(-d/m_D)*B*(sed/rhor - psi0)/(J-phir)/m_M;
+                    // the neighbor's stimulus contributes to the mass supply at this point,
+                    // so it is normalized by the fluid volume (J-phir) of this point
+                    double sedn = rpt->m_sed;
+                    double rhorn = pbm->SolidReferentialApparentDensity(mp);
+                    zhat += exp(-d/m_D)*m_B(mp)*(sedn/rhorn - m_psi0(mp))/(J-phir)/m_M;
                 }
             }
         }
@@ -197,7 +194,7 @@ mat3ds FEReactionRateHuiskes::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
         FEMesh& mesh = GetFEModel()->GetMesh();
         int ie = pt.m_elem->GetLocalID();
         int NEPL = (int)m_EPL[ie].size();
-#pragma omp parallel for shared (NEPL)
+        // serial loop: zhat, dzhatde and the temporaries below are shared accumulators
         for (int i=0; i<NEPL; ++i) {
             int je = m_EPL[ie][i];
             if (je > -1) {
