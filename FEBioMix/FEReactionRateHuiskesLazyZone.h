@@ -47,6 +47,9 @@ public:
 	
 	//! tangent of reaction rate with effective fluid pressure at material point
 	double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) override;
+
+    //! sum of proximity weights used to normalize the nonlocal reaction rate
+    double ProximityWeight(FEMaterialPoint& pt);
 	
 public:
 	FEParamDouble   m_B;					//!< mass supply coefficient

@@ -81,7 +81,7 @@ bool FEReactionRateHuiskesLazyZone::Init()
         feLogInfo("Evaluating element proximity...");
         m_EPL.assign(mesh.Elements(), std::vector<int>());
         for (int i=0; i< mesh.Elements(); ++i) {
-            std::vector<int> epl = m_topo.ElementProximityList(i, m_D*mult);
+            std::vector<int> epl = m_topo.ElementProximityList(i, m_D*mult, false);
             m_EPL[i] = epl;
         }
         feLogInfo("Done.");
@@ -138,18 +138,25 @@ double FEReactionRateHuiskesLazyZone::ReactionRate(FEMaterialPoint& pt)
     else if (psi > psi0ub) dpsi = psi - psi0ub;
 
     double zhat = B*dpsi/(J-phir)/m_M;
+    // nonlocal contributions are weighted by exp(-d/D) and the weighted sum is
+    // normalized by the sum of weights W, so that D sets the averaging distance
+    // of the stimulus without changing the magnitude of the response
+    double W = 1;
     if (m_D > 0) {
         FEMesh& mesh = GetFEModel()->GetMesh();
-        int ie = pt.m_elem->GetLocalID();
+        // m_EPL is indexed by the mesh-wide element index (not the domain-local ID)
+        int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
         int NEPL = (int)m_EPL[ie].size();
-        // serial loop: zhat, dzhatde and the temporaries below are shared accumulators
+        // serial loop: zhat, W and the temporaries below are shared accumulators
         for (int i=0; i<NEPL; ++i) {
             int je = m_EPL[ie][i];
             if (je > -1) {
                 FEElement* el = mesh.Element(je);
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-                    double d = (pt.m_rt - mp.m_rt).unit();
+                    if (&mp == &pt) continue;   // this point's own contribution is added above
+                    double w = exp(-(pt.m_rt - mp.m_rt).norm()/m_D);
+                    W += w;
                     if (m_comp == -1) {
                         rpt = mp.ExtractData<FERemodelingMaterialPoint>();
                     }
@@ -166,11 +173,12 @@ double FEReactionRateHuiskesLazyZone::ReactionRate(FEMaterialPoint& pt)
                     double dpsin = 0;
                     if (psin < lbn) dpsin = psin - lbn;
                     else if (psin > ubn) dpsin = psin - ubn;
-                    zhat += exp(-d/m_D)*m_B(mp)*dpsin/(J-phir)/m_M;
+                    zhat += w*m_B(mp)*dpsin/(J-phir)/m_M;
                 }
             }
         }
     }
+    zhat /= W;
     return zhat;
 }
 
@@ -206,46 +214,33 @@ mat3ds FEReactionRateHuiskesLazyZone::Tangent_ReactionRate_Strain(FEMaterialPoin
         pt.ExtractData<FEElasticMixtureMaterialPoint>()->GetPointData(m_comp)->ExtractData<FERemodelingMaterialPoint>();
     double psi = rpt->m_sed/rhor;
     if ((psi < m_psi0lb(pt)) || (psi > m_psi0ub(pt)))
-        dzhatde += (et.m_s+I*p)*(B/rhor/m_M/(J-phir));
+        dzhatde += (et.m_s+I*p)*(B/rhor/m_M/(J-phir)/ProximityWeight(pt));
+    // Neighboring points contribute to the reaction rate (see ReactionRate), but their
+    // contributions depend on the strains at those points, not at this point, so they
+    // do not contribute to this tangent (this cross-element coupling is neglected).
+    return dzhatde;
+}
+
+//-----------------------------------------------------------------------------
+//! sum of the proximity weights exp(-d/D) of all integration points that contribute
+//! to the reaction rate at this point (including this point, whose weight is 1)
+double FEReactionRateHuiskesLazyZone::ProximityWeight(FEMaterialPoint& pt)
+{
+    double W = 1;
     if (m_D > 0) {
-        mat3ds s(0);
         FEMesh& mesh = GetFEModel()->GetMesh();
-        int ie = pt.m_elem->GetLocalID();
-        int NEPL = (int)m_EPL[ie].size();
-        // serial loop: zhat, dzhatde and the temporaries below are shared accumulators
-        for (int i=0; i<NEPL; ++i) {
-            int je = m_EPL[ie][i];
-            if (je > -1) {
-                FEElement* el = mesh.Element(je);
-                for (int k=0; k<el->GaussPoints(); ++k) {
-                    FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-                    double d = (pt.m_rt - mp.m_rt).unit();
-                    FERemodelingMaterialPoint* rptn = nullptr;
-                    if (m_comp == -1) {
-                        rptn = mp.ExtractData<FERemodelingMaterialPoint>();
-                        FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-                        // we just want the effective stress, so subtract the pressure term
-                        p = pbm->GetActualFluidPressure(mp);
-                        s = et.m_s+I*p;
-                    }
-                    else {
-                        FEElasticMixtureMaterialPoint* mmp = mp.ExtractData<FEElasticMixtureMaterialPoint>();
-                        FEMaterialPoint& mpi = *mmp->GetPointData(m_comp);
-                        rptn = mpi.ExtractData<FERemodelingMaterialPoint>();
-                        FEElasticMaterialPoint& et = *mpi.ExtractData<FEElasticMaterialPoint>();
-                        // the stress stored in elastic mixture material points is an effective stress
-                        s = et.m_s;
-                    }
-                    rhor = pbm->SolidReferentialApparentDensity(mp);
-                    B = m_B(mp);
-                    double psin = rptn->m_sed/rhor;
-                    if ((psin < m_psi0lb(mp)) || (psin > m_psi0ub(mp)))
-                        dzhatde += exp(-d/m_D)*s*(B/rhor/m_M)/(J-phir);
-                }
+        int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
+        for (int je : m_EPL[ie]) {
+            if (je < 0) continue;
+            FEElement* el = mesh.Element(je);
+            for (int k=0; k<el->GaussPoints(); ++k) {
+                FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
+                if (&mp == &pt) continue;
+                W += exp(-(pt.m_rt - mp.m_rt).norm()/m_D);
             }
         }
     }
-    return dzhatde;
+    return W;
 }
 
 //-----------------------------------------------------------------------------

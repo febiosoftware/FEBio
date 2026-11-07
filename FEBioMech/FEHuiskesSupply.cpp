@@ -82,7 +82,8 @@ double FEHuiskesSupply::Supply(FEMaterialPoint& pt)
     
     if (m_D > 0) {
         FEMesh& mesh = GetFEModel()->GetMesh();
-        int ie = pt.m_elem->GetLocalID();
+        // m_EPL is indexed by the mesh-wide element index (not the domain-local ID)
+        int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
         int NEPL = (int)m_EPL[ie].size();
 #pragma omp parallel for shared (NEPL)
         for (int i=0; i<NEPL; ++i) {
@@ -113,7 +114,8 @@ mat3ds FEHuiskesSupply::Tangent_Supply_Strain(FEMaterialPoint &pt)
 
     if (m_D > 0) {
         FEMesh& mesh = GetFEModel()->GetMesh();
-        int ie = pt.m_elem->GetLocalID();
+        // m_EPL is indexed by the mesh-wide element index (not the domain-local ID)
+        int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
         int NEPL = (int)m_EPL[ie].size();
 #pragma omp parallel for shared (NEPL)
         for (int i=0; i<NEPL; ++i) {

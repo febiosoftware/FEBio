@@ -11205,7 +11205,7 @@ nolink "false"
 \begin_layout Standard
 When multiple solid species are present,
  the net solid mass content may be given by 
-\begin_inset Formula $\rho^{s}_{r}=\sum\limits_{\sigma}\rho^{\sigma}_{r}$
+\begin_inset Formula $\rho^{s}_{r}=\varphi^{s}_{0}\rho^{s}_{T}+\sum\limits_{\sigma}\rho^{\sigma}_{r}$
 \end_inset
 
  whereas the net mass supply of solid is 
@@ -11251,7 +11251,12 @@ where
 \begin_inset Formula $\varphi^{s}_{0}$
 \end_inset
 
- is the referential solid volume fraction of solid constituents not explicitly modeled by solid-bound molecules (a user-defined parameter).
+ is the referential solid volume fraction of solid constituents not explicitly modeled by solid-bound molecules (a user-defined parameter),
+ whose true density is 
+\begin_inset Formula $\rho^{s}_{T}$
+\end_inset
+
+.
  According to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
@@ -48495,7 +48500,7 @@ literal "false"
  
 \begin_inset Formula 
 \begin{equation}
-k\left(\mathbf{F},\rho^{s}_{r}\right)=\frac{B}{\left(J-\varphi^{s}_{r}\right)M^{s}}\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)\,,,\label{eq531}
+k\left(\mathbf{F},\rho^{s}_{r}\right)=\frac{B}{\left(J-\varphi^{s}_{r}\right)M^{s}}\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)\,,\label{eq531}
 \end{equation}
 
 \end_inset
@@ -48514,7 +48519,12 @@ where
 \begin_inset Formula $\rho^{s}_{r}$
 \end_inset
 
- is the referential mass density of the solid,
+ is the referential mass density of the solid (
+\begin_inset Formula $\rho^{s}_{r}=\varphi^{s}_{0}\rho^{s}_{T}+\sum_{\sigma}\rho^{\sigma}_{r}$
+\end_inset
+
+,
+ which includes the mass of all solid-bound molecules),
  
 \begin_inset Formula $\psi_{0}$
 \end_inset
@@ -48564,31 +48574,144 @@ nolink "false"
 
 \end_inset
 
- is extended to include the contribution from neighboring sensing cells,
+ is extended to include a weighted average of the stimuli sensed at the current point and at neighboring sensing cells,
  
 \begin_inset Formula 
 \begin{equation}
-k\left(\mathbf{F},\rho^{s}_{r}\right)=\frac{1}{\left(J-\varphi^{s}_{r}\right)M^{s}}\left(B\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)+\sum^{N}_{i=1}e^{-d_{i}/D}B_{i}\left(\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0}\right)\right)\,.\label{eq:eq531b}
+k\left(\mathbf{F},\rho^{s}_{r}\right)=\frac{1}{\left(J-\varphi^{s}_{r}\right)M^{s}}\,\frac{B\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)+\sum^{N}_{i=1}w_{i}B_{i}\left(\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0i}\right)}{1+\sum^{N}_{i=1}w_{i}}\,,\quad w_{i}=e^{-d_{i}/D}\,.\label{eq:eq531b}
 \end{equation}
 
 \end_inset
 
 Here,
  
-\begin_inset Formula $N$
+\begin_inset Formula $w_{i}$
 \end_inset
 
- represents the number of elements in the neighborhood of the current material point element,
- which fall within a characteristic sensing distance 
-\begin_inset Formula $D$
+ is the weight of sensing point 
+\begin_inset Formula $i$
 \end_inset
 
 ,
- and 
+ 
+\begin_inset Formula $D$
+\end_inset
+
+ is a characteristic sensing distance,
+ 
 \begin_inset Formula $d_{i}$
 \end_inset
 
- represents the distance between these neighboring points and the current material point.
+ is the distance between sensing point 
+\begin_inset Formula $i$
+\end_inset
+
+ and the current material point in the current configuration,
+ and 
+\begin_inset Formula $B_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi_{0i}$
+\end_inset
+
+ are the values of 
+\begin_inset Formula $B$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi_{0}$
+\end_inset
+
+ at that point (these parameters may vary spatially).
+ The sensing points are the 
+\begin_inset Formula $N$
+\end_inset
+
+ integration points of elements of the same material whose centroids lie within a distance 
+\begin_inset Formula $4D$
+\end_inset
+
+ of the centroid of the current element,
+ including the other integration points of the current element;
+ more distant points have weights smaller than 
+\begin_inset Formula $e^{-4}$
+\end_inset
+
+ and are neglected.
+ The weighted sum of stimuli is normalized by the sum of weights,
+ 
+\begin_inset Formula $1+\sum^{N}_{i=1}w_{i}$
+\end_inset
+
+,
+ where the unit weight is that of the current point.
+ With this normalization,
+ 
+\begin_inset Formula $D$
+\end_inset
+
+ controls the spatial extent over which the remodeling stimulus is averaged,
+ without altering the magnitude of the response;
+ eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:eq531b"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ reduces to eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq531"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ when the stimulus is spatially uniform,
+ or when 
+\begin_inset Formula $D\rightarrow0$
+\end_inset
+
+.
+ Without this normalization,
+ the sum in the numerator grows with the number of sensing points within the distance 
+\begin_inset Formula $4D$
+\end_inset
+
+,
+ making the effective remodeling rate dependent on both 
+\begin_inset Formula $D$
+\end_inset
+
+ and the mesh resolution;
+ in typical models this amplification can exceed three orders of magnitude,
+ which may also prevent convergence of the nonlinear analysis.
+\end_layout
+
+\begin_layout Standard
+In the evaluation of the stiffness matrix,
+ the tangent of 
+\begin_inset Formula $k$
+\end_inset
+
+ with respect to the strain at the current material point only includes the contribution from the stimulus sensed at that point,
+ scaled by 
+\begin_inset Formula $1/\left(1+\sum^{N}_{i=1}w_{i}\right)$
+\end_inset
+
+.
+ The contributions from neighboring sensing points depend on the strains at those points,
+ not on the strain at the current point;
+ this nonlocal coupling between elements is neglected in the tangent,
+ producing an approximate Newton scheme.
 \end_layout
 
 \begin_layout Subsection
@@ -48677,10 +48800,10 @@ tuple "list"
  
 \begin_inset Formula 
 \begin{equation}
-\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{lb}_{0}=\begin{cases}
-\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{lb}_{0} & \frac{\Psi_{ri}}{\rho^{s}_{ri}}<\psi^{lb}_{0}\\
-0 & \psi^{lb}_{0}\le\frac{\Psi_{ri}}{\rho^{s}_{ri}}\le\psi^{ub}_{0}\\
-\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{ub}_{0} & \frac{\Psi_{ri}}{\rho^{s}_{ri}}>\psi^{ub}_{0}
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0i}=\begin{cases}
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{lb}_{0i} & \frac{\Psi_{ri}}{\rho^{s}_{ri}}<\psi^{lb}_{0i}\\
+0 & \psi^{lb}_{0i}\le\frac{\Psi_{ri}}{\rho^{s}_{ri}}\le\psi^{ub}_{0i}\\
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{ub}_{0i} & \frac{\Psi_{ri}}{\rho^{s}_{ri}}>\psi^{ub}_{0i}
 \end{cases}\label{eq:lazy-zone-D}
 \end{equation}
 
@@ -48717,6 +48840,30 @@ tuple "list"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+Here,
+ 
+\begin_inset Formula $\psi^{lb}_{0i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi^{ub}_{0i}$
+\end_inset
+
+ are the threshold values at sensing point 
+\begin_inset Formula $i$
+\end_inset
+
+.
+ In the tangent of 
+\begin_inset Formula $k$
+\end_inset
+
+ with respect to the strain,
+ the contribution from the current point vanishes whenever its specific strain energy lies within the lazy zone,
+ since the stimulus is then independent of the strain.
 \end_layout
 
 \begin_layout Section
