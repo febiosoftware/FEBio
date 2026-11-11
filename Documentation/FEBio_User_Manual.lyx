@@ -268,7 +268,7 @@ figs-within-sections
 \papersides 2
 \paperpagestyle default
 \tablestyle default
-\tracking_changes true
+\tracking_changes false
 \output_changes false
 \change_bars false
 \postpone_fragile_content false
@@ -104159,7 +104159,7 @@ L
 The Huiskes specific reaction rate has the form 
 \begin_inset Formula 
 \[
-k=\frac{1}{\left(J-\varphi^{s}_{r}\right)M^{s}}\left(B\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)+\sum^{N}_{i=1}e^{-d_{i}/D}B_{i}\left(\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0}\right)\right)\,,
+k=\frac{1}{\left(J-\varphi^{s}_{r}\right)M^{s}}\,\frac{B\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)+\sum^{N}_{i=1}w_{i}B_{i}\left(\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0i}\right)}{1+\sum^{N}_{i=1}w_{i}}\,,\quad w_{i}=e^{-d_{i}/D}\,,
 \]
 
 \end_inset
@@ -104169,7 +104169,7 @@ where
 \end_inset
 
  is the strain energy density of the solid (strain energy in current configuration per mixture volume in the reference configuration) and 
-\begin_inset Formula $\rho^{s}_{r}=\sum\nolimits_{\sigma}\rho^{\sigma}_{r}$
+\begin_inset Formula $\rho^{s}_{r}=\varphi^{s}_{0}\rho^{s}_{T}+\sum\nolimits_{\sigma}\rho^{\sigma}_{r}$
 \end_inset
 
  is the referential apparent solid density (mass of solid in current configuration per mixture volume in reference configuration).
@@ -104207,20 +104207,78 @@ literal "false"
  due to the presence of neihboring sensing cells that provide some form of feedback at the current location).
  Here,
  
-\begin_inset Formula $N$
+\begin_inset Formula $w_{i}$
 \end_inset
 
- represents the number of elements in the neighborhood of the current material point element,
- which fall within a characteristic sensing distance 
-\begin_inset Formula $D$
+ is the weight assigned to sensing point 
+\begin_inset Formula $i$
 \end_inset
 
 ,
- and 
+ 
 \begin_inset Formula $d_{i}$
 \end_inset
 
- represents the distance between these neighboring points and the current material point.
+ is the distance between that point and the current material point (evaluated in the current configuration),
+ and 
+\begin_inset Formula $B_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi_{0i}$
+\end_inset
+
+ are the values of 
+\begin_inset Formula $B$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi_{0}$
+\end_inset
+
+ at that point (these parameters may vary spatially).
+ The sensing points are the 
+\begin_inset Formula $N$
+\end_inset
+
+ integration points of neighboring elements of the same material,
+ including the other integration points of the element containing the current point.
+ The weighted sum of stimuli is divided by the sum of weights,
+ 
+\begin_inset Formula $1+\sum^{N}_{i=1}w_{i}$
+\end_inset
+
+ (where the unit weight is that of the current point),
+ so that 
+\begin_inset Formula $D$
+\end_inset
+
+ only controls the distance over which the stimulus is averaged,
+ not the magnitude of the remodeling response.
+ In particular,
+ when the stimulus is spatially uniform,
+ 
+\begin_inset Formula $k$
+\end_inset
+
+ is the same as for 
+\begin_inset Formula $D=0$
+\end_inset
+
+,
+ so that a value of 
+\begin_inset Formula $B$
+\end_inset
+
+ calibrated with 
+\begin_inset Formula $D=0$
+\end_inset
+
+ remains applicable when 
+\begin_inset Formula $D>0$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -104257,11 +104315,7 @@ literal "false"
 \end_inset
 
 ,
- the finite element code first searches for all the neighboring elements 
-\begin_inset Formula $N$
-\end_inset
-
- which fall within a distance of 
+ the finite element code first searches for all the neighboring elements of the same material whose centroids fall within a distance of 
 \begin_inset Formula $d_{i}\le4\times D$
 \end_inset
 
@@ -104282,17 +104336,25 @@ literal "false"
 ).
  This search is conducted once,
  at the start of the analysis,
- implying that it is not updated at subsequent time points when the deformation may alter distances.
+ implying that the list of neighboring elements is not updated at subsequent time points when the deformation may alter distances (the weights 
+\begin_inset Formula $w_{i}$
+\end_inset
+
+ are evaluated using the current distances 
+\begin_inset Formula $d_{i}$
+\end_inset
+
+).
  With increasing values of 
 \begin_inset Formula $D$
 \end_inset
 
 ,
- the number 
+ the number of neighboring elements (and the number 
 \begin_inset Formula $N$
 \end_inset
 
- of neighboring elements may increase considerably,
+ of sensing points) may increase considerably,
  especially in three-dimensional models,
  which will considerably slow down the computation of 
 \begin_inset Formula $k$
@@ -104304,6 +104366,33 @@ literal "false"
 \end_inset
 
 .
+ Furthermore,
+ the contributions of neighboring sensing points depend on the strains at those points;
+ this nonlocal coupling is not included in the stiffness matrix,
+ which may reduce the rate of convergence of the nonlinear solution when 
+\begin_inset Formula $D$
+\end_inset
+
+ is large.
+ Note that in earlier versions of FEBio the weighted sum was not divided by 
+\begin_inset Formula $1+\sum^{N}_{i=1}w_{i}$
+\end_inset
+
+,
+ making the remodeling response increase with 
+\begin_inset Formula $D$
+\end_inset
+
+ and with mesh refinement;
+ models with 
+\begin_inset Formula $D>0$
+\end_inset
+
+ created with those versions may need to have 
+\begin_inset Formula $B$
+\end_inset
+
+ recalibrated.
 \end_layout
 
 \begin_layout Standard
@@ -104456,6 +104545,416 @@ where cells convert solutes (e.g.,
 
 \begin_layout LyX-Code
     <psi0>0.01</psi0>
+\end_layout
+
+\begin_layout LyX-Code
+    <D>0</D>
+\end_layout
+
+\begin_layout LyX-Code
+  </forward_rate>
+\end_layout
+
+\begin_layout LyX-Code
+</reaction>
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Huiskes Reaction Rate with Lazy Zone
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Huiskes-Reaction-Rate-LZ"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The material type for the Huiskes reaction rate with lazy zone is 
+\shape italic
+Huiskes reaction rate (lazy zone)
+\shape default
+.
+ This material model is similar to the Huiskes reaction rate (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Huiskes-Reaction-Rate"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ except that remodeling only occurs when the specific strain energy falls outside a range of homeostatic values,
+ known as the lazy zone.
+ The following parameters must be defined:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<B>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+reaction rate per specific strain energy 
+\begin_inset Formula $B$
+\end_inset
+
+ (default=0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\shape italic
+units vary
+\shape default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<psi0lb>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lower bound of specific strain energy at homeostasis 
+\begin_inset Formula $\psi^{lb}_{0}$
+\end_inset
+
+ (default=0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+F
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+L
+\series default
+/
+\series bold
+M
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<psi0ub>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+upper bound of specific strain energy at homeostasis 
+\begin_inset Formula $\psi^{ub}_{0}$
+\end_inset
+
+ (default=0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+F
+\series default
+
+\begin_inset Formula $\cdot$
+\end_inset
+
+
+\series bold
+L
+\series default
+/
+\series bold
+M
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<D>
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+characteristic distance from sensors (default=0)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[
+\series bold
+L
+\series default
+]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The specific reaction rate has the form 
+\begin_inset Formula 
+\[
+k=\frac{1}{\left(J-\varphi^{s}_{r}\right)M^{s}}\,\frac{B\,\Delta\psi+\sum^{N}_{i=1}w_{i}B_{i}\,\Delta\psi_{i}}{1+\sum^{N}_{i=1}w_{i}}\,,\quad w_{i}=e^{-d_{i}/D}\,,
+\]
+
+\end_inset
+
+where the stimulus at the current point is 
+\begin_inset Formula 
+\[
+\Delta\psi=\begin{cases}
+\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi^{lb}_{0} & \frac{\Psi_{r}}{\rho^{s}_{r}}<\psi^{lb}_{0}\\
+0 & \psi^{lb}_{0}\le\frac{\Psi_{r}}{\rho^{s}_{r}}\le\psi^{ub}_{0}\\
+\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi^{ub}_{0} & \frac{\Psi_{r}}{\rho^{s}_{r}}>\psi^{ub}_{0}
+\end{cases}
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula $\Delta\psi_{i}$
+\end_inset
+
+ is evaluated similarly at sensing point 
+\begin_inset Formula $i$
+\end_inset
+
+,
+ using 
+\begin_inset Formula $\Psi_{ri}/\rho^{s}_{ri}$
+\end_inset
+
+ and the threshold values 
+\begin_inset Formula $\psi^{lb}_{0i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi^{ub}_{0i}$
+\end_inset
+
+ at that point.
+ All other terms are defined as in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Huiskes-Reaction-Rate"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ The reaction rate is zero when the specific strain energy at the current point and at all its sensing points lies within the lazy zone;
+ solid is resorbed (
+\begin_inset Formula $k<0$
+\end_inset
+
+) when the stimulus falls below 
+\begin_inset Formula $\psi^{lb}_{0}$
+\end_inset
+
+ and deposited (
+\begin_inset Formula $k>0$
+\end_inset
+
+) when it exceeds 
+\begin_inset Formula $\psi^{ub}_{0}$
+\end_inset
+
+.
+ The values must satisfy 
+\begin_inset Formula $\psi^{lb}_{0}\le\psi^{ub}_{0}$
+\end_inset
+
+;
+ when 
+\begin_inset Formula $\psi^{lb}_{0}=\psi^{ub}_{0}=\psi_{0}$
+\end_inset
+
+ this model reduces to the Huiskes reaction rate.
+ The considerations regarding the choice of 
+\begin_inset Formula $D$
+\end_inset
+
+ and the singularity at 
+\begin_inset Formula $J-\varphi^{s}_{r}\to0$
+\end_inset
+
+ described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Huiskes-Reaction-Rate"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ also apply to this model.
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Example:
+\end_layout
+
+\begin_layout Standard
+The example of Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Huiskes-Reaction-Rate"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ may be modified to include a lazy zone as follows:
+\end_layout
+
+\begin_layout LyX-Code
+<reaction name="solid remodeling" type="mass-action-forward">
+\end_layout
+
+\begin_layout LyX-Code
+  <vP sbm="1">1</vP>
+\end_layout
+
+\begin_layout LyX-Code
+  <forward_rate type="Huiskes reaction rate (lazy zone)">
+\end_layout
+
+\begin_layout LyX-Code
+    <B>1.0</B>
+\end_layout
+
+\begin_layout LyX-Code
+    <psi0lb>0.008</psi0lb>
+\end_layout
+
+\begin_layout LyX-Code
+    <psi0ub>0.012</psi0ub>
 \end_layout
 
 \begin_layout LyX-Code
