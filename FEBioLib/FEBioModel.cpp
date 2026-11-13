@@ -66,6 +66,7 @@ SOFTWARE.*/
 #include "febio.h"
 #include "version.h"
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <fstream>
 #include <functional>

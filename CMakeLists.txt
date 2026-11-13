@@ -396,7 +396,16 @@ if(APPLE)
 endif()
 
 # Link Pardiso-project
-if(USE_PDL)
+if(PDL_RUNTIME_LOAD)
+    # Do not link libpardiso; it is located and opened with dlopen at run time
+    # (see NumCore/PardisoProjectSolver.cpp). PDL_LIB, if set, is only used as
+    # an extra search location.
+    target_compile_definitions(numcore PRIVATE PARDISODL PARDISODL_RUNTIME)
+    if(PDL_LIB)
+        target_compile_definitions(numcore PRIVATE PDL_DEFAULT_PATH="${PDL_LIB}")
+    endif()
+    target_link_libraries(numcore PRIVATE ${CMAKE_DL_LIBS})
+elseif(USE_PDL)
     target_compile_definitions(numcore PRIVATE PARDISODL)
     target_link_libraries(numcore PRIVATE ${PDL_LIB})
     set(ENV{PARDISOLICMESSAGE} "1")

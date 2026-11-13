@@ -79,7 +79,7 @@ bool FEReactionRateHuiskes::Init()
         feLogInfo("Evaluating element proximity...");
         m_EPL.assign(mesh.Elements(), std::vector<int>());
         for (int i=0; i< mesh.Elements(); ++i) {
-            std::vector<int> epl = m_topo.ElementProximityList(i, m_D*mult);
+            std::vector<int> epl = m_topo.ElementProximityList(i, m_D*mult, false);
             m_EPL[i] = epl;
         }
         feLogInfo("Done.");
@@ -130,38 +130,43 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
     double B = m_B(pt);
     double psi0 = m_psi0(pt);
 	double zhat = B*(sed/rhor - psi0)/(J-phir)/m_M;
+    // nonlocal contributions are weighted by exp(-d/D) and the weighted sum is
+    // normalized by the sum of weights W, so that D sets the averaging distance
+    // of the stimulus without changing the magnitude of the response
+    double W = 1;
     if (m_D > 0) {
         FEMesh& mesh = GetFEModel()->GetMesh();
-        int ie = pt.m_elem->GetLocalID();
+        // m_EPL is indexed by the mesh-wide element index (not the domain-local ID)
+        int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
         int NEPL = (int)m_EPL[ie].size();
-#pragma omp parallel for shared (NEPL)
+        // serial loop: zhat, W and the temporaries below are shared accumulators
         for (int i=0; i<NEPL; ++i) {
             int je = m_EPL[ie][i];
             if (je > -1) {
                 FEElement* el = mesh.Element(je);
                 for (int k=0; k<el->GaussPoints(); ++k) {
                     FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-                    double d = (pt.m_rt - mp.m_rt).unit();
+                    if (&mp == &pt) continue;   // this point's own contribution is added above
+                    double w = exp(-(pt.m_rt - mp.m_rt).norm()/m_D);
+                    W += w;
                     if (m_comp == -1) {
                         rpt = mp.ExtractData<FERemodelingMaterialPoint>();
-                        FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-                        J = et.m_J;
                     }
                     else {
                         FEElasticMixtureMaterialPoint* mmp = mp.ExtractData<FEElasticMixtureMaterialPoint>();
                         FEMaterialPoint& mpi = *mmp->GetPointData(m_comp);
                         rpt = mpi.ExtractData<FERemodelingMaterialPoint>();
                     }
-                    sed = rpt->m_sed;
-                    rhor = pbm->SolidReferentialApparentDensity(mp);
-                    phir = pbm->SolidReferentialVolumeFraction(mp);
-                    B = m_B(mp);
-                    psi0 = m_psi0(mp);
-                    zhat += exp(-d/m_D)*B*(sed/rhor - psi0)/(J-phir)/m_M;
+                    // the neighbor's stimulus contributes to the mass supply at this point,
+                    // so it is normalized by the fluid volume (J-phir) of this point
+                    double sedn = rpt->m_sed;
+                    double rhorn = pbm->SolidReferentialApparentDensity(mp);
+                    zhat += w*m_B(mp)*(sedn/rhorn - m_psi0(mp))/(J-phir)/m_M;
                 }
             }
         }
     }
+    zhat /= W;
 	return zhat;
 }
 
@@ -191,41 +196,33 @@ mat3ds FEReactionRateHuiskes::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
     double zhat = ReactionRate(pt);
     mat3dd I(1);
     double B = m_B(pt);
-    mat3ds dzhatde = (I*(-zhat) + (et.m_s+I*p)*(B/rhor/m_M))/(J-phir);
+    mat3ds dzhatde = (I*(-zhat) + (et.m_s+I*p)*(B/rhor/m_M/ProximityWeight(pt)))/(J-phir);
+    // Neighboring points contribute to the reaction rate (see ReactionRate), but their
+    // contributions depend on the strains at those points, not at this point, so they
+    // do not contribute to this tangent (this cross-element coupling is neglected).
+	return dzhatde;
+}
+
+//-----------------------------------------------------------------------------
+//! sum of the proximity weights exp(-d/D) of all integration points that contribute
+//! to the reaction rate at this point (including this point, whose weight is 1)
+double FEReactionRateHuiskes::ProximityWeight(FEMaterialPoint& pt)
+{
+    double W = 1;
     if (m_D > 0) {
-        mat3ds s(0);
         FEMesh& mesh = GetFEModel()->GetMesh();
-        int ie = pt.m_elem->GetLocalID();
-        int NEPL = (int)m_EPL[ie].size();
-#pragma omp parallel for shared (NEPL)
-        for (int i=0; i<NEPL; ++i) {
-            int je = m_EPL[ie][i];
-            if (je > -1) {
-                FEElement* el = mesh.Element(je);
-                for (int k=0; k<el->GaussPoints(); ++k) {
-                    FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
-                    double d = (pt.m_rt - mp.m_rt).unit();
-                    if (m_comp == -1) {
-                        FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-                        // we just want the effective stress, so subtract the pressure term
-                        p = pbm->GetActualFluidPressure(mp);
-                        s = et.m_s+I*p;
-                    }
-                    else {
-                        FEElasticMixtureMaterialPoint* mmp = mp.ExtractData<FEElasticMixtureMaterialPoint>();
-                        FEMaterialPoint& mpi = *mmp->GetPointData(m_comp);
-                        FEElasticMaterialPoint& et = *mpi.ExtractData<FEElasticMaterialPoint>();
-                        // the stress stored in elastic mixture material points is an effective stress
-                        s = et.m_s;
-                    }
-                    rhor = pbm->SolidReferentialApparentDensity(mp);
-                    B = m_B(mp);
-                    dzhatde += exp(-d/m_D)*s*(B/rhor/m_M)/(J-phir);
-                }
+        int ie = m_topo.GetElementIndexFromID(pt.m_elem->GetID());
+        for (int je : m_EPL[ie]) {
+            if (je < 0) continue;
+            FEElement* el = mesh.Element(je);
+            for (int k=0; k<el->GaussPoints(); ++k) {
+                FEMaterialPoint& mp = *(el->GetMaterialPoint(k));
+                if (&mp == &pt) continue;
+                W += exp(-(pt.m_rt - mp.m_rt).norm()/m_D);
             }
         }
     }
-	return dzhatde;
+    return W;
 }
 
 //-----------------------------------------------------------------------------

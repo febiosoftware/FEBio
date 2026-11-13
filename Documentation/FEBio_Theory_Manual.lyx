@@ -94,7 +94,7 @@ figs-within-sections
 \papersides 2
 \paperpagestyle default
 \tablestyle default
-\tracking_changes true
+\tracking_changes false
 \output_changes false
 \change_bars false
 \postpone_fragile_content false
@@ -11205,7 +11205,7 @@ nolink "false"
 \begin_layout Standard
 When multiple solid species are present,
  the net solid mass content may be given by 
-\begin_inset Formula $\rho^{s}_{r}=\sum\limits_{\sigma}\rho^{\sigma}_{r}$
+\begin_inset Formula $\rho^{s}_{r}=\varphi^{s}_{0}\rho^{s}_{T}+\sum\limits_{\sigma}\rho^{\sigma}_{r}$
 \end_inset
 
  whereas the net mass supply of solid is 
@@ -11251,7 +11251,12 @@ where
 \begin_inset Formula $\varphi^{s}_{0}$
 \end_inset
 
- is the referential solid volume fraction of solid constituents not explicitly modeled by solid-bound molecules (a user-defined parameter).
+ is the referential solid volume fraction of solid constituents not explicitly modeled by solid-bound molecules (a user-defined parameter),
+ whose true density is 
+\begin_inset Formula $\rho^{s}_{T}$
+\end_inset
+
+.
  According to eq.
 \begin_inset CommandInset ref
 LatexCommand eqref
@@ -48799,7 +48804,7 @@ literal "false"
  
 \begin_inset Formula 
 \begin{equation}
-k\left(\mathbf{F},\rho^{s}_{r}\right)=\frac{B}{\left(J-\varphi^{s}_{r}\right)M^{s}}\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)\,,,\label{eq531}
+k\left(\mathbf{F},\rho^{s}_{r}\right)=\frac{B}{\left(J-\varphi^{s}_{r}\right)M^{s}}\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)\,,\label{eq531}
 \end{equation}
 
 \end_inset
@@ -48818,7 +48823,12 @@ where
 \begin_inset Formula $\rho^{s}_{r}$
 \end_inset
 
- is the referential mass density of the solid,
+ is the referential mass density of the solid (
+\begin_inset Formula $\rho^{s}_{r}=\varphi^{s}_{0}\rho^{s}_{T}+\sum_{\sigma}\rho^{\sigma}_{r}$
+\end_inset
+
+,
+ which includes the mass of all solid-bound molecules),
  
 \begin_inset Formula $\psi_{0}$
 \end_inset
@@ -48868,31 +48878,296 @@ nolink "false"
 
 \end_inset
 
- is extended to include the contribution from neighboring sensing cells,
+ is extended to include a weighted average of the stimuli sensed at the current point and at neighboring sensing cells,
  
 \begin_inset Formula 
 \begin{equation}
-k\left(\mathbf{F},\rho^{s}_{r}\right)=\frac{1}{\left(J-\varphi^{s}_{r}\right)M^{s}}\left(B\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)+\sum^{N}_{i=1}e^{-d_{i}/D}B_{i}\left(\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0}\right)\right)\,.\label{eq:eq531b}
+k\left(\mathbf{F},\rho^{s}_{r}\right)=\frac{1}{\left(J-\varphi^{s}_{r}\right)M^{s}}\,\frac{B\left(\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}\right)+\sum^{N}_{i=1}w_{i}B_{i}\left(\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0i}\right)}{1+\sum^{N}_{i=1}w_{i}}\,,\quad w_{i}=e^{-d_{i}/D}\,.\label{eq:eq531b}
 \end{equation}
 
 \end_inset
 
 Here,
  
-\begin_inset Formula $N$
+\begin_inset Formula $w_{i}$
 \end_inset
 
- represents the number of elements in the neighborhood of the current material point element,
- which fall within a characteristic sensing distance 
-\begin_inset Formula $D$
+ is the weight of sensing point 
+\begin_inset Formula $i$
 \end_inset
 
 ,
- and 
+ 
+\begin_inset Formula $D$
+\end_inset
+
+ is a characteristic sensing distance,
+ 
 \begin_inset Formula $d_{i}$
 \end_inset
 
- represents the distance between these neighboring points and the current material point.
+ is the distance between sensing point 
+\begin_inset Formula $i$
+\end_inset
+
+ and the current material point in the current configuration,
+ and 
+\begin_inset Formula $B_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi_{0i}$
+\end_inset
+
+ are the values of 
+\begin_inset Formula $B$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi_{0}$
+\end_inset
+
+ at that point (these parameters may vary spatially).
+ The sensing points are the 
+\begin_inset Formula $N$
+\end_inset
+
+ integration points of elements of the same material whose centroids lie within a distance 
+\begin_inset Formula $4D$
+\end_inset
+
+ of the centroid of the current element,
+ including the other integration points of the current element;
+ more distant points have weights smaller than 
+\begin_inset Formula $e^{-4}$
+\end_inset
+
+ and are neglected.
+ The weighted sum of stimuli is normalized by the sum of weights,
+ 
+\begin_inset Formula $1+\sum^{N}_{i=1}w_{i}$
+\end_inset
+
+,
+ where the unit weight is that of the current point.
+ With this normalization,
+ 
+\begin_inset Formula $D$
+\end_inset
+
+ controls the spatial extent over which the remodeling stimulus is averaged,
+ without altering the magnitude of the response;
+ eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:eq531b"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ reduces to eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq531"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ when the stimulus is spatially uniform,
+ or when 
+\begin_inset Formula $D\rightarrow0$
+\end_inset
+
+.
+ Without this normalization,
+ the sum in the numerator grows with the number of sensing points within the distance 
+\begin_inset Formula $4D$
+\end_inset
+
+,
+ making the effective remodeling rate dependent on both 
+\begin_inset Formula $D$
+\end_inset
+
+ and the mesh resolution;
+ in typical models this amplification can exceed three orders of magnitude,
+ which may also prevent convergence of the nonlinear analysis.
+\end_layout
+
+\begin_layout Standard
+In the evaluation of the stiffness matrix,
+ the tangent of 
+\begin_inset Formula $k$
+\end_inset
+
+ with respect to the strain at the current material point only includes the contribution from the stimulus sensed at that point,
+ scaled by 
+\begin_inset Formula $1/\left(1+\sum^{N}_{i=1}w_{i}\right)$
+\end_inset
+
+.
+ The contributions from neighboring sensing points depend on the strains at those points,
+ not on the strain at the current point;
+ this nonlocal coupling between elements is neglected in the tangent,
+ producing an approximate Newton scheme.
+\end_layout
+
+\begin_layout Subsection
+Huiskes Remodeling with Lazy Zone
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Huiskes-Remodeling-LZ"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For this material,
+ the specific reaction rate depends on the deviation of the specific strain energy from two threshold values,
+ 
+\begin_inset Formula $\psi^{lb}_{0}$
+\end_inset
+
+ (lower bound) and 
+\begin_inset Formula $\psi^{ub}_{0}$
+\end_inset
+
+ (upper bound),
+ 
+\begin_inset Formula 
+\begin{equation}
+\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi_{0}=\begin{cases}
+\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi^{lb}_{0} & \frac{\Psi_{r}}{\rho^{s}_{r}}<\psi^{lb}_{0}\\
+0 & \psi^{lb}_{0}\le\frac{\Psi_{r}}{\rho^{s}_{r}}\le\psi^{ub}_{0}\\
+\frac{\Psi_{r}}{\rho^{s}_{r}}-\psi^{ub}_{0} & \frac{\Psi_{r}}{\rho^{s}_{r}}>\psi^{ub}_{0}
+\end{cases}\label{eq:lazy-zone-0-D}
+\end{equation}
+
+\end_inset
+
+This expression may be substituted into Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq531"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ to produce 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\nospellcheck off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $k\left(\mathbf{F},\rho^{s}_{r}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If we also let osteocytes serve as sensing cells,
+ the model of eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:lazy-zone-0-D"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ is extended to include the contribution from neighboring sensing cells,
+ 
+\begin_inset Formula 
+\begin{equation}
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi_{0i}=\begin{cases}
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{lb}_{0i} & \frac{\Psi_{ri}}{\rho^{s}_{ri}}<\psi^{lb}_{0i}\\
+0 & \psi^{lb}_{0i}\le\frac{\Psi_{ri}}{\rho^{s}_{ri}}\le\psi^{ub}_{0i}\\
+\frac{\Psi_{ri}}{\rho^{s}_{ri}}-\psi^{ub}_{0i} & \frac{\Psi_{ri}}{\rho^{s}_{ri}}>\psi^{ub}_{0i}
+\end{cases}\label{eq:lazy-zone-D}
+\end{equation}
+
+\end_inset
+
+This expression may be substituted into Eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:eq531b"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ to produce 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\nospellcheck off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $k\left(\mathbf{F},\rho^{s}_{r}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Here,
+ 
+\begin_inset Formula $\psi^{lb}_{0i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi^{ub}_{0i}$
+\end_inset
+
+ are the threshold values at sensing point 
+\begin_inset Formula $i$
+\end_inset
+
+.
+ In the tangent of 
+\begin_inset Formula $k$
+\end_inset
+
+ with respect to the strain,
+ the contribution from the current point vanishes whenever its specific strain energy lies within the lazy zone,
+ since the stimulus is then independent of the strain.
 \end_layout
 
 \begin_layout Section
@@ -54716,6 +54991,168 @@ The tangential frictional traction in slip depends only on the tangential compon
 These definitions of contact kinematics may now be used to formulate frictional contact.
 \end_layout
 
+\begin_layout Standard
+When the slip increment over a time step,
+ 
+\begin_inset Formula $\left|\mathbf{P}_{N}\cdot\mathbf{v}^{r}\right|\Delta t$
+\end_inset
+
+,
+ is too small to resolve a direction,
+ 
+\begin_inset Formula $\mathbf{s}^{(1)}$
+\end_inset
+
+ in eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:s1"
+nolink "false"
+
+\end_inset
+
+ is dominated by round-off error while the friction traction retains its full magnitude 
+\begin_inset Formula $\mu\left|t_{n}\right|$
+\end_inset
+
+,
+ and the factor 
+\begin_inset Formula $1/\left|\mathbf{P}_{N}\cdot\mathbf{v}^{r}\right|$
+\end_inset
+
+ in its linearization (eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Ds"
+nolink "false"
+
+\end_inset
+
+) becomes unbounded as 
+\begin_inset Formula $\Delta t\to0$
+\end_inset
+
+.
+ An optional regularization of the slip direction may be activated with the 
+\emph on
+slip_tol
+\emph default
+ parameter,
+ which replaces eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:s1"
+nolink "false"
+
+\end_inset
+
+ with
+\begin_inset Formula 
+\begin{equation}
+\mathbf{s}^{(1)}=\frac{\mathbf{P}_{N}\cdot\mathbf{v}^{r}}{\sqrt{\left|\mathbf{P}_{N}\cdot\mathbf{v}^{r}\right|^{2}+\left(h_{0}/\Delta t\right)^{2}}}\,,\quad h_{0}=\text{slip\_tol}\,\sqrt{J^{(1)}_{\eta}}\,,\label{eq:s1-regularized}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $h_{0}$
+\end_inset
+
+ is a length proportional to the local element size,
+ so that 
+\emph on
+slip_tol
+\emph default
+ is dimensionless.
+ The linearization of eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:s1-regularized"
+nolink "false"
+
+\end_inset
+
+ is given by eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Ds"
+nolink "false"
+
+\end_inset
+
+ with 
+\begin_inset Formula $\left|\mathbf{P}_{N}\cdot\mathbf{v}^{r}\right|$
+\end_inset
+
+ replaced by the denominator of eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:s1-regularized"
+nolink "false"
+
+\end_inset
+
+,
+ so that the tangent remains consistent and bounded.
+ For slip increments smaller than 
+\begin_inset Formula $h_{0}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\left|\mathbf{s}^{(1)}\right|<1$
+\end_inset
+
+ and the friction traction is reduced proportionately;
+ therefore,
+ 
+\emph on
+slip_tol
+\emph default
+ should be chosen well below the slip increment of genuinely sliding points.
+ The default value 
+\emph on
+slip_tol
+\emph default
+=0 recovers eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:s1"
+nolink "false"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsubsection
 Coulomb Frictional Contact
 \begin_inset CommandInset label
@@ -54943,6 +55380,34 @@ nolink "false"
 
 ,
  is employed to differentiate between stick and slip.
+ By default,
+ eq.
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:slip_tn"
+nolink "false"
+
+\end_inset
+
+ only applies while 
+\begin_inset Formula $\varepsilon g<0$
+\end_inset
+
+;
+ otherwise the integration point is released from contact,
+ as described in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SE-Contact-Release"
+nolink "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -55176,6 +55641,39 @@ An active-passive strategy for the multipliers ensures consistency when the cont
 
 ,
  in conjunction with an exact return mapping for slip.
+ Unless tension is admitted across the interface (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SE-Contact-Release"
+nolink "false"
+
+\end_inset
+
+),
+ the update of 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ in slip is limited to compressive values,
+ 
+\begin_inset Formula $\lambda_{n}\leftarrow\min\left(\lambda_{n}+\varepsilon g,0\right)$
+\end_inset
+
+,
+ and an integration point whose updated normal multiplier is no longer compressive (
+\begin_inset Formula $\lambda_{n}\geq0$
+\end_inset
+
+,
+ where in stick 
+\begin_inset Formula $\lambda_{n}=\boldsymbol{\lambda}_{s}\cdot\mathbf{n}^{(1)}$
+\end_inset
+
+) is released from contact.
 \end_layout
 
 \begin_layout Standard
@@ -55316,6 +55814,35 @@ tuple "list"
 \end_inset
 
 .
+When the 
+\emph on
+smooth_aug
+\emph default
+ option is selected,
+ the active multiplier is not updated from the gap.
+ Instead,
+ it is set from the traction 
+\begin_inset Formula $\boldsymbol{\sigma}\cdot\mathbf{n}^{(1)}$
+\end_inset
+
+ of the solid element underlying the contact face,
+ whose stress 
+\begin_inset Formula $\boldsymbol{\sigma}$
+\end_inset
+
+ is projected from its integration points to the face nodes and interpolated at the contact integration point;
+ in stick 
+\begin_inset Formula $\boldsymbol{\lambda}_{s}$
+\end_inset
+
+ takes the value of this traction,
+ whereas in slip 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ takes the value of its normal component.
+ In a two-pass analysis these multipliers are halved,
+ since each pass carries half of the contact traction.
 \end_layout
 
 \begin_layout Subsubsection
@@ -55490,6 +56017,308 @@ nolink "false"
  In this way,
  the double-counting of the gap function does not unnecessarily shift the contact status,
  but augmentation is able to modify the stick-slip status if accurate enforcement of the contact constraints requires it.
+\end_layout
+
+\begin_layout Subsubsection
+Contact Release and Tension
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:SE-Contact-Release"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The return map of Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SE-Stick-Slip-Algorithm"
+nolink "false"
+
+\end_inset
+
+ selects between stick and slip,
+ but whether an integration point is in contact at all is a separate decision.
+ By default the interface is unilateral:
+ an integration point on 
+\begin_inset Formula $\gamma^{(1)}$
+\end_inset
+
+ is in contact only when the ray along 
+\begin_inset Formula $\mathbf{n}^{(1)}$
+\end_inset
+
+ intersects 
+\begin_inset Formula $\gamma^{(2)}$
+\end_inset
+
+ within the search radius,
+ and the normal contact traction is compressive.
+ This requires 
+\begin_inset Formula $\tilde{t}_{n}<0$
+\end_inset
+
+ for the trial stick traction,
+ and 
+\begin_inset Formula $t_{n}<0$
+\end_inset
+
+ in eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:slip_tn"
+nolink "false"
+
+\end_inset
+
+ or 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AL_tn"
+nolink "false"
+
+\end_inset
+
+ in slip.
+ Otherwise the integration point is released:
+ its traction 
+\begin_inset Formula $\mathbf{t}^{(1)}$
+\end_inset
+
+ is set to zero,
+ and its Lagrange multipliers 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ and 
+\begin_inset Formula $\boldsymbol{\lambda}_{s}$
+\end_inset
+
+,
+ slip direction 
+\begin_inset Formula $\mathbf{s}^{(1)}$
+\end_inset
+
+ and stick status are all reset,
+ so that no stale contact quantity is carried into subsequent iterations or time steps.
+ In effect,
+ the slip normal traction is evaluated as 
+\begin_inset Formula $t_{n}=\min\left(\lambda_{n}+\varepsilon g,0\right)$
+\end_inset
+
+,
+ with 
+\begin_inset Formula $\lambda_{n}=0$
+\end_inset
+
+ in the penalty scheme.
+ The release test is applied even while the stick-slip status is frozen following an augmentation (Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SE-Stick-Slip-Algorithm"
+nolink "false"
+
+\end_inset
+
+),
+ since freezing the stick-slip status must not freeze the contact status;
+ otherwise,
+ a point that separates during the augmentation loop would remain locked in stick and could not disengage.
+ The contact pressure reported in the output is 
+\begin_inset Formula $p=-t_{n}$
+\end_inset
+
+,
+ which is non-negative for a unilateral interface.
+\end_layout
+
+\begin_layout Standard
+When the 
+\emph on
+tension
+\emph default
+ option is selected,
+ the interface becomes bilateral:
+ tensile normal tractions (
+\begin_inset Formula $t_{n}>0$
+\end_inset
+
+) are admitted,
+ the release tests described above are skipped,
+ and 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ is not limited to compressive values during augmentation.
+ Eqs.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:slip_tn"
+nolink "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AL_tn"
+nolink "false"
+
+\end_inset
+
+ then enforce 
+\begin_inset Formula $g\to0$
+\end_inset
+
+ regardless of the sign of 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+,
+ preventing the surfaces from separating as well as from penetrating,
+ while still allowing them to slide relative to each other.
+ An integration point whose ray no longer intersects 
+\begin_inset Formula $\gamma^{(2)}$
+\end_inset
+
+ transmits no traction,
+ but its multipliers are retained.
+ The tension option cannot be combined with friction (
+\begin_inset Formula $\mu\neq0$
+\end_inset
+
+),
+ since the Coulomb slip criterion of eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:slip-criterion"
+nolink "false"
+
+\end_inset
+
+ is not meaningful for a tensile normal traction;
+ FEBio reports an error if both are requested.
+\end_layout
+
+\begin_layout Standard
+Since the stick condition requires 
+\begin_inset Formula $\left|\tilde{\mathbf{t}}^{(1)}_{T}\right|<\mu\left|\tilde{t}_{n}\right|$
+\end_inset
+
+,
+ it can never be satisfied when 
+\begin_inset Formula $\mu=0$
+\end_inset
+
+.
+ Therefore,
+ every contact point of a frictionless interface,
+ with or without the tension option,
+ is in slip,
+ and only the slip kinematics and linearizations apply.
+\end_layout
+
+\begin_layout Standard
+Finally,
+ a prescribed separation 
+\begin_inset Formula $g_{0}$
+\end_inset
+
+ between the contact surfaces may be specified with the 
+\emph on
+offset
+\emph default
+ option.
+ In that case,
+ the normal gap 
+\begin_inset Formula $g$
+\end_inset
+
+ is replaced by 
+\begin_inset Formula $g-g_{0}$
+\end_inset
+
+ in eqs.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:slip_tn"
+nolink "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AL_tn"
+nolink "false"
+
+\end_inset
+
+,
+ and the vector gap
+\begin_inset Formula $\mathbf{g}_{s}$
+\end_inset
+
+ is replaced by
+\begin_inset Formula $\mathbf{g}_{s}-g_{0}\mathbf{n}^{(1)}$
+\end_inset
+
+ in eqs.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:stick_traction"
+nolink "false"
+
+\end_inset
+
+ and
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AL_stick_traction"
+nolink "false"
+
+\end_inset
+
+,
+ so that the contact constraints are satisfied when the surfaces are separated by
+\begin_inset Formula $g_{0}$
+\end_inset
+
+ along
+\begin_inset Formula $\mathbf{n}^{(1)}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -55933,8 +56762,52 @@ literal "true"
 
 ).
  In the present formulation,
- this simplification to perfect contact is not adopted,
+ this simplification to perfect contact is not adopted for frictional contact (
+\begin_inset Formula $\mu\neq0$
+\end_inset
+
+),
  as it was determined that retaining all terms provides better convergence and stability.
+ For frictionless contact (
+\begin_inset Formula $\mu=0$
+\end_inset
+
+),
+ the simplification is adopted by default in the stiffness matrix:
+ the true contravariant basis vectors 
+\begin_inset Formula $\mathbf{g}^{\alpha}_{(i)}$
+\end_inset
+
+ are used in place of 
+\begin_inset Formula $\bar{\mathbf{g}}^{\alpha}_{(i)}$
+\end_inset
+
+,
+ and terms proportional to 
+\begin_inset Formula $g$
+\end_inset
+
+,
+ such as the last term of eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:Deta"
+nolink "false"
+
+\end_inset
+
+,
+ are omitted.
+ The residual is unaffected by this choice.
+ All terms may be retained for frictionless contact by setting the higher-order stiffness multiplier 
+\emph on
+knmult
+\emph default
+ to 1.
 \end_layout
 
 \begin_layout Standard

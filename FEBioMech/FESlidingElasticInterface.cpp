@@ -943,7 +943,9 @@ vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, co
             // assume stick and calculate the trial traction
             vec3d xo = ss.Local2Global(se, n);
             vec3d xt = ms.Local2Global(*pmep, data.m_rsp[0], data.m_rsp[1]);
-            vec3d dg = xt - xo;
+            // vector gap, measured from the prescribed offset separation
+            // (consistent with the normal gap g in ProjectSurface)
+            vec3d dg = xt - xo - nu*m_offset;
 
             t  = Lt + dg*eps;
             tn = t*nu;
@@ -977,8 +979,9 @@ vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, co
         // calculate current global position of the previous intersection point
         vec3d xt = ms.Local2Global(*pmep, data.m_rsp[0], data.m_rsp[1]);
 
-        // vector gap
-        vec3d dg = xt - xo;
+        // vector gap, measured from the prescribed offset separation
+        // (x2 = x1 + offset*nu when the stick constraint is satisfied)
+        vec3d dg = xt - xo - nu*m_offset;
 
         // calculate stick traction, normal component, shear component
         t  = Lt + dg*eps;
@@ -1007,8 +1010,9 @@ vec3d FESlidingElasticInterface::ContactTraction(FESlidingElasticSurface& ss, co
         data.m_pme = pmep;
         data.m_rs  = data.m_rsp;
 
-        // recalculate gap
-        data.m_dg = dg + nu*m_offset;
+        // store the vector gap; it is also used by UpdateContactPressures()
+        // and Augment(), so it must be the same gap that produced t
+        data.m_dg = dg;
     }
     // ------------------------------------------------------------------
     // 2b. S L I P   (this also covers first contact, where pmep == nullptr)
