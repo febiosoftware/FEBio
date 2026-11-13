@@ -66,27 +66,37 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 	// get the mesh
 	FEMesh& m = GetFEModel()->GetMesh();
 
-	// get the element this surface element belongs to
-	FEElement* pe = el.m_elem[0].pe;
-	if (pe == nullptr) return 0.0;
+	// get the element(s) this surface element belongs to
+	FEElement* pe0 = el.m_elem[0].pe;
+	FEElement* pe1 = el.m_elem[1].pe;
+	if (pe0 == nullptr) return 0.0;
 
-	// make sure the parent element has a solid (elastic or rigid) response. Besides elastic
-	// domains, this includes domains whose material has an elastic solid component without
-	// being an elastic domain (e.g., biphasic-FSI and multiphasic-FSI domains). Previously these
-	// were rejected, which returned a zero auto-penalty and effectively disabled contact.
+	// The parent element must have a solid (elastic or rigid) response.
+	// An elastic domain on either side of the facet takes precedence (this was the behavior
+	// in FEBio 4.4 and earlier). This matters when a contact facet lies on the interface between
+	// an elastic domain and a domain whose material only has a (typically very compliant) solid
+	// component, e.g. fluid-FSI, biphasic-FSI or multiphasic-FSI. In that case the auto-penalty
+	// must be based on the elastic domain, otherwise it may be many orders of magnitude too small.
+	auto isElastic = [](FEElement* pel) {
+		return (pel && dynamic_cast<FEElasticDomain*>(pel->GetMeshPartition()));
+	};
+	// Only if neither side is an elastic domain do we fall back to domains whose material has
+	// an elastic solid component without being an elastic domain (e.g., biphasic-FSI and
+	// multiphasic-FSI domains). Previously these were rejected, which returned a zero
+	// auto-penalty and effectively disabled contact.
 	auto hasSolid = [this](FEElement* pel) {
 		if (pel == nullptr) return false;
-		if (dynamic_cast<FEElasticDomain*>(pel->GetMeshPartition())) return true;
 		FEMaterial* pm = GetFEModel()->GetMaterial(pel->GetMatID());
 		if (pm == nullptr) return false;
 		if (pm->ExtractProperty<FEElasticMaterial>() == nullptr) return false;
 		return (pel->GetMaterialPoint(0) && pel->GetMaterialPoint(0)->ExtractData<FEElasticMaterialPoint>());
 	};
-	if (!hasSolid(pe))
-	{
-		if ((pe = el.m_elem[1].pe) == nullptr) return 0.0;
-		if (!hasSolid(pe)) return 0.0;
-	}
+	FEElement* pe = nullptr;
+	if      (isElastic(pe0)) pe = pe0;
+	else if (isElastic(pe1)) pe = pe1;
+	else if (hasSolid (pe0)) pe = pe0;
+	else if (hasSolid (pe1)) pe = pe1;
+	else return 0.0;
 
 	double eps = 0;
 

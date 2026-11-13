@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include "FEBioImport.h"
 
 class FEFacetSet;
+class DataRecord;
 
 //-----------------------------------------------------------------------------
 // Output Section
@@ -42,4 +43,15 @@ public:
 protected:
 	void ParseLogfile    (XMLTag& tag);
 	void ParsePlotfile   (XMLTag& tag);
+
+private:
+	DataRecord* ParseNodeData(XMLTag& tag);
+	DataRecord* ParseFaceData(XMLTag& tag);
+	DataRecord* ParseElemData(XMLTag& tag);
+	DataRecord* ParseRigidBodyData(XMLTag& tag);
+	DataRecord* ParseRigidConnectorData(XMLTag& tag);
+	DataRecord* ParseSurfaceData(XMLTag& tag);
+	DataRecord* ParseDomainData(XMLTag& tag);
+	DataRecord* ParseModelData(XMLTag& tag);
+	DataRecord* ParseDefineElementData(XMLTag& tag);
 };

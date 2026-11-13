@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/LinearSolver.h>
 #include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/CompactSymmMatrix.h>
+#include <string>
 
 //! This Pardiso solver can be installed as a shared object library from
 //!		http://www.pardiso-project.org
@@ -54,6 +55,11 @@ public:
 
 	void UseIterativeFactorization(bool b);
 
+	// true if the Panua library can be used (always true when linked at build
+	// time; when loaded at run time, the library must be found and licensed)
+	static bool IsAvailable();
+	static std::string UnavailableReason();
+
 protected:
 
 	CompactMatrix*	m_pA;
@@ -65,6 +71,7 @@ protected:
 	double m_dparm[64];
 
 	bool m_iparm3;	// use direct-iterative method
+	int  m_pivot_perturbation;	// pivot perturbation exponent: eps = 10^-m_pivot_perturbation (0 = Panua default)
 
 	// Matrix data
 	int m_n, m_nnz, m_nrhs;

@@ -52,12 +52,14 @@ public:
     // returns a pointer to a new material point object
     FEMaterialPointData* CreateMaterialPointData() override;
     
-    //! Perform integration
+    //! Perform integration of the CDF from 0 to In_1 using composite
+    //! Gauss-Legendre quadrature (history-independent)
     void Integrate(FEMaterialPoint& mp, const double In_1);
-    
+
 protected:
 	FEParamDouble   m_E;		// Young's modulus when all fibers are engaged
 	double	m_epsf;
+    double  m_dImax;            // maximum width of each quadrature segment (in units of In-1)
 
     FEDamageCDF*    m_CDF;
     

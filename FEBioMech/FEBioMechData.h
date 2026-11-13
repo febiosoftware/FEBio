@@ -1175,6 +1175,14 @@ private:
 	int	m_index = -1;
 };
 
+// Exports the elastic deformation gradient for a kinematic growth element
+class FELogKGElasticDeformationGradient : public FELogElemMat3dData
+{
+public:
+	FELogKGElasticDeformationGradient(FEModel* fem) : FELogElemMat3dData(fem) {}
+	mat3d typedValue(FEElement& el) override;
+};
+
 //=============================================================================
 // R I G I D   B O D Y    D A T A
 //=============================================================================

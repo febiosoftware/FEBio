@@ -153,7 +153,7 @@ public:
         m_print_level = 0;
         m_scaling     = PartitionScalingOff;
         m_fscaling    = FSDefault;
-        m_pivotTol    = -1.0;          // < 0 means "leave Accelerate's default alone"
+        m_pivotTol    = 0;             // < 0 means "leave Accelerate's default alone"
         m_strategy    = SSDirect;
         m_pcMaxAge    = 0;
         m_pcAge       = 0;

@@ -813,31 +813,46 @@ private:
 class FEPlotRigidBodyPosition : public FEPlotRigidBodyData
 {
 public:
-	FEPlotRigidBodyPosition(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_rt; }) {}
+	FEPlotRigidBodyPosition(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_rt; }) 
+	{
+		SetUnits(UNIT_LENGTH);
+	}
 };
 
 class FEPlotRigidBodyVelocity : public FEPlotRigidBodyData
 {
 public:
-	FEPlotRigidBodyVelocity(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_vt; }) {}
+	FEPlotRigidBodyVelocity(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_vt; }) 
+	{
+		SetUnits(UNIT_VELOCITY);
+	}
 };
 
 class FEPlotRigidBodyAcceleration : public FEPlotRigidBodyData
 {
 public:
-	FEPlotRigidBodyAcceleration(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_at; }) {}
+	FEPlotRigidBodyAcceleration(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_at; }) 
+	{
+		SetUnits(UNIT_ACCELERATION);
+	}
 };
 
 class FEPlotRigidBodyAngularVelocity : public FEPlotRigidBodyData
 {
 public:
-	FEPlotRigidBodyAngularVelocity(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_wt; }) {}
+	FEPlotRigidBodyAngularVelocity(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_wt; }) 
+	{
+		SetUnits(UNIT_ANGULAR_VELOCITY);
+	}
 };
 
 class FEPlotRigidBodyAngularAcceleration : public FEPlotRigidBodyData
 {
 public:
-	FEPlotRigidBodyAngularAcceleration(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_alt; }) {}
+	FEPlotRigidBodyAngularAcceleration(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_alt; }) 
+	{
+		SetUnits(UNIT_ANGULAR_ACCELERATION);
+	}
 };
 
 class FEPlotRigidBodyEuler : public FEPlotRigidBodyData
@@ -849,19 +864,28 @@ public:
 		q.GetEuler(e.x, e.y, e.z);
 		e *= RAD2DEG;
 		return e;
-		}) {}
+		}) 
+	{
+		SetUnits(UNIT_RADIAN);
+	}
 };
 
 class FEPlotRigidBodyForce : public FEPlotRigidBodyData
 {
 public:
-	FEPlotRigidBodyForce(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_Fr; }) {}
+	FEPlotRigidBodyForce(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_Fr; }) 
+	{
+		SetUnits(UNIT_FORCE);
+	}
 };
 
 class FEPlotRigidBodyMoment : public FEPlotRigidBodyData
 {
 public:
-	FEPlotRigidBodyMoment(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_Mr; }) {}
+	FEPlotRigidBodyMoment(FEModel* fem, FERigidBody* prb) : FEPlotRigidBodyData(fem, prb, [](const FERigidBody& rb) { return rb.m_Mr; }) 
+	{
+		SetUnits(UNIT_MOMENT);
+	}
 };
 
 
