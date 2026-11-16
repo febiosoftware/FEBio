@@ -208,12 +208,12 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 		// the first section has to be the archive
 		++tag;
 		if (tag != "Archive") return errf("FATAL ERROR: The first element must be the archive name\n");
-		char szar[256];
-		tag.value(szar);
+		std::string sar;
+		tag.value(sar);
 
 		// open the archive
 		DumpFile ar(fem);
-		if (ar.Open(szar) == false) return errf("FATAL ERROR: failed opening restart archive\n");
+		if (ar.Open(sar.c_str()) == false) return errf("FATAL ERROR: failed opening restart archive\n");
 
 		// read the archive
 		fem.Serialize(ar);

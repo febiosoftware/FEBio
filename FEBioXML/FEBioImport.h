@@ -198,9 +198,9 @@ protected:
 	void BuildFileSectionMap(int nversion);
 
 public:
-	char	m_szdmp[512];
-	char	m_szlog[512];
-	char	m_szplt[512];
+	char	m_szdmp[1024];
+	char	m_szlog[1024];
+	char	m_szplt[1024];
 
 public:
 	std::vector<DataRecord*>		m_data;

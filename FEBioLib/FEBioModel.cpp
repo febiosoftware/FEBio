@@ -66,6 +66,7 @@ SOFTWARE.*/
 #include "febio.h"
 #include "version.h"
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <fstream>
 #include <functional>
@@ -762,6 +763,14 @@ string removeNewLines(const char* sz)
 //-----------------------------------------------------------------------------
 void FEBioModel::Log(int ntag, const char* szmsg)
 {
+	// This function can be called from several threads at once (e.g. a material
+	// that issues a warning from inside an OpenMP-parallel stress update). The log
+	// file, its output stream, the IO timer, and the report string are not thread-safe,
+	// so serialize all access here. (A recursive mutex is used in case logging ever
+	// calls back into Log.)
+	static std::recursive_mutex logMutex;
+	std::lock_guard<std::recursive_mutex> lock(logMutex);
+
 	TimerTracker t(&m_IOTimer);
 
 	if      (ntag == 0) m_log.printf(szmsg);

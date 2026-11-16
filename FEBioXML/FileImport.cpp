@@ -1479,7 +1479,7 @@ bool FEFileImport::Open(const char* szfile, const char* szmode)
 	m_fp = fopen(szfile, szmode);
 	if (m_fp == 0) return false;
 
-	strcpy(m_szfile, szfile);
+	snprintf(m_szfile, sizeof(m_szfile), "%s", szfile);
 
 	return true;
 }

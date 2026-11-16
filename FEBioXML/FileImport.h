@@ -241,9 +241,9 @@ protected:
 
 protected:
 	FILE*	m_fp;			//!< file pointer
-	char	m_szfile[256];	//!< file name
+	char	m_szfile[1024];	//!< file name
 	char	m_szerr[256];	//!< error message
-	char	m_szpath[512];	//!< file path
+	char	m_szpath[1024];	//!< file path
 
 protected:
 	FEFileSectionMap	m_map;

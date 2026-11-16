@@ -31,7 +31,7 @@ namespace febio {
 //! This structures stores the command line options that were input by the user
 struct FEBIOLIB_API CMDOPTIONS
 {
-	enum { MAXFILE = 512 };
+	enum { MAXFILE = 1024 };
 
 	int		ndebug;			//!< debug flag
 

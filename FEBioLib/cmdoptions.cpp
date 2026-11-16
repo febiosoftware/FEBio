@@ -58,6 +58,31 @@ std::vector< std::string > split_string(const std::string& s)
 	return args;
 }
 
+// Copy a string into a fixed-size buffer. Reports an error if the string does not fit,
+// instead of overflowing the buffer.
+static bool copyString(char* dst, size_t size, const std::string& src)
+{
+	if (src.size() >= size)
+	{
+		fprintf(stderr, "FATAL ERROR: file name is too long (%d characters; maximum is %d):\n%s\n", (int)src.size(), (int)size - 1, src.c_str());
+		dst[0] = 0;
+		return false;
+	}
+	memcpy(dst, src.c_str(), src.size() + 1);
+	return true;
+}
+
+// Remove the extension from a file name. Only a '.' in the file name itself counts,
+// not one in a directory name (e.g. "/path/2. Model/file.feb").
+static std::string removeExtension(const std::string& file)
+{
+	size_t dot = file.rfind('.');
+	size_t slash = file.find_last_of("/\\");
+	if ((dot != std::string::npos) && ((slash == std::string::npos) || (dot > slash)))
+		return file.substr(0, dot);
+	return file;
+}
+
 bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 {
 	// split the string
@@ -102,8 +127,8 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 		if (strcmp(sz, "-r") == 0)
 		{
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-r is incompatible with other command line option.\n"); return false; }
-			strcpy(ops.sztask, "restart");
-			strcpy(ops.szctrl, args[++i].c_str());
+			copyString(ops.sztask, sizeof(ops.sztask), "restart");
+			copyString(ops.szctrl, sizeof(ops.szctrl), args[++i].c_str());
 			ops.binteractive = false;
 		}
 		else if (strcmp(sz, "-noappend") == 0)
@@ -113,14 +138,14 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 		else if (strcmp(sz, "-d") == 0)
 		{
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-d is incompatible with other command line option.\n"); return false; }
-			strcpy(ops.sztask, "diagnose");
-			strcpy(ops.szctrl, args[++i].c_str());
+			copyString(ops.sztask, sizeof(ops.sztask), "diagnose");
+			copyString(ops.szctrl, sizeof(ops.szctrl), args[++i].c_str());
 			ops.binteractive = false;
 		}
 		else if (strcmp(sz, "-p") == 0)
 		{
 			bplt = true;
-			strcpy(ops.szplt, args[++i].c_str());
+			copyString(ops.szplt, sizeof(ops.szplt), args[++i].c_str());
 		}
 		else if (strncmp(sz, "-dump", 5) == 0)
 		{
@@ -138,7 +163,7 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 				if (szi[0] != '-')
 				{
 					// assume this is the name of the dump file
-					strcpy(ops.szdmp, args[++i].c_str());
+					copyString(ops.szdmp, sizeof(ops.szdmp), args[++i].c_str());
 					bdmp = true;
 				}
 			}
@@ -146,25 +171,26 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 		else if (strcmp(sz, "-o") == 0)
 		{
 			blog = true;
-			strcpy(ops.szlog, args[++i].c_str());
+			copyString(ops.szlog, sizeof(ops.szlog), args[++i].c_str());
 		}
 		else if (strcmp(sz, "-i") == 0)
 		{
-			++i;
+			if (i >= nargs - 1) { fprintf(stderr, "FATAL ERROR: missing file name after -i\n"); return false; }
+			sz = args[++i].c_str();
 			const char* szext = strrchr(sz, '.');
 			if (szext == 0)
 			{
 				// we assume a default extension of .feb if none is provided
 				snprintf(ops.szfile, sizeof(ops.szfile), "%s.feb", sz);
 			}
-			else strcpy(ops.szfile, sz);
+			else if (!copyString(ops.szfile, sizeof(ops.szfile), sz)) return false;
 			ops.binteractive = false;
 		}
 		else if (strcmp(sz, "-s") == 0)
 		{
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-s is incompatible with other command line option.\n"); return false; }
-			strcpy(ops.sztask, "optimize");
-			strcpy(ops.szctrl, args[++i].c_str());
+			copyString(ops.sztask, sizeof(ops.sztask), "optimize");
+			copyString(ops.szctrl, sizeof(ops.szctrl), args[++i].c_str());
 		}
 		else if ((strcmp(sz, "-g") == 0) || (strcmp(sz, "-g1") == 0))
 		{
@@ -186,11 +212,11 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 		}
 		else if (strcmp(sz, "-cnf") == 0)	// obsolete: use -config instead
 		{
-			strcpy(ops.szcnf, args[++i].c_str());
+			copyString(ops.szcnf, sizeof(ops.szcnf), args[++i].c_str());
 		}
 		else if (strcmp(sz, "-config") == 0)
 		{
-			strcpy(ops.szcnf, args[++i].c_str());
+			copyString(ops.szcnf, sizeof(ops.szcnf), args[++i].c_str());
 		}
 		else if (strcmp(sz, "-noconfig") == 0)
 		{
@@ -199,7 +225,7 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 		else if (strncmp(sz, "-task", 5) == 0)
 		{
 			if (sz[5] != '=') { fprintf(stderr, "command line error when parsing task\n"); return false; }
-			strcpy(ops.sztask, sz + 6);
+			copyString(ops.sztask, sizeof(ops.sztask), sz + 6);
 
 			if (i < nargs - 1)
 			{
@@ -207,13 +233,13 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 				if (szi[0] != '-')
 				{
 					// assume this is a control file for the specified task
-					strcpy(ops.szctrl, args[++i].c_str());
+					copyString(ops.szctrl, sizeof(ops.szctrl), args[++i].c_str());
 				}
 			}
 		}
 		else if (strcmp(sz, "-import") == 0)
 		{
-			strcpy(ops.szimp, args[++i].c_str());
+			copyString(ops.szimp, sizeof(ops.szimp), args[++i].c_str());
 		}
 		else if (sz[0] == '-')
 		{
@@ -233,7 +259,7 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 				}
 				else
 				{
-					strcpy(ops.szfile, sz);
+					if (!copyString(ops.szfile, sizeof(ops.szfile), sz)) return false;
 				}
 				ops.binteractive = false;
 			}
@@ -257,38 +283,21 @@ bool febio::ProcessOptionsString(const std::string& s, CMDOPTIONS& ops)
 	}
 
 	// if no task is defined, we assume a std solve is wanted
-	if (ops.sztask[0] == 0) strcpy(ops.sztask, "solve");
+	if (ops.sztask[0] == 0) copyString(ops.sztask, sizeof(ops.sztask), "solve");
 
 	// derive the other filenames
-	if (ops.szfile[0])
+	// NOTE: std::string is used here so that long file paths are not truncated
+	// (or overflow a fixed-size buffer).
+	if (ops.szfile[0] || ops.szctrl[0])
 	{
-		char szbase[256]; strcpy(szbase, ops.szfile);
-		char* ch = strrchr(szbase, '.');
-		if (ch) *ch = 0;
+		std::string sbase = removeExtension(ops.szfile[0] ? ops.szfile : ops.szctrl);
 
-		char szlogbase[256];
-		if (ops.szctrl[0])
-		{
-			strcpy(szlogbase, ops.szctrl);
-			ch = strrchr(szlogbase, '.');
-			if (ch) *ch = 0;
-		}
-		else strcpy(szlogbase, szbase);
+		std::string slogbase = sbase;
+		if (ops.szfile[0] && ops.szctrl[0]) slogbase = removeExtension(ops.szctrl);
 
-		if (!blog) snprintf(ops.szlog, sizeof(ops.szlog), "%s.log", szlogbase);
-		if (!bplt) snprintf(ops.szplt, sizeof(ops.szplt), "%s.xplt", szbase);
-		if (!bdmp) snprintf(ops.szdmp, sizeof(ops.szdmp), "%s.dmp", szbase);
-	}
-	else if (ops.szctrl[0])
-	{
-		char szbase[256]; strcpy(szbase, ops.szfile);
-		strcpy(szbase, ops.szctrl);
-		char* ch = strrchr(szbase, '.');
-		if (ch) *ch = 0;
-
-		if (!blog) snprintf(ops.szlog, sizeof(ops.szlog), "%s.log", szbase);
-		if (!bplt) snprintf(ops.szplt, sizeof(ops.szplt), "%s.xplt", szbase);
-		if (!bdmp) snprintf(ops.szdmp, sizeof(ops.szdmp), "%s.dmp", szbase);
+		if (!blog && !copyString(ops.szlog, sizeof(ops.szlog), slogbase + ".log")) return false;
+		if (!bplt && !copyString(ops.szplt, sizeof(ops.szplt), sbase + ".xplt")) return false;
+		if (!bdmp && !copyString(ops.szdmp, sizeof(ops.szdmp), sbase + ".dmp")) return false;
 	}
 
 	return true;

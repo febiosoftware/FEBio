@@ -313,7 +313,7 @@ bool FEBioImport::Load(FEModel& fem, const char* szfile)
 	m_data.clear();
 
 	// extract the path
-	strcpy(m_szpath, szfile);
+	snprintf(m_szpath, sizeof(m_szpath), "%s", szfile);
 	char* ch = strrchr(m_szpath, '\\');
 	if (ch==0) ch = strrchr(m_szpath, '/');
 	if (ch==0) m_szpath[0] = 0; else *(ch+1)=0;
