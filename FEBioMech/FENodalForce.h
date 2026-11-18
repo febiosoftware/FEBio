@@ -28,6 +28,7 @@ SOFTWARE.*/
 
 #pragma once
 #include <FECore/FENodalLoad.h>
+#include <FECore/FEModelParam.h>
 #include "febiomech_api.h"
 
 //-----------------------------------------------------------------------------

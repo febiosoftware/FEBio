@@ -50,7 +50,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FEModelLoad.h>
 #include <FECore/FEAnalysis.h>
-#include <FECore/FENodalLoad.h>
+#include <FECore/FENodalDOFLoad.h>
 #include <FECore/FEBoundaryCondition.h>
 #include <FECore/FENLConstraint.h>
 #include <FECore/FELinearConstraintManager.h>

@@ -23,15 +23,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #include "stdafx.h"
 #include "FENodalLoad.h"
 #include "FENodeSet.h"
-#include "DumpStream.h"
 #include "FENode.h"
-#include "FEMaterialPoint.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FENodalLoad, FEModelLoad)
@@ -148,80 +144,4 @@ void FENodalLoad::LoadVector(FEGlobalVector& R)
 void FENodalLoad::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Nothing to do here.
-}
-
-//-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FENodalDOFLoad, FENodalLoad)
-	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list)");
-	ADD_PARAMETER(m_scale, "scale")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
-END_FECORE_CLASS();
-
-//-----------------------------------------------------------------------------
-FENodalDOFLoad::FENodalDOFLoad(FEModel* fem) : FENodalLoad(fem)
-{
-	m_dof = -1;
-	m_scale = 0.0;
-
-	m_dtscale = false;
-}
-
-//-----------------------------------------------------------------------------
-void FENodalDOFLoad::SetDtScale(bool b)
-{
-	m_dtscale = b;
-}
-
-//-----------------------------------------------------------------------------
-void FENodalDOFLoad::SetLoad(double s)
-{
-	m_scale = s;
-}
-
-//-----------------------------------------------------------------------------
-bool FENodalDOFLoad::SetDofList(FEDofList& dofList)
-{
-	return dofList.AddDof(m_dof);
-}
-
-//-----------------------------------------------------------------------------
-//! Return the current value of the nodal load
-void FENodalDOFLoad::GetNodalValues(int n, std::vector<double>& val)
-{
-	assert(val.size() == 1);
-	const FENodeSet& nset = *GetNodeSet();
-	int nid = nset[n];
-	const FENode& node = *nset.Node(n);
-
-	FEMaterialPoint mp;
-	mp.m_r0 = node.m_r0;
-	mp.m_index = n;
-
-	val[0] = m_scale(mp);
-
-	if (m_dtscale)
-	{
-		double dt = GetTimeInfo().timeIncrement;
-		val[0] *= dt;
-	}
-}
-
-double FENodalDOFLoad::NodeValue(int n)
-{
-	const FENodeSet& nset = *GetNodeSet();
-	int nid = nset[n];
-	const FENode& node = *nset.Node(n);
-
-	FEMaterialPoint mp;
-	mp.m_r0 = node.m_r0;
-	mp.m_index = n;
-
-	double val = m_scale(mp);
-
-	if (m_dtscale)
-	{
-		double dt = GetTimeInfo().timeIncrement;
-		val *= dt;
-	}
-
-	return val;
 }

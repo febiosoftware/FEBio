@@ -44,7 +44,7 @@ SOFTWARE.*/
 #include <FECore/sys.h>
 #include <FECore/FEModel.h>
 #include <FECore/FEModelLoad.h>
-#include <FECore/FENodalLoad.h>
+#include <FECore/FENodalDOFLoad.h>
 #include <FECore/FEAnalysis.h>
 #include <FECore/FEBoundaryCondition.h>
 #include <FECore/FENLConstraint.h>

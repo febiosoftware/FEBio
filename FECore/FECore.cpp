@@ -30,7 +30,7 @@ SOFTWARE.*/
 #include "FECore.h"
 #include "FECoreKernel.h"
 #include "FEPrescribedDOF.h"
-#include "FENodalLoad.h"
+#include "FENodalDOFLoad.h"
 #include "FEFixedBC.h"
 #include "FELinearConstraint.h"
 #include "FEInitialCondition.h"

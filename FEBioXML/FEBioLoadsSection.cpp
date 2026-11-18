@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FECoreKernel.h>
 #include <FECore/FENodalLoad.h>
+#include <FECore/FENodalDOFLoad.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEEdge.h>

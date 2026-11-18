@@ -32,6 +32,7 @@ SOFTWARE.*/
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEEdgeLoad.h>
 #include <FECore/FEEdge.h>
+#include <FECore/FEModelParam.h>
 
 void FEBioLoadsSection4::Parse(XMLTag& tag)
 {

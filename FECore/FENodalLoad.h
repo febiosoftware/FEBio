@@ -23,19 +23,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-
-
-
 #pragma once
 #include "FEModelLoad.h"
-#include "FENodeDataMap.h"
 #include "FEDofList.h"
-#include "FEModelParam.h"
-
-//-----------------------------------------------------------------------------
+#include <vector>
 class FENodeSet;
 
-//-----------------------------------------------------------------------------
 //! Nodal load boundary condition
 class FECORE_API FENodalLoad : public FEModelLoad
 {
@@ -84,39 +77,7 @@ protected:
 	FEDofList	m_dofs;
 	FENodeSet*	m_nodeSet;
 	bool		m_brelative;
-	vector<vector<double> >	m_rval;
-
-	DECLARE_FECORE_CLASS();
-};
-
-//-----------------------------------------------------------------------------
-// Class for prescribing the "load" on a degree of freedom.
-class FECORE_API FENodalDOFLoad : public FENodalLoad
-{
-public:
-	FENodalDOFLoad(FEModel* fem);
-
-	//! Set the DOF list
-	bool SetDofList(FEDofList& dofList) override;
-
-	//! get/set degree of freedom
-	void SetDOF(int ndof) { m_dof = ndof; }
-	int GetDOF() const { return m_dof; }
-
-	//! get/set load 
-	void SetLoad(double s);
-
-	void GetNodalValues(int n, std::vector<double>& val) override;
-
-	double NodeValue(int n);
-
-	void SetDtScale(bool b);
-
-private:
-	int				m_dof;		//!< degree of freedom index
-	FEParamDouble	m_scale;	//!< applied load scale factor
-
-	bool m_dtscale;
+	std::vector<std::vector<double>>	m_rval;
 
 	DECLARE_FECORE_CLASS();
 };
