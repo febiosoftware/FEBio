@@ -31,8 +31,9 @@ SOFTWARE.*/
 #include "MathObject.h"
 #include <vector>
 #include <string>
+#include "fecore_api.h"
 
-class FEMathController : public FELoadController
+class FECORE_API FEMathController : public FELoadController
 {
 public:
 	FEMathController(FEModel* fem);
